@@ -1,0 +1,33 @@
+/**
+ * \defgroup kvalobsdb  kvalobs database interface and helper classes.
+ *
+ */
+
+/**
+ * \defgroup dbinterface Interface classes to the kvalobs database.
+ * \ingroup kvalobsdb
+ */	
+
+ /**
+  * \defgroup dbutility database utility.
+  * \ingroup kvalobsdb
+  */		
+
+ /**
+  * \defgroup kvqueries Common queries used in kvalobs.
+  * \ingroup dbutility
+  */		
+
+
+/**
+ * \defgroup kvinternalhelpers Common classes used in the kvalobs server.
+ * \ingroup kvalobsdb
+ */	
+/**
+ * \namespace kvalobs
+ *
+ * \brief The namespace the kvalobs Interface and helper classes to
+ *        the database is in.
+ */
+
+

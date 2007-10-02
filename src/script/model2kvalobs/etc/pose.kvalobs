@@ -1,0 +1,15 @@
+* Sample setup file for pose
+
+DATA.IN  = #2
+FILE.TYPE= metdat
+MODEL.NAME="20"
+
+PARAMETER.DEFINITION.FILE="etc/parameters.kvalobs"
+OUTPUT.FILE=#3
+
+NORWEGIAN.CHARACTERS
+LOWERCASE.NAMES
+REMOVE.SUFFIXES
+SUFFIX.TAG="%"
+
+* The end

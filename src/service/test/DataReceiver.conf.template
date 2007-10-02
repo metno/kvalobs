@@ -1,0 +1,16 @@
+#This is configuration file is used for kvcpp/test
+
+datadir="/home/borgem/projects/kvalobs/kvalobs-1-0-dataflytfix/src/service/test/data"
+
+#loglevel and tracelevel: FATAL, ERROR, WARN, INFO, DEBUG
+#defult loglevel=INFO og tracelevel=DEBUG
+loglevel=INFO
+tracelevel=DEBUG
+
+corba{
+   #CORBA nameserver to be used.
+   nameserver="corbans"
+   
+   #Which kvalobs servers shall we send observations to.
+   path=("kv-glacier")
+}		

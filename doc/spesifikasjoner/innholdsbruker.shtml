@@ -1,0 +1,104 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+               "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+
+    <!--#include file="header.shtml" -->
+
+  <p>	
+
+<h1>Sekvensiell beskrivelse av gangen gjennom Kvalobs</h1>
+
+<ol>
+<li>Inndata<br>
+	<ul>
+	<li>Utvalgte lister blir sendt fra Norcom</li>
+	<li>Alle meldinger blir sendt fra AutoObs</li>
+	<li>Alle meldinger blir sendt fra ComObs</li>
+	<li>Etterregistrerte meldinger</li>
+	<li>Beregninger fra HIRLAM blir sendt hver 12. time og lagres i tabellen <i>model_data</i></li>
+	<li>Metadata blir oppdatert ved endringer,<br>
+	og lagres i tabellene <i>station, obs_pgm, station_param og checks</i>.</li>
+	</ul><br>&nbsp;</li>
+
+<li>Gjenkjenning<br>
+	Meldingene blir dekodet hvis stasjonsidentifikasjonen finnes i tabellen <i>station</i> ved en av
+	<ul>
+	<li>Nasjonalt stasjonsnummer</li>
+	<li>WMO-nummer</li>
+	<li>Kallesignal</li>
+	<li>ICAO-identifikator</li>
+	</ul>
+	<br>
+	I tilfellet <i>typeid</i>=11, SHIP-melding blir tabellen <i>station</i> oppdatert hvis kallesignalet 
+	ikke forekommer fra f&oslash;r.<br>
+	
+	Andre meldinger med ukjent stasjonsidentifikasjon blir lagt i tabellen <i>rejectdecode</i>.<br>
+        Meldinger med urimelig tidsinformasjon blir ogs&aring; lagt i tabellen <i>rejectdecode</i> for manuell inspeksjon.<br>&nbsp;</li>
+	
+<li>Dekoding<br>
+	Observasjonene blir lagt i tabellen <i>data</i> og p&aring;f&oslash;rt tilleggsopplysninger.<br>
+	Observasjoner i form av tekster blir tilsvarende lagt i tabellen <i>text_data</i>.
+	<ul>
+	<li><i>data.typeid</i> meldingstypenummer</li>
+	<li><i>data.tbtime</i>, tiden for n&aring;r observasjonen ble lagt i databasen</li>
+	<li><i>data.useinfo(7)</i>, forsinkelse som angir at en toleransegrense er overskredet for differansen 
+        mellom observasjonsterminen og tbtime. Toleransegrensen er en grense for varsling.</li>
+	</ul><br>&nbsp;</li>
+
+<li>Kontroll<br>
+	Observasjonene blir kontrollert fortl&oslash;pende hvis
+	<ul>
+	<li>Kombinasjonen av stasjonsnummer <i>stationid</i> og parameter <i>paramid</i> finnes i tabellen obs_pgm;</li>
+	<li>Observasjonen har <i>typeid</i>=11, SHIP-melding.</li>
+	</ul><br>&nbsp;</li>
+
+<li>Parameterisering av kontrollene<br>
+	Kontrollenes innhold er fordelt mellom de tre tabellene <i>algorithms</i>, <i>checks</i> og <i>station_param</i>.<br>
+	<ul>
+	<li>Tabellen <i>algorithms</i> inneholder algoritmene kodet i perl<br>
+	og en <i>signature</i>, en liste over algoritmens parametere slik algoritmen blir eksekvert.<br></li>
+	<li>Tabellen <i>checks</i> inneholder
+		<ul>
+		<li><i>checks.qcx</i>, navnet p&aring; sjekken</li>
+		<li><i>checks.checkname</i>, hvilken algoritme som skal kj&oslash;re</li>
+		<li><i>checks.checksignature</i>, en liste over algoritmens parametere, hvilke observasjoner som skal kontrolleres og hvilke 
+		observasjoner eller modelldata som er referanseinformasjon (avgrenset til tidsintervall, stasjonsliste, typeid, m.m.).
+			<ul>
+			<li>Antallet parametere m&aring; stemme overens med <i>algorithms.signature</i></li>
+			<li>Deler av parameternavnene m&aring; stemme overens med <i>param.name</i></li>
+			<li>Deler av parameternavnene m&aring; stemme overens med oppf&oslash;ringen i <i>station_param.metadata</i></li>
+			</ul></li>
+		<li><i>checks.stationid</i>, hvilken stasjon sjekken gjelder, verdien 0 betyr at sjekken gjelder alle stasjoner</li>
+		<li><i>checks.medium_qcx</i>, hvilket segment av controlinfo som skal oppdateres (via hjelpetabellen <i>qcx_info</i>)</li>
+		<li><i>checks.active</i>, ved hvilke tidspunkt sjekken skal kj&oslash;re, verdien * * * * * betyr "alltid"</li>
+		</ul>
+	<br></li>
+	<li>Tabellen <i>station_param</i> inneholder sjekkenes detaljerte parameterverdier<br>
+	Betegnelsene i <i>station_param.metadata</i> m&aring; stemme overens med <i>checks.checksignature</i></li>
+	</ul><br>&nbsp;</li>
+
+<li>Resultatet av kontrollene<br>
+	I tabellen <i>data</i> blir <i>data.controlinfo</i> og <i>data.useinfo</i> oppdatert etter hver sjekk.<br>
+	Eventuelle endringer av observasjonen blir lagret i <i>data.corrected</i><br>&nbsp;</li>
+	
+<li>Manglende observasjoner<br>
+	Klokken 00:30 og hver time deretter kj&oslash;rer en rutine for komplettering av tidsserier i forhold til 
+	foreg&aring;ende observasjonstermin.<br>
+	Hvis kombinasjonen av stasjonsnummer, parameter, time og ukedag finnes i tabellen <i>obs_pgm</i> blir det 
+	lagt til en post i tabellen <i>data</i> og kontrollene blir kj&oslash;rt som om en ny melding var kommet inn.<br>
+	Ett resultat kan v&aelig;re at en modellverdi blir satt inn i <i>data.corrected</i> med tilh&oslash;rende 
+	flagging av <i>data.controlinfo</i> og <i>data.useinfo</i>.<br>&nbsp;</li>
+	
+<li>Utdata<br>
+	Kvalobstabellenes innhold er tilgjengelig gjennom CORBA-grensesnittet. SYNOP-enkoderen, Klimadatabasen, og 
+	KRO mottar poster fra tabellen data etter hver kontrollkj&oslash;ring.<br>&nbsp;</li>
+</ol>
+<hr>
+<p>&nbsp;</p>
+
+
+Last modified: Fri Apr 29 13:04:00 GMT 2005
+<!-- hhmts end -->
+  </body>
+</html>

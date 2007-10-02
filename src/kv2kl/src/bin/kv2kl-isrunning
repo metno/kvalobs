@@ -1,0 +1,45 @@
+#! /bin/sh
+
+KVDIR=$KVALOBS
+
+NAME=
+
+if [ "$#" -gt 0 ]; then
+	NAME=$1
+fi
+
+PIDFILE="$KVDIR/var/run/kv2kl.pid"
+
+if [ "$NAME" ]; then
+	PIDFILE="$KVDIR/var/run/kv2kl-$NAME.pid"
+fi
+
+if [ ! -f "$PIDFILE" ]; then
+	echo "kv2kl is not running!"
+	exit 1
+fi
+
+PID=$(cat $PIDFILE)
+
+if [ "$?" -ne "0" ]; then
+	echo "Cant read pid from file: $PIDFILE"
+	echo "kv2kl is not running????"
+	exit 1
+fi
+
+kill -0 $PID
+
+EXTRA=" "
+
+if [ "$NAME" ]; then
+	EXTRA=" ($NAME) "
+fi
+
+
+if [ "$?" -eq "0" ]; then
+	echo "kv2kl$EXTRAis running!"
+	exit 0
+fi
+
+echo "kv2kl$EXTRAis not running!"
+exit 1

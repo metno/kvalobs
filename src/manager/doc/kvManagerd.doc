@@ -1,0 +1,34 @@
+/**
+ \page kvmanagerd kvManagerd
+
+ \section kvman_1 Overview 
+
+ The \em kvManagerd module is responsible for the data and control
+ flow in the system. It receive signals from the \em kvDataInputd when
+ new observations data is ready in the database. It sends a signal to
+ \em kvQabased when data is scheduled for QA control. When the QA
+ control is completed it receives a signal from \em kvQabased. A
+ signal is now sendt to \em kvServiced to notify that new observation
+ is ready for use. It also runs a timely check on the data in the
+ database searching for completly missing observations. 
+
+The first action that
+ is taken on new observations is a check for missing values. The  
+ expected observations values that shall be delivered for a given time
+ resides in the database.
+ this check it lookup the 
+ stationid/typeid in the table \em obs_pgm. Entries for missing data
+ fields is added to the observation. The value is set to -32768. After
+ this check \em kvQabased is signaled that there is new observations
+ to run the QA test on. \em kvQabased has signal back to \em
+ kvManagerd when the QA checks has completed. \em kvManagerd send now
+ a signal to \em kvServiced to notify that new observations is ready
+ to use.
+
+ The \em kvManagerd is also responsible to find observations that is
+ totally missing. This check is run once every hour at HH:30. When we
+ find observations that is totally missing, dummy data is generated
+ for this observation. The data value is set to -32768. And a the flag
+ XXX is set to. 
+
+*/

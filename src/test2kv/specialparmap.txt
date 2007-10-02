@@ -1,0 +1,30 @@
+V1     V1   0   0
+V2     V1   1   0
+V3     V1   2   0
+Q0     QO   0   0  
+S      SS   0   0
+ST     OT   0   0
+TJM10  TJM 10   0
+TJM20  TJM 20   0
+TJM50  TJM 50   0
+W1     W    0   0
+W2     W    1   0
+V4     V4   0   0   
+V5     V4   1   0
+V6     V4   2   0
+V7     V4   3   0
+<TYPEN>
+V4   V4 0  -19
+V5   V4 1  -19
+V6   V4 2  -19
+V7   V4 0  -13
+V8   V4 1  -13
+V9   V4 2  -13
+V10  V4 0   0
+V11  V4 1   0
+V12  V4 2   0
+
+
+
+
+

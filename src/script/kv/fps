@@ -1,0 +1,116 @@
+#! /usr/bin/perl -w
+
+use strict;
+
+if($#ARGV<0){
+  print("\n  Bruk:\n\n    fps [-n] programnavn\n\n");
+  print("\n    -e eksakt match av programnavn.\n");
+  print("      -n angir at programmet ikke skal skrive noe til\n");
+  print("         skjermen. Bare sette exit status.\n");
+  print("         0 - programmet finnes ikke i prosesstabellen\n");
+  print("         1 - programmet finnes i prosesstabellen\n\n");
+  exit(1);
+}
+
+
+
+my $n=0;
+my @output=`ps -ef`;
+my $line;
+my @entry;
+my @cmd;
+my $prog;
+my $progname;
+my $doprint=1;
+my $exact=0;
+my $firstline;
+my $linecpy;
+my $hack;
+my $option;
+
+foreach $option (@ARGV){
+  if($option eq "-n"){
+    $doprint=0;
+  }elsif($option eq "-e"){
+    $exact=1;
+  }
+}
+
+
+$progname=$ARGV[$#ARGV];
+
+#printf("programname=$progname\n");
+#printf("doprint=$doprint\n");
+#printf("exact=$exact\n\n");
+
+
+
+$firstline=shift(@output);
+
+foreach  $line (@output){
+  if($line=~/perl .*fps +/){
+    next;
+  }
+
+  $linecpy=$line;
+  $line=~s/^ *//;
+  @entry=split(/ +/, $line);
+
+  if($#entry >= 7){
+    $hack=$entry[4];
+
+    #print("hack <$hack>\n");
+
+    if($hack=~/[A-za-z]$/){
+      @cmd=split('/', $entry[8]);
+    }else{
+      @cmd=split('/', $entry[7]);
+    }
+
+    $prog=$cmd[$#cmd];
+    #  print("$prog\n");
+
+    if($exact){
+      if($prog=~/^$progname$/){
+	if($n==0){
+	  if($doprint){
+	    print("$firstline");
+	  }
+	}
+
+	$n++;
+	if($doprint){
+	  print("$linecpy");
+	}
+      }
+    }else{
+      if($prog=~/$progname/){
+	if($n==0){
+	  if($doprint){
+	    print("$firstline");
+	  }
+	}
+	
+	$n++;
+	if($doprint){
+	    print("$linecpy");
+	  }
+      }
+    }
+  }
+}
+
+if($n==0){
+  if($doprint){
+    print("Programmet <$progname> kjører ikke!\n\n");
+  }
+  
+#  print("Exit 1!\n\n");
+
+  exit(1);
+}
+
+# print("Exit 0!\n\n");
+
+
+exit(0);

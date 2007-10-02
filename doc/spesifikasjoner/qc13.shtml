@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+               "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+
+  <!--#include file="header.shtml"-->
+
+  <p>	
+
+    <h1>QC1-3 STEP CHECK</h1>
+
+
+<p>&nbsp;</p>
+<p><b>Gabriel Kielland</b>
+<p>&nbsp;</p>
+<p>
+Controlling that the observation has a reasonable time development untill the time of observation.
+<p>
+There are three different checks
+<ol>
+<li>Step check;
+<li>Check on frozen value;
+<li>Dip check.
+</ol>
+Only meteorological parameters with continuous observation values is controlled.
+
+<p>
+In the step check comparison between the present values and the previous one results in 
+an error flag when the difference exceeds the parameter specific threshold.
+<p>
+In the check on frozen value error flags is attributed when the observation value is 
+repeated in excess of the number of times specified for the parameter.
+<p>
+The dip check is the QC2d-1 check. The error flag is attributed when the difference between 
+the present values and the previous one plus the difference between the present values and the 
+next one exceeds the parameter specific threshold.
+<p>
+Working examples: 
+<ol>
+<li>Whenever a wind speed value is controlled, the latest prior value available observed during 
+the previous 120 minutes (scaleable) is considered for step comparison. If the difference between the present and the prior 
+value exceedes 40 m/s (scaleable) both values are flagged. 
+<li>Whenever a wind speed value is controlled, all prior values available observed during 
+the previous 900 minutes (scaleable) is considered for frozen value comparison. If there are less than 
+5 values (scaleable) available the control aborts. If the variation between the 5 latest values is 
+less than 0.01 m/s the present value is flagged.
+</ol>
+
+<p>&nbsp;</p>
+
+<p>
+Last modified: Fri Dec  3 16:59:00 GMT 2004
+<!-- hhmts end -->
+  </body>
+</html>
+

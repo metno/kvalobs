@@ -1,0 +1,14 @@
+# This is a MANUALLY generated file
+
+prefix=PREFIX
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: decodeutility
+Description: Decoding utilities for kvalobs
+Version: 1.0
+Requires: libxml++-1.0
+Conflicts:
+Libs: -L${libdir} -ldecodeutility -L$(BOOST_HOME)/lib/ -lboost_thread -lboost_regex -L$(KVDIR)/lib -lkvalobs -ldb -lfileutil -ldl -ldnmithread -lcorbahelper -lcorba_skel -lmiutil -lmiconfparser -lmilog
+Cflags: -I${includedir}/ -I${includedir}/kvskel/

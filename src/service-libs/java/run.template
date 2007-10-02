@@ -1,0 +1,31 @@
+#!/bin/sh
+ 
+#Hvilken JWM skal brukes
+: ${JRE_HOME:="/disk1/lib/java/jre"}
+ 
+#Hvor ligger jacorb sine kjøre filer antlr-2.7.2.jar,
+#concurrent-1.3.2.jar,jacorb.jar, avalon-framework-4.1.5.jar og logkit-1.2.jar
+#Dette er stien til hvor du pakket ut jacaorb-2.3.tar.gz
+: ${JACORB_HOME:="/disk1/lib/jacorb"}
+
+
+#Hvor ligger kvalobs java biblioteket.
+KVALOBSJAR=/sti/til/kvalobsclt.jar
+
+
+### Skal ikke være nødvendig og endre noe av det under.
+export JACORB_HOME
+ 
+CLASSPATH=${KVALOBSJAR}:${CLASSPATH}
+
+export CLASSPATH
+
+: ${JVM_FLAGS:=""}
+ 
+# call java interpreter
+exec ${JRE_HOME}/bin/java ${JVM_FLAGS} \
+    -Djava.endorsed.dirs=${JACORB_HOME}/lib -classpath ${JACORB_HOME}/lib/jacorb.jar:${JACORB_HOME}/lib/logkit-1.2.jar:${JACORB_HOME}/lib/avalon-framework-4.1.5.jar:${JACORB_HOME}/lib/concurrent-1.3.2.jar:${JACORB_HOME}/lib/antlr-2.7.2.jar:${CLASSPATH} \
+    -Djacorb.home=${JACORB_HOME} \
+    -Dorg.omg.CORBA.ORBClass=org.jacorb.orb.ORB \
+    -Dorg.omg.CORBA.ORBSingletonClass=org.jacorb.orb.ORBSingleton \
+    "$@"

@@ -1,0 +1,112 @@
+Mandag 11/6-07
+Tilstede: Pål Sannes, Øystein Lie, Bjørn Nordin, Børge Moe, Vegard Bønes,
+Paul Eglitis, Knut Johansen, Lars Andresen, Per-Ove Kjensli (referent)
+
+Discussion of items in the "TODO-liste", specially with respect to the start
+of QC2-development, but also to select items to be in focus on short term.
+
+Paul is going to start QC2-ROM development. It deals with distribution of
+accumulated precipitation to RR_24 values, Spatial QC and interpolation. Dip
+test for hourly data is waiting to be solved.
+
+Generally: QC2 should be made as a separate daemon, to avoid interactions
+with Qabase.
+
+There may be several implications to the Kvalobs system from QC2, to be
+handled during development.
+
+ITEMS WITH HIGH PRIORITY as starting tasks for Paul and Bjørn (reference to
+TODO-priority number): 
+
+   2. Observations from Manual Weather Stations (MWS) (typeid=1,306,308) may
+be rejected during decoding - and the data are stored in rejectdecode table.
+A warning (email?) should be given to IT-operators to initiate resending of
+data from the observer. (Paul, Bjørn)
+
+   4. Handling and flags of highly suspicious data, for very important data.
+Priority elements are temperature and precipitation. Lars and Paul will make
+a specification (covering the user needs): Important to reject highly
+suspicious data, and to trig a checking action at VA (Metdiv) in near real
+time. A specification of flag-criteria for trigging. Implementation of a
+warning system and handling reactions at VA. (Paul, Lars, Bjørn)
+
+NEW ITEMS for the TODO-list:
+
+ 6. Decoding of new SMS-formats, 20 and 42. Øystein sends specification of
+SMS-42 to Børge. To be implemented soon. (Børge)
+
+ 5. The program "smsedit" should take care of all MWS (SMS formats) like
+(306?),308. The purpose is to be able to resend observations as original
+data into Kvalobs - looking at SMS-files and rejectdecode table. It works
+well for 302. Reference to item 20 "Messages with error in time stamp".
+Reference to email from Obsdiv, Margareth Moe. (Vegard)
+
+ 7. Enhancement of Kvalobs Log. The log should cover several days, and the
+source code in the log should be removed. the log should be placed on a
+separate partition. (Børge)
+
+**** Service routines for the SMS-servers. Is the routines OK today, do the
+operators get the necessary warnings? Quite often we have delays in
+dataflow, input, to Kvalobs. (Øystein, Ola)
+
+OBS_PGM related items (11,16,23):
+
+We have agreed on several enhancements of the obs_pgm table, although there
+are discussions about topics linked to the function of the table. We need an
+summary of the discussion so far. (Pål)
+
+We agreed on these actions:
+
+  11. Add a Boolean column in obs_pgm like "local_obstime", true for typeid
+402. Adjust the "fill in missing data function" to use this information to
+set summer/winter observation time (UTC) according to dates of time-shift
+(dates stored in a separate table). Also to be used in QC2. Column should be
+added as soon as possible. (Børge) To be implemented in the missing data
+function before October - specification (Pål, Bjørn), Implementation (?).
+
+  16. Add a date column in obs_pgm "to_time", to take care of history in
+observation program. To be used in QC2. Column should be added as soon as
+possible. (Børge) 
+Adjust the "fill in missing data function" to use this information to avoid
+garbage in the data table. As soon as possible. (Børge)
+
+  23. Add a Boolean column like "unreliable", to take care of
+pre-disqualification of observations. The column should be updated
+automatically from STINFOSYS by metadata updates in near real time. Should
+be operated by Helpdesk. Cooperation with the STINFOSYS-project. (Pål,
+Terje)
+
+
+OTHER COMMENTS AND ACTIONS:
+
+   1. Update of single elements should not cause update by missing values of
+other elements. To be solved soon. (Børge, Vegard)
+
+   9. Need to check out impacts (if any) of QC2-ROM when correcting
+aggregated values. 
+
+  12. 9999-data from AWS. Proposal: To store 9999-data as original values,
+and use the flag fmis. Specification needs to be worked out. (Pål, Lars)
+
+18, 20, 25. Need to save observations that are updated by reinput of
+original data. Specification work to be done: How should we use, or draw
+attention to, the backup data? Just in case we get suspicious, or more
+objective criteria? (?,?).
+
+  29. The communication between Qabase and the scripts should be extended to
+take care of details about related elements. Discussion about the test
+QC1-2-100: do we need more details from this routine? Further discussions
+and also status about the complex routine QC1-2-100. (Bjørn, Øystein, Lars)
+
+13, 30. Autoobs and Comobs decoder should be separated decoders to give more
+flexible software. This may also affect the decoding problem of elements
+like snow depth and snow cover (?). "No snow on ground" is represented in
+different ways in the dataflow formats, including "empty elements". Perhaps
+the decoders should use the obs_pgm to know if the value should be presented
+like "-1" or not. Check out status of today (Per-Ove, Bjørn, Lars) and
+eventually specify what to be done.
+
+  17. Backup-delete monthly routine. Kvalobs - Histkvalobs.
+The monthly delete routine in Kvalobs should delete the complete month as
+soon as it is transferred to backup files and imported into Histkvalobs. To
+avoid available duplicate data. To be solved soon. (Børge)

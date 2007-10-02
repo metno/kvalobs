@@ -1,0 +1,19 @@
+#!/bin/sh
+
+DESTINATION=
+DIRECTORIES="bin var/log var/norcom2kv var/run etc"
+FILES=
+
+
+THISTOP=`pwd`
+
+if [ -f "norcom2kv" ]; then
+    mkdir -p bin
+    cp -fuv norcom2kv bin
+else
+    echo "BUILD FIRST: `pwd`"
+    exit 0
+fi
+
+. $KVDIR/conf/INSTALL.conf
+

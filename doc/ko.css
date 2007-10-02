@@ -1,0 +1,82 @@
+BODY {
+	font-family: palatino, times, serif;
+	font-style:  normal;
+	font-size: 10pt;
+	text-align: justify;
+	margin-left: 2%;
+	margin-right: 2%;
+}
+
+
+
+
+
+
+
+BLOCKQUOTE.command {
+	font-family: "lucida typewriter", courier, monospace;
+	text-align: left;
+}
+
+H1 {	
+	font-weight: bold;
+	font-size: 18pt;
+}
+
+H1 EM {
+	font-weight: normal;
+	fonst-style: italic;
+}
+
+H1.header {
+	font-size: 14pt;
+	color: green;
+	font-weight: normal;
+}
+
+H2 {	
+	font-size: medium;
+	color: green; 
+	text-transform: uppercase;
+}
+
+H4 {
+	font-size: small;
+	font-weight: bold;
+	font-style: normal;
+}
+
+H5 {
+	font-size: small;
+	font-weight: normal;
+	font-style: italic;
+}
+
+OL {
+	text-align: justify;
+	list-style-position: outside;
+	margin-right: 7%;
+	margin-top: 1em;
+	margin-bottom: 1em;
+}
+
+UL {
+	list-style-position: outside;
+	margin-right: 7%;
+	margin-top: 1em;
+	margin-bottom: 1em;
+}
+
+UL.ragged {
+	text-align: left;
+}
+
+UL UL {
+	margin-top: 0em;
+	margin-bottom: 0em;
+}
+
+
+
+
+

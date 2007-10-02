@@ -1,0 +1,1081 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Kvalobs climatological consistency</title>
+  <style>
+<!--
+@page { margin: 2.5cm }
+P { margin-bottom: 0cm; color: #000000; text-align: left; widows: 0; orphans: 0 }
+P.western { font-family: "Times New Roman", serif; font-size: 14pt; so-language: en-AU; font-weight: bold }
+P.cjk { font-family: "Times New Roman", serif; font-size: 14pt; font-weight: bold }
+H1 { margin-top: 0cm; margin-bottom: 0cm; color: #000000; widows: 2; orphans: 2; text-decoration: underline }
+H1.western { font-family: "Times New Roman", serif; font-size: 12pt; so-language: nb-NO; font-weight: medium }
+H1.cjk { font-family: "Times New Roman", serif; font-size: 12pt; font-weight: medium }
+H1.ctl { font-family: "Arial Unicode MS"; font-size: 12pt; font-weight: medium }
+H2 { margin-top: 0cm; margin-bottom: 0cm; color: #000000; widows: 2; orphans: 2 }
+H2.western { font-family: "Times New Roman", serif; font-size: 12pt; so-language: nb-NO }
+H2.cjk { font-family: "Times New Roman", serif; font-size: 12pt }
+H2.ctl { font-family: "Arial Unicode MS"; font-size: 12pt; font-weight: medium }
+H3 { margin-left: 1.25cm; text-indent: -1.25cm; margin-top: 0cm; margin-bottom: 0cm; color: #000000; widows: 2; orphans: 2; text-decoration: underline }
+H3.western { font-family: "Times New Roman", serif; font-size: 12pt; so-language: en-US; font-weight: medium }
+H3.cjk { font-family: "Times New Roman", serif; font-size: 12pt; font-weight: medium }
+H3.ctl { font-family: "Arial Unicode MS"; font-size: 12pt; font-weight: medium }
+H4 { margin-top: 0cm; margin-bottom: 0cm; color: #000000; widows: 0; orphans: 0 }
+H4.western { font-family: "Times New Roman", serif; so-language: en-AU }
+H4.cjk { font-family: "Times New Roman", serif }
+H4.ctl { font-family: "Arial Unicode MS"; font-size: 12pt; font-weight: medium }
+-->
+  </style>
+</head>
+<body>
+<h1 class="western"><br>
+</h1>
+<p
+ style="margin-left: 1.25cm; text-indent: -1.25cm; widows: 2; orphans: 2;"
+ align="left">
+<br>
+</p>
+<h1 class="western"
+ style="text-decoration: none; page-break-before: always; text-align: center;">
+<b>QC1-6: Probable consistency - climatological relationship between
+parameters<br>
+</b></h1>
+<p style="widows: 2; orphans: 2; text-align: left;"><br>
+</p>
+<p style="widows: 2; orphans: 2; text-align: left;" lang="en-GB"> <font
+ size="3">The numbering is based on the following succession of
+meteorological elements:</font></p>
+<p style="widows: 2; orphans: 2; text-align: left;"> <font size="3">Temperature
+(211-230),
+temperature/weather (231-270), wind/weather/waves/state of the sea
+(271-300), precipitation/snow/state of the ground (301-310),
+visibility/weather codes (311-320) and cloud/weather codes (321-330).<br>
+<br>
+</font></p>
+<font size="3">The information is considered to be suspect.
+Climatological inconsistency is flagged whenever an expression in the
+table below is
+satisfied.<br>
+</font>
+<br>
+<p style="widows: 2; orphans: 2;" align="left" lang="en-US"> <br>
+</p>
+<h2 class="western"
+ style="text-align: center; text-decoration: underline;" lang="en-GB">Temperature</h2>
+<br>
+<table style="width: 90%; text-align: left;" border="1" cellpadding="2"
+ cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Check
+id</span></td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Implementation</span></td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Description</span></td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Source</span></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-211<br>
+      </td>
+      <td style="vertical-align: top;"><font size="3">TAN_12 &lt;
+Min(TA_12h) &#8211; 15</font></td>
+      <td style="vertical-align: top;"><font size="3">T<sub>n</sub>T<sub>n</sub>T<sub>n</sub>
+&lt; min(TTT_12h) &#8211; 15</font><font size="3">&deg;</font></font></td>
+      <td style="vertical-align: top;"><font size="3">DNMI</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-212</td>
+      <td style="vertical-align: top;"><font size="3">TAN_12(06)
+&lt; Min(TA(06)_12h) &#8211; 9</font></td>
+      <td style="vertical-align: top;"><font size="3">T<sub>n</sub>T<sub>n</sub>T<sub>n</sub>(06)
+&lt;
+min(TTT(06)_12h) &#8211; 9</font><font size="3">&deg;</font></font></td>
+      <td style="vertical-align: top;"><font size="3">DNMI</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-213</td>
+      <td style="vertical-align: top;"><font size="3">TAN_12(06) &lt;
+TA(06) &#8211; 10</font></td>
+      <td style="vertical-align: top;"><font size="3">T<sub>n</sub>T<sub>n</sub>T<sub>n</sub>(06)
+&lt; TTT(06) &#8211; 10</font><font size="3">&deg;</font></font></td>
+      <td style="vertical-align: top;"><font size="3">DNMI</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-214_215</td>
+      <td style="vertical-align: top;"><font size="3">TAN_12(18) &lt; TA(06) &#8211; 5<br>
+                                       TAN_12(18) &lt; 5&deg;C &amp; TAN_12(18) &lt; Min(TA(18)_12h) &#8211; 4<br>
+                                       TAN_12(18) &#8805; 5&deg;C &amp; TAN_12(18) &lt; Min(TA(18)_12h) &#8211; 2</font></td>
+      <td style="vertical-align: top;"><font size="3"> T<sub>n</sub>T<sub>n</sub>T<sub>n</sub>(18)
+&lt; TTT(06) &#8211; 5</font><font size="3">&deg;<br>
+                             T<sub>n</sub>T<sub>n</sub>T<sub>n</sub>(18) &lt; min(TTT(18)_12h) &#8211; 4&deg;<br>
+                             T<sub>n</sub>T<sub>n</sub>T<sub>n</sub>(18) &lt; min(TTT(18)_12h) &#8211; 2&deg;</font></td>
+      <td style="vertical-align: top;"><font size="3">DNMI</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-216</td>
+      <td style="vertical-align: top;"><font size="3">TAX_12 &gt;
+Max(TA_12h) + 15</font></td>
+      <td style="vertical-align: top;"><font size="3">T<sub>x</sub>T<sub>x</sub>T<sub>x</sub>
+&gt;
+max(TTT_12h) + 15</font><font size="3">&deg;</font></font></td>
+      <td style="vertical-align: top;"><font size="3">DNMI</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-217</td>
+      <td style="vertical-align: top;"><font size="3">TAX_12(06) &gt;
+Max(TA(06)_12h) + 3</font></td>
+      <td style="vertical-align: top;"><font size="3">T<sub>x</sub>T<sub>x</sub>T<sub>x</sub>(06)
+&gt; max(TTT(06)_12h) + 3</font><font size="3">&deg;</font></font></td>
+      <td style="vertical-align: top;"><font size="3">DNMI</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-decoration:line-through">QC1-6-218</td>
+      <td style="vertical-align: top; text-decoration:line-through">TAX_12(06) &gt; TA(06) + 5</td>
+      <td style="vertical-align: top; text-decoration:line-through">T<sub>x</sub>T<sub>x</sub>T<sub>x</sub>(06)
+&gt; TTT(06) +5&deg;</td>
+      <td style="vertical-align: top; text-decoration:line-through">DNMI</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-decoration:line-through">QC1-6-219</td>
+      <td style="vertical-align: top; text-decoration:line-through">TAX_12(18) &gt; TA(18) + 5</td>
+      <td style="vertical-align: top; text-decoration:line-through">T<sub>x</sub>T<sub>x</sub>T<sub>x</sub>(18)
+&gt; TTT(18) +5&deg;</td>
+      <td style="vertical-align: top; text-decoration:line-through">DNMI</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-220</td>
+      <td style="vertical-align: top;"><font size="3">TAX_12(18) &gt;
+TA(12) + 5</font></td>
+      <td style="vertical-align: top;"><font size="3">T<sub>x</sub>T<sub>x</sub>T<sub>x</sub>(18)
+&gt; TTT(12) +5</font><font size="3">&deg;</font></font></td>
+      <td style="vertical-align: top;"><font size="3">DNMI</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-221</td>
+      <td style="vertical-align: top;"><font size="3">TAX_12(18) &lt;
+12&deg;C &amp; TAX_12(18) &gt; Max(TA(18)_12h) + 3<br>
+      TAX_12(18) &#8805; 12&deg;C &amp; TAX_12(18) &gt; Max(TA(18)_12h) + 5</font><br>
+      </td>
+      <td style="vertical-align: top;"><font size="3">T<sub>x</sub>T<sub>x</sub>T<sub>x</sub>(18)
+&gt; max(TTT(18)_12h) +3</font><font size="3">&deg;<br>
+      </font></font><font size="3">T<sub>x</sub>T<sub>x</sub>T<sub>x</sub>(18)
+&gt;
+max(TTT(18)_12h) +5</font><font size="3">&deg;</font></font></td>
+      <td style="vertical-align: top;"><font size="3">DNMI</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-224</td>
+      <td style="vertical-align: top;"><font size="3">TGN_12 &gt; TAN_12</font></td>
+      <td style="vertical-align: top;"><font size="3">T<sub>g</sub>T<sub>g</sub>T<sub>g</sub>
+&gt; T<sub>n</sub>T<sub>n</sub>T<sub>n</sub></font></td>
+      <td style="vertical-align: top;"><font size="3">DNMI</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-226</td>
+      <td style="vertical-align: top;"><font size="3">TD &lt; TA &#8211; 20</font></td>
+      <td style="vertical-align: top;"><font size="3">T<sub>d</sub>T<sub>d</sub>T<sub>d</sub>
+&lt; TTT &#8211; 20</font><font size="3">&deg;</font></font></td>
+      <td style="vertical-align: top;"><font size="3">SMHI</font></td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+<h2 class="western"
+ style="text-align: center; text-decoration: underline;" lang="en-US">Temperature/weather</h2>
+<br>
+<table style="width: 90%; text-align: left;" border="1" cellpadding="2"
+ cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Check
+id</span></td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Implementation</span></td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Description</span></td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Source</span></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-231</td>
+      <td style="vertical-align: top;"><font size="3">NN &gt; 7 &amp;
+TGN_12 &lt; TAN_12 &#8211; 10</font></td>
+      <td style="vertical-align: top;"><font size="3">T<sub>g</sub>T<sub>g</sub>T<sub>g</sub>
+&lt; TTT &#8211; 10</font><font size="3">&deg;</font></font></td>
+      <td style="vertical-align: top;">DNMI<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-232</td>
+      <td style="vertical-align: top;"><font size="3">NN &#8805;</font> 7 &amp; TGN_12
+&lt; TAN_12 &#8211; 5</font></td>
+      <td style="vertical-align: top;"><font size="3">T<sub>g</sub>T<sub>g</sub>T<sub>g</sub>
+&lt; TTT &#8211; 5</font><font size="3">&deg;</font></font></td>
+      <td style="vertical-align: top;">DNMI<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-233</td>
+      <td style="vertical-align: top;"><font size="3">TA &gt; 5 &amp;
+70 &#8804; </font>WW &#8804; 79<br>
+      </font><font size="3">TA &gt; 5 &amp; 85 &#8804; </font>WW &#8804; 88</font><br>
+      </td>
+      <td style="vertical-align: top;"><font size="3">TTT&gt; +5<span
+ lang="en-US">&deg;</span>C &amp; 70&#8804;ww&#8804;79<br>
+      </font><font size="3">TTT&gt; +5&deg;C &amp; 85&#8804;ww&#8804;88</font><br>
+      </td>
+      <td style="vertical-align: top;"><font size="3">WMO</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-234</td>
+      <td style="vertical-align: top;"><font size="3">TA &gt; 3 &amp;
+(V1=snow || V2=snow || V3=snow)</font></td>
+      <td style="vertical-align: top;"><font size="3">TTT&gt; +3&deg;</font>C
+&amp; V1/2/3=snow</font></td>
+      <td style="vertical-align: top;">DNMI<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-235</td>
+      <td style="vertical-align: top;"><font size="3">TAN_12 &gt; 2
+&amp; </font><font size="3">(V1=snow || V2=snow || V3=snow)</font></td>
+      <td style="vertical-align: top;"><font size="3">T<sub>n</sub>T<sub>n</sub>T<sub>n</sub>
+&gt; +2&deg;</font>C &amp; V1/2/3=snow</font></td>
+      <td style="vertical-align: top;">DNMI</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-236</td>
+      <td style="vertical-align: top;"><font size="3">TA &lt; -2 &amp;
+50 &#8804; </font>WW &#8804;
+      </font>55<br>
+      </font><font size="3">TA &lt; -2 &amp; 58 &#8804; WW &#8804; 65<br>
+      </font><font size="3">TA &lt; -2 &amp; 80 &#8804; WW &#8804; 82</font><br>
+      </td>
+      <td style="vertical-align: top;"><font size="3">TTT&lt; -2&deg;C &amp; 50&#8804;ww&#8804;55<br>
+      </font><font size="3">TTT&lt; -2&deg;C &amp; 58&#8804;ww&#8804;65<br>
+      </font><font size="3">TTT&lt; -2&deg;C &amp; 80&#8804;ww&#8804;82</font><br>
+      </td>
+      <td style="vertical-align: top;">WMO<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-237</td>
+      <td style="vertical-align: top;"><font size="3">TAX_12 &lt; 0.5
+&amp; (V1</font><font size="3">=drizzle,rain || </font><font size="3">V2</font><font
+ size="3">=drizzle,rain || </font><font size="3">V3=drizzle,rain)</font></td>
+      <td style="vertical-align: top;"><font size="3">T<sub>x</sub>T<sub>x</sub>T<sub>x</sub>
+&lt; +0.5&deg;C &amp; V1/2/3=drizzle,
+rain</font></td>
+      <td style="vertical-align: top;">DNMI<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-238</td>
+      <td style="vertical-align: top;"><font size="3">TA &lt; 0 &amp;
+(V1</font><font size="3">=rain ||</font><font size="3"> V2</font><font
+ size="3">=rain || </font><font size="3">V3=rain)</font></td>
+      <td style="vertical-align: top;"><font size="3">TTT&lt; 0&deg;<span lang="en-US">C &amp; V1/2/3=rain</span></font></td>
+      <td style="vertical-align: top;">DNMI</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-239_242</td>
+      <td style="vertical-align: top;"><font size="3">(TA &gt; 12 || TA &lt; -5) &amp;
+68 &#8804; WW &#8804; 69<br>
+      </font><font size="3">(TA &gt; 12 || TA &lt; -5) &amp; 83 &#8804; WW &#8804; 84</font><br>
+      </td>
+      <td style="vertical-align: top;"><font size="3">TTT&gt; +12 &deg;C &amp; 68&#8804;ww&#8804;69<br>
+TTT&lt; -5&deg;C &amp; 68&#8804;ww&#8804;69<br>      
+TTT&gt; +12&deg;C &amp; 83&#8804;ww&#8804;84<br>
+TA &lt; -5 &amp; 83 &#8804; WW &#8804; 84</font><br>
+      </td>
+      <td style="vertical-align: top;"><font size="3">WMO</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-240_243</td>
+      <td style="vertical-align: top;"><font size="3">TA &gt; 5 &amp;
+(V1</font><font size="3">=sleet || </font><font size="3">V2</font><font
+ size="3">=sleet || </font><font size="3">V3=sleet)<br>
+      </font><font size="3">TA &lt;
+-1 &amp; </font><font size="3">(V1</font><font size="3">=sleet || </font><font
+ size="3">V2</font><font size="3">=sleet || </font><font size="3">V3=sleet)</font><br>
+      </td>
+      <td style="vertical-align: top;"><font size="3">TTT&gt; +5&deg;C &amp; V1/2/3=sleet<br>
+      </font><font size="3">TTT&lt; -1&deg;C
+&amp; V1/2/3=sleet</font><br>
+      </td>
+      <td style="vertical-align: top;">DNMI</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-241</td>
+      <td style="vertical-align: top;"><font size="3">TAN_12 &gt;
+5 &amp;</font><font size="3"> (V1</font><font size="3">=sleet || </font><font
+ size="3">V2</font><font size="3">=sleet || </font><font size="3">V3=sleet)</font></td>
+      <td style="vertical-align: top;"><font size="3">T<sub>n</sub>T<sub>n</sub>T<sub>n</sub>
+&gt; +5&deg;C &amp; V1/2/3=sleet</font></td>
+      <td style="vertical-align: top;">DNMI</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-244</td>
+      <td style="vertical-align: top;"><font size="3">TAN_12 &lt; -2
+&amp;</font><font size="3"> (V1</font><font size="3">=sleet || </font><font
+ size="3">V2</font><font size="3">=sleet
+|| </font><font size="3">V3=sleet)</font></td>
+      <td style="vertical-align: top;"><font size="3"><span lang="en-US">T<sub>x</sub>T<sub>x</sub>T<sub>x</sub>
+&lt; -2&deg;C &amp;
+V1/2/3=sleet</span></font></td>
+      <td style="vertical-align: top;">DNMI</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-245_246</td>
+      <td style="vertical-align: top;"><font size="3">TA &gt;
+3 &amp; 56 &#8804; WW &#8804; 57<br>
+      </font><font size="3">TA &gt; 3 &amp; 66 &#8804; WW &#8804; 67<br>
+      </font><font size="3">TA &gt; 0 &amp; 56 &#8804; WW &#8804; 57<br>
+      </font><font size="3">TA &gt; 0 &amp; 66 &#8804; WW &#8804; 67</font><br>
+      </td>
+      <td style="vertical-align: top;"><font size="3">TTT&gt; +3&deg;C &amp; 66&#8804;ww&#8804;67<br>
+      </font><font size="3">TTT&gt; +3&deg;C &amp; 66&#8804;ww&#8804;67</font><br>
+      <font size="3">TTT&gt; 0<span lang="en-US">&deg;</span>C &amp; 56&#8804;ww&#8804;57</font><br>
+      <font size="3">TTT&gt; 0&deg;C &amp; 66&#8804;ww&#8804;67</font><br>
+      </td>
+      <td style="vertical-align: top;">WMO<br>
+      <br>
+SMHI<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-247_248</td>
+      <td style="vertical-align: top;"><font size="3">TA &lt; -10 &amp; 56 &#8804; WW &#8804; 57<br>
+      </font><font size="3">TA &lt; -10 &amp; 66 &#8804; WW &#8804; 67</font><br>
+      <font size="3">TA &lt; -7 &amp; 56 &#8804; WW &#8804; 57</font><br>
+      <font size="3">TA &lt; -7 &amp; 66 &#8804; WW &#8804; 67</font><br>
+      </td>
+      <td style="vertical-align: top;"><font size="3">TTT&lt; -10&deg;C &amp; 56&#8804;ww&#8804;5<br>
+      </font><font size="3">TTT&lt; -10&deg;C &amp; 66&#8804;ww&#8804;67</font><br>
+      <font size="3">TTT&lt; -7&deg;C &amp; 56&#8804;ww&#8804;57</font><br>
+      <font size="3">TTT&lt; -7&deg;C &amp; 66&#8804;ww&#8804;67</font><br>
+      </td>
+      <td style="vertical-align: top;">WMO<br>
+      <br>
+SMHI<br>
+      <br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-249</td>
+      <td style="vertical-align: top;"><font size="3">TA &gt; 3 &amp; 48 &#8804; WW &#8804; 49</font></td>
+      <td style="vertical-align: top;"><font size="3">TTT&gt; +3<span
+ lang="en-US">&deg;</span>C &amp; 48&#8804;ww&#8804;4</font></td>
+      <td style="vertical-align: top;">WMO</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-250</td>
+      <td style="vertical-align: top;"><font size="3">TA - TD &gt; 5 &amp; 40 &#8804; WW &#8804; 49</font></td>
+      <td style="vertical-align: top;"><font size="3">TTT-T<sub>d</sub>T<sub>d</sub>T<sub>d</sub>&gt;5&deg;C &amp; 40&#8804;ww&#8804;49</font></td>
+      <td style="vertical-align: top;">WMO<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-251</td>
+      <td style="vertical-align: top;"><font size="3">TA &gt; 20.0 &amp; WW &#8712; [36,39]</font></td>
+      <td style="vertical-align: top;"><font size="3">TTT &gt;</font><font
+ size="3"><span lang="en-GB">20&deg;C</span></font><font
+ size="3"> &amp; ww&#8712;[36,39]</font></td>
+      <td style="vertical-align: top;">WMO</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-252</td>
+      <td style="vertical-align: top;"><font size="3">TA &gt; </font><font
+ size="3">20.0</font><font size="3"> &amp; WW &#8712; [48,49]</font></td>
+      <td style="vertical-align: top;"><font size="3">TTT &gt;</font><font
+ size="3"><span lang="en-GB">20&deg;C</span></font><font
+ size="3"> &amp; ww&#8712;</font><font
+ size="3">[48,49]</font></td>
+      <td style="vertical-align: top;">WMO</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-253</td>
+      <td style="vertical-align: top;"><font size="3">TA &gt; </font><font
+ size="3">20.0</font><font size="3"> &amp; WW &#8712; [56,57]</font></td>
+      <td style="vertical-align: top;"><font size="3">TTT &gt;</font><font
+ size="3"><span lang="en-GB">20&deg;C</span></font><font
+ size="3"> &amp; ww&#8712;</font></font><font
+ size="3">[56,57]</font></td>
+      <td style="vertical-align: top;">WMO</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-254</td>
+      <td style="vertical-align: top;"><font size="3">TA &gt; </font><font
+ size="3">20.0</font><font size="3"> &amp; WW &#8712; [66,67]</font></td>
+      <td style="vertical-align: top;"><font size="3">TTT &gt;</font><font
+ size="3"><span lang="en-GB">20&deg;C</span></font><font
+ size="3"> &amp; ww&#8712;</font></font><font
+ size="3">[66,67]</font></td>
+      <td style="vertical-align: top;">WMO</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-255</td>
+      <td style="vertical-align: top;"><font size="3">TA &gt; </font><font
+ size="3">20.0</font><font size="3"> &amp; WW &#8712; [68,69]</font></td>
+      <td style="vertical-align: top;"><font size="3">TTT &gt;</font><font
+ size="3"><span lang="en-GB">20&deg;C</span></font><font
+ size="3"> &amp; ww&#8712;</font></font><font
+ size="3">[68,69]</font></td>
+      <td style="vertical-align: top;">WMO</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-256</td>
+      <td style="vertical-align: top;"><font size="3">TA &gt; </font><font
+ size="3">20.0</font><font size="3"> &amp; WW &#8712; [70,75]</font></td>
+      <td style="vertical-align: top;"><font size="3">TTT &gt;</font><font
+ size="3"><span lang="en-GB">20&deg;C</span></font><font
+ size="3"> &amp; ww&#8712;</font></font><font
+ size="3">[70,75]</font></td>
+      <td style="vertical-align: top;">WMO</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-257</td>
+      <td style="vertical-align: top;"><font size="3">TA &gt; </font><font
+ size="3">20.0</font><font size="3"> &amp; WW &#8712; [76,79]</font></td>
+      <td style="vertical-align: top;"><font size="3">TTT &gt;</font><font
+ size="3"><span lang="en-GB">20&deg;C</span></font><font
+ size="3"> &amp; ww&#8712;</font></font><font
+ size="3">[76,79]</font></td>
+      <td style="vertical-align: top;">WMO</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-258</td>
+      <td style="vertical-align: top;"><font size="3">TA &gt; </font><font
+ size="3">20.0</font><font size="3"> &amp; WW &#8712; [83,86]</font></td>
+      <td style="vertical-align: top;"><font size="3">TTT &gt;</font><font
+ size="3"><span lang="en-GB">20&deg;C</span></font><font
+ size="3"> &amp; ww&#8712;</font></font><font
+ size="3">[83,86]</font></td>
+      <td style="vertical-align: top;">WMO</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-259</td>
+      <td style="vertical-align: top;"><font size="3">TA &gt; </font><font
+ size="3">25</font><font size="3">.0</font><font size="3"> &amp;</font><font
+ size="3"> IS &#8800;null</font></td>
+      <td style="vertical-align: top;"><font size="3">TTT &gt;</font><font
+ size="3"><span lang="en-GB"> 25&deg;C</span></font><font
+ size="3"> &amp; Is &#8800; null</font></td>
+      <td style="vertical-align: top;">WMO</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-260</td>
+      <td style="vertical-align: top;"><font size="3">TA &gt; </font><font
+ size="3">25</font><font size="3">.0</font><font size="3"> &amp;</font><font
+ size="3"><span lang="de-DE"> ES &#8800;null</span></font></td>
+      <td style="vertical-align: top;"><font size="3">TTT &gt;</font><font
+ size="3"><span lang="en-GB"> 25&deg;C</span></font><font
+ size="3"><span lang="de-DE"> &amp; Es &#8800;null</span></font></td>
+      <td style="vertical-align: top;">WMO</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-261</td>
+      <td style="vertical-align: top;"><font size="3">TA &gt; </font><font
+ size="3">25</font><font size="3">.0</font><font size="3"> &amp;</font><font
+ size="3"><span lang="de-DE"> RS &#8800;null</span></font></td>
+      <td style="vertical-align: top;"><font size="3">TTT &gt;</font><font
+ size="3"><span lang="en-GB"> 25&deg;C</span></font><font
+ size="3"><span lang="de-DE"> &amp; Rs &#8800;null</span></font></td>
+      <td style="vertical-align: top;">WMO</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-262</td>
+      <td style="vertical-align: top;"><font size="3">TA &gt; </font><font
+ size="3">25</font><font size="3">.0</font><font size="3"> &amp;</font><font
+ size="3"> CI &#8800; null</font></td>
+      <td style="vertical-align: top;"><font size="3">TTT &gt;</font><font
+ size="3"><span lang="en-GB"> 25&deg;C</span></font><font
+ size="3"> &amp; ci <span lang="en-US">&#8800;</span>
+null</font></td>
+      <td style="vertical-align: top;">WMO</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-263</td>
+      <td style="vertical-align: top;"><font size="3">TA &gt; </font><font
+ size="3">25</font><font size="3">.0</font><font size="3"> &amp;</font><font
+ size="3"> SI &#8800; null</font></td>
+      <td style="vertical-align: top;"><font size="3">TTT &gt;</font><font
+ size="3"><span lang="en-GB"> 25&deg;C</span></font><font
+ size="3"> &amp; Si <span lang="en-US">&#8800;</span>
+null</font></td>
+      <td style="vertical-align: top;">WMO</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-264</td>
+      <td style="vertical-align: top;"><font size="3">TA &gt; </font><font
+ size="3">25</font><font size="3">.0</font><font size="3"> &amp;</font><font
+ size="3"> BI &#8800; null</font></td>
+      <td style="vertical-align: top;"><font size="3">TTT &gt;</font><font
+ size="3"><span lang="en-GB"> 25&deg;C</span></font><font
+ size="3"> &amp; bi <span lang="en-US">&#8800;</span>
+null</font></td>
+      <td style="vertical-align: top;">WMO</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-265</td>
+      <td style="vertical-align: top;"><font size="3">TA &gt; </font><font
+ size="3">25</font><font size="3">.0</font><font size="3"> &amp; </font><font
+ size="3">DI &#8800; null<br>
+      </font></font></td>
+      <td style="vertical-align: top;"><font size="3">TTT &gt;</font><font
+ size="3"><span lang="en-GB"> 25&deg;C</span></font><font
+ size="3"> &amp; Di <span lang="en-US">&#8800;</span>
+null</font></td>
+      <td style="vertical-align: top;">WMO</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-266</td>
+      <td style="vertical-align: top;"><font size="3">TA &gt; </font><font
+ size="3">25</font><font size="3">.0</font><font size="3"> &amp;</font><font
+ size="3">
+ZI &#8800; null</font></td>
+      <td style="vertical-align: top;"><font size="3">TTT &gt;</font><font
+ size="3"><span lang="en-GB"> 25&deg;C</span></font><font
+ size="3">
+&amp; zi &#8800; null</font></td>
+      <td style="vertical-align: top;">WMO</td>
+    </tr>
+  </tbody>
+</table>
+<p style="widows: 2; orphans: 2; text-align: left;"><br>
+<font size="3"><span lang="en-GB"></span></font></p>
+<br>
+<h1 class="western" style="text-align: center;" lang="en-US"><big>Wind/waves</big></h1>
+<p style="widows: 2; orphans: 2; text-align: left;"><font size="3"><span
+ lang="en-US"></span></font></p>
+<table style="width: 90%; text-align: left;" border="1" cellpadding="2"
+ cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Check
+id</span></td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Implementation</span></td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Description</span></td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Source</span></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-271</td>
+      <td style="vertical-align: top;">FX - Max(FF_6h) &gt; 5<br>
+      </td>
+      <td style="vertical-align: top;"><font size="3"><span lang="en-US">f<sub>x</sub>f<sub>x</sub></span></font><font
+ size="3"><span lang="en-US"> - max(ff_6h)&gt;5-10 m/s</span></font></td>
+      <td style="vertical-align: top;">DNMI<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-271.A</td>
+      <td style="vertical-align: top;">FX_6 - Max(FF_6h) &gt; 5</td>
+      <td style="vertical-align: top;"><font size="3"><span lang="en-US">f<sub>x</sub>f<sub>x</sub></span></font><font
+ size="3"><span lang="en-US"> - max(ff_6h)&gt;5-10 m/s</span></font></td>
+      <td style="vertical-align: top;">DNMI</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-272</td>
+      <td style="vertical-align: top;"><font size="3"><span lang="en-US">FG
+&gt; 6.5 &amp; FG &gt; 2 * FX</span></font></td>
+      <td style="vertical-align: top;"><font size="3"><span lang="en-US">f<sub>g</sub>f<sub>g</sub>
+&gt;
+6.5
+m/s &amp; f<sub>g</sub>f<sub>g</sub> &gt; 2f<sub>x</sub>f<sub>x</sub>
+or
+3f<sub>x</sub>f<sub>x</sub></span></font></td>
+      <td style="vertical-align: top;">DNMI</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-273</td>
+      <td style="vertical-align: top;"><font size="3">(WW = 37 || WW =
+39) &amp; FF &lt; 10 </font></td>
+      <td style="vertical-align: top;"><font size="3"> ww=37, 39 &amp;
+ff&lt;10 m/s </font></td>
+      <td style="vertical-align: top;">WMO</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-274</td>
+      <td style="vertical-align: top;"><font size="3"><span lang="en-US">SG &#8805; 6 &amp;
+FX &lt; 11</span></font></td>
+      <td style="vertical-align: top;"><font size="3"><span lang="en-US">S&#8805;6 &amp; f<sub>x</sub>f<sub>x</sub> &lt;11
+m/s</span></font></td>
+      <td style="vertical-align: top;">DNMI</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-275</td>
+      <td style="vertical-align: top;"><font size="3"><span lang="en-US">SG
+&lt; 3 &amp; FX &#8805; 14 </span></font></td>
+      <td style="vertical-align: top;"><font size="3"><span lang="en-US">S&lt;3
+&amp; f<sub>x</sub>f<sub>x</sub> &#8805;14
+m/s</span></font></td>
+      <td style="vertical-align: top;">DNMI</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-276</td>
+      <td style="vertical-align: top;"><font size="3">FF = 0 &amp; PWA &#8800; 0 <br>
+      </font><font size="3">FF = 0 &amp; PW &#8800; 0</font><br>
+      </td>
+      <td style="vertical-align: top;"><font size="3"> ff=0 &amp; P<sub>wa</sub>P<sub>wa</sub>
+      &#8800;0<br>
+      </font><font size="3">ff=0 &amp;
+P<sub>w</sub>P<sub>w</sub> &#8800;0</font><br>
+      </td>
+      <td style="vertical-align: top;">WMO<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-277</td>
+      <td style="vertical-align: top;"><font size="3">FF &#8804; 3 &amp; HWA &gt; 9.7<br>
+      </font><font size="3">FF &#8804; 3 &amp; HW &gt; 9.7</font><br>
+      </td>
+      <td style="vertical-align: top;"><font size="3">ff &#8804; 3 m/s &amp; H<sub>wa</sub>H<sub>wa</sub> &gt;9.7 m<br>
+      </font><font size="3"> ff &#8804;</font>
+3
+m/s &amp; H<sub>w</sub>H<sub>w</sub> &gt;9.7 m</font><br>
+      </td>
+      <td style="vertical-align: top;">WMO<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-278</td>
+      <td style="vertical-align: top;"><font size="3">HWA = 0 &amp; PWA
+      <span lang="de-DE">&#8800; </span><span
+ lang="en-US">0</span></font></td>
+      <td style="vertical-align: top;"><font size="3"><span lang="en-US">H<sub>wa</sub>H<sub>wa</sub>=00
+&amp; P<sub>wa</sub>P<sub>wa</sub> </span><span lang="de-DE">&#8800;</span>00</font></td>
+      <td style="vertical-align: top;"><font size="3">DNMI</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-280</td>
+      <td style="vertical-align: top;"><font size="3">PW = 00 &amp; FF
+&gt; 5.0</font></td>
+      <td style="vertical-align: top;"><font size="3">P<sub>w</sub>P<sub>w</sub>=00
+&amp; ff&gt;10 knots</font></td>
+      <td style="vertical-align: top;"><font size="3">DNMI</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-281</td>
+      <td style="vertical-align: top;"><font size="3">PW &#8713; [00, 04]
+&amp; FF &#8712; [0.0, 5.0]</font></td>
+      <td style="vertical-align: top;"><font size="3">P<sub>w</sub>P<sub>w</sub>&#8800;00-04 &amp; ff &#8712;[00,10] knots</font></td>
+      <td style="vertical-align: top;"><font size="3">DNMI</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-282</td>
+      <td style="vertical-align: top;"><font size="3">PW</font><font
+ size="3"> &#8713; </font><font size="3">[01, 08]
+&amp; FF &#8712; [5.1, 7.5]</font> </td>
+      <td style="vertical-align: top;"><font size="3">P<sub>w</sub>P<sub>w</sub>&#8800;01-08 &amp; ff &#8712;[11,15] knots</font> </td>
+      <td style="vertical-align: top;"><font size="3">DNMI</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-283</td>
+      <td style="vertical-align: top;"><font size="3">PW</font><font
+ size="3"> &#8713; </font><font size="3"><span
+ style="font-family: symbol,serif;">[</span>02, 10]
+&amp; FF &#8712; [7.6,
+12.5]</font> </td>
+      <td style="vertical-align: top;"><font size="3">P<sub>w</sub>P<sub>w</sub>&#8800;02-10 &amp; ff &#8712;[16,25]
+knots</font> </td>
+      <td style="vertical-align: top;"><font size="3">DNMI</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-284</td>
+      <td style="vertical-align: top;"><font size="3">PW</font><font
+ size="3"> &#8713; </font><font size="3"><span
+ style="font-family: symbol,serif;">[</span>03, 14]
+&amp; FF &#8712; [12.6, 17.5]</font> </td>
+      <td style="vertical-align: top;"><font size="3">P<sub>w</sub>P<sub>w</sub>&#8800;03-14 &amp; ff &#8712;[26,35]
+knots</font> </td>
+      <td style="vertical-align: top;"><font size="3">DNMI</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-285</td>
+      <td style="vertical-align: top;"><font size="3">PW</font><font
+ size="3"> &#8713; [</font><font size="3">04, 18]
+&amp; FF &#8712; [17.6, 22.5]</font> </td>
+      <td style="vertical-align: top;"><font size="3">P<sub>w</sub>P<sub>w</sub>&#8800;04-18 &amp; ff &#8712;[35,45]
+knots</font> </td>
+      <td style="vertical-align: top;"><font size="3">DNMI</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-286</td>
+      <td style="vertical-align: top;"><font size="3">PW</font><font
+ size="3"> &#8713; [</font><font size="3">06, 24]
+&amp; FF &#8712; [22.6, 30.0]</font> </td>
+      <td style="vertical-align: top;"><font size="3">P<sub>w</sub>P<sub>w</sub>&#8800;06-24 &amp; ff &#8712;[46,60]
+knots</font> </td>
+      <td style="vertical-align: top;"><font size="3">DNMI</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-287</td>
+      <td style="vertical-align: top;"><font size="3">PW &lt; 10 &amp;
+FF &gt;
+30</font> </td>
+      <td style="vertical-align: top;"><font size="3">P<sub>w</sub>P<sub>w</sub>
+&lt; 10 &amp; ff
+&gt; 60 knots</font> </td>
+      <td style="vertical-align: top;"><font size="3">DNMI</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-288</td>
+      <td style="vertical-align: top;"><font size="3">HW = 0.0 &amp; PW &#8800; 0</font> </td>
+      <td style="vertical-align: top;"><font size="3">H<sub>w</sub>H<sub>w</sub>=00
+&amp; P<sub>w</sub>P<sub>w</sub>&#8800; 00</font>
+      </td>
+      <td style="vertical-align: top;"><font size="3">DNMI</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-289</td>
+      <td style="vertical-align: top;"><font size="3">HW &#8800; 0.0
+&amp; PW = 0</font> </td>
+      <td style="vertical-align: top;"><font size="3">H<sub>w</sub>H<sub>w</sub>&#8800;00 &amp; P<sub>w</sub>P<sub>w</sub>=00</font>
+      </td>
+      <td style="vertical-align: top;"><font size="3">DNMI</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-290 </td>
+      <td style="vertical-align: top;"><font size="3">HW</font><font
+ size="3"> &#8713; </font><font size="3">[0.0, 2.5] &amp; FF &#8712; [0.0, 5.0]</font> </td>
+      <td style="vertical-align: top;"><font size="3">H<sub>w</sub>H<sub>w</sub>&#8800;00-05 &amp; ff &#8712;[00,10]
+knots</font> </td>
+      <td style="vertical-align: top;"><font size="3">DNMI</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-291</td>
+      <td style="vertical-align: top;"><font size="3">HW</font><font
+ size="3"> &#8713; [</font><font size="3">0.5, 3.5]
+&amp; FF &#8712; [5.1, 7.5]</font></td>
+      <td style="vertical-align: top;"><font size="3">H<sub>w</sub>H<sub>w</sub>&#8800;01-07 &amp; ff &#8712;[11,15]
+knots
+      </font></td>
+      <td style="vertical-align: top;"><font size="3">DNMI</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-292</td>
+      <td style="vertical-align: top;"><font size="3">HW</font><font
+ size="3"> &#8713; </font><font size="3">[1.0, 5.0]
+&amp; FF &#8712; [7.6, 12.5]</font></td>
+      <td style="vertical-align: top;"><font size="3">H<sub>w</sub>H<sub>w</sub>&#8800;02-10 &amp; ff &#8712;[16,25]
+knots</font></td>
+      <td style="vertical-align: top;"><font size="3">DNMI</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-293</td>
+      <td style="vertical-align: top;"><font size="3">HW</font><font
+ size="3"> &#8713; </font><font size="3">[1.5, 7.5]
+&amp; FF &#8712; [12.6, 17.5]</font></td>
+      <td style="vertical-align: top;"><font size="3">H<sub>w</sub>H<sub>w</sub>&#8800;03-15 &amp; ff &#8712;[26,35]
+knots</font></td>
+      <td style="vertical-align: top;"><font size="3">DNMI</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-294</td>
+      <td style="vertical-align: top;"><font size="3">HW</font><font
+ size="3"> &#8713; [</font><font size="3">2.0, 10.5]
+&amp; FF &#8712; [17.6, 22.5]
+      </font></td>
+      <td style="vertical-align: top;"><font size="3">H<sub>w</sub>H<sub>w</sub>&#8800;04-21 &amp; ff &#8712;</font></font><font
+ size="3">[36,45]
+knots</font></td>
+      <td style="vertical-align: top;"><font size="3">DNMI</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-295</td>
+      <td style="vertical-align: top;"><font size="3">HW</font><font
+ size="3"> &#8713; </font><font size="3">[3.0, 12.0]
+&amp; FF &#8712; [22.6, 30]</font></td>
+      <td style="vertical-align: top;"><font size="3">H<sub>w</sub>H<sub>w</sub>&#8800;06-24 &amp; ff &#8712;[46,60]
+knots</font></td>
+      <td style="vertical-align: top;"><font size="3">DNMI</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-296</td>
+      <td style="vertical-align: top;"><font size="3">HW &lt; 5.0 &amp;
+FF &#8805; 30</font></td>
+      <td style="vertical-align: top;"><font size="3">H<sub>w</sub>H<sub>w</sub>&lt;10
+&amp; ff &#8805; 60 knots</font></td>
+      <td style="vertical-align: top;"><font size="3">DNMI</font></td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+<h1 class="western" style="text-align: center;" lang="en-US"><big>Precipitation/snow/state
+of the ground<br>
+<br>
+</big></h1>
+<table style="width: 90%; text-align: left;" border="1" cellpadding="2"
+ cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Check
+id</span></td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Implementation</span></td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Description</span></td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Source</span></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-301</td>
+      <td style="vertical-align: top;"><font size="3"><span lang="en-US">EM
+= 0 &amp; TGN_12 &gt; 3</span></font></td>
+      <td style="vertical-align: top;"><font size="3">E&#8217;=0 &amp; T<sub>g</sub>T<sub>g</sub>T<sub>g</sub>
+&gt; +3&deg;C</font></td>
+      <td style="vertical-align: top;"><font size="3">WMO</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-302</td>
+      <td style="vertical-align: top;"><font size="3"><span lang="en-US">5</span> &#8804; EM &#8804; </font><span lang="en-US">8 &amp; TGN_12 &gt; 0</span>
+      </font></td>
+      <td style="vertical-align: top;"><font size="3">5&#8804;E&#8217;&#8804;8 &amp; T<sub>g</sub>T<sub>g</sub>T<sub>g</sub>
+&gt; 0&deg;C</font></td>
+      <td style="vertical-align: top;"><font size="3">WMO</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-305</td>
+      <td style="vertical-align: top;"><font size="3">EM = 9
+&amp; SA &lt; 15.0</font></td>
+      <td style="vertical-align: top;"><font size="3">E&#8217;=9 &amp;
+sss&lt;15 cm</font></td>
+      <td style="vertical-align: top;"><font size="3">WMO</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-306</td>
+      <td style="vertical-align: top;"><font size="3">RA &#8800; null &amp;
+TA &lt; -25.0</font></td>
+      <td style="vertical-align: top;"><font size="3">RA &amp;
+Ta&lt;-25&deg;C</font></td>
+      <td style="vertical-align: top;">new<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-66.A</td>
+      <td style="vertical-align: top;"><font size="3">EM &gt; 0 &amp;
+EMf = 0 &amp; SN = 0<br>
+where<br>
+      </font><font size="3">EM is state of the ground<br>
+EMf is state of the ground the previous day<br>
+      </font><font size="3">SN is snow last 24 hours: V1-V7 &#8712;[2, 5, 6,
+28, 30]</font><br>
+      </td>
+      <td style="vertical-align: top;"><font size="3">Correspondence
+between E&#8217;, sss and
+type of
+precipitation</font></td>
+      <td style="vertical-align: top;"><font size="3">DNMI</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-66.B_66.C</td>
+      <td style="vertical-align: top;"><font size="3">SA &#8800; 0 &amp; SAf
+= 0 &amp; SN = 0<br>
+      </font><font size="3">SA &gt; SAf &amp; SN = 0<br>
+      </font>where<br>
+      <font size="3">SA is snow depth now-value<br>
+SAf is snow depth the previous day</font><font size="3"><br>
+SN is snow last 24 hours: V1-V7 &#8712; [2, 5, 6, 28, 30]</font><br>
+      </td>
+      <td style="vertical-align: top;"><font size="3">Correspondence
+between sss </font><font size="3"> and
+type of
+precipitation snow<br>
+      </font></td>
+      <td style="vertical-align: top;"><font size="3">DNMI</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-66.D</td>
+      <td style="vertical-align: top;"><font size="3">SA &lt; SAf - 10
+&amp; RE = 0<br>
+where<br>
+      </font><font size="3">SA is snow depth now-value<br>
+SAf is snow depth the previous day</font><font size="3"><br>
+RE is rain last 24 hours: V1-V7 &#8712; [3, 7, 30]</font><br>
+      </td>
+      <td style="vertical-align: top;"><font size="3">Correspondence
+between sss </font><font size="3"> and
+type of
+precipitation rain<br>
+      </font></td>
+      <td style="vertical-align: top;"><font size="3">DNMI</font></td>
+    </tr>
+  </tbody>
+</table>
+<p style="widows: 2; orphans: 2;" align="left"><br>
+<br>
+</p>
+<h1 class="western" style="text-align: center;" lang="en-GB"><big>Visibility/weather
+codes<br>
+<br>
+</big></h1>
+<table style="width: 90%; text-align: left;" border="1" cellpadding="2"
+ cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Check
+id</span></td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Implementation</span></td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Description</span></td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Source</span></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-311</td>
+      <td style="vertical-align: top;"><font size="3">10000 &#8804; VV &#8804; 75000 &amp; 04 &#8804; WW &#8804; 07<br>
+      </font><font size="3">10000 &#8804; VV &#8804; 75000 &amp; 38 &#8804; WW &#8804; 39</font><br>
+      </td>
+      <td style="vertical-align: top;"><font size="3">60&#8804;VV&#8804;89 &amp; 04&#8804;ww&#8804;07<br>
+      </font><font size="3">60&#8804;VV&#8804;89 &amp; 38&#8804;ww&#8804;39</font><br>
+      <font size="3">&#8804;VV&#8804;99 &amp; 04&#8804;ww&#8804;07<br>
+      97&#8804;VV&#8804;99 &amp; 38&#8804;ww&#8804;39</font>
+      </td>
+      <td style="vertical-align: top;"><font size="3">WMO</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-312</td>
+      <td style="vertical-align: top;"><font size="3">0 &#8804; VV &#8804; 900 &amp; WW </font><font
+ size="3">&#8712; [</font><font size="3"><span lang="en-US">11;12; 28; 40]</span></font></td>
+      <td style="vertical-align: top;">00&#8804;VV&#8804;<span
+ lang="en-US">09 &amp; ww=11, 12,
+28, 40<br>
+      </span><font size="3"><span lang="en-US">90</span>&#8804;VV&#8804;<span lang="en-US">93 &amp; ww=11, 12,
+28, 40</span></font><br>
+      </td>
+      <td style="vertical-align: top;"><font size="3">WMO</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-313</td>
+      <td style="vertical-align: top;"><font size="3">0 &#8804; VV &#8804; 4000 &amp; WW &#8804; 03</td>
+      <td style="vertical-align: top;"><font size="3"><span lang="en-US">90</span>&#8804;<span lang="en-US">VV</span>&#8804;<span lang="en-US">96 &amp; ww</span>&#8804;<span lang="en-US">03</span></font></td>
+      <td style="vertical-align: top;"><font size="3">WMO</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-316.A</td>
+      <td style="vertical-align: top;"><font size="3"><span lang="en-US">VV</span> &#8804; 900 &amp; WW &#8804; <span lang="en-US">03</span></font></td>
+      <td style="vertical-align: top;"><font size="3"><span lang="en-US">VV</span>&#8804;09 &amp; ww&#8804;03</font></td>
+      <td style="vertical-align: top;"><font size="3">WMO</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-316.B</td>
+      <td style="vertical-align: top;"><font size="3"><span lang="en-US">VV
+      </span>&#8804; 900 &amp; (WW = 05 ||
+WW = 40)</font></td>
+      <td style="vertical-align: top;"><font size="3">VV&#8804;09
+&amp; ww=05,40</font></td>
+      <td style="vertical-align: top;"><font size="3">WMO</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-316.C</td>
+      <td style="vertical-align: top;"><font size="3"><span lang="en-US">VV
+      </span>&#8804; 900 &amp; 10 &#8804; WW &#8804; 16</font></td>
+      <td style="vertical-align: top;"><font size="3">VV&#8804;09 &amp; 10&#8804;ww&#8804;16</font></td>
+      <td style="vertical-align: top;"><font size="3">WMO</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-316.D</td>
+      <td style="vertical-align: top;"><font size="3"><span lang="en-US">VV
+      </span>&#8804; 900 &amp; 20 &#8804; WW &#8804; 29</font></td>
+      <td style="vertical-align: top;"><font size="3">VV&#8804;09 &amp; 20&#8804;ww&#8804;29</font></td>
+      <td style="vertical-align: top;"><font size="3">WMO</font></td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+<h1 class="western" style="text-align: center;" lang="en-US"><big>Cloud/weather
+codes<br>
+<br>
+</big></h1>
+<table style="width: 90%; text-align: left;" border="1" cellpadding="2"
+ cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Check
+id</span></td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Implementation</span></td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Description</span></td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Source</span></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-321<br>
+      </td>
+      <td style="vertical-align: top;"><font size="3">0 &#8804; HL &#8804; 50 &amp; 20000 &#8804; VV &#8804; 75000</font></td>
+      <td style="vertical-align: top;"><font size="3">0&#8804;h&#8804;1 &amp; 70&#8804;VV&#8804;<span lang="en-US">89</span></font></td>
+      <td style="vertical-align: top;"><font size="3">WMO</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-322</td>
+      <td style="vertical-align: top;"><font size="3"><span lang="en-US">NN
+= 9 &amp; (WW &lt; 16 || 18 </span>&#8804; WW &#8804; 29)<br>
+      </font><font size="3">NN = 9 &amp; (WW = 36 || WW = 37)</font><br>
+      </td>
+      <td style="vertical-align: top;"><font size="3">N=9 &amp;
+ww&lt;16, 18&#8804;ww&#8804;29<br>
+      </font><font size="3">N=9 &amp; ww=36, 37</font><br>
+      </td>
+      <td style="vertical-align: top;"><font size="3">WMO</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-323.A</td>
+      <td style="vertical-align: top;"><font size="3"><span lang="en-US">NN
+= 0 &amp; (WW = 03 || 14 </span>&#8804; <span
+ lang="en-US">WW </span>&#8804; <span
+ lang="en-US">17)</span></font></td>
+      <td style="vertical-align: top;"><font size="3"><span lang="en-US">N=0
+&amp; ww=03, 14</span>&#8804;<span
+ lang="en-US">ww</span>&#8804;<span
+ lang="en-US">17</span></font></td>
+      <td style="vertical-align: top;"><font size="3">WMO</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-323.B</td>
+      <td style="vertical-align: top;"><font size="3">NN = 0 &amp; 80 &#8804; WW &#8804; 99</font></td>
+      <td style="vertical-align: top;"><font size="3">N=0 &amp; 80&#8804;ww&#8804;99</font></td>
+      <td style="vertical-align: top;"><font size="3">WMO</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-324</td>
+      <td style="vertical-align: top;"><font size="3"><span lang="en-US">NN
+&lt; 5 &amp; 50 </span>&#8804; <span
+ lang="en-US">WW</span> &#8804; <span
+ lang="en-US">59</span></font></td>
+      <td style="vertical-align: top;"><font size="3"><span lang="en-US">N&lt;5
+&amp; 50</span>&#8804;ww&#8804;59</font></td>
+      <td style="vertical-align: top;"><font size="3">WMO</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-325.A</td>
+      <td style="vertical-align: top;"><font size="3"><span lang="en-US">NN
+&lt; 3 &amp; (60</span> &#8804; <span
+ lang="en-US">WW </span>&#8804; <span
+ lang="en-US">69 || 72 </span>&#8804; <span
+ lang="en-US">WW </span>&#8804; <span
+ lang="en-US">75)</span></font></td>
+      <td style="vertical-align: top;"><font size="3"><span lang="en-US">N&lt;3
+&amp; 60</span>&#8804;ww&#8804;69,72&#8804;ww&#8804;75</font></td>
+      <td style="vertical-align: top;"><font size="3">WMO</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-325.B</td>
+      <td style="vertical-align: top;"><font size="3">NN &lt; 3 &amp;
+77 &#8804; WW &#8804; 79</font></td>
+      <td style="vertical-align: top;"><font size="3">N&lt;3 &amp; 77&#8804;ww&#8804;79</font></td>
+      <td style="vertical-align: top;"><font size="3">WMO</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-326</td>
+      <td style="vertical-align: top;"><font size="3">NH = 0 &amp; (50 &#8804; WW &#8804; 75 || 77 &#8804; WW &#8804; 99)</font></td>
+      <td style="vertical-align: top;"><font size="3">N<sub>h</sub>=0
+&amp; 50&#8804;ww&#8804;75,77&#8804;ww&#8804;99</font></td>
+      <td style="vertical-align: top;"><font size="3">WMO</font></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-327</td>
+      <td style="vertical-align: top;">95 &#8804; WW &#8804; 99 &amp; CC1 &#8800; 9 &amp; CC2 &#8800; 9 &amp; CC3 &#8800; 9 &amp; CC4 &#8800; 9</td>
+      <td style="vertical-align: top;"><font size="3">95&#8804;<span lang="en-US">ww</span>&#8804;<span lang="en-US">99 &amp; C</span><span
+ lang="de-DE">&#8800;</span>9</font></td>
+      <td style="vertical-align: top;"><font size="3">WMO</font></td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<p>&nbsp;</p>
+</body>
+</html>

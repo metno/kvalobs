@@ -1,0 +1,162 @@
+#! /bin/sh
+
+pkg_filter=""
+
+if [ -z "$MIPKG_PATH" ]; then
+	MIPKG_PATH=$HOME
+fi
+
+mipkgdir=${MIPKG_PATH}/.mipkg
+
+if [ ! -d $mipkgdir ]; then
+	echo "Ingen mipkg database i katalogen: ${MIPKG_PATH}/.mipkg"
+	echo "Trenger du kanskje å sette environment variabelen MIPKG_PATH!"
+	exit 1
+fi
+
+if [ ! -f $mipkgdir/.lib/mipkg-lib ]; then
+	echo "mipkg systemet er ikke satt opp rett!"
+	echo "Mangler filen: $mipkgdir/.lib/mipkg-lib"
+	exit 1
+else
+	.  $mipkgdir/.lib/mipkg-lib
+fi
+
+if [ -f $mipkgdir/.mipkgrc ]; then
+	. $mipkgdir/.mipkgrc
+	echo "Leser konfigurasjonsfilen $mipkgdir/.mipkgrc"
+fi
+
+function use(){
+    echo "  Bruk:"
+    echo "     mipkg-remove -a -h "
+    echo ""
+    echo "    -a list alle pakkene."
+    echo "    -h gi denne hjelpe teksten."
+    echo " "
+    exit 1
+}
+
+currentdir=$(pwd)
+
+if ! cd "$MIPKG_PATH" ; then
+	echo "Kan ikke skifte katalog til <$MIPKG_PATH> gitt med MIPKG_PATH!"
+	exit 1
+fi
+
+
+pkglist=""
+listallopt=0
+OPTERR=0
+getopts "ah" opt
+optret=$?
+
+while [ $optret -eq 0 ]; do
+	case $opt in
+		a) listallopt=1;;
+		h) use;;
+	   \?) echo "Ugyldig option: $OPTARG"; use;;
+		*) echo "Uventet, dette skal ikke skje!"; use;;
+	esac
+   	getopts "ah" opt
+  	optret=$?
+done
+
+
+if [ $listallopt -eq 1 ]; then
+	pkg_filter=""
+fi
+
+
+echo "listallopt: $listallopt"
+
+echo "pkg_filter: $pkg_filter"
+
+find_installed_package .mipkg "$pkg_filter" pkglist
+
+echo "pkglist: $pkglist"
+
+if [ -z "$pkglist" ]; then
+	echo "Ingen pakker er tilgjengelig for fjerning!"
+
+	if [ $listallopt -eq 0 ]; then
+		echo "Prøv å kjør komandoen: mipkg-remove -a"
+	else
+		echo "  **** Det finnes ingen pakker i pakke databasen: $mipkgdir ****"
+	fi
+	
+	cd $currentdir
+	exit 1
+fi
+
+pkgname=""
+
+select_package .mipkg "$pkglist" pkgname
+
+echo "Sletter pakken  $pkgname !"
+
+
+if [ ! -d .mipkg/$pkgname ]; then
+    echo "Pakken <$pkgname> er ikke instalert"
+    cd $currentdir
+    exit 1
+fi
+
+if [ -L .mipkg/$pkgname ]; then
+    echo "Det holder ikke bare med pakkenavnet, version"
+    echo "Maa ogsaa angis!"
+    cd $currentdir
+    exit 1
+fi
+
+if [ ! -f .mipkg/$pkgname/NAME ]; then
+    echo "File <.mipkg/$pkgname/NAME> finnes ikke!"
+    cd $currentdir
+    exit 1
+fi
+
+name=$(cat $mipkgdir/$pkgname/NAME)
+
+echo "NAME $name"
+
+currentpkg=""
+
+if [ -L  .mipkg/$name ]; then
+    dummy="dummy-$(date '+%Y%m%dT%H%M%S')"
+    
+    touch  .mipkg/$pkgname/$dummy
+
+    if [ -f  .mipkg/$name/$dummy ]; then
+		currentpkg=$pkgname
+    fi
+    
+    rm -f .mipkg/$pkgname/$dummy
+
+    if [  "$currentpkg" ]; then
+		echo ""
+		echo "  $pkgname er nåværende instalerte pakke av $name!"
+		echo ""
+		cd $currentdir
+		
+		exit 1
+    fi
+fi
+
+rm -rf .mipkg/$pkgname
+
+if [ "$?" -eq 0 ]; then
+    echo "Pakken <$pkgname> er slettet!"
+    cd $currentdir
+    exit 0
+fi
+
+echo 
+echo " FATAL: mislykket i å slette $pkgname"
+echo 
+cd $currentdir
+
+exit 1
+
+
+
+

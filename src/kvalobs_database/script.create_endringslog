@@ -1,0 +1,123 @@
+Terje Reite november 2004
+tabellen var_station er fjernet
+
+Terje Reite oktober 2004
+tabellen generated_types lagt til for å kunne skjelle mellom ekte og genererte typeid
+
+Terje Reite mai 2004
+Typeid er lagt til i tabellen obs_pgm
+
+
+Terje Reite  april 2004
+Kolonnen read er lagt til i tabellen types
+Kolonnen name i types tabellen har skiftet navn til format og betydningen er 
+strammet opp og avgrenset til format
+
+
+Terje Reite 16. mars 2004
+tabellen key_val er lagt til, hjelpetabell under runtime
+
+
+Terje Reite 2. februar 2004
+earlymessage, latemessage er fjernet fra tabellen types
+corrected er gjort om til FLOAT NOT NULL (gjort litt tidligere enn denne dato)
+
+
+Terje Reite 21. oktober 2003
+earlyobs, lateobs, earlymessage, latemessage er lagt til som integer 
+default null i tabellen types
+
+
+Terje Reite 11. oktober 2003
+Lagt til  kolonnen static i tabellen station
+Lagt til  kolonnen decoder i tabellen reject_decode
+Lagt til tabellen operator 
+
+
+
+Terje Reite 25. september 2003
+tabellen paramset slettes, 
+informasjonen i denne tabellen skal lagres, 
+informasjonen om innholdet skal ligge i script.create_doc;
+det skal lages en egen fil som vil fungere som bibliotek,
+denne filen ligger i /kvalobs/src/lib/kvalobs/  
+
+Terje Reite 5. september 2003
+kolonnen maxspeed er lagt til tabellen station 
+
+Terje Reite 18. juni 2003.
+Tabellen stationid_klima er lagt til
+
+
+Terje Reite 4. juni 2003.
+active i tabellen checks endrer type fra integer til TEXT
+gammel beskrivelse av active er:
+active: dette er en integer verdi: 
+        0 betyr at denne checken alltid kjores,
+        positivt heltall betyr at denne checken kjorer en gang i m?neden,
+        negativt heltall betyr at denne checken ikke er i bruk
+tabellen reference_station så endres kolonnen paramid til paramsetid,
+den endrer samtidig betydning.
+tabellen paramset opprettes
+
+
+Terje Reite 16. mai 2003.
+Lagt til  kolonnen hour i station_param
+
+Terje Reite 11. april 2003.
+Lagt til level og nr_sensor i tabellen obs_pgm.
+nr_sensor er antallet sensorer.
+
+Terje Reite 28. mars 2003.
+lagt til kolonnen level_offset i tabellen param
+
+Terje Reite 25. mars 2003.
+Endrer det tilbake slik det var før 24. mars.
+
+Terje Reite 24. mars 2003.
+fjernet tabellen types
+typeid endrer navn til type og blir en char(1); får tilsvarende
+betydning som i klimadatabasen.
+level blir gjort om til float; endringen for dette gjøres i alle tabeller der 
+level forekommer.
+
+Terje Reite 17. februar 2003.
+lagt til kolonnen hqc_type i tabellen station
+
+Terje Reite 30. januar 2003.
+Byttet ut betegnelsene level1_qcx og level2_qcx til main_qcx og medium_qcx.
+Fjernet kolonnen qcx fra qcx_info tabellen.
+Lagt til kolonnen medium_qcx i tabellen checks.
+
+Terje Reite 17. januar 2003.
+endret lengde av ship_code fra 6 til 7 karakterer i tabellen station
+endret kolonnen active fra bool til integer i tabellen checks
+
+
+Terje Reite 18. desember 2002: 
+fjernet tabellen not_data; funksjonen er overfort til controlinfo(7).
+lagt til kolonnen cfailed i tabellen data
+lagt til tabellen text_data
+lagt til kolonnen modelid i tabellen model_data
+lagt til tabellen model som definerer modelid  
+fjernet kolonnene checkid, fromday og today i tabellen checks
+lagt til kolonnen active i tabellen checks
+fjernet kolonnen qcxid fra tabellen qcx_info
+lagt til kolonnen comment i tabellen qcx_info
+lagt til 2 view: data_view og text_data_view
+
+
+Terje Reite 31. oktober 2002:
+lagt til kolonnen fromtime i tabellene station, checks, station_param og
+obs_pgm; Tiden fra dataene for denne tabellen gjelder - de gjelder fra denne
+fradatoen og frem til neste eller frem til naatidspunktet.
+
+
+
+
+
+
+
+
+
+

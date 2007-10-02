@@ -1,0 +1,258 @@
+#inlist tar to parametere elem og list. 
+#Returnrere elem hvis elem er i listen og
+#en tom streng hvis elementet ikke er i listen.
+#$1 elem
+#$2 list
+function inlist()
+{
+	local cmd=$1
+    local list=$2
+
+    for c in $list; do
+		if [ "$c" = "$cmd" ]; then
+	    	echo "$c"
+	    	return 0
+		fi
+    done
+    
+    echo ""
+    return 1
+}
+
+
+
+#elemAt tar to parametere index og list.
+#Returnnere elementet list[index]. index starter ved 0. 
+function elemAt()
+{
+    local index=$1
+    local list=$2
+    local nn=0
+
+    for elem in $list; do
+		if [ $nn -eq $index ]; then
+	    	echo "$elem"
+	    	return 0;
+		fi
+		let nn=nn+1
+    done
+
+    echo ""
+    return 1
+}
+
+
+
+function select_pkg()
+{
+	#Parameter $1 er en tekst for å bruke for valg tekst
+	#Parameter $2 er listen det skal velges fra!
+	#Pakken returneres i parameter $3
+	
+	local cmd=""
+   	local lineno=0
+    local list=""
+    local ___select_pkg_pkg_=""
+    
+	while [ -z "$cmd"  ]; do
+		clear
+		echo ""
+		echo "$1"
+		echo "-------------------------"
+		
+		lineno=0
+		list=""
+		
+		for elem in $2 ; do
+	    	echo "  $lineno: $elem"
+	    	list="$list$IFS$lineno"
+	    	let lineno=lineno+1
+		done
+	
+		echo "  q: quit"
+		echo "-------------------------"
+		read -p "Valg: " cmd theRest
+	
+		if [ "$cmd" = "q" ]; then
+	    	echo "Quit!"
+	    	exit 1
+		fi
+	
+		cmd=$(inlist $cmd "$list")
+    done
+    
+    ___select_pkg_pkg_=$(elemAt $cmd "$2")
+    
+    if [ -z "$___select_pkg_pkg_" ]; then
+		echo "ERROR: Uventet feil!"
+		echo "list:  $2"
+		echo "index: $cmd"
+		exit 1
+    fi
+
+    eval "$3=\$___select_pkg_pkg_"
+    return 0
+}
+
+#select_package returnerer en pakkeversjon fra en liste av pakker.
+# $1 mipkgdir 
+# $2 pkglist
+# $3 utverdi pkgversion
+function select_package()
+{
+	local pkg
+	local mipkgdir=$1
+	local pkglist=$2
+	local pkgversionstmp=""
+	local pkgversionlist=""
+	local ___select_pkgver=""
+	local dir=""
+	local currentpkg=""
+	local currentdir="$(pwd)"
+			
+	if [ -z "$pkglist" ]; then
+		echo "Pakkelisten er tom!"
+		exit 1
+	fi
+	
+	if ! cd $mipkgdir ; then
+		echo "Kan ikke skifte katalog til $mipkgdir!"
+		exit 1
+	fi
+	
+	select_pkg 'Velg pakke?' "$pkglist" pkg
+
+	if [ -z "$pkg" ]; then
+		echo "Error: pakke valget resulterte i en tom streng!"
+		cd $currentdir
+		exit 1
+	fi
+
+	if [ ! -f "$pkg/NAME" ]; then
+		echo "$pkg mangler filen $pkg/NAME!"
+		cd $currentdir
+		exit 1
+	fi
+	
+	if [ ! -f "$pkg/VERSION" ]; then
+		echo "$pkg mangler filen $pkg/VERSION"
+		cd $currentdir
+		exit 1
+	fi
+	
+	currentpkg="$(cat $pkg/NAME)-$(cat $pkg/VERSION)"
+
+
+	echo "Følgende pakke er valgt: $pkg"
+
+	pkgversionstmp="$pkg*"
+
+	for dir in $pkgversionstmp; do
+		if [ -L $dir ]; then
+			continue
+		fi
+	
+		if [ -d $dir ]; then
+			if [ ! -f $dir/NAME ]; then
+				continue
+			fi
+		
+			___select_pkgver=$(cat $dir/NAME)
+		
+			if [ "$___select_pkgver" -a "$___select_pkgver" = "$pkg" ]; then
+				echo "dir: $dir"
+				echo "currentpkg: $currentpkg"
+			
+				if [ "$currentpkg" = "$dir" ]; then
+					if [ -z "$pkgversionlist" ]; then
+						pkgversionlist="$dir (gjeldende version)"
+					else
+						pkgversionlist="$pkgversionlist,$dir (gjeldende version)"
+					fi
+				else
+					if [ -z "$pkgversionlist" ]; then
+						pkgversionlist="$dir"
+					else
+						pkgversionlist="$pkgversionlist,$dir"
+					fi
+				fi
+			fi
+		fi
+	done
+
+	echo "Pakkeversjoner: $pkgversionlist"
+
+	___select_pkgver=""
+
+	old_IFS="$IFS"
+	IFS=","
+	
+	select_pkg "Velg versjon av pakken: $pkg" "$pkgversionlist" ___select_pkgver
+	
+	IFS="$old_IFS"
+	
+	if [ -z "$___select_pkgver" ]; then
+		echo "Error: pkgver er en tom streng!"
+		cd $currentdir
+		exit 1
+	fi	
+	
+	#Hvis pakken som er valgt er '(gjeldende versjon)' ønsker vi bare pakke navnet
+	#og ikke hjeleteksten '(gjeldende versjon)'
+
+	for mypkg in $___select_pkgver; do
+		___select_pkgver="$mypkg"  
+		break;
+	done
+
+	echo "Valgt Pakke: $___select_pkgver ($3)" 
+
+	eval "$3=\$___select_pkgver"
+	
+	cd $currentdir
+}
+
+#find_installed_package finner alle instalerte pakker!
+# $1 mipkgdir 
+# $2 filterlist - Hvis filterlisten er tom finn alle pakkene som er instalert
+#                 Hvis filterlisten ikke er tom finn kun pakker som er i listen.
+# $3 returverdi pakkeliste
+
+function find_installed_package()
+{
+	local mipkgdir=$1
+	local filter=$2
+	local dir=""
+	local file=""
+	local ___find_pkglist=""
+	local currentdir=$(pwd)
+	
+	echo "Find: $filter"
+	
+	if ! cd $mipkgdir ; then
+		echo "Kan ikke skifte katalog til $mipkgdir"
+		exit 1
+	fi
+	
+		
+	if [ -z "$filter" ]; then
+		dir=*
+		for file in $dir; do
+			if [ -L $file ]; then
+				___find_pkglist="$___find_pkglist $file"
+			fi
+		done
+	else
+		for file in $filter; do
+			if [ -L $file ]; then
+				___find_pkglist="$___find_pkglist $file"
+			fi
+		done
+	fi
+	
+	echo "find: ___find_pkglist: $___find_pkglist"
+	
+	eval "$3=\$___find_pkglist"
+	
+	cd $currentdir
+}

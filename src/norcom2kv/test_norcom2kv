@@ -1,0 +1,25 @@
+#! /bin/sh
+
+export KVALOBS=$(pwd)/test
+
+SYNOPDIR=$KVALOBS/synop
+
+mkdir -p $KVALOBS/etc
+mkdir -p $SYNOPDIR
+mkdir -p $KVALOBS/var/log
+mkdir -p $KVALOBS/var/norcom2kv/data2kv
+mkdir -p $KVALOBS/var/norcom2kv/tmp
+
+SYNOPDIR=$(echo $SYNOPDIR | sed -e 's/\//\\\//g')
+rm $KVALOBS/synop/*
+cp synop/data0000  $KVALOBS/synop
+
+echo $SYNOPDIR
+
+cat 'test_norcom2kv.conf' | sed -e "s/@@synopdir@@/$SYNOPDIR/" > \
+    $KVALOBS/etc/norcom2kv.conf
+ 
+exec ./norcom2kv --test
+
+
+

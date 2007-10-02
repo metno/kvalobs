@@ -1,0 +1,4 @@
+#Dette er en text file for testing av 
+#FileUtil.readFile2Str  
+linej 3
+linje4

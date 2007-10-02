@@ -1,0 +1,28 @@
+# master makefile for KVALOBS libs
+
+THISMAKE= $(MAKE) -f Makefile.klibs
+
+def:
+	@echo 'usage: make [normal | depends | install | veryclean | brutal]'
+
+normal:
+	$(THISMAKE) "EXECUTE=make; make install" klibs
+
+depends:
+	$(THISMAKE) "EXECUTE=make depends" klibs
+
+install:
+	$(THISMAKE) "EXECUTE=make install" klibs
+
+pretty:
+	$(THISMAKE) "EXECUTE=make pretty" klibs
+
+veryclean:
+	$(THISMAKE) "EXECUTE=make veryclean" klibs
+
+brutal:
+	$(THISMAKE) "EXECUTE=make veryclean; make; make install" klibs
+
+klibs:
+	cd decoder;        $(EXECUTE)	
+

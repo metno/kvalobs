@@ -1,0 +1,131 @@
+#ifndef __kvsynopd_h__
+#define __kvsynopd_h__
+
+#include "KeyVal.idl"
+#include "admin.idl"
+
+module kvsynopd{
+
+  struct SynopData{
+    long     stationid;
+    string   termin;
+    boolean  isOk;
+    string   message;
+    string   synop;
+  };
+
+  struct DelayElement{
+    long   wmono;
+    string obstime;
+    string delay;
+  };
+
+  typedef sequence<DelayElement> DelayList;
+
+  typedef sequence<long> LongList;
+
+  struct ReloadElement{
+    short wmono;
+    short eventsWaiting;
+  };
+  
+  typedef sequence<ReloadElement> ReloadList;
+
+  struct StationInfo{
+    short    wmono;
+    LongList stationIDList;
+    string   info;
+  };
+  
+  typedef sequence<StationInfo> StationInfoList;
+  
+  interface synopcb{
+    void synop(in SynopData data); 
+  };
+
+  typedef sequence<short> WmoNoList;
+
+  struct SynopElement{
+    short  wmono;
+    string obstime;
+    string createtime;
+    short  ccx;
+    string wmomsg;
+  };
+
+  typedef sequence<SynopElement> SynopList;
+
+  struct DataElement{
+    long stationid;
+    string obstime;
+    string original;
+    short  paramid;
+    short  typeid_;
+    short  sensor;
+    short  level;
+  };
+  
+  typedef sequence<DataElement> DataElementList;
+  
+  
+  interface synop : micutil::Admin{
+    boolean createSynop(in short  wmono, 
+			in string obstime,
+			in micutil::KeyValList keyVals,
+			in synopcb callback);
+    
+    boolean stations(out StationInfoList infoList);	     
+    boolean uptime(out string startTime, out long uptimeInSeconds);
+    boolean delays(out string nowTime, out DelayList dl);
+    boolean reloadConf(out string message);
+    
+    /**
+     * \brief reloadcache mark stations for reload from kvalobs.
+     * 
+     * If fromTime is an empty string, list all stations marked
+     * for reload. If fromTime is an valid time in the past, reload
+     * the cache with data from \a fromTime until current time.
+     *
+     * \param fromTime, from this time until current time. 
+     * \param wmonolist, list all stations marked for releoad.
+     * \param message, an message of the status of the opperation.
+     */
+    boolean reloadCache(in string fromTime, out ReloadList wmonolist, 
+                        out string message);
+
+
+    /** Get a synop tah is generated.
+     * \param wmoList a list of the wmonumbers we want. If the
+     *                list is empty return information about all 
+     *                synops.
+     * \param fromtime the first synop time we want a synop for.
+     * \param totime the first synop time we want a synop for.
+     *               This may be empty if we only want synop for
+     *               one synop time.
+     * \param[out] synops  A list of the requested synops.
+     * \param[out] message An error message on failure.
+     * \return true on success, false otherwise.
+     */
+    boolean getsynop(in WmoNoList wmoList, 
+		     in string fromtime, in string totime,
+		     out SynopList synops,
+		     out string message);
+
+
+    /** Get the data that is used to encode a synop.
+     *
+     * \param wmono The wmono we want the data for.
+     * \param obstime The obstime we want data for.
+     * \param[out] datalist The datalist.
+     * \param[out] message An error message on failure.
+     * \return true on success, false otherwise.
+     */
+    boolean getdata(in short wmono, 
+		    in string obstime, 
+		    out DataElementList datalist,
+		    out string message); 
+ 
+    };
+};
+
+#endif

@@ -1,0 +1,43 @@
+#! /bin/sh
+
+SQLITE=sqlite
+SYNOPDB="kvsynopd.sqlite"
+SYNOPDBDIR="$KVALOBS/var/kvsynop"
+DBCREATE="$KVALOBS/share/kvsynop/createdb.sql"
+
+if ! [ $KVALOBS ]; then
+    echo "Environment variable KVALOBS must be set!"
+    exit 1
+fi
+
+if ! [ -d "$SYNOPDBDIR" ]; then
+    echo "Directory $SYNOPDBDIR donr exist!"
+    exit 1
+fi
+
+if ! [ -f "$DBCREATE" ]; then
+    echo "Missing file: $DBCREATE"
+    exit 1
+fi
+
+cd "$SYNOPDBDIR"
+
+if ! [ -f "$SYNOPDBDIR/$SYNOPDB" ]; then
+    $SQLITE "$SYNOPDBDIR/$SYNOPDB" < "$DBCREATE"
+    
+    if ! [ -f "$SYNOPDBDIR/$SYNOPDB" ]; then
+	echo "FATAL: Cant create database!"
+	exit 1
+    else
+	echo "Database created!"
+	exit 0
+    fi
+fi
+
+echo "The database allready exist!"
+echo "If you want to replace the old, remove the"
+echo "file <$SYNOPDBDIR/$SYNOPDB> and run this command"
+echo "again!"
+
+exit 0
+    

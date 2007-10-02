@@ -1,0 +1,49 @@
+# This configuration file has 3 ways to define a key:
+# as number, string or as a list consisting of number and string.
+# It is recomended that one uses only one datatype, number or string in
+# the list.
+  
+# key1 = number = integer or float
+# key2   = string = "                 "    
+# key3   = list = ( "mystring", mynumber )
+# 
+
+#example
+#logdir must be an absolute path
+#logdir="/home/user/projects/kvalobs/kvalobs/src/kv2kro/log"
+
+
+
+
+
+corba{
+  #Where is CORBA nameserver
+  nameserver="corbans.oslo.dnmi.no"
+
+  #Which path in CORBA nameserver shall we use for
+  #this instance of kvalobs
+  path="kvtest"
+}
+
+database{
+  #Which database driver shall be used. 
+  dbdriver="pgdriver.so"
+
+  #The string to be used to connect to the database.
+  #ex. for a postgresql databse
+  #dbconnect="user=kvalobs dbname=kvalobs password= host= port="
+  dbconnect="user=kvalobs dbname=kvalobs password=kvalobs12 host=rime"
+}
+
+kvManagerd{
+}
+
+kvDataInputd{
+
+
+
+}
+
+
+kvQabased{
+}

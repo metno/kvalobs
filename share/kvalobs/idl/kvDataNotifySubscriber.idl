@@ -1,0 +1,44 @@
+#ifndef __kvDataNotifySubscriber_h__
+#define __kvDataNotifySubscriber_h__
+
+#include "kvServiceCommon.idl"
+
+module CKvalObs{
+  module CService{
+
+    interface kvDataNotifySubscriber{
+      struct What{
+			long       stationID;
+			long       typeID_;
+			QcIdList   qc;
+			string     obsTime;
+      };  
+      
+      typedef sequence<What> WhatList;
+      
+      void callback(in WhatList what_); 
+    };  
+    
+    interface kvDataNotifySubscriberExt{
+      struct What{
+			long       stationID;
+			long       typeID_;
+			QcIdList   qc;
+			string     obsTime;
+      };  
+      
+      typedef sequence<What> WhatList;
+      
+    /**
+     * @return true if more data is accepted and 
+     *         false if we are about to shutdown 
+     *         or an error in the client has occured.
+     */
+      boolean callback(in WhatList what_, in SubscribeId subid); 
+    };  
+    
+  };
+};
+
+
+#endif

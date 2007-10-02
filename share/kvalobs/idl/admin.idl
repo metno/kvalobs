@@ -1,0 +1,33 @@
+#ifndef __admin_h__
+#define __admin_h__
+
+module micutil{
+
+  /**
+   * Admin is a interface that can be used to implements some 
+   * adminitstration task, like ping, status, etc.
+   */  
+  interface Admin{
+    /**
+     * ping. In addition to be a ping it return false if some
+     * fatal error condition is detected in the pinged object.
+     * Use statusmessage to get more details of the error condition.
+     */
+    boolean ping(); 
+    
+    /**
+     * @params details an integer that controls how much is 
+     *         information that is returned in the message.
+     *         As a guide use 0 (FATAL), 1 (ERROR), 2 (WARNING), 3 (INFO)
+     *         4 (DEBUG), etc. Higher number more information.
+     */
+    void statusmessage(in short details, out string message);
+    
+    /**
+     * shutdown return true if it can shutdown false otherwise.
+     */
+    boolean shutdown();
+  };
+};
+
+#endif

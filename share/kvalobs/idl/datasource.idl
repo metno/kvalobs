@@ -1,0 +1,41 @@
+#ifndef __KvalObs_DataSource_idl__
+#define __KvalObs_DataSource_idl__
+
+#include "admin.idl"
+
+module CKvalObs {
+  module CDataSource {
+    
+    exception Fatal{};
+    
+    /**
+     * NODECODER,   there is no decoder for the obsType.
+     *              The observation is not saved to the database. Don't
+     *              mind to retry to send the observation until a
+     *              decoder is written and installed.
+     * DECODEERROR, cant decode the message. The
+     *              message is saved to rejectdecode.
+     * NOTSAVED,    the message is not SAVED to the database,
+     *              if possible try to resend it later, after 
+     *              a delay.
+     * ERROR,       A general error. Look at the 'message'. The
+     *              observation is not saved to the database.
+     * OK           The message is decoded and saved to the 
+     *              database.
+     */
+
+    enum EResult { OK, NODECODER, DECODEERROR, NOTSAVED, ERROR };
+
+    struct Result{
+      EResult res;
+      string  message;
+    };
+
+    interface Data : micutil::Admin {
+      Result newData(in string data, in string obsType);
+    };
+
+  };
+};
+
+#endif

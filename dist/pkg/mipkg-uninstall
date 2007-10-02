@@ -1,0 +1,104 @@
+#! /bin/sh
+
+function use(){
+    echo "  Bruk:"
+    echo "     mipkg-uninstall <pakke>"
+    echo ""
+    echo "    - pakke maa vaere en katalog i .mipkg katalogen!"
+    echo " "
+    exit 1
+}
+
+
+
+if [ $# -eq 0 ]; then
+    use;
+fi
+
+pkgname=$1
+
+if [ ! -d .mipkg ]; then
+    if [ ! $? ]; then
+	echo "Det er ingen .mipkg katalog i denne arbeids katalogen!!!"
+	exit 1
+    fi
+fi
+
+if [ ! -d .mipkg/$pkgname ]; then
+    echo "Pakken <$pkgname> er ikke instalert"
+    exit 1
+fi
+
+if [ -L .mipkg/$pkgname ]; then
+    echo "Det holder ikke bare med pakkenavnet, version"
+    echo "Maa ogsaa angis!"
+    exit 1
+fi
+
+if [ "$?" -ne 0 ]; then
+    echo 
+    echo " Fatal kan ikke skifte katalog til <.mipkg>!"
+    echo
+    exit 1
+fi
+
+if [ ! -f .mipkg/$pkgname/NAME ]; then
+    echo "File <.mipkg/$pkgname/NAME> finnes ikke!"
+    exit 1
+fi
+
+name=$(cat .mipkg/$pkgname/NAME)
+
+echo "NAME $name"
+
+
+currentpkg=""
+
+if [ -L  .mipkg/$name ]; then
+    dummy="dummy-$(date '+%Y%m%dT%H%M%S')"
+    
+    touch  .mipkg/$pkgname/$dummy
+
+    if [ -f  .mipkg/$name/$dummy ]; then
+	currentpkg=$pkgname
+    fi
+    
+    rm -f  .mipkg/$pkgname/$dummy
+
+    if [  "$currentpkg" ]; then
+	echo "$pkgname er naavarende instalerte pakke av $name"
+	echo "Avinstallerer nåværenede versjon av <$name> ($currentpkg)!"
+
+	if [ -x .mipkg/$pkgname/mipkg/PKG-UNINSTALL ]; then
+	     .mipkg/$pkgname/mipkg/PKG-UNINSTALL  .mipkg/$pkgname
+    
+	    if [ "$?" -ne 0 ]; then
+		echo
+		echo " FATAL: kan ikke avinstallere nåværende <$name>"
+		echo
+		exit 1
+	    fi
+	else
+	    echo "WARNING: pakken <$currentpkg> har ingen PKG-UNINSTALL skript"
+	fi
+
+	rm -f  .mipkg/$name
+    fi
+fi
+
+rm -rf .mipkg/$pkgname
+
+if [ "$?" -eq 0 ]; then
+    echo "Pakken <$pkgname> er slettet!"
+    exit 1
+fi
+
+echo 
+echo " FATAL: mislykket i å avinstaelere $pkgname"
+echo 
+
+exit 1
+
+
+
+

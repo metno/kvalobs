@@ -1,0 +1,84 @@
+kvAgregated
+
+
+1. Introduksjon
+
+Dette programmet mottar observasjoner fra kvalobs og genererer
+aggregerte verdier på grunnlag av disse. De aggregerte verdiene
+sendes så tilbake til kvalobs.
+
+Følgende liste viser hvilke parametre fra kvalobs som generer hva:
+
+Fra	 Til	     Når
+----------------------------------------
+TAN	 TAN_12	     06:00 og 18:00
+TAX	 TAX_12	     06:00 og 18:00
+TGN	 TGN_12	     06:00 og 18:00
+
+RR_01	 RR_1	     Hver time
+RR_1 	 RR_12	     06:00 og 18:00
+RA	 RR_12	     06:00 og 18:00
+RR_12	 RR_24	     06:00
+
+Merk at det også genereres aggregerte verdier av de aggregerte
+verdiene, så dersom for eksempel en stasjon kun rapporterer RR_1 vil
+både RR_12 og RR_24 aggregeres.
+
+Det er også verd å merke seg at aggregeringene oppdateres etterhvert
+som grunnlagsdata oppdateres, så dersom for eksempel en observasjon
+av RR_1 endres av HQC, vil aggregerte verdier av RR_12 oppdateres
+tilsvarende.
+
+
+2. Aggregerte parametre
+
+De aggregerte parametrene vil ha lik stasjonsid, sensor og level som
+de parametrene som aggregeres. typeid, derimot, vil endres til å bli
+lik den negative verdien av den originale typeid. Dette medfører at
+aggregerte verdier lett kan skilles fra ikke-aggregerte verdier i
+kvalobs.
+
+De aggregerte parametrenes flagg settes ikke. Dette medfører at
+standardverdier automatisk kommer med: useinfo=0000000000000000 og
+controlinfo=9999900000000000.
+
+
+3. Aggregerte parametre og kvalobs
+
+Det er viktig å merke seg at siden de aggregerte parametrene får
+negativ typeid, blir de av kvalobs oppfattet som forskjellige
+stasjoner som "grunnlagsstasjonene". Dette, sammen med at stasjoner
+med negativ typeid ikke fins i obs_pgm, medfører at det ikke blir
+gjort noen kvalitetskontroll av de aggregerte verdiene.
+
+
+4. Oppsett før kjøring
+
+For å kjøre kvAgregated må sqlite (http://www.sqlite.org) være
+installert. For å lage en database som skal brukes av kvAgregated kan
+skriptet agregateDbInit.sh kjøres. Etter dette er kvAgregated klar for
+kjøring.
+
+
+5. Start av kvAgregated
+
+Når kvAgregated startes vil den i begynne med å hente ned data fra
+kvalobs for de siste 24 timene. Dette er resurskrevende, og programmet
+bør ikke startes mens kvalobs har mye annet å gjøre, dvs at hver hele og
+halve time bør unngås for oppstart.
+
+Etter oppstarten vil aggregerte data genereres fortløpende, etterhvert
+som grunnlagsdata kommer inn. En begrensing for dette er at
+kvAgregated aldri vil generere aggregerte verdier gjeldende langt bak
+i tid. Kun data som gjelder det siste døgnet vil prosesseres.
+
+kvAgregated tar ikke kommandolinjeargumenter. 
+
+
+6. Feilsituasjoner
+
+Selv om kvalobs går ned må ikke kvAgregated restartes.
+
+RR_12 vil ikke aggregeres fra RA dersom RA-verdien har minket
+betraktelig siden sist aggregering (for eksempel dersom målebøtta har
+blitt tømt).

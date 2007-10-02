@@ -1,0 +1,5 @@
+Main-Class: metno.SqlHelper.SqlHelperMain
+Class-Path: log4j-1.2.13.jar
+            ojdbc14.jar
+            pgjdbc3.jar
+            kvalobsclt.jar

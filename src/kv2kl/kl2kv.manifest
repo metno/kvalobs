@@ -1,0 +1,8 @@
+Main-Class: metno.kvalobs.kl2kv.Kl2KvMain
+Class-Path: ../jacorb/jacorb.jar
+            ../jacorb/logkit-1.2.jar
+            ../jacorb/avalon-framework-4.1.5.jar
+            log4j-1.2.13.jar
+            kvalobsclt.jar 
+            ojdbc14.jar
+            pgjdbc3.jar

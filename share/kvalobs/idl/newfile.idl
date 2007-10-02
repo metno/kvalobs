@@ -1,0 +1,16 @@
+#ifndef __newfile_idl__
+#define __newfile_idl__
+
+//newfilesignal define a interface that can be used to signal that 
+//a newfile is put into the directory named with the input parameter
+//'newfileindir'.
+//It is put in the micutil (Meteorological Institute CORBA utility) module.
+
+
+module micutil {
+  interface newfilesignal{
+    void newfile(in string newfileindir);
+  };
+};
+
+#endif

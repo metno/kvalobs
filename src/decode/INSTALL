@@ -1,0 +1,16 @@
+#!/bin/sh
+
+DESTINATION=
+DIRECTORIES="lib/decode"
+FILES=
+
+if [ -f synopdecoder_cron.sh ]; then
+	chmod +x synopdecoder_cron.sh
+	
+	if mkdir -p bin ; then
+		DIRECTORIES="$DIRECTORIES bin"
+		cp -f synopdecoder_cron.sh bin
+	fi
+fi
+
+. $KVDIR/conf/INSTALL.conf

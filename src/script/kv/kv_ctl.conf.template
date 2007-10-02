@@ -1,0 +1,4 @@
+START_PROGS="kvQabased kvManagerd kvDataInputd kvServiced kvSynopd"
+STOP_PROGS="kvServiced kvDataInputd kvQabased kvManagerd kvSynopd"
+
+TIMEOUT=60

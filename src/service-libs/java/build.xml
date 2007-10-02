@@ -1,0 +1,213 @@
+<?xml version="1.0" ?>
+<project default="main">
+	<property environment="env"/>
+	<property name="builddir" location="build"/>
+	<property name="idlgendir" location="src/generated" />
+	<property name="src" location="src" />
+	<property name="testresult" location="testresult"/>
+	<property name="testsrc" location="test" />
+	<property name="tmpdir" location="tmp"/>
+	<property name="libdir" location="../../../share/kvalobs/java/lib"/>
+	<property name="bindir" location="../../../bin"/>
+	<property name="idl2java_compiler" location="../../../share/kvalobs/java/bin/idl"/>
+
+
+	<path id="build.classpath">
+		<fileset dir="${libdir}/jacorb">
+			<include name="*.jar"/>
+			<exclude name="idl.jar"/>
+		</fileset>
+		<pathelement path="${libdir}/log4j-1.2.13.jar"/>
+		<pathelement path="${builddir}"/>
+	</path>
+	
+	<path id="test.classpath">
+		<path refid="build.classpath"/>
+		<pathelement path="${libdir}/junit.jar" />
+		<pathelement path="${libdir}/hsqldb.jar" />
+	</path>
+	
+	<target name="main" depends="clean, idl2java, compile, jar, jar2libdir, sqlhelper, kvdatalistener">
+	</target>
+	
+	<target name="init">
+		<mkdir dir="${builddir}"/>
+		<mkdir dir="${testresult}"/>
+		<mkdir dir="${tmpdir}"/>
+		<mkdir dir="docs"/>
+	</target>
+	
+	<target name="idl2java">
+		<apply executable="${idl2java_compiler}"> 
+			<arg value="-d" />
+			<arg value="${idlgendir}"/> 
+			<srcfile/>
+			<filelist dir="../../../share/kvalobs/idl" 
+			        files="kvService.idl,
+			               managerInput.idl,
+					       kvDataNotifySubscriber.idl,
+			               kvDataSubscriber.idl,
+			               kvHintSubscriber.idl,
+				           kvServiceCommon.idl,
+						   commonStationInfo.idl,
+						   datasource.idl,
+						   admin.idl" />  
+			</apply>
+	</target>
+	
+	<target name="compile" depends="init, idl2java">
+		<javac destdir="${builddir}" srcdir="${src}" classpathref="build.classpath" debug="true"> 
+			<include name="**/*.java"/>	
+		<!--	<exclude name="**/KvDataListener/*.java"/> -->
+		<!--	<exclude name="**/SqlHelper/*.java"/> -->
+		</javac>
+	</target>
+	
+	
+	<target name="clean">
+		<delete dir="${idlgendir}"/>
+		<delete dir="${builddir}"/>
+		<delete dir="${testresult}"/>
+		<delete file="kvalobsclt.jar"/>
+		<delete dir="${tmpdir}"/>
+		<delete dir="docs"/>
+	</target>
+	
+	<target name="doc">
+		<javadoc destdir="docs"
+		         author="true"
+				 version="true"
+				 use="true"
+				 classpathref="build.classpath"
+				 windowtitle="kvalobs java client">
+			<fileset dir="src">
+				<include name="**/*.java"/>
+			</fileset>
+		</javadoc>
+	</target>
+	<target name="jar">
+		<jar destfile="kvalobsclt.jar" basedir="${builddir}" includes="**/*.class"/>
+	</target>
+	
+	<target name="sqlhelper" depends="init, compile">
+		<jar destfile="SqlHelper.jar" manifest="SqlHelper.manifest" >
+			<fileset dir="${builddir}">
+				<include name="**/SqlHelper/**/*.class"/>
+				<exclude name="**/*Test.class"/>
+			</fileset>
+		</jar>
+		<copy todir="${libdir}" file="SqlHelper.jar"/>
+		<copy todir="${bindir}" file="binsrc/sqlhelper"/>
+	</target>
+	
+	<target name="install" depends="main">
+		<mkdir dir="${env.KVALOBS}/share/kvalobs/java/lib"/>
+		<mkdir dir="${env.KVALOBS}/bin"/>
+		<copy todir="${env.KVALOBS}/share/kvalobs/java/lib">
+			<fileset dir="${libdir}" includes="**/*.jar"/>
+		</copy>
+		<exec executable="cp" dir="." failonerror="true">
+			<arg line="binsrc/sqlhelper ${env.KVALOBS}/bin"/>
+		</exec>
+		<exec executable="cp" dir="." failonerror="true">
+			<arg line="binsrc/kvdatalistener ${env.KVALOBS}/bin"/>
+		</exec>
+
+	</target>
+	
+	<target name="kvdatalistener">
+		<jar destfile="KvDataListener.jar" manifest="KvDataListener.manifest" >
+				<fileset dir="${builddir}">
+					<include name="**/KvDataListener/**/*.class"/>
+					<exclude name="**/*Test.class"/>
+				</fileset>
+			</jar>
+			<copy todir="${libdir}" file="KvDataListener.jar"/>
+			<copy todir="${bindir}" file="binsrc/kvdatalistener"/>
+	</target>
+	
+	<target name="jar2libdir">
+		<copy todir="${libdir}" file="kvalobsclt.jar"/>
+	</target>	
+	
+	<!-- ***********************************************
+	     ***********************************************
+	     *********      JUnit test targets      ********
+	     ***********************************************
+	     ***********************************************  -->
+	
+	<target name="compile-test">
+			<javac destdir="${builddir}" srcdir="${testsrc}" debug="true" classpathref="test.classpath">
+				<include name="**/*Test.java"/>
+			</javac>
+	</target>
+		
+	
+	<target name="test" depends="test-metno.util.PropertiesHelper, 
+		                          test-metno.util.StringUtil,
+	                             test-metno.dbutil.DbConnection, 
+		                          test-metno.dbutil.DbConnectionMgr,
+	                             test-metno.util.GetOpt, 
+		                          test-metno.SqlHelper,
+		                          test-metno.util.FileUtil">
+	</target>
+	<target name="test-metno.util.PropertiesHelper" depends="compile, compile-test">
+		<junit printsummary="yes" fork="yes" haltonfailure="yes">
+			<formatter type="brief" usefile="true"/>
+			<classpath refid="test.classpath"/>
+			<test todir="${testresult}" name="metno.util.PropertiesHelperTest"/>
+		</junit>
+	</target>
+	
+	<target name="test-metno.util.StringUtil" depends="compile, compile-test">
+		<junit printsummary="yes" fork="yes" haltonfailure="yes">
+			<formatter type="brief" usefile="true"/>
+			<classpath refid="test.classpath"/>
+			<test todir="${testresult}" name="metno.util.StringUtilTest"/>
+		</junit>
+	</target>
+	
+	<target name="test-metno.dbutil.DbConnection" depends="compile, compile-test">
+		<junit printsummary="yes" fork="yes" haltonfailure="yes">
+			<formatter type="brief" usefile="true"/>
+			<classpath refid="test.classpath"/>
+			<test todir="${testresult}" name="metno.dbutil.DbConnectionTest"/>
+		</junit>
+	</target>
+	
+	<target name="test-metno.dbutil.DbConnectionMgr" depends="compile, compile-test">
+		<junit printsummary="yes" fork="yes" haltonfailure="yes">
+			<formatter type="brief" usefile="true"/>
+			<classpath refid="test.classpath"/>
+			<test todir="${testresult}" name="metno.dbutil.DbConnectionMgrTest"/>
+		</junit>
+	</target>
+	
+	<target name="test-metno.util.GetOpt" depends="compile, compile-test">
+		<junit printsummary="yes" fork="yes" haltonfailure="yes">
+			<formatter type="brief" usefile="true"/>
+			<classpath refid="test.classpath"/>
+			<test todir="${testresult}" name="metno.util.GetOptTest"/>
+		</junit>
+	</target>
+	
+	<target name="test-metno.SqlHelper" depends="compile, compile-test">
+		<junit printsummary="yes" fork="yes" haltonfailure="yes">
+			<formatter type="brief" usefile="true"/>
+			<classpath refid="test.classpath"/>
+			<test todir="${testresult}" name="metno.SqlHelper.SqlHelperTest"/>
+		</junit>
+	</target>
+
+	<target name="test-metno.util.FileUtil" depends="compile, compile-test">
+		<junit printsummary="yes" fork="yes" haltonfailure="yes">
+			<formatter type="brief" usefile="true"/>
+			<classpath refid="test.classpath"/>
+			<test todir="${testresult}" name="metno.util.FileUtilTest"/>
+		</junit>
+	</target>
+		
+	
+	
+</project>
+

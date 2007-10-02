@@ -1,0 +1,29 @@
+#Dette er en lokal konfigurasjonsfil hvor man kan
+#sette opp diverse variabler for kompilering av
+#kvalobs lokalt. Rename filen til myconf.
+#
+# NB! myconf SKAL IKKE inn i cvs arkivet.
+
+#Kompilerings variabler
+
+#PYTHONPATH m� noen ganger settes for at omniidl kompilatoren
+#skal fungere. omniidl er skrevet i python.
+#Set PYTHONPATH til <hvor omniorb er instalert>/lib/pythonX.Y
+#hvor X.Y er versionene til python som brukes.
+
+
+#export PYTHONPATH=$(HOME)/src/kvalobstest/lib/python
+#export CXX=g++-3.4
+#export CC=gcc-3.4
+#export OMNIORB_INCLUDE=/usr/include
+#export OMNIORB_LIB=/usr/lib
+#export OMNIORB_BIN=/usr/bin
+#export PSQL_INCLUDE=/usr/include/postgresql
+#export PSQL_LIB=/usr/lib
+#export BOOST_HOME=/opt/local
+#export SQLITELIB=/usr/lib
+#export SQLITEINCLUDE=/usr/include
+#export QTDIR=/usr
+#export QT_INCLUDE=$(QTDIR)/include/qt3
+#export QT_LIB=$(QTDIR)/lib
+#export PUTOOLS=/usr/local

@@ -1,0 +1,74 @@
+
+/**
+\mainpage
+
+<h3>Overview</h3>
+
+<p>The <b>QABase module</b> is responsible for running the <b>quality controls</b> (QCs) on observations. It is usually initiated from the <b>kvManager</b> module after updates in the observation database; either freshly incoming data or <i>missing</i> data constructed from a timeout in the receiving system. QABase may also be called directly from one of the test-systems in Kvalobs. QABase is designed to perform all automatic quality controls for the Kvalobs system (but at the moment only QC1 is fully implemented and tested). The quality controls themselves are implemented as Perl routines residing in the Kvalobs database. From these routines we assemble workable Perl scripts containing observation- and model data from the kvalobs database, various metadata for the quality control (also residing in the database), and other relevant information; all as Perl variables. These scripts are compiled and run in an embedded Perl interpreter inside QABase. The output from each run is interpreted by QABase, and appropriate actions on observations are taken:
+<ul>
+      <li>Changes in control- and use-flags
+      <li>Changes in missing-status
+      <li>Changes in the data-value itself: the corrected value
+</ul>
+</p>
+
+<p>
+Input to QABase is a kvStationInfo, containing information on the originating station and the observation time. 
+QABase will then:
+    <ol>
+      <li>find all relevant checks for this station, time and quality control level.
+      <li>For each check:
+	<ul>
+	  <li> Assemble the QC Perl-script from observation data, model data, meta data and the appropriate Perl routine.
+	  <li> Compile and run the script in the embedded Perl interpreter.
+	  <li> Update the observation according to return values from the script.
+	    
+	</ul>
+    </ol>
+</p>
+
+<p>
+Logging output from QABase are routed through the <b>Logger</b> classes documented elsewhere in Kvalobs. In addition to the usual ascii logfile residing in <i>var/log</i>, QABase produces a HTML based log in a directory structure like: Stationid --> Date --> Observationtime.
+</p>
+
+
+<hr>
+
+<h3>Main Classes </h3>
+<ul>
+<li>kvQABaseControl runs the QC operation.
+<li>kvQABaseDBConnection handles the connection to the database.
+<li>kvQABaseMeteodata handles all meteorological data - including updating stored observations.
+<li>kvQABaseMetadata handles the meta data for the QC checks.
+<li>kvPerlParser is the wrapper for the embedded Perl interpreter.
+<li>kvQABaseScriptManager stores the scripts/routines and interpretes the arguments for each check.
+</ul>
+
+
+<hr>
+
+<h3>Work flow </h3>
+
+<ol>
+<li>Incoming command to QABase enters work queue; picked up in <b>QaWork</b>.
+<li><b>kvControl::runChecks</b> is called with reference to a set of observations to be quality controlled. This is the main routine performing all checks.
+<li>Create and initiate the database gate: kvQABaseDBConnection. Make sure the connection is ok.
+<li>Check if this observation set is appropriate for the QC runs (the "observation programme" determines here).
+<li>Update cached data from the static database tables (at most once each hour).
+<li>Create and initate the logger classes.
+<li>Fetch all relevant checks for this stationid and time. Each check contains reference to a Perl routine with arguments to this routine.
+<li>For each check:
+<li>Let kvQABaseScriptManager fetch the appropriate Perl routine and interprete the arguments following the check. Information about the necessary data and meta data for this routine are stored in kvQABase::script_var structures.
+<li> kvQABaseMeteodata loads observations (both data and text-data ) and model data via kvQABaseDBConnection. This data is kept in kvQABaseDBConnection::obs_data, kvQABaseDBConnection::text_data and kvQABaseDBConnection::model_data. From information in the kvQABase::script_var structures, a string containg Perl-code with data-variables is produced.
+<li>In the same fashion, kvQABaseMetadata produces Perl-code with the appropriate meta-data via the kvQABaseDBConnection and information in the kvQABase::script_var structures.
+<li>The Perl-code versions of the data and meta-data are combined with the stored routine, and the resulting Perl script is sent to kvPerlParser for compiling and run. The return values are stored in a string/double map.
+<li>The return values from the script are evaluated in kvQABaseMeteodata::updateParameters. The controlflag and useflag is updated for the relevant observation (the one being checked). The observational "corrected" value and the "missing status" may also be changed.
+<li>End of check loop.
+
+</ol>
+
+
+
+
+
+*/

@@ -1,0 +1,1388 @@
+<html>
+<head><title>System for overvåking</title>
+</head>
+<body><br>
+<div align="right"><h3>Versjon 15. februar 2002</h3></div>
+<p><br>
+<div align="center"><h1>SYSTEM FOR OVERVÅKING</h1></div>
+<p><br>
+
+<div align="center">
+<a href="#dbstruct">Databasestruktur</a>&nbsp;
+<a href="#db_beskr">Databasebeskrivelse</a>&nbsp;
+<a href="#kv_meld">Kvalobsmeldinger</a>&nbsp;
+<a href="#flagg">Flagg</a>&nbsp;
+<a href="#wg_beskr">Webgr.snitt-beskrivelse</a>&nbsp;
+<a href="#wg_vis">Webgr.snitt-visuelt</a>&nbsp;
+
+
+
+</div>
+<p><br>
+
+
+<b>Mål:</b><br>
+I prosjektdirektivet for KVALOBS er målet for arbeidspakke 2.3 angitt som:
+<p>
+"I tilknytning til QC0,1,2 skal det lages moduler for automatisk overvåkning og avviksrapportering. Dette skal sørge for at tilstrekkelig informasjon gjøres tilgjengelig for de det angår. Informasjon fra kvalitetskontrollsystemet (automatisk generert) ang. feil / avvik i observasjonsdataene må være tilgjengelig i dette systemet. Det må vurderes om dette overvåkingssystemet fra kvalitetskontrollen kan inngå som en del av et større stasjonsinformasjons system som også vil inneholde viktig informasjon om stasjonene og datakvalitet for alle brukere av observasjonsdata." 
+<p>
+Hovedvekten av arbeidet vil ligge i å lage et enhetlig rapporteringssystem for service-seksjonen, slik at de så effektivt og tidlig som mulig kan oppdage feil/avvik på manuelle og automatiske stasjoner og rette disse.
+<p>
+<b>Rapporteringsgruppen:</b><br>
+Gruppen som har ansvaret for å utvikle system for overvåking, rapporteringsgruppen,
+består av Leif Olonkin, Audun Christoffersen, Gabriel Kielland, Liv Older og 
+Øystein Lie.
+<p>
+<b>Dagens overvåkingssystem:</b><br>  
+<b>1)</b> AutoObs samler inn timesdata fra automatstasjoner som vises i 
+"Visningsprogram for automatstasjoner". Serviceoperatører følger med på dette og her detekteres om en stasjon faller ut/ekstremalverdier. Dette er ofte en tidkrevende prosess som det er ønske om å effektivisere.<br>
+<b>2)</b> Service, IT og VA-salen får telefoner fra observatører og andre som melder fra om feil. Her kan det ofte være gjentatte beskjeder om samme forhold gjennom ulike kanaler. Det er ønske om effektivisering som forhindrer at flere tar samme sak.<br>
+<b>3)</b> De stasjonene som er satt opp med PIO kan i tillegg til vanlig datamelding sende en tekst fra observatør på slutten. Teksten kan inneholde feilmeldinger. Disse meldingene mangler et standardisert meldingsformat og instruks.<br>
+<b>4)</b> MILOS sender ALARM1, 2, 3-meldinger (QC0-feilmeldinger) som ikke nyttiggjøres i AutoObs.<br> 
+<b>5)</b> Klimaavdelingens rutineprogram skal erstattes av Kvalobs. Det nåværende systemet er vanskelig å holde ved like, og gir mange irrelevante meldinger.<br> 
+<b>6)</b> Service-operatørene har anledning til å ringe opp stasjonene direkte når de skal analysere en ustabilitet. Det er bare nå-situasjonen som vil være tilgjengelig.
+<p>
+<b>De det angår:</b>
+<ol>
+<li type ="1"> Sanntids oppfølging av dataflyt (førstelinjekontroll).</li>
+<li type="1"> Service og vedlikehold av sensorer og kommunikasjonslinjer (service).</li>
+<li type="1"> Langtidsoppfølging av observatørene (stasjonsoppfølging).</li>
+</ol>
+<p>
+I første omgang utvikles systemet primært med tanke på service.<br>
+Førstelinjekontrollen: Førstelinjekontrollens behov for oppfølging må samordnes med videreutvikling av mottakssystemene.<br>
+Stasjonsoppfølging: Avviksmeldinger som blir samlet opp er også egnet til langsiktig oppfølging av observatørene. I første versjon av overvåkingssystemet legges det ikke opp til eget grensesnitt for stasjonsoppfølging.
+<p>
+<b>Alarmnivå:</b><br>
+I forbindelse med feilrapportering er det flere alarmnivåer gradert etter ulik reaksjonstid:<br> 
+<b>1.</b>   Mast ramlet ned, lynet har slått ned osv. Servicetiltak bør gjennomføres så fort som mulig.<br>
+<b>2.</b>   Feilmeldinger fra stasjon som indikerer at sensor er ute av drift. Feilmeldingen kan f.eks. være overskridelse av ekstremverdi/frosset verdi. Dette kan skyldes ledningsbrudd, kortslutning etc. Mulig servicetiltak.<br>
+<b>3.</b>  Gjentatte feilmeldinger som indikerer at sensordel begynner å slites/fungere dårlig. F.eks. at kulelager må byttes osv. Mulig vedlikeholdsbehov må planlegges.<br>
+<b>4.</b> Systematiske feil eller avvik som krever langsiktig oppfølging eller oppfølging av observatør.<br>
+<b>5.</b> Det vil også oppstå tilfeller der ikke observasjon blir rapportert i det hele tatt, dvs. manglende observasjon, og at observatør har avgitt ukorrekt observasjonsrapport, der man må gi tilbakemelding slik at det korrigeres.
+<p>
+<b>Grensesnitt:</b><br>
+Det skal utvikles et web-basert rapporteringssystem for serviceseksjonens oppfølging av instrumenter og kommunikasjonssystemet. Åpningsbildet er et Norgeskart med en statuslampe for hver stasjon. Kartet genereres ved ArcIMS. Rød lampe indikerer feil, gul lampe indikerer feil med beskrevet tiltak, og grønn lampe indikerer enten at tiltak er utført, at feil er utbedret eller at servicebehov ikke er påkrevet.<br>
+Det skal også være zoommuligheter eller andre muligheter for å vise et utvalg stasjoner.
+Når man klikker seg inn på den enkelte stasjon skal man få stasjonsopplysninger og siste feilsituasjon for den stasjonen. Det skal utvikles 5 forskjellige sider: Selve kartet, stasjonsstatus, registrering av ny melding, nytt tiltak/endre tiltak og registrering av ny bruker. Kartet og stasjonsstatus er tilgjengelig for alle på intranett, men kun service vil få anledning til å kvittere for mottatt melding, beskrive og kvittere for tiltak. Helpdesk og service, varslingsenhetene (regionene) og ettertidskontrollen på klimaavdelingen skal ha mulighet til å registrere ny feilmelding.<br> 
+Systemet for overvåking skal inneholde en database kalt Tiltaksdatabasen. Den skal utvikles i Postgresql. De statiske tabellene skal vedlikeholdes med Kvalobs-databasen som master.
+<p>
+
+<b>Feilmeldingskilder i det nye overvåkingssystemet:</b><br>
+<b>1) Kvalobskontrollene:</b> <br>
+Langt de fleste meldingene vil komme fra Kvalobs.<br>
+QC1 "sanntidskontroll" gjennomføres så fort som mulig etter at dataene er kommet inn til DNMI og feilmeldinger fra Kvalobs "pushes" over i Tiltaksdatabasen. Meldinger fra QC2 "kvalitetskontroll i ettertid" og HQC "manuell kvalitetskontroll" vil også dekkes i overvåkingssystemet.<br> 
+<b>2) Innsamlingskontrollene: </b><br>
+Meldinger fra AutoObs-systemet.<br>
+Melding om avvikssituasjoner og servicebehov vil bli foreslått i eget notat, samt forslag til standardisert SMS og resultater av QC0-sjekkene formidlet via tekstmeldinger. 
+PIO bør konfigureres med standardisert melding i tråd med det som vil gjelde for de automatiske stasjonene. Mottakssystemene må videreutvikles slik at meldinger fra stasjonene blir lagt inn i tiltaksdatabasen.<br>
+<b>3)  Registreringssystemet:</b><br>
+Registreringssystemet omfatter all manuell input fra "meldingsgivere":<br>
+Helpdesk og Service som mottar beskjeder på telefon og på andre måter.<br>
+Varslingsenhetene (regionene) og ettertidskontrollen i Klimadataseksjonen skal også kunne rapportere inn i dette systemet.
+<a name="dbstruct"></a>
+<p>
+<br>
+<center><h2>Detaljert om Tiltaksdatabasen:</h2></center>
+<p>
+<center><img src="images/Drawing_TDB5.gif"></center>
+<p>
+<br>
+<br>
+<center><h3>Tiltaksdatabasen skal inneholde følgende dynamiske tabeller:</h3></center>
+<p>
+<b>1. Stasjon</b> (nr, navn, type, lat, lon, status, region, flyplass).<br>
+<b>2. Feil</b> (nr, stasjonsnr, feiltypenr, tiltaksnr, kvittering, signaturnr, lestid)<br>
+<b>3. Melding</b> (nr, tekst, feilnr, tid, param1nr, param2nr, param3nr, param4nr, signaturnr, testnr, testparam1, testparam2, testparam3, testparam4, testparam5)<br>
+Dette er feilmeldinger, både automatisk innkomne fra Kvalobs og manuelt registrerte fra Helpdesk og registrert fra SMS, PIO.<br>
+<b>4. Tiltak</b> (nr, tekst, typenr, feilnr, beskrevet, beskrivtid, signaturnr, ferdig, sluttid, sluttfarnr)<br>
+<p>
+Disse skal ha oppslag til de faste registrene:<br> 
+<ul>
+	<li>Feiltype
+	<li>Tiltakstype
+	<li>Signatur
+	<li>Kvalobstest
+	<li>Parameter
+</ul>
+
+
+Detaljgjennomgang av tabellene kommer lenger bak.
+<p>
+<b>Behandling av Kvalobs-meldinger:</b><br>
+Databasen må være søkbar på feilmeldinger. Meldingene fra Kvalobs eller Helpdesk blir søkbare på meldingstype og for Kvalobs sin del også på det spesifikke sjekknummeret som har slått ut.<br>
+Tilknyttet sjekkene fra Kvalobs som slår ut og pushes over til tiltaksdatabasen må det utvikles et eget program for strenggenerering, der man bruker ferdigdefinerte strenger utfra sjekknummeret som følger med og "fyller på" med testverdiene/grenseverdiene som kommer fra Kvalobs. Dette blir da en utfyllende tekst som hekter seg på Kvalobs-meldingene.
+<p>
+Grenseverdiene/testverdiene som følger med meldingen, vil plasseres i variablene <br>
+testparam1.......testparam5. <br>
+testparam1 (int)<br>
+testparam2 (int)<br>
+testparam3 (int)<br>
+testparam4 (int)<br>
+testparam5 (int)<br>
+<p>
+Tekstene blir laget som en kombinasjon av de forhåndsgenererte 
+tekstdelene i tabellen <b>Kvalobstest</b>. Parametrene som blir oversendt 
+fra Kvalobs-kontrollene blir lagret i tabellen <b>Melding</b>. Deretter 
+vil et program generere en utfyllende tekststreng til Kvalobsmeldingen, 
+der hver sjekk er tilordnet en kort tekst. Testverdier, grenseverdier og 
+parameterverdier blir plassert innenfor tekststrengen.
+<p>
+F.eks.: Sjekk nr. 7 i Kvalobs, som er TX < TM, blir utført på stasjon 
+nummer 12345 for observasjonstidspunktet 2002.06.06.09:00. Sjekken 
+detekterer en feil som blir markert ved at flagget fc blir satt til 
+verdien 2 i Kvalobsdatabasen qaDB for parameterene TX og TM.
+En programmodul sender sjekknummeret (verdien 7), stasjonsnummeret, 
+tidspunktet, og de to parameterverdiene (TX=10.0; TM=10.2) til 
+tiltaksdatabasen. Verdiene blir lagret i tabellen <b>Melding</b>. Parameterverdiene 
+blir plassert i testparam1 og testparam2.
+En annen programmodul setter opp tekststrengen basert på sjekknummeret 
+og parameterverdien, oppretter en ny post i tabellen <b>Feil</b> eller 
+oppretter en kobling til en eksisterende post i tabellen <b>Feil</b>, og endrer 
+eventuelt stasjonens status fra 'grønn' til 'rød'. Tekststrengen 
+"Maksimumstemperatur < Middeltemperatur. TX=10.0, TM=10.2" blir lagt 
+i tabellen <b>Melding</b>. Hvis dette var en ny feilsituasjon ble feiltypen 
+satt til "Temp-feil".
+<p>
+<b>Tiltak:</b>
+Når man beskriver tiltak slår man opp i <b>"Tiltakstype"</b>, som f.eks. kan være "Kontakt observatør", "Kontakt tilsynsmann", "Avventer", "Sensorsjekk" osv. I tillegg skal det være en valgfri rubrikk hvor man kan skrive inn fritekst for å beskrive mer utfyllende hvilket tiltak man setter i verk. Tiltakstypene blir det søkbare når det gjelder tiltak.
+<p>
+
+<b>PIO/SMS</b><br>
+Mottaksystemet for PIO og SMS-meldinger må også konfigureres til å registerere meldinger som lagres i tiltaksdatabasen.<br>
+<p>
+Alle feilmeldingene må også logges, slik at man kan slå opp i tidligere feilmeldinger og kjøre statistikk.<br>
+<p><a name="kv_meld"></a>
+<br>
+<br>
+<table align="center" border="2" width="70%">
+<caption><b><h3>Eksempler på meldingstyper og tilhørende meldinger i fritekst</h3></b></caption>
+<tr>
+ <th>Meldingstype</th><th>Fra Kvalobs</th><th>Testen som er gjort</th><th>Fritekst fra      Kvalobs</th>
+</tr>
+<tr>
+ <td>"Temp-feil"</td>
+ <td>Sjekknr. 7 <br> TX=10&nbsp;&nbsp;&nbsp;&nbsp;fc=2<br>TM=10.2</td>
+ <td>TX < TM <br>(logikk)</td>
+ <td>Maksimumstemperatur < <br> Middeltemperatur, <br> TX=10.0, TM=10.2</td>
+</tr>
+<tr>
+ <td>"Fuktfeil"</td>
+ <td>Sjekknr. 34&nbsp;&nbsp;Testverdi=30<br>UU(t)=88, UU(t-1)=24<br>fs=2</td>
+ <td>UU(t)-UU(t-1)>30.0<br>sprang</td>
+ <td>Relativ fuktighet sprang<br>over 30% på èn time.<br>UU(t)=88, UU(t-1)=24</td>
+</tr>
+<tr>
+ <td><center>"</center></td>
+ <td>Sjekknr. 58  UM=1.0<br>fr=5</td>
+ <td>UM<5.0<br>(grense)</td>
+ <td>Grensefeil UM=1.0 fordi<br>UM<5.0</td>
+</tr>
+<tr>
+ <td>"Vind-feil"</td>
+ <td>Sjekknr. 3 param 7<br>paramverdi 140<br>fr=4</td>
+ <td>FG>131<br>grense</td>
+ <td>Vindkast, 10 meter>131<br>FG=140</td>
+</tr>
+<tr>
+ <td><center>"</center></td>
+ <td>Sjekknr. 12 param8<br>FX(t)=15  FX(t-1)=70<br>fs=2</td>
+ <td>FX(t)-FX(t-1)>40<br>(sprang)</td>
+ <td>Maks. vindhastighet, 10 <br>meter, 10 min. middel<br>sprang > 40<br>FX(t)=15 FX(t-1)=70</td>
+</tr>
+<tr>
+ <td>"Trykk-feil"</td>
+ <td>Sjekknr. 9<br>QNH(t)=1002.2,<br>QNH(t-1)=1024.9<br>fs=2</td>
+ <td>&#124QNH(t)-QNH(t-1)&#124>12.0<br>sprang</td>
+ <td>..</td>
+</tr>
+<tr>
+ <td>"Strålingsfeil"</td>
+ <td>..</td>
+ <td>..</td>
+ <td>..</td>
+</tr>
+<tr>
+ <td>"Nedbørfeil"</td>
+ <td>Sjekknr. 14 param 4<br>RR=2.5  RR_12=0.0<br>fc=0xA</td>
+ <td>&#124RR(t-11)(t-10)...(t)-RR_12&#124>1.2<br>(logikk)</td>
+ <td>Total nedbør 12 timer<<br>nåverdi nedbørintensitet<br>Logikkfeil akkumulert RR=2.5, RR_12=0.0</td>
+</tr>
+<tr>
+ <td><center>"</center></td>
+ <td>Sjekknr. 10<br>Logikkfeil  RR=0.3, RT=0.0<br>fc=0xA</td>
+ <td>RR>0.2 og RT=0<br>(logikk)</td>
+ <td>Logikkfeil, antall minutter<br>nedbør = 0 mens<br>nedbørintensitet >      0.2<br>RR=0.3, RT=0.0</td>
+</tr>
+<tr>
+ <td>"Sikt-feil"</td>
+ <td>..</td>
+ <td>42<=ww<=49 &<br>10<=VV<=09<br>(logikk)</td>
+ <td>..</td>
+</tr>
+<tr>
+ <td><center>"</center></td>
+ <td>..</td>
+ <td>60<=VV<=89 &<br>38<=ww<=39<br>(logikk)</td>
+ <td>..</td>
+</tr>
+<tr>
+ <td>"Sky-feil"</td>
+ <td>..</td>
+ <td>NH=9 & CL>=0 eller<br>CM>=0 eller CH>=0<br>(logikk)</td>
+ <td>..</td>
+</tr>
+<tr>
+ <td>"Bølge-feil"</td>
+ <td>..</td>
+ <td>..</td>
+ <td>..</td>
+</tr>
+<tr>
+ <td>"Service"</td>
+ <td>..</td>
+ <td>..</td>
+ <td>..</td>
+</tr>
+<tr>
+ <td>"Mange-feil"</td>
+ <td>..</td>
+ <td>..</td>
+ <td>Mange feil på stasjonen</td>
+</tr>
+<tr>
+ <td>"Systemfeil"</td>
+ <td>Manglende verdi</td>
+ <td>..</td>
+ <td>Manglende parameterverdi</td>
+</tr>
+<tr>
+ <td>"Stasjon nede"</td>
+ <td>Tilfeldige verdier vil forekomme</td>
+ <td>..</td>
+ <td>Stasjonen er under vedlikehold</td>
+</tr>
+</table>
+<a name="db_beskr"></a>
+<p>
+<br>
+
+<h3><b>Beskrivelse av tabellene og variablene i tiltaksdatabasen:</b><br></h3>
+<p>
+<b>Vi har de dynamiske tabellene<br></b><b><ul>
+<li>Stasjon
+<li>Feil
+<li>Melding
+<li>Tiltak
+</ul></b>
+
+som refererer til de statiske tabellene<br>
+<ul> 
+<li>Tiltakstype
+<li>Feiltype
+<li>Signatur
+<li>Kvalobstest
+<li>Parameter
+</ul>
+<p>
+<br>
+<br>
+
+<h3>Stasjon:</h3>
+Tabellen inneholder informasjon om de stasjonene som skal vedlikeholdes av Meteorologisk Institutt.
+<b>nr</b> (int) Klimanummeret på stasjonen <br>
+<b>navn</b> (char) Navnet på stasjonen<br>
+<b>type</b> (char) Automat, nedbør, metar osv. Skal benyttes for å vise et avgrenset utvalg stasjoner.<br>
+<b>lat</b> (int) Breddegrad, desimalt<br>
+<b>lon</b> (int) Lengdegrad, desimalt<br>
+<b>status</b> (char) Stasjonsstatus: Rød/Gul/Grønn<br>
+<b>region</b> (char) Regioner til de ulike stasjonene: Enten Sørlandet, Østlandet, Vestlandet, Trøndelag, Nord-Norge, Arktis eller marine stasjoner.<br>
+<b>flyplass</b>  (bool) Om en stasjon er definert som flyplass-stasjon eller ikke. <br>
+<p>
+
+<h3>Feil:</h3>
+Tabellen Feil inneholder variable som entydig definerer hver eneste feilsituasjon som er registrert og hvilket tiltak som følger med den aktuelle meldingen.<br>
+<b>nr</b> (int) Dette nummeret øker med 1 for hver ny feilsituasjon.<br>
+<b>stasjonsnr</b> (int) er stasjonsnummeret på stasjonen (refererer til nr i tabellen Stasjon)<br>
+<b>feiltypenr</b> (int) er nummeret på feiltypen til de aktuelle meldingene (refererer til nr i tabellen Feiltype)<br>
+<b>tiltaksnr</b> (int) er nummeret på det aktuelle tiltaket som er foreskrevet (refererer til nr i tabellen Tiltak). Dette teller seg opp etter som tiltakene beskrives.<br>
+<b>kvittering</b> (bool) er en ja/nei variabel som sier om feilsituasjonen er registrert. <br>
+<b>signaturnr</b> (char) er navnet på den som har registrert feilsituasjonen.<br>
+<b>lestid</b> (time) er når meldingen er lest.<br>
+<p>
+
+<h3>Melding:</h3>
+Denne tabellen inneholder alle meldingstekstene med signatur, tidspunkt osv.
+Eks. melding fra Helpdesk: Helpdesk-operatør får telefon fra observatør. Han skriver inn en passende tekst i fritekstvinduet (se eksempler på grensesnitt lenger bak) og må samtidig velge en passende kategori, f.eks. "Temp-feil" eller "Vind-feil". Disse kategoriene er forhåndsdefinerte i en egen liste under variabelen tekst i tabellen <b>Meldingstype</b>.
+Eks. Kvalobs-melding: En Kvalobs-melding pushes over automatisk fra Kvalobs-systemet til tiltaksdatabasen og lagres i variabelen tekst i tabellen <b>Melding</b>. På forhånd må alle Kvalobs-sjekker vha. numrene knyttes til en meldingstype, og dette gjøres i tabellen <b>Kvalobstype</b>. <br>
+Når stasjonen har en aktiv feilsituasjon blir den nye meldingen knyttet til den aktuelle eksisterende feilsituasjonen.
+<p>
+Det skal også være mulig å endre en meldingstype til "Mange-feil" hvis flere ulike feil følger etter hverandre. Dermed skjønner man at de har sammenheng med den første feilen. 
+<p>
+<b>nr</b> (int) Et entydig nummer til meldingen, løpenummer. Nummeret teller seg altså opp etter hver melding som kommer inn.<br>
+<b>tekst</b> (char) Selve meldingsteksten.<br>
+<b>feilnr</b> (int) Meldingen får tildelt et hovednummer som refererer til tabellen "Feil".<br>
+<b>tid</b> (time) Når meldingen er registrert i tiltaksdatabasen.<br>
+<b>param1nr</b> (int) Nummeret til første aktuelle parameter i testen som utføres.<br> 
+<b>param2nr</b> (int) Nummeret til andre aktuelle parameter i testen som utføres.<br> 
+<b>param3nr</b> (int) Nummeret til tredje aktuelle parameter i testen som utføres.<br> 
+<b>param4nr</b> (int) Nummeret til fjerde aktuelle parameter i testen som utføres.<br> 
+<b>signaturnr</b> (int) Nummeret på signaturen. <br> 
+<b>testnr</b> (float) testnummeret eller sjekknummeret fra Kvalobs (hvis meldingen kommer fra Kvalobs).<br>
+<b>testparam1</b> (float)  Verdien til første parameter i testen <br>
+<b>testparam2 (float)</b>  Verdien til andre parameter i testen <br>
+<b>testparam3 (float)</b>  Verdien til tredje parameter i testen <br>
+<b>testparam4 (float)</b>  Verdien til fjerde parameter i testen <br>
+<b>testparam5 (float)</b>Verdien til femte parameter i testen  <br>
+<p>
+
+<h3>Tiltak</h3>
+<b>nr</b> (int) Det fortløpende nummeret som gis tiltakene etterhvert som de blir beskrevet.<br>
+<b>tekst</b> (char) Fritekst fra service-operatør. Denne kan være detaljert for å beskrive utfyllende hvilket tiltak som er gjort.<br>
+<b>typenr</b> (int) Samme som nr i tabellen "tiltakstype". Nummeret på typekategori tiltak. Dette blir det søkbare på tiltak.<br>
+<b>feilnr</b> (int) Nummeret på meldingen som er registrert.<br>
+<b>beskrevet</b> (bool) Om tiltak er beskrevet eller ikke, Ja/nei. Hvis tiltak er beskrevet settes lampe på aktuell stasjon på statuskart fra rød til gul.<br>
+<b>beskrivtid</b> (time) Når er tiltak beskrevet. Blir automatisk registrert.<br>
+<b>signaturnr</b> (char) Nummer på signatur til serviceoperatøren som har beskrevet tiltak.<br>
+<b>ferdig</b> (bool) Er tiltak utført eller ikke, ja/nei. Hvis tiltak er utført settes lampe på aktuell stasjon på statuskart fra gul til grønn. <br>
+<b>sluttid</b> (time) Tid når tiltak er utført, lampe har blitt grønn. Registreres automatisk.<br>
+<b>sluttfarnr</b> (char) Nummer som refererer til serviceoperatør som har utført tiltak.<br>
+<p>
+
+<h3>Tiltakstype</h3>
+<b>nr</b> (int) Nummer på hovedtype tiltak.<br>
+<b>tekst</b> (char) Beskrivelse av hovedtype tiltak, eks. "Kontakt observatør", "Kontakt tilsynsmann", "Avventer", "Sensorsjekk", "Service".<br>
+
+<h3>Feiltype</h3>
+<b>nr</b> (int) Nummer på hovedtype melding.<br>
+<b>tekst</b> (char) Beskrivelse av hovedtype melding, eks. "Temp-feil", "Fukt-feil", "Trykk-feil".<br>
+Når flere meldinger følger etter hverandre fra Kvalobs, og den første meldingen er registrert som f.eks. "Temp-feil", vil også de andre meldingene som følger etter (dvs. sålenge statuslampa er rød) bli tildelt denne hovedkategorien sålenge de tilhører den samme.<br>
+Ellers blir de tildelt kategorien "Mange feil".<br>
+Vi har også en egen spesiell kategori "Stasjon nede" både på meldingstype og tiltakstype. Dersom det pågår service på en stasjon vil mange feilmeldinger naturlig nok renne inn, uten at de er reelle siden stasjonen f.eks. er nede. Slike meldinger grupperes under "Stasjon nede"-kategorien, og da vet man at feilmeldingene skyldes at det jobbes på stasjonen. Lampen forblir gul til eventuelle feil er utbedret, og blir ikke rød sålenge "Stasjon nede"-kategorien er satt. <br>
+<p> 
+
+<h3>Signatur</h3>
+<b>nr</b> Nummeret på signaturen.<br>
+<b>navn</b> (char) Navnet på alle som har tilgang til å registrere melding <br>
+<b>tilgang</b> (int) Nivå for rettigheter til Tiltaksdatabasen. Laveste nivå er lesetilgang, høyeste nivå er full skrivetilgang<br>
+<b>kommentar</b> (char) Eventuelle kommentarer om brukerne.<br>
+<b>fulltnavn</b> (char) Fullt navn på person som har registrert seg.<br>
+
+<h3>Kvalobstest</h3>
+<b>nr</b> (int) Alle sjekknumrene som er definert i Kvalobs.<br>
+<b>antalltekst</b> (int) Antall tekststrenger Kvalobs-sjekken skal generere.<br>
+<b>tekst1</b> (char) Tekststreng 1, avhengig av hvilken Kvalobs-sjekk som har slått ut.<br>
+<b>tekst2</b> (char) Tekststreng 2, avhengig av hvilken Kvalobs-sjekk som har slått ut.<br>
+<b>tekst3</b> (char) Tekststreng 3, avhengig av hvilken Kvalobs-sjekk som har slått ut.<br>
+<b>tekst4</b> (char) Tekststreng 4, avhengig av hvilken Kvalobs-sjekk som har slått ut.<br>
+Denne tabellen vil antagelig bli videreutviklet med tanke på streng-generering.<br>
+Det er planlagt at tekststrengen skal genereres vha. "navn" i parametertabellen.<br>
+
+<h3>Kvalobstype</h3>
+<b>nr</b> (int) Refererer til nr i tabellen Kvalobstest.<br>
+<b>feiltypenr</b> (int) Refererer til nr i tabellen Feiltype.<br>
+
+<h3>Parameter</h3>
+<b>nr</b> (int) Parameternummer fra parameter-sjekk i Kvalobs.<br>
+<b>navn</b> (char) navn på parameter som blir sjekket (eks. temperatur, fuktighet, trykk). <br>
+<b>kode</b> (char) Kvalobskoden til parameteren.<br>
+<b>beskrivelse (char)
+<p><a name="#flagg"></a>
+<br>
+<br>
+<table align="center" border="0">
+<tr>
+  <td><h3>Flagg som sendes over til Tiltaksdatabasen fra Kvalobskontrollene:</h3>
+  </td>
+</tr>
+
+<tr>
+<td>
+<b>(Flaggingen av korreksjoner er uthevet).</b>
+<br><br>
+
+<i>Grenseverdikontroll (r):</i><br>
+fr=4    Kontrollert. Observert verdi større enn høyeste testverdi<br>
+fr=5    Kontrollert. Observert verdi mindre enn minste testverdi<br>
+<b>fr=6    Forkastet. Observert verdi utenfor fysikalske grenser.</b><br>
+<br>
+<i>Konsistens-kontroll (s):</i><br>
+fc=2   Kontrollert. Formell inkonsistens, men ikke mulig å avgjøre i hvilken parameter<br> 
+fc=3   Kontrollert. Formell inkonsistens, men neppe feil i aktuell parameter<br>
+fc=4   Kontrollert. Formell inkonsistens, antakelig feil i aktuell parameter<br>
+<b>fc=5   Kontrollert. Formell inkonsistens. Korrigert automatisk<br>
+fc=6   Kontrollert. Formell inkonsistens. Korrigert manuelt</b><br>
+fc=0xA   Kontrollert. Klimatologisk inkonsistens. Observert verdi større enn høyeste testverdi<br>
+fc=0xB   Kontrollert. Klimatologisk inkonsistens. Observert verdi mindre enn minste testverdi<br>
+<b>fc=0xC   Kontrollert. Klimatologisk inkonsistens. Korrigert automatisk. <br>
+fc=0xD   Kontrollert. Klimatologisk inkonsistens. Korrigert manuelt.</b><br>
+<br>
+<i>Prognostisk romkontroll (n):</i><br>
+fn=4   Kontrollert. Observert verdi større enn høyeste testverdi.<br>
+fn=5   Kontrollert. Observert verdi mindre enn minste testverdi.<br>
+<b>fn=6   Manglende verdi erstattet med modellverdi.</b><br>
+<br>
+<i>Meldingskontroll (Posisjonskontroll)</i><br>
+fpos=3   Kontrollert. Mistenkelig melding. Ingen korreksjon<br>
+<b>fpos=4   Kontrollert. Mistenkelig melding. Korrigert automatisk.<br>
+fpos=6   Meldingsverdi forkastet.<br>
+fpos=0xC   Kontrollert. Mistenkelig melding. Korrigert manuelt.<br></b>
+<br>
+<i>Sprangkontroll (s)</i><br>
+fs=2   Kontrollert. Observert endring høyere enn testverdi. Ingen korreksjon.<br>
+fs=3   Kontrollert. Ingen endring i måleverdi over x tidsskritt. Ingen korreksjon.<br>
+<b>fs=6   Kontrollert. Observert endring høyere enn testverdi. Korrigert automatisk.<br>
+fs=7   Kontrollert. Ingen endring i måleverdi over x tidsskritt. Korrigert automatisk.<br>
+fs=0xE   Kontrollert. Observert endring høyere enn testverdi. Korrigert manuelt<br>
+fs=0xF   Kontrollert. Ingen endring i måleverdi over x tidsskritt. Korrigert manuelt.<br></b>
+<br>
+
+<i>Tidsserietilpasning (ns/is)</i><br>
+<b>fns/fis=1   Interpolert med godt resultat.<br>
+fns/fis=2   Interpolert med usikkert resultat<br></b>
+fns/fis=3   Forsøkt interpolert. Metode uegnet.<br>
+<br>
+<i>Væranalyse (i)</i><br>
+fi=2   Kontrollert. Mistenkelig verdi. Ingen korreksjon.<br>
+<b>fi=3   Kontrollert. Mistenkelig verdi. Korrigert automatisk.<br>
+fi=0xB   Kontrollert. Mistenkelig verdi. Korrigert manuelt.</b><br>
+<br>
+
+<i>Statistikk-kontroll (tp)</i><br>
+ftp=2   Kontrollert. Mistenkelig verdi. Ingen korreksjon.<br>
+<b>ftp=0xA   Kontrollert. Mistenkelig verdi. Korrigert manuelt.<br></b>
+<br>
+
+<i>Klimatologikontroll (i/is)<br></i>
+fi/is=2   Kontrollert. Mistenkelig verdi. Ikke korrigert.<br>
+<b>fi/is=3   Kontrollert. Mistenkelig verdi. Korrigert automatisk.<br>
+fi/is=0xB   Kontrollert. Mistenkelig verdi. Korrigert manuelt.</b><br>
+<br>
+</td>
+</tr>
+</table>
+<a name="wg_beskr"></a>
+<br><p>
+</b>
+<center><h2>Webgrensesnitt mot tiltaksdatabasen</h2></center>
+
+Tiltaksdatabasen skal ha fem ulike vinduer (grensesnitt) mot intranettet på DNMI:
+<b>Oversiktskart</b>, <b>Stasjonsstatus</b>, <b>Registrering av ny melding</b>, <b>Registrering av nytt tiltak</b> og <b>Registrering av ny bruker</b>. I tillegg har man mulighet til å klikke seg til et vindu som viser historikk, dvs. et skript setter sammen liste over feilmeldingene som har kommet inn på den aktuelle stasjonen + alle tiltak som er satt. <b>Oversiktskart</b> og <b>Stasjonsstatus</b> er tilgjengelig for alle på intranett. <br>
+Helpdesk og service + varslingsenhetene (regionene) og ettertidskontrollen i klimadataseksjonen har mulighet til å registrere ny feilmelding. Kun service vil få anledning til å kvittere for mottatt melding, beskrive og kvittere for tiltak. 
+Nedenfor følger en beskrivelse av de ulike vinduene og interaksjonen mellom dem.
+<p>
+<i><b>Oversiktskart (Rapporteringssystem for service):</b> <br></i>
+Som første oversiktsbilde over stasjonene har vi et Norgeskart med status for hver stasjon (rød, gul, grønn). De tre ulike statusene representerer ulike "lag" av kartet. Rød lampe (ligger øverst) indikerer feil, gul lampe (i et mellomlag) indikerer feil med beskrevet tiltak (eller at servicetiltak pågår på stasjon), og grønn lampe (underst) indikerer tiltak utført, at feil er utbedret eller at servicebehov ikke er påkrevet.<br>
+<p>
+Vi har fire ulike knapper for å vise utvalg av stasjonstyper: Automatstasjoner, Flyplasser, Manuelle værstasjoner, Nedbørstasjoner. Ved å klikke på hver av disse vil kun stasjonene innenfor den bestemte gruppen vise seg på kartet, og man "filtrerer" vekk de andre stasjonstypene. Øverst har vi også muligheten til å vise "Alle stasjoner".<br>
+<p>
+Dessuten har vi en knapp "Velg region" der man kan velge å se status for alle stasjoner fra enten Sørlandet, Østlandet, Vestlandet, Trøndelag, Nord-Norge, Arktis eller marine stasjoner.<br>
+Vi har en knapp "Velg Stasjon" der alle Meteorologisk Institutts stasjoner er listet opp i alfabetisk rekkefølge.<br>
+I tillegg har vi en knapp "Alle stasjoner med feil" der alle stasjoner som har rød status vises.<br>
+<p>
+For å se på stasjonsstatus for en bestemt stasjon er det to alternativer: Det ene er å klikke i rubrikken "Velg stasjon". Alternativt kan man klikke direkte på kartet på stasjonen man vil se nærmere på. I begge tilfeller kommer man til et nytt vindu kalt <b>Stasjonsstatus</b> (beskrivelse under) hvor status, siste innkomne feilmeldinger og eventuelt tiltak for den aktuelle stasjonen er beskrevet.
+<p>
+I kartvinduet har man også en knapp for å "Registrere nye meldinger" hvor man kommer inn i vinduet <b>Registrering av ny melding</b> (beskrivelse under).  <br>
+Dessuten har man to rubrikker: "Velkommen 'navn på eier av maskinen'" og "Hvis du ikke er 'navn på eier av maskinen', klikk her." Default navn settes til Anton, slik at første gang man klikker seg til oversiktskartet vises "Velkommen Anton" og "Hvis du ikke er Anton, klikk her." Man må klikke på den siste rubrikken for å registrere seg. Da kommer man inn i vinduet <b>Registrering av ny bruker</b> (beskrivelse under).<br> <p>
+
+
+Det vil ialt være fem nivåer på tilgangsrettighetene i Overvåkingssystemet (stigende nummer har økende rettigheter):<br>
+<b>1.</b> "Default" bruker er Anton. Alle på Meteorologisk Institutts intranett har rett til å se Oversiktskart og Stasjonsstatus for alle stasjoner.<br>
+<b>2.</b> Neste nivå innbefatter i tillegg rett til å registrere ny melding (Helpdesk, Service, Varslingsenhetene (regionene) og ettertidskontrollen i klimadataseksjonen).<br>
+<b>3.</b> Neste nivå innbefatter i tillegg rett til å bekrefte melding (Primært Service). <br>
+<b>4.</b>Nivå 4 innbefatter rett til å bekrefte melding og å beskrive tiltak (Service). <br> 
+<b>5.</b>Det høyeste nivået innbefatter i tillegg til å bekrefte melding og beskrive tiltak, å kvittere for utført tiltak/feil rettet. Dette blir det "strengeste" nivået og kan innbefatte "utvalgt" Service-personell.
+
+Script: Genererer kartet eller henter ferdige genererte kart og åpner Tiltaksdatabasen med riktige rettigheter.<br>
+<p>
+
+<i><b>Stasjonsstatus:</b><br></i>
+Vindu Stasjonsstatus skal vise status for stasjonen (rød, gul, grønn), siste innkomne feilmelding og om tiltak er beskrevet, eventuelt utført.<br>
+<p>
+Felles for alle stasjonsstatus-vinduene:<br>
+<b>Øverst:</b> <i>Stasjonsutvalg, Stasjon, Stasjonsstatus, Feilsituasjon </i> .<br>
+Nederst vil det være en liste over alle de siste feilmeldingene med tidspunkt, forklaring av melding og hvor meldingen er kommet fra.<br>
+<p>
+<b>Stasjonsstatus rød</b><br>
+"Stasjonsutvalg" blir en rubrikk man kan scrolle seg ned og velge region. "Stasjon" viser en alfabetisk liste over alle stasjonene i den regionen man har valgt. I "Stasjonsstatus" står det "rød" og rubrikken er farget rødt. "Feilsituasjon" viser siste feilsituasjon for den aktuelle stasjonen. I tillegg for stasjonsstatus rød har vi en knapp "Bekreft melding". Denne kan trykkes på av autorisert Service-personell. Når man har trykket på denne, forsvinner knappen og de to rubrikkene "Lest melding" og navnet kommer opp.
+I tillegg har vi knappene "Beskriv tiltak" og "Null-tiltak".<br>
+Rubrikkene "Tidspunkt", "Tiltakstype" og "Forklaring tiltak" står tomme sålenge ikke tiltak er beskrevet.
+<p>
+
+<b></b> Den nederste tabellen viser alle de siste feilmeldingene som er registrert på den aktuelle/siste feilsituasjonen. For enda lengre historie må man benytte seg av "Vis historikk"-knappen. I tillegg har man knappene "Til kartsiden" og "Registrering av ny melding".
+Tidspunktet for feilmelding settes automatisk når den registreres av f.eks. Kvalobs eller Helpdesk. Det viser dato og klokkeslett. <br>
+Midterste kolonne viser utfyllende opplysninger, enten automatisk generert av et skript (Kvalobs) eller fritekst fra Helpdesk, andre. Tekstene skal kunne ombrekkes.<br>
+Siste kolonne viser hvem som har sent feilmeldingen (eks. Kvalobs). <br>
+<p>
+
+<b>Stasjonsstatus gul</b><br>
+Den viser mye av det samme som Stasjonsstatus "rød", men i tillegg er et tiltak beskrevet og vises på skjermen, med tidspunkt, tiltakstype og tiltaksansvarlig.<br>
+Man har en knapp "Endre tiltak", og en knapp "Feil rettet". Den siste trykkes på når tiltak er utført/feil utbedret. Da går stasjonsstatus over til å bli grønn igjen. Ellers har man de samme knappene "Til kartsiden" og "Registrering av ny melding", i tillegg til "Vis historikk".<br>
+Nederst vises de siste ankomne feilmeldinger.
+<p>
+
+<b>Stasjonsstatus grønn</b><br> Her vises "Stasjonsutvalg", "Stasjon", "Stasjonsstatus".
+Rubrikkene "Feilsituasjon" og "Lest melding" er tomme.<br>
+I tillegg har vi knappene "Til kartsiden" og "Registrering av ny melding", og visningen av de siste feilmeldingene nederst. 
+<p>
+<br>
+Mer forklaring til punktet om tiltak:<br>
+"Tidspunkt" for når tiltak er beskrevet settes automatisk.  <br>
+"Tiltakstype" er en fast rubrikk som viser siste type av tiltak som er satt. <br>
+"Forklaring tiltak" er fritekst fra service-operatør.<br>
+"Tiltaksansvarlig" og navn viser den som har beskrevet tiltak. 
+<p>
+<b>Knappen <i>Vis historikk</i>: </b><br>
+Ved å trykke <i>Vis Historikk</i> får man en fullstendig oversikt over feilmeldingene som har kommet inn på en stasjon (og tiltakene som er satt). Dessuten kommer det opp en ny knapp <i>Skjul historikk</i> når knappen <i>Vis historikk</i> er trykket. Når knappen <i>Vis historikk</i> trykkes genererer et skript et nytt vindu (som er nesten det samme som det andre), der tabellen med feilmeldinger er utvidet med èn kolonne. Denne viser alle tiltakene som er beskrevet og utført tidligere for hver feilsituasjon. Samtlige feilmeldinger og tiltak vises i historikk-vinduet.<br>
+<p>
+
+
+<b><i>Registrering av ny melding:</b></i>   <br>
+Øverst har vi <i>Stasjonsutvalg</i> der man velger region. <i>Stasjon</i> viser utvalget i aktuell region. <i>Stasjonsstatus</i> er enten grønn, rød eller gul avhengig av situasjonen. <br>
+<i>Feilsituasjon</i> viser nåværende feilsituasjon dersom det er noen. <br>
+I rubrikken <i>Meldingstype</i> kan man velge hvilken meldingstype (utfra forhåndsdefinert liste) som passer best til den feilmeldingen man skal beskrive. <br> I rubrikken <i>Forklaring melding</i> skriver man inn en passende beskrivelse av meldingen. Dette blir en fritekst.<br>
+Til høyre har vi en knapp "Registrer" som registrerer meldingen og putter den inn i Tiltaksdatabasen, samt sørger for at status på den aktuelle stasjonen settes til rød hvis den ikke er rød/gul fra før. 
+Under har vi knappene "Til kartsiden" og "Vis historikk". Helt nederst vises de sist registrerte feilmeldingene.
+
+<p>
+
+<b><i>Registrering av nytt tiltak:</b></i><br> 
+Øverst vises Stasjonsutvalg, Stasjon, Stasjonsstatus, Feilsituasjon og Lest melding.<br> 
+I rubrikken "Tiltakstype" kan man velge hvilken type tiltak som passer best (utfra forhåndsdefinert liste). Dette feltet må fylles ut i tillegg til friteksten i rubrikken "Forklaring tiltak". <br>
+Så har man de to knappene "Lagre" og "Angre". "Lagre" sender tiltaket til Tiltaksdatabasen. Tidspunkt og navn blir registrert automatisk. I det tiltak er beskrevet og lagret, vil stasjonsstatus bli gul.<br>
+Under har vi knappene "Til kartsiden" og "Historikk".<br>
+Den nederste tabellen viser de siste ankomne feilmeldingene.<br>
+
+<p> 
+
+<b><i>Registrering av ny bruker:</b></i><br>
+Øverst har vi rubrikkene Fullt navn og Brukernavn som fylles ut.
+Til høyre har vi en rubrikk "Registrer" som registrerer brukeren, og en knapp "Avbryt".
+<p><a name="wg_vis"></a>
+<br>
+<center><h2>Eksempler på wegrensesnitt</h2></center>
+<p>
+<br>
+<img src="images/Drawing3.gif">
+
+
+
+<DIV ALIGN = "center">
+<P>
+<H2><DIV ALIGN = "center">Stasjonsstatus</DIV></H2>
+
+
+<form 
+    action="http://rime/cgi-bin/opplisting.pl" method="post">
+
+
+<DIV ALIGN = "center">
+<TABLE bgcolor="#ADD8E6" width="90%">
+<TR><TD bgcolor="#ADD8E6"><p><br><br></TD></TR>
+
+<TR>
+<TD>
+
+
+
+<DIV ALIGN = "center">
+<TABLE border="2" cellspacing="0" width="85%">
+  <TR>
+ 	<TD bgcolor="#C0C0C0"><B>Stasjonsutvalg</B></TD>   
+	<TD bgcolor="#C0C0C0"><b>Stasjon</b></TD>
+	<TD bgcolor="#C0C0C0"><b>Stasjonsstatus</b></TD>
+	<TD bgcolor="#C0C0C0"><b>Feilsituasjon</b></TD>
+	<TD><INPUT TYPE="SUBMIT" VALUE="Bekreft melding"</TD>
+  </TR>
+  <TR>
+	<TD ALIGN="middle"><SELECT NAME="REGION">
+		<OPTION>Østlandet</OPTION>
+		<OPTION>Vestlandet</OPTION>
+		<OPTION>Midt-Norge</OPTION>
+		<OPTION>Nord-Norge</OPTION>
+		<OPTION>Arktis</OPTION>
+	    </SELECT>		
+	</TD>   
+	<TD align="middle"><SELECT NAME="REGION">
+		<OPTION>Tynset</OPTION>
+		<OPTION>Gardermoen</OPTION>
+		<OPTION>Røros</OPTION>
+		<OPTION>Blindern</OPTION>
+		<OPTION>Nesbyen</OPTION>
+	    </SELECT>	
+	</TD>
+	
+
+	<TD bgcolor="red">"Rød"</TD>
+	<TD bgcolor="white">"Mange feil"</TD>
+	<TD bgcolor="white"></TD>
+  </TR>
+</TABLE><p><p>
+<br>
+<TABLE border="2" cellspacing ="0" width="90%">
+  <TR>
+	<TD bgcolor="#C0C0C0"><B>Tidspunkt</B></TD>   
+	<TD bgcolor="#C0C0C0"><B>Tiltakstype</B></TD>
+	<TD bgcolor="#C0C0C0"><B>Forklaring tiltak</B></TD>
+	<TD><INPUT TYPE="SUBMIT" VALUE="Beskriv tiltak"</TD> 
+  </TR>	
+  <TR>
+	<TD bgcolor="white"></TD>		
+	<TD bgcolor="white"></TD>
+	<TD bgcolor="white"></TD>
+	<TD><INPUT TYPE="SUBMIT" VALUE="Null-tiltak"</TD> 
+
+  </TR>
+</TABLE>
+</DIV>
+
+
+<DIV ALIGN="center">
+<TABLE border="0" cellspacing ="30">
+<TR>
+	<TD><INPUT TYPE="SUBMIT" VALUE="Til kartsiden"></TD> 
+	<TD></TD>
+	<TD><INPUT TYPE="SUBMIT" VALUE="Registrering av ny melding"></TD>
+	<TD></TD>
+	<TD><INPUT TYPE="SUBMIT" VALUE="Vis historikk"></TD>
+
+</TR>
+</TABLE>
+
+
+<TABLE border="2" cellspacing ="7">
+<TR>
+	<TD>02.06.02 kl.12.16 UTC</TD>
+	<TD>Maksimumstemp. < Middeltemp, TX=10.0, TM=10.2</TD> 
+	<TD>Kvalobs</TD>
+</TR>	
+<TR>
+	<TD>02.06.02 kl.12.11 UTC</TD>
+	<TD>Relativ fuktighet sprang over 30 % på én time.UU(t)=88, UU(t-1)=24</TD> 
+	<TD>Kvalobs</TD>
+</TR>	
+<TR>	
+	<TD>02.05.02 kl.13.10 UTC</TD>
+	<TD>Maks.vindhastighet, 10 meter, 10 min middel, sprang > 40 FX(t)=15 FX(t-1)=70</TD> 
+	<TD>Kvalobs</TD>
+</TR>
+<TR>	
+	<TD>02.05.02 kl.12.45 UTC</TD>
+	<TD>Total nedbør 12 timer < nåverdi nedbørintensitet Logikkfeil akkumulert RR=2.5, RR_12=0.0</TD> 
+	<TD>Kvalobs</TD>	
+</TR>
+<TR>	
+	<TD>02.05.02 kl.12.15 UTC</TD>
+	<TD>Logikkfeil, antall minutter nedbør = 0 mens nedbørintensitet > 0.2 RR=0.3, RT=0.0</TD> 
+	<TD>Kvalobs</TD>
+</TR>	
+<TR>
+	<TD>02.04.02 kl.12.16 UTC</TD>
+	<TD>Temperaturen har hengt seg opp</TD> 
+	<TD>Helpdesk</TD>
+</TR>
+</TABLE>
+
+
+</TD>
+</TR>
+
+<TR><TD bgcolor="#ADD8E6"><br><br></TD></TR>
+
+</TABLE>
+</DIV>
+</form>
+</DIV>
+
+<P>
+<br>
+<H2><DIV ALIGN = "center">Stasjonsstatus</DIV></H2>
+
+
+
+
+
+<DIV ALIGN = "center">
+<TABLE bgcolor="#ADD8E6" width="90%">
+<TR><TD bgcolor="#ADD8E6"><p><br><br></TD></TR>
+
+<TR>
+<TD>
+
+
+
+<DIV ALIGN = "center">
+<TABLE border="2" cellspacing="0" width="85%">
+  <TR>
+ 	<TD bgcolor="#C0C0C0"><B>Stasjonsutvalg</B></TD>   
+	<TD bgcolor="#C0C0C0"><b>Stasjon</b></TD>
+	<TD bgcolor="#C0C0C0"><b>Stasjonsstatus</b></TD>
+	<TD bgcolor="#C0C0C0"><b>Feilsituasjon</b></TD>
+	<TD bgcolor="#C0C0C0"><b>Lest melding</b></TD>
+  </TR>
+  <TR>
+	<TD ALIGN="middle"><SELECT NAME="REGION">
+		<OPTION>Østlandet</OPTION>
+		<OPTION>Vestlandet</OPTION>
+		<OPTION>Midt-Norge</OPTION>
+		<OPTION>Nord-Norge</OPTION>
+		<OPTION>Arktis</OPTION>
+	    </SELECT>		
+	</TD>   
+	<TD align="middle"><SELECT NAME="REGION">
+		<OPTION>Tynset</OPTION>
+		<OPTION>Gardermoen</OPTION>
+		<OPTION>Røros</OPTION>
+		<OPTION>Blindern</OPTION>
+		<OPTION>Nesbyen</OPTION>
+	    </SELECT>	
+	</TD>
+	
+
+	<TD bgcolor="red">"Rød"</TD>
+	<TD bgcolor="white">"Mange feil"</TD>
+	<TD bgcolor="white">Lasse</TD>
+  </TR>
+</TABLE><p><p>
+<br>
+<TABLE border="2" cellspacing ="0" width="90%">
+  <TR>
+	<TD bgcolor="#C0C0C0"><B>Tidspunkt</B></TD>   
+	<TD bgcolor="#C0C0C0"><B>Tiltakstype</B></TD>
+	<TD bgcolor="#C0C0C0"><B>Forklaring tiltak</B></TD>
+	<TD><INPUT TYPE="SUBMIT" VALUE="Beskriv tiltak"</TD> 
+  </TR>	
+  <TR>
+	<TD bgcolor="white"></TD>		
+	<TD bgcolor="white"></TD>
+	<TD bgcolor="white"></TD>
+	<TD><INPUT TYPE="SUBMIT" VALUE="Null-tiltak"</TD> 
+
+  </TR>
+</TABLE>
+</DIV>
+
+
+<DIV ALIGN="center">
+<TABLE border="0" cellspacing ="30">
+<TR>
+	<TD><INPUT TYPE="SUBMIT" VALUE="Til kartsiden"></TD> 
+	<TD></TD>
+	<TD><INPUT TYPE="SUBMIT" VALUE="Registrering av ny melding"></TD>
+	<TD></TD>
+	<TD><INPUT TYPE="SUBMIT" VALUE="Vis historikk"></TD>
+
+</TR>
+</TABLE>
+
+
+<TABLE border="2" cellspacing ="7">
+<TR>
+	<TD>02.06.02 kl.12.16 UTC</TD>
+	<TD>Maksimumstemp. < Middeltemp, TX=10.0, TM=10.2</TD> 
+	<TD>Kvalobs</TD>
+</TR>	
+<TR>
+	<TD>02.06.02 kl.12.11 UTC</TD>
+	<TD>Relativ fuktighet sprang over 30 % på én time.UU(t)=88, UU(t-1)=24</TD> 
+	<TD>Kvalobs</TD>
+</TR>	
+<TR>	
+	<TD>02.05.02 kl.13.10 UTC</TD>
+	<TD>Maks.vindhastighet, 10 meter, 10 min middel, sprang > 40 FX(t)=15 FX(t-1)=70</TD> 
+	<TD>Kvalobs</TD>
+</TR>
+<TR>	
+	<TD>02.05.02 kl.12.45 UTC</TD>
+	<TD>Total nedbør 12 timer < nåverdi nedbørintensitet Logikkfeil akkumulert RR=2.5, RR_12=0.0</TD> 
+	<TD>Kvalobs</TD>	
+</TR>
+<TR>	
+	<TD>02.05.02 kl.12.15 UTC</TD>
+	<TD>Logikkfeil, antall minutter nedbør = 0 mens nedbørintensitet > 0.2 RR=0.3, RT=0.0</TD> 
+	<TD>Kvalobs</TD>
+</TR>	
+<TR>
+	<TD>02.04.02 kl.12.16 UTC</TD>
+	<TD>Temperaturen har hengt seg opp</TD> 
+	<TD>Helpdesk</TD>
+</TR>
+</TABLE>
+
+
+</TD>
+</TR>
+
+<TR><TD bgcolor="#ADD8E6"><br><br></TD></TR>
+
+</TABLE>
+</DIV>
+
+<p>
+<br>
+<H2><DIV ALIGN = "center">Stasjonsstatus</DIV></H2>
+
+
+
+
+
+<DIV ALIGN = "center">
+<TABLE bgcolor="#ADD8E6" width="90%">
+<TR><TD bgcolor="#ADD8E6"><p><br><br></TD></TR>
+
+<TR>
+<TD>
+
+
+
+<DIV ALIGN = "center">
+<TABLE border="2" cellspacing="0" width="85%">
+  <TR>
+ 	<TD bgcolor="#C0C0C0"><B>Stasjonsutvalg</B></TD>   
+	<TD bgcolor="#C0C0C0"><b>Stasjon</b></TD>
+	<TD bgcolor="#C0C0C0"><b>Stasjonsstatus</b></TD>
+	<TD bgcolor="#C0C0C0"><b>Feilsituasjon</b></TD>
+	<TD bgcolor="#C0C0C0"><b>Lest melding</b></TD>
+  </TR>
+  <TR>
+	<TD ALIGN="middle"><SELECT NAME="REGION">
+		<OPTION>Østlandet</OPTION>
+		<OPTION>Vestlandet</OPTION>
+		<OPTION>Midt-Norge</OPTION>
+		<OPTION>Nord-Norge</OPTION>
+		<OPTION>Arktis</OPTION>
+	    </SELECT>		
+	</TD>   
+	<TD align="middle"><SELECT NAME="REGION">
+		<OPTION>Tynset</OPTION>
+		<OPTION>Gardermoen</OPTION>
+		<OPTION>Røros</OPTION>
+		<OPTION>Blindern</OPTION>
+		<OPTION>Nesbyen</OPTION>
+	    </SELECT>	
+	</TD>
+	
+
+	<TD bgcolor="yellow">"Gul"</TD>
+	<TD bgcolor="white">"Stasjon nede"</TD>
+	<TD bgcolor="white">Lasse</TD>
+  </TR>
+</TABLE><p><p>
+<br>
+<TABLE border="2" cellspacing ="0" width="90%">
+  <TR>
+	<TD bgcolor="#C0C0C0"><B>Tidspunkt</B></TD>   
+	<TD bgcolor="#C0C0C0"><B>Tiltakstype</B></TD>
+	<TD bgcolor="#C0C0C0"><B>Forklaring tiltak</B></TD>
+	<TD bgcolor="#C0C0C0"><B>Tiltaksansvarlig</B></TD>
+	<TD><INPUT TYPE="SUBMIT" VALUE="Endre tiltak"</TD>
+  </TR>	
+  <TR>
+	<TD bgcolor="white">02.06.02 kl. 12.30 UTC</TD>		
+	<TD bgcolor="white">"Service"</TD>
+	<TD bgcolor="white">Service-tiltak pågår på stasjon</TD>
+	<TD bgcolor="white">Lasse</TD>
+	<TD bgcolor="white"></TD>
+
+  </TR>
+</TABLE>
+</DIV>
+<p><br>
+
+<DIV ALIGN="right"><INPUT TYPE="SUBMIT" VALUE="Feil rettet">
+</DIV>
+
+
+<DIV ALIGN="center">
+<TABLE border="0" cellspacing ="30">
+<TR>
+	<TD><INPUT TYPE="SUBMIT" VALUE="Til kartsiden"></TD> 
+	<TD></TD>
+	<TD><INPUT TYPE="SUBMIT" VALUE="Registrering av ny melding"></TD>
+	<TD></TD>
+	<TD><INPUT TYPE="SUBMIT" VALUE="Vis historikk"></TD>
+
+</TR>
+</TABLE>
+
+
+<TABLE border="2" cellspacing ="7">
+<TR>
+	<TD>02.06.02 kl.12.16 UTC</TD>
+	<TD>Maksimumstemp. < Middeltemp, TX=10.0, TM=10.2</TD> 
+	<TD>Kvalobs</TD>
+</TR>	
+<TR>
+	<TD>02.06.02 kl.12.11 UTC</TD>
+	<TD>Relativ fuktighet sprang over 30 % på én time.UU(t)=88, UU(t-1)=24</TD> 
+	<TD>Kvalobs</TD>
+</TR>	
+<TR>	
+	<TD>02.05.02 kl.13.10 UTC</TD>
+	<TD>Maks.vindhastighet, 10 meter, 10 min middel, sprang > 40 FX(t)=15 FX(t-1)=70</TD> 
+	<TD>Kvalobs</TD>
+</TR>
+<TR>	
+	<TD>02.05.02 kl.12.45 UTC</TD>
+	<TD>Total nedbør 12 timer <nåverdi nedbørintensitet Logikkfeil akkumulert RR=2.5, RR_12=0.0</TD> 
+	<TD>Kvalobs</TD>	
+</TR>
+<TR>	
+	<TD>02.05.02 kl.12.15 UTC</TD>
+	<TD>Logikkfeil, antall minutter nedbør = 0 mens nedbørintensitet > 0.2 RR=0.3, RT=0.0</TD> 
+	<TD>Kvalobs</TD>
+</TR>	
+<TR>
+	<TD>02.04.02 kl.12.16 UTC</TD>
+	<TD>Temperaturen har hengt seg opp</TD> 
+	<TD>Helpdesk</TD>
+</TR>
+</TABLE>
+
+
+</TD>
+</TR>
+
+<TR><TD bgcolor="#ADD8E6"><br><br></TD></TR>
+
+</TABLE>
+</DIV>
+<p>
+<br>
+<P>
+<H2><DIV ALIGN = "center">Stasjonsstatus</DIV></H2>
+
+
+
+
+
+<DIV ALIGN = "center">
+<TABLE bgcolor="#ADD8E6" width="90%">
+<TR><TD bgcolor="#ADD8E6"><p><br><br></TD></TR>
+
+<TR>
+<TD>
+
+
+
+<DIV ALIGN = "center">
+<TABLE border="2" cellspacing="0" width="90%">
+  <TR>
+ 	<TD bgcolor="#C0C0C0"><B>Stasjonsutvalg</B></TD>   
+	<TD bgcolor="#C0C0C0"><b>Stasjon</b></TD>
+	<TD bgcolor="#C0C0C0"><b>Stasjonsstatus</b></TD>
+	<TD bgcolor="#C0C0C0"><b>Feilsituasjon</b></TD>
+	<TD bgcolor="#C0C0C0"><b>Lest melding</b></TD>
+  </TR>
+  <TR>
+	<TD ALIGN="middle"><SELECT NAME="REGION">
+		<OPTION>Østlandet</OPTION>
+		<OPTION>Vestlandet</OPTION>
+		<OPTION>Midt-Norge</OPTION>
+		<OPTION>Nord-Norge</OPTION>
+		<OPTION>Arktis</OPTION>
+	    </SELECT>		
+	</TD>   
+	<TD align="middle"><SELECT NAME="REGION">
+		<OPTION>Tynset</OPTION>
+		<OPTION>Gardermoen</OPTION>
+		<OPTION>Røros</OPTION>
+		<OPTION>Blindern</OPTION>
+		<OPTION>Nesbyen</OPTION>
+	    </SELECT>	
+	</TD>
+	
+
+	<TD bgcolor="green">"Grønn"</TD>
+	<TD bgcolor="white"></TD>
+	<TD bgcolor="white"></TD>
+  </TR>
+</TABLE><p><p>
+<br>
+
+
+
+<DIV ALIGN="center">
+<TABLE border="0" cellspacing ="30">
+<TR>
+	<TD><INPUT TYPE="SUBMIT" VALUE="Til kartsiden"></TD> 
+	<TD></TD>
+	<TD></TD>
+	<TD></TD>
+	<TD><INPUT TYPE="SUBMIT" VALUE="Registrering av ny melding"></TD>
+	
+	
+
+</TR>
+</TABLE>
+
+
+<TABLE border="2" cellspacing ="7">
+<TR>
+	<TD>02.06.02 kl.12.16 UTC</TD>
+	<TD>Maksimumstemp. < Middeltemp, TX=10.0, TM=10.2</TD> 
+	<TD>Kvalobs</TD>
+</TR>	
+<TR>
+	<TD>02.06.02 kl.12.11 UTC</TD>
+	<TD>Relativ fuktighet sprang over 30 % på én time.UU(t)=88, UU(t-1)=24</TD> 
+	<TD>Kvalobs</TD>
+</TR>	
+<TR>	
+	<TD>02.05.02 kl.13.10 UTC</TD>
+	<TD>Maks.vindhastighet, 10 meter, 10 min middel, sprang > 40 FX(t)=15 FX(t-1)=70</TD> 
+	<TD>Kvalobs</TD>
+</TR>
+<TR>	
+	<TD>02.05.02 kl.12.45 UTC</TD>
+	<TD>Total nedbør 12 timer < nåverdi nedbørintensitet Logikkfeil akkumulert RR=2.5, RR_12=0.0</TD> 
+	<TD>Kvalobs</TD>	
+</TR>
+<TR>	
+	<TD>02.05.02 kl.12.15 UTC</TD>
+	<TD>Logikkfeil, antall minutter nedbør = 0 mens nedbørintensitet > 0.2 RR=0.3, RT=0.0</TD> 
+	<TD>Kvalobs</TD>
+</TR>	
+<TR>
+	<TD>02.04.02 kl.12.16 UTC</TD>
+	<TD>Temperaturen har hengt seg opp</TD> 
+	<TD>Helpdesk</TD>
+</TR>
+</TABLE>
+
+
+</TD>
+</TR>
+
+<TR><TD bgcolor="#ADD8E6"><br><br></TD></TR>
+
+</TABLE>
+</DIV>
+<p>
+<br>
+<P>
+<H2><DIV ALIGN = "center">Registrering av ny melding</DIV></H2>
+
+
+
+
+
+<DIV ALIGN = "center">
+<TABLE bgcolor="#ADD8E6" width="90%">
+<TR><TD bgcolor="#ADD8E6"><p><br><br></TD></TR>
+
+<TR>
+<TD>
+
+
+
+<DIV ALIGN = "center">
+<TABLE border="2" cellspacing="0" width="85%">
+  <TR>
+ 	<TD bgcolor="#C0C0C0"><B>Stasjonsutvalg</B></TD>   
+	<TD bgcolor="#C0C0C0"><b>Stasjon</b></TD>
+	<TD bgcolor="#C0C0C0"><b>Stasjonsstatus</b></TD>
+	<TD bgcolor="#C0C0C0"><b>Feilsituasjon</b></TD>
+  </TR>
+  <TR>
+	<TD ALIGN="middle"><SELECT NAME="REGION">
+		<OPTION>Østlandet</OPTION>
+		<OPTION>Vestlandet</OPTION>
+		<OPTION>Midt-Norge</OPTION>
+		<OPTION>Nord-Norge</OPTION>
+		<OPTION>Arktis</OPTION>
+	    </SELECT>		
+	</TD>   
+	<TD align="middle"><SELECT NAME="REGION">
+		<OPTION>Tynset</OPTION>
+		<OPTION>Gardermoen</OPTION>
+		<OPTION>Røros</OPTION>
+		<OPTION>Blindern</OPTION>
+		<OPTION>Nesbyen</OPTION>
+	    </SELECT>	
+	</TD>
+	
+
+	<TD bgcolor="green">"Grønn"</TD>
+	<TD bgcolor="white"></TD>
+  </TR>
+</TABLE><p><p>
+<br>
+<TABLE border="2" cellspacing ="0" width="70%">
+  <TR>
+	<TD bgcolor="#C0C0C0"><B>Meldingstype</B></TD>   
+	<TD bgcolor="#C0C0C0"><B>Forklaring melding</B></TD>
+	<TD><INPUT TYPE="SUBMIT" VALUE="Registrer"</TD>
+  </TR>	
+  <TR>
+	<TD align="middle"><SELECT NAME="REGION">
+		<OPTION>"Temp-feil"</OPTION>
+		<OPTION>"Fukt-feil"</OPTION>
+		<OPTION>"Vind-feil"</OPTION>
+		<OPTION>"Trykk-feil"</OPTION>
+		<OPTION>"Strålingsfeil"</OPTION>
+		<OPTION>"Nedbør-feil"</OPTION>
+		<OPTION>"Sikt-feil"</OPTION>
+		<OPTION>"Sky-feil"</OPTION>
+		<OPTION>"Bølge-feil"</OPTION>
+		<OPTION>"Service"</OPTION>
+		<OPTION>"Mange-feil"</OPTION>
+		<OPTION>"System-feil</OPTION>
+	    </SELECT>	
+	</TD>		
+	<TD><TEXTAREA NAME="Forklaring melding" cols="50" rows="2"></TEXTAREA></TD>
+	<TD bgcolor="white"></TD>
+
+  </TR>
+</TABLE>
+</DIV>
+<p>
+
+
+<DIV ALIGN="center">
+<TABLE border="0" cellspacing ="30">
+<TR>
+	<TD><INPUT TYPE="SUBMIT" VALUE="Til kartsiden"></TD> 
+	<TD></TD>
+	<TD></TD>
+	<TD></TD>
+	<TD></TD>
+	<TD></TD>
+	<TD></TD>
+	<TD><INPUT TYPE="SUBMIT" VALUE="Vis historikk"></TD>
+
+</TR>
+</TABLE>
+
+
+<TABLE border="2" cellspacing ="7">
+<TR>
+	<TD>02.06.02 kl.12.16 UTC</TD>
+	<TD>Maksimumstemp. < Middeltemp, TX=10.0, TM=10.2</TD> 
+	<TD>Kvalobs</TD>
+</TR>	
+<TR>
+	<TD>02.06.02 kl.12.11 UTC</TD>
+	<TD>Relativ fuktighet sprang over 30 % på én time.UU(t)=88, UU(t-1)=24</TD> 
+	<TD>Kvalobs</TD>
+</TR>	
+<TR>	
+	<TD>02.05.02 kl.13.10 UTC</TD>
+	<TD>Maks.vindhastighet, 10 meter, 10 min middel, sprang > 40 FX(t)=15 FX(t-1)=70</TD> 
+	<TD>Kvalobs</TD>
+</TR>
+<TR>	
+	<TD>02.05.02 kl.12.45 UTC</TD>
+	<TD>Total nedbør 12 timer < nåverdi nedbørintensitet Logikkfeil akkumulert RR=2.5, RR_12=0.0</TD> 
+	<TD>Kvalobs</TD>	
+</TR>
+<TR>	
+	<TD>02.05.02 kl.12.15 UTC</TD>
+	<TD>Logikkfeil, antall minutter nedbør = 0 mens nedbørintensitet > 0.2 RR=0.3, RT=0.0</TD> 
+	<TD>Kvalobs</TD>
+</TR>	
+<TR>
+	<TD>02.04.02 kl.12.16 UTC</TD>
+	<TD>Temperaturen har hengt seg opp</TD> 
+	<TD>Helpdesk</TD>
+</TR>
+</TABLE>
+
+
+</TD>
+</TR>
+
+<TR><TD bgcolor="#ADD8E6"><br><br></TD></TR>
+
+</TABLE>
+</DIV>
+<p>
+<br>
+<P>
+<H2><DIV ALIGN = "center">Nytt tiltak/Endre tiltak</DIV></H2>
+
+
+
+
+
+<DIV ALIGN = "center">
+<TABLE bgcolor="#ADD8E6" width="90%">
+<TR><TD bgcolor="#ADD8E6"><p><br><br></TD></TR>
+
+<TR>
+<TD>
+
+
+
+<DIV ALIGN = "center">
+<TABLE border="2" cellspacing="0" width="85%">
+  <TR>
+ 	<TD bgcolor="#C0C0C0"><B>Stasjonsutvalg</B></TD>   
+	<TD bgcolor="#C0C0C0"><b>Stasjon</b></TD>
+	<TD bgcolor="#C0C0C0"><b>Stasjonsstatus</b></TD>
+	<TD bgcolor="#C0C0C0"><b>Feilsituasjon</b></TD>
+	<TD bgcolor="#C0C0C0"><b>Lest melding</b></TD>
+  </TR>
+  <TR>
+	<TD ALIGN="middle"><SELECT NAME="REGION">
+		<OPTION>Østlandet</OPTION>
+		<OPTION>Vestlandet</OPTION>
+		<OPTION>Midt-Norge</OPTION>
+		<OPTION>Nord-Norge</OPTION>
+		<OPTION>Arktis</OPTION>
+	    </SELECT>		
+	</TD>   
+	<TD align="middle"><SELECT NAME="REGION">
+		<OPTION>Tynset</OPTION>
+		<OPTION>Gardermoen</OPTION>
+		<OPTION>Røros</OPTION>
+		<OPTION>Blindern</OPTION>
+		<OPTION>Nesbyen</OPTION>
+	    </SELECT>	
+	</TD>
+	
+
+	<TD bgcolor="red">"Rød"</TD>
+	<TD bgcolor="white">"Mange feil"</TD>
+	<TD bgcolor="white">Lasse</TD>
+  </TR>
+</TABLE><p><p>
+<br>
+<TABLE border="2" cellspacing ="0" width="70%">
+  <TR>
+	<TD bgcolor="#C0C0C0"><B>Tiltakstype</B></TD>
+	<TD bgcolor="#C0C0C0"><B>Forklaring tiltak</B></TD>
+	<TD><INPUT TYPE="SUBMIT" VALUE="Lagre"></TD>
+	 
+</TR>	
+  <TR>
+	<TD><select name="Tiltakstype">
+          <option>"Kontakt observatør"</option>
+          <option>"Avventer"</option>
+          <option>"Sensorsjekk"</option>
+          <option>"Annet"</option>
+          <option>"Service"</option>
+          <option>"Null-tiltak"</option>
+          <option>"Kontakt tilsynsmann"</option>
+          <option>"Bytte av sensor"</option>
+        </select></td>
+	<TD><TEXTAREA NAME="Forklaring tiltak" rows="2" cols="50"></TEXTAREA></TD>
+	<TD><INPUT TYPE="SUBMIT" VALUE="Angre"></TD>
+	
+  </TR>
+</TABLE>
+</DIV>
+<p>
+
+
+
+
+<DIV ALIGN="center">
+<TABLE border="0" cellspacing ="30">
+<TR>
+	<TD><INPUT TYPE="SUBMIT" VALUE="Til kartsiden"></TD> 
+	<TD></TD>
+	<TD></TD>
+	<TD></TD>
+	<TD></TD>
+	<TD></TD>
+	<TD></TD>
+	<TD><INPUT TYPE="SUBMIT" VALUE="Vis historikk"></TD>
+        
+</TR>
+</TABLE>
+
+
+<TABLE border="2" cellspacing ="7">
+<TR>
+	<TD>02.06.02 kl.12.16 UTC</TD>
+	<TD>Maksimumstemp. < Middeltemp, TX=10.0, TM=10.2</TD> 
+	<TD>Kvalobs</TD>
+</TR>	
+<TR>
+	<TD>02.06.02 kl.12.11 UTC</TD>
+	<TD>Relativ fuktighet sprang over 30 % på én time.UU(t)=88, UU(t-1)=24</TD> 
+	<TD>Kvalobs</TD>
+</TR>	
+<TR>	
+	<TD>02.05.02 kl.13.10 UTC</TD>
+	<TD>Maks.vindhastighet, 10 meter, 10 min middel, sprang > 40 FX(t)=15 FX(t-1)=70</TD> 
+	<TD>Kvalobs</TD>
+</TR>
+<TR>	
+	<TD>02.05.02 kl.12.45 UTC</TD>
+	<TD>Total nedbør 12 timer < nåverdi nedbørintensitet Logikkfeil akkumulert RR=2.5, RR_12=0.0</TD> 
+	<TD>Kvalobs</TD>	
+</TR>
+<TR>	
+	<TD>02.05.02 kl.12.15 UTC</TD>
+	<TD>Logikkfeil, antall minutter nedbør = 0 mens nedbørintensitet > 0.2 RR=0.3, RT=0.0</TD> 
+	<TD>Kvalobs</TD>
+</TR>	
+<TR>
+	<TD>02.04.02 kl.12.16 UTC</TD>
+	<TD>Temperaturen har hengt seg opp</TD> 
+	<TD>Helpdesk</TD>
+</TR>
+</TABLE>
+
+
+</TD>
+</TR>
+
+<TR><TD bgcolor="#ADD8E6"><br><br></TD></TR>
+
+</TABLE>
+</DIV>
+<p>
+<br>
+<P>
+<H2><DIV ALIGN = "center">Registrering av ny bruker</DIV></H2>
+
+
+
+
+
+<DIV ALIGN = "center">
+<TABLE bgcolor="#ADD8E6" width="60%">
+<TR><TD bgcolor="#ADD8E6"><p><br><br></TD></TR>
+
+<TR>
+<TD>
+
+
+
+<DIV ALIGN = "center">
+<TABLE border="2" cellspacing="0" width="80%">
+  <TR>
+ 	<TD bgcolor="#C0C0C0"><B>Fullt navn</B></TD>   
+	<TD bgcolor="#C0C0C0"><b>Brukernavn</b></TD>
+	<TD><INPUT TYPE="SUBMIT" VALUE="Registrer">
+	    <INPUT TYPE="SUBMIT" VALUE="Avbryt"></TD>
+  </TR>
+  <TR>
+	<TD bgcolor="white">Lasse</TD>   
+	<TD bgcolor="white">lasses</TD>
+	<TD bgcolor="white"></TD>
+  </TR>
+</TABLE><p>
+
+
+
+
+
+
+
+
+
+</TD>
+</TR>
+
+<TR><TD bgcolor="#ADD8E6"><br><br></TD></TR>
+
+</TABLE>
+</DIV>
+
+
+</body>
+</html>

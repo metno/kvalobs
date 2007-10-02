@@ -1,0 +1,19 @@
+
+/**
+ * \defgroup servicelibs Client librarys to use to communicate with kvalobs.
+ */
+ 
+/**
+ * \defgroup kvcpp C++.
+ * \ingroup servicelibs
+ */
+
+ /**
+  * \defgroup kvqt C++ with Qt.
+  * \ingroup servicelibs 
+  */
+
+  /**
+   * \defgroup kvjava java
+   * \ingroup servicelibs
+   */ 

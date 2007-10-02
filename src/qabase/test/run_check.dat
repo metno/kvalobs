@@ -1,0 +1,6 @@
+#Oppsettfil til å  brukes sammen med run_check
+
+data_start="2001-01-02 06"
+data_stop="2001-01-02 06"
+
+data_stations="4780 17150 18700 27500"

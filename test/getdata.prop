@@ -1,0 +1,20 @@
+sql=SELECT obstime,stationid,typeid,paramid,sensor,level, \
+           to_char(original,'FM9999990.0'),to_char(corrected,'FM9999990.0') \
+    FROM data WHERE stationid=${$2} AND typeid=${$3} \
+         ORDER BY obstime,stationid,typeid,paramid,sensor,level;
+
+ofile=dbdata/${$2}-${$3}.dat
+
+select.18700.3.ofile=${sql}
+select.18700.6.ofile=${sql}
+select.47300.306.ofile=${sql}
+select.47300.330.ofile=${sql}
+select.86500.312.ofile=${sql}
+select.19710.312.ofile=${sql}
+select.90490.308.ofile=${sql}
+select.90490.311.ofile=${sql}
+select.93301.308.ofile=${sql}
+select.93301.330.ofile=${sql}
+select.50500.308.ofile=${sql}
+select.50500.311.ofile=${sql}
+select.50500.501.ofile=${sql}

@@ -1,0 +1,15 @@
+# This is a MANUALLY generated file
+
+prefix=PREFIX
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: kvcpp2
+Description: Client library for Kvalobs
+Version: 1.0
+Requires: omniORB4 omniDynamic4
+Conflicts:
+Cflags: -I${includedir}/ -I${includedir}/kvservice/ -I${includedir}/kvskel/
+Libs: -L${libdir} -lkvcpp2 -lmilog -lmiconfparser -lcorba_skel  \
+  -lcorbahelper -lkvalobs -lfileutil -ldb -ldnmithread

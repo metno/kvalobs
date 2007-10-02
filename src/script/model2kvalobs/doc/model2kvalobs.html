@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>model2kvalobs</title>
+  </head>
+
+  <body>
+    <h1>model2kvalobs dokumentasjon</h1>
+
+    Modellinnlastningen i kvalobs skjer per idag via crontab.<br>
+    jobben <b>lam20kv.cron</b> kjører:
+    <p> 
+       <b>hirlam2kvalobs.sh </b> $RUN <br>
+      med <b>RUN</b>=06/12/18 eller 00
+    <p>
+      Scriptet har en innline-dokumentasjon
+    <h2>hirlam2kvalobs.sh</h2>
+    Første delen av jobben består i generering av 2 
+    input-filer for selve datahenting.
+    det kjøres programmet: <p><b> kv2metdat </b></p>
+    som logger seg inn i kvalobs basen og henter
+    ut  stationslisten og parameterlisten.
+    Jobben genererer med dette 2 filer:
+    <ul>
+    <li><b> stations.kvalobs: </b>  stationliste metdat interpolasjon
+    <li><b> parmap.kvalobs:  </b>  parameterliste for data-selektering
+    </ul>
+    Filene kan brukes uavhengig av at databasene er oppe eller ikke.
+    Siden de listene er ganske statisk er dette en god forsikring.
+    Er kvalobs databasen nede, kan man generere model-filer allikevel
+    og laster disse med inn neste gang nå kvalobs er på luften igjen.
+      <p>
+      Etter dette brukes det: <p><b> metdat / posdat</b></p> for å generere
+      meteogramfiler fra feltene vha stasjonlisten.<br>
+      På disse meteogramfiler kjøres det:
+      <p><b>model2kv</b></p>
+      som plukker de verdiene som er etterspurt og generer
+      kvalobs-kompatible innlastningsfiler.
+      <br>
+      filene blir lastet inn via psql. Det blir laget en extra fil
+      <b>last_tempo.back</b> som inneholder 6 timer lengre frem
+      med data. Hvis en modellkjøring er ute, laster systemet denne
+      inn i stedet.
+      <p>
+
+
+
+
+
+    <hr>
+    <address><a href="mailto:juergen.schulze@met.no">Juergen Schulze</a></address>
+<!-- Created: Wed Dec 15 14:59:02 CET 2004 -->
+<!-- hhmts start -->
+Last modified: Wed Dec 15 15:38:43 CET 2004
+<!-- hhmts end -->
+  </body>
+</html>

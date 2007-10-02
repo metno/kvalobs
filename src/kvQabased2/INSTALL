@@ -1,0 +1,10 @@
+#!/bin/sh
+
+DESTINATION=
+DIRECTORIES="bin var/log var/run var/html etc"
+FILES=
+
+
+. $KVDIR/conf/INSTALL.conf
+
+

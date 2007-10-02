@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+               "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+
+    <!--#include file="header.shtml" -->
+<p>
+
+<h2>Veiledning for IT-divisjonens operat&oslash;rer i f&oslash;rste
+driftsfase - testdrift</h2>
+
+<h3>0. Form&aring;l</h3>
+<p>
+Kvalobs er met.nos operasjonelle system for kvalitetskontroll av observasjonsdataene. 
+Ved mottak blir observasjonene sendt gjennom Kvalobs-kontrollene. Resultatet blir 
+lagret i form av flagg. Brukersystemene som SYNOP-generatoren og Klimadatabasen tar i 
+bruk flagginformasjonen p&aring; ulike m&aring;ter. Meldinger om feil blir sendt til 
+<a href="http://modon/tiltak">KRO</a> med henblikk p&aring; tiltak ved 
+Stasjonsnettavdelingen. Les mer om utviklingsprosjektet p&aring <a href="http://kvproject/">
+http://kvproject/</a>.
+<p>
+<br>
+<br>
+<h3>1. Maskiner</h3>
+<p>
+Operasjonelt g&aring;r Kvalobs p&aring; serverparet warm/cool.<br>
+For test- og videreutviklingsform&aring;l g&aring;r en egen versjon
+p&aring; serveren rime.<br>
+<br>
+<br>
+<h3>2. Innlogging</h3>
+<p>
+ssh -X kvalobs@warm&nbsp; &lt; ... &gt;<br>
+<br>
+<br>
+<h3>3. Operat&oslash;rinngrep</h3>
+<p>
+For at kvalobs skal virke m&aring; f&oslash;lgende virke og v&aelig;re
+oppe &aring; kj&oslash;re:<br>
+- serverne/daemonene<br>
+- databasen<br>
+I f&oslash;rste driftsfase er eneste aktuelle operasjon &aring; avbryte
+Kvalobs hvis programvaren skulle vise seg &aring; skape problemer for
+&oslash;vrige rutiner (jfr. &#167;4). Hvis problemer: stans kvalobsserverne. Gi beskjed 
+om at Kvalobs er stanset, og gi noe av bakgrunnen for problemet, til 
+prosjektet ved <a href="mailto:borge.moe@met.no">borge.moe@met.no</a> og 
+<a href"mailto:gabriel.kielland@met.no">gabriel.kielland@met.no</a>.<br>
+Det vil ikke v&aelig;re n&oslash;dvendig &aring; stanse databasen.<br>
+<br>
+<h3>4. Start og stopp av serverne/daemonene til kvalobs</h3>
+<p>
+<h4>4.1 </h4>
+<p>
+kvstop stanser kvalobsserverne<br>
+kvstart starter kvalobsserverne<br>
+NB! disse her starter og stopper bare serverne, ikke databasen.</p>
+
+<h4>4.2 </h4>
+<p>
+En kan starte de enkelte daemonene/serverne hver for seg.<br>
+De skal startes i f&oslash;lgende rekkef&oslash;lge:<br>
+kvQabased<br>
+kvManagerd<br>
+kvDataInputd<br>
+kvServiced<br>
+kvsynopd<br>
+norcom2kv<br>
+<br>
+<br>
+<h3>5. Overv&aring;king av datastr&oslash;mmer</h3>
+<p>
+Systemet mottar data dynamisk fra fire kilder i f&oslash;rste
+driftsfase:<br>
+- Comobs<br>
+- Autoobs<br>
+- Norcom<br>
+- Modelldata<br>
+</p>
+
+<h4>5.1 Mottak</h4>
+<p>
+På serverparet glory/glaze er daemon aosmsd produsent av data fra Comobs til Kvalobs.<br>
+På serverparet glory/glaze er daemon kvprod produsent av data fra Autoobs til Kvalobs.<br>
+På serverparet glory/glaze er daemon autoobs2kv mottaker av data fra Autoobs til Kvalobs.<br>
+På serverparet warm/cool er daemon norcom2kv produsent av data fra Norcom til Kvalobs.<br>
+På serverparet warm/cool overf&oslash;rerer cronjobben lam2kv data fra HIRLAM til Kvalobs.<br>
+</p>
+<p>
+I norcom-monitoren (ncmon) inneholder ruten 'Kvalobs' wmo-meldinger som er rutet til Kvalobs.</p>
+
+<h4>5.2 Levering</h4>
+<p>
+I f&oslash;rste driftsfase leverer systemet kun data til Norcom.<br>
+<p>
+På serverparet warm/cool er daemon kvsynopd produsent av data fra Kvalobs til Norcom.<br>
+kvsynopd legger fullstendig og korrekt formatert SYNOP på området /dnmi/norcom/data/incoming/kvalobs.
+<p>
+Som en foreløpig løsning er det valgt å rute alle innkommende meldinger fra
+Kvalobs til MSYS7 (/opdata/norcom/msys/msys7).<br>
+Senere, når Kvalobs er blitt operasjonell og overtatt for AutoObs som innkommende rute til Norcom,
+vil vi i stedet rute til msys2 og msys9 samt til Message Prep.</p>
+<p>
+I norcom-monitoren (ncmon) er det en rute 'Kvalobs From' for meldinger som kommer inn fra Kvalobs.</p>
+<br>
+<img src="images/ITveil.gif">
+<br>
+   <!--#include file="footer.shtml" -->
+
+
+<!-- Created: Fri Mar 19 15:36:08 GMT 2004 -->
+<!-- hhmts start -->
+Last modified: Mon Mar 26 09:51:00 GMT 2004<br>
+by Gabriel Kielland
+<!-- hhmts end -->
+  </body>
+</html>

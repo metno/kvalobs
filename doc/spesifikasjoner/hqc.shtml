@@ -1,0 +1,1235 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+
+     <!--#include file="header.shtml" -->
+
+<H2 align="center">KVALOBS-prosjektet - AP2.4 HQC</h2>
+<br>
+<br><br><br><br>
+<h1 align="center">Manuell kontroll</h1>
+<p align="center">av</p>
+<p align="center">Lars Andresen, redaktør,<br>
+Knut Iden, Knut Johansen, Gabriel Kielland<br>
+<br>
+<br>
+Meteorologisk institutt 27. juni 2002<br>
+<br>
+</p>
+<p align="left">
+<br>
+Utenom HQC-gruppen, har diverse personer i Klimaavdelingen bidratt i
+prosessen med rapporten.<br>
+<br><br><br><br>
+</p>
+<h2>INNHOLDSFORTEGNELSE</h2>
+<br>
+     1. <a href="#1">Introduksjon</a><br>
+     1.1. <a href="#1.1">Dagens situasjon</a>
+<p>2. <a href="#2">Ny HQC-rutine - forslag til design</a><br>
+2.1. <a href="#2.1">Standard oppsett av visningsverktøy</a><br>
+2.2. <a href="#2.2">Vurdering av flagg for HQC</a><br>
+2.2.1. <a href="#2.2.1">Feilliste basert på QC-flagg og HQC-informasjon</a><br>
+2.3. <a href="#2.3">HQC-kontrollene</a><br>
+2.4. <a href="#2.4">Opplæring</a></p>
+<p>3. <a href="#3">Visningsverktøy og funksjonalitet</a><br>
+3.1. <a href="#3.1">Kart</a><br>
+3.1.1. <a href="#3.1.1">Bruk av pseudodata i HQC</a><br>
+3.2. <a href="#3.2">Tidsserier</a><br>
+3.3. <a href="#3.3">Statistikk</a><br>
+3.4. <a href="#3.4">Presentasjon av flagginformasjon</a><br>
+3.5. <a href="#3.5">Presentasjon av stasjonstype i HQC</a><br>
+3.6. <a href="#3.6">Presentasjon av datalister og tabeller</a></p>
+<p>4. <a href="#4">Generelt om HQC av forskjellige værelementer</a><br>
+4.1. <a href="#4.1">Kontroll av temperatur</a><br>
+4.2. <a href="#4.2">Kontroll av nedbør</a><br>
+4.3. <a href="#4.3">Kontroll av bølgehøyde, bølgeperiode og sjøgang</a></p>
+<p>5. <a href="#5">Forslag til forenklinger</a></p>
+<p>6. <a href="#6">Gjenstående arbeid</a><br>
+<br>
+</p>
+<h2><br>
+<a name="1"></a>
+1. Introduksjon</h2>
+<p>HQC består av HQC0, HQC1 og HQC2, dvs manuelle kontroller som korresponderer
+med kvalitetskontrollene QC0, QC1 og QC2. HQC0 er iverksatt på PiO-stasjonene
+og maritime stasjoner, der TURBO-programmet er implementert. Den manuelle
+kontrollen for disse vil bli spesifisert i sammenheng med automatisk QC0 (se <a href="http://kvproject/notes/QC0.shtml">
+http://kvproject/notes/QC0.shtml</a>). På grunn av tidsnød kan HQC1 bare benyttes
+til å forkaste opplagt feilaktige meldinger, ev. gi tilbakemelding til den
+ansvarlige for observasjonen (observatøren på manuelle stasjoner, OBS-div
+eller IT-div for automatstasjoner). Dermed gjenstår HQC2, som heretter omtales
+som HQC.</p>
+<p>QC0, QC1 og QC2 er automatiske kvalitetskontroller som oppdager feil eller
+mistenkelige verdier. En del av kontrollene vil ikke kunne føre til automatisk
+retting og må ha en manuell håndtering i ettertid. Noen av kontrollene kan, om
+vi ønsker det, erstatte manglende verdier med interpolerte verdier. En
+forbedret QC-kontroll skal redusere antall tilfelle, der det er mistanke om feil
+(&quot;mistenkelige verdier&quot;), slik at den manuelle kontrollen (HQC) kan
+konsentrere seg mest mulig om reelle feil. HQC kan også benyttes til å finne
+feil som QC-kontrollsystemet ikke har fanget opp. HQC kan benyttes til å
+evaluere yteevnen til de forskjellige automatiske kontrollene
+(interpolasjonsmetodene) og bidra til en forbedring av testverdigrunnlaget for
+automatkontrollene, og gjennom læring legge til rette for nye automatiske
+kontrollrutiner.</p>
+<p>HQC-systemet bør utformes slik at det både kan håndtere data i nær sann
+tid og historiske data i klimadatabasen.</p>
+<h3><a name="1.1"></a>1.1. Dagens situasjon</h3>
+<p>I kvalitetskontrollen er det mange faktorer som bidrar til at arbeidet ikke blir
+så effektivt som man kunne ønske:</p>
+<p>· Mye manuelt arbeid med å rette opp inkonsistens i observasjonene.<br>
+· Oppretting av feil er veldig mye basert på en sammenlikning av værforhold
+på nabostasjonene (romkontroll med bruk av dagbøker og parameterlister).<br>
+· Temporær automatisk interpolasjon for hurtigstatistikk (manuell kontroll
+blir gjort om igjen senere).<br>
+· Kompleks og mangelfull dataflyt (data ikke tilgjengelig til rett tid,
+metadata ikke à jour, m.m.).<br>
+· Mye manuell interpolasjon.<br>
+· Feillister på papir (men papir kan også være hensiktsmessig praktisk
+sett).<br>
+· Liten integrering av forskjellige datakilder (f.eks. metar- og
+pluviometerdata).</p>
+<p>Kvalitetskontrollen har tradisjonelt vært en kontroll av manuelle
+værstasjoner og nedbørstasjoner. Klimaavdelingen har ikke hatt kapasitet til
+å kontrollere og rette opp feil og mangler fra met.no's automatiske
+værstasjoner. Det er derfor nødvendig å gjøre en kvalitetskontroll av slike
+automatstasjonsdata, før de kan benyttes fullt ut. Klimaavdelingen har heller
+ikke hatt kapasitet til å jobbe med systematiske feil i observasjonsdataene i
+Klimadatabasen. De nye KVALOBS-kontrollene vil gjøre det mulig å forbedre
+kvaliteten på slike data.</p>
+<p>Klimaavdelingen har et utilstrekkelig opplegg for overvåking av
+datastrømmen inn i Klimadatabasen. Dette blir en viktig og nødvendig
+arbeidsoppgave når KVALOBS-systemet blir iverksatt.</p>
+<h2><br>
+<a name="2"></a>
+2. Ny HQC-rutine - forslag til design</h2>
+<p>Vi har i dette dokumentet definert minimumsløsninger og i noen grad
+beskrevet hvordan disse løsningene bør videreutvikles for at kontrollarbeidet
+kan bli mest mulig effektivt.</p>
+<p>En ny rutine for manuell etterkontroll av meteorologiske observasjoner bør
+legges opp etter de enkelte værelementer, slik at samme parameter fra
+forskjellige stasjonstyper kontrolleres samtidig.</p>
+<p>Kontrollen blir mest effektiv når samtlige værelementer fra alle typer
+værstasjoner kan kontrolleres i en daglig rutine. Men fortsatt vil enkelte
+observasjoner først være tilgjengelig etter en uke eller måned. Disse dataene
+kan likevel i prinsippet kontrolleres på samme måte som i en daglig rutine.</p>
+<p>I praksis vil en ny HQC-rutine i stor grad benytte seg av elektroniske
+verktøy når man skal foreta romkontroller, tidsseriekontroller eller kombinere
+tids- og romkontroller (se kap.4. Generelt om HQC av forskjellige værelementer).
+For et gitt tidspunkt blir parameterverdiene og flagghistorikken til valgt
+parameter presentert for hvert stasjonspunkt på spesialtilpassede kart.
+Samtidig vil det bli mulig å se tidsseriene for valgt parameter for aktuell
+stasjon og nabostasjoner i egne vinduer. Også organisert tabell- eller
+listeinformasjon vil bli lett tilgjengelig, og det vil bli enkle og raske
+prosedyrer for manuell korreksjon, interpolasjon og flagging.</p>
+<p>Det kan være praktisk at man starter kontrollarbeidet ved å sette seg
+grundig inn i værsituasjonen for det aktuelle døgnet (+ minst 6 timer før og
+etter): Skyer, nedbør, vind, lufttrykk, fronter og luftmasser. Å ha mulighet
+for animasjon av værelementene gjennom døgnet kan være hensiktsmessig.</p>
+<p>Kontrollarbeidet kan gjøres på to måter: 1) Ved å ta samtlige
+værelementer ved ett og samme tidspunkt eller 2) ved å ta ett værelement
+gjennom hele døgnet, før man starter på neste element. Begge deler bør være
+mulig. Stasjoner som har parametere med flagg, som indikerer feil eller mistanke
+om feil, må være lett å identifisere med de visningsverktøy som utvikles for
+kontrollarbeidet.</p>
+<p>Det må være mulig i HQC-rutinen å iverksette automatiske kontroller, enten
+fordi automatiske kontroller ikke er foretatt, fordi datasett er komplettert
+eller fordi man har oppdaget at feilaktige rettelser har påvirket kontrollen
+for andre stasjoner. I det sistnevnte tilfellet må man kunne velge å kjøre
+kontrollen på originale observasjonsdata. Det må altså være mulig manuelt å
+styre tidspunktet for iverksetting av QC2-kontroller.</p>
+<h3><a name="2.1"></a>2.1. Standard oppsett av visningsverktøy</h3>
+<p>
+For at kontrollrutinen skal fungere effektivt, må man sørge for at den
+informasjon som man trenger i det daglige arbeid, kommer opp på skjermen uten
+at man ber om det eller ved et enkelt tastetrykk (standard oppsett). Annen
+informasjon bør gjøres tilgjengelig med færrest mulig tastetrykk. Vi ser for
+oss følgende:</p>
+<p>Kontrolløren sitter ved en arbeidsstasjon. I hovedvinduet kommer
+visningsprogrammet DIANA opp med et standard kartutsnitt for f.eks. Nord-Europa.
+I et annet vindu kommer feillista for samtlige stasjoner, ordnet etter dato,
+klokkeslett og stasjonsnummer. Denne lista er søkbar på dato, klokkeslett,
+region, fylke, stasjonsnummer, stasjonstype, høyde over havet, kontroll,
+kontrollflagg, etc. Kontrolløren velger dato og klokkeslett. Da kommer
+automatisk væranalysen for dette tidspunkt, med fronter, isobarer og metter.
+Feillista stiller seg inn på aktuell dato og klokkeslett. Det er nå mulig å
+kjøre en animasjon fremover i tid på væranalysen (egen tast for dette). Én
+tast kobler inn satellittbildene, én tast kobler inn radarbildene.</p>
+<p>Når kontrollen av observasjonene starter velges et hensiktsmessig
+kartutsnitt ved å trekke et rektangel rundt området eller ved å zoome.
+Kontrolløren velger fra en meny hvilken parameter som skal kontrolleres og
+hvilke øvrige parametere som skal vises. Skal flere parametere vises, må den
+parameteren som skal kontrolleres utheves. Skal bare en parameter vises /
+kontrolleres er det nok å klikke på vedkommende parameter på en vilkårlig
+stasjon. Én tast kobler da inn flaggenes fargesignal for vedkommende parameter
+og eventuelt flaggkoden. Man kan på denne måten få en god oversikt over
+omfanget av påviste feil for de forskjellige parametrene. I et eget vindu
+aktiveres et skalerbart topografisk kart over Norge, der detaljnivå er
+tilpasset utsnittet, og der observasjonsverdier fra valgt parameter kan
+presenteres i stasjonspunktene. Gjennom dette programmet kan man få frem
+informasjon om stasjon, landskap, klimakart, statistikk m.m.</p>
+<p>Straks parameter og stasjon er valgt, aktiveres standardoppsettet for denne
+parameterkontrollen: Den aktuelle stasjonen markeres på kartet. Samtlige
+feilmeldinger for stasjonen bringes frem i feillista, flagghistorikken for den
+aktuelle parameteren presenteres for det aktuelle tidspunktet. Tidsserien 24
+timer bakover i tid vises i et eget vindu, ev. sammen med den aktuelle
+modellkurven. Originaldata, korrigerte data og modelldata vises for det aktuelle
+tidspunktet og med ett tastetrykk kan man gå over i
+korrigerings-/redigeringsmodus, med det ønskede oppsett av data. Tilsvarende
+informasjon presenteres for nabostasjonene til den stasjon som kontrolleres,
+enten i eget vindu eller sammenstilt med aktuell stasjon.</p>
+<p>Det bør være mulig å endre standardoppsettet slik at man f.eks. kan velge
+om man vil ha tidsseriene i flere vinduer, eller alle i samme vindu, etc.
+Hensikten er at man automatisk skal få frem mest mulig av den informasjon man
+trenger. I de fleste tilfelle vil standardoppsettet ha tilstrekkelig og riktig
+informasjon, men det vil alltid være situasjoner der oppsettet ikke fungerer
+godt nok. I disse tilfellene må brukeren enkelt kunne velge i verktøyet
+gjennom menyer eller kunne søke i lister og tabeller etter ulike kriterier.
+Innstillinger og søk brukeren gjør, bør kunne lagres og lett hentes frem slik
+at brukeren raskt kan komme til oppsett som har vist seg å være velegnet for
+den aktuelle oppgaven om standardoppsettet ikke er godt nok. Innstillingene bør
+kunne lagres som temaprofiler og personprofiler.</p>
+<p>Standardoppsettet kan også aktiveres gjennom den søkbare feillista. Man
+ordner lista etter dato og klokkeslett, velger parameter og stasjon, og så
+kommer standard informasjon frem.</p>
+<p>Når kontrolløren er i &quot;korrigeringsmodus&quot; kan standard oppsett
+være hele observasjonen eller definerte parametergrupper, etter mønster av
+tabell 3.2.</p>
+<h3><a name="2.2"></a>2.2. Vurdering av flagg for HQC</h3>
+<p>En del av flaggene som det automatiske kontrollapparatet kommer opp med, gir
+grunnlaget for en romkontroll eller en tidsseriekontroll, eller en kombinasjon
+av disse. Nedenfor følger en vurdering av hva som vil skje med en mistenkelig
+verdi eller feil i de forskjellige kontrollene, sett i forhold til HQC.
+Flaggnotasjonen er hentet fra dokumentet &quot;Flagg i KVALOBS&quot; (<a href="file:///U:/Dataseksjon/Kvalobs%20innblikk/hqc.shtml">http://kvproject/docs/flags.shtml</a>).</p>
+<p><br>
+QC1-1. Grenseverdikontroll.<br>
+Anta fr=4-5. Dette er i utgangspunktet en mistenkelig verdi, men vi vet ikke om
+verdien er feil eller korrekt. Det er foreløpig ikke grunnlag for noen HQC.</p>
+<p>QC1-2. Konsistenskontroll.<br>
+Anta fc=2, 4. Det er en feil i aktuell parameter eller i en annen parameter
+innenfor samme værelement (eller ev. innenfor et annet værelement, men det vil
+da fremgå av flagg for denne parameteren). Det er grunnlag for HQC for aktuell
+parameter og tidspunkt. Det må gjøres en korreksjon.<br>
+Anta fc=8-9, 0xA-0xB. Det er en mulig feil i aktuell parameter eller i en annen
+parameter, men det er foreløpig ikke grunnlag for noen HQC.<br>
+Det må settes opp spesielle kriterier for automatisk korreksjon (fc=5, 0xC) og
+en vurdering av ev. HQC</p>
+<p>QC1-3. Sprangkontroll.<br>
+Anta fs=2-3. Det er en mulig feil i aktuell parameter, men det er foreløpig
+ikke grunnlag for noen HQC.</p>
+<p>QC1-4. Prognostisk romkontroll.<br>
+Anta fn=2-5. Det er en mulig feil i aktuell parameter. Dersom det ikke er flere
+andre stasjoner i samme området med tilsvarende &quot;utslag&quot;, er det
+grunnlag for HQC. Er det derimot to eller flere stasjoner som får utslag, kan
+det tyde på at modellverdiene ikke er pålitelige for dette tidspunkt. Dette
+markeres i en feiloversikt (logg). Det er ingen spesiell grunn for HQC av
+aktuell parameter, med mindre andre flagg indikerer en manuell kontroll.<br>
+Anta fn=6. Manglende verdi er erstattet av modellverdi. Det bør gjøres en
+HQC-vurdering av modellverdienes kvalitet for aktuell parameter på aktuelt
+tidspunkt.</p>
+<p>QC1-5. Meldingskontroll (Posisjonskontroll, bevegelige målestasjoner).<br>
+Denne kontrollen er mest relevant i forbindelse med kontroll av meteorologiske
+observasjoner fra skip. Ut fra midlere kurs (Ds) og midlere fart (Vs) siste 3
+timer kan en beregne en sannsynlig ny posisjon.<br>
+Anta at fpos=3. Det er grunnlag for HQC.</p>
+<p>QC2d-1. Sprangkontroll.<br>
+Anta at det ikke ble utslag i forrige sprangtest (QC1-3) og at fs(nå)=2-3. Det
+er en mulig feil i aktuell parameter, men det er foreløpig ikke grunnlag for
+noen HQC.<br>
+Det må settes opp spesielle kriterier for automatisk korreksjon (fs=6-7) og en
+vurdering av ev. HQC.</p>
+<p>QC2d-2. Tidsserietilpasning.<br>
+Anta fns/is=1-2. Manglende verdi er erstattet av beregnet verdi.<br>
+Anta fns/is=2-3. Det er grunnlag for HQC.</p>
+<p>QC2d-4. Statistikk-kontroll.<br>
+Anta ftp=2. Det er grunnlag for HQC. Statistiske parametere sjekkes i rom og
+tid. Ev. korreksjoner må spesialbehandles. Feilperioden må kartlegges. Det må
+utvikles automatiske metoder for å korrigere systematiske feil i historiske
+data.</p>
+<h4><a name="2.2.1"></a>2.2.1. Feilliste basert på QC-flagg og HQC-informasjon</h4>
+<p>I første versjon av KVALOBS er det kontrollene ovenfor som gir flagg på
+grunnlag av stasjonens egne data (med unntak for QC1-4 og delvis unntak for
+QC2d-2, QC2d-4), og som gir mulighet for å oppdage feil i en enkeltobservasjon.
+QC2d-2 og QC2d-4 er enten romkontroller og/eller statistiske kontroller -
+sistnevnte hovedsakelig for å ta systematiske feil over en tidsperiode.</p>
+<p>Når kontrollene ovenfor er gjennomført, må det gjøres en automatisk
+vurdering av de flaggene som er satt tidligere (fr=4-5, fc=8-9, 0xA-0xB, fs=2-3,
+fn=2-5, 6, fns/is=2-3, ftp=2), både i forhold til flere flagg for samme
+observasjon, i forhold til tilsvarende flagg for nabostasjoner og i forhold til
+HQC-informasjon beskrevet nedenfor. Når det er grunnlag for HQC, markeres dette
+i en feilliste.</p>
+<p>Merknad<br>
+Algoritmene må utformes med tanke på ev. automatiske korreksjoner som måtte
+være gjort på et tidlig tidspunkt, med de konsekvenser dette har for senere
+kontroller. Arbeidet med å definere kriteriene for feillistene er ikke
+fullført.</p>
+<p>Når HQC-kontrollen starter må kontrolløren ha mest mulig informasjon om
+observasjonene og hvordan de enkelte automatiske kontrollene har slått ut. For
+hver av de automatiske kontrollene er det definert egne kontrollflagg i
+flaggdokumentet. Men også følgende forhold må tilrettelegges:</p>
+<p>Informasjon som forteller hvorvidt observasjonen gjeldende for aktuell termin
+er tatt innenfor eller utenfor godkjent observasjonstidsintervall (enten for
+tidlig eller for sent), må være synlig på kartet som en type flagginformasjon
+(se kap.6, pkt. 5 og 6). Også informasjon om hvor lang tid utenfor godkjent
+intervall, er nødvendig i kontrollen.</p>
+<p>Oppsamlet nedbørmengde eller &quot;oppsamlet&quot; minimums- eller
+maksimumstemperatur vil komme inn i kontrollen med &quot;feil&quot; verdi,
+dersom ikke observasjonen er fordelt automatisk. Informasjon om oppsamling og
+fordeling må være synlig på kartet som en type flagginformasjon (se kap.6,
+pkt. 5 og 6), både når automatisk fordeling er foretatt og når oppsamlet
+verdi ikke er fordelt.</p>
+<p>Observasjoner som mangler må markeres i det grafiske visningsverktøyet, som
+f.eks. X, og i datatabellen og feillista.</p>
+<p>All manuell manipulasjon med observasjonene (korreksjon, interpolasjon) må
+registreres på en eller annen måte, f.eks. som flagg, og det må registreres
+at HQC er gjennomført, selv om ingen endringer er foretatt. Dersom den manuelle
+behandlingen av dataene kan knyttes til flagg i QC-prosessen, kan HQC-flaggene
+settes automatisk. All manuell setting av flagg må unngås.</p>
+<h3><a name="2.3"></a>2.3. HQC-kontrollene
+</h3>
+<p>HQC-kontroller er oftest en etterprøving av automatiske kontroller, der disse
+har pekt på mistenkelige verdier, åpenbare feil eller manglende verdier, ev.
+at kontrollene har resultert i automatiske interpolasjoner og korreksjoner. I
+første versjon av KVALOBS er de to automatiske kontrollene nedenfor ikke
+prioritert. Disse er da å betrakte som rene manuelle kontroller inntil videre.
+I utgangspunktet er romlige analyser og tidsserieanalyser typiske verktøy for
+HQC.<br>
+</p>
+<p>QC2d-3. Væranalyse.<br>
+Kontrollen er ikke implementert i første versjon av KVALOBS. Kontrollen blir
+derfor hovedsakelig en manuell romkontroll inntil videre. Det må legges opp en
+rutine for hvert værelement (se kap.4. Generelt om HQC av forskjellige
+værelementer).</p>
+<p>QC2m-1. Klimatologikontroll.<br>
+Kontrollen er ikke implementert i første versjon av KVALOBS. Kontrollen blir
+derfor hovedsakelig en manuell kontroll inntil videre. Det må legges opp en
+rutine for hvert værelement.</p>
+<p>Når HQC er foretatt, og det enten er foretatt en korreksjon eller
+interpolasjon, så vil man benytte de såkalte HQC-flaggene (se flaggdokumentet)
+i de enkelte kontrollene: fc=6, fc=0xD, fs=0xE-0xF, fns/is=0xA, fi=0xB, ftp=0xA,
+fi/is=0xB, når den aktuelle parameteren er blitt tilknyttet et kontrollflagg. I
+tillegg må det markeres / registreres når HQC ikke er foretatt, når HQC har
+funnet observasjonene OK, når observasjoner utenfor obstid er korrigert, når
+oppsamling er fordelt og når observasjoner med kun 0 eller 1 i flaggverdi er
+korrigert (se for øvrig kap.6, pkt. 6).</p>
+<p>Det er viktig at statusinformasjon om HQC-prosessen for en stasjon er
+tilgjengelig for alle som er delaktige i rutinen, inntil rutinearbeidet er
+avsluttet, slik at man i ettertid ikke behøver å gjøre manuelle kontroller om
+igjen. Markeringene som gjøres i HQC vil være en del av den informasjon som
+senere skal følge observasjonene i klimadatabasen som bruksinformasjon.</p>
+<h3><a name="2.4"></a>2.4. Opplæring
+</h3>
+<p>Rutinepersonalet må ha tilstrekkelig meteorologisk kunnskap til å nyttiggjøre
+seg all den informasjon som blir tilgjengelig gjennom de valgte
+visningsverktøy. Opplæring må til, f.eks. i å utnytte den informasjonen som
+finnes i nåværende versjon av programmet DIANA, for kontrollformål, og i
+klimakartenes betydning for kvalitetskontrollen. En opplæringsplan for dette
+foreligger. Teknisk bruk av verktøyene vil bli gjennomgått for
+rutinepersonalet i forbindelse med KVALOBS-prosjektet. Se for øvrig kap.3.
+Visningsverktøy og funksjonalitet.<br>
+<br>
+</p>
+<h2><a name="3"></a>3. Visningsverktøy og funksjonalitet</h2>
+<p>I dette kapitlet har vi forsøkt å gi en presentasjon av funksjonaliteten
+på verktøyet på et middels detaljeringsnivå. Dette burde være tilstrekkelig
+for en prototyping av verktøyet. Det er vanskelig for brukermiljøet å ta
+stilling til de enkelte elementer i verktøyet, uten å ha sett hvordan det
+fungerer i praksis. Det må derfor være mulig å gjøre nødvendige
+tilpasninger før HQC-systemet settes i regulær drift.</p>
+<p>For HQC er det viktig med hensiktsmessige verktøy for å vise:</p>
+     <p>1. Aktuell værsituasjon, f.eks. i form av væranalyse, satellitt- og
+radarbilder, ev. også tilleggsinformasjon (feltfremstilling av forskjellige
+parametere, radiosonderinger, lynregistreringer m.m.), sammen med bakkebaserte
+observasjoner og modellverdier.<br>
+2. Tidsserier av observerte parametere og modellverdier.<br>
+3. Kartbasert klimatologisk informasjon, topografisk informasjon, sammen med
+bakkebaserte observasjoner og stasjonsinformasjon, bl.a. om lokalklimatologiske
+forhold.<br>
+4. Klimastatistikk og feilstatistikk.<br>
+5. Flagginformasjon.<br>
+6. Stasjonstype.<br>
+7. Datalister og tabeller (originale observasjonsdata, korrigerte
+observasjonsdata, modelldata).<br>
+8. Feillogg.<br>
+9. Feillister.</p>
+<p>Forklaring<br>
+Datalister og tabeller er i prinsippet samme sak. I visningsmodus snakker vi om
+lister, i korrigeringsmodus snakker vi om tabeller. En liste/tabell for
+korrigerte data kan også tenkes å omfatte en feillogg, som igjen omfatter en
+feilliste Feilloggen inneholder alle flagg som er satt på observasjoner.
+Feillista inneholder bare de observasjonene som er definert til å behandles
+manuelt. Alle lister og tabeller må være søkbare på et hvert element.
+Hovedtrekkene i forklaringen er vist i figur 3.1. Lister/tabeller er dynamiske
+og interaktive. Det betyr bl.a. at det er en kobling mellom kart, grafer og
+lister. Når man klikker på f.eks. et flagg på kartet, så markeres automatisk
+det samme flagget i feillista. Den rettelsen man gjør i tabellen, går til
+databasen og videre tilbake til visningsverktøyet.<br>
+<br>
+<br>
+<img src="http://kvproject/docs/images/fig31.gif">
+<br>
+</p>
+<p>Figur 3.1.<br>
+Skisse som viser forbindelsen mellom KVALOBS-databasen og HQC-verktøy (grafisk,
+liste- og tabellbasert). Legg merke til at manuell registrering av ettertidsdata
+går inn i KVALOBS-databasen via Klimadatabasen. Det kan også være koblinger
+nevnt i rapporten, som ikke er vist på figuren.<br>
+<br>
+</p>
+<p>Vi har allerede verktøy, som med små tilpasninger, tilfredsstiller kravene
+ovenfor. Analyseverktøyet DIANA, som er tilrettelagt for værvarslingsformål,
+kan også utnyttes i kvalitetskontrollen. Programmene ArcGIS og ArcIMS som er i
+bruk på Klimaavdelingen, kan presentere topografi og forskjellige typer
+klimaoversikter (f.eks. nedbørfordeling i forholdt til sirkulasjonsmønstre)
+sammen med aktuelle parameterverdier.</p>
+<p>I et kvalitetskontrollarbeide trenger vi både rask tilgang til informasjon
+og hensiktsmessige retteprosedyrer. Hensikten med verktøyene er at
+datakontrollørene skal få et best mulig verktøy for å kunne foreta en rask
+vurdering og beslutning i forhold til aktuelle feil og mistenkelige verdier i
+observasjonene og at ev. manipulasjon med dataene kan utføres raskt og
+effektivt. I det følgende vil vi spesifisere hva slags funksjonalitet vi tenker
+oss med de nevnte verktøy, for å kunne oppnå en slik målsetting.</p>
+<h3><a name="3.1"></a>3.1. Kart</h3>
+<p>Meteorologisk institutts verktøy for digital analyse (DIANA) blir benyttet i
+varslingstjenesten bl.a. for å framstille synoptisk informasjon i de ulike
+formene dataene foreligger. DIANA kan benyttes for å vise pseudodata som
+støtte for vurderingen av mistenkelige parameterverdier og interpolering av
+manglende verdier. DIANAs pseudodata er modellgenererte feltverdier,
+satellittbilder, radarbilder, væranalyse, ev. tilleggsinformasjon. Se også
+kap.3.1.1. Bruk av pseudodata i HQC. All informasjon som støtte i
+kontrollarbeidet bør lages i et format som støttes av DIANA og de GIS-baserte
+systemene (ArcIMS, ArcGIS).</p>
+<p>Vi ønsker en videreutvikling av DIANA til å bli et beslutningsstøttesystem
+for HQC. Det betyr bl.a. visning av flaggede verdier i DIANA-grensesnittet,
+manipulering av KVALOBS-databasens verdier og flagging og lagring i
+KVALOBS-databasen, som en egen HQC-applikasjon, tilgjengelig gjennom
+DIANA-grensesnittet. I tillegg ønsker vi å utnytte ArcIMS for presentasjon av
+klimatologisk informasjon.</p>
+<p>Begge kartverktøy må ha følgende funksjonalitet:<br>
+· Det må kunne presentere forskjellige typer romlige fordelinger (se
+nedenfor).<br>
+· Det må være en dynamisk kobling til tidsserieverktøy og listeverktøy (se
+kap.2.1. Standardoppsett).<br>
+· Det må være en kobling mellom parameter og flagg (se kap.3.4. Presentasjon
+av flagginformasjon).</p>
+<p>Følgende muligheter må være tilgjengelige ved presentasjon av romlig
+fordeling av modellverdi for stasjonspunktet:<br>
+· Valg av parametere. Flere parametere bør kunne presenteres samtidig.<br>
+· Isolinjer og/eller annen hensiktsmessig fremstilling av parameterverdienes
+fordeling i rommet.<br>
+· Andre romlige fordelinger ved samme tidspunkt (flere detaljer nedenfor).<br>
+· Modellhøyde skal være en parameter.</p>
+<p>I senere versjoner av KVALOBS ønsker vi at de prognostiske modellverdiene
+til bruk for QC1 erstattes av beste analyseverdi i QC2/HQC, f.eks. etter en
+assimilasjonsprosess, forutsatt at parameteren er egnet for slik fremstilling.</p>
+<p>Også presentasjon av andre romlige fordelinger må være mulig samtidig:<br>
+· Observert(e) parameter(e).<br>
+o Punktinformasjon.<br>
+o Flere parametere samtidig (på en hensiktsmessig form, à la met og/eller
+fargekode).<br>
+o Bør kunne presentere høydedifferansen mellom modell og værstasjon.<br>
+o Fordel om informasjonen kan fremstilles som felt-informasjon.<br>
+· Differanse (ev. prosent ved nedbør) mellom modellverdi og observert verdi
+for et gitt tidspunkt, som punktinformasjon og hvis mulig som feltinformasjon.<br>
+· Statistiske parametere på samme måte som ovenfor.<br>
+o F.eks. avvik fra gjennomsnittsverdi/normalverdi (differanse/prosent).<br>
+o Fordel om informasjonen kan fremstilles som feltinformasjon.</p>
+<p>Et DIANA-produkt bør etter tilpasses kontrollformål, og rutinene ved
+Klimaavdelingen. Men som nevnt vil også kartbaserte verktøy med topografisk
+informasjon og rask tilgang til stasjonsinformasjon om bl.a. lokalklimatologiske
+forhold være viktig i en manuell rutine.</p>
+<p>Viktige momenter for et kartbasert presentasjonsverktøy:<br>
+· God &quot;utvalgsfunksjonalitet&quot;. I romkontroll er det viktig å velge
+fornuftige værstasjoner å sammenlikne med, enten kontrollen gjelder et
+tidspunkt eller en tidsserie.<br>
+· God topografisk informasjon. Lokale forhold kan være årsak til at
+kvalitetskontrollen slår ut. Det å utvikle en forståelse for de forskjellige
+metodenes egenskaper i forbindelse med kunnskap om lokal/regional topografi og
+værsituasjon, knyttet mot stasjonsinformasjon, er meget viktig.<br>
+· Landskapsmessig informasjon (elver, veier, bebyggelse, skog, etc.).<br>
+· Bør for enkelte &quot;høydeavhengige&quot; parametere (f.eks. temperatur)
+kunne presentere parameterverdi redusert til et gitt nivå. Bør ev. være mulig
+å velge mellom flere reduksjonsmetoder (&quot;klimatologisk&quot;, etter
+standardatmosfæren, tørradiabatisk, fuktigadiabatisk, etter inversjonsforhold,
+etc.).<br>
+· Forskjellige typer informasjon tilgjengelig samtidig, enten ved å kunne
+legge på ny informasjon i samme bilde, eller presentere denne i forskjellige
+vinduer på samme skjerm, eller benytte flere skjermer til informasjon.<br>
+· Informasjon tilpasset kvalitetskontroll.<br>
+· Brukervennlighet.<br>
+· Zoom-funksjon.<br>
+· Rask tilgang på informasjon.</p>
+<p>Man må kunne bruke informasjonen fra både DIANA og ArcIMS samtidig. Begge
+verktøy bør ha funksjoner som styrer informasjonen etter utsnittet en ser på,
+dette for å unngå overlessing av oversiktsskjermbilder, og gi muligheten til
+mer detaljerte studier når en er på liten skala.</p>
+<h4><a name="3.1.1"></a>3.1.1. Bruk av pseudodata i HQC.</h4>
+<p>Den manuelle kontrollen vil behøve referanseinformasjon for på best mulig
+måte å kunne avgjøre hvilken observasjonsverdi som er den korrekte.
+Pseudodata er data som kan belyse riktigheten av observasjonsdataene eller tjene
+til å etterberegne en sannsynlig observasjonsverdi når observasjon ikke
+foreligger meldt. Operasjonelt kan pseudodataene være sammenstillinger av data
+fra en eller flere nærliggende stasjoner, resultater fra modellberegninger,
+varslingsmeteorologiske analyser, eller fjernmålte observasjonsdata.</p>
+<p>Visningsverktøyet DIANA er i utgangspunktet laget for bruk ved
+varslingstjenesten. I den gjeldende operative versjonen er modellfeltene fra
+HIRLAM10, HIRLAM20, HIRLAM50, ECMWF, WAVE/WAM og SEA/ECOM3D gjort tilgjengelig
+for tidspunkter ett døgn bakover. Bakkeanalysene er gjort tilgjengelig 31 dager
+bakover. Satellittbildene og radarbildene er også gjort tilgjengelig ett døgn
+bakover.</p>
+<p>Ved en tilpasning av DIANA til bruk i HQC må de utvalgte pseudodataene være
+tilgjengelig for hele KVALOBS' testperiode. I &quot;overordnet design&quot; er
+testperioden satt til maksimalt seks måneder.</p>
+<p>Historiske data blir arkivert ved met.no. Omfanget av arkiveringen er
+beskrevet i <a href="http://innblikk.dnmi.no/dataguide/programutvikling/arkiverte_data/arkiv_produkter.html"> http://innblikk.dnmi.no/dataguide/programutvikling/arkiverte_data/arkiv_produkter.html</a>.
+Dette dokumentet holdes jevnlig oppdatert. HIRLAM modellfelt og satellittbilder
+fra NOAA og METEOSAT er tilgjengelig der fra 1.1.1999. Hos ECMWF vil
+modellfeltene i nær fremtid ligge lagret fra 1.1.1961. EUMETSAT lagrer
+Meteosat-bilder siden desember 1995, tilgjengelig online. Data tilbake til 1977
+er tilgjengelig. NOAA lagrer satellittdata tilbake til oktober 1978.
+Langtidslagring av radarbilder er foreløpig ikke satt i system. Analysene er
+produsert digitalt siden 2001. Langtidslagring er foreløpig ikke satt i system.</p>
+<p>Bruk av pseudodata for HQC krever tilrettelegging i flere trinn:</p>
+<p>1. Det må innenfor prosjektet klarlegges hvilket utvalg av pseudodata som
+skal være underlaget for HQC. Typene pseudodata er:<br>
+Modellfelt, METEOSAT-bilder, NOAA-bilder, radarbilder, analyser, oppstigninger.<br>
+2. Deretter må det utenfor prosjektet opprettes rutiner for at pseudodataene
+blir lagret på et tilgjengelig medium over et tidsintervall av de siste seks
+måneder. Ansvaret for rutinene er fordelt mellom IT-div, FoU-div, Met-div og
+Obs-div.<br>
+3. Innenfor prosjektet må det lages et grensesnitt for at HQC-operatøren kan
+sikres å kunne benytte de aktuelle pseudodataene.<br>
+4. For etterkontroll av historiske data må det innenfor prosjektet opprettes
+hensiktsmessige rutiner for å tilrettelegge de tilsvarende pseudodataene.</p>
+<h3><a name="3.2"></a>3.2. Tidsserier</h3>
+<p>Et grafisk tidsserieverktøy må ha følgende funksjonalitet:<br>
+· Det må kunne presentere tidsserier for forskjellige parametere og flere
+stasjoner samtidig (se nedenfor).<br>
+· Det må være dynamisk koblet til stasjonspunkt / observasjon på kart og
+listeverktøy.<br>
+o F.eks. må man kunne se graf og datatabeller samtidig.</p>
+<p>Følgende valg må være tilgjengelige ved presentasjon av tidsserier:<br>
+· Modellverdier av aktuell parameter for stasjonspunktet.<br>
+· Observasjonsverdier fra aktuell stasjon sammenstilt med modellverdiene.<br>
+· Observasjonsverdier fra nabostasjoner i samme tidsrom, både i samme diagram
+som for aktuell stasjon og i eget diagram.<br>
+· Enkelt valg av nabostasjonsområde / nabostasjoner.<br>
+o Grafisk utsnitt (rektangulært, sirkulært).<br>
+o Stasjonskriterier (f.eks. høyde over havet, høyde over dalbunn, annen type
+eksponering, stasjonstype, m.m.).<br>
+· Enkelt valg av tidsperiode før og etter aktuelt tidspunkt.<br>
+· Må kunne slå av/på tidsseriene.<br>
+· Må kunne velge punktvisninger eller linje/kurve-visning.<br>
+· Må kunne fremstille alle datatyper, uansett observasjonshyppighet (³ 1
+minutt).<br>
+· Bør kunne plassere ev. maks.- og min.-verdier på et fornuftig punkt på
+tidsskalaen.<br>
+· Vinduene må kunne flyttes rundt i skjermbildet.<br>
+· Vinduene må kunne forstørres/forminskes.<br>
+· Tidsseriene må være synlig sammen med annen hensiktsmessig informasjon,
+dvs. i kombinasjon med f.eks.:<br>
+o Væranalyse.<br>
+o Satellittbilde.<br>
+o Radarbilde.<br>
+o Topografisk informasjon.<br>
+o Etc.</p>
+<h3><a name="3.3"></a>3.3. Statistikk</h3>
+<p>I tillegg til statistikk som presenteres på kart (nevnt ovenfor), vil det også
+være hensiktsmessig å ha lett tilgang til annen type klimastatistikk og
+feilstatistikk for de enkelte stasjonene. Dette må kunne hentes inn fra
+Klimadatabasen.</p>
+<h3><a name="3.4"></a>3.4. Presentasjon av flagginformasjon</h3>
+<p>I en manuell kvalitetskontroll er det viktig å kunne få en god oversikt over
+hvordan de forskjellige kontrollene har slått ut for den enkelte parameter.</p>
+<p>I væranalyser er så å si all informasjon om været plassert rundt
+stasjonsringen for alle aktuelle stasjoner. Denne værinformasjonen kalles en
+mett. Hver parameter har sin faste plass og kan slik sett presenteres samtidig
+med de øvrige parametrene. Men parametrene kan også presenteres hver for seg.
+Når en parameter er valgt, ønsker vi at stasjonsringen viser kvalitetsstatus
+for vedkommende parameter og at en tallkode med noe mer informasjon vises like
+ved stasjonsringen (men ikke i veien for valgt parameter). De to typene av
+flagginformasjon er presentert nedenfor som &quot;fargesignal&quot; og
+&quot;tallkode&quot;.</p>
+<p>La oss anta at det er temperatur som kontrolleres. I metten presenteres da 1)
+kun temperatur (eller temperaturgruppen), all annen informasjon blir usynlig,
+men &quot;resultatet&quot; av flagginformasjonen fra samtlige kontroller som er
+gjennomført, blir vist; eller 2) hele metten vises, men temperaturen blir vist
+med egen farge, slik at det blir lett synlig at det er flagginformasjonen for
+temperatur, som presenteres. Ved hvert skifte av parameter, skifter innholdet i
+flagginformasjonen.</p>
+<p>Vi har til sammen 9 QC1/QC2-kontroller, og et sett flagg for hver kontroll.
+For å lette oversikten kan man slå noen kontroller sammen, og man kan forenkle
+flagginformasjonen i flaggdokumentet. Denne kan f.eks. presenteres både som
+tall og som farge etter skjemaet i tabell 3.1.<br>
+<br>
+</p>
+<p>Tabell 3.1.<br>
+Sammenheng mellom tallkode og fargesignal</p>
+     <div align="center">
+      <center>
+      <table border="1" width="586" height="65">
+        <tr>
+          <td width="48" height="29">0<br>
+            1<br>
+            2<br>
+            3<br>
+            4<br>
+            5<br>
+            6</td>
+          <td width="187" height="29">Ikke kontrollert<br>
+            Kontrollert. OK<br>
+            Liten differanse<br>
+            Stor differanse<br>
+            Mistenkelig<br>
+            Interpolert<br>
+            Observasjon til feil tidspunkt&nbsp;</td>
+          <td width="329" height="29"> Grønt lys (gå
+videre): 1
+            <p>Gult lys (se nærmere på disse): 0 &amp; 2-6</td>
+        </tr>
+        <tr>
+          <td width="48" height="24">7<br>
+            8<br>
+            9</td>
+          <td width="187" height="24">Inkonsistens<br>
+            Korrigert<br>
+            Oppsamling</td>
+          <td width="329" height="24"> Rødt lys (stopp, her er det feil som bør
+sjekkes): 7-9</td>
+        </tr>
+      </table>
+      </center>
+     </div>
+<p>Fargesignal<br>
+Her presenteres kjente lyssignalfarger innenfor en passe stor stasjonsring.
+Fargen bestemmes ut fra flaggene fra samtlige kontroller, der den mest alvorlige
+flaggmeldingen, uansett kontroll, bestemmer fargen.</p>
+<p>Vi har da et lett gjenkjennelige &quot;lyssignal&quot;. Det blir lett å se i
+hvilke områder observasjonene er OK og hvilke stasjoner som må sjekkes
+nærmere. Fargesignalet kan presenteres sammen med metten, dersom valgt
+parameter blir tydelig markert. Fargesignalet gir ikke informasjon om hvilke
+kontroller som har slått ut, og passer heller ikke for fargeblinde.
+Presentasjonen bør derfor gis sammen med en mer detaljert tallkode (se
+nedenfor).</p>
+<p>Tallkode<br>
+Her foreslår vi å presentere en 5-sifret tallkode, der siffer 1-3 representer
+QC1-kontrollen (inkludert QC2d-1), siffer 4QC2-kontrollen og siffer 5
+HQC-kontrollen. Sifrene leses fra venstre mot høyre. Kontrollene slås sammen
+slik: 1 betyr grenseverdi- eller konsistenskontroll (fr, fc), 2 betyr
+prognostisk romkontroll (fn), 3 betyr sprangkontroll (fs), 4 betyr
+tidsserietilpasning (fns/is), statistikk-kontroll (ftp), væranalyse eller
+klimatologikontroll (fi, fi/is). Siffer 5 kan inneholde både HQC-informasjon og
+HQC-flagg. Dersom det oppstår konflikt mellom flaggene, velges høyeste
+tallverdi i skjemaet ovenfor.</p>
+<p>Tallkoden tar liten plass og den kan plasseres utenfor informasjonen i metten.
+Det er lett å se om flaggene er satt tidlig eller sent i kontrollprosedyren.
+Det er lett å avgjøre om observasjonen er OK (1), er mistenkelig (2-4, 6), er
+feil eller har vært feil (7-8) eller er interpolert/oppsamlet (5, 9). To og to
+kontroller er stort sett slått sammen, og man kan ikke skille de to fra
+hverandre innbyrdes. Dersom man ønsker mer detaljer om enkeltkontroller, kan
+man gå til en detaljert flaggliste eller feillogg, der flaggene for samtlige
+kontroller er vist.</p>
+<p>Eksempel<br>
+Anta at kvalitetskontrollene har slått ut på følgende måte: Nr.1:fr=1, nr.2:
+fc=2, nr.3: fn=3, nr.4: fs=1 (QC1-3), fs=2 (QC2d-1), nr.5: fns/is=0, nr.7:
+ftp=1, i følge flaggdokumentet (posisjonskontrollen ikke medregnet).
+Kontrollene nr.6 og nr.8, væranalyse og klimatologikontroll, er i første
+versjon av KVALOBS kun manuelle kontroller. Disse er derfor ikke aktivert når
+HQC starter.</p>
+<p>&quot;Fargesignal&quot; vil presentere rød stasjonsring.</p>
+     <p>&quot;Tallkode&quot; vil først bestemme tallverdi og så velge den høyeste
+tallverdien.</p>
+     <ul>
+      <li>Siffer 1: 1 - 7</li>
+      <li>Siffer 2: 1 - 4</li>
+      <li>Siffer 3: 2</li>
+      <li>Siffer 4: 0 - 1 - 0</li>
+      <li>Siffer 5: 0</li>
+     </ul>
+<p>Før HQC vil flaggene bli presentert med følgende tallkode: 74210.</p>
+<p>Dynamiske detaljer<br>
+Ved klikk på stasjonsring, kommer detaljert flagginformasjon, feillogg, etc.
+opp som informasjon. Ved klikk på tallkode, kommer hjelpeverktøy for tallkode
+opp, ev. også sammen med informasjonen nevnt ovenfor.</p>
+<h3><a name="3.5"></a>3.5. Presentasjon av stasjonstype i HQC</h3>
+<p>Manuelle værstasjoner vil ha en fylt stasjonsring, som skiller disse stasjonene
+fra automatstasjonene. Det er neppe nødvendig å skille mellom synop- og
+klimastasjoner. Men delvis automatiserte stasjoner bør kunne skilles fra
+manuelle værstasjoner. Man må få vite hvilke typer landbaserte
+automatstasjoner man har på kartet. met.no's stasjoner må kunne skilles fra
+landbruksstasjoner, Vegvesenets stasjoner og ev. andre automatstasjoner. For
+nedbørstasjonene må man kunne skille mellom stasjoner med daglige
+observasjoner, daglige observasjoner med fast oppsamling og ikke-daglige
+observasjoner (inkludert 1 totalisatorstasjon), som måler oppsamlet nedbør
+over en lengre tidsperiode. Det vil også være behov for å se forskjell på
+skip og plattformer.</p>
+<p>Delvis automatiserte stasjoner kan f.eks. ha en stasjonsring inne i trekant.
+For rene automatstasjoner kan man benytte met.no's automatstasjonssymbol, og
+bokstaver for de andre typene automatstasjoner: L for landbruk, V for
+Vegvesenet, F for flyplass (kun metarstasjoner), osv.</p>
+<p>Daglige nedbørstasjoner kan markeres med N, daglige med fast oppsamling med
+NO, ikke-daglige med NI og totalisatorstasjoner med NT.</p>
+<h3><a name="3.6"></a>3.6. Presentasjon av datalister og tabeller</h3>
+<p>Mye informasjon kan presenteres på kart og i tidsserier, men en del informasjon
+må også være tilgjengelig som tekstbaserte lister/tabeller. Dette gjelder
+feil, flagg og observasjoner. Som nevnt i forklaringen i kap.3 (side 7) er
+lister og tabeller i prinsippet samme sak. Lister brukes ved visning, tabeller
+ved korrigering. Listeverktøy må ha følgende funksjonalitet:<br>
+· Lister/presenteres i egne vinduer.<br>
+· Det må være en dynamisk kobling til kart, tidsserie og database, slik at
+alle endringer raskt oppdateres hos den kontrollør, som gjør endringene.<br>
+o F.eks. må den dynamiske koblingen være slik at man kan se tidsserieplott og
+datalister samtidig.<br>
+· Datalister må kunne aktiviseres både fra feillister og kart (se kap.2.1
+Standardoppsett).<br>
+· Det må være mulig å legge inn manglende observasjoner manuelt.<br>
+· Det må være en funksjon som sørger for at bare én person ad gangen kan
+jobbe med den aktuelle feilen.<br>
+· Det må være mulig å søke etter og styre den informasjon man trenger.<br>
+o F.eks. kan det være hensiktsmessig med gruppering av informasjon.<br>
+o Det må f.eks. være mulig å søke etter stasjoner med samme flagghistorikk
+(se for øvrig kap.3.6. Presentasjon av lister og datatabeller. Søkbarhet).<br>
+· En feilliste må innholde / være søkbar på følgende parametere: Dato,
+tid, stasjonsnummer eller annen stasjonsidentifikasjon, navn, fylke, parameter,
+feiltype / beskrivelse, original parameterverdi, modellverdi, aktuell
+parameterverdi, flagg.<br>
+· Dersom hele observasjonen mangler bør dette komme i klartekst (og gis en
+egen markering på kartet).</p>
+<p>Datatabeller<br>
+I de foregående underkapitler har vi sett på verktøyene kun som
+visningsverktøy, som et hjelpemiddel for å identifisere feil og kunne ta
+beslutninger i forhold til mistenkelige verdier, feil og manglende data. Når en
+feil er identifisert, er det neste steget å korrigere / interpolere data. Når
+en dataliste er i korrigeringsmodus har vi en datatabell. For
+kvalitetskontrollen trengs datatabeller fra den aktuelle stasjonen og
+referansestasjoner. En referansestasjon er nødvendigvis ikke nabostasjonen hvis
+topografien (inkludert høyden over havet) er svært ulik mellom disse to
+stasjonene. Hvilke parametere som skal presenteres, er avhengig av hvilke
+parametere som skal korrigeres. Et bit av det aktuelle verktøyet er grafisk. En
+grafisk utplotting av tidsserien med feil, samt tilsvarende serie fra
+referansestasjon vil raskt kunne gi en oversikt over forholdene når feilen
+oppstod. Man må kunne se grafen samtidig som man ruller datatabellen opp og
+ned. Se for øvrig kap.3.2. Tidsserier.</p>
+<p>Det må være mulig å liste ut hele observasjoner (dvs. f.eks. alle
+parameterverdiene i en synop) på en lettvint måte, og det må være mulig i en
+feilliste å markere at hele observasjonen mangler, slik at man ikke trenger
+spesifisere dette for hver enkelt parameter.</p>
+<p>Nedenfor (tabell 3.2) følger en parametervis opplisting av hvilke parametere
+det er ønskelig å se samtidig for å kunne interpolere dataene. En del av
+parametrene er samlebetegnelser for flere parametere. For interpolasjon av
+skydekke kan satellittbilder brukes til å gi en indikasjon, det vil derfor
+være gunstig med en link fra aktuelle data til aktuelt satellittbilde. Dersom
+en verdi enten er interpolert eller observert, må dette komme frem både i
+tabell og graf. I tabellen bør fontene endres, men i grafen kan en f.eks. sette
+kryss (eller en annen punktmarkering) på interpolerte verdier, eller stiple
+streken forbi slike verdier.<br>
+<br>
+Tabell 3.2.<br>
+Parametere som det er naturlig å &quot;konsultere&quot;, når man skal sjekke
+mulige feil i en gitt parameter.
+</p>
+     <div align="center">
+      <center>
+      <table border="1" width="434" height="84">
+        <tr>
+          <td width="134" height="7"><b>Lufttrykk&nbsp;</b></td>
+          <td width="156" height="7"><b> Temperatur&nbsp;</b></td>
+          <td width="122" height="7"><b> Fuktighet</b></td>
+        </tr>
+        <tr>
+          <td width="134" height="8">
+Stasjonstrykk<br>
+            Havnivåtrykk<br>
+            Karakteristikk<br>
+            Trykktendens<br>
+            Temperatur</td>
+          <td width="156" height="8">Temperatur<br>
+            Skydekke<br>
+            Soltid</td>
+          <td width="122" height="8"> &quot;Været&quot;<br>
+            Fuktighet<br>
+            Nedbør<br>
+            Skydekke</td>
+        </tr>
+        <tr>
+          <td width="134" height="5"><b>
+Vind&nbsp;</b></td>
+          <td width="156" height="5"><b> Nedbør&nbsp;</b></td>
+          <td width="122" height="5"><b> Skydekke</b></td>
+        </tr>
+        <tr>
+          <td width="134" height="21">
+Vindfart<br>
+            Vindretning<br>
+            Trykkfeltet&nbsp;</td>
+          <td width="156" height="21"> Nedbør<br>
+            Temperatur<br>
+            &quot;Været&quot;<br>
+            Snødybde
+og -dekke<br>
+            Soltimer<br>
+            Fuktighet<br>
+            Fjernmålingsdata(bilder)</td>
+          <td width="122" height="21"> Skydekke<br>
+            Nedbør<br>
+            &quot;Været&quot;<br>
+            Soltimer<br>
+            Fjernmålingsdata(bilder)</td>
+        </tr>
+        <tr>
+          <td width="134" height="7"><b>
+Synsvidde&nbsp;</b></td>
+          <td width="156" height="7"><b> &quot;Været&quot;&nbsp;</b></td>
+          <td width="122" height="7"><b> Sjøgang/bølgehøyde</b></td>
+        </tr>
+        <tr>
+          <td width="134" height="7">
+Synsvidde<br>
+            &quot;Været&quot;<br>
+            Soltimer<br>
+            Temperatur<br>
+            Skydekke</td>
+          <td width="156" height="7"> &quot;Været&quot;<br>
+            Synsvidde<br>
+            Nedbør<br>
+            Soltimer<br>
+            Temperatur<br>
+            Skydekke</td>
+          <td width="122" height="7">Vindfart<br>
+            Vindretning<br>
+            Sjøgang<br>
+            Bølgehøyde</td>
+        </tr>
+      </table>
+      </center>
+     </div>
+<p><br>
+Søkbarhet<br>
+I enkelte tilfeller vil ikke standard lister eller datatabeller være gode nok,
+Da må spesielt tilpassede søk kunne gjennomføres. Dette bør skje som en
+link/knapp fra datavinduet og over i et spesialverktøy for denne typen
+datautlisting. Når knappen trykkes bør en gå over i søkevinduet. Ved denne
+overgangen må oppsettet fra standardtabellen bli med inn i søkevinduet slik at
+en enkelt kan gå inn og redigere disse. Slike søk bør også kunne lagres for
+fremtidig bruk. Tilsvarende som for datatabellen er det viktig at grafisk
+presentasjon av dataene kan styres ved å bytte ut stasjoner og parametere ved
+enkle grep.</p>
+<p>Månedsdatatabell<br>
+I tillegg til det som er satt opp over, må det være mulig å vise flere
+(samtlige) stasjoner for hver måned i en spesialtilpasset datatabell, for å
+kunne foreta en manuell romlig kontroll av datasettet. I en slik kontroll er det
+igjen viktig at stasjonene grupperes fornuftig (stasjonsnummer er ikke egnet i
+alle situasjoner), og at interpolerte/korrigerte verdier markeres. Her må det
+kunne skilles mellom målinger, manuelle og automatiske interpolasjoner, og
+fordelte verdier.</p>
+<p>Alternative data<br>
+I noen tilfeller kan det være aktuelt å hente inn data fra andre etater o.l.
+Dette er data som kun er ment som støtte for beslutninger vedrørende våre
+egne data. De eksterne dataene skal ikke behandles, ikke kontrolleres, ikke
+lagres. Dataene hentes inn etter behov, ikke rutinemessig. For f.eks.
+kontrollformål vet vi at det er mulig å få data for valgte værsituasjoner
+fra f.eks. kraftverk, NVE, kommuner, statlige etater, etc. Det må på litt
+lengre sikt lages en løsning der en kan importere slike data, fra et eller
+flere definerte formater, inn i KVALOBS.</p>
+<p>Retting av feil<br>
+Som tidligere beskrevet vil det være effektivt å bruke de samme skjermbildene
+for både visningsmodus og korrigeringsmodus. I det en verdi blir lagt inn i
+basen må det automatisk flagges. Dette automatiske flagget som sier at verdien
+er manuelt lagt inn / interpolert, må kunne overstyres med f.eks. at
+kontrollør har fått korrekt verdi fra observatør.</p>
+<p>Det må være enkelt å lagre rettelser og interpolasjoner. Det må være
+tilstrekkelig å klikke på stasjonens parameterverdi i kartgrensesnittet, for
+å få opp det riktige feltet i datatabellen, der en kan skrive inn ny verdi.
+Det samme må kunne skje ved å klikke på aktuell parameter i feillista.</p>
+<p>Verktøyet som utvikles med tanke på retting, må innholde en del enkle
+automatiske rutiner for å eliminere feil. Disse kontrollene må f.eks. kunne
+bruke verdier før og etter aktuelt tidspunkt, samt parametere med opplagt
+sammenheng (f.eks. TA, TX og TN), til å plukke ut f.eks. tastefeil. Dette er
+funksjonalitet som benyttes på Klimaavdelingen i dag.</p>
+<p>Kommentar<br>
+Skjermbildet for å legge inn nedbørkort i Klimadatabasen fungerer bra,
+bortsett fra at det er litt tungvint å manøvrere seg i kortet om en ikke skal
+følge den opplagte ruten. Dette skjermbildet bør videreføres med en ev.
+forbedring i navigasjonsmulighetene. Dataflyten for slike data (nedbørkort og
+værstasjonsdagbøker) vil gå via Klimadatabasen til KVALOBS-databasen.</p>
+<p>Som tidligere nevnt må verktøyet være dynamisk, noe som må gi det
+resultatet at når noe er lagt inn i tabellen, må det innen rimelig tid vises i
+grafiske fremstillinger og på kart.</p>
+<h2><br>
+<a name="4"></a>
+4. Generelt om HQC av forskjellige værelementer</h2>
+<p>I en ny kvalitetskontrollrutine vil man benytte det verktøyet som er
+beskrevet i foregående kapittel. De viktigste manuelle kontrollene er
+romkontroller og tidsseriekontroller, enten hver for seg eller kombinert.
+Statistikk-kontroller kan brukes på stasjonens egne data alene, men det er i
+mange sammenhenger naturlig å sammenlikne med representative nabostasjoner.</p>
+<p>Romkontroller tar sikte på å avklare observasjoner, som kontrollsystemet
+ikke er i stand til å gå god for (resultatet av flaggene i QC0, QC1 og QC2).
+Man sammenlikner stasjoner, som man forventer har samme meteorologiske forhold
+eller samme tidsforløp av aktuell parameter gjennom døgnet. I den forbindelse
+er det naturlig å benytte tidsseriekontroller for å sammenlikne tidsserier fra
+representative nabostasjoner. Dersom det er få stasjoner som observerer ved
+klokkeslett i mellom hovedobsene, og det er mistanke om feil ved disse
+tidspunktene, kontrolleres temperaturen for aktuell stasjon ved nærmeste
+hovedobs for å se om &quot;nivået&quot; er riktig. Dernest ser man på
+tidsserien fra stasjonen, ev. også på representative nabostasjoner, for å se
+om tidsforløpet av parameteren er fornuftig.</p>
+<p>Når man sammenlikner stasjoner må man vite om stasjonene er sammenlignbare.
+Dette beror på mange forskjellige forhold: Stasjonstype, stasjonens omgivelser,
+eksponering, høyde over havet, lokale forhold, etc. Det må derfor bl.a. være
+lett å identifisere stasjonstype i det aktuelle stasjonspunktet og det må
+utarbeides statistikk eller annen informasjon om hvilke stasjoner som &quot;går
+i takt&quot;, dvs er representative for hverandre. Man må være oppmerksom på
+om de presenterte parameterverdier er observasjoner eller interpolasjoner.</p>
+<p>I en HQC-rutine er oppgaven å kontrollere mistenkelige verdier, ev.
+korrigere eller interpolere og sette nødvendige kontrollflagg. Innenfor hver
+parametergruppe har vi foreslått hvilke parametere som bør omfattes av en
+HQC-kontroll. Vi har også foreslått forenklinger i kontrollen, se kap.5.
+Forslag til forenklinger.</p>
+<p>Dersom det mot formodning skulle bli lengre perioder med manglende
+instrumentelle data fra viktige klimastasjoner, vil modellverdier være det
+beste utgangspunktet for interpolasjon av manglende data. Det kan imidlertid bli
+nødvendig å gjøre korreksjoner av disse basert på korrelasjonsanalyser og
+annen statistikk.</p>
+<p>NB!<br>
+I HQC-rutinen må det være mulig å aktivere automatiske metoder og prosedyrer,
+som enten er utviklet kun for manuell etterkontroll, eller som inngår i det
+automatiske QC-systemet. Det kan f.eks. være ulike interpolasjonsmetoder innen
+QC2m-1, der værsituasjonen, topografien, værelementet, ev. andre forhold
+avgjør hvilken metode som er best egnet for å beregne en erstatningsverdi.
+Hensikten med HQC er å ha et verktøy som hjelper kontrolløren til å ta en
+rask beslutning i forhold til manglende data, mistenkelige verdier og feil.</p>
+<p>Parameternotasjonen i dette kapitlet er hentet fra dokumentet
+&quot;Parametere i første versjon av KVALOBS-databasen (<a href="http://kvproject/docs/parameters.shtml">http://kvproject/docs/parameters.shtml</a>).</p>
+<h3><br>
+<a name="4.1"></a>
+4.1. Kontroll av temperatur</h3>
+<p>Følgende stasjonstyper observerer temperatur:<br>
+· Manuelle værstasjoner (synop, ship, klima og metar).<br>
+· Automatiske værstasjoner (tilhørende met.no, Statens Plantevern,
+met.no/Oljedirektoratet, met.no/Luftfartsverket, met.no/kommuner, Statens
+Vegvesen).</p>
+<p>Den foreslåtte HQC-rutinen gjelder følgende parametere:<br>
+TA (lufttemperatur ved observasjonstiden), TAM (middeltemperatur siste time),
+TAN_12 (minimumstemperatur siste 12 timer), TAX_12 (maksimumstemperatur siste 12
+timer), TG (gresstemperatur ved observasjonstiden), TGM (midlere gresstemperatur
+siste time), TGN_12 (gressminimumstemperatur siste 12 timer), TW
+(sjøtemperatur).</p>
+<p>Romkontroll<br>
+Romkontroll foretas minst ved standardtidspunktene hver tredje time, men det kan
+vise seg hensiktsmessig å foreta romkontroll også for timedata. Et alternativ
+til romkontroll ved ett tidspunkt er en tidsseriekontroll eller en kombinasjon
+av disse (se nedenfor).</p>
+<p>Forutsetninger:<br>
+Samtlige temperaturparametere nevnt ovenfor, observasjoner (originale og
+korrigerte) og modellverdier, må kunne fremstilles på kart (minimumskrav). Av
+hensyn til kontroll av TAN_12, TAX_12 (kl 06 og 18 UTC) og TGN_12 (kl 06 UTC)
+beregnes tilsvarende parametere for automatstasjonene. Det må være mulig å
+fremstille TA/TG/TW, ev. annen informasjon, fra manuelle stasjoner sammen med
+TAM/TGM fra automatiske stasjoner. Dersom en observasjon av minimums- eller
+maksimumstemperatur gjelder for en lengre periode enn 12 timer, må denne være
+flagget, slik at man kan ta hensyn til dette i den manuelle kontrollen (se
+kap.2.2.1. Feilliste basert på QC-flagg og HQC-informasjon).<br>
+</p>
+<p>En klimatologikontroll kan gjøre romkontrollen mer effektiv. Dersom
+værsituasjonen er slik at temperaturen på stasjonene kan reduseres til et
+felles høydenivå, uten for store feil, vil sammenlikningen mellom stasjonene
+følge et mønster, som kan være lettere å kontrollere, f.eks. i forhold til
+aktuell værsituasjon eller ved sammenlikning med et forventet klimatologisk
+mønster. I fremtidige versjoner av KVALOBS vil man kunne velge mellom ulike
+interpolasjonsmetoder, der klimatologiske elementer og lokale særtrekk er bedre
+ivaretatt enn i Prognostisk romkontroll.</p>
+<p>I en temperaturkontroll må det alltid være samsvar mellom aktuell
+temperatur og temperaturobservasjonene før og etter. Det bør således foretas
+en tidsseriekontroll.</p>
+<p>Tidsseriekontroll<br>
+Parameterverdiene for TA, TG og TW for valgt stasjon, innenfor valgt
+tidsperiode, plottes inn på et tidsseriediagram for aktuelt værelement, der en
+HIRLAM tidsseriekurve er sentral i diagrammet. Dermed blir det lettere å
+vurdere alle typer temperaturdata, uavhengig av observasjonsfrekvens.</p>
+<p>Forutsetninger:<br>
+Det må beregnes tilstrekkelig tett (i tid) med modellverdier, slik at
+realistisk kurve kan trekkes.</p>
+<h3><a name="4.2"></a>4.2. Kontroll av nedbør</h3>
+<p>Følgende stasjonstyper observerer nedbør:<br>
+· Manuelle værstasjoner (nedbør (met.no, eksterne), synop og klima).<br>
+· Automatiske værstasjoner (met.no, Statens Plantevern, met.no/kommuner,
+Statens Vegvesen).</p>
+<p>Den foreslåtte HQC-rutinen gjelder følgende parametere:<br>
+Parametere: RR (nedbørmengde hvert minutt), RR_01 (nedbørmengde siste time),
+RR_12 (nedbørmengde siste 12 timer), RR_24 (nedbørmengde siste 24 timer), SA (snødybde
+ved observasjonstiden) og SD (snødekke ved observasjonstiden).</p>
+<p>Romkontrollen foretas for standardtidspunktene 06 og 18 UTC. I tillegg bør
+timevise data fra automatstasjoner (RR_01) og minuttdata fra
+nedbørintensitet-stasjoner (RR) kontrolleres i en tidsseriekontroll, ev. i
+kombinasjon med en romkontroll (se nedenfor). Kontroll av snødybde og snødekke
+foretas for kl 06 UTC.</p>
+<p>Forutsetninger:<br>
+Samtlige nedbørparametere nevnt ovenfor, observasjoner og modellverdier, må
+kunne fremstilles på kart (minimumskrav). Det betyr at minuttverdier må
+akkumuleres til timeverdier av nedbør, og timeverdier og minuttverdier må
+akkumuleres til 12- og 24-timers nedbørverdier. Markas tilstand, EM, må
+konverteres til snødekke, SD. En stasjon som leverer en oppsamlet nedbørsum
+over en lengre periode enn observasjonsprogrammet tilsier, må være flagget,
+slik at disse observasjonene kan skilles ut fra de ordinære nedbørverdiene fra
+de andre stasjonene (se kap.2.2.1. Feilliste basert på QC-flagg og
+HQC-informasjon).</p>
+<p>Før romkontrollen starter må det avklares hva slags type nedbør man har
+hatt i oppsamlingsperioden (frontnedbør, jevn eller ujevn intensitet,
+bygenedbør, spredte byger, omfangsrike byger, svak eller sterk intensitet,
+osv.). Radar- og satellittinformasjon (ev. også sondediagram) vil være nyttig
+informasjon for en slik vurdering. Romkontrollen må ta hensyn til forventet
+geografisk spredning av nedbørmengde. Det vil forhåpentligvis bli mulig å
+utnytte digitalisert informasjon fra radar og satellitt i romkontrollen, slik at
+indeksparametere basert på modell-, radar- og satellittinformasjon kan brukes i
+tillegg til en visuell analyse.</p>
+<p>En klimatologikontroll kan gjøre romkontrollen mer effektiv, dersom
+topografisk påvirkning på nedbørmengden, kan dokumenteres, f.eks. ved
+klimakart. Ved kontroll av snødekke, snødybde og endring av snødybde, kan
+fremtidige snøakkumuleringskart bli et nyttig hjelpemiddel.</p>
+<p>Nedbørmengde er en vanskelig parameter å kontrollere fordi det kan være
+store lokale forskjeller i nedbørmengde innenfor et og samme distrikt. Det kan
+derfor være aktuelt i visse områder å benytte seg av forskjellige
+interpolasjonsmetoder, for å kunne avgjøre om store utslag i forhold til
+nabostasjoner, er rimelige eller ikke. Slike metoder er beskrevet bl.a. i
+NORDKLIMs siste rapport (08/02 KLIMA).</p>
+<p>En nedbørkontroll må også avdekke om det er samsvar mellom nedbørtype og
+endringer i nedbørmengde i løpet av relativt korte tidsskritt. Det må derfor
+være mulig å foreta en tidsseriekontroll i forhold til slik informasjon. Også
+her vil radarinformasjon (ev. også satellittinformasjon og informasjon om
+instabilitet) være et godt hjelpemiddel.</p>
+<p><br>
+Tidsseriekontroll / romlig tidsseriekontroll<br>
+Parameterverdiene for RR, RR_01, SA og SD, innenfor valgt tidsperiode, plottes
+inn i på et tidsseriediagram. RR_12 og RR_24 plottes inn i et søylediagram,
+der en HIRLAM tidsserie er sentral i diagrammet. Dette gjøres for aktuell
+stasjon og representative stasjoner. Alternativt vises parametere i et
+tabellformat, som gir en kombinasjon av rom og tid (stasjon + referansestasjoner
++ modell for et valgt tidsrom, jf. &quot;ukelister&quot; i dagens
+nedbørrutine).</p>
+<p>Forutsetninger:<br>
+Det må beregnes tilstrekkelig tett (i tid) med modellverdier, slik at
+presentasjonen blir hensiktsmessig.</p>
+<p>Forslag til kontroll av oppsamlet nedbør og manglende snø<br>
+I forbindelse med kortere eller lengre opphold i observasjonen, vil det bli
+aktuelt å fordele nedbørmengde og snødybde/-dekke. Nedbørmengden må
+fordeles slik at summen av de fordelte mengder er lik oppsamlet nedbør.
+Erstatning av manglende snødybde/-dekke blir å betrakte som en interpolasjon,
+der det skal være samsvar mellom snøverdier, fordelt nedbørmengde, temperatur
+og vind (snøfokk) i &quot;oppsamlingsperioden&quot;.</p>
+<p>Forutsetninger:<br>
+Det forutsettes at oppsamlet nedbør fra en stasjon er tydelig flagget.
+Spesialtilpasset statistikk må kunne presenteres i stasjonspunkter eller i en
+tabell. Radarinformasjon må kunne presenteres i stasjonspunkter.</p>
+<p>For tilbakefordeling etter oppsamling bør det utarbeides raffinerte
+statistiske metoder. Men inntil videre kan man benytte seg av en type
+&quot;tommelfingermetodikk&quot; som, avhengig av værsituasjonen, går ut på
+å fordele nedbøren 1) med samme prosentandel som på nabostasjoner, 2) etter
+romlige medianverdier for hver standard måleperiode eller ev. 3) etter
+radarinformasjon. Metodene er nærmere beskrevet i Innholdsgruppens rapport.</p>
+<p>Det kan også være naturlig å benytte seg av HIRLAM-modellverdier etter
+tilsvarende prosedyrer , kanskje best velegnet for tilfelle 1).</p>
+<p>For snødybde og -dekke kan man ikke benytte HIRLAMs modellverdier. Her bør
+det følgelig utvikles avanserte metoder for interpolasjon, men inntil videre
+kan man benytte tilsvarende prosedyrer som nevnt i punktene 1-3 ovenfor, dersom
+utvalgte stasjoner ligger i samme høydenivå og har samme strålingsforhold.
+Dersom nedbøren faller både som regn og snø blant de utvalgte stasjonene, må
+man i større grad gjøre skjønnsmessige vurderinger. Helst bør man benytte
+referansestasjoner, og overføre tidsvariasjon i disse (prosentvis endring av
+dybde fra dag til dag).</p>
+<p>Dersom disse kontrollene kan implementeres i QC2 (se Innholdsgruppens
+arbeid), blir HQC-arbeidet å overvåke den automatiske fordelingen.</p>
+<h3><a name="4.3"></a>4.3. Kontroll av bølgehøyde, bølgeperiode og sjøgang</h3>
+<p>Følgende stasjonstyper observerer bølgehøyde, bølgeperiode og sjøgang:<br>
+· Værskipet Polarfront og plattformene observerer bølgehøyde og -periode
+instrumentelt (ship og automatstasjoner).<br>
+· Kystvaktfartøyene observerer bølgehøyde og -periode visuelt (ship).<br>
+· Manuelle værstasjoner ytterst på kysten observerer sjøgang visuelt (synop,
+hovedsakelig fyrstasjoner).</p>
+<p>Målehyppigheten til kystvaktens fartøyer kan variere en del. Det vil også
+være lengre opphold i målingene ved landligge. Dønning rapporteres i liten
+grad/ikke fra disse stasjonene.</p>
+<p>Den foreslåtte HQC-rutinen gjelder følgende parametere:<br>
+HW (visuell vindbølgehøyde), HWA (instrumentell bølgehøyde), PW (visuell
+vindbølgeperiode), PWA (instrumentell bølgeperiode), HW1, HW2 (høyde av hhv.
+dønningssystem 1 og 2), PW1, PW2 (periode av hhv. dønningssystem 1 og 2), DW1,
+DW2 (retning av hhv. dønningssystem 1 og 2), SG (sjøgang).</p>
+<p>Fra de faste maritime stasjonene foreligger det instrumentelle målinger
+minst hver tredje time, men det kan også være aktuelt å benytte romkontroll
+på timebasis. Det er likevel mest nærliggende å tenke at en kontroll av
+mellomliggende timeobservasjoner foretas i en tidsseriekontroll, tilsvarende den
+som er beskrevet for temperatur.</p>
+<p>Forutsetninger:<br>
+HW, HWA og tilsvarende PW, PWA er prinsipielt ikke de samme størrelsene, men i
+praksis behandles de som de samme, nemlig som estimat av signifikant
+bølgehøyde og gjennomsnittlig bølgeperiode. Sjøgangskoden konverteres til
+bølgehøyde ved å bruke øvre verdi i intervallet (ev. middelverdien). Det må
+være enkelt å få frem en kartmessig fremstilling av prognose-/analysefelt med
+stasjonsverdier av disse parametrene inkludert, innenfor det tidsintervall som
+kontrolleres. Flaggstatus for aktuell parameter i form av
+&quot;fargesignal&quot; kan være et hensiktsmessig hjelpemiddel for rask
+lokalisering av mulige problemer. Bølger i våre farvann er oftest generert av
+vind. Analyse-/prognosefelt av vindhastighet og vindretning må derfor være
+lett å få frem.</p>
+<p>I romkontrollen kan flere sammenlikninger tenkes: 1) mellom bølgehøyde fra
+de maritime stasjonene og bølgeobservasjonen fra kyststasjonene og mellom
+bølgehøydene fra to naboplattformer, dersom ikke avstanden er for stor og 2)
+mellom observert bølgehøyde og WAM-modellens bølgefelt og 3) mellom observert
+bølgehøyde og HIRLAM-modellens vindfelt. Interpolasjon av manglende data for
+å få fram komplette serier er ikke aktuelt for båtene, men kan være aktuelt
+for de faste stasjonene. Praksis til nå har vært at åpenbart feilaktige
+verdier er fjernet (uten erstatningsverdi).</p>
+<p>Sjøgang rettes kun unntaksvis, siden denne parameteren er vanskelig å
+vurdere (pga lokale forhold, vindkomponent fra land, m.m.). Det foreslås at
+interpolering ikke foretas utover 1 døgn med sammenhengende opphold i
+observasjonen, med mindre det kan dokumenteres god korrelasjon med vind- eller
+bølgefelt for vedkommende stasjon. Det må vurderes om bruk av tidsserie eller
+korrelasjonsanalyse kan benyttes for interpolasjon.</p>
+<p>Rapport av dønning er det lite av, noe som ikke nødvendigvis betyr at det
+er lite dønning i våre farvann. Men det er en vanskelig parameter å observere
+på et lite fartøy i åpen sjø. HQC kan bare foretas når et
+prognose-/analysefelt av dønning, med tilhørende periode, er lett
+tilgjengelig.</p>
+<p>Å få frem tidsforløpet av aktuell parameter på en stasjon, sammen med
+andre parametere av betydning for denne (eksempelvis vindhastighet og retning,
+når aktuell parameter er bølgehøyde), må være et mulig valg i et
+visningsverktøy.</p>
+<p>Hvis man kjenner vindhastighet og vindretning ved det aktuelle tidspunktet og
+i tiden før og det er god korrelasjon mellom vindhastighet og
+sjøgang/bølgehøyde for aktuell vindretning, så kan sjøgang/bølgehøyde
+interpoleres.</p>
+<p>Mistenkelige verdier må enkelt kunne fjernes og eventuelt erstattes med
+interpolert verdi. Hvis vind og sjø er vanskelig å vurdere, vil sjøgang ikke
+bli interpolert, heller ikke ved kortvarige mangler i observasjonen.</p>
+<p>met.no rapporterer de kvalitetskontrollerte maritime data til to sentre
+(Hamburg og Bracknell) som følge av en WMO-avtale. Data sendes på et format
+IMMT-01. I dette formatet flagges data etter visse regler. Til nå har vi ikke
+fulgt dette opp i sin ytterste konsekvens, men vi bør fange dette opp i en ny
+applikasjon når KVALOBS muliggjør dette.<br>
+<br>
+</p>
+<h2><a name="5"></a>5. Forslag til forenklinger</h2>
+<p>Data fra stasjoner som met.no ikke har ansvar for, korrigeres ikke i HQC.
+Dette gjelder bl.a. METAR, utenlandske stasjoner og Vegvesenets stasjoner. Data
+kan kontrolleres og flagges hvis systemressursene tillater det, men korrigeres
+ikke. Kontrollflaggene for slike parametere kan likevel være nyttig informasjon
+for den manuelle kontrollen. Et unntak fra denne hovedregel er SHIP data som
+kommer inn fra plattformene på Norsk kontinentalsokkel. Disse målingene tas
+på stasjoner som den enkelte operatør er ansvarlig for etter OD's regelverk.
+Målingene behandles som om de kom fra met.no sine stasjoner.</p>
+<p>For øvrig foreslås forenklinger for de parametrene som er nevnt nedenfor,
+innenfor hver parametergruppe. Parameternavnene er hentet fra <a href="http://kvproject/docs/parameters.shtml"> http://kvproject/docs/parameters.shtml</a>.</p>
+<p>Lufttrykk<br>
+PH (QNH) kontrolleres, men verken korrigeres eller interpoleres - bare flagges.<br>
+PB (avlest barometertrykk) kontrolleres ikke.</p>
+<p>Temperatur<br>
+TNT (minimumstermometerets topp), TXT (maksimumstermometerets topp), TR
+(rullebane), TRM, TRN, TRX, TS (snø), TSM, TSN, TSX, TV (veibane), TVM, TVN,
+TVX kontrolleres, men verken korrigeres eller interpoleres - bare flagges.<br>
+TWM, TWN, TWX (sjøtemperaturer) og TP (barometertemperatur) kontrolleres ikke.</p>
+<p>Fuktighet<br>
+UH (avlest hygrometerverdi) kontrolleres ikke.</p>
+<p>Vind<br>
+DD_02, FF_02, FG_10 kontrolleres, men verken korrigeres eller interpoleres -
+bare flagges.</p>
+<p>Nedbør<br>
+RX, RT og SS_24 kontrolleres, men verken korrigeres eller interpoleres - bare
+flagges.<br>
+RA, RR_03, RR_06, RT_24, SS kontrolleres ikke.</p>
+<p>Stråling<br>
+QA, QB, QBM, QBN, QBX, QD, QE, QL, QLX, QO, QOX, QR kontrolleres ikke i HQC, kun
+gjennom de automatiske kontrollene.</p>
+<p>Bølger og dønning<br>
+WHMAX, WHM0, WH13, WL, WTHMAX, WTMAX, WTP, WTP2, WTS, WTZ kommer inn til met.no
+som E-data. De kontrolleres ikke i HQC, kun gjennom de automatiske kontrollene.</p>
+<p>Skyer<br>
+HH, HLN, HM kontrolleres ikke.</p>
+<p>Øvrige parametere<br>
+BI, BT, CI, DI, IIR, IIX, IS, ITR, ITZ, RS, SI, ZI, VMOR, VR, VZ, WA_01, WA_15,
+WA_60 kontrolleres ikke.<br>
+<br>
+</p>
+<h2><a name="6"></a>6. Gjenstående arbeid</h2>
+<p>HQC-rapporten avsluttes foreløpig her med en oppsummering av hva
+arbeidsgruppa mener gjenstår for at dokumentet skal oppfylle punktene i
+prosjektdirektivet. Det er fortsatt detaljer som må på plass for at
+HQC-systemet skal fungere, og det er visse temaer som bør utvikles videre for
+at systemet skal bli effektivt.</p>
+     <ol>
+      <li>Det må lages en spesifikasjon av kriteriene for feillista og en prosedyre
+for selve flaggsettingen i HQC.</li>
+      <li>QC-kontrollprosedyren må tilrettelegges slik at det er mulig med manuell
+oppstart av automatiske kontroller, både sammenhengende og enkeltvis.
+Tidspunktet for QC2-kontrollene må kunne styres manuelt.</li>
+      <li>Observasjoner som er gjort utenom godkjent observasjonstidsintervall må
+merkes slik at dette blir synlig på kart, tidsseriegrafer og i lister.
+Merkingen kan f.eks. kodes slik: 2: Mindre enn 1 time for tidlig/sent, 3: Mer
+enn 1 time for tidlig/sent. Mer eksakt informasjon om når observatøren har
+observert må være lett tilgjengelig for kontrolløren.</li>
+      <li>Oppsamling må merkes slik at dette blir synlig på kart, tidsseriegrafer og
+i lister. Merkingen kan f.eks. kodes slik: 5: Ikke fordelt, 6: Fordelt
+automatisk, 7: Fordelt manuelt (det siste er et flagg som ev. settes i
+HQC-rutinen).</li>
+      <li>Manipulering av data i HQC må kunne flagges (se pkt. 6) utover de flaggene
+som er beskrevet i dokumentet &quot;Flagging i KVALOBS&quot; (versjon 2.0).
+Flaggene kan f.eks. være slik: 0: Ikke kontrollert, 1: Kontrollert. Funnet i
+orden, 4: Observasjon utenfor obs.tid. Korrigert, 7: Oppsamling. Fordelt, 8:
+Observasjon uten flagg. Korrigert, 9: Observasjon med flagg. Korrigert
+(sistnevnte flagg fører til automatisk flaggsetting i tråd med
+flaggdokumentet. Jf. pkt. 3 og 4.</li>
+      <li>Det er foreløpig uavklart om det skal settes et eget flagg i HQC-rutinen (se
+pkt. 5), eller om manipuleringen av dataene skal registreres på annen måte
+(prosjektleder mener loggføring er tilstrekkelig). Saken kan ev. tas opp
+samtidig med definisjonen av feillista (pkt. 1).</li>
+      <li>Det må lages et system for beregning av 12-timersverdier av minimums- og
+maksimumstemperatur fra timeverdier på automatstasjonene. Tilsvarende
+tilrettelegges gress- og sjøtemperatur. Minuttverdier av nedbør akkumuleres
+til timeverdier. Timeverdier og minuttverdier akkumuleres til 12- og 24-timers
+nedbørverdier. Markas tilstand konverteres til snødekke. Sjøgangskoden
+konverteres til bølgehøyde.</li>
+      <li>Det må spesifiseres standardoppsett av datalister til bruk i kontrollen.</li>
+      <li>Det må tas høyde for å kunne overstyre flagg pga.
+korreksjoner/interpolasjoner når korrekte data kommer inn i ettertid.</li>
+      <li>Det må lages en spesifikasjon av tabelloppsettet for en
+tidsserieromkontroll (viktigst for nedbør).</li>
+      <li>For å lette det manuelle arbeidet med inkonsistens i observasjonene bør en
+automatisk korrigeringsrutine for værparametere (inkludert sikt) spesifiseres.
+Dette er primært Innholdgruppas ansvar, men har stor betydning for HQC-arbeidet
+og er derfor høyt prioritert.</li>
+      <li>Det må utvikles automatiske metoder for korrigering av systematiske feil i
+historiske data.</li>
+      <li>Ansvar og koordinering av langtidslagring av pseudodata må avklares.</li>
+      <li>Det må lages en god og lettfattelig brukerveiledning av visningsverktøy og
+kontrollrutine.</li>
+      <li>Det må tilrettelegges for bruk av eksterne støttedata.</li>
+      <li>Arbeidet med klimatologiske metoder er ikke fullført. F.eks. må det
+arbeides med å frembringe en oversikt over representative stasjoner ved
+forskjellige værtyper ved bruk av romlig kontroll- / interpolasjons-metodikk.</li>
+      <li>I følge prosjektdirektivet skal det utvikles rutiner for HQC. Dette
+arbeidet er påbegynt, men per i dag mangler bl.a. en beskrivelse av
+rutinekontrollen av parametrene nevnt nedenfor.<br>
+<br>
+      </li>
+     </ol>
+<p>Lufttrykk<br>
+AA, PO, POM, PON, POX, PP, PR</p>
+<p>Temperatur<br>
+TAN, TAX, TGN, TGX, TJ, TJM.<br>
+TD (duggpunktstemperatur), TDM, TDN, TDX kontrolleres sammen med lufttemperatur
+og relativ fuktighet.</p>
+<p>Fuktighet<br>
+UU, UUM, UUN, UUX</p>
+<p>Vind<br>
+DD, DG, DM, DX, FF, FG, FM, FX</p>
+<p>Stråling<br>
+OT, OT_24</p>
+<p>Skyer<br>
+CC, HS, NH, NN, NS, CH, CL, CM, HL</p>
+<p>Øvrige parametere<br>
+EM, V1-V12, WW, W1, W2, X1WD, X2WD, X3WD, VV<br>
+<br>
+</p>
+
+    <!--#include file="footer.shtml" -->
+
+</html>

@@ -1,0 +1,15 @@
+#ifndef __commonStationInfo_idl__
+#define __commonStationInfo_idl__
+
+module CKvalObs {
+
+  struct StationInfo{
+    long                stationId;
+    string              obstime;  //iso time string
+    long                typeId_;
+  };
+  
+  typedef sequence<StationInfo> StationInfoList;
+};
+
+#endif

@@ -1,0 +1,99 @@
+#! /bin/sh
+
+#Dette skriptet overvaker overforingen fra kvalobs
+#til klimadatabasen, kv2kl.
+#
+#Skriptet kjores av cron i angitte perioder. 
+#
+#Skriptet overvaker loggfilen $KVALOBS/var/log/kv2kl.log
+#Hvis filen ikke er oppdatert innenfor en angitt 
+#tidsperiode antas det at overføringen har stoppet og 
+#en feilmelding via e-post til angitte personer.
+
+
+KL_HOST=euros
+muser="borgem@met.no"
+
+TEMPLATE="$KVALOBS/share/kvalobs/template/kv2kl_cron.tmpl"
+FILE="$KVALOBS/var/log/kv2kl.log"
+#ERROR_TIME=7200
+ERROR_TIME=5400
+
+stat="$KVALOBS/bin/mystat.pl"
+
+function sendmail()
+{
+	$(Mail -s "kv2kl ($KL_HOST): Dataoverføringen stoppet $1." $muser < $2)
+}
+
+
+now=$(date +'%s')
+
+mtimetmp=`$stat $FILE`
+
+if [ "$?" -ne 0 ]; then
+	echo "stat error!"
+	exit 1
+fi
+
+mtime=$(echo "$mtimetmp" | cut -d, -f1)
+mtimeStamp=$(echo "$mtimetmp" | cut -d, -f2 | cut -d. -f1)
+
+hour=$(date --date="$mtimeStamp" +'%H')
+start_day=$(date --date="$mtimeStamp" +'%Y-%m-%d')
+
+start_time=""
+
+if [ "$hour" -ge "0"  -a "$hour" -lt "3" ]; then
+    start_time="$start_day 00:00:00"
+elif [ "$hour" -ge "3"  -a "$hour" -lt "6" ]; then
+    start_time="$start_day 03:00:00"
+elif [ "$hour" -ge "6"  -a "$hour" -lt "9" ]; then
+    start_time="$start_day 06:00:00"
+elif [ "$hour" -ge "9"  -a "$hour" -lt "12" ]; then
+    start_time="$start_day 09:00:00"
+elif [ "$hour" -ge "12"  -a "$hour" -lt "15" ]; then
+    start_time="$start_day 12:00:00"
+elif [ "$hour" -ge "15"  -a "$hour" -lt "18" ]; then
+    start_time="$start_day 15:00:00"
+elif [ "$hour" -ge "18"  -a "$hour" -lt "21" ]; then
+    start_time="$start_day 18:00:00"
+else
+    start_time="$start_day 21:00:00"
+fi
+
+let timediff=$now-$mtime
+
+echo "Nowstamp:   $(date  +'%Y-%m-%d %H:%M:%S')"
+echo "filestamp:  $mtimeStamp"
+echo "mtime:      $mtime"
+echo "now:        $now"
+echo "timediff:   $timediff"
+echo "hour:       $hour"
+echo "start_day:  $start_day"
+echo "start_time: $start_time"
+
+if [ "$timediff" -gt "$ERROR_TIME" ]; then
+		
+	if [ ! -f "$KVALOBS/tmp/kv2kl_mail" ]; then
+		sed -s "s/@@ERROR_TIME@@/$ERROR_TIME/" $TEMPLATE > $KVALOBS/tmp/kv2kl_mail
+		sed -s "s&@@KVALOBS@@&$KVALOBS&" $KVALOBS/tmp/kv2kl_mail > $KVALOBS/tmp/kv2kl_mail.tmp
+		mv $KVALOBS/tmp/kv2kl_mail.tmp $KVALOBS/tmp/kv2kl_mail
+		sed -s "s/@@KL_HOST@@/$KL_HOST/" $KVALOBS/tmp/kv2kl_mail > $KVALOBS/tmp/kv2kl_mail.tmp
+		mv $KVALOBS/tmp/kv2kl_mail.tmp $KVALOBS/tmp/kv2kl_mail
+		sed -s "s/@@FILESTAMP@@/$mtimeStamp/" $KVALOBS/tmp/kv2kl_mail > $KVALOBS/tmp/kv2kl_mail.tmp
+		mv $KVALOBS/tmp/kv2kl_mail.tmp $KVALOBS/tmp/kv2kl_mail
+		sed -s "s/@@FROM_TIME@@/$start_time/" $KVALOBS/tmp/kv2kl_mail > $KVALOBS/tmp/kv2kl_mail.tmp
+		mv $KVALOBS/tmp/kv2kl_mail.tmp $KVALOBS/tmp/kv2kl_mail
+		
+		sendmail $mtimeStamp $KVALOBS/tmp/kv2kl_mail
+  	fi 		
+		
+	echo "ERROR: kv2kl may have stopped!"
+	exit 0
+fi
+
+rm -f $KVALOBS/tmp/kv2kl_mail
+
+
+

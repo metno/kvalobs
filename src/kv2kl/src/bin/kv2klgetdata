@@ -1,0 +1,17 @@
+#! /bin/sh
+
+KVDIR=$KVALOBS
+
+export KVDIR 
+
+
+#KVALOBSJAR=$KVDIR/share/kvalobs/java/lib/kvalobsclt.jar
+
+#export CLASSPATH=$KVALOBSJAR:$CLASSPATH
+#echo "CLASSPATH: $CLASSPATH"
+#echo "$@"
+
+exec $KVDIR/share/kvalobs/java/bin/jaco \
+     "-DKVALOBS=$KVALOBS"  \
+     -jar $KVDIR/share/kvalobs/java/lib/kv2klgetdata.jar "$@"
+    

@@ -1,0 +1,7 @@
+#!/bin/sh
+
+DESTINATION=
+DIRECTORIES="lib/decode"
+FILES=
+
+. $KVDIR/conf/INSTALL.conf

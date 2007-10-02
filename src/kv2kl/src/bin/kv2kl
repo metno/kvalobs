@@ -1,0 +1,27 @@
+#! /bin/sh
+
+if [ -z "$KVDIR" ]; then
+	KVDIR=$KVALOBS
+fi
+
+export KVDIR 
+
+
+#KVALOBSJAR=$KVDIR/share/kvalobs/java/lib/kvalobsclt.jar
+
+#export CLASSPATH=$KVALOBSJAR:$CLASSPATH
+#echo "CLASSPATH: $CLASSPATH"
+#echo "$@"
+
+PIDFILE=kv2kl.pid
+
+if [ "$NAME" ]; then
+	PIDFILE=kv2kl-$NAME.pid
+fi
+
+echo "$$" > $KVALOBS/var/run/$PIDFILE
+
+exec $KVDIR/share/kvalobs/java/bin/jaco \
+     "-DKVALOBS=$KVALOBS"  \
+     -jar $KVDIR/share/kvalobs/java/lib/kv2kl.jar "$@"
+    

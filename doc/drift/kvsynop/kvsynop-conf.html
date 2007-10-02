@@ -1,0 +1,383 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>Konfigurasjon av SYNOP generatoren!</title>
+</head>
+<body>
+
+<div align="left">
+<h1>Konfiguarasjon av SYNOP generatoren.</h1>
+<br/>
+</div>
+<h1 id="oversikt_1">1 Oversikt</h1>
+<p>
+Dette dokumentet beskriver koding av SYNOP med data fra kvalobs og noen hjelpeprogrammer for vedlikehold av SYNOP koderen. 
+</p>
+
+<h2 id="oversikt_1_1">1.1 Synopgeneratoren, kvsynopd.
+</h2>
+<p>
+Synopgeneratoren, <em>kvsynopd</em>, ligger i katalogen <em>$KVALOBS/bin</em>. kvsynopd mottar data fra kvalobs via CORBA grensesnittet til kvalobs. For å kunne kode en SYNOP fra en automatstasjon trenger man i verste fall 24 timer med data. For å redusere belastnigen på kvalobs og for å øke gjennomstrømshastigheten gjennom kvsynopd blir data mellomlagret i en sqlite database. Denne databasen ligger  katalogen <em>$KVALOBS/var/kvsynop</em> og består av en fil, kvsynopd.sqlite. Ved oppstart leser kvsynopd konfigurasjonsfile <em>$KVALOBS/etc/kvsynopd.conf</em>. Konfigurasjonsfilen bestemmer hvilke stasjoner det skal lages SYNOP for og hvilke data som skal brukes.
+</p>
+<p>
+Til hjelp i feilsøking av kvsynopd genereres det en del logdata. Logdata ligger i katalogen <em>$KVALOBS/var/kvsynop/debug</em> det er en fil for hver synop som er laget i løpet av den siste måneden. 
+</p>
+<p>I tillegg opprettes en pidfil i katalogen <em>$KVALOBS/var/run</em> med navnet kvsynopd.pid.
+</p>
+<p>
+Oppsumering av filer og kataloger som brukes av kvsynopd. Alle katalogene er relativ til katalogen angitt med miljøvariablen <em>$KVALOBS</em>.
+
+<div style="margin-left: 30px">
+	<table border="1">
+	<thead th align="left" valign="middle">
+	<tr>
+		<th>Katalog/fil</th>
+		<th>Beskrivelse</th>
+	</tr>
+	</thead>
+	<tbody>
+	<tr>
+		<td>bin/kvsynopd</td>
+		<td>
+			Selve SYNOP generatoren.
+		</td>
+	</tr>
+	<tr>
+		<td>etc/kvsynopd.conf</td>
+		<td>
+			Konfigurasjonsfilen til kvsynopd.
+		</td>
+	</tr>
+	<tr>
+		<td>var/run/kvsynopd.pid</td>
+		<td>
+			Pidfilen til kvsynopd.
+		</td>
+	</tr>
+	<tr>
+		<td>var/kvsynop/kvsynopd.sqlite</td>
+		<td>
+			Mellomlager for data til bruk i SYNOP produksjonen.	
+		</td>
+	</tr>
+	<tr>
+		<td>var/kvsynop/debug</td>
+		<td>
+			Katalog hvor logdata til bruk i feilsøking lagres.	
+		</td>
+	</tr>
+
+	</tbody>
+	</table>
+</div>
+</p>
+
+<h1 id="conf">2 Konfigurasjonsfilen</h1>
+<p>
+Konfigurasjonsfilen kan logisk deles opp i to hovedseksjoner. Den første seksjonen spesifiserer:
+
+<ul>
+	<li>Hvor logfilene skal være.</li>
+	<li>Loglevel.</li>
+	<li>Databasen som brukes til mellomlagring av data.
+	</li>
+	<li>Hvilke kvalobsserver vi skal motta data fra.
+	</li>
+	<li>Hvilke CORBA nameserver som skal brukes for å finne kvalobsserveren.</li>
+</ul>
+</p>
+<p>
+Den andre seksjonen spesifiserer hvilke stasjoner vi skal lage SYNOP for og hvilke data vi skal bruke for hver stasjon.
+</p>
+<p>
+<div align="center" id="eks_1">
+<table border="1" cellpadding="2" cellspacing="2">
+<caption align="bottom" align="left"><b><i>Eksempel 1:</i></b>
+Eksempel på en konfigurasjonsfil. Alt etter # tegnet er kommentarer. 	 
+</caption>
+  <tbody>
+    <tr>
+      <td>
+<pre>
+#Globalseksjon start
+
+logdir="/home/borge/projects/kvalobs/runtime/var/log"
+debugdir="/home/borge/projects/kvalobs/runtime/var/kvsynop/debug"
+
+#loglevel and tracelevel: FATAL, ERROR, WARN, INFO, DEBUG, DEBUG1-6
+#defult loglevel=INFO og tracelevel=DEBUG
+loglevel=INFO
+tracelevel=DEBUG
+
+#Globalseksjon slutt
+
+#Databaseseksjon for mellomlageret
+database{ 
+   driver="/home/borge/projects/kvalobs/runtime/lib/db/sqlitedriver.so"
+   dbconnect="/home/borge/projects/kvalobs/runtime/var/kvsynop/kvsynopd.sqlite"
+}
+
+#Seksjon for hvilke kvalobsserver vi skal bruke og
+#CORBA navnetjeneren vi skal bruke for å finne den.
+corba{
+   #CORBA nameserver to be used.
+   nameserver="corbans.oslo.dnmi.no"
+
+   #Which kvalobs servers shall we receive observations from.
+   path=("kvalobs")
+}
+
+#Her starter oppsettet for hvilke stasjoner vi skal
+#lage SYNOP for og hvilke data som skal brukes.
+
+wmo_default{
+  #default values
+  copyto="/metno/kvalobs/var/kvsynop/synop2norcom"
+  copy="true"
+  owner="AUTG"
+  #owner="KVAL"
+  list="99"
+}
+
+wmo_01001{
+    #Janmayen
+    stationid=99950
+    typepriority=("*3", 6)
+    delay=("SS:00")
+    owner="ENJA"
+    precipitation=("RRRtr")
+}
+wmo_01492{
+    #blindern
+    stationid=18700
+    typepriority=("*3",6)
+    delay=("SS:15")
+    owner="HYBR"
+    precipitation=("RRRtr")
+}
+
+wmo_01494{
+    #rygge
+    stationid=(17150)
+    typepriority=("*311", 308)
+    delay=("SS:02")
+    list="99"
+    owner="AUTG"
+    precipitation=("RRRtr")
+    copy="true"
+}
+</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</p>
+
+<h2 id="conf_1">Seksjon 1</h2>
+Seksjon 1 er delt opp i tre under seksjoner. Den første underseksjonen er alt før <em>database{</em> i 
+<a href="#eks_1"><b>eksempel 1</b></a> og kalles den globale seksjonen. Seksjonen som begynner med <em>database{</em> og slutter med <em>}</em> er database seksjonen for mellomlageret. Og til slutt har vi seksjonen som setter opp hvilke kvalobsserver vi skal motta data fra og CORBA navnetjeneren vi må slå opp i for å finne den. Seksjonen begynner med <em>corba {</em> og slutter med <em>}</em>. 
+
+<h2 id="stasjon_conf">Konfigurasjon av stasjoner</h2>
+Her defineres alle stasjonene det skal genereres SYNOP for. Seksjonen er delt i to en defaultseksjon og oppsettet for alle enkelt stasjonene det skal lages SYNOP for.
+ 
+<h3 id="wmo_dafault">Default verdier for stasjons seksjonen</h3>
+I default seksjonen kan vi sette verdier for enkelt parametere som er felles for mange stasjoner. Hvis en obligatorisk parameter i stasjonsseksjon ikke har angitt verdi hentes verdien fra defaultseksjonen. Defaultseksjonen har navnet <em>wmo_dafult</em>.
+
+<h3 id="stasjons_element">Stasjonsoppsett</h3>
+<p>
+Alle stasjonene det skal lages en SYNOP for må ha en stasjonsseksjon. Stasjonseksjonene har navnet <em>wmo_WMO-nummer</em>, hvor <em>WMO-nummer</em> er WMO nummeret til stasjonen med 5 siffer.
+</p>
+
+<p>Det er en fordel og holde stasjonene sortert på WMO-nummeret.</p>
+
+<p>
+	Elementene i stasjonsseksjonen er <em>stationid</em>, <em>typepriority</em>,
+	<em>delay</em>, <em>list</em>, <em>owner</em>, <em>precipitation</em>, <em	>copy</em> og <em>copyto</em>.
+</p>
+
+<p>
+<div style="margin-left: 15pt">	
+<dl>
+<dt><b>stationid</b></dt>
+	<dd>
+	<div>
+		<p>Stationid er nasjonaliden til stasjonen det skal lages synop for.
+		</p>
+	</div> 
+	</dd>
+	<dt><b>typepriority</b></dt>
+	<dd>
+	<div>
+		<p>
+		Dette er en liste over kvalobs typeid vi skal hente data for. Denne listen har flere formål. Den angir hvilke typeid som skal brukes, hvilke typeid vi må ha data fra for å kunne lage en SYNOP, og i hvilken rekkefølge vi bruker dataene i. Feks hvis det er nedbør i dataene for to typeid bruker vi nedbøren fra den som er definert først. Hvis vi må ha data fra en, eller flere typeid for å kunne lage en SYNOP angir vi dette med en * foran typeideen.
+		</p>
+		<p>
+			Eks <br/>
+			typepriority=("*330", 308), <br/><br/>
+			
+			Her angir vi at vi skal lage en synop med data fra typeid 330 og 308, og at typeid 330 må være med. Legg merke til fnuttene rundt *330. 
+		</p>
+	</div>
+	</dd>
+	<dt><b>delay</b></dt>
+	<dd>
+	<div>
+		<p>
+			<em>delay</em> angir at vi skal holde igjen produksjonen av SYNOP i et vist antall minutter hvis ikke data fra alle typeid i <em>typepriority</em> listen er mottat. Hvis tidsforsinkelsen utløper og vi fremdeles ikke har data for alle typeidene, men vi har data for alle typeid med * foran så lages SYNOP'en uansett. 
+		</p>
+		<p>
+		Eks <br/>
+		delay=("SS:15"), <br/><br/>
+		
+		Her angir vi at vi skal vente til 15 minutter over et SYNOP tidspunkt på at data fra alle typeid skal komme. SS angir at vi skal kun vente ved SYNOP tidspunkt, dvs 0, 3, 6, 9, 12, 15, 18, 21.	
+		</p>
+		<p>
+			Hvis vi ønsker å vente ved hver time angir vi det som delay=("HH:15"). Denne formen trenger vi normalt ikke.
+		</p>
+		<p>
+			Hvis vi ekplisitt ønsker å forhindre at en SYNOP blir sendt ut for gitte 
+			terminer kan man gjøre det ved å sette et - (bindestrek) foran.			 
+		</p>
+		<p>
+		Eks <br/>
+		delay=("-SS") <br/><br/>
+		
+		Her angir vi at det ikke skal sendes ut SYNOP for synopterminenen, dvs 0, 3, 6, etc. 
+		<br/><br/>
+		delay=("-12") <br/><br/>
+		
+		Her angir vi at vi ikke ønsker å sende ut SYNOP for 12 terminen.
+		</p>
+	</div>
+	</dd>
+	<dt><b>precipitation</b></dt>
+	<dd>
+	<div>
+		<p>
+			Denne parameteren må være med hvis nedbør skal med i SYNOP'en. Vi må angi hvilke nedbørparameter vi skal bruke. De mest brukte er "RRRtr", "RA" og "RR_24".
+		</p>
+		<p> 
+		<table border="1"  style="margin-left: 40pt" cellspacing="2">
+		<tbody style="text-align: right">
+		<tr>
+			<th>typeid</th>
+			<th>RRRtr</th>
+			<th>RA</th>
+			<th>RR_24</th>
+		</tr>
+		<tr>
+		   <td >3</td>
+			<td style="text-align: center">x</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+		   <td>6</td>
+			<td>&nbsp;</td>
+			<td style="text-align: center">x</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+		   <td>302</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td style="text-align: center">x</td>
+		</tr>
+		<tr>
+		   <td>306</td>
+			<td style="text-align: center">x</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+		   <td>308</td>
+			<td style="text-align: center">x</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+		   <td>330</td>
+			<td>&nbsp;</td>
+			<td style="text-align: center">x</td>
+			<td>&nbsp;</td>
+		</tr>
+		</tbody>
+		</table>
+		<br/>
+		</p>
+		<p>
+		Meldingstypene 310 og 311 har ikke nedbør.
+	   </p>
+	</div>
+	</dd>
+	<dt><b>copy</b></dt>
+	<dd>
+	<div>
+	<p>
+	<em>copy</em> angir om SYNOP'en skal kopieres til NORCOM. Denne parameteren angis sjeldent for enkelt stasjoner, default verdien i <em>wmo_default</em> brukes.
+	</p>
+	</div>
+	</dd>
+	<dt><b>owner</b></dt>
+	<dd>
+	<div>
+	<p>
+	<em>owner</em> angir verdien for <em>CCCC</em> feltet i SYNOP'en. Må være 4 tegn.
+	</p>
+	</div>
+	</dd>
+	<dt><b>list</b></dt>
+	<dd>
+	<div>
+	<p>
+	<em>list</em> angir verdien for <em>ii</em> felet i SYNOP'en. Må være 2 tegn. 
+	</p>
+	</div>
+	</dd>
+	</div>
+	</dd>
+</dl>
+</div>
+</p>
+
+<h3>Legg inn ny stajon</h3>
+<p>
+Log inn på maskinen <em>kvalobs</em> som bruker <em>kvalobs</em> med følgende komando:<br/><br/>
+&nbsp;&nbsp;&nbsp;<em>ssh kvalobs@kvalobs</em>.<br/> Alle komandoer i det følgende må utføres fra denne bruker kontoen.
+</p>
+<p>
+La oss som et eksempel anta vi skal legge inn en ny stasjone med WMO nummer 01499 og stationid 99999. SYNOP skal settes sammen med data fra SMS meldingskode 30 og 8. Stasjonen har "manuell" nedbør. Nedbøren kommer inn i SMS meldingskode 8.
+</p>
+<p>
+For å finne ut hvilke kvalobs-typeid som skal brukes for SMS meldingskodene legger vi til 300 til SMS-meldingskodene. Vi får altså inn data fra kvalobs med typeid 330 og 308. Og nedbøren er fra 308, dvs <em>precipitation</em> RRRtr. SMS meldinger med typeid 308 kommer inn kun ved SYNOP tidspunkt. Og for å lage en SYNOP bør vi ha data 308 og vi må ha data fra 330. Vi kan legge til følgende seksjon i <em>$KVALOBS/etc/kvsynopd.conf</em>.  
+</p>
+<pre>
+	wmo_01499{
+		stationid=99999
+		typepriority=("*330", 308)
+		precipitation=("RRRtr")
+		delay=("SS:15")
+		list="99"
+		owner="HYBR"
+	}
+</pre>
+<p>
+Det er satt opp at man skal vente til minst 15 minutter over et SYNOP tidspunkt for at observatør meldingen 308 skal komme inn. Kommer 308 meldingen inn tidligere kan SYNOP'en bli laget tidligere.
+</p>
+<p><em>list</em> og <em>owner</em> er satt til "99" og "HYBR". Verdiene for disse parameterene får man fra NORCOM administrator. Fortrinnsvis Pål Sannes, John Syer eller Sverre Skjåk.
+</p>
+<p>
+Etter at man har satt inn eller endret en stasjon bør man sjekke at konfiguarasjonsfilen ikke har feil. Dette gjør man med kommandoen: <br/><br/>
+&nbsp;&nbsp;&nbsp; <em>kvsynopdparse</em> <br/><br/> <em>kvsynopdparse</em> leser filen <em>$KVALOBS/etc/kvsynopd.conf</em>. 
+</p>
+<p>
+Når konfigurasjonsfilen er sjekket og uten feil må man få synopgeneratoren til å laste stasjonsseksjonene i konfigurasjonsfilen på nytt. Dette gjøres med kommandoen: <br/><br/> &nbsp;&nbsp;&nbsp;<em>kvsynopclt &nbsp;&nbsp;--reload</em>
+</p>
+<p>
+<em>kvsynopclt --reload</em> vil skrive ut hva som er endret.
+</p>
+
+</body>
+</html>

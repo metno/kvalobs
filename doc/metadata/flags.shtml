@@ -1,0 +1,2032 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<!--#include file="../header.shtml" -->
+  <title>Kvalobs-flagg</title>
+  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=utf-8">
+  <meta name="GENERATOR" content="OpenOffice.org 2.0  (Linux)">
+  <meta name="AUTHOR" content="Lars Andresen">
+  <meta name="CREATED" content="20070523;10550000">
+  <meta name="CHANGEDBY" content="Lars Andresen">
+  <meta name="CHANGED" content="20070523;14320000">
+  <style>
+	<!--
+		@page { size: 8.5in 11in; margin: 0.79in }
+		P { margin-bottom: 0.08in }
+	-->�</style>
+</head>
+<body>
+<table>
+  <tbody>
+    <tr width="95%">
+      <td width="100">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+      <td width="1100">
+      <h1>Flagg i KVALOBS (versjon 8.7.1)</h1>
+      <h2>Bakgrunn</h2>
+      <p>Meteorologisk institutts system for kvalitetssikring av
+observasjoner (KVALOBS) omfatter et sett av kvalitetskontroller der
+alle
+dataene blir statusmerket. I den automatiske kontrollen er det modulen
+QABase som håndterer kontrollene. Selve kontrollene kjøres
+som utskiftbare skript. Hver enkelt kontroll av observasjonene blir
+markeret i skriptene med kontrollflagg. Modulen QABase sammenfatter
+deretter kontrollresultatene til et sett av bruksflagg. De automatiske
+kontrollene i KVALOBS
+skal hovedsakelig detektere mulige feil. De påfølgende
+manuelle kontrollene er avgrenset til verifisering og
+overprøving av forhold som er automatisk detektert. Resultatet
+blir markert i et eget kontrollflagg for manuell kontroll i
+HQC-applikasjonen. Flaggene blir overført sammen med dataene til
+permanent lagring i
+klimadatabasen og senere bruk.</p>
+      <p>I KVALOBS-databasen blir hver observasjon lagret som poster i
+en
+egen tabell (/<i>data</i>/). Strukturen til denne er vist i tabellen
+nedenfor.</p>
+      <center>
+      <table border="1" cellpadding="5" width="559">
+        <tbody>
+          <tr>
+            <th width="81">Felt</th>
+            <th width="75">Datatype</th>
+            <th width="403">Kommentar</th>
+          </tr>
+          <tr>
+            <td width="81"><i>original</i></td>
+            <td width="75"> float</td>
+            <td width="403">Original verdi</td>
+          </tr>
+          <tr>
+            <td width="81"><i>corrected</i></td>
+            <td width="75">float</td>
+            <td width="403">Korrigert verdi (d.s.s. original verdi hvis
+ingen
+korreksjon)</td>
+          </tr>
+          <tr>
+            <td width="81"><i>stationid</i></td>
+            <td width="75">int</td>
+            <td width="403">stasjonsnummer, egen tabell</td>
+          </tr>
+          <tr>
+            <td width="81"><i>obstime</i></td>
+            <td width="75">time</td>
+            <td width="403">observasjonstermin</td>
+          </tr>
+          <tr>
+            <td width="81"><i>tbtime</i></td>
+            <td width="75">time</td>
+            <td width="403">tiden for når datasettet ble lagt inn
+i Kvalobs</td>
+          </tr>
+          <tr>
+            <td width="81"><i>typeid</i></td>
+            <td width="75">int</td>
+            <td width="403">meldingsformatnummer, egen tabell (SYNOP,
+METAR,
+o.a.)</td>
+          </tr>
+          <tr>
+            <td width="81"><i>controlinfo</i></td>
+            <td width="75">char (16)</td>
+            <td width="403">De seksten kontrollflaggene. <a
+ href="#controlinfo">Detaljert forklaring nedenfor</a></td>
+          </tr>
+          <tr>
+            <td width="81"><i>level</i></td>
+            <td width="75">int</td>
+            <td width="403">måling av samme parameter i ulike
+høyder. Verdien 0 angir standardhøyde</td>
+          </tr>
+          <tr>
+            <td width="81"><i>paramid</i></td>
+            <td width="75">int</td>
+            <td width="403">parameternummer, egen tabell</td>
+          </tr>
+          <tr>
+            <td width="81"><i>sensor</i></td>
+            <td width="75">char (1)</td>
+            <td width="403">eventuelle parallellmålinger.
+Defaultverdi er 0</td>
+          </tr>
+          <tr>
+            <td width="81"><i>useinfo</i></td>
+            <td width="75">char (16)</td>
+            <td width="403">De seksten bruksflaggene. <a
+ href="#useinfo">Detaljert forklaring nedenfor</a></td>
+          </tr>
+          <tr>
+            <td width="81"><i>cfailed</i></td>
+            <td width="75">string</td>
+            <td width="403">koder for test som har gitt utslag</td>
+          </tr>
+        </tbody>
+      </table>
+      </center>
+      <p>&nbsp;</p>
+      <a name="controlinfo"> </a>
+      <h2><a name="controlinfo">Kontrollinformasjon (controlinfo)</a></h2>
+      <p><a name="controlinfo">Kontrollinformasjonen i feltet <i>'controlinfo'</i>
+består av
+en serie på totalt 16 kontrollflagg. Kontrollflaggene markerer
+hvilken status hver av KVALOBS-kontrollene har gitt observasjonen. </a></p>
+      <p><a name="controlinfo">Flaggene er tilordnet den enkelte
+observasjonen/parameterverdien.
+Parameter, sted og tidspunkt er entydig gitt ved andre felter enn
+kontrollflaggene.</a></p>
+      <h3><a name="controlinfo">Kontrollflaggene:</a></h3>
+      <center>
+      <table border="1" cellpadding="5" width="672">
+        <tbody>
+          <tr>
+            <th align="center" width="121">Flagg</th>
+            <th align="center" width="101">Kodesystem</th>
+            <th align="center" width="300">Beskrivelse</th>
+            <th align="center" width="150">Blir satt av</th>
+          </tr>
+          <tr>
+            <td width="121">controlinfo(0)</td>
+            <td align="center" width="101"><strike>fqclevel</strike></td>
+            <td width="300"><strike>Kontrollnivå</strike></td>
+            <td width="150"><strike>QABase</strike></td>
+          </tr>
+          <tr>
+            <td width="121"><a href="#fr">controlinfo(1)</a></td>
+            <td align="center" width="101">fr</td>
+            <td width="300">Grenseverdikontroll</td>
+            <td width="150">QC1-1-sjekker</td>
+          </tr>
+          <tr>
+            <td width="121"><a href="#fcc">controlinfo(2)</a></td>
+            <td align="center" width="101">fcc</td>
+            <td width="300">Formell konsistenskontroll</td>
+            <td width="150">QC1-2-sjekker</td>
+          </tr>
+          <tr>
+            <td width="121"><a href="#fs">controlinfo(3)</a></td>
+            <td align="center" width="101">fs</td>
+            <td width="300">Sprangkontroll</td>
+            <td width="150">QC1-3-sjekker<br>
+QC2d-1-sjekker</td>
+          </tr>
+          <tr>
+            <td width="121"><a href="#fnum">controlinfo(4)</a></td>
+            <td align="center" width="101">fnum</td>
+            <td width="300">Prognostisk romkontroll</td>
+            <td width="150">QC1-4-sjekker</td>
+          </tr>
+          <tr>
+            <td width="121"><a href="#fpos">controlinfo(5)</a></td>
+            <td align="center" width="101">fpos</td>
+            <td width="300">Meldingskontroll</td>
+            <td width="150">QC1-5-sjekker</td>
+          </tr>
+          <tr>
+            <td width="121"><a href="#fmis">controlinfo(6)</a></td>
+            <td align="center" width="101">fmis</td>
+            <td width="300">Manglende observasjon</td>
+            <td width="150">Dekoder<br>
+Alle sjekker<br>
+HQC-applikasjonen</td>
+          </tr>
+          <tr>
+            <td width="121"><a href="#ftime">controlinfo(7)</a></td>
+            <td align="center" width="101">ftime</td>
+            <td width="300">Tidsserietilpasning</td>
+            <td width="150">QC2d-2-sjekker</td>
+          </tr>
+          <tr>
+            <td width="121"><a href="#fw">controlinfo(8)</a></td>
+            <td align="center" width="101">fw</td>
+            <td width="300">Væranalyse</td>
+            <td width="150">QC2d-3-sjekker</td>
+          </tr>
+          <tr>
+            <td width="121"><a href="#fstat">controlinfo(9)</a></td>
+            <td align="center" width="101">fstat</td>
+            <td width="300">Statistikkontroll</td>
+            <td width="150">QC2d-4-sjekker</td>
+          </tr>
+          <tr>
+            <td width="121"><a href="#fcp">controlinfo(10)</a></td>
+            <td align="center" width="101">fcp</td>
+            <td width="300">Klimatologisk konsistenskontroll</td>
+            <td width="150">QC1-6-sjekker</td>
+          </tr>
+          <tr>
+            <td width="121"><a href="#fclim">controlinfo(11)</a></td>
+            <td align="center" width="101">fclim</td>
+            <td width="300">Klimatologikontroll</td>
+            <td width="150">QC2m-1-sjekker</td>
+          </tr>
+          <tr>
+            <td width="121"><a href="#fd">controlinfo(12)</a></td>
+            <td align="center" width="101">fd</td>
+            <td width="300">Fordeling av samleverdier</td>
+            <td width="150">QC1-7-sjekker<br>
+QC2m-2-sjekker<br>
+HQC-applikasjonen<br>
+            </td>
+          </tr>
+          <tr>
+            <td width="121"><a href="#fpre">controlinfo(13)</a></td>
+            <td align="center" width="101">fpre</td>
+            <td width="300">Forhåndskvalifisering</td>
+            <td width="150">QC1-0-sjekker</td>
+          </tr>
+          <tr>
+            <td width="121"><a href="#fcombi">controlinfo(14)</a></td>
+            <td align="center" width="101">fcombi</td>
+            <td width="300">Kombinert vurdering</td>
+            <td width="150">QC1-9-sjekker</td>
+          </tr>
+          <tr>
+            <td width="121"><a href="#fhqc">controlinfo(15)</a></td>
+            <td align="center" width="101">fhqc</td>
+            <td width="300">Manuell kvalitetskontroll</td>
+            <td width="150">HQC-applikasjonen</td>
+          </tr>
+        </tbody>
+      </table>
+      </center>
+      <p><a name="controlinfo">Det er definert fem operasjonelle
+kontrollnivåer i KVALOBS.
+Disse er i sekvensiell rekkefølge:</a></p>
+      <ul>
+        <a name="controlinfo"> <li>QC0 - kontroll på stasjonen; </li>
+        <li>QC1 - automatisk sanntidskontroll etter mottak; </li>
+        <li>QC2d - automatisk ettertidskontroll innenfor ett
+døgn
+etter mottak; </li>
+        <li>QC2m - automatisk ettertidskontroll av en måneds
+observasjoner samlet; </li>
+        <li>HQC - manuell ettertidskontroll. </li>
+        </a>
+      </ul>
+      <p><a name="controlinfo">Det blir ikke overført
+kontrollflagg fra stasjonenes
+QC0-kontroller til sentrale datalagre. </a></p>
+      <h2><a name="controlinfo">Kontrollnivåflagg (qclevel)</a></h2>
+      <p><a name="controlinfo"> controlinfo(0), fqclevel
+--------------&gt; Tatt ut. Tilsvarende informasjon er i useinfo(0) </a></p>
+      <p><a name="controlinfo">Resultatet av kontrollene sammenfattes i
+kontrollflagg. Det er
+definert tretten kontrolltyper. Syv av kontrolltypene blir
+gjennomført under QC1, fire under QC2d og to under QC2m.
+Sprangkontrollen under QC1 og dipkontrollen under QC2d er dekket av
+samme flaggkodesystem. To av kontrolltypene blir påbegynt under
+QC2m. Alle kontrollene kan sjekkes og eventuelt overprøves i
+HQC.
+De automatiske rettelsene skal kunne overprøves i HQC. </a></p>
+      <h3><a name="controlinfo">Kontrolltypene:</a></h3>
+      <table>
+        <tbody>
+          <tr>
+            <td>QC1-0</td>
+            <td>Forhåndsvurdert håndtering</td>
+          </tr>
+          <tr>
+            <td>QC1-1</td>
+            <td>Grenseverdikontroll</td>
+          </tr>
+          <tr>
+            <td>QC1-2</td>
+            <td>Formell konsistenskontroll</td>
+          </tr>
+          <tr>
+            <td>QC1-3</td>
+            <td>Sprangkontroll</td>
+          </tr>
+          <tr>
+            <td>QC1-4</td>
+            <td>Prognostisk romkontroll</td>
+          </tr>
+          <tr>
+            <td>QC1-5</td>
+            <td>Meldingskontroll</td>
+          </tr>
+          <tr>
+            <td>QC1-6</td>
+            <td>Klimatologisk konsistenskontroll</td>
+          </tr>
+          <tr>
+            <td>QC1-7</td>
+            <td>Påvisning av oppsamlet verdi</td>
+          </tr>
+          <tr>
+            <td>QC1-9</td>
+            <td>Vurdering basert på en kombinasjon av
+QC1-kontrollene</td>
+          </tr>
+          <tr>
+            <td>QC2d-1</td>
+            <td>Dipkontroll</td>
+          </tr>
+          <tr>
+            <td>QC2d-2</td>
+            <td>Tidsserietilpasning</td>
+          </tr>
+          <tr>
+            <td>QC2d-3</td>
+            <td>Væranalyse</td>
+          </tr>
+          <tr>
+            <td>QC2d-4</td>
+            <td>Statistikkontroll</td>
+          </tr>
+          <tr>
+            <td>QC2m-1</td>
+            <td>Klimatologikontroll</td>
+          </tr>
+          <tr>
+            <td>QC2m-2</td>
+            <td>Fordeling av samleverdi</td>
+          </tr>
+        </tbody>
+      </table>
+      <a name="controlinfo"><br>
+      </a>
+      <h2><a name="controlinfo">Kontrollflaggene</a></h2>
+      <p> <a name="controlinfo">Når en kontroll er gjennomført
+blir det avledet et
+kontrollflagg som inngår i kontrollinformasjonen <i>controlinfo</i>.
+Hvert kontrollflagg blir satt av en gitt kontrolltype. Nedenfor er
+kontrolltypen angitt til venstre for til tilhørende
+flaggverdien. Flaggingen som innebærer korreksjon av verdi i
+feltet /<i>corrected</i>/ i tabellen /<i>data</i>/ er <b>uthevet</b>. </a></p>
+      <a name="fr"> </a>
+      <h3><a name="fr">Grenseverdikontroll (range)</a></h3>
+      <p><a name="fr"> controlinfo(1), fr </a>
+      <table width="562">
+        <tbody>
+          <tr>
+            <td width="80"><br>
+            </td>
+            <td width="56">fr=0</td>
+            <td width="406"> Ikke kontrollert</td>
+          </tr>
+          <tr>
+            <td width="80">QC1-1</td>
+            <td width="56">fr=1</td>
+            <td width="406"> Kontrollert. Funnet i orden</td>
+          </tr>
+          <tr>
+            <td width="80">QC1-1</td>
+            <td width="56">fr=2</td>
+            <td width="406"> Kontrollert. Observert verdi større
+enn
+høy testverdi</td>
+          </tr>
+          <tr>
+            <td width="80">QC1-1</td>
+            <td width="56">fr=3</td>
+            <td width="406"> Kontrollert. Observert verdi mindre enn
+lav
+testverdi</td>
+          </tr>
+          <tr>
+            <td width="80">QC1-1</td>
+            <td width="56">fr=4</td>
+            <td width="406"> Kontrollert. Observert verdi større
+enn
+høyeste testverdi</td>
+          </tr>
+          <tr>
+            <td width="80">QC1-1</td>
+            <td width="56">fr=5</td>
+            <td width="406"> Kontrollert. Observert verdi mindre enn
+minste
+testverdi</td>
+          </tr>
+          <tr>
+            <td width="80">QC1-1</td>
+            <td width="56"><b>fr=6</b></td>
+            <td width="406"><b> Forkastet. Observert verdi utenfor
+fysikalske grenser.</b></td>
+          </tr>
+        </tbody>
+      </table>
+      <a name="fr"><br>
+      </a></p>
+      <a name="fcc"> </a>
+      <h3><a name="fcc">Formell konsistenskontroll (consistency certain)</a></h3>
+      <p><a name="fcc"> controlinfo(2), fcc </a>
+      <table width="641">
+        <tbody>
+          <tr>
+            <td width="80"><br>
+            </td>
+            <td width="60">fcc=0</td>
+            <td width="501">Ikke kontrollert. </td>
+          </tr>
+          <tr>
+            <td width="80">QC1-2</td>
+            <td width="60">fcc=1</td>
+            <td width="501">Kontrollert. Funnet i orden. </td>
+          </tr>
+          <tr>
+            <td width="80">QC1-2</td>
+            <td width="60">fcc=2</td>
+            <td width="501">Kontrollert. Formell inkonsistens, men
+neppe feil
+i aktuell parameter. </td>
+          </tr>
+          <tr>
+            <td width="80">QC1-2</td>
+            <td width="60">fcc=3</td>
+            <td width="501">Kontrollert. Formell inkonsistens ved
+observasjonsterminen, men ikke mulig
+å avgjøre i hvilken parameter. </td>
+          </tr>
+          <tr>
+            <td width="80">QC1-2</td>
+            <td width="60">fcc=4</td>
+            <td width="501">Kontrollert. Formell inkonsistens i forhold
+til tidligere/senere observasjonstermin, men ikke mulig å
+avgjøre i hvilken parameter. </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top;">&nbsp;</td>
+            <td style="vertical-align: top;">fcc=5</td>
+            <td style="vertical-align: top;">&lt; reservert &gt;</td>
+          </tr>
+          <tr>
+            <td width="80">QC1-2</td>
+            <td width="60">fcc=6</td>
+            <td width="501">Kontrollert. Formell inkonsistens ved
+observasjonsterminen, antagelig feil
+i aktuell parameter. </td>
+          </tr>
+          <tr>
+            <td width="80">QC1-2</td>
+            <td width="60">fcc=7</td>
+            <td width="501">Kontrollert. Formell inkonsistens i forhold
+til tidligere/senere observasjonstermin, antagelig feil i aktuell
+parameter. </td>
+          </tr>
+          <tr>
+            <td width="80">QC1-2</td>
+            <td width="60">fcc=8</td>
+            <td width="501">Kontrollert. Formell inkonsistens ved
+observasjonsterminen. En av parametrene mangler.</td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top;"><br>
+            </td>
+            <td style="vertical-align: top;">fcc=9<br>
+            </td>
+            <td style="vertical-align: top;">&lt; reservert &gt;<br>
+            </td>
+          </tr>
+          <tr>
+            <td width="80">QC1-2</td>
+            <td width="60"><b>fcc=A</b></td>
+            <td width="501"><b>Kontrollert. Formell inkonsistens ved
+observasjonsterminen. Korrigert
+automatisk.</b> </td>
+          </tr>
+          <tr>
+            <td width="80">QC1-2</td>
+            <td width="60"><b>fcc=B</b></td>
+            <td width="501"><b>Kontrollert. Formell inkonsistens i
+forhold til tidligere/senere observasjonstermin. Korrigert automatisk.</b>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top;"><br>
+            </td>
+            <td style="vertical-align: top;">fcc=C<br>
+            </td>
+            <td style="vertical-align: top;">&lt; reservert &gt;<br>
+            </td>
+          </tr>
+          <tr>
+            <td width="80">QC1-2</td>
+            <td width="60"><b>fcc=D</b></td>
+            <td width="501"><b>Forkastet. Formell inkonsistens.</b> </td>
+          </tr>
+        </tbody>
+      </table>
+      <a name="fcc"><br>
+      </a></p>
+      <a name="fcp"> </a>
+      <h3><a name="fcp">Klimatologisk konsistenskontroll (consistency
+probable)</a></h3>
+      <p><a name="fcp"> controlinfo(10), fcp </a>
+      <table width="641">
+        <tbody>
+          <tr>
+            <td width="80"><br>
+            </td>
+            <td width="60">fcp=0</td>
+            <td width="501">Ikke kontrollert </td>
+          </tr>
+          <tr>
+            <td width="80">QC1-6</td>
+            <td width="60">fcp=1</td>
+            <td width="501">Kontrollert. Funnet i orden </td>
+          </tr>
+          <tr>
+            <td width="80">QC1-6</td>
+            <td width="60">fcp=2</td>
+            <td width="501">Kontrollert. Klimatologisk tvilsom, men
+neppe
+feil i aktuell parameter </td>
+          </tr>
+          <tr>
+            <td width="80">QC1-6</td>
+            <td width="60">fcp=3</td>
+            <td width="501">Kontrollert. Klimatologisk tvilsom ved
+observasjonsterminen, men ikke
+mulig å avgjøre i hvilken parameter<br>
+            </td>
+          </tr>
+          <tr>
+            <td width="80">QC1-6</td>
+            <td width="60">fcp=4</td>
+            <td width="501">Kontrollert. Klimatologisk tvilsom i
+forhold til tidligere/senere observasjonstermin, men ikke
+mulig å avgjøre i hvilken parameter<br>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top;"><br>
+            </td>
+            <td style="vertical-align: top;">fcp=5<br>
+            </td>
+            <td style="vertical-align: top;">&lt; reservert &gt;<br>
+            </td>
+          </tr>
+          <tr>
+            <td width="80">QC1-6</td>
+            <td width="60">fcp=6</td>
+            <td width="501">Kontrollert. Klimatologisk tvilsom ved
+observasjonsterminen, antagelig
+feil i aktuell parameter<br>
+            </td>
+          </tr>
+          <tr>
+            <td width="80">QC1-6</td>
+            <td width="60">fcp=7</td>
+            <td width="501">Kontrollert. Klimatologisk tvilsom i
+forhold til tidligere/senere observasjonstermin, antagelig
+feil i aktuell parameter<br>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top;"><br>
+            </td>
+            <td style="vertical-align: top;">fcp=8-9<br>
+            </td>
+            <td style="vertical-align: top;">&lt; reservert &gt;<br>
+            </td>
+          </tr>
+          <tr>
+            <td width="80">QC1-6</td>
+            <td width="60"><b>fcp=A</b></td>
+            <td width="501"><b>Kontrollert. Klimatologisk inkonsistens
+ved observasjonsterminen.
+Korrigert automatisk.</b> </td>
+          </tr>
+          <tr>
+            <td width="80">QC1-6</td>
+            <td width="60"><b>fcp=B</b></td>
+            <td width="501"><b>Kontrollert. Klimatologisk inkonsistens
+i forhold til tidligere/senere observasjonstermin.
+Korrigert automatisk.</b> </td>
+          </tr>
+        </tbody>
+      </table>
+      <a name="fcp"><br>
+      </a></p>
+      <a name="fs"> </a>
+      <h3><a name="fs">Sprangkontroll (step/dip/freeze/drift)</a></h3>
+      <p><a name="fs"> controlinfo(3), fs </a>
+      <table width="570">
+        <tbody>
+          <tr>
+            <td width="76"><br>
+            </td>
+            <td width="85">fs=0</td>
+            <td width="389">Ikke kontrollert </td>
+          </tr>
+          <tr>
+            <td width="76">QC1-3</td>
+            <td width="85">fs=1</td>
+            <td width="389">Kontrollert funnet i orden </td>
+          </tr>
+          <tr>
+            <td width="76">QC1-3</td>
+            <td width="85">fs=2</td>
+            <td width="389">Kontrollert. Observert endring
+høyere enn
+testverdi. Ingen korreksjon </td>
+          </tr>
+          <tr>
+            <td width="76">QC1-3</td>
+            <td width="85">fs=3</td>
+            <td width="389">Kontrollert. Ingen endring i
+måleverdi over
+x tidsskritt. Ingen korreksjon </td>
+          </tr>
+          <tr>
+            <td width="76">QC2d-1</td>
+            <td width="85">fs=4</td>
+            <td width="389">Kontrollert. Mistanke om feil detektert i
+QC1-3. Ingen tilsvarende feil i QC2d1-1. Ingen korreksjon.</td>
+          </tr>
+          <tr>
+            <td width="76">QC2d-1</td>
+            <td width="85">fs=5</td>
+            <td width="389">Kontrollert. Ingen mistanke om feil
+detektert i QC1-3. Mistanke om feil detektert i QC2d-1. Ingen
+korreksjon </td>
+          </tr>
+          <tr>
+            <td width="76"><br>
+            </td>
+            <td width="85">fs=6</td>
+            <td width="389">&lt; reservert &gt; </td>
+          </tr>
+          <tr>
+            <td width="76"><br>
+            </td>
+            <td width="85">fs=7</td>
+            <td width="389">Kontrollert. Observert drift i
+instrumentet. Ingen korreksjon </td>
+          </tr>
+          <tr>
+            <td width="76"><br>
+            </td>
+            <td width="85">fs=8</td>
+            <td width="389">&lt; reservert &gt; </td>
+          </tr>
+          <tr>
+            <td width="76">QC2d-1</td>
+            <td width="85"><b>fs=9</b></td>
+            <td width="389"><b>Kontrollert. Observert endring
+høyere
+enn testverdi. Korrigert automatisk</b> </td>
+          </tr>
+          <tr>
+            <td width="76">QC2d-1</td>
+            <td width="85"><b>fs=A</b></td>
+            <td width="389"><b>Kontrollert. Ingen endring i
+måleverdi
+over x tidsskritt. Korrigert automatisk</b> </td>
+          </tr>
+        </tbody>
+      </table>
+      <a name="fs"><br>
+      </a></p>
+      <a name="fnum"> </a>
+      <h3><a name="fnum">Prognostisk romkontroll (numerical)</a></h3>
+      <p><a name="fnum"> controlinfo(4), fnum </a>
+      <table width="564">
+        <tbody>
+          <tr>
+            <td width="77"><br>
+            </td>
+            <td width="61">fnum=0</td>
+            <td width="406">Ikke kontrollert </td>
+          </tr>
+          <tr>
+            <td width="77">QC1-4</td>
+            <td width="61">fnum=1</td>
+            <td width="406">Kontrollert. Funnet i orden </td>
+          </tr>
+          <tr>
+            <td width="77">QC1-4</td>
+            <td width="61">fnum=2</td>
+            <td width="406">Kontrollert. Observert verdis avvik fra
+modellverdien større enn høy testverdi </td>
+          </tr>
+          <tr>
+            <td width="77">QC1-4</td>
+            <td width="61">fnum=3</td>
+            <td width="406">Kontrollert. Observert verdis avvik fra
+modellverdien mindre enn lav testverdi </td>
+          </tr>
+          <tr>
+            <td width="77">QC1-4</td>
+            <td width="61">fnum=4</td>
+            <td width="406">Kontrollert. Observert verdis avvik fra
+modellverdien større enn høyeste testverdi </td>
+          </tr>
+          <tr>
+            <td width="77">QC1-4</td>
+            <td width="61">fnum=5</td>
+            <td width="406">Kontrollert. Observert verdis avvik fra
+modellverdien mindre enn minste testverdi </td>
+          </tr>
+          <tr>
+            <td width="77">QC1-4</td>
+            <td width="61"><b>fnum=6</b></td>
+            <td width="406"><b>Original verdi mangler eller er
+forkastet. </b><b>Interpolert/korrigert med modellverdi.&nbsp;</b> </td>
+          </tr>
+        </tbody>
+      </table>
+      <a name="fnum"><br>
+      </a></p>
+      <a name="fpos"> </a>
+      <h3><a name="fpos">Meldingskontroll (position)</a></h3>
+      <p><a name="fpos">Det er laget to tester for bevegelige stasjoner:<br>
+1) Sjekk av at bevegelige
+stasjoner har hatt en rimelig forflytning siden forrige observasjon; 2)
+Sjekk av at posisjonen for en bevegelig bøye ikke er landbasert.
+Mens de øvrige testene er pr. parameter, er disse pr. melding og
+resultatet vil gjelde alle parameterne i meldingen.<br>
+Tidspunktskontroll blir flagget på samme måte.</a></p>
+      <p><a name="fpos"> controlinfo(5), fpos </a>
+      <table width="572">
+        <tbody>
+          <tr>
+            <td width="77"><br>
+            </td>
+            <td width="86">fpos=0</td>
+            <td width="389">Ikke kontrollert</td>
+          </tr>
+          <tr>
+            <td width="77">QC1-5</td>
+            <td width="86">fpos=1</td>
+            <td width="389">Kontrollert funnet i orden</td>
+          </tr>
+          <tr>
+            <td width="77"><br>
+            </td>
+            <td width="86">fpos=2</td>
+            <td width="389">&lt; reservert &gt;</td>
+          </tr>
+          <tr>
+            <td width="77">QC1-5</td>
+            <td width="86">fpos=3</td>
+            <td width="389">Kontrollert. Mistenkelig melding. Ingen
+korreksjon.</td>
+          </tr>
+          <tr>
+            <td width="77">QC1-5</td>
+            <td width="86"><b>fpos=4</b></td>
+            <td width="389"><b>Kontrollert. Mistenkelig melding.
+Korrigert
+automatisk.</b></td>
+          </tr>
+          <tr>
+            <td width="77"><br>
+            </td>
+            <td width="86">fpos=5</td>
+            <td width="389">&lt; reservert &gt;</td>
+          </tr>
+          <tr>
+            <td width="77">QC1-5</td>
+            <td width="86"><b>fpos=6</b></td>
+            <td width="389"><b>Meldingsverdi forkastet.</b></td>
+          </tr>
+        </tbody>
+      </table>
+      <a name="fpos"><br>
+      </a></p>
+      <a name="fmis"> </a>
+      <h3><a name="fmis">Manglende observasjon (missing)</a></h3>
+      <p><a name="fmis"> controlinfo(6), fmis </a>
+      <table width="550">
+        <tbody>
+          <tr>
+            <td width="74"><br>
+            </td>
+            <td width="85">fmis=0</td>
+            <td width="371">Original verdi og korrigert verdi
+eksisterer. </td>
+          </tr>
+          <tr>
+            <td width="74">Flere</td>
+            <td width="85">fmis=1</td>
+            <td width="371">Original verdi mangler. Korrigert verdi
+eksisterer. </td>
+          </tr>
+          <tr>
+            <td width="74">Flere</td>
+            <td width="85">fmis=2</td>
+            <td width="371">Korrigert verdi mangler. Original verdi
+eksisterer (Original verdi er forkastet).</td>
+          </tr>
+          <tr>
+            <td width="74">Dekoder</td>
+            <td width="85">fmis=3</td>
+            <td width="371">Original verdi og korrigert verdi mangler. </td>
+          </tr>
+        </tbody>
+      </table>
+      <a name="fmis"><br>
+      </a></p>
+      <a name="ftime"> </a>
+      <h3><a name="ftime">Tidsserietilpasning (timeseries)</a></h3>
+      <p><a name="ftime"> controlinfo(7), ftime </a>
+      <table width="550">
+        <tbody>
+          <tr>
+            <td width="74"><br>
+            </td>
+            <td width="85">ftime=0</td>
+            <td width="371">Ikke kontrollert</td>
+          </tr>
+          <tr>
+            <td width="74">QC2d-2</td>
+            <td width="85"><b>ftime=1</b></td>
+            <td width="371"><b>Interpolert/korrigert med godt resultat</b></td>
+          </tr>
+          <tr>
+            <td width="74">QC2d-2</td>
+            <td width="85"><b>ftime=2</b></td>
+            <td width="371"><b>Interpolert/korrigert med usikkert
+resultat</b></td>
+          </tr>
+          <tr>
+            <td width="74">QC2d-2</td>
+            <td width="85">ftime=3</td>
+            <td width="371">Forsøkt interpolert/korrigert.
+Metode uegnet.</td>
+          </tr>
+        </tbody>
+      </table>
+      <a name="ftime"><br>
+      </a></p>
+      <a name="fw"> </a>
+      <h3><a name="fw"> Væranalyse (weather analysis)</a></h3>
+      <p><a name="fw"> controlinfo(8), fw </a>
+      <table width="567">
+        <tbody>
+          <tr>
+            <td width="72"><br>
+            </td>
+            <td width="68">fw=0</td>
+            <td width="407">Ikke kontrollert</td>
+          </tr>
+          <tr>
+            <td width="72">QC2d-3</td>
+            <td width="68">fw=1</td>
+            <td width="407">Kontrollert. Funnet i orden</td>
+          </tr>
+          <tr>
+            <td width="72">QC2d-3</td>
+            <td width="68">fw=2</td>
+            <td width="407">Kontrollert. Mistenkelig verdi. Ingen
+korreksjon</td>
+          </tr>
+          <tr>
+            <td width="72">QC2d-3</td>
+            <td width="68"><b>fw=3</b></td>
+            <td width="407"><b>Kontrollert. Mistenkelig verdi.
+Korrigert
+automatisk</b></td>
+          </tr>
+        </tbody>
+      </table>
+      <a name="fw"><br>
+      </a></p>
+      <a name="fstat"> </a>
+      <h3><a name="fstat">Statistikkontroll (statistical)</a></h3>
+      <p><a name="fstat"> controlinfo(9), fstat </a>
+      <table width="567">
+        <tbody>
+          <tr>
+            <td width="69"><br>
+            </td>
+            <td width="69">fstat=0</td>
+            <td width="409">Ikke kontrollert</td>
+          </tr>
+          <tr>
+            <td width="69">QC2d-4</td>
+            <td width="69">fstat=1</td>
+            <td width="409">Kontrollert. Funnet i orden</td>
+          </tr>
+          <tr>
+            <td width="69">QC2d-4</td>
+            <td width="69">fstat=2</td>
+            <td width="409">Kontrollert. Mistenkelig verdi. Ingen
+korreksjon.</td>
+          </tr>
+        </tbody>
+      </table>
+      <a name="fstat"><br>
+      </a></p>
+      <a name="fclim"> </a>
+      <h3><a name="fclim">Klimatologikontroll (climatological)</a></h3>
+      <p><a name="fclim"> controlinfo(11), fclim </a>
+      <table width="570">
+        <tbody>
+          <tr>
+            <td width="68"><br>
+            </td>
+            <td width="74">fclim=0</td>
+            <td width="408">Ikke kontrollert</td>
+          </tr>
+          <tr>
+            <td width="68">QC2m-1</td>
+            <td width="74">fclim=1</td>
+            <td width="408">Kontrollert. Funnet i orden</td>
+          </tr>
+          <tr>
+            <td width="68">QC2m-1</td>
+            <td width="74">fclim=2</td>
+            <td width="408">Kontrollert. Mistenkelig verdi. Ikke
+korrigert</td>
+          </tr>
+          <tr>
+            <td width="68">QC2m-1</td>
+            <td width="74"><b>fclim=3</b></td>
+            <td width="408"><b>Kontrollert. Mistenkelig verdi.
+Korrigert
+automatisk</b></td>
+          </tr>
+        </tbody>
+      </table>
+      <a name="fclim"><br>
+      </a></p>
+      <a name="fd"> </a>
+      <h3><a name="fd">Fordeling av samleverdier (distribution)</a></h3>
+      <p><a name="fd"> controlinfo(12), fd </a></p>
+      <p><a name="fd">To prosedyrer som hittil blir utført
+manuelt blir delvis
+automatisert i Kvalobs (QC1-7 og QC2m-2):&nbsp;<br>
+- Fordeling av oppsamlet nedbør over en periode<br>
+- Fordeling av maksimums- og minimumsverdi over en periode<br>
+Den automatiske fordelingen kan etterprøves i HQC.</a></p>
+      <p><a name="fd">fd=3 settes når man har mistanke om at
+originalverdien kan dekke en lengre periode enn det som parameteren er
+definert for, for eksempel når man i RR_24 kan ha fått inn samlet
+nedbør for mer enn 24 timer (oppsamlet verdi). fd settes lik 1 når man
+er overbevist om at perioden originalverdien gjelder for stemmer
+overens med perioden parameteren er definert for. fd settes lik 2 for
+alle observasjoner i en periode som man er overbevist om at man har
+fått inn en oppsamlet verdi for, enten den oppsamlede verdien er kommet
+inn som siste originalverdi i oppsamlingsperioden eller er funnet på
+annen måte (f.eks. lagt inn i RR_X for nedbør).<br>
+      </a></p>
+      <p>
+      <table width="570">
+        <tbody>
+          <tr>
+            <td width="68"><br>
+            </td>
+            <td width="74">fd=0</td>
+            <td width="408">Ikke vurdert som samleverdi</td>
+          </tr>
+          <tr>
+            <td width="68">QC1-7, HQC<br>
+            </td>
+            <td width="74">fd=1</td>
+            <td width="408">Normal observasjon, ikke oppsamlet verdi</td>
+          </tr>
+          <tr>
+            <td width="68">QC1-7, HQC<br>
+            </td>
+            <td width="74">fd=2</td>
+            <td width="408">Observasjonen tilhører en
+oppsamlingsperiode utover den som er definert i selve parameteren </td>
+          </tr>
+          <tr>
+            <td width="68">QC1-7</td>
+            <td width="74">fd=3</td>
+            <td width="408">Unormal observasjon. Original verdi kan
+være oppsamlet verdi</td>
+          </tr>
+          <tr>
+            <td width="68"><br>
+            </td>
+            <td width="74">fd=4-5</td>
+            <td width="408">&lt; reservert &gt;</td>
+          </tr>
+          <tr>
+            <td width="68">QC1-7</td>
+            <td style="font-weight: bold;" width="74">fd=6</td>
+            <td width="408"><b>&nbsp;Tilfordelt fra
+en oppsamlet verdi ved hjelp av numeriske modellverdier</b></td>
+          </tr>
+          <tr>
+            <td width="68">QC2m-2</td>
+            <td style="font-weight: bold;" width="74">fd=7</td>
+            <td width="408"><b>&nbsp;Tilfordelt fra
+en oppsamlet verdi ved hjelp av væranalysen / klimaanalysen</b></td>
+          </tr>
+          <tr>
+            <td width="68">QC2m-2</td>
+            <td width="74"><b>fd=A</b></td>
+            <td width="408"><b>&nbsp;Tilfordelt fra
+en oppsamlet verdi etter metode 1 (jevn nedbør)</b></td>
+          </tr>
+          <tr>
+            <td width="68">QC2m-2</td>
+            <td width="74"><b>fd=B</b></td>
+            <td width="408"><b>&nbsp;Tilfordelt fra
+en oppsamlet verdi etter metode 2 (ujevn nedbør)</b></td>
+          </tr>
+        </tbody>
+      </table>
+      </p>
+      <p><a name="fd"> </a></p>
+      <a name="fpre"> </a>
+      <h3><a name="fpre"><br>
+Forhåndskvalifisering (prequalification)</a></h3>
+      <p><a name="fpre"> controlinfo(13), fpre </a></p>
+      <p><a name="fpre">Bestemte kombinasjoner av <i>'stationid'</i>
+og <i>'paramid'</i> kan forkastes. Det samme kan meldinger
+karakterisert som støy.<br>
+      </a></p>
+      <p>
+      <table width="570">
+        <tbody>
+          <tr>
+            <td width="68"><br>
+            </td>
+            <td width="74">fpre=0</td>
+            <td width="408">Ikke vurdert<br>
+            </td>
+          </tr>
+          <tr>
+            <td width="68"><br>
+            </td>
+            <td width="74">fpre=1-4</td>
+            <td width="408">&lt; reservert &gt;<br>
+            </td>
+          </tr>
+          <tr>
+            <td width="68">QC1-0<br>
+            </td>
+            <td width="74">fpre=5</td>
+            <td width="408">Ekskludert fra kvalitetskontrollen, da
+originalverdi mangler<br>
+            </td>
+          </tr>
+          <tr>
+            <td width="68">QC1-0<br>
+            </td>
+            <td width="74"><b>fpre=6</b></td>
+            <td width="408"><b>Forkastet automatisk, fast ugyldig
+original verdi</b><br>
+            </td>
+          </tr>
+          <tr>
+            <td width="68">QC1-0<br>
+            </td>
+            <td width="74"><b>fpre=7</b></td>
+            <td width="408"><b>Forkastet automatisk, original verdi er
+støy</b><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      </p>
+      <p><a name="fpre"><br>
+      <br>
+      </a></p>
+      <a name="fcombi"> </a>
+      <h3><a name="fcombi"><br>
+Kombinert vurdering (combined assessment)</a></h3>
+      <p><a name="fcombi"> controlinfo(14), fcombi</a></p>
+      <p><a name="fcombi">Tolking av en kombinasjon av
+kontrollflaggverdier. Kombinasjonene er ikke generelt gyldige,
+bare for utvalgte parametere.<br>
+      </a></p>
+      <p>
+      <table width="570">
+        <tbody>
+          <tr>
+            <td width="68"><br>
+            </td>
+            <td width="74">fcombi=0</td>
+            <td width="408">Ikke tolket<br>
+            </td>
+          </tr>
+          <tr>
+            <td width="68"><br>
+            </td>
+            <td width="74">fcombi=1</td>
+            <td width="408">Tolket. Funnet iorden.<br>
+            </td>
+          </tr>
+          <tr>
+            <td width="68">QC1-9<br>
+            </td>
+            <td width="74">fcombi=2</td>
+            <td width="408">Utenfor høyeste grenseverdi, ikke
+påvist sprang, innenfor tolerert avvik fra modellverdi<br>
+            </td>
+          </tr>
+          <tr>
+            <td width="68"><br>
+            </td>
+            <td width="74">fcombi=3-8</td>
+            <td width="408">&lt; reservert &gt;<br>
+            </td>
+          </tr>
+          <tr>
+            <td width="68">QC1-9<br>
+            </td>
+            <td width="74"><b>fcombi=9</b></td>
+            <td width="408"><b>Forkastet. Utenfor høyeste
+grenseverdi, ikke påvist sprang, utenfor tolerert avvik fra
+modellverdi</b><br>
+            </td>
+          </tr>
+          <tr>
+            <td width="68">QC1-9<br>
+            </td>
+            <td width="74"><b>fcombi=A</b></td>
+            <td width="408"><b>Forkastet. Utenfor høyeste
+grenseverdi, påvist sprang, innenfor tolerert avvik fra
+modellverdi</b><br>
+            </td>
+          </tr>
+          <tr>
+            <td width="68">QC1-9<br>
+            </td>
+            <td width="74"><b>fcombi=B</b></td>
+            <td width="408"><b>Forkastet. Utenfor høyeste
+grenseverdi, påvist sprang, utenfor tolerert avvik fra modellverdi</b><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      </p>
+      <p><a name="fcombi"><br>
+      <br>
+      </a></p>
+      <a name="fhqc"> </a>
+      <h3><a name="fhqc"><br>
+Manuell kvalitetskontroll (human quality control)</a></h3>
+      <p><a name="fhqc"> controlinfo(15), fhqc </a></p>
+      <p><a name="fhqc">HQC blir gjennomført i en dedikert
+applikasjon som
+håndterer flaggsettingen<br>
+      </a></p>
+      <p>
+      <table width="570">
+        <tbody>
+          <tr>
+            <td width="68"><br>
+            </td>
+            <td width="74">fhqc=0</td>
+            <td width="408">Ikke kontrollert i HQC<br>
+            </td>
+          </tr>
+          <tr>
+            <td width="68">HQC<br>
+            </td>
+            <td width="74">fhqc=1</td>
+            <td width="408">Kontrollert i HQC. Funnet i orden.<br>
+            </td>
+          </tr>
+          <tr>
+            <td width="68">HQC<br>
+            </td>
+            <td width="74">fhqc=2</td>
+            <td width="408">Ikke kvalifisert for feilliste.
+Sannsynligvis i orden.<br>
+            </td>
+          </tr>
+          <tr>
+            <td width="68">HQC<br>
+            </td>
+            <td width="74">fhqc=3-4</td>
+            <td width="408">&lt; reservert &gt;<br>
+            </td>
+          </tr>
+          <tr>
+            <td width="68">HQC</td>
+            <td width="74"><b>fhqc=5</b></td>
+            <td width="408"><b>Interpolert manuelt<br>
+            </b></td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top;">HQC<br>
+            </td>
+            <td style="vertical-align: top;"><span
+ style="font-weight: bold;">fhqc=6</span><br>
+            </td>
+            <td style="vertical-align: top;"><span
+ style="font-weight: bold;">Tilfordelt
+manuelt</span><br>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top;">HQC<br>
+            </td>
+            <td style="vertical-align: top;"><span
+ style="font-weight: bold;">fhqc=7</span><br>
+            </td>
+            <td style="vertical-align: top;"><span
+ style="font-weight: bold;">Korrigert
+manuelt</span><br>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top;">HQC<br>
+            </td>
+            <td style="vertical-align: top;">fhqc=8-9<br>
+            </td>
+            <td style="vertical-align: top;">&lt; reservert &gt;<br>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top;">HQC<br>
+            </td>
+            <td style="vertical-align: top;"><span
+ style="font-weight: bold;">fhqc=A</span><br>
+            </td>
+            <td style="vertical-align: top;"><span
+ style="font-weight: bold;">Forkastet
+manuelt</span><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      </p>
+      <p><a name="fhqc"><br>
+      <br>
+      </a></p>
+      <a name="useinfo"> </a>
+      <h2><a name="useinfo">Bruksinformasjon (useinfo)</a></h2>
+      <p><a name="useinfo">Bruksinformasjonens 16 bruksflagg
+oppsummerer resultatet av
+kontrollprosessen av nytte for den etterfølgende bruk av
+dataene.
+Bruksflaggene skal gi informasjon om sluttresultatet av kontrollene.</a></p>
+      <p><a name="useinfo">I henhold til "Overordnet design" skal
+bruksflaggene bidra til
+å få frem: </a></p>
+      <ol type="a">
+        <a name="useinfo"> <li>om observasjonen mangler </li>
+        <li>om manglende observasjon er interpolert manuelt eller
+automatisk </li>
+        <li>om observasjonen er kontrollert eller ikke </li>
+        <li>om observasjonen er funnet i orden </li>
+        <li>om observasjonen er korrigert manuelt eller automatisk og
+hvorfor </li>
+        <li>om observasjonen er mistenkelig, men likevel ikke korrigert
+        </li>
+        <li>om oppsamlet nedbør over en periode er fordelt </li>
+        <li>om absolutt maksimums- og minimumsverdi over en periode er
+fordelt </li>
+        </a>
+      </ol>
+      <a name="useinfo">Det nordiske samarbeidsprosjektet NORKLIM har
+anbefalt et sett kvalitetsflagg [1]. NORDKLIM-flaggene er implementert
+som useinfo(0)-useinfo(4). </a>
+      <h3><a name="useinfo">Bruksflaggene:</a></h3>
+      <p> </p>
+      <center>
+      <table border="1" cellpadding="5" width="602">
+        <tbody>
+          <tr>
+            <th width="101">Flagg</th>
+            <th width="350">Beskrivelse</th>
+            <th width="151">Blir satt av</th>
+          </tr>
+          <tr>
+            <td width="101"><a href="#use0">useinfo(0)</a></td>
+            <td width="350">Kontrollnivå passert</td>
+            <td width="151">QABase</td>
+          </tr>
+          <tr>
+            <td width="101"><a href="#use1">useinfo(1)</a></td>
+            <td width="350">Originalverdiens avvik fra normert
+observasjonsprosedyre</td>
+            <td width="151">QABase</td>
+          </tr>
+          <tr>
+            <td width="101"><a href="#use2">useinfo(2)</a></td>
+            <td width="350">Kvalitetsnivå for originalverdi</td>
+            <td width="151">QABase</td>
+          </tr>
+          <tr>
+            <td width="101"><a href="#use3">useinfo(3)</a></td>
+            <td width="350">Behandling av originalverdi<br>
+            </td>
+            <td width="151">QABase</td>
+          </tr>
+          <tr>
+            <td width="101"><a href="#use4">useinfo(4)</a></td>
+            <td width="350">Viktigste kontrollmetode</td>
+            <td width="151">QABase</td>
+          </tr>
+          <tr>
+            <td width="101">useinfo(5)</td>
+            <td width="350">&lt; reservert &gt;</td>
+            <td width="151"><br>
+            </td>
+          </tr>
+          <tr>
+            <td width="101">useinfo(6)</td>
+            <td width="350">&lt; reservert &gt;</td>
+            <td width="151"><br>
+            </td>
+          </tr>
+          <tr>
+            <td width="101"><a href="#use7">useinfo(7)</a></td>
+            <td width="350">Forsinkelse</td>
+            <td width="151">Dekoder<br>
+(QABase)</td>
+          </tr>
+          <tr>
+            <td width="101"><a href="#use8">useinfo(8)</a></td>
+            <td width="350">Prosent konfidens, første siffer av
+to</td>
+            <td width="151">(QABase)</td>
+          </tr>
+          <tr>
+            <td width="101"><a href="#use8">useinfo(9)</a></td>
+            <td width="350">Prosent konfidens, andre siffer av to</td>
+            <td width="151">(QABase)</td>
+          </tr>
+          <tr>
+            <td width="101">useinfo(10)</td>
+            <td width="350">&lt; reservert &gt;</td>
+            <td width="151"><br>
+            </td>
+          </tr>
+          <tr>
+            <td width="101">useinfo(11)</td>
+            <td width="350">&lt; reservert &gt;</td>
+            <td width="151"><br>
+            </td>
+          </tr>
+          <tr>
+            <td width="101">useinfo(12)</td>
+            <td width="350">&lt; reservert &gt;</td>
+            <td width="151"><br>
+            </td>
+          </tr>
+          <tr>
+            <td width="101"><a href="#use13">useinfo(13)</a></td>
+            <td width="350">HQC-operatørens løpenummer,
+første siffer av to</td>
+            <td width="151">HQC</td>
+          </tr>
+          <tr>
+            <td width="101"><a href="#use13">useinfo(14)</a></td>
+            <td width="350">HQC-operatørens løpenummer,
+andre siffer av to</td>
+            <td width="151">HQC</td>
+          </tr>
+          <tr>
+            <td width="101"><a href="#use15">useinfo(15)</a></td>
+            <td width="350">Antall tester som har gitt utslag</td>
+            <td width="151">QABase</td>
+          </tr>
+        </tbody>
+      </table>
+      </center>
+      <p></p>
+      <p><a name="useinfo">&nbsp;</a></p>
+      <a name="use0"> </a>
+      <h3>Forståelse av kriteriene</h3>
+Hvis flere kriterier står innenfor en parentes, regnes parentesen
+som ett kriterium. Når flere enn ett kriterium følger
+etter hverandre, betyr det siste ”og” at alle kriterier må
+være oppfylt. Dersom det i stedet står ”eller”, betyr det
+at minst ett kriterium må være oppfylt. <br>
+      <br>
+      <font face="Courier New, monospace"><font size="2"></font></font>
+      <h3><a name="use0">Kontrollnivå passert</a></h3>
+      <table width="562">
+        <tbody>
+          <tr>
+            <td width="120">useinfo(0) = 0</td>
+            <td width="406">&lt; reservert &gt;</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(0) = 1</td>
+            <td width="406">QC1, QC2 og HQC er gjennomført</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(0) = 2</td>
+            <td width="406">QC2 og HQC er gjennomført (ikke QC1)</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(0) = 3</td>
+            <td width="406">QC1 og HQC er gjennomført (ikke hele
+QC2)</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(0) = 4</td>
+            <td width="406">HQC er gjennomført (ikke QC1, ikke
+hele QC2)</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(0) = 5</td>
+            <td width="406">QC1 og QC2 er gjennomført (ikke HQC)</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(0) = 6</td>
+            <td width="406">QC2 er gjennomført (ikke QC1, ikke
+HQC)</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(0) = 7</td>
+            <td width="406">QC1 er gjennomført (ikke hele QC2,
+ikke HQC)</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(0) = 8</td>
+            <td width="406">&lt; reservert &gt;</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(0) = 9</td>
+            <td width="406">Informasjon om kontrollnivå ikke gitt</td>
+          </tr>
+        </tbody>
+      </table>
+      <p><a name="use0"> Initialverdien av useinfo(0) er 9. </a></p>
+      <p><a name="use0"> QC1 gjennomført betyr at minst en
+QC1-sjekk er gjennomført.</a></p>
+      <p><a name="use0">&nbsp;</a></p>
+      <a name="use1"> </a>
+      <h3><a name="use1">Originalverdiens avvik fra normert
+observasjonsprosedyre</a></h3>
+      <table width="562">
+        <tbody>
+          <tr>
+            <td width="120">useinfo(1) = 0</td>
+            <td width="406">Normert observasjonsperiode og
+observasjonstid</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(1) = 1</td>
+            <td width="406">Observasjonstid avviker fra normen</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(1) = 2</td>
+            <td width="406">Observasjonsperiode er kortere enn normert</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(1) = 3</td>
+            <td width="406">Observasjonsperiode er lengre enn normert</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(1) = 4</td>
+            <td width="406">Observasjonstid avviker fra normen,
+observasjonsperiode er kortere enn normert</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(1) = 5</td>
+            <td width="406">Observasjonstid avviker fra normen,
+observasjonsperiode er lengre enn normert</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(1) = 6</td>
+            <td width="406">&lt; reservert &gt;</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(1) = 7</td>
+            <td width="406">&lt; reservert &gt;</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(1) = 8</td>
+            <td width="406">Originalverdi mangler</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(1) = 9</td>
+            <td width="406">Statusinformasjon ikke gitt</td>
+          </tr>
+        </tbody>
+      </table>
+      <p><a name="use1">useinfo(1) settes etter gjennomført QC1.</a></p>
+      <p><a name="use1">Initialverdien av useinfo(1) er 9.</a></p>
+      <p><a name="use1">useinfo(1) settes til 8 hvis fmis=1 eller
+fmis=3.<br>
+      </a></p>
+      <p><a name="use1">For fmis=0 eller fmis=2 settes useinfo(1) som
+følger:</a></p>
+      <p><a name="use1">useinfo(1) settes til 0 hvis (fd=0 eller fd=1)
+og useinfo(7)=0.<br>
+      </a> <a name="use1">useinfo(1) settes til 1 hvis (fd=0 eller
+fd=1)
+og useinfo(7)&gt;0.<br>
+      </a><a name="use1">useinfo(1) settes til 2 hvis fd=3 og
+useinfo(7)=0.<br>
+      </a><a name="use1">useinfo(1) settes til 3 hvis (fd=2, fd=6,
+fd=7, fd=A eller fd=B) og useinfo(7)=0.<br>
+      </a><a name="use1">useinfo(1) settes til 4 hvis fd=3 og
+useinfo(7)&gt;0.<br>
+      </a><a name="use1">useinfo(1) settes til 5 hvis (fd=2, fd=6,
+fd=7, fd=A eller fd=B) og useinfo(7)&gt;0.<br>
+      </a><a name="use1"></a></p>
+      <p><a name="use1">&nbsp;</a></p>
+      <a name="use2"> </a>
+      <h3><a name="use2">Kvalitetsnivå for originalverdi</a></h3>
+      <p>
+      <table width="542">
+        <tbody>
+          <tr>
+            <td width="130">useinfo(2) = 0</td>
+            <td width="406">Originalverdi funnet i orden</td>
+          </tr>
+          <tr>
+            <td width="130">useinfo(2) = 1</td>
+            <td width="406">Originalverdi noe mistenkelig (antagelig
+korrekt)</td>
+          </tr>
+          <tr>
+            <td width="130">useinfo(2) = 2</td>
+            <td width="406">Originalverdi svært mistenkelig
+(antagelig feilaktig)</td>
+          </tr>
+          <tr>
+            <td width="130">useinfo(2) = 3</td>
+            <td width="406">Originalverdi sikkert feilaktig</td>
+          </tr>
+          <tr>
+            <td width="130">useinfo(2) ∈ [4,8]</td>
+            <td width="406">&lt; reservert &gt;</td>
+          </tr>
+          <tr>
+            <td width="130">useinfo(2) = 9</td>
+            <td width="406">Kvalitetsinformasjon ikke gitt</td>
+          </tr>
+        </tbody>
+      </table>
+      </p>
+      <p><a name="use2"> Initialverdien av useinfo(2) er 9. <br>
+      </a></p>
+      <p><a name="use2">For fmis=1 eller fmis=3 settes useinfo(2) til 9.</a></p>
+      <p><a name="use2">Ellers settes useinfo(2) til 0 hvis fhqc=1
+eller fhqc=2.</a></p>
+      <p><a name="use2">Ellers settes useinfo(2) som følger, i
+prioritert
+rekkefølge:</a></p>
+      <p> <a name="use2">useinfo(2) settes til 3 hvis<br>
+fr=6, fcc≥A, fcp≥A, fs≥9, fnum=6, fpos≥4, fd=2, fd≥6, fpre≥6, fw=3,
+fclim=3, fcombi≥9 eller fhqc≥6.</a></p>
+      <p> <a name="use2">useinfo(2) settes til 2 hvis<br>
+fr=4, fr=5, fcc=3, fcc=4, fcc=6, fcc=7, fcp=3, fcp=4, fcp=6, fcp=7,
+fs=3, fnum=4, fnum=5, fpos=3, fstat=2 eller fd=3.<br>
+      </a></p>
+      <p> <a name="use2">useinfo(2) settes til 1 hvis<br>
+fr=2, fr=3, fcc=2, fcp=2, fs=2, fs=4, fs=5, fs=7, fnum=2, fnum=3, fw=2,
+fclim=2 eller fcombi=2.</a></p>
+      <p> <a name="use2">useinfo(2) settes til 0 hvis<br>
+fr=1, fcc=1, fcp=1, fs=1, fnum=1, fpos=1, fstat=1, fclim=1, fd=1 eller
+fcombi=1.</a></p>
+      <p> <a name="use2">Ellers settes useinfo(2) til initialverdien 9.<br>
+      </a></p>
+      <p><a name="use2">&nbsp;</a></p>
+      <a name="use3"> </a>
+      <h3><a name="use3">Behandling av originalverdi<br>
+      </a></h3>
+      <p>
+      <table width="542">
+        <tbody>
+          <tr>
+            <td width="120">useinfo(3) = 0</td>
+            <td width="406">Original verdi er beholdt uendret<br>
+            </td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(3) = 1</td>
+            <td width="406">Original verdi er manuelt korrigert</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(3) = 2</td>
+            <td width="406">Original verdi er manuelt interpolert</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(3) = 3</td>
+            <td width="406">Original verdi er automatisk korrigert</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(3) = 4</td>
+            <td width="406">Original verdi er automatisk interpolert</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(3) = 5</td>
+            <td width="406">Original verdi er manuelt tilfordelt fra
+akkumulert verdi</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(3) = 6</td>
+            <td width="406">Original verdi er automatisk tilfordelt fra
+akkumulert verdi</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(3) = 7</td>
+            <td width="406">&lt; reservert &gt;</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(3) = 8</td>
+            <td width="406">Original verdi er forkastet</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(3) = 9</td>
+            <td width="406">Kvalitetsinformasjon er ikke gitt</td>
+          </tr>
+        </tbody>
+      </table>
+      </p>
+      <a name="use3"><br>
+      </a>
+      <p><a name="use3">Initialverdien av useinfo(3) er 9.<br>
+      <p><a name="use3">For fmis=3 settes useinfo(3) til 9.</a></p>
+      <p><a name="use3">Ellers settes useinfo(3) som følger, i
+prioritert rekkefølge:</a></p>
+      <p><a name="use3">useinfo(3) settes til 5 hvis fhqc=6.</a></p>
+      <p><a name="use3">useinfo(3) settes til 6 hvis fd&gt;5.</a></p>
+      <p><a name="use3">useinfo(3) settes til 2 hvis fhqc=5.</a></p>
+      <p><a name="use3">useinfo(3) settes til 1 hvis fhqc=7.</a></p>
+      <p><a name="use3">useinfo(3) settes til 0 hvis fhqc=1
+eller 2.</a></p>
+      <p><a name="use3">useinfo(3) settes til 4 hvis ftime=1, ftime=2
+eller (fnum=6 og fmis=1).</a></p>
+      <p><a name="use3">useinfo(3) settes til 3 hvis fcc=A, fcc=B,
+fcp=A, fcp=B, fs=9, fs=A, fpos=4, fw=3, fclim=3 eller (fnum=6 og
+fmis=0).</a></p>
+      <p><a name="use3">useinfo(3) settes til 8 hvis fr=6, fcc=D,
+fpos=6, fpre&gt;=6, fcombi&gt;=9 eller fhqc=A.</a></p>
+      <p><a name="use3">Ellers settes useinfo(3) til 0.<br>
+      <br>
+&nbsp;&nbsp;</a></p>
+      <a name="use3"> </a><a name="use3">Forklaring av begreper: </a>
+      <p><a name="use3">Tilfordeling, korreksjon, interpolasjon og
+forkasting er definert slik at de utelukker hverandre gjensidig.</a></p>
+      <p><a name="use3">Tilfordeling foretas fra en oppsamlet
+(akkumulert)
+verdi ved å sette inn verdier i feltet corrected for hele
+oppsamlingsperioden. Tilfordelings­flagget (controlinfo(12)) brukes
+for
+alle observasjonene i denne perioden.</a></p>
+      <p><a name="use3">Korreksjon er endring av originalverdi og kan
+bare foretas når original­verdi eksisterer og ikke er blitt
+tilfordelt.</a></p>
+      <p><a name="use3">Interpolasjon er innsetting av en
+erstatningsverdi og kan bare foretas når originalverdi mangler og
+ikke er blitt tilfordelt.</a></p>
+      <p><a name="use3">Forkasting er sletting av originalverdi, og kan
+bare
+foretas når originalverdi eksisterer og ikke er blitt tilfordelt
+eller
+korrigert. I praksis vil en originalverdi være forkastet hvis
+minst én
+kontroll har forkastet verdien (det tilhørende flagget er blitt
+satt
+til en verdi hvor den forklarende teksten markerer observasjonen som
+”forkastet”), og originalverdien samtidig ikke er blitt korrigert eller
+tilfordelt eller er blitt godkjent av HQC.</a></p>
+      <p><a name="use3">HQC kan oppheve en forkasting ved å
+godkjenne
+originalverdien, korrigere den eller tilfordele. Også annen
+automatisk
+behandling av originalverdien (korreksjon, interpolasjon og
+tilfordeling) kan endres av HQC.</a></p>
+      <p><a name="use3">Merk at kombinasjonen useinfo(2)=3 og
+useinfo(3)=0 er
+mulig: originalverdien kan være merket for senere tilfordeling
+(den er
+da sikkert feilaktig, men verken korrigert, interpolert, tilfordelt
+eller forkastet). <br>
+      </a></p>
+      <p><a name="use3"><br>
+      </a></p>
+      <p><a name="use3"><br>
+      </a></p>
+      <h3><a name="use4">Viktigste kontrollmetode</a></h3>
+      <p>
+      <table width="542">
+        <tbody>
+          <tr>
+            <td width="120">useinfo(4) = 0</td>
+            <td width="406">Original verdi kontrollert og funnet i orden</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(4) = 1</td>
+            <td width="406">Grenseverdikontroll</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(4) = 2</td>
+            <td width="406">Konsistenskontroll (mer enn én
+parameter)</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(4) = 3</td>
+            <td width="406">Sprangkontroll (én parameter)</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(4) = 4</td>
+            <td width="406">Konsistenskontroll i forhold til
+tidligere/senere observasjonsterminer (mer enn én parameter)</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(4) = 5</td>
+            <td width="406">Romkontroll, basert på
+observasjonsdata</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(4) = 6</td>
+            <td width="406">Romkontroll, basert på tidsserier</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(4) = 7</td>
+            <td width="406">Romkontroll, basert på modelldata</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(4) = 8</td>
+            <td width="406">Romkontroll, basert på statistikk</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(4) = 9</td>
+            <td width="406">Kvalitetsinformasjon ikke gitt</td>
+          </tr>
+        </tbody>
+      </table>
+      </p>
+      <p><a name="use4"> Initialverdien av useinfo(4) er 9.<br>
+useinfo(4) settes etter at useinfo(2) er satt.</a></p>
+      <p> <a name="use4">useinfo(4) settes til 0 hvis
+useinfo(2)=0.</a></p>
+      <p><a name="use4">Ellers settes useinfo(4) som følger, i
+prioritert rekkefølge:</a></p>
+      <p><a name="use4">useinfo(4) settes til 9 hvis fhqc≥5.</a></p>
+      <p><a name="use4">useinfo(4) settes til 9 hvis fd=2 eller fd≥6</a>.</p>
+      <p><a name="use4">useinfo(4) settes til 1 hvis<br>
+fr&gt;1, fcc≤1, fcp≤1, fs≤1, fnum≤1, fpos≤1, ftime≤1, fw≤1, fstat≤1 og
+fclim≤1.</a></p>
+      <p><a name="use4">useinfo(4) settes til 2 hvis<br>
+(fcc=2, fcc=3, fcc=6, fcc=A, fcc=D, fcp=2, fcp=3, eller fcp=A)<br>
+og fs≤1, fnum≤1, fpos≤1, ftime≤1, fw≤1, fstat≤1 og fclim≤1.</a></p>
+      <p> <a name="use4">useinfo(4) settes til 3 hvis<br>
+(fs&gt;1 eller fpos&gt;1) og fnum≤1, ftime≤1, fw≤1, fstat≤1 og fclim≤1.</a></p>
+      <p> <a name="use4">useinfo(4) settes til 4 hvis<br>
+(fcc=4, fcc=7, fcc=B, fcp=4, fcp=7, eller fcp=B)<br>
+og fnum≤1, ftime≤1, fw≤1, fstat≤1 og fclim≤1.</a></p>
+      <p> <a name="use4">useinfo(4) settes til 5 hvis<br>
+(fw&gt;1 eller fclim&gt;1) og fnum≤1, ftime≤1 og fstat≤1.</a></p>
+      <p> <a name="use4">useinfo(4) settes til 6 hvis<br>
+ftime&gt;1 og fnum≤1 og fstat≤1.</a></p>
+      <p> <a name="use4">useinfo(4) settes til 7 hvis<br>
+fnum&gt;1 og fstat≤1.</a></p>
+      <p> <a name="use4">useinfo(4) settes til 8 hvis<br>
+fstat&gt;1.</a></p>
+      <p><a name="use4">&nbsp;Ellers settes useinfo(4) til
+initialverdien 9.<br>
+      </a></p>
+      <p><a name="use4"><br>
+      </a></p>
+      <a name="use7"> </a>
+      <h3><a name="use7">Forsinkelse</a></h3>
+      <p><a name="use7"> Meldingene inneholder en eller flere
+observasjoner. De ulike
+meldingene skal mottas ved met.no innenfor et normert tidsvindu.
+Tidsvinduet vil variere for ulike stasjonsoppsett og
+kommunikasjonsløsninger.</a></p>
+      <p>
+      <table width="542">
+        <tbody>
+          <tr>
+            <td width="120">useinfo(7) = 0</td>
+            <td width="406">Observasjonen er utført til rett tid
+og meldt til rett
+tid</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(7) = 1</td>
+            <td width="406">Observasjonen er utført
+for tidlig og meldt til rett tid</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(7) = 2</td>
+            <td width="406">Observasjonen er utført
+for sent men meldt til rett tid</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(7) = 3</td>
+            <td width="406">Observasjonen er meldt for tidlig</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(7) = 4</td>
+            <td width="406">Observasjonen er meldt for sent</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(7) = 5</td>
+            <td width="406">Observasjonen er utført
+for tidlig og meldt for sent</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(7) = 6<br>
+            </td>
+            <td width="406">Observasjonen er utført
+for sent og meldt for sent</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(7) = 7</td>
+            <td width="406">&lt; reservert &gt;</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(7) = 8</td>
+            <td width="406">&lt; reservert &gt;</td>
+          </tr>
+          <tr>
+            <td width="120">useinfo(7) = 9</td>
+            <td width="406">Forsinkelse ikke vurdert</td>
+          </tr>
+        </tbody>
+      </table>
+      </p>
+      <p><a name="use7"> Initialverdien av useinfo(7) er 9. </a></p>
+      <p><a name="use7"> useinfo(7) settes til 0, 3 eller 4 ved
+innlegging
+i Kvalobs-databasen.</a></p>
+      <p><a name="use7">useinfo(7) settes til 1, 2, 5 eller 6 av en
+kontrollrutine i sammenheng med QC2.</a></p>
+      <p><a name="use7">&nbsp;useinfo(7) settes til 9 når observasjonen
+mangler.</a></p>
+      <a name="use8"> </a>
+      <h3><a name="use8">Konfidens</a></h3>
+      <p><a name="use8"> En egen rutine beregner prosent konfidens av
+originalverdien basert
+på resultatet av kontrollene. </a></p>
+      <p><a name="use8"> useinfo(8) og useinfo(9) settes til integer
+heksadesimalverdien av
+prosenttallet. F.eks. vil 63% konfidens bli representert med
+useinfo(8)=3, useinfo(9)=F.</a></p>
+      <p><a name="use8"> useinfo(8) og useinfo(9) settes av en
+kontrollrutine som beregner
+konfidens.</a></p>
+      <p><a name="use8">&nbsp;</a></p>
+      <a name="use13"> </a>
+      <h3><a name="use13">HQC-operatørens løpenummer</a></h3>
+      <p><a name="use13"> I applikasjonen for manuell kvalitetskontroll
+(HQC) skal hver operatør logge seg inn ved en signatur.
+Signaturen blir lagret sammen med et løpenummer som
+identifiserer operatørene i dataene. Operatørens
+løpenummer blir lagret i useinfo(13) og useinfo(14).</a></p>
+      <p><a name="use13"> useinfo(13) og useinfo(14) settes etter
+utført HQC</a></p>
+      <p><a name="use13">&nbsp;</a></p>
+      <a name="use15"> </a>
+      <h3><a name="use15">Tester som har gitt utslag (cfailed)</a></h3>
+      <p><a name="use15"> Hver enkelt test er tilordnet en
+identifikator <i>qcx</i> i tabellen <i>checks</i>.
+Hvis en test gir utslag som en mistenkelig eller feilaktig verdi, blir
+testens identifikator lagret som et tillegg til bruksinformasjonen i
+feltet <i>cfailed</i>. Når flere tester gir utslag, blir
+identifikatorene lagret kommaseparert.<br>
+Parametriseringen av testene kan finnes i tabellen <i>station_param</i>
+og lagres ikke sammen med dataene.</a></p>
+      <p><a name="use15"> useinfo(15) kan ha verdiene 0, 1, 2, ..., F
+og angir antall tester
+som har gitt utslag. Verdien F angir at mer enn 14 tester har gitt
+utslag.</a></p>
+      <p> <a name="use15">useinfo(15) blir inkrementert ved tilfellene
+fr&gt;1, fcc&gt;1, fcp&gt;1, fs&gt;1, fnum&gt;1, fpos&gt;1, fw&gt;1,
+fstat&gt;1, fclim&gt;1 eller fpre&gt;1.</a></p>
+      <p><a name="use15">&nbsp;</a></p>
+      <hr>
+      <h2><a name="use15">Referanser</a></h2>
+      <p><a name="use15">[1] Lars Andresen (ed): "Quality Information
+of Meteorological Observations. Recommendations for a common Nordic
+end-user flagging system. Klima Report 11/2003. met.no</a></p>
+      <hr>
+      <p><a name="use15"><small>Endringslogg:</small></a></p>
+      <p><a name="use15"><small> versjon 2.0:</small></a></p>
+      <p><a name="use15"><small> Korrigert fns/fis til fns/is.<br>
+Flaggverdien fns/is=0xA lagt til.<br>
+Utvidet betydning for flaggverdiene fi=0xB, ftp=0xA og fi/is=0xB.<br>
+      </small></a></p>
+      <p><a name="use15"><small> versjon 3.0:</small></a></p>
+      <p><a name="use15"><small> Omarbeidet kontrollflaggene fra
+å være 4-bits
+verdier til karakterer.<br>
+Omarbeidet bruksinformasjonen. Tatt i bruk WMO-standard kodesett og
+prosent konfidens.<br>
+Utvidet betydning av HQC-flaggene til å omfatte forkastede verdier<br>
+Innført flagging av manglende verdi som QC1-0 og med eget
+flaggkodesystem fmis.</small></a></p>
+      <p><a name="use15"><small> versjon 4.0:</small></a></p>
+      <p><a name="use15"><small> Delt konsistenskontrollen i formell
+konsistens (QC1-2) og
+klimatologisk konsistens (QC1-6). Byttet betydning mellom fcc=2 og
+fcc=3.
+Verdien i hvert av flaggene er nå sortert etter økende
+alvorlighetsgrad.</small></a></p>
+      <p><a name="use15"><small> versjon 5.0:</small></a></p>
+      <p><a name="use15"><small> Endret navn på kontrollflaggene.
+Nummerering fra 0 til
+15. Kontrollflagg for fordeling (fd) definert.<br>
+Nye definisjoner av bruksflaggene.<br>
+      </small></a></p>
+      <p><a name="use15"><small> versjon 6.0:<br>
+      </small></a></p>
+      <p><a name="use15"><small> Kontrollflagg for hqc (fhqc) er
+definert separat.
+Kontrollflagg for klimatologisk konsistens (fcp) er definert.<br>
+Flaggverdiene av fcc er endret. Beskrivelsen av fd er endret.<br>
+useinfo(4)=4 er ny. useinfo(5) er endret. useinfo(7)=1,2,5,6 er nye.<br>
+      <br>
+      </small></a></p>
+      <p><a name="use15"><small>versjon 7.0:<br>
+      </small></a></p>
+      <p><a name="use15"><small>Ny beskrivelse av useinfo(0)-useinfo(4)
+i henhold til Norklims anbefalinger.<br>
+Innført kontrollflaggverdiene fs=4, fs=5 for fullstendighet.<br>
+Utvidet betydningen av kontrollflagget fd med ny tolkning av fd=1.
+Høyeste verdi for fd er 5 i stedet for 4.<br>
+Utvidelse av fcc og fcb med hensyn til Norklims skille mellom 'internal
+consistency' og 'step consistency'. Nye flaggverdier er fcc=4, fcc=7,
+fcc=B, fcp=4, fcp=7, fcp=B. fcc utvidet med kontrollflaggverdien fcc=D.<br>
+Innført bruksflaggene useinfo(13) og useinfo(14).<br>
+      </small></a></p>
+      <p><a name="use15"><small>versjon 8.0:<br>
+      </small></a></p>
+      <p><a name="use15"><small>QC1-0 utvidet til å omfatte
+automatisk forkastede observasjoner. Innført fpre,
+controlinfo(13).<br>
+Definert QC1-7 for påvisning av oppsamlet verdi med controlflag
+fd, controlinfo(12).<br>
+Utvidet betydningen av kontrollflagget fd. Høyeste verdi for fd
+er B.<br>
+      </small></a></p>
+      <p><a name="use15"><small>versjon 8.1:<br>
+      </small></a></p>
+      <p><a name="use15"><small>Harmonisert beskrivelsen av
+useinfo(13)/useinfo(14) til å være løpenummer.<br>
+Korrigert beskrivelsen av hvordan useinfo(0) blir satt. Beskrivelsen
+for useinfo(2)=0 endret fra "Originalverdi sikkert korrekt" til
+"Originalverdi funnet i orden". </small></a></p>
+      <p><a name="use15"><small>versjon 8.2:<br>
+      </small></a></p>
+      <p><a name="use15"><small>Fjernet bruken av useinfo(6). Justert
+regler for tilordning av useinfo(0)=7, useinfo(2)=3.<br>
+      </small></a></p>
+      <p><a name="use15"><small>versjon 8.3:<br>
+      </small></a></p>
+      <p><a name="use15"><small>Korrigert algoritmen for tilordning av
+useinfo(1) med å ta hensyn til fd<br>
+Korrigert algoritmen for tilordning av useinfo(3) med å ta hensyn
+til fpre.<br>
+Lagt til fhqc=2. </small></a></p>
+      <p><a name="use15"><small>versjon 8.4:<br>
+      </small></a></p>
+      <p><a name="use15"><small>Utvidet betydningen av sprangkontroll
+til drift i instrument. Ny flaggverdi fs=7. Tilsvarende utvidelse for
+useinfo(2).<br>
+Oppdatert den innledende beskrivelsen<br>
+Utvidet beskrivelse i oppsummeringstabellen for kontrollflaggene og
+bruksflaggene.<br>
+      </small></a></p>
+      <p><a name="use15"><small>versjon 8.5:<br>
+      </small></a></p>
+      <p><a name="use15"><small>Lagt til fcombi - controlinfo(14).
+Justert regler for tilordning av useinfo(2)=1, useinfo(2)=2, og
+useinfo(2)=3.<br>
+      </small></a></p>
+      <p><a name="use15"><small>versjon 8.6:<br>
+      </small></a></p>
+      <p><a name="use15"><small>Fjernet bruken av controlinfo(0) -
+fqclevel. Omdefinert regelen for tilordning av useinfo(0) uten å
+endre flaggets betydning.<br>
+Ny flaggverdi fpre=5. Justert regler for tilordning av useinfo(2)=3,
+useinfo(3)=8, og useinfo(3)=4.<br>
+      </small></a></p>
+      <p><a name="use15"><small>versjon 8.6.1:<br>
+      </small></a></p>
+      <p><a name="use15"><small>Presisert betydningen av fd. Korrigert
+algoritmen for tilordning av useinfo(0), useinfo(2) og useinfo(3).<br>
+      </small></a></p>
+      <p><a name="use15"><small>versjon 8.6.2:<br>
+      </small></a></p>
+      <p><a name="use15"><small>Tilbakestilt en regel fra v. 8.5 om
+fmis og useinfo(2)=9. Skrevet om reglene for tilordning av useinfo(2).<br>
+      </small></a></p>
+      <p><a name="use15"><small>versjon 8.6.3:<br>
+      </small></a></p>
+      <p><a name="use15"><small>Korrigert algoritmen for tilordning av
+useinfo(2).<br>
+      </small></a></p>
+      <p><a name="use15"><small>versjon 8.6.4 og 8.6.5:<br>
+      </small></a></p>
+      <p><a name="use15"><small>Utvidet betydning av fd=2.<br>
+      </small></a></p>
+      <p><a name="use15"><small>versjon 8.7:<br>
+      </small></a></p>
+      <p><a name="use15"><small>Controlinfo: Korrigering av tekst for
+fnum=6, ftime=1,2,3, fd=1,2,6,7,A,B.&nbsp; Ny verdi 8 for fcc. Lagt inn
+forklaring av oppsamlet verdi.<br>
+Useinfo: Lagt til seksjonene: "Forståelse av kriterier" og "Forklaring
+av begreper" (den siste under useinfo(3)). Ny verdi 9 for useinfo(7).
+Endringer av kriterier for
+useinfo(2,3,4,7). Forenkling av tekst for
+setting av useinfo(1,2,3,4). Omdøping av useinfo(3) fra "Originalverdi
+korrigert" til "Behandling av originalverdi".<br>
+      </small></a></p>
+      <p><a name="use15"><small>versjon 8.7.1:<br>
+      </small></a></p>
+      <p><a name="use15"><small>Korrigert algoritmen for tilordning av
+useinfo(3).<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p>&nbsp;</p>
+Sist oppdatert av Pål Sannes 14. juni 2007
+<p></p>
+</body>
+</html>

@@ -1,0 +1,18 @@
+#!/bin/sh
+
+DESTINATION=
+DIRECTORIES="bin var/agregate"
+FILES=
+
+THISTOP=`pwd`
+
+if [ -f "kvAgregated" ]; then
+    mkdir -p bin
+    cp -fuv  kvAgregated bin
+else
+    echo "BUILD FIRST: `pwd`"
+    exit 0
+fi
+
+. $KVDIR/conf/INSTALL.conf
+

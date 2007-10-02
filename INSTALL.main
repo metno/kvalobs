@@ -1,0 +1,173 @@
+#!/bin/sh
+
+# INSTALL SCRIPT TO INSTALL THE COMPLETE KVALOBS SYSTEM!!!!
+# This script is the parent script to all
+# kvalobs INSTALL scripts which are located at the source directories.
+# the scripts include the $KVALOBS/conf/INSTALL.conf file
+# which contains all rules for the installation. 
+#
+# a standard INSTALL file executed by INSTALL.main
+# should look like this:
+#----------------------------------------------------------
+# #!/bin/sh
+# DESTINATION=                    [ path after $DESTINATION ]
+# DIRECTORIES=                    [ if you want to install some directories ]
+# FILES=                          [ if you want to install a list of files ]
+# . $KVDIR/conf/INSTALL.conf      [ include all targets ]
+#
+# if none of $DIRECTORIES or $FILES is defined 
+# INSTALL will install the complete tree below the 
+# place where INSTALL is located
+#
+#------------------------------------------------------------
+#
+# juergens@met.no 3/2004
+#
+
+if [ -z "$KVDIR" ]; then
+   export KVDIR=$PWD
+fi
+
+
+# PRETTY PARAMETERS: 
+
+BOLD="[1;31m"
+PLAIN="[0m"
+
+echo "$BOLD KVDIR is $KVDIR$PLAIN"
+
+
+# DEST is the main tree for installation 
+# like $HOME/production 
+
+DEST=
+
+
+HELP=
+FIND=
+FORCE=
+UNKNOWN=
+
+# COMMAND LINE PARSING =========================================
+
+while [ -n "$(echo $1 | grep '-')" ]; do
+    case $1 in
+    -force   ) FORCE="-f" ;;
+    -f       ) FORCE="-f" ;;
+    -help    ) HELP=TRUE;;
+    -h       ) HELP=TRUE;;
+    -dest    ) DEST="-d $2"
+		shift;;
+    -d       ) DEST="-d $2"
+		shift;;
+    -test    ) TEST="-t";;
+    -t       ) TEST="-t";;
+    -analyse ) FIND=TRUE;;
+    -a       ) FIND=TRUE;;
+    *        ) UNKNOWN=$1
+    esac
+    shift
+done
+
+TARGETS=
+
+while [ $1 ]; do
+   TARGET="$TARGETS $1"
+   TARGETS="$TARGET"      
+   shift
+done
+
+
+if [ $UNKNOWN ]; then
+    echo $BOLD
+    echo "UNKNOWN OPTION: $UNKNOWN" 	
+    echo "skipping INSTALL at $PWD"
+    echo $PLAIN
+    exit;
+fi
+
+# PRINT HELP FOR THE COMMANDLINE ================================
+
+if [ $HELP ]; then
+
+    echo $BOLD
+    echo "Script to install KVALOBS to the operational site"
+    echo "Usage: INSTALL <options> <target1 target2 ...>"
+    echo
+    echo "Options:                                             "
+    echo 
+    echo " -f  -force$PLAIN      FORCEs Installation / no confirm required "
+    echo $BOLD
+    echo " -d  -dest$PLAIN       main DESTination directory"
+    echo $BOLD
+    echo " -t  -test$PLAIN       TEST / dry run only"
+    echo $BOLD
+    echo " -a  -analyse$PLAIN    find all related INSTALL scripts and exit"
+    echo $BOLD
+    echo " -h  -help$PLAIN       shows this page"
+    echo
+  
+    exit;
+fi
+
+
+# INSTALL ==========================================================
+
+FLAGS="$FORCE $TEST $DEST" 
+
+
+if [ -z "$TARGETS" ]; then
+
+# IF NO TARGETS - FIND THEM ALL ----------------------------------
+
+   TARGETS=`find . -name INSTALL -type f -perm +ug+x`
+else 
+  BUF=
+
+# VALIDATE TARGETS -----------------------------------------------
+
+  for TARGET in $TARGETS; do
+    if [ -f "$TARGET/INSTALL" ]; then
+	BUF=$BUF" $TARGET"
+    else
+       echo $BOLD
+       echo "$TARGET""INSTALL not found  .........  skipping"	    
+       echo $PLAIN
+    fi
+  done
+  TARGETS=$BUF
+fi
+
+
+if [ "$FIND" ]; then
+   echo $BOLD
+   echo "ANALYSING: "
+   echo "WITHOUT THE -a FLAG THIS INSTALLATION WOULD PERFORM:"
+   echo $PLAIN
+fi
+    
+TOPDIR=$PWD
+
+# EXECUTE ALL INSTALL TARGETS -------------------------------------
+	
+for TARGET in $TARGETS; do
+
+    cd $TOPDIR
+
+    if [ "$FIND" ]; then
+	echo "$TARGET $FLAGS"
+    else
+	cd ${TARGET%%INSTALL}
+	./INSTALL $FLAGS
+    fi
+
+done
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,474 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<!--#include file="header.shtml" -->
+  <title>Kvalobs skriptings-veileder</title>
+</head>
+<body>
+<p> </p>
+<h1>VEILEDNING FOR KODING AV PERL-SKRIPT OG INNLEGGING AV SJEKKENES METADATA</h1>
+<p>Av Audun Christoffersen og Gabriel Kielland</p>
+<h2>Innledning</h2>
+<p> Her f&oslash;lger en veiledning for den som skal kode av skript til
+qaBase, samt n&oslash;dvendige prosedyrer for &aring; bruke skriptet i
+en sjekk. Veiledningen forklarer hvordan metadataene er strukturert,
+hvordan perlskriptet skal v&aelig;re utformet og hvilke parametere som
+er tilgjengelige i skriptene. For å se hvordan skriptene inngår i en 
+større sammenheng i Kvalobs, se <a href="http://kvalobs/spesifikasjoner/innholdsbruker.shtml">
+Sekvensiell beskrivelse av gangen gjennom Kvalobs</a></p>
+<p>
+Forfatteren av et qaBase perlskript skal levere tre ting til systemet: </p>
+<ul>
+  <li> et entydig navn p&aring; skriptet </li>
+  <li> en signatur for skriptet </li>
+  <li> selve perl-koden for utf&oslash;ring av sjekken </li>
+</ul>
+Disse utgj&oslash;r til sammen en rad i tabellen <i>algorithms</i>.
+<h2>Signaturen i tabellene algorithms og checks</h2>
+<p>
+Signaturen beskriver krav til data for skriptet: krav til
+observasjonsdata, modelldata og metadata. Signaturen brukes av qaBase
+for &aring; bygge opp datadelen av perlskriptet. Merk at signaturen
+opptrer to steder i tabellverket for kvalobs: i <i>algorithms</i> og i
+<i>checks</i>. I <i>algorithms</i> er signaturen en abstrakt
+beskrivelse av data-kravene for en sjekk - det er i kombinasjon med
+signaturen i <i>checks</i> at det faktiske datakrav for en spesifikk
+sjekk blir klart. Dette er mekanismen som muliggj&oslash;r gjenbruk av
+perlskripter - p&aring; stajonsniv&aring; og (for enkelte sjekktyper)
+p&aring; parameterniv&aring;.
+</p>
+<p> En signatur (i <i>algorithms</i> og i <i>checks</i>) har
+f&oslash;lgende struktur: </p>
+<pre> <b>signatur</b> = obs-<b>datakrav</b> [<b>|</b> refobs-<b>datakrav</b>][ <b>|</b> model-<b>datakrav</b> ][ <b>|</b> meta-<b>datakrav</b> ]<br> <br> <b>datakrav</b> = <b>datakilde;parameterliste;stasjonsliste;tidsintervall</b><br> <br> <b>datakilde</b> = <b>obs</b> eller <b>refobs</b> eller <b>model</b> eller <b>meta</b><br><br> <b>parameterliste</b> = <b>parameter,parameter,</b>...<br><br> <b>parameter</b> = parameternavn eller parameternavn<b>&amp;</b>level<b>&amp;</b>sensor<b>&amp;</b>typeID<br><br> <b>stasjonsliste</b> = stasjonsid<b>,</b>stasjonsid<b>,</b>... <br><br> <b>tidsintervall</b> = start<b>,</b>slutt<br> </pre>
+<b>Datakildene</b> har f&oslash;lgende betydning
+<ul>
+  <li> <b>obs</b> er observasjoner som skal oppdateres i denne sjekken
+(flagg-verdi og evnt. korreksjon og missing). </li>
+  <li><b>refobs</b> er observasjonsparametre som referansedata. </li>
+  <li><b>model</b> er modell-verdier som referansedata. </li>
+  <li><b>meta</b> er metadata for sjekken. </li>
+</ul>
+<br>
+<b>Syntaks for algorithms.signature:</b>
+<ul>
+  <li> <b>parameter</b> angis alltid med et enkelt navn; dette danner
+basis for variabelnavnet i skriptet, og forfatteren st&aring;r fritt i
+valg av navnet. </li>
+  <li> Stasjonsliste og tidsintervall skal v&aelig;re tomme i <i>algorithms</i>-signaturen
+- disse gir kun mening i realisasjonen for hver sjekk (signaturen i <i>checks</i>).
+  </li>
+  <li><b>Eksempler:</b><br>
+Signatur: <b>obs;X,Y;;</b> <br>
+Krav til data:
+    <ul>
+      <li>Observasjonsdata som skal oppdateres, parametere X og Y </li>
+    </ul>
+Signatur: <b>obs;X;;|refobs;rX;;|model;mX;;|meta;X_MID,X_STD;;</b> <br>
+Krav til data:
+    <ul>
+      <li>Observasjonsdata som skal oppdateres, parameter X </li>
+      <li>Observasjonsdata som referanse, parameter rX </li>
+      <li>Modelldata parameter mX </li>
+      <li>Metadata parametre X_MID og X_STD </li>
+    </ul>
+  </li>
+</ul>
+<br>
+<br>
+<b>Syntaks for checks.signature:</b>
+<ul>
+  <li> <b>Parameter:</b><br>
+I <i>checks</i> har <b>parameternavn</b> en streng betydning; For
+parametre i <b>obs</b> og <b>refobs</b> gruppene m&aring; navnet
+v&aelig;re et gyldig parameternavn hentet fra tabellen <b>param</b>
+(f.eks. <i>TA</i>). Dette angir data fra observasjonstabellen <i>data</i>.<br>
+For gruppen <b>model</b> m&aring; navnet v&aelig;re et gyldig
+parameternavn hentet fra tabellen <b>param</b>.<br>
+For gruppen <b>meta</b> m&aring; navnet angi en tilsvarende parameter
+i <i>station_param.metadata</i>, og syntaks her er <b>parameternavn_metadatanavn</b>,
+alts&aring; med parameternavn som prefix til &oslash;nsket
+<br>metadatavariabel; f.eks. vil <i>TA_MAX</i> angi verdien <i>MAX</i>
+fra <i>station_param.metadata</i> for <i>TA</i> og samme <i>qcx</i>.
+    <p>I <b>obs</b> og <b>refobs</b> gruppene kan parameternavn i
+tillegg
+presiseres med <b>level</b>, <b>sensor</b> og <b>typeID</b> etter
+syntaksen over - datatypen er heltall. Merk at konstruksjoner av typen <b>navn&amp;&amp;sensor&amp;</b>
+er lovlig - level og typeID er her ubestemt. </p>
+  </li>
+  <li> <b>Tidsintervall</b> angis med verdiene <b>start</b> og <b>stopp</b>
+som er antall minutter relativt til observasjonstidspunktet (T0) i
+synkende rekkef&oslash;lge. Eksempelvis vil tidsintervall=<b>0,-180</b>
+bety intervallet [T0, T0-180min]. De faktiske tidspunktene som blir
+funnet i datagrunnlaget vil tilsvarende bli skrevet ut i synkende
+rekkef&oslash;lge i perl-skriptet. Manglende angivelse av tidsintervall
+tolkes som <b>kun observasjonstidspunktet</b>. </li>
+  <li> <b>Stasjonsliste</b> er en kommaseparert liste over
+stasjonsid'er, og brukes hvis man trenger data fra andre stasjoner enn
+den aktuelle. En tom stasjonsliste betyr kun data fra aktuell stasjon -
+dvs stasjonen til observasjonen som utl&oslash;ste sjekken. </li>
+  <li><b>Eksempler (svarer til eksemplene for algorithms):</b><br>
+Signatur: <b>obs;TA,TAX;;</b> <br>
+Krav til data:
+    <ul>
+      <li>Observasjonsdata som skal oppdateres, parametere TA og TAX.
+Kun observasjonstidspunktet og aktuell stasjon. </li>
+    </ul>
+Signatur: <b>obs;TA;;0,-180|refobs;TA;18700;0,-180|model;TA;;|meta;TA_MID,TA_STD;;</b>
+    <br>
+Krav til data:
+    <ul>
+      <li>Observasjonsdata som skal oppdateres, parameter TA. Aktuell
+stasjon og alle observasjoner mellom aktuell observasjonstidspunkt og 3
+timer tilbake. </li>
+      <li>Observasjonsdata som referanse, parameter TA for aktuell
+stasjon samt stasjon 18700, og samme tidsintervall som for
+observasjonene. </li>
+      <li>Modelldata parameter TA for aktuell stasjon og tidspunkt </li>
+      <li>Metadata parametre TA_MID og TA_STD </li>
+    </ul>
+  </li>
+</ul>
+<hr>
+<h2>Perlkoden</h2>
+<p>
+Perlkoden skal best&aring; av en funksjon med navnet <b>check</b>
+etter mal
+nedenfor. Datadelen av skriptet vil bli generert automatisk av
+qaBase-modulen p&aring; bakgrunn av signaturen og informasjon for hver
+enkelt sjekk (i tabellene <i>checks</i> og <i>station_param</i>).
+</p>
+<p> Mal for sjekkfunksjon:<br>
+</p>
+<pre> sub check {<br><br> # Koden for selve testen<br><br> # - Variabelnavn for data skal v&aelig;re i overenstemmelse<br><br> # med de som er oppgitt i signaturen.<br><br> # - Funksjonen har selv ansvar for &aring; sjekke for manglende<br><br> # data (se "Datadelen i et Perl-skript" nedenfor)<br><br> # Funksjonen m&aring;:<br><br> # 1. sette flagg til ny verdi for alle parametre i<br><br> # obs-delen av signaturen - og returnere denne.<br><br> # Funksjonen kan ogs&aring;:<br><br> # 1. returnere korreksjon for en parameter i obs-<br><br> # delen av signaturen<br><br> # 2. returnere ny missing-status for en parameter i obs-<br><br> # delen av signaturen<br> <br><br> # retur fra funksjonen er:<br><br> # 1) antall p&aring;f&oslash;lgende returverdier<br><br> # 2) liste med alternerende navn og verdi etter<br><br> # f&oslash;lgende struktur:<br><br> # X_0_0_flag,1,X_0_0_corrected,27.0,...<br><br><br> my @retvector = ("X_0_0_flag",1); # kun flaggverdi ut her<br><br> my $numout= @retvector; # antall returverdier<br><br> return (@retvector, $numout);<br> }<br> </pre>
+<h4>Returverdier</h4>
+Returverdiene fra skriptet sendes (som nevnt i malen over) i en liste
+med alternerende navn og verdi. Navnene har f&oslash;lgende syntaks:<br>
+<b>PARNAVN</b>_<b>TIDINDEX</b>_<b>STASJONSINDEX</b>_<b>DATATYPE</b> <br>
+med betydningen:
+<ul>
+  <li><b>PARNAVN</b> er navn p&aring; parameter i <i>algorithms</i>-signaturen
+  </li>
+  <li><b>TIDINDEX</b> angir tidspunkt for verdien (se neste avsnitt (om
+datadelen) for nummerering av tidspunkter). Verdien <b>0</b> betyr
+aktuelt observasjonstidspunkt. </li>
+  <li><b>STASJONSINDEX</b> angir hvilken stasjon verdien gjelder for
+(se neste avsnitt for nummerering av stasjoner). </li>
+  <li><b>DATATYPE</b> er en av:
+    <ol>
+      <li><b>"flag"</b> som angir kontrollflaggverdi </li>
+      <li><b>"corrected"</b> som angir ny korrigert observasjonsverdi </li>
+      <li><b>"missing"</b> som angir ny verdi for missing-flagget i
+kontrollflaggene (se flagg-dokumentasjonen for lovlige verdier). </li>
+    </ol>
+  </li>
+</ul>
+Merk at det kun er observasjoner som er angitt i <b>obs</b>-delen av
+checks-signaturen som kan oppdateres med disse returverdiene. <b>refobs</b>-observasjoner
+er, som navnet antyder, kun for konstante referanseverdier &aring;
+regne.
+<hr>
+<h2>Kj&oslash;ring av sjekk-skript</h2>
+<p>
+Etter &aring; ha lagt inn et nytt skript i <i>algorithms</i> kan du
+gj&oslash;re klart for &aring; kj&oslash;re sjekken i qaBase. Dette
+gj&oslash;res ved &aring; legge inn nye rader i <i>checks</i>-tabellen
+som refererer til det nye skriptet. Se i database-dokumentasjonen for
+aktuelle felter i denne tabellen. En av n&oslash;klene er <i>stationid</i>
+(identifikatoren for stasjonen du &oslash;nsker &aring; kj&oslash;re
+sjekken p&aring;). Du m&aring; oppgi en konkret signatur med offisielle
+parameternavn og lister over ekstra stasjoner og tidspunkt. Denne
+signaturen m&aring; passe til signaturen du la inn i <i>algorithms</i>,
+dvs. datakilder og antall parametere for hver av disse m&aring; stemme
+overens. <br>
+<br>
+Se eksemplene senere i dokumentet.
+</p>
+<p> </p>
+<hr>
+<h2>Datadelen i et Perl-skript</h2>
+<p>
+Som nevnt over vil datadelen lages automatisk av qaBase-modulen. Hvilke
+observasjons/modell/metadata variable som skal inng&aring; i skriptet
+ved hver enkel sjekk kommer frem ved &aring; kombinere informasjon i
+signaturen (attributt <i>signature</i> i tabell <i>algorithms</i>)
+med dens realisasjon for den aktuelle sjekken (attributt <i>checksignature</i>
+i tabell <i>checks</i> og tilh&oslash;rende <i>metadata</i> i tabell <i>)station_param</i>.
+</p>
+<p> Merknader: </p>
+<ol>
+  <li> Navn p&aring; data-variablene hentes fra signaturen, navn
+p&aring; tid og stasjons-variablene er faste. </li>
+  <li> Manglende data kan forekomme i datalistene for observasjoner og
+referanse-observasjoner. Dette angis p&aring; to m&aring;ter:
+    <ul>
+      <li> En skalar for observasjonene ($obs_missing) og en for
+referanse-observasjonene ($refobs_missing) angir om det finnes mangler
+i denne datadelen. </li>
+      <li> Med hver dataliste f&oslash;lger det med en liste (struktur
+identisk med datalisten) som angir "manglende-status" for hver verdi.
+Navn som datalisten med suffix "_missing". </li>
+    </ul>
+  </li>
+  <li>I tilfellet innlesing av flere tidsserier med ulik
+tidsoppl&oslash;sning vil skriptet ha tilgjengelig "manglende data" som
+ikke er registrert i tabellen <i>data</i>, og som heller ikke blir
+skrevet tilbake dit.</li>
+  <li> Aktuell stasjon er implisitt, dvs at en tom stasjons-del i <i>checksignature</i>
+vil allikevel gi data for aktuell stasjon. </li>
+  <li> Aktuelt observasjonstidspunkt er implisitt, dvs at en tom
+tid-del i <i>checksignature</i> vil allikevel gi data for
+observasjonstidspunktet. </li>
+</ol>
+Det vil opprettes fire uavhengige deler, en for hver av de fire
+datakildene:
+<p> </p>
+<ul>
+  <li> Datadel: observasjoner<br>
+    <pre> # Observasjonstidspunkt (for observasjon som trigget denne sjekken)<br><br> @obstime=(YYYY,MM,DD,hh,mm,ss); # alltid inkludert<br><br><br> # Tider. Tidspunkt (som avvik i minutter fra obstime) vi har<br><br> # observasjonsdata for. <br> $obs_numtimes=2;<br> @obs_timeoffset=(0,-180);<br><br><br> # Stasjoner. Stasjoner vi har observasjonsdata for.<br> $obs_numstations=2;<br> @obs_stations=(1001,1023);<br><br><br> # Angir om det finnes mangler i observasjonsdataene<br><br> # 0=ingen mangler, 1=det eksisterer mangler<br> $obs_missing=0;<br><br><br> # Selve observasjonsdataene. Disse er representert med en liste for<br><br> # hver parameter (parametrisert p&aring; TID og STASJON).<br><br> # N&oslash;kkel for datalistene (med eksempel fra variablene over): <br><br> # - sidx = stasjonsindex. Eksempel: 0= stasjon 1001, 1=1023<br><br> # - tidx = tidindex. Eksempel: 0=observasjonstidspunkt, 1= 3 timer<br><br> # tidligere<br><br> # verdi= $X[sidx*obs_numtimes + tidx];<br><br> # <br> #============================================================<br><br> # Navn p&aring; variabel hentes fra signaturen<br> @X=(19.3,19.4,19.5,19.6);<br><br><br> # Mangler i datalisten angis i egen liste (identisk struktur):<br><br> # 0=OK, 1=original verdi mangler, 2=korrigert verdi mangler,<br><br> # 3=original og korrigert verdi mangler.<br> @X_missing=(0,0,0,0);<br><br><br> # Angir gjeldende kontrollflaggverdi.<br><br> # Flagget kan v&aelig;re satt ved en tidligere kj&oslash;ring som benyttet samme kontrollflaggposisjon<br> @X_controlinfo=(0,0,0,0);</pre>
+  </li>
+  <li> Datadel: referanseobservasjoner (strukturmessig lik
+observasjonsdelen)
+    <pre> # Tider. Tidspunkt (som avvik i minutter fra obstime) vi har<br><br> # observasjonsdata for.<br> $refobs_numtimes=1;<br> @refobs_timeoffset=(0);<br><br><br> # Stasjoner. Stasjoner vi har observasjoner for.<br> $refobs_numstations=1;<br> @refobs_stations=(1001);<br><br><br> # Noen mangler i datalistene?<br> $refobs_missing=0;<br><br><br> # Selve dataene. Disse er representert som for observasjonene.<br><br> # Navn p&aring; variabel hentes fra signaturen<br> @rX=(21.3);<br><br><br> # Mangler i datalisten<br> @rX_missing=(0);<br></pre>
+  </li>
+  <li> Datadel: modelldata (strukturmessig lik observasjonsdelen)
+    <pre> # Tider. Tidspunkt (som avvik i minutter fra obstime) vi har<br><br> # modelldata for.<br> $model_numtimes=1;<br> @model_timeoffset=(0);<br><br><br> # Stasjoner. Stasjoner vi har modelldata for.<br> $model_numstations=1;<br> @model_stations=(1001);<br><br><br> # Selve modelldataene. Disse er representert som for observasjonene.<br><br> # Navn p&aring; variabel hentes fra signaturen<br> @mX=(24.3);<br></pre>
+  </li>
+  <li> Datadel: Metadata (strukturmessig lik observasjonsdelen)<br>
+    <pre> # Tider. Tidspunkt (som avvik i minutter fra obstime) vi har metadata for.<br> $meta_numtimes=1;<br> @meta_timeoffset=(0);<br><br><br> # Stasjoner. Stasjoner vi har metadata for.<br> $meta_numstations=1;<br> @meta_stations=(1001);<br><br><br> # Selve metadataene. Disse er representert som for observasjonene.<br><br> # Navn p&aring; variabler hentes fra signaturen<br> @X_STD=(4.3);<br> @X_MID=(23.1);<br><br></pre>
+  </li>
+</ul>
+<h2>Komplette eksempler</h2>
+<p>
+<b>EKSEMPEL 1</b>
+</p>
+<hr> Det skal lages en generell sjekk-rutine for alle QC1-1
+(grenseverdi) sjekker.<br>
+Pga sjekkens natur kan den parametriseres p&aring; parameter - dvs vi
+benytter et anonymt variabelnavn for observasjonsparameteren. Vi kaller
+variabelen X.
+<p> For disse sjekkene trenger vi </p>
+<ol>
+  <li> observasjonen for aktuell stasjon/tidspunkt </li>
+  <li> ingen referanseobservasjoner eller modellverdier </li>
+  <li> grenseverdier for aktuell parameter (vi tar her et subsett av
+sjekkene i QC1-1) </li>
+</ol>
+Signaturen blir da: <b>obs;X;;|meta;X_MIN,X_MAX;;</b>
+<p> Perlskriptet kan se slik ut: </p>
+<pre><code><br># RANGE_CHECK<br><br>sub check {<br> # sjekk for manglende data<br> if ($X_missing[0] &gt; 0){<br> # aborter..<br> return 0;<br> }<br> my $flag= 1;<br> if ($X[0] &gt; $X_MAX[0]){<br> $flag= 2;<br> #print "value:$X[0] is larger than max:$X_MAX[0]\n";<br> } elsif ($X[0] &lt; $X_MIN){<br> $flag= 3;<br> #print "value:$X[0] is smaller than min:$X_MIN[0]\n";<br> }<br> <br> my @retvector = ("X_0_0_flag",$flag);<br> my $numout= @retvector;<br> return (@retvector, $numout);<br>}<br><br></code></pre>
+Vi kaller denne sjekken <b>RANGE_CHECK</b> og lagrer spr&aring;k,
+navn, signatur og perlskript i tabellen <i>algorithms</i>:
+<table border="1" frame="void">
+  <tbody>
+    <tr>
+      <th>Attributt </th>
+      <th>Verdi </th>
+      <th>Forklaring </th>
+    </tr>
+    <tr>
+      <td>language </td>
+      <td>1 </td>
+      <td>Perl-skript </td>
+    </tr>
+    <tr>
+      <td>checkname </td>
+      <td>RANGE_CHECK </td>
+      <td>Navn p&aring; sjekk i <i>algorithms</i> </td>
+    </tr>
+    <tr>
+      <td>signature </td>
+      <td><code>obs;X;;|meta;X_MIN,X_MAX;;</code> </td>
+      <td>Generell signatur </td>
+    </tr>
+    <tr>
+      <td>script </td>
+      <td>
+      <pre><code><br># RANGE_CHECK<br><br>sub check {<br><br> # sjekk for manglende data<br> if ($X_missing[0] &gt; 0){<br><br> # aborter..<br> return 0;<br> }<br> my $flag= 1;<br> if ($X[0] &gt; $X_MAX[0]){<br> $flag= 2;<br> #print "value:$X[0] is larger than max:$X_MAX[0]\n";<br> } elsif ($X[0] &lt; $X_MIN){<br> $flag= 3;<br> #print "value:$X[0] is smaller than min:$X_MIN[0]\n";<br> }<br> <br> my @retvector = ("X_0_0_flag",$flag);<br> my $numout= @retvector;<br> return (@retvector, $numout);<br>}<br></code></pre>
+      <br>
+      </td>
+      <td> Her lagres selve skriptet </td>
+    </tr>
+  </tbody>
+</table>
+<p> Neste skritt er &aring; opprette en sjekk som benytter denne
+rutinen. Det involverer &aring; legge inn en ny rad i tabellen <i>checks</i>
+som refererer til rutinen. Vi legger inn:
+<table border="1" frame="void">
+  <tbody>
+    <tr>
+      <th>Attributt </th>
+      <th>Verdi </th>
+      <th>Forklaring </th>
+    </tr>
+    <tr>
+      <td>stationid </td>
+      <td>97250 </td>
+      <td>Karasjok </td>
+    </tr>
+    <tr>
+      <td>qcx </td>
+      <td>QC1-1-ex</td>
+      <td>Navn p&aring; sjekk i <i>checks</i></td>
+    </tr>
+    <tr>
+      <td>medium_qcx</td>
+      <td>QC1-1</td>
+      <td>bestemmer sjekkens rekkef&oslash;lge og
+kontrollflaggposisjonen</td>
+    </tr>
+    <tr>
+      <td>language </td>
+      <td>1 </td>
+      <td>Perl-skript </td>
+    </tr>
+    <tr>
+      <td>checkname </td>
+      <td>RANGE_CHECK </td>
+      <td>Navn p&aring; sjekk i <i>algorithms</i> </td>
+    </tr>
+    <tr>
+      <td>checksignature </td>
+      <td><code>obs;TA;;|meta;TA_low,TA_high;;</code> </td>
+      <td>Aktuell signatur </td>
+    </tr>
+    <tr>
+      <td>active </td>
+      <td>* * * * * </td>
+      <td>Sjekken kj&oslash;rer alltid</td>
+    </tr>
+    <tr>
+      <td>fromtime </td>
+      <td>'1500-01-01 00:00:00'</td>
+      <td>Sjekken gjelder alle observasjoner siden da</td>
+    </tr>
+  </tbody>
+</table>
+</p>
+<p> I <b><i>checksignature</i></b> ser vi hvordan den anonyme
+X-variabelen i
+signaturen f&aring;r en reell verdi, i dette tilfelle temperatur TA.
+Legg merke til her at for metadataene TA_high og TA_low s&aring; er de
+satt sammen av navnet til paramid(TA) og navnet p&aring; det subsettet
+av metadata vi er interessert i, nemlig high og low. Navnene high og
+low skal v&aelig;re lagt inn i <i>station_param.metadata</i>. Det
+finnes
+ogs&aring; andre metadata for QC1-1 og det er highest og lowest. </p>
+<p> N&aring;r denne sjekken blir utf&oslash;rt vil <b>qaBase</b>
+generere en datadel for skriptet basert p&aring; signaturen og <b>checksignature</b>
+over. Her er det ferdige skriptet som vil bli kj&oslash;rt av
+Perl-interpreteren:</p>
+<pre><code><br><br>#==========================================<br><br># QC1 check-script<br># type:QC1-1 range_check<br><br>#==========================================<br><br><br>#==========================================<br><br># MetaData<br><br>#<br>$meta_numtimes=1;<br>@meta_timeoffset=(0);<br><br>$meta_numstations=1;<br>@meta_stations=(97250);<br><br>@X_MIN=(-10);<br>@X_MAX=(10);<br><br><br>#==========================================<br><br># Data<br><br>#<br>@obstime=(2002,6,3,12,0,0);<br><br>$obs_numtimes=1;<br>@obs_timeoffset=(0);<br><br>$obs_numstations=1;<br>@obs_stations=(97250);<br><br>$obs_missing=0;<br><br>@X=(19.3);<br>@X_missing=(0);<br><br>#<br><br>#==========================================<br><br><br># RANGE_CHECK<br><br>sub check {<br> <br># sjekk for manglende data<br> if ($X_missing[0] &gt; 0){<br> <br># aborter..<br> return 0;<br> }<br> my $flag= 1;<br> if ($X[0] &gt; $X_MAX[0]){<br> $flag= 2;<br><br> #print "value:$X[0] is larger than max:$X_MAX[0]\n";<br> } elsif ($X[0] &lt; $X_MIN){<br> $flag= 3;<br><br> #print "value:$X[0] is smaller than min:$X_MIN[0]\n";<br> }<br> <br> my @retvector = ("X_0_0_flag",$flag);<br> my $numout= @retvector;<br> return (@retvector, $numout);<br>}<br><br></code></pre>
+<p>
+<b>EKSEMPEL 2</b> </p>
+<hr> Vi lager en fiktiv sjekk-rutine som skal sjekke parameter X. Den
+trenger observasjonsdata for parametere X og Y for flere stasjoner og
+flere tider, modelldata for parametere X og Y for
+observasjonstidspunktet og aktuell stasjon, og meta-data for parameter
+X. Rutinen kan returnere en ny verdi for observasjons-parameteren X.
+<p>Signaturen blir da:<br>
+<b>obs;X;;|refobs;Y;;|model;model_X,model_Y;;|meta;X_ME,X_SDE;;</b>
+</p>
+<p>Perlskriptet kan se slik ut:<br>
+</p>
+<pre><code><br><br># COMPLEX_CHECK<br><br>sub check {<br><br> # <br> # gj&oslash;r noen tester - og returner en ny verdi for X <br><br> # Merk at data returneres ved &aring; pushe variabelnavn og deretter verdi<br><br> # p&aring; stacken<br> <br> # Denne rutinen tolererer ingen manglende observasjoner:<br> if ($obs_missing &gt; 0){<br><br> # aborter..<br> return 0;<br> }<br><br> my @retvector;<br> push(@retvector, "X_0_0_flag");<br> push(@retvector, 7);<br> push(@retvector, "X_0_0_corrected");<br> push(@retvector, 12.1);<br><br> my $numout= @retvector; # antall returverdier<br><br> return (@retvector, $numout);<br>}<br><br></code></pre>
+Vi kaller denne sjekken <b>COMPLEX_CHECK</b> og lagrer spr&aring;k,
+navn, signatur og perlskript i tabellen <i>algorithms</i>:
+<table border="1" frame="void">
+  <tbody>
+    <tr>
+      <th>Attributt </th>
+      <th>Verdi </th>
+      <th>Forklaring </th>
+    </tr>
+    <tr>
+      <td>language </td>
+      <td>1 </td>
+      <td>Perl-skript </td>
+    </tr>
+    <tr>
+      <td>checkname </td>
+      <td>COMPLEX_CHECK </td>
+      <td>Navn p&aring; sjekk i <i>algorithms</i> </td>
+    </tr>
+    <tr>
+      <td>signature </td>
+      <td><code>obs;X;;|refobs;Y;;|model;model_X,model_Y;;|meta;X_ME,X_SDE;;</code>
+      </td>
+      <td>Generell signatur </td>
+    </tr>
+    <tr>
+      <td>script </td>
+      <td>
+      <pre><code><br># COMPLEX_CHECK<br><br>sub check {<br><br> # <br><br> # gj&oslash;r noen tester - og returner en ny verdi for X <br><br> # Merk at data returneres ved &aring; pushe variabelnavn og deretter verdi<br><br> # p&aring; stacken<br> <br><br> # Denne rutinen tolererer ingen manglende observasjoner:<br> if ($obs_missing &gt; 0){<br><br> # aborter..<br> return 0;<br> }<br> <br> my @retvector;<br> push(@retvector, "X_0_0_flag");<br> push(@retvector, 7);<br> push(@retvector, "X_0_0_corrected");<br> push(@retvector, 12.1);<br> my $numout= @retvector; # antall returverdier<br><br><br> return (@retvector, $numout);<br>}<br></code></pre>
+      <br>
+      </td>
+      <td> Her lagres selve skriptet </td>
+    </tr>
+  </tbody>
+</table>
+<p>
+Neste skritt er &aring; opprette en sjekk som benytter denne rutinen.
+Vi
+legger inn en ny rad i tabellen <i>checks</i> som refererer til
+rutinen:</p>
+<p>
+<table border="1" frame="void">
+  <tbody>
+    <tr>
+      <th>Attributt </th>
+      <th>Verdi </th>
+    </tr>
+    <tr>
+      <td>stationid </td>
+      <td>97250 </td>
+    </tr>
+    <tr>
+      <td>qcx </td>
+      <td>QC1-4-ex</td>
+    </tr>
+    <tr>
+      <td>medium_qcx</td>
+      <td>QC1-4</td>
+    </tr>
+    <tr>
+      <td>language </td>
+      <td>1 </td>
+    </tr>
+    <tr>
+      <td>checkname </td>
+      <td>COMPLEX_CHECK </td>
+    </tr>
+    <tr>
+      <td>checksignature </td>
+      <td><code>obs;TA;1003,1014;0,-180|refobs;TD;1003,1014;0,-180|model;TA,TD;;|meta;TA_ME,TA_SDE;;</code>
+      </td>
+    </tr>
+    <tr>
+      <td>active </td>
+      <td>* * * * *</td>
+    </tr>
+    <tr>
+      <td>fromtime </td>
+      <td>'2000-12-31 23:59:59'</td>
+    </tr>
+  </tbody>
+</table>
+</p>
+<p> I <b>checksignature</b> ser vi en realisasjon av den abstrakte
+signaturen over. Her sier vi at TA er aktuell observasjonsparameter og
+at vi i tillegg trenger TD som referanse-observasjon. Observasjonene
+skal hentes for stasjonene: 97250,1003,1014 og for alle tider mellom
+aktuell observasjonstid og 180 minutter tilbake i tid. Vi vil ha
+modell-data for TA og TD for stasjon:97250 og aktuell observasjonstid.
+Vi vil ogs&aring; ha meta-dataene TA_ME og TA_SDE for stasjon: 97250. </p>
+<p> Her er det ferdige skriptet som vil bli kj&oslash;rt av
+Perl-interpreteren:</p>
+<p> </p>
+<pre><code><br><br>#==========================================<br><br># QC1 check-script<br><br># type:QC1-4 <br><br>#==========================================<br><br><br>#==========================================<br><br># MetaData<br>#<br><br>$meta_numtimes=1;<br>@meta_timeoffset=(0);<br><br>$meta_numstations=1;<br>@meta_stations=(97250);<br><br>@X_ME=(12.0);<br>@X_SDE=(5.0);<br><br><br>#==========================================<br><br># Data<br><br>#<br>@obstime=(2002,6,3,12,0,0);<br><br><br>$obs_numtimes=4;<br>@obs_timeoffset=(0,-60,-120,-180);<br><br><br>$obs_numstations=3;<br>@obs_stations=(97250,1003,1014);<br><br><br>$obs_missing=0;<br><br><br>@X=(19.3,17.5,16.1,14.6,16.2,16.6,19.3,17.5,16.1,14.6,16.2,16.4);<br>@X_missing=(0,0,0,0,0,0,0,0,0,0,0,0);<br>@X_controlinfo=(0,0,0,0,0,0,0,0,0,0,0,0);<br><br><br>$refobs_numtimes=4;<br>@refobs_timeoffset=(0,-60,-120,-180);<br><br><br>$refobs_numstations=3;<br>@refobs_stations=(97250,1003,1014);<br><br><br>$refobs_missing=0;<br><br><br>@Y=(17.3,15.5,13.1,12.6,13.2,14.6,15.3,16.5,11.1,12.6,12.2,11.4);<br>@Y_missing=(0,0,0,0,0,0,0,0,0,0,0,0);<br>@Y_controlinfo=(0,0,0,0,0,0,0,0,0,0,0,0);<br><br><br>$model_numtimes=1;<br>@model_timeoffset=(0);<br><br><br>$model_numstations=1;<br>@model_stations=(97250);<br><br><br>@model_X=(21.2);<br>@model_Y=(14.2);<br><br><br>#<br><br>#==========================================<br><br><br># COMPLEX_CHECK<br><br>sub check {<br><br> # <br> # gj&oslash;r noen tester - og returner en ny verdi for X <br><br> # Merk at data returneres ved &aring; pushe variabelnavn og deretter verdi<br><br> # p&aring; stacken<br> <br><br> # Denne rutinen tolererer ingen manglende observasjoner:<br><br> if ($obs_missing &gt; 0){<br><br> # aborter..<br> return 0;<br> }<br> <br> my @retvector;<br> push(@retvector, "X_0_0_flag");<br> push(@retvector, 7);<br> push(@retvector, "X_0_0_corrected");<br> push(@retvector, 12.1);<br> my $numout= @retvector; # antall returverdier<br><br> return (@retvector, $numout);<br>}<br><br><br></code></pre>
+<hr>
+<p>&nbsp;</p>
+Last modified: Thu Mar 15 15:00:00 GMT 2007
+<br>
+<br>
+</body>
+</html>

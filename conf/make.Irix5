@@ -1,0 +1,212 @@
+######
+#
+# WARNING WARNING WARNING WARNING
+#
+# This is a minimalist setup file for Irix. It is used only to
+# compile milog and confparser. Nothing else is will work
+#
+######
+
+# This file contains common setup for compiler, OMNIORB, postgresql, 
+# BOOST and PERL. It is defined five variables that control where we 
+# shall look for this common tools. They are:
+# GCCBIN       - where is gcc installed. PATH is used for default search
+#                after gcc and g++. To override this default, define GCCBIN
+#                in your environment.
+# OMNIORB_HOME - Where shall we look for OMNIORB. Default value is
+#                defined in this file. To override this default 
+#                define OMNIORB_HOME in your environment.
+# BOOST_HOME   - Where shall we look for BOOST. Default value is
+#                defined in this file. To override this default define 
+#                BOOST_HOME in your environment.
+# POSTGRESQL_HOME - Where is postgresql installed. Default /usr/local/pgsql
+# SQLITEINCLUDE   - Where is the header files to sqlite.
+# SQLITELIB       - Where is the sqlite library files.
+#
+# PERL_BIN     - Where is PERL. To override this default define
+#                PERL_BIN in your environment
+# QTDIR        - Where is qt installed.
+#
+# Where can we find the tools we depend on. 
+# gcc        - http://gcc.gnu.org
+# BOOST      - http://www.boost.org
+# OMNIORB    - http://www.omniorb.org
+# postgresql - http://www.postgresql.org
+# qt         - http://www.trolltech.com
+# sqlite     - http://www.sqlite.org
+
+#Where shall we install this program package.
+LOCALDIR=/usr/local
+
+
+#Default for where to install lib / include for libraries ....
+
+INCTO=../$(TOP)/include/$(LIBNAME)
+INCFROM=include
+
+LIBFROM=obj
+LIBTO=$(TOP)/lib
+IIGNORE=
+
+TOBIN:=$(TOP)/bin
+
+# Platform suffix
+PLT=
+
+ifdef SQLITEINCLUDE
+  ifndef SQLITEINCLUDE_DEFINED
+    SQLITEINCLUDE:= -I$(SQLITEINCLUDE)
+    SQLITEINCLUDE_DEFINED=1
+    export SQLITEINCLUDE_DEFINED
+  endif
+endif
+
+ifdef SQLITELIB
+  ifndef SQLITELIB_DEFINED
+    SQLITELIB:= -L$(SQLITELIB) -lsqlite
+    SQLITELIB_DEFINED=1
+    export SQLITELIB_DEFINED
+  endif
+endif
+
+ifndef QTDIR
+QTDIR=/usr/local/qt
+endif
+
+#Where is postgresql installed
+ifdef POSTGRESQL_HOME
+POSTGRESQL_HOME:=$(POSTGRESQL_HOME)
+else
+POSTGRESQL_HOME:=/usr/local/pgsql
+endif
+
+
+#Where is BOOST and OMNIORB installed
+ifdef OMNIORB_HOME
+OMNIORB_HOME:=$(OMNIORB_HOME)
+else
+OMNIORB_HOME:=/usr/local
+endif
+
+ifdef BOOST_HOME
+BOOST_HOME:=$(BOOST_HOME)
+else
+BOOST_HOME:=/usr/local
+endif
+
+#CORBA library for java
+ifdef JACORB_HOME
+JACORB_HOME:=$(JACORB_HOME)
+else
+JACORB_HOME:=$(HOME)/jacorb
+endif
+
+JACORBJAR:=$(JACORB_HOME)/lib/jacorb.jar
+IDLJAVA:=$(JACORB_HOME)/bin/idl
+
+export JACORB_HOME JACORBJAR IDLJAVA
+
+
+#JAVA compiler 
+ifdef JAVA_HOME
+JAVAC:=$(JAVA_HOME)/bin/javac
+JAVADOC:=$(JAVA_HOME)/bin/javadoc
+else
+JAVAC:=javac
+JAVADOC:=javadoc
+endif
+
+export JAVADOC JAVAC
+
+
+
+
+ifdef GCCBIN
+  GCCBIN:=$(GCCBIN)/
+  GCCBIN:=$(subst //,/,$(GCCBIN))
+else
+  GCCBIN:=/usr/local/bin/
+endif
+
+#Where is perl installed
+####PERL_HOME:=/usr/lib/perl/5.6.1
+####PERL_HOME:=/usr/local/lib/perl5/5.8.0
+
+ifndef PERL_BIN
+  PERL_BIN:=perl
+endif
+
+
+#dummy:
+#	@echo 'GCCBIN=$(GCCBIN)'
+#	@echo 'POSTGRESQL_HOME=$(POSTGRESQL_HOME)'
+
+LEX=flex
+
+# Compilers etc
+
+CXX=/usr/bin/CC
+
+#IDLCXX og IDLCXXANY angir hvilke idl-kompilator som skal brukes!
+IDLCXX=$(OMNIORB_HOME)/bin/omniidl -bcxx -Wbexample
+IDLCXXANY=$(OMNIORB_HOME)/bin/omniidl -bcxx -Wba
+
+
+AR=CC 
+ARFLAGS= -ar -o
+
+COMMONFLAGS=-n32 -g -c -float -ansi -LANG:ansi-for-init-scope=ON -LANG:std \
+	    -LANG:exceptions=ON -woff 3303,1110,1182 -I$(HOME)/include/CC 
+
+# Which flag must be set for shared libs.
+CXXSOFLAGS=-fPIC
+CXXLDSOFLAGS=-shared 
+
+#If we loads shared object with dlopen we must use extra link option when
+#linking our programs. This is for g++ compiled shared objects.
+#See the gcc FAQ at http://gcc.gnu.org/faq.html for a further explenation.
+CXXLINKSO=$(COMMONFLAGS) -Wl,-E
+
+
+
+# CXX-flags
+CXXFLAGS=  $(COMMONFLAGS) 
+CXXLDFLAGS=$(COMMONFLAGS) -L$(HOME)/lib
+
+# C-flags
+CFLAGS=   $(COMMONFLAGS) -pthread
+CLDFLAGS= $(COMMONFLAGS) -pthread
+
+
+# Some includes
+XINCLUDE= -I/usr/X11R6/include
+GLINCLUDE=-I/usr/local/include
+FTINCLUDE=-I/usr/local/include
+GLTTINCLUDE=-I/usr/local/include/gltt
+OMNIINCLUDE= -I$(OMNIORB_HOME)/include/omniorb \
+	     -I$(OMNIORB_HOME)/include/omniorb/omniORB4
+BOOSTINCLUDE=-I$(BOOST_HOME)/include
+
+ifndef PSQL_INCLUDE
+POSTGRESINCLUDE=-I$(POSTGRESQL_HOME)/include -I$(POSTGRESQL_HOME)/include/pgsql
+else
+POSTGRESINCLUDE=-I$(PSQL_INCLUDE)
+endif
+
+PERLCCOPTS=`$(PERL_BIN) -MExtUtils::Embed -e ccopts`
+
+# Where is the libs...
+ifndef PSQL_LIB
+POSTGRESLIB=-L$(POSTGRESQL_HOME)/lib
+else
+POSTGRESLIB=-L$(PSQL_LIB)
+endif
+
+OMNILIB=-L$(OMNIORB_HOME)/lib
+BOOSTLIB=-L$(BOOST_HOME)/lib
+PERLLIBS=`$(PERL_BIN) -MExtUtils::Embed -e ldopts`
+
+
+export OMNIINCLUDE BOOSTINCLUDE POSTGRESINCLUDE PERLCCOPTS
+export POSTGRESLIB OMNILIB BOOSTLIB PERLLIBS QTDIR
+export SQLITEINCLUDE SQLITELIB

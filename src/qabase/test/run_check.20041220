@@ -1,0 +1,137 @@
+#!/bin/sh
+
+#set -ax
+
+BLUE="[0;34m"
+RED="[0;31m"
+NORM="[0;0;0m"
+
+function yes_no()
+{
+    echo -n "[j/n] : "
+    stty raw         # Get one Character 
+    readchar=`dd if=/dev/tty bs=1 count=1 2>/dev/null`
+    stty -raw
+    echo
+
+    if [ $readchar != 'j' -a $readchar != 'J' ]; then
+         return 0        
+    fi
+    return 1
+}
+
+htmltop=/disk1/kvalobs
+oprhtml=qabase-log
+tsthtml=tst-log
+refhtml=ref-log
+bindir=$KVALOBS/bin
+testdir=$KVALOBS/test
+# logdir=$KVALOBS/var/log
+htmldir=$htmltop/$oprhtml
+sqlfile=$testdir/sql_file
+# diffile=$htmltop/html_diff
+timefile=$testdir/time_file
+
+nolog=$1
+
+echo "$BLUE ================================================================= $NORM"
+echo "$BLUE run_check - start av qabase på test-data $NORM"
+echo "  kjører qabase på test-data, html-logg fra kjøring havner i separate "
+echo "  katalog-trær"
+echo ""
+echo " $BLUE Støttefiler: $NORM"
+echo "    - $timefile"
+echo "      start- og stopp-tider for test-kjøring settes her (def. 7 dager i mai 2001)"
+echo "    - $sqlfile"
+echo "      SQL-kommandoer for kopiering av test-data fra tabeller test_data til data"
+echo ""
+echo " $BLUE Bruk: $NORM"
+echo "  - Velg først referanse-kjøring for å kjøre på uendrede test-data."
+echo "  - Gjør endringer på test-data - og kjør testene på nytt "
+echo "    (svar nei for referanse-kjøring)."
+echo ""
+echo " $BLUE Resultatfiler: $NORM"
+echo "  Loggene ligger på $htmltop/tst-log for normal kjøring"
+echo "                 på $htmltop/ref-log for referanse-kjøring"
+echo ""
+echo "  Bruk f.eks konqueror /disk1/kvalobs/tst-log for å se på detaljer"
+echo "$BLUE ================================================================= $NORM"
+echo ""
+
+# Fetch run-times from file
+for t in start stopp ; do
+   read $t'_year' $t'_mon' $t'_day' $t'_hour'
+done < $timefile
+
+echo " TEST-data from: $start_year $start_mon $start_day $start_hour"
+echo "             to: $stopp_year $stopp_mon $stopp_day $stopp_hour"
+
+
+# What type of run
+
+runtype="test"
+echo -n "$RED Er dette en referanse-kjøring? "
+yes_no
+if [ $? -ne 0 ] ; then
+  runtype="reference"
+fi 
+echo "$NORM"
+
+if [ "$runtype" = "reference" ] 
+then 
+  if [ $nolog ] ; then
+    htmldir="/dev/null"
+  else
+    htmldir=$htmltop/$refhtml
+  fi
+  echo " REFERANSE-kjøring: logger til $htmldir"
+
+  echo -n "$RED Vil du legge inn originale test-data (tomme flaggverdier)? "
+  yes_no
+  run=$?
+  echo "$NORM"
+  if [ $run -ne 0 ] ; then
+    echo " Kopierer test-data til data-tabellen"
+    echo " Denne operasjonen vil ta tid ..."
+    #.....
+    psql -h kvalobs -d kvalobs -U kvalobs -f $sqlfile
+    if [ $? -ne 0 ] ; then
+	echo "$RED kopiering av test-data feilet! Avslutter.. $NORM"
+	exit 1
+    fi
+    echo " Kopiering ferdig .. Klar for kjøring.."
+  fi
+
+else
+  if [ $nolog ] ; then
+    htmldir="/dev/null"
+  else
+    htmldir=$htmltop/$tsthtml
+  fi
+  echo " Normal kjøring: logger til $htmldir"
+fi
+
+echo -n "$RED Start? "
+yes_no
+run=$?
+echo "$NORM"
+if [ $run -ne 0 ] ; then
+  if [ $nolog ] ; then
+    echo "no log"
+  else
+    # make new log-tree
+    rm -rf $htmldir
+    mkdir -p $htmldir
+  fi
+
+  # send list of stations and times to qabase
+  $bindir/forceCheck -s 4780 -a "$start_year-$start_mon-$start_day $start_hour:00:00" -o "$stopp_year-$stopp_mon-$stopp_day $stopp_hour:00:00" -l "$htmldir"
+
+  if [ "$runtype" = "reference" ] 
+  then 
+    echo " REFERANSE-kjøring er ferdig."
+  else
+    echo " Normal kjøring er ferdig."
+  fi
+
+fi 

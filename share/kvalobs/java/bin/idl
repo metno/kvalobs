@@ -1,0 +1,5 @@
+#!/bin/sh
+
+MYJACORB=$KVDIR/share/kvalobs/java/lib/jacorb
+
+java  -classpath $MYJACORB/idl.jar:$MYJACORB/logkit-1.2.jar:${CLASSPATH} org.jacorb.idl.parser  "$@"

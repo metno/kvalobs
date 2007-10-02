@@ -1,0 +1,105 @@
+Nødvendig endring i hvordan data flyter gjennom systemet.
+=========================================================
+
+Legge arbeidslisten i en tabell, istedet for i memmory.
+-------------------------------------------------------
+Oppretter en tabell workque som holder arbeids elementene. Etter at et
+arbeidselement er ferdig legges dataene inn i tabellen
+workstatistik. På denne måten vil vi ha en oversikt over tidsforbruket
+i systemt for hver melding. Dette kan komme fint med i
+debugging. workstatistik bør ryddes med jevne mellomrom.
+
+Utkast til tabellen workque:
+
+       stationid \
+       obstime	 |  Nøkkel
+       typeid    /
+       tbtime   samme som datasettet sitt tbtime
+       priority kan brukes for å prioritere hvilke datasett som skal
+                behandles først.
+       process_start
+       qa_start
+       qa_stop
+       service_start
+       service_stop
+
+CREATE TABLE workque (
+	stationid     INTEGER NOT NULL,
+	obstime       TIMESTAMP NOT NULL,
+	typeid	      INTEGER NOT NULL,
+	tbtime	      TIMESTAMP NOT NULL,
+	priority      INTEGER NOT NULL,
+	process_start TIMESTAMP,
+	qa_start      TIMESTAMP,
+	qa_stop       TIMESTAMP,
+	service_start TIMESTAMP,
+	service_stop  TIMESTAMP,
+	UNIQUE (stationid, obstime, typeid) 
+);
+
+CREATE TABLE workstatistik (
+	stationid     INTEGER NOT NULL,
+	obstime       TIMESTAMP NOT NULL,
+	typeid	      INTEGER NOT NULL,
+	tbtime	      TIMESTAMP NOT NULL,
+	priority      INTEGER NOT NULL,
+	process_start TIMESTAMP,	
+	qa_start      TIMESTAMP,
+	qa_stop       TIMESTAMP,
+	service_start TIMESTAMP,
+	service_stop  TIMESTAMP,
+	UNIQUE (stationid, obstime, typeid) 
+);
+
+CREATE TABLE subscribertbl_[subscriberid] (
+	stationid     INTEGER NOT NULL,
+	obstime       TIMESTAMP NOT NULL,
+	typeid	      INTEGER NOT NULL,
+	UNIQUE(stationid, obstime, typeid)
+);
+
+Data flyt:
+
+kvDataInputd legger inn informasjon om meldingen i tabellen
+workque. kvDataInputd sender nå en melding til kvManager.
+
+kvManager leser tabellen workque på melding fra kvDataInputd eller ved
+oppstart. Sender melding til kvQabase og setter tidspunktet i
+qa_start, når kvQabased er ferdig med jobben setter kvManagerd
+tidspunket qa_stop. kvManagerd sender så melding til kvServiced som
+overtar ansvaret for workque elementet. Den setter service_start og
+service_stop og fjerner elementet fra workque og legger det inn i
+tabellen workstatistik.
+
+Som en ekstra konsistenskontroll ved oppstart kan tabellen workque
+sjekkes for å fjerne element som er fullført og legge dem inn i workstatistik.
+
+
+Subscribere:
+
+For kvServiced har vi flere muligheter for forbedring.  Alle service
+subscriberene kan få opprettet en egen tabell med subscriberid som
+tabellnavn. En referanse til et element i workelement legges inn for
+hvert datasett som skal sendes til mottaker. Når mottaker har fått
+elementet fjernes det fra tabellen. Vi kan også tenke oss to typer
+subscribere persistente og ikke persistente.
+
+- Hvor persistente mottakere vil alltid ha samme subscriberid.
+- Ikke persistente mottakere har forskjellig subscriberid.
+
+Med dette kan vi ha to typer håndtering av subscriber tabellene.
+Når en IKKE persistent subscriber logger av, unsubscribe, slettes
+subscriber tabellen for denne subscriberen. Tabellen vil ikke slettes
+for en persistent subscriber, men nye workelemnt vil legges inn selv
+om subscriberen ikke er på logget. På denne måten kan vi garantere at
+en mottaker vil motta alle data uten noen form for logikk i mottakeren
+for å håndtere dette.
+
+Gjennomføring:
+
+-Dataflyt delen burde være triviell å implementer.
+-Subscriber delen er mer komplisert. Den har også flere moment med seg
+ som må løses, feks hvordan blir man en persistent subscriber...   
+
+
+

@@ -1,0 +1,28 @@
+*** posdat.hirlam  ('posdat.input')
+***
+*=> Meteogram data from HIRLAM, standard selection.
+*=>
+*=> Environment var:
+*=>    none
+*=> Command format:
+*=>    posdat  posdat.hirlam  poolhl.dat  standard
+*=>                           <input>     <format>
+*** ...........(#1)...........#2..........#3......
+***
+***---------------------------------------------------------------------
+**++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+** Options    Remember '......' syntax.
+** ($... = environment var. ; #n = coomand line arg. no. n)
+*>
+'FILE= #2'  
+'DATA.METEOGRAM'
+'FORMAT.STANDARD'        
+'NAME_SUFFIX=%'
+'PROG_OUT=6,9'
+'END'
+**++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+**
+**
+*>
+'>>>>', '#3'
+'====', '*'

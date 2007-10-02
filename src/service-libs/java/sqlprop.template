@@ -1,0 +1,6 @@
+sql=SELECT stnr,status,fdato,tdato,typeid,nytt_stnr FROM T_KV2KLIMA_FILTER;
+
+ofile=t_kv2klima_filter.dat
+
+select.ofile=${sql}
+

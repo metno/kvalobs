@@ -1,0 +1,393 @@
+<html>
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<meta name=Generator content="Microsoft Word 10 (filtered)">
+<title>Bidrag til </title>
+
+<style>
+<!--
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0cm;
+	margin-bottom:.0001pt;
+	font-size:12.0pt;
+	font-family:"Times New Roman";}
+@page Section1
+	{size:595.3pt 841.9pt;
+	margin:70.85pt 70.85pt 70.85pt 70.85pt;}
+div.Section1
+	{page:Section1;}
+ /* List Definitions */
+ ol
+	{margin-bottom:0cm;}
+ul
+	{margin-bottom:0cm;}
+-->
+</style>
+
+</head>
+
+<body lang=NO-BOK>
+
+<div class=Section1>
+
+<p class=MsoNormal><b>Bidrag til </b></p>
+
+<p class=MsoNormal><b>Flagg-dokumentet i Kvalobs</b></p>
+
+<p class=MsoNormal>(fra Lars Andresen februar 2007, med noen små tilføyelser
+april 2007)</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal><b><span style='font-size:16.0pt'>Håndtering av controlinfo-flagg
+fra HQC-programmene</span></b></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>I HQC har vi 6 forskjellige valg i forhold til de
+observasjoner/korreksjoner vi håndterer: </p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<ol style='margin-top:0cm' start=1 type=1>
+ <li class=MsoNormal><b>Korrigert OK.</b> Det settes x i denne kolonnen når man
+     ønsker å godkjenne en interpolert eller korrigert verdi når korrigert
+     verdi (corrected) er forskjellig fra originalverdien, f.eks. når
+     originalverdien mangler. Ofte brukt når en automatstasjon mangler en serie
+     timevise observasjoner og det settes inn modellverdier for disse.
+     Alternativet er å skrive inn den samme verdien på nytt som en
+     interpolasjon, hvilket er tidkrevende ved store datamengder. </li>
+ <li class=MsoNormal><b>Original OK.</b> Det settes x i denne kolonnen når man
+     ønsker å godkjenne en original­verdi, som enten er mistenkeliggjort av den
+     automatiske kontrollen, eller som er feilaktig korrigert eller forkastet.
+     I alle tilfelle forblir, eller settes, den korrigerte verdien lik
+     originalverdien. </li>
+ <li class=MsoNormal><b>Interpolert.</b> Det settes inn en erstatningsverdi for
+     den manglende originalverdien eller man endrer en tidligere innsatt
+     erstatningsverdi. </li>
+ <li class=MsoNormal><b>Tilfordelt.</b> Det settes inn en erstatningsverdi for
+     en manglende verdi i oppsamlings­perioden og en korrigert verdi for
+     oppsamlingsverdien. I begge tilfelle settes controlinfo(12)=fd=2, hvis
+     ikke observasjonen har dette flagget fra før. Hvis fd=3 (usikerhet
+     vedrørende oppsamlet verdi), avgjør HQC om flagget skal endres til 1 (ikke
+     oppsamlet verdi) eller 2 (oppsamlet verdi). </li>
+ <li class=MsoNormal><b>Korrigert.</b> Det settes inn en annen korrigert verdi
+     enn den som står fra før eller man setter inn en ny verdi, hvis
+     originalverdien er forkastet.</li>
+ <li class=MsoNormal><b>Forkastet.</b> Det settes x i denne kolonnen når man
+     ønsker å forkaste en eksisterende originalverdi, uten å sette inn en
+     erstatningsverdi, eller man ønsker å godkjenne at originalverdien
+     tidligere er forkastet automatisk, når det ikke er satt inn noen
+     erstatnings­verdi, eller man ønsker å forkaste en tidligere
+     erstatningsverdi. I alle tilfelle settes korrigert verdi=-32766 (eller
+     null).</li>
+</ol>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>I tillegg har vi den automatiske godkjenningen av
+observasjonen i feillisteprogrammet:</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<ol style='margin-top:0cm' start=7 type=1>
+ <li class=MsoNormal><b>Original verdi sannsynligvis OK.</b> Dersom en av
+     kontrollene har slått ut, f.eks. grenseverdikontrollen, så kan en annen
+     kontroll, f.eks. den prognostiske romkontrollen oppheve mistanken om feil.
+     Eksempelet viser at utslaget i den første kontrollen skyldes en litt
+     uvanlig værsituasjon. At værsituasjonen har vært uvanlig bekreftes av den
+     andre kontrollen. Vi antar da at observasjonen er korrekt.</li>
+</ol>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>HQC-håndteringen fører til at to flagg i controlinfo endres:
+fmis (controlinfo(6)) og fhqc (controlinfo(15)). Også fd (controlinfo(12)) kan
+endres. Dette skjer etter følgende kriterier:</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<b><span style='font-size:12.0pt;font-family:"Times New Roman"'><br clear=all
+style='page-break-before:always'>
+
+<ol style='margin-top:0cm' start=1 type=1>
+ <li class=MsoNormal>Korrigert OK.<span style='font-weight:normal'> Korrigert
+     verdi beholdes uforandret.</span></li>
+</ol>
+
+</span></b>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>fmis=0. Originalverdi eksisterer.
+Korrigert OK oppfattes i HQC som en manuell korreksjon av originalverdi til
+samme verdi som allerede står i corrected. I dette tilfellet settes fhqc=7, fmis
+endres ikke. Hvis fd=2, 6-B, settes fhqc=6.</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'><b>NB!</b> Hvis Original=Corrected
+har operatøren åpenbart satt x i feil kolonne (siden det forutsettes at
+korrigert verdi er forskjellig fra originalverdien). Meningen har vært å
+godkjenne originalverdien, til tross for mistenkeliggjøring. I dette tilfellet
+settes fhqc=1, fmis endres ikke. Hvis fd=3, endres fd til 1.</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>fmis=1. Originalverdi mangler.
+Korrigert OK oppfattes i HQC som en manuell interpolasjon med samme verdi som
+allerede står i corrected. I dette tilfellet settes fhqc=5, fmis endres ikke.
+Hvis fd=2, 6-B, settes fhqc=6. </p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>[fmis=2. Skal ikke forekomme for
+dette alternativet, siden det forutsettes at korrigert verdi eksisterer. Men
+ved en manuell håndtering kan man komme til å sette x i feil OK-kolonne, dvs
+tro at man godkjenner en original verdi. I dette tilfellet settes fhqc=1 og
+fmis=2 endres til fmis=0. Korrigert verdi settes lik original. Dette gir altså
+samme resultat som å sette x i pkt.2.]</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>[fmis=3. Skal ikke forekomme for
+dette alternativet, siden verken original eller korrigert verdi eksisterer. Korrigert
+verdi og fmis beholdes uendret. Man bør tipses om at interpolasjonsfeltet kan
+benyttes, se pkt.3.]</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>&nbsp;</p>
+
+<ol style='margin-top:0cm' start=2 type=1>
+ <li class=MsoNormal><b>Original OK.</b> Korrigert verdi skal ha samme verdi
+     som originalverdi.</li>
+</ol>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>fmis=0. Originalverdi eksisterer,
+korrigert verdi eksisterer. Enten korrigert verdi er lik originalverdi
+(mistenkeliggjort av QC-flagg) eller korrigert i forhold til originalverdi
+(feilaktig), så betyr Original OK at originalverdien beholdes uendret i
+corrected. I dette tilfellet settes fhqc=1, fmis endres ikke. Hvis fd=3, endres
+fd til 1.</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>fmis=2. Originalverdi eksisterer,
+korrigert verdi mangler. Det betyr at originalverdi er forkastet og ikke
+erstattet av noen modellverdi eller annen erstatningsverdi. Original OK betyr
+at forkastingen er gjort på feilaktig grunnlag. I dette tilfellet settes
+fhqc=1, fmis endres til 0 og korrigert verdi settes lik originalverdi. Hvis
+fd=3, endres fd til 1.</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>[fmis=1. Skal ikke forekomme for
+dette alternativet, siden det forutsettes at original­verdi verdi eksisterer.
+Men ved en manuell håndtering kan man komme til å sette x i feil OK-kolonne, dvs
+tro at man godkjenner en korrigert verdi. I dette tilfellet settes fhqc=5 fmis endres
+ikke. Korrigert verdi beholdes uforandret. Dette gir altså samme resultat som å
+sette x i pkt.1.]</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>[fmis=3. Skal ikke forekomme for
+dette alternativet, siden verken original eller korrigert verdi eksisterer. Korrigert
+verdi og fmis beholdes uendret. Man bør tipses om at interpolasjonsfeltet kan
+benyttes, se pkt.3.]</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>&nbsp;</p>
+
+<ol style='margin-top:0cm' start=3 type=1>
+ <li class=MsoNormal><b>Interpolert.</b> Originalverdi er manglende (-32767), korrigert
+     verdi er enten manglende før HQC, eller det er satt inn en modellverdi
+     (QC1) / automatisk interpolert verdi (QC2), som man ønsker å endre på. En
+     godkjenning av en tidligere innsatt verdi gjøres i Korrigert OK (pkt.1).
+     Hvis fd=2, 6-B skulle man ha valgt ”Tilfordelt” (punkt 4).</li>
+</ol>
+
+<p class=MsoNormal style='margin-left:35.4pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>fmis=1. Korrigert verdi er en
+modellverdi eller en automatisk interpolert verdi. I dette tilfellet endres korrigert
+verdi og man setter fhqc=5, fmis endres ikke. Hvis fd=2, 6-B, settes fhqc=6.</p>
+
+<p class=MsoNormal style='text-indent:35.4pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>fmis=3. Korrigert verdi mangler. I
+dette tilfellet settes inn en erstatningsverdi for corrected=-32767, og man setter
+fhqc=5, fmis endres til 1. Hvis fd=2, 6-B, settes fhqc=6.</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>[fmis=0. Skal ikke forekomme for
+dette alternativet, siden det forutsettes at originalverdi mangler. I dette
+tilfellet endrer man korrigert verdi og setter fhqc=7, fmis endres ikke.]</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>[fmis=2. Skal ikke forekomme for
+dette alternativet, siden det forutsettes at originalverdi mangler. I dette
+tilfellet setter man inn en ny korrigert verdi og setter fhqc=7, fmis endres til
+0.]</p>
+
+<p class=MsoNormal>             </p>
+
+<ol style='margin-top:0cm' start=4 type=1>
+ <li class=MsoNormal><b>Tilfordelt.</b> Her får vi en kombinasjon av det som
+     står i Interpolert (pkt.3) og Korrigert (pkt.5). Vi skiller mellom de
+     manglende observasjonene i oppsamlingsperioden og opp­­samlings­verdien. </li>
+</ol>
+
+<p class=MsoNormal style='margin-left:35.4pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>fmis=0. Originalverdi og
+korrigert verdi eksisterer, dvs. det finnes en oppsamlet verdi. I dette
+tilfellet endres korrigert verdi, man setter fhqc=6, fmis endres ikke. Man
+setter fd=2, hvis dette ikke allerede har skjedd. Hvis fd=3 i utgangspunktet,
+endres fd til 2.</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>fmis=1. Originalverdi mangler,
+dvs. er under oppsamling. Korrigert verdi eksisterer, som modellverdi,
+tilpasset modellverdi eller som annen interpolert verdi. I dette tilfellet
+settes fhqc=6, fmis endres ikke. </p>
+
+<p class=MsoNormal style='text-indent:35.4pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>fmis=2. Skal egentlig ikke
+forekomme, men hvis det skjer så setter man inn den tilfordelte verdien, setter
+fhqc=6, fmis endres til 0. Man setter fd=2, hvis dette ikke allerede har
+skjedd. Hvis fd=3 i utgangspunktet, endres fd til 2.</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>fmis=3. Originalverdi og
+korrigert verdi mangler, dvs. er under oppsamling. I dette tilfellet settes inn
+en tilfordelt verdi og setter fhqc=6, fmis endres til 1. Man setter fd=2, hvis
+dette ikke allerede har skjedd.</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>&nbsp;</p>
+
+<ol style='margin-top:0cm' start=5 type=1>
+ <li class=MsoNormal><b>Korrigert.</b>. Original verdi eksisterer, korrigert
+     verdi er enten forkastet (og mangler, dvs. -32766) eller det er satt inn
+     en modellverdi (QC1) / automatisk interpolert verdi (QC2) for den
+     forkastede verdien. En godkjenning av en tidligere korrigert verdi gjøres
+     i Korrigert OK (pkt.1). Hvis fd=2, 6-B skulle man ha valgt ”Tilfordelt”
+     (punkt 4).</li>
+</ol>
+
+<p class=MsoNormal style='margin-left:35.4pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>fmis=0. Korrigert verdi
+eksisterer, men endres. I dette tilfellet settes altså fhqc=7, fmis endres
+ikke. Hvis fd=2, 6-B, settes fhqc=6.</p>
+
+<p class=MsoNormal style='text-indent:35.4pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>fmis=2. Korrigert verdi mangler
+fordi originalverdi er forkastet. I dette tilfellet settes inn en ny korrigert verdi
+og man setter fhqc=7, fmis endres til 0. Hvis fd=2, 6-B, settes fhqc=6.</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>[fmis=1. Skal ikke forekomme for
+dette alternativet, siden det forutsettes at original­verdi eksisterer. I dette
+tilfellet endrer man korrigert verdi og setter fhqc=5, fmis endres ikke.]</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>[fmis=3. Skal ikke forekomme for
+dette alternativet, siden det forutsettes at original­verdi eksisterer. I dette
+tilfellet setter man inn en ny korrigert verdi og setter fhqc=5, fmis endres
+til 1.]</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<ol style='margin-top:0cm' start=6 type=1>
+ <li class=MsoNormal><b>Forkastet.</b> Dette alternativet velges i de fleste
+     tilfelle når originalverdi eksisterer og korrigert verdi har samme verdi
+     som originalverdi, og man ønsker å forkaste original­verdien uten å sette
+     inn noen erstatningsverdi (korrigert verdi settes lik -32766). Men man kan
+     også bruke dette alternativet hvis man ønsker å godkjenne at
+     originalverdien er forkastet i QC1 eller QC2, uten at man vil sette inn en
+     erstatningsverdi (Forkastet OK). Man kan også forkaste en tidligere
+     innsatt erstatningsverdi.</li>
+</ol>
+
+<p class=MsoNormal style='margin-left:35.4pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>fmis=0. Originalverdi eksisterer,
+men denne ønsker man å forkaste. I dette tilfellet settes fhqc=A, fmis endres
+til 2.</p>
+
+<p class=MsoNormal style='text-indent:35.4pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>fmis=2. Originalverdi er allerede
+forkastet. Man ønsker å godkjenne dette manuelt. I dette tilfellet settes fhqc=A,
+fmis endres ikke.</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>[fmis=1. Skal ikke forekomme for
+dette alternativet, siden det forutsettes at original­verdi eksisterer.
+Korrigert verdi og fmis beholdes uendret.]</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>[fmis=3. Skal ikke forekomme for
+dette alternativet, siden det forutsettes at original­verdi eksisterer.
+Korrigert verdi og fmis beholdes uendret.]</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>&nbsp;</p>
+
+<ol style='margin-top:0cm' start=7 type=1>
+ <li class=MsoNormal><b>Original verdi sannsynligvis OK.</b> Dette alternativet
+     velges automatisk av feilliste­programmet, fhqc settes lik 2.</li>
+</ol>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>fmis=0. Originalverdi eksisterer,
+korrigert verdi eksisterer. Korrigert verdi er lik originalverdi, men
+mistenkeliggjort av QC-flagg. Originalverdien i corrected beholdes uendret. I
+dette tilfellet settes fhqc=1, fmis endres ikke.</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>[fmis=1. Skal ikke forekomme for
+dette alternativet, siden det forutsettes at original­verdi verdi eksisterer.
+Automatisk innsatte verdier for manglende går til feillista.]</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>[fmis=2. Skal ikke forekomme for
+dette alternativet, siden forkastede verdier går til feillista.]</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:35.4pt'>[fmis=3. Skal ikke forekomme for
+dette alternativet, siden verken original eller korrigert verdi eksisterer.]</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal><b>NB!</b></p>
+
+<p class=MsoNormal>Når controlinfo blir endret, ved f.eks. fmis, fd eller fhqc,
+kjøres en subrutine i Kvalobs (kalles opp fra HQC), som oppdaterer useinfo. </p>
+
+</div>
+
+</body>
+
+</html>

@@ -1,0 +1,235 @@
+<?xml version="1.0" ?>
+<project default="main">
+	<property environment="env"/>
+	<property name="builddir" location="build"/>
+	<property name="distdir"  location="dist"/>
+	<property name="src" location="src" />
+	<property name="testresult" location="testresult"/>
+	<property name="testsrc" location="test" />
+	<property name="tmpdir" location="tmp"/>
+	<property name="libdir" location="../../share/kvalobs/java/lib"/>
+	<property name="bindir" location="../../bin"/>
+   <property name="jaco"   location="../../share/kvalobs/java/bin/jaco"/>
+
+	<path id="build.classpath">
+		<fileset dir="${libdir}/jacorb">
+			<include name="*.jar"/>
+			<exclude name="idl.jar"/>
+		</fileset>
+		<pathelement path="${libdir}/kvalobsclt.jar"/>
+		<pathelement path="${libdir}/log4j-1.2.13.jar"/>
+		<pathelement path="${builddir}"/>
+	</path>
+	
+	<path id="test.classpath">
+		<path refid="build.classpath"/>
+		<pathelement path="${libdir}/junit.jar" />
+		<pathelement path="${libdir}/hsqldb.jar" />
+	</path>
+	
+	<target name="main" depends="clean, compile">
+	</target>
+	
+	<target name="init">
+		<mkdir dir="${builddir}"/>
+		<mkdir dir="${testresult}"/>
+		<mkdir dir="${tmpdir}"/>
+	</target>
+	
+	
+	<target name="compile" depends="init">
+		<javac destdir="${builddir}" srcdir="${src}" classpathref="build.classpath" debug="true"> 
+     <!--<compilerarg value="-Xlint:unchecked"/> -->
+			<include name="**/*.java"/>	
+		<!--	<exclude name="**/SqlHelper/*.java"/> -->
+		</javac>
+	</target>
+	
+	
+	<target name="clean">
+		<delete dir="${idlgendir}"/>
+		<delete dir="${distdir}"/>
+		<delete dir="${builddir}"/>
+		<delete dir="${testresult}"/>
+		<delete file="kvalobsclt.jar"/>
+		<delete dir="${tmpdir}"/>
+		<delete file="kl2kv.jar"/>
+		<delete file="kv2kl.jar"/>
+		<delete file="kv-dist.tar"/>
+	</target>
+	
+	<target name="kv2kl" depends="init, compile">
+		<jar destfile="kv2kl.jar" manifest="kv2kl.manifest" >
+			<fileset dir="${builddir}">
+				<include name="**/kl/**/*.class"/>
+				<include name="**/kv2kl/**/*.class"/>
+				<exclude name="**/*Test.class"/>
+			</fileset>
+		</jar>
+		<copy todir="${libdir}" file="kv2kl.jar"/>
+	</target>
+	
+	<target name="kl2kv" depends="init, compile">
+		<jar destfile="kl2kv.jar" manifest="kl2kv.manifest" >
+			<fileset dir="${builddir}">
+				<include name="**/kl/**/*.class"/>
+				<include name="**/kl2kv/**/*.class"/>
+				<exclude name="**/*Test.class"/>
+			</fileset>
+		</jar>
+		<copy todir="${libdir}" file="kl2kv.jar"/>
+	</target>
+
+	<target name="kv2klgetdata" depends="init, compile">
+		<jar destfile="kv2klgetdata.jar" manifest="kv2klgetdata.manifest" >
+			<fileset dir="${builddir}">
+				<include name="**/kl/**/*.class"/>
+				<include name="**/kv2klgetdata/**/*.class"/>
+				<exclude name="**/*Test.class"/>
+			</fileset>
+		</jar>
+		<copy todir="${libdir}" file="kv2klgetdata.jar"/>
+	</target>
+
+
+	
+	<target name="dist" depends="main, kv2kl, kl2kv, kv2klgetdata">
+		<delete dir="${distdir}"/>
+		<mkdir dir="${distdir}/share/kvalobs/java/bin"/>
+		<mkdir dir="${distdir}/share/kvalobs/java/etc"/>
+		<mkdir dir="${distdir}/etc"/>	
+		<mkdir dir="${distdir}/bin"/>
+		<copy  todir="${distdir}/etc">
+			<fileset dir="src/etc">
+				<include name="*.conf.template"/>
+				<include name="*_log.conf.template"/>
+			</fileset>
+		</copy>
+		<copy  file="../../share/kvalobs/java/etc/jacorb.properties" 
+		       todir="${distdir}/share/kvalobs/java/etc"/>
+		<copy todir="${distdir}/share/kvalobs/java/lib">
+			<fileset dir="${libdir}">
+				<include name="**/*.jar"/>
+				<exclude name="**/junit.jar"/>
+				<exclude name="**/SqlHelper.jar"/>
+				<exclude name="**/idl.jar"/>
+			</fileset>
+		</copy>
+		
+		<exec executable="cp" dir="." failonerror="true">
+			<arg line="../../share/kvalobs/java/bin/jaco ${distdir}/share/kvalobs/java/bin"/>
+		</exec>
+
+		<exec executable="cp" dir="." failonerror="true">
+			<arg line="src/bin/kl2kv ${distdir}/bin"/>
+		</exec>
+		
+		<exec executable="cp" dir="." failonerror="true">
+			<arg line="src/bin/kv2kl ${distdir}/bin"/>
+		</exec>
+		
+		<exec executable="cp" dir="." failonerror="true">
+			<arg line="src/bin/kv2kl.sh ${distdir}/bin"/>
+		</exec>
+		
+		<exec executable="cp" dir="." failonerror="true">
+			<arg line="src/bin/kv2kl-start ${distdir}/bin"/>
+		</exec>
+		
+		<exec executable="cp" dir="." failonerror="true">
+			<arg line="src/bin/kv2kl-stop ${distdir}/bin"/>
+		</exec>
+		
+		<exec executable="cp" dir="." failonerror="true">
+			<arg line="src/bin/kv2kl-isrunning ${distdir}/bin"/>
+		</exec>
+		
+		<exec executable="cp" dir="." failonerror="true">
+			<arg line="src/bin/kv2klgetdata ${distdir}/bin"/>
+		</exec>
+
+		<tar destfile="kv-dist.tar"  compression="none">
+			<tarfileset dir="${distdir}" mode="755">
+				<include name="bin/*"/>
+				<include name="share/kvalobs/java/bin/*"/>
+			</tarfileset>
+			<tarfileset dir="${distdir}" mode="644">
+				<include name="etc/*"/>
+				<include name="share/kvalobs/java/lib/**/*"/>
+				<include name="share/kvalobs/java/etc/*"/>
+			</tarfileset>
+		</tar>
+		
+	</target>
+	
+	
+	<target name="install" depends="dist">
+		<untar src="kv-dist.tar" dest="${env.KVALOBS}" compression="none"/>
+	</target>
+	
+	<target name="jar2libdir">
+		<copy todir="${libdir}" file="kvalobsclt.jar"/>
+	</target>	
+	
+	<!-- ***********************************************
+	     ***********************************************
+	     *********      JUnit test targets      ********
+	     ***********************************************
+	     ***********************************************  -->
+	
+	<target name="compile-test">
+			<javac destdir="${builddir}" srcdir="${testsrc}" debug="true" classpathref="test.classpath">
+				<include name="**/*Test.java"/>
+			</javac>
+	</target>
+		
+	
+	<target name="test" depends="test-kv2klimafilter,
+		                          test-ParamFilter,
+										  test-DataHelper,
+										  test-Station,
+		                          test-SendData">
+	</target>
+
+	<target name="test-kv2klimafilter" depends="compile, compile-test">
+		<junit printsummary="yes" fork="yes" haltonfailure="yes">
+			<formatter type="brief" usefile="true"/>
+			<classpath refid="test.classpath"/>
+			<test todir="${testresult}" name="metno.kvalobs.kl.klfilterTest"/>
+		</junit>
+	</target>
+	
+	<target name="test-ParamFilter" depends="compile, compile-test">
+		<junit printsummary="yes" fork="yes" haltonfailure="yes">
+			<formatter type="brief" usefile="true"/>
+			<classpath refid="test.classpath"/>
+			<test todir="${testresult}" name="metno.kvalobs.kl.ParamFilterTest"/>
+		</junit>
+	</target>
+	
+	<target name="test-DataHelper" depends="compile, compile-test">
+		<junit printsummary="yes" fork="yes" haltonfailure="yes">
+			<formatter type="brief" usefile="true"/>
+			<classpath refid="test.classpath"/>
+			<test todir="${testresult}" name="metno.kvalobs.kl2kv.DataHelperTest"/>
+		</junit>
+	</target>
+	
+	<target name="test-Station" depends="compile, compile-test">
+		<junit printsummary="yes" fork="yes" haltonfailure="yes">
+			<formatter type="brief" usefile="true"/>
+			<classpath refid="test.classpath"/>
+			<test todir="${testresult}" name="metno.kvalobs.kl2kv.StationTest"/>
+		</junit>
+	</target>
+
+	<target name="test-SendData" depends="compile, compile-test">
+		<junit printsummary="yes" fork="yes" haltonfailure="yes" jvm="${jaco}">
+			<env key="KVDIR" value="../.." />
+			<formatter type="brief" usefile="true"/>
+			<classpath refid="test.classpath"/>
+			<test todir="${testresult}" name="metno.kvalobs.kl2kv.SendDataTest"/>
+		</junit>
+	</target>
+</project>
+

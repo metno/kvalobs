@@ -1,0 +1,92 @@
+#! /bin/sh
+
+KVDIR=$KVALOBS
+
+UPLOG_PREFIX=
+TIMEOUT=60
+
+if [ -f "$KVDIR/etc/kv2kl-start.conf" ]; then
+	. $KVDIR/etc/kv2kl-start.conf
+fi
+
+NAME=
+CONF=$KVDIR/etc/kv2kl.conf
+PIDFILE=kv2kl.pid
+
+if [ "$#" -gt 0 ]; then
+	NAME=$1
+	CONF=$KVDIR/etc/kv2kl-$NAME.conf
+fi
+	
+if [ ! -f "$CONF" ]; then
+	echo "Finner ikke konfigurasjonsfilen: '$CONF'"
+	exit 1
+fi
+	
+PIDFILE=kv2kl.pid
+
+if [ "$NAME" ]; then
+	PIDFILE=kv2kl-$NAME.pid
+fi
+
+function isrunning()
+{
+    pidfile=$1
+   
+    if [ -f $KVDIR/var/run/$pidfile ]; then 
+		PID=`cat $KVDIR/var/run/$pidfile`
+		#echo "PID: $KVDIR/var/run/$pidfile: $PID"
+		kill  -0 $PID > /dev/null 2>&1
+
+		if [ $? -eq 0 ]; then
+	   	return 0
+	   else
+	   	rm -f $pidfile
+	   	return 1
+	   fi	
+   fi
+    
+   return 1
+}
+
+
+export NAME 
+EXTRA=
+
+if [ "$NAME" ]; then
+	EXTRA="($NAME)"
+fi
+
+echo -n "Starting kv2kl $EXTRA"
+
+if isrunning $PIDFILE ; then
+	echo " - running"
+	exit 0
+fi
+
+UPLOG_FILE=$KVDIR/var/log/kv2kl_$UPLOG_PREFIX.log
+
+if [ "$NAME" ]; then
+	UPLOG_FILE=$KVDIR/var/log/kv2kl_$UPLOG_PREFIX-$NAME.log
+fi
+
+rm -rf $UPLOG_FILE
+
+$KVDIR/bin/kv2kl.sh -c $CONF > /dev/null 2>&1 &
+#$KVDIR/bin/kv2kl.sh -c $CONF &
+
+n=0
+
+while [ $n -lt $TIMEOUT  -a ! -f "$UPLOG_FILE" ]; do
+	let n=n+1
+	sleep 1
+done
+ 
+if [ -f "$UPLOG_FILE" ]; then
+	echo " - Ok!"
+	exit 0
+else
+   echo " - Failed!"
+   exit 1
+fi
+ 
