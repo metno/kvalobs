@@ -38,7 +38,7 @@ veryclean:
 	if [ -d lib ]; then          \
 	   cd lib; rm -f *.a *.so;   \
 	   cd ..;                          \
-	   if [ ! -d lib/CVS ]; then \
+	   if [ ! -d lib/.svn ]; then \
 	      rm -rf lib ;           \
 	   fi                              \
 	fi

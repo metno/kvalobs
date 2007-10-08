@@ -26,7 +26,7 @@ veryclean:
 	if [ -d $(LIBDIR) ]; then          \
 	   cd $(LIBDIR); rm -f *.a *.so;   \
 	   cd ..;                          \
-	   if [ ! -d $(LIBDIR)/CVS ]; then \
+	   if [ ! -d $(LIBDIR)/.svn ]; then \
 	      rm -rf $(LIBDIR) ;           \
 	   fi                              \
 	fi

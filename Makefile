@@ -37,7 +37,7 @@ veryclean:
 	      if [ -f $$FILE ]; then           \
 	         rm -f $$FILE;                 \
 	      elif [ -d $$FILE ]; then         \
-	         if [ $$FILE != 'CVS' ]; then  \
+	         if [ $$FILE != '.svn' ]; then  \
 	            rm -Rf $$FILE ;            \
 	         fi                            \
 	      fi                               \
@@ -49,7 +49,7 @@ veryclean:
 	      if [ -f $$FILE ]; then           \
 	         rm -f $$FILE;                 \
 	      elif [ -d $$FILE ]; then         \
-	         if [ $$FILE != 'CVS' ]; then  \
+	         if [ $$FILE != '.svn' ]; then  \
 	            rm -Rf $$FILE ;            \
 	         fi                            \
 	      fi                               \

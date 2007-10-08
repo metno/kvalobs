@@ -50,7 +50,7 @@ veryclean:
 	if [ -d $(LIBDIR) ]; then          \
 	   cd $(LIBDIR); rm -f *.a *.so;   \
 	   cd ..;                          \
-	   if [ ! -d $(LIBDIR)/CVS ]; then \
+	   if [ ! -d $(LIBDIR)/.svn ]; then \
 	      rm -rf $(LIBDIR) ;           \
 	   fi                              \
 	fi
@@ -75,7 +75,7 @@ install:
 	   if [ $(INCTO) ]; then                                  \
 	      mkdir -p $(INCTO);                                  \
 	      if [ -d $(INCTO) ]; then                            \
-	         for FILE in `ls -A1 -ICVS -I*~ $(IIGNORE) $$MYINCFROM` ; do  \
+	         for FILE in `ls -A1 -I.svn -I*~ $(IIGNORE) $$MYINCFROM` ; do  \
 	            if [ -f $(INCTO)/$$FILE ]; then               \
 	               if diff $$MYINCFROM/$$FILE $(INCTO)/$$FILE > /dev/null ; then \
 			          continue ;                              \

@@ -50,7 +50,7 @@ libs:
 
 veryclean:
 	for FILE in `ls -1` ; do \
-	   if [ -d $$FILE -a $$FILE != "CVS" ] ; then \
+	   if [ -d $$FILE -a $$FILE != ".svn" ] ; then \
               (cd $$FILE ; \
 	      if [ -f Makefile ]; then \
 		    $(MAKE) veryclean ; \
@@ -60,7 +60,7 @@ veryclean:
 
 clean:
 	for FILE in `ls -1` ; do \
-	   if [ -d $$FILE -a $$FILE != "CVS" ] ; then \
+	   if [ -d $$FILE -a $$FILE != ".svn" ] ; then \
               (cd $$FILE ; \
 	      if [ -f Makefile ]; then \
 		    $(MAKE) clean ; \
@@ -70,7 +70,7 @@ clean:
 
 depends:
 	for FILE in `ls -1` ; do \
-	   if [ -d $$FILE -a $$FILE != "CVS" ] ; then \
+	   if [ -d $$FILE -a $$FILE != ".svn" ] ; then \
               (cd $$FILE ; \
 	      if [ -f Makefile ]; then \
 		    $(MAKE) depends ; \
