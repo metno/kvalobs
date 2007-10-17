@@ -127,19 +127,19 @@ namespace agregator
      * \brief Get the value for paramID which we are interested in
      * writing.
      */
-    inline int writeParam()       const { return write_param; }
+    int writeParam()       const { return write_param; }
 
     /**
      * \brief Get the number of hours back in time we are interested
      * in for generating an agregate observation.
      */
-    inline int interestingHours() const { return interesting_hours; }
+    int interestingHours() const { return interesting_hours; }
 
     /**
      * \brief Get the list of specifict times at which we want to
      * generate agregate values.
      */
-    inline const std::set<miutil::miClock> & generateWhen() const { return generate_when; }
+    const std::set<miutil::miClock> & generateWhen() const { return generate_when; }
 
     /**
      * \brief Find the earliest and latest interesting point in time

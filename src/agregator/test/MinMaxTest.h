@@ -31,27 +31,24 @@
 #ifndef MINMAXTEST_H_
 #define MINMAXTEST_H_
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <minmax.h>
+#include "AbstractAgregatorTest.h"
 
-class MinMaxTest : public CppUnit::TestFixture
+class MinMaxTest : public AbstractAgregatorTest
 {
-    CPPUNIT_TEST_SUITE( MinMaxTest );
+    CPPUNIT_TEST_SUB_SUITE( MinMaxTest, AbstractAgregatorTest );
     CPPUNIT_TEST( testNormal );
     CPPUNIT_TEST( testIncompleteData );
+    CPPUNIT_TEST( testCompleteDataObservationInMiddle );
     CPPUNIT_TEST_SUITE_END();
 public:
 	MinMaxTest();
 	virtual ~MinMaxTest();
 	
     virtual void setUp();
-    virtual void tearDown();
 	
 	void testNormal();
 	void testIncompleteData();
-	
-private:
-	agregator::MinMax * agregator;
+	void testCompleteDataObservationInMiddle();
 };
 
 #endif /*MINMAXTEST_H_*/

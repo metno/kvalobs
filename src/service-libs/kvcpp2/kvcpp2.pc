@@ -5,11 +5,18 @@ exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
 
+putools=PUTOOLS
 Name: kvcpp2
 Description: Client library for Kvalobs
 Version: 1.0
+
 Requires: omniORB4 omniDynamic4
+
 Conflicts:
-Cflags: -I${includedir}/ -I${includedir}/kvservice/ -I${includedir}/kvskel/
+
+Cflags: -I${includedir}/ -I${includedir}/kvservice/ \
+-I${includedir}/kvskel/ -I${putools}/include/
+
 Libs: -L${libdir} -lkvcpp2 -lmilog -lmiconfparser -lcorba_skel  \
-  -lcorbahelper -lkvalobs -lfileutil -ldb -ldnmithread
+  -lcorbahelper -lkvalobs -lfileutil -lkv_db -ldnmithread \
+  -L${putools}/lib -lpuTools

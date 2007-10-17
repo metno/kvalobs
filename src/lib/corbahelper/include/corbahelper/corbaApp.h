@@ -32,7 +32,7 @@
 #define __corbaApp_h__
 
 #include <string>
-#include <CORBA.h>
+#include <omniORB4/CORBA.h>
 
 /**
  * \brief The namespace the CORBA helper utilities is in.

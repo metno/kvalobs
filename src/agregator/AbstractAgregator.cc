@@ -90,8 +90,6 @@ namespace agregator
 
     const TimeSpan ret( startTime, genTime );
 
-    // LOGDEBUG( "Time span: " << ret.first << " - " << ret.second );
-
     return ret;
   }
 
@@ -158,7 +156,7 @@ namespace agregator
 		
 	    if ( not shouldProcess( data, observations ) )
 	    {
-	      LOGDEBUG( "Will not process" );
+	      LOGINFO( "Will not process" );
 	      return return_type( 0 );
 	    }
 	

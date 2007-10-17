@@ -31,12 +31,11 @@
 #ifndef RA2RR_12FORWARDTEST_H_
 #define RA2RR_12FORWARDTEST_H_
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <ra2rr_12.h>
+#include "AbstractAgregatorTest.h"
 
-class ra2rr_12ForwardTest : public CppUnit::TestFixture
+class ra2rr_12ForwardTest : public AbstractAgregatorTest
 {
-    CPPUNIT_TEST_SUITE( ra2rr_12ForwardTest );
+    CPPUNIT_TEST_SUB_SUITE( ra2rr_12ForwardTest, AbstractAgregatorTest );
     CPPUNIT_TEST( testExpressedInterest );
     CPPUNIT_TEST( testNotEnoughData );
     CPPUNIT_TEST( testDataMarkedAsMissing );
@@ -53,7 +52,6 @@ public:
 	virtual ~ra2rr_12ForwardTest();
 
     virtual void setUp();
-    virtual void tearDown();
 
 	void testExpressedInterest();
 	
@@ -75,8 +73,6 @@ public:
 	void test12hPositive24hZeroAt18();
 
 private:
-    agregator::ra2rr_12_forward * agregator;
-
     enum { RR_12 = 109, RA = 104 };
 };
 

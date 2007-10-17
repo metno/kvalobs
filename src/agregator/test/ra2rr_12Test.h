@@ -31,15 +31,16 @@
 #ifndef RA2RR_12TEST_H_
 #define RA2RR_12TEST_H_
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <ra2rr_12.h>
+#include "AbstractAgregatorTest.h"
 
 
-class ra2rr_12Test : public CppUnit::TestFixture
+class ra2rr_12Test : public AbstractAgregatorTest
 {
-    CPPUNIT_TEST_SUITE( ra2rr_12Test );
+    CPPUNIT_TEST_SUB_SUITE( ra2rr_12Test, AbstractAgregatorTest );
     CPPUNIT_TEST( testExpressedInterest );
     CPPUNIT_TEST( testNotEnoughData );
+    CPPUNIT_TEST( testCompleteDataObservationInMiddle );
+    CPPUNIT_TEST( testNonStandardDataSet );
     CPPUNIT_TEST( testDataMarkedAsMissing );
     CPPUNIT_TEST( testStandardAgregation );
     CPPUNIT_TEST( testResultIsZero );
@@ -59,6 +60,10 @@ public:
 	
 	void testNotEnoughData();
 	
+	void testCompleteDataObservationInMiddle();
+	
+    void testNonStandardDataSet();
+    
 	void testDataMarkedAsMissing();
 	
     void testStandardAgregation();
@@ -75,8 +80,6 @@ public:
 	void test12hPositive24hZeroAt18();
 
 private:
-    agregator::ra2rr_12 * agregator;
-
     enum { RR_12 = 109, RA = 104 };
 };
 

@@ -314,10 +314,10 @@ namespace kvservice
         if ( dl.empty() )
         {
           l.push_back( *it );
-          // LOGDEBUG( "No matching entries in kvalobs - sending unmodified." );
+          LOGDEBUG( "No matching entries in kvalobs - sending unmodified." );
           continue;
         }
-        assert( dl.size() == 1 );
+        //assert( dl.size() == 1 );
         kvData & d = dl.front();
         LOGDEBUG( "Matching entry:\n" << decodeutility::kvdataformatter::createString( d ) );
 

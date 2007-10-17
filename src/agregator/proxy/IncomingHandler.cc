@@ -191,14 +191,14 @@ namespace kvservice
             for ( CIKvDataList i2 = i1->dataList().begin();
                   i2 != i1->dataList().end(); ++i2 )
               ss << decodeutility::kvdataformatter::createString( * i2 ) << endl;
-          LOGINFO( ss.str() );
+          LOGDEBUG( ss.str() );
 
           KvDataSaver ds( proxy );
           ds.next( *data );
 
           proxy.callback_send( *data );
 
-          LOGDEBUG( "Station " << data->front().dataList().front().stationID() << " done" );
+          LOGINFO( "Station " << data->front().dataList().front().stationID() << " done" );
         }
       }
     }

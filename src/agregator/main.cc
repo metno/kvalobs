@@ -90,7 +90,7 @@ struct backprod
       if ( proxy.stopping() )
         return;
       LOGINFO( "Done processing data back to " << from );
-      sleep( 60 );
+      sleep( 10 );
     }
   }
 };
@@ -129,7 +129,7 @@ int main( int argc, char **argv )
   // Logging
   FLogStream fine( 9, 1024 * 1024 );
   fine.open(kvdir + "var/agregate/agregator.log");
-  fine.loglevel( DEBUG );
+  fine.loglevel( INFO );
   FLogStream error( 9 );
   error.open(kvdir + "var/agregate/agregator.warn.log");
   error.loglevel( WARN );
@@ -230,7 +230,7 @@ int main( int argc, char **argv )
 
   backprod back( proxy, backprod_length );
   boost::thread t( back );
-  //back();
+//  back();
 
   // Start
   proxy.start_thread();

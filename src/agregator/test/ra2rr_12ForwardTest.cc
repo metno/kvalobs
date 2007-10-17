@@ -29,6 +29,7 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include "ra2rr_12ForwardTest.h"
+#include <ra2rr_12.h>
 #include <kvalobs/kvDataOperations.h>
 
 CPPUNIT_TEST_SUITE_REGISTRATION( ra2rr_12ForwardTest );
@@ -37,7 +38,6 @@ using namespace kvalobs;
 using namespace agregator;
 
 ra2rr_12ForwardTest::ra2rr_12ForwardTest()
-        : agregator( 0 )
 {}
 
 ra2rr_12ForwardTest::~ra2rr_12ForwardTest()
@@ -46,12 +46,6 @@ ra2rr_12ForwardTest::~ra2rr_12ForwardTest()
 void ra2rr_12ForwardTest::setUp()
 {
     agregator = new agregator::ra2rr_12_forward;
-}
-
-void ra2rr_12ForwardTest::tearDown()
-{
-    delete agregator;
-    agregator = 0;
 }
 
 void ra2rr_12ForwardTest::testExpressedInterest()

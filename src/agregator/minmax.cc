@@ -49,23 +49,22 @@ namespace agregator
         , function( minmax )
   {}
 
-
   float MinMax::generateKvData( const kvDataList &data,
                                 const kvData &trigger )
   {
     float val = data.front().corrected();
     
-    miutil::miTime tooEarly( trigger.obstime() );
-    tooEarly.addHour( - interestingHours() );
+//    miutil::miTime tooEarly( trigger.obstime() );
+//    tooEarly.addHour( - interestingHours() );
 
     for ( kvDataList::const_iterator it = data.begin(); it != data.end(); ++ it )
     {
-      if ( it->obstime() > tooEarly and it->obstime() <= trigger.obstime() )
-      {
+//      if ( it->obstime() > tooEarly and it->obstime() <= trigger.obstime() )
+//      {
 	      if ( not valid( * it ) )
 	        return invalidParam;
 	      val = function( val, it->corrected() );
-      }
+//      }
     }
 
     return val;

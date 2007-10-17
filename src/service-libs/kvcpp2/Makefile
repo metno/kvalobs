@@ -67,13 +67,16 @@ endif
 
 all:  install installqt
 
+SED_SUBSTITUTION = sed s,PREFIX,`cd $(PREFIX); pwd`, | \
+	sed s,PUTOOLS,$(PUTOOLS),
+
 install: $(TARGET)
 	mkdir -p $(PREFIX)/include/kvservice/$(PROGRAM_NAME)/corba/ $(PREFIX)/lib $(PREFIX)/lib/pkgconfig/
 	cp $(TARGET) $(PREFIX)/lib
 	cp -f include/*.h $(PREFIX)/include/kvservice/$(PROGRAM_NAME)
 	cp -f include/corba/*.h $(PREFIX)/include/kvservice/$(PROGRAM_NAME)/corba/
 	rm -f $(PREFIX)/lib/pkgconfig/$(PROGRAM_NAME).pc
-	cat $(PROGRAM_NAME).pc | sed s,PREFIX,`cd $(PREFIX); pwd`, >> $(PREFIX)/lib/pkgconfig/$(PROGRAM_NAME).pc
+	cat $(PROGRAM_NAME).pc | $(SED_SUBSTITUTION) >> $(PREFIX)/lib/pkgconfig/$(PROGRAM_NAME).pc
 
 uninstall: uninstallqt
 	rm -rf $(PREFIX)/lib/$(TARGET) \

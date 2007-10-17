@@ -49,19 +49,7 @@ OBJ=  $(ALL_SRC:.cc=.o)
 TESTOBJ= $(TESTSRC:.cc=.o)
 TESTLIB= -lcppunit
 
-ifndef PREFIX
-	PREFIX=$(HOME)/apps/
-endif 
-
-all:  $(TEST_PROGRAM_NAME) test $(TARGET) 
-
-install: $(TARGET)
-	mkdir -p $(PREFIX)/bin/
-	cp $(TARGET) $(PREFIX)/bin
-
-uninstall:
-	rm -f $(PREFIX)/bin/$(TARGET)
-
+all:  $(TEST_PROGRAM_NAME) test $(TARGET)
 
 .cc.o:
 	$(CXX) $(CXXFLAGS) $(DEFINES) $(INCLUDE) -o $@ -c $<

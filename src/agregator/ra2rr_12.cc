@@ -80,13 +80,11 @@ namespace agregator
 
   bool ra2rr_12::shouldProcess( const kvData & trigger, const kvDataList & observations )
   {
-    const set<miClock> & gw = generateWhen();
+	  const set<miClock> & gw = generateWhen();
     if ( observations.size() > 1 and
          gw.find( trigger.obstime().clock() ) != gw.end() and
          find_if( observations.begin(), observations.end(), hasObsHour<6> ) != observations.end() and
          find_if( observations.begin(), observations.end(), hasObsHour<18> ) != observations.end() )
-//         gw.find( observations.rbegin()->obstime().clock() ) != gw.end() and
-//         gw.find( observations.begin()->obstime().clock() ) != gw.end() )
       return true;
     return false;
   }
@@ -116,40 +114,6 @@ namespace agregator
 		
 	
 	return agregate( * from, * to, oneDayAgo == data.end() ? 0 : &* oneDayAgo );  
-	
-//    if ( not ( valid( trigger ) and valid( * previous ) ) )
-//      return invalidParam;
-//    
-//    // Do calculation
-//    float result = to->corrected() - previous->corrected();
-//    LOGDEBUG( "Calculation sum: " << result );
-//
-//	// Correct false precipitation 
-//	// - if  rain for 18:00 - 06:00 > 0
-//	//   and rain for 06:00 - 06:00 <= 0
-//	//   then return -1
-//	if ( result > 0 and to->obstime().clock().hour() == 6)
-//	{
-//		miutil::miTime obstime = to->obstime();
-//		obstime.addDay( -1 );
-//		kvDataList::const_iterator oneDayAgo = std::find_if( data.begin(), data.end(), has_obstime( obstime ) );
-//		if ( oneDayAgo != data.end() )
-//		{
-//			float otherResult = to->corrected() - oneDayAgo->corrected();
-//			if ( otherResult < 0.0001 )
-//				result = otherResult;
-//		}
-//	}
-//    
-//    // Make neccessary adjustments (values <= 0 is set to -1):
-//    if ( result < -9 ) {
-//      LOGDEBUG( "RA sum was negative: Reporting no rain" );
-//      return -1;
-//    }
-//    if ( result < 0.0001 )
-//      return -1;
-//      
-//    return result;
   }
 
   float ra2rr_12::agregate( const kvData & from, const kvData & to, const kvData * oneDayAgo ) const

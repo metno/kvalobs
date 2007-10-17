@@ -29,7 +29,9 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include "ra2rr_12Test.h"
+#include <ra2rr_12.h>
 #include <kvalobs/kvDataOperations.h>
+#include <iterator>
 
 CPPUNIT_TEST_SUITE_REGISTRATION( ra2rr_12Test );
 
@@ -37,7 +39,6 @@ using namespace kvalobs;
 using namespace agregator;
 
 ra2rr_12Test::ra2rr_12Test()
-	: agregator( 0 )
 {}
 
 ra2rr_12Test::~ra2rr_12Test()
@@ -78,6 +79,38 @@ void ra2rr_12Test::testNotEnoughData()
 	AbstractAgregator::kvDataPtr d = agregator->process( data.back(), data );
 	CPPUNIT_ASSERT( not d.get() );
 }
+
+void ra2rr_12Test::testCompleteDataObservationInMiddle()
+{
+	AbstractAgregator::kvDataList data;
+	const kvDataFactory dataFactory( 42, "2007-06-06 06:00:00", 302 );
+	
+	miutil::miTime t("2007-06-05 06:00:00");
+	for ( int i = 0; i < 13; ++ i )
+	{
+		data.push_back( dataFactory.getData( i, RA, t ) );
+		t.addHour();
+	}
+	
+	AbstractAgregator::kvDataList::const_iterator randomElement = data.begin();
+	advance(randomElement, 4);
+
+	AbstractAgregator::kvDataPtr d = agregator->process( * randomElement, data );
+
+	CPPUNIT_ASSERT( ! d.get() );
+}
+
+void ra2rr_12Test::testNonStandardDataSet()
+{
+	AbstractAgregator::kvDataList data;
+	const kvDataFactory dataFactory( 42, "2007-06-06 06:00:00", 302 );
+	for ( miutil::miTime t = "2007-06-06 07:00:00"; t < "2007-06-06 19:00:00"; t.addHour() )
+		data.push_back( dataFactory.getData( 100, RA, t ) );
+	
+	AbstractAgregator::kvDataPtr d = agregator->process( data.back(), data );
+	CPPUNIT_ASSERT( ! d.get() );
+}
+
 
 void ra2rr_12Test::testDataMarkedAsMissing()
 {
