@@ -1,6 +1,0 @@
-Revision history for Perl extension KvService.
-
-0.01  Fri Apr  4 17:05:15 2003
-	- original version; created by h2xs 1.21 with options
-		-O -n KvService kvglue/kvglue.h
-

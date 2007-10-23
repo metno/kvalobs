@@ -2,7 +2,7 @@ TOP=../../..
 
 LIBLIST:=kvcpp kvcpp2
 LIBLIST_DRIFT:=kvcpp 
-DIRLIST:=kvcpp qt java  
+DIRLIST:=kvcpp java  
 
 
 export DIRLIST LIBLIST LIBLIST_DRIFT
