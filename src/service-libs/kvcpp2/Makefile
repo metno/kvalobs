@@ -33,7 +33,7 @@ INCLUDE:= -Iinclude/ \
   $(BOOSTINCLUDE) $(OMNIINCLUDE) `pkg-config --cflags qt-mt`
 #	 `pkg-config --cflags qt-mt omniORB4 omniDynamic4 libxml++-1.0`
 
-# LIB:=	-L$(TOP)/lib -lkvcpp2 -ldecodeutility -lkvalobs -ldb -lfileutil -ldl -ldnmithread \
+# LIB:=	-L$(TOP)/lib -lkvcpp2 -ldecodeutility -lkvalobs -lkvdb -lfileutil -ldl -ldnmithread \
 # 		-lcorbahelper -lcorba_skel \
 # 		-lmiutil -lmiconfparser -lmilog \
 # 		$(BOOSTLIB) -lboost_thread -lboost_regex \

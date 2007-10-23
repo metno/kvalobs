@@ -37,7 +37,7 @@
 #include <boost/shared_ptr.hpp>
 #include <mgrApp.h>
 #include <CommandQue.h>
-#include <db.h>
+#include <kvdb.h>
 #include <kvStationInfoCommand.h>
 
 typedef boost::shared_ptr<PreProcessJob>            PreProcessJobPtr;

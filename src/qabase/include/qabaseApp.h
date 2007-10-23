@@ -35,7 +35,7 @@
 #include <kvskel/managerInput.hh>
 #include <kvalobs/kvStationInfo.h>
 #include <dnmithread/CommandQue.h>
-#include <db/dbdrivermgr.h>
+#include <kvdb/dbdrivermgr.h>
 
 
 /**

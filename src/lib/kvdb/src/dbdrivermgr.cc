@@ -29,9 +29,9 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include <fileutil/dso.h>
-#include "../include/db/dbdrivermgr.h"
+#include "../include/kvdb/dbdrivermgr.h"
 #include <sstream>
-#include "../include/db/db.h"
+#include "../include/kvdb/kvdb.h"
 
                          
 dnmi::db::

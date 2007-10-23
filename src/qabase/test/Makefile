@@ -8,7 +8,7 @@ INCLUDE=-I$(TOP)/include \
     	 
 LIBDIR=-L$(TOP)/lib $(BOOSTLIB) 
 LIB_DIR=-L$(TOP)/lib $(BOOSTLIB) $(OMNILIB) -L$(PUTOOLS)/lib 
-LIBS=-lmiconfparser -lmilog -lkvalobs -lmiutil -ldb -ldnmithread \
+LIBS=-lmiconfparser -lmilog -lkvalobs -lmiutil -lkvdb -ldnmithread \
      -lcorbahelper -lpuTools -lboost_thread \
      -lcorba_skel -lomniORB4 -lomnithread -lomniDynamic4  -lpthread
 

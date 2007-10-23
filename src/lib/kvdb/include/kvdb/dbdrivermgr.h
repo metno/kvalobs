@@ -32,7 +32,7 @@
 #define __dnmi__db_dbdrivermgr_h__
 
 #include <fileutil/dso.h>
-#include <db/db.h>
+#include <kvdb/kvdb.h>
 
 namespace dnmi {
   namespace db {

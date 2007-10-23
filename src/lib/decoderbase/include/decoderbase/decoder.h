@@ -35,7 +35,7 @@
 #include <miconfparser/miconfparser.h>
 #include <puTools/miString>
 #include <puTools/miTime>
-#include <db/db.h>
+#include <kvdb/kvdb.h>
 #include <fileutil/dso.h>
 #include <kvalobs/paramlist.h>
 #include <kvalobs/kvData.h>

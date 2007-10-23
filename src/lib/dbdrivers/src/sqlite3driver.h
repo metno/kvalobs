@@ -32,8 +32,8 @@
 #define __dnmi_db_drivers_sqlitedriver_h__
 
 #ifdef __cplusplus
-#include <db/db.h>
-#include <db/dbdrivermgr.h>
+#include <kvdb/kvdb.h>
+#include <kvdb/dbdrivermgr.h>
 
 
 /**

@@ -12,4 +12,4 @@ Requires: qt-mt
 Conflicts:
 Cflags: -I${includedir}/ -I${includedir}/kvservice/
 Libs: -L${libdir} -lkvcpp2 -lmilog -lmiconfparser -lcorba_skel  \
-  -lcorbahelper -lkvalobs -lfileutil -ldb -ldnmithread
+  -lcorbahelper -lkvalobs -lfileutil -lkvdb -ldnmithread

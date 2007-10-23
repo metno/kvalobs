@@ -1,7 +1,7 @@
 TOP=../..
 
 
-DIRLIST:=confparser milog miutil fileutil threadutil db  dbdrivers \
+DIRLIST:=confparser milog miutil fileutil threadutil kvdb  dbdrivers \
 	corbahelper kvalobs  decoderbase  decodeutility autoobsdecoder \
 	tips kldecoder kv2kvdecoder dummydecoder rejectdecoder comobsdecoder
 

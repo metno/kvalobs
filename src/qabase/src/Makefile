@@ -6,14 +6,14 @@ dummy:
 endif
 
 #LIB_DIR=-L$(TOP)/lib $(BOOSTLIB) $(OMNILIB) $(PERLLIB)
-#LIBS=-ldnmithread -lkvalobs -ldb -lfileutil -lmiutil -ldl -lcorbahelper \
+#LIBS=-ldnmithread -lkvalobs -lkvdb -lfileutil -lmiutil -ldl -lcorbahelper \
 #     -lboost_thread -lcorba_skel -lomniORB4 -lomnithread \
 #     -lomniDynamic4 -lpthread \
 #     -rdynamic -lperl -lnsl -ldl -lm -lc -lcrypt -lutil
 
 LIB_DIR=-L$(TOP)/lib $(BOOSTLIB) $(OMNILIB)  -L$(PUTOOLS)/lib
 
-LIBS=-lmilog -ldnmithread -lkvalobs -ldb -lfileutil -lmiutil -ldl \
+LIBS=-lmilog -ldnmithread -lkvalobs -lkvdb -lfileutil -lmiutil -ldl \
      -lmiconfparser -lcorbahelper -lpuTools -lboost_thread -lcorba_skel \
      -lomniORB4 -lomnithread -lomniDynamic4 -lpthread \
      $(PERLLIBS)

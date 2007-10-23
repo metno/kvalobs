@@ -23,12 +23,12 @@ INCLUDE:= -Isrc/                      \
 	      -I$(TOP)/include/kvalobs    \
 	      -I$(TOP)/include/miutil     \
 	      -I$(TOP)/include/dnmithread \
-	      -I$(TOP)/include/db         \
+	      -I$(TOP)/include/kvdb       \
 	      -I$(TOP)/include/kvskel     \
 	      -I$(TOP)/include/fileutil   \
 	      -I$(TOP)/include/corbahelper 
 
-LIB:=	-L$(PUTOOLS)/lib -L$(TOP)/lib -lkvalobs -ldb -lfileutil -ldl -ldnmithread \
+LIB:=	-L$(PUTOOLS)/lib -L$(TOP)/lib -lkvalobs -lkvdb -lfileutil -ldl -ldnmithread \
 		-lcorbahelper -lcorba_skel \
 		-lmiutil -lpuTools -lmiconfparser -lmilog \
 		$(OMNILIB) -lomniORB4 -lomnithread -lomniDynamic4 \

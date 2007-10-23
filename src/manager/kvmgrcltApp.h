@@ -31,7 +31,7 @@
 #ifndef __kvmgrcltApp_h__
 #define __kvmgrcltApp_h__
 
-#include <db/dbdrivermgr.h>
+#include <kvdb/dbdrivermgr.h>
 #include <kvalobs/kvapp.h>
 #include <puTools/miTime>
 

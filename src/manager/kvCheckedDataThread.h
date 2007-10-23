@@ -33,7 +33,7 @@
 
 #include <list>
 #include <dnmithread/CommandQue.h>
-#include <db/db.h>
+#include <kvdb/kvdb.h>
 #include <kvalobs/kvWorkelement.h>
 #include "mgrApp.h"
 

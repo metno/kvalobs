@@ -34,7 +34,7 @@
 #include <kvalobs/kvDbBase.h>
 #include <puTools/miString>
 #include <puTools/miTime>
-#include <db/db.h>
+#include <kvdb/kvdb.h>
 
 /// What is this?
 class DataTblView : public kvalobs::kvDbBase{

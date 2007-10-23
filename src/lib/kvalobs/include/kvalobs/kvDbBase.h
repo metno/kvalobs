@@ -31,7 +31,7 @@
 #ifndef _kvDbBase_h
 #define _kvDbBase_h
 
-#include <db/db.h>
+#include <kvdb/kvdb.h>
 #include <puTools/miString>
 #include <iostream>
 #include <fstream>

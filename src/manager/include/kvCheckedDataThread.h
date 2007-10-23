@@ -33,7 +33,7 @@
 
 #include <mgrApp.h>
 #include <CommandQue.h>
-#include <db.h>
+#include <kvdb.h>
 
 class KvCheckedDataThread{
   ManagerApp               &app;

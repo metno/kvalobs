@@ -32,7 +32,7 @@
 #define KVALOBSDATABASE_H
 
 #include <string>
-#include <db/db.h>
+#include <kvdb/kvdb.h>
 #include <boost/noncopyable.hpp>
 
 /**

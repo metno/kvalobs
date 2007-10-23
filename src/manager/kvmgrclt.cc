@@ -34,7 +34,7 @@
 #include <vector>
 
 #include <sstream>
-#include <db/dbdrivermgr.h>
+#include <kvdb/dbdrivermgr.h>
 #include <kvalobs/kvDbGate.h>
 #include <kvalobs/kvStation.h>
 #include <kvalobs/kvData.h>

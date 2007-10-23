@@ -38,8 +38,8 @@
 
 
 #ifdef __cplusplus
-#include <db/db.h>
-#include <db/dbdrivermgr.h>
+#include <kvdb/kvdb.h>
+#include <kvdb/dbdrivermgr.h>
 
 
 extern "C" {

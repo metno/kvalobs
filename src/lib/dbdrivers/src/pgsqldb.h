@@ -32,8 +32,8 @@
 #define __dnmi_db_drivers_pgsqldb_h__
 
 #include <libpq-fe.h>
-#include <db/db.h>
-#include <db/dbdrivermgr.h>
+#include <kvdb/kvdb.h>
+#include <kvdb/dbdrivermgr.h>
 
 
 namespace dnmi {

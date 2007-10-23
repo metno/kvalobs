@@ -21,7 +21,7 @@ INCLUDE:= -I. $(BOOSTINCLUDE) $(OMNIINCLUDE) \
 	     -I $(TOP)/include/kvservice\
 	     `pkg-config --cflags $(PKG_CONFIG_LIBS)`
 
-LIB:= -L$(TOP)/lib -lkvcpp2 -ldecodeutility -lkvalobs -ldb -lfileutil -ldl -ldnmithread \
+LIB:= -L$(TOP)/lib -lkvcpp2 -ldecodeutility -lkvalobs -lkvdb -lfileutil -ldl -ldnmithread \
 	-lcorbahelper -lcorba_skel \
 	-lmiutil -lmiconfparser -lmilog -L$(PUTOOLS)/lib -lpuTools \
 	$(BOOSTLIB) -lboost_thread -lboost_regex \

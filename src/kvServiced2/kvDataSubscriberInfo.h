@@ -36,7 +36,7 @@
 #include <vector>
 #include <kvskel/kvService.hh>
 #include <dnmithread/CommandQue.h>
-#include <db/db.h>
+#include <kvdb/kvdb.h>
 #include "kvSubscriberBase.h"
 #include "DataToSubscribers.h"
 

@@ -33,7 +33,7 @@
 
 #include <boost/thread/thread.hpp>
 #include <map>
-#include <db/dbdrivermgr.h>
+#include <kvdb/dbdrivermgr.h>
 
 /**
  * \addtogroup kvDatainputd

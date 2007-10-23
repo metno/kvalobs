@@ -30,7 +30,7 @@
 */
 #include <string>
 #include <iostream>
-#include <db/dbdrivermgr.h>
+#include <kvdb/dbdrivermgr.h>
 #include "kvalobs/kvDbGate.h"
 #include <list>
 

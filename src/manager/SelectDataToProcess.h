@@ -35,7 +35,7 @@
 #include <boost/shared_ptr.hpp>
 #include "mgrApp.h"
 #include <dnmithread/CommandQue.h>
-#include <db/db.h>
+#include <kvdb/kvdb.h>
 #include <kvalobs/kvWorkelement.h>
 #include <kvalobs/kvDbGate.h>
 

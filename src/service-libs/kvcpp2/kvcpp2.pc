@@ -18,5 +18,5 @@ Cflags: -I${includedir}/ -I${includedir}/kvservice/ \
 -I${includedir}/kvskel/ -I${putools}/include/
 
 Libs: -L${libdir} -lkvcpp2 -lmilog -lmiconfparser -lcorba_skel  \
-  -lcorbahelper -lkvalobs -lfileutil -lkv_db -ldnmithread \
+  -lcorbahelper -lkvalobs -lfileutil -lkvdb -ldnmithread \
   -L${putools}/lib -lpuTools

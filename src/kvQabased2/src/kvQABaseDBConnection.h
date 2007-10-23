@@ -57,7 +57,7 @@
 #include <kvalobs/kvDataOperations.h>
 #include <set>
 
-#include <db/dbdrivermgr.h>
+#include <kvdb/dbdrivermgr.h>
 
 /**
  * \brief QABase Database Connection Gate

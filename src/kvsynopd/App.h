@@ -36,7 +36,7 @@
 #define __kvsynopd_app_h__
 
 #include <kvcpp/KvApp.h>
-#include <db/dbdrivermgr.h>
+#include <kvdb/dbdrivermgr.h>
 #include <list>
 #include <puTools/miTime>
 #include <boost/thread/mutex.hpp>

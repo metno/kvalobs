@@ -35,7 +35,7 @@
 #include <kvservice/kvcpp2/kvservicetypes.h>
 #include <set>
 #include <puTools/miTime>
-//#include <db.h>
+//#include <kvdb.h>
 #include <dnmithread/CommandQue.h>
 #include <kvskel/datasource.hh>
 #include <decodeutility/kvDataFormatter.h>

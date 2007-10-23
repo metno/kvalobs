@@ -21,11 +21,11 @@ INCLUDE=-I$(TOP)/include             \
 
 
 
-LIBS=-L$(TOP)/lib $(BOOSTLIB) $(LIBXML_LIB) -lkvalobs -ldb -ldnmithread  \
+LIBS=-L$(TOP)/lib $(BOOSTLIB) $(LIBXML_LIB) -lkvalobs -lkvdb -ldnmithread  \
      -lboost_thread  -lboost_regex -lfileutil  -lmiutil -lmilog -lpthread \
      -lm -ldl 
 
-#LIBS=-L$(TOP)/lib $(BOOSTLIB) -ldb -lfileutil -ldl 
+#LIBS=-L$(TOP)/lib $(BOOSTLIB) -lkvdb -lfileutil -ldl 
 
 #MYLIBS=-L$(TOP)/lib 
 

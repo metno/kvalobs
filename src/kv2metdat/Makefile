@@ -16,7 +16,7 @@ INCLUDE=-I$(TOP)/include \
 	     $(BOOSTINCLUDE)
 
 
-LINKS=   -L$(TOP)/lib $(BOOSTLIB) -L$(PUTOOLS)/lib -lkvalobs -ldnmithread -lboost_thread  -lpthread -ldb -lfileutil -ldl -lpuTools -lm 
+LINKS=   -L$(TOP)/lib $(BOOSTLIB) -L$(PUTOOLS)/lib -lkvalobs -ldnmithread -lboost_thread  -lpthread -lkvdb -lfileutil -ldl -lpuTools -lm 
 
 
 # From .cc to .o

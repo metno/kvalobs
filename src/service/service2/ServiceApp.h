@@ -35,7 +35,7 @@
 #include <kvalobs/kvStationInfo.h>
 #include <kvalobs/kvStation.h>
 #include <kvskel/qabase.hh>
-#include <db/dbdrivermgr.h>
+#include <kvdb/dbdrivermgr.h>
 #include "SubscriberData.h"
 
 class ReaperBase;

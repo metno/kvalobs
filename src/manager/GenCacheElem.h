@@ -32,7 +32,7 @@
 #define __menager_gen_cache_element_h__
 
 #include <puTools/miTime>
-#include <db/db.h>
+#include <kvdb/kvdb.h>
 #include <boost/thread/mutex.hpp>
 /**
  * \ingroup kvmanager

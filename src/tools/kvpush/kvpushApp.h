@@ -31,8 +31,8 @@
 #ifndef __kvpushApp_h__
 #define __kvpushApp_h__
 
-#include <db/db.h>
-#include <db/dbdrivermgr.h>
+#include <kvdb/kvdb.h>
+#include <kvdb/dbdrivermgr.h>
 #include <kvalobs/kvapp.h>
 #include <puTools/miTime>
 #include <list>

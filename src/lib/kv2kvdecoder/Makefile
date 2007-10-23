@@ -30,7 +30,7 @@ KLOBJ=  $(KLSRC:.cc=.o)
 SOOBJ  := $(KLOBJ)
 
 
-LINKS= $(BOOSTLIB) -L${TOP}/lib -lkvalobs -ldb -ldnmithread  \
+LINKS= $(BOOSTLIB) -L${TOP}/lib -lkvalobs -lkvdb -ldnmithread  \
 	-lboost_thread  -lboost_regex -lfileutil -ldl -lmiutil -lpthread -lm $(LIBXMLPPLIB) $(CPPUNIT_LIB)
 
 SOLINK:=
@@ -57,7 +57,7 @@ $(PROJECT): $(SOOBJ)
 	rm -f core core.*
 
 LIB_DIR=-L$(TOP)/lib $(BOOSTLIB) $(OMNILIB)
-LIBS=-ldecodeutility -lmiutil -ldecoderbase -lkvalobs -ldb -lfileutil -lmiconfparser \
+LIBS=-ldecodeutility -lmiutil -ldecoderbase -lkvalobs -lkvdb -lfileutil -lmiconfparser \
 	-ldnmithread  \
 	-lcorbahelper -lmilog -lboost_thread -lcorba_skel -lomniORB4 \
 	-lomnithread -lomniDynamic4 -ldl -lpthread \

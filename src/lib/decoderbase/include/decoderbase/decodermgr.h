@@ -32,7 +32,7 @@
 #define __dnmi_decoder_DecoderMgr_h__
 
 #include <puTools/miString>
-#include <db/db.h>
+#include <kvdb/kvdb.h>
 #include <fileutil/dso.h>
 #include <decoderbase/decoder.h>
 #include <kvalobs/kvTypes.h>

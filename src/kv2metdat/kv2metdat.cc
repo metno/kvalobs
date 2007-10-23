@@ -33,7 +33,7 @@
 #include <list>
 #include <vector>
 
-#include <db/dbdrivermgr.h>
+#include <kvdb/dbdrivermgr.h>
 #include <kvalobs/kvDbGate.h>
 #include <kvalobs/kvStation.h>
 #include <kvalobs/kvParam.h>

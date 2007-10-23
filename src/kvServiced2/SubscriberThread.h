@@ -36,7 +36,7 @@
 #include <dnmithread/Thread.h>
 #include <dnmithread/CommandQue.h>
 #include <milog/milog.h>
-#include <db/db.h>
+#include <kvdb/kvdb.h>
 #include "kvDataSubscriberInfo.h"
 
 /**

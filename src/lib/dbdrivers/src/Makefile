@@ -58,7 +58,7 @@ setup:
 #Compiles the postgresql driver.
 pgdriver: pgdriver.o pgsqldb.o 
 	$(CXX) $(CXXLDFLAGS) $(CXXLDSOFLAGS) -o $@.so -fPIC $< \
-	    pgsqldb.o $(POSTGRESLIB) -L$(TOP)/lib -lpq -ldb -lfileutil
+	    pgsqldb.o $(POSTGRESLIB) -L$(TOP)/lib -lpq -lkvdb -lfileutil
 	mkdir -p ../lib/db
 	cp $@.so ../lib/db
 
@@ -72,7 +72,7 @@ dummysqldb.o: dummysqldb.cc
 
 dummydriver: dummydriver.o dummysqldb.o 
 	$(CXX) $(CXXLDFLAGS) $(CXXLDSOFLAGS) -o $@.so -fPIC $< \
-	    dummysqldb.o -L$(TOP)/lib -ldb 
+	    dummysqldb.o -L$(TOP)/lib -lkvdb 
 	mkdir -p ../lib/db
 	cp $@.so ../lib/db
 
@@ -86,7 +86,7 @@ pgsqldb.o: pgsqldb.cc
 #Compiles the sqlite driver.
 sqlitedriver: $(SQLITEOBJ)
 	$(CXX) $(CXXLDFLAGS) $(CXXLDSOFLAGS) -o $@.so -fPIC \
-	    $(SQLITEOBJ) $(SQLITELIB) -L$(TOP)/lib  -ldb -lfileutil
+	    $(SQLITEOBJ) $(SQLITELIB) -L$(TOP)/lib  -lkvdb -lfileutil
 	mkdir -p ../lib/db
 	cp $@.so ../lib/db
 
@@ -102,7 +102,7 @@ sqlitedb.o: sqlitedb.cc
 sqlite3driver: $(SQLITE3OBJ)
 	$(CXX) $(CXXLDFLAGS) $(CXXLDSOFLAGS) -o $@.so -fPIC \
 	    $(SQLITE3OBJ) $(SQLITE3LIB)  \
-		-L$(TOP)/lib  -ldb -lfileutil
+		-L$(TOP)/lib  -lkvdb -lfileutil
 	mkdir -p ../lib/db
 	cp $@.so ../lib/db
 
@@ -117,7 +117,7 @@ sqlite3db.o: sqlite3db.cc
 #Compiles the odbc driver. (Not implemented)
 odbcdriver: odbcdriver.o odbcdb.o
 	$(CXX) $(CXXLDFLAGS) $(CXXLDSOFLAGS) -o $@.so $< \
-	    odbcdb.o db.o -L$(ODBCLIB) -lodbc -ldb	
+	    odbcdb.o db.o -L$(ODBCLIB) -lodbc -lkvdb 
 
 odbcdriver.o: odbcdriver.cc
 	$(CXX) $(CXXFLAGS) $(CXXSOFLAGS) $(INCLUDE) -c $< 

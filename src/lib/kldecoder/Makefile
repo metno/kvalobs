@@ -29,7 +29,7 @@ KLOBJ=  $(KLSRC:.cc=.o)
 SOOBJ  := $(KLOBJ) 
 
 
-LINKS= $(BOOSTLIB) -L${TOP}/lib -lkvalobs -ldb -ldnmithread  \
+LINKS= $(BOOSTLIB) -L${TOP}/lib -lkvalobs -lkvdb -ldnmithread  \
 	-lboost_thread  -lboost_regex -lfileutil -ldl -lmiutil -lpthread -lm 
 
 SOLINK:=

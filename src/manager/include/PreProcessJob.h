@@ -32,7 +32,7 @@
 #define __preprocessjob_h__
 
 #include <miTime>
-#include <db.h>
+#include <kvdb.h>
 
 
 class PreProcessJob

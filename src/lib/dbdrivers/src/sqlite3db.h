@@ -34,8 +34,8 @@
 #include <vector>
 #include <list>
 #include <sqlite3.h>
-#include <db/db.h>
-#include <db/dbdrivermgr.h>
+#include <kvdb/kvdb.h>
+#include <kvdb/dbdrivermgr.h>
 
 
 namespace dnmi {

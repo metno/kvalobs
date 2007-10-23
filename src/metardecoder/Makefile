@@ -20,7 +20,7 @@ INCLUDE=-I$(PUTOOLS)/include -I$(PUTOOLS)/include/puTools \
 ALLOBJ= kvMetar.o kvMetarDecoder.o decode.o
 
 ALLSRC= $(ALLOBJ:.o=.cc) 
-LINKS=-L${TOP}/lib -L$(PUTOOLS)/lib -lkvalobs -ldb -ldnmithread\
+LINKS=-L${TOP}/lib -L$(PUTOOLS)/lib -lkvalobs -lkvdb -ldnmithread\
 	  -ltips 	-lmiutil -lfileutil -lpuTools -lpthread -ldl        \
 	   $(BOOSTLIB) 	-lboost_thread  -lboost_regex -lm 
 

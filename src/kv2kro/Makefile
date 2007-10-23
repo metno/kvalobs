@@ -14,7 +14,7 @@ BOOST_LIB=$(BOOSTLIB) -lboost_thread
 
 
 #KVALOBS stuff
-KVLIB:=-L$(TOP)/lib -lkvcpp -lmiutil -lkvalobs -ldb -lcorbahelper \
+KVLIB:=-L$(TOP)/lib -lkvcpp -lmiutil -lkvalobs -lkvdb -lcorbahelper \
 	-ldnmithread -lcorba_skel -L$(PUTOOLS)/lib -lpuTools -lmilog -lmiconfparser
 
 KVINCLUDE:=-I$(TOP)/include           \

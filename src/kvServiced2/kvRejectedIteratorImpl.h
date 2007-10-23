@@ -36,7 +36,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <kvskel/kvService.hh>
-#include <db/db.h>
+#include <kvdb/kvdb.h>
 #include <kvalobs/kvRejectdecode.h>
 #include "ServiceApp.h"
 #include "ReaperBase.h"

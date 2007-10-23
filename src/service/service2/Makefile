@@ -30,7 +30,7 @@ INCLUDE=-I$(TOP)/include/            \
 	    $(BOOSTINCLUDE)              
 
 LINKS= -L$(TOP)/lib $(OMNILIB) $(BOOSTLIB) -L$(PUTOOLS)/lib -lkvalobs  \
-	-lmiutil -ldb -lfileutil -lmiconfparser -lcorbahelper -ldnmithread \
+	-lmiutil -lkvdb -lfileutil -lmiconfparser -lcorbahelper -ldnmithread \
 	-lcorba_skel -lpuTools\
 	-lboost_thread 	-lmilog -lomniORB4 -lomnithread  -lboost_regex \
 	-lpthread -lm  -ldl

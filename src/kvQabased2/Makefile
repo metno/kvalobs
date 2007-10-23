@@ -21,7 +21,7 @@ INCLUDE:= $(BOOSTINCLUDE) \
 	  `pkg-config --cflags cppunit`
 
 LIB:=	-L$(TOP)/lib $(BOOSTLIB) $(OMNILIB) -L$(PUTOOLS)/lib \
-		-lmilog -lkvalobs -ldb -lfileutil -lmiutil -ldl \
+		-lmilog -lkvalobs -lkvdb -lfileutil -lmiutil -ldl \
 		-lmiconfparser -lcorbahelper -lboost_thread -lboost_filesystem -lcorba_skel -ldnmithread \
 		-lomniORB4 -lomnithread -lomniDynamic4 -lpthread -lpuTools $(PERLLIBS)
 

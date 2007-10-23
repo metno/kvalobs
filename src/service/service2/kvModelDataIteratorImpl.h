@@ -36,7 +36,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <kvskel/kvService.hh>
-#include <db/db.h>
+#include <kvdb/kvdb.h>
 #include <list>
 #include <kvalobs/kvModelData.h>
 #include "ServiceApp.h"

@@ -38,7 +38,7 @@ DECOBJ  = $(COMOBJ) decode.o
 
 
 
-LINKS= $(BOOSTLIB) -L${TOP}/lib -L$(PUTOOLS)/lib -lkvalobs -ldb -lpuTools -ldnmithread  \
+LINKS= $(BOOSTLIB) -L${TOP}/lib -L$(PUTOOLS)/lib -lkvalobs -lkvdb -lpuTools -ldnmithread  \
 	-lboost_thread  -lboost_regex -lfileutil -ldl -lmiutil -lpthread -lm 
 
 SOLINK:=

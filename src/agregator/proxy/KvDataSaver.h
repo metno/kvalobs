@@ -34,7 +34,7 @@
 #include "KvalobsProxy.h"
 #include <kvservice/kvcpp2/kvservicetypes.h>
 #include <kvservice/kvcpp2/KvGetDataReceiver.h>
-//#include <db.h>
+//#include <kvdb.h>
 
 
 namespace kvservice

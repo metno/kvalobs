@@ -5,7 +5,7 @@ INCLUDE=-I$(TOP)/include/db\
 	-I$(TOP)/include/fileutil
 
 LIBDIR=-L$(TOP)/lib
-LIBS=-ldb -lfileutil -ldl
+LIBS=-lkvdb -lfileutil -ldl
 
 %.o: %.cc
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< 

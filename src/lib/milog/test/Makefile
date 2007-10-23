@@ -3,7 +3,7 @@ include $(TOP)/conf/make.$(OSTYPE)
 
 INCLUDE=-I$(TOP)/include/milog $(BOOSTINCLUDE)
 LIBDIR=-L$(TOP)/lib
-LIBS= -lkvalobs -ldb -lfileutil -lmiutil  -ldl -ldnmithread -lboost_thread -lpthread
+LIBS= -lkvalobs -lkvdb -lfileutil -lmiutil  -ldl -ldnmithread -lboost_thread -lpthread
 
 override DEFINE+= -D_REENTRANT
 

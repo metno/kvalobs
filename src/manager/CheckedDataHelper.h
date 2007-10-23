@@ -31,7 +31,7 @@
 #ifndef __CheckedDataHelper_h__
 #define __CheckedDataHelper_h__
 
-#include <db/db.h>
+#include <kvdb/kvdb.h>
 #include <kvalobs/kvStationInfo.h>
 #include "mgrApp.h"
 

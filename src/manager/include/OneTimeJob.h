@@ -32,7 +32,7 @@
 #define __OneTimeJob_h__
 
 #include <miTime>
-#include <db.h>
+#include <kvdb.h>
 #include <kvStationInfo.h>
 #include <CommandQue.h>
 

@@ -47,7 +47,7 @@
 #include <kvalobs/kvTypes.h>
 #include <kvalobs/kvReferenceStation.h>
 #include <kvalobs/kvQueries.h>
-#include <db/db.h>
+#include <kvdb/kvdb.h>
 
 #include <list>
 

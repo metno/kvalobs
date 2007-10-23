@@ -34,7 +34,7 @@
 #include <kvskel/commonStationInfo.hh>
 #include <kvalobs/kvStationInfoCommand.h>
 #include "mgrApp.h"
-#include <db/db.h>
+#include <kvdb/kvdb.h>
 #include "CheckedDataHelper.h"
 
 class  CheckedDataCommandBase : public kvalobs::StationInfoCommand{

@@ -8,7 +8,7 @@ endif
 override DEFINES+= -D_REENTRANT
 
 LIB_DIR=-L$(TOP)/lib $(BOOSTLIB) $(OMNILIB)
-LIBS=-ldnmithread -lkvalobs -ldb -lfileutil -lmiutil -lcorbahelper \
+LIBS=-ldnmithread -lkvalobs -lkvdb -lfileutil -lmiutil -lcorbahelper \
      -lmilog -lmiconfparser\
      -lboost_thread -lcorba_skel -lomniORB4 -lomnithread \
      -lomniDynamic4 -ldl -lpthread

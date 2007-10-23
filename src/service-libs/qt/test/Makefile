@@ -22,7 +22,7 @@ BOOST_LIB=$(BOOSTLIB) -lboost_thread
 
 
 #KVALOBS stuff
-KVLIB:=-L$(TOP)/lib -lkvQt -lmiutil -lkvalobs -ldb -lcorbahelper \
+KVLIB:=-L$(TOP)/lib -lkvQt -lmiutil -lkvalobs -lkvdb -lcorbahelper \
 	-ldnmithread -lcorba_skel -lmilog -lmiconfparser
 
 KVINCLUDE:=-I$(TOP)/include/kvskel      \

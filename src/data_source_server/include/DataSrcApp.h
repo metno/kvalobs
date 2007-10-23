@@ -40,7 +40,7 @@
 #include <dnmithread/CommandQue.h>
 #include "DecodeCommand.h"
 #include <decoderbase/decodermgr.h>
-#include <db/dbdrivermgr.h>
+#include <kvdb/dbdrivermgr.h>
 #include "ConnectionCache.h"
 #include <kvalobs/paramlist.h>
 #include <kvalobs/kvTypes.h>

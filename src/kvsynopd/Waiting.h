@@ -33,7 +33,7 @@
 
 #include <list>
 #include <boost/shared_ptr.hpp>
-#include <db/db.h>
+#include <kvdb/kvdb.h>
 #include "StationInfo.h"
 
 class Waiting

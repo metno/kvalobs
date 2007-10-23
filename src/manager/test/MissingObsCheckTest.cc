@@ -35,7 +35,7 @@
 #include <getopt.h>
 #include <iostream>
 #include <string>
-#include <db/dbdrivermgr.h>
+#include <kvdb/dbdrivermgr.h>
 #include <kvalobs/kvDbGate.h>
 #include <list>
 #include <milog/milog.h>

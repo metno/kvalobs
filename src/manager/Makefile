@@ -37,7 +37,7 @@ INCLUDE=-I$(TOP)/include              \
 
 LIB_DIR=-L$(TOP)/lib $(BOOSTLIB) $(OMNILIB) -L$(PUTOOLS)/lib
 
-LIBS=-lkvalobs -ldb -lfileutil -lmiutil -lcorbahelper \
+LIBS=-lkvalobs -lkvdb -lfileutil -lmiutil -lcorbahelper \
      -lmilog -lmiconfparser\
      -ldnmithread -lpuTools -lboost_thread -lcorba_skel -lomniORB4 -lomnithread \
      -lomniDynamic4 -ldl -lpthread

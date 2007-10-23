@@ -31,8 +31,8 @@
 #ifndef __dnmi_db_drivers_dummysqldb_h__
 #define __dnmi_db_drivers_dummysqldb_h__
 
-#include <db/db.h>
-#include <db/dbdrivermgr.h>
+#include <kvdb/kvdb.h>
+#include <kvdb/dbdrivermgr.h>
 
 
 namespace dnmi {

@@ -33,7 +33,7 @@
 
 #include <mgrApp.h>
 #include <CommandQue.h>
-#include <db.h>
+#include <kvdb.h>
 #include <kvStationInfoCommand.h>
 
 class CheckForMissingObsMessages

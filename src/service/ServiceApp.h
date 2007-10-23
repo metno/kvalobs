@@ -36,7 +36,7 @@
 #include <kvskel/qabase.hh>
 #include "kvSubscriberCollection.h"
 #include <kvalobs/kvStation.h>
-#include <db/dbdrivermgr.h>
+#include <kvdb/dbdrivermgr.h>
 
 class ReaperBase;
 

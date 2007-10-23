@@ -36,7 +36,7 @@
 #include <kvalobs/kvStationInfo.h>
 #include <kvskel/qabase.hh>
 #include <kvalobs/kvStation.h>
-#include <db/dbdrivermgr.h>
+#include <kvdb/dbdrivermgr.h>
 #include <kvskel/kvService.hh>
 #include "GenCacheElem.h"
 

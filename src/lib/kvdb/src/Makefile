@@ -6,7 +6,7 @@ dummy:
 endif
 
 
-OBJFILES:=db.o dbdrivermgr.o transactionhelper.o
+OBJFILES:=kvdb.o dbdrivermgr.o transactionhelper.o
 SRCFILES:=$(OBJFILES:.o=.cc)
 
 %.o: %.cc

@@ -13,7 +13,7 @@ LIBXML_LIB:=$(filter-out -lpthread, $(LIBXML_LIB_TMP))
 
 LIB_DIR=-L$(TOP)/lib $(BOOSTLIB) $(OMNILIB) 
 LIBS=-ldecoderbase -ldecodeutility $(LIBXML_LIB) -lmiutil  -lkvalobs -ldecodeutility \
-	 $(LIBXMLPPLIB) -ldb -lfileutil -lmiconfparser 	-ldnmithread  \
+	 $(LIBXMLPPLIB) -lkvdb -lfileutil -lmiconfparser 	-ldnmithread  \
 	-lcorbahelper -lmilog -L$(PUTOOLS)/lib -lpuTools -lboost_thread \
 	-lcorba_skel -lomniORB4 -lomnithread -lomniDynamic4 -ldl -lpthread $(LIBXMLPPLIB)
 

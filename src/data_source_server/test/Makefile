@@ -14,7 +14,7 @@ INCLUDE=-I$(INC)/miutil \
 	
 	
 LIB_DIR=-L$(TOP)/lib $(BOOSTLIB) $(OMNILIB)
-LIBS=-lkvalobs -ldb  -lmilog -lmiconfparser -lmiutil  -lcorbahelper \
+LIBS=-lkvalobs -lkvdb  -lmilog -lmiconfparser -lmiutil  -lcorbahelper \
      -ldnmithread  -lboost_thread -lcorba_skel  -lomniORB4 -lomnithread \
      -lomniDynamic4  -lpthread
 	

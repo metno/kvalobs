@@ -29,7 +29,7 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include "kvalobsdatabase.h"
-#include <db/dbdrivermgr.h>
+#include <kvdb/dbdrivermgr.h>
 #include <stdexcept>
 #include <fstream>
 #include <boost/filesystem/operations.hpp>

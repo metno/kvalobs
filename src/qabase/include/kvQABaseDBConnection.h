@@ -57,7 +57,7 @@
 #include <kvalobs/kvObsPgm.h>
 #include <kvalobs/kvDbGate.h>
 
-#include <db/dbdrivermgr.h>
+#include <kvdb/dbdrivermgr.h>
 
 class kvQABaseDBConnection {
 public:

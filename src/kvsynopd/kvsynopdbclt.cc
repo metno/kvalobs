@@ -38,7 +38,7 @@
 #include <iostream>
 #include <miconfparser/miconfparser.h>
 #include <string>
-#include <db/dbdrivermgr.h>
+#include <kvdb/dbdrivermgr.h>
 #include <fstream>
 #include <kvalobs/kvDbGate.h>
 #include "tblSynop.h"

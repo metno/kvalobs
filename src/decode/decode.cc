@@ -35,7 +35,7 @@
 #include <iostream>
 #include "kvSynopDecoder.h"
 #include <string>
-#include <db/dbdrivermgr.h>
+#include <kvdb/dbdrivermgr.h>
 #include <kvalobs/kvDbGate.h>
 #include <list>
 
