@@ -1,5 +1,0 @@
-#!/bin/sh
-
-cp -fupv forceCheck $KVALOBS/bin
-mkdir -p $KVALOBS/test
-cp -fupv run_check.dat $KVALOBS/test

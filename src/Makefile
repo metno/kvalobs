@@ -4,7 +4,7 @@ LIBLIST:=skel lib decode service-libs
 LIBLIST_DRIFT:=skel lib decode
 
 #DIRLIST:=data_source_server manager kvServiced2 \
-	     norcom2kv kvsynopd agregator tools kvQabased2
+	     norcom2kv kvsynopd agregator tools kvQabased
 
 #DIRLIST_DRIFT:=data_source_server manager kvServiced2 \
 	     norcom2kv kvsynopd agregator tools
@@ -14,10 +14,10 @@ DIRLIST_DRIFT:=data_source_server manager service \
 
 
 #DIRLIST:=data_source_server manager qabase service \
-	 norcom2kv kvsynopd agregator kvQabased2
+	 norcom2kv kvsynopd agregator kvQabased
 
 
-DIRLIST:=data_source_server manager kvQabased2 service \
+DIRLIST:=data_source_server manager kvQabased service \
 	 norcom2kv kvsynopd agregator
 
 
@@ -34,7 +34,7 @@ all-drift: drift-libs
 	for DIR in $$DIRLIST ; do \
 	   (cd $$DIR; $(MAKE) ) \
 	done ; \
-	cd kvQabased2; $(MAKE) install
+	cd kvQabased; $(MAKE) install
 
 drift-libs:	
 	for DIR in $$LIBLIST_DRIFT ; do \
