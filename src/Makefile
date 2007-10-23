@@ -3,22 +3,22 @@ TOP=..
 LIBLIST:=skel lib decode service-libs 
 LIBLIST_DRIFT:=skel lib decode
 
-#DIRLIST:=data_source_server manager kvServiced2 \
-	     norcom2kv kvsynopd agregator tools kvQabased
+#DIRLIST:=kvDataInputd manager kvServiced2 \
+	     norcom2kv kvsynopd kvAgregated tools kvQabased
 
-#DIRLIST_DRIFT:=data_source_server manager kvServiced2 \
-	     norcom2kv kvsynopd agregator tools
+#DIRLIST_DRIFT:=kvDataInputd manager kvServiced2 \
+	     norcom2kv kvsynopd kvAgregated tools
 
-DIRLIST_DRIFT:=data_source_server manager service \
-	     norcom2kv kvsynopd agregator tools
-
-
-#DIRLIST:=data_source_server manager qabase service \
-	 norcom2kv kvsynopd agregator kvQabased
+DIRLIST_DRIFT:=kvDataInputd manager service \
+	     norcom2kv kvsynopd kvAgregated tools
 
 
-DIRLIST:=data_source_server manager kvQabased service \
-	 norcom2kv kvsynopd agregator
+#DIRLIST:=kvDataInputd manager qabase service \
+	 norcom2kv kvsynopd kvAgregated kvQabased
+
+
+DIRLIST:=kvDataInputd manager kvQabased service \
+	 norcom2kv kvsynopd kvAgregated
 
 
 export DIRLIST DIRLIST_DRIFT LIBLIST LIBLIST_DRIFT
