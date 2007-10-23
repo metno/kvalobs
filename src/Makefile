@@ -3,21 +3,21 @@ TOP=..
 LIBLIST:=skel lib decode service-libs 
 LIBLIST_DRIFT:=skel lib decode
 
-#DIRLIST:=kvDataInputd manager kvServiced2 \
+#DIRLIST:=kvDataInputd kvManagerd kvServiced \
 	     norcom2kv kvsynopd kvAgregated tools kvQabased
 
-#DIRLIST_DRIFT:=kvDataInputd manager kvServiced2 \
+#DIRLIST_DRIFT:=kvDataInputd kvManagerd kvServiced \
 	     norcom2kv kvsynopd kvAgregated tools
 
-DIRLIST_DRIFT:=kvDataInputd manager service \
+DIRLIST_DRIFT:=kvDataInputd kvManagerd kvServiced \
 	     norcom2kv kvsynopd kvAgregated tools
 
 
-#DIRLIST:=kvDataInputd manager qabase service \
+#DIRLIST:=kvDataInputd kvManagerd kvQabased kvServiced \
 	 norcom2kv kvsynopd kvAgregated kvQabased
 
 
-DIRLIST:=kvDataInputd manager kvQabased service \
+DIRLIST:=kvDataInputd kvManagerd kvQabased kvServiced \
 	 norcom2kv kvsynopd kvAgregated
 
 
@@ -27,24 +27,25 @@ export DIRLIST DIRLIST_DRIFT LIBLIST LIBLIST_DRIFT
 
 all: libs
 	for DIR in $$DIRLIST ; do \
-	   (cd $$DIR; $(MAKE) ) \
-	done
+           (cd $$DIR && $(MAKE) ) \
+        done
+
 
 all-drift: drift-libs
 	for DIR in $$DIRLIST ; do \
-	   (cd $$DIR; $(MAKE) ) \
+	   (cd $$DIR && $(MAKE) ) \
 	done ; \
 	cd kvQabased; $(MAKE) install
 
 drift-libs:	
 	for DIR in $$LIBLIST_DRIFT ; do \
-	   (cd $$DIR; $(MAKE) ) \
+	   (cd $$DIR && $(MAKE) ) \
 	done ; \
 	cd service-libs; $(MAKE) drift
 
 libs:
 	for DIR in $$LIBLIST ; do \
-	   (cd $$DIR; $(MAKE) ) \
+	   (cd $$DIR && $(MAKE) ) \
 	done
 
 
