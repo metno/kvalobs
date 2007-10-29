@@ -29,7 +29,7 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include "KvDataReceiver.h"
-#include <kvservice/kvcpp2/KvApp.h>
+#include <kvservice/kvcpp/KvApp.h>
 #include <milog/milog.h>
 
 namespace kvservice

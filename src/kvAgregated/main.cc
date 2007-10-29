@@ -28,7 +28,7 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#include <kvservice/kvcpp2/corba/CorbaKvApp.h>
+#include <kvservice/kvcpp/corba/CorbaKvApp.h>
 #include "AgregatorHandler.h"
 #include "proxy/KvalobsProxy.h"
 #include <kvalobs/kvStation.h>
@@ -139,7 +139,7 @@ int main( int argc, char **argv )
   // Proxy database
   DriverManager manager;
   std::string proxyID;
-  const string dbDriverPath = kvdir + "lib/kvdb/";
+  const string dbDriverPath = kvdir + "lib/db/";
   if ( !manager.loadDriver(dbDriverPath + "sqlitedriver.so", proxyID) ) {
     LOGFATAL( "Error when loading database driver: " << manager.getErr() );
     return 2;

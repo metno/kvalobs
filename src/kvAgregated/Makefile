@@ -18,10 +18,10 @@ INCLUDE:= -I. $(BOOSTINCLUDE) $(OMNIINCLUDE) \
 	     -I$(TOP)/include \
 	     -I$(PUTOOLS)/include -I$(PUTOOLS)/include/puTools \
 	     -I $(TOP)/include/kvskel \
-	     -I $(TOP)/include/kvservice\
+	     -I $(TOP)/include/kvservice/kvcpp\
 	     `pkg-config --cflags $(PKG_CONFIG_LIBS)`
 
-LIB:= -L$(TOP)/lib -lkvcpp2 -ldecodeutility -lkvalobs -lkvdb -lfileutil -ldl -ldnmithread \
+LIB:= -L$(TOP)/lib -lkvcpp -ldecodeutility -lkvalobs -lkvdb -lfileutil -ldl -ldnmithread \
 	-lcorbahelper -lcorba_skel \
 	-lmiutil -lmiconfparser -lmilog -L$(PUTOOLS)/lib -lpuTools \
 	$(BOOSTLIB) -lboost_thread -lboost_regex \

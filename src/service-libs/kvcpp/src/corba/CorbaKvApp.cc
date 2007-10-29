@@ -156,7 +156,8 @@ namespace kvservice
 
     std::string CorbaKvApp::kvpathInCorbaNameserver() const
     {
-      return nameserverpath;
+      string::size_type len = nameserverpath.size(); 
+      return nameserverpath.substr(1, len -2 );
     }
 
 

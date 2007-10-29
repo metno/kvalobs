@@ -33,8 +33,8 @@
 
 #include <list>
 #include <stdexcept>
-#include <kvservice/kvcpp2/kvevents.h>
-#include <kvservice/kvcpp2/KvGetDataReceiver.h>
+#include <kvservice/kvcpp/kvevents.h>
+#include <kvservice/kvcpp/KvGetDataReceiver.h>
 #include <boost/thread/mutex.hpp>
 
 namespace boost

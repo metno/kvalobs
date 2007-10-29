@@ -32,10 +32,9 @@
 #define __kvservice__proxy__KvalobsProxy_h__
 
 #include <boost/utility.hpp>
-#include <kvservice/kvcpp2/kvservicetypes.h>
+#include <kvservice/kvcpp/kvservicetypes.h>
 #include <set>
 #include <puTools/miTime>
-//#include <kvdb.h>
 #include <dnmithread/CommandQue.h>
 #include <kvskel/datasource.hh>
 #include <decodeutility/kvDataFormatter.h>

@@ -35,7 +35,7 @@
 #ifndef __kvsynopd_app_h__
 #define __kvsynopd_app_h__
 
-#include <kvcpp2/corba/CorbaKvApp.h>
+#include <kvcpp/corba/CorbaKvApp.h>
 #include <kvdb/dbdrivermgr.h>
 #include <list>
 #include <puTools/miTime>
