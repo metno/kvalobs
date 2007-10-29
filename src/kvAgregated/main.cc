@@ -139,7 +139,7 @@ int main( int argc, char **argv )
   // Proxy database
   DriverManager manager;
   std::string proxyID;
-  const string dbDriverPath = kvdir + "lib/db/";
+  const string dbDriverPath = kvdir + "lib/kvdb/";
   if ( !manager.loadDriver(dbDriverPath + "sqlitedriver.so", proxyID) ) {
     LOGFATAL( "Error when loading database driver: " << manager.getErr() );
     return 2;

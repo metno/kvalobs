@@ -11,5 +11,5 @@ Version: 1.0
 Requires: qt-mt
 Conflicts:
 Cflags: -I${includedir}/ -I${includedir}/kvservice/
-Libs: -L${libdir} -lkvcpp2 -lmilog -lmiconfparser -lcorba_skel  \
+Libs: -L${libdir} -lkvcpp -lmilog -lmiconfparser -lcorba_skel  \
   -lcorbahelper -lkvalobs -lfileutil -lkvdb -ldnmithread

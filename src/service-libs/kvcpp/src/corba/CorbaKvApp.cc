@@ -154,6 +154,11 @@ namespace kvservice
       return 0;
     }
 
+    std::string CorbaKvApp::kvpathInCorbaNameserver() const
+    {
+      return nameserverpath;
+    }
+
 
     kvService_ptr CorbaKvApp::lookUpManager( bool forceNS, bool & usedNS )
     {

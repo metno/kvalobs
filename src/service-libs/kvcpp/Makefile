@@ -1,4 +1,4 @@
-PROGRAM_NAME= kvcpp2
+PROGRAM_NAME= kvcpp
 TARGET= lib$(PROGRAM_NAME).a
 TEST_PROGRAM_NAME= test$(PROGRAM_NAME)
 
@@ -33,7 +33,7 @@ INCLUDE:= -Iinclude/ \
   $(BOOSTINCLUDE) $(OMNIINCLUDE) `pkg-config --cflags qt-mt`
 #	 `pkg-config --cflags qt-mt omniORB4 omniDynamic4 libxml++-1.0`
 
-# LIB:=	-L$(TOP)/lib -lkvcpp2 -ldecodeutility -lkvalobs -lkvdb -lfileutil -ldl -ldnmithread \
+# LIB:=	-L$(TOP)/lib -lkvcpp -ldecodeutility -lkvalobs -lkvdb -lfileutil -ldl -ldnmithread \
 # 		-lcorbahelper -lcorba_skel \
 # 		-lmiutil -lmiconfparser -lmilog \
 # 		$(BOOSTLIB) -lboost_thread -lboost_regex \
@@ -83,7 +83,7 @@ uninstall: uninstallqt
     $(PREFIX)/include/kvservice/$(PROGRAM_NAME) \
     $(PREFIX)/lib/pkgconfig/$(PROGRAM_NAME).pc
 
-QT_PROGRAM_NAME= kvQt2
+QT_PROGRAM_NAME= kvQt
 QT_TARGET= lib$(QT_PROGRAM_NAME).a
 
 installqt: $(QT_TARGET)

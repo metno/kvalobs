@@ -151,6 +151,8 @@ namespace kvservice
        */
       static miutil::conf::ConfSection* readConf(const std::string &fname);
 
+      std::string kvpathInCorbaNameserver() const;
+
       virtual bool getKvData( KvGetDataReceiver &dataReceiver, const WhichDataHelper &wd );
       virtual bool getKvRejectDecode( const CKvalObs::CService::RejectDecodeInfo &decodeInfo, kvservice::RejectDecodeIterator &it );
       virtual bool getKvParams( std::list<kvalobs::kvParam> &paramList );

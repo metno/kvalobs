@@ -17,6 +17,6 @@ Conflicts:
 Cflags: -I${includedir}/ -I${includedir}/kvservice/ \
 -I${includedir}/kvskel/ -I${putools}/include/
 
-Libs: -L${libdir} -lkvcpp2 -lmilog -lmiconfparser -lcorba_skel  \
+Libs: -L${libdir} -lkvcpp -lmilog -lmiconfparser -lcorba_skel  \
   -lcorbahelper -lkvalobs -lfileutil -lkvdb -ldnmithread \
   -L${putools}/lib -lpuTools
