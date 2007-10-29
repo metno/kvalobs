@@ -1,6 +1,6 @@
 TOP=../../..
 
-LIBLIST:=kvcpp kvcpp2
+LIBLIST:=kvcpp
 LIBLIST_DRIFT:=kvcpp 
 DIRLIST:=kvcpp java  
 
