@@ -1,0 +1,23 @@
+$KVDIR/src/service-libs/kvcpp inneholder en makefil som må kjøres før
+en kjører makefilen til DataReceiverSimpleKro, nå ser det ut som at denne makefilen kjører 
+automatisk når alt kompileres.
+
+ DataReceiverSimpleKro brukes som teknologi i flere kontekster blant
+ annet i overføringen til kro og for overføringen til st-info-sys.
+
+For å kjøre dette her bruker en programmet DataReceiverSimpleKro
+Katalogen må i tillegg inneholde en fil med navnet ObsInsert. Denne
+filen blir kalt opp av  DataReceiverSimpleKro og
+DataReceiverSimpleKro skriver ut en fil med navn
+obsDataList."tidspunkt"; eks. 2005-03-01_19:09:57
+
+For at ikke katalogen skal bli helt full må det døgnlig kjøres en
+cronjobb som heter delete_oldfiles.pl og som sletter filer eldre enn
+14 dager, dette tidsintervallet kan enkelt stilles dersom det skulle
+være nødvendig. 
+
+For å kjøre programmet er det er bare å starte programmet
+./DataReceiverSimpleKro
+ Programmet DataReceiverSimpleKro kaller opp shell scriptet obsInsert med navnet på 
+ filen den har skrevet ut. 
+ obsInsert inneholder her:  perl obsInsertTest.pl $1
