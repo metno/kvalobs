@@ -14,13 +14,13 @@ BOOST_LIB=$(BOOSTLIB) -lboost_thread
 
 
 #KVALOBS stuff
-KVLIB:=-L$(TOP)/lib -lkvcpp -lmiutil -lkvalobs -lkvdb -lfileutil -ldecodeutility\
+KVLIB:=-L$(TOP)/lib -lkvcpp2 -lmiutil -lkvalobs -lkvdb -lfileutil -ldecodeutility\
 	-lcorbahelper -ldnmithread -lcorba_skel -lmilog -lmiconfparser 
 
 KVINCLUDE:=-I$(TOP)/include           \
-	       -I$(TOP)/include/kvservice \
-    	   -I$(TOP)/include/kvskel    \
-		   -I$(PUTOOLS)/include -I$(PUTOOLS)/include/puTools
+           -I$(TOP)/include/kvservice \
+           -I$(TOP)/include/kvskel    \
+           -I$(PUTOOLS)/include -I$(PUTOOLS)/include/puTools
 
 
 KVSYNOPD_OBJ:=kvsynopd.o App.o DataReceiver.o Data.o SynopWorker.o SynopData.o\

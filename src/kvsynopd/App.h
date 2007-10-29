@@ -35,12 +35,13 @@
 #ifndef __kvsynopd_app_h__
 #define __kvsynopd_app_h__
 
-#include <kvcpp/KvApp.h>
+#include <kvcpp2/corba/CorbaKvApp.h>
 #include <kvdb/dbdrivermgr.h>
 #include <list>
 #include <puTools/miTime>
 #include <boost/thread/mutex.hpp>
 #include <kvskel/kvsynopd.hh>
+#include "kvsynopdImpl.h"
 #include "StationInfo.h"
 #include "Waiting.h"
 #include "tblSynop.h"
@@ -52,52 +53,59 @@ namespace kvsynopd{
 
 class GetData;
 
-class App : public kvservice::KvApp
+class App : public kvservice::corba::CorbaKvApp
 {
- public:
-  typedef std::list<StationInfoPtr>                   StationList;
-  typedef std::list<StationInfoPtr>::iterator        IStationList;
-  typedef std::list<StationInfoPtr>::const_iterator CIStationList;
+public:
+   typedef std::list<StationInfoPtr>                   StationList;
+   typedef std::list<StationInfoPtr>::iterator        IStationList;
+   typedef std::list<StationInfoPtr>::const_iterator CIStationList;
   
- private:
-  dnmi::db::DriverManager dbMgr;
-  std::string             dbDriver;
-  std::string             dbConnect;
-  std::string             dbDriverId;
-  StationList             stationList;
-  miutil::miTime          startTime_;
-  WaitingList             waitingList;
-  std::string             confFile;
-  std::string             kvpath_;
-  std::string             mypathInCorbaNS;
-  std::list<int>          continuesTypeID_;
-  std::list<ObsEvent*>    obsEventWaitingOnCacheReload;
-  std::list<GetData*>     getDataThreads;
-  bool                    hasStationWaitingOnCacheReload;
-  bool                    acceptAllTimes_;
+private:
+   dnmi::db::DriverManager dbMgr;
+   std::string             dbDriver;
+   std::string             dbConnect;
+   std::string             dbDriverId;
+   StationList             stationList;
+   miutil::miTime          startTime_;
+   WaitingList             waitingList;
+   std::string             confFile;
+   std::string             kvpath_;
+   std::string             mypathInCorbaNS;
+   std::list<int>          continuesTypeID_;
+   std::list<ObsEvent*>    obsEventWaitingOnCacheReload;
+   std::list<GetData*>     getDataThreads;
+   bool                    hasStationWaitingOnCacheReload;
+   bool                    acceptAllTimes_;
+   kvsynopd::synop_var synopRef;
   
-  void readWaitingElementsFromDb();
+   void readWaitingElementsFromDb();
+   boost::mutex mutex;
 
-  boost::mutex mutex;
-
- public:
-  App(int argn, char **argv, const std::string &kvpath,  
+public:
+   App(int argn, char **argv, const std::string &kvpath,  
       const std::string &confFile_, miutil::conf::ConfSection *conf);
-  ~App();
+   ~App();
 
   
-  std::string kvpath()const{ return kvpath_;}
+   std::string kvpath()const{ return kvpath_;}
 
 
-    bool acceptAllTimes()const { return acceptAllTimes_;}
+   bool acceptAllTimes()const { return acceptAllTimes_;}
 
-  /**
-   * \brief cretae a globale logger with id \a id.
-   *
-   * \param is An id to identify the logger.
-   * \return true on success and false otherwise.
-   */
-  bool createGlobalLogger(const std::string &id);
+   /**
+    * \brief Setup and initialize the interface to kvsynopd.
+    * 
+    * \return true if the subsystem has been setup and false otherwise.
+    */ 
+   bool initKvSynopInterface( dnmi::thread::CommandQue &newObsQue );
+  
+   /**
+    * \brief cretae a globale logger with id \a id.
+    *
+    * \param is An id to identify the logger.
+    * \return true on success and false otherwise.
+    */
+   bool createGlobalLogger(const std::string &id);
 
 
   

@@ -56,7 +56,7 @@ namespace{
 SynopCltApp *SynopCltApp::app =0;
 
 SynopCltApp::SynopCltApp(int argn, char **argv)
-  :synopcb(kvsynopd::synopcb::_nil()),corbaThread(0), shutdown_(false),capp(0),
+  :corbaThread(0),synopcb(kvsynopd::synopcb::_nil()), shutdown_(false),capp(0),
    synop(kvsynopd::synop::_nil())
 {
   SynopcbImpl *synopImpl;
@@ -567,7 +567,6 @@ namespace{
   void
   setSigHandlers()
   {
-    sigset_t         oldmask;
     struct sigaction act, oldact;
     
     

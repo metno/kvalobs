@@ -85,7 +85,7 @@ createGlobalLogger(const std::string &id)
 App::
 App(int argn, char **argv, const std::string &kvpath,   
     const std::string &confFile_, miutil::conf::ConfSection *conf):
-  kvservice::KvApp(argn, argv, conf), 
+  kvservice::corba::CorbaKvApp(argn, argv, conf), 
   startTime_(miutil::miTime::nowTime()),
    confFile(confFile_), 
   kvpath_(kvpath),
@@ -158,7 +158,7 @@ App(int argn, char **argv, const std::string &kvpath,
   valElem=conf->getValue("corba.kvpath");
 
   if(valElem.empty()){
-    mypathInCorbaNS=kvpathInCorbaNameserver();
+    mypathInCorbaNS=nameserverpath;
   }else{
     mypathInCorbaNS=valElem[0].valAsString();
   }
@@ -176,7 +176,6 @@ App(int argn, char **argv, const std::string &kvpath,
 
   //We dont need conf any more.
   delete conf;
-
 }
 
 App::
@@ -184,6 +183,35 @@ App::
 {
 }
 
+
+bool
+App::
+initKvSynopInterface(  dnmi::thread::CommandQue &newObsQue )
+{
+   kvSynopdImpl *synopdImpl;
+      
+   try{
+      synopdImpl=new kvSynopdImpl( *this, newObsQue);
+      PortableServer::ObjectId_var id = getPoa()->activate_object(synopdImpl);
+
+      synopRef = synopdImpl->_this();
+      IDLOGINFO( "main", "CORBAREF: " << corbaRef(synopRef) );
+      std::string nsname = "/" + mypathInCorbaNameserver();
+      nsname += "kvsynopd";
+      IDLOGINFO( "main", "CORBA NAMESERVER (register as): " << nsname );
+      putObjInNS(synopRef, nsname);
+   }
+   catch( const std::bad_alloc &ex ) {
+      LOGFATAL("NOMEM: cant initialize the aplication!");
+      return false;
+   }
+   catch(...){
+      IDLOGFATAL("main","CORBA: cant initialize the aplication!");
+      return false;
+   }
+   
+   return true;
+}
 
 
 void 
@@ -309,24 +337,28 @@ App::
 readStationInfo(std::list<StationInfoPtr> &stList)const
 {
   StationInfoParse theParser;
-
+  
   LOGDEBUG2("Reading conf from file!" << endl <<
 	    "<"<<confFile<<">" <<endl);
 
-  miutil::conf::ConfSection *conf=KvApp::readConf(confFile);
+  miutil::conf::ConfSection *conf=miutil::conf::ConfParser::parse( confFile );
 
   if(!conf)
     return false;
 
   stList.clear();
 
+  bool ret=true;
+  
   if(!theParser.parse(conf, stList)){
     LOGWARN("Cant parse the SYNOP configuration!" << endl 
 	    << "File: <" << confFile << ">" << endl );
-    return false;
+    ret = false;
   }    
 
-  return true;
+  delete conf;
+
+  return ret;
 }
 
 

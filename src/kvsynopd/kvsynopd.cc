@@ -33,15 +33,15 @@
 #include <boost/thread/thread.hpp>
 #include <milog/milog.h>
 #include <fileutil/pidfileutil.h>
+#include <kvalobs/kvapp.h>
 #include "SynopWorker.h"
 #include "DataReceiver.h"
 #include "App.h"
-#include "kvsynopdImpl.h"
 #include "Replay.h"
 #include "delaycontrol.h"
 #include "InitLogger.h"
 
-using namespace kvservice;
+//using namespace kvservice;
 using namespace std;
 using namespace miutil;
 
@@ -67,7 +67,17 @@ main(int argn, char **argv)
   pidfile=kvpath+"/var/run/kvsynopd.pid";
 
   dnmi::file::PidFileHelper pidFile;
-  App  app(argn, argv, kvpath, confFile, KvApp::readConf(confFile));
+  miutil::conf::ConfSection *conf;
+  
+  try{
+      conf=miutil::conf::ConfParser::parse(confFile);
+  }
+  catch( const logic_error &ex ){
+     LOGFATAL( ex.what() );
+     return 1;
+  }
+  
+  App  app(argn, argv, kvpath, confFile, conf );
   dnmi::thread::CommandQue newDataQue;  
   dnmi::thread::CommandQue newObsQue;  
   dnmi::thread::CommandQue replayQue;  
@@ -75,8 +85,6 @@ main(int argn, char **argv)
   SynopWorker         synopWorker(app, newObsQue, replayQue);
   Replay              replay(app, replayQue);
   DelayControl        delayControl(app, newDataQue);
-  kvSynopdImpl        *synopdImpl;
-  kvsynopd::synop_var synopRef;
   miTime              startTime;
 
 
@@ -94,8 +102,6 @@ main(int argn, char **argv)
       return 1;
     }
   }
-
-
 
 
   //COMMENT:
@@ -125,30 +131,13 @@ main(int argn, char **argv)
     }
   }
       
-  try{
-    synopdImpl=new kvSynopdImpl(app, newObsQue);
-  }
-  catch(...){
-    LOGFATAL("NOMEM: cant initialize the aplication!");
+  
+  if( ! app.initKvSynopInterface(  newObsQue ) ){
+    LOGFATAL("Cant initialize the interface to <kvsynopd>.");
     return 1;
   }
-
-  try{
-    PortableServer::ObjectId_var id =app.getPoa()->activate_object(synopdImpl);
-
-    synopRef=synopdImpl->_this();
-    IDLOGINFO("main", "CORBAREF: " << app.corbaRef(synopRef));
-    std::string nsname="/"+app.mypathInCorbaNameserver();
-    nsname+="kvsynopd";
-    IDLOGINFO("main","CORBA NAMESERVER (register as): " << nsname);
-    app.putObjInNS(synopRef, nsname);
-  }
-  catch(...){
-    IDLOGFATAL("main","CORBA: cant initialize the aplication!");
-  }
   
-
-  std::string id=app.subscribeData(KvDataSubscribeInfoHelper(), newDataQue);
+  std::string id=app.subscribeData(kvservice::KvDataSubscribeInfoHelper(), newDataQue);
   
   if(id.empty()){
     LOGFATAL("Cant subscribe on <kvData>.");

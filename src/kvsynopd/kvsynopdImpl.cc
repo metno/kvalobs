@@ -30,6 +30,7 @@
 */
 #include <milog/milog.h>
 #include <iostream>
+#include "App.h"
 #include "StationInfo.h"
 #include "kvsynopdImpl.h"
 

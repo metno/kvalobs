@@ -66,11 +66,11 @@ main(int argn, char **argv)
     kvsynopd::StationInfoList list; 
 
     if(app.stationsList(list)){
-      for(CORBA::Long i=0; i<list.length(); i++){
+      for(CORBA::ULong i=0; i<list.length(); i++){
 	COUT("wmono: " << list[i].wmono << endl);
 	COUT("   stationid: ");
 	
-	for(CORBA::Long j=0; j<list[i].stationIDList.length(); j++){
+	for(CORBA::ULong j=0; j<list[i].stationIDList.length(); j++){
 	  COUT(list[i].stationIDList[j] << " ");
 	}
 	COUT(endl);
@@ -99,7 +99,7 @@ main(int argn, char **argv)
     }else{
       COUT("Delay list at: " << t << endl <<
 	   "---------------------------------------------------" << endl);
-      for(CORBA::Long i=0; i<dl.length(); i++){
+      for(CORBA::ULong i=0; i<dl.length(); i++){
 	COUT("wmono: " << setfill('0') << setw(5) << dl[i].wmono 
 	     << " obstime: " << dl[i].obstime 
 	     << " delay to: " << dl[i].delay << endl<< setfill(' '));
@@ -152,7 +152,7 @@ main(int argn, char **argv)
       COUT("wmono: ");
       count=0;
 
-      for(CORBA::Long i=0; i<reloadlist->length(); i++, count++){
+      for(CORBA::ULong i=0; i<reloadlist->length(); i++, count++){
 
 	if(count==8){
 	  COUT("\n-----  ");

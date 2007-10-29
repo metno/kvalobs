@@ -34,7 +34,8 @@
 #include <kvskel/kvsynopd.hh>
 #include "obsevent.h"
 #include <kvskel/adminInterface.h>
-#include "App.h"
+
+class App;
 
 class kvSynopdImpl: public virtual POA_kvsynopd::synop,
 		    public virtual micutil::AdminInterface,
