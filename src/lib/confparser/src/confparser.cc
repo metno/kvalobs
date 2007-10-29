@@ -116,6 +116,31 @@ parse(std::istream &ist)
   return parse();
 }
  
+miutil::conf::ConfSection*
+miutil::conf::ConfParser::
+parse( const std::string &filename )
+{
+  miutil::conf::ConfParser  parser;
+  miutil::conf::ConfSection *conf;
+  ifstream    fis;
+  
+  fis.open(filename.c_str());
+
+  if(!fis){
+      throw std::logic_error("Reading configuration from file <"+filename + ">!");
+  }else{
+      conf=parser.parse(fis);
+      
+      if(!conf){
+         throw std::logic_error("Error while reading configuration file: <"
+                                 + filename + 
+                                 "> Reason: " + parser.getError() );
+      }
+      
+      return conf;
+   }
+} 
+ 
 miutil::conf::ConfSection* 
 miutil::conf::ConfParser::
 parse()

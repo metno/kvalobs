@@ -36,6 +36,7 @@
 #include <iostream>
 #include <list>
 #include <string>
+#include <stdexcept>
 #include <miconfparser/confsection.h>
 
 
@@ -196,6 +197,21 @@ namespace miutil{
        *         needed anymore.
        */
       ConfSection *parse(std::istream &ist);
+  
+  
+      /**
+       * \brief parse a file.
+       *
+       * that contains the configurations settings.
+       * \param ist the input stream to be parsed.
+       * \return a pointer to a ConfSections. 
+       *         You must delete this pointer when it is not 
+       *         needed anymore.
+       * 
+       * \throws std::logic_error when the file dont exist, cant 
+       * be opened or there is an error in the file. 
+       */
+      static ConfSection *parse( const std::string &filename );
   
       /**
        * \brief parse a input stream
