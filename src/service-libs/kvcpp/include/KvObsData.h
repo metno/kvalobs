@@ -39,7 +39,7 @@
 namespace kvservice
 {
   /**
-   * \addtogroup kvcpp2
+   * \addtogroup kvcpp
    * @{
    */
 
