@@ -5,7 +5,7 @@ exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
 
-Name: kvQt2
+Name: kvQt
 Description: Qt-compatible client library for Kvalobs
 Version: 1.0
 Requires: qt-mt
