@@ -22,7 +22,7 @@ libs-drift:
 	for DIR in $$LIBLIST_DRIFT ; do \
 	   (cd $$DIR; $(MAKE) ) \
 	done ;\
-	cd kvcpp2; $(MAKE) install
+	cd kvcpp; $(MAKE) install
 
 
 veryclean:
