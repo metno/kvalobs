@@ -49,7 +49,10 @@ OBJ=  $(ALL_SRC:.cc=.o)
 TESTOBJ= $(TESTSRC:.cc=.o)
 TESTLIB= -lcppunit
 
-all:  $(TARGET)
+all:  install
+
+install:	$(TARGET)
+	cp $(TARGET) $(TOP)/bin/
 
 .cc.o:
 	$(CXX) $(CXXFLAGS) $(DEFINES) $(INCLUDE) -o $@ -c $<
