@@ -46,7 +46,7 @@ OBJ=  $(ALL_SRC:.cc=.o)
 TESTOBJ= $(TESTSRC:.cc=.o)
 TESTLIB= `pkg-config --libs cppunit`
 
-all:  test $(TARGET) install
+all:  $(TARGET) install
 
 PREFIX= $(TOP)
 
@@ -84,7 +84,7 @@ $(TEST_TARGET): $(OBJ) $(TESTOBJ)
 $(LIB_NAME): $(OBJ)
 
 
-test:  $(TEST_TARGET)
+check:  $(TEST_TARGET)
 	@echo Running tests:; KVALOBS=$(TOP) ./$(TEST_TARGET) >> /dev/null
 
 
@@ -115,4 +115,4 @@ veryclean: clean
 	rm -f $(TARGET) $(TEST_TARGET)
 	rmdir bin/
 
-.PHONY: all pretty clean test KEEP_UI_HEADERS
+.PHONY: all pretty clean check KEEP_UI_HEADERS
