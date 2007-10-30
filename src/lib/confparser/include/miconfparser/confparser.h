@@ -203,9 +203,9 @@ namespace miutil{
        * \brief parse a file.
        *
        * that contains the configurations settings.
-       * \param ist the input stream to be parsed.
+       * \param the file to be parsed.
        * \return a pointer to a ConfSections. 
-       *         You must delete this pointer when it is not 
+       *         The caller must delete this pointer when it is not 
        *         needed anymore.
        * 
        * \throws std::logic_error when the file dont exist, cant 
