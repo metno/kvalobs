@@ -20,19 +20,18 @@ DRIVERS:=pgdriver dummydriver #odbcdriver
 SQLITE3INCLUDE=$(shell pkg-config --cflags sqlite3 2>/dev/null)
 SQLITE3LIB=$(shell pkg-config --libs sqlite3 2>/dev/null)
 
-ifdef SQLITEINCLUDE 
-  TMPSQLITEINCLUD:=$(SQLITEINCLUDE)
-  ifneq ($(strip $(TMPSQLITEINCLUDE)),"")
-     DRIVERS+=sqlitedriver
-     SQLITEOBJ+=sqlitedriver.o sqlitedb.o	
-  endif 
-endif
+SQLITE2INCLUDE=$(shell pkg-config --cflags sqlite 2>/dev/null)
+SQLITE2LIB=$(shell pkg-config --libs sqlite 2>/dev/null)
+
+ifndef ($(SQLITE2INCLUDE),)
+	DRIVERS+=sqlitedriver
+    SQLITEOBJ+=sqlitedriver.o sqlitedb.o	
+endif 
 
 ifneq ($(SQLITE3INCLUDE),)
      DRIVERS+=sqlite3driver
      SQLITE3OBJ+=sqlite3driver.o sqlite3db.o	
 endif
-
 
 %.o: %.cc
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< 
@@ -41,17 +40,20 @@ endif
 OBJFILES:=$(PGDRIVEROBJ) $(ODBSOBJ) $(SQLITEOBJ) 
 SRCFILES:=$(OBJFILES:.o=.cc)
 
+
+.PHONY: setup clean veryclean
+
 #debug: 	
 #	@echo "DRIVERS: $(DRIVERS)"
 #	@echo "SQLITEINCLUDE: $(SQLITEINCLUDE)"
 
 all: setup $(DRIVERS)
 	@echo "DRIVERS: $(DRIVERS)"
-	@echo "SQLITEINCLUDE: $(SQLITEINCLUDE)"
 
 setup:
 	@echo "DRIVERS: $(DRIVERS)"
-	@echo "SQLITEINCLUDE:  $(SQLITEINCLUDE)"
+	@echo "SQLITE2INCLUDE:  $(SQLITE2INCLUDE)"
+	@echo "SQLITE2LIB:     $(SQLITE2LIB)"
 	@echo "SQLITE3INCLUDE: $(SQLITE3INCLUDE)"
 	@echo "SQLITE3LIB:     $(SQLITE3LIB)"
 
@@ -86,7 +88,7 @@ pgsqldb.o: pgsqldb.cc
 #Compiles the sqlite driver.
 sqlitedriver: $(SQLITEOBJ)
 	$(CXX) $(CXXLDFLAGS) $(CXXLDSOFLAGS) -o $@.so -fPIC \
-	    $(SQLITEOBJ) $(SQLITELIB) -L$(TOP)/lib  -lkvdb -lfileutil
+	    $(SQLITEOBJ) $(SQLITE2LIB) -L$(TOP)/lib  -lkvdb -lfileutil
 	mkdir -p ../lib/db
 	cp $@.so ../lib/db
 
@@ -94,7 +96,7 @@ sqlitedriver.o: sqlitedriver.cc
 	$(CXX) $(CXXFLAGS) $(CXXSOFLAGS) $(INCLUDE) -c $< 
 
 sqlitedb.o: sqlitedb.cc
-	$(CXX) $(CXXFLAGS) $(CXXSOFLAGS) $(INCLUDE) -c $< 
+	$(CXX) $(CXXFLAGS) $(CXXSOFLAGS) $(SQLITE2INCLUDE) $(INCLUDE) -c $< 
 
 
 
@@ -107,7 +109,7 @@ sqlite3driver: $(SQLITE3OBJ)
 	cp $@.so ../lib/db
 
 sqlite3driver.o: sqlite3driver.cc
-	$(CXX) $(CXXFLAGS) $(CXXSOFLAGS) $(INCLUDE) -c $< 
+	$(CXX) $(CXXFLAGS) $(CXXSOFLAGS)  $(INCLUDE) -c $< 
 
 sqlite3db.o: sqlite3db.cc
 	$(CXX) $(CXXFLAGS) $(CXXSOFLAGS) $(SQLITE3INCLUDE) $(INCLUDE) -c $< 

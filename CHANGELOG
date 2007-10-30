@@ -1,3 +1,9 @@
+2007-10-29 Børge Moe
+           kvsynopd
+           - Use kvcpp2.
+           kv2kro2
+           - Reimplemented kv2kro to use kvcpp2
+
 2007-08-27 Ny versjon kvalobs-drift-20070827T0758
            **************************************
            

@@ -39,10 +39,8 @@ ALLSRC:= $(kv2kro_SRC)
 
 kv2kro: $(kv2kro_OBJ)
 	$(CXX) $(CXXFLAGS) -o $@ $(kv2kro_OBJ) $(LIBS)
-
-DataReceiverSimpleKro: DataReceiverSimpleKro.o
-	$(CXX) $(CXXFLAGS) -o $@ DataReceiverSimpleKro.o  $(LIBS)
-
+	cp kv2kro DataReceiverSimpleKro 
+	
 depends:
 	rm -f $(DEPENDSFILE)
 	@echo '# Automatically-generated dependencies list:' > $(DEPENDSFILE)
@@ -51,12 +49,12 @@ depends:
 -include $(DEPENDSFILE)
 
 clean:
-	rm -rf moc_*.*
 	rm -rf *.o *~
 	rm -f *.a
 	rm -f core
 	rm -f core.*
-	rm -f DataReceiverSimpleKro #testKvGetData testKvGetDataReceiver 
-	rm -f $(DEPENDSFILE)
+	rm -f DataReceiverSimpleKro kv2kro
+
 
 veryclean: clean
+	rm -f $(DEPENDSFILE)
