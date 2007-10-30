@@ -32,7 +32,7 @@ all: libs
 
 
 all-drift: drift-libs
-	for DIR in $$DIRLIST ; do \
+	for DIR in $$DIRLIST_DRIFT ; do \
 	   (cd $$DIR && $(MAKE) ) \
 	done ; \
 	cd kvQabased; $(MAKE) install
