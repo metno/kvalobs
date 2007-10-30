@@ -1,4 +1,7 @@
 TOP=.
+KVDIR=$(shell pwd)
+
+export KVDIR
 
 .PHONY: libs veryclean prepare tag-cvs dist
 
