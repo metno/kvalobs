@@ -1096,14 +1096,14 @@ Synop::Max_Vind_Max_Kode(std::string &kode, SynopDataList &sd)
     
    i=nNeedTimes-1;
     
-   if(sd[i].vindHastNaa==FLT_MAX ){
+   if(sd[i].vindHastMax==FLT_MAX ){
       kode=" 0";
       kode+=sjoegangKode;
       kode+="///";
       return;
    }
     
-   fMax=sd[i].vindHastNaa;
+   fMax=sd[i].vindHastMax;
    iMaxIndex=i;
    i--;
     

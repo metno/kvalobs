@@ -444,24 +444,24 @@ SynopData::setData(const int  &param,
 		snoeMark.replace(0, 1, buf);
 	      break;
     case 112:                                 //SA, _Esss
-              if(im==-2){ // 2005.06.21, Bxrge, Endret fra -1.
-		snoeMark.replace(1, 3, "998");
+         if(im==-2){ // 2005.06.21, Bxrge, Endret fra -1.
+		       snoeMark.replace(1, 3, "998");
 	      }else if(im==-3){
-		snoeMark.replace(1, 3, "999");
+		       snoeMark.replace(1, 3, "999");
 	      }else if(im==998 || im==997 || im==999){
-		//Bxrge Moe
-		//2005.01.20
-		//Denne er ikke i bruk og kan fjernes
-	        sprintf(buf,"%03d", im);
-                snoeMark.replace(1, 3, buf);
-             }else if(fData>=0  && fData<0.5){
-		snoeMark.replace(1, 3, "997");
-	     }else if(fData>=0.5 && fData<997.0){
-	       im=static_cast<int>(fabs(floor(static_cast<double>(fData)+0.5)));
-	       sprintf(buf,"%03d", im);
-	       snoeMark.replace(1, 3, buf);
-	     }
-	      break;
+            //Bxrge Moe
+		      //2005.01.20
+		      //Denne er ikke i bruk og kan fjernes
+            sprintf(buf,"%03d", im);
+            snoeMark.replace(1, 3, buf);
+         }else if(fData>=0  && fData<0.5){
+            snoeMark.replace(1, 3, "997");
+	      }else if(fData>=0.5 && fData<997.0){
+	         im=static_cast<int>(fabs(floor(static_cast<double>(fData)+0.5)));
+	         sprintf(buf,"%03d", im);
+	         snoeMark.replace(1, 3, buf);
+	      }
+	     break;
     case  13:                                 //ITZ, "_tz")
 	      ITZ=buf;
 	      break;
