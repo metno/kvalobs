@@ -1033,7 +1033,7 @@ Synop::Max_Vind_Max_Kode(std::string &kode, SynopDataList &sd)
    else
       sjoegangKode=sd[0].sjoegang;
     
-   if(nTimeStr<=nNeedTimes){
+   if(nTimeStr < nNeedTimes){
       fMax=FLT_MAX;
       cTid='/';
     	
