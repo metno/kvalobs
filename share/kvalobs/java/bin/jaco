@@ -8,9 +8,28 @@
 # ... but we have to refer to the JRE only!
 
 MYJACORB=$KVDIR/share/kvalobs/java/lib/jacorb
+MY_JAVA=""
 
+if [ -n "$JAVA_HOME" ]; then
+    MY_JAVA=$JAVA_HOME
+elif [ -n "$JRE_HOME" ]; then
+    MY_JAVA=$JRE_HOME
+elif which java > /dev/null 2>&1 ; then
+    MY_JAVA=$(dirname $(dirname $(which java)))
+fi
 
-: ${JRE_HOME:="/opt/java"}
+if [ -z "$MY_JAVA" ]; then
+    echo "No java found, try to set JAVA_HOME."
+    exit 1
+fi
+
+JAVA_HOME=$MY_JAVA
+
+if [ ! -x "$JAVA_HOME/bin/java" ]; then
+    echo "No java found, try to set JAVA_HOME."
+    exit 1
+fi
+
 JACORB_HOME=$MYJACORB
 
 export JACORB_HOME
