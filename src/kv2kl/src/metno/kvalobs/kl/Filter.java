@@ -64,8 +64,8 @@ public class Filter {
 									Timestamp obstime,
 			                        StringHolder msg){
 		
-		if(paramFilter==null ||
-			paramFilter.stationid!=data.stationID){
+		if( paramFilter==null ||
+			paramFilter.stationid!=data.stationID ) {
 			paramFilter=new ParamFilter(data.stationID, con);
 		}
 		
@@ -90,12 +90,12 @@ public class Filter {
 		if(fromDate==null){
 			if(toDate==null)
 				ret=true;
-			else if(toDate.compareTo(obstime)>=0)
+			else if(obstime.compareTo(toDate)<=0)
 				ret=true;
-		}else if(fromDate.compareTo(obstime)<=0){
+		}else if(obstime.compareTo(fromDate)>=0){
 			if(toDate==null)
 				ret=true;
-			else if(toDate.compareTo(obstime)>=0)
+			else if(obstime.compareTo(toDate)<=0)
 				ret=true;
 		}
 		
@@ -245,6 +245,9 @@ public class Filter {
 		if(!filterEnabled)
 			return true;
 		
+		//System.out.println(" -- Filter:  sid: "+data.stationID + " tid: "+data.typeID_
+		//		                              + " paramID: "+data.paramID + " obstime: " + data.obstime);
+		
 		MiGMTTime obstimeTmp=new MiGMTTime();
 		
 		if(!obstimeTmp.parse(data.obstime)){
@@ -256,7 +259,7 @@ public class Filter {
 		Timestamp obstime=new Timestamp(obstimeTmp.getTime().getTime());
 		dbElem=loadFromDb(data, obstime);
 	
-		if( ! dbKv2KlimaFilterElem.isOk() ) {
+		if( ! dbElem.isOk() ) {
 		//There was a problem with loading from the database.
 			logger.error(new MiGMTTime() 
 		     			+" ERROR: filter.filter: DB error, blocking the observation!");
@@ -266,8 +269,8 @@ public class Filter {
 		
 		
 		if( ! dbElem.hasFilterElements() ){
-			logger.info("No filter data for station: " + data.stationID + " typeid: " +  data.typeID_ );
-			return true;
+			logger.info("BLOCKED: No filter data for station: " + data.stationID + " typeid: " +  data.typeID_ );
+			return false;
 		}
 		
 		if( ! dbElem.setCurrentFilterElem(obstime) ) {

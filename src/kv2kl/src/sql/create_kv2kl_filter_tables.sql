@@ -10,8 +10,8 @@
 CREATE TABLE T_KV2KLIMA_FILTER (
 	stnr   numeric(10,0) NOT NULL,
 	status character(1) NOT NULL,
-	fdato  date,  
-	tdato  date,
+	fdato  timestamp(0),  
+	tdato  timestamp(0),
 	typeid numeric(4,0),
 	nytt_stnr numeric(5,0) 
  );

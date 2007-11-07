@@ -23,7 +23,7 @@
 	
 	<path id="test.classpath">
 		<path refid="build.classpath"/>
-		<pathelement path="${libdir}/junit.jar" />
+		<pathelement path="${libdir}/junit-4.4.jar" />
 		<pathelement path="${libdir}/hsqldb.jar" />
 	</path>
 	

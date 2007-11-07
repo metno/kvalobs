@@ -57,13 +57,13 @@ import org.apache.log4j.Logger;
  * stationid/typeid combination. Values in T_KV2KLIMA_PARAM_FILTER, may add or remove 
  * to the values in the T_KV2KLIMA_TYPEID_PARAM_FILTER table. If a paramid is negativ 
  * it is removed from the filter and a postiv paramid add to the filter. A timespan must
- * be given for when the valuesis valid. The timespan is given with a from date (fdato)
+ * be given for when the values is valid. The timespan is given with a from date (fdato)
  * and a to date (tdato). Note that for the add/remove to function as specified the 
  * fdato and tdato must match exactly. 
  * 
- * The fdato and tdato is valid for the timespan [fdato,tdato>.
+ * The fdato and tdato is valid for the timespan [fdato,tdato].
  * 
- * <b>Examle of filter upset</b><br/>
+ * <b>Examle of filter setup</b><br/>
  * If you generally dont want data for params SA (112) and SD (18) for typeid 302,
  * but you want SD for station 18700. <br> 
  * 

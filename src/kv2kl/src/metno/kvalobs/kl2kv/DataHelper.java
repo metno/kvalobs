@@ -131,8 +131,8 @@ public class DataHelper{
      * @param typeid The typeid to the stations we shall send to kvalobs.
      * @param table The table we shall pull the data to kvalobs from. If 
      *         null is given the default table KL2KVALOBS is used.
-     * @param max_count The maximum of data i one message to be sendt to 
-     *         kvalobs. 
+     * @param max_count The data to be sendt to kvalobs is
+     *        split up in max_count chuncks. 
      */
     public DataHelper(DbConnection con, DataToKv dataToKv,  
     		           String typeid, String table, int max_count){

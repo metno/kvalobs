@@ -173,7 +173,8 @@ public class SqlInsertHelper {
 	}
 
 	protected boolean usetypeid(DataElem elem, LinkedList typelist){
-		boolean useTypeid=false;
+		if( typelist == null )
+			return true;
 		
 		if(typelist!=null){
             ListIterator it=typelist.listIterator();
@@ -182,13 +183,12 @@ public class SqlInsertHelper {
                 Integer n=(Integer)it.next();
             
                 if(elem.typeID_==n.shortValue()){
-                    useTypeid=true;
-                    break;
+                    return true;
                 }
             }
         }
 		
-		return useTypeid;
+		return false;
 	}
 	
 	
@@ -249,7 +249,6 @@ public class SqlInsertHelper {
    		Filter filter=new Filter(dbconn); 
    		boolean loggedFilter;
    		boolean loggedNewObs;
-        boolean useTypeid;
         int     typeid=0;
    		StringHolder msg=new StringHolder();
    		boolean  filterRet;
