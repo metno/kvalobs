@@ -41,6 +41,8 @@ import static metno.DbTestUtil.*;
 import org.junit.*;
 import static org.junit.Assert.*;
 import junit.framework.JUnit4TestAdapter;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 public class klfilterTest {
     static final String dbdriver="org.hsqldb.jdbcDriver";
@@ -49,6 +51,16 @@ public class klfilterTest {
     static final String dbuser="sa"; //Default user in a HSQLDB.
     static final String createFilterTables="src/sql/create_kv2kl_filter_tables.sql";
     DbConnectionMgr mgr=null;
+    
+    
+    
+    
+    @BeforeClass
+    public static void setUpAndLoadTheDb(){
+    	PropertyConfigurator.configure("test/metno/kvalobs/kl/klfilterTest_log.conf");
+    }
+
+    
     
     
     @Before
@@ -89,13 +101,6 @@ public class klfilterTest {
     DbConnectionMgr fillWithData(){
         DbConnectionMgr mgr=null;
         
-        String create="CREATE TABLE T_KV2KLIMA_FILTER ("+
-                      "stnr   numeric(10,0) NOT NULL,"+
-                      "status character(1) NOT NULL,"+
-                      "fdato  date,"  +
-                      "tdato  date,"+
-                      "typeid numeric(4,0),"+
-                      "nytt_stnr numeric(10,0))";
         
         String insert="insert into t_kv2klima_filter VALUES("+
         			  "18700,'T',NULL,NULL,308,NULL);"+
@@ -104,7 +109,20 @@ public class klfilterTest {
         			  "insert into t_kv2klima_filter VALUES("+
         			  "18700,'D',NULL,NULL,6,NULL);"+
         			  "insert into t_kv2klima_filter VALUES("+
-        			  "18700,'D',NULL,NULL,10,18701);";
+        			  "18700,'D',NULL,NULL,10,18701);"+ 
+        			  "insert into t_kv2klima_filter VALUES("+
+        			  "18500,'D',NULL,'2006-01-01 03:00:00',10,NULL);"+ 
+        			  "insert into t_kv2klima_filter VALUES("+
+        			  "18500,'D','2006-02-01 03:00:00', '2006-02-20 12:00:00',10,NULL);"+
+        			  "insert into t_kv2klima_filter VALUES("+
+        			  "18500,'D','2006-02-20 14:00:00',NULL,10,NULL);" +
+        			  "insert into t_kv2klima_filter VALUES("+
+        			  "18600,'D',NULL,'2006-01-01 03:00:00',10,NULL);" +
+        			  "insert into t_kv2klima_filter VALUES("+
+        			  "18800,'D','2006-01-01 03:00:00', NULL, 10,NULL);";
+
+        
+
         
         deleteDb("tmp/db");
         
@@ -192,38 +210,80 @@ public class klfilterTest {
         
         Filter filter=new Filter(con);
         
-        ret=filter.filter(fillWithStationData(18700, 6,
-                                              "2006-03-09 18:00:00"),
-                           msg);
+        ret=filter.filter(fillWithStationData(18700, 6, "2006-03-09 18:00:00"), msg);
         assertTrue(ret);       
         
-        ret=filter.filter(fillWithStationData(18700, 6,
-                                               "2006-03-09 18:00:00"),
-                                               msg);
+        ret=filter.filter(fillWithStationData(18700, 6, "2006-03-09 18:00:00"), msg);
         assertTrue(ret);       
 
-        ret=filter.filter(fillWithStationData(18700, 1,
-                                              "2006-03-09 18:00:00"),
-                                              msg);
+        ret=filter.filter(fillWithStationData(18700, 1, "2006-03-09 18:00:00"), msg);
         
         assertFalse(ret);       
 
-        ret=filter.filter(fillWithStationData(18700, 1,
-                          "2006-03-09 18:00:00"),
-                           msg);
+        ret=filter.filter(fillWithStationData(18700, 1, "2006-03-09 18:00:00"), msg);
         
         assertFalse(ret);
         
-        ret=filter.filter(fillWithStationData(18700, 6,
-                                              "2006-03-09 18:00:00"),
-                                              msg);
+        ret=filter.filter(fillWithStationData(18700, 6, "2006-03-09 18:00:00"), msg);
         assertTrue(ret);       
 
-        ret=filter.filter(fillWithStationData(18700, 6,
-                                              "2006-03-09 18:00:00"),
-                                              msg);
+        ret=filter.filter(fillWithStationData(18700, 6, "2006-03-09 18:00:00"), msg);
+        assertTrue(ret); 
+		  
+		ret=filter.filter(fillWithStationData(18500, 10, "2005-12-09 18:00:00"), msg);
         assertTrue(ret); 
 
+        ret=filter.filter(fillWithStationData(18500, 10, "2006-01-01 03:00:00"), msg);
+        assertTrue(ret);
+		        
+        ret=filter.filter(fillWithStationData(18500, 10, "2006-1-1 04:00:00"), msg);
+        assertFalse(ret);
+
+        ret=filter.filter(fillWithStationData(18500, 10, "2006-2-1 02:00:00"), msg);
+        assertFalse(ret);
+        
+        ret=filter.filter(fillWithStationData(18500, 10, "2006-2-1 03:00:00"), msg);
+        assertTrue(ret);
+        
+        ret=filter.filter(fillWithStationData(18500, 10, "2006-2-18 02:00:00"), msg);
+        assertTrue(ret);
+
+        ret=filter.filter(fillWithStationData(18500, 10, "2006-2-20 12:00:00"), msg);
+        assertTrue(ret);
+
+        ret=filter.filter(fillWithStationData(18500, 10, "2006-2-20 13:00:00"), msg);
+        assertFalse(ret);
+        
+        ret=filter.filter(fillWithStationData(18500, 10, "2006-2-20 14:00:00"), msg);
+        assertTrue(ret);
+        
+        ret=filter.filter(fillWithStationData(18500, 10, "2006-2-20 11:00:00"), msg);
+        assertTrue(ret);
+        
+        ret=filter.filter(fillWithStationData(18500, 10, "2008-2-20 11:00:00"), msg);
+        assertTrue(ret);
+
+        ret=filter.filter(fillWithStationData(18600, 10, "2003-2-20 11:00:00"), msg);
+        assertTrue(ret);
+        
+        ret=filter.filter(fillWithStationData(18600, 10, "2006-1-1 3:00:00"), msg);
+        assertTrue(ret);
+
+        ret=filter.filter(fillWithStationData(18600, 10, "2006-1-1 4:00:00"), msg);
+        assertFalse(ret);
+        
+        ret=filter.filter(fillWithStationData(18600, 10, "2007-1-1 4:00:00"), msg);
+        assertFalse(ret);
+        
+        ret=filter.filter(fillWithStationData(18800, 10, "2006-1-1 2:00:00"), msg);
+        assertFalse(ret);
+                        
+        ret=filter.filter(fillWithStationData(18800, 10, "2006-1-1 3:00:00"), msg);
+        assertTrue(ret);
+
+        ret=filter.filter(fillWithStationData(18800, 10, "2007-1-1 4:00:00"), msg);
+        assertTrue(ret);
+                
         try{
            mgr.releaseDbConnection(con);
         }
@@ -258,46 +318,83 @@ public class klfilterTest {
         				  msg);
         assertTrue(ret);
 
-    	ret=filter.filter(getDataElem(18700, 3,"2006-03-09 18:00:00", 104, 0, 0),
-				          msg);
-    	assertFalse(ret);
-
-        
-    	ret=filter.filter(getDataElem(18700, 3,"2001-03-09 18:00:00", 104, 0, 0),
-		                  msg);
-    	assertFalse(ret);
     	
-    //	System.out.println(filter.paramFilter.types);
-    	ret=filter.filter(getDataElem(18700, 3,"2005-03-09 18:00:00", 104, 0, 0),
-		                  msg);
-    	assertFalse(ret);
-  	
-    	ret=filter.filter(getDataElem(18700, 3,"2006-03-09 18:00:00", 104, 0, 0),
-	                      msg);
-    	assertFalse(ret);
+        ret=filter.filter(getDataElem(18700, 3,"2001-03-09 18:00:00", 104, 0, 0),
+                msg);
+        assertFalse(ret);
+        
 
     	ret=filter.filter(getDataElem(18700, 3,"2005-01-02 23:00:00", 104, 0, 0),
-  	                      msg);
+                  msg);
+
       	assertFalse(ret);
+
+      	ret=filter.filter(getDataElem(18700, 3,"2005-01-03 00:00:00", 104, 0, 0),
+                msg);
+
+    	assertFalse(ret);
     	
-      	ret=filter.filter(getDataElem(18700, 3,"2005-01-03 01:00:00", 104, 0, 0),
-     	                  msg);
-        assertTrue(ret);
-        
+    	ret=filter.filter(getDataElem(18700, 3,"2005-01-03 01:00:00", 104, 0, 0),
+                msg);
+
+    	assertTrue(ret);
+
+    	ret=filter.filter(getDataElem(18700, 3,"2005-01-13 23:00:00", 104, 0, 0),
+                msg);
+
+    	assertTrue(ret);
+    	
+    	ret=filter.filter(getDataElem(18700, 3,"2005-01-31 23:00:00", 104, 0, 0),
+                msg);
+
+    	assertTrue(ret);
+
+    	ret=filter.filter(getDataElem(18700, 3,"2005-02-01 00:00:00", 104, 0, 0),
+                msg);
+
+    	assertFalse(ret);
+    	
+    	ret=filter.filter(getDataElem(18700, 3,"2005-010-02 23:00:00", 104, 0, 0),
+                msg);
+
+    	assertFalse(ret);
+    	
+    	ret=filter.filter(getDataElem(18700, 3,"2006-01-01 00:00:00", 104, 0, 0),
+                msg);
+
+    	assertFalse(ret);
+    	
+
+    	ret=filter.filter(getDataElem(18700, 3,"2006-01-01 01:00:00", 104, 0, 0),
+                msg);
+
+    	assertTrue(ret);
+
+    	ret=filter.filter(getDataElem(18700, 3,"2006-01-01 02:00:00", 104, 0, 0),
+                msg);
+
+    	assertFalse(ret);
+    	
+        ret=filter.filter(getDataElem(18700, 3,"2006-03-09 18:00:00", 104, 0, 0),
+				          msg);
+    	assertFalse(ret);
+    	    	
         ret=filter.filter(getDataElem(18700, 3,"2005-01-03 00:00:00", 110, 0, 0),
     	                  msg);
-        assertTrue(ret);
+        assertFalse(ret);
          
         //test nagativ typeid. Should be accepted as abs(typeid).
         ret=filter.filter(getDataElem(18700, -3,"2005-01-03 00:00:00", 110, 0, 0),
                           msg);
-        assertTrue(ret);
+        
+        System.out.println(" ret : " +ret);
+        assertFalse(ret);
       	
       	//Test the upper limit of [fdato,tdato>, the tdato part.
       	
       	ret=filter.filter(getDataElem(18700, 3,"2005-01-03 00:00:00", 104, 0, 0),
     	                  msg);
-        assertTrue(ret);
+        assertFalse(ret);
         
         ret=filter.filter(getDataElem(18700, 3,"2005-01-02 23:59:59", 104, 0, 0),
   	          			  msg);
@@ -349,9 +446,9 @@ public class klfilterTest {
                            msg);
         assertFalse(ret);
         assertNotNull(filter.dbKv2KlimaFilterElem);
-        assertNotNull(filter.dbKv2KlimaFilterElem.status);
-        assertTrue(filter.dbKv2KlimaFilterElem.status.length()!=0);
-        assertTrue(filter.dbKv2KlimaFilterElem.status.charAt(0)=='T');
+        assertNotNull(filter.dbKv2KlimaFilterElem.getStatus());
+        assertTrue(filter.dbKv2KlimaFilterElem.getStatus().length() != 0 );
+        assertTrue(filter.dbKv2KlimaFilterElem.getStatus().charAt(0)=='T');
         ret=filter.filter(fillWithStationData(18700, 308,
                                               "2006-03-09 18:00:00"),
                                                msg);

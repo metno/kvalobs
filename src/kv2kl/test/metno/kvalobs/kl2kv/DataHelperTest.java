@@ -48,6 +48,9 @@ import metno.util.FileUtil;
 import org.junit.*;
 import static org.junit.Assert.*;
 import junit.framework.JUnit4TestAdapter;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
 
 public class DataHelperTest {
     static final String dbdriver="org.hsqldb.jdbcDriver";
@@ -59,7 +62,9 @@ public class DataHelperTest {
     
     @BeforeClass
     public static void setUpAndLoadTheDb(){
-        deleteDb("tmp/db");
+    	PropertyConfigurator.configure("test/metno/kvalobs/kl2kv/DataHelperTest_log.conf");
+    	
+    	deleteDb("tmp/db");
         
         try {
             mgr=new DbConnectionMgr(dbdriver, dbuser, dbpasswd, dbconnect, 10);
@@ -87,20 +92,18 @@ public class DataHelperTest {
         }
     	
     }
-    
+
+    @Before
     public void setUp(){
     }
   
+    @After
     public void tearDown(){
     }
     
-    
-        
     static boolean listKl2Kvalobs(DbConnectionMgr mgr){
     	return listDbTable(mgr,"KV2KVALOBS");
     }
-
-    
 
     
     @Test
@@ -118,6 +121,8 @@ public class DataHelperTest {
     		System.out.println("Size: "+dataToKv.theData.size());
     		assertTrue(dataToKv.theData.size()==4);
     		assertTrue(ret);
+    		
+    		System.out.println("---"+dataToKv.theData.get(0)+"---");
     		assertEquals(dataToKv.theData.get(0),
     					 "18500/330\n"+
     			         "V4S,V5S,V6S,V4,V5,V6,SA,SD,ITR,RR_X,KLSTART,KLOBS,RR_01,V1,V2,V3,WW,W1,W2,UU,TA,TAX_12,TAN_12,DD,FF,NN,NH,CL,CM,CH,RR_12,HL,VV,V7,DX,DG,KLFX,KLFG,FG_010,FF_1,FX_1,FG_1,SG,EM,OT_24,EV,TW,FX,FG,PO,PR,AA,PP,FX_6,FX_12,OT_1,BT,FM,QO,QOX,RA,RR_1,TD,TAM,TAN,TAX,TG,TGM,TGN,TGX,UM,RR_24\n"+
