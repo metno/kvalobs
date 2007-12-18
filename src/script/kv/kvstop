@@ -116,7 +116,7 @@ function killprog()
         while [ $? -eq 0 -a $n -lt $TIMEOUT  ]; do
 	    	let n=n+1
 	    	sleep 1
-	    	wasruning=true
+	    	wasrunning=true
 	    	isrunning $prog
 		done
 	
