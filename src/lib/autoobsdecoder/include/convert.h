@@ -38,7 +38,7 @@
 #include <vector>
 #include <puTools/miTime>
 #include <kvalobs/paramlist.h>
-
+#include <kvalobs/kvData.h>
 namespace kvalobs{
   namespace decoder{
     namespace autoobs{
@@ -198,12 +198,45 @@ namespace kvalobs{
 
 	        float  RR(int &paramid, const miutil::miTime &obstime);
 	     };
+	     
+	     struct SaSdEm {
+	        std::string sa;
+	        std::string sd;
+	        std::string em;
+	        bool  hasSa;
+	        bool  hasSd;
+	        bool  hasEm;
+	        
+	        SaSdEm():hasSa( false ), hasSd( false ), hasEm( false ){}
+	        
+	        SaSdEm( const SaSdEm &cc )
+	           : sa(cc.sa), sd(cc.sd),em(cc.em), 
+	             hasSa( cc.hasSa ), hasSd( cc.hasSd ), hasEm( cc.hasEm ) {}
+	        
+	        SaSdEm& operator=(const SaSdEm &rhs ) {
+	           if( this != &rhs ) {
+	              sa = rhs.sa;
+	              sd = rhs.sd;
+	              em = rhs.em; 
+	              hasSa = rhs.hasSa;
+	              hasSd = rhs.hasSd;
+	              hasEm = rhs.hasEm;
+	           }
+	           return *this;
+	        }
+	        
+	        static bool dataSa( kvData &data, const SaSdEm &sa, const kvData &saSdEmTemplate );
+	        static bool dataSd( kvData &data, const SaSdEm &sd, const kvData &saSdEmTemplate );
+	        static bool dataEm( kvData &data, const SaSdEm &em, const kvData &saSdEmTemplate );
+	     };
 
       private:
 	     DataConvert();
 	     DataConvert(const DataConvert&);
 	     DataConvert& operator=(const DataConvert&);
    
+	     bool allCh(const std::string &val, char ch);
+
 	     bool allSlash(const std::string &val);
 
 	     bool decodeSpDef(std::vector<DataElem>  &data,
@@ -237,11 +270,14 @@ namespace kvalobs{
 			                                      const std::string &val);
 
 	     ParamList &paramList;
+	     
 	     bool  hasRRRtr_;
 	     RRRtr RRRtr_;
+	     bool hasSa, hasSd; //Is the station setup with Sa, SD and/or EM. 
+	     SaSdEm saSdEm_;
 
         public:
-	        DataConvert(ParamList &p);
+	        DataConvert(ParamList &p, const std::string &SaSd="");
 	
 	        /**
 	         * \exception BadFormat, UnkownParameter
@@ -254,6 +290,9 @@ namespace kvalobs{
 	        bool hasRRRtr(RRRtr &rr){ rr=RRRtr_; 
                                      std::cerr << "hasRRtr: " << hasRRRtr_ <<"  RR_N: " << rr.RR_N << std::endl;
                                      return hasRRRtr_ && !rr.RR_N;}
+	        
+	        void resetSaSdEm(){ saSdEm_ = SaSdEm(); }
+	        bool hasSaSdEm( SaSdEm &saSdEm );
          };
 
       /** @} */

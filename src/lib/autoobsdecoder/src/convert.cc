@@ -92,21 +92,91 @@ namespace kvalobs {
       }
       
 
-      DataConvert::DataConvert(ParamList &p):paramList(p), hasRRRtr_(false){
+      bool 
+      DataConvert::SaSdEm::
+      dataSa( kvData &data, const SaSdEm &sa, const kvData &saSdEmTemplate  ) 
+      {
+         if( sa.sa.empty() )
+            return false;
+         
+         int v = atoi( sa.sa.c_str() );
+         
+         data = kvData( saSdEmTemplate.stationID(), saSdEmTemplate.obstime(), 
+                        v /*original*/, 112  /*paramid*/, saSdEmTemplate.tbtime(),
+                        saSdEmTemplate.typeID(), saSdEmTemplate.sensor(), saSdEmTemplate.level(), 
+                        v /*corected*/, saSdEmTemplate.controlinfo(), saSdEmTemplate.useinfo(), 
+                        saSdEmTemplate.cfailed() );
+         
+         return true;
+         
+      }
+                  
+      
+      bool
+      DataConvert::SaSdEm::
+      dataSd( kvData &data, const SaSdEm &sd, const kvData &saSdEmTemplate  ) 
+      {
+         if( sd.sd.empty() )
+            return false;
+         
+         int v = atoi( sd.sd.c_str() );
+                  
+         data = kvData( saSdEmTemplate.stationID(), saSdEmTemplate.obstime(), 
+                        v /*original*/, 18  /*paramid*/, saSdEmTemplate.tbtime(),
+                        saSdEmTemplate.typeID(), saSdEmTemplate.sensor(), saSdEmTemplate.level(), 
+                        v /*corected*/, saSdEmTemplate.controlinfo(), saSdEmTemplate.useinfo(), 
+                        saSdEmTemplate.cfailed() );
+                  
+         return true;
+      }
+      
+      bool 
+      DataConvert::SaSdEm::
+      dataEm( kvData &data, const SaSdEm &em, const kvData &saSdEmTemplate  )
+      {
+         if( em.em.empty() )
+            return false;
+                  
+         int v = atoi( em.em.c_str() );
+                  
+         data = kvData( saSdEmTemplate.stationID(), saSdEmTemplate.obstime(), 
+                        v /*original*/, 7  /*paramid*/, saSdEmTemplate.tbtime(),
+                        saSdEmTemplate.typeID(), saSdEmTemplate.sensor(), saSdEmTemplate.level(), 
+                        v /*corected*/, saSdEmTemplate.controlinfo(), saSdEmTemplate.useinfo(), 
+                        saSdEmTemplate.cfailed() );
+                  
+         return true;
+      }
+      
+      DataConvert::DataConvert(ParamList &p, const std::string &SaSd)
+         :  paramList(p), hasRRRtr_(false), hasSa( false ), hasSd( false ) 
+      {
+         if( SaSd.size() >= 2 ) {
+            if( SaSd[0] != '0' )
+               hasSa = true;
+            
+            if( SaSd[1] != '0' )
+               hasSd = true;
+         }
       }
 
       bool 
       DataConvert::allSlash(const std::string &val){
-	     std::string::const_iterator it=val.begin();
-	
-	     for(;it!=val.end(); it++){
-	        if(*it!='/')
-	           return false;
-	     }
-	
-	     return true;
+         return allCh( val, '/' );
       }
-      
+
+      bool 
+      DataConvert::allCh(const std::string &val, char ch){
+        std::string::const_iterator it=val.begin();
+   
+        for(;it!=val.end(); it++){
+           if(*it != ch)
+              return false;
+        }
+   
+        return true;
+      }
+
 
 
       std::vector<DataElem>
@@ -371,16 +441,26 @@ namespace kvalobs {
 	  
 	         if(id.empty())
 	            continue;
-
+	         
 	         if(spDef[i].index>=0)
 	            spVal=val.substr(spDef[i].index, spDef[i].size);
 	         else
 	            spVal=val;
-	  
+
+	         //Test if we have snow depth (SA) and/or the 
+	         //snow state to the ground (SD/EM).
+	         //The test must be done here, before the test of all
+	         //slashes.
+	         if( id == "SA" )
+	            saSdEm_.hasSa = true;
+	         else if( id == "SD ")
+	            saSdEm_.hasSd = true;
+	         else if ( id == "EM")
+	            saSdEm_.hasEm = true;
+
 	         if(allSlash(spVal))
 	            continue;
 	  
-	 
 	         if(id=="_Rt"){
 	            RRRtr_.rt=atoi(spVal.c_str());
 	            LOGDEBUG("-- _Rt (" << spVal << ") : " <<  RRRtr_.rt);
@@ -490,13 +570,25 @@ namespace kvalobs {
 	               continue;
 	         }else if(id=="SA"){ //Esss, sss->SA
 	            if(spVal=="997")
-	               spVal="0";
+	               spVal = "0";
 	            else if(spVal=="998")
-	               spVal="-1";
+	               spVal = "-1";
 	            else if(spVal=="999")
-	               spVal="-3";
+	               spVal = "-3";
                else if(spVal=="000")
-                  continue;
+                  spVal = "-1";
+	            
+	            saSdEm_.sa = spVal;
+	            continue;
+	         }else if( id == "SD" ) {
+	            if( allCh(spVal, '0') )
+	               spVal = "-1";
+	            
+	            saSdEm_.sd = spVal;
+	            continue;
+	         }else if( id == "EM" ) {
+	            saSdEm_.em = spVal;
+	            continue;
 	         }
 
 	         it=paramList.find(Param(id, -1));
@@ -664,7 +756,26 @@ namespace kvalobs {
 	
 	            return rr;
             }
-      
+
+            bool
+            DataConvert::
+            hasSaSdEm( SaSdEm &saSdEm )
+            {
+               if( ! hasSa && ! hasSd && 
+                   ! saSdEm_.hasSa  && ! saSdEm_.hasSd && ! saSdEm_.hasEm )
+                  return false;
+               
+               if( hasSa && saSdEm_.sa.empty() )
+                  saSdEm_.sa = "-1";
+               
+               if( hasSd && saSdEm_.hasEm && saSdEm_.em.empty() )
+                  saSdEm_.em = "-1";
+               
+               if( hasSd && saSdEm_.hasSd && saSdEm_.sd.empty() )
+                  saSdEm_.sd = "-1";
+               
+               saSdEm = saSdEm_;
+            }
       
             SplitDef*
             findSplitDef(const  std::string &name, int &totSize) {
