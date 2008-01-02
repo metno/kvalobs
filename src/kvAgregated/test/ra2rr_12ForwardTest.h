@@ -39,12 +39,14 @@ class ra2rr_12ForwardTest : public AbstractAgregatorTest
     CPPUNIT_TEST( testExpressedInterest );
     CPPUNIT_TEST( testNotEnoughData );
     CPPUNIT_TEST( testDataMarkedAsMissing );
-    CPPUNIT_TEST( testStandardAgregation );
-    CPPUNIT_TEST( testResultIsZero );
-    CPPUNIT_TEST( testResultIsBelowZero );
-    CPPUNIT_TEST( testResultIsMuchBelowZero );
-    CPPUNIT_TEST( test12hPositive24hZeroAt06 );
-    CPPUNIT_TEST( test12hPositive24hZeroAt18 );
+    CPPUNIT_TEST( testExpressedInterest );
+    CPPUNIT_TEST( test12hZero );
+    CPPUNIT_TEST( test12hNegative );
+    CPPUNIT_TEST( test12hPositive24hNegative );
+    CPPUNIT_TEST( test12hPositive24hZero );
+    CPPUNIT_TEST( test12hPositive24hPositivePrev12hNegative );
+    CPPUNIT_TEST( test12hPositive24hPositivePrev12hZero );
+    CPPUNIT_TEST( test12hPositive24hPositivePrev12hPositive );
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -53,25 +55,31 @@ public:
 
     virtual void setUp();
 
+    virtual void testGetTimeSpanAtGenerationPoint();
+    
+    virtual void testGetTimeSpan();
+    
 	void testExpressedInterest();
 	
 	void testNotEnoughData();
 	
 	void testDataMarkedAsMissing();
 	
-    void testStandardAgregation();
+    void test12hZero();
     
-    void testResultIsZero();
-    
-    void testResultIsBelowZero();
-    
-    /// Simulate emptying of the bucket.
-    void testResultIsMuchBelowZero();
+    void test12hNegative();
 
-	void test12hPositive24hZeroAt06();
+	void test12hPositive24hNegative();
 	
-	void test12hPositive24hZeroAt18();
+	void test12hPositive24hZero();
 
+	void test12hPositive24hPositivePrev12hNegative();
+
+	void test12hPositive24hPositivePrev12hZero();
+
+	void test12hPositive24hPositivePrev12hPositive();
+
+	
 private:
     enum { RR_12 = 109, RA = 104 };
 };

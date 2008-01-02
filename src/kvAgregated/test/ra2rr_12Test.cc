@@ -126,21 +126,7 @@ void ra2rr_12Test::testDataMarkedAsMissing()
 }
 
 
-
-void ra2rr_12Test::testStandardAgregation()
-{
-	AbstractAgregator::kvDataList data;
-	const kvDataFactory dataFactory( 42, "2007-06-06 06:00:00", 302 );
-	data.push_back( dataFactory.getData( 210.1, RA, "2007-06-05 06:00:00" ) );
-	data.push_back( dataFactory.getData( 211.2, RA, "2007-06-05 18:00:00" ) );
-	data.push_back( dataFactory.getData( 213.3, RA, "2007-06-06 06:00:00" ) );
-	
-	AbstractAgregator::kvDataPtr d = agregator->process( data.back(), data );
-	CPPUNIT_ASSERT( d.get() );
-	CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.1, d->corrected(), .00001 );
-}
-
-void ra2rr_12Test::testResultIsZero()
+void ra2rr_12Test::test12hZero()
 {
 	AbstractAgregator::kvDataList data;
 	const kvDataFactory dataFactory( 42, "2007-06-06 06:00:00", 302 );
@@ -150,59 +136,94 @@ void ra2rr_12Test::testResultIsZero()
 	
 	AbstractAgregator::kvDataPtr d = agregator->process( data.back(), data );
 	CPPUNIT_ASSERT( d.get() );
+	CPPUNIT_ASSERT_EQUAL( miutil::miTime("2007-06-06 06:00:00"), d->obstime() );
 	CPPUNIT_ASSERT_DOUBLES_EQUAL( 0, d->corrected(), .00001 );
 }
 
-
-void ra2rr_12Test::testResultIsBelowZero()
+void ra2rr_12Test::test12hNegative()
 {
 	AbstractAgregator::kvDataList data;
 	const kvDataFactory dataFactory( 42, "2007-06-06 06:00:00", 302 );
 	data.push_back( dataFactory.getData( 210.1, RA, "2007-06-05 06:00:00" ) );
-	data.push_back( dataFactory.getData( 213.5, RA, "2007-06-05 18:00:00" ) );
+	data.push_back( dataFactory.getData( 213.3, RA, "2007-06-05 18:00:00" ) );
+	data.push_back( dataFactory.getData( 212.2, RA, "2007-06-06 06:00:00" ) );
+	
+	AbstractAgregator::kvDataPtr d = agregator->process( data.back(), data );
+	CPPUNIT_ASSERT( d.get() );
+	CPPUNIT_ASSERT_EQUAL( miutil::miTime("2007-06-06 06:00:00"), d->obstime() );
+	CPPUNIT_ASSERT_DOUBLES_EQUAL( 0, d->corrected(), .00001 );
+}
+
+void ra2rr_12Test::test12hPositive24hNegative()
+{
+	AbstractAgregator::kvDataList data;
+	const kvDataFactory dataFactory( 42, "2007-06-06 06:00:00", 302 );
+	data.push_back( dataFactory.getData( 214.4, RA, "2007-06-05 06:00:00" ) );
+	data.push_back( dataFactory.getData( 212.2, RA, "2007-06-05 18:00:00" ) );
 	data.push_back( dataFactory.getData( 213.3, RA, "2007-06-06 06:00:00" ) );
 	
 	AbstractAgregator::kvDataPtr d = agregator->process( data.back(), data );
 	CPPUNIT_ASSERT( d.get() );
+	CPPUNIT_ASSERT_EQUAL( miutil::miTime("2007-06-06 06:00:00"), d->obstime() );
 	CPPUNIT_ASSERT_DOUBLES_EQUAL( 0, d->corrected(), .00001 );
 }
 
-void ra2rr_12Test::testResultIsMuchBelowZero()
+
+void ra2rr_12Test::test12hPositive24hZero()
 {
 	AbstractAgregator::kvDataList data;
 	const kvDataFactory dataFactory( 42, "2007-06-06 06:00:00", 302 );
-	data.push_back( dataFactory.getData( 210.1, RA, "2007-06-05 06:00:00" ) );
-	data.push_back( dataFactory.getData( 213.5, RA, "2007-06-05 18:00:00" ) );
-	data.push_back( dataFactory.getData( 13.3, RA, "2007-06-06 06:00:00" ) );
+	data.push_back( dataFactory.getData( 213.3, RA, "2007-06-05 06:00:00" ) );
+	data.push_back( dataFactory.getData( 212.2, RA, "2007-06-05 18:00:00" ) );
+	data.push_back( dataFactory.getData( 213.3, RA, "2007-06-06 06:00:00" ) );
 	
 	AbstractAgregator::kvDataPtr d = agregator->process( data.back(), data );
 	CPPUNIT_ASSERT( d.get() );
+	CPPUNIT_ASSERT_EQUAL( miutil::miTime("2007-06-06 06:00:00"), d->obstime() );
 	CPPUNIT_ASSERT_DOUBLES_EQUAL( 0, d->corrected(), .00001 );
 }
 
-void ra2rr_12Test::test12hPositive24hZeroAt06()
+
+void ra2rr_12Test::test12hPositive24hPositivePrev12hNegative()
 {
 	AbstractAgregator::kvDataList data;
 	const kvDataFactory dataFactory( 42, "2007-06-06 06:00:00", 302 );
-	data.push_back( dataFactory.getData( 211.2, RA, "2007-06-05 06:00:00" ) );
-	data.push_back( dataFactory.getData( 210.1, RA, "2007-06-05 18:00:00" ) );
-	data.push_back( dataFactory.getData( 211.2, RA, "2007-06-06 06:00:00" ) );
+	data.push_back( dataFactory.getData( 212.1, RA, "2007-06-05 06:00:00" ) );
+	data.push_back( dataFactory.getData( 211.1, RA, "2007-06-05 18:00:00" ) );
+	data.push_back( dataFactory.getData( 213.3, RA, "2007-06-06 06:00:00" ) );
 	
 	AbstractAgregator::kvDataPtr d = agregator->process( data.back(), data );
 	CPPUNIT_ASSERT( d.get() );
-	CPPUNIT_ASSERT_DOUBLES_EQUAL( 0, d->corrected(), .00001 );
+	CPPUNIT_ASSERT_EQUAL( miutil::miTime("2007-06-06 06:00:00"), d->obstime() );
+	CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.2, d->corrected(), .00001 );
 }
 
-void ra2rr_12Test::test12hPositive24hZeroAt18()
+
+void ra2rr_12Test::test12hPositive24hPositivePrev12hZero()
 {
 	AbstractAgregator::kvDataList data;
-	const kvDataFactory dataFactory( 42, "2007-06-06 18:00:00", 302 );
-	data.push_back( dataFactory.getData( 211.2, RA, "2007-06-05 18:00:00" ) );
-	data.push_back( dataFactory.getData( 210.1, RA, "2007-06-06 06:00:00" ) );
-	data.push_back( dataFactory.getData( 211.2, RA, "2007-06-06 18:00:00" ) );
+	const kvDataFactory dataFactory( 42, "2007-06-06 06:00:00", 302 );
+	data.push_back( dataFactory.getData( 211.1, RA, "2007-06-05 06:00:00" ) );
+	data.push_back( dataFactory.getData( 211.1, RA, "2007-06-05 18:00:00" ) );
+	data.push_back( dataFactory.getData( 213.3, RA, "2007-06-06 06:00:00" ) );
 	
 	AbstractAgregator::kvDataPtr d = agregator->process( data.back(), data );
 	CPPUNIT_ASSERT( d.get() );
-	CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.1, d->corrected(), .00001 );	
+	CPPUNIT_ASSERT_EQUAL( miutil::miTime("2007-06-06 06:00:00"), d->obstime() );
+	CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.2, d->corrected(), .00001 );
 }
 
+
+void ra2rr_12Test::test12hPositive24hPositivePrev12hPositive()
+{
+	AbstractAgregator::kvDataList data;
+	const kvDataFactory dataFactory( 42, "2007-06-06 06:00:00", 302 );
+	data.push_back( dataFactory.getData( 211.0, RA, "2007-06-05 06:00:00" ) );
+	data.push_back( dataFactory.getData( 212.2, RA, "2007-06-05 18:00:00" ) );
+	data.push_back( dataFactory.getData( 213.3, RA, "2007-06-06 06:00:00" ) );
+	
+	AbstractAgregator::kvDataPtr d = agregator->process( data.back(), data );
+	CPPUNIT_ASSERT( d.get() );
+	CPPUNIT_ASSERT_EQUAL( miutil::miTime("2007-06-06 06:00:00"), d->obstime() );
+	CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.1, d->corrected(), .00001 );
+}

@@ -118,22 +118,44 @@ namespace agregator
 
   float ra2rr_12::agregate( const kvData & from, const kvData & to, const kvData * oneDayAgo ) const
   {
+    const float zero = 0.0001;
+    
+//    cout << from.corrected() << " - " << to.corrected();
+//    if ( oneDayAgo )
+//      cout << " - " << oneDayAgo->corrected();
+//    cout << endl;
+    
     if ( not ( valid( from ) and valid( to ) ) )
       return invalidParam;
     
-    // Do calculation
-    float result = to.corrected() - from.corrected();
+    const float diff12h = to.corrected() - from.corrected();
+//    cout << "diff12h: " << diff12h << endl;
 
-	// Correct false precipitation 
-	// - if  rain for 18:00 - 06:00 > 0
-	//   and rain for 06:00 - 06:00 <= 0
-	//   then return -1
-	if ( oneDayAgo and result > 0 and to.obstime().clock().hour() == 6)
-	{
-		float otherResult = to.corrected() - oneDayAgo->corrected();
-		if ( otherResult < 0.0001 )
-			result = otherResult;
-	}
+    float result;
+    if ( ! oneDayAgo )
+      result = diff12h;
+    else {
+      if ( diff12h < zero ) {
+        result = 0;
+      }
+      else {
+        const float diff24h = to.corrected() - oneDayAgo->corrected();
+//        cout << "diff24h: " << diff24h << endl;
+        if ( diff24h <= zero )
+        	result = 0;
+        else {
+  	const float diff12hPrevious = from.corrected() - oneDayAgo->corrected();
+//  	cout << "diff12hPrevious: " << diff12hPrevious << endl;
+  	if ( diff12hPrevious >= zero )
+  	  result = diff12h;
+  	else
+  	  result = diff24h;
+        }
+      }
+    }    
+    
+//    Hvis RR_12(t) = RA(t)-RA(t-12) < 0 
+//    Sett RR_12(t) = 0
 
     LOGDEBUG( "Calculation sum: " << result );
     
@@ -153,24 +175,11 @@ namespace agregator
     name += "-Forward";
   }
 
-  const pair<miTime, miTime> ra2rr_12_forward::getTimeSpan( const kvData &data )
+  const ra2rr_12_forward::TimeSpan ra2rr_12_forward::getTimeSpan( const kvalobs::kvData &data ) const
   {
-    miDate date = data.obstime().date();
-    set<miClock>::const_iterator it =
-        generateWhen().lower_bound( data.obstime().clock() );
-    if ( it == generateWhen().end() ) {
-      it = generateWhen().begin();
-      date.addDay();
-    }
-    miTime startTime( date, *it );
-    startTime.addSec( -1 );
-    miTime genTime = startTime;
-    genTime.addHour( interestingHours() );
-
-    const pair<miTime, miTime> ret(startTime, genTime);
-    
-    LOGDEBUG( "Time span: " << ret.first << " - " << ret.second );
-
-    return ret;
+	  TimeSpan ts = ra2rr_12::getTimeSpan(data);
+	  ts.first.addHour(timeOffset());
+	  ts.second.addHour(timeOffset());
+	  return ts;
   }
 }
