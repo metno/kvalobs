@@ -41,6 +41,7 @@
 #include <utility>
 #include <cmath>
 #include <algorithm>
+#include <functional>
 #include <boost/thread/thread.hpp>
 
 //#define NDEBUG
@@ -369,6 +370,7 @@ namespace kvservice
       //LogContext context( "KvalobsProxy::getData" );
 
       assert( not oldestInProxy.undef() );
+      
 
       // Fetch data from kvalobs, if neccessary
       if ( from <= oldestInProxy )
@@ -384,7 +386,15 @@ namespace kvservice
       {
         miTime p_from = max( from, oldestInProxy );
         //LOGDEBUG( "Fetching times " << p_from << " - " << to << " from proxy" );
-        proxy_getData( data, station, p_from, to, paramid, type, sensor, lvl );
+        KvDataList proxyData;
+        proxy_getData( proxyData, station, p_from, to, paramid, type, sensor, lvl );
+        for ( KvDataList::const_iterator it = proxyData.begin(); it != proxyData.end(); ++ it )
+        {
+        	KvDataList::const_iterator find = find_if(data.begin(), data.end(), 
+        			bind1st(kvalobs::compare::same_kvData(),*it)); 
+        	if ( find == data.end() )
+        		data.push_back(* it);
+        }
       }
     }
 

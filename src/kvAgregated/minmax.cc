@@ -52,19 +52,28 @@ namespace agregator
   float MinMax::generateKvData( const kvDataList &data,
                                 const kvData &trigger )
   {
-    float val = data.front().corrected();
+	if ( int(data.size()) != interestingHours() )
+		throw std::logic_error("incorrect size of input data list");
+	  
+    float val = trigger.corrected();
     
-//    miutil::miTime tooEarly( trigger.obstime() );
-//    tooEarly.addHour( - interestingHours() );
+    TimeSpan ts = getTimeSpan(trigger);
 
     for ( kvDataList::const_iterator it = data.begin(); it != data.end(); ++ it )
     {
-//      if ( it->obstime() > tooEarly and it->obstime() <= trigger.obstime() )
-//      {
+      if ( it->obstime() > ts.first and it->obstime() <= ts.second )
+      {
 	      if ( not valid( * it ) )
 	        return invalidParam;
 	      val = function( val, it->corrected() );
-//      }
+      }
+      else
+      {
+    	std::ostringstream errMsg;
+    	errMsg << "invalid date for input data: " << it->obstime() 
+    		<< ". Date should be in range (" << ts.first << ", " << ts.second << "].";
+    	throw std::logic_error(errMsg.str());
+      }
     }
 
     return val;

@@ -38,6 +38,8 @@ class MinMaxTest : public AbstractAgregatorTest
     CPPUNIT_TEST_SUB_SUITE( MinMaxTest, AbstractAgregatorTest );
     CPPUNIT_TEST( testNormal );
     CPPUNIT_TEST( testIncompleteData );
+    CPPUNIT_TEST( testWrongInputDates );
+    CPPUNIT_TEST( testMissingRow );
     CPPUNIT_TEST( testCompleteDataObservationInMiddle );
     CPPUNIT_TEST_SUITE_END();
 public:
@@ -48,6 +50,8 @@ public:
 	
 	void testNormal();
 	void testIncompleteData();
+	void testWrongInputDates();
+	void testMissingRow();
 	void testCompleteDataObservationInMiddle();
 };
 

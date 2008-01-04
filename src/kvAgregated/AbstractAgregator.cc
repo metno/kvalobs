@@ -170,7 +170,6 @@ namespace agregator
 	    {
 	      if ( err.what() [ 0 ] != '\0' )
 	      {
-	      	cout << err.what() << endl;
 	        LOGERROR( err.what() );
 	      }
 	      return return_type( 0 );

@@ -149,6 +149,23 @@ namespace agregator
     }
   }
   
+  namespace
+  {
+  	struct assertObsTimeMatches
+  	{
+  		const AbstractAgregator::TimeSpan & obsTimes_;
+  		assertObsTimeMatches(const AbstractAgregator::TimeSpan & obsTimes ) : obsTimes_(obsTimes) {}
+  		void operator () (const kvalobs::kvData & d)
+  		{
+  			if ( d.obstime() <= obsTimes_.first || d.obstime() > obsTimes_.second )
+  			{
+  				std::ostringstream errMsg;
+  				errMsg << d.obstime()<<" is not in range ("<<obsTimes_.first<<", "<<obsTimes_.second<<"]";
+  				throw std::logic_error(errMsg.str());
+  			}
+  		}
+  	};
+  }
   
   list<kvalobs::kvData>
   AgregatorHandler::getRelevantObsList( const kvalobs::kvData & data,
@@ -158,6 +175,8 @@ namespace agregator
 
     getProxy().getData( ret, data.stationID(), obsTimes.first, obsTimes.second,
                    data.paramID(), data.typeID(), data.sensor(), data.level() );
+    
+    for_each(ret.begin(), ret.end(), assertObsTimeMatches(obsTimes));
     
     return ret;
   }
