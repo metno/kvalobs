@@ -175,11 +175,12 @@ getMetaSaSd( miutil::miString &msg )
    string keyval;
    string key;
    string val;
-   string::size_type i;
 
    CommaString cstr(obsType, '/');
     
-   for( int i=0; cstr.size(); ++i ) {
+   for( int i=0; i<cstr.size(); ++i ) {
+      
+      cerr << "loop" << endl;
       if( ! cstr.get( i, keyval ) )
          continue;
       

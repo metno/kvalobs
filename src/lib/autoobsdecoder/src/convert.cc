@@ -569,15 +569,6 @@ namespace kvalobs {
 	            if(spVal=="00")
 	               continue;
 	         }else if(id=="SA"){ //Esss, sss->SA
-	            if(spVal=="997")
-	               spVal = "0";
-	            else if(spVal=="998")
-	               spVal = "-1";
-	            else if(spVal=="999")
-	               spVal = "-3";
-               else if(spVal=="000")
-                  spVal = "-1";
-	            
 	            saSdEm_.sa = spVal;
 	            continue;
 	         }else if( id == "SD" ) {
@@ -761,19 +752,35 @@ namespace kvalobs {
             DataConvert::
             hasSaSdEm( SaSdEm &saSdEm )
             {
+               string sa;
+            
                if( ! hasSa && ! hasSd && 
                    ! saSdEm_.hasSa  && ! saSdEm_.hasSd && ! saSdEm_.hasEm )
                   return false;
                
-               if( hasSa && saSdEm_.sa.empty() )
-                  saSdEm_.sa = "-1";
+               if( hasSa || saSdEm_.hasSa ) {
+                  if( saSdEm_.sa.empty() || 
+                      saSdEm_.sa == "998" || 
+                      saSdEm_.sa == "000" )
+                     sa = "-1";
+                  else if( saSdEm_.sa == "997" )
+                     sa = "0";
+                  else if( saSdEm_.sa == "999" )
+                     sa = "-3";
+                  else
+                     sa = saSdEm_.sa;
+               }
+
+               if( hasSd || saSdEm_.hasEm ) {
+                  if( saSdEm_.em.empty() ) {
+                     if( saSdEm_.sa == "998" )
+                        saSdEm_.em = "1";
+                     else
+                        saSdEm_.em = "-1";
+                  }
+               }
                
-               if( hasSd && saSdEm_.hasEm && saSdEm_.em.empty() )
-                  saSdEm_.em = "-1";
-               
-               if( hasSd && saSdEm_.hasSd && saSdEm_.sd.empty() )
-                  saSdEm_.sd = "-1";
-               
+               saSdEm_.sa = sa;
                saSdEm = saSdEm_;
             }
       
