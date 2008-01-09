@@ -83,6 +83,8 @@ SynopData::SynopData():
     FX(FLT_MAX),
     WAWA(FLT_MAX),
     HLN(FLT_MAX),
+    EM(FLT_MAX),
+    SA(FLT_MAX),
     nedboerInd_verInd("//"),
     hoeyde_sikt("///"),
     verGenerelt("////"),
@@ -146,6 +148,8 @@ SynopData::SynopData(const SynopData &p):
     FX(p.FX),
     WAWA(p.WAWA),
     HLN(p.HLN),
+    EM(p.EM),
+    SA(p.SA),
     nedboerInd_verInd(p.nedboerInd_verInd),
     hoeyde_sikt(p.hoeyde_sikt),
     skydekke(p.skydekke),
@@ -221,6 +225,8 @@ SynopData::operator=(const SynopData &p)
     FX               =p.FX;
     WAWA             =p.WAWA;
     HLN              =p.HLN;
+    EM               =p.EM;
+    SA               =p.SA;
     nedboerInd_verInd=p.nedboerInd_verInd;
     hoeyde_sikt      =p.hoeyde_sikt;
     skydekke         =p.skydekke;
@@ -342,7 +348,9 @@ SynopData::setData(const int  &param,
     case  83: FG=fData;            break; //FG
     case  86: FX=fData;            break; //FX  
     case  56: HLN=fData;           break; //HLN
-    case  49: WAWA=fData;          break;
+    case  49: WAWA=fData;          break; //WaWa
+    case   7: EM=fData;            break; //E (snow state to the ground) in E'sss
+    case 112: SA=fData;            break; //sss (snow depth) in E'sss
     case   9:                             //IR, _irix
               IIR=buf;
 	      nedboerInd_verInd.replace(0, 1, buf);
@@ -439,7 +447,7 @@ SynopData::setData(const int  &param,
     case  19:                                 //_S
               sjoegang=buf;
 	      break;
-    case   7:        
+    /*case   7:        
               if(fData>=0)//EM, _Esss
 		snoeMark.replace(0, 1, buf);
 	      break;
@@ -462,6 +470,7 @@ SynopData::setData(const int  &param,
 	         snoeMark.replace(1, 3, buf);
 	      }
 	     break;
+	     */
     case  13:                                 //ITZ, "_tz")
 	      ITZ=buf;
 	      break;

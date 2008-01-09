@@ -240,7 +240,7 @@ use(bool exit_)
         << "\t-s kvalobs server to send the data to.\n\n"
         << "  Assume the decoder is given as the first line of filename, if \n"
         << "  the -d option is not given.\n\n"
-        << "  If the kavlobs server to send to is not given, the server is taken\n"
+        << "  If the kvalobs server to send to is not given, the server is taken\n"
         << "  from the variable corba.path in the configuration\n"
         << "  file $KVALOBS/etc/kvalobs.conf\n\n";
        

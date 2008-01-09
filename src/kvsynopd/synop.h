@@ -37,7 +37,14 @@
 #include "StationInfo.h"
 
 #define GROUPSIZE                  6
-#define KNOPFAKTOR     1.94384449244
+
+/*
+ * Quick and dirty fix to let the windspeed be in m/s, ie dont
+ * convert to knop
+ */
+
+#define KNOPFAKTOR     1
+//#define KNOPFAKTOR     1.94384449244
 
 class Synop
 {
@@ -125,6 +132,7 @@ class Synop
     bool doVerGenerelt(std::string &kode, int &ix, const SynopData &data);
     bool SjoeTempKode(std::string &kode, const SynopData &data);
     bool SjekkEsss(std::string &kode, const std::string &str);
+    void doEsss( std::string &kode, const SynopData &data );
     void GressTempKode(std::string &kode, SynopDataList &sd);
     void SplittStreng(std::string &streng, std::string::size_type index);
 

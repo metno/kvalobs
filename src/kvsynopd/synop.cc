@@ -80,6 +80,9 @@
  * -NÃ¥r duggpunktet beregnes marginalt hÃ¸yere, 0.5 grader C, enn  
  *  lufttemperaturen sÃ¥ settes duggpunket lik lufttemperaturen.
  * -Ryddet opp i tÃ¥pelig og ulogisk kode.
+ * 
+ * 2007-12-19 Bxrge
+ * - Endret koding av gruppe 4 E'sss.
  */
 
 using namespace std;
@@ -265,7 +268,8 @@ doSynop(int           synopno,
   
     Skydekke_Kode(skydekkeKode, sisteTid.skydekke);
     Hoyde_Sikt_Kode(hoyde_siktKode, sisteTid);
-    SjekkEsss(snoeMarkKode, sisteTid.snoeMark);
+    //SjekkEsss(snoeMarkKode, sisteTid.snoeMark);
+    doEsss( snoeMarkKode, sisteTid );
     Sjekk_Gruppe(8, skyerKode, sisteTid.skyer);
     Sjekk_Gruppe(8, skyerEkstraKode1, sisteTid.skyerEkstra1);
     Sjekk_Gruppe(8, skyerEkstraKode2, sisteTid.skyerEkstra2);
@@ -1508,6 +1512,77 @@ Synop::SjekkEsss(std::string &kode, const std::string &str)
   	}
   
   	return true;
+}
+
+
+/**
+ * Coding of E'sss.
+ * 
+ * The coding of E'sss is dependent on EM and SA.
+ * 
+ * EM -> E
+ * SA -> sss
+ * 
+ * Når en værstasjon sender 998 vil de enten også sende E'= 1. (Hvis de har
+ * utelatt E' må vi dekode E' til 1 siden 998 er en såpass bevisst handling.)
+ *
+ * Altså, det er E' som bestemmer om SA=-1 er flekkvis snø. I koding av synop
+ * må en altså for alle typeid bruke kombinasjonen av SA og E' eller SA og SD 
+ * for å kunne angi 998 i synop.
+ * SA=-1 når snødybde raporteres som "blank", utelatt (gruppe) eller "0" (Ingen
+ * snø)
+ * SA=-1 når snødybde raporteres som 998             (flekkvis snø)
+ * SA=0  når snødybde raporteres som 997             (mindre enn 0.5 cm snø)
+ * SA=-3 når snødybde raporteres som 999             (måling umulig)
+ * EM=-1 når EM raporteres som "blank" eller utelatt (gruppe) 
+ * EM=0  er is-lag
+ * EM= 1 - 9 er andel snødekke og type
+ *
+ * Synop enkoding fra Kvalobs
+ * Når det skal lages synop fra kvalobs så må det kanskje ut fra dette til en 
+ * justering av dagens enkoder slik at koding av SA og EM blir riktig? (For 302
+ * må kun SA benyttes i synop - ikke SD.) 
+ * 
+ */
+
+void 
+Synop::
+doEsss( std::string &kode, const SynopData &data )
+{
+   kode.erase();
+   
+   char buf[16];
+   string em;
+   string sa;
+   
+   if( data.EM == FLT_MAX && data.SA == FLT_MAX )
+      return;
+   
+   if( data.EM == FLT_MAX || data.EM < 0 || data.EM > 10 )
+      em = "/";
+   else {
+      sprintf( buf, "%01.0f", data.EM );
+      em = buf;
+   }
+   
+   if( data.SA == FLT_MAX  || data.SA < -3 || data.SA > 996 )
+      sa = "///";
+   else if( data.SA == -1 ) {
+      if( em =="/" )
+         sa = "///";
+      else
+         sa = "998";
+   }else if( data.SA == 0 )
+      sa = "997";
+   else if( data.SA == -3 )
+      sa = "999";
+   else {
+      sprintf( buf, "%3.0f", data.SA );
+      sa = buf;
+   }
+
+   //Creates the code 4E'sss
+   kode = " 4" + em + sa;
 }
 
 

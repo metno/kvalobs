@@ -90,6 +90,8 @@ class  SynopData
   	float  FX;    //Max wind since last observation
   	float  WAWA;
   	float  HLN;
+  	float  EM;    //Snow state to the gound (Markas tilstand).
+  	float  SA;    //Snow depth.
   	std::string nedboerInd_verInd;
   	std::string hoeyde_sikt;
   	std::string skydekke;
@@ -117,6 +119,9 @@ class  SynopData
   	bool setData(const int  &param, 
 				 const std::string &data_);
 
+  	/**
+  	 * Removes data that only generates groups with slashes.
+  	 */
   	void cleanUpSlash();
 
   	void           time(const miutil::miTime &t){time_=t;}
