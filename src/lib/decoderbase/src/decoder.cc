@@ -37,6 +37,8 @@
 #include <kvalobs/kvQueries.h>
 #include <kvalobs/kvGeneratedTypes.h>
 #include <kvalobs/kvWorkelement.h>
+#include <miutil/commastring.h>
+#include <miutil/trimstr.h>
 #include "../include/decoderbase/decoder.h"
 #include "../include/decoderbase/ConfParser.h"
 #include "../include/decoderbase/metadata.h"
@@ -127,7 +129,62 @@ setMetaconf(const miutil::miString &metaconf_)
 
 }
 
+std::string 
+kvalobs::decoder::
+DecoderBase::
+getObsTypeKey( const std::string &keyToFind_ ) const
+{
+   string keyval;
+   string key;
+   string val;
+   string keyToFind( keyToFind_  );
+   
+   miutil::trimstr( keyToFind );
+   
+   if( keyToFind.empty() )
+      return "";
+   
+   miutil::CommaString cstr(obsType, '/');
+    
+   for( int i=0; i<cstr.size(); ++i ) {
+      
+      if( ! cstr.get( i, keyval ) )
+         continue;
+      
+      miutil::CommaString tmpKeyVal( keyval, '=' );
+      
+      if( tmpKeyVal.size() <2 )
+         continue;
+      
+      tmpKeyVal.get( 0, key );
+      tmpKeyVal.get( 1, val );
+      
+      miutil::trimstr( key );
+      
+      if( key == keyToFind ) {
+         
+         if( key.size() >= 2)
+            return val;
+      }
+   }
+   
+   return "";
 
+}
+
+
+std::string 
+kvalobs::decoder::
+DecoderBase::
+getMetaSaSd()const
+{
+   string meta=getObsTypeKey( "meta_SaSd" );
+
+   if(meta.length() < 2)
+      return "";
+     
+   return meta;
+}
       
 const kvalobs::kvTypes* 
 kvalobs::decoder::

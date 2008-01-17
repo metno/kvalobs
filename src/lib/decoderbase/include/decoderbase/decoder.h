@@ -300,6 +300,48 @@ namespace kvalobs{
       
       void setMetaconf(const miutil::miString &metaconf);
 
+      
+      /**
+       * \brief Return the value of a key in obstype.
+       * 
+       * The obstype string that identifies a message can contain
+       * key=value pairs.
+       * 
+       * The generell format on the obstype string is:
+       * 
+       *   messagetype/key0=val0/key1=val1/.../keyN=valN
+       * 
+       * Where the keys may be specific for the messagetype.
+       * 
+       * \param key The key we want the value to.
+       * \return the value to the key if the key exist or an
+       *         empty string otherwise.
+       */
+      std::string getObsTypeKey( const std::string &key ) const;
+      
+      
+      /**
+       * \brief Returns the meta_SaSd key from ObsType.
+       * 
+       * The values indicates if the station report SA/SD/EM. 
+       * The returned string is two character wide. Where each
+       * value represent a boolean, 0 is false and 1 true.
+       * 
+       * The first character indicate is the value for SA and 
+       * the second caharacter is the value of SD.
+       *  
+       *  -SA=1 The station report snowdepth.
+       *  -SD/EM = 1 The station report the state of the ground. 
+       * 
+       * The values comes typically from the E'sss codings. See 
+       * the WMO specificatipn for SYNOP.
+       * 
+       * \return The value of the meta_SaSd key from the ObsType 
+       *         if present otherwise an empty string is returned.
+       */
+      std::string getMetaSaSd()const;
+      
+      
       /**
        * \brief return the decoder id.
        * \return The decoder id.
