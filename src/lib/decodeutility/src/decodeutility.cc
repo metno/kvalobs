@@ -55,6 +55,9 @@ VV( const std::string &spVal_ )
   }else if(iVV>0 && iVV<=50){
     sprintf(cVV, "%d", iVV*100);
     val=cVV;
+  }else if(iVV>50 && iVV<56) {
+     sprintf(cVV, "%d", -iVV);
+     val=cVV;
   }else if(iVV>=56 && iVV<=80){
     sprintf(cVV, "%d", (iVV-50)*1000);
     val=cVV;
@@ -79,7 +82,10 @@ VVKode(float m)
 
   im=static_cast<int>(round(m));
   
-  if(im<=0){
+  if( im < 0 )
+     return string("");
+  
+  if(im==0){
     return string("00");
   }
 
