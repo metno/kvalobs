@@ -28,6 +28,8 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+
+#include <limits.h>
 #include <stdlib.h>
 #include <milog/milog.h>
 #include "sms2.h"
@@ -538,13 +540,24 @@ doKvPrecipitation(kvalobs::decodeutil::DecodedDataElem &data,
 	string buf;
 	string SA;
 	string SD;
-	int    iSD;
+	int    iSD=INT_MAX;
 	char   sRR[128];
 	miTime dtComObs;
 	int    dif;
 	miTime t6;        //6 terminen
 	kvUseInfo useInfo;
-
+	string metaSaSd=getMetaSaSd();
+	bool hasSa=false;
+	bool hasSd=false;
+	
+	if( ! metaSaSd.empty() && metaSaSd.length()>=2 ) {
+	   if( metaSaSd[0] != '0')
+	      hasSa=true;
+	   
+	   if( metaSaSd[1] != '0')
+	      hasSd=true;
+	}
+	
   	getInData("SA", SA);
   	getInData("SD", SD);
   	getInData("KLCOMOBS", klComObs);
@@ -578,12 +591,12 @@ doKvPrecipitation(kvalobs::decodeutil::DecodedDataElem &data,
   	cleanString(SA);
   	cleanString(SD);
 
-  	if(SD.empty()){
+  	if((SD.empty() || SD=="0") && hasSd ){
     	SD="-1";
     	iSD=-1;
   	}
  
-  	if(SD!="-1"){
+  	if( !SD.empty() && SD!="-1"){
     	int i;
     	for(i=0; i<SD.length() && isdigit(SD[i]); i++);
     
@@ -595,6 +608,9 @@ doKvPrecipitation(kvalobs::decodeutil::DecodedDataElem &data,
     	}
   	}
   
+  	if( (SA.empty() || SA=="0") && hasSa )
+  	   SA="-1";
+  	
   	if(iSD==1 || iSD==2){
     	SA="-1"; //Flekkvis sne
   	}
