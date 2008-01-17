@@ -92,6 +92,9 @@ class  SynopData
   	float  HLN;
   	float  EM;    //Snow state to the gound (Markas tilstand).
   	float  SA;    //Snow depth.
+  	float  Vmor;  //Automatic measured horizontal visibility
+  	float  VV;    //Human estimated horizontal visibility
+  	float  HL;
   	std::string nedboerInd_verInd;
   	std::string hoeyde_sikt;
   	std::string skydekke;

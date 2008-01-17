@@ -85,6 +85,9 @@ SynopData::SynopData():
     HLN(FLT_MAX),
     EM(FLT_MAX),
     SA(FLT_MAX),
+    Vmor(FLT_MAX),
+    VV(FLT_MAX),
+    HL(FLT_MAX),
     nedboerInd_verInd("//"),
     hoeyde_sikt("///"),
     verGenerelt("////"),
@@ -150,6 +153,9 @@ SynopData::SynopData(const SynopData &p):
     HLN(p.HLN),
     EM(p.EM),
     SA(p.SA),
+    Vmor(p.Vmor),
+    VV(p.VV),
+    HL(p.HL),
     nedboerInd_verInd(p.nedboerInd_verInd),
     hoeyde_sikt(p.hoeyde_sikt),
     skydekke(p.skydekke),
@@ -227,6 +233,9 @@ SynopData::operator=(const SynopData &p)
     HLN              =p.HLN;
     EM               =p.EM;
     SA               =p.SA;
+    Vmor             =p.Vmor;
+    VV               =p.VV;
+    HL               =p.HL;
     nedboerInd_verInd=p.nedboerInd_verInd;
     hoeyde_sikt      =p.hoeyde_sikt;
     skydekke         =p.skydekke;
@@ -358,14 +367,16 @@ SynopData::setData(const int  &param,
     case  10:                             //IX, _irix
  	      nedboerInd_verInd.replace(1, 1, buf);
 	      break;
-    case  55:                               //HL, _hVV
-	      ch=HLKode(fData);
+    case  55:  HL=fData;           break; //HL, _hVV
+/*	      ch=HLKode(fData);
 	      hoeyde_sikt[0]=ch;
-	      break;
-    case 273:                              //VV, _hVV
-	      s=VVKode(fData);
-	      hoeyde_sikt.replace(1, 2, s);
-	      break;
+	      break;*/
+    case 271: Vmor = fData;        break; //Vmor, _hVV
+    case 273: VV = fData;          break; //VV, _hVV
+    /*	      s=VVKode(fData);
+	      if( ! s.empty() )
+	         hoeyde_sikt.replace(1, 2, s);
+	      break; */
     case 15:                                //NN, _N
 	      skydekke=buf;
 	      break;
@@ -769,6 +780,8 @@ operator<<(std::ostream& ost, const SynopData& sd)
       << "trykkTendens           (PP): " << sd.trykkTendens      << endl
       << "trykkKarakter          (AA): " << sd.AA                << endl
       << "nedboerInd_verInd   (_irix): " << sd.nedboerInd_verInd << endl
+      << "Vmor (automatic VV)  (_hVV): " << sd.Vmor              << endl
+      << "VV (estimated VV)    (_hVV): " << sd.VV                << endl
       << "hoeyde_sikt          (_hVV): " << sd.hoeyde_sikt       << endl
       << "HLN                        : " << sd.HLN               << endl
       << "skydekke               (_N): " << sd.skydekke          << endl

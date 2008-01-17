@@ -44,8 +44,9 @@
  */
 
 #define KNOPFAKTOR     1
+#define IW 1             //Wind unit i m/s
 //#define KNOPFAKTOR     1.94384449244
-
+//#define IW 4  //Wind unit in knop
 class Synop
 {
     Synop(const Synop &);

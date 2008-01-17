@@ -83,6 +83,12 @@
  * 
  * 2007-12-19 Bxrge
  * - Endret koding av gruppe 4 E'sss.
+ * 
+ * 2008-01-15 Bxrge
+ * - Endret kodingen av vind fra knop to m/s.
+ * 
+ * 2008-01-16 Bxrge
+ * - Lagt til støtte for autmatisk målt VV (Vmor).
  */
 
 using namespace std;
@@ -306,7 +312,20 @@ doSynop(int           synopno,
     }
 
   
-    sprintf(tmp,"\r\nAAXX %s4", dato_tid.c_str());
+    /**
+     * Changed the wind unit from knop to m/s
+     * 
+     * AAXX DDhhW 
+     * 
+     * Where DD is the day.
+     *       hh is the termin (hour).
+     *       W  wind unit, 
+     *          W = 4 - knop
+     *          W = 1 - m/s
+     * 
+     * IW is defined in synop.h
+     */
+    sprintf(tmp,"\r\nAAXX %s%1d", dato_tid.c_str(), IW);
     synop+=tmp;
       
     sprintf(tmp, "\r\n%05d %1d%1d", synopno, ir, ix);
@@ -1361,65 +1380,31 @@ Synop::Skydekke_Kode(std::string &kode, const std::string &str)
 void 
 Synop::Hoyde_Sikt_Kode(std::string &kode, const SynopData &data)
 {
-	std::string str=data.hoeyde_sikt;
-	bool hasH=true;
-	
-	kode="///";
+   float Vmor=data.Vmor;
+   float VV=data.VV;
+   float HLN=data.HLN;
+   float HL=data.HL;
 
-   if(str.length() != 3){
-		hasH=false;
-   }else{
-		bool hasVV=true;
+   kode="///";
    
-		if(!isdigit(str[0])){
-			str[0]='/';
-			hasH=false;
-		}
-
-      if( !isdigit(str[1]) || !isdigit(str[2]))
-      	hasVV=false;
-      	
-      if(!hasVV){
-      	str[1]='/';
-      	str[2]='/';
-      }
-     
-      kode=str;
+	if( VV == FLT_MAX && Vmor!=FLT_MAX )
+	   VV = Vmor;
+	
+	if( HL == FLT_MAX && HLN != FLT_MAX )
+	   HL = HLN;
+	   
+	if( HL != FLT_MAX ) {
+	   char ch=decodeutility::HLKode( HL );
+	   kode[0]=ch;
 	}
 	
-	if(!hasH && data.HLN!=FLT_MAX){
-		float f=data.HLN;
-		int h=-1;
-		
-		if(f>=0 && f<50)
-			h=0;
-		else if(f>=50 && f<100)
-			h=1;
-		else if(f>=100 && f<200)
-			h=2;
-		else if(f>=200 && f<300)
-			h=3;
-		else if(f>=300 && f<600)
-			h=4;
-		else if(f>=600 && f<1000)
-			h=5;
-		else if(f>=1000 && f<1500)
-			h=6;
-		else if(f>=1500 && f<2000)
-			h=7;
-		else if(f>=2000 && f<2500)
-			h=8;
-		else if(f>=2500)
-			h=9;
-			
-		if(h>-1){
-			char buf[10];
-			
-			sprintf(buf, "%d", h);
-			kode[0]=buf[0];
-		}
+	if( VV != FLT_MAX ) {
+	   string s=decodeutility::VVKode(fData);
+	   
+	   if( ! s.empty() )
+	      kode.replace(1, 2, s);
 	}
-} /* Hoyde_Sikt_Kode */
+}
 
 
 /*
