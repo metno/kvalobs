@@ -168,40 +168,6 @@ getTypeId(miutil::miString &msg)
    return atoi(val.c_str());
 }
 
-std::string 
-AutoObsDecoder::
-getMetaSaSd( miutil::miString &msg )
-{
-   string keyval;
-   string key;
-   string val;
-
-   CommaString cstr(obsType, '/');
-    
-   for( int i=0; i<cstr.size(); ++i ) {
-      
-      cerr << "loop" << endl;
-      if( ! cstr.get( i, keyval ) )
-         continue;
-      
-      CommaString tmpKeyVal( keyval, '=' );
-      
-      if( tmpKeyVal.size() <2 )
-         continue;
-      
-      tmpKeyVal.get( 0, key );
-      tmpKeyVal.get( 1, val );
-      
-      if( key == "meta_SaSd" ) {
-         
-         if( key.size() >= 2)
-            return val;
-      }
-   }
-   
-   return "";
-}
-
 
 char 
 AutoObsDecoder::
@@ -272,7 +238,7 @@ execute(miutil::miString &msg)
 {
   	const int             VISUEL_TYPEID=6;
   	const int             AWS_TYPEID=3;
-  	DataConvert           converter(paramList, getMetaSaSd( msg ) );
+  	DataConvert           converter(paramList, getMetaSaSd() );
   	std::vector<DataElem> elems;
   	string                tmp;
   	CommaString           data;
@@ -464,6 +430,7 @@ execute(miutil::miString &msg)
       	}
     	}
     
+
     	DataConvert::RRRtr RRRtr;
 
     	if(converter.hasRRRtr(RRRtr)){
@@ -514,36 +481,38 @@ execute(miutil::miString &msg)
 				}
  
       	}	
-      	DataConvert::SaSdEm saSdEm;
-
-      	if( converter.hasSaSdEm( saSdEm ) ) {
-      	   //Create a template to use
-      	   //to hold all common parameters for SA, SD and EM.
-      	   kvData saSdEmTmp(stationid, obstime, 
-      	                    -32767 /*original*/, 0  /*paramid*/, tbtime,
-      	                    useTypeid, 0 /*sensor*/, 0 /*level*/, 
-      	                    -32767 /*corected*/, kvControlInfo(), kvUseInfo(), "");
-			      
-      	   saSdEmTmp.useinfo(7, checkObservationTime(typeId, tbtime, obstime));
-      	   kvData saSdEmData;
-			      
-      	   try{
-      	      if( DataConvert::SaSdEm::dataSa( saSdEmData, saSdEm, saSdEmTmp ) )
-      	         dataList[useTypeid].push_back(saSdEmData );
-				      
-      	      if( DataConvert::SaSdEm::dataSd( saSdEmData, saSdEm, saSdEmTmp ) )
-      	         dataList[useTypeid].push_back(saSdEmData );
-				      
-      	      if( DataConvert::SaSdEm::dataEm( saSdEmData, saSdEm, saSdEmTmp ) )
-      	         dataList[useTypeid].push_back(saSdEmData );
-		   
-      	   }
-      	   catch(std::exception & ex) {
-      	      LOGERROR("Exception: " << ex.what() << endl <<
-      	            "---------: DataConvert::RRRtr: paramid"<< paramid << endl);
-      	   }
-      	}
     	}
+      cerr << "CHECKPOINT: SaSdEm" << endl;
+      	
+      DataConvert::SaSdEm saSdEm;
+
+      if( converter.hasSaSdEm( saSdEm ) ) {
+         //Create a template to use
+         //to hold all common parameters for SA, SD and EM.
+         kvData saSdEmTmp(stationid, obstime, 
+                          -32767 /*original*/, 0  /*paramid*/, tbtime,
+                          useTypeid, 0 /*sensor*/, 0 /*level*/, 
+                          -32767 /*corected*/, kvControlInfo(), kvUseInfo(), "");
+			      
+         saSdEmTmp.useinfo(7, checkObservationTime(typeId, tbtime, obstime));
+         kvData saSdEmData;
+			      
+         if( DataConvert::SaSdEm::dataSa( saSdEmData, saSdEm, saSdEmTmp ) ) {
+            nExpectedParams++;
+            dataList[useTypeid].push_back(saSdEmData );
+         }
+				      
+         if( DataConvert::SaSdEm::dataSd( saSdEmData, saSdEm, saSdEmTmp ) ) {
+            dataList[useTypeid].push_back(saSdEmData );
+            nExpectedParams++;
+         }
+         
+         if( DataConvert::SaSdEm::dataEm( saSdEmData, saSdEm, saSdEmTmp ) ) {
+            dataList[useTypeid].push_back(saSdEmData );
+            nExpectedParams++;
+         }
+		   
+     	}
 
     	for(itDataList=dataList.begin();
 			 itDataList!=dataList.end();

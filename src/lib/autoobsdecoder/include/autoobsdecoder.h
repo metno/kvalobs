@@ -54,9 +54,7 @@ namespace kvalobs{
 	
 	long getStationId(miutil::miString &msg);
 	long getTypeId( miutil::miString &msg );
-	std::string getMetaSaSd( miutil::miString &msg );
-
-
+	
 	char checkObservationTime(int typeId,
 				  miutil::miTime tbt, 
 				  miutil::miTime obt);
