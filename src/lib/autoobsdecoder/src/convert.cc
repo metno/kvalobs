@@ -151,7 +151,6 @@ namespace kvalobs {
       DataConvert::DataConvert(ParamList &p, const std::string &SaSd)
          :  paramList(p), hasRRRtr_(false), hasSa( false ), hasSd( false ) 
       {
-         cerr << "CTOR: DataConvert: " << SaSd << endl;
          if( SaSd.size() >= 2 ) {
             if( SaSd[0] != '0' )
                hasSa = true;
@@ -755,9 +754,11 @@ namespace kvalobs {
             {
                string sa;
                
-               cerr << "hasSaSdEm: hasSa=" << (hasSa?"t":"f") << " hasSd=" << (hasSd?"t":"f") << endl
-                    << "           saSdEm_.hasSa=" << (saSdEm_.hasSa?"t":"f") << " saSdEm_.hasSd=" << (saSdEm_.hasSd?"t":"f") 
-                    <<  " saSdEm_.hasEm=" << (saSdEm_.hasEm?"t":"f") << endl;
+               LOGDEBUG("hasSaSdEm: hasSa=" << (hasSa?"t":"f") << " hasSd=" << (hasSd?"t":"f") << endl
+                        << "saSdEm_.hasSa=" << (saSdEm_.hasSa?"t":"f") << " saSdEm_.hasSd=" << (saSdEm_.hasSd?"t":"f") 
+                        <<  " saSdEm_.hasEm=" << (saSdEm_.hasEm?"t":"f") << endl
+                        << "saSdEm_.sa=" << saSdEm_.sa << " saSdEm_.em=" << saSdEm_.em 
+                        << " saSdEm_.sd=" << saSdEm_.sd);
             
                if( ! hasSa && ! hasSd && 
                    ! saSdEm_.hasSa  && ! saSdEm_.hasSd && ! saSdEm_.hasEm )

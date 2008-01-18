@@ -482,7 +482,6 @@ execute(miutil::miString &msg)
  
       	}	
     	}
-      cerr << "CHECKPOINT: SaSdEm" << endl;
       	
       DataConvert::SaSdEm saSdEm;
 
