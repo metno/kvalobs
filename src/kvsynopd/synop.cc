@@ -33,6 +33,7 @@
 #include <math.h>
 #include <float.h>
 #include <milog/milog.h>
+#include <decodeutility/decodeutility.h>
 #include "synop.h"
 
 /*CHANGES
@@ -1399,7 +1400,7 @@ Synop::Hoyde_Sikt_Kode(std::string &kode, const SynopData &data)
 	}
 	
 	if( VV != FLT_MAX ) {
-	   string s=decodeutility::VVKode(fData);
+	   string s=decodeutility::VVKode( VV );
 	   
 	   if( ! s.empty() )
 	      kode.replace(1, 2, s);
