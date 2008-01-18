@@ -1,3 +1,15 @@
+2008-01-18 Børge Moe
+           kvsynopd
+           * Endret koding av Esss.
+           * VV, støtte for automatisk målt sikt Vmor.
+           * Vindhastighet i m/s i stedet for knop.
+
+           autoobsdecoder
+           * Endret dekoding av SA, SD, EM og Esss.
+
+           comobsdekoder
+           * Endret dekoding av SA og SD.
+
 2007-10-30 Vegard Bønes
            kvcpp removed, kvcpp2->kvcpp
 
