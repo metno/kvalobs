@@ -3,7 +3,7 @@
 set -a
 #set -e
 
-if [ ! KVALOBS ]; then
+if [ ! $KVALOBS ]; then
 #   KVALOBS=/disk1/kvruntime
     KVALOBS=$HOME
 fi

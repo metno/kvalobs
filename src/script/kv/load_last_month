@@ -5,7 +5,7 @@ muser="pal.sannes@met.no Per.Ove.Kjensli@met.no borgem@met.no"
 set -a
 #set -e
 
-if [ ! KVALOBS ]; then
+if [ ! $KVALOBS ]; then
    #KVALOBS=/disk1/kvruntime
   	KVALOBS=$HOME
 fi
