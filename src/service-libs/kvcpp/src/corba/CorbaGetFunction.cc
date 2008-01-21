@@ -58,15 +58,18 @@ namespace kvservice
 	  LOGERROR("The CORBA subsystem is shutdown!!!");
 	  return false;
 	}
-
+	
 	try {
 	  for ( int i = 0; i < 2; i++ ) {
 	    service = corbaApp->lookUpManager( forceNS, usedNS );
 	    try {
 	      bool result = this->process( service );
-	      if ( ! result )
-		LOGWARN("Can't get data from kvalobs!");
-	      return result;
+	      if ( ! result ) {
+		LOGWARN("Can't get data from kvalobs!!");
+	      }
+	      else {
+		return result;
+	      }
 	    }
 	    catch( CORBA::TRANSIENT &ex ){
 	      LOGWARN("Exception CORBA::TRANSIENT!");
@@ -175,10 +178,10 @@ namespace kvservice
       { 
       }
 
-      bool getKvModelDataFunc::process( kvService_ptr service ) 
+      bool getKvModelDataFunc::process( kvService_ptr service )
       {
 	ModelDataIterator_var it;
-	ModelDataList_var  data;
+	ModelDataList_var data;
 
 	bool ok = service->getModelData( *wd.whichData(), it );
 
@@ -187,18 +190,25 @@ namespace kvservice
 	  while ( it->next( data ) ) {
 	    for ( CORBA::ULong i = 0; i < data->length(); i++ ) {
 	      for ( CORBA::ULong k = 0; k < data[i].dataList.length(); k++ ) {
-		kvalobs::kvModelData 
-		  myData( data[i].dataList[k].stationID,
-			  miutil::miTime(data[i].dataList[k].obstime),
-			  data[i].dataList[k].paramID,
-			  data[i].dataList[k].level,
-			  data[i].dataList[k].modelID,
-			  data[i].dataList[k].original );
+		kvalobs::kvModelData
+		myData( data[i].dataList[k].stationID,
+		    miutil::miTime(data[i].dataList[k].obstime),
+		    data[i].dataList[k].paramID,
+		    data[i].dataList[k].level,
+		    data[i].dataList[k].modelID,
+		    data[i].dataList[k].original );
 		dataList.push_back( myData );
 	      }
 	    }
 	  }
+	  try {
+	    it->destroy();
+	  }
+	  catch(...) {
+	    LOGERROR("Can't destroy iterator!");
+	  }
 	}
+
 	return ok;
       }
  
@@ -398,10 +408,11 @@ namespace kvservice
 	    service = corbaApp->lookUpManager( forceNS, usedNS );
 	    try{
 	      if(!service->getData(*wd.whichData(), it)){
-		LOGWARN("Can't get data from kvalobs!");
+		LOGWARN("Can't get data from kvalobs!!!!");
 		return DataIterator::_nil();
-	      }else
+	      }else {
 		return it;
+	      }
 	    }
 	    catch(CORBA::TRANSIENT &ex){
 	      LOGWARN("Exception CORBA::TRANSIENT!");
@@ -504,7 +515,12 @@ namespace kvservice
 	    for ( CORBA::ULong i = 0; i < data->length(); i++ )
 	      dataList.push_back( KvObsData( data[i] ) ); 
 	}
+	catch(std::exception & e) {
+	  std::cout << e.what() << std::endl;
+	  err = true;
+	}
 	catch(...){
+	  std::cout << "Unknown error" << std::endl;
 	  err = true;
 	}
     
