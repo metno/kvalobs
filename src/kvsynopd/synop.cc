@@ -1563,7 +1563,7 @@ doEsss( std::string &kode, const SynopData &data )
    else if( data.SA == -3 )
       sa = "999";
    else {
-      sprintf( buf, "%3.0f", data.SA );
+      sprintf( buf, "%03.0f", data.SA );
       sa = buf;
    }
 
