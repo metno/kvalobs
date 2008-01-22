@@ -346,6 +346,7 @@ execute(miutil::miString &msg)
     	LOGDEBUG("  Data: obstime:  " << obstime << endl);
     
     	converter.resetRRRtr();
+    	converter.resetSaSdEm();
    
     	for (int i = 0; i < header.size(); i++) {
       	useTypeid=typeId;
