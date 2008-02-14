@@ -76,8 +76,6 @@ namespace kvalobs{
 	virtual ~SmsBase();
 
 	
-	std::string getMetaSaSd()const{ return ComObsDec.getMetaSaSd(); }
-	
 	/**
 	 * \brief setNowTime is used for testing only. 
 	 */

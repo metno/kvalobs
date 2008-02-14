@@ -115,6 +115,42 @@ getStationid(long obsid, bool isWmono)
   return DecoderBase::getStationId(key, val);
 }
 
+std::string 
+kvalobs::decoder::comobsdecoder::
+ComObsDecoder::
+getMetaSaSdEm( int stationid, int typeid_, const miutil::miTime &obstime )
+{
+   string sasdem="000";
+   
+   if( obsPgm.obstime.undef() || obsPgm.obstime != obstime ){
+      if( ! loadObsPgmParamInfo( stationid, typeid_, obstime, obsPgm ) ){
+         return "000";
+         LOGDEBUG("DBERROR: SaSdEm:  000");
+      }
+   }
+   
+   kvalobs::decoder::Active state;
+   
+   if( obsPgm.isActive( stationid, typeid_, 112, 0, 0, obstime, state ) ) {
+      if( state == kvalobs::decoder::YES )
+         sasdem[0]='1';
+   }
+    
+   if( obsPgm.isActive( stationid, typeid_, 18, 0, 0, obstime, state ) ) {
+         if( state == kvalobs::decoder::YES )
+            sasdem[1]='1';
+   }
+   
+   if( obsPgm.isActive( stationid, typeid_, 7, 0, 0, obstime, state ) ) {
+      if( state == kvalobs::decoder::YES )
+         sasdem[2]='1';
+   }
+   
+   LOGDEBUG("SaSdEm: " << sasdem);
+   
+   return sasdem;
+}
+
 
 kvalobs::decoder::DecoderBase::DecodeResult 
 kvalobs::decoder::comobsdecoder::

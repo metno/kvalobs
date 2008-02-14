@@ -56,27 +56,32 @@ namespace kvalobs{
        * This is a decoder for rejected messages.
        */
       class ComObsDecoder : public DecoderBase{
-	ComObsDecoder();
-	ComObsDecoder(const ComObsDecoder &);
-	ComObsDecoder& operator=(const ComObsDecoder &);
+         ComObsDecoder();
+         ComObsDecoder(const ComObsDecoder &);
+         ComObsDecoder& operator=(const ComObsDecoder &);
 	
       protected:
-	SmsBase *smsfactory(int smscode);
-	long   getStationid(long obsid, bool isWmono);
+         SmsBase *smsfactory(int smscode);
+         long   getStationid(long obsid, bool isWmono);
 
+         
+         kvalobs::decoder::ObsPgmParamInfo obsPgm;
+         
       public:
-	ComObsDecoder(dnmi::db::Connection     &con,
-		     const ParamList        &params,
-		     const std::list<kvalobs::kvTypes> &typeList,
-		     const miutil::miString &obsType,
-		     const miutil::miString &obs, 
-		     int                    decoderId=-1);
+         ComObsDecoder(dnmi::db::Connection     &con,
+                       const ParamList        &params,
+                       const std::list<kvalobs::kvTypes> &typeList,
+                       const miutil::miString &obsType,
+                       const miutil::miString &obs, 
+                       int                    decoderId=-1);
 	
-	virtual ~ComObsDecoder();
+         virtual ~ComObsDecoder();
+
+         std::string getMetaSaSdEm( int stationid, int typeid_, const miutil::miTime &obstime );
+ 
+         virtual miutil::miString name()const;
 	
-	virtual miutil::miString name()const;
-	
-	virtual DecodeResult execute(miutil::miString &msg);
+         virtual DecodeResult execute(miutil::miString &msg);
       };
       
       /** @} */

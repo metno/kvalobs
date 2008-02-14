@@ -70,6 +70,71 @@ namespace{
 
 
 
+kvalobs::decoder::
+ObsPgmParamInfo::
+ObsPgmParamInfo()
+{
+}
+
+kvalobs::decoder::
+ObsPgmParamInfo::
+ObsPgmParamInfo( const ObsPgmParamInfo &cs )
+   : obsPgm( cs.obsPgm ), obstime( cs.obstime )
+{
+}
+
+kvalobs::decoder::
+ObsPgmParamInfo& 
+kvalobs::decoder::
+ObsPgmParamInfo::
+operator=( const ObsPgmParamInfo &rhs )
+{
+   if( &rhs != this ) {
+      obsPgm  = rhs.obsPgm;
+      obstime = rhs.obstime;
+   }
+   
+   return *this;
+}
+    
+bool 
+kvalobs::decoder::
+ObsPgmParamInfo::
+isActive( int stationid, 
+      int typeid_,
+      int paramid,
+      int sensor,
+      int level,
+      const miutil::miTime &obstime,
+      Active &state ) const
+{
+   state = NO;
+   
+   for( CIObsPgmList it=obsPgm.begin();
+        it!=obsPgm.end();
+        ++it )
+   {
+      if( it->stationID() == stationid &&
+          it->typeID() == typeid_ &&
+          it->paramID() == paramid &&
+          it->level() == level &&
+          it->nr_sensor() > sensor ) {
+         
+         if( it->isOn( obstime ) ) {
+            if( it->collector() )
+               state = MAYBE;
+            else
+               state = YES;
+           
+            return true;
+         }
+      }
+   }
+   
+   return false;
+}
+
+
     
 kvalobs::decoder::
 DecoderBase::
@@ -841,4 +906,27 @@ loglevel(const std::string &logname, milog::LogLevel loglevel)
       return;
     }
   }
+}
+
+bool 
+kvalobs::decoder::
+DecoderBase::
+loadObsPgmParamInfo( int stationid, int typeid_, 
+                     const miutil::miTime &obstime,
+                     ObsPgmParamInfo &paramInfo ) const
+{
+   paramInfo.obsPgm.clear();
+   paramInfo.obstime = obstime;
+   
+   kvDbGate gate( &con );
+   
+   if( !gate.select( paramInfo.obsPgm, 
+                     kvQueries::selectObsPgm( stationid, typeid_, obstime) 
+                    )
+     ){
+      LOGWARN("DBError: Cant access obs_pgm: " << endl << "Reason: " << gate.getErrorStr());
+      return false;
+   }
+  
+   return true;
 }

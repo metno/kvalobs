@@ -72,6 +72,42 @@ name() const
 	return "AutoObsDecoder";
 }
 
+
+std::string 
+AutoObsDecoder::
+getMetaSaSdEm( int stationid, int typeid_, const miutil::miTime &obstime )
+{
+   string sasdem="000";
+   
+   if( obsPgm.obstime.undef() || obsPgm.obstime != obstime ){
+      if( ! loadObsPgmParamInfo( stationid, typeid_, obstime, obsPgm ) ){
+         return "000";
+         LOGDEBUG("DBERROR: SaSdEm:  000");
+      }
+   }
+   
+   kvalobs::decoder::Active state;
+   
+   if( obsPgm.isActive( stationid, typeid_, 112, 0, 0, obstime, state ) ) {
+      if( state == kvalobs::decoder::YES )
+         sasdem[0]='1';
+   }
+    
+   if( obsPgm.isActive( stationid, typeid_, 18, 0, 0, obstime, state ) ) {
+         if( state == kvalobs::decoder::YES )
+            sasdem[1]='1';
+   }
+   
+   if( obsPgm.isActive( stationid, typeid_, 7, 0, 0, obstime, state ) ) {
+      if( state == kvalobs::decoder::YES )
+         sasdem[2]='1';
+   }
+   
+   LOGDEBUG("SaSdEm: " << sasdem);
+   
+   return sasdem;
+}
+
 long 
 AutoObsDecoder::
 getStationId(miutil::miString &msg)
@@ -238,7 +274,7 @@ execute(miutil::miString &msg)
 {
   	const int             VISUEL_TYPEID=6;
   	const int             AWS_TYPEID=3;
-  	DataConvert           converter(paramList, getMetaSaSd() );
+  	DataConvert           converter( paramList );
   	std::vector<DataElem> elems;
   	string                tmp;
   	CommaString           data;
@@ -483,9 +519,12 @@ execute(miutil::miString &msg)
  
       	}	
     	}
-      	
+      
+      std::string         sSaSdEm;
       DataConvert::SaSdEm saSdEm;
 
+      converter.setSaSdEm( getMetaSaSdEm( stationid, useTypeid, obstime) );
+      
       if( converter.hasSaSdEm( saSdEm ) ) {
          //Create a template to use
          //to hold all common parameters for SA, SD and EM.

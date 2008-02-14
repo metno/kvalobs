@@ -148,18 +148,33 @@ namespace kvalobs {
          return true;
       }
       
-      DataConvert::DataConvert(ParamList &p, const std::string &SaSd)
-         :  paramList(p), hasRRRtr_(false), hasSa( false ), hasSd( false ) 
+      DataConvert::DataConvert(ParamList &p)
+         :  paramList(p), hasRRRtr_(false), 
+            hasSa( false ), hasSd( false ), hasEm( false ) 
       {
-         if( SaSd.size() >= 2 ) {
-            if( SaSd[0] != '0' )
-               hasSa = true;
-            
-            if( SaSd[1] != '0' )
-               hasSd = true;
-         }
       }
 
+      void DataConvert::setSaSdEm( const std::string &sa_sd_em)
+      {
+         if( sa_sd_em.length() != 3 ) {
+            LOGDEBUG("DataConvert::setSaSdEm: sa_sd_em.length()!=3: (" << sa_sd_em.length() << ")" );
+            return;
+         }
+         
+         hasSa = false;
+         hasSd = false;
+         hasEm = false;
+         
+         if( sa_sd_em[0] == '1')
+            hasSa = true;
+         
+         if( sa_sd_em[1] == '1')
+            hasSd = true;
+         
+         if( sa_sd_em[2] == '1')
+            hasEm = true;
+      }
+      
       bool 
       DataConvert::allSlash(const std::string &val){
          return allCh( val, '/' );
@@ -193,7 +208,18 @@ namespace kvalobs {
       	int                   height=0;
       	int                   slashCount=0;
 	
-         if(val.empty())
+      	if( param=="SA")
+      	   saSdEm_.hasSa = true;
+      	else if( param=="EM" )
+      	   saSdEm_.hasEm = true;
+      	else if( param=="SD")
+      	   saSdEm_.hasSd = true;
+      	else if( param == "_Esss") {
+      	   saSdEm_.hasSa = true;
+      	   saSdEm_.hasEm = true;
+      	}
+      	
+         if(val.empty()) 
             return data;
 	
          for(std::string::const_iterator it=val.begin();
@@ -203,7 +229,7 @@ namespace kvalobs {
                slashCount++;
 	      }
 	
-	      if(val.length()==slashCount)
+	      if(val.length()==slashCount ) 
 	         return data;
 	
 	      if(!decodeParam(param, paramName, sensor, height, mod))
@@ -446,18 +472,7 @@ namespace kvalobs {
 	            spVal=val.substr(spDef[i].index, spDef[i].size);
 	         else
 	            spVal=val;
-
-	         //Test if we have snow depth (SA) and/or the 
-	         //snow state to the ground (SD/EM).
-	         //The test must be done here, before the test of all
-	         //slashes.
-	         if( id == "SA" )
-	            saSdEm_.hasSa = true;
-	         else if( id == "SD ")
-	            saSdEm_.hasSd = true;
-	         else if ( id == "EM")
-	            saSdEm_.hasEm = true;
-
+	   
 	         if(allSlash(spVal))
 	            continue;
 	  
@@ -649,6 +664,25 @@ namespace kvalobs {
 	                  val.erase(0, 1);
 	               }
 	            }
+	         }else if(name=="SA" || name=="SD" || name=="EM"){
+	            if( val.size() <= 0 )
+	               return;
+	            
+	            if( name=="SA" ) {
+	               saSdEm_.hasSa = true;
+	               saSdEm_.sa = val;
+	            }else if( name == "SD") {
+	               saSdEm_.hasSd = true;
+	               saSdEm_.sd = val;
+	            } else {
+	               saSdEm_.hasEm = true;
+	               saSdEm_.em = val;
+	            }
+	            
+	            //We take care of the values when 
+	            //SaSdEm is computed and inserted into the database.
+	            //This hapends in the mainloop in autoobsdecoder.cc
+	            return;
 	         }
 
 	         data.push_back(DataElem(it->id(), val, sensor, height, mod));
@@ -754,18 +788,29 @@ namespace kvalobs {
             {
                string sa;
                
-               LOGDEBUG("hasSaSdEm: hasSa=" << (hasSa?"t":"f") << " hasSd=" << (hasSd?"t":"f") << endl
-                        << "saSdEm_.hasSa=" << (saSdEm_.hasSa?"t":"f") << " saSdEm_.hasSd=" << (saSdEm_.hasSd?"t":"f") 
-                        <<  " saSdEm_.hasEm=" << (saSdEm_.hasEm?"t":"f") << endl
+               LOGDEBUG("hasSaSdEm: hasSa=" << (hasSa?"t":"f") << " hasSd=" << (hasSd?"t":"f") << " hasEm=" << (hasEm?"t":"f") << endl
+                        << " saSdEm_.hasEm=" << (saSdEm_.hasEm?"t":"f") << " saSdEm_.hasSa=" << (saSdEm_.hasSa?"t":"f") 
+                        << " saSdEm_.hasSd=" << (saSdEm_.hasSd?"t":"f") << endl
                         << "saSdEm_.sa=" << saSdEm_.sa << " saSdEm_.em=" << saSdEm_.em 
                         << " saSdEm_.sd=" << saSdEm_.sd);
             
-               if( ! hasSa && ! hasSd && 
+               if( ! hasSa && ! hasSd && ! hasEm && 
                    ! saSdEm_.hasSa  && ! saSdEm_.hasSd && ! saSdEm_.hasEm )
                   return false;
                
+               
+               if( hasEm || saSdEm_.hasEm ) {
+                  if( saSdEm_.em.empty() ) {
+                     if( saSdEm_.sa == "998" )
+                        saSdEm_.em = "1";
+                     else if ( hasEm && saSdEm_.hasEm)
+                        saSdEm_.em = "-1";
+                  }
+               }
+
+               
                if( hasSa || saSdEm_.hasSa ) {
-                  if( saSdEm_.sa.empty() || 
+                  if( ( saSdEm_.sa.empty() && hasSa && saSdEm_.hasSa ) || 
                       saSdEm_.sa == "998" || 
                       saSdEm_.sa == "000" )
                      sa = "-1";
@@ -776,18 +821,11 @@ namespace kvalobs {
                   else
                      sa = saSdEm_.sa;
                }
-
-               if( hasSd || saSdEm_.hasEm ) {
-                  if( saSdEm_.em.empty() ) {
-                     if( saSdEm_.sa == "998" )
-                        saSdEm_.em = "1";
-                     else
-                        saSdEm_.em = "-1";
-                  }
-               }
-               
+                              
                saSdEm_.sa = sa;
                saSdEm = saSdEm_;
+               
+               return true;
             }
       
             SplitDef*

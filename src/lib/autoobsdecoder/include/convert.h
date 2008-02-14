@@ -207,11 +207,14 @@ namespace kvalobs{
 	        bool  hasSd;
 	        bool  hasEm;
 	        
-	        SaSdEm():hasSa( false ), hasSd( false ), hasEm( false ){}
+	        SaSdEm()
+	           :hasSa( false ), hasSd( false ), hasEm( false )
+	        {}
 	        
 	        SaSdEm( const SaSdEm &cc )
 	           : sa(cc.sa), sd(cc.sd),em(cc.em), 
-	             hasSa( cc.hasSa ), hasSd( cc.hasSd ), hasEm( cc.hasEm ) {}
+	             hasSa( cc.hasSa ), hasSd( cc.hasSd ), hasEm( cc.hasEm )
+	             {}
 	        
 	        SaSdEm& operator=(const SaSdEm &rhs ) {
 	           if( this != &rhs ) {
@@ -273,12 +276,14 @@ namespace kvalobs{
 	     
 	     bool  hasRRRtr_;
 	     RRRtr RRRtr_;
-	     bool hasSa, hasSd; //Is the station setup with Sa, SD and/or EM. 
+	     bool hasSa, hasSd, hasEm; //Is the station setup with Sa, SD and/or EM. 
 	     SaSdEm saSdEm_;
 
         public:
-	        DataConvert(ParamList &p, const std::string &SaSd="");
+	        DataConvert(ParamList &p );
 	
+	        void setSaSdEm( const std::string &sa_sd_em);
+	        
 	        /**
 	         * \exception BadFormat, UnkownParameter
 	         */

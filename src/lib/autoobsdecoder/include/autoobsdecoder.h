@@ -48,19 +48,22 @@ namespace kvalobs{
        * \brief implement the interface DecoderBase.
        */
       class AutoObsDecoder : public DecoderBase{
-	AutoObsDecoder();
-	AutoObsDecoder(const AutoObsDecoder &);
-	AutoObsDecoder& operator=(const AutoObsDecoder &);
+         AutoObsDecoder();
+         AutoObsDecoder(const AutoObsDecoder &);   
+         AutoObsDecoder& operator=(const AutoObsDecoder &);
 	
-	long getStationId(miutil::miString &msg);
-	long getTypeId( miutil::miString &msg );
+         long getStationId(miutil::miString &msg);
+         long getTypeId( miutil::miString &msg );
 	
-	char checkObservationTime(int typeId,
-				  miutil::miTime tbt, 
-				  miutil::miTime obt);
-	miutil::miTime firstObsTime; //Used by checkObservationTime.
-	char           checkRet;     //Used by checkObservationTime.
-
+         std::string getMetaSaSdEm( int stationid, int typeid_, const miutil::miTime &obstime );
+	
+         char checkObservationTime(int typeId,
+                                   miutil::miTime tbt, 
+				                       miutil::miTime obt);
+         miutil::miTime firstObsTime; //Used by checkObservationTime.
+         char           checkRet;     //Used by checkObservationTime.
+         kvalobs::decoder::ObsPgmParamInfo obsPgm;
+         
       public:
 	AutoObsDecoder(dnmi::db::Connection   &con,
 		       const ParamList        &params,

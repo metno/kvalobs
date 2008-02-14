@@ -546,17 +546,7 @@ doKvPrecipitation(kvalobs::decodeutil::DecodedDataElem &data,
 	int    dif;
 	miTime t6;        //6 terminen
 	kvUseInfo useInfo;
-	string metaSaSd=getMetaSaSd();
-	bool hasSa=false;
-	bool hasSd=false;
 	
-	if( ! metaSaSd.empty() && metaSaSd.length()>=2 ) {
-	   if( metaSaSd[0] != '0')
-	      hasSa=true;
-	   
-	   if( metaSaSd[1] != '0')
-	      hasSd=true;
-	}
 	
   	getInData("SA", SA);
   	getInData("SD", SD);
@@ -588,35 +578,8 @@ doKvPrecipitation(kvalobs::decodeutil::DecodedDataElem &data,
     	sprintf(sRR, "%0.1f", RR);
   	}
 
-  	cleanString(SA);
-  	cleanString(SD);
-
-  	if((SD.empty() || SD=="0") && hasSd ){
-    	SD="-1";
-    	iSD=-1;
-  	}
- 
-  	if( !SD.empty() && SD!="-1"){
-    	int i;
-    	for(i=0; i<SD.length() && isdigit(SD[i]); i++);
-    
-    	if(i<SD.length()){ //Invalid code
-      		SD="-1";
-      		iSD=-1;
-    	}else{
-      		iSD=atoi(SD.c_str());
-    	}
-  	}
-  
-  	if( (SA.empty() || SA=="0") && hasSa )
-  	   SA="-1";
-  	
-  	if(iSD==1 || iSD==2){
-    	SA="-1"; //Flekkvis sne
-  	}
-  
   	LOGDEBUG2("KLSTART: <" << klStart << ">" << endl
-		      << "KLOBS:   <" << klObs   << ">" << endl); 
+  	          << "KLOBS:   <" << klObs   << ">" << endl); 
 
   	//if one of klStart or klObs is empty and the other
   	//is not empty we have an invalid observation!
@@ -763,6 +726,44 @@ doKvPrecipitation(kvalobs::decodeutil::DecodedDataElem &data,
     	}
   	}
 
+   bool hasSa=false;
+   bool hasSd=false;
+  	string sSaSdEm = ComObsDec.getMetaSaSdEm( data.stationID(), data.typeID(), data.getDate() );
+  	   
+  	if( sSaSdEm[0] != '0')
+  	   hasSa=true;
+  	         
+  	if( sSaSdEm[1] != '0')
+  	   hasSd=true;
+  	   
+  	LOGERROR("sSaSdEm. " << sSaSdEm << " hasSa: " << (hasSa?"t":"f") << " hasSd: " << (hasSd?"t":"f"));
+  	cleanString(SA);
+  	cleanString(SD);
+
+  	if((SD.empty() || SD=="0") && hasSd ){
+  	   SD="-1";
+  	   iSD=-1;
+  	}
+  	 
+  	if( !SD.empty() && SD!="-1"){
+  	   int i;
+  	   for(i=0; i<SD.length() && isdigit(SD[i]); i++);
+  	    
+  	   if(i<SD.length()){ //Invalid code
+  	      SD="-1";
+  	      iSD=-1;
+  	   }else{
+  	      iSD=atoi(SD.c_str());
+  	   }
+  	}
+  	  
+  	if( (SA.empty() || SA=="0") && hasSa )
+  	   SA="-1";
+  	   
+  	if(iSD==1 || iSD==2){
+  	   SA="-1"; //Flekkvis sne
+  	}
+  	
   	if(!SA.empty())
     	data.addData("SA", SA, useInfo);
   

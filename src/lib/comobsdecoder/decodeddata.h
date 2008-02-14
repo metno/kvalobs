@@ -108,6 +108,9 @@ namespace kvalobs{
       }
       miutil::miTime getDate()const{ return dtObs;}  
       void clean(){ data_.clear(); textData_.clear();dtObs=miutil::miTime();}
+      long stationID()const{ return sid; }
+      long typeID()const{ return tid; }
+  
       
       friend std::ostream& operator<<(std::ostream&, const DecodedDataElem &el);
     };
@@ -136,6 +139,9 @@ namespace kvalobs{
       DecodedDataElem        createDataElem()const{ 
 	return DecodedDataElem(&params, sid, tid);
       } 
+      
+      long stationID()const{ return sid; }
+      long typeID()const{ return tid; }
       void               add(const DecodedDataElem &elem);
       TDecodedDataElem       *data(){ return &data_;}
       

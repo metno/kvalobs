@@ -32,11 +32,13 @@
 #define __dnmi_decoder_Decoder_h__
 
 #include <list>
+#include <set>
 #include <miconfparser/miconfparser.h>
 #include <puTools/miString>
 #include <puTools/miTime>
 #include <kvdb/kvdb.h>
 #include <fileutil/dso.h>
+#include <kvalobs/kvObsPgm.h>
 #include <kvalobs/paramlist.h>
 #include <kvalobs/kvData.h>
 #include <kvalobs/kvStationInfo.h>
@@ -68,6 +70,32 @@ namespace kvalobs{
 
     class ConfParser;
 
+    typedef enum { YES, NO, MAYBE } Active; 
+    
+    class ObsPgmParamInfo {
+    public:
+       typedef std::list<kvalobs::kvObsPgm>                   ObsPgmList;
+       typedef std::list<kvalobs::kvObsPgm>::iterator        IObsPgmList;
+       typedef std::list<kvalobs::kvObsPgm>::const_iterator CIObsPgmList;
+            
+       ObsPgmList     obsPgm;
+       miutil::miTime obstime;
+       
+       
+       ObsPgmParamInfo();
+       ObsPgmParamInfo( const ObsPgmParamInfo &cs );
+       
+       ObsPgmParamInfo& operator=( const ObsPgmParamInfo & );
+       
+       bool isActive( int stationid, 
+                      int typeid_,
+                      int paramid,
+                      int sensor,
+                      int level,
+                      const miutil::miTime &obstime,
+                      Active &state ) const;
+    };
+    
     class DecoderBase{
       DecoderBase();
       DecoderBase(const DecoderBase &);
@@ -341,7 +369,6 @@ namespace kvalobs{
        */
       std::string getMetaSaSd()const;
       
-      
       /**
        * \brief return the decoder id.
        * \return The decoder id.
@@ -467,6 +494,14 @@ namespace kvalobs{
        */
       bool loadConf(int sid, int tid, 
 		    kvalobs::decoder::ConfParser &parser);
+
+      /**
+       * \brief Load the observation program.
+       */
+      bool loadObsPgmParamInfo( int stationid, int typeid_, 
+                                const miutil::miTime &obstime,
+                                ObsPgmParamInfo &paramInfo
+                                ) const;
 
     };
     

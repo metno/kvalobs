@@ -1567,8 +1567,12 @@ doEsss( std::string &kode, const SynopData &data )
       sa = buf;
    }
 
+      
    //Creates the code 4E'sss
    kode = " 4" + em + sa;
+   
+   /*if( kode == " 4////")
+      kode.erase();*/
 }
 
 
