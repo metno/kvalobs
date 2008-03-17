@@ -31,7 +31,7 @@
 
 #include <iostream>
 #include <dnmithread/CommandQue.h>
-#include <kvservice/kvcpp2/kvevents.h>
+#include <kvcpp/kvevents.h>
 #include "App.h"
 #include "DataReceiver.h"
 

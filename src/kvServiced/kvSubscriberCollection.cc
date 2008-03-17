@@ -40,24 +40,15 @@
 #include <boost/lexical_cast.hpp>
 #include <unistd.h>
 #include <fileutil/dir.h>
+#include <kvalobs/kvPath.h>
 
 using namespace std;
 using namespace miutil;
 
 KvSubscriberCollection::KvSubscriberCollection()
 {
-    char *env=getenv("KVALOBS");
 
-    if(!env){
-	subPath="./";
-    }else{
-	subPath=env;
-	
-	if(!subPath.empty() && subPath[subPath.length()-1]!='/')
-	    subPath+="/";
-
-	subPath+="var/kvalobs/service/subscribers/";
-    }
+	subPath = kvPath("localstatedir") +"/service/subscribers/";
     
     readAllSubscribersFromFile();
 	
@@ -1159,13 +1150,13 @@ KvSubscriberCollection::addDataNotifyFromFileFile(
 	cptrSub=CKvalObs::CService::kvDataNotifySubscriber::_narrow(cptrCO);
 	
 	if(CORBA::is_nil(cptrSub)){
-	    LOGERROR("CORBA: null refernce! Wrong type????!!!");
+	    LOGERROR("CORBA: null refernce! Wrong type.");
 	    CORBA::release(cptrSub);
 	    return false;
 	}
     }
     catch(...){
-	LOGERROR("EXCEPTION: CORBA: null refernce! Wrong type????!!!");
+	LOGERROR("EXCEPTION: CORBA: null refernce! Wrong type.");
 	return false;
     }
     
@@ -1306,13 +1297,13 @@ KvSubscriberCollection::addDataFromFile(
 	cptrSub=CKvalObs::CService::kvDataSubscriber::_narrow(cptrCO);
 	
 	if(CORBA::is_nil(cptrSub)){
-	    LOGERROR("CORBA: null refernce! Wrong type????!!!");
+	    LOGERROR("CORBA: null refernce! Wrong type.");
 	    CORBA::release(cptrSub);
 	    return false;
 	}
     }
     catch(...){
-	LOGERROR("EXCEPTION: CORBA: null refernce! Wrong type????!!!");
+	LOGERROR("EXCEPTION: CORBA: null refernce! Wrong type.");
 	return false;
     }
     
@@ -1398,13 +1389,13 @@ KvSubscriberCollection::addKvHintFromFile(const miutil::miString &subid,
 	cptrSub=CKvalObs::CService::kvHintSubscriber::_narrow(cptrCO);
 	
 	if(CORBA::is_nil(cptrSub)){
-	    LOGERROR("CORBA: null refernce! Wrong type????!!!");
+	    LOGERROR("CORBA: null refernce! Wrong type.");
 	    CORBA::release(cptrSub);
 	    return false;
 	}
     }
     catch(...){
-	LOGERROR("EXCEPTION: CORBA: null refernce! Wrong type????!!!");
+	LOGERROR("EXCEPTION: CORBA: null refernce! Wrong type.");
 	return false;
     }
     

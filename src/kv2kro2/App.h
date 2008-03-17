@@ -35,7 +35,7 @@
 
 #include <string>
 #include <dnmithread/Thread.h>
-#include <kvservice/kvcpp2/corba/CorbaKvApp.h>
+#include <kvcpp/corba/CorbaKvApp.h>
 #include "DataReceiver.h"
 
 

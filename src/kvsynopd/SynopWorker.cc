@@ -45,6 +45,7 @@
 #include "SynopWorker.h"
 #include "obsevent.h"
 #include "synop.h"
+#include <kvalobs/kvPath.h>
 
 using namespace std;
 using namespace kvalobs;
@@ -112,7 +113,7 @@ SynopWorker::operator()()
       	FLogStream *logs=new FLogStream(2, 307200); //300k
       	std::ostringstream ost;
 
-      	ost << app.kvpath() << "/var/log/kvsynop/" 
+      	ost << kvPath("localstatedir") << "/log/kvsynop/" 
 	  			 << event->stationInfo()->wmono() << ".log";
 
       	if(logs->open(ost.str())){

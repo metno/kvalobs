@@ -1,7 +1,0 @@
-#!/bin/sh
-
-DESTINATION=
-DIRECTORIES="lib/db"
-FILES=
-
-. $KVDIR/conf/INSTALL.conf

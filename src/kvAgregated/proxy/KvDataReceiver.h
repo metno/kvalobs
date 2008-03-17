@@ -31,7 +31,7 @@
 #ifndef __kvservice__proxy__internal__KvDataReceiver_h__
 #define __kvservice__proxy__internal__KvDataReceiver_h__
 
-#include <kvservice/kvcpp/KvGetDataReceiver.h>
+#include <kvcpp/KvGetDataReceiver.h>
 
 namespace kvservice
 {

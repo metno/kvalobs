@@ -45,6 +45,8 @@
 #include <puTools/miTime>
 #include <sstream>
 #include <fstream>
+#include <kvalobs/kvPath.h>
+
 using namespace std;
 
 miutil::conf::ConfSection* 
@@ -117,24 +119,17 @@ getSynopAndOutput(Options &opt,
 int
 main(int argn, char **argv)
 {
-  char *pKvpath=getenv("KVALOBS");
-  std::string kvpath;
+  
   miutil::conf::ConfSection* conf;
   IntStringMap nameMap;
   Options      options;
   ostringstream ost;
   miutil::miTime obt;
 
-  if(!pKvpath){
-    cerr << "Missing KVALOBS environment variable!" << endl; 
-    kvpath=".";
-  }else{
-    kvpath=pKvpath;
-  }
+  
+  cerr << "Configurationfile: " << kvPath("sysconfdir")+"/kvsynopd.conf" << endl;
 
-  cerr << "Configurationfile: " << (kvpath+"/etc/kvsynopd.conf") << endl;
-
-  conf=readConf(kvpath+"/etc/kvsynopd.conf");
+  conf=readConf( kvPath("sysconfdir") + "/kvsynopd.conf");
 
   if(!conf){
     return 1;

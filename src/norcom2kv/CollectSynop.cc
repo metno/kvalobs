@@ -42,6 +42,7 @@
 #include "CollectSynop.h"
 #include "crc_ccitt.h"
 #include <puTools/miTime>
+#include <kvalobs/kvPath.h>
 
 using namespace std;
 using namespace CKvalObs::CDataSource;
@@ -70,7 +71,7 @@ CollectSynop::readFile(const std::string &file,
     char		  ch;
 
     if(!fs){
-		LOGERROR("Cant open file <" << app.relpath(file) << ">!");
+		LOGERROR("Cant open file <" << file << ">!");
 		return false;
     }
 
@@ -79,7 +80,7 @@ CollectSynop::readFile(const std::string &file,
     }
 
     if(!fs.eof()){
-		LOGERROR("Error while reading file <" << app.relpath(file) << ">!");
+		LOGERROR("Error while reading file <" << file << ">!");
 		fs.close();
 		return false;
     }
@@ -118,7 +119,7 @@ CollectSynop::getFileList(FileList &fileList,
       	path.append("/");
 
   	if(!dir.open(path, pattern)){
-    	LOGERROR("Cant read directory <" << app.relpath(path) << ">!");
+    	LOGERROR("Cant read directory <" << path << ">!");
     	return false;
   	}
 
@@ -137,7 +138,7 @@ CollectSynop::getFileList(FileList &fileList,
     
     	if(stat(filepath.c_str(), &sbuf)<0){
       		LOGERROR("Cant get modification time for the file <" << 
-	       	app.relpath(filepath) << ">!");
+	                	filepath << ">!");
       		continue;
     	}
     
@@ -231,7 +232,7 @@ CollectSynop::run()
 		return 1;
     }
 
-    app.readFInfoList(app.kvdir()+"var/norcom2kv/norcom2kv_finfo.dat", 
+    app.readFInfoList( kvPath("localstatedir")+"/norcom2kv/norcom2kv_finfo.dat", 
 				      fileInfoList);
 
     while(!app.inShutdown()){
@@ -244,7 +245,7 @@ CollectSynop::run()
 
 			if(checkForNewObservations()){
 	    		collectObservations();
-	    		app.saveFInfoList(app.kvdir()+"var/norcom2kv/norcom2kv_finfo.dat", 
+	    		app.saveFInfoList( kvPath("localstatedir")+"/norcom2kv/norcom2kv_finfo.dat", 
 			    				  fileInfoList);
 
 			}
@@ -288,14 +289,14 @@ CollectSynop::tryToSendSavedObservations()
 		it++){
 
 		if(!readFile(it->name(), content)){
-	    	LOGERROR("Cant read the file: " << app.relpath(it->name()));
+	    	LOGERROR("Cant read the file: " << it->name());
 	    	continue;
 		}
 	
         i=content.find("\n");
 
 		if(i==string::npos){
-	    	LOGERROR("Format error: in savedfile: " << app.relpath(it->name())
+	    	LOGERROR("Format error: in savedfile: " << it->name()
 		    		 <<   endl << "Expecting '\\n'");
 	    	unlink(it->name().c_str());
 	   		continue;
@@ -304,7 +305,7 @@ CollectSynop::tryToSendSavedObservations()
 		type=content.substr(0, i);
 	
 		if(type.empty()){
-	    	LOGERROR("Format error: in savedfile: " << app.relpath(it->name())
+	    	LOGERROR("Format error: in savedfile: " << it->name()
 		    		 <<  endl << "Expecting 'type'");
 	    	unlink(it->name().c_str());
 	   		continue;
@@ -353,11 +354,11 @@ CollectSynop::collectObservations()
     	if(it->second.toBeCollected()){
       		string fromfile(it->second.copy());
       
-      		LOGINFO("Collect file: " << app.relpath(it->first) << endl << 
-	      		"From the copy: " << app.relpath(fromfile));
+      		LOGINFO("Collect file: " << it->first << endl << 
+	      		"From the copy: " << fromfile);
       
       		if(!readFile(fromfile, buf)){
-				LOGERROR("Can't read the file: " << app.relpath(fromfile));
+				LOGERROR("Can't read the file: " << fromfile);
 				
 				if(!app.debug())
 					unlink(fromfile.c_str());
@@ -370,7 +371,7 @@ CollectSynop::collectObservations()
 	      	File f(fromfile);
 	      
 	      	if(!f.ok()){
-				LOGERROR("Cant stat the file: " << app.relpath(fromfile) );
+				LOGERROR("Cant stat the file: " << fromfile );
 				
 				it->second.removecopy(!app.debug());
 					
@@ -437,12 +438,12 @@ CollectSynop::doNewObs(const std::string &obsFileName, const std::string &obs)
       		LOGWARN("It was problems with the splitting of the WMO raport." << endl
 	      			<< "Error: " << err << endl
 	      			<<"The observation is written to file: " << endl 
-	      			<<"  " << app.relpath(fname) );
+	      			<<"  " << fname );
     	}else{
       		LOGWARN("It was problems with the splitting of the WMO raport." << endl
 	      			<< "ERROR: " << err 
 	      			<< "Failed to save the observation to file in directory: " 
-	      			<< endl << "  " << app.relpath(app.logdir()));
+	      			<< endl << "  " << app.logdir());
     	}
   	}
  
@@ -458,20 +459,20 @@ CollectSynop::doNewObs(const std::string &obsFileName, const std::string &obs)
 
     	if(fname.empty()){
       		LOGERROR("TEST: cant save WMORaport_'obsFile' to \n"
-	       			 "directory: " << app.relpath(app.data2kvdir()));
+	       			 "directory: " << app.data2kvdir());
     	}else{
       		LOGINFO("TEST: saved 'splitted' WMORaport to: " << endl
-	      			<< app.relpath(fname));
+	      			<< fname);
     	}
     
     	fname=writeFile(app.data2kvdir(), filename+"_", true, obs);
 
     	if(fname.empty()){
       		LOGERROR("TEST: cant save 'obsFile' to \n"
-	       			"directory: " << app.relpath(app.data2kvdir()));
+	       			"directory: " << app.data2kvdir());
     	}else{
       	LOGINFO("TEST: saved obsfile to: " << endl
-	    		<< app.relpath(fname));
+	    		<< fname);
     	}
   	}else{
     	sendWMORaport(wmoRaport);
@@ -514,9 +515,9 @@ CollectSynop::sendWMORaport(const WMORaport &raport)
 
 	  				if(fname.empty()){
 	    				LOGERROR("Cant save 'kvadata_synop_' in directory: " << endl
-		     					  << app.relpath(app.data2kvdir()));
+		     					  << app.data2kvdir());
 	  				}else{
-	    				LOGINFO("Saved: " << endl << app.relpath(fname) << endl);
+	    				LOGINFO("Saved: " << endl << fname << endl);
 	  				}	
 				}
       		}else{
@@ -666,7 +667,7 @@ CollectSynop::checkForNewObservations()
 	   	}
 
     	if(it==fileList.end()){
-      		LOGDEBUG("Erase <" << app.relpath(fiIt->first) << "> from fileInfoList\n");
+      		LOGDEBUG("Erase <" << fiIt->first << "> from fileInfoList\n");
       		tmpFiIt=fiIt;
       		fiIt++;
       		fileInfoList.erase(tmpFiIt);
@@ -685,19 +686,19 @@ CollectSynop::checkForNewObservations()
 	    fiIt=fileInfoList.find(it->name());
     
     	if(fiIt==fileInfoList.end()){
-      		LOGDEBUG("New entrie: <" << app.relpath(it->name()) 
+      		LOGDEBUG("New entrie: <" << it->name() 
 	       			<< "> in fileInfoList\n");
       		fileInfoList[it->name()]=FInfo(*it);
     	}else{
       		if(fiIt->second.mtime() != it->mtime()){
-				LOGDEBUG("New mtime: <" << app.relpath(it->name()) << ">");
+				LOGDEBUG("New mtime: <" << it->name() << ">");
 	
 				try{
 	  				fiIt->second.mtimeNow();
 	  				fiIt->second.seen(false);
 	  				fiIt->second.collected(false);
 				}catch(FInfo::StatException &ex){
-	  				LOGINFO("The file has gone: " << app.relpath(it->name()));
+	  				LOGINFO("The file has gone: " << it->name());
 	  				fileInfoList.erase(fiIt);
 	  				fiIt=fileInfoList.end();
 				}
@@ -714,9 +715,9 @@ CollectSynop::checkForNewObservations()
 
     	if(fiIt!=fileInfoList.end()){
       		if(fiIt->second.toBeCollected()){
-				LOGINFO("New observation in file: " << app.relpath(fiIt->second.name())
-						<< endl<<"A copy of the file is: " << 
-				app.relpath(fiIt->second.copy()));
+				LOGINFO("New observation in file: " << fiIt->second.name()
+						<< endl << "A copy of the file is: " << 
+				fiIt->second.copy());
 				hasNewFilesToCollect=true;
       		}
     	}
@@ -740,13 +741,13 @@ copyFile(FInfoList &infoList, IFInfoList it)
   			
   	string tofile=app.tmpdir()+it->second.namepart()+buf;
 
-  	LOGDEBUG("Copysynopfile: " << app.relpath(it->second.name()) << endl <<
-			 "-----------to: " << app.relpath(tofile));
+  	LOGDEBUG("Copysynopfile: " << it->second.name() << endl <<
+			 "-----------to: " << tofile);
 
   	if(!miutil::file::copyfile(it->second.name(), tofile)){
-    	LOGWARN("Cant copy synopfile: " << app.relpath(it->second.name()) << endl <<
-	    		"---------------- to: " << app.relpath(tofile) <<
-	    		"Removing <"<<app.relpath(it->second.name()) <<"> from InfoList!");
+    	LOGWARN("Cant copy synopfile: " << it->second.name() << endl <<
+	    		"---------------- to: " << tofile <<
+	    		"Removing <"<< it->second.name() <<"> from InfoList!");
     	infoList.erase(it);
     	return infoList.end();
   	}
@@ -755,15 +756,15 @@ copyFile(FInfoList &infoList, IFInfoList it)
     	it->second.mtimeNow();
   	}
   	catch(FInfo::StatException &ex){
-    	LOGINFO("The synop file has gone: " << app.relpath(it->second.name()));
+    	LOGINFO("The synop file has gone: " << it->second.name());
     	infoList.erase(it);
     	return infoList.end();
   	}
 
   	if(it->second.mtime()!=oldtime){
-    	LOGDEBUG("Synopfile: <" << app.relpath(it->second.name()) << 
+    	LOGDEBUG("Synopfile: <" << it->second.name() << 
 	    		 "> has changed after copy!" << endl <<
-	     		 "Removing copy: " << app.relpath(tofile));
+	     		 "Removing copy: " << tofile);
     	unlink(tofile.c_str());
     	it->second.seen(false);
     	it->second.collected(false);

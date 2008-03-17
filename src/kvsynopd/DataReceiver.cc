@@ -35,6 +35,7 @@
 #include "DataReceiver.h"
 #include "ValidData.h"
 #include "tblSynop.h"
+#include <kvalobs/kvPath.h>
 
 using namespace std;
 using namespace kvservice;
@@ -518,7 +519,7 @@ DataReceiver::setDefaultLogger(StationInfoPtr station)
     	FLogStream *logs=new FLogStream(1, 204800); //200k
     	std::ostringstream ost;
     
-    	ost << app.kvpath() << "/var/log/kvsynop/dr-" 
+    	ost << kvPath("localstatedir") << "/log/kvsynop/dr-" 
 			<< station->wmono() << ".log";
     
     	if(logs->open(ost.str())){

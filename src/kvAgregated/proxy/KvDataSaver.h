@@ -32,8 +32,8 @@
 #define __kvservice__proxy__internal__KvDataSaver_h__
 
 #include "KvalobsProxy.h"
-#include <kvservice/kvcpp/kvservicetypes.h>
-#include <kvservice/kvcpp/KvGetDataReceiver.h>
+#include <kvcpp/kvservicetypes.h>
+#include <kvcpp/KvGetDataReceiver.h>
 
 
 namespace kvservice

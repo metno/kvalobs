@@ -39,6 +39,7 @@
 #include <miconfparser/miconfparser.h>
 #include "ObjReaper.h"
 #include <fileutil/pidfileutil.h>
+#include <kvalobs/kvPath.h>
 
 using namespace std;
 using namespace boost;
@@ -52,7 +53,6 @@ main(int argc, char** argv)
   dnmi::thread::CommandQue dataReadyQue; 
   string                   dbdriver;
   miutil::conf::ConfSection *conf=KvApp::getConfiguration();
-  char *pKv=getenv("KVALOBS");
   bool error;
   string pidfile;
 
@@ -75,12 +75,8 @@ main(int argc, char** argv)
 
   InitLogger(argc, argv, "kvServiced");
 
-  if(!pKv){
-    LOGFATAL("The environment variable KVALOBS must be set!");
-    return 1;
-  }
   
-  pidfile=string(pKv)+"/var/run/kvServiced.pid";
+  pidfile = kvPath("localstatedir")+"/run/kvServiced.pid";
 
   if(dnmi::file::isRunningPidFile(pidfile, error)){
     if(error){

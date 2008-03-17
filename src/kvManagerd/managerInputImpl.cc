@@ -67,7 +67,7 @@ ManagerInputImpl::newData(const CKvalObs::StationInfoList& infoList)
     return true;
   }catch(...){
     if(cmd){
-      LOGERROR("Can post the data to the que! (NOMEM????)");
+      LOGERROR("Can post the data to the que! (NOMEM?)");
       delete cmd;
     }else{
       LOGFATAL("OUT OF MEMORY!");

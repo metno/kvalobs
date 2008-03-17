@@ -34,7 +34,7 @@
 #include <algorithm>
 #include <sstream>
 #include <kvalobs/kvObsPgm.h>
-#include <kvservice/kvcpp/KvApp.h>
+#include <kvcpp/KvApp.h>
 #include <milog/milog.h>
 #include <kvalobs/kvDataOperations.h>
 #include <boost/thread/xtime.hpp>

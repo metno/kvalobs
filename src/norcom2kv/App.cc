@@ -41,6 +41,7 @@
 #include <fstream>
 #include <miconfparser/miconfparser.h>
 #include <sstream>
+#include <kvalobs/kvPath.h>
 
 using namespace std;
 using namespace CKvalObs::CDataSource;
@@ -78,10 +79,9 @@ App::App(int argn,
     string            tracelevel;
     ConfSection       *myConf=App::getConfiguration();
     ValElementList    valelem;
-    string            kvpath=getKvalobsPath();
 
     if(!myConf){
-      LOGFATAL("Cant read the configuration file <$KVALOBS/etc/norcom2kv.conf>");
+      LOGFATAL("Cant read the configuration file <" << kvPath("sysconfdir") + "/norcom2kv.conf>");
       exit(1);
     }
 
@@ -127,9 +127,9 @@ App::App(int argn,
     
 
 
-    data2kvdir_=kvpath+"var/norcom2kv/data2kv/";
-    tmpdir_=kvpath+"var/norcom2kv/tmp/";
-    logdir_=kvpath+"var/log/";
+    data2kvdir_ = kvPath("localstatedir")+"/norcom2kv/data2kv/";
+    tmpdir_     = kvPath("localstatedir")+"/norcom2kv/tmp/";
+    logdir_     = kvPath("localstatedir")+"/log/";
 
     data2kvdir_=checkdir(data2kvdir_, true);
     tmpdir_=checkdir(tmpdir_, true);
@@ -362,7 +362,7 @@ App::saveFInfoList(const std::string &name, const FInfoList &infoList)
   ofstream fost(name.c_str(), ios::out);
 
   if(!fost){
-    LOGERROR("Cant save infoList to file: " << endl << relpath(name));
+    LOGERROR("Cant save infoList to file: " << endl << name);
     return false;
   }
   
@@ -375,7 +375,7 @@ App::saveFInfoList(const std::string &name, const FInfoList &infoList)
     return true;
   }
   
-  LOGINFO("Save Info for file(s). In file: " << relpath(name));  
+  LOGINFO("Save Info for file(s). In file: " << name);  
   
   
   for(;it!=infoList.end(); it++){
@@ -415,7 +415,7 @@ App::readFInfoList(const std::string &name, FInfoList &infoList)
       File fd(fname);
       
       if(!fd.ok()){
-	LOGINFO("<" << relpath(fname) << "> No longer exist!");
+	LOGINFO("<" << fname << "> No longer exist!");
 	continue;
       }
       
@@ -425,7 +425,7 @@ App::readFInfoList(const std::string &name, FInfoList &infoList)
 	       );
 
       infoList[fi.name()]=fi;
-	LOGINFO("Adding <" << relpath(fi.name()) << "> to the list of known files!");
+	LOGINFO("Adding <" << fi.name() << "> to the list of known files!");
      
     }else{
       LOGDEBUG("NOT Matched");
@@ -462,7 +462,7 @@ App::inShutdown()const
 }
 
 
-
+/*
 std::string 
 App::
 relpath(const std::string &path_, bool kvalobs)
@@ -483,7 +483,7 @@ relpath(const std::string &path_, bool kvalobs)
 
   return path;
 }
-
+*/
 namespace{
   void 
   sig_term(int)

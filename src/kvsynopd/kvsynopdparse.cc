@@ -37,6 +37,7 @@
 #include <miconfparser/miconfparser.h>
 #include "StationInfoParse.h"
 #include <milog/milog.h>
+#include <kvalobs/kvPath.h>
 
 using namespace std;
 using namespace miutil::conf;
@@ -113,17 +114,9 @@ main(int argn, char **argv)
       use(1);
     }
   }
-
-  if(file.empty()){
-    if(getenv("KVALOBS")){
-      file=getenv("KVALOBS");
-      file=file+"/etc/kvsynopd.conf";
-    }else{
-      cerr << "\n\tEnvironment variable KVALOBS must be set!\n\n";
-      use(1);
-    }
-  }
-      
+  
+  file = kvPath("sysconfdir")+"/kvsynopd.conf";
+  
   cerr << "Reading file: " << file << endl;
 
   if(!readConfFile(file, stationList)){

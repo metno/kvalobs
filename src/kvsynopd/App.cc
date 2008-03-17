@@ -43,6 +43,7 @@
 #include "tblKeyVal.h"
 #include "getDataReceiver.h"
 #include "GetDataThread.h"
+#include <kvalobs/kvPath.h>
 
 using namespace std;
 using namespace miutil;
@@ -61,7 +62,7 @@ createGlobalLogger(const std::string &id)
     	FLogStream *logs=new FLogStream(2, 204800); //200k
     	std::ostringstream ost;
     
-    	ost << kvpath() << "/var/log/kvsynop/" << id << ".log";
+    	ost << kvPath("localstatedir") << "/log/kvsynop/" << id << ".log";
     
     	if(logs->open(ost.str())){
       		if(!LogManager::createLogger(id, logs)){
@@ -83,12 +84,11 @@ createGlobalLogger(const std::string &id)
 }
 
 App::
-App(int argn, char **argv, const std::string &kvpath,   
+App(int argn, char **argv,   
     const std::string &confFile_, miutil::conf::ConfSection *conf):
   kvservice::corba::CorbaKvApp(argn, argv, conf), 
   startTime_(miutil::miTime::nowTime()),
-   confFile(confFile_), 
-  kvpath_(kvpath),
+  confFile(confFile_), 
   hasStationWaitingOnCacheReload(false),
   acceptAllTimes_(false)
 {

@@ -35,6 +35,7 @@
 #include <unistd.h>
 #include "InitLogger.h"
 #include <iostream>
+#include <kvalobs/kvPath.h>
 
 using namespace milog;
 using namespace std;
@@ -52,27 +53,9 @@ InitLogger(int argn, char **argv, const std::string &logname)
     LogLevel     logLevel=milog::NOTSET;
     FLogStream   *fs;
     StdErrStream *trace;
+             
+    filename = kvPath("localstatedir") + "/log/" + logname + ".log";
     
-
-    name=getenv("KVALOBS");
-    
-    if(name){
-		filename=name;
-    }else{
-      	cerr << "Environment variable KVALOBS must be set!" << endl;
-      	exit(1);
-    }
-    
-    if(filename.empty()){
-		std::cerr << "FATAL: Can't initialize the Logging system.\n";
-		exit(1);
-    }
-    
-    if(filename[filename.length()-1]!='/')
-      	filename+="/";
-    
-    filename+="var/log/" + logname + ".log";
-        
     for(int i=0; i<argn; i++){
 		if(strcmp("--tracelevel", argv[i])==0){
 	    	i++;

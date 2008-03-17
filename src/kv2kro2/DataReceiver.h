@@ -33,7 +33,7 @@
 #ifndef __DATARECEIVER_H__
 #define __DATARECEIVER_H__
 
-#include <kvservice/kvcpp2/kveventinterface.h>
+#include <kvcpp/kveventinterface.h>
 #include <dnmithread/Thread.h>
 
 

@@ -32,7 +32,7 @@
 #define __kvsynop_getDataReceiver_h__
 
 #include <boost/shared_ptr.hpp>
-#include <kvservice/kvcpp/KvGetDataReceiver.h>
+#include <kvcpp/KvGetDataReceiver.h>
 #include <kvalobs/kvDbGate.h>
 #include "App.h"
 

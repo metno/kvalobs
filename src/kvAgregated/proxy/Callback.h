@@ -32,7 +32,7 @@
 #define __kvservice__proxy__Callback__
 
 #include "KvalobsProxy.h"
-#include <kvservice/kvcpp/kvservicetypes.h>
+#include <kvcpp/kvservicetypes.h>
 
 namespace kvservice
 {

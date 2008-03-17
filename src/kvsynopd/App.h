@@ -69,7 +69,6 @@ private:
    miutil::miTime          startTime_;
    WaitingList             waitingList;
    std::string             confFile;
-   std::string             kvpath_;
    std::string             mypathInCorbaNS;
    std::list<int>          continuesTypeID_;
    std::list<ObsEvent*>    obsEventWaitingOnCacheReload;
@@ -82,14 +81,11 @@ private:
    boost::mutex mutex;
 
 public:
-   App(int argn, char **argv, const std::string &kvpath,  
-      const std::string &confFile_, miutil::conf::ConfSection *conf);
+   App( int argn, char **argv, 
+        const std::string &confFile_, miutil::conf::ConfSection *conf);
    ~App();
 
-  
-   std::string kvpath()const{ return kvpath_;}
-
-
+ 
    bool acceptAllTimes()const { return acceptAllTimes_;}
 
    /**

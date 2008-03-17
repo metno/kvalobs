@@ -106,8 +106,7 @@ class App : public KvApp
     * This is a fine function to use to get shorter path messages in 
     * logfiles.
     */
-   std::string relpath(const std::string &path, bool kvalobs=true);
-   std::string kvdir()const { return getKvalobsPath();}
+   //std::string relpath(const std::string &path, bool kvalobs=true);
    std::string logdir()const { return logdir_;}
    bool        test()const{ return test_;}
    std::string tmpdir()const {return tmpdir_;}

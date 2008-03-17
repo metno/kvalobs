@@ -35,29 +35,19 @@
 #include <milog/milog.h>
 #include "CorbaThread.h"
 #include "InitLogger.h"
+#include <kvalobs/kvPath.h>
 
 int
 main(int argn, char **argv)
 {
-  char *pKvpath=getenv("KVALOBS");
-  std::string kvpath;
   bool error;
   std::string pidfile;
   CorbaThread *corbaThread;
   int         ret;
 
   InitLogger(argn, argv, "norcom2kv");
-  
-  if(!pKvpath){
-    kvpath=".";
-  }else{
-    kvpath=pKvpath;
 
-    if(kvpath[kvpath.length()-1]!='/')
-      kvpath+='/';
-  }
-
-  pidfile=kvpath+"/var/run/norcom2kv.pid";
+  pidfile = kvPath("localstatedir")+"/run/norcom2kv.pid";
   dnmi::file::PidFileHelper pidFile;
 
   App::setConfFile("norcom2kv.conf");

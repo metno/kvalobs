@@ -34,8 +34,8 @@
 #include "KvDataReceiver.h"
 #include "IncomingHandler.h"
 #include <kvalobs/kvDataOperations.h>
-#include <kvservice/kvcpp/KvApp.h>
-#include <kvservice/kvcpp/kvevents.h>
+#include <kvcpp/KvApp.h>
+#include <kvcpp/kvevents.h>
 #include <milog/milog.h>
 #include <sstream>
 #include <utility>

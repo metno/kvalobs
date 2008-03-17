@@ -1,0 +1,20 @@
+decoderdir=$(pkglibdir)/decode
+
+decoder_LTLIBRARIES = autoobs.la
+autoobs_la_SOURCES = autoobs.cc  autoobs.h \
+                     autoobsdecoder.cc autoobsdecoder.h \
+                     convert.cc  convert.h  \
+                     DontDecodeParams.cc  \
+                     NameConvertDef.cc  \
+                     SplitDef.cc 
+autoobs_la_CPPFLAGS = -D_REENTRANT \
+                      -I$(top_srcdir)/src/lib  \
+                      -I$(top_srcdir)/src/lib/decoder \
+                      $(putools_CFLAGS) $(libxmlpp_CFLAGS)
+autoobs_la_LIBADD = $(top_builddir)/src/lib/miutil/libmiutil.la 
+autoobs_la_LDFLAGS = -module
+
+
+
+
+

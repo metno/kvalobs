@@ -40,6 +40,7 @@
 #include "Replay.h"
 #include "delaycontrol.h"
 #include "InitLogger.h"
+#include <kvalobs/kvPath.h>
 
 //using namespace kvservice;
 using namespace std;
@@ -48,23 +49,14 @@ using namespace miutil;
 int
 main(int argn, char **argv)
 {
-  
-  char *pKvpath=getenv("KVALOBS");
-  std::string kvpath;
   bool error;
   std::string pidfile;
   std::string confFile;
 
-  if(!pKvpath){
-    kvpath=".";
-  }else{
-    kvpath=pKvpath;
-  }
-
   InitLogger(argn, argv, "kvsynopd");
 
-  confFile=kvpath+"/etc/kvsynopd.conf";
-  pidfile=kvpath+"/var/run/kvsynopd.pid";
+  confFile = kvPath("sysconfdir")+"/kvsynopd.conf";
+  pidfile = kvPath("localstatedir")+"/run/kvsynopd.pid";
 
   dnmi::file::PidFileHelper pidFile;
   miutil::conf::ConfSection *conf;
@@ -77,7 +69,7 @@ main(int argn, char **argv)
      return 1;
   }
   
-  App  app(argn, argv, kvpath, confFile, conf );
+  App  app(argn, argv, confFile, conf );
   dnmi::thread::CommandQue newDataQue;  
   dnmi::thread::CommandQue newObsQue;  
   dnmi::thread::CommandQue replayQue;  
@@ -148,7 +140,7 @@ main(int argn, char **argv)
   //Write the subscriber id to the file $KVALOBS/var/kvsynop/datasubscriber.id
   ofstream subidfile;
 
-  subidfile.open(string(kvpath+"/var/kvsynop/datasubscriber.id").c_str());
+  subidfile.open( string(kvPath("localstatedir")+"/kvsynop/datasubscriber.id").c_str());
 
   if(subidfile.is_open()){
     subidfile << id << endl;

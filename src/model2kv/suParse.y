@@ -3,10 +3,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "bool.h"
-#include "pose.h"
+#include "puCtools/bool.h"
+#include "libpose/pose.h"
 #include "setup.h"
-#include "safety.h"
+#include "puCtools/safety.h"
 
 static int fcount=0;
 

@@ -35,9 +35,9 @@
 #define _setup_h
 
 
-#include <psSubstitute.h>
-#include <psRead.h>
-#include <pose.h>
+#include <libpose/psSubstitute.h>
+#include <libpose/psRead.h>
+#include <libpose/pose.h>
 
 #define _defaultoutfile "pose.output"
 #define _backupextension "~"

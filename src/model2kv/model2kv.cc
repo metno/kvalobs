@@ -33,9 +33,9 @@
 #include <fstream>
 #include <sstream>
 #include <map>
-#include <miString.h>
-#include <miTime.h>
-#include <timemanip.h>
+#include <puTools/miString.h>
+#include <puTools/miTime.h>
+#include <puCtools/timemanip.h>
 
 using namespace std;
 

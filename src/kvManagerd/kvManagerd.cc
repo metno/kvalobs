@@ -47,7 +47,7 @@
 #include "SelectDataToProcess.h"
 #include "SendDataToQa.h"
 #include "ServiceCheckedInputImpl.h"
-
+#include <kvalobs/kvPath.h>
 using namespace std;
 using namespace boost;
 
@@ -64,7 +64,6 @@ main(int argc, char** argv)
   string                   dbdriver;
   bool                     docheckForMissingObs=true;
   miutil::conf::ConfSection *conf=KvApp::getConfiguration();
-  char *pKv=getenv("KVALOBS");
   bool error;
   string pidfile;
 
@@ -100,12 +99,7 @@ main(int argc, char** argv)
   
   LOGINFO("check_for_missing_obs=" << (docheckForMissingObs?"true":"false"));
 
-  if(!pKv){
-    LOGFATAL("The environment variable KVALOBS must be set!");
-    return 1;
-  }
-  
-  pidfile=string(pKv)+"/var/run/kvManagerd.pid";
+  pidfile = kvPath("localstatedir")+"/run/kvManagerd.pid";
 
   LOGDEBUG("pidfile: " << pidfile);
 

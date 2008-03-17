@@ -33,6 +33,7 @@
 #include <miconfparser/miconfparser.h>
 #include <fileutil/pidfileutil.h>
 #include "App.h"
+#include <kvalobs/kvPath.h>
 
 using namespace std;
 
@@ -43,14 +44,9 @@ main( int argn, char **argv )
    string confile;
    bool   pidfileError;
    
-   if( getenv("KVALOBS")){
-      string path = string(getenv("KVALOBS"));
-      confile = path + "/etc/";
-      pidfile = path + "/var/run/";
-   }
-  
-   confile += "kv2kro.conf";
-   pidfile += "kv2kro.pid";
+   
+   confile = kvPath("sysconfdir") + "/kv2kro.conf";
+   pidfile = kvPath("localstatedir")+ "/run/kv2kro.pid";
   
    if( dnmi::file::isRunningPidFile( pidfile, pidfileError ) ) {
       if( pidfileError ){

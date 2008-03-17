@@ -35,6 +35,7 @@
 #include "mgrApp.h"
 #include <milog/milog.h>
 #include <kvalobs/kvDbGate.h>
+#include <kvalobs/kvPath.h>
 
 
 namespace{
@@ -61,7 +62,7 @@ ManagerApp(int argn, char **argv,
 {
   LogContext context("ApplicationInit");
 
-  string driver(getKvalobsPath()+"lib/db/"+dbDriver);
+  string driver( kvPath("pkglibdir")+"/db/"+dbDriver);
   
   setSigHandlers();
 

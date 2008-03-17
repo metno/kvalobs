@@ -28,7 +28,7 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#include <kvservice/kvcpp/corba/CorbaKvApp.h>
+#include <kvcpp/corba/CorbaKvApp.h>
 #include "AgregatorHandler.h"
 #include "proxy/KvalobsProxy.h"
 #include <kvalobs/kvStation.h>
@@ -38,7 +38,7 @@
 #include <kvdb/dbdrivermgr.h>
 #include <set>
 #include <fileutil/pidfileutil.h>
-
+#include <kvalobs/kvPath.h>
 #include <boost/thread/thread.hpp>
 
 #include "minmax.h"
@@ -98,16 +98,10 @@ struct backprod
 int main( int argc, char **argv )
 {
   // KVDIR
-  string kvdir = getenv("KVALOBS");
-  if ( kvdir.empty() ) {
-    LOGFATAL( "Could not find KVALOBS environment variable" );
-    return 1;
-  }
-  if(kvdir[kvdir.length()-1]!='/')
-    kvdir+="/";
+  
 
   //PID-file
-  std::string pidfile=kvdir+"var/run/kvAgregated.pid";
+  std::string pidfile=kvPath("localstatedir")+"/run/kvAgregated.pid";
   bool pidfileError;
   if(dnmi::file::isRunningPidFile(pidfile, pidfileError)){
     if(pidfileError){
@@ -128,10 +122,10 @@ int main( int argc, char **argv )
 
   // Logging
   FLogStream fine( 9, 1024 * 1024 );
-  fine.open(kvdir + "var/agregate/agregator.log");
+  fine.open(kvPath("localstatedir") + "/agregate/agregator.log");
   fine.loglevel( INFO );
   FLogStream error( 9 );
-  error.open(kvdir + "var/agregate/agregator.warn.log");
+  error.open(kvPath("localstatedir") + "/agregate/agregator.warn.log");
   error.loglevel( WARN );
   LogManager::instance()->addStream( &fine );
   LogManager::instance()->addStream( &error );
@@ -139,16 +133,17 @@ int main( int argc, char **argv )
   // Proxy database
   DriverManager manager;
   std::string proxyID;
-  const string dbDriverPath = kvdir + "lib/db/";
+  const string dbDriverPath = kvPath("pkglibdir") + "/db/";
   if ( !manager.loadDriver(dbDriverPath + "sqlitedriver.so", proxyID) ) {
     LOGFATAL( "Error when loading database driver: " << manager.getErr() );
     return 2;
   }
-  Connection *dbConn = manager.connect(proxyID, kvdir + "var/agregate/database.sqlite");
+  Connection *dbConn = manager.connect(proxyID, 
+                                       kvPath("localstatedir") + "/agregate/database.sqlite");
 
   if ( ! dbConn ) {
     LOGFATAL("Cant create a database connection to: " 
-	     << endl << kvdir + "var/agregate/database.sqlite");
+	     << endl << kvPath("localstatedir") + "/agregate/database.sqlite");
     return 1;
   }
 
@@ -157,7 +152,7 @@ int main( int argc, char **argv )
   string myconf = "kvAgregated.conf";
   miutil::conf::ConfSection *confSec = KvApp::readConf(myconf);
   if(!confSec){
-    myconf=kvdir + "etc/kvalobs.conf";
+    myconf=kvPath("sysconfdir") + "/kvalobs.conf";
     confSec = KvApp::readConf(myconf);
   }
   if(!confSec){

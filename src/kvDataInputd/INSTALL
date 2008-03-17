@@ -1,8 +1,0 @@
-#!/bin/sh
-
-DESTINATION=
-DIRECTORIES="bin var/log var/run"
-FILES=
-
-. $KVDIR/conf/INSTALL.conf
-

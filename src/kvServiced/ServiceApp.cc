@@ -34,6 +34,7 @@
 #include <kvskel/commonStationInfo.hh>
 #include <milog/milog.h>
 #include <puTools/miTime>
+#include <kvalobs/kvPath.h>
 #include "ServiceApp.h"
 #include "ReaperBase.h"
 
@@ -57,7 +58,7 @@ ServiceApp(int argn, char **argv,
 {
   LogContext context("ApplicationInit");
 
-  string driver(getKvalobsPath()+"lib/db/"+dbDriver);
+  string driver(kvPath("pkglibdir")+"/db/"+dbDriver);
   
   setSigHandlers();
 
@@ -234,7 +235,7 @@ removeReaperObj(ReaperBase *rb)
   		}
   	}
   			
-   LOGDEBUG("removeReaperObj: No ReaperObj found in the reaperList! (This must be an error???)");
+   LOGDEBUG("removeReaperObj: No ReaperObj found in the reaperList! (This must be an error!)");
 }
 
 void 

@@ -32,7 +32,7 @@
 #ifndef __GETDATA_H__
 #define __GETDATA_H__
 
-#include <kvcpp2/KvGetDataReceiver.h>
+#include <kvcpp/KvGetDataReceiver.h>
 
 class GetData :  
    public kvservice::KvGetDataReceiver

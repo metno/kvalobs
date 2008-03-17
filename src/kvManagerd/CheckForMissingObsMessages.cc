@@ -37,6 +37,7 @@
 #include <boost/bind.hpp>
 #include "CheckForMissingObsMessages.h"
 #include "MissingObsCheck.h"  
+#include <kvalobs/kvPath.h>
 
 using namespace kvalobs;
 using namespace std;
@@ -216,7 +217,7 @@ findMissingData(const miutil::miTime& runtime,
 {
  	string logfile;
     
-   logfile=app.getKvalobsPath() + "/var/log/kvManagerd-missing.log";
+   logfile = kvPath("localstatedir") + "/log/kvManagerd-missing.log";
 
 	milog::SetResetDefaultLoggerHelper loggerHelper(logfile, 1048576);
 
