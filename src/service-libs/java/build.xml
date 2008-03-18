@@ -15,11 +15,18 @@
 	<path id="build.classpath">
 		<fileset dir="${libdir}/jacorb">
 			<include name="*.jar"/>
-			<exclude name="idl.jar"/>
+   	   <exclude name="idl.jar"/>  
 		</fileset>
 		<pathelement path="${libdir}/log4j-1.2.13.jar"/>
 		<pathelement path="${builddir}"/>
 	</path>
+	
+	<path id="idl.classpath">
+	      <fileset dir="${libdir}/jacorb">
+	         <include name="*.jar"/>
+	      </fileset>
+	</path>
+	   
 	
 	<path id="test.classpath">
 		<path refid="build.classpath"/>
@@ -27,6 +34,12 @@
 		<pathelement path="${libdir}/hsqldb.jar" />
 	</path>
 	
+	<!-- Jacorb includes a Ant task to use for compiling idl files. It depends on jacorb IDL compiler
+	     and is not a general purpose task for converting idl files to java classes.
+	     The documentation for this task can be found at http://www.jacorb.org/documentation.html.
+	 -->
+	<taskdef name="jacidl" classpathref="idl.classpath" classname="org.jacorb.idl.JacIDL" />
+		
 	<target name="main" depends="clean, idl2java, compile, jar, jar2libdir, sqlhelper, kvdatalistener">
 	</target>
 	
@@ -37,6 +50,22 @@
 		<mkdir dir="docs"/>
 	</target>
 	
+	<target name="idl2java">
+	   <jacidl destdir="${idlgendir}"  
+	           srcdir ="../../../share/kvalobs/idl" 
+              includes="kvService.idl,
+                        managerInput.idl,
+                        kvDataNotifySubscriber.idl,
+                        kvDataSubscriber.idl,
+                        kvHintSubscriber.idl,
+                        kvServiceCommon.idl,
+                        commonStationInfo.idl,
+                        datasource.idl,
+                        admin.idl" />  
+
+	</target>
+
+<!--	
 	<target name="idl2java">
 		<apply executable="${idl2java_compiler}"> 
 			<arg value="-d" />
@@ -54,7 +83,7 @@
 						   admin.idl" />  
 			</apply>
 	</target>
-	
+-->	
 	<target name="compile" depends="init, idl2java">
 		<javac destdir="${builddir}" srcdir="${src}" classpathref="build.classpath" debug="true"> 
 			<include name="**/*.java"/>	
