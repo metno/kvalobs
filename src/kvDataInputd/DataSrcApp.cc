@@ -228,7 +228,8 @@ DataSrcApp::registerDb(int nConn)
   LOGINFO("registerDb: loading driver <" << driver << ">!\n");
 
   if(!dbMgr.loadDriver(driver, drvId)){
-    LOGFATAL("registerDb: Can't load driver <" << driver << ">\n");
+    //LOGFATAL("registerDb: Can't load driver <" << driver << ">\n");
+    LOGFATAL(dbMgr.getErr());
     return 0;
   }
   
