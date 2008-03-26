@@ -148,8 +148,8 @@ KvApp::~KvApp()
 bool 
 KvApp::isOk()const
 {
-    if( CorbaHelper::CorbaApp::isOk() )
-	return false;
+    if( ! CorbaHelper::CorbaApp::isOk() )
+       return false;
     
     return true;
 }
