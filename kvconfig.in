@@ -48,6 +48,7 @@ fi
 
 case $1 in 
     --bindir) echo @bindir@	;;
+    --libexecdir) echo @libexecdir@ ;;
 	--libdir) echo @libdir@ ;;
 	--datadir) echo @datadir@ ;;
 	--sysconfdir) echo @sysconfdir@ ;;
@@ -64,7 +65,7 @@ case $1 in
 		echo 
 		echo Use exactly one of the following options:
 		echo
-		echo --bindir --libdir --datadir --sysconfdir --localstatedir --version --help
+		echo --bindir --libexecdir --libdir --datadir --sysconfdir --localstatedir --version --help
 	;;
     *) 
     	echo Unkonwn option: $1
