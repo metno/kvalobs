@@ -130,5 +130,3 @@ namespace {
 		return true;
 	}
  }
- 
- 
