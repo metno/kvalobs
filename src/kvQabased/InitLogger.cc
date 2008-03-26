@@ -54,7 +54,7 @@ InitLogger(int argn, char **argv, const std::string &logname,
     StdErrStream *trace;
     
 
-    filename = kvPath("localstatedir")+"/var/log";
+    filename = kvPath("localstatedir")+"/log";
     htmlpath= filename;
     htmlpath+= "/html";
 
