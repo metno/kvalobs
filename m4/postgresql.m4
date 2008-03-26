@@ -47,8 +47,9 @@ AC_DEFUN([KV_POSTGRESQL],
 	if test $PG_CONFIG -a -x $PG_CONFIG; then
 		postgresql_CFLAGS=`$PG_CONFIG --includedir`
 		AC_SUBST(postgresql_CFLAGS)
-		postgresql_LIBS="-L`$PG_CONFIG --libdir` `$PG_CONFIG --libs`"
+		postgresql_LIBS="-L`$PG_CONFIG --libdir` -lpq"
 		AC_SUBST(postgresql_LIBS)
+		# TODO: Make this more robust!
 	else
 		AC_MSG_ERROR([Unable to locate pg_config - please use --with-postgresql to specify where to find it.])
 	fi
