@@ -51,10 +51,12 @@
 
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace kvalobs;
 using namespace milog;
+using boost::filesystem::path;
 
 namespace
 {
@@ -91,7 +93,7 @@ namespace
 
 CheckRunner::CheckRunner( const kvStationInfo & params,
                           dnmi::db::Connection & con_,
-                          const string & logp )
+                          const path & logp )
     : stinfo( params )
     , dbcon( & con_ )
     , meteod( dbcon, params )
@@ -381,27 +383,18 @@ void CheckRunner::operator() ( bool forceCheck )
 
 namespace
 {
-  boost::filesystem::path logPath( const kvalobs::kvStationInfo & stinfo, const std::string & start_logpath )
+  path logPath( const kvalobs::kvStationInfo & stinfo, const path & start_logpath )
   {
+    path log_dir(start_logpath);
+    const path stationDirectory = boost::lexical_cast<string>(stinfo.stationID()); 
 
-    namespace fs = boost::filesystem;
-  
-    /*
-    fs::path log_dir( start_logpath );
-    log_dir = log_dir/stinfo.stationID()/stinfo.obstime().isoDate();
-    fs::create_directories( log_dir );
-    return log_dir;
-    */
+    log_dir /= stationDirectory/stinfo.obstime().isoDate();
 
-    ostringstream path;
-    path << start_logpath << '/' << stinfo.stationID() << '/' << stinfo.obstime().isoDate() << '/';
-    fs::path log_dir( path.str() );
-    fs::create_directories( log_dir );
-
+    boost::filesystem::create_directories( log_dir );
     return log_dir;
   }
 
-  boost::filesystem::path logfilename( const std::string & clock, int version )
+  path logfilename( const std::string & clock, int version )
   {
       ostringstream filename;
       filename << "log-" << clock;
@@ -410,7 +403,7 @@ namespace
       return filename.str();
   }
 
-  std::string getLogfileName( const kvalobs::kvStationInfo & stinfo, const std::string & start_logpath )
+  path getLogfilePath( const kvalobs::kvStationInfo & stinfo, const path & start_logpath )
   {
     namespace fs = boost::filesystem;
 
@@ -439,14 +432,14 @@ HtmlStream * CheckRunner::openHTMLStream()
   {
     html = new HtmlStream;
     
-    std::string logfilename = getLogfileName( stinfo, logpath_ );
+    path logfile = getLogfilePath( stinfo, logpath_ );
     
     LOGINFO( "CheckRunner::runChecks for station:" << stinfo.stationID()
         << " and obstime:" << stinfo.obstime() << endl
-        << "Logging all activity to:" << logfilename << endl );
+        << "Logging all activity to:" << logfile.native_file_string() << endl );
   
-    if ( !html->open( logfilename ) )
-      throw std::runtime_error( "Failed to create logfile for the html output. Filename:\n" + logfilename );
+    if ( !html->open( logfile.native_file_string() ) )
+      throw std::runtime_error( "Failed to create logfile for the html output. Filename:\n" + logfile.native_file_string() );
   
     Logger::createLogger( "html", html );
     Logger::logger("html").logLevel( DEBUG );

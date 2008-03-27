@@ -36,6 +36,8 @@
 #include <milog/milog.h>
 #include <kvalobs/kvDbGate.h>
 #include <puTools/miTime>
+#include <boost/regex.hpp>
+#include <boost/filesystem/exception.hpp>
 #include <memory>
 #include <stdexcept>
 
@@ -233,8 +235,21 @@ QaWork::doWork( const kvalobs::kvStationInfo & params,
 
   try
   {
-    CheckRunner checkRunner( params, con, logPath.empty() ? logpath_ : logPath );
+    // boost::filesystem::path cannot handle paths/with//multiple//slashes//separating/single/elements
+    boost::regex re("(\\/\\/)");
+    std::string normalizedLog = boost::regex_replace(logPath.empty() ? logpath_ : logPath, re, "/");
+    
+    CheckRunner checkRunner( params, con, normalizedLog );
     checkRunner();
+  }
+  catch ( boost::filesystem::filesystem_error & )
+  {
+    static const std::string devnull = "/dev/null";
+    if ( logPath != devnull )
+    {
+      LOGERROR("Error when trying to open log file. Trying " << devnull << " instead.");
+      doWork(params, retList, con, devnull);
+    }
   }
   catch ( std::exception & e )
   {

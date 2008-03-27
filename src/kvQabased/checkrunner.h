@@ -39,6 +39,7 @@
 #include "kvQABaseDBConnection.h"
 #include "kvQABaseMeteodata.h"
 #include "kvQABaseTypes.h"
+#include <boost/filesystem/path.hpp>
 
 class kvQABaseDBConnection;
 class kvQABaseMetadata;
@@ -77,14 +78,14 @@ class CheckRunner
      */
     CheckRunner( const kvalobs::kvStationInfo & params,
                  dnmi::db::Connection & con,
-                 const std::string & logpath );
+                 const boost::filesystem::path & logpath );
     
     ~CheckRunner();
 
     /**
      * Set logpath (before first runchecks)
      */
-    void logpath( const std::string& logp )
+    void logpath( const boost::filesystem::path & logp )
     {
       logpath_ = logp;
     }
@@ -124,7 +125,7 @@ class CheckRunner
     kvQABaseMeteodata meteod; // Meteorological data manager
 
     /// Path to logfile(s)
-    std::string logpath_;
+    boost::filesystem::path logpath_;
     /// The next time the static tables should be updated.
     miutil::miTime updateStaticTime;
 
