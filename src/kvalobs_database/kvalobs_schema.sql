@@ -47,7 +47,7 @@ CREATE LANGUAGE plpgsql;
 --
 -- Trigger function for propagating changes to the data table into data_history
 --
-CREATE FUNCTION 
+CREATE OR REPLACE FUNCTION 
 	backup_old_data() 
 RETURNS trigger AS
 $BODY$
@@ -55,7 +55,7 @@ BEGIN
 	INSERT INTO data_history 
 		(stationid,obstime,original,paramid,tbtime,typeid,sensor,level,corrected,controlinfo,useinfo,cfailed)
 	VALUES
-		(NEW.stationid,NEW.obstime,NEW.original,NEW.paramid,NEW.tbtime,NEW.typeid,NEW.sensor,NEW.level,NEW.corrected,NEW.controlinfo,NEW.useinfo,NEW.cfailed);
+		(OLD.stationid,OLD.obstime,OLD.original,OLD.paramid,'now',OLD.typeid,OLD.sensor,OLD.level,OLD.corrected,OLD.controlinfo,OLD.useinfo,OLD.cfailed);
 	RETURN NULL;
 END;
 $BODY$
@@ -69,7 +69,7 @@ CREATE TRIGGER backup_data AFTER UPDATE ON data FOR EACH ROW EXECUTE PROCEDURE b
 -- Deleted rows are marked in data_history with NULL values for original, 
 -- corrected, controlinfo, useinfo and cfailed.
 --
-CREATE FUNCTION 
+CREATE OR REPLACE FUNCTION 
 	backup_old_data_delete() 
 RETURNS trigger AS
 $BODY$
@@ -77,7 +77,7 @@ BEGIN
 	INSERT INTO data_history 
 		(stationid,obstime,original,paramid,tbtime,typeid,sensor,level,corrected,controlinfo,useinfo,cfailed)
 	VALUES
-		(OLD.stationid,OLD.obstime,NULL,OLD.paramid,OLD.tbtime,OLD.typeid,OLD.sensor,OLD.level,NULL,NULL,NULL,NULL);
+		(OLD.stationid,OLD.obstime,NULL,OLD.paramid,'now',OLD.typeid,OLD.sensor,OLD.level,NULL,NULL,NULL,NULL);
 	RETURN NULL;
 END;
 $BODY$
