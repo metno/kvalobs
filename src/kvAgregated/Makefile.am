@@ -35,6 +35,9 @@ kvAgregated_LIBS = \
 	$(omniDynamic4_LIBS) \
 	$(BOOST_THREAD_LIB)
 	
+EXTRA_DIST = agregateDbInit.sh
+install-data-hook:
+	. $(srcdir)/agregateDbInit.sh $(localstatedir)/$(PACKAGE)
 
 
 TESTS = kvAgregatedTest
