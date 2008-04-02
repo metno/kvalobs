@@ -38,6 +38,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.TimeZone;
 import java.lang.Short;
 import CKvalObs.CService.DataElem;
 import metno.dbutil.DbConnectionMgr;
@@ -62,6 +63,7 @@ public class DataHelperTest {
     
     @BeforeClass
     public static void setUpAndLoadTheDb(){
+    	TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
     	PropertyConfigurator.configure("test/metno/kvalobs/kl2kv/DataHelperTest_log.conf");
     	
     	deleteDb("tmp/db");

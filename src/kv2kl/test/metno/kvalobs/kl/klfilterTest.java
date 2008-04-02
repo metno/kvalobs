@@ -30,6 +30,7 @@
 */
 package metno.kvalobs.kl;
 
+import java.util.TimeZone;
 import java.io.File;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -57,6 +58,7 @@ public class klfilterTest {
     
     @BeforeClass
     public static void setUpAndLoadTheDb(){
+    	TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
     	PropertyConfigurator.configure("test/metno/kvalobs/kl/klfilterTest_log.conf");
     }
 

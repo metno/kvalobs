@@ -40,6 +40,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.TimeZone;
 import java.lang.Short;
 import CKvalObs.CService.DataElem;
 import metno.dbutil.DbConnectionMgr;
@@ -67,6 +68,7 @@ public class SendDataTest {
 
     @BeforeClass
     public static void setUpAndLoadTheDb(){
+    	TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
         deleteDb("tmp/db");
         
         try {
