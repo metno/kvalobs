@@ -40,6 +40,10 @@ public class MiTime{
 
     /**yyyy-MM-dd HH:mm:ss*/
     public static final String FMT_ISO="yyyy-MM-dd HH:mm:ss";
+
+    /**yyyy-MM-dd HH:mm:ss z*/
+    public static final String FMT_ISO_z="yyyy-MM-dd HH:mm:ss z";
+    
     /**yyyyMMddHHmmss
     public static final String FMT_COMPACT_TIMESTAMP="yyyyMMddHHmmss";
     /**yyyyMMddHHmm*/
@@ -174,6 +178,8 @@ public class MiTime{
     }
     
     /**
+     * Create a string representation of the date in
+     * the given format, fmt.
      * 
      * @param fmt The format we want the string in.
      * @return An string in the format given by fmt.
@@ -188,7 +194,7 @@ public class MiTime{
     }
     
     public String toString(){
-        return toString(FMT_ISO);
+        return toString(FMT_ISO_z);
     }
 
     /**
@@ -208,7 +214,7 @@ public class MiTime{
             pos= new ParsePosition(0);
             format=new SimpleDateFormat(fmt);
             
-            format.getCalendar().setTimeZone(cal.getTimeZone());
+            format.setTimeZone(cal.getTimeZone());
             
             Date date=format.parse(timestamp, pos);
             
