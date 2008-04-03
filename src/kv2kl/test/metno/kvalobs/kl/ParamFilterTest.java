@@ -37,7 +37,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.LinkedList;
-import java.lang.Short;
+import java.lang.Integer;
 import CKvalObs.CService.DataElem;
 import metno.dbutil.DbConnectionMgr;
 import metno.dbutil.DbConnection;
@@ -148,13 +148,13 @@ public class ParamFilterTest {
     		assertNotNull("Cant create an dbconnection!", con);
     	
     		LinkedList tl302=new LinkedList();
-    		tl302.add(new ParamFilter.ParamElem(112,0,0));
+    		tl302.add(new ParamFilter.ParamElem(302,112,0,0));
     		Collections.sort(tl302);
     	
     		LinkedList tl330=new LinkedList();
-    		tl330.add(new ParamFilter.ParamElem(104,1,0));
-    		tl330.add(new ParamFilter.ParamElem(106,0,0));
-    		tl330.add(new ParamFilter.ParamElem(125,0,0));
+    		tl330.add(new ParamFilter.ParamElem(330,104,1,0));
+    		tl330.add(new ParamFilter.ParamElem(330,106,0,0));
+    		tl330.add(new ParamFilter.ParamElem(330,125,0,0));
     		Collections.sort(tl330);
     	
     		ParamFilter pf=new ParamFilter(18700, con);
@@ -175,7 +175,7 @@ public class ParamFilterTest {
     		assertTrue(paramList.size()==0);
     		assertEquals(pf.types.size(), 3);
     		
-    		Object obj=pf.types.get(new Short((short)312));
+    		Object obj=pf.types.get(new Integer((short)312));
     		
     		assertNotNull(obj);
     		LinkedList	list=(LinkedList)obj;
