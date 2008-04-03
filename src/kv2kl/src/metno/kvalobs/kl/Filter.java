@@ -38,6 +38,7 @@ import metno.util.MiGMTTime;
 import metno.util.StringHolder;
 import CKvalObs.CService.*;
 import java.util.Date;
+import java.util.*;
 import org.apache.log4j.Logger;
 
 public class Filter {
@@ -245,8 +246,8 @@ public class Filter {
 		if(!filterEnabled)
 			return true;
 		
-		//System.out.println(" -- Filter:  sid: "+data.stationID + " tid: "+data.typeID_
-		//		                              + " paramID: "+data.paramID + " obstime: " + data.obstime);
+		logger.debug(" -- Filter:  sid: "+data.stationID + " tid: "+data.typeID_
+		             + " paramID: "+data.paramID + " obstime: " + data.obstime);
 		
 		MiGMTTime obstimeTmp=new MiGMTTime();
 		
@@ -255,8 +256,10 @@ public class Filter {
 					     +" ERROR: filter.filter: Cant parse <obstime> '"+data.obstime+"'");
 			return true;
 		}
-				
-		Timestamp obstime=new Timestamp(obstimeTmp.getTime().getTime());
+	
+		Timestamp obstime = obstimeTmp.getTimestamp();
+		logger.debug(" -- Filter:  Incomming obstime decoded to: " + obstimeTmp + " (GMT) -> Timestamp: " + obstime );
+		
 		dbElem=loadFromDb(data, obstime);
 	
 		if( ! dbElem.isOk() ) {

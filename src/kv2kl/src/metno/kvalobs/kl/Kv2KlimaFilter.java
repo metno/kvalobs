@@ -212,7 +212,7 @@ public class Kv2KlimaFilter {
 			}
 		}
 		currentElem = filterElemList.getFirst();
-		logger.debug("No valid filter element (false): " + currentElem);
+		logger.debug("No valid filter element (false): " + this);
 		return false;
 	}
 	

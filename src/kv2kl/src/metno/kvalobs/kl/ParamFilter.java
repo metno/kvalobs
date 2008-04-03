@@ -61,6 +61,10 @@ import org.apache.log4j.Logger;
  * and a to date (tdato). Note that for the add/remove to function as specified the 
  * fdato and tdato must match exactly. 
  * 
+ * If a typeid in the filter table is negativ, ie less than 0 it only blocks inncomming
+ * data with a negativ typeid. While a positiv typeid in the filtertables blocks both
+ * data with nagativ and positiv typeids.
+ * 
  * The fdato and tdato is valid for the timespan [fdato,tdato].
  * 
  * <b>Examle of filter setup</b><br/>
@@ -94,17 +98,20 @@ public class ParamFilter {
 		final static long MILIS_IN_YEAR=31536000000L;
 		final static long MIN_YEAR=-1900*MILIS_IN_YEAR;
 		final static long MAX_YEAR=6000*MILIS_IN_YEAR;
+		int typeid;
 		int paramid;
 		int sensor;
 		int level;
 		Timestamp fdato;
 		Timestamp tdato;
 			
-		ParamElem(int paramid, 
+		ParamElem(int typeid,
+				  int paramid, 
 				  int sensor, 
 				  int level,
 				  Timestamp fdato,
 				  Timestamp tdato){
+			this.typeid=typeid;
 			this.paramid=paramid;
 			this.sensor=sensor;
 			this.level=level;
@@ -121,9 +128,11 @@ public class ParamFilter {
 			
 		}
 		
-		ParamElem(int paramid, 
+		ParamElem(int typeid,
+				  int paramid, 
 				  int sensor, 
 				  int level){
+			this.typeid=typeid;
 			this.paramid=paramid;
 			this.sensor=sensor;
 			this.level=level;
@@ -137,12 +146,12 @@ public class ParamFilter {
 		
 		boolean init(java.sql.ResultSet rs){
 			try{
-				paramid=rs.getInt("paramid");
-				sensor=rs.getInt("sensor");
-				level=rs.getInt("xlevel");
-				
-				fdato=rs.getTimestamp("fdato");
-				tdato=rs.getTimestamp("tdato");
+				typeid  = rs.getInt("typeid");
+				paramid = rs.getInt("paramid");
+				sensor  = rs.getInt("sensor");
+				level   = rs.getInt("xlevel");
+				fdato   = rs.getTimestamp("fdato");
+				tdato   = rs.getTimestamp("tdato");
 				
 				if(fdato==null)
 					this.fdato=new Timestamp(MIN_YEAR);
@@ -155,6 +164,7 @@ public class ParamFilter {
 			catch(SQLException ex){
 				logger.error("SQL problems: cant fetch data from a resultset!\n"+ex
 						      + " SQLState: "+ex.getSQLState());
+				typeid=0;
 				paramid=0;
 				sensor=0;
 				level=0;
@@ -167,11 +177,17 @@ public class ParamFilter {
 
 		@Override
 		public String toString(){
-			return "{"+paramid+","+sensor+","+level+","+fdato+","+tdato+"}";
+			return "{ tid:"+typeid+", pid:"+paramid+", sen:"+sensor+", lev:"+level+",fdate:"+fdato+", tdate:"+tdato+"}";
 		}
 		
 		public int compareTo(Object obj) {
 			ParamElem e=(ParamElem)obj;
+			
+			if( typeid<e.typeid)
+				return -1;
+			
+			if( typeid>e.typeid)
+				return 1;
 			
 			if(paramid<e.paramid)
 				return -1;
@@ -220,7 +236,8 @@ public class ParamFilter {
 		while(it.hasNext()){
 			ParamElem param=(ParamElem)it.next();
 			
-			if(param.paramid==pid &&
+			if(param.typeid==pe.typeid &&
+			   param.paramid==pid &&
 			   param.sensor==pe.sensor &&
 			   param.level==pe.level &&
 			   param.fdato.compareTo(pe.fdato)==0 &&
@@ -237,7 +254,7 @@ public class ParamFilter {
 	}
 	
 	LinkedList loadFromDb(short type){
-		short typeid=(short)Math.abs(type);
+		int  typeid = Math.abs(type);
 		LinkedList list=new LinkedList();
 		boolean error=false;
 
@@ -245,9 +262,9 @@ public class ParamFilter {
 			types=new HashMap();
 		
 		String stmt="SELECT * FROM T_KV2KLIMA_TYPEID_PARAM_FILTER "+
-					"  WHERE typeid="+typeid;
+					"  WHERE abs(typeid)="+typeid;
 
-		logger.debug("TypeidParamFilter lookup: " + stmt);
+		logger.debug("TypeidParamFilter::loadFromDb: query: " + stmt);
 		
 		ResultSet rs=null;
 		
@@ -261,7 +278,7 @@ public class ParamFilter {
 					logger.error("Failed to initialize an ParamElem from the database!");
 					continue;
 				}
-				
+				logger.debug("TypeidParamFilter::loadFromDb: add element: " + pe);
 				list.add(pe);
 			}
 		}
@@ -284,7 +301,7 @@ public class ParamFilter {
 			return null;
 		
 		stmt="SELECT * FROM T_KV2KLIMA_PARAM_FILTER "+
-		     "  WHERE typeid="+typeid+" AND stnr="+stationid;
+		     "  WHERE abs(typeid)="+typeid+" AND stnr="+stationid;
 
 		logger.debug("ParamFilter lookup: " + stmt);
 
@@ -300,7 +317,7 @@ public class ParamFilter {
 					logger.error("Failed to initialize an ParamElem from the database!");
 					continue;
 				}
-	
+				logger.debug("TypeidParamFilter::loadFromDb: addOrRemove element: " + pe);
 				addOrRemoveFromList(list, pe);
 			}
 		}
@@ -320,7 +337,7 @@ public class ParamFilter {
 			}
 		}
 		Collections.sort(list);
-		types.put(new Short(typeid), list);
+		types.put(new Integer(typeid), list);
 
 		return list;
 	}
@@ -343,7 +360,7 @@ public class ParamFilter {
 			}
 		}
 		
-		Object obj=types.get(new Short(data.typeID_));
+		Object obj=types.get(new Integer( Math.abs( data.typeID_) ) );
 		
 		if(obj==null)
 			params=loadFromDb(data.typeID_);
@@ -358,8 +375,17 @@ public class ParamFilter {
 		while(it.hasNext()){
 			ParamElem param=(ParamElem)it.next();
 
-			if(param.paramid==data.paramID &&
-			   param.level==data.level){
+			logger.debug("-- ParamFilter: ParamElem: " + param);
+			
+			if( param.paramid == data.paramID &&
+			    param.level   == data.level   &&
+			    Math.abs(param.typeid)  == Math.abs(data.typeID_) ){
+				
+				//Negative typeid in the filter tables effect only
+				//negative types.
+				if( param.typeid < 0 && data.typeID_ > 0 )
+					continue;
+				
 				int s;
 				
 				try{
