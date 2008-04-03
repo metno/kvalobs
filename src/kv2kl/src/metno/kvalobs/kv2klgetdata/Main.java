@@ -33,6 +33,7 @@ package metno.kvalobs.kv2klgetdata;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.TimeZone;
 import metno.kvalobs.kl.KlApp;
 import kvalobs.*;
 import CKvalObs.CService.*;
@@ -113,6 +114,9 @@ public class Main {
 	
     public static void main(String[] args)
     {	
+    	//Set the default timezone to GMT.
+    	TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
+    	
     	String conffile="kv2kl.conf";
     	String kvpath=KlApp.getKvpath();
 	
