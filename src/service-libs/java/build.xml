@@ -172,7 +172,8 @@
 	</target>
 		
 	
-	<target name="test" depends="test-metno.util.PropertiesHelper, 
+	<target name="test" depends="test-metno.util.Time,
+		                          test-metno.util.PropertiesHelper, 
 		                          test-metno.util.StringUtil,
 	                             test-metno.dbutil.DbConnection, 
 		                          test-metno.dbutil.DbConnectionMgr,
@@ -180,6 +181,14 @@
 		                          test-metno.SqlHelper,
 		                          test-metno.util.FileUtil">
 	</target>
+	<target name="test-metno.util.Time" depends="compile, compile-test">
+			<junit printsummary="yes" fork="yes" haltonfailure="yes">
+				<formatter type="brief" usefile="true"/>
+				<classpath refid="test.classpath"/>
+				<test todir="${testresult}" name="metno.util.MiGMTTimeTest"/>
+			</junit>
+	</target>
+	
 	<target name="test-metno.util.PropertiesHelper" depends="compile, compile-test">
 		<junit printsummary="yes" fork="yes" haltonfailure="yes">
 			<formatter type="brief" usefile="true"/>
