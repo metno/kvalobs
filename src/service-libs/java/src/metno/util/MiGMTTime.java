@@ -33,7 +33,7 @@ package metno.util;
 
 import java.util.*;
 import java.text.*;
-
+import java.sql.Timestamp;
 
 public class MiGMTTime extends MiTime{
     
@@ -70,5 +70,14 @@ public class MiGMTTime extends MiTime{
     public MiGMTTime(int year, int month, int day, int hour, int min, int sec){
         super(TimeZone.getTimeZone("GMT"));
         set(year, month, day, hour, min, sec);	
+    }
+    
+    public Timestamp getTimestamp() {
+    	TimeZone old = TimeZone.getDefault();
+    	TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
+    	
+    	Timestamp ts = new Timestamp( cal.getTimeInMillis() );
+    	TimeZone.setDefault( old );
+    	return ts;
     }
 }
