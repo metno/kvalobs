@@ -121,10 +121,13 @@ public class klfilterTest {
         			  "insert into t_kv2klima_filter VALUES("+
         			  "18600,'D',NULL,'2006-01-01 03:00:00',10,NULL);" +
         			  "insert into t_kv2klima_filter VALUES("+
-        			  "18800,'D','2006-01-01 03:00:00', NULL, 10,NULL);";
-
-        
-
+        			  "18800,'D','2006-01-01 03:00:00', NULL, 10,NULL);" +
+        			  "insert into t_kv2klima_filter VALUES("+
+        			  "4460,'D','2007-10-31 00:00:00','2007-11-01 07:00:00', 330, NULL);" +
+        			  "insert into t_kv2klima_filter VALUES(" +
+        			  "4460,'D','2007-11-01 08:00:00', NULL, 342, NULL);" +
+        			  "insert into t_kv2klima_filter VALUES(" +
+        			  "88000,'D','2008-01-01 00:00:00', NULL, 42, NULL);";
         
         deleteDb("tmp/db");
         
@@ -286,6 +289,19 @@ public class klfilterTest {
         ret=filter.filter(fillWithStationData(18800, 10, "2007-1-1 4:00:00"), msg);
         assertTrue(ret);
                 
+        ret=filter.filter(fillWithStationData(4460, 342, "2007-11-01 07:00:00"), msg);
+        assertFalse(ret);
+     
+        ret=filter.filter(fillWithStationData(4460, 342, "2007-11-01 08:00:00"), msg);
+        assertTrue(ret);
+        
+        ret=filter.filter(fillWithStationData(4460, 342, "2007-10-31 18:00:00"), msg);
+        assertFalse(ret);
+        
+        ret=filter.filter(fillWithStationData(4460, 330, "2007-10-31 18:00:00"), msg);
+        assertTrue(ret);
+     
+        
         try{
            mgr.releaseDbConnection(con);
         }
@@ -472,6 +488,48 @@ public class klfilterTest {
              fail("Unexpected exception!");
         }
 
+    }
+
+    @Test
+    public void negativTypeid(){
+        StringHolder msg=new StringHolder();
+        DbConnection con=null;
+        boolean         ret;
+        
+        System.out.println("Test: testStation");
+        assertNotNull(mgr);
+        assertTrue(listTestTables(mgr));
+        
+        try{
+           con=mgr.newDbConnection();
+        }
+        catch(Exception e){
+            fail("Unexpected exception!");
+        }
+        
+        assertNotNull(con);
+        
+        Filter filter=new Filter(con);
+
+        ret=filter.filter(fillWithStationData(88000, -42, "2007-12-31 23:00:00"), msg);
+        assertFalse(ret);
+
+        ret=filter.filter(fillWithStationData(88000, -42, "2008-01-01 00:00:00"), msg);
+        assertTrue(ret);
+
+        ret=filter.filter(fillWithStationData(88000, -42, "2008-01-01 19:00:00"), msg);
+        assertFalse(ret);
+        
+        ret=filter.filter(fillWithStationData(88000, 42, "2008-01-01 19:00:00"), msg);
+        assertTrue(ret);
+
+        
+        try{
+        	mgr.releaseDbConnection(con);
+        }	
+        catch(Exception e){
+        	fail("Unexpected exception!");
+        }
     }
     
     @Test	
