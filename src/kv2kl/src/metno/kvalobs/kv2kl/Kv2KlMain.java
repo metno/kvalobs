@@ -51,6 +51,9 @@ public class Kv2KlMain {
 	
     public static void main(String[] args)
     {
+    	//Set the default timezone to GMT.
+    	TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
+
     	String kvpath=KlApp.getKvpath();
     	String configfile="kv2kl.conf";
     	Param[] param;
