@@ -67,8 +67,11 @@ PKG_CHECK_MODULES(cppunit, cppunit)
 KV_PERL
 AX_BOOST_BASE
 AX_BOOST_THREAD
+if test -z $BOOST_THREAD_LIB; then AC_MSG_ERROR([Unable to find boost thread library]); fi 
 AX_BOOST_REGEX
+if test -z $BOOST_REGEX_LIB; then AC_MSG_ERROR([Unable to find boost regex library]); fi 
 AX_BOOST_FILESYSTEM
+if test -z $BOOST_FILESYSTEM_LIB; then AC_MSG_ERROR([Unable to find boost filesystem library]); fi 
 KV_MODEL2KV
 
 AC_CONFIG_HEADERS(config.h)
