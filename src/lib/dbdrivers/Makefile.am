@@ -6,7 +6,7 @@ dbdriver_LTLIBRARIES = pgdriver.la dummydriver.la sqlite3driver.la sqlitedriver.
 
 pgdriver_la_SOURCES = pgdriver.h pgdriver.cc pgsqldb.h pgsqldb.cc
 pgdriver_la_CPPFLAGS = $(postgresql_CFLAGS) \
-                       $(top_srcdir)/src/lib/kvdb
+                       $(top_srcdir)/src/lib
 pgdriver_la_LDFLAGS = $(postgresql_LIBS) -module
 
 dummydriver_la_SOURCES = dummydriver.h dummydriver.cc dummysqldb.h dummysqldb.cc
