@@ -17,8 +17,7 @@ kvQabased_SOURCES = \
 	QaWorkCommand.cc QaWorkCommand.h \
 	QaWorkThread.cc QaWorkThread.h \
 	kvQABaseTypes.h \
-	kvQabased.cc \
-	ObsData.h ObsData.cc
+	kvQabased.cc
 
 kvQabased_CPPFLAGS = \
 	-I$(top_srcdir)/src/lib \
