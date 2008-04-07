@@ -5,7 +5,8 @@ dbdriverdir = $(pkglibdir)/db
 dbdriver_LTLIBRARIES = pgdriver.la dummydriver.la sqlite3driver.la sqlitedriver.la
 
 pgdriver_la_SOURCES = pgdriver.h pgdriver.cc pgsqldb.h pgsqldb.cc
-pgdriver_la_CPPFLAGS = $(postgresql_CFLAGS)
+pgdriver_la_CPPFLAGS = $(postgresql_CFLAGS) \
+                       $(top_srcdir)/src/lib/kvdb
 pgdriver_la_LDFLAGS = $(postgresql_LIBS) -module
 
 dummydriver_la_SOURCES = dummydriver.h dummydriver.cc dummysqldb.h dummysqldb.cc
