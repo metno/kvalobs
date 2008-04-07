@@ -42,25 +42,18 @@ namespace
 {
   DriverManager dm;
 
-  string getDriverPath()
-  {
-    const char * kvalobs = getenv( "KVALOBS" );
-    if ( ! kvalobs )
-      kvalobs = ".";
-    return string( kvalobs ) + "/lib/db/sqlite3driver.so";
-  }
-
   string getConnectString()
   {
     string ret;
-    if ( ! dm.loadDriver( getDriverPath(), ret ) )
+    if ( ! dm.loadDriver( DBDRIVER, ret ) )
       return string();
     return ret;
   }
 
   string getDbSetup()
   {
-    ifstream f( "test/database/setupdb.sql" );
+    ifstream f( SETUPDB_SQL );
+    //ifstream f( "test/database/setupdb.sql" );
     string ret;
     getline( f, ret, char_traits<char>::to_char_type( char_traits<char>::eof() ) );
     return ret;
@@ -74,14 +67,14 @@ const std::string KvalobsDatabase::db_memory_database_filename = ":memory:";
 void KvalobsDatabase::setup( const std::string & filename )
 {
   if ( dbConnectString.empty() )
-    throw std::runtime_error( "Unable to connect to database driver: " + getDriverPath() );
+    throw std::runtime_error( "Unable to connect to database driver: " DBDRIVER );
 
   if ( filename != db_memory_database_filename )
     boost::filesystem::remove( filename );
     
   connection_ = dm.connect( dbConnectString, filename );
   if ( dbSetup.empty() )
-    throw std::runtime_error( "Unable to find database setup file" );
+    throw std::runtime_error( "Unable to find database setup file" SETUPDB_SQL );
   connection_->exec( dbSetup );
 }
 

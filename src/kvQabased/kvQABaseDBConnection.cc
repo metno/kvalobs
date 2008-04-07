@@ -580,12 +580,12 @@ bool kvQABaseDBConnection::getObservations( const int sid,                   // 
   {
     obs_data & d = data[ it->obstime() ];
 
-    if ( std::find( d.data.begin(), d.data.end(), * it ) == d.data.end() )
-    {
+//    if ( std::find( d.data.begin(), d.data.end(), * it ) == d.data.end() )
+//    {
       IDLOGDEBUG( "html", "Found ObsData:" << * it << std::endl );
       d.time = it->obstime();
       d.data.push_back( * it );
-    }
+//    }
   }
 
   return true;

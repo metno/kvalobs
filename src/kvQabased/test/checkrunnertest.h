@@ -53,7 +53,9 @@ class CheckRunnerTest : public CppUnit::TestFixture
     CPPUNIT_TEST( testCorrectedValueWhenRejected );
     CPPUNIT_TEST( testInsertModelValueSetsCorrectUseinfo );
     CPPUNIT_TEST( testAllTypeidAreInputData );
-//     CPPUNIT_TEST( testPrefersCurrentTypeID );
+    CPPUNIT_TEST( testPrefersCurrentTypeID );
+    CPPUNIT_TEST( testHandlesSpecifiedTypeidInChecks );
+    CPPUNIT_TEST( testDoesNotCheckWhenChecksSpecifyAnotherTypeid );
     CPPUNIT_TEST_SUITE_END();
 
   public:
@@ -75,27 +77,47 @@ class CheckRunnerTest : public CppUnit::TestFixture
     void testCorrectedValueWhenRejected();
     void testInsertModelValueSetsCorrectUseinfo();
     void testAllTypeidAreInputData();
+    
+    /**
+     * Check if we control the correct typeid if several typeids exist in the 
+     * database.
+     */
     void testPrefersCurrentTypeID();
+    
+    /**
+     * Giving several data with different typeids, and checking that only the 
+     * typeid specified in the test and process command gets checked. Other 
+     * data should be left alone.
+     */
+    void testHandlesSpecifiedTypeidInChecks();
+    
+    /**
+     * We give data of typeid 302, but the checks specify that they should 
+     * only be run on typeid 303.
+     */
+    void testDoesNotCheckWhenChecksSpecifyAnotherTypeid();
 
   private:
     void runCheckRunner( const std::string & checkName );
-    template <typename InsertIterator>  void getData( InsertIterator out );
+    void runCheckRunner( const std::string & checkName, const kvalobs::kvStationInfo & si );
+    template <typename InsertIterator> InsertIterator getData( InsertIterator out );
     std::string getLogPath( const std::string & name ) const;
 
   private:
     const kvalobs::kvStationInfo stationInfo;
-    KvalobsDatabase * db;
+    std::auto_ptr<KvalobsDatabase> db;
 };
 
 
 
 template <typename InsertIterator>
-void CheckRunnerTest::getData( InsertIterator out )
+InsertIterator CheckRunnerTest::getData( InsertIterator out )
 {
   typedef std::auto_ptr<dnmi::db::Result> Result;
   Result res( db->getConnection() ->execQuery( "select * from data" ) );
   while ( res->hasNext() )
-    out = res->next();
+    out++ = res->next();
+  return out;
 }
 
 

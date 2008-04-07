@@ -1,9 +1,13 @@
 insert into model_data values ( 42, '2006-05-26 06:00:00', 110, 0, 20, 10.3 );
+insert into model_data values ( 42, '2006-05-26 06:00:00', 111, 0, 20, 11 );
+insert into model_data values (  9, '2006-05-26 06:00:00', 111, 0, 20, 12 );
 
 
 insert into station_param values (0,33,0,0,1,365,-1,'QC1-1-33','max;highest;high;low;lowest;min
 29.0;29.0;29.0;1.0;1.0;1.0','','1500-01-01 00:00:00' );
 insert into station_param values (0,110,0,0,1,365,-1,'QC1-4-110','highest;high;low;lowest;dry
+13.20;6.82;-4.06;-11.30;1.0', '', '1500-01-01 00:00:00' );
+insert into station_param values (0,111,0,0,1,365,-1,'QC1-4-111','highest;high;low;lowest;dry
 13.20;6.82;-4.06;-11.30;1.0', '', '1500-01-01 00:00:00' );
 insert into station_param values (0,112,0,0,1,365,-1,'QC1-1-34','max;highest;high;low;lowest;min
 29.0;29.0;29.0;1.0;1.0;1.0','','1500-01-01 00:00:00' );
@@ -12,22 +16,26 @@ insert into station_param values (0,42,0,0,1,365,-1,'QC1-1-35','max;highest;high
 
 
 insert into station values ( 42, 59.9427, 10.7207, 94, 0, 'Min stasjon', 1, 1,'','','',8,'t','1996-12-01 00:00:00' );
+insert into station values (  9, 59.9427, 10.7207, 94, 0, 'Min stasjon 2', 1, 1,'','','',8,'t','1996-12-01 00:00:00' );
 
 
 insert into param values (33, 'V3', 'Været ved observasjonstiden, tredje tegn', 'nasjonal kode to siffer', 0, '' );
 insert into param values (110, 'RR_24', 'Nedbør, tilvekst siste 24 timer', 'mm', 0, '' );
+insert into param values (111, 'R', 'Nedbør, tilvekst siste 14 timer', 'mm', 0, '' );
 insert into param values (112, 'SA', 'Snødybde', 'cm',0, 'nåverdi, totalt fra bakken' );
 insert into param values (42, 'W1', 'Været siden forrige hovedobservasjonstid', 'WMO-kode 4561 ett siffer', 0, '' );
 
 
 insert into obs_pgm values (42, 33, 0, 1, 302, 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't',  't', 't', '2006-05-26 06:00:00');
 insert into obs_pgm values (42, 110, 0, 1, 302, 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't',  't', 't', '2006-05-26 06:00:00');
+insert into obs_pgm values (9 , 111, 0, 1, 303, 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't',  't', 't', '2006-05-26 06:00:00');
 insert into obs_pgm values (42, 112, 0, 1, 302, 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't',  't', 't', '2006-05-26 06:00:00');
 insert into obs_pgm values (42, 42, 0, 1, 302, 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't',  't', 't', '2006-05-26 06:00:00');
 
 
 insert into checks values (0, 'QC1-1-33', 'QC1-1',1,'RANGE_CHECK','obs;V3;;|meta;V3_max,V3_highest,V3_high,V3_low,V3_lowest,V3_min;;','* * * * *' , '1500-01-01 00:00:00' );
 insert into checks values (0, 'QC1-4-110', 'QC1-4', 1, 'PROGNOSTIC SPACE_CHECK_RR' ,'obs;RR_24&0&&;;|model;RR_24&0&&;;|meta;RR_24_highest,RR_24_high,RR_24_low,RR_24_lowest,RR_24_dry;;', '* * * * *', '1500-01-01 00:00:00' );
+insert into checks values (0, 'QC1-4-111', 'QC1-4', 1, 'PROGNOSTIC SPACE_CHECK_RR' ,'obs;R&0&&303;;|model;R&0&&;;|meta;R_highest,R_high,R_low,R_lowest,R_dry;;', '* * * * *', '1500-01-01 00:00:00' );
 insert into checks values (0, 'QC1-1-34', 'QC1-1',1,'RANGE_CHECK','obs;SA;;|meta;SA_max,SA_highest,SA_high,SA_low,SA_lowest,SA_min;;','* * * * *' , '1500-01-01 00:00:00' );
 insert into checks values (0, 'QC1-1-35', 'QC1-1',1,'RANGE_CHECK','obs;W1;;|meta;W1_max,W1_highest,W1_high,W1_low,W1_lowest,W1_min;;','* * * * *' , '1500-01-01 00:00:00' );
 

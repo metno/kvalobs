@@ -42,6 +42,7 @@
 
 using namespace std;
 using namespace miutil;
+using namespace kvalobs;
 
 
 kvQABaseMeteodata::kvQABaseMeteodata( kvQABaseDBConnection & dbcon,
@@ -52,24 +53,6 @@ kvQABaseMeteodata::kvQABaseMeteodata( kvQABaseDBConnection & dbcon,
     , medium_qcx_( "" )
     , saveCache_( dbcon )
 {}
-
-// clear datalists
-void
-kvQABaseMeteodata::clear()
-{
-  obsdata.clear();
-  textdata.clear();
-  modeldata.clear();
-
-  minObsTime_.clear();
-  maxObsTime_.clear();
-
-  minTextTime_.clear();
-  maxTextTime_.clear();
-
-  minModelTime_.clear();
-  maxModelTime_.clear();
-}
 
 /*
   load all observation-data for one station, several timesteps
@@ -129,6 +112,15 @@ kvQABaseMeteodata::loadObsData( const int sid,
                 << endl );
     return false;
   }
+  
+//  cout << "From database:" << endl;
+//  for ( std::map<miutil::miTime, kvQABaseDBConnection::obs_data>::const_iterator mit = obsdata[sid].begin(); mit != obsdata[sid].end(); ++ mit ) {
+//    cout << mit->first << endl;
+//    const std::vector<kvalobs::kvData> & d = mit->second.data;
+//    for ( std::vector<kvalobs::kvData>::const_iterator it = d.begin(); it != d.end(); ++ it )
+//      cout << "\t\t" << * it << endl;
+//  }
+    
   return true;
 }
 
@@ -311,7 +303,7 @@ kvQABaseMeteodata::data_asPerl( const string qcx,                               
 
   skipcheck = false;
   // using observation_program // if normal station:
-  if ( oplist.size() > 0 )
+  if ( ! oplist.empty() )
   {
     // ensure that requested obs.parameters are active in observation_program
     kvObsPgmList::const_iterator itrop;
@@ -326,19 +318,8 @@ kvQABaseMeteodata::data_asPerl( const string qcx,                               
       IDLOGINFO( "html", "Checking obs_pgm for par:" << vname
                  << " nr:" << pid << endl );
       for ( itrop = oplist.begin(); itrop != oplist.end(); itrop++ )
-      {
         if ( itrop->paramID() == pid )
-        {
           break;
-          /* ============= REMOVED 2003-12-18
-          //  if (itrop->collector()) // collector: always check
-          //    break;
-          //  if (!itrop->isOn(obstime_)) // is parameter inactive?
-          //    skipcheck= true;
-          //  break;
-          */
-        }
-      }
       if ( skipcheck || itrop == oplist.end() )
       {
         // parameter inactive or not found in obs_program
@@ -480,12 +461,47 @@ kvQABaseMeteodata::data_asPerl( const string qcx,                               
   return true;
 }
 
+kvQABaseMeteodata::DataFromTime & kvQABaseMeteodata::preloadData(const kvalobs::kvStationInfo & si)
+{
+  if ( obsdata.find( si.stationID() ) == obsdata.end() )
+    if ( ! loadObsData( si.stationID(), 0, 0 ) )
+      throw std::runtime_error( "Error on preread of data table" );
+
+  DataFromTime & ret = obsdata[ si.stationID() ];
+  return ret;
+}
+
+void kvQABaseMeteodata::resetFlags(const kvalobs::kvStationInfo & si)
+{
+  DataFromTime & data_ = preloadData(si);
+
+  for ( DataFromTime::iterator it = data_.begin(); it != data_.end(); ++ it )
+  {
+    typedef kvQABaseDBConnection::obs_data::Container KvDL;
+    KvDL & dl = it->second.data;
+    for ( KvDL::iterator itb = dl.begin(); itb != dl.end(); ++ itb )
+    {
+      int missing = itb->controlinfo().flag( flag::fmis );
+      int collected = itb->controlinfo().flag( flag::fd );
+      kvControlInfo ci;
+      ci.set( flag::fmis, missing );
+      ci.set( flag::fd, collected );
+      itb->controlinfo( ci );
+      
+      kvUseInfo ui = itb->useinfo();
+      for ( int i = 0; i < 5; ++ i )
+        ui.set( i, 9 );
+      ui.set( 15, 0 );
+      itb->useinfo( ui );
+    }
+  }
+}
+
 
 bool
 kvQABaseMeteodata::fillObsVariables( kvQABase::script_var & vars )
 {
-  typedef std::set
-    <int> TimeOffsets;
+  typedef std::set<int> TimeOffsets;
   TimeOffsets alltimes; // unique list of timeoffsets
 
   for ( vector<int>::iterator pp = vars.allpos.begin(); pp != vars.allpos.end(); pp++ )
@@ -552,6 +568,14 @@ kvQABaseMeteodata::fillObsVariables( kvQABase::script_var & vars )
         - specific typeID OR the original stationinfo.typeID()!!
         ( -typeID == typeID )
         */
+        
+        // The following two loops should probably be written better some time:
+        //
+        // The sum of the two loops is: in case a check parameter wants _any_ 
+        // typeid, we prefer the parameter with typeid from the incoming data
+        // (stationinfo_), before any others. This is done in loop 1. If no 
+        // such typeid/parameter exists we try to find any other one (in 
+        // loop 2).
                 
         // look for exact match:
         for ( find = container_.begin(); find != container_.end(); ++ find )
@@ -562,12 +586,14 @@ kvQABaseMeteodata::fillObsVariables( kvQABase::script_var & vars )
                || abs( find->typeID() ) == abs( tid ) ) )
             break;
         // or exact except typeID:
-        if ( find == container_.end() )
+        if ( find == container_.end() && tid == -32767)
           for ( find = container_.begin(); find != container_.end(); ++ find )
             if ( find->paramID() == vid &&
                  ( sid == -32767 || find->sensor() == sid ) &&
-                 ( lid == -32767 || find->level() == lid ) )
+                 ( lid == -32767 || find->level() == lid ) ) {
+//              cout << "FOUND: " << find->typeID() << " (looked for " << tid << ")" << endl;
               break;
+            }
         if ( find != container_.end() ) // found
         {
           IDLOGDEBUG( "html", "Found OBSERVATION parameter:" << vname
@@ -692,8 +718,7 @@ kvQABaseMeteodata::fillObsVariables( kvQABase::script_var & vars )
 bool
 kvQABaseMeteodata::fillModelVariables( kvQABase::script_var& vars )
 {
-  set
-    <int> alltimes; // unique list of timeoffsets
+  set<int> alltimes; // unique list of timeoffsets
 
   vector<int>::iterator pp = vars.allpos.begin();
   for ( ; pp != vars.allpos.end(); pp++ )
@@ -774,8 +799,7 @@ kvQABaseMeteodata::fillModelVariables( kvQABase::script_var& vars )
 
   // update complete set of timeoffsets (in reverse order)
   vars.alltimes.clear();
-  set
-    <int>::reverse_iterator rt = alltimes.rbegin();
+  set<int>::reverse_iterator rt = alltimes.rbegin();
   for ( ; rt != alltimes.rend(); rt++ )
     vars.alltimes.push_back( *rt ); // add timestep to list
 
@@ -1024,7 +1048,7 @@ void kvQABaseMeteodata::updateSingleParam( ObsKeys & updated_obs,
     return ;
   }
   string type( key, pos + 1, string::npos );
-  transform( type.begin(), type.end(), type.begin(), ( int( * ) ( int ) ) tolower ); // convert type to lowercase
+  transform( type.begin(), type.end(), type.begin(), (int(*)(int))tolower ); // convert type to lowercase
 
   try
   {

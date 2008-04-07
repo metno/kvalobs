@@ -29,7 +29,7 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include "checkrunnertest.h"
-#include "../src/checkrunner.h"
+#include "../checkrunner.h"
 #include <string>
 #include <fstream>
 #include <iterator>
@@ -58,34 +58,41 @@ CheckRunnerTest::CheckRunnerTest()
 CheckRunnerTest::~CheckRunnerTest()
 {}
 
+namespace
+{
+  std::string getInitSqlStatement() {
+    ifstream f( CHECKRUNNERTEST_INIT_SQL );
+    if ( ! f )
+      throw std::runtime_error( "Test file not found: " CHECKRUNNERTEST_INIT_SQL );
+    std::string ret;
+    getline( f, ret, char_traits<char>::to_char_type( char_traits<char>::eof() ) );
+    return ret;
+  }
+}
 
 void CheckRunnerTest::setUp()
 {
-  db = new KvalobsDatabase;
+  db = std::auto_ptr<KvalobsDatabase>( new KvalobsDatabase );
 
   // Setup db:
-  static string init_sql_statement;
-  if ( init_sql_statement.empty() )
-  {
-    ifstream f( "test/etc/checkrunnertest.init.sql" );
-    if ( ! f )
-      throw std::runtime_error( "Test file not found" );
-    getline( f, init_sql_statement, char_traits<char>::to_char_type( char_traits<char>::eof() ) );
-  }
+  static const string init_sql_statement = getInitSqlStatement();
   db->getConnection() ->exec( init_sql_statement );
 }
 
 
 void CheckRunnerTest::tearDown()
 {
-  delete db;
-  db = 0;
 }
 
 
 void CheckRunnerTest::runCheckRunner( const std::string & checkName )
 {
-  CheckRunner checkRunner( stationInfo, * db->getConnection(), getLogPath( checkName ) );
+  runCheckRunner(checkName, stationInfo);
+}
+
+void CheckRunnerTest::runCheckRunner( const std::string & checkName, const kvalobs::kvStationInfo & si )
+{
+  CheckRunner checkRunner( si, * db->getConnection(), getLogPath( checkName ) );
   checkRunner();
 }
 
@@ -135,6 +142,11 @@ void CheckRunnerTest::testNormal()
   CPPUNIT_ASSERT_EQUAL( ui, outData.useinfo() );
 }
 
+namespace
+{
+  kvalobs::compare::exactly_equal eq_;
+}
+
 
 void CheckRunnerTest::testSkipHqc()
 {
@@ -151,16 +163,8 @@ void CheckRunnerTest::testSkipHqc()
   CPPUNIT_ASSERT_EQUAL( size_t( 1 ), result.size() );
   const kvData & outData = result.front();
 
-  CPPUNIT_ASSERT( kvalobs::hqc::hqc_accepted( outData ) );
-
-  /*  kvalobs::kvUseInfo ui;
-    ui.setUseFlags( outData.controlinfo() );
-    CPPUNIT_ASSERT_EQUAL( ui, outData.useinfo() );*/
-}
-
-namespace
-{
-  kvalobs::compare::exactly_equal eq_;
+//  CPPUNIT_ASSERT( kvalobs::hqc::hqc_accepted( outData ) );
+  CPPUNIT_ASSERT( eq_(inData, outData) );
 }
 
 
@@ -411,4 +415,76 @@ void CheckRunnerTest::testPrefersCurrentTypeID()
   it = result.find( inData3 );
   CPPUNIT_ASSERT( it != result.end() );
   CPPUNIT_ASSERT_EQUAL( kvControlInfo(), it->controlinfo() );  
+}
+
+namespace
+{
+  struct hasTypeId
+  {
+    const int wanted;
+    hasTypeId(int wantedTypeId) : wanted(wantedTypeId) {}
+    bool operator () (const kvalobs::kvData & d ) {
+      return d.typeID() == wanted;
+    }
+  };  
+}
+
+
+void CheckRunnerTest::testHandlesSpecifiedTypeidInChecks()
+{
+  // This differs from testPrefersCurrentTypeID in that the checks table 
+  // specifies that the checks for paramid 111 only applies to typeid 303.
+  
+  kvDataFactory fa( 9, "2006-05-26 06:00:00", 102 );
+  const kvalobs::kvData bogusDataA = fa.getData( 0, 111 );
+  db->getConnection() ->exec( "insert into data values " + bogusDataA.toSend() );
+
+  kvDataFactory fb( 9, "2006-05-26 06:00:00", 303 );
+  const kvalobs::kvData inData = fb.getData( 100000, 111 );
+  db->getConnection() ->exec( "insert into data values " + inData.toSend() );
+
+  kvDataFactory fc( 9, "2006-05-26 06:00:00", 304 );
+  const kvalobs::kvData bogusDataB = fc.getData( 0, 111 );
+  db->getConnection() ->exec( "insert into data values " + bogusDataB.toSend() );
+
+  
+  kvalobs::kvStationInfo si( 9, "2006-05-26 06:00:00", 303 );
+  runCheckRunner( __func__, si );
+  
+  vector<kvData> result;
+  getData( back_inserter( result ) );
+  CPPUNIT_ASSERT_EQUAL( size_t( 3 ), result.size() );
+
+  vector<kvData>::const_iterator find;
+  
+  find = std::find_if(result.begin(), result.end(), hasTypeId(303));
+  CPPUNIT_ASSERT(find != result.end());
+  CPPUNIT_ASSERT_EQUAL(4, find->controlinfo().flag(kvalobs::flag::fnum));
+  
+  find = std::find_if(result.begin(), result.end(), hasTypeId(102));
+  CPPUNIT_ASSERT(find != result.end());
+  CPPUNIT_ASSERT(eq_(bogusDataA, * find));
+  
+  find = std::find_if(result.begin(), result.end(), hasTypeId(304));
+  CPPUNIT_ASSERT(find != result.end());
+  CPPUNIT_ASSERT(eq_(bogusDataB, * find));
+}
+
+void CheckRunnerTest::testDoesNotCheckWhenChecksSpecifyAnotherTypeid()
+{
+  kvDataFactory fa( 9, "2006-05-26 06:00:00", 302 );
+  const kvalobs::kvData inData = fa.getData( 21, 111 );
+  db->getConnection()->exec( "insert into data values " + inData.toSend() );
+    
+  kvalobs::kvStationInfo si( 9, "2006-05-26 06:00:00", 302 );
+  runCheckRunner( __func__, si );
+ 
+  vector<kvData> result;
+  getData( back_inserter( result ) );
+  CPPUNIT_ASSERT_EQUAL( size_t( 1 ), result.size() );
+  
+  const kvData & outData = result.front();
+  
+  CPPUNIT_ASSERT_EQUAL(inData.controlinfo(), outData.controlinfo());
+  CPPUNIT_ASSERT(eq_(inData, outData));
 }

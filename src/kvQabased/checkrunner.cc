@@ -108,7 +108,7 @@ CheckRunner::~CheckRunner()
 
 bool CheckRunner::shouldProcess()
 {
-  // Skip stations with typeid < 0 (aggregated values) (by Vegard Bnes)
+  // Skip stations with typeid < 0 (aggregated values)
   if ( stinfo.typeID() < 0 ) {
     log_( "Incoming data are agregated" );
     return false;
@@ -138,10 +138,10 @@ bool CheckRunner::shouldProcess()
   return true;
 }
 
-// Return if any data has been modified by HQC (ugly and temporary hack) (by Vegard Bnes):
+// Return if any data has been modified by HQC
 bool CheckRunner::hqcCorrected()
 {
-  const kvQABaseMeteodata::DataFromTime & data_ = getCheckData();
+  const kvQABaseMeteodata::DataFromTime & data_ = meteod.getData();
 
   for ( kvQABaseMeteodata::DataFromTime::const_iterator it = data_.begin(); it != data_.end(); ++ it )
   {
@@ -156,15 +156,17 @@ bool CheckRunner::hqcCorrected()
 
 bool CheckRunner::dataWasCheckedBefore()
 {
-  const kvQABaseMeteodata::DataFromTime & data_ = getCheckData();
+  const kvQABaseMeteodata::DataFromTime & data_ = meteod.getData();
 
   for ( kvQABaseMeteodata::DataFromTime::const_iterator it = data_.begin(); it != data_.end(); ++ it )
   {
     typedef kvQABaseDBConnection::obs_data::Container KvDL;
     const KvDL & dl = it->second.data;
-    for ( KvDL::const_iterator itb = dl.begin(); itb != dl.end(); ++ itb )
+    for ( KvDL::const_iterator itb = dl.begin(); itb != dl.end(); ++ itb ) {
+//      cout << "Considering: " << * itb << endl;
       if ( itb->typeID() == stinfo.typeID() and itb->useinfo().flag( 0 ) == 9 )
         return false;
+    }
   }
   return true;
 }
@@ -222,8 +224,16 @@ string CheckRunner::getMeteoData( const kvalobs::kvChecks & check, kvQABaseScrip
 {
   string ret;
   bool skipcheck = false;
+
+//  cout << "REQUEST:\n";
+//  cout << '\t' << check.qcx() << "\t-\t" << check.checkname() << endl;
+//  cout << '\t' << check.checksignature() << endl;
+//  for (kvObsPgmList::const_iterator it = oprogramlist.begin(); it != oprogramlist.end(); ++ it )
+//    cout << "\t\t" << it->stationID() << ", " << it->paramID() << ", " << it->typeID() << endl;
+  
   if ( ! meteod.data_asPerl( check.qcx(), check.medium_qcx(), check.language(), sman, oprogramlist, skipcheck, ret ) )
     throw runtime_error( "CheckRunner::runChecks failed in meteod.data_asPerl" );
+  
   if ( skipcheck )
     throw SkipCheck();
   return ret;
@@ -252,45 +262,11 @@ string CheckRunner::getScript( const kvChecks & check, kvQABaseMetadata & metad,
   string metaData = getMetaData( check, metad, sman );
 
   checkstr << metaData << meteoData << perlScript;
+  
+//  cout << "\n------------------------------------------------------------------\n\n";
+//  cout << checkstr.str() << endl; 
 
   return checkstr.str();
-}
-
-
-void CheckRunner::resetFlags()
-{
-  kvQABaseMeteodata::DataFromTime & data_ = getCheckData();
-
-  for ( kvQABaseMeteodata::DataFromTime::iterator it = data_.begin(); it != data_.end(); ++ it )
-  {
-    typedef kvQABaseDBConnection::obs_data::Container KvDL;
-    KvDL & dl = it->second.data;
-    for ( KvDL::iterator itb = dl.begin(); itb != dl.end(); ++ itb )
-    {
-      int missing = itb->controlinfo().flag( flag::fmis );
-      int collected = itb->controlinfo().flag( flag::fd );
-      kvControlInfo ci;
-      ci.set( flag::fmis, missing );
-      ci.set( flag::fd, collected );
-      itb->controlinfo( ci );
-      
-      kvUseInfo ui = itb->useinfo();
-      for ( int i = 0; i < 5; ++ i )
-        ui.set( i, 9 );
-      ui.set( 15, 0 );
-      itb->useinfo( ui );
-    }
-  }
-}
-
-kvQABaseMeteodata::DataFromTime & CheckRunner::getCheckData()
-{
-  if ( meteod.obsdata.find( stinfo.stationID() ) == meteod.obsdata.end() )
-    if ( ! meteod.loadObsData( stinfo.stationID(), 0, 0 ) )
-      throw std::runtime_error( "CheckRunner: Error on preread of data table" );
-
-  kvQABaseMeteodata::DataFromTime & ret = meteod.obsdata[ stinfo.stationID() ];
-  return ret;
 }
 
 
@@ -314,10 +290,13 @@ void CheckRunner::runCheck( const kvalobs::kvChecks & check, kvQABaseMetadata & 
   }
 
   // Writing the script to be run to html:
-  //  log_( "Final checkstring:" );
-  //  log_( "<font color=#007700>" );
-  //  log_( final_check );
-  //  log_( "</font>" );
+#define LOG_CHECK_SCRIPT
+#ifdef LOG_CHECK_SCRIPT  
+    log_( "Final checkstring:" );
+    log_( "<font color=#007700>" );
+    log_( final_check );
+    log_( "</font>" );
+#endif
 
   /* ----- run check ---------------------------------- */
   kvPerlParser parser;                // the perlinterpreter
@@ -364,13 +343,13 @@ void CheckRunner::operator() ( bool forceCheck )
   kvQABaseMetadata metad( dbcon );      // Metadata manager
   kvQABaseScriptManager sman( dbcon );  // Perlscript manager
 
-  // find relevant checks (QC1) for this observation
+  //  relevant checks (QC1) for this observation
   list<kvChecks> checks;
   findChecks( checks );
   if ( checks.empty() )
     return logEnd_( "No appropriate checks found" );
 
-  resetFlags();
+  meteod.resetFlags(stinfo);
     
   // Loop through checks
   for ( list<kvChecks>::const_iterator cp = checks.begin(); cp != checks.end(); ++ cp )
@@ -457,114 +436,3 @@ HtmlStream * CheckRunner::openHTMLStream()
   }
   return html;
 }
-
-//COMMENT:
-//22072003 Bxrge Moe
-//I have replaced the call of 'system' to run a shell command with a
-//a call to mkdir. We have greater control of the creation of the
-//directory. The regression system asumes that logdir is set up via
-//symblolic links and manipulates the links. In this senario we never
-//know where the links points or if the link is in a state of chance. We
-//have a race between us and the regression system. It is better that we
-//test and create a directory in a controlled way. We never creates a log
-//file if the the top most part of the directory dont exist ie. the link
-//does not exist. In this senario we may lose a logfile or two, but that
-//is not critical. In the case where the link is missing we open /dev/null
-//as the logfile.
-//
-//This solution is not bullet prof if the regresion system copys files
-//and a file that is written to by us is at the same time read by the
-//regression system. But it works as a quick fix.
-
-/*
-HtmlStream * CheckRunner::openHTMLStream()
-{
-  HtmlStream * html;
-  ostringstream ost;
-  list<string> pathlist;
-  bool error = false;
-
-  ost << stinfo.stationID();
-
-  try
-  {
-    html = new HtmlStream();
-  }
-  catch ( ... )
-  {
-    LOGERROR( "OUT OF MEMMORY, cant allocate HtmlStream!" );
-    return 0;
-  }
-
-  pathlist.push_back( ost.str() );
-  pathlist.push_back( stinfo.obstime().isoDate() );
-
-  ost.str( "" );
-  //logpath_ is the directory where we shall put our
-  //html files.
-  ost << logpath_;
-
-  for ( list<string>::iterator it = pathlist.begin();
-        it != pathlist.end() && !error;
-        it++ )
-  {
-    ost << "/" << *it;
-    std::string ost_out = ost.str();
-    if ( mkdir( ost_out.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH ) < -1 )
-    {
-      if ( errno == EEXIST )
-      {
-        continue;
-      }
-      else
-      {
-        error = true;
-      }
-    }
-  }
-
-  if ( error )
-  {
-    LOGINFO( "CheckRunner::runChecks for station:" << stinfo.stationID()
-             << " and obstime:" << stinfo.obstime() << endl
-             << "Logging all activity to: /dev/null" << endl
-             << "A directory in the logpath maybe missing or a dangling link!" );
-    html->open( "/dev/null" );
-    return html;
-  }
-
-  //log version info:
-  std::string version = "";
-  
-  
-  ost << "/log-" << stinfo.obstime().isoClock() << version << ".html";
-
-  miutil::miString logfilename = ost.str();
-  logfilename.replace( ":", "-" );
-
-  LOGINFO( "CheckRunner::runChecks for station:" << stinfo.stationID()
-           << " and obstime:" << stinfo.obstime() << endl
-           << "Logging all activity to:" << logfilename << endl );
-
-
-  if ( !html->open( logfilename ) )
-  {
-    LOGERROR( "Failed to create logfile for the html output. Filename:\n" <<
-              logfilename << "\nUsing /dev/null!" );
-    html->open( "/dev/null" );
-  }
-
-  Logger::createLogger( "html", html );
-//   Logger::logger( "html" ).logLevel( INFO );
-  Logger::logger("html").logLevel( DEBUG );
-
-  IDLOGINFO( "html", "<h1>"
-             << "CheckRunner::runChecks for station:" << stinfo.stationID()
-             << " and obstime:" << stinfo.obstime()
-             << "</h1>" << endl );
-  IDLOGINFO( "html", "<CODE><PRE>" );
-
-
-  return html;
-}
-  */

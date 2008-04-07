@@ -37,6 +37,8 @@
 #include <milog/milog.h>
 #include <kvalobs/kvChecks.h>
 #include "kvQABaseDBConnection.h"
+//#include "ObsData.h"
+//typedef ObsData kvQABaseMeteodata;
 #include "kvQABaseMeteodata.h"
 #include "kvQABaseTypes.h"
 #include <boost/filesystem/path.hpp>
@@ -106,8 +108,6 @@ class CheckRunner
     bool dataWasCheckedBefore();
     void updateStaticVariables();
     void findChecks( std::list<kvalobs::kvChecks> & out );
-    void resetFlags();
-    kvQABaseMeteodata::DataFromTime & getCheckData();
 
     void runCheck( const kvalobs::kvChecks & check, kvQABaseMetadata & metad, kvQABaseScriptManager & sman );
 

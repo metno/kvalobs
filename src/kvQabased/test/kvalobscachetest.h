@@ -32,8 +32,8 @@
 #define KVALOBSCACHETEST_H
 
 #include <cppunit/extensions/HelperMacros.h>
-#include "../src/kvalobscache.h"
-#include "../src/kvQABaseDBConnection.h"
+#include "../kvalobscache.h"
+#include "../kvQABaseDBConnection.h"
 #include "database/kvalobsdatabase.h"
 
 /**

@@ -68,10 +68,12 @@ class kvQABaseMeteodata
     kvQABase::script_var obs_vars, refobs_vars, model_vars;
 
     // Allows access to obsdata, so method shouldProcess may cache the data it needs to look up:
-    friend class CheckRunner;
+//    friend class CheckRunner;
     
     /// observations by station-id and time
+public:
     typedef std::map<miutil::miTime, kvQABaseDBConnection::obs_data> DataFromTime;
+private:
     typedef std::map<int, DataFromTime> DataFromStTime;
     DataFromStTime obsdata;
     /// text_data by station-id and time
@@ -122,16 +124,25 @@ class kvQABaseMeteodata
 
     typedef std::map<std::string, double> ScriptReturnType;
 
+    const DataFromTime & getData()
+    {
+      return preloadData();
+    }
+    
+    void resetFlags(const kvalobs::kvStationInfo & si);
+    
     /**
       - Update parameters with return-variables from check.
       - Finally save parameters to DB
     */
     bool updateParameters( const ScriptReturnType & params );
 
-    /// clear data
-    void clear();
-
   private:
+    DataFromTime & preloadData(const kvalobs::kvStationInfo & si);
+    DataFromTime & preloadData() {
+      return preloadData(stationinfo_);
+    }
+    
     /**
      * @param param a name-value pair from check.
      * @param newdata write changes here.
