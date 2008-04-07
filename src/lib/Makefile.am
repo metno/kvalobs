@@ -1,6 +1,8 @@
 SUBDIRS = \
 	kvskel \
 	miutil \
+	kvalobs \
+	kvdb \
 	decodeutility \
 	dbdrivers \
 	corbahelper \
@@ -8,6 +10,4 @@ SUBDIRS = \
 	miconfparser \
 	dnmithread \
 	fileutil \
-	kvdb \
-	kvalobs \
 	decoder
