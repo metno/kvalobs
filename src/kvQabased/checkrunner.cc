@@ -290,7 +290,7 @@ void CheckRunner::runCheck( const kvalobs::kvChecks & check, kvQABaseMetadata & 
   }
 
   // Writing the script to be run to html:
-#define LOG_CHECK_SCRIPT
+//#define LOG_CHECK_SCRIPT
 #ifdef LOG_CHECK_SCRIPT  
     log_( "Final checkstring:" );
     log_( "<font color=#007700>" );
