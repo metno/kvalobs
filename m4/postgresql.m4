@@ -45,7 +45,7 @@ AC_DEFUN([KV_POSTGRESQL],
 	)
 
 	if test $PG_CONFIG -a -x $PG_CONFIG; then
-		postgresql_CFLAGS=`$PG_CONFIG --includedir`
+		postgresql_CFLAGS="-I`$PG_CONFIG --includedir`"
 		AC_SUBST(postgresql_CFLAGS)
 		postgresql_LIBS="-L`$PG_CONFIG --libdir` -lpq"
 		AC_SUBST(postgresql_LIBS)
