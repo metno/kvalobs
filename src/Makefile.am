@@ -10,4 +10,5 @@ SUBDIRS = \
 	kvAgregated  \
 	model2kv \
 	kv2kro2 \
-	kvalobs_database
+	kvalobs_database \
+	script

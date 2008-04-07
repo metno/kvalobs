@@ -54,6 +54,8 @@ AC_CONFIG_FILES([Makefile
                 src/model2kv/Makefile
                 src/kv2kro2/Makefile
                 src/kvalobs_database/Makefile
+                src/script/Makefile
+                src/script/kv/Makefile
 ])
 
 
