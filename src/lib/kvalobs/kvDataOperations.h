@@ -79,15 +79,33 @@ namespace kvalobs
   kvData getMissingKvData( int stationID, const miutil::miTime & obsTime,
 			   int paramID, int typeID, int sensor, int level );
 
+  /**
+   * Creates kvData objects, beloning to a specific "observation", consisting 
+   * of stationid, observation time and typeid, along with sensor and level.
+   * Created objects will have all these parameters, but with the option to
+   * respecify observation time when creating an object. This is to support 
+   * creation of type 302-type observation, which has three different obstimes
+   * in the same observation.  
+   */
   class kvDataFactory
   {
     public:
       kvDataFactory( int stationID, const miutil::miTime & obsTime, int typeID, int sensor = 0, int level = 0 );
 
+      /**
+       * Create a factory for creating observation data logically beloning to 
+       * the given input.
+       */
       explicit kvDataFactory( const kvData & data );
 
+      /**
+       * Get a missing parameter for the given observation.
+       */
       kvData getMissing( int paramID, const miutil::miTime & obsTime = miutil::miTime() ) const;
 
+      /**
+       * Get one piece of data for the observation.
+       */
       kvData getData( float val, int paramID, const miutil::miTime & obsTime = miutil::miTime() ) const;
 
     private:
