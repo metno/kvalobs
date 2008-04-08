@@ -89,6 +89,7 @@ private:
   bool sat_;
   bool sun_;
   miutil::miTime fromtime_;
+  miutil::miTime totime_;
 
 public:
 
@@ -96,9 +97,9 @@ public:
   kvObsPgm(const dnmi::db::DRow& r) {set(r);} 
   kvObsPgm( int stationid,
             int paramid,
-	    int level,
+	         int level,
             int nr_sensor,
-	    int typ,
+	         int typ,
             bool collector,
             bool kl00,
             bool kl01,
@@ -131,14 +132,20 @@ public:
             bool fri,
             bool sat,
             bool sun,
-            const miutil::miTime& fromtime )
-  { set(stationid, paramid, level, nr_sensor, typ, collector, kl00, kl01, kl02, kl03, kl04, kl05, kl06, kl07, kl08, kl09, kl10, kl11, kl12, kl13, kl14, kl15, kl16, kl17, kl18, kl19, kl20, kl21, kl22, kl23, mon, tue, wed, thu, fri, sat, sun, fromtime);}
+            const miutil::miTime& fromtime,
+            const miutil::miTime& totime )
+  { set( stationid, paramid, level, nr_sensor, typ, collector, 
+		   kl00, kl01, kl02, kl03, kl04, kl05, kl06, kl07, kl08, 
+		   kl09, kl10, kl11, kl12, kl13, kl14, kl15, kl16, kl17,
+		   kl18, kl19, kl20, kl21, kl22, kl23, 
+		   mon, tue, wed, thu, fri, sat, sun, 
+		   fromtime, totime);}
 
   bool set( int stationid,
             int paramid,
             int level,
             int nr_sensor,
-	    int typ,
+	         int typ,
             bool collector,
             bool kl00,
             bool kl01,
@@ -171,7 +178,8 @@ public:
             bool fri,
             bool sat,
             bool sun,
-            const miutil::miTime& fromtime );
+            const miutil::miTime& fromtime,
+            const miutil::miTime& totime);
 
   bool set(const dnmi::db::DRow&);
   char* tableName() const {return "obs_pgm";}
@@ -216,6 +224,7 @@ public:
   bool sat()                const {return sat_; }
   bool sun()                const {return sun_; }
   miutil::miTime fromtime() const {return fromtime_; }
+  miutil::miTime totime() const   {return totime_; }
 
   bool isOn(const miutil::miTime&) const;
   };

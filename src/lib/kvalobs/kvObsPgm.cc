@@ -75,16 +75,17 @@ miString kvalobs::kvObsPgm::toSend() const
        << quoted(fri_)            << ","
        << quoted(sat_)            << ","
        << quoted(sun_)            << ","
-       << quoted(fromtime_)            << ")";
+       << quoted(fromtime_)       << ","
+       << quoted(totime_)         << ")";
    return ost.str();
 }
 
 
 bool kvalobs::kvObsPgm::set( int stationid,
                              int paramid,
-			     int level,
-			     int nr_sensor,
-			     int typ,
+                             int level,
+                             int nr_sensor,
+                             int typ,
                              bool collector,
                              bool kl00,
                              bool kl01,
@@ -117,7 +118,8 @@ bool kvalobs::kvObsPgm::set( int stationid,
                              bool fri,
                              bool sat,
                              bool sun,
-                             const miutil::miTime& fromtime ){
+                             const miutil::miTime& fromtime,
+                             const miutil::miTime& totime){
   stationid_ = stationid;
   paramid_   = paramid;
   level_     = level;
@@ -156,6 +158,7 @@ bool kvalobs::kvObsPgm::set( int stationid,
   sat_ = sat;
   sun_ = sun;
   fromtime_ = fromtime;
+  totime_ = totime;
   sortBy_= miString(stationid_);
   return true;
 }
@@ -248,6 +251,8 @@ bool kvalobs::kvObsPgm::set(const dnmi::db::DRow& r_)
         sun_= (buf=="t") ? true : false;
       }else if(*it=="fromtime"){
         fromtime_=miTime(buf);
+      }else if(*it=="totime"){
+         totime_=miTime(buf);
       }
     }
     catch(...){
@@ -348,10 +353,12 @@ kvalobs::kvObsPgm::uniqueKey()const
 {
   ostringstream ost;
   
-  ost << " WHERE stationid=" << stationid_ << " AND "
-      << "       paramid="   << paramid_   << " AND "
-      << "       level="     << level_     << " AND "
-      << "       fromtime="   << quoted(fromtime_.isoTime());
+  ost << " WHERE stationid=" << stationid_                  << " AND "
+      << "       typeid="    << typeid_                     << " AND " 
+      << "       paramid="   << paramid_                    << " AND "
+      << "       level="     << level_                      << " AND "
+      << "       fromtime="  << quoted(fromtime_.isoTime()) << " AND " 
+      << "       totime="    << quoted(totime_.isoTime());
  
   return ost.str();
 }
