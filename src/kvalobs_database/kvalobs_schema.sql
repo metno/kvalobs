@@ -293,10 +293,11 @@ CREATE TABLE obs_pgm (
 	sat	BOOLEAN DEFAULT FALSE,
 	sun	BOOLEAN DEFAULT FALSE,
         fromtime TIMESTAMP NOT NULL,
-	UNIQUE ( stationid, paramid, level, fromtime )	
+        totime   TIMESTAMP DEFAULT NULL,
+	UNIQUE ( stationid, typeid, paramid, level, fromtime, totime )	
 );
 
-CREATE INDEX obs_pgm_index_fromtime_typeid_stationid ON obs_pgm (fromtime, typeid, stationid);
+CREATE INDEX obs_pgm_index_fromtime_totime_typeid_stationid ON obs_pgm (fromtime, totime, typeid, stationid);
 
 CREATE TABLE operator (
 	username TEXT NOT NULL,
