@@ -47,6 +47,7 @@ if [ x$2 != x ]; then
 fi 
 
 case $1 in 
+    --prefix) echo @prefix@	;;
     --bindir) echo @bindir@	;;
     --libexecdir) echo @libexecdir@ ;;
 	--libdir) echo @libdir@ ;;
@@ -65,7 +66,7 @@ case $1 in
 		echo 
 		echo Use exactly one of the following options:
 		echo
-		echo --bindir --libexecdir --libdir --datadir --sysconfdir --localstatedir --version --help
+		echo --prefix --bindir --libexecdir --libdir --datadir --sysconfdir --localstatedir --version --help
 	;;
     *) 
     	echo Unkonwn option: $1
