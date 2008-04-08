@@ -179,6 +179,7 @@ module CKvalObs{
       boolean sat;
       boolean sun;
       string  fromtime;
+      string  totime;
     };
 
     typedef sequence<Obs_pgm> Obs_pgmList;
