@@ -158,6 +158,7 @@ addToObsPgmList(CKvalObs::CService::Obs_pgmList &pgmList,
     pgm.sat=it->sat();
     pgm.sun=it->sun();
     pgm.fromtime=it->fromtime().isoTime().c_str();
+    pgm.totime=it->totime().isoTime().c_str();
       
 
     if(aUnion){
