@@ -379,7 +379,8 @@ namespace kvservice
 			  (*obspgm)[i].sat,
 			  (*obspgm)[i].sun,
 			  // UNDEF:
-			  miutil::miTime((*obspgm)[i].fromtime)
+			  miutil::miTime((*obspgm)[i].fromtime),
+			  miutil::miTime((*obspgm)[i].totime)
 			  );
 	    obsPgmList.push_back(obsp);
 	  }
