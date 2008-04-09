@@ -483,7 +483,7 @@ kvQueries::selectObsPgm(long stationid,
 
 /*
   Select all entries from obs_pgm matching typeid and
-  valid fromtime and totime
+  valid fromtime and totime.
   - Sort by stationid.
   - Valid fromtime is found by using a 'correlated subquery'
 */
@@ -497,7 +497,7 @@ kvQueries::selectObsPgmByTypeid(long tid,
 	ost << " WHERE typeid=" << tid << " AND "
 	    << "       (( fromtime<=" << obst << " AND totime>" << obst << ") OR "
 	    << "        ( fromtime<=" << obst << " AND totime IS NULL ) "
-	    << "       ) ORDER BY paramid";
+	    << "       ) ORDER BY stationid, typeid";
 /*    
   ost << " OP1 WHERE OP1.typeid=" << tid   
       << " AND OP1.fromtime=("
