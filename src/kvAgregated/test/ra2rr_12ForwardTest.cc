@@ -52,7 +52,7 @@ void ra2rr_12ForwardTest::testGetTimeSpanAtGenerationPoint()
 {
 	const kvalobs::kvDataFactory dataFactory( 42, "2007-06-06 06:00:00", 302 );
 	const AbstractAgregator::TimeSpan timeSpan = 
-		agregator->getTimeSpan(dataFactory.getData( 15, 1 ));
+	agregator->getTimeSpan(dataFactory.getData( 15, 1 ));
 	CPPUNIT_ASSERT_EQUAL(miutil::miTime("2007-06-05 18:00:00"), timeSpan.first );
 	CPPUNIT_ASSERT_EQUAL(miutil::miTime("2007-06-06 18:00:00"), timeSpan.second );
 }
@@ -62,7 +62,7 @@ void ra2rr_12ForwardTest::testGetTimeSpan()
 {
 	const kvalobs::kvDataFactory dataFactory( 42, "2007-06-06 03:00:00", 302 );
 	const AbstractAgregator::TimeSpan timeSpan = 
-		agregator->getTimeSpan(dataFactory.getData( 15, 1 ));
+	agregator->getTimeSpan(dataFactory.getData( 15, 1 ));
 	CPPUNIT_ASSERT_EQUAL(miutil::miTime("2007-06-05 18:00:00"), timeSpan.first );
 	CPPUNIT_ASSERT_EQUAL(miutil::miTime("2007-06-06 18:00:00"), timeSpan.second );
 }
