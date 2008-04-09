@@ -1,5 +1,7 @@
 bin_SCRIPTS = kvstart kvstop
 
+EXTRA_DIST = kvstart.sh kvstop.sh
+
 SED_SUBST = sed s,__KVCONFIG__,$(bindir)/kvconfig,g $< > $@ 
 
 kvstart:	kvstart.sh
