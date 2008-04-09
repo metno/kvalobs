@@ -432,7 +432,13 @@ kvQueries::selectObsPgm(long stationid,
 			const miutil::miTime& otime)
 {
   ostringstream ost;
+  string obst("\'" + otime.isoTime() +"\'");
   
+  ost << " WHERE stationid=" << stationid  << " AND "
+      << "       (( fromtime<=" << obst << " AND totime>" << obst << ") OR "
+      << "        ( fromtime<=" << obst << " AND totime IS NULL ) "
+      << "       ) ORDER BY paramid";
+/*  
   ost << " OP1 WHERE OP1.stationid=" << stationid
       << " AND OP1.fromtime=("
       << "         SELECT MAX(OP2.fromtime) FROM obs_pgm OP2 WHERE"
@@ -440,13 +446,13 @@ kvQueries::selectObsPgm(long stationid,
       << "         AND OP2.stationid = OP1.stationid"
       << "         AND OP2.paramid  = OP1.paramid"
       << " ) ORDER BY OP1.paramid";
-
+*/
   return ost.str();
 }
 
 /*
   Select all entries from obs_pgm matching stationid, typeid and
-  valid fromtime
+  valid fromtime and totime
   - Sort by paramid
   - Valid fromtime is found by using a 'correlated subquery'
 */
@@ -455,9 +461,15 @@ kvQueries::selectObsPgm(long stationid,
 			long tid,
 			const miutil::miTime& otime) 
 {
-  ostringstream ost;
+	ostringstream ost;
+	string obst("\'" + otime.isoTime() +"\'");
+    
+   ost << " WHERE stationid=" << stationid  << " AND typeid=" << tid << " AND "
+       << "       (( fromtime<=" << obst << " AND totime>" << obst << ") OR "
+       << "        ( fromtime<=" << obst << " AND totime IS NULL ) "
+       << "       ) ORDER BY paramid";
   
-  ost << " OP1 WHERE OP1.typeid=" << tid << " AND OP1.stationid=" << stationid
+/*  ost << " OP1 WHERE OP1.typeid=" << tid << " AND OP1.stationid=" << stationid
       << " AND OP1.fromtime=("
       << "         SELECT MAX(OP2.fromtime) FROM obs_pgm OP2 WHERE"
       << "         OP2.fromtime<=\'" << otime.isoTime() << "\'"
@@ -465,13 +477,13 @@ kvQueries::selectObsPgm(long stationid,
       << "         AND OP2.paramid  = OP1.paramid"
       << "         AND OP2.typeid  = OP1.typeid"
       << " ) ORDER BY OP1.paramid";
- 
+*/ 
   return ost.str();
 }
 
 /*
   Select all entries from obs_pgm matching typeid and
-  valid fromtime
+  valid fromtime and totime
   - Sort by stationid.
   - Valid fromtime is found by using a 'correlated subquery'
 */
@@ -479,8 +491,14 @@ miutil::miString
 kvQueries::selectObsPgmByTypeid(long tid,
 			                      const miutil::miTime& otime) 
 {
-  ostringstream ost;
-  
+	ostringstream ost;
+	string obst("\'" + otime.isoTime() +"\'");
+      
+	ost << " WHERE typeid=" << tid << " AND "
+	    << "       (( fromtime<=" << obst << " AND totime>" << obst << ") OR "
+	    << "        ( fromtime<=" << obst << " AND totime IS NULL ) "
+	    << "       ) ORDER BY paramid";
+/*    
   ost << " OP1 WHERE OP1.typeid=" << tid   
       << " AND OP1.fromtime=("
       << "         SELECT MAX(OP2.fromtime) FROM obs_pgm OP2 WHERE"
@@ -490,12 +508,13 @@ kvQueries::selectObsPgmByTypeid(long tid,
       << "             OP2.paramid    = OP1.paramid   AND"
       << "             OP2.level      = OP1.level"
       << " ) ORDER BY OP1.stationid, OP1.typeid";
- 
+*/ 
   return ost.str();
 }
 
 
-miutil::miString kvQueries::selectObsPgm( long stationid )
+miutil::miString 
+kvQueries::selectObsPgm( long stationid )
 {
   ostringstream ss;
   ss << "WHERE stationid=" << stationid << " ORDER BY stationid, typeid, paramid";
@@ -505,22 +524,27 @@ miutil::miString kvQueries::selectObsPgm( long stationid )
 
 
 /*
-  Select all entries from obs_pgm with valid fromtime 
+  Select all entries from obs_pgm with valid fromtime and totime 
   - Sort by stationid, typeid and paramid
   - Valid fromtime is found by using a 'correlated subquery'
 */
 miutil::miString
 kvQueries::selectObsPgm(const miutil::miTime& otime)
-{
-  ostringstream ost;
-  
-  ost << " OP1 WHERE OP1.fromtime=("
+{	
+	ostringstream ost;
+	string obst("\'" + otime.isoTime() +"\'");
+        
+  	ost << " WHERE ( fromtime<=" << obst << " AND totime>" << obst << ") OR "
+  	    << "       ( fromtime<=" << obst << " AND totime IS NULL ) "
+  	    << "        ORDER BY stationid, typeid, paramid";
+ 
+  /*	ost << " OP1 WHERE OP1.fromtime=("
       << "         SELECT MAX(OP2.fromtime) FROM obs_pgm OP2 WHERE"
       << "         OP2.fromtime<=\'" << otime.isoTime() << "\'"
       << "         AND OP2.stationid = OP1.stationid"
       << "         AND OP2.paramid  = OP1.paramid"
       << " ) ORDER BY OP1.stationid,OP1.typeid,OP1.paramid";
-
+  */
   return ost.str();
 }
 
