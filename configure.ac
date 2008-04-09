@@ -64,7 +64,7 @@ KV_FIND_OMNIORB4
 KV_POSTGRESQL
 PKG_CHECK_MODULES(sqlite3, sqlite3)
 PKG_CHECK_MODULES(sqlite2, sqlite)
-PKG_CHECK_MODULES(libxmlpp, libxml++-1.0)
+PKG_CHECK_MODULES(libxmlpp, libxml++-2.6)
 PKG_CHECK_MODULES(cppunit, cppunit)
 KV_PERL
 AX_BOOST_BASE
@@ -73,7 +73,10 @@ if test -z $BOOST_THREAD_LIB; then AC_MSG_ERROR([Unable to find boost thread lib
 AX_BOOST_REGEX
 if test -z $BOOST_REGEX_LIB; then AC_MSG_ERROR([Unable to find boost regex library]); fi 
 AX_BOOST_FILESYSTEM
-if test -z $BOOST_FILESYSTEM_LIB; then AC_MSG_ERROR([Unable to find boost filesystem library]); fi 
+if test -z $BOOST_FILESYSTEM_LIB; then AC_MSG_ERROR([Unable to find boost filesystem library]); fi
+AX_BOOST_PROGRAM_OPTIONS
+if test -z $BOOST_PROGRAM_OPTIONS_LIB; then AC_MSG_ERROR([Unable to find boost program_options library]); fi
+ 
 KV_MODEL2KV
 
 AC_CONFIG_HEADERS(config.h)
