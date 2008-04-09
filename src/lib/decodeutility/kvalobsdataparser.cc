@@ -145,7 +145,7 @@ KvalobsDataParser::KvalobsDataParser( KvalobsData & d )
 KvalobsDataParser::~KvalobsDataParser()
 {}
 
-void KvalobsDataParser::on_start_element( const std::string & name, const AttributeList & attributes )
+void KvalobsDataParser::on_start_element( const Glib::ustring & name, const AttributeList & attributes )
 {
   currentContext_.push( name );
 
@@ -163,7 +163,7 @@ void KvalobsDataParser::on_start_element( const std::string & name, const Attrib
   }
 }
 
-void KvalobsDataParser::on_end_element( const std::string & name )
+void KvalobsDataParser::on_end_element( const Glib::ustring & name )
 {
   currentContext_.pop();
 
@@ -186,7 +186,7 @@ void KvalobsDataParser::on_end_element( const std::string & name )
     context_.erase( "sensor" );
 }
 
-void KvalobsDataParser::on_characters( const std::string & characters )
+void KvalobsDataParser::on_characters( const Glib::ustring & characters )
 {
   string s( characters );
   miutil::trimstr( s );

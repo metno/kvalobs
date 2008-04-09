@@ -79,6 +79,7 @@ void KvalobsDataSerializerTest::testPreserveKvData()
   out->getData( outdata );
   DSet outdata_set( outdata.begin(), outdata.end() );
 
+  CPPUNIT_ASSERT_EQUAL(in->size(), out->size());
   CPPUNIT_ASSERT( equal( indata.begin(), indata.end(), outdata_set.begin(), compare::exactly_equal_ex_tbtime() ) );
 }
 

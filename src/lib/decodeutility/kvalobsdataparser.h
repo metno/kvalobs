@@ -57,10 +57,10 @@ class KvalobsDataParser : protected xmlpp::SaxParser
     KvalobsDataParser( KvalobsData & d );
 
     virtual ~KvalobsDataParser();
-
-    virtual void on_start_element( const std::string &name, const AttributeList &attributes);
-    virtual void on_end_element( const std::string &name);
-    virtual void on_characters( const std::string & characters );
+    
+    virtual void on_start_element( const Glib::ustring &name, const AttributeList &attributes);
+    virtual void on_end_element( const Glib::ustring &name);
+    virtual void on_characters( const Glib::ustring & characters );
 
   private:
     void insertData();

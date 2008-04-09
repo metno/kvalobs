@@ -67,6 +67,10 @@ class KvalobsDataSerializerTest : public CppUnit::TestFixture
     kvalobs::serialize::KvalobsData * in;
 
     typedef boost::shared_ptr<kvalobs::serialize::KvalobsData> KvalobsDataPtr;
+
+    /**
+     * Create string representation, and the turn it back into kvData objects
+     */
     KvalobsDataPtr loop();
 };
 
