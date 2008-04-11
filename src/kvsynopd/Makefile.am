@@ -108,4 +108,6 @@ kvsynopdparse_LDADD = $(top_builddir)/src/service-libs/kvcpp/libkvcpp.la \
                      $(top_builddir)/src/lib/kvskel/libkvskel.la \
                      $(top_builddir)/src/lib/milog/libmilog.la 
                         
-                                               
+sqldir=$(datadir)/kvalobs/kvsynop
+sql_DATA=kvsynopd_schema.sql
+bin_SCRIPTS = kvsynopd_initdb
