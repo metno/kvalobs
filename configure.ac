@@ -50,7 +50,8 @@ AC_CONFIG_FILES([Makefile
                 src/kvManagerd/Makefile
                 src/norcom2kv/Makefile
                 src/kvAgregated/Makefile
-                src/kvsynopd/Makefile                
+                src/kvsynopd/Makefile 
+                src/kvsynopd/kvsynopd_initdb
                 src/model2kv/Makefile
                 src/kv2kro2/Makefile
                 src/kvalobs_database/Makefile
