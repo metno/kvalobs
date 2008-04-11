@@ -6,3 +6,5 @@ CREATE TABLE waiting(wmono integer, obstime timestamp, delaytime timestamp, UNIQ
 
 CREATE TABLE keyval(key text, val text, UNIQUE(key));
 
+CREATE INDEX data_stationid_obstime_index on data (stationid,obstime);
+CREATE INDEX synop_obstime_index on synop (obstime);
