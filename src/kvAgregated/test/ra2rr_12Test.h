@@ -49,6 +49,7 @@ class ra2rr_12Test : public AbstractAgregatorTest
 	CPPUNIT_TEST(test12hPositive24hPositivePrev12hNegative);
 	CPPUNIT_TEST(test12hPositive24hPositivePrev12hZero);
 	CPPUNIT_TEST(test12hPositive24hPositivePrev12hPositive);
+	CPPUNIT_TEST(testEmptyBucket);
 	CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -81,6 +82,8 @@ public:
 	void test12hPositive24hPositivePrev12hZero();
 
 	void test12hPositive24hPositivePrev12hPositive();
+	
+	void testEmptyBucket();
 
 private:
 	enum

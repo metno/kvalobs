@@ -59,10 +59,11 @@ namespace kvservice
   namespace proxy
   {
 
-    KvalobsProxy::KvalobsProxy( Connection & connection_, bool repopulate )
+    KvalobsProxy::KvalobsProxy( Connection & connection_, const std::vector<int> & stations, bool repopulate )
         : connection( connection_ )
         , lastCleaned( miDate::today() )
         , daysToKeep( 35 )
+        , stations_(stations)
         , shutdown( false )
         , oldestInProxy( miTime::nowTime() )
         , thread( 0 )
@@ -154,7 +155,8 @@ namespace kvservice
       assert( KvApp::kvApp );
       LOGINFO( "Subscribing to data from source" );
       KvDataSubscribeInfoHelper sih;
-      //sih.addStationId( 18815 );
+      for ( std::vector<int>::const_iterator it = stations_.begin(); it != stations_.end(); ++ it )
+	sih.addStationId( * it );
       subscription = KvApp::kvApp->subscribeData( sih, queue );
     }
 
@@ -234,7 +236,11 @@ namespace kvservice
       WhichDataHelper wdh( CKvalObs::CService::All );
       miTime new_to( to );
       new_to.addSec( -1 );
-      wdh.addStation( 0, from, new_to );
+      if ( stations_.empty() )
+	wdh.addStation( 0, from, new_to );
+      else
+	for ( std::vector<int>::const_iterator it = stations_.begin(); it != stations_.end(); ++ it )
+	  wdh.addStation( * it, from, new_to );
 
       KvDataList dataList;
       internal::KvDataReceiver dr( dataList );

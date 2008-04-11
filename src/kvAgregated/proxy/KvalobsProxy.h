@@ -40,6 +40,7 @@
 #include <decodeutility/kvDataFormatter.h>
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/shared_ptr.hpp>
+#include <vector>
 
 namespace kvservice
 {
@@ -57,7 +58,7 @@ namespace kvservice
     class KvalobsProxy : boost::noncopyable
     {
       public:
-        KvalobsProxy( dnmi::db::Connection & connection, bool repopulate = false );
+        KvalobsProxy( dnmi::db::Connection & connection, const std::vector<int> & stations, bool repopulate = false );
         ~KvalobsProxy( );
 
         void getData( KvDataList &data, int station,
@@ -147,6 +148,8 @@ namespace kvservice
         std::string subscription;
 
         std::set<int> interesting;
+        
+        const std::vector<int> stations_;
 
         dnmi::thread::CommandQue queue;
 

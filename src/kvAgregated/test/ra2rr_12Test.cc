@@ -223,3 +223,17 @@ void ra2rr_12Test::test12hPositive24hPositivePrev12hPositive()
 	CPPUNIT_ASSERT_EQUAL(miutil::miTime("2007-06-06 06:00:00"), d->obstime() );
 	CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.1, d->corrected(), .00001);
 }
+
+void ra2rr_12Test::testEmptyBucket()
+{
+	AbstractAgregator::kvDataList data;
+	const kvDataFactory dataFactory( 42, "2007-06-06 06:00:00", 302);
+	data.push_back(dataFactory.getData( 411.0, RA, "2007-06-05 06:00:00") );
+	data.push_back(dataFactory.getData( 112.2, RA, "2007-06-05 18:00:00") );
+	data.push_back(dataFactory.getData( 113.3, RA, "2007-06-06 06:00:00") );
+
+	AbstractAgregator::kvDataPtr d = agregator->process(data.back(), data);
+	CPPUNIT_ASSERT(d.get() );
+	CPPUNIT_ASSERT_EQUAL(miutil::miTime("2007-06-06 06:00:00"), d->obstime() );
+	CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.1, d->corrected(), .00001);  
+}
