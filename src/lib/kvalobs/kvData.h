@@ -141,7 +141,7 @@ public:
   void controlinfo(const kvControlInfo &f) { controlinfo_ = f;}
   void useinfo(const kvUseInfo &f)         { useinfo_     = f;}
   void useinfo(int flag, char newVal);
-  void cfailed(miutil::miString& cf)       { cfailed_     =cf;}
+  void cfailed(const miutil::miString& cf) { cfailed_     =cf;}
 
 };
 
