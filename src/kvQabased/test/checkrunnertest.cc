@@ -488,3 +488,39 @@ void CheckRunnerTest::testDoesNotCheckWhenChecksSpecifyAnotherTypeid()
   CPPUNIT_ASSERT_EQUAL(inData.controlinfo(), outData.controlinfo());
   CPPUNIT_ASSERT(eq_(inData, outData));
 }
+
+void CheckRunnerTest::testChecksHighLevels()
+{
+  kvDataFactory f(42, "2006-05-26 06:00:00", 302, 0, 25 );
+  kvData d = f.getData(5, 110);
+  db->getConnection()->exec( "insert into data values " + d.toSend() );
+
+  runCheckRunner( __func__ );
+
+  vector<kvData> result;
+  getData( back_inserter( result ) );
+
+  for ( vector<kvData>::const_iterator it = result.begin(); it != result.end(); ++ it )
+    cout << * it << endl;
+  
+  CPPUNIT_ASSERT_EQUAL( size_t( 1 ), result.size() );
+  CPPUNIT_ASSERT( d.controlinfo() != kvControlInfo() );
+}
+
+void CheckRunnerTest::testChecksNonstandardSensor()
+{
+  kvDataFactory f(42, "2006-05-26 06:00:00", 302, 1, 0 );
+  kvData d = f.getData(5, 110);
+  db->getConnection()->exec( "insert into data values " + d.toSend() );
+
+  runCheckRunner( __func__ );
+
+  vector<kvData> result;
+  getData( back_inserter( result ) );
+
+  for ( vector<kvData>::const_iterator it = result.begin(); it != result.end(); ++ it )
+    cout << * it << endl;
+  
+  CPPUNIT_ASSERT_EQUAL( size_t( 1 ), result.size() );
+  CPPUNIT_ASSERT( d.controlinfo() != kvControlInfo() );
+}
