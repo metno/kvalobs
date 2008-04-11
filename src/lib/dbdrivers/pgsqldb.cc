@@ -345,6 +345,35 @@ dnmi::db::drivers::PGConnection::lastError()const
 }
 
 
+std::string 
+dnmi::db::drivers::
+PGConnection::
+esc( const std::string &stringToEscape )const
+{
+	if(!con)
+		throw SQLException("NO CONNECTION: not connected to a database!");
+		
+	char *buf = 0;
+
+	try { 
+		buf = new char[stringToEscape.length()*2 + 1];
+
+		PQescapeStringConn( con, buf, 
+				              stringToEscape.c_str(), stringToEscape.length(),
+				              0 );
+	
+		string ret(buf);
+		delete[] buf;
+		buf=0;
+		return ret;
+	}
+	catch( ... ) {
+		if( buf )
+			delete[] buf; 
+		
+		throw SQLException("NOMEM: Cant escape the string.");
+	}
+}
 
 
 dnmi::db::drivers::PGResult::PGResult(PGresult *r):Result(PQnfields(r))

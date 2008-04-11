@@ -142,6 +142,7 @@ namespace dnmi {
 	virtual Result *execQuery(const std::string &stmt);
 	
 	std::string lastError()const;
+	virtual std::string esc( const std::string &stringToEscape )const;
       };
       
     }

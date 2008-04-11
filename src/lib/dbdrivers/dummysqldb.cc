@@ -103,7 +103,12 @@ dnmi::db::drivers::DummyConnection::lastError()const
 	throw SQLNotSupported("lastError: Not supported!");
 }
 
-
+std::string
+dnmi::db::drivers::DummyConnection::
+esc( const std::string &stringToEscape )const
+{
+	return stringToEscape;
+}
 
 
 

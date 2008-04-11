@@ -243,7 +243,26 @@ dnmi::db::drivers::SQLiteConnection::lastError()const
   return errMsg;
 }
 
-
+std::string 
+dnmi::db::drivers::
+SQLiteConnection::
+esc( const std::string &stringToEscape )const
+{
+	char *buf = sqlite3_mprintf("%q", stringToEscape.c_str() );
+	
+	if( ! buf )
+		throw SQLException("NOMEM: Cant escape the string.");
+	
+	try {
+		string ret( buf );
+		sqlite3_free( buf );
+		
+		return ret;
+	}
+	catch( ... ) {
+		throw SQLException("NOMEM: Cant escape the string.");
+	}
+}
 
 
 dnmi::db::drivers::SQLiteResult::SQLiteResult(SQLite::SQLiteData *data_):
