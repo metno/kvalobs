@@ -152,13 +152,15 @@ namespace agregator
   	
 	std::auto_ptr<kvalobs::kvData> AbstractAgregator::process( const kvalobs::kvData & data, const std::list<kvalobs::kvData> & observations )
 	{
-		typedef std::auto_ptr<kvalobs::kvData> return_type;
+	  typedef std::auto_ptr<kvalobs::kvData> return_type;
 		
 	    if ( not shouldProcess( data, observations ) )
 	    {
-	      LOGINFO( "Will not process" );
+	      LOGDEBUG( "Will not process" );
 	      return return_type( 0 );
 	    }
+	    
+	    LOGINFO( "Agregating with base " << data );
 	
 	    // Call abstract method to get agregate value:
 	    float agregateValue;

@@ -56,7 +56,7 @@ namespace agregator
 
   void AgregatorHandler::addHandler( AbstractAgregator * handler )
   {
-    LOGDEBUG( "Adding handler: " << handler->readParam() << " -> " << handler->writeParam() );
+    LOGINFO( "Adding handler: " << handler->readParam() << " -> " << handler->writeParam() );
     getProxy().addInteresting( handler->readParam() );
     getProxy().addInteresting( handler->writeParam() );
     handlers.insert( Handler( handler->readParam(), handler ) );
@@ -99,13 +99,19 @@ namespace agregator
   void AgregatorHandler::process( const kvalobs::kvData & data )
   {
       const int paramID = data.paramID();
+      
+      if ( ! allowedParameters_.empty() && 
+	  find(allowedParameters_.begin(), allowedParameters_.end(), paramID) == allowedParameters_.end() ) {
+	return;
+      }
+      
       HandlerMap::const_iterator it = handlers.lower_bound( paramID );
       const HandlerMap::const_iterator end = handlers.upper_bound( paramID );
       while ( it != end )
       {
         try
         {
-          LOGINFO( "Processing:\n" <<
+          LOGDEBUG( "Processing:\n" <<
                    decodeutility::kvdataformatter::createString( data ) );
                    
           //it->second->process( data );

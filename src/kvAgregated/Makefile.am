@@ -13,11 +13,13 @@ kvAgregated_SOURCES = \
 	ra2rr_12.h ra2rr_12.cc \
 	rr.h rr.cc \
 	GenerateZero.h GenerateZero.cc \
-	paramID.h times.h\
+	BackProduction.h BackProduction.cc \
+	paramID.h times.h \
 	main.cc
 
 kvAgregated_CPPFLAGS = \
 	-D_REENTRANT \
+	-DVERSION=\"$(VERSION)\" \
 	-I$(top_srcdir)/src/service-libs \
 	-I$(top_srcdir)/src/lib/ \
 	-I$(top_builddir)/src/lib/ \
@@ -27,13 +29,8 @@ kvAgregated_CPPFLAGS = \
 	$(putools_CFLAGS)
 
 kvAgregated_LDADD = \
-	../service-libs/kvcpp/libkvcpp.la 
-	
-
-kvAgregated_LIBS = \
-	$(putools_LIBS) \
-	$(omniDynamic4_LIBS) \
-	$(BOOST_THREAD_LIB)
+	../service-libs/kvcpp/libkvcpp.la \
+	$(BOOST_PROGRAM_OPTIONS_LIB) 
 	
 EXTRA_DIST = agregateDbInit.sh
 install-data-hook:

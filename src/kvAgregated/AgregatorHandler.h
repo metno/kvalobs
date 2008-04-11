@@ -52,6 +52,11 @@ namespace agregator
     void process( const kvalobs::kvData & data );
     
     void save( const kvalobs::kvData & d );
+    
+    void setParameterFilter(const std::vector<int> & allowedParameters )
+    {
+      allowedParameters_ = allowedParameters;
+    }
 
     void addHandler( AbstractAgregator *handler );
     
@@ -63,6 +68,8 @@ namespace agregator
     typedef std::multimap<int, AbstractAgregator *> HandlerMap;
 
     HandlerMap handlers;    
+    
+    std::vector<int> allowedParameters_;
   };
 }
 

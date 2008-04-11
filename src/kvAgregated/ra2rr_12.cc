@@ -40,7 +40,7 @@ using namespace kvalobs;
 namespace agregator
 {
   ra2rr_12::ra2rr_12( )
-  	: AbstractAgregator( RA, RR_12, 24, sixAmSixPm)
+  	: AbstractAgregator( RA, RR_12, 25, sixAmSixPm)
   {}
 
   namespace
@@ -80,7 +80,7 @@ namespace agregator
 
   bool ra2rr_12::shouldProcess( const kvData & trigger, const kvDataList & observations )
   {
-	  const set<miClock> & gw = generateWhen();
+    const set<miClock> & gw = generateWhen();
     if ( observations.size() > 1 and
          gw.find( trigger.obstime().clock() ) != gw.end() and
          find_if( observations.begin(), observations.end(), hasObsHour<6> ) != observations.end() and
@@ -100,63 +100,56 @@ namespace agregator
     miTime t = to->obstime();
     t.addHour( timeOffset() );
     
-	kvDataList::const_iterator find = find_if( data.begin(), data.end(), has_obstime( t ) );
-	if ( find == data.end() )
-		throw runtime_error( "Could not find other relevant RA observation" );
-	const kvData * from = &* find;
+    kvDataList::const_iterator find = find_if( data.begin(), data.end(), has_obstime( t ) );
+    if ( find == data.end() )
+      throw runtime_error( "Could not find other relevant RA observation" );
+    const kvData * from = &* find;
 		
-	if ( from->obstime() > to->obstime() )
-		swap( from, to );
+    if ( from->obstime() > to->obstime() )
+      swap( from, to );
 		
     t = to->obstime();
-	t.addDay( -1 );
-	kvDataList::const_iterator oneDayAgo = find_if( data.begin(), data.end(), has_obstime( t ) );
-		
+    t.addDay( -1 );
+    kvDataList::const_iterator oneDayAgo = find_if( data.begin(), data.end(), has_obstime( t ) );
 	
-	return agregate( * from, * to, oneDayAgo == data.end() ? 0 : &* oneDayAgo );  
+    return agregate( * from, * to, oneDayAgo == data.end() ? 0 : &* oneDayAgo );  
   }
 
   float ra2rr_12::agregate( const kvData & from, const kvData & to, const kvData * oneDayAgo ) const
-  {
-    const float zero = 0.0001;
-    
-//    cout << from.corrected() << " - " << to.corrected();
-//    if ( oneDayAgo )
-//      cout << " - " << oneDayAgo->corrected();
-//    cout << endl;
-    
-    if ( not ( valid( from ) and valid( to ) ) )
-      return invalidParam;
-    
-    const float diff12h = to.corrected() - from.corrected();
-//    cout << "diff12h: " << diff12h << endl;
+    {
+      const float zero = 0.01;
 
-    float result;
-    if ( ! oneDayAgo )
-      result = diff12h;
-    else {
-      if ( diff12h < zero ) {
-        result = 0;
+      if ( not ( valid( from ) and valid( to ) ) )
+      return invalidParam;
+
+      const float diff12h = to.corrected() - from.corrected();
+
+      float result;
+      if ( ! oneDayAgo ) {
+	LOGINFO("No RA data 24h ago.");
+	result = diff12h;
       }
       else {
-        const float diff24h = to.corrected() - oneDayAgo->corrected();
-//        cout << "diff24h: " << diff24h << endl;
-        if ( diff24h <= zero )
-        	result = 0;
-        else {
-  	const float diff12hPrevious = from.corrected() - oneDayAgo->corrected();
-//  	cout << "diff12hPrevious: " << diff12hPrevious << endl;
-  	if ( diff12hPrevious >= zero )
-  	  result = diff12h;
-  	else
-  	  result = diff24h;
-        }
-      }
-    }    
-    
-//    Hvis RR_12(t) = RA(t)-RA(t-12) < 0 
-//    Sett RR_12(t) = 0
+	if ( diff12h < zero ) {
+	  result = 0;
+	}
+	else {
+	  const float diff24h = to.corrected() - oneDayAgo->corrected();
+	  const float diff12hPrevious = from.corrected() - oneDayAgo->corrected();
 
+	  if ( diff12hPrevious <= -100 )
+	    result = diff12h;
+	  else if ( diff24h <= zero )
+	    result = 0;
+	  else {
+	    if ( diff12hPrevious >= zero )
+	      result = diff12h;
+	    else
+	      result = diff24h;
+	  }
+	}
+      }    
+    
     LOGDEBUG( "Calculation sum: " << result );
     
     // Make neccessary adjustments (values <= 0 is set to -1):
@@ -178,7 +171,7 @@ namespace agregator
   const ra2rr_12_forward::TimeSpan ra2rr_12_forward::getTimeSpan( const kvalobs::kvData &data ) const
   {
 	  TimeSpan ts = ra2rr_12::getTimeSpan(data);
-	  ts.first.addHour(timeOffset());
+	  ts.first.addHour(timeOffset() +1);
 	  ts.second.addHour(timeOffset());
 	  return ts;
   }
