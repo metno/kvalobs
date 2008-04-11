@@ -31,10 +31,18 @@ kvAgregated_CPPFLAGS = \
 kvAgregated_LDADD = \
 	../service-libs/kvcpp/libkvcpp.la \
 	$(BOOST_PROGRAM_OPTIONS_LIB) 
+
+	
+pkgstatedir = $(localstatedir)/$(PACKAGE)/agregate
+nodist_pkgstate_DATA = database.sqlite
+
+CLEANFILES = database.sqlite
+
+database.sqlite: 
+	. $(srcdir)/agregateDbInit.sh $@ 
 	
 EXTRA_DIST = agregateDbInit.sh
-install-data-hook:
-	. $(srcdir)/agregateDbInit.sh $(localstatedir)/$(PACKAGE)
+
 
 
 TESTS = kvAgregatedTest

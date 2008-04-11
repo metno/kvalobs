@@ -108,6 +108,12 @@ namespace kvalobs
        */
       kvData getData( float val, int paramID, const miutil::miTime & obsTime = miutil::miTime() ) const;
 
+      int stationID() const { return stationID_; }
+      int typeID() const { return typeID_; }
+      const miutil::miTime & obstime() const { return obstime_; }
+      int sensor() const { return sensor_; }
+      int level() const { return level_; }
+      
     private:
       const int stationID_;
       const int typeID_;

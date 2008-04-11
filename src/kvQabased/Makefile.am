@@ -49,6 +49,9 @@ kvQabased_LDADD = \
 	-ldl
 
 
+clean-local:
+	rm -rf test/var
+
 TESTS = kvQabasedTest
 
 check_PROGRAMS = kvQabasedTest
