@@ -334,6 +334,13 @@ namespace dnmi {
 	  virtual void exec(const std::string &SQLstmt)=0;
 	  
 	  virtual std::string lastError()const=0;
+	  
+	  /**
+	   * Correctly escape strings to insert into the database.
+	   * 
+	   * \exception SQLException if an error occured.
+	   */
+	  virtual std::string esc( const std::string &stringToEscape )const=0;
       };
 
       /**
