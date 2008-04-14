@@ -28,15 +28,17 @@
 
 KVCONFIG=__KVCONFIG__
 
-if [ -e ${KVALOBS}/etc/kv_ctl.conf ]; then
-    . ${KVALOBS}/etc/kv_ctl.conf
+KVBIN=`$KVCONFIG --bindir`
+KVPID=`$KVCONFIG --localstatedir`/kvalobs/run
+KVCONF=`$KVCONFIG --sysconfdir`/kvalobs
+
+if [ -e ${KVCONF}/kv_ctl.conf ]; then
+    . ${KVCONF}/kv_ctl.conf
 else
-    echo "Missing file:  ${KVALOBS}/etc/kv_ctl.conf"
+    echo "Missing file:  ${KVCONF}/kv_ctl.conf"
     exit 1
 fi
 
-KVBIN=`$KVCONFIG --bindir`
-KVPID=`$KVCONFIG --localstatedir`/kvalobs/run
 
 echo "KVBIN=$KVBIN"
 echo "KVPID=$KVPID"
@@ -82,8 +84,8 @@ function yes_no()
 }
 
 
-if [ -e ${HOME}/bin/kvname ]; then
-    KVNAME=`cat ${HOME}/bin/kvname`
+if [ -e ${KVCONF}/kvname ]; then
+    KVNAME=`cat ${KVCONF}/kvname`
     echo "Den som har stanset kvalobs er: $KVNAME"
    echo "Ønsker du å starte kvalobs?"
    yes_no
@@ -130,9 +132,10 @@ for PROG in $START_PROGS ; do
     fi
 done
 
-if [ -e ${HOME}/bin/kvname ]; then
-    rm  ${HOME}/bin/kvname
+if [ -e ${KVCONF}/kvname ]; then
+    rm  ${KVCONF}/kvname
 fi
+
 exit 0
 
 

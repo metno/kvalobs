@@ -29,10 +29,14 @@
 
 KVCONFIG=__KVCONFIG__
 
-if [ -e ${KVALOBS}/etc/kv_ctl.conf ]; then
-    . ${KVALOBS}/etc/kv_ctl.conf
+KVBIN=`$KVCONFIG --bindir`
+KVPID=`$KVCONFIG --localstatedir`/kvalobs/run
+KVCONF=`$KVCONFIG --sysconfdir`/kvalobs
+
+if [ -e ${KVCONF}/kv_ctl.conf ]; then
+    . ${KVCONF}/kv_ctl.conf
 else
-    echo "Missing file:  ${KVALOBS}/etc/kv_ctl.conf"
+    echo "Missing file:  ${KVCONF}/kv_ctl.conf"
     exit 1
 fi
 
@@ -72,9 +76,6 @@ done
 
 echo "listopt: $listopt"
 echo "killallopt: $killallopt"
-
-KVPID=`$KVCONFIG --localstatedir`/kvalobs/run
-
 echo "KVPID=$KVPID"
 echo "TIMEOUT=$TIMEOUT"
 
