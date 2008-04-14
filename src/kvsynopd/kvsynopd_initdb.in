@@ -26,4 +26,4 @@ if [ -f "${DBDIR}/${DBNAME}" ]; then
 	exit 1
 fi
 
-sqlite ${DBDIR}/${DBNAME} "${SQL}"
+sqlite3 ${DBDIR}/${DBNAME} "${SQL}"
