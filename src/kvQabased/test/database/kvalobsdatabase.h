@@ -31,6 +31,7 @@
 #ifndef KVALOBSDATABASE_H
 #define KVALOBSDATABASE_H
 
+#include "kvQABaseDBConnection.h"
 #include <string>
 #include <kvdb/kvdb.h>
 #include <boost/noncopyable.hpp>
@@ -68,9 +69,13 @@ class KvalobsDatabase : boost::noncopyable
      * Get a connection to the database
      */
     dnmi::db::Connection * getConnection() { return connection_; }
+    
+    kvQABaseDBConnection * getQaBaseConnection() { return con_; }
 
   private:
     dnmi::db::Connection * connection_;
+    
+    kvQABaseDBConnection * con_;
     
     static const std::string dbConnectString;
     static const std::string dbSetup;

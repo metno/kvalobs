@@ -59,11 +59,6 @@ class kvQABaseMeteodata
     /// checks performed for:
     const kvalobs::kvStationInfo& stationinfo_;
 
-    // current check has attributes:
-    std::string qcx_;            ///< check-id
-    std::string medium_qcx_;     ///< medium classification of check
-    int language_;               ///< algorithm-type
-
     /// current check-variables
     kvQABase::script_var obs_vars, refobs_vars, model_vars;
 
@@ -102,25 +97,29 @@ private:
     bool loadModelData( const int sid, const int tstart, const int tstop );
 
     /** fill observation var-structure for one source */
-    bool fillObsVariables( kvQABase::script_var& vars );
+    void fillObsVariables( kvQABase::script_var& vars );
     /** fill model var-structure for one source */
-    bool fillModelVariables( kvQABase::script_var& vars );
+    void fillModelVariables( kvQABase::script_var& vars );
 
   public:
     kvQABaseMeteodata( kvQABaseDBConnection& dbcon,
                        const kvalobs::kvStationInfo& stationinfo );
 
     /**
-      PERL output
-      return data for one parameter-check
+     * Thrown by data_asPerl to signify that a check should not be run
+     */
+    struct SkipCheck : std::exception {};
+    
+    /**
+     * PERL output
+     *
+     * @throws SkipCheck If the function decides that checks should not be run 
+     * on this data.
+     * @throws std::exception on error in data lookup 
+     * @return data for one parameter-check
     */
-    bool data_asPerl( const std::string qcx,                 // check-id
-                      const std::string medium_qcx,          // medium class. of check
-                      const int language,                    // algorithm type
-                      const kvQABaseScriptManager& sman,     // script manager
-                      const kvObsPgmList & oplist,      // obs_pgm
-                      bool& skipcheck,                       // skip this check (ret)
-                      std::string& data );               // return perl-data
+    std::string data_asPerl( const kvQABaseScriptManager& sman,     // script manager
+                      const kvObsPgmList & oplist );      // obs_pgm
 
     typedef std::map<std::string, double> ScriptReturnType;
 
@@ -135,7 +134,7 @@ private:
       - Update parameters with return-variables from check.
       - Finally save parameters to DB
     */
-    bool updateParameters( const ScriptReturnType & params );
+    bool updateParameters( const ScriptReturnType & params, const kvalobs::kvChecks & check );
 
   private:
     DataFromTime & preloadData(const kvalobs::kvStationInfo & si);
@@ -147,7 +146,7 @@ private:
      * @param param a name-value pair from check.
      * @param newdata write changes here.
      */
-    void setFlag( ScriptReturnType::const_iterator param, const ScriptReturnType & scriptRet,  kvalobs::kvData & newdata );
+    void setFlag( ScriptReturnType::const_iterator param, const ScriptReturnType & scriptRet,  kvalobs::kvData & newdata, const kvalobs::kvChecks & check );
     void setMissing( ScriptReturnType::const_iterator param, kvalobs::kvData & newdata );
     void setCorrected( float newVal, kvalobs::kvData & data );
 
@@ -164,7 +163,7 @@ private:
     typedef std::map<std::string, obs_keys> ObsKeys;
 
     kvalobs::kvData & getModifiedData( ObsKeys & updated_obs, ScriptReturnType::const_iterator pp, const std::string & type );
-    void updateSingleParam( ObsKeys & updated_obs, const ScriptReturnType::const_iterator pp, const ScriptReturnType & params );
+    void updateSingleParam( ObsKeys & updated_obs, const ScriptReturnType::const_iterator pp, const ScriptReturnType & params, const kvalobs::kvChecks & check );
 
     void saveInDb( const ObsKeys & k );
 

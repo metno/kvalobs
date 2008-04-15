@@ -238,8 +238,10 @@ QaWork::doWork( const kvalobs::kvStationInfo & params,
     // boost::filesystem::path cannot handle paths/with//multiple//slashes//separating/single/elements
     boost::regex re("(\\/\\/)");
     std::string normalizedLog = boost::regex_replace(logPath.empty() ? logpath_ : logPath, re, "/");
+
+    kvQABaseDBConnection dbcon(& con);
     
-    CheckRunner checkRunner( params, con, normalizedLog );
+    CheckRunner checkRunner( params, dbcon, normalizedLog );
     checkRunner();
   }
   catch ( boost::filesystem::filesystem_error & )

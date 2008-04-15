@@ -92,7 +92,7 @@ void CheckRunnerTest::runCheckRunner( const std::string & checkName )
 
 void CheckRunnerTest::runCheckRunner( const std::string & checkName, const kvalobs::kvStationInfo & si )
 {
-  CheckRunner checkRunner( si, * db->getConnection(), getLogPath( checkName ) );
+  CheckRunner checkRunner( si, * db->getQaBaseConnection(), getLogPath( checkName ) );
   checkRunner();
 }
 
@@ -176,7 +176,7 @@ void CheckRunnerTest::testSkipAggregated()
 
   {
     kvalobs::kvStationInfo si( stationInfo.stationID(), stationInfo.obstime(), - stationInfo.typeID() );
-    CheckRunner checkRunner( si, * db->getConnection(), getLogPath( __func__ ) );
+    CheckRunner checkRunner( si, * db->getQaBaseConnection(), getLogPath( __func__ ) );
     checkRunner();
   }
 
@@ -282,7 +282,7 @@ void CheckRunnerTest::testReCheckResetsFlags()
   db->getConnection() ->exec( "insert into data values " + inData.toSend() );
 
   {
-    CheckRunner checkRunner( stationInfo, * db->getConnection(), getLogPath( __func__ ) );
+    CheckRunner checkRunner( stationInfo, * db->getQaBaseConnection(), getLogPath( __func__ ) );
     checkRunner( true );
   }
 
@@ -500,11 +500,11 @@ void CheckRunnerTest::testChecksHighLevels()
   vector<kvData> result;
   getData( back_inserter( result ) );
 
-  for ( vector<kvData>::const_iterator it = result.begin(); it != result.end(); ++ it )
-    cout << * it << endl;
+//  for ( vector<kvData>::const_iterator it = result.begin(); it != result.end(); ++ it )
+//    cout << * it << endl;
   
   CPPUNIT_ASSERT_EQUAL( size_t( 1 ), result.size() );
-  CPPUNIT_ASSERT( d.controlinfo() != kvControlInfo() );
+  CPPUNIT_ASSERT( result.front().controlinfo() != kvControlInfo() );
 }
 
 void CheckRunnerTest::testChecksNonstandardSensor()
@@ -518,9 +518,9 @@ void CheckRunnerTest::testChecksNonstandardSensor()
   vector<kvData> result;
   getData( back_inserter( result ) );
 
-  for ( vector<kvData>::const_iterator it = result.begin(); it != result.end(); ++ it )
-    cout << * it << endl;
+//  for ( vector<kvData>::const_iterator it = result.begin(); it != result.end(); ++ it )
+//    cout << * it << endl;
   
   CPPUNIT_ASSERT_EQUAL( size_t( 1 ), result.size() );
-  CPPUNIT_ASSERT( d.controlinfo() != kvControlInfo() );
+  CPPUNIT_ASSERT( result.front().controlinfo() != kvControlInfo() );
 }

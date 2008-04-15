@@ -30,7 +30,9 @@
 */
 #include "kvQABaseScriptManager.h"
 #include <puTools/miString>
+#include <boost/lexical_cast.hpp>
 #include <sstream>
+#include <stdexcept>
 
 #include <milog/milog.h>
 
@@ -353,14 +355,13 @@ bool kvQABaseScriptManager::getAlgoName( string& name ) const
   return true;
 }
 
-bool kvQABaseScriptManager::getVariables( const kvQABase::data_source source, kvQABase::script_var& vars ) const
+void kvQABaseScriptManager::getVariables( const kvQABase::data_source source, kvQABase::script_var& vars ) const
 {
   if ( !algo_selected )
-    return false;
+    throw std::logic_error("ScriptManager unable to get variables: No algorithm selected");
   if ( source < 0 || source > 3 )
-    return false;
+    throw std::logic_error("ScriptManager unable to get variables: Invalid source:" + boost::lexical_cast<string>(source));
   vars = variables[ source ];
-  return true;
 }
 
 void kvQABaseScriptManager::clear()
@@ -408,14 +409,10 @@ namespace
   }
 }
 
-bool kvQABaseScriptManager::makePerlVariables( kvQABase::script_var& vars,
-    string& varstring ) const
+string kvQABaseScriptManager::makePerlVariables( kvQABase::script_var& vars) const
 {
   if ( vars.allpos.empty() || vars.alltimes.empty() || vars.pars.empty() )
-  {
-    varstring = "";
-    return true;
-  }
+    return "";
 
   // missing data and data-status only for observations
   const bool make_missing = ( vars.dsource == kvQABase::obs_data ||
@@ -500,6 +497,5 @@ bool kvQABaseScriptManager::makePerlVariables( kvQABase::script_var& vars,
     }
   }
 
-  varstring = ret.str();
-  return true;
+  return ret.str();
 }

@@ -17,7 +17,8 @@ kvQabased_SOURCES = \
 	QaWorkCommand.cc QaWorkCommand.h \
 	QaWorkThread.cc QaWorkThread.h \
 	kvQABaseTypes.h \
-	kvQabased.cc
+	kvQabased.cc \
+	CheckCreator.cc CheckCreator.h
 
 kvQabased_CPPFLAGS = \
 	-I$(top_srcdir)/src/lib \
@@ -73,7 +74,8 @@ kvQabasedTest_CPPFLAGS = \
 	-DSETUPDB_SQL=$(SETUP_DB) \
 	-DCHECKRUNNERTEST_INIT_SQL=\"$(srcdir)/test/etc/checkrunnertest.init.sql\" \
 	$(kvQabased_CPPFLAGS) \
-	$(cppunit_CFLAGS)
+	$(cppunit_CFLAGS) \
+	-DLOG_CHECK_SCRIPT 
 	
 kvQabasedTest_LDADD = \
 	$(kvQabased_LDADD) \

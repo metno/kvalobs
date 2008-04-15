@@ -7,6 +7,10 @@ insert into station_param values (0,33,0,0,1,365,-1,'QC1-1-33','max;highest;high
 29.0;29.0;29.0;1.0;1.0;1.0','','1500-01-01 00:00:00' );
 insert into station_param values (0,110,0,0,1,365,-1,'QC1-4-110','highest;high;low;lowest;dry
 13.20;6.82;-4.06;-11.30;1.0', '', '1500-01-01 00:00:00' );
+insert into station_param values (0,110,25,0,1,365,-1,'QC1-4-110-2','highest;high;low;lowest;dry
+13.20;6.82;-4.06;-11.30;1.0', '', '1500-01-01 00:00:00' );
+insert into station_param values (0,110,0,1,1,365,-1,'QC1-4-110-3','highest;high;low;lowest;dry
+13.20;6.82;-4.06;-11.30;1.0', '', '1500-01-01 00:00:00' );
 insert into station_param values (0,111,0,0,1,365,-1,'QC1-4-111','highest;high;low;lowest;dry
 13.20;6.82;-4.06;-11.30;1.0', '', '1500-01-01 00:00:00' );
 insert into station_param values (0,112,0,0,1,365,-1,'QC1-1-34','max;highest;high;low;lowest;min
@@ -35,6 +39,8 @@ insert into obs_pgm values (42, 42, 0, 1, 302, 't', 't', 't', 't', 't', 't', 't'
 
 insert into checks values (0, 'QC1-1-33', 'QC1-1',1,'RANGE_CHECK','obs;V3;;|meta;V3_max,V3_highest,V3_high,V3_low,V3_lowest,V3_min;;','* * * * *' , '1500-01-01 00:00:00' );
 insert into checks values (0, 'QC1-4-110', 'QC1-4', 1, 'PROGNOSTIC SPACE_CHECK_RR' ,'obs;RR_24&0&&;;|model;RR_24&0&&;;|meta;RR_24_highest,RR_24_high,RR_24_low,RR_24_lowest,RR_24_dry;;', '* * * * *', '1500-01-01 00:00:00' );
+insert into checks values (0, 'QC1-4-110-2', 'QC1-4', 1, 'PROGNOSTIC SPACE_CHECK_RR' ,'obs;RR_24&25&&;;|model;RR_24&0&&;;|meta;RR_24_highest,RR_24_high,RR_24_low,RR_24_lowest,RR_24_dry;;', '* * * * *', '1500-01-01 00:00:00' );
+insert into checks values (0, 'QC1-4-110-3', 'QC1-4', 1, 'PROGNOSTIC SPACE_CHECK_RR' ,'obs;RR_24&&1&;;|model;RR_24&0&&;;|meta;RR_24_highest,RR_24_high,RR_24_low,RR_24_lowest,RR_24_dry;;', '* * * * *', '1500-01-01 00:00:00' );
 insert into checks values (0, 'QC1-4-111', 'QC1-4', 1, 'PROGNOSTIC SPACE_CHECK_RR' ,'obs;R&0&&303;;|model;R&0&&;;|meta;R_highest,R_high,R_low,R_lowest,R_dry;;', '* * * * *', '1500-01-01 00:00:00' );
 insert into checks values (0, 'QC1-1-34', 'QC1-1',1,'RANGE_CHECK','obs;SA;;|meta;SA_max,SA_highest,SA_high,SA_low,SA_lowest,SA_min;;','* * * * *' , '1500-01-01 00:00:00' );
 insert into checks values (0, 'QC1-1-35', 'QC1-1',1,'RANGE_CHECK','obs;W1;;|meta;W1_max,W1_highest,W1_high,W1_low,W1_lowest,W1_min;;','* * * * *' , '1500-01-01 00:00:00' );

@@ -49,8 +49,6 @@ kvQABaseMeteodata::kvQABaseMeteodata( kvQABaseDBConnection & dbcon,
                                       const kvalobs::kvStationInfo & stationinfo )
     : dbcon_( dbcon )
     , stationinfo_( stationinfo )
-    , qcx_( "" )
-    , medium_qcx_( "" )
     , saveCache_( dbcon )
 {}
 
@@ -244,221 +242,61 @@ kvQABaseMeteodata::loadModelData( const int sid,
 
 
 // return data for one parameter
-bool
-kvQABaseMeteodata::data_asPerl( const string qcx,                                // check-id
-                                const string medium_qcx,                         // medium class. of check
-                                const int language,                                   // algorithm type
-                                const kvQABaseScriptManager& sman,                    // active Script-Manager
-                                const kvObsPgmList & oplist,                     // obs_pgm
-                                bool& skipcheck,                                      // obs_pgm may skip check..
-                                string& data )                                    // return perl-data
+std::string
+kvQABaseMeteodata::data_asPerl( const kvQABaseScriptManager& sman,                    // active Script-Manager
+                                const kvObsPgmList & oplist )                     // obs_pgm
 {
-  qcx_ = qcx;
-  medium_qcx_ = medium_qcx;
-  language_ = language;
-
-  data.clear();
-
-  data += "\n";
-  data += "#==========================================\n";
-  data += "#  Data\n";
-  data += "#\n";
-
-  bool result;
-
-  result = sman.getVariables( kvQABase::obs_data, obs_vars );
-  if ( !result )
-  {
-    IDLOGERROR( "html", "kvQABaseMeteodata::data_asPerl ERROR"
-                << " could not get observation variables."
-                << endl );
-    return false;
-  }
-  result = sman.getVariables( kvQABase::refobs_data, refobs_vars );
-  if ( !result )
-  {
-    IDLOGERROR( "html", "kvQABaseMeteodata::data_asPerl ERROR"
-                << " could not get reference observation variables."
-                << endl );
-    return false;
-  }
-  result = sman.getVariables( kvQABase::model_data, model_vars );
-  if ( !result )
-  {
-    IDLOGERROR( "html", "kvQABaseMeteodata::data_asPerl ERROR"
-                << " could not get model variables."
-                << endl );
-    return false;
-  }
-
+  sman.getVariables( kvQABase::obs_data, obs_vars );
+  sman.getVariables( kvQABase::refobs_data, refobs_vars );
+  sman.getVariables( kvQABase::model_data, model_vars );
 
   // if no data needed - return
-  if ( obs_vars.pars.size() == 0 &&
-       refobs_vars.pars.size() == 0 &&
-       model_vars.pars.size() == 0 )
+  if ( obs_vars.pars.empty() && refobs_vars.pars.empty() && model_vars.pars.empty() )
   {
-    IDLOGINFO( "html", "No observation- or model-data needed: RETURN" );
-    return true;
+    IDLOGINFO( "html", "No observation- or model-data needed" );
+    return "# No observation- or model-data needed\n";
   }
 
-  skipcheck = false;
   // using observation_program // if normal station:
   if ( ! oplist.empty() )
   {
     // ensure that requested obs.parameters are active in observation_program
-    kvObsPgmList::const_iterator itrop;
-    vector<kvQABase::script_par>::const_iterator itrpa;
-    for ( itrpa = obs_vars.pars.begin(); itrpa != obs_vars.pars.end(); itrpa++ )
-    {
-      if ( !itrpa->normal )
-        continue;
-      int pid = itrpa->paramid;
-      string vname = itrpa->name;
-
-      IDLOGINFO( "html", "Checking obs_pgm for par:" << vname
-                 << " nr:" << pid << endl );
-      for ( itrop = oplist.begin(); itrop != oplist.end(); itrop++ )
-        if ( itrop->paramID() == pid )
-          break;
-      if ( skipcheck || itrop == oplist.end() )
-      {
-        // parameter inactive or not found in obs_program
-        IDLOGINFO( "html", " SKIPPING check "
-                   << ( skipcheck ? "(inactive in obs_program) !"
-                        : "(param not found in obs_program for station) !" )
-                   << endl );
-        skipcheck = true;
-        return true;
+    for ( vector<kvQABase::script_par>::const_iterator itrpa = obs_vars.pars.begin(); itrpa != obs_vars.pars.end(); itrpa++ )
+      if ( itrpa->normal ) {
+        IDLOGINFO( "html", "Checking obs_pgm for par:" << itrpa->name << " nr:" << itrpa->paramid << endl );
+        if ( find_if(oplist.begin(), oplist.end(), kvalobs::inspect::has_paramid(itrpa->paramid)) == oplist.end() )
+          throw SkipCheck(); // parameter inactive or not found in obs_program
       }
-    }
   }
 
 
   // Read and put data into script_var structure
-  if ( !fillObsVariables( obs_vars ) )
-  {
-    IDLOGERROR( "html", "kvQABaseMeteodata::data_asPerl ERROR"
-                << " could not fill var-structures for observations."
-                << endl );
-    return false;
-  }
+  fillObsVariables( obs_vars );
+  fillObsVariables( refobs_vars );
+  fillModelVariables( model_vars );
+  
+  std::ostringstream ret;
+  ret << "\n";
+  ret << "#==========================================\n";
+  ret << "#  Data\n";
+  ret << "#\n";
 
-  if ( !fillObsVariables( refobs_vars ) )
-  {
-    IDLOGERROR( "html", "kvQABaseMeteodata::data_asPerl ERROR"
-                << " could not fill var-structures for reference observations."
-                << endl );
-    return false;
-  }
-
-  if ( !fillModelVariables( model_vars ) )
-  {
-    IDLOGERROR( "html", "kvQABaseMeteodata::data_asPerl ERROR"
-                << " could not fill var-structures for model."
-                << endl );
-    return false;
-  }
-
-
-  //   IDLOGDEBUG("html","---------- Dump of obs_vars" << endl);
-  //   if (obs_vars.allpos.size() > 0){
-  //     IDLOGDEBUG("html","Source:" << obs_vars.source << endl);
-  //     IDLOGDEBUG("html","Timestart:" << obs_vars.timestart << endl);
-  //     IDLOGDEBUG("html","Timestop:" << obs_vars.timestop << endl);
-  //     for (int k=0; k<obs_vars.allpos.size(); k++)
-  //       IDLOGDEBUG("html","  Station:" << obs_vars.allpos[k] << endl);
-  //     for (int k=0; k<obs_vars.alltimes.size(); k++)
-  //       IDLOGDEBUG("html","  Timeoffset:" << obs_vars.alltimes[k] << endl);
-  //     IDLOGDEBUG("html","Variables" << endl);
-  //     for (int k=0; k<obs_vars.pars.size(); k++){
-  //       IDLOGDEBUG("html","-------------------------------" << endl);
-  //       IDLOGDEBUG("html","  - var-signature:" << obs_vars.pars[k].signature << endl);
-  //       IDLOGDEBUG("html","  - var-name:" << obs_vars.pars[k].name << endl);
-  //       IDLOGDEBUG("html","  - var-paramid:" << obs_vars.pars[k].paramid << endl);
-  //       IDLOGDEBUG("html","  - #var-values:" << obs_vars.pars[k].values.size() << endl);
-  //     }
-  //   }
-  //   IDLOGDEBUG("html","----------------------------------" << endl);
-
-  //   IDLOGDEBUG("html","---------- Dump of refobs_vars" << endl);
-  //   if (refobs_vars.allpos.size() > 0){
-  //     IDLOGDEBUG("html","Source:" << refobs_vars.source << endl);
-  //     IDLOGDEBUG("html","Timestart:" << refobs_vars.timestart << endl);
-  //     IDLOGDEBUG("html","Timestop:" << refobs_vars.timestop << endl);
-  //     for (int k=0; k<refobs_vars.allpos.size(); k++)
-  //       IDLOGDEBUG("html","  Station:" << refobs_vars.allpos[k] << endl);
-  //     for (int k=0; k<refobs_vars.alltimes.size(); k++)
-  //       IDLOGDEBUG("html","  Timeoffset:" << refobs_vars.alltimes[k] << endl);
-  //     IDLOGDEBUG("html","Variables" << endl);
-  //     for (int k=0; k<refobs_vars.pars.size(); k++){
-  //       IDLOGDEBUG("html","-------------------------------" << endl);
-  //       IDLOGDEBUG("html","  - var-signature:" << refobs_vars.pars[k].signature << endl);
-  //       IDLOGDEBUG("html","  - var-name:" << refobs_vars.pars[k].name << endl);
-  //       IDLOGDEBUG("html","  - var-paramid:" << refobs_vars.pars[k].paramid << endl);
-  //       IDLOGDEBUG("html","  - #var-values:" << refobs_vars.pars[k].values.size() << endl);
-  //     }
-  //   }
-  //   IDLOGDEBUG("html","----------------------------------" << endl);
-
-  //   IDLOGDEBUG("html","---------- Dump of model_vars" << endl);
-  //   if (model_vars.allpos.size() > 0){
-  //     IDLOGDEBUG("html","Source:" << model_vars.source << endl);
-  //     IDLOGDEBUG("html","Timestart:" << model_vars.timestart << endl);
-  //     IDLOGDEBUG("html","Timestop:" << model_vars.timestop << endl);
-  //     for (int k=0; k<model_vars.allpos.size(); k++)
-  //       IDLOGDEBUG("html","  Station:" << model_vars.allpos[k] << endl);
-  //     for (int k=0; k<model_vars.alltimes.size(); k++)
-  //       IDLOGDEBUG("html","  Timeoffset:" << model_vars.alltimes[k] << endl);
-  //     IDLOGDEBUG("html","Variables" << endl);
-  //     for (int k=0; k<model_vars.pars.size(); k++){
-  //       IDLOGDEBUG("html","-------------------------------" << endl);
-  //       IDLOGDEBUG("html","  - var-signature:" << model_vars.pars[k].signature << endl);
-  //       IDLOGDEBUG("html","  - var-name:" << model_vars.pars[k].name << endl);
-  //       IDLOGDEBUG("html","  - var-paramid:" << model_vars.pars[k].paramid << endl);
-  //       IDLOGDEBUG("html","  - #var-values:" << model_vars.pars[k].values.size() << endl);
-  //     }
-  //   }
-  //   IDLOGDEBUG("html","----------------------------------" << endl);
-
-
-
-  string obs_varstring;
-  if ( !sman.makePerlVariables( obs_vars, obs_varstring ) )
-  {
-    return false;
-  }
-  string refobs_varstring;
-  if ( !sman.makePerlVariables( refobs_vars, refobs_varstring ) )
-  {
-    return false;
-  }
-  string model_varstring;
-  if ( !sman.makePerlVariables( model_vars, model_varstring ) )
-  {
-    return false;
-  }
-
-  // add observation-time as variabel
-  miTime obstime = stationinfo_.obstime();
-  data += "my @obstime=(" + miString( obstime.year() ) + "," +
-          miString( obstime.month() ) + "," +
-          miString( obstime.day() ) + "," +
-          miString( obstime.hour() ) + "," +
-          miString( obstime.min() ) + "," +
-          miString( obstime.sec() ) + ");\n";
-
-  data += "\n";
+  // add observation-time as variabel  
+  const miTime obstime = stationinfo_.obstime();
+  ret   << "my @obstime=("  
+  	<< obstime.year() << "," << obstime.month() << "," << obstime.day() << "," 
+        << obstime.hour() << "," << obstime.min() << "," << obstime.sec() << ");\n\n";
 
   // add meteorological data strings
-  data += obs_varstring + "\n";
-  data += refobs_varstring + "\n";
-  data += model_varstring + "\n";
+  ret << sman.makePerlVariables( obs_vars ) + "\n";
+  ret << sman.makePerlVariables( refobs_vars ) + "\n";
+  ret << sman.makePerlVariables( model_vars ) + "\n";
 
-  data += "#\n";
-  data += "#==========================================\n";
-  data += "\n";
+  ret << "#\n";
+  ret << "#==========================================\n";
+  ret << "\n";
 
-  return true;
+  return ret.str();
 }
 
 kvQABaseMeteodata::DataFromTime & kvQABaseMeteodata::preloadData(const kvalobs::kvStationInfo & si)
@@ -498,7 +336,7 @@ void kvQABaseMeteodata::resetFlags(const kvalobs::kvStationInfo & si)
 }
 
 
-bool
+void
 kvQABaseMeteodata::fillObsVariables( kvQABase::script_var & vars )
 {
   typedef std::set<int> TimeOffsets;
@@ -510,7 +348,7 @@ kvQABaseMeteodata::fillObsVariables( kvQABase::script_var & vars )
 
     // load data
     if ( ! loadObsData( *pp, vars.timestart, vars.timestop ) )
-      return false;
+      throw std::runtime_error( "Error when attempting to load obsdata" );
 
     // if still no data...give up
     if ( obsdata[ *pp ].empty() )
@@ -519,12 +357,12 @@ kvQABaseMeteodata::fillObsVariables( kvQABase::script_var & vars )
                   << " and timesteps:" << vars.timestart
                   << "," << vars.timestop
                   << endl );
-      return false;
+      throw std::runtime_error( "Unable to find observations for station/timestep" );
     }
 
     // fetch text data
     if ( !loadTextData( *pp, vars.timestart, vars.timestop ) )
-      return false;
+      throw std::runtime_error("Error when attempting to load text data");
 
     // loop observation times
     for ( DataFromTime::iterator tp = obsdata[ *pp ].begin(); tp != obsdata[ *pp ].end(); ++ tp )
@@ -709,13 +547,11 @@ kvQABaseMeteodata::fillObsVariables( kvQABase::script_var & vars )
 
   for ( TimeOffsets::reverse_iterator rt = alltimes.rbegin(); rt != alltimes.rend(); rt++ )
     vars.alltimes.push_back( *rt ); // add timestep to list
-
-  return true;
 }
 
 
 
-bool
+void
 kvQABaseMeteodata::fillModelVariables( kvQABase::script_var& vars )
 {
   set<int> alltimes; // unique list of timeoffsets
@@ -727,9 +563,7 @@ kvQABaseMeteodata::fillModelVariables( kvQABase::script_var& vars )
 
     // load data
     if ( !loadModelData( *pp, vars.timestart, vars.timestop ) )
-    {
-      return false;
-    }
+      throw std::runtime_error("Unable to load model data");
 
     // if still no data...give up
     if ( modeldata[ *pp ].size() == 0 )
@@ -737,7 +571,7 @@ kvQABaseMeteodata::fillModelVariables( kvQABase::script_var& vars )
       IDLOGERROR( "html", "no MODELDATA found for station:" << *pp
                   << " and timesteps:" << vars.timestart << "," << vars.timestop
                   << endl );
-      return false;
+      throw std::runtime_error("Unable to find model data for station/timestep" );
     }
 
     // loop times
@@ -787,7 +621,7 @@ kvQABaseMeteodata::fillModelVariables( kvQABase::script_var& vars )
           status = kvQCFlagTypes::status_original_missing;
           vars.missing_data = true;
           // should we really........
-          return false;
+          throw std::runtime_error("Missing model parameter " + vname);
         }
 
         // add data value
@@ -802,8 +636,6 @@ kvQABaseMeteodata::fillModelVariables( kvQABase::script_var& vars )
   set<int>::reverse_iterator rt = alltimes.rbegin();
   for ( ; rt != alltimes.rend(); rt++ )
     vars.alltimes.push_back( *rt ); // add timestep to list
-
-  return true;
 }
 
 
@@ -811,7 +643,7 @@ kvQABaseMeteodata::fillModelVariables( kvQABase::script_var& vars )
 
 
 
-void kvQABaseMeteodata::setFlag( ScriptReturnType::const_iterator param, const ScriptReturnType & scriptRet, kvalobs::kvData & newdata )
+void kvQABaseMeteodata::setFlag( ScriptReturnType::const_iterator param, const ScriptReturnType & scriptRet, kvalobs::kvData & newdata, const kvalobs::kvChecks & check )
 {
   const string & key = param->first;
   int flagvalue = static_cast<int>( param->second );
@@ -825,9 +657,9 @@ void kvQABaseMeteodata::setFlag( ScriptReturnType::const_iterator param, const S
 
   // ensure that new flagvalue is larger than old
   int oldflagvalue;
-  cinfo.getControlFlag( medium_qcx_, oldflagvalue );
+  cinfo.getControlFlag( check.medium_qcx(), oldflagvalue );
   if ( oldflagvalue < flagvalue )
-    cinfo.setControlFlag( medium_qcx_, flagvalue );
+    cinfo.setControlFlag( check.medium_qcx(), flagvalue );
 
   IDLOGINFO( "html", "kvQABaseMeteodata::updateParameters controlinfo  AFTER:" << cinfo << endl <<
              "=====================================================" << endl );
@@ -857,7 +689,7 @@ void kvQABaseMeteodata::setFlag( ScriptReturnType::const_iterator param, const S
       subcheck = ost.str();
     }
 
-    cfailed += qcx_ + subcheck + ":" + miString( language_ );
+    cfailed += check.qcx() + subcheck + ":" + miString( check.language() );
     IDLOGINFO( "html", "cfailed = " << cfailed << endl );
     newdata.cfailed( cfailed );
   }
@@ -1030,7 +862,8 @@ kvalobs::kvData & kvQABaseMeteodata::getModifiedData( ObsKeys & updated_obs,
 
 void kvQABaseMeteodata::updateSingleParam( ObsKeys & updated_obs,
     const ScriptReturnType::const_iterator pp,
-    const ScriptReturnType & params )
+    const ScriptReturnType & params, 
+    const kvalobs::kvChecks & check)
 {
   const string & key = pp->first;
   double value = pp->second;
@@ -1058,7 +891,7 @@ void kvQABaseMeteodata::updateSingleParam( ObsKeys & updated_obs,
 
     // Set results from flag:
     if ( type == type_flag )
-      setFlag( pp, params, newdata );
+      setFlag( pp, params, newdata, check );
     else if ( type == type_missing )
       setMissing( pp, newdata );
     else if ( type == type_corrected )
@@ -1093,12 +926,12 @@ void kvQABaseMeteodata::saveInDb( const ObsKeys & updated_obs )
 }
 
 
-bool kvQABaseMeteodata::updateParameters( const ScriptReturnType & params )
+bool kvQABaseMeteodata::updateParameters( const ScriptReturnType & params, const kvalobs::kvChecks & check )
 {
   ObsKeys updated_obs;
 
   for ( ScriptReturnType::const_iterator pp = params.begin(); pp != params.end(); ++ pp )
-    updateSingleParam( updated_obs, pp, params );
+    updateSingleParam( updated_obs, pp, params, check );
 
   saveInDb( updated_obs );
 

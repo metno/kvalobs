@@ -36,8 +36,8 @@
 
 #include "kvQABaseTypes.h"
 #include "kvQABaseDBConnection.h"
-#include "kvQABaseScriptManager.h"
-#include "kvQABaseMetadata.h"
+//#include "kvQABaseScriptManager.h"
+//#include "kvQABaseMetadata.h"
 
 #include <list>
 
@@ -92,12 +92,13 @@ namespace
 }
 
 CheckRunner::CheckRunner( const kvStationInfo & params,
-                          dnmi::db::Connection & con_,
-                          const path & logp )
+    kvQABaseDBConnection & con_,
+    const path & logp )
     : stinfo( params )
-    , dbcon( & con_ )
-    , meteod( dbcon, params )
+    , dbcon( con_ )
+    , meteod( con_, params )
     , logpath_( logp )
+    , checkCreator_(meteod, params, con_)
 {
   if ( !dbcon.dbOk() )
     throw runtime_error( "No database connection" );
@@ -119,9 +120,7 @@ bool CheckRunner::shouldProcess()
   // ...unless this is an unknown ship, stinfo.stationID()>10000000
   if ( stinfo.stationID() <= 10000000 )
   {
-    if ( ! dbcon.getObsPgm( stinfo.stationID(), stinfo.obstime(), oprogramlist ) )
-      throw std::runtime_error( "Error when accesssing obs_pgm from database" );
-    if ( oprogramlist.empty() ) {
+    if ( checkCreator_.oprogramlist().empty() ) {
       log_( "Station does not exist in obspgm" );
       return false;
     }
@@ -196,112 +195,25 @@ void CheckRunner::findChecks( list<kvChecks> & out )
     logEnd_( "CheckRunner: Error reading checks", Error );
 }
 
-string CheckRunner::getPerlScript( const kvalobs::kvChecks & check, kvQABaseScriptManager & sman ) const
-{
-  bool sig_ok; // signature ok
-  if ( ! sman.findAlgo( check.checkname(), check.checksignature(), stinfo.stationID(), sig_ok ) )
-    throw runtime_error( "CheckRunner::runChecks failed in ScriptManager.findAlgo\nAlgorithm not identified!" );
-  else if ( ! sig_ok )
-    throw runtime_error( "CheckRunner::runChecks failed in ScriptManager.findAlgo\nBAD signature(s)!" );
-  
-  string ret;
-  
-  if ( ! sman.getScript( ret ) )
-    throw runtime_error( "CheckRunner::runChecks failed in ScriptManager.getScript" );
-
-  return ret;
-}
-
-namespace
-{
-  /**
-   * Signals that a particuar check should not be run.
-   */
-  struct SkipCheck : exception {};
-}
-
-string CheckRunner::getMeteoData( const kvalobs::kvChecks & check, kvQABaseScriptManager & sman )
-{
-  string ret;
-  bool skipcheck = false;
-
-//  cout << "REQUEST:\n";
-//  cout << '\t' << check.qcx() << "\t-\t" << check.checkname() << endl;
-//  cout << '\t' << check.checksignature() << endl;
-//  for (kvObsPgmList::const_iterator it = oprogramlist.begin(); it != oprogramlist.end(); ++ it )
-//    cout << "\t\t" << it->stationID() << ", " << it->paramID() << ", " << it->typeID() << endl;
-  
-  if ( ! meteod.data_asPerl( check.qcx(), check.medium_qcx(), check.language(), sman, oprogramlist, skipcheck, ret ) )
-    throw runtime_error( "CheckRunner::runChecks failed in meteod.data_asPerl" );
-  
-  if ( skipcheck )
-    throw SkipCheck();
-  return ret;
-}
-
-string CheckRunner::getMetaData( const kvalobs::kvChecks & check, kvQABaseMetadata & metad, kvQABaseScriptManager & sman ) const
-{
-  string ret;
-  if ( ! metad.data_asPerl( stinfo.stationID(), check.qcx(), stinfo.obstime(), sman, ret ) )
-    throw std::runtime_error( "CheckRunner::runChecks failed in metad.data_asPerl" );
-  return ret;
-}
-
-
-string CheckRunner::getScript( const kvChecks & check, kvQABaseMetadata & metad, kvQABaseScriptManager & sman )
-{
-  ostringstream checkstr; // final check string
-  checkstr << "#==========================================\n"
-  << "# KVALOBS check-script\n"
-  << "# type: " << check.qcx() << "\n"
-  << "#==========================================\n\n"
-  << "use strict;\n";
-
-  string perlScript = getPerlScript( check, sman );
-  string meteoData = getMeteoData( check, sman );
-  string metaData = getMetaData( check, metad, sman );
-
-  checkstr << metaData << meteoData << perlScript;
-  
-//  cout << "\n------------------------------------------------------------------\n\n";
-//  cout << checkstr.str() << endl; 
-
-  return checkstr.str();
-}
-
-
-void CheckRunner::runCheck( const kvalobs::kvChecks & check, kvQABaseMetadata & metad, kvQABaseScriptManager & sman )
+void CheckRunner::runCheck( const std::string & checkScript, const kvalobs::kvChecks & check )
 {
   log_( "<HR>" );
   log_( string( "<H2>Check loop, type:" ) + check.qcx() + " name:" + check.checkname() + "</H2>" );
 
-  string final_check;
-  try
-  {
-    final_check = getScript( check, metad, sman );
-  }
-  catch ( SkipCheck & )
-  {
-    return log_( "CheckRunner::runCheck skipping check (obs_program)" );
-  }
-  catch ( runtime_error & e )
-  {
-    return log_( e.what(), Error );
-  }
 
   // Writing the script to be run to html:
 //#define LOG_CHECK_SCRIPT
 #ifdef LOG_CHECK_SCRIPT  
     log_( "Final checkstring:" );
     log_( "<font color=#007700>" );
-    log_( final_check );
+    log_( checkScript );
     log_( "</font>" );
 #endif
 
   /* ----- run check ---------------------------------- */
   kvPerlParser parser;                // the perlinterpreter
   map<string, double> retvalues;
-  if ( ! parser.runScript( final_check, retvalues ) )
+  if ( ! parser.runScript( checkScript, retvalues ) )
     return log_( "CheckRunner::runCheck failed in parser.runScript", Error );
 
   // TEST --------------------------------------------------
@@ -315,7 +227,7 @@ void CheckRunner::runCheck( const kvalobs::kvChecks & check, kvQABaseMetadata & 
   {
     // Update parameters with new control-flags and any return-variables - also update kvStationInfo
     IDLOGINFO( "html", "Updating observation(s) with return values from check" << endl );
-    if ( ! meteod.updateParameters( retvalues ) )
+    if ( ! meteod.updateParameters( retvalues, check ) )
       log_( "CheckRunner::runCheck failed in updateParameters", Error );
   }
   else
@@ -340,21 +252,30 @@ void CheckRunner::operator() ( bool forceCheck )
     throw;
   }
   
-  kvQABaseMetadata metad( dbcon );      // Metadata manager
-  kvQABaseScriptManager sman( dbcon );  // Perlscript manager
-
   //  relevant checks (QC1) for this observation
-  list<kvChecks> checks;
-  findChecks( checks );
+  const list<kvChecks> & checks = checkCreator_.getChecks(); 
   if ( checks.empty() )
     return logEnd_( "No appropriate checks found" );
 
-  meteod.resetFlags(stinfo);
+  meteod.resetFlags(stinfo); // what is this? And why does things fail when I move this line?
     
   // Loop through checks
-  for ( list<kvChecks>::const_iterator cp = checks.begin(); cp != checks.end(); ++ cp )
-    runCheck( * cp, metad, sman );
+  for ( list<kvChecks>::const_iterator cp = checks.begin(); cp != checks.end(); ++ cp ) {
+    try {
+      CheckCreator::ScriptList scripts;
+      checkCreator_.getScripts( scripts, * cp );
+      for ( CheckCreator::ScriptList::const_iterator script = scripts.begin(); script != scripts.end(); ++ script )
+	runCheck( * script, * cp );
+    }
+    catch ( kvQABaseMeteodata::SkipCheck & ) {
+      log_( "CheckRunner::runCheck skipping check (obs_program)" );
+    }
+    catch ( std::exception & e ) {
+      log_( e.what(), Error );
+    }
+  }
 
+  
   logEnd_( "Done processing", Debug );
   LOGINFO( "CheckRunner::runChecks FINISHED" << endl );
 }

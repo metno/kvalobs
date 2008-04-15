@@ -76,6 +76,8 @@ void KvalobsDatabase::setup( const std::string & filename )
   if ( dbSetup.empty() )
     throw std::runtime_error( "Unable to find database setup file" SETUPDB_SQL );
   connection_->exec( dbSetup );
+  
+  con_ = new kvQABaseDBConnection(connection_); 
 }
 
 
@@ -93,6 +95,7 @@ KvalobsDatabase::KvalobsDatabase( const std::string & filename )
 
 KvalobsDatabase::~KvalobsDatabase()
 {
+  delete con_;
   delete connection_;
 }
 

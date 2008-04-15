@@ -76,12 +76,11 @@ class kvQABaseScriptManager
     bool getAlgoName( std::string& name ) const;
 
     /// return prepared script_var variable for one data_source
-    bool getVariables( const kvQABase::data_source source,
+    void getVariables( const kvQABase::data_source source,
                        kvQABase::script_var& vars ) const;
 
     /// make Perl code from script_var variables
-    bool makePerlVariables( kvQABase::script_var& vars,
-                            std::string& varstring ) const;
+    std::string makePerlVariables( kvQABase::script_var& vars) const;
 
     void clear();
 };

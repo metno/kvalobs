@@ -31,21 +31,17 @@
 #ifndef _checkrunner_h
 #define _checkrunner_h
 
+#include "CheckCreator.h"
+#include "kvQABaseDBConnection.h"
+#include "kvQABaseMeteodata.h"
+#include "kvQABaseTypes.h"
 #include <puTools/miString>
 #include <puTools/miTime>
 #include <kvalobs/kvStationInfo.h>
 #include <milog/milog.h>
 #include <kvalobs/kvChecks.h>
-#include "kvQABaseDBConnection.h"
-//#include "ObsData.h"
-//typedef ObsData kvQABaseMeteodata;
-#include "kvQABaseMeteodata.h"
-#include "kvQABaseTypes.h"
 #include <boost/filesystem/path.hpp>
 
-class kvQABaseDBConnection;
-class kvQABaseMetadata;
-class kvQABaseScriptManager;
 
 /*
 TODO:
@@ -79,8 +75,8 @@ class CheckRunner
      * @param logpath path for logging.
      */
     CheckRunner( const kvalobs::kvStationInfo & params,
-                 dnmi::db::Connection & con,
-                 const boost::filesystem::path & logpath );
+	kvQABaseDBConnection & con,
+        const boost::filesystem::path & logpath );
     
     ~CheckRunner();
 
@@ -109,14 +105,9 @@ class CheckRunner
     void updateStaticVariables();
     void findChecks( std::list<kvalobs::kvChecks> & out );
 
-    void runCheck( const kvalobs::kvChecks & check, kvQABaseMetadata & metad, kvQABaseScriptManager & sman );
+    void runCheck( const std::string & checkScript, const kvalobs::kvChecks & check );
 
-    std::string getScript( const kvalobs::kvChecks & check, kvQABaseMetadata & metad, kvQABaseScriptManager & sman );
-    std::string getPerlScript( const kvalobs::kvChecks & check, kvQABaseScriptManager & sman ) const;
-    std::string getMeteoData( const kvalobs::kvChecks & check, kvQABaseScriptManager & sman );
-    std::string getMetaData( const kvalobs::kvChecks & check, kvQABaseMetadata & metad, kvQABaseScriptManager & sman ) const;
-
-  private:
+    CheckCreator checkCreator_;
 
     const kvalobs::kvStationInfo & stinfo;
     kvQABaseDBConnection dbcon;

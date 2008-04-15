@@ -56,8 +56,8 @@ class CheckRunnerTest : public CppUnit::TestFixture
     CPPUNIT_TEST( testPrefersCurrentTypeID );
     CPPUNIT_TEST( testHandlesSpecifiedTypeidInChecks );
     CPPUNIT_TEST( testDoesNotCheckWhenChecksSpecifyAnotherTypeid );
-//    CPPUNIT_TEST( testChecksHighLevels );
-//    CPPUNIT_TEST( testChecksNonstandardSensor );
+    CPPUNIT_TEST( testChecksHighLevels );
+    CPPUNIT_TEST( testChecksNonstandardSensor );
     CPPUNIT_TEST_SUITE_END();
 
   public:

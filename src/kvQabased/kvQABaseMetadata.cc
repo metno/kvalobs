@@ -54,15 +54,14 @@ kvQABaseMetadata::data_asPerl(const int                    sid,  // station-id
 {
   data.clear();   // clear final perl-string
 
-  bool result;
   kvQABase::script_var vars;
 
   // get requirements for script
-  result= sman.getVariables(kvQABase::meta_data, vars);
-  if (!result) {
-    IDLOGERROR("html",
-	       "kvQABaseMetadata::data_asPerl ERROR sman.getVariables failed."
-	       << std::endl);
+  try {
+    sman.getVariables(kvQABase::meta_data, vars);
+  }
+  catch ( std::exception & e ) {
+    IDLOGERROR("html", e.what() << std::endl);
     return false;
   }
 
@@ -82,7 +81,7 @@ kvQABaseMetadata::data_asPerl(const int                    sid,  // station-id
     int ipos= vars.allpos[i];
 
     // fetch metadata from DB
-    result= dbcon_.getMetadata(ipos,otime,ctype,tables);
+    bool result= dbcon_.getMetadata(ipos,otime,ctype,tables);
     if (!result) {
       IDLOGERROR("html",
 		 "kvQABaseMetadata::data_asPerl ERROR dbcon_.getMetadata failed."
@@ -123,16 +122,7 @@ kvQABaseMetadata::data_asPerl(const int                    sid,  // station-id
   }
 
   // convert var_structure into Perl-code
-  std::string varstring;
-
-  result= sman.makePerlVariables(vars, varstring);
-
-  if (!result) {
-    IDLOGERROR("html",
-	       "kvQABaseMetadata::data_asPerl ERROR sman.makePerlVariables failed."
-	       << std::endl);
-    return false;
-  }
+  std::string varstring = sman.makePerlVariables(vars); 
 
   // Pretty heading
   data+="\n";
