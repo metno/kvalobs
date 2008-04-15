@@ -47,7 +47,12 @@ libkvalobs_la_CPPFLAGS = $(AM_CPPFLAGS) $(putools_CFLAGS) \
                          -DPREFIX="\""$(prefix)"\"" 
 libkvalobs_la_LDFLAGS = $(putools_LDFLAGS)
 #libkvalobs_la_LIBS = $(top_builddir)/src/lib/miutil/libmiutil.a
-libkvalobs_la_LIBADD = $(top_builddir)/src/lib/miutil/libmiutil.la
+libkvalobs_la_LIBADD = $(top_builddir)/src/lib/miutil/libmiutil.la \
+                       $(top_builddir)/src/lib/miconfparser/libmiconfparser.a \
+                       $(top_builddir)/src/lib/milog/libmilog.la \
+                       $(top_builddir)/src/lib/dnmithread/libdnmithread.la \
+                       $(top_builddir)/src/lib/kvdb/libkvdb.la \
+                       $(top_builddir)/src/lib/kvskel/libkvskel.la
 
 kvalobsincludedir = $(pkgincludedir)/kvalobs
 kvalobsinclude_HEADERS = \

@@ -2,12 +2,12 @@ SUBDIRS = \
 	kvskel \
 	dnmithread \
 	miutil \
-	kvalobs \
+	miconfparser \
+	milog \
 	fileutil \
 	kvdb \
+	kvalobs \
 	decodeutility \
 	dbdrivers \
 	corbahelper \
-	milog \
-	miconfparser \
 	decoder

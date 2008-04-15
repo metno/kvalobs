@@ -29,7 +29,7 @@ kvAgregated_CPPFLAGS = \
 	$(putools_CFLAGS)
 
 kvAgregated_LDADD = \
-	../service-libs/kvcpp/libkvcpp.la \
+	$(top_builddir)/src/service-libs/kvcpp/libkvcpp.la \
 	$(BOOST_PROGRAM_OPTIONS_LIB) 
 
 	

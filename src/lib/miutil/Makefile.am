@@ -7,4 +7,4 @@ libmiutil_la_SOURCES = \
 	miTimeParse.h miTimeParse.cc 
 
 libmiutil_la_CPPFLAGS = $(putools_CFLAGS)
-libmiutil_la_LIBS = $(putools_LIBS)
+libmiutil_la_LIBADD = $(putools_LIBS)
