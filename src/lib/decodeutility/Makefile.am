@@ -13,8 +13,16 @@ libdecodeutility_la_SOURCES = \
 	
 libdecodeutility_la_CPPFLAGS = $(AM_CPPFLAGS) $(putools_CFLAGS) $(libxmlpp_CFLAGS) $(omniORB4_CFLAGS) $(BOOST_CPPFLAGS)
 
-#libdecodeutility_la_LIBADD =
-libdecodeutility_la_LDFLAGS = $(putools_LIBS) $(libxmlpp_LIBS) $(omniORB4_LIBS) $(BOOST_LDFLAGS) $(BOOST_THREAD_LIB)
+libdecodeutility_la_LIBADD = $(top_builddir)/src/lib/kvalobs/libkvalobs.la \
+                             $(top_builddir)/src/lib/kvskel/libkvskel.la \
+                             $(top_builddir)/src/lib/miutil/libmiutil.la \
+                             $(putools_LIBS)  \
+                             $(libxmlpp_LIBS) \
+                             $(omniORB4_LIBS) \
+                             $(BOOST_LDFLAGS) \
+                             $(BOOST_THREAD_LIB)
+                             
+#libdecodeutility_la_LDFLAGS = $(putools_LIBS) $(libxmlpp_LIBS) $(omniORB4_LIBS) $(BOOST_LDFLAGS) $(BOOST_THREAD_LIB)
 
 TESTS = decodeutilitytest
 

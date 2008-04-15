@@ -46,7 +46,8 @@ libkvalobs_la_CPPFLAGS = $(AM_CPPFLAGS) $(putools_CFLAGS) \
                          -DLOCALSTATEDIR="\""$(localstatedir)"\"" \
                          -DPREFIX="\""$(prefix)"\"" 
 libkvalobs_la_LDFLAGS = $(putools_LDFLAGS)
-libkvalobs_la_LIBS = ../miutil/libmiutil.a
+#libkvalobs_la_LIBS = $(top_builddir)/src/lib/miutil/libmiutil.a
+libkvalobs_la_LIBADD = $(top_builddir)/src/lib/miutil/libmiutil.la
 
 kvalobsincludedir = $(pkgincludedir)/kvalobs
 kvalobsinclude_HEADERS = \
