@@ -148,6 +148,24 @@ namespace kvalobs
     bool hqc_accepted( const kvData & d );
     bool hqc_rejected( const kvData & d );
   }
+  
+  /**
+   * Various functors for inspecting kvData objects
+   */
+  namespace inspect
+  {
+    class has_paramid
+    {
+      int paramid_;
+    public:
+      has_paramid(int paramid) : paramid_(paramid) {}
+      template<typename T>
+      bool operator() (const T & t) const
+      {
+	return t.paramID() == paramid_;
+      }
+    };
+  }
 
   namespace compare
   {
