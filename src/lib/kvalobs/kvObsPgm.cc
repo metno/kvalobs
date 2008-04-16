@@ -250,9 +250,15 @@ bool kvalobs::kvObsPgm::set(const dnmi::db::DRow& r_)
       }else if(*it=="sun"){
         sun_= (buf=="t") ? true : false;
       }else if(*it=="fromtime"){
-        fromtime_=miTime(buf);
+      	if( ! buf.empty() )
+      		fromtime_=miTime(buf);
+      	else
+      		fromtime_ = miTime();
       }else if(*it=="totime"){
-         totime_=miTime(buf);
+      	if( ! buf.empty()  )
+      		totime_=miTime(buf);
+      	else
+      		totime_=miTime();
       }
     }
     catch(...){
