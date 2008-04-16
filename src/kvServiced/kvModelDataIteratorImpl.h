@@ -42,8 +42,10 @@
 #include "ServiceApp.h"
 #include "ReaperBase.h"
 
-class ModelDataIteratorImpl: public POA_CKvalObs::CService::ModelDataIterator,
-			     public ReaperBase 
+class ModelDataIteratorImpl: 
+	public POA_CKvalObs::CService::ModelDataIterator,
+	public PortableServer::RefCountServantBase,
+	public ReaperBase 
 {
   
   class InvalidWhichData : public std::exception{
@@ -74,6 +76,8 @@ public:
 
   void destroy();
   CORBA::Boolean next(CKvalObs::CService::ModelDataList_out modelData_);
+  virtual void addRef() { _add_ref(); }
+  virtual void removeRef(){ _remove_ref(); }
   
 };
 

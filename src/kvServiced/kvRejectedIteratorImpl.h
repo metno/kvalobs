@@ -41,8 +41,9 @@
 #include "ServiceApp.h"
 #include "ReaperBase.h"
 
-class RejectedIteratorImpl
-  :public POA_CKvalObs::CService::RejectedIterator,
+class RejectedIteratorImpl :
+  public POA_CKvalObs::CService::RejectedIterator,
+  public PortableServer::RefCountServantBase,
   public ReaperBase
 {
   
@@ -77,6 +78,8 @@ public:
   CORBA::Boolean 
     next(CKvalObs::CService::RejectdecodeList_out rejectedList_);
   
+  virtual void addRef() { _add_ref(); }
+  virtual void removeRef(){ _remove_ref(); }
 };
 
 
