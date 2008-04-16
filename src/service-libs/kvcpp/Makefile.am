@@ -35,11 +35,11 @@ libkvcpp_la_LIBADD = \
 	$(top_builddir)/src/lib/kvdb/libkvdb.la \
 	$(top_builddir)/src/lib/fileutil/libfileutil.la \
 	$(top_builddir)/src/lib/milog/libmilog.la \
-	$(top_builddir)/src/lib/miconfparser/libmiconfparser.a \
 	$(top_builddir)/src/lib/kvskel/libkvskel.la \
 	$(top_builddir)/src/lib/corbahelper/libcorbahelper.la \
 	$(top_builddir)/src/lib/dnmithread/libdnmithread.la \
 	$(top_builddir)/src/lib/kvskel/libkvadmininterface.la 
+#	$(top_builddir)/src/lib/miconfparser/libmiconfparser.a  
 	
 	
 	

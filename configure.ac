@@ -9,54 +9,56 @@ AC_CONFIG_MACRO_DIR([m4])
 
 AC_PROG_LIBTOOL
 AM_PROG_LEX
+AM_PROG_CC_C_O
 AC_PROG_YACC
 
+
 AC_CONFIG_FILES([Makefile
-				kvconfig
-				share/Makefile
-				share/kvalobs/Makefile
-				share/kvalobs/idl/Makefile
-                src/Makefile
-                src/lib/Makefile
-                src/lib/kvskel/Makefile
-                src/lib/miutil/Makefile
-                src/lib/decodeutility/Makefile
-                src/lib/dbdrivers/Makefile
-                src/lib/corbahelper/Makefile
-                src/lib/milog/Makefile
-                src/lib/milog/private/Makefile
-                src/lib/milog/thread/Makefile
-                src/lib/miconfparser/Makefile
-                src/lib/dnmithread/Makefile
-                src/lib/fileutil/Makefile
-                src/lib/kvdb/Makefile
-                src/lib/kvalobs/Makefile
-                src/lib/decoder/Makefile
-                src/lib/decoder/decoderbase/Makefile
-                src/lib/decoder/rejectdecoder/Makefile
-                src/lib/decoder/kv2kvdecoder/Makefile
-                src/lib/decoder/dummydecoder/Makefile
-                src/lib/decoder/kldecoder/Makefile
-                src/lib/decoder/autoobsdecoder/Makefile
-                src/lib/decoder/comobsdecoder/Makefile
-                src/lib/decoder/synopdecoder/Makefile
-                src/service-libs/Makefile
-                src/service-libs/kvcpp/Makefile
-                src/service-libs/kvcpp/kvcpp.pc
-                src/service-libs/kvcpp/corba/Makefile
-                src/kvDataInputd/Makefile
-                src/kvServiced/Makefile
-                src/kvQabased/Makefile
-                src/kvManagerd/Makefile
-                src/norcom2kv/Makefile
-                src/kvAgregated/Makefile
-                src/kvsynopd/Makefile 
-                src/kvsynopd/kvsynopd_initdb
-                src/model2kv/Makefile
-                src/kv2kro2/Makefile
-                src/kvalobs_database/Makefile
-                src/script/Makefile
-                src/script/kv/Makefile
+                 kvconfig
+                 share/Makefile
+                 share/kvalobs/Makefile
+                 share/kvalobs/idl/Makefile
+                 src/Makefile
+                 src/lib/Makefile
+                 src/lib/kvskel/Makefile
+                 src/lib/miutil/Makefile
+                 src/lib/decodeutility/Makefile
+                 src/lib/dbdrivers/Makefile
+                 src/lib/corbahelper/Makefile
+                 src/lib/milog/Makefile
+                 src/lib/milog/private/Makefile
+                 src/lib/milog/thread/Makefile
+                 src/lib/miconfparser/Makefile
+                 src/lib/dnmithread/Makefile
+                 src/lib/fileutil/Makefile
+                 src/lib/kvdb/Makefile
+                 src/lib/kvalobs/Makefile
+                 src/lib/decoder/Makefile
+                 src/lib/decoder/decoderbase/Makefile
+                 src/lib/decoder/rejectdecoder/Makefile
+                 src/lib/decoder/kv2kvdecoder/Makefile
+                 src/lib/decoder/dummydecoder/Makefile
+                 src/lib/decoder/kldecoder/Makefile
+                 src/lib/decoder/autoobsdecoder/Makefile
+                 src/lib/decoder/comobsdecoder/Makefile
+                 src/lib/decoder/synopdecoder/Makefile
+                 src/service-libs/Makefile
+                 src/service-libs/kvcpp/Makefile
+                 src/service-libs/kvcpp/kvcpp.pc
+                 src/service-libs/kvcpp/corba/Makefile
+                 src/kvDataInputd/Makefile
+                 src/kvServiced/Makefile
+                 src/kvQabased/Makefile
+                 src/kvManagerd/Makefile
+                 src/norcom2kv/Makefile
+                 src/kvAgregated/Makefile
+                 src/kvsynopd/Makefile 
+                 src/kvsynopd/kvsynopd_initdb
+                 src/model2kv/Makefile
+                 src/kv2kro2/Makefile
+                 src/kvalobs_database/Makefile
+                 src/script/Makefile
+                 src/script/kv/Makefile
 ])
 
 
