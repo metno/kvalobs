@@ -102,23 +102,30 @@ kvQABaseMeteodata::loadObsData( const int sid,
     maxObsTime_[ sid ] = etime;
   }
 
+  
   // fetch observation-data from db
-  if ( !dbcon_.getObservations( sid, stime, etime, obsdata[ sid ] ) )
+  std::list<kvalobs::kvData> dlist;
+  if ( !dbcon_.getObservations( sid, stime, etime, dlist ) )
   {
     IDLOGERROR( "html", "kvQABaseMeteodata::loadObsData ERROR"
                 << " could not get observations from DB."
                 << endl );
     return false;
   }
+  DataFromTime & timeData = obsdata[ sid ];
   
-//  cout << "From database:" << endl;
-//  for ( std::map<miutil::miTime, kvQABaseDBConnection::obs_data>::const_iterator mit = obsdata[sid].begin(); mit != obsdata[sid].end(); ++ mit ) {
-//    cout << mit->first << endl;
-//    const std::vector<kvalobs::kvData> & d = mit->second.data;
-//    for ( std::vector<kvalobs::kvData>::const_iterator it = d.begin(); it != d.end(); ++ it )
-//      cout << "\t\t" << * it << endl;
-//  }
-    
+  // add new data
+  for ( std::list<kvalobs::kvData>::const_iterator it = dlist.begin(); it != dlist.end(); ++ it )
+  {
+    obs_data & d = timeData[ it->obstime() ];
+
+//    if ( std::find( d.data.begin(), d.data.end(), * it ) == d.data.end() )
+//    {
+      IDLOGDEBUG( "html", "Found ObsData:" << * it << std::endl );
+      d.push_back( * it );
+//    }
+  }
+      
   return true;
 }
 
@@ -315,8 +322,8 @@ void kvQABaseMeteodata::resetFlags(const kvalobs::kvStationInfo & si)
 
   for ( DataFromTime::iterator it = data_.begin(); it != data_.end(); ++ it )
   {
-    typedef kvQABaseDBConnection::obs_data::Container KvDL;
-    KvDL & dl = it->second.data;
+    typedef obs_data KvDL;
+    KvDL & dl = it->second;
     for ( KvDL::iterator itb = dl.begin(); itb != dl.end(); ++ itb )
     {
       int missing = itb->controlinfo().flag( flag::fmis );
@@ -396,8 +403,8 @@ kvQABaseMeteodata::fillObsVariables( kvQABase::script_var & vars )
                    << " nr:" << vid << endl );
 
         // find parameter in data-structs
-        kvQABaseDBConnection::obs_data::Container & container_ = tp->second.data;
-        kvQABaseDBConnection::obs_data::Container::const_iterator find;
+        obs_data & container_ = tp->second;
+        obs_data::const_iterator find;
 
         /* check for:
         - correct parameter
@@ -501,7 +508,7 @@ kvQABaseMeteodata::fillObsVariables( kvQABase::script_var & vars )
                    << " nr:" << vid << endl );
 
         // find parameter in data-structs
-        int i, np = ttp->second.data.size();
+        int i, np = ttp->second.size();
         for ( i = 0; i < np; i++ )
         {
           /* check for:
@@ -509,19 +516,19 @@ kvQABaseMeteodata::fillObsVariables( kvQABase::script_var & vars )
              - specific typeID OR the original stationinfo.typeID()!!
                ( -typeID == typeID )
           */
-          if ( ttp->second.data[ i ].paramID() == vid &&
-               ( ( tid == -32767 && abs( ttp->second.data[ i ].typeID() )
+          if ( ttp->second[ i ].paramID() == vid &&
+               ( ( tid == -32767 && abs( ttp->second[ i ].typeID() )
                    == abs( stationinfo_.typeID() ) ) ||
-                 abs( ttp->second.data[ i ].typeID() ) == abs( tid ) ) )
+                 abs( ttp->second[ i ].typeID() ) == abs( tid ) ) )
           {
             // the observation here is the original value
-            value = ttp->second.data[ i ].original();
+            value = ttp->second[ i ].original();
             // set status= OK
             status = kvQCFlagTypes::status_ok;
             // ensure missing_data flag sanity
             vars.missing_data |= ( status > 0 );
             // set correct typeID in vars
-            vars.pars[ j ].typeID = ttp->second.data[ i ].typeID();
+            vars.pars[ j ].typeID = ttp->second[ i ].typeID();
             break;
           }
         }
@@ -600,13 +607,13 @@ kvQABaseMeteodata::fillModelVariables( kvQABase::script_var& vars )
                    << " nr:" << vid << endl );
 
         // find parameter in data-structs
-        int i, np = tp->second.data.size();
+        int i, np = tp->second.size();
         for ( i = 0; i < np; i++ )
         {
-          if ( tp->second.data[ i ].paramID() == vid )
+          if ( tp->second[ i ].paramID() == vid )
           {
             ostringstream ost;
-            ost << tp->second.data[ i ].original();
+            ost << tp->second[ i ].original();
             value = ost.str();
             status = kvQCFlagTypes::status_ok;
             break;
@@ -825,7 +832,7 @@ kvalobs::kvData & kvQABaseMeteodata::getModifiedData( ObsKeys & updated_obs,
     throw runtime_error( "Obsdata not found for time:" + time.isoTime() );
 
   // find correct parameter and typeID
-  kvQABaseDBConnection::obs_data::Container & container_ = obsdata[ station ][ time ].data;
+  obs_data & container_ = obsdata[ station ][ time ];
   int np = container_.size();
   for ( ipar = 0; ipar < np; ++ ipar )
   {
@@ -909,7 +916,8 @@ void kvQABaseMeteodata::saveInDb( const ObsKeys & updated_obs )
 {
   for ( ObsKeys::const_iterator itr = updated_obs.begin(); itr != updated_obs.end(); itr++ )
   {
-    kvalobs::kvData newdata = obsdata[ itr->second.stationID ][ itr->second.time ].data[ itr->second.paridx ];
+    // ouch!
+    kvalobs::kvData newdata = obsdata[ itr->second.stationID ][ itr->second.time ][ itr->second.paridx ];
     //     cout << "save\t" << newdata << endl;
     saveCache_.insert( newdata );
 

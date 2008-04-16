@@ -144,8 +144,8 @@ bool CheckRunner::hqcCorrected()
 
   for ( kvQABaseMeteodata::DataFromTime::const_iterator it = data_.begin(); it != data_.end(); ++ it )
   {
-    typedef kvQABaseDBConnection::obs_data::Container KvDL;
-    const KvDL & dl = it->second.data;
+    typedef kvQABaseMeteodata::obs_data KvDL;
+    const KvDL & dl = it->second;
     for ( KvDL::const_iterator itb = dl.begin(); itb != dl.end(); ++ itb )
       if ( itb->typeID() == stinfo.typeID() and itb->controlinfo().flag( 15 ) )
         return true;
@@ -159,8 +159,8 @@ bool CheckRunner::dataWasCheckedBefore()
 
   for ( kvQABaseMeteodata::DataFromTime::const_iterator it = data_.begin(); it != data_.end(); ++ it )
   {
-    typedef kvQABaseDBConnection::obs_data::Container KvDL;
-    const KvDL & dl = it->second.data;
+    typedef kvQABaseMeteodata::obs_data KvDL;
+    const KvDL & dl = it->second;
     for ( KvDL::const_iterator itb = dl.begin(); itb != dl.end(); ++ itb ) {
 //      cout << "Considering: " << * itb << endl;
       if ( itb->typeID() == stinfo.typeID() and itb->useinfo().flag( 0 ) == 9 )

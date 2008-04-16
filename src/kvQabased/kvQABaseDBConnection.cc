@@ -442,41 +442,41 @@ bool kvQABaseDBConnection::getMetadata( const int sid,
 }
 
 
-// Get exactly one observation-parameter
-bool kvQABaseDBConnection::getObservation( const int sid,                   // station
-    const miutil::miTime& otime,     // obs-time
-    const int pid,                   // parameter
-    kvalobs::kvData& param )
-{
-  bool result;
-
-  std::list<kvalobs::kvData> dlist;
-
-  try
-  {
-    result = dbGate.select( dlist, kvQueries::selectData( sid, pid, otime ) );
-  }
-  catch ( dnmi::db::SQLException & ex )
-  {
-    IDLOGERROR( "html", "Exception: " << ex.what() << std::endl );
-  }
-  catch ( ... )
-  {
-    IDLOGERROR( "html", "Unknown exception: con->exec(ctbl) .....\n" );
-  }
-
-  if ( !result || dlist.size() == 0 )
-    return false;
-
-  std::list<kvalobs::kvData>::const_iterator it = dlist.begin();
-  for ( ;it != dlist.end(); it++ )
-  {
-    IDLOGDEBUG( "html", "Found ObsData:" << *it << std::endl );
-    param = *it;
-  }
-
-  return true;
-}
+//// Get exactly one observation-parameter
+//bool kvQABaseDBConnection::getObservation( const int sid,                   // station
+//    const miutil::miTime& otime,     // obs-time
+//    const int pid,                   // parameter
+//    kvalobs::kvData& param )
+//{
+//  bool result;
+//
+//  std::list<kvalobs::kvData> dlist;
+//
+//  try
+//  {
+//    result = dbGate.select( dlist, kvQueries::selectData( sid, pid, otime ) );
+//  }
+//  catch ( dnmi::db::SQLException & ex )
+//  {
+//    IDLOGERROR( "html", "Exception: " << ex.what() << std::endl );
+//  }
+//  catch ( ... )
+//  {
+//    IDLOGERROR( "html", "Unknown exception: con->exec(ctbl) .....\n" );
+//  }
+//
+//  if ( !result || dlist.size() == 0 )
+//    return false;
+//
+//  std::list<kvalobs::kvData>::const_iterator it = dlist.begin();
+//  for ( ;it != dlist.end(); it++ )
+//  {
+//    IDLOGDEBUG( "html", "Found ObsData:" << *it << std::endl );
+//    param = *it;
+//  }
+//
+//  return true;
+//}
 
 
 // Set timestamp in Key/Value table
@@ -550,18 +550,17 @@ bool kvQABaseDBConnection::setObservation( const kvalobs::kvData& param )
 bool kvQABaseDBConnection::getObservations( const int sid,                   // station
     const miutil::miTime& stime,     // start-time
     const miutil::miTime& etime,     // end-time
-    std::map<miutil::miTime, obs_data> & data )
+    std::list<kvalobs::kvData> & data )
 {
-  bool result;
-
   IDLOGINFO( "html", "Fetching observations from:" << stime
              << " until " << etime << std::endl );
 
-  std::list<kvalobs::kvData> dlist;
+//  std::list<kvalobs::kvData> dlist;
 
   try
   {
-    result = dbGate.select( dlist, kvQueries::selectData( sid, stime, etime ) );
+    bool result = dbGate.select( data, kvQueries::selectData( sid, stime, etime ) );
+    return result;
   }
   catch ( dnmi::db::SQLException & ex )
   {
@@ -571,24 +570,7 @@ bool kvQABaseDBConnection::getObservations( const int sid,                   // 
   {
     IDLOGERROR( "html", "Unknown exception: con->exec(ctbl) .....\n" );
   }
-
-  if ( !result )
-    return false;
-
-  // add new data
-  for ( std::list<kvalobs::kvData>::const_iterator it = dlist.begin(); it != dlist.end(); ++ it )
-  {
-    obs_data & d = data[ it->obstime() ];
-
-//    if ( std::find( d.data.begin(), d.data.end(), * it ) == d.data.end() )
-//    {
-      IDLOGDEBUG( "html", "Found ObsData:" << * it << std::endl );
-      d.time = it->obstime();
-      d.data.push_back( * it );
-//    }
-  }
-
-  return true;
+  return false;
 }
 
 
@@ -629,14 +611,13 @@ bool kvQABaseDBConnection::getTextData( const int sid,                   // stat
   for ( it = tdlist.begin();it != tdlist.end(); it++ )
   {
     if ( data.count( it->obstime() ) > 0 )
-      data[ it->obstime() ].data.clear();
+      data[ it->obstime() ].clear();
   }
   // add new data
   for ( it = tdlist.begin();it != tdlist.end(); it++ )
   {
     IDLOGDEBUG( "html", "Found TextData:" << *it << std::endl );
-    data[ it->obstime() ].time = it->obstime();
-    data[ it->obstime() ].data.push_back( *it );
+    data[ it->obstime() ].push_back( *it );
   }
 
   return true;
@@ -682,14 +663,13 @@ bool kvQABaseDBConnection::getModelData( const int sid,                   // sta
   for ( it = mdlist.begin();it != mdlist.end(); it++ )
   {
     if ( data.count( it->obstime() ) > 0 )
-      data[ it->obstime() ].data.clear();
+      data[ it->obstime() ].clear();
   }
   // add new data
   for ( it = mdlist.begin();it != mdlist.end(); it++ )
   {
     IDLOGDEBUG( "html", "Found ModelData:" << *it << std::endl );
-    data[ it->obstime() ].time = it->obstime();
-    data[ it->obstime() ].data.push_back( *it );
+    data[ it->obstime() ].push_back( *it );
   }
 
   return true;

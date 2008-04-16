@@ -67,7 +67,13 @@ class kvQABaseMeteodata
     
     /// observations by station-id and time
 public:
-    typedef std::map<miutil::miTime, kvQABaseDBConnection::obs_data> DataFromTime;
+//    struct cached_kvData_w_time
+//    {
+//      typedef std::vector<kvalobs::kvData> Container;
+//      Container data;
+//    };
+    typedef std::vector<kvalobs::kvData> obs_data;
+    typedef std::map<miutil::miTime, obs_data> DataFromTime;
 private:
     typedef std::map<int, DataFromTime> DataFromStTime;
     DataFromStTime obsdata;

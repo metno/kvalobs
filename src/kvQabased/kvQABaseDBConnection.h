@@ -65,20 +65,12 @@
 class kvQABaseDBConnection
 {
   public:
-    template <typename Content>
-    struct cached_data_w_time
-    {
-      miutil::miTime time;
-      typedef std::vector<Content> Container;
-      Container data;
-    };
-
     /// all obs_data parameters from one timestep
-    typedef cached_data_w_time<kvalobs::kvData> obs_data;
+//    typedef cached_data_w_time<kvalobs::kvData> obs_data; // moved to meteodata
     /// all text_data parameters from one timestep
-    typedef cached_data_w_time<kvalobs::kvTextData> text_data;
+    typedef std::vector<kvalobs::kvTextData> text_data;
     /// all model_data parameters from one timestep
-    typedef cached_data_w_time<kvalobs::kvModelData> model_data;
+    typedef std::vector<kvalobs::kvModelData> model_data;
 
   private:
     bool connection_ok;
@@ -138,10 +130,10 @@ class kvQABaseDBConnection
                       std::list<kvMetadataTable>& tables );
 
     /// get observation from db matching stationid, parameterid and obstime
-    bool getObservation( const int sid,                   // station
-                         const miutil::miTime& otime,     // obs-time
-                         const int pid,                   // parameter
-                         kvalobs::kvData& param );
+//    bool getObservation( const int sid,                   // station
+//                         const miutil::miTime& otime,     // obs-time
+//                         const int pid,                   // parameter
+//                         kvalobs::kvData& param );
 
     template <typename Iterator>
     bool setObservation( Iterator begin, Iterator end )
@@ -174,7 +166,7 @@ class kvQABaseDBConnection
     bool getObservations( const int sid,                  // station
                           const miutil::miTime& stime,    // start-time
                           const miutil::miTime& etime,    // end-time
-                          std::map<miutil::miTime, obs_data>& data );
+                          std::list<kvalobs::kvData> & data );
 
     /** get all text_data from db matching stationid and obstime
         between stime and etime
@@ -194,11 +186,6 @@ class kvQABaseDBConnection
 
     /// Set timestamp in Key/Value table
     bool saveTimestamp( const miutil::miTime& time );
-
-    dnmi::db::Connection * getConnection()
-    {
-      return connection_;
-    }
 
   private:
     dnmi::db::Connection * connection_;
