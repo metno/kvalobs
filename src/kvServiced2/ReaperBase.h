@@ -37,7 +37,7 @@
 
 
 
-class ReaperBase :  public PortableServer::RefCountServantBase
+class ReaperBase  
 {
   time_t                       lastAccess_;
   bool                         running;
@@ -66,6 +66,9 @@ class ReaperBase :  public PortableServer::RefCountServantBase
   bool isRunning(time_t &lastAccess)const;
 
   void setObjId(PortableServer::ObjectId *id){objId=id;}
+  
+  virtual void addRef()=0;
+  virtual void removeRef()=0;
 
 };
 

@@ -220,7 +220,8 @@ ServiceApp::
 addReaperObj(ReaperBase *rb)
 {
   boost::mutex::scoped_lock l(reaperMutex);
-  rb->_add_ref();
+  //rb->_add_ref();
+  rb->addRef();
   reaperObjList.push_back(rb);
 }
 
@@ -235,7 +236,8 @@ removeReaperObj(ReaperBase *rb)
   	for(;it!=reaperObjList.end(); it++){
   		if(*it==rb){
   			reaperObjList.erase(it);
-  			rb->_remove_ref();
+  			//rb->_remove_ref();
+  			rb->removeRef();
   			LOGDEBUG("removeReaperObj: An ReaperObj is removed from the reaperList!");
   			return;
   		}
@@ -274,7 +276,8 @@ cleanUpReaperObj()
       	//We remove this deativated object from the list.
       	//It has been deactivated by the client.
       	LOGINFO("COLLECT: A client has disconected a ReaperBase object!");
-      	(*it)->_remove_ref();
+      	//(*it)->_remove_ref();
+      	(*it)->removeRef();
       	it=reaperObjList.erase(it);
       	ost << " Inactive: removed";
     	}else if(!(*it)->isRunning(lastAccess)){
@@ -285,7 +288,8 @@ cleanUpReaperObj()
       	if((now-lastAccess)>=TIMEOUT){
 				LOGWARN("TIMEOUT, a ReaperBase object is garbage collected!");
 				(*it)->deactivate();
-				(*it)->_remove_ref();
+				//(*it)->_remove_ref();
+				(*it)->removeRef();
 				it=reaperObjList.erase(it);
 				ost << " Timout: removed";
       	}else{

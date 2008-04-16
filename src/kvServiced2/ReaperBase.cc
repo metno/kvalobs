@@ -55,7 +55,8 @@ deactivate()
   
   if(active){
     CorbaHelper::CorbaApp::getCorbaApp()->getPoa()->deactivate_object(objId);
-    _remove_ref();
+    //_remove_ref();
+    removeRef();
     active=false;
   }
 }
