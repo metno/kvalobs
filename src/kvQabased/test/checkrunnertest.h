@@ -57,6 +57,7 @@ class CheckRunnerTest : public CppUnit::TestFixture
     CPPUNIT_TEST( testHandlesSpecifiedTypeidInChecks );
     CPPUNIT_TEST( testDoesNotCheckWhenChecksSpecifyAnotherTypeid );
     CPPUNIT_TEST( testChecksHighLevels );
+//    CPPUNIT_TEST( testOnlyUsesSpecificLevel );
     CPPUNIT_TEST( testChecksNonstandardSensor );
     CPPUNIT_TEST_SUITE_END();
 
@@ -109,6 +110,10 @@ class CheckRunnerTest : public CppUnit::TestFixture
      */
     void testChecksNonstandardSensor();
     
+    /**
+     * Checks should not mix different levels.
+     */
+    void testOnlyUsesSpecificLevel();
 
   private:
     void runCheckRunner( const std::string & checkName );

@@ -524,3 +524,40 @@ void CheckRunnerTest::testChecksNonstandardSensor()
   CPPUNIT_ASSERT_EQUAL( size_t( 1 ), result.size() );
   CPPUNIT_ASSERT( result.front().controlinfo() != kvControlInfo() );
 }
+
+void CheckRunnerTest::testOnlyUsesSpecificLevel()
+{
+  kvDataFactory f0(42, "2006-05-26 06:00:00", 302);
+  kvData d0a = f0.getData(1, 112);
+  db->getConnection()->exec( "insert into data values " + d0a.toSend() );
+  // don't send this to the database:
+  kvData d0b = f0.getMissing(42);
+  db->getConnection()->exec( "insert into data values " + d0b.toSend() );
+  
+  kvDataFactory f25(42, "2006-05-26 06:00:00", 302, 0, 25 );
+  kvData d25a = f25.getData(2, 112);
+  db->getConnection()->exec( "insert into data values " + d25a.toSend() );
+  kvData d25b = f25.getData(2, 42);
+  db->getConnection()->exec( "insert into data values " + d25b.toSend() );
+
+  runCheckRunner( __func__ );
+
+  vector<kvData> result;
+  getData( back_inserter( result ) );
+  
+  for ( vector<kvData>::const_iterator it = result.begin(); it != result.end(); ++ it )
+    cout << * it << endl;
+  
+  vector<kvData>::const_iterator L0 = find_if(result.begin(), result.end(), 
+      std::bind2nd( kvalobs::compare::same_kvData(), d0a ) );
+  CPPUNIT_ASSERT( L0 != result.end() );
+  CPPUNIT_ASSERT_EQUAL( 8, L0->controlinfo().flag(2) );
+  // 9 probably means level 0 data was checked against level 25 data
+  // 0 means check was skipped, or that test results were not stored
+  
+  
+  vector<kvData>::const_iterator L25 = find_if(result.begin(), result.end(), 
+      std::bind2nd( kvalobs::compare::same_kvData(), d25a ) );
+  CPPUNIT_ASSERT( L25 != result.end() );
+  CPPUNIT_ASSERT_EQUAL( 2, L25->controlinfo().flag(2) );
+}

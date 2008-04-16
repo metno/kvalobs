@@ -19,6 +19,7 @@ insert into station_param values (0,42,0,0,1,365,-1,'QC1-1-35','max;highest;high
 29.0;29.0;29.0;1.0;1.0;1.0','','1500-01-01 00:00:00' );
 
 
+
 insert into station values ( 42, 59.9427, 10.7207, 94, 0, 'Min stasjon', 1, 1,'','','',8,'t','1996-12-01 00:00:00' );
 insert into station values (  9, 59.9427, 10.7207, 94, 0, 'Min stasjon 2', 1, 1,'','','',8,'t','1996-12-01 00:00:00' );
 
@@ -44,6 +45,7 @@ insert into checks values (0, 'QC1-4-110-3', 'QC1-4', 1, 'PROGNOSTIC SPACE_CHECK
 insert into checks values (0, 'QC1-4-111', 'QC1-4', 1, 'PROGNOSTIC SPACE_CHECK_RR' ,'obs;R&0&&303;;|model;R&0&&;;|meta;R_highest,R_high,R_low,R_lowest,R_dry;;', '* * * * *', '1500-01-01 00:00:00' );
 insert into checks values (0, 'QC1-1-34', 'QC1-1',1,'RANGE_CHECK','obs;SA;;|meta;SA_max,SA_highest,SA_high,SA_low,SA_lowest,SA_min;;','* * * * *' , '1500-01-01 00:00:00' );
 insert into checks values (0, 'QC1-1-35', 'QC1-1',1,'RANGE_CHECK','obs;W1;;|meta;W1_max,W1_highest,W1_high,W1_low,W1_lowest,W1_min;;','* * * * *' , '1500-01-01 00:00:00' );
+insert into checks values (0, 'QC1-2-112', 'QC1-2', 1, 'EQUAL_CHECK', 'obs;SA,W1;;', '* * * * *' , '1500-01-01 00:00:00' );
 
 
 
@@ -155,6 +157,35 @@ sub check {
     push(@retvector, $X[0]);
     push(@retvector, "X_0_0_missing");
     push(@retvector, $X_missing[0]);
+    my $numout = @retvector;
+
+    return (@retvector, $numout);
+}
+'
+);
+
+insert into algorithms values (1, 'EQUAL_CHECK', 'obs;X,Y;;','
+#checkname:  EQUAL_CHECK
+#signature: obs;X,Y;;
+
+# check for unit tests
+
+
+sub check {
+
+    my $flag = 1;
+
+	if ( $Y_missing[0] == 3 ) {
+		$flag = 8;
+	}
+    elsif ( $X[0] != $Y[0] ) {
+		$flag = 9;
+    }
+	else {
+		$flag = 2;
+	}
+
+    my @retvector = ("X_0_0_flag", $flag);
     my $numout = @retvector;
 
     return (@retvector, $numout);
