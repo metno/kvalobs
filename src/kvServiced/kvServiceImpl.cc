@@ -49,6 +49,9 @@ using namespace dnmi::db;
 using namespace milog;
 using namespace miutil;
 
+
+#define MAX_DATE "3000-01-01 00:00:00"
+
 KvServiceImpl::
 KvServiceImpl(ServiceApp &app_):app(app_)
 {
@@ -157,7 +160,11 @@ addToObsPgmList(CKvalObs::CService::Obs_pgmList &pgmList,
     pgm.sat=it->sat();
     pgm.sun=it->sun();
     pgm.fromtime=it->fromtime().isoTime().c_str();
-    pgm.totime=it->totime().isoTime().c_str();
+    
+    if( it->totime().undef() )
+   	 pgm.totime = (const char*)MAX_DATE;
+    else
+   	 pgm.totime=it->totime().isoTime().c_str();
       
 
     if(aUnion){
