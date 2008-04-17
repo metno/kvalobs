@@ -139,8 +139,11 @@ namespace agregator
       throw runtime_error( "Could not fetch obs_pgm from kvalobs!" );
 
     StDataContainer newData;
+    
+    const miutil::miTime now = miutil::miTime::nowTime();
+    
     for ( list<kvObsPgm>::const_iterator it = obspgm.begin(); it != obspgm.end(); it++ )
-      if ( it->paramID() == RR_01 )
+      if ( it->paramID() == RR_01 && it->fromtime() <  now && now < it->totime() )
         newData.push_back( *it );
 
     if ( stations != newData )
