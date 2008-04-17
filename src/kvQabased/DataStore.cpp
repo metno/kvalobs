@@ -5,8 +5,16 @@
 using namespace std;
 using namespace kvalobs;
 
-DataStore::DataStore(const kvalobs::kvData & dummy) :
-  factory_(dummy)
+DataStore::DataStore()
+{
+}
+
+DataStore::DataStore(const kvalobs::kvData & dummy) 
+	: stationID_(dummy.stationID())
+	, typeID_(dummy.typeID())
+	, obstime_(dummy.obstime())
+	, sensor_(dummy.sensor())
+	, level_(dummy.level())
 {
 }
 
@@ -14,12 +22,14 @@ DataStore::~DataStore()
 {
 }
 
-void DataStore::getStores(list<DataStore> & out, const vector<kvData> & data)
+
+// fixme!
+void DataStore::getStores(DataStore::DataList & out, const list<kvData> & data)
 {
   typedef map<kvalobs::kvData, DataStore, kvalobs::compare::lt_kvData_without_paramID<> > CreateList;
   CreateList toCreate;
 
-  for (vector<kvData>::const_iterator it = data.begin(); it != data.end(); ++it) {
+  for (list<kvData>::const_iterator it = data.begin(); it != data.end(); ++it) {
     CreateList::iterator f = toCreate.insert(CreateList::value_type(*it, DataStore(*it))).first;
     f->second.insert_(*it);
   }
@@ -28,25 +38,21 @@ void DataStore::getStores(list<DataStore> & out, const vector<kvData> & data)
     out.push_back(category->second);
 }
 
-DataStore::Data::Data(const kvalobs::kvData & d) :
-  parameter(d.paramID()), original(d.original()), corrected(d.corrected()),
-      controlinfo(d.controlinfo()), useinfo(d.useinfo()), cfailed(d.cfailed())
-{
-}
-
-kvalobs::kvData DataStore::getData_(const DataStore::Data & d) const
-{
-  kvData r = factory_.getData(d.original, d.parameter);
-  r.corrected(d.corrected);
-  r.controlinfo(d.controlinfo);
-  r.useinfo(d.useinfo);
-  r.cfailed(d.cfailed);
-
-  return r;
-}
+//DataStore::Data::Data(const kvalobs::kvData & d) :
+//  parameter(d.paramID()), original(d.original()), corrected(d.corrected()),
+//      controlinfo(d.controlinfo()), useinfo(d.useinfo()), cfailed(d.cfailed())
+//{
+//}
 
 void DataStore::insert_(const kvalobs::kvData & d)
 {
+  if ( d.stationID() != stationID() || 
+      d.obstime() != obstime() || 
+      d.typeID() != typeID() ||
+      ! kvalobs::compare::eq_sensor(d.sensor(), sensor()) ||
+      d.level() != level() )
+    throw std::logic_error("Inserted data does not match container");
+  
   data_.push_back(d);
 }
 
@@ -66,11 +72,14 @@ namespace
   };
 }
 
-const kvData DataStore::operator[](int parameter) const
-{
-  vector<Data>::const_iterator f = find_if(data_.begin(), data_.end(), has_paramid(parameter));
-  if ( f != data_.end() )
-  return getData_( * f );
-  else
-  return factory_.getMissing(parameter);
-}
+//kvData & DataStore::operator[](int parameter)
+//{
+//  Store::const_iterator f = find_if(data_.begin(), data_.end(), has_paramid(parameter));
+//  if ( f == data_.end() ) {
+//    kvalobs::kvData r = factory_.getMissing(parameter);
+//    data_.push_back(r);
+//    f = data.end();
+//    -- f;
+//  }
+//  return * f;
+//}
