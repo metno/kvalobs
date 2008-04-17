@@ -157,6 +157,9 @@ bool CheckRunner::dataWasCheckedBefore()
 {
   const kvQABaseMeteodata::DataFromTime & data_ = meteod.getData();
 
+  if ( data_.empty() ) // no data to check
+    return false;
+  
   for ( kvQABaseMeteodata::DataFromTime::const_iterator it = data_.begin(); it != data_.end(); ++ it )
   {
     typedef kvQABaseMeteodata::obs_data KvDL;
