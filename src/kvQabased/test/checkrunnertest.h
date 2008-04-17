@@ -57,7 +57,8 @@ class CheckRunnerTest : public CppUnit::TestFixture
     CPPUNIT_TEST( testHandlesSpecifiedTypeidInChecks );
     CPPUNIT_TEST( testDoesNotCheckWhenChecksSpecifyAnotherTypeid );
     CPPUNIT_TEST( testChecksHighLevels );
-//    CPPUNIT_TEST( testOnlyUsesSpecificLevel );
+    CPPUNIT_TEST( testChecksHighLevelsWhenLowLevelsPresent );
+    CPPUNIT_TEST( testOnlyUsesSpecificLevel );
     CPPUNIT_TEST( testChecksNonstandardSensor );
     CPPUNIT_TEST_SUITE_END();
 
@@ -105,6 +106,11 @@ class CheckRunnerTest : public CppUnit::TestFixture
      */
     void testChecksHighLevels();
 
+    /**
+     * Data at level > 0 should also be checked, even when we have data at level 0.
+     */ 
+    void testChecksHighLevelsWhenLowLevelsPresent();
+    
     /**
      * Data with sensor > 0 should also be checked
      */

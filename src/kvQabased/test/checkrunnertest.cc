@@ -507,6 +507,36 @@ void CheckRunnerTest::testChecksHighLevels()
   CPPUNIT_ASSERT( result.front().controlinfo() != kvControlInfo() );
 }
 
+void CheckRunnerTest::testChecksHighLevelsWhenLowLevelsPresent()
+{
+  kvDataFactory f(42, "2006-05-26 06:00:00", 302, 0, 25 );
+  kvData d = f.getData(5, 110);
+  db->getConnection()->exec( "insert into data values " + d.toSend() );
+
+  kvDataFactory f0(42, "2006-05-26 06:00:00", 302);
+  kvData d0 = f0.getData(2, 110);
+  db->getConnection()->exec( "insert into data values " + d0.toSend() );
+
+  
+  runCheckRunner( __func__ );
+
+  vector<kvData> result;
+  getData( back_inserter( result ) );
+
+//  for ( vector<kvData>::const_iterator it = result.begin(); it != result.end(); ++ it )
+//    cout << * it << endl;
+  
+  CPPUNIT_ASSERT_EQUAL( size_t( 2 ), result.size() );
+  
+  vector<kvData>::const_iterator r = find_if(result.begin(), result.end(), 
+        std::bind2nd( kvalobs::compare::same_kvData(), d ) );
+  
+  CPPUNIT_ASSERT(r != result.end());
+  CPPUNIT_ASSERT( r->controlinfo() != kvControlInfo() );
+}
+
+
+
 void CheckRunnerTest::testChecksNonstandardSensor()
 {
   kvDataFactory f(42, "2006-05-26 06:00:00", 302, 1, 0 );

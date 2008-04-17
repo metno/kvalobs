@@ -45,7 +45,12 @@ insert into checks values (0, 'QC1-4-110-3', 'QC1-4', 1, 'PROGNOSTIC SPACE_CHECK
 insert into checks values (0, 'QC1-4-111', 'QC1-4', 1, 'PROGNOSTIC SPACE_CHECK_RR' ,'obs;R&0&&303;;|model;R&0&&;;|meta;R_highest,R_high,R_low,R_lowest,R_dry;;', '* * * * *', '1500-01-01 00:00:00' );
 insert into checks values (0, 'QC1-1-34', 'QC1-1',1,'RANGE_CHECK','obs;SA;;|meta;SA_max,SA_highest,SA_high,SA_low,SA_lowest,SA_min;;','* * * * *' , '1500-01-01 00:00:00' );
 insert into checks values (0, 'QC1-1-35', 'QC1-1',1,'RANGE_CHECK','obs;W1;;|meta;W1_max,W1_highest,W1_high,W1_low,W1_lowest,W1_min;;','* * * * *' , '1500-01-01 00:00:00' );
-insert into checks values (0, 'QC1-2-112', 'QC1-2', 1, 'EQUAL_CHECK', 'obs;SA,W1;;', '* * * * *' , '1500-01-01 00:00:00' );
+
+-- Check specs for CheckRunnerTest::testOnlyUsesSpecificLevel(). This should really have been just one line,
+-- with unspecified level. But that makes it all fail.
+insert into checks values (0, 'QC1-2-112-25', 'QC1-2', 1, 'EQUAL_CHECK', 'obs;SA&25,W1&25;;', '* * * * *' , '1500-01-01 00:00:00' );
+insert into checks values (0, 'QC1-2-112-0', 'QC1-2', 1, 'EQUAL_CHECK', 'obs;SA&0,W1&0;;', '* * * * *' , '1500-01-01 00:00:00' );
+
 
 
 
