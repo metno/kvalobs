@@ -253,9 +253,10 @@ int main( int argc, char **argv )
   handler.addHandler( &tax12 );
   MinMax tgn12 = min( TGN, TGN_12, 12, six );
   handler.addHandler( &tgn12 );
+  rr_1 * rr1 = 0;
   if ( backProduction.empty() || daemonMode ) {
-    rr_1  rr1  = rr_1();
-    handler.addHandler( &rr1  );
+    rr1 = new rr_1;
+    handler.addHandler( rr1 );
   }
   rr_12 rr12 = rr_12();
   handler.addHandler( &rr12 );
@@ -295,8 +296,11 @@ int main( int argc, char **argv )
   }
   catch (std::exception & e ) {
     LOGFATAL(e.what());
+    delete rr1;
     return 1;
   }
+  
+  delete rr1;
 
   return 0;
 }
