@@ -51,6 +51,7 @@ insert into checks values (0, 'QC1-1-35', 'QC1-1',1,'RANGE_CHECK','obs;W1;;|meta
 insert into checks values (0, 'QC1-2-112-25', 'QC1-2', 1, 'EQUAL_CHECK', 'obs;SA&25,W1&25;;', '* * * * *' , '1500-01-01 00:00:00' );
 insert into checks values (0, 'QC1-2-112-0', 'QC1-2', 1, 'EQUAL_CHECK', 'obs;SA&0,W1&0;;', '* * * * *' , '1500-01-01 00:00:00' );
 
+insert into checks values (0, 'QC1-2-112-L1', 'QC1-2', 1, 'EQUAL_CHECK', 'obs;SA&&1,W1&&1;;', '* * * * *' , '1500-01-01 00:00:00' );
 
 
 

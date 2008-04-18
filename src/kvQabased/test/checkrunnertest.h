@@ -60,6 +60,7 @@ class CheckRunnerTest : public CppUnit::TestFixture
     CPPUNIT_TEST( testChecksHighLevelsWhenLowLevelsPresent );
     CPPUNIT_TEST( testOnlyUsesSpecificLevel );
     CPPUNIT_TEST( testChecksNonstandardSensor );
+    CPPUNIT_TEST( testOnlyUsesSpecificSensor );
     CPPUNIT_TEST_SUITE_END();
 
   public:
@@ -117,9 +118,16 @@ class CheckRunnerTest : public CppUnit::TestFixture
     void testChecksNonstandardSensor();
     
     /**
-     * Checks should not mix different levels.
+     * Checks should not mix different levels. Only applies to checks with 
+     * specified levels
      */
     void testOnlyUsesSpecificLevel();
+    
+    /**
+     * Checks should not mix different sensors. Only applies to checks with 
+     * specified sensors
+     */
+    void testOnlyUsesSpecificSensor();
 
   private:
     void runCheckRunner( const std::string & checkName );

@@ -419,7 +419,7 @@ void CheckRunnerTest::testPrefersCurrentTypeID()
 
 namespace
 {
-  struct hasTypeId
+  struct hasTypeId : std::unary_function<kvalobs::kvData, bool>
   {
     const int wanted;
     hasTypeId(int wantedTypeId) : wanted(wantedTypeId) {}
@@ -575,8 +575,8 @@ void CheckRunnerTest::testOnlyUsesSpecificLevel()
   vector<kvData> result;
   getData( back_inserter( result ) );
   
-  for ( vector<kvData>::const_iterator it = result.begin(); it != result.end(); ++ it )
-    cout << * it << endl;
+//  for ( vector<kvData>::const_iterator it = result.begin(); it != result.end(); ++ it )
+//    cout << * it << endl;
   
   vector<kvData>::const_iterator L0 = find_if(result.begin(), result.end(), 
       std::bind2nd( kvalobs::compare::same_kvData(), d0a ) );
@@ -590,4 +590,41 @@ void CheckRunnerTest::testOnlyUsesSpecificLevel()
       std::bind2nd( kvalobs::compare::same_kvData(), d25a ) );
   CPPUNIT_ASSERT( L25 != result.end() );
   CPPUNIT_ASSERT_EQUAL( 2, L25->controlinfo().flag(2) );
+}
+
+void CheckRunnerTest::testOnlyUsesSpecificSensor()
+{
+  kvDataFactory f0(42, "2006-05-26 06:00:00", 302);
+  kvData d0a = f0.getData(1, 112);
+  db->getConnection()->exec( "insert into data values " + d0a.toSend() );
+  // don't send this to the database:
+  kvData d0b = f0.getMissing(42);
+  db->getConnection()->exec( "insert into data values " + d0b.toSend() );
+  
+  kvDataFactory f1(42, "2006-05-26 06:00:00", 302, 1 );
+  kvData d1a = f1.getData(2, 112);
+  db->getConnection()->exec( "insert into data values " + d1a.toSend() );
+  kvData d1b = f1.getData(2, 42);
+  db->getConnection()->exec( "insert into data values " + d1b.toSend() );
+
+  runCheckRunner( __func__ );
+
+  vector<kvData> result;
+  getData( back_inserter( result ) );
+  
+//  for ( vector<kvData>::const_iterator it = result.begin(); it != result.end(); ++ it )
+//    cout << * it << endl;
+  
+  vector<kvData>::const_iterator L0 = find_if(result.begin(), result.end(), 
+      std::bind2nd( kvalobs::compare::same_kvData(), d0a ) );
+  CPPUNIT_ASSERT( L0 != result.end() );
+  CPPUNIT_ASSERT_EQUAL( 8, L0->controlinfo().flag(2) );
+  // 9 probably means level 0 data was checked against sensor 1 data
+  // 0 means check was skipped, or that test results were not stored
+  
+  
+  vector<kvData>::const_iterator L1 = find_if(result.begin(), result.end(), 
+      std::bind2nd( kvalobs::compare::same_kvData(), d1a ) );
+  CPPUNIT_ASSERT( L1 != result.end() );
+  CPPUNIT_ASSERT_EQUAL( 2, L1->controlinfo().flag(2) );
 }
