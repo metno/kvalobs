@@ -96,6 +96,66 @@ CREATE TABLE text_data (
 );
 
 
+--
+-- This table maintains a complete history of everything that has happened to 
+-- the text_data table.
+-- The version row contains the version of the data - a higher number is newer.
+-- Since each number in the version row is unique, you may see the entire 
+-- data history in this table.  
+-- 
+CREATE TABLE text_data_history (
+	version bigserial,
+	stationid   INTEGER NOT NULL,
+	obstime     TIMESTAMP NOT NULL,
+	original    TEXT,
+	paramid	    INTEGER NOT NULL,
+	tbtime	    TIMESTAMP NOT NULL,
+	typeid	    INTEGER NOT NULL,
+	UNIQUE ( version, stationid, obstime, paramid, typeid ) 
+);
+
+--
+-- Trigger function for propagating changes to the text_data table into text_data_history
+--
+CREATE OR REPLACE FUNCTION 
+	backup_old_text_data() 
+RETURNS trigger AS
+$BODY$
+BEGIN
+	INSERT INTO text_data_history
+		(stationid,obstime,original,paramid,tbtime,typeid)
+	VALUES
+		(OLD.stationid,OLD.obstime,OLD.original,OLD.paramid,'now',OLD.typeid);
+	RETURN NULL;
+END;
+$BODY$
+LANGUAGE 'plpgsql';
+--CREATE TRIGGER backup_text_data AFTER INSERT OR UPDATE ON text_data FOR EACH ROW EXECUTE PROCEDURE backup_old_text_data();
+-- Modification: We only insert text_data into backup store after it has been modified:
+CREATE TRIGGER backup_text_data AFTER UPDATE ON text_data FOR EACH ROW EXECUTE PROCEDURE backup_old_text_data();
+
+--
+-- Trigger function for propagating deletes in the text_data table into text_data_history
+-- Deleted rows are marked in text_data_history with NULL values for original, 
+-- corrected, controlinfo, useinfo and cfailed.
+--
+CREATE OR REPLACE FUNCTION 
+	backup_old_text_data_delete() 
+RETURNS trigger AS
+$BODY$
+BEGIN
+	INSERT INTO text_data_history 
+		(stationid,obstime,original,paramid,tbtime,typeid)
+	VALUES
+		(OLD.stationid,OLD.obstime,NULL,OLD.paramid,'now',OLD.typeid);
+	RETURN NULL;
+END;
+$BODY$
+LANGUAGE 'plpgsql';
+CREATE TRIGGER backup_text_data_delete AFTER DELETE ON text_data FOR EACH ROW EXECUTE PROCEDURE backup_old_text_data_delete();
+
+
+
 CREATE VIEW data_view AS
 SELECT data.stationid, data.obstime, CAST(data.original AS TEXT), data.paramid, data.tbtime, data.typeid
 FROM data, text_data
