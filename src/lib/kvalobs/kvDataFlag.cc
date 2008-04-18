@@ -512,10 +512,9 @@ void kvControlInfo::setFqclevel()
     if (completed[i])
       c = c | (1 << i);
 
-  COUT("kvControlInfo::setFqclevel final flag:" << c << endl);
+  //COUT("kvControlInfo::setFqclevel final flag:" << c << endl);
 
-  set
-    (0, c);
+  set(0, c);
 }
 
 
