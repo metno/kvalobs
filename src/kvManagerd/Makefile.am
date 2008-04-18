@@ -27,7 +27,7 @@ kvManagerd_SOURCES =  mgrApp.cc  mgrApp.h \
                       
                       
 kvManagerd_CPPFLAGS = $(AM_CPPFLAGS)
-kvManagerd_LDFLAGS = -Wl,-E -pthread 
+kvManagerd_LDFLAGS = -pthread -export-dynamic
 kvManagerd_LDADD = $(top_builddir)/src/lib/kvalobs/libkvalobs.la \
                    $(top_builddir)/src/lib/kvdb/libkvdb.la \
                    $(top_builddir)/src/lib/fileutil/libfileutil.la \
@@ -43,5 +43,5 @@ kvManagerd_LDADD = $(top_builddir)/src/lib/kvalobs/libkvalobs.la \
 
 
 kvmgrclt_SOURCES = kvmgrclt.cc  kvmgrcltApp.cc kvmgrcltApp.h
-kvmgrclt_LDFLAGS = -Wl,-E -pthread
+kvmgrclt_LDFLAGS = -pthread -export-dynamic
 kvmgrclt_LDADD = $(kvManagerd_LDADD)   

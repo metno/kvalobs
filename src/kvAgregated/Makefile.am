@@ -28,7 +28,7 @@ kvAgregated_CPPFLAGS = \
 	$(BOOST_CPPFLAGS) \
 	$(putools_CFLAGS)
 
-kvAgregated_LDFLAGS = -rpath $(pkglibdir)
+kvAgregated_LDFLAGS = -rpath $(pkglibdir) -export-dynamic
 
 kvAgregated_LDADD = \
 	$(top_builddir)/src/service-libs/kvcpp/libkvcpp.la \

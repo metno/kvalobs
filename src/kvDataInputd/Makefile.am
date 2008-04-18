@@ -13,7 +13,7 @@ kvDataInputd_SOURCES=InitLogger.cc InitLogger.h \
 kvDataInputd_clt_SOURCES = kvinputd_clt.cc
 
 kvDataInputd_CPPFLAGS = $(AM_CPPFLAGS) $(libxmlpp_CFLAGS)
-kvDataInputd_LDFLAGS = -pthread 
+kvDataInputd_LDFLAGS = -pthread -export-dynamic
 kvDataInputd_LDADD = $(top_builddir)/src/lib/decoder/decoderbase/libdecoderbase.la \
 		     $(top_builddir)/src/lib/decodeutility/libdecodeutility.la \
 		     $(top_builddir)/src/lib/miutil/libmiutil.la \
@@ -29,7 +29,7 @@ kvDataInputd_LDADD = $(top_builddir)/src/lib/decoder/decoderbase/libdecoderbase.
                      $(putools_LIBS) $(omniORB4_LIBS) $(libxmlpp_LIBS) $(BOOST_THREAD_LIB)  -ldl
 
 kvDataInputd_clt_CPPFLAGS = $(AM_CPPFLAGS)
-kvDataInputd_clt_LDFLAGS = -Wl,-E -pthread 
+kvDataInputd_clt_LDFLAGS = -pthread -export-dynamic 
 kvDataInputd_clt_LDADD = $(top_builddir)/src/lib/kvalobs/libkvalobs.la \
                          $(top_builddir)/src/lib/kvdb/libkvdb.la \
                          $(top_builddir)/src/lib/fileutil/libfileutil.la \

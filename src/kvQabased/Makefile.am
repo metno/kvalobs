@@ -30,6 +30,7 @@ kvQabased_CPPFLAGS = \
 	$(putools_CFLAGS) \
 	$(perl_CFLAGS)
 	
+kvQabased_LDFLAGS = -pthread -export-dynamic	
 kvQabased_LDADD = \
 	$(top_builddir)/src/lib/milog/libmilog.la \
 	$(top_builddir)/src/lib/kvalobs/libkvalobs.la \

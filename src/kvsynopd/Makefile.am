@@ -32,7 +32,7 @@ kvsynopd_SOURCES = kvsynopd.cc \
 
 kvsynopd_CPPFLAGS = $(AM_CPPFLAGS) -I$(top_srcdir)/src/service-libs \
                     $(omniORB4_CFLAGS) 
-kvsynopd_LDFLAGS = -pthread 
+kvsynopd_LDFLAGS = -pthread -export-dynamic
 kvsynopd_LIBS=   $(omniORB4_LIBS) $(putools_LIBS) $(BOOST_THREAD_LIB) \
                  -lm
 

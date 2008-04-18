@@ -23,7 +23,7 @@ kvServiced_SOURCES=kvServiced.cc \
                    kvHintSubscriber.h kvDataNotifySubscriberImpl.h
              
 kvServiced_CPPFLAGS = $(AM_CPPFLAGS)
-kvServiced_LDFLAGS = -Wl,-E -pthread 
+kvServiced_LDFLAGS =  -pthread -export-dynamic
 kvServiced_LDADD = $(top_builddir)/src/lib/kvalobs/libkvalobs.la \
                    $(top_builddir)/src/lib/miutil/libmiutil.la \
                    $(top_builddir)/src/lib/kvdb/libkvdb.la \
