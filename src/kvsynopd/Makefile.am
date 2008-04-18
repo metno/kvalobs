@@ -48,7 +48,9 @@ kvsynopd_LDADD = $(top_builddir)/src/service-libs/kvcpp/libkvcpp.la \
                  $(top_builddir)/src/lib/kvskel/libkvadmininterface.la \
                  $(top_builddir)/src/lib/kvskel/libkvskel.la \
                  $(top_builddir)/src/lib/milog/libmilog.la 
-             
+            
+EXTRA_DIST = kvsynopd_schema.sql
+ 
 kvsynopclt_SOURCES = kvsynopclt.cc \
                      kvsynopCltSynopcbImp.cc kvsynopCltSynopcbImp.h \
                      kvsynopCltApp.cc  kvsynopCltApp.h \
