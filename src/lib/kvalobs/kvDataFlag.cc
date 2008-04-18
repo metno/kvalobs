@@ -530,7 +530,7 @@ void kvControlInfo::setFqclevel(const std::string& medium_qcx)
     int mqc= int(mainQCX_[medium_qcx]);
     c |= (1 << mqc);
 
-    COUT("kvControlInfo::setFqclevel final flag:" << c << endl);
+//    COUT("kvControlInfo::setFqclevel final flag:" << c << endl);
 
     set
       (0, c);
