@@ -61,6 +61,7 @@ AC_CONFIG_FILES([Makefile
                  src/kvalobs_database/Makefile
                  src/script/Makefile
                  src/script/kv/Makefile
+                 src/script/dbadmin/Makefile
 ])
 
 

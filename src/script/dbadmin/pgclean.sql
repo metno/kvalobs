@@ -23,9 +23,11 @@
 -- It is deleted from both data and text_data tables.
 --
 select timestamp 'today'- interval'250 day' AS "Deleting data before!";
-delete from data where tbtime<=(timestamp 'today'-interval'250 day');
-delete from text_data where tbtime<=(timestamp 'today'-interval'250 day');
+delete from data where tbtime<=(timestamp 'today'-interval'3 months');
+delete from text_data where tbtime<=(timestamp 'today'-interval'3 months');
 
+delete from data_history where tbtime<(timestamp 'today'-interval'3 months');
+delete from text_data_history where tbtime<(timestamp 'today'-interval'3 months');
 
 --
 -- Deletes from rejectdecode all records that is more than 1 month old.
@@ -42,5 +44,5 @@ delete from workstatistik  where tbtime<=(timestamp 'today'-interval'31 day');
 --
 -- Deletes from model_data all records that is more than 8 months old.
 --
-select timestamp 'today'- interval'250 day' AS "Deleting model_data before!";
-delete from model_data  where obstime<=(timestamp 'today'-interval'250 day');
+select timestamp 'today'- interval'3 months' AS "Deleting model_data before!";
+delete from model_data  where obstime<=(timestamp 'today'-interval'3 months');

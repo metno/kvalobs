@@ -1,1 +1,1 @@
-SUBDIRS = kv
+SUBDIRS = kv dbadmin
