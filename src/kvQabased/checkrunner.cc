@@ -200,6 +200,8 @@ void CheckRunner::findChecks( list<kvChecks> & out )
 
 void CheckRunner::runCheck( const std::string & checkScript, const kvalobs::kvChecks & check )
 {
+  LogContext context( "Running check " + check.checkname() );
+  
   log_( "<HR>" );
   log_( string( "<H2>Check loop, type:" ) + check.qcx() + " name:" + check.checkname() + "</H2>" );
 
