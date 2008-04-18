@@ -1,9 +1,9 @@
 #! /bin/sh
 
 SQL=sqlite
-SQLDIR=`kvconfig --datadir`/kvalobs/db
-LOGDIR=`kvconfig --localstatedir`/kvalobs/log
-DBFILE=`kvconfig --localstatedir`/kvalobs/kvsynopd.sqlite
+SQLDIR=`KVCONFIG --datadir`/kvalobs/db
+LOGDIR=`KVCONFIG --localstatedir`/kvalobs/log
+DBFILE=`KVCONFIG --localstatedir`/kvalobs/kvsynopd.sqlite
 
 DAY=`date '+%d'`
 LOG=$LOGDIR/kvsynopdb-$DAY.log

@@ -1,6 +1,6 @@
 #! /bin/sh
 
-SQLDIR=`kvconfig --datadir`/kvalobs/db
+SQLDIR=`KVCONFIG --datadir`/kvalobs/db
 
 if [ -f $SQLDIR/pgclean_locale.sql ]; then
     SQLCLEAN=$SQLDIR/pgclean_locale.sql
@@ -9,7 +9,7 @@ else
 fi
 
 PSQL=psql
-LOGDIR=`kvconfig --localstatedir`/kvalobs/log
+LOGDIR=`KVCONFIG --localstatedir`/kvalobs/log
 
 DAY=`date '+%d'`
 LOG=$LOGDIR/kvdbadmin-$DAY.log
