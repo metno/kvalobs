@@ -628,3 +628,47 @@ void CheckRunnerTest::testOnlyUsesSpecificSensor()
   CPPUNIT_ASSERT( L1 != result.end() );
   CPPUNIT_ASSERT_EQUAL( 2, L1->controlinfo().flag(2) );
 }
+
+void CheckRunnerTest::testOnlyUsesSpecificStationWithSpecificLevel()
+{
+  // station 9, level 25
+  kvDataFactory f_s9_l25(9, "2006-05-26 06:00:00", 302, 0, 25);
+  kvData d_s9_l25 = f_s9_l25.getData(0, 112);
+  db->getConnection()->exec( "insert into data values " + d_s9_l25.toSend() );
+  
+  // station 9, level 0
+  kvDataFactory f_s9_l0(9, "2006-05-26 06:00:00", 302 );
+  kvData d_s9_l0 = f_s9_l0.getData(0, 112);
+  db->getConnection()->exec( "insert into data values " + d_s9_l0.toSend() );
+
+  // station 42, level 25
+  kvDataFactory f_s42_l25(42, "2006-05-26 06:00:00", 302, 0, 25);
+  kvData d_s42_l25 = f_s42_l25.getData(0, 112);
+  db->getConnection()->exec( "insert into data values " + d_s42_l25.toSend() );
+  
+  kvalobs::kvStationInfo si( 9, "2006-05-26 06:00:00", 302 );
+  runCheckRunner( __func__, si );
+  
+  vector<kvData> result;
+  getData( back_inserter( result ) );
+  
+//  for ( vector<kvData>::const_iterator it = result.begin(); it != result.end(); ++ it )
+//    cout << * it << endl;
+ 
+  CPPUNIT_ASSERT_EQUAL( size_t(3), result.size() );
+
+  vector<kvData>::const_iterator find = std::find_if(result.begin(), result.end(), 
+      std::bind2nd( kvalobs::compare::same_kvData(), d_s9_l25 ) );
+  CPPUNIT_ASSERT( find != result.end() );
+  CPPUNIT_ASSERT_EQUAL( 3, find->controlinfo().flag(5) );
+  
+  find = std::find_if(result.begin(), result.end(), 
+        std::bind2nd( kvalobs::compare::same_kvData(), d_s9_l0 ) );
+  CPPUNIT_ASSERT( find != result.end() );
+  CPPUNIT_ASSERT( ! find->controlinfo().flag(5) );
+  
+  find = std::find_if(result.begin(), result.end(), 
+        std::bind2nd( kvalobs::compare::same_kvData(), d_s42_l25 ) );
+  CPPUNIT_ASSERT( find != result.end() );
+  CPPUNIT_ASSERT( ! find->controlinfo().flag(5) );
+}

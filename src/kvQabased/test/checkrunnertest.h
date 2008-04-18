@@ -61,6 +61,7 @@ class CheckRunnerTest : public CppUnit::TestFixture
     CPPUNIT_TEST( testOnlyUsesSpecificLevel );
     CPPUNIT_TEST( testChecksNonstandardSensor );
     CPPUNIT_TEST( testOnlyUsesSpecificSensor );
+    CPPUNIT_TEST( testOnlyUsesSpecificStationWithSpecificLevel );
     CPPUNIT_TEST_SUITE_END();
 
   public:
@@ -128,6 +129,12 @@ class CheckRunnerTest : public CppUnit::TestFixture
      * specified sensors
      */
     void testOnlyUsesSpecificSensor();
+    
+    /**
+     * Checks specify a check at level 25 for station 9. We don't want to run 
+     * checks for other stations or other levels.
+     */
+    void testOnlyUsesSpecificStationWithSpecificLevel();
 
   private:
     void runCheckRunner( const std::string & checkName );

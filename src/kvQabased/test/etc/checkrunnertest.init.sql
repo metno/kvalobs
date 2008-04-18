@@ -36,6 +36,8 @@ insert into obs_pgm values (42, 110, 0, 1, 302, 't', 't', 't', 't', 't', 't', 't
 insert into obs_pgm values (9 , 111, 0, 1, 303, 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't',  't', 't', '2006-05-26 06:00:00');
 insert into obs_pgm values (42, 112, 0, 1, 302, 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't',  't', 't', '2006-05-26 06:00:00');
 insert into obs_pgm values (42, 42, 0, 1, 302, 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't',  't', 't', '2006-05-26 06:00:00');
+insert into obs_pgm values (9 , 112, 0, 1, 302, 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't',  't', 't', '2006-05-26 06:00:00');
+insert into obs_pgm values (9 , 112, 25, 1, 302, 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't', 't',  't', 't', '2006-05-26 06:00:00');
 
 
 insert into checks values (0, 'QC1-1-33', 'QC1-1',1,'RANGE_CHECK','obs;V3;;|meta;V3_max,V3_highest,V3_high,V3_low,V3_lowest,V3_min;;','* * * * *' , '1500-01-01 00:00:00' );
@@ -46,13 +48,14 @@ insert into checks values (0, 'QC1-4-111', 'QC1-4', 1, 'PROGNOSTIC SPACE_CHECK_R
 insert into checks values (0, 'QC1-1-34', 'QC1-1',1,'RANGE_CHECK','obs;SA;;|meta;SA_max,SA_highest,SA_high,SA_low,SA_lowest,SA_min;;','* * * * *' , '1500-01-01 00:00:00' );
 insert into checks values (0, 'QC1-1-35', 'QC1-1',1,'RANGE_CHECK','obs;W1;;|meta;W1_max,W1_highest,W1_high,W1_low,W1_lowest,W1_min;;','* * * * *' , '1500-01-01 00:00:00' );
 
--- Check specs for CheckRunnerTest::testOnlyUsesSpecificLevel(). This should really have been just one line,
--- with unspecified level. But that makes it all fail.
+-- Check specs for CheckRunnerTest::testOnlyUsesSpecificLevel()
 insert into checks values (0, 'QC1-2-112-25', 'QC1-2', 1, 'EQUAL_CHECK', 'obs;SA&25,W1&25;;', '* * * * *' , '1500-01-01 00:00:00' );
 insert into checks values (0, 'QC1-2-112-0', 'QC1-2', 1, 'EQUAL_CHECK', 'obs;SA&0,W1&0;;', '* * * * *' , '1500-01-01 00:00:00' );
-
+-- For testOnlyUsesSpecificSensor
 insert into checks values (0, 'QC1-2-112-L1', 'QC1-2', 1, 'EQUAL_CHECK', 'obs;SA&&1,W1&&1;;', '* * * * *' , '1500-01-01 00:00:00' );
 
+--testOnlyUsesSpecificStationWithSpecificLevel()
+insert into checks values (0, 'QC1-5-112-25', 'QC1-5', 1, 'STUPID_CHECK', 'obs;SA&25;;', '* * * * *' , '1500-01-01 00:00:00' );
 
 
 insert into qcx_info values('QC1-9', 'QC1', 14, 'Kombinert vurdering');
@@ -190,6 +193,24 @@ sub check {
 	else {
 		$flag = 2;
 	}
+
+    my @retvector = ("X_0_0_flag", $flag);
+    my $numout = @retvector;
+
+    return (@retvector, $numout);
+}
+'
+);
+
+insert into algorithms values (1, 'STUPID_CHECK', 'obs;X;;','
+#checkname:  EQUAL_CHECK
+#signature: obs;X;;
+
+# check for unit tests
+
+
+sub check {
+    my $flag = 3;
 
     my @retvector = ("X_0_0_flag", $flag);
     my $numout = @retvector;
