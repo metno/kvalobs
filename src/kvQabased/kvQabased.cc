@@ -29,6 +29,8 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include <boost/thread/thread.hpp>
+#include <boost/filesystem/convenience.hpp>
+#include <boost/filesystem/exception.hpp>
 #include "qabaseApp.h"
 #include "qabaseInputImpl.h"
 #include "QaWorkThread.h"
@@ -64,7 +66,6 @@ main( int argc, char** argv )
   //ie: KVDB, KVDBUSER, PGHOST, PGPORT
   string constr( KvApp::createConnectString() );
   bool error;
-  string pidfile;
 
 
   if ( conf )
@@ -81,17 +82,38 @@ main( int argc, char** argv )
 
   string htmlpath;
 
-  InitLogger( argc, argv, "kvQabased", htmlpath );
-
+  try {
+    InitLogger( argc, argv, "kvQabased", htmlpath );
+  }
+  catch ( filesystem::filesystem_error & e) {
+    LOGFATAL( e.what() );
+    return 1;
+  }
+  
+  
   LOGINFO( "KvQabased: starting ...." );
-  pidfile = kvPath("localstatedir")+ "/run/kvQabased.pid";
+  filesystem::path rundir( kvPath("localstatedir") + "/run" );
+  if ( ! boost::filesystem::exists(rundir) ) {
+    try {
+      filesystem::create_directories(rundir);      
+    }
+    catch ( filesystem::filesystem_error & e) {
+      LOGFATAL( e.what() );
+      return 1;
+    }
+  }
+  else if ( ! filesystem::is_directory(rundir) ) {
+    LOGFATAL( rundir.native_file_string() << "exists but is not a directory" );
+    return 1;
+  }
+  filesystem::path pidfile( rundir/"kvQabased.pid" );
 
-  if ( dnmi::file::isRunningPidFile( pidfile, error ) )
+  if ( dnmi::file::isRunningPidFile( pidfile.native_file_string(), error ) )
   {
     if ( error )
     {
       LOGFATAL( "An error occured while reading the pidfile:" << endl
-                << pidfile << " remove the file if it exist and"
+                << pidfile.native_file_string() << " remove the file if it exist and"
                 << endl << "kvQabased is not running. " <<
                 "If it is running and there is problems. Kill kvQabased and"
                 << endl << "restart it." << endl << endl );
@@ -100,7 +122,7 @@ main( int argc, char** argv )
     else
     {
       LOGFATAL( "Is kvQabased allready running?" << endl
-                << "If not remove the pidfile: " << pidfile );
+                << "If not remove the pidfile: " << pidfile.native_file_string() );
       return 1;
     }
   }

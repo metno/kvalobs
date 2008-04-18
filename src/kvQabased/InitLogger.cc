@@ -30,12 +30,15 @@
 */
 #include <string.h>
 #include <string>
+#include <boost/filesystem/convenience.hpp>
 #include <milog/milog.h>
 #include <unistd.h>
 #include "InitLogger.h"
 #include <iostream>
+#include <stdexcept>
 #include <kvalobs/kvPath.h>
 
+using namespace boost::filesystem;
 using namespace milog;
 using namespace std;
 
@@ -47,18 +50,22 @@ void
 InitLogger(int argn, char **argv, const std::string &logname,
 	   std::string &htmlpath )
 {
-    string       filename;
     LogLevel     traceLevel=milog::NOTSET;
     LogLevel     logLevel=milog::NOTSET;
     FLogStream   *fs;
     StdErrStream *trace;
     
 
-    filename = kvPath("localstatedir")+"/log";
-    htmlpath= filename;
-    htmlpath+= "/html";
+    const path localstate(kvPath("localstatedir"));
+    path filename = localstate/"log";
+    path html = filename/"html";
+    if ( ! exists(html)  )
+      create_directories(html);
+    else if ( ! is_directory(html) )
+      throw std::runtime_error(html.native_file_string() + "exists but is not a directory");
 
-    filename+= "/" + logname +".log";
+    htmlpath= html.native_directory_string();
+    filename/=logname +".log";
     
     for(int i=0; i<argn; i++){
 	if(strcmp("--tracelevel", argv[i])==0){
@@ -79,9 +86,9 @@ InitLogger(int argn, char **argv, const std::string &logname,
     try{
 	fs=new FLogStream(4);
 	
-	if(!fs->open(filename)){
+	if(!fs->open(filename.native_file_string())){
 	    std::cerr << "FATAL: Can't initialize the Logging system.\n";
-	    std::cerr << "------ Cant open the Logfile <" << filename << ">\n";
+	    std::cerr << "------ Cant open the Logfile <" << filename.native_file_string() << ">\n";
 	    delete fs;
 	    exit(1);
 	}
@@ -111,7 +118,7 @@ InitLogger(int argn, char **argv, const std::string &logname,
 	exit(1);
     }
 
-    std::cerr << "Logging to file <" << filename << ">!\n";
+    std::cerr << "Logging to file <" << filename.native_file_string() << ">!\n";
     
 }
 

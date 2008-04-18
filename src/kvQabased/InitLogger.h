@@ -31,6 +31,10 @@
 #ifndef __initlogger_h__
 #define __initlogger_h__
 
+/**
+ * @throws std::exception if log directories does not exist, and we are unable 
+ * to create them.
+ */
 void
 InitLogger(int argn, char **argv, const std::string &logname,
 	   std::string &htmlpath);
