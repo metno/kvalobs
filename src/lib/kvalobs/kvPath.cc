@@ -30,27 +30,33 @@
 */
 #include <stdlib.h>
 #include <iostream>
+#include <boost/algorithm/string/replace.hpp>
 #include <kvalobs/kvPath.h>
 
 std::string 
 kvPath( const std::string &name )
 {
+  std::string ret;
+  
   if( name=="pkglibdir" )
-     return PKGLIBDIR;
+     ret = PKGLIBDIR;
   else if( name=="sysconfdir" )
-     return SYSCONFDIR+std::string("/kvalobs");
+     ret = SYSCONFDIR+std::string("/kvalobs");
   else if( name=="libdir" )
-     return LIBDIR;
+     ret = LIBDIR;
   else if( name=="bindir" )
-     return BINDIR;
+     ret = BINDIR;
   else if( name=="datadir" )
-     return DATADIR+std::string("/kvalobs");
+     ret = DATADIR+std::string("/kvalobs");
   else if( name=="localstatedir" )
-     return LOCALSTATEDIR+std::string("/kvalobs");
+     ret = LOCALSTATEDIR+std::string("/kvalobs");
   else if( name=="prefix")
-     return PREFIX;
+     ret = PREFIX;
   else {
-    std::cerr << "FATAL: The 'name' (" << name << ") is NOT recogniced!\n";
-    return "";
+    std::cerr << "FATAL: The 'name' (" << name << ") is NOT recognised!\n";
   }
+
+  boost::algorithm::replace_all(ret, "//", "/");
+  
+  return ret;
 }
