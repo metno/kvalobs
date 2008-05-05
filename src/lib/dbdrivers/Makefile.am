@@ -20,8 +20,8 @@ sqlite3driver_la_CPPFLAGS = $(sqlite3_CFLAGS) \
 sqlite3driver_la_LDFLAGS =  -module
 sqlite3driver_la_LIBADD = $(sqlite3_LIBS)
 
-sqlitedriver_la_SOURCES = sqlitedriver.h sqlitedriver.cc sqlitedb.h sqlitedb.cc
-sqlitedriver_la_CPPFLAGS = $(sqlite2_CFLAGS)  \
-                          -I$(top_srcdir)/src/lib
-sqlitedriver_la_LDFLAGS = -module
-sqlitedriver_la_LIBADD = $(sqlite2_LIBS)
+#sqlitedriver_la_SOURCES = sqlitedriver.h sqlitedriver.cc sqlitedb.h sqlitedb.cc
+#sqlitedriver_la_CPPFLAGS = $(sqlite2_CFLAGS)  \
+#                          -I$(top_srcdir)/src/lib
+#sqlitedriver_la_LDFLAGS = -module
+#sqlitedriver_la_LIBADD = $(sqlite2_LIBS)
