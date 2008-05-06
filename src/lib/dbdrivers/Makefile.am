@@ -2,7 +2,8 @@ AM_CPPFLAGS = -I $(top_srcdir)/src/lib
 
 dbdriverdir = $(pkglibdir)/db
 
-dbdriver_LTLIBRARIES = pgdriver.la dummydriver.la sqlite3driver.la sqlitedriver.la
+#dbdriver_LTLIBRARIES = pgdriver.la dummydriver.la sqlite3driver.la sqlitedriver.la
+dbdriver_LTLIBRARIES = pgdriver.la dummydriver.la sqlite3driver.la 
 
 pgdriver_la_SOURCES = pgdriver.h pgdriver.cc pgsqldb.h pgsqldb.cc
 pgdriver_la_CPPFLAGS = $(postgresql_CFLAGS) \
