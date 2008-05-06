@@ -36,6 +36,7 @@ import metno.dbutil.*;
 import java.lang.Math;
 import metno.util.MiGMTTime;
 import metno.util.StringHolder;
+import metno.util.IntHolder;
 import CKvalObs.CService.*;
 import java.util.Date;
 import java.util.*;
@@ -61,26 +62,32 @@ public class Filter {
 		}
 	}
 	
-	protected boolean paramFilter(CKvalObs.CService.DataElem data, 
-									Timestamp obstime,
-			                        StringHolder msg){
-		
+	protected boolean paramFilter(int stationID, int typeID, int paramID, short level,
+			                      String sensor, boolean useLevelAndSensor, 
+							      Timestamp obstime,
+                                  StringHolder msg){
+
 		if( paramFilter==null ||
-			paramFilter.stationid!=data.stationID ) {
-			paramFilter=new ParamFilter(data.stationID, con);
+			paramFilter.stationid!=stationID ) {
+			paramFilter=new ParamFilter(stationID, con);
 		}
-		
-		if(!paramFilter.filter(data, obstime)){
-			addToString(msg, "[paramFilter] Blocked param: "+data.paramID+
-					         " sensor: "+data.sensor+
-					         " level: "+data.level); 
+
+		if(!paramFilter.filter((short)paramID, (short)typeID, 
+				               level, sensor, useLevelAndSensor,
+				               obstime)) {
+			if( useLevelAndSensor )
+				addToString(msg, "[paramFilter] Blocked param: "+paramID+
+						         " sensor: "+sensor+
+					             " level: "+level);
+			else
+				addToString(msg, "[paramFilter] Blocked param: "+paramID + 
+						         ", No sensor and level." );
 			return false;
 		}
-		
+
 		return true;
 	}
-	
-	
+
 	public boolean inDateInterval(Timestamp fromDate, Timestamp toDate, 
 								    Timestamp obstime){
 		boolean ret=false;
@@ -188,17 +195,17 @@ public class Filter {
 		return true;
 	}
 	
-	protected void doNyStnr(CKvalObs.CService.DataElem data, 
+	protected void doNyStnr(IntHolder stationID, int typeID_, 
 							Kv2KlimaFilter dbElem,
-							StringHolder   msg){
+						    StringHolder   msg){
 		if(dbElem.getNytt_stnr()!=0){
 			if(dbElem.getTypeid()==0 || 
-			   dbElem.getTypeid()==Math.abs(data.typeID_)){
+			   dbElem.getTypeid()==Math.abs(typeID_)){
 				addToString(msg, 
-						 "[doNyStnr] Changed stnr to "
-						 + dbElem.getNytt_stnr()+".");
-			
-				data.stationID=dbElem.getNytt_stnr();
+							"[doNyStnr] Changed stnr to "+
+							dbElem.getNytt_stnr()+".");
+
+				stationID.setValue( dbElem.getNytt_stnr() );
 			}
 		}
 	}
@@ -217,50 +224,47 @@ public class Filter {
 		return filterEnabled;
 	}
 	
-	public Kv2KlimaFilter loadFromDb(CKvalObs.CService.DataElem data, 
+	public Kv2KlimaFilter loadFromDb( int stationID, int typeID_, 
 									  Timestamp obstime){
-		int typeid=Math.abs(data.typeID_);
-		
+		int typeid=Math.abs(typeID_);
+
 		if(dbKv2KlimaFilterElem!=null && 
-		   dbKv2KlimaFilterElem.getStnr()==data.stationID &&
+		   dbKv2KlimaFilterElem.getStnr()==stationID &&
 		   dbKv2KlimaFilterElem.getTypeid()==typeid ) { 
-		   
+
 			return dbKv2KlimaFilterElem;
 		}
-		
-		dbKv2KlimaFilterElem = new Kv2KlimaFilter(data.stationID, typeid, con);
-		
+
+		dbKv2KlimaFilterElem = new Kv2KlimaFilter(stationID, typeid, con);
+
 		return dbKv2KlimaFilterElem;
 	}
+	
 
-	/** Shall we use this observation element. 
-	 * 
-	 * @param DataElem an observation element.
-	 * 
-	 * @return true if we shall use this observation element and false otherwise.
-	 */
-	public boolean filter(CKvalObs.CService.DataElem data, 
-			              StringHolder msg){
+	
+	public boolean filter(IntHolder stationID, short typeID_, short paramID, 
+			              short level, String sensor, boolean useLevelAndSensor,
+			              String sObstime, StringHolder msg){
 		Kv2KlimaFilter dbElem;
 
 		if(!filterEnabled)
 			return true;
 		
-		logger.debug(" -- Filter:  sid: "+data.stationID + " tid: "+data.typeID_
-		             + " paramID: "+data.paramID + " obstime: " + data.obstime);
+		logger.debug(" -- Filter:  sid: "+stationID.getValue() + " tid: "+typeID_
+		             + " paramID: "+paramID + " obstime: " + sObstime);
 		
 		MiGMTTime obstimeTmp=new MiGMTTime();
 		
-		if(!obstimeTmp.parse(data.obstime)){
+		if(!obstimeTmp.parse(sObstime)){
 			logger.error(new MiGMTTime() 
-					     +" ERROR: filter.filter: Cant parse <obstime> '"+data.obstime+"'");
+					     +" ERROR: filter.filter: Cant parse <obstime> '"+sObstime+"'");
 			return true;
 		}
 	
 		Timestamp obstime = obstimeTmp.getTimestamp();
 		logger.debug(" -- Filter:  Incomming obstime decoded to: " + obstimeTmp + " (GMT) -> Timestamp: " + obstime );
 		
-		dbElem=loadFromDb(data, obstime);
+		dbElem=loadFromDb( stationID.getValue(), typeID_, obstime);
 	
 		if( ! dbElem.isOk() ) {
 		//There was a problem with loading from the database.
@@ -272,7 +276,7 @@ public class Filter {
 		
 		
 		if( ! dbElem.hasFilterElements() ){
-			logger.info("BLOCKED: No filter data for station: " + data.stationID + " typeid: " +  data.typeID_ );
+			logger.info("BLOCKED: No filter data for station: " + stationID.getValue() + " typeid: " +  typeID_ );
 			return false;
 		}
 		
@@ -284,11 +288,51 @@ public class Filter {
 		if(!doStatus(dbElem, msg))
 			return false;
 		
-		doNyStnr(data, dbElem, msg);
+		doNyStnr(stationID, typeID_, dbElem, msg);
 		
-		if(!paramFilter(data, obstime, msg))
+		if(!paramFilter(stationID.getValue(), typeID_, paramID, 
+			            level, sensor, useLevelAndSensor,
+			            obstime, msg))
 			return false;
 		
 		return true;
+	}
+	
+	
+	public boolean filter(CKvalObs.CService.TextDataElem data, 
+            StringHolder msg){
+		IntHolder stationID = new IntHolder(data.stationID);
+
+		if( filter(stationID, data.typeID_, data.paramID, (short)0, null, 
+				false, data.obstime, msg ) ){
+			//The stationid may have changed.
+			data.stationID = stationID.getValue();
+			return true;
+		}
+
+		return false;
+	}
+
+	
+	
+	/** Shall we use this observation element. 
+	 * 
+	 * @param DataElem an observation element.
+	 * 
+	 * @return true if we shall use this observation element and false otherwise.
+	 */
+	public boolean filter(CKvalObs.CService.DataElem data, 
+			              StringHolder msg){
+		IntHolder stationID = new IntHolder(data.stationID);
+		
+		if( filter(stationID, data.typeID_, data.paramID, data.level, data.sensor, 
+				   true, data.obstime, msg ) ){
+			//The stationid may have changed.
+			data.stationID = stationID.getValue();
+			return true;
+		}
+		
+		return false;
+		
 	}
 }

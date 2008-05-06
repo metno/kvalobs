@@ -125,7 +125,7 @@ public class Kv2KlMain {
 
          app=new Kv2KlApp(args, configfile, kvserver, false);
          dataSubscribeInfo=new KvDataSubscribeInfo();
-         dataReceiver=new KlDataReceiver(app, kvname+".dat"); 
+         dataReceiver=new KlDataReceiver( app, kvname+".dat" ); 
          hint=new KvHintListener(app);
          
     	logger.info("Starting: " +now);

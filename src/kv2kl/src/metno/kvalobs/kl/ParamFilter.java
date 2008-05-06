@@ -91,7 +91,7 @@ public class ParamFilter {
 	static  Logger logger=Logger.getLogger(ParamFilter.class);
 
 	int stationid;
-	HashMap types;
+	HashMap<Integer, LinkedList<ParamElem>> types;
 	DbConnection con;
 	
 	static class ParamElem implements Comparable{
@@ -224,17 +224,17 @@ public class ParamFilter {
 	 * @param list The list toa add or remove an element from.
 	 * @param pe The ParamElement to add/remove to the list.
 	 */
-	void addOrRemoveFromList(LinkedList list, ParamElem pe){
+	void addOrRemoveFromList(LinkedList<ParamElem> list, ParamElem pe){
 		boolean remove=false;
 		int     pid=Math.abs(pe.paramid);
 		
 		if(pe.paramid<0)
 			remove=true;
 		
-		ListIterator it=list.listIterator(0);
+		ListIterator<ParamElem> it=list.listIterator(0);
 		
 		while(it.hasNext()){
-			ParamElem param=(ParamElem)it.next();
+			ParamElem param=it.next();
 			
 			if(param.typeid==pe.typeid &&
 			   param.paramid==pid &&
@@ -253,13 +253,13 @@ public class ParamFilter {
 			list.add(pe);
 	}
 	
-	LinkedList loadFromDb(short type){
+	LinkedList<ParamElem> loadFromDb(short type){
 		int  typeid = Math.abs(type);
-		LinkedList list=new LinkedList();
+		LinkedList<ParamElem> list=new LinkedList<ParamElem>();
 		boolean error=false;
 
 		if(types==null)
-			types=new HashMap();
+			types=new HashMap<Integer, LinkedList<ParamElem>>();
 		
 		String stmt="SELECT * FROM T_KV2KLIMA_TYPEID_PARAM_FILTER "+
 					"  WHERE abs(typeid)="+typeid;
@@ -336,7 +336,8 @@ public class ParamFilter {
 						      + " SQLState: "+ex.getSQLState());
 			}
 		}
-		Collections.sort(list);
+		
+		Collections.sort( list );
 		types.put(new Integer(typeid), list);
 
 		return list;
@@ -347,12 +348,23 @@ public class ParamFilter {
 		this.con=con;
 		types=null;
 	}
-
+	
 	boolean filter(CKvalObs.CService.DataElem data, Timestamp obstime){
-		LinkedList params=null;
-			
+		return filter(data.paramID, data.typeID_, data.level, data.sensor, 
+				      true, obstime );
+	}
+	
+	boolean filter(CKvalObs.CService.TextDataElem data, Timestamp obstime){
+		return filter(data.paramID, data.typeID_, (short)0, null, 
+				      false, obstime);
+	}
+	
+	boolean filter( short paramid, short typeid, short level, String sensor,
+			        boolean useLevelAndSensor, Timestamp obstime ) {
+		LinkedList<ParamElem> params=null;
+		
 		if(types==null){
-			params=loadFromDb(data.typeID_);
+			params=loadFromDb(typeid);
 			
 			if(params==null){
 				System.out.println("ParamFilter: Unexpected null list!");
@@ -360,53 +372,58 @@ public class ParamFilter {
 			}
 		}
 		
-		Object obj=types.get(new Integer( Math.abs( data.typeID_) ) );
+		LinkedList<ParamElem> obj=types.get(new Integer( Math.abs( typeid ) ) );
 		
 		if(obj==null)
-			params=loadFromDb(data.typeID_);
+			params=loadFromDb(typeid);
 		else
-			params=(LinkedList)obj;
+			params=obj;
 		
 		if(params==null || params.size()==0)
 			return true;
 		
-		ListIterator it=params.listIterator(0);
+		ListIterator<ParamElem> it=params.listIterator(0);
 		
 		while(it.hasNext()){
-			ParamElem param=(ParamElem)it.next();
+			ParamElem param=it.next();
 
 			logger.debug("-- ParamFilter: ParamElem: " + param);
 			
-			if( param.paramid == data.paramID &&
-			    param.level   == data.level   &&
-			    Math.abs(param.typeid)  == Math.abs(data.typeID_) ){
+			if( param.paramid == paramid &&
+			    Math.abs(param.typeid)  == Math.abs(typeid) ){
+				
+				if( useLevelAndSensor )
+					if( param.level != level )
+						continue;
 				
 				//Negative typeid in the filter tables effect only
 				//negative types.
-				if( param.typeid < 0 && data.typeID_ > 0 )
+				if( param.typeid < 0 && typeid > 0 )
 					continue;
-				
-				int s;
-				
-				try{
-					s=Integer.parseInt(data.sensor);
+	
+				if( useLevelAndSensor ) {
+					int s;
+					
+					try{
+						s=Integer.parseInt(sensor);
 
-					if(param.sensor==s){
-						if(obstime.compareTo(param.fdato)>=0 && 
-						    obstime.compareTo(param.tdato)<=0)
-							return false;
+						if(param.sensor==s){
+							if(obstime.compareTo(param.fdato)>=0 && 
+							   obstime.compareTo(param.tdato)<=0)
+								return false;
+						}
+					}
+					catch(NumberFormatException ex){
+						ex.printStackTrace();
+						logger.error("parseInt: the sensor value is not a number ("+param.sensor+")");
+						return true;
 					}
 				}
-				catch(NumberFormatException ex){
-					ex.printStackTrace();
-					logger.error("parseInt: the sensor value is not a number ("+param.sensor+")");
-					return true;
-				}
-				
 			}
 		}
 		
 		return true;
 	}
+	
 	
 }

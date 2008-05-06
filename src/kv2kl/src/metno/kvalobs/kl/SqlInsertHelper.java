@@ -38,10 +38,13 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 
 import CKvalObs.CService.DataElem;
+import CKvalObs.CService.TextDataElem;
 import CKvalObs.CService.ObsData;
+import metno.dbutil.DbConnectionMgr;
 import metno.dbutil.DbConnection;
 import metno.util.MiGMTTime;
 import metno.util.StringHolder;
+import metno.util.IntHolder;
 
 import org.apache.log4j.Logger;
 
@@ -49,13 +52,13 @@ public class SqlInsertHelper {
 	static Logger logger=Logger.getLogger(SqlInsertHelper.class);
 	static Logger filterlog=Logger.getLogger("filter");
 	PrintWriter fout;
-	KlApp       klApp;
+	DbConnectionMgr conMgr=null;
 	boolean    enableFilter;
 	
-	
-	public SqlInsertHelper(KlApp app, String backupfile, boolean enableFilter){
+		
+	public SqlInsertHelper(DbConnectionMgr conMgr, String backupfile, boolean enableFilter){
 		fout=null;
-	   	klApp=app;
+	   	this.conMgr=conMgr;
 	   	this.enableFilter=enableFilter;
 
 	   	if(backupfile!=null){
@@ -68,111 +71,47 @@ public class SqlInsertHelper {
 	   		}
 	   	}
 	 }
+
+	
+	 public SqlInsertHelper(DbConnectionMgr conMgr, String backupfile){
+		 this(conMgr, backupfile, true);
+	 }
+
+	 public SqlInsertHelper(DbConnectionMgr conMgr){
+		 this(conMgr, null, true);
+	 }
+	
+	 public DbConnection newDbConnection(){
+		 try {
+			 return conMgr.newDbConnection();
+		 } catch (SQLException e) {
+			 logger.warn("Cant create a new database connection: "+
+					     e.getMessage());
+			 return null;
+		 }
+	 }
 	 
-	 public SqlInsertHelper(KlApp app, String backupfile){
-		 this(app, backupfile, true);
+	 
+	 public void  releaseDbConnection(DbConnection con){
+		 String msg;
+	        
+		 try {
+			 conMgr.releaseDbConnection(con);
+			 return;
+		 } catch (IllegalArgumentException e) {
+			 msg=e.getMessage();
+		 } catch (IllegalStateException e) {
+			 msg=e.getMessage();
+		 } catch (SQLException e) {
+			 msg=e.getMessage();
+		 }
+
+		 logger.warn("Cant release the database connection: "+msg);
 	 }
-
-	 public SqlInsertHelper(KlApp app){
-		 this(app, null, true);
-	 }
-	
-	protected String createOracleInsertQuery(DataElem elem){
-	   	logger.debug("Insert into a Oracle database!");
-	   	String query="insert into kv2klima(stnr,dato,original,kvstamp,paramid,typeid,xlevel,sensor,useinfo,corrected,controlinfo,cfailed) values ("
-	   				 +elem.stationID+",to_date('"
-	   				 +elem.obstime+"','yyyy-mm-dd hh24:mi:ss'),"
-	   				 +elem.original+",to_date('"
-	   				 +elem.tbtime+"','yyyy-mm-dd hh24:mi:ss'),"
-	   				 +elem.paramID+","
-	  				 +elem.typeID_+","
-	   				 +elem.level  +","
-	   				 +elem.sensor  +",'"
-	   				 +elem.useinfo +"',"
-	   				 +elem.corrected+",'"
-	   				 +elem.controlinfo+"','"
-	   				 +elem.cfailed+"')";
-	   	return query;
-	}
-
-	
 	
 
-	protected String createPgInsertQuery(DataElem elem){
-	  	logger.debug("Insert into a Pg database!");
-	   	String query="insert into kv2klima(stnr,dato,original,kvstamp,paramid,typeid,xlevel,sensor,useinfo,corrected,controlinfo,cfailed) values ("
-	   				 +elem.stationID+","
-	   				 +"'"+elem.obstime+"',"
-	   				 +elem.original+","
-	   				 +"'"+elem.tbtime+"',"
-	   				 +elem.paramID+","
-	   				 +elem.typeID_+","
-	   				 +elem.level  +","
-	   				 +elem.sensor  +",'"
-	   				 +elem.useinfo +"',"
-	   				 +elem.corrected+",'"
-	   				 +elem.controlinfo+"','"
-	   				 +elem.cfailed+"')";
-	   	return query;
-   }
-
-	protected String createOracleUpdateQuery(DataElem elem){
-	   	logger.debug("Update a Oracle database!");
-	   	String query="UPDATE kv2klima "+
-	   				 "SET " +
-	   				 "  original="+elem.original + "," +
-	   				 "  kvstamp=to_date('"+elem.tbtime+"','yyyy-mm-dd hh24:mi:ss')," +
-	   				 "  useinfo='"+elem.useinfo + "',"+
-	   				 "  corrected="+elem.corrected + "," +
-	   				 "  controlinfo='"+elem.controlinfo+"'," +
-	   				 "  cfailed='"+elem.cfailed+"' " +
-	   				 "WHERE " +
-	   				 "  stnr=" + elem.stationID + " AND " +
-	   				 "  dato=to_date('" + elem.obstime + "','yyyy-mm-dd hh24:mi:ss') AND " +
-	   				 "  paramid=" + elem.paramID + " AND " +
-	   				 "  typeid=" + elem.typeID_ + " AND " +
-	   				 "  xlevel=" + elem.level + " AND " +
-	   				 "  sensor=" + elem.sensor;
-	   	return query;
-	}
-
-	protected String createPgUpdateQuery (DataElem elem){
-	   	logger.debug("Update a Pg database!");
-	   	String query="UPDATE kv2klima "+
-	   				 "SET " +
-	   				 "  original="+elem.original + "," +
-	   				 "  kvstamp='"+elem.tbtime+"'" +
-	   				 "  useinfo='"+elem.useinfo + "',"+
-	   				 "  corrected="+elem.corrected + "," +
-	   				 "  controlinfo='"+elem.controlinfo+"'," +
-	   				 "  cfailed='"+elem.cfailed+"' " +
-	   				 "WHERE " +
-	   				 "  stnr=" + elem.stationID + " AND " +
-	   				 "  dato='" + elem.obstime + "' AND " +
-	   				 "  paramid=" + elem.paramID + " AND " +
-	   				 "  typeid=" + elem.typeID_ + " AND " +
-	   				 "  xlevel=" + elem.level + " AND " +
-	   				 "  sensor=" + elem.sensor;
-	   	return query;
-	}
 	
-	
-	
-	protected String createInsertQuery(DataElem data, String dbdriver){
-    	if(dbdriver.indexOf("oracle")>-1)
-    		return createOracleInsertQuery(data);
-    	else
-    		return createPgInsertQuery(data);
-	}
-
-	protected String createUpdateQuery(DataElem data, String dbdriver){
-   		if(dbdriver.indexOf("oracle")>-1)
-   			return createOracleUpdateQuery(data);
-   		else
-   			return createPgUpdateQuery(data);
-	}
-
-	protected boolean usetypeid(DataElem elem, LinkedList typelist){
+	protected boolean usetypeid(int  typeid, LinkedList typelist){
 		if( typelist == null )
 			return true;
 		
@@ -182,7 +121,7 @@ public class SqlInsertHelper {
             while(it.hasNext()){
                 Integer n=(Integer)it.next();
             
-                if(elem.typeID_==n.shortValue()){
+                if(typeid==n.shortValue()){
                     return true;
                 }
             }
@@ -191,14 +130,19 @@ public class SqlInsertHelper {
 		return false;
 	}
 	
+
 	
-	protected boolean doInsertData(DbConnection dbcon, DataElem elem){
-			String query=createInsertQuery(elem, dbcon.getDbdriver());
+	protected boolean doInsertData(DbConnection dbcon, String insertQuery, String updateQuery){
+			String query=insertQuery;
+			
+			if( query == null )
+				return true;
 			
 			logger.debug(query);
 
 			try{
 				dbcon.exec(query);
+				return true;
 			}
 			catch(SQLException SQLe){
 				String sqlState=SQLe.getSQLState();
@@ -206,9 +150,8 @@ public class SqlInsertHelper {
 				if(sqlState!=null && 
 				   sqlState.startsWith("23")){
 					logger.warn(new MiGMTTime() +": "+ SQLe);
-					String updateQuery=createUpdateQuery(elem, dbcon.getDbdriver());
-					
-					return updateData(dbcon, elem);
+					query = updateQuery;
+					return updateData( dbcon, query );
 				}else{
 					logger.error(new MiGMTTime() +": "+ SQLe);
 				}
@@ -223,12 +166,13 @@ public class SqlInsertHelper {
 			return false;
 	}
 	
-	protected boolean updateData(DbConnection dbcon, DataElem elem){
-		String query=null;
+	protected boolean updateData(DbConnection dbcon, String updateQuery ){
+		String query=updateQuery;
 
+		if( query == null )
+			return true;
+		
 		try{
-			query=createUpdateQuery(elem, dbcon.getDbdriver());
-			
 			dbcon.exec(query);
 			return true;
 		}catch(SQLException SQLe){
@@ -244,8 +188,9 @@ public class SqlInsertHelper {
 		return false;
 	}
 
-   	public boolean insertData(ObsData[] obsData, LinkedList typelist){
-   		DbConnection dbconn=klApp.newDbConnection();
+	
+ 	public boolean insertData(ObsData[] obsData, LinkedList typelist){
+   		DbConnection dbconn=newDbConnection();
    		Filter filter=new Filter(dbconn); 
    		boolean loggedFilter;
    		boolean loggedNewObs;
@@ -269,51 +214,59 @@ public class SqlInsertHelper {
    				logger.warn("Opppsss: NO DATA!");
    				return true;
    			}
-   		
+   			
+   			DataHelper dh = new DataHelper( dbconn.getDbdriver() );
+   			
    			for(int i=0; i<obsData.length; i++){
    				msg.setValue(null);
    				loggedFilter=false;
    				loggedNewObs=false;
                     
    				DataElem[] elem=obsData[i].dataList;
-	    
-   				if(elem==null){
-   					logger.warn("Opppsss: NO PARAMS!");
-   					continue;
-   				}
+   				dh.init( obsData[i].dataList, obsData[i].textDataList );
+   				IntHolder stationID = new IntHolder();
+   				
    			
-   				for(int j=0; j<elem.length; j++){
-   					if(typeid!=elem[j].typeID_){
-   						typeid=elem[j].typeID_;
+   				while( dh.next() ){
+   					if(typeid!=dh.getTypeID() ){
+   						typeid=dh.getTypeID();
                         loggedNewObs=false;
    					}
    							
-   					if(!usetypeid(elem[j], typelist))
+   					if(!usetypeid(dh.getTypeID(), typelist))
    						continue;
                             
    					if(!loggedNewObs){
    						loggedNewObs=true;
-   						logger.info("New obs: stationid: "+elem[j].stationID+
-   									" typid: "+elem[j].typeID_+ 
-   									" obstime: " + elem[j].obstime);
+   						logger.info("New obs: stationid: "+dh.getStationID()+
+   									" typid: "+dh.getTypeID()+ 
+   									" obstime: " + dh.getObstime() );
    					}
 
-   					filterRet=filter.filter(elem[j], msg);
+   					stationID.setValue( dh.getStationID() );
+
+   					filterRet=filter.filter(stationID, dh.getTypeID(), dh.getParamID(), 
+   							                dh.getLevel(), dh.getSensor(), dh.useLevelAndSensor(),
+   							                dh.getObstime(), msg );
+   					
+   					//The stationid my have changed
+   					dh.setStationID( stationID.getValue() );
+   					
 					
 					if(!loggedFilter && msg.getValue()!=null){
 						loggedFilter=true;
-   						filterlog.info(elem[j].stationID + 
+   						filterlog.info(dh.getStationID() + 
    								       " " + 
-   								       elem[j].typeID_ +
+   								       dh.getTypeID() +
 							           " " +
-								       elem[j].obstime + ": " +
+								       dh.getObstime() + ": " +
 								       msg.getValue());
    					}	
 					
    					if(!filterRet)
    						continue;
 
-   					if(!doInsertData(dbconn, elem[j]))
+   					if(!doInsertData( dbconn, dh.createInsertQuery(), dh.createUpdateQuery() ) )
    						ret=false;
    				}
    			}
@@ -322,11 +275,9 @@ public class SqlInsertHelper {
    			logger.error(new MiGMTTime() + ": " + e);
    		}
 
-   		klApp.releaseDbConnection(dbconn);
+   		releaseDbConnection(dbconn);
 
    		logger.debug("DataReceiver (Return): "+new MiGMTTime());
    		return ret;
    	}
-   
-   
 }

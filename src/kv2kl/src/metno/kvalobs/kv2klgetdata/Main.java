@@ -98,7 +98,7 @@ public class Main {
         
         String[] res=typelist.split(" |,");
         
-        LinkedList ll=new LinkedList();
+        LinkedList<Integer> ll=new LinkedList<Integer>();
         
         for(int i=0; i<res.length; i++){
             try {
@@ -283,9 +283,9 @@ public class Main {
     	
 
        if(disableFilter)
-    	   insertstmt=new SqlInsertHelper(app, null, false);
+    	   insertstmt=new SqlInsertHelper(app.getConnectionMgr(), null, false);
        else
-    	   insertstmt=new SqlInsertHelper(app);
+    	   insertstmt=new SqlInsertHelper(app.getConnectionMgr());
          
        MiGMTTime start=new MiGMTTime();	
          

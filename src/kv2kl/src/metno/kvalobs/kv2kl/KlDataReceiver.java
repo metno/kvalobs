@@ -46,7 +46,7 @@ public class KlDataReceiver implements KvDataEventListener {
     
     public KlDataReceiver(Kv2KlApp app, String backupfile){
     	this.app=app;
-    	insertstmt=new SqlInsertHelper(app, backupfile);
+    	insertstmt=new SqlInsertHelper(app.getConnectionMgr(), backupfile);
     }
  
     public void kvDataEvent(KvDataEvent event) {

@@ -200,6 +200,10 @@ public class KlApp extends KvApp
         logger.warn("Cant release the database connection: "+msg);
     }
     
+    public DbConnectionMgr getConnectionMgr() {
+    	return conMgr;
+    }
+    	
     public PropertiesHelper getConf(){
     	return conf;
     }

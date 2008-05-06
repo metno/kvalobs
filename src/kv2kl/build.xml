@@ -39,7 +39,7 @@
 	
 	<target name="compile" depends="init">
 		<javac destdir="${builddir}" srcdir="${src}" classpathref="build.classpath" debug="true"> 
-     <!--<compilerarg value="-Xlint:unchecked"/> -->
+     	<compilerarg value="-Xlint:unchecked"/> 
 			<include name="**/*.java"/>	
 		<!--	<exclude name="**/SqlHelper/*.java"/> -->
 		</javac>

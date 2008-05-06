@@ -143,7 +143,7 @@ public class Kl2KvMain {
      	System.out.println("log4j conf: "+kvpath+"/etc/"+logfile);
      	PropertyConfigurator.configure(kvpath+"/etc/"+logfile);
     	 
-    	 List stations=go.getFilenameList();
+    	 List<String> stations=go.getFilenameList();
     	
          go=null; //We dont need it anymore.
 

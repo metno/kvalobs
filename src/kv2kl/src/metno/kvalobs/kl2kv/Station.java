@@ -129,7 +129,7 @@ public class Station {
 	 * @param st A stationlist
 	 * @return A list of stations and stations intervals.
 	 */
-	public static Station[] stations(List st){
+	public static Station[] stations(List<String> st){
 		if(st==null || st.size()==0){
 			Station[] stl=new Station[1];
 			stl[0]=new Station();
