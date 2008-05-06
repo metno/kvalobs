@@ -9,7 +9,7 @@ public class DefaultQuery implements IQuery{
 	}
 	
 	public String createDataUpdateQuery( CKvalObs.CService.DataElem elem ){
-		logger.debug("Update a SQL92 database!");
+		logger.debug("Update data in a SQL92 database!");
 		String query="UPDATE kv2klima "+
 			 "SET " +
 			 "  original="+elem.original + "," +
@@ -47,11 +47,31 @@ public class DefaultQuery implements IQuery{
 	}
 	
 	public String createTextDataUpdateQuery( CKvalObs.CService.TextDataElem elem ){
-		return null;
+		logger.debug("Update textData in a SQL92 database!");
+		String query="UPDATE T_TEXT_DATA "+
+			 "SET " +
+			 "  original='"+elem.original + "'," +
+			 "  tbtime='"+elem.tbtime+"' " +
+			 "WHERE " +
+			 "  stationid=" + elem.stationID + " AND " +
+			 "  obstime='" + elem.obstime + "' AND " +
+			 "  paramid=" + elem.paramID + " AND " +
+			 "  typeid=" + elem.typeID_; 
+		return query;
 	}
 	
 	public String createTextDataInsertQuery(CKvalObs.CService.TextDataElem elem){
-		return null;
+		logger.debug("Insert textData into a SQL92 database!");
+		String query="INSERT INTO T_TEXT_DATA(stationid,obstime,original,paramid,tbtime,typeid) "+
+		             "values ("
+				 	     +elem.stationID+","
+				         +"'"+elem.obstime+"','"
+				         +elem.original+"',"
+				         +elem.paramID+","
+				         +"'"+elem.tbtime+"',"
+				         +elem.typeID_
+				     +")";
+		return query;
 	}
 	
 }

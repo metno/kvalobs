@@ -63,9 +63,9 @@ public class DataHelper {
 		if( textDataElem != null ) {
 			if( index >= textDataElem.length ) {
 				textDataElem = null;
-				return false;
+			} else { 
+				return  true;
 			}
-			return  true;
 		}
 		
 		return false;

@@ -29,7 +29,7 @@ public class OracleQuery implements IQuery {
 	}
 	
 	public String createDataInsertQuery( CKvalObs.CService.DataElem elem){
-		logger.debug("Insert into a Oracle database!");
+		logger.debug("Insert data into a Oracle database!");
 	   	String query="insert into kv2klima(stnr,dato,original,kvstamp,paramid,typeid,xlevel,sensor,useinfo,corrected,controlinfo,cfailed) values ("
 	   				 +elem.stationID+",to_date('"
 	   				 +elem.obstime+"','yyyy-mm-dd hh24:mi:ss'),"
@@ -47,11 +47,30 @@ public class OracleQuery implements IQuery {
 	}
 	
 	public String createTextDataUpdateQuery( CKvalObs.CService.TextDataElem elem ){
-		return null;
+		logger.debug("Update textData in a Oracle database!");
+	   	String query="UPDATE T_TEXT_DATA "+
+	   				 "SET " +
+	   				 "  original='"+elem.original + "'," +
+	   				 "  tbtime=to_date('"+elem.tbtime+"','yyyy-mm-dd hh24:mi:ss')" +
+	   				 "WHERE " +
+	   				 "  stationid=" + elem.stationID + " AND " +
+	   				 "  obstime=to_date('" + elem.obstime + "','yyyy-mm-dd hh24:mi:ss') AND " +
+	   				 "  paramid=" + elem.paramID + " AND " +
+	   				 "  typeid=" + elem.typeID_;
+	   	return query;
 	}
 	
 	public String createTextDataInsertQuery(CKvalObs.CService.TextDataElem elem){
-		return null;
+		logger.debug("Insert textData into a Oracle database!");
+	   	String query="insert into T_TEXT_DATA(stationid,obstime,original,paramid,tbtime,typeid) values ("
+	   				 +elem.stationID+",to_date('"
+	   				 +elem.obstime+"','yyyy-mm-dd hh24:mi:ss'),'"
+	   				 +elem.original+"',"
+	   				 +elem.paramID+",to_date('"
+	   				 +elem.tbtime+"','yyyy-mm-dd hh24:mi:ss'),"
+	   				 +elem.typeID_
+	   				 +"')";
+	   	return query;
 	}
 	
 }
