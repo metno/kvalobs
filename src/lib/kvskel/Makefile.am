@@ -19,10 +19,13 @@ idl_sources=admin.idl \
 libkvskel_ladir = @includedir@/kvskel
 nodist_libkvskel_la_SOURCES = $(idl_sources:.idl=SK.cc)
 libkvskel_la_CPPFLAGS = $(omniORB4_CFLAGS)
+libkvskel_la_LIBADD = $(omniORB4_LIBS)
 
 libkvadmininterface_ladir = @includedir@/kvskel
 libkvadmininterface_la_SOURCES = adminInterface.cc
 libkvadmininterface_la_CPPFLAGS = $(omniORB4_CFLAGS)
+libkvadmininterface_la_LIBADD = $(top_builddir)/src/lib/kvskel/libkvskel.la \
+                                $(omniORB4_LIBS)
 
 kvskelincludedir = $(pkgincludedir)/kvskel
 kvskelinclude_HEADERS = adminInterface.h $(idl_sources:.idl=.hh)

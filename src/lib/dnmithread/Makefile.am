@@ -3,6 +3,7 @@ AM_CPPFLAGS = -I $(top_srcdir)/src/lib
 pkglib_LTLIBRARIES = libdnmithread.la
 
 libdnmithread_la_SOURCES = CommandQue.cc ThrPoolQue.cc thread_private.cc
+libdnmithread_la_LIBADD = $(BOOST_THREAD_LIB)
 
 
 dnmithreadincludedir = $(pkgincludedir)/dnmithread

@@ -18,7 +18,10 @@ libmilog_la_SOURCES = Logger.h Logger.cc \
 	miloghelper.h miloghelper.cc \
 	milog.h macros.h \
 	milogtypes.h 
-	
+
 # don't install: LoggerImpl.h ThreadLogManager.h types.h
-	
+
 SUBDIRS = private thread
+
+libmilog_la_LDFLAGS = -pthread
+libmilog_la_LIBADD = -lpthread

@@ -70,6 +70,7 @@ KV_FIND_OMNIORB4
 KV_POSTGRESQL
 PKG_CHECK_MODULES(sqlite3, sqlite3)
 #PKG_CHECK_MODULES(sqlite2, sqlite)
+PKG_CHECK_MODULES(libxml2, libxml-2.0)
 PKG_CHECK_MODULES(libxmlpp, libxml++-2.6)
 PKG_CHECK_MODULES(cppunit, cppunit)
 KV_PERL

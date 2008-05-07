@@ -35,7 +35,7 @@ libkvalobs_la_SOURCES = \
 	kvDataOperations.cc \
 	kvTextDataOperations.cc \
 	kvPsSubscribers.cc
-	
+
 
 libkvalobs_la_CPPFLAGS = $(AM_CPPFLAGS) $(putools_CFLAGS) \
                          -DPKGLIBDIR="\""$(pkglibdir)"\"" \
@@ -51,7 +51,10 @@ libkvalobs_la_LIBADD = $(top_builddir)/src/lib/miutil/libmiutil.la \
                        $(top_builddir)/src/lib/milog/libmilog.la \
                        $(top_builddir)/src/lib/dnmithread/libdnmithread.la \
                        $(top_builddir)/src/lib/kvdb/libkvdb.la \
-                       $(top_builddir)/src/lib/kvskel/libkvskel.la
+                       $(top_builddir)/src/lib/corbahelper/libcorbahelper.la \
+                       $(top_builddir)/src/lib/miconfparser/libmiconfparser.a \
+                       $(top_builddir)/src/lib/kvskel/libkvskel.la \
+		       $(BOOST_THREAD_LIB) $(omniORB4_LIBS)
 
 kvalobsincludedir = $(pkgincludedir)/kvalobs
 kvalobsinclude_HEADERS = \

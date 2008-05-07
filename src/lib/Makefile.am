@@ -6,8 +6,8 @@ SUBDIRS = \
 	milog \
 	fileutil \
 	kvdb \
+	corbahelper \
 	kvalobs \
 	decodeutility \
 	dbdrivers \
-	corbahelper \
 	decoder

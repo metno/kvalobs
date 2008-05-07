@@ -10,18 +10,19 @@ libdecodeutility_la_SOURCES = \
 	kvDataFormatter.h kvDataFormatter.cc \
 	DataReinserter.h bits/DataReinserter.tcc \
 	sorteddata.h
-	
+
 libdecodeutility_la_CPPFLAGS = $(AM_CPPFLAGS) $(putools_CFLAGS) $(libxmlpp_CFLAGS) $(omniORB4_CFLAGS) $(BOOST_CPPFLAGS)
 
 libdecodeutility_la_LIBADD = $(top_builddir)/src/lib/kvalobs/libkvalobs.la \
                              $(top_builddir)/src/lib/kvskel/libkvskel.la \
                              $(top_builddir)/src/lib/miutil/libmiutil.la \
+			     $(top_builddir)/src/lib/milog/libmilog.la \
                              $(putools_LIBS)  \
                              $(libxmlpp_LIBS) \
                              $(omniORB4_LIBS) \
                              $(BOOST_LDFLAGS) \
                              $(BOOST_THREAD_LIB)
-                             
+
 #libdecodeutility_la_LDFLAGS = $(putools_LIBS) $(libxmlpp_LIBS) $(omniORB4_LIBS) $(BOOST_LDFLAGS) $(BOOST_THREAD_LIB)
 
 TESTS = decodeutilitytest
