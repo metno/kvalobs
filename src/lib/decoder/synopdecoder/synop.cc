@@ -217,7 +217,24 @@ int synop::sign(const char s,const signtype stype)
 
 int synop::checkCountry()
 {
-  return (pinfo.IIiii ? pinfo.IIiii  / 1000 : 0);
+	int II=pinfo.IIiii ? pinfo.IIiii  / 1000 : 0;
+	
+	if( II != 0 )
+		return II;
+	
+	if( pinfo.callSign.length()>=3 ) {
+		//Check if the callsign of the ship is for norway.
+		//callsign for norway start with 3 character in the
+		//following range JWA-JXZ, LAA-LNZ or 3YA-3YZ
+		string cs = pinfo.callSign.substr( 0, 3 );
+		
+		if( (cs>="JWA" && cs<="JXZ") ||
+			 (cs>="LAA" && cs<="LNZ") ||
+			 (cs>="3YA" && cs<="3YZ")    )
+			return 1;
+	}
+		
+	return 0;	
 }
 
 
