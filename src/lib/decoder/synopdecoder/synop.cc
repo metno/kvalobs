@@ -814,11 +814,11 @@ void synop::sort222Token(const char *token)
     break;
   case 4:
     setToken(Pw1Pw1,token,1,2);
-    setToken(Hw1Hw1,token,3,2);
+    setScaledToken(Hw1Hw1,token,0.5,3,2);
     break;
   case 5:  
     setToken(Pw2Pw2,token,1,2);
-    setToken(Hw2Hw2,token,3,2);
+    setScaledToken(Hw2Hw2,token,0.5,3,2);
     break;
   case 6:
     setToken(Is,token+1);
