@@ -94,6 +94,8 @@ public class Kv2KlMain {
              }
          }
 
+    	System.out.println("Configfile (in): " + configfile );
+    	 
     	 int i=configfile.lastIndexOf(".conf");
     	 String kvname;
      	
@@ -107,7 +109,7 @@ public class Kv2KlMain {
     	 
     	 if(i>-1){
     		 if(i<kvname.length()){
-    			 kvname.substring(i+1);
+    			 kvname = kvname.substring(i+1);
     		 }else{
     			 System.out.println("FATAL: the name of the configuration file must on the form 'name.conf' <" + configfile +">");
         		 System.exit(1);

@@ -69,7 +69,7 @@ public class OracleQuery implements IQuery {
 	   				 +elem.paramID+",to_date('"
 	   				 +elem.tbtime+"','yyyy-mm-dd hh24:mi:ss'),"
 	   				 +elem.typeID_
-	   				 +"')";
+	   				 +")";
 	   	return query;
 	}
 	

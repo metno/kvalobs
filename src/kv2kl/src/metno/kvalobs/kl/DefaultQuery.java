@@ -28,7 +28,7 @@ public class DefaultQuery implements IQuery{
 		return query;
 	}
 	
-	public String createDataInsertQuery( CKvalObs.CService.DataElem elem){
+	public String createDataInsertQuery( CKvalObs.CService.DataElem elem ){
 		logger.debug("Insert into a SQL92 database!");
 		String query="insert into kv2klima(stnr,dato,original,kvstamp,paramid,typeid,xlevel,sensor,useinfo,corrected,controlinfo,cfailed) values ("
 				 +elem.stationID+","
@@ -60,7 +60,7 @@ public class DefaultQuery implements IQuery{
 		return query;
 	}
 	
-	public String createTextDataInsertQuery(CKvalObs.CService.TextDataElem elem){
+	public String createTextDataInsertQuery( CKvalObs.CService.TextDataElem elem ) {
 		logger.debug("Insert textData into a SQL92 database!");
 		String query="INSERT INTO T_TEXT_DATA(stationid,obstime,original,paramid,tbtime,typeid) "+
 		             "values ("

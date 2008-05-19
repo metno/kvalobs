@@ -49,7 +49,10 @@ public class DataHelper {
 	
 	public boolean next() {
 		index++;
-		int l;
+
+		//System.out.println(" index: " + index );
+		//System.out.println(" #dataElem: "+(dataElem!=null?dataElem.length:"(null)"));
+		//System.out.println(" #textDataElem: "+(textDataElem!=null?textDataElem.length:"(null)"));
 		
 		if( dataElem != null ) {
 			if( index >= dataElem.length ) {
@@ -82,11 +85,15 @@ public class DataHelper {
 	}
 	
 	public void setStationID( int sid  ){
-		if( dataElem != null )
+		if( dataElem != null ) {
 			dataElem[index].stationID = sid;
+			return;
+		}
 		
-		if( textDataElem != null )
+		if( textDataElem != null ) {
 			textDataElem[index].stationID = sid;
+			return;
+		}
 	}
 	
 	public short getTypeID()throws NoData {

@@ -273,6 +273,7 @@ public class SqlInsertHelper {
    		}
    		catch(Exception e){
    			logger.error(new MiGMTTime() + ": " + e);
+   			e.printStackTrace();
    		}
 
    		releaseDbConnection(dbconn);
