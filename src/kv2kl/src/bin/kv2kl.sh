@@ -14,4 +14,4 @@ fi
 
 $KVDIR/bin/kv2kl "$@"
 
-rm -f $KVDIR/var/run/$PIDFILE
+#rm -f $KVDIR/var/run/$PIDFILE
