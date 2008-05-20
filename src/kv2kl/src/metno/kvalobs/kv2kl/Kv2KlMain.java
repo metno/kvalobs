@@ -164,6 +164,7 @@ public class Kv2KlMain {
     	}
     	
     	app.setKvIsUp(true);
+    	app.createPidFile();
     	
     	logger.info("Subscribe on <KvData>, subscriberid <" 
     			           + subscriberid+"> Ctrl+c for aa avslutte!");

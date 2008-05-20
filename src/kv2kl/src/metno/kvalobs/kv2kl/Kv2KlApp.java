@@ -212,7 +212,7 @@ public class Kv2KlApp extends KlApp
     			logger.warn("Cant update the file '"+kvIsUpLogFile+"'!");
     		}
     	}
-    	
+    	removePidFile();
     	logger.info("Prorgram terminate!");
     }
 }
