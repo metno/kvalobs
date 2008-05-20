@@ -47,6 +47,7 @@ public class KlApp extends KvApp
     DbConnectionMgr conMgr=null;
     PropertiesHelper conf=null;
     String           kvserver;
+    File             pidFile=null;
     static String           kvpath=null;
     
     String getConfile(String conf){
@@ -226,6 +227,7 @@ public class KlApp extends KvApp
 	    
     		if(kvpath==null){
     			System.out.println("Hmmmm. No 'user.home', exiting!");
+    			logger.fatal("Environment variable KVALOBS is unset, using HOME!");
     			System.exit(1);
     		}
     	}
@@ -238,4 +240,80 @@ public class KlApp extends KvApp
 
     	return kvpath;
     }
+	
+	
+	/**
+	 * Create a pid file. The filepath and pid must be set as property
+	 * in the start script of the application.
+	 * 
+	 * The path property is PIDFILE and the pid property is USEPID.
+	 * 
+	 * The property is set with the -D switch on the java commandline.
+	 * 
+	 * If the pidfile exist or an error occure in the creation of the
+	 * pidfile the application terminate.
+	 */
+	synchronized public void createPidFile(){
+		String pid=null;
+		String pidFilename=null;
+		
+    	if(pidFile!=null)
+    		return;
+    	
+    	pidFilename=System.getProperties().getProperty("PIDFILE");
+    	
+    	if(pidFilename==null){
+    		System.out.println("FATAL: Property variable PIDFILE is unset!");
+    		logger.fatal("FATAL: Property variable PIDFILE is unset!");
+    		System.exit(1);
+    	}
+	
+    	pid=System.getProperties().getProperty("USEPID");
+    	
+    	if( pid == null ) {
+    		System.out.println("FATAL: Property variable USEPID is unset!");
+    		logger.fatal("FATAL: Property variable USEPID is unset!");
+    		System.exit(1);
+    	}
+
+    	pidFile = new File( pidFilename );
+    	
+    	try {
+    		if( ! pidFile.createNewFile() ) {
+    			logger.fatal("FATAL: The pidfile '"+pidFilename+"' allready exist!" +
+    					     "If an instance of the application is not running"+
+    					     " remove the file and try again.");
+    			System.exit(1);
+    		}
+    		
+    		FileWriter fw = new FileWriter( pidFile, true );
+    		fw.write( pid );
+    		fw.close();
+    		System.out.println("Writing pidfile '" + pidFilename + "' with pid '"+pid+"'!");
+    		logger.fatal("Writing pidfile '" + pidFilename + "' with pid '"+pid+"'!");
+    	}
+    	catch( java.io.IOException ex ) {
+    		logger.fatal("FATAL: " + ex.getMessage() );
+    		System.exit(1);
+    	}
+    	catch( java.lang.SecurityException ex ) {
+    		logger.fatal("FATAL: " + ex.getMessage() );
+    		System.exit(1);
+    	}
+    }
+
+	/**
+	 * Remove a previous created pidfile.
+	 * 
+	 * @see createPidFile
+	 */
+	synchronized public void removePidFile() {
+		try {
+			if( pidFile != null )
+				pidFile.delete();
+		}
+		catch( java.lang.SecurityException ex ) {
+			//NOOP
+		}
+	}
 }
