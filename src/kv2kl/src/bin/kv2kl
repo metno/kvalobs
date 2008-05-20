@@ -1,27 +1,30 @@
 #! /bin/sh
 
+#This script my be called from another script.
+#If the environment variables PIDFILE and NAME 
+#is set they are used. If not an PIDFILE variable
+#is generated in this script.
+
 if [ -z "$KVDIR" ]; then
 	KVDIR=$KVALOBS
 fi
 
 export KVDIR 
+RUN_DIR=$KVDIR/var/run 
 
-
-#KVALOBSJAR=$KVDIR/share/kvalobs/java/lib/kvalobsclt.jar
-
-#export CLASSPATH=$KVALOBSJAR:$CLASSPATH
-#echo "CLASSPATH: $CLASSPATH"
-#echo "$@"
-
-PIDFILE=kv2kl.pid
-
-if [ "$NAME" ]; then
-	PIDFILE=kv2kl-$NAME.pid
+if [ -z "$PIDFILE" ]; then
+	if [ "$NAME" ]; then
+		PIDFILE=$RUN_DIR/kv2kl-$NAME.pid
+	else
+		PIDFILE=$RUN_DIR/kv2kl.pid
+	fi
 fi
 
-echo "$$" > $KVALOBS/var/run/$PIDFILE
+USEPID="$$" 
 
 exec $KVDIR/share/kvalobs/java/bin/jaco \
-     "-DKVALOBS=$KVALOBS"  \
+     "-DKVALOBS=$KVDIR" \
+     "-DPIDFILE=$PIDFILE" \
+     "-DUSEPID=$USEPID"   \
      -jar $KVDIR/share/kvalobs/java/lib/kv2kl.jar "$@"
     

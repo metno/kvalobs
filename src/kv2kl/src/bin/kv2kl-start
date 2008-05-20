@@ -1,21 +1,32 @@
 #! /bin/sh
 
 KVDIR=$KVALOBS
-
-UPLOG_PREFIX=
 TIMEOUT=60
+UPLOG_PREFIX="uplog"
 
-if [ -f "$KVDIR/etc/kv2kl-start.conf" ]; then
-	. $KVDIR/etc/kv2kl-start.conf
+LOG_DIR=$KVDIR/var/log
+ETC_DIR=$KVDIR/etc
+RUN_DIR=$KVDIR/var/run
+BIN_DIR=$KVDIR/bin
+
+EXTRA=
+
+if [ -f "$ETC_DIR/kv2kl-start.conf" ]; then
+	. $ETC_DIR/kv2kl-start.conf
 fi
 
 NAME=
-CONF=$KVDIR/etc/kv2kl.conf
-PIDFILE=kv2kl.pid
+CONF=$ETC_DIR/kv2kl.conf
+PIDFILE=$RUN_DIR/kv2kl.pid
+
+UPLOG_FILE=$LOG_DIR//kv2kl_$UPLOG_PREFIX.log
 
 if [ "$#" -gt 0 ]; then
 	NAME=$1
-	CONF=$KVDIR/etc/kv2kl-$NAME.conf
+	CONF=$ETC_DIR/kv2kl-$NAME.conf
+	PIDFILE=$RUN_DIR/kv2kl-$NAME.pid
+	UPLOG_FILE=$LOG_DIR/kv2kl_$UPLOG_PREFIX-$NAME.log
+	EXTRA="($NAME)"
 fi
 	
 if [ ! -f "$CONF" ]; then
@@ -23,19 +34,14 @@ if [ ! -f "$CONF" ]; then
 	exit 1
 fi
 	
-PIDFILE=kv2kl.pid
-
-if [ "$NAME" ]; then
-	PIDFILE=kv2kl-$NAME.pid
-fi
 
 function isrunning()
 {
     pidfile=$1
    
-    if [ -f $KVDIR/var/run/$pidfile ]; then 
-		PID=`cat $KVDIR/var/run/$pidfile`
-		#echo "PID: $KVDIR/var/run/$pidfile: $PID"
+    if [ -f $pidfile ]; then 
+		PID=`cat $pidfile`
+		#echo "PID: $pidfile: $PID"
 		kill  -0 $PID > /dev/null 2>&1
 
 		if [ $? -eq 0 ]; then
@@ -48,45 +54,34 @@ function isrunning()
     
    return 1
 }
-
-
-export NAME 
-EXTRA=
-
-if [ "$NAME" ]; then
-	EXTRA="($NAME)"
-fi
-
+ 
 echo -n "Starting kv2kl $EXTRA"
 
 if isrunning $PIDFILE ; then
 	echo " - running"
 	exit 0
 fi
+rm -f $UPLOG_FILE
 
-UPLOG_FILE=$KVDIR/var/log/kv2kl_$UPLOG_PREFIX.log
+export NAME
+export PIDFILE
 
-if [ "$NAME" ]; then
-	UPLOG_FILE=$KVDIR/var/log/kv2kl_$UPLOG_PREFIX-$NAME.log
-fi
-
-rm -rf $UPLOG_FILE
-
-$KVDIR/bin/kv2kl.sh -c $CONF > /dev/null 2>&1 &
-#$KVDIR/bin/kv2kl.sh -c $CONF &
+$BIN_DIR/kv2kl -c $CONF > /dev/null 2>&1 &
+#$BIN_DIR/kv2kl -c $CONF &
 
 n=0
 
-while [ $n -lt $TIMEOUT  -a ! -f "$UPLOG_FILE" ]; do
+while [ $n -lt $TIMEOUT  ]; do
+	if isrunning $PIDFILE ; then
+		echo " - Ok!"
+		exit 0
+	fi
+
 	let n=n+1
 	sleep 1
 done
- 
-if [ -f "$UPLOG_FILE" ]; then
-	echo " - Ok!"
-	exit 0
-else
-   echo " - Failed!"
-   exit 1
-fi
+
+echo " - Failed!"
+exit 1
+
  
