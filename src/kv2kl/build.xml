@@ -127,10 +127,12 @@
 		<exec executable="cp" dir="." failonerror="true">
 			<arg line="src/bin/kv2kl ${distdir}/bin"/>
 		</exec>
-		
+
+		<!--
 		<exec executable="cp" dir="." failonerror="true">
 			<arg line="src/bin/kv2kl.sh ${distdir}/bin"/>
 		</exec>
+		-->
 		
 		<exec executable="cp" dir="." failonerror="true">
 			<arg line="src/bin/kv2kl-start ${distdir}/bin"/>
