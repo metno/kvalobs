@@ -128,7 +128,7 @@ import java.util.ArrayList;
  */
 public class GetOpt {
 	/** The List of File Names found after args */
-	protected List fileNameArguments;
+	protected List<String> fileNameArguments;
 	/** The set of characters to look for */
 	protected final GetOptDesc[] options;
 	/** Where we are in the options */
@@ -210,8 +210,8 @@ public class GetOpt {
 	 * from the option that was matched) and whose value is a String
 	 * containing the value, or null for a non-option argument.
 	 */
-	public Map parseArguments(String[] argv) {
-		Map optionsAndValues = new HashMap();
+	public Map<String, String> parseArguments(String[] argv) {
+		Map<String,String> optionsAndValues = new HashMap<String,String>();
 
 		for (int i = 0; i < argv.length; i++) {
 			Debug.println("getopt", "parseArg: i=" + i + ": arg " + argv[i]);
@@ -230,7 +230,7 @@ public class GetOpt {
 	}
 
 	/** Get the list of filename-like arguments after options */
-	public List getFilenameList() {
+	public List<String> getFilenameList() {
 		if (fileNameArguments == null) {
 			throw new IllegalArgumentException(
 				"Illegal call to getFilenameList() before parseOptions() or getopt(argv)!");
@@ -254,7 +254,7 @@ public class GetOpt {
 		// If we are (now) finished, bail.
 		if (done) {
 			if(fileNameArguments==null)
-				fileNameArguments=new ArrayList();
+				fileNameArguments=new ArrayList<String>();
 			
 			return DONE;
 		}
@@ -292,7 +292,7 @@ public class GetOpt {
 			return '?';
 		} else {
 			if(fileNameArguments==null){
-				fileNameArguments = new ArrayList();
+				fileNameArguments = new ArrayList<String>();
 			
 				for(; optind<argv.length; optind++){
 					fileNameArguments.add(argv[optind]);

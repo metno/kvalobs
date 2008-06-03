@@ -93,7 +93,7 @@ public class FileUtil {
 	 * 
 	 * @param file2write The name of the file to write the string.
 	 * @param buf The string to write to the file.
-	 * @return true on success and fale ortherwise.
+	 * @return true on success and false ortherwise.
 	 */
 	static public boolean writeStr2File(String file2write, String buf){
 		BufferedWriter out;
