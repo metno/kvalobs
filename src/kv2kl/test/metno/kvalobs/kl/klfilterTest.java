@@ -181,6 +181,18 @@ public class klfilterTest {
                             "0123456789012345", "0123456789012345",
                             ""); 
     }
+    
+
+    DataElem 
+        fillWithStationData(int sid, int tid, int pid,String obstime){
+        
+        return new DataElem(
+                            sid, obstime, 1.2, (short)pid,
+                            "2006-03-09 18:00:00", 
+                            (short)tid, "0", (short)0, 1.2, 
+                            "0123456789012345", "0123456789012345",
+                            ""); 
+    }
 
     DataElem getDataElem(int sid, int tid, String obstime, 
     					 int paramid, int sensor, int level){
@@ -401,12 +413,12 @@ public class klfilterTest {
     	                  msg);
         assertFalse(ret);
          
-        //test nagativ typeid. Should be accepted as abs(typeid).
+        //test nagativ typeid. Should be accepted.
         ret=filter.filter(getDataElem(18700, -3,"2005-01-03 00:00:00", 110, 0, 0),
                           msg);
         
         System.out.println(" ret : " +ret);
-        assertFalse(ret);
+        assertTrue(ret);
       	
       	//Test the upper limit of [fdato,tdato>, the tdato part.
       	
@@ -522,6 +534,18 @@ public class klfilterTest {
         
         ret=filter.filter(fillWithStationData(88000, 42, "2008-01-01 19:00:00"), msg);
         assertTrue(ret);
+        
+        ret=filter.filter(fillWithStationData(88000, 42, 210, "2008-01-01 19:00:00"), msg);
+        assertTrue(ret);
+        
+        ret=filter.filter(fillWithStationData(88000, -42, 210, "2008-01-01 19:00:00"), msg);
+        assertFalse(ret);
+
+        ret=filter.filter(fillWithStationData(88000, -42, 209, "2008-01-01 19:00:00"), msg);
+        assertTrue(ret);
+        
+        ret=filter.filter(fillWithStationData(88000, 42, 209, "2008-01-01 19:00:00"), msg);
+        assertFalse(ret);
 
         
         try{

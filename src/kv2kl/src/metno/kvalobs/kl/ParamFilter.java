@@ -390,17 +390,12 @@ public class ParamFilter {
 			logger.debug("-- ParamFilter: ParamElem: " + param);
 			
 			if( param.paramid == paramid &&
-			    Math.abs(param.typeid)  == Math.abs(typeid) ){
+			    param.typeid  == typeid ){
 				
 				if( useLevelAndSensor )
 					if( param.level != level )
 						continue;
-				
-				//Negative typeid in the filter tables effect only
-				//negative types.
-				if( param.typeid < 0 && typeid > 0 )
-					continue;
-	
+					
 				if( useLevelAndSensor ) {
 					int s;
 					
