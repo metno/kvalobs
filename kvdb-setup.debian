@@ -1,0 +1,40 @@
+Oppsett av kvalobs databasekluster i debian
+--------------------------------------------
+Testet postgresql versjon er 8.3.
+Testet debian versjon er etch.
+
+Kommandoen pg_createcluster brukes.
+
+Opprett en partisjon under /var/lib/postgresql/8.3/kvalobs.
+Denne partisjonen bør ikke være mindre enn 50 GB.
+
+set locale til C eller POSIX.
+Set encoding til LATIN1 (ISO 8859-1)
+Set kvalobs til a vare superbruker.
+
+pg_createcluster --socketdir=/var/kvalobs/run --encoding=LATIN1 --locale=C --user=kvalobs --port=5433 --start 8.3 kvalobs 
+
+Editer filen /etc/postgresql/8.3/kvalobs/postgresql.conf.
+Finn variablene 'listen_addresses' og sett den til riktig host.
+Set default timezone til UTC.
+
+I hjemmekatalogen til kvalobs opprett filen .postgresqlrc og legg inn
+folgende linje:
+
+8.3 kvalobs *
+
+Login in i databsen med psql template1 og opprett databasen kvalobs.
+
+Database schemaene kan nå legges inn databasen.
+
+Opprett rollene først:
+psql template1 < /usr/share/kvalobs/db/kvalobs_roles.sql
+
+Opprett databasen
+psql template1 < /usr/share/kvalobs/db/kvalobs_createdb.sql
+
+Opprett tabeller
+psql kvalobs < /usr/share/kvalobs/db/kvalobs_schema.sql
+
+
+
