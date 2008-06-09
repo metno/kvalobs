@@ -18,19 +18,5 @@
 --
 -- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
--- Kvalobs admin role
-CREATE ROLE kv_admin NOLOGIN SUPERUSER;
-
--- Kvalobs read/write/delete
-CREATE ROLE kv_write NOLOGIN;
-
---Kvalobs read only role.
-CREATE ROLE kv_read NOLOGIN;
-
---A role to be used only by the kvalobs software
---Set a default password. This shuold be altered by an administrator.
-CREATE ROLE kvproc INHERIT LOGIN PASSWORD 'kvproc' IN ROLE kv_write ;
-
---A kvalobs administration role.
---Set a default password. This shuold be altered by an administrator.
-CREATE ROLE kvadmin INHERIT LOGIN PASSWORD 'kvadmin12' IN ROLE kv_admin ;
+--Create a kvalobs database.
+CREATE DATABASE kvalobs OWNER kvalobs;
