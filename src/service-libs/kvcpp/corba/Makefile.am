@@ -1,5 +1,14 @@
 noinst_LTLIBRARIES = libcorbakvapp.la
 
+libcorbakvappincludedir =  $(pkgincludedir)/kvcpp/corba
+libcorbakvappinclude_HEADERS = 	CorbaGetFunction.h \
+	CorbaKvApp.h \
+	kvCorbaThread.h \
+	kvDataNotifySubscriberImpl.h \
+	kvDataSubscriberImpl.h \
+	kvHintSubscriberImpl.h 
+
+
 libcorbakvapp_la_SOURCES = \
 	CorbaGetFunction.cc CorbaGetFunction.h \
 	CorbaKvApp.cc CorbaKvApp.h \

@@ -2,6 +2,27 @@ AM_CPPFLAGS = -I $(top_srcdir)/src/lib -D_REENTRANT
 
 pkglib_LTLIBRARIES = libmilog.la
 
+milogincludedir =$(pkgincludedir)/milog
+nobase_miloginclude_HEADERS = Logger.h \
+	LogStream.h \
+	Layout.h \
+	StdLayout.h \
+	FLogStream.h  \
+	TraceLayout.h \
+	LogManager.h \
+	HtmlStream.h \
+	HtmlLayout.h \
+	StdErrStream.h \
+	miloghelper.h \
+	milog.h macros.h \
+	milogtypes.h \
+	private/LoggerImpl.h private/ThreadLogManager.h private/types.h \
+	thread/DummyThread.h thread/PThread.h thread/Thread.h
+
+#milogprivateincludedir =$(pkgincludedir)/milog/private
+#milogprivateinclude_HEADERS = private/LoggerImpl.h private/ThreadLogManager.h private/types.h
+
+
 libmilog_la_SOURCES = Logger.h Logger.cc \
 	LogStream.h LogStream.cc \
 	Layout.h Layout.cc \

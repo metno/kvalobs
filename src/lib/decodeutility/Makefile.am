@@ -2,6 +2,17 @@ AM_CPPFLAGS = -I$(top_srcdir)/src/lib
 
 pkglib_LTLIBRARIES = libdecodeutility.la
 
+
+decodeutilityincludedir = $(pkgincludedir)/decodeutility
+nobase_decodeutilityinclude_HEADERS = 	decodeutility.h \
+	kvalobsdata.h \
+	kvalobsdataparser.h \
+	kvalobsdataserializer.h \
+	kvDataFormatter.h \
+	DataReinserter.h bits/DataReinserter.tcc \
+	sorteddata.h
+
+
 libdecodeutility_la_SOURCES = \
 	decodeutility.h decodeutility.cc \
 	kvalobsdata.h kvalobsdata.cc \

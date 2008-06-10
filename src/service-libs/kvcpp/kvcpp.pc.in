@@ -1,7 +1,7 @@
 prefix=@prefix@
 exec_prefix=@exec_prefix@
 libdir=@libdir@
-pkglibdir=@pkglibdir@
+pkglibdir=${libdir}/kvalobs
 includedir=@includedir@
 
 Name: kvcpp
@@ -9,4 +9,4 @@ Description: Client library for Kvalobs
 Version: @VERSION@
 Requires: putools >= 3.0.0, omniDynamic4 
 Libs: -L${libdir} -lkvcpp -Wl,-rpath ${pkglibdir}
-Cflags: -I${includedir} -I${includedir}/@PACKAGE@
+Cflags: -I${includedir} -I${includedir}/@PACKAGE@ -I${includedir}/@PACKAGE@/kvskel/
