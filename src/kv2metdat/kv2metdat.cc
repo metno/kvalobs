@@ -38,6 +38,7 @@
 #include <kvalobs/kvStation.h>
 #include <kvalobs/kvParam.h>
 #include <puTools/miString>
+#include <kvalobs/kvPath.h>
 
 
 ///  Created by met.no/PU: j.schulze@met.no
@@ -59,16 +60,17 @@ using namespace dnmi::db;
 
 int main(int argc, char** argv)
 {
-  string kvalobs = getenv("KVALOBS");
   string home    = getenv("HOME");
   string constr  = "  ";
 
-  if(kvalobs.empty() ) {
-    cerr << "KVALOBS: environment not defined ... exit " << endl;
-    return 1;
-  }
 
-  string passwdfile = home+"/.kvpasswd";
+  if( home.empty() ) {
+	  cerr << "The HOME environment variable must be set!" << endl;
+	  return 1;
+  }
+	  
+  
+  string passwdfile(home+"/.kvpasswd");
   ifstream passf(passwdfile.c_str());
 
   vector<miString> words;
@@ -81,13 +83,16 @@ int main(int argc, char** argv)
       continue;
     
     if(words[0]=="dbpass") {
-      constr = "user=kvalobs dbname=kvalobs host=localhost password="+ words[1];
+   	 if( ! words[1].empty() )
+   		 constr = "user=kvalobs dbname=kvalobs host=localhost password="+ words[1];
+   	 else
+   		 constr = "user=kvalobs dbname=kvalobs host=localhost";
+   	 
       break;
     }
   }
   
-
-  string driver = kvalobs + "/lib/db/pgdriver.so";
+  string driver( kvPath("pkglibdir")+"/db/pgdriver.so");
   string driveID;
 
 

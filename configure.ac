@@ -57,6 +57,7 @@ AC_CONFIG_FILES([Makefile
                  src/kvsynopd/Makefile 
                  src/kvsynopd/kvsynopd_initdb
                  src/model2kv/Makefile
+                 src/kv2metdat/Makefile
                  src/kv2kro2/Makefile
                  src/kvalobs_database/Makefile
                  src/script/Makefile
