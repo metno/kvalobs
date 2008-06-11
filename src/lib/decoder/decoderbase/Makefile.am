@@ -12,4 +12,4 @@ libdecoderbase_la_LIBADD =   $(top_builddir)/src/lib/kvalobs/libkvalobs.la \
                              $(top_builddir)/src/lib/milog/libmilog.la \
                              $(top_builddir)/src/lib/kvdb/libkvdb.la \
                              $(top_builddir)/src/lib/fileutil/libfileutil.la \
-			     $(putools_LIBS) $(libxml2_LIBS)
+			                    $(putools_LIBS) $(libxml2_LIBS)

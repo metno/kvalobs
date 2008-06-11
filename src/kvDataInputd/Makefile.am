@@ -40,4 +40,3 @@ kvDataInputd_clt_LDADD = $(top_builddir)/src/lib/kvalobs/libkvalobs.la \
                          $(top_builddir)/src/lib/miutil/libmiutil.la \
                          $(top_builddir)/src/lib/kvskel/libkvskel.la \
                          $(putools_LIBS) $(omniORB4_LIBS) $(libxmlpp_LIBS) $(BOOST_THREAD_LIB) -ldl
-

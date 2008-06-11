@@ -11,4 +11,3 @@ kvstart:	kvstart.sh
 
 kvstop:	kvstop.sh
 	$(SED_SUBST)
-	

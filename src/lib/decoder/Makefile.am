@@ -7,4 +7,3 @@ SUBDIRS = \
 	autoobsdecoder \
 	comobsdecoder \
 	synopdecoder
-	

@@ -19,8 +19,3 @@ autoobs_la_LIBADD = $(top_builddir)/src/lib/decoder/decoderbase/libdecoderbase.l
 		    $(top_builddir)/src/lib/miutil/libmiutil.la \
                     $(putools_LIBS) 
 autoobs_la_LDFLAGS = -module
-
-
-
-
-

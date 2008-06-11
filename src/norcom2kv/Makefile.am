@@ -28,4 +28,3 @@ norcom2kv_LDADD = $(top_builddir)/src/lib/kvalobs/libkvalobs.la \
                   $(top_builddir)/src/lib/milog/libmilog.la \
                   $(putools_LIBS) $(omniORB4_LIBS) $(BOOST_REGEX_LIB) $(BOOST_THREAD_LIB) \
                   -ldl -lm
-                    

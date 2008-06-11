@@ -26,8 +26,3 @@ kv2kro_LDADD = $(top_builddir)/src/service-libs/kvcpp/libkvcpp.la \
                $(top_builddir)/src/lib/miconfparser/libmiconfparser.a 
              
 EXTRA_DIST = README delete_oldfiles.pl obsInsert obsInsertTest.pl               
-               
-
- 
-
-                 

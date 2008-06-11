@@ -92,4 +92,3 @@ kvalobsinclude_HEADERS = \
 	kvPsSubscribers.h \
 	kvQCFlagTypes.h \
 	kvexception.h
- 
