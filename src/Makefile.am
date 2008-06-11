@@ -9,6 +9,7 @@ SUBDIRS = \
 	kvsynopd \
 	kvAgregated  \
 	model2kv \
+	kv2metdat \
 	kv2kro2 \
 	kvalobs_database \
 	script
