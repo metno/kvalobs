@@ -1,6 +1,6 @@
 bin_SCRIPTS = kvstart kvstop
 
-EXTRA_DIST = kvstart.sh kvstop.sh kvcron.template
+EXTRA_DIST = kvstart.sh kvstop.sh kvcron.template save_last_month load_last_month
 
 CLEANFILES = kvstart kvstop
 
