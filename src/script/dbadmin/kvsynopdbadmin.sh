@@ -1,6 +1,6 @@
 #! /bin/sh
 
-SQL=sqlite
+SQL=sqlite3
 SQLDIR=`KVCONFIG --datadir`/kvalobs/db
 LOGDIR=`KVCONFIG --localstatedir`/kvalobs/log
 DBFILE=`KVCONFIG --localstatedir`/kvalobs/kvsynopd.sqlite
