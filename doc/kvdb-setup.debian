@@ -35,6 +35,9 @@ Editer filen /etc/postgresql/8.3/kvalobs/postgresql.conf.
 Finn variablene 'listen_addresses' og sett den til riktig host.
 Set default timezone til UTC.
 
+Opprettelse av databasen og innleggeing av metadata gjøres av kvdrift.
+---------------------------------------------------------------------
+
 I hjemmekatalogen til kvalobs opprett filen .postgresqlrc og legg inn
 folgende linje:
 
@@ -53,6 +56,6 @@ psql template1 < /usr/share/kvalobs/db/kvalobs_createdb.sql
 Opprett tabeller
 psql kvalobs < /usr/share/kvalobs/db/kvalobs_schema.sql
 
-Metadata legges inn av kvdrift.
+
 
 
