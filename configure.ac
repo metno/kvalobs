@@ -63,6 +63,7 @@ AC_CONFIG_FILES([Makefile
                  src/script/Makefile
                  src/script/kv/Makefile
                  src/script/dbadmin/Makefile
+                 src/doc/Makefile
 ])
 
 

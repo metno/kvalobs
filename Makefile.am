@@ -1,4 +1,4 @@
-SUBDIRS = share src
+SUBDIRS = share src doc
 
 ACLOCAL_AMFLAGS = -I m4
 
