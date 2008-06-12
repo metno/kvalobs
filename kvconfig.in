@@ -54,6 +54,7 @@ case $1 in
 	--datadir) echo @datadir@ ;;
 	--sysconfdir) echo @sysconfdir@ ;;
 	--localstatedir) echo @localstatedir@ ;;
+	--pkglibdir) echo @libdir@/@PACKAGE@ ;;
 	--version) echo $VERSION ;;
 	--help) 
 		echo $VERSION
@@ -66,7 +67,7 @@ case $1 in
 		echo 
 		echo Use exactly one of the following options:
 		echo
-		echo --prefix --bindir --libexecdir --libdir --datadir --sysconfdir --localstatedir --version --help
+		echo --prefix --bindir --libexecdir --libdir --datadir --sysconfdir --localstatedir --pkglibdir --version --help
 	;;
     *) 
     	echo Unkonwn option: $1
