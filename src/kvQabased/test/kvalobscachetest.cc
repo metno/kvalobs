@@ -90,3 +90,25 @@ void KvalobsCacheTest::testSave()
   kvalobs::compare::exactly_equal eq;
   CPPUNIT_ASSERT( eq( a, data ) );
 }
+
+void KvalobsCacheTest::testOverwriteFirst()
+{
+	  kvalobs::kvDataFactory f( 42, "2006-05-26 06:00:00", 302 );
+	  kvalobs::kvData a = f.getData( 3, 110 );
+	  db->getConnection()->exec( "INSERT INTO data VALUES " + a.toSend() );
+
+	  a.corrected(50);
+	  cache->insert( a );
+
+	  a.corrected(100);
+	  cache->insert( a );
+	  
+	  delete cache; // delete cache object - forcing a flushing of the cache.
+	  cache = 0;
+
+	  boost::shared_ptr<Result> res( db->getConnection()->execQuery( "select * from data;" ) );
+
+	  CPPUNIT_ASSERT_EQUAL( 1, res->size() );
+	  kvalobs::kvData data( res->next() );
+	  CPPUNIT_ASSERT_EQUAL( float( 100 ), data.corrected() );
+}

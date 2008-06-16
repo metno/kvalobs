@@ -61,8 +61,10 @@ void KvalobsCache::insert( const kvalobs::kvData & data )
   std::pair<Cache::iterator, bool> result = cache_.insert( data );
   if ( not result.second )
   {
-    cache_.erase( result.first -- );
-    cache_.insert( result.first, data );
+//		cache_.erase( result.first -- );
+//		cache_.insert( result.first, data );
+    cache_.erase( result.first );
+    cache_.insert( data );
   }
 }
 

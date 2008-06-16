@@ -43,6 +43,7 @@ class KvalobsCacheTest : public CppUnit::TestFixture
 {
     CPPUNIT_TEST_SUITE( KvalobsCacheTest );
     CPPUNIT_TEST( testSave );
+    CPPUNIT_TEST( testOverwriteFirst );
     CPPUNIT_TEST_SUITE_END();
   public:
     KvalobsCacheTest();
@@ -53,6 +54,8 @@ class KvalobsCacheTest : public CppUnit::TestFixture
     virtual void tearDown();
 
     void testSave();
+    
+    void testOverwriteFirst();
 
   private:
     KvalobsCache * cache;
