@@ -6,6 +6,7 @@
 # update 2003-07-09 [ backup-system established ]
 # update 2004-01-19 [ RR_12/24 etc added        ]
 # update 2004-01-29 [ PP added                  ]
+# update 2008-07-07 [ use hirlam12 (not 20)     ]
 # -------------------------------------------------------------- 
 
 RUN=$1
@@ -47,7 +48,7 @@ POSE=$ETC/pose.kvalobs
 
 OUTDAT=$DATA/last_tempo.dat
 BACKDAT=$DATA/last_tempo.back
-OUTSQL=$LOAD/hirlam20_$TODAY.$RUN
+OUTSQL=$LOAD/hirlam12_$TODAY.$RUN
 
 
 #----------------JOB:--------------------------------------------
@@ -72,15 +73,15 @@ cd $JOB
 # old fashion way ... remember station.kvalobs includes
 # the kvalobs station number as name ...
 
-LAMIN=`/usr/bin/find /opdata/hirlam20/grdn$RUN.dat -cmin -1000`
+LAMIN=`/usr/bin/find /opdata/hirlam12/h12sf$RUN.dat -cmin -1000`
 
 if [ "$LAMIN" ]; then
     
     # METDAT file OK and newer than 10 hours    
     
 
-    $METDAT $MET $POS $LAMIN +6,+11  2001 LAM20 $OUTDAT 
-    $METDAT $MET $POS $LAMIN +12,+17 2001 LAM20 $BACKDAT
+    $METDAT $MET $POS $LAMIN +6,+11  12 LAM12 $OUTDAT 
+    $METDAT $MET $POS $LAMIN +12,+17 12 LAM12 $BACKDAT
     
 
     
@@ -91,11 +92,12 @@ if [ "$LAMIN" ]; then
 	TMP_RR12=$DATA/RR12.tmp
 	OUT_RR12=$DATA/RR12.dat
 	POS_RR12=$ETC/posdat.RR12
-	SQL_RR12=$LOAD/hirlam20_RR12_$TODAY.$RUN
+	SQL_RR12=$LOAD/hirlam12_RR12_$TODAY.$RUN
 	MET_RR12=$ETC/metdat.RR12
 
 
-	$METDAT $MET_RR12 $POS $LAMIN +06,+18  2001 LAM20 $TMP_RR12 
+# Gridnumber is 12 for Hirlam 12, 2001 for Hirlam 20
+	$METDAT $MET_RR12 $POS $LAMIN +06,+18  12 LAM12 $TMP_RR12 
 	
 	$POSDAT $POS_RR12 $TMP_RR12 $OUT_RR12
 
@@ -113,11 +115,11 @@ if [ "$LAMIN" ]; then
 	TMP_RR24=$DATA/RR24.tmp
 	OUT_RR24=$DATA/RR24.dat
 	POS_RR24=$ETC/posdat.RR24
-	SQL_RR24=$LOAD/hirlam20_RR24_$TODAY.$RUN
+	SQL_RR24=$LOAD/hirlam12_RR24_$TODAY.$RUN
 	MET_RR24=$ETC/metdat.RR24
 
 
-	$METDAT $MET_RR24 $POS $LAMIN +06,+30 2001 LAM20 $TMP_RR24 
+	$METDAT $MET_RR24 $POS $LAMIN +06,+30 12 LAM12 $TMP_RR24 
 
 	$POSDAT $POS_RR24 $TMP_RR24 $OUT_RR24
 	
@@ -133,11 +135,11 @@ if [ "$LAMIN" ]; then
     TMP_PP=$DATA/PP.tmp
     OUT_PP=$DATA/PP.dat
     POS_PP=$ETC/posdat.PP
-    SQL_PP=$LOAD/hirlam20_PP_$TODAY.$RUN
+    SQL_PP=$LOAD/hirlam12_PP_$TODAY.$RUN
     MET_PP=$ETC/metdat.PP
 
 
-    $METDAT $MET_PP $POS $LAMIN +03,+9 2001 LAM20 $TMP_PP 
+    $METDAT $MET_PP $POS $LAMIN +03,+9 12 LAM12 $TMP_PP 
     $POSDAT $POS_PP $TMP_PP $OUT_PP
 
     if [ -f "$OUT_PP" ]; then
