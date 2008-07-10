@@ -12,7 +12,7 @@ Resten av /var/kvalobs tar  ~ 1 GB.
 Kvalobs administrasjon kontoen bør ha ~ 5 GB tilgjengelig.
 
 I tillegg vil et fult sett av metadata for databasen alltid 
-være tilgjenegelig i /usr/share/kvalobs ( ~ 50 MB). 
+være tilgjenegelig i /usr/share/kvalobs/metadata ( ~ 50 MB). 
 
 
 Oppsett av kvalobs databasekluster i debian
@@ -23,11 +23,11 @@ Testet debian versjon er etch.
 Kommandoen pg_createcluster brukes.
 
 Opprett en partisjon under /var/lib/postgresql/8.3/kvalobs.
-Denne partisjonen bør ikke være mindre enn 50 GB.
+Denne partisjonen bør være minst 50 GB.
 
-set locale til C eller POSIX.
-Set encoding til LATIN1 (ISO 8859-1)
-Set kvalobs til a vare superbruker.
+Sett locale til C eller POSIX.
+Sett encoding til LATIN1 (ISO 8859-1)
+Sett kvalobs til a vare superbruker.
 
 pg_createcluster --socketdir=/var/kvalobs/run --encoding=LATIN1 --locale=C --user=kvalobs --port=5433 --start 8.3 kvalobs 
 
@@ -43,7 +43,7 @@ folgende linje:
 
 8.3 kvalobs *
 
-Login in i databsen med psql template1 og opprett databasen kvalobs.
+Login i databasen med psql template1 og opprett databasen kvalobs.
 
 Database schemaene kan nå legges inn databasen.
 
