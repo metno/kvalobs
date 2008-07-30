@@ -84,25 +84,32 @@ public class KvDataListenerApp extends KvApp
     		}
     	}
    	
-    	String kvpath=System.getProperties().getProperty("KVALOBS");
+    	String confpath=System.getProperties().getProperty("KVCONFPATH");
 	
-    	if(kvpath==null){
-    		logger.warn("Environment variable KVALOBS is unset, using HOME!");
-    		kvpath=System.getProperties().getProperty("user.home");
+    	if(confpath==null){
+    		logger.warn("Environment variable KVCONFPATH is unset, using $HOME/etc!");
+    		confpath=System.getProperties().getProperty("user.home");
 	    
-    		if(kvpath==null){
+    		if(confpath==null){
     			logger.fatal("Hmmmm. No 'user.home', exiting!");
     			System.exit(1);
     		}
+    		
+    		
+        	if(confpath.charAt(confpath.length()-1)=='/'){
+        		confpath=confpath.substring(0, confpath.length()-1);
+        	}
+        	
+        	confpath = confpath + "/etc";
     	}
 	   	
-    	if(kvpath.charAt(kvpath.length()-1)=='/'){
-    		kvpath=kvpath.substring(0, kvpath.length()-1);
+    	if(confpath.charAt(confpath.length()-1)=='/'){
+    		confpath=confpath.substring(0, confpath.length()-1);
     	}
 
-    	logger.info("Using <" + kvpath + "> as KVALOBS path!");
+    	logger.info("Using <" + confpath + "> as KVCONFPATH!");
 
-    	String confFile=kvpath+"/etc/kvdatalistener.conf";
+    	String confFile=confpath+"/kvdatalistener.conf";
 
     	PropertiesHelper conf=new PropertiesHelper();
 
@@ -110,11 +117,11 @@ public class KvDataListenerApp extends KvApp
             conf.loadFromFile(confFile);
         } catch (FileNotFoundException e1) {
             logger.fatal("Cant open configuration file: "+confFile);
-            logger.fatal("Reason: "+e1.getMessage());// TODO Auto-generated catch block
+            logger.fatal("Reason: "+e1.getMessage());
             System.exit(1);
         } catch (IOException e1) {
             logger.fatal("Error while reading configuration file: "+confFile);
-            logger.fatal("Reason: "+e1.getMessage());// TODO Auto-generated catch block
+            logger.fatal("Reason: "+e1.getMessage());
             System.exit(1);
         }
         

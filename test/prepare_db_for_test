@@ -7,28 +7,30 @@ set -a  # export variables to the environment of subsequent commands
 set -e  # Exit if a simple shell command fails
 #set -x  # for debugging, remove later
 
+if [ ! -f ~/.kvtest ]; then
+	echo "The test config file is missing '~/.kvtest'"
+	exit 1
+fi
 
 if ! [ $PGHOST ]; then
     echo "PGHOST er ikke satt! Avslutter..."
     exit 1
 fi
 
-
-
 ## ** Global variables **
-if ! [ $KVALOBS ]; then
-    echo "KVALOBS er ikke satt! Avslutter..."
+if ! [ $KVTEST ]; then
+    echo "KVTEST er ikke satt! Avslutter..."
     exit 1
 fi
 
 if [ -z "$PGPASSWORD" ]; then
-    PGPASSWORD=`grep dbpass $KVALOBS/.kvpasswd | sed -e 's/ *dbpass *//'`
+    PGPASSWORD=`grep dbpass $HOME/.kvpasswd | sed -e 's/ *dbpass *//'`
 fi
 
-PGNAME=kvalobs
+PGDATABASE=kvalobs
 PGUSER=kvalobs
-psql -h $PGHOST -d $PGNAME -U $PGUSER < $KVALOBS/share/kvalobs/test/delete_data.sql
+psql -h $PGHOST -d $PGDATABASE -U $PGUSER < $KVTEST/test/sql/delete_data.sql
 
-sqlite $KVALOBS/var/kvsynop/kvsynopd.sqlite < $KVALOBS/share/kvalobs/test/delete_synop.sql
-sqlite $KVALOBS/var/agregate/database.sqlite < $KVALOBS/share/kvalobs/test/delete_agregator.sql
+sqlite /var/kvalobs/kvsynop/kvsynopd.sqlite < $KVTEST/test/sql/delete_synop.sql
+sqlite /var/kvalobs/agregate/database.sqlite < $KVTEST/test/sql/delete_agregator.sql
 
