@@ -41,7 +41,7 @@ if [ ! -x "$GETDATA" ]; then
 fi
 
 if cd $KVTESTDIR ; then
-	if ! $GETDATA -f getdata_received.prop ; then
+	if ! $GETDATA -f $KVTESTDIR/etc/getdata_received.prop ; then
 		echo "Kan ikke hente data ut av kvalobs databasen!">> $TESTRAPORT 
 		cd ..
 		exit 2
