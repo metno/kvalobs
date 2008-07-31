@@ -5,4 +5,4 @@ Class-Path: ../jacorb/jacorb.jar
             log4j-1.2.13.jar
             kvalobsclt.jar 
             ojdbc14.jar
-            pgjdbc3.jar
+            postgresql-8.3-603.jdbc3.jar
