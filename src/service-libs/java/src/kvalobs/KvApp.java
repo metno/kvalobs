@@ -102,7 +102,8 @@ public class KvApp
      */
     public KvApp(String[] args, 
                  String kvServer_,
-                 boolean usingSwing)
+                 boolean usingSwing,
+                 java.util.Properties prop)
     {
         
         for(int i=0; i<args.length; i++){
@@ -141,9 +142,9 @@ public class KvApp
         
         if(!usingSwing){
             eventQue=new KvEventQue();
-            corbaThread=new CorbaThread(args, eventQue, this);
+            corbaThread=new CorbaThread(args, eventQue, this, prop);
         }else{
-            corbaThread=new CorbaThread(args, null, this);
+            corbaThread=new CorbaThread(args, null, this, prop);
         }
         corbaThread.setDaemon(true);
         System.out.println("CORBA thread deamon: "+corbaThread.isDaemon());

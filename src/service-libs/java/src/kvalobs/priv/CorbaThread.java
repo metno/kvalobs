@@ -51,17 +51,19 @@ public class CorbaThread extends Thread
     private boolean                      isInit=false;
     private KvEventQue                   eventQue=null;
     private KvApp                        app=null;
+    private java.util.Properties         prop=null;
     
-    public CorbaThread(String[] args_, KvEventQue eventQue_, KvApp app_)
+    public CorbaThread(String[] args_, KvEventQue eventQue_, KvApp app_, java.util.Properties prop)
     {
         args=args_;
         eventQue=eventQue_;
         app=app_;
+        this.prop = prop;
     }
     
     public void run()
     {
-        orb = ORB.init(args, null);
+        orb = ORB.init(args, prop);
         
         try{
             poa=POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
