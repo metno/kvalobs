@@ -100,7 +100,7 @@ public class KlApp extends KvApp
      * @param usingSwing
      */
     public KlApp(String[] args, String conffile, String kvserver, boolean usingSwing){
-    	super(args, null, usingSwing);
+    	super(args, null, usingSwing, null);
     	String confFile=getConfile(conffile);
     	
     	conf=new PropertiesHelper();

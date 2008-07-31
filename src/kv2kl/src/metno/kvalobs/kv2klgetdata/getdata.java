@@ -39,7 +39,7 @@ public class getdata {
     public static void main(String[] args)
     {
 	Param[] param;
-	KvApp app=new KvApp(args, "kvalobs", false);
+	KvApp app=new KvApp(args, "kvalobs", false, null);
 	WhichData[] whichData=new WhichData[1];
 	KvDataIterator dataIter;
 	ObsData[]      obsData;
