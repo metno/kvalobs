@@ -51,12 +51,12 @@ public class SqlHelperMain {
 	
     public static void main(String[] args)
     {
-    	String path=System.getProperties().getProperty("SQLHELPER_HOME");
-    	System.out.println("log4j conf: "+path+"/etc/SqlHelper_log.conf");
-    	PropertyConfigurator.configure(path+"/etc/SqlHelper_log.conf");
+    	String path=System.getProperties().getProperty("KVJAVA_CONF");
+    	System.out.println("log4j conf: "+path+"/SqlHelper_log.conf");
+    	PropertyConfigurator.configure(path+"/SqlHelper_log.conf");
     	
         SqlHelper sqlhelper=null;
-        String configfile =path+"/etc/SqlHelper.conf";
+        String configfile =path+"/SqlHelper.conf";
         String sqlpropfile=null;
         GetOpt go = new GetOpt("c:f:h");
 
