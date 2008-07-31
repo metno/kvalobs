@@ -1,17 +1,41 @@
 #! /bin/sh
 
-KVDIR=$KVALOBS
 
-export KVDIR 
+if  which kvconfig > /dev/null &>1; then
+    KVCONFIG=kvconfig
+fi
 
+if [ "z$KVJAVA"="z" ]; then
+	if [ "z$KVCONFIG" != "z" ]; then
+   	KVJAVA="$(kvconfig --datadir)/kvalobs/java"
+      
+      if [ ! -x "$KVJAVA/bin/jaco" ]; then
+      	KVJAVA=""
+      fi
+   fi
+fi
 
-#KVALOBSJAR=$KVDIR/share/kvalobs/java/lib/kvalobsclt.jar
+if [ "z$KVJAVA"="z" ]; then
+    KVJAVA=$HOME/share/kvalobs/java
+fi
 
-#export CLASSPATH=$KVALOBSJAR:$CLASSPATH
-#echo "CLASSPATH: $CLASSPATH"
-#echo "$@"
+if [ "z$KVJAVA_CONF" = "z" ]; then 
+	if [ "z$KVCONFIG" != "z" ]; then
+		KVJAVA_CONF="$(kvconfig --sysconfdir)/kvalobs"
+	
+		if [ ! -d $KVJAVA_CONF ]; then
+			KVJAVA_CONF=
+		fi
+	fi
+fi
+
+if [ "z$KVJAVA_CONF" = "z" ]; then
+	KVJAVA_CONF="$HOME/etc"
+fi
+
+export KVJAVA KVJAVA_CONF
 
 $JAVA_HOME/bin/java  \
-  "-DSQLHELPER_HOME=$KVALOBS"  \
-  -jar $KVDIR/share/kvalobs/java/lib/SqlHelper.jar "$@"
+  "-DKVJAVA_CONF=$KVJAVA_CONF"  \
+  -jar $KVJAVA/lib/SqlHelper.jar "$@"
     
