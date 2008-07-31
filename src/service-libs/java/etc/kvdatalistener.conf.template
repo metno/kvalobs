@@ -1,0 +1,10 @@
+dbconnect=jdbc:postgresql://localhost:5434/kvalobs
+dbdriver=org.postgresql.Driver
+dbuser=kvalobs
+dbpasswd=kvalobs12
+
+text_data.tablename=rcvtest_text_data
+data.tablename=rcvtest_data
+
+kvserver=kvtest-test
+corba.nameserver=corbaloc::corbans.oslo.dnmi.no:2809/NameService

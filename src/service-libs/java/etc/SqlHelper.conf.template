@@ -1,0 +1,4 @@
+dbconnect=jdbc:postgresql://localhost:5434/kvalobs
+dbdriver=org.postgresql.Driver
+dbuser=kvproc
+dbpasswd=kvproc
