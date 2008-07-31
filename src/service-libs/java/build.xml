@@ -2,6 +2,7 @@
 <project default="main">
 	<property environment="env"/>
 	<property name="builddir" location="build"/>
+	<property name="distdir"  location="dist"/>
 	<property name="idlgendir" location="src/generated" />
 	<property name="src" location="src" />
 	<property name="testresult" location="testresult"/>
@@ -118,16 +119,7 @@
 		<jar destfile="kvalobsclt.jar" basedir="${builddir}" includes="**/*.class"/>
 	</target>
 	
-	<target name="sqlhelper" depends="init, compile">
-		<jar destfile="SqlHelper.jar" manifest="SqlHelper.manifest" >
-			<fileset dir="${builddir}">
-				<include name="**/SqlHelper/**/*.class"/>
-				<exclude name="**/*Test.class"/>
-			</fileset>
-		</jar>
-		<copy todir="${libdir}" file="SqlHelper.jar"/>
-		<copy todir="${bindir}" file="binsrc/sqlhelper"/>
-	</target>
+	
 	
 	<target name="install" depends="main">
 		<mkdir dir="${env.KVALOBS}/share/kvalobs/java/lib"/>
@@ -144,7 +136,18 @@
 
 	</target>
 	
-	<target name="kvdatalistener">
+	<target name="sqlhelper" depends="init, compile">
+		<jar destfile="SqlHelper.jar" manifest="SqlHelper.manifest" >
+			<fileset dir="${builddir}">
+				<include name="**/SqlHelper/**/*.class"/>
+				<exclude name="**/*Test.class"/>
+			</fileset>
+		</jar>
+		<copy todir="${libdir}" file="SqlHelper.jar"/>
+		<copy todir="${bindir}" file="binsrc/sqlhelper"/>
+	</target>
+	
+	<target name="kvdatalistener" depends="init, compile">
 		<jar destfile="KvDataListener.jar" manifest="KvDataListener.manifest" >
 				<fileset dir="${builddir}">
 					<include name="**/KvDataListener/**/*.class"/>
@@ -158,6 +161,59 @@
 	<target name="jar2libdir">
 		<copy todir="${libdir}" file="kvalobsclt.jar"/>
 	</target>	
+	
+	<target name="dist" depends="main, kvdatalistener , sqlhelper">
+			<delete dir="${distdir}"/>
+			<mkdir dir="${distdir}/share/kvalobs/java/bin"/>
+			<mkdir dir="${distdir}/share/kvalobs/java/etc"/>
+			<mkdir dir="${distdir}/etc"/>	
+			<mkdir dir="${distdir}/bin"/>
+			<copy  todir="${distdir}/etc">
+				<fileset dir="etc">
+					<include name="*.conf.template"/>
+					<include name="*_log.conf.template"/>
+				</fileset>
+			</copy>
+			<copy  file="../../../share/kvalobs/java/etc/jacorb.properties" 
+			       todir="${distdir}/share/kvalobs/java/etc"/>
+			<copy todir="${distdir}/share/kvalobs/java/lib">
+				<fileset dir="${libdir}">
+					<include name="**/*.jar"/>
+					<exclude name="**/junit.jar"/>
+<!--					<exclude name="**/SqlHelper.jar"/>   -->
+					<exclude name="**/idl.jar"/>
+				</fileset>
+			</copy>
+			
+			<exec executable="cp" dir="." failonerror="true">
+				<arg line="../../../share/kvalobs/java/bin/jaco ${distdir}/share/kvalobs/java/bin"/>
+			</exec>
+
+			<exec executable="cp" dir="." failonerror="true">
+				<arg line="binsrc/kvdatalistener ${distdir}/bin"/>
+			</exec>
+			
+			<exec executable="cp" dir="." failonerror="true">
+				<arg line="binsrc/sqlhelper ${distdir}/bin"/>
+			</exec>
+
+			<tar destfile="kvclt-dist.tar"  compression="none">
+				<tarfileset dir="${distdir}" mode="755">
+					<include name="bin/*"/>
+					<include name="share/kvalobs/java/bin/*"/>
+				</tarfileset>
+				<tarfileset dir="${distdir}" mode="644">
+					<include name="etc/*"/>
+					<include name="share/kvalobs/java/lib/**/*"/>
+					<include name="share/kvalobs/java/etc/*"/>
+				</tarfileset>
+			</tar>
+			
+		</target>
+
+	
+	
+	
 	
 	<!-- ***********************************************
 	     ***********************************************
