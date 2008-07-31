@@ -1,27 +1,26 @@
 #! /bin/sh
 
-if [ -z "$KVALOBS" ]; then
-	echo "Environment variabelen KVALOBS må være satt!"
+if [ -z "$KVTESTDIR" ]; then
+	echo "Environment variabelen KVTESTDIR må være satt!"
 	exit 2
 fi 
 
-TESTRAPORT=$KVALOBS/testraport-$(date +'%Y-%m-%d')
-DATADIR=$KVALOBS/test/synop
-DATADIR_TMP=$KVALOBS/test/tmp
-EXPECTED_DATADIR=$KVALOBS/test/expected_synop
+TESTRAPORT=$KVTESTDIR/testraport-$(date +'%Y-%m-%d')
+DATADIR=$KVTESTDIR/data_from_kvalobs/dbdata_received
+EXPECTED_DATADIR=$KVTESTDIR/expected_result/db_data_received
 
 echo "" >> $TESTRAPORT 
-echo "--- Test av kvsynopd (SYNOP) ---" >> $TESTRAPORT 
+echo "--- Test av kvServiced (datasubcriber) ---" >> $TESTRAPORT 
 echo "" >> $TESTRAPORT 
 echo " * Forventet datakatalog: $EXPECTED_DATADIR" >> $TESTRAPORT
-echo " * Synop katalog: $DATADIR"  >> $TESTRAPORT
+echo " * Mottat datakatalog: $DATADIR"  >> $TESTRAPORT
 echo -e "\n\n">> $TESTRAPORT
 
 N_TEST_RUN=0
 N_TEST_FAILED=0
 N_TEST_OK=0
 
-GETSYNOP=$KVALOBS/bin/kvsynopdbclt
+GETDATA=$KVTESTDIR/bin/sqlhelper
 
 if ! mkdir -p $DATADIR; then
 	echo "Kan ikke opprette katalogen: $DATADIR ! " >> $TESTRAPORT 
@@ -30,40 +29,22 @@ fi
 
 rm -f $DATADIR/*.dat
 
-if ! mkdir -p $DATADIR_TMP; then
-	echo "Kan ikke opprette katalogen: $DATADIR_TMP ! " >> $TESTRAPORT 
-	exit 2
-fi 
-
-rm -f $DATADIR_TMP/*.syn
-
 if [ ! -d "$EXPECTED_DATADIR" ]; then
- 	echo "Katalogen med forventet SYNOP finnes ikke: $EXPECTED_DATADIR">> $TESTRAPORT 
+ 	echo "Katalogen med forventet data finnes ikke: $EXPECTED_DATADIR">> $TESTRAPORT 
  	exit 2
 fi
 
 
-if [ ! -x "$GETSYNOP" ]; then
-	echo "Klienten for å hente ut SYNOP finnes ikke: $GETSYNOP">> $TESTRAPORT 
+if [ ! -x "$GETDATA" ]; then
+	echo "Klienten for å hente ut data fra kvalobs finnes ikke: $GETDATA">> $TESTRAPORT 
 	exit 2
 fi
 
-if cd $KVALOBS/test ; then
-	$GETSYNOP  --only-synoptimes -f all -o tmp
-	
-	if [ ! $? ]; then
-		echo "Kan ikke hente SYNOP ut av SYNOP databasen!">> $TESTRAPORT 
+if cd $KVTESTDIR ; then
+	if ! $GETDATA -f getdata_received.prop ; then
+		echo "Kan ikke hente data ut av kvalobs databasen!">> $TESTRAPORT 
 		cd ..
 		exit 2
-	fi
-	
-	if cd tmp ; then
-		TMPSYNOP=$(ls -1 *.syn)
-		
-		for f in $TMPSYNOP ; do
-			sed -e '/\[Created/d' $f > $f.tmp
-			sed -e '/^S/d' $f.tmp > $DATADIR/$f
-		done
 	fi
 	
 	cd ..
@@ -79,12 +60,12 @@ if ! cd $EXPECTED_DATADIR ; then
 	exit 2
 fi
 
-EXPECTED=$(ls -1 *.syn)
+EXPECTED=$(ls -1 *.dat)
 cd ..
 
 for f in $EXPECTED ; do
 	let N_TEST_RUN=N_TEST_RUN+1
-	diff -u -b -B $EXPECTED_DATADIR/$f $DATADIR/$f
+	diff -u $EXPECTED_DATADIR/$f $DATADIR/$f
 	
 	RES=$?
 	 

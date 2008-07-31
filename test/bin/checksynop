@@ -1,26 +1,27 @@
 #! /bin/sh
 
-if [ -z "$KVALOBS" ]; then
+if [ -z "$KVTESTDIR" ]; then
 	echo "Environment variabelen KVALOBS må være satt!"
 	exit 2
 fi 
 
-TESTRAPORT=$KVALOBS/testraport-$(date +'%Y-%m-%d')
-DATADIR=$KVALOBS/test/dbdata_received
-EXPECTED_DATADIR=$KVALOBS/test/expected_db_data_received
+TESTRAPORT=$KVTESTDIR/testraport-$(date +'%Y-%m-%d')
+DATADIR=$KVTESTDIR/data_from_kvalobs/synop
+DATADIR_TMP=$KVTESTDIR/tmp
+EXPECTED_DATADIR=$KVTESTDIR/expected_result/synop
 
 echo "" >> $TESTRAPORT 
-echo "--- Test av kvServiced (datasubcriber) ---" >> $TESTRAPORT 
+echo "--- Test av kvsynopd (SYNOP) ---" >> $TESTRAPORT 
 echo "" >> $TESTRAPORT 
 echo " * Forventet datakatalog: $EXPECTED_DATADIR" >> $TESTRAPORT
-echo " * Mottat datakatalog: $DATADIR"  >> $TESTRAPORT
+echo " * Synop katalog: $DATADIR"  >> $TESTRAPORT
 echo -e "\n\n">> $TESTRAPORT
 
 N_TEST_RUN=0
 N_TEST_FAILED=0
 N_TEST_OK=0
 
-GETDATA=$KVALOBS/bin/sqlhelper
+GETSYNOP=kvsynopdbclt
 
 if ! mkdir -p $DATADIR; then
 	echo "Kan ikke opprette katalogen: $DATADIR ! " >> $TESTRAPORT 
@@ -29,22 +30,40 @@ fi
 
 rm -f $DATADIR/*.dat
 
+if ! mkdir -p $DATADIR_TMP; then
+	echo "Kan ikke opprette katalogen: $DATADIR_TMP ! " >> $TESTRAPORT 
+	exit 2
+fi 
+
+rm -f $DATADIR_TMP/*.syn
+
 if [ ! -d "$EXPECTED_DATADIR" ]; then
- 	echo "Katalogen med forventet data finnes ikke: $EXPECTED_DATADIR">> $TESTRAPORT 
+ 	echo "Katalogen med forventet SYNOP finnes ikke: $EXPECTED_DATADIR">> $TESTRAPORT 
  	exit 2
 fi
 
 
-if [ ! -x "$GETDATA" ]; then
-	echo "Klienten for å hente ut data fra kvalobs finnes ikke: $GETDATA">> $TESTRAPORT 
+if [ ! -x "$GETSYNOP" ]; then
+	echo "Klienten for å hente ut SYNOP finnes ikke: $GETSYNOP">> $TESTRAPORT 
 	exit 2
 fi
 
-if cd $KVALOBS/test ; then
-	if ! $GETDATA -f getdata_received.prop ; then
-		echo "Kan ikke hente data ut av kvalobs databasen!">> $TESTRAPORT 
+if cd $KVTESTDIR ; then
+	$GETSYNOP  --only-synoptimes -f all -o tmp
+	
+	if [ ! $? ]; then
+		echo "Kan ikke hente SYNOP ut av SYNOP databasen!">> $TESTRAPORT 
 		cd ..
 		exit 2
+	fi
+	
+	if cd tmp ; then
+		TMPSYNOP=$(ls -1 *.syn)
+		
+		for f in $TMPSYNOP ; do
+			sed -e '/\[Created/d' $f > $f.tmp
+			sed -e '/^S/d' $f.tmp > $DATADIR/$f
+		done
 	fi
 	
 	cd ..
@@ -60,12 +79,12 @@ if ! cd $EXPECTED_DATADIR ; then
 	exit 2
 fi
 
-EXPECTED=$(ls -1 *.dat)
+EXPECTED=$(ls -1 *.syn)
 cd ..
 
 for f in $EXPECTED ; do
 	let N_TEST_RUN=N_TEST_RUN+1
-	diff -u $EXPECTED_DATADIR/$f $DATADIR/$f
+	diff -u -b -B $EXPECTED_DATADIR/$f $DATADIR/$f
 	
 	RES=$?
 	 

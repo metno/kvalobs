@@ -1,17 +1,17 @@
 #! /bin/sh
 
-if [ -z "$KVALOBS" ]; then
-	echo "Environment variabelen KVALOBS må være satt!"
+if [ -z "$KVTESTDIR" ]; then
+	echo "Environment variabelen KVTESTDIR må være satt!"
 	exit 2
 fi 
 
-TESTRAPORT=$KVALOBS/testraport-$(date +'%Y-%m-%d')
-DATADIR=$KVALOBS/test/dbdata
-EXPECTED_DATADIR=$KVALOBS/test/expected_db_data
-TESTDATADIR=$KVALOBS/test/data
+TESTRAPORT=$KVTESTDIR/testraport-$(date +'%Y-%m-%d')
+DATADIR=$KVTESTDIR/data_from_kvalobs/dbdata
+EXPECTED_DATADIR=$KVTESTDIR/expected_result/db_data
+TESTDATADIR=$KVTESTDIR/testdata
 
-KVINPUTCLT=$KVALOBS/bin/kvDataInputd_clt
-GETDATA=$KVALOBS/bin/sqlhelper
+KVINPUTCLT=kvDataInputd_clt
+GETDATA=$KVTESTDIR/bin/sqlhelper
 
 rm -f $TESTRAPORT
 
@@ -64,8 +64,8 @@ for f in $TESTDATA; do
 	fi
 done
 
-if cd $KVALOBS/test ; then
-	if ! $GETDATA -f getdata.prop ; then
+if cd $KVTESTDIR ; then
+	if ! $GETDATA -f $KVTESTDIR/etc/getdata.prop ; then
 		echo "Kan ikke hente data ut av kvalobs databasen!">> $TESTRAPORT
 		cd ..
 		exit 2
