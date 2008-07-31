@@ -8,6 +8,8 @@ pkgconfigdir = $(libdir)/pkgconfig
 
 install-data-hook:
 	$(install_sh) -m 755 -d $(DESTDIR)/$(localstatedir)/@PACKAGE_NAME@
+	$(install_sh) -m 755 -d $(DESTDIR)/$(localstatedir)/@PACKAGE_NAME@/service
+	$(install_sh) -m 755 -d $(DESTDIR)/$(localstatedir)/@PACKAGE_NAME@/service/subscribers
 	$(install_sh) -m 755 -d $(DESTDIR)/$(localstatedir)/@PACKAGE_NAME@/agregate
 	$(install_sh) -m 755 -d $(DESTDIR)/$(localstatedir)/@PACKAGE_NAME@/kvsynop
 	$(install_sh) -m 755 -d $(DESTDIR)/$(localstatedir)/@PACKAGE_NAME@/kvsynop/debug
