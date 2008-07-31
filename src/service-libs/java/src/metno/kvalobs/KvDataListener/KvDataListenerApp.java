@@ -69,8 +69,12 @@ public class KvDataListenerApp extends KvApp
     	}
     }
 
-    public KvDataListenerApp(String[] args, boolean usingSwing){
-    	super(args, null, usingSwing);
+        
+    public KvDataListenerApp(String[] args, 
+    		                 boolean usingSwing, 
+    		                 metno.util.PropertiesHelper conf,
+    		                 java.util.Properties corbaProp ){
+    	super(args, null, usingSwing, corbaProp);
     	
     	for(int i=0; i<args.length; i++){
     		if(args[i].compareTo("--subid")==0){
@@ -84,48 +88,7 @@ public class KvDataListenerApp extends KvApp
     		}
     	}
    	
-    	String confpath=System.getProperties().getProperty("KVCONFPATH");
-	
-    	if(confpath==null){
-    		logger.warn("Environment variable KVCONFPATH is unset, using $HOME/etc!");
-    		confpath=System.getProperties().getProperty("user.home");
-	    
-    		if(confpath==null){
-    			logger.fatal("Hmmmm. No 'user.home', exiting!");
-    			System.exit(1);
-    		}
-    		
-    		
-        	if(confpath.charAt(confpath.length()-1)=='/'){
-        		confpath=confpath.substring(0, confpath.length()-1);
-        	}
-        	
-        	confpath = confpath + "/etc";
-    	}
-	   	
-    	if(confpath.charAt(confpath.length()-1)=='/'){
-    		confpath=confpath.substring(0, confpath.length()-1);
-    	}
-
-    	logger.info("Using <" + confpath + "> as KVCONFPATH!");
-
-    	String confFile=confpath+"/kvdatalistener.conf";
-
-    	PropertiesHelper conf=new PropertiesHelper();
-
     	try {
-            conf.loadFromFile(confFile);
-        } catch (FileNotFoundException e1) {
-            logger.fatal("Cant open configuration file: "+confFile);
-            logger.fatal("Reason: "+e1.getMessage());
-            System.exit(1);
-        } catch (IOException e1) {
-            logger.fatal("Error while reading configuration file: "+confFile);
-            logger.fatal("Reason: "+e1.getMessage());
-            System.exit(1);
-        }
-        
-        try {
             conMgr=new DbConnectionMgr(conf);
         } catch (IllegalArgumentException e1) {
             logger.fatal("Missing properties in the configuration file: " + e1.getMessage());

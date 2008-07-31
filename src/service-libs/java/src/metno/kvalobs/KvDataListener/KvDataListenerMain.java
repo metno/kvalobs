@@ -34,28 +34,87 @@ import kvalobs.*;
 import CKvalObs.CService.*;
 import java.util.*;
 import java.text.*;
+import java.io.*;
 import metno.util.MiGMTTime;
+import metno.util.PropertiesHelper;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 public class KvDataListenerMain {
 	static Logger logger = Logger.getLogger(KvDataListenerMain.class);
 	
+	static metno.util.PropertiesHelper loadConfFromFile() {
+    	String confpath=System.getProperties().getProperty("KVJAVA_CONF");
+    	
+    	if(confpath==null){
+    		logger.warn("Environment variable KVJAVA_CONF is unset, using $HOME/etc!");
+    		confpath=System.getProperties().getProperty("user.home");
+	    
+    		if(confpath==null){
+    			logger.fatal("Hmmmm. No 'user.home', exiting!");
+    			System.exit(1);
+    		}
+    		
+    		
+        	if(confpath.charAt(confpath.length()-1)=='/'){
+        		confpath=confpath.substring(0, confpath.length()-1);
+        	}
+        	
+        	confpath = confpath + "/etc";
+    	}
+	   	
+    	if(confpath.charAt(confpath.length()-1)=='/'){
+    		confpath=confpath.substring(0, confpath.length()-1);
+    	}
+
+    	logger.info("Using <" + confpath + "> as KVJAVA_CONF!");
+
+    	String confFile=confpath+"/kvdatalistener.conf";
+
+    	PropertiesHelper conf=new PropertiesHelper();
+
+    	try {
+            conf.loadFromFile(confFile);
+        } catch (FileNotFoundException e1) {
+            logger.fatal("Cant open configuration file: "+confFile);
+            logger.fatal("Reason: "+e1.getMessage());
+            System.exit(1);
+        } catch (IOException e1) {
+            logger.fatal("Error while reading configuration file: "+confFile);
+            logger.fatal("Reason: "+e1.getMessage());
+            System.exit(1);
+        }
+
+        return conf;
+    }
+
+	
     public static void main(String[] args)
     {
-    	String kvpath=System.getProperties().getProperty("KVALOBS");
+    	String kvpath=System.getProperties().getProperty("KVJAVA_CONF");
     	
     	if(kvpath==null){
-    		System.out.println("FATAL: Propertie KVALOBS must be set!");
+    		System.out.println("FATAL: Propertie KVJAVA_CONF must be set!");
     		System.exit(1);
     	}
     	
     	//Konfigurer loggesystemet, log4j.
-    	System.out.println("log4j conf: "+kvpath+"/etc/kvdatalistener_log.conf");
-    	PropertyConfigurator.configure(kvpath+"/etc/kvdatalistener_log.conf");
+    	System.out.println("log4j conf: "+kvpath+"/kvdatalistener_log.conf");
+    	PropertyConfigurator.configure(kvpath+"/kvdatalistener_log.conf");
+    	
+    	metno.util.PropertiesHelper myConf = loadConfFromFile();
+    	java.util.Properties corbaConf = null;
+    	
+    	String corbaNameserver = myConf.getProperty("corba.nameserver");
+    	
+    	if( corbaNameserver!=null && corbaNameserver.length()>0 ) {
+    		corbaConf = new java.util.Properties();
+    		corbaConf.setProperty("ORBInitRef.NameService", corbaNameserver );
+    	}
+    		
     	
     	Param[] param;
-    	KvDataListenerApp app=new KvDataListenerApp(args, false);
+    	KvDataListenerApp app=new KvDataListenerApp(args, false, myConf, corbaConf);
     	WhichData[] whichData=new WhichData[1];
     	KvDataSubscribeInfo dataSubscribeInfo=new KvDataSubscribeInfo();
     	KvDataReceiver dataReceiver=new KvDataReceiver(app);
