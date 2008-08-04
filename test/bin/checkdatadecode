@@ -10,8 +10,8 @@ DATADIR=$KVTESTDIR/data_from_kvalobs/dbdata
 EXPECTED_DATADIR=$KVTESTDIR/expected_result/db_data
 TESTDATADIR=$KVTESTDIR/testdata
 
-KVINPUTCLT=kvDataInputd_clt
-GETDATA=$KVTESTDIR/bin/sqlhelper
+KVINPUTCLT=`which kvDataInputd_clt 2> /dev/null`
+GETDATA=$HOME/bin/sqlhelper
 
 rm -f $TESTRAPORT
 
@@ -27,29 +27,29 @@ N_TEST_FAILED=0
 N_TEST_OK=0
 
 if ! mkdir -p $DATADIR; then
-	echo "Kan ikke opprette katalogen: $DATADIR ! ">> $TESTRAPORT
+	echo "Kan ikke opprette katalogen: $DATADIR ! "
 	exit 2
 fi 
 
 rm -f $DATADIR/*.dat
 
 if [ ! -d "$EXPECTED_DATADIR" ]; then
- 	echo "Katalogen med forventet data finnes ikke: $EXPECTED_DATADIR">> $TESTRAPORT
+ 	echo "Katalogen med forventet data finnes ikke: $EXPECTED_DATADIR"
  	exit 2
 fi
 
 if [ ! -d "$TESTDATADIR" ]; then
- 	echo "Katalogen med testdata finnes ikke: $TESTDATADIR">> $TESTRAPORT
+ 	echo "Katalogen med testdata finnes ikke: $TESTDATADIR"
  	exit 2
 fi
 
 if [ ! -x "$KVINPUTCLT" ]; then
-	echo "Klienten for å laste kvalobs med testdata finnes ikke: $KVINPUTCLT">> $TESTRAPORT
+	echo "Klienten for å laste kvalobs med testdata finnes ikke: $KVINPUTCLT"
 	exit 2
 fi
 
 if [ ! -x "$GETDATA" ]; then
-	echo "Klienten for å hente ut data fra kvalobs finnes ikke: $GETDATA">> $TESTRAPORT
+	echo "Klienten for å hente ut data fra kvalobs finnes ikke: $GETDATA"
 	exit 2
 fi
 
@@ -59,14 +59,14 @@ TESTDATA=$TESTDATADIR/*.dat
 for f in $TESTDATA; do
 	$KVINPUTCLT $f
 	if [ "$?" -ne 0 ]; then
-		echo "Kan ikke laste data inn i kvalobs!">> $TESTRAPORT
+		echo "Kan ikke laste data inn i kvalobs!"
 		exit 2
 	fi
 done
 
 if cd $KVTESTDIR ; then
 	if ! $GETDATA -f $KVTESTDIR/etc/getdata.prop ; then
-		echo "Kan ikke hente data ut av kvalobs databasen!">> $TESTRAPORT
+		echo "Kan ikke hente data ut av kvalobs databasen!"
 		cd ..
 		exit 2
 	fi
@@ -79,7 +79,7 @@ fi
 
 
 if ! cd $EXPECTED_DATADIR ; then
-	echo "Kan ikke skifte til katalogen med forventet data etter decoding!">> $TESTRAPORT
+	echo "Kan ikke skifte til katalogen med forventet data etter decoding!"
 	echo "  $EXPECTED_DATADIR"
 	exit 2
 fi
