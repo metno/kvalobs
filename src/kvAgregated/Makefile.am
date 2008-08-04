@@ -1,4 +1,5 @@
 bin_PROGRAMS = kvAgregated
+bin_SCRIPTS = kvAgregateDbInit.sh
 
 kvAgregated_SOURCES = \
 	proxy/IncomingHandler.h proxy/IncomingHandler.cc \
@@ -42,9 +43,9 @@ nodist_pkgstate_DATA = database.sqlite
 CLEANFILES = database.sqlite
 
 database.sqlite: 
-	. $(srcdir)/agregateDbInit.sh $@ 
+	. $(srcdir)/kvAgregateDbInit.sh $@ 
 	
-EXTRA_DIST = agregateDbInit.sh
+EXTRA_DIST = kvAgregateDbInit.sh
 
 
 
