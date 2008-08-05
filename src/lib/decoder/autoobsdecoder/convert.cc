@@ -101,12 +101,12 @@ namespace kvalobs {
          
          //int v = atoi( sa.sa.c_str() );
          float v;
-         LOGDEBUG("DataConvert::dataSa: sa: " << sa.sa );
+         //LOGDEBUG("DataConvert::dataSa: sa: " << sa.sa );
          
          if( sscanf( sa.sa.c_str(), "%f", &v) != 1 )
          		return false;
          
-         LOGDEBUG("DataConvert::dataSa: sa (float): " << v );
+         //LOGDEBUG("DataConvert::dataSa: sa (float): " << v );
          
          data = kvData( saSdEmTemplate.stationID(), saSdEmTemplate.obstime(), 
                         v /*original*/, 112  /*paramid*/, saSdEmTemplate.tbtime(),
