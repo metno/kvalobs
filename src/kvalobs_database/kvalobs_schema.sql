@@ -41,7 +41,7 @@ CREATE INDEX data_tbtime_index ON data (tbtime);
 REVOKE ALL ON data FROM public;
 GRANT ALL ON data TO kv_admin;
 GRANT SELECT ON data TO kv_read;
-GRANT SELECT, UPDATE, INSERT ON data TO kv_write;
+GRANT SELECT, UPDATE, INSERT, DELETE ON data TO kv_write;
 
 
 --
@@ -70,8 +70,8 @@ CREATE TABLE data_history (
 REVOKE ALL ON data_history FROM public;
 GRANT ALL ON data_history TO kv_admin;
 GRANT SELECT ON data_history TO kv_read;
-GRANT SELECT, UPDATE, INSERT ON data_history TO kv_write;
-
+GRANT SELECT, UPDATE, INSERT, DELETE ON data_history TO kv_write;
+GRANT USAGE ON SEQUENCE data_history_version_seq TO kv_write;
 
 
 CREATE LANGUAGE plpgsql;
@@ -130,7 +130,7 @@ CREATE TABLE text_data (
 REVOKE ALL ON text_data FROM public;
 GRANT ALL ON text_data TO kv_admin;
 GRANT SELECT ON text_data TO kv_read;
-GRANT SELECT, UPDATE, INSERT ON text_data TO kv_write;
+GRANT SELECT, UPDATE, INSERT, DELETE ON text_data TO kv_write;
 
 
 --
@@ -153,7 +153,8 @@ CREATE TABLE text_data_history (
 REVOKE ALL ON text_data_history FROM public;
 GRANT ALL ON text_data_history TO kv_admin;
 GRANT SELECT ON text_data_history TO kv_read;
-GRANT SELECT, UPDATE, INSERT ON text_data_history TO kv_write;
+GRANT SELECT, UPDATE, INSERT, DELETE ON text_data_history TO kv_write;
+GRANT USAGE ON SEQUENCE text_data_history_version_seq TO kv_write;
 
 
 --
@@ -234,7 +235,7 @@ CREATE TABLE rejectdecode (
 REVOKE ALL ON rejectdecode FROM public;
 GRANT ALL ON rejectdecode TO kv_admin;
 GRANT SELECT ON rejectdecode TO kv_read;
-GRANT SELECT, UPDATE, INSERT ON rejectdecode TO kv_write;
+GRANT SELECT, UPDATE, INSERT, DELETE ON rejectdecode TO kv_write;
 
 
 CREATE TABLE model_data (
@@ -294,7 +295,7 @@ CREATE TABLE generated_types (
 REVOKE ALL ON generated_types FROM public;
 GRANT ALL ON generated_types TO kv_admin;
 GRANT SELECT ON generated_types TO kv_read;
-GRANT SELECT, UPDATE, INSERT ON generated_types TO kv_write;
+GRANT SELECT, UPDATE, INSERT, DELETE ON generated_types TO kv_write;
 
 
 
@@ -335,7 +336,7 @@ CREATE TABLE station (
 REVOKE ALL ON station FROM public;
 GRANT ALL ON station TO kv_admin;
 GRANT SELECT ON station TO kv_read;
-GRANT SELECT, UPDATE, INSERT ON station TO kv_write;
+GRANT SELECT, UPDATE, INSERT, DELETE ON station TO kv_write;
 
 
 
@@ -505,7 +506,7 @@ CREATE TABLE key_val (
 REVOKE ALL ON key_val FROM public;
 GRANT ALL ON key_val TO kv_admin;
 GRANT SELECT ON key_val TO kv_read;
-GRANT SELECT, UPDATE, INSERT ON key_val TO kv_write;
+GRANT SELECT, UPDATE, INSERT, DELETE ON key_val TO kv_write;
 
 
 
@@ -557,7 +558,7 @@ workque (priority, stationid, typeid, obstime);
 REVOKE ALL ON workque FROM public;
 GRANT ALL ON workque TO kv_admin;
 GRANT SELECT ON workque TO kv_read;
-GRANT SELECT, UPDATE, INSERT ON workque TO kv_write;
+GRANT SELECT, UPDATE, INSERT, DELETE ON workque TO kv_write;
 
 
 
@@ -577,7 +578,7 @@ CREATE TABLE workstatistik  (
 REVOKE ALL ON workstatistik FROM public;
 GRANT ALL ON workstatistik TO kv_admin;
 GRANT SELECT ON workstatistik TO kv_read;
-GRANT SELECT, UPDATE, INSERT ON workstatistik TO kv_write;
+GRANT SELECT, UPDATE, INSERT, DELETE ON workstatistik TO kv_write;
 
 
 CREATE TABLE ps_subscribers  (
@@ -593,4 +594,4 @@ CREATE TABLE ps_subscribers  (
 REVOKE ALL ON ps_subscribers FROM public;
 GRANT ALL ON ps_subscribers TO kv_admin;
 GRANT SELECT ON ps_subscribers TO kv_read;
-GRANT SELECT, UPDATE, INSERT ON ps_subscribers TO kv_write;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ps_subscribers TO kv_write;
