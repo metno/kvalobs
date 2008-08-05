@@ -99,7 +99,11 @@ namespace kvalobs {
          if( sa.sa.empty() )
             return false;
          
-         int v = atoi( sa.sa.c_str() );
+         //int v = atoi( sa.sa.c_str() );
+         float v;
+         
+         if( sscanf( sa.sa.c_str(), "%f", &v) != 1 )
+         		return false;
          
          data = kvData( saSdEmTemplate.stationID(), saSdEmTemplate.obstime(), 
                         v /*original*/, 112  /*paramid*/, saSdEmTemplate.tbtime(),
