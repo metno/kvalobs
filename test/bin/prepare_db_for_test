@@ -22,6 +22,6 @@ PGDATABASE=kvalobs
 PGUSER=kvalobs
 
 psql  < $KVTESTDIR/sql/delete_data.sql
-sqlite /var/kvalobs/kvsynop/kvsynopd.sqlite < $KVTESTDIR/sql/delete_synop.sql
-sqlite /var/kvalobs/agregate/database.sqlite < $KVTESTDIR/sql/delete_agregator.sql
+sqlite3 /var/kvalobs/kvsynop/kvsynopd.sqlite < $KVTESTDIR/sql/delete_synop.sql
+sqlite3 /var/kvalobs/agregate/database.sqlite < $KVTESTDIR/sql/delete_agregator.sql
 
