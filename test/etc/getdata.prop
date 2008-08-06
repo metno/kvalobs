@@ -3,7 +3,7 @@ sql=SELECT obstime,stationid,typeid,paramid,sensor,level, \
     FROM data WHERE stationid=${$2} AND typeid=${$3} \
          ORDER BY obstime,stationid,typeid,paramid,sensor,level;
 
-ofile=dbdata/${$2}-${$3}.dat
+ofile=data_from_kvalobs/dbdata/${$2}-${$3}.dat
 
 select.18700.3.ofile=${sql}
 select.18700.6.ofile=${sql}
