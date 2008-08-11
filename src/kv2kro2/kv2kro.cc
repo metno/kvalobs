@@ -46,7 +46,8 @@ main( int argn, char **argv )
    
    
    confile = kvPath("sysconfdir") + "/kv2kro.conf";
-   pidfile = dnmi::file::createPidFileName( "kv2kro" );
+   pidfile = dnmi::file::createPidFileName( kvPath("localstatedir") + "/run",
+                                            "kv2kro" );
   
    if( dnmi::file::isRunningPidFile( pidfile, pidfileError ) ) {
       if( pidfileError ){

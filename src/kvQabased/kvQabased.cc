@@ -106,7 +106,7 @@ main( int argc, char** argv )
     LOGFATAL( rundir.native_file_string() << "exists but is not a directory" );
     return 1;
   }
-  filesystem::path pidfile( dnmi::file::createPidFileName( "kvQabased" ) );
+  filesystem::path pidfile( dnmi::file::createPidFileName( rundir.native_file_string(), "kvQabased" ) );
 
   if ( dnmi::file::isRunningPidFile( pidfile.native_file_string(), error ) )
   {

@@ -36,14 +36,13 @@
 #include <iostream>
 #include "pidfileutil.h"
 #include <stdio.h>
-#include <kvalobs/kvPath.h>
 
 using namespace std;
 
 
 std::string 
 dnmi::file::
-createPidFileName(const std::string &progname)
+createPidFileName(const std::string &path, const std::string &progname)
 {
   struct utsname buf;
   string nodename;
@@ -51,10 +50,8 @@ createPidFileName(const std::string &progname)
   
   if( uname( &buf ) == 0 ) 
 	  nodename = buf.nodename;
-  
-  pidfilename=kvPath("localstatedir");
-  pidfilename+="/run/";
-  pidfilename+=progname;
+   
+  pidfilename = path + "/" + progname;
   
   if( !nodename.empty() ) 
 	  pidfilename += "-" + nodename;

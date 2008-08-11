@@ -56,7 +56,8 @@ main(int argn, char **argv)
   InitLogger(argn, argv, "kvsynopd");
 
   confFile = kvPath("sysconfdir")+"/kvsynopd.conf";
-  pidfile = dnmi::file::createPidFileName( "kvsynopd" );
+  pidfile = dnmi::file::createPidFileName( kvPath("localstatedir") + "/run",
+		                                     "kvsynopd" );
 
   dnmi::file::PidFileHelper pidFile;
   miutil::conf::ConfSection *conf;

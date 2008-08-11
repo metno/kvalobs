@@ -46,14 +46,16 @@ namespace dnmi{
    /**
     * Create a name for the pidfile. The name is on the form:
     * 
-    * 'localstatedir'/kvalobs/run/progname-nodename.pid
+    * 'path'/progname-nodename.pid
     * 
     * Where nodename is the name of the machine we are running on.
     * 
+    * @param path The directory to put the pidfile.
     * @param progname the progname part of the pidfile name.
     * @return The name to use as the pidfile.
     */  
-    std::string createPidFileName( const std::string &progname );
+    std::string createPidFileName( const std::string &path, 
+   		                          const std::string &progname );
   
     /**
      * \brief Create a pidfile.
