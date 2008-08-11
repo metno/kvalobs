@@ -18,6 +18,7 @@ kv2kro_LIBS = $(omniORB4_LIBS) $(putools_LIBS) $(BOOST_THREAD_LIB) \
 kv2kro_LDADD = $(top_builddir)/src/service-libs/kvcpp/libkvcpp.la \
                $(top_builddir)/src/lib/miutil/libmiutil.la \
                $(top_builddir)/src/lib/kvalobs/libkvalobs.la \
+               $(top_builddir)/src/lib/fileutil/libfileutil.la \
                $(top_builddir)/src/lib/kvdb/libkvdb.la \
                $(top_builddir)/src/lib/corbahelper/libcorbahelper.la \
                $(top_builddir)/src/lib/dnmithread/libdnmithread.la \
