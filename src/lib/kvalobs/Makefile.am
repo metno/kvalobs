@@ -48,6 +48,7 @@ libkvalobs_la_CPPFLAGS = $(AM_CPPFLAGS) $(putools_CFLAGS) \
 libkvalobs_la_LDFLAGS = $(putools_LDFLAGS)
 #libkvalobs_la_LIBS = $(top_builddir)/src/lib/miutil/libmiutil.a
 libkvalobs_la_LIBADD = $(top_builddir)/src/lib/miutil/libmiutil.la \
+                       $(top_builddir)/src/lib/fileutil/libfileutil.la \
                        $(top_builddir)/src/lib/milog/libmilog.la \
                        $(top_builddir)/src/lib/dnmithread/libdnmithread.la \
                        $(top_builddir)/src/lib/kvdb/libkvdb.la \
