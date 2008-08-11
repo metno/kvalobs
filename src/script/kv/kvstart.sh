@@ -31,6 +31,7 @@ KVCONFIG=__KVCONFIG__
 KVBIN=`$KVCONFIG --bindir`
 KVPID=`$KVCONFIG --localstatedir`/kvalobs/run
 KVCONF=`$KVCONFIG --sysconfdir`/kvalobs
+NODENAME=$(uname -n)
 
 if [ -e ${KVCONF}/kv_ctl.conf ]; then
     . ${KVCONF}/kv_ctl.conf
@@ -55,8 +56,8 @@ function isrunning()
 {
     prog=$1
    
-    if [ -f $KVPID/$prog.pid ]; then 
-	PID=`cat $KVPID/$prog.pid`
+    if [ -f $KVPID/$prog-$NODENAME.pid ]; then 
+	PID=`cat $KVPID/$prog-$NODENAME.pid`
 	#echo "PID: $PROG: $PID"
 	kill  -0 $PID > /dev/null 2>&1
 
@@ -67,7 +68,7 @@ function isrunning()
 	    if [ ! -z "$running" ]; then
 		return 0
 	    else
-		rm -f $KVPID/$prog.pid
+		rm -f $KVPID/$prog-$NODENAME.pid
 	    fi	
         fi
    fi
@@ -119,18 +120,18 @@ for PROG in $START_PROGS ; do
     if [ $? -eq 0 ]; then
 	echo "running"
     else
-	rm -f $KVPID/$PROG.pid
+	rm -f $KVPID/$PROG-$NODENAME.pid
 
 	$KVBIN/$PROG > /dev/null  2>&1 &
 	
 	n=0
 
-        while [ $n -lt $TIMEOUT  -a ! -f "$KVPID/$PROG.pid" ]; do
+        while [ $n -lt $TIMEOUT  -a ! -f "$KVPID/$PROG-$NODENAME.pid" ]; do
 	      let n=n+1
 	      sleep 1
 	done
  
-	if [ -f "$KVPID/$PROG.pid" ]; then
+	if [ -f "$KVPID/$PROG-$NODENAME.pid" ]; then
 	    echo "Ok!"
 	else
 	    echo "Failed!"

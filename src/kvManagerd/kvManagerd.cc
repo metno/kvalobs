@@ -99,7 +99,7 @@ main(int argc, char** argv)
   
   LOGINFO("check_for_missing_obs=" << (docheckForMissingObs?"true":"false"));
 
-  pidfile = kvPath("localstatedir")+"/run/kvManagerd.pid";
+  pidfile = KvApp::createPidFileName( "kvManagerd" );
 
   LOGDEBUG("pidfile: " << pidfile);
 

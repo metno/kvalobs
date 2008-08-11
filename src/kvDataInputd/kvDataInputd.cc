@@ -65,7 +65,7 @@ main(int argn, char** argv)
 
   InitLogger(argn, argv);
   
-  pidfile= kvPath("localstatedir") + "/var/run/kvDataInputd.pid";
+  pidfile= KvApp::createPidFileName( "kvDataInputd" );
 
   if(dnmi::file::isRunningPidFile(pidfile, error)){
     if(error){

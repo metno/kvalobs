@@ -29,6 +29,7 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include <stdio.h>
+#include <sys/utsname.h>
 #include <unistd.h>
 #include <string>
 #include <stdlib.h>
@@ -39,6 +40,7 @@
 #include <dnmithread/mtcout.h>
 #include <kvalobs/kvapp.h>
 #include <kvalobs/kvPath.h>
+#include <fileutil/pidfileutil.h>
 
 using namespace std;
 using namespace miutil::conf;
@@ -214,18 +216,21 @@ KvApp::printUseMsgAndExit(int exitStatus)
 }
 
 
+std::string 
+KvApp::
+createPidFileName(const std::string &progname)
+{
+	return dnmi::file::createPidFileName( progname );
+}
 
 
 void 
 KvApp::createPidFile(const std::string &progname)
 {
   FILE *fd;
-
-  pidfile=kvPath("localstatedir");
-  pidfile+="/run/";
-  pidfile+=progname;
-  pidfile+=".pid";
-
+  
+  pidfile = createPidFileName( progname );
+  
   LOGINFO("Writing pid to file <" << pidfile << ">!");
 
   fd=fopen(pidfile.c_str(), "w");

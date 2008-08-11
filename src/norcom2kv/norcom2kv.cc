@@ -47,7 +47,7 @@ main(int argn, char **argv)
 
   InitLogger(argn, argv, "norcom2kv");
 
-  pidfile = kvPath("localstatedir")+"/run/norcom2kv.pid";
+  pidfile = dnmi::file::createPidFileName( "norcom2kv" );
   dnmi::file::PidFileHelper pidFile;
 
   App::setConfFile("norcom2kv.conf");

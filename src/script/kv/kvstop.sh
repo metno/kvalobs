@@ -32,6 +32,7 @@ KVCONFIG=__KVCONFIG__
 KVBIN=`$KVCONFIG --bindir`
 KVPID=`$KVCONFIG --localstatedir`/kvalobs/run
 KVCONF=`$KVCONFIG --sysconfdir`/kvalobs
+NODENAME=$(uname -n)
 
 if [ -e ${KVCONF}/kv_ctl.conf ]; then
     . ${KVCONF}/kv_ctl.conf
@@ -86,6 +87,7 @@ echo "listopt: $listopt"
 echo "killallopt: $killallopt"
 echo "KVPID=$KVPID"
 echo "TIMEOUT=$TIMEOUT"
+echo "node: $NODENAME"
 
 #inlist tar to parametere
 function inlist()
@@ -108,8 +110,8 @@ function isrunning()
 {
     prog=$1
    
-    if [ -f $KVPID/$prog.pid ]; then 
-	PID=`cat $KVPID/$prog.pid`
+    if [ -f $KVPID/$prog-$NODENAME.pid ]; then 
+	PID=`cat $KVPID/$prog-$NODENAME.pid`
 	#echo "PID: $prog: $PID"
 	#echo "	kill  -0 $PID"
 	kill  -0 $PID > /dev/null 2>&1
@@ -123,7 +125,7 @@ function isrunning()
 	    fi
         fi
 
-        rm -f $KVPID/$prog.pid
+        rm -f $KVPID/$prog-$NODENAME.pid
    fi
     
    return 1
@@ -136,8 +138,8 @@ function killprog()
     prog=$1
     echo -n "$prog ....."
     
-    if [ -f $KVPID/$prog.pid ]; then 
-		PID=`cat $KVPID/$prog.pid`
+    if [ -f $KVPID/$prog-$NODENAME.pid ]; then 
+		PID=`cat $KVPID/$prog-$NODENAME.pid`
 		#echo "PID: $PROG: $PID"
 		kill $PID > /dev/null 2>&1
 	

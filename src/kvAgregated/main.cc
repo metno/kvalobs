@@ -164,7 +164,7 @@ int main( int argc, char **argv )
 
 	
   //PID-file
-  const std::string pidfile=kvPath("localstatedir")+"/run/kvAgregated.pid";
+  const std::string pidfile=dnmi::file::createPidFileName( "kvAgregated" );
   if ( backProduction.empty() || daemonMode ) {
       bool pidfileError;
       if(dnmi::file::isRunningPidFile(pidfile, pidfileError)){

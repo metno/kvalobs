@@ -34,7 +34,6 @@
 #include <exception>
 #include <corbahelper/corbaApp.h>
 
-
 namespace miutil{
   namespace conf{
       class ConfSection;
@@ -173,6 +172,20 @@ class KvApp : public CorbaHelper::CorbaApp
      \endverbatim
    */
   static void        setConfFile(const std::string &filename);
+
+  
+  /**
+   * Create a name for the pidfile. The name is on the form:
+   * 
+   * progname-nodename.pid
+   * 
+   * Where nodename is the name of the machine we are running on.
+   * 
+   * @param progname the progname part of the pidfile name.
+   * @return The name to use as the pidfile.
+   */  
+  static std::string createPidFileName( const std::string &progname );
+
   void createPidFile(const std::string &progname);
   void deletePidFile();
 

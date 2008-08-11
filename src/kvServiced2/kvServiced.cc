@@ -80,7 +80,7 @@ main(int argc, char** argv)
     return 1;
   }
   
-  pidfile=string(pKv)+"/var/run/kvServiced.pid";
+  pidfile=KvApp::createPidFileName( "kvServiced" );
 
   if(dnmi::file::isRunningPidFile(pidfile, error)){
     if(error){

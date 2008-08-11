@@ -76,7 +76,7 @@ main(int argc, char** argv)
   InitLogger(argc, argv, "kvServiced");
 
   
-  pidfile = kvPath("localstatedir")+"/run/kvServiced.pid";
+  pidfile = KvApp::createPidFileName( "kvServiced" );
 
   if(dnmi::file::isRunningPidFile(pidfile, error)){
     if(error){

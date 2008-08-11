@@ -28,6 +28,7 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+#include <sys/utsname.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <signal.h>
@@ -35,8 +36,34 @@
 #include <iostream>
 #include "pidfileutil.h"
 #include <stdio.h>
+#include <kvalobs/kvPath.h>
 
 using namespace std;
+
+
+std::string 
+dnmi::file::
+createPidFileName(const std::string &progname)
+{
+  struct utsname buf;
+  string nodename;
+  string pidfilename;
+  
+  if( uname( &buf ) == 0 ) 
+	  nodename = buf.nodename;
+  
+  pidfilename=kvPath("localstatedir");
+  pidfilename+="/run/";
+  pidfilename+=progname;
+  
+  if( !nodename.empty() ) 
+	  pidfilename += "-" + nodename;
+   
+  pidfilename += ".pid";
+  
+  return pidfilename;
+}
+
 
 bool 
 dnmi::file::createPidFile(const std::string &pidfile)
