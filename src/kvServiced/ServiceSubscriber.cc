@@ -565,7 +565,7 @@ DataFunc::DataFunc(const DataToSendList &dataList)
   CORBA::Long            obsi=0;
   CORBA::Long            datai;
   char                   *sTmp;
-  char                   buf[20];
+  char                   buf[64];
   bool                   hasData;
 
   data.length(dataList.size());
