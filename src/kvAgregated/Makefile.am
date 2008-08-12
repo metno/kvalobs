@@ -64,7 +64,7 @@ kvAgregatedTest_SOURCES = \
 	$(kvAgregated_SOURCES:main.cc=)
 
 kvAgregatedTest_CPPFLAGS = $(kvAgregated_CPPFLAGS) $(cppunit_CFLAGS)
-kvAgregatedTest_LDFLAGS = \ 
+kvAgregatedTest_LDFLAGS = \
 		$(cppunit_LIBS)  \
 		$(top_builddir)/src/service-libs/kvcpp/libkvcpp.la \
       $(top_builddir)/src/lib/kvalobs/libkvalobs.la
