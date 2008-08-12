@@ -33,6 +33,7 @@ kvAgregated_LDFLAGS = -rpath $(pkglibdir) -export-dynamic
 
 kvAgregated_LDADD = \
 	$(top_builddir)/src/service-libs/kvcpp/libkvcpp.la \
+	$(top_builddir)/src/lib/kvalobs/libkvalobs.la \
 	$(top_builddir)/src/lib/fileutil/libfileutil.la \
 	$(top_builddir)/src/lib/miconfparser/libmiconfparser.a \
 	$(BOOST_PROGRAM_OPTIONS_LIB) 
@@ -63,4 +64,7 @@ kvAgregatedTest_SOURCES = \
 	$(kvAgregated_SOURCES:main.cc=)
 
 kvAgregatedTest_CPPFLAGS = $(kvAgregated_CPPFLAGS) $(cppunit_CFLAGS)
-kvAgregatedTest_LDFLAGS = $(cppunit_LIBS) ../service-libs/kvcpp/libkvcpp.la
+kvAgregatedTest_LDFLAGS = \ 
+		$(cppunit_LIBS)  \
+		$(top_builddir)/src/service-libs/kvcpp/libkvcpp.la \
+      $(top_builddir)/src/lib/kvalobs/libkvalobs.la
