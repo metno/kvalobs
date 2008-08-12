@@ -359,7 +359,7 @@ operator()()
     ost.str("");
     ost << "WHERE obstime>='" << lowerBound.isoTime() << "' AND " 
 	<< "process_start IS NULL " 
-	<< "ORDER BY priority, obstime, tbtime, typeid DECS "
+	<< "ORDER BY priority, obstime, tbtime, typeid DESC "
 	<< "LIMIT " << HIGH_PRI_LIMIT;
 
 
