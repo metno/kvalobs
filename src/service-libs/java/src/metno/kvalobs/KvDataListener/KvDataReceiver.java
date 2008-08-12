@@ -90,6 +90,14 @@ public class KvDataReceiver implements KvDataEventListener {
     										" obstime: " + elem[j].obstime);
     						}
  
+    						logger.info("sid: "+elem[j].stationID+
+									    " tid: "+elem[j].typeID_+
+									    " pid: "+elem[j].paramID+
+									    " otime: " + elem[j].obstime+
+									    " orig: " +elem[j].original+
+									    " cor: " +elem[j].corrected +
+									    " cinfo: "+elem[j].controlinfo+
+									    " uinfo: "+elem[j].useinfo );
     						
     						query=dataInserter.createInsertQuery(elem[j], dbconn.getDbdriver());
     						logger.debug(query);
