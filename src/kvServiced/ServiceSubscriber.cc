@@ -585,38 +585,38 @@ DataFunc::DataFunc(const DataToSendList &dataList)
       data[obsi].dataList.length(itd->dataList.size());
       hasData=true;
 
-      for(list<kvalobs::kvData>::const_iterator it=itd->dataList.begin();
-	  it!=itd->dataList.end(); 
-	  it++) {
-
-	data[obsi].dataList[datai].stationID=it->stationID(); 
-	data[obsi].dataList[datai].obstime=it->obstime().isoTime().c_str();
-	data[obsi].dataList[datai].original=it->original();
-	data[obsi].dataList[datai].paramID=it->paramID();
-	data[obsi].dataList[datai].tbtime=it->tbtime().isoTime().c_str();
-	data[obsi].dataList[datai].typeID_=it->typeID();
+      for( list<kvalobs::kvData>::const_iterator it=itd->dataList.begin();
+      	  it!=itd->dataList.end(); 
+	        it++) {
+      	LOGDEBUG("DS: " << *it );
+      	data[obsi].dataList[datai].stationID=it->stationID(); 
+      	data[obsi].dataList[datai].obstime=it->obstime().isoTime().c_str();
+      	data[obsi].dataList[datai].original=it->original();
+      	data[obsi].dataList[datai].paramID=it->paramID();
+      	data[obsi].dataList[datai].tbtime=it->tbtime().isoTime().c_str();
+      	data[obsi].dataList[datai].typeID_=it->typeID();
 	
-	sprintf(buf, "%d", it->sensor()); 
-	sTmp=CORBA::string_dup(buf);
+      	sprintf(buf, "%d", it->sensor()); 
+      	sTmp=CORBA::string_dup(buf);
 	
-	if(sTmp){
-	  data[obsi].dataList[datai].sensor=sTmp;
-	}else{
-	  LOGERROR("DataFunc (CTOR): NOMEM for <kvData::sensor>!");
-	}
+      	if(sTmp){
+      		data[obsi].dataList[datai].sensor=sTmp;
+      	}else{
+      		LOGERROR("DataFunc (CTOR): NOMEM for <kvData::sensor>!");
+      	}
 	
-	data[obsi].dataList[datai].level=it->level();
-	data[obsi].dataList[datai].corrected=it->corrected();
-	data[obsi].dataList[datai].controlinfo=it->controlinfo().flagstring().c_str();
-	data[obsi].dataList[datai].useinfo=it->useinfo().flagstring().c_str();
-	data[obsi].dataList[datai].cfailed=it->cfailed().c_str();
+      	data[obsi].dataList[datai].level=it->level();
+      	data[obsi].dataList[datai].corrected=it->corrected();
+      	data[obsi].dataList[datai].controlinfo=it->controlinfo().flagstring().c_str();
+      	data[obsi].dataList[datai].useinfo=it->useinfo().flagstring().c_str();
+      	data[obsi].dataList[datai].cfailed=it->cfailed().c_str();
 	
-	datai++;
+      	datai++;
       }
 
       if(datai!=itd->dataList.size()){
-	LOGERROR("Datafunc (CTOR): Inconsistent size, dataList!");
-	data[obsi].dataList.length(datai);
+      	LOGERROR("Datafunc (CTOR): Inconsistent size, dataList!");
+      	data[obsi].dataList.length(datai);
       }
 	
     }else{
@@ -628,23 +628,22 @@ DataFunc::DataFunc(const DataToSendList &dataList)
       data[obsi].textDataList.length(itd->textDataList.size());
       hasData=true;
 
-      for(list<kvalobs::kvTextData>::const_iterator it=itd->textDataList.begin();
-	  it!=itd->textDataList.end();
-	  it++) {
-
-	data[obsi].textDataList[datai].stationID=it->stationID(); 
-	data[obsi].textDataList[datai].obstime=it->obstime().isoTime().c_str();
-	data[obsi].textDataList[datai].original=it->original().c_str();
-	data[obsi].textDataList[datai].paramID=it->paramID();
-	data[obsi].textDataList[datai].tbtime=it->tbtime().isoTime().c_str();
-	data[obsi].textDataList[datai].typeID_=it->typeID();
+      for( list<kvalobs::kvTextData>::const_iterator it=itd->textDataList.begin();
+           it!=itd->textDataList.end();
+	        it++) {
+      	data[obsi].textDataList[datai].stationID=it->stationID(); 
+      	data[obsi].textDataList[datai].obstime=it->obstime().isoTime().c_str();
+      	data[obsi].textDataList[datai].original=it->original().c_str();
+      	data[obsi].textDataList[datai].paramID=it->paramID();
+      	data[obsi].textDataList[datai].tbtime=it->tbtime().isoTime().c_str();
+      	data[obsi].textDataList[datai].typeID_=it->typeID();
 	
-	datai++;
+      	datai++;
       }
 
       if(datai!=itd->textDataList.size()){
-	LOGERROR("Datafunc (CTOR): Inconsistent size, textDataList!");
-	data[obsi].textDataList.length(datai);
+      	LOGERROR("Datafunc (CTOR): Inconsistent size, textDataList!");
+      	data[obsi].textDataList.length(datai);
       }
 
     }else{

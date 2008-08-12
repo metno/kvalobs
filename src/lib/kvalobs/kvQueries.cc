@@ -137,7 +137,7 @@ kvQueries::selectDataFromType(const int sid,
   
   ost << " where stationid=" << sid
       << " and typeid="      << tid
-      << " and obstime=\'"   << otime.isoTime() << "\'";
+      << " and obstime=\'"   << otime.isoTime() << "\' ORDER BY paramid, level, sensor";
   
   return ost.str();
 }

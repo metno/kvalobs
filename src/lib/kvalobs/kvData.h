@@ -31,6 +31,7 @@
 #ifndef __kvData_h__
 #define __kvData_h__
 
+#include <ostream>
 #include <kvalobs/kvDbBase.h>
 #include <kvalobs/kvDataFlag.h>
 
@@ -146,6 +147,8 @@ public:
   void useinfo(int flag, char newVal);
   void cfailed(const miutil::miString& cf) { cfailed_     =cf;}
 
+  friend std::ostream& operator<<( std::ostream& output,
+                                   const kvalobs::kvData &d );
 };
 
 /** @} */

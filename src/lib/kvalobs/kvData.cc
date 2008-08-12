@@ -293,3 +293,24 @@ kvalobs::kvData::useinfo(int flag,  char newVal)
 {
   useinfo_.set(flag,newVal);
 }
+
+std::ostream& 
+kvalobs::operator<<( std::ostream& output,
+                     const kvalobs::kvData& d)
+{
+  output << "["
+	     	<< "sid: "    << d.stationid_
+	     	<< " otime: " << d.obstime_
+	     	<< " tid: "   << d.typeid_ 
+			<< " pid: "   << d.paramid_
+			<< " lvl: "   << d.level_
+			<< " sen: "   << d.sensor_
+			<< " orig: "  <<  d.original_
+			<< " cor: "   << d.corrected_
+			<< " cinfo: " << d.controlinfo_
+			<< " uinfo: " << d.useinfo_ 
+			<< "]";
+  
+  return output;
+}
+
