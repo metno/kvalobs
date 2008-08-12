@@ -79,31 +79,31 @@ kvalobs::kvData::set(const dnmi::db::DRow &r_)
       buf=r[*it];
       
       if(*it=="stationid"){
-	stationid_=atoi(buf.c_str());
+      	stationid_=atoi(buf.c_str());
       }else if(*it=="obstime"){
-	obstime_=miTime(buf);
+      	obstime_=miTime(buf);
       }else if(*it=="original"){
-	sscanf(buf.c_str(),"%f", &original_);
+      	sscanf(buf.c_str(),"%f", &original_);
       }else if(*it=="paramid"){
-	paramid_=atoi(buf.c_str());
+      	paramid_=atoi(buf.c_str());
       }else if(*it=="tbtime"){
-	tbtime_=miTime(buf);
+      	tbtime_=miTime(buf);
       }else if(*it=="typeid"){
-	typeid_=atoi(buf.c_str());
+      	typeid_=atoi(buf.c_str());
       }else if(*it=="sensor"){
-	sensor_=atoi(buf.c_str());
+      	sensor_=atoi(buf.c_str());
       }else if(*it=="level"){
-	level_=atoi(buf.c_str());
+      	level_=atoi(buf.c_str());
       }else if(*it=="corrected"){
-	sscanf(buf.c_str(),"%f", &corrected_);
+      	sscanf(buf.c_str(),"%f", &corrected_);
       }else if(*it=="controlinfo"){
-	controlinfo_=kvControlInfo(buf);
+      	controlinfo_=kvControlInfo(buf);
       }else if(*it=="useinfo"){
-	useinfo_=kvUseInfo(buf);
+      	useinfo_=kvUseInfo(buf);
       }else if(*it=="cfailed"){
-	  cfailed_=buf;
+      	cfailed_=buf;
       }else{
-	CERR("kvData::set .. unknown entry:" << *it << std::endl);
+      	CERR("kvData::set .. unknown entry:" << *it << std::endl);
       }
     }
     catch(...){
@@ -113,6 +113,50 @@ kvalobs::kvData::set(const dnmi::db::DRow &r_)
  
   createSortIndex();
   return true;
+}
+
+kvalobs::
+kvData::
+kvData( const kvData &d ) :
+	stationid_( d.stationid_ ),
+	obstime_( d.obstime_ ),
+	original_( d.original_ ),
+	paramid_( d.paramid_ ),
+	tbtime_( d.tbtime_ ),
+	typeid_( d.typeid_ ),
+	sensor_( d.sensor_ ),
+	level_( d.level_ ),
+	corrected_( d.corrected_ ),
+	controlinfo_( d.controlinfo_ ),
+	useinfo_( d.useinfo_ ),
+	cfailed_( d.cfailed_ )
+{
+	createSortIndex();
+}
+
+kvalobs::kvData&
+kvalobs::
+kvData::
+operator=(const kvData &rhs )
+{
+	if( this != &rhs ) {
+		stationid_   = rhs.stationid_;
+		obstime_     = rhs.obstime_;
+		original_    = rhs.original_;
+		paramid_     = rhs.paramid_;
+		tbtime_      = rhs.tbtime_; 
+		typeid_      = rhs.typeid_;
+		sensor_      = rhs.sensor_;
+		level_       = rhs.level_;
+		corrected_   = rhs.corrected_;
+		controlinfo_ = rhs.controlinfo_;
+		useinfo_     = rhs.useinfo_;
+		cfailed_     = rhs.cfailed_;
+		
+		createSortIndex();
+	}
+	
+	return *this;
 }
 
 bool 

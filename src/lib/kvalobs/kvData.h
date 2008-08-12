@@ -71,6 +71,8 @@ private:
 
 public:
   kvData() {clean();}
+  kvData( const kvData &d );
+ 
   kvData(const dnmi::db::DRow &r){set(r);}
   kvData(int                      pos, 
 	 const miutil::miTime &   obt,    
@@ -115,9 +117,10 @@ public:
   // typeid for observations artificially created by kvalobs
   enum { kv_typeid = 5 };
 
-
-
   char* tableName()           const {return "data";}
+
+  kvData& operator=(const kvData &rhs );
+  
   miutil::miString toSend()   const;
   miutil::miString toUpdate() const;
   miutil::miString toUpload() const;
