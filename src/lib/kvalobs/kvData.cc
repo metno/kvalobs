@@ -41,6 +41,24 @@ using namespace std;
 using namespace miutil;
 using namespace dnmi;
 
+kvalobs::kvData::kvData( const kvalobs::kvData &d ) :
+	stationid_( d.stationid_ ),
+	obstime_( d.obstime_ ),
+	original_( d.original_ ),
+	paramid_( d.paramid_ ),
+	tbtime_( d.tbtime_ ),
+	typeid_( d.typeid_ ),
+	sensor_( d.sensor_ ),
+	level_( d.level_ ),
+	corrected_( d.corrected_ ),
+	controlinfo_( d.controlinfo_ ),
+	useinfo_( d.useinfo_ ),
+	cfailed_( d.cfailed_ )
+{
+	createSortIndex();
+}
+
+
 void 
 kvalobs::kvData::createSortIndex() 
 {
@@ -115,29 +133,11 @@ kvalobs::kvData::set(const dnmi::db::DRow &r_)
   return true;
 }
 
-kvalobs::
-kvData::
-kvData( const kvData &d ) :
-	stationid_( d.stationid_ ),
-	obstime_( d.obstime_ ),
-	original_( d.original_ ),
-	paramid_( d.paramid_ ),
-	tbtime_( d.tbtime_ ),
-	typeid_( d.typeid_ ),
-	sensor_( d.sensor_ ),
-	level_( d.level_ ),
-	corrected_( d.corrected_ ),
-	controlinfo_( d.controlinfo_ ),
-	useinfo_( d.useinfo_ ),
-	cfailed_( d.cfailed_ )
-{
-	createSortIndex();
-}
 
 kvalobs::kvData&
 kvalobs::
 kvData::
-operator=(const kvData &rhs )
+operator=(const kvalobs::kvData &rhs )
 {
 	if( this != &rhs ) {
 		stationid_   = rhs.stationid_;
