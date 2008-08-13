@@ -20,7 +20,7 @@ N_TEST_RUN=0
 N_TEST_FAILED=0
 N_TEST_OK=0
 
-GETDATA=$KVTESTDIR/bin/sqlhelper
+GETDATA=$HOME/bin/sqlhelper
 
 if ! mkdir -p $DATADIR; then
 	echo "Kan ikke opprette katalogen: $DATADIR ! " >> $TESTRAPORT 
