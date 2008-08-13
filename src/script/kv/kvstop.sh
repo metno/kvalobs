@@ -41,7 +41,7 @@ else
     exit 1
 fi
 
-if [ "$USER" != "$KVUSER" ]; then
+if [ "$USER" != "$KVUSER"  -o "$USER" != "root" ]; then
    echo "Only the '$KVUSER' user my start kvalobs."
    echo "You are loggd in as user '$USER'"
    exit 1
