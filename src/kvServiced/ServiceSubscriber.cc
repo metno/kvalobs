@@ -590,7 +590,9 @@ DataFunc::DataFunc(const DataToSendList &dataList)
       for( list<kvalobs::kvData>::const_iterator it=itd->dataList.begin();
       	  it!=itd->dataList.end(); 
 	        it++) {
-      	LOGDEBUG("DS: " << *it );
+      	/* DEBUG
+      	  LOGDEBUG("DS: " << *it );
+      	 */
       	data[obsi].dataList[datai].stationID   = it->stationID(); 
       	data[obsi].dataList[datai].obstime     = it->obstime().isoTime().c_str();
       	data[obsi].dataList[datai].original    = it->original();
@@ -667,9 +669,9 @@ DataFunc::func(KvDataSubscriberPtr ptr)
  if(!checkStatusAndQc(ptr)){
    return;
  }
-  
- ostringstream ost;
  
+ /* DEBUG
+ ostringstream ost;
  for( CORBA::Long i=0; i<data.length(); ++i) {
 	 for( CORBA::Long k=0; k<data[i].dataList.length(); ++k ) {
 		 ost << "CORBA["
@@ -688,6 +690,7 @@ DataFunc::func(KvDataSubscriberPtr ptr)
  }
  
  LOGDEBUG( ost.str() );
+ */
  
  try{
     kvDataSubscriber_var ref=ptr->subscriber();
