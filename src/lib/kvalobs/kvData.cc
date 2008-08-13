@@ -299,16 +299,16 @@ kvalobs::operator<<( std::ostream& output,
                      const kvalobs::kvData& d)
 {
   output << "["
-	     	<< "sid: "    << d.stationid_
-	     	<< " otime: " << d.obstime_
-	     	<< " tid: "   << d.typeid_ 
-			<< " pid: "   << d.paramid_
-			<< " lvl: "   << d.level_
-			<< " sen: "   << d.sensor_
-			<< " orig: "  <<  d.original_
-			<< " cor: "   << d.corrected_
-			<< " cinfo: " << d.controlinfo_
-			<< " uinfo: " << d.useinfo_ 
+	     	<< "sid: "    << d.stationID()
+	     	<< " otime: " << d.obstime()
+	     	<< " tid: "   << d.typeID()
+			<< " pid: "   << d.paramID()
+			<< " lvl: "   << d.level()
+			<< " sen: "   << d.sensor()
+			<< " orig: "  <<  d.original()
+			<< " cor: "   << d.corrected()
+			<< " cinfo: " << d.controlinfo()
+			<< " uinfo: " << d.useinfo()
 			<< "]";
   
   return output;

@@ -28,6 +28,8 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+
+#include <sstream>
 #include <cstring>
 #include <kvalobs/kvDbGate.h>
 #include <kvalobs/kvWorkelement.h>
@@ -666,6 +668,27 @@ DataFunc::func(KvDataSubscriberPtr ptr)
    return;
  }
   
+ ostringstream ost;
+ 
+ for( CORBA::Long i=0; i<data.length(); ++i) {
+	 for( CORBA::Long k=0; k<data[i].dataList.length(); ++k ) {
+		 ost << "CORBA["
+			     	<< "sid: "    << data[i].dataList[k].stationID
+			     	<< " otime: " << data[i].dataList[k].obstime
+			     	<< " tid: "   << data[i].dataList[k].typeID_
+					<< " pid: "   << data[i].dataList[k].paramID
+					<< " lvl: "   << data[i].dataList[k].level
+					<< " sen: "   << data[i].dataList[k].sensor
+					<< " orig: "  << data[i].dataList[k].original
+					<< " cor: "   << data[i].dataList[k].corrected
+					<< " cinfo: " << data[i].dataList[k].controlinfo
+					<< " uinfo: " << data[i].dataList[k].useinfo
+					<< "]" << endl;
+	 }	 
+ }
+ 
+ LOGDEBUG( ost.str() );
+ 
  try{
     kvDataSubscriber_var ref=ptr->subscriber();
     ref->callback(data);
