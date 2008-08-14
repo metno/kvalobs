@@ -21,7 +21,7 @@ N_TEST_RUN=0
 N_TEST_FAILED=0
 N_TEST_OK=0
 
-GETSYNOP=kvsynopdbclt
+GETSYNOP=$(which kvsynopdbclt 2> /dev/null)
 
 if ! mkdir -p $DATADIR; then
 	echo "Kan ikke opprette katalogen: $DATADIR ! " >> $TESTRAPORT 
@@ -44,7 +44,7 @@ fi
 
 
 if [ ! -x "$GETSYNOP" ]; then
-	echo "Klienten for å hente ut SYNOP finnes ikke: $GETSYNOP">> $TESTRAPORT 
+	echo "Klienten for å hente ut SYNOP finnes ikke: 'kvsynopdbclt'">> $TESTRAPORT 
 	exit 2
 fi
 
