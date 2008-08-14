@@ -107,6 +107,7 @@ public class KvDataReceiver implements KvDataEventListener {
                             }
                             catch(SQLException SQLe){
                                 logger.error(new MiGMTTime() +": "+ SQLe);
+                                logger.error("SQL state: " + SQLe.getSQLState() );
                             
                                 if(query!=null)
                                     fout.println(query);
