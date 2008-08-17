@@ -211,8 +211,51 @@
 			
 		</target>
 
+	<!-- 
+	     Target to compile kvDataInputClt using only JavaSE call, this include using
+	     the included CORBA.
+	-->
+	<path id="kvDataInputClt.build.classpath">
+		<pathelement path="${builddir}"/>
+	</path>
+		
+	<target name="kvDataInputClt" depends="kvDataInputClt-compile">
+		<jar destfile="kvDataInputClt.jar" manifest="kvDataInputClt.manifest" >
+			<fileset dir="build/kvDataInputClt">
+				<include name="**/*.class"/>
+				<exclude name="**/*Test.class"/>
+			</fileset>
+		</jar>
+	</target>
+		
 	
+	<target name="kvDataInputClt-compile" depends="kvDataInputClt-idl" >
+		<mkdir dir="build/kvDataInputClt"/>
+		
+		<javac destdir="build/kvDataInputClt" srcdir="src/generated/kvDataInputClt" 
+			    classpathref="kvDataInputClt.build.classpath" debug="true"> 
+			<include name="**/*.java"/>	
+		</javac>
+		<javac destdir="build/kvDataInputClt" srcdir="src/metno/kvalobs/kvDataInputClt" 
+			    classpathref="kvDataInputClt.build.classpath" debug="true"> 
+			<include name="**/*.java"/>	
+		</javac>
+   </target>
 	
+	<target name="kvDataInputClt-idl" >
+		<apply executable="idlj" failonerror="true"> 
+			<arg value="-fclient" />
+			<arg value="-i" />
+			<arg value="../../../share/kvalobs/idl" />
+			<arg value="-td" />
+			<arg value="src/generated/kvDataInputClt" /> 
+			<srcfile/>
+			<filelist dir="../../../share/kvalobs/idl" 
+				files="datasource.idl,
+					   admin.idl" />  
+		</apply>
+		
+	</target>
 	
 	
 	<!-- ***********************************************
