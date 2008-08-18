@@ -92,6 +92,10 @@ int main(int argc, char** argv)
     }
   }
   
+  if( constr.empty() ) {
+	  constr = "user=kvalobs dbname=kvalobs host=localhost";
+  }
+  
   string driver( kvPath("pkglibdir")+"/db/pgdriver.so");
   string driveID;
 
@@ -107,7 +111,7 @@ int main(int argc, char** argv)
     con=manager.connect(driveID,constr);
     
     if(!con){
-	cerr << "Can't create connection to <" << driveID << endl;
+	cerr << "Can't create connection to <" << driveID << ">" << endl;
 	return 1;
     }
     cerr << "Connected to <" << driveID <<">"<< endl;
