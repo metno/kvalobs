@@ -48,7 +48,7 @@ public class CorbaHelper {
 			n++;
 			
 			if( hasPort )
-				nameServerLocation="NameService=corbaloc:iiop:"+cnameserver + "/NameService";
+				nameServerLocation = "NameService=corbaloc:iiop:"+cnameserver + "/NameService";
 			else
 				nameServerLocation ="NameService=corbaloc:iiop:"+cnameserver + ":2809/NameService";
 			
@@ -124,10 +124,8 @@ public class CorbaHelper {
 	    	 System.exit( 1 );
 	     }
 	        
-	     System.out.println("NameServer: narrow");
-	        
 	     try{
-	    	 CKvalObs.CDataSource.Data dataInput=DataHelper.narrow(obj);
+	    	 CKvalObs.CDataSource.Data dataInput = DataHelper.narrow(obj);
 	    	 return dataInput;
 	     }
 	     catch(Exception ex){
