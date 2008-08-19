@@ -176,7 +176,7 @@ int main(int argc, char** argv){
   for( int i=0; i<argc; ++i )
 	  cerr << "argv[" << i << "]= '"<<argv[i]<< "'" << endl;
   
-  return 0
+  return 0;
 	  
   if(!readPindexMap( kvParams )) {
     cerr <<"Could not read <" << kvParams << "> for identification ... exiting!" 
