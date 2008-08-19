@@ -137,15 +137,49 @@ miString format2kvalobs(struct filecontents* datain)
 /// juergens@met.no
 
 int main(int argc, char** argv){
-
-  if (argc<2) {
-    cerr <<"Usage: "<< argv[0] << "  <pose.input> <infile> <outfile>" <<endl;
+	string kvParams;
+	int ip=-1;
+	
+  if (argc<3) {
+    cerr <<"Usage: "<< argv[0] << "-p <param.kvalobs>  <pose.input> <infile> <outfile>" <<endl;
     return 1;
   } 
 
+  for( int i=0; i<argc; ++i ) {
+	  if( strcmp( argv[i], "-p") == 0 ) {
+		  if ( (i+1) < argc ) {
+			  kvParams = argv[i+1];
+		  }
+		  ip = i;
+		  break;
+	  }
+  }
 
-  if(!readPindexMap("etc/parmap.kvalobs")) {
-    cerr <<"Could not read etc/parmap.kvalobs for identification ... exiting!" 
+  if( kvParams.empty() ) {
+	  cerr << "Missing kvalobs parameterfile. Use the -p parameterfile option!"
+	  		<< endl;
+	  return 1;
+  }
+ 
+  //Remove the -p parameterfile option from the argv list.
+  
+  if( ip < 0 ) {
+	  cerr << "Unrecoverable internal error ...." << endl;
+	  return 1;
+  }
+  
+  for( int i=ip; i<(argc-2); ++i ) 
+	  argv[i] = argv[i+2];
+  
+  argc -= 2;
+  
+  for( int i=0; i<argc; ++i )
+	  cerr << "argv[" << i << "]= '"<<argv[i]<< "'" << endl;
+  
+  return 0
+	  
+  if(!readPindexMap( kvParams )) {
+    cerr <<"Could not read <" << kvParams << "> for identification ... exiting!" 
 	 << endl;
     return 1;
   }
