@@ -141,7 +141,7 @@ int main(int argc, char** argv){
 	int ip=-1;
 	
   if (argc<3) {
-    cerr <<"Usage: "<< argv[0] << "-p <param.kvalobs>  <pose.input> <infile> <outfile>" <<endl;
+    cerr <<"Usage: "<< argv[0] << " -p <param.kvalobs>  <pose.input> <infile> <outfile>" <<endl;
     return 1;
   } 
 
@@ -173,11 +173,11 @@ int main(int argc, char** argv){
   
   argc -= 2;
   
+  /* Debug:
   for( int i=0; i<argc; ++i )
 	  cerr << "argv[" << i << "]= '"<<argv[i]<< "'" << endl;
-  
-  return 0;
-	  
+  */
+  	  
   if(!readPindexMap( kvParams )) {
     cerr <<"Could not read <" << kvParams << "> for identification ... exiting!" 
 	 << endl;
