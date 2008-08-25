@@ -129,7 +129,7 @@ callSubscribers(const kvalobs::kvStationInfo &si)
   	}
 
   	if(!gate.select(textDataList,
-		  				 kvQueries::selectDataFromType(si.stationID(),
+		  				 kvQueries::selectTextDataFromType(si.stationID(),
 						  										 si.typeID(),
 																 si.obstime()))){
     	textDataList.clear();
