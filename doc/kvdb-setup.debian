@@ -43,6 +43,17 @@ folgende linje:
 
 8.3 kvalobs *
 
+Opprett også filen .pgpass og legg passordet til kvalobs brukeren som
+kvalobs programvaren bruker inn i filen. På denne måten trenger ikke 
+kvalobs.conf å innholde noen passord og vi trenger ikke sette environment
+variabelen PGPASSWORD for skriptene. Den foretrukne kvalobs brukeren for
+kvalobs programvaren er kvproc.
+
+Eks på .pgpass file er 
+
+localhost:5437:kvalobs:kvalobs:kvalobs#password
+localhost:5437:kvalobs:kvproc:kvproc#password
+
 Login i databasen med psql template1 og opprett databasen kvalobs.
 
 Database schemaene kan nå legges inn databasen.
@@ -56,6 +67,14 @@ psql template1 < /usr/share/kvalobs/db/kvalobs_createdb.sql
 Opprett tabeller
 psql kvalobs < /usr/share/kvalobs/db/kvalobs_schema.sql
 
+Før metadataene kan lastes inn må de legges in i /usr/share/kvalobs/metadata.
 
+Så må man sette environment variabelene
+PGHOST og PGPORT, perlscriptene er avhengig av disse.
 
+Eks.
+ PGPORT=5437
+ PGHOST=localhost
 
+Laste inn metadata i kavlobs databasen
+/usr/lib/kvalobs_metadata/bin/run_metadata
