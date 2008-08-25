@@ -58,6 +58,10 @@ public class KvDataReceiver implements KvDataEventListener {
                                       app.getTextDataTablename());
     }
 
+    public void updateElem( DataElem elem, DbConnection dbcon) {
+   
+    }
+    
     public void kvDataEvent(KvDataEvent event) {
     	DbConnection dbconn=app.newDbConnection();
     	String query=null;
@@ -108,6 +112,10 @@ public class KvDataReceiver implements KvDataEventListener {
                             catch(SQLException SQLe){
                                 logger.error(new MiGMTTime() +": "+ SQLe);
                                 logger.error("SQL state: " + SQLe.getSQLState() );
+                                
+                                if( SQLe.getSQLState().startWith("23") ) {
+                                	updateElem( elem[j], dbconn );
+                                }
                             
                                 if(query!=null)
                                     fout.println(query);
