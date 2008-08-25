@@ -143,6 +143,21 @@ kvQueries::selectDataFromType(const int sid,
 }
 
 miString 
+kvQueries::selectTextDataFromType(const int sid,
+			      const int tid,
+			      const miTime& otime)
+{
+  ostringstream ost;
+  
+  ost << " where stationid=" << sid
+      << " and typeid="      << tid
+      << " and obstime=\'"   << otime.isoTime() << "\' ORDER BY paramid";
+  
+  return ost.str();
+}
+
+
+miString 
 kvQueries::selectDataFromAbsType(const int sid,
 				 const int tid,
 				 const miTime& otime)

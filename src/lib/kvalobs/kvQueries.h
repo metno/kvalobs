@@ -101,6 +101,17 @@ namespace kvQueries {
 
 
   /**
+   * \brief select all rows from table \em text_data matching
+   *  stationid=sid, typeid=tid and obstime=otime.
+   * 
+   * The result is sorted by paramid.
+   */
+  miutil::miString  selectTextDataFromType(const int sid,
+		  							                const int tid,
+	                                        const miutil::miTime& otime);
+
+  
+  /**
    * \brief select all rows from table \em data matching
    *  stationid=sid, abs(typeid)=abs(tid) and obstime=otime
    */
