@@ -500,7 +500,7 @@ void
 Synop::Naa_Vind_Kode(std::string &kode, float retn, float hast)
 {  
   	char tmp[30];
-  
+  	
   	kode="////";
   
   	if( hast < 0.1 )
@@ -511,43 +511,43 @@ Synop::Naa_Vind_Kode(std::string &kode, float retn, float hast)
   
   	if( fabs(retn) > 360){ /* Grensefeil */
     	if(hast > 98 ){     /* Grensefeil */
-      		kode="////";
+    		kode="////";
     	}else{
-      		hast *=KNOPFAKTOR;  
-      		hast = floor( (double) hast+0.5);
+    		hast *=KNOPFAKTOR;  
+    		hast = floor( (double) hast+0.5);
       
-      		if(hast<1.0)
-				kode="0000";
-      		else if(hast >= 99.0){
-				sprintf(tmp,"//99 00%03.0f",hast);
+    		if(hast<1.0)
+    			kode="0000";
+    		else if(hast >= 99.0){
+    			sprintf(tmp,"//99 00%03.0f",hast);
 				kode=tmp;
-      		}else{
+    		}else{
 				sprintf(tmp,"//%02.0f",hast);
 				kode=tmp;
-      		}
+    		}
     	}
   	}else{
     	if(retn>=5)
-      		retn = floor( (double)(retn/10)+0.5 );
+    		retn = floor( (double)(retn/10)+0.5 );
     	else   
-      		retn = 36;
+    		retn = 36;
     
     	if(fabs(hast) > 98 ){     /* Grensefeil */
-      		sprintf(tmp,"%02.0f//",retn);
-      		kode=tmp;
+    		sprintf(tmp,"%02.0f//",retn);
+    		kode=tmp;
     	}else{
-      		hast *= KNOPFAKTOR;
-      		hast = floor( (double) hast+0.5);
+    		hast *= KNOPFAKTOR;
+    		hast = floor( (double) hast+0.5);
       
-      		if(hast<1.0)
+    		if(hast<1.0)
 				kode="0000";
-      		else if(hast>=99.0){
+    		else if(hast>=99.0){
 				sprintf(tmp,"%02.0f99 00%03.0f",retn,hast);
-	  			kode=tmp;
-      		}else{
+				kode=tmp;
+    		}else{
 				sprintf(tmp,"%02.0f%02.0f",retn,hast);
 				kode=tmp;
-      		}
+    		}
     	}
   	}
 }
@@ -960,42 +960,44 @@ Synop::Max_Vind_Gust_Kode(std::string &kode, SynopDataList &sd)
 		return;
 
     if(nTimeStr<6){
-      	if(sd[0].FG==FLT_MAX || sd[0].FG<0)
-			return;
+     	if(sd[0].FG==FLT_MAX || sd[0].FG<0)
+     		return;
 
-      	fMax=sd[0].FG;
-      	fMax *= KNOPFAKTOR;
+      fMax=sd[0].FG;
+      fMax *= KNOPFAKTOR;
+      fMax = floor((double) fMax + 0.5);
+      
+      if(fMax>=99.0 && fMax<=176){
+      	sprintf(stmp, " 91199 00%03.0f", fMax);
+      	kode=stmp;
+      }else if(fMax<99.0){
+      	sprintf(stmp, " 911%02.0f", fMax);
+      	kode=stmp;
+      }
 
-      	if(fMax>=99.0 && fMax<=176){
-			sprintf(stmp, " 91199 00%03.0f", fMax);
-			kode=stmp;
-      	}else if(fMax<99.0){
-			sprintf(stmp, " 911%02.0f", fMax);
-			kode=stmp;
-      	}
-
-      	return;
+      return;
     }
 
     
 
     for(int i=0; i<6; i++){
-      	if(sd[i].vindHastGust==FLT_MAX)
+      if(sd[i].vindHastGust==FLT_MAX)
 			return;
       
-      	if(sd[i].vindHastGust>fMax)
+      if(sd[i].vindHastGust>fMax)
 			fMax=sd[i].vindHastGust;
     }
 
     if(fMax<0)
-      	return;
+      return;
     
     fMax *= KNOPFAKTOR;
-
+    fMax = floor((double) fMax+0.5);
+    
     if(fMax>=99.0)
-      	sprintf(stmp, " 91199 00%03.0f", fMax);
+     	sprintf(stmp, " 91199 00%03.0f", fMax);
     else
-      	sprintf(stmp, " 911%02.0f", fMax);
+     	sprintf(stmp, " 911%02.0f", fMax);
 
     kode=stmp;
 }
@@ -1099,6 +1101,9 @@ Synop::Max_Vind_Max_Kode(std::string &kode, SynopDataList &sd)
             cTid=sd[0].ITZ[0];
       }   
 
+      //Guard against rounding error.
+      fMax = floor( (double) fMax+0.5);
+      
       if(fMax>=0 && fMax<176){
          if(fMax>=99)
             sprintf(stmp, "99 00%03.0f", fMax);
@@ -1168,9 +1173,11 @@ Synop::Max_Vind_Max_Kode(std::string &kode, SynopDataList &sd)
       kode+="///";
       return;
    }
-      
-   iMax= (int)rint(fMax*KNOPFAKTOR);
-   iNaaMax=(int)rint(sd[0].vindHastNaa*KNOPFAKTOR);
+   
+   iMax = (int)floor((double) fMax*KNOPFAKTOR+0.5);
+   iNaaMax = (int) floor((double) sd[0].vindHastNaa*KNOPFAKTOR );
+ //  iMax= (int)rint(fMax*KNOPFAKTOR);
+ //  iNaaMax=(int)rint( sd[0].vindHastNaa*KNOPFAKTOR);
     
    if(iTidsAngiv==1){
       if(iMax==iNaaMax)
@@ -1540,8 +1547,14 @@ doEsss( std::string &kode, const SynopData &data )
    char buf[16];
    string em;
    string sa;
+   int    iSA;
    
-   if( data.EM == FLT_MAX && data.SA == FLT_MAX )
+   if( data.SA == FLT_MAX )
+   	iSA = INT_MAX;
+   else
+   	iSA = (int) floor((double) data.SA + 0.5 );
+   
+   if( data.EM == FLT_MAX && iSA == INT_MAX )
       return;
    
    if( data.EM == FLT_MAX || data.EM < 0 || data.EM > 10 )
@@ -1551,28 +1564,25 @@ doEsss( std::string &kode, const SynopData &data )
       em = buf;
    }
    
-   if( data.SA == FLT_MAX  || data.SA < -3 || data.SA > 996 )
+   if( iSA == INT_MAX  || iSA < -3 || iSA > 996 )
       sa = "///";
-   else if( data.SA == -1 ) {
+   else if( iSA == -1 ) {
       if( em =="/" )
          sa = "///";
       else
          sa = "998";
-   }else if( data.SA == 0 )
+   }else if( iSA == 0 )
       sa = "997";
-   else if( data.SA == -3 )
+   else if( iSA == -3 )
       sa = "999";
    else {
-      sprintf( buf, "%03.0f", data.SA );
+      sprintf( buf, "%03d", iSA );
       sa = buf;
    }
 
       
    //Creates the code 4E'sss
    kode = " 4" + em + sa;
-   
-   /*if( kode == " 4////")
-      kode.erase();*/
 }
 
 
