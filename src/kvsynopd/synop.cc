@@ -90,6 +90,9 @@
  * 
  * 2008-01-16 Bxrge
  * - Lagt til støtte for autmatisk målt VV (Vmor).
+ * 
+ * 2008-09-24 Bxrge
+ * - Rettet avrundingsfeil i Gust, max vind og E'sss.
  */
 
 using namespace std;
