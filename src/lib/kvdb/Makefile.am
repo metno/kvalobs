@@ -1,4 +1,4 @@
-AM_CPPFLAGS = -I $(top_srcdir)/src/lib
+AM_CPPFLAGS = -I $(top_srcdir)/src/lib -D_REENTRANT
 
 
 pkglib_LTLIBRARIES = libkvdb.la
