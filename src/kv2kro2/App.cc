@@ -293,14 +293,6 @@ printObsDataList( KvObsDataList& dataList )
       cerr<<"can not rename file"<<ptextfilename<<endl;
    }
   
-   string sysarg = "./obsInsert " + filename;
-   system(sysarg.c_str());
-
-   if( readText ){
-      sysarg = "./obsInsert " + textfilename;
-      system( sysarg.c_str() );
-   }
-  
    toTime.addHour(-6);
    storeToFile( fileFromTime, toTime );
    cout<<"**  printObsDataList is finished **"<<endl;
