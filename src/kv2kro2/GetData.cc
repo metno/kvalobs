@@ -67,4 +67,6 @@ next( kvservice::KvObsDataList &datalist )
       App::printObsDataList( datalist );
       cerr << "--------------------------\n";
    }
+   
+   return true;
 }
