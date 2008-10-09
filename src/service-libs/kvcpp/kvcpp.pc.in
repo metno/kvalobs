@@ -8,5 +8,5 @@ Name: kvcpp
 Description: Client library for Kvalobs
 Version: @VERSION@
 Requires: putools >= 3.0.0, omniDynamic4 
-Libs: -L${libdir} -lkvcpp -Wl,-rpath ${pkglibdir}
-Cflags: -I${includedir} -I${includedir}/@PACKAGE@ -I${includedir}/@PACKAGE@/kvskel/
+Libs: -L${libdir} -lkvcpp -Wl,-rpath ${pkglibdir} 
+Cflags: -D_REENTRANT -I${includedir} -I${includedir}/@PACKAGE@ -I${includedir}/@PACKAGE@/kvskel/

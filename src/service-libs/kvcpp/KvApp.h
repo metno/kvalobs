@@ -303,10 +303,32 @@ namespace kvservice
        * functions.
        *
        * It doesn't return before the application is ready to terminate,
-       * ie doShutdown is called or SIGQUIT/SIGINT is received. 
+       * ie doShutdown is called or SIGQUIT/SIGINT is received.
+       * 
+       * The event loop is in principle run as follow 
+       * 
+       * run() {
+       * 	
+       *    ......   
+       * 
+       *    while( not in shutdown ) {
+       * 		work();
+       * 		
+       *       ....
+       *    }
+       *   
+       *     .....
+       * }
        * 
        */
       virtual void run() =0;
+       
+      
+
+      /**
+       * \brief work is called on every turn of the event loop.
+       */
+      virtual void work() {};
 
     protected:
       virtual ~KvAppControl() {}

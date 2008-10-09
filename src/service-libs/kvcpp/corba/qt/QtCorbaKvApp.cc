@@ -159,12 +159,13 @@ namespace kvservice
 	    sleep( 1 );
 	  CommandBase *com = 0;
 	  while ( not app->shutdown() ) {
+		 app->work();
 	    com = app->signalQueue.get( 1 );
 	    if ( com )
 	      qApp->postEvent( QtCorbaKvApp::kvQApp, new GotDataEvent( com ) );
 	  }
 	  qApp->postEvent( qApp, new QEvent( (QEvent::Type) 1043 ) );
-	}
+}
       };
 
       void QtCorbaKvApp::run()

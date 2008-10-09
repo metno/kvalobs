@@ -229,8 +229,10 @@ namespace kvservice
 
     void CorbaKvApp::run()
     {
-      while ( not shutdown() )
-	sleep(1);
+   	 while ( not shutdown() ) {
+   		 work();
+   		 sleep(1);
+   	 }
     }
 
     bool 
