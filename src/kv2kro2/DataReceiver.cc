@@ -99,7 +99,7 @@ run()
    dnmi::thread::CommandBase *cmd;
    kvservice::KvEventBase *event;
    
-   while( app.shutdown() ) {
+   while( ! app.shutdown() ) {
       cmd = que.get( 2 );
       
       if( ! cmd )
