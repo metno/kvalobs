@@ -8,3 +8,6 @@ libmiutil_la_SOURCES = \
 
 libmiutil_la_CPPFLAGS = $(putools_CFLAGS)
 libmiutil_la_LIBADD = $(putools_LIBS)
+
+miutilincludedir = $(pkgincludedir)/miutil
+miutilinclude_HEADERS = cmprspace.h commastring.h miTimeParse.h trimstr.h
