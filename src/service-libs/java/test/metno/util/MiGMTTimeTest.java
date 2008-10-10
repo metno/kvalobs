@@ -67,4 +67,15 @@ public class MiGMTTimeTest extends TestCase{
     	TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
     	System.out.println("sqlT (GMT): " + sqlT );
     }
+    
+    public void testParse(){
+    	String t = "1970-01-10 02:00:00";
+    	MiGMTTime tt = new MiGMTTime();
+    	
+    	tt.parse(t);
+    	
+    	System.out.println("t (GMT) : " + tt.toString() );
+    	System.out.println("t : " + tt.toString(MiGMTTime.FMT_ISO) );
+    }
+
 }
