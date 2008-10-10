@@ -89,7 +89,7 @@ public class Main {
         if(!t.parse(date))
             return null;
         
-        return t.toString();
+        return t.toString( MiGMTTime.FMT_ISO );
     }
     
     static LinkedList createtTypelist(String typelist){
