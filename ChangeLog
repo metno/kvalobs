@@ -5,6 +5,7 @@
              - src/kvManagerd/InitLogger.cc
              - src/kvQabased/InitLogger.cc
              - src/kvServiced/InitLogger.cc
+             - src/kvServiced2/InitLogger.cc
              - src/kvsynopd/InitLogger.cc
              - src/norcom2kv/InitLogger.cc  
 
