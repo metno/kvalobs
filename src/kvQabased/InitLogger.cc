@@ -72,13 +72,13 @@ InitLogger(int argn, char **argv, const std::string &logname,
 	    i++;
 	    
 	    if(i<argn){
-	      traceLevel=getLogLevel(argv[i+1]);
+	      traceLevel=getLogLevel(argv[i]);
 	    }
 	}else if(strcmp("--loglevel", argv[i])==0){
 	    i++;
 	    
 	    if(i<argn){
-		logLevel=getLogLevel(argv[i+1]);
+		logLevel=getLogLevel(argv[i]);
 	    }
 	}
     }

@@ -60,7 +60,7 @@ InitLogger(int argn, char **argv, const std::string &logname)
 	    i++;
 	    
 	    if(i<argn){
-	      traceLevel=getLogLevel(argv[i+1]);
+	      traceLevel=getLogLevel(argv[i]);
 	      
 	      if(traceLevel==milog::NOTSET){
 		traceLevel=milog::DEBUG;
@@ -70,7 +70,7 @@ InitLogger(int argn, char **argv, const std::string &logname)
 	    i++;
 	    
 	    if(i<argn){
-		logLevel=getLogLevel(argv[i+1]);
+		logLevel=getLogLevel(argv[i]);
 		
 		if(logLevel==milog::NOTSET){
 		  logLevel=milog::INFO;
