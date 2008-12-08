@@ -1,3 +1,16 @@
+2008-12-08 Børge Moe
+           * Fixed an offset by one bug. Reported by Yngve.Einarsson@smhi.se.
+             Changed files.
+             - src/kvDataInputd/InitLogger.cc
+             - src/kvManagerd/InitLogger.cc
+             - src/kvQabased/InitLogger.cc
+             - src/kvServiced/InitLogger.cc
+             - src/kvsynopd/InitLogger.cc
+             - src/norcom2kv/InitLogger.cc  
+
+-------------
+
+
 2008-01-18 Børge Moe
            kvsynopd
            * Endret koding av Esss.
