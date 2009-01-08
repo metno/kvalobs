@@ -281,6 +281,61 @@ namespace kvQueries {
    */
   miutil::miString selectIsGenerated(long stationid, int typeid_);
 
+  /** EGLITIS (for Qc2)
+   * \brief select all rows from table \em data matching
+   *  stationid in list, paramid=pid and obstime in [stime - etime]
+   */
+  miutil::miString selectData(const std::list<int> slist,
+                              const int pid,
+                              const miutil::miTime& stime,
+                              const miutil::miTime& etime);
+  /** EGLITIS (for Qc2)
+   * \brief select all rows from table \em data matching
+   *  stationid in list, paramid=pid and obstime in [stime - etime]
+   */
+  miutil::miString selectData(const std::list<int> slist,
+                              const int pid,
+                              const int tid,
+                              const miutil::miTime& stime,
+                              const miutil::miTime& etime);
+
+  /** EGLITIS (for Qc2)
+   * \brief select all rows from table \em data matching
+   *  paramid=pid, typeid=tid, obstime in [stime - etime]
+   *  and controlinfo=controlString
+   */
+
+   miutil::miString selectData(const int pid, 
+                               const int tid, 
+                               const miutil::miTime& stime, 
+                               const miutil::miTime& etime, 
+                               const std::string& controlString);
+
+  /** EGLITIS (for Qc2)
+   * \brief select all rows from table \em data matching
+   *  a single stationid, paramid=pid and obstime in [stime - etime]
+   */
+   miutil::miString selectData(const int stid,
+                               const int pid, 
+                               const int tid, 
+                               const miutil::miTime& stime, 
+                               const miutil::miTime& etime);
+  /** EGLITIS (for Qc2)
+   * \brief select all rows from table \em data matching
+   *  a single stationid, paramid=pid and obstime in [stime - etime]
+   */
+   miutil::miString selectData(const int stid,
+                               const int pid,
+                               const miutil::miTime& stime,
+                               const miutil::miTime& etime);
+
+  /** EGLITIS (for Qc2)
+   * \brief A query to pick out missing float values especially
+   *  for Qc2 tests, for all stations at one particular time
+   */
+   miutil::miString selectMissingData(const float value,
+                                      const int pid, 
+                                      const miutil::miTime& Ptime);
   /** @} */
 };
 

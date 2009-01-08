@@ -585,3 +585,125 @@ selectIsGenerated(long stationid, int typeid_)
   
   return ost.str();
 }
+
+  /** EGLITIS (for Qc2)
+   * \brief select all rows from table \em data matching
+   *  stationid in list, paramid=pid and obstime in [stime - etime]
+   */
+miutil::miString 
+kvQueries::selectData(const std::list<int> slist, const int pid, const miutil::miTime& stime, const miutil::miTime& etime)
+{
+  ostringstream ost;
+
+  ost << " WHERE stationid IN (";
+
+  std::list<int>::const_iterator sp= slist.begin();
+  for (; sp!=slist.end(); sp++)
+    ost << (sp==slist.begin() ? "" : ",") << *sp;
+
+  ost << ") and paramid="     << pid
+      << " and obstime>=\'"  << stime.isoTime() << "\'"
+      << " and obstime<=\'"  << etime.isoTime() << "\'"
+      << " order by obstime";
+
+  return ost.str();
+}
+
+  /** EGLITIS (for Qc2)
+   * \brief select all rows from table \em data matching
+   *  stationid in list, paramid=pid and obstime in [stime - etime]
+   */
+miutil::miString 
+kvQueries::selectData(const std::list<int> slist, const int pid, const int tid, const miutil::miTime& stime, const miutil::miTime& etime)
+{
+  ostringstream ost;
+
+  ost << " WHERE stationid IN (";
+
+  std::list<int>::const_iterator sp= slist.begin();
+  for (; sp!=slist.end(); sp++)
+    ost << (sp==slist.begin() ? "" : ",") << *sp;
+
+  ost << ") and paramid="    << pid
+      << " and typeid="      << tid
+      << " and obstime>=\'"  << stime.isoTime() << "\'"
+      << " and obstime<=\'"  << etime.isoTime() << "\'"
+      << " order by obstime";
+
+  return ost.str();
+}
+
+  /** EGLITIS (for Qc2)
+   * \brief select all rows from table \em data matching
+   *  a single stationid, paramid=pid and obstime in [stime - etime]
+   */
+miutil::miString 
+kvQueries::selectData(const int stid, const int pid, const int tid, const miutil::miTime& stime, const miutil::miTime& etime)
+{
+  ostringstream ost;
+
+  ost << " WHERE stationid=" <<stid
+      << " and paramid="    << pid
+      << " and typeid="      << tid
+      << " and obstime>=\'"  << stime.isoTime() << "\'"
+      << " and obstime<=\'"  << etime.isoTime() << "\'"
+      << " order by obstime";
+
+  return ost.str();
+}
+
+  /** EGLITIS (for Qc2)
+   * \brief select all rows from table \em data matching
+   *  a single stationid, paramid=pid and obstime in [stime - etime]
+   */
+miutil::miString 
+kvQueries::selectData(const int stid, const int pid, const miutil::miTime& stime, const miutil::miTime& etime)
+{
+  ostringstream ost;
+
+  ost << " WHERE stationid=" <<stid
+      << " and paramid="    << pid
+      << " and obstime>=\'"  << stime.isoTime() << "\'"
+      << " and obstime<=\'"  << etime.isoTime() << "\'"
+      << " order by obstime";
+
+  return ost.str();
+}
+
+  /** EGLITIS (for Qc2)
+   * \brief select all rows from table \em data matching
+   *  paramid=pid and obstime in [stime - etime] and controlinfo="control string"
+   */
+miutil::miString 
+kvQueries::selectData(const int pid, const int tid, const miutil::miTime& stime, const miutil::miTime& etime, const string& controlString)
+{
+  ostringstream ost;
+
+  ost << " WHERE paramid="     << pid
+      << " and typeid="        << tid
+      << " and controlinfo=\'" << controlString   << "\'" 
+      << " and obstime>=\'"    << stime.isoTime() << "\'"
+      << " and obstime<=\'"    << etime.isoTime() << "\'"
+      << " order by obstime";
+
+  return ost.str();
+}
+
+
+  /** EGLITIS (for Qc2)
+   * \brief A query to pick out missing float values especially
+   *  for Qc2 tests, for all stations at one particular time
+   */
+miutil::miString 
+kvQueries::selectMissingData(const float value, const int pid, const miutil::miTime& Ptime)
+{
+  ostringstream ost;
+
+  ost << " WHERE original="     << value
+      << " and paramid="        << pid
+      << " and obstime=\'"      << Ptime.isoTime() << "\'"
+      << " order by obstime";
+
+  return ost.str();
+}
+
