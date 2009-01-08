@@ -50,7 +50,6 @@
 #include <qfont.h>
 #include <qlayout.h>
 
-#include "PaperField.h"
 
 #include "scone.h"
 
@@ -69,11 +68,6 @@ Process4D( ReadProgramOptions params )
    miutil::miTime stime=params.UT0;
    miutil::miTime etime=params.UT1;
    std::string CIF=params.ControlInfoString;
-  //QApplication a(0,0);                       //Only if we want to plot some results during testing
-  //PaperField Plotter(-100,-100,700,700,0,0);
-  //Plotter.setGeometry( 100, 100, 500, 355 );
-  //a.setMainWidget( &Plotter );
-  //Plotter.show();
 
   std::list<kvalobs::kvStation> StationList;
   std::list<int> StationIds;
@@ -190,13 +184,6 @@ Process4D( ReadProgramOptions params )
                                      DataToWrite(id->stationID(),id->obstime(),id->paramID());
                                 stList.push_back(DataToWrite);
 
-                           //if (id->controlinfo().flag(13)==9) {  
-                                //Plotter.AddPoint( (int)(10*d.original()),(int)(10*d.corrected()) ); 
-                                // Note the plot here is used when test data is being analysed
-                                // for the optimisation of algorithms.
-                                // 10* just for visibility on the simple pixmap!!
-                           //}
-
 
                            }
                        }
@@ -219,7 +206,6 @@ Process4D( ReadProgramOptions params )
   std::cout << "Timings : " << ProcessTime << std::endl;
   }
 
-//a.exec();
 return 0;
 }
 

@@ -50,7 +50,6 @@
 #include <qlcdnumber.h>
 #include <qfont.h>
 #include <qlayout.h>
-#include "PaperField.h"
 
 
 #include "ProcessControl.h"
@@ -86,11 +85,6 @@ Variability( ReadProgramOptions params )
 // --------------------------------------------
 
 
-  QApplication a(0,0);
-  PaperField Plotter;
-  Plotter.setGeometry( 100, 100, 500, 355 );
-  a.setMainWidget( &Plotter );
-  Plotter.show();
 
   std::list<kvalobs::kvStation> StationList;
   std::list<int> StationIds;
@@ -152,7 +146,6 @@ Variability( ReadProgramOptions params )
                 std::cout << " " << skew;
                 std::cout << " " << kurt;
                 std::cout << endl;
-                Plotter.AddPoint( iday,(int)(mean*10.0) );
                 ++iday;
        }
               
@@ -193,7 +186,6 @@ Variability( ReadProgramOptions params )
        }
   ProcessTime.addHour(StepH);
   }
-a.exec();
 return 0;
 }
 
