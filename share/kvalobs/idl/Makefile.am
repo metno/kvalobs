@@ -1,4 +1,6 @@
-EXTRA_DIST = \
+idldir = $(pkgdatadir)/idl
+
+idl_DATA = \
 	admin.idl \
 	commonStationInfo.idl \
 	datasource.idl \
@@ -12,3 +14,5 @@ EXTRA_DIST = \
 	managerInput.idl \
 	newfile.idl \
 	qabase.idl
+
+EXTRA_DIST = $(idl_DATA)
