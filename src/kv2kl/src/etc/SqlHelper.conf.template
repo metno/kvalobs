@@ -1,6 +1,6 @@
 #dbconnect=jdbc:oracle:thin:@euros:1521:dvh
 #dbdriver=oracle.jdbc.driver.OracleDriver
-#dblogin=kvalobs
+#dbuser=kvalobs
 #dbpasswd=obs2005
 
 dbconnect=jdbc:postgresql://localhost:5432/dvh
