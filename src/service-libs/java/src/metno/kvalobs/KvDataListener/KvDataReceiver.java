@@ -113,7 +113,7 @@ public class KvDataReceiver implements KvDataEventListener {
                                 logger.error(new MiGMTTime() +": "+ SQLe);
                                 logger.error("SQL state: " + SQLe.getSQLState() );
                                 
-                                if( SQLe.getSQLState().startWith("23") ) {
+                                if( SQLe.getSQLState().startsWith("23") ) {
                                 	updateElem( elem[j], dbconn );
                                 }
                             
