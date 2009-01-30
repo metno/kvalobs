@@ -99,6 +99,9 @@
 		<mkdir dir="${distdir}/share/kvalobs/java/etc"/>
 		<mkdir dir="${distdir}/etc"/>	
 		<mkdir dir="${distdir}/bin"/>
+		<mkdir dir="${distdir}/var"/>
+		<mkdir dir="${distdir}/var/run"/>
+		<mkdir dir="${distdir}/var/log"/>
 		<copy  todir="${distdir}/etc">
 			<fileset dir="src/etc">
 				<include name="*.conf.template"/>
@@ -157,6 +160,7 @@
 			</tarfileset>
 			<tarfileset dir="${distdir}" mode="644">
 				<include name="etc/*"/>
+				<include name="var/*"/>
 				<include name="share/kvalobs/java/lib/**/*"/>
 				<include name="share/kvalobs/java/etc/*"/>
 			</tarfileset>
