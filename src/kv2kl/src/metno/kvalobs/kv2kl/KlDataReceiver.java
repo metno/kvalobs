@@ -49,6 +49,10 @@ public class KlDataReceiver implements KvDataEventListener {
     	insertstmt=new SqlInsertHelper(app.getConnectionMgr(), backupfile);
     }
  
+    public KlDataReceiver(Kv2KlApp app, String backupfile, boolean enableFilter ){
+    	this.app=app;
+    	insertstmt=new SqlInsertHelper(app.getConnectionMgr(), backupfile, enableFilter );
+    }
     public void kvDataEvent(KvDataEvent event) {
     	ObsData[] obsData=event.getObsData();
     	app.updateLastKvContact();

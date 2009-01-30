@@ -44,8 +44,13 @@ public class Kv2KlMain {
 	static Logger logger = Logger.getLogger(Kv2KlMain.class);
 	
 	public static void use(int exitcode){
-		System.out.println("Usage: kv2kl [-s kvserver] [-h] [-c configFile]");
-        System.exit(exitcode);
+		System.out.println("Usage: kv2kl [-s kvserver] [-h] [-c configFile] -d ");
+		System.out.println("  OPTIONS");
+		System.out.println("    -d disable the data filter.");
+		System.out.println("    -s kvserver Override the kvserver in the config file.");
+		System.out.println("    -c configfile Use configfile.");
+		System.out.println("    -h This help message.");
+		System.exit(exitcode);
     }
 
 	
@@ -71,8 +76,9 @@ public class Kv2KlMain {
     	String subscriberid;
     	String hintid;
     	MiGMTTime now=new MiGMTTime();
-    	GetOpt go = new GetOpt("c:hs:");
+    	GetOpt go = new GetOpt("c:hs:d");
     	String kvserver=null;
+    	boolean enableFilter=true;
 
     	char c;
          
@@ -86,6 +92,9 @@ public class Kv2KlMain {
                  break;
              case 's':
             	 kvserver=go.optarg();
+            	 break;
+             case 'd':
+            	 enableFilter = false;
             	 break;
              default:
                  System.err.println("Unknown option character " + c);
@@ -127,7 +136,7 @@ public class Kv2KlMain {
 
          app=new Kv2KlApp(args, configfile, kvserver, false);
          dataSubscribeInfo=new KvDataSubscribeInfo();
-         dataReceiver=new KlDataReceiver( app, kvname+".dat" ); 
+         dataReceiver=new KlDataReceiver( app, kvname+".dat", enableFilter ); 
          hint=new KvHintListener(app);
          
     	logger.info("Starting: " +now);
