@@ -112,7 +112,6 @@ namespace kvalobs{
 	miutil::miTime getDate()const{ return dtObs;}  
 	void clean(){ data_.clear(); textData_.clear();dtObs=miutil::miTime();}
 
-	friend std::ostream& operator<<(std::ostream&, const SmsDataElem &el);
       };
 
 
