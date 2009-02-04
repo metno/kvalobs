@@ -116,6 +116,7 @@ namespace kvalobs{
       };
 
 
+      std::ostream& operator<<(std::ostream&, const SmsDataElem &el);
       typedef std::list<SmsDataElem>                   TSmsDataElem;
       typedef std::list<SmsDataElem>::iterator        ITSmsDataElem;
       typedef std::list<SmsDataElem>::const_iterator CITSmsDataElem;
