@@ -112,10 +112,10 @@ namespace kvalobs{
       long typeID()const{ return tid; }
   
       
-      friend std::ostream& operator<<(std::ostream&, const DecodedDataElem &el);
     };
 
     
+    std::ostream& operator<<(std::ostream&, const DecodedDataElem &el);
     typedef std::list<DecodedDataElem>                   TDecodedDataElem;
     typedef std::list<DecodedDataElem>::iterator        ITDecodedDataElem;
     typedef std::list<DecodedDataElem>::const_iterator CITDecodedDataElem;
