@@ -93,6 +93,8 @@
  * 
  * 2008-09-24 Bxrge
  * - Rettet avrundingsfeil i Gust, max vind og E'sss.
+ * 2009-02-26 Bxrge
+ * - #1241. Rettet feil i generereing av nedbør for en 1 fra RR_1. 
  */
 
 using namespace std;
