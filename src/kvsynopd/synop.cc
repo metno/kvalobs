@@ -2331,7 +2331,7 @@ Synop::nedborFromRR(float &nedbor, float &fRR24, int &tr, SynopDataList &sd)
     	nTimes=6;
   	}else{
     	tr=1;
-    	nTimes=2;
+    	nTimes=1;
   	}
   	
   	if(nTimeStr<nTimes)
