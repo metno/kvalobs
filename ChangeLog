@@ -1,3 +1,7 @@
+2009-02-26 Børge Moe
+           * kvSynopd
+             #1241. Fixed generation of hourly precipitation from RR_1.
+
 2009-01-08 Paul Eglitis
            * Copied prototype Qc2 source tree into the kvalobs/trunk/src/kvQc2
 
