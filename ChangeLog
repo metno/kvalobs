@@ -1,10 +1,23 @@
+----------------
+
+2009-03-23 Bxrge Moe
+           - new release 2.0.2.
+
+2009-03-23 Børge Moe
+           * kv2metdat
+             - Only transfer model data for norwegians stations to kvalobs db, 
+               ie stationid<100000.
+
+2009-03-23 Børge Moe
+           * kvSynopd
+             - #1241. Fixed tr(=5) for hourly precipitation from RR_1.
+
 2009-02-26 Børge Moe
            * kvSynopd
-             #1241. Fixed generation of hourly precipitation from RR_1.
+             - #1241. Fixed generation of hourly precipitation from RR_1.
 
 2009-01-08 Paul Eglitis
            * Copied prototype Qc2 source tree into the kvalobs/trunk/src/kvQc2
-
 
 2008-12-08 Børge Moe
            * Fixed an offset by one bug. Reported by Yngve.Einarsson@smhi.se.
