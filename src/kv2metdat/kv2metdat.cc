@@ -122,7 +122,7 @@ int main(int argc, char** argv)
     // Creating station list ...
 
     list<kvStation> pos;
-    gate.select(pos," where (lat!=0 or lon!=0) and static=true");
+    gate.select(pos," where (lat!=0 or lon!=0) and static=true and stationid < 100000");
 
     list<kvStation>::iterator po=pos.begin();
 
