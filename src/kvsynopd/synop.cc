@@ -94,7 +94,10 @@
  * 2008-09-24 Bxrge
  * - Rettet avrundingsfeil i Gust, max vind og E'sss.
  * 2009-02-26 Bxrge
- * - #1241. Rettet feil i generereing av nedbør for en 1 fra RR_1. 
+ * - #1241. Rettet feil i generereing av nedbør for en 1 time fra RR_1. 
+ *
+ * 2009-03-23 Bxrge
+ * - #1241. Rettet tr for en 1 times nedbør fra RR_1. 
  */
 
 using namespace std;
@@ -2332,7 +2335,7 @@ Synop::nedborFromRR(float &nedbor, float &fRR24, int &tr, SynopDataList &sd)
     	tr=1;
     	nTimes=6;
   	}else{
-    	tr=1;
+    	tr=5;
     	nTimes=1;
   	}
   	
@@ -2341,10 +2344,10 @@ Synop::nedborFromRR(float &nedbor, float &fRR24, int &tr, SynopDataList &sd)
 
   	for(int i=0; i<nTimes; i++){
     	if(sd[i].nedboer1Time==FLT_MAX)
-      		return 4;
+      	return 4;
     
     	if(sd[i].nedboer1Time>=0)
-      		sum+=sd[i].nedboer1Time;
+      	sum+=sd[i].nedboer1Time;
   	}
 
   	nedbor=sum;
@@ -2354,21 +2357,21 @@ Synop::nedborFromRR(float &nedbor, float &fRR24, int &tr, SynopDataList &sd)
     	sum=0.0;
 
     	for(i=0; i<24; i++){
-      		if(sd[i].nedboer1Time==FLT_MAX)
+    		if(sd[i].nedboer1Time==FLT_MAX)
 				break;
-      		else if(sd[i].nedboer1Time>=0.0)
+    		else if(sd[i].nedboer1Time>=0.0)
 				sum+=sd[i].nedboer1Time;
     	}
     
     	if(i==24)
-      		fRR24=sum;
+    		fRR24=sum;
   	}
   
   	LOGDEBUG("synopTidspunkt:          " << sd[0].time() 
 			 << "  RR=" <<  sd[0].nedboer1Time << endl
-	   		 << "synopTidspunkt-" << nTimes << " timer : " 
-	   		 << sd[nTimes-1].time() 
-	   		 << "  RR=" <<  sd[nTimes-1].nedboer1Time << endl);
+			 << "synopTidspunkt-" << nTimes << " timer : " 
+			 << sd[nTimes-1].time() 
+			 << "  RR=" <<  sd[nTimes-1].nedboer1Time << endl);
 
   
   	if(nedbor<=limit){
