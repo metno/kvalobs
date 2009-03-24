@@ -1,7 +1,11 @@
 ----------------
 
-2009-03-23 Bxrge Moe
+2009-03-24 Bxrge Moe
            - new release 2.0.2.
+
+2009-03-24 Bxrge Moe
+			  * kvSynopd
+             - Fixed rounding error in max wind code in section 555.
 
 2009-03-23 Børge Moe
            * kv2metdat

@@ -98,6 +98,9 @@
  *
  * 2009-03-23 Bxrge
  * - #1241. Rettet tr for en 1 times nedbør fra RR_1. 
+ *
+ * 2009-03-24 Bxrge
+ * - Rettet avrundingsfeil i max vind.
  */
 
 using namespace std;
@@ -1182,8 +1185,8 @@ Synop::Max_Vind_Max_Kode(std::string &kode, SynopDataList &sd)
       return;
    }
    
-   iMax = (int)floor((double) fMax*KNOPFAKTOR+0.5);
-   iNaaMax = (int) floor((double) sd[0].vindHastNaa*KNOPFAKTOR );
+   iMax = (int)floor((double) fMax*KNOPFAKTOR + 0.5);
+   iNaaMax = (int) floor((double) sd[0].vindHastNaa*KNOPFAKTOR + 0.5 );
  //  iMax= (int)rint(fMax*KNOPFAKTOR);
  //  iNaaMax=(int)rint( sd[0].vindHastNaa*KNOPFAKTOR);
     
