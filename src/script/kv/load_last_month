@@ -1,6 +1,6 @@
 #! /bin/sh
 
-muser="pal.sannes@met.no Per.Ove.Kjensli@met.no borgem@met.no"
+muser="bjorn.nordin@met.no"
 
 set -a
 #set -e
@@ -13,7 +13,7 @@ fi
 PGPORT=5434
 PGUSER=kvalobs
 PGHOST=localhost
-PGPASSWORD=`grep dbpass $KVALOBS/.kvpasswd | sed -e 's/ *dbpass *//'`
+# PGPASSWORD=`grep dbpass $KVALOBS/.kvpasswd | sed -e 's/ *dbpass *//'`
 
 backupdir=$KVALOBS/var/klima_backup
 logdir=$KVALOBS/var/log
@@ -74,7 +74,7 @@ if [ -s "$loadlog" ]; then
 	date=$(tail -1 $loadlog | cut -d' ' -f1 -)
 
 	if [ "$nowdate" = "$date" ]; then
-		log "Allready backed up!"
+		log "Already backed up!"
 		exit 0
 	fi
 fi 
@@ -104,7 +104,7 @@ fi
 
 N=0
 
-for file in "$files" ; do
+for file in $files ; do
 	rm -rf *
 	tar jxpf ../$file
 	
