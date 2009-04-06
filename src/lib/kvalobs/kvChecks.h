@@ -1,7 +1,7 @@
 /*
-  Kvalobs - Free Quality Control Software for Meteorological Observations 
+  Kvalobs - Free Quality Control Software for Meteorological Observations
 
-  $Id: kvChecks.h,v 1.1.2.2 2007/09/27 09:02:29 paule Exp $                                                       
+  $Id: kvChecks.h,v 1.1.2.2 2007/09/27 09:02:29 paule Exp $
 
   Copyright (C) 2007 met.no
 
@@ -15,17 +15,17 @@
   This file is part of KVALOBS
 
   KVALOBS is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License as 
-  published by the Free Software Foundation; either version 2 
+  modify it under the terms of the GNU General Public License as
+  published by the Free Software Foundation; either version 2
   of the License, or (at your option) any later version.
-  
+
   KVALOBS is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License along 
-  with KVALOBS; if not, write to the Free Software Foundation Inc., 
+
+  You should have received a copy of the GNU General Public License along
+  with KVALOBS; if not, write to the Free Software Foundation Inc.,
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #ifndef __kvChecks_h__
@@ -43,7 +43,7 @@ namespace kvalobs{
    * \addtogroup  dbinterface
    *
    * @{
-   */  
+   */
 
 
   /**
@@ -66,7 +66,7 @@ public:
   kvChecks(int stationid,
 	   const  miutil::miString &qcx,
            const  miutil::miString &medium_qcx,
-	   int  language,  
+	   int  language,
 	   const miutil::miString &checkname,
 	   const miutil::miString &checksignature,
            const miutil::miString &active,
@@ -75,18 +75,18 @@ public:
       set(stationid, qcx, medium_qcx, language,
 	  checkname, checksignature, active, fromtime);
     }
-  
-  bool set(int stationid,  
+
+  bool set(int stationid,
 	   const miutil::miString &qcx,
 	   const  miutil::miString &medium_qcx,
-	   int  language,  
+	   int  language,
 	   const miutil::miString &checkname,
 	   const  miutil::miString &checksignature,
            const  miutil::miString &active,
 	   const miutil::miTime &fromtime);
 
   bool set(const dnmi::db::DRow&);
-  char* tableName() const {return "checks";}
+  const char* tableName() const {return "checks";}
   miutil::miString toSend() const;
   miutil::miString uniqueKey()const;
 
@@ -100,14 +100,14 @@ public:
   const miutil::miTime fromtime()  const { return fromtime_;}
 
 /*
-  miutil::miDate fromDAY(int y=-1) const 
+  miutil::miDate fromDAY(int y=-1) const
   { return  julianDayThatYear(fromday_,y); }
 
-  miutil::miDate toDAY(int y=-1) const 
+  miutil::miDate toDAY(int y=-1) const
   { return  julianDayThatYear(today_,y); }
 */
 };
 
-/** @} */ 
+/** @} */
 };
 #endif

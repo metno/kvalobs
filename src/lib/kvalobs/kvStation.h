@@ -1,7 +1,7 @@
 /*
-  Kvalobs - Free Quality Control Software for Meteorological Observations 
+  Kvalobs - Free Quality Control Software for Meteorological Observations
 
-  $Id: kvStation.h,v 1.1.2.2 2007/09/27 09:02:30 paule Exp $                                                       
+  $Id: kvStation.h,v 1.1.2.2 2007/09/27 09:02:30 paule Exp $
 
   Copyright (C) 2007 met.no
 
@@ -15,17 +15,17 @@
   This file is part of KVALOBS
 
   KVALOBS is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License as 
-  published by the Free Software Foundation; either version 2 
+  modify it under the terms of the GNU General Public License as
+  published by the Free Software Foundation; either version 2
   of the License, or (at your option) any later version.
-  
+
   KVALOBS is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License along 
-  with KVALOBS; if not, write to the Free Software Foundation Inc., 
+
+  You should have received a copy of the GNU General Public License along
+  with KVALOBS; if not, write to the Free Software Foundation Inc.,
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #ifndef _kvStation_h
@@ -37,12 +37,12 @@
 /* Edited by T.Reite april 2004 */
 
 namespace kvalobs {
-  
+
   /**
    * \addtogroup  dbinterface
    *
    * @{
-   */  
+   */
 
 
   /**
@@ -71,23 +71,23 @@ namespace kvalobs {
     kvStation() {}
     kvStation(const dnmi::db::DRow& r) {set(r);}
     kvStation( int st, float la, float lo, float he, float max,
-	       const miutil::miString& na, int wm, int nn, 
+	       const miutil::miString& na, int wm, int nn,
 	       const miutil::miString& ic, const miutil::miString& ca,
 	       const miutil::miString& ss, int environmentid,
 	       bool static_, const miutil::miTime& fromtime)
       {set(st,la,lo,he,max,na,wm,nn,ic,ca,ss,environmentid,static_,fromtime);}
 
     bool set(const dnmi::db::DRow&);
-    
+
     bool set( int, float, float, float, float, const miutil::miString&,
 	      int, int, const miutil::miString&, const miutil::miString&,
 	      const miutil::miString&, int,
 	      bool, const miutil::miTime& );
 
-    char* tableName() const {return "station";}
+    const char* tableName() const {return "station";}
     miutil::miString toSend() const;
     miutil::miString uniqueKey()const;
-    
+
     int stationID()                const {return stationid_;  }
     float lat()                    const {return lat_;        }
     float lon()                    const {return lon_;        }
@@ -103,7 +103,7 @@ namespace kvalobs {
     bool _static()                 const {return static_;     }
     miutil::miTime fromtime()      const {return fromtime_;   }
   };
-  
+
   /** @} */
 }
 

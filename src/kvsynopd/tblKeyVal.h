@@ -1,7 +1,7 @@
 /*
-  Kvalobs - Free Quality Control Software for Meteorological Observations 
+  Kvalobs - Free Quality Control Software for Meteorological Observations
 
-  $Id: tblKeyVal.h,v 1.1.6.2 2007/09/27 09:02:23 paule Exp $                                                       
+  $Id: tblKeyVal.h,v 1.1.6.2 2007/09/27 09:02:23 paule Exp $
 
   Copyright (C) 2007 met.no
 
@@ -15,17 +15,17 @@
   This file is part of KVALOBS
 
   KVALOBS is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License as 
-  published by the Free Software Foundation; either version 2 
+  modify it under the terms of the GNU General Public License as
+  published by the Free Software Foundation; either version 2
   of the License, or (at your option) any later version.
-  
+
   KVALOBS is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License along 
-  with KVALOBS; if not, write to the Free Software Foundation Inc., 
+
+  You should have received a copy of the GNU General Public License along
+  with KVALOBS; if not, write to the Free Software Foundation Inc.,
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #ifndef __kvsynop_tblKeyVal_h__
@@ -37,7 +37,7 @@ class TblKeyVal : public kvalobs::kvDbBase {
 private:
   std::string key_;
   std::string val_;
-  
+
   void createSortIndex();
 
 public:
@@ -52,23 +52,23 @@ public:
 
   bool set(const dnmi::db::DRow&);
   bool set(const TblKeyVal &keyVal);
-  
+
   TblKeyVal& operator=(const TblKeyVal &keyVal){
                   if(&keyVal!=this)
-		    set(keyVal); 
+		    set(keyVal);
 		  return *this;
              }
 
   void clean();
 
-  char* tableName()            const {return "keyval";}
+  const char* tableName()            const {return "keyval";}
   miutil::miString toSend()    const;
   miutil::miString toUpdate()  const;
   miutil::miString uniqueKey() const;
- 
-  std::string  key() const { return key_; } 
-  std::string  val() const { return val_; } 
-  void         val(const std::string &v) { val_=v; } 
+
+  std::string  key() const { return key_; }
+  std::string  val() const { return val_; }
+  void         val(const std::string &v) { val_=v; }
 };
 
 #endif

@@ -1,7 +1,7 @@
 /*
-  Kvalobs - Free Quality Control Software for Meteorological Observations 
+  Kvalobs - Free Quality Control Software for Meteorological Observations
 
-  $Id: kvDbBase.h,v 1.1.2.2 2007/09/27 09:02:30 paule Exp $                                                       
+  $Id: kvDbBase.h,v 1.1.2.2 2007/09/27 09:02:30 paule Exp $
 
   Copyright (C) 2007 met.no
 
@@ -15,17 +15,17 @@
   This file is part of KVALOBS
 
   KVALOBS is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License as 
-  published by the Free Software Foundation; either version 2 
+  modify it under the terms of the GNU General Public License as
+  published by the Free Software Foundation; either version 2
   of the License, or (at your option) any later version.
-  
+
   KVALOBS is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License along 
-  with KVALOBS; if not, write to the Free Software Foundation Inc., 
+
+  You should have received a copy of the GNU General Public License along
+  with KVALOBS; if not, write to the Free Software Foundation Inc.,
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #ifndef _kvDbBase_h
@@ -43,8 +43,8 @@
 namespace kvalobs {
 
   /**
-   * \addtogroup dbutility  
-   * 
+   * \addtogroup dbutility
+   *
    * @{
    */
 
@@ -57,7 +57,7 @@ namespace kvalobs {
    * \li uniqueKey()
    * \li tableName()
    * \li toSend()
-   * 
+   *
    * They must also implements getter and setter functions for every field
    * in the table and a constructors that accepts all fields in the table
    * as arguments.
@@ -69,7 +69,7 @@ namespace kvalobs {
   protected:
     miutil::miString sortBy_;
     miutil::miDate julianDayThatYear(int addOn,int year=-1) const;
-    
+
   public:
 
 
@@ -81,20 +81,20 @@ namespace kvalobs {
 
     /**Used to specifie an NULL value for a TEXT field*/
     static const std::string TEXT_NULL;
-    
+
     kvDbBase();
     virtual ~kvDbBase();
-    
+
     /**
      * \brief creates a SQL insert statment.
-     * 
+     *
      * toSend assume a SQL inser statemen on the form: \n
      * \verbatim
         INSERT INTO table VALUES( ... )
 	                        ^^^^^^^
 				  (*)
        \endverbatim
-     * 
+     *
      * It is the (*) part that is toSend return.
      *
      * It is importent to remeber to quote string, data, time and datetime
@@ -103,19 +103,19 @@ namespace kvalobs {
      * Take a  look at the example \ref kvDbBaseExample.doc "kvDbBaseExample"
      * to see how this is done.
      *
-     * \return The value part of a SQL insert statment. 
+     * \return The value part of a SQL insert statment.
      *
      */
     virtual miutil::miString toSend()const=0;
-    
+
     /**
      * \brief make quoted string of the input parameter.
-     * 
+     *
      * \param toQuote the string to be quoted.
      * \return a quoted version of the toQuote string.
      */
     miutil::miString quoted(const miutil::miString &toQuote) const;
-    
+
     /**
      * /brief make a quoted ISO time.
      *
@@ -131,7 +131,7 @@ namespace kvalobs {
      * \return a quoted string version of intToQuote.
      */
     miutil::miString quoted(const int &intToQuote) const;
-    
+
     /**
      * /brief is this instance initialized with walues.
      *
@@ -146,9 +146,9 @@ namespace kvalobs {
      *  \return A string that can be used to update a row in the table.
      */
     virtual miutil::miString toUpdate()const;
-    
+
     /**
-     * \brief create a string that uniqly idenitify this instance 
+     * \brief create a string that uniqly idenitify this instance
      *        in the table.
      *
      * \return a string that can be used in a query to uniqly indentify
@@ -156,28 +156,28 @@ namespace kvalobs {
      */
     virtual miutil::miString uniqueKey()const =0;
 
-    
+
     miutil::miString insertQuery(const bool replace) const;
     miutil::miString selectAllQuery() const;
     miutil::miString selectAllQuery(const miutil::miString &tblName) const;
-    
+
     /**
      * \brief the table name/view class represent.
      *
      * \return the table name.
      */
-    virtual char* tableName()const=0;
-    
+    virtual const char* tableName()const=0;
+
     friend bool operator>(const kvDbBase& lhs,const kvDbBase& rhs);
     friend bool operator<(const kvDbBase& lhs, const kvDbBase& rhs);
     friend bool operator==(const kvDbBase& lhs, const kvDbBase& rhs);
     friend bool operator!=(const kvDbBase& lhs, const kvDbBase& rhs);
 
     friend std::ostream& operator<<(std::ostream&, const kvDbBase&);
-    
+
   };
 
-  
+
   bool  operator>(const kvDbBase& lhs,const kvDbBase& rhs);
   bool  operator<(const kvDbBase& lhs, const kvDbBase& rhs);
   bool  operator==(const kvDbBase& lhs, const kvDbBase& rhs);
@@ -188,10 +188,10 @@ namespace kvalobs {
 
   /**
    * \example kvDbBaseExample.doc
-   * Here is an example how to use kvalobs::kvDbBase. We hava a table 
+   * Here is an example how to use kvalobs::kvDbBase. We hava a table
    * \em   types in the kvalobs database which is created with the SQL create
    * statement as:
-   * 
+   *
    * \verbatim
      CREATE TABLE types (
         typeid   INTEGER NOT NULL,
@@ -207,9 +207,9 @@ namespace kvalobs {
    *
    * We implement this as: \n
    * The headerfile \em kvTypes.h
-   * 
+   *
    * \include  kvTypes.h
-   *  
+   *
    * And the implementation file \em kvTypes.cc.
    *
    * \include kvTypes.cc

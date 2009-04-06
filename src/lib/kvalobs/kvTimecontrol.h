@@ -1,7 +1,7 @@
 /*
-  Kvalobs - Free Quality Control Software for Meteorological Observations 
+  Kvalobs - Free Quality Control Software for Meteorological Observations
 
-  $Id: kvTimecontrol.h,v 1.1.2.2 2007/09/27 09:02:30 paule Exp $                                                       
+  $Id: kvTimecontrol.h,v 1.1.2.2 2007/09/27 09:02:30 paule Exp $
 
   Copyright (C) 2007 met.no
 
@@ -15,17 +15,17 @@
   This file is part of KVALOBS
 
   KVALOBS is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License as 
-  published by the Free Software Foundation; either version 2 
+  modify it under the terms of the GNU General Public License as
+  published by the Free Software Foundation; either version 2
   of the License, or (at your option) any later version.
-  
+
   KVALOBS is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License along 
-  with KVALOBS; if not, write to the Free Software Foundation Inc., 
+
+  You should have received a copy of the GNU General Public License along
+  with KVALOBS; if not, write to the Free Software Foundation Inc.,
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #ifndef _kvTimecontrol_h
@@ -43,7 +43,7 @@ namespace kvalobs {
    * \addtogroup  dbinterface
    *
    * @{
-   */  
+   */
 
 
   /**
@@ -64,12 +64,12 @@ namespace kvalobs {
     kvTimecontrol( int fr, int to,int ti, int pr,
 		   const miutil::miString& qc)
     {set(fr,to,ti,pr,qc);}
-    
+
     bool set(const dnmi::db::DRow&);
     bool set(int, int,int, int,  const miutil::miString& );
 
 
-    char* tableName() const {return "timecontrol";}
+    const char* tableName() const {return "timecontrol";}
     miutil::miString toSend() const;
     miutil::miString uniqueKey()const;
 
@@ -80,14 +80,14 @@ namespace kvalobs {
     miutil::miString qcx() const { return qcx_;     }
 
 
-    miutil::miDate fromDAY(int y=-1) const 
+    miutil::miDate fromDAY(int y=-1) const
     { return  julianDayThatYear(fromday_,y); }
 
-    miutil::miDate toDAY(int y=-1) const 
+    miutil::miDate toDAY(int y=-1) const
     { return  julianDayThatYear(today_,y); }
 
   };
-  
+
   /** @} */
 }
 

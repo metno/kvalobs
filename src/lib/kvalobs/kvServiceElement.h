@@ -1,7 +1,7 @@
 /*
-  Kvalobs - Free Quality Control Software for Meteorological Observations 
+  Kvalobs - Free Quality Control Software for Meteorological Observations
 
-  $Id: kvServiceElement.h,v 1.1.2.2 2007/09/27 09:02:30 paule Exp $                                                       
+  $Id: kvServiceElement.h,v 1.1.2.2 2007/09/27 09:02:30 paule Exp $
 
   Copyright (C) 2007 met.no
 
@@ -15,17 +15,17 @@
   This file is part of KVALOBS
 
   KVALOBS is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License as 
-  published by the Free Software Foundation; either version 2 
+  modify it under the terms of the GNU General Public License as
+  published by the Free Software Foundation; either version 2
   of the License, or (at your option) any later version.
-  
+
   KVALOBS is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License along 
-  with KVALOBS; if not, write to the Free Software Foundation Inc., 
+
+  You should have received a copy of the GNU General Public License along
+  with KVALOBS; if not, write to the Free Software Foundation Inc.,
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #ifndef __kvalobs_db_kvServiceElement_h__
@@ -35,7 +35,7 @@
 
 /*
  * Created by DNMI/IT: borge.moe@met.no
- * at Tue Sep 20  20:15:16 2004 
+ * at Tue Sep 20  20:15:16 2004
  */
 
 namespace kvalobs{
@@ -43,7 +43,7 @@ namespace kvalobs{
    * \addtogroup  dbinterface
    *
    * @{
-   */  
+   */
 
 
   /**
@@ -56,29 +56,29 @@ private:
   int            stationid_;
   miutil::miTime obstime_;
   int            typeid_;
-  
+
   void createSortIndex();
 
 public:
   kvServiceElement();
   kvServiceElement(const dnmi::db::DRow &r){set(r);}
-  kvServiceElement(int                  sid, 
-		   const miutil::miTime &obt,    
+  kvServiceElement(int                  sid,
+		   const miutil::miTime &obt,
 		   int                  tid)
     { set(sid, obt, tid);}
 
-  bool set(int                  sid, 
-	   const miutil::miTime &obt,    
+  bool set(int                  sid,
+	   const miutil::miTime &obt,
 	   int                  tid);
 
   bool set(const dnmi::db::DRow&);
 
-  char*            tableName() const {return "service_element";}
+  const char*            tableName() const {return "service_element";}
   miutil::miString    toSend() const;
   miutil::miString  toUpdate() const;
   miutil::miString uniqueKey() const;
- 
-  int            stationID()   const { return stationid_; } 
+
+  int            stationID()   const { return stationid_; }
   miutil::miTime obstime()     const { return obstime_;   }
   int            typeID()      const { return typeid_;    }
 };

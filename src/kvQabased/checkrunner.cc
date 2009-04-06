@@ -1,7 +1,7 @@
 /*
-  Kvalobs - Free Quality Control Software for Meteorological Observations 
+  Kvalobs - Free Quality Control Software for Meteorological Observations
 
-  $Id: checkrunner.cc,v 1.1.2.8 2007/09/27 09:02:21 paule Exp $                                                       
+  $Id: checkrunner.cc,v 1.1.2.8 2007/09/27 09:02:21 paule Exp $
 
   Copyright (C) 2007 met.no
 
@@ -15,17 +15,17 @@
   This file is part of KVALOBS
 
   KVALOBS is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License as 
-  published by the Free Software Foundation; either version 2 
+  modify it under the terms of the GNU General Public License as
+  published by the Free Software Foundation; either version 2
   of the License, or (at your option) any later version.
-  
+
   KVALOBS is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License along 
-  with KVALOBS; if not, write to the Free Software Foundation Inc., 
+
+  You should have received a copy of the GNU General Public License along
+  with KVALOBS; if not, write to the Free Software Foundation Inc.,
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include "kvPerlParser.h"
@@ -159,7 +159,7 @@ bool CheckRunner::dataWasCheckedBefore()
 
   if ( data_.empty() ) // no data to check
     return false;
-  
+
   for ( kvQABaseMeteodata::DataFromTime::const_iterator it = data_.begin(); it != data_.end(); ++ it )
   {
     typedef kvQABaseMeteodata::obs_data KvDL;
@@ -201,14 +201,14 @@ void CheckRunner::findChecks( list<kvChecks> & out )
 void CheckRunner::runCheck( const std::string & checkScript, const kvalobs::kvChecks & check )
 {
   LogContext context( "Running check " + check.checkname() );
-  
+
   log_( "<HR>" );
   log_( string( "<H2>Check loop, type:" ) + check.qcx() + " name:" + check.checkname() + "</H2>" );
 
 
   // Writing the script to be run to html:
 //#define LOG_CHECK_SCRIPT
-#ifdef LOG_CHECK_SCRIPT  
+#ifdef LOG_CHECK_SCRIPT
     log_( "Final checkstring:" );
     log_( "<font color=#007700>" );
     log_( checkScript );
@@ -256,14 +256,14 @@ void CheckRunner::operator() ( bool forceCheck )
     logEnd_( e.what(), Error );
     throw;
   }
-  
+
   //  relevant checks (QC1) for this observation
-  const list<kvChecks> & checks = checkCreator_.getChecks(); 
+  const list<kvChecks> & checks = checkCreator_.getChecks();
   if ( checks.empty() )
     return logEnd_( "No appropriate checks found" );
 
   meteod.resetFlags(stinfo); // what is this? And why does things fail when I move this line?
-    
+
   // Loop through checks
   for ( list<kvChecks>::const_iterator cp = checks.begin(); cp != checks.end(); ++ cp ) {
     try {
@@ -280,7 +280,7 @@ void CheckRunner::operator() ( bool forceCheck )
     }
   }
 
-  
+
   logEnd_( "Done processing", Debug );
   LOGINFO( "CheckRunner::runChecks FINISHED" << endl );
 }
@@ -291,9 +291,10 @@ namespace
   path logPath( const kvalobs::kvStationInfo & stinfo, const path & start_logpath )
   {
     path log_dir(start_logpath);
-    const path stationDirectory = boost::lexical_cast<string>(stinfo.stationID()); 
+    const path stationDirectory = boost::lexical_cast<string>(stinfo.stationID());
 
-    log_dir /= stationDirectory/stinfo.obstime().isoDate();
+    const std::string obsTime = stinfo.obstime().isoDate();
+    log_dir /= stationDirectory/obsTime;
 
     boost::filesystem::create_directories( log_dir );
     return log_dir;
@@ -313,7 +314,7 @@ namespace
     namespace fs = boost::filesystem;
 
     fs::path log_dir = logPath( stinfo, start_logpath );
-  
+
     std::string clock = stinfo.obstime().isoClock();
     std::replace( clock.begin(), clock.end(), ':', '-' );
 
@@ -336,19 +337,19 @@ HtmlStream * CheckRunner::openHTMLStream()
   try
   {
     html = new HtmlStream;
-    
+
     path logfile = getLogfilePath( stinfo, logpath_ );
-    
+
     LOGINFO( "CheckRunner::runChecks for station:" << stinfo.stationID()
         << " and obstime:" << stinfo.obstime() << endl
         << "Logging all activity to:" << logfile.native_file_string() << endl );
-  
+
     if ( !html->open( logfile.native_file_string() ) )
       throw std::runtime_error( "Failed to create logfile for the html output. Filename:\n" + logfile.native_file_string() );
-  
+
     Logger::createLogger( "html", html );
     Logger::logger("html").logLevel( DEBUG );
-  
+
     IDLOGINFO( "html", "<h1>"
         << "CheckRunner::runChecks for station:" << stinfo.stationID()
             << " and obstime:" << stinfo.obstime()
