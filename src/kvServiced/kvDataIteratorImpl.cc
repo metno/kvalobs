@@ -64,6 +64,15 @@ DataIteratorImpl::~DataIteratorImpl()
   	LOGDEBUG("DTOR: DataIteratorImpl::~DataIteratorImpl ... 1 ...\n");
 }
 
+/**
+ * TODO: Destroy may delete resources while they are in use -> CRASH. 
+ * There is a chance for a crash if destroy is called while
+ * next is in progress. We must check if we are running.
+ * 
+ * The best solution is maybe not to dealocate the resources here
+ * but add it to a 'to be deleted que' and let the reaper thread delete
+ * the resources.
+ */
 
 void  
 DataIteratorImpl::destroy()
@@ -455,3 +464,16 @@ insertTextData(CKvalObs::CService::ObsDataList *obsDataList,
   	(*obsDataList)[i].dataList.length(0);
   	(*obsDataList)[i].textDataList=textData;
 }
+
+
+/*
+ * TODO: Implement the cleanup, ie move the cleanup of the database object and whichData
+ * from the deactivate method to this method. Remember to add a call to cleanup in 
+ * the method ServiceApp::cleanUpReaperObj()
+ * 
+void 
+DataIteratorImpl::
+cleanUp()
+{
+}
+*/

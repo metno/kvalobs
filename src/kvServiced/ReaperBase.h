@@ -67,6 +67,9 @@ class ReaperBase
 
   void setObjId(PortableServer::ObjectId *id){objId=id;}
   
+  
+  //Cleanup the resources this object is using.
+  virtual void cleanUp()=0;
   virtual void addRef()=0;
   virtual void removeRef()=0;
 

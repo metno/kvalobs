@@ -47,6 +47,12 @@ isActive()const
 }
 
  
+/**
+ * TODO: Do not deactivate a running object.
+ * We must also check if the object isRunning and not delete deactivate
+ * it if it is. Tah mean that we must change the return value from void to bool and return true 
+ * if we have deactivated it.
+ */
 void 
 ReaperBase::
 deactivate()
