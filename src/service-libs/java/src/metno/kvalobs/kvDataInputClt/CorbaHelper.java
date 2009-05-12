@@ -21,7 +21,7 @@ public class CorbaHelper {
 		boolean hasPort = false;
 		boolean hasORBInit = false;
 		String myArg[] = null;
-		String cnameserver=System.getProperty("corba.nameserver", "corbans.oslo.dnmi.no:2809" );
+		String cnameserver=System.getProperty("corba.nameserver", "corbans.met.no:2809" );
 		
 		int i = cnameserver.indexOf(":");
 				
