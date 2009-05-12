@@ -2,6 +2,22 @@ package metno.kvalobs.kvDataInputClt;
 
 import CKvalObs.CDataSource.*;
 
+/**
+ * 
+ * Two properties is defined.
+ * 
+ * - kvserver
+ * - corba.nameserver. Optional, default corbans.met.no. 
+ * 
+ * run with:
+ *  java -Dkvserver=kvalobs -Dcorba.nameserver=corbans.met.no -jar kvDataInputClt.jar datafilename
+ * 
+ * Datafilename is a data datafile on the "kvalobs" format.
+ * 
+ * Exit status 0 on success and 1 on failure.  
+ *
+ * @author borgem
+ */
 public class kvDataInputCltMain {
 
 	/**
