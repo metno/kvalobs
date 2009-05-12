@@ -7,7 +7,7 @@ import CKvalObs.CDataSource.*;
  * Two properties is defined.
  * 
  * - kvserver
- * - corba.nameserver. Optional, default corbans.met.no. 
+ * - corba.nameserver. Optional, default corbans.met.no:2809. 
  * 
  * run with:
  *  java -Dkvserver=kvalobs -Dcorba.nameserver=corbans.met.no -jar kvDataInputClt.jar datafilename
