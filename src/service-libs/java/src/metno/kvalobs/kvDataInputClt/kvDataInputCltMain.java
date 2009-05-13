@@ -12,7 +12,7 @@ import CKvalObs.CDataSource.*;
  * run with:
  *  java -Dkvserver=kvalobs -Dcorba.nameserver=corbans.met.no -jar kvDataInputClt.jar datafilename
  * 
- * Datafilename is a data datafile on the "kvalobs" format.
+ * Datafilename is a datafile on the "kvalobs" format.
  * 
  * Exit status 0 on success and 1 on failure.  
  *
