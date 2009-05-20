@@ -27,7 +27,7 @@
 #the user should not define keys inside the corba namespace below 
 corba{
   #Where is CORBA nameserver
-  nameserver="corbans.oslo.dnmi.no"
+  nameserver="corbans.met.no"
 
   #Which path in CORBA nameserver shall we use for
   #this instance of kvalobs
