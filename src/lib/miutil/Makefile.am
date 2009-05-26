@@ -4,7 +4,8 @@ libmiutil_la_SOURCES = \
 	commastring.h commastring.cc \
 	trimstr.h trimstr.cc \
 	cmprspace.h cmprspace.cc \
-	miTimeParse.h miTimeParse.cc 
+	miTimeParse.h miTimeParse.cc \
+	replace.h replace.cc
 
 libmiutil_la_CPPFLAGS = $(putools_CFLAGS)
 libmiutil_la_LIBADD = $(putools_LIBS)
