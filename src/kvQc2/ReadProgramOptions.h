@@ -37,6 +37,7 @@ int RunAtHour;
 int pid;
 int tid;
 int missing;
+int MinimumValue;
 float InterpolationLimit;
 bool newfile;
 std::map<int, unsigned char> zflag;

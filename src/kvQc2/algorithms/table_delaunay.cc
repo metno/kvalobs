@@ -3652,7 +3652,7 @@ void triangulation_order3_plot_eps ( char *file_name, int node_num,
 
 void triangulation_order3_plot_eps ( char *file_name, int node_num, 
   double node_xy[], int triangle_num, int triangle_node[], int node_show, 
-  int triangle_show, double xtarget, double ytarget )
+  int triangle_show, double xtarget, double ytarget, double xp1, double yp1, double xp2, double yp2, double xp3, double yp3 )
 
 //****************************************************************************80
 //
@@ -3933,6 +3933,57 @@ void triangulation_order3_plot_eps ( char *file_name, int node_num,
         << x_ps << "  " 
         << y_ps << "  "
         << circle_size << " 0 360 arc closepath fill\n";
+    }
+
+//Draw surrounding triangle nodes
+
+   {
+      x_ps = ( int ) (
+        ( ( x_max - xp1             ) * ( double ) ( x_ps_min )  
+        + (       + xp1     - x_min ) * ( double ) ( x_ps_max ) ) 
+        / ( x_max                     - x_min ) );
+
+      y_ps = ( int ) (
+        ( ( y_max - yp1             ) * ( double ) ( y_ps_min )  
+        + (         yp1     - y_min ) * ( double ) ( y_ps_max ) ) 
+        / ( y_max                     - y_min ) );
+
+      file_unit << "newpath  " 
+        << x_ps << "  " 
+        << y_ps << "  "
+        << circle_size+3 << " 0 360 arc closepath fill\n";
+    }
+   {
+      x_ps = ( int ) (
+        ( ( x_max - xp2             ) * ( double ) ( x_ps_min )  
+        + (       + xp2     - x_min ) * ( double ) ( x_ps_max ) ) 
+        / ( x_max                     - x_min ) );
+
+      y_ps = ( int ) (
+        ( ( y_max - yp2             ) * ( double ) ( y_ps_min )  
+        + (         yp2     - y_min ) * ( double ) ( y_ps_max ) ) 
+        / ( y_max                     - y_min ) );
+
+      file_unit << "newpath  " 
+        << x_ps << "  " 
+        << y_ps << "  "
+        << circle_size+3 << " 0 360 arc closepath fill\n";
+    }
+   {
+      x_ps = ( int ) (
+        ( ( x_max - xp3             ) * ( double ) ( x_ps_min )  
+        + (       + xp3     - x_min ) * ( double ) ( x_ps_max ) ) 
+        / ( x_max                     - x_min ) );
+
+      y_ps = ( int ) (
+        ( ( y_max - yp3             ) * ( double ) ( y_ps_min )  
+        + (         yp3     - y_min ) * ( double ) ( y_ps_max ) ) 
+        / ( y_max                     - y_min ) );
+
+      file_unit << "newpath  " 
+        << x_ps << "  " 
+        << y_ps << "  "
+        << circle_size+3 << " 0 360 arc closepath fill\n";
     }
   }
 //

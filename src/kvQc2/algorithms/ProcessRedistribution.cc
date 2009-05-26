@@ -44,16 +44,19 @@
 #include "CheckedDataCommandBase.h"
 #include "CheckedDataHelper.h"
 
-#include <qapplication.h>
-#include <qpushbutton.h>
-#include <qlcdnumber.h>
-#include <qfont.h>
-#include <qlayout.h>
+//#include <qapplication.h>
+//#include <qpushbutton.h>
+//#include <qlcdnumber.h>
+//#include <qfont.h>
+//#include <qlayout.h>
 
+//#include "PaperField.h"
 
 #include "ProcessControl.h"
 
 #include "scone.h"
+
+#include "epsx.h"
 
 
 
@@ -71,8 +74,16 @@ Redistribute( ReadProgramOptions params )
   const int pid=params.pid;
   const int tid=params.tid;
 
+  std::vector<float> XP;
+  std::vector<float> YP;
+
   ProcessControl CheckFlags;
 
+  //QApplication a(0,0);
+  //PaperField Plotter(-100,-100,700,700,0,0);
+  //Plotter.setGeometry( 100, 100, 500, 355 );
+  //a.setMainWidget( &Plotter );
+  //Plotter.show();
 
   std::list<kvalobs::kvStation> StationList;
   std::list<kvalobs::kvStation> ActualStationList;
@@ -101,11 +112,15 @@ Redistribute( ReadProgramOptions params )
 
              try {
               result = dbGate.select(Qc2Data, kvQueries::selectData(StationIds,pid,tid,ProcessTime,ProcessTime));
+///<<<<<<< .mine
+              //std::cout << kvQueries::selectData(StationIds,pid,tid,ProcessTime,ProcessTime) << std::endl;
+///=======
               /// put back the typeid becuase we have two measurements from the same station with different typeid            
 
               //result = dbGate.select(Qc2Data, kvQueries::selectData(StationIds,pid,ProcessTime,ProcessTime));
                                   ///do not mind which type id is used here
                                   ///only set the time id for selecting paramters to redistribute.
+///>>>>>>> .r679
               }
               catch ( dnmi::db::SQLException & ex ) {
                 IDLOGERROR( "html", "Exception: " << ex.what() << std::endl );
@@ -133,6 +148,7 @@ Redistribute( ReadProgramOptions params )
        if(!ReturnData.empty()) {
           for (std::list<kvalobs::kvData>::const_iterator id = ReturnData.begin(); id != ReturnData.end(); ++id) {
                       try {
+                           //if (!id->controlinfo().flag(15)) {  // Do not overwrite data controlled by humans!
                            if ( CheckFlags.condition(id->controlinfo(),params.Wflag) ) {  // Do not overwrite data controlled by humans!
                                 kvData d = *id;
                                 kvUseInfo ui = d.useinfo();
@@ -142,6 +158,20 @@ Redistribute( ReadProgramOptions params )
                                 kvalobs::kvStationInfo::kvStationInfo DataToWrite(id->stationID(),id->obstime(),id->paramID());
                                 std::cout << "ZZZ To Write: "<< id->original() << " " << id->corrected() << std::endl;
                                 stList.push_back(DataToWrite);
+
+                           //if (id->controlinfo().flag(13)==9) {  
+                           if ( CheckFlags.condition(id->controlinfo(),params.zflag) ) {  
+                           //if (id->controlinfo().flag(13)==params.zflag[15]) {    // This is just to test parameter control flag passing
+                                //Plotter.AddPoint( (int)(10*d.original()),(int)(10*d.corrected()) ); 
+                                XP.push_back(d.original());
+                                YP.push_back(d.corrected());
+                                std::cout << "ZZZ Plotted: "<< d.original() << " " << d.corrected() << std::endl;
+                                // Note the plot here is used when test data is being analysed
+                                // for the optimisation of algorithms.
+                                // 10* just for visibility on the simple pixmap!!
+                           }
+
+
                            }
                        }
                        catch ( dnmi::db::SQLException & ex ) {
@@ -162,6 +192,9 @@ Redistribute( ReadProgramOptions params )
   ProcessTime.addDay();
 
   }
+epsx Fish2(XP,YP,"Plout.eps");
+//std::cout << "Chi-squared = " << Plotter.linearChi2() << std::endl;
+//a.exec();
 Qc2D GSW(Qc2Data,StationList,params);
 GSW.distributor(StationList,ReturnData,1); // temporary solution for memory cleanup
 return 0;

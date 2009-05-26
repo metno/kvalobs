@@ -285,6 +285,15 @@ Qc2_interp()
             case 7:
                 intp_delaunay(i);
                 break;
+            case 8:
+                intp_dummy(i);
+                break;
+            case 9:
+                intp_temp(i);
+                break;
+            case 10:
+  	        calculate_intp_temp(i);
+                break;
             default:
                 std::cout << "No valid Interpolation Code Provided. Case: " << InterpCode << std::endl;
                 break;
@@ -746,8 +755,8 @@ calculate_intp_h(unsigned int index)
  	  	          weight += data_point/(pindex[i].first*pindex[i].first);
                           //idog += 1;
  	  	  }
- 	  }
- 	     
+           }
+
 
  	  if (inv_dist > 0.0) {
  	  
@@ -877,7 +886,6 @@ calculate_trintp_sl(unsigned int index, std::list<int> BestStations)
                for (std::list<int>::const_iterator ist=BestStations.begin(); ist != BestStations.end(); ++ist){
                      OKTRI=true;
                      i=stindex[ *ist ];
-                     //std::cout << "Station: "<< *ist << std::endl;
 
                      x[j]=(double) lon_[i]*radish;
                      y[j]=(double) lat_[i]*radish;        
@@ -892,15 +900,6 @@ calculate_trintp_sl(unsigned int index, std::list<int> BestStations)
 
                      xp[j] = utm.u;  //Longitude  -> X-cartesian
                      yp[j] = utm.v;  //Latitude   -> Y-cartesian
-
-
-                     //std::cout << y[j] << " " << x[j] << std::endl;
-                     //std::cout << utm.u << " " << utm.v << std::endl;
-
-                     //xp[j]=x[j]; 
-                     //yp[j]=sin( y[j] );  /// should I make a projection to a planar triangle or not ???
-                     ///TO BE FIXED .. needs full conversion to UTM here
-                     /// see notes from Matthias !!!!!!!!!!!!!!!!!!!!!!!
 
                      if (xp[j] < 0.009) OKTRI=false;
                      if (yp[j] < 0.009) OKTRI=false;
@@ -920,31 +919,174 @@ calculate_trintp_sl(unsigned int index, std::list<int> BestStations)
                      utm = pj.ll2xy(utm);
                      xt = utm.u;
                      yt = utm.v;
-       
-                     //std::cout << rr[0] << " %% " << rr[1]  << " %% " << rr[2] << std::endl; 
                      Denom=(xp[2]-xp[0])*(yp[1]-yp[0])-(xp[1]-xp[0])*(yp[2]-yp[0]);
                      d_rr_over_d_x=((yp[1]-yp[0])*(rr[2]-rr[0])-(yp[2]-yp[0])*(rr[1]-rr[0]))/Denom;
                      d_rr_over_d_y=((xp[2]-xp[0])*(rr[1]-rr[0])-(xp[1]-xp[0])*(rr[2]-rr[0]))/Denom;
                      intp_[index]=rr[0]+(xt-xp[0])*d_rr_over_d_x+(yt-yp[0])*d_rr_over_d_y;
-                     //intp_[index]=rr[0]+(lon_[index]*radish-xp[0])*d_rr_over_d_x+((sin(lat_[index]*radish))-yp[0])*d_rr_over_d_y;
-    
 
-                //std::cout << Denom << " "
-                         //<< d_rr_over_d_x << " "
-                         //<< d_rr_over_d_y << " "
-                         //<< rr[0] << " "
-                         //<< rr[1] << " "
-                         //<< rr[2] << " "
-                         //<< intp_[index] << " "
-                         //<< original_[index] << " "
-                         //<< corrected_[index] << " Fundango "
-                         //<< std::endl; 
                 }
           } 
 
 
 } 
 
+/// dummy modeule                                                                     |
+void
+Qc2D::
+intp_dummy(unsigned int index)
+{
+
+          const double RADIUS=6371.0;
+          float temp_distance;
+          float data_point;
+          float weight;
+          float inv_dist;
+          float delta_lat;
+          float delta_lon;
+          double a, c;
+          const double radish = 0.01745329251994329509;
+
+          ProcessControl CheckFlags;
+
+          inv_dist = 0.0;
+          weight   = 0.0;
+
+             intp_[index] = 1000.0;                 
+}
+
+///Inverse distance weighting interpolation prototype.
+/// Algorithm to construct a model value by inverse distance weighting from neighbouring stations.
+/// This optionincludes experimental investigation of various uniformity tests.
+void 
+Qc2D::
+intp_temp(unsigned int index)
+{
+ 	  const double RADIUS=6371.0;
+ 	  float temp_distance;
+ 	  float data_point;
+ 	  float weight;
+ 	  float inv_dist;
+ 	  float delta_lat;
+ 	  float delta_lon;
+          double a, c;
+ 	  const double radish = 0.01745329251994329509;
+
+          ProcessControl CheckFlags;
+
+          std::vector<float> NeighboursUsed;
+          NeighboursUsed.clear();
+          double sum, mean, var, dev, skew, kurt;
+
+ 	  
+ 	  typedef pair <float,int> id_pair;
+ 	  
+ 	  // pindex will hold the "station_distance" and the index in the
+ 	  // original data array.
+ 	  
+ 	  std::vector<id_pair> pindex;
+ 	  std::vector<id_pair>::const_iterator ip;
+
+ 	  for (unsigned int i=0 ; i<original_.size() ; i++) {
+
+            //std::cout << original_[i] << std::endl;
+ 	  	
+            delta_lon=(lon_[index]-lon_[i])*radish;
+            delta_lat=(lat_[index]-lat_[i])*radish;
+            a        = sin(delta_lat/2)*sin(delta_lat/2) +
+                       cos(lat_[i]*radish)*cos(lat_[index]*radish)*
+                       sin(delta_lon/2)*sin(delta_lon/2);
+            c        =2.0 * atan2(sqrt(a),sqrt(1-a));
+
+            temp_distance = RADIUS*c;                
+            
+            pindex.push_back( id_pair(temp_distance,i) );
+      }	
+       
+      //sort the data, i.e. by the distance to each neighbour
+      //the value in the second part of the pair is the index in the original array 
+       
+ 	  sort(pindex.begin(),pindex.end());
+ 	  	  
+ 	  //Find index for stations < max_distance km distant
+ 	  
+ 	  int imax=0;
+          float max_distance=params.InterpolationLimit;
+ 	  
+ 	  for (unsigned int i=0 ; i<original_.size() ; i++) {
+ 	  	  if (pindex[i].first < max_distance) imax=i;
+ 	  	  }
+ 	   	  
+
+
+ 	  inv_dist = 0.0;
+ 	  weight   = 0.0;
+
+          //bool DoInt=false;
+
+          /// This is a placeholder for spatial interpretation for temperature. Currently the algorithm just picks the same value as the nearest neighbour with a measurement.
+
+ 	  for (int i=1 ; i<imax+1 ; i++) {  //NB i=0 corresponds to the station for which we do an interpolation
+
+             //std::cout << original_[pindex[i].second] << std::endl;
+
+             if (original_[pindex[i].second] != params.missing) {
+ 	        intp_[index] = original_[pindex[i].second]*(1.0 - ( ht_[index] - ht_[pindex[i].second] )*0.006);
+/// includes rudimentary height correction ...
+                break;
+             }
+ 	  }
+ 
+} 
+
+/// perform an inverse distanced weighted interpolation based on all the neighbours. 
+/// This one modified for temperature ... working ... not for use
+void
+Qc2D::
+calculate_intp_temp(unsigned int index)
+{
+
+          const double RADIUS=6371.0;
+          float temp_distance;
+          float data_point;
+          float weight;
+          float inv_dist;
+          float delta_lat;
+          float delta_lon;
+          double a, c;
+          const double radish = 0.01745329251994329509;
+
+          ProcessControl CheckFlags;
+
+          inv_dist = 0.0;
+          weight   = 0.0;
+
+          for (unsigned int i=0 ; i<original_.size() ; i++) {
+
+              if (i != index){
+                   delta_lon=(lon_[index]-lon_[i])*radish;
+                   delta_lat=(lat_[index]-lat_[i])*radish;
+                   a        = sin(delta_lat/2)*sin(delta_lat/2) +
+                              cos(lat_[i]*radish)*cos(lat_[index]*radish)*
+                              sin(delta_lon/2)*sin(delta_lon/2);
+                   c        =2.0 * atan2(sqrt(a),sqrt(1-a));
+
+                   temp_distance = RADIUS*c;
+
+                   data_point=original_[i]*(1.0-(ht_[index] - ht_[i])*0.006);
+
+                   //if (data_point > -1 && temp_distance > 0 && controlinfo_[i].flag( 12 ) == 1 ){
+                   if (original_[i] != params.missing && temp_distance > 0 ){
+                               inv_dist += 1.0/(temp_distance*temp_distance*temp_distance*temp_distance);
+                               weight += data_point/(temp_distance*temp_distance*temp_distance*temp_distance);
+                               std::cout << data_point << " " << temp_distance << std::endl;
+                       }
+              }
+          }
+
+          if (inv_dist > 0.0) {
+             intp_[index] = weight/inv_dist;
+          }
+}
 
 /// perform an inverse distanced weighted interpolation based on all the neighbours. 
 void
@@ -1002,6 +1144,9 @@ void
 Qc2D::
 intp_delaunay(unsigned int index)
 {
+
+          //std::cout << "In intp_delaunay with Index= " << index << std::endl;
+
  	  const double RADIUS=6371.0;
  	  float temp_distance;
  	  float data_point;
@@ -1012,15 +1157,26 @@ intp_delaunay(unsigned int index)
           double a, c;
  	  const double radish = 0.01745329251994329509;
 
+          char epsfilename[]="outX";
+          char buffer[30];
+
           ProcessControl CheckFlags;
 
           std::vector<float> NeighboursUsed;
           NeighboursUsed.clear();
           double sum, mean, var, dev, skew, kurt;
 
+          double XX_triangle[3]; // corresponds to the triangle longitudes !!!
+          double YY_triangle[3]; // corresponds to the triangle latitudes  !!!
  	  
  	  typedef pair <float,int> id_pair;
  	  
+          double Denom,d_rr_over_d_x,d_rr_over_d_y;
+          double x[3], y[3],rr[3];
+          double xp[3], yp[3];
+          double xt, yt;
+          bool OKTRI=true;
+
  	  // pindex will hold the "station_distance" and the index in the
  	  // original data array.
  	  
@@ -1056,24 +1212,16 @@ intp_delaunay(unsigned int index)
  	  	  if (pindex[i].first < max_distance) imax=i;
  	  	  }
  	   	  
-          std::cout << "IMAX: " << imax << std::endl;
+          //std::cout << "IMAX: " << imax << std::endl;
 
  	  inv_dist = 0.0;
  	  weight   = 0.0;
 
-          //bool DoInt=false;
-   
-          std::cout << "--------------------------" << std::endl;
-          std::cout << "Target:" << " "
-                    << lon_[index] << " "
-                    << lat_[index] << std::endl;
-          std::cout << "Target Check:" << " "
-                    << lon_[pindex[0].second] << " "
-                    << lat_[pindex[0].second] << std::endl;
+          //std::cout << "Triangulate over these neighbours" << std::endl; 
 
-          std::cout << "Triangulate over these neighbours" << std::endl; 
-
-          if (imax >=3){         // only makes sense for triangulation (must be at least threee nodes surrounding)
+          if (imax >=3){         // only makes sense for triangulation (must be at least three nodes surrounding)
+                                 // the point with index = 0 (remember imax is the largest index value and so corresponds 
+                                 // to a list of imax+1 stations.
 
 
           // Setup projection engine business
@@ -1084,6 +1232,7 @@ intp_delaunay(unsigned int index)
           
                    std::vector<double> lat;
                    std::vector<double> lon;
+                   std::vector<double> original_data;
                    std::vector<int> stid;
           
                    int node_num;
@@ -1095,12 +1244,18 @@ intp_delaunay(unsigned int index)
                    bool triangle_show = true;
 
                    int result;
+                   int node_index;
           
-                   node_num=imax-1;  // These are only the neighbours 
-                             table= new double[2*imax];
+                   node_num=imax;  // These are only the neighbours 
+                   table= new double[2*node_num];
           
           
- 	            for (int i=0 ; i<imax+1 ; i++) { 
+ 	           for (int i=0 ; i<=imax ; i++) {    // NB imax is an index
+
+
+                  /// Problem to solve here
+                  /// we trianulate the nodes but lose track of the data corresponding to the node !!!!!!
+
           
           //Loop Through Stations And Convert To UTM co-ordinates
           
@@ -1111,144 +1266,114 @@ intp_delaunay(unsigned int index)
                         lon.push_back( utm.u );
                         lat.push_back( utm.v );
                         if (i > 0) {                // i=0 corresponds to the target
-                          table[2*(i-1)]=utm.u;
+                          table[2*(i-1)  ]=utm.u;
                           table[2*(i-1)+1]=utm.v;
-                          std::cout << "TABLE: " << utm.u << " " << utm.v << std::endl;
+                          //Make sure we keep the right set of data values corrsponding to the neighbours
+                               original_data.push_back( original_[pindex[i].second]);
                         }
-                   }
-          
-                std::cout << "TARGET in UTM : " << lon[0] << " " << lat[0] << std::endl;
+                    }
           
                 int m2 = 3;
-                triangle_node = new int[m2*3*imax];
-                triangle_neighbor = new int[m2*3*imax];  /// Funny non-intuitive counting here array is (1+N) where n=1 is the centre???
-          
+                triangle_node = new int[m2*3*node_num];
+                triangle_neighbor = new int[m2*3*node_num];  /// Funny non-intuitive counting here array is (1+N) where n=1 is the centre???
+                                                             /// Check all this array dimensioning ... I think it is fishy!
           
                 //Calculate the Triangles For Each Target Station
-                std::cout << "CALLING DTRIS!" << std::endl;
-                std::cout << "Fusion" << std::endl;
-                std::cout << node_num << " " << table[0] << " " << table[1] << std::cout;
                 result=dtris2 ( node_num, table, &triangle_num, triangle_node, triangle_neighbor );  
-                std::cout << "ESCAPING FROM GEOMPACK ... " << std::endl;
+
+                /// We are assuming that table is not reordered !!!!!
+
+            if (!result) {  //-------------------------
+                     cout << "\n";
+                     cout << "  Computed the triangulation.\n";
+                     cout << "  Number of triangles is " << triangle_num << "\n";
+
           
-                intp_[index]=-10.0;  /// This does nothing more yet !!!!!!!!!!!!!!!!!!!
-                CP_[index]=-10.0;
-                std::cout << "RESULT: " << result << std::endl; 
-                if (!result) {  //-------------------------
-                  cout << "\n";
-                  cout << "  Computed the triangulation.\n";
-                  cout << "  Number of triangles is " << triangle_num << "\n";
+                      intp_[index]=-10.0;  /// This does nothing more yet !!!!!!!!!!!!!!!!!!!
+                      CP_[index]=-10.0;
           
-          //We have to find which triangle is home for our station
+                   //We have to find which triangle is home for our station
           
-          //Loop over all triangles
-                int tri;
-                int point_within_triangle=-999;
-                int point_within_how_many_triangles=0;                                   
-                double x_triangle[3]; // corresponds to the longitude !!!
-                double y_triangle[3]; // corresponds to the latitude  !!!
-                double dot00,dot01,dot02,dot11,dot12,invDenom,u,v;
+                   //Loop over all triangles
+                      int tri;
+                      int point_within_triangle=-999;
+                      int point_within_how_many_triangles=0;                                   
+                      double x_triangle[3]; // corresponds to the longitude !!!
+                      double y_triangle[3]; // corresponds to the latitude  !!!
+                      float cornerdata[3];  // corresponds to the data associated with the corner  !!!
+                      double dot00,dot01,dot02,dot11,dot12,invDenom,u,v;
 
-                std::cout  << "Arithmetic: " << *triangle_node << std::endl;
-          
-                for (tri=0; tri<triangle_num; ++tri) {
-                // still do not understand the content of dtris output ... lets just print it all out and have a look ...
-                // Table: coordinates at (0,1) correspond to the centre point. The coordinates at (2,3) are the first
-                // neighbour ...
-                   std::cout << triangle_node[3*tri] << " " <<
-                   triangle_node[3*tri+1] << " " <<
-                   triangle_node[3*tri+2] << std::endl;
-                   std::cout << triangle_neighbor[3*tri] << " " <<
-                   triangle_neighbor[3*tri+1] << " " <<
-                   triangle_neighbor[3*tri+2] << std::endl;
-                //ok that output made some sense to me ...
+                      for (tri=0; tri<triangle_num; ++tri) {
 
-                //A triangle
-                   x_triangle[0] = table[ 2*triangle_node[3*tri] ];
-                   y_triangle[0] = table[ 2*triangle_node[3*tri] + 1 ];
-                   std::cout << 2*triangle_node[3*tri] << " " <<  2*triangle_node[3*tri] + 1  << std::endl;
+                           for (int corner=0; corner <=2; ++corner){
+      
+                                int node_index = triangle_node[corner + tri*3] - 1;   // NB triangle_node values do not start at 0
+                                                                              // delaunay code result ?
+                                x_triangle[corner] = table[ 2*( node_index ) + 0 ];
+                                y_triangle[corner] = table[ 2*( node_index ) + 1 ];
+                                cornerdata[corner] = original_data[ node_index ];
 
-                   x_triangle[1] = table[ 2*triangle_node[3*tri+1] ];
-                   y_triangle[1] = table[ 2*triangle_node[3*tri+1] + 1 ];
-                   std::cout << 2*triangle_node[3*tri+1] << " " <<  2*triangle_node[3*tri+1] + 1  << std::endl;
-
-                   x_triangle[2] = table[ 2*triangle_node[3*tri+2] ];
-                   y_triangle[2] = table[ 2*triangle_node[3*tri+2] + 1 ];
-                   std::cout << 2*triangle_node[3*tri+2] << " " <<  2*triangle_node[3*tri+2] + 1  << std::endl;
-
-                   std::cout << "--------------------------------------------------------" << std::endl;
-                 //Into which triangle does table[0],table[1] fall ?
+                           }
 
 //  Perform "Point in triangle test" according to Barycentric Technique (see http://www.blackpawn.com/texts/pointinpoly/default.html) 
 
-                   dot00=(x_triangle[3]-x_triangle[1])*(x_triangle[3]-x_triangle[1]) + (y_triangle[3]-y_triangle[1])*(y_triangle[3]-y_triangle[1]);
-                   dot01=(x_triangle[3]-x_triangle[1])*(x_triangle[2]-x_triangle[1]) + (y_triangle[3]-y_triangle[1])*(y_triangle[2]-y_triangle[1]);
-                   dot02=(x_triangle[3]-x_triangle[1])*(lon[0]         -x_triangle[1]) + (y_triangle[3]-y_triangle[1])*(lat[1]         -y_triangle[1]);
-                   dot11=(x_triangle[2]-x_triangle[1])*(x_triangle[2]-x_triangle[1]) + (y_triangle[2]-y_triangle[1])*(y_triangle[2]-y_triangle[1]);
-                   dot12=(x_triangle[2]-x_triangle[1])*(lon[0]         -x_triangle[1]) + (y_triangle[2]-y_triangle[1])*(lat[1]         -y_triangle[1]);
+                         dot00=(x_triangle[2]-x_triangle[0])*(x_triangle[2]-x_triangle[0]) + (y_triangle[2]-y_triangle[0])*(y_triangle[2]-y_triangle[0]);
+                         dot01=(x_triangle[2]-x_triangle[0])*(x_triangle[1]-x_triangle[0]) + (y_triangle[2]-y_triangle[0])*(y_triangle[1]-y_triangle[0]);
+                         dot02=(x_triangle[2]-x_triangle[0])*(lon[0]       -x_triangle[0]) + (y_triangle[2]-y_triangle[0])*(lat[0]       -y_triangle[0]);
+                         dot11=(x_triangle[1]-x_triangle[0])*(x_triangle[1]-x_triangle[0]) + (y_triangle[1]-y_triangle[0])*(y_triangle[1]-y_triangle[0]);
+                         dot12=(x_triangle[1]-x_triangle[0])*(lon[0]       -x_triangle[0]) + (y_triangle[1]-y_triangle[0])*(lat[0]       -y_triangle[0]);
 
-                   invDenom = 1.0 / (dot00 * dot11 - dot01 * dot01);  
-                   u = (dot11 * dot02 - dot01 * dot12) * invDenom;
-                   v = (dot00 * dot12 - dot01 * dot02) * invDenom;
+                         invDenom = 1.0 / (dot00 * dot11 - dot01 * dot01);  //HOOK
+                         u = (dot11 * dot02 - dot01 * dot12) * invDenom;
+                         v = (dot00 * dot12 - dot01 * dot02) * invDenom;
 
-                   if(u >= 0. && v >= 0. && u + v <= 1.0) {         
-                     point_within_triangle=tri;
-                     point_within_how_many_triangles=point_within_how_many_triangles+1;
-                   }           
+                         if(u >= 0. && v >= 0. && u + v <= 1.0) {         
+                                point_within_triangle=tri;
+                                //std::cout << "Found a candidate triangle = " << tri << std::endl;
+                                point_within_how_many_triangles=point_within_how_many_triangles+1;
+                                sprintf(epsfilename,"%d%s%d%s",stid_[index],"_",tri,".eps");
+                                //std::cout << epsfilename << std::endl;
+                                triangulation_order3_plot_eps ( epsfilename, node_num, table, triangle_num, triangle_node, 
+                                                          node_show, triangle_show, lon[0], lat[0], x_triangle[0],
+                                                          y_triangle[0],x_triangle[1],y_triangle[1],x_triangle[2],y_triangle[2] );
+                      
+                                for (int ii=0;ii<3;++ii){
+                 
+                                      data_point=(double) cornerdata[ii];       /// This is wrong! It is not the right data point.
+                                      if (data_point == -1.0) data_point = 0; /// This is only for RAINFALL
+                 
+                                      rr[ii]=data_point;
+                                      xp[ii]=x_triangle[ii];
+                                      yp[ii]=y_triangle[ii];
 
-           std::cout << "RESULT-> " << point_within_triangle << " " << point_within_how_many_triangles << std::endl;
+                          }
 
+                     //OKTRI=true;
+                     //if (xp[j] < 0.009) OKTRI=false;
+                     //if (yp[j] < 0.009) OKTRI=false; ?????????????????
 
+                                 if (rr[0] > -1 && rr[1] > -1 && rr[2] > -1 && OKTRI){
+                                 ///if (rr[0] > params.MinimumValue && rr[1] > params.MinimumValue && rr[2] > params.MinimumValue && OKTRI){
+                                 /// Need something like the above for any generalisation (currently triangulate only rainfall).
+                                      xt = lon[0];
+                                      yt = lat[0];
+                                      Denom=(xp[2]-xp[0])*(yp[1]-yp[0])-(xp[1]-xp[0])*(yp[2]-yp[0]);
+                                      d_rr_over_d_x=((yp[1]-yp[0])*(rr[2]-rr[0])-(yp[2]-yp[0])*(rr[1]-rr[0]))/Denom;
+                                      d_rr_over_d_y=((xp[2]-xp[0])*(rr[1]-rr[0])-(xp[1]-xp[0])*(rr[2]-rr[0]))/Denom;
+                                      intp_[index]=rr[0]+(xt-xp[0])*d_rr_over_d_x+(yt-yp[0])*d_rr_over_d_y;
+                                 }
 
-           char epsfilename[]="outX";
+                         }           
 
-           char buffer[30];
-           sprintf(epsfilename,"%d%s",stid_[index],".eps");
-           std::cout << epsfilename << std::endl;
-           
-           triangulation_order3_plot_eps ( epsfilename, node_num, table, triangle_num, triangle_node, node_show, triangle_show, lon[0], lat[0] );
-           
-
-
-
-                }
+                   }
            }   //------------------ 
+
                 delete [] table;
                 delete [] triangle_node;
                 delete [] triangle_neighbor;
 
 
 }
-//***********
- 	  //***********for (int i=1 ; i<imax+1 ; i++) {  //NB i=0 corresponds to the station for which we do an interpolation
- 	  	  //***********
- 	  	  //***********data_point=original_[pindex[i].second];
- 	  	  //***********
- 	  	  //***********if (data_point == -1) data_point = 0; // These are bone dry measurments
- 	  	                                        //***********// as opposed to days when there
- 	  	                                        //***********// may have been rain but none
- 	  	                                        //***********// was measurable
- 	  	  //***********
- 	  	  //***********if (imax > 1 && data_point > -1 && pindex[i].first > 0 && 
-                                              //***********CheckFlags.condition(controlinfo_[i],params.Iflag)) {
-//***********
-                        //***********inv_dist += 1.0/(pindex[i].first*pindex[i].first); 
-                        //***********weight += data_point/(pindex[i].first*pindex[i].first);
-                        //***********NeighboursUsed.push_back(data_point);
- 	  	  //***********}
- 	  //***********}
-//***********
-          //***********if (NeighboursUsed.size() > 0) {
-          //***********computeStats(NeighboursUsed.begin( ), NeighboursUsed.end( ), sum, mean, var, dev, skew, kurt);
-          //***********}
-//***********
-          //***********/// How many neighbours to use is an open question.
-          //***********/// Best option is to do the triangulation !!!!!!!!!!!!!!!!!!! ??????????????+
- 	  //***********/// if (inv_dist > 0.0 && NeighboursUsed.size() > 0 && NeighboursUsed.size() < 7) {
- 	  //***********if (inv_dist > 0.0) {
- 	     //***********intp_[index] = weight/inv_dist; 
-             //***********CP_[index]=dev;
- 	  //***********}  
  
 } 
 

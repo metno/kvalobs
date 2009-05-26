@@ -116,10 +116,13 @@ select(ReadProgramOptions params)
          break;
      case 3:
          std::cout << "Case: " << AlgoCode << std::endl;
-         //Process4D(params.pid, params.tid, params.UT0, params.UT1, params.ControlInfoString);
          Process4D(params);
          break;
      case 4:
+         std::cout << "Case: " << AlgoCode << std::endl;
+         ProcessUnitT(params);
+         break;
+     case 5:
          std::cout << "Case: " << AlgoCode << std::endl;
          break;
      default:

@@ -61,6 +61,10 @@ int
 ReadProgramOptions::
 SelectConfigFiles( std::vector<string>& config_files)
 {
+     
+       //std::string filename;
+       //filename="gordon";
+       //config_files.push_back(filename);
 
 try{
        char *pKv=getenv("KVALOBS"); 
@@ -75,11 +79,14 @@ try{
        std::string filename;
 
        if ( !fs::exists( full_path ) ) {
-           std::cout << "Does not exist: " << full_path.native_file_string() <<std::endl;
+           //std::cout << "Does not exist: " << full_path.native_file_string() <<std::endl;
+           std::cout << "Does not exist: " << full_path.file_string() <<std::endl;
        }
        else {
            for ( fs::directory_iterator dit( full_path ); dit != end_iter; ++dit ) {
-              filename=dit->native_file_string();
+              //filename=dit->path().filename();
+              //filename=dit->file_string();
+              //filename=dit->native_file_string();
               if ( filename.substr(filename.length()-3,3) == "cfg") {
                    config_files.push_back(filename);
                    std::cout << "Configuration File Found: " << filename << std::endl; 
@@ -91,7 +98,7 @@ try{
        std::cout << "Problem with configuration files for Qc2" << std::endl;
        std::cout << ecfg.what() << std::endl;
        return 1;
-   }
+   } 
 return 0;
 }
 
@@ -109,6 +116,7 @@ int RunHour;
 int ParamId;
 int TypeId;
 int MissingValue;
+int MinValue;
 float InterpolationDistance;
 // Test control flag paramters
 unsigned char z_fqclevel,z_fr,z_fcc,z_fs,z_fnum,z_fpos,z_fmis,z_ftime,z_fw,z_fstat,z_fcp,z_fclim,z_fd,z_fpre,z_fcombi,z_fhqc;
@@ -162,6 +170,7 @@ try{
         ("ControlVector",po::value<std::vector<int> > (&ControlVector),  "Control Vector")
 
         ("MissingValue",po::value<int>(&MissingValue)->default_value(-32767),  "Original Missing Data Value") /// could also rely on fmis here !!??
+        ("MinValue",po::value<int>(&MinValue)->default_value(-32767),  "Minimum Data Value FOr Some Controls") 
         ("InterpolationDistance",po::value<float>(&InterpolationDistance)->default_value(0),  "Nearest Nieighboue Limiting Distance") 
 
         ("z_fqclevel",po::value<unsigned char>  (&z_fqclevel)->default_value(0x3F),  "fqclevel")
@@ -309,6 +318,7 @@ try{
          ControlInfoVector=ControlVector;
          InterpolationLimit=InterpolationDistance;
          missing=MissingValue;
+         MinimumValue=MinValue;
          std::cout << miutil::miTime::nowTime() << ": " << UT0 << " -> " << UT1 << "  " << filename << std::endl;
 
 

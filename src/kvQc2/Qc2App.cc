@@ -33,6 +33,7 @@
 #include "Qc2App.h"
 #include <milog/milog.h>
 #include <string>
+#include <kvalobs/kvPath.h>
 
 namespace{
   volatile sig_atomic_t sigTerm=0;
@@ -60,7 +61,8 @@ Qc2App::Qc2App(int argn, char **argv,
   	std::cout << "arg " << k << ": " << argv[k]  << std::endl;
   }
   
-  string driver(getKvalobsPath()+"lib/kvdb/"+dbDriver);
+  string driver(kvPath("pkglibdir")+"/db/"+dbDriver);
+  //string driver(getKvalobsPath()+"lib/kvdb/"+dbDriver);
   setSigHandlers();
 
   LOGINFO("Loading driver for database engine <" << driver << ">!\n");

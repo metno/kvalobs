@@ -47,7 +47,12 @@ public:
   ReadProgramOptions                  params;
 
   std::map<int, int>                  stindex; //use this to lookup index based on station id.
-  void istindex(int stid)             {stindex[ stid ] = stindex.size()-1;}
+  void istindex(int stid)             {stindex[ stid ] = stid_.size()-1;}
+  //void istindex(int stid)             {stindex[ stid ] = stidex.size()-1;}
+  //void istindex(int stid)             {stindex[ stid ] = obstime_.size()-1;}   // Can be any counter ?????
+  //void istindex(int stid)             {stindex[ stid ] = 100;   // Can be any counter ?????
+                                      //std::cout << stid << " " << "Size " << stindex.size() << std::endl;} 
+
                                       //maps the station id to the index of the vectors
                                       //as they are populated ... does this work for all 
                                       //compilers?? i.e. size can never be 0 because an
@@ -96,8 +101,11 @@ public:
   void distributor(const std::list<kvalobs::kvStation> & slist, std::list<kvalobs::kvData>& ReturnData,int ClearFlag);  // UMPH !!! ClearFlag
 
   void calculate_intp_all(unsigned int index);
+  void calculate_intp_temp(unsigned int index);
   void idw_intp_limit(unsigned int index);
   void intp_delaunay(unsigned int index);
+  void intp_dummy(unsigned int index);
+  void intp_temp(unsigned int index);
   void calculate_intp_wet_dry(unsigned int index);
   void calculate_intp_h(unsigned int index);  // includes modification due to change in height (h).
   void calculate_intp_sl(unsigned int index, std::list<int> BestStations); // perform an interpolation based on a list of allowed stations (sl).

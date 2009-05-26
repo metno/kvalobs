@@ -51,6 +51,7 @@ void timestamp ( void );
 char *timestring ( void );
 void triangulation_order3_plot_eps ( char *file_name, int node_num, double node_xy[], int triangle_num, int triangle_node[], int node_show, int triangle_show );
 void triangulation_order3_plot_eps ( char *file_name, int node_num, double node_xy[], int triangle_num, int triangle_node[], int node_show, int triangle_show, double xtarget, double ytarget );
+void triangulation_order3_plot_eps ( char *file_name, int node_num, double node_xy[], int triangle_num, int triangle_node[], int node_show, int triangle_show, double xtarget, double ytarget, double xp1, double yp1, double xp2, double yp2, double xp3, double yp3 );
 void vbedg ( double x, double y, int point_num, double point_xy[], int tri_num, 
 int tri_vert[], int tri_nabe[], int *ltri, int *ledg, int *rtri, int *redg );
 

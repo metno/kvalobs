@@ -169,14 +169,19 @@ RedistributeStationData(int & sid, std::list<kvalobs::kvData>& ReturnData)
                   //if ( k==sindex ) std::cout << "SUMCHECK " << accval << " " <<roundSum << std::endl;
 
                   fixtime=dst_time[ stid ][ k ];
-                  fixtime.addDay(3650);  // Security feature ... REMOVE THIS WHEN THIS CODE IS READY
-                                         // ADD 10 years in case anyone uses thisi code and writes data back to kvalobs database
+                  fixtime.addDay(366);  // FOR TESTING ... REMOVE THIS WHEN THIS CODE IS READY
+                  ///fixtime.addDay(366);  *** FOR TESTING ... REMOVE THIS WHEN THIS CODE IS READY
 
 
 
                   fixflags=d_controlinfo[ stid ][ k ];
                   ControlFlag.setter(fixflags,params.Sflag);
+                  //fixflags.set(12,8);    // Just set the flag value to 8 for now to indicate
+                                         // redistribution ... full specification is pending                     
+                  //fixflags.set(9,3);     // Space to define things in fstat                            
+                                         // setting this will trigger Qc2done status 
 
+                  std::cout << "Algorithm Test Mode !!!!!!!!!!!!!!!"<< std::endl;
 
                    std::cout << "RESULTS: "           <<    "\"" 
                             << stid                        << "\",\"" 
@@ -192,7 +197,11 @@ RedistributeStationData(int & sid, std::list<kvalobs::kvData>& ReturnData)
                             << fixflags                    << "\",\""                  
                             << d_useinfo[ stid ][ k ]      << "\"" << std::endl; 
 
-                  ReturnElement.set(stid,fixtime,dst_data[ stid ][ k ],110,
+                  if (dst_corr[ stid ][ k ]==-1) {dst_corr[ stid ][ k ]=0;}    // For algorithm testing
+                  if (dst_data[ stid ][ k ]==-1) {dst_data[ stid ][ k ]=0;}    // For algorithm testing
+                  ReturnElement.set(stid,fixtime,dst_corr[ stid ][ k ],110,  // For use in algorithm
+                                                                               // varitional tests
+                  //ReturnElement.set(stid,fixtime,dst_data[ stid ][ k ],110,
                                 dst_tbtime[ stid ][ k ],d_typeid[ stid ][ k ], d_sensor[ stid ][ k ],
                                 d_level[ stid ][ k ], roundVal,fixflags, 
                                 d_useinfo[ stid ][ k ], d_cfailed[ stid ][ k ]+" Qc2-R");
