@@ -1,6 +1,7 @@
 SUBDIRS = \
 	lib \
 	service-libs \
+	data2kv \
 	kvDataInputd \
 	kvServiced \
 	kvQabased \
