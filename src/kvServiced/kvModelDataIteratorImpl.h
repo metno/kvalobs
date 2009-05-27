@@ -75,6 +75,10 @@ public:
 
 
   void destroy();
+  
+  ///Overrided from reaperBase.
+  virtual void cleanUp();
+  
   CORBA::Boolean next(CKvalObs::CService::ModelDataList_out modelData_);
   virtual void addRef() { _add_ref(); }
   virtual void removeRef(){ _remove_ref(); }

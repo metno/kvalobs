@@ -78,6 +78,9 @@ public:
   CORBA::Boolean 
     next(CKvalObs::CService::RejectdecodeList_out rejectedList_);
   
+  ///Overrided from reaperBase.
+  virtual void cleanUp();
+  
   virtual void addRef() { _add_ref(); }
   virtual void removeRef(){ _remove_ref(); }
 };

@@ -224,3 +224,14 @@ next(CKvalObs::CService::RejectdecodeList_out rejectedList)
     
   return true;
 }
+
+/*
+ * TODO: Implement the cleanup, ie move the cleanup of the database object and whichData
+ * from the deactivate method to this method. Remember to add a call to cleanup in 
+ * the method ServiceApp::cleanUpReaperObj()
+ */ 
+void 
+RejectedIteratorImpl::
+cleanUp()
+{
+}

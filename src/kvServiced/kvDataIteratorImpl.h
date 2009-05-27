@@ -109,7 +109,7 @@ public:
   void destroy();
   CORBA::Boolean next(CKvalObs::CService::ObsDataList_out obsData_);
   
-  //Overrided from reaperBase.
+  ///Overrided from reaperBase.
   virtual void cleanUp();
   virtual void addRef() { _add_ref(); }
   virtual void removeRef(){ _remove_ref(); }
