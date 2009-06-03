@@ -45,6 +45,47 @@ namespace CorbaHelper{
    * @{
    */
   
+	/**
+	 * ServiceHost is a helper class to hold an
+	 * host port specification.   
+	 */
+	struct ServiceHost {
+		std::string host;
+		int  port;
+
+		ServiceHost( ) : port( -1 ) {}
+	
+		ServiceHost( const ServiceHost &service ) 
+			: host( service.host), port( service.port )
+			{}
+	
+		ServiceHost( const std::string &serviceWithPort, int defaultPort )
+			:port( -1 )
+			{	
+				decode( serviceWithPort, defaultPort );
+			}
+	
+		ServiceHost& operator=( const ServiceHost &rhs ) 
+			{
+				if( this != &rhs ) {
+					host = rhs.host;
+					port = rhs.port;
+				}
+			
+				return *this;
+			}
+	
+		/**
+		 * Decode a string on the form hostname:port.
+		 */
+		bool decode( const std::string &erviceWithPort, int defaultPort );
+	
+		bool isValid()const { return port >= 0 && ! host.empty(); }
+	
+		std::string toString()const;
+	};
+
+
   /**
    * CORBA helper class. There must be only one of this in an 
    * application (Singelton). There is nothing to enforce this 
@@ -93,6 +134,23 @@ namespace CorbaHelper{
     
     
     /**
+     * \brief putObjInNS is a helper function that can be used 
+     * to put referances to objects in the CORBA name server. The
+     * nameserver to use is given with 'nameservice'.
+     * 
+     * \param objref the object referance to be put in the CORBA nameserver.
+     * \param name is a string on the form /path/to/name. Where /path/to 
+     *    represent the context the name shall be put into. And name is the 
+     *    name we want the objref to be known by.
+     * \param nameservice Put the referance to the object in this
+     *  nameserver. 
+     */ 
+    bool   putObjInNS( CORBA::Object_ptr objref, 
+       		           const std::string &name,
+        		           const ServiceHost &nameservice );
+
+    
+    /**
      * \brief getObjInNS is a helper function that can be used 
      * to get referances to an object in the CORBA name server.
      * 
@@ -102,6 +160,21 @@ namespace CorbaHelper{
      * \return A corba Object, may be an NULL referans.
      */  
     CORBA::Object_ptr getObjFromNS(const std::string &name);
+    
+    /**
+     * \brief getObjInNS is a helper function that can be used 
+     * to get referances to an object in the CORBA name server.
+     * The nameserveice used is specified with the nameservice
+     * parameter.
+     * 
+     * \param name is a string on the form /path/to/name. Where /path/to 
+     *    represent the context the name shall be get from. And name is the 
+     *    name the objref is known by.
+     * \param nameservice The name service to use to get the object.
+     * \return A corba Object, may be an NULL referans.
+     */  
+    CORBA::Object_ptr getObjFromNS( const std::string &name, 
+   		                           const ServiceHost &nameservice );
 
     ///Get a stringified object referance for the object.
     std::string corbaRef(CORBA::Object_ptr ptr);
