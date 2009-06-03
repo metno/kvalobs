@@ -13,11 +13,11 @@ data2kv_SOURCES=data2kv.cc \
 
 data2kv_CPPFLAGS = $(AM_CPPFLAGS) 
 data2kv_LDFLAGS = -pthread
-data2kv_LDADD = $(top_builddir)/src/lib/kvalobs/libkvalobs.la \ 
+data2kv_LDADD = $(top_builddir)/src/lib/kvalobs/libkvalobs.la \
 					 $(top_builddir)/src/lib/miutil/libmiutil.la \
                 $(top_builddir)/src/lib/fileutil/libfileutil.la \
                 $(top_builddir)/src/lib/miconfparser/libmiconfparser.a \
-                $(top_builddir)/src/lib/dnmithread/libdnmithread.la\
+                $(top_builddir)/src/lib/dnmithread/libdnmithread.la \
                 $(top_builddir)/src/lib/corbahelper/libcorbahelper.la \
                 $(top_builddir)/src/lib/milog/libmilog.la \
                 $(top_builddir)/src/lib/kvskel/libkvskel.la \
