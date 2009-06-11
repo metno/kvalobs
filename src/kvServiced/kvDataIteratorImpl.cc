@@ -64,35 +64,14 @@ DataIteratorImpl::~DataIteratorImpl()
   	LOGDEBUG("DTOR: DataIteratorImpl::~DataIteratorImpl ... 1 ...\n");
 }
 
-/**
- * TODO: Destroy may delete resources while they are in use -> CRASH. 
- * There is a chance for a crash if destroy is called while
- * next is in progress. We must check if we are running.
- * 
- * The best solution is maybe not to dealocate the resources here
- * but add it to a 'to be deleted que' and let the reaper thread delete
- * the resources.
- */
 
 void  
 DataIteratorImpl::destroy()
 {
-  	//CODE:
-  	// We must delete this instance of DataIteratorImpl. We cant just 
-  	// call 'delete this'. We must also implement some mean of cleaning up
-  	// this instance if the client dont behave as expected or crash before
-  	// destroy is called.
+	// We just deactivate the object here. The cleanup thread will release the resources
+	// and remove it from the reaperObjList.
 
   	LOGDEBUG("DataIteratorImpl::destroy: called!\n");
-
-
-  	app.releaseDbConnection(dbCon);
-  	delete whichData;
-
-  	whichData=0;
-  	dbCon=0;
-
-	app.removeReaperObj(this);
 
   	deactivate();
   
@@ -136,14 +115,22 @@ DataIteratorImpl::next(CKvalObs::CService::ObsDataList_out obsDataList)
   	char                   *sTmp;
   	char                   buf[20];
   	CORBA::Long            tmpIData;
-
+  	bool                   active;
   	//ObsDataList          obsDataList;
-  	IsRunningHelper isRunning(*this);
-
+  	
+  	IsRunningHelper isRunning(*this, active );
+  	  	
   	LogContext context("service/DataIterator");
-
-  	obsDataList =new CKvalObs::CService::ObsDataList(OBSLIST_DELTA);
+  	
   	LOGDEBUG("next: called ..." );
+  	
+  	//Check if we are deactivated. If so just return false.
+  	if( ! active ) {
+  		LOGDEBUG( "next: deactivated ( returning false)");
+  		return false;
+  	} 
+  	
+  	obsDataList =new CKvalObs::CService::ObsDataList(OBSLIST_DELTA);
   
   	do{
     	tmpIData=iData;
@@ -155,7 +142,7 @@ DataIteratorImpl::next(CKvalObs::CService::ObsDataList_out obsDataList)
     
     	try{
         	//findData, increments iData when necesary!
-      		if(!findData(dataList, textDataList, (*whichData)[iData])){
+    		if(!findData(dataList, textDataList, (*whichData)[iData])){
 				LOGDEBUG("next: Cant find data (return false)!");
 				//CODE:
 				//We have a problem with the connection to the database.
@@ -165,7 +152,7 @@ DataIteratorImpl::next(CKvalObs::CService::ObsDataList_out obsDataList)
 				//had problems. Anyway, the caller must react the same way and
 				//call destroy on the iterator.
 				return false;
-      		}
+    		}
     	}
     	catch(InvalidWhichData &ex){
       		LOGDEBUG("next: EXCEPTION: " << endl <<  ex.what() << endl);
@@ -475,4 +462,9 @@ void
 DataIteratorImpl::
 cleanUp()
 {
+	app.releaseDbConnection(dbCon);
+  	delete whichData;
+
+  	whichData=0;
+  	dbCon=0;
 }

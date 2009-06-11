@@ -43,6 +43,7 @@ class ReaperBase
   bool                         running;
   bool                         active;
   PortableServer::ObjectId_var objId;
+  bool                         timedout;
   boost::mutex mutex;
 
  public:
@@ -59,7 +60,7 @@ class ReaperBase
 
 
   //Set the running state!
-  void setRunning(bool running);
+  void setRunning(bool running, bool &isActive );
 
   //Is running returns true if the service is
   //running right now.
@@ -67,6 +68,8 @@ class ReaperBase
 
   void setObjId(PortableServer::ObjectId *id){objId=id;}
   
+  bool isTimedout() const { return timedout; }
+  void setTimedout() { timedout = true; }
   
   //Cleanup the resources this object is using.
   virtual void cleanUp()=0;
@@ -79,12 +82,13 @@ class IsRunningHelper{
   ReaperBase &rb;
 
  public:
-  IsRunningHelper(ReaperBase &rb_):rb(rb_){
-    rb.setRunning(true);
+  IsRunningHelper(ReaperBase &rb_, bool &isActive ):rb(rb_){
+    rb.setRunning(true, isActive );
   }
 
   ~IsRunningHelper(){
-    rb.setRunning(false);
+	  bool dummy;
+    rb.setRunning(false, dummy );
   }
 };
 

@@ -172,12 +172,6 @@ destroy()
   // destroy is called.
 
   LOGDEBUG4("RejectedIteratorImpl::destroy: called!\n");
-
-  app.releaseDbConnection(dbCon);
-  dbCon=0;
-
-	app.removeReaperObj(this);
-  
   deactivate();
   LOGDEBUG6("RejectedIteratorImpl::destroy: leaving!\n");
 }
@@ -187,42 +181,49 @@ CORBA::Boolean
 RejectedIteratorImpl::
 next(CKvalObs::CService::RejectdecodeList_out rejectedList)
 {
-  list<kvRejectdecode>           dataList;
-  list<kvRejectdecode>::iterator it;
+	list<kvRejectdecode>           dataList;
+	list<kvRejectdecode>::iterator it;
+	bool active;
 
-  IsRunningHelper running(*this);
+	IsRunningHelper running(*this, active );
   
-  LogContext context("service/RejectedIterator");
-  rejectedList =new CKvalObs::CService::RejectdecodeList();
-  CERR("RejectedIteratorImpl::next: called ... \n");
+	LogContext context("service/RejectedIterator");
+	LOGDEBUG("RejectedIteratorImpl::next: called ... \n");
+  
+	//Check if we are deactivated. If so just return false.
+	if( ! active ) {
+		LOGDEBUG( "next: deactivated ( returning false)");
+  		return false;
+  	}
+  
+	rejectedList =new CKvalObs::CService::RejectdecodeList();
+  
   
 
-  if(!findData(dataList)){
-    //An error occured.
-    return false;
-  }
+	if(!findData(dataList)){
+		//An error occured.
+		return false;
+	}
  
-  it=dataList.begin();
+	it=dataList.begin();
 
-  if(it==dataList.end()){
-    LOGERROR("All requested rejected data is sendt!");
-    return false;
-  }
+	if(it==dataList.end()){
+		LOGERROR("All requested rejected data is sendt!");
+		return false;
+	}
 
-  rejectedList->length(dataList.size());
+	rejectedList->length(dataList.size());
   
-  
-  for(CORBA::Long datai=0;it!=dataList.end(); datai++, it++){
-    (*rejectedList)[datai].message=it->message().c_str();
-    (*rejectedList)[datai].tbtime=it->tbtime().isoTime().c_str();
-    (*rejectedList)[datai].decoder=it->decoder().c_str();
-    (*rejectedList)[datai].comment=it->comment().c_str();
-  }
+	for(CORBA::Long datai=0;it!=dataList.end(); datai++, it++){
+		(*rejectedList)[datai].message=it->message().c_str();
+		(*rejectedList)[datai].tbtime=it->tbtime().isoTime().c_str();
+		(*rejectedList)[datai].decoder=it->decoder().c_str();
+		(*rejectedList)[datai].comment=it->comment().c_str();
+	}
     
-  LOGINFO("next: return " << rejectedList->length() << " elements!" <<endl);
-
+	LOGDEBUG("next: return " << rejectedList->length() << " elements!" <<endl);
     
-  return true;
+	return true;
 }
 
 /*
@@ -234,4 +235,6 @@ void
 RejectedIteratorImpl::
 cleanUp()
 {
+	app.releaseDbConnection(dbCon);
+	dbCon=0;
 }

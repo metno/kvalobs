@@ -31,22 +31,23 @@
 #include <iostream>
 #include <kvskel/kvService.hh>
 #include <corbahelper/corbaApp.h>
-#include <miutil/miTime>
+#include <puTools/miTime>
 
 using namespace CorbaHelper;
 using namespace std;
 using namespace CKvalObs::CService;
 using namespace miutil;
 
-main(int argn, char **argv){
-	string        kvserviceName("/kvtest/kvService");
+main(int argn, char **argv)
+{
+	string        kvserviceName("/kvtest-conan/kvService");
 	WhichDataList wd;
+			
 	CorbaApp      app(argn, argv);
 	
-	app.setNameservice("corbans.oslo.dnmi.no");
-	
+	app.setNameservice("localhost");
 	CORBA::Object_ptr tmpObj=app.getObjFromNS(kvserviceName);
-	
+
 	if(CORBA::is_nil(tmpObj)){
 		cerr << "Cant locate CORBA object <" << kvserviceName << ">!" << endl;
 		return 1;
@@ -60,9 +61,10 @@ main(int argn, char **argv){
 	}
 	
 	wd.length(1);
-	wd[0].stationid=0;
+	//wd[0].stationid=0;
+	wd[0].stationid=18700;
 	wd[0].status=All;
-	wd[0].fromObsTime="2005-10-31 13:00:00";
+	wd[0].fromObsTime="2009-05-26 08:00:00";
 	wd[0].toObsTime="";
 	
 	DataIterator_var dataIt;
@@ -77,9 +79,10 @@ main(int argn, char **argv){
 		return 1;		
 	}
 			
+	ObsDataList *obsData;
 	try {
-		ObsDataList *obsData;
-		
+	
+		bool destroy=true;
 		while(dataIt->next(obsData)){
 			for(CORBA::Long i=0; i<obsData->length(); i++){
 				cerr << "[" << i << "] stationid: " << (*obsData)[i].stationid << endl;
@@ -104,10 +107,11 @@ main(int argn, char **argv){
 				}
 				
 				cerr << "=============================================" << endl;
-			}		
-			
+			}
+			//abort();
+			//sleep( 65);
 			cerr << "<<<<<<<<<<<<<<<< next >>>>>>>>>>>>>>>>" << endl;
-					
+			
 		}
 		
 		dataIt->destroy();
@@ -117,6 +121,7 @@ main(int argn, char **argv){
 		
 		try{
 			dataIt->destroy();
+			dataIt->next(obsData);
 		}
 		catch(...){
 		}

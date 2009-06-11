@@ -51,24 +51,26 @@ void
 ObjReaper::
 operator()()
 {
-  const int NEXT_TIME=60; 
-  time_t now;
-  time_t next;
+	//const int NEXT_TIME=60;
+	const int NEXT_TIME=5;
+	time_t now;
+	time_t next;
 
-  time(&next);
+	time( &next );
   
-  while(!app.shutdown()){
-    time(&now);
+	while( !app.shutdown() ) {
+		time( &now );
     
-    if(next>now){
-      sleep(1);
-      continue;
-    }
-    
-    next+=NEXT_TIME;
-    app.cleanUpReaperObj();
-  
-  }
+		if( next>now ){
+			sleep( 1 );
+			continue;
+		}
+		
+		app.cleanUpReaperObj();
+		
+		time( &now );
+		next = now + NEXT_TIME;
+	}
 }
 
 

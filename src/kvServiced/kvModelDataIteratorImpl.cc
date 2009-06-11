@@ -28,14 +28,16 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#include "kvModelDataIteratorImpl.h"
-#include <kvalobs/kvDbGate.h>
 #include <list>
+#include <milog/milog.h>
+#include <kvalobs/kvDbGate.h>
 #include <kvalobs/kvModelData.h>
+#include "kvModelDataIteratorImpl.h"
 
 using namespace std;
 using namespace kvalobs;
 using namespace CKvalObs::CService;
+using namespace milog;
 
 ModelDataIteratorImpl::ModelDataIteratorImpl(dnmi::db::Connection *dbCon_,
 				   WhichDataList *whichData_,
@@ -47,167 +49,160 @@ ModelDataIteratorImpl::ModelDataIteratorImpl(dnmi::db::Connection *dbCon_,
 ModelDataIteratorImpl::~ModelDataIteratorImpl()
 {
   
-  CERR("DTOR: ModelDataIteratorImpl::~ModelDataIteratorImpl...\n");
+	LOGDEBUG("DTOR: ModelDataIteratorImpl::~ModelDataIteratorImpl...\n");
   
-  if(whichData)
-    delete whichData;
+	if(whichData)
+		delete whichData;
 
-  if(dbCon)
-    app.releaseDbConnection(dbCon);
-
-  CERR("DTOR: ModelDataIteratorImpl::~ModelDataIteratorImpl ... 1 ...\n");
+	if(dbCon)
+		app.releaseDbConnection(dbCon);
+	
+	LOGDEBUG("DTOR: ModelDataIteratorImpl::~ModelDataIteratorImpl ... 1 ...\n");
 }
 
 
 void  
 ModelDataIteratorImpl::destroy()
 {
-  //CODE:
-  // We must delete this instance of ModelDataIteratorImpl. We cant just 
-  // call 'delete this'. We must also implement some mean of cleaning up
-  // this instance if the client dont behave as expected or crash before
-  // destroy is called.
-
-  CERR("ModelDataIteratorImpl::destroy: called!\n");
-  app.releaseDbConnection(dbCon);
-  delete whichData;
-
-  whichData=0;
-  dbCon=0;
-  
-  app.removeReaperObj(this);
-  
-  deactivate();
-  CERR("ModelDataIteratorImpl::destroy: leaving!\n");
+	// We just deactivate the object here. The cleanup thread will release the resources
+	// and remove it from the reaperObjList.
+	
+	LOGDEBUG("ModelDataIteratorImpl::destroy: called!\n");
+	deactivate();
+	LOGDEBUG("ModelDataIteratorImpl::destroy: leaving!\n");
 }
 
 CORBA::Boolean  
 ModelDataIteratorImpl::next(CKvalObs::CService::ModelDataList_out modelDataList)
 {
-  list<kvModelData>           dataList;
-  list<kvModelData>::iterator it;
-  miutil::miTime         thisTime;
-  CORBA::Long            obsi=0;
-  CORBA::Long            datai=0;
-  char                   *sTmp;
+	list<kvModelData>           dataList;
+	list<kvModelData>::iterator it;
+	miutil::miTime         thisTime;
+	CORBA::Long            obsi=0;
+	CORBA::Long            datai=0;
+	char                   *sTmp;
+	bool                   active;
   //ObsDataList          obsDataList;
 
-  IsRunningHelper(*this);
+	LogContext context("service/ModelDataIterator");
+	IsRunningHelper(*this, active );
 
-  modelDataList =new CKvalObs::CService::ModelDataList();
-  CERR("ModelDataIteratorImpl::next: called ... \n");
+	LOGDEBUG("ModelDataIteratorImpl::next: called ... \n");
   
-  do{
-    if(iData>=whichData->length()){
-      CERR("ModelDataIteratorImpl::next: End of data reached (return false)!\n");
-      return false;
-    }
+	//Check if we are deactivated. If so just return false.
+	if( ! active ) {
+		LOGDEBUG( "next: deactivated ( returning false)");
+		return false;
+	} 
+  
+	modelDataList =new CKvalObs::CService::ModelDataList();
+	
+	do{
+		if(iData>=whichData->length()){
+			LOGDEBUG("ModelDataIteratorImpl::next: End of data reached (return false)!\n");
+			return false;
+		}
     
-    try{
-      
-      //Try to keep me alive!
-
-      if(!findData(dataList, (*whichData)[iData])){
-	CERR("ModelDataIteratorImpl::next: Cant find data (return false)!\n");
-	//CODE:
-	//We have a problem with the connection to the database.
-	//We return false. false is used to mark the end of stream. So
-	//the caller sees this as an end of stream, that is wrong. We 
-	//may add an exception here later to tell the caller that we
-	//had problems. Anyway, the caller must react the same and
-	//call destroy on the iterator.
-	return false;
-      }
-    }
-    catch(InvalidWhichData &ex){
-      CERR("ModelDataIteratorImpl::next: EXCEPTION: \n" << "   " << ex.what() << endl);
-      return false;
-    }
-    catch(...){
-      CERR("ModelDataIteratorImpl::next: UNKNOWN EXCEPTION: \n");
-      return false;
-    }
+		try{
+			if(!findData(dataList, (*whichData)[iData])){
+				LOGWARN("ModelDataIteratorImpl::next: Cant find data (return false)!\n");
+				//CODE:
+				//We have a problem with the connection to the database.
+				//We return false. false is used to mark the end of stream. So
+				//the caller sees this as an end of stream, that is wrong. We 
+				//may add an exception here later to tell the caller that we
+				//had problems. Anyway, the caller must react the same and
+				//call destroy on the iterator.
+				return false;
+			}
+		}
+		catch(InvalidWhichData &ex){
+			LOGERROR("ModelDataIteratorImpl::next: EXCEPTION: \n" << "   " << ex.what() << endl);
+			return false;
+		}
+		catch(...){
+			LOGERROR("ModelDataIteratorImpl::next: UNKNOWN EXCEPTION: \n");
+			return false;
+		}
      
-    iData++;
+		iData++;
+	}while(dataList.empty());
 
-  }while(dataList.empty());
-
-  it=dataList.begin();
+	it=dataList.begin();
   
-  if(it!=dataList.end()){
-    modelDataList->length(obsi+1);
-    thisTime=it->obstime();
-  }
+	if(it!=dataList.end()){
+		modelDataList->length(obsi+1);
+		thisTime=it->obstime();
+	}
 
-  while(it!=dataList.end()){
-    if(it->obstime()!=thisTime){
-      //New record
-      obsi++;
-      datai=0;
-      thisTime=it->obstime();
-      modelDataList->length(obsi+1);
-      CERR("ModelDataIteratorImpl::next: obsDataList[" << obsi-1 << "].dataList.length()="
-	   << (*modelDataList)[obsi-1].dataList.length() << endl);
-    }
+	while(it!=dataList.end()){
+		if(it->obstime()!=thisTime){
+			//New record
+			obsi++;
+			datai=0;
+			thisTime=it->obstime();
+			modelDataList->length(obsi+1);
+			LOGDEBUG( "ModelDataIteratorImpl::next: obsDataList[" << obsi-1 << "].dataList.length()="
+					    << (*modelDataList)[obsi-1].dataList.length() << endl);
+		}
    
-    (*modelDataList)[obsi].dataList.length(datai+1);
-    (*modelDataList)[obsi].dataList[datai].stationID=it->stationID(); 
-    (*modelDataList)[obsi].dataList[datai].obstime=
+		(*modelDataList)[obsi].dataList.length(datai+1);
+		(*modelDataList)[obsi].dataList[datai].stationID=it->stationID(); 
+		(*modelDataList)[obsi].dataList[datai].obstime=
                                   it->obstime().isoTime().c_str();
-    (*modelDataList)[obsi].dataList[datai].paramID=it->paramID();
-    (*modelDataList)[obsi].dataList[datai].level=it->level();
-    (*modelDataList)[obsi].dataList[datai].modelID=it->modelID();
-    (*modelDataList)[obsi].dataList[datai].original=it->original();  
+		(*modelDataList)[obsi].dataList[datai].paramID=it->paramID();
+		(*modelDataList)[obsi].dataList[datai].level=it->level();
+		(*modelDataList)[obsi].dataList[datai].modelID=it->modelID();
+		(*modelDataList)[obsi].dataList[datai].original=it->original();  
      
-    datai++;
-    it++; //Move to the next data in dataList.
-  }
+		datai++;
+		it++; //Move to the next data in dataList.
+	}
     
-  CERR("ModelDataIteratorImpl::next: obsDataList->length()=" 
-       << modelDataList->length() << endl);
+	LOGDEBUG( "ModelDataIteratorImpl::next: obsDataList->length()=" 
+             << modelDataList->length() << endl);
 
-
-  return true;
+	return true;
 }
 
 bool
 ModelDataIteratorImpl::findData(list<kvModelData> &data, 
 			   const CKvalObs::CService::WhichData &wData)
 {
-  kvDbGate gate(dbCon);
-  miutil::miTime stime(wData.fromObsTime);
-  miutil::miTime etime(wData.toObsTime);
+	kvDbGate gate(dbCon);
+	miutil::miTime stime(wData.fromObsTime);
+	miutil::miTime etime(wData.toObsTime);
 
-  if(stime.undef() || etime.undef()){
-    if(stime.undef()){
-      ostringstream os;
-      os << "Inavlid time spec (fromObsTime): ";
+	if(stime.undef() || etime.undef()){
+		if(stime.undef()){
+			ostringstream os;
+			os << "Inavlid time spec (fromObsTime): ";
 
-      if(wData.fromObsTime)
-	os <<  wData.fromObsTime;
-      else
-	os << "(NULL POINTER)";
+			if(wData.fromObsTime)
+				os <<  wData.fromObsTime;
+			else
+				os << "(NULL POINTER)";
 
-      os << "!";
+			os << "!";
 	 
-      throw InvalidWhichData(os.str());
-    }
+			throw InvalidWhichData(os.str());
+		}
 
-    if(etime.undef()){
-      etime=etime.nowTime();
-    }
-  }
+		if(etime.undef()){
+			etime=etime.nowTime();
+		}
+	}
      
-  CERR("ModelDataIteratorImpl::findData: calling gate.select(data, .... \n");
+	LOGDEBUG("ModelDataIteratorImpl::findData: calling gate.select(data, .... \n");
 
-  if(gate.select(data, kvQueries::selectModelData(wData.stationid, stime, etime))){
-    CERR("ModelDataIteratorImpl::findData: nElements=" << data.size() 
-	 << " (return true)\n");
-    return true;
-  }
+	if( gate.select(data, kvQueries::selectModelData(wData.stationid, stime, etime))){
+		LOGDEBUG( "ModelDataIteratorImpl::findData: nElements=" << data.size() 
+				    << " (return true)\n");
+		return true;
+	}
 
-  CERR("ModelDataIteratorImpl::findData: return false\n");
-  return false;
+	LOGDEBUG("ModelDataIteratorImpl::findData: return false\n");
+	return false;
 }
   
 /*
@@ -219,6 +214,11 @@ void
 ModelDataIteratorImpl::
 cleanUp()
 {
+	app.releaseDbConnection(dbCon);
+	delete whichData;
+
+	whichData=0;
+	dbCon=0;
 }
   
 

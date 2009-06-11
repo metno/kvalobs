@@ -108,8 +108,9 @@ getNewDbConnection()
   con=dbMgr.connect(dbDriverId, dbConnect);
 
   if(!con){
-    LOGERROR("Can't create a database connection  (" 
-	     << dbDriverId << ")" << endl << "Connect string: <" << dbConnect << ">!");
+    LOGERROR( "Can't create a database connection  (" 
+	           << dbDriverId << ")" << endl << "Connect string: <" 
+	           << dbConnect << ">!");
     return 0;
   }
 
@@ -249,53 +250,53 @@ cleanUpReaperObj()
   	time_t lastAccess;
   	time_t now;
   	bool running;
-  	ostringstream ost;
 
   	time(&now);
 
   	boost::mutex::scoped_lock l(reaperMutex);
   	std::list<ReaperBase*>::iterator it=reaperObjList.begin();
 
-  	LOGDEBUG("cleanUpReaperObj running!");
+  	//LOGDEBUG("cleanUpReaperObj running!");
 
   	while(it!=reaperObjList.end()){
   		running=(*it)->isRunning(lastAccess);
-  		ost << "active: " << ((*it)->isActive()?"true":"false") 
-  		    << " running: " << (running?"true":"false") 
-  		    << " lastAccess: " << miutil::miTime(lastAccess) 
-  		    << " timedif: " << now -lastAccess ;
+  		LOGDEBUG( "cleanUpReaperObj: active: " << ((*it)->isActive()?"true":"false") 
+  					 << " running: " << (running?"true":"false") 
+  					 << " lastAccess: " << miutil::miTime(lastAccess) 
+  		    		 << " timedif: " << now -lastAccess                );
   		    
-    	if(!(*it)->isActive()){
-      	//We remove this deativated object from the list.
+    	if( !(*it)->isActive() ) {
+      	//We remove this deactivated object from the list.
       	//It has been deactivated by the client.
-      	LOGINFO("COLLECT: A client has disconected a ReaperBase object!");
+    		if( (*it)->isTimedout() ) {
+    			LOGWARN("COLLECT: A ReaperBase object has timedout.!");
+    		} else{
+    			LOGINFO("COLLECT: A client has disconected a ReaperBase object!");
+    		}
       	//(*it)->_remove_ref();
-      	(*it)->removeRef();
-      	it=reaperObjList.erase(it);
-      	ost << " Inactive: removed";
-    	}else if(!(*it)->isRunning(lastAccess)){
+      	ReaperBase *obj = *it;
+      	it = reaperObjList.erase(it);
+      	obj->cleanUp();
+      	obj->removeRef();
+    	} else if( !(*it)->isRunning(lastAccess) ){
       	//Check if the object has timedout and we
       	//garbage collect it. We assume that the client has crashed
       	//or has forgotten about us. This is a bug in the client.
 
       	if((now-lastAccess)>=TIMEOUT){
-				LOGWARN("TIMEOUT, a ReaperBase object is garbage collected!");
+				LOGWARN("TIMEOUT, a ReaperBase object is scheduled for garbage collection!");
+				//Only deactivate the object here. It is removed from
+				//reaperObjList the next time around.
 				(*it)->deactivate();
-				//(*it)->_remove_ref();
-				(*it)->removeRef();
-				it=reaperObjList.erase(it);
-				ost << " Timout: removed";
+				(*it)->setTimedout();
       	}else{
 				it++;
       	}
     	}else{
       	it++;
     	}
-    	
-    	ost << endl;
   	}
   	
-  	LOGDEBUG("Reaper: " << endl << ost.str());
 }
 
 namespace{
