@@ -1,6 +1,19 @@
 AM_CPPFLAGS = -I$(top_srcdir)/src/lib -I$(top_srcdir)/src/lib/decoder -I$(top_builddir)/src/lib -I$(top_builddir)/src/lib/kvskel  $(omniORB4_CFLAGS)  $(putools_CFLAGS)  -D_REENTRANT
 
+noinst_PROGRAMS = createTestData
+
 bin_PROGRAMS = kvDataInputd kvDataInputd_clt
+
+
+createTestData_SOURCES = createTestData.cc
+
+createTestData_CPPFLAGS = $(AM_CPPFLAGS)
+createTestData_LDFLAGS = -pthread 
+createTestData_LDADD = $(putools_LIBS) 
+
+
+
+ 
 
 kvDataInputd_SOURCES=InitLogger.cc InitLogger.h \
                      DataSrcImpl.cc DataSrcImpl.h \
