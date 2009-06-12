@@ -1,4 +1,4 @@
-SUBDIRS = test
+#SUBDIRS = test
 AM_CPPFLAGS = -I$(top_srcdir)/src/lib  -I$(top_builddir)/src/lib -I$(top_builddir)/src/lib/kvskel  $(omniORB4_CFLAGS)  $(putools_CFLAGS)  -D_REENTRANT
 
 bin_PROGRAMS = kvServiced 

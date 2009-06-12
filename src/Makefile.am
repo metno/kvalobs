@@ -4,6 +4,7 @@ SUBDIRS = \
 	data2kv \
 	kvDataInputd \
 	kvServiced \
+	kvServiced/test \
 	kvQabased \
 	kvManagerd \
 	norcom2kv \
