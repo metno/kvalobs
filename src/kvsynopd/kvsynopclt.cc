@@ -33,6 +33,8 @@
 #include <iostream>
 #include <sstream>
 #include <kvskel/kvsynopd.hh>
+#include <kvalobs/kvPath.h>
+#include <miconfparser/miconfparser.h>
 #include <list>
 #include <dnmithread/mtcout.h>
 #include "kvsynopCltApp.h"
@@ -43,7 +45,20 @@ int
 main(int argn, char **argv)
 {
   Options opt;
-  SynopCltApp app(argn, argv);
+  std::string confFile;
+  miutil::conf::ConfSection *conf;
+  
+  confFile = kvPath("sysconfdir")+"/kvsynopd.conf";
+
+  try{
+      conf=miutil::conf::ConfParser::parse(confFile);
+  }
+  catch( const logic_error &ex ){
+     CERR( ex.what() );
+     return 1;
+  }
+  
+  SynopCltApp app(argn, argv, conf );
 
   opt=app.options();
 

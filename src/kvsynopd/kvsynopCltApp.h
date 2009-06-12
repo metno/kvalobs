@@ -34,6 +34,7 @@
 #include <puTools/miTime>
 #include <map>
 #include <list>
+#include <miconfparser/miconfparser.h>
 #include "kvsynopCorbaThread.h"
 
 typedef std::map<std::string, std::string>                   TKeyVal;
@@ -51,7 +52,7 @@ struct Options{
   typedef std::list<int>::iterator IIntList;
 
   Options()
-    :cmd(Undef), kvserver("kvalobs"), nshost("corbans")
+    :cmd(Undef), kvserver("kvalobs"), nshost("corbans.met.no")
   {
   }
 
@@ -84,7 +85,7 @@ struct Options{
 
 class SynopCltApp 
 {
-  bool getOptions(int argn, char **argv, Options &opt);
+  bool getOptions(int argn, char **argv, miutil::conf::ConfSection *conf, Options &opt);
   Options opt;
   SynopCltCorbaThread   *corbaThread;
   kvsynopd::synopcb_var synopcb;
@@ -95,7 +96,7 @@ class SynopCltApp
   bool                  wait_;
   kvsynopd::SynopData   result;
  public:
-  SynopCltApp(int argn, char **argv);
+  SynopCltApp(int argn, char **argv, miutil::conf::ConfSection *conf );
   ~SynopCltApp();
 
   Options options() const{ return opt;}

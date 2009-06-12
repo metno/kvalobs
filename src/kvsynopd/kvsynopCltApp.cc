@@ -55,7 +55,7 @@ namespace{
 
 SynopCltApp *SynopCltApp::app =0;
 
-SynopCltApp::SynopCltApp(int argn, char **argv)
+SynopCltApp::SynopCltApp(int argn, char **argv, miutil::conf::ConfSection *conf )
   :corbaThread(0),synopcb(kvsynopd::synopcb::_nil()), shutdown_(false),capp(0),
    synop(kvsynopd::synop::_nil())
 {
@@ -65,7 +65,7 @@ SynopCltApp::SynopCltApp(int argn, char **argv)
   spin.tv_sec=0;
   spin.tv_nsec=10000000;
 
-  if(!getOptions(argn, argv, opt)){
+  if(!getOptions(argn, argv, conf, opt)){
     cerr << "Inavlid or missing option!";
     use(1);
   }
@@ -381,139 +381,170 @@ SynopCltApp::reloadConf()
 }
 
 bool
-SynopCltApp::getOptions(int argn, char **argv, Options &opt)
+SynopCltApp::getOptions(int argn, char **argv, miutil::conf::ConfSection *conf, Options &opt)
 {
-  struct option long_options[]={{"list-stations", 0, 0, 0},
-				{"uptime", 0, 0, 0},
-				{"help", 0, 0, 0},
-				{"synop", 0, 0, 0},
-				{"delay-list", 0, 0, 0},
-				{"reload", 0, 0, 0},
-				{"cachereload", 0, 0, 0},
-				{0,0,0,0}};
-  int c;
-  int index;
-  bool hasTime=false;
-  std::string sWmo;
+	struct option long_options[]={{"list-stations", 0, 0, 0},
+			{"uptime", 0, 0, 0},
+			{"help", 0, 0, 0},
+			{"synop", 0, 0, 0},
+			{"delay-list", 0, 0, 0},
+			{"reload", 0, 0, 0},
+			{"cachereload", 0, 0, 0},
+			{0,0,0,0}};
+	int c;
+	int index;
+	bool hasTime=false;
+	std::string sWmo;
 
-  while(true){
-    c=getopt_long(argn, argv, "s:n:t:", long_options, &index);
+	miutil::conf::ValElementList valElem;
 
-    if(c==-1)
-      break;
+	valElem=conf->getValue("corba.nameserver");
 
-    switch(c){
-    case 's':
-      opt.kvserver=optarg;
-      break;
-    case 'n':
-      opt.nshost=optarg;
-      break;
-    case 't':
-      int y, m, d, h;
-      if(sscanf(optarg, "%d-%d-%d %d", &y, &m, &d, &h)!=4){
-	CERR("Invalid timespec: " << optarg<< endl);
-	use(1);
-      }
-
-      
-      opt.time=miutil::miTime(y, m, d, h);
-      hasTime=true;
-      break;
-    case 0:
-      if(strcmp(long_options[index].name,"list-stations")==0){
-	if(opt.cmd!=Options::Undef)
-	  return false;
-	
-	opt.cmd=Options::StationList;
-	cerr << "list-stations!" << endl;
-      }else if(strcmp(long_options[index].name,"uptime")==0){
-	if(opt.cmd!=Options::Undef)
-	  return false;
-	
-	opt.cmd=Options::Uptime;
-	cerr << "uptime!" << endl;
-      }else if(strcmp(long_options[index].name,"help")==0){
-	if(opt.cmd!=Options::Undef)
-	  return false;
-	
-	opt.cmd=Options::Help;
-	use(0);
-      }else if(strcmp(long_options[index].name,"synop")==0){
-	if(opt.cmd!=Options::Undef)
-	  return false;
-	
-	opt.cmd=Options::Synop;
-
-	cerr << "synop!" << endl;
-      }else if(strcmp(long_options[index].name,"delay-list")==0){
-	if(opt.cmd!=Options::Undef)
-	  return false;
-	
-	opt.cmd=Options::Delays;
-	cerr << "delay-list!" << endl;
-
-      }else if(strcmp(long_options[index].name,"reload")==0){
-	if(opt.cmd!=Options::Undef)
-	  return false;
-	
-	opt.cmd=Options::Reload;
-	cerr << "Reload!" << endl;
-      }else if(strcmp(long_options[index].name, "cachereload")==0){
-	if(opt.cmd!=Options::Undef)
-	  return false;
-	
-	opt.cmd=Options::CacheReload;
-	cerr << "CacheReload!" << endl;
-      }
-
-      break;
-    case '?':
-      cerr << "Unknown option : <" << (char)optopt << "> unknown!" << endl;
-      return false;
-      break;
-    case ':':
-      cerr << optopt << " missing argument!" << endl;
-      return false;
-      break;
-    default:
-      cerr << "?? option caharcter: <" << (char)optopt << "> unknown!" << endl;
-      return false;
-    }
-  }
-
-  if(optind<argn){
-    while(optind<argn){
-      sWmo=argv[optind++];
-      
-      for(std::string::size_type i=0; i<sWmo.length(); i++){
-	if(!isdigit(sWmo[i])){
-	  return false;
+	if(valElem.empty()){
+		CERR("No nameserver <corba.nameserver> in the configurationfile!");
+		exit(1);
 	}
-      }
+
+	opt.nshost=valElem[0].valAsString();
+
+	if(opt.nshost.empty()){
+	  CERR("The key <corba.nameserver> in the configurationfile has no value!");
+	  exit(1);
+	}
+  
+	valElem=conf->getValue("corba.kvpath");
+
+	if(valElem.empty())
+		valElem=conf->getValue("corba.path");
+	
+	if( valElem.empty() ) {
+		CERR("Either the <corba.kvpath> or <corba.path> has a value in the configuration file.");
+		exit(1);
+	}
+
+	opt.kvserver = valElem[0].valAsString();
+
+	if( opt.kvserver.empty() ) {
+		CERR("Either the <corba.kvpath> or <corba.path> has a value in the configuration file.");
+		exit(1);
+	}
+  
+	while(true){
+		c=getopt_long(argn, argv, "s:n:t:", long_options, &index);
+
+		if(c==-1)
+			break;
+
+		switch(c){
+		case 's':
+			opt.kvserver=optarg;
+			break;
+		case 'n':
+			opt.nshost=optarg;
+			break;
+		case 't':
+			int y, m, d, h;
+			if(sscanf(optarg, "%d-%d-%d %d", &y, &m, &d, &h)!=4){
+				CERR("Invalid timespec: " << optarg<< endl);
+				use(1);
+			}
       
-      opt.wmonoList.push_back(atoi(sWmo.c_str()));
-    }
-  }
+			opt.time=miutil::miTime(y, m, d, h);
+			hasTime=true;
+			break;
+		case 0:
+			if(strcmp(long_options[index].name,"list-stations")==0){
+				if(opt.cmd!=Options::Undef)
+					return false;
+	
+				opt.cmd=Options::StationList;
+				CERR("list-stations!" << endl);
+			}else if(strcmp(long_options[index].name,"uptime")==0){
+				if(opt.cmd!=Options::Undef)
+					return false;
+	
+				opt.cmd=Options::Uptime;
+				CERR( "uptime!" << endl );
+			}else if(strcmp(long_options[index].name,"help")==0){
+				if(opt.cmd!=Options::Undef)
+					return false;
+	
+				opt.cmd=Options::Help;
+				use(0);
+			}else if(strcmp(long_options[index].name,"synop")==0){
+				if(opt.cmd!=Options::Undef)
+					return false;
+	
+				opt.cmd=Options::Synop;
 
-  if(opt.cmd==Options::Undef){
-    opt.cmd=Options::Synop;
-  }
+				CERR("synop!" << endl);
+			}else if(strcmp(long_options[index].name,"delay-list")==0){
+				if(opt.cmd!=Options::Undef)
+					return false;
+	
+				opt.cmd=Options::Delays;
+				CERR("delay-list!" << endl );
 
-  if(opt.cmd==Options::Synop){
-    if(opt.wmonoList.empty()){
-      CERR("No wmono to create SYNOP for!\n");
-      return false;
-    }
+			}else if(strcmp(long_options[index].name,"reload")==0){
+				if(opt.cmd!=Options::Undef)
+					return false;
+	
+				opt.cmd=Options::Reload;
+				CERR( "Reload!" << endl );
+			}else if(strcmp(long_options[index].name, "cachereload")==0){
+				if(opt.cmd!=Options::Undef)
+					return false;
+	
+				opt.cmd=Options::CacheReload;
+				CERR( "CacheReload!" << endl );
+			}
+
+			break;
+		case '?':
+			CERR( "Unknown option : <" << (char)optopt << "> unknown!" << endl);
+			return false;
+			break;
+		case ':':
+			CERR( optopt << " missing argument!" << endl);
+			return false;
+			break;
+		default:
+			CERR("?? option caharcter: <" << (char)optopt << "> unknown!" << endl);
+			return false;
+		}
+	}
+
+	if(optind<argn){
+		while(optind<argn){
+			sWmo=argv[optind++];
+      
+			for(std::string::size_type i=0; i<sWmo.length(); i++){
+				if(!isdigit(sWmo[i])){
+					return false;
+				}
+			}
+      
+			opt.wmonoList.push_back(atoi(sWmo.c_str()));
+		}
+	}
+
+	if(opt.cmd==Options::Undef){
+		opt.cmd=Options::Synop;
+	}
+
+	if(opt.cmd==Options::Synop){
+		if(opt.wmonoList.empty()){
+			CERR("No wmono to create SYNOP for!\n");
+			return false;
+		}
     
-    if(!hasTime){
-      CERR("No time specified!\n");
-      return false;
-    }
-  }
+		if(!hasTime){
+			CERR("No time specified!\n");
+			return false;
+		}
+	}
    
-  return true;
-    
+	return true;
 }
       
 
