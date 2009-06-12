@@ -2,7 +2,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/src/lib  -I$(top_builddir)/src/lib -I$(top_builddi
 
 
 
-bin_PROGRAMS = getdata 
+noinst_PROGRAMS = getdata 
 
 getdata_SOURCES=getdata.cc
 getdata_CPPFLAGS = $(AM_CPPFLAGS)
