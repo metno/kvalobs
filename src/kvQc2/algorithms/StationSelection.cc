@@ -25,7 +25,7 @@ StationSelection::StationSelection()
    int key;
 
    std::ifstream ind;
-   ind.open("/home/paule/prototypes/shed/prototype_redesign/src/algorithms/TriangulatedNeighbours.txt");
+   ind.open("/metno/kvalobs/kvalobs-svn/src/kvQc2/algorithms/TriangulatedNeighbours.txt");
 
    /// Later make the name of the neighbours file as an option in the configuration file!!!!
 
