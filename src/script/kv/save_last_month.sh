@@ -111,7 +111,7 @@ fi
 
 rm -rf $tmpdir
 
-scp "$tarfile.bz2" kvalobs@poriaz:var/klima_backup
+scp "$tarfile.bz2" kvalobs@histkvalobs:var/klima_backup
 
 if [ "$?" -ne 0 ]; then
 	echo "WARNING: Cant copy the $tarfile.bz2 to kvalobs@poriaz:var/klima_backup" >> $logfile
