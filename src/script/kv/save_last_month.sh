@@ -114,7 +114,7 @@ rm -rf $tmpdir
 scp "$tarfile.bz2" kvalobs@histkvalobs:var/klima_backup
 
 if [ "$?" -ne 0 ]; then
-	echo "WARNING: Cant copy the $tarfile.bz2 to kvalobs@poriaz:var/klima_backup" >> $logfile
+	echo "WARNING: Cant copy the $tarfile.bz2 to kvalobs@histkvalobs:var/klima_backup" >> $logfile
 fi
 
 echo "End of backup: $(date +'%Y-%m-%d %H:%M:%S')" >> $logfile
