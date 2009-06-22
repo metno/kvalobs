@@ -32,6 +32,7 @@ class ProcessImpl
     //int Process4D(int pid, int tid, miutil::miTime stime, miutil::miTime etime, std::string CIF);
     int Process4D(ReadProgramOptions params);                                                           
     int ProcessUnitT(ReadProgramOptions params);                                                           
+    int Interpolate(ReadProgramOptions params);                                                           
 };
 
 

@@ -41,7 +41,7 @@ epsx::epsx( std::vector<float> XXX, std::vector<float> YYY, char *file_name )
   if (xstep < 50.0) step=25;
   if (xstep < 25.0) step=10;
   if (xstep < 10.0) step=5;
-  //if (xstep < 5.0) step=1;
+  if (xstep < 5.0) step=1;
   if (step == 0) step=int(xstep);
   int xstepx=int(step);
   int xcounter=int(xrange/xstepx+1);
@@ -55,7 +55,7 @@ epsx::epsx( std::vector<float> XXX, std::vector<float> YYY, char *file_name )
   if (ystep < 50.0) step=25;
   if (ystep < 25.0) step=10;
   if (ystep < 10.0) step=5;
-  //if (ystep < 5.0) step=1;
+  if (ystep < 5.0) step=1;
   if (step == 0) step=int(ystep);
   int ystepy=step;
   int ycounter=int(yrange/ystepy+1);
@@ -77,8 +77,8 @@ epsx::epsx( std::vector<float> XXX, std::vector<float> YYY, char *file_name )
 // Scale everything to fit the page
   float scalefactorx=1.0;
   float scalefactory=1.0;
-  scalefactorx=595.0/(2.0*xrange); // scales things to A4 portrait width
-  scalefactory=850.0/(2.0*yrange); // scales things to A4 portrait width
+  scalefactorx=595.0/xrange; // scales things to A4 portrait width
+  scalefactory=850.0/yrange; // scales things to A4 portrait width
   std::cout << "Scale Factor: "<< scalefactorx << " " << scalefactory << std::endl;
 
   file_unit << "%!PS-Adobe-3.0 EPSF-3.0\n";
@@ -157,6 +157,7 @@ epsx::epsx( std::vector<float> XXX, std::vector<float> YYY, char *file_name )
     }
 
 // Draw the axes
+  file_unit << "0.1 setlinewidth\n";
   file_unit << "newpath\n";
   file_unit << "0 "<< ymin <<" moveto\n";
   file_unit << "0 "<< ymax <<" lineto\n";
