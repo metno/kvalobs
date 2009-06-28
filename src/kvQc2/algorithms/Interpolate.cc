@@ -93,7 +93,9 @@ Interpolate( ReadProgramOptions params )
      std::cout << "Time Stamp: " << ProcessTime << std::endl;
 
              try {
-              result = dbGate.select(Qc2Data, kvQueries::selectData(StationIds,pid,ProcessTime,ProcessTime));
+              //result = dbGate.select(Qc2Data, kvQueries::selectData(StationIds,pid,ProcessTime,ProcessTime));
+              result = dbGate.select(Qc2Data, kvQueries::selectData(StationIds,pid,tid,ProcessTime,ProcessTime));
+              std::cout << pid << " " << tid << std::endl;
               }
               catch ( dnmi::db::SQLException & ex ) {
                 IDLOGERROR( "html", "Exception: " << ex.what() << std::endl );

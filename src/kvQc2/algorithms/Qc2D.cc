@@ -901,6 +901,8 @@ calculate_trintp_sl(unsigned int index, std::list<int> BestStations)
                      xp[j] = utm.u;  //Longitude  -> X-cartesian
                      yp[j] = utm.v;  //Latitude   -> Y-cartesian
 
+
+
                      if (xp[j] < 0.009) OKTRI=false;
                      if (yp[j] < 0.009) OKTRI=false;
 
@@ -1183,17 +1185,42 @@ intp_delaunay(unsigned int index)
  	  std::vector<id_pair> pindex;
  	  std::vector<id_pair>::const_iterator ip;
 
+          std::vector<float>                  working_data;
+          std::vector<float>                  working_lat;
+          std::vector<float>                  working_lon;
+          std::vector<float>                  working_ht;
+
+ 
+
+/// Only makes sense to perform this interpolation if there are realvalues in the mesh 
  	  for (unsigned int i=0 ; i<original_.size() ; i++) {
- 	  	
-            delta_lon=(lon_[index]-lon_[i])*radish;
-            delta_lat=(lat_[index]-lat_[i])*radish;
+                if (original_[i] != params.missing || i==index) {
+                     working_data.push_back(original_[i]);
+                     working_lat.push_back(lat_[i]);
+                     working_lon.push_back(lon_[i]);
+                     working_ht.push_back(ht_[i]);
+                }
+          }	
+
+
+ 	  //for (unsigned int i=0 ; i<original_.size() ; i++) {
+            //delta_lon=(lon_[index]-lon_[i])*radish;
+            //delta_lat=(lat_[index]-lat_[i])*radish;
+            //a        = sin(delta_lat/2)*sin(delta_lat/2) +
+                       //cos(lat_[i]*radish)*cos(lat_[index]*radish)*
+                       //sin(delta_lon/2)*sin(delta_lon/2);
+            //c        =2.0 * atan2(sqrt(a),sqrt(1-a));
+            //temp_distance = RADIUS*c;                
+            //pindex.push_back( id_pair(temp_distance,i) );
+      //}	
+ 	  for (unsigned int i=0 ; i<working_data.size() ; i++) {
+            delta_lon=(lon_[index]-working_lon[i])*radish;
+            delta_lat=(lat_[index]-working_lat[i])*radish;
             a        = sin(delta_lat/2)*sin(delta_lat/2) +
-                       cos(lat_[i]*radish)*cos(lat_[index]*radish)*
+                       cos(working_lat[i]*radish)*cos(lat_[index]*radish)*
                        sin(delta_lon/2)*sin(delta_lon/2);
             c        =2.0 * atan2(sqrt(a),sqrt(1-a));
-
             temp_distance = RADIUS*c;                
-            
             pindex.push_back( id_pair(temp_distance,i) );
       }	
        
@@ -1208,7 +1235,8 @@ intp_delaunay(unsigned int index)
  	  int imax=0;
           float max_distance=params.InterpolationLimit;
  	  
- 	  for (unsigned int i=0 ; i<original_.size() ; i++) {
+ 	  for (unsigned int i=0 ; i<working_data.size() ; i++) {
+ 	  //for (unsigned int i=0 ; i<original_.size() ; i++) {
  	  	  if (pindex[i].first < max_distance) imax=i;
  	  	  }
  	   	  
@@ -1240,6 +1268,7 @@ intp_delaunay(unsigned int index)
                    int *triangle_neighbor;
                    int *triangle_node;
                    int triangle_num;
+                   int copy_triangle_num;
                    bool node_show = true;
                    bool triangle_show = true;
 
@@ -1254,14 +1283,18 @@ intp_delaunay(unsigned int index)
 
 
                   /// Problem to solve here
-                  /// we trianulate the nodes but lose track of the data corresponding to the node !!!!!!
+                  /// we triangulate the nodes but lose track of the data corresponding to the node !!!!!!
 
           
           //Loop Through Stations And Convert To UTM co-ordinates
           
-                        utm.u= lon_[pindex[i].second]*radish;   /// Use DEG_TO_RAD instead !!!!! ????????
-                        utm.v= lat_[pindex[i].second]*radish;
+                        //utm.u= lon_[pindex[i].second]*radish;   /// Use DEG_TO_RAD instead !!!!! ????????
+                        //utm.v= lat_[pindex[i].second]*radish;
+                        utm.u= working_lon[pindex[i].second]*radish;   /// Use DEG_TO_RAD instead !!!!! ????????
+                        utm.v= working_lat[pindex[i].second]*radish;
                         utm = pj.ll2xy(utm);
+                     ////std::cout << "Longitude = " << utm.u << " from "  << lon_[i] << std::endl;
+                     //std::cout << "Latitude  = " << utm.v << " from "  << lat_[i] << std::endl;
              
                         lon.push_back( utm.u );
                         lat.push_back( utm.v );
@@ -1269,7 +1302,9 @@ intp_delaunay(unsigned int index)
                           table[2*(i-1)  ]=utm.u;
                           table[2*(i-1)+1]=utm.v;
                           //Make sure we keep the right set of data values corrsponding to the neighbours
-                               original_data.push_back( original_[pindex[i].second]);
+                               //original_data.push_back( original_[pindex[i].second]);
+                               original_data.push_back( working_data[pindex[i].second]);
+                          //std::cout << "Loading: " << utm.u << " " << utm.v << " " <<  original_[pindex[i].second] << std::endl;      
                         }
                     }
           
@@ -1279,6 +1314,7 @@ intp_delaunay(unsigned int index)
                                                              /// Check all this array dimensioning ... I think it is fishy!
           
                 //Calculate the Triangles For Each Target Station
+                //std::cout << "Enter DTRIS2 " << std::endl;
                 result=dtris2 ( node_num, table, &triangle_num, triangle_node, triangle_neighbor );  
 
                 /// We are assuming that table is not reordered !!!!!
@@ -1287,6 +1323,7 @@ intp_delaunay(unsigned int index)
                      cout << "\n";
                      cout << "  Computed the triangulation.\n";
                      cout << "  Number of triangles is " << triangle_num << "\n";
+                     copy_triangle_num=triangle_num;
 
           
                       intp_[index]=-10.0;  /// This does nothing more yet !!!!!!!!!!!!!!!!!!!
@@ -1294,6 +1331,7 @@ intp_delaunay(unsigned int index)
           
                    //We have to find which triangle is home for our station
           
+                                //std::cout << triangle_num << std::endl;
                    //Loop over all triangles
                       int tri;
                       int point_within_triangle=-999;
@@ -1302,18 +1340,23 @@ intp_delaunay(unsigned int index)
                       double y_triangle[3]; // corresponds to the latitude  !!!
                       float cornerdata[3];  // corresponds to the data associated with the corner  !!!
                       double dot00,dot01,dot02,dot11,dot12,invDenom,u,v;
-
-                      for (tri=0; tri<triangle_num; ++tri) {
+                      for (tri=0; tri<copy_triangle_num; ++tri) {
 
                            for (int corner=0; corner <=2; ++corner){
       
                                 int node_index = triangle_node[corner + tri*3] - 1;   // NB triangle_node values do not start at 0
                                                                               // delaunay code result ?
+                                //std::cout << "corner: "<< corner <<  " node index: " <<node_index << std::endl;
                                 x_triangle[corner] = table[ 2*( node_index ) + 0 ];
                                 y_triangle[corner] = table[ 2*( node_index ) + 1 ];
                                 cornerdata[corner] = original_data[ node_index ];
+                                //std::cout << "corner: "<<  x_triangle[corner] << " " <<  y_triangle[corner]  << " " << cornerdata[corner] << std::endl;
 
                            }
+                        //sleep(1);
+
+                                //std::cout << triangle_num << std::endl;
+                       //std::cout << "looped over the triangles " << std::endl;
 
 //  Perform "Point in triangle test" according to Barycentric Technique (see http://www.blackpawn.com/texts/pointinpoly/default.html) 
 
@@ -1324,6 +1367,7 @@ intp_delaunay(unsigned int index)
                          dot12=(x_triangle[1]-x_triangle[0])*(lon[0]       -x_triangle[0]) + (y_triangle[1]-y_triangle[0])*(lat[0]       -y_triangle[0]);
 
                          invDenom = 1.0 / (dot00 * dot11 - dot01 * dot01);  //HOOK
+                         //std::cout << "inverse Denominator : " << invDenom << std::endl;
                          u = (dot11 * dot02 - dot01 * dot12) * invDenom;
                          v = (dot00 * dot12 - dot01 * dot02) * invDenom;
 
@@ -1332,10 +1376,23 @@ intp_delaunay(unsigned int index)
                                 //std::cout << "Found a candidate triangle = " << tri << std::endl;
                                 point_within_how_many_triangles=point_within_how_many_triangles+1;
                                 sprintf(epsfilename,"%d%s%d%s",stid_[index],"_",tri,".eps");
+                                //std::cout << triangle_num << std::endl;
                                 //std::cout << epsfilename << std::endl;
-                                triangulation_order3_plot_eps ( epsfilename, node_num, table, triangle_num, triangle_node, 
+                                //std::cout << epsfilename<<" "<< node_num<<" "<<table<<" "<<triangle_num<<" "<<triangle_node<<" "<<
+                                                          //node_show<<" "<<triangle_show<<" "<<lon[0]<<" "<<lat[0]<<" "<<x_triangle[0]<<" "<<
+                                                          //y_triangle[0]<<" "<<x_triangle[1]<<" "<<y_triangle[1]<<" "<<x_triangle[2]<<" "<<y_triangle[2] <<" "<< std::endl;
+                                //triangulation_order3_plot_eps ( "out.eps", node_num, table, copy_triangle_num, triangle_node, 
+                                triangulation_order3_plot_eps ( epsfilename, node_num, table, copy_triangle_num, triangle_node, 
                                                           node_show, triangle_show, lon[0], lat[0], x_triangle[0],
                                                           y_triangle[0],x_triangle[1],y_triangle[1],x_triangle[2],y_triangle[2] );
+                         std::cout << "TQ Triangulation Information" << std::endl;
+                         std::cout << "TQ Point ... Lon ... Lat .....Value" << std::endl;
+                         std::cout << " TQ 0 "<< lon[0] << " " <<lat[0] << " " << std::endl;
+
+                         std::cout << " TQ "<< lon[0] << " " <<lat[0] << std::endl;
+                         std::cout << " TQ "<< x_triangle[0] << " " <<y_triangle[0]<< std::endl;
+                         std::cout << " TQ "<< x_triangle[1]<< " " <<y_triangle[1]<< std::endl;
+                         std::cout << " TQ "<< x_triangle[2]<< " " <<y_triangle[2]<< std::endl;
                       
                                 for (int ii=0;ii<3;++ii){
                  
@@ -1345,6 +1402,7 @@ intp_delaunay(unsigned int index)
                                       rr[ii]=data_point;
                                       xp[ii]=x_triangle[ii];
                                       yp[ii]=y_triangle[ii];
+                                      std::cout << rr[ii] << std::endl;
 
                           }
 
@@ -1352,7 +1410,8 @@ intp_delaunay(unsigned int index)
                      //if (xp[j] < 0.009) OKTRI=false;
                      //if (yp[j] < 0.009) OKTRI=false; ?????????????????
 
-                                 if (rr[0] > -1 && rr[1] > -1 && rr[2] > -1 && OKTRI){
+                                 if (rr[0] > -1 && rr[1] > -1 && rr[2] > -1){
+                                 //if (rr[0] > -1 && rr[1] > -1 && rr[2] > -1 && OKTRI){
                                  ///if (rr[0] > params.MinimumValue && rr[1] > params.MinimumValue && rr[2] > params.MinimumValue && OKTRI){
                                  /// Need something like the above for any generalisation (currently triangulate only rainfall).
                                       xt = lon[0];
@@ -1361,6 +1420,7 @@ intp_delaunay(unsigned int index)
                                       d_rr_over_d_x=((yp[1]-yp[0])*(rr[2]-rr[0])-(yp[2]-yp[0])*(rr[1]-rr[0]))/Denom;
                                       d_rr_over_d_y=((xp[2]-xp[0])*(rr[1]-rr[0])-(xp[1]-xp[0])*(rr[2]-rr[0]))/Denom;
                                       intp_[index]=rr[0]+(xt-xp[0])*d_rr_over_d_x+(yt-yp[0])*d_rr_over_d_y;
+                                      std::cout << "RESULTS ######## "<< intp_[index] << " " << original_[index] << std::endl;
                                  }
 
                          }           
