@@ -677,6 +677,12 @@ calculate_intp_h(unsigned int index)
  	  float delta_lon;
           double a, c;
  	  const double radish = 0.01745329251994329509;
+
+          int steps;                         
+          float rfac;                         
+          float TV;
+          float height;
+
  	  
  	  typedef pair <float,int> id_pair;
  	  
@@ -731,29 +737,37 @@ calculate_intp_h(unsigned int index)
 
 // reduce the data point to sea-level
 
- 	  	 
+                 height=ht_[pindex[i].second];
+                 steps= height/100;
+                 rfac =(height-100.0*steps)/100.0;
  
                                                 
  	  	  if (imax > 1 && data_point > -1 && pindex[i].first > 0 && 
  	  	                              controlinfo_[pindex[i].second].flag( 12 ) == 1  ) {
                           data_point_h = data_point;
-                          if (ht_[pindex[i].second] > 1000.0) {
-                               data_point = data_point - data_point*( (ht_[pindex[i].second]-1000) / 2000.0);
+
+                          TV=data_point;
+                          if (height>1000.0) TV = TV - 0.05*rfac*TV;
+                          for (int j=steps;j>0;--j){
+                            if(j>10) {
+                              TV=TV-0.05*TV;
+                            }
+                            else {
+                              TV=TV-0.1*TV;
+                            }
                           }
-                          if (ht_[pindex[i].second] <= 1000.0) {
-                               data_point = data_point - data_point*(ht_[pindex[i].second]/1000.0);
-                          }
-                          /*std::cout << "HEIGHT: " << stid_[pindex[i].second] <<" "
-                                          << data_point_h << " "
-                                          << data_point   << " "
-                                          << lat_[pindex[i].second] <<" "
-                                          << lon_[pindex[i].second] <<" "
-                                          <<  ht_[pindex[i].second] <<" "
-                                          << std::endl; */
-                          //std::cout << "Still need to add 5% mod above 1000m" << std::endl;
+                          if (height<=1000.0) TV = TV - 0.1*rfac*TV;
+                          data_point=TV;
+
+
+                          //if (ht_[pindex[i].second] > 1000.0) {
+                               //data_point = data_point - data_point*( (ht_[pindex[i].second]-1000) / 2000.0);
+                          //}
+                          //if (ht_[pindex[i].second] <= 1000.0) {
+                               //data_point = data_point - data_point*(ht_[pindex[i].second]/1000.0);
+                          //}
  	  	  	  inv_dist += 1.0/(pindex[i].first*pindex[i].first); 
  	  	          weight += data_point/(pindex[i].first*pindex[i].first);
-                          //idog += 1;
  	  	  }
            }
 
@@ -761,13 +775,32 @@ calculate_intp_h(unsigned int index)
  	  if (inv_dist > 0.0) {
  	  
  	     intp_[index] = weight/inv_dist; 
-             if (ht_[index] <= 1000.0){
- 	         intp_[index] = intp_[index]+intp_[index]*(ht_[index]/1000.0); // put back to correct altitude
+             TV=intp_[index];
+             height=ht_[index];
+             steps= height/100;
+             rfac =(height-100.0*steps)/100.0;
+
+             if (height<=1000.0) TV = TV/(1.0-0.1*rfac);
+             for (int j=0;j<steps;++j){
+               if(j>9) {
+                 TV=TV/0.95;
+               }
+               else {
+                 TV=TV/0.9;
+               }
              }
-             if (ht_[index] > 1000.0){
- 	         intp_[index] = 2.0*intp_[index]; // the bit up to 1000 km !!!!!!!! 
-                 intp_[index] = (intp_[index]+intp_[index]*(ht_[index]/2000.0)); // put back to correct altitude
-             }
+             if (height>1000.0) TV = TV/(1.0-0.05*rfac);
+
+             intp_[index]=TV;
+
+
+             //if (ht_[index] <= 1000.0){
+ 	         //intp_[index] = intp_[index]+intp_[index]*(ht_[index]/1000.0); // put back to correct altitude
+             //}
+             //if (ht_[index] > 1000.0){
+ 	         //intp_[index] = 2.0*intp_[index]; // the bit up to 1000 km !!!!!!!! 
+                 //intp_[index] = (intp_[index]+intp_[index]*(ht_[index]/2000.0)); // put back to correct altitude
+             //}
  	     //std::cout << intp_[index] << std::endl; 
  	  }  
           //std::cout << "Number of points used in interpolation = " << idog << std::endl;
