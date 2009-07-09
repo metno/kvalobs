@@ -317,6 +317,7 @@ calculate_intp_wet_dry(unsigned int index)
  	  float delta_lon;
           double a, c;
  	  const double radish = 0.01745329251994329509;
+          ProcessControl CheckFlags;
  	  
  	  typedef pair <float,int> id_pair;
  	  
@@ -359,16 +360,7 @@ calculate_intp_wet_dry(unsigned int index)
 
  	  inv_dist = 0.0;
  	  weight   = 0.0;
-          //int idog=0;
-          //bool DoInt=true;
           bool DoInt=false;
-
-          //LOGINFO("ZZY Station of Interest:" << stid_[index] << " " << original_[index] << " " <<lat_[index] 
-                                         //<< " " << lon_[index] << " " <<ht_[index]);
- 	  
-                        //LOGINFO("ZZY ...................:" << stid_[pindex[i].second] << " " 
-                          //<< original_[pindex[i].second] << " " <<lat_[pindex[i].second] 
-                          //<< " " << lon_[pindex[i].second] << " " <<ht_[pindex[i].second]);
           
           float sumPP=0.0;     //   MP | PP
           float sumPM=0.0;     //   _ _|_ _
@@ -399,10 +391,6 @@ calculate_intp_wet_dry(unsigned int index)
 
           std::vector<float> Difs;
           Difs.clear();
-
-          //std::cout << stid_[index] << " ?=? " << stid_[pindex[0].second] << std::endl;
-          //std::cout << original_[index] << " ?=? " << original_[pindex[0].second] << std::endl;
-          //std::cout << "Distance = " << pindex[0].first << std::endl; // Just checking algorithm is working.
 
  	  for (int i=1 ; i<imax+1 ; i++) { //implement a uniformity check
             data_point=original_[pindex[i].second];
@@ -446,9 +434,16 @@ calculate_intp_wet_dry(unsigned int index)
           }
 
           // only interpolate if all surrounding data is all wet
-          if (nPP==nPPwet && nPM==nPMwet && nMM==nMMwet && nMP==nMPwet) DoInt=true; 
+          if (nPP==nPPwet && nPM==nPMwet && nMM==nMMwet && nMP==nMPwet) {
+                DoInt=true; 
+                std::cout << "WET ..." << std::endl;
+          }
+          
           // ...or dry
-          if (nPP==nPPdry && nPM==nPMdry && nMM==nMMdry && nMP==nMPdry) DoInt=true; 
+          if (nPP==nPPdry && nPM==nPMdry && nMM==nMMdry && nMP==nMPdry) { 
+                DoInt=true; 
+                std::cout << "DRY ..." << std::endl;
+          }
 
           if (mPP != -999.0 && mPM != -999.0) Difs.push_back(fabs(mPP-mPM));
           if (mPP != -999.0 && mMM != -999.0) Difs.push_back(fabs(mPP-mMM));
@@ -457,12 +452,6 @@ calculate_intp_wet_dry(unsigned int index)
           if (mPM != -999.0 && mMP != -999.0) Difs.push_back(fabs(mPM-mMP));
           if (mMM != -999.0 && mMP != -999.0) Difs.push_back(fabs(mMM-mMP));
 
-                  //std::cout << "Vector analysis: ";
-                  //for (std::vector<float>::const_iterator jj=Difs.begin(); jj<Difs.end();++jj){
-                       //std::cout<<*jj<<" ";
-                  //}
-                  //std::cout<<std::endl;
-
           NumWetQ=((sumPP>0.0) ? 1 : 0)  + ((sumPM>0.0) ? 1 : 0)+ ((sumMM>0.0) ? 1 : 0)+ ((sumMP>0.0) ? 1 : 0);
           NumDryQ=((sumPP==0.0 && nPP>0) ? 1 : 0) + ((sumPM==0.0 && nPM>0) ? 1 : 0) + ((sumMM==0.0 && nMM>0) ? 1 : 0) +
                   ((sumMP==0.0 && nMP>0) ? 1 : 0); 
@@ -470,6 +459,7 @@ calculate_intp_wet_dry(unsigned int index)
           //std::cout << "Wet Regions : " << NumWetQ << std::endl;
           //std::cout << "Dry Regions : " << NumDryQ << std::endl;
           //std::cout << "Stats " << NumWetQ << " " << NumDryQ << std::endl;
+          //std::cout << "DoInt = " << DoInt << std::endl;
 
           int Biggies=0;
           for (std::vector<float>::const_iterator jj=Difs.begin(); jj<Difs.end();++jj){
@@ -523,39 +513,21 @@ calculate_intp_wet_dry(unsigned int index)
  	  	  
  	  	  //if (imax > 1 && data_point > -1 && pindex[i].first > 0 && data_point < 40 &&
  	  	  if (DoInt && imax > 1 && data_point > -1 && pindex[i].first > 0 && 
- 	  	                              controlinfo_[pindex[i].second].flag( 12 ) == 1  ) {
-
-
-                       //std::cout << " " << stid_[pindex[i].second];
- 	  	  	
-                        //inv_dist += 1.0/(pindex[i].first); 
-                        //weight += data_point/(pindex[i].first);
-
+ 	  	                              //controlinfo_[pindex[i].second].flag( 12 ) == 1  ) {
+                                               CheckFlags.condition(controlinfo_[i],params.Iflag)) {
+                        
+                        //std::cout << "Interpolatig ... " << std::endl;
                         inv_dist += 1.0/(pindex[i].first*pindex[i].first); 
                         weight += data_point/(pindex[i].first*pindex[i].first);
-
-                        //inv_dist += 1.0/(pindex[i].first*pindex[i].first*pindex[i].first); 
-                        //weight += data_point/(pindex[i].first*pindex[i].first*pindex[i].first);
-
-                        //inv_dist += 1.0/(pindex[i].first*pindex[i].first*pindex[i].first*pindex[i].first); 
-                        //weight += data_point/(pindex[i].first*pindex[i].first*pindex[i].first*pindex[i].first);
-
-                        //LOGINFO("ZZY ...................:" << stid_[pindex[i].second] << " " 
-                          //<< original_[pindex[i].second] << " " <<lat_[pindex[i].second] 
-                          //<< " " << lon_[pindex[i].second] << " " <<ht_[pindex[i].second]);
-
-                        //idog += 1;
  	  	  }
  	  }
 
-          //std::cout << std::endl;
- 	     
-
  	  if (inv_dist > 0.0) {
  	     intp_[index] = weight/inv_dist; 
+             std::cout << "RESULTS "<< intp_[index] << " " << original_[index] << std::endl;
+                        std::cout << "Interpolatig ... " << std::endl;
+              
  	  }  
- 
-          //std::cout << "Number of points used in interpolation = " << idog << std::endl;
 }
 
 ///Inverse distance weighting interpolation prototype.
