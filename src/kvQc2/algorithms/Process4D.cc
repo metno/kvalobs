@@ -44,13 +44,12 @@
 #include "CheckedDataCommandBase.h"
 #include "CheckedDataHelper.h"
 
-//#include <qapplication.h>
-//#include <qpushbutton.h>
-//#include <qlcdnumber.h>
-//#include <qfont.h>
-//#include <qlayout.h>
+#include <math.h>
+//GNU Statistical library
+#include <gsl/gsl_errno.h>
+#include <gsl/gsl_spline.h>
 
-//#include "PaperField.h"
+
 
 #include "scone.h"
 
@@ -64,6 +63,38 @@ int
 ProcessImpl::
 Process4D( ReadProgramOptions params )
 {
+// Test code for gsl compilation
+       int i;
+       double xi, yi, x[10], y[10];
+     
+       printf ("#m=0,S=2\n");
+     
+       for (i = 0; i < 10; i++)
+         {
+           x[i] = i + 0.5 * sin (i);
+           y[i] = i + cos (i * i);
+           printf ("%g %g\n", x[i], y[i]);
+         }
+     
+       printf ("#m=1,S=0\n");
+     
+       {
+         gsl_interp_accel *acc 
+           = gsl_interp_accel_alloc ();
+         gsl_spline *spline 
+           = gsl_spline_alloc (gsl_interp_cspline, 10);
+     
+         gsl_spline_init (spline, x, y, 10);
+     
+         for (xi = x[0]; xi < x[9]; xi += 0.01)
+           {
+             yi = gsl_spline_eval (spline, xi, acc);
+             printf ("%g %g\n", xi, yi);
+           }
+         gsl_spline_free (spline);
+         gsl_interp_accel_free (acc);
+       }
+
  /// Need to integrate multiple handling of different type ids OR resolve this issue
  /// by separate program that scan kvalobs database and identifies the value of
  /// each duplicate measurement to use ...
@@ -115,9 +146,6 @@ Process4D( ReadProgramOptions params )
 
              try {
                 result = dbGate.select(Qc2Data, kvQueries::selectMissingData(params.missing,pid,ProcessTime));
-                          //std::cout << "QueryA: "<< kvQueries::selectMissingData(params.missing,pid,ProcessTime) << std::endl;
-                //std::cout << kvQueries::selectMissingData(params.missing,pid,ProcessTime) << std::endl;
-                //std::cout << "....................................................." << std::endl;
               }
               catch ( dnmi::db::SQLException & ex ) {
                 IDLOGERROR( "html", "Exception: " << ex.what() << std::endl );
@@ -135,7 +163,6 @@ Process4D( ReadProgramOptions params )
                           midpoint=0;
                           for (uint kkk=0;kkk<Tseries.size();++kkk){
                               if (Tseries[kkk].obstime() == ProcessTime) {
-                                    //std::cout << "middle Point: " << kkk << std::endl;
                                     midpoint=kkk;
                                     ++mcount;
                               }
@@ -149,7 +176,6 @@ Process4D( ReadProgramOptions params )
                           if (midpoint > 0 && mcount == 1) {
 
                                  for (uint kkk=midpoint+1;kkk<Tseries.size();++kkk){
-                                     //std::cout << kkk << std::endl;
                                      if (Tseries[kkk].original() != params.missing){
                                          minupper=kkk;
                                          break;                                
@@ -158,7 +184,6 @@ Process4D( ReadProgramOptions params )
                                  }
 
                                  for (uint kkk=midpoint-1;kkk>0;--kkk){
-                                     //std::cout << kkk << std::endl;
                                      if (Tseries[kkk].original() != params.missing){
                                          minlower=kkk;
                                          break;                                
@@ -170,12 +195,6 @@ Process4D( ReadProgramOptions params )
                                      minlower=midpoint;
                                      minupper=midpoint;
                                  }
-
-                                 //std::cout << minlower << " " << minupper << std::endl;
-                                 //////for (uint kkk=minlower;kkk<=minupper;++kkk){
-                                      //if (kkk==midpoint) std::cout << "Midpoint ..." << std::endl;
-                                      //std::cout <<"Min Range: "<< Tseries[kkk] << std::endl;
-                                 //}
 
                                  if (minupper != midpoint && minlower != midpoint){     
                                       for (uint kkk=minupper+1;kkk<Tseries.size();++kkk){
@@ -196,58 +215,35 @@ Process4D( ReadProgramOptions params )
                           }
 
                            
-                          if (minupper != midpoint && minlower != midpoint){     
+                    if (minupper != midpoint && minlower != midpoint){     
 
-                                 std::cout << Tseries[maxlower].stationID() << " START ";
-                                 for (uint lll=maxlower;lll<=minlower;++lll){
-                                      //std::cout <<"Min Range: "<< Tseries[lll] << std::endl;
-                                      std::cout << Tseries[lll].obstime() << ">"<<Tseries[lll].original() << ",";
-                                      //std::cout << Tseries[lll].original() << ",";
-                                 }
+                           std::cout << Tseries[maxlower].stationID() << " START ";
+                           for (uint lll=maxlower;lll<=minlower;++lll){
+                                std::cout << Tseries[lll].obstime() << ">"<<Tseries[lll].original() << ",";
+                           }
+
+                           for (uint kkk=minlower+1;kkk<=minupper-1;++kkk){
+                               result = dbGate.select(Qc2InterpData, kvQueries::selectData(StationIds,pid,Tseries[kkk].obstime(),
+                                                                                                     Tseries[kkk].obstime() ));
+                               Qc2D GSW(Qc2InterpData,StationList,params);
+                               GSW.Qc2_interp(); 
+                               std::cout << Tseries[kkk].obstime()<<">"<<Tseries[kkk].original() << "," << GSW.intp_[GSW.stindex[Tseries[kkk].stationID()]] << ",";
+                           }
+                           std::cout << Tseries[minupper].obstime() << ">" << Tseries[minupper].original();
+                           for (uint lll=minupper+1;lll<=maxupper;++lll){
+                                     std::cout<<"," << Tseries[lll].obstime() << ">" << Tseries[lll].original();
+                           }
+                                std::cout << " FINISH" << std::endl;
+                    }
+
+                    // The whole time series ...
+
+                           for (uint lll=maxlower;lll<=maxupper;++lll){
+                                std::cout << Tseries[lll].obstime() << ":"<<Tseries[lll].original() << std::endl;
+                           }
 
 
-
-
-                              //std::cout << "Mx: "<< Tseries[minlower] << std::endl; 
-                              for (uint kkk=minlower+1;kkk<=minupper-1;++kkk){
-                                     result = dbGate.select(Qc2InterpData, kvQueries::selectData(StationIds,pid,Tseries[kkk].obstime(),
-                                                                                                           Tseries[kkk].obstime() ));
-                                     Qc2D GSW(Qc2InterpData,StationList,params);
-
-                                     //for (std::map<int,int>::iterator it=GSW.stindex.begin(); it!=GSW.stindex.end(); ++it){
-                                          //std::cout << (*it).second << " " << (*it).first << std::endl;
-                                          //std::cout << (*it).second << " " << GSW.stid_[(*it).second] << std::endl;
-                                     //}
-                               
-                                     GSW.Qc2_interp(); 
-
-                                     //std::cout << "Match: "
-                                               //<< "S: " << Tseries[kkk].stationID() << " "
-                                               //<< "T: " << Tseries[kkk].obstime() << " "
-                                               //<< "O: " << Tseries[kkk].original() << " "
-                                               //<< "C: " << Tseries[kkk].corrected() << " "
-                                               //<< "TI: " << Tseries[kkk].typeID() << " "
-                                               //<< "TI: " << GSW.typeid_[GSW.stindex[Tseries[kkk].stationID()]] << " "
-                                               //<< "S: " << GSW.stid_[GSW.stindex[Tseries[kkk].stationID()]] << " "
-                                               //<< "I: " << GSW.intp_[GSW.stindex[Tseries[kkk].stationID()]] <<  " "
-                                               //<< "T: " << GSW.obstime_[GSW.stindex[Tseries[kkk].stationID()]] <<  " "
-                                               //<< "C: " << GSW.corrected_[GSW.stindex[Tseries[kkk].stationID()]] << " *** " 
-                                               //<< "Index " << GSW.stindex[Tseries[kkk].stationID()] << " "
-                                               //<< std::endl;
-                                       std::cout << Tseries[kkk].obstime()<<">"<<Tseries[kkk].original() << "," << GSW.intp_[GSW.stindex[Tseries[kkk].stationID()]] << ",";
-                                       //std::cout << Tseries[kkk].original() << "," << GSW.intp_[GSW.stindex[Tseries[kkk].stationID()]] << ",";
-                             }
-                              //std::cout << "Mx: "<< Tseries[minupper] << std::endl; 
-                                           //std::cout << Tseries[minupper].original();
-                                           std::cout << Tseries[minupper].obstime() << ">" << Tseries[minupper].original();
-                              for (uint lll=minupper+1;lll<=maxupper;++lll){
-                                           //std::cout <<"Max Range: "<< Tseries[lll] << std::endl;
-                                           std::cout<<"," << Tseries[lll].obstime() << ">" << Tseries[lll].original();
-                                           //std::cout<<","<< Tseries[lll].original();
-                                      }
-                                      std::cout << " FINISH" << std::endl;
-                          }
-                          Tseries.clear();
+                    Tseries.clear();
                    }
               }
   ProcessTime.addHour(-1);

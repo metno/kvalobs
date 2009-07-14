@@ -74,6 +74,8 @@ kvQc2_LDADD = \
         -lproj \
         -lnetcdf \
         -lnetcdf_c++ \
+        -lgsl \
+        -lgslcblas
 	-ldl 
 
 
