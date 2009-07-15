@@ -38,6 +38,8 @@
 #include <milog/milog.h>
 #include <kvalobs/kvDbGate.h>
 #include <puTools/miTime>
+#include <puTools/miDate>
+#include <puTools/miClock>
 #include <memory>
 #include <stdexcept>
 
@@ -66,6 +68,8 @@ Process4D( ReadProgramOptions params )
 // Test code for gsl compilation
        int i;
        double xi, yi, x[10], y[10];
+       std::vector<double> xv;
+       std::vector<double> yv;
      
        printf ("#m=0,S=2\n");
      
@@ -73,6 +77,8 @@ Process4D( ReadProgramOptions params )
          {
            x[i] = i + 0.5 * sin (i);
            y[i] = i + cos (i * i);
+           xv.push_back(x[i]);
+           yv.push_back(y[i]);
            printf ("%g %g\n", x[i], y[i]);
          }
      
@@ -85,6 +91,7 @@ Process4D( ReadProgramOptions params )
            = gsl_spline_alloc (gsl_interp_cspline, 10);
      
          gsl_spline_init (spline, x, y, 10);
+         //gsl_spline_init (spline, xv, yv, 10);
      
          for (xi = x[0]; xi < x[9]; xi += 0.01)
            {
@@ -124,6 +131,8 @@ Process4D( ReadProgramOptions params )
   miutil::miTime ProcessTime;
   miutil::miTime XTime;
   miutil::miTime YTime;
+  miutil::miDate PDate(2009,10,10);
+  miutil::miClock PClock;
   ProcessTime = etime;
 
   std::vector<kvalobs::kvData> Tseries;
@@ -234,13 +243,14 @@ Process4D( ReadProgramOptions params )
                                      std::cout<<"," << Tseries[lll].obstime() << ">" << Tseries[lll].original();
                            }
                                 std::cout << " FINISH" << std::endl;
+                                // The whole time series ...
+            
+                                   for (uint lll=maxlower;lll<=maxupper;++lll){
+                                          //PDate(2009,10,10);
+                                          std::cout << Tseries[lll].obstime()<< " " << Tseries[lll].obstime().isoTime(true,true) << ":"<<Tseries[lll].original() << std::endl;
+                                   }
                     }
 
-                    // The whole time series ...
-
-                           for (uint lll=maxlower;lll<=maxupper;++lll){
-                                std::cout << Tseries[lll].obstime() << ":"<<Tseries[lll].original() << std::endl;
-                           }
 
 
                     Tseries.clear();
