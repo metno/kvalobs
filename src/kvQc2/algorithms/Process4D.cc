@@ -66,33 +66,22 @@ ProcessImpl::
 Process4D( ReadProgramOptions params )
 {
 // Test code for gsl compilation
-       int i;
+       int i, nseries;
        double xi, yi, x[10], y[10];
-       std::vector<double> xv;
-       std::vector<double> yv;
-     
-       printf ("#m=0,S=2\n");
+       double tt[100], pp[100];
      
        for (i = 0; i < 10; i++)
          {
            x[i] = i + 0.5 * sin (i);
            y[i] = i + cos (i * i);
-           xv.push_back(x[i]);
-           yv.push_back(y[i]);
            printf ("%g %g\n", x[i], y[i]);
          }
-     
-       printf ("#m=1,S=0\n");
-     
        {
          gsl_interp_accel *acc 
            = gsl_interp_accel_alloc ();
          gsl_spline *spline 
            = gsl_spline_alloc (gsl_interp_cspline, 10);
-     
          gsl_spline_init (spline, x, y, 10);
-         //gsl_spline_init (spline, xv, yv, 10);
-     
          for (xi = x[0]; xi < x[9]; xi += 0.01)
            {
              yi = gsl_spline_eval (spline, xi, acc);
@@ -131,8 +120,10 @@ Process4D( ReadProgramOptions params )
   miutil::miTime ProcessTime;
   miutil::miTime XTime;
   miutil::miTime YTime;
-  miutil::miDate PDate(2009,10,10);
-  miutil::miClock PClock;
+  miutil::miDate PDate;
+  double JulDec;
+  long StartDay;
+  double HourDec;
   ProcessTime = etime;
 
   std::vector<kvalobs::kvData> Tseries;
@@ -225,12 +216,10 @@ Process4D( ReadProgramOptions params )
 
                            
                     if (minupper != midpoint && minlower != midpoint){     
-
                            std::cout << Tseries[maxlower].stationID() << " START ";
                            for (uint lll=maxlower;lll<=minlower;++lll){
                                 std::cout << Tseries[lll].obstime() << ">"<<Tseries[lll].original() << ",";
                            }
-
                            for (uint kkk=minlower+1;kkk<=minupper-1;++kkk){
                                result = dbGate.select(Qc2InterpData, kvQueries::selectData(StationIds,pid,Tseries[kkk].obstime(),
                                                                                                      Tseries[kkk].obstime() ));
@@ -243,22 +232,46 @@ Process4D( ReadProgramOptions params )
                                      std::cout<<"," << Tseries[lll].obstime() << ">" << Tseries[lll].original();
                            }
                                 std::cout << " FINISH" << std::endl;
-                                // The whole time series ...
-            
+                                   nseries=0; 
+                                   PDate.setDate(Tseries[maxlower].obstime().year(),Tseries[maxlower].obstime().month(),Tseries[maxlower].obstime().day());
+                                   std::cout << Tseries[maxlower].obstime().year() << " " <<Tseries[maxlower].obstime().month() << " " <<Tseries[maxlower].obstime().day() << std::endl;
+                                   StartDay=PDate.julianDay();
                                    for (uint lll=maxlower;lll<=maxupper;++lll){
-                                          //PDate(2009,10,10);
-                                          std::cout << Tseries[lll].obstime()<< " " << Tseries[lll].obstime().isoTime(true,true) << ":"<<Tseries[lll].original() << std::endl;
+                                       if (Tseries[lll].original() != params.missing){
+                                          PDate.setDate(Tseries[lll].obstime().year(),Tseries[lll].obstime().month(),Tseries[lll].obstime().day() );
+                                          JulDec=PDate.julianDay()+Tseries[lll].obstime().hour()/24.0 + 
+                                                                   Tseries[lll].obstime().min()/(24.0*60)+Tseries[lll].obstime().sec()/(24.0*60.0*60.0);
+                                          HourDec=(PDate.julianDay()-StartDay)*24.0 +Tseries[lll].obstime().hour() +
+                                                                                     Tseries[lll].obstime().min()/60.0+Tseries[lll].obstime().sec()/3600.0;
+                                            tt[nseries]=HourDec;
+                                            pp[nseries]=Tseries[lll].original();
+                                            nseries=nseries+1;
+                                            std::cout << "INPUT:" << tt[nseries] << " " << pp[nseries] << " N:" << nseries << std::endl;
+                                       }
                                    }
+                                   std::cout << "number check: " << nseries-1 << " " << maxupper-maxlower << std::endl;
+ /// Need to integrate multiple handling of different type ids OR resolve this issue
                     }
-
-
 
                     Tseries.clear();
                    }
               }
   ProcessTime.addHour(-1);
-  //std::cout << "Timings : " << ProcessTime << std::endl;
   }
 return 0;
 }
+                                   ///{
+                                     ///gsl_interp_accel *acc 
+                                       ///= gsl_interp_accel_alloc ();
+                                     ///gsl_spline *spline 
+                                       ///= gsl_spline_alloc (gsl_interp_cspline, nseries);
+                                     ///gsl_spline_init (spline, tt, pp, nseries);
+                                     ///for (xi = x[0]; xi < x[nseries]; xi += 1.0)  
+                                       ///{
+                                         ///yi = gsl_spline_eval (spline, xi, acc);
+                                         ///printf ("%g %g\n", xi, yi);
+                                       ///}
+                                     ///gsl_spline_free (spline);
+                                     ///gsl_interp_accel_free (acc);
+                                   ///}
 
