@@ -216,20 +216,20 @@ Process4D( ReadProgramOptions params )
 
                            
                     if (minupper != midpoint && minlower != midpoint){     
-                           std::cout << Tseries[maxlower].stationID() << " START ";
+                           std::cout << Tseries[maxlower].stationID() << " START " << std::endl;
                            for (uint lll=maxlower;lll<=minlower;++lll){
-                                std::cout << Tseries[lll].obstime() << ">"<<Tseries[lll].original() << ",";
+                                std::cout << lll  << " " << Tseries[lll].obstime() << ">"<<Tseries[lll].original() << std::endl;
                            }
                            for (uint kkk=minlower+1;kkk<=minupper-1;++kkk){
                                result = dbGate.select(Qc2InterpData, kvQueries::selectData(StationIds,pid,Tseries[kkk].obstime(),
                                                                                                      Tseries[kkk].obstime() ));
                                Qc2D GSW(Qc2InterpData,StationList,params);
                                GSW.Qc2_interp(); 
-                               std::cout << Tseries[kkk].obstime()<<">"<<Tseries[kkk].original() << "," << GSW.intp_[GSW.stindex[Tseries[kkk].stationID()]] << ",";
+                               std::cout << kkk << " " << Tseries[kkk].obstime()<<">"<<Tseries[kkk].original() << "," << GSW.intp_[GSW.stindex[Tseries[kkk].stationID()]] << std::endl;
                            }
-                           std::cout << Tseries[minupper].obstime() << ">" << Tseries[minupper].original();
+                           std::cout << minupper << " " << Tseries[minupper].obstime() << ">" << Tseries[minupper].original() << std::endl;
                            for (uint lll=minupper+1;lll<=maxupper;++lll){
-                                     std::cout<<"," << Tseries[lll].obstime() << ">" << Tseries[lll].original();
+                                     std::cout<< lll <<" " << Tseries[lll].obstime() << ">" << Tseries[lll].original() << std::endl;
                            }
                                 std::cout << " FINISH" << std::endl;
                                    nseries=0; 
@@ -245,12 +245,26 @@ Process4D( ReadProgramOptions params )
                                                                                      Tseries[lll].obstime().min()/60.0+Tseries[lll].obstime().sec()/3600.0;
                                             tt[nseries]=HourDec;
                                             pp[nseries]=Tseries[lll].original();
+                                            std::cout << "INPUT:" << lll << " " << tt[nseries] << " " << pp[nseries] << " N:" << nseries << std::endl;
                                             nseries=nseries+1;
-                                            std::cout << "INPUT:" << tt[nseries] << " " << pp[nseries] << " N:" << nseries << std::endl;
                                        }
                                    }
                                    std::cout << "number check: " << nseries-1 << " " << maxupper-maxlower << std::endl;
  /// Need to integrate multiple handling of different type ids OR resolve this issue
+                                   {
+                                     gsl_interp_accel *acc 
+                                       = gsl_interp_accel_alloc ();
+                                     gsl_spline *spline 
+                                       = gsl_spline_alloc (gsl_interp_cspline, nseries);
+                                     gsl_spline_init (spline, tt, pp, nseries);
+                                     for (xi = x[0]; xi < x[nseries]; xi += 1.0)  
+                                       {
+                                         yi = gsl_spline_eval (spline, xi, acc);
+                                         printf ("%g %g\n", xi, yi);
+                                       }
+                                     gsl_spline_free (spline);
+                                     gsl_interp_accel_free (acc);
+                                   }
                     }
 
                     Tseries.clear();
@@ -260,18 +274,4 @@ Process4D( ReadProgramOptions params )
   }
 return 0;
 }
-                                   ///{
-                                     ///gsl_interp_accel *acc 
-                                       ///= gsl_interp_accel_alloc ();
-                                     ///gsl_spline *spline 
-                                       ///= gsl_spline_alloc (gsl_interp_cspline, nseries);
-                                     ///gsl_spline_init (spline, tt, pp, nseries);
-                                     ///for (xi = x[0]; xi < x[nseries]; xi += 1.0)  
-                                       ///{
-                                         ///yi = gsl_spline_eval (spline, xi, acc);
-                                         ///printf ("%g %g\n", xi, yi);
-                                       ///}
-                                     ///gsl_spline_free (spline);
-                                     ///gsl_interp_accel_free (acc);
-                                   ///}
 
