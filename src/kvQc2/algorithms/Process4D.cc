@@ -239,6 +239,7 @@ Process4D( ReadProgramOptions params )
                                }
                            }
 // GSL interpolation routines
+/// OBS! The length of the akima spline is longer than the interval requested ... is this a behaviour of the library or a bug ??? CHECK 
                            std::cout << "N: "<< nseries << std::endl;
                            std::cout << maxlower<<" "<<minlower<<" "<<minupper<<" "<<maxupper<< std::endl;
                            gsl_interp_accel *acc = gsl_interp_accel_alloc ();
