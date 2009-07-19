@@ -95,6 +95,7 @@ Process4D( ReadProgramOptions params )
  /// by separate program that scan kvalobs database and identifies the value of
  /// each duplicate measurement to use ...
    int pid=params.pid;
+   int tid=params.tid;
    miutil::miTime stime=params.UT0;
    miutil::miTime etime=params.UT1;
    std::string CIF=params.ControlInfoString;
@@ -145,7 +146,8 @@ Process4D( ReadProgramOptions params )
      Tseries.clear();
 
              try {
-                result = dbGate.select(Qc2Data, kvQueries::selectMissingData(params.missing,pid,ProcessTime));
+                //result = dbGate.select(Qc2Data, kvQueries::selectMissingData(params.missing,pid,ProcessTime));
+                result = dbGate.select(Qc2Data, kvQueries::selectMissingData(params.missing,pid,tid,ProcessTime));
               }
               catch ( dnmi::db::SQLException & ex ) {
                 IDLOGERROR( "html", "Exception: " << ex.what() << std::endl );
@@ -155,7 +157,7 @@ Process4D( ReadProgramOptions params )
               }
               if(!Qc2Data.empty()) {
                    for (std::list<kvalobs::kvData>::const_iterator id = Qc2Data.begin(); id != Qc2Data.end(); ++id) {
-                          result = dbGate.select(Qc2SeriesData, kvQueries::selectData(id->stationID(),pid,XTime,YTime));
+                          result = dbGate.select(Qc2SeriesData, kvQueries::selectData(id->stationID(),pid,tid,XTime,YTime));
                           for (std::list<kvalobs::kvData>::const_iterator is = Qc2SeriesData.begin(); is != Qc2SeriesData.end(); ++is) {
                              Tseries.push_back(*is);
                           }
