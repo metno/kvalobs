@@ -65,45 +65,25 @@ int
 ProcessImpl::
 Process4D( ReadProgramOptions params )
 {
-// Test code for gsl compilation
-       int i, nseries;
-       double xi, yi, x[10], y[10];
-       double tt[100], pp[100];
-     
-       for (i = 0; i < 10; i++)
-         {
-           x[i] = i + 0.5 * sin (i);
-           y[i] = i + cos (i * i);
-           printf ("%g %g\n", x[i], y[i]);
-         }
-       {
-         gsl_interp_accel *acc 
-           = gsl_interp_accel_alloc ();
-         gsl_spline *spline 
-           = gsl_spline_alloc (gsl_interp_cspline, 10);
-         gsl_spline_init (spline, x, y, 10);
-         for (xi = x[0]; xi < x[9]; xi += 0.01)
-           {
-             yi = gsl_spline_eval (spline, xi, acc);
-             printf ("%g %g\n", xi, yi);
-           }
-         gsl_spline_free (spline);
-         gsl_interp_accel_free (acc);
-       }
+// For gsl compilation
+  int i, nseries;
+  double xi, yi;
+  double tt[100], pp[100]; // only set up for time series; max 100 points, an trap to catch errors ...
 
- /// Need to integrate multiple handling of different type ids OR resolve this issue
- /// by separate program that scan kvalobs database and identifies the value of
- /// each duplicate measurement to use ...
-   int pid=params.pid;
-   int tid=params.tid;
-   miutil::miTime stime=params.UT0;
-   miutil::miTime etime=params.UT1;
-   std::string CIF=params.ControlInfoString;
+/// Need to integrate multiple handling of different type ids OR resolve this issue
+/// by separate program that scan kvalobs database and identifies the value of
+/// each duplicate measurement to use ...
+  int pid=params.pid;
+  int tid=params.tid;
+  miutil::miTime stime=params.UT0;
+  miutil::miTime etime=params.UT1;
 
   uint midpoint;
   uint minlower,minupper;
   uint maxlower,maxupper;
   int mcount;
+
+  std::vector<int> gap_index;
 
   std::list<kvalobs::kvStation> StationList;
   std::list<int> StationIds;
@@ -129,13 +109,28 @@ Process4D( ReadProgramOptions params )
 
   std::vector<kvalobs::kvData> Tseries;
 
-
   int HW=params.StepH; /// carry window with the paramter StepH
   ///This algorithm steps back in time.
   GetStationList(StationList);  /// StationList is all the possible stations
   for (std::list<kvalobs::kvStation>::const_iterator sit=StationList.begin(); sit!=StationList.end(); ++ sit) {
      StationIds.push_back( sit->stationID() );
   }  /// Does this not have to go in the loop ...
+
+///
+/// The window is determined by the params.StepH (need to add a uniques parameter in config options for this), fed into HW
+/// The time series selected is checked for missing values and the optimum number of niegbours 
+///    x: value 
+///    m: missing value
+///
+///  m x x x x x m m m m x x x x x x m   time --->
+///    1       2         3         4
+///
+/// 1: maxlower
+/// 2: minlower
+/// 3: minupper
+/// 4: maxupper
+///
+/// The indices for the missing values 'm' are held in gap_index.
 
   while (ProcessTime >= stime) 
   {
@@ -218,57 +213,79 @@ Process4D( ReadProgramOptions params )
 
                            
                     if (minupper != midpoint && minlower != midpoint){     
-                           std::cout << Tseries[maxlower].stationID() << " START " << std::endl;
-                           for (uint lll=maxlower;lll<=minlower;++lll){
-                                std::cout << lll  << " " << Tseries[lll].obstime() << ">"<<Tseries[lll].original() << std::endl;
-                           }
                            for (uint kkk=minlower+1;kkk<=minupper-1;++kkk){
                                result = dbGate.select(Qc2InterpData, kvQueries::selectData(StationIds,pid,Tseries[kkk].obstime(),
                                                                                                      Tseries[kkk].obstime() ));
                                Qc2D GSW(Qc2InterpData,StationList,params);
                                GSW.Qc2_interp(); 
-                               std::cout << kkk << " " << Tseries[kkk].obstime()<<">"<<Tseries[kkk].original() << "," << GSW.intp_[GSW.stindex[Tseries[kkk].stationID()]] << std::endl;
                            }
-                           std::cout << minupper << " " << Tseries[minupper].obstime() << ">" << Tseries[minupper].original() << std::endl;
-                           for (uint lll=minupper+1;lll<=maxupper;++lll){
-                                     std::cout<< lll <<" " << Tseries[lll].obstime() << ">" << Tseries[lll].original() << std::endl;
+                           nseries=0; 
+                           PDate.setDate(Tseries[maxlower].obstime().year(),Tseries[maxlower].obstime().month(),Tseries[maxlower].obstime().day());
+                           StartDay=PDate.julianDay();
+                           for (uint lll=maxlower;lll<=maxupper;++lll){
+                               PDate.setDate(Tseries[lll].obstime().year(),Tseries[lll].obstime().month(),Tseries[lll].obstime().day() );
+                               JulDec=PDate.julianDay()+Tseries[lll].obstime().hour()/24.0 + 
+                                                           Tseries[lll].obstime().min()/(24.0*60)+Tseries[lll].obstime().sec()/(24.0*60.0*60.0);
+                               HourDec=(PDate.julianDay()-StartDay)*24.0 +Tseries[lll].obstime().hour() +
+                                                                             Tseries[lll].obstime().min()/60.0+Tseries[lll].obstime().sec()/3600.0;
+                               std::cout << "INPUT " << HourDec << " " << Tseries[lll].original() << std::endl;
+                               if (Tseries[lll].original() != params.missing){
+                                  tt[nseries]=HourDec;
+                                  pp[nseries]=Tseries[lll].original();
+                                  nseries=nseries+1;
+                               } 
+                               else {
+                                  gap_index.push_back(lll); // need to work out the new corrected values to pass back to kvalobs
+                               }
                            }
-                                std::cout << " FINISH" << std::endl;
-                                   nseries=0; 
-                                   PDate.setDate(Tseries[maxlower].obstime().year(),Tseries[maxlower].obstime().month(),Tseries[maxlower].obstime().day());
-                                   std::cout << Tseries[maxlower].obstime().year() << " " <<Tseries[maxlower].obstime().month() << " " <<Tseries[maxlower].obstime().day() << std::endl;
-                                   StartDay=PDate.julianDay();
-                                   for (uint lll=maxlower;lll<=maxupper;++lll){
-                                       if (Tseries[lll].original() != params.missing){
-                                          PDate.setDate(Tseries[lll].obstime().year(),Tseries[lll].obstime().month(),Tseries[lll].obstime().day() );
-                                          JulDec=PDate.julianDay()+Tseries[lll].obstime().hour()/24.0 + 
-                                                                   Tseries[lll].obstime().min()/(24.0*60)+Tseries[lll].obstime().sec()/(24.0*60.0*60.0);
-                                          HourDec=(PDate.julianDay()-StartDay)*24.0 +Tseries[lll].obstime().hour() +
-                                                                                     Tseries[lll].obstime().min()/60.0+Tseries[lll].obstime().sec()/3600.0;
-                                            tt[nseries]=HourDec;
-                                            pp[nseries]=Tseries[lll].original();
-                                            std::cout << "INPUT:" << lll << " " << tt[nseries] << " " << pp[nseries] << " N:" << nseries << std::endl;
-                                            nseries=nseries+1;
-                                       }
-                                   }
-                                   std::cout << "number check: " << nseries-1 << " " << maxupper-maxlower << std::endl;
- /// Need to integrate multiple handling of different type ids OR resolve this issue
-                                   {
-                                     gsl_interp_accel *acc 
-                                       = gsl_interp_accel_alloc ();
-                                     gsl_spline *spline 
-                                       = gsl_spline_alloc (gsl_interp_cspline, nseries);
-                                     gsl_spline_init (spline, tt, pp, nseries);
-                                     for (xi = x[0]; xi < x[nseries]; xi += 1.0)  
-                                       {
-                                         yi = gsl_spline_eval (spline, xi, acc);
-                                         printf ("%g %g\n", xi, yi);
-                                       }
-                                     gsl_spline_free (spline);
-                                     gsl_interp_accel_free (acc);
-                                   }
+// GSL interpolation routines
+                           std::cout << "N: "<< nseries << std::endl;
+                           std::cout << maxlower<<" "<<minlower<<" "<<minupper<<" "<<maxupper<< std::endl;
+                           gsl_interp_accel *acc = gsl_interp_accel_alloc ();
+                           gsl_spline *spline = gsl_spline_alloc (gsl_interp_akima, maxupper-maxlower);
+                           gsl_spline_init (spline, tt, pp, maxupper-maxlower);
+                           for (xi = tt[0]; xi < tt[nseries]; xi += 1.0)  {
+                                 yi = gsl_spline_eval (spline, xi, acc);
+                                 std::cout << "INTERP " << xi << " " << yi << std::endl;
+                           }
+                           gsl_spline_free (spline);
+                           gsl_interp_accel_free (acc);
+                           for (std::vector<int>::const_iterator ig = gap_index.begin();ig != gap_index.end(); ++ig){
+                                    std::cout <<"Gaps: "<< *ig << std::endl;
+                           }
+                           std::cout << "------------------------------------------------- " << std::endl;
                     }
 
+// Add here the logic to write results back to the database and inform kvServiceD
+                      //try {
+                              //if ( CheckFlags.condition(id->controlinfo(),params.Wflag) ) {  // Do not overwrite data controlled by humans!
+                                   //kvData d = *id;
+                                   //kvUseInfo ui = d.useinfo();
+                                   //ui.setUseFlags( d.controlinfo() );
+                                   //d.useinfo( ui );   
+                                   //dbGate.insert( d, "data", true); 
+                                   //kvalobs::kvStationInfo::kvStationInfo DataToWrite(id->stationID(),id->obstime(),id->paramID());
+                                   //stList.push_back(DataToWrite);
+                              //if ( CheckFlags.condition(id->controlinfo(),params.zflag) ) {  
+                                   //XP.push_back(d.original());
+                                   //YP.push_back(d.corrected());
+                              //}
+                           //}
+                       //}
+                          //catch ( dnmi::db::SQLException & ex ) {
+                            //IDLOGERROR( "html", "Exception: " << ex.what() << std::endl );
+                            //std::cout<<"INSERTO> CATCH ex" << result <<std::endl;
+                          //}
+                          //catch ( ... ) {
+                            //IDLOGERROR( "html", "Unknown exception: con->exec(ctbl) .....\n" );
+                            //std::cout<<"INSERTO> CATCH ..." << result <<std::endl;
+                          //}
+                          //if(!stList.empty()){
+                              //checkedDataHelper.sendDataToService(stList);
+                              //stList.clear();
+                          //}
+
+                    gap_index.clear();
                     Tseries.clear();
                    }
               }
