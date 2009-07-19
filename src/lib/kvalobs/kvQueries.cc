@@ -707,3 +707,20 @@ kvQueries::selectMissingData(const float value, const int pid, const miutil::miT
   return ost.str();
 }
 
+  /** EGLITIS (for Qc2)
+   * \brief A query to pick out missing float values especially
+   *  for Qc2 tests, for all stations at one particular time
+   */
+miutil::miString 
+kvQueries::selectMissingData(const float value, const int pid, const int tid, const miutil::miTime& Ptime)
+{
+  ostringstream ost;
+
+  ost << " WHERE original="     << value
+      << " and paramid="        << pid
+      << " and typeid="        << tid
+      << " and obstime=\'"      << Ptime.isoTime() << "\'"
+      << " order by obstime";
+
+  return ost.str();
+}

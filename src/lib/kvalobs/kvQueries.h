@@ -336,6 +336,16 @@ namespace kvQueries {
    miutil::miString selectMissingData(const float value,
                                       const int pid, 
                                       const miutil::miTime& Ptime);
+
+  /** EGLITIS (for Qc2)
+   * \brief A query to pick out missing float values especially
+   *  for Qc2 tests, for all stations at one particular time
+   */
+   miutil::miString selectMissingData(const float value,
+                                      const int pid, 
+                                      const int tid, 
+                                      const miutil::miTime& Ptime);
+
   /** @} */
 };
 
