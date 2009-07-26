@@ -108,6 +108,7 @@ Interpolate( ReadProgramOptions params )
 
                 Qc2D GSW(Qc2Data,StationList, params);
                 GSW.Qc2_interp(); 
+                GSW.SampleSemiVariogram();
                 GSW.write_cdf(StationList);
        }
        ProcessTime.addDay();

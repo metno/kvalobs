@@ -110,6 +110,8 @@ public:
   void calculate_intp_h(unsigned int index);  // includes modification due to change in height (h).
   void calculate_intp_sl(unsigned int index, std::list<int> BestStations); // perform an interpolation based on a list of allowed stations (sl).
   void calculate_trintp_sl(unsigned int index, std::list<int> BestStations);  // strict triangle interpolation
+
+  int SampleSemiVariogram();
                                       
   
   int write_cdf(const std::list<kvalobs::kvStation> & slist); // write the data record to a CDF file
