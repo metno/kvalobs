@@ -70,6 +70,7 @@ Process4D( ReadProgramOptions params )
   double xi, yi;
   double tt[100], pp[100]; // only set up for time series; max 100 points, an trap to catch errors ...
 
+  int counter=0;
 /// Need to integrate multiple handling of different type ids OR resolve this issue
 /// by separate program that scan kvalobs database and identifies the value of
 /// each duplicate measurement to use ...
@@ -233,6 +234,7 @@ Process4D( ReadProgramOptions params )
                                   tt[nseries]=HourDec;
                                   pp[nseries]=Tseries[lll].original();
                                   nseries=nseries+1;
+                                  std::cout << "For Routine: " << HourDec << " " << Tseries[lll].original() << std::endl;
                                } 
                                else {
                                   gap_index.push_back(lll); // need to work out the new corrected values to pass back to kvalobs
@@ -245,9 +247,11 @@ Process4D( ReadProgramOptions params )
                            gsl_interp_accel *acc = gsl_interp_accel_alloc ();
                            gsl_spline *spline = gsl_spline_alloc (gsl_interp_akima, maxupper-maxlower);
                            gsl_spline_init (spline, tt, pp, maxupper-maxlower);
+                           counter=0;
                            for (xi = tt[0]; xi < tt[nseries]; xi += 1.0)  {
                                  yi = gsl_spline_eval (spline, xi, acc);
-                                 std::cout << "INTERP " << xi << " " << yi << std::endl;
+                                 std::cout << counter << " INTERP " << xi << " " << yi << std::endl;
+                                 counter++;
                            }
                            gsl_spline_free (spline);
                            gsl_interp_accel_free (acc);
@@ -260,6 +264,9 @@ Process4D( ReadProgramOptions params )
 // Add here the logic to write results back to the database and inform kvServiceD
                       //try {
                               //if ( CheckFlags.condition(id->controlinfo(),params.Wflag) ) {  // Do not overwrite data controlled by humans!
+                              //if ( counter==1 )  {  // Do not overwrite data controlled by humans!
+                                   //std::cout << "Value to write back" << std::endl;
+                                   //std::cout << "... dummy block ..." << std::endl;
                                    //kvData d = *id;
                                    //kvUseInfo ui = d.useinfo();
                                    //ui.setUseFlags( d.controlinfo() );
