@@ -135,6 +135,7 @@ Process4D( ReadProgramOptions params )
 
   while (ProcessTime >= stime) 
   {
+     std::cout << "Process Time: " << ProcessTime << std::endl;
      XTime=ProcessTime;
      XTime.addHour(-HW);
      YTime=ProcessTime;
@@ -154,6 +155,7 @@ Process4D( ReadProgramOptions params )
               if(!Qc2Data.empty()) {
                    for (std::list<kvalobs::kvData>::const_iterator id = Qc2Data.begin(); id != Qc2Data.end(); ++id) {
                           result = dbGate.select(Qc2SeriesData, kvQueries::selectData(id->stationID(),pid,tid,XTime,YTime));
+                          std::cout << "Station Id: " << id->stationID() << std::endl;
                           for (std::list<kvalobs::kvData>::const_iterator is = Qc2SeriesData.begin(); is != Qc2SeriesData.end(); ++is) {
                              Tseries.push_back(*is);
                           }
@@ -229,12 +231,12 @@ Process4D( ReadProgramOptions params )
                                                            Tseries[lll].obstime().min()/(24.0*60)+Tseries[lll].obstime().sec()/(24.0*60.0*60.0);
                                HourDec=(PDate.julianDay()-StartDay)*24.0 +Tseries[lll].obstime().hour() +
                                                                              Tseries[lll].obstime().min()/60.0+Tseries[lll].obstime().sec()/3600.0;
-                               std::cout << "INPUT " << HourDec << " " << Tseries[lll].original() << std::endl;
+                               std::cout << "INPUT " << HourDec << " " << Tseries[lll].original() << " " << Tseries[lll].obstime() << std::endl;
                                if (Tseries[lll].original() != params.missing){
                                   tt[nseries]=HourDec;
                                   pp[nseries]=Tseries[lll].original();
                                   nseries=nseries+1;
-                                  std::cout << "For Routine: " << HourDec << " " << Tseries[lll].original() << std::endl;
+                                  std::cout << " N: " << nseries << " Tseries Index:  " << lll<< " HourDec: " << HourDec << " Original: " << Tseries[lll].original() << " Obstime: " << Tseries[lll].obstime() << std::endl;
                                } 
                                else {
                                   gap_index.push_back(lll); // need to work out the new corrected values to pass back to kvalobs
@@ -248,10 +250,18 @@ Process4D( ReadProgramOptions params )
                            gsl_spline *spline = gsl_spline_alloc (gsl_interp_akima, maxupper-maxlower);
                            gsl_spline_init (spline, tt, pp, maxupper-maxlower);
                            counter=0;
-                           for (xi = tt[0]; xi < tt[nseries]; xi += 1.0)  {
+/// CHECK out this point !!! what exactly happens here ??????
+                           std::cout << "entering interpolation" <<std::endl;
+                           std::cout << "Xi limits: "<<  tt[0] << " " << tt[nseries-1] <<std::endl;
+                           for (xi = tt[0]; xi < tt[nseries-1]; xi += 1.0)  {
                                  yi = gsl_spline_eval (spline, xi, acc);
-                                 std::cout << counter << " INTERP " << xi << " " << yi << std::endl;
+                                 //std::cout << "Counter " << counter << " INTERP " << xi << " " << yi << std::endl;
                                  counter++;
+                                 std::cout << "HourDec from tt: " << xi << " Corresponding Tseries Time " << Tseries[counter+minlower].obstime() 
+                                                        << " Interpolant "
+                                                        << yi  
+                                                        << " Original "
+                                                        << Tseries[counter+minlower].original() << std::endl; 
                            }
                            gsl_spline_free (spline);
                            gsl_interp_accel_free (acc);
