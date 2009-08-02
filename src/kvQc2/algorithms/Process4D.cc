@@ -246,9 +246,18 @@ Process4D( ReadProgramOptions params )
 /// OBS! The length of the akima spline is longer than the interval requested ... is this a behaviour of the library or a bug ??? CHECK 
                            std::cout << "N: "<< nseries << std::endl;
                            std::cout << maxlower<<" "<<minlower<<" "<<minupper<<" "<<maxupper<< std::endl;
+                           counter=0;
+                           for (xi = tt[0]; xi < tt[nseries-1]; xi += 1.0)  {
+                                 std::cout << "HourDec from tt: " << xi << " Corresponding Tseries Time " << Tseries[counter+maxlower].obstime() 
+                                                        << " Original "
+                                                        << Tseries[counter+maxlower].original() << std::endl; 
+                                 counter++;
+                           }
                            gsl_interp_accel *acc = gsl_interp_accel_alloc ();
                            gsl_spline *spline = gsl_spline_alloc (gsl_interp_akima, maxupper-maxlower);
                            gsl_spline_init (spline, tt, pp, maxupper-maxlower);
+                           //gsl_spline *spline = gsl_spline_alloc (gsl_interp_akima, maxupper-maxlower+1);
+                           //gsl_spline_init (spline, tt, pp, nseries);
                            counter=0;
 /// CHECK out this point !!! what exactly happens here ??????
                            std::cout << "entering interpolation" <<std::endl;
@@ -256,12 +265,12 @@ Process4D( ReadProgramOptions params )
                            for (xi = tt[0]; xi < tt[nseries-1]; xi += 1.0)  {
                                  yi = gsl_spline_eval (spline, xi, acc);
                                  //std::cout << "Counter " << counter << " INTERP " << xi << " " << yi << std::endl;
-                                 counter++;
-                                 std::cout << "HourDec from tt: " << xi << " Corresponding Tseries Time " << Tseries[counter+minlower].obstime() 
+                                 std::cout << "HourDec from tt: " << xi << " Corresponding Tseries Time " << Tseries[counter+maxlower].obstime() 
                                                         << " Interpolant "
                                                         << yi  
                                                         << " Original "
-                                                        << Tseries[counter+minlower].original() << std::endl; 
+                                                        << Tseries[counter+maxlower].original() << std::endl; 
+                                 counter++;
                            }
                            gsl_spline_free (spline);
                            gsl_interp_accel_free (acc);
