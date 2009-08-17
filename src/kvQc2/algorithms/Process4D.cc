@@ -68,7 +68,7 @@ Process4D( ReadProgramOptions params )
 // For gsl compilation
   int i, nseries;
   double xi, yi;
-  double tt[100], pp[100]; // only set up for time series; max 100 points, an trap to catch errors ...
+  double tt[100], pp[100]; // only set up for time series; max 100 points, and trap to catch errors ...
 
   int counter=0;
 /// Need to integrate multiple handling of different type ids OR resolve this issue

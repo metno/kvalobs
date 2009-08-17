@@ -43,15 +43,6 @@
 
 #include "CheckedDataCommandBase.h"
 #include "CheckedDataHelper.h"
-
-//#include <qapplication.h>
-//#include <qpushbutton.h>
-//#include <qlcdnumber.h>
-//#include <qfont.h>
-//#include <qlayout.h>
-
-//#include "PaperField.h"
-
 #include "ProcessControl.h"
 
 #include "scone.h"

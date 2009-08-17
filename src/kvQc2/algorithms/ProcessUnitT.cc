@@ -41,20 +41,11 @@
 #include <memory>
 #include <stdexcept>
 
+#include "ProcessControl.h"
 #include "CheckedDataCommandBase.h"
 #include "CheckedDataHelper.h"
 
-//#include <qapplication.h>
-//#include <qpushbutton.h>
-//#include <qlcdnumber.h>
-//#include <qfont.h>
-//#include <qlayout.h>
-
-//#include "PaperField.h"
-
 #include "scone.h"
-
-
 
 using namespace kvalobs;
 using namespace std;
@@ -82,6 +73,8 @@ ProcessUnitT( ReadProgramOptions params )
   std::list<kvalobs::kvData> ReturnData;
   bool result;
 
+  ProcessControl CheckFlags;
+
   kvalobs::kvStationInfoList  stList;
   CheckedDataHelper checkedDataHelper(app);
 
@@ -91,6 +84,8 @@ ProcessUnitT( ReadProgramOptions params )
   miutil::miTime XTime;
   miutil::miTime YTime;
   ProcessTime = etime;
+
+  miutil::miTime fixtime; /// fixtime here for tests
 
   std::vector<kvalobs::kvData> Tseries;
   std::list<kvalobs::kvData> MaxT;
@@ -128,44 +123,82 @@ ProcessUnitT( ReadProgramOptions params )
                              if (Tseries.size()==3) {
                                    if (Tseries[0].original() > params.missing && Tseries[1].original()==params.missing && 
                                        Tseries[2].original() > params.missing){
-                                       std::cout << "PHOTON FISH CAKE !!!!!!!!!!!!!" << std::endl;
                                        result = dbGate.select(MaxT, kvQueries::selectData(id->stationID(),215,YTime,YTime));
                                        result = dbGate.select(MinT, kvQueries::selectData(id->stationID(),213,YTime,YTime));
                                        if (MaxT.size()==1 && MinT.size()==1){
 
                                                LinInterpolated=0.5*(Tseries[0].original()+Tseries[2].original());
                                                TanTaxInterpolated=0.5*(MinT.begin()->original()+MaxT.begin()->original());
-                                               std::cout << "originals[0]: " << Tseries[0].original() << std::endl;
-                                               std::cout << "originals[1]: " << Tseries[1].original() << " Linear Interpolation: " << LinInterpolated << std::endl;
-                                               std::cout << "Tan Tax Interpolation: " << TanTaxInterpolated << std::endl;
-                                               std::cout << "originals[2]: " << Tseries[2].original() << std::endl;
-
-                                               std::cout << "Min: " << MinT.begin()->original() << std::endl;
-                                               std::cout << "Max: " << MaxT.begin()->original() << std::endl;
-                                               std::cout << "-------------------------------------" << std::endl;
 
                                      result = dbGate.select(Qc2InterpData, kvQueries::selectData(StationIds,pid,Tseries[1].obstime(),
                                                                                                            Tseries[1].obstime() ));
                                      Qc2D GSW(Qc2InterpData,StationList,params);
                                      GSW.Qc2_interp(); 
+                                     ///fixtime=Tseries[1].obstime().addDay(3650); Would this work ???
+                                     fixtime=Tseries[1].obstime();
+                                     fixtime.addDay(3650);
                                      std::cout << Tseries[1].obstime()  <<" "        
+                                               << fixtime <<" "        
                                                << Tseries[1].stationID()<<" "        
                                                << Tseries[1].corrected()<<" "        
                                                << Tseries[1].original() << " "         
+                                               << Tseries[1].controlinfo() << " "         
                                                << GSW.corrected_[GSW.stindex[Tseries[1].stationID()]] << " "
                                                << "Nearest Neighbour: " << GSW.intp_[GSW.stindex[Tseries[1].stationID()]] << " "
                                                << GSW.stid_[GSW.stindex[Tseries[1].stationID()]] << std::endl;
-
-                                       //std::cout << Tseries[kkk].original() << "," << GSW.intp_[GSW.stindex[Tseries[kkk].stationID()]] << ",";
-
+// Add here the logic to write results back to the database and inform kvServiceD
+//
+//  In this case the data we are working with is Tseries[1]
+//
+                      try {
+                              if ( CheckFlags.condition(id->controlinfo(),params.Wflag) ) {  // Do not overwrite data controlled by humans!
+                  //ReturnElement.set(stid,fixtime,dst_data[ stid ][ k ],110,
+                  //  dst_tbtime[ stid ][ k ],d_typeid[ stid ][ k ], d_sensor[ stid ][ k ],
+                  // d_level[ stid ][ k ], roundVal,fixflags, 
+                  // d_useinfo[ stid ][ k ], d_cfailed[ stid ][ k ]+" Qc2-R");
+                                   //kvData d = Tseries[1];
+                                   kvData d;                                                   
+                                   d.set(Tseries[1].stationID(),
+                                         //Tseries[1].obstime().addDay(3650),
+                                         fixtime,
+                                         Tseries[1].original(),
+                                         Tseries[1].paramID(),
+                                         Tseries[1].tbtime(),
+                                         Tseries[1].typeID(),
+                                         Tseries[1].sensor(),
+                                         Tseries[1].level(),
+                                         Tseries[1].corrected(),
+                                         Tseries[1].controlinfo(),
+                                         Tseries[1].useinfo(),
+                                         Tseries[1].cfailed()+" Qc2 UnitT");
+                                   kvUseInfo ui = d.useinfo();
+                                   ui.setUseFlags( d.controlinfo() );
+                                   d.useinfo( ui );   
+                                   std::cout << "This data to be written back to db ... " << std::endl; 
+                                   //dbGate.insert( d, "data", true); 
+                                   kvalobs::kvStationInfo::kvStationInfo DataToWrite(id->stationID(),id->obstime(),id->paramID());
+                                   stList.push_back(DataToWrite);
+                              }
+                       }
+                          catch ( dnmi::db::SQLException & ex ) {
+                            IDLOGERROR( "html", "Exception: " << ex.what() << std::endl );
+                            std::cout<<"INSERTO> CATCH ex" << result <<std::endl;
+                          }
+                          catch ( ... ) {
+                            IDLOGERROR( "html", "Unknown exception: con->exec(ctbl) .....\n" );
+                            std::cout<<"INSERTO> CATCH ..." << result <<std::endl;
+                          }
+                          if(!stList.empty()){
+                              checkedDataHelper.sendDataToService(stList);
+                              stList.clear();
+                          }
                                        }
                                    }
                              }
                           }
+
+
                    }
-                                     //result = dbGate.select(Qc2InterpData, kvQueries::selectData(StationIds,pid,Tseries[kkk].obstime(),
-                                     //Qc2D GSW(Qc2InterpData,StationList,params);
-                                     //GSW.Qc2_interp(); 
                 Tseries.clear();
   ProcessTime.addHour(-1);
   }
