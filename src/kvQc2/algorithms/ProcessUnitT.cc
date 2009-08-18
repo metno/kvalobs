@@ -74,6 +74,7 @@ ProcessUnitT( ReadProgramOptions params )
   bool result;
 
   ProcessControl CheckFlags;
+  kvalobs::kvControlInfo fixflags;
 
   kvalobs::kvStationInfoList  stList;
   CheckedDataHelper checkedDataHelper(app);
@@ -137,12 +138,15 @@ ProcessUnitT( ReadProgramOptions params )
                                      ///fixtime=Tseries[1].obstime().addDay(3650); Would this work ???
                                      fixtime=Tseries[1].obstime();
                                      fixtime.addDay(3650);
+                                     fixflags=Tseries[1].controlinfo();
+                                     CheckFlags.setter(fixflags,params.Sflag);
                                      std::cout << Tseries[1].obstime()  <<" "        
                                                << fixtime <<" "        
                                                << Tseries[1].stationID()<<" "        
                                                << Tseries[1].corrected()<<" "        
                                                << Tseries[1].original() << " "         
                                                << Tseries[1].controlinfo() << " "         
+                                               << "New: " << fixflags << " "
                                                << GSW.corrected_[GSW.stindex[Tseries[1].stationID()]] << " "
                                                << "Nearest Neighbour: " << GSW.intp_[GSW.stindex[Tseries[1].stationID()]] << " "
                                                << GSW.stid_[GSW.stindex[Tseries[1].stationID()]] << std::endl;
@@ -159,7 +163,6 @@ ProcessUnitT( ReadProgramOptions params )
                                    //kvData d = Tseries[1];
                                    kvData d;                                                   
                                    d.set(Tseries[1].stationID(),
-                                         //Tseries[1].obstime().addDay(3650),
                                          fixtime,
                                          Tseries[1].original(),
                                          Tseries[1].paramID(),
@@ -167,15 +170,15 @@ ProcessUnitT( ReadProgramOptions params )
                                          Tseries[1].typeID(),
                                          Tseries[1].sensor(),
                                          Tseries[1].level(),
-                                         Tseries[1].corrected(),
-                                         Tseries[1].controlinfo(),
+                                         TanTaxInterpolated,                                                           
+                                         fixflags,
                                          Tseries[1].useinfo(),
                                          Tseries[1].cfailed()+" Qc2 UnitT");
                                    kvUseInfo ui = d.useinfo();
                                    ui.setUseFlags( d.controlinfo() );
                                    d.useinfo( ui );   
                                    std::cout << "This data to be written back to db ... " << std::endl; 
-                                   //dbGate.insert( d, "data", true); 
+                                   dbGate.insert( d, "data", true); 
                                    kvalobs::kvStationInfo::kvStationInfo DataToWrite(id->stationID(),id->obstime(),id->paramID());
                                    stList.push_back(DataToWrite);
                               }
