@@ -770,7 +770,7 @@ bool kvUseInfo::setUseFlags(const kvControlInfo& cinfo)
 	      fpos       >= 4    ||
           fd         == 2    ||
           fd         >= 6    ||
-	      fpre       >= 6    ||
+	      fpre       >= 4    ||
 	      fw         == 3    ||
 	      fclim      == 3    ||
 	      fcombi     >= 9    ||
@@ -858,6 +858,7 @@ bool kvUseInfo::setUseFlags(const kvControlInfo& cinfo)
     		  fs    == 9   ||
     		  fs    == 0xA ||
     		  fpos  == 4   ||
+    		  fpre  == 4   ||
     		  fw    == 3   ||
     		  fclim == 3   ||
     		  ( fnum == 6 && fmis == 0 ) )
@@ -993,8 +994,7 @@ bool kvUseInfo::setUseFlags(const kvControlInfo& cinfo)
 
   // Finally- set the useflags
   for (int i=0; i<kvDataFlag::size; i++)
-    set
-      (i, ui[i]);
+    set(i, ui[i]);
 
   return true;
 }
