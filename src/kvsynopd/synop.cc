@@ -101,6 +101,9 @@
  *
  * 2009-03-24 Bxrge
  * - Rettet avrundingsfeil i max vind.
+ *
+ * 2009-09-23 Bxrge
+ * - Ikke la negative verdier for Esss slippe gjennom til SYNOP.
  */
 
 using namespace std;
@@ -1578,14 +1581,16 @@ doEsss( std::string &kode, const SynopData &data )
    if( iSA == INT_MAX  || iSA < -3 || iSA > 996 )
       sa = "///";
    else if( iSA == -1 ) {
-      if( em =="/" )
-         sa = "///";
-      else
-         sa = "998";
+	   if( em =="/" )
+		   sa = "///";
+	   else
+		   sa = "998";
    }else if( iSA == 0 )
-      sa = "997";
+	   sa = "997";
    else if( iSA == -3 )
-      sa = "999";
+	   sa = "999";
+   else if( iSA < 0 )
+	   sa="///";
    else {
       sprintf( buf, "%03d", iSA );
       sa = buf;
