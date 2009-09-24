@@ -290,7 +290,7 @@ public class KlApp extends KvApp
     		fw.write( pid );
     		fw.close();
     		System.out.println("Writing pidfile '" + pidFilename + "' with pid '"+pid+"'!");
-    		logger.fatal("Writing pidfile '" + pidFilename + "' with pid '"+pid+"'!");
+    		logger.info("Writing pidfile '" + pidFilename + "' with pid '"+pid+"'!");
     	}
     	catch( java.io.IOException ex ) {
     		logger.fatal("FATAL: " + ex.getMessage() );
@@ -309,10 +309,14 @@ public class KlApp extends KvApp
 	 */
 	synchronized public void removePidFile() {
 		try {
-			if( pidFile != null )
+			if( pidFile != null ) {
+	    			System.out.println("Removing pidfile '" + pidFile.getName() + "!");	
+				logger.info("Removing pidfile '" + pidFile.getName() + "!");
 				pidFile.delete();
+			}
 		}
 		catch( java.lang.SecurityException ex ) {
+			System.out.println("SecurityException: Removing pidfile '" + pidFile.getName() + "!");	
 			//NOOP
 		}
 	}
