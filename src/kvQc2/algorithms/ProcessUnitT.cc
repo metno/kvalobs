@@ -135,21 +135,29 @@ ProcessUnitT( ReadProgramOptions params )
                                                                                                            Tseries[1].obstime() ));
                                      Qc2D GSW(Qc2InterpData,StationList,params);
                                      GSW.Qc2_interp(); 
-                                     ///fixtime=Tseries[1].obstime().addDay(3650); Would this work ???
+                                     ///fixtime=Tseries[1].obstime().addDay(730); Would this work ???
                                      fixtime=Tseries[1].obstime();
-                                     fixtime.addDay(3650);
+                                     fixtime.addDay(730);  // Write the data to 2 years hence (beware leap years in back calculating)
                                      fixflags=Tseries[1].controlinfo();
+                                   // write the new flag value
                                      CheckFlags.setter(fixflags,params.Sflag);
-                                     std::cout << Tseries[1].obstime()  <<" "        
-                                               << fixtime <<" "        
-                                               << Tseries[1].stationID()<<" "        
-                                               << Tseries[1].corrected()<<" "        
-                                               << Tseries[1].original() << " "         
-                                               << Tseries[1].controlinfo() << " "         
-                                               << "New: " << fixflags << " "
-                                               << GSW.corrected_[GSW.stindex[Tseries[1].stationID()]] << " "
-                                               << "Nearest Neighbour: " << GSW.intp_[GSW.stindex[Tseries[1].stationID()]] << " "
-                                               << GSW.stid_[GSW.stindex[Tseries[1].stationID()]] << std::endl;
+                                     //std::cout << Tseries[1].obstime()  <<" "        
+                                               //<< fixtime <<" "        
+                                               //<< Tseries[1].stationID()<<" "        
+                                               //<< Tseries[1].corrected()<<" "        
+                                               //<< Tseries[1].original() << " "         
+                                               //<< Tseries[1].controlinfo() << " "         
+                                               //<< "New: " << fixflags << " "
+                                               //<< GSW.corrected_[GSW.stindex[Tseries[1].stationID()]] << " "
+                                               //<< "Nearest Neighbour: " << GSW.intp_[GSW.stindex[Tseries[1].stationID()]] << " "
+                                               //<< GSW.stid_[GSW.stindex[Tseries[1].stationID()]] << std::endl;
+
+
+                     std::cout << "RUN-TCOR-TLIN-TTAN-TNEIGHBOUR: " 
+                               << Tseries[0].original() << " " << Tseries[1].original() << " " << Tseries[2].original() << " "
+                               << Tseries[1].corrected() << " " << LinInterpolated << " " << TanTaxInterpolated << std::endl;
+
+
 // Add here the logic to write results back to the database and inform kvServiceD
 //
 //  In this case the data we are working with is Tseries[1]
@@ -161,6 +169,7 @@ ProcessUnitT( ReadProgramOptions params )
                   // d_level[ stid ][ k ], roundVal,fixflags, 
                   // d_useinfo[ stid ][ k ], d_cfailed[ stid ][ k ]+" Qc2-R");
                                    //kvData d = Tseries[1];
+                             //Set data structure to write to the database
                                    kvData d;                                                   
                                    d.set(Tseries[1].stationID(),
                                          fixtime,
@@ -174,11 +183,14 @@ ProcessUnitT( ReadProgramOptions params )
                                          fixflags,
                                          Tseries[1].useinfo(),
                                          Tseries[1].cfailed()+" Qc2 UnitT");
+                             // Set use info corresponding to controlinfo
                                    kvUseInfo ui = d.useinfo();
                                    ui.setUseFlags( d.controlinfo() );
                                    d.useinfo( ui );   
+                             // write the data back
                                    std::cout << "This data to be written back to db ... " << std::endl; 
                                    dbGate.insert( d, "data", true); 
+                             // fill structure to inform the serviced
                                    kvalobs::kvStationInfo::kvStationInfo DataToWrite(id->stationID(),id->obstime(),id->paramID());
                                    stList.push_back(DataToWrite);
                               }

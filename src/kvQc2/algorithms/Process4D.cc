@@ -235,8 +235,8 @@ Process4D( ReadProgramOptions params )
                                if (Tseries[lll].original() != params.missing){
                                   tt[nseries]=HourDec;
                                   pp[nseries]=Tseries[lll].original();
-                                  nseries=nseries+1;
                                   std::cout << " N: " << nseries << " Tseries Index:  " << lll<< " HourDec: " << HourDec << " Original: " << Tseries[lll].original() << " Obstime: " << Tseries[lll].obstime() << std::endl;
+                                  nseries=nseries+1;
                                } 
                                else {
                                   gap_index.push_back(lll); // need to work out the new corrected values to pass back to kvalobs
@@ -244,7 +244,7 @@ Process4D( ReadProgramOptions params )
                            }
 // GSL interpolation routines
 /// OBS! The length of the akima spline is longer than the interval requested ... is this a behaviour of the library or a bug ??? CHECK 
-                           std::cout << "N: "<< nseries << std::endl;
+                           std::cout << "N: "<< nseries-1 << std::endl;
                            std::cout << maxlower<<" "<<minlower<<" "<<minupper<<" "<<maxupper<< std::endl;
                            counter=0;
                            for (xi = tt[0]; xi < tt[nseries-1]; xi += 1.0)  {
@@ -261,8 +261,8 @@ Process4D( ReadProgramOptions params )
                            counter=0;
 /// CHECK out this point !!! what exactly happens here ??????
                            std::cout << "entering interpolation" <<std::endl;
-                           std::cout << "Xi limits: "<<  tt[0] << " " << tt[nseries-1] <<std::endl;
-                           for (xi = tt[0]; xi < tt[nseries-1]; xi += 1.0)  {
+                           std::cout << "Xi limits: "<<  tt[0] << " " << tt[nseries-1] -1 <<std::endl;
+                           for (xi = tt[0]; xi <= tt[nseries-1]; xi += 1.0)  {
                                  yi = gsl_spline_eval (spline, xi, acc);
                                  //std::cout << "Counter " << counter << " INTERP " << xi << " " << yi << std::endl;
                                  std::cout << "HourDec from tt: " << xi << " Corresponding Tseries Time " << Tseries[counter+maxlower].obstime() 
