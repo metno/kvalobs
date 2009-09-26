@@ -153,9 +153,11 @@ ProcessUnitT( ReadProgramOptions params )
                                                //<< GSW.stid_[GSW.stindex[Tseries[1].stationID()]] << std::endl;
 
 
-                     std::cout << "RUN-TCOR-TLIN-TTAN-TNEIGHBOUR: " 
-                               << Tseries[0].original() << " " << Tseries[1].original() << " " << Tseries[2].original() << " "
-                               << Tseries[1].corrected() << " " << LinInterpolated << " " << TanTaxInterpolated << std::endl;
+                     std::cout << "RUN-TCOR-TLIN-TTAN-TNEIGHBOUR-TMIN-TMAX: |" 
+                               << Tseries[0].original() << " |" << Tseries[1].original() << " |" << Tseries[2].original() << " |"
+                               << Tseries[1].corrected() << " |" << LinInterpolated << " |" << TanTaxInterpolated <<  " |"
+                               << GSW.intp_[GSW.stindex[Tseries[1].stationID()]] << " |"
+                               << MinT.begin()->original() << " |" << MaxT.begin()->original() << " |"<< std::endl;
 
 
 // Add here the logic to write results back to the database and inform kvServiceD
