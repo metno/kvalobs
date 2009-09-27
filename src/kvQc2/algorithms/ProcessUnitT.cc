@@ -157,7 +157,8 @@ ProcessUnitT( ReadProgramOptions params )
                                << Tseries[0].original() << " |" << Tseries[1].original() << " |" << Tseries[2].original() << " |"
                                << Tseries[1].corrected() << " |" << LinInterpolated << " |" << TanTaxInterpolated <<  " |"
                                << GSW.intp_[GSW.stindex[Tseries[1].stationID()]] << " |"
-                               << MinT.begin()->original() << " |" << MaxT.begin()->original() << " |"<< std::endl;
+                               << MinT.begin()->original() << " |" << MaxT.begin()->original() << " |"
+                               << Tseries[1].cfailed() << " |" << std::endl;
 
 
 // Add here the logic to write results back to the database and inform kvServiceD
@@ -165,7 +166,8 @@ ProcessUnitT( ReadProgramOptions params )
 //  In this case the data we are working with is Tseries[1]
 //
                       try {
-                              if ( CheckFlags.condition(id->controlinfo(),params.Wflag) ) {  // Do not overwrite data controlled by humans!
+                              //if ( CheckFlags.condition(id->controlinfo(),params.Wflag) ) {  // Do not overwrite data controlled by humans!
+                              if ( Tseries[1].corrected() <  MinT.begin()->original() || Tseries[1].corrected() >  MaxT.begin()->original() ) {  /// Update if correction is out of TAN TAX range!
                   //ReturnElement.set(stid,fixtime,dst_data[ stid ][ k ],110,
                   //  dst_tbtime[ stid ][ k ],d_typeid[ stid ][ k ], d_sensor[ stid ][ k ],
                   // d_level[ stid ][ k ], roundVal,fixflags, 
