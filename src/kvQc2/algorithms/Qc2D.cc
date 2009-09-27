@@ -1250,6 +1250,12 @@ intp_delaunay(unsigned int index)
  	  inv_dist = 0.0;
  	  weight   = 0.0;
 
+          ///We have the neighbours must check to see if there are any duplicate points
+
+          for (int j=0 ; j<=imax ; j++) {    // NB imax is an index
+             std::cout << "STATION-LIST: " <<  stid_[pindex[j].second] << std::endl;
+          }
+
           //std::cout << "Triangulate over these neighbours" << std::endl; 
 
           if (imax >=3){         // only makes sense for triangulation (must be at least three nodes surrounding)
