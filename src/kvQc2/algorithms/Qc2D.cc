@@ -1252,9 +1252,9 @@ intp_delaunay(unsigned int index)
 
           ///We have the neighbours must check to see if there are any duplicate points
 
-          for (int j=0 ; j<=imax ; j++) {    // NB imax is an index
-             std::cout << "STATION-LIST: " <<  stid_[pindex[j].second] << std::endl;
-          }
+          //for (int j=0 ; j<=imax ; j++) {    // NB imax is an index
+             //std::cout << "STATION-LIST: " <<  stid_[pindex[j].second] << std::endl;
+          //}
 
           //std::cout << "Triangulate over these neighbours" << std::endl; 
 
@@ -1345,8 +1345,6 @@ intp_delaunay(unsigned int index)
                                 //std::cout << triangle_num << std::endl;
                    //Loop over all triangles
                       int tri;
-                      int point_within_triangle=-999;
-                      int point_within_how_many_triangles=0;                                   
                       double x_triangle[3]; // corresponds to the longitude !!!
                       double y_triangle[3]; // corresponds to the latitude  !!!
                       float cornerdata[3];  // corresponds to the data associated with the corner  !!!
@@ -1383,19 +1381,9 @@ intp_delaunay(unsigned int index)
                          v = (dot00 * dot12 - dot01 * dot02) * invDenom;
 
                          if(u >= 0. && v >= 0. && u + v <= 1.0) {         
-                                point_within_triangle=tri;
-                                //std::cout << "Found a candidate triangle = " << tri << std::endl;
-                                point_within_how_many_triangles=point_within_how_many_triangles+1;
-                                sprintf(epsfilename,"%d%s%d%s",stid_[index],"_",tri,".eps");
-                                //std::cout << triangle_num << std::endl;
-                                //std::cout << epsfilename << std::endl;
-                                //std::cout << epsfilename<<" "<< node_num<<" "<<table<<" "<<triangle_num<<" "<<triangle_node<<" "<<
-                                                          //node_show<<" "<<triangle_show<<" "<<lon[0]<<" "<<lat[0]<<" "<<x_triangle[0]<<" "<<
-                                                          //y_triangle[0]<<" "<<x_triangle[1]<<" "<<y_triangle[1]<<" "<<x_triangle[2]<<" "<<y_triangle[2] <<" "<< std::endl;
-                                //triangulation_order3_plot_eps ( "out.eps", node_num, table, copy_triangle_num, triangle_node, 
-                                triangulation_order3_plot_eps ( epsfilename, node_num, table, copy_triangle_num, triangle_node, 
-                                                          node_show, triangle_show, lon[0], lat[0], x_triangle[0],
-                                                          y_triangle[0],x_triangle[1],y_triangle[1],x_triangle[2],y_triangle[2] );
+                                //sprintf(epsfilename,"%d%s%d%s",stid_[index],"_",tri,".eps");
+                                //triangulation_order3_plot_eps ( epsfilename, node_num, table, copy_triangle_num, triangle_node, node_show,triangle_show,lon[0],lat[0],x_triangle[0],y_triangle[0],x_triangle[1],y_triangle[1],x_triangle[2],y_triangle[2] );
+                         /// PLotting test triangles gives memory fault on virtual boxes !!!!ZZ
                          std::cout << "TQ Triangulation Information" << std::endl;
                          std::cout << "TQ Point ... Lon ... Lat .....Value" << std::endl;
                          std::cout << " TQ 0 "<< lon[0] << " " <<lat[0] << " " << std::endl;
