@@ -98,6 +98,12 @@ ProcessUnitT( ReadProgramOptions params )
      StationIds.push_back( sit->stationID() );
   } 
 
+  std::cout << ProcessTime << std::endl;
+  std::cout << ProcessTime << std::endl;
+  std::cout << ProcessTime << std::endl;
+  std::cout << ProcessTime << std::endl;
+  std::cout << ProcessTime << std::endl;
+
   while (ProcessTime >= stime) 
   {
      XTime=ProcessTime;
