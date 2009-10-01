@@ -52,7 +52,7 @@ ObjReaper::
 operator()()
 {
 	//const int NEXT_TIME=60;
-	const int NEXT_TIME=5;
+	const int NEXT_TIME=1;
 	time_t now;
 	time_t next;
 
