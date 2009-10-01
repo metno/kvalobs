@@ -267,18 +267,20 @@ cleanUpReaperObj()
   		    		 << " timedif: " << now -lastAccess                );
   		    
     	if( !(*it)->isActive() ) {
-      	//We remove this deactivated object from the list.
-      	//It has been deactivated by the client.
+    		//We remove this deactivated object from the list.
+    		//It has been deactivated by the client.
     		if( (*it)->isTimedout() ) {
     			LOGWARN("COLLECT: A ReaperBase object has timedout.!");
     		} else{
     			LOGINFO("COLLECT: A client has disconected a ReaperBase object!");
     		}
-      	//(*it)->_remove_ref();
-      	ReaperBase *obj = *it;
-      	it = reaperObjList.erase(it);
-      	obj->cleanUp();
-      	obj->removeRef();
+    		//(*it)->_remove_ref();
+    		ReaperBase *obj = *it;
+    		int n = reaperObjList.size();
+    		it = reaperObjList.erase(it);
+    		LOGDEBUG("COLLECT before # : " << n << " after # : " << reaperObjList.size() << " max: " << MAX_CLIENTS );
+    		obj->cleanUp();
+    		obj->removeRef();
     	} else if( !(*it)->isRunning(lastAccess) ){
       	//Check if the object has timedout and we
       	//garbage collect it. We assume that the client has crashed
