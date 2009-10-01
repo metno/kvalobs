@@ -471,9 +471,14 @@ void
 DataIteratorImpl::
 cleanUp()
 {
-	app.releaseDbConnection(dbCon);
+ 	boost::mutex::scoped_lock lock( mutex );
+
+ 	if( dbCon ) {
+ 		app.releaseDbConnection(dbCon);
+ 		dbCon = 0;
+ 	}
+
   	delete whichData;
 
   	whichData=0;
-  	dbCon=0;
 }
