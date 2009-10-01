@@ -63,6 +63,7 @@ class DataIteratorImpl:
   miutil::miTime                    endTime;
   miutil::miTime                    startTimeOfGetData;
   ServiceApp                        &app;
+  boost::mutex                      mutex;
 
   /**
    * filterData use the status field in wData (WhichData) to 

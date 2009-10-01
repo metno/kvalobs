@@ -54,7 +54,8 @@ DataIteratorImpl::~DataIteratorImpl()
 {
   
   	LOGDEBUG("DTOR: DataIteratorImpl::~DataIteratorImpl...\n");
-  
+  	boost::mutex::scoped_lock lock( mutex );
+
   	if(whichData)
     	delete whichData;
 
@@ -68,13 +69,19 @@ DataIteratorImpl::~DataIteratorImpl()
 void  
 DataIteratorImpl::destroy()
 {
-	// We just deactivate the object here. The cleanup thread will release the resources
+	// We deactivate and release th dbConnection here. The cleanup thread will release the resources
 	// and remove it from the reaperObjList.
+	boost::mutex::scoped_lock lock( mutex );
 
   	LOGDEBUG("DataIteratorImpl::destroy: called!\n");
 
+  	if(dbCon) {
+  		app.releaseDbConnection(dbCon);
+        dbCon = 0;
+  	}
+
   	deactivate();
-  
+
   	LOGDEBUG("DataIteratorImpl::destroy: leaving!\n");
 }
 
@@ -118,6 +125,8 @@ DataIteratorImpl::next(CKvalObs::CService::ObsDataList_out obsDataList)
   	bool                   active;
   	//ObsDataList          obsDataList;
   	
+  	boost::mutex::scoped_lock lock( mutex );
+
   	IsRunningHelper isRunning(*this, active );
   	  	
   	LogContext context("service/DataIterator");
