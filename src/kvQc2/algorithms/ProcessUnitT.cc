@@ -98,12 +98,6 @@ ProcessUnitT( ReadProgramOptions params )
      StationIds.push_back( sit->stationID() );
   } 
 
-  std::cout << ProcessTime << std::endl;
-  std::cout << ProcessTime << std::endl;
-  std::cout << ProcessTime << std::endl;
-  std::cout << ProcessTime << std::endl;
-  std::cout << ProcessTime << std::endl;
-
   while (ProcessTime >= stime) 
   {
      XTime=ProcessTime;
@@ -111,6 +105,8 @@ ProcessUnitT( ReadProgramOptions params )
      YTime=ProcessTime;
      YTime.addHour(1);
      Tseries.clear();
+
+     std::cout << "Process Time = " << ProcessTime << std::endl;
 
              try {
                 result = dbGate.select(Qc2Data, kvQueries::selectMissingData(params.missing,pid,ProcessTime));
@@ -125,7 +121,13 @@ ProcessUnitT( ReadProgramOptions params )
                    for (std::list<kvalobs::kvData>::const_iterator id = Qc2Data.begin(); id != Qc2Data.end(); ++id) {
                           result = dbGate.select(Qc2SeriesData, kvQueries::selectData(id->stationID(),pid,XTime,YTime));
                           for (std::list<kvalobs::kvData>::const_iterator is = Qc2SeriesData.begin(); is != Qc2SeriesData.end(); ++is) {
-                             Tseries.push_back(*is);
+                             // Only do this if it has not been done bedfore
+                             if  ( CheckFlags.condition(is->controlinfo(),params.Aflag) ) {
+                                   Tseries.push_back(*is);
+                                   std::cout << "Tseries:  "<< *is << std::endl;
+                             } else {
+                                   std::cout << "Rejected: "<< *is << std::endl;
+                             }
                           }
                              if (Tseries.size()==3) {
                                    if (Tseries[0].original() > params.missing && Tseries[1].original()==params.missing && 
