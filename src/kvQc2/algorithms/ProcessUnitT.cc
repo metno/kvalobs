@@ -106,7 +106,7 @@ ProcessUnitT( ReadProgramOptions params )
      YTime.addHour(1);
      Tseries.clear();
 
-     std::cout << "Process Time = " << ProcessTime << std::endl;
+     //std::cout << "Process Time = " << ProcessTime << std::endl;
 
              try {
                 result = dbGate.select(Qc2Data, kvQueries::selectMissingData(params.missing,pid,ProcessTime));
@@ -145,9 +145,9 @@ ProcessUnitT( ReadProgramOptions params )
                                      GSW.Qc2_interp(); 
                                      ///fixtime=Tseries[1].obstime().addDay(730); Would this work ???
                                      fixtime=Tseries[1].obstime();
-                                     fixtime.addDay(730);  // Write the data to 2 years hence (beware leap years in back calculating)
+                                     //fixtime.addDay(730);  // Write the data to 2 years hence (beware leap years in back calculating)
                                      fixflags=Tseries[1].controlinfo();
-                                   // write the new flag value
+                                     // write the new flag value
                                      CheckFlags.setter(fixflags,params.Sflag);
                                      //std::cout << Tseries[1].obstime()  <<" "        
                                                //<< fixtime <<" "        
@@ -194,7 +194,7 @@ ProcessUnitT( ReadProgramOptions params )
                                          TanTaxInterpolated,                                                           
                                          fixflags,
                                          Tseries[1].useinfo(),
-                                         Tseries[1].cfailed()+" Qc2 UnitT");
+                                         Tseries[1].cfailed()+" Qc2 UnitT corrected was:"+StrmConvert(Tseries[1].corrected()) );
                              // Set use info corresponding to controlinfo
                                    kvUseInfo ui = d.useinfo();
                                    ui.setUseFlags( d.controlinfo() );

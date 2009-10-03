@@ -106,6 +106,30 @@ Interpolate( ReadProgramOptions params )
 
       if(!Qc2Data.empty()) {
 
+                ////Let us do some experiments with flag testing to work out how far we are ...
+
+                // This is the logic in Redistribution ... what is it actually doing?
+
+
+                     // **** HERE ADD THE Qc2Data loop
+
+                     Ihere=notValid
+
+                           if ( CheckFlags.condition(id->controlinfo(),params.Wflag) ) { 
+
+                             } else {
+
+                             }
+                // And now we are trying to do something in ProcessUnitT ...
+                             if  ( CheckFlags.condition(id->controlinfo(),params.Aflag) ) {
+
+                             } else {
+
+                             }
+
+                ///End of experiments ... this
+
+
                 Qc2D GSW(Qc2Data,StationList, params);
                 GSW.Qc2_interp(); 
                 GSW.SampleSemiVariogram();
