@@ -122,7 +122,8 @@ ProcessUnitT( ReadProgramOptions params )
                           result = dbGate.select(Qc2SeriesData, kvQueries::selectData(id->stationID(),pid,XTime,YTime));
                           for (std::list<kvalobs::kvData>::const_iterator is = Qc2SeriesData.begin(); is != Qc2SeriesData.end(); ++is) {
                              // Only do this if it has not been done bedfore
-                             if  ( CheckFlags.condition(is->controlinfo(),params.Aflag) ) {
+                             //if  ( CheckFlags.condition(is->controlinfo(),params.Aflag) ) {
+                             if  ( is->controlinfo().flag(8) != params.Aflag[8] ) {
                                    Tseries.push_back(*is);
                                    std::cout << "Tseries:  "<< *is << std::endl;
                              } else {

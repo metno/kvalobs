@@ -111,22 +111,31 @@ Interpolate( ReadProgramOptions params )
                 // This is the logic in Redistribution ... what is it actually doing?
 
 
-                     // **** HERE ADD THE Qc2Data loop
+                for (std::list<kvalobs::kvData>::const_iterator sid = Qc2Data.begin(); sid != Qc2Data.end(); ++sid) {
 
-                     Ihere=notValid
+                           std::cout << sid->controlinfo() << std::endl;
 
-                           if ( CheckFlags.condition(id->controlinfo(),params.Wflag) ) { 
+                           std::cout << "W3: "<< params.Wflag[3] << std::endl;
+                           std::cout << "A3: "<< params.Aflag[3] << std::endl;
+                           std::cout << "W8: "<< params.Wflag[8] << std::endl;
+                           std::cout << "A8: "<< params.Aflag[8] << std::endl;
+                           std::cout << "W7: "<< params.Wflag[7] << std::endl;
+                           std::cout << "Flag(1): " << sid->controlinfo().flag(1) << std::endl;
 
+                           if ( CheckFlags.condition(sid->controlinfo(),params.Wflag) ) { 
+                                   std::cout << "Yes ... Wflag" << std::endl;
                              } else {
-
+                                   std::cout << "No ... Wflag" << std::endl;
                              }
                 // And now we are trying to do something in ProcessUnitT ...
-                             if  ( CheckFlags.condition(id->controlinfo(),params.Aflag) ) {
-
+                             if  ( CheckFlags.condition(sid->controlinfo(),params.Aflag) ) {
+                                   std::cout << "Yes ... Aflag" << std::endl;
                              } else {
-
+                                   std::cout << "No ... Aflag" << std::endl;
                              }
-
+                           std::cout << "------------------------------------------" << std::endl;
+                           sleep(1);
+                }
                 ///End of experiments ... this
 
 

@@ -4,6 +4,11 @@
 
 #include "algorithms/scone.h"
 
+/// All flag check chars set to  0x3F unless set explicitely in a configuration file.
+/// The condition method searches through a controlinfo and see if any of the char/bits match
+/// a flag value set in the config file. Also can test individual claes, e.g. Aflag[3] (under development ???).
+
+
 
 ProcessControl::
 ProcessControl(){
