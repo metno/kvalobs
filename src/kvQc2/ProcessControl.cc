@@ -4,9 +4,13 @@
 
 #include "algorithms/scone.h"
 
-/// All flag check chars set to  0x3F unless set explicitely in a configuration file.
+/// All flag check chars not set unless set explicitely in a configuration file, the values set
+/// are carried around in a map with the index pair corresponding  to the nibble position. This
+/// is handled by ReadProgramOptions.cc
 /// The condition method searches through a controlinfo and see if any of the char/bits match
-/// a flag value set in the config file. Also can test individual claes, e.g. Aflag[3] (under development ???).
+/// a flag value set in the config file. 
+
+/// Also can test individual claes, e.g. Aflag[3] (under development ???).
 
 
 
