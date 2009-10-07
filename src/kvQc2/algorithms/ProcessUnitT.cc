@@ -122,8 +122,9 @@ ProcessUnitT( ReadProgramOptions params )
                           result = dbGate.select(Qc2SeriesData, kvQueries::selectData(id->stationID(),pid,XTime,YTime));
                           for (std::list<kvalobs::kvData>::const_iterator is = Qc2SeriesData.begin(); is != Qc2SeriesData.end(); ++is) {
                              // Only do this if it has not been done bedfore
-                             //if  ( CheckFlags.condition(is->controlinfo(),params.Aflag) ) {
-                             if  ( is->controlinfo().cflag(7) != params.Aflag[7] ) {  /// Need to implement this from the config file !!!!ZZ
+                             if  ( CheckFlags.condition(is->controlinfo(),params.Aflag) ) { /// If any Aflag already set then will not process further
+                                                                                            /// logic is meant to be counter intuitive here !!!
+                             //if  ( is->controlinfo().cflag(7) != params.Aflag[7] ) {  /// Need to implement this from the config file !!!!ZZ
                                    Tseries.push_back(*is);
                                    std::cout << "Tseries:  "<< *is << std::endl;
                              } else {
