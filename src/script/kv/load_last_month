@@ -1,6 +1,6 @@
 #! /bin/sh
 
-muser="bjorn.nordin@met.no"
+muser="kvdrift@met.no borgem@met.no nils.langgard@met.no"
 
 set -a
 #set -e
@@ -85,7 +85,7 @@ if [ -z "$files" ]; then
 	log "No new data file(s)."
 	
 	if [ $day -gt 3 ]; then
-		log "No datafile has been received on kvalobs@poriaz from kvalobs@kvalobs!"
+		log "No datafile has been received on kvalobs@histkvalobs from kvalobs@kvalobs!"
 		log "Try to run the script save_last_month on kvalobs@kvalobs by hand,"
 		log "and look out for any error message."
 		log "The script is executed by cron on the 1th at kl. 6:25 each month."
