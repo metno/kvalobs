@@ -66,6 +66,7 @@ Interpolate( ReadProgramOptions params )
   std::vector<float> XP;
   std::vector<float> YP;
 
+  kvalobs::kvControlInfo fixflags;
   ProcessControl CheckFlags;
 
   std::list<kvalobs::kvStation> StationList;
@@ -114,13 +115,11 @@ Interpolate( ReadProgramOptions params )
                 for (std::list<kvalobs::kvData>::const_iterator sid = Qc2Data.begin(); sid != Qc2Data.end(); ++sid) {
 
                            std::cout << sid->controlinfo() << std::endl;
+                           std::cout << "W flag Size" << std::endl;
+                           std::cout << params.Wflag.size() << std::endl;
 
-                           std::cout << "W3: "<< params.Wflag[3] << std::endl;
-                           std::cout << "A3: "<< params.Aflag[3] << std::endl;
-                           std::cout << "W8: "<< params.Wflag[8] << std::endl;
-                           std::cout << "A8: "<< params.Aflag[8] << std::endl;
-                           std::cout << "W7: "<< params.Wflag[7] << std::endl;
-                           std::cout << "Flag(1): " << sid->controlinfo().flag(1) << std::endl;
+                           fixflags=sid->controlinfo();
+
 
                            if ( CheckFlags.condition(sid->controlinfo(),params.Wflag) ) { 
                                    std::cout << "Yes ... Wflag" << std::endl;
@@ -133,8 +132,10 @@ Interpolate( ReadProgramOptions params )
                              } else {
                                    std::cout << "No ... Aflag" << std::endl;
                              }
+                           std::cout << fixflags << std::endl;
+                           CheckFlags.setter(fixflags,params.Wflag);
+                           std::cout << fixflags << std::endl;
                            std::cout << "------------------------------------------" << std::endl;
-                           sleep(1);
                 }
                 ///End of experiments ... this
 

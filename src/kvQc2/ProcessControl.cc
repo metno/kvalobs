@@ -30,7 +30,7 @@ ProcessControl(){
    HexToInt['F']=15;
 }
 
-
+/// If any of the members of the flag group zflag match the controlinfo a false is returned.
 bool 
 ProcessControl::
 condition(kvalobs::kvControlInfo controlinfo, std::map<int, unsigned char> zflag){
@@ -38,20 +38,21 @@ condition(kvalobs::kvControlInfo controlinfo, std::map<int, unsigned char> zflag
   int filter=0;
 
   for (std::map<int, unsigned char>::const_iterator ik=zflag.begin(); ik != zflag.end(); ++ik) {
-       if ( (*ik).second != controlinfo.cflag((*ik).first) ) ++filter;
+       if ( (*ik).second == controlinfo.cflag((*ik).first) ) ++filter;
   }
 
   if (!filter) {
-      return true; }
+      return true;}
   else{    
-      return false; }
+      return false;}
 }
 
+/// Any values set in the flag group zflag are written into Controlinfo
 int 
 ProcessControl::
 setter( kvalobs::kvControlInfo &controlinfo, std::map<int, unsigned char> zflag ){
 
- int CC, II;
+  int CC, II;
 
   for (std::map<int, unsigned char>::const_iterator ik=zflag.begin(); ik != zflag.end(); ++ik) {
       CC=(*ik).first; 
