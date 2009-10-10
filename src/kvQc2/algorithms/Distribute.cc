@@ -35,6 +35,7 @@
 #include <algorithm>
 #include "Distribute.h"
 #include "tround.h"
+#include "scone.h"
 #include <dnmithread/mtcout.h>
 #include <milog/milog.h>
 #include <map>
@@ -58,13 +59,10 @@ add_element(int & sid, float & data, float & intp, float & corr, float & newd, m
     dst_intp[ sid ].push_back(intp);
     dst_corr[ sid ].push_back(corr);
     dst_newd[ sid ].push_back(newd);
-        
     dst_tbtime[ sid ].push_back(tbtime);
     dst_time[ sid ].push_back(obstime);
-    
     d_sensor[ sid ].push_back(sensor);
     d_level[ sid ].push_back(level);
-
     d_typeid[ sid ].push_back(d_tid);
     d_controlinfo[ sid ].push_back(d_control);
     d_useinfo[ sid ].push_back(d_use);
@@ -114,8 +112,6 @@ clean_station_entry(int & sid)
 
 
 /// Algorithm to redistribute data based on interpolated model data.  
-/// Currently rewrites all data to one year in the future (better for running tests in 
-/// development phase....)
 void
 Distribute::
 RedistributeStationData(int & sid, std::list<kvalobs::kvData>& ReturnData)
@@ -139,8 +135,6 @@ RedistributeStationData(int & sid, std::list<kvalobs::kvData>& ReturnData)
         float sumint = 0.0;
         float missing_val = params.missing;
         while (missing_val == params.missing && index != 0) {   //works out how long the series to redistribute is
-        //float missing_val = -32767;
-        //while (missing_val == -32767 && index != 0) {   //works out how long the series to redistribute is
               missing_val=dst_data[ stid ][ index - 1 ];
               ++irun;
               --index;
@@ -166,45 +160,29 @@ RedistributeStationData(int & sid, std::list<kvalobs::kvData>& ReturnData)
                   roundSum += roundVal;  // Need to check roundSum does not deviate too much from accval
                   if (original_accval == -1.0) roundVal=-1.0; 
 
-                  //if ( k==sindex ) std::cout << "SUMCHECK " << accval << " " <<roundSum << std::endl;
-
                   fixtime=dst_time[ stid ][ k ];
-                  fixtime.addDay(366);  // FOR TESTING ... REMOVE THIS WHEN THIS CODE IS READY
-                  ///fixtime.addDay(366);  *** FOR TESTING ... REMOVE THIS WHEN THIS CODE IS READY
-
-
 
                   fixflags=d_controlinfo[ stid ][ k ];
                   ControlFlag.setter(fixflags,params.Sflag);
-                  //fixflags.set(12,8);    // Just set the flag value to 8 for now to indicate
-                                         // redistribution ... full specification is pending                     
-                  //fixflags.set(9,3);     // Space to define things in fstat                            
-                                         // setting this will trigger Qc2done status 
 
-                  std::cout << "Algorithm Test Mode !!!!!!!!!!!!!!!"<< std::endl;
+                  //std::cout << "RESULTS: "           <<    "\"" 
+                            //<< stid                        << "\",\"" 
+                            //<< dst_time[ stid ][ k ]       << "\",\"" 
+                            //<< dst_tbtime[ stid ][ k ]     << "\",\"" 
+                            //<< dst_data[ stid ][ k ]       << "\",\"" 
+                            //<< dst_intp[ stid ][ k ]       << "\",\"" 
+                            //<< dst_corr[ stid ][ k ]       << "\",\"" 
+                            //<< dst_newd[ stid ][ k ]       << "\",\"" 
+                            //<< d_typeid[ stid ][ k ]       << "\",\"" 
+                            //<< d_cfailed[ stid ][ k ]      << "\",\"" 
+                            //<< d_controlinfo[ stid ][ k ]  << "\",\"" 
+                            //<< fixflags                    << "\",\""                  
+                            //<< d_useinfo[ stid ][ k ]      << "\"" << std::endl; 
 
-                   std::cout << "RESULTS: "           <<    "\"" 
-                            << stid                        << "\",\"" 
-                            << dst_time[ stid ][ k ]       << "\",\"" 
-                            << dst_tbtime[ stid ][ k ]     << "\",\"" 
-                            << dst_data[ stid ][ k ]       << "\",\"" 
-                            << dst_intp[ stid ][ k ]       << "\",\"" 
-                            << dst_corr[ stid ][ k ]       << "\",\"" 
-                            << dst_newd[ stid ][ k ]       << "\",\"" 
-                            << d_typeid[ stid ][ k ]       << "\",\"" 
-                            << d_cfailed[ stid ][ k ]      << "\",\"" 
-                            << d_controlinfo[ stid ][ k ]  << "\",\"" 
-                            << fixflags                    << "\",\""                  
-                            << d_useinfo[ stid ][ k ]      << "\"" << std::endl; 
-
-                  if (dst_corr[ stid ][ k ]==-1) {dst_corr[ stid ][ k ]=0;}    // For algorithm testing
-                  if (dst_data[ stid ][ k ]==-1) {dst_data[ stid ][ k ]=0;}    // For algorithm testing
-                  ReturnElement.set(stid,fixtime,dst_corr[ stid ][ k ],110,  // For use in algorithm
-                                                                               // varitional tests
-                  //ReturnElement.set(stid,fixtime,dst_data[ stid ][ k ],110,
+                  ReturnElement.set(stid,fixtime,dst_data[ stid ][ k ],110,
                                 dst_tbtime[ stid ][ k ],d_typeid[ stid ][ k ], d_sensor[ stid ][ k ],
                                 d_level[ stid ][ k ], roundVal,fixflags, 
-                                d_useinfo[ stid ][ k ], d_cfailed[ stid ][ k ]+" Qc2-R");
+                                d_useinfo[ stid ][ k ], d_cfailed[ stid ][ k ]+" Qc2 Redis corrected was:"+StrmConvert(dst_corr[ stid ][ k ]) );
                   ReturnData.push_back(ReturnElement);
                }
            }

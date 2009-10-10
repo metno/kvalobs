@@ -17,6 +17,8 @@ public:
    bool condition( kvalobs::kvControlInfo controlinfo, std::map<int, unsigned char> vlag );
    int setter( kvalobs::kvControlInfo &controlinfo, std::map<int, unsigned char> vlag );
 
+   bool true_nibble( kvalobs::kvControlInfo controlinfo, unsigned char nibble );
+
 protected:
 
 private:

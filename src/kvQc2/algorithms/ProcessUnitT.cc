@@ -106,8 +106,6 @@ ProcessUnitT( ReadProgramOptions params )
      YTime.addHour(1);
      Tseries.clear();
 
-     //std::cout << "Process Time = " << ProcessTime << std::endl;
-
              try {
                 result = dbGate.select(Qc2Data, kvQueries::selectMissingData(params.missing,pid,ProcessTime));
               }
@@ -121,16 +119,8 @@ ProcessUnitT( ReadProgramOptions params )
                    for (std::list<kvalobs::kvData>::const_iterator id = Qc2Data.begin(); id != Qc2Data.end(); ++id) {
                           result = dbGate.select(Qc2SeriesData, kvQueries::selectData(id->stationID(),pid,XTime,YTime));
                           for (std::list<kvalobs::kvData>::const_iterator is = Qc2SeriesData.begin(); is != Qc2SeriesData.end(); ++is) {
-                             // Only do this if it has not been done bedfore
-                             if  ( CheckFlags.condition(is->controlinfo(),params.Aflag) ) { /// If any Aflag already set then will not process further
-                                                                                            /// logic is meant to be counter intuitive here !!!
-                             //if  ( is->controlinfo().cflag(7) != params.Aflag[7] ) {  /// Need to implement this from the config file !!!!ZZ
+                             if  ( !CheckFlags.condition(is->controlinfo(),params.Aflag) ) { /// If one or more of the analysis flags are set then will not process further! 
                                    Tseries.push_back(*is);
-                                   std::cout << "Tseries:  "<< *is << std::endl;
-                             } else {
-                                   std::cout << is->controlinfo().cflag(7) << std::endl;
-                                   std::cout <<  params.Aflag[7] << std::endl;
-                                   std::cout << "Rejected: "<< *is << std::endl;
                              }
                           }
                              if (Tseries.size()==3) {
@@ -147,48 +137,21 @@ ProcessUnitT( ReadProgramOptions params )
                                                                                                            Tseries[1].obstime() ));
                                      Qc2D GSW(Qc2InterpData,StationList,params);
                                      GSW.Qc2_interp(); 
-                                     ///fixtime=Tseries[1].obstime().addDay(730); Would this work ???
                                      fixtime=Tseries[1].obstime();
                                      //fixtime.addDay(730);  // Write the data to 2 years hence (beware leap years in back calculating)
                                      fixflags=Tseries[1].controlinfo();
-                                     // write the new flag value
                                      CheckFlags.setter(fixflags,params.Sflag);
-                                     //std::cout << Tseries[1].obstime()  <<" "        
-                                               //<< fixtime <<" "        
-                                               //<< Tseries[1].stationID()<<" "        
-                                               //<< Tseries[1].corrected()<<" "        
-                                               //<< Tseries[1].original() << " "         
-                                               //<< Tseries[1].controlinfo() << " "         
-                                               //<< "New: " << fixflags << " "
-                                               //<< GSW.corrected_[GSW.stindex[Tseries[1].stationID()]] << " "
-                                               //<< "Nearest Neighbour: " << GSW.intp_[GSW.stindex[Tseries[1].stationID()]] << " "
-                                               //<< GSW.stid_[GSW.stindex[Tseries[1].stationID()]] << std::endl;
 
+// The logic to write results back to the database and inform kvServiceD
+//  In this case the data we are working with (i.e. potentially right back to the db) is Tseries[1]
 
-                     std::cout << "RUN-TCOR-TLIN-TTAN-TNEIGHBOUR-TMIN-TMAX: |" 
-                               << Tseries[0].original() << " |" << Tseries[1].original() << " |" << Tseries[2].original() << " |"
-                               << Tseries[1].corrected() << " |" << LinInterpolated << " |" << TanTaxInterpolated <<  " |"
-                               << GSW.intp_[GSW.stindex[Tseries[1].stationID()]] << " |"
-                               << MinT.begin()->original() << " |" << MaxT.begin()->original() << " |"
-                               << Tseries[1].cfailed() << " |" << std::endl;
-
-
-// Add here the logic to write results back to the database and inform kvServiceD
-//
-//  In this case the data we are working with is Tseries[1]
-//
                       try {
-                              //if ( CheckFlags.condition(id->controlinfo(),params.Wflag) ) {  // Do not overwrite data controlled by humans!
-                              if ( Tseries[1].corrected() <  MinT.begin()->original() || Tseries[1].corrected() >  MaxT.begin()->original() ) {  /// Update if correction is out of TAN TAX range!
-                  //ReturnElement.set(stid,fixtime,dst_data[ stid ][ k ],110,
-                  //  dst_tbtime[ stid ][ k ],d_typeid[ stid ][ k ], d_sensor[ stid ][ k ],
-                  // d_level[ stid ][ k ], roundVal,fixflags, 
-                  // d_useinfo[ stid ][ k ], d_cfailed[ stid ][ k ]+" Qc2-R");
-                                   //kvData d = Tseries[1];
+                             /// Update if correction is out of TAN TAX range!
+                             if ( Tseries[1].corrected() <  MinT.begin()->original() || Tseries[1].corrected() >  MaxT.begin()->original() ) {  
                              //Set data structure to write to the database
                                    kvData d;                                                   
                                    d.set(Tseries[1].stationID(),
-                                         fixtime,
+                                         Tseries[1].obstime(),
                                          Tseries[1].original(),
                                          Tseries[1].paramID(),
                                          Tseries[1].tbtime(),
@@ -227,8 +190,6 @@ ProcessUnitT( ReadProgramOptions params )
                                    }
                              }
                           }
-
-
                    }
                 Tseries.clear();
   ProcessTime.addHour(-1);
