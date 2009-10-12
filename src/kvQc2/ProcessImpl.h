@@ -33,6 +33,7 @@ class ProcessImpl
     int Process4D(ReadProgramOptions params);                                                           
     int ProcessUnitT(ReadProgramOptions params);                                                           
     int Interpolate(ReadProgramOptions params);                                                           
+    int SpaceCheck(ReadProgramOptions params);                                                           
 };
 
 

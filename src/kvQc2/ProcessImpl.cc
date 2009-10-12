@@ -128,6 +128,10 @@ select(ReadProgramOptions params)
          break;
      case 6:
          std::cout << "Case: " << AlgoCode << std::endl;
+         SpaceCheck(params);
+         break;
+     case 7:
+         std::cout << "Case: " << AlgoCode << std::endl;
          break;
      default:
          std::cout << "No valid Algorithm Code Provided. Case: " << AlgoCode << std::endl;

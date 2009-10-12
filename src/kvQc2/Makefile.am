@@ -30,6 +30,7 @@ kvQc2_SOURCES = \
 	algorithms/ProcessRedistribution.cc \
 	algorithms/ProcessUnitT.cc \
 	algorithms/Interpolate.cc \
+	algorithms/SpaceCheck.cc \
 	algorithms/ProcessVariability.cc \
 	algorithms/proj++.cc \
 	algorithms/proj++.h \
