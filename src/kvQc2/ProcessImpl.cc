@@ -128,7 +128,7 @@ select(ReadProgramOptions params)
          break;
      case 6:
          std::cout << "Case: " << AlgoCode << std::endl;
-         SpaceCheck(params);
+         ProcessSpaceCheck(params);
          break;
      case 7:
          std::cout << "Case: " << AlgoCode << std::endl;

@@ -1668,6 +1668,61 @@ SampleSemiVariogram(){
 return 0;
 }
 
+
+//
+// Performs a Space Check [Early version very basic]
+// 
+//
+
+int 
+Qc2D::
+SpaceCheck(){
+ 	  const double RADIUS=6371.0;
+ 	  float temp_distance;
+ 	  float temp_gamma;
+ 	  float data_point;
+ 	  float weight;
+ 	  float inv_dist;
+ 	  float delta_lat;
+ 	  float delta_lon;
+          double a, c;
+ 	  const double radish = 0.01745329251994329509;
+          ProcessControl CheckFlags;
+
+          std::vector<float> Gamma;  // semivariogram cloud
+          std::vector<float> H; // distance bwteeen the points
+
+          // Need to calculate all possible pairs
+
+ 	  for (unsigned int index=0 ; index<original_.size() ; index++) {
+ 	     for (unsigned int i=0 ; i<original_.size() ; i++) {
+
+
+                 if (original_[i] != params.missing && original_[index] != params.missing) { 	  	
+                     delta_lon=(lon_[index]-lon_[i])*radish;
+                     delta_lat=(lat_[index]-lat_[i])*radish;
+                     a        = sin(delta_lat/2)*sin(delta_lat/2) +
+                                cos(lat_[i]*radish)*cos(lat_[index]*radish)*
+                                sin(delta_lon/2)*sin(delta_lon/2);
+                     c        =2.0 * atan2(sqrt(a),sqrt(1-a));
+   
+                     temp_distance = RADIUS*c;                
+                     temp_gamma = 0.5*(original_[index] - original_[i])*(original_[index] - original_[i]);
+   
+                     std::cout << "SV: " << temp_distance <<  " " << temp_gamma << std::endl;
+   
+                     Gamma.push_back( temp_gamma );
+                     H.push_back( temp_distance );
+                 }
+
+              }
+           }	
+       
+      //sort the data, i.e. by the distance to each neighbour
+      //the value in the second part of the pair is the index in the original array 
+       
+return 0;
+}
 //
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------

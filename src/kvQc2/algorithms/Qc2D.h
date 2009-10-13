@@ -112,6 +112,7 @@ public:
   void calculate_trintp_sl(unsigned int index, std::list<int> BestStations);  // strict triangle interpolation
 
   int SampleSemiVariogram();
+  int SpaceCheck();
                                       
   
   int write_cdf(const std::list<kvalobs::kvStation> & slist); // write the data record to a CDF file
