@@ -153,8 +153,8 @@ Qc2D(std::list<kvalobs::kvData>& QD, std::list<kvalobs::kvStation>& SL, ReadProg
   }
 
 /// Includes handling of missing rows.
-//  This block will add entries for stations with no values. If an accumulated value is found for these
-//  stations a reaccumulation is performed.
+///  This block will add entries for stations with no values. If an accumulated value is found for these
+///  stations a reaccumulation is performed.
 for ( std::list<kvalobs::kvStation>::const_iterator ist = SL.begin(); ist != SL.end(); ++ ist )
   {
       std::vector<int>::const_iterator vit = find (stid_.begin(), stid_.end(),  ist->stationID() );
@@ -361,10 +361,10 @@ calculate_intp_wet_dry(unsigned int index)
  	  weight   = 0.0;
           bool DoInt=false;
           
-          float sumPP=0.0;     //   MP | PP
-          float sumPM=0.0;     //   _ _|_ _
-          float sumMM=0.0;     //      |
-          float sumMP=0.0;     //   MM | PM
+          float sumPP=0.0;     ///   MP | PP
+          float sumPM=0.0;     ///   _ _|_ _
+          float sumMM=0.0;     ///      |
+          float sumMP=0.0;     ///   MM | PM
           int nPP=0;
           int nPM=0;
           int nMM=0;
@@ -1366,7 +1366,7 @@ intp_delaunay(unsigned int index)
                                 //std::cout << triangle_num << std::endl;
                        //std::cout << "looped over the triangles " << std::endl;
 
-//  Perform "Point in triangle test" according to Barycentric Technique (see http://www.blackpawn.com/texts/pointinpoly/default.html) 
+///  Perform "Point in triangle test" according to Barycentric Technique (see http://www.blackpawn.com/texts/pointinpoly/default.html) 
 
                          dot00=(x_triangle[2]-x_triangle[0])*(x_triangle[2]-x_triangle[0]) + (y_triangle[2]-y_triangle[0])*(y_triangle[2]-y_triangle[0]);
                          dot01=(x_triangle[2]-x_triangle[0])*(x_triangle[1]-x_triangle[0]) + (y_triangle[2]-y_triangle[0])*(y_triangle[1]-y_triangle[0]);
@@ -1613,7 +1613,7 @@ write_cdf(const std::list<kvalobs::kvStation> & slist)
 }
 
 //
-// Calculates the semivarigram for the loaded data 
+/// Calculates the semivarigram for the loaded data 
 // 
 //
 
@@ -1673,6 +1673,11 @@ return 0;
 // Performs a Space Check [Early version very basic]
 // 
 //
+
+
+///TODO
+/// at the moment this is just a copy of the semivariogram code block, a SpaceCheck to be generated here!
+
 
 int 
 Qc2D::
