@@ -1676,15 +1676,12 @@ return 0;
 
 
 ///TODO
-/// at the moment this is just a copy of the semivariogram code block, a SpaceCheck to be generated here!
-
-
-int 
+/// at the moment this is just a copy of the interpolation code block, a SpaceCheck to be generated here!
+int  
 Qc2D::
 SpaceCheck(){
  	  const double RADIUS=6371.0;
  	  float temp_distance;
- 	  float temp_gamma;
  	  float data_point;
  	  float weight;
  	  float inv_dist;
@@ -1692,42 +1689,59 @@ SpaceCheck(){
  	  float delta_lon;
           double a, c;
  	  const double radish = 0.01745329251994329509;
+          float max_distance=params.InterpolationLimit;
+          int imax;
+
           ProcessControl CheckFlags;
+ 
+          std::map<int, std::list<int> > TheNeighbours;
 
-          std::vector<float> Gamma;  // semivariogram cloud
-          std::vector<float> H; // distance bwteeen the points
-
-          // Need to calculate all possible pairs
+          double sum, mean, var, dev, skew, kurt;
+ 	  
+ 	  typedef pair <float,int> id_pair;
+ 	  
+ 	  std::vector<id_pair> pindex;
+ 	  std::vector<id_pair>::const_iterator ip;
 
  	  for (unsigned int index=0 ; index<original_.size() ; index++) {
- 	     for (unsigned int i=0 ; i<original_.size() ; i++) {
 
-
-                 if (original_[i] != params.missing && original_[index] != params.missing) { 	  	
+ 	        for (unsigned int i=0 ; i<original_.size() ; i++) {
                      delta_lon=(lon_[index]-lon_[i])*radish;
                      delta_lat=(lat_[index]-lat_[i])*radish;
                      a        = sin(delta_lat/2)*sin(delta_lat/2) +
                                 cos(lat_[i]*radish)*cos(lat_[index]*radish)*
                                 sin(delta_lon/2)*sin(delta_lon/2);
                      c        =2.0 * atan2(sqrt(a),sqrt(1-a));
-   
+         
                      temp_distance = RADIUS*c;                
-                     temp_gamma = 0.5*(original_[index] - original_[i])*(original_[index] - original_[i]);
-   
-                     std::cout << "SV: " << temp_distance <<  " " << temp_gamma << std::endl;
-   
-                     Gamma.push_back( temp_gamma );
-                     H.push_back( temp_distance );
-                 }
+                     pindex.push_back( id_pair(temp_distance,i) );
+                 }	
 
-              }
-           }	
+ 	         sort(pindex.begin(),pindex.end());
+ 	         imax=0;
+ 	         for (unsigned int i=0 ; i<original_.size() ; i++) {
+ 	  	         if (pindex[i].first < max_distance) imax=i;
+ 	  	  }
+                 std::cout << original_[index] <<  " " << intp_[index]  << std::endl;
+ 	         for (int i=1 ; i<imax+1 ; i++) {  //NB i=0 corresponds to the station for which we do an interpolation
+                       TheNeighbours[ index ].push_back( original_[pindex[i].second] );
+                       std::cout<<stid_[index]<<" "<<stid_[pindex[i].second]<<" "<<pindex[i].first<<" "<<original_[pindex[i].second]<<std::endl;
+                 }
+                 computeStats(TheNeighbours[index].begin( ), TheNeighbours[index].end( ), sum, mean, var, dev, skew, kurt);
+                 std::cout << sum << " " <<  mean << " " << var << " " << dev << " " << skew << " " <<  kurt <<std::endl;
+                 std::cout << "-------------------------------------------------" << std::endl;
+                 sleep(1);
+                 pindex.clear();
+          }
        
       //sort the data, i.e. by the distance to each neighbour
       //the value in the second part of the pair is the index in the original array 
-       
-return 0;
-}
+
+          //if (NeighboursUsed.size() > 0) {
+          //computeStats(NeighboursUsed.begin( ), NeighboursUsed.end( ), sum, mean, var, dev, skew, kurt);
+          //}
+ 
+} 
 //
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
