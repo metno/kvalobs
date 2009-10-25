@@ -1722,13 +1722,18 @@ SpaceCheck(){
  	         for (unsigned int i=0 ; i<original_.size() ; i++) {
  	  	         if (pindex[i].first < max_distance) imax=i;
  	  	  }
-                 std::cout << original_[index] <<  " " << intp_[index]  << std::endl;
+                 //std::cout << original_[index] <<  " " << intp_[index]  << std::endl;
  	         for (int i=1 ; i<imax+1 ; i++) {  //NB i=0 corresponds to the station for which we do an interpolation
                        TheNeighbours[ index ].push_back( original_[pindex[i].second] );
-                       std::cout<<stid_[index]<<" "<<stid_[pindex[i].second]<<" "<<pindex[i].first<<" "<<original_[pindex[i].second]<<std::endl;
+                       //std::cout<<stid_[index]<<" "<<stid_[pindex[i].second]<<" "<<pindex[i].first<<" "<<original_[pindex[i].second]<<std::endl;
                  }
                  computeStats(TheNeighbours[index].begin( ), TheNeighbours[index].end( ), sum, mean, var, dev, skew, kurt);
-                 std::cout << sum << " " <<  mean << " " << var << " " << dev << " " << skew << " " <<  kurt <<std::endl;
+                 //std::cout << sum << " " <<  mean << " " << var << " " << dev << " " << skew << " " <<  kurt <<std::endl;
+
+                 std::cout << "Useinfo: " << useinfo_[index] << std::endl;
+                 std::cout << "Original: " << original_[index] << std::endl;
+                 std::cout << "Neighbour mean: " << mean << " +/- " << dev << std::endl;
+
                  std::cout << "-------------------------------------------------" << std::endl;
                  sleep(1);
                  pindex.clear();
