@@ -34,6 +34,9 @@
 #include <vector>
 #include <string>
 #include "SynopData.h"
+#ifdef USE_KVDATA
+#include "DataList.h"
+#endif
 #include "StationInfo.h"
 
 #define GROUPSIZE                  6
@@ -155,6 +158,31 @@ class Synop
      *        p� formen 'CCCXXX'  som senere skal skiftes
      *        ut med aktuell CCA verdi.
      */
+#ifdef USE_KVDATA
+	/**
+	* 2009-10-22, YE: doSynop calls either of doSynop_int, which is the 
+     * original met.no implementation or exportSynop_int, which is the SMHI version
+     * which exports in kv2kv format.
+     * The new flag, export_as_kvdata, defines which to call.
+	 */
+	bool    doSynop(int                  synopno,
+		    const std::string    &usteder,
+		    int                  listenummer,
+		    std::string          &synop,
+		    StationInfoPtr       info,
+		    SynopDataList        &synopData,
+		    bool                 create_CCA_template,
+			DataEntryList        &data,
+		    bool                 export_as_kvdata);
+
+	bool    exportSynop_int(int              synopno,
+		    const std::string    &usteder,
+		    int                  listenummer,
+		    std::string          &synop,
+		    StationInfoPtr       info,
+		    DataEntryList        &data);
+
+#else
     bool    doSynop(int                  synopno,
 		    const std::string    &usteder,
 		    int                  listenummer,
@@ -162,8 +190,14 @@ class Synop
 		    StationInfoPtr       info,
 		    SynopDataList        &synopData,
 		    bool                 create_CCA_template=false);
-
-
+#endif
+	bool    doSynop_int(int              synopno,
+		    const std::string    &usteder,
+		    int                  listenummer,
+		    std::string          &synop,
+		    StationInfoPtr       info,
+		    SynopDataList        &synopData,
+		    bool                 create_CCA_template);
     /**
      * replaceCCCXXX erstatter CCCXXX templaten, hvis den finnes,
      * med verdien angitt med ccx. Hvis ccx er 0 skal vi bare fjerne

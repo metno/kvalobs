@@ -38,6 +38,9 @@
 #include <milog/LogManager.h>
 #include <milog/TraceLayout.h>
 #include <milog/FLogStream.h>
+#ifdef SMHI_LOG
+#include <milog/FDLogStream.h>
+#endif
 #include <milog/LogStream.h>
 #include <milog/StdErrStream.h>
 #include <milog/miloghelper.h>

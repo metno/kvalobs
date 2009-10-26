@@ -43,14 +43,44 @@ private:
   int              typeid_;
   int              sensor_;
   int              level_;
-
-
+#ifdef USE_KVDATA
+  std::string      corrected_;
+  std::string      controlinfo_;
+  std::string      useinfo_;
+  std::string      cfailed_;
+#endif
   void createSortIndex();
 
 public:
   Data() {clean();}
   Data(const kvalobs::kvData &data){ set(data);}
   Data(const dnmi::db::DRow &r){set(r);}
+#ifdef USE_KVDATA
+  Data(int                      pos, 
+       const miutil::miTime    &obt,    
+       const std::string       &org,   
+       int                      par,    
+       int                      typ,     
+       int                      sen,     
+       int                      lvl,
+       const std::string       &corr,
+       const std::string       &ctrli,
+       const std::string       &usei,
+       const std::string       &cf)
+    { set(pos, obt, org, par, typ, sen, lvl, corr, ctrli, usei, cf);}
+
+  bool set(int                      pos, 
+	   const miutil::miTime    &obt,    
+	   const std::string       &org,   
+	   int                      par,    
+	   int                      typ,     
+	   int                      sen,     
+	   int                      lvl,
+	   const std::string       &corr,
+	   const std::string       &ctrli,
+	   const std::string       &usei,
+	   const std::string       &cf);
+#else
   Data(int                      pos,
        const miutil::miTime    &obt,
        const std::string       &org,
@@ -67,7 +97,7 @@ public:
 	   int                      typ,
 	   int                      sen,
 	   int                      lvl);
-
+#endif
    bool set(const dnmi::db::DRow&);
    bool set(const kvalobs::kvData &data);
 
@@ -85,6 +115,12 @@ public:
   int              typeID()      const { return typeid_;     }
   int              sensor()      const { return sensor_-'0'; }
   int              level()       const { return level_;      }
+#ifdef USE_KVDATA
+  std::string      corrected()   const { return corrected_;  }
+  std::string      controlinfo() const { return controlinfo_;}
+  std::string      useinfo()     const { return useinfo_;    }
+  std::string      cfailed()     const { return cfailed_;    }
+#endif
 };
 
 #endif

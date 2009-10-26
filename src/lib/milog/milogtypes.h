@@ -30,8 +30,18 @@
 */
 #ifndef __milog_milogtypes_h__
 #define __milog_milogtypes_h__
+#ifdef SMHI_LOG
+/* Common defines for new FDLogStream*/
 
-
+#define SECOND 1
+#define MINUTE 2
+#define HOUR 3
+#define DAY 4
+#define DEFAULT_DAY_FORMAT "%Y-%m-%d"
+#define DEFAULT_HOUR_FORMAT "%Y-%m-%d-%H"
+#define DEFAULT_MINUTE_FORMAT "%Y-%m-%d-%H-%M"
+#define DEFAULT_SECOND_FORMAT "%Y-%m-%d-%H-%M-%S"
+#endif
 namespace milog {
 
   /**

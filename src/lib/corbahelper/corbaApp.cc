@@ -28,6 +28,13 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+#ifdef USE_OPENSSL
+#include <sys/stat.h>
+#include <fstream>
+#include <miconfparser/miconfparser.h>
+#include <kvalobs/kvPath.h>
+#endif
+
 #include <sstream>
 #include <dnmithread/mtcout.h>
 #include <miutil/trimstr.h>
@@ -35,6 +42,7 @@
 
 using namespace CorbaHelper;
 using namespace std;
+using namespace miutil::conf;
 
 CorbaHelper::CorbaApp *CorbaHelper::CorbaApp::app=0;
 
@@ -85,7 +93,71 @@ toString()const
     
 CorbaApp::CorbaApp(int argn, char **argv, const char *options[][2])
 {
+#ifdef USE_OPENSSL
+  ConfParser parser;
+  string conffile;
+  ConfSection * conf = NULL;
+  ifstream fis;
+  ValElementList val;
+  string certificate_authority_file("");
+  string key_file("");
+  string key_file_password("");
+  
+  conffile=kvPath("sysconfdir")+"/kvalobs.conf";
+
+  fis.open(conffile.c_str());
+
+  if(!fis) {
+    CERR("CorbaApp::CorbaApp Cant open the configuration file <" << conffile << ">!" << endl);
+    exit(1);
+  }else {
+    conf=parser.parse(fis);
+    fis.close();
+    if (!conf) {
+      CERR("CorbaApp::CorbaApp Error while reading configuration file: <" << conffile << "!" << endl << parser.getError() << endl);
+      exit(1);
+      
+    } else {
+      val=conf->getValue("sslContext.certificate_authority_file");
+      if(val.size()==1) {
+        certificate_authority_file = val[0].valAsString();
+      }
+      val=conf->getValue("sslContext.key_file");
+      if(val.size()==1) {
+        key_file = val[0].valAsString();
+      }
+      val=conf->getValue("sslContext.key_file_password");
+      if(val.size()==1) {
+        key_file_password = val[0].valAsString();
+      }
+	  cerr << certificate_authority_file << ", " << key_file << ", " << key_file_password << endl;
+	  /* Now, we shall make the singleton */
+
+      delete conf;
+    } // is conf
+
+  } // fis open
+
+  /* Check if file exists */
+  /* should we run unsafe, in this case? */
+  struct stat sb;
+  if (stat(certificate_authority_file.c_str(),&sb) < 0) {
+    CERR("CorbaApp::CorbaApp Cannot open certificate file: " 
+	 << certificate_authority_file << endl);
+    exit(1);
+  }
+  if (stat(key_file.c_str(),&sb) < 0) {
+    CERR("CorbaApp::CorbaApp Cannot open key file"
+	 << key_file << endl);
+    exit(1);
+  }
+#endif
   try{
+#ifdef USE_OPENSSL
+	sslContext::certificate_authority_file = CORBA::string_dup(certificate_authority_file.c_str());
+	sslContext::key_file = CORBA::string_dup(key_file.c_str());
+	sslContext::key_file_password = CORBA::string_dup(key_file_password.c_str());
+#endif
     orb = CORBA::ORB_init(argn, argv, "omniORB4", options);
     CORBA::Object_var obj = orb->resolve_initial_references("RootPOA");
     poa = PortableServer::POA::_narrow(obj);

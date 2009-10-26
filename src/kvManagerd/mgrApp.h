@@ -39,6 +39,9 @@
 #include <kvdb/dbdrivermgr.h>
 #include <kvskel/kvService.hh>
 #include "GenCacheElem.h"
+#ifdef SMHI_LOG
+#include <milog/milog.h>
+#endif
 
 class ManagerApp: public KvApp
 {
@@ -80,7 +83,10 @@ class ManagerApp: public KvApp
 	     const char *options[][2]=0);
 
   virtual ~ManagerApp();
-  
+#ifdef SMHI_LOG
+  milog::LogLevel     traceLevel;
+  milog::LogLevel     logLevel;   
+#endif
   //inherited from KvApp
   virtual bool isOk()const;
 

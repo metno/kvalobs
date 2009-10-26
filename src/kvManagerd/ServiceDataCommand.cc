@@ -82,7 +82,7 @@ executeImpl()
   for(it=workList.begin(); it!=workList.end(); it++){
     if(!gate.remove(*it, "workque")){
       errorCount++;
-      LOGERROR("DBERROR: cant remove from workque: " << endl <<
+      LOGERROR("DBERROR: can't remove from workque: " << endl <<
 	       "-- Stationid: " << it->stationID() << " obstime: " <<
 	       it->obstime() << " typeid: " << it->typeID() <<
 	       endl << "Reason: " << gate.getErrorStr());
@@ -95,9 +95,12 @@ executeImpl()
 	       endl << "Reason: " << gate.getErrorStr());
     }
   }
-  
-  LOGINFO("Cleaned up workque: errorCount=" << errorCount <<
-	  " #workelements: " << workList.size());
+  if (errorCount > 0) {
+	LOGINFO("Cleaned up work queue: error count=" << errorCount <<
+		" #workelements: " << workList.size());
+   } else {
+    LOGDEBUG("Cleaned up work queue: no errors");
+   }
 }
 
 

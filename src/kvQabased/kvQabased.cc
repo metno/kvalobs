@@ -40,6 +40,10 @@
 #include <fileutil/pidfileutil.h>
 #include "AdminImpl.h"
 #include <kvalobs/kvPath.h>
+#ifdef USE_PYTHON
+#include "kvQABaseTypes.h"
+#include "kvPythonInterpreter.h"
+#endif
 
 //For test
 const char* options[][ 2 ] =
@@ -67,6 +71,9 @@ main( int argc, char** argv )
   string constr( KvApp::createConnectString() );
   bool error;
 
+#ifdef USE_PYTHON
+  int language = ALL;
+#endif
 
   if ( conf )
   {
@@ -74,6 +81,13 @@ main( int argc, char** argv )
 
     if ( val.size() == 1 )
       dbdriver = val[ 0 ].valAsString();
+
+#ifdef USE_PYTHON
+	val = conf->getValue( "script.language" );
+
+	if ( val.size() == 1 )
+		language = val[ 0 ].valAsInt();
+#endif
   }
 
   //Use postgresql as a last guess.
@@ -126,15 +140,27 @@ main( int argc, char** argv )
       return 1;
     }
   }
+#ifdef USE_PYTHON
+  /* get a pointer to the embedded python interpreter,
+  exit if not OK! 
+  */
+  kvPythonInterpreter * interpret = kvPythonInterpreter::getInterpreter();
+  if (interpret == NULL)
+  {
+	LOGFATAL( "FATAL: can't  initialize the PYTHON interpreter!\n" );
+    return 1;
+  }
 
-
-
-
+  QaBaseApp app( argc, argv, dbdriver, constr, language, options );
+#else
   QaBaseApp app( argc, argv, dbdriver, constr, options );
-
+#endif
   if ( !app.isOk() )
   {
     LOGFATAL( "FATAL: can't  initialize " << argv[ 0 ] << "!\n" );
+#ifdef USE_PYTHON
+	kvPythonInterpreter::freeInterpreter();
+#endif
     return 1;
   }
 
@@ -160,6 +186,9 @@ main( int argc, char** argv )
       if ( !app.putRefInNS( ref, "kvQabaseInput" ) )
       {
         LOGFATAL( "FATAL: can't register with CORBA nameserver!\n" );
+#ifdef USE_PYTHON
+		kvPythonInterpreter::freeInterpreter();
+#endif
         return 1;
       }
 
@@ -172,6 +201,9 @@ main( int argc, char** argv )
       if ( !app.putRefInNS( ref, "kvQabaseAdmin" ) )
       {
         LOGFATAL( "FATAL: can't register with CORBA nameserver!\n" );
+#ifdef USE_PYTHON
+		kvPythonInterpreter::freeInterpreter();
+#endif
         return 1;
       }
 
@@ -195,12 +227,18 @@ main( int argc, char** argv )
   {
     LOGFATAL( "Caught CORBA::SystemException." );
     app.deletePidFile();
+#ifdef USE_PYTHON
+	kvPythonInterpreter::freeInterpreter();
+#endif
     exit( 1 );
   }
   catch ( CORBA::Exception& )
   {
     LOGFATAL( "Caught CORBA::Exception." );
     app.deletePidFile();
+#ifdef USE_PYTHON
+	kvPythonInterpreter::freeInterpreter();
+#endif
     exit( 1 );
   }
   catch ( omniORB::fatalException & fe )
@@ -210,17 +248,26 @@ main( int argc, char** argv )
               << "  line: " << fe.line() << endl
               << "  mesg: " << fe.errmsg() );
     app.deletePidFile();
+#ifdef USE_PYTHON
+	kvPythonInterpreter::freeInterpreter();
+#endif
     exit( 1 );
   }
   catch ( ... )
   {
     LOGFATAL( "Caught unknown exception." );
     app.deletePidFile();
+#ifdef USE_PYTHON
+	kvPythonInterpreter::freeInterpreter();
+#endif
     exit( 1 );
   }
 
   CERR( "kvQabased: exit ....\n" );
   app.deletePidFile();
+#ifdef USE_PYTHON
+	kvPythonInterpreter::freeInterpreter();
+#endif
   return 0;
 }
 

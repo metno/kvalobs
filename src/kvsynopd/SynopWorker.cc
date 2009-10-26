@@ -110,7 +110,11 @@ SynopWorker::operator()()
 	    		  << (event->hasCallback()?"T":"F"));
 
     	try{
+#ifdef SMHI_LOG
+		FDLogStream *logs=new FDLogStream(DAY, DEFAULT_DAY_FORMAT); //One log per day.
+#else
       	FLogStream *logs=new FLogStream(2, 307200); //300k
+#endif
       	std::ostringstream ost;
 
       	ost << kvPath("localstatedir") << "/log/kvsynop/" 
@@ -445,13 +449,25 @@ SynopWorker::newObs(ObsEvent &event)
   	bool synopOk;
 
   	try{
+#ifdef USE_KVDATA
+		synopOk=synop.doSynop(info->wmono(),
+			  				   	 info->owner(),
+									 atoi(info->list().c_str()),
+			  				  		 sSynop, 
+			  				  		 info,
+			  				  		 synopData,
+			  				  		 true,
+									 data,
+									 app.isExportAsKvData());
+#else
     	synopOk=synop.doSynop(info->wmono(),
 			  				   	 info->owner(),
 									 atoi(info->list().c_str()),
 			  				  		 sSynop, 
 			  				  		 info,
 			  				  		 synopData,
-			  				  		 true);
+		  				  		     true);
+#endif
   	}
   	catch(std::out_of_range &e){
     	LOGWARN("EXCEPTION: out_of_range: wmono: " << info->wmono() <<
@@ -818,13 +834,21 @@ saveTo(StationInfoPtr info,
   }
 
   if(ccx==0){
-    ost << info->copyto() << "/" <<  info->wmono() << "-" 
-	<< setfill('0') << setw(2) << obstime.day() << setw(2) 
+    ost << info->copyto() << "/" <<  info->wmono() << "-"
+#ifdef USE_KVDATA
+	<< setfill('0') << setw(4) << obstime.year() << setw(2) << obstime.month() << setw(2) << obstime.day() << setw(2) 
+#else
+	<< setfill('0') << setw(2) << obstime.day() << setw(2)
+#endif
 	<< obstime.hour()
 	<< ".synop";
   }else{ 
     ost << info->copyto() << "/" <<  info->wmono() << "-" 
-	<< setfill('0') << setw(2) << obstime.day() << setw(2) 
+#ifdef USE_KVDATA
+	<< setfill('0') << setw(4) << obstime.year() << setw(2) << obstime.month() << setw(2) << obstime.day() << setw(2) 
+#else
+	<< setfill('0') << setw(2) << obstime.day() << setw(2)
+#endif
 	<< obstime.hour() << "-" << static_cast<char>('A'+(ccx-1))
 	<< ".synop";
   }

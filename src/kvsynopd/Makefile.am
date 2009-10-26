@@ -1,8 +1,9 @@
-AM_CPPFLAGS = -D_REENTRANT \
+AM_CPPFLAGS = -D_REENTRANT -DSMHI_LOG -DUSE_KVDATA -DUSE_OPENSSL\
               -I$(top_builddir)/src/lib \
               -I$(top_builddir)/src/lib/kvskel \
               -I$(top_srcdir)/src/lib  \
               $(omniORB4_CFLAGS)  \
+              $(OpenSSL_CFLAGS) \
               $(putools_CFLAGS)  
 
 bin_PROGRAMS = kvsynopd kvsynopclt kvsynopdbclt kvsynopdparse
@@ -33,7 +34,7 @@ kvsynopd_SOURCES = kvsynopd.cc \
 kvsynopd_CPPFLAGS = $(AM_CPPFLAGS) -I$(top_srcdir)/src/service-libs \
                     $(omniORB4_CFLAGS) 
 kvsynopd_LDFLAGS = -pthread -export-dynamic
-kvsynopd_LIBS=   $(omniORB4_LIBS) $(putools_LIBS) $(BOOST_THREAD_LIB) \
+kvsynopd_LIBS=   $(omniORB4_LIBS) -lomnisslTP4  $(OpenSSL_LIBS) $(putools_LIBS) $(BOOST_THREAD_LIB) \
                  -lm
 
 kvsynopd_LDADD = $(top_builddir)/src/service-libs/kvcpp/libkvcpp.la \
@@ -56,9 +57,9 @@ kvsynopclt_SOURCES = kvsynopclt.cc \
                      kvsynopCltApp.cc  kvsynopCltApp.h \
                      kvsynopCorbaThread.cc kvsynopCorbaThread.h
 kvsynopclt_CPPFLAGS = $(AM_CPPFLAGS) -I$(top_srcdir)/src/service-libs \
-                      $(omniORB4_CFLAGS)
+                      $(omniORB4_CFLAGS) $(OpenSSL_CFLAGS)
 kvsynopclt_LDFLAGS = -pthread 
-kvsynopclt_LIBS = $(omniORB4_LIBS) $(putools_LIBS) $(BOOST_THREAD_LIB) \
+kvsynopclt_LIBS = $(omniORB4_LIBS) -lomnisslTP4  $(OpenSSL_LIBS) $(putools_LIBS) $(BOOST_THREAD_LIB) \
                   -lm
 kvsynopclt_LDADD = $(top_builddir)/src/service-libs/kvcpp/libkvcpp.la \
                    $(top_builddir)/src/lib/kvalobs/libkvalobs.la \
@@ -76,7 +77,7 @@ kvsynopclt_LDADD = $(top_builddir)/src/service-libs/kvcpp/libkvcpp.la \
 kvsynopdbclt_SOURCES = kvsynopdbclt.cc \
                        tblSynop.cc tblSynop.h
 kvsynopdbclt_LDFLAGS = -pthread 
-kvsynopdbclt_LIBS = $(omniORB4_LIBS) $(putools_LIBS) $(BOOST_THREAD_LIB) \
+kvsynopdbclt_LIBS = $(omniORB4_LIBS) -lomnisslTP4  $(OpenSSL_LIBS) $(putools_LIBS) $(BOOST_THREAD_LIB) \
                   -lm
 kvsynopdbclt_LDADD = $(top_builddir)/src/service-libs/kvcpp/libkvcpp.la \
                      $(top_builddir)/src/lib/kvalobs/libkvalobs.la \
@@ -95,7 +96,7 @@ kvsynopdparse_SOURCES = kvsynopdparse.cc \
                         StationInfo.cc StationInfo.h \
                         StationInfoParse.cc StationInfoParse.h
 kvsynopdparse_LDFLAGS = -pthread 
-kvsynopdparse_LIBS = $(omniORB4_LIBS) $(putools_LIBS) $(BOOST_THREAD_LIB) \
+kvsynopdparse_LIBS = $(omniORB4_LIBS) -lomnisslTP4  $(OpenSSL_LIBS) $(putools_LIBS) $(BOOST_THREAD_LIB) \
                   -lm
 kvsynopdparse_LDADD = $(top_builddir)/src/service-libs/kvcpp/libkvcpp.la \
                      $(top_builddir)/src/lib/kvalobs/libkvalobs.la \

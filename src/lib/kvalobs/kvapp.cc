@@ -368,7 +368,7 @@ namespace{
     }else{
       LOGINFO("Reading configuration from file <" << conffile << ">!" << endl);
       conf=parser.parse(fis);
-      
+    fis.close(); 
       if(!conf){
 	LOGERROR("Error while reading configuration file: <" << conffile 
 		 << ">!" << endl << parser.getError() << endl);

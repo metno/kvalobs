@@ -1,4 +1,4 @@
-AM_CPPFLAGS = -I $(top_srcdir)/src/lib -D_REENTRANT
+AM_CPPFLAGS = -DSMHI_LOG -I $(top_srcdir)/src/lib $(putools_CFLAGS) -D_REENTRANT
 
 pkglib_LTLIBRARIES = libmilog.la
 
@@ -8,6 +8,7 @@ nobase_miloginclude_HEADERS = Logger.h \
 	Layout.h \
 	StdLayout.h \
 	FLogStream.h  \
+	FDLogStream.h \
 	TraceLayout.h \
 	LogManager.h \
 	HtmlStream.h \
@@ -28,6 +29,7 @@ libmilog_la_SOURCES = Logger.h Logger.cc \
 	Layout.h Layout.cc \
 	StdLayout.h StdLayout.cc \
 	FLogStream.h FLogStream.cc \
+	FDLogStream.h FDLogStream.cc \
 	LoggerImpl.cc \
 	TraceLayout.h TraceLayout.cc \
 	LogManager.h LogManager.cc \

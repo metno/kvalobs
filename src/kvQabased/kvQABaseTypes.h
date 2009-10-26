@@ -42,6 +42,13 @@
 #include <set>
 #include <kvalobs/kvObsPgm.h>
 
+#ifdef USE_PYTHON
+/* the language constants */
+ #define ALL 0
+ #define PERL 1
+ #define PYTHON 2
+#endif
+
 namespace kvQABase
 {
 

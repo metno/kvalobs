@@ -58,7 +58,7 @@ DataSrcImpl::newData(const char* data, const char* obsType)
   
   milog::LogContext logContext("CORBA(DataSrcImpl)"); 
 
-  LOGINFO("newData: arrived!\n"); 
+  LOGDEBUG("newData: arrived!\n"); 
   LOGDEBUG("obsType: " << obsType << 
 	   "\ndata: [" << data << "]");
 

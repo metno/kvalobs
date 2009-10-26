@@ -27,6 +27,12 @@
   You should have received a copy of the GNU General Public License along 
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+  YE: 2009-10-22
+  In order to support export in kvdata format,
+  the corrected, controlinfo, useinfo, cfailed must bee added
+  to the data model of the sqlite3 database,
+  and, of course, when reading data from kvalobs.
 */
 #include <list>
 #include <stdlib.h>
@@ -56,7 +62,13 @@ clean()
   paramid_     = 0;     
   typeid_      = 0;      
   sensor_      = 0;      
-  level_       = 0;       
+  level_       = 0;
+#ifdef USE_KVDATA
+  corrected_.erase();
+  controlinfo_.erase();
+  useinfo_.erase();
+  cfailed_.erase();    
+#endif
 
   createSortIndex();
 }
@@ -68,10 +80,17 @@ set(const kvalobs::kvData &data)
   	char buf[100];
 
   	sprintf(buf, "%.2f", data.original());
-  
+#ifdef USE_KVDATA
+	char buf1[100];
+	sprintf(buf1,"%.2f", data.corrected()); 
+	set(data.stationID(), data.obstime(), buf, data.paramID(), 
+	    data.typeID(), data.sensor(), data.level(),
+	    buf1, data.controlinfo().flagstring(),
+	    data.useinfo().flagstring(),data.cfailed()); 
+#else
   	set(data.stationID(), data.obstime(), buf, data.paramID(), 
       	data.typeID(), data.sensor(), data.level()); 
-      
+#endif 
 	return true;
 }
 
@@ -103,6 +122,16 @@ set(const dnmi::db::DRow &r_)
 	sensor_=atoi(buf.c_str());
       }else if(*it=="level"){
 	level_=atoi(buf.c_str());
+#ifdef USE_KVDATA
+      }else if(*it=="corrected"){
+	corrected_=buf;
+      }else if(*it=="controlinfo"){
+	controlinfo_=buf;
+      }else if(*it=="useinfo"){
+	useinfo_=buf;
+      }else if(*it=="cfailed"){
+	cfailed_=buf;
+#endif
       }else{
 	LOGWARN("Data::set .. unknown entry:" << *it << std::endl);
       }
@@ -119,8 +148,16 @@ set(const dnmi::db::DRow &r_)
 bool 
 Data::
 set(int pos, const miutil::miTime &obt,    
-    const std::string &org, int par, int   typ, int sen, 
-    int lvl)
+    const std::string &org, int par, int typ, int sen, 
+    int lvl
+#ifdef USE_KVDATA
+	,
+	const std::string &corr,
+    const std::string &ctrli,
+    const std::string &usei,
+    const std::string &cf
+#endif
+	)
 {
   stationid_   = pos;   
   obstime_     = obt;     
@@ -128,7 +165,14 @@ set(int pos, const miutil::miTime &obt,
   paramid_     = par;     
   typeid_      = typ;      
   sensor_      = sen;      
-  level_       = lvl;       
+  level_       = lvl;
+
+#ifdef USE_KVDATA
+  corrected_   = corr;
+  controlinfo_ = ctrli;
+  useinfo_     = usei;
+  cfailed_     = cf;
+#endif
 
   createSortIndex();
 
@@ -147,7 +191,15 @@ Data::toSend() const
       << paramid_         << ","         
       << typeid_          << ","          
       << quoted(sensor_)  << ","
-      << level_           << ")";      
+      << level_           <<
+#ifdef USE_KVDATA
+	  ","
+	  << quoted(corrected_) << ","
+      << quoted(controlinfo_) << ","
+      << quoted(useinfo_) << ","
+      << quoted(cfailed_) <<
+#endif
+	  ")";      
 
   return ost.str();
 }

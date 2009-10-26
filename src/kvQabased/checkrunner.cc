@@ -30,7 +30,9 @@
 */
 #include "kvPerlParser.h"
 #undef list
-
+#ifdef USE_PYTHON
+#include "kvPythonInterpreter.h"
+#endif
 #include <errno.h>
 #include "checkrunner.h"
 
@@ -207,7 +209,7 @@ void CheckRunner::runCheck( const std::string & checkScript, const kvalobs::kvCh
 
 
   // Writing the script to be run to html:
-//#define LOG_CHECK_SCRIPT
+#define LOG_CHECK_SCRIPT
 #ifdef LOG_CHECK_SCRIPT
     log_( "Final checkstring:" );
     log_( "<font color=#007700>" );
@@ -216,11 +218,30 @@ void CheckRunner::runCheck( const std::string & checkScript, const kvalobs::kvCh
 #endif
 
   /* ----- run check ---------------------------------- */
-  kvPerlParser parser;                // the perlinterpreter
+  IDLOGDEBUG( "html", "Language:" << check.language() << endl );
   map<string, double> retvalues;
+#ifdef USE_PYTHON
+  if (check.language() == PERL)
+  {
+#endif
+  kvPerlParser parser;                // the perlinterpreter
   if ( ! parser.runScript( checkScript, retvalues ) )
     return log_( "CheckRunner::runCheck failed in parser.runScript", Error );
-
+#ifdef USE_PYTHON
+  }
+  else
+  {
+	  /* data to the python interface, both meteodata and metadata in this oreder */
+	  list<kvQABase::script_var> data;
+	  /* call the CheckCreator to get the data */
+	  checkCreator_.getMeteoData( check, data);
+	  checkCreator_.getMetaData( check, data );
+	  // The PYTHON interpreter
+	  kvPythonInterpreter * interpret = kvPythonInterpreter::getInterpreter();
+	  if( interpret->dispatch(check.checkname(),stinfo.obstime(),data,retvalues))
+		  return log_( "CheckRunner::runCheck failed in interpret.dispatch\n" + check.checkname() + "\n" + checkScript, Error );
+  }
+#endif
   // TEST --------------------------------------------------
   log_( "Successfully run check.", Debug );
   IDLOGDEBUG( "html", "Number of return parameters:" << retvalues.size() << endl );
@@ -282,7 +303,7 @@ void CheckRunner::operator() ( bool forceCheck )
 
 
   logEnd_( "Done processing", Debug );
-  LOGINFO( "CheckRunner::runChecks FINISHED" << endl );
+  LOGDEBUG( "CheckRunner::runChecks FINISHED" << endl );
 }
 
 

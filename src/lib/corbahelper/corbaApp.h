@@ -33,6 +33,9 @@
 
 #include <string>
 #include <omniORB4/CORBA.h>
+#ifdef USE_OPENSSL
+#include <omniORB4/sslContext.h>
+#endif
 
 /**
  * \brief The namespace the CORBA helper utilities is in.

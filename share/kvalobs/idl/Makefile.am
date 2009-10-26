@@ -15,4 +15,4 @@ idl_DATA = \
 	newfile.idl \
 	qabase.idl
 
-EXTRA_DIST = $(idl_DATA)
+#EXTRA_DIST = $(idl_DATA)

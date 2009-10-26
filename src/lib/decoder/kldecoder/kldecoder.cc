@@ -190,6 +190,8 @@ execute(miutil::miString &msg)
     	msg="Inavlid format. No data?!!";
     	return Error;
   	}else{
+		/* OBS! skip the header part */
+	    getline(istr,tmp);
     	if(!decodeHeader(tmp, params, msg)){
       		LOGERROR("INVALID header:" << endl << tmp);
       		return Error;
@@ -289,7 +291,10 @@ execute(miutil::miString &msg)
 				 		 data.cinfo(), 
 				 		 data.uinfo(),
 				 		 "");
-	      
+
+
+				//LOGDEBUG("kvData:" << endl << "The struct: " << d.toSend());
+
 				if(!putKvDataInDb(d, priority)){
 	  				LOGERROR("Can't save data. Stationid: " 
 		  	 		 		 << stationid <<"\n");
@@ -313,7 +318,7 @@ execute(miutil::miString &msg)
            
    msg=ost.str();
    
-   LOGINFO(msg);
+   LOGDEBUG(msg);
 
   	if(lines==1 || (count==0 && nExpectedData==0)){
     	msg+="No data!";
@@ -346,11 +351,12 @@ getStationId(miutil::miString &msg)
     miString key;
     miString val;
     miString::size_type i;
-    CommaString cstr(obsType, '/');
+    //CommaString cstr(obsType, '/');
+    CommaString cstr(obs, '/');
     long  id;
     
     if(cstr.size()<2){
-      	msg="obsType: Invalid Format!";
+      	msg="obs: Invalid Format!";
       	return 0;
     }
 
@@ -362,7 +368,7 @@ getStationId(miutil::miString &msg)
     i = keyval.find('=');
   
     if (i == miString::npos) {
-		msg = "obsType: <id> Invalid format!";
+		msg = "obs: <id> Invalid format!";
 		return 0;
     }
     
@@ -373,7 +379,7 @@ getStationId(miutil::miString &msg)
     key.trim();
     
     if (key.empty() || val.empty()) {
-		msg = "obsType: Invalid format!";
+		msg = "obs: Invalid format!";
 		return false;
     }
     
@@ -409,10 +415,11 @@ getTypeId(miutil::miString &msg)const
     string val;
     string::size_type i;
 
-    CommaString cstr(obsType, '/');
+    //CommaString cstr(obsType, '/');
+	CommaString cstr(obs, '/');
     
     if(cstr.size()<3){
-      	msg="To few element in, expecting 3. <obsType>(" + obsType + ")!";
+      	msg="To few element in, expecting 3. <obs>(" + obs + ")!";
       	return -1;  
     }
 
@@ -422,21 +429,21 @@ getTypeId(miutil::miString &msg)const
     i=keyval.find("=");
     
     if(i==string::npos){
-      	msg="Invalid format <obsType>(" + obsType + ")!";
+      	msg="Invalid format <obs>(" + obs + ")!";
       	return -1;
     }
 
     key=keyval.substr(0, i);
 
     if(key!="type"){
-      	msg="Invalid format, expecting <type>. <obsType>(" + obsType + ")!";
+      	msg="Invalid format, expecting <type>. <obs>(" + obs + ")!";
       	return -1;
     }
      
     val=keyval.substr(i+1);
 
     if(val.empty()){
-      	msg="Invalid format, no value for <type>. <obsType>(" + obsType + ")!";
+      	msg="Invalid format, no value for <type>. <obs>(" + obs + ")!";
       	return -1;
     }
       

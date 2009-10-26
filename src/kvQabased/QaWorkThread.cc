@@ -151,7 +151,7 @@ namespace
 void
 QaWork::operator() ()
 {
-  LOGINFO( "QaWork: starting work thread!\n" );
+  LOGDEBUG( "QaWork: starting work thread!\n" );
 
   ConnectionHandler connectionHandler( app );
 
@@ -166,7 +166,7 @@ QaWork::operator() ()
     if ( app.shutdown() )
       continue;
 
-    LOGINFO( "QaWork: command received....\n" );
+    LOGDEBUG( "QaWork: command received....\n" );
 
     const QaWorkCommand * work = dynamic_cast<const QaWorkCommand*>( cmd.get() );
 
@@ -185,7 +185,7 @@ QaWork::operator() ()
     else
       LOGERROR( "QaWork: Unexpected command ....\n" );
   }
-  LOGINFO( "QaWork: Thread terminating!" );
+  LOGDEBUG( "QaWork: Thread terminating!" );
 }
 
 void QaWork::process( dnmi::db::Connection & con, const QaWorkCommand & work )
@@ -229,7 +229,7 @@ QaWork::doWork( const kvalobs::kvStationInfo & params,
 {
   retList.push_back( params );
 
-  LOGINFO( "QaWork::doWork at:" << miutil::miTime::nowTime()
+  LOGDEBUG( "QaWork::doWork at:" << miutil::miTime::nowTime()
            << "  Processing " << params.stationID() << " for time "
            << params.obstime() << std::endl );
 
@@ -238,9 +238,11 @@ QaWork::doWork( const kvalobs::kvStationInfo & params,
     // boost::filesystem::path cannot handle paths/with//multiple//slashes//separating/single/elements
     boost::regex re("(\\/\\/)");
     std::string normalizedLog = boost::regex_replace(logPath.empty() ? logpath_ : logPath, re, "/");
-
+#ifdef USE_PYTHON
+	kvQABaseDBConnection dbcon(& con, app.getScriptLanguage());
+#else
     kvQABaseDBConnection dbcon(& con);
-    
+#endif
     CheckRunner checkRunner( params, dbcon, normalizedLog );
     checkRunner();
   }

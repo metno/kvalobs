@@ -43,12 +43,20 @@ namespace{
 }
 
 void
+#ifdef SMHI_LOG
+InitLogger(int argn, char **argv, const std::string &logname, LogLevel * traceLevel_, LogLevel * logLevel_)
+#else
 InitLogger(int argn, char **argv, const std::string &logname)
+#endif
 {
     string       filename;
     LogLevel     traceLevel=milog::NOTSET;
     LogLevel     logLevel=milog::NOTSET;
+#ifdef SMHI_LOG
+	FDLogStream  *fs;
+#else
     FLogStream   *fs;
+#endif
     StdErrStream *trace;
      
     filename = kvPath("localstatedir") + "/log/" + logname +".log";
@@ -68,9 +76,17 @@ InitLogger(int argn, char **argv, const std::string &logname)
 	    }
 	}
     }
-    
+#ifdef SMHI_LOG
+    /* export the log settings for this server */
+    *traceLevel_ = traceLevel;
+ 	*logLevel_ = logLevel;
+#endif
     try{
+#ifdef SMHI_LOG
+	fs=new FDLogStream(DAY);
+#else
 	fs=new FLogStream(4);
+#endif
 	
 	if(!fs->open(filename)){
 	    std::cerr << "FATAL: Can't initialize the Logging system.\n";

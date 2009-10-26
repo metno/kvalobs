@@ -59,7 +59,11 @@ App::
 createGlobalLogger(const std::string &id)
 {
   	try{
+#ifdef SMHI_LOG
+		FDLogStream *logs=new FDLogStream(DAY,DEFAULT_DAY_FORMAT); // One logfile per day
+#else
     	FLogStream *logs=new FLogStream(2, 204800); //200k
+#endif
     	std::ostringstream ost;
     
     	ost << kvPath("localstatedir") << "/log/kvsynop/" << id << ".log";
@@ -123,7 +127,32 @@ App(int argn, char **argv,
   }else{
     IDLOGINFO("main", "Rejecting obstimes that is too old or to early.");
   }
+#ifdef USE_KVDATA
+  exportAsKvData_=false;
+  valElem=conf->getValue("export_as_kvdata");
 
+  if(!valElem.empty()){
+    string t=valElem[0].valAsString();
+    
+    if(!t.empty() && (t[0]=='t' || t[0]=='T'))
+        exportAsKvData_=true;
+  }
+
+  if(exportAsKvData_){
+    IDLOGINFO("main", "Exporting synop in kvData export format.");
+  }else{
+    IDLOGINFO("main", "Exporting synop as synop telegrams.");
+  }
+  // YE: Added 2009-04-14
+  days_back_in_time_ = 3;
+  valElem=conf->getValue("days_back_in_time");
+
+  if(!valElem.empty()){
+    days_back_in_time_=valElem[0].valAsInt();
+  }
+  
+  IDLOGINFO("main", "Exporting synop " << days_back_in_time_ << " days back.");
+#endif
 
   valElem=conf->getValue("database.driver");
 
@@ -174,8 +203,8 @@ App(int argn, char **argv,
   
   readWaitingElementsFromDb();
 
-  //We dont need conf any more.
-  delete conf;
+  //We must not delete conf here.
+  //delete conf;
 }
 
 App::
@@ -196,7 +225,8 @@ initKvSynopInterface(  dnmi::thread::CommandQue &newObsQue )
 
       synopRef = synopdImpl->_this();
       IDLOGINFO( "main", "CORBAREF: " << corbaRef(synopRef) );
-      std::string nsname = "/" + mypathInCorbaNameserver();
+      //std::string nsname = "/" + mypathInCorbaNameserver();
+	  std::string nsname = mypathInCorbaNameserver();
       nsname += "kvsynopd";
       IDLOGINFO( "main", "CORBA NAMESERVER (register as): " << nsname );
       putObjInNS(synopRef, nsname);

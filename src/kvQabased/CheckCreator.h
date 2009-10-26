@@ -8,6 +8,9 @@
 #include <string>
 #include <list>
 #include <vector>
+#ifdef USE_PYTHON
+#include "kvQABaseTypes.h"
+#endif
 
 namespace kvalobs {
   class kvStationInfo;
@@ -32,6 +35,18 @@ public:
   
   const std::list<kvalobs::kvChecks> & getChecks() const { return checklist_; }
   const kvObsPgmList & oprogramlist() const { return oprogramlist_; }
+  
+#ifdef USE_PYTHON
+  /* extension for python */
+  std::string getPythonScript( const kvalobs::kvChecks & check );
+  
+  /* these two new methods take a general approach when returning data,
+   instead of a string. The return a boolean or throws an exception depending of the
+   severity of the error
+  */
+  bool getMeteoData( const kvalobs::kvChecks & check, std::list<kvQABase::script_var>& data );
+  bool getMetaData( const kvalobs::kvChecks & check, std::list<kvQABase::script_var>& data );
+#endif
   
 private:
   std::string getPerlScript( const kvalobs::kvChecks & check );

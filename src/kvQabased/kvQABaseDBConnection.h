@@ -88,9 +88,16 @@ class kvQABaseDBConnection
     static long int qcxinfo_timestamp; ///< last update of list
     bool updateQcxList();
 
-  public:
-    kvQABaseDBConnection( dnmi::db::Connection *con );
+#ifdef USE_PYTHON
+	static int script_language;
+#endif
 
+  public:
+#ifdef USE_PYTHON
+    kvQABaseDBConnection( dnmi::db::Connection *con, const int & script_language_ );
+#else
+    kvQABaseDBConnection( dnmi::db::Connection *con );
+#endif
     bool dbOk() const
     {
       return connection_ok;

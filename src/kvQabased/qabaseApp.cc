@@ -48,8 +48,14 @@ using namespace milog;
 QaBaseApp::QaBaseApp(int argn, char **argv,
 		     const std::string &driver_,
 		     const std::string &connect_,
+#ifdef USE_PYTHON
+			 const int & script_language_,
+#endif
 		     const char *opt[][2])
   :KvApp(argn, argv, opt), dbConnect(connect_), dbDriver(driver_),
+#ifdef USE_PYTHON
+   script_language(script_language_),
+#endif
    refManager(CKvalObs::CManager::CheckedInput::_nil()),
    shutdown_(false), orbIsDown(false)
 {

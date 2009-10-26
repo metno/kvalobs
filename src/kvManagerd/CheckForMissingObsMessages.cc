@@ -218,9 +218,12 @@ findMissingData(const miutil::miTime& runtime,
  	string logfile;
     
    logfile = kvPath("localstatedir") + "/log/kvManagerd-missing.log";
-
+#ifdef SMHI_LOG
+    /* use app.logLevel to set logging level */
+ 	milog::SetResetDefaultLoggerHelper loggerHelper(logfile, app.logLevel, DEFAULT_DAY_FORMAT);
+#else
 	milog::SetResetDefaultLoggerHelper loggerHelper(logfile, 1048576);
-
+#endif
    miutil::miTime lastMissingRun=lastMissingRuntime(con);
 
 	MissingObsCheck check(*con, outputQue, app.genCache(), 

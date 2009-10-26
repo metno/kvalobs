@@ -134,3 +134,83 @@ kvQABaseMetadata::data_asPerl(const int                    sid,  // station-id
 
   return true;
 }
+
+#ifdef USE_PYTHON
+// return metadata for a check
+bool
+kvQABaseMetadata::data_asRaw(const int                    sid,  // station-id
+			      const std::string            ctype,// check-type
+			      const miutil::miTime&        otime,// observationtime
+			      const kvQABaseScriptManager& sman, // script-manager
+			      std::list<kvQABase::script_var>& data) // return data here
+{
+  kvQABase::script_var vars;
+
+  // get requirements for script
+  try {
+    sman.getVariables(kvQABase::meta_data, vars);
+  }
+  catch ( std::exception & e ) {
+    IDLOGERROR("html", e.what() << std::endl);
+    return false;
+  }
+
+  if (vars.pars.size() == 0) return true; // no requirements, return
+
+  vars.alltimes.clear();
+  vars.alltimes.push_back(0); // only one timestep for meta-data
+
+  std::list<kvMetadataTable> tables; // metadata-tables
+
+  // NBNBNB should we get a list of times to get metadata for?????
+
+  int npos= vars.allpos.size();
+
+  for (int i=0; i<npos; i++){
+    tables.clear(); // clear metadata-tables
+    int ipos= vars.allpos[i];
+
+    // fetch metadata from DB
+    bool result= dbcon_.getMetadata(ipos,otime,ctype,tables);
+    if (!result) {
+      IDLOGERROR("html",
+		 "kvQABaseMetadata::data_asPerl ERROR dbcon_.getMetadata failed."
+		 << std::endl);
+      return false;
+    }
+
+    // put metadata into script_var structure
+    int n= vars.pars.size();
+
+    for (int j=0; j<n; j++){
+      std::string vname= vars.pars[j].name;
+      std::string value= kvQABase::missing_value;
+      int status= kvQCFlagTypes::status_ok;
+      bool found = false;
+
+      std::list<kvMetadataTable>::iterator mp= tables.begin();
+      for (; mp != tables.end(); mp++){
+	if (mp->findEntry(vname, value)){
+	  found= true;
+	  break;
+	}
+      }
+
+      if (!found){
+	IDLOGERROR("html", "Missing METADATA parameter:" << vname
+		   << " for station:" << ipos << std::endl);
+	status= kvQCFlagTypes::status_original_missing;
+	vars.missing_data= true;
+	// should we really....
+	return false;
+      }
+
+      // add data value
+      vars.pars[j].values[ipos][0].value=  value;
+      vars.pars[j].values[ipos][0].status= status;
+    }
+  }
+  data.push_back(vars);
+  return true;
+}
+#endif

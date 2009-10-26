@@ -1,4 +1,4 @@
-AM_CPPFLAGS = -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib -D_REENTRANT
+AM_CPPFLAGS = -DUSE_KVALOBS_ENV -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib -D_REENTRANT
 
 pkglib_LTLIBRARIES = libkvalobs.la
 

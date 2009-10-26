@@ -52,7 +52,11 @@ InitLogger(int argn, char **argv, const std::string &logname,
 {
     LogLevel     traceLevel=milog::NOTSET;
     LogLevel     logLevel=milog::NOTSET;
+#ifdef SMHI_LOG
+ 	FDLogStream  *fs;
+#else
     FLogStream   *fs;
+#endif
     StdErrStream *trace;
     
 
@@ -84,8 +88,11 @@ InitLogger(int argn, char **argv, const std::string &logname,
     }
     
     try{
+#ifdef SMHI_LOG
+	fs=new FDLogStream(DAY);
+#else
 	fs=new FLogStream(4);
-	
+#endif
 	if(!fs->open(filename.native_file_string())){
 	    std::cerr << "FATAL: Can't initialize the Logging system.\n";
 	    std::cerr << "------ Cant open the Logfile <" << filename.native_file_string() << ">\n";

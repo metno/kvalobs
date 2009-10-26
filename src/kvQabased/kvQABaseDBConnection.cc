@@ -54,12 +54,23 @@ long int kvQABaseDBConnection::qcxinfo_timestamp = 0;
 
 miutil::miTime kvQABaseDBConnection::active_timestamp = miutil::miTime::nowTime();
 
+#ifdef USE_PYTHON
+int kvQABaseDBConnection::script_language = ALL;
+#endif
+
+#ifdef USE_PYTHON
+kvQABaseDBConnection::kvQABaseDBConnection( dnmi::db::Connection *con, const int & script_language_ )
+#else
 kvQABaseDBConnection::kvQABaseDBConnection( dnmi::db::Connection *con )
-    : connection_ok( false )
+#endif
+	: connection_ok( false )
     , connection_( con )
 {
   if ( !con )
     return ;
+#ifdef USE_PYTHON
+  script_language = script_language_;
+#endif
 
   dbGate.set( con );
   connection_ok = true;
@@ -319,7 +330,12 @@ bool kvQABaseDBConnection::getChecks( const int sid,
   slist.push_back( 0 );
   slist.push_back( sid );
 
+#ifdef USE_PYTHON
+  int language = script_language; // The preferred languag in kvalobs.conf
+#else
   int language = 1; // only perl-scripts
+#endif
+
   bool result;
 
   //   if (!dbGate.valid()){
@@ -329,7 +345,18 @@ bool kvQABaseDBConnection::getChecks( const int sid,
 
   try
   {
-    result = dbGate.select( clist, kvQueries::selectChecks( slist, language, otime ) );
+#ifdef USE_PYTHON
+	if (language == ALL)
+	{
+		result = dbGate.select( clist, kvQueries::selectChecks( slist, PYTHON, otime ) );
+		result = dbGate.select( clist, kvQueries::selectChecks( slist, PERL, otime ) );
+	}
+	else
+	{
+		result = dbGate.select( clist, kvQueries::selectChecks( slist, language, otime ) );
+	}
+#endif
+	result = dbGate.select( clist, kvQueries::selectChecks( slist, language, otime ) );
   }
   catch ( dnmi::db::SQLException & ex )
   {

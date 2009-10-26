@@ -52,6 +52,9 @@ class QaBaseApp: public KvApp
   std::string                          dbConnect;
   std::string                          dbDriver;
   std::string                          dbDriverId;
+#ifdef USE_PYTHON
+  int								   script_language;
+#endif
   CKvalObs::CManager::CheckedInput_var refManager;
   bool shutdown_;
   bool                                 orbIsDown;
@@ -65,6 +68,9 @@ class QaBaseApp: public KvApp
   QaBaseApp(int argn, char **argv, 
 	    const std::string &driver_,
 	    const std::string &connect_,
+#ifdef USE_PYTHON
+		const int & script_language_,
+#endif
 	    const char *options[][2]=0);
   virtual ~QaBaseApp();
 
@@ -95,6 +101,13 @@ class QaBaseApp: public KvApp
    */
   bool sendToManager(kvalobs::kvStationInfoList &retList,
 		     CKvalObs::CManager::CheckedInput_ptr callback);
+
+#ifdef USE_PYTHON
+  /**
+   * get the script language
+   */
+  int getScriptLanguage() { return script_language; }
+#endif
 };
 
 

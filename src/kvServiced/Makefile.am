@@ -1,5 +1,5 @@
 #SUBDIRS = test
-AM_CPPFLAGS = -I$(top_srcdir)/src/lib  -I$(top_builddir)/src/lib -I$(top_builddir)/src/lib/kvskel  $(omniORB4_CFLAGS)  $(putools_CFLAGS)  -D_REENTRANT
+AM_CPPFLAGS = -I$(top_srcdir)/src/lib  -I$(top_builddir)/src/lib -I$(top_builddir)/src/lib/kvskel  $(omniORB4_CFLAGS)  $(OpenSSL_CFLAGS) $(putools_CFLAGS)  -D_REENTRANT -DSMHI_LOG -DUSE_OPENSSL
 
 bin_PROGRAMS = kvServiced 
 
@@ -35,5 +35,5 @@ kvServiced_LDADD = $(top_builddir)/src/lib/kvalobs/libkvalobs.la \
                    $(top_builddir)/src/lib/kvskel/libkvadmininterface.la \
                    $(top_builddir)/src/lib/kvskel/libkvskel.la \
                    $(top_builddir)/src/lib/milog/libmilog.la \
-                   $(putools_LIBS) $(omniORB4_LIBS) $(BOOST_THREAD_LIB) \
+                   $(putools_LIBS) $(omniORB4_LIBS) -lomnisslTP4 $(OpenSSL_LIBS) $(BOOST_THREAD_LIB) \
                    -ldl -lm

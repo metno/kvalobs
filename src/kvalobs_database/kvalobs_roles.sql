@@ -19,7 +19,8 @@
 -- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 -- Kvalobs admin role
-CREATE ROLE kv_admin NOLOGIN SUPERUSER;
+-- CREATE ROLE kv_admin NOLOGIN SUPERUSER;
+CREATE ROLE kv_admin NOLOGIN CREATEDB CREATEROLE;
 
 -- Kvalobs read/write/delete
 CREATE ROLE kv_write NOLOGIN;

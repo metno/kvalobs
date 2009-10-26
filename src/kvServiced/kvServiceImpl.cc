@@ -547,7 +547,7 @@ getData(const WhichDataList& whichData,
   	}
    
   	if(whichData[0].stationid==0){
-    	LOGINFO("It is asked for all stations!"  << endl <<
+    	LOGINFO("Data is requested for all stations!"  << endl <<
 	    		  "fromtime: " << miTime(whichData[0].fromObsTime) <<
 	    		  " (" << whichData[0].fromObsTime << ")" << endl <<
 	    		  "totime: "  << miTime(whichData[0].toObsTime) << 

@@ -65,6 +65,15 @@ public:
 		   const kvQABaseScriptManager& sman,// script-manager
 		   std::string& data);               // return data here
 
+#ifdef USE_PYTHON
+  /// return metadata as raw data, language independent
+  bool data_asRaw(const int sid,                    // station-id
+		   const std::string ctype,          // check-type
+		   const miutil::miTime& otime,      // observationtime
+		   const kvQABaseScriptManager& sman,// script-manager
+		   std::list<kvQABase::script_var>& data);               // return data here
+#endif
+
 };
 
 #endif

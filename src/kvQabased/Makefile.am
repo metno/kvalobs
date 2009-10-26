@@ -8,6 +8,7 @@ kvQabased_SOURCES = \
 	kvCronString.cc kvCronString.h \
 	kvMetadataTable.cc kvMetadataTable.h \
 	kvPerlParser.cc kvPerlParser.h \
+	kvPythonInterpreter.cc kvPythonInterpreter.h \
 	kvQABaseDBConnection.cc kvQABaseDBConnection.h \
 	kvQABaseMetadata.cc kvQABaseMetadata.h \
 	kvQABaseMeteodata.cc kvQABaseMeteodata.h \
@@ -28,7 +29,8 @@ kvQabased_CPPFLAGS = \
 	$(BOOST_CPPFLAGS) \
 	$(omniDynamic4_CFLAGS) \
 	$(putools_CFLAGS) \
-	$(perl_CFLAGS)
+	$(perl_CFLAGS)\
+	-I/usr/include/python2.4 -DSMHI_LOG -DUSE_PYTHON -DUSE_OPENSSL
 	
 kvQabased_LDFLAGS = -pthread -export-dynamic	
 kvQabased_LDADD = \
@@ -47,7 +49,9 @@ kvQabased_LDADD = \
 	$(BOOST_REGEX_LIB) \
 	$(BOOST_FILESYSTEM_LIB) \
 	$(omniDynamic4_LIBS) \
+	-lomnisslTP4 $(OpenSSL_LIBS) \
 	$(perl_LIBS) \
+	-L/usr/lib64/python2.4 -lpython2.4 \
 	-ldl
 
 

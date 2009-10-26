@@ -31,6 +31,9 @@
 #include <milog/miloghelper.h>
 #include <milog/FLogStream.h>
 #include <milog/macros.h>
+#ifdef SMHI_LOG
+#include <milog/FDLogStream.h>
+#endif
 
 void
 milog::SetResetDefaultLoggerHelper::
@@ -59,6 +62,36 @@ init(const std::string &logfile,
     	LOGERROR("Cant create a logstream: " << logfile);
   	}
 }
+
+#ifdef SMHI_LOG
+void
+milog::SetResetDefaultLoggerHelper::
+init(const std::string &logfile,
+	 milog::LogLevel loglevel,
+	 const miString & timeFormat, 
+	 const int & nRotate){
+	reset=false;
+	
+  	try{
+    	FDLogStream *logs=new FDLogStream(nRotate, timeFormat);
+    
+    	if(logs->open(logfile.c_str())){
+      		Logger::setDefaultLogger(logs);
+      		
+      		if(loglevel!=milog::NOTSET)
+      			Logger::logger().logLevel(loglevel);
+      			
+      		reset=true;
+    	}else{
+      		LOGERROR("Cant open the logfile <" << logfile << ">!");
+      		delete logs;
+    	}
+  	}
+  	catch(...){
+    	LOGERROR("Cant create a logstream: " << logfile);
+  	}
+}
+#endif
 
 milog::SetResetDefaultLoggerHelper::
 ~SetResetDefaultLoggerHelper(){

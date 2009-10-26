@@ -30,8 +30,13 @@
 */
 #ifndef __initlogger_h__
 #define __initlogger_h__
-
+#ifdef SMHI_LOG
+#include <milog/milog.h>
+#endif
 void
+#ifdef SMHI_LOG
+InitLogger(int argn, char **argv, const std::string &logname, milog::LogLevel * traceLevel_, milog::LogLevel * logLevel_);
+#else
 InitLogger(int argn, char **argv, const std::string &logname);
-
+#endif
 #endif

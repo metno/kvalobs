@@ -127,6 +127,21 @@ private:
     std::string data_asPerl( const kvQABaseScriptManager& sman,     // script manager
                       const kvObsPgmList & oplist );      // obs_pgm
 
+#ifdef USE_PYTHON
+	/**
+     * RAW output
+     *
+     * @throws SkipCheck If the function decides that checks should not be run 
+     * on this data.
+     * @throws std::exception on error in data lookup 
+     * @return data for one parameter-check in kvQABase::script_var format
+    */
+	
+	bool data_asRaw( const kvQABaseScriptManager& sman,                    // active Script-Manager
+                                const kvObsPgmList & oplist,
+								std::list<kvQABase::script_var>& data);                     // obs_pgm
+#endif
+
     typedef std::map<std::string, double> ScriptReturnType;
 
     const DataFromTime & getData()

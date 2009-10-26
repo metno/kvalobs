@@ -77,6 +77,8 @@ PKG_CHECK_MODULES(sqlite3, sqlite3)
 PKG_CHECK_MODULES(libxml2, libxml-2.0)
 PKG_CHECK_MODULES(libxmlpp, libxml++-2.6)
 PKG_CHECK_MODULES(cppunit, cppunit)
+PKG_CHECK_MODULES(OpenSSL, openssl)
+PKG_CHECK_MODULES(glibmm24, glibmm-2.4)
 KV_PERL
 AX_BOOST_BASE
 AX_BOOST_THREAD

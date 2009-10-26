@@ -94,9 +94,14 @@ main(int argc, char** argv)
   //Use postgresql as a last guess.
   if(dbdriver.empty())
     dbdriver="pgdriver.so";
-
+#ifdef SMHI_LOG
+  milog::LogLevel     traceLevel=milog::NOTSET;
+  milog::LogLevel     logLevel=milog::NOTSET;
+   
+  InitLogger(argc, argv, "kvManagerd", &traceLevel, &logLevel);
+#else
   InitLogger(argc, argv, "kvManagerd");
-  
+#endif  
   LOGINFO("check_for_missing_obs=" << (docheckForMissingObs?"true":"false"));
 
   pidfile = KvApp::createPidFileName( "kvManagerd" );
@@ -125,7 +130,10 @@ main(int argc, char** argv)
   if(!app.isOk()){
     return 1;
   }
-
+#ifdef SMHI_LOG
+  app.traceLevel = traceLevel;
+  app.logLevel = logLevel;
+#endif
   app.checkForMissingObs(docheckForMissingObs);
 
   orb=app.getOrb();

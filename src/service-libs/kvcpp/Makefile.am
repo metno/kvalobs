@@ -44,11 +44,13 @@ libkvcpp_la_LIBADD = \
 	
 	
 libkvcpp_la_CPPFLAGS = \
+	-DUSE_OPENSSL \
 	-D_REENTRANT \
 	-I$(top_srcdir)/src/lib \
 	-I$(top_builddir)/src/lib \
 	-I$(top_builddir)/src/lib/kvskel \
 	$(omniORB4_CFLAGS) \
+	$(OpenSSL_CFLAGS) \
 	$(putools_CFLAGS)
 
 

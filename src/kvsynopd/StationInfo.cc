@@ -176,7 +176,11 @@ StationInfo::
 delay(int hour, int &minute, 
       bool &force,  bool &relativToFirst)const
 {
-  	bool         stime=hour%3==0; //Is it a synop time.
+#ifdef USE_KVDATA
+	bool         stime=true; // YE: 09-10-22, all hours must be exported
+#else
+	bool         stime=hour%3==0; //Is it a synop time.
+#endif
   	CITDelayList it=delayList_.begin();
 
   	relativToFirst=false;

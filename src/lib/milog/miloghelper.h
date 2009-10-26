@@ -34,6 +34,12 @@
 #include <sstream>
 #include <milog/Logger.h>
 
+#ifdef SMHI_LOG
+#include <puTools/miString.h>
+
+using namespace miutil;
+#endif
+
 namespace milog {
   /**
    * \addtogroup milog
@@ -311,7 +317,13 @@ namespace milog {
 				   		 milog::LogLevel loglevel=milog::NOTSET,
 	 				                 long  sizeInBytes=1048576, 
 	 										 int nRotate=1);
-			
+#ifdef SMHI_LOG
+						/* new to support FDLogStream */
+			void init(const std::string &logfile,
+				   		 milog::LogLevel loglevel=milog::NOTSET,
+	 				                 const miString & timeFormat = DEFAULT_DAY_FORMAT, 
+	 										 const int & nRotate=DAY);
+#endif
 		public:
 	 		SetResetDefaultLoggerHelper(const std::string &logfile,
 	 											 milog::LogLevel loglevel=milog::NOTSET,
@@ -325,7 +337,22 @@ namespace milog {
 	 											 int   nRotate=1){
 	 				init(logfile, milog::NOTSET, sizeInBytes, nRotate);
 	 		}
-		 											 	
+#ifdef SMHI_LOG
+			/* new to support FDLogStream */
+			
+			SetResetDefaultLoggerHelper(const std::string &logfile,
+	 											 milog::LogLevel loglevel=milog::NOTSET,
+												 const miString & timeFormat = DEFAULT_DAY_FORMAT, 
+												 const int & nRotate=DAY){
+	 				init(logfile, loglevel, timeFormat, nRotate);
+	 		}
+		 	
+		 	SetResetDefaultLoggerHelper(const std::string &logfile,
+				const miString & timeFormat = DEFAULT_DAY_FORMAT, 
+				const int & nRotate=DAY){
+	 				init(logfile, milog::NOTSET, timeFormat, nRotate);
+	 		}
+#endif		 											 	
 	 		~SetResetDefaultLoggerHelper();
 	};
 

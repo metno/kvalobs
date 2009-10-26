@@ -104,6 +104,9 @@
  *
  * 2009-09-23 Bxrge
  * - Ikke la negative verdier for Esss slippe gjennom til SYNOP.
+ *
+ * 2009-10-22 Yngve
+ * Added export in kvdata format.
  */
 
 using namespace std;
@@ -112,7 +115,100 @@ using namespace std;
 
 bool
 Synop::
-doSynop(int           synopno,
+doSynop(int            synopno,
+		    const std::string    &usteder,
+		    int                  listenummer,
+		    std::string          &synop,
+		    StationInfoPtr       info,
+		    SynopDataList        &synopData,
+		    bool                 create_CCA_template
+#ifdef USE_KVDATA
+			,
+			DataEntryList        &data,
+		    bool                 export_as_kvdata
+#endif
+			)
+{
+#ifdef USE_KVDATA
+  if (export_as_kvdata)
+    return exportSynop_int(synopno, usteder,listenummer,synop,info,data);
+  else
+#endif
+    return doSynop_int(synopno, usteder,listenummer,synop,info,synopData,create_CCA_template);
+};
+#ifdef USE_KVDATA
+bool 
+Synop::
+exportSynop_int(int              synopno,
+		    const std::string    &usteder,
+		    int                  listenummer,
+		    std::string          &synop,
+		    StationInfoPtr       info,
+		    DataEntryList        &data)
+{
+  milog::LogContext context("synop");
+    
+  errorMsg.erase();
+
+  StationInfo::TLongList types;
+  StationInfo::RITLongList itt;  
+  DataEntryList::CITDataEntryList dit;
+  DataListEntry::CITDataList it;
+  DataListEntry::TDataList dataList;
+
+  types=info->typepriority();
+  dit=data.begin();
+  
+  /* NOTE: the tbtime is not present in the Data class */
+  miutil::miTime firstObsTime;
+  if(dit!=data.end()){
+     for(; dit!=data.end(); dit++){
+       itt=types.rbegin();
+       for(;itt!=types.rend(); itt++){
+	 dataList=dit->getTypeId(*itt);
+      
+	 if(dataList.empty())
+	   continue;
+	 /* We will only export oneof the termins,
+	  * I hope the following fix will fix this.
+	  * The entries in dataList are ordered by obstime.
+	  */
+	 it=dataList.begin();
+	 if(firstObsTime.undef())
+	   firstObsTime = it->obstime();
+	 for(;it!=dataList.end(); it++){
+	   if (it->obstime() == firstObsTime)
+	     {
+	       ostringstream ost;
+	       ost << it->stationID() << "|" 
+		   << it->obstime() << "|" 
+		   << it->original() << "|" 
+		   << it->paramID() << "|"
+		   << "" << "|"
+		   << it->typeID() << "|" 
+		   << it->sensor() << "|"
+		   << it->level() << "|"
+		   << it->corrected() << "|"
+		   << it->controlinfo() << "|"
+		   << it->useinfo() << "|"
+		   << it->cfailed() << "\n";
+	       synop = synop + ost.str();
+	     }
+	 }
+       } 
+     }
+  }else{
+    errorMsg = "No data in the datalist for the station!";
+    return false;
+  }
+  return true;
+};
+#endif
+
+
+bool
+Synop::
+doSynop_int(int           synopno,
 	const std::string &utsteder,
 	int               listenummer,
 	std::string       &synop,

@@ -162,8 +162,11 @@ DataReceiver::newData(kvservice::KvObsDataListPtr data)
   	toTime=miutil::miTime::nowTime();
   	fromTime=toTime;
   	toTime.addHour(3);
+#ifdef USE_KVDATA
+	fromTime.addDay(-app.getDaysBackInTime());
+#else
   	fromTime.addDay(-3);
-
+#endif
   	LOGINFO("Accepting data in the time interval: " << fromTime << " - " << 
 	  		toTime);
 
@@ -516,7 +519,11 @@ void
 DataReceiver::setDefaultLogger(StationInfoPtr station)
 {
   	try{
+#ifdef SMHI_LOG
+		FDLogStream *logs=new FDLogStream(DAY, DEFAULT_DAY_FORMAT); // One logfile a day
+#else
     	FLogStream *logs=new FLogStream(1, 204800); //200k
+#endif
     	std::ostringstream ost;
     
     	ost << kvPath("localstatedir") << "/log/kvsynop/dr-" 

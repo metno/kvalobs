@@ -48,7 +48,11 @@ InitLogger(int argn, char **argv)
     string       filename;
     LogLevel     traceLevel=milog::NOTSET;
     LogLevel     logLevel=milog::NOTSET;
+#ifdef SMHI_LOG
+ 	FDLogStream  *fs;
+#else
     FLogStream   *fs;
+#endif
     StdErrStream *trace;
 
     filename=kvPath("localstatedir") + "/log/kvDataInputd.log";
@@ -70,7 +74,11 @@ InitLogger(int argn, char **argv)
     }
     
     try{
+#ifdef SMHI_LOG
+ 	   fs=new FDLogStream(DAY);
+#else
        fs=new FLogStream(4);
+#endif
 	
        if(!fs->open(filename)){
           std::cerr << "FATAL: Can't initialize the Logging system.\n";

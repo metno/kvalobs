@@ -39,6 +39,9 @@
 #include <kvdb/dbdrivermgr.h>
 #include <list>
 #include <puTools/miTime>
+#ifdef SMHI_LOG
+#include <milog/milog.h>
+#endif
 #include <boost/thread/mutex.hpp>
 #include <kvskel/kvsynopd.hh>
 #include "kvsynopdImpl.h"
@@ -75,6 +78,10 @@ private:
    std::list<GetData*>     getDataThreads;
    bool                    hasStationWaitingOnCacheReload;
    bool                    acceptAllTimes_;
+#ifdef USE_KVDATA
+   bool                    exportAsKvData_;
+   int                     days_back_in_time_;
+#endif
    kvsynopd::synop_var synopRef;
   
    void readWaitingElementsFromDb();
@@ -85,8 +92,17 @@ public:
         const std::string &confFile_, miutil::conf::ConfSection *conf);
    ~App();
 
- 
+#ifdef SMHI_LOG
+   milog::LogLevel traceLevel_;
+   milog::LogLevel logLevel_;
+#endif
+
    bool acceptAllTimes()const { return acceptAllTimes_;}
+#ifdef USE_KVDATA
+   bool isExportAsKvData()const { return exportAsKvData_;}
+
+   int getDaysBackInTime()const { return days_back_in_time_;}
+#endif
 
    /**
     * \brief Setup and initialize the interface to kvsynopd.

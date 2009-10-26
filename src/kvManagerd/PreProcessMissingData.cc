@@ -63,7 +63,7 @@ PreProcessMissingData::doJob(long                 stationId,
 	      		  typeId);
     	return;
   	}else{
-    	LOGINFO("doJob STARTING typeId:" << typeId << " obstime:"
+    	LOGDEBUG("doJob STARTING typeId:" << typeId << " obstime:"
 	    		<< obstime   << std::endl);
   	}
   	// init database connection
@@ -200,11 +200,11 @@ PreProcessMissingData::doJob(long                 stationId,
       		LOGINFO("Missing " << missingParamCount << " parameters. Should be " 
 	      			<< paramObsPgmCount << " parameters for the station!");
     	}else{
-      		LOGINFO("No missing parameters for the station!");
+      		LOGDEBUG("No missing parameters for the station!");
     	}
   	}else{
-    	LOGINFO("No parameters is expecting for the stations at this time!");
+    	LOGDEBUG("No parameters is expecting for the stations at this time!");
   	}
   
-  	LOGINFO("doJob FINISHED" << std::endl);
+  	LOGDEBUG("doJob FINISHED" << std::endl);
 }

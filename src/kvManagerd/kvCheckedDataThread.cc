@@ -320,7 +320,11 @@ cleanupWorkque()
 
   app.releaseDbConnection(con);
 
-  LOGINFO("Cleaned up workque: errorCount=" << errorCount);
+  if (errorCount > 0) {
+     LOGINFO("Cleaned up work queue: error count=" << errorCount);
+   } else {
+     LOGDEBUG("Cleaned up work queue: no errors");
+   }
 
 }
 

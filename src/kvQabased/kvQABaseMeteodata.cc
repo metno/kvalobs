@@ -306,6 +306,55 @@ kvQABaseMeteodata::data_asPerl( const kvQABaseScriptManager& sman,              
   return ret.str();
 }
 
+#ifdef USE_PYTHON
+// return data for one parameter
+bool
+kvQABaseMeteodata::data_asRaw( const kvQABaseScriptManager& sman,                    // active Script-Manager
+                                const kvObsPgmList & oplist,
+								std::list<kvQABase::script_var>& data)                     // obs_pgm
+{
+  sman.getVariables( kvQABase::obs_data, obs_vars );
+  sman.getVariables( kvQABase::refobs_data, refobs_vars );
+  sman.getVariables( kvQABase::model_data, model_vars );
+
+  // if no data needed - return
+  if ( obs_vars.pars.empty() && refobs_vars.pars.empty() && model_vars.pars.empty() )
+  {
+    IDLOGINFO( "html", "No observation- or model-data needed" );
+    return false;
+  }
+
+  // using observation_program // if normal station:
+  if ( ! oplist.empty() )
+  {
+    // ensure that requested obs.parameters are active in observation_program
+    for ( vector<kvQABase::script_par>::const_iterator itrpa = obs_vars.pars.begin(); itrpa != obs_vars.pars.end(); itrpa++ )
+      if ( itrpa->normal ) {
+        IDLOGINFO( "html", "Checking obs_pgm for par:" << itrpa->name << " nr:" << itrpa->paramid << endl );
+        if ( find_if(oplist.begin(), oplist.end(), kvalobs::inspect::has_paramid(itrpa->paramid)) == oplist.end() )
+          throw SkipCheck(); // parameter inactive or not found in obs_program
+      }
+  }
+
+
+  // Read and put data into script_var structure
+  fillObsVariables( obs_vars );
+  fillObsVariables( refobs_vars );
+  fillModelVariables( model_vars );
+
+  /* put data back in list */
+  /* Check so no empty vars is returned */
+  if (!obs_vars.pars.empty())
+	data.push_back(obs_vars);
+  if (!refobs_vars.pars.empty())
+	data.push_back(refobs_vars);
+  if (!model_vars.pars.empty())
+	data.push_back(model_vars);
+  
+  return true;
+}
+#endif
+
 kvQABaseMeteodata::DataFromTime & kvQABaseMeteodata::preloadData(const kvalobs::kvStationInfo & si)
 {
   if ( obsdata.find( si.stationID() ) == obsdata.end() )

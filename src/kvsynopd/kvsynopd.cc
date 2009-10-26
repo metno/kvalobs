@@ -45,6 +45,7 @@
 //using namespace kvservice;
 using namespace std;
 using namespace miutil;
+using namespace miutil::conf;
 
 int
 main(int argn, char **argv)
@@ -53,7 +54,14 @@ main(int argn, char **argv)
   std::string pidfile;
   std::string confFile;
 
+#ifdef SMHI_LOG
+  milog::LogLevel traceLevel_;
+  milog::LogLevel logLevel_;
+
+  InitLogger(argn, argv, "kvsynopd", &traceLevel_, &logLevel_);     
+#else
   InitLogger(argn, argv, "kvsynopd");
+#endif
 
   confFile = kvPath("sysconfdir")+"/kvsynopd.conf";
   pidfile = dnmi::file::createPidFileName( kvPath("localstatedir") + "/run",
@@ -96,7 +104,20 @@ main(int argn, char **argv)
     }
   }
 
+#ifdef USE_KVDATA
+  //COMMENT: YE: 2009-10-22
+  // If present,start_time gives a hard starting point in time,
+  // else, use app.checkpoint()
+  ValElementList valElem; 
+  
+  valElem=conf->getValue("start_time");
 
+  if(!valElem.empty()){
+    string t=valElem[0].valAsString();
+    
+    if(!t.empty())
+      startTime=miTime(t);
+#else
   //COMMENT:
   //For debugging. At the momment a time spec
   //on the form "YYYY-MM-DD hh:mm:ss" as the first
@@ -116,6 +137,7 @@ main(int argn, char **argv)
     }else{
       startTime.setTime(argv[1]);
     }
+#endif
   }else{
     startTime=app.checkpoint();
     
@@ -153,17 +175,27 @@ main(int argn, char **argv)
   boost::thread synopWorkerThread(synopWorker);
   IDLOGDEBUG("main","Started <SynopWorkerThread>!");
 
+  int hoursback = 48;
+#ifdef USE_KVDATA
+  valElem=conf->getValue("days_back_in_time");
+
+  if(!valElem.empty()){
+    int t=valElem[0].valAsInt();
+    
+    hoursback = t * 24;
+  }
+#endif
   if(!startTime.undef()){
     miTime now(miTime::nowTime());
     
-    now.addHour(-48);
+    now.addHour(-hoursback);
     
     if(startTime<now)
       startTime=now;
     
   }else{
     startTime=miTime::nowTime();
-    startTime.addHour(-48);
+    startTime.addHour(-hoursback);
   }
   
   IDLOGINFO("main","Getting data from kvalobs from time: " << startTime);

@@ -114,7 +114,7 @@ getNewDbConnection()
     return 0;
   }
 
-  LOGINFO("New database connection (" << dbDriverId 
+  LOGDEBUG("New database connection (" << dbDriverId 
        << ") created!");
   return con;
 }
