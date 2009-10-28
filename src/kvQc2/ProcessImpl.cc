@@ -107,34 +107,42 @@ select(ReadProgramOptions params)
      switch (AlgoCode) {
      case 1:
          std::cout << "Case: " << AlgoCode << std::endl;
+         LOGINFO("Case 1: Redistribute");
          //Redistribute(params.UT0, params.UT1, params.tid);
          Redistribute(params);
          break;
      case 2:
          std::cout << "Case: " << AlgoCode << std::endl;
+         LOGINFO("Case 2: Variability");
          Variability(params);
          break;
      case 3:
          std::cout << "Case: " << AlgoCode << std::endl;
+         LOGINFO("Case 3: Process4D");
          Process4D(params);
          break;
      case 4:
          std::cout << "Case: " << AlgoCode << std::endl;
+         LOGINFO("Case 4: ProcessUnitT");
          ProcessUnitT(params);
          break;
      case 5:
          std::cout << "Case: " << AlgoCode << std::endl;
+         LOGINFO("Case 5: Interpolate");
          Interpolate(params);
          break;
      case 6:
          std::cout << "Case: " << AlgoCode << std::endl;
+         LOGINFO("Case 6: ProcessSpaceCheck");
          ProcessSpaceCheck(params);
          break;
      case 7:
          std::cout << "Case: " << AlgoCode << std::endl;
+         LOGINFO("Case 7: Dummy");
          break;
      default:
          std::cout << "No valid Algorithm Code Provided. Case: " << AlgoCode << std::endl;
+         LOGINFO("Case 8: No Valid Code");
          break;
      }
      return(0);
