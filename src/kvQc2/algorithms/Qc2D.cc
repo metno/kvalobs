@@ -348,8 +348,7 @@ calculate_intp_wet_dry(unsigned int index)
  	  //Find index for stations < max_distance km distant
  	  
  	  int imax=0;
-          //float max_distance=100.0;
-          float max_distance=50.0;
+          float max_distance=params.InterpolationLimit;
  	  
  	  for (unsigned int i=0 ; i<original_.size() ; i++) {
  	  	  if (pindex[i].first < max_distance) imax=i;
@@ -395,7 +394,7 @@ calculate_intp_wet_dry(unsigned int index)
             data_point=original_[pindex[i].second];
             if (data_point == -1) data_point = 0; 
             if (imax > 1 && data_point > -1 && pindex[i].first > 0 && 
- 	  	                              controlinfo_[pindex[i].second].flag( 12 ) == 1  ) {
+ 	  	                               CheckFlags.condition(controlinfo_[i],params.Iflag) ) {
 
                    if (lat_[pindex[i].second] >  lat_[index] &&
                        lon_[pindex[i].second] >  lon_[index]) {
@@ -649,6 +648,8 @@ calculate_intp_h(unsigned int index)
           double a, c;
  	  const double radish = 0.01745329251994329509;
 
+          ProcessControl CheckFlags;
+
           int steps;                         
           float rfac;                         
           float TV;
@@ -682,12 +683,10 @@ calculate_intp_h(unsigned int index)
        
  	  sort(pindex.begin(),pindex.end());
  	  	  
- 	  //Find index for stations < 50 km distant ... up to a maximumu of 20 points
  	  
  	  int imax=0;
-          float max_distance=100.0;
-          //float max_distance=50.0;
- 	  
+          float max_distance=params.InterpolationLimit;  	  
+
  	  for (unsigned int i=0 ; i<original_.size() ; i++) {
  	  	  if (pindex[i].first < max_distance) imax=i;
  	  	  }
@@ -714,7 +713,7 @@ calculate_intp_h(unsigned int index)
  
                                                 
  	  	  if (imax > 1 && data_point > -1 && pindex[i].first > 0 && 
- 	  	                              controlinfo_[pindex[i].second].flag( 12 ) == 1  ) {
+ 	  	                               CheckFlags.condition(controlinfo_[i],params.Iflag)  ) {
                           data_point_h = data_point;
 
                           TV=data_point;
@@ -731,12 +730,6 @@ calculate_intp_h(unsigned int index)
                           data_point=TV;
 
 
-                          //if (ht_[pindex[i].second] > 1000.0) {
-                               //data_point = data_point - data_point*( (ht_[pindex[i].second]-1000) / 2000.0);
-                          //}
-                          //if (ht_[pindex[i].second] <= 1000.0) {
-                               //data_point = data_point - data_point*(ht_[pindex[i].second]/1000.0);
-                          //}
  	  	  	  inv_dist += 1.0/(pindex[i].first*pindex[i].first); 
  	  	          weight += data_point/(pindex[i].first*pindex[i].first);
  	  	  }
@@ -1653,7 +1646,7 @@ SampleSemiVariogram(){
                      temp_distance = RADIUS*c;                
                      temp_gamma = 0.5*(original_[index] - original_[i])*(original_[index] - original_[i]);
    
-                     std::cout << "SV: " << temp_distance <<  " " << temp_gamma << std::endl;
+                     //std::cout << "SV: " << temp_distance <<  " " << temp_gamma << std::endl;
    
                      Gamma.push_back( temp_gamma );
                      H.push_back( temp_distance );
