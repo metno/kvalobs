@@ -53,9 +53,14 @@
 
 #include "table_delaunay.h"
 
+
+#include <boost/date_time/gregorian/gregorian.hpp>
+
 using namespace std;
 using namespace miutil;
 using namespace dnmi;
+
+
 
 
 
@@ -434,13 +439,13 @@ calculate_intp_wet_dry(unsigned int index)
           // only interpolate if all surrounding data is all wet
           if (nPP==nPPwet && nPM==nPMwet && nMM==nMMwet && nMP==nMPwet) {
                 DoInt=true; 
-                std::cout << "WET ..." << std::endl;
+                //std::cout << "WET ..." << std::endl;
           }
           
           // ...or dry
           if (nPP==nPPdry && nPM==nPMdry && nMM==nMMdry && nMP==nMPdry) { 
                 DoInt=true; 
-                std::cout << "DRY ..." << std::endl;
+                //std::cout << "DRY ..." << std::endl;
           }
 
           if (mPP != -999.0 && mPM != -999.0) Difs.push_back(fabs(mPP-mPM));
@@ -522,8 +527,8 @@ calculate_intp_wet_dry(unsigned int index)
 
  	  if (inv_dist > 0.0) {
  	     intp_[index] = weight/inv_dist; 
-             std::cout << "RESULTS "<< intp_[index] << " " << original_[index] << std::endl;
-                        std::cout << "Interpolatig ... " << std::endl;
+             //std::cout << "RESULTS "<< intp_[index] << " " << original_[index] << std::endl;
+                        //std::cout << "Interpolatig ... " << std::endl;
               
  	  }  
 }
@@ -1460,11 +1465,9 @@ write_cdf(const std::list<kvalobs::kvStation> & slist)
    
    char dougal[17], zebedee[17];
    
-   int month=obstime_[0].month();      /// Fix this here
-   ///int month=obstime_[0].month();      ***********  Fix this here
-   ///int month=obstime_[0].month();      ***********  Fix this here
-   ///int month=obstime_[0].month();      ***********  Fix this here
-   ///int month=obstime_[0].month();      ***********  Fix this here
+   long JulianDay[NX];
+   //boost::gregorian::date d(2002,2,10);
+   //JulianDay=d.julian_day();
 
 
     for ( std::list<kvalobs::kvStation>::const_iterator it = slist.begin(); it != slist.end(); ++ it )
@@ -1484,6 +1487,9 @@ write_cdf(const std::list<kvalobs::kvStation> & slist)
             Interpolated[counter]=intp_[d];
          	Redistributed[counter]=redis_[d];
          	ConfidenceParameter[counter]=CP_[d];
+
+            boost::gregorian::date xxx(obstime_[d].year(),obstime_[d].month(),obstime_[d].day() );
+            JulianDay[counter]=xxx.julian_day();
          	
             Location[counter][0]=lat_[d];
             Location[counter][1]=lon_[d];
@@ -1537,7 +1543,7 @@ write_cdf(const std::list<kvalobs::kvStation> & slist)
       NcVar *intdata5 = dataFile.add_var("ControlInfo", ncChar,nTime, xDim, nFlag);
       NcVar *intdata6 = dataFile.add_var("UseInfo", ncChar, nTime, xDim, nFlag);
       NcVar *intdata60 = dataFile.add_var("TypeID", ncInt, nTime, xDim);
-      NcVar *intdata7 = dataFile.add_var("Time", ncInt, nTime);   
+      NcVar *intdata7 = dataFile.add_var("Time", ncLong, nTime);   
     
       intdata1->put(&Interpolated[0], 1, NX);
       intdata10->put(&Redistributed[0], 1, NX);
@@ -1548,7 +1554,7 @@ write_cdf(const std::list<kvalobs::kvStation> & slist)
       intdata5->put(&QQ[0][0],1,NX,NF);
       intdata6->put(&UU[0][0],1,NX,NF);   
       intdata60->put(&Cdftypeid[0],1,NX);   
-      intdata7->put(&month,1);
+      intdata7->put(&JulianDay[0],NX);
       
    } else{
    	  
@@ -1590,7 +1596,7 @@ write_cdf(const std::list<kvalobs::kvStation> & slist)
              appdata5->put(&QQ[0][0],1,NX,NF);
              appdata6->put(&UU[0][0],1,NX,NF);   
              appdata60->put(&Cdftypeid[0],1,NX);   
-             appdata7->put(&month,1);           
+             appdata7->put(&JulianDay[0],NX);           
        }
    }
    
