@@ -1465,11 +1465,14 @@ write_cdf(const std::list<kvalobs::kvStation> & slist)
    
    char dougal[17], zebedee[17];
    
-   long JulianDay[NX];
+   long JulianDay;
 
    //boost::gregorian::date d(2002,2,10);
    //JulianDay=d.julian_day();
 
+            //boost::gregorian::date xxx(obstime_[d].year(),obstime_[d].month(),obstime_[d].day() );
+            //JulianDay[counter]=xxx.julian_day();
+            JulianDay=obstime_[0].dayOfYear();
 
     for ( std::list<kvalobs::kvStation>::const_iterator it = slist.begin(); it != slist.end(); ++ it )
     {
@@ -1489,8 +1492,6 @@ write_cdf(const std::list<kvalobs::kvStation> & slist)
          	Redistributed[counter]=redis_[d];
          	ConfidenceParameter[counter]=CP_[d];
 
-            boost::gregorian::date xxx(obstime_[d].year(),obstime_[d].month(),obstime_[d].day() );
-            JulianDay[counter]=xxx.julian_day();
          	
             Location[counter][0]=lat_[d];
             Location[counter][1]=lon_[d];
@@ -1555,7 +1556,7 @@ write_cdf(const std::list<kvalobs::kvStation> & slist)
       intdata5->put(&QQ[0][0],1,NX,NF);
       intdata6->put(&UU[0][0],1,NX,NF);   
       intdata60->put(&Cdftypeid[0],1,NX);   
-      intdata7->put(&JulianDay[0],NX);
+      intdata7->put(&JulianDay,1);
       
    } else{
    	  
@@ -1597,7 +1598,7 @@ write_cdf(const std::list<kvalobs::kvStation> & slist)
              appdata5->put(&QQ[0][0],1,NX,NF);
              appdata6->put(&UU[0][0],1,NX,NF);   
              appdata60->put(&Cdftypeid[0],1,NX);   
-             appdata7->put(&JulianDay[0],NX);           
+             appdata7->put(&JulianDay,1);           
        }
    }
    
