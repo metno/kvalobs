@@ -1466,6 +1466,7 @@ write_cdf(const std::list<kvalobs::kvStation> & slist)
    char dougal[17], zebedee[17];
    
    long JulianDay[NX];
+
    //boost::gregorian::date d(2002,2,10);
    //JulianDay=d.julian_day();
 
