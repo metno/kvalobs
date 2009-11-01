@@ -124,13 +124,21 @@ ProcessUnitT( ReadProgramOptions params )
                              }
                           }
                              if (Tseries.size()==3) {
+                                   std::cout << "---------------------" << std::endl;
+                                   std::cout << "Found an analysis case ... " << std::endl;
                                    LOGINFO("Interpolating data ...");
+                                   std::cout << Tseries[0].stationID() << " " <<  Tseries[1].stationID() << " " << Tseries[2].stationID() << std::endl; 
+                                   std::cout << Tseries[0].obstime() << " " <<  Tseries[1].obstime() << " " << Tseries[2].obstime() << std::endl; 
+                                   std::cout << Tseries[0].original() << " " <<  Tseries[1].original() << " " << Tseries[2].original() << std::endl; 
                                    if (Tseries[0].original() > params.missing && Tseries[1].original()==params.missing && 
                                        Tseries[2].original() > params.missing){
+                                       std::cout << "Checking Other Parameters" << std::endl;
                                        result = dbGate.select(MaxT, kvQueries::selectData(id->stationID(),215,YTime,YTime));
                                        result = dbGate.select(MinT, kvQueries::selectData(id->stationID(),213,YTime,YTime));
+                                       std::cout <<  MaxT.size() << " " << MinT.size() << std::endl;
                                        if (MaxT.size()==1 && MinT.size()==1){
 
+                                               std::cout <<  MaxT.begin()->original() << " " << MinT.begin()->original() << std::endl;
                                                LinInterpolated=0.5*(Tseries[0].original()+Tseries[2].original());
                                                TanTaxInterpolated=0.5*(MinT.begin()->original()+MaxT.begin()->original());
 
@@ -148,31 +156,35 @@ ProcessUnitT( ReadProgramOptions params )
 
                       try {
                              /// Update if correction is out of TAN TAX range!
-                             if ( Tseries[1].corrected() <  MinT.begin()->original() || Tseries[1].corrected() >  MaxT.begin()->original() ) {  
+                             if ( Tseries[1].corrected() <  MinT.begin()->original() || Tseries[1].corrected() >  MaxT.begin()->original() ) 
+                            {  
                              //Set data structure to write to the database
-                                   kvData d;                                                   
-                                   d.set(Tseries[1].stationID(),
-                                         Tseries[1].obstime(),
-                                         Tseries[1].original(),
-                                         Tseries[1].paramID(),
-                                         Tseries[1].tbtime(),
-                                         Tseries[1].typeID(),
-                                         Tseries[1].sensor(),
-                                         Tseries[1].level(),
-                                         TanTaxInterpolated,                                                           
-                                         fixflags,
-                                         Tseries[1].useinfo(),
-                                         Tseries[1].cfailed()+" Qc2 UnitT corrected was:"+StrmConvert(Tseries[1].corrected()) );
+                                if ( CheckFlags.condition(id->controlinfo(),params.Wflag) )  {
+                                        std::cout << "W-flag-Passed" << std::endl;
+                                        kvData d;                                                   
+                                        d.set(Tseries[1].stationID(),
+                                              Tseries[1].obstime(),
+                                              Tseries[1].original(),
+                                              Tseries[1].paramID(),
+                                              Tseries[1].tbtime(),
+                                              Tseries[1].typeID(),
+                                              Tseries[1].sensor(),
+                                              Tseries[1].level(),
+                                              TanTaxInterpolated,                                                           
+                                              fixflags,
+                                              Tseries[1].useinfo(),
+                                              Tseries[1].cfailed()+" Qc2 UnitT corrected was:"+StrmConvert(Tseries[1].corrected()) );
                              // Set use info corresponding to controlinfo
-                                   kvUseInfo ui = d.useinfo();
-                                   ui.setUseFlags( d.controlinfo() );
-                                   d.useinfo( ui );   
+                                        kvUseInfo ui = d.useinfo();
+                                        ui.setUseFlags( d.controlinfo() );
+                                        d.useinfo( ui );   
                              // write the data back
-                                   std::cout << "This data to be written back to db ... " << std::endl; 
-                                   dbGate.insert( d, "data", true); 
+                                        std::cout << "This data to be written back to db ... " << std::endl; 
+                                        dbGate.insert( d, "data", true); 
                              // fill structure to inform the serviced
-                                   kvalobs::kvStationInfo::kvStationInfo DataToWrite(id->stationID(),id->obstime(),id->paramID());
-                                   stList.push_back(DataToWrite);
+                                        kvalobs::kvStationInfo::kvStationInfo DataToWrite(id->stationID(),id->obstime(),id->paramID());
+                                        stList.push_back(DataToWrite);
+                                   }
                               }
                        }
                           catch ( dnmi::db::SQLException & ex ) {
