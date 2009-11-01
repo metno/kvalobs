@@ -117,6 +117,7 @@ ProcessUnitT( ReadProgramOptions params )
               }
               if(!Qc2Data.empty()) {
                    for (std::list<kvalobs::kvData>::const_iterator id = Qc2Data.begin(); id != Qc2Data.end(); ++id) {
+                          Tseries.clear();   /// or is it better here ??? YES YES YES
                           result = dbGate.select(Qc2SeriesData, kvQueries::selectData(id->stationID(),pid,XTime,YTime));
                           for (std::list<kvalobs::kvData>::const_iterator is = Qc2SeriesData.begin(); is != Qc2SeriesData.end(); ++is) {
                              if  ( !CheckFlags.condition(is->controlinfo(),params.Aflag) ) { /// If one or more of the analysis flags are set then will not process further! 
@@ -124,21 +125,21 @@ ProcessUnitT( ReadProgramOptions params )
                              }
                           }
                              if (Tseries.size()==3) {
-                                   std::cout << "---------------------" << std::endl;
-                                   std::cout << "Found an analysis case ... " << std::endl;
+                                   //std::cout << "---------------------" << std::endl;
+                                   //std::cout << "Found an analysis case ... " << std::endl;
                                    LOGINFO("Interpolating data ...");
-                                   std::cout << Tseries[0].stationID() << " " <<  Tseries[1].stationID() << " " << Tseries[2].stationID() << std::endl; 
-                                   std::cout << Tseries[0].obstime() << " " <<  Tseries[1].obstime() << " " << Tseries[2].obstime() << std::endl; 
-                                   std::cout << Tseries[0].original() << " " <<  Tseries[1].original() << " " << Tseries[2].original() << std::endl; 
+                                   //std::cout << Tseries[0].stationID() << " " <<  Tseries[1].stationID() << " " << Tseries[2].stationID() << std::endl; 
+                                   //std::cout << Tseries[0].obstime() << " " <<  Tseries[1].obstime() << " " << Tseries[2].obstime() << std::endl; 
+                                   //std::cout << Tseries[0].original() << " " <<  Tseries[1].original() << " " << Tseries[2].original() << std::endl; 
                                    if (Tseries[0].original() > params.missing && Tseries[1].original()==params.missing && 
                                        Tseries[2].original() > params.missing){
-                                       std::cout << "Checking Other Parameters" << std::endl;
+                                       //std::cout << "Checking Other Parameters" << std::endl;
                                        result = dbGate.select(MaxT, kvQueries::selectData(id->stationID(),215,YTime,YTime));
                                        result = dbGate.select(MinT, kvQueries::selectData(id->stationID(),213,YTime,YTime));
-                                       std::cout <<  MaxT.size() << " " << MinT.size() << std::endl;
+                                       //std::cout <<  MaxT.size() << " " << MinT.size() << std::endl;
                                        if (MaxT.size()==1 && MinT.size()==1){
 
-                                               std::cout <<  MaxT.begin()->original() << " " << MinT.begin()->original() << std::endl;
+                                               //std::cout <<  MaxT.begin()->original() << " " << MinT.begin()->original() << std::endl;
                                                LinInterpolated=0.5*(Tseries[0].original()+Tseries[2].original());
                                                TanTaxInterpolated=0.5*(MinT.begin()->original()+MaxT.begin()->original());
 
@@ -159,8 +160,11 @@ ProcessUnitT( ReadProgramOptions params )
                              if ( Tseries[1].corrected() <  MinT.begin()->original() || Tseries[1].corrected() >  MaxT.begin()->original() ) 
                             {  
                              //Set data structure to write to the database
-                                if ( CheckFlags.condition(id->controlinfo(),params.Wflag) )  {
-                                        std::cout << "W-flag-Passed" << std::endl;
+                             /// REMOVE ALL THE CONTROLS
+                                //if ( CheckFlags.condition(id->controlinfo(),params.Wflag) )  {  /// WFLAG needs putting back in
+                                /// and a control in the configuration file to turn totally on or off!!!!
+                                 {
+                                        //std::cout << "W-flag-Passed" << std::endl;
                                         kvData d;                                                   
                                         d.set(Tseries[1].stationID(),
                                               Tseries[1].obstime(),
@@ -179,13 +183,14 @@ ProcessUnitT( ReadProgramOptions params )
                                         ui.setUseFlags( d.controlinfo() );
                                         d.useinfo( ui );   
                              // write the data back
-                                        std::cout << "This data to be written back to db ... " << std::endl; 
+                                        //std::cout << "This data to be written back to db ... " << std::endl; 
                                         dbGate.insert( d, "data", true); 
                              // fill structure to inform the serviced
                                         kvalobs::kvStationInfo::kvStationInfo DataToWrite(id->stationID(),id->obstime(),id->paramID());
                                         stList.push_back(DataToWrite);
                                    }
                               }
+                              //Tseries.clear();  /// This may be better here than at the bottom ... check later
                        }
                           catch ( dnmi::db::SQLException & ex ) {
                             IDLOGERROR( "html", "Exception: " << ex.what() << std::endl );
@@ -204,7 +209,7 @@ ProcessUnitT( ReadProgramOptions params )
                              }
                           }
                    }
-                Tseries.clear();
+                //Tseries.clear();
   ProcessTime.addHour(-1);
   }
 return 0;
