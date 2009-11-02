@@ -359,7 +359,10 @@ namespace{
     ConfSection *conf;
     ifstream   fis;
  
-    conffile=kvPath("sysconfdir")+"/" + KvApp::getConfFile();
+    conffile = KvApp::getConfFile();
+
+    if( !conffile.empty() && conffile[0] != '/' )
+    	conffile=kvPath("sysconfdir")+"/" + KvApp::getConfFile();
 
     fis.open(conffile.c_str());
 
