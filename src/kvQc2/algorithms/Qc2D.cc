@@ -1725,18 +1725,27 @@ SpaceCheck(){
  	  	  }
                  //std::cout << original_[index] <<  " " << intp_[index]  << std::endl;
  	         for (int i=1 ; i<imax+1 ; i++) {  //NB i=0 corresponds to the station for which we do an interpolation
-                       TheNeighbours[ index ].push_back( original_[pindex[i].second] );
+                       
+ 	               data_point=original_[pindex[i].second];
+                       if (params.pid==110 && data_point==-1) {
+                           data_point=0; 
+                       }
+                       if (data_point != params.missing){
+                           TheNeighbours[ index ].push_back( data_point );
+                       }
                        //std::cout<<stid_[index]<<" "<<stid_[pindex[i].second]<<" "<<pindex[i].first<<" "<<original_[pindex[i].second]<<std::endl;
                  }
-                 computeStats(TheNeighbours[index].begin( ), TheNeighbours[index].end( ), sum, mean, var, dev, skew, kurt);
-                 //std::cout << sum << " " <<  mean << " " << var << " " << dev << " " << skew << " " <<  kurt <<std::endl;
+                 //if (TheNeighbours[index].size() > 0 && TheNeighbours.size < 5) { /// Ole Einar once told me that never use mor ethan Nx neighbours
+                 ///may want to add this sometime ... but not in this way ...w
+                 if (TheNeighbours[index].size() > 0) {
+                      computeStats(TheNeighbours[index].begin( ), TheNeighbours[index].end( ), sum, mean, var, dev, skew, kurt);
+                      //std::cout << sum << " " <<  mean << " " << var << " " << dev << " " << skew << " " <<  kurt <<std::endl;
 
-                 std::cout << "Useinfo: " << useinfo_[index] << std::endl;
-                 std::cout << "Original: " << original_[index] << std::endl;
-                 std::cout << "Neighbour mean: " << mean << " +/- " << dev << std::endl;
+                      std::cout << "Useinfo: " << useinfo_[index] << " Original: " << original_[index] << 
+                                  " Neighbour mean: " << mean << " +/- " << dev << std::endl;
+                 }
 
-                 std::cout << "-------------------------------------------------" << std::endl;
-                 sleep(1);
+                 //sleep(1);
                  pindex.clear();
           }
        

@@ -87,7 +87,7 @@ ProcessSpaceCheck( ReadProgramOptions params )
 /// Make time step completely arbitrary etc ...................... TODO
   while (ProcessTime <= etime) {
 
-     std::cout << "Time Stamp: " << ProcessTime << std::endl;
+     //std::cout << "Time Stamp: " << ProcessTime << std::endl;
 
              try {
               result = dbGate.select(Qc2Data, kvQueries::selectData(StationIds,pid,ProcessTime,ProcessTime));
@@ -105,7 +105,8 @@ ProcessSpaceCheck( ReadProgramOptions params )
                 GSW.Qc2_interp(); 
                 GSW.SpaceCheck();
        }
-       ProcessTime.addDay();
+       ProcessTime.addHour();  /// Eventually drive this from the configuration file !!!!
+       //ProcessTime.addDay();
      }
 return 0;
 }
