@@ -28,15 +28,17 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+#include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
 #include <getopt.h>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <stdio.h>
 #include <dnmithread/mtcout.h>
 #include <kvskel/datasource.hh>
-#include <puTools/miTime>
+//#include <puTools/miTime>
 #include <kvalobs/kvapp.h>
 
 using namespace CKvalObs::CDataSource;
@@ -55,8 +57,9 @@ use(bool exit=true);
 
 int main(int argc, char** argv)
 {
-  	CORBA::ORB_ptr          orb;  
-  	PortableServer::POA_ptr poa;
+	CORBA::ORB_ptr          orb;
+	PortableServer::POA_ptr poa;
+  	string            optDecoder;
   	string            decoder;
   	string            file;
   	string            content;
@@ -65,6 +68,20 @@ int main(int argc, char** argv)
   	CORBA::Object_var refObject;
   	Data_var          refData;
   	char              ch;
+  	bool              verbose=false;
+  	string            confile;
+  	string            cwDir;
+  	bool ok;
+
+
+	char buf[512];
+
+	if( getcwd( buf, 512 ) ) {
+		cwDir = buf;
+
+		if( cwDir[cwDir.length()-1] != '/' )
+			cwDir += "/";
+	}
 
 	//Check if the argument list contain --help. 
 	//If so print our help text, but don't exit. 
@@ -83,41 +100,40 @@ int main(int argc, char** argv)
 		}
 	}
 
-  	KvApp app(argc, argv);
+	KvApp::setConfFile( "kvdataclt.conf");
 
-  	orb=app.getOrb();
-  	poa=app.getPoa();
+	opterr=0; //dont print to standard error.
 
-  	opterr=0; //dont print to standard error.
-
-  	while((ch=getopt(argc, argv,"d:s:h"))!=-1){
-    	switch(ch){
+  	while((ch=getopt(argc, argv,"c:d:s:hv"))!=-1){
+  		switch(ch){
+  		case 'c':
+  			confile = optarg;
+  			break;
     	case 'd':
-      	decoder=optarg;
-      	break;
+    		decoder=optarg;
+    		break;
     	case 'h':
-      	use();
-      	break;
+    		use();
+    		break;
     	case 's':
     		kvserver=optarg;
     		break;
+    	case 'v':
+    		verbose=true;
+    		break;
     	case '?':
-      	cout << "Unknown option -" << static_cast<char>(optopt) << endl;
-      	use();
-      	break;
+    		cout << "Unknown option -" << static_cast<char>(optopt) << endl;
+    		use();
+    		break;
     	case ':':
-      	cout << "Option -: " << optopt << " missing argument!" << endl;
-      	use();
-      	break;
+    		cout << "Option -: " << optopt << " missing argument!" << endl;
+    		use();
+    		break;
     	}
   	}
-  
-  	if(kvserver.empty())
-  		kvserver=app.kvserver();
 
-	cout << "Sending data to the kvalobs server: " << kvserver << endl;
 
-  	if(decoder.empty()){
+ 	if( ! optDecoder.empty() && verbose ) {
     	cerr << "Missing -d decoder\n\n";
     	cerr << "Assume the first line in the file specifies the decoder!\n\n";
   	}
@@ -125,56 +141,88 @@ int main(int argc, char** argv)
   	if(optind<argc)
     	file=argv[optind];
   	else{
-    	cout << "Missing filename!" << endl;
+    	cerr << "Missing filename!" << endl;
     	use();
     	return 1;
   	}
-  
-  	if(!readFile(file, content, decoder)){
-    	cout << "Cant read file <" << file << ">!\n\n";
-    	return 1;
+
+  	if( ! confile.empty() ) {
+  		if( confile[0] != '/' )
+  			confile = cwDir + confile;
+  	} else if( confile.empty() ) {
+  		confile = cwDir + ".kvdataclt";
+  		struct stat sbuf;
+
+  		if( stat( confile.c_str(), &sbuf ) < 0 )
+  			confile.erase();
   	}
+  
+  	if( confile.empty() )
+  		confile = "kvdataclt.conf";
+
+	KvApp::setConfFile( confile );
+
+  	KvApp app(argc, argv);
+
+  	orb=app.getOrb();
+  	poa=app.getPoa();
+
+
+  	if( kvserver.empty() )
+  		kvserver=app.kvserver();
+
+  	cout << "Sending data to:  " << kvserver << endl;
+
+
+  	if(!readFile(file, content, decoder))
+    	return 1;
 
 	try {
- 		refObject=app.getRefInNS("kvinput", kvserver);
+		refObject=app.getRefInNS("kvinput", kvserver);
     	refData=Data::_narrow(refObject);
     
     	if(CORBA::is_nil(refData)){
-      	CERR("Can't find <kvinput>\n");
-      	return 1;
+    		CERR("Can't find <kvinput>\n");
+    		return 1;
     	}
    
-    	cout << "Sending observation to kvDataInput!" << endl
-	 		  << "decoder: " << decoder << endl
-	 		  << "Observation: " << content << endl << endl;
- 
-    	res=refData->newData(content.c_str(), decoder.c_str());
-    
-    	switch(res->res){
-    	case OK:
-      	cout << "OK!\n";
-      	break;
-    	case NODECODER:
-      	cout << "NODECODER: " << res->message << endl;
-      	break;
-    	case DECODEERROR:
-      	cout << "DECODEERROR: " << res->message << endl;
-      	break;
-    	case NOTSAVED:
-      	cout << "NOTSAVED: " << res->message << endl;
-      	break;
-    	case ERROR:
-      	cout << "ERROR: " << res->message << endl;
-      	break;
+    	if( verbose ) {
+    		cerr << "Sending observation to kvDataInput!" << endl
+                 << "decoder: " << decoder << endl
+	 		     << "Observation: " << content << endl << endl;
     	}
 
-      cout << res->message;
+    	res=refData->newData(content.c_str(), decoder.c_str());
+    
+    	ok = false;
+
+    	switch(res->res){
+    	case OK:
+    		cout << "OK";
+    		if( verbose )
+    	    	cout << ": " << res->message;
+    		cout << endl;
+    		ok=true;
+    		break;
+    	case NODECODER:
+    		cout << "NODECODER: " << res->message << endl;
+    		break;
+    	case DECODEERROR:
+    		cout << "DECODEERROR: " << res->message << endl;
+    		break;
+    	case NOTSAVED:
+    		cout << "NOTSAVED: " << res->message << endl;
+    		break;
+    	case ERROR:
+    		cout << "ERROR: " << res->message << endl;
+    		break;
+    	}
 
     	orb->destroy();
   	}
   	catch(CORBA::COMM_FAILURE& ex) {
     	cerr << "Caught system exception COMM_FAILURE -- unable to contact the "
-      	  << "object." << endl;
+      	     << "object." << endl;
   	}
   	catch(CORBA::SystemException&) {
     	cerr << "Caught a CORBA::SystemException." << endl;
@@ -183,7 +231,7 @@ int main(int argc, char** argv)
     	cerr << "Caught CORBA::Exception." << endl;
   	}
   	catch(omniORB::fatalException& fe) {
-   	cerr << "Caught omniORB::fatalException:" << endl;
+  		cerr << "Caught omniORB::fatalException:" << endl;
     	cerr << "  file: " << fe.file() << endl;
     	cerr << "  line: " << fe.line() << endl;
     	cerr << "  mesg: " << fe.errmsg() << endl;
@@ -192,7 +240,7 @@ int main(int argc, char** argv)
     	cerr << "Caught unknown exception." << endl;
   	}
 
-  	if(res->res==OK)
+  	if( ok )
     	return 0;
   	else
     	return 1;
@@ -200,26 +248,32 @@ int main(int argc, char** argv)
 
 bool
 readFile(const std::string &file, 
-	 std::string &content, std::string &decoder)
+		 std::string &content,
+		 std::string &decoder)
 {
 	ifstream      fist(file.c_str());
-   ostringstream ost;
-   string        data;
+	ostringstream ost;
+	string        data;
 
-   if(!fist){
-   	return false;
-   }
+	if(!fist) {
+		cerr << "Cant open file: " << file << endl;
+		return false;
+	}
 
- 	if(decoder.empty())
+	decoder.erase();
+	content.erase();
+
+ 	while( decoder.empty() )
   		getline(fist, decoder);
   
-  	while(getline(fist, data)){
-   	ost << data << endl;
-  	}
+  	while(getline(fist, data))
+  		ost << data << endl;
+
 	
-   if(!fist.eof()){
-		fist.close();
-		return false;
+   if( !fist.eof() ) {
+	   cerr << "Cant read file: " << file << endl;
+	   fist.close();
+	   return false;
    }
 
    fist.close();
