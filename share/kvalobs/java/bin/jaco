@@ -7,7 +7,7 @@
 
 # ... but we have to refer to the JRE only!
 
-if  which kvconfig > /dev/null &>1; then
+if  which kvconfig > /dev/null 2>&1; then
     KVCONFIG=kvconfig
 fi
 
