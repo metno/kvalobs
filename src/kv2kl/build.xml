@@ -55,6 +55,7 @@
 		<delete dir="${tmpdir}"/>
 		<delete file="kl2kv.jar"/>
 		<delete file="kv2kl.jar"/>
+		<delete file="kv2klnew.jar"/>
 		<delete file="kv-dist.tar"/>
 	</target>
 	
@@ -78,6 +79,17 @@
 			</fileset>
 		</jar>
 		<copy todir="${libdir}" file="kl2kv.jar"/>
+	</target>
+
+	<target name="kl2kvnew" depends="init, compile">
+		<jar destfile="kl2kvnew.jar" manifest="kl2kvnew.manifest" >
+			<fileset dir="${builddir}">
+				<include name="**/kl/**/*.class"/>
+				<include name="**/kl2kvnew/**/*.class"/>
+				<exclude name="**/*Test.class"/>
+			</fileset>
+		</jar>
+		<copy todir="${libdir}" file="kl2kvnew.jar"/>
 	</target>
 
 	<target name="kv2klgetdata" depends="init, compile">
