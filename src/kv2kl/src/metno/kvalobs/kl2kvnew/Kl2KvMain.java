@@ -39,7 +39,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import metno.kvalobs.kl.KlApp;
+import metno.kvalobs.kl.*;
 import metno.kvalobs.kv2kl.Kv2KlMain;
 import metno.util.GetOpt;
 import metno.util.MiGMTTime;
@@ -83,9 +83,11 @@ public class Kl2KvMain {
     	String typeid=null;
     	boolean error=false;
     	
-    	KvalobsDataXml xml = new KvalobsDataXml();
+    	Kv2KvDataXml xml = new Kv2KvDataXml();
     	
-    	xml.getXML();
+    	KvDataContainer dataContainer=new KvDataContainer( false );
+    	
+    	xml.getXML( dataContainer, false, false );
     	
     	System.exit(0);
     	
