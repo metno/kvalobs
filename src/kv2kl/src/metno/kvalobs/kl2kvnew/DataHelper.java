@@ -34,7 +34,8 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import metno.kvalobs.kl.KlApp;
+import java.util.*;
+import metno.kvalobs.kl.*;
 import metno.util.MiGMTTime;
 import org.apache.log4j.Logger;
 
@@ -81,6 +82,7 @@ public class DataHelper{
 	String tablename="KL2KVALOBS";
 	String typeid;
     String params;
+    List<TimeRange> obstimes;
     DataToKv dataToKv;
     DbConnection  con;
     int           msgCount;
@@ -116,12 +118,12 @@ public class DataHelper{
     
     public DataHelper(DbConnection con, DataToKv dataToKv,  
 	                   String typeid){
-    	this(con, dataToKv, typeid, null, 20);
+    	this(con, dataToKv, typeid, null, null, 20);
     }
     
     public DataHelper(DbConnection con, DataToKv dataToKv,  
-                       String typeid, String table){
-    	this(con, dataToKv, typeid, table, 20);
+                       String typeid, List<TimeRange> obstimes, String table){
+    	this(con, dataToKv, typeid, obstimes, table, 20);
     }
     
     /**
@@ -135,7 +137,7 @@ public class DataHelper{
      *        split up in max_count chuncks. 
      */
     public DataHelper(DbConnection con, DataToKv dataToKv,  
-    		           String typeid, String table, int max_count){
+    		           String typeid, List<TimeRange> obstimes, String table, int max_count){
     	params=null;
     	msgCount=0;
     	obsCount=0;
@@ -151,17 +153,25 @@ public class DataHelper{
     	this.typeid=typeid;
     	this.dataToKv=dataToKv;
     	this.con=con;
+    	this.obstimes = obstimes;
     }
     
-    protected String createQuery(Station st){
+    protected String createQuery(Station st, TimeRange obstime ){
     	String query=st.query();
     	
     	if(query.length()>0)
     		query=" AND "+query;
     	
-   		return "Select * from "+ getTable()+
-    				" where typeid="+getTypeid()+ query+
-    				" order by stnr,dato";
+    	if( obstime != null ) {
+    		if( obstime.isEqual() ) 
+    			query += " AND obstime='" + obstime.getFrom() +"'";
+    		else 
+    			query += " AND obstime<='" + obstime.getFrom() +"' AND obstime<='" + obstime.getTo()+"'";
+    	}
+    	
+   		return "SELECT * FROM "+ getTable()+
+    				" WHERE typeid="+getTypeid() + query;
+    				//" order by stnr,dato";
     }
 
     /**
@@ -230,144 +240,11 @@ public class DataHelper{
      */
     protected boolean convertToKvDataAndSend(java.sql.ResultSet rs){
     	try{
-    		ResultSetMetaData md=rs.getMetaData();
-    		int nColumns=md.getColumnCount();
-    		int stationid=-1;
-    		int prevStationid=-1;
     		int count=0;
-    		boolean hasData;
-    		String tmp;
-    		String data=createParams(md)+"\n";
-    		String tmpData=null;
-    		Timestamp tsobstime;
-    		MiGMTTime obstime;
-    		String RR24;
-    		String cinfo_RR24;
-    		String uinfo_RR24;
+    		String data;
     		
-    		while(rs.next()){
-    			
-    			stationid =  rs.getInt(1);
-
-    			if((stationid!=prevStationid && prevStationid!=-1 && count>0) ||
-    			    count>=MAX_COUNT){
-    				System.out.println("DEBUG:"+prevStationid+"("+getTypeid()+") ["+
-                                       data+"]");
-    				if(!dataToKv.sendData(data, prevStationid, 
-    				                     Integer.parseInt(getTypeid()))){
-    					System.out.println("Cant send data to kvalobs!");
-    					return false;
-    				}
-    				msgCount++;
-    				data=getParams()+"\n";
-    				count=0;
-    			}
-
-    			
-    			prevStationid=stationid;
-    			hasData=false;
-    			
-    			tsobstime=rs.getTimestamp(2);
-    			
-    			if(rs.wasNull()){
-    				logger.error("No timestamp given (SQL NULL)!");
-    				continue;
-    			}
-    			
-    			obstime=new MiGMTTime(tsobstime);
-    			tmpData=obstime.toString(MiGMTTime.FMT_COMPACT_TIMESTAMP_1);
-
-    			hasData=false;
-    			RR24="";
-    			cinfo_RR24="";
-    			uinfo_RR24="";
-    			int i;
-    			boolean missing=false;
-    			
-    			for (i = 4; i<=nColumns; i++) {
-    				if(ignore(md.getColumnName(i)))
-    					continue;
-
-    				if(md.getColumnName(i).equalsIgnoreCase("RR_24")){
-    					RR24=rs.getString(i);
-    					
-    					if(rs.wasNull())
-    						RR24="";
-    					else{
-    						float f=Float.parseFloat(RR24);
-    						
-    						if(floatIsEq(f, MISSING_VAL)){
-    							missing=true;
-    						}
-    					}
-    				}else if(md.getColumnName(i).equalsIgnoreCase("CONTROLINFO")){
-    					cinfo_RR24=rs.getString(i);
-    					
-    					if(rs.wasNull() || cinfo_RR24.length()!=16){
-    						if(missing)
-    							cinfo_RR24="0000003000000000";
-    						else
-    							cinfo_RR24="";
-    					}else{
-    						if(missing){
-   								char buf[]=cinfo_RR24.toCharArray();
-    							
-   								if(buf.length!=16){
-   									logger.warn("controlinfo (RR_24). Wrong size '"+buf.length+"' expected length 16.");
-   									cinfo_RR24=null;
-   								}else{
-   									buf[6]='3';
-   									cinfo_RR24=new String(buf);
-   								}
-    						}
-    					}
-    				}else if(md.getColumnName(i).equalsIgnoreCase("USEINFO")){
-    					uinfo_RR24=rs.getString(i);
-    					
-    					if(rs.wasNull())
-    						uinfo_RR24="";
-    				}else{
-    					tmp=rs.getString(i);
-		        				
-    					if(rs.wasNull()){
-    						tmp="";
-    					}else if(tmp.length()>0){
-    						try {
-								float f=Float.parseFloat(tmp);
-			
-								if(floatIsEq(f, MISSING_VAL))
-										tmp=tmp+"(0000003000000000,)";
-							} catch (NumberFormatException e) {
-								logger.debug("NumberFormatException: '"+tmp+ "' Not a number (Float)");
-							}
-    					}
-    					
-    					tmpData+=","+tmp;
-
-						if(tmp.length()>0)
-							hasData=true;
-    				}
-    			}
-
-                if(i>4){
-                	tmpData+=",";
-                	if(RR24.length()>0){
-                		tmpData+=RR24+"("+cinfo_RR24+","+uinfo_RR24+")";
-                		hasData=true;
-                	}
-   				}
-    			
-    			if(hasData){
-    				data+=tmpData+"\n";
-    				count++;
-    				obsCount++;
-    			}else{
-        			System.out.println("NODATA: "+stationid+" ("+getTypeid()+") obstime: "+rs.getString(2));
-        		}
-    		}
-	    
     		if(count>0){
-    			System.out.println(stationid+"("+getTypeid()+") ["+
+    			System.out.println( "Send til kvalobs ["+
     							   data+"]");
     			if(!dataToKv.sendData(data, stationid, 
 				   Integer.parseInt(getTypeid()))){
@@ -386,22 +263,8 @@ public class DataHelper{
     	}
     }
     
-    public boolean sendDataToKv(Station station){
-    	System.out.println("Running for typeid: " + typeid);
-    	System.out.println("table:       " + tablename);
-    	System.out.println("Station(s): "+station);
-
-    	logger.info("Running for typeid: " + typeid);
-    	logger.info("table:       " + tablename);
-    	logger.info("Station(s):  " + station);
-    	
-    	if(con==null){
-    		System.out.println("No valid (null) connection to the db!");
-     	    logger.error("No valid (null) connection to the db!");
-     	    return false;
-    	}
-    	
-    	String query=createQuery(station);
+    boolean doSendDataToKv(Station station, TimeRange obstime) {
+    	String query=createQuery( station, obstime );
     	
     	System.out.println("Query:[" + query +"]");
 
@@ -427,11 +290,36 @@ public class DataHelper{
 
     	    return false;
     	}
-    	    
            
-    	boolean res=convertToKvDataAndSend(rs);
+    	return convertToKvDataAndSend(rs);
+    }
+    
+    public boolean sendDataToKv(Station station){
+    	boolean ret=true;
+    	System.out.println("Running for typeid: " + typeid);
+    	System.out.println("table:       " + tablename);
+    	System.out.println("Station(s): "+station);
 
-    	return res;
+    	logger.info("Running for typeid: " + typeid);
+    	logger.info("table:       " + tablename);
+    	logger.info("Station(s):  " + station);
+    	
+    	if(con==null){
+    		System.out.println("No valid (null) connection to the db!");
+     	    logger.error("No valid (null) connection to the db!");
+     	    return false;
+    	}
+    
+    	if( obstimes == null ) 
+    		return doSendDataToKv( station, null );
+    	  
+
+    	for( TimeRange obstime : obstimes ) {
+    		if( ! doSendDataToKv( station, obstime ) )
+    			ret = false;
+    	}
+    	
+    	return ret;
     }
     
     public int getObsCount(){ return obsCount; }

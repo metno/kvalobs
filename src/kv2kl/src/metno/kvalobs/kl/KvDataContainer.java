@@ -8,7 +8,6 @@ import java.util.*;
 import metno.util.MiGMTTime;
 
 public class KvDataContainer {
-	boolean overwrite;
 	TreeSet<KvDataStation> data;
 	int iStationid; 
 	int iObstime;    
@@ -164,8 +163,7 @@ public class KvDataContainer {
 	}
 	
 	
-	public KvDataContainer( boolean overwrite ) {
-		this.overwrite = overwrite;
+	public KvDataContainer(  ) {
 		data = new TreeSet<KvDataStation>(); 
 	}
 	
@@ -273,7 +271,7 @@ public class KvDataContainer {
     	}
 	}
 	
-	Iterator<KvDataStation> iterator() {
+	public Iterator<KvDataStation> iterator() {
 		if( data == null )
 			return null;
 		

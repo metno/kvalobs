@@ -31,11 +31,13 @@
 package metno.kvalobs.kl2kvnew;
 
 import java.sql.*;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 
 import metno.dbutil.DbConnection;
 import CKvalObs.CDataSource.*;
+import metno.kvalobs.kl.*;
 
 public class SendData implements DataToKv {
     
@@ -100,7 +102,7 @@ public class SendData implements DataToKv {
     }
 	 
 
-    public boolean sendDataToKv(String sTypeid, Station[] stations){
+    public boolean sendDataToKv(String sTypeid, Station[] stations, List<TimeRange> obstimes ){
 	
     	DataHelper dh;
     	DbConnection con=null;
@@ -113,7 +115,7 @@ public class SendData implements DataToKv {
     		return false;
     	}
 	
-    	dh=new DataHelper(con,this,sTypeid, app.getTablename());
+    	dh=new DataHelper(con,this,sTypeid, obstimes, app.getTablename());
 		
 		System.out.println("Running for typeid: " + dh.getTypeid());
     	System.out.println("Stations: " + Station.toString(stations));

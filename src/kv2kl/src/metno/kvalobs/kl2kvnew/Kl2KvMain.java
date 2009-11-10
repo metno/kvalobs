@@ -36,12 +36,17 @@ import java.util.*;
 import java.io.File;
 import java.text.*;
 import java.util.Vector;
+import java.util.regex.*;
+
+import javax.print.attribute.standard.MediaSize.Other;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import metno.kvalobs.kl.*;
 import metno.kvalobs.kv2kl.Kv2KlMain;
 import metno.util.GetOpt;
+import metno.util.GetOptDesc;
 import metno.util.MiGMTTime;
 
 public class Kl2KvMain {
@@ -56,6 +61,17 @@ public class Kl2KvMain {
 		    "\t   Default konfigurasjonsfil er: $KVALOBS/etc/kl2kv.conf\n"+
 		    "\t-s kvserver Bruk kvserver som kvalobsserver i stedet for den\n"+
 		    "\t   som er angitt i konfigurasjonsfilen!\n"+
+		    "\t-l \n" +
+		    "\t--time-list Kommaseparert liste over obstime som skal brukes. \n" +
+		    "\t   Format: fromtime-totime, hvor formatet på fromtime og totime er:\n"+
+		    "\t     YYYY-MM-DDThh[:mm:ss] \n"+
+		    "\t   to time kan utelates og blir da satt lik fromtime.\n"+
+		    "\t \n"+
+		    "\t   Eks 1. --time-list '2009-10-1 - 2009-11-1', dette gir alt av data for\n" +
+		    "\t        oktober. Legg merke til at apostrof må brukes dersom listen innhoilder\n" +
+		    "\t        mellomrom.\n"+
+		    "\t   Eks 2. --time-list '2009-10-1T00,2009-10-1T02,2009-10-1T05', dette gir data for\n" +
+		    "\t        obstidene 00, 02 og 05 for 1. oktober.\n" +
 		    "\t-t typeidlist Angi en liste av typeider som skal sendes over\n"+
 		    "\t   til kvalobs. typeidlist er på formen typeid0,typeid1,..,typeidN\n"+
 		    "\t   Det skal ikke være noen mellomrom i listen. Hvis det er \n"+
@@ -68,11 +84,32 @@ public class Kl2KvMain {
 		    "    Hvis man ønsker å sende data for typeid 302 for stasjonene\n"+
 		    "    18500 til 18700 samt stasjonene 17555 og 17000 gir man \n"+
 		    "    kommandoen:\n\n"+
-		    "    kl2kv -t 302 18500-18700 17555 1700\n\n"
+		    "    kl2kv -t 302 18500-8700 17555 1700\n\n"
 		);
 		
         System.exit(exitcode);
     }
+	
+	public static List<TimeRange> decodeOptObstime( String optObstime ) 
+	{
+		if( optObstime == null )
+			return null;
+		
+		
+		List<TimeRange> obstimelist = new LinkedList<TimeRange>();
+		
+		String[] obstimeList = optObstime.split(",");
+		
+		//Pattern date = Pattern.compile(" *(\\d{4})-(\\d{1,2})-(\\d{1,2})(((:?T)\\:\\d{1,2}){0,3})? *");
+		Pattern date = Pattern.compile(" *(\\d{4})-(\\d{1,2})-(\\d{1,2}) *");
+		
+		for( String obstime : obstimeList ){
+			Matcher match = date.matcher( obstime );
+			
+		}
+		return obstimelist;
+	}
+	
 	
     public static void main(String[] args)
     {
@@ -81,11 +118,21 @@ public class Kl2KvMain {
     	
     	String kvpath=KlApp.getKvpath();
     	String typeid=null;
+    	String optTimeList=null;
+    	List<TimeRange> obstimes=null;
     	boolean error=false;
+    	
+    	GetOptDesc options[] = {
+    	            new GetOptDesc('t', "typeid", true),
+    	            new GetOptDesc('c', "conf-file", true),
+    	            new GetOptDesc('h', "help", false),
+    	            new GetOptDesc('s', "kvalobs-server", true),
+    	            new GetOptDesc('l', "time-list", true)
+    	        };
     	
     	Kv2KvDataXml xml = new Kv2KvDataXml();
     	
-    	KvDataContainer dataContainer=new KvDataContainer( false );
+    	KvDataContainer dataContainer=new KvDataContainer(  );
     	
     	xml.getXML( dataContainer, false, false );
     	
@@ -101,30 +148,46 @@ public class Kl2KvMain {
     	String configfile="kl2kv.conf";
     	MiGMTTime start=new MiGMTTime();
     	
-    	GetOpt go = new GetOpt("t:c:hs:");
+    	GetOpt go = new GetOpt( options );
     	String kvserver=null;
     	
-    	char c;
+    	
+    	Map<String,String> optArgs = go.parseArguments( args );
+    	Set<String> optKeys=optArgs.keySet();
+    	
          
-    	while ((c = go.getopt(args)) != GetOpt.DONE) {
-             switch(c) {
+    	for( String opt : optKeys ) {
+             switch( opt.charAt( 0 ) ) {
              case 'h':
                  use(0);
                  break;
              case 'c':
-                 configfile= go.optarg();
+                 configfile= optArgs.get( opt );
                  break;
              case 't':
-            	 typeid=go.optarg();
+            	 typeid=optArgs.get( opt );
+            	 break;
+             case 'l':
+            	 optTimeList=optArgs.get( opt );
             	 break;
              case 's':
             	 kvserver=go.optarg();
             	 break;
              default:
-             	 logger.fatal("Unknown option character " + c);
+             	 logger.fatal("Unknown option character " + opt);
                  use(1);
              }
          }
+    	
+    	 
+    	 if( optTimeList != null ) {
+    		 obstimes = TimeDecoder.decodeTimeList( optTimeList );
+    		 
+    		 if( obstimes == null ) {
+    			 System.out.println("Invalid time-list: '"+optTimeList+"'");
+    			 System.exit(1);
+    		 }
+    	 }
     	
     	 int i=configfile.lastIndexOf(".conf");
     	
@@ -173,7 +236,7 @@ public class Kl2KvMain {
     	 }
     	 
     	 for(String type : typeidlist){
-    		 if(!sendData.sendDataToKv(type, stationlist)){
+    		 if(!sendData.sendDataToKv(type, stationlist, obstimes)){
     			 logger.error("Failed to send data for typeid "+
     					       type+ " to kvalobs!");
     		 }else{
