@@ -71,7 +71,7 @@ import java.util.ArrayList;
             doFile(args[i]);
         }
  * </pre></li>
- * <li>Newer model, which allows long-named options:
+ * <li>Newer model, which allows long-named options. A longnamed option must start with --:
  * <pre>
         boolean numeric_option = false;
         boolean errs = false;
@@ -211,6 +211,7 @@ public class GetOpt {
 	 * containing the value, or null for a non-option argument.
 	 */
 	public Map<String, String> parseArguments(String[] argv) {
+		fileNameArguments=new ArrayList<String>();
 		Map<String,String> optionsAndValues = new HashMap<String,String>();
 
 		for (int i = 0; i < argv.length; i++) {
@@ -266,14 +267,35 @@ public class GetOpt {
 		// If so look it up in the list.
 		String thisArg = argv[optind];
 		
-		if (thisArg.startsWith("-")) {
+		if (thisArg.startsWith("--")) {
             optind++;
 			optarg = null;
 
 			for (int i=0; i<options.length; i++) {
-				if ( options[i].argLetter == thisArg.charAt(1) ||
-					(options[i].argName != null &&
-					 options[i].argName == thisArg.substring(1))) { // found it
+				if ( options[i].argName != null &&
+					 options[i].argName.compareToIgnoreCase( thisArg ) == 0 ) { // found it
+					// If it needs an option argument, get it.
+					if (options[i].takesArgument) {
+						if (optind < argv.length) {
+							optarg = argv[optind]; 
+							++optind;
+						} else {
+							throw new IllegalArgumentException(
+								"Option " + options[i].argName +
+								" needs value but found end of arg list");
+						}
+					}
+					return options[i].argLetter;
+				}
+			}
+			// Began with "-" but not matched, so must be error.
+			return '?';
+		} else if (thisArg.startsWith("-")) {
+            optind++;
+			optarg = null;
+
+			for (int i=0; i<options.length; i++) {
+				if ( options[i].argLetter == thisArg.charAt(1) ) { // found it
 					// If it needs an option argument, get it.
 					if (options[i].takesArgument) {
 						if (optind < argv.length) {
