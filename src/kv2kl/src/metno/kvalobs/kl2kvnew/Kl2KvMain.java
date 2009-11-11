@@ -55,7 +55,7 @@ public class Kl2KvMain {
 	
 	public static void use(int exitcode){
 		System.out.println(
-		    "Bruk: kl2kv [-h] [-s kvserver] [-c configFile] -t typeidlist stationlist\n\n"+
+		    "Bruk: kl2kv [-h] [-s kvserver] [-c configFile] [-l obstimelist] -t typeidlist stationlist\n\n"+
 		    "\t-h Skriv ut denne hjelpeteksten!\n"+
 		    "\t-c configFile Angi en alternativ konfigurasjonsfil.\n"+
 		    "\t   Default konfigurasjonsfil er: $KVALOBS/etc/kl2kv.conf\n"+
@@ -129,15 +129,7 @@ public class Kl2KvMain {
     	            new GetOptDesc('s', "kvalobs-server", true),
     	            new GetOptDesc('l', "time-list", true)
     	        };
-    	
-    	Kv2KvDataXml xml = new Kv2KvDataXml();
-    	
-    	KvDataContainer dataContainer=new KvDataContainer(  );
-    	
-    	xml.getXML( dataContainer, false, false );
-    	
-    	System.exit(0);
-    	
+    	    	
     	if(kvpath==null){
     		System.out.println("FATAL: Propertie KVALOBS must be set!");
     		System.exit(1);

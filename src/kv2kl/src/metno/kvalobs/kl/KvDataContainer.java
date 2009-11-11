@@ -5,7 +5,10 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.*;
 
+import javax.xml.stream.XMLStreamException;
+
 import metno.util.MiGMTTime;
+import metno.util.MiTime;
 
 public class KvDataContainer {
 	TreeSet<KvDataStation> data;
@@ -169,7 +172,7 @@ public class KvDataContainer {
 	
 	
 	
-	public void add( java.sql.ResultSet rs ) {
+	public boolean add( java.sql.ResultSet rs ) {
     	try{
     		Timestamp tsobstime;
     		//String tmpDate;
@@ -187,7 +190,7 @@ public class KvDataContainer {
     		
     		if( ! doInitialize( rs ) ) {
     			System.out.println("KvDataContainer::add: Missing coloumns in the database.");
-    			return;
+    			return false;
     		}
     		
     		while(rs.next()){
@@ -247,27 +250,36 @@ public class KvDataContainer {
     			
     			if( rs.wasNull() ) {
     				System.out.println("KvDataContainer::add: controlinfo is NULL." );
-    				continue;
+    				controlinfo = "0000000000000000";
     			}
     			
     			useinfo = rs.getString( iUseinfo );
     			
     			if( rs.wasNull() ) {
     				System.out.println("KvDataContainer::add: useinfo is NULL." );
-    				continue;
+    				useinfo = "0000000000000000";
     			}
     			
     			cfailed = rs.getString( iCfailed );
     			
+    			if( rs.wasNull() ) {
+    				System.out.println("KvDataContainer::add: cfailed is NULL." );
+    				cfailed = "";
+    			}
+    			
     			
     			obstime=new MiGMTTime(tsobstime);
     			//tmpDate=obstime.toString(MiGMTTime.FMT_COMPACT_TIMESTAMP_1);
+    		
+    			 add( stationid, typeid, obstime, sensor, level, paramid,
+    		    	  original,	corrected, controlinfo,	useinfo, cfailed );
     		}
-
+    		
+    		return true;
     	}
     	catch(SQLException SQLe){                
     		System.out.println(SQLe);            
-    		return ;
+    		return false;
     	}
 	}
 	
@@ -276,5 +288,100 @@ public class KvDataContainer {
 			return null;
 		
 		return data.iterator();
+	}
+	
+	@Override
+	public String toString() {
+		if( data == null )
+			return "";
+
+		StringBuilder s = new StringBuilder();
+		KvDataStation station;
+		KvDataType type;
+		KvDataObstime obstime;
+		KvDataSensor sensor;
+		KvDataLevel level;
+		KvDataParam param;
+		Iterator<KvDataStation> itStation;
+		Iterator<KvDataType> itType;
+		Iterator<KvDataObstime> itObstime;
+		Iterator<KvDataSensor> itSensor;
+		Iterator<KvDataLevel> itLevel;
+		Iterator<KvDataParam> itParam;
+		
+			
+		itStation = data.iterator();
+
+		if( itStation == null ) 
+			return "";
+				
+		while( itStation.hasNext() ) {
+			station = itStation.next();
+			
+			itType = station.iterator();
+			
+			if( itType == null ) {
+				System.err.println("Kv2DataContainer::toString: fatal empty typelist.");
+				continue;
+			}
+				
+			while( itType.hasNext() ) {
+				type = itType.next();
+					
+				itObstime = type.iterator();
+					
+				if( itObstime == null ) {
+					System.err.println("Kv2DataContainer::toString: fatal empty obstimelist.");
+					continue;
+				}
+					
+				while( itObstime.hasNext() ) {
+					obstime = itObstime.next();
+					itSensor = obstime.iterator();
+							
+					if( itSensor == null ) {
+						System.err.println("Kv2DataContainer::toString: fatal empty sensorlist.");
+						continue;
+					}
+						
+					while( itSensor.hasNext() ) {
+						sensor = itSensor.next();
+						itLevel = sensor.iterator();
+						
+						if( itLevel == null ) {
+							System.err.println("Kv2DataContainer::toString: fatal empty levellist.");
+							continue;
+						}
+						
+						while( itLevel.hasNext() ) {
+							level = itLevel.next();
+							itParam = level.iterator();
+								
+							if( itParam == null ) {
+								System.err.println("Kv2DataContainer::toString: fatal empty paramlist.");
+								continue;
+							}
+								
+							while( itParam.hasNext() ) {
+								param = itParam.next();
+								s.append( obstime.getObstime().toString()+"," );
+								s.append( station.getStation() +"," );
+								s.append( type.getType()+"," );
+								s.append( param.getParamid()+"," );
+								s.append( sensor.getSensor()+"," );
+								s.append( level.getLevel() +"," );
+								s.append( param.getOriginal()+"," );
+								s.append( param.getCorrected()+"," );
+								s.append( param.getControlinfo()+"," );
+								s.append( param.getUseinfo()+"," );
+								s.append( param.getCfailed()+"\n" );
+							}									
+						}
+					}
+				}
+			}
+		}
+		
+		return s.toString();
 	}
 }

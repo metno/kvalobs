@@ -1,12 +1,13 @@
 #! /bin/sh
 
-KVJAVA=$(cd ../..; pwd)
-KVJAVA=$KVJAVA
+TOP=$(cd ../..; pwd)
+KVJAVA=$TOP/share/kvalobs/java
 export KVJAVA 
 
 
 
-KVDIR=$KVJAVA
+
+KVDIR=$TOP
 
 export KVDIR 
 

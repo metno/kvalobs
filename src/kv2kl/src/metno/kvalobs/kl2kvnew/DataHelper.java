@@ -79,7 +79,7 @@ public class DataHelper{
 		
 	static Logger logger = Logger.getLogger(DataHelper.class);
 	static final float MISSING_VAL=-32767.0f;
-	String tablename="KL2KVALOBS";
+	String tablename="KLOPP.T_KL2KVALOBS_HIST";
 	String typeid;
     String params;
     List<TimeRange> obstimes;
@@ -186,50 +186,7 @@ public class DataHelper{
     }
     
     
-    /**
-     * createParams creates a header for the message sendt to kvalobs.
-     * The precipitation elements is added as the last element.
-     * 
-     * The creation of the header must match the data creation in
-     * convertToKvDataAndSend. 
-     * 
-     * @param md Metadata
-     * @return A string to use as a header in the message to kvalobs.
-     * @throws SQLException
-     */
-    protected String createParams(ResultSetMetaData md) throws SQLException{
-    	boolean first=true;
-    	boolean hasRR24=false;
-
-    	for(int i=4; i<=md.getColumnCount(); i++){
-    		if(ignore(md.getColumnName(i)))
-				continue;
-				
-    		if(md.getColumnName(i).equalsIgnoreCase("RR_24") ||
-    		   md.getColumnName(i).equalsIgnoreCase("CONTROLINFO") ||
-    		   md.getColumnName(i).equalsIgnoreCase("USEINFO")){
-    			hasRR24=true;
-    			continue;
-    		}
-    		
-    		if(first){
-    			params=md.getColumnName(i).toUpperCase();
-    			first=false;
-    		}else
-    			params+=","+md.getColumnName(i).toUpperCase();
-    	}
-    	
-    	if(hasRR24){
-    		if(first)
-    			params="RR_24";
-    		else
-    			params+=",RR_24";
-    	}
-    	
-    	return params;
-    }
-    
-    /**
+        /**
      * This function creates a message to send to kvalobs. The data
      * is read from the resultset.
      * 
@@ -238,43 +195,68 @@ public class DataHelper{
      * @param rs The dataset to send to kvalobs.
      * @return true on success.
      */
-    protected boolean convertToKvDataAndSend(java.sql.ResultSet rs){
-    	try{
-    		int count=0;
-    		String data;
+    protected boolean convertToKvXmlAndSend(java.sql.ResultSet rs ){	
+    	int count=0;
+    	String xmlData;
+    	KvDataContainer dataContainer=new KvDataContainer();
     		
-    		if(count>0){
-    			System.out.println( "Send til kvalobs ["+
-    							   data+"]");
-    			if(!dataToKv.sendData(data, stationid, 
-				   Integer.parseInt(getTypeid()))){
-    				System.out.println("Cant send data to kvalobs!");
-    				return false;
-    			}
-    			
-    			msgCount++;
-    		}
-	    
-    		return true;
-    	}
-    	catch(SQLException SQLe){                
-    		System.out.println(SQLe);            
+    	if( ! dataContainer.add( rs ) ) {
+    		System.err.println("convertToKvXmlAndSend: Failed to read data from the database.");
     		return false;
     	}
+    		
+    	System.err.println( dataContainer );
+    		
+    	Iterator<KvDataStation> itStation = dataContainer.iterator();
+    		
+    	if( itStation == null  ) {
+    		System.err.println("convertToKvXmlAndSend: No data found in the database.");
+    		return true;
+    	}
+    		    
+    	Kv2KvDataXml converttoXml = new Kv2KvDataXml();
+
+    	while( itStation.hasNext() ) {
+    		KvDataStation station = itStation.next();
+    			
+    		xmlData = converttoXml.getXML( station, true, false );
+    			
+    		if( xmlData == null ) {
+    			System.err.println("convertToKvXmlAndSend: Failed to create XML.");
+    			return false;
+    		}
+    			
+    		System.err.println( xmlData );
+    	/*TODO: Activate this when ready to test with a kvalobs server.		
+    		if(!dataToKv.sendData( xmlData, station.getStation(), Integer.parseInt( getTypeid() ) ) ){
+    			System.out.println("Cant send data to kvalobs! Stationid: " + station.getStation() + " typeid: " + getTypeid() );
+    			return false;
+    		}
+    		*/
+    		count++;
+    	}
+    		
+    	if(count>0){
+    		System.out.println( count + " data is sendt to kvalobs.");
+    	}
+	    
+    	return true;
     }
     
     boolean doSendDataToKv(Station station, TimeRange obstime) {
     	String query=createQuery( station, obstime );
+    	System.out.println("Data for: typeid: " + typeid+ " Station: " + station + " Time: " + obstime );
     	
-    	System.out.println("Query:[" + query +"]");
-
     	if(query==null){
     	    System.out.println("Cant create query!!!");
     	    logger.error("Cant create query!!!");
     	    
     	    return false;
     	}
-
+    	
+    	System.out.println("Query:[" + query +"]");
+    	
+    	System.exit( 0 );
     	ResultSet rs;
     	
     	try{
@@ -291,7 +273,7 @@ public class DataHelper{
     	    return false;
     	}
            
-    	return convertToKvDataAndSend(rs);
+    	return convertToKvXmlAndSend(rs);
     }
     
     public boolean sendDataToKv(Station station){

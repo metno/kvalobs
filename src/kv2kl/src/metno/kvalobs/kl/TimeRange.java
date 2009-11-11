@@ -42,7 +42,10 @@ public class TimeRange {
 	}
 	
 	public String toString() {
-		return from + " - " + to;
+		if( isEqual() )
+			return from.toString();
+		else
+			return from + " - " + to;
 	}
 	
 	public boolean isEqual() {
