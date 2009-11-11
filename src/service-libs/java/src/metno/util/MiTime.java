@@ -32,8 +32,9 @@ package metno.util;
 
 
 import java.util.*;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 import java.text.*;
-
 
 public class MiTime{
     Calendar cal;
@@ -50,6 +51,8 @@ public class MiTime{
     public static final String FMT_COMPACT_TIMESTAMP_1="yyyyMMddHHmm";
     /**yyyyMMddHH*/
     public static final String FMT_COMPACT_TIMESTAMP_2="yyyyMMddHH";
+    
+    static Pattern datePattern = Pattern.compile("^ *(\\d{4})-(\\d{1,2})-(\\d{1,2})((T| +)(\\d{1,2})(:\\d{1,2}){0,2})? *");
     
     public MiTime(){
         cal=Calendar.getInstance();
@@ -234,4 +237,105 @@ public class MiTime{
     public boolean parse(String timestamp){
         return parse(timestamp, FMT_ISO);
     }
+    
+    static MiTime parseOptHms( String time, MiTime miTime, StringBuilder remaining ) {
+    	int year, month, day, hour, min, second;
+
+    	if( miTime == null ) {
+			System.out.println( "No MiTime template (miTime==null)!");
+			return null;
+		} 
+		
+		if( time == null ) {
+			System.out.println( "No time string (time==null)!");
+			return null;
+		}
+		
+		if( remaining != null )
+			remaining.delete( 0, remaining.length() );
+			
+		Matcher match = datePattern.matcher( time );
+		
+		hour=0;
+		min=0;
+		second=0;	
+		System.out.println("Match: '"+ time + "'");
+			
+		if( ! match.lookingAt() ) {
+			System.out.println("NOT a valid timestamp, '" + time + "'!");
+			return null;
+		}
+		
+		if( remaining != null ) {
+			remaining.delete( 0, remaining.length() );
+			String matched = match.group();
+			String notMatched = time.substring( matched.length() );
+			notMatched = notMatched.trim();
+			remaining.append( notMatched ); 
+		}
+		
+		year = Integer.parseInt( match.group( 1 ) );
+		month = Integer.parseInt( match.group( 2 ) );
+		day = Integer.parseInt( match.group( 3 ) );
+		time = match.group( 4 );
+				
+		if( time != null ) {
+			String hms[] = time.substring( 1 ).split( ":" );
+				
+			if( hms.length > 0 )
+				hour = Integer.parseInt( hms[0] );
+				
+			if( hms.length > 1 )
+				min = Integer.parseInt( hms[1] );
+						
+			if( hms.length > 2 )
+				second = Integer.parseInt( hms[2] );
+		}
+		
+		if( month < 1 || month > 12 ) {
+			System.out.println(" Invalid month: '" + month + "' must be in range [1,12]." );
+			return null;
+		}
+				
+		if( day < 1 || day > 31 ) {
+			System.out.println(" Invalid day: '" + day + "' must be in range [1,31]." );
+			return null;
+		}
+
+		if( hour<0 || hour>23 ){
+			System.out.println(" Invalid hour: '" + hour + "' must be in range [0,23]." );
+			return null;
+		}
+				
+		if( min<0 || min>23 ){
+			System.out.println(" Invalid min: '" + min + "' must be in range [0,59]." );
+			return null;
+		}
+				
+		if( second<0 || second>23 ){
+			System.out.println(" Invalid second: '" + second + "' must be in range [0,59]." );
+			return null;
+		}
+				
+		miTime.set( year, month, day, hour, min, second );
+
+		return miTime;
+    }
+    
+    /**
+     * Parse time format with optional hour, min and second. Missing
+     * hour, min and second is set to 0.
+     * 
+     *   
+     * @param time
+     * @return
+     */
+    public static MiTime parseOptHms( String time, StringBuilder remaining ) 
+	{
+    	MiTime miTime=new MiTime();
+    	
+    	return parseOptHms( time, miTime, remaining );	
+    }
+	
+    
 }

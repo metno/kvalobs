@@ -35,6 +35,8 @@ import java.util.*;
 import java.text.*;
 import java.sql.Timestamp;
 
+import metno.util.MiTime;
+
 public class MiGMTTime extends MiTime{
     
     public MiGMTTime(){
@@ -79,5 +81,20 @@ public class MiGMTTime extends MiTime{
     	Timestamp ts = new Timestamp( cal.getTimeInMillis() );
     	TimeZone.setDefault( old );
     	return ts;
+    }
+    
+    /**
+     * Parse time format with optional hour, min and second. Missing
+     * hour, min and second is set to 0.
+     * 
+     *   
+     * @param time
+     * @return
+     */
+    public static MiGMTTime parseOptHms( String time, StringBuilder remaining  ) 
+	{
+    	MiGMTTime miTime=new MiGMTTime();
+    	
+    	return (MiGMTTime)MiTime.parseOptHms( time, miTime, remaining );	
     }
 }
