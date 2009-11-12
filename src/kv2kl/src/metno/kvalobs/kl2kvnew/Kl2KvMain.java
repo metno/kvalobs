@@ -207,7 +207,7 @@ public class Kl2KvMain {
      	PropertyConfigurator.configure(kvpath+"/etc/"+logfile);
     	 
     	 List<String> stations=go.getFilenameList();
-    	
+    	 
          go=null; //We dont need it anymore.
 
          if(typeid==null)
@@ -216,6 +216,9 @@ public class Kl2KvMain {
      	 String[] typeidlist=typeid.split(",");
          
          app=new Kl2KvApp(args, configfile, kvserver, false);
+         
+         app.setNameserver( "localhost", null );
+         
     	 sendData=new SendData(app);          
     	 
     	 logger.info("Program started at: " + start);

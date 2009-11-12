@@ -166,7 +166,7 @@ public class DataHelper{
     		if( obstime.isEqual() ) 
     			query += " AND obstime='" + obstime.getFrom() +"'";
     		else 
-    			query += " AND obstime<='" + obstime.getFrom() +"' AND obstime<='" + obstime.getTo()+"'";
+    			query += " AND obstime>='" + obstime.getFrom() +"' AND obstime<='" + obstime.getTo()+"'";
     	}
     	
    		return "SELECT * FROM "+ getTable()+
@@ -227,12 +227,11 @@ public class DataHelper{
     		}
     			
     		System.err.println( xmlData );
-    	/*TODO: Activate this when ready to test with a kvalobs server.		
+    	/*TODO: Activate this when ready to test with a kvalobs server. */		
     		if(!dataToKv.sendData( xmlData, station.getStation(), Integer.parseInt( getTypeid() ) ) ){
     			System.out.println("Cant send data to kvalobs! Stationid: " + station.getStation() + " typeid: " + getTypeid() );
     			return false;
     		}
-    		*/
     		count++;
     	}
     		
@@ -256,7 +255,6 @@ public class DataHelper{
     	
     	System.out.println("Query:[" + query +"]");
     	
-    	System.exit( 0 );
     	ResultSet rs;
     	
     	try{
