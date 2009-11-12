@@ -315,10 +315,10 @@ public class GetOpt {
 		} else {
 			if(fileNameArguments==null){
 				fileNameArguments = new ArrayList<String>();
+			}
 			
-				for(; optind<argv.length; optind++){
-					fileNameArguments.add(argv[optind]);
-				}
+			for(; optind<argv.length; optind++){
+				fileNameArguments.add(argv[optind]);
 			}
 			
 			// Found non-argument non-option word in argv: end of options.
