@@ -257,7 +257,7 @@ public class KvDataContainer {
     			
     			if( rs.wasNull() ) {
     				System.out.println("KvDataContainer::add: useinfo is NULL." );
-    				useinfo = "0000000000000000";
+    				useinfo = "9999900000000000";
     			}
     			
     			cfailed = rs.getString( iCfailed );
