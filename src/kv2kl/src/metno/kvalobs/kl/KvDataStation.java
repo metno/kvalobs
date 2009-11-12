@@ -1,7 +1,7 @@
 package metno.kvalobs.kl;
 import java.util.*;
 
-public class KvDataStation {
+public class KvDataStation implements Comparable<KvDataStation> {
 	int station;
 	TreeSet<KvDataType> container = null;
 	
@@ -15,6 +15,10 @@ public class KvDataStation {
 		catch( NullPointerException e) {
 			container = null;
 		}
+	}
+	
+	public int compareTo( KvDataStation station ) {
+		return this.station -station.station;
 	}
 	
 	public KvDataType findType( int typeid ) {

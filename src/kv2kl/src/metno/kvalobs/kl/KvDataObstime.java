@@ -3,7 +3,7 @@ import java.util.*;
 
 import metno.util.*;
 
-public class KvDataObstime {
+public class KvDataObstime implements Comparable<KvDataObstime>{
 	MiGMTTime obstime;
 	boolean invalidate;
 	TreeSet<KvDataSensor> container = null;
@@ -19,6 +19,10 @@ public class KvDataObstime {
 		catch( NullPointerException e) {
 			container = null;
 		}
+	}
+
+	public int compareTo( KvDataObstime obstime ) {
+		return this.obstime.compareTo( obstime.obstime );
 	}
 	
 	public KvDataSensor findSensor( int sensor ) {

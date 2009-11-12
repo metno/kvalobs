@@ -1,6 +1,6 @@
 package metno.kvalobs.kl;
 
-public class KvDataParam {
+public class KvDataParam implements Comparable<KvDataParam> {
 	int paramid;
 	float original;
 	float corrected;
@@ -19,6 +19,10 @@ public class KvDataParam {
 		this.cfailed = cfailed;
 	}
 
+	public int compareTo( KvDataParam param ) {
+		return this.paramid -param.paramid;
+	}
+	
 	public int getParamid() {
 		return paramid;
 	}

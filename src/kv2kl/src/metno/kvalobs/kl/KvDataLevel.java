@@ -1,7 +1,7 @@
 package metno.kvalobs.kl;
 import java.util.*;
 
-public class KvDataLevel {
+public class KvDataLevel implements Comparable<KvDataLevel>{
 	int level;
 	TreeSet<KvDataParam> container = null;
 	
@@ -14,6 +14,10 @@ public class KvDataLevel {
 		catch( NullPointerException e) {
 			container = null;
 		}
+	}
+	
+	public int compareTo( KvDataLevel level ) {
+		return this.level -level.level;
 	}
 
 	public KvDataParam findParam( int paramid ) {

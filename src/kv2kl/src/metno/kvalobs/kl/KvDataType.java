@@ -1,7 +1,7 @@
 package metno.kvalobs.kl;
 import java.util.*;
 
-public class KvDataType {
+public class KvDataType  implements Comparable<KvDataType>{
 	int type;
 	TreeSet<KvDataObstime> container = null;
 	
@@ -15,6 +15,10 @@ public class KvDataType {
 		catch( NullPointerException e) {
 			container = null;
 		}
+	}
+	
+	public int compareTo( KvDataType type ) {
+		return this.type -type.type;
 	}
 	
 	public KvDataObstime findObstime(  metno.util.MiGMTTime obstime ) {

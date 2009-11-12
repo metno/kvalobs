@@ -1,7 +1,7 @@
 package metno.kvalobs.kl;
 import java.util.*;
 
-public class KvDataSensor {
+public class KvDataSensor implements Comparable<KvDataSensor> {
 	int sensor;
 	TreeSet<KvDataLevel> container = null;
 	
@@ -14,6 +14,10 @@ public class KvDataSensor {
 		catch( NullPointerException e) {
 			container = null;
 		}
+	}
+	
+	public int compareTo( KvDataSensor sensor ) {
+		return this.sensor -sensor.sensor;
 	}
 	
 	public KvDataLevel findLevel( int level ) {
