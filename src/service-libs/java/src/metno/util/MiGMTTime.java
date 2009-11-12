@@ -74,11 +74,11 @@ public class MiGMTTime extends MiTime{
         set(year, month, day, hour, min, sec);	
     }
     
-    public Timestamp getTimestamp() {
+    public java.sql.Timestamp getTimestamp() {
     	TimeZone old = TimeZone.getDefault();
     	TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
     	
-    	Timestamp ts = new Timestamp( cal.getTimeInMillis() );
+    	java.sql.Timestamp ts = new java.sql.Timestamp( cal.getTimeInMillis() );
     	TimeZone.setDefault( old );
     	return ts;
     }
