@@ -94,9 +94,9 @@ public class Station {
 			return "";
 		
 		if(last==0)
-			return "stnr="+first;
+			return "stationid="+first;
 		
-		return "stnr>="+first + " AND stnr<="+last;
+		return "stationid>="+first + " AND stationid<="+last;
 	}
 	
 	public String toString(){
