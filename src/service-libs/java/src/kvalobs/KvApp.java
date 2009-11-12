@@ -60,11 +60,14 @@ public class KvApp
     private kvService     service=null;
     private kvServiceExt  serviceExt=null;
     private CKvalObs.CDataSource.Data  dataInput=null;
+    private String        nameServerHost=null;
+    private String        nameServerPort=null;
     private String        kvServer=null;
     private NamingContextExt nameServer=null;
     private KvEventQue       eventQue=null;    
     private ShutdownHook   hook=null; 
     private boolean        isShutdown=false;
+    
     //GetDataThreads is accessed by this thread and getDataThreadManager.
     //All access that add og delete an entry in the array must be
     //synchronized.
@@ -189,6 +192,11 @@ public class KvApp
 		adminList.clear();
     }
     
+    public void setNameserver( String host, String port ) {
+    	nameServerHost = host;
+    	nameServerPort = port;
+    }
+    
     synchronized public boolean registerAdmin(String where, IAdmin admin) {
     	NamingContextExt ns=resolveNameServer();
     	
@@ -246,7 +254,37 @@ public class KvApp
     
     synchronized  protected NamingContextExt resolveNameServer()
     {
-        try{
+    	try {
+    		
+    		if( nameServerHost != null ) {
+    			
+    			String ns = "corbaname::" + nameServerHost;
+    			
+    			if( nameServerPort == null )
+    				ns += ":2809";
+    			else
+    				ns += ":" + nameServerPort;
+    			
+    			ns += "/NameService";
+    				
+    			System.out.println("About to resolve the nameserver! '" + ns +"'");
+    			nameServer=NamingContextExtHelper.narrow(
+    						CorbaThread.orb.string_to_object( ns )
+    						);
+    		} else {
+    			nameServer=NamingContextExtHelper.narrow(
+    					               CorbaThread.orb.resolve_initial_references("NameService")
+    			            );
+    			System.out.println("The nameserver resolved!");
+    		}
+    	}
+    	catch(Exception ex){
+            System.out.println("Can't resolve nameservice!");
+            nameServer=null;
+            return null;
+        }
+        /*
+    	try{
             System.out.println("About to resolve the nameserver!");
             nameServer=NamingContextExtHelper.narrow(
                     CorbaThread.orb.resolve_initial_references("NameService")
@@ -258,7 +296,7 @@ public class KvApp
             nameServer=null;
             return null;
         }
-        
+        */
         return nameServer;
     }
     
