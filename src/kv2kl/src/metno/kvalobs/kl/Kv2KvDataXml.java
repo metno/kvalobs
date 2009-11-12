@@ -216,6 +216,8 @@ public class Kv2KvDataXml {
 				endElem();
 			}
 				
+			endElem();
+			
 			return true;
 		} catch (XMLStreamException e) {
 			e.printStackTrace();
@@ -291,136 +293,5 @@ public class Kv2KvDataXml {
 		}
 	}
 	
-	/*
-	public String getXML( KvDataContainer container, boolean overwrite, boolean invalidate ) 
-	{
-		KvDataStation station;
-		KvDataType type;
-		KvDataObstime obstime;
-		KvDataSensor sensor;
-		KvDataLevel level;
-		KvDataParam param;
-		Iterator<KvDataStation> itStation;
-		Iterator<KvDataType> itType;
-		Iterator<KvDataObstime> itObstime;
-		Iterator<KvDataSensor> itSensor;
-		Iterator<KvDataLevel> itLevel;
-		Iterator<KvDataParam> itParam;
-		
-		ByteArrayOutputStream out  = new ByteArrayOutputStream();
-		XMLOutputFactory factory = XMLOutputFactory.newInstance();
-		
-		try {
-			xml = factory.createXMLStreamWriter(out);
-			xml.writeStartDocument();
-
-			itStation = container.iterator();
-			
-			if( itStation == null )
-				return null;
-			
-			if( overwrite )
-				write("KvalobsData", "overwrite", "1");
-			else
-				xml.writeStartElement( "KvalobsData" );
-
-			while( itStation.hasNext() ) {
-				station = itStation.next();
-				writeElemVal( "station", station.getStation()  );
-				
-				itType = station.iterator();
-				
-				if( itType == null ) {
-					System.out.println("Kv2KvDataXml::getXML: fatal empty typelist.");
-					return null;
-				}
-				
-				while( itType.hasNext() ) {
-					type = itType.next();
-					writeElemVal( "typeid", type.getType() );
-					
-					itObstime = type.iterator();
-				
-					if( itObstime == null ) {
-						System.out.println("Kv2KvDataXml::getXML: fatal empty obstimelist.");
-						return null;
-					}
-					
-					while( itObstime.hasNext() ) {
-						obstime = itObstime.next();
-						writeElemVal( "obstime", obstime.getObstime() );
-						
-						if( invalidate )
-							xml.writeAttribute( "invalidate",  "1" );
-						
-						itSensor = obstime.iterator();
-					
-						if( itSensor == null ) {
-							System.out.println("Kv2KvDataXml::getXML: fatal empty sensorlist.");
-							return null;
-						}
-						
-						while( itSensor.hasNext() ) {
-							sensor = itSensor.next();
-							writeElemVal( "sensor", sensor.getSensor() );
-							
-							itLevel = sensor.iterator();
-						
-							if( itLevel == null ) {
-								System.out.println("Kv2KvDataXml::getXML: fatal empty levellist.");
-								return null;
-							}
-						
-							while( itLevel.hasNext() ) {
-								level = itLevel.next();
-								writeElemVal( "level", level.getLevel() );
-								
-								itParam = level.iterator();
-							
-								if( itParam == null ) {
-									System.out.println("Kv2KvDataXml::getXML: fatal empty paramlist.");
-									return null;
-								}
-								
-								while( itParam.hasNext() ) {
-									param = itParam.next();
-									write( "kvdata", "paramid", param.getParamid() );
-									writeElem( "original", param.getOriginal() );
-									
-									if(Math.abs(param.getOriginal() - param.getCorrected() ) > 0.01 )
-										writeElem( "corrected", param.getCorrected());
-										
-									writeElem( "controlinfo", param.getControlinfo()  );
-									writeElem( "useinfo", param.getUseinfo() );
-									
-									if( param.getCfailed() != null && ! param.getCfailed().isEmpty() )
-										writeElem("cfailed", param.getCfailed() );
-									
-									endElem();
-								}
-								
-								endElem();
-							}
-								
-							endElem();
-						}
-						
-						endElem();
-					}
-					
-					endElem();
-				}
-				
-				endElem();
-			}
-
-			endElem();
-			
-			xml.close();
-			return out.toString();
-		} catch (XMLStreamException e) {
-			return null;
-		}
-	}
-	*/
+	
 }
