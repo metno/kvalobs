@@ -1605,7 +1605,7 @@ public class KvApp
      *         or the CORBA nameserver may be down.
      */
     
-    protected CKvalObs.CDataSource.Result sendDataToKv(String data, String obsType)
+    public CKvalObs.CDataSource.Result sendDataToKv(String data, String obsType)
     {
         CKvalObs.CDataSource.Result result=null;
         boolean resolvedKvinput=false;
