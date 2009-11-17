@@ -105,7 +105,7 @@
 
 
 	
-	<target name="dist" depends="main, kv2kl, kl2kv, kv2klgetdata">
+	<target name="dist" depends="main, kv2kl, kl2kv, kl2kvnew, kv2klgetdata">
 		<delete dir="${distdir}"/>
 		<mkdir dir="${distdir}/share/kvalobs/java/bin"/>
 		<mkdir dir="${distdir}/share/kvalobs/java/etc"/>
@@ -138,7 +138,11 @@
 		<exec executable="cp" dir="." failonerror="true">
 			<arg line="src/bin/kl2kv ${distdir}/bin"/>
 		</exec>
-		
+
+		<exec executable="cp" dir="." failonerror="true">
+			<arg line="src/bin/kl2kvnew ${distdir}/bin"/>
+		</exec>
+
 		<exec executable="cp" dir="." failonerror="true">
 			<arg line="src/bin/kv2kl ${distdir}/bin"/>
 		</exec>
