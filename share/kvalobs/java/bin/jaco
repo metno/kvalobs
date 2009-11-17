@@ -11,17 +11,17 @@ if  which kvconfig > /dev/null 2>&1; then
     KVCONFIG=kvconfig
 fi
 
-if [ "z$KVJAVA"="z" ]; then
+if [ "z$KVJAVA" = "z" ]; then
 	if [ "z$KVCONFIG" != "z" ]; then
-   	KVJAVA="$(kvconfig --datadir)/kvalobs/java"
+   		KVJAVA="$(kvconfig --datadir)/kvalobs/java"
 
 		if [ ! -x "$KVJAVA/bin/jaco" ]; then
-      	KVJAVA=""
-      fi
+      		KVJAVA=""
+        fi
 	fi
 fi
 
-if [ "z$KVJAVA"="z" ]; then
+if [ "z$KVJAVA" = "z" ]; then
     KVJAVA=$HOME/share/kvalobs/java
 fi
 
@@ -55,6 +55,8 @@ export JACORB_HOME
 : ${JVM_FLAGS:=""}
 
 echo "java: ${JAVA_HOME}/bin/java"
+echo "JACORB_HOME: $JACORB_HOME"
+echo "KVJAVA: $KVJAVA"
 
 # call java interpreter
 exec ${JAVA_HOME}/bin/java ${JVM_FLAGS} \
