@@ -218,6 +218,11 @@ public class GetOpt {
 			Debug.println("getopt", "parseArg: i=" + i + ": arg " + argv[i]);
 			char c = getopt(argv);
 		
+			if( c == '?' ) {
+				String opt = new String( "?" );
+				opt += i;
+				optionsAndValues.put( opt, optarg);
+			}
 			if (c != DONE) {
 				strConvArray[0] = c;
 				optionsAndValues.put(new String(strConvArray), optarg);
@@ -270,10 +275,10 @@ public class GetOpt {
 		if (thisArg.startsWith("--")) {
             optind++;
 			optarg = null;
-
+			
 			for (int i=0; i<options.length; i++) {
-				if ( options[i].argName != null &&
-					 options[i].argName.compareToIgnoreCase( thisArg ) == 0 ) { // found it
+				if ( options[i].argName != null && thisArg.length()>2 &&
+					 options[i].argName.compareToIgnoreCase( thisArg.substring(2) ) == 0 ) { // found it
 					// If it needs an option argument, get it.
 					if (options[i].takesArgument) {
 						if (optind < argv.length) {
@@ -288,7 +293,8 @@ public class GetOpt {
 					return options[i].argLetter;
 				}
 			}
-			// Began with "-" but not matched, so must be error.
+			// Began with "--" but not matched, so must be error.
+			optarg = thisArg;
 			return '?';
 		} else if (thisArg.startsWith("-")) {
             optind++;
@@ -311,6 +317,7 @@ public class GetOpt {
 				}
 			}
 			// Began with "-" but not matched, so must be error.
+			optarg = thisArg;
 			return '?';
 		} else {
 			if(fileNameArguments==null){
