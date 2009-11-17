@@ -55,13 +55,13 @@ public class SendData implements DataToKv {
     	
     	public boolean sendData(String data, int stationid, int typeid){
     		CKvalObs.CDataSource.Result res;
-        	res=app.sendKlDataToKv(data, stationid, typeid);
+        	res=app.sendDataToKv(data, "kv2kvDecoder");
 
         	if(res==null)
         		return false;
         	
         	if(res.res!=EResult.OK){
-        		System.out.println("Failed: stationid : " +stationid +"typeid: " + typeid
+        		System.out.println("Failed: stationid : " +stationid +(typeid>0?"typeid: " + typeid:"")
         		          			+" - " + res.message);
 				logger.warn("Failed: stationid : " +stationid +"typeid: " + typeid
 	          			     + " - " + res.message);
@@ -102,7 +102,8 @@ public class SendData implements DataToKv {
     }
 	 
 
-    public boolean sendDataToKv(String sTypeid, Station[] stations, List<TimeRange> obstimes ){
+    public boolean sendDataToKv(String sTypeid, Station[] stations, List<TimeRange> obstimes, 
+    		                    boolean disableQC1 ){
 	
     	DataHelper dh;
     	DbConnection con=null;
@@ -115,13 +116,13 @@ public class SendData implements DataToKv {
     		return false;
     	}
 	
-    	dh=new DataHelper(con,this,sTypeid, obstimes, app.getTablename());
+    	dh=new DataHelper(con,this,sTypeid, obstimes, disableQC1, app.getTablename());
 		
 		System.out.println("Running for typeid: " + dh.getTypeid());
     	System.out.println("Stations: " + Station.toString(stations));
     	System.out.println("Table: "+dh.getTable());
     	
-    	logger.info("Running for typeid: " + dh.getTypeid());
+    	logger.info("Running for typeid: " + (dh.getTypeid()==null?"all":dh.getTypeid()) ) ;
 		logger.info("Stations: " + Station.toString(stations));
 		logger.info("Table: "+dh.getTable());
 		

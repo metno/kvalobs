@@ -53,14 +53,18 @@ public class Kl2KvMain {
     
 	static Logger logger = Logger.getLogger(Kl2KvMain.class);
 	
-	public static void use(int exitcode){
+	public static void use(int exitcode, String extra ){
+		
 		System.out.println(
-		    "Bruk: kl2kv [-h] [-s kvserver] [-c configFile] [-l obstimelist] -t typeidlist stationlist\n\n"+
+		    "Bruk: kl2kv [-h] [-n] [-s kvserver] [-c configFile] [-l obstimelist] -t typeidlist stationlist\n\n"+
 		    "\t-h Skriv ut denne hjelpeteksten!\n"+
 		    "\t-c configFile Angi en alternativ konfigurasjonsfil.\n"+
 		    "\t   Default konfigurasjonsfil er: $KVALOBS/etc/kl2kv.conf\n"+
 		    "\t-s kvserver Bruk kvserver som kvalobsserver i stedet for den\n"+
 		    "\t   som er angitt i konfigurasjonsfilen!\n"+
+		    "\t-n \n" +
+		    "\t--no-qc1 Disable kjøring av QC1 i qaBase. Dette gjøres ved å settes hqcflagg til 3\n"+
+		    "\t   i controlinfo for hver enkelt observasjon.\n"+
 		    "\t-l \n" +
 		    "\t--time-list Kommaseparert liste over obstime som skal brukes. \n" +
 		    "\t   Format: fromtime-totime, hvor formatet på fromtime og totime er:\n"+
@@ -84,32 +88,11 @@ public class Kl2KvMain {
 		    "    Hvis man ønsker å sende data for typeid 302 for stasjonene\n"+
 		    "    18500 til 18700 samt stasjonene 17555 og 17000 gir man \n"+
 		    "    kommandoen:\n\n"+
-		    "    kl2kv -t 302 18500-8700 17555 1700\n\n"
+		    "    kl2kv -t 302 18500-8700 17555 1700\n\n" + (extra==null?"":(extra+"\n\n")) 
 		);
 		
         System.exit(exitcode);
     }
-	
-	public static List<TimeRange> decodeOptObstime( String optObstime ) 
-	{
-		if( optObstime == null )
-			return null;
-		
-		
-		List<TimeRange> obstimelist = new LinkedList<TimeRange>();
-		
-		String[] obstimeList = optObstime.split(",");
-		
-		//Pattern date = Pattern.compile(" *(\\d{4})-(\\d{1,2})-(\\d{1,2})(((:?T)\\:\\d{1,2}){0,3})? *");
-		Pattern date = Pattern.compile(" *(\\d{4})-(\\d{1,2})-(\\d{1,2}) *");
-		
-		for( String obstime : obstimeList ){
-			Matcher match = date.matcher( obstime );
-			
-		}
-		return obstimelist;
-	}
-	
 	
     public static void main(String[] args)
     {
@@ -120,6 +103,7 @@ public class Kl2KvMain {
     	String typeid=null;
     	String optTimeList=null;
     	List<TimeRange> obstimes=null;
+    	boolean disableQC1=false;
     	boolean error=false;
     	
     	GetOptDesc options[] = {
@@ -127,7 +111,8 @@ public class Kl2KvMain {
     	            new GetOptDesc('c', "conf-file", true),
     	            new GetOptDesc('h', "help", false),
     	            new GetOptDesc('s', "kvalobs-server", true),
-    	            new GetOptDesc('l', "time-list", true)
+    	            new GetOptDesc('l', "time-list", true),
+    	            new GetOptDesc('n', "no-qc1", false)
     	        };
     	    	
     	if(kvpath==null){
@@ -151,7 +136,7 @@ public class Kl2KvMain {
     	for( String opt : optKeys ) {
              switch( opt.charAt( 0 ) ) {
              case 'h':
-                 use(0);
+                 use(0, null);
                  break;
              case 'c':
                  configfile= optArgs.get( opt );
@@ -165,20 +150,25 @@ public class Kl2KvMain {
              case 's':
             	 kvserver=go.optarg();
             	 break;
+             case 'n':
+            	 disableQC1=true;
+            	 break;
+             case '?':
+            	 use( 1,  new String( "*** Unknown option: " + optArgs.get( opt ) ) );
              default:
-             	 logger.fatal("Unknown option character " + opt);
-                 use(1);
+                 use(1, new String( "*** Unknown option: " +  opt ) );
              }
          }
     	
-    	 
+    	    	 
     	 if( optTimeList != null ) {
     		 obstimes = TimeDecoder.decodeTimeList( optTimeList );
     		 
     		 if( obstimes == null ) {
-    			 System.out.println("Invalid time-list: '"+optTimeList+"'");
-    			 System.exit(1);
+    			 use( 1, "*** Invalid time-list: '"+optTimeList+"'" );
     		 }
+    		 
+    		 obstimes = TimeDecoder.ensureResolution( obstimes, 6 );
     	 }
     	
     	 int i=configfile.lastIndexOf(".conf");
@@ -210,14 +200,15 @@ public class Kl2KvMain {
     	 
          go=null; //We dont need it anymore.
 
-         if(typeid==null)
-        	 use(1);
-
-     	 String[] typeidlist=typeid.split(",");
+         String[] typeidlist;
+         if(typeid==null) {
+        	 typeidlist = new String[1];
+        	 typeidlist[0] = null;
+         } else {
+        	 typeidlist=typeid.split(",");
+         }
          
          app=new Kl2KvApp(args, configfile, kvserver, false);
-         
-         app.setNameserver( "localhost", null );
          
     	 sendData=new SendData(app);          
     	 
@@ -227,11 +218,11 @@ public class Kl2KvMain {
     	 
     	 if(stationlist==null){
     		 logger.fatal("**** Feil i stasjonslisten ****\n\n");
-    		 use(1);
+    		 use(1, "*** Feil i stasjonslisten." );
     	 }
     	 
     	 for(String type : typeidlist){
-    		 if(!sendData.sendDataToKv(type, stationlist, obstimes)){
+    		 if(!sendData.sendDataToKv( type, stationlist, obstimes, disableQC1 ) ){
     			 logger.error("Failed to send data for typeid "+
     					       type+ " to kvalobs!");
     		 }else{

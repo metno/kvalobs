@@ -87,6 +87,7 @@ public class DataHelper{
     DbConnection  con;
     int           msgCount;
     int           obsCount;
+    boolean       disableQC1=false;
     static String[] ignoreList={"REG_DATO"};
     
     
@@ -117,13 +118,13 @@ public class DataHelper{
     }
     
     public DataHelper(DbConnection con, DataToKv dataToKv,  
-	                   String typeid){
-    	this(con, dataToKv, typeid, null, null, 20);
+	                   String typeid, boolean disableQC1 ){
+    	this(con, dataToKv, typeid, null, disableQC1, null, 20);
     }
     
     public DataHelper(DbConnection con, DataToKv dataToKv,  
-                       String typeid, List<TimeRange> obstimes, String table){
-    	this(con, dataToKv, typeid, obstimes, table, 20);
+                       String typeid, List<TimeRange> obstimes, boolean disableQC1, String table){
+    	this(con, dataToKv, typeid, obstimes, disableQC1, table, 20);
     }
     
     /**
@@ -137,7 +138,8 @@ public class DataHelper{
      *        split up in max_count chuncks. 
      */
     public DataHelper(DbConnection con, DataToKv dataToKv,  
-    		           String typeid, List<TimeRange> obstimes, String table, int max_count){
+    		           String typeid, List<TimeRange> obstimes, boolean disableQC1,
+    		           String table, int max_count){
     	params=null;
     	msgCount=0;
     	obsCount=0;
@@ -154,24 +156,51 @@ public class DataHelper{
     	this.dataToKv=dataToKv;
     	this.con=con;
     	this.obstimes = obstimes;
+    	this.disableQC1 = disableQC1;
     }
     
     protected String createQuery(Station st, TimeRange obstime ){
-    	String query=st.query();
+    	String query="";
+    	String stQuery=st.query();
+    	String typeQuery=null;
+    	String obstQuery=null;
+    	boolean doAnd = false;
     	
-    	if(query.length()>0)
-    		query=" AND "+query;
+    	if(stQuery.length() == 0 )
+    		stQuery = null;
+    	
+    	if( getTypeid() != null ) 
+    		typeQuery = " typeid="+getTypeid();
+    	
     	
     	if( obstime != null ) {
     		if( obstime.isEqual() ) 
-    			query += " AND obstime='" + obstime.getFrom() +"'";
+    			obstQuery = " obstime='" + obstime.getFrom() +"'";
     		else 
-    			query += " AND obstime>='" + obstime.getFrom() +"' AND obstime<='" + obstime.getTo()+"'";
+    			obstQuery = " obstime>='" + obstime.getFrom() +"' AND obstime<='" + obstime.getTo()+"'";
     	}
     	
-   		return "SELECT * FROM "+ getTable()+
-    				" WHERE typeid="+getTypeid() + query;
-    				//" order by stnr,dato";
+    	if( stQuery != null || obstQuery != null  || typeQuery != null ) {
+    		query = " WHERE";
+    		
+    		if( stQuery != null ) {
+    			doAnd = true;
+    			query += stQuery;
+    		}
+    
+    		if( typeQuery != null ) {
+    			query += ( doAnd?(" AND" + typeQuery):typeQuery);
+    			doAnd = true;
+    		}
+    
+    		if( obstQuery != null ) {
+    			query += ( doAnd?(" AND" + obstQuery):obstQuery);
+    			doAnd = true;
+    		}
+    		
+    	}
+    	
+   		return "SELECT * FROM "+ getTable()+ query;
     }
 
     /**
@@ -200,12 +229,12 @@ public class DataHelper{
     	String xmlData;
     	KvDataContainer dataContainer=new KvDataContainer();
     		
-    	if( ! dataContainer.add( rs ) ) {
+    	if( ! dataContainer.add( rs, disableQC1 ) ) {
     		System.err.println("convertToKvXmlAndSend: Failed to read data from the database.");
     		return false;
     	}
     		
-    	System.err.println( dataContainer );
+    	//System.err.println( dataContainer );
     		
     	Iterator<KvDataStation> itStation = dataContainer.iterator();
     		
@@ -226,9 +255,12 @@ public class DataHelper{
     			return false;
     		}
     			
-    		System.err.println( xmlData );
-    	/*TODO: Activate this when ready to test with a kvalobs server. */		
-    		if(!dataToKv.sendData( xmlData, station.getStation(), Integer.parseInt( getTypeid() ) ) ){
+    		int typeid=0;
+    		
+    		if( getTypeid() != null )
+    			typeid = Integer.parseInt( getTypeid() );
+    		
+    		if( ! dataToKv.sendData( xmlData, station.getStation(), typeid ) ){
     			System.out.println("Cant send data to kvalobs! Stationid: " + station.getStation() + " typeid: " + getTypeid() );
     			return false;
     		}
@@ -244,7 +276,7 @@ public class DataHelper{
     
     boolean doSendDataToKv(Station station, TimeRange obstime) {
     	String query=createQuery( station, obstime );
-    	System.out.println("Data for: typeid: " + typeid+ " Station: " + station + " Time: " + obstime );
+    	System.out.println("Data for: typeid: " + (typeid==null?"all":typeid)+ " Station: " + station + " Time: " + obstime );
     	
     	if(query==null){
     	    System.out.println("Cant create query!!!");
@@ -253,7 +285,7 @@ public class DataHelper{
     	    return false;
     	}
     	
-    	System.out.println("Query:[" + query +"]");
+    	logger.debug("Query: " + query );
     	
     	ResultSet rs;
     	
