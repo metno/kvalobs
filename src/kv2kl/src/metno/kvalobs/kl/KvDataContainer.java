@@ -11,6 +11,7 @@ import metno.util.MiGMTTime;
 import metno.util.MiTime;
 
 public class KvDataContainer {
+	static final int MISSING_VALUE=-32767;
 	TreeSet<KvDataStation> data;
 	int iStationid; 
 	int iObstime;    
@@ -172,7 +173,7 @@ public class KvDataContainer {
 	
 	
 	
-	public boolean add( java.sql.ResultSet rs ) {
+	public boolean add( java.sql.ResultSet rs, boolean disableQC1 ) {
     	try{
     		Timestamp tsobstime;
     		//String tmpDate;
@@ -187,6 +188,9 @@ public class KvDataContainer {
     		String controlinfo;
     		String useinfo;
     		String cfailed;
+    		int iiOriginal;
+    		int iiCorrected;
+    		char[] buf = new char[16];
     		
     		if( ! doInitialize( rs ) ) {
     			System.out.println("KvDataContainer::add: Missing coloumns in the database.");
@@ -251,6 +255,41 @@ public class KvDataContainer {
     			if( rs.wasNull() ) {
     				System.out.println("KvDataContainer::add: controlinfo is NULL." );
     				controlinfo = "0000000000000000";
+    			} else {
+    				//As a hack we set hqc flag to 3 if the flag is '0'.
+    				//If the hqc flag is > 0, we live as it is. 
+    				if( controlinfo.length() >= 16 && disableQC1 ) {
+    					controlinfo.getChars( 0, 16, buf, 0 );
+    					
+    					if( buf[15] == '0' ) {
+    						buf[15] = '3';
+    						controlinfo = new String( buf );
+    					}
+    				}
+    			}
+    			
+    			
+    			// Sett fmis in controlinfo. This should be set, but to be 
+    			//compatible with the old kl2kv we set it her if it is not
+    			//set.
+    			iiOriginal = Math.round( original );
+    			iiCorrected = Math.round( corrected );
+    			
+    			if( iiOriginal == MISSING_VALUE || iiCorrected == MISSING_VALUE ) {
+    				if( controlinfo.length() >= 16  ) {
+    					controlinfo.getChars( 0, 16, buf, 0 );
+    					
+    					if( buf[6] == '0' ) {
+    						if( iiOriginal == MISSING_VALUE && iiCorrected == MISSING_VALUE )
+    							buf[6] = '3';
+    						else if( iiOriginal == MISSING_VALUE )
+    							buf[6] = '1';
+    						else
+    							buf[6] = '2';
+    						
+    						controlinfo = new String( buf );
+    					}
+    				}
     			}
     			
     			useinfo = rs.getString( iUseinfo );
@@ -266,7 +305,6 @@ public class KvDataContainer {
     				System.out.println("KvDataContainer::add: cfailed is NULL." );
     				cfailed = "";
     			}
-    			
     			
     			obstime=new MiGMTTime(tsobstime);
     			//tmpDate=obstime.toString(MiGMTTime.FMT_COMPACT_TIMESTAMP_1);

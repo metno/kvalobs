@@ -132,6 +132,37 @@ public class KlApp extends KvApp
         else
         	this.kvserver=kvserver;
         
+        String myNameserver=null;
+        String myNameserverport=null;
+       
+        String[] tmpArr = this.kvserver.split("@");
+        
+        if( tmpArr.length > 1) {
+        	this.kvserver = tmpArr[0];
+        	
+        	if(tmpArr[1].length() > 0 ) {
+        		tmpArr = tmpArr[1].split( ":" );
+        		myNameserver = tmpArr[0];
+        		myNameserver.trim();
+        		
+        		if( tmpArr.length > 1 && tmpArr[1].length() > 0 ) {
+        			myNameserverport = tmpArr[1];
+        			myNameserverport.trim();
+        		}
+        			
+        		if( myNameserver.isEmpty() ) {
+        			myNameserver = null;
+        			myNameserverport = null;
+        		}
+        		
+        		if( myNameserverport != null && myNameserverport.isEmpty() )
+        			myNameserverport = null;
+        	}
+        }
+        
+        if( myNameserver != null ) 
+        	this.setNameserver(myNameserver, myNameserverport );
+        
         setKvServer(this.kvserver);
 
     	System.out.println("Database setup: ");
@@ -140,7 +171,11 @@ public class KlApp extends KvApp
     	System.out.println("  dbconnect: "+conMgr.getDbconnect());
     	System.out.println("");
     	System.out.println("Using kvalobs server: ");
-    	System.out.println("   kvserver: "+this.kvserver);
+    	System.out.println("          kvserver: "+this.kvserver);
+
+    	if( myNameserver != null)
+    		System.out.println("  CORBA nameserver: "+ myNameserver + (myNameserverport!=null?(":"+myNameserverport):""));
+    	
     }
 
     public void setDbIdleTime(int secs){

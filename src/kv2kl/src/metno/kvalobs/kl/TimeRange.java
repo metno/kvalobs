@@ -15,22 +15,21 @@ public class TimeRange {
 	{
 		if( from == null && to == null )
 			return;
-		
-		this.from = from;
-		this.to = to;
-		
+	
+		this.from = from==null?null:new MiTime( from );
+		this.to = to==null?null:new MiTime( to );
+
 		if( from == null)
-			this.from = to;
-		
-		if( to == null )
-			this.to = from;
+			this.from = this.to;
+		else if( to == null )
+			this.to = this.from;
 		
 	}
 	
 	public TimeRange( MiTime time )
 	{
-		this.from = time;
-		this.to = time;
+		this.from = new MiTime( time );
+		this.to = this.from;
 	}
 
 	public MiTime getFrom() {

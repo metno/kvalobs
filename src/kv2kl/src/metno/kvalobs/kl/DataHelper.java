@@ -3,6 +3,7 @@ package metno.kvalobs.kl;
 public class DataHelper {
 	IQuery query=null;
 	String dbdriver=null;
+	char ctlinfo[] = new char[16];
 	CKvalObs.CService.DataElem[] dataElem=null;
 	CKvalObs.CService.TextDataElem[] textDataElem=null;
 	int index=-1;
@@ -59,6 +60,18 @@ public class DataHelper {
 				dataElem = null;
 				index=0;
 			} else { 
+				
+				//If fhqc is 3 is an hack to disable running of qc1. If it is set 
+				//remove it.
+				if( dataElem[index].controlinfo != null && dataElem[index].controlinfo.length() >= 16 ) {
+					dataElem[index].controlinfo.getChars(0, 16, ctlinfo, 16 );
+				
+					if( ctlinfo[15] == '3' ) {
+						ctlinfo[15] = '0';
+						dataElem[index].controlinfo = new String( ctlinfo );
+					}
+				}
+				
 				return true;
 			}
 		}

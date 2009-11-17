@@ -86,5 +86,59 @@ public class TimeDecoder {
 		return new TimeRange( from, to );
 		
 	}
+	
+	/**
+	 * ensureResololution split all TimeRange in the list times where the difference between
+	 * fromtime and totime is greater than the resolutionInHours. On return all TimeRange in the
+	 * times list has a difference equal or less than  resolutionInHours. The number of elements
+	 * in the times list will be greater or equal to the length of the in comming list. The in comming
+	 * times list is unchanged.
+	 *  
+	 * 
+	 * @param times List of TimeRange to split.
+ 	 * @param resolutionInHours The maximum difference between fromTime and toTime.
+	 * @return List<TimeRange> A list of TimeRange with a differens less than or equal to r
+	 *         resolutionInHours.
+	 */
+	public static List<TimeRange> ensureResolution( List<TimeRange> times, int resolutionInHours )
+	{
+		List<TimeRange> retTimes = new LinkedList<TimeRange>();
+		MiTime fromTime;
+		MiTime toTime;
+		MiTime newToTime;
+		MiTime newFromTime;
+		
+		for( TimeRange time : times ){
+			fromTime = time.getFrom();
+			toTime = time.getTo();
+			
+			if( fromTime == null || toTime == null ) {
+				if( fromTime == null )
+					fromTime = toTime;
+				else 
+					toTime = fromTime;
+				
+				retTimes.add( new TimeRange( fromTime ,toTime ) );
+				continue;
+			}
 
+			newToTime = new MiTime( fromTime );
+			newFromTime = new MiTime( fromTime );
+			
+			while( true ) {
+				newToTime.addHour( resolutionInHours );
+
+				if( newToTime.compareTo( toTime ) < 0 ) {
+					retTimes.add(  new TimeRange( newFromTime, newToTime ) );
+					newFromTime.set( newToTime );
+					newFromTime.addHour( 1 );
+				} else {
+					retTimes.add(  new TimeRange( newFromTime, toTime ) );
+					break;
+				}
+			}
+		}
+		
+		return retTimes;		
+	}
 }
