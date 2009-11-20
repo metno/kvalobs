@@ -87,8 +87,7 @@ sub checkAndCopy {
 	my @header;
 	my $nHeaderElem;
 	my $nDataElem;
-	my $commas;
-	
+		
 	if( ! open( FILE , "<$file" ) ) {
 		timestamp; print $logfile "FAILED to open file <$file>!\n";
 		return 0;
@@ -128,7 +127,7 @@ sub checkAndCopy {
 		
 		if( $nDataElem < $nHeaderElem ) {
 			my $ii=0;
-			$commas = "";
+			my $commas = "";
 			
 			while( $ii < ($nHeaderElem-$nDataElem) ) {
 				$fixed = 1;
@@ -143,11 +142,13 @@ sub checkAndCopy {
 	}
 	
 	if( $tmpfile ) {
+		timestamp;
+
 		if( $fixed ) {
-			timestamp; print $logfile "Added missing commas. $file -> $destpath - ";
-		} else {
-			timestamp; print $logfile "$file -> $destpath - ";
-		}
+			 print $logfile "Added missing commas. ";
+		} 		
+
+		print $logfile "$file -> $destpath - ";
 		
 		qx/$copy $tmpfile $destpath\/$fname/;
 		
