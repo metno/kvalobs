@@ -122,7 +122,7 @@ public class Kl2KvMain {
     	    	
     	Kl2KvApp app;
     	SendData  sendData;          
-    	String configfile="kl2kv.conf";
+    	String configfile="kl2kvnew.conf";
     	MiGMTTime start=new MiGMTTime();
     	
     	GetOpt go = new GetOpt( options );
