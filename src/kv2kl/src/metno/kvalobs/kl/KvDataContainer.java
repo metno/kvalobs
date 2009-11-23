@@ -24,6 +24,8 @@ public class KvDataContainer {
 	int iControlinfo;
 	int iUseinfo;
 	int iCfailed;
+	int nObservations=0;
+	int nMessages=0;
 
 	KvDataStation findStation( int stationid ) {
 		Iterator<KvDataStation> it = data.iterator();
@@ -125,6 +127,7 @@ public class KvDataContainer {
 		KvDataObstime otime = type.findObstime( obstime );
 		
 		if( otime == null ) {
+			nMessages++;
 			otime = new KvDataObstime(obstime, false );
 			type.add( otime );
 		}
@@ -159,6 +162,7 @@ public class KvDataContainer {
 		KvDataParam kvParam = kvLevel.findParam( paramid );
 		
 		if( kvParam == null  ) {
+			nObservations++;
 			kvParam = new KvDataParam( paramid, original, corrected, controlinfo, useinfo, cfailed );
 			kvLevel.add( kvParam );
 		} else if( (kvParam.isMissingOriginal() && kvParam.isMissingCorrected()) &&
@@ -327,6 +331,9 @@ public class KvDataContainer {
     		return false;
     	}
 	}
+	
+	public int getNumberOfObservations() { return nObservations; }
+	public int getNumberOfMessages() { return nMessages; }
 	
 	public Iterator<KvDataStation> iterator() {
 		if( data == null )

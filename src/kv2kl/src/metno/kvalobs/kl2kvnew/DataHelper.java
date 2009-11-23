@@ -85,8 +85,8 @@ public class DataHelper{
     List<TimeRange> obstimes;
     DataToKv dataToKv;
     DbConnection  con;
-    int           msgCount;
-    int           obsCount;
+    int           msgCount=0;
+    int           obsCount=0;
     boolean       disableQC1=false;
     static String[] ignoreList={"REG_DATO"};
     
@@ -268,6 +268,9 @@ public class DataHelper{
     		}
     		count++;
     	}
+    	
+    	msgCount += dataContainer.getNumberOfMessages();
+    	obsCount += dataContainer.getNumberOfObservations();
     		
     	if(count>0){
     		System.out.println( count + " data is sendt to kvalobs.");
