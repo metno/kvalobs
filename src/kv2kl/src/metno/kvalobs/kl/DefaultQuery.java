@@ -1,5 +1,7 @@
 package metno.kvalobs.kl;
 
+import metno.util.MiTime;
+
 import org.apache.log4j.Logger;
 
 public class DefaultQuery implements IQuery{
@@ -74,4 +76,7 @@ public class DefaultQuery implements IQuery{
 		return query;
 	}
 	
+	public String dateString( MiTime time ) {
+		return "'" + time.toString( MiTime.FMT_ISO ) +"'";
+	}
 }
