@@ -1,6 +1,8 @@
 package metno.kvalobs.kl;
 
 import org.apache.log4j.Logger;
+import metno.kvalobs.kl.*;
+import metno.util.MiTime;
 
 public class OracleQuery implements IQuery {
 	static Logger logger=Logger.getLogger(SqlInsertHelper.class);
@@ -73,4 +75,7 @@ public class OracleQuery implements IQuery {
 	   	return query;
 	}
 	
+	public String dateString( MiTime time ) {
+		return "to_date('" + time.toString(MiTime.FMT_ISO) + "','yyyy-mm-dd hh24:mi:ss')";
+	}
 }

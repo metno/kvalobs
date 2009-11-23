@@ -31,8 +31,9 @@
 package metno.kvalobs.kl2kvnew;
 
 import metno.util.MiGMTTime;
-import metno.kvalobs.kl.KlApp;
+import metno.kvalobs.kl.*;
 import metno.util.*;
+import metno.kvalobs.kl.IQuery;
 import kvalobs.*;
 import java.sql.*;
 import java.io.*;
@@ -45,7 +46,9 @@ public class Kl2KvApp extends KlApp
 	static Logger logger=Logger.getLogger(Kl2KvApp.class);
 	
     String stations;
-    String tablename="KL2KVALOBS";
+    String tablename="T_KL2KVALOBS_HIST";
+    
+    public static IQuery sqlHelper=null; 
     
     public Kl2KvApp(String[] args, String conffile, String kvserver, boolean usingSwing){
     	super(args, conffile, kvserver, usingSwing);
@@ -57,6 +60,15 @@ public class Kl2KvApp extends KlApp
     	if(tmpTablename!=null && tmpTablename.length()>0){
     		tablename=tmpTablename;
     	}
+    	
+    	String dbdriver = conf.getProperty( "dbdriver" );
+    	
+    	if( dbdriver == null || dbdriver.length() == 0 ) {
+    		logger.fatal( "dbdriver must be set in the configuration file." );
+    		System.exit( 1 );
+    	}
+    	
+    	sqlHelper = QueryFactory.createQuery( dbdriver );
     }
     
     public String getTablename(){

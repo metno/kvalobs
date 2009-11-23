@@ -36,7 +36,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.*;
 import metno.kvalobs.kl.*;
-import metno.util.MiGMTTime;
+import metno.util.*;
 import org.apache.log4j.Logger;
 
 import sun.beans.editors.FloatEditor;
@@ -160,6 +160,7 @@ public class DataHelper{
     }
     
     protected String createQuery(Station st, TimeRange obstime ){
+    	IQuery sqlHelper = Kl2KvApp.sqlHelper;
     	String query="";
     	String stQuery=st.query();
     	String typeQuery=null;
@@ -175,9 +176,10 @@ public class DataHelper{
     	
     	if( obstime != null ) {
     		if( obstime.isEqual() ) 
-    			obstQuery = " obstime='" + obstime.getFrom() +"'";
+    			obstQuery = " obstime=" + sqlHelper.dateString( obstime.getFrom() );
     		else 
-    			obstQuery = " obstime>='" + obstime.getFrom() +"' AND obstime<='" + obstime.getTo()+"'";
+    			obstQuery = " obstime>=" + sqlHelper.dateString( obstime.getFrom() )
+    			          + " AND obstime<=" + sqlHelper.dateString( obstime.getTo() );
     	}
     	
     	if( stQuery != null || obstQuery != null  || typeQuery != null ) {
