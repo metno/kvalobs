@@ -1,5 +1,7 @@
 package metno.kvalobs.kl;
 
+import metno.kvalobs.kl.KvDataContainer;
+
 public class KvDataParam implements Comparable<KvDataParam> {
 	int paramid;
 	float original;
@@ -45,6 +47,18 @@ public class KvDataParam implements Comparable<KvDataParam> {
 
 	public String getCfailed() {
 		return cfailed;
+	}
+	
+	public boolean isMissingOriginal() {
+		int val = Math.round( original );
+		
+		return val == KvDataContainer.MISSING_VALUE;
+	}
+	
+	public boolean isMissingCorrected() {
+		int val = Math.round( corrected );
+		
+		return val == KvDataContainer.MISSING_VALUE;
 	}
 
 }
