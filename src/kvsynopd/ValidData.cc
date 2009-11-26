@@ -61,6 +61,18 @@ kvdatacheck::validData(const kvalobs::kvData &data)
 {
   kvUseInfo     uinfo=data.useinfo();
   kvControlInfo info=data.controlinfo();
+
+#ifdef USE_KVDATA
+  // We must export all changes made in hqc
+  if (info.hqcDone())
+	return true;
+  // we must export the result from automatic interpolation
+  // also...
+  int flag=flag2int(info.cflag(f_fnum));
+  if(flag == 6){
+    return true;
+  }
+#endif
   
   if(!check_useinfo1(uinfo, data.paramID())){
     LOGINFO("REJECTED useinfo(1): stationid: " << data.stationID() 
