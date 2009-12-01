@@ -37,6 +37,14 @@ CREATE TABLE data (
 
 CREATE INDEX data_obstime_index ON data (obstime);
 CREATE INDEX data_tbtime_index ON data (tbtime);
+--
+-- Added for performance reasons when reading data from kvalobs
+--
+CREATE INDEX data_stationidobstime_index
+  ON data
+  USING btree
+  (stationid, obstime);
+
 
 REVOKE ALL ON data FROM public;
 GRANT ALL ON data TO kv_admin;
