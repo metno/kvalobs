@@ -94,7 +94,7 @@ public class ParamFilter {
 	HashMap<Integer, LinkedList<ParamElem>> types;
 	DbConnection con;
 	
-	static class ParamElem implements Comparable{
+	static class ParamElem implements Comparable<Object>{
 		final static long MILIS_IN_YEAR=31536000000L;
 		final static long MIN_YEAR=-1900*MILIS_IN_YEAR;
 		final static long MAX_YEAR=6000*MILIS_IN_YEAR;
