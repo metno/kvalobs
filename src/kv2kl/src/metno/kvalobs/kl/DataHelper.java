@@ -55,23 +55,23 @@ public class DataHelper {
 		//System.out.println(" #dataElem: "+(dataElem!=null?dataElem.length:"(null)"));
 		//System.out.println(" #textDataElem: "+(textDataElem!=null?textDataElem.length:"(null)"));
 		
-		if( dataElem != null ) {
+		while( dataElem != null ) { 
 			if( index >= dataElem.length ) {
 				dataElem = null;
 				index=0;
+				continue;
 			} else { 
-				
-				//If fhqc is 3 is an hack to disable running of qc1. If it is set 
-				//remove it.
+				//fhqc == 3 is an hack to disable running of qc1. If it is set 
+				//skip this element.
 				if( dataElem[index].controlinfo != null && dataElem[index].controlinfo.length() >= 16 ) {
 					dataElem[index].controlinfo.getChars(0, 16, ctlinfo, 16 );
 				
 					if( ctlinfo[15] == '3' ) {
-						ctlinfo[15] = '0';
-						dataElem[index].controlinfo = new String( ctlinfo );
+						index++;
+						continue;
 					}
 				}
-				
+					
 				return true;
 			}
 		}
