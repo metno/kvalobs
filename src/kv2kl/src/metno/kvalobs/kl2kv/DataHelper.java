@@ -38,7 +38,6 @@ import metno.kvalobs.kl.KlApp;
 import metno.util.MiGMTTime;
 import org.apache.log4j.Logger;
 
-import sun.beans.editors.FloatEditor;
 import metno.dbutil.DbConnection;
 import metno.dbutil.DbConnectionMgr;
 
