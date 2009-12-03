@@ -64,7 +64,7 @@ public class DataHelper {
 				//fhqc == 3 is an hack to disable running of qc1. If it is set 
 				//skip this element.
 				if( dataElem[index].controlinfo != null && dataElem[index].controlinfo.length() >= 16 ) {
-					dataElem[index].controlinfo.getChars(0, 16, ctlinfo, 16 );
+					dataElem[index].controlinfo.getChars( 0, 16, ctlinfo, 0 );
 				
 					if( ctlinfo[15] == '3' ) {
 						index++;
