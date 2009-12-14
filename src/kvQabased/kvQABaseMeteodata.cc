@@ -54,6 +54,8 @@ kvQABaseMeteodata::kvQABaseMeteodata( kvQABaseDBConnection & dbcon,
 
 /*
   load all observation-data for one station, several timesteps
+  NOTE: This metod does not check if all required parameters
+  has been loaded....
 */
 bool
 kvQABaseMeteodata::loadObsData( const int sid,
@@ -75,18 +77,26 @@ kvQABaseMeteodata::loadObsData( const int sid,
               << stime << " until " << etime
               << endl );
   // check if required data already exist..
+  std::list<kvalobs::kvData> dlist;
   if ( obsdata.count( sid ) > 0 )
   {
+	  // We must assume, that the stime and etime are correct
+	  // there seems to be a bug here
+  /*
     if ( stime >= minObsTime_[ sid ] )
       stime = maxObsTime_[ sid ];
     if ( etime <= maxObsTime_[ sid ] )
       etime = minObsTime_[ sid ];
-
-    if ( stime >= minObsTime_[ sid ] && etime <= maxObsTime_[ sid ] )
-    {
-      IDLOGDEBUG( "html", "...already loaded..." << endl );
-      return true;
-    }
+  */
+// As a test, we should try to reload and replace the existing data,
+// instead of just returning true
+// Unfortunately, this is very cpu consuming, so we must skip it.
+// The problem is, that we cant be sure to have all data that we need...
+	if ( stime >= minObsTime_[ sid ] && etime <= maxObsTime_[ sid ] )
+	{
+        IDLOGDEBUG( "html", "ObsData already loaded!" << std::endl );
+		return true;
+	}
     else if ( stime < minObsTime_[ sid ] )
     {
       minObsTime_[ sid ] = stime;
@@ -104,7 +114,7 @@ kvQABaseMeteodata::loadObsData( const int sid,
 
   
   // fetch observation-data from db
-  std::list<kvalobs::kvData> dlist;
+  //std::list<kvalobs::kvData> dlist;
   if ( !dbcon_.getObservations( sid, stime, etime, dlist ) )
   {
     IDLOGERROR( "html", "kvQABaseMeteodata::loadObsData ERROR"
@@ -118,7 +128,6 @@ kvQABaseMeteodata::loadObsData( const int sid,
   for ( std::list<kvalobs::kvData>::const_iterator it = dlist.begin(); it != dlist.end(); ++ it )
   {
     obs_data & d = timeData[ it->obstime() ];
-
 //    if ( std::find( d.data.begin(), d.data.end(), * it ) == d.data.end() )
 //    {
       IDLOGDEBUG( "html", "Found ObsData:" << * it << std::endl );
@@ -980,6 +989,18 @@ void kvQABaseMeteodata::saveInDb( const ObsKeys & updated_obs )
            }*/
   }
   //   cout << endl;
+}
+
+void kvQABaseMeteodata::flushCache()
+{
+  try
+  {
+    saveCache_.flush();
+  }
+  catch( std::exception & e )
+  {
+    IDLOGERROR( "html", e.what() );
+  }	
 }
 
 

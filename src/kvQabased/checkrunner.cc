@@ -301,7 +301,7 @@ void CheckRunner::operator() ( bool forceCheck )
     }
   }
 
-
+  meteod.flushCache();
   logEnd_( "Done processing", Debug );
   LOGDEBUG( "CheckRunner::runChecks FINISHED" << endl );
 }

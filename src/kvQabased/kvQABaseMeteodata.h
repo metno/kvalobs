@@ -157,6 +157,8 @@ private:
     */
     bool updateParameters( const ScriptReturnType & params, const kvalobs::kvChecks & check );
 
+	void flushCache();
+
   private:
     DataFromTime & preloadData(const kvalobs::kvStationInfo & si);
     DataFromTime & preloadData() {
