@@ -55,6 +55,8 @@ ProcessImpl::
 Redistribute( ReadProgramOptions params )
 {
 
+  LOGINFO("Redistribute Accumulations");
+
   miutil::miTime stime=params.UT0;
   miutil::miTime etime=params.UT1;
   const int pid=params.pid;
@@ -76,12 +78,17 @@ Redistribute( ReadProgramOptions params )
 
   miutil::miTime ProcessTime;
 
+
   GetStationList(StationList);  /// StationList is all the possible stations
   for (std::list<kvalobs::kvStation>::const_iterator sit=StationList.begin(); sit!=StationList.end(); ++ sit) {
      StationIds.push_back( sit->stationID() );
   }
 
   ProcessTime = stime;
+
+  //std::cout << "ETIME TIME STAMP: " << etime << std::endl;
+  //std::cout << "STIME TIME STAMP: " << stime << std::endl;
+  //std::cout << "ProcessTIME TIME STAMP: " << ProcessTime << std::endl;
 
   while (ProcessTime <= etime) {
 

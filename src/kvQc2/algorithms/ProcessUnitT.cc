@@ -58,12 +58,13 @@ ProcessUnitT( ReadProgramOptions params )
  /// Need to integrate multiple handling of different type ids OR resolve this issue
  /// by separate program that scan kvalobs database and identifies the value of
  /// each duplicate measurement to use ...
-   int pid=params.pid;
-   float LinInterpolated;
-   float TanTaxInterpolated;
-   miutil::miTime stime=params.UT0;
-   miutil::miTime etime=params.UT1;
-   std::string CIF=params.ControlInfoString;
+  LOGINFO("ProcessUnitT");
+  int pid=params.pid;
+  float LinInterpolated;
+  float TanTaxInterpolated;
+  miutil::miTime stime=params.UT0;
+  miutil::miTime etime=params.UT1;
+  std::string CIF=params.ControlInfoString;
 
   std::list<kvalobs::kvStation> StationList;
   std::list<int> StationIds;
@@ -85,6 +86,10 @@ ProcessUnitT( ReadProgramOptions params )
   miutil::miTime XTime;
   miutil::miTime YTime;
   ProcessTime = etime;
+
+  //std::cout << "ETIME TIME STAMP: " << etime << std::endl;
+  //std::cout << "STIME TIME STAMP: " << stime << std::endl;
+  //std::cout << "ProcessTIME TIME STAMP: " << ProcessTime << std::endl;
 
   miutil::miTime fixtime; /// fixtime here for tests
 
