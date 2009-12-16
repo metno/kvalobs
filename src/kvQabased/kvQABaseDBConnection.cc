@@ -552,7 +552,33 @@ bool kvQABaseDBConnection::setObservation( const kvalobs::kvData& param )
 
   try
   {
-    result = dbGate.update( param );
+	  // Reread data from kvalobs so that new data has not arrived when 
+	  // controls have run
+
+	  std::list<kvalobs::kvData> dlist;
+	  result = dbGate.select( dlist, kvQueries::selectData(param) );
+	  // return if data not found in db
+	  if ( !result || dlist.size() == 0 )
+	  {
+		  IDLOGERROR( "html", "No old ObsData to update: " << param << std::endl );
+		  return false;
+	  }
+	  // Check if original data has arrived 
+	  std::list<kvalobs::kvData>::const_iterator it = dlist.begin();
+	  for ( ;it != dlist.end(); it++ )
+	  {
+		  kvalobs::kvData old_param = *it;
+		  // compare old_param with param
+		  // do not update if the original values differ
+		  if (old_param.original() != param.original())
+		  {
+			  IDLOGERROR( "html", "ObsData to update: " << param << std::endl );
+			  IDLOGERROR( "html", "Original differ (in db): " << old_param.original() << " , (in kvQabased) " << param.original() << std::endl );
+			  return false;
+		  }
+	  }
+	  result = dbGate.update( param );
+	  IDLOGDEBUG( "html", "ObsData updated: " << param << std::endl );
   }
   catch ( dnmi::db::SQLException & ex )
   {

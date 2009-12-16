@@ -79,7 +79,6 @@ void KvalobsCache::flush()
   	ui.setUseFlags( d.controlinfo() );
   	d.useinfo( ui );
 	toSave.push_back( d );
-	IDLOGDEBUG( "html", "Saving ObsData:" << d << std::endl );
   }
   
   if ( ! dbcon_.setObservation( toSave.begin(), toSave.end() ) )
