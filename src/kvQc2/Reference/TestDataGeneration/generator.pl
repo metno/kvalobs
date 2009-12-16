@@ -59,10 +59,9 @@ print $CHK2,"\n";
 sub shouldo {
   print
 (" 
-  #Hi $user_name, usage is:
-
-          #$0 YYYY MM DD HH CPT STATION HOUR_HALF_WIDTH
-
+  Hi $user_name, usage is:
+          $0 \"YYYY-MM-DD 06:00:00\" NUMBER_MISSING_POINTS StationID TypeID ParamID 
 ")
 }
+
 ## ----------------------------------------------------
