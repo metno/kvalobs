@@ -36,15 +36,6 @@ $PID=$ARGV[4];
 
 $M=$N-1;
 
-$CHK="SELECT * FROM data WHERE obstime='$DATE' AND stationid=$STID AND typeid=$TID AND paramid=$PID AND original>-32767 AND (SELECT COUNT(original) FROM data WHERE obstime BETWEEN date '$DATE' - interval '$M days' AND '$DATE' AND stationid=$STID AND typeid=$TID AND paramid=$PID AND original>-32767)=$N;";
-
-$CHK2="SELECT * FROM data WHERE obstime BETWEEN date '$DATE' - interval '$M days' AND '$DATE' AND stationid=$STID AND typeid=$TID AND paramid=$PID AND original>-32767;";
-
-print SCRIPT_FILE $CHK,"\n";
-print SCRIPT_FILE "\n";
-print SCRIPT_FILE $CHK2,"\n";
-print SCRIPT_FILE "\n";
-
 $UP1="UPDATE data SET original=((SELECT SUM(original) FROM data WHERE obstime BETWEEN date '$DATE' - interval '$M days' AND '$DATE' AND stationid=$STID AND typeid=$TID AND paramid=$PID AND original>-32767)+(SELECT COUNT(original) FROM data WHERE obstime BETWEEN date '$DATE' - interval '$M days' AND '$DATE' AND stationid=$STID AND typeid=$TID AND paramid=$PID AND original=-1)) WHERE obstime='$DATE' AND stationid=$STID AND typeid=$TID AND paramid=$PID AND original>-32767 AND (SELECT COUNT(original) FROM data WHERE obstime BETWEEN date '$DATE' - interval '$M days' AND '$DATE' AND stationid=$STID AND typeid=$TID AND paramid=$PID AND original>-32767)=$N;";
 
 $UP2="UPDATE data SET controlinfo='9999999999992990' WHERE obstime='$DATE' AND stationid=$STID AND typeid=$TID AND paramid=$PID AND original>-32767 AND (SELECT COUNT(original) FROM data WHERE obstime BETWEEN date '$DATE' - interval '$M days' AND '$DATE' AND stationid=$STID AND typeid=$TID AND paramid=$PID AND original>-32767)=$N;"; 
@@ -55,7 +46,6 @@ print SCRIPT_FILE "\n";
 print SCRIPT_FILE $UP2,"\n";
 
 for ($i=1; $i < $N; $i++){
-          #print $i,"\n";
           $j=$i-1;
           print SCRIPT_FILE "UPDATE data SET controlinfo='9999999999992990' WHERE obstime BETWEEN date '$DATE' -interval '$i days' AND date '$DATE' -interval '$j days' AND stationid=$STID AND typeid=$TID AND paramid=$PID AND original>-32767 AND (SELECT COUNT(original) FROM data WHERE obstime BETWEEN date '$DATE' - interval '$M days' AND '$DATE' AND stationid=$STID AND typeid=$TID AND paramid=$PID AND original>-32767)=$N;\n";
 print SCRIPT_FILE "\n";
@@ -63,17 +53,16 @@ print SCRIPT_FILE "\n";
 print SCRIPT_FILE "\n";
 }
 
+print SCRIPT_FILE "UPDATE data SET cfailed=cfailed||'TEST-DATA-RA_RR24 original='||corrected, original=-32767 WHERE obstime BETWEEN date '$DATE' - interval '$M days' AND '$DATE' AND stationid=$STID AND typeid=$TID AND paramid=$PID AND original=-11111;\n";
 print SCRIPT_FILE "\n";
-print SCRIPT_FILE $CHK,"\n";
-print SCRIPT_FILE "\n";
-print SCRIPT_FILE $CHK2,"\n";
+print SCRIPT_FILE "UPDATE data SET cfailed=cfailed||'TEST-DATA-RA_RR24 original='||corrected WHERE obstime='$DATE' AND stationid=$STID AND typeid=$TID AND paramid=$PID;\n";
+
 
 
 close (SCRIPT_FILE); 
 
 system("psql kvalobs -f RA_RA24_ScriptFile.sql");
 
-print "After all the updates do this final fix: UPDATE data SET cfailed=cfailed||'TEST-DATA-RA_RR24 original='||corrected, original=-32767 where original=-11111; \n";
 ## ----------------------------------------------------
 
 sub shouldo {
