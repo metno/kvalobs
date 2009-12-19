@@ -38,7 +38,7 @@ $M=$N-1;
 
 $UP1="UPDATE data SET original=((SELECT SUM(original) FROM data WHERE obstime BETWEEN date '$DATE' - interval '$M days' AND '$DATE' AND stationid=$STID AND typeid=$TID AND paramid=$PID AND original>-32767)+(SELECT COUNT(original) FROM data WHERE obstime BETWEEN date '$DATE' - interval '$M days' AND '$DATE' AND stationid=$STID AND typeid=$TID AND paramid=$PID AND original=-1)) WHERE obstime='$DATE' AND stationid=$STID AND typeid=$TID AND paramid=$PID AND original>-32767 AND (SELECT COUNT(original) FROM data WHERE obstime BETWEEN date '$DATE' - interval '$M days' AND '$DATE' AND stationid=$STID AND typeid=$TID AND paramid=$PID AND original>-32767)=$N;";
 
-$UP2="UPDATE data SET controlinfo='9999999999992990' WHERE obstime='$DATE' AND stationid=$STID AND typeid=$TID AND paramid=$PID AND original>-32767 AND (SELECT COUNT(original) FROM data WHERE obstime BETWEEN date '$DATE' - interval '$M days' AND '$DATE' AND stationid=$STID AND typeid=$TID AND paramid=$PID AND original>-32767)=$N;"; 
+$UP2="UPDATE data SET controlinfo='1140000000002000' WHERE obstime='$DATE' AND stationid=$STID AND typeid=$TID AND paramid=$PID AND original>-32767 AND (SELECT COUNT(original) FROM data WHERE obstime BETWEEN date '$DATE' - interval '$M days' AND '$DATE' AND stationid=$STID AND typeid=$TID AND paramid=$PID AND original>-32767)=$N;"; 
 
 print SCRIPT_FILE "\n";
 print SCRIPT_FILE $UP1,"\n";
@@ -47,7 +47,7 @@ print SCRIPT_FILE $UP2,"\n";
 
 for ($i=1; $i < $N; $i++){
           $j=$i-1;
-          print SCRIPT_FILE "UPDATE data SET controlinfo='9999999999992990' WHERE obstime BETWEEN date '$DATE' -interval '$i days' AND date '$DATE' -interval '$j days' AND stationid=$STID AND typeid=$TID AND paramid=$PID AND original>-32767 AND (SELECT COUNT(original) FROM data WHERE obstime BETWEEN date '$DATE' - interval '$M days' AND '$DATE' AND stationid=$STID AND typeid=$TID AND paramid=$PID AND original>-32767)=$N;\n";
+          print SCRIPT_FILE "UPDATE data SET controlinfo='1110000000002000' WHERE obstime BETWEEN date '$DATE' -interval '$i days' AND date '$DATE' -interval '$j days' AND stationid=$STID AND typeid=$TID AND paramid=$PID AND original>-32767 AND (SELECT COUNT(original) FROM data WHERE obstime BETWEEN date '$DATE' - interval '$M days' AND '$DATE' AND stationid=$STID AND typeid=$TID AND paramid=$PID AND original>-32767)=$N;\n";
 print SCRIPT_FILE "\n";
           print SCRIPT_FILE "UPDATE data SET original=-11111 WHERE obstime BETWEEN date '$DATE' -interval '$i days' AND date '$DATE' -interval '$j days' AND stationid=$STID AND typeid=$TID AND paramid=$PID AND original>-32767 AND (SELECT COUNT(original) FROM data WHERE obstime BETWEEN date '$DATE' - interval '$M days' AND '$DATE' AND stationid=$STID AND typeid=$TID AND paramid=$PID AND original>-32767)=$N;\n";
 print SCRIPT_FILE "\n";
