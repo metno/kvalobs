@@ -61,18 +61,35 @@ kvdatacheck::validData(const kvalobs::kvData &data)
 {
   kvUseInfo     uinfo=data.useinfo();
   kvControlInfo info=data.controlinfo();
-
+// A little to complicated, when we load baak
+// we will export uncontrolled data also
+//#ifdef USE_KVDATA
+//  // We must export all changes made in hqc
+//  if (info.hqcDone())
+//	return true;
+//  // we must export the result from automatic interpolation
+//  // also...
+//  int flag=flag2int(info.cflag(f_fnum));
+//  if(flag == 6){
+//    return true;
+//  }
+//#endif
+// Rules valid when loading baak, must be changed when loading the new archive
 #ifdef USE_KVDATA
-  // We must export all changes made in hqc
-  if (info.hqcDone())
-	return true;
-  // we must export the result from automatic interpolation
-  // also...
-  int flag=flag2int(info.cflag(f_fnum));
+  // Check limits...
+  int flag=flag2int(info.cflag(f_fr));
   if(flag == 6){
-    return true;
+	  return false;
   }
+  // Check missing...
+  flag=flag2int(info.cflag(f_fmis));
+  if(flag == 3){
+	  return false;
+  }
+  // export all the rest...
+  return true;
 #endif
+
   
   if(!check_useinfo1(uinfo, data.paramID())){
     LOGINFO("REJECTED useinfo(1): stationid: " << data.stationID() 
