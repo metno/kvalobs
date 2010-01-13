@@ -133,7 +133,7 @@ static void output_dealloc(OutputObject* self)
 static void add_int(PyObject* dict, const std::string& key, int value)
 {
   /* add integer to dictionary */
-
+  //  IDLOGDEBUG("html", "add_int '" << key << "'" << value << "'" << std::endl );
   /* build key */
   PyObject* keyobj = PyString_FromStringAndSize(key.c_str(), key.size());
   if (!keyobj)
@@ -157,7 +157,7 @@ static PyObject* open_list(PyObject* dict, const std::string& key)
   /* add list to dictionary.  returns a list object that can be
      populated with add_int (below) and add_value.  the resulting list
      object must be closed with close_list. */
-
+  // IDLOGDEBUG("html", "open_list '" << key << "'" << std::endl );
   /* build key */
   PyObject* keyobj = PyString_FromStringAndSize(key.c_str(), key.size());
   if (!keyobj)
@@ -179,7 +179,7 @@ static PyObject* open_list(PyObject* dict, const std::string& key)
 static void add_int(PyObject* list, int value)
 {
   /* add integer to list object */
-
+  //IDLOGDEBUG("html", "add_int '" << value << "'" << std::endl );
   if (!list)
     return;
 
@@ -196,7 +196,7 @@ static void add_value(PyObject* list, const std::string& value, int missing)
 {
   /* add value to list object.  values are given as strings, but are
      converted to floats by this layer */
-
+  //IDLOGDEBUG("html", "add_value '" << value << "'" << missing << "'" << std::endl );
   if (!list)
     return;
 
@@ -226,7 +226,7 @@ static void add_value(PyObject* list, const std::string& value, int missing)
 static inline void close_list(PyObject* list)
 {
   /* close a list object that was opened with open_list */
-
+  //IDLOGDEBUG("html", "close_list()" << std::endl );
   Py_XDECREF(list);
 }
 
@@ -235,7 +235,10 @@ static int add_script_var(PyObject* dict, const kvQABase::script_var& var)
   /* add contents of a script_var object to dictionary */
 
   if (var.allpos.empty() || var.alltimes.empty() || var.pars.empty())
-    return 0; // ignore empty records
+  {
+    IDLOGDEBUG("html", "Empty script_var, ignored!" << std::endl );
+	return 0; // ignore empty records
+  }
 
   /* iterator types used below */
   typedef std::vector<int>::const_iterator int_iter;
@@ -292,7 +295,9 @@ static int add_script_var(PyObject* dict, const kvQABase::script_var& var)
 	/* look for it in the station map.  note that we cannot use
 	   operator[] here; it may modify the map, and so doesn't work
 	   on const maps */
-
+    /* If no value found, a missing value is added instead. That means
+	 * that we take care of parameters with unequal observation programs 
+	*/
 	station_map_iter is = par->values.find(*pp);
 	if (is != par->values.end()) {
 	  timeslot_map_iter it = (is->second).find(*tp);
@@ -382,13 +387,20 @@ kvPythonInterpreter::kvPythonInterpreter()
 
   char* bootstrap =
     "def missing(x): return x is None\n"
+    "def expand(x, xoffs, timespan=12):\n"
+    "  ret = [None] * (timespan+1)\n"
+    "  for i in range(len(xoffs)):\n"
+    "    toffset = -xoffs[i]/60\n"
+    "    if 0<= toffset <= timespan:\n"
+    "      ret[toffset] = x[i]\n"
+    "  return ret\n"
     "class Dispatcher:\n"
     "  def __init__(self):\n"
     "    self.cache = {}\n"
     "  def register(self, name, script):\n"
     "    # print 'CALL register(%r, %r)' % (name, script[:40])\n"
 #if defined(USE_ARGS)
-    "    context = dict(missing=missing)\n"
+    "    context = dict(missing=missing,expand=expand)\n"
     "    exec compile(script, name + '.py', 'exec') in context\n"
     "    self.cache[name] = context['check']\n"
     "    return\n"
@@ -405,7 +417,7 @@ kvPythonInterpreter::kvPythonInterpreter()
     "    self.cache[name](result, **data)\n"
     "    return result\n"
 #else
-    "    context = dict(missing=missing)\n"
+    "    context = dict(missing=missing,expand=expand)\n"
     "    context.update(data)\n"
     "    exec self.cache[name] in context\n"
     "    result = dict()\n"
