@@ -113,10 +113,12 @@ Redistribute( ReadProgramOptions params )
        }
               
        if(!ReturnData.empty()) {
+          std::cout << "Not Empty" << std::endl;
           for (std::list<kvalobs::kvData>::const_iterator id = ReturnData.begin(); id != ReturnData.end(); ++id) {
                       try {
+                           std::cout << "Flag Check" << std::endl;
                            if ( CheckFlags.condition(id->controlinfo(),params.Wflag) ) { 
-                                //std::cout << "WRITING ***************************************" << std::endl;
+                                std::cout << "WRITING ***************************************" << std::endl;
                                 kvData d = *id;
                                 kvUseInfo ui = d.useinfo();
                                 ui.setUseFlags( d.controlinfo() );

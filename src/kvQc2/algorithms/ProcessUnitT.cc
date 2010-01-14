@@ -46,6 +46,7 @@
 #include "CheckedDataHelper.h"
 
 #include "scone.h"
+#include "tround.h"
 
 using namespace kvalobs;
 using namespace std;
@@ -147,6 +148,7 @@ ProcessUnitT( ReadProgramOptions params )
                                                //std::cout <<  MaxT.begin()->original() << " " << MinT.begin()->original() << std::endl;
                                                LinInterpolated=0.5*(Tseries[0].original()+Tseries[2].original());
                                                TanTaxInterpolated=0.5*(MinT.begin()->original()+MaxT.begin()->original());
+                                               TanTaxInterpolated=round<float,1>(TanTaxInterpolated);
 
                                      result = dbGate.select(Qc2InterpData, kvQueries::selectData(StationIds,pid,Tseries[1].obstime(),
                                                                                                            Tseries[1].obstime() ));
