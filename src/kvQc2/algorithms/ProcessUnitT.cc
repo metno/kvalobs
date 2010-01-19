@@ -217,6 +217,7 @@ ProcessUnitT( ReadProgramOptions params )
                           }
                    }
                 //Tseries.clear();
+                //
   ProcessTime.addHour(-1);
   }
 return 0;

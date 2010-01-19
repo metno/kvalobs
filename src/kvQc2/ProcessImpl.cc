@@ -138,6 +138,11 @@ select(ReadProgramOptions params)
          break;
      case 7:
          std::cout << "Case: " << AlgoCode << std::endl;
+         LOGINFO("Case 7: FlagTester");
+         FlagTester(params);
+         break;
+     case 8:
+         std::cout << "Case: " << AlgoCode << std::endl;
          LOGINFO("Case 7: Dummy");
          break;
      default:

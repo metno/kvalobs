@@ -32,6 +32,7 @@ kvQc2_SOURCES = \
 	algorithms/Interpolate.cc \
 	algorithms/ProcessSpaceCheck.cc \
 	algorithms/ProcessVariability.cc \
+	algorithms/FlagTester.cc \
 	algorithms/proj++.cc \
 	algorithms/proj++.h \
 	algorithms/Qc2D.cc \
