@@ -47,6 +47,10 @@
 
 #include "scone.h"
 #include "tround.h"
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
 
 using namespace kvalobs;
 using namespace std;
@@ -69,6 +73,44 @@ FlagTester( ReadProgramOptions params )
   ProcessControl CheckFlags;
   kvalobs::kvControlInfo fixflags;
   kvData d;
+  std::vector<std::string> FlagStrings;
+  std::vector<kvalobs::kvControlInfo> ControlFlags; 
+
+   std::string line;
+   string valis;
+   string key;
+
+   std::ifstream ind;
+   ind.open("/metno/kvalobs/kvalobs-svn/src/kvQc2/algorithms/Flags.txt");
+   if(ind) {
+      ind >> key;
+      while ( !ind.eof() ) {
+
+         ind >> valis;
+         if (valis!=";") {
+             FlagStrings.push_back(valis);
+         }
+         else if (valis==";") {
+             ind >> key;
+         }
+      }
+   }
+   else {
+          std::cout << "Could not open Flags.txt file!" << std::endl;
+   }
+
+  ind.close();
+
+  for (std::vector<string>::const_iterator vit = FlagStrings.begin(); vit != FlagStrings.end(); ++vit){
+     kvalobs::kvUseInfo ubruce;
+     std::cout << ubruce << std::endl;
+     //std::cout << *vit << std::endl;
+     kvalobs::kvControlInfo kbruce(*vit);
+     ubruce.setUseFlags( kbruce );
+     std::cout << kbruce << std::endl;
+     std::cout << ubruce << std::endl;
+     std::cout << "---------------" << std::endl;
+  }
 
   kvUseInfo ui = d.useinfo();
   std::cout << d.controlinfo() << std::endl;
