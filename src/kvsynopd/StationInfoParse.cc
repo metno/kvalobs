@@ -130,7 +130,7 @@ StationInfo*
 StationInfoParse::parseSection(miutil::conf::ConfSection *stationConf, 
 			       			   int wmono)
 {
- 	char *keywords[]={"stationid", "delay", "precipitation",
+ 	const char *keywords[]={"stationid", "delay", "precipitation",
 		    		  "typepriority", "list",
 		    		  "copy", "copyto", "owner", "loglevel", 0};
 
@@ -385,8 +385,8 @@ std::list<std::string>
 StationInfoParse::
 doDefPrecip(miutil::conf::ValElementList &vl, int wmono)
 {
-  	char *validval[]={"RA", "RR", "RRRtr", "RR_01", "RR_1", 
-	   				   "RR_3", "RR_6","RR_12","RR_24",0};
+  	const char *validval[]={"RA", "RR", "RRRtr", "RR_01", "RR_1",
+	   		 		   "RR_3", "RR_6","RR_12","RR_24",0};
   	int i;
   	ostringstream ost;
   	std::list<std::string> RR;

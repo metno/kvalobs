@@ -57,7 +57,7 @@ using namespace boost;
 
 
 namespace{
-  char *splitType[]={"METAR", "BBXX", 0};
+  const char *splitType[]={"METAR", "BBXX", 0};
 
   regex zczc("^ *ZCZC *[0-9]* *");
   regex nil("[0-9A-Za-z]* *NIL[ =]*", regex::icase| regex::normal);

@@ -2403,11 +2403,11 @@ Synop::SplittStreng(std::string &streng, std::string::size_type index)
   	std::string::size_type t;
   	std::string::size_type p;
   	std::string::size_type n;
-  	char        *seksjon[]={" 222// ", 
-					        " 333 ", 
-			  				" 444 ", 
-			  				" 555 ",
-			  				0};
+  	const char        *seksjon[]={" 222// ",
+			                      " 333 ",
+			  				      " 444 ",
+			  				      " 555 ",
+			  				      0};
   
   	i = 0;
   

@@ -53,15 +53,15 @@ namespace kvalobs{
        * \brief convert from autoobs param name too kvalobs param name.
        */
       struct NameConvertDef{
-	      char *oldName;
-	      char *newName;
+	      const char *oldName;
+	      const char *newName;
       };
 
       /**
        * \brief A name
        */
       struct NameDef{
-	      char *name;
+	      const char *name;
       };
       
       /**
@@ -71,7 +71,7 @@ namespace kvalobs{
       struct SplitDef
       {
 	     ///Kvalobs parameter name.
-	     char *id;  
+	     const char *id;
 	     /// An index into the AutoObs parameter data where a element start
 	     char index;
 	     ///The size of the data that starts at index 
@@ -84,7 +84,7 @@ namespace kvalobs{
       struct SplitData
       {
 	     ///AutoObs param name.
-	     char *name;
+	     const char *name;
 	
 	     ///A referanse to a corresponding kvalobs param name.
 	     SplitDef *def;

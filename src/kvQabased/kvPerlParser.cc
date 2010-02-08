@@ -87,7 +87,7 @@ bool kvPerlParser::runScript( const std::string& script,
   //   char *thescript= (char*) malloc(sizeof(char)*(script.length()+1));
   //   strcpy(thescript, script.c_str());
 
-  char *embedding[] = { "", "-e", const_cast<char*>( script.c_str() ) };
+  const char *embedding[] = { "", "-e", script.c_str() };
   //   char *embedding[] = { "", "-e", thescript };
 
   IDLOGINFO( "html", "  Start PERL parsing " << std::endl );
@@ -100,7 +100,7 @@ bool kvPerlParser::runScript( const std::string& script,
   
   //IDLOGDEBUG("html", "before perl_parse: "<<	std::endl <<embedding[2]);
   
-  res = perl_parse( my_perl, NULL, numa, embedding, NULL );
+  res = perl_parse( my_perl, NULL, numa, const_cast<char **>(embedding), NULL );
   if ( res != 0 )
   {
     std::string errstr;
