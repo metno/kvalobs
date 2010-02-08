@@ -107,8 +107,7 @@ FlagTester( ReadProgramOptions params )
      //std::cout << *vit << std::endl;
      kvalobs::kvControlInfo kbruce(*vit);
      ubruce.setUseFlags( kbruce );
-     std::cout << kbruce << std::endl;
-     std::cout << ubruce << std::endl;
+     std::cout << kbruce << " "<< ubruce << std::endl;
      std::cout << "---------------" << std::endl;
   }
 
