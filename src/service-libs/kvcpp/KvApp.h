@@ -336,11 +336,11 @@ namespace kvservice
   }
     
   /**
-   * \brief A application singleton class for kvservice aplications.
+   * \brief A application singleton class for kvservice applications.
    *
    * Note that all methods in this class are abstract.
    *
-   * There is nothing that prevent you from creating more instanceses
+   * There is nothing that prevent you from creating more instances
    * but the behavior is undefined. Don't do it.
    */
   class KvApp
