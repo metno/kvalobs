@@ -3,35 +3,26 @@
 
 using agregator::AbstractAgregator;
 
-AbstractAgregatorTest::AbstractAgregatorTest()
-	: agregator(0)
+TEST_P(AbstractAgregatorTest, testGetTimeSpanAtGenerationPoint)
 {
-}
-
-AbstractAgregatorTest::~AbstractAgregatorTest()
-{
-}
-
-void AbstractAgregatorTest::testGetTimeSpanAtGenerationPoint()
-{
-	const std::set<miutil::miClock> & generateWhen = agregator->generateWhen(); 
+	const std::set<miutil::miClock> & generateWhen = GetParam()->generateWhen();
 	const miutil::miClock toTest(* generateWhen.begin());
 	const kvalobs::kvDataFactory dataFactory( 42, "2007-06-06 06:00:00", 302 );
 	miutil::miTime time(miutil::miDate("2007-06-06"),toTest);
 	const kvalobs::kvData d = dataFactory.getData( 15, 1, time );
 	
-	const AbstractAgregator::TimeSpan timeSpan = agregator->getTimeSpan(d);
+	const AbstractAgregator::TimeSpan timeSpan = GetParam()->getTimeSpan(d);
 
-	CPPUNIT_ASSERT_EQUAL(time, timeSpan.second);
+	ASSERT_EQ(time, timeSpan.second);
 	
-	time.addHour(- agregator->interestingHours());
-	CPPUNIT_ASSERT_EQUAL(time, timeSpan.first);	
+	time.addHour(- GetParam()->interestingHours());
+	ASSERT_EQ(time, timeSpan.first);
 }
 
 
-void AbstractAgregatorTest::testGetTimeSpan()
+TEST_P(AbstractAgregatorTest, testGetTimeSpan)
 {
-	const std::set<miutil::miClock> & generateWhen = agregator->generateWhen();
+	const std::set<miutil::miClock> & generateWhen = GetParam()->generateWhen();
 	const miutil::miClock toTest(* generateWhen.begin());
 	const kvalobs::kvDataFactory dataFactory( 42, "2007-06-06 06:00:00", 302 );
 	miutil::miTime time(miutil::miDate("2007-06-06"),toTest);
@@ -40,10 +31,10 @@ void AbstractAgregatorTest::testGetTimeSpan()
 	triggerTime.addHour(-1);
 	const kvalobs::kvData d = dataFactory.getData( 15, 1, triggerTime );
 	
-	const AbstractAgregator::TimeSpan timeSpan = agregator->getTimeSpan(d);
+	const AbstractAgregator::TimeSpan timeSpan = GetParam()->getTimeSpan(d);
 	
-	CPPUNIT_ASSERT_EQUAL(time, timeSpan.second);
+	ASSERT_EQ(time, timeSpan.second);
 	
-	time.addHour(- agregator->interestingHours());
-	CPPUNIT_ASSERT_EQUAL(time, timeSpan.first);
+	time.addHour(- GetParam()->interestingHours());
+	ASSERT_EQ(time, timeSpan.first);
 }

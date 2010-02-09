@@ -56,15 +56,19 @@ TESTS = kvAgregatedTest
 check_PROGRAMS = kvAgregatedTest
 
 kvAgregatedTest_SOURCES = \
-	test/AbstractAgregatorTest.cc test/AbstractAgregatorTest.h \
-	test/MinMaxTest.cc test/MinMaxTest.h \
-	test/ra2rr_12ForwardTest.cc test/ra2rr_12ForwardTest.h \
-	test/ra2rr_12Test.cc test/ra2rr_12Test.h \
+	test/AbstractAgregatorTest.cc \
+	test/AbstractAgregatorTest.h \
+	test/MinMaxTest.cc \
+	test/ra2rr_12ForwardTest.cc \
+	test/ra2rr_12Test.cc \
 	test/test.cc \
 	$(kvAgregated_SOURCES:main.cc=)
 
-kvAgregatedTest_CPPFLAGS = $(kvAgregated_CPPFLAGS) $(cppunit_CFLAGS)
-kvAgregatedTest_LDFLAGS = \
-		$(cppunit_LIBS)  \
-		$(top_builddir)/src/service-libs/kvcpp/libkvcpp.la \
-      $(top_builddir)/src/lib/kvalobs/libkvalobs.la
+kvAgregatedTest_CPPFLAGS = $(kvAgregated_CPPFLAGS) $(GTEST_CFLAGS)
+kvAgregatedTest_CXXFLAGS = $(GTEST_CXXFLAGS)
+kvAgregatedTest_LDFLAGS = $(GTEST_LDFLAGS) \
+	$(top_builddir)/src/service-libs/kvcpp/libkvcpp.la \
+	$(top_builddir)/src/lib/kvalobs/libkvalobs.la \
+	$(GTEST_LIBS)
+	
+

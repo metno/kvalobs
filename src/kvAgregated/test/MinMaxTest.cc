@@ -28,32 +28,27 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#include "MinMaxTest.h"
+
+#include "AbstractAgregatorTest.h"
 #include <minmax.h>
 #include <times.h>
 #include <kvalobs/kvDataOperations.h>
 #include <algorithm>
 #include <iterator>
 
-CPPUNIT_TEST_SUITE_REGISTRATION( MinMaxTest );
-
 using namespace kvalobs;
 using namespace agregator;
 
-MinMaxTest::MinMaxTest()
+class MinMaxTest : public AbstractAgregatorTest
 {
-}
+protected:
+	MinMax agregatorToTest;
+	MinMaxTest() : agregatorToTest(1, 2, 12, sixAmSixPm, std::min<float>) {}
+};
 
-MinMaxTest::~MinMaxTest()
-{
-}
+INSTANTIATE_TEST_CASE_P(MinMaxTest, AbstractAgregatorTest, testing::Values(AgregatorPtr(new MinMax(1, 2, 12, sixAmSixPm, std::min<float>))));
 
-void MinMaxTest::setUp()
-{
-	agregator = new MinMax( 1, 2, 12, sixAmSixPm, std::min<float> );
-}
-
-void MinMaxTest::testNormal()
+TEST_F(MinMaxTest, testNormal)
 {
 	AbstractAgregator::kvDataList data;
 	const kvDataFactory dataFactory( 42, "2007-06-06 06:00:00", 302 );
@@ -74,15 +69,15 @@ void MinMaxTest::testNormal()
 	AbstractAgregator::kvDataList::const_iterator p = data.begin();
 	++p;
 	
-	AbstractAgregator::kvDataPtr d = agregator->process( *p, data );
-	CPPUNIT_ASSERT( d.get() );
+	AbstractAgregator::kvDataPtr d = agregatorToTest.process( *p, data );
+	ASSERT_TRUE( d.get() );
 	
-	CPPUNIT_ASSERT_EQUAL( 2, d->paramID() );
-	CPPUNIT_ASSERT_DOUBLES_EQUAL( 3, d->corrected(), 0.0005 );
-	CPPUNIT_ASSERT_DOUBLES_EQUAL( 3, d->original(), 0.0005 );
+	EXPECT_EQ( 2, d->paramID() );
+	EXPECT_FLOAT_EQ( 3, d->corrected() );
+	EXPECT_FLOAT_EQ( 3, d->original() );
 }
 
-void MinMaxTest::testIncompleteData()
+TEST_F(MinMaxTest, testIncompleteData)
 {
 	AbstractAgregator::kvDataList data;
 	const kvDataFactory dataFactory( 42, "2007-06-06 06:00:00", 302 );
@@ -100,14 +95,14 @@ void MinMaxTest::testIncompleteData()
 	data.push_back( dataFactory.getData( 5, 1, "2007-06-06 05:00:00" ) );
 	data.push_back( dataFactory.getData( 5, 1, "2007-06-06 06:00:00" ) );
 
-	AbstractAgregator::kvDataPtr d = agregator->process( data.back(), data );
-	CPPUNIT_ASSERT( d.get() );
+	AbstractAgregator::kvDataPtr d = agregatorToTest.process( data.back(), data );
+	ASSERT_TRUE(d.get());
 	
-	CPPUNIT_ASSERT_EQUAL( 2, d->paramID() );
-	CPPUNIT_ASSERT( not valid( * d ) );	
+	EXPECT_EQ( 2, d->paramID() );
+	ASSERT_TRUE( not valid( * d ) );
 }
 
-void MinMaxTest::testMissingRow()
+TEST_F(MinMaxTest, testMissingRow)
 {
 	AbstractAgregator::kvDataList data;
 	const kvDataFactory dataFactory( 42, "2007-06-06 06:00:00", 302 );
@@ -125,12 +120,12 @@ void MinMaxTest::testMissingRow()
 	data.push_back( dataFactory.getData( 5, 1, "2007-06-06 05:00:00" ) );
 	data.push_back( dataFactory.getData( 5, 1, "2007-06-06 06:00:00" ) );
 
-	AbstractAgregator::kvDataPtr d = agregator->process( data.back(), data );
-	CPPUNIT_ASSERT( ! d.get() );
+	AbstractAgregator::kvDataPtr d = agregatorToTest.process( data.back(), data );
+	ASSERT_TRUE( ! d.get() );
 }
 
 
-void MinMaxTest::testWrongInputDates()
+TEST_F(MinMaxTest, testWrongInputDates)
 {
 	AbstractAgregator::kvDataList data;
 	const kvDataFactory dataFactory( 42, "2007-06-06 06:00:00", 302 );
@@ -148,14 +143,14 @@ void MinMaxTest::testWrongInputDates()
 	data.push_back( dataFactory.getData( 5, 1, "2007-06-06 05:00:00" ) );
 	data.push_back( dataFactory.getData( 4, 1, "2007-06-06 06:00:00" ) );
 
-	AbstractAgregator::kvDataPtr d = agregator->process( data.back(), data );
-	CPPUNIT_ASSERT( ! d.get() );
-//	CPPUNIT_ASSERT_DOUBLES_EQUAL(4, d->original(), 0.0005);
-//	CPPUNIT_ASSERT_DOUBLES_EQUAL(4, d->corrected(), 0.0005);
+	AbstractAgregator::kvDataPtr d = agregatorToTest.process( data.back(), data );
+	ASSERT_TRUE( ! d.get() );
+//	EXPECT_FLOAT_EQ(4, d->original());
+//	EXPECT_FLOAT_EQ(4, d->corrected());
 }
 
 
-void MinMaxTest::testCompleteDataObservationInMiddle()
+TEST_F(MinMaxTest, testCompleteDataObservationInMiddle)
 {
 	AbstractAgregator::kvDataList data;
 	const kvDataFactory dataFactory( 42, "2007-06-06 06:00:00", 302 );
@@ -176,15 +171,15 @@ void MinMaxTest::testCompleteDataObservationInMiddle()
 	AbstractAgregator::kvDataList::const_iterator randomElement = data.begin();
 	std::advance( randomElement, 4 );
 	
-	AbstractAgregator::kvDataPtr d = agregator->process( * randomElement, data );
-	CPPUNIT_ASSERT( d.get() );
+	AbstractAgregator::kvDataPtr d = agregatorToTest.process( * randomElement, data );
+	ASSERT_TRUE(d.get());
 	
-	CPPUNIT_ASSERT_EQUAL( 2, d->paramID() );
+	EXPECT_EQ( 2, d->paramID() );
 	
 	// This is a previous bug we are checking for:
-	CPPUNIT_ASSERT( d->corrected() != randomElement->corrected() );
+	ASSERT_TRUE( d->corrected() != randomElement->corrected() );
 	
 	// This is the correct answer:
-	CPPUNIT_ASSERT_DOUBLES_EQUAL( 0, d->corrected(), 0.0005 );
-	CPPUNIT_ASSERT_DOUBLES_EQUAL( 0, d->original(), 0.0005 );
+	EXPECT_FLOAT_EQ( 0, d->corrected());
+	EXPECT_FLOAT_EQ( 0, d->original());
 }

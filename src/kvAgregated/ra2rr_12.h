@@ -102,7 +102,6 @@ class ra2rr_12_forward : public ra2rr_12
 public:
   ra2rr_12_forward( );
 
-protected:
   virtual const TimeSpan getTimeSpan( const kvalobs::kvData &data ) const;
 
   virtual int timeOffset() const { return 12; }
