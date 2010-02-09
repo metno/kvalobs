@@ -78,7 +78,7 @@ PKG_CHECK_MODULES(libxml2, libxml-2.0)
 PKG_CHECK_MODULES(libxmlpp, libxml++-2.6)
 
 PKG_CHECK_MODULES(cppunit, cppunit)
-GTEST_CHECK
+GTEST_LIB_CHECK([1.4], [true], [false])
 
 
 KV_PERL
