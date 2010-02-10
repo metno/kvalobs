@@ -1,21 +1,37 @@
+CXX = ccache g++
+
 bin_PROGRAMS = kvAgregated
 bin_SCRIPTS = kvAgregateDbInit.sh
 
 kvAgregated_SOURCES = \
-	proxy/IncomingHandler.h proxy/IncomingHandler.cc \
-	proxy/KvalobsProxy.h proxy/KvalobsProxy.cc \
-	proxy/KvDataReceiver.h proxy/KvDataReceiver.cc \
-	proxy/KvDataSaver.h proxy/KvDataSaver.cc \
+	configuration/AgregatorConfiguration.h \
+	configuration/AgregatorConfiguration.cpp \
+	proxy/IncomingHandler.h \
+	proxy/IncomingHandler.cc \
+	proxy/KvalobsProxy.h \
+	proxy/KvalobsProxy.cc \
+	proxy/KvDataReceiver.h \
+	proxy/KvDataReceiver.cc \
+	proxy/KvDataSaver.h \
+	proxy/KvDataSaver.cc \
 	proxy/Callback.h \
-	AbstractAgregator.h AbstractAgregator.cc \
-	AgregatorHandler.h AgregatorHandler.cc \
-	KvDataFunctors.h KvDataFunctors.cc \
-	minmax.h minmax.cc \
-	ra2rr_12.h ra2rr_12.cc \
+	AbstractAgregator.h \
+	AbstractAgregator.cc \
+	AgregatorHandler.h \
+	AgregatorHandler.cc \
+	KvDataFunctors.h \
+	KvDataFunctors.cc \
+	minmax.h \
+	minmax.cc \
+	ra2rr_12.h \
+	ra2rr_12.cc \
 	rr.h rr.cc \
-	GenerateZero.h GenerateZero.cc \
-	BackProduction.h BackProduction.cc \
-	paramID.h times.h \
+	GenerateZero.h \
+	GenerateZero.cc \
+	BackProduction.h \
+	BackProduction.cc \
+	paramID.h \
+	times.h \
 	main.cc
 
 kvAgregated_CPPFLAGS = \
@@ -56,19 +72,21 @@ TESTS = kvAgregatedTest
 check_PROGRAMS = kvAgregatedTest
 
 kvAgregatedTest_SOURCES = \
+	test/test.cc \
+	$(kvAgregated_SOURCES:main.cc=) \
 	test/AbstractAgregatorTest.cc \
 	test/AbstractAgregatorTest.h \
 	test/MinMaxTest.cc \
 	test/ra2rr_12ForwardTest.cc \
 	test/ra2rr_12Test.cc \
-	test/test.cc \
-	$(kvAgregated_SOURCES:main.cc=)
+	test/AgregatorConfigurationTest.cc
+	
 
 kvAgregatedTest_CPPFLAGS = $(kvAgregated_CPPFLAGS) $(GTEST_CFLAGS)
 kvAgregatedTest_CXXFLAGS = $(GTEST_CXXFLAGS)
 kvAgregatedTest_LDFLAGS = $(GTEST_LDFLAGS) \
 	$(top_builddir)/src/service-libs/kvcpp/libkvcpp.la \
 	$(top_builddir)/src/lib/kvalobs/libkvalobs.la \
+	$(BOOST_PROGRAM_OPTIONS_LIB) \
 	$(GTEST_LIBS)
 	
-

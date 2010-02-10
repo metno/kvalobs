@@ -1,37 +1,37 @@
-/*
-  Kvalobs - Free Quality Control Software for Meteorological Observations 
+/* Kvalobs - Free Quality Control Software for Meteorological Observations
 
-  $Id: main.cc,v 1.4.2.9 2007/09/27 09:02:15 paule Exp $                                                       
+ $Id: main.cc,v 1.4.2.9 2007/09/27 09:02:15 paule Exp $
 
-  Copyright (C) 2007 met.no
+ Copyright (C) 2007 met.no
 
-  Contact information:
-  Norwegian Meteorological Institute
-  Box 43 Blindern
-  0313 OSLO
-  NORWAY
-  email: kvalobs-dev@met.no
+ Contact information:
+ Norwegian Meteorological Institute
+ Box 43 Blindern
+ 0313 OSLO
+ NORWAY
+ email: kvalobs-dev@met.no
 
-  This file is part of KVALOBS
+ This file is part of KVALOBS
 
-  KVALOBS is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License as 
-  published by the Free Software Foundation; either version 2 
-  of the License, or (at your option) any later version.
-  
-  KVALOBS is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License along 
-  with KVALOBS; if not, write to the Free Software Foundation Inc., 
-  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ KVALOBS is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as
+ published by the Free Software Foundation; either version 2
+ of the License, or (at your option) any later version.
+
+ KVALOBS is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along
+ with KVALOBS; if not, write to the Free Software Foundation Inc.,
+ 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
 #include <kvcpp/corba/CorbaKvApp.h>
 #include "AgregatorHandler.h"
 #include "BackProduction.h"
 #include "proxy/KvalobsProxy.h"
+#include "configuration/AgregatorConfiguration.h"
 #include <kvalobs/kvStation.h>
 #include <milog/milog.h>
 #include <milog/FLogStream.h>
@@ -40,6 +40,7 @@
 #include <set>
 #include <fileutil/pidfileutil.h>
 #include <kvalobs/kvPath.h>
+#include <boost/scoped_ptr.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
@@ -47,6 +48,7 @@
 #include "minmax.h"
 #include "rr.h"
 #include "ra2rr_12.h"
+#include <memory>
 
 using namespace std;
 using namespace agregator;
@@ -60,250 +62,185 @@ typedef kvservice::corba::CorbaKvApp KvApp;
 
 namespace
 {
-void version(std::ostream & out)
+void setupPidFile(dnmi::file::PidFileHelper & pidFile)
 {
-  out << "kvAgregated (kvalobs) " << VERSION << endl;
-}
-
-void help(std::ostream & out, const boost::program_options::options_description & options )
-{
-  version(out);
-  out << "\nData agregation daemon for kvalobs.\n\n" << options << endl;
+	//PID-file
+	std::string pidFileName;
+	pidFileName = dnmi::file::createPidFileName(kvPath("localstatedir") + "/run", "kvAgregated");
+	bool pidfileError;
+	if (dnmi::file::isRunningPidFile(pidFileName, pidfileError))
+	{
+		if (pidfileError)
+		{
+			std::ostringstream msg;
+			msg << "An error occured while reading the pidfile " <<
+					pidFileName	<< ". Remove the file if it exist and "
+					"<agregate> is not running. If it is running and there are "
+					"problems. Kill <agregate> and restart it.";
+			throw std::runtime_error(msg.str());
+		}
+		else
+		{
+			std::ostringstream msg;
+			msg << "Is <agregate> allready running? If not remove the pidfile: " << pidFileName;
+			throw std::runtime_error(msg.str());;
+		}
+	}
+	pidFile.createPidFile(pidFileName);
 }
 
 void runDaemon(kvservice::proxy::KvalobsProxy & proxy)
 {
-    proxy.start_thread();
-    
-    const set<int> &inter = proxy.getInteresting();
-    for ( set<int>::const_iterator it = inter.begin(); it != inter.end(); it++ )
-      cerr << *it << " ";
-    cerr << endl;
-    
-    LOGINFO("Starting main loop");
-    KvApp::kvApp->run();
+	proxy.start_thread();
+
+	LOGINFO("Starting main loop");
+	KvApp::kvApp->run();
 }
 
-void populate(std::vector<int> & out, const std::string & elementsSpec)
+std::auto_ptr<FLogStream> createLog(const std::string & logFile, milog::LogLevel level, int maxSize)
 {
-  using namespace boost;
-  
-  split_iterator<string::const_iterator> it = make_split_iterator(elementsSpec, first_finder(","));
-  for ( ; it != split_iterator<string::const_iterator>(); ++ it )
-    out.push_back(lexical_cast<int>(*it));
+	std::auto_ptr<FLogStream> ret(new FLogStream(9, maxSize));
+
+	ret->open(kvPath("localstatedir") + "/log/" + logFile);
+	ret->loglevel(level);
+	LogManager::instance()->addStream(ret.get());
+	return ret;
 }
 
-}
-
-int main( int argc, char **argv )
+Connection * getProxyDatabaseConnection(const std::string & databaseFile)
 {
-  opt::options_description options("Available options");
-  
-  opt::options_description mode("Working mode");
-  std:string backProduction;
-  bool daemonMode;
-  std::string stationsSpec;
-  std::string parameterSpec;
-  mode.add_options()
-  ("back-production,b", opt::value<std::string>(& backProduction), 
-      "Produce data according to the given specification. Format for specification is '2008-04-08T06:00:00,5', which means produce data valid for period 2008-04-08T06:00:00 - 2008-04-08T11:00:00. Daemon mode will not be entered if this option is given.")
-  ("daemon-mode,d", opt::bool_switch(& daemonMode),
-      "Enter daemon mode, even if overridden by the --back-production option.")
-  ("stations,s", opt::value(& stationsSpec), "Only process stations from the given comma-separated list.")
-  ("parameter,p", opt::value(& parameterSpec), "Only process parameters from the given comma-separated list.")
-  ;
-  options.add(mode);
-  
-  opt::options_description database("Database");
-  bool repopulate;
-  database.add_options()
-  ("repopulate,r", opt::bool_switch(& repopulate), "Repopulate internal agragator database on startup");
-  options.add(database);
-  
-  opt::options_description general("General");
-  general.add_options()
-  ("help", "Get help message")
-  ("version", "Display version information");
-  options.add(general);  
-  
-  opt::variables_map o;
-  
-  opt::parsed_options parsed = 
-    opt::command_line_parser(argc, argv).options(options).allow_unregistered().run();  
-  opt::store(parsed, o);
-  opt::notify(o);
+	// Proxy database
+	DriverManager manager;
+	std::string proxyID;
+	const string dbDriverPath = kvPath("pkglibdir") + "/db/";
+	if (!manager.loadDriver(dbDriverPath + "sqlite3driver.so", proxyID))
+		throw std::runtime_error("Error when loading database driver: " + manager.getErr() );
 
-  if ( o.find("help") != o.end() ) {
-    help(cout, options);
-    return 0;
-  }
-  if ( o.find("version") != o.end() ) {
-    version(cout);
-    return 0;
-  }
-  
-  std::vector<int> stations;
-  try {
-    populate(stations, stationsSpec);
-  }
-  catch ( std::exception & ) {
-    cout << "Invalid format: " << stationsSpec << endl;
-    cout << "Example format for station specification is 180,320,400" << endl;
-    return 1;
-  }
-  
-  std::vector<int> parameters;
-  try {
-    populate(parameters, parameterSpec);
-  }
-  catch ( std::exception & ) {
-    cout << "Invalid format: " << stationsSpec << endl;
-    cout << "Example format for parameter specification is 104,109" << endl;
-    return 1;
-  }
+	Connection * dbConn = manager.connect(proxyID, databaseFile);
 
-	
-  //PID-file
-  std::string pidfile;
-  pidfile = dnmi::file::createPidFileName( kvPath("localstatedir") + "/run",
-		                                     "kvAgregated" );
-  
-  if ( backProduction.empty() || daemonMode ) {
-      bool pidfileError;
-      if(dnmi::file::isRunningPidFile(pidfile, pidfileError)){
-        if(pidfileError){
-          LOGFATAL("An error occured while reading the pidfile:" << endl
-    	       << pidfile << " remove the file if it exist and"
-    	       << endl << "<agregate> is not running. " << 
-    	       "If it is running and there is problems. Kill <agregate> and"
-    	       << endl << "restart it." << endl << endl);
-          return 1;
-        }else{
-          LOGFATAL("Is <agregate> allready running?" << endl
-    	       << "If not remove the pidfile: " << pidfile);
-          return 1;
-        }
-      }
-  }
-  dnmi::file::PidFileHelper pidFile;
+	if (!dbConn)
+		throw std::runtime_error("Cant create a database connection to " + databaseFile);
 
+	return dbConn;
+}
 
-  // Logging
-  FLogStream fine( 9, 1024 * 1024 );
-  fine.open(kvPath("localstatedir") + "/log/kvAgregated.log");
-  fine.loglevel( INFO );
-  FLogStream error( 9 );
-  error.open(kvPath("localstatedir") + "/log/kvAgregated.warn.log");
-  error.loglevel( WARN );
-  LogManager::instance()->addStream( &fine );
-  LogManager::instance()->addStream( &error );
+miutil::conf::ConfSection * getConfSection()
+{
+	string myconf = "kvAgregated.conf";
+	miutil::conf::ConfSection * confSec = KvApp::readConf(myconf);
+	if (!confSec)
+	{
+		myconf = kvPath("sysconfdir") + "/kvalobs.conf";
+		confSec = KvApp::readConf(myconf);
+	}
+	if (!confSec)
+		throw std::runtime_error("Cant open conf file: " + myconf);
+	return confSec;
+}
 
-  
-  // Proxy database
-  DriverManager manager;
-  std::string proxyID;
-  const string dbDriverPath = kvPath("pkglibdir") + "/db/";
-  if ( !manager.loadDriver(dbDriverPath + "sqlite3driver.so", proxyID) ) {
-    LOGFATAL( "Error when loading database driver: " << manager.getErr() );
-    return 2;
-  }
-  Connection *dbConn = manager.connect(proxyID, 
-                                       kvPath("localstatedir") + "/agregate/database.sqlite");
-  if ( ! dbConn ) {
-    LOGFATAL("Cant create a database connection to: " 
-	     << endl << kvPath("localstatedir") + "/agregate/database.sqlite");
-    return 1;
-  }
-
-  
-  // Configuration file
-  //string myconf=kvdir + "etc/" + "kvAgregated.conf";
-  string myconf = "kvAgregated.conf";
-  miutil::conf::ConfSection *confSec = KvApp::readConf(myconf);
-  if(!confSec){
-    myconf=kvPath("sysconfdir") + "/kvalobs.conf";
-    confSec = KvApp::readConf(myconf);
-  }
-  if(!confSec){
-    LOGFATAL("Cant open conf file: " << myconf);
-    return 1;
-  }
-
-  // PID-file creation
-  if ( backProduction.empty() || daemonMode )
-    pidFile.createPidFile(pidfile);
-
-  
-  // Core objects
-  KvApp app( argc, argv, confSec );
-  kvservice::proxy::KvalobsProxy proxy( *dbConn, stations, false );
-  AgregatorHandler handler( proxy );
-  handler.setParameterFilter(parameters);
-  if ( repopulate )
-    proxy.db_repopulate();
-
-
-  
-  // Standard times
-  set<miClock> six;
-  six.insert( miClock( 6,0,0) );
-  six.insert( miClock(18,0,0) );
-
-  // Add handlers
-  MinMax tan12 = min( TAN, TAN_12, 12, six );
-  handler.addHandler( &tan12 );
-  MinMax tax12 = max( TAX, TAX_12, 12, six );
-  handler.addHandler( &tax12 );
-  MinMax tgn12 = min( TGN, TGN_12, 12, six );
-  handler.addHandler( &tgn12 );
-  rr_1 * rr1 = 0;
-  if ( backProduction.empty() || daemonMode ) {
-    rr1 = new rr_1;
-    handler.addHandler( rr1 );
-  }
-  rr_12 rr12 = rr_12();
-  handler.addHandler( &rr12 );
-  rr_24 rr24 = rr_24();
-  handler.addHandler( &rr24 );
-  ra2rr_12_backward ra2rr_b;
-  handler.addHandler( &ra2rr_b );
-  ra2rr_12_forward  ra2rr_f;
-  handler.addHandler( &ra2rr_f );
-  
-  // Backproduction instead of daemon mode?
-  try {
-    if ( ! backProduction.empty() ) {
-      BackProduction back(proxy, backProduction);
-      if ( ! daemonMode ) {
-	back();
-	return 0;
-      }
-      else {
-	boost::thread t( back );
+void runThreadWithBackProduction(BackProduction & back, kvservice::proxy::KvalobsProxy & proxy)
+{
+	boost::thread t(back);
 	runDaemon(proxy);
 	t.join();
-      }
-    }
-    else {
-      miutil::miTime to( 
-	  miutil::miDate::today(), 
-	  miutil::miClock(miutil::miClock::oclock().hour(), 0, 0) );
-      miutil::miTime from( to );
-      from.addHour( -3 );
-      
-      BackProduction back(proxy, from, to);
-      boost::thread t( back );
-      runDaemon(proxy);
-      t.join();
-    }
-  }
-  catch (std::exception & e ) {
-    LOGFATAL(e.what());
-    delete rr1;
-    return 1;
-  }
-  
-  delete rr1;
+}
 
-  return 0;
+void runAgregator(const AgregatorConfiguration & conf,
+		kvservice::proxy::KvalobsProxy & proxy)
+{
+	if ( conf.backProduction() )
+	{
+		BackProduction back(proxy, conf.backProductionSpec());
+		if (!conf.daemonMode())
+			back(); // run outside a thread
+		else
+			runThreadWithBackProduction(back, proxy);
+	}
+	else
+	{
+		// even if no backproduction was set, we want to generate data for 3
+		// hours back in time
+		miutil::miTime to(miutil::miDate::today(), miutil::miClock(	miutil::miClock::oclock().hour(), 0, 0));
+		miutil::miTime from(to);
+		from.addHour(-3);
+
+		BackProduction back(proxy, from, to);
+		runThreadWithBackProduction(back, proxy);
+	}
+}
+
+}
+
+int main(int argc, char **argv)
+{
+	AgregatorConfiguration conf;
+	AgregatorConfiguration::ParseResult result = conf.parse(argc, argv);
+
+	if (result != AgregatorConfiguration::No_Action)
+		return result;
+
+	try
+	{
+		// PidFile
+		dnmi::file::PidFileHelper pidFile;
+		if (conf.runInDaemonMode())
+			setupPidFile(pidFile);
+
+		// Logging
+		std::auto_ptr<FLogStream> fine = createLog("kvAgregated.log", INFO, 1024 * 1024);
+		std::auto_ptr<FLogStream> error = createLog("kvAgregated.warn.log", INFO, 100 * 1024);
+
+		// KvApp
+		boost::scoped_ptr<miutil::conf::ConfSection> confSec(getConfSection());
+		KvApp app(argc, argv, confSec.get());
+
+		// Proxy database
+		boost::scoped_ptr<Connection> dbConn(getProxyDatabaseConnection(conf.proxyDatabaseName()));
+		kvservice::proxy::KvalobsProxy proxy(*dbConn, conf.stations(), false);
+
+		AgregatorHandler handler(proxy);
+		handler.setParameterFilter(conf.parameters());
+		if (conf.repopulateDatabase())
+			proxy.db_repopulate();
+
+		// Standard times
+		set<miClock> six;
+		six.insert(miClock(6, 0, 0));
+		six.insert(miClock(18, 0, 0));
+
+		// Add handlers
+		MinMax tan12 = min(TAN, TAN_12, 12, six);
+		handler.addHandler(&tan12);
+		MinMax tax12 = max(TAX, TAX_12, 12, six);
+		handler.addHandler(&tax12);
+		MinMax tgn12 = min(TGN, TGN_12, 12, six);
+		handler.addHandler(&tgn12);
+		boost::scoped_ptr<rr_1> rr1(conf.runInDaemonMode() ? new rr_1 : (rr_1 *) 0);
+		if ( rr1 )
+			handler.addHandler(rr1.get());
+		rr_12 rr12 = rr_12();
+		handler.addHandler(&rr12);
+		rr_24 rr24 = rr_24();
+		handler.addHandler(&rr24);
+		ra2rr_12_backward ra2rr_b;
+		handler.addHandler(&ra2rr_b);
+		ra2rr_12_forward ra2rr_f;
+		handler.addHandler(&ra2rr_f);
+
+		// Backproduction instead of daemon mode?
+		try
+		{
+		    runAgregator(conf, proxy);
+		}
+		catch (std::exception & e)
+		{
+			LOGFATAL(e.what());
+			return 1;
+		}
+	}
+	catch ( std::exception & e )
+	{
+		LOGFATAL(e.what());
+		return 1;
+	}
 }
