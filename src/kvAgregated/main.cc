@@ -182,16 +182,16 @@ int main(int argc, char **argv)
 	if (result != AgregatorConfiguration::No_Action)
 		return result;
 
+	// Logging
+	std::auto_ptr<FLogStream> fine = createLog("kvAgregated.log", INFO, 1024 * 1024);
+	std::auto_ptr<FLogStream> error = createLog("kvAgregated.warn.log", INFO, 100 * 1024);
+
 	try
 	{
 		// PidFile
 		dnmi::file::PidFileHelper pidFile;
 		if (conf.runInDaemonMode())
 			setupPidFile(pidFile);
-
-		// Logging
-		std::auto_ptr<FLogStream> fine = createLog("kvAgregated.log", INFO, 1024 * 1024);
-		std::auto_ptr<FLogStream> error = createLog("kvAgregated.warn.log", INFO, 100 * 1024);
 
 		// KvApp
 		boost::scoped_ptr<miutil::conf::ConfSection> confSec(getConfSection());

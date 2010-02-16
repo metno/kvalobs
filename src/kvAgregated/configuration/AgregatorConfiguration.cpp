@@ -179,5 +179,5 @@ std::string AgregatorConfiguration::proxyDatabaseName() const
 
 bool AgregatorConfiguration::repopulateDatabase() const
 {
-	return givenOptions_["repopulate"].as<bool>();
+	return givenOptions_.count("repopulate");
 }
