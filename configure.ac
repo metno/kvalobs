@@ -1,5 +1,5 @@
 AC_PREREQ([2.59])
-AC_INIT([kvalobs], [2.0.6], [kvoss@met.no])
+AC_INIT([kvalobs], [2.0.7], [kvoss@met.no])
 AM_INIT_AUTOMAKE
 #METNO_SET_VERSION_INFO
 
@@ -78,7 +78,8 @@ PKG_CHECK_MODULES(libxml2, libxml-2.0)
 PKG_CHECK_MODULES(libxmlpp, libxml++-2.6)
 
 PKG_CHECK_MODULES(cppunit, cppunit)
-GTEST_LIB_CHECK([1.4], [true], [false])
+GTEST_CHECK
+GMOCK_CHECK
 
 
 KV_PERL

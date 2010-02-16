@@ -68,11 +68,11 @@ namespace kvservice
           void startThreads();
           void stopThreads();
 
-          bool stop() const;
+          bool isStopping() const;
 
         private:
 
-          KvalobsProxy &proxy;
+          KvalobsProxy & proxy;
 
           const int noOfThreads;
 

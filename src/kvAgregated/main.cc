@@ -28,15 +28,17 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include <kvcpp/corba/CorbaKvApp.h>
+#include "AgregatorRunner.h"
 #include "AgregatorHandler.h"
 #include "BackProduction.h"
+#include "proxy/ProxyDatabaseConnection.h"
 #include "proxy/KvalobsProxy.h"
 #include "configuration/AgregatorConfiguration.h"
 #include <kvalobs/kvStation.h>
 #include <milog/milog.h>
 #include <milog/FLogStream.h>
 #include <puTools/miClock.h>
-#include <kvdb/dbdrivermgr.h>
+//#include <kvdb/dbdrivermgr.h>
 #include <set>
 #include <fileutil/pidfileutil.h>
 #include <kvalobs/kvPath.h>
@@ -89,9 +91,9 @@ void setupPidFile(dnmi::file::PidFileHelper & pidFile)
 	pidFile.createPidFile(pidFileName);
 }
 
-void runDaemon(kvservice::proxy::KvalobsProxy & proxy)
+void runDaemon(AgregatorRunner & runner)
 {
-	proxy.start_thread();
+	runner.start_thread();
 
 	LOGINFO("Starting main loop");
 	KvApp::kvApp->run();
@@ -107,22 +109,22 @@ std::auto_ptr<FLogStream> createLog(const std::string & logFile, milog::LogLevel
 	return ret;
 }
 
-Connection * getProxyDatabaseConnection(const std::string & databaseFile)
-{
-	// Proxy database
-	DriverManager manager;
-	std::string proxyID;
-	const string dbDriverPath = kvPath("pkglibdir") + "/db/";
-	if (!manager.loadDriver(dbDriverPath + "sqlite3driver.so", proxyID))
-		throw std::runtime_error("Error when loading database driver: " + manager.getErr() );
-
-	Connection * dbConn = manager.connect(proxyID, databaseFile);
-
-	if (!dbConn)
-		throw std::runtime_error("Cant create a database connection to " + databaseFile);
-
-	return dbConn;
-}
+//Connection * getProxyDatabaseConnection(const std::string & databaseFile)
+//{
+//	// Proxy database
+//	DriverManager manager;
+//	std::string proxyID;
+//	const string dbDriverPath = kvPath("pkglibdir") + "/db/";
+//	if (!manager.loadDriver(dbDriverPath + "sqlite3driver.so", proxyID))
+//		throw std::runtime_error("Error when loading database driver: " + manager.getErr() );
+//
+//	Connection * dbConn = manager.connect(proxyID, databaseFile);
+//
+//	if (!dbConn)
+//		throw std::runtime_error("Cant create a database connection to " + databaseFile);
+//
+//	return dbConn;
+//}
 
 miutil::conf::ConfSection * getConfSection()
 {
@@ -138,23 +140,24 @@ miutil::conf::ConfSection * getConfSection()
 	return confSec;
 }
 
-void runThreadWithBackProduction(BackProduction & back, kvservice::proxy::KvalobsProxy & proxy)
+void runThreadWithBackProduction(BackProduction & back, AgregatorRunner & runner)
 {
 	boost::thread t(back);
-	runDaemon(proxy);
+	runDaemon(runner);
 	t.join();
 }
 
 void runAgregator(const AgregatorConfiguration & conf,
 		kvservice::proxy::KvalobsProxy & proxy)
 {
+	AgregatorRunner runner(conf.stations(), proxy);
 	if ( conf.backProduction() )
 	{
-		BackProduction back(proxy, conf.backProductionSpec());
+		BackProduction back(proxy, runner, conf.backProductionSpec());
 		if (!conf.daemonMode())
 			back(); // run outside a thread
 		else
-			runThreadWithBackProduction(back, proxy);
+			runThreadWithBackProduction(back, runner);
 	}
 	else
 	{
@@ -164,8 +167,8 @@ void runAgregator(const AgregatorConfiguration & conf,
 		miutil::miTime from(to);
 		from.addHour(-3);
 
-		BackProduction back(proxy, from, to);
-		runThreadWithBackProduction(back, proxy);
+		BackProduction back(proxy, runner, from, to);
+		runThreadWithBackProduction(back, runner);
 	}
 }
 
@@ -195,8 +198,8 @@ int main(int argc, char **argv)
 		KvApp app(argc, argv, confSec.get());
 
 		// Proxy database
-		boost::scoped_ptr<Connection> dbConn(getProxyDatabaseConnection(conf.proxyDatabaseName()));
-		kvservice::proxy::KvalobsProxy proxy(*dbConn, conf.stations(), false);
+		ProxyDatabaseConnection dbConn(conf.proxyDatabaseName());
+		kvservice::proxy::KvalobsProxy proxy(dbConn, conf.stations(), false);
 
 		AgregatorHandler handler(proxy);
 		handler.setParameterFilter(conf.parameters());

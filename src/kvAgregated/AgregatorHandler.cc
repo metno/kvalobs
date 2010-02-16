@@ -42,7 +42,7 @@ namespace agregator
   AgregatorHandler *AgregatorHandler::agHandler = 0;
 
   AgregatorHandler::AgregatorHandler( KvalobsProxy & proxy )
-      : Callback( proxy )
+      : Callback( proxy.getCallbackCollection() ), proxy_(proxy)
   {
     if ( ! agHandler )
       agHandler = this;
@@ -57,8 +57,8 @@ namespace agregator
   void AgregatorHandler::addHandler( AbstractAgregator * handler )
   {
     LOGINFO( "Adding handler: " << handler->readParam() << " -> " << handler->writeParam() );
-    getProxy().addInteresting( handler->readParam() );
-    getProxy().addInteresting( handler->writeParam() );
+    proxy_.addInteresting( handler->readParam() );
+    proxy_.addInteresting( handler->writeParam() );
     handlers.insert( Handler( handler->readParam(), handler ) );
   }
 
@@ -143,7 +143,7 @@ namespace agregator
   {
     list<kvalobs::kvData> dl;
     dl.push_back( d );
-    CKvalObs::CDataSource::Result_var res = getProxy().sendData( dl );
+    CKvalObs::CDataSource::Result_var res = proxy_.sendData( dl );
 
     if ( res->res != CKvalObs::CDataSource::OK )
     {
@@ -179,7 +179,7 @@ namespace agregator
   {
     list<kvalobs::kvData> ret;
 
-    getProxy().getData( ret, data.stationID(), obsTimes.first, obsTimes.second,
+    proxy_.getData( ret, data.stationID(), obsTimes.first, obsTimes.second,
                    data.paramID(), data.typeID(), data.sensor(), data.level() );
     
     for_each(ret.begin(), ret.end(), assertObsTimeMatches(obsTimes));

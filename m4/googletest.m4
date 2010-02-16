@@ -19,3 +19,27 @@ AM_CONDITIONAL([HAVE_GTEST], [test -x ${GTEST_CONFIG}])
 AC_SUBST(gtest_CFLAGS)
 AC_SUBST(gtest_LIBS)
 ])
+
+
+
+AC_DEFUN([GMOCK_CHECK],
+[
+AC_ARG_WITH(
+	[gmock],
+	AS_HELP_STRING([--with-gmock=PATH],
+	[Specify install location for googlemock.]),
+	[GMOCK_CONFIG_PATH="${with_gmock}/bin"}],
+	[GMOCK_CONFIG_PATH="${PATH}"]
+)
+AC_PATH_PROG(GMOCK_CONFIG, [gmock-config], [no], ${GMOCK_CONFIG_PATH})
+
+if test -x ${GMOCK_CONFIG}; then
+   gmock_CFLAGS=`${GMOCK_CONFIG} --cppflags`
+   gmock_LIBS=`${GMOCK_CONFIG} --libs | sed s/gtest/gmock/`
+fi
+
+AM_CONDITIONAL([HAVE_GMOCK], [test -x ${GMOCK_CONFIG}])
+
+AC_SUBST(gmock_CFLAGS)
+AC_SUBST(gmock_LIBS)
+])

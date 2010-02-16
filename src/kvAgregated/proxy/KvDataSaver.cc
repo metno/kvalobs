@@ -66,13 +66,14 @@ bool KvDataSaver::next(KvObsDataList & data)
 bool KvDataSaver::next(KvDataList & data)
 {
 
-	//LOGDEBUG( data.size() << " new pieces of data." );
+	LOGDEBUG( data.size() << " new pieces of data." );
 
 	for (IKvDataList d = data.begin(); d != data.end(); d++)
 	{
 		if (proxy.interesting.find(d->paramID() ) == proxy.interesting.end() )
 			continue;
 		string insertQuery = "insert into data values " + d->toSend();
+
 		KvalobsProxy::Lock lock(proxy.proxy_mutex);
 		try
 		{

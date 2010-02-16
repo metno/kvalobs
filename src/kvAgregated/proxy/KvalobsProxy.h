@@ -31,6 +31,7 @@
 #ifndef __kvservice__proxy__KvalobsProxy_h__
 #define __kvservice__proxy__KvalobsProxy_h__
 
+#include "CallbackCollection.h"
 #include <boost/utility.hpp>
 #include <kvcpp/kvservicetypes.h>
 #include <set>
@@ -41,6 +42,10 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/shared_ptr.hpp>
 #include <vector>
+
+
+
+class ProxyDatabaseConnection;
 
 namespace kvservice
 {
@@ -58,63 +63,33 @@ namespace kvservice
     class KvalobsProxy : boost::noncopyable
     {
       public:
-        KvalobsProxy( dnmi::db::Connection & connection, const std::vector<int> & stations, bool repopulate = false );
+        KvalobsProxy( ProxyDatabaseConnection & connection, const std::vector<int> & stations, bool repopulate = false );
         ~KvalobsProxy( );
 
+        /**
+         * Get kvalobs data. The source is either the database, or the proxy database
+         */
         void getData( KvDataList &data, int station,
                       const miutil::miTime &from, const miutil::miTime &to,
                       int paramid, int type, int sensor, int lvl );
 
+        /**
+         * Send data to kvalobs. Data will also be stored in proxy database
+         */
         CKvalObs::CDataSource::Result_var sendData( const KvDataList &data );
 
-
-        dnmi::db::Connection & setConnection( dnmi::db::Connection & connection );
-
         /**
-         * Add parameter to store in database
+         * Add parameter to store in cache database
          */
         void addInteresting( int param )
         {
           interesting.insert( param );
         }
 
-        const std::set<int> & getInteresting() const
-        {
-          return interesting;
-        }
+        const std::vector<int> & getInteresingStations() const { return stations_; }
 
-        /**
-         * Start loop, waiting for data
-         */
-        void start();
-
-        /**
-         * Start loop in a new thread.
-         */
-        void start_thread();
-
-        /**
-         * Stop loop. Will not cancel subscription.
-         */
-        void stop();
-
-        /**
-         * Are we about to stop?
-         */
-        bool stopping() const
-        {
-          return shutdown;
-        }
-
-        /**
-         * Process data for the given period of time.
-         */
-        void processData( const miutil::miTime &from, const miutil::miTime &to );
-
-        /**
-         * Wait for data, for timeout seconds. If timeout == 0: wait forever.
-         */
-        void awaitData( int timeout = 1 );
+        CallbackCollection & getCallbackCollection() { return callbackCollection; }
+        const CallbackCollection & getCallbackCollection() const { return callbackCollection; }
 
         // Operations on proxy:
         void db_clear();
@@ -137,25 +112,14 @@ namespace kvservice
         }
 
 
-      private:  // Proxy database:
+      private:
         dnmi::db::Connection &connection;
-        miutil::miDate lastCleaned;
-        const int daysToKeep;
 
       private:  // Kvalobs subscription:
-        void kvalobs_subscribe();
-
-        std::string subscription;
 
         std::set<int> interesting;
         
         const std::vector<int> stations_;
-
-        dnmi::thread::CommandQue queue;
-
-        void run();
-
-        bool shutdown;
 
         boost::shared_ptr<internal::IncomingHandler> incomingHandler;
         friend class internal::IncomingHandler;
@@ -173,28 +137,10 @@ namespace kvservice
                               const miutil::miTime &to,
                               int paramid, int type, int sensor, int lvl );
 
-        //void rmIrrelevant(  KvDataList &data, std::set<miutil::miTime> &times,
-        //                int paramid, int type, int sensor, int lvl );
-
       private:  // Callback
-        friend class Callback;
-
-        typedef std::set<Callback *> CallbackSet;
-        typedef CallbackSet::const_iterator CICallbackSet;
-
-
-        void callback_add( Callback *callback );
-        void callback_rm( Callback *callback );
-
-        std::set<Callback *> callbacks;
-        boost::mutex callbacks_mutex;
-
-        void callback_send( KvObsDataList &data );
-        void callback_send( KvDataList &data );
+        CallbackCollection callbackCollection;
 
       private:  // Thread synchronization
-
-        boost::thread *thread;
 
         friend class internal::KvDataSaver;
 
@@ -202,6 +148,10 @@ namespace kvservice
         mutable boost::recursive_mutex kv_mutex;
 
         mutable boost::recursive_mutex proxy_mutex;
+
+        class Cleaner;
+        Cleaner * cleaner_;
+        boost::thread * cleanerThread_;
     };
   }
 }

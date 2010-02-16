@@ -15,6 +15,12 @@ kvAgregated_SOURCES = \
 	proxy/KvDataSaver.h \
 	proxy/KvDataSaver.cc \
 	proxy/Callback.h \
+	proxy/CallbackCollection.h \
+	proxy/CallbackCollection.cpp \
+	proxy/ProxyDatabaseConnection.h \
+	proxy/ProxyDatabaseConnection.cpp \
+	AgregatorRunner.h \
+	AgregatorRunner.cpp \
 	AbstractAgregator.h \
 	AbstractAgregator.cc \
 	AgregatorHandler.h \
@@ -79,14 +85,18 @@ kvAgregatedTest_SOURCES = \
 	test/MinMaxTest.cc \
 	test/ra2rr_12ForwardTest.cc \
 	test/ra2rr_12Test.cc \
-	test/AgregatorConfigurationTest.cc
+	test/AgregatorConfigurationTest.cc \
+	test/KvalobsProxyTest.cc
 	
 
-kvAgregatedTest_CPPFLAGS = $(kvAgregated_CPPFLAGS) $(GTEST_CFLAGS)
-kvAgregatedTest_CXXFLAGS = $(GTEST_CXXFLAGS)
-kvAgregatedTest_LDFLAGS = $(GTEST_LDFLAGS) \
+kvAgregatedTest_CPPFLAGS = \
+	$(kvAgregated_CPPFLAGS) \
+	$(gtest_CFLAGS) \
+	$(gmock_CFLAGS)
+
+kvAgregatedTest_LDFLAGS = \
 	$(top_builddir)/src/service-libs/kvcpp/libkvcpp.la \
 	$(top_builddir)/src/lib/kvalobs/libkvalobs.la \
 	$(BOOST_PROGRAM_OPTIONS_LIB) \
-	$(GTEST_LIBS)
-	
+	$(gtest_LIBS) \
+	$(gmock_LIBS)

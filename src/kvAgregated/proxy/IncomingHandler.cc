@@ -66,18 +66,17 @@ namespace kvservice
           {
             boost::mutex::scoped_lock lock ( handler.mutex );
 
-            LOGDEBUG( "Top of loop: " << handler.queue.size()
-                      << " elements in queue." << endl );
+//            LOGDEBUG( "Top of loop: " << handler.queue.size()
+//                      << " elements in queue." << endl );
 
-            if ( not handler.proxy.stopping()
-                 and handler.queue.empty() )
+            if ( not handler.isStopping() and handler.queue.empty() )
             {
-              LOGDEBUG( "Thread sleeping" );
+              //LOGDEBUG( "Thread sleeping" );
               handler.condition.wait( lock );
-              LOGDEBUG( "Thread woke up" );
+              //LOGDEBUG( "Thread woke up" );
             }
 
-            if ( handler.stop() )
+            if ( handler.isStopping() )
               break;
 
             if ( handler.queue.empty() )
@@ -116,7 +115,7 @@ namespace kvservice
             handler.condition.notify_one();
           }
         }
-        LOGDEBUG( "Thread terminating" );
+        //LOGDEBUG( "Thread terminating" );
       }
 
       IncomingHandler::IncomingHandler( KvalobsProxy &proxy_,
@@ -130,7 +129,7 @@ namespace kvservice
 
       IncomingHandler::~IncomingHandler( )
       {
-        assert( proxy.stopping() );
+        //assert( proxy.stopping() );
         {
           boost::mutex::scoped_lock lock( mutex );
           queue.clear();
@@ -176,9 +175,9 @@ namespace kvservice
         threads.clear();
       }
 
-      bool IncomingHandler::stop() const
+      bool IncomingHandler::isStopping() const
       {
-        return threadsStopping or proxy.stopping();
+        return threadsStopping;
       }
 
       void IncomingHandler::process( KvObsDataListPtr & data )
@@ -196,7 +195,7 @@ namespace kvservice
           KvDataSaver ds( proxy );
           ds.next( *data );
 
-          proxy.callback_send( *data );
+          proxy.getCallbackCollection().send( *data );
 
           LOGINFO( "Station " << data->front().dataList().front().stationID() << " done" );
         }

@@ -10,6 +10,8 @@ class KvalobsProxy;
 }
 }
 
+class AgregatorRunner;
+
 /**
  * Creates new agregates, based on new data.
  * 
@@ -21,6 +23,7 @@ class BackProduction
 {
 public:
 	BackProduction(kvservice::proxy::KvalobsProxy & proxy, 
+			const AgregatorRunner & runner,
 			const miutil::miTime & from, 
 			const miutil::miTime & to);
 	
@@ -33,14 +36,18 @@ public:
 	 * 
 	 * @throw std::logic_error if specification is invalid
 	 */
-	BackProduction(kvservice::proxy::KvalobsProxy & proxy, const std::string & timeSpec);
+	BackProduction(kvservice::proxy::KvalobsProxy & proxy, const AgregatorRunner & runner, const std::string & timeSpec);
 	
 	~BackProduction();
 
 	void operator () ();
 	
 private:
+
+	void processData( const miutil::miTime &from, const miutil::miTime &to );
+
 	kvservice::proxy::KvalobsProxy & proxy_;
+	const AgregatorRunner & runner_;
 	miutil::miTime from_;
 	miutil::miTime to_;
 };

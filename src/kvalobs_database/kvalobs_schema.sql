@@ -67,6 +67,11 @@ CREATE TABLE data_history (
 	cfailed     TEXT DEFAULT NULL,    	
 	UNIQUE ( version, stationid, obstime, paramid, level, sensor, typeid ) 
 );
+
+CREATE INDEX data_history_main_index ON data_history (stationid, obstime, paramid, level, sensor, typeid);
+CREATE INDEX data_history_obstime_index ON data_history (obstime);
+CREATE INDEX data_history_tbtime_index ON data_history (tbtime);
+
 REVOKE ALL ON data_history FROM public;
 GRANT ALL ON data_history TO kv_admin;
 GRANT SELECT ON data_history TO kv_read;
