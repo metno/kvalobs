@@ -41,7 +41,7 @@ class AgregatorConfiguration
 {
 public:
 	AgregatorConfiguration();
-	explicit AgregatorConfiguration(std::ostream & messageStream, std::ostream & errorStream);
+	AgregatorConfiguration(std::ostream & messageStream, std::ostream & errorStream);
 	~AgregatorConfiguration();
 
 	enum ParseResult
