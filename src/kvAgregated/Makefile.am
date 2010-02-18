@@ -1,5 +1,3 @@
-CXX = ccache g++
-
 bin_PROGRAMS = kvAgregated
 bin_SCRIPTS = kvAgregateDbInit.sh
 
@@ -64,7 +62,7 @@ kvAgregated_LDADD = \
 pkgstatedir = $(localstatedir)/$(PACKAGE)/agregate
 nodist_pkgstate_DATA = database.sqlite
 
-CLEANFILES = database.sqlite
+MOSTLYCLEANFILES = database.sqlite
 
 database.sqlite: 
 	. $(srcdir)/kvAgregateDbInit.sh $@ 
@@ -73,9 +71,13 @@ EXTRA_DIST = kvAgregateDbInit.sh
 
 
 
-TESTS = kvAgregatedTest
+#TESTS = kvAgregatedTest
 
-check_PROGRAMS = kvAgregatedTest
+#check_PROGRAMS = kvAgregatedTest
+EXTRA_PROGRAMS = kvAgregatedTest
+
+installcheck-local: kvAgregatedTest
+	./$<
 
 kvAgregatedTest_SOURCES = \
 	test/test.cc \
@@ -100,3 +102,5 @@ kvAgregatedTest_LDFLAGS = \
 	$(BOOST_PROGRAM_OPTIONS_LIB) \
 	$(gtest_LIBS) \
 	$(gmock_LIBS)
+
+CLEANFILES = kvAgregatedTest

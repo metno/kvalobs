@@ -48,6 +48,7 @@ AC_CONFIG_FILES([Makefile
                  src/service-libs/kvcpp/Makefile
                  src/service-libs/kvcpp/kvcpp.pc
                  src/service-libs/kvcpp/corba/Makefile
+                 src/service-libs/kvcpp/mock/Makefile
                  src/data2kv/Makefile
                  src/kvDataInputd/Makefile
                  src/kvServiced/test/Makefile

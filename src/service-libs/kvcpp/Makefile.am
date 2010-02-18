@@ -1,4 +1,4 @@
-SUBDIRS = corba
+SUBDIRS = corba mock
 
 lib_LTLIBRARIES = libkvcpp.la
 
