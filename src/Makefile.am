@@ -9,7 +9,6 @@ SUBDIRS = \
 	kvManagerd \
 	norcom2kv \
 	kvsynopd \
-	kvAgregated  \
 	model2kv \
 	kv2metdat \
 	kv2kro2 \
