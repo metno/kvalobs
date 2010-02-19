@@ -222,7 +222,31 @@ namespace dnmi{
      * \brief When was the file last modifyed.
      */
     time_t modTime(const std::string &name);
-    
+
+
+    /**
+     * \brief fileFactory sets the 'file' parameter and return true if 'filename' exist.
+     * false is returned if the file do not exist.
+     *
+     * @param filename The name and path to the file to return a dnmi::file::File instance to.
+     * @param[out] file On success the file parameter is filled with data. The file parameter
+     * is not touched if the file do not exist.
+     * @return true on success and false otherwise.
+     */
+    bool fileFactory( const std::string &filename, dnmi::file::File &file );
+
+    /**
+     * \brief fileFactory returns a pointer a File if 'filename' exist.
+     * 0 is returned if the file do not exist.
+     *
+     * The pointer must be deleted by the caller.
+     *
+	 * @param filename The name and path to the file to return a dnmi::file::File instance to.
+	 * @return A pointer to dnmi::file::File on success and 0 otherwise.
+     */
+    File*  fileFactory( const std::string &filename );
+
+
     /** @} */
   }
 }

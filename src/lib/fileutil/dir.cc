@@ -30,6 +30,7 @@
 */
 #include <string.h>
 #include <errno.h>
+#include <stdio.h>
 #include <ctype.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -212,16 +213,16 @@ fileSize(const std::string &name)
   if(stat(name.c_str(), &s)<0)
     return -1;
  
-  return s.st_mtime;
+  return s.st_size;
 }
 
 bool 
 dnmi::file::
 canRead(const std::string &name)
 {
-  if(!access(name.c_str(), R_OK)<0)
+  if( access(name.c_str(), R_OK) == 0 )
     return true;
-  
+
   return false;
 }
 
@@ -229,7 +230,7 @@ bool
 dnmi::file::
 canWrite(const std::string &name)
 {
-  if(!access(name.c_str(), W_OK)<0)
+  if( access(name.c_str(), W_OK) == 0)
     return true;
   
   return false;
@@ -239,7 +240,41 @@ time_t
 dnmi::file::
 modTime(const std::string &name)
 {
+	struct stat s;
+
+	if(stat(name.c_str(), &s)<0)
+		return -1;
+
+	return s.st_mtime;
 }
+
+bool
+dnmi::file::
+fileFactory( const std::string &filename, dnmi::file::File &file )
+{
+	File r( filename );
+
+	if( ! r.ok() )
+		return false;
+
+	file = r;
+	return true;
+}
+
+
+dnmi::file::File*
+dnmi::file::
+fileFactory( const std::string &filename )
+{
+	File r( filename );
+
+	if( ! r.ok() )
+		return 0;
+
+
+	return new File( r );
+}
+
 
 namespace{
 
