@@ -22,3 +22,16 @@ synop_la_LIBADD = $(top_builddir)/src/lib/decoder/decoderbase/libdecoderbase.la 
                   $(putools_LIBS) $(BOOST_THREAD_LIB)
 
 synop_la_LDFLAGS = -module
+
+TESTS=kvSynopDecodeTest
+
+check_PROGRAMS=kvSynopDecodeTest
+
+kvSynopDecodeTest_SOURCES = test/kvSynopDecodeTest.cc \
+							$(synop_SOURCES:synopentry.cc=)
+
+kvSynopDecodeTest_CPPFLAGS = $(synop_la_CPPFLAGS)
+kvSynopDecodeTest_LDFLAGS = -lgtest \
+                            $(top_builddir)/src/lib/decoder/synopdecoder \
+                            $(top_builddir)/src/service-libs/kvcpp/libkvcpp.la \
+                            $(top_builddir)/src/lib/kvalobs/libkvalobs.la
