@@ -24,14 +24,17 @@ synop_la_LIBADD = $(top_builddir)/src/lib/decoder/decoderbase/libdecoderbase.la 
 synop_la_LDFLAGS = -module
 
 TESTS=kvSynopDecodeTest
+noinst_PROGRAMS=kvSynopDecodeTest
 
 check_PROGRAMS=kvSynopDecodeTest
 
 kvSynopDecodeTest_SOURCES = test/kvSynopDecodeTest.cc \
-							$(synop_SOURCES:synopentry.cc=)
+							kvSynopDecoder.cc  kvSynopDecoder.h \
+							synop.cc  synop.h \
+							synopElements.h \
+							synopLexer.h synopLexer.ll
 
 kvSynopDecodeTest_CPPFLAGS = $(synop_la_CPPFLAGS)
 kvSynopDecodeTest_LDFLAGS = -lgtest \
-                            $(top_builddir)/src/lib/decoder/synopdecoder \
                             $(top_builddir)/src/service-libs/kvcpp/libkvcpp.la \
                             $(top_builddir)/src/lib/kvalobs/libkvalobs.la
