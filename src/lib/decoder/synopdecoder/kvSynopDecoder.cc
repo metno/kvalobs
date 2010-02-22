@@ -69,26 +69,24 @@ bool kvSynopDecoder::initialise(const list<kvStation>& kpos, int earlyobs, int l
     syno = itr->wmonr();
     from = itr->fromtime();
 
-
     if(from > now ) // station is not active yet!
-      continue;
+    	continue;
     
     if(fromtimes.count(syno))
-      if(fromtimes[syno] > from ) // there is allready a newer
-	continue;                 // record for this station ...
+      if(fromtimes[syno] > from )// there is allready a newer
+    	  continue;                 // record for this station ...
 
     if(syno > 0 )
       fromtimes[syno] = from;
     
     if(!stat)
       continue;
-       
+
     if(syno)
       synopRegister[syno] = stat;
     
     if(call.exists())
       shipRegister[call]  = stat;
-  
   }
 
   lastTempoIndex  
@@ -97,7 +95,7 @@ bool kvSynopDecoder::initialise(const list<kvStation>& kpos, int earlyobs, int l
     + now.hour()  * 1000
     + now.min()   * 10;
   
-  return !synopRegister.empty();
+  return ! ( synopRegister.empty() && shipRegister.empty() );
 }
 
 
