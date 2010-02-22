@@ -79,7 +79,7 @@ int synop::readToken(const char *token, int a, int b)
     else if ( a >= strlen(token))
       return undef;
     else
-      return (*(token+a) == '/' || *(token+a) == 'X' || *token == 'x' ? undef : (*(token+a) -zero));
+      return (*(token+a) == '/' || *(token+a) == 'X' || *(token+a) == 'x' ? undef : (*(token+a) -zero));
   }
   else {
     if(b+a >  strlen(token))
