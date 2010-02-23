@@ -81,6 +81,7 @@ private:
   miutil::miString rejectComment;
   
   char checkObservationTime(miutil::miTime tbt, miutil::miTime obt);
+  void correct_h_VV_N( std::list<kvalobs::kvData> &data )const;
 
 
 public:

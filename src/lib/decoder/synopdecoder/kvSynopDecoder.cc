@@ -219,6 +219,39 @@ char kvSynopDecoder::checkObservationTime(miutil::miTime tbt, miutil::miTime obt
   return 0;
 }
 
+/*
+ * Fra Lars Andresen: Har jeg fått følgende spesifikasjon for å skille mellom HL=-3 og
+ * HL=-32767: Hvis skymengde, N, eller sikt, VV, mangler ("/"), enten den ene
+ * eller andre eller begge (selv om gruppe 7 er med), så anses HL="/" som
+ * manglende.
+ *
+ */
+
+void
+kvSynopDecoder::
+correct_h_VV_N( std::list<kvalobs::kvData> &data ) const
+{
+	int h=INT_MAX;  //paramid 55
+	int VV=INT_MAX; //paramid 273
+	int N=INT_MAX;  //paramid 15
+	list<kvalobs::kvData>::iterator ith=data.end();
+
+	for( list<kvalobs::kvData>::iterator it=data.begin(); it != data.end(); ++it ) {
+		if( it->paramID() == 55 ) {
+			ith = it;
+			h = static_cast<int>(it->original());
+		} else if( it->paramID() == 273 )
+			VV = static_cast<int>( it->original() );
+		else if( it->paramID() == 15 )
+			N = static_cast<int>( it->original() );
+	}
+
+	if( h == -3 && (VV == INT_MAX || N == INT_MAX) ) {
+		if( ith != data.end() )
+			data.erase( ith );
+	}
+
+}
 
 bool kvSynopDecoder::decode(const std::string &raw, list<kvData>&   data)
 {     
@@ -260,6 +293,9 @@ bool kvSynopDecoder::decode(const std::string &raw, list<kvData>&   data)
 	}
       }
     }
+
+    correct_h_VV_N( data );
+
   }
   return true;
 }
