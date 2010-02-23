@@ -188,31 +188,30 @@ TEST_F( SynopDecodeTest, scaleDW1_DW2)
 {
 	list<kvalobs::kvData> dataList;
 	kvalobs::kvRejectdecode rejectInfo;
+	string synopmsg="AAXX 18061 01488 16/// /1701 10139 20115 60062 222XX 30112=";
 
-	string shipmsg="BBXX LDWR 07221 99662 10018 41997 02718 10036 21036 40067 53095 70111 8xx//"
-			       " 22200 04064 11016 3//// 4//// 5//// 70082=";
 
-	bool decoded = synopDecoder.decode( shipmsg , dataList );
+	bool decoded = synopDecoder.decode( synopmsg , dataList );
 
-	EXPECT_TRUE( decoded ) << "Failed to decode ship message.";
+	EXPECT_TRUE( decoded ) << "Failed to decode synop message.";
 
 	if( ! decoded )  {
 		rejectInfo = synopDecoder.rejected("synop");
-		cerr << "Rejected: " << rejectInfo << endl;
+		FAIL() << "Rejected: " << rejectInfo << endl;
 	}
 
-	int Nh=INT_MAX; //paramid 14
-	int Cl=INT_MAX; //paramid 23
+	int dw1=INT_MAX; //paramid 65
+	int dw2=INT_MAX; //paramid 66
 
 	for( list<kvalobs::kvData>::iterator it=dataList.begin(); it != dataList.end(); ++it ) {
-		if( it->paramID() == 14 )
-			Nh = static_cast<int>(it->original());
-		else if( it->paramID() == 23 )
-			Cl = static_cast<int>( it->original() );
+		if( it->paramID() == 65 )
+			dw1 = static_cast<int>(it->original());
+		else if( it->paramID() == 66 )
+			dw2 = static_cast<int>( it->original() );
 	}
 
-	EXPECT_TRUE( Nh == INT_MAX ) << "Nh is invalid set.";
-	EXPECT_TRUE( Cl == INT_MAX ) << "Cl is invalid set.";
+	EXPECT_TRUE( dw1 == 10 ) << "Expected: dw1=10. Got dw1=" << dw1;
+	EXPECT_TRUE( dw2 == 120 ) << "Expected: dw2=120. Got dw2=" << dw2;
 }
 
 
