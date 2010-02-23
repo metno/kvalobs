@@ -28,7 +28,8 @@ kvsynopd_SOURCES = kvsynopd.cc \
                    InitLogger.cc InitLogger.h \
                    getDataReceiver.cc getDataReceiver.h \
                    GetDataThread.cc GetDataThread.h \
-                   kvsynopdImpl.h obsevent.h
+                   kvsynopdImpl.h obsevent.h \
+                   LoadSynopData.h LoadSynopData.cc
 
 kvsynopd_CPPFLAGS = $(AM_CPPFLAGS) -I$(top_srcdir)/src/service-libs \
                     $(omniORB4_CFLAGS) 
@@ -113,3 +114,33 @@ kvsynopdparse_LDADD = $(top_builddir)/src/service-libs/kvcpp/libkvcpp.la \
 sqldir=$(datadir)/kvalobs/kvsynop
 sql_DATA=kvsynopd_schema.sql
 bin_SCRIPTS = kvsynopd_initdb
+
+TESTS=kvSynopEncodeTest
+noinst_PROGRAMS=kvSynopEncodeTest
+
+check_PROGRAMS=kvSynopEncodeTest
+
+kvSynopEncodeTest_SOURCES = test/kvSynopEncodeTest.cc \
+							test/kvSynopEncodeTestConf.h \
+							test/ReadDataFile.h test/ReadDataFile.cc \
+							Data.cc Data.h\
+							DataList.cc DataList.h \
+		                    SynopData.cc SynopData.h \
+		                    StationInfo.cc StationInfo.h \
+        		            StationInfoParse.cc StationInfoParse.h \
+		                    synop.cc synop.h \
+		                    ValidData.cc ValidData.h \
+		                    InitLogger.cc InitLogger.h \
+		                    LoadSynopData.h LoadSynopData.cc 
+		                    
+ 
+kvSynopEncodeTest_CPPFLAGS = $(AM_CPPFLAGS) -DTESTDATADIR="\""$(top_srcdir)/src/kvsynopd/test"\""
+
+kvSynopEncodeTest_LDADD = -lgtest \
+	                        $(top_builddir)/src/lib/kvalobs/libkvalobs.la \
+                         	$(top_builddir)/src/lib/miutil/libmiutil.la \
+                            $(top_builddir)/src/lib/fileutil/libfileutil.la \
+                            $(top_builddir)/src/lib/decodeutility/libdecodeutility.la \
+                            $(top_builddir)/src/lib/miconfparser/libmiconfparser.a \
+                            $(top_builddir)/src/lib/milog/libmilog.la \
+                            $(top_builddir)/src/service-libs/kvcpp/libkvcpp.la 
