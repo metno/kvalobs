@@ -108,7 +108,7 @@
 
 using namespace std;
 
-#define FEQ(f1, f2, d) (((f1)-(f2))<(d)?true:false)
+#define FEQ(f1, f2, d) ((fabsf((f1)-(f2)))<(d)?true:false)
 
 bool
 Synop::
@@ -2167,43 +2167,43 @@ Synop::nedborFromRRRtr(float &nedbor,
 		       int   &tr, 
 		       SynopDataList &sd)
 {
-  	nedbor=FLT_MAX;
+	nedbor=FLT_MAX;
   	fRR24 =FLT_MAX;
 
   	if(sd.begin()->time().hour()==6) {
-    	CISynopDataList it=sd.begin();
+  		CISynopDataList it=sd.begin();
     	miutil::miTime tt=it->time();
 	
     	tt.addHour(-12);	
     
     	CISynopDataList it2=sd.find(tt);	
     	
-    	if(it2!=sd.end() && it2->time()==tt){
+    	if( it2 != sd.end() && it2->time() == tt ){
     		bool hasPrecip=true;
     		fRR24=0.0;
 			
-         //If there is measured no precip in the 12 hour time
-         //periode the nedboer12Time=-1.0.
-         //We cant just test for for nedboer12Time==-1.0. 
+    		//If there is measured no precip in the 12 hour time
+    		//periode the nedboer12Time=-1.0.
+    		//We cant just test for for nedboer12Time==-1.0.
          
-         //cerr << "nedboer12Time:  " << it->nedboer12Time << endl
-         //    <<"nedboer12Time2: " << it2->nedboer12Time << endl;
+    		//cerr << "nedboer12Time:  " << it->nedboer12Time << endl
+    		//    <<"nedboer12Time2: " << it2->nedboer12Time << endl;
                     
-			if(it->nedboer12Time!=FLT_MAX){
-            if(it->nedboer12Time>=0.0)
+			if( it->nedboer12Time != FLT_MAX ){
+				if( it->nedboer12Time >= 0.0 )
 	  			   fRR24+=it->nedboer12Time;
-            else if(it->nedboer12Time<=-1.5f)
-               hasPrecip=false;
-         }else if(it->IIR!="3")
-	  			hasPrecip=false;
+				else if( it->nedboer12Time <= -1.5f )
+					hasPrecip=false;
+			}else if( it->IIR != "3")
+				hasPrecip=false;
 	  			
-	  		if(it2->nedboer12Time!=FLT_MAX){
-            if(it2->nedboer12Time>=0.0)
-	  			   fRR24+=it2->nedboer12Time;
-            else if(it2->nedboer12Time<=-1.5f)
-               hasPrecip=false;
-         }else if(it2->IIR!="3")
-	  			hasPrecip=false;
+			if( it2->nedboer12Time != FLT_MAX){
+				if( it2->nedboer12Time >= 0.0)
+					fRR24 += it2->nedboer12Time;
+				else if( it2->nedboer12Time <= -1.5f)
+					hasPrecip=false;
+			}else if( it2->IIR != "3")
+				hasPrecip=false;
 
 			if(!hasPrecip)
 				fRR24=FLT_MAX;
@@ -2221,10 +2221,10 @@ Synop::nedborFromRRRtr(float &nedbor,
    //cerr << "sd[0].ITR: [" << (sd[0].ITR[0]-'0') << "]" << endl;
 
   	if(sd[0].ITR.empty()){
-    	if(sd[0].IIR.empty() || sd[0].IIR[0]!='3') 
-      		return 4;
+  		if(sd[0].IIR.empty() || sd[0].IIR[0]!='3')
+  			return 4;
 
-    	nedbor=0.0;
+  		nedbor=0.0;
     	return 3;
   	}
 
