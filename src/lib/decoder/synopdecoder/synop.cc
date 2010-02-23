@@ -978,9 +978,17 @@ void synop::sort333Token(const char *token)
       setPrecipitation(token);
     } /// just if this does not exist in S111
     break;
-  case 7:
-    setScaledToken(RR24,token,0.1,1,4);
-    break;
+  case 7: {
+		  int tmp=readToken( token, 1, 4 );
+
+		  if( tmp == 9999 )
+			  setBuffer( RR24, 0 );
+		  else if( tmp == 0 )
+			  setBuffer( RR24, -1 );
+		  else
+			  setScaledToken(RR24,token,0.1,1,4);
+	  }
+	  break;
   case 8:
     if(!readToken(token,1,4))
       extra333 = true;
