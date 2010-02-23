@@ -29,7 +29,7 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-
+#include <float.h>
 #include <limits.h>
 #include <string>
 #include <kvalobs/kvData.h>
@@ -40,6 +40,14 @@
 #include <gtest/gtest.h>
 
 using namespace std;
+
+namespace {
+struct ParamVal {
+	int paramid;
+	float *val;
+};
+
+}
 
 class SynopDecodeTest : public testing::Test
 {
@@ -101,6 +109,30 @@ protected:
 
 	}
 
+	bool decode2ParamVal( const std::string &synop, ParamVal *paramval, kvalobs::kvRejectdecode &rejectInfo ) {
+		list<kvalobs::kvData> dataList;
+
+		for( int i=0; paramval[i].paramid; ++i )
+			*paramval[i].val = FLT_MAX;
+
+		if( ! synopDecoder.decode( synop, dataList ) ) {
+			rejectInfo = synopDecoder.rejected("synop");
+			return false;
+		}
+
+		for( list<kvalobs::kvData>::iterator it=dataList.begin(); it != dataList.end(); ++it ) {
+			for( int i=0; paramval[i].paramid; ++i ) {
+				if( it->paramID() == paramval[i].paramid ) {
+					*paramval[i].val = it->original();
+					break;
+				}
+			}
+		}
+
+		return true;
+
+	}
+
 
 };
 
@@ -152,33 +184,18 @@ TEST_F( SynopDecodeTest, hVVN_missing )
  */
 TEST_F( SynopDecodeTest, decodeX )
 {
-	list<kvalobs::kvData> dataList;
 	kvalobs::kvRejectdecode rejectInfo;
+	float Nh, Cl;
+	ParamVal param[]={ {14, &Nh},
+			           {23, &Cl},
+				       {0, 0} };
 
 	string shipmsg="BBXX LDWR 07221 99662 10018 41997 02718 10036 21036 40067 53095 70111 8xx//"
 			       " 22200 04064 11016 3//// 4//// 5//// 70082=";
 
-	bool decoded = synopDecoder.decode( shipmsg , dataList );
-
-	EXPECT_TRUE( decoded ) << "Failed to decode ship message.";
-
-	if( ! decoded )  {
-		rejectInfo = synopDecoder.rejected("synop");
-		cerr << "Rejected: " << rejectInfo << endl;
-	}
-
-	int Nh=INT_MAX; //paramid 14
-	int Cl=INT_MAX; //paramid 23
-
-	for( list<kvalobs::kvData>::iterator it=dataList.begin(); it != dataList.end(); ++it ) {
-		if( it->paramID() == 14 )
-			Nh = static_cast<int>(it->original());
-		else if( it->paramID() == 23 )
-			Cl = static_cast<int>( it->original() );
-	}
-
-	EXPECT_TRUE( Nh == INT_MAX ) << "Nh is invalid set.";
-	EXPECT_TRUE( Cl == INT_MAX ) << "Cl is invalid set.";
+	EXPECT_TRUE( decode2ParamVal( shipmsg, param, rejectInfo) ) << "Failed to decode ship message.";
+	EXPECT_FLOAT_EQ( Nh, FLT_MAX) << "Expected: Nh=FLT_MAX. Got Nh=" << Nh;
+	EXPECT_FLOAT_EQ( Cl, FLT_MAX) << "Expected: Cl=FLT_MAX. Got Cl=" << Cl;
 }
 
 /**
@@ -186,32 +203,42 @@ TEST_F( SynopDecodeTest, decodeX )
  */
 TEST_F( SynopDecodeTest, scaleDW1_DW2)
 {
-	list<kvalobs::kvData> dataList;
 	kvalobs::kvRejectdecode rejectInfo;
+	float dw1, dw2;
+	ParamVal param[]={ {65, &dw1},
+			           {66, &dw2},
+				       {0, 0} };
+
 	string synopmsg="AAXX 18061 01488 16/// /1701 10139 20115 60062 222XX 30112=";
 
+	EXPECT_TRUE( decode2ParamVal( synopmsg, param, rejectInfo) ) << "Failed to decode synop message.";
+	EXPECT_FLOAT_EQ( dw1, 10.0) << "Expected: DW1=10.0. Got DW1=" << dw1;
+	EXPECT_FLOAT_EQ( dw2, 120.0) << "Expected: DW2=120.0. Got DW2=" << dw2;
+}
 
-	bool decoded = synopDecoder.decode( synopmsg , dataList );
 
-	EXPECT_TRUE( decoded ) << "Failed to decode synop message.";
+/**
+ * Test scaling of DW1 and DW2.
+ */
+TEST_F( SynopDecodeTest, decode333_7RRR)
+{
+	kvalobs::kvRejectdecode rejectInfo;
+	string synopmsg;
+	float RR24;
+	ParamVal param[]={ {110, &RR24},
+			           {0, 0} };
 
-	if( ! decoded )  {
-		rejectInfo = synopDecoder.rejected("synop");
-		FAIL() << "Rejected: " << rejectInfo << endl;
-	}
+	synopmsg="AAXX 18061 01488 16/// /1701 10139 20115 60062 333 79999=";
+	EXPECT_TRUE( decode2ParamVal( synopmsg, param, rejectInfo) ) << "Failed to decode synop message.";
+	EXPECT_FLOAT_EQ( RR24, 0.0 ) << "Expected: RR24=0.0. Got RR24=" << RR24;
 
-	int dw1=INT_MAX; //paramid 65
-	int dw2=INT_MAX; //paramid 66
+	synopmsg="AAXX 18061 01488 16/// /1701 10139 20115 60062 333 70000=";
+	EXPECT_TRUE( decode2ParamVal( synopmsg, param, rejectInfo) ) << "Failed to decode synop message.";
+	EXPECT_FLOAT_EQ( RR24, -1.0 ) << "Expected: RR24=-1.0. Got RR24=" << RR24;
 
-	for( list<kvalobs::kvData>::iterator it=dataList.begin(); it != dataList.end(); ++it ) {
-		if( it->paramID() == 65 )
-			dw1 = static_cast<int>(it->original());
-		else if( it->paramID() == 66 )
-			dw2 = static_cast<int>( it->original() );
-	}
-
-	EXPECT_TRUE( dw1 == 10 ) << "Expected: dw1=10. Got dw1=" << dw1;
-	EXPECT_TRUE( dw2 == 120 ) << "Expected: dw2=120. Got dw2=" << dw2;
+	synopmsg="AAXX 18061 01488 16/// /1701 10139 20115 60062 333 70012=";
+	EXPECT_TRUE( decode2ParamVal( synopmsg, param, rejectInfo) ) << "Failed to decode synop message.";
+	EXPECT_FLOAT_EQ( RR24, 1.2 ) << "Expected: RR24=1.2. Got RR24=" << RR24;
 }
 
 
