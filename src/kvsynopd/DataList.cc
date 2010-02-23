@@ -318,3 +318,15 @@ hasContinuesTimes(const std::list<int> &ctList, int hours)const
 
   return n>=hours;
 }
+
+
+std::ostream&
+operator<<( std::ostream& ost,
+		    const DataEntryList& dl)
+{
+	for( DataEntryList::CITDataEntryList it=dl.begin(); it != dl.end(); ++it ) {
+		ost << *it << std::endl;
+	}
+
+	return ost;
+}
