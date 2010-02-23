@@ -32,6 +32,7 @@
 #define __kvsynop_Data_h__
 
 #include <kvalobs/kvData.h>
+#include <kvalobs/kvDataFlag.h>
 #include <kvalobs/kvDbBase.h>
 
 class Data : public kvalobs::kvDbBase {
@@ -43,6 +44,8 @@ private:
   int              typeid_;
   int              sensor_;
   int              level_;
+  std::string      controlinfo_;
+  std::string      useinfo_;
 
 
   void createSortIndex();
@@ -57,8 +60,10 @@ public:
        int                      par,
        int                      typ,
        int                      sen,
-       int                      lvl)
-  { set(pos, obt, org, par, typ, sen, lvl);}
+       int                      lvl,
+       const std::string &controlinfo="",
+       const std::string &useinfo="" )
+  { set(pos, obt, org, par, typ, sen, lvl, controlinfo, useinfo);}
 
   bool set(int                      pos,
 	   const miutil::miTime    &obt,
@@ -66,14 +71,16 @@ public:
 	   int                      par,
 	   int                      typ,
 	   int                      sen,
-	   int                      lvl);
+	   int                      lvl,
+	   const std::string &controlinfo="",
+	   const std::string &useinfo="");
 
    bool set(const dnmi::db::DRow&);
    bool set(const kvalobs::kvData &data);
 
   void clean();
 
-  const char* tableName()           const {return "data";}
+  const char* tableName() const {return "data";}
   miutil::miString toSend()   const;
   miutil::miString toUpdate() const;
   miutil::miString uniqueKey() const;
@@ -85,6 +92,8 @@ public:
   int              typeID()      const { return typeid_;     }
   int              sensor()      const { return sensor_-'0'; }
   int              level()       const { return level_;      }
+  kvalobs::kvControlInfo controlinfo()const;
+  kvalobs::kvUseInfo useinfo()const;
 };
 
 #endif

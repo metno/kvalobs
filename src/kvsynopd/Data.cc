@@ -70,7 +70,9 @@ set(const kvalobs::kvData &data)
   	sprintf(buf, "%.2f", data.original());
   
   	set(data.stationID(), data.obstime(), buf, data.paramID(), 
-      	data.typeID(), data.sensor(), data.level()); 
+      	data.typeID(), data.sensor(), data.level(),
+      	data.controlinfo().flagstring(),
+      	data.useinfo().flagstring() );
       
 	return true;
 }
@@ -80,47 +82,53 @@ bool
 Data::
 set(const dnmi::db::DRow &r_)
 {
-  db::DRow               &r=const_cast<db::DRow&>(r_);
-  string                 buf;
-  list<string>           names=r.getFieldNames();
-  list<string>::iterator it=names.begin();
+	db::DRow               &r=const_cast<db::DRow&>(r_);
+	string                 buf;
+	list<string>           names=r.getFieldNames();
+	list<string>::iterator it=names.begin();
  
-  for(;it!=names.end(); it++){
-    try{
-      buf=r[*it];
+	for(;it!=names.end(); it++){
+		try{
+			buf=r[*it];
       
-      if(*it=="stationid"){
-	stationid_=atoi(buf.c_str());
-      }else if(*it=="obstime"){
-	obstime_=miTime(buf);
-      }else if(*it=="original"){
-	original_=buf;
-      }else if(*it=="paramid"){
-	paramid_=atoi(buf.c_str());
-      }else if(*it=="typeid"){
-	typeid_=atoi(buf.c_str());
-      }else if(*it=="sensor"){
-	sensor_=atoi(buf.c_str());
-      }else if(*it=="level"){
-	level_=atoi(buf.c_str());
-      }else{
-	LOGWARN("Data::set .. unknown entry:" << *it << std::endl);
-      }
-    }
-    catch(...){
-      LOGWARN("Data: unexpected exception ..... \n");
-    }  
-  }
+			if(*it=="stationid"){
+				stationid_=atoi(buf.c_str());
+			}else if(*it=="obstime"){
+				obstime_=miTime(buf);
+			}else if(*it=="original"){
+				original_=buf;
+			}else if(*it=="paramid"){
+				paramid_=atoi(buf.c_str());
+			}else if(*it=="typeid"){
+				typeid_=atoi(buf.c_str());
+			}else if(*it=="sensor"){
+				sensor_=atoi(buf.c_str());
+			}else if(*it=="level"){
+				level_=atoi(buf.c_str());
+			}else if(*it=="controlinfo"){
+				controlinfo_= buf;
+			}else if(*it=="useinfo"){
+				useinfo_= buf;
+			}else{
+				LOGWARN("Data::set .. unknown entry:" << *it << std::endl);
+			}
+		}
+		catch(...){
+			LOGWARN("Data: unexpected exception ..... \n");
+		}
+	}
  
-  createSortIndex();
-  return true;
+	createSortIndex();
+	return true;
 }
 
 bool 
 Data::
 set(int pos, const miutil::miTime &obt,    
     const std::string &org, int par, int   typ, int sen, 
-    int lvl)
+    int lvl,
+    const std::string &controlinfo,
+	const std::string &useinfo)
 {
   stationid_   = pos;   
   obstime_     = obt;     
@@ -128,7 +136,9 @@ set(int pos, const miutil::miTime &obt,
   paramid_     = par;     
   typeid_      = typ;      
   sensor_      = sen;      
-  level_       = lvl;       
+  level_       = lvl;
+  controlinfo_ = controlinfo;
+  useinfo_     = useinfo;
 
   createSortIndex();
 
@@ -147,7 +157,9 @@ Data::toSend() const
       << paramid_         << ","         
       << typeid_          << ","          
       << quoted(sensor_)  << ","
-      << level_           << ")";      
+      << level_           << ","
+      << quoted(controlinfo_) << ","
+      << quoted(useinfo_) << ")";
 
   return ost.str();
 }
@@ -178,6 +190,8 @@ toUpdate()const
   ostringstream ost;
   
   ost << "SET original=" << quoted(original_)
+	  << "    ,controlinfo=" << quoted(controlinfo_)
+	  << "    ,useinfo=" << quoted(useinfo_)
       << " WHERE stationid=" << stationid_ << " AND "
       << "       obstime="   << quoted(obstime_.isoTime()) << " AND "
       << "       paramid="   << paramid_ << " AND "
@@ -186,5 +200,24 @@ toUpdate()const
       << "       level="     << level_;
 
   return ost.str();
-
 }
+
+kvalobs::kvControlInfo
+Data::
+controlinfo()const
+{
+	if( controlinfo_.length() != kvalobs::kvDataFlag::size )
+		return kvalobs::kvControlInfo();
+
+	return kvalobs::kvControlInfo( controlinfo_ );
+}
+
+ kvalobs::kvUseInfo
+ Data::
+ useinfo()const
+ {
+	 if( useinfo_.length() != kvalobs::kvDataFlag::size )
+		 return kvalobs::kvUseInfo();
+
+	 return kvalobs::kvUseInfo( useinfo_ );
+ }
