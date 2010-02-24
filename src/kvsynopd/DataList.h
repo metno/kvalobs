@@ -81,6 +81,11 @@ class DataListEntry{
    	 */
   		TDataList getTypeId(int typeID)const;
 
+  		/**
+  		 * Return all typeID's for this list.
+  		 */
+  		std::list<int> getTypes()const;
+
 
   		/**
    	 * size, returns the number of Data elements for typeID.

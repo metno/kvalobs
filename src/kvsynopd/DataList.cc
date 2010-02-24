@@ -53,6 +53,18 @@ getTypeId(int typeID)const
   return TDataList();
 }
 
+std::list<int>
+DataListEntry::
+getTypes()const
+{
+	std::list<int> ret;
+
+	for( CITTypeList it=dataList.begin(); it!= dataList.end(); ++it )
+		ret.push_back( it->first );
+
+	return ret;
+}
+
 int 
 DataListEntry::
 size(int typeID)const
