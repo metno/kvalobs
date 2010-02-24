@@ -43,39 +43,42 @@
  */
 
 void 
-miutil::cmprspace(std::string &buf)
+miutil::cmprspace(std::string &buf, bool newlineAsSpace)
 {
-    const char *space=" \t\r";
-    std::string::size_type n1, n2;
+	const char *space=" \t\r";
+	std::string::size_type n1, n2;
 
-    if(buf.length()==0)
-	return;
-    
-    n1=buf.find_first_of(space);
+	if( newlineAsSpace )
+		space = " \t\r\n";
 
-    while(n1!=std::string::npos)
-    {
-	n2=buf.find_first_not_of(space, n1);
-	    
-	if(n2!=std::string::npos)
+	if(buf.length()==0)
+		return;
+
+	n1=buf.find_first_of(space);
+
+	while(n1!=std::string::npos)
 	{
-	    if(buf[n2]=='\n'|| (n1>0 && buf[n1-1]=='\n') || n1==0)
-		buf.erase(n1, n2-n1);
-	    else 
-	    {
-		if((n2-n1)>1)
-		    buf.erase(n1+1, (n2-n1)-1);
-		
-		if(buf[n1]!=' ')
-		    buf[n1]=' ';
-	    }
+		n2=buf.find_first_not_of(space, n1);
 
-	    n1=buf.find_first_of(space, n2);
-	}else
-	{
-	    buf.erase(n1);
-	    n1=std::string::npos;
+		if(n2!=std::string::npos)
+		{
+			if(buf[n2]=='\n'|| (n1>0 && buf[n1-1]=='\n') || n1==0)
+				buf.erase(n1, n2-n1);
+			else
+			{
+				if((n2-n1)>1)
+					buf.erase(n1+1, (n2-n1)-1);
+
+				if(buf[n1]!=' ')
+					buf[n1]=' ';
+			}
+
+			n1=buf.find_first_of(space, n1+1);
+		}else
+		{
+			buf.erase(n1);
+			n1=std::string::npos;
+		}
 	}
-    }
 }
 	    

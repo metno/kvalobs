@@ -53,7 +53,7 @@ namespace miutil{
    */
   
   void 
-    cmprspace(std::string &buf);
+    cmprspace(std::string &buf, bool newlineAsSpace=false);
   /** @} */ 
   
 }
