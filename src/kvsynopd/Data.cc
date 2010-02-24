@@ -221,3 +221,19 @@ controlinfo()const
 
 	 return kvalobs::kvUseInfo( useinfo_ );
  }
+
+ std::ostream&
+ operator<<( std::ostream& ost,
+             const Data& data )
+ {
+	ost << "["<< data.stationid_ << ", "
+		<< data.obstime_ << ", "
+		<< data.original_ << ", "
+		<< data.paramid_ << ", "
+		<< data.typeid_ << ", "
+		<< data.sensor_ << ", "
+		<< data.level_ << ", "
+		<< data.controlinfo_ << ", "
+		<< data.useinfo_ << "]";
+	return ost;
+ }
