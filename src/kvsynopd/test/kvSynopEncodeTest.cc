@@ -32,9 +32,11 @@
 #include <float.h>
 #include <limits.h>
 #include <string>
+#include <miutil/cmprspace.h>
 #include <kvalobs/kvData.h>
 #include <list>
 #include <kvalobs/kvStation.h>
+#include <milog/milog.h>
 #include "synop.h"
 #include "kvSynopEncodeTestConf.h"
 #include "StationInfoParse.h"
@@ -44,6 +46,9 @@
 
 using namespace std;
 
+namespace {
+}
+
 
 class SynopEncodeTest : public testing::Test
 {
@@ -52,13 +57,25 @@ protected:
 	Synop synopEncoder;
 	std::list<StationInfoPtr> stationList;
 
+	StationInfoPtr findWmoNo( int wmono ) {
+		for( std::list<StationInfoPtr>::iterator it=stationList.begin(); it!=stationList.end(); ++it ) {
+			if( (*it)->wmono() == wmono )
+				return *it;
+		}
+
+		return StationInfoPtr();
+	}
+
 	///Called before each test case.
 	virtual void SetUp() {
 		using namespace miutil::conf;
 		ConfParser confParser;
 		istringstream iconf(testconf);
-		DataEntryList rawData;
 
+		//Turn off almost all logging.
+		milog::Logger::logger().logLevel( milog::ERROR );
+
+		synopEncoder.setTest( true );
 		//cerr << "[" << endl << testconf << endl << "]" << endl;
 
 		ConfSection *conf = confParser.parse( iconf );
@@ -68,12 +85,6 @@ protected:
 		StationInfoParse stationParser;
 
 		ASSERT_TRUE( stationParser.parse( conf, stationList ) ) << "Cant parse the station information.";
-
-		readDataFile( "data_7010.dat", rawData );
-		/*for( std::list<StationInfoPtr>::iterator it = stationList.begin();
-			 it != stationList.end(); ++it ) {
-			cerr << **it << endl;
-		}*/
 	}
 
 	///Called after each test case.
@@ -88,6 +99,39 @@ protected:
 
 TEST_F( SynopEncodeTest, RR24_for_RRRtr )
 {
+	SynopDataList data;
+	StationInfoPtr stInfo;
+	string synop;
+	stInfo = findWmoNo( 1389 );
+
+
+	ASSERT_TRUE( stInfo ) << "No station information for wmono " << 1389;
+
+	loadSynopDataFromFile( "data_7010-1.dat", stInfo, data );
+	EXPECT_TRUE( synopEncoder.doSynop( stInfo, data, synop, false ) ) << "FAILED: Cant generate synop for "<< 1389;
+	miutil::cmprspace( synop, true );
+    EXPECT_EQ( synop, "AAXX 23061 01389 16/// ///// 1//// 2//// 69912 333 70003 555 41///=") << "Generated synop 1: " << synop;
+
+    loadSynopDataFromFile( "data_7010-2.dat", stInfo, data );
+    EXPECT_TRUE( synopEncoder.doSynop( stInfo, data, synop, false ) ) << "FAILED: Cant generate synop for "<< 1389;
+    miutil::cmprspace( synop, true );
+    EXPECT_EQ( synop, "AAXX 23061 01389 16/// ///// 1//// 2//// 60002 333 70000 555 40///=")<< "Generated synop 2: " << synop;
+
+    loadSynopDataFromFile( "data_7010-3.dat", stInfo, data );
+    EXPECT_TRUE( synopEncoder.doSynop( stInfo, data, synop, false ) ) << "FAILED: Cant generate synop for "<< 1389;
+    miutil::cmprspace( synop, true );
+    EXPECT_EQ( synop, "AAXX 23061 01389 16/// ///// 1//// 2//// 60002 333 79999 555 40///=")<< "Generated synop 3: " << synop;
+
+    loadSynopDataFromFile( "data_7010-4.dat", stInfo, data );
+    EXPECT_TRUE( synopEncoder.doSynop( stInfo, data, synop, false ) ) << "FAILED: Cant generate synop for "<< 1389;
+    miutil::cmprspace( synop, true );
+    EXPECT_EQ( synop, "AAXX 23061 01389 16/// ///// 1//// 2//// 69902 333 79999 555 40///=")<< "Generated synop 4: " << synop;
+
+    loadSynopDataFromFile( "data_7010-5.dat", stInfo, data );
+    EXPECT_TRUE( synopEncoder.doSynop( stInfo, data, synop, false ) ) << "FAILED: Cant generate synop for "<< 1389;
+    miutil::cmprspace( synop, true );
+    EXPECT_EQ( synop, "AAXX 23061 01389 16/// ///// 1//// 2//// 69912 333 70001 555 41///=")<< "Generated synop 5: " << synop;
+
 }
 
 

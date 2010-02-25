@@ -59,13 +59,46 @@ readDataFile( const std::string &filename, DataEntryList &data)
 
 		Data d( atoi( dataValues[0].c_str() ), miutil::miTime( dataValues[1] ),
 				dataValues[2], atoi( dataValues[3].c_str() ) ,
-				atoi( dataValues[5].c_str() ), atoi( dataValues[6].c_str() ),
+				atoi( dataValues[5].c_str() ), atoi( dataValues[6].c_str() )+'0',
 				atoi( dataValues[7].c_str() ), dataValues[9], dataValues[10] );
 
 		data.insert( d );
+	}
+/*
+	for( DataEntryList::CITDataEntryList itd=data.begin(); itd!=data.end(); ++itd ) {
+		std::list<int> types = itd->getTypes();
 
+		for( std::list<int>::iterator tit=types.begin(); tit!=types.end(); ++tit ) {
+			DataListEntry::TDataList dl = itd->getTypeId( *tit );
+
+			for( DataListEntry::CITDataList dit=dl.begin(); dit!=dl.end(); ++dit )
+				cerr << *dit << endl;
+		}
+ 	}
+*/
+	return true;
+}
+
+bool
+loadSynopDataFromFile( const std::string &filename,
+					   StationInfoPtr      info,
+					   SynopDataList       &sd )
+{
+	DataEntryList rawdata;
+
+	sd.clear();
+
+	if( !info ) {
+		cerr << "loadSynopDataFromFile: StationInfoPtr == 0 " << endl;
+		return false;
 	}
 
-	cerr << data;
-	return false;
+	if( ! readDataFile( filename, rawdata ) )
+		return false;
+
+	loadSynopData( rawdata, sd, info );
+
+	//cerr << sd << endl;
+	return true;
 }
+

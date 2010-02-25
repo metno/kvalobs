@@ -34,9 +34,14 @@
 
 #include <string>
 #include <DataList.h>
+#include <LoadSynopData.h>
 
 bool
 readDataFile( const std::string &filename, DataEntryList &data);
 
+bool
+loadSynopDataFromFile( const std::string &filename,
+					   StationInfoPtr      info,
+					   SynopDataList       &sd );
 
 #endif
