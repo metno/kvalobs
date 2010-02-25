@@ -24,8 +24,6 @@ synop_la_LIBADD = $(top_builddir)/src/lib/decoder/decoderbase/libdecoderbase.la 
 synop_la_LDFLAGS = -module
 
 TESTS=kvSynopDecodeTest
-noinst_PROGRAMS=kvSynopDecodeTest
-
 check_PROGRAMS=kvSynopDecodeTest
 
 kvSynopDecodeTest_SOURCES = test/kvSynopDecodeTest.cc \
