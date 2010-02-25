@@ -62,7 +62,7 @@ namespace decodeutility {
 
       stringstream ss;
       // 42.1 and not 42.10099212:
-      ss << setprecision(1) << setiosflags(ios::fixed);
+      //ss << setprecision(1) << setiosflags(ios::fixed);
       ss << d.stationID()                << internSeparator
 	 << d.obstime()                  << internSeparator
 	 << d.original()                 << internSeparator

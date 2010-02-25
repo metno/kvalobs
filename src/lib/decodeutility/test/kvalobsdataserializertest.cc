@@ -28,80 +28,85 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#include "kvalobsdataserializertest.h"
+
+#include <gtest/gtest.h>
+#include "kvalobsdata.h"
+#include <kvalobs/kvDataOperations.h>
+#include <set>
+#include <boost/shared_ptr.hpp>
 #include "kvalobsdataserializer.h"
 #include "kvalobsdataparser.h"
 #include <string>
 
-CPPUNIT_TEST_SUITE_REGISTRATION( KvalobsDataSerializerTest );
 
 using namespace std;
 using namespace kvalobs;
 using namespace kvalobs::serialize;
 
-KvalobsDataSerializerTest::KvalobsDataSerializerTest()
-{}
-
-KvalobsDataSerializerTest::~KvalobsDataSerializerTest()
-{}
-
-void KvalobsDataSerializerTest::setUp()
+class KvalobsDataSerializerTest : public testing::Test
 {
-  kvalobs::kvDataFactory f( 42, "2006-04-26 06:00:00", 302 );
-  indata.insert( f.getData( 1.0, 110 ) );
-  indata.insert( f.getData( 4, 112 ) );
-  indata.insert( f.getData( 3, 18 ) );
-  indata.insert( f.getData( 3, 34 ) );
-  indata.insert( f.getData( 3, 34, "2006-04-25 18:00:00" ) );
+protected:
+    typedef std::set<kvalobs::kvData, kvalobs::compare::lt_kvData> DSet;
+    DSet indata;
+    kvalobs::serialize::KvalobsData in;
 
-  in = new KvalobsData;
-  in->insert( indata.begin(), indata.end() );
-}
+    typedef boost::shared_ptr<kvalobs::serialize::KvalobsData> KvalobsDataPtr;
 
-void KvalobsDataSerializerTest::tearDown()
-{
-  indata.clear();
-  delete in;
-}
+    /**
+     * Create string representation, and the turn it back into kvData objects
+     */
+    KvalobsDataPtr loop()
+    {
+      string xml = KvalobsDataSerializer::serialize( in );
+      KvalobsDataPtr out( new KvalobsData );
+      KvalobsDataParser::parse( xml, * out.get() );
+      return out;
+    }
 
-KvalobsDataSerializerTest::KvalobsDataPtr KvalobsDataSerializerTest::loop()
-{
-  string xml = KvalobsDataSerializer::serialize( * in );
-  KvalobsDataPtr out( new KvalobsData );
-  KvalobsDataParser::parse( xml, * out.get() );
-  return out;
-}
+    KvalobsDataSerializerTest()
+    {
+    	  kvalobs::kvDataFactory f( 42, "2006-04-26 06:00:00", 302 );
+    	  indata.insert( f.getData( 1.0, 110 ) );
+    	  indata.insert( f.getData( 4, 112 ) );
+    	  indata.insert( f.getData( 3, 18 ) );
+    	  indata.insert( f.getData( 3, 34 ) );
+    	  indata.insert( f.getData( 3, 34, "2006-04-25 18:00:00" ) );
 
-void KvalobsDataSerializerTest::testPreserveKvData()
+    	  in.insert( indata.begin(), indata.end() );
+    }
+};
+
+
+TEST_F(KvalobsDataSerializerTest, testPreserveKvData)
 {
   KvalobsDataPtr out = loop();
   list<kvData> outdata;
   out->getData( outdata );
   DSet outdata_set( outdata.begin(), outdata.end() );
 
-  CPPUNIT_ASSERT_EQUAL(in->size(), out->size());
-  CPPUNIT_ASSERT( equal( indata.begin(), indata.end(), outdata_set.begin(), compare::exactly_equal_ex_tbtime() ) );
+  ASSERT_EQ(in.size(), out->size());
+  EXPECT_TRUE( equal( indata.begin(), indata.end(), outdata_set.begin(), compare::exactly_equal_ex_tbtime() ) );
 }
 
-void KvalobsDataSerializerTest::testPreserveOverwrite()
+TEST_F(KvalobsDataSerializerTest, testPreserveOverwrite)
 {
   KvalobsDataPtr out = loop();
-  CPPUNIT_ASSERT( not out->overwrite() );
-  in->overwrite( true );
+  EXPECT_TRUE( not out->overwrite() );
+  in.overwrite( true );
   out = loop();
-  CPPUNIT_ASSERT( out->overwrite() );
+  EXPECT_TRUE( out->overwrite() );
 }
 
-void KvalobsDataSerializerTest::testPreserveInvalidate()
+TEST_F(KvalobsDataSerializerTest, testPreserveInvalidate)
 {
-  in->invalidate( true, 42, 302, "2006-04-26 06:00:00" );
-  in->invalidate( true, 42, 302, "2006-04-25 18:00:00" );
-  in->invalidate( true, 42, 302, "2006-04-25 12:00:00" );
+  in.invalidate( true, 42, 302, "2006-04-26 06:00:00" );
+  in.invalidate( true, 42, 302, "2006-04-25 18:00:00" );
+  in.invalidate( true, 42, 302, "2006-04-25 12:00:00" );
 
   KvalobsDataPtr out = loop();
 
-  CPPUNIT_ASSERT( out->isInvalidate( 42, 302, "2006-04-26 06:00:00" ) );
-  CPPUNIT_ASSERT( out->isInvalidate( 42, 302, "2006-04-25 18:00:00" ) );
-  CPPUNIT_ASSERT( out->isInvalidate( 42, 302, "2006-04-25 12:00:00" ) );
-  CPPUNIT_ASSERT( not out->isInvalidate( 42, 302, "2006-04-26 12:00:00" ) );
+  EXPECT_TRUE( out->isInvalidate( 42, 302, "2006-04-26 06:00:00" ) );
+  EXPECT_TRUE( out->isInvalidate( 42, 302, "2006-04-25 18:00:00" ) );
+  EXPECT_TRUE( out->isInvalidate( 42, 302, "2006-04-25 12:00:00" ) );
+  EXPECT_TRUE( not out->isInvalidate( 42, 302, "2006-04-26 12:00:00" ) );
 }

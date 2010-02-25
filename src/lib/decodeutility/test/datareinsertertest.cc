@@ -28,33 +28,17 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#include "datareinsertertest.h"
-#include <iostream>
 
-CPPUNIT_TEST_SUITE_REGISTRATION( DataReinserterTest );
+#include <gtest/gtest.h>
+#include "DataReinserter.h"
 
-using namespace std;
-
-DataReinserterTest::DataReinserterTest()
-    : CppUnit::TestFixture()
-{}
-
-
-DataReinserterTest::~DataReinserterTest()
-{}
-
-void DataReinserterTest::setUp()
+struct DummyApp
 {
-  reinserter = new DataReinserter( 0, 42 );
-}
+  CKvalObs::CDataSource::Result_var sendDataToKv( const char *, const char * ) { return CKvalObs::CDataSource::Result_var(); }
+};
 
-void DataReinserterTest::tearDown()
+
+TEST(DataReinserterTest, construct)
 {
-  delete reinserter;
-}
-
-
-void DataReinserterTest::warning()
-{
-  clog << "\nWarning: There are no tests for DataReinserter" << endl;
+	kvalobs::DataReinserter<DummyApp> ds( 0, 42 );
 }

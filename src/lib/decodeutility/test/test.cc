@@ -28,20 +28,14 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/ui/text/TestRunner.h>
-#include <milog/Logger.h>
 
+#include <milog/milog.h>
+#include <gtest/gtest.h>
 
 int main(int argc, char* argv[])
 {
-  milog::Logger::logger().logLevel( milog::FATAL );
+	milog::Logger::logger().logLevel( milog::FATAL );
 
-  CppUnit::TextUi::TestRunner runner;
-  runner.setOutputter( new CppUnit::CompilerOutputter( &runner.result(), std::cerr ) );
-
-  runner.addTest( CppUnit::TestFactoryRegistry::getRegistry().makeTest() );
-
-  return ! runner.run();
+	testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
 }

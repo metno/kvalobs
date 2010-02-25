@@ -28,93 +28,84 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#include "kvalobsdatatest.h"
+
+#include <gtest/gtest.h>
+#include "kvalobsdata.h"
 #include <kvalobs/kvDataOperations.h>
 #include <kvalobs/kvTextDataOperations.h>
-
-CPPUNIT_TEST_SUITE_REGISTRATION( KvalobsDataTest );
 
 using namespace std;
 using namespace kvalobs;
 using namespace kvalobs::serialize;
 
-KvalobsDataTest::KvalobsDataTest()
-{}
 
-KvalobsDataTest::~KvalobsDataTest()
-{}
-
-void KvalobsDataTest::setUp()
+class KvalobsDataTest : public testing::Test
 {
-  data = new KvalobsData;
-}
+protected:
+	KvalobsData data;
+};
 
-void KvalobsDataTest::tearDown()
+TEST_F(KvalobsDataTest, testContructor)
 {
-  delete data;
-}
-
-void KvalobsDataTest::testContructor()
-{
-  CPPUNIT_ASSERT( not data->overwrite() );
-  CPPUNIT_ASSERT( data->empty() );
-  CPPUNIT_ASSERT_EQUAL( size_t( 0 ), data->size() );
+  EXPECT_TRUE( not data.overwrite() );
+  EXPECT_TRUE( data.empty() );
+  EXPECT_EQ( size_t( 0 ), data.size() );
 
   list<kvData> d;
   list<kvTextData> td;
-  data->getData( d, td );
-  CPPUNIT_ASSERT( d.empty() );
-  CPPUNIT_ASSERT( td.empty() );
+  data.getData( d, td );
+  EXPECT_TRUE( d.empty() );
+  EXPECT_TRUE( td.empty() );
 
   list<KvalobsData::InvalidateSpec> inv;
-  data->getInvalidate( inv );
-  CPPUNIT_ASSERT( inv.empty() );
+  data.getInvalidate( inv );
+  EXPECT_TRUE( inv.empty() );
 }
 
-void KvalobsDataTest::testInsertKvData()
+TEST_F(KvalobsDataTest, testInsertKvData)
 {
   kvalobs::kvDataFactory f( 42, "2006-04-26 06:00:00", 302 );
   kvData d = f.getData(  0.1, 110 );
-  data->insert( d );
+  data.insert( d );
   list<kvData> out;
-  data->getData( out );
+  data.getData( out );
 
-  CPPUNIT_ASSERT( not data->empty() );
-  CPPUNIT_ASSERT_EQUAL( size_t( 1 ), data->size() );
-  CPPUNIT_ASSERT_EQUAL( size_t( 1 ), out.size() );
-  CPPUNIT_ASSERT( compare::exactly_equal_ex_tbtime()( d, out.front() ) );
+  ASSERT_TRUE( not data.empty() );
+  EXPECT_EQ( size_t( 1 ), data.size() );
+  EXPECT_EQ( size_t( 1 ), out.size() );
+  EXPECT_TRUE( compare::exactly_equal_ex_tbtime()( d, out.front() ) );
 }
 
-void KvalobsDataTest::testInsertKvTextData()
+TEST_F(KvalobsDataTest, testInsertKvTextData)
 {
   kvTextDataFactory f( 42, "2006-04-26 06:00:00", 302 );
   kvTextData d = f.getData( "FOO", 1021 );
-  data->insert( d );
+  data.insert( d );
   list<kvTextData> out;
-  data->getData( out );
+  data.getData( out );
 
-  CPPUNIT_ASSERT( not data->empty() );
-  CPPUNIT_ASSERT_EQUAL( size_t( 1 ), data->size() );
-  CPPUNIT_ASSERT_EQUAL( size_t( 1 ), out.size() );
-  CPPUNIT_ASSERT( compare::kvTextData_exactly_equal_ex_tbtime()( d, out.front() ) );
+  ASSERT_TRUE( not data.empty() );
+  EXPECT_EQ( size_t( 1 ), data.size() );
+  EXPECT_EQ( size_t( 1 ), out.size() );
+  EXPECT_TRUE( compare::kvTextData_exactly_equal_ex_tbtime()( d, out.front() ) );
 }
 
-void KvalobsDataTest::testInvalidate()
+TEST_F(KvalobsDataTest, testInvalidate)
 {
   int st = 4;
   int tp = 5;
   miutil::miTime ot = "2006-04-26 06:00:00";
-  data->invalidate( true, st, tp, ot );
+  data.invalidate( true, st, tp, ot );
 
-  CPPUNIT_ASSERT( data->isInvalidate( st, tp, ot ) );
+  EXPECT_TRUE( data.isInvalidate( st, tp, ot ) );
 
   list<KvalobsData::InvalidateSpec> inv;
-  data->getInvalidate( inv );
+  data.getInvalidate( inv );
 
-  CPPUNIT_ASSERT_EQUAL( size_t( 1 ), inv.size() );
+  EXPECT_EQ( size_t( 1 ), inv.size() );
 
   const KvalobsData::InvalidateSpec & i = inv.front();
-  CPPUNIT_ASSERT_EQUAL( st, i.station );
-  CPPUNIT_ASSERT_EQUAL( tp, i.typeID );
-  CPPUNIT_ASSERT_EQUAL( ot, i.obstime );
+  EXPECT_EQ( st, i.station );
+  EXPECT_EQ( tp, i.typeID );
+  EXPECT_EQ( ot, i.obstime );
 }

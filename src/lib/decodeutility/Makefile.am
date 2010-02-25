@@ -41,15 +41,18 @@ TESTS = decodeutilitytest
 check_PROGRAMS = decodeutilitytest
 
 decodeutilitytest_SOURCES = \
-	test/datareinsertertest.h test/datareinsertertest.cc \
-	test/kvalobsdataserializertest.h test/kvalobsdataserializertest.cc \
-	test/kvalobsdatatest.h test/kvalobsdatatest.cc \
+	test/datareinsertertest.cc \
+	test/kvalobsdataserializertest.cc \
+	test/kvalobsdatatest.cc \
+	test/kvDataFormatterTest.cc \
 	test/test.cc
 
 decodeutilitytest_CPPFLAGS = $(AM_CPPFLAGS) \
+	-I$(top_srcdir)/src/service-libs \
 	-I$(top_builddir)/src/lib/kvskel \
 	-I.. $(libdecodeutility_la_CPPFLAGS) \
-	$(cppunit_CFLAGS)
+	$(gtest_CFLAGS)
+	
 
 decodeutilitytest_LDADD = \
 	libdecodeutility.la \
@@ -60,6 +63,7 @@ decodeutilitytest_LDADD = \
 	../fileutil/libfileutil.la \
 	../corbahelper/libcorbahelper.la \
 	../miconfparser/libmiconfparser.a \
-	../dnmithread/libdnmithread.la
+	../dnmithread/libdnmithread.la \
+	$(gtest_LIBS)
 
 decodeutilitytest_LDFLAGS = $(libdecodeutility_la_LDFLAGS) $(cppunit_LIBS) 
