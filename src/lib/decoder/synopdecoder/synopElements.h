@@ -199,7 +199,7 @@ namespace syn {
 
   static const int TxTxTx   = 216; ///< Max.temp. (day)
   static const int TnTnTn   = 214; ///< minimum temp. (night)
-  static const int E        = 7;   ///< soil condition   
+  static const int E        = 129;   ///< soil condition
   static const int jjj      = 0;   ///< nat.dev.par. (not in Norway?)  
   static const int E_       = 7;   ///< soil condition in snow E'
   static const int sss      = 112; ///< Snow depth in cm
