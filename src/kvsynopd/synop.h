@@ -63,6 +63,7 @@ class Synop
 
  protected:
     bool           debug;
+    bool           test; //Used for unit testing
     std::string    errorMsg;
     EPrecipitation precipitationParam;
 
@@ -147,6 +148,7 @@ class Synop
 
     std::string getErrorMsg()const { return errorMsg;}
     void        setDebug(){ debug=true;}
+    void        setTest( bool flag ) { test = flag; }
     
     /**
      * doSynop,
@@ -163,6 +165,11 @@ class Synop
 		    SynopDataList        &synopData,
 		    bool                 create_CCA_template=false);
 
+    bool doSynop( StationInfoPtr       info,
+    		      SynopDataList        &synopData,
+    		      std::string          &synop,
+    		      bool                 create_CCA_template=false
+    		    );
 
     /**
      * replaceCCCXXX erstatter CCCXXX templaten, hvis den finnes,

@@ -112,6 +112,29 @@ using namespace std;
 
 bool
 Synop::
+doSynop( StationInfoPtr       info,
+    	 SynopDataList        &synopData,
+    	 std::string          &synop,
+    	 bool                 create_CCA_template )
+{
+	milog::LogContext context("synop");
+
+	if( !info ) {
+		LOGERROR( "Cant create synop. Missing station information.");
+		return false;
+	}
+
+	return doSynop( info->wmono(),
+			        info->owner(),
+			        atoi(info->list().c_str()),
+			        synop,
+			        info,
+			        synopData,
+			        create_CCA_template );
+}
+
+bool
+Synop::
 doSynop(int           synopno,
 	const std::string &utsteder,
 	int               listenummer,
@@ -162,6 +185,8 @@ doSynop(int           synopno,
     SynopData sisteTid;
     int       nTimeStr=0;
     
+
+    synop.erase();
     milog::LogContext context("synop");
     
     verGenerelt    = false;
@@ -298,22 +323,24 @@ doSynop(int           synopno,
     Sjekk_Gruppe(8, skyerEkstraKode4, sisteTid.skyerEkstra4);
     Sjekk_Gruppe(0, sjoeTempKode, sisteTid.sjoeTemp);
     
-    synop="\r\r\nZCZC\r\r\n";
-    synop+=tidsKode;
-    synop+="NO";
-    sprintf(tmp,"%02d ", listenummer);
-    synop+=tmp;
+    if( ! test ) {
+    	synop="\r\r\nZCZC\r\r\n";
+    	synop+=tidsKode;
+    	synop+="NO";
+    	sprintf(tmp,"%02d ", listenummer);
+    	synop+=tmp;
     
-    while(tmpUtsteder.length()<4)
-		tmpUtsteder.insert(0," ");
+    	while(tmpUtsteder.length()<4)
+    		tmpUtsteder.insert(0," ");
 
-    tmpUtsteder+=" ";
-    synop+=tmpUtsteder;
-    synop+=dato_tid;
-    synop.append("00");
+		tmpUtsteder+=" ";
+		synop+=tmpUtsteder;
+		synop+=dato_tid;
+		synop.append("00");
 
-    if(create_CCA_template)
-      	synop+=" CCCXXX";
+		if(create_CCA_template)
+			synop+=" CCCXXX";
+    }
 
     if(ir==1){
       	if(!(sisteTid.time().hour()%6) && ITR>=1 && ITR<=4)
@@ -420,10 +447,13 @@ doSynop(int           synopno,
     SplittStreng(synopStr, 69);
     
     synop+=synopStr;
-    synop+="\r\n\r\r\n\n\n\n\n\n\n\nNNNN\r\n";
     
+    if( ! test ) {
+    	synop+="\r\n\r\r\n\n\n\n\n\n\n\nNNNN\r\n";
+    }
+
     return true;
-} /* LagSynop */
+}
 
 
 
@@ -1780,7 +1810,9 @@ Synop::Nedboer_Kode(std::string &kode,  //RRRtr
   	if(time==6){
     	//Skal vi kode 24 (7RR24) timers nedb�r i 333 seksjonen 
     	if(fRR24!=FLT_MAX){
-      		if(fRR24<0){
+      		if( fRR24 == FLT_MIN ) //FLT_MIN signals trace of precipitation
+      			rr24Kode=" 79999";
+      		else if(fRR24<0){
 				rr24Kode=" 70000";
       		}else{
 				fRR24*=10;
@@ -2180,7 +2212,7 @@ Synop::nedborFromRRRtr(float &nedbor,
     	
     	if( it2 != sd.end() && it2->time() == tt ){
     		bool hasPrecip=true;
-    		fRR24=0.0;
+    		fRR24=-1.0;
 			
     		//If there is measured no precip in the 12 hour time
     		//periode the nedboer12Time=-1.0.
@@ -2190,23 +2222,31 @@ Synop::nedborFromRRRtr(float &nedbor,
     		//    <<"nedboer12Time2: " << it2->nedboer12Time << endl;
                     
 			if( it->nedboer12Time != FLT_MAX ){
-				if( it->nedboer12Time >= 0.0 )
+				if( it->nedboer12Time >= 0.0 ) {
+					if( fRR24 < 0  )
+						fRR24 = 0.0;
+
 	  			   fRR24+=it->nedboer12Time;
-				else if( it->nedboer12Time <= -1.5f )
+				} else if( it->nedboer12Time <= -1.5f )
 					hasPrecip=false;
 			}else if( it->IIR != "3")
 				hasPrecip=false;
 	  			
 			if( it2->nedboer12Time != FLT_MAX){
-				if( it2->nedboer12Time >= 0.0)
+				if( it2->nedboer12Time >= 0.0) {
+					if( fRR24 < 0  )
+						fRR24 = 0.0;
+
 					fRR24 += it2->nedboer12Time;
-				else if( it2->nedboer12Time <= -1.5f)
+				} else if( it2->nedboer12Time <= -1.5f)
 					hasPrecip=false;
 			}else if( it2->IIR != "3")
 				hasPrecip=false;
 
 			if(!hasPrecip)
 				fRR24=FLT_MAX;
+			else if( FEQ( fRR24, 0.0, 0.001 ) )
+				fRR24=FLT_MIN; //Use FLT_MIN to signal trace of precipitation.
     	}
     	
     	if(fRR24==FLT_MAX){
@@ -2440,12 +2480,12 @@ Synop::SplittStreng(std::string &streng, std::string::size_type index)
 
 
 Synop::Synop(EPrecipitation pre)
-  :debug(false), precipitationParam(pre)
+  :debug(false), test( false), precipitationParam(pre)
     
 {
 }
 
-Synop::Synop():debug(false), precipitationParam(PrecipitationRA)
+Synop::Synop():debug(false), test( false ), precipitationParam(PrecipitationRA)
 {
 }
 
