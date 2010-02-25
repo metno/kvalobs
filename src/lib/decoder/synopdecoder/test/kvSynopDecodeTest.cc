@@ -74,6 +74,9 @@ protected:
 		stationList.push_back( kvalobs::kvStation(76900, 66, 2, 6, 0,"MIKE", 0, 76900, "", "LDWR","",7, true,
 				                                  miutil::miTime("1977-01-01 00:00:00")));
 
+		stationList.push_back( kvalobs::kvStation( 40745, 60.1173, 10.829, 170, 0,"Test1", 40745, 40745, "", "","",8, true,
+						                                  miutil::miTime("2007-01-08 00:00:00")));
+
 
 		ASSERT_TRUE( synopDecoder.initialise( stationList, 10, 20 ) ) << "Cant initialize the synopdecoder.";
 
@@ -218,7 +221,7 @@ TEST_F( SynopDecodeTest, scaleDW1_DW2)
 
 
 /**
- * Test scaling of DW1 and DW2.
+ * Test decoding of 333 7RRRR.
  */
 TEST_F( SynopDecodeTest, decode333_7RRR)
 {
@@ -240,6 +243,33 @@ TEST_F( SynopDecodeTest, decode333_7RRR)
 	EXPECT_TRUE( decode2ParamVal( synopmsg, param, rejectInfo) ) << "Failed to decode synop message.";
 	EXPECT_FLOAT_EQ( RR24, 1.2 ) << "Expected: RR24=1.2. Got RR24=" << RR24;
 }
+
+/**
+ * Decoding of 333 3Ejjj.
+ */
+TEST_F( SynopDecodeTest, decode333_3Ejjj)
+{
+	kvalobs::kvRejectdecode rejectInfo;
+	string synopmsg;
+	float SA; //paramid 112 (sss from 4E'sss)
+	float E_; //paramid 7 (E' from 4E'sss)
+	float SD; //paramid 18, deduced from E_
+	float E; //paramid 129, (E from 3Ejjj)
+	float jjj; //Not used, (jjj from 3Ejjj)
+	ParamVal param[]={{7,   &E_},
+			          {18,  &SD},
+			          {112, &SA},
+			          {129, &E},
+		              {0, 0} };
+
+
+	synopmsg="AAXX 18061 40745 46/// ///// 333 31002=";
+
+	EXPECT_TRUE( decode2ParamVal( synopmsg, param, rejectInfo) ) << "Rejected: " << rejectInfo.comment();
+	EXPECT_TRUE( SA==FLT_MAX && E_==FLT_MAX && SD==FLT_MAX ) << "Failed (4E'sss): SA=" << SA << " E'=" << E_ << " SD=" << SD;
+	EXPECT_FLOAT_EQ( E, 1 ) << "Failed: (3Ejjj) E=" << E;
+}
+
 
 
 int
