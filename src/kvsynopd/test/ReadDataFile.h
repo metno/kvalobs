@@ -37,11 +37,12 @@
 #include <LoadSynopData.h>
 
 bool
-readDataFile( const std::string &filename, DataEntryList &data);
+readDataFile( const std::string &filename, DataEntryList &data, const miutil::miTime &fromtime=miutil::miTime() );
 
 bool
 loadSynopDataFromFile( const std::string &filename,
 					   StationInfoPtr      info,
-					   SynopDataList       &sd );
+					   SynopDataList       &sd,
+					   const miutil::miTime &fromtime=miutil::miTime() );
 
 #endif

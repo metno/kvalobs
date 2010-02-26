@@ -33,16 +33,18 @@
 #include <fstream>
 #include <test/ReadDataFile.h>
 #include <miutil/commastring.h>
+#include <miutil/trimstr.h>
 #include <Data.h>
 
 using namespace std;
 
 bool
-readDataFile( const std::string &filename, DataEntryList &data)
+readDataFile( const std::string &filename, DataEntryList &data, const miutil::miTime &fromtime )
 {
 	string file=string(TESTDATADIR) + "/" + filename;
 	ifstream fin;
 	string line;
+	miutil::miTime obstime;
 
 	data.clear();
 
@@ -52,12 +54,29 @@ readDataFile( const std::string &filename, DataEntryList &data)
 		return false;
 
 	while( getline( fin, line ) ) {
+
+		string::size_type i = line.find( "#@#"); //Comment
+
+		if( i != string::npos )
+			line.erase( i );
+
+		miutil::trimstr( line );
+
+		if( line.empty() )
+			continue;
+
+
 		miutil::CommaString dataValues( line, '|' );
 
 		if( dataValues.size() != 12 )
 			continue;
 
-		Data d( atoi( dataValues[0].c_str() ), miutil::miTime( dataValues[1] ),
+		obstime = miutil::miTime( dataValues[1] );
+
+		if( ! fromtime.undef() && obstime > fromtime )
+			continue;
+
+		Data d( atoi( dataValues[0].c_str() ), obstime,
 				dataValues[2], atoi( dataValues[3].c_str() ) ,
 				atoi( dataValues[5].c_str() ), atoi( dataValues[6].c_str() )+'0',
 				atoi( dataValues[7].c_str() ), dataValues[9], dataValues[10] );
@@ -82,7 +101,8 @@ readDataFile( const std::string &filename, DataEntryList &data)
 bool
 loadSynopDataFromFile( const std::string &filename,
 					   StationInfoPtr      info,
-					   SynopDataList       &sd )
+					   SynopDataList       &sd,
+					   const miutil::miTime &fromtime )
 {
 	DataEntryList rawdata;
 
@@ -93,8 +113,10 @@ loadSynopDataFromFile( const std::string &filename,
 		return false;
 	}
 
-	if( ! readDataFile( filename, rawdata ) )
+	if( ! readDataFile( filename, rawdata, fromtime ) ) {
+		cerr << "Failed to read datafile <" << filename << ">." << endl;
 		return false;
+	}
 
 	loadSynopData( rawdata, sd, info );
 

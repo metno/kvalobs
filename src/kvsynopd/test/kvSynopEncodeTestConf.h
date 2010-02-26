@@ -24,6 +24,14 @@ const char *testconf =
 "  typepriority=(312)\n"
 "  owner=\"PIOG\"\n"
 "  precipitation=(\"RRRtr\")\n"
-"}\n";
+"}\n"
+"wmo_01001{\n"
+"  #Rena\n"
+"  stationid=7010\n"
+"  typepriority=(330)\n"
+"  owner=\"AUTG\"\n"
+"  precipitation=(\"RA\")\n"
+"}\n"
+;
 
 #endif /* KVSYNOPENCODETESTCONF_H_ */
