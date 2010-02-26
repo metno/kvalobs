@@ -1217,16 +1217,23 @@ Synop::Max_Vind_Max_Kode(std::string &kode, SynopDataList &sd)
       kode+="///";
       return;
    }
-   
+
+   if( fMax <= sd[0].vindHastNaa ) {
+   	   iTidsAngiv = 0;
+   	   fMax = sd[0].vindHastNaa;
+   }
+
    iMax = (int)floor((double) fMax*KNOPFAKTOR + 0.5);
    iNaaMax = (int) floor((double) sd[0].vindHastNaa*KNOPFAKTOR + 0.5 );
  //  iMax= (int)rint(fMax*KNOPFAKTOR);
  //  iNaaMax=(int)rint( sd[0].vindHastNaa*KNOPFAKTOR);
-    
+
+
+   /*
    if(iTidsAngiv==1){
       if(iMax==iNaaMax)
          iTidsAngiv=0;
-   }
+   }*/
     
    kode=" 0";
    kode+=sjoegangKode;
