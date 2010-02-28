@@ -20,6 +20,7 @@ class StationSelection
 public:
 
     StationSelection();
+    StationSelection(std::string filename);
     StationSelection(std::list<int> StationList);
     ~StationSelection(){};
 

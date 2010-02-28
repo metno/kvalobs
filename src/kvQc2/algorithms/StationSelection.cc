@@ -60,6 +60,33 @@ StationSelection::StationSelection()
 
 }
 
+StationSelection::StationSelection(std::string filename)
+{
+   std::string line;
+   int valis;
+   int key;
+   std::ifstream ind;
+   ind.open( filename.c_str() );
+
+   if(ind) {
+      ind >> key;
+      while ( !ind.eof() ) {
+         ind >> valis;
+         if (valis!=0) {
+             NeighbourMap[ key ].push_back(valis);
+         }
+         else if (valis==0) {
+             ind >> key;
+         }
+         //getline(ind,line);
+      }
+   }
+   else {
+          std::cout << "Could not open best station file!" << std::endl;
+   }
+  ind.close();
+}
+
 /// This constructor will handle the Delauney triangles and Choice of Triangulated Neighbours
 /// NO No No ------------ this is better handled directly inside Qc2D *****
 StationSelection::StationSelection(std::list<int> StationIDList)
