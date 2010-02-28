@@ -32,6 +32,8 @@ int LastN;
 std::string ControlInfoString;
 std::vector<int> ControlInfoVector;
 
+std::string NeighbourFilename;
+
 int RunAtMinute;
 int RunAtHour;
 int pid;

@@ -259,8 +259,10 @@ Qc2D::
 Qc2_interp()
 {
 
-
-      StationSelection Adjacent;     // These options go with _sl
+      std::cout << "*** NEIGHBOURS ***" << std::endl;
+      std::cout << params.NeighbourFilename << std::endl;
+      std::cout << "*** NEIGHBOURS ***" << std::endl;
+      StationSelection Adjacent(params.NeighbourFilename);     // These options go with _sl
       std::map<int, std::list<int> > Neighbours=Adjacent.ReturnMap();
 
       int InterpCode = params.InterpCode;
