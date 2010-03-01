@@ -1,0 +1,23 @@
+#! /bin/sh
+
+PGPORT=5433
+PGDATA=/var/lib/postgresql/8.3/kvalobs
+
+pg_ctl -w start > /dev/null 2>&1
+
+
+#set -e
+#tty -s
+#pg_ctlcluster 8.3 kvalobs start > /dev/null 2>&1
+
+#echo "pg_ctlcluster: exit status: $?"
+
+#if [ "$?" != "0" ]; then 
+#   tty -s
+#   exit 1
+#fi
+
+#tty -s
+#echo "kvstart-postgres: fake"
+
+#exit 0

@@ -1,0 +1,42 @@
+#! /bin/sh
+
+#  script to control lam20kv.sh
+# Created by j.schulze@met.no 2002-12-19
+
+
+
+export KVALOBS=$HOME/kvalobs
+export KVDBUSER=kvalobs
+export KVDB=kvalobs
+export KVPATH_IN_NS=kvtest
+export PGHOST=rime.oslo.dnmi.no
+export HOSTNAME=rime.oslo.dnmi.no
+
+
+NOW=`/bin/date +%H`
+    
+if [ $NOW -eq 11 ] ; then
+	RUN=06
+    elif [ $NOW -eq 17 ] ; then
+	RUN=12
+    elif [ $NOW -eq 23 ] ; then
+	RUN=18
+    else
+	RUN=00
+fi
+
+JOB=$HOME/cronjob/lam2kv
+
+$JOB/bin/hirlam2kvalobs.sh $RUN  >  $JOB/log/hirlam2kvalobs.$RUN 2>&1
+
+
+
+
+
+
+
+
+
+
+
+

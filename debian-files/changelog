@@ -1,0 +1,30 @@
+kvalobs (2.0.3-1) unstable; urgency=low
+
+  * kvsynopclt. Use corba.kvpath, corba.path and corba.nameserver from kvsynopd.conf as default values.
+  * Moved autoobs2kv from AutoObs to kvalobs an renamed it to data2kv. Added the posibility to use different nameservers for receiving kvalobs instances. 	
+  * #1244. kvServiced. Fix a race condition in kvDataIteratorImpl, kvModelDataIteratorImpl, kvRejectedIteratorImpl. 
+  * Updated a few config files.
+
+ -- Kvalobs <kvalobs@met.no>  Fri, 12 Jun 2009 10:45:00 +0200
+	
+kvalobs (2.0.2-1) unstable; urgency=low
+
+  * kvsynopd, corrected bug in hourly precipitation from RR_1, #1241.
+  * kv2metdat. Transfer only modeldata for norwegians station to kvalobsdb, ie stationid < 100000.
+  * Fixed a bug in the option parser for initialization og the logger, reported by Yngve.Einarsson@smhi.se.
+  * Updated a few config files.
+
+ -- Kvalobs <kvalobs@met.no>  Mon, 25 Mar 2009 08:00:00 +0200
+	
+kvalobs (2.0.1-1) unstable; urgency=low
+
+  * kvsynopd, fixed roundings error in Gust, max wind and E'sss.
+
+ -- Kvalobs <kvalobs@met.no>  Fri, 26 Sep 2008 08:26:00 +0200
+
+kvalobs (2.0.0-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Kvalobs <kvalobs@met.no>  Wed,  7 May 2008 06:02:35 +0000
+

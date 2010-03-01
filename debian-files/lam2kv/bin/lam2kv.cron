@@ -1,0 +1,40 @@
+#! /bin/sh
+
+#  script to control lam20kv.sh
+# Created by j.schulze@met.no 2002-12-19
+
+
+ETCDIR=$(kvconfig --sysconfdir)/kvalobs
+
+if [ -f "$ETCDIR/kv-env.conf" ]; then
+    . $ETCDIR/kv-env.conf
+fi
+
+NOW=`/bin/date +%H`
+    
+if [ $NOW -eq 11 ] ; then
+	RUN=06
+    elif [ $NOW -eq 17 ] ; then
+	RUN=12
+    elif [ $NOW -eq 23 ] ; then
+	RUN=18
+    else
+	RUN=00
+fi
+
+#JOB=$HOME/cronjob/lam2kv
+LOG=$(kvconfig --localstatedir)/kvalobs/lam2kv/log
+
+$(kvconfig --libdir)/kvalobs/bin/hirlam2kvalobs.sh $RUN  >  $LOG/hirlam2kvalobs.$RUN 2>&1
+
+
+
+
+
+
+
+
+
+
+
+

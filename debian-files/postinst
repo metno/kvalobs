@@ -1,0 +1,178 @@
+#!/bin/sh
+# postinst script for kvalobs
+#
+# see: dh_installdeb(1)
+
+set -e
+
+# summary of how this script can be called:
+#        * <postinst> `configure' <most-recently-configured-version>
+#        * <old-postinst> `abort-upgrade' <new version>
+#        * <conflictor's-postinst> `abort-remove' `in-favour' <package>
+#          <new-version>
+#        * <postinst> `abort-remove'
+#        * <deconfigured's-postinst> `abort-deconfigure' `in-favour'
+#          <failed-install-package> <version> `removing'
+#          <conflicting-package> <version>
+# for details, see http://www.debian.org/doc/debian-policy/ or
+# the debian-policy package
+
+. /usr/share/debconf/confmodule
+
+#Debconf 
+db_get kvalobs/user && KV_USER="$RET"
+db_get kvalobs/homedir && KV_HOME="$RET"
+
+
+
+#BINDIR, BIN and DIR must be in sync with the respectives variables in postrm.
+BINDIR="/usr/bin"
+BIN="kv2kro kvAgregated  kvDataInputd kvDataInputd_clt kvdbadmin 
+     kvManagerd kvmgrclt kvQabased kvServiced kvstart kvstop 
+     kvsynopclt kvsynopd kvsynopdbadmin kvsynopdbclt
+     kvsynopd_initdb kvsynopdparse norcom2kv kvstart-postgres
+     kvstop-postgres"
+
+KVBINDIR="/usr/lib/kvalobs/bin"
+KVBIN="check_kvsynopd.sh
+       hirlam2kvalobs.sh
+       kvdbadmin.sh
+       kvsynopdbadmin.sh
+       lam2kv.cron
+       qabase_cron.sh
+       save_last_month.sh
+       synopdecoder_cron.sh"
+
+
+ETC_FILES="kv_ctl.conf
+           kvcron
+           lam2kv/metdat.1h    
+           lam2kv/metdat.RR24         
+           lam2kv/posdat.PP    
+           lam2kv/pose.kvalobs
+           lam2kv/metdat.PP    
+           lam2kv/parameters.kvalobs  
+           lam2kv/posdat.RR12  
+           lam2kv/metdat.RR12  
+           lam2kv/parmap.kvalobs      
+           lam2kv/posdat.RR24  
+           lam2kv/stations.kvalobs
+	   "
+
+DIRS="/usr/share/kvalobs 
+      /usr/share/kvalobs/db
+      /usr/share/kvalobs/kvsynop 
+      /usr/share/kvalobs/metadata
+      /etc/kvalobs
+      /etc/kvalobs/lam2kv
+      /var/kvalobs
+      /var/kvalobs/norcom2kv
+      /var/kvalobs/norcom2kv/data2kv
+      /var/kvalobs/norcom2kv/tmp
+      /var/kvalobs/lam2kv
+      /var/kvalobs/lam2kv/log
+      /var/kvalobs/lam2kv/upload
+      /var/kvalobs/lam2kv/data
+      /var/kvalobs/agregate
+      /var/kvalobs/kvsynop
+      /var/kvalobs/kvsynop/debug
+      /var/kvalobs/log
+      /var/kvalobs/log/decoders
+      /var/kvalobs/log/decoders/SynopDecoder
+      /var/kvalobs/log/kvsynopdbadmin
+      /var/kvalobs/log/kvdbadmin
+      /var/kvalobs/log/html
+      /var/kvalobs/log/kvsynop
+      /var/kvalobs/run
+      /var/kvalobs/service
+      /var/kvalobs/service/subscribers"     
+
+SQLLITE_DB="/var/kvalobs/kvsynop/kvsynopd.sqlite
+            /var/kvalobs/agregate/database.sqlite"
+
+case "$1" in
+  configure)
+    #Create the kvalobs admin account.
+    if ! getent passwd $KV_USER > /dev/null 2>&1 ; then
+	echo $$ adduser --gecos 0 --disabled-password $KV_USER --home $KV_HOME >> /dev/null
+	adduser --gecos 0 --disabled-password --home $KV_HOME $KV_USER
+    fi
+    
+    #Fix owner, group and permission. 
+    for i in $BIN; do
+      # only do something when no setting exists
+      if ! dpkg-statoverride --list $BINDIR/$i >/dev/null 2>&1
+      then
+         dpkg-statoverride --update --add root $KV_USER 774 $BINDIR/$i
+      fi
+    done
+
+    for i in $KVBIN; do
+      # only do something when no setting exists
+      if ! dpkg-statoverride --list $KVBINDIR/$i >/dev/null 2>&1
+      then
+         dpkg-statoverride --update --add root $KV_USER 774 $KVBINDIR/$i
+      fi
+    done
+
+    for i in $DIRS; do
+      # only do something when no setting exists
+      if ! dpkg-statoverride --list $i >/dev/null 2>&1
+      then
+         dpkg-statoverride --update --add root $KV_USER 2775 $i
+      fi
+    done
+    for i in $ETC_FILES; do
+      # only do something when no setting exists
+      if ! dpkg-statoverride --list /etc/kvalobs/$i >/dev/null 2>&1
+      then
+         dpkg-statoverride --update --add root $KV_USER 664 /etc/kvalobs/$i
+      fi
+    done
+
+    #Setup the agregator and kvsynop cache databases if they 
+    #do not exist.
+
+    if [ ! -f /var/kvalobs/kvsynop/kvsynopd.sqlite ]; then
+	/usr/bin/kvsynopd_initdb
+    fi
+
+    if [ ! -f /var/kvalobs/agregate/database.sqlite ]; then
+	/usr/bin/kvAgregateDbInit.sh /var/kvalobs/agregate/database.sqlite
+    fi
+    
+    #Only the kvalobs user and group can write to the cache databases.
+    for i in $SQLLITE_DB; do
+      # only do something when no setting exists
+      if ! dpkg-statoverride --list $i >/dev/null 2>&1
+      then
+	  dpkg-statoverride --update --add root $KV_USER 664 $i
+      fi 
+    done
+
+    update-rc.d kvalobs defaults    
+    
+#    if which invoke-rc.d >/dev/null 2>&1; then
+#         invoke-rc.d kvalobs start ignore-postgres
+#    else
+#	 /etc/init.d/kvalobs start ignore-postgres
+#    fi
+    ;;
+
+  abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+  *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
+
+# dh_installdeb will replace this with shell code automatically
+# generated by other debhelper scripts.
+
+#DEBHELPER#
+
+exit 0
+
+

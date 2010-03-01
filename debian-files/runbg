@@ -1,0 +1,165 @@
+#!/usr/bin/perl -w
+#
+
+=head1 NAME
+
+runbg - runs given command in background
+
+=head1 SYNOPSIS
+
+runbg [<options>] <command>
+   options : --exit-after=<seconds>
+             --help
+             --kill-after=<seconds>
+             --login-env
+             --user=<user>
+
+=head1 DESCRIPTION
+
+Runs the given command and waits until it finishes, optionally killing
+it after B<--kill-after> seconds. If B<--exit-after> is given then
+runbg will exit after that many seconds but leave the command running
+in the background.
+
+The command can be run as another user if B<--user> is supplied and
+runbg is started by root. The child process will change directory to
+the home directory of the given user and to a "safe" environment, with
+for example, HOME set to the home directory of the user and PATH being
+set to /usr/local/bin:/usr/bin:/bin:/usr/bin/X11 and most other
+variables removed. Try I<runbg --user=auser env> to see what variables
+are setup.
+
+To run several commands together just wrap them in quotes and they'll
+be run using a shell but note that B<--kill-after> will not kill all
+the commands depending upon what the shell does when killed. If you
+want the user's environment setup as for a login shell then use
+B<--login-env> and a login shell will be started for running the
+command.
+
+=cut
+
+use strict;
+
+# Standard perl modules as of 5.6
+use English;
+use File::Basename;
+use Getopt::Long;
+# command and its options must follow our options
+Getopt::Long::Configure ('require_order');
+use IO::Handle;
+use POSIX qw(setgid setuid);
+use POSIX qw(:sys_wait_h);
+
+sub usage {
+  STDERR->print (basename($0) . <<EOF
+: <options> <command> [<arguments>]
+
+ --exit-after=<seconds>        runbg exits, command continues
+ --help                        display this help
+ --kill-after=<seconds>        kill the command after this many seconds
+ --login-env                   runs a login shell to run the command
+ --user=<user>                 run the command as this user
+EOF
+				);
+  exit (1);
+}
+
+my $exit_time = -1;
+my $help;
+my $kill_time = -1;
+my $login_env = 0;
+my $user = '';
+GetOptions ('exit-after=i' => \$exit_time,
+			'help' => \$help,
+			'kill-after=i' => \$kill_time,
+			'login-env' => \$login_env,
+			'user=s', \$user,
+		   ) or usage;
+
+usage if @ARGV == 0 || $help;
+
+die ("Unable to switch user unless root\n") if
+  $user && $UID != 0;
+
+die ("Only one of exit-after and kill-after can be given\n") if
+  $exit_time != -1 && $kill_time != -1;
+my $killing = ($kill_time != -1 ? -1 : 0);
+my $alarm_time = ($killing ? $kill_time : $exit_time);
+
+# User requested so figure the uid and gid
+my $groups = [];
+my ($name, $pass, $uid, $gid, $quota, $comment, $gcos, $home, $shell);
+if ($user) {
+  ($name, $pass, $uid, $gid, $quota, $comment, $gcos, $home, $shell) = getpwnam ($user);
+  die ($user . "not found\n") if ! defined ($uid);
+
+  # Find the groups this user belongs to
+  while ( my ($name, $passwd, $gid, $members) = getgrent) {
+	push (@{$groups}, $gid) if
+	  grep (m"^$user$", split (" ", $members));
+  }
+}
+else {
+  ($name, $pass, $uid, $gid, $quota, $comment, $gcos, $home, $shell) = getpwuid ($UID);
+}
+
+my $pid = fork;
+if (! defined ($pid)) {
+  die ("Failed to fork, $OS_ERROR\n");
+}
+if (! $pid) {
+  if ($user) {
+	# Change to home dir, switch uid/gid (but NOTE gid has to be
+	# switched first or it won't work), although not sure about the
+	# effective or real so do both, and fix the environment (could
+	# have option to preserve it maybe) inheriting some variables
+	chdir ($home) or die ("Unable to chdir to user's home directory, $home\n");
+	$GID = $gid;
+	$EGID = join (" ", $gid, @{$groups});
+	$EUID = $UID = $uid;
+	%ENV = (HOME => $home,
+			(exists ($ENV{HZ}) ? (HZ => $ENV{HZ}) : ()),
+			LOGNAME => $name,
+			(exists ($ENV{PAGER}) ? (PAGER => $ENV{PAGER}) : ()),
+			# Hm, is this enough ?
+			PATH => "/usr/local/bin:/usr/bin:/bin:/usr/bin/X11",
+			PWD => $home,
+			SHELL => $shell,
+			(exists ($ENV{TERM}) ? (TERM => $ENV{TERM}) : ()),
+			USER => $name,
+			USERNAME => $name
+		   );
+  }
+  if ($login_env) {
+	# Is --login standard ? Tried with -sh but didn't work as I'd
+	# hoped
+	my $command = [$shell, '--login', '-c', '"' . join (" ", @ARGV) . '"'];
+	exec join (" ", @{$command});
+  }
+  else {
+	exec @ARGV;
+  }
+  exit ($OS_ERROR);
+}
+
+# Parent - wait for the script/command to exit but setup an alarm if
+# required (see perlfunc for reason for eval)
+eval {
+  local $SIG{ALRM} = sub { die "alarm\n" }; # NB: \n required
+  alarm ($alarm_time) if $alarm_time != -1;
+  waitpid ($pid, 0);
+  alarm (0);
+};
+if ($killing) {
+  kill ('INT', $pid) if kill (0, $pid);
+  my $start = time;
+  waitpid ($pid, WNOHANG);
+  while (kill (0, $pid)) {
+	select(undef, undef, undef, 0.1);
+	if (time > $start + 5) {
+	  kill ('KILL', $pid);
+	}
+	waitpid ($pid, WNOHANG);
+  }
+}
+exit ($CHILD_ERROR >> 8);

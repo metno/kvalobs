@@ -1,0 +1,8 @@
+#!/bin/sh
+
+. /usr/share/debconf/confmodule
+db_version 2.0
+
+db_input low kvalobs/user
+db_input medium kvalobs/homedir
+db_go || true
