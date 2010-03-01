@@ -176,10 +176,26 @@ kvdatacheck::
 Validate::
 validDataUseOnlyUseInfo( const Data &data )
 {
-  kvUseInfo     uinfo=data.useinfo();
+  kvUseInfo uinfo=data.useinfo();
 
-  return true;
+  int uinfo_2; // QA level for original data value.
+  int uinfo_3; //Treatment of original data value.
+
+  uinfo_2=data.useinfo().flag( 2 );
+  uinfo_3=data.useinfo().flag( 3 );
+
+  if( data.controlinfo().flag(f_fhqc) == 10 )
+	  return false;
+
+  if( ! (uinfo_3 == 0 || uinfo_3 == 9)  )
+	  return false;
+
+  if( (uinfo_2 <= 1) || uinfo_2 == 9  )
+	  return true;
+
+  return false;
 }
+
 
 bool
 kvdatacheck::
