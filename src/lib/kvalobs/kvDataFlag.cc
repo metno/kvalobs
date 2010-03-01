@@ -777,8 +777,7 @@ bool kvUseInfo::setUseFlags(const kvControlInfo& cinfo)
 	      fhqc       >= 6 )
       ui[2]= 3;
 
-    else if ( fr    == 4   ||
-              fr    == 5   ||
+    else if ( ((fr == 4 || fr == 5) && fcombi != 2)  ||
               fcc   == 3   ||
               fcc   == 4   ||
               fcc   == 6   ||
@@ -886,10 +885,11 @@ bool kvUseInfo::setUseFlags(const kvControlInfo& cinfo)
 	else if ( fhqc >= 5 )
 		ui[ 4 ] = 9;
 
-	else if ( fd == 2 || fd >= 6 )
+	else if ( fd == 2 || fd >= 6 || fr == 7)
 		ui[ 4 ] = 9;
 
-	else if ( fr    >  1 &&
+	else if ( fr    <  7 &&
+			  fr    >  1 &&
 			  fcc   <= 1 &&
 			  fcp   <= 1 &&
 			  fs    <= 1 &&
