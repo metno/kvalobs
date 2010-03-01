@@ -102,36 +102,35 @@ TEST_F( SynopEncodeTest, RR24_for_RRRtr )
 	SynopDataList data;
 	StationInfoPtr stInfo;
 	string synop;
+	kvdatacheck::Validate validData( kvdatacheck::Validate::NoCheck );
 	stInfo = findWmoNo( 1389 );
-
 
 	ASSERT_TRUE( stInfo ) << "No station information for wmono " << 1389;
 
-	loadSynopDataFromFile( "data_7010-1.dat", stInfo, data );
+	loadSynopDataFromFile( "data_7010-1.dat", stInfo, data, validData );
 	EXPECT_TRUE( synopEncoder.doSynop( stInfo, data, synop, false ) ) << "FAILED: Cant generate synop for "<< 1389;
 	miutil::cmprspace( synop, true );
     EXPECT_EQ( synop, "AAXX 23061 01389 16/// ///// 1//// 2//// 69912 333 70003 555 41///=") << "Generated synop 1: " << synop;
 
-    loadSynopDataFromFile( "data_7010-2.dat", stInfo, data );
+    loadSynopDataFromFile( "data_7010-2.dat", stInfo, data, validData );
     EXPECT_TRUE( synopEncoder.doSynop( stInfo, data, synop, false ) ) << "FAILED: Cant generate synop for "<< 1389;
     miutil::cmprspace( synop, true );
     EXPECT_EQ( synop, "AAXX 23061 01389 16/// ///// 1//// 2//// 60002 333 70000 555 40///=")<< "Generated synop 2: " << synop;
 
-    loadSynopDataFromFile( "data_7010-3.dat", stInfo, data );
+    loadSynopDataFromFile( "data_7010-3.dat", stInfo, data, validData );
     EXPECT_TRUE( synopEncoder.doSynop( stInfo, data, synop, false ) ) << "FAILED: Cant generate synop for "<< 1389;
     miutil::cmprspace( synop, true );
     EXPECT_EQ( synop, "AAXX 23061 01389 16/// ///// 1//// 2//// 60002 333 79999 555 40///=")<< "Generated synop 3: " << synop;
 
-    loadSynopDataFromFile( "data_7010-4.dat", stInfo, data );
+    loadSynopDataFromFile( "data_7010-4.dat", stInfo, data, validData );
     EXPECT_TRUE( synopEncoder.doSynop( stInfo, data, synop, false ) ) << "FAILED: Cant generate synop for "<< 1389;
     miutil::cmprspace( synop, true );
     EXPECT_EQ( synop, "AAXX 23061 01389 16/// ///// 1//// 2//// 69902 333 79999 555 40///=")<< "Generated synop 4: " << synop;
 
-    loadSynopDataFromFile( "data_7010-5.dat", stInfo, data );
+    loadSynopDataFromFile( "data_7010-5.dat", stInfo, data, validData );
     EXPECT_TRUE( synopEncoder.doSynop( stInfo, data, synop, false ) ) << "FAILED: Cant generate synop for "<< 1389;
     miutil::cmprspace( synop, true );
     EXPECT_EQ( synop, "AAXX 23061 01389 16/// ///// 1//// 2//// 69912 333 70001 555 41///=")<< "Generated synop 5: " << synop;
-
 }
 
 
@@ -140,57 +139,57 @@ TEST_F( SynopEncodeTest, encode_TzFxFx )
 	SynopDataList data;
 	StationInfoPtr stInfo;
 	string synop;
+	kvdatacheck::Validate validData( kvdatacheck::Validate::NoCheck );
 	int wmono=1001;
 	stInfo = findWmoNo( wmono );
 
 
 	ASSERT_TRUE( stInfo ) << "No station information for wmono " << wmono;
 
-	loadSynopDataFromFile( "data_TzFxFx-1.dat", stInfo, data );
+	loadSynopDataFromFile( "data_TzFxFx-1.dat", stInfo, data, validData );
 	EXPECT_TRUE( synopEncoder.doSynop( stInfo, data, synop, false ) ) << "FAILED: Cant generate synop for "<< 1389;
 	miutil::cmprspace( synop, true );
     EXPECT_EQ( synop, "AAXX 22151 01001 46/// ///// 1//// 2//// 555 0/003 4////=") << "Generated synop 1: " << synop;
 
-    loadSynopDataFromFile( "data_TzFxFx-2.dat", stInfo, data );
+    loadSynopDataFromFile( "data_TzFxFx-2.dat", stInfo, data, validData );
     EXPECT_TRUE( synopEncoder.doSynop( stInfo, data, synop, false ) ) << "FAILED: Cant generate synop for "<< 1389;
     miutil::cmprspace( synop, true );
     EXPECT_EQ( synop, "AAXX 22151 01001 46/// ///// 1//// 2//// 555 0/003 4////=") << "Generated synop 2: " << synop;
 
-    loadSynopDataFromFile( "data_TzFxFx-3.dat", stInfo, data );
+    loadSynopDataFromFile( "data_TzFxFx-3.dat", stInfo, data, validData );
     EXPECT_TRUE( synopEncoder.doSynop( stInfo, data, synop, false ) ) << "FAILED: Cant generate synop for "<< 1389;
     miutil::cmprspace( synop, true );
     EXPECT_EQ( synop, "AAXX 22151 01001 46/// ///// 1//// 2//// 555 0/103 4////=") << "Generated synop 3: " << synop;
 
-    loadSynopDataFromFile( "data_TzFxFx-4.dat", stInfo, data );
+    loadSynopDataFromFile( "data_TzFxFx-4.dat", stInfo, data, validData );
     EXPECT_TRUE( synopEncoder.doSynop( stInfo, data, synop, false ) ) << "FAILED: Cant generate synop for "<< 1389;
     miutil::cmprspace( synop, true );
     EXPECT_EQ( synop, "AAXX 22151 01001 46/// ///// 1//// 2//// 555 0/304 4////=") << "Generated synop 4: " << synop;
 
-    loadSynopDataFromFile( "data_TzFxFx-5.dat", stInfo, data );
+    loadSynopDataFromFile( "data_TzFxFx-5.dat", stInfo, data, validData );
     EXPECT_TRUE( synopEncoder.doSynop( stInfo, data, synop, false ) ) << "FAILED: Cant generate synop for "<< 1389;
     miutil::cmprspace( synop, true );
     EXPECT_EQ( synop, "AAXX 22121 01001 16/// ///// 1//// 2//// 6//// 555 0/405 4////=") << "Generated synop 5: " << synop;
 
-    loadSynopDataFromFile( "data_TzFxFx-6.dat", stInfo, data );
+    loadSynopDataFromFile( "data_TzFxFx-6.dat", stInfo, data, validData );
     EXPECT_TRUE( synopEncoder.doSynop( stInfo, data, synop, false ) ) << "FAILED: Cant generate synop for "<< 1389;
     miutil::cmprspace( synop, true );
     EXPECT_EQ( synop, "AAXX 22121 01001 16/// ///// 1//// 2//// 6//// 555 0/404 4////=") << "Generated synop 6: " << synop;
 
-    loadSynopDataFromFile( "data_TzFxFx-7.dat", stInfo, data );
+    loadSynopDataFromFile( "data_TzFxFx-7.dat", stInfo, data, validData );
     EXPECT_TRUE( synopEncoder.doSynop( stInfo, data, synop, false ) ) << "FAILED: Cant generate synop for "<< 1389;
     miutil::cmprspace( synop, true );
     EXPECT_EQ( synop, "AAXX 22121 01001 16/// ///// 1//// 2//// 6//// 555 0/405 4////=") << "Generated synop 7: " << synop;
 
-    loadSynopDataFromFile( "data_TzFxFx-8.dat", stInfo, data );
+    loadSynopDataFromFile( "data_TzFxFx-8.dat", stInfo, data, validData );
     EXPECT_TRUE( synopEncoder.doSynop( stInfo, data, synop, false ) ) << "FAILED: Cant generate synop for "<< 1389;
     miutil::cmprspace( synop, true );
     EXPECT_EQ( synop, "AAXX 22121 01001 16/// ///// 1//// 2//// 6//// 555 0/008 4////=") << "Generated synop 8: " << synop;
 
-    loadSynopDataFromFile( "data_TzFxFx-9.dat", stInfo, data );
+    loadSynopDataFromFile( "data_TzFxFx-9.dat", stInfo, data, validData );
     EXPECT_TRUE( synopEncoder.doSynop( stInfo, data, synop, false ) ) << "FAILED: Cant generate synop for "<< 1389;
     miutil::cmprspace( synop, true );
     EXPECT_EQ( synop, "AAXX 22121 01001 16/// ///// 1//// 2//// 6//// 555 0/005 4////=") << "Generated synop 9: " << synop;
-
 }
 
 

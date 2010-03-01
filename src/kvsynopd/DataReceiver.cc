@@ -33,7 +33,6 @@
 #include "Data.h"
 #include <kvalobs/kvDbGate.h>
 #include "DataReceiver.h"
-#include "ValidData.h"
 #include "tblSynop.h"
 #include <kvalobs/kvPath.h>
 
@@ -247,11 +246,8 @@ DataReceiver::newData(kvservice::KvObsDataListPtr data)
       		continue;
     	}
 
-    	for(dit=it->dataList().begin(); dit!=it->dataList().end(); dit++){
-       		if(kvdatacheck::validData(*dit)){
-	 			dataList.push_back(Data(*dit));
-       		}
-    	}
+    	for(dit=it->dataList().begin(); dit!=it->dataList().end(); dit++)
+    		dataList.push_back(Data(*dit));
    
     	dit=it->dataList().begin();
     

@@ -20,7 +20,7 @@ kvsynopd_SOURCES = kvsynopd.cc \
                    kvsynopdImpl.cc kvsynopdImpl.h \
                    Replay.cc Replay.h \
                    synop.cc synop.h \
-                   ValidData.cc ValidData.h \
+                   Validate.cc Validate.h \
                    tblWaiting.cc tblWaiting.h \
                    Waiting.cc Waiting.h \
                    delaycontrol.cc delaycontrol.h \
@@ -129,7 +129,7 @@ kvSynopEncodeTest_SOURCES = test/kvSynopEncodeTest.cc \
 		                    StationInfo.cc StationInfo.h \
         		            StationInfoParse.cc StationInfoParse.h \
 		                    synop.cc synop.h \
-		                    ValidData.cc ValidData.h \
+		                    Validate.cc Validate.h \
 		                    InitLogger.cc InitLogger.h \
 		                    LoadSynopData.h LoadSynopData.cc 
 		                    

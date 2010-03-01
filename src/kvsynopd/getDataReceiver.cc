@@ -34,7 +34,6 @@
 #include "StationInfo.h"
 #include "getDataReceiver.h"
 #include "Data.h"
-#include "ValidData.h"
 #include "obsevent.h"
 
 using namespace std;
@@ -108,14 +107,10 @@ next(kvservice::KvObsDataList &dl)
 				continue;
       		}
       
-      		if(kvdatacheck::validData(*dit)){
-				if(event)
-	  				event->addTypeidReceived(dit->stationID(), dit->typeID());
+      		if(event)
+      			event->addTypeidReceived(dit->stationID(), dit->typeID());
 
-				myDataList.push_back(Data(*dit));
-      		}else{
-				invalidData++;
-      		}
+      		myDataList.push_back(Data(*dit));
     	}
     
     	int nData=0;

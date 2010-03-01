@@ -102,6 +102,7 @@ bool
 loadSynopDataFromFile( const std::string &filename,
 					   StationInfoPtr      info,
 					   SynopDataList       &sd,
+					   kvdatacheck::Validate &validate ,
 					   const miutil::miTime &fromtime )
 {
 	DataEntryList rawdata;
@@ -118,7 +119,7 @@ loadSynopDataFromFile( const std::string &filename,
 		return false;
 	}
 
-	loadSynopData( rawdata, sd, info );
+	loadSynopData( rawdata, sd, info, validate );
 
 	//cerr << sd << endl;
 	return true;

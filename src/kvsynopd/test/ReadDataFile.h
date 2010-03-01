@@ -43,6 +43,7 @@ bool
 loadSynopDataFromFile( const std::string &filename,
 					   StationInfoPtr      info,
 					   SynopDataList       &sd,
+					   kvdatacheck::Validate &validate,
 					   const miutil::miTime &fromtime=miutil::miTime() );
 
 #endif

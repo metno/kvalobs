@@ -35,11 +35,13 @@
 #include <DataList.h>
 #include <StationInfo.h>
 #include <SynopData.h>
+#include <Validate.h>
 
 void
 loadSynopData( const DataEntryList &dl,
 			   SynopDataList       &sd,
-			   StationInfoPtr      info );
+			   StationInfoPtr      info,
+			   kvdatacheck::Validate &validate );
 
 
 #endif

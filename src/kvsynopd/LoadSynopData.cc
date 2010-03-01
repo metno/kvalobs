@@ -37,7 +37,8 @@ using namespace std;
 void
 loadSynopData(const DataEntryList &dl,
 			  SynopDataList       &sd,
-			  StationInfoPtr      info)
+			  StationInfoPtr      info,
+			   kvdatacheck::Validate &validate )
 {
 	StationInfo::TLongList          types;
 	StationInfo::RITLongList        itt;
@@ -71,7 +72,13 @@ loadSynopData(const DataEntryList &dl,
 				//the parameters we wish to overide tis behavior for.
 
 				if(itd->sensor()==0 && itd->level()==0){
-					synopData.setData(itd->paramID(), itd->original());
+					if( validate( *itd ) )
+						synopData.setData(itd->paramID(), itd->original());
+					else {
+						LOGDEBUG("CheckData: do NOT use: " << itd->obstime() << " " << itd->paramID() << " " << itd->typeID() << " val: "
+								 << itd->original() << " cinfo: " << itd->controlinfo().flagstring() << " uinfo: "
+								 << itd->useinfo().flagstring() );
+					}
 				}else{
 					LOGINFO("loadSynop: sensor=" << itd->sensor() << " level=" << itd->level()
 							<< " not used!");
