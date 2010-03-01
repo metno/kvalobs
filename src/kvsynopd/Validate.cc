@@ -184,9 +184,6 @@ validDataUseOnlyUseInfo( const Data &data )
   uinfo_2=data.useinfo().flag( 2 );
   uinfo_3=data.useinfo().flag( 3 );
 
-  if( data.controlinfo().flag(f_fhqc) == 10 )
-	  return false;
-
   if( ! (uinfo_3 == 0 || uinfo_3 == 9)  )
 	  return false;
 
