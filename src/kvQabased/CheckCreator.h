@@ -9,8 +9,9 @@
 #include <list>
 #include <vector>
 
-namespace kvalobs {
-  class kvStationInfo;
+namespace kvalobs
+{
+class kvStationInfo;
 }
 
 class kvQABaseScriptManager;
@@ -23,27 +24,34 @@ class kvQABaseDBConnection;
 class CheckCreator
 {
 public:
-  CheckCreator( kvQABaseMeteodata & meteod, const kvalobs::kvStationInfo & station, kvQABaseDBConnection & con );
-  ~CheckCreator();
-  
-  typedef std::vector<std::string> ScriptList;
-  
-  void getScripts(ScriptList & out, const kvalobs::kvChecks & check );
-  
-  const std::list<kvalobs::kvChecks> & getChecks() const { return checklist_; }
-  const kvObsPgmList & oprogramlist() const { return oprogramlist_; }
-  
+	CheckCreator(kvQABaseMeteodata & meteod,
+			const kvalobs::kvStationInfo & station, kvQABaseDBConnection & con);
+	~CheckCreator();
+
+	typedef std::vector<std::string> ScriptList;
+
+	void getScripts(ScriptList & out, const kvalobs::kvChecks & check);
+
+	const std::list<kvalobs::kvChecks> & getChecks() const
+	{
+		return checklist_;
+	}
+	const kvObsPgmList & oprogramlist() const
+	{
+		return oprogramlist_;
+	}
+
 private:
-  std::string getPerlScript( const kvalobs::kvChecks & check );
-  std::string getMeteoData( const kvalobs::kvChecks & check );
-  std::string getMetaData( const kvalobs::kvChecks & check );
-  
-  const kvalobs::kvStationInfo & station_;
-  kvObsPgmList oprogramlist_;
-  std::list<kvalobs::kvChecks> checklist_;
-  kvQABaseMeteodata & meteod_; // Meteorological data manager
-  kvQABaseMetadata metad;
-  kvQABaseScriptManager sman;
+	std::string getPerlScript(const kvalobs::kvChecks & check);
+	std::string getMeteoData(const kvalobs::kvChecks & check);
+	std::string getMetaData(const kvalobs::kvChecks & check);
+
+	const kvalobs::kvStationInfo & station_;
+	kvObsPgmList oprogramlist_;
+	std::list<kvalobs::kvChecks> checklist_;
+	kvQABaseMeteodata & meteod_; // Meteorological data manager
+	kvQABaseMetadata metad;
+	kvQABaseScriptManager sman;
 };
 
 #endif /*CHECKCREATOR_H_*/
