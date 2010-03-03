@@ -92,14 +92,12 @@ BEGIN
 	INSERT INTO data_history 
 		(stationid,obstime,original,paramid,tbtime,typeid,sensor,level,corrected,controlinfo,useinfo,cfailed)
 	VALUES
-		(OLD.stationid,OLD.obstime,OLD.original,OLD.paramid,now(),OLD.typeid,OLD.sensor,OLD.level,OLD.corrected,OLD.controlinfo,OLD.useinfo,OLD.cfailed);
+		(NEW.stationid,NEW.obstime,NEW.original,NEW.paramid,now(),NEW.typeid,NEW.sensor,NEW.level,NEW.corrected,NEW.controlinfo,NEW.useinfo,NEW.cfailed);
 	RETURN NULL;
 END;
 $BODY$
 LANGUAGE 'plpgsql';
---CREATE TRIGGER backup_data AFTER INSERT OR UPDATE ON data FOR EACH ROW EXECUTE PROCEDURE backup_old_data();
--- Modification: We only insert data into backup store after it has been modified:
-CREATE TRIGGER backup_data AFTER UPDATE ON data FOR EACH ROW EXECUTE PROCEDURE backup_old_data();
+CREATE TRIGGER backup_data AFTER INSERT OR UPDATE ON data FOR EACH ROW EXECUTE PROCEDURE backup_old_data();
 
 --
 -- Trigger function for propagating deletes in the data table into data_history
@@ -173,14 +171,12 @@ BEGIN
 	INSERT INTO text_data_history
 		(stationid,obstime,original,paramid,tbtime,typeid)
 	VALUES
-		(OLD.stationid,OLD.obstime,OLD.original,OLD.paramid,now(),OLD.typeid);
+		(NEW.stationid,NEW.obstime,NEW.original,NEW.paramid,now(),NEW.typeid);
 	RETURN NULL;
 END;
 $BODY$
 LANGUAGE 'plpgsql';
---CREATE TRIGGER backup_text_data AFTER INSERT OR UPDATE ON text_data FOR EACH ROW EXECUTE PROCEDURE backup_old_text_data();
--- Modification: We only insert text_data into backup store after it has been modified:
-CREATE TRIGGER backup_text_data AFTER UPDATE ON text_data FOR EACH ROW EXECUTE PROCEDURE backup_old_text_data();
+CREATE TRIGGER backup_text_data AFTER INSERT OR UPDATE ON text_data FOR EACH ROW EXECUTE PROCEDURE backup_old_text_data();
 
 --
 -- Trigger function for propagating deletes in the text_data table into text_data_history
