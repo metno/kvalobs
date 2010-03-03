@@ -211,7 +211,7 @@ void CheckRunner::findChecks(list<kvChecks> & out)
 		logEnd_("CheckRunner: Error reading checks", Error);
 }
 
-void CheckRunner::runCheck(const std::string & checkScript,
+void CheckRunner::runCheck(const CheckCreator::Script & checkScript,
 		const kvalobs::kvChecks & check)
 {
 	LogContext context("Running check " + check.checkname());
@@ -221,18 +221,19 @@ void CheckRunner::runCheck(const std::string & checkScript,
 			+ check.checkname() + "</H2>");
 
 	// Writing the script to be run to html:
-	//#define LOG_CHECK_SCRIPT
-#ifdef LOG_CHECK_SCRIPT
-	log_( "Final checkstring:" );
+	log_( "Check meteodata:" );
 	log_( "<font color=#007700>" );
-	log_( checkScript );
+	log_( checkScript.meteoData() );
 	log_( "</font>" );
-#endif
+	log_( "Check metadata:" );
+	log_( "<font color=#007700>" );
+	log_( checkScript.metaData() );
+	log_( "</font>" );
 
 	/* ----- run check ---------------------------------- */
 	kvPerlParser parser; // the perlinterpreter
 	map<string, double> retvalues;
-	if (!parser.runScript(checkScript, retvalues))
+	if (!parser.runScript(checkScript.str(), retvalues))
 		return log_("CheckRunner::runCheck failed in parser.runScript", Error);
 
 	// TEST --------------------------------------------------

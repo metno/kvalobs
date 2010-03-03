@@ -30,19 +30,15 @@ CheckCreator::~CheckCreator()
 void CheckCreator::getScripts(CheckCreator::ScriptList & out,
 		const kvChecks & check)
 {
-	ostringstream checkstr; // final check string
-	checkstr << "#==========================================\n"
-			<< "# KVALOBS check-script\n" << "# type: " << check.qcx() << "\n"
-			<< "#==========================================\n\n"
-			<< "use strict;\n";
-
 	string perlScript = getPerlScript(check);
 	string meteoData = getMeteoData(check);
 	string metaData = getMetaData(check);
 
-	checkstr << metaData << meteoData << perlScript;
+	// WARNING: create strings first, and in this order!
+	// there is some dependency on something here that I have never quite understood.. :/
+	Script script(perlScript, meteoData, metaData, check.qcx());
 
-	out.push_back(checkstr.str());
+	out.push_back(script);
 }
 
 string CheckCreator::getPerlScript(const kvalobs::kvChecks & check)
@@ -78,4 +74,21 @@ string CheckCreator::getMetaData(const kvalobs::kvChecks & check)
 		throw std::runtime_error(
 				"CheckCreator::runChecks failed in metad.data_asPerl");
 	return ret;
+}
+
+CheckCreator::Script::Script(const std::string & perlScript, const std::string & meteoData, const std::string & metaData, const std::string & qcx) :
+		perlScript_(perlScript), meteoData_(meteoData), metaData_(metaData), qcx_(qcx)
+{}
+
+std::string CheckCreator::Script::str() const
+{
+	ostringstream checkstr; // final check string
+	checkstr << "#==========================================\n"
+			<< "# KVALOBS check-script\n" << "# type: " << qcx() << "\n"
+			<< "#==========================================\n\n"
+			<< "use strict;\n";
+
+	checkstr << metaData() << meteoData() << perlScript();
+
+	return checkstr.str();
 }

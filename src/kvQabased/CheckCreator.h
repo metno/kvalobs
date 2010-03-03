@@ -28,7 +28,9 @@ public:
 			const kvalobs::kvStationInfo & station, kvQABaseDBConnection & con);
 	~CheckCreator();
 
-	typedef std::vector<std::string> ScriptList;
+	class Script;
+
+	typedef std::vector<Script> ScriptList;
 
 	void getScripts(ScriptList & out, const kvalobs::kvChecks & check);
 
@@ -53,5 +55,26 @@ private:
 	kvQABaseMetadata metad;
 	kvQABaseScriptManager sman;
 };
+
+class CheckCreator::Script
+{
+public:
+	Script(const std::string & perlScript, const std::string & meteoData, const std::string & metaData, const std::string & qcx);
+
+	std::string str() const;
+
+	const std::string & perlScript() const { return perlScript_; }
+	const std::string & meteoData() const { return meteoData_; }
+	const std::string & metaData() const { return metaData_; }
+	const std::string & qcx() const { return qcx_; }
+
+private:
+	std::string perlScript_;
+	std::string meteoData_;
+	std::string metaData_;
+	std::string qcx_;
+};
+
+
 
 #endif /*CHECKCREATOR_H_*/

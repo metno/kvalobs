@@ -103,7 +103,7 @@ private:
 	void updateStaticVariables();
 	void findChecks(std::list<kvalobs::kvChecks> & out);
 
-	void runCheck(const std::string & checkScript,
+	void runCheck(const CheckCreator::Script & checkScript,
 			const kvalobs::kvChecks & check);
 
 	CheckCreator checkCreator_;
