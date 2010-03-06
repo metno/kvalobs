@@ -551,13 +551,20 @@ bool kvControlInfo::qc1Done() const
 bool kvControlInfo::qc2dDone() const
 {
   //return false;//flag( f_fs ) or flag( f_ftime ) or flag( f_fw ) or flag( f_fstat );
-  return flag( f_fs ) or flag( f_ftime ) or flag( f_fw ) or flag( f_fstat );
+  return (flag( f_fs ) > 3) or flag( f_ftime ) or flag( f_fw ) or flag( f_fstat );
 }
+
+// Here you need to alter the check for flag f_fs being set into checking
+// for the specific values of f_s which QC2 alone is able to set. fs=1,2,3
+// should not imply qc2dDone=true, because fs=1,2,3 is set by QC1, not QC2.
+// Similarly for the flag f_fd in qc2mDone.
+//
+// ... Assume no change to qc1done code since always a Qc1 check before a Qc2 ???
 
 bool kvControlInfo::qc2mDone() const
 {
   //return false;//flag( f_fclim ) or flag( f_fd );
-  return flag( f_fclim ) or flag( f_fd );
+  return flag( f_fclim ) or (flag( f_fd ) > 6);
 }
 
 bool kvControlInfo::qc2Done() const
