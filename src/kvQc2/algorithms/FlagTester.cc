@@ -75,6 +75,7 @@ FlagTester( ReadProgramOptions params )
   kvData d;
   std::vector<std::string> FlagStrings;
   std::vector<kvalobs::kvControlInfo> ControlFlags; 
+  std::vector<kvalobs::kvUseInfo> UseFlags; 
 
    std::string line;
    string valis;
@@ -82,18 +83,14 @@ FlagTester( ReadProgramOptions params )
 
    std::ifstream ind;
    ind.open("/metno/kvalobs/kvalobs-svn/src/kvQc2/algorithms/Flags.txt");
+   // Change the file to read both original controlinfo and useinfo
    if(ind) {
-      ind >> key;
       while ( !ind.eof() ) {
 
          ind >> valis;
-         if (valis!=";") {
-             FlagStrings.push_back(valis);
+         FlagStrings.push_back(valis);
+
          }
-         else if (valis==";") {
-             ind >> key;
-         }
-      }
    }
    else {
           std::cout << "Could not open Flags.txt file!" << std::endl;
@@ -101,22 +98,33 @@ FlagTester( ReadProgramOptions params )
 
   ind.close();
 
-  for (std::vector<string>::const_iterator vit = FlagStrings.begin(); vit != FlagStrings.end(); ++vit){
-     kvalobs::kvUseInfo ubruce;
-     std::cout << ubruce << std::endl;
-     //std::cout << *vit << std::endl;
-     kvalobs::kvControlInfo kbruce(*vit);
+   int ii;
+   for(ii=0; ii < FlagStrings.size()-1; ii=ii+2)
+   {
+     //cout << FlagStrings[ii] << endl;
+     //std::cout << ubruce << std::endl;
+     kvalobs::kvControlInfo kbruce( FlagStrings[ii] );
+     kvalobs::kvUseInfo ubruce( FlagStrings[ii+1] );
      ubruce.setUseFlags( kbruce );
-     std::cout << kbruce << " "<< ubruce << std::endl;
+     std::cout << kbruce << " "<< FlagStrings[ii+1] << " " << ubruce << std::endl;
      std::cout << "---------------" << std::endl;
-  }
+   }
 
-  kvUseInfo ui = d.useinfo();
-  std::cout << d.controlinfo() << std::endl;
-  std::cout << ui << std::endl;
-  ui.setUseFlags( d.controlinfo() );
-  std::cout << ui << std::endl;
-  std::cout << "---------------" << std::endl;
+  //for (std::vector<string>::const_iterator vit = FlagStrings.begin(); vit != FlagStrings.end(); ++vit){
+     //kvalobs::kvUseInfo ubruce;
+     //std::cout << ubruce << std::endl;
+     //kvalobs::kvControlInfo kbruce(*vit);
+     //ubruce.setUseFlags( kbruce );
+     //std::cout << kbruce << " "<< ubruce << std::endl;
+     //std::cout << "---------------" << std::endl;
+  //}
+
+  //kvUseInfo ui = d.useinfo();
+  //std::cout << d.controlinfo() << std::endl;
+  //std::cout << ui << std::endl;
+  //ui.setUseFlags( d.controlinfo() );
+  //std::cout << ui << std::endl;
+  //std::cout << "---------------" << std::endl;
 
 return 0;
 }

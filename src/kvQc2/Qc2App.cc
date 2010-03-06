@@ -46,6 +46,7 @@ using namespace std;
 using namespace dnmi::db;
 using namespace milog;
 
+
 Qc2App::Qc2App(int argn, char **argv,
 		     const std::string &driver_,
 		     const std::string &connect_,
