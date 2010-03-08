@@ -246,6 +246,7 @@ TEST_F( SynopDecodeTest, decode333_7RRR)
 
 /**
  * Decoding of 333 3Ejjj.
+ * If E is given, set SA=-1.
  */
 TEST_F( SynopDecodeTest, decode333_3Ejjj)
 {
@@ -266,7 +267,8 @@ TEST_F( SynopDecodeTest, decode333_3Ejjj)
 	synopmsg="AAXX 18061 40745 46/// ///// 333 31002=";
 
 	EXPECT_TRUE( decode2ParamVal( synopmsg, param, rejectInfo) ) << "Rejected: " << rejectInfo.comment();
-	EXPECT_TRUE( SA==FLT_MAX && E_==FLT_MAX && SD==FLT_MAX ) << "Failed (4E'sss): SA=" << SA << " E'=" << E_ << " SD=" << SD;
+	EXPECT_TRUE( E_==FLT_MAX && SD==FLT_MAX ) << "Failed (4E'sss): E'=" << E_ << " SD=" << SD;
+	EXPECT_FLOAT_EQ( SA, -1 ) << "Failed: (3Ejjj) SA=" << SA;
 	EXPECT_FLOAT_EQ( E, 1 ) << "Failed: (3Ejjj) E=" << E;
 }
 
