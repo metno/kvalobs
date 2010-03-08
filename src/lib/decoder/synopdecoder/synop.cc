@@ -964,6 +964,15 @@ void synop::sort333Token(const char *token)
   case 3:
     setToken(E,token,1);
     setToken(jjj,token,2,3);
+    {
+    	//Climadb quirk
+    	int EValue;;
+
+    	if( value( E, EValue ) ) {
+    		if( EValue>=0 && EValue<=9 )
+    			setBuffer( sss, -1 );
+    	}
+    }
     break;
   case 4:
     setToken(E_,token,1);
