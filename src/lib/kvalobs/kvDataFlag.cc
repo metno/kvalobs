@@ -767,11 +767,11 @@ bool kvUseInfo::setUseFlags(const kvControlInfo& cinfo)
 	      fcp        >= 0xA  ||
 	      fs         >= 9    ||
           fnum       == 6    ||
+          fw         == 6    ||
 	      fpos       >= 4    ||
           fd         == 2    ||
           fd         >= 6    ||
 	      fpre       >= 4    ||
-	      fw         == 3    ||
 	      fclim      == 3    ||
 	      fcombi     >= 9    ||
 	      fhqc       >= 6 )
@@ -789,6 +789,8 @@ bool kvUseInfo::setUseFlags(const kvControlInfo& cinfo)
               fs    == 3   ||
               fnum  == 4   ||
               fnum  == 5   ||
+              fw    == 4   ||
+              fw    == 5   ||
               fpos  == 3   ||
               fstat == 2   ||
               fd    == 3 )
@@ -805,6 +807,7 @@ bool kvUseInfo::setUseFlags(const kvControlInfo& cinfo)
              fnum  == 2    ||
              fnum  == 3    ||
              fw    == 2    ||
+             fw    == 3    ||
              fclim == 2    ||
              fcombi== 2)
       ui[2]= 1;
@@ -814,6 +817,7 @@ bool kvUseInfo::setUseFlags(const kvControlInfo& cinfo)
              fcp   == 1    ||
              fs    == 1    ||
              fnum  == 1    ||
+             fw    == 1    ||
              fpos  == 1    ||
              fstat == 1    ||
              fclim == 1    ||
@@ -856,9 +860,9 @@ bool kvUseInfo::setUseFlags(const kvControlInfo& cinfo)
     		  fs    == 0xA ||
     		  fpos  == 4   ||
     		  fpre  == 4   ||
-    		  fw    == 3   ||
     		  fclim == 3   ||
-    		  ( fnum == 6 && fmis == 0 ) )
+    		  ( fnum == 6 && fmis == 0 ) ||
+    		  ( fw == 6 && fmis == 0 ) )
     	ui[ 3 ] = 3;
 
     else if ( fr     == 6   ||
