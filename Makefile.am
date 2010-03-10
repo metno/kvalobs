@@ -1,4 +1,4 @@
-SUBDIRS = share src doc
+SUBDIRS =  share src doc
 
 ACLOCAL_AMFLAGS = -I m4
 
@@ -21,3 +21,5 @@ install-data-hook:
 
 #pkgconfig_DATA = @PACKAGE_TARNAME@.pc
 #$(pkgconfig_DATA): config.status
+
+include mk/debian.mk
