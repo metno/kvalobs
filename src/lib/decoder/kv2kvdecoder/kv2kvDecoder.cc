@@ -47,9 +47,6 @@
 #include <functional>
 #include <stdexcept>
 
-#define NDEBUG
-#include <cassert>
-
 using namespace std;
 using namespace kvalobs::decoder;
 using namespace kvalobs::serialize;
@@ -72,7 +69,7 @@ kv2kvDecoder::kv2kvDecoder(dnmi::db::Connection & con,
 		const miutil::miString & obsType, const miutil::miString & obs,
 		int decoderId) :
 	DecoderBase(con, params, typeList, obsType, obs, decoderId), dbGate(&con),
-			priority_(5), tbtime(miutil::miTime::nowTime()), doLog_(false)
+			priority_(5), tbtime(miutil::miTime::nowTime())
 {
 	milog::LogContext lcontext(name());
 	LOGDEBUG( "kv2kvDecoder object created" );
@@ -104,8 +101,6 @@ DecoderBase::DecodeResult kv2kvDecoder::handleError_(
 DecoderBase::DecodeResult kv2kvDecoder::execute(miutil::miString & msg)
 {
 	milog::LogContext lcontext(name());
-	if (doLog_)
-		LOGDEBUG( msg );
 
 	KvalobsData data;
 	try
@@ -352,7 +347,8 @@ kv2kvDecoder::kvDataPtr kv2kvDecoder::getDbData(const kvData d)
 	if (dbGate.select(dbData, kvQueries::selectData(d)))
 	{
 		// Lookup is done so that only a single instance will match
-		assert( dbData.size( ) <= 1 );
+		if ( dbData.size() > 1 )
+			throw DecoderError(decoder::DecoderBase::Error, "Too many rows returned by query");
 		if (dbData.empty())
 		{
 			LOGDEBUG( "No match for data " << d << " in database" );

@@ -66,15 +66,6 @@ public:
 
 	virtual DecodeResult execute(miutil::miString & msg);
 
-	void logMessages(bool doLog)
-	{
-		doLog_ = doLog;
-	}
-	bool logMessages() const
-	{
-		return doLog_;
-	}
-
 protected:
 	kvDbGate dbGate;
 
@@ -110,7 +101,6 @@ private:
 
 	int priority_;
 	const miutil::miTime tbtime;
-	bool doLog_;
 };
 
 }
