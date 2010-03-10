@@ -392,7 +392,7 @@ void kv2kvDecoder::adapt( kvData & d, kvDataPtr dbData, bool overwrite ) const
            d.original(), d.paramID(), tbtime,
            d.typeID(), d.sensor(), d.level(),
            d.corrected(), d.controlinfo(),
-           d.useinfo(), d.cfailed() );*/
+	 d.useinfo(), d.cfailed() );*/
 }
 
 }
