@@ -35,7 +35,7 @@
 #include <kvalobs/kvDataOperations.h>
 #include <kvalobs/kvQueries.h>
 #include <decoderbase/decoder.h>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include <milog/milog.h>
 #include <kvdb/transactionhelper.h>
 #include <memory>

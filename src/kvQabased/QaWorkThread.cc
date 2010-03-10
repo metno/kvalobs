@@ -35,7 +35,7 @@
 #include <sstream>
 #include <milog/milog.h>
 #include <kvalobs/kvDbGate.h>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include <boost/regex.hpp>
 #include <boost/filesystem/exception.hpp>
 #include <memory>

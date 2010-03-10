@@ -33,7 +33,7 @@
 
 #include <vector>
 #include <map>
-#include <puTools/miString>
+#include <puTools/miString.h>
 
 /* Dette er ingen databaseconnection- men et bibliotek */
 

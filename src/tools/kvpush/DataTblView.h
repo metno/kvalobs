@@ -32,8 +32,8 @@
 #define __DATATBLVIEW_H__
 
 #include <kvalobs/kvDbBase.h>
-#include <puTools/miString>
-#include <puTools/miTime>
+#include <puTools/miString.h>
+#include <puTools/miTime.h>
 #include <kvdb/kvdb.h>
 
 /// What is this?

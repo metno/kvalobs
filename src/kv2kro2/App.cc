@@ -31,7 +31,7 @@
 
 #include <stdio.h>
 #include <fstream>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include "GetData.h"
 #include "App.h"
 

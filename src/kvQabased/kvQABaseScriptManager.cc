@@ -29,7 +29,7 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include "kvQABaseScriptManager.h"
-#include <puTools/miString>
+#include <puTools/miString.h>
 #include <boost/lexical_cast.hpp>
 #include <sstream>
 #include <stdexcept>

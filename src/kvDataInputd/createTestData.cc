@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include <fstream>
 
 using namespace miutil;

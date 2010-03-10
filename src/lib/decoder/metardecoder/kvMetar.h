@@ -31,8 +31,8 @@
 #ifndef _kvMetar_h
 #define _kvMetar_h
 
-#include <puTools/miString>
-#include <puTools/miTime>
+#include <puTools/miString.h>
+#include <puTools/miTime.h>
 #include "kvMetarElements.h"
 
 extern "C" {

@@ -33,7 +33,7 @@
 
 #include <kvdb/dbdrivermgr.h>
 #include <kvalobs/kvapp.h>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 
 class KvMgrCltApp : public KvApp 
 {

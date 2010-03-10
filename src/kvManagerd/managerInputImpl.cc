@@ -29,7 +29,7 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include <dnmithread/mtcout.h>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include "managerInputImpl.h"
 #include <kvalobs/kvStationInfoCommand.h>
 #include <milog/milog.h>

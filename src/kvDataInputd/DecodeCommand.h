@@ -33,7 +33,7 @@
 
 #include <dnmithread/CommandQue.h>
 #include <decoderbase/decoder.h>
-#include <puTools/miString>
+#include <puTools/miString.h>
 
 
 /**

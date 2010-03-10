@@ -37,7 +37,7 @@
 #include <kvalobs/kvDbGate.h>
 #include <kvalobs/kvStation.h>
 #include <kvalobs/kvParam.h>
-#include <puTools/miString>
+#include <puTools/miString.h>
 #include <kvalobs/kvPath.h>
 
 

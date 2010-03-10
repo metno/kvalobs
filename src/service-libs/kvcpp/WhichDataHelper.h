@@ -32,7 +32,7 @@
 #define __kvservice_whichdatahelper__
 
 #include <kvskel/kvService.hh>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 
 namespace kvservice{
 

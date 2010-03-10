@@ -33,7 +33,7 @@
 #include <dnmithread/mtcout.h>
 #include <sstream>
 #include <boost/lexical_cast.hpp>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include <miutil/commastring.h>
 #include <milog/milog.h>
 #include "convert.h"

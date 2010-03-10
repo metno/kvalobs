@@ -34,7 +34,7 @@
 #include "kvCronString.h"
 #include <kvalobs/kvKeyVal.h>
 #include "qabaseApp.h"
-#include <puTools/miString>
+#include <puTools/miString.h>
 #include <fstream>
 #include <sstream>
 #include <list>

@@ -34,7 +34,7 @@
 #include "kvQABaseDBConnection.h"
 #include <kvalobs/kvQCFlagTypes.h>
 
-#include <puTools/miString>
+#include <puTools/miString.h>
 #include <list>
 
 #include <milog/milog.h>

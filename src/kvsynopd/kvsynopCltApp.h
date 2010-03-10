@@ -31,7 +31,7 @@
 #ifndef __kvsynopCltApp_h__
 #define __kvsynopCltApp_h__
 
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include <map>
 #include <list>
 #include <miconfparser/miconfparser.h>

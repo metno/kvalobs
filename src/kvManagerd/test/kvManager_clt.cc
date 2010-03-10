@@ -36,7 +36,7 @@
 #include <dnmithread/mtcout.h>
 #include <kvskel/managerInput.hh>
 #include <kvskel/datasource.hh>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include <kvalobs/kvapp.h>
 
 

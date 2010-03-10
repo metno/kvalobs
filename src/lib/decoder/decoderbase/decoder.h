@@ -34,8 +34,8 @@
 #include <list>
 #include <set>
 #include <miconfparser/miconfparser.h>
-#include <puTools/miString>
-#include <puTools/miTime>
+#include <puTools/miString.h>
+#include <puTools/miTime.h>
 #include <kvdb/kvdb.h>
 #include <fileutil/dso.h>
 #include <kvalobs/kvObsPgm.h>

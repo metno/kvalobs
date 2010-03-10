@@ -31,7 +31,7 @@
 #ifndef __OneTimeJob_h__
 #define __OneTimeJob_h__
 
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include <kvdb/kvdb.h>
 #include <kvalobs/kvStationInfo.h>
 #include <dnmithread/CommandQue.h>

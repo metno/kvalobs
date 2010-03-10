@@ -35,8 +35,8 @@
 #include "kvQABaseDBConnection.h"
 #include "kvQABaseMeteodata.h"
 #include "kvQABaseTypes.h"
-#include <puTools/miString>
-#include <puTools/miTime>
+#include <puTools/miString.h>
+#include <puTools/miTime.h>
 #include <kvalobs/kvStationInfo.h>
 #include <milog/milog.h>
 #include <kvalobs/kvChecks.h>

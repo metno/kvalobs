@@ -34,7 +34,7 @@
 #include <stdexcept>
 #include <list>
 #include <string>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 
 
 class  SynopData

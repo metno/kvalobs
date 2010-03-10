@@ -30,7 +30,7 @@
 */
 
 #include "kvMetadataTable.h"
-#include <puTools/miString>
+#include <puTools/miString.h>
 
 #include <milog/milog.h>
 

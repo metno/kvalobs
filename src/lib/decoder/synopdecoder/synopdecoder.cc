@@ -32,7 +32,7 @@
 #include <fstream>
 #include <stdlib.h>
 #include <boost/lexical_cast.hpp>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include <miutil/commastring.h>
 #include <milog/milog.h>
 #include <kvalobs/kvDbGate.h>

@@ -31,7 +31,7 @@
 #include <map>
 #include <kvalobs/kvParamset.h> 
 #include <kvalobs/kvParamsetdef.h>
-#include <puTools/miString>
+#include <puTools/miString.h>
 
 
 using namespace std;

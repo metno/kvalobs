@@ -31,7 +31,7 @@
 #include <stdlib.h>
 #include <sstream>
 #include <milog/milog.h>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include <miutil/trimstr.h>
 #include <kvalobs/kvDbGate.h>
 #include "smsmeldingparser.h"

@@ -31,7 +31,7 @@
 #ifndef __DataFilterBase_h__
 #define __DataFilterBase_h__
 
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include "Data.h"
 
 class DataFilterBase{

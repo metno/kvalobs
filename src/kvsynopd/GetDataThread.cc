@@ -31,7 +31,7 @@
 /* $Header: /var/lib/cvs/kvalobs/src/kvsynopd/GetDataThread.cc,v 1.4.2.4 2007/09/27 09:02:22 paule Exp $ */
 #include <milog/milog.h>
 #include <sstream>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include "getDataReceiver.h"
 #include "GetDataThread.h"
 

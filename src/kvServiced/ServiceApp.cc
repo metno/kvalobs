@@ -33,7 +33,7 @@
 #include <iostream>
 #include <kvskel/commonStationInfo.hh>
 #include <milog/milog.h>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include <kvalobs/kvPath.h>
 #include "ServiceApp.h"
 #include "ReaperBase.h"

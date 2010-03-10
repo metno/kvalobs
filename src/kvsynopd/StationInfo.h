@@ -40,7 +40,7 @@
 #include <milog/milog.h>
 #include <list>
 #include <string>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 
 //#include "StationInfoParse.h"
 

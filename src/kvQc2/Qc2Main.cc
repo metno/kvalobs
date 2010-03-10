@@ -39,7 +39,7 @@
 #include <miconfparser/miconfparser.h>
 #include <fileutil/pidfileutil.h>
 #include "Qc2Thread.h"
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include <kvalobs/kvPath.h>
 
 

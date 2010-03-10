@@ -34,7 +34,7 @@
 #include <kvalobs/kvObsPgm.h>
 #include <kvalobs/kvQueries.h>
 #include <kvalobs/kvWorkelement.h>
-#include <puTools/miClock>
+#include <puTools/miClock.h>
 #include "MissingObsCheck.h"
 
 using namespace kvalobs;

@@ -4,7 +4,7 @@
 #include <string>
 #include <list>
 #include <map>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 
 #include <milog/milog.h>
 

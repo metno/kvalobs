@@ -31,8 +31,8 @@
 #ifndef _kvQueries_h
 #define _kvQueries_h
 
-#include <puTools/miString>
-#include <puTools/miTime>
+#include <puTools/miString.h>
+#include <puTools/miTime.h>
 #include <sstream>
 #include <kvalobs/kvData.h>
 #include <list>

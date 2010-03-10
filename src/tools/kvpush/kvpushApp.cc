@@ -33,7 +33,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <stdlib.h>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include <kvalobs/kvDbGate.h>
 #include <kvalobs/kvWorkelement.h>
 #include <miconfparser/confparser.h>

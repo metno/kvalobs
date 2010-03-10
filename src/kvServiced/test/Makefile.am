@@ -13,7 +13,7 @@ getdata_LDADD = $(top_builddir)/src/service-libs/kvcpp/libkvcpp.la \
 
 stressTestGetData_SOURCES=stressTestGetData.cc
 stressTestGetData_CPPFLAGS = $(AM_CPPFLAGS)
-stressTestGetData_LDFLAGS =  -pthread  -rpath $(libdir) -rpath $(libdir)/kvalobs
+stressTestGetData_LDFLAGS =  -pthread  
 stressTestGetData_LDADD =  $(top_builddir)/src/service-libs/kvcpp/libkvcpp.la \
                           -lm
  

@@ -31,7 +31,7 @@
 #include <time.h>
 #include <milog/milog.h>
 #include <sstream>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include "obsevent.h"
 #include "delaycontrol.h"
 

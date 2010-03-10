@@ -32,7 +32,7 @@
 /* Created by DNMI/PU: j.schulze@met.no
    at Wed Aug 28 14:09:50 2002 */
 
-#include <puTools/miString>
+#include <puTools/miString.h>
 
 using namespace std; 
 using namespace miutil;

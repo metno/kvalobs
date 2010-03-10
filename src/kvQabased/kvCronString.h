@@ -36,8 +36,8 @@
    at Wed May 14 17:12:03 2003 */
 
 #include <string>
-#include <puTools/miString>
-#include <puTools/miTime>
+#include <puTools/miString.h>
+#include <puTools/miTime.h>
 #include <vector>
 
 namespace kvalobs {

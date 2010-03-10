@@ -34,7 +34,7 @@
 #include <boost/function.hpp>
 #include <dnmithread/CommandQue.h>
 #include <kvdb/kvdb.h>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include <kvalobs/kvStationInfoCommand.h>
 #include "GenCacheElem.h"
 

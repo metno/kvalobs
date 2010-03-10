@@ -31,7 +31,7 @@
 #ifndef __preprocessjob_h__
 #define __preprocessjob_h__
 
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include <kvdb/kvdb.h>
 
 

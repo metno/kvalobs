@@ -36,7 +36,7 @@
 #include <list>
 #include <boost/shared_ptr.hpp>
 #include <kvskel/kvDataNotifySubscriber.hh>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 
 namespace kvservice{
     class KvWhat{

@@ -31,7 +31,7 @@
 #ifndef __dnmi_decoder_DecoderMgr_h__
 #define __dnmi_decoder_DecoderMgr_h__
 
-#include <puTools/miString>
+#include <puTools/miString.h>
 #include <kvdb/kvdb.h>
 #include <fileutil/dso.h>
 #include <decoderbase/decoder.h>

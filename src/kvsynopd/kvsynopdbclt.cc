@@ -42,7 +42,7 @@
 #include <fstream>
 #include <kvalobs/kvDbGate.h>
 #include "tblSynop.h"
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include <sstream>
 #include <fstream>
 #include <kvalobs/kvPath.h>

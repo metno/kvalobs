@@ -37,7 +37,7 @@
 #include <kvalobs/paramlist.h>
 #include <list>
 #include <string>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 
 
 namespace kvalobs{

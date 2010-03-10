@@ -41,7 +41,7 @@
 
 #include "kvMetar.h"
 #include <iostream>
-#include <puTools/miString>
+#include <puTools/miString.h>
 
 /// Created by DNMI/PU: j.schulze@met.no
 /// at Wed Apr  2 08:34:13 2003 

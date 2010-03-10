@@ -90,15 +90,16 @@ class GetDataReceiver :
     			}
 
     			nParams++;
-    			/*cerr << dit->stationID() << "," << dit->obstime() << "," << dit->typeID() << ","
-    				 << dit->paramID() << "," << dit->original() << "," << dit->corrected() << endl;*/
+    			cerr << dit->stationID() << "," << dit->obstime() << "," << dit->typeID() << ","
+    				 << dit->paramID() << "," << dit->original() << "," << dit->corrected() << ": Data" << endl;
     		}
 
     		for( KvObsData::kvTextDataList::iterator dit=textData.begin(); dit != textData.end(); ++dit ) {
     			cerr << dit->stationID() << "," << dit->obstime() << "," << dit->typeID() << ","
-    				 << dit->paramID() << "," << dit->original()  << endl;
+    				 << dit->paramID() << "," << dit->original()  << ": TextData" <<endl;
     		}
-    		//cerr << " -----------------------------------------------------------------------  " << endl;
+
+    		cerr << " -----------------------------------------------------------------------  " << endl;
     	}
     }
 };
@@ -141,8 +142,10 @@ public:
 		int nObstimes;
 		int nParams;
 		kvservice::WhichDataHelper whichData;
+        //whichData.addStation( 18700, miutil::miTime("2006-02-06 06:00:00"), miutil::miTime("2006-02-06 06:00:00"));
+		whichData.addStation( 0, miutil::miTime("2010-02-22 06:00:00"), miutil::miTime("2010-02-22 06:00:00"));
 		//whichData.addStation( 18700, miutil::miTime("2006-02-06 06:00:00"), miutil::miTime("2006-02-10 06:00:00"));
-		whichData.addStation( 18700, miutil::miTime("2010-02-11 10:00:00"), miutil::miTime("2010-02-12 09:00:00"));
+		//whichData.addStation( 18700, miutil::miTime("2010-02-11 10:00:00"), miutil::miTime("2010-02-12 09:00:00"));
 
 		for( int N=1; N>0; N-- ) {
 			GetDataReceiver dataReceiver;

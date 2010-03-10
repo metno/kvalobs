@@ -41,7 +41,7 @@
 #include <fileutil/copyfile.h>
 #include "CollectSynop.h"
 #include "crc_ccitt.h"
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include <kvalobs/kvPath.h>
 
 using namespace std;

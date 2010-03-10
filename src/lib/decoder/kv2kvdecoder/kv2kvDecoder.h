@@ -34,7 +34,7 @@
 #include <decoderbase/decoder.h>
 #include <kvalobs/kvDbGate.h>
 #include <decodeutility/kvalobsdata.h>
-#include <puTools/miString>
+#include <puTools/miString.h>
 #include <list>
 #include <stdexcept>
 #include <boost/utility.hpp>

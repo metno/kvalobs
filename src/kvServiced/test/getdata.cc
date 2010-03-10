@@ -31,7 +31,7 @@
 #include <iostream>
 #include <kvskel/kvService.hh>
 #include <corbahelper/corbaApp.h>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 
 using namespace CorbaHelper;
 using namespace std;

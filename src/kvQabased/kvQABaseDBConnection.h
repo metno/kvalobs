@@ -41,7 +41,7 @@
 #include <string>
 #include <list>
 #include <map>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 
 #include "kvMetadataTable.h"
 #include "kvQABaseTypes.h"

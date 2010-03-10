@@ -32,7 +32,7 @@
 #define __MITIMEPARSE_H__
 
 #include <exception>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 
 namespace miutil{
 	

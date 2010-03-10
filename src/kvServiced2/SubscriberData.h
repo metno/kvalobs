@@ -33,7 +33,7 @@
 
 #include <boost/thread/thread.hpp>
 #include <map>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include <kvskel/kvService.hh>
 #include "SubscriberThread.h"
 #include "DataToSubscribers.h"

@@ -34,7 +34,7 @@
 #include "mgrApp.h"
 #include <dnmithread/CommandQue.h>
 #include <kvdb/kvdb.h>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 
 
 class CheckForMissingObsMessages

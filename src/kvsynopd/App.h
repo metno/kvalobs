@@ -38,7 +38,7 @@
 #include <kvcpp/corba/CorbaKvApp.h>
 #include <kvdb/dbdrivermgr.h>
 #include <list>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include <boost/thread/mutex.hpp>
 #include <kvskel/kvsynopd.hh>
 #include "kvsynopdImpl.h"

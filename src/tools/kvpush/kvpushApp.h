@@ -34,7 +34,7 @@
 #include <kvdb/kvdb.h>
 #include <kvdb/dbdrivermgr.h>
 #include <kvalobs/kvapp.h>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include <list>
 #include <string>
 #include <exception>

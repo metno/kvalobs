@@ -33,7 +33,7 @@
 
 #include <set>
 #include <utility>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include <kvalobs/kvData.h>
 #include <kvalobs/kvTextData.h>
 

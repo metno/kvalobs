@@ -36,7 +36,7 @@
 #include <string>
 #include <exception>
 #include <vector>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include <kvalobs/paramlist.h>
 #include <kvalobs/kvData.h>
 namespace kvalobs{

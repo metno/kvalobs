@@ -30,7 +30,7 @@
 */
 #include <iostream>
 #include <sstream>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include <iomanip>
 #include <stdio.h>
 #include <fstream>

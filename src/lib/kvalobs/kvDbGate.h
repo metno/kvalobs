@@ -31,7 +31,7 @@
 #ifndef _kvDbGate_h
 #define _kvDbGate_h
 
-#include <puTools/miString>
+#include <puTools/miString.h>
 #include <kvalobs/kvAlgorithms.h>
 #include <kvalobs/kvChecks.h>
 #include <kvalobs/kvData.h>

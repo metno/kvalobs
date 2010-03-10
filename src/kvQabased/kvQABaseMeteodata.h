@@ -38,7 +38,7 @@
 
 #include <string>
 #include <map>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include "kvQABaseScriptManager.h"
 #include "kvQABaseDBConnection.h"
 #include "kvalobscache.h"

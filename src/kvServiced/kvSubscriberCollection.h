@@ -42,8 +42,8 @@
 #include "kvSubscriberBase.h"
 #include <kvskel/kvService.hh>
 #include <stdio.h>
-#include <puTools/miTime>
-#include <puTools/miString>
+#include <puTools/miTime.h>
+#include <puTools/miString.h>
 #include <fstream>
 
 class KvSubscriberCollection{

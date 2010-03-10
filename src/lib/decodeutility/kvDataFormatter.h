@@ -34,7 +34,7 @@
 #include <list>
 #include <sstream>
 #include <exception>
-#include <puTools/miString>
+#include <puTools/miString.h>
 #include <kvalobs/kvData.h>
 
 

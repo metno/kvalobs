@@ -31,7 +31,7 @@
 #ifndef __menager_gen_cache_element_h__
 #define __menager_gen_cache_element_h__
 
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include <kvdb/kvdb.h>
 #include <boost/thread/mutex.hpp>
 /**

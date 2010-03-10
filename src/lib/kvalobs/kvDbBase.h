@@ -32,10 +32,10 @@
 #define _kvDbBase_h
 
 #include <kvdb/kvdb.h>
-#include <puTools/miString>
+#include <puTools/miString.h>
 #include <iostream>
 #include <fstream>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include <dnmithread/mtcout.h>
 
 /* Created  by JS at Mon Aug 26 13:25:00 2002 */

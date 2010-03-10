@@ -12,7 +12,7 @@
 #include <miutil/trimstr.h>
 #include <kvalobs/kvPath.h>
 #include <fileutil/dir.h>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include "App.h"
 #include "CollectData.h"
 

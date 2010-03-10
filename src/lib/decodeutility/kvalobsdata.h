@@ -37,7 +37,7 @@
 #include <list>
 #include <utility>
 #include <kvalobs/kvDataFlag.h>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 
 namespace kvalobs
 {

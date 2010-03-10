@@ -32,7 +32,7 @@
 #include <milog/milog.h>
 
 #include <list>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include <kvalobs/kvDbGate.h>
 #include <kvalobs/kvQueries.h>
 #include <kvalobs/kvKeyVal.h>

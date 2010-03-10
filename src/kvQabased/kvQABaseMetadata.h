@@ -47,7 +47,7 @@
 
 #include <string>
 #include <map>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include "kvQABaseDBConnection.h"
 #include "kvQABaseScriptManager.h"
 

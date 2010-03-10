@@ -36,7 +36,7 @@
 #include <sstream>
 #include <milog/milog.h>
 #include <kvalobs/kvDbGate.h>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include <memory>
 #include <stdexcept>
 

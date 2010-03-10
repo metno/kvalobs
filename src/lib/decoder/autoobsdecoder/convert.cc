@@ -36,7 +36,7 @@
 #include <string.h>
 #include "convert.h"
 #include <milog/milog.h>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include <dnmithread/mtcout.h>
 #include <sstream>
 #include <decodeutility/decodeutility.h>

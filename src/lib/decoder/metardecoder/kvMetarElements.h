@@ -31,7 +31,7 @@
 #ifndef _kvMetarElements_h
 #define _kvMetarElements_h
 
-#include <puTools/miString>
+#include <puTools/miString.h>
 
 /// Created by met.no/FoU/PU: j.schulze@met.no
 /// at Tue Apr  1 11:28:21 2003

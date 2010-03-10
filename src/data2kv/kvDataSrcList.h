@@ -4,7 +4,7 @@
 #include <string>
 #include <kvskel/datasource.hh>
 #include <list>
-#include <puTools/miTime>
+#include <puTools/miTime.h>
 #include <corbahelper/corbaApp.h>
 
 struct KvDataReceiver {
