@@ -69,7 +69,8 @@ AC_CONFIG_FILES([Makefile
 ])
 
 
-PKG_CHECK_MODULES(putools, putools)
+
+PKG_CHECK_MODULES(putools, puTools)
 KV_FIND_OMNIORB4
 KV_POSTGRESQL
 PKG_CHECK_MODULES(sqlite3, sqlite3)
