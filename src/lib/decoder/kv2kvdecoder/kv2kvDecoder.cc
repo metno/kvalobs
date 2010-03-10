@@ -73,44 +73,34 @@ kv2kvDecoder::kv2kvDecoder(dnmi::db::Connection & con,
 {
 	milog::LogContext lcontext(name());
 	LOGDEBUG( "kv2kvDecoder object created" );
+
+	try
+	{
+		parse(data, obs);
+		parseResult_ = Ok;
+		parseMessage_ = "Ok";
+
+	} catch (DecoderError & e)
+	{
+		parseResult_ = Error;
+		parseMessage_ = "Could not parse data";
+	}
 }
 
 kv2kvDecoder::~kv2kvDecoder()
 {
 }
 
-DecoderBase::DecodeResult kv2kvDecoder::handleError_(
-		const kv2kvDecoder::DecoderError & e, miutil::miString & msg)
-{
-	msg = e.what();
-	ostringstream ss;
-	ss << msg << endl << "Data was:\n" << obs;
-	try
-	{
-		kvRejectdecode reject(obs, tbtime, name(), msg);
-		if (!this->putRejectdecodeInDb(reject))
-			throw exception();
-	} catch (...)
-	{
-		ss << endl << "Unable to save message in rejectdecode!";
-	}
-	LOGERROR( ss.str() );
-	return e.res;
-}
-
 DecoderBase::DecodeResult kv2kvDecoder::execute(miutil::miString & msg)
 {
 	milog::LogContext lcontext(name());
 
-	KvalobsData data;
-	try
+	if ( parseResult_ != Ok )
 	{
-		parse(data, obs);
-	} catch (DecoderError & e)
-	{
-		miutil::miString e_msg = "Could not parse data";
-		return handleError_(e, e_msg);
+		msg = parseMessage_;
+		return parseResult_;
 	}
+
 	try
 	{
 		// Transactions may not be used here - the underlying system uses them.
@@ -121,14 +111,27 @@ DecoderBase::DecodeResult kv2kvDecoder::execute(miutil::miString & msg)
 		data.getData(tdl, tbtime);
 		save(dl, tdl);
 		//     getConnection()->endTransaction();
-
-		msg = "ok";
-		return decoder::DecoderBase::Ok;
 	} catch (DecoderError & e)
 	{
 		//     getConnection()->rollBack();
-		return handleError_(e, msg);
+		parseMessage_ = e.what();
+		parseResult_ = e.res;
+		ostringstream ss;
+		ss << parseMessage_ << endl << "Data was:\n" << obs;
+		try
+		{
+			kvRejectdecode reject(obs, tbtime, name(), msg);
+			if (!this->putRejectdecodeInDb(reject))
+				throw exception();
+		} catch (...)
+		{
+			ss << endl << "Unable to save message in rejectdecode!";
+		}
+		LOGERROR( ss.str() );
 	}
+
+	msg = parseMessage_;
+	return parseResult_;
 }
 
 void kv2kvDecoder::parse(KvalobsData & data, const miutil::miString & obs) const

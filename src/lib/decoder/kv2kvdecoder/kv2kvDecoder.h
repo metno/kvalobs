@@ -66,7 +66,7 @@ public:
 
 	virtual DecodeResult execute(miutil::miString & msg);
 
-protected:
+private:
 	kvDbGate dbGate;
 
 	void parse(serialize::KvalobsData & data, const miutil::miString & obs) const;
@@ -96,9 +96,9 @@ protected:
 		}
 	};
 
-private:
-	DecodeResult handleError_(const DecoderError & e, miutil::miString & msg);
-
+	serialize::KvalobsData data;
+	DecodeResult parseResult_;
+	miutil::miString parseMessage_;
 	int priority_;
 	const miutil::miTime tbtime;
 };
