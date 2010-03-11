@@ -48,7 +48,9 @@ namespace serialize
 {
 
 /**
- * The content of a serialized message
+ * The content of a serialized message.
+ *
+ * Format:
  *
  * @author Vegard B�nes
  */
@@ -61,11 +63,29 @@ class KvalobsData
 
     ~KvalobsData();
 
+    /**
+     * True if no data is contained in this object.
+     */
     bool empty() const;
+
+    /**
+     * Number of observations (not parameters) in this object.
+     */
     size_t size() const;
 
+    /**
+     * Add data to object
+     */
     void insert( const kvalobs::kvData & d );
+
+    /**
+     * Add text data to object
+     */
     void insert( const kvalobs::kvTextData & d );
+
+    /**
+     * Add data to object, from an iterator range.
+     */
     template<typename InputIterator>
     void insert( InputIterator begin, InputIterator end )
     {
@@ -73,8 +93,19 @@ class KvalobsData
         insert( * begin );
     }
 
+    /**
+     * Get all data from object, with the given tbtime
+     */
     void getData( std::list<kvalobs::kvData> & out, const miutil::miTime & tbtime = miutil::miTime() ) const;
+
+    /**
+     * Get all text data from object, with the given tbtime
+     */
     void getData( std::list<kvalobs::kvTextData> & out, const miutil::miTime & tbtime = miutil::miTime()  ) const;
+
+    /**
+     * Get all data and text datafrom object, with the given tbtime
+     */
     void getData( std::list<kvalobs::kvData> & out1, std::list<kvalobs::kvTextData> & out2 ,
                   const miutil::miTime & tbtime = miutil::miTime() ) const
     {
@@ -82,18 +113,51 @@ class KvalobsData
       getData( out2 );
     }
 
-    bool overwrite() const
-    {
-      return overwrite_;
-    }
+
+    /**
+     * Set overwrite specification
+     *
+     * Shall the kvalobs decoder ignore and overwrite any values in the database?
+     */
     void overwrite( bool doit )
     {
       overwrite_ = doit;
     }
 
+    /**
+     * Get overwrite specification
+     *
+     * Shall the kvalobs decoder ignore and overwrite any values in the database?
+     */
+    bool overwrite() const
+    {
+      return overwrite_;
+    }
+
+    /**
+     * Set invalidate specification.
+     *
+     * If invalidate is true, all parametes which forms a specific observation
+     * will be rejected, before the new data is inserted.
+     *
+     * If overwrite() is true as well, all data will be deleted before
+     * inserting the new values.
+     */
     void invalidate( bool doit, int station, int typeID, const miutil::miTime & obstime );
+
+    /**
+     * Query invalidate specification. Shall the given station, typeId, and
+     * obstime be invalidated?
+     *
+     * @see invalidate
+     */
     bool isInvalidate( int station, int typeID, const miutil::miTime & obstime ) const;
 
+    /**
+     * Specification for what observations will be invalidated
+     *
+     * @see invalidate
+     */
     struct InvalidateSpec
     {
       int station;
@@ -103,6 +167,12 @@ class KvalobsData
           : station( st ), typeID( ty ), obstime( ot )
       {}
     };
+
+    /**
+     * Get a complete list of observations to be invalidated.
+     *
+     * @see invalidate
+     */
     void getInvalidate( std::list<InvalidateSpec> & invSpec );
 
     /**
