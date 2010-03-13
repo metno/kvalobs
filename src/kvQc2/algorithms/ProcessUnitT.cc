@@ -155,40 +155,27 @@ ProcessUnitT( ReadProgramOptions params )
 
                       try {
                              /// Update if correction is out of TAN TAX range!
-                             if ( Tseries[1].corrected() <  MinT.begin()->original() || Tseries[1].corrected() >  MaxT.begin()->original() ) 
+                             //if ( Tseries[1].corrected() <  MinT.begin()->original() || Tseries[1].corrected() >  MaxT.begin()->original() ) 
+                             if ( Tseries[1].corrected() <  MinT.begin()->original() || Tseries[1].corrected() >  MaxT.begin()->original()
+                                  &&  CheckFlags.condition(id->controlinfo(),params.Wflag) )
                             {  
-                             //Set data structure to write to the database
-                             /// REMOVE ALL THE CONTROLS
-                                //if ( CheckFlags.condition(id->controlinfo(),params.Wflag) )  {  /// WFLAG needs putting back in
-                                /// and a control in the configuration file to turn totally on or off!!!!
+                                /// and a control in the configuration file to turn Wflag totally on or off!!!!
                                  {
-                                        //std::cout << "W-flag-Passed" << std::endl;
                                         kvData d;                                                   
-                                        d.set(Tseries[1].stationID(),
-                                              Tseries[1].obstime(),
-                                              Tseries[1].original(),
-                                              Tseries[1].paramID(),
-                                              Tseries[1].tbtime(),
-                                              Tseries[1].typeID(),
-                                              Tseries[1].sensor(),
-                                              Tseries[1].level(),
-                                              TanTaxInterpolated,                                                           
-                                              fixflags,
-                                              Tseries[1].useinfo(),
+                                        d.set(Tseries[1].stationID(), Tseries[1].obstime(), Tseries[1].original(), Tseries[1].paramID(),
+                                              Tseries[1].tbtime(), Tseries[1].typeID(), Tseries[1].sensor(), Tseries[1].level(), TanTaxInterpolated,                                                    fixflags, Tseries[1].useinfo(),
                                               Tseries[1].cfailed()+" Qc2 UnitT corrected was:"+StrmConvert(Tseries[1].corrected())+params.CFAILED_STRING );
                              // Set use info corresponding to controlinfo
                                         kvUseInfo ui = d.useinfo();
                                         ui.setUseFlags( d.controlinfo() );
                                         d.useinfo( ui );   
                              // write the data back
-                                        //std::cout << "This data to be written back to db ... " << std::endl; 
                                         dbGate.insert( d, "data", true); 
                              // fill structure to inform the serviced
                                         kvalobs::kvStationInfo::kvStationInfo DataToWrite(id->stationID(),id->obstime(),id->paramID());
                                         stList.push_back(DataToWrite);
                                    }
                               }
-                              //Tseries.clear();  /// This may be better here than at the bottom ... check later
                        }
                           catch ( dnmi::db::SQLException & ex ) {
                             IDLOGERROR( "html", "Exception: " << ex.what() << std::endl );
@@ -207,8 +194,6 @@ ProcessUnitT( ReadProgramOptions params )
                              }
                           }
                    }
-                //Tseries.clear();
-                //
   ProcessTime.addHour(-1);
   }
 return 0;
