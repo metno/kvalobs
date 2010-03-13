@@ -184,7 +184,7 @@ ProcessUnitT( ReadProgramOptions params )
                                               TanTaxInterpolated,                                                           
                                               fixflags,
                                               Tseries[1].useinfo(),
-                                              Tseries[1].cfailed()+" Qc2 UnitT corrected was:"+StrmConvert(Tseries[1].corrected()) );
+                                              Tseries[1].cfailed()+" Qc2 UnitT corrected was:"+StrmConvert(Tseries[1].corrected())+params.CFAILED_STRING );
                              // Set use info corresponding to controlinfo
                                         kvUseInfo ui = d.useinfo();
                                         ui.setUseFlags( d.controlinfo() );

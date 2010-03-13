@@ -182,7 +182,8 @@ RedistributeStationData(int & sid, std::list<kvalobs::kvData>& ReturnData)
                   ReturnElement.set(stid,fixtime,dst_data[ stid ][ k ],110,
                                 dst_tbtime[ stid ][ k ],d_typeid[ stid ][ k ], d_sensor[ stid ][ k ],
                                 d_level[ stid ][ k ], roundVal,fixflags, 
-                                d_useinfo[ stid ][ k ], d_cfailed[ stid ][ k ]+" Qc2 Redis corrected was:"+StrmConvert(dst_corr[ stid ][ k ]) );
+                                d_useinfo[ stid ][ k ], 
+                                d_cfailed[ stid ][ k ]+" Qc2 Redis corrected was:"+StrmConvert(dst_corr[ stid ][ k ])+params.CFAILED_STRING);
                   ReturnData.push_back(ReturnElement);
                }
            }
