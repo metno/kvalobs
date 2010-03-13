@@ -131,33 +131,24 @@ ProcessUnitT( ReadProgramOptions params )
                              }
                           }
                              if (Tseries.size()==3) {
-                                   //std::cout << "---------------------" << std::endl;
-                                   //std::cout << "Found an analysis case ... " << std::endl;
                                    LOGINFO("Interpolating data ...");
-                                   //std::cout << Tseries[0].stationID() << " " <<  Tseries[1].stationID() << " " << Tseries[2].stationID() << std::endl; 
-                                   //std::cout << Tseries[0].obstime() << " " <<  Tseries[1].obstime() << " " << Tseries[2].obstime() << std::endl; 
-                                   //std::cout << Tseries[0].original() << " " <<  Tseries[1].original() << " " << Tseries[2].original() << std::endl; 
                                    if (Tseries[0].original() > params.missing && Tseries[1].original()==params.missing && 
                                        Tseries[2].original() > params.missing){
-                                       //std::cout << "Checking Other Parameters" << std::endl;
                                        result = dbGate.select(MaxT, kvQueries::selectData(id->stationID(),215,YTime,YTime));
                                        result = dbGate.select(MinT, kvQueries::selectData(id->stationID(),213,YTime,YTime));
-                                       //std::cout <<  MaxT.size() << " " << MinT.size() << std::endl;
                                        if (MaxT.size()==1 && MinT.size()==1){
 
-                                               //std::cout <<  MaxT.begin()->original() << " " << MinT.begin()->original() << std::endl;
                                                LinInterpolated=0.5*(Tseries[0].original()+Tseries[2].original());
                                                TanTaxInterpolated=0.5*(MinT.begin()->original()+MaxT.begin()->original());
                                                TanTaxInterpolated=round<float,1>(TanTaxInterpolated);
 
-                                     result = dbGate.select(Qc2InterpData, kvQueries::selectData(StationIds,pid,Tseries[1].obstime(),
+                                               result = dbGate.select(Qc2InterpData, kvQueries::selectData(StationIds,pid,Tseries[1].obstime(),
                                                                                                            Tseries[1].obstime() ));
-                                     Qc2D GSW(Qc2InterpData,StationList,params);
-                                     GSW.Qc2_interp(); 
-                                     fixtime=Tseries[1].obstime();
-                                     //fixtime.addDay(730);  // Write the data to 2 years hence (beware leap years in back calculating)
-                                     fixflags=Tseries[1].controlinfo();
-                                     CheckFlags.setter(fixflags,params.Sflag);
+                                               Qc2D GSW(Qc2InterpData,StationList,params);
+                                               GSW.Qc2_interp(); 
+                                               fixtime=Tseries[1].obstime();
+                                               fixflags=Tseries[1].controlinfo();
+                                               CheckFlags.setter(fixflags,params.Sflag);
 
 // The logic to write results back to the database and inform kvServiceD
 //  In this case the data we are working with (i.e. potentially right back to the db) is Tseries[1]
