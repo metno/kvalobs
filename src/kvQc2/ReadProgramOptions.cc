@@ -120,6 +120,7 @@ int TypeId;
 int MissingValue;
 int MinValue;
 std::string BestStationFilename;
+std::string CfailedString;
 float InterpolationDistance;
 // Test control flag paramters
 unsigned char z_fqclevel,z_fr,z_fcc,z_fs,z_fnum,z_fpos,z_fmis,z_ftime,z_fw,z_fstat,z_fcp,z_fclim,z_fd,z_fpre,z_fcombi,z_fhqc;
@@ -177,6 +178,7 @@ try{
         ("ControlVector",po::value<std::vector<int> > (&ControlVector),  "Control Vector")
 
         ("BestStationFilename",po::value<std::string> (&BestStationFilename),  "Filename containing the best station list")
+        ("CfailedString",po::value<std::string> (&CfailedString),  "Value to add to CFAILED if the algorithm runs and writes data back to the database")
 
         ("MissingValue",po::value<int>(&MissingValue)->default_value(-32767),  "Original Missing Data Value") /// could also rely on fmis here !!??
         ("MinValue",po::value<int>(&MinValue)->default_value(-32767),  "Minimum Data Value FOr Some Controls") 
@@ -327,6 +329,7 @@ try{
          ControlInfoVector=ControlVector;
          InterpolationLimit=InterpolationDistance;
          NeighbourFilename=BestStationFilename;
+         CFAILED_STRING=CfailedString;
          missing=MissingValue;
          MinimumValue=MinValue;
          std::cout << miutil::miTime::nowTime() << ": " << UT0 << " -> " << UT1 << "  " << filename << std::endl;

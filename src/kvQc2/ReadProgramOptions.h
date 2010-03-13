@@ -33,6 +33,7 @@ std::string ControlInfoString;
 std::vector<int> ControlInfoVector;
 
 std::string NeighbourFilename;
+std::string CFAILED_STRING;
 
 int RunAtMinute;
 int RunAtHour;
