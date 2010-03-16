@@ -62,7 +62,7 @@ createGlobalLogger(const std::string &id)
     	FLogStream *logs=new FLogStream(2, 204800); //200k
     	std::ostringstream ost;
     
-    	ost << kvPath("localstatedir") << "/log/kvsynop/" << id << ".log";
+    	ost << kvPath("logdir") << "/kvsynop/" << id << ".log";
     
     	if(logs->open(ost.str())){
       		if(!LogManager::createLogger(id, logs)){

@@ -114,7 +114,7 @@ SynopWorker::operator()()
       	FLogStream *logs=new FLogStream(2, 307200); //300k
       	std::ostringstream ost;
 
-      	ost << kvPath("localstatedir") << "/log/kvsynop/" 
+      	ost << kvPath("logdir") << "/kvsynop/"
 	  			 << event->stationInfo()->wmono() << ".log";
 
       	if(logs->open(ost.str())){

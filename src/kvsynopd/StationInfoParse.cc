@@ -30,6 +30,7 @@
 */
 #include <sstream>
 #include <stdio.h>
+#include <string.h>
 #include <milog/milog.h>
 #include "StationInfo.h"
 #include "StationInfoParse.h"
@@ -169,31 +170,31 @@ StationInfoParse::parseSection(miutil::conf::ConfSection *stationConf,
     	value=stationConf->getValue(keywords[i]);
       
     	if(value.empty()){
-      		if(keywords[i]=="precipitation"){
+      		if( strcmp( keywords[i], "precipitation") == 0 ){
 				LOGDEBUG6("NO VALUE: for key <" << keywords[i] << "> in WMO section <" 
 						  << wmono << ">! Using default value!" << endl);
 				st->precipitation_=defVal.precipitation;
-      		}else if(keywords[i]=="list"){
+      		}else if( strcmp( keywords[i], "list") == 0 ){
 				LOGDEBUG6("NO VALUE: for key <" << keywords[i] << "> in WMO section <" 
 		 		<< wmono << ">! Using default value!" << endl);
 				st->list_=defVal.list;
-      		}else if(keywords[i]=="copy"){
+      		}else if( strcmp( keywords[i], "copy") == 0 ){
 				LOGDEBUG6("NO VALUE: for key <" << keywords[i] << "> in WMO section <" 
 						  << wmono << ">! Using default value!" << endl);
 				st->copy_=defVal.copy;
-      		}else if(keywords[i]=="copyto"){
+      		}else if( strcmp( keywords[i], "copyto") == 0 ){
 				LOGDEBUG6("NO VALUE: for key <" << keywords[i] << "> in WMO section <" 
 						  << wmono << ">! Using default value!" << endl);
 				st->copyto_=defVal.copyto;
-      		}else if(keywords[i]=="owner"){
+      		}else if( strcmp( keywords[i], "owner") == 0 ){
 				LOGDEBUG6("NO VALUE: for key <" << keywords[i] << "> in WMO section <" 
 						  << wmono << ">! Using default value!" << endl);
 				st->owner_=defVal.owner;
-      		}else if(keywords[i]=="delay"){
+      		}else if( strcmp( keywords[i],"delay") == 0 ){
 				LOGDEBUG6("NO VALUE: for key <" <<keywords[i] << "> in WMO section <" 
 		 				  << wmono << ">! Using default value!");
 				st->delayList_=defVal.delay;
-      		}else if(keywords[i]=="loglevel"){
+      		}else if( strcmp( keywords[i], "loglevel") == 0 ){
 				LOGDEBUG6("NO VALUE: for key <" <<keywords[i] << "> in WMO section <" 
 		 				  << wmono << ">! Using default value!");
 				st->loglevel_=defVal.loglevel;
@@ -206,25 +207,25 @@ StationInfoParse::parseSection(miutil::conf::ConfSection *stationConf,
     	}else{
       		ok=true;
 
-      		if(keywords[i]=="stationid"){
+      		if( strcmp( keywords[i], "stationid" ) == 0 ){
 				ok=doStationid(keywords[i], value, *st);
-      		}else if(keywords[i]=="delay"){
+      		}else if( strcmp( keywords[i], "delay" ) == 0 ){
 				ok=doDelay(keywords[i], value, *st);
-      		}else if(keywords[i]=="precipitation"){
+      		}else if( strcmp( keywords[i], "precipitation" ) == 0 ){
 				ok=doPrecip(keywords[i], value, *st);
-      		}else if(keywords[i]=="typepriority"){
+      		}else if( strcmp( keywords[i], "typepriority" ) == 0 ){
 				ok=doTypePri(keywords[i], value, *st);
-      		}else if(keywords[i]=="owner"){
+      		}else if( strcmp( keywords[i], "owner" ) == 0 ){
 				st->owner_=doDefOwner(value, st->wmono());
 				ok=!st->owner_.empty();
-      		}else if(keywords[i]=="list"){
+      		}else if( strcmp( keywords[i], "list" ) == 0 ){
 				st->list_=doDefList(value, st->wmono());
 				ok=!st->list_.empty();
-     		}else if(keywords[i]=="copy"){
+     		}else if( strcmp( keywords[i], "copy" ) == 0 ){
 				st->copy_=doDefCopy(value, st->wmono());
-      		}else if(keywords[i]=="copyto"){
+      		}else if( strcmp( keywords[i], "copyto" ) == 0 ){
 				st->copyto_=doDefCopyto(value, st->wmono());
-      		}else if(keywords[i]=="loglevel"){
+      		}else if( strcmp( keywords[i], "loglevel" ) == 0 ){
 				st->loglevel_=doDefLogLevel(value, st->wmono());
       		}
 
