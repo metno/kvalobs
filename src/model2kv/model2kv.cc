@@ -39,6 +39,7 @@
 
 using namespace std;
 
+using namespace miutil;
 
 /// program to prepare model-data from "pose" to
 /// the kvalobs table format

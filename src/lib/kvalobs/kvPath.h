@@ -49,6 +49,6 @@
  * @return The path to the 'name'. An empty string if name is not recogniced.
  * 
  */
-std::string kvPath( const std::string &name );
+std::string kvPath( const std::string &name, const std::string &system="kvalobs" );
 
 #endif

@@ -51,7 +51,7 @@ InitLogger(int argn, char **argv)
     FLogStream   *fs;
     StdErrStream *trace;
 
-    filename=kvPath("localstatedir") + "/log/kvDataInputd.log";
+    filename=kvPath("logdir") + "/kvDataInputd.log";
     
     for(int i=0; i<argn; i++){
        if(strcmp("--tracelevel", argv[i])==0){

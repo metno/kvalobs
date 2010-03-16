@@ -217,7 +217,7 @@ findMissingData(const miutil::miTime& runtime,
 {
  	string logfile;
     
-   logfile = kvPath("localstatedir") + "/log/kvManagerd-missing.log";
+   logfile = kvPath("logdir") + "/kvManagerd-missing.log";
 
 	milog::SetResetDefaultLoggerHelper loggerHelper(logfile, 1048576);
 

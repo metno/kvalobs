@@ -56,8 +56,8 @@ InitLogger(int argn, char **argv, const std::string &logname,
     StdErrStream *trace;
     
 
-    const path localstate(kvPath("localstatedir"));
-    path filename = localstate/"log";
+    const path localstate(kvPath("logdir"));
+    path filename = localstate;
     path html = filename/"html";
     if ( ! exists(html)  )
       create_directories(html);

@@ -53,7 +53,7 @@ InitLogger(int argn, char **argv, const std::string &logname)
     StdErrStream *trace;
     
 
-    filename = kvPath("localstatedir") +"/log/" + logname + ".log";
+    filename = kvPath("logdir") +"/" + logname + ".log";
     
     for(int i=0; i<argn; i++){
 	if(strcmp("--tracelevel", argv[i])==0){

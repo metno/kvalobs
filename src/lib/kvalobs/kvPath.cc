@@ -34,22 +34,24 @@
 #include <kvalobs/kvPath.h>
 
 std::string 
-kvPath( const std::string &name )
+kvPath( const std::string &name, const std::string &system )
 {
   std::string ret;
   
   if( name=="pkglibdir" )
      ret = PKGLIBDIR;
   else if( name=="sysconfdir" )
-     ret = SYSCONFDIR+std::string("/kvalobs");
+     ret = SYSCONFDIR+std::string("/" + system);
   else if( name=="libdir" )
      ret = LIBDIR;
   else if( name=="bindir" )
      ret = BINDIR;
   else if( name=="datadir" )
-     ret = DATADIR+std::string("/kvalobs");
+     ret = DATADIR+std::string("/" + system );
   else if( name=="localstatedir" )
-     ret = LOCALSTATEDIR+std::string("/kvalobs");
+     ret = LOCALSTATEDIR+std::string("/lib/" + system);
+  else if( name=="logdir")
+	  ret = LOCALSTATEDIR+std::string("/log/" + system);
   else if( name=="prefix")
      ret = PREFIX;
   else {

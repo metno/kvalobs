@@ -45,8 +45,9 @@ libkvalobs_la_CPPFLAGS = $(AM_CPPFLAGS) $(putools_CFLAGS) \
                          -DDATADIR="\""$(datadir)"\"" \
                          -DLOCALSTATEDIR="\""$(localstatedir)"\"" \
                          -DPREFIX="\""$(prefix)"\"" 
+
 libkvalobs_la_LDFLAGS = $(putools_LDFLAGS)
-#libkvalobs_la_LIBS = $(top_builddir)/src/lib/miutil/libmiutil.a
+
 libkvalobs_la_LIBADD = $(top_builddir)/src/lib/miutil/libmiutil.la \
                        $(top_builddir)/src/lib/fileutil/libfileutil.la \
                        $(top_builddir)/src/lib/milog/libmilog.la \
@@ -55,7 +56,7 @@ libkvalobs_la_LIBADD = $(top_builddir)/src/lib/miutil/libmiutil.la \
                        $(top_builddir)/src/lib/corbahelper/libcorbahelper.la \
                        $(top_builddir)/src/lib/miconfparser/libmiconfparser.a \
                        $(top_builddir)/src/lib/kvskel/libkvskel.la \
-		       $(BOOST_THREAD_LIB) $(omniORB4_LIBS)
+				       $(BOOST_THREAD_LIB) $(omniORB4_LIBS)
 
 kvalobsincludedir = $(pkgincludedir)/kvalobs
 kvalobsinclude_HEADERS = \
