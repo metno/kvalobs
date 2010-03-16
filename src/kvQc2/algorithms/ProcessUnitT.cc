@@ -136,7 +136,8 @@ ProcessUnitT( ReadProgramOptions params )
                                        Tseries[2].original() > params.missing){
                                        result = dbGate.select(MaxT, kvQueries::selectData(id->stationID(),215,YTime,YTime));
                                        result = dbGate.select(MinT, kvQueries::selectData(id->stationID(),213,YTime,YTime));
-                                       if (MaxT.size()==1 && MinT.size()==1){
+                                       if (MaxT.size()==1 && MinT.size()==1 && 
+                                           MaxT.begin()->original() > -99.9 && MinT.begin()->original() > -99.9){
 
                                                LinInterpolated=0.5*(Tseries[0].original()+Tseries[2].original());
                                                TanTaxInterpolated=0.5*(MinT.begin()->original()+MaxT.begin()->original());
@@ -156,7 +157,7 @@ ProcessUnitT( ReadProgramOptions params )
                       try {
                              /// Update if correction is out of TAN TAX range!
                              //if ( Tseries[1].corrected() <  MinT.begin()->original() || Tseries[1].corrected() >  MaxT.begin()->original() ) 
-                             if ( Tseries[1].corrected() <  MinT.begin()->original() || Tseries[1].corrected() >  MaxT.begin()->original()
+                             if ( ( Tseries[1].corrected() <  MinT.begin()->original() || Tseries[1].corrected() >  MaxT.begin()->original() )
                                   &&  CheckFlags.condition(id->controlinfo(),params.Wflag) )
                             {  
                                 /// and a control in the configuration file to turn Wflag totally on or off!!!!
