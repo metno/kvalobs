@@ -35,12 +35,27 @@ CC=gcc-4.1
 
 config.status: configure
 	dh_testdir
-	# Add here commands to configure the package.
-	./configure --prefix=/usr  --enable-model2kv --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info  --localstatedir=/var --sysconfdir=/etc CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)"
+	
+	# Add here commands to configure the package.	
+ifneq "$(wildcard /usr/share/misc/config.sub)" ""
+	cp -f /usr/share/misc/config.sub config.sub
+endif
+ifneq "$(wildcard /usr/share/misc/config.guess)" ""
+	cp -f /usr/share/misc/config.guess config.guess
+endif
+
+	./configure --prefix=/usr  --enable-model2kv \
+	    --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info  \
+	    --localstatedir=/var --sysconfdir=/etc \
+	    CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)"
+
+#	./configure --prefix=/usr   --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info  --localstatedir=/var --sysconfdir=/etc CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)"
+
+
 #	./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/usr  --enable-model2kv --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info  --localstatedir=/var --sysconfdir=/etc CFLAGS="$(CFLAGS)" LDFLAGS="-Wl,-z,defs"
 #	./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/usr   --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info --localstatedir=/var --sysconfdir=/etc CFLAGS="$(CFLAGS)" LDFLAGS="-Wl,-z,defs"
 	#Unpack mi-src, containing posdat and metdat that is used to upload modeldata to kvalobs 
-	(cd debian; tar zxpf mi-src.20080818.tar.gz)
+	(cd debian; tar zxpf mi-src.20100312.tar.gz)
 
 #Architecture 
 build: build-arch build-indep
@@ -65,14 +80,8 @@ clean:
 	rm -f build-arch-stamp build-indep-stamp #CONFIGURE-STAMP#
 
 	# Add here commands to clean up after the build process.
-	-$(MAKE) distclean
-ifneq "$(wildcard /usr/share/misc/config.sub)" ""
-	cp -f /usr/share/misc/config.sub config.sub
-endif
-ifneq "$(wildcard /usr/share/misc/config.guess)" ""
-	cp -f /usr/share/misc/config.guess config.guess
-endif
-	(cd debian/mi-src; $(MAKE) OSTYPE=debian-etch clean; rm -rf ../mi-src/)
+	[ ! -f Makefile ] || $(MAKE) distclean
+	( if test -d debian/mi-src ; then cd debian/mi-src; $(MAKE) OSTYPE=linux clean; rm -rf ../mi-src/; fi)
 
 	dh_clean 
 
@@ -113,7 +122,7 @@ install-arch:
 	cp $(CURDIR)/debian/scripts/*.sh $(CURDIR)/debian/tmp/usr/lib/kvalobs/bin
 
 	#Make and install misrc, posdat and metdat.
-	(cd debian/mi-src; $(MAKE) OSTYPE=debian-etch; $(MAKE) OSTYPE=debian-etch install)
+	(cd debian/mi-src; $(MAKE) OSTYPE=linux; $(MAKE) OSTYPE=linux install)
 
 	dh_install -s --sourcedir=debian/tmp
 # Must not depend on anything. This is to be called by
@@ -143,7 +152,7 @@ binary-common:
 #	dh_perl
 	dh_makeshlibs
 	dh_installdeb
-	dh_shlibdeps
+	dh_shlibdeps 
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb

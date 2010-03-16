@@ -1,0 +1,3 @@
+usr/lib/kvalobs/lib*.so*
+usr/lib/kvalobs/db/*.so*
+usr/lib/kvalobs/decode/*.so*

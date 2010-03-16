@@ -1,58 +1,76 @@
 Source: kvalobs
 Section: main
 Priority: extra
-Maintainer: <kvalobs@met.no>
-Build-Depends: debhelper (>= 5), autotools-dev, lsb, g++ (>= 4.1.1), debconf,
- automake, libtool, g77 (>= 3.4.6), bison (>= 2.3), flex (>= 2.5.33), 
+Maintainer: Borge Moe <borge.moe@met.no>
+Build-Depends: debhelper (>= 5), autotools-dev, g++ (>= 4.1.1), debconf,
+ automake, libtool, gfortran (>= 4.1.0), bison (>= 2.3) | bison-1.35, flex (>= 2.5.33), 
  sqlite3 (>= 3.3.8), libsqlite3-dev (>= 3.3.8),
  libxml2-dev (>= 2.6.27), libxml++2.6-dev (>= 2.14.0), libcppunit-dev (>= 1.12),
  libboost-dev (>= 1.33.1), libboost-thread-dev (>= 1.33.1), 
  libboost-regex-dev (>= 1.33.1), libboost-filesystem-dev (>= 1.33.1),
  libboost-program-options-dev (>= 1.33.1), libomniorb4-dev (>= 4.0.6),
  omniidl4 (>= 4.0.6), postgresql-8.3 (>= 8.3), libpq-dev (>= 8.3),
- libperl-dev (>= 5.8), libdbd-pg-perl (>= 1.49), puctools-dev (>= 3.0),
- parameter-dev (>=3.0), putools-dev (>= 3.0), libpose-dev (>= 3.0),
- libmi-dev (>= 3.0)
+ libperl-dev (>= 5.8), libdbd-pg-perl (>= 1.49), metlibs-puctools-dev (>= 3.0),
+ metlibs-parameter-dev (>=3.0), metlibs-putools-dev (>= 3.0), 
+ metlibs-libmi-dev (>= 3.0)
+# ,libpose-dev (>= 3.0)
 Standards-Version: 3.7.2
 
 Package: kvalobs
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, adduser, debconf, postgresql-8.3,
- sqlite3, libmi1 (>= 3.0.0)
+Depends: libkvalobs1 (= ${Source-Version}), 
+ ${shlibs:Depends}, ${misc:Depends}, adduser, debconf, postgresql-8.3,
+ sqlite3
 Description: A quality assurance system for meteorological observations.
  Kvalobs is a quality assurance system for meteorological observations.
 
-
-Package: kvalobs-dev
+Package: libkvalobs1
 Section: libdevel
 Architecture: any
-Depends:  ${shlibs:Depends}, ${misc:Depends}
+Depends:  libkvalobs1 (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: Runtime library for kvalobs clients.
+ Kvalobs is a quality assurance system for meteorological observations.
+
+
+Package: libkvcpp1
+Section: libdevel
+Architecture: any
+Depends:  libkvalobs1 (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: Runtime library for kvalobs clients.
+ Kvalobs is a quality assurance system for meteorological observations.
+
+Package: libkvcpp-dev
+Section: libdevel
+Architecture: any
+Depends: libkvcpp1 (= ${Source-Version}) , metlibs-putools-dev, 
+ ${shlibs:Depends}, ${misc:Depends}
 Description: Client development file for kvalobs.
  Kvalobs is a quality assurance system for meteorological observations.
 
 
-Package: kvdataclt
-Architecture: any
-Depends:  ${shlibs:Depends}, ${misc:Depends}
-Description: Client program to send data to a kvalobs server.
- A client program to send data to a kvalobs server. The data to
- send is in files with the "kvalobs format..
+#Package: kvdataclt
+#Architecture: any
+#Depends:  ${shlibs:Depends}, ${misc:Depends}
+#Description: Client program to send data to a kvalobs server.
+# A client program to send data to a kvalobs server. The data to
+# send is in files with the "kvalobs format..
 
 
 Package: kvalobs-build-depends
 Section: libdevel
 Architecture: any
-Depends:  debhelper (>= 5), autotools-dev, lsb, g++ (>= 4.1.1), debconf,
- automake, libtool, g77 (>= 3.4.6), bison (>= 2.3), flex (>= 2.5.33), 
+Depends: debhelper (>= 5), autotools-dev, g++ (>= 4.1.1), debconf,
+ automake, libtool, gfortran (>= 4.1.0), bison (>= 2.3) | bison-1.35, flex (>= 2.5.33), 
  sqlite3 (>= 3.3.8), libsqlite3-dev (>= 3.3.8),
  libxml2-dev (>= 2.6.27), libxml++2.6-dev (>= 2.14.0), libcppunit-dev (>= 1.12),
  libboost-dev (>= 1.33.1), libboost-thread-dev (>= 1.33.1), 
  libboost-regex-dev (>= 1.33.1), libboost-filesystem-dev (>= 1.33.1),
  libboost-program-options-dev (>= 1.33.1), libomniorb4-dev (>= 4.0.6),
  omniidl4 (>= 4.0.6), postgresql-8.3 (>= 8.3), libpq-dev (>= 8.3),
- libperl-dev (>= 5.8), libdbd-pg-perl (>= 1.49), puctools-dev (>= 3.0),
- parameter-dev (>=3.0), putools-dev (>= 3.0), libpose-dev (>= 3.0),
- libmi-dev (>= 3.0)
+ libperl-dev (>= 5.8), libdbd-pg-perl (>= 1.49), metlibs-puctools-dev (>= 3.0),
+ metlibs-parameter-dev (>=3.0), metlibs-putools-dev (>= 3.0), 
+ metlibs-libmi-dev (>= 3.0)
+# ,libpose-dev (>= 3.0)
 Description: Install libraries that is needed to build kvalobs.
  Kvalobs is a quality assurance system for meteorological observations. This
  is a meta package that only install the dependecies that is needed to build

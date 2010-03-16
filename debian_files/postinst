@@ -27,17 +27,15 @@ db_get kvalobs/homedir && KV_HOME="$RET"
 
 #BINDIR, BIN and DIR must be in sync with the respectives variables in postrm.
 BINDIR="/usr/bin"
-BIN="kv2kro kvAgregated  kvDataInputd kvDataInputd_clt kvdbadmin 
+BIN="kv2kro  kvDataInputd kvDataInputd_clt kvdbadmin 
      kvManagerd kvmgrclt kvQabased kvServiced kvstart kvstop 
-     kvsynopclt kvsynopd kvsynopdbadmin kvsynopdbclt
-     kvsynopd_initdb kvsynopdparse norcom2kv kvstart-postgres
+     norcom2kv kvstart-postgres
      kvstop-postgres"
 
 KVBINDIR="/usr/lib/kvalobs/bin"
 KVBIN="check_kvsynopd.sh
        hirlam2kvalobs.sh
        kvdbadmin.sh
-       kvsynopdbadmin.sh
        lam2kv.cron
        qabase_cron.sh
        save_last_month.sh
@@ -61,34 +59,26 @@ ETC_FILES="kv_ctl.conf
 
 DIRS="/usr/share/kvalobs 
       /usr/share/kvalobs/db
-      /usr/share/kvalobs/kvsynop 
       /usr/share/kvalobs/metadata
       /etc/kvalobs
       /etc/kvalobs/lam2kv
-      /var/kvalobs
-      /var/kvalobs/norcom2kv
-      /var/kvalobs/norcom2kv/data2kv
-      /var/kvalobs/norcom2kv/tmp
-      /var/kvalobs/lam2kv
-      /var/kvalobs/lam2kv/log
-      /var/kvalobs/lam2kv/upload
-      /var/kvalobs/lam2kv/data
-      /var/kvalobs/agregate
-      /var/kvalobs/kvsynop
-      /var/kvalobs/kvsynop/debug
-      /var/kvalobs/log
-      /var/kvalobs/log/decoders
-      /var/kvalobs/log/decoders/SynopDecoder
-      /var/kvalobs/log/kvsynopdbadmin
-      /var/kvalobs/log/kvdbadmin
-      /var/kvalobs/log/html
-      /var/kvalobs/log/kvsynop
-      /var/kvalobs/run
-      /var/kvalobs/service
-      /var/kvalobs/service/subscribers"     
+      /var/lib/kvalobs
+      /var/lib/kvalobs/norcom2kv
+      /var/lib/kvalobs/norcom2kv/data2kv
+      /var/lib/kvalobs/norcom2kv/tmp
+      /var/lib/kvalobs/lam2kv
+      /var/lib/kvalobs/lam2kv/log
+      /var/lib/kvalobs/lam2kv/upload
+      /var/lib/kvalobs/lam2kv/data
+      /var/lib/kvalobs/agregate
+      /var/log/kvalobs
+      /var/log/kvalobs/decoders
+      /var/log/kvalobs/decoders/SynopDecoder
+      /var/log/kvalobs/html
+      /var/lib/kvalobs/run
+      /var/lib/kvalobs/service
+      /var/lib/kvalobs/service/subscribers"     
 
-SQLLITE_DB="/var/kvalobs/kvsynop/kvsynopd.sqlite
-            /var/kvalobs/agregate/database.sqlite"
 
 case "$1" in
   configure)
@@ -128,26 +118,6 @@ case "$1" in
       then
          dpkg-statoverride --update --add root $KV_USER 664 /etc/kvalobs/$i
       fi
-    done
-
-    #Setup the agregator and kvsynop cache databases if they 
-    #do not exist.
-
-    if [ ! -f /var/kvalobs/kvsynop/kvsynopd.sqlite ]; then
-	/usr/bin/kvsynopd_initdb
-    fi
-
-    if [ ! -f /var/kvalobs/agregate/database.sqlite ]; then
-	/usr/bin/kvAgregateDbInit.sh /var/kvalobs/agregate/database.sqlite
-    fi
-    
-    #Only the kvalobs user and group can write to the cache databases.
-    for i in $SQLLITE_DB; do
-      # only do something when no setting exists
-      if ! dpkg-statoverride --list $i >/dev/null 2>&1
-      then
-	  dpkg-statoverride --update --add root $KV_USER 664 $i
-      fi 
     done
 
     update-rc.d kvalobs defaults    
