@@ -1,5 +1,5 @@
 AC_PREREQ([2.59])
-AC_INIT([kvalobs], [2.0.7], [kvoss@met.no])
+AC_INIT([kvalobs], [2.1.0], [kvoss@met.no])
 AM_INIT_AUTOMAKE
 #METNO_SET_VERSION_INFO
 
@@ -56,8 +56,6 @@ AC_CONFIG_FILES([Makefile
                  src/kvQabased/Makefile
                  src/kvManagerd/Makefile
                  src/norcom2kv/Makefile
-                 src/kvsynopd/Makefile 
-                 src/kvsynopd/kvsynopd_initdb
                  src/model2kv/Makefile
                  src/kv2metdat/Makefile
                  src/kv2kro2/Makefile
