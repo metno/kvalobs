@@ -71,7 +71,11 @@ size_t KvalobsData::size() const
 
 void KvalobsData::insert( const kvData & d )
 {
-  obs_[d.stationID()][d.typeID()][d.obstime()][d.sensor()][d.level()][d.paramID()].content() = d;
+	int sensor = d.sensor();
+	if ( sensor >= '0' )
+		sensor = 0;
+
+  obs_[d.stationID()][d.typeID()][d.obstime()][sensor][d.level()][d.paramID()].content() = d;
 }
 
 void KvalobsData::insert( const kvTextData & d )
