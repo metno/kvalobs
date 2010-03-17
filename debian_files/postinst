@@ -70,7 +70,6 @@ DIRS="/usr/share/kvalobs
       /var/lib/kvalobs/lam2kv/log
       /var/lib/kvalobs/lam2kv/upload
       /var/lib/kvalobs/lam2kv/data
-      /var/lib/kvalobs/agregate
       /var/log/kvalobs
       /var/log/kvalobs/decoders
       /var/log/kvalobs/decoders/SynopDecoder
