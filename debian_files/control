@@ -27,7 +27,7 @@ Description: A quality assurance system for meteorological observations.
 Package: libkvalobs1
 Section: libdevel
 Architecture: any
-Depends:  libkvalobs1 (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
+Depends:  ${shlibs:Depends}, ${misc:Depends}
 Description: Runtime library for kvalobs clients.
  Kvalobs is a quality assurance system for meteorological observations.
 
