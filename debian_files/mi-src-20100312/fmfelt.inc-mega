@@ -1,0 +1,5 @@
+c..include file for fmfelt.f
+c
+c  maxsiz : max field size
+c
+      parameter (maxsiz=3000000)
