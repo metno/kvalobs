@@ -1,5 +1,6 @@
 #!/bin/sh
 
+
 # As start it checks to see if the routine.oslo.dnmi.no IP alias is
 # already defined on this or another machine then tries to run sms. As
 # stop it tries to stop sms then removes the IP alias.
@@ -32,66 +33,80 @@ if [ $# -ge 2 ]; then
    fi
 fi
 
-case "$1" in
-   start)
-        # When this script is being run in the background with no
+startkv() {
+	# When this script is being run in the background with no
 	# terminal then delay the startup so that the "primary host" 
-        # can setup the alias first
+    # can setup the alias first
     
 	echo "TRY_TO_GRAB_KVALOBS_ALIAS: $TRY_TO_GRAB_KVALOBS_ALIAS"
-        if [ "$TRY_TO_GRAB_KVALOBS_ALIAS" = "yes" ]; then
-           me=$(uname -n)
-	   tty -s
-	   if [ $? = 1 -a -n "${PRIMARY_HOST}" -a ${PRIMARY_HOST} != ${me} ]; then
-	      echo This is not the primary host - delaying 1 minute before setting up the IP alias
-	      sleep 60
-	   fi
-           if [ "z$ALIAS_KVALOBS" != "z" ]; then
-              echo "Configuring kvalobs alias"
-              $ALIAS_KVALOBS start || exit 1
-           fi
+    if [ "$TRY_TO_GRAB_KVALOBS_ALIAS" = "yes" ]; then
+    	me=$(uname -n)
+	   	tty -s
+	   	if [ $? = 1 -a -n "${PRIMARY_HOST}" -a ${PRIMARY_HOST} != ${me} ]; then
+	    	echo This is not the primary host - delaying 1 minute before setting up the IP alias
+	      	sleep 60
+	   	fi
+        if [ "z$ALIAS_KVALOBS" != "z" ]; then
+        	echo "Configuring kvalobs alias"
+            $ALIAS_KVALOBS start || exit 1
         fi
+  	fi
 
-        if [ "$IGNORE_POSTGRES" = "no" ]; then
-	    echo "Starting postgreSQL for kvalobs"
+    if [ "$IGNORE_POSTGRES" = "no" ]; then
+		echo "Starting postgreSQL for kvalobs"
 	    /usr/lib/kvalobs/bin/runbg --exit-after=60 --login-env --user=kvalobs kvstart-postgres
-        fi
+    fi
 	
-        echo "Starting kvalobs"
+    echo "Starting kvalobs"
 	/usr/lib/kvalobs/bin/runbg --exit-after=60 --login-env --user=kvalobs kvstart > /dev/null 2>&1
       		
 	if [ "z$ETCDIR" != "z" ]; then
-	   echo "Fixing kvalobs users crontab"
-           if [ -f "$ETCDIR/kvcron" ]; then 
-	      crontab -u kvalobs $KVHOME/cronjob/kvcron > /dev/null 2>&1
-           else
-              echo "-- No crontabfile: $ETCDIR/kvcron"
-           fi
+		echo "Fixing kvalobs users crontab"
+        if [ -f "$ETCDIR/kvcron" ]; then 
+	    	crontab -u kvalobs $KVHOME/cronjob/kvcron > /dev/null 2>&1
+        else
+            echo "-- No crontabfile: $ETCDIR/kvcron"
         fi
-        ;;
-	
-   stop)
+    fi
+}
+
+stopkv() {
 	echo "Stopping kvalobs"
 	/usr/lib/kvalobs/bin/runbg --exit-after=120 --login-env --user=kvalobs kvstop > /dev/null 2>&1
-        #su --login kvalobs -c kvstop
+    #su --login kvalobs -c kvstop
 
-        if [ "$IGNORE_POSTGRES" = "no" ]; then
-	    echo "Stoping postgreSQL for kvalobs"
+	if [ "$IGNORE_POSTGRES" = "no" ]; then
+		echo "Stoping postgreSQL for kvalobs"
 	    /usr/lib/kvalobs/bin/runbg --exit-after=60 --login-env --user=kvalobs kvstop-postgres
-        fi
+    fi
 
  	echo "Removing kvalobs users crontab"
 	if ! crontab -r -u kvalobs > /dev/null 2>&1 ; then
-	   echo "-- No crontab is installed for kvalobs."
-        fi
+		echo "-- No crontab is installed for kvalobs."
+    fi
 
 	if [ "$TRY_TO_GRAB_KVALOBS_ALIAS" = "yes" ]; then
-	   if [ "z$ALIAS_KVALOBS" != "z" ]; then
-              echo "Removing kvalobs alias"
-	      $ALIAS_KVALOBS stop || exit 1
-           fi
+		if [ "z$ALIAS_KVALOBS" != "z" ]; then
+        	echo "Removing kvalobs alias"
+	      	$ALIAS_KVALOBS stop || exit 1
         fi
-	;;
+    fi
+}
+
+case "$1" in
+   	start)
+   		startkv
+        ;;
+	
+   	stop)
+   		stopkv
+		;;
+	
+	restart | force-reload | reload)
+		stopkv
+		startkv
+		;;
+		
 
     *)
         echo "Usage: `basename $0` {start | stop}"

@@ -33,8 +33,7 @@ BIN="kv2kro  kvDataInputd kvDataInputd_clt kvdbadmin
      kvstop-postgres"
 
 KVBINDIR="/usr/lib/kvalobs/bin"
-KVBIN="check_kvsynopd.sh
-       hirlam2kvalobs.sh
+KVBIN="hirlam2kvalobs.sh
        kvdbadmin.sh
        lam2kv.cron
        qabase_cron.sh

@@ -1,19 +1,9 @@
 sqldir = $(datadir)/kvalobs/db
 
-sql_DATA = cleansynopdb.sql generated_synop.sql pgclean.sql pgclean_mini.sql
-
-bin_SCRIPTS = kvdbadmin kvsynopdbadmin
+sql_DATA = pgclean.sql pgclean_mini.sql
 
 SED_SUBST = sed s,KVCONFIG,$(bindir)/kvconfig,g $< > $@ 
+	
+EXTRA_DIST = pgclean.sql pgclean_mini.sql kvdbadmin.sh
 
-kvdbadmin: kvdbadmin.sh
-	$(SED_SUBST)
-	
-kvsynopdbadmin: kvsynopdbadmin.sh 
-	$(SED_SUBST)
-	
-	
-EXTRA_DIST = cleansynopdb.sql generated_synop.sql pgclean.sql pgclean_mini.sql \
-             kvdbadmin.sh kvsynopdbadmin.sh
-
-CLEANFILES = kvdbadmin kvsynopdbadmin
+CLEANFILES = kvdbadmin 

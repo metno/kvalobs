@@ -7,9 +7,8 @@ usr/lib/kvalobs/db
 usr/lib/kvalobs/decode
 usr/share/kvalobs
 usr/share/kvalobs/db
-usr/share/kvalobs/kvsynop
 usr/share/kvalobs/metadata
-var/kvalobs
+var/lib/kvalobs
 var/lib/kvalobs/norcom2kv
 var/lib/kvalobs/norcom2kv/data2kv
 var/lib/kvalobs/norcom2kv/tmp
@@ -21,7 +20,5 @@ var/lib/kvalobs/run
 var/log/kvalobs/
 var/log/kvalobs/decoders
 var/log/kvalobs/decoders/SynopDecoder
-var/log/kvalobs/kvsynopdbadmin
 var/log/kvalobs/kvdbadmin
-var/lib/kvalobs/agregate
 var/lib/kvalobs/service/subscribers
