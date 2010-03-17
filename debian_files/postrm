@@ -23,7 +23,7 @@ set -e
 #BINDIR, BIN and DIR must be in sync with the respectives variables in postinst.
 
 BINDIR="/usr/bin"
-BIN="kv2kro kvDataInputd kvDataInputd_clt kvdbadmin 
+BIN="kv2kro kvDataInputd kvdataclt kvdbadmin 
      kvManagerd kvmgrclt kvQabased kvServiced kvstart kvstop 
      kvsynopdparse norcom2kv kvstart-postgres
      kvstop-postgres"

@@ -27,7 +27,7 @@ db_get kvalobs/homedir && KV_HOME="$RET"
 
 #BINDIR, BIN and DIR must be in sync with the respectives variables in postrm.
 BINDIR="/usr/bin"
-BIN="kv2kro  kvDataInputd kvDataInputd_clt kvdbadmin 
+BIN="kv2kro  kvDataInputd kvdataclt kvdbadmin 
      kvManagerd kvmgrclt kvQabased kvServiced kvstart kvstop 
      norcom2kv kvstart-postgres
      kvstop-postgres"
