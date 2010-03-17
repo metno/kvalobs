@@ -35,6 +35,7 @@ BIN="kv2kro  kvDataInputd kvDataInputd_clt kvdbadmin
 KVBINDIR="/usr/lib/kvalobs/bin"
 KVBIN="hirlam2kvalobs.sh
        kvdbadmin.sh
+       runbg
        lam2kv.cron
        qabase_cron.sh
        save_last_month.sh
