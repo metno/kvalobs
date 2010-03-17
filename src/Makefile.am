@@ -7,9 +7,9 @@ SUBDIRS = \
 	kvServiced/test \
 	kvQabased \
 	kvManagerd \
-	norcom2kv \
 	model2kv \
 	kv2metdat \
-	kv2kro2 \
 	kvalobs_database \
-	script
+	script \
+	norcom2kv \
+	kv2kro2 

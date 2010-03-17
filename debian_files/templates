@@ -7,5 +7,5 @@ Description: Home directory for the kvalobs admin user.
 Template: kvalobs/user
 Type: string
 Default: kvalobs
-Description: b Specify the name to the kvalobs admin account.
+Description: Specify the name to the kvalobs admin account.
  Specify the name to the kvalobs admin account.
