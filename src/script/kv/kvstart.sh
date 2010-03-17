@@ -29,7 +29,7 @@
 KVCONFIG=__KVCONFIG__
 
 KVBIN=`$KVCONFIG --bindir`
-KVPID=`$KVCONFIG --localstatedir`/kvalobs/run
+KVPID=`$KVCONFIG --localstatedir`/lib/kvalobs/run
 KVCONF=`$KVCONFIG --sysconfdir`/kvalobs
 NODENAME=$(uname -n)
 
