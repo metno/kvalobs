@@ -56,5 +56,5 @@ libkvcpp_la_CPPFLAGS = \
 
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = kvcpp.pc
+pkgconfig_DATA = libkvcpp.pc
 $(pkgconfig_DATA): $(top_builddir)/config.status
