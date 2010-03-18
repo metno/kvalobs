@@ -1,3 +1,10 @@
+kvalobs (2.1.0-2) unstable; urgency=low
+
+  * Rename kvcpp.pc to libkvcpp.pc.
+  
+ -- Borge Moe <borge.moe@met.no>  Thu, 18 Mar 2010 09:16:00 +0100
+
+
 kvalobs (2.1.0-1) unstable; urgency=low
 
   * Split out kvsynopd to its own project.
