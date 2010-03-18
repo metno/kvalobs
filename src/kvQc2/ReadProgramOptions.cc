@@ -177,7 +177,7 @@ try{
         ("ControlString",po::value<std::string>  (&ControlString),  "Control Info")
         ("ControlVector",po::value<std::vector<int> > (&ControlVector),  "Control Vector")
 
-        ("BestStationFilename",po::value<std::string> (&BestStationFilename),  "Filename containing the best station list")
+        ("BestStationFilename",po::value<std::string> (&BestStationFilename)->default_value("NotSet"),  "Filename containing the best station list")
         ("CfailedString",po::value<std::string> (&CfailedString)->default_value(""),  "Value to add to CFAILED if the algorithm runs and writes data back to the database")
 
         ("MissingValue",po::value<int>(&MissingValue)->default_value(-32767),  "Original Missing Data Value") /// could also rely on fmis here !!??

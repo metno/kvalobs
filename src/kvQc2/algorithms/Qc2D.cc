@@ -258,13 +258,6 @@ void
 Qc2D::
 Qc2_interp()
 {
-
-      std::cout << "*** NEIGHBOURS ***" << std::endl;
-      std::cout << params.NeighbourFilename << std::endl;
-      std::cout << "*** NEIGHBOURS ***" << std::endl;
-      StationSelection Adjacent(params.NeighbourFilename);     // These options go with _sl
-      std::map<int, std::list<int> > Neighbours=Adjacent.ReturnMap();
-
       int InterpCode = params.InterpCode;
 
       for (unsigned int i=0 ; i<original_.size() ; i++) {
@@ -279,11 +272,19 @@ Qc2_interp()
   	        calculate_intp_h(i);  // This option would add a 10% correction to the height for every 100m.
                 break;
             case 4:
-  	        calculate_intp_sl(i,Neighbours[ stid_[i] ]);  // Perform the interpolation over a station list 
+                if (params.NeighbourFilename != "NotSet") {
+                    StationSelection Adjacent(params.NeighbourFilename);   
+                    std::map<int, std::list<int> > Neighbours=Adjacent.ReturnMap(); /// Rework this later ...
+  	            calculate_intp_sl(i,Neighbours[ stid_[i] ]);  // Perform the interpolation over a station list 
+                }
                 break;
             case 5:
-  	        calculate_trintp_sl(i,Neighbours[ stid_[i] ]);  // Perform the interpolation over a station list 
-                                                                // and performs linear gradient interpolation
+                if (params.NeighbourFilename != "NotSet") {
+                    StationSelection Adjacent(params.NeighbourFilename);   
+                    std::map<int, std::list<int> > Neighbours=Adjacent.ReturnMap(); /// Rework this later ...
+  	            calculate_trintp_sl(i,Neighbours[ stid_[i] ]); // Perform the interpolation over a station list 
+                                                                   // and performs linear gradient interpolation
+                }                                                      
                 break;
             case 6:
                 calculate_intp_wet_dry(i);

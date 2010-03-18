@@ -68,6 +68,7 @@ StationSelection::StationSelection(std::string filename)
    std::ifstream ind;
    ind.open( filename.c_str() );
 
+
    if(ind) {
       ind >> key;
       while ( !ind.eof() ) {
