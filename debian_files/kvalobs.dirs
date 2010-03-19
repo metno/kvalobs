@@ -3,11 +3,8 @@ etc/kvalobs/lam2kv
 usr/bin
 usr/lib
 usr/lib/kvalobs/bin
-usr/lib/kvalobs/db
-usr/lib/kvalobs/decode
 usr/share/kvalobs
 usr/share/kvalobs/db
-usr/share/kvalobs/metadata
 var/lib/kvalobs
 var/lib/kvalobs/norcom2kv
 var/lib/kvalobs/norcom2kv/data2kv

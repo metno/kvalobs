@@ -81,12 +81,6 @@ DIRS="/usr/share/kvalobs
 
 case "$1" in
   configure)
-    #Create the kvalobs admin account.
-    if ! getent passwd $KV_USER > /dev/null 2>&1 ; then
-	echo $$ adduser --gecos 0 --disabled-password $KV_USER --home $KV_HOME >> /dev/null
-	adduser --gecos 0 --disabled-password --home $KV_HOME $KV_USER
-    fi
-    
     #Fix owner, group and permission. 
     for i in $BIN; do
       # only do something when no setting exists
