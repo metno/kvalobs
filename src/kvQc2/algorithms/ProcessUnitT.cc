@@ -158,7 +158,7 @@ ProcessUnitT( ReadProgramOptions params )
                              /// Update if correction is out of TAN TAX range!
                              //if ( Tseries[1].corrected() <  MinT.begin()->original() || Tseries[1].corrected() >  MaxT.begin()->original() ) 
                              if ( ( Tseries[1].corrected() <  MinT.begin()->original() || Tseries[1].corrected() >  MaxT.begin()->original() )
-                                  &&  CheckFlags.condition(id->controlinfo(),params.Wflag) )
+                                  &&  CheckFlags.true_nibble(id->controlinfo(),params.Wflag,15,params.Wbool) )
                             {  
                                 /// and a control in the configuration file to turn Wflag totally on or off!!!!
                                  {

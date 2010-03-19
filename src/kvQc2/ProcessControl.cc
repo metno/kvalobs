@@ -53,9 +53,20 @@ condition(kvalobs::kvControlInfo controlinfo, std::map<int, unsigned char> zflag
 
 bool
 ProcessControl::
-true_nibble( kvalobs::kvControlInfo controlinfo, unsigned char nibble ){
-      
-      return true;
+true_nibble( kvalobs::kvControlInfo controlinfo, std::map<int, unsigned char> vlag, int vindex, bool flagbool ){
+
+     if (flagbool) { 
+         if (controlinfo.cflag(vindex)==vlag[vindex]) { 
+             return true;}
+         else{
+             return false;}
+     } else {
+         if (controlinfo.cflag(vindex)==vlag[vindex]) { 
+             return true;}
+         else{
+             return false;}
+    }
+
 }
 
 /// Any values set in the flag group zflag are written into Controlinfo

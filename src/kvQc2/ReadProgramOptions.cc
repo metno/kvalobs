@@ -132,6 +132,7 @@ unsigned char W_fqclevel,W_fr,W_fcc,W_fs,W_fnum,W_fpos,W_fmis,W_ftime,W_fw,W_fst
 // CONTROL FLAGS TO SET 
 unsigned char S_fqclevel,S_fr,S_fcc,S_fs,S_fnum,S_fpos,S_fmis,S_ftime,S_fw,S_fstat,S_fcp,S_fclim,S_fd,S_fpre,S_fcombi,S_fhqc; //SET
 
+
 std::vector<unsigned char> V_fqclevel,V_fr,V_fcc,V_fs,V_fnum,V_fpos,V_fmis,V_ftime,V_fw,V_fstat,V_fcp,V_fclim,V_fd,V_fpre,V_fcombi,V_fhqc; //For algorithms which need multiple control options for the same flag
 
 std::string ControlString;
@@ -201,6 +202,8 @@ try{
         ("z_fcombi",po::value<unsigned char>  (&z_fcombi)->default_value(0x3F),  "fcombi")
         ("z_fhqc",po::value<unsigned char>  (&z_fhqc)->default_value(0x3F),  "fhqc")
 
+        ("zbool",po::value<bool>  (&zbool)->default_value(true),  "Option to change logic of all flag controls")
+
         ("R_fqclevel",po::value<unsigned char>  (&R_fqclevel)->default_value(0x3F),  "fqclevel")
         ("R_fr",po::value<unsigned char>  (&R_fr)->default_value(0x3F),  "fr")
         ("R_fcc",po::value<unsigned char>  (&R_fcc)->default_value(0x3F),  "fcc")
@@ -217,6 +220,8 @@ try{
         ("R_fpre",po::value<unsigned char>  (&R_fpre)->default_value(0x3F),  "fpre")
         ("R_fcombi",po::value<unsigned char>  (&R_fcombi)->default_value(0x3F),  "fcombi")
         ("R_fhqc",po::value<unsigned char>  (&R_fhqc)->default_value(0x3F),  "fhqc")
+
+        ("Rbool",po::value<bool>  (&Rbool)->default_value(true),  "Option to change logic of all flag controls")
 
         ("I_fqclevel",po::value<unsigned char>  (&I_fqclevel)->default_value(0x3F),  "fqclevel")
         ("I_fr",po::value<unsigned char>  (&I_fr)->default_value(0x3F),  "fr")
@@ -235,6 +240,8 @@ try{
         ("I_fcombi",po::value<unsigned char>  (&I_fcombi)->default_value(0x3F),  "fcombi")
         ("I_fhqc",po::value<unsigned char>  (&I_fhqc)->default_value(0x3F),  "fhqc")
 
+        ("Ibool",po::value<bool>  (&Ibool)->default_value(true),  "Option to change logic of all flag controls")
+
         ("A_fqclevel",po::value<unsigned char>  (&A_fqclevel)->default_value(0x3F),  "fqclevel")
         ("A_fr",po::value<unsigned char>  (&A_fr)->default_value(0x3F),  "fr")
         ("A_fcc",po::value<unsigned char>  (&A_fcc)->default_value(0x3F),  "fcc")
@@ -251,6 +258,8 @@ try{
         ("A_fpre",po::value<unsigned char>  (&A_fpre)->default_value(0x3F),  "fpre")
         ("A_fcombi",po::value<unsigned char>  (&A_fcombi)->default_value(0x3F),  "fcombi")
         ("A_fhqc",po::value<unsigned char>  (&A_fhqc)->default_value(0x3F),  "fhqc")
+
+        ("Abool",po::value<bool>  (&Abool)->default_value(true),  "Option to change logic of all flag controls")
 
         ("W_fqclevel",po::value<unsigned char>  (&W_fqclevel)->default_value(0x3F),  "fqclevel")
         ("W_fr",po::value<unsigned char>  (&W_fr)->default_value(0x3F),  "fr")
@@ -269,6 +278,8 @@ try{
         ("W_fcombi",po::value<unsigned char>  (&W_fcombi)->default_value(0x3F),  "fcombi")
         ("W_fhqc",po::value<unsigned char>  (&W_fhqc)->default_value(0x3F),  "fhqc")
 
+        ("Wbool",po::value<bool>  (&Wbool)->default_value(true),  "Option to change logic of all flag controls")
+
         ("S_fqclevel",po::value<unsigned char>  (&S_fqclevel)->default_value(0x3F),  "fqclevel")
         ("S_fr",po::value<unsigned char>  (&S_fr)->default_value(0x3F),  "fr")
         ("S_fcc",po::value<unsigned char>  (&S_fcc)->default_value(0x3F),  "fcc")
@@ -285,6 +296,7 @@ try{
         ("S_fpre",po::value<unsigned char>  (&S_fpre)->default_value(0x3F),  "fpre")
         ("S_fcombi",po::value<unsigned char>  (&S_fcombi)->default_value(0x3F),  "fcombi")
         ("S_fhqc",po::value<unsigned char>  (&S_fhqc)->default_value(0x3F),  "fhqc")
+
 
         ("V_fqclevel",po::value<std::vector<unsigned char> >  (&V_fqclevel),  "fqclevel")
         ("V_fr",po::value<std::vector<unsigned char> >  (&V_fr),  "fr")

@@ -32,6 +32,8 @@ int LastN;
 std::string ControlInfoString;
 std::vector<int> ControlInfoVector;
 
+bool zbool,Rbool,Ibool,Abool,Wbool;
+
 std::string NeighbourFilename;
 std::string CFAILED_STRING;
 
