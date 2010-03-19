@@ -1,3 +1,23 @@
+kvalobs (2.1.1-3) unstable; urgency=low
+
+  * Yet another dupload.
+  
+ -- Borge Moe <borge.moe@met.no>  Fri, 19 Mar 2010 10:35:00 +0100
+
+
+kvalobs (2.1.1-2) unstable; urgency=low
+
+  * Yet another dupload.
+  
+ -- Borge Moe <borge.moe@met.no>  Thu, 18 Mar 2010 12:17:00 +0100
+
+
+kvalobs (2.1.1-1) unstable; urgency=low
+
+  * Try another dupload.
+  
+ -- Borge Moe <borge.moe@met.no>  Thu, 18 Mar 2010 10:39:00 +0100
+
 kvalobs (2.1.0-2) unstable; urgency=low
 
   * Rename kvcpp.pc to libkvcpp.pc.
