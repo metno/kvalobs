@@ -61,7 +61,7 @@ true_nibble( kvalobs::kvControlInfo controlinfo, std::map<int, unsigned char> vl
          else{
              return false;}
      } else {
-         if (controlinfo.cflag(vindex)==vlag[vindex]) { 
+         if (controlinfo.cflag(vindex)!=vlag[vindex]) { 
              return true;}
          else{
              return false;}
