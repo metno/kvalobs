@@ -183,7 +183,7 @@ try{
 
         ("MissingValue",po::value<int>(&MissingValue)->default_value(-32767),  "Original Missing Data Value") /// could also rely on fmis here !!??
         ("MinValue",po::value<int>(&MinValue)->default_value(-32767),  "Minimum Data Value FOr Some Controls") 
-        ("InterpolationDistance",po::value<float>(&InterpolationDistance)->default_value(0),  "Nearest Nieighboue Limiting Distance") 
+        ("InterpolationDistance",po::value<float>(&InterpolationDistance)->default_value(25),  "Nearest Neighbour Limiting Distance") 
 
         ("z_fqclevel",po::value<unsigned char>  (&z_fqclevel)->default_value(0x3F),  "fqclevel")
         ("z_fr",po::value<unsigned char>  (&z_fr)->default_value(0x3F),  "fr")
