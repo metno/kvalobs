@@ -109,7 +109,7 @@ Redistribute( ReadProgramOptions params )
                 Qc2D GSW(Qc2Data,StationList, params,"Generate Missing Rows");
                 GSW.Qc2_interp(); 
                 GSW.distributor(StationList,ReturnData,0);
-                GSW.write_cdf(StationList);
+                ///GSW.write_cdf(StationList);
        }
               
        if(!ReturnData.empty()) {
