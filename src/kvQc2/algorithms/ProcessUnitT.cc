@@ -88,16 +88,11 @@ ProcessUnitT( ReadProgramOptions params )
   miutil::miTime YTime;
   ProcessTime = etime;
 
-  //std::cout << "ETIME TIME STAMP: " << etime << std::endl;
-  //std::cout << "STIME TIME STAMP: " << stime << std::endl;
-  //std::cout << "ProcessTIME TIME STAMP: " << ProcessTime << std::endl;
-
   miutil::miTime fixtime; /// fixtime here for tests
 
   std::vector<kvalobs::kvData> Tseries;
   std::list<kvalobs::kvData> MaxT;
   std::list<kvalobs::kvData> MinT;
-
 
   GetStationList(StationList);  /// StationList is all the possible stations ... Check
   for (std::list<kvalobs::kvStation>::const_iterator sit=StationList.begin(); sit!=StationList.end(); ++ sit) {
@@ -123,7 +118,7 @@ ProcessUnitT( ReadProgramOptions params )
               }
               if(!Qc2Data.empty()) {
                    for (std::list<kvalobs::kvData>::const_iterator id = Qc2Data.begin(); id != Qc2Data.end(); ++id) {
-                          Tseries.clear();   /// or is it better here ??? YES YES YES
+                          Tseries.clear();  
                           result = dbGate.select(Qc2SeriesData, kvQueries::selectData(id->stationID(),pid,XTime,YTime));
                           for (std::list<kvalobs::kvData>::const_iterator is = Qc2SeriesData.begin(); is != Qc2SeriesData.end(); ++is) {
                              if  ( !CheckFlags.condition(is->controlinfo(),params.Aflag) ) { /// If one or more of the analysis flags are set then will not process further! 
@@ -139,14 +134,15 @@ ProcessUnitT( ReadProgramOptions params )
                                        if (MaxT.size()==1 && MinT.size()==1 && 
                                            MaxT.begin()->original() > -99.9 && MinT.begin()->original() > -99.9){
 
-                                               LinInterpolated=0.5*(Tseries[0].original()+Tseries[2].original());
+                                               LinInterpolated=0.5*(Tseries[0].original()+Tseries[2].original()); //this is calculate but not used
+                                                                                                                  //maybe add a comparitive test??
                                                TanTaxInterpolated=0.5*(MinT.begin()->original()+MaxT.begin()->original());
                                                TanTaxInterpolated=round<float,1>(TanTaxInterpolated);
 
-                                               result = dbGate.select(Qc2InterpData, kvQueries::selectData(StationIds,pid,Tseries[1].obstime(),
-                                                                                                           Tseries[1].obstime() ));
-                                               Qc2D GSW(Qc2InterpData,StationList,params);
-                                               GSW.Qc2_interp(); 
+                                               //result = dbGate.select(Qc2InterpData, kvQueries::selectData(StationIds,pid,Tseries[1].obstime(),
+                                                                                                           //Tseries[1].obstime() ));
+                                               //Qc2D GSW(Qc2InterpData,StationList,params);
+                                               //GSW.Qc2_interp(); 
                                                fixtime=Tseries[1].obstime();
                                                fixflags=Tseries[1].controlinfo();
                                                CheckFlags.setter(fixflags,params.Sflag);
