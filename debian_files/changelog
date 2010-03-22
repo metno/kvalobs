@@ -1,3 +1,10 @@
+kvalobs (2.1.1-4) unstable; urgency=low
+
+  * Add a kvalobsuser package that creates the kvalobs user if it not exist.
+  
+ -- Borge Moe <borge.moe@met.no>  Mon, 22 Mar 2010 09:08:00 +0100
+
+
 kvalobs (2.1.1-3) unstable; urgency=low
 
   * Yet another dupload.
