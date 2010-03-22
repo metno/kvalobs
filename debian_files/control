@@ -18,7 +18,7 @@ Standards-Version: 3.7.3
 
 Package: kvalobs
 Architecture: any
-Depends: kvalobs-user, libkvalobs1 (= ${binary:Version}), 
+Depends: kvalobsuser, libkvalobs1 (= ${binary:Version}), 
  ${shlibs:Depends}, ${misc:Depends}, adduser, debconf, postgresql-8.3,
  sqlite3
 Description: A quality assurance system for meteorological observations
