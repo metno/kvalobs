@@ -27,7 +27,7 @@ kvcppinclude_HEADERS = \
 	WhichDataHelper.h
 	
 libkvcpp_la_LDFLAGS= -rpath $(libdir) \
-                     -R $(libdir)/kvalobs \ 
+                     -R $(libdir)/kvalobs \
 			         -version-info 1:0:0
 
 libkvcpp_la_LIBADD = \
