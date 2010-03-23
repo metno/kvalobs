@@ -1,4 +1,4 @@
-kvalobs (2.1.1-4) unstable; urgency=low
+kvalobs (2.1.1-5) unstable; urgency=low
 
   * Move all so files from /us/lib/kvalobs/lib to /us/lib
     and add kkalobs to the names.
