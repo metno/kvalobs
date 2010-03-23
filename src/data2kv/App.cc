@@ -171,7 +171,7 @@ App(int argn,
 		}
     
       if(piddir_.empty()) 
-      	piddir_ = kvPath("localstatedir") + "/run";
+      	piddir_ = kvPath("rundir");
 	}
 
 	if(piddir_[0]!='/'){

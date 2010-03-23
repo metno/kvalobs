@@ -1,5 +1,13 @@
 kvalobs (2.1.1-4) unstable; urgency=low
 
+  * Move all so files from /us/lib/kvalobs/lib to /us/lib
+    and add kkalobs to the names.
+  * Put the pid files into /var/run/kvalobs dir.
+  
+ -- Borge Moe <borge.moe@met.no>  Tue, 23 Mar 2010 14:13:00 +0100
+
+kvalobs (2.1.1-4) unstable; urgency=low
+
   * Add a kvalobsuser package that creates the kvalobs user if it not exist.
   
  -- Borge Moe <borge.moe@met.no>  Mon, 22 Mar 2010 09:08:00 +0100

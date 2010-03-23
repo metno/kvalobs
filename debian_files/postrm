@@ -29,8 +29,7 @@ BIN="kv2kro kvDataInputd kvdataclt kvdbadmin
      kvstop-postgres"
 
 KVBINDIR="/usr/lib/kvalobs/bin"
-KVBIN="check_kvsynopd.sh
-       hirlam2kvalobs.sh
+KVBIN="hirlam2kvalobs.sh
        runbg
        kvdbadmin.sh
        lam2kv.cron
@@ -73,7 +72,7 @@ DIRS="/usr/share/kvalobs
       /var/log/kvalobs/decoders/SynopDecoder
       /var/log/kvalobs/kvsynopdbadmin
       /var/log/kvalobs/html
-      /var/lib/kvalobs/run
+      /var/run/kvalobs
       /var/lib/kvalobs/service
       /var/lib/kvalobs/service/subscribers"     
 

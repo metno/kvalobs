@@ -1,15 +1,16 @@
 AM_CPPFLAGS = -I$(top_srcdir)/src/lib -I$(top_srcdir)/src/lib/decoder -D_REENTRANT
 
-pkglib_LTLIBRARIES = libdecoderbase.la
+lib_LTLIBRARIES = libkvalobs_decoderbase.la
 
-libdecoderbase_la_SOURCES = decodermgr.cc decodermgr.h \
+libkvalobs_decoderbase_la_SOURCES = decodermgr.cc decodermgr.h \
                             decoder.cc decoder.h\
                             metadata.cc metadata.h \
                             GenCacheElem.h ConfParser.h
                             
-libdecoderbase_la_CPPFLAGS = $(AM_CPPFLAGS) $(putools_CFLAGS) $(libxmlpp_CFLAGS)
-libdecoderbase_la_LIBADD =   $(top_builddir)/src/lib/kvalobs/libkvalobs.la \
-                             $(top_builddir)/src/lib/milog/libmilog.la \
-                             $(top_builddir)/src/lib/kvdb/libkvdb.la \
-                             $(top_builddir)/src/lib/fileutil/libfileutil.la \
+libkvalobs_decoderbase_la_CPPFLAGS = $(AM_CPPFLAGS) $(putools_CFLAGS) $(libxmlpp_CFLAGS)
+libkvalobs_decoderbase_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@
+libkvalobs_decoderbase_la_LIBADD =   $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
+                             $(top_builddir)/src/lib/milog/libkvalobs_milog.la \
+                             $(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la \
+                             $(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la \
 			                    $(putools_LIBS) $(libxml2_LIBS)

@@ -1,6 +1,6 @@
 AM_CPPFLAGS = -I$(top_srcdir)/src/lib
 
-pkglib_LTLIBRARIES = libdecodeutility.la
+lib_LTLIBRARIES = libkvalobs_decodeutility.la
 
 
 decodeutilityincludedir = $(pkgincludedir)/decodeutility
@@ -13,7 +13,7 @@ nobase_decodeutilityinclude_HEADERS = 	decodeutility.h \
 	sorteddata.h
 
 
-libdecodeutility_la_SOURCES = \
+libkvalobs_decodeutility_la_SOURCES = \
 	decodeutility.h decodeutility.cc \
 	kvalobsdata.h kvalobsdata.cc \
 	kvalobsdataparser.h kvalobsdataparser.cc \
@@ -22,19 +22,17 @@ libdecodeutility_la_SOURCES = \
 	DataReinserter.h bits/DataReinserter.tcc \
 	sorteddata.h
 
-libdecodeutility_la_CPPFLAGS = $(AM_CPPFLAGS) $(putools_CFLAGS) $(libxmlpp_CFLAGS) $(omniORB4_CFLAGS) $(BOOST_CPPFLAGS)
-
-libdecodeutility_la_LIBADD = $(top_builddir)/src/lib/kvalobs/libkvalobs.la \
-                             $(top_builddir)/src/lib/kvskel/libkvskel.la \
-                             $(top_builddir)/src/lib/miutil/libmiutil.la \
-			     $(top_builddir)/src/lib/milog/libmilog.la \
+libkvalobs_decodeutility_la_CPPFLAGS = $(AM_CPPFLAGS) $(putools_CFLAGS) $(libxmlpp_CFLAGS) $(omniORB4_CFLAGS) $(BOOST_CPPFLAGS)
+libkvalobs_decodeutility_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@
+libkvalobs_decodeutility_la_LIBADD = $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
+                             $(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
+                             $(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
+			                 $(top_builddir)/src/lib/milog/libkvalobs_milog.la \
                              $(putools_LIBS)  \
                              $(libxmlpp_LIBS) \
                              $(omniORB4_LIBS) \
                              $(BOOST_LDFLAGS) \
                              $(BOOST_THREAD_LIB)
-
-#libdecodeutility_la_LDFLAGS = $(putools_LIBS) $(libxmlpp_LIBS) $(omniORB4_LIBS) $(BOOST_LDFLAGS) $(BOOST_THREAD_LIB)
 
 TESTS = decodeutilitytest
 
@@ -56,14 +54,14 @@ decodeutilitytest_CPPFLAGS = $(AM_CPPFLAGS) \
 
 decodeutilitytest_LDADD = \
 	libdecodeutility.la \
-	../kvalobs/libkvalobs.la \
-	../milog/libmilog.la \
-	../miutil/libmiutil.la \
-	../kvdb/libkvdb.la \
-	../fileutil/libfileutil.la \
-	../corbahelper/libcorbahelper.la \
-	../miconfparser/libmiconfparser.a \
-	../dnmithread/libdnmithread.la \
+	../kvalobs/libkvalobs_kvalobs.la \
+	../milog/libkvalobs_milog.la \
+	../miutil/libkvalobs_miutil.la \
+	../kvdb/libkvalobs_kvdb.la \
+	../fileutil/libkvalobs_fileutil.la \
+	../corbahelper/libkvalobs_corbahelper.la \
+	../miconfparser/libkvalobs_miconfparser.a \
+	../dnmithread/libkvalobs_dnmithread.la \
 	$(gtest_LIBS)
 
 decodeutilitytest_LDFLAGS = $(libdecodeutility_la_LDFLAGS) $(cppunit_LIBS) 

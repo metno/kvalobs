@@ -45,6 +45,8 @@
  *  - bindir        , eg $prefix/bin
  *  - datadir       , eg $prefix/share 
  *  - localstatedir , eg $prefix/var
+ *  - logdir        , eg $localstatedir/log/kvalobs
+ *  - rundir        , eg $localstatedir/run/kvalobs
  * 
  * @return The path to the 'name'. An empty string if name is not recogniced.
  * 

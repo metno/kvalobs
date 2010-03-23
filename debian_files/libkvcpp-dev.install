@@ -1,4 +1,3 @@
 usr/include/kvalobs/*
-usr/lib/kvalobs/lib*.*a
+usr/lib/libkvalobs_*.*a
 usr/lib/pkgconfig/*
-usr/lib/kvalobs/*.la

@@ -13,9 +13,9 @@ var/lib/kvalobs/lam2kv
 var/lib/kvalobs/lam2kv/log
 var/lib/kvalobs/lam2kv/upload
 var/lib/kvalobs/lam2kv/data
-var/lib/kvalobs/run
+var/run/kvalobs
 var/log/kvalobs/
-/var/log/kvalobs/html
+var/log/kvalobs/html
 var/log/kvalobs/decoders
 var/log/kvalobs/decoders/SynopDecoder
 var/log/kvalobs/kvdbadmin

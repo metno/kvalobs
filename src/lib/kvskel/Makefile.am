@@ -1,6 +1,6 @@
 #AM_CPPFLAGS = -I $(top_srcdir)/src/lib
 
-pkglib_LTLIBRARIES = libkvskel.la libkvadmininterface.la
+lib_LTLIBRARIES = libkvalobs_kvskel.la libkvalobs_kvadmininterface.la
 idl_sources=admin.idl \
             KeyVal.idl \
             datasource.idl \
@@ -17,14 +17,16 @@ idl_sources=admin.idl \
 
 
 libkvskel_ladir = @includedir@/kvskel
-nodist_libkvskel_la_SOURCES = $(idl_sources:.idl=SK.cc)
-libkvskel_la_CPPFLAGS = $(omniORB4_CFLAGS)
-libkvskel_la_LIBADD = $(omniORB4_LIBS)
+nodist_libkvalobs_kvskel_la_SOURCES = $(idl_sources:.idl=SK.cc)
+libkvalobs_kvskel_la_CPPFLAGS = $(omniORB4_CFLAGS)
+libkvalobs_kvskel_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@
+libkvalobs_kvskel_la_LIBADD = $(omniORB4_LIBS)
 
-libkvadmininterface_ladir = @includedir@/kvskel
-libkvadmininterface_la_SOURCES = adminInterface.cc
-libkvadmininterface_la_CPPFLAGS = $(omniORB4_CFLAGS)
-libkvadmininterface_la_LIBADD = $(top_builddir)/src/lib/kvskel/libkvskel.la \
+libkvalobs_kvadmininterface_ladir = @includedir@/kvskel
+libkvalobs_kvadmininterface_la_SOURCES = adminInterface.cc
+libkvalobs_kvadmininterface_la_CPPFLAGS = $(omniORB4_CFLAGS)
+libkvalobs_kvadmininterface_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@
+libkvalobs_kvadmininterface_la_LIBADD = $(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
                                 $(omniORB4_LIBS)
 
 kvskelincludedir = $(pkgincludedir)/kvskel

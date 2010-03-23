@@ -220,7 +220,7 @@ std::string
 KvApp::
 createPidFileName(const std::string &progname)
 {
-	std::string path( kvPath("localstatedir") + "/run" );
+	std::string path( kvPath("rundir") );
 	return dnmi::file::createPidFileName( path, progname );
 }
 

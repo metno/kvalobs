@@ -16,15 +16,15 @@ norcom2kv_SOURCES = norcom2kv.cc \
 
 norcom2kv_CPPFLAGS = $(AM_CPPFLAGS)
 norcom2kv_LDFLAGS = -pthread 
-norcom2kv_LDADD = $(top_builddir)/src/lib/kvalobs/libkvalobs.la \
-                   $(top_builddir)/src/lib/kvdb/libkvdb.la \
-                  $(top_builddir)/src/lib/fileutil/libfileutil.la \
-                  $(top_builddir)/src/lib/miutil/libmiutil.la \
-                  $(top_builddir)/src/lib/miconfparser/libmiconfparser.a \
-                  $(top_builddir)/src/lib/corbahelper/libcorbahelper.la \
-                  $(top_builddir)/src/lib/dnmithread/libdnmithread.la\
-                  $(top_builddir)/src/lib/kvskel/libkvadmininterface.la \
-                  $(top_builddir)/src/lib/kvskel/libkvskel.la \
-                  $(top_builddir)/src/lib/milog/libmilog.la \
+norcom2kv_LDADD = $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
+                   $(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la \
+                  $(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la \
+                  $(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
+                  $(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la \
+                  $(top_builddir)/src/lib/corbahelper/libkvalobs_corbahelper.la \
+                  $(top_builddir)/src/lib/dnmithread/libkvalobs_dnmithread.la\
+                  $(top_builddir)/src/lib/kvskel/libkvalobs_kvadmininterface.la \
+                  $(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
+                  $(top_builddir)/src/lib/milog/libkvalobs_milog.la \
                   $(putools_LIBS) $(omniORB4_LIBS) $(BOOST_REGEX_LIB) $(BOOST_THREAD_LIB) \
                   -ldl -lm

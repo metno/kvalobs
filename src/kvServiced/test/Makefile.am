@@ -6,13 +6,13 @@ noinst_PROGRAMS = getdata
 getdata_SOURCES=getdata.cc
 getdata_CPPFLAGS = $(AM_CPPFLAGS)
 getdata_LDFLAGS =  -pthread 
-getdata_LDADD = $(top_builddir)/src/service-libs/kvcpp/libkvcpp.la \
+getdata_LDADD = $(top_builddir)/src/service-libs/kvcpp/libkvalobs_kvcpp.la \
                 -lm
 
 
 stressTestGetData_SOURCES=stressTestGetData.cc
 stressTestGetData_CPPFLAGS = $(AM_CPPFLAGS)
 stressTestGetData_LDFLAGS =  -pthread  -rpath $(libdir)/kvalobs
-stressTestGetData_LDADD =  $(top_builddir)/src/service-libs/kvcpp/libkvcpp.la \
+stressTestGetData_LDADD =  $(top_builddir)/src/service-libs/kvcpp/libkvalobs_kvcpp.la \
                           -lm
  

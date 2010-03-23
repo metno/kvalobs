@@ -3,7 +3,7 @@ include $(TOP)/conf/make.$(OSTYPE)
 
 INCLUDE=-I$(TOP)/include
 LIBDIR=-L$(TOP)/lib
-LIBS=-lfileutil 
+LIBS=-lkvalobs_fileutil 
 
 PHONY: clean veryclean
 

@@ -1,8 +1,8 @@
 SUBDIRS = corba mock
 
-lib_LTLIBRARIES = libkvcpp.la
+lib_LTLIBRARIES = libkvalobs_kvcpp.la
 
-libkvcpp_la_SOURCES = \
+libkvalobs_kvcpp_la_SOURCES = \
 	KvApp.cc  \
 	kvDataSubscribeInfoHelper.cc \
 	kveventinterface.cc \
@@ -26,27 +26,27 @@ kvcppinclude_HEADERS = \
 	RejectdecodeIterator.h \
 	WhichDataHelper.h
 	
-libkvcpp_la_LDFLAGS= -rpath $(libdir) \
+libkvalobs_kvcpp_la_LDFLAGS= -rpath $(libdir) \
                      -R $(libdir)/kvalobs \
-			         -version-info 1:0:0
+			         -version-info @KVALOBSLIBS_SO_VERSION@
 
-libkvcpp_la_LIBADD = \
+libkvalobs_kvcpp_la_LIBADD = \
 	$(top_builddir)/src/service-libs/kvcpp/corba/libcorbakvapp.la \
-	$(top_builddir)/src/lib/decodeutility/libdecodeutility.la \
-	$(top_builddir)/src/lib/kvalobs/libkvalobs.la \
-	$(top_builddir)/src/lib/miutil/libmiutil.la \
-	$(top_builddir)/src/lib/kvdb/libkvdb.la \
-	$(top_builddir)/src/lib/fileutil/libfileutil.la \
-	$(top_builddir)/src/lib/milog/libmilog.la \
-	$(top_builddir)/src/lib/kvskel/libkvskel.la \
-	$(top_builddir)/src/lib/corbahelper/libcorbahelper.la \
-	$(top_builddir)/src/lib/dnmithread/libdnmithread.la \
-	$(top_builddir)/src/lib/kvskel/libkvadmininterface.la \
-	$(top_builddir)/src/lib/miconfparser/libmiconfparser.a  
+	$(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
+	$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
+	$(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
+	$(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la \
+	$(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la \
+	$(top_builddir)/src/lib/milog/libkvalobs_milog.la \
+	$(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
+	$(top_builddir)/src/lib/corbahelper/libkvalobs_corbahelper.la \
+	$(top_builddir)/src/lib/dnmithread/libkvalobs_dnmithread.la \
+	$(top_builddir)/src/lib/kvskel/libkvalobs_kvadmininterface.la \
+	$(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la  
 	
 	
 	
-libkvcpp_la_CPPFLAGS = \
+libkvalobs_kvcpp_la_CPPFLAGS = \
 	-D_REENTRANT \
 	-I$(top_srcdir)/src/lib \
 	-I$(top_builddir)/src/lib \

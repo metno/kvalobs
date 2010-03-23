@@ -7,7 +7,7 @@ INCLUDE=-I$(PUTOOLS)/include         \
         $(BOOSTINCLUDE)
         
 LIBDIR=-L$(TOP)/lib -L$(PUTOOLS)/lib
-LIBS= -lkvalobs -lkvdb -lfileutil -lmiutil -lpuTools -ldl -ldnmithread -lboost_thread -lpthread
+LIBS= -lkvalobs_kvalobs -lkvalobs_kvdb -lkvalobs_fileutil -lkvalobs_miutil -lpuTools -ldl -lkvalobs_dnmithread -lboost_thread -lpthread
 
 %.o: %.cc
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< 

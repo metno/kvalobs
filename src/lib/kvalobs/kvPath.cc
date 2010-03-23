@@ -52,6 +52,8 @@ kvPath( const std::string &name, const std::string &system )
      ret = LOCALSTATEDIR+std::string("/lib/" + system);
   else if( name=="logdir")
 	  ret = LOCALSTATEDIR+std::string("/log/" + system);
+  else if( name=="rundir")
+	  ret = LOCALSTATEDIR+std::string("/run/" + system);
   else if( name=="prefix")
      ret = PREFIX;
   else {

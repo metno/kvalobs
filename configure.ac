@@ -14,6 +14,7 @@ AC_PROG_YACC
 AC_PROG_CXX
 AC_PROG_INSTALL
 
+AC_SUBST([KVALOBSLIBS_SO_VERSION], [1:0:0])
 
 AC_CONFIG_FILES([Makefile
                  kvconfig

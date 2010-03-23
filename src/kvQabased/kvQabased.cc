@@ -92,7 +92,7 @@ main( int argc, char** argv )
   
   
   LOGINFO( "KvQabased: starting ...." );
-  filesystem::path rundir( kvPath("localstatedir") + "/run" );
+  filesystem::path rundir( kvPath("rundir")  );
   if ( ! boost::filesystem::exists(rundir) ) {
     try {
       filesystem::create_directories(rundir);      
