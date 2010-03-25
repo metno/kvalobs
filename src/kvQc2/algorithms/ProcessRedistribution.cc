@@ -119,6 +119,15 @@ Redistribute( ReadProgramOptions params )
                            std::cout << "Flag Check" << std::endl;
                            if ( CheckFlags.condition(id->controlinfo(),params.Wflag) ) { 
                                 std::cout << "WRITING ***************************************" << std::endl;
+                                        LOGINFO("Redistribute Precipitation Writing Data "
+                                                                            +StrmConvert(id->corrected())+" "
+                                                                            +StrmConvert(id->stationID())+" "
+                                                                            +StrmConvert(id->obstime().year())+"-"
+                                                                            +StrmConvert(id->obstime().month())+"-"
+                                                                            +StrmConvert(id->obstime().day())+" "
+                                                                            +StrmConvert(id->obstime().hour())+":"
+                                                                            +StrmConvert(id->obstime().min())+":"
+                                                                            +StrmConvert(id->obstime().sec()) );
                                 kvData d = *id;
                                 kvUseInfo ui = d.useinfo();
                                 ui.setUseFlags( d.controlinfo() );

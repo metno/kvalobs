@@ -126,7 +126,7 @@ ProcessUnitT( ReadProgramOptions params )
                              }
                           }
                              if (Tseries.size()==3) {
-                                   LOGINFO("Interpolating data ...");
+                                   //LOGINFO("Interpolating data ...");
                                    if (Tseries[0].original() > params.missing && Tseries[1].original()==params.missing && 
                                        Tseries[2].original() > params.missing){
                                        result = dbGate.select(MaxT, kvQueries::selectData(id->stationID(),215,YTime,YTime));
@@ -167,6 +167,14 @@ ProcessUnitT( ReadProgramOptions params )
                                         ui.setUseFlags( d.controlinfo() );
                                         d.useinfo( ui );   
                              // write the data back
+                                        LOGINFO("ProcessUnitT Writing Data "+StrmConvert(TanTaxInterpolated)+" "
+                                                                            +StrmConvert(Tseries[1].stationID())+" "
+                                                                            +StrmConvert(Tseries[1].obstime().year())+"-"
+                                                                            +StrmConvert(Tseries[1].obstime().month())+"-"
+                                                                            +StrmConvert(Tseries[1].obstime().day())+" "
+                                                                            +StrmConvert(Tseries[1].obstime().hour())+":"
+                                                                            +StrmConvert(Tseries[1].obstime().min())+":"
+                                                                            +StrmConvert(Tseries[1].obstime().sec()) );
                                         dbGate.insert( d, "data", true); 
                              // fill structure to inform the serviced
                                         kvalobs::kvStationInfo::kvStationInfo DataToWrite(id->stationID(),id->obstime(),id->paramID());
