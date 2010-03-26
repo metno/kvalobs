@@ -386,6 +386,39 @@ GRANT ALL ON station_param TO kv_admin;
 GRANT SELECT ON station_param TO kv_read;
 GRANT SELECT, UPDATE, INSERT ON station_param TO kv_write;
 
+
+CREATE TABLE metadatatype (
+        metadatatypename text NOT NULL,
+        description TEXT NOT NULL,
+        PRIMARY KEY ( metadatatypename )
+);
+	
+REVOKE ALL ON metadatatype FROM public;
+GRANT ALL ON metadatatype TO kv_admin;
+GRANT SELECT ON metadatatype TO kv_read;
+GRANT SELECT, UPDATE, INSERT ON metadatatype TO kv_write;
+
+
+CREATE TABLE station_metadata (
+        stationid INTEGER NOT NULL,
+        paramid INTEGER DEFAULT NULL,
+        typeid INTEGER DEFAULT NULL,
+        level INTEGER DEFAULT NULL,
+        sensor CHAR(1) DEFAULT NULL,
+        metadatatypename TEXT NOT NULL,
+        metadata float NOT NULL,
+        fromtime TIMESTAMP NOT NULL,
+        totime TIMESTAMP DEFAULT NULL,
+        UNIQUE ( stationid, paramid, typeid, level, sensor, metadatatypename, fromtime ),
+        FOREIGN KEY(metadatatypename) REFERENCES metadatatype
+); 
+
+REVOKE ALL ON station_metadata FROM public;
+GRANT ALL ON station_metadata TO kv_admin;
+GRANT SELECT ON station_metadata TO kv_read;
+GRANT SELECT, UPDATE, INSERT ON station_metadata TO kv_write;
+
+
 CREATE TABLE algorithms (
 	language  INTEGER DEFAULT NULL,
 	checkname TEXT NOT NULL,
