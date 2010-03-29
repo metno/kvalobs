@@ -74,7 +74,7 @@ SETUP_DB = \"$(srcdir)/test/database/setupdb.sql\"
 kvQabasedTest_CPPFLAGS = \
 	-DDBDRIVER=\"$(top_builddir)/src/lib/dbdrivers/.libs/sqlite3driver.so\" \
 	-DSETUPDB_SQL=$(SETUP_DB) \
-	-DCHECKRUNNERTEST_INIT_SQL=\"$(srcdir)/test/etc/checkrunnertest.init.sql\" \
+	-DCHECKRUNNERTEST_INIT_SQL=\"$(srcdir)/test/share/checkrunnertest.init.sql\" \
 	$(kvQabased_CPPFLAGS) \
 	$(gtest_CFLAGS) \
 	-DLOG_CHECK_SCRIPT 
