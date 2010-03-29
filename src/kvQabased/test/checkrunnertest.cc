@@ -114,7 +114,8 @@ TEST_F(CheckRunnerTest, testNoChecks)
 	db.getConnection() ->exec("delete from checks");
 
 	// We merely check that this does not crash or throw any exceptions:
-	runCheckRunner(__func__);
+	const ::testing::TestInfo * const test_info = ::testing::UnitTest::GetInstance()->current_test_info();
+	runCheckRunner(test_info->name());
 }
 
 TEST_F(CheckRunnerTest, testNormal)
@@ -123,7 +124,9 @@ TEST_F(CheckRunnerTest, testNormal)
 	kvalobs::kvData inData = f.getData(94, 33);
 	db.getConnection() ->exec("insert into data values " + inData.toSend());
 
-	runCheckRunner(__func__);
+		const ::testing::TestInfo * const test_info = ::testing::UnitTest::GetInstance()->current_test_info();
+	runCheckRunner(test_info->name());
+
 
 	vector<kvData> result;
 	getData(back_inserter(result));
@@ -152,7 +155,9 @@ TEST_F(CheckRunnerTest, testSkipHqc)
 	kvalobs::hqc::hqc_accept(inData);
 	db.getConnection() ->exec("insert into data values " + inData.toSend());
 
-	runCheckRunner(__func__);
+	const ::testing::TestInfo * const test_info = ::testing::UnitTest::GetInstance()->current_test_info();
+	runCheckRunner(test_info->name());
+
 
 	vector<kvData> result;
 	getData(back_inserter(result));
@@ -214,7 +219,9 @@ TEST_F(CheckRunnerTest, testSkipPreChecked)
 	kvalobs::kvData inData = getQC1ModifiedData(94, 33, f);
 	db.getConnection() ->exec("insert into data values " + inData.toSend());
 
-	runCheckRunner(__func__);
+	const ::testing::TestInfo * const test_info = ::testing::UnitTest::GetInstance()->current_test_info();
+	runCheckRunner(test_info->name());
+
 
 	vector<kvData> result;
 	getData(back_inserter(result));
@@ -242,7 +249,9 @@ TEST_F(CheckRunnerTest, testNoSkipedIfOneNotChecked)
 	kvData unchecked = f.getData(42, 42);
 	db.getConnection() ->exec("insert into data values " + unchecked.toSend());
 
-	runCheckRunner(__func__);
+	const ::testing::TestInfo * const test_info = ::testing::UnitTest::GetInstance()->current_test_info();
+	runCheckRunner(test_info->name());
+
 
 	Container result;
 	getData(inserter(result, result.begin()));
@@ -296,7 +305,9 @@ TEST_F(CheckRunnerTest, testOriginalValueIsInput)
 	inData.corrected(2); // This corrected value won't be rejected
 	db.getConnection() ->exec("insert into data values " + inData.toSend());
 
-	runCheckRunner(__func__);
+	const ::testing::TestInfo * const test_info = ::testing::UnitTest::GetInstance()->current_test_info();
+	runCheckRunner(test_info->name());
+
 
 	vector<kvData> result;
 	getData(back_inserter(result));
@@ -312,7 +323,8 @@ TEST_F(CheckRunnerTest, testCorrectedValueWhenRejected)
 	kvalobs::kvData inData = f.getData(94, 33);
 	db.getConnection() ->exec("insert into data values " + inData.toSend());
 
-	runCheckRunner(__func__);
+	const ::testing::TestInfo * const test_info = ::testing::UnitTest::GetInstance()->current_test_info();
+	runCheckRunner(test_info->name());
 
 	vector<kvData> result;
 	getData(back_inserter(result));
@@ -329,7 +341,8 @@ TEST_F(CheckRunnerTest, testInsertModelValueSetsCorrectUseinfo)
 	kvalobs::kvData inData = f.getMissing(110);
 	db.getConnection() ->exec("insert into data values " + inData.toSend());
 
-	runCheckRunner(__func__);
+	const ::testing::TestInfo * const test_info = ::testing::UnitTest::GetInstance()->current_test_info();
+	runCheckRunner(test_info->name());
 
 	vector<kvData> result;
 	getData(back_inserter(result));
@@ -356,7 +369,8 @@ TEST_F(CheckRunnerTest, testAllTypeidAreInputData)
 	kvalobs::kvData inData2 = f2.getData(2.0, 110);
 	db.getConnection() ->exec("insert into data values " + inData2.toSend());
 
-	runCheckRunner(__func__);
+	const ::testing::TestInfo * const test_info = ::testing::UnitTest::GetInstance()->current_test_info();
+	runCheckRunner(test_info->name());
 
 	typedef std::set<kvalobs::kvData, kvalobs::compare::lt_kvData>
 			ResultContainer;
@@ -388,7 +402,8 @@ TEST_F(CheckRunnerTest, testPrefersCurrentTypeID)
 	kvalobs::kvData inData3 = f3.getData(2.0, 110);
 	db.getConnection() ->exec("insert into data values " + inData3.toSend());
 
-	runCheckRunner(__func__);
+	const ::testing::TestInfo * const test_info = ::testing::UnitTest::GetInstance()->current_test_info();
+	runCheckRunner(test_info->name());
 
 	typedef std::set<kvalobs::kvData, kvalobs::compare::lt_kvData>
 			ResultContainer;
@@ -490,7 +505,8 @@ TEST_F(CheckRunnerTest, testChecksHighLevels)
 	kvData d = f.getData(5, 110);
 	db.getConnection()->exec("insert into data values " + d.toSend());
 
-	runCheckRunner(__func__);
+	const ::testing::TestInfo * const test_info = ::testing::UnitTest::GetInstance()->current_test_info();
+	runCheckRunner(test_info->name());
 
 	vector<kvData> result;
 	getData(back_inserter(result));
@@ -512,7 +528,8 @@ TEST_F(CheckRunnerTest, testChecksHighLevelsWhenLowLevelsPresent)
 	kvData d0 = f0.getData(2, 110);
 	db.getConnection()->exec("insert into data values " + d0.toSend());
 
-	runCheckRunner(__func__);
+	const ::testing::TestInfo * const test_info = ::testing::UnitTest::GetInstance()->current_test_info();
+	runCheckRunner(test_info->name());
 
 	vector<kvData> result;
 	getData(back_inserter(result));
@@ -535,7 +552,8 @@ TEST_F(CheckRunnerTest, testChecksNonstandardSensor)
 	kvData d = f.getData(5, 110);
 	db.getConnection()->exec("insert into data values " + d.toSend());
 
-	runCheckRunner(__func__);
+	const ::testing::TestInfo * const test_info = ::testing::UnitTest::GetInstance()->current_test_info();
+	runCheckRunner(test_info->name());
 
 	vector<kvData> result;
 	getData(back_inserter(result));
@@ -562,7 +580,8 @@ TEST_F(CheckRunnerTest, testOnlyUsesSpecificLevel)
 	kvData d25b = f25.getData(2, 42);
 	db.getConnection()->exec("insert into data values " + d25b.toSend());
 
-	runCheckRunner(__func__);
+	const ::testing::TestInfo * const test_info = ::testing::UnitTest::GetInstance()->current_test_info();
+	runCheckRunner(test_info->name());
 
 	vector<kvData> result;
 	getData(back_inserter(result));
@@ -599,7 +618,9 @@ TEST_F(CheckRunnerTest, testOnlyUsesSpecificSensor)
 	kvData d1b = f1.getData(2, 42);
 	db.getConnection()->exec("insert into data values " + d1b.toSend());
 
-	runCheckRunner(__func__);
+	const ::testing::TestInfo * const test_info =
+			::testing::UnitTest::GetInstance()->current_test_info();
+	runCheckRunner(test_info->name());
 
 	vector<kvData> result;
 	getData(back_inserter(result));
