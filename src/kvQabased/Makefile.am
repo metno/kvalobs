@@ -85,4 +85,4 @@ kvQabasedTest_LDADD = \
 	
 EXTRA_DIST = \
 	test/database/setupdb.sql \
-	test/etc/checkrunnertest.init.sql
+	test/share/checkrunnertest.init.sql
