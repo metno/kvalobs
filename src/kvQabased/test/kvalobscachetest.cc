@@ -28,42 +28,41 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#include "kvalobscachetest.h"
+
+#include <gtest/gtest.h>
+#include "../kvalobscache.h"
+#include "../kvQABaseDBConnection.h"
+#include "database/kvalobsdatabase.h"
 #include <kvalobs/kvDataOperations.h>
 #include <boost/shared_ptr.hpp>
 
-CPPUNIT_TEST_SUITE_REGISTRATION( KvalobsCacheTest );
-
 using namespace dnmi::db;
 
-KvalobsCacheTest::KvalobsCacheTest()
-  : cache( 0 ), qabaseConnection( 0 ), db( 0 )
+class KvalobsCacheTest : public testing::Test
 {
-}
+public:
+	KvalobsCacheTest()
+	{
+		  db = new KvalobsDatabase;
+		  qabaseConnection = new kvQABaseDBConnection( db->getConnection() );
+		  cache = new KvalobsCache( * qabaseConnection );
+	}
+	~KvalobsCacheTest()
+	{
+	  delete cache;
+	  delete qabaseConnection; qabaseConnection = 0;
+	  delete db;
+	}
 
 
-KvalobsCacheTest::~KvalobsCacheTest()
-{
-}
+protected:
+	KvalobsCache * cache;
+    kvQABaseDBConnection * qabaseConnection;
+    KvalobsDatabase * db;
 
+};
 
-void KvalobsCacheTest::setUp()
-{
-  db = new KvalobsDatabase;
-  qabaseConnection = new kvQABaseDBConnection( db->getConnection() );
-  cache = new KvalobsCache( * qabaseConnection );
-}
-
-
-void KvalobsCacheTest::tearDown()
-{
-  delete cache; cache = 0;
-  delete qabaseConnection; qabaseConnection = 0;
-  delete db; db = 0;
-}
-
-
-void KvalobsCacheTest::testSave()
+TEST_F(KvalobsCacheTest, testSave)
 {
   kvalobs::kvDataFactory f( 42, "2006-05-26 06:00:00", 302 );
   kvalobs::kvData a = f.getData( 3, 110 );
@@ -83,15 +82,15 @@ void KvalobsCacheTest::testSave()
 
   boost::shared_ptr<Result> res( db->getConnection()->execQuery( "select * from data;" ) );
 
-  CPPUNIT_ASSERT_EQUAL( 1, res->size() );
+  ASSERT_EQ( 1, res->size() );
   kvalobs::kvData data( res->next() );
 
-  CPPUNIT_ASSERT_EQUAL( float( 42 ), data.corrected() );
+  EXPECT_EQ( float( 42 ), data.corrected() );
   kvalobs::compare::exactly_equal eq;
-  CPPUNIT_ASSERT( eq( a, data ) );
+  EXPECT_TRUE( eq( a, data ) );
 }
 
-void KvalobsCacheTest::testOverwriteFirst()
+TEST_F(KvalobsCacheTest, testOverwriteFirst)
 {
 	  kvalobs::kvDataFactory f( 42, "2006-05-26 06:00:00", 302 );
 	  kvalobs::kvData a = f.getData( 3, 110 );
@@ -108,7 +107,7 @@ void KvalobsCacheTest::testOverwriteFirst()
 
 	  boost::shared_ptr<Result> res( db->getConnection()->execQuery( "select * from data;" ) );
 
-	  CPPUNIT_ASSERT_EQUAL( 1, res->size() );
+	  ASSERT_EQ( 1, res->size() );
 	  kvalobs::kvData data( res->next() );
-	  CPPUNIT_ASSERT_EQUAL( float( 100 ), data.corrected() );
+	  EXPECT_EQ( float( 100 ), data.corrected() );
 }

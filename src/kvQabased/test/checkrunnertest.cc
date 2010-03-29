@@ -28,8 +28,10 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#include "checkrunnertest.h"
+
+#include <gtest/gtest.h>
 #include "../checkrunner.h"
+#include "database/kvalobsdatabase.h"
 #include <string>
 #include <fstream>
 #include <iterator>
@@ -42,21 +44,9 @@
 #include <boost/filesystem/exception.hpp>
 
 
-CPPUNIT_TEST_SUITE_REGISTRATION( CheckRunnerTest );
-
-
 using namespace std;
 using namespace kvalobs;
 using namespace boost::filesystem;
-
-CheckRunnerTest::CheckRunnerTest()
-    : stationInfo( 42, "2006-05-26 06:00:00", 302 )
-    , db( 0 )
-{}
-
-
-CheckRunnerTest::~CheckRunnerTest()
-{}
 
 namespace
 {
@@ -70,76 +60,85 @@ namespace
   }
 }
 
-void CheckRunnerTest::setUp()
+
+class CheckRunnerTest : public testing::Test
 {
-  db = std::auto_ptr<KvalobsDatabase>( new KvalobsDatabase );
+public:
+    const kvalobs::kvStationInfo stationInfo;
+    KvalobsDatabase db;
 
-  // Setup db:
-  static const string init_sql_statement = getInitSqlStatement();
-  db->getConnection() ->exec( init_sql_statement );
-}
+    CheckRunnerTest() :
+    	stationInfo(42, "2006-05-26 06:00:00", 302)
+    {
+    	  static const string init_sql_statement = getInitSqlStatement();
+    	  db.getConnection() ->exec( init_sql_statement );
+    }
+
+    void runCheckRunner( const std::string & checkName )
+    {
+      runCheckRunner(checkName, stationInfo);
+    }
+
+    void runCheckRunner( const std::string & checkName, const kvalobs::kvStationInfo & si )
+    {
+      CheckRunner checkRunner( si, * db.getQaBaseConnection(), getLogPath( checkName ) );
+      checkRunner();
+    }
+
+    template <typename InsertIterator> InsertIterator getData( InsertIterator out )
+    {
+      typedef std::auto_ptr<dnmi::db::Result> Result;
+      Result res( db.getConnection()->execQuery( "select * from data" ) );
+      while ( res->hasNext() )
+        out++ = res->next();
+      return out;
+    }
 
 
-void CheckRunnerTest::tearDown()
-{
-}
+    string getLogPath( const string & name ) const
+    {
+      static const path baseLogPath( "test/var/log/" );
+      path ret = baseLogPath / name;
+      create_directories( ret );
+      return ret.native_directory_string();
+    }
+};
 
-
-void CheckRunnerTest::runCheckRunner( const std::string & checkName )
-{
-  runCheckRunner(checkName, stationInfo);
-}
-
-void CheckRunnerTest::runCheckRunner( const std::string & checkName, const kvalobs::kvStationInfo & si )
-{
-  CheckRunner checkRunner( si, * db->getQaBaseConnection(), getLogPath( checkName ) );
-  checkRunner();
-}
-
-string CheckRunnerTest::getLogPath( const string & name ) const
-{
-  static const path baseLogPath( "test/var/log/" );
-  path ret = baseLogPath / name;
-  create_directories( ret );
-  return ret.native_directory_string();
-}
-
-
-void CheckRunnerTest::testNoChecks()
+TEST_F(CheckRunnerTest, testNoChecks)
 {
   kvDataFactory f( 42, "2006-05-26 06:00:00", 302 );
   kvalobs::kvData inData = f.getData( 94, 33 );
-  db->getConnection() ->exec( "insert into data values " + inData.toSend() );
+  db.getConnection() ->exec( "insert into data values " + inData.toSend() );
 
   // remove all checks from database:
-  db->getConnection() ->exec( "delete from checks" );
+  db.getConnection() ->exec( "delete from checks" );
 
   // We merely check that this does not crash or throw any exceptions:
   runCheckRunner( __func__ );
 }
 
 
-void CheckRunnerTest::testNormal()
+TEST_F(CheckRunnerTest, testNormal)
 {
   kvDataFactory f( 42, "2006-05-26 06:00:00", 302 );
   kvalobs::kvData inData = f.getData( 94, 33 );
-  db->getConnection() ->exec( "insert into data values " + inData.toSend() );
+  db.getConnection() ->exec( "insert into data values " + inData.toSend() );
 
   runCheckRunner( __func__ );
 
   vector<kvData> result;
   getData( back_inserter( result ) );
 
-  CPPUNIT_ASSERT_EQUAL( size_t( 1 ), result.size() );
+  ASSERT_EQ( size_t( 1 ), result.size() );
   const kvData & outData = result.front();
-  CPPUNIT_ASSERT( kvalobs::rejected( outData ) );
+  EXPECT_TRUE( kvalobs::rejected( outData ) );
   const kvalobs::kvControlInfo ci = outData.controlinfo();
-  //   CPPUNIT_ASSERT_EQUAL( 1, ci.flag( kvalobs::flag::fqclevel ) ); // This flag is no longer in use
-  CPPUNIT_ASSERT_EQUAL( 6, ci.flag( kvalobs::flag::fr ) );
+  //   ASSERT_EQ( 1, ci.flag( kvalobs::flag::fqclevel ) ); // This flag is no longer in use
+  EXPECT_EQ( 6, ci.flag( kvalobs::flag::fr ) );
 
   kvalobs::kvUseInfo ui;
   ui.setUseFlags( ci );
-  CPPUNIT_ASSERT_EQUAL( ui, outData.useinfo() );
+  EXPECT_EQ( ui, outData.useinfo() );
 }
 
 namespace
@@ -148,45 +147,45 @@ namespace
 }
 
 
-void CheckRunnerTest::testSkipHqc()
+TEST_F(CheckRunnerTest, testSkipHqc)
 {
   kvDataFactory f( 42, "2006-05-26 06:00:00", 302 );
   kvalobs::kvData inData = f.getData( 94, 33 );
   kvalobs::hqc::hqc_accept( inData );
-  db->getConnection() ->exec( "insert into data values " + inData.toSend() );
+  db.getConnection() ->exec( "insert into data values " + inData.toSend() );
 
   runCheckRunner( __func__ );
 
   vector<kvData> result;
   getData( back_inserter( result ) );
 
-  CPPUNIT_ASSERT_EQUAL( size_t( 1 ), result.size() );
+  ASSERT_EQ( size_t( 1 ), result.size() );
   const kvData & outData = result.front();
 
-//  CPPUNIT_ASSERT( kvalobs::hqc::hqc_accepted( outData ) );
-  CPPUNIT_ASSERT( eq_(inData, outData) );
+//  EXPECT_TRUE( kvalobs::hqc::hqc_accepted( outData ) );
+  EXPECT_TRUE( eq_(inData, outData) );
 }
 
 
-void CheckRunnerTest::testSkipAggregated()
+TEST_F(CheckRunnerTest, testSkipAggregated)
 {
   kvDataFactory f( 42, "2006-05-26 06:00:00", -302 );
   kvalobs::kvData inData = f.getData( 94, 33 );
-  db->getConnection() ->exec( "insert into data values " + inData.toSend() );
+  db.getConnection() ->exec( "insert into data values " + inData.toSend() );
 
   {
     kvalobs::kvStationInfo si( stationInfo.stationID(), stationInfo.obstime(), - stationInfo.typeID() );
-    CheckRunner checkRunner( si, * db->getQaBaseConnection(), getLogPath( __func__ ) );
+    CheckRunner checkRunner( si, * db.getQaBaseConnection(), getLogPath( __func__ ) );
     checkRunner();
   }
 
   vector<kvData> result;
   getData( back_inserter( result ) );
 
-  CPPUNIT_ASSERT_EQUAL( size_t( 1 ), result.size() );
+  ASSERT_EQ( size_t( 1 ), result.size() );
   const kvData & outData = result.front();
 
-  CPPUNIT_ASSERT( eq_( inData, outData ) );
+  EXPECT_TRUE( eq_( inData, outData ) );
 }
 
 
@@ -211,26 +210,26 @@ namespace
 }
 
 
-void CheckRunnerTest::testSkipPreChecked()
+TEST_F(CheckRunnerTest, testSkipPreChecked)
 {
   kvDataFactory f( 42, "2006-05-26 06:00:00", 302 );
   kvalobs::kvData inData = getQC1ModifiedData( 94, 33, f );
-  db->getConnection() ->exec( "insert into data values " + inData.toSend() );
+  db.getConnection() ->exec( "insert into data values " + inData.toSend() );
 
   runCheckRunner( __func__ );
 
   vector<kvData> result;
   getData( back_inserter( result ) );
 
-  CPPUNIT_ASSERT_EQUAL( size_t( 1 ), result.size() );
+  ASSERT_EQ( size_t( 1 ), result.size() );
   const kvData & outData = result.front();
 
-  CPPUNIT_ASSERT_EQUAL( inData.controlinfo(), outData.controlinfo() );
-  CPPUNIT_ASSERT_EQUAL( inData.useinfo(), outData.useinfo() );
-  CPPUNIT_ASSERT( eq_( inData, outData ) );
+  EXPECT_EQ( inData.controlinfo(), outData.controlinfo() );
+  EXPECT_EQ( inData.useinfo(), outData.useinfo() );
+  EXPECT_TRUE( eq_( inData, outData ) );
 }
 
-void CheckRunnerTest::testNoSkipedIfOneNotChecked()
+TEST_F(CheckRunnerTest, testNoSkipedIfOneNotChecked)
 {
   typedef set<kvData, compare::lt_kvData> Container;
 
@@ -241,128 +240,125 @@ void CheckRunnerTest::testNoSkipedIfOneNotChecked()
   dl.insert( getQC1ModifiedData( 23, 110, f ) );
   dl.insert( getQC1ModifiedData( 1, 112, f ) );
   for ( Container::iterator it = dl.begin(); it != dl.end(); ++ it )
-    db->getConnection() ->exec( "insert into data values " + it->toSend() );
+    db.getConnection() ->exec( "insert into data values " + it->toSend() );
   kvData unchecked = f.getData( 42, 42 );
-  db->getConnection() ->exec( "insert into data values " + unchecked.toSend() );
+  db.getConnection() ->exec( "insert into data values " + unchecked.toSend() );
 
   runCheckRunner( __func__ );
 
   Container result;
   getData( inserter( result, result.begin() ) );
 
-  CPPUNIT_ASSERT_EQUAL( size_t( 4 ), result.size() );
+  ASSERT_EQ( size_t( 4 ), result.size() );
 
   for ( Container::const_iterator inData = dl.begin(); inData != dl.end(); ++ inData )
   {
     Container::const_iterator outData = result.find( * inData );
-    CPPUNIT_ASSERT( outData != result.end() );
-    CPPUNIT_ASSERT( kvControlInfo() != outData->controlinfo() );
+    EXPECT_TRUE( outData != result.end() );
+    EXPECT_TRUE( kvControlInfo() != outData->controlinfo() );
     //CPPUNIT_ASSERT_ASSERTION_FAIL(
-    //  CPPUNIT_ASSERT_EQUAL( kvControlInfo(), outData->controlinfo() )
+    //  ASSERT_EQ( kvControlInfo(), outData->controlinfo() )
     //);
     // We assume the bogus checks in the test input was wrong:
-    CPPUNIT_ASSERT_ASSERTION_FAIL(
-      CPPUNIT_ASSERT_EQUAL( inData->controlinfo(), outData->controlinfo() )
-    );
+    EXPECT_FALSE( inData->controlinfo() == outData->controlinfo() );
   }
   // See if previously unchecked data has been rechecked
   Container::const_iterator outData = result.find( unchecked );
-  CPPUNIT_ASSERT( outData != result.end() );
-  CPPUNIT_ASSERT_EQUAL_MESSAGE( "Data has wrong controlinfo/useinfo flags: " + outData->toSend(),
-                                7, outData->useinfo().flag( 0 ) );
+  ASSERT_TRUE( outData != result.end() );
+  EXPECT_EQ( 7, outData->useinfo().flag( 0 ) ) << "Data has wrong controlinfo/useinfo flags: " << outData->toSend();
 }
 
 
-void CheckRunnerTest::testReCheckResetsFlags()
+TEST_F(CheckRunnerTest, testReCheckResetsFlags)
 {
   flag::ControlFlag originalFlag = flag::fcc;
 
   kvDataFactory f( 42, "2006-05-26 06:00:00", 302 );
   kvalobs::kvData inData = getQC1ModifiedData( 94, 33, f, originalFlag );
-  db->getConnection() ->exec( "insert into data values " + inData.toSend() );
+  db.getConnection() ->exec( "insert into data values " + inData.toSend() );
 
   {
-    CheckRunner checkRunner( stationInfo, * db->getQaBaseConnection(), getLogPath( __func__ ) );
+    CheckRunner checkRunner( stationInfo, * db.getQaBaseConnection(), getLogPath( __func__ ) );
     checkRunner( true );
   }
 
   vector<kvData> result;
   getData( back_inserter( result ) );
 
-  CPPUNIT_ASSERT_EQUAL( size_t( 1 ), result.size() );
+  ASSERT_EQ( size_t( 1 ), result.size() );
   const kvData & outData = result.front();
 
-  CPPUNIT_ASSERT_EQUAL( 0, outData.controlinfo().flag( originalFlag ) );
+  EXPECT_EQ( 0, outData.controlinfo().flag( originalFlag ) );
 }
 
 
-void CheckRunnerTest::testOriginalValueIsInput()
+TEST_F(CheckRunnerTest, testOriginalValueIsInput)
 {
   kvDataFactory f( 42, "2006-05-26 06:00:00", 302 );
   kvalobs::kvData inData = f.getData( 94, 33 );
   inData.corrected( 2 ); // This corrected value won't be rejected
-  db->getConnection() ->exec( "insert into data values " + inData.toSend() );
+  db.getConnection() ->exec( "insert into data values " + inData.toSend() );
 
   runCheckRunner( __func__ );
 
   vector<kvData> result;
   getData( back_inserter( result ) );
 
-  CPPUNIT_ASSERT_EQUAL( size_t( 1 ), result.size() );
+  ASSERT_EQ( size_t( 1 ), result.size() );
   const kvData & outData = result.front();
-  CPPUNIT_ASSERT( kvalobs::rejected( outData ) );
+  EXPECT_TRUE( kvalobs::rejected( outData ) );
 }
 
 
-void CheckRunnerTest::testCorrectedValueWhenRejected()
+TEST_F(CheckRunnerTest, testCorrectedValueWhenRejected)
 {
   kvDataFactory f( 42, "2006-05-26 06:00:00", 302 );
   kvalobs::kvData inData = f.getData( 94, 33 );
-  db->getConnection() ->exec( "insert into data values " + inData.toSend() );
+  db.getConnection() ->exec( "insert into data values " + inData.toSend() );
 
   runCheckRunner( __func__ );
 
   vector<kvData> result;
   getData( back_inserter( result ) );
 
-  CPPUNIT_ASSERT_EQUAL( size_t( 1 ), result.size() );
+  ASSERT_EQ( size_t( 1 ), result.size() );
   const kvData & outData = result.front();
-  CPPUNIT_ASSERT( kvalobs::rejected( outData ) );
-  CPPUNIT_ASSERT_EQUAL( float( -32766 ), outData.corrected() );
+  EXPECT_TRUE( kvalobs::rejected( outData ) );
+  EXPECT_EQ( float( -32766 ), outData.corrected() );
 }
 
-void CheckRunnerTest::testInsertModelValueSetsCorrectUseinfo()
+TEST_F(CheckRunnerTest, testInsertModelValueSetsCorrectUseinfo)
 {
   kvDataFactory f( 42, "2006-05-26 06:00:00", 302 );
   kvalobs::kvData inData = f.getMissing( 110 );
-  db->getConnection() ->exec( "insert into data values " + inData.toSend() );
+  db.getConnection() ->exec( "insert into data values " + inData.toSend() );
 
   runCheckRunner( __func__ );
 
   vector<kvData> result;
   getData( back_inserter( result ) );
 
-  CPPUNIT_ASSERT_EQUAL( size_t( 1 ), result.size() );
+  ASSERT_EQ( size_t( 1 ), result.size() );
   const kvData & outData = result.front();
 
-  CPPUNIT_ASSERT( kvalobs::original_missing( outData ) );
-  CPPUNIT_ASSERT( kvalobs::valid( outData ) );
+  EXPECT_TRUE( kvalobs::original_missing( outData ) );
+  EXPECT_TRUE( kvalobs::valid( outData ) );
 
   kvUseInfo real_ui = outData.useinfo();
   kvUseInfo correct_ui;
   correct_ui.setUseFlags( outData.controlinfo() );
-  CPPUNIT_ASSERT_EQUAL( correct_ui, real_ui );
+  EXPECT_EQ( correct_ui, real_ui );
 }
 
-void CheckRunnerTest::testAllTypeidAreInputData()
+TEST_F(CheckRunnerTest, testAllTypeidAreInputData)
 {
   kvDataFactory f1( 42, "2006-05-26 06:00:00", 302 );
   kvalobs::kvData inData1 = f1.getData( 1.0, 111 );
-  db->getConnection() ->exec( "insert into data values " + inData1.toSend() );
+  db.getConnection() ->exec( "insert into data values " + inData1.toSend() );
 
   kvDataFactory f2( 42, "2006-05-26 06:00:00", 322 );
   kvalobs::kvData inData2 = f2.getData( 2.0, 110 );
-  db->getConnection() ->exec( "insert into data values " + inData2.toSend() );
+  db.getConnection() ->exec( "insert into data values " + inData2.toSend() );
   
   runCheckRunner( __func__ );
   
@@ -370,14 +366,14 @@ void CheckRunnerTest::testAllTypeidAreInputData()
   ResultContainer result;
   getData( inserter( result, result.begin() ) );
 
-  CPPUNIT_ASSERT_EQUAL( size_t( 2 ), result.size() );
+  ASSERT_EQ( size_t( 2 ), result.size() );
   
   ResultContainer::const_iterator it = result.find( inData2 );
-  CPPUNIT_ASSERT( it != result.end() );
-  CPPUNIT_ASSERT_EQUAL( kvControlInfo( "1000300000000000" ), it->controlinfo() );
+  EXPECT_TRUE( it != result.end() );
+  EXPECT_EQ( kvControlInfo( "1000300000000000" ), it->controlinfo() );
 }
 
-void CheckRunnerTest::testPrefersCurrentTypeID()
+TEST_F(CheckRunnerTest, testPrefersCurrentTypeID)
 {
   // Warning: 
   // This test may incorrectly pass if the underlying database happens to deliver 
@@ -385,15 +381,15 @@ void CheckRunnerTest::testPrefersCurrentTypeID()
   
   kvDataFactory f1( 42, "2006-05-26 06:00:00", 302 );
   kvalobs::kvData inData1 = f1.getData( 1.0, 110 );
-  db->getConnection() ->exec( "insert into data values " + inData1.toSend() );
+  db.getConnection() ->exec( "insert into data values " + inData1.toSend() );
 
   kvDataFactory f2( 42, "2006-05-26 06:00:00", 300 );
   kvalobs::kvData inData2 = f2.getData( 2.0, 110 );
-  db->getConnection() ->exec( "insert into data values " + inData2.toSend() );
+  db.getConnection() ->exec( "insert into data values " + inData2.toSend() );
 
   kvDataFactory f3( 42, "2006-05-26 06:00:00", 307 );
   kvalobs::kvData inData3 = f3.getData( 2.0, 110 );
-  db->getConnection() ->exec( "insert into data values " + inData3.toSend() );
+  db.getConnection() ->exec( "insert into data values " + inData3.toSend() );
 
     
   runCheckRunner( __func__ );
@@ -402,19 +398,19 @@ void CheckRunnerTest::testPrefersCurrentTypeID()
   ResultContainer result;
   getData( inserter( result, result.begin() ) );
 
-  CPPUNIT_ASSERT_EQUAL( size_t( 3 ), result.size() );
+  ASSERT_EQ( size_t( 3 ), result.size() );
   
   ResultContainer::const_iterator it = result.find( inData1 );
-  CPPUNIT_ASSERT( it != result.end() );
-  CPPUNIT_ASSERT_EQUAL( kvControlInfo( "1000300000000000" ), it->controlinfo() );
+  EXPECT_TRUE( it != result.end() );
+  EXPECT_EQ( kvControlInfo( "1000300000000000" ), it->controlinfo() );
   
   it = result.find( inData2 );
-  CPPUNIT_ASSERT( it != result.end() );
-  CPPUNIT_ASSERT_EQUAL( kvControlInfo(), it->controlinfo() );  
+  ASSERT_TRUE( it != result.end() );
+  EXPECT_EQ( kvControlInfo(), it->controlinfo() );
 
   it = result.find( inData3 );
-  CPPUNIT_ASSERT( it != result.end() );
-  CPPUNIT_ASSERT_EQUAL( kvControlInfo(), it->controlinfo() );  
+  ASSERT_TRUE( it != result.end() );
+  EXPECT_EQ( kvControlInfo(), it->controlinfo() );
 }
 
 namespace
@@ -430,22 +426,22 @@ namespace
 }
 
 
-void CheckRunnerTest::testHandlesSpecifiedTypeidInChecks()
+TEST_F(CheckRunnerTest, testHandlesSpecifiedTypeidInChecks)
 {
   // This differs from testPrefersCurrentTypeID in that the checks table 
   // specifies that the checks for paramid 111 only applies to typeid 303.
   
   kvDataFactory fa( 9, "2006-05-26 06:00:00", 102 );
   const kvalobs::kvData bogusDataA = fa.getData( 0, 111 );
-  db->getConnection() ->exec( "insert into data values " + bogusDataA.toSend() );
+  db.getConnection() ->exec( "insert into data values " + bogusDataA.toSend() );
 
   kvDataFactory fb( 9, "2006-05-26 06:00:00", 303 );
   const kvalobs::kvData inData = fb.getData( 100000, 111 );
-  db->getConnection() ->exec( "insert into data values " + inData.toSend() );
+  db.getConnection() ->exec( "insert into data values " + inData.toSend() );
 
   kvDataFactory fc( 9, "2006-05-26 06:00:00", 304 );
   const kvalobs::kvData bogusDataB = fc.getData( 0, 111 );
-  db->getConnection() ->exec( "insert into data values " + bogusDataB.toSend() );
+  db.getConnection() ->exec( "insert into data values " + bogusDataB.toSend() );
 
   
   kvalobs::kvStationInfo si( 9, "2006-05-26 06:00:00", 303 );
@@ -453,47 +449,47 @@ void CheckRunnerTest::testHandlesSpecifiedTypeidInChecks()
   
   vector<kvData> result;
   getData( back_inserter( result ) );
-  CPPUNIT_ASSERT_EQUAL( size_t( 3 ), result.size() );
+  ASSERT_EQ( size_t( 3 ), result.size() );
 
   vector<kvData>::const_iterator find;
   
   find = std::find_if(result.begin(), result.end(), hasTypeId(303));
-  CPPUNIT_ASSERT(find != result.end());
-  CPPUNIT_ASSERT_EQUAL(4, find->controlinfo().flag(kvalobs::flag::fnum));
+  ASSERT_TRUE(find != result.end());
+  EXPECT_EQ(4, find->controlinfo().flag(kvalobs::flag::fnum));
   
   find = std::find_if(result.begin(), result.end(), hasTypeId(102));
-  CPPUNIT_ASSERT(find != result.end());
-  CPPUNIT_ASSERT(eq_(bogusDataA, * find));
+  ASSERT_TRUE(find != result.end());
+  EXPECT_TRUE(eq_(bogusDataA, * find));
   
   find = std::find_if(result.begin(), result.end(), hasTypeId(304));
-  CPPUNIT_ASSERT(find != result.end());
-  CPPUNIT_ASSERT(eq_(bogusDataB, * find));
+  ASSERT_TRUE(find != result.end());
+  EXPECT_TRUE(eq_(bogusDataB, * find));
 }
 
-void CheckRunnerTest::testDoesNotCheckWhenChecksSpecifyAnotherTypeid()
+TEST_F(CheckRunnerTest, testDoesNotCheckWhenChecksSpecifyAnotherTypeid)
 {
   kvDataFactory fa( 9, "2006-05-26 06:00:00", 302 );
   const kvalobs::kvData inData = fa.getData( 21, 111 );
-  db->getConnection()->exec( "insert into data values " + inData.toSend() );
+  db.getConnection()->exec( "insert into data values " + inData.toSend() );
     
   kvalobs::kvStationInfo si( 9, "2006-05-26 06:00:00", 302 );
   runCheckRunner( __func__, si );
  
   vector<kvData> result;
   getData( back_inserter( result ) );
-  CPPUNIT_ASSERT_EQUAL( size_t( 1 ), result.size() );
+  ASSERT_EQ( size_t( 1 ), result.size() );
   
   const kvData & outData = result.front();
   
-  CPPUNIT_ASSERT_EQUAL(inData.controlinfo(), outData.controlinfo());
-  CPPUNIT_ASSERT(eq_(inData, outData));
+  EXPECT_EQ(inData.controlinfo(), outData.controlinfo());
+  EXPECT_TRUE(eq_(inData, outData));
 }
 
-void CheckRunnerTest::testChecksHighLevels()
+TEST_F(CheckRunnerTest, testChecksHighLevels)
 {
   kvDataFactory f(42, "2006-05-26 06:00:00", 302, 0, 25 );
   kvData d = f.getData(5, 110);
-  db->getConnection()->exec( "insert into data values " + d.toSend() );
+  db.getConnection()->exec( "insert into data values " + d.toSend() );
 
   runCheckRunner( __func__ );
 
@@ -503,19 +499,19 @@ void CheckRunnerTest::testChecksHighLevels()
 //  for ( vector<kvData>::const_iterator it = result.begin(); it != result.end(); ++ it )
 //    cout << * it << endl;
   
-  CPPUNIT_ASSERT_EQUAL( size_t( 1 ), result.size() );
-  CPPUNIT_ASSERT( result.front().controlinfo() != kvControlInfo() );
+  ASSERT_EQ( size_t( 1 ), result.size() );
+  EXPECT_TRUE( result.front().controlinfo() != kvControlInfo() );
 }
 
-void CheckRunnerTest::testChecksHighLevelsWhenLowLevelsPresent()
+TEST_F(CheckRunnerTest, testChecksHighLevelsWhenLowLevelsPresent)
 {
   kvDataFactory f(42, "2006-05-26 06:00:00", 302, 0, 25 );
   kvData d = f.getData(5, 110);
-  db->getConnection()->exec( "insert into data values " + d.toSend() );
+  db.getConnection()->exec( "insert into data values " + d.toSend() );
 
   kvDataFactory f0(42, "2006-05-26 06:00:00", 302);
   kvData d0 = f0.getData(2, 110);
-  db->getConnection()->exec( "insert into data values " + d0.toSend() );
+  db.getConnection()->exec( "insert into data values " + d0.toSend() );
 
   
   runCheckRunner( __func__ );
@@ -526,22 +522,22 @@ void CheckRunnerTest::testChecksHighLevelsWhenLowLevelsPresent()
 //  for ( vector<kvData>::const_iterator it = result.begin(); it != result.end(); ++ it )
 //    cout << * it << endl;
   
-  CPPUNIT_ASSERT_EQUAL( size_t( 2 ), result.size() );
+  ASSERT_EQ( size_t( 2 ), result.size() );
   
   vector<kvData>::const_iterator r = find_if(result.begin(), result.end(), 
         std::bind2nd( kvalobs::compare::same_kvData(), d ) );
   
-  CPPUNIT_ASSERT(r != result.end());
-  CPPUNIT_ASSERT( r->controlinfo() != kvControlInfo() );
+  ASSERT_TRUE(r != result.end());
+  EXPECT_TRUE( r->controlinfo() != kvControlInfo() );
 }
 
 
 
-void CheckRunnerTest::testChecksNonstandardSensor()
+TEST_F(CheckRunnerTest, testChecksNonstandardSensor)
 {
   kvDataFactory f(42, "2006-05-26 06:00:00", 302, 1, 0 );
   kvData d = f.getData(5, 110);
-  db->getConnection()->exec( "insert into data values " + d.toSend() );
+  db.getConnection()->exec( "insert into data values " + d.toSend() );
 
   runCheckRunner( __func__ );
 
@@ -551,24 +547,24 @@ void CheckRunnerTest::testChecksNonstandardSensor()
 //  for ( vector<kvData>::const_iterator it = result.begin(); it != result.end(); ++ it )
 //    cout << * it << endl;
   
-  CPPUNIT_ASSERT_EQUAL( size_t( 1 ), result.size() );
-  CPPUNIT_ASSERT( result.front().controlinfo() != kvControlInfo() );
+  ASSERT_EQ( size_t( 1 ), result.size() );
+  EXPECT_TRUE( result.front().controlinfo() != kvControlInfo() );
 }
 
-void CheckRunnerTest::testOnlyUsesSpecificLevel()
+TEST_F(CheckRunnerTest, testOnlyUsesSpecificLevel)
 {
   kvDataFactory f0(42, "2006-05-26 06:00:00", 302);
   kvData d0a = f0.getData(1, 112);
-  db->getConnection()->exec( "insert into data values " + d0a.toSend() );
+  db.getConnection()->exec( "insert into data values " + d0a.toSend() );
   // don't send this to the database:
   kvData d0b = f0.getMissing(42);
-  db->getConnection()->exec( "insert into data values " + d0b.toSend() );
+  db.getConnection()->exec( "insert into data values " + d0b.toSend() );
   
   kvDataFactory f25(42, "2006-05-26 06:00:00", 302, 0, 25 );
   kvData d25a = f25.getData(2, 112);
-  db->getConnection()->exec( "insert into data values " + d25a.toSend() );
+  db.getConnection()->exec( "insert into data values " + d25a.toSend() );
   kvData d25b = f25.getData(2, 42);
-  db->getConnection()->exec( "insert into data values " + d25b.toSend() );
+  db.getConnection()->exec( "insert into data values " + d25b.toSend() );
 
   runCheckRunner( __func__ );
 
@@ -580,32 +576,32 @@ void CheckRunnerTest::testOnlyUsesSpecificLevel()
   
   vector<kvData>::const_iterator L0 = find_if(result.begin(), result.end(), 
       std::bind2nd( kvalobs::compare::same_kvData(), d0a ) );
-  CPPUNIT_ASSERT( L0 != result.end() );
-  CPPUNIT_ASSERT_EQUAL( 8, L0->controlinfo().flag(2) );
+  ASSERT_TRUE( L0 != result.end() );
+  EXPECT_EQ( 8, L0->controlinfo().flag(2) );
   // 9 probably means level 0 data was checked against level 25 data
   // 0 means check was skipped, or that test results were not stored
   
   
   vector<kvData>::const_iterator L25 = find_if(result.begin(), result.end(), 
       std::bind2nd( kvalobs::compare::same_kvData(), d25a ) );
-  CPPUNIT_ASSERT( L25 != result.end() );
-  CPPUNIT_ASSERT_EQUAL( 2, L25->controlinfo().flag(2) );
+  ASSERT_TRUE( L25 != result.end() );
+  EXPECT_EQ( 2, L25->controlinfo().flag(2) );
 }
 
-void CheckRunnerTest::testOnlyUsesSpecificSensor()
+TEST_F(CheckRunnerTest, testOnlyUsesSpecificSensor)
 {
   kvDataFactory f0(42, "2006-05-26 06:00:00", 302);
   kvData d0a = f0.getData(1, 112);
-  db->getConnection()->exec( "insert into data values " + d0a.toSend() );
+  db.getConnection()->exec( "insert into data values " + d0a.toSend() );
   // don't send this to the database:
   kvData d0b = f0.getMissing(42);
-  db->getConnection()->exec( "insert into data values " + d0b.toSend() );
+  db.getConnection()->exec( "insert into data values " + d0b.toSend() );
   
   kvDataFactory f1(42, "2006-05-26 06:00:00", 302, 1 );
   kvData d1a = f1.getData(2, 112);
-  db->getConnection()->exec( "insert into data values " + d1a.toSend() );
+  db.getConnection()->exec( "insert into data values " + d1a.toSend() );
   kvData d1b = f1.getData(2, 42);
-  db->getConnection()->exec( "insert into data values " + d1b.toSend() );
+  db.getConnection()->exec( "insert into data values " + d1b.toSend() );
 
   runCheckRunner( __func__ );
 
@@ -617,34 +613,34 @@ void CheckRunnerTest::testOnlyUsesSpecificSensor()
   
   vector<kvData>::const_iterator L0 = find_if(result.begin(), result.end(), 
       std::bind2nd( kvalobs::compare::same_kvData(), d0a ) );
-  CPPUNIT_ASSERT( L0 != result.end() );
-  CPPUNIT_ASSERT_EQUAL( 8, L0->controlinfo().flag(2) );
+  ASSERT_TRUE( L0 != result.end() );
+  EXPECT_EQ( 8, L0->controlinfo().flag(2) );
   // 9 probably means level 0 data was checked against sensor 1 data
   // 0 means check was skipped, or that test results were not stored
   
   
   vector<kvData>::const_iterator L1 = find_if(result.begin(), result.end(), 
       std::bind2nd( kvalobs::compare::same_kvData(), d1a ) );
-  CPPUNIT_ASSERT( L1 != result.end() );
-  CPPUNIT_ASSERT_EQUAL( 2, L1->controlinfo().flag(2) );
+  ASSERT_TRUE( L1 != result.end() );
+  EXPECT_EQ( 2, L1->controlinfo().flag(2) );
 }
 
-void CheckRunnerTest::testOnlyUsesSpecificStationWithSpecificLevel()
+TEST_F(CheckRunnerTest, testOnlyUsesSpecificStationWithSpecificLevel)
 {
   // station 9, level 25
   kvDataFactory f_s9_l25(9, "2006-05-26 06:00:00", 302, 0, 25);
   kvData d_s9_l25 = f_s9_l25.getData(0, 112);
-  db->getConnection()->exec( "insert into data values " + d_s9_l25.toSend() );
+  db.getConnection()->exec( "insert into data values " + d_s9_l25.toSend() );
   
   // station 9, level 0
   kvDataFactory f_s9_l0(9, "2006-05-26 06:00:00", 302 );
   kvData d_s9_l0 = f_s9_l0.getData(0, 112);
-  db->getConnection()->exec( "insert into data values " + d_s9_l0.toSend() );
+  db.getConnection()->exec( "insert into data values " + d_s9_l0.toSend() );
 
   // station 42, level 25
   kvDataFactory f_s42_l25(42, "2006-05-26 06:00:00", 302, 0, 25);
   kvData d_s42_l25 = f_s42_l25.getData(0, 112);
-  db->getConnection()->exec( "insert into data values " + d_s42_l25.toSend() );
+  db.getConnection()->exec( "insert into data values " + d_s42_l25.toSend() );
   
   kvalobs::kvStationInfo si( 9, "2006-05-26 06:00:00", 302 );
   runCheckRunner( __func__, si );
@@ -655,20 +651,20 @@ void CheckRunnerTest::testOnlyUsesSpecificStationWithSpecificLevel()
 //  for ( vector<kvData>::const_iterator it = result.begin(); it != result.end(); ++ it )
 //    cout << * it << endl;
  
-  CPPUNIT_ASSERT_EQUAL( size_t(3), result.size() );
+  ASSERT_EQ( size_t(3), result.size() );
 
   vector<kvData>::const_iterator find = std::find_if(result.begin(), result.end(), 
       std::bind2nd( kvalobs::compare::same_kvData(), d_s9_l25 ) );
-  CPPUNIT_ASSERT( find != result.end() );
-  CPPUNIT_ASSERT_EQUAL( 3, find->controlinfo().flag(5) );
+  ASSERT_TRUE( find != result.end() );
+  EXPECT_EQ( 3, find->controlinfo().flag(5) );
   
   find = std::find_if(result.begin(), result.end(), 
         std::bind2nd( kvalobs::compare::same_kvData(), d_s9_l0 ) );
-  CPPUNIT_ASSERT( find != result.end() );
-  CPPUNIT_ASSERT( ! find->controlinfo().flag(5) );
+  ASSERT_TRUE( find != result.end() );
+  EXPECT_TRUE( ! find->controlinfo().flag(5) );
   
   find = std::find_if(result.begin(), result.end(), 
         std::bind2nd( kvalobs::compare::same_kvData(), d_s42_l25 ) );
-  CPPUNIT_ASSERT( find != result.end() );
-  CPPUNIT_ASSERT( ! find->controlinfo().flag(5) );
+  ASSERT_TRUE( find != result.end() );
+  EXPECT_TRUE( ! find->controlinfo().flag(5) );
 }

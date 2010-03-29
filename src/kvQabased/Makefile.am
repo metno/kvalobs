@@ -60,9 +60,10 @@ check_PROGRAMS = kvQabasedTest
 
 kvQabasedTest_SOURCES= \
 	test/test.cc \
-	test/kvalobscachetest.h test/kvalobscachetest.cc \
-	test/checkrunnertest.h test/checkrunnertest.cc \
-	test/database/kvalobsdatabase.h test/database/kvalobsdatabase.cc \
+	test/kvalobscachetest.cc \
+	test/checkrunnertest.cc \
+	test/database/kvalobsdatabase.h \
+	test/database/kvalobsdatabase.cc \
 	$(kvQabased_SOURCES:kvQabased.cc=)
 
 #	-DSETUPDB_SQL=\"$(srcdir)/test/database/setupdb.sql\"
@@ -75,12 +76,12 @@ kvQabasedTest_CPPFLAGS = \
 	-DSETUPDB_SQL=$(SETUP_DB) \
 	-DCHECKRUNNERTEST_INIT_SQL=\"$(srcdir)/test/etc/checkrunnertest.init.sql\" \
 	$(kvQabased_CPPFLAGS) \
-	$(cppunit_CFLAGS) \
+	$(gtest_CFLAGS) \
 	-DLOG_CHECK_SCRIPT 
 	
 kvQabasedTest_LDADD = \
 	$(kvQabased_LDADD) \
-	$(cppunit_LIBS)
+	$(gtest_LIBS)
 	
 EXTRA_DIST = \
 	test/database/setupdb.sql \
