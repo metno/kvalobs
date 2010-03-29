@@ -706,13 +706,12 @@ void kvQABaseMeteodata::setMissing(ScriptReturnType::const_iterator param,
 			"kvQABaseMeteodata::updateParameters controlinfo BEFORE:" << cinfo << endl );
 
 	int newVal = static_cast<int> (param->second);
-	if (newVal >= 2)
-		kvalobs::reject(newdata);
-	else
-	{
-		cinfo.setControlFlag(kvQCFlagTypes::f_fmis, newVal);
-		newdata.controlinfo(cinfo);
-	}
+	cinfo.setControlFlag(kvQCFlagTypes::f_fmis, newVal);
+	newdata.controlinfo(cinfo);
+	if ( newVal == 3 )
+		newdata.corrected(-32767);
+	else if ( newVal == 2 )
+		newdata.corrected(-32766);
 
 	IDLOGINFO( "html", "kvQABaseMeteodata::updateParameters controlinfo  AFTER:" << newdata.controlinfo() << endl <<
 			"=====================================================" << endl );

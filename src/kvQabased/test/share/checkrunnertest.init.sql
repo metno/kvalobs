@@ -85,9 +85,9 @@ insert into algorithms values (1,'RANGE_CHECK', 'obs;X;;|meta;X_1,X_2,X_3,X_4,X_
 
 sub check {
 #tolererer ingen manglende observasjoner:
-   #if ( $X_missing[0] > 0 ) {
-   #   return 0;
-   # }
+   if ( $X_missing[0] > 0 ) {
+      return 0;
+    }
 
     my $flag = 1;
 
