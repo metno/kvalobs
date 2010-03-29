@@ -34,5 +34,4 @@ kvSynopDecodeTest_SOURCES = test/kvSynopDecodeTest.cc \
 
 kvSynopDecodeTest_CPPFLAGS = $(synop_la_CPPFLAGS)
 kvSynopDecodeTest_LDFLAGS = -lgtest \
-                            $(top_builddir)/src/service-libs/kvcpp/libkvalobs_kvcpp.la \
-                            $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la
+                            $(synop_la_LIBADD)

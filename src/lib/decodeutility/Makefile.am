@@ -1,4 +1,4 @@
-AM_CPPFLAGS = -I$(top_srcdir)/src/lib
+AM_CPPFLAGS = -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib/ -I$(top_builddir)/src/lib/kvskel
 
 lib_LTLIBRARIES = libkvalobs_decodeutility.la
 
@@ -45,23 +45,10 @@ decodeutilitytest_SOURCES = \
 	test/kvDataFormatterTest.cc \
 	test/test.cc
 
-decodeutilitytest_CPPFLAGS = $(AM_CPPFLAGS) \
-	-I$(top_srcdir)/src/service-libs \
-	-I$(top_builddir)/src/lib/kvskel \
-	-I.. $(libdecodeutility_la_CPPFLAGS) \
-	$(gtest_CFLAGS)
+decodeutilitytest_CPPFLAGS = $(libkvalobs_decodeutility_la_CPPFLAGS) $(gtest_CFLAGS)
 	
 
 decodeutilitytest_LDADD = \
-	libdecodeutility.la \
-	../kvalobs/libkvalobs_kvalobs.la \
-	../milog/libkvalobs_milog.la \
-	../miutil/libkvalobs_miutil.la \
-	../kvdb/libkvalobs_kvdb.la \
-	../fileutil/libkvalobs_fileutil.la \
-	../corbahelper/libkvalobs_corbahelper.la \
-	../miconfparser/libkvalobs_miconfparser.a \
-	../dnmithread/libkvalobs_dnmithread.la \
+	libkvalobs_decodeutility.la \
+	$(libkvalobs_decodeutility_la_LIBADD) \
 	$(gtest_LIBS)
-
-decodeutilitytest_LDFLAGS = $(libdecodeutility_la_LDFLAGS) $(cppunit_LIBS) 
