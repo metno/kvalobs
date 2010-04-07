@@ -58,7 +58,7 @@ dnmi::db::drivers::SQLiteDriver::createConnection(const std::string &connect)
     con=new SQLiteConnection(connect, name());
   }
   catch(...){
-    setErrMsg("Out of memmory!");
+    setErrMsg("Out of memory!");
     return 0;
   }
 
@@ -92,18 +92,15 @@ dnmi::db::drivers::SQLiteConnection::SQLiteConnection(
 					      const std::string &driverId)
   :Connection(driverId), con(0)
 {
-  char *msg=0;
   int res = sqlite3_open( connect.c_str(), & con );
+  if ( SQLITE_OK != res )
+  {
+	  errMsg = sqlite3_errmsg(con);
+	  con = 0;
+  }
 
   if(con)
     sqlite3_busy_timeout(con, 5000); //sets busy timeout to 5 second.
-
-  errMsg.erase();
-
-  if(msg){
-    errMsg=msg;
-    free(msg);
-  }
 }
 
 dnmi::db::drivers::SQLiteConnection::~SQLiteConnection()
