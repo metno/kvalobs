@@ -40,6 +40,7 @@
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
+#include <kvalobs/kvPath.h>
 
 #include "ReadProgramOptions.h"
 
@@ -61,34 +62,26 @@ int
 ReadProgramOptions::
 SelectConfigFiles( std::vector<string>& config_files)
 {
-     
-       //std::string filename;
-       //filename="gordon";
-       //config_files.push_back(filename);
 
 try{
-       char *pKv=getenv("KVALOBS"); 
-       fs::path config_path(string(pKv)+"/Qc2Config/");
+  //char *pKv=getenv("KVALOBS");
+
+       fs::path config_path(kvPath("sysconfdir")+"/Qc2Config/");
        
        // scan for files
        std::cout << "Scanning For Files" << std::endl;   
        fs::directory_iterator end_iter; // By default this is pass the end of a directory !
        fs::path full_path( fs::initial_path() );
        full_path = fs::system_complete( config_path );
-       
+       // std::cout << full_path.native_file_string()<<std::endl;
        std::string filename;
 
-       std::cout << full_path << std::endl;
-
        if ( !fs::exists( full_path ) ) {
-           //std::cout << "Does not exist: " << full_path.native_file_string() <<std::endl;
-           std::cout << "Does not exist: " << full_path.file_string() <<std::endl;
+           std::cout << "Does not exist: " << full_path.native_file_string() <<std::endl;
        }
        else {
            for ( fs::directory_iterator dit( full_path ); dit != end_iter; ++dit ) {
-              //std::cout << dit->path() << std::endl;
-              //std::cout << dit->leaf() << std::endl;
-              filename=dit->path().native_file_string();
+              filename=dit->native_file_string();
               if ( filename.substr(filename.length()-3,3) == "cfg") {
                    config_files.push_back(filename);
                    std::cout << "Configuration File Found: " << filename << std::endl; 
@@ -100,7 +93,7 @@ try{
        std::cout << "Problem with configuration files for Qc2" << std::endl;
        std::cout << ecfg.what() << std::endl;
        return 1;
-   } 
+   }
 return 0;
 }
 
@@ -118,9 +111,6 @@ int RunHour;
 int ParamId;
 int TypeId;
 int MissingValue;
-int MinValue;
-std::string BestStationFilename;
-std::string CfailedString;
 float InterpolationDistance;
 // Test control flag paramters
 unsigned char z_fqclevel,z_fr,z_fcc,z_fs,z_fnum,z_fpos,z_fmis,z_ftime,z_fw,z_fstat,z_fcp,z_fclim,z_fd,z_fpre,z_fcombi,z_fhqc;
@@ -131,7 +121,6 @@ unsigned char A_fqclevel,A_fr,A_fcc,A_fs,A_fnum,A_fpos,A_fmis,A_ftime,A_fw,A_fst
 unsigned char W_fqclevel,W_fr,W_fcc,W_fs,W_fnum,W_fpos,W_fmis,W_ftime,W_fw,W_fstat,W_fcp,W_fclim,W_fd,W_fpre,W_fcombi,W_fhqc; //WRITE
 // CONTROL FLAGS TO SET 
 unsigned char S_fqclevel,S_fr,S_fcc,S_fs,S_fnum,S_fpos,S_fmis,S_ftime,S_fw,S_fstat,S_fcp,S_fclim,S_fd,S_fpre,S_fcombi,S_fhqc; //SET
-
 
 std::vector<unsigned char> V_fqclevel,V_fr,V_fcc,V_fs,V_fnum,V_fpos,V_fmis,V_ftime,V_fw,V_fstat,V_fcp,V_fclim,V_fd,V_fpre,V_fcombi,V_fhqc; //For algorithms which need multiple control options for the same flag
 
@@ -178,12 +167,8 @@ try{
         ("ControlString",po::value<std::string>  (&ControlString),  "Control Info")
         ("ControlVector",po::value<std::vector<int> > (&ControlVector),  "Control Vector")
 
-        ("BestStationFilename",po::value<std::string> (&BestStationFilename)->default_value("NotSet"),  "Filename containing the best station list")
-        ("CfailedString",po::value<std::string> (&CfailedString)->default_value(""),  "Value to add to CFAILED if the algorithm runs and writes data back to the database")
-
         ("MissingValue",po::value<int>(&MissingValue)->default_value(-32767),  "Original Missing Data Value") /// could also rely on fmis here !!??
-        ("MinValue",po::value<int>(&MinValue)->default_value(-32767),  "Minimum Data Value FOr Some Controls") 
-        ("InterpolationDistance",po::value<float>(&InterpolationDistance)->default_value(25),  "Nearest Neighbour Limiting Distance") 
+        ("InterpolationDistance",po::value<float>(&InterpolationDistance)->default_value(0),  "Nearest Nieighboue Limiting Distance") 
 
         ("z_fqclevel",po::value<unsigned char>  (&z_fqclevel)->default_value(0x3F),  "fqclevel")
         ("z_fr",po::value<unsigned char>  (&z_fr)->default_value(0x3F),  "fr")
@@ -202,8 +187,6 @@ try{
         ("z_fcombi",po::value<unsigned char>  (&z_fcombi)->default_value(0x3F),  "fcombi")
         ("z_fhqc",po::value<unsigned char>  (&z_fhqc)->default_value(0x3F),  "fhqc")
 
-        ("zbool",po::value<bool>  (&zbool)->default_value(true),  "Option to change logic of all flag controls")
-
         ("R_fqclevel",po::value<unsigned char>  (&R_fqclevel)->default_value(0x3F),  "fqclevel")
         ("R_fr",po::value<unsigned char>  (&R_fr)->default_value(0x3F),  "fr")
         ("R_fcc",po::value<unsigned char>  (&R_fcc)->default_value(0x3F),  "fcc")
@@ -220,8 +203,6 @@ try{
         ("R_fpre",po::value<unsigned char>  (&R_fpre)->default_value(0x3F),  "fpre")
         ("R_fcombi",po::value<unsigned char>  (&R_fcombi)->default_value(0x3F),  "fcombi")
         ("R_fhqc",po::value<unsigned char>  (&R_fhqc)->default_value(0x3F),  "fhqc")
-
-        ("Rbool",po::value<bool>  (&Rbool)->default_value(true),  "Option to change logic of all flag controls")
 
         ("I_fqclevel",po::value<unsigned char>  (&I_fqclevel)->default_value(0x3F),  "fqclevel")
         ("I_fr",po::value<unsigned char>  (&I_fr)->default_value(0x3F),  "fr")
@@ -240,8 +221,6 @@ try{
         ("I_fcombi",po::value<unsigned char>  (&I_fcombi)->default_value(0x3F),  "fcombi")
         ("I_fhqc",po::value<unsigned char>  (&I_fhqc)->default_value(0x3F),  "fhqc")
 
-        ("Ibool",po::value<bool>  (&Ibool)->default_value(true),  "Option to change logic of all flag controls")
-
         ("A_fqclevel",po::value<unsigned char>  (&A_fqclevel)->default_value(0x3F),  "fqclevel")
         ("A_fr",po::value<unsigned char>  (&A_fr)->default_value(0x3F),  "fr")
         ("A_fcc",po::value<unsigned char>  (&A_fcc)->default_value(0x3F),  "fcc")
@@ -258,8 +237,6 @@ try{
         ("A_fpre",po::value<unsigned char>  (&A_fpre)->default_value(0x3F),  "fpre")
         ("A_fcombi",po::value<unsigned char>  (&A_fcombi)->default_value(0x3F),  "fcombi")
         ("A_fhqc",po::value<unsigned char>  (&A_fhqc)->default_value(0x3F),  "fhqc")
-
-        ("Abool",po::value<bool>  (&Abool)->default_value(true),  "Option to change logic of all flag controls")
 
         ("W_fqclevel",po::value<unsigned char>  (&W_fqclevel)->default_value(0x3F),  "fqclevel")
         ("W_fr",po::value<unsigned char>  (&W_fr)->default_value(0x3F),  "fr")
@@ -278,8 +255,6 @@ try{
         ("W_fcombi",po::value<unsigned char>  (&W_fcombi)->default_value(0x3F),  "fcombi")
         ("W_fhqc",po::value<unsigned char>  (&W_fhqc)->default_value(0x3F),  "fhqc")
 
-        ("Wbool",po::value<bool>  (&Wbool)->default_value(true),  "Option to change logic of all flag controls")
-
         ("S_fqclevel",po::value<unsigned char>  (&S_fqclevel)->default_value(0x3F),  "fqclevel")
         ("S_fr",po::value<unsigned char>  (&S_fr)->default_value(0x3F),  "fr")
         ("S_fcc",po::value<unsigned char>  (&S_fcc)->default_value(0x3F),  "fcc")
@@ -296,7 +271,6 @@ try{
         ("S_fpre",po::value<unsigned char>  (&S_fpre)->default_value(0x3F),  "fpre")
         ("S_fcombi",po::value<unsigned char>  (&S_fcombi)->default_value(0x3F),  "fcombi")
         ("S_fhqc",po::value<unsigned char>  (&S_fhqc)->default_value(0x3F),  "fhqc")
-
 
         ("V_fqclevel",po::value<std::vector<unsigned char> >  (&V_fqclevel),  "fqclevel")
         ("V_fr",po::value<std::vector<unsigned char> >  (&V_fr),  "fr")
@@ -340,10 +314,7 @@ try{
          ControlInfoString=ControlString;
          ControlInfoVector=ControlVector;
          InterpolationLimit=InterpolationDistance;
-         NeighbourFilename=BestStationFilename;
-         CFAILED_STRING=CfailedString;
          missing=MissingValue;
-         MinimumValue=MinValue;
          std::cout << miutil::miTime::nowTime() << ": " << UT0 << " -> " << UT1 << "  " << filename << std::endl;
 
 
