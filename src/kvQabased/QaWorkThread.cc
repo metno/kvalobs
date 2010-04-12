@@ -159,34 +159,47 @@ void QaWork::operator()()
 
 	while (!app.shutdown())
 	{
-		auto_ptr<const dnmi::thread::CommandBase> cmd(app.getInQue().get(1));
-		if (!cmd.get())
+		try
 		{
-			connectionHandler.notNeeded();
-			continue;
-		}
-		if (app.shutdown())
-			continue;
-
-		LOGINFO( "QaWork: command received....\n" );
-
-		const QaWorkCommand * work =
-				dynamic_cast<const QaWorkCommand*> (cmd.get());
-
-		// The list will have one and only one element when it is received from kvManager.
-		if (work and not work->getStationInfo().empty())
-		{
-			dnmi::db::Connection * con = connectionHandler.getConnection();
-			if (!con)
+			auto_ptr<const dnmi::thread::CommandBase> cmd(app.getInQue().get(1));
+			if (!cmd.get())
 			{
-				LOGERROR( "Could not get connection to database" );
+				connectionHandler.notNeeded();
 				continue;
 			}
-			if (not app.shutdown())
-				process(*con, *work);
+			if (app.shutdown())
+				continue;
+
+			LOGINFO( "QaWork: command received....\n" );
+
+			const QaWorkCommand * work =
+					dynamic_cast<const QaWorkCommand*> (cmd.get());
+
+			// The list will have one and only one element when it is received from kvManager.
+			if (work and not work->getStationInfo().empty())
+			{
+				dnmi::db::Connection * con = connectionHandler.getConnection();
+				if (!con)
+				{
+					LOGERROR( "Could not get connection to database" );
+					continue;
+				}
+				if (not app.shutdown())
+					process(*con, *work);
+			}
+			else
+			LOGERROR( "QaWork: Unexpected command ....\n" );
 		}
-		else
-		LOGERROR( "QaWork: Unexpected command ....\n" );
+		catch ( std::bad_alloc & )
+		{
+			LOGFATAL("Memory allocation error!");
+			app.doShutdown();
+			break;
+		}
+		catch (std::exception & e )
+		{
+			LOGERROR(std::string("Error when processing data set: ") + e.what())
+		}
 	}
 	LOGINFO( "QaWork: Thread terminating!" );
 }
@@ -252,8 +265,5 @@ void QaWork::doWork(const kvalobs::kvStationInfo & params,
 			LOGERROR("Error when trying to open log file. Trying " << devnull << " instead.");
 			doWork(params, retList, con, devnull);
 		}
-	} catch (std::exception & e)
-	{
-		LOGERROR( e.what() );
 	}
 }

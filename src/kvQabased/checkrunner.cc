@@ -40,6 +40,7 @@
 //#include "kvQABaseMetadata.h"
 
 #include <list>
+#include <new>
 
 #include <milog/milog.h>
 
@@ -293,7 +294,12 @@ void CheckRunner::operator()(bool forceCheck)
 		} catch (kvQABaseMeteodata::SkipCheck &)
 		{
 			log_("CheckRunner::runCheck skipping check (obs_program)");
-		} catch (std::exception & e)
+		} catch ( std::bad_alloc & e )
+		{
+			LOGERROR(e.what());
+			logEnd_(e.what(), Error);
+			throw;
+		}catch (std::exception & e)
 		{
 			log_(e.what(), Error);
 		}
