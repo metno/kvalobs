@@ -50,7 +50,7 @@ endif
 	./configure --prefix=/usr  --enable-model2kv \
 	    --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info  \
 	    --localstatedir=/var --sysconfdir=/etc \
-	    CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)"
+	    CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" PKG_CONFIG_PATH=/usr/lib/pkgconfig
 
 #	./configure --prefix=/usr   --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info  --localstatedir=/var --sysconfdir=/etc CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)"
 
@@ -101,7 +101,13 @@ install-indep:
 
 	dh_install -i
 
-install-arch:
+db_install_script: src/kvalobs_database/kvalobs_roles.sql src/kvalobs_database/kvalobs_schema.sql
+	cat src/kvalobs_database/kvalobs_roles.sql >> $@
+	echo "BEGIN;" >> $@
+	cat src/kvalobs_database/kvalobs_schema.sql >> $@
+	echo "END;" >> $@
+
+install-arch:	db_install_script
 	dh_testdir
 	dh_testroot
 	dh_clean -k -s 
@@ -128,6 +134,13 @@ install-arch:
 	(cd debian/mi-src-$(MI_SRC_DATE); $(MAKE) OSTYPE=linux; $(MAKE) OSTYPE=linux install)
 
 	dh_install -s --sourcedir=debian/tmp
+
+	cp db_install_script debian/kvalobs/usr/share/dbconfig-common/data/kvalobs/install-dbadmin/pgsql
+	for F in src/kvalobs_database/upgrade/*.sql; do \
+		cp $$F debian/kvalobs/usr/share/dbconfig-common/data/kvalobs/upgrade/pgsql/`basename $$F .sql`; \
+	done
+
+
 # Must not depend on anything. This is to be called by
 # binary-arch/binary-indep
 # in another 'make' thread.

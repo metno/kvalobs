@@ -28,7 +28,7 @@ case "$1" in
     ;;
 
   purge)
-  		deluser --remove-home $KV_USER
+  		deluser $KV_USER
      ;;
    
     *)
