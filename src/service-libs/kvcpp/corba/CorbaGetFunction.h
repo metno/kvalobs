@@ -39,6 +39,7 @@
 #include <kvalobs/kvParam.h>
 #include <kvalobs/kvStation.h>
 #include <kvalobs/kvStationParam.h>
+#include <kvalobs/kvStationMetadata.h>
 #include <kvalobs/kvTypes.h>
 #include <kvalobs/kvObsPgm.h>
 #include <kvalobs/kvOperator.h>
@@ -175,6 +176,18 @@ class getKvStationParamFunc: public CorbaGetFunction
 public:
 	getKvStationParamFunc(std::list<kvalobs::kvStationParam> &stParam,
 			int stationid, int paramid, int day);
+protected:
+	virtual bool process(CKvalObs::CService::kvService_ptr service);
+};
+
+class getKvStationMetaDataFunc: public CorbaGetFunction
+{
+	std::list<kvalobs::kvStationMetadata> &stParam;
+	int stationid;
+	std::string metadataName_;
+public:
+	getKvStationMetaDataFunc(std::list<kvalobs::kvStationMetadata> &stParam,
+			int stationid, const std::string & metadataName);
 protected:
 	virtual bool process(CKvalObs::CService::kvService_ptr service);
 };

@@ -34,7 +34,8 @@ libkvalobs_kvalobs_la_SOURCES = \
 	kvOperator.cc \
 	kvDataOperations.cc \
 	kvTextDataOperations.cc \
-	kvPsSubscribers.cc
+	kvPsSubscribers.cc \
+	kvStationMetadata.cc
 
 
 libkvalobs_kvalobs_la_CPPFLAGS = $(AM_CPPFLAGS) $(putools_CFLAGS) \
@@ -93,4 +94,5 @@ kvalobsinclude_HEADERS = \
 	kvTextDataOperations.h \
 	kvPsSubscribers.h \
 	kvQCFlagTypes.h \
-	kvexception.h
+	kvexception.h \
+	kvStationMetadata.h

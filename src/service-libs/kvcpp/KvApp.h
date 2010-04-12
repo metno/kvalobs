@@ -40,6 +40,7 @@
 #include <kvalobs/kvParam.h>
 #include <kvalobs/kvStation.h>
 #include <kvalobs/kvStationParam.h>
+#include <kvalobs/kvStationMetadata.h>
 #include <kvalobs/kvTypes.h>
 #include <kvalobs/kvObsPgm.h>
 #include <kvalobs/kvOperator.h>
@@ -154,6 +155,14 @@ namespace kvservice
        * \return true on success, otherwqise false.
        */
       virtual bool getKvStationParam( std::list<kvalobs::kvStationParam> &stParam, int stationid, int paramid = -1, int day = -1 ) =0;
+
+      /**
+       * \brief Get metadata for a specific station.
+       *
+       * \param stMeta The list to be populated with station metadata.
+       * \param stationid the stationid for which parameters is to be fetched.
+       */
+      virtual bool getKvStationMetaData( std::list<kvalobs::kvStationMetadata> &stMeta, int stationid, const std::string & metadataName = "") =0;
 
        /**
        * \brief return the observation programs.

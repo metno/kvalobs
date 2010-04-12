@@ -307,6 +307,36 @@ bool getKvStationParamFunc::process(kvService_ptr service)
 	return ok;
 }
 
+
+getKvStationMetaDataFunc::getKvStationMetaDataFunc(list<kvStationMetadata> &stParam,
+		int stationid, const std::string & metadataName) :
+	stParam(stParam), stationid(stationid), metadataName_(metadataName)
+{
+}
+
+bool getKvStationMetaDataFunc::process(kvService_ptr service)
+{
+//	CKvalObs::CService::Station_paramList *stp;
+//	bool ok = service->getStationParam(stp, stationid, paramid, day);
+//	if (ok)
+//	{
+//		stParam.clear();
+//		for (CORBA::ULong i = 0; i < stp->length(); i++)
+//		{
+//			kvStationParam param((*stp)[i].stationid, (*stp)[i].paramid,
+//					(*stp)[i].level, ((char*) (*stp)[i].sensor)[0] - '0',
+//					(*stp)[i].fromday, (*stp)[i].today, (*stp)[i].hour,
+//					miString((*stp)[i].qcx), miString((*stp)[i].metadata),
+//					miString((*stp)[i].desc_metadata), miTime(
+//							(*stp)[i].fromtime));
+//			stParam.push_back(param);
+//		}
+//	}
+//	return ok;
+	return true;
+}
+
+
 getKvObsPgmFunc::getKvObsPgmFunc(list<kvObsPgm> &obsPgm,
 		const list<long> &stationList, bool aUnion) :
 	obsPgmList(obsPgm), stationList(stationList), aUnion(aUnion)

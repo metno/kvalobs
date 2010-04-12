@@ -200,7 +200,23 @@ module CKvalObs{
 
     typedef sequence<Station_param> Station_paramList;
 
+    
+    struct Station_metadata {
+        long stationid;
+        long paramid;
+        long typeID_;
+        long level;
+        string sensor;
+        string metadatatypename;
+        float metadata;
+        string metadataDescription;
+        string fromtime;
+        string totime;
+    };
 
+    typedef sequence<Station_metadata> Station_metadataList;
+
+    
     struct Rejectdecode{
       string message;
       string tbtime;
