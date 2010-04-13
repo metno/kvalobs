@@ -206,7 +206,7 @@ module CKvalObs{
         long paramid;
         long typeID_;
         long level;
-        string sensor;
+        long sensor;
         string metadatatypename;
         float metadata;
         string metadataDescription;

@@ -156,12 +156,16 @@ namespace kvservice
        */
       virtual bool getKvStationParam( std::list<kvalobs::kvStationParam> &stParam, int stationid, int paramid = -1, int day = -1 ) =0;
 
-      /**
-       * \brief Get metadata for a specific station.
-       *
-       * \param stMeta The list to be populated with station metadata.
-       * \param stationid the stationid for which parameters is to be fetched.
-       */
+     /**
+      * \brief Get metadata for a specific station.
+      *
+      * \param stMeta The list to be populated with station metadata.
+      * \param stationid the stationid for which parameters is to be fetched.
+      *    If stationid == -1, request metadata for all stations defined in the
+      *    station table.
+      * \param metadataName The name of the metadata we want. An empty string
+      *    request all metadata for the stationd.
+      */
       virtual bool getKvStationMetaData( std::list<kvalobs::kvStationMetadata> &stMeta, int stationid, const std::string & metadataName = "") =0;
 
        /**

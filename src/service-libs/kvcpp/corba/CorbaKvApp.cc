@@ -163,37 +163,37 @@ namespace kvservice
 
     kvService_ptr CorbaKvApp::lookUpManager( bool forceNS, bool & usedNS )
     {
-      CORBA::Object_var                 obj;
-      CKvalObs::CService::kvService_ptr ptr; 
-      std::string path(nameserverpath+"kvService");
-      usedNS=false;
+    	CORBA::Object_var                 obj;
+    	CKvalObs::CService::kvService_ptr ptr;
+    	std::string path(nameserverpath+"kvService");
+    	usedNS=false;
 
-      Lock lock(mutex);
+    	Lock lock(mutex);
     
-      while(true){
-	if(forceNS){
-	  usedNS=true;
+    	while(true){
+    		if(forceNS){
+    			usedNS=true;
 	  
-	  obj=getObjFromNS(path);
+    			obj=getObjFromNS(path);
 	  
-	  if(CORBA::is_nil(obj))
-	    throw LookUpException("EXCEPTION: Can't obtain a reference for 'kvService'\n           from the CORBA nameserver!");
+    			if(CORBA::is_nil(obj))
+    				throw LookUpException("EXCEPTION: Can't obtain a reference for 'kvService'\n           from the CORBA nameserver!");
 	  
-	  ptr=CKvalObs::CService::kvService::_narrow(obj);
+    			ptr=CKvalObs::CService::kvService::_narrow(obj);
 	  
-	  if(CORBA::is_nil(ptr))
-	    throw LookUpException("EXCEPTION: Can't narrow reference for 'kvService'!");
+    			if(CORBA::is_nil(ptr))
+    				throw LookUpException("EXCEPTION: Can't narrow reference for 'kvService'!");
 	  
-	  refService=CKvalObs::CService::kvService::_duplicate(ptr);
+    			refService=CKvalObs::CService::kvService::_duplicate(ptr);
 	  
-	  return ptr;
-	}
+    			return ptr;
+    		}
 	
-	if(CORBA::is_nil(refService))
-	  forceNS=true;
-	else
-	  return CKvalObs::CService::kvService::_duplicate(refService);
-      }
+    		if(CORBA::is_nil(refService))
+    			forceNS=true;
+    		else
+    		  return CKvalObs::CService::kvService::_duplicate(refService);
+    	}
     }
 
     bool CorbaKvApp::shutdown() const

@@ -48,7 +48,7 @@ CorbaKvApp *CorbaGetFunction::corbaApp = NULL;
 
 bool CorbaGetFunction::operator()(const char *name)
 {
-	CKvalObs::CService::kvService_ptr service;
+	CKvalObs::CService::kvService_var service;
 	bool forceNS = false;
 	bool usedNS;
 
@@ -316,24 +316,53 @@ getKvStationMetaDataFunc::getKvStationMetaDataFunc(list<kvStationMetadata> &stPa
 
 bool getKvStationMetaDataFunc::process(kvService_ptr service)
 {
-//	CKvalObs::CService::Station_paramList *stp;
-//	bool ok = service->getStationParam(stp, stationid, paramid, day);
-//	if (ok)
-//	{
-//		stParam.clear();
-//		for (CORBA::ULong i = 0; i < stp->length(); i++)
-//		{
-//			kvStationParam param((*stp)[i].stationid, (*stp)[i].paramid,
-//					(*stp)[i].level, ((char*) (*stp)[i].sensor)[0] - '0',
-//					(*stp)[i].fromday, (*stp)[i].today, (*stp)[i].hour,
-//					miString((*stp)[i].qcx), miString((*stp)[i].metadata),
-//					miString((*stp)[i].desc_metadata), miTime(
-//							(*stp)[i].fromtime));
-//			stParam.push_back(param);
-//		}
-//	}
-//	return ok;
-	return true;
+	CKvalObs::CService::kvServiceExt_var serviceext;
+
+	serviceext = CKvalObs::CService::kvServiceExt::_narrow( service );
+
+	if( CORBA::is_nil( serviceext ) ) {
+		LogContext context("getKvStationMetaData");
+		LOGERROR("getKvStationMetaData: Is not supported by the server.");
+		return false;
+	}
+	CKvalObs::CService::Station_metadataList *metadata;
+	bool ok = serviceext->getStationMetaData( metadata, stationid, metadataName_.c_str() );
+
+	if (ok )
+	{
+		int param_;
+		int type_;
+		int level_;
+		int sensor_;
+
+		int *paramPtr;
+		int *typePtr;
+		int *levelPtr;
+		int *sensorPtr;
+
+		stParam.clear();
+		for (CORBA::ULong i = 0; i < metadata->length(); i++)
+		{
+			param_ = (*metadata)[i].paramid;
+			type_ = (*metadata)[i].typeID_;
+			level_ = (*metadata)[i].level;
+			sensor_ = (*metadata)[i].sensor;
+
+			paramPtr  = param_ == kvDbBase::INT_NULL?0:&param_;
+			typePtr   = type_  == kvDbBase::INT_NULL?0:&type_;
+			levelPtr  = level_ == kvDbBase::INT_NULL?0:&level_;
+			sensorPtr = sensor_== kvDbBase::INT_NULL?0:&sensor_;
+
+			kvStationMetadata meta( (*metadata)[i].stationid, paramPtr, typePtr, levelPtr, sensorPtr,
+									 string( (*metadata)[i].metadatatypename ),
+									 (*metadata)[i].metadata,
+									 string( (*metadata)[i].metadataDescription ),
+									 miTime( (*metadata)[i].fromtime ),
+									 miTime( (*metadata)[i].totime ) );
+			stParam.push_back( meta );
+		}
+	}
+	return ok;
 }
 
 

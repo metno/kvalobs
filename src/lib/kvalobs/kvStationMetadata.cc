@@ -63,6 +63,19 @@ kvStationMetadata::kvStationMetadata(int station, const int * param, const int *
 {
 }
 
+kvStationMetadata::kvStationMetadata(const kvStationMetadata & d):
+		station_(d.station_),
+		param_(d.param_),
+		type_(d.type_ ),
+		level_(d.level_),
+		sensor_(d.sensor_),
+		name_(d.name_),
+		metadata_(d.metadata_),
+		description_(d.description_),
+		fromtime_(d.fromtime_),
+		totime_(d.totime_)
+{
+}
 
 kvStationMetadata::~kvStationMetadata()
 {
