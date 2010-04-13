@@ -1,6 +1,7 @@
 usr/bin/*
 usr/lib/kvalobs/bin/*
 usr/share/kvalobs/db/*.sql
+usr/share/kvalobs/db/upgrade/*.sql
 etc/kvalobs/kv_ctl.conf
 etc/kvalobs/kvcron
 etc/kvalobs/lam2kv/*
