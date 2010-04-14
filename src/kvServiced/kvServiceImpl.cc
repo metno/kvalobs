@@ -1324,6 +1324,8 @@ KvServiceImpl::getStationMetaData( Station_metadataList_out stMeta,
    bool       retRes=true;
 
    try{
+
+      LOGDEBUG( "Query: " << q.str() );
       auto_ptr<Result> res( con->execQuery(q.str()) );
 
       stMeta->length( res->size() );
@@ -1348,7 +1350,12 @@ KvServiceImpl::getStationMetaData( Station_metadataList_out stMeta,
 	      md.totime              = r[rPos++].c_str();
       }
    }
+   catch( const std::exception &ex ) {
+      LOGERROR( "EXCEPTION: Query:" << q.str() << endl << "Reason: " << ex.what() );
+      retRes=false;
+   }
    catch(...){
+      LOGERROR( "Unexpected EXCEPTION: Query:" << q.str() << endl << "Reason: Unknown.");
       retRes=false;
    }
 
