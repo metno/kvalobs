@@ -184,10 +184,11 @@ class getKvStationMetaDataFunc: public CorbaGetFunction
 {
 	std::list<kvalobs::kvStationMetadata> &stParam;
 	int stationid;
+	miutil::miTime obstime;
 	std::string metadataName_;
 public:
 	getKvStationMetaDataFunc(std::list<kvalobs::kvStationMetadata> &stParam,
-			int stationid, const std::string & metadataName);
+			int stationid, const miutil::miTime &obstime, const std::string & metadataName);
 protected:
 	virtual bool process(CKvalObs::CService::kvService_ptr service);
 };

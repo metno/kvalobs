@@ -309,8 +309,8 @@ bool getKvStationParamFunc::process(kvService_ptr service)
 
 
 getKvStationMetaDataFunc::getKvStationMetaDataFunc(list<kvStationMetadata> &stParam,
-		int stationid, const std::string & metadataName) :
-	stParam(stParam), stationid(stationid), metadataName_(metadataName)
+		int stationid, const miutil::miTime &obstime, const std::string & metadataName) :
+	stParam(stParam), stationid(stationid), obstime(obstime), metadataName_(metadataName)
 {
 }
 
@@ -326,7 +326,7 @@ bool getKvStationMetaDataFunc::process(kvService_ptr service)
 		return false;
 	}
 	CKvalObs::CService::Station_metadataList *metadata;
-	bool ok = serviceext->getStationMetaData( metadata, stationid, metadataName_.c_str() );
+	bool ok = serviceext->getStationMetaData( metadata, stationid, obstime.isoTime().c_str(), metadataName_.c_str() );
 
 	if (ok )
 	{

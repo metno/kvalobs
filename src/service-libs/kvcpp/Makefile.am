@@ -26,9 +26,7 @@ kvcppinclude_HEADERS = \
 	RejectdecodeIterator.h \
 	WhichDataHelper.h
 	
-libkvalobs_kvcpp_la_LDFLAGS= -rpath $(libdir) \
-                     -R $(libdir)/kvalobs \
-			         -version-info @KVALOBSLIBS_SO_VERSION@
+libkvalobs_kvcpp_la_LDFLAGS= -version-info @KVALOBSLIBS_SO_VERSION@
 
 libkvalobs_kvcpp_la_LIBADD = \
 	$(top_builddir)/src/service-libs/kvcpp/corba/libcorbakvapp.la \

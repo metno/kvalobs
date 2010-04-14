@@ -178,26 +178,60 @@ module CKvalObs{
 
     interface kvServiceExt : kvService {
 
+	  /**
+	   * Register a persistent subscriber with the kvalobs server.
+	   * For this to succeed the it must be set up an 
+	   * persistent subscriber id in the server.
+	   *
+	   * @param id An predefined persistent subscriber id.
+	   * @param sub A callback to call to notify the subscriber.
+	   * @return An empty SubscriberId on failure and a SubscribeId on success. The returned
+	   *    subscriberid may be different from the persistent \a id used in the call. Use the returned 
+	   *    id to unregister the subscriber. 
+	   */
       SubscribeId registerDataNotify(in SubscribeId id, 
 				     in kvDataNotifySubscriberExt sub);
 
+      /**
+	   * register a persistent subscriber with the kvalobs server.
+	   * For this to succeed the it must be set up an 
+	   * persistent subscriber id in the server.
+	   *
+	   * @param id An predefined persistent subscriber id.
+	   * @param sub A callback to call to send the data to the subscriber.
+	   * @return An empty SubscriberId on failure and a SubscribeId on success. The returned
+	   *    subscriberid may be different from the persistent \a id used in the call. Use the returned 
+	   *    id to unregister the subscriber.
+	   */
       SubscribeId registerData(in SubscribeId id, 
 			       in kvDataSubscriberExt sub);
+			       
+	  /**
+	   * Unregister a persistent subcriber. 
+	   *
+	   * @param id A subscriber id. The subscriber id must have been obtained from
+	   *   a previous call to registerDataNotify or registerData.
+	   * @return True on success and false otherwise. It return false if the id
+	   *    was not obtained with registerDataNotify or registerData. It may also 
+	   *    be false if the server previous has tryed to send data or notify the
+	   *    subscriber without success over a longer period. 
+	   */
+	  boolean     unregisterSubscriber( in SubscribeId id );
 
       boolean     getDataExt(in WhichDataExtList whichData, 
                              out DataIterator it);
                              
-                           /**
+      /**
        * \brief Get metadata for a specific station.
        *
-       * \param stMeta The list to be populated with station metadata.
-       * \param stationid the stationid for which parameters is to be fetched.
+       * @param stMeta The list to be populated with station metadata.
+       * @param stationid the stationid for which parameters is to be fetched.
        *    If stationid == -1, request metadata for all stations defined in the
        *    station table.
-       * \param metadataName The name of the metadata we want. An empty string 
+       * @param metadataName The name of the metadata we want. An empty string 
        *    request all metadata for the stationd.
        */   
-	  boolean getStationMetaData( out Station_metadataList stMeta, in long stationid, in string metadataName );
+	  boolean getStationMetaData( out Station_metadataList stMeta, in long stationid, in string obstime, in string metadataName );
     };
 
     interface DataReadyInput{

@@ -189,7 +189,11 @@ addToObsPgmList(CKvalObs::CService::Obs_pgmList &pgmList,
 	pgmUnion.paramID=-1;
 		
 	continue;
-      }
+      }  char* registerDataNotify(const char* id, kvDataNotifySubscriberExt_ptr sub);
+      char* registerData(const char* id, kvDataSubscriberExt_ptr sub);
+      CORBA::Boolean getDataExt(const WhichDataExtList& whichData, DataIterator_out it);
+      CORBA::Boolean getStationMetaData(Station_metadataList_out stMeta, ::CORBA::Long stationid, const char* metadataName);
+
   
       if(pgm.kl00)
 	pgmUnion.kl00=true;
@@ -1228,3 +1232,129 @@ getStationParam( CKvalObs::CService::Station_paramList_out spList,
 
   return retRes;
 }
+
+char*
+KvServiceImpl::registerDataNotify(const char* id, kvDataNotifySubscriberExt_ptr sub)
+{
+	LogContext context( "service/registerDataNotify" );
+	LOGWARN("service/registerDataNotify: NOT SUPPORTED");
+	return CORBA::string_dup("");
+}
+char*
+KvServiceImpl::registerData(const char* id, kvDataSubscriberExt_ptr sub)
+{
+	LogContext context( "service/registerData" );
+	LOGWARN("service/registerData: NOT SUPPORTED");
+	return CORBA::string_dup("");
+}
+
+CORBA::Boolean
+KvServiceImpl::unregisterSubscriber(const char *id)
+{
+	LogContext context( "service/unregister" );
+	LOGWARN("service/unregister: NOT SUPPORTED");
+	return false;
+}
+
+CORBA::Boolean
+KvServiceImpl::getDataExt(const WhichDataExtList& whichData, DataIterator_out it)
+{
+	LogContext context( "service/getDataExt" );
+	LOGWARN("service/getDataExt: NOT SUPPORTED");
+	return false;
+}
+
+CORBA::Boolean
+KvServiceImpl::getStationMetaData( Station_metadataList_out stMeta,
+		                           CORBA::Long stationid, const char* obstime_,
+		                           const char* metadataName )
+{
+   LogContext context( "service/getStationMetaData" );
+   Connection *con = app.getNewDbConnection();
+   miutil::miTime obstime;
+
+   if(!con) {
+      LOGWARN("Unable to create db connection.");
+      return false;
+   }
+
+   if( strlen( obstime_ ) > 0 ) {
+      obstime = miutil::miTime( obstime_ );
+
+      if( obstime.undef() ) {
+         LOGWARN("Invalid obstime <" << obstime_ << ">.");
+         return false;
+      }
+   }
+
+   LOGDEBUG("request: obstime: " << obstime_ << " stationid: " << stationid << " metadataName: " << metadataName );
+
+   stMeta = 0;
+
+   try {
+      stMeta = new CKvalObs::CService::Station_metadataList();
+   }
+   catch(...){
+      if( con )
+         app.releaseDbConnection(con);
+
+      LOGDEBUG("NOMEM!!!");
+      return false;
+   }
+
+
+   ostringstream q;
+
+   q << "SELECT s.stationid,  s.paramid, s.typeid, s.level, s.sensor, s.metadatatypename, s.metadata, "
+     << "m.description, s.fromtime, s.totime FROM station_metadata AS s, metadatatype AS m"
+     << " WHERE s.metadatatypename = m.metadatatypename ";
+
+   if( stationid > 0 )
+      q << " AND stationid=" << stationid;
+
+   if( metadataName && strlen(metadataName) >= 0 )
+      q << " AND s.metadatatypename=" << metadataName;
+
+   if( ! obstime.undef() )
+      q << " and fromtime<='" << obstime.isoTime() << "'"
+	     << " and totime>='" << obstime.isoTime() << "'";
+
+   q << " ORDER BY stationid, metadatatypename, fromtime";
+
+   bool       retRes=true;
+
+   try{
+      auto_ptr<Result> res( con->execQuery(q.str()) );
+
+      stMeta->length( res->size() );
+      int pos = -1;
+      CORBA::Long rPos;
+
+      while ( res->hasNext() ) {
+         DRow r = res->next();
+	      rPos = 0;
+	      pos++;
+	      Station_metadata &md = (*stMeta)[ pos ];
+
+	      md.stationid           = atol( r[rPos++].c_str() );
+	      md.paramid             = atol( r[rPos++].c_str() );
+	      md.typeID_             = atol( r[rPos++].c_str() );
+	      md.level               = atol( r[rPos++].c_str() );
+	      md.sensor              = atol( r[rPos++].c_str() );
+	      md.metadatatypename    = r[rPos++].c_str();
+	      md.metadata            = atof( r[rPos++].c_str() );
+	      md.metadataDescription = r[rPos++].c_str();
+	      md.fromtime            = r[rPos++].c_str();
+	      md.totime              = r[rPos++].c_str();
+      }
+   }
+   catch(...){
+      retRes=false;
+   }
+
+   app.releaseDbConnection(con);
+
+   return retRes;
+}
+
+

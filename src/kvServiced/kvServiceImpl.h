@@ -40,7 +40,7 @@
 #include <kvalobs/kvObsPgm.h>
 
 
-class KvServiceImpl: public virtual POA_CKvalObs::CService::kvService,
+class KvServiceImpl: public virtual POA_CKvalObs::CService::kvServiceExt,
 		     public virtual micutil::AdminInterface,
 		     public PortableServer::RefCountServantBase {
   
@@ -106,6 +106,17 @@ public:
 				  CORBA::Long stationid, 
 				  CORBA::Long paramid, 
 				  CORBA::Long day );
+
+  //This implements the new methods defined in kvServiceExt
+  char* registerDataNotify(const char* id, CKvalObs::CService::kvDataNotifySubscriberExt_ptr sub);
+  char* registerData(const char* id, CKvalObs::CService::kvDataSubscriberExt_ptr sub);
+
+  CORBA::Boolean unregisterSubscriber(const char *id);
+
+  CORBA::Boolean getDataExt(const CKvalObs::CService::WhichDataExtList& whichData, CKvalObs::CService::DataIterator_out it);
+  CORBA::Boolean getStationMetaData( CKvalObs::CService::Station_metadataList_out stMeta,
+		                             CORBA::Long stationid, const char* obstime, const char* metadataName);
+
 };
 
 

@@ -297,9 +297,9 @@ namespace kvservice
     }
     bool 
     CorbaKvApp::
-    getKvStationMetaData( std::list<kvalobs::kvStationMetadata> &stMeta, int stationid, const std::string & metadataName)
+    getKvStationMetaData( std::list<kvalobs::kvStationMetadata> &stMeta, int stationid, const miutil::miTime &obstime, const std::string & metadataName)
     {
-        getKvStationMetaDataFunc func( stMeta, stationid, metadataName );
+        getKvStationMetaDataFunc func( stMeta, stationid, obstime, metadataName );
         return func( __func__ );
     }
     bool

@@ -166,7 +166,7 @@ namespace kvservice
       * \param metadataName The name of the metadata we want. An empty string
       *    request all metadata for the stationd.
       */
-      virtual bool getKvStationMetaData( std::list<kvalobs::kvStationMetadata> &stMeta, int stationid, const std::string & metadataName = "") =0;
+      virtual bool getKvStationMetaData( std::list<kvalobs::kvStationMetadata> &stMeta, int stationid, const miutil::miTime &obstime, const std::string & metadataName = "") =0;
 
        /**
        * \brief return the observation programs.
