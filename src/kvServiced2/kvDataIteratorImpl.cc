@@ -261,10 +261,11 @@ DataIteratorImpl::next(CKvalObs::CService::ObsDataList_out obsDataList)
   
   	while(tit!=textDataList.end()){
     	if(tit->obstime()!=thisTime){
-      		textData.length(datai);
-      		datai=0;
-      		insertTextData(obsDataList, textData);
-   		}
+    	   thisTime = tit->obstime();
+    	   textData.length(datai);
+    	   datai=0;
+    	   insertTextData(obsDataList, textData);
+    	}
 
     	if(textData.length()<=datai)
       		textData.length(textData.length()+TEXTDATALIST_DELTA);

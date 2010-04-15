@@ -40,7 +40,7 @@ using namespace miutil;
 
 main(int argn, char **argv)
 {
-	string        kvserviceName("/kvtest-conan/kvService");
+	string        kvserviceName("/kv-conan/kvService");
 	WhichDataList wd;
 			
 	CorbaApp      app(argn, argv);
@@ -64,8 +64,8 @@ main(int argn, char **argv)
 	//wd[0].stationid=0;
 	wd[0].stationid=18700;
 	wd[0].status=All;
-	wd[0].fromObsTime="2009-05-26 08:00:00";
-	wd[0].toObsTime="";
+	wd[0].fromObsTime="2010-04-14 11:00:00";
+	wd[0].toObsTime="2010-04-14 13:00:00";
 	
 	DataIterator_var dataIt;
 	
@@ -92,10 +92,11 @@ main(int argn, char **argv)
 						 << miTime((*obsData)[i].dataList[ii].obstime) << ","
 						 << miTime((*obsData)[i].dataList[ii].tbtime) << ","
 						 << (*obsData)[i].dataList[ii].typeID_ << ","
-						 << (*obsData)[i].dataList[ii].paramID << endl;
+						 << (*obsData)[i].dataList[ii].paramID << "," << (*obsData)[i].dataList[ii].original
+                   << ",(" << (*obsData)[i].dataList[ii].corrected << ")"<< endl;
 				}
 			
-				cerr << "------- textdata ---------" << endl;
+				cerr << "------- textdat  a ---------" << endl;
 					
 				for (CORBA::Long ii = 0; 
 					 ii < (*obsData)[i].textDataList.length(); 
@@ -103,7 +104,8 @@ main(int argn, char **argv)
 					cerr << (*obsData)[i].textDataList[ii].stationID << ","
 					     << miTime((*obsData)[i].textDataList[ii].obstime) << ","
 					     << (*obsData)[i].textDataList[ii].typeID_ << ","
-					     << (*obsData)[i].textDataList[ii].paramID << endl;
+					     << (*obsData)[i].textDataList[ii].paramID << "," << (*obsData)[i].textDataList[ii].original
+					     <<  endl;
 				}
 				
 				cerr << "=============================================" << endl;

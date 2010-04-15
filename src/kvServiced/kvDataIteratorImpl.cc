@@ -248,9 +248,16 @@ DataIteratorImpl::next(CKvalObs::CService::ObsDataList_out obsDataList)
   	   (*obsDataList)[obsi].dataList.length(datai);
   	   obsDataList->length(obsi+1);
     }
-    
+
   	LOGDEBUG("next: obsDataList->length()=" 
 			<< obsDataList->length() << endl);
+
+   ostringstream ds;
+   for( tit=textDataList.begin(); tit != textDataList.end(); ++tit )
+     ds << tit->stationID() << "," << tit->obstime() << "," << tit->typeID() << ","
+        << tit->paramID() << "," << tit->original() << endl;
+
+   LOGDEBUG( "text_data: " << endl << ds.str() );
 
   	tit=textDataList.begin();
 
@@ -260,16 +267,18 @@ DataIteratorImpl::next(CKvalObs::CService::ObsDataList_out obsDataList)
   	}
 
 
+
   	thisTime=tit->obstime();
   	datai=0;
   	TextDataElemList textData(TEXTDATALIST_DELTA);
   
   	while(tit!=textDataList.end()){
     	if(tit->obstime()!=thisTime){
-      		textData.length(datai);
-      		datai=0;
-      		insertTextData(obsDataList, textData);
-   		}
+    	   thisTime = tit->obstime();
+    	   textData.length(datai);
+    	   datai=0;
+    	   insertTextData(obsDataList, textData);
+    	}
 
     	if(textData.length()<=datai)
       		textData.length(textData.length()+TEXTDATALIST_DELTA);
