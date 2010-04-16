@@ -10,7 +10,6 @@ idl_DATA = \
 	kvHintSubscriber.idl \
 	kvServiceCommon.idl \
 	kvService.idl \
-	kvsynopd.idl \
 	managerInput.idl \
 	newfile.idl \
 	qabase.idl
