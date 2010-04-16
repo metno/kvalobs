@@ -49,7 +49,7 @@ public:
 	MOCK_METHOD1(getKvTypes, bool( std::list<kvalobs::kvTypes> &typeList ));
 	MOCK_METHOD1(getKvOperator, bool( std::list<kvalobs::kvOperator> &operatorList ));
 	MOCK_METHOD4(getKvStationParam, bool( std::list<kvalobs::kvStationParam> &stParam, int stationid, int paramid, int day ));
-	MOCK_METHOD3(getKvStationMetaData, bool( std::list<kvalobs::kvStationMetadata> &stMeta, int stationid, const std::string & metadataName ));
+	MOCK_METHOD4(getKvStationMetaData, bool( std::list<kvalobs::kvStationMetadata> &stMeta, int stationid, const miutil::miTime &obstime, const std::string & metadataName ));
 
 	MOCK_METHOD3(getKvObsPgm, bool( std::list<kvalobs::kvObsPgm> &obsPgm, const std::list<long> &stationList, bool aUnion ));
 	MOCK_METHOD2(getKvData, bool( kvservice::KvObsDataList &dataList, const kvservice::WhichDataHelper &wd ));

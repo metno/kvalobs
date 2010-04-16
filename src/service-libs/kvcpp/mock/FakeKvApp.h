@@ -89,7 +89,7 @@ public:
 		return true;
 	}
 
-    virtual bool getKvStationMetaData( std::list<kvalobs::kvStationMetadata> &stMeta, int stationid, const std::string & metadataName = "")
+    virtual bool getKvStationMetaData( std::list<kvalobs::kvStationMetadata> &stMeta, int stationid, const miutil::miTime &obstime, const std::string & metadataName = "")
     {
     	return true;
     }
