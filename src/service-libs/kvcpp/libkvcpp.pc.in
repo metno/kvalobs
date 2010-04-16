@@ -3,6 +3,7 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 pkglibdir=${libdir}/kvalobs
 includedir=@includedir@
+idldir=@datadir@/@PACKAGE@/idl
 
 Name: kvcpp
 Description: Client library for Kvalobs
