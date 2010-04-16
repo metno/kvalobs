@@ -12,8 +12,7 @@ idl_sources=admin.idl \
             kvDataSubscriber.idl \
             kvHintSubscriber.idl \
             kvService.idl \
-            newfile.idl \
-            kvsynopd.idl 
+            newfile.idl 
 
 
 libkvskel_ladir = @includedir@/kvskel
