@@ -89,7 +89,11 @@ main(int argn, char **argv)
 
 	      cerr << it->stationID() << "," << it->typeID() << "," << it->paramID() << "," << it->sensor() << "," << it->level()
 	           << "," << it->name() << "," << it->metadata() << "," << it->fromtime() << ","
-	           << (totime.undef()?"(NULL)":totime.isoTime()) << ",'" << it->metadataDescription()<< "'" << endl;
+	           << (totime.undef()?"(NULL)":totime.isoTime()) << ",'" << it->metadataDescription()<< "'"
+	           << "," << "SpecificLevel: "<< (it->haveSpecificLevel()?"true":"false")
+	           << "," << "SpecificType: "<< (it->haveSpecificType()?"true":"false")
+	           << "," << "SpecificParam: "<< (it->haveSpecificParam()?"true":"false")
+	           << "," << "SpecificSensor: "<< (it->haveSpecificSensor()?"true":"false") << endl;
 	   }
 	}
 	catch (...) {
