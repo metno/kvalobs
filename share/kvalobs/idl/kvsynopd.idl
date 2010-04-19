@@ -4,6 +4,8 @@
 #include "KeyVal.idl"
 #include "admin.idl"
 
+/* 2010-04-19, short changed to long for all wmono */
+
 module kvsynopd{
 
   struct SynopData{
@@ -25,14 +27,14 @@ module kvsynopd{
   typedef sequence<long> LongList;
 
   struct ReloadElement{
-    short wmono;
+    long wmono;
     short eventsWaiting;
   };
   
   typedef sequence<ReloadElement> ReloadList;
 
   struct StationInfo{
-    short    wmono;
+    long    wmono;
     LongList stationIDList;
     string   info;
   };
@@ -46,7 +48,7 @@ module kvsynopd{
   typedef sequence<short> WmoNoList;
 
   struct SynopElement{
-    short  wmono;
+    long  wmono;
     string obstime;
     string createtime;
     short  ccx;
@@ -69,7 +71,7 @@ module kvsynopd{
   
   
   interface synop : micutil::Admin{
-    boolean createSynop(in short  wmono, 
+    boolean createSynop(in long  wmono, 
 			in string obstime,
 			in micutil::KeyValList keyVals,
 			in synopcb callback);
@@ -120,7 +122,7 @@ module kvsynopd{
      * \param[out] message An error message on failure.
      * \return true on success, false otherwise.
      */
-    boolean getdata(in short wmono, 
+    boolean getdata(in long wmono, 
 		    in string obstime, 
 		    out DataElementList datalist,
 		    out string message); 
