@@ -48,9 +48,6 @@ module CKvalObs{
     
     typedef sequence<ObsData>  ObsDataList;
 
-
-
-
     struct ModelDataElem{
       long    stationID;
       string  obstime;
