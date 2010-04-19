@@ -42,6 +42,11 @@ namespace kvalobs
   bool valid( const kvData & d );
 
   /**
+   * \brief Has the original value been modified in any way?
+   */
+  bool corrected( const kvData & d );
+
+  /**
    * \brief Does parameter contain data in either original or corrected?
    */
   bool missing( const kvData & d );

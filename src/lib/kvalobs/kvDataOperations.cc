@@ -45,6 +45,12 @@ bool valid( const kvData & d )
   return not missing( d ) and not rejected( d );
 }
 
+bool corrected( const kvData & d )
+{
+	int missing = d.controlinfo().flag( fmis );
+	return missing != 0 and missing != 3;
+}
+
 bool missing( const kvData & d )
 {
   return d.controlinfo().flag( fmis ) == 3;
@@ -72,6 +78,7 @@ void reject( kvData & d )
     kvControlInfo ci = d.controlinfo();
     int old_fmis = ci.flag( fmis );
     int new_fmis = old_fmis | 2;
+    new_fmis &= 3; // remove edited flag
     ci.set( fmis, new_fmis );
 
     d.controlinfo( ci );
@@ -83,11 +90,15 @@ void correct( kvData & d, float new_val )
 {
   kvControlInfo ci = d.controlinfo();
   int old_fmis = ci.flag( fmis );
-  ci.set( fmis, old_fmis & 1 );
+
+  int new_fmis = old_fmis & 1 ? 1 : 4;
+
+  ci.set( fmis, new_fmis );
 
   d.controlinfo( ci );
   d.corrected( new_val );
 }
+
 
 kvData getMissingKvData( int stationID, const miutil::miTime & obsTime,
                          int paramID, int typeID, int sensor, int level )
