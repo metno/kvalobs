@@ -7,6 +7,8 @@ getdata_SOURCES=getdata.cc
 getdata_CPPFLAGS = $(AM_CPPFLAGS)
 getdata_LDFLAGS =  -pthread 
 getdata_LDADD = $(top_builddir)/src/service-libs/kvcpp/libkvalobs_kvcpp.la \
+		$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
+		$(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
                 -lm
 
 getstationmetadata_SOURCES=getstationmetadata.cc
@@ -27,5 +29,7 @@ stressTestGetData_CPPFLAGS = $(AM_CPPFLAGS)
 #stressTestGetData_LDFLAGS =  -pthread  -rpath $(libdir)/kvalobs
 stressTestGetData_LDFLAGS =  -pthread  
 stressTestGetData_LDADD =  $(top_builddir)/src/service-libs/kvcpp/libkvalobs_kvcpp.la \
-                          -lm
+                $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
+		$(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
+                -lm
  

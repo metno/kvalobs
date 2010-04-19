@@ -14,6 +14,8 @@ kv2kro_CPPFLAGS = -D_REENTRANT \
                   $(putools_CFLAGS)  
 kv2kro_LDFLAGS = -pthread 
 kv2kro_LDADD = $(top_builddir)/src/service-libs/kvcpp/libkvalobs_kvcpp.la \
+                $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
+		$(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
                $(putools_LIBS) $(omniORB4_LIBS) $(BOOST_THREAD_LIB) \
               -lm 
              
