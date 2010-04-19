@@ -79,6 +79,25 @@ kvStationMetadata::kvStationMetadata(const kvStationMetadata & d):
 
 kvStationMetadata::~kvStationMetadata()
 {
+
+}
+
+kvStationMetadata&
+kvStationMetadata::operator =(const kvStationMetadata & rhs)
+{
+   if( &rhs != this ) {
+      station_ = rhs.station_;
+      param_ = rhs.param_;
+      type_ = rhs.type_;
+      level_ = rhs.level_;
+      sensor_ = rhs.sensor_;
+      name_ = rhs.name_;
+      metadata_ = rhs.metadata_;
+      description_ = rhs.description_;
+      fromtime_ = rhs.fromtime_;
+      totime_ = rhs.totime_;
+   }
+   return *this;
 }
 
 namespace

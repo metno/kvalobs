@@ -53,7 +53,7 @@ public:
 
 	virtual ~kvStationMetadata();
 
-	const kvStationMetadata & operator =(const kvStationMetadata & d);
+	kvStationMetadata & operator =(const kvStationMetadata & d);
 
     int stationID() const { return station_; }
     int paramID() const { return param_; }
