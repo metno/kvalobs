@@ -163,8 +163,11 @@ namespace kvservice
       * \param stationid the stationid for which parameters is to be fetched.
       *    If stationid == -1, request metadata for all stations defined in the
       *    station table.
+      * \param obstime The obsetime we want metadata to. If obstime is undef return all metadata regardless of obstime.
       * \param metadataName The name of the metadata we want. An empty string
       *    request all metadata for the stationd.
+      *
+      * \return on success and false othewise.
       */
       virtual bool getKvStationMetaData( std::list<kvalobs::kvStationMetadata> &stMeta, int stationid, const miutil::miTime &obstime, const std::string & metadataName = "") =0;
 
