@@ -326,7 +326,12 @@ bool getKvStationMetaDataFunc::process(kvService_ptr service)
 		return false;
 	}
 	CKvalObs::CService::Station_metadataList *metadata;
-	bool ok = serviceext->getStationMetaData( metadata, stationid, obstime.isoTime().c_str(), metadataName_.c_str() );
+	string myObstime;
+
+	if( ! obstime.undef() )
+	   myObstime = obstime.isoTime();
+
+	bool ok = serviceext->getStationMetaData( metadata, stationid, myObstime.c_str(), metadataName_.c_str() );
 
 	if (ok )
 	{
@@ -348,17 +353,23 @@ bool getKvStationMetaDataFunc::process(kvService_ptr service)
 			level_ = (*metadata)[i].level;
 			sensor_ = (*metadata)[i].sensor;
 
-			paramPtr  = param_ == kvDbBase::INT_NULL?0:&param_;
-			typePtr   = type_  == kvDbBase::INT_NULL?0:&type_;
-			levelPtr  = level_ == kvDbBase::INT_NULL?0:&level_;
-			sensorPtr = sensor_== kvDbBase::INT_NULL?0:&sensor_;
+//			paramPtr  = param_ == kvDbBase::INT_NULL?0:&param_;
+//			typePtr   = type_  == kvDbBase::INT_NULL?0:&type_;
+//			levelPtr  = level_ == kvDbBase::INT_NULL?0:&level_;
+//			sensorPtr = sensor_== kvDbBase::INT_NULL?0:&sensor_;
+
+			paramPtr  = param_ == -32767?0:&param_;
+			typePtr   = type_  == -32767?0:&type_;
+			levelPtr  = level_ == -32767?0:&level_;
+			sensorPtr = sensor_== -32767?0:&sensor_;
+
 
 			kvStationMetadata meta( (*metadata)[i].stationid, paramPtr, typePtr, levelPtr, sensorPtr,
 									 string( (*metadata)[i].metadatatypename ),
 									 (*metadata)[i].metadata,
 									 string( (*metadata)[i].metadataDescription ),
 									 miTime( (*metadata)[i].fromtime ),
-									 miTime( (*metadata)[i].totime ) );
+									 ( strlen( (*metadata)[i].totime ) == 0 ? miTime():miTime( (*metadata)[i].totime ) ) );
 			stParam.push_back( meta );
 		}
 	}
