@@ -1275,19 +1275,6 @@ KvServiceImpl::getStationMetaData( Station_metadataList_out stMeta,
       return false;
    }
 
-   if( strlen( obstime_ ) > 0 ) {
-      obstime = miutil::miTime( obstime_ );
-
-      if( obstime.undef() ) {
-         LOGWARN("Invalid obstime <" << obstime_ << ">.");
-         return false;
-      }
-   }
-
-   LOGDEBUG("request: obstime: " << obstime_ << " stationid: " << stationid << " metadataName: " << metadataName );
-
-   stMeta = 0;
-
    try {
       stMeta = new CKvalObs::CService::Station_metadataList();
    }
@@ -1300,6 +1287,17 @@ KvServiceImpl::getStationMetaData( Station_metadataList_out stMeta,
    }
 
 
+   if( obstime_ && strlen( obstime_ ) > 0 ) {
+      obstime = miutil::miTime( obstime_ );
+
+      if( obstime.undef() ) {
+         LOGWARN("Invalid obstime <" << obstime_ << ">.");
+         return false;
+      }
+   }
+
+   LOGDEBUG("request: obstime: " << (obstime.undef()?"undef" : obstime.isoTime()) << " stationid: " << stationid << " metadataName: " << metadataName );
+
    ostringstream q;
 
    q << "SELECT s.stationid,  s.paramid, s.typeid, s.level, s.sensor, s.metadatatypename, s.metadata, "
@@ -1309,12 +1307,12 @@ KvServiceImpl::getStationMetaData( Station_metadataList_out stMeta,
    if( stationid > 0 )
       q << " AND stationid=" << stationid;
 
-   if( metadataName && strlen(metadataName) >= 0 )
-      q << " AND s.metadatatypename=" << metadataName;
+   if( metadataName && strlen(metadataName) > 0 )
+      q << " AND s.metadatatypename='" << metadataName << "'";
 
    if( ! obstime.undef() )
-      q << " and fromtime<='" << obstime.isoTime() << "'"
-      << " and totime>='" << obstime.isoTime() << "'";
+      q << " AND fromtime<='" << obstime.isoTime() << "'"
+      << " AND (totime IS NULL OR totime>='" << obstime.isoTime() << "')";
 
    q << " ORDER BY stationid, metadatatypename, fromtime";
 
@@ -1327,7 +1325,7 @@ KvServiceImpl::getStationMetaData( Station_metadataList_out stMeta,
 
       stMeta->length( res->size() );
       int pos = -1;
-      string sensor;
+      string val;
       CORBA::Long rPos;
 
       while ( res->hasNext() ) {
@@ -1336,20 +1334,22 @@ KvServiceImpl::getStationMetaData( Station_metadataList_out stMeta,
          pos++;
          Station_metadata &md = (*stMeta)[ pos ];
 
-         md.stationid           = atol( r[rPos++].c_str() );
-         md.paramid             = atol( r[rPos++].c_str() );
-         md.typeID_             = atol( r[rPos++].c_str() );
-         md.level               = atol( r[rPos++].c_str() );
+         val = r[rPos++];
+         md.stationid = (val.empty()?-32767:atol(val.c_str()));
+
+         val = r[rPos++];
+         md.paramid = (val.empty()?-32767:atol(val.c_str()));
+
+         val = r[rPos++];
+         md.typeID_ = (val.empty()?-32767:atol(val.c_str()));
+
+         val = r[rPos++];
+         md.level = (val.empty()?-32767:atol(val.c_str()));
 
          //This terrible choice of using CHAR in the database as type for the sensor.
-         sensor = r[rPos++];
+         val = r[rPos++];
+         md.sensor = (val.empty()?-32767:val[0] - '0');
 
-         if( sensor.empty() )
-            md.sensor = 0;
-         else
-            md.sensor = sensor[0] - '0';
-
-         md.sensor              = atol( r[rPos++].c_str() );
          md.metadatatypename    = r[rPos++].c_str();
          md.metadata            = atof( r[rPos++].c_str() );
          md.metadataDescription = r[rPos++].c_str();
