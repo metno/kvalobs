@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##QABASELOGDIR=/metno/kvalobs/var/log/html
-QABASELOGDIR=$(kvconfig --localstatedir)/kvalobs/log/html
+QABASELOGDIR=$(kvconfig --localstatedir)/log/kvalobs/html
 
 #find $QABASELOGDIR -name '*.html' -type f -mtime +0 -exec rm -f {} \;
 find $QABASELOGDIR -xdev -name '*.html' -type f -mtime +3 -exec rm -f {} \;
