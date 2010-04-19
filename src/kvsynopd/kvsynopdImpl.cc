@@ -51,7 +51,7 @@ kvSynopdImpl::
 
 CORBA::Boolean 
 kvSynopdImpl::
-createSynop(CORBA::Short wmono, 
+createSynop(CORBA::Long wmono, 
 	    const char* obstime, 
 	    const micutil::KeyValList& keyVals,
 	    kvsynopd::synopcb_ptr callback)
@@ -256,7 +256,7 @@ getsynop(const kvsynopd::WmoNoList& wmoList,
 
 CORBA::Boolean 
 kvSynopdImpl::
-getdata(CORBA::Short wmono, const char* obstime, 
+getdata(CORBA::Long wmono, const char* obstime, 
 	kvsynopd::DataElementList_out datalist,
 	CORBA::String_out message)
 {

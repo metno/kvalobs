@@ -50,7 +50,7 @@ public:
   virtual ~kvSynopdImpl();
 
 
-  CORBA::Boolean createSynop(CORBA::Short wmono, 
+  CORBA::Boolean createSynop(CORBA::Long wmono, 
 			     const char* obstime, 
 			     const micutil::KeyValList& keyVals,
 			     kvsynopd::synopcb_ptr callback);
@@ -67,7 +67,7 @@ public:
 			  const char* fromtime, const char* totime, 
 			  kvsynopd::SynopList_out synops,
 			  CORBA::String_out message);
-  CORBA::Boolean getdata(CORBA::Short wmono, const char* obstime, 
+  CORBA::Boolean getdata(CORBA::Long wmono, const char* obstime, 
 			 kvsynopd::DataElementList_out datalist,
 			 CORBA::String_out message);
 
