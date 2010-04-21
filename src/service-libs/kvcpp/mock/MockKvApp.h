@@ -78,6 +78,7 @@ public:
 		ON_CALL(*this, getKvTypes(_)).WillByDefault(Return(true));
 		ON_CALL(*this, getKvOperator(_)).WillByDefault(Return(true));
 		ON_CALL(*this, getKvStationParam(_,_,_,_)).WillByDefault(Return(true));
+		ON_CALL(*this, getKvStationMetaData(_,_,_,_)).WillByDefault(Return(true));
 		ON_CALL(*this, getKvObsPgm(_,_,_)).WillByDefault(Return(true));
 		ON_CALL(*this, getKvData(An<kvservice::KvObsDataList &>(),_)).WillByDefault(Return(true));
 
