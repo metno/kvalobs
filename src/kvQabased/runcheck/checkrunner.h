@@ -72,7 +72,7 @@ public:
 	 * @param con A database connection to the kvalobs database.
 	 * @param logpath path for logging.
 	 */
-			CheckRunner(const kvalobs::kvStationInfo & params,
+	CheckRunner(const kvalobs::kvStationInfo & params,
 					kvQABaseDBConnection & con,
 					const boost::filesystem::path & logpath);
 

@@ -31,7 +31,7 @@
 
 #include <gtest/gtest.h>
 #include "../kvalobscache.h"
-#include "../kvQABaseDBConnection.h"
+#include "../../kvQABaseDBConnection.h"
 #include "database/kvalobsdatabase.h"
 #include <kvalobs/kvDataOperations.h>
 #include <boost/shared_ptr.hpp>

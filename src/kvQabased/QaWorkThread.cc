@@ -31,7 +31,7 @@
 #include "QaWorkThread.h"
 #include "qabaseApp.h"
 #include "QaWorkCommand.h"
-#include "checkrunner.h"
+#include "runcheck/checkrunner.h"
 #include <sstream>
 #include <milog/milog.h>
 #include <kvalobs/kvDbGate.h>

@@ -53,7 +53,7 @@ std::string getInitSqlStatement()
 {
 	ifstream f(CHECKRUNNERTEST_INIT_SQL);
 	if ( ! f )
-	throw std::runtime_error( "Test file not found: " CHECKRUNNERTEST_INIT_SQL );
+		throw std::runtime_error( "Test file not found: " CHECKRUNNERTEST_INIT_SQL );
 	std::string ret;
 	getline(f, ret, char_traits<char>::to_char_type(char_traits<char>::eof()));
 	return ret;
@@ -124,7 +124,7 @@ TEST_F(CheckRunnerTest, testNormal)
 	kvalobs::kvData inData = f.getData(94, 33);
 	db.getConnection() ->exec("insert into data values " + inData.toSend());
 
-		const ::testing::TestInfo * const test_info = ::testing::UnitTest::GetInstance()->current_test_info();
+	const ::testing::TestInfo * const test_info = ::testing::UnitTest::GetInstance()->current_test_info();
 	runCheckRunner(test_info->name());
 
 
