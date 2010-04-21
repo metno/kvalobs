@@ -739,7 +739,7 @@ bool kvUseInfo::setUseFlags(const kvControlInfo& cinfo)
               ui[7] == 0 )
       ui[1] = 2;
 
-    else if ( (fd == 2 || fd == 6 || fd == 7 || fd == 0xA || fd == 0xB) &&
+    else if ( (fd == 2 || fd == 5 || fd == 6 || fd == 7 || fd == 0xA || fd == 0xB) &&
                ui[7] == 0 )
       ui[1] = 3;
 
