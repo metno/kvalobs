@@ -12,6 +12,8 @@ kvQabased_SOURCES += \
 	runcheck/kvQABaseScriptManager.cc \
 	runcheck/kvQABaseScriptManager.h \
 	runcheck/CheckCreator.cc \
-	runcheck/CheckCreator.h
+	runcheck/CheckCreator.h \
+	runcheck/HtmlLog.cc \
+	runcheck/HtmlLog.h
 	
 include runcheck/test/make.mk

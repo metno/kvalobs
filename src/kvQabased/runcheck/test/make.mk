@@ -1,5 +1,5 @@
 clean-local:
-	rm -rf runcheck/test/var
+	rm -rf test/var
 
 TESTS = kvQabasedTest
 

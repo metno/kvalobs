@@ -32,6 +32,7 @@
 #define _checkrunner_h
 
 #include "CheckCreator.h"
+#include "HtmlLog.h"
 #include "kvQABaseDBConnection.h"
 #include "kvQABaseMeteodata.h"
 #include "kvQABaseTypes.h"
@@ -79,14 +80,6 @@ public:
 	~CheckRunner();
 
 	/**
-	 * Set logpath (before first runchecks)
-	 */
-	void logpath(const boost::filesystem::path & logp)
-	{
-		logpath_ = logp;
-	}
-
-	/**
 	 * Main routine. Runs all relevant checks for station
 	 *
 	 * @param forceCheck If true, run checks on data, even if it has been
@@ -119,7 +112,7 @@ private:
 	/// The next time the static tables should be updated.
 	miutil::miTime updateStaticTime;
 
-	milog::HtmlStream * openHTMLStream();
+	HtmlLog log_;
 };
 
 #endif

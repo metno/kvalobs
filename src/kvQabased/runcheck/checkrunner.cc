@@ -36,8 +36,7 @@
 
 #include "kvQABaseTypes.h"
 #include "kvQABaseDBConnection.h"
-//#include "kvQABaseScriptManager.h"
-//#include "kvQABaseMetadata.h"
+
 
 #include <list>
 #include <new>
@@ -59,53 +58,18 @@ using namespace kvalobs;
 using namespace milog;
 using boost::filesystem::path;
 
-namespace
-{
-enum LogType
-{
-	Debug, Info, Warn, Error
-};
-
-inline void log_(const std::string & msg, LogType t = Info)
-{
-	switch (t)
-	{
-	case Debug:
-		IDLOGDEBUG( "html", msg << endl )
-		;
-		break;
-	case Info:
-		IDLOGINFO( "html", msg << endl )
-		;
-		break;
-	case Warn:
-		IDLOGWARN( "html", msg << endl )
-		;
-		break;
-	case Error:
-		IDLOGERROR( "html", msg << endl )
-		;
-		break;
-	}
-}
-
-void logEnd_(const std::string & msg, LogType t = Info)
-{
-	log_(msg, t);
-	IDLOGINFO( "html", "</PRE></CODE>" );
-	Logger::removeLogger("html");
-	if (t == Error)
-		throw std::runtime_error(msg);
-}
-}
-
-CheckRunner::CheckRunner(const kvStationInfo & params,
-		kvQABaseDBConnection & con_, const path & logp) :
-	stinfo(params), dbcon(con_), meteod(con_, params), logpath_(logp),
-			checkCreator_(meteod, params, con_)
+CheckRunner::CheckRunner(const kvStationInfo & params, kvQABaseDBConnection & con_, const path & logp) :
+	stinfo(params),
+	dbcon(con_),
+	meteod(con_, params),
+	checkCreator_(meteod, params, con_),
+	log_(params, logp.native_directory_string())
 {
 	if (!dbcon.dbOk())
+	{
+		log_("No database connection - unable to perform checks", HtmlLog::Error),
 		throw runtime_error("No database connection");
+	}
 }
 
 CheckRunner::~CheckRunner()
@@ -209,7 +173,10 @@ void CheckRunner::updateStaticVariables()
 void CheckRunner::findChecks(list<kvChecks> & out)
 {
 	if (!dbcon.getChecks(stinfo.stationID(), stinfo.obstime(), out))
-		logEnd_("CheckRunner: Error reading checks", Error);
+	{
+		log_("CheckRunner: Error reading checks", HtmlLog::Error);
+		throw std::runtime_error("Error reading checks");
+	}
 }
 
 void CheckRunner::runCheck(const CheckCreator::Script & checkScript,
@@ -235,10 +202,10 @@ void CheckRunner::runCheck(const CheckCreator::Script & checkScript,
 	kvPerlParser parser; // the perlinterpreter
 	map<string, double> retvalues;
 	if (!parser.runScript(checkScript.str(), retvalues))
-		return log_("CheckRunner::runCheck failed in parser.runScript", Error);
+		return log_("CheckRunner::runCheck failed in parser.runScript", HtmlLog::Error);
 
 	// TEST --------------------------------------------------
-	log_("Successfully run check.", Debug);
+	log_("Successfully run check.", HtmlLog::Debug);
 	IDLOGDEBUG( "html", "Number of return parameters:" << retvalues.size() << endl );
 	for (map<string, double>::iterator dp = retvalues.begin(); dp
 			!= retvalues.end(); dp++)
@@ -250,34 +217,36 @@ void CheckRunner::runCheck(const CheckCreator::Script & checkScript,
 		// Update parameters with new control-flags and any return-variables - also update kvStationInfo
 		IDLOGINFO( "html", "Updating observation(s) with return values from check" << endl );
 		if (!meteod.updateParameters(retvalues, check))
-			log_("CheckRunner::runCheck failed in updateParameters", Error);
+			log_("CheckRunner::runCheck failed in updateParameters", HtmlLog::Error);
 	}
 	else
-		log_("No return values from check - skip update..", Warn);
+		log_("No return values from check - skip update..", HtmlLog::Warn);
 }
 
 void CheckRunner::operator()(bool forceCheck)
 {
-	openHTMLStream();
 	try
 	{
 		if (not forceCheck and not shouldProcess())
 		{
-			logEnd_("Will not process data");
+			log_("Will not process data");
 			return;
 		}
 		updateStaticVariables();
 	} catch (std::exception & e)
 	{
 		// We wish to log errors on html:
-		logEnd_(e.what(), Error);
+		log_(e.what(), HtmlLog::Error);
 		throw;
 	}
 
 	//  relevant checks (QC1) for this observation
 	const list<kvChecks> & checks = checkCreator_.getChecks();
 	if (checks.empty())
-		return logEnd_("No appropriate checks found");
+	{
+		log_("No appropriate checks found");
+		return;
+	}
 
 	meteod.resetFlags(stinfo); // what is this? And why does things fail when I move this line?
 
@@ -288,8 +257,7 @@ void CheckRunner::operator()(bool forceCheck)
 		{
 			CheckCreator::ScriptList scripts;
 			checkCreator_.getScripts(scripts, *cp);
-			for (CheckCreator::ScriptList::const_iterator script =
-					scripts.begin(); script != scripts.end(); ++script)
+			for (CheckCreator::ScriptList::const_iterator script = scripts.begin(); script != scripts.end(); ++script)
 				runCheck(*script, *cp);
 		} catch (kvQABaseMeteodata::SkipCheck &)
 		{
@@ -297,98 +265,14 @@ void CheckRunner::operator()(bool forceCheck)
 		} catch ( std::bad_alloc & e )
 		{
 			LOGERROR(e.what());
-			logEnd_(e.what(), Error);
+			log_(e.what(), HtmlLog::Error);
 			throw;
 		}catch (std::exception & e)
 		{
-			log_(e.what(), Error);
+			log_(e.what(), HtmlLog::Error);
 		}
 	}
 
-	logEnd_("Done processing", Debug);
+	log_("Done processing", HtmlLog::Debug);
 	LOGINFO( "CheckRunner::runChecks FINISHED" << endl );
-}
-
-namespace
-{
-path logPath(const kvalobs::kvStationInfo & stinfo, const path & start_logpath)
-{
-	path log_dir(start_logpath);
-	const path stationDirectory = boost::lexical_cast<string>(
-			stinfo.stationID());
-
-	const std::string obsTime = stinfo.obstime().isoDate();
-	log_dir /= stationDirectory / obsTime;
-
-	boost::filesystem::create_directories(log_dir);
-	return log_dir;
-}
-
-path logfilename(const std::string & clock, int version)
-{
-	ostringstream filename;
-	filename << "log-" << clock;
-	if (version)
-		filename << '_' << version;
-	filename << ".html";
-	return filename.str();
-}
-
-path getLogfilePath(const kvalobs::kvStationInfo & stinfo,
-		const path & start_logpath)
-{
-	namespace fs = boost::filesystem;
-
-	fs::path log_dir = logPath(stinfo, start_logpath);
-
-	std::string clock = stinfo.obstime().isoClock();
-	std::replace(clock.begin(), clock.end(), ':', '-');
-
-	fs::path log_file;
-	for (int i = 8; i >= 0; --i)
-	{
-		log_file = log_dir / logfilename(clock, i);
-		if (fs::exists(log_file))
-		{
-			fs::path rename_to = log_dir / logfilename(clock, i + 1);
-			fs::remove(rename_to);
-			fs::rename(log_file, rename_to);
-		}
-	}
-	return log_file.native_directory_string();
-}
-}
-
-HtmlStream * CheckRunner::openHTMLStream()
-{
-	HtmlStream * html = 0;
-	try
-	{
-		html = new HtmlStream;
-
-		path logfile = getLogfilePath(stinfo, logpath_);
-
-		LOGINFO( "CheckRunner::runChecks for station:" << stinfo.stationID()
-				<< " and obstime:" << stinfo.obstime() << endl
-				<< "Logging all activity to:" << logfile.native_file_string() << endl );
-
-		if (!html->open(logfile.native_file_string()))
-			throw std::runtime_error(
-					"Failed to create logfile for the html output. Filename:\n"
-							+ logfile.native_file_string());
-
-		Logger::createLogger("html", html);
-		Logger::logger("html").logLevel(DEBUG);
-
-		IDLOGINFO( "html", "<h1>"
-				<< "CheckRunner::runChecks for station:" << stinfo.stationID()
-				<< " and obstime:" << stinfo.obstime()
-				<< "</h1>" << endl );
-		IDLOGINFO( "html", "<CODE><PRE>" );
-	} catch (std::exception & e)
-	{
-		LOGERROR( "Error when creating logfile: " << e.what() << "\nUsing /dev/null for logging!");
-		html->open("/dev/null");
-	}
-	return html;
 }
