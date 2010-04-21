@@ -65,8 +65,8 @@ operator()()
   miTime                   synopFromTime(now);
 
   if(hours>=0){
-    synopFromTime.addHour(-6);
-
+    synopFromTime.addHour(-24);
+    //synopFromTime.addHour(-6);
     if(fromTime>=synopFromTime)
       synopFromTime=fromTime;
   }

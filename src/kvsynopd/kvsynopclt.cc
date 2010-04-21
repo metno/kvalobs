@@ -57,6 +57,23 @@ main(int argn, char **argv)
      CERR( ex.what() );
      return 1;
   }
+
+  // We should have the synop exported in the same way as from kvsynopd
+
+  miutil::conf::ValElementList valElem;
+
+  valElem=conf->getValue("wmo_default.copyto");
+  
+  bool toStdout = false;
+  miutil::miString exportPath;
+  if(valElem.empty()){
+		CERR("No directory <wmo_default.copyto> in the configurationfile!");
+		toStdout = true;
+	}
+  else
+  {
+	  exportPath = valElem[0].valAsString();
+  }
   
   SynopCltApp app(argn, argv, conf );
 
@@ -122,36 +139,47 @@ main(int argn, char **argv)
       COUT(endl);
     }
   }else if(opt.cmd==Options::Synop){
-     
-    if(opt.time.undef()){
-      CERR("Invalid time <" << opt.time << ">!");
-    }else{
-      Options::IIntList it=opt.wmonoList.begin();
-      kvsynopd::SynopData d;
-      TKeyVal keyvals;
-      
-      for(; it!=opt.wmonoList.end(); it++){
-	if(!app.createSynop(*it, opt.time, keyvals, 20, d)){
-	  if(app.shutdown()){
-	    break;
-	  }else{
-	    CERR("Create synop failed!\n");
-	  }
-	continue;
-	}
-	
-	if(!d.isOk){
-	  CERR("Cant create synop for <" << d.stationid << ">!\n"
-	       << "Reason: " << d.message << endl);
-	  continue;
-	}
-	
-	CERR("Created synop for <" << d.stationid << "> termin: " << d.termin
-	     << endl << "Message: " << d.message << endl << "Synop: " << endl
-	     << d.synop << endl << endl);
-      }
 
-    }
+	  if(opt.time.undef()){
+		  CERR("Invalid time <" << opt.time << ">!");
+	  }else{
+		  Options::IIntList it=opt.wmonoList.begin();
+		  kvsynopd::SynopData d;
+		  TKeyVal keyvals;
+
+		  for(; it!=opt.wmonoList.end(); it++){
+			  if(!app.createSynop(*it, opt.time, keyvals, 20, d)){
+				  if(app.shutdown()){
+					  break;
+				  }else{
+					  CERR("Create synop failed!\n");
+				  }
+				  continue;
+			  }
+
+			  if(!d.isOk){
+				  CERR("Cant create synop for <" << d.stationid << ">!\n"
+					  << "Reason: " << d.message << endl);
+				  continue;
+			  }
+			  if (toStdout)
+			  {
+				  CERR("Created synop for <" << d.stationid << "> termin: " << d.termin
+					  << endl << "Message: " << d.message << endl << "Synop: " << endl
+					  << d.synop << endl << endl);
+			  }
+			  else
+			  {
+				  // open o file and create a synop the same way as in kvsynopd
+				  // Construct a file name...
+				  miutil::miString wmo_no = miutil::miString((int)d.stationid);
+				  miutil::miString synop = miutil::miString((const char *)d.synop);
+				  app.saveTo(wmo_no,exportPath, opt.time, synop, 0);
+
+			  }
+		  }
+
+	  }
   }else if(opt.cmd==Options::Reload){
     CERR("OPTION: Reload!" << endl);
     app.reloadConf();

@@ -28,6 +28,13 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <errno.h>
+#include <sstream>
+#include <iomanip>
+#include <fstream>
 #include <dnmithread/mtcout.h>
 #include <unistd.h>
 #include <time.h>
@@ -545,6 +552,80 @@ SynopCltApp::getOptions(int argn, char **argv, miutil::conf::ConfSection *conf, 
 	}
    
 	return true;
+}
+void
+SynopCltApp::saveTo(const miutil::miString &wmono,
+	  const miutil::miString &copyto,
+       const miutil::miTime &obstime, 
+	   const miutil::miString &wmomsg,
+       int ccx)
+{
+  
+  ofstream      f;
+  struct stat   sbuf; 
+
+  if(stat(copyto.c_str(), &sbuf)<0){
+    if(errno==ENOENT || errno==ENOTDIR){
+      CERR("copyto: <"<<copyto<<"> invalid path!");
+    }else if(errno==EACCES){
+      CERR("copyto: <"<<copyto<<"> permission denied!");
+    }else{
+      CERR("copyto: <"<<copyto<<">, lstat unknown error!");
+    }
+    
+    return;
+  }
+
+  if(!S_ISDIR(sbuf.st_mode)){
+    CERR("copyto: <"<<copyto<<"> not a directory!");
+    return;
+  }
+  bool isWritten = false;
+  // Try to write to file, even if its already there... 
+  while (!isWritten)
+  {
+	  ostringstream ost;
+	  if(ccx==0){
+		  ost << copyto << "/" <<  wmono << "-"
+#ifdef USE_KVDATA
+			  << setfill('0') << setw(4) << obstime.year() << setw(2) << obstime.month() << setw(2) << obstime.day() << setw(2) 
+#else
+			  << setfill('0') << setw(2) << obstime.day() << setw(2)
+#endif
+			  << obstime.hour()
+			  << ".synop";
+	  }else{ 
+		  ost << copyto << "/" <<  wmono << "-" 
+#ifdef USE_KVDATA
+			  << setfill('0') << setw(4) << obstime.year() << setw(2) << obstime.month() << setw(2) << obstime.day() << setw(2) 
+#else
+			  << setfill('0') << setw(2) << obstime.day() << setw(2)
+#endif
+			  << obstime.hour() << "-" << static_cast<char>('A'+(ccx-1))
+			  << ".synop";
+	  }
+	  f.open(ost.str().c_str(),std::ios::out|std::ios::in);
+	  if (f.is_open())
+	  {
+		  // close the file if it exist...
+		  f.close();
+	  }
+	  else
+	  {
+		  // the file not exist, open it...
+		  f.open(ost.str().c_str(),std::ios::out);
+
+		  if(f.is_open()){
+			  COUT("Writing SYNOP to file: " << ost.str()<<std::endl;);
+			  f << wmomsg;
+			  f.close();
+			  isWritten = true;
+		  }else{
+			  CERR("Cant write SYNOP to file: " << ost.str()<<std::endl;);
+		  }
+	  }
+	  ccx++;
+  }
 }
       
 

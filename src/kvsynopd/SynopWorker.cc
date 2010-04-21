@@ -715,13 +715,13 @@ SynopWorker::loadSynopData(const DataEntryList &dl,
 	//We use only the default sensor for every parameter, ie sensor=0.
 	//This may be to restrective. Shuld this be a configuration option for
 	//the parameters we wish to overide tis behavior for.
-	
-	if(itd->sensor()==0 && itd->level()==0){
+	//Commented 2010-04-20, YE 
+	//if(itd->sensor()==0 && itd->level()==0){
 	  synopData.setData(itd->paramID(), itd->original());
-	}else{
-	  LOGINFO("loadSynop: sensor=" << itd->sensor() << " level=" << itd->level()
-		  << " not used!");
-	}
+	//}else{
+	//  LOGINFO("loadSynop: sensor=" << itd->sensor() << " level=" << itd->level()
+	//	  << " not used!");
+	//}
       }
     }
     

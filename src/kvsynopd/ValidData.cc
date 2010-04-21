@@ -79,11 +79,18 @@ kvdatacheck::validData(const kvalobs::kvData &data)
   // Check limits...
   int flag=flag2int(info.cflag(f_fr));
   if(flag == 6){
+	  LOGINFO("REJECTED (fr): stationid: " << data.stationID() << " obstime: " 
+	    << data.obstime() << " paramid: " << data.paramID() 
+	    << " original: " << data.original());
 	  return false;
   }
   // Check missing...
   flag=flag2int(info.cflag(f_fmis));
   if(flag == 3){
+	  LOGINFO("REJECTED (fmis): stationid: " << data.stationID() 
+	    << " obstime: " << data.obstime()
+	    << " paramid: " << data.paramID() 
+	    << " original: " << data.original());
 	  return false;
   }
   // export all the rest...

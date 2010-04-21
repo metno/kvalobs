@@ -116,6 +116,12 @@ class SynopCltApp
 		   int timeoutInSeconds,
 		   kvsynopd::SynopData &result);
 
+  void saveTo(const miutil::miString &wmono,
+	  const miutil::miString &copyto,
+       const miutil::miTime &obstime, 
+	   const miutil::miString &wmomsg,
+       int ccx);
+
   bool delayList(kvsynopd::DelayList &delayList, miutil::miTime &nowTime);
   
   kvsynopd::ReloadList* cacheReloadList(std::string &message);
