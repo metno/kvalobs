@@ -9,6 +9,7 @@ kvQabasedTest_SOURCES= \
 	test/test.cc \
 	test/kvalobscachetest.cc \
 	test/checkrunnertest.cc \
+	test/kvCronStringTest.cc \
 	test/database/kvalobsdatabase.h \
 	test/database/kvalobsdatabase.cc \
 	$(kvQabased_SOURCES:kvQabased.cc=)
