@@ -91,34 +91,31 @@ path getLogfilePath(const kvalobs::kvStationInfo & stinfo,
 
 HtmlLog::HtmlLog(const kvalobs::kvStationInfo & stinfo, const std::string & logPath)
 {
-//	try
-//	{
-		html = new HtmlStream;
+	html = new HtmlStream;
 
-		path logfile = getLogfilePath(stinfo, logPath);
+	path logfile = getLogfilePath(stinfo, logPath);
 
-		LOGINFO( "CheckRunner::runChecks for station:" << stinfo.stationID()
-				<< " and obstime:" << stinfo.obstime() << endl
-				<< "Logging all activity to:" << logfile.native_file_string() << endl );
+	LOGINFO( "CheckRunner::runChecks for station:" << stinfo.stationID()
+			<< " and obstime:" << stinfo.obstime() << endl
+			<< "Logging all activity to:" << logfile.native_file_string() << endl );
 
+	if ( logPath.empty() )
+		html->open("/dev/null");
+	else
+	{
 		if (!html->open(logfile.native_file_string()))
-			throw std::runtime_error(
-					"Failed to create logfile for the html output. Filename:\n"
-							+ logfile.native_file_string());
+			LOGERROR("Failed to create logfile for the html output. Filename:\n" << logfile.native_file_string());
+		html->open("/dev/null");
+	}
 
-		Logger::createLogger("html", html);
-		Logger::logger("html").logLevel(DEBUG);
+	Logger::createLogger("html", html);
+	Logger::logger("html").logLevel(DEBUG);
 
-		IDLOGINFO( "html", "<h1>"
-				<< "CheckRunner::runChecks for station:" << stinfo.stationID()
-				<< " and obstime:" << stinfo.obstime()
-				<< "</h1>" << endl );
-		IDLOGINFO( "html", "<CODE><PRE>" );
-//	} catch (std::exception & e)
-//	{
-//		LOGERROR( "Error when creating logfile: " << e.what() << "\nUsing /dev/null for logging!");
-//		html->open("/dev/null");
-//	}
+	IDLOGINFO( "html", "<h1>"
+			<< "CheckRunner::runChecks for station:" << stinfo.stationID()
+			<< " and obstime:" << stinfo.obstime()
+			<< "</h1>" << endl );
+	IDLOGINFO( "html", "<CODE><PRE>" );
 }
 
 HtmlLog::~HtmlLog()

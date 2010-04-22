@@ -28,9 +28,6 @@
  with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#include "perl/kvPerlParser.h"
-#undef list
-
 #include <errno.h>
 #include "checkrunner.h"
 
@@ -198,11 +195,12 @@ void CheckRunner::runCheck(const CheckCreator::Script & checkScript,
 	log_( checkScript.metaData() );
 	log_( "</font>" );
 
-	/* ----- run check ---------------------------------- */
-	kvPerlParser parser; // the perlinterpreter
-	map<string, double> retvalues;
-	if (!parser.runScript(checkScript.str(), retvalues))
-		return log_("CheckRunner::runCheck failed in parser.runScript", HtmlLog::Error);
+	CheckCreator::Script::return_value retvalues = checkScript.run();
+
+//	kvPerlParser parser; // the perlinterpreter
+//	map<string, double> retvalues;
+//	if (!parser.runScript(checkScript.str(), retvalues))
+//		return log_("CheckRunner::runCheck failed in parser.runScript", HtmlLog::Error);
 
 	// TEST --------------------------------------------------
 	log_("Successfully run check.", HtmlLog::Debug);

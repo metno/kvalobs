@@ -99,6 +99,8 @@ private:
 	void runCheck(const CheckCreator::Script & checkScript,
 			const kvalobs::kvChecks & check);
 
+
+
 	CheckCreator checkCreator_;
 
 	const kvalobs::kvStationInfo & stinfo;

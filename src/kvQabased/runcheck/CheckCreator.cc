@@ -2,6 +2,7 @@
 #include "kvQABaseScriptManager.h"
 #include "kvQABaseMetadata.h"
 #include "kvQABaseDBConnection.h"
+#include "perl/kvPerlParser.h"
 #include <kvalobs/kvChecks.h>
 #include <kvalobs/kvStationInfo.h>
 #include <sstream>
@@ -79,6 +80,16 @@ string CheckCreator::getMetaData(const kvalobs::kvChecks & check)
 CheckCreator::Script::Script(const std::string & perlScript, const std::string & meteoData, const std::string & metaData, const std::string & qcx) :
 		perlScript_(perlScript), meteoData_(meteoData), metaData_(metaData), qcx_(qcx)
 {}
+
+CheckCreator::Script::return_value CheckCreator::Script::run() const
+{
+	kvPerlParser parser; // the perlinterpreter
+	return_value retvalues;
+	if ( ! parser.runScript(str(), retvalues) )
+		throw std::runtime_error("CheckRunner::runCheck failed in parser.runScript");
+	return retvalues;
+}
+
 
 std::string CheckCreator::Script::str() const
 {

@@ -44,3 +44,4 @@ kvQabased_LDADD = \
 	-ldl
 
 include runcheck/make.mk
+include test/make.mk

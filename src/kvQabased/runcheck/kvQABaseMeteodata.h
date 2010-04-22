@@ -77,8 +77,30 @@ public:
 	 * @throws std::exception on error in data lookup
 	 * @return data for one parameter-check
 	 */
-	std::string data_asPerl(const kvQABaseScriptManager& sman, // script manager
-			const kvObsPgmList & oplist); // obs_pgm
+	std::string data_asPerl(const kvQABaseScriptManager& sman,
+			const kvObsPgmList & oplist)
+	{
+		fetchDataIntoThis(sman, oplist);
+		return perlScript(sman);
+	}
+
+private:
+	/**
+	 * transfer data from the given script manager and into *this. This method
+	 * must have been called before generating a perl script.
+	 *
+	 * \throws SkipCheck If data with a needed paramid does not exist
+	 */
+	void fetchDataIntoThis(const kvQABaseScriptManager& sman, const kvObsPgmList & oplist);
+
+	/**
+	 * Generate perl script.
+	 *
+	 * fetchDataIntoThis must have been called first
+	 */
+	std::string perlScript(const kvQABaseScriptManager& sman) const;
+
+public:
 
 	/**
 	 * Parsed version of what have been returned from a script.

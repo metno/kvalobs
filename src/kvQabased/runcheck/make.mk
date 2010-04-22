@@ -15,4 +15,3 @@ kvQabased_SOURCES += \
 	runcheck/HtmlLog.h
 	
 include runcheck/perl/make.mk
-include runcheck/test/make.mk

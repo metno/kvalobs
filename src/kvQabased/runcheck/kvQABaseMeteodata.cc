@@ -237,8 +237,7 @@ bool kvQABaseMeteodata::loadModelData(const int sid, const int tstart,
 	return true;
 }
 
-// return data for one parameter
-std::string kvQABaseMeteodata::data_asPerl(const kvQABaseScriptManager& sman, // active Script-Manager
+void kvQABaseMeteodata::fetchDataIntoThis(const kvQABaseScriptManager& sman, // active Script-Manager
 		const kvObsPgmList & oplist) // obs_pgm
 {
 	sman.getVariables(kvQABase::obs_data, obs_vars);
@@ -250,21 +249,18 @@ std::string kvQABaseMeteodata::data_asPerl(const kvQABaseScriptManager& sman, //
 			&& model_vars.pars.empty())
 	{
 		IDLOGINFO( "html", "No observation- or model-data needed" );
-		return "# No observation- or model-data needed\n";
+		return;
 	}
 
 	// using observation_program // if normal station:
 	if (!oplist.empty())
 	{
 		// ensure that requested obs.parameters are active in observation_program
-		for (vector<kvQABase::script_par>::const_iterator itrpa =
-				obs_vars.pars.begin(); itrpa != obs_vars.pars.end(); itrpa++)
+		for (vector<kvQABase::script_par>::const_iterator itrpa = obs_vars.pars.begin(); itrpa != obs_vars.pars.end(); itrpa++)
 			if (itrpa->normal)
 			{
 				IDLOGINFO( "html", "Checking obs_pgm for par:" << itrpa->name << " nr:" << itrpa->paramid << endl );
-				if (find_if(oplist.begin(), oplist.end(),
-						kvalobs::inspect::has_paramid(itrpa->paramid))
-						== oplist.end())
+				if (find_if(oplist.begin(), oplist.end(), kvalobs::inspect::has_paramid(itrpa->paramid)) == oplist.end())
 					throw SkipCheck(); // parameter inactive or not found in obs_program
 			}
 	}
@@ -273,6 +269,14 @@ std::string kvQABaseMeteodata::data_asPerl(const kvQABaseScriptManager& sman, //
 	fillObsVariables(obs_vars);
 	fillObsVariables(refobs_vars);
 	fillModelVariables(model_vars);
+}
+
+std::string kvQABaseMeteodata::perlScript(const kvQABaseScriptManager& sman) const
+{
+	// if no data needed - return
+	if (obs_vars.pars.empty() and refobs_vars.pars.empty() and model_vars.pars.empty())
+		return "# No observation- or model-data needed\n";
+
 
 	std::ostringstream ret;
 	ret << "\n";
@@ -297,6 +301,7 @@ std::string kvQABaseMeteodata::data_asPerl(const kvQABaseScriptManager& sman, //
 
 	return ret.str();
 }
+
 
 kvQABaseMeteodata::DataFromTime & kvQABaseMeteodata::preloadData(
 		const kvalobs::kvStationInfo & si)
@@ -340,8 +345,7 @@ void kvQABaseMeteodata::fillObsVariables(kvQABase::script_var & vars)
 	typedef std::set<int> TimeOffsets;
 	TimeOffsets alltimes; // unique list of timeoffsets
 
-	for (vector<int>::iterator pp = vars.allpos.begin(); pp
-			!= vars.allpos.end(); pp++)
+	for (vector<int>::iterator pp = vars.allpos.begin(); pp != vars.allpos.end(); pp++)
 	{
 		IDLOGINFO( "html", " -OBS processing for pos:" << * pp << endl );
 

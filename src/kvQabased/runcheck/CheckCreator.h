@@ -5,6 +5,7 @@
 #include "kvQABaseScriptManager.h"
 #include "kvQABaseMetadata.h"
 #include <kvalobs/kvChecks.h>
+#include <map>
 #include <string>
 #include <list>
 #include <vector>
@@ -60,6 +61,13 @@ class CheckCreator::Script
 {
 public:
 	Script(const std::string & perlScript, const std::string & meteoData, const std::string & metaData, const std::string & qcx);
+
+	typedef	std::map<std::string, double> return_value;
+
+	/**
+	 * Run the script
+	 */
+	return_value run() const;
 
 	std::string str() const;
 

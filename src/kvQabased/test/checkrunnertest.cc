@@ -30,7 +30,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "../checkrunner.h"
+#include "../runcheck/checkrunner.h"
 #include "database/kvalobsdatabase.h"
 #include <string>
 #include <fstream>
