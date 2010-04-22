@@ -708,9 +708,9 @@ void kvQABaseMeteodata::setMissing(ScriptReturnType::const_iterator param,
 	int newVal = static_cast<int> (param->second);
 	cinfo.setControlFlag(kvQCFlagTypes::f_fmis, newVal);
 	newdata.controlinfo(cinfo);
-	if ( newVal == 3 )
+	if (newVal == 3)
 		newdata.corrected(-32767);
-	else if ( newVal == 2 )
+	else if (newVal == 2)
 		newdata.corrected(-32766);
 
 	IDLOGINFO( "html", "kvQABaseMeteodata::updateParameters controlinfo  AFTER:" << newdata.controlinfo() << endl <<
@@ -927,8 +927,7 @@ bool kvQABaseMeteodata::updateParameters(const ScriptReturnType & params,
 {
 	ObsKeys updated_obs;
 
-	for (ScriptReturnType::const_iterator pp = params.begin(); pp
-			!= params.end(); ++pp)
+	for (ScriptReturnType::const_iterator pp = params.begin(); pp != params.end(); ++pp)
 		updateSingleParam(updated_obs, pp, params, check);
 
 	saveInDb(updated_obs);
