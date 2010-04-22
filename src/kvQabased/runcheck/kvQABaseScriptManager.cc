@@ -374,7 +374,7 @@ void kvQABaseScriptManager::clear()
 
 namespace
 {
-  void addTimeVariables( ostream & ost, kvQABase::script_var & vars )
+  void addTimeVariables( ostream & ost, const kvQABase::script_var & vars )
   {
     ost << "my $" << vars.source << "_numtimes=" << vars.alltimes.size() << ";\n";
     ost << "my @" << vars.source << "_timeoffset=(";
@@ -388,7 +388,7 @@ namespace
     ost << ");\n\n";
   }
 
-  void addPositionVariables( ostream & ost, kvQABase::script_var & vars )
+  void addPositionVariables( ostream & ost, const kvQABase::script_var & vars )
   {
     ost << "my $" << vars.source << "_numstations=" << vars.allpos.size() << ";\n";
     ost << "my @" << vars.source << "_stations=(";
@@ -402,14 +402,14 @@ namespace
     ost << ");\n\n";
   }
 
-  void addMissingVariables( ostream & ost, kvQABase::script_var & vars )
+  void addMissingVariables( ostream & ost, const kvQABase::script_var & vars )
   {
     // make global missing data variable
     ost << "my $" << vars.source << "_missing=" << ( vars.missing_data ? 1 : 0 ) << ";\n\n";
   }
 }
 
-string kvQABaseScriptManager::makePerlVariables( kvQABase::script_var& vars) const
+string kvQABaseScriptManager::makePerlVariables( const kvQABase::script_var& vars) const
 {
   if ( vars.allpos.empty() || vars.alltimes.empty() || vars.pars.empty() )
     return "";
@@ -432,7 +432,7 @@ string kvQABaseScriptManager::makePerlVariables( kvQABase::script_var& vars) con
 
   // loop over parameters
   //   for ( size_t i = 0; i < vars.pars.size(); i++ )
-  for ( vector<kvQABase::script_par>::iterator it = vars.pars.begin(); it != vars.pars.end(); ++ it )
+  for ( vector<kvQABase::script_par>::const_iterator it = vars.pars.begin(); it != vars.pars.end(); ++ it )
   {
     ret << "my @" << it->signature << "=(";
 
@@ -462,8 +462,15 @@ string kvQABaseScriptManager::makePerlVariables( kvQABase::script_var& vars) con
 
         kvQABase::par_values par_values;
         // find data-value
-        if ( it->values.count( *pp ) and it->values[ *pp ].count( *tp ) )
-          par_values = it->values[ *pp ][ *tp ];
+
+
+        std::map<int, std::map<int, kvQABase::par_values> >::const_iterator find = it->values.find(* pp);
+        if ( find != it->values.end() )
+        {
+        	std::map<int, kvQABase::par_values>::const_iterator find2 = find->second.find(* tp);
+        	if ( find2 != find->second.end() )
+        		par_values = find2->second;
+        }
         
         ret << par_values.value;
 

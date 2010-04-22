@@ -80,7 +80,7 @@ class kvQABaseScriptManager
                        kvQABase::script_var& vars ) const;
 
     /// make Perl code from script_var variables
-    std::string makePerlVariables( kvQABase::script_var& vars) const;
+    std::string makePerlVariables( const kvQABase::script_var& vars) const;
 
     void clear();
 };
