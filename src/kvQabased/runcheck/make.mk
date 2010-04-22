@@ -3,8 +3,6 @@ kvQabased_SOURCES += \
 	runcheck/checkrunner.h \
 	runcheck/kvalobscache.cc \
 	runcheck/kvalobscache.h \
-	runcheck/kvPerlParser.cc \
-	runcheck/kvPerlParser.h \
 	runcheck/kvQABaseMetadata.cc \
 	runcheck/kvQABaseMetadata.h \
 	runcheck/kvQABaseMeteodata.cc \
@@ -16,4 +14,5 @@ kvQabased_SOURCES += \
 	runcheck/HtmlLog.cc \
 	runcheck/HtmlLog.h
 	
+include runcheck/perl/make.mk
 include runcheck/test/make.mk

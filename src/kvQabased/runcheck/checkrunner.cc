@@ -28,7 +28,7 @@
  with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#include "kvPerlParser.h"
+#include "perl/kvPerlParser.h"
 #undef list
 
 #include <errno.h>
@@ -248,7 +248,7 @@ void CheckRunner::operator()(bool forceCheck)
 		return;
 	}
 
-	meteod.resetFlags(stinfo); // what is this? And why does things fail when I move this line?
+	meteod.resetFlags(stinfo);
 
 	// Loop through checks
 	for (list<kvChecks>::const_iterator cp = checks.begin(); cp != checks.end(); ++cp)
