@@ -369,8 +369,7 @@ void kvQABaseMeteodata::fillObsVariables(kvQABase::script_var & vars)
 			throw std::runtime_error("Error when attempting to load text data");
 
 		// loop observation times
-		for (DataFromTime::iterator tp = obsdata[*pp].begin(); tp
-				!= obsdata[*pp].end(); ++tp)
+		for (DataFromTime::iterator tp = obsdata[*pp].begin(); tp != obsdata[*pp].end(); ++tp)
 		{
 			int mindiff = miTime::minDiff(tp->first, stationinfo_.obstime());
 
@@ -422,18 +421,17 @@ void kvQABaseMeteodata::fillObsVariables(kvQABase::script_var & vars)
 
 				// look for exact match:
 				for (find = container_.begin(); find != container_.end(); ++find)
-					if (find->paramID() == vid && (sid == -32767
-							|| find->sensor() == sid) && (lid == -32767
-							|| find->level() == lid) && ((tid == -32767 && abs(
-							find->typeID()) == abs(stationinfo_.typeID()))
-							|| abs(find->typeID()) == abs(tid)))
+					if (find->paramID() == vid &&
+							(sid == -32767 || find->sensor() == sid) &&
+							(lid == -32767 || find->level() == lid) &&
+							((tid == -32767 && abs(find->typeID()) == abs(stationinfo_.typeID())) || abs(find->typeID()) == abs(tid)))
 						break;
 				// or exact except typeID:
-				if (find == container_.end() && tid == -32767)
+				if (find == container_.end())
 					for (find = container_.begin(); find != container_.end(); ++find)
-						if (find->paramID() == vid && (sid == -32767
-								|| find->sensor() == sid) && (lid == -32767
-								|| find->level() == lid))
+						if (find->paramID() == vid &&
+								(sid == -32767 || find->sensor() == sid) &&
+								(lid == -32767 || find->level() == lid))
 						{
 							//              cout << "FOUND: " << find->typeID() << " (looked for " << tid << ")" << endl;
 							break;
