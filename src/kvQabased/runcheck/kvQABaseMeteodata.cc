@@ -427,7 +427,7 @@ void kvQABaseMeteodata::fillObsVariables(kvQABase::script_var & vars)
 							((tid == -32767 && abs(find->typeID()) == abs(stationinfo_.typeID())) || abs(find->typeID()) == abs(tid)))
 						break;
 				// or exact except typeID:
-				if (find == container_.end())
+				if (find == container_.end() and tid == -32767 )
 					for (find = container_.begin(); find != container_.end(); ++find)
 						if (find->paramID() == vid &&
 								(sid == -32767 || find->sensor() == sid) &&
