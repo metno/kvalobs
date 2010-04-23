@@ -167,15 +167,6 @@ void CheckRunner::updateStaticVariables()
 	}
 }
 
-void CheckRunner::findChecks(list<kvChecks> & out)
-{
-	if (!dbcon.getChecks(stinfo.stationID(), stinfo.obstime(), out))
-	{
-		log_("CheckRunner: Error reading checks", HtmlLog::Error);
-		throw std::runtime_error("Error reading checks");
-	}
-}
-
 void CheckRunner::runCheck(const CheckCreator::Script & checkScript,
 		const kvalobs::kvChecks & check)
 {

@@ -94,7 +94,6 @@ private:
 	bool hqcCorrected();
 	bool dataWasCheckedBefore();
 	void updateStaticVariables();
-	void findChecks(std::list<kvalobs::kvChecks> & out);
 
 	void runCheck(const CheckCreator::Script & checkScript,
 			const kvalobs::kvChecks & check);
