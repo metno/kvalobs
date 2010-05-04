@@ -56,9 +56,9 @@ DataSubscriber::callback(const CKvalObs::CService::ObsDataList& data)
 {
   LOGDEBUG( "Callback" );
 
-  struct timeval tv;
-  struct timezone tz;
-  int result = gettimeofday( & tv, & tz );
+//  struct timeval tv;
+//  struct timezone tz;
+//  int result = gettimeofday( & tv, & tz );
 
   DataEvent        *dataEvent;
   KvObsDataList    *dataList;
@@ -92,17 +92,17 @@ DataSubscriber::callback(const CKvalObs::CService::ObsDataList& data)
     return;
   }
 
-  if ( result == -1 ) {
-    LOGINFO( "Time to process: ERROR" );
-    return;
-  }   
-  struct timeval tv2;
-  result = gettimeofday( & tv2, & tz );
-  if ( result != -1 ) {
-    LOGINFO( "Time to process: " << tv2.tv_sec - tv.tv_sec << " seconds, "
-	     << tv2.tv_usec - tv.tv_usec << " microseconds." );
-  }
-  else {
-    LOGINFO( "Time to process: ERROR_" );
-  }
+//  if ( result == -1 ) {
+//    LOGINFO( "Time to process: ERROR" );
+//    return;
+//  }
+//  struct timeval tv2;
+//  result = gettimeofday( & tv2, & tz );
+//  if ( result != -1 ) {
+//    LOGINFO( "Time to process: " << tv2.tv_sec - tv.tv_sec << " seconds, "
+//	     << tv2.tv_usec - tv.tv_usec << " microseconds." );
+//  }
+//  else {
+//    LOGINFO( "Time to process: ERROR_" );
+//  }
 }
