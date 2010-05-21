@@ -4,7 +4,5 @@ set -e
 #set -x
 
 . /usr/share/debconf/confmodule
-. /usr/share/dbconfig-common/dpkg/prerm.pgsql 
-dbc_go kvalobs $@
 
 #DEBHELPER#
