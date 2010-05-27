@@ -98,6 +98,13 @@ namespace kvalobs{
   typedef std::list<kvStationInfo>::iterator       IkvStationInfoList;
   typedef std::list<kvStationInfo>::const_iterator CIkvStationInfoList;
 
+  inline bool operator == (const kvStationInfo & a, const kvStationInfo & b) {
+    return  a.stationID() == b.stationID() and
+    		a.obstime() == b.obstime() and
+    		a.typeID() == b.typeID();
+  }
+
+
   /** @} */
 };
 
