@@ -47,9 +47,6 @@ std::map<std::string, kvQCFlagTypes::main_qc> kvControlInfo::mainQCX_;
 // medium_qcx --> controlpart map
 std::map<std::string, int> kvControlInfo::controlPart_;
 
-/// list of flag values which trigger destruction of 'corrected' (by c_part)
-std::map<int, std::set<int> > kvControlInfo::badValues_;
-
 kvControlInfo::kvControlInfo() :
 	kvDataFlag()
 {
@@ -153,26 +150,6 @@ void kvControlInfo::init_()
 		mainQCXint_["QC2m"] = main_qc2m;
 		mainQCXint_["HQC"] = main_hqc;
 	}
-
-	// list of flag values which trigger destruction of 'corrected' (by c_part)
-	// NB: These values should probably be put in a db table...!
-	if (badValues_.size() == 0)
-	{
-		badValues_[f_fr].insert(6);
-
-		badValues_[f_fcc].insert(0xD);
-
-		badValues_[f_fpos].insert(6);
-
-		badValues_[f_fpre].insert(6);
-		badValues_[f_fpre].insert(7);
-
-		badValues_[f_fcombi].insert(9);
-		badValues_[f_fcombi].insert(0xA);
-		badValues_[f_fcombi].insert(0xB);
-
-		badValues_[f_fhqc].insert(0xA);
-	}
 }
 
 // Assignment operator
@@ -263,82 +240,12 @@ bool kvControlInfo::setControlFlag(const std::string& medium_qcx,
  force controlflag in specified part of controlinfo
  */
 bool kvControlInfo::setControlFlag(const kvQCFlagTypes::c_flags cf,
-		const int& control, bool setfqcl)
+		const int& control)
 {
 	int nibble = static_cast<int> (cf);
 	set(nibble, control);
 
-	if (setfqcl)
-		setFqclevel();
 	return true;
-}
-
-/*
- Controlinfo-flag routine.
- Check if value for one control part in 'bad'-list
- */
-bool kvControlInfo::iznogood(const std::string& medium_qcx) const
-{
-	if (controlPart_.count(medium_qcx) > 0)
-	{
-		int index = controlPart_[medium_qcx];
-		int control = flag(index);
-		return (badValues_[index].count(control) == 1);
-	}
-	std::clog << "unknown medium_qcx:" << medium_qcx << std::endl;
-	return false;
-}
-
-/*
- Controlinfo-flag routine.
- set the FqcLevel flag in controlinfo dataflags
- (Nibble 0)
- */
-void kvControlInfo::setFqclevel()
-{
-	// REMOVED 2003-12-18 !!!
-	return;
-
-	// find completion level for each main QC-type
-	bool completed[num_mainqcx];
-
-	for (int i = 0; i < num_mainqcx; i++)
-		completed[i] = true;
-
-	std::map<std::string, kvQCFlagTypes::main_qc>::const_iterator itr;
-
-	for (itr = mainQCX_.begin(); itr != mainQCX_.end(); itr++)
-	{
-
-		std::string medium_qcx = itr->first;
-		if (controlPart_.count(medium_qcx) > 0)
-		{
-			// AND together completion-status for each medium_qcx
-			completed[itr->second] &= (flag(controlPart_[medium_qcx]) > 0);
-
-		}
-		else
-		{
-			std::clog << "unknown medium_qcx:" << medium_qcx << std::endl;
-		}
-
-	}
-
-	std::cout << "kvControlInfo::setFqclevel checks completed. " << "qc1:"
-			<< (completed[0] ? "TRUE " : "FALSE ") << "qc2d:"
-			<< (completed[1] ? "TRUE " : "FALSE ") << "qc2m:"
-			<< (completed[2] ? "TRUE " : "FALSE ") << "hqc:"
-			<< (completed[3] ? "TRUE " : "FALSE ") << std::endl;
-
-	int c = 0;
-	// final flag is simple bitmask
-	for (int i = 0; i < num_mainqcx; i++)
-		if (completed[i])
-			c = c | (1 << i);
-
-	//COUT("kvControlInfo::setFqclevel final flag:" << c << std::endl;
-
-	set(0, c);
 }
 
 /*

@@ -57,7 +57,7 @@ namespace kvQCFlagTypes {
     'controlpart' in kvQcxInfo
   */
   enum c_flags {
-    f_fqclevel= 0,
+    f_fagg=     0,
     f_fr=       1,
     f_fcc=      2,
     f_fs=       3,

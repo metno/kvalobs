@@ -80,6 +80,7 @@ public:
 	 * \brief set HQC observer-id (0 - 255)
 	 */
 	void HQCid(const int& c);
+
 	/**
 	 * \brief get HQC observer-id
 	 */

@@ -45,26 +45,6 @@ namespace kvalobs
  */
 class kvControlInfo: public kvDataFlag
 {
-protected:
-	/// controlpart --> c_flags map
-	static std::map<int, kvQCFlagTypes::c_flags> lockedControlFlags_;
-	/// main_qcx string --> main_qc enum map
-	static std::map<std::string, kvQCFlagTypes::main_qc> mainQCXint_;
-
-	/// list of QcxInfo (from db)
-	static std::list<kvalobs::kvQcxInfo> qcxinfolist_;
-
-	/// medium_qcx --> main_qc enum map
-	static std::map<std::string, kvQCFlagTypes::main_qc> mainQCX_;
-	/// medium_qcx --> controlpart map
-	static std::map<std::string, int> controlPart_;
-
-	/// list of flag values (by c_part) which trigger destruction of 'corrected'
-	static std::map<int, std::set<int> > badValues_;
-
-	/// init static structures etc.
-	void init_();
-
 public:
 	/// flag is all zero's
 	kvControlInfo();
@@ -85,6 +65,7 @@ public:
 	 * \return  false if unknown checktype
 	 */
 	bool getControlFlag(const std::string& medium_qcx, int& control);
+
 	/**
 	 * \brief set controlflag - based on checktype,
 	 *
@@ -93,20 +74,12 @@ public:
 	 */
 	bool setControlFlag(const std::string& medium_qcx, const int& control,
 			bool setfqcl = true);
+
 	/**
 	 * \brief force controlflag in specified part of controlinfo
-	 *
-	 * optionally calls setFqclevel
 	 */
-	bool setControlFlag(const kvQCFlagTypes::c_flags cf, const int& control,
-			bool setfqcl = true);
-	/**
-	 * \brief set the FqcLevel flag in controlinfo dataflags
-	 * (Nibble 0)
-	 *
-	 * Usually called by setControlFlag()
-	 */
-	void setFqclevel();
+	bool setControlFlag(const kvQCFlagTypes::c_flags cf, const int& control);
+
 	void setFqclevel(const std::string& medium_qcx);
 
 	bool qc1Done() const;
@@ -125,11 +98,6 @@ public:
 	 */
 	int MissingFlag() const;
 
-	/**
-	 * \brief check if value for one control part corresponds to a rejected 'corrected'
-	 */
-	bool iznogood(const std::string& medium_qcx) const;
-
 	kvControlInfo& operator=(const kvControlInfo &rhs);
 	kvControlInfo& operator=(const kvDataFlag &rhs);
 	bool operator==(const kvControlInfo& rhs) const;
@@ -137,6 +105,25 @@ public:
 	{
 		return !(*this == rhs);
 	}
+
+private:
+	/// controlpart --> c_flags map
+	static std::map<int, kvQCFlagTypes::c_flags> lockedControlFlags_;
+	/// main_qcx string --> main_qc enum map
+	static std::map<std::string, kvQCFlagTypes::main_qc> mainQCXint_;
+
+	/// list of QcxInfo (from db)
+	static std::list<kvalobs::kvQcxInfo> qcxinfolist_;
+
+	/// medium_qcx --> main_qc enum map
+	static std::map<std::string, kvQCFlagTypes::main_qc> mainQCX_;
+	/// medium_qcx --> controlpart map
+	static std::map<std::string, int> controlPart_;
+
+	/// init static structures etc.
+	void init_();
+
+
 	friend std::ostream& operator<<(std::ostream& output,
 			const kvalobs::kvControlInfo& kd);
 };
