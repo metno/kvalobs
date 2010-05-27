@@ -19,7 +19,6 @@ libkvalobs_kvalobs_la_SOURCES = \
 	kvStation.cc \
 	kvStationParam.cc \
 	kvQcxInfo.cc \
-	kvDataFlag.cc \
 	kvTimecontrol.cc \
 	kvQueries.cc \
 	kvStationInfoCommand.cc \
@@ -35,7 +34,10 @@ libkvalobs_kvalobs_la_SOURCES = \
 	kvDataOperations.cc \
 	kvTextDataOperations.cc \
 	kvPsSubscribers.cc \
-	kvStationMetadata.cc
+	kvStationMetadata.cc \
+	flag/kvDataFlag.cc \
+	flag/kvControlInfo.cc \
+	flag/kvUseInfo.cc
 
 
 libkvalobs_kvalobs_la_CPPFLAGS = $(AM_CPPFLAGS) $(putools_CFLAGS) \
@@ -96,3 +98,9 @@ kvalobsinclude_HEADERS = \
 	kvQCFlagTypes.h \
 	kvexception.h \
 	kvStationMetadata.h
+
+kvalobsflagincludedir = $(kvalobsincludedir)/flag
+kvalobsflaginclude_HEADERS = \
+	flag/kvDataFlag.h \
+	flag/kvControlInfo.h \
+	flag/kvUseInfo.h
