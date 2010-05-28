@@ -83,6 +83,16 @@ GRANT USAGE ON SEQUENCE data_history_version_seq TO kv_write;
 
 CREATE LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION 
+kvalobs_database_version()
+RETURNS text AS
+$BODY$
+BEGIN
+	RETURN '2.1.3';
+END;
+$BODY$
+LANGUAGE plpgsql IMMUTABLE;
+
 --
 -- Trigger function for propagating changes to the data table into data_history
 --

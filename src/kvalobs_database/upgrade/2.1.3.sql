@@ -1,0 +1,13 @@
+BEGIN;
+
+CREATE OR REPLACE FUNCTION 
+kvalobs_database_version()
+RETURNS text AS
+$BODY$
+BEGIN
+	RETURN '2.1.3';
+END;
+$BODY$
+LANGUAGE plpgsql IMMUTABLE;
+
+END;
