@@ -220,15 +220,12 @@ bool kvControlInfo::getControlFlag(const std::string& medium_qcx, int& control)
  return false if unknown checktype
  */
 bool kvControlInfo::setControlFlag(const std::string& medium_qcx,
-		const int& control, bool setfqcl)
+		const int& control)
 {
 	if (controlPart_.count(medium_qcx) > 0)
 	{
 		int nibble = controlPart_[medium_qcx];
 		set(nibble, control);
-
-		if (setfqcl)
-			setFqclevel(medium_qcx);
 		return true;
 	}
 	std::clog << "unknown medium_qcx:" << medium_qcx << std::endl;
@@ -246,28 +243,6 @@ bool kvControlInfo::setControlFlag(const kvQCFlagTypes::c_flags cf,
 	set(nibble, control);
 
 	return true;
-}
-
-/*
- Controlinfo-flag routine.
- set the FqcLevel flag in controlinfo dataflags
- (Nibble 0)
- */
-void kvControlInfo::setFqclevel(const std::string& medium_qcx)
-{
-	if (mainQCX_.count(medium_qcx) > 0)
-	{
-		int c = flag(0);
-		int mqc = int(mainQCX_[medium_qcx]);
-		c |= (1 << mqc);
-
-		//    COUT("kvControlInfo::setFqclevel final flag:" << c << std::endl;
-
-		set(0, c);
-		return;
-	}
-
-	std::clog << "unknown medium_qcx:" << medium_qcx << std::endl;
 }
 
 bool kvControlInfo::qc1Done() const

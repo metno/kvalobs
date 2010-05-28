@@ -381,7 +381,7 @@ TEST_F(CheckRunnerTest, testAllTypeidAreInputData)
 
 	ResultContainer::const_iterator it = result.find( inData2 );
 	EXPECT_TRUE( it != result.end() );
-	EXPECT_EQ( kvControlInfo( "1000300000000000" ), it->controlinfo() );
+	EXPECT_EQ( kvControlInfo( "0000300000000000" ), it->controlinfo() );
 }
 
 TEST_F(CheckRunnerTest, testPrefersCurrentTypeID)
@@ -414,7 +414,7 @@ TEST_F(CheckRunnerTest, testPrefersCurrentTypeID)
 
 	ResultContainer::const_iterator it = result.find( inData1 );
 	EXPECT_TRUE( it != result.end() );
-	EXPECT_EQ( kvControlInfo( "1000300000000000" ), it->controlinfo() );
+	EXPECT_EQ( kvControlInfo( "0000300000000000" ), it->controlinfo() );
 
 	it = result.find( inData2 );
 	ASSERT_TRUE( it != result.end() );

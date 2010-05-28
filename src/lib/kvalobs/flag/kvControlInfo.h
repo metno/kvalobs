@@ -72,15 +72,12 @@ public:
 	 * optionally calls setFqclevel
 	 * \return false if unknown checktype
 	 */
-	bool setControlFlag(const std::string& medium_qcx, const int& control,
-			bool setfqcl = true);
+	bool setControlFlag(const std::string& medium_qcx, const int& control);
 
 	/**
 	 * \brief force controlflag in specified part of controlinfo
 	 */
 	bool setControlFlag(const kvQCFlagTypes::c_flags cf, const int& control);
-
-	void setFqclevel(const std::string& medium_qcx);
 
 	bool qc1Done() const;
 	bool qc2dDone() const;
