@@ -142,7 +142,6 @@ bool kvUseInfo::setUseFlags(const kvControlInfo& cinfo)
 	const int fcombi = cinfo.flag(f_fcombi);
 	const int fhqc = cinfo.flag(f_fhqc);
 
-
 	// useinfo(0) : "Kontrollniv� passert"
 	if (cinfo.qc1Done() and cinfo.qc2Done() and cinfo.hqcDone())
 		ui[0] = 1;
@@ -200,23 +199,23 @@ bool kvUseInfo::setUseFlags(const kvControlInfo& cinfo)
 		else if (fhqc == 1 || fhqc == 2)
 			ui[2] = 0;
 
-		else if (fagg > 4 || fr == 6 || fcc >= 0xA || fcp >= 0xA || fs >= 9 || fnum == 6
-				|| fw == 6 || fpos >= 4 || fd == 2 || fd >= 6 || fpre >= 4
-				|| fclim == 3 || fcombi >= 9 || fhqc >= 6)
+		else if (fagg > 4 || fr == 6 || fcc >= 0xA || fcp >= 0xA || fs >= 9
+				|| fnum == 6 || fw == 6 || fpos >= 4 || fd == 2 || fd >= 6
+				|| fpre >= 4 || fclim == 3 || fcombi >= 9 || fhqc >= 6)
 			ui[2] = 3;
 
-		else if (fagg == 3 || ((fr == 4 || fr == 5) && fcombi != 2) || fcc == 3 || fcc == 4
-				|| fcc == 6 || fcc == 7 || fcp == 3 || fcp == 4 || fcp == 6
-				|| fcp == 7 || fs == 3 || fnum == 4 || fnum == 5 || fw == 4
+		else if (fagg == 3 || ((fr == 4 || fr == 5) && fcombi != 2 && fcombi
+				!= 1) || fcc == 3 || fcc == 4 || fcc == 6 || fcc == 7 || fcp
+				== 3 || fcp == 4 || fcp == 6 || fcp == 7 || fs == 3 || fw == 4
 				|| fw == 5 || fpos == 3 || fstat == 2 || fd == 3)
 			ui[2] = 2;
 
-		else if (fagg == 2 || fr == 2 || fr == 3 || fcc == 2 || fcp == 2 || fs == 2 || fs
-				== 4 || fs == 5 || fs == 7 || fw == 2
-				|| fw == 3 || fclim == 2 || fcombi == 2)
+		else if (fagg == 2 || fr == 2 || fr == 3 || fcc == 2 || fcp == 2 || fs
+				== 2 || fs == 4 || fs == 5 || fs == 7 || fw == 2 || fw == 3
+				|| fclim == 2 || fcombi == 2)
 			ui[2] = 1;
 
-		else if (fagg == 1 || fr == 1 || fcc == 1 || fcp == 1 || fs == 1 || fnum == 1 || fnum == 2 || fnum == 3|| fw
+		else if (fagg == 1 || fr == 1 || fcc == 1 || fcp == 1 || fs == 1 || fw
 				== 1 || fpos == 1 || fstat == 1 || fclim == 1 || fd == 1
 				|| fcombi == 1)
 			ui[2] = 0;
@@ -247,14 +246,14 @@ bool kvUseInfo::setUseFlags(const kvControlInfo& cinfo)
 		else if (fmis == 1)
 			ui[3] = 4;
 
-		else if (fagg == 6 || fcc == 0xA || fcc == 0xB || fcp == 0xA || fcp == 0xB || fs
-				== 9 || fs == 0xA || fpos == 4 || fpre == 4 || fclim == 3
-				|| (fnum == 6 && (fmis == 0 || fmis == 4)) || (fw == 6 && (fmis
-				== 0 || fmis == 4)))
+		else if (fagg == 6 || fcc == 0xA || fcc == 0xB || fcp == 0xA || fcp
+				== 0xB || fs == 9 || fs == 0xA || fpos == 4 || fpre == 4
+				|| fclim == 3 || (fnum == 6 && (fmis == 0 || fmis == 4)) || (fw
+				== 6 && (fmis == 0 || fmis == 4)))
 			ui[3] = 3;
 
-		else if (fagg == 0xB || fr == 6 || fcc == 0xD || fpos == 6 || fpre >= 6 || fcombi >= 9
-				|| fhqc == 0xA)
+		else if (fagg == 0xB || fr == 6 || fcc == 0xD || fpos == 6 || fpre >= 6
+				|| fcombi >= 9 || fhqc == 0xA)
 			ui[3] = 8;
 
 		else
@@ -275,33 +274,33 @@ bool kvUseInfo::setUseFlags(const kvControlInfo& cinfo)
 		else if (fd == 2 || fd >= 6 || fr == 7)
 			ui[4] = 9;
 
-		else if (fr < 7 && fr > 1 && fcc <= 1 && fcp <= 1 && fs <= 1 && fnum
-				<= 1 && fpos <= 1 && ftime <= 1 && fw <= 1 && fstat <= 1
+		else if (7 > fr && fr > 1 && fcc <= 1 && fcp <= 1 && fs <= 1 && fnum
+				<= 5 && fpos <= 1 && ftime <= 1 && fw <= 1 && fstat <= 1
 				&& fclim <= 1)
 			ui[4] = 1;
 
 		else if ((fcc == 2 || fcc == 3 || fcc == 6 || fcc == 9 || fcc == 0xA
 				|| fcc == 0xD || fcp == 2 || fcp == 3 || fcp == 0xA) && fs <= 1
-				&& fnum <= 1 && fpos <= 1 && ftime <= 1 && fw <= 1 && fstat
+				&& fnum <= 5 && fpos <= 1 && ftime <= 1 && fw <= 1 && fstat
 				<= 1 && fclim <= 1)
 			ui[4] = 2;
 
-		else if ((fs > 1 || fpos > 1) && fnum <= 1 && ftime <= 1 && fw <= 1
+		else if ((fs > 1 || fpos > 1) && fnum <= 5 && ftime <= 1 && fw <= 1
 				&& fstat <= 1 && fclim <= 1)
 			ui[4] = 3;
 
 		else if ((fcc == 4 || fcc == 7 || fcc == 0xB || fcp == 4 || fcp == 7
-				|| fcp == 0xB) && fnum <= 1 && ftime <= 1 && fw <= 1 && fstat
+				|| fcp == 0xB) && fnum <= 5 && ftime <= 1 && fw <= 1 && fstat
 				<= 1 && fclim <= 1)
 			ui[4] = 4;
 
-		else if ((fw > 1 || fclim > 1) && fnum <= 1 && ftime <= 1 && fstat <= 1)
+		else if ((fw > 1 || fclim > 1) && fnum <= 5 && ftime <= 1 && fstat <= 1)
 			ui[4] = 5;
 
-		else if (ftime > 1 && fnum <= 1 && fstat <= 1)
+		else if (ftime > 1 && fnum <= 5 && fstat <= 1)
 			ui[4] = 6;
 
-		else if (fnum > 1 && fstat <= 1)
+		else if (fnum > 5 && fstat <= 1)
 			ui[4] = 7;
 
 		else if (fstat > 1)
