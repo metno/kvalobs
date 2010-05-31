@@ -21,5 +21,3 @@ var/log/kvalobs/decoders
 var/log/kvalobs/decoders/SynopDecoder
 var/log/kvalobs/kvdbadmin
 var/lib/kvalobs/service/subscribers
-usr/share/dbconfig-common/scripts/kvalobs/install/
-usr/share/dbconfig-common/scripts/kvalobs/upgrade/pgsql/

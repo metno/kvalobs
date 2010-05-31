@@ -1,3 +1,27 @@
+kvalobs (2.1.2-2) hardy; urgency=low
+
+  * removed dbconfig-common from package
+
+ -- Borge Moe <borge.moe@met.no>  Fri, 21 May 2010 12:56:41 +0200
+
+kvalobs (2.1.2-1) unstable; urgency=low
+
+  * new release
+
+ --  Borge Moe <borge.moe@met.no>  Mon, 19 Apr 2010 09:54:48 +0200
+
+kvalobs (2.1.1-8) unstable; urgency=low
+
+  * Correct 2.1.1 build
+
+ --  Borge Moe <borge.moe@met.no>  Mon, 19 Apr 2010 08:23:05 +0200
+
+kvalobs (2.1.1-7) unstable; urgency=low
+
+  * Correct 2.1.1 build
+
+ --  <vegardb@met.no>  Fri, 16 Apr 2010 15:04:15 +0200
+
 kvalobs (2.1.1-6) unstable; urgency=low
 
   * Fix rundir in kvstart.

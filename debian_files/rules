@@ -133,13 +133,6 @@ install-arch:
 
 	dh_install -s --sourcedir=debian/tmp
 
-	install -m 774 debian/db/kvalobs.install_database.sh debian/kvalobs/usr/share/dbconfig-common/scripts/kvalobs/install/pgsql
-	for F in debian/kvalobs/usr/share/kvalobs/db/upgrade/*.sql; do \
-			sed s:__UPGRADE_FILE__:/usr/share/kvalobs/db/upgrade/`basename $$F`: debian/db/upgrade_skeleton.sh > debian/kvalobs/usr/share/dbconfig-common/scripts/kvalobs/upgrade/pgsql/`basename $$F .sql`; \
-		chmod 774 debian/kvalobs/usr/share/dbconfig-common/scripts/kvalobs/upgrade/pgsql/`basename $$F .sql`; \
-	done
-
-
 # Must not depend on anything. This is to be called by
 # binary-arch/binary-indep
 # in another 'make' thread.

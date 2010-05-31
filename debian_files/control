@@ -20,7 +20,7 @@ Package: kvalobs
 Architecture: any
 Depends: kvalobsuser, libkvalobs1 (= ${binary:Version}), 
  ${shlibs:Depends}, ${misc:Depends}, adduser, debconf, postgresql-8.3,
- sqlite3, dbconfig-common
+ sqlite3
 Suggests: postgresql-client
 Description: A quality assurance system for meteorological observations
  Kvalobs is a quality assurance system for meteorological observations.
