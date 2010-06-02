@@ -129,7 +129,7 @@ for file in $files ; do
 	if [ "$debug" = "true" ]; then
 		psql --echo-all kvalobs -f $dir/load.sql 
 	else
-		psql --echo-all kvalobs -f $dir/load.sql >> $tlogfile
+		psql --echo-all kvalobs -f $dir/load.sql >> $tlogfile 2>&1
 	fi
 			
 	if [ "$?" -ne 0 ]; then
