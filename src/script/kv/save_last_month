@@ -78,7 +78,8 @@ echo "\\copy text_data_temp TO $ftextdata WITH DELIMITER AS '|'" >> $sql
 echo "\\copy model_data_temp TO $fmodeldata WITH DELIMITER AS '|'" >> $sql
 
 #Opprett en sqlfil for å laste data inn i databasen.
-echo "DELETE FROM data WHERE obstime BETWEEN '$start_date' AND '$end_date';" > $lsql
+echo "\set ON_ERROR_STOP" > $lsql
+echo "DELETE FROM data WHERE obstime BETWEEN '$start_date' AND '$end_date';" >> $lsql
 echo "DELETE FROM text_data WHERE obstime BETWEEN '$start_date' AND '$end_date';" >> $lsql
 echo "DELETE FROM model_data WHERE obstime BETWEEN '$start_date' AND '$end_date';" >> $lsql
 echo "\\copy data FROM $fdata WITH DELIMITER AS '|'"  >> $lsql
