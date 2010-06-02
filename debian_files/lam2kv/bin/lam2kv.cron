@@ -23,7 +23,7 @@ if [ $NOW -eq 11 ] ; then
 fi
 
 #JOB=$HOME/cronjob/lam2kv
-LOG=$(kvconfig --localstatedir)/kvalobs/lam2kv/log
+LOG=$(kvconfig --localstatedir)/log/kvalobs/lam2kv/log
 
 $(kvconfig --libdir)/kvalobs/bin/hirlam2kvalobs.sh $RUN  >  $LOG/hirlam2kvalobs.$RUN 2>&1
 

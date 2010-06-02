@@ -26,7 +26,7 @@ LOCALBIN="$(kvconfig --libdir)/kvalobs/bin"
 #JOB=$HOME/cronjob/lam2kv
 
 BIN=$(kvconfig --bindir)
-JOB=$(kvconfig --localstatedir)/kvalobs/lam2kv
+JOB=$(kvconfig --localstatedir)/lib/kvalobs/lam2kv
 
 DATA=$JOB/data
 LOAD=$JOB/upload
