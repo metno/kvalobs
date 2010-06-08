@@ -705,8 +705,43 @@ bool kvUseInfo::setUseFlags(const kvControlInfo& cinfo)
 
   //IDLOGDEBUG("html", "setUseFlags: fhqc=" << fhqc << endl <<
   //           "qclevel=" << qclevel<< endl);
+// An ugly fix, just to test....
+// To bee removed later on...
+/*
+Vi tror vi har en lösning på problemet med statuskod till BÅK.
 
+Vi sätter nu två fasta koder såfort fd=4 eller fd=5.
 
+Fd==4 -> nordklim:76909  -> båkstatus:30
+Fd==5 -> nordklim:73000  -> båkstatus:31
+*/
+
+  // The ugly fix....
+
+  if (fd == 4)
+  {
+	  ui[0] = 7;
+	  ui[1] = 6;
+	  ui[2] = 9;
+	  ui[3] = 0;
+	  ui[4] = 9;
+	  // Finally- set the useflags
+	  for (int i=0; i<kvDataFlag::size; i++)
+		  set(i, ui[i]);
+	  return true;
+  }
+  if (fd == 5)
+  {
+	  ui[0] = 7;
+	  ui[1] = 3;
+	  ui[2] = 0;
+	  ui[3] = 0;
+	  ui[4] = 0;
+	  // Finally- set the useflags
+	  for (int i=0; i<kvDataFlag::size; i++)
+		  set(i, ui[i]);
+	  return true;
+  }
   // useinfo(0) : "Kontrollniv� passert"
   if ( cinfo.qc1Done() and cinfo.qc2Done() and cinfo.hqcDone() )             ui[ 0 ] = 1;
   else if ( ! cinfo.qc1Done() and cinfo.qc2Done() and cinfo.hqcDone() )      ui[ 0 ] = 2;
