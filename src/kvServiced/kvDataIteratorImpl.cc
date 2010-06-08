@@ -408,7 +408,7 @@ DataIteratorImpl::findData(list<kvData> &data,
 	     " timeinterval:" << stime << " - " << etime );
     	ret=false;
   	}
- 
+#ifdef USE_TEXTDATA 
   	if(gate.select(textData, 
 					kvQueries::selectTextData(wData.stationid, 
 											  stime, 
@@ -418,7 +418,7 @@ DataIteratorImpl::findData(list<kvData> &data,
    		LOGWARN("Error fetching <textData>! stationid: " << wData.stationid <<
 	   			" timeinterval:" << stime << " - " << etime );
   }
- 
+#endif
  
   LOGINFO("DataIteratorImpl::findData: return " << (ret?"TRUE":"FALSE")<<endl);
   return ret;
