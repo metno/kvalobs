@@ -109,9 +109,12 @@ DataIteratorImpl::destroy()
 CORBA::Boolean  
 DataIteratorImpl::next(CKvalObs::CService::ObsDataList_out obsDataList)
 {
+	// Something funny 
+	
 	const int              OBSLIST_DELTA=12;
 	const int              DATALIST_DELTA=20;
 	const int              TEXTDATALIST_DELTA=10;
+	
 	list<kvData>               dataList;
 	list<kvData>::iterator     it;
 	list<kvTextData>           textDataList;
@@ -337,7 +340,7 @@ DataIteratorImpl::findData(list<kvData> &data,
 	textData.clear();
 	data.clear();
 
-  	LOGDEBUG("stationid: " << wData.stationid << " currentEndTime: "
+  	LOGINFO("stationid: " << wData.stationid << " currentEndTime: "
 	   		 << currentEndTime << " endTime: " << endTime << " iData: " <<
 	   		 iData);
 
@@ -367,9 +370,14 @@ DataIteratorImpl::findData(list<kvData> &data,
   	}else{
     	stime=currentEndTime;
   	}
-  
+	// YE: 2010-06-07
+    // Hm, we should try to optimize this question!
+	// It is unneccesesary to split the time, let the user of the api decide.
+	// But, there are some CORBA problems...
+	
   	tmpTime=stime;
-  	tmpTime.addHour(12);
+  	//tmpTime.addHour(12);
+	tmpTime.addHour(168);
 
   	if(tmpTime<endTime){
     	currentEndTime=tmpTime;
@@ -385,12 +393,16 @@ DataIteratorImpl::findData(list<kvData> &data,
     	etime=endTime;
     	iData++;
   	}
+	/*
 
-
-  	LOGDEBUG("select(" << wData.stationid << ", " << stime << ", " << etime);
+	currentEndTime=miTime(); //set currentEndTime to undef.
+    etime=endTime;
+    iData++;
+	*/
+  	LOGINFO("select(" << wData.stationid << ", " << stime << ", " << etime);
 
   	if(gate.select(data, kvQueries::selectData(wData.stationid, stime, etime))){
-    	LOGDEBUG("data: nElements=" << data.size()); 
+    	LOGINFO("data: nElements=" << data.size()); 
   	}else{
     	LOGERROR("Error fetching <data>! stationid: " << wData.stationid <<
 	     " timeinterval:" << stime << " - " << etime );
@@ -401,14 +413,14 @@ DataIteratorImpl::findData(list<kvData> &data,
 					kvQueries::selectTextData(wData.stationid, 
 											  stime, 
 											  etime))){
-    	LOGDEBUG("textData: nElements=" << textData.size()); 
+    	LOGINFO("textData: nElements=" << textData.size()); 
  	}else{
    		LOGWARN("Error fetching <textData>! stationid: " << wData.stationid <<
 	   			" timeinterval:" << stime << " - " << etime );
   }
  
  
-  LOGDEBUG("DataIteratorImpl::findData: return " << (ret?"TRUE":"FALSE")<<endl);
+  LOGINFO("DataIteratorImpl::findData: return " << (ret?"TRUE":"FALSE")<<endl);
   return ret;
 }
 

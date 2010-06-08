@@ -107,10 +107,11 @@ main(int argc, char** argv)
   poa=app.getPoa();
 
   //set timeout to 5 minutes
-  //  omniORB::setClientCallTimeout(300000);
+  // due to a slow database and large queries
+  omniORB::setClientCallTimeout(300000);
 
   //set timeout to 1 minute
-  omniORB::setClientCallTimeout(60000);
+  //omniORB::setClientCallTimeout(60000);
 
 
   ServiceSubscriber serviceSubscriber(app, dataReadyQue);

@@ -247,7 +247,8 @@ ServiceApp::
 cleanUpReaperObj()
 {
   	//const int TIMEOUT=900; //15 minutes
-  	const int TIMEOUT=60; //1 minutes
+  	//const int TIMEOUT=60; //1 minutes
+	const int TIMEOUT=300;
   	time_t lastAccess;
   	time_t now;
   	bool running;

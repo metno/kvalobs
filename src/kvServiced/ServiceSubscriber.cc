@@ -200,14 +200,14 @@ void
 ServiceSubscriber::
 removeDeadConnections()
 {
-  app.subscribers.removeDeadSubscribers(60);
+  app.subscribers.removeDeadSubscribers(300);
 }
  
 void       
 ServiceSubscriber::
 operator()()
 {
-  const                     int CON_IDLE_TIME=60;
+  const                     int CON_IDLE_TIME=300;
   const                     int WAIT_ON_QUE_TIMEOUT=1;
   int                       conIdleTime=0;
   DataReadyCommand          *stInfoCmd=0;
