@@ -12,4 +12,5 @@ SUBDIRS = \
 	kvalobs_database \
 	script \
 	norcom2kv \
-	kv2kro2 
+	kv2kro2 \
+	tools/kvpush

@@ -36,6 +36,7 @@
 #include <kvalobs/kvStation.h>
 #include <kvalobs/kvData.h>
 #include <kvalobs/kvWorkelement.h>
+#include <kvalobs/kvPath.h>
 #include "kvpushApp.h"
 
 using namespace std; 

@@ -61,6 +61,7 @@ AC_CONFIG_FILES([Makefile
                  src/model2kv/Makefile
                  src/kv2metdat/Makefile
                  src/kv2kro2/Makefile
+                 src/tools/kvpush/Makefile
                  src/kvalobs_database/Makefile
                  src/kvalobs_database/upgrade/Makefile
                  src/script/Makefile

@@ -41,6 +41,7 @@
 #include <miutil/commastring.h>
 #include <sstream>
 #include <string>
+#include <kvalobs/kvPath.h>
 #include "kvpushApp.h"
 
 using namespace std;
@@ -52,26 +53,15 @@ KvPushApp::
 KvPushApp(int argn, char **argv, const char *options[][2]):
 	KvApp(argn, argv, options)
 {
+   string confdir = kvPath( "sysconfdir" );
+   string pkglibdir = kvPath("pkglibdir");
+   string confile = confdir+"/kvalobs.conf";
+
 	ConfSection *conf=KvApp::getConfiguration();
 	std::string dbdriver;
 	
-	if(!getenv("KVALOBS")){
-		cerr << "The environment variable KVALOBS must be set!" << endl;
-		exit(1);
-	}
-	
-	string kvpath=getenv("KVALOBS");
-	
-	if(kvpath.empty()){
-		cerr << "The environment variable KVALOBS is empty!" << endl;
-		exit(1);
-	}
-	
-	if(kvpath[kvpath.length()-1]!='/')
-		kvpath+='/';
-	
 	if(!conf){
-		cerr << "Cant read the configuration file <$KVALOBS/etc/kvalobs.conf>!";
+		cerr << "Cant read the configuration file '" << confile << "'.\n\n";
 		exit(1);
 	}
 	
@@ -83,16 +73,16 @@ KvPushApp(int argn, char **argv, const char *options[][2]):
 
   	//Use postgresql as a last guess.
 	if(dbdriver.empty()){
- 		cerr << "No database driver specified in <$KVALOBS/etc/kvalobs.conf>!";
+ 		cerr << "No database driver specified in '" << confile << "'." << endl << endl;
  		exit(1);
  	}
  	
- 	dbdriver=kvpath+"lib/db/"+dbdriver;
+ 	dbdriver=pkglibdir+"/db/"+dbdriver;
  	
  	if(!dbMgr.loadDriver(dbdriver, dbDriverId)){
   		cerr << "Can't load driver <" << dbdriver << endl 
 	     	<< dbMgr.getErr() << endl 
-	     	<< "Check if the driver is in the directory $KVALOBS/lib/db???";
+	     	<< "Check if '"<< dbdriver << "' exist." << endl << endl;
 
     	exit(1);
   	}
@@ -104,7 +94,7 @@ KvPushApp(int argn, char **argv, const char *options[][2]):
    if(val.size()==1){
      	dbConnect=val[0].valAsString();
    }else{
-   	cerr << "No database.dbconnect specified in $KVALOBS/etc/kvalobs.conf!" << endl;
+   	cerr << "No database.dbconnect specified in '" << confile <<"'.\n\n";
    	exit(1);	
   	}
 }
