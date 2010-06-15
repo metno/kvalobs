@@ -273,7 +273,7 @@ cleanUpReaperObj()
     		if( (*it)->isTimedout() ) {
     			LOGWARN("COLLECT: A ReaperBase object has timedout.!");
     		} else{
-    			LOGINFO("COLLECT: A client has disconected a ReaperBase object!");
+    			LOGDEBUG("COLLECT: A client has disconected a ReaperBase object!");
     		}
     		//(*it)->_remove_ref();
     		ReaperBase *obj = *it;

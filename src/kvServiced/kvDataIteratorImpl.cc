@@ -340,7 +340,7 @@ DataIteratorImpl::findData(list<kvData> &data,
 	textData.clear();
 	data.clear();
 
-  	LOGINFO("stationid: " << wData.stationid << " currentEndTime: "
+  	LOGDEBUG("stationid: " << wData.stationid << " currentEndTime: "
 	   		 << currentEndTime << " endTime: " << endTime << " iData: " <<
 	   		 iData);
 
@@ -399,10 +399,10 @@ DataIteratorImpl::findData(list<kvData> &data,
     etime=endTime;
     iData++;
 	*/
-  	LOGINFO("select(" << wData.stationid << ", " << stime << ", " << etime);
+  	LOGDEBUG("select(" << wData.stationid << ", " << stime << ", " << etime);
 
   	if(gate.select(data, kvQueries::selectData(wData.stationid, stime, etime))){
-    	LOGINFO("data: nElements=" << data.size()); 
+    	LOGDEBUG("data: nElements=" << data.size()); 
   	}else{
     	LOGERROR("Error fetching <data>! stationid: " << wData.stationid <<
 	     " timeinterval:" << stime << " - " << etime );
@@ -413,14 +413,14 @@ DataIteratorImpl::findData(list<kvData> &data,
 					kvQueries::selectTextData(wData.stationid, 
 											  stime, 
 											  etime))){
-    	LOGINFO("textData: nElements=" << textData.size()); 
+    	LOGDEBUG("textData: nElements=" << textData.size()); 
  	}else{
    		LOGWARN("Error fetching <textData>! stationid: " << wData.stationid <<
 	   			" timeinterval:" << stime << " - " << etime );
   }
 #endif
  
-  LOGINFO("DataIteratorImpl::findData: return " << (ret?"TRUE":"FALSE")<<endl);
+  LOGDEBUG("DataIteratorImpl::findData: return " << (ret?"TRUE":"FALSE")<<endl);
   return ret;
 }
 
