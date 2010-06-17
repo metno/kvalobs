@@ -103,6 +103,9 @@ namespace kvalobs{
     		a.obstime() == b.obstime() and
     		a.typeID() == b.typeID();
   }
+  inline bool operator != (const kvStationInfo & a, const kvStationInfo & b) {
+	  return not operator == (a, b);
+  }
 
 
   /** @} */
