@@ -69,12 +69,14 @@ public:
 private:
 	kvDbGate dbGate;
 
+	void saveInRejectDecode();
 	void parse(serialize::KvalobsData & data, const miutil::miString & obs) const;
 	void verifyAndAdapt(serialize::KvalobsData & data, std::list<
 			kvalobs::kvData> & out);
 	//     void save( const serialize::KvalobsData & data );
 	void save(const std::list<kvalobs::kvData> & dl, const std::list<
 			kvalobs::kvTextData> & tdl);
+
 
 	typedef boost::shared_ptr<const kvalobs::kvData> kvDataPtr;
 	kvDataPtr getDbData(const kvalobs::kvData d);

@@ -98,6 +98,7 @@ DecoderBase::DecodeResult kv2kvDecoder::execute(miutil::miString & msg)
 	if ( parseResult_ != Ok )
 	{
 		msg = parseMessage_;
+		saveInRejectDecode();
 		return parseResult_;
 	}
 
@@ -116,22 +117,26 @@ DecoderBase::DecodeResult kv2kvDecoder::execute(miutil::miString & msg)
 		//     getConnection()->rollBack();
 		parseMessage_ = e.what();
 		parseResult_ = e.res;
-		ostringstream ss;
-		ss << parseMessage_ << endl << "Data was:\n" << obs;
-		try
-		{
-			kvRejectdecode reject(obs, tbtime, name(), msg);
-			if (!this->putRejectdecodeInDb(reject))
-				throw exception();
-		} catch (...)
-		{
-			ss << endl << "Unable to save message in rejectdecode!";
-		}
-		LOGERROR( ss.str() );
+		saveInRejectDecode();
 	}
 
 	msg = parseMessage_;
 	return parseResult_;
+}
+
+void kv2kvDecoder::saveInRejectDecode()
+{
+	std::string originalMessage = parseMessage_;
+	try
+	{
+		kvRejectdecode reject(obs, tbtime, name(), parseMessage_);
+		if (!this->putRejectdecodeInDb(reject))
+			throw std::runtime_error("Unable to save data in rejectdecode table!");
+	} catch (std::exception & e )
+	{
+		originalMessage = originalMessage + '\n' + e.what();
+	}
+	LOGERROR(originalMessage << '\n' << "Data was:\n" << obs);
 }
 
 void kv2kvDecoder::parse(KvalobsData & data, const miutil::miString & obs) const
@@ -370,9 +375,7 @@ void kv2kvDecoder::verify(const kvData & d, kvDataPtr dbData) const
 	if (dbData.get() and abs(dbData->original() - d.original()) > delta)
 	{
 		ostringstream ss;
-		ss << "New data is not compatible with old in database." << endl
-				<< "Station: " << d.stationID() << endl << "Values: DB = "
-				<< dbData->original() << ". New = " << d.original();
+		ss << "New data is not compatible with old in database: Values: DB = "<< dbData->original() << ". New = " << d.original();
 		throw DecoderError(decoder::DecoderBase::Rejected, ss.str());
 	}
 }
