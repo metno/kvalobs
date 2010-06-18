@@ -18,24 +18,24 @@ logdir=$(kvconfig --localstatedir)/log/kvalobs/klima_backup
 backupdir=$VARDIR/klima_backup
 
 
-if[ "${nmonth}z" = "z" ]; then
+if [ "${nmonth}z"="z" ]; then
 	NMONTH=4
 else
     NMONTH=$nmonth
 fi
 
-if [ "${histkvalobs}z" = "z" ]; then
+if [ "${histkvalobs}z"="z" ]; then
 	histkvalobs="kvalobs@histkvalobs:var/klima_backup"
 else
 	histkvalobs="$histkvalobs"
 fi
 
-if [ "${enable}z" = "z" ]; then
+if [ "${enable}z"="z" ]; then
 	enable="false"
 fi
 
-if [ "$enable" = "false" ]; then
-|	echo "Save last month disabled!"
+if [ "$enable"="false" ]; then
+	echo "Save last month disabled!"
 	exit 0
 fi 
 
