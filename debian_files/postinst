@@ -56,8 +56,7 @@ ETC_FILES="kv_ctl.conf
            lam2kv/metdat.RR12  
            lam2kv/parmap.kvalobs      
            lam2kv/posdat.RR24  
-           lam2kv/stations.kvalobs
-	   "
+           lam2kv/stations.kvalobs"
 
 DIRS="/usr/share/kvalobs 
       /usr/share/kvalobs/db
@@ -80,6 +79,7 @@ DIRS="/usr/share/kvalobs
       /var/lib/kvalobs/service
       /var/lib/kvalobs/service/subscribers"     
 
+echo "postinst: $1"
 
 case "$1" in
   configure)
