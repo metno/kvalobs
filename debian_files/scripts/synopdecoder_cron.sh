@@ -4,7 +4,7 @@
 #Sletter også filer som er for gamle!
 
 
-DIR="$(kvconfig --localstatedir)/kvalobs/log/decoders/SynopDecoder"
+DIR="$(kvconfig --localstatedir)/log/kvalobs/decoders/SynopDecoder"
 
 if ! cd $DIR ; then
 	echo "Kan ikke skifte katalog til $DIR!"

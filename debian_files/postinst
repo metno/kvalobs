@@ -43,6 +43,8 @@ KVBIN="hirlam2kvalobs.sh
 
 
 ETC_FILES="kv_ctl.conf
+           pgclean-local.sql
+           save_last_month.conf
            kvcron
            lam2kv/metdat.1h    
            lam2kv/metdat.RR24         

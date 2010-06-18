@@ -1,13 +1,13 @@
 #Orginalskript src/script/kv/kvcron
-#Alle endringer bï¿½r gjï¿½res i orginalskripet!!!
+#Alle endringer bår gjøres i orginalskripet!!!
 
 MYBIN=/usr/lib/kvalobs/bin
-LOG=/var/kvalobs/log
+LOG=/var/log/kvalobs
 
 30 5,11,17,23 * * * $MYBIN/lam2kv.cron %
 15 * * * * $MYBIN/qabase_cron.sh > /dev/null 2>&1  %
 25 0 * * * $MYBIN/kvdbadmin.sh %
 25 5 * * * $MYBIN/kvsynopdbadmin.sh %
 5  1 * * * $MYBIN/synopdecoder_cron.sh %
-*/5 * * * * $MYBIN/check_kvsynopd.sh >> $LOG/check_kvsynopd.log %
+#*/5 * * * * $MYBIN/check_kvsynopd.sh >> $LOG/check_kvsynopd.log %
 30 6 1 * * $MYBIN/save_last_month.sh

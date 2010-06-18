@@ -1,15 +1,16 @@
 #! /bin/sh
 
 SQLDIR=`KVCONFIG --datadir`/kvalobs/db
+ETCDIR=`KVCONFIG --sysconfdir`/kvalobs
 
-if [ -f $SQLDIR/pgclean_locale.sql ]; then
-    SQLCLEAN=$SQLDIR/pgclean_locale.sql
+if [ -f $ETCDIR/pgclean-local.sql ]; then
+    SQLCLEAN=$ETCDIR/pgclean-local.sql
 else
     SQLCLEAN=$SQLDIR/pgclean.sql
 fi
 
 PSQL=psql
-LOGDIR=`KVCONFIG --localstatedir`/kvalobs/log
+LOGDIR=`KVCONFIG --localstatedir`/log/kvalobs
 
 DAY=`date '+%d'`
 LOG=$LOGDIR/kvdbadmin-$DAY.log

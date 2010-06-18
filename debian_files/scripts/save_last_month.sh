@@ -3,23 +3,46 @@
 set -a
 #set -e
 
-ETCDIR=$(kvconfig --sysconfdir)/kvalobs
-VARDIR=$(kvconfig --localstatedir)/kvalobs
 
 if [ -f "$ETCDIR/kv-env.conf" ]; then
     . $ETCDIR/kv-env.conf
 fi
 
+if [ -f "$ETCDIR/save_last_month.conf" ]; then
+    . $ETCDIR/save_last_month.conf
+fi
 
-NMONTH=4
+ETCDIR=$(kvconfig --sysconfdir)/kvalobs
+VARDIR=$(kvconfig --localstatedir)/lib/kvalobs
+logdir=$(kvconfig --localstatedir)/log/kvalobs/klima_backup
+backupdir=$VARDIR/klima_backup
+
+
+if[ "${nmonth}z" = "z" ]; then
+	NMONTH=4
+else
+    NMONTH=$nmonth
+fi
+
+if [ "${histkvalobs}z" = "z" ]; then
+	histkvalobs="kvalobs@histkvalobs:var/klima_backup"
+else
+	histkvalobs="$histkvalobs"
+fi
+
+if [ "${enable}z" = "z" ]; then
+	enable="false"
+fi
+
+if [ "$enable" = "false" ]; then
+|	echo "Save last month disabled!"
+	exit 0
+fi 
 
 #PGPORT=5434
 #PGUSER=kvalobs
 #PGHOST=localhost
 #PGPASSWORD=`grep dbpass $KVALOBS/.kvpasswd | sed -e 's/ *dbpass *//'`
-
-backupdir=$VARDIR/klima_backup
-logdir=$VARDIR/log/klima_backup
 
 mkdir -p $logdir
 mkdir -p $backupdir
@@ -81,12 +104,15 @@ echo "\\copy text_data_temp TO $ftextdata WITH DELIMITER AS '|'" >> $sql
 echo "\\copy model_data_temp TO $fmodeldata WITH DELIMITER AS '|'" >> $sql
 
 #Opprett en sqlfil for aa laste data inn i databasen.
-echo "DELETE FROM data WHERE obstime BETWEEN '$start_date' AND '$end_date';" > $lsql
+echo "\set ON_ERROR_STOP" > $lsql
+echo "BEGIN" >> $lsql
+echo "DELETE FROM data WHERE obstime BETWEEN '$start_date' AND '$end_date';" >> $lsql
 echo "DELETE FROM text_data WHERE obstime BETWEEN '$start_date' AND '$end_date';" >> $lsql
 echo "DELETE FROM model_data WHERE obstime BETWEEN '$start_date' AND '$end_date';" >> $lsql
 echo "\\copy data FROM $fdata WITH DELIMITER AS '|'"  >> $lsql
 echo "\\copy text_data FROM $ftextdata WITH DELIMITER AS '|'" >> $lsql
 echo "\\copy model_data FROM $fmodeldata WITH DELIMITER AS '|'" >> $lsql
+echo "END" >> $lsql
 
 psql -U kvalobs kvalobs -f $sql
 
@@ -111,10 +137,10 @@ fi
 
 rm -rf $tmpdir
 
-scp "$tarfile.bz2" kvalobs@poriaz:var/klima_backup
+scp "$tarfile.bz2" "$histkvalobs"
 
 if [ "$?" -ne 0 ]; then
-	echo "WARNING: Cant copy the $tarfile.bz2 to kvalobs@poriaz:var/klima_backup" >> $logfile
+	echo "WARNING: Cant copy the $tarfile.bz2 to $histkvalobs" >> $logfile
 fi
 
 echo "End of backup: $(date +'%Y-%m-%d %H:%M:%S')" >> $logfile

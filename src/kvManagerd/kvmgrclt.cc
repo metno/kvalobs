@@ -92,15 +92,15 @@ int main(int argc, char** argv)
     // Creating station list ...
 
     list<kvStation> stations;
-    gate.select(stations," where static=true order by stationid");
+    gate.select(stations," where wmonr>=1000 AND wmonr<1500 order by stationid");
 
 
 	list<kvData>           data;
 	list<kvData>::iterator dit;	
 	ostringstream          ost;
 	
-	miTime startObst("2005-12-16 06:00:00");
-	miTime endObst(startObst);
+	miTime startObst("2010-06-08 10:00:00");
+	miTime endObst("2010-06-09 08:00:00");
 	miTime obst(startObst);
 	//endObst.addDay(1);
 	

@@ -117,6 +117,8 @@ install-arch:
 	mkdir -p $(CURDIR)/debian/tmp/etc/kvalobs
 	mkdir -p $(CURDIR)/debian/tmp/etc/kvalobs/lam2kv
 	mkdir -p $(CURDIR)/debian/tmp/usr/lib/kvalobs/bin
+	cp $(CURDIR)/debian/pgclean-local.sql $(CURDIR)/debian/tmp/etc/kvalobs
+	cp $(CURDIR)/debian/save_last_month.conf $(CURDIR)/debian/tmp/etc/kvalobs
 	cp $(CURDIR)/debian/kv_ctl.conf $(CURDIR)/debian/tmp/etc/kvalobs
 	cp $(CURDIR)/debian/kvstart-postgres $(CURDIR)/debian/tmp/usr/bin
 	cp $(CURDIR)/debian/kvstop-postgres $(CURDIR)/debian/tmp/usr/bin
