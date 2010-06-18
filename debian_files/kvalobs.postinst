@@ -80,7 +80,7 @@ DIRS="/usr/share/kvalobs
       /var/lib/kvalobs/service
       /var/lib/kvalobs/service/subscribers"     
 
-echo "postinst: $1"
+#echo "postinst: $1"
 
 case "$1" in
   configure)
