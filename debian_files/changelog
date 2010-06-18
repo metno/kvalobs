@@ -1,4 +1,4 @@
-kvalobs (2.1.4-1) unstable; urgency=low
+kvalobs (2.1.4-2) unstable; urgency=low
 
   * new version.
   * Added a configuration file to save_last_month. ( /etc/kvalobs/save_last_month.conf)
