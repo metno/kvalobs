@@ -69,7 +69,7 @@ class DataTblView : public kvalobs::kvDbBase{
 		/** Not implemented, not needed!*/
 		miutil::miString uniqueKey()const;
 		
-		char* tableName()const;
+		const char* tableName()const;
 		
 		bool exist() const { return obstime_.undef();}
 		

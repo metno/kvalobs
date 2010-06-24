@@ -82,7 +82,7 @@ uniqueKey()const
 	return "";
 }
 		
-char* 
+const char*
 DataTblView::
 tableName()const{
 	return "data";
