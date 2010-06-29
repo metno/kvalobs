@@ -104,12 +104,16 @@ HtmlLog::HtmlLog(const kvalobs::kvStationInfo & stinfo, const std::string & logP
 	else
 	{
 		if (!html->open(logfile.native_file_string()))
+		{
 			LOGERROR("Failed to create logfile for the html output. Filename:\n" << logfile.native_file_string());
-		html->open("/dev/null");
+			html->open("/dev/null");
+		}
 	}
 
 	Logger::createLogger("html", html);
 	Logger::logger("html").logLevel(DEBUG);
+
+	Logger::logger("html").debug("hallo?");
 
 	IDLOGINFO( "html", "<h1>"
 			<< "CheckRunner::runChecks for station:" << stinfo.stationID()

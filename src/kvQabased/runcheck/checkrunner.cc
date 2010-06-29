@@ -78,7 +78,7 @@ bool CheckRunner::shouldProcess()
 	// Skip stations with typeid < 0 (aggregated values)
 	if (stinfo.typeID() < 0)
 	{
-		log_("Incoming data are agregated");
+		log_("Incoming data are aggregated");
 		return false;
 	}
 
