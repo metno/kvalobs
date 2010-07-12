@@ -76,6 +76,29 @@ TEST_F(KvalobsDataTest, testInsertKvData)
   EXPECT_TRUE( compare::exactly_equal_ex_tbtime()( d, out.front() ) );
 }
 
+TEST_F(KvalobsDataTest, testInsertKvDataMultipleSensors)
+{
+  kvalobs::kvDataFactory f0( 42, "2006-04-26 06:00:00", 302 );
+  kvData d0 = f0.getData(  0.1, 110 );
+  data.insert( d0 );
+
+  kvalobs::kvDataFactory f1( 42, "2006-04-26 06:00:00", 302, 1 );
+  kvData d1 = f1.getData(  0.2, 110 );
+  data.insert( d1 );
+
+
+  list<kvData> out;
+  data.getData( out );
+
+  ASSERT_TRUE( not data.empty() );
+  EXPECT_EQ( size_t( 2 ), data.size() ); // 1 or 2?
+  EXPECT_EQ( size_t( 2 ), out.size() );
+
+  EXPECT_TRUE( compare::exactly_equal_ex_tbtime()( d0, out.front() ) or compare::exactly_equal_ex_tbtime()( d0, out.back() ) );
+  EXPECT_TRUE( compare::exactly_equal_ex_tbtime()( d1, out.front() ) or compare::exactly_equal_ex_tbtime()( d1, out.back() ) );
+}
+
+
 TEST_F(KvalobsDataTest, testInsertKvTextData)
 {
   kvTextDataFactory f( 42, "2006-04-26 06:00:00", 302 );
