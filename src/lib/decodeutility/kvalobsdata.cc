@@ -73,7 +73,7 @@ void KvalobsData::insert( const kvData & d )
 {
 	int sensor = d.sensor();
 	if ( sensor >= '0' )
-		sensor = 0;
+		sensor -= '0';
 
   obs_[d.stationID()][d.typeID()][d.obstime()][sensor][d.level()][d.paramID()].content() = d;
 }
