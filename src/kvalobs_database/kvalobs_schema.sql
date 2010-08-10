@@ -51,6 +51,46 @@ GRANT ALL ON data TO kv_admin;
 GRANT SELECT ON data TO kv_read;
 GRANT SELECT, UPDATE, INSERT, DELETE ON data TO kv_write;
 
+--
+-- Added as a cross reference to our database, MORA. Used when loading mora with controled data from kvalobs
+--
+
+-- Table: kval_to_mora_xref
+
+-- DROP TABLE kval_to_mora_xref;
+
+CREATE TABLE kval_to_mora_xref
+(
+  stationid integer NOT NULL,
+  obstime timestamp without time zone NOT NULL,
+  paramid integer NOT NULL,
+  observation_master_id bigint NOT NULL,
+  time_tick timestamp without time zone NOT NULL,
+  observation_sampling_time_seconds double precision NOT NULL,
+  offset_from_time_tick_seconds double precision NOT NULL,
+  automation_code integer NOT NULL,
+  value_version_number integer NOT NULL,
+  CONSTRAINT kval_to_mora_xref_pkey PRIMARY KEY (stationid, obstime, paramid)
+)
+WITH (OIDS=FALSE);
+
+REVOKE ALL ON kval_to_mora_xref FROM public;
+ALTER TABLE kval_to_mora_xref OWNER TO "kvalob.u";
+GRANT ALL ON TABLE kval_to_mora_xref TO "kvalob.u";
+GRANT ALL ON TABLE kval_to_mora_xref TO kv_admin;
+GRANT SELECT ON TABLE kval_to_mora_xref TO kv_read;
+GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE kval_to_mora_xref TO kv_write;
+-- Index: kval_to_mora_xref_i1
+
+-- DROP INDEX kval_to_mora_xref_i1;
+
+CREATE UNIQUE INDEX kval_to_mora_xref_i1
+  ON kval_to_mora_xref
+  USING btree
+  (observation_master_id, time_tick, observation_sampling_time_seconds, offset_from_time_tick_seconds, automation_code, value_version_number);
+
+
+
 
 --
 -- This table maintains a complete history of everything that has happened to 
