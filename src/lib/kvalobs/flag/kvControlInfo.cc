@@ -254,12 +254,12 @@ bool kvControlInfo::qc1Done() const
 
 bool kvControlInfo::qc2dDone() const
 {
-	return false;//flag( f_fs ) or flag( f_ftime ) or flag( f_fw ) or flag( f_fstat );
+        return (flag( f_fs ) > 3) or flag( f_ftime ) or flag( f_fw ) or flag( f_fstat );
 }
 
 bool kvControlInfo::qc2mDone() const
 {
-	return false;//flag( f_fclim ) or flag( f_fd );
+        return flag( f_fclim ) or (flag( f_fd ) > 6);
 }
 
 bool kvControlInfo::qc2Done() const
