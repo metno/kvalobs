@@ -141,7 +141,8 @@ PreProcessMissingData::doJob(long                 stationId,
       		for (itd=datalist.begin(); itd!=datalist.end(); itd++){
 				if (itd->paramID() == paramid &&
 	    			itd->level()   == level &&
-	    			itd->sensor()  == sensor)
+	    			itd->sensor()  == sensor &&
+				itd->typeID()  == typeId)
 	  				break;
       		}
       
