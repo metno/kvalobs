@@ -248,8 +248,7 @@ bool kvUseInfo::setUseFlags(const kvControlInfo& cinfo)
 
 		else if (fagg == 6 || fcc == 0xA || fcc == 0xB || fcp == 0xA || fcp
 				== 0xB || fs == 9 || fs == 0xA || fpos == 4 || fpre == 4
-				|| fclim == 3 || (fnum == 6 && (fmis == 0 || fmis == 4)) || (fw
-				== 6 && (fmis == 0 || fmis == 4)))
+				|| fclim == 3 || ((fnum == 6 || fw == 6 || ftime == 1 || ftime == 2) && fmis == 4))
 			ui[3] = 3;
 
 		else if (fagg == 0xB || fr == 6 || fcc == 0xD || fpos == 6 || fpre >= 6
