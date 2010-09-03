@@ -246,6 +246,7 @@ CREATE TABLE rejectdecode (
 	tbtime TIMESTAMP NOT NULL,
 	decoder TEXT NOT NULL,
 	comment TEXT DEFAULT NULL,
+	fixed boolean NOT NULL DEFAULT false,
 	UNIQUE ( tbtime, message, decoder )
 );
 

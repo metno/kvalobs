@@ -1,33 +1,33 @@
 /*
-  Kvalobs - Free Quality Control Software for Meteorological Observations 
+ Kvalobs - Free Quality Control Software for Meteorological Observations
 
-  $Id: kvalobsdata.h,v 1.1.2.3 2007/09/27 09:02:27 paule Exp $                                                       
+ $Id: kvalobsdata.h,v 1.1.2.3 2007/09/27 09:02:27 paule Exp $
 
-  Copyright (C) 2007 met.no
+ Copyright (C) 2007 met.no
 
-  Contact information:
-  Norwegian Meteorological Institute
-  Box 43 Blindern
-  0313 OSLO
-  NORWAY
-  email: kvalobs-dev@met.no
+ Contact information:
+ Norwegian Meteorological Institute
+ Box 43 Blindern
+ 0313 OSLO
+ NORWAY
+ email: kvalobs-dev@met.no
 
-  This file is part of KVALOBS
+ This file is part of KVALOBS
 
-  KVALOBS is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License as 
-  published by the Free Software Foundation; either version 2 
-  of the License, or (at your option) any later version.
-  
-  KVALOBS is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License along 
-  with KVALOBS; if not, write to the Free Software Foundation Inc., 
-  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ KVALOBS is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as
+ published by the Free Software Foundation; either version 2
+ of the License, or (at your option) any later version.
+
+ KVALOBS is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along
+ with KVALOBS; if not, write to the Free Software Foundation Inc.,
+ 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
 #ifndef KVALOBSDATA_H
 #define KVALOBSDATA_H
 
@@ -37,6 +37,7 @@
 #include <list>
 #include <utility>
 #include <kvalobs/kvDataFlag.h>
+#include <kvalobs/kvRejectdecode.h>
 #include <puTools/miTime.h>
 
 namespace kvalobs
@@ -50,142 +51,163 @@ namespace serialize
 /**
  * The content of a serialized message.
  *
- * Format:
+ * \see KvalobsDataSerializer
  *
  * @author Vegard B�nes
  */
 class KvalobsData
 {
-  public:
-    KvalobsData();
+public:
+	KvalobsData();
 
-    KvalobsData( const std::list<kvData> & data, const std::list<kvTextData> & tdata );
+	KvalobsData(const std::list<kvData> & data,
+			const std::list<kvTextData> & tdata);
 
-    ~KvalobsData();
+	~KvalobsData();
 
-    /**
-     * True if no data is contained in this object.
-     */
-    bool empty() const;
+	/**
+	 * True if no data is contained in this object.
+	 */
+	bool empty() const;
 
-    /**
-     * Number of observations (not parameters) in this object.
-     */
-    size_t size() const;
+	/**
+	 * Number of observations (not parameters) in this object.
+	 */
+	size_t size() const;
 
-    /**
-     * Add data to object
-     */
-    void insert( const kvalobs::kvData & d );
+	/**
+	 * Add data to object
+	 */
+	void insert(const kvalobs::kvData & d);
 
-    /**
-     * Add text data to object
-     */
-    void insert( const kvalobs::kvTextData & d );
+	/**
+	 * Add text data to object
+	 */
+	void insert(const kvalobs::kvTextData & d);
 
-    /**
-     * Add data to object, from an iterator range.
-     */
-    template<typename InputIterator>
-    void insert( InputIterator begin, InputIterator end )
-    {
-      for ( ; begin != end; ++ begin )
-        insert( * begin );
-    }
+	/**
+	 * Add data to object, from an iterator range.
+	 */
+	template<typename InputIterator>
+	void insert(InputIterator begin, InputIterator end)
+	{
+		for (; begin != end; ++begin)
+			insert(*begin);
+	}
 
-    /**
-     * Get all data from object, with the given tbtime
-     */
-    void getData( std::list<kvalobs::kvData> & out, const miutil::miTime & tbtime = miutil::miTime() ) const;
+	void setMessageCorrectsThisRejection(
+			const kvalobs::kvRejectdecode & previouslyRejectedMessage)
+	{
+		correctedMessages_.push_back(previouslyRejectedMessage);
+	}
 
-    /**
-     * Get all text data from object, with the given tbtime
-     */
-    void getData( std::list<kvalobs::kvTextData> & out, const miutil::miTime & tbtime = miutil::miTime()  ) const;
+	/**
+	 * Get all data from object, with the given tbtime
+	 */
+	void getData(std::list<kvalobs::kvData> & out,
+			const miutil::miTime & tbtime = miutil::miTime()) const;
 
-    /**
-     * Get all data and text datafrom object, with the given tbtime
-     */
-    void getData( std::list<kvalobs::kvData> & out1, std::list<kvalobs::kvTextData> & out2 ,
-                  const miutil::miTime & tbtime = miutil::miTime() ) const
-    {
-      getData( out1 );
-      getData( out2 );
-    }
+	/**
+	 * Get all text data from object, with the given tbtime
+	 */
+	void getData(std::list<kvalobs::kvTextData> & out,
+			const miutil::miTime & tbtime = miutil::miTime()) const;
 
+	/**
+	 * Get all data and text datafrom object, with the given tbtime
+	 */
+	void getData(std::list<kvalobs::kvData> & out1, std::list<
+			kvalobs::kvTextData> & out2, const miutil::miTime & tbtime =
+			miutil::miTime()) const
+	{
+		getData(out1);
+		getData(out2);
+	}
 
-    /**
-     * Set overwrite specification
-     *
-     * Shall the kvalobs decoder ignore and overwrite any values in the database?
-     */
-    void overwrite( bool doit )
-    {
-      overwrite_ = doit;
-    }
+	typedef std::vector<kvalobs::kvRejectdecode> RejectList;
+	void getRejectedCorrections(RejectList & out) const
+	{
+		out = correctedMessages_;
+	}
 
-    /**
-     * Get overwrite specification
-     *
-     * Shall the kvalobs decoder ignore and overwrite any values in the database?
-     */
-    bool overwrite() const
-    {
-      return overwrite_;
-    }
+	/**
+	 * Set overwrite specification
+	 *
+	 * Shall the kvalobs decoder ignore and overwrite any values in the database?
+	 */
+	void overwrite(bool doit)
+	{
+		overwrite_ = doit;
+	}
 
-    /**
-     * Set invalidate specification.
-     *
-     * If invalidate is true, all parametes which forms a specific observation
-     * will be rejected, before the new data is inserted.
-     *
-     * If overwrite() is true as well, all data will be deleted before
-     * inserting the new values.
-     */
-    void invalidate( bool doit, int station, int typeID, const miutil::miTime & obstime );
+	/**
+	 * Get overwrite specification
+	 *
+	 * Shall the kvalobs decoder ignore and overwrite any values in the database?
+	 */
+	bool overwrite() const
+	{
+		return overwrite_;
+	}
 
-    /**
-     * Query invalidate specification. Shall the given station, typeId, and
-     * obstime be invalidated?
-     *
-     * @see invalidate
-     */
-    bool isInvalidate( int station, int typeID, const miutil::miTime & obstime ) const;
+	/**
+	 * Set invalidate specification.
+	 *
+	 * If invalidate is true, all parametes which forms a specific observation
+	 * will be rejected, before the new data is inserted.
+	 *
+	 * If overwrite() is true as well, all data will be deleted before
+	 * inserting the new values.
+	 */
+	void invalidate(bool doit, int station, int typeID,
+			const miutil::miTime & obstime);
 
-    /**
-     * Specification for what observations will be invalidated
-     *
-     * @see invalidate
-     */
-    struct InvalidateSpec
-    {
-      int station;
-      int typeID;
-      miutil::miTime obstime;
-      InvalidateSpec( int st, int ty, miutil::miTime ot )
-          : station( st ), typeID( ty ), obstime( ot )
-      {}
-    };
+	/**
+	 * Query invalidate specification. Shall the given station, typeId, and
+	 * obstime be invalidated?
+	 *
+	 * @see invalidate
+	 */
+	bool
+			isInvalidate(int station, int typeID,
+					const miutil::miTime & obstime) const;
 
-    /**
-     * Get a complete list of observations to be invalidated.
-     *
-     * @see invalidate
-     */
-    void getInvalidate( std::list<InvalidateSpec> & invSpec );
+	/**
+	 * Specification for what observations will be invalidated
+	 *
+	 * @see invalidate
+	 */
+	struct InvalidateSpec
+	{
+		int station;
+		int typeID;
+		miutil::miTime obstime;
+		InvalidateSpec(int st, int ty, miutil::miTime ot) :
+			station(st), typeID(ty), obstime(ot)
+		{
+		}
+	};
 
-    /**
-     * Const access to data holder
-     */
-    const internal::Observations & obs() const
-    {
-      return obs_;
-    }
+	/**
+	 * Get a complete list of observations to be invalidated.
+	 *
+	 * @see invalidate
+	 */
+	void getInvalidate(std::list<InvalidateSpec> & invSpec);
 
-  private:
-    bool overwrite_;
-    internal::Observations obs_;
+	/**
+	 * Const access to data holder
+	 */
+	const internal::Observations & obs() const
+	{
+		return obs_;
+	}
+
+private:
+	bool overwrite_;
+	internal::Observations obs_;
+
+	RejectList correctedMessages_;
 };
 
 }

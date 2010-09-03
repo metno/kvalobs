@@ -76,7 +76,7 @@ private:
 	//     void save( const serialize::KvalobsData & data );
 	void save(const std::list<kvalobs::kvData> & dl, const std::list<
 			kvalobs::kvTextData> & tdl);
-
+	void markAsFixed(const serialize::KvalobsData::RejectList & rejectedMesage);
 
 	typedef boost::shared_ptr<const kvalobs::kvData> kvDataPtr;
 	kvDataPtr getDbData(const kvalobs::kvData d);

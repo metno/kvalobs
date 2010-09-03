@@ -219,6 +219,7 @@ next(CKvalObs::CService::RejectdecodeList_out rejectedList)
 		(*rejectedList)[datai].tbtime=it->tbtime().isoTime().c_str();
 		(*rejectedList)[datai].decoder=it->decoder().c_str();
 		(*rejectedList)[datai].comment=it->comment().c_str();
+	    (*rejectedList)[datai].is_fixed=it->fixed();
 	}
     
 	LOGDEBUG("next: return " << rejectedList->length() << " elements!" <<endl);

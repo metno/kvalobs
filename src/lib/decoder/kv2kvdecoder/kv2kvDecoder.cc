@@ -111,6 +111,11 @@ DecoderBase::DecodeResult kv2kvDecoder::execute(miutil::miString & msg)
 		list<kvTextData> tdl;
 		data.getData(tdl, tbtime);
 		save(dl, tdl);
+
+		KvalobsData::RejectList rejectedFixes;
+		data.getRejectedCorrections(rejectedFixes);
+		markAsFixed(rejectedFixes);
+
 		//     getConnection()->endTransaction();
 	} catch (DecoderError & e)
 	{
@@ -218,6 +223,25 @@ void kv2kvDecoder::save(const list<kvData> & dl, const list<kvTextData> & tdl)
 		//     }
 	}
 }
+
+void kv2kvDecoder::markAsFixed(const serialize::KvalobsData::RejectList & rejectedMesage)
+{
+	for ( serialize::KvalobsData::RejectList::const_iterator it = rejectedMesage.begin(); it != rejectedMesage.end(); ++ it )
+	{
+		std::stringstream query;
+		query << "update rejectdecode set fixed='true'";
+		//query << ", comment='FIXED: '||comment ";
+		query << it->uniqueKey();
+		try
+		{
+			getConnection()->exec(query.str());
+		} catch (dnmi::db::SQLException & e)
+		{
+			throw DecoderError(decoder::DecoderBase::Error, "Unable to mark rejected message as fixed");
+		}
+	}
+}
+
 
 namespace
 {

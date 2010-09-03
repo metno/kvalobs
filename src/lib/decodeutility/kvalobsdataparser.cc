@@ -117,6 +117,16 @@ namespace
     }
   };
 
+  class CorrectedRejectionHandler : public HandlerFunction
+  {
+  public:
+	  void operator()( const AttributeList & attr, KvalobsData & data_, map<string, string> & context_ ) const
+	  {
+		  std::string tbtime = get_attr(attr, "tbtime");
+		  context_["message/tbtime"] = tbtime;
+	  }
+  };
+
   typedef shared_ptr<HandlerFunction> hfp;
   typedef map<string, hfp> HandlerMap;
   const HandlerMap handlers_ = assign::map_list_of
@@ -126,6 +136,9 @@ namespace
       ("obstime", hfp( new ObstimeHandler() ) )
       ("sensor", hfp( new ValHandler( "sensor" ) ) )
       ("level", hfp( new ValHandler( "level" ) ) )
+
+      ("decoder", hfp( new ValHandler("decoder") ) )
+      ("message", hfp( new CorrectedRejectionHandler ) )
       ;
 }
 
@@ -180,17 +193,31 @@ void KvalobsDataParser::on_end_element( const Glib::ustring & name )
     context_.erase( "useinfo" );
     context_.erase( "cfailed" );
   }
+  else if ( name == "message")
+  {
+	  std::string message = context_["message"];
+	  miutil::miTime tbtime(context_["message/tbtime"]);
+	  std::string decoder = context_["decoder"];
+	  kvalobs::kvRejectdecode reject(message, tbtime, decoder, "");
+	  data_.setMessageCorrectsThisRejection(reject);
+	  context_.erase("message");
+	  context_.erase("message/tbtime");
+  }
   else if ( name == "level" )
     context_.erase( "level" );
   else if ( name == "sensor" )
     context_.erase( "sensor" );
+  else if ( name == "decoder" )
+	  context_.erase("decoder");
+  else if ( name == "fixed_rejected_message" )
+	  context_.erase("fixed_rejected_message");
 }
 
 void KvalobsDataParser::on_characters( const Glib::ustring & characters )
 {
   string s( characters );
   miutil::trimstr( s );
-  if ( not s.empty() )
+  if ( not ( s.empty() or currentContext_.empty() ) )
     context_[ currentContext_.top() ] = s;
 }
 

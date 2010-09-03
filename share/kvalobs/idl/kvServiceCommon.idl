@@ -219,6 +219,7 @@ module CKvalObs{
       string tbtime;
       string decoder;
       string comment;
+      boolean is_fixed;
     };
 
     typedef sequence<Rejectdecode> RejectdecodeList;
