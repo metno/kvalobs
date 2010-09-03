@@ -79,7 +79,7 @@ main(int argn, char **argv)
   }
 	
 
-  if(!f.open(filename.c_str()){
+  if( !f.open( filename.c_str() ) ) {
     cerr << "Cant open file <" << filename << ">!!!\n";
     return  1;
   }

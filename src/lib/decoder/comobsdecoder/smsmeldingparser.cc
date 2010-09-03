@@ -407,7 +407,7 @@ SmsMeldingParser_errorFunc(void *ctx,
       va_start(args, msg);
       n=vsnprintf(buf, n+1, msg, args);
       m=buf;
-      delete buf;
+      delete[] buf;
     }
     catch(...){
        cerr << "SmsMeldingParser_errorFunc: OUT OF MEMMORY!\n";
@@ -441,7 +441,7 @@ SmsMeldingParser_warningFunc(void *ctx,
       va_start(args, msg);
       n=vsnprintf(buf, n+1, msg, args);
       m=buf;
-      delete buf;
+      delete[] buf;
     }
     catch(...){
        cerr << "SmsMeldingParser_errorFunc: OUT OF MEMMORY!\n";
@@ -475,7 +475,7 @@ SmsMeldingParser_fatalErrorSAXFunc(void *ctx,
       va_start(args, msg);
       n=vsnprintf(buf, n+1, msg, args);
       m=buf;
-      delete buf;
+      delete[] buf;
     }
     catch(...){
        cerr << "SmsMeldingParser_errorFunc: OUT OF MEMMORY!\n";

@@ -749,7 +749,7 @@ MetaParser_errorFunc(void *ctx,
       va_start(args, msg);
       n=vsnprintf(buf, n+1, msg, args);
       m=buf;
-      delete buf;
+      delete[] buf;
     }
     catch(...){
        cerr << "MetaParser_errorFunc: OUT OF MEMMORY!\n";
@@ -783,7 +783,7 @@ MetaParser_warningFunc(void *ctx,
       va_start(args, msg);
       n=vsnprintf(buf, n+1, msg, args);
       m=buf;
-      delete buf;
+      delete[] buf;
     }
     catch(...){
        cerr << "MetaParser_errorFunc: OUT OF MEMMORY!\n";
@@ -817,7 +817,7 @@ MetaParser_fatalErrorSAXFunc(void *ctx,
       va_start(args, msg);
       n=vsnprintf(buf, n+1, msg, args);
       m=buf;
-      delete buf;
+      delete[] buf;
     }
     catch(...){
        cerr << "MetaParser_errorFunc: OUT OF MEMMORY!\n";
