@@ -34,7 +34,8 @@ KVBIN="hirlam2kvalobs.sh
        kvdbadmin.sh
        lam2kv.cron
        qabase_cron.sh
-       save_last_month.sh"
+       save_last_month.sh
+       load_last_month.sh"
 
 
 ETC_FILES="kv_ctl.conf 

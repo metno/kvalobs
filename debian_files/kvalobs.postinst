@@ -39,6 +39,7 @@ KVBIN="hirlam2kvalobs.sh
        lam2kv.cron
        qabase_cron.sh
        save_last_month.sh
+       load_last_month.sh
        synopdecoder_cron.sh"
 
 
