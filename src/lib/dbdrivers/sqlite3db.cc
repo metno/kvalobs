@@ -150,38 +150,41 @@ dnmi::db::drivers::SQLiteConnection::rollBack()
 void
 dnmi::db::drivers::SQLiteConnection::exec(const std::string &query)
 {
-  //  string sMsg;
-  int   sqliteRes;
-  char  *msg=0;
+   //  string sMsg;
+   int   sqliteRes;
+   char  *msg=0;
 
-  errMsg.erase();
+   errMsg.erase();
 
-  if(!con)
-    throw SQLNotConnected("NO CONNECTION, not connected to any database!");
-  
-  sqliteRes=sqlite3_exec(con, query.c_str(), 0, 0, &msg);
-  
-  if(msg){
-    errMsg=msg;
-    free(msg);
-  }
-  
-  if(sqliteRes!=SQLITE_OK){
-    //cerr << "ERROR: " << sqliteRes << endl;
-    if(sqliteRes==SQLITE_CONSTRAINT){
-      string::size_type i=errMsg.find("unique");
+   if(!con)
+      throw SQLNotConnected("NO CONNECTION, not connected to any database!");
 
-      if(i!=string::npos){
-	throw SQLDuplicate("SQLite: Duplicate (" + errMsg +")");
+   sqliteRes=sqlite3_exec(con, query.c_str(), 0, 0, &msg);
+
+   if(msg){
+      errMsg=msg;
+      free(msg);
+   }
+
+   if(sqliteRes!=SQLITE_OK){
+      ostringstream emsg;
+      //cerr << "ERROR: " << sqliteRes << endl;
+      if(sqliteRes==SQLITE_CONSTRAINT){
+         string::size_type i=errMsg.find("unique");
+
+         if(i!=string::npos){
+            throw SQLDuplicate("SQLite: Duplicate (" + errMsg +")");
+         }else{
+            emsg << "SQLite: sqliteres(" << sqliteRes << "): " + errMsg;
+            throw SQLException( emsg.str() );
+         }
+      }else if(sqliteRes==SQLITE_BUSY){
+         throw SQLBusy("SQLite: " + errMsg);
       }else{
-	throw SQLException("SQLite: "+errMsg);
+         emsg << "SQLite: sqliteres(" << sqliteRes << "): " + errMsg;
+         throw SQLException( emsg.str() );
       }
-    }else if(sqliteRes==SQLITE_BUSY){
-      throw SQLBusy("SQLite: " + errMsg);
-    }else{
-      throw SQLException("SQLite: "+errMsg);
-    }
-  }
+   }
 }
 
 
@@ -220,7 +223,9 @@ dnmi::db::drivers::SQLiteConnection::execQuery(const std::string &query)
     if(sqliteRes==SQLITE_BUSY){
       throw SQLBusy("SQLiteBusy: " + sMsg);
     }else{
-      throw SQLException(sMsg);
+      ostringstream  emsg;
+      emsg << "SQLite: sqliteres(" << sqliteRes << "): " + errMsg;
+      throw SQLException( emsg.str() );
     }
   }
   
