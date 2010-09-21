@@ -90,6 +90,15 @@ namespace milog{
 	static bool createLogger(const std::string &id, LogStream *strm);
 
 	/**
+	 * Check if a logger with a given id exist.
+	 *
+	 * @param id The logger to check for.
+	 * @return true if an logger for the id exist and false otherwise.
+	 */
+	static bool hasLogger(const std::string &id );
+
+
+	/**
 	 * \brief Add a stream to the default logger.
 	 */
 	static bool addStream(LogStream *strm);

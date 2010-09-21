@@ -176,7 +176,26 @@ namespace milog{
 	
 	return true;
     }
-    
+
+    bool
+    LogManager::hasLogger(const std::string &id )
+    {
+       LogManager *mgr=instance();
+       priv::LoggerImpl *log;
+
+       if(!mgr)
+          return false;
+
+       thread::ScopedLock lock(LogManager::mutex_);
+
+       priv::ITLoggerImplList it=mgr->loggers_.find(id);
+
+       if(it==mgr->loggers_.end())
+          return false;
+
+       return true;
+    }
+
     bool 
     LogManager::createLogger(const std::string &id, LogStream *strm)
     {
