@@ -3,9 +3,12 @@
 #include <sstream>
 #include <fstream>
 #include <string>
+#include <map>
 #include "bufrdefs.h"
 #include "ParamDescriptor.h"
 #include "BufrMessage.h"
+#include "BufrDecodeSequences.h"
+#include "BufrDecodeKvResult.h"
 
 using namespace std;
 
@@ -68,11 +71,12 @@ splitBufr( const std::string &bufr, list<string> &bufrs )
 int
 main( int argn, char **argv )
 {
-   string bufrname("1492-2206.bufr");
-   //string bufrname("syno_2010092106.bufr");
+   //string bufrname("1492-2206.bufr");
+   string bufrname("syno_2010092106.bufr");
    string sBufr;
    kvalobs::decoder::bufr::DescriptorFloatValue descriptorVal;
    kvalobs::decoder::bufr::BufrMessage bufrMsg;
+   map<int, int> bufrTbls;
 
    if( ! readFile( bufrname, sBufr ) ) {
       cerr << "Failed to read file: " << bufrname << endl;
@@ -89,6 +93,9 @@ main( int argn, char **argv )
    }
 
    cerr << "#BUFR messages: " << bufrList.size() << endl;
+   kvalobs::decoder::bufr::BufrDecodeKvResult decodeResult;
+   kvalobs::decoder::bufr::BufrToKvUnit_ptr unitConverter( new kvalobs::decoder::bufr::BufrToKvUnit() );
+   kvalobs::decoder::bufr::BufrDecodeSequences decoder( unitConverter );
 
    for( list<string>::iterator it = bufrList.begin(); it != bufrList.end(); ++it ) {
       sBufr = *it;
@@ -98,9 +105,22 @@ main( int argn, char **argv )
          return 1;
       }
 
+      pair< map<int, int>::iterator, bool>  res = bufrTbls.insert( pair<int,int>(bufrMsg.descriptorTbl(), 0) );
+
       cerr << bufrMsg << endl;
+      decoder.decodeBufrMessage( &bufrMsg, &decodeResult );
+      if( ! res.second )
+         res.first->second++;
+
+      //cerr << bufrMsg.descriptorTbl() << endl;
+      //cerr << bufrMsg << endl;
    }
 
+
+   cerr << endl <<  "BufrTables: " << endl;
+   for( map<int, int>::iterator it=bufrTbls.begin(); it!=bufrTbls.end(); ++it ) {
+      cerr <<"  " << it->first << ": " << it->second << endl;
+   }
 
 
 #if 0

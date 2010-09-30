@@ -5,6 +5,7 @@
  *      Author: borgem
  */
 
+#include <float.h>
 #include "kvParamdefs.h"
 #include "BufrToKvUnit.h"
 
@@ -83,6 +84,9 @@ BufrToKvUnit::
 convert( int kvparamid, double value, const std::string &unitName )const
 {
    UnitElement unit;
+
+   if( value == DBL_MAX )
+      return FLT_MAX;
 
    if( findUnit( unitName, kvparamid, unit ) )
       return unit.scale()*static_cast<float>(value)+unit.offset();

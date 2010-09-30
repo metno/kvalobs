@@ -5,6 +5,7 @@
  *      Author: borgem
  */
 
+#include <float.h>
 #include "BufrDecodeBase.h"
 
 using namespace std;
@@ -33,19 +34,27 @@ namespace {
       if( descVal.descriptor != descriptor )
          throw BufrSequenceException( descriptor, descVal.descriptor );
 
-      if( descVal.value == RVIND )
-          return true;
 
       value.unit = descVal.unit;
 
       if( descVal.unit == "CCITTIA5" ) {
          value.type = String;
-         value.s = bufr->getStringValue( static_cast<int>( descVal.value ) );
+
+         if( descVal.value == RVIND )
+            value.s = "";
+         else
+            value.s = bufr->getStringValue( static_cast<int>( descVal.value ) );
+
          return true;
       }
 
       value.type = Float;
-      value.d = descVal.value;
+
+      if( descVal.value == RVIND )
+         value.d = DBL_MAX;
+      else
+         value.d = descVal.value;
+
       return true;
    }
 
@@ -57,20 +66,6 @@ namespace kvalobs {
 namespace decoder {
 namespace bufr {
 
-void
-BufrDecodeResult::
-add( float value, int kvparamid, int sensor, int level )
-{
-   if( stationid == INT_MAX )
-      return;
-
-   if( obstime.undef() )
-      return;
-
-   data.push_back( kvalobs::kvData( stationid, obstime, value, kvparamid, tbtime, typeid_, sensor, level, value,
-                                    kvalobs::kvControlInfo(), kvalobs::kvUseInfo(), "" ) );
-}
-
 /**
 * @exception BufrSequenceException, BufrException
 * @param descriptor Expected descriptor
@@ -78,7 +73,7 @@ add( float value, int kvparamid, int sensor, int level )
 */
 bool
 BufrDecodeBase::
-decode( int descriptor,  double &value_, std::string &unit, bool mustexist )
+getDescriptor( int descriptor,  double &value_, std::string &unit, bool mustexist )
 {
    Value val;
 
@@ -97,7 +92,7 @@ decode( int descriptor,  double &value_, std::string &unit, bool mustexist )
 
 bool
 BufrDecodeBase::
-decode( int descriptor,  std::string &value_, bool mustexist )
+getDescriptor( int descriptor,  std::string &value_, bool mustexist )
 {
    Value val;
 
@@ -114,6 +109,20 @@ decode( int descriptor,  std::string &value_, bool mustexist )
 
 }
 
+bool
+BufrDecodeBase::
+ignoreDescriptor( int descriptor, bool mustexist )
+{
+   Value val;
+
+   bool ret = doDecode( bufrMessage, descriptor, val, mustexist );
+
+   if( !ret )
+      return ret;
+
+   return true;
+}
+
 
 /**
 * @exception BufrSequenceException, BufrException
@@ -124,13 +133,13 @@ decode( int descriptor,  std::string &value_, bool mustexist )
 */
 bool
 BufrDecodeBase::
-decode( int descriptor, int kvparam, int sensor, int level, bool mustexist )
+getDescriptor( int descriptor, int kvparam,  BufrDecodeResultBase *result, int sensor, int level, bool mustexist )
 {
    double dval;
    float fval;
    string unit;
 
-   if( ! decode( descriptor, dval, unit, mustexist ) )
+   if( ! getDescriptor( descriptor, dval, unit, mustexist ) )
       return false;
 
    fval = unitConvert->convert( kvparam, dval, unit );
@@ -139,28 +148,20 @@ decode( int descriptor, int kvparam, int sensor, int level, bool mustexist )
    return true;
 }
 
-BufrDecodeResult*
+void
 BufrDecodeBase::
-decode( BufrMessage *bufr )
+decodeBufrMessage( BufrMessage *bufr, BufrDecodeResultBase *result_ )
 {
-   if( ! bufr )
+   if( ! bufr || ! result_ )
       throw BufrException("EXCEPTION: BuffrMessage. NULLPOINTER");
 
    bufrMessage = bufr;
 
    try {
-      result = new BufrDecodeResult();
-   }
-   catch( ... ) {
-      throw BufrException("EXCEPTION: NO MEM to allocate BufrDecodeResult.");
-   }
-
-   try {
-      decode();
-      return result;
+      decode( result_ );
+      return;
    }
    catch( const BufrException &ex ) {
-      delete result;
       throw;
    }
 }

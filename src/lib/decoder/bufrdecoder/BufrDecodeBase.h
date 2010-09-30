@@ -8,6 +8,7 @@
 #ifndef __BUFRDECODEBASE_H__
 #define __BUFRDECODEBASE_H__
 
+#include <float.h>
 #include <limits.h>
 #include <list>
 #include <exception>
@@ -20,18 +21,17 @@ namespace kvalobs {
 namespace decoder {
 namespace bufr {
 
-struct BufrDecodeResult
+class BufrDecodeResultBase
 {
-   std::list<kvalobs::kvData> data;
-   miutil::miTime obstime;
-   miutil::miTime tbtime;
-   int stationid;
-   int typeid_;
+public:
+   BufrDecodeResultBase(){}
+   virtual ~BufrDecodeResultBase(){}
 
-   BufrDecodeResult():
-      tbtime( miutil::miTime::nowTime() ), stationid( INT_MAX ), typeid_( 7 ) {}
-
-   void add( float value, int kvparamid, int sensor=0, int level=0 );
+   virtual void setObstime( const miutil::miTime &obstime ) =0;
+   virtual miutil::miTime getObstime()const =0;
+   virtual void setStationid( int wmono )=0;
+   virtual void setLatLong( double latitude, double longitude )=0;
+   virtual void add( float value, int kvparamid, int sensor=0, int level=0 )=0;
 };
 
 
@@ -98,7 +98,6 @@ class BufrDecodeBase
 {
 protected:
 
-   BufrDecodeResult* result;
    BufrMessage *bufrMessage;
    BufrToKvUnit_ptr unitConvert;
 
@@ -109,8 +108,8 @@ protected:
     * @return If mustexist=true an excpetion is thrown if the descriptor
     *         do not exist. If mustexist=false false is returned.
     */
-   bool decode( int descriptor,  double &value, std::string &unit, bool mustexist=true );
-   bool decode( int descriptor,  std::string &value, bool mustexist=true );
+   bool getDescriptor( int descriptor,  double &value, std::string &unit, bool mustexist=true );
+   bool getDescriptor( int descriptor,  std::string &value, bool mustexist=true );
 
    /**
     * @exception BufrSequenceException, BufrException, BufrEndException
@@ -121,23 +120,26 @@ protected:
     * * @return If mustexist=true an excpetion is thrown if the descriptor
     *         do not exist. If mustexist=false false is returned.
     */
-   bool decode( int descriptor, int kvparam, int sensor=0, int level=0, bool mustexist=true );
+   bool getDescriptor( int descriptor, int kvparam, BufrDecodeResultBase *res, int sensor=0, int level=0, bool mustexist=true );
+
+   bool ignoreDescriptor( int descriptor, bool mustexist=true );
 
    /**
     * @exception BufrSequenceException, BufrException
     */
-   virtual void decode()=0;
+   virtual void decode( BufrDecodeResultBase *result )=0;
 
 public:
 
    BufrDecodeBase( BufrToKvUnit_ptr unitConvert )
       : unitConvert( unitConvert ) {}
+   virtual ~BufrDecodeBase(){}
    /**
     * @exception BufrSequenceException, BufrException,BufrEndException
     * @param bufr
     * @return
     */
-   virtual BufrDecodeResult* decode( BufrMessage *bufr );
+   virtual void decodeBufrMessage( BufrMessage *bufr, BufrDecodeResultBase *result );
 
 };
 

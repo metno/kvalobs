@@ -113,10 +113,12 @@ getStringValue( int charDescriptorValue )
       return "";
 
    index = int( charDescriptorValue/1000 );
-   index--;
 
-   if( index >= ksup[6] )
+   cerr << " **** Index: " << index << " length: " << charDescriptorValue % 1000 << " ksup[6]: " << ksup[6] << endl;
+   if( index >ksup[6] )
       return "";
+
+   index--;
 
    return copyToString( cvals[ index ], charDescriptorValue % 1000 );
 }
@@ -125,7 +127,7 @@ int
 BufrMessage::
 descriptorTbl()const
 {
-   if( valid )
+   if( ! valid )
       return -1;
 
    if( kdtlen <= 0 )

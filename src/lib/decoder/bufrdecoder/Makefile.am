@@ -9,6 +9,8 @@ bufrdecoder_SOURCES = kvParamdefs.h \
 					  BufrMessage.cc BufrMessage.h \ 
 					  BufrToKvUnit.cc BufrToKvUnit.h \
 					  BufrDecodeBase.cc BufrDecodeBase.h \
+					  BufrDecodeKvResult.cc BufrDecodeKvResult.h \
+					  BufrDecodeSequences.cc BufrDecodeSequences.h \
                       bufrdecoder.cc
                       
 bufrdecoder_CPPFLAGS = -I$(top_srcdir)/src/lib \
