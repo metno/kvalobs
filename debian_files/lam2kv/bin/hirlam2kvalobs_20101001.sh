@@ -81,32 +81,13 @@ cd $JOB
 # old fashion way ... remember station.kvalobs includes
 # the kvalobs station number as name ...
 
-
-
 LAMIN=`/usr/bin/find /opdata/hirlam8/h8km$RUN.dat -cmin -1000`
-
-#dev-vm101 hack.
-#For some reason the metdat cant read files from an NFS mount.
-#As a work around we copy the files to /myopdata
-
-MYHOST=`hostname`
-
-if [ "$MYHOST" = "dev-vm101" ]; then
-    rm -f /myopdata/*
-    if [ "$LAMINz" != "z" ]; then
-		echo "COPY: $LAMIN to /myopdata"
-		cp $LAMIN /myopdata
-		myfile=`basename $LAMIN`
-        LAMIN="/myopdata/$myfile" 
-        echo "LAMIN: $LAMIN"
-    fi
-fi
 
 if [ "$LAMIN" ]; then
     
     # METDAT file OK and newer than 10 hours    
-    echo "$METDAT $MET $POS $LAMIN +6,+11  8 LAM8 $OUTDAT"
-    echo "$METDAT $MET $POS $LAMIN +12,+17 8 LAM8 $BACKDAT"
+    
+
     $METDAT $MET $POS $LAMIN +6,+11  8 LAM8 $OUTDAT 
     $METDAT $MET $POS $LAMIN +12,+17 8 LAM8 $BACKDAT
     
