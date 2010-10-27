@@ -1,37 +1,58 @@
 DOKUMENTASJON AV TABELLENE.
-Terje Reite februar 2005.
+Norsk språklig ( bokmål ). 
+
+Terje Reite 27. oktober 2010.
+
+METADATATABELLER SOM IKKE ER I BRUK:
+generated_types, reference_station, timecontrol, stationid_klima, param_feltfil.
+
+ANDRE TABELLER SOM ER TOMME:
+ps_subscribers
 
 
 GENERELL OVERSIKT.
-Tabellene kan kategoriseres på 3 forskjellige måter:
-1) den ene er kilden til innholdet i tabellene: runtime - metadata
-2)den andre er model - observasjon
-3)den tredje er hva eksterne brukere trenger: trenger - ikke trenger.
+Tabellene kan kategoriseres på 2 forskjellige måter:
+1) Hva er kildene til innholdet i tabellene ? 
+   Det er 3 forskjellige måter det kan kategorieseres
+   1a) Eksterne kilder: Observasjoner, modeller og metadata
+   1b) Interne kilder: Tabellrader og flagg som genereres og settes av systemet selv.
+   1c) View: Visninger som er basert på innholdet i andre tabeller
+2) Hva trenger brukerne eller kundene, hvilke produkter lager kvalobs ?
 
 
-1) Kategorisert etter kilden til innholdet i tabellene får vi en 
-run_time gruppe og en metadatagruppe.
-På mange måter kan vi oppfatte runtimegruppen som en datagruppe.
-Tabellene i runtimegruppen er: data, text_data, rejectdecode og 
-model_data; blant disse er også to views: data_view og text_data_view.
-Tabellene key_val, workque og workstatistik er tabeller til hjelp under runtime.
+1a) Eksterne kilder:  
+Tabellene for observasjoner er: data, data_history, text_data, text_data_history, rejectdecode.
+Tabellen for modell data er: model_data
 
-Tabellene i metadatagruppen er resten av tabellene i databasen.
+Tabellene i metadatagruppen er stort sett resten av tabellene: 
+model,types,param,station,checks,station_param,
+metadatatype,station_metadata,
+algorithms,
+obs_pgm,operator,qcx_info.
 
-2)En annen måte å dele tabellene inn etter grupper er etter modell - observasjon.
-da blir tabellen model og model_data i en gruppe og resten av tabellene i en 
-annen gruppe. Tabellen model er da en metadata tabell og tabellen model_data er en 
-runtime tabell.
 
-3)En tredje måte å dele inn tabellene på er etter hva kundene SYNOP-enkoderen, Klimadatabasen, 
-KRO og eventuelle andre trenger
-- kunder trenger ikke vite noe om modelldata, tabellene model_data og model blir 
-da uaktuelle
-- kunder trenger ikke vite noe om ikke dekodede data, tabellen rejectdecode 
-forsvinner 
-- kunder trenger ikke vite noe om metadata og tabeller som har med 
-checker og algoritmer, flesteparten av metadatatabellen forsvinner bortsett fra
-types
+1b) Interne kilder:
+Tabeller til hjelp under kjøringen av kvalobs: key_val, workque og workstatistik.
+Tabellene data_history og text_data_history får genererte tabellrader satt.
+Tabellene data og text_data får satt flagg under kjøringen.
+
+1c) View:
+Det finnes 2: data_view og text_data_view
+
+3)En tredje måte å dele inn tabellene på er etter hva kundene trenger.
+Eksempler på kunder er BUFR-enkoderen, Klimadatabasene og KRO. Indirekte er også YR kunde gjennom klima.
+Hva kunder ikke trenger å vite noe om:
+- kunder trenger ikke vite noe om modelldata, tabellene model_data og model blir da uaktuelle
+- kunder trenger ikke vite noe om ikke dekodede data, tabellen rejectdecode forsvinner 
+- kunder trenger ikke vite noe om metadata og tabeller som har med checker og algoritmer, flesteparten av metadatatabellen forsvinner.
+
+Det kunder trenger å vite er tabellen med observasjoner for punktdata:
+data
+text_data
+
+
+I tillegg trenger kunder å ta i mot innholdet i følgende tabeller som kan hentes i fra Stinfosys:
+types ( kalles i Stinfosys message_format )
 param
 station
 
@@ -82,6 +103,18 @@ cfailed: tester som har gitt utslag; syntaksen for denne kolonnen er
          qcx:language i en kommaseparert liste der en får verdiene i fra tabellen checks.
 
 
+data_history.
+KILDE: Endringer i tabellen data inkludert innlegging av nye rader i tabellen data.
+HVEM bruker tabellen: Tabellen data.
+BESKRIVELSE av tabellen: Endringer i tabellen data inkludert innlegging av nye rader 
+                         blir plassert her.
+BESKRIVELSE av attributtene i tabellen: 
+Se tabellen data for beskrivelse av flesteparen av attributtene, 
+nedenfor beskrives bare de som er unik for denne tabellen.
+version bigserial: index for unik id.
+modificationtime: tidspunktet raden er lagt inn.
+
+
 text_data.
 KILDE: INTERN.
 HVEM bruker tabellen: Alle moduler.
@@ -101,6 +134,18 @@ original: Observert parameterverdi, tekststring som beskriver en signatur
 paramid: parameternummer, se tabellen param.
 tbtime: Tidspunkt for når posten ble generert i Kvalobsdb.
 typeid: se tabellen types.
+
+
+text_data_history.
+KILDE: Endringer i tabellen text_data inkludert innlegging av nye rader.
+HVEM bruker tabellen: Tabellen data.
+BESKRIVELSE av tabellen: Endringer i tabellen text_data inkludert innlegging av nye rader 
+                         blir plassert her.
+BESKRIVELSE av attributtene i tabellen: 
+Se tabellen text_data for beskrivelse av flesteparen av attributtene, 
+nedenfor beskrives bare de som er unik for denne tabellen.
+version bigserial: index for unik id.
+modificationtime: tidspunktet raden er lagt inn.
 
 
 VIEW data_view
@@ -125,7 +170,7 @@ message: Melding som har kommet inn og som ikke kunne dekodes
 tbtime: Tidspunkt for når message ble lagret i Kvalobsdb.
 decoder: Beskriver hvilken dekoder som er brukt 
 comment: kommentar. F.eks. tekst som beskriver hvorfor meldingen ble forkastet.
-
+fixed: bolsk variabel, ?
 
 model_data.
 KILDE: Pseudodata, fra modeller.
@@ -137,8 +182,8 @@ stationid: stasjonsnummer, se tabellen station.
 obstime: Observasjonstid. Tidspunkt for observasjonens gyldighet.
 paramid: parameternummer, se tabellen param.
 level: Nivå der samme parameter observeres i ulik høyde eller dybde.
-original: Beregnet parameterverdi.
 modelid: En id som indikerer hvilken modell det er, jfr. tabellen model.
+original: Beregnet parameterverdi.
 
 
 model
@@ -152,7 +197,7 @@ comment: kommentar.
 
 
 types.
-KILDE: METADATA, fra ST_INFO_SYS.
+KILDE: METADATA, fra Stinfosys.
 HVEM bruker tabellen: Data.
 BESKRIVELSE av tabellen: Dette er en tabell for attributten typeid i tabellene 
                          data og text_data.
@@ -190,7 +235,7 @@ comment: kommentar.
 
 
 generated_types
-KILDE: METADATA, fra ST_INFO_SYS.
+KILDE: METADATA, fra Stinfosys.
 HVEM bruker tabellen: Data.
 BESKRIVELSE av tabellen: Dette er en tabell som viser hvilke stationid, paramid kombinasjoner av en typeid som er genererte
 BESKRIVELSE av attributtene i tabellen:
@@ -199,7 +244,7 @@ typeid:    se tabellen types
 
 
 param.
-KILDE: METADATA, fra ST_INFO_SYS.
+KILDE: METADATA, fra Stinfosys.
 HVEM bruker tabellen: Alle moduler
 BESKRIVELSE av tabellen: Kode og beskrivelse for observerte værparametere
 BESKRIVELSE av attributtene i tabellen:
@@ -218,13 +263,14 @@ comment: Tilleggstekst om spesielle forhold ved parameteren.
 
 
 station.
-KILDE: METADATA, fra ST_INFO_SYS & kvalobs-interne
+KILDE: METADATA, fra Stinfosys & kvalobs-interne
 HVEM bruker tabellen: Alle modulene
 BESKRIVELSE av tabellen:
 Denne tabellen inneholder informasjon om stasjonene.
 BESKRIVELSE av attributtene i tabellen:
-stationid:  stasjonsnummer.Stasjoner som har static lik true kommer fra ST_INFO_SYS, de som har static
-           lik false er kvalobs-interne stasjonsnummer og er autogenerert i kvalobs.
+stationid: stasjonsnummer.Stasjoner som har static lik true kommer fra Stinfosys, 
+           de som har static lik false er kvalobs-interne stasjonsnummer og 
+           er autogenerert i kvalobs.
 	   Tallet 0 er forbeholdt å brukes som verdi i 
 	   tabellene checks og station_param som et flagg i betydningen alle stasjoner. 
            Ingen stasjoner kan ha stationid 0.
@@ -294,24 +340,13 @@ fromtime: Tiden fra dataene for denne stasjonen gjelder;
           stasjonen ble opprettet.
 
 
-environment.
-KILDE: METADATA, basert på analyse av type_begrepet i klimadatabasen.
-HVEM bruker tabellen: station
-BESKRIVELSE av tabellen:
-Denne tabellen inneholder en beskrivelse av forskjellige typer miljø for en stasjon.
-BESKRIVELSE av attributtene i tabellen:
-environmentid: et id nummer til tabellen environment som sier noe om observasjonsmiljøet på stasjonen
-name: navnet på miljøet, en alfanumerisk navnekode
-use: hva dataene kan brukes til
-description: Beskrivelse av miljøet på stasjonen
-
-
 checks.
 KILDE:  METADATA, våre egne.
 	Det er 2 hovedmåter tabellen checks mottar metadata på:
 	1) Automatisk
-	Metadataene i checkene er automatisk generert for disse filene og styres i fra station_param og et
-        template for checken som gjør at en får autogenerert hvilke parametere den gjelder for.
+	Metadataene i checkene er automatisk generert for disse filene og styres i fra
+        station_param og et template for checken som gjør at en får 
+        autogenerert hvilke parametere den gjelder for.
 	2) Manuelt
 	Manuell punching av checks metadata i små filer som deretter leses inn i 
       	databasen ved hjelp av et script.
@@ -419,7 +454,35 @@ bare laget for å illustrere strukturen på et filformat:
 desc_metadata: Beskrivelse av hva metadataene er for noe.
 fromtime: Tiden fra dataene for denne raden gjelder.
 
-algorithms
+
+metadatatype.
+KILDE:  METADATA, våre egne.
+HVEM bruker tabellen: station_metadata 
+BESKRIVELSE av tabellen: definisjonstabell for tabellen station_metadata. 
+BESKRIVELSE av attributtene i tabellen:
+metadatatypename: alias eller navn på metadataene brukt i tabellen station_metadata.
+description: definisjon av hva metadatatypename er for noe.
+
+
+station_metadata.
+KILDE:  METADATA, våre egne.
+HVEM bruker tabellen: QABase
+BESKRIVELSE av tabellen: Nye metadata for QABase.
+BESKRIVELSE av attributtene i tabellen:
+stationid: stasjonsnummer, se tabellen station.
+	   Her skal 0 bety at metadataene gjelder for alle stasjoner;
+	   se "OVERSIKT OVER stationid=0" nederst.
+paramid: parameternummer, se tabellen param.
+typeid: se tabellen types.
+level: se tabellen data.
+sensor: se tabellen data.
+metadatatypename: se tabellen metadatatype.
+metadata: float NOT NULL, verdien av metadataene i denne tabellen
+fromtime: Dataene for denne raden gjelder fra og med dette tidspunktet.
+totime: Dataene for denne raden gjelder til og med dette tidspunktet.
+
+
+algorithms.
 KILDE:  METADATA, våre egne.
 HVEM bruker tabellen: QABase
 BESKRIVELSE av tabellen: lagrer skript, dette er en skripttabell.
@@ -474,7 +537,7 @@ qcx: Hva slags kontrolltype, se tabellen checks.
 
 
 obs_pgm 
-KILDE: METADATA, fra ST_INFO_SYS. 
+KILDE: METADATA, fra Stinfosys. 
 HVEM bruker tabellen:
  QABases modul for manglende observasjoner 
 BESKRIVELSE av tabellen:
@@ -508,7 +571,7 @@ collector: Observasjonen kan komme til ulike tider, men er ikke p&aring;krevet.
 kl00 - kl23: Observasjonstidspunkt.
 mon - son: Observasjonsdag.
 fromtime: Tiden fra dataene i denne raden gjelder
-
+totime: Dataene for denne raden gjelder til og med dette tidspunktet.
 
 
 operator
@@ -546,8 +609,46 @@ key:     nøkkel sammen med package, en må oppfatte key som en subnøkkel for en g
 value:   verdi for en vilkårlig key.
 
 
+workque
+KILDE: INTERN
+HVEM bruker tabellen: runtimesystemet
+BESKRIVELSE av tabellen: Hjelpetabell som brukes av runtimesystemet, 
+ingen mennesker skal putte noe inn her. Jfr. systemdokumentasjonen.
+BESKRIVELSE av attributtene i tabellen:
+stationid: se tabellen station,
+obstime: se tabellen data,
+typeid: se tabellen types,
+tbtime: se tabellen data,
+priority: prioritet,
+process_start:
+qa_start:
+qa_stop:
+service_start:
+service_stop:
+
+
+workstatistik.
+KILDE: INTERN
+HVEM bruker tabellen: runtimesystemet
+BESKRIVELSE av tabellen: Hjelpetabell som brukes av runtimesystemet, 
+ingen mennesker skal putte noe inn her. Jfr. systemdokumentasjonen.
+BESKRIVELSE av attributtene i tabellen:
+stationid: se tabellen station,
+obstime: se tabellen data,
+typeid: se tabellen types,
+tbtime: se tabellen data,
+priority: prioritet,
+process_start:
+qa_start:
+qa_stop:
+service_start:
+service_stop:
+
+
+ps_subscribers ??
+
 stationid_klima
-KILDE:  METADATA, fra ST_INFO_SYS.
+KILDE:  METADATA, fra Stinfosys.
 HVEM bruker tabellen:
 Hele Meteorologisk institutt, deriblant kvalobs.
 BESKRIVELSE av tabellen:
@@ -560,7 +661,7 @@ klop: klimadatabasens nye system for utenlandske stasjoner
 
 
 param_feltfil
-KILDE:  METADATA, fra ST_INFO_SYS.
+KILDE:  METADATA, fra Stinfosys.
 HVEM bruker tabellen:
 Hele Meteorologisk institutt, deriblant kvalobs.
 BESKRIVELSE av tabellen:
@@ -581,10 +682,8 @@ feltfil_level2: dette er høyde nivå parameteren i de tilfellene parameteren
 
 
 
-paramset
-Informasjonen om innholdet skal ligge i script.create_doc;
-det skal lages en egen fil som vil fungere som bibliotek,
-denne filen ligger i /kvalobs/src/lib/kvalobs/
+
+
 paramset er ikke lenger noen tabell, derimot er det et bibliotek
 Biblioteket brukes for &aring; gruppere parametere.
 paramid: parameternummer, se tabellen param.
