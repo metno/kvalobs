@@ -315,6 +315,8 @@ bool kvUseInfo::setUseFlags(const kvControlInfo& cinfo)
 
 	// useinfo(15) : "Tester som har gitt utslag (cfailed)"
 	ui[15] = 0;
+	if (fhqc > 0)
+		ui[15]++;
 	if (fr > 1)
 		ui[15]++;
 	if (fcc > 1)
@@ -326,6 +328,8 @@ bool kvUseInfo::setUseFlags(const kvControlInfo& cinfo)
 	if (fnum > 1)
 		ui[15]++;
 	if (fpos > 1)
+		ui[15]++;
+	if (ftime > 1)
 		ui[15]++;
 	if (fw > 1)
 		ui[15]++;
