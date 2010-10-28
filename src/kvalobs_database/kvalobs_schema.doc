@@ -1,10 +1,7 @@
 DOKUMENTASJON AV TABELLENE.
 Norsk språklig ( bokmål ). 
 
-Terje Reite 27. oktober 2010.
-
-METADATATABELLER SOM IKKE ER I BRUK:
-generated_types, reference_station, timecontrol, stationid_klima, param_feltfil.
+Terje Reite 28. oktober 2010.
 
 ANDRE TABELLER SOM ER TOMME:
 ps_subscribers
@@ -232,15 +229,6 @@ read: Dette har med hvordan observasjonen er avlest og vi har da 3 typer:
       M = Manuell, A = Automatisk, I = (Kvalobs)Intern.
 obspgm: observasjonsprogrammet, er det time eller minutt.
 comment: kommentar.
-
-
-generated_types
-KILDE: METADATA, fra Stinfosys.
-HVEM bruker tabellen: Data.
-BESKRIVELSE av tabellen: Dette er en tabell som viser hvilke stationid, paramid kombinasjoner av en typeid som er genererte
-BESKRIVELSE av attributtene i tabellen:
-stationid: se tabellen station
-typeid:    se tabellen types
 
 
 param.
@@ -500,42 +488,6 @@ signature: signaturen til parametere, metadata og variabelnavn som en trenger
 script: koden for skriptet.
 
 
-reference_station
-KILDE:  METADATA, våre egne
-HVEM bruker tabellen: Den brukes av det scriptet som skal
-                      preprosessere kolonnene til checks.
-BESKRIVELSE av tabellen:
-BESKRIVELSE av attributtene i tabellen:
-stationid: stasjonsnummer, dette er stasjonen det skal 
-           tas referanser i forhold til
-paramsetid: Dette er en gruppe parametere som er definert i tabellen
-            paramset.
-reference: kommaseparert liste av stationid for referansestasjonene.
-
-
-
-timecontrol
-KILDE:  METADATA, våre egne.
-HVEM bruker tabellen: Den som kontrollerer arbeidet.
-BESKRIVELSE av tabellen: Denne tabellen er foreløpig bare for QC2 tester. 
-		Denne tabellen er for tidskontroll for når testene
-                skal kjøres. Det som skjer er at en gang i timen
-                så sjekker datamaskinen om noen tester skal kjøres.
-                Dersom en får tilbake noe fra spørring til fromday, today
-                og time så kjører en den med høyest prioritet. En får
-                en bedre ytelse dersom testene lastes inn en gang i døgnet
-                fra databasen til programmet. 
-BESKRIVELSE av attributtene i tabellen:
-fromday: Fra og med hvilken dag i året testen gjelder
-today: Til og med hvilken dag i året testen gjelder
-time: Hele time for når testen skal kjøres
-priority: Prioritering av rekkefølge for når testene skal kjøres;
-          laveste tall har høyest prioritet. Vi begynner å telle fra og med 1
-          og oppover.
-qcx: Hva slags kontrolltype, se tabellen checks.
-
-
-
 obs_pgm 
 KILDE: METADATA, fra Stinfosys. 
 HVEM bruker tabellen:
@@ -647,51 +599,6 @@ service_stop:
 
 ps_subscribers ??
 
-stationid_klima
-KILDE:  METADATA, fra Stinfosys.
-HVEM bruker tabellen:
-Hele Meteorologisk institutt, deriblant kvalobs.
-BESKRIVELSE av tabellen:
-Denne tabellen brukes til å finne sammenhengen mellom koden for en stasjon
-i klimadatabasen og i kvalobs.
-stationid: stasjonsnummer, se tabellen station.
-klima: klimadatabasens gamle system for utenlandske stasjoner
-klop: klimadatabasens nye system for utenlandske stasjoner 
-
-
-
-param_feltfil
-KILDE:  METADATA, fra Stinfosys.
-HVEM bruker tabellen:
-Hele Meteorologisk institutt, deriblant kvalobs.
-BESKRIVELSE av tabellen:
-Denne tabellen brukes til å finne sammenhengen mellom koden for en parameter
-i en feltfil og i kvalobs.
-paramid: parameternummer, se tabellen param.
-level:  Nivå der samme fysiske parameter observeres i ulik høyde eller dybde
-        målt i meter. For værkoder derimot er dette en tidsparameter som har en
-        ubestemt verdi innenfor et bestemt tidsintervall. 
-feltfil_paramid: dette er en kode som er paramid for parameteren
-feltfil_vertical_coordinate: dette sier noe om hvilken type vertikal koordinat
-                             vi har.
-feltfil_level1: dette er høyde nivået for parameteren.
-feltfil_level2: dette er høyde nivå parameteren i de tilfellene parameteren
-                beskriver et område mellom to høydeflater. 
-
-
-
-
-
-
-
-paramset er ikke lenger noen tabell, derimot er det et bibliotek
-Biblioteket brukes for &aring; gruppere parametere.
-paramid: parameternummer, se tabellen param.
-paramsetid: en id for en gruppe av parametere, rader med felles paramsetid
-            tilhører samme gruppe.
-Kategoriseringer om sammenhengen paramid og paramsetid sortert
-etter paramsetid:
-INGEN INFORMASJON ER FOREL&Oslash;PIG SATT INN
 
 
 OVERSIKT OVER stationid=0.

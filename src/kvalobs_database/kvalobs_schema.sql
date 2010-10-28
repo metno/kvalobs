@@ -305,17 +305,6 @@ GRANT SELECT, UPDATE, INSERT ON types TO kv_write;
 
 
 
-CREATE TABLE generated_types (
-	stationid INTEGER NOT NULL,
-	typeid  INTEGER NOT NULL,
-	UNIQUE ( stationid, typeid )
-);
-REVOKE ALL ON generated_types FROM public;
-GRANT ALL ON generated_types TO kv_admin;
-GRANT SELECT ON generated_types TO kv_read;
-GRANT SELECT, UPDATE, INSERT, DELETE ON generated_types TO kv_write;
-
-
 
 CREATE TABLE param (
 	paramid INTEGER NOT NULL,
@@ -444,34 +433,6 @@ GRANT SELECT, UPDATE, INSERT ON algorithms TO kv_write;
 
 
 
-
-CREATE TABLE reference_station (
-	stationid INTEGER NOT NULL,
-        paramsetid   INTEGER NOT NULL,
-	reference TEXT DEFAULT NULL,
-	UNIQUE ( stationid, paramsetid ) 
-);
-REVOKE ALL ON reference_station FROM public;
-GRANT ALL ON reference_station TO kv_admin;
-GRANT SELECT ON reference_station TO kv_read;
-GRANT SELECT, UPDATE, INSERT ON reference_station TO kv_write;
-
-
-
-CREATE TABLE timecontrol (
-	fromday	  INTEGER NOT NULL,
-	today	  INTEGER NOT NULL,
-	time      INTEGER NOT NULL,
-	priority  INTEGER NOT NULL,
-	qcx       TEXT NOT NULL,
-	UNIQUE ( fromday, today, time, priority )  
-);
-REVOKE ALL ON timecontrol FROM public;
-GRANT ALL ON timecontrol TO kv_admin;
-GRANT SELECT ON timecontrol TO kv_read;
-GRANT SELECT, UPDATE, INSERT ON timecontrol TO kv_write;
-
-
 CREATE TABLE obs_pgm (
 	stationid INTEGER NOT NULL,
 	paramid	  INTEGER NOT NULL,
@@ -558,35 +519,6 @@ REVOKE ALL ON key_val FROM public;
 GRANT ALL ON key_val TO kv_admin;
 GRANT SELECT ON key_val TO kv_read;
 GRANT SELECT, UPDATE, INSERT, DELETE ON key_val TO kv_write;
-
-
-
-CREATE TABLE stationid_klima (
-        stationid INTEGER NOT NULL,
-        klima    INTEGER DEFAULT NULL,
-        klop     INTEGER DEFAULT NULL,
-        UNIQUE ( stationid )
-);
-REVOKE ALL ON stationid_klima FROM public;
-GRANT ALL ON stationid_klima TO kv_admin;
-GRANT SELECT ON stationid_klima TO kv_read;
-GRANT SELECT, UPDATE, INSERT ON stationid_klima TO kv_write;
-
-
-
-CREATE TABLE param_feltfil (
-	paramid INTEGER NOT NULL,
-	level   INTEGER DEFAULT 0,	
-	feltfil_code    INTEGER NOT NULL,
-	feltfil_vertical_coordinate INTEGER DEFAULT 0,
-	feltfil_level1  INTEGER DEFAULT NULL,
-	feltfil_level2  INTEGER DEFAULT NULL,
-	UNIQUE ( paramid, level, feltfil_vertical_coordinate )
-);
-REVOKE ALL ON param_feltfil FROM public;
-GRANT ALL ON param_feltfil TO kv_admin;
-GRANT SELECT ON param_feltfil TO kv_read;
-GRANT SELECT, UPDATE, INSERT ON param_feltfil TO kv_write;
 
 
 
