@@ -7,53 +7,6 @@ ANDRE TABELLER SOM ER TOMME:
 ps_subscribers
 
 
-GENERELL OVERSIKT.
-Tabellene kan kategoriseres på 2 forskjellige måter:
-1) Hva er kildene til innholdet i tabellene ? 
-   Det er 3 forskjellige måter det kan kategorieseres
-   1a) Eksterne kilder: Observasjoner, modeller og metadata
-   1b) Interne kilder: Tabellrader og flagg som genereres og settes av systemet selv.
-   1c) View: Visninger som er basert på innholdet i andre tabeller
-2) Hva trenger brukerne eller kundene, hvilke produkter lager kvalobs ?
-
-
-1a) Eksterne kilder:  
-Tabellene for observasjoner er: data, data_history, text_data, text_data_history, rejectdecode.
-Tabellen for modell data er: model_data
-
-Tabellene i metadatagruppen er stort sett resten av tabellene: 
-model,types,param,station,checks,station_param,
-metadatatype,station_metadata,
-algorithms,
-obs_pgm,operator,qcx_info.
-
-
-1b) Interne kilder:
-Tabeller til hjelp under kjøringen av kvalobs: key_val, workque og workstatistik.
-Tabellene data_history og text_data_history får genererte tabellrader satt.
-Tabellene data og text_data får satt flagg under kjøringen.
-
-1c) View:
-Det finnes 2: data_view og text_data_view
-
-3)En tredje måte å dele inn tabellene på er etter hva kundene trenger.
-Eksempler på kunder er BUFR-enkoderen, Klimadatabasene og KRO. Indirekte er også YR kunde gjennom klima.
-Hva kunder ikke trenger å vite noe om:
-- kunder trenger ikke vite noe om modelldata, tabellene model_data og model blir da uaktuelle
-- kunder trenger ikke vite noe om ikke dekodede data, tabellen rejectdecode forsvinner 
-- kunder trenger ikke vite noe om metadata og tabeller som har med checker og algoritmer, flesteparten av metadatatabellen forsvinner.
-
-Det kunder trenger å vite er tabellen med observasjoner for punktdata:
-data
-text_data
-
-
-I tillegg trenger kunder å ta i mot innholdet i følgende tabeller som kan hentes i fra Stinfosys:
-types ( kalles i Stinfosys message_format )
-param
-station
-
-
 data.
 KILDE: NORCOM, ComObs, AUtoObs, div. etterregistrering.
 HVEM bruker tabellen: Alle moduler.
@@ -600,43 +553,4 @@ service_stop:
 ps_subscribers ??
 
 
-
-OVERSIKT OVER stationid=0.
-Mange tabeller som har stationid kan ha denne lik 0.
-Disse tabellene er:
-checks
-station_param
-
-I tabellen obs_pgm kan ikke stationid være 0.
-
-Så hva betyr det at stationid=0 i checks og station_param?
-Jo, det betyr at en henviser til en annen tabell for å vise hvilke
-stasjoner som sjekken gjelder for.  Tabellen checks henviser til
-station_param og tabellen station_param henviser til tabellen obs_pgm.
-
-Dette gir følgende rekkefølge i programmet under runtime:
-1) En slår opp i tabellen checks for å finne ut hvilke tester som skal
-kjøres, og hvilke metadata de trenger og hvilke stasjoner de skal kjøres
-for. stationid=0 betyr her at hvilke stasjoner sjekken skal kjøres for
-styres fra station_param. Dersom stationid er forskjellig fra 0 i
-checks så er det checks som styrer hvilke stasjoner som sjekken skal
-kjøres for.
-Hva skjer dersom en både har stationid = 0 og stationid <> 0 for samme qcx i 
-tabellen checks?
-
-2) Etter å ha slått opp i checks så slår en opp i tabellen station_param.
- Dersom stationid er forskjellig
-fra 0 i station_param så er det station_param som styrer hvilke
-sjekker som skal kjøres. Dersom stationid=0 i station_param så må en
-slå opp i tabellen obs_pgm for å se hvilke stasjoner sjekken skal kjøre for.
-
-Men en står overfor samme problemstilling i station_param som den en
-hadde for checks: Hva skjer dersom en både har stationid = 0 og stationid <> 0 for samme qcx i 
-tabellen station_param?
-Det valget som er gjort er følgende:
-
-En spesifikk stationid har forrang for stationid=0; Først kjøres alle sjekker med 
-spesifikk stationid, deretter blir de stasjonene som ikke har noen spesifikk stationid 
-styrt av stationid=0. For station_param betyr det at disse henvises
-til og styres av obs_pgm. Spesifikk stationid betyr en stationid forskjellig fra null.
 
