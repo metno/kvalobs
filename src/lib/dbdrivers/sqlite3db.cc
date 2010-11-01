@@ -28,6 +28,7 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+#include <stdlib.h>
 #include <unistd.h>
 #include <sstream>
 #include "sqlite3db.h"

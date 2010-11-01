@@ -31,7 +31,7 @@
 #ifndef __smsmeldingparser_h_bm314__
 #define __smsmeldingparser_h_bm314__
 
-#include <string>
+#include <string.h>
 #include <sstream>
 #include <libxml/parser.h>
 #include "smsmelding.h"

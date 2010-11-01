@@ -34,7 +34,7 @@
 #include <map>
 #include <vector>
 #include <list>
-#include <string>
+#include <string.h>
 #include <sstream>
 #include <stdexcept> //out_of_range
 

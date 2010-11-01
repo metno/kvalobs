@@ -31,6 +31,8 @@
 #include "synop.h"
 #include <math.h>
 #include <sstream>
+#include <cstring>
+#include <cstdlib>
 
 using namespace syn;
 using namespace std;

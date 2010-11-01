@@ -32,6 +32,7 @@
 #define __corbaApp_h__
 
 #include <string>
+#include <stdio.h>
 #include <omniORB4/CORBA.h>
 
 /**

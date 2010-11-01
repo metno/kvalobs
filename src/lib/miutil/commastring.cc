@@ -28,7 +28,8 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#include <string>
+#include <string.h>
+//#include <boost/algorithm/string.hpp>
 #include <stdexcept>
 #include <algorithm>
 #include <sstream>
@@ -339,6 +340,7 @@ miutil::
 CommaString::
 copy(char *str, int size)const
 {
+
   bool first=true;
   string val;
  

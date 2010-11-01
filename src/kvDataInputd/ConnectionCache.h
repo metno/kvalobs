@@ -31,7 +31,9 @@
 #ifndef __ConnectionCache_h__
 #define __ConnectionCache_h__
 
-#include <boost/thread/thread.hpp>
+//#include <boost/thread/thread.hpp>
+#include <boost/thread.hpp>
+#include <boost/thread/condition.hpp>
 #include <map>
 #include <kvdb/dbdrivermgr.h>
 

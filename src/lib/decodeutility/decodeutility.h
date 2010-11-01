@@ -32,6 +32,7 @@
 #define __dnmi_decodeutility_h__
 
 
+#include <stdio.h>
 #include <string>
 
 namespace decodeutility{

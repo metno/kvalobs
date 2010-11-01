@@ -32,6 +32,7 @@
 #define __milog_flogstream_h__
 
 #include <stdio.h>
+#include <string.h>
 #include <milog/LogStream.h>
 
 
