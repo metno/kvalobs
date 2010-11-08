@@ -1,3 +1,35 @@
+/*
+  Kvalobs - Free Quality Control Software for Meteorological Observations
+
+  $Id: comobsentry.cc,v 1.1.2.1 2007/09/27 09:02:24 paule Exp $
+
+  Copyright (C) 2007 met.no
+
+  Contact information:
+  Norwegian Meteorological Institute
+  Box 43 Blindern
+  0313 OSLO
+  NORWAY
+  email: kvalobs-dev@met.no
+
+  This file is part of KVALOBS
+
+  KVALOBS is free software; you can redistribute it and/or
+  modify it under the terms of the GNU General Public License as
+  published by the Free Software Foundation; either version 2
+  of the License, or (at your option) any later version.
+
+  KVALOBS is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  General Public License for more details.
+
+  You should have received a copy of the GNU General Public License along
+  with KVALOBS; if not, write to the Free Software Foundation Inc.,
+  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
+
+
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -5,12 +37,13 @@
 #include <string>
 #include <map>
 #include "bufrdefs.h"
-#include "ParamDescriptor.h"
 #include "BufrMessage.h"
-#include "BufrDecodeSequences.h"
+#include "BufrDecodeSynoptic.h"
 #include "BufrDecodeKvResult.h"
+#include "kvParamdefs.h"
 
 using namespace std;
+using namespace kvalobs::decoder::bufr;
 
 bool
 readFile( const std::string &name, std::string &buf )
@@ -71,8 +104,8 @@ splitBufr( const std::string &bufr, list<string> &bufrs )
 int
 main( int argn, char **argv )
 {
-   //string bufrname("1492-2206.bufr");
-   string bufrname("syno_2010092106.bufr");
+   string bufrname("1492-20100406.bufr");
+   //string bufrname("syno_2010092106.bufr");
    string sBufr;
    kvalobs::decoder::bufr::DescriptorFloatValue descriptorVal;
    kvalobs::decoder::bufr::BufrMessage bufrMsg;
@@ -94,8 +127,8 @@ main( int argn, char **argv )
 
    cerr << "#BUFR messages: " << bufrList.size() << endl;
    kvalobs::decoder::bufr::BufrDecodeKvResult decodeResult;
-   kvalobs::decoder::bufr::BufrToKvUnit_ptr unitConverter( new kvalobs::decoder::bufr::BufrToKvUnit() );
-   kvalobs::decoder::bufr::BufrDecodeSequences decoder( unitConverter );
+   //kvalobs::decoder::bufr::BufrDecodeSequences decoder( unitConverter );
+   kvalobs::decoder::bufr::BufrDecodeSynoptic decoder;
 
    for( list<string>::iterator it = bufrList.begin(); it != bufrList.end(); ++it ) {
       sBufr = *it;
@@ -119,7 +152,7 @@ main( int argn, char **argv )
 
    cerr << endl <<  "BufrTables: " << endl;
    for( map<int, int>::iterator it=bufrTbls.begin(); it!=bufrTbls.end(); ++it ) {
-      cerr <<"  " << it->first << ": " << it->second << endl;
+      cerr <<"  " << it->first << "(" << paramid::paramName( it->first ) << "): " << it->second << endl;
    }
 
 

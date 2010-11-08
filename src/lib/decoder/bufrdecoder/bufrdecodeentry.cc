@@ -31,10 +31,10 @@
 #include <list>
 #include <milog/milog.h>
 #include "bufrdecodeentry.h"
-//#include "bufrdecode.h"
+#include "BufrDecodeSynoptic.h"
 
 
-//using namespace kvalobs::decoder::bufr;
+using namespace kvalobs::decoder::bufr;
 
 kvalobs::decoder::DecoderBase* 
 decoderFactory(dnmi::db::Connection &con,
@@ -45,10 +45,10 @@ decoderFactory(dnmi::db::Connection &con,
 	       const miutil::miString &obs)
 {
    /*
-  BufrDecoder *dec;
+  BufrDecodeSynoptic *dec;
 
   try{
-    dec=new BufrDecoder(con, params, typeList, obsType, obs, decoderId);
+    dec=new BufrDecodeSynoptic(con, params, typeList, obsType, obs, decoderId);
   }
   catch(...){
     return 0;

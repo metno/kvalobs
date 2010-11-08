@@ -1,9 +1,33 @@
 /*
- * BufrMessage.h
- *
- *  Created on: Sep 26, 2010
- *      Author: borgem
- */
+  Kvalobs - Free Quality Control Software for Meteorological Observations
+
+  $Id: comobsentry.cc,v 1.1.2.1 2007/09/27 09:02:24 paule Exp $
+
+  Copyright (C) 2007 met.no
+
+  Contact information:
+  Norwegian Meteorological Institute
+  Box 43 Blindern
+  0313 OSLO
+  NORWAY
+  email: kvalobs-dev@met.no
+
+  This file is part of KVALOBS
+
+  KVALOBS is free software; you can redistribute it and/or
+  modify it under the terms of the GNU General Public License as
+  published by the Free Software Foundation; either version 2
+  of the License, or (at your option) any later version.
+
+  KVALOBS is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  General Public License for more details.
+
+  You should have received a copy of the GNU General Public License along
+  with KVALOBS; if not, write to the Free Software Foundation Inc.,
+  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 
 #include <iomanip>
 #include <iostream>
@@ -89,6 +113,31 @@ nextFloatValueDescriptor( DescriptorFloatValue &descriptor )
    descriptor.unit = copyToString( cunits[ valueIndex ], 24 );
    descriptor.name = copyToString( cnames[ valueIndex ], 64 );
    valueIndex++;
+
+   return &descriptor;
+}
+
+DescriptorFloatValue*
+BufrMessage::
+peekAtFloatValueDescriptor( DescriptorFloatValue &descriptor, int index )
+{
+   descriptor.descriptor = -1;
+   descriptor.index = -1;
+   descriptor.value = RVIND;
+
+   if( ! valid )
+      return 0;
+
+   int i = valueIndex + index;
+
+   if( i >= kdtexplen )
+      return 0;
+
+   descriptor.descriptor = kdtexplist[ i ];
+   descriptor.index = i;
+   descriptor.value = vals[ i ];
+   descriptor.unit = copyToString( cunits[ i ], 24 );
+   descriptor.name = copyToString( cnames[ i ], 64 );
 
    return &descriptor;
 }

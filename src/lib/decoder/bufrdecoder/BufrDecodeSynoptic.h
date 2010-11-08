@@ -29,72 +29,34 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include <iostream>
-#include "BufrDecodeKvResult.h"
+#ifndef __BUFRDECODESYNOPTIC_H__
+#define __BUFRDECODESYNOPTIC_H__
 
+#include <limits.h>
+#include "BufrDecodeBase.h"
 namespace kvalobs {
 namespace decoder {
 namespace bufr {
 
-using namespace std;
 
-int
-BufrDecodeKvResult::
-findStationid( int wmono )
+class BufrDecodeSynoptic : virtual public BufrDecodeBase
 {
-   if( wmono != wmono_ || stationid_ == INT_MAX ) {
-      if( stationList_ ) {
-         std::list<kvalobs::kvStation>::iterator it = stationList_->begin();
+protected:
+   void setheightOfPressureSensorAboveMeanSeaLevel( const BufrValue &value );
+   void setheightOfStationAboveMeanSeaLevel( const BufrValue &value );
+   void setHeightOfSenorAboveLocalGround( const BufrValue &value );
 
-         for( ;it != stationList_->end(); ++it ) {
-            if( it->wmonr() == wmono )
-               break;
-         }
+   virtual void decode( BufrDecodeResultBase *result );
 
-         wmono_ = wmono;
+public:
+   BufrDecodeSynoptic();
+   virtual ~BufrDecodeSynoptic();
 
-         if( it == stationList_->end() )
-            stationid_ = INT_MAX;
-         else
-            stationid_ = it->stationID();
-      }
-   }
+};
 
-   return stationid_;
-}
-
-void
-BufrDecodeKvResult::
-clear()
-{
-   wmono_ = INT_MAX;
-   stationid_ = INT_MAX;
-   latitude_ = FLT_MAX;
-   longitude_ = FLT_MAX;
-   data_.clear();
-}
-
-void
-BufrDecodeKvResult::
-setStationid( int wmono )
-{
-   stationid_ = findStationid( wmono );
-}
-
-void
-BufrDecodeKvResult::
-add( float value, int kvparamid, const miutil::miTime &obstime )
-{
-   if( obstime_.undef() )
-      return;
-
-   if( value == FLT_MAX )
-      return;
-
-   data_.push_back( Data( value , kvparamid, obstime_ ) );
-}
 
 }
 }
 }
 
+#endif /* BUFRDECODESEQUENCES_H_ */

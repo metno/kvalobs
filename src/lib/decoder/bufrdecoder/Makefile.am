@@ -4,13 +4,11 @@ decoder_LTLIBRARIES = bufrdecoder.la
 
 noinst_PROGRAMS = bufrdecoder
 
-bufrdecoder_SOURCES = kvParamdefs.h \
-					  ParamDescriptor.cc ParamDescriptor.h \
+bufrdecoder_SOURCES = kvParamdefs.h kvParamdefs.cc\
 					  BufrMessage.cc BufrMessage.h \ 
-					  BufrToKvUnit.cc BufrToKvUnit.h \
 					  BufrDecodeBase.cc BufrDecodeBase.h \
 					  BufrDecodeKvResult.cc BufrDecodeKvResult.h \
-					  BufrDecodeSequences.cc BufrDecodeSequences.h \
+					  BufrDecodeSynoptic.cc BufrDecodeSynoptic.h \
                       bufrdecoder.cc
                       
 bufrdecoder_CPPFLAGS = -I$(top_srcdir)/src/lib \
@@ -22,8 +20,7 @@ bufrdecoder_LDADD = $(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
                     -lm
 
 bufrdecoder_la_SOURCES = bufrdecodeentry.cc bufrdecodeentry.h \
-						 BufrMessage.cc BufrMessage.h \
-						 ParamDescriptor.cc ParamDescriptor.h
+						 BufrMessage.cc BufrMessage.h 
 						                           
 bufrdecoder_la_CPPFLAGS = -D_REENTRANT \
                             -I$(top_srcdir)/src/lib \
