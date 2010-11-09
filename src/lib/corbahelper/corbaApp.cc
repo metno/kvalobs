@@ -347,6 +347,10 @@ putObjInNS(CORBA::Object_ptr objref,
 			CERR("Service required is invalid [does not exist]." << endl);
 			return false;
 		}
+		catch (CORBA::Exception & ex ) {
+			CERR("Corba exception: " << ex._name() << endl);
+			return false;
+		}
 		catch(...){
 			CERR("UNKNOWN exception: CorbaApp::putObjInNS!!!!\n");
 			return false;
