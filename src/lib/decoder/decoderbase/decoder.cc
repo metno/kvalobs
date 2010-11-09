@@ -37,6 +37,7 @@
 #include <kvalobs/kvQueries.h>
 #include <kvalobs/kvGeneratedTypes.h>
 #include <kvalobs/kvWorkelement.h>
+#include <kvalobs/kvPath.h>
 #include <miutil/commastring.h>
 #include <miutil/trimstr.h>
 #include "decoder.h"
