@@ -728,21 +728,15 @@ DecoderBase::
 loadConf(int sid, int tid,
 	 kvalobs::decoder::ConfParser &parser)
 {
-  string                    kvpath;
   miutil::conf::ConfParser  myparser;
   miutil::conf::ConfSection *conf;
   ostringstream              fname;
   ifstream    fis;
 
-  if(getenv("KVALOBS")){
-    kvpath=getenv("KVALOBS");
-    if(!kvpath.empty() && kvpath[kvpath.length()-1]=='/')
-      kvpath.erase(kvpath.length()-1);
-  }
 
+  fname << kvPath("sysconfdir");
 
-  fname << kvpath << "/etc/decode/" << name() << "/" << sid << "-" << tid
-	<< ".conf";
+  fname << "/decode/" << name() <<  ".conf";
 
   fis.open(fname.str().c_str());
 
@@ -788,30 +782,27 @@ openFLogStream(const std::string &filename)
     return 0;
   }
 
-  if(getenv("KVALOBS")){
-    string path=getenv("KVALOBS");
-    if(!path.empty() && path[path.length()-1]=='/')
-      path.erase(path.length()-1);
 
-    if(path.empty())
-      error=true;
-    else
-      pathlist.push_back(path);
-  }else{
-    error=true;
-  }
+  string path=getenv("KVALOBS");
+  path = kvPath("logdir");
+
+  if(!path.empty() && path[path.length()-1]=='/')
+     path.erase(path.length()-1);
+
+  if(path.empty())
+     error=true;
+  else
+     pathlist.push_back(path);
 
   if(error){
     LOGERROR("Cant open logfile! "  <<
-	     "MISSING/EMPTY environment variable KVALOBS " << endl <<
+	     "MISSING/EMPTY 'logdir'" << endl <<
 	     "Logging all activity to: /dev/null");
     fs->open("/dev/null");
 
     return fs;
   }
 
-  pathlist.push_back("var");
-  pathlist.push_back("log");
   pathlist.push_back("decoders");
   pathlist.push_back(name());
 
