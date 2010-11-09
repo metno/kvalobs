@@ -45,8 +45,11 @@ namespace bufr {
 
 typedef boost::shared_ptr<std::list<kvalobs::kvStation> > KvStationList_ptr;
 
+class BufrDecoder;
+
 class BufrDecodeKvResult : public BufrDecodeResultBase
 {
+protected:
    struct Data {
       int paramid;
       float value;
@@ -80,6 +83,8 @@ public:
    virtual void setStationid( int wmono );
    virtual void setLatLong( double latitude, double longitude ) { latitude_ = latitude; longitude_ = longitude; }
    virtual void add( float value, int kvparamid, const miutil::miTime &obstime );
+
+
 };
 
 }

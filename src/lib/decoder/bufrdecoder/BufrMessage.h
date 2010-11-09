@@ -76,6 +76,8 @@ class BufrMessage
    int valueIndex;
 
 public:
+   std::string error;
+
    BufrMessage()
       :valid( false ), kdtlen( KELEM ), kdtexplen( KELEM ), kelem( KELEM ), kvals( KELEM )
    {}

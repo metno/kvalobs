@@ -30,6 +30,7 @@
 */
 
 #include <iostream>
+#include <milog/milog.h>
 #include "BufrDecodeKvResult.h"
 
 namespace kvalobs {
@@ -67,6 +68,7 @@ void
 BufrDecodeKvResult::
 clear()
 {
+   obstime_ = miutil::miTime(); //Undef
    wmono_ = INT_MAX;
    stationid_ = INT_MAX;
    latitude_ = FLT_MAX;
@@ -85,14 +87,16 @@ void
 BufrDecodeKvResult::
 add( float value, int kvparamid, const miutil::miTime &obstime )
 {
-   if( obstime_.undef() )
-      return;
-
    if( value == FLT_MAX )
       return;
 
-   data_.push_back( Data( value , kvparamid, obstime_ ) );
+   if( obstime_.undef() )
+      obstime_ = obstime;
+
+
+   data_.push_back( Data( value , kvparamid, obstime ) );
 }
+
 
 }
 }

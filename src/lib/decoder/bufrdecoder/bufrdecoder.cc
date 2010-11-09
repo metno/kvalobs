@@ -1,7 +1,7 @@
 /*
-  Kvalobs - Free Quality Control Software for Meteorological Observations
+  Kvalobs - Free Quality Control Software for Meteorological Observations 
 
-  $Id: comobsentry.cc,v 1.1.2.1 2007/09/27 09:02:24 paule Exp $
+  $Id: synopdecoder.cc,v 1.18.2.5 2007/09/27 09:02:18 paule Exp $                                                       
 
   Copyright (C) 2007 met.no
 
@@ -15,64 +15,200 @@
   This file is part of KVALOBS
 
   KVALOBS is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License as
-  published by the Free Software Foundation; either version 2
+  modify it under the terms of the GNU General Public License as 
+  published by the Free Software Foundation; either version 2 
   of the License, or (at your option) any later version.
-
+  
   KVALOBS is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   General Public License for more details.
-
-  You should have received a copy of the GNU General Public License along
-  with KVALOBS; if not, write to the Free Software Foundation Inc.,
+  
+  You should have received a copy of the GNU General Public License along 
+  with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-
-
-#include <iomanip>
-#include <iostream>
+#include <float.h>
+#include <limits.h>
 #include <sstream>
 #include <fstream>
-#include <string>
-#include <map>
-#include "bufrdefs.h"
-#include "BufrMessage.h"
-#include "BufrDecodeSynoptic.h"
+#include <stdlib.h>
+#include <boost/lexical_cast.hpp>
+#include <puTools/miTime.h>
+#include <miutil/commastring.h>
+#include <miutil/splitstr.h>
+#include <miutil/base64.h>
+#include <milog/milog.h>
+#include <kvalobs/kvDbGate.h>
+#include <kvalobs/kvQueries.h>
+#include <kvalobs/kvTypes.h>
+#include <fileutil/mkdir.h>
+#include "bufrdecoder.h"
 #include "BufrDecodeKvResult.h"
-#include "kvParamdefs.h"
+#include "BufrDecodeSynoptic.h"
 
-using namespace std;
 using namespace kvalobs::decoder::bufr;
+using namespace std;
+using namespace dnmi::db;
+using namespace miutil;
+using namespace boost;
+using namespace kvalobs;
+
+
+miutil::miTime BufrDecoder::lastStationCheck;
+boost::mutex   BufrDecoder::mutex;
+
+
+BufrDecoder::
+BufrDecoder( dnmi::db::Connection   &con,
+             const ParamList        &params,
+             const std::list<kvalobs::kvTypes> &typeList,
+             const miutil::miString &obsType,
+             const miutil::miString &obs,
+             int                    decoderId)
+   : DecoderBase(con, params, typeList, obsType, obs, decoderId), earlyobs(INT_MAX),
+     lateobs( INT_MAX )
+
+{
+}
+
+BufrDecoder::
+~BufrDecoder()
+{
+}
+
+miutil::miString 
+BufrDecoder::
+name() const
+{
+    return "BufrDecoder";
+}
+
+long 
+BufrDecoder::
+getStationId(miutil::miString & msg)
+{
+}
+
+long
+BufrDecoder::
+getStationid( int wmono )const
+{
+   if( ! stationList )
+      return -1;
+
+   for( std::list<kvalobs::kvStation>::const_iterator it = stationList->begin();
+        it != stationList->end(); ++it ) {
+      if( wmono == it->wmonr() )
+         return it->stationID();
+      else if( wmono > it->wmonr() )
+         return -1;
+   }
+
+   return -1;
+}
 
 bool
-readFile( const std::string &name, std::string &buf )
+BufrDecoder::
+getEarlyLateObs( int &early, int &late )const
 {
-   ostringstream ost;
-   char ch;
-   int i=0;
-   ifstream inf( name.c_str() );
+   if( lateobs == INT_MAX || earlyobs == INT_MAX )
+      return false;
 
-   if( ! inf ) {
-      cerr << "grmf .... \n";
+   early = earlyobs;
+   late = lateobs;
+   return true;
+}
+
+bool
+BufrDecoder::
+saveData( list<kvalobs::kvData> &data,
+          bool				 	     &rejected,
+          std::string			  &rejectedMessage)
+{
+   list<kvalobs::kvData>::iterator it=data.begin();
+   int i=0;
+   int priority=10;
+
+   rejected=false;
+
+   if(it==data.end())
+      return true;
+
+   if(it->stationID()<100000){
+      //National stations that is registred in table 'station'.
+      priority=6;
+   }else if(it->stationID()<=10000000){
+      //Foregn stations is in the range [100000, 10000000]
+      priority=7;
+   }else if(it->stationID()>10000000 && it->stationID()<130000000){
+      //COMMENT:
+      //As a quick fix to set priority. We reduce the priority
+      //for ships. We now that ships get a automatic generated stationid
+      //in the range [10100009, 123123599]. For
+
+      priority=8;
+   }
+
+   for(;it!=data.end(); it++){
+      if(it->obstime().undef() || it->tbtime().undef()){
+         rejectedMessage="Missing obsTime or tbtime for observation!";
+         rejected=true;
+         return false;
+      }
+   }
+
+   if(!putKvDataInDb(data, priority)){
+      it=data.begin();
+      LOGWARN("Cant save data: sid=" << it->stationID() << " tid=" << it->typeID()
+              << " obst=" << it->obstime());
       return false;
    }
 
-   while( inf.good()  ) {
-      ch = inf.get();
+   return true;
+}
 
-      if( inf.good() ) {
-         i++;
-         //cerr << "("<<(isprint( ch )?ch:'.' )<<")";
-         ost << ch;
+bool
+BufrDecoder::
+initialize()
+{
+   kvDbGate        gate(getConnection());
+   list<kvStation> *stat = new list<kvStation>();
+   list<kvTypes>   types;
+
+   //Get stations from the database
+
+   if( ! stat ) {
+      LOGERROR("NOMEM: Can't allocate space for <station> data!");
+      return false;
+   }
+
+   if(!gate.select( *stat, " WHERE wmonr IS NOT NULL ORDER BY wmonr")) {
+      LOGERROR("Can't get station data from table <station>!\n" <<
+               gate.getErrorStr());
+      delete stat;
+      return false;
+   }else{
+      LOGINFO("Data for " << stat->size()
+              << " station is read from table <station>");
+   }
+
+   stationList.reset( stat );
+   lastStationCheck=miTime::nowTime();
+
+
+   if(gate.select( types, "where typeid=1 OR typeid=7 order by typeid DESC")) {
+      if (!types.empty()) {
+         earlyobs = types.begin()->earlyobs();
+         lateobs  = types.begin()->lateobs();
       }
    }
-   //cerr << endl << "i: " << i << endl;
-   buf = ost.str();
-   return inf.eof();
+
+   return true;
 }
 
 void
+BufrDecoder::
 splitBufr( const std::string &bufr, list<string> &bufrs )
 {
 
@@ -98,167 +234,139 @@ splitBufr( const std::string &bufr, list<string> &bufrs )
       bufrs.push_back( bufr.substr( prev ) );
 }
 
-
-
-
-int
-main( int argn, char **argv )
+std::string
+BufrDecoder::
+getFormat()const
 {
-   string bufrname("1492-20100406.bufr");
-   //string bufrname("syno_2010092106.bufr");
-   string sBufr;
-   kvalobs::decoder::bufr::DescriptorFloatValue descriptorVal;
-   kvalobs::decoder::bufr::BufrMessage bufrMsg;
-   map<int, int> bufrTbls;
+   string::size_type n;
+   vector<string> strings=splitstr( obsType, '/' );
 
-   if( ! readFile( bufrname, sBufr ) ) {
-      cerr << "Failed to read file: " << bufrname << endl;
-      return 1;
-   }
+   for( vector<string>::size_type i=0; i<strings.size(); ++i ) {
+      if( strings[i].find( "format" )!= string::npos  ) {
+         vector<string> keyval = splitstr( strings[i], '=' );
 
-   list<string> bufrList;
-
-   splitBufr( sBufr, bufrList );
-
-   if( bufrList.empty() ) {
-      cerr << "No BUFR messages in <" << bufrname << ">" << endl;
-      return 0;
-   }
-
-   cerr << "#BUFR messages: " << bufrList.size() << endl;
-   kvalobs::decoder::bufr::BufrDecodeKvResult decodeResult;
-   //kvalobs::decoder::bufr::BufrDecodeSequences decoder( unitConverter );
-   kvalobs::decoder::bufr::BufrDecodeSynoptic decoder;
-
-   for( list<string>::iterator it = bufrList.begin(); it != bufrList.end(); ++it ) {
-      sBufr = *it;
-
-      if( ! bufrMsg.bufrExpand( sBufr, bufrMsg ) ) {
-         cerr << "Failed to expand BUFR." << endl;
-         return 1;
-      }
-
-      pair< map<int, int>::iterator, bool>  res = bufrTbls.insert( pair<int,int>(bufrMsg.descriptorTbl(), 0) );
-
-      cerr << bufrMsg << endl;
-      decoder.decodeBufrMessage( &bufrMsg, &decodeResult );
-      if( ! res.second )
-         res.first->second++;
-
-      //cerr << bufrMsg.descriptorTbl() << endl;
-      //cerr << bufrMsg << endl;
-   }
-
-
-   cerr << endl <<  "BufrTables: " << endl;
-   for( map<int, int>::iterator it=bufrTbls.begin(); it!=bufrTbls.end(); ++it ) {
-      cerr <<"  " << it->first << "(" << paramid::paramName( it->first ) << "): " << it->second << endl;
-   }
-
-
-#if 0
-   unsigned long int *kbuff;
-   long int ksup[9];
-   long int ksec0[3];
-   long int ksec1[40];
-   long int ksec2[4096];
-   long int ksec3[4];
-   long int ksec4[2];
-   long int key[46];
-   long int kerr;
-
-
-   if( ! readFile( bufrname, sBufr ) ) {
-      cerr << "Failed to read file: " << bufrname << endl;
-      return 1;
-   }
-
-   list<string> bufrList;
-
-   splitBufr( sBufr, bufrList );
-
-   if( bufrList.empty() ) {
-      cerr << "No BUFR messages in <" << bufrname << ">" << endl;
-      return 0;
-   }
-
-   cerr << "#BUFR messages: " << bufrList.size() << endl;
-
-   for( list<string>::iterator it = bufrList.begin(); it != bufrList.end(); ++it ) {
-      sBufr = *it;
-
-      length = sBufr.length();
-      length /= 4;
-      long int kelem=KELEM;
-      long int kvals=KELEM;
-      char cnames[KELEM][64];
-      char cunits[KELEM][24];
-      double vals[KVALS];
-      char cvals[KVALS][80];
-
-      //bus0123_( &length , reinterpret_cast<unsigned long int*>( const_cast<char*>(sBufr.data())), ksup, ksec0, ksec1, ksec2, ksec3, &kerr );
-      bufrex_( &length , reinterpret_cast<unsigned long int*>( const_cast<char*>(sBufr.data())), ksup, ksec0, ksec1, ksec2, ksec3, ksec4,
-               &kelem, (char **)cnames, (char **)cunits, &kvals, vals, (char **)cvals, &kerr );
-
-      if( kerr != 0 ) {
-         cerr << "Failed to decode bufr: " << bufrname << endl;
-         return 1;
-      }
-
-      cerr << "sBuf length: " << sBufr.length() << endl;
-      cerr << "Ret length:  " << length << endl;
-      cerr << "kelem:       " << kelem << endl;
-      cerr << "kvals:       " << kvals << endl;
-      cerr << "Dim of Array KSEC0: " << ksup[8] << endl;
-      cerr << "Dim of Array KSEC1: " << ksup[0] << endl;
-      cerr << "Dim of Array KSEC2: " << ksup[1] << endl;
-      cerr << "Dim of Array KSEC3: " << ksup[2] << endl;
-      cerr << "Dim of Array KSEC4: " << ksup[3] << endl;
-      cerr << "Number of expanded elements: " << ksup[4] << endl;
-      cerr << "Number of subsets: " << ksup[5] << endl;
-      cerr << "Number of elements in CVALS: " << ksup[6] << endl;
-      cerr << "Bufr message size: " << ksup[7] << endl;
-
-      long int ktdlen=KELEM;
-      long int kdtlist[KELEM];
-      long int kdtexplen = KELEM;
-      long int kdtexplist[KELEM];
-      busel_( &ktdlen, kdtlist, &kdtexplen, kdtexplist, &kerr );
-
-      if( kerr != 0 ) {
-         cerr << "Failed to decode descriptors: " << bufrname << endl;
-         return 1;
-      }
-
-      cerr << "Des      #: " << ktdlen << endl;
-      cerr << "Des exp: #: " << kdtexplen << endl;
-
-      cerr << "Unexpanded table. " << endl;
-      for( int i=0; i<ktdlen; ++i ) {
-         cerr << setw(3) << i << ":" << kdtlist[i] << endl;
-      }
-      cerr << endl;
-      cerr << "Expnaded table." << endl;
-
-      int prev=0;
-      for( int i=0; i<kdtexplen; ++i ) {
-         //F XX YYY
-         int N = kdtexplist[i];
-         int F=int(N/100000);
-         int X=int((N-F*100000)/1000);
-         int Y=int((N-X*1000));
-         cerr << setw(3) << i << ": " << setfill('0') << setw(6) << N
-               <<  " (" << setw(1) << setfill('0') << F << " "
-               << setw(2) << setfill('0') << X << " "
-               << setw(3) << setfill('0') << Y << ")" <<(N==prev?'*':' ')<< endl;
-         prev = N;
-      }
-
-      cerr << endl;
-      cerr << "Values: " << endl;
-      for( int i=0; i<ksup[4]; ++i ) {
-         cerr << setw(4)<<setfill('0')<< i << ": " <<  vals[i] << endl; //"("<<cnames[i]<<" ["<<cunits[i]<<"])" << endl;
+         if( keyval.size() == 2 && keyval[0]=="format" )
+            return keyval[1];
       }
    }
-#endif
+
+   return "";
 }
+
+kvalobs::decoder::DecoderBase::DecodeResult 
+BufrDecoder::execute(miutil::miString &msg)
+{
+   kvalobs::kvRejectdecode  reject;
+   bool                     saveReject;
+   std::string              saveRejectMessage;
+   list<kvalobs::kvData>    data;
+   miTime                   nowTime(miTime::nowTime());
+   string                   format;
+   string                   bufr;
+   list<string>             bufrList;
+   int                      errorCount=0;
+
+   Lock lock(mutex);
+
+   milog::LogContext lcontext("BufrDecoder");
+   LOGINFO("New observation(s)");
+
+   if(obs.length()==0){
+      LOGERROR("Incomming message has zero size!");
+      return Ok;
+   }
+
+   format = getFormat();
+
+   if( format != "base64" ) {
+      LOGERROR("It is expected that the observation is base64 encoded. Format is <"+format+">.");
+      msg="It is expected that the observation is base64 encoded. Format is <"+format+">.";
+      return Rejected;
+   }
+
+
+
+   if( lastStationCheck.undef() ||
+         abs(miTime::hourDiff(lastStationCheck, nowTime)) > 1 ){
+      LOGINFO("Initialize the station information from the database.");
+
+      if(!initialize()){
+         LOGERROR("Can't initialize the SynopDecoder!!!");
+         msg="Can't initialize the SynopDecoder!!!";
+         return NotSaved;
+      }
+   }
+
+   decode64( obs, bufr );
+   splitBufr( bufr, bufrList );
+
+   BufrDecodeSynoptic bufrDecoder;
+   DecodeKvResult decodeResult;
+   BufrMessage bufrMsg;
+
+   for( list<string>::const_iterator it = bufrList.begin(); it != bufrList.end(); ++it ) {
+      if( ! BufrMessage::bufrExpand(*it, bufrMsg ) ) {
+         string buf;
+         encode64( it->c_str(), it->size(), buf );
+         LOGERROR("Failed to decode bufr (base64): " << endl << buf << endl << "Reason: " << bufrMsg.error );
+         ++errorCount;
+         continue;
+      }
+
+      decodeResult.clear();
+      bufrDecoder.decodeBufrMessage( &bufrMsg, &decodeResult );
+
+      if( ! decodeResult.saveData( this ) ) {
+         errorCount++;
+      }
+   }
+
+   msg="OK!";
+
+   if(  errorCount > 0 ) {
+      LOGWARN("BUFR: #" << bufrList.size()-errorCount << " Observation(s) decoded and saved. #" << errorCount << " failed to decode.");
+   } else {
+      LOGINFO("BUFR: SUCCESS: #" << bufrList.size() << " Observation(s) decoded and saved!");
+   }
+
+   return Ok;
+}
+
+bool
+DecodeKvResult::
+saveData( BufrDecoder *decoder )
+{
+   miutil::miTime tbTime( miutil::miTime::nowTime() );
+
+   if( wmono_ != INT_MAX )
+      stationid_ = decoder->getStationid( wmono_ );
+
+   if( stationid_ < 0) {
+      LOGWARN("BUFR: No stationid found for wmono <" << wmono_ << ">.");
+      return false;
+   }
+
+   if( obstime_.undef() ) {
+      LOGWARN("BUFR: No obstime in BUFR message for wmono <" << wmono_ << ">.");
+      return false;
+   }
+   std::map<int, miutil::miTime>::iterator itTbTime = stationidTbTimeList.find( stationid_ );
+
+   if( itTbTime != stationidTbTimeList.end() && itTbTime->second == tbTime)
+      tbTime.addSec( 1 );
+
+   stationidTbTimeList[stationid_]=tbTime;
+   std::list<kvalobs::kvData> kvDataList;
+
+   for( std::list<Data>::const_iterator itData=data_.begin(); itData != data_.end(); ++itData ) {
+      kvDataList.push_back( kvalobs::kvData( stationid_, itData->obstime, itData->value, itData->paramid,
+                                             tbTime, typeid_, 0, 0, itData->value,
+                                             kvalobs::kvControlInfo(), kvalobs::kvUseInfo(),"") );
+   }
+
+   bool rejected;
+   string rejectMessage;
+   decoder->saveData( kvDataList, rejected, rejectMessage );
+   return true;
+}
+

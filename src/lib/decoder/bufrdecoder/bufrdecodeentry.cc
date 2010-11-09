@@ -71,7 +71,7 @@ getObsTypes()
 {
   std::list<miutil::miString> list;
 
-  list.push_back("bufrdecode");
+  list.push_back("BUFR");
 
   return list;
 }

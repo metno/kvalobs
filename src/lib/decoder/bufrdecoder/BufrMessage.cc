@@ -31,6 +31,7 @@
 
 #include <iomanip>
 #include <iostream>
+#include <sstream>
 #include <miutil/trimstr.h>
 #include "BufrMessage.h"
 
@@ -62,6 +63,8 @@ bufrExpand( const std::string &bufr, BufrMessage &bufrMessage )
    bufrMessage.kvals = KELEM;
    long int kerr;
 
+   bufrMessage.error="No error!";
+
    if( bufr.empty() )
       return false;
 
@@ -75,7 +78,10 @@ bufrExpand( const std::string &bufr, BufrMessage &bufrMessage )
             &bufrMessage.kvals, bufrMessage.vals, (char **)bufrMessage.cvals, &kerr );
 
    if( kerr != 0 ) {
-      cerr << "Failed to decode bufr." << endl;
+      ostringstream ost;
+
+      ost << "Failed to decode bufr. BUFR error code: " << kerr <<".";
+      bufrMessage.error = ost.str();
       return false;
    }
 
@@ -83,7 +89,10 @@ bufrExpand( const std::string &bufr, BufrMessage &bufrMessage )
            &bufrMessage.kdtexplen, bufrMessage.kdtexplist, &kerr );
 
    if( kerr != 0 ) {
-      cerr << "Failed to decode descriptors." << endl;
+      ostringstream ost;
+
+      ost << "Failed to decode descriptors. BUFR error code: " << kerr <<".";
+      bufrMessage.error = ost.str();
       return false;
    }
 
