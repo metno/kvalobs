@@ -138,37 +138,38 @@ dnmi::thread::CommandBase*
 dnmi::thread::
 CommandQue::get(int timeout)
 {
-  Lock lk(m);
+   Lock lk(m);
 
-  if(que.empty()){
+   if(que.empty()){
       if(timeout==0){
-	
-	while(que.empty()){
-	  cond.wait(lk);
-	  
-	  if(suspended)
-	    throw QueSuspended();
-	}
+
+         while(que.empty()){
+            cond.wait(lk);
+
+            if( que.empty() && suspended )
+               throw QueSuspended();
+         }
       }else{
-	boost::xtime xt;
+         boost::xtime xt;
 
-	xtime_get(&xt, boost::TIME_UTC);
-	xt.sec+=timeout;
-       
-	cond.timed_wait(lk, xt);
-	
-	if(suspended)
-	  throw QueSuspended();
+         xtime_get(&xt, boost::TIME_UTC);
+         xt.sec+=timeout;
 
-	if(que.empty())
-	  return 0;
+         cond.timed_wait(lk, xt);
+
+         if( que.empty() ) {
+            if( suspended )
+               throw QueSuspended();
+
+            return 0;
+         }
       }
-  }
+   }
 
-  CommandBase *tmp=que.front();
-  que.pop_front();
-  
-  return tmp;
+   CommandBase *tmp=que.front();
+   que.pop_front();
+
+   return tmp;
 }
 
 dnmi::thread::CommandBase*
