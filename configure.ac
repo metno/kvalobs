@@ -39,6 +39,7 @@ AC_CONFIG_FILES([Makefile
                  src/lib/kvalobs/Makefile
                  src/lib/decoder/Makefile
                  src/lib/decoder/decoderbase/Makefile
+                 src/lib/decoder/bufrdecoder/Makefile
                  src/lib/decoder/rejectdecoder/Makefile
                  src/lib/decoder/kv2kvdecoder/Makefile
                  src/lib/decoder/dummydecoder/Makefile
