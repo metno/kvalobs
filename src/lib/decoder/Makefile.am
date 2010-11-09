@@ -6,4 +6,5 @@ SUBDIRS = \
 	kldecoder \
 	autoobsdecoder \
 	comobsdecoder \
-	synopdecoder
+	synopdecoder  \
+	bufrdecoder
