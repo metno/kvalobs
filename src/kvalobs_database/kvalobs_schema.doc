@@ -1,7 +1,7 @@
 DOKUMENTASJON AV TABELLENE.
 Norsk språklig ( bokmål ). 
 
-Terje Reite 28. oktober 2010.
+Terje Reite 11. november 2010.
 
 ANDRE TABELLER SOM ER TOMME:
 ps_subscribers
@@ -120,7 +120,8 @@ message: Melding som har kommet inn og som ikke kunne dekodes
 tbtime: Tidspunkt for når message ble lagret i Kvalobsdb.
 decoder: Beskriver hvilken dekoder som er brukt 
 comment: kommentar. F.eks. tekst som beskriver hvorfor meldingen ble forkastet.
-fixed: bolsk variabel, ?
+fixed: Angir om den avviste meldingen har blitt håndert av hqc.
+
 
 model_data.
 KILDE: Pseudodata, fra modeller.
@@ -551,6 +552,4 @@ service_stop:
 
 
 ps_subscribers ??
-
-
 
