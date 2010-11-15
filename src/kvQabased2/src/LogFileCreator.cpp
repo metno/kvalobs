@@ -31,7 +31,8 @@
 #include "Exception.h"
 #include <kvalobs/kvStationInfo.h>
 #include <milog/milog.h>
-#include <boost/filesystem.hpp>
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/convenience.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -120,7 +121,7 @@ LogFileCreator::LogStreamPtr LogFileCreator::getLogStream(const kvalobs::kvStati
 			renameOldLogs(logFile);
 			LogStreamPtr logStream(new boost::filesystem::ofstream(logFile));
 			if ( not logStream->good() )
-				throw LogFileCreationError("Error when opening log file: " + logFile.file_string());
+				throw LogFileCreationError("Error when opening log file: " + logFile.native_file_string());
 			return logStream;
 		}
 		catch ( std::exception & e )

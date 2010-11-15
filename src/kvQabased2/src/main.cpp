@@ -35,8 +35,6 @@
 #include <corbalistener/corbaMain.h>
 #include "db/KvalobsDatabaseAccess.h"
 #include <milog/milog.h>
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/fstream.hpp>
 #include <boost/lexical_cast.hpp>
 
 

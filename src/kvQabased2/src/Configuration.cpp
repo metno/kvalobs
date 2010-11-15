@@ -31,7 +31,8 @@
 #include "Configuration.h"
 #include <kvalobs/kvStationInfo.h>
 #include <boost/program_options.hpp>
-#include <boost/filesystem.hpp>
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <iostream>
 #include <cstdlib>
@@ -85,9 +86,9 @@ void parse(const boost::filesystem::path & configFile, variables_map & vm, const
 	using namespace boost::filesystem;
 
 	if ( not exists(configFile) )
-		throw std::runtime_error(configFile.file_string() + ": no such file or directory");
+		throw std::runtime_error(configFile.native_file_string() + ": no such file or directory");
 	if ( is_directory(configFile) )
-		throw std::runtime_error(configFile.directory_string() + " is a directory");
+		throw std::runtime_error(configFile.native_directory_string() + " is a directory");
 
 	ifstream s(configFile);
 	store(parse_config_file(s, configFileOptions), vm);
@@ -225,7 +226,7 @@ std::ostream & Configuration::help(std::ostream & s, const boost::program_option
 	boost::filesystem::path defaultConfig = defaultConfigFile();
 	if (not defaultConfig.empty())
 		s << "Additional configuration is read from <"
-				<< defaultConfig.file_string() << ">\n\n";
+				<< defaultConfig.native_file_string() << ">\n\n";
 
 	s << options << std::endl;
 
