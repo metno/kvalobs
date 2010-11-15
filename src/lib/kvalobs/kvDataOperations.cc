@@ -36,8 +36,11 @@ using namespace kvalobs::flag;
 
 namespace kvalobs
 {
+namespace
+{
 const float rejectedValue_ = -32766;
 const float missingValue_ = -32767;
+}
 
 
 bool valid( const kvData & d )
