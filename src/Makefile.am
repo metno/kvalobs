@@ -6,6 +6,7 @@ SUBDIRS = \
 	kvServiced \
 	kvServiced/test \
 	kvQabased \
+	kvQabased2 \
 	kvManagerd \
 	model2kv \
 	kv2metdat \

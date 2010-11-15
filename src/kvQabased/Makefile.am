@@ -1,6 +1,6 @@
-bin_PROGRAMS = kvQabased
+bin_PROGRAMS = kvQabased_old
 
-kvQabased_SOURCES = \
+kvQabased_old_SOURCES = \
 	AdminImpl.cc AdminImpl.h \
 	InitLogger.cc InitLogger.h \
 	kvCronString.cc kvCronString.h \
@@ -13,7 +13,7 @@ kvQabased_SOURCES = \
 	kvQABaseTypes.h \
 	kvQabased.cc
 
-kvQabased_CPPFLAGS = \
+kvQabased_old_CPPFLAGS = \
 	-I$(top_srcdir)/src/lib \
 	-I$(top_builddir)/src/lib \
 	-I$(top_builddir)/src/lib/kvskel \
@@ -23,8 +23,8 @@ kvQabased_CPPFLAGS = \
 	$(putools_CFLAGS) \
 	$(perl_CFLAGS)
 	
-kvQabased_LDFLAGS = -pthread -export-dynamic	
-kvQabased_LDADD = \
+kvQabased_old_LDFLAGS = -pthread -export-dynamic	
+kvQabased_old_LDADD = \
 	$(top_builddir)/src/lib/milog/libkvalobs_milog.la \
 	$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
 	$(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la \
