@@ -1,8 +1,11 @@
 decoderdir=$(pkglibdir)/decode
 
-decoder_LTLIBRARIES = bufrdecoder.la
+#decoder_LTLIBRARIES = bufrdecoder.la
+EXTRA_LTLIBRARIES = bufrdecoder.la
 
-noinst_PROGRAMS = bufrdecode
+#noinst_PROGRAMS = bufrdecode
+EXTRA_PROGRAMS = bufrdecode
+
 
 bufrdecode_SOURCES = kvParamdefs.h kvParamdefs.cc\
 					  BufrMessage.cc BufrMessage.h \
