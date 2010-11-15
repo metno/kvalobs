@@ -48,18 +48,12 @@ boost::filesystem::path defaultConfigFile()
 {
 	using namespace boost::filesystem;
 
-#ifndef SYSCONFDIR
-	const char * sysconfdir = std::getenv("HOME");
-#else
-	const char * sysconfdir = SYSCONFDIR;
+#ifdef SYSCONFDIR
+	const path homeDir(SYSCONFDIR);
+	const path potentialConfigFile(homeDir / "kvQabased.conf" );
+	if ( exists(potentialConfigFile) )
+		return potentialConfigFile;
 #endif
-	if ( sysconfdir )
-	{
-		path homeDir(sysconfdir);
-		path potentialConfigFile(homeDir / "qabase.conf" );
-		if ( exists(potentialConfigFile) )
-			return potentialConfigFile;
-	}
 	return path();
 }
 

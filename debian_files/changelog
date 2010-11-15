@@ -1,3 +1,9 @@
+kvalobs (2.3.0-1) lucid; urgency=low
+
+  * new version
+
+ -- Vegard Bones <vegard.bones@met.no>  Mon, 15 Nov 2010 12:35:09 +0100
+
 kvalobs (2.2.0-1) unstable; urgency=low
 
   * new version, with interface change

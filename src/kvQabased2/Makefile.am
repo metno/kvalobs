@@ -31,6 +31,9 @@ EXTRA_DIST = $(qabase_src_SOURCES)
 bin_PROGRAMS = kvQabased
 kvQabased_SOURCES = $(qabase_src_SOURCES) 
 
+kvQabased_CPPFLAGS = $(AM_CPPFLAGS) -DSYSCONFDIR='"$(sysconfdir)"'
+
+
 include src/qabase.mk
 
 
