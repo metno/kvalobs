@@ -51,16 +51,21 @@ boost::filesystem::path getLogFileName(const kvalobs::kvStationInfo & observatio
 
 boost::filesystem::path getLogFile(const kvalobs::kvStationInfo & observationToCheck, const std::string & baseLogDir)
 {
-	boost::filesystem::path base(baseLogDir);
-	if ( exists(base) and is_directory(base) )
-	{
-		base /= boost::lexical_cast<std::string>(observationToCheck.stationID());
-		base /= observationToCheck.obstime().isoDate();
+	const boost::filesystem::path base(baseLogDir);
 
-		if ( not exists(base) and ! create_directories(base) )
-			throw LogFileCreationError("Unable to create logging folder " + base.string() );
-		base /= getLogFileName(observationToCheck);
-		return base;
+	if ( not exists(base) and ! create_directories(base) )
+		throw LogFileCreationError("Unable to create base logging folder " + base.string() );
+
+	if ( is_directory(base) )
+	{
+		boost::filesystem::path logFile(base);
+		logFile /= boost::lexical_cast<std::string>(observationToCheck.stationID());
+		logFile /= observationToCheck.obstime().isoDate();
+
+		if ( not exists(logFile) and ! create_directories(logFile) )
+			throw LogFileCreationError("Unable to create logging folder " + logFile.string() );
+		logFile /= getLogFileName(observationToCheck);
+		return logFile;
 	}
 	else
 		return base;

@@ -114,7 +114,7 @@ Configuration::Configuration(int & argc, char ** argv) :
 	options_description logging("Logging");
 	logging.add_options()
 			("loglevel", value<std::string>()->default_value("debug"), "Set loglevel (debug_all, debug, info, warn, error or fatal")
-			("logdir", value<std::string>(& baseLogDir_), "Use the given directory as base directory for script logs");
+			("logdir", value<std::string>(& baseLogDir_)->default_value(LOGDIR), "Use the given directory as base directory for script logs");
 
 	options_description database("Database");
 	database.add_options()

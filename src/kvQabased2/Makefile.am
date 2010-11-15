@@ -31,8 +31,12 @@ EXTRA_DIST = $(qabase_src_SOURCES)
 bin_PROGRAMS = kvQabased
 kvQabased_SOURCES = $(qabase_src_SOURCES) 
 
-kvQabased_CPPFLAGS = $(AM_CPPFLAGS) -DSYSCONFDIR='"$(sysconfdir)"'
+logdir = $(localstatedir)/log/kvalobs/checks
 
+kvQabased_CPPFLAGS = \
+	$(AM_CPPFLAGS) \
+	-DSYSCONFDIR='"$(sysconfdir)"' \
+	-DLOGDIR='"$(logdir)"'
 
 include src/qabase.mk
 
@@ -42,7 +46,7 @@ if HAVE_GMOCK
 check_PROGRAMS = qabasetest
 TESTS = $(check_PROGRAMS)
 qabasetest_SOURCES = $(qabase_src_SOURCES)
-qabasetest_CPPFLAGS = $(AM_CPPFLAGS) $(gmock_CFLAGS)
+qabasetest_CPPFLAGS = $(AM_CPPFLAGS) -DLOGDIR='"$(builddir)"' $(gmock_CFLAGS)
 qabasetest_LDADD = $(gmock_LIBS)
 
 include test/qabase.mk
