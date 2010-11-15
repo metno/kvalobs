@@ -1,4 +1,4 @@
-kvQabased_SOURCES += \
+kvQabased_old_SOURCES += \
 	runcheck/checkrunner.cc \
 	runcheck/checkrunner.h \
 	runcheck/kvalobscache.cc \

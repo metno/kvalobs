@@ -7,7 +7,7 @@ qabase_src_SOURCES += \
 	src/Configuration.h \
 	src/LogFileCreator.h
 	
-qabase_SOURCES += src/main.cpp
+kvQabased_SOURCES += src/main.cpp
 
 include src/scriptrunner/qabase.mk
 include src/corbalistener/qabase.mk
