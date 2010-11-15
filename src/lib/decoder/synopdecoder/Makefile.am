@@ -32,6 +32,6 @@ kvSynopDecodeTest_SOURCES = test/kvSynopDecodeTest.cc \
 							synopElements.h \
 							synopLexer.h synopLexer.ll
 
-kvSynopDecodeTest_CPPFLAGS = $(synop_la_CPPFLAGS)
-kvSynopDecodeTest_LDFLAGS = -lgtest \
+kvSynopDecodeTest_CPPFLAGS = $(synop_la_CPPFLAGS) $(gtest_CFLAGS)
+kvSynopDecodeTest_LDFLAGS = $(gtest_LIBS) \
                             $(synop_la_LIBADD)
