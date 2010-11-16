@@ -113,8 +113,9 @@ Configuration::Configuration(int & argc, char ** argv) :
 
 	options_description logging("Logging");
 	logging.add_options()
-			("loglevel", value<std::string>()->default_value("debug"), "Set loglevel (debug_all, debug, info, warn, error or fatal")
-			("logdir", value<std::string>(& baseLogDir_)->default_value(LOGDIR), "Use the given directory as base directory for script logs");
+			("runloglevel", value<std::string>()->default_value("debug"), "Set loglevel (debug_all, debug, info, warn, error or fatal")
+			("runlogfile", value<std::string>(& runLogFile_)->default_value(LOGDIR"/kvQabased.log"), "Set file name for run log")
+			("logdir", value<std::string>(& baseLogDir_)->default_value(LOGDIR"/checks"), "Use the given directory as base directory for script logs");
 
 	options_description database("Database");
 	database.add_options()
@@ -169,9 +170,9 @@ Configuration::Configuration(int & argc, char ** argv) :
 		qcxFilter_.push_back(qcxFilter);
 	}
 
-	if ( vm.count("loglevel") )
+	if ( vm.count("runloglevel") )
 	{
-		std::string wantedLevel = vm["loglevel"].as<std::string>();
+		std::string wantedLevel = vm["runloglevel"].as<std::string>();
 		if ( wantedLevel == "debug_all" )
 			logLevel_ = milog::DEBUG1;
 		else if ( wantedLevel == "debug" )
@@ -187,7 +188,7 @@ Configuration::Configuration(int & argc, char ** argv) :
 		else
 			throw std::runtime_error(wantedLevel + " is not a valid loglevel");
 	}
-	milog::Logger::logger().logLevel(logLevel_);
+	//milog::Logger::logger().logLevel(logLevel_);
 
 	observationToCheck_ = getStationInfo(vm);
 }

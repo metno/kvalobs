@@ -35,6 +35,7 @@
 #include <corbalistener/corbaMain.h>
 #include "db/KvalobsDatabaseAccess.h"
 #include <milog/milog.h>
+#include <milog/FLogStream.h>
 #include <boost/lexical_cast.hpp>
 
 
@@ -102,6 +103,38 @@ int main(int argc, char ** argv)
 		qabase::Configuration config(argc, argv);
 		if ( not config.runNormally() )
 			return 0;
+
+
+//		std::auto_ptr<FLogStream> ret(new FLogStream(9, maxSize));
+//
+//		boost::filesystem::path logDir = kvPath("logdir");
+//		boost::filesystem::path logFile = logDir/logFileName;
+//
+//		if ( not exists(logDir) )
+//			create_directories(logDir);
+//		else
+//			if ( not is_directory(logDir) )
+//				throw std::runtime_error("Log directory is a file! " + logDir.string());
+//
+//		ret->open(logFile.string());
+//		ret->loglevel(level);
+//		LogManager::instance()->addStream(ret.get());
+//		return ret;
+
+		milog::LogStream * s = 0;
+		if ( not config.runLogFile().empty())
+		{
+			milog::FLogStream * fs = new milog::FLogStream(9, 100000);
+			fs->open(config.runLogFile());
+			fs->loglevel(config.logLevel());
+
+			milog::LogManager::createLogger("filelog", fs);
+			milog::LogManager::setDefaultLogger("filelog");
+
+			s = fs;
+		}
+		boost::scoped_ptr<milog::LogStream> logStream;
+
 
 		if ( config.haveObservationToCheck() )
 		{

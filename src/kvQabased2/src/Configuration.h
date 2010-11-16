@@ -110,6 +110,11 @@ public:
 	 */
 	const QcxFilter & qcxFilter() const { return qcxFilter_; }
 
+	const std::string & runLogFile() const
+	{
+		return runLogFile_;
+	}
+
 	/**
 	 * Get the desired logging level.
 	 * @return Selected logging level.
@@ -146,6 +151,7 @@ private:
 
 	QcxFilter qcxFilter_;
 
+	std::string runLogFile_;
 	milog::LogLevel logLevel_;
 	std::string baseLogDir_;
 

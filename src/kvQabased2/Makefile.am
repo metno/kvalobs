@@ -31,7 +31,7 @@ EXTRA_DIST = $(qabase_src_SOURCES)
 bin_PROGRAMS = kvQabased
 kvQabased_SOURCES = $(qabase_src_SOURCES) 
 
-logdir = $(localstatedir)/log/kvalobs/checks
+logdir = $(localstatedir)/log/kvalobs
 
 kvQabased_CPPFLAGS = \
 	$(AM_CPPFLAGS) \
