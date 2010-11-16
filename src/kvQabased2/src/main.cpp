@@ -107,7 +107,7 @@ int main(int argc, char ** argv)
 		milog::LogStream * s = 0;
 		if ( not config.runLogFile().empty())
 		{
-			milog::FLogStream * fs = new milog::FLogStream(9, 100000);
+			milog::FLogStream * fs = new milog::FLogStream(9, 1024*1024);
 			fs->open(config.runLogFile());
 			fs->loglevel(config.logLevel());
 
