@@ -233,7 +233,7 @@ kvQueries::selectTextData(const int sid,
   ost << " where stationid=" << sid
       << " and obstime>=\'"  << stime.isoTime() << "\'"
       << " and obstime<=\'"  << etime.isoTime() << "\'"
-      << " order by obstime,typeid";
+      << " order by obstime,typeid DESC";
   
   return ost.str();
 }
