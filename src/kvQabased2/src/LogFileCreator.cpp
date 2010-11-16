@@ -43,8 +43,12 @@ QABASE_EXCEPTION(LogFileCreationError);
 
 boost::filesystem::path getLogFileName(const kvalobs::kvStationInfo & observationToCheck)
 {
-	std::ostringstream name;
-	name << "log-" << observationToCheck.obstime().clock() << '.' << observationToCheck.typeID() << ".log";
+  std::ostringstream name;
+  int hour = observationToCheck.obstime().hour();
+  name << "log.kl";
+  if ( hour < 10 )
+    name << 0;
+  name << hour << '.' << observationToCheck.typeID() << ".log";
   	return name.str();
 	//return "log-" + observationToCheck.obstime().isoClock() + ".log";
 }
