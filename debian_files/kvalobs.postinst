@@ -76,6 +76,7 @@ DIRS="/usr/share/kvalobs
       /var/log/kvalobs/decoders
       /var/log/kvalobs/decoders/SynopDecoder
       /var/log/kvalobs/html
+      /var/log/kvalobs/kvService
       /var/run/kvalobs
       /var/lib/kvalobs/service
       /var/lib/kvalobs/service/subscribers"     

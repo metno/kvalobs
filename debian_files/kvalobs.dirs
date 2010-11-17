@@ -20,4 +20,5 @@ var/log/kvalobs/html
 var/log/kvalobs/decoders
 var/log/kvalobs/decoders/SynopDecoder
 var/log/kvalobs/kvdbadmin
+var/log/kvalobs/kvService
 var/lib/kvalobs/service/subscribers
