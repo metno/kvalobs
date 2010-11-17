@@ -29,6 +29,7 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include <map>
 #include <sstream>
 #include <cstring>
 #include <kvalobs/kvDbGate.h>
@@ -256,6 +257,7 @@ operator()()
    dnmi::thread::CommandBase *cmd=0;
    bool                      fromKvManager;
    std::string               logName;
+   map<string, bool>         loggers; //Holds a map of all loggers we have created.
 
    milog::LogContext logContext("ServiceSubscriber");
 
@@ -327,15 +329,23 @@ operator()()
          logName = "kvManagerd";
       } else if( stInfoCmd->source().empty() ) {
          LOGDEBUG("DataReady received from <> (Unknown)!");
-         logName = "unknown";
+         logName = "UNKNOWN";
       } else {
          LOGDEBUG("DataReady received from <" << stInfoCmd->source() << ">!");
          logName = stInfoCmd->source();
       }
 
-      if( ! app.createGlobalLogger( logName, milog::DEBUG ) )
-         logName.erase();
+      map<string, bool>::iterator logIt=loggers.find( logName );
 
+      if( logIt != loggers.end() ) {
+         if( ! logIt->second )
+            logName.erase();
+      } else {
+         if( app.createGlobalLogger( logName, milog::DEBUG ) )
+            loggers[logName]=true;
+         else
+            loggers[logName]=false;
+      }
 
       conIdleTime=0;
       kvalobs::IkvStationInfoList it=stInfoCmd->getStationInfo().begin();
