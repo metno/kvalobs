@@ -1,5 +1,5 @@
 kvalobs (2.3.0.3-1) lucid; urgency=low
-  * kvServiced. More ogging.
+  * kvServiced. More logging.
   
  -- Børge Moe <borge.moe@met.no>  Wed, 17 Nov 2010 10:58:00 +0100
 
