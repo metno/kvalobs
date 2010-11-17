@@ -1,3 +1,15 @@
+kvalobs (2.3.0.1-1) lucid; urgency=low
+
+  * Added a new CORBA interface DataReadyInputExt with a new method dataReadyExt. This
+ 	is the same method as dataReady with a extra paramtere 'source'. The changes is 
+ 	compatible with old versions of kvalobs. 
+  * Added dataReadyExt support to kvServiced.
+  * Update kvManagerd to use dataReadyExt.
+  * getData sort the data on typeids so the negative type id comes last. 
+
+ -- Børge Moe <borge.moe@met.no>  Wed, 17 Nov 2010 07:38:00 +0100
+
+
 kvalobs (2.3.0-1) lucid; urgency=low
 
   * new version
