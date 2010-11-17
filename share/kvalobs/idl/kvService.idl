@@ -240,6 +240,13 @@ module CKvalObs{
 			out boolean bussy);
     };
 
+    interface DataReadyInputExt : DataReadyInput{
+      boolean dataReadyExt( in string source,
+                            in CKvalObs::StationInfoList data, 
+			                in CKvalObs::CManager::CheckedInput callback,
+			                out boolean bussy );
+    };
+
   };
 };
 
