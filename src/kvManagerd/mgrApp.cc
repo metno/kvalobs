@@ -205,7 +205,7 @@ sendDataToKvService(const kvalobs::kvStationInfoList &info_,
   CORBA::Boolean             serviceBussy;
   bool                       forceNS=false;
   bool                       usedNS=false;
-  CKvalObs::CService::DataReadyInput_ptr service;
+  CKvalObs::CService::DataReadyInputExt_ptr service;
   
   bussy=false;
 
@@ -228,9 +228,10 @@ sendDataToKvService(const kvalobs::kvStationInfoList &info_,
       service=lookUpKvService(forceNS, usedNS);
 
       try{
-	if(!service->dataReady(stInfoList, 
-			       refServiceCheckedInput,
-			       serviceBussy)){
+	if(!service->dataReadyExt( "__##kvManagerd@@very_secret_hash:-)##__",
+	                           stInfoList,
+	                           refServiceCheckedInput,
+	                           serviceBussy )){
 	  if(serviceBussy)
 	    bussy=true;
 	}
@@ -278,12 +279,12 @@ sendDataToKvService(const kvalobs::kvStationInfoList &info_,
  *lookUpManager will either return the refMgr or look up kvManagerInput'
  *in the CORBA nameservice.
  */ 
-CKvalObs::CService::DataReadyInput_ptr
+CKvalObs::CService::DataReadyInputExt_ptr
 ManagerApp::
 lookUpKvService(bool forceNS, bool &usedNS)
 {
   CORBA::Object_var obj;
-  CKvalObs::CService::DataReadyInput_ptr ptr;
+  CKvalObs::CService::DataReadyInputExt_ptr ptr;
 
   usedNS=false;
 
@@ -296,7 +297,7 @@ lookUpKvService(bool forceNS, bool &usedNS)
       if(CORBA::is_nil(obj))
 	throw LookUpException("EXCEPTION: Can't obtain a reference for 'kvServiceDataReady'\n           from the CORBA nameserver!");
       
-      ptr=CKvalObs::CService::DataReadyInput::_narrow(obj);
+      ptr=CKvalObs::CService::DataReadyInputExt::_narrow(obj);
       
       if(CORBA::is_nil(ptr))
 	throw LookUpException("EXCEPTION: Can't narrow reference for 'kvServiceDataReady'!");

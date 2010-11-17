@@ -45,7 +45,7 @@ class ManagerApp: public KvApp
   CKvalObs::CQaBase::QaBaseInput_var refQa;
   CKvalObs::CManager::CheckedInput_var refCheckedInput;
   CKvalObs::CManager::CheckedInput_var refServiceCheckedInput;
-  CKvalObs::CService::DataReadyInput_var refKvServiceDataReady;
+  CKvalObs::CService::DataReadyInputExt_var refKvServiceDataReady;
   dnmi::db::DriverManager            dbMgr;
   std::string                        dbDriver;
   std::string                        dbConnect;
@@ -59,7 +59,7 @@ class ManagerApp: public KvApp
    */
   CKvalObs::CQaBase::QaBaseInput_ptr lookUpQabase(bool forceNS, 
 						  bool &usedNS);
-  CKvalObs::CService::DataReadyInput_ptr lookUpKvService(bool forceNS, 
+  CKvalObs::CService::DataReadyInputExt_ptr lookUpKvService(bool forceNS,
 						     bool &usedNS);
 
   
@@ -81,6 +81,8 @@ class ManagerApp: public KvApp
 
   virtual ~ManagerApp();
   
+
+
   //inherited from KvApp
   virtual bool isOk()const;
 
