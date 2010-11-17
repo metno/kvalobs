@@ -116,6 +116,7 @@ dataReadyExt( const char* source,
               CKvalObs::CManager::CheckedInput_ptr callback,
               CORBA::Boolean& bussy )
 {
+   string mysource( source );
    string logid( source );
    DataReadyCommand *cmd=0;
 
@@ -123,11 +124,14 @@ dataReadyExt( const char* source,
 
    LogContext context("dataReady");
 
-   if( !app->createGlobalLogger( logid ) )
-      logid.erase();
+   if( string(source) == string("__##kvManagerd@@very_secret_hash:-)##__") ) {
+      logid="kvManagerd";
+      mysource = logid;
+   }
 
+   app->createGlobalLogger( logid );
 
-   LOGDEBUG("New data from <" << source << ">!");
+   LOGDEBUG("New data from <" << mysource << ">!");
 
    if( ! logid.empty() ) {
       IDLOGDEBUG(logid, "New data ready to distribute! # of elements: " << infoList.length() );

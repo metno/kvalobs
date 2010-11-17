@@ -334,8 +334,11 @@ operator()()
          logName = stInfoCmd->source();
       }
 
-      if( ! app.createGlobalLogger( logName, milog::DEBUG ) )
-         logName.erase();
+      string savedLogger( logName );
+
+      if( ! app.createGlobalLogger( logName, milog::DEBUG ) ) {
+         LOGERROR( "Failed to create logger <" << savedLogger << ">!");
+      }
 
       if( ! logName.empty() ) {
          IDLOGDEBUG( logName, "Number of datasets: " << stInfoCmd->getStationInfo().size()  );

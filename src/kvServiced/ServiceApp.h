@@ -69,7 +69,7 @@ class ServiceApp: public KvApp
    * \param is An id to identify the logger.
    * \return true on success and false otherwise.
    */
-  bool createGlobalLogger(const std::string &id, milog::LogLevel ll=milog::NOTSET );
+  bool createGlobalLogger( std::string &id, milog::LogLevel ll=milog::NOTSET );
 
 
   //inherited from KvApp

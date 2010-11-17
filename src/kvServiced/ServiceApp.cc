@@ -85,7 +85,7 @@ ServiceApp::
 
 bool
 ServiceApp::
-createGlobalLogger(const std::string &id, milog::LogLevel ll)
+createGlobalLogger( std::string &id, milog::LogLevel ll)
 {
    try{
 
@@ -98,16 +98,22 @@ createGlobalLogger(const std::string &id, milog::LogLevel ll)
       FLogStream *logs=new FLogStream(2, 204800); //200k
       std::ostringstream ost;
 
+      if( id == "__##kvManagerd@@very_secret_hash:-)##__" )
+         id = "kvManagerd";
+
       ost << kvPath("logdir") << "/kvService/" << id << ".log";
 
       if(logs->open(ost.str())){
          logs->loglevel( ll );
          if(!LogManager::createLogger(id, logs)){
+            LOGERROR("Failed to create logger <" << id << ">!");
             delete logs;
+            id.erase();
             return false;
          }
          return true;
       }else{
+         id.erase();
          LOGERROR("Cant open the logfile <" << ost.str() << ">!");
          delete logs;
          return false;
@@ -115,6 +121,7 @@ createGlobalLogger(const std::string &id, milog::LogLevel ll)
    }
    catch(...){
       LOGERROR("Cant create a logstream for LOGID " << id);
+      id.erase();
       return false;
    }
 }
