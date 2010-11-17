@@ -237,7 +237,7 @@ bool kvUseInfo::setUseFlags(const kvControlInfo& cinfo)
 		else if (fhqc == 5 || fagg == 5 || (ftime == 1 && fmis == 1))
 			ui[3] = 2;
 
-		else if (fhqc == 7 || fagg == 4 || (ftime == 1 && fmis == 4))
+		else if (fhqc == 7 || fagg == 4 || fr == 0xA || (ftime == 1 && fmis == 4))
 			ui[3] = 1;
 
 		else if (fhqc == 1 || fhqc == 2)
@@ -272,7 +272,7 @@ bool kvUseInfo::setUseFlags(const kvControlInfo& cinfo)
 		else if (fd == 2 || fd >= 6 || fr == 7)
 			ui[4] = 9;
 
-		else if (7 > fr && fr > 1 && fcc <= 1 && fcp <= 1 && fs <= 1 && fnum
+		else if ((fr == 0xA || (7 > fr && fr > 1)) && fcc <= 1 && fcp <= 1 && fs <= 1 && fnum
 				<= 5 && fpos <= 1 && ftime <= 1 && fw <= 1 && fstat <= 1
 				&& fclim <= 1)
 			ui[4] = 1;
