@@ -101,7 +101,7 @@ createGlobalLogger(const std::string &id, milog::LogLevel ll)
       FLogStream *logs=new FLogStream(2, 204800); //200k
       std::ostringstream ost;
 
-      ost << kvPath("logdir") << "/service/" << id << ".log";
+      ost << kvPath("logdir") << "/kvService/" << id << ".log";
 
       if(logs->open(ost.str())){
          logs->loglevel( ll );
