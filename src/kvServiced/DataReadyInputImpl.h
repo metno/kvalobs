@@ -35,15 +35,19 @@
 #include <kvskel/kvService.hh>
 #include <dnmithread/CommandQue.h>
 
+
+class ServiceApp;
+
 class DataReadyInputImpl: public POA_CKvalObs::CService::DataReadyInputExt,
 			public PortableServer::RefCountServantBase {
   virtual ~DataReadyInputImpl();
   
   dnmi::thread::CommandQue &que;
+  ServiceApp *app;
   
 public:
   // standard constructor
-  DataReadyInputImpl(dnmi::thread::CommandQue &que_);
+  DataReadyInputImpl(dnmi::thread::CommandQue &que_, ServiceApp *app);
  
   CORBA::Boolean dataReady(const CKvalObs::StationInfoList& infoList,
 			   CKvalObs::CManager::CheckedInput_ptr callback,

@@ -90,14 +90,11 @@ createGlobalLogger(const std::string &id, milog::LogLevel ll)
    try{
 
       if( ll == milog::NOTSET )
-         ll = milog::INFO;
+         ll = milog::DEBUG;
 
-      /*FIXME: Remove the comments when the needed functionality is
-       * in effect on an operational machin.
-       *
-       *if( LogManager::hasLogger(id) )
-       *  return true;
-       */
+       if( LogManager::hasLogger(id) )
+         return true;
+
       FLogStream *logs=new FLogStream(2, 204800); //200k
       std::ostringstream ost;
 
@@ -109,7 +106,6 @@ createGlobalLogger(const std::string &id, milog::LogLevel ll)
             delete logs;
             return false;
          }
-
          return true;
       }else{
          LOGERROR("Cant open the logfile <" << ost.str() << ">!");

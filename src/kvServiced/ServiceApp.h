@@ -44,12 +44,12 @@ class ReaperBase;
 class ServiceApp: public KvApp
 {
 	enum { MAX_CLIENTS=10000 };
-  dnmi::db::DriverManager            dbMgr;
-  std::string                        dbDriver;
-  std::string                        dbConnect;
-  std::string                        dbDriverId;
-  bool                               orbIsDown;
-  std::list<ReaperBase*>             reaperObjList;
+  dnmi::db::DriverManager      dbMgr;
+  std::string                  dbDriver;
+  std::string                  dbConnect;
+  std::string                  dbDriverId;
+  bool                         orbIsDown;
+  std::list<ReaperBase*>       reaperObjList;
   bool shutdown_;
   boost::mutex mutex;
   boost::mutex reaperMutex;

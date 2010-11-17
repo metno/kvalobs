@@ -120,7 +120,7 @@ main(int argc, char** argv)
   thread objReaperThread(reaper);
   
   try {                                    
-    DataReadyInputImpl *dataReadyImpl = new DataReadyInputImpl(dataReadyQue);
+    DataReadyInputImpl *dataReadyImpl = new DataReadyInputImpl( dataReadyQue, &app );
     KvServiceImpl *serviceImpl = new KvServiceImpl(app);
   
     PortableServer::ObjectId_var mgrImplIid=poa->activate_object(dataReadyImpl);

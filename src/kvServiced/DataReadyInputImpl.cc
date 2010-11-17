@@ -32,6 +32,7 @@
 #include <puTools/miTime.h>
 #include "DataReadyInputImpl.h"
 #include "DataReadyCommand.h"
+#include "ServiceApp.h"
 
 
 using namespace miutil;
@@ -39,8 +40,8 @@ using namespace std;
 using namespace milog;
 
 DataReadyInputImpl::
-DataReadyInputImpl(dnmi::thread::CommandQue &que_)
-  :que(que_)
+DataReadyInputImpl(dnmi::thread::CommandQue &que_, ServiceApp *app_)
+  :que(que_), app(app_)
 {
 }
 
@@ -59,14 +60,26 @@ DataReadyInputImpl::dataReady( const CKvalObs::StationInfoList& infoList,
                                CKvalObs::CManager::CheckedInput_ptr callback,
 			                      CORBA::Boolean& bussy)
 {
+   string logid("UNKNOWN");
+
    DataReadyCommand *cmd=0;
 
    bussy=false;
 
+   if( !app->createGlobalLogger( logid ) )
+      logid.erase();
+
    LogContext context("dataReady");
-   LOGDEBUG("New data from kvManagerd!");
+   LOGDEBUG("New data from <UNKNOWN>!");
+
+   if( ! logid.empty() ) {
+      IDLOGDEBUG(logid, "New data ready to distribute! # of elements: " << infoList.length() );
+   }
 
    if(que.size()>5){
+      if( ! logid.empty() ) {
+         IDLOGDEBUG(logid, "BUSSY, to high load at the moment.");
+      }
       bussy=true;
       return false;
    }
@@ -80,9 +93,15 @@ DataReadyInputImpl::dataReady( const CKvalObs::StationInfoList& infoList,
    }catch(...){
       if(cmd){
          LOGERROR("Can post the data to the que! (NOMEM?)");
+         if( ! logid.empty() ) {
+            IDLOGERROR( logid, "Can post the data to the que! (NOMEM?)" );
+         }
          delete cmd;
       }else{
          LOGFATAL("NOMEM!");
+         if( ! logid.empty() ) {
+            IDLOGFATAL( logid, "NOMEM" );
+         }
       }
       return false;
    }
@@ -97,14 +116,28 @@ dataReadyExt( const char* source,
               CKvalObs::CManager::CheckedInput_ptr callback,
               CORBA::Boolean& bussy )
 {
+   string logid( source );
    DataReadyCommand *cmd=0;
 
    bussy=false;
 
    LogContext context("dataReady");
-   LOGDEBUG("New data from kvManagerd!");
+
+   if( !app->createGlobalLogger( logid ) )
+      logid.erase();
+
+
+   LOGDEBUG("New data from <" << source << ">!");
+
+   if( ! logid.empty() ) {
+      IDLOGDEBUG(logid, "New data ready to distribute! # of elements: " << infoList.length() );
+   }
 
    if(que.size()>5){
+      if( ! logid.empty() ) {
+         IDLOGDEBUG(logid, "BUSSY, to high load at the moment.");
+      }
+
       bussy=true;
       return false;
    }
@@ -119,9 +152,18 @@ dataReadyExt( const char* source,
    }catch(...){
       if(cmd){
          LOGERROR("Can post the data to the que! (NOMEM?)");
+
+         if( ! logid.empty() ) {
+            IDLOGERROR( logid, "Can post the data to the que! (NOMEM?)" );
+         }
+
          delete cmd;
       }else{
          LOGFATAL("NOMEM!");
+
+         if( ! logid.empty() ) {
+            IDLOGFATAL( logid, "NOMEM" );
+         }
       }
       return false;
    }

@@ -257,7 +257,6 @@ operator()()
    dnmi::thread::CommandBase *cmd=0;
    bool                      fromKvManager;
    std::string               logName;
-   map<string, bool>         loggers; //Holds a map of all loggers we have created.
 
    milog::LogContext logContext("ServiceSubscriber");
 
@@ -335,16 +334,11 @@ operator()()
          logName = stInfoCmd->source();
       }
 
-      map<string, bool>::iterator logIt=loggers.find( logName );
+      if( ! app.createGlobalLogger( logName, milog::DEBUG ) )
+         logName.erase();
 
-      if( logIt != loggers.end() ) {
-         if( ! logIt->second )
-            logName.erase();
-      } else {
-         if( app.createGlobalLogger( logName, milog::DEBUG ) )
-            loggers[logName]=true;
-         else
-            loggers[logName]=false;
+      if( ! logName.empty() ) {
+         IDLOGDEBUG( logName, "Number of datasets: " << stInfoCmd->getStationInfo().size()  );
       }
 
       conIdleTime=0;
