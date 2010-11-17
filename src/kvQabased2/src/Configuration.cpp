@@ -113,7 +113,7 @@ Configuration::Configuration(int & argc, char ** argv) :
 
 	options_description logging("Logging");
 	logging.add_options()
-			("runloglevel", value<std::string>()->default_value("debug"), "Set loglevel (debug_all, debug, info, warn, error or fatal")
+			("runloglevel", value<std::string>()->default_value("info"), "Set loglevel (debug_all, debug, info, warn, error or fatal")
 			("runlogfile", value<std::string>(& runLogFile_)->default_value(LOGDIR"/kvQabased.log"), "Set file name for run log")
 			("logdir", value<std::string>(& baseLogDir_)->default_value(LOGDIR"/checks"), "Use the given directory as base directory for script logs");
 
