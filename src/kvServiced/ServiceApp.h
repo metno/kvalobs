@@ -31,6 +31,7 @@
 #ifndef __ServiceApp_h__
 #define __ServiceApp_h__
 
+#include <milog/milog.h>
 #include <kvalobs/kvapp.h>
 #include <kvalobs/kvStationInfo.h>
 #include <kvskel/qabase.hh>
@@ -62,6 +63,15 @@ class ServiceApp: public KvApp
 
   virtual ~ServiceApp();
   
+  /**
+   * \brief create a globale logger with id \a id.
+   *
+   * \param is An id to identify the logger.
+   * \return true on success and false otherwise.
+   */
+  bool createGlobalLogger(const std::string &id, milog::LogLevel ll=milog::NOTSET );
+
+
   //inherited from KvApp
   virtual bool isOk()const;
 

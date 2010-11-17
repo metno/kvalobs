@@ -77,10 +77,52 @@ ServiceApp(int argn, char **argv,
   
 }
 
-ServiceApp
-::~ServiceApp()
+ServiceApp::
+~ServiceApp()
 {
 }
+
+
+bool
+ServiceApp::
+createGlobalLogger(const std::string &id, milog::LogLevel ll)
+{
+   try{
+
+      if( ll == milog::NOTSET )
+         ll = milog::INFO;
+
+      /*FIXME: Remove the comments when the needed functionality is
+       * in effect on an operational machin.
+       *
+       *if( LogManager::hasLogger(id) )
+       *  return true;
+       */
+      FLogStream *logs=new FLogStream(2, 204800); //200k
+      std::ostringstream ost;
+
+      ost << kvPath("logdir") << "/service/" << id << ".log";
+
+      if(logs->open(ost.str())){
+         logs->loglevel( ll );
+         if(!LogManager::createLogger(id, logs)){
+            delete logs;
+            return false;
+         }
+
+         return true;
+      }else{
+         LOGERROR("Cant open the logfile <" << ost.str() << ">!");
+         delete logs;
+         return false;
+      }
+   }
+   catch(...){
+      LOGERROR("Cant create a logstream for LOGID " << id);
+      return false;
+   }
+}
+
 
 bool 
 ServiceApp::

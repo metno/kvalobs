@@ -55,40 +55,76 @@ DataReadyInputImpl::
  * The serviceSubscriberThread listen on the que.
  */
 CORBA::Boolean 
-DataReadyInputImpl::dataReady(const CKvalObs::StationInfoList& infoList,
-			      CKvalObs::CManager::CheckedInput_ptr callback,
-			      CORBA::Boolean& bussy)
+DataReadyInputImpl::dataReady( const CKvalObs::StationInfoList& infoList,
+                               CKvalObs::CManager::CheckedInput_ptr callback,
+			                      CORBA::Boolean& bussy)
 {
-  DataReadyCommand *cmd=0;
-  
-  bussy=false;
+   DataReadyCommand *cmd=0;
 
-  LogContext context("dataReady");
-  LOGDEBUG("New data from kvManagerd!");
- 
-  if(que.size()>5){
-    bussy=true;
-    return false;
-  }
-    
-  try{
-    cmd=new DataReadyCommand(infoList, 
-			     CKvalObs::CManager::CheckedInput::
-			     _duplicate(callback));
-    que.postAndBrodcast(cmd);
-    return true;
-  }catch(...){
-    if(cmd){
-      LOGERROR("Can post the data to the que! (NOMEM?)");
-      delete cmd;
-    }else{
-      LOGFATAL("NOMEM!");
-    }
-    return false;
-  }
+   bussy=false;
+
+   LogContext context("dataReady");
+   LOGDEBUG("New data from kvManagerd!");
+
+   if(que.size()>5){
+      bussy=true;
+      return false;
+   }
+
+   try{
+      cmd=new DataReadyCommand( infoList,
+                                CKvalObs::CManager::CheckedInput::
+                                _duplicate(callback));
+      que.postAndBrodcast(cmd);
+      return true;
+   }catch(...){
+      if(cmd){
+         LOGERROR("Can post the data to the que! (NOMEM?)");
+         delete cmd;
+      }else{
+         LOGFATAL("NOMEM!");
+      }
+      return false;
+   }
 
 }
 
 
+CORBA::Boolean
+DataReadyInputImpl::
+dataReadyExt( const char* source,
+              const CKvalObs::StationInfoList& infoList,
+              CKvalObs::CManager::CheckedInput_ptr callback,
+              CORBA::Boolean& bussy )
+{
+   DataReadyCommand *cmd=0;
 
+   bussy=false;
+
+   LogContext context("dataReady");
+   LOGDEBUG("New data from kvManagerd!");
+
+   if(que.size()>5){
+      bussy=true;
+      return false;
+   }
+
+   try{
+      cmd=new DataReadyCommand( source,
+                                infoList,
+                                CKvalObs::CManager::CheckedInput::
+                                _duplicate(callback));
+      que.postAndBrodcast(cmd);
+      return true;
+   }catch(...){
+      if(cmd){
+         LOGERROR("Can post the data to the que! (NOMEM?)");
+         delete cmd;
+      }else{
+         LOGFATAL("NOMEM!");
+      }
+      return false;
+   }
+
+}
 

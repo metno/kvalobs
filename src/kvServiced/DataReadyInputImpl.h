@@ -35,7 +35,7 @@
 #include <kvskel/kvService.hh>
 #include <dnmithread/CommandQue.h>
 
-class DataReadyInputImpl: public POA_CKvalObs::CService::DataReadyInput,
+class DataReadyInputImpl: public POA_CKvalObs::CService::DataReadyInputExt,
 			public PortableServer::RefCountServantBase {
   virtual ~DataReadyInputImpl();
   
@@ -48,6 +48,11 @@ public:
   CORBA::Boolean dataReady(const CKvalObs::StationInfoList& infoList,
 			   CKvalObs::CManager::CheckedInput_ptr callback,
 			   CORBA::Boolean& bussy);
+
+  CORBA::Boolean dataReadyExt( const char* source,
+                               const CKvalObs::StationInfoList& data,
+                               CKvalObs::CManager::CheckedInput_ptr callback,
+                               CORBA::Boolean& bussy);
 };
 
 #endif

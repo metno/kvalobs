@@ -31,6 +31,7 @@
 #ifndef __DataReadyCommand_h__
 #define __DataReadyCommand_h__
 
+#include <string>
 #include <kvalobs/kvStationInfo.h>
 #include <kvalobs/kvStationInfoCommand.h>
 #include <kvskel/managerInput.hh>
@@ -43,15 +44,23 @@ class DataReadyCommand : public kvalobs::StationInfoCommand{
   DataReadyCommand(const DataReadyCommand &);
   DataReadyCommand& operator=(const DataReadyCommand &);
   CKvalObs::CManager::CheckedInput_var callback;
+  std::string source_;
 
  public:
-  DataReadyCommand(const CKvalObs::StationInfoList &stInfo, 
-		   const CKvalObs::CManager::CheckedInput_ptr callback);
+
+  DataReadyCommand( const CKvalObs::StationInfoList &stInfo,
+		              const CKvalObs::CManager::CheckedInput_ptr callback);
+
+  DataReadyCommand( const char *source,
+                    const CKvalObs::StationInfoList &stInfo,
+                    const CKvalObs::CManager::CheckedInput_ptr callback);
+
 
   ~DataReadyCommand(){};
   
   CKvalObs::CManager::CheckedInput_ptr getCallback()const;
   
+  std::string source()const { return source_; }
   bool       executeImpl(){}; //Do nothing
 
 };

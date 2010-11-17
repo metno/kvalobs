@@ -124,13 +124,17 @@ class ServiceSubscriber{
   dnmi::thread::CommandQue &inputque;
   dnmi::db::Connection     *dbCon;
 
-  void callDataNotifySubscribers(const kvalobs::kvStationInfo &stationInfo);
-  void callDataSubscribers(const kvalobs::kvStationInfo &stationInfo);
+  void callDataNotifySubscribers(const kvalobs::kvStationInfo &stationInfo,
+                                 const std::string &logid);
+  void callDataSubscribers(const kvalobs::kvStationInfo &stationInfo,
+                           const std::string &logid);
   void removeDeadConnections();
   void updateWorkelementServiceStart(const kvalobs::kvStationInfo &st,
-				     dnmi::db::Connection *con);
+				     dnmi::db::Connection *con,
+                 const std::string &logid);
   void updateWorkelementServiceStop(const kvalobs::kvStationInfo &st,
-				    dnmi::db::Connection *con);
+				    dnmi::db::Connection *con,
+                const std::string &logid);
 
  public:
   ServiceSubscriber(const ServiceSubscriber &s);

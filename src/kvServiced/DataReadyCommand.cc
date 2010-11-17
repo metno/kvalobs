@@ -36,6 +36,17 @@ DataReadyCommand(const CKvalObs::StationInfoList &stInfo,
   :kvalobs::StationInfoCommand(stInfo), callback(callback_)
 {
 }
+
+DataReadyCommand::
+DataReadyCommand( const char *source,
+                  const CKvalObs::StationInfoList &stInfo,
+                  const CKvalObs::CManager::CheckedInput_ptr callback_)
+  :kvalobs::StationInfoCommand(stInfo), callback(callback_)
+{
+   if( source )
+      source_ = source;
+}
+
   
  
 CKvalObs::CManager::CheckedInput_ptr 
