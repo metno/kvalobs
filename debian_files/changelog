@@ -1,3 +1,9 @@
+kvalobs (2.3.0.2-1) lucid; urgency=low
+  * kvServiced. Fix bug in logging.
+  
+ -- Børge Moe <borge.moe@met.no>  Wed, 17 Nov 2010 08:45:00 +0100
+	
+
 kvalobs (2.3.0.1-1) lucid; urgency=low
 
   * Added a new CORBA interface DataReadyInputExt with a new method dataReadyExt. This
