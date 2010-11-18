@@ -30,6 +30,7 @@
 #include "KvalobsDatabaseAccess.h"
 #include "databaseResultFilter.h"
 #include <kvdb/dbdrivermgr.h>
+#include <kvalobs/kvPath.h>
 #include <milog/milog.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -51,7 +52,7 @@ KvalobsDatabaseAccess::KvalobsDatabaseAccess(const std::string & databaseConnect
 	static std::string driverId;
 	if (driverId.empty())
 	{
-		std::string driver(SYSCONFDIR);
+		std::string driver = kvalobs::kvPath(kvalobs::libdir) + "/kvalobs/db/pgdriver.so";
 
 		if (!dbMgr.loadDriver(driver, driverId))
 			throw std::runtime_error("Unable to load driver " + driver);

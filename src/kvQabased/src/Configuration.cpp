@@ -30,6 +30,7 @@
 #include <config.h>
 #include "Configuration.h"
 #include <kvalobs/kvStationInfo.h>
+#include <kvalobs/kvPath.h>
 #include <boost/program_options.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -114,8 +115,8 @@ Configuration::Configuration(int & argc, char ** argv) :
 	options_description logging("Logging");
 	logging.add_options()
 			("runloglevel", value<std::string>()->default_value("info"), "Set loglevel (debug_all, debug, info, warn, error or fatal")
-			("runlogfile", value<std::string>(& runLogFile_)->default_value(LOGDIR"/kvQabased.log"), "Set file name for run log")
-			("logdir", value<std::string>(& baseLogDir_)->default_value(LOGDIR"/checks"), "Use the given directory as base directory for script logs");
+			("runlogfile", value<std::string>(& runLogFile_)->default_value(kvalobs::kvPath(kvalobs::logdir) + "/kvQabased.log"), "Set file name for run log")
+			("logdir", value<std::string>(& baseLogDir_)->default_value(kvalobs::kvPath(kvalobs::logdir) + "/checks/"), "Use the given directory as base directory for script logs");
 
 	options_description database("Database");
 	database.add_options()

@@ -33,6 +33,23 @@
 
 #include <string>
 
+namespace kvalobs
+{
+	enum PathQuery {
+		 prefix,
+		 pkglibdir,
+		 sysconfdir,
+		 libdir,
+		 bindir,
+		 datadir,
+		 localstatedir,
+		 logdir,
+		 rundir
+	};
+
+	std::string kvPath(PathQuery name, const std::string & system = "kvalobs");
+}
+
 /**
  * kvPath returns the path to the named directory.
  * 

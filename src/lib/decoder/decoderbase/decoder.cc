@@ -735,7 +735,7 @@ loadConf(int sid, int tid,
   ifstream    fis;
 
 
-  fname << kvPath("sysconfdir");
+  fname << kvPath(sysconfdir);
 
   fname << "/decode/" << name() <<  ".conf";
 
@@ -784,8 +784,8 @@ openFLogStream(const std::string &filename)
   }
 
 
-  string path=getenv("KVALOBS");
-  path = kvPath("logdir");
+  //string path=getenv("KVALOBS");
+  string path = kvPath(logdir);
 
   if(!path.empty() && path[path.length()-1]=='/')
      path.erase(path.length()-1);
