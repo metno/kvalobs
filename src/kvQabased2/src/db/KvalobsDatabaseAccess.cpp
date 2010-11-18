@@ -51,11 +51,7 @@ KvalobsDatabaseAccess::KvalobsDatabaseAccess(const std::string & databaseConnect
 	static std::string driverId;
 	if (driverId.empty())
 	{
-#ifdef SYSCONFDIR
-		std::string driver("/usr/local/lib/kvalobs/db/pgdriver.so");
-#else
-		std::string driver("/disk1/kvalobs/lib/kvalobs/db/pgdriver.so");
-#endif
+		std::string driver(SYSCONFDIR);
 
 		if (!dbMgr.loadDriver(driver, driverId))
 			throw std::runtime_error("Unable to load driver " + driver);
