@@ -151,17 +151,14 @@ callDataNotifySubscribers(const kvalobs::kvStationInfo &si,
                    kvQueries::selectDataFromType(si.stationID(),
                                                  si.typeID(),
                                                  si.obstime()))){
-      LOGERROR("DataNotify: Cant read from the database: " << endl <<
-               "  stationID: " << si.stationID() << endl <<
-               "     typeID: " << si.typeID() << endl <<
-               "    obstime: " << si.obstime() );
+      if( logid.empty() ) {
+         LOGWARN( "NODATA (notifysub) source <?>: stationid: " << si.stationID() << " typeid: " << si.typeID() << " obstime: " << si.obstime() );
+      } else {
+         LOGWARN( "NODATA (notifysub) source <" << logid << ">: stationid: " << si.stationID() << " typeid: " << si.typeID() << " obstime: " << si.obstime() );
+      }
 
       if( !logid.empty() ) {
-         IDLOGERROR( logid, "DataNotify: Cant read from the database: " << endl <<
-                     "  stationID: " << si.stationID() << endl <<
-                     "     typeID: " << si.typeID() << endl <<
-                     "    obstime: " << si.obstime() );
-
+         IDLOGWARN( logid, "NODATA (notifysub): stationid: " << si.stationID() << " typeid: " << si.typeID() << " obstime: " << si.obstime() );
       }
       return;
    }
@@ -218,8 +215,19 @@ callDataSubscribers(const kvalobs::kvStationInfo &si,
       textDataList.clear();
    }
 
-   if(dataList.empty() && textDataList.empty())
+   if(dataList.empty() && textDataList.empty()) {
+      if( logid.empty() ) {
+         LOGWARN( "NODATA (datasub) source <?>: stationid: " << si.stationID() << " typeid: " << si.typeID() << " obstime: " << si.obstime() );
+      } else {
+         LOGWARN( "NODATA (datasub) source <" << logid << ">: stationid: " << si.stationID() << " typeid: " << si.typeID() << " obstime: " << si.obstime() );
+      }
+
+      if( ! logid.empty() ) {
+         IDLOGWARN( logid, "NODATA (datasub): stationid: " << si.stationID() << " typeid: " << si.typeID() << " obstime: " << si.obstime() );
+      }
+
       return;
+   }
 
    dataToSend.push_back(DataToSend(dataList, textDataList, si.stationID()));
 
@@ -348,6 +356,10 @@ operator()()
       kvalobs::IkvStationInfoList it=stInfoCmd->getStationInfo().begin();
 
       for(;it!=stInfoCmd->getStationInfo().end(); it++){
+         if( !logName.empty() ) {
+            IDLOGDEBUG( logName, "Observation: stationid: " << it->stationID() << " typeid: " << it->typeID() << " obstime: " << it->obstime() );
+         }
+
          if( fromKvManager )
             updateWorkelementServiceStart(*it, dbCon, logName);
 
