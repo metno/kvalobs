@@ -1,3 +1,9 @@
+kvalobs (2.3.0.5-1) lucid; urgency=low
+  * kvServiced. More logging.
+  
+ -- Børge Moe <borge.moe@met.no>  Wed, 18 Nov 2010 09:00:00 +0100
+
+
 kvalobs (2.3.0.4-1) lucid; urgency=low
   * kvServiced. More logging.
   
