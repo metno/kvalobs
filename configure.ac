@@ -57,7 +57,7 @@ AC_CONFIG_FILES([Makefile
                  src/kvServiced/test/Makefile
                  src/kvServiced/Makefile
                  src/kvQabased_old/Makefile
-                 src/kvQabased2/Makefile
+                 src/kvQabased/Makefile
                  src/kvManagerd/Makefile
                  src/norcom2kv/Makefile
                  src/model2kv/Makefile
