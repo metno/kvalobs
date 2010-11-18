@@ -89,7 +89,7 @@ void QaWork::operator()()
 {
 	milog::Logger::logger().logLevel(logLevel_);
 
-	LOGINFO( "QaWork: starting work thread!\n" );
+	LOGDEBUG( "QaWork: starting work thread!\n" );
 
 	ConnectionHandler connectionHandler(app);
 
@@ -107,7 +107,7 @@ void QaWork::operator()()
 			if (app.shutdown())
 				continue;
 
-			LOGINFO( "QaWork: command received....\n" );
+			LOGDEBUG( "QaWork: command received....\n" );
 
 			const QaWorkCommand * work =
 					dynamic_cast<const QaWorkCommand*> (cmd.get());
@@ -136,7 +136,7 @@ void QaWork::operator()()
 			LOGERROR(std::string("Error when processing data set: ") + e.what())
 		}
 	}
-	LOGINFO( "QaWork: Thread terminating!" );
+	LOGDEBUG( "QaWork: Thread terminating!" );
 }
 
 void QaWork::process(dnmi::db::Connection & con, const QaWorkCommand & work)
@@ -175,7 +175,7 @@ void QaWork::doWork(const kvalobs::kvStationInfo & params,
 {
 	retList.push_back(params);
 
-	LOGINFO( "QaWork::doWork at:" << miutil::miTime::nowTime() << "  Processing " << params );
+	LOGDEBUG( "QaWork::doWork at:" << miutil::miTime::nowTime() << "  Processing " << params );
 
 	db::KvalobsDatabaseAccess db(& con, false);
 	qabase::CheckRunner checkRunner(db);

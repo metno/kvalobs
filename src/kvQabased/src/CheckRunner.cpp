@@ -71,7 +71,7 @@ void CheckRunner::newObservation(const kvalobs::kvStationInfo & obs, std::ostrea
 
 	if ( not shouldRunAnyChecks(obs) )
 	{
-		LOGINFO("Will not run any checks on observation: " << obs);
+		LOGDEBUG("Will not run any checks on observation: " << obs);
 		return;
 	}
 
