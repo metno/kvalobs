@@ -42,6 +42,7 @@ namespace
 const std::map<std::string, PathQuery> pathNameTranslations =
 		boost::assign::map_list_of
 		("pkglibdir", pkglibdir)
+		("sysconfdir", sysconfdir)
 		("libdir", libdir)
 		("bindir", bindir)
 		("datadir", datadir)
