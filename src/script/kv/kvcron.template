@@ -2,7 +2,7 @@
 #Alle endringer b�r gj�res i orginalskripet!!!
 
 30 5,11,17,23 * * * $HOME/cronjob/lam2kv/bin/lam2kv.cron %
-15 * * * * $HOME/bin/qabase_cron > /dev/null 2>&1  %
+15 * * * * $HOME/bin/qabaselog_cleanup > /dev/null 2>&1  %
 25 1 * * * $HOME/bin/kvdbadmin.sh %
 25 5 * * * $HOME/bin/kvsynopdbadmin.sh %
 5  1 * * * $HOME/bin/synopdecoder_cron.sh %

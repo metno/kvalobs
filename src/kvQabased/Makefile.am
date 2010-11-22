@@ -37,6 +37,7 @@ kvQabased_CPPFLAGS = \
 	$(AM_CPPFLAGS)
 
 include src/qabase.mk
+include scripts/qabase.mk
 
 
 if HAVE_GMOCK 

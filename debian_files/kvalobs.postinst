@@ -30,14 +30,14 @@ BINDIR="/usr/bin"
 BIN="kv2kro  kvDataInputd kvdataclt kvdbadmin 
      kvManagerd kvmgrclt kvQabased kvServiced kvstart kvstop 
      norcom2kv kvstart-postgres
-     kvstop-postgres"
+     kvstop-postgres
+     qabase_log_cleanup"
 
 KVBINDIR="/usr/lib/kvalobs/bin"
 KVBIN="hirlam2kvalobs.sh
        kvdbadmin.sh
        runbg
        lam2kv.cron
-       qabase_cron.sh
        save_last_month.sh
        load_last_month.sh
        synopdecoder_cron.sh"
