@@ -1,3 +1,9 @@
+kvalobs (2.3.1-1) lucid; urgency=low
+
+  * moved files
+  
+ -- Børge Moe <borge.moe@met.no>  Mon, 22 Nov 2010 12:15:00 +0100
+
 kvalobs (2.3.0.5-1) lucid; urgency=low
   * kvServiced. More logging.
   
