@@ -304,6 +304,15 @@ GRANT SELECT ON types TO kv_read;
 GRANT SELECT, UPDATE, INSERT ON types TO kv_write;
 
 
+CREATE TABLE generated_types (
+	stationid INTEGER NOT NULL,
+	typeid  INTEGER NOT NULL,
+	UNIQUE ( stationid, typeid )
+);
+REVOKE ALL ON generated_types FROM public;
+GRANT ALL ON generated_types TO kv_admin;
+GRANT SELECT ON generated_types TO kv_read;
+GRANT SELECT, UPDATE, INSERT, DELETE ON generated_types TO kv_write;
 
 
 CREATE TABLE param (
