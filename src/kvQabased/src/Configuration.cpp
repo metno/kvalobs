@@ -91,7 +91,7 @@ void parse(const boost::filesystem::path & configFile, variables_map & vm, const
 	if ( is_directory(configFile) )
 		throw std::runtime_error(configFile.native_directory_string() + " is a directory");
 
-	ifstream s(configFile);
+	boost::filesystem::ifstream s(configFile);
 	store(parse_config_file(s, configFileOptions), vm);
 	notify(vm);
 }
