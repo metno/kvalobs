@@ -1,7 +1,0 @@
-sql=SELECT * FROM data WHERE stationid=${$2} AND typeid=${$3} ORDER BY obstime, stationid, typeid, paramid, sensor, level;
-
-ofile=testrun_data/${$2}-${$3}.dat
-
-select.18700.306.ofile=${sql}
-select.18700.3.ofile=${sql}
-select.18700.6.ofile=${sql}
