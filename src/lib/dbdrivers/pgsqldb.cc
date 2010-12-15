@@ -85,6 +85,9 @@ dnmi::db::drivers::PGConnection::PGConnection(const std::string &connect,
   :Connection(driverId), con(0)
 {
   char *msg;
+
+  pimpel = new PGPimpel();
+
   con=PQconnectdb(connect.c_str());
   
   if(con){
@@ -105,10 +108,14 @@ dnmi::db::drivers::PGConnection::PGConnection(const std::string &connect,
 
 dnmi::db::drivers::PGConnection::~PGConnection()
 {
-  if(con){
-    std::cerr << "Disconnect from a PostgreSQL database!\n";
-    PQfinish(con);
-  }
+   if( pimpel ) {
+      delete static_cast<PGPimpel*>(pimpel);
+   }
+
+   if(con){
+      std::cerr << "Disconnect from a PostgreSQL database!\n";
+      PQfinish(con);
+   }
 }
 
 
@@ -215,6 +222,7 @@ dnmi::db::drivers::PGConnection::exec(const std::string &query)
  
     char *msg=PQresStatus(status);
     std::string msg2=PQresultErrorMessage(p);
+    std::string errorCode( PQresultErrorField( p, PG_DIAG_SQLSTATE ) );
     std::string msgStr;
     std::string::size_type i;
 
@@ -225,7 +233,7 @@ dnmi::db::drivers::PGConnection::exec(const std::string &query)
       
       if(i!=std::string::npos){
 	PQclear(p);
-	throw SQLDuplicate(msg2);
+	throw SQLDuplicate(msg2, errorCode);
       }
     }
 
@@ -236,7 +244,7 @@ dnmi::db::drivers::PGConnection::exec(const std::string &query)
       
       if(i!=std::string::npos){
 	PQclear(p);
-	throw SQLAborted(msg2);
+	throw SQLAborted(msg2, errorCode );
       }
     }
 
@@ -251,9 +259,9 @@ dnmi::db::drivers::PGConnection::exec(const std::string &query)
     PQclear(p);
 
     if(!msgStr.empty())
-	throw SQLException(msgStr);
+	throw SQLException( msgStr, errorCode );
     else
-	throw SQLException("UNKNOWN ERROR!");
+	throw SQLException("UNKNOWN ERROR!", errorCode );
 }
 
 
@@ -308,7 +316,9 @@ dnmi::db::drivers::PGConnection::execQuery(const std::string &query)
   }
 
   std::string msg=PQresultErrorMessage(p);
+  std::string errorCode( PQresultErrorField( p, PG_DIAG_SQLSTATE ) );
   std::string::size_type i;
+
   PQclear(p);
 
   i=msg.find("duplicate");
@@ -317,14 +327,14 @@ dnmi::db::drivers::PGConnection::execQuery(const std::string &query)
     i=msg.find("key");
     
     if(i!=std::string::npos){
-      throw SQLDuplicate(msg);
+      throw SQLDuplicate(msg, errorCode );
     }
   }
 
   if(!msg.empty()){
-    throw SQLException(msg);
+    throw SQLException(msg, errorCode );
   }else{
-    throw SQLException("UNKNOWN ERROR!");
+    throw SQLException("UNKNOWN ERROR!", errorCode );
   }
 }
       
@@ -475,3 +485,76 @@ dnmi::db::drivers::PGResult::nextImpl()
     tupleIndex++;
     
 }
+
+
+void
+dnmi::db::drivers::
+PGPimpel::
+beginTransaction(dnmi::db::Connection::IsolationLevel isolation)
+{
+   using namespace dnmi::db::priv;
+   switch( isolation ) {
+   case Connection::SERIALIZABLE:
+      con->exec("START TRANSACTION ISOLATION LEVEL SERIALIZABLE");
+      break;
+   case Connection::READ_COMMITTED:
+      con->exec("START TRANSACTION ISOLATION LEVEL READ COMMITTED");
+         break;
+   case Connection::READ_UNCOMMITTED:
+      con->exec("START TRANSACTION ISOLATION LEVEL READ UNCOMMITTED" );
+            break;
+   case Connection::REPEATABLE_READ:
+      con->exec("START TRANSACTION ISOLATION LEVEL REPEATABLE READ");
+      break;
+   }
+
+}
+
+dnmi::db::drivers::
+PGPimpel::
+PGPimpel() : dnmi::db::priv::Pimpel()
+{
+}
+
+void
+dnmi::db::drivers::
+PGPimpel::
+perform( dnmi::db::Connection *con_,
+         dnmi::db::Transaction &transaction, int retry,
+         dnmi::db::Connection::IsolationLevel isolation)
+{
+   con = static_cast<PGConnection*>( con_ );
+
+   while( retry > 0 ) {
+      Transaction t( transaction );
+
+      beginTransaction( isolation );
+
+      try {
+         if( t( con ) ) {
+            t.onSuccess();
+            con->endTransaction();
+            return;
+         } else {
+            t.onFailure();
+            retry--;
+         }
+      }
+      catch (const SQLAborted &e) {
+         if( e.errorCode()!= "40001" ) //SERIALIZATION FAILURE
+            retry--;
+         t.onAbort();
+      }
+      catch( ... ) {
+         retry--;
+      }
+
+      try {
+         con->rollBack();
+      }
+      catch( ... ) {
+      }
+   }
+
+}
+

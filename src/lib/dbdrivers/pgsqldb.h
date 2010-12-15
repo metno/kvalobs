@@ -33,17 +33,20 @@
 
 #include <libpq-fe.h>
 #include <kvdb/kvdb.h>
+#include <kvdb/Pimpel.h>
 #include <kvdb/dbdrivermgr.h>
 
 
 namespace dnmi {
   namespace db {
+
     namespace drivers{
       /**
        * \addtogroup dbpgsql
        *
        * @{
        */
+
 
       /**
        * \brief Implements the the abstract DriverBase interface.
@@ -131,6 +134,18 @@ namespace dnmi {
 	    virtual std::string esc( const std::string &stringToEscape )const;
 	};
 	
+	class PGPimpel : public dnmi::db::priv::Pimpel
+	{
+	   PGConnection *con;
+
+	public:
+	   PGPimpel();
+	   void beginTransaction(dnmi::db::Connection::IsolationLevel isolation);
+	   virtual void perform( dnmi::db::Connection *con,
+	                         dnmi::db::Transaction &transaction, int retry,
+	                         dnmi::db::Connection::IsolationLevel isolation);
+	};
+
     }
     
     /** @} */

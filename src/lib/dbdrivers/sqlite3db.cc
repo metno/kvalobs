@@ -100,14 +100,19 @@ dnmi::db::drivers::SQLiteConnection::SQLiteConnection(
 	  con = 0;
   }
 
-  if(con)
+  if(con) {
     sqlite3_busy_timeout(con, 5000); //sets busy timeout to 5 second.
+    pimpel = new SQLitePimpel();
+  }
 }
 
 dnmi::db::drivers::SQLiteConnection::~SQLiteConnection()
 {
   if(con)
     sqlite3_close(con);
+
+  if( pimpel )
+     delete static_cast<SQLitePimpel*>( pimpel );
 }
 
 
@@ -167,23 +172,27 @@ dnmi::db::drivers::SQLiteConnection::exec(const std::string &query)
       sqlite3_free(msg);
    }
 
+   ostringstream errorCode;
+   errorCode << sqliteRes;
+
    if(sqliteRes!=SQLITE_OK){
       ostringstream emsg;
       //cerr << "ERROR: " << sqliteRes << endl;
+
       if(sqliteRes==SQLITE_CONSTRAINT){
          string::size_type i=errMsg.find("unique");
 
          if(i!=string::npos){
-            throw SQLDuplicate("SQLite: Duplicate (" + errMsg +")");
+            throw SQLDuplicate("SQLite: Duplicate (" + errMsg +")", errorCode.str() );
          }else{
             emsg << "SQLite: sqliteres(" << sqliteRes << "): " + errMsg;
-            throw SQLException( emsg.str() );
+            throw SQLException( emsg.str(), errorCode.str() );
          }
       }else if(sqliteRes==SQLITE_BUSY){
-         throw SQLBusy("SQLite: " + errMsg);
+         throw SQLBusy("SQLite: " + errMsg, errorCode.str() );
       }else{
          emsg << "SQLite: sqliteres(" << sqliteRes << "): " + errMsg;
-         throw SQLException( emsg.str() );
+         throw SQLException( emsg.str(), errorCode.str() );
       }
    }
 }
@@ -209,6 +218,8 @@ dnmi::db::drivers::SQLiteConnection::execQuery(const std::string &query)
 
   sqliteRes=sqlite3_exec(con, query.c_str(), dataCallback, data, &msg);
 
+  ostringstream errorCode;
+  errorCode << sqliteRes;
 
   if(msg){
     sMsg=msg;
@@ -222,11 +233,11 @@ dnmi::db::drivers::SQLiteConnection::execQuery(const std::string &query)
     //cerr << "ERROR: " << sqliteRes << endl;
 
     if(sqliteRes==SQLITE_BUSY){
-      throw SQLBusy("SQLiteBusy: " + sMsg);
+      throw SQLBusy("SQLiteBusy: " + sMsg, errorCode.str());
     }else{
       ostringstream  emsg;
       emsg << "SQLite: sqliteres(" << sqliteRes << "): " + errMsg;
-      throw SQLException( emsg.str() );
+      throw SQLException( emsg.str(), errorCode.str() );
     }
   }
   
@@ -371,6 +382,96 @@ dnmi::db::drivers::SQLiteResult::nextImpl()
 
     nextData++;
 }
+
+
+void
+dnmi::db::drivers::
+SQLitePimpel::
+beginTransaction(dnmi::db::Connection::IsolationLevel isolation)
+{
+   using namespace dnmi::db::priv;
+   switch( isolation ) {
+   case Connection::SERIALIZABLE:
+      con->exec("BEGIN TRANSACTION");
+      break;
+   case Connection::READ_COMMITTED:
+      con->exec("BEGIN TRANSACTION");
+         break;
+   case Connection::READ_UNCOMMITTED:
+      con->exec("BEGIN TRANSACTION");
+            break;
+   case Connection::REPEATABLE_READ:
+      con->exec("BEGIN TRANSACTION");
+      break;
+   }
+
+}
+
+dnmi::db::drivers::
+SQLitePimpel::
+SQLitePimpel() : dnmi::db::priv::Pimpel()
+{
+}
+
+void
+dnmi::db::drivers::
+SQLitePimpel::
+perform( dnmi::db::Connection *con_,
+         dnmi::db::Transaction &transaction, int retry,
+         dnmi::db::Connection::IsolationLevel isolation)
+{
+   con = static_cast<SQLiteConnection*>( con_ );
+
+   while( retry > 0 ) {
+      Transaction t( transaction );
+
+      beginTransaction( isolation );
+
+      try {
+         if( t( con ) ) {
+            t.onSuccess();
+            con->endTransaction();
+            return;
+         } else {
+            t.onFailure();
+            retry--;
+         }
+      }
+      catch (const SQLAborted &e) {
+         retry--;
+         t.onAbort();
+      }
+      catch( const SQLBusy &e) {
+         continue;
+      }
+      catch( const SQLException &e) {
+         istringstream is( e.errorCode() );
+         int i;
+         is >> i;
+
+         if( i == SQLITE_INTERRUPT ) {
+            try {
+               con->rollBack();
+            }
+            catch( ... ) {
+            }
+            t.onAbort();
+            return;
+         }
+      }
+      catch( ... ) {
+         retry--;
+      }
+
+      try {
+         con->rollBack();
+      }
+      catch( ... ) {
+      }
+   }
+
+}
+
 
 
 namespace {

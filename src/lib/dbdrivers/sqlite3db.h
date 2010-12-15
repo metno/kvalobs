@@ -35,118 +35,132 @@
 #include <list>
 #include <sqlite3.h>
 #include <kvdb/kvdb.h>
+#include <kvdb/transaction.h>
+#include <kvdb/Pimpel.h>
 #include <kvdb/dbdrivermgr.h>
 
 
 namespace dnmi {
-  namespace db {
-    namespace drivers{
-      /**
-       * \addtogroup dbsqlite
-       *
-       * @{
-       */
-      
-      namespace SQLite{
-	typedef std::vector<std::string>                   Row;
-	typedef std::vector<std::string>::iterator        IRow;
-	typedef std::vector<std::string>::const_iterator CIRow;
-	typedef std::list<Row>                             RowList;
-	typedef std::list<Row>::iterator                  IRowList;
-	typedef std::list<Row>::const_iterator           CIRowList;
-	
-	struct SQLiteData{
-	  RowList data;
-	  Row     fieldNames;
-	};
-      }    
+namespace db {
+namespace drivers{
+/**
+* \addtogroup dbsqlite
+*
+* @{
+*/
 
-      /**
-       * \brief Implements the the abstract DriverBase interface.
-       *
-       * \see dnmi::db::DriverBase
-       */
-      class SQLiteDriver: public dnmi::db::DriverBase {
-      public:
-	SQLiteDriver();
-	virtual ~SQLiteDriver();
-	
-	virtual std::string name()const { return "sqlite3"; }
-	virtual Connection* createConnection(const std::string &connect);
-	virtual bool        releaseConnection(Connection *connect);
-      };
-      
+namespace SQLite{
+typedef std::vector<std::string>                   Row;
+typedef std::vector<std::string>::iterator        IRow;
+typedef std::vector<std::string>::const_iterator CIRow;
+typedef std::list<Row>                             RowList;
+typedef std::list<Row>::iterator                  IRowList;
+typedef std::list<Row>::const_iterator           CIRowList;
 
-      /**
-       * \brief Implements the the abstract Result interface.
-       *
-       * \see dnmi::db::Result
-       */
-      class SQLiteResult :  public dnmi::db::Result{
-	SQLiteResult();
-	SQLiteResult(const SQLiteResult  &);
-	SQLiteResult& operator=(const SQLiteResult &);
-	
-	SQLite::SQLiteData    *sqlData;
-	SQLite::CIRowList  nextData;  
-	    
-	friend class SQLiteConnection;
-	SQLiteResult(SQLite::SQLiteData *data);
-	
-	virtual void nextImpl();
-      public:
-	~SQLiteResult();
-	
-	
-	bool                hasResult()const; 
-	
-	virtual int         fields()const;
-	virtual std::string fieldName(int index)const;
-	virtual int         fieldIndex(const std::string &fieldName)const;
-	virtual FieldType   fieldType(int index)const;
-	virtual FieldType   fieldType(const std::string &fieldName)const;
-	virtual int         fieldSize(int index)const;
-	virtual int         fieldSize(const std::string &fieldName)const;
-	virtual int         size()const;
-	virtual bool        hasNext()const;
-      };
-      
+struct SQLiteData{
+   RowList data;
+   Row     fieldNames;
+};
+}
 
-      /**
-       * \brief Implements the the abstract Connection interface.
-       *
-       * \see dnmi::db::Connection
-       */
-      class SQLiteConnection : public dnmi::db::Connection{
-	SQLiteConnection();
-	SQLiteConnection(const SQLiteConnection &);
-	SQLiteConnection& operator=(const SQLiteConnection &);
-	
-	friend class SQLiteDriver;
-	sqlite3 * con;
-	std::string errMsg;
-	
-	SQLiteConnection(const std::string &connect, 
-			 const std::string &driverId);
-      public:
-	~SQLiteConnection();
-	
-	virtual bool isConnected(); 
-	virtual bool tryReconnect();
-	
-	virtual void beginTransaction();
-	virtual void endTransaction();
-	virtual void rollBack();
-	
-	virtual void   exec(const std::string &stmt);
-	virtual Result *execQuery(const std::string &stmt);
-	
-	std::string lastError()const;
-	virtual std::string esc( const std::string &stringToEscape )const;
-      };
-      
-    }
-  }
+/**
+* \brief Implements the the abstract DriverBase interface.
+*
+* \see dnmi::db::DriverBase
+*/
+class SQLiteDriver: public dnmi::db::DriverBase {
+public:
+   SQLiteDriver();
+   virtual ~SQLiteDriver();
+
+   virtual std::string name()const { return "sqlite3"; }
+   virtual Connection* createConnection(const std::string &connect);
+   virtual bool        releaseConnection(Connection *connect);
+};
+
+
+/**
+* \brief Implements the the abstract Result interface.
+*
+* \see dnmi::db::Result
+*/
+class SQLiteResult :  public dnmi::db::Result{
+   SQLiteResult();
+   SQLiteResult(const SQLiteResult  &);
+   SQLiteResult& operator=(const SQLiteResult &);
+
+   SQLite::SQLiteData    *sqlData;
+   SQLite::CIRowList  nextData;
+
+   friend class SQLiteConnection;
+   SQLiteResult(SQLite::SQLiteData *data);
+
+   virtual void nextImpl();
+public:
+   ~SQLiteResult();
+
+
+   bool                hasResult()const;
+
+   virtual int         fields()const;
+   virtual std::string fieldName(int index)const;
+   virtual int         fieldIndex(const std::string &fieldName)const;
+   virtual FieldType   fieldType(int index)const;
+   virtual FieldType   fieldType(const std::string &fieldName)const;
+   virtual int         fieldSize(int index)const;
+   virtual int         fieldSize(const std::string &fieldName)const;
+   virtual int         size()const;
+   virtual bool        hasNext()const;
+};
+
+
+/**
+* \brief Implements the the abstract Connection interface.
+*
+* \see dnmi::db::Connection
+*/
+class SQLiteConnection : public dnmi::db::Connection{
+   SQLiteConnection();
+   SQLiteConnection(const SQLiteConnection &);
+   SQLiteConnection& operator=(const SQLiteConnection &);
+
+   friend class SQLiteDriver;
+   sqlite3 * con;
+   std::string errMsg;
+
+   SQLiteConnection(const std::string &connect,
+                    const std::string &driverId);
+public:
+   ~SQLiteConnection();
+
+   virtual bool isConnected();
+   virtual bool tryReconnect();
+
+   virtual void beginTransaction();
+   virtual void endTransaction();
+   virtual void rollBack();
+
+   virtual void   exec(const std::string &stmt);
+   virtual Result *execQuery(const std::string &stmt);
+
+   std::string lastError()const;
+   virtual std::string esc( const std::string &stringToEscape )const;
+};
+
+class SQLitePimpel : public dnmi::db::priv::Pimpel
+{
+   SQLiteConnection *con;
+
+public:
+   SQLitePimpel();
+   void beginTransaction(dnmi::db::Connection::IsolationLevel isolation);
+   virtual void perform( dnmi::db::Connection *con,
+                         dnmi::db::Transaction &transaction, int retry,
+                         dnmi::db::Connection::IsolationLevel isolation);
+};
+
+}
+}
 }
 
 #endif
