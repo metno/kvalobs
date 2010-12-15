@@ -29,7 +29,7 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include "kvdb.h"
-
+#include "Pimpel.h"
 
 void
 dnmi::db::DRow::setResult(Result *r)
@@ -133,7 +133,44 @@ dnmi::db::Result::getFieldNames()const
 }
 
 
+void
+dnmi::db::
+Connection::
+perform( dnmi::db::Transaction &transaction, int retry,
+         IsolationLevel isolation )
+{
 
+
+   if( pimpel ) {
+      return static_cast<dnmi::db::priv::Pimpel*>(pimpel)->perform( this, transaction, retry, isolation);
+   }
+
+   while( retry > 0 ) {
+      Transaction t( transaction );
+
+      beginTransaction();
+
+      try {
+         if( t(this ) ) {
+            t.onSuccess();
+            endTransaction();
+            return;
+         } else {
+            t.onFailure();
+            retry--;
+         }
+      }
+      catch (const SQLAborted &e) {
+         retry--;
+         t.onAbort();
+      }
+      catch( ... ) {
+         retry--;
+      }
+
+      rollBack();
+   }
+}
 
 
 

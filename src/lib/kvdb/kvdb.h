@@ -37,6 +37,7 @@
 #include <vector>
 #include <list>
 #include <stdio.h>
+#include <kvdb/transaction.h>
 
 
 /**
@@ -64,11 +65,16 @@ namespace db {
 */
 class SQLException : public std::exception{
    std::string reason;
+   std::string errorCode_;
 public:
    explicit SQLException(const std::string &reason_)
    : reason(reason_){}
+   explicit SQLException(const std::string &reason_, const std::string &errorCode )
+      : reason(reason_), errorCode_(errorCode){}
 
    virtual ~SQLException()throw(){};
+
+   std::string errorCode()const { return errorCode_; }
 
    const char *what()const throw()
 	            { return reason.c_str();}
@@ -84,6 +90,8 @@ class SQLNotSupported : public SQLException{
 public:
    explicit SQLNotSupported(const std::string &reason_)
    :SQLException(reason_){}
+   explicit SQLNotSupported(const std::string &reason_, const std::string &errorCode )
+      :SQLException(reason_, errorCode){}
    explicit SQLNotSupported()
    :SQLException("Not supported!"){}
 
@@ -104,6 +112,8 @@ public:
    explicit SQLDuplicate(const std::string &reason_)
    :SQLException(reason_){}
 
+   explicit SQLDuplicate(const std::string &reason_, const std::string &errorCode )
+      :SQLException(reason_, errorCode ){}
    ~SQLDuplicate()throw(){}
 };
 
@@ -117,6 +127,9 @@ class SQLNotConnected : public SQLException{
 public:
    explicit SQLNotConnected(const std::string &reason_)
    :SQLException(reason_){}
+
+   explicit SQLNotConnected(const std::string &reason_, const std::string &errorCode )
+   :SQLException(reason_, errorCode ){}
 
    ~SQLNotConnected()throw(){};
 };
@@ -133,6 +146,8 @@ public:
    explicit SQLBusy(const std::string &reason_)
    :SQLException(reason_){}
 
+   explicit SQLBusy(const std::string &reason_, const std::string &errorCode )
+      :SQLException(reason_, errorCode ){}
    explicit SQLBusy()
    :SQLException("SQLBusy"){}
 
@@ -151,6 +166,8 @@ class SQLAborted : public SQLException{
 public:
    explicit SQLAborted(const std::string &reason_)
    :SQLException(reason_){}
+   explicit SQLAborted(const std::string &reason_, const std::string &errorCode )
+      :SQLException(reason_, errorCode ){}
 
    ~SQLAborted()throw(){};
 };
@@ -262,9 +279,12 @@ class Connection{
 protected:
    std::string driverId;
 
-   Connection(const std::string &driverId_):driverId(driverId_){}
+   void *pimpel;
+
+   Connection(const std::string &driverId_):driverId(driverId_),pimpel( 0 ){}
 
 public:
+   typedef enum{ SERIALIZABLE, REPEATABLE_READ, READ_COMMITTED, READ_UNCOMMITTED } IsolationLevel;
 
    ///No public constructor
    virtual ~Connection(){};
@@ -342,7 +362,18 @@ public:
    * \exception SQLException if an error occured.
    */
    virtual std::string esc( const std::string &stringToEscape )const=0;
+
+   /**
+    * Performs an transaction.
+    *
+    * @param transaction
+    * @param retry Number of times to retry a transaction before giving up.
+    */
+   void perform( dnmi::db::Transaction &transaction, int retry = 3,
+                 IsolationLevel isolation=Connection::SERIALIZABLE );
 };
+
+
 
 /**
 * \brief The result set from a query.
