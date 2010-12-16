@@ -71,8 +71,12 @@ DecodeCommand::wait(int timeoutInSecond)
 {
   DecodeCommand* cmd;
 
+
   try{
-    cmd=dynamic_cast<DecodeCommand *>(resQue.get(timeoutInSecond));
+	  dnmi::thread::CommandBase * msg = resQue.get(timeoutInSecond);
+	  if ( ! msg )
+		  return 0;
+    cmd=dynamic_cast<DecodeCommand *>(msg);
 
     if(!cmd){
       LOGWARN("DecodeCommand::wait: timeout?? (failed dynamic_cast)!\n");
