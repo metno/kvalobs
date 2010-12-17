@@ -5,6 +5,7 @@ lib_LTLIBRARIES = libkvalobs_decoderbase.la
 libkvalobs_decoderbase_la_SOURCES = decodermgr.cc decodermgr.h \
                             decoder.cc decoder.h\
                             metadata.cc metadata.h \
+                            DataUpdateTransaction.h DataUpdateTransaction.cc \
                             GenCacheElem.h ConfParser.h
                             
 libkvalobs_decoderbase_la_CPPFLAGS = $(AM_CPPFLAGS) $(putools_CFLAGS) $(libxmlpp_CFLAGS)

@@ -552,6 +552,18 @@ putKvDataInDb(const std::list<kvalobs::kvData> &sd_,
 bool
 kvalobs::decoder::
 DecoderBase::
+addDataToDb( const miutil::miTime &obstime, int stationid, int typeid_,
+             const std::list<kvalobs::kvData> &sd,
+             const std::list<kvalobs::kvTextData> &textData,
+             int priority)
+{
+   return false;
+}
+
+
+bool
+kvalobs::decoder::
+DecoderBase::
 putkvTextDataInDb(const kvalobs::kvTextData &td_, int priority)
 {
   kvalobs::kvTextData td(td_);

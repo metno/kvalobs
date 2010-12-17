@@ -1,0 +1,106 @@
+/*
+  Kvalobs - Free Quality Control Software for Meteorological Observations
+
+  $Id: decoder.h,v 1.1.2.2 2007/09/27 09:02:27 paule Exp $
+
+  Copyright (C) 2007 met.no
+
+  Contact information:
+  Norwegian Meteorological Institute
+  Box 43 Blindern
+  0313 OSLO
+  NORWAY
+  email: kvalobs-dev@met.no
+
+  This file is part of KVALOBS
+
+  KVALOBS is free software; you can redistribute it and/or
+  modify it under the terms of the GNU General Public License as
+  published by the Free Software Foundation; either version 2
+  of the License, or (at your option) any later version.
+
+  KVALOBS is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  General Public License for more details.
+
+  You should have received a copy of the GNU General Public License along
+  with KVALOBS; if not, write to the Free Software Foundation Inc.,
+  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
+
+#ifndef __DATAUPDATETRANSACTION_H__
+#define __DATAUPDATETRANSACTION_H__
+
+#include <list>
+#include <boost/shared_ptr.hpp>
+#include <kvalobs/kvData.h>
+#include <kvalobs/kvTextData.h>
+#include <kvdb/transaction.h>
+
+namespace kvalobs{
+namespace decoder{
+
+
+/**
+ * \brief A transaction class to help in inserting new data.
+ *
+ * Old data for the observation is deleted if the observation
+ * allready exist and is not equal to the new data. ie a duplicate
+ * message.
+ *
+ * A message is identified by stationid, typeid and tbtime. It is
+ * importent that new data is inserted with a unique stationid,
+ * typeid, tbtime for a message that comes with a nominal obstime.
+ */
+
+class DataUpdateTransaction : public dnmi::db::Transaction
+{
+   DataUpdateTransaction operator=( const DataUpdateTransaction &rhs);
+   std::list<kvalobs::kvData> *newData;
+   std::list<kvalobs::kvTextData> *newTextData;
+   miutil::miTime obstime;
+   int stationid;
+   int typeid_;
+   boost::shared_ptr<bool> ok_;
+
+public:
+   miutil::miTime getTimestamp( dnmi::db::Connection *conection, int &msec );
+   bool getData( dnmi::db::Connection *conection,
+                 int stationid,
+                 int typeid_,
+                 const miutil::miTime &obstime,
+                 std::list<kvalobs::kvData> &data,
+                 std::list<kvalobs::kvTextData> &textData );
+   bool hasDataWithTbtime( dnmi::db::Connection *con, const miutil::miTime &tbtime, int &msec );
+   miutil::miTime getUniqTbtime( dnmi::db::Connection *con, int &msec );
+   bool isEqual( std::list<kvalobs::kvData> &oldData,
+                 std::list<kvalobs::kvTextData> &oldTextData );
+   void insertData(dnmi::db::Connection *conection);
+
+   void insert( dnmi::db::Connection *conection,
+                const kvalobs::kvDbBase &elem,
+                const std::string &tblName );
+
+   void replaceData( dnmi::db::Connection *conection,
+                     const std::list<kvalobs::kvData> &dataList,
+                     const std::list<kvalobs::kvTextData> &textDataList );
+
+   DataUpdateTransaction( const miutil::miTime &obstime,
+                          int stationid,
+                          int typeid_,
+                          std::list<kvalobs::kvData> *newData,
+                          std::list<kvalobs::kvTextData> *newTextData );
+   DataUpdateTransaction(const DataUpdateTransaction &dut );
+
+   virtual bool operator()(dnmi::db::Connection *conection);
+   virtual void onSuccess();
+
+   bool ok()const { return *ok_; }
+};
+
+
+
+}
+}
+#endif

@@ -224,6 +224,34 @@ namespace kvalobs{
 
 
       /**
+       * \brief Inserts data and textdata into the database.
+       *
+       * It calls addStationInfo, so the caller must NOT do this.
+       * The field tbtime will be updated if it is not set.
+       *
+       * Before data is inserted into the database we checks if the
+       * data already exist and is equal to the data we are trying to insert.
+       * If it does, the method just returns true without actually inserting
+       * the data.
+       *
+       * If there exist data for the dataset but the data is not equal all
+       * data is deleted before the new dataset is inserted.
+       *
+       * \param obstime The observation time.
+       * \param stationid The stationid.
+       * \param typeid The typeid.
+       * \param sd data to insert.
+       * \param textData to insert.
+       * \param priority The priority of the \em obs. Defaul value is 5.
+       * \return true if successful false otherwise.
+       */
+      bool addDataToDb( const miutil::miTime &obstime, int stationid, int typeid_,
+                        const std::list<kvalobs::kvData> &sd,
+                        const std::list<kvalobs::kvTextData> &textData,
+                        int priority=5);
+
+
+      /**
        * \brief insert the \em obs message into the table \em rejectdecode. 
        *
        */
