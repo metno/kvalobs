@@ -28,14 +28,15 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+#include <stdio.h>
 #include "miTimeParse.h"
 
 using namespace std;
 
 namespace{
 
-typedef enum TimeSpec{Year=0, Month, Day, Hour, Minute, Second, 
-	                  TimeSpecEnd};
+enum TimeSpec{Year=0, Month, Day, Hour, Minute, Second,
+              TimeSpecEnd};
 	
 const string validSpecifiers("YymdHMS");
 
@@ -208,6 +209,27 @@ miTimeParse(const std::string &format,
 	
 	return i;
 }	
+
+//TODO: This code must be fixed to match the documentation.
+miutil::miTime
+miutil::
+isoTimeWithMsec( const std::string &timespec, int &msec )
+{
+   msec = 0;
+
+   if( timespec.empty() )
+      return miutil::miTime();
+
+   std::string::size_type p = timespec.find( '.' );
+
+   if( p != std::string::npos ) {
+      sscanf( timespec.substr(p+1).c_str(), "%d", &msec);
+      return miutil::miTime( timespec.substr(0, p) );
+   } else {
+      return miutil::miTime( timespec );
+   }
+}
+
 		
 namespace{
 

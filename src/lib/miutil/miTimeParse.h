@@ -73,6 +73,20 @@ namespace miutil{
 				 miTime &time,
 				 const miTime &nearestToThisTime=miTime());
 	
+   /**
+    * Decode an time string with microseconds. Valid time string format
+    * YYYY-MM-DD hh:mm:ss[.mmmmmm] [±HHMM]
+    * YYYY-MM-DDThh:mm:ss[.mmmmmm] [±HHMM]
+    *
+    * Where the parts in [] is optional parts.
+    *
+    * The returned time is in UTC.
+    * @param timespec the timestring to decode.
+    * @param[out] msec The microsecond part.
+    * @return A UTC time.
+    */
+	miutil::miTime isoTimeWithMsec( const std::string &timespec, int &msec );
+
 }
 
 #endif /*MITIMEPARSE_H_*/
