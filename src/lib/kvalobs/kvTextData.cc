@@ -37,12 +37,24 @@ using namespace miutil;
 miString kvalobs::kvTextData::toSend() const
 {
    ostringstream ost;
+   string myTbtime;
+
+   if( tbtimemsec_ > 0 ) {
+      ost << tbtime_ << "." << tbtimemsec_;
+      myTbtime = ost.str();
+   } else {
+      ost << tbtime_;
+      myTbtime = ost.str();
+   }
+
+   ost.str("");
+
    ost << "("
        << stationid_         << ","
        << quoted(obstime_)   << ","
        << quoted(original_)  << ","
        << paramid_           << ","
-       << quoted(tbtime_)    << ","
+       << quoted(myTbtime)   << ","
        << typeid_            << ")";
    return ost.str();
 }
@@ -60,6 +72,7 @@ bool kvalobs::kvTextData::set( int                     sta,
   original_  = org;
   paramid_   = pid;
   tbtime_    = tbt;
+  tbtimemsec_= 0;
   typeid_    = typ;
   sortBy_    = miString(sta)+obt.isoTime();
   return true;
@@ -85,7 +98,7 @@ bool kvalobs::kvTextData::set(const dnmi::db::DRow& r_)
       }else if(*it=="paramid"){
         paramid_=atoi(buf.c_str());
       }else if(*it=="tbtime"){
-        tbtime_=miTime(buf);
+        tbtime_= decodeTimeWithMsec( buf, tbtimemsec_ );
       }else if(*it=="typeid"){
         typeid_=atoi(buf.c_str());
       }
@@ -96,6 +109,18 @@ bool kvalobs::kvTextData::set(const dnmi::db::DRow& r_)
   }
   sortBy_= miString(stationid_)+obstime_.isoTime();
   return true;
+}
+
+void
+kvalobs::kvTextData::
+tbtime( const miutil::miTime &tbtime, int msec)
+{
+   tbtime_ = tbtime;
+
+   if( msec>0 )
+      tbtimemsec_ = msec;
+   else
+      tbtimemsec_ = 0;
 }
 
 miutil::miString 

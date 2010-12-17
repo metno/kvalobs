@@ -60,6 +60,7 @@ private:
   float            original_;
   int              paramid_;
   miutil::miTime   tbtime_;
+  int              tbtimemsec_;
   int              typeid_;
   int              sensor_;
   int              level_;
@@ -132,6 +133,7 @@ public:
   float            original()    const { return original_;   }
   int              paramID()     const { return paramid_;    }
   miutil::miTime   tbtime()      const { return tbtime_;     }
+  int              tbtimemsec()  const { return tbtimemsec_; }
   int              typeID()      const { return typeid_;     }
   int              sensor()      const { return sensor_;     }
   int              level()       const { return level_;      }
@@ -140,6 +142,7 @@ public:
   kvUseInfo        useinfo()     const { return useinfo_;    }
   miutil::miString cfailed()     const { return cfailed_;    }
 
+  void tbtime( const miutil::miTime &tbtime, int msec=0);
   void typeID(int t)                       { typeid_      =t; }
   void corrected(float c)                  { corrected_   = c;}
   void controlinfo(const kvControlInfo &f) { controlinfo_ = f;}

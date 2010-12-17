@@ -54,6 +54,7 @@ private:
   miutil::miString original_;
   int              paramid_;
   miutil::miTime   tbtime_;
+  int              tbtimemsec_;
   int              typeid_;
 
 public:
@@ -86,8 +87,10 @@ public:
   miutil::miString original()  const { return original_; }
   int              paramID()   const { return paramid_;  }
   miutil::miTime   tbtime()    const { return tbtime_;   }
+  int              tbtimemsec()const { return tbtimemsec_; }
   int              typeID()    const { return typeid_;   }
 
+  void tbtime( const miutil::miTime &tbtime, int msec=0);
   void typeID(int t) { typeid_=t;}
 };
 

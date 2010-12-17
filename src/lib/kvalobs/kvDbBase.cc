@@ -28,7 +28,10 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+#include <stdio.h>
+#include <string.h>
 #include <kvalobs/kvDbBase.h>
+#include <miutil/miTimeParse.h>
 #include <sstream>
 #include <limits.h>
 #include <float.h>
@@ -124,6 +127,14 @@ julianDayThatYear(int addOn,int year) const
   return date;
 }
 
+
+
+miutil::miTime
+kvalobs::kvDbBase::
+decodeTimeWithMsec( const std::string &timespec, int &msec )
+{
+   return miutil::isoTimeWithMsec( timespec, msec );
+}
 
 ostream& 
 kvalobs::

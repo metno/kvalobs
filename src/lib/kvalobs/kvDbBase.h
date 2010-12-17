@@ -162,6 +162,20 @@ namespace kvalobs {
     miutil::miString selectAllQuery(const miutil::miString &tblName) const;
 
     /**
+     * Decode an time string with microseconds. Valid time string format
+     * YYYY-MM-DD hh:mm:ss[.mmmmmm] [±HHMM]
+     * YYYY-MM-DDThh:mm:ss[.mmmmmm] [±HHMM]
+     *
+     * Where the parts in [] is optional parts.
+     *
+     * The returned time is in UTC.
+     * @param timespec the timestring to decode.
+     * @param[out] msec The microsecond part.
+     * @return A UTC time.
+     */
+    miutil::miTime decodeTimeWithMsec( const std::string &timespec, int &msec );
+
+    /**
      * \brief the table name/view class represent.
      *
      * \return the table name.

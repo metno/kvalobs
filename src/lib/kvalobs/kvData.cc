@@ -47,6 +47,7 @@ kvalobs::kvData::kvData( const kvalobs::kvData &d ) :
 	original_( d.original_ ),
 	paramid_( d.paramid_ ),
 	tbtime_( d.tbtime_ ),
+	tbtimemsec_( d.tbtimemsec_ ),
 	typeid_( d.typeid_ ),
 	sensor_( d.sensor_ ),
 	level_( d.level_ ),
@@ -73,7 +74,8 @@ kvalobs::kvData::clean()
   obstime_     = miTime::nowTime();  
   original_    = 0;    
   paramid_     = 0;     
-  tbtime_      = miTime::nowTime();      
+  tbtime_      = miTime::nowTime();
+  tbtimemsec_  = 0;
   typeid_      = 0;      
   sensor_      = 0;      
   level_       = 0;       
@@ -105,7 +107,7 @@ kvalobs::kvData::set(const dnmi::db::DRow &r_)
       }else if(*it=="paramid"){
       	paramid_=atoi(buf.c_str());
       }else if(*it=="tbtime"){
-      	tbtime_=miTime(buf);
+      	tbtime_ = decodeTimeWithMsec( buf, tbtimemsec_ );
       }else if(*it=="typeid"){
       	typeid_=atoi(buf.c_str());
       }else if(*it=="sensor"){
@@ -144,7 +146,8 @@ operator=(const kvalobs::kvData &rhs )
 		obstime_     = rhs.obstime_;
 		original_    = rhs.original_;
 		paramid_     = rhs.paramid_;
-		tbtime_      = rhs.tbtime_; 
+		tbtime_      = rhs.tbtime_;
+		tbtimemsec_  = rhs.tbtimemsec_;
 		typeid_      = rhs.typeid_;
 		sensor_      = rhs.sensor_;
 		level_       = rhs.level_;
@@ -171,6 +174,7 @@ kvalobs::kvData::set(int pos, const miutil::miTime &obt,
   original_    = org;    
   paramid_     = par;     
   tbtime_      = tbt;      
+  tbtimemsec_  = 0;
   typeid_      = typ;      
   sensor_      = sen;      
   level_       = lvl;       
@@ -194,6 +198,7 @@ kvalobs::kvData::set(int pos, const miutil::miTime &obt,
   original_   = org;
   paramid_    = par;
   tbtime_     = tbt;  
+  tbtimemsec_ = 0;
   typeid_     = typ;   
   level_      = lvl;       
 
@@ -210,13 +215,24 @@ miutil::miString
 kvalobs::kvData::toSend() const
 {
   ostringstream ost;
- 
+  string myTbtime;
+
+  if( tbtimemsec_ > 0 ) {
+     ost << tbtime_ << "." << tbtimemsec_;
+     myTbtime = ost.str();
+  } else {
+     ost << tbtime_;
+     myTbtime = ost.str();
+  }
+
+  ost.str("");
+
   ost << "(" 
       << stationid_       << ","
       << quoted(obstime_) << ","         
       << original_        << ","        
       << paramid_         << ","         
-      << quoted(tbtime_)  << ","          
+      << quoted(myTbtime) << ","
       << typeid_          << ","          
       << quoted(sensor_)  << ","
       << level_           << ","           
@@ -232,12 +248,23 @@ miutil::miString
 kvalobs::kvData::toUpload() const
 {
   ostringstream ost;
- 
+  string myTbtime;
+
+  if( tbtimemsec_ > 0 ) {
+     ost << tbtime_ << "." << tbtimemsec_;
+     myTbtime = ost.str();
+  } else {
+     ost << tbtime_;
+     myTbtime = ost.str();
+  }
+
+  ost.str("");
+
   ost << stationid_       << ","
       << obstime_         << ","         
       << original_        << ","        
       << paramid_         << ","         
-      << tbtime_          << ","          
+      << myTbtime         << ","
       << typeid_          << ","          
       << sensor_          << ","
       << level_           << ","           
@@ -292,6 +319,19 @@ void
 kvalobs::kvData::useinfo(int flag,  char newVal)
 {
   useinfo_.set(flag,newVal);
+}
+
+
+void
+kvalobs::kvData::
+tbtime( const miutil::miTime &tbtime, int msec)
+{
+   tbtime_ = tbtime;
+
+   if( msec>0 )
+      tbtimemsec_ = msec;
+   else
+      tbtimemsec_ = 0;
 }
 
 std::ostream& 
