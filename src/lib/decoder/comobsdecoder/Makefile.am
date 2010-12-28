@@ -1,3 +1,4 @@
+SUBDIRS=test
 decoderdir=$(pkglibdir)/decode
 
 decoder_LTLIBRARIES = comobsdecoder.la
