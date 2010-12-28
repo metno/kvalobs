@@ -1,0 +1,54 @@
+AM_CPPFLAGS = -I$(top_srcdir)/src/lib -I$(top_srcdir)/src/lib/decoder -I$(top_builddir)/src/lib $(putools_CFLAGS)  -D_REENTRANT
+
+bin_PROGRAMS = testsms2 gtestsms2 
+
+testsms2_SOURCES=testsms2.cc ReadParamsFromFile.cc \
+				 FakeComobsDecoder.h FakeComobsDecoder.cc \
+				 ../comobsdecode.cc ../decodeddata.cc \
+				  ../smsmeldingparser.cc ../smsmelding.cc\
+				../sms2.cc ../smsbase.cc  ../smsdata.cc
+
+testsms2_CPPFLAGS = $(AM_CPPFLAGS) $(libxmlpp_CFLAGS) \
+					-DTESTDIR="\""$(top_srcdir)/src/lib/decoder/comobsdecoder/test"\""
+testsms2_LDFLAGS =  -pthread -export-dynamic
+testsms2_LDADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs_decoderbase.la \
+               $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
+                $(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la \
+                $(top_builddir)/src/lib/dnmithread/libkvalobs_dnmithread.la\
+                $(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la \
+                $(top_builddir)/src/lib/milog/libkvalobs_milog.la \
+                $(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
+                $(putools_LIBS) $(libxml2_LIBS) \
+	 	        $(BOOST_THREAD_LIB) $(BOOST_REGEX_LIB) \
+		        -lm -ldl
+
+gtestsms2_SOURCES=gtestsms2.cc ReadParamsFromFile.cc \
+				 FakeComobsDecoder.h FakeComobsDecoder.cc \
+				 ../comobsdecode.cc ../decodeddata.cc \
+				  ../smsmeldingparser.cc ../smsmelding.cc\
+				../sms2.cc ../smsbase.cc  ../smsdata.cc
+
+gtestsms2_CPPFLAGS = $(AM_CPPFLAGS) $(libxmlpp_CFLAGS) $(synop_la_CPPFLAGS) $(gtest_CFLAGS) \
+					-DTESTDIR="\""$(top_srcdir)/src/lib/decoder/comobsdecoder/test"\""
+gtestsms2_LDFLAGS =  -pthread -export-dynamic
+gtestsms2_LDADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs_decoderbase.la \
+               $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
+                $(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la \
+                $(top_builddir)/src/lib/dnmithread/libkvalobs_dnmithread.la\
+                $(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la \
+                $(top_builddir)/src/lib/milog/libkvalobs_milog.la \
+                $(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
+                $(putools_LIBS) $(libxml2_LIBS) \
+	 	        $(BOOST_THREAD_LIB) $(BOOST_REGEX_LIB) $(gtest_LIBS) \
+		        -lm -ldl
+
+
+
+#testsmsbasetimes: testsmsbasetimes.o ReadParamsFromFile.o
+#	$(CXX) $(CXXLDFLAGS) -o $@ testsmsbasetimes.o ReadParamsFromFile.o \
+#	     ../smsbase.o $(LIBS) -lmilog
+
+
+
+
+

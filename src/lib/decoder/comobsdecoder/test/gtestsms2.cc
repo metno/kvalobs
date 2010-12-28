@@ -28,6 +28,7 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+#include <float.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -43,21 +44,121 @@
 #include "ReadParamsFromFile.h"
 #include "../smsmeldingparser.h"
 #include "FakeComobsDecoder.h"
+#include <gtest/gtest.h>
 
 using namespace std;
 using namespace kvalobs;
 using namespace kvalobs::decoder::comobsdecoder;
 using namespace miutil;
+using namespace dnmi::file;
 using namespace dnmi::db;
+using namespace kvalobs::decodeutil;
 
-void runtestOnFile(const ParamList &paramList,
-                   std::list<kvalobs::kvTypes> typesList,
-                   const dnmi::file::File &file);
 
-string dbId;
-DriverManager dbMgr;
-string testdir( TESTDIR );
 
+
+class Sms2DecodeTest : public testing::Test
+{
+
+protected:
+   string dbId;
+   DriverManager dbMgr;
+   string testdir;
+   ParamList        paramList;
+   std::list<kvalobs::kvTypes> typesList;
+
+   ///Called before each test case.
+   virtual void SetUp() {
+      testdir = TESTDIR;
+      if( dbId.empty() )
+         ASSERT_TRUE( dbMgr.loadDriver( "./src/lib/dbdrivers/.libs/dummydriver.so", dbId ) )<<
+         "Failed to load Db driver.";
+
+      if( paramList.empty() )
+         ASSERT_TRUE( ReadParamsFromFile(testdir+"/param.csv", paramList ) ) <<
+         "Cant read params from the file <param.csv>";
+   }
+
+   ///Called after each test case.
+   virtual void TearDown() {
+
+   }
+
+   kvalobs::decodeutil::DecodedDataElem
+   getDataSet( DecodedData *decodedData, const miutil::miTime &obstime )
+   {
+      for( TDecodedDataElem::iterator it=decodedData->data()->begin();
+            it != decodedData->data()->end(); ++it ) {
+         if( it->getDate() == obstime )
+            return *it;
+      }
+
+      return decodedData->createDataElem();
+   }
+
+   float getData( const kvalobs::decodeutil::DecodedDataElem &data,
+                  const miutil::miTime &obstime,
+                  int paramid, int sensor=0, int level=0)
+   {
+      for( std::list<kvalobs::kvData>::const_iterator it=data.data().begin();
+            it != data.data().end(); ++it ){
+         if( it->obstime()==obstime && it->paramID()==paramid &&
+               it->sensor() == sensor && it->level() == level )
+            return it->original();
+      }
+
+      return FLT_MAX;
+   }
+
+   kvalobs::decodeutil::DecodedData*
+   runtestOnFile( const ParamList &paramList,
+                  std::list<kvalobs::kvTypes> typesList,
+                  const dnmi::file::File &file);
+
+};
+
+
+TEST_F( Sms2DecodeTest, MultiObsTime )
+{
+   dnmi::file::File file;
+   kvalobs::decodeutil::DecodedData *data;
+
+   file=File(testdir+"/testdata/sms02-29-201012280654.xml");
+   data = runtestOnFile( paramList, typesList, file );
+
+   EXPECT_TRUE( data != 0 );
+   EXPECT_TRUE( data->size() == 1 ) << "DataSize: " << data->size();
+
+   for( TDecodedDataElem::iterator eit = data->data()->begin(); eit != data->data()->end(); ++eit ) {
+      cerr << "Date: " << eit->getDate() << endl;
+      for(std::list<kvalobs::kvData>::const_iterator dit=eit->data().begin(); dit!= eit->data().end(); dit++){
+         cerr << *dit  << endl;
+      }
+      cerr << " ----------------------------- " << endl;
+   }
+
+   DecodedDataElem elem = getDataSet( data, "2010-12-28 06:00:00" );
+   EXPECT_TRUE( elem.dataSize() == 9 ) << " DataSet: size = " << elem.dataSize();
+   EXPECT_TRUE( elem.getDate() == miTime("2010-12-28 06:00:00") ) << "Date: " << elem.getDate();
+   EXPECT_FLOAT_EQ( getData( elem, miTime("2010-12-28 06:00:00"), 34), 2 )    << "Val: " << getData( elem, miTime("2010-12-28 06:00:00"), 34);
+   EXPECT_FLOAT_EQ( getData( elem, miTime("2010-12-28 06:00:00"), 35), 0 )    << "Val: " << getData( elem, miTime("2010-12-28 06:00:00"), 35);
+   EXPECT_FLOAT_EQ( getData( elem, miTime("2010-12-28 06:00:00"), 110), 0.1 ) << "Val: " << getData( elem, miTime("2010-12-28 06:00:00"), 110);
+   EXPECT_FLOAT_EQ( getData( elem, miTime("2010-12-28 06:00:00"), 112), 49 )  << "Val: " << getData( elem, miTime("2010-12-28 06:00:00"), 112);
+
+   EXPECT_FLOAT_EQ( getData( elem, miTime("2010-12-27 12:00:00"), 34), 2 )    << "Val: " << getData( elem, miTime("2010-12-28 06:00:00"), 34);
+   EXPECT_FLOAT_EQ( getData( elem, miTime("2010-12-27 12:00:00"), 35), 0 )    << "Val: " << getData( elem, miTime("2010-12-28 06:00:00"), 35);
+
+   EXPECT_FLOAT_EQ( getData( elem, miTime("2010-12-27 18:00:00"), 34), 2 )    << "Val: " << getData( elem, miTime("2010-12-28 06:00:00"), 34);
+   EXPECT_FLOAT_EQ( getData( elem, miTime("2010-12-27 18:00:00"), 35), 0 )    << "Val: " << getData( elem, miTime("2010-12-28 06:00:00"), 35);
+}
+
+int
+main(int argc, char **argv) {
+   ::testing::InitGoogleTest(&argc, argv);
+   return RUN_ALL_TESTS();
+}
+
+#if 0
 int
 main(int argn, char **argv)
 {  
@@ -112,8 +213,9 @@ main(int argn, char **argv)
 
 
 }
-
-void 
+#endif
+kvalobs::decodeutil::DecodedData*
+Sms2DecodeTest::
 runtestOnFile(const ParamList &paramList,
               const std::list<kvalobs::kvTypes> typesList,
               const dnmi::file::File &file)
@@ -141,7 +243,7 @@ runtestOnFile(const ParamList &paramList,
 
    if(i==string::npos){
       cerr << "NO TIMESTAMP: Invalid format on filename." << endl;
-      return;
+      return 0;
    }
 
    fname=fname.substr(i+1);
@@ -149,21 +251,17 @@ runtestOnFile(const ParamList &paramList,
 
    if(i==string::npos){
       cerr << "NO TIMESTAMP: Invalid format on filename." << endl;
-      return;
+      return 0;
    }
 
    fname.erase(i);
 
    nowTime.setTime(fname);
-   cerr << "Timestamp: " << fname << " miTime: " << nowTime <<endl;
-
 
    if(!dnmi::file::ReadFile(file.name(), fcontent)){
       cerr << "cant read the file!" << endl;
-      return;
+      return 0;
    }
-
-
 
    for( int i=0; i<2; ++i ) {
       if( of.is_open() )
@@ -175,12 +273,11 @@ runtestOnFile(const ParamList &paramList,
       if(!of.is_open() ){
          if( i>0 ) {
             cerr << "Cant open result file: " << myFile << endl;
-            return;
+            return 0;
          }
 
          mkdir( "./testresult", 0775 );
       } else {
-         cerr << "Open file: " << myFile << endl;
          break;
       }
    }
@@ -188,16 +285,16 @@ runtestOnFile(const ParamList &paramList,
    smsmsg=smsparse.parse(fcontent);
 
    if(!smsmsg){
-      cerr << "Cant parse the smsmsg!" << endl;
-      return;
+      of << "Cant parse the smsmsg!" << endl;
+      return 0;
    }
 
+   of << "Timestamp: " << fname << " miTime: " << nowTime <<endl;
    of << fcontent << endl;
-   cerr << fcontent << endl;
 
-   cerr << "SMS code  : " << smsmsg->getCode() << endl;
-   cerr << "nationalid: " << smsmsg->getClimano() << endl;
-   cerr << "wmono     : " << smsmsg->getSynopno() << endl;
+   of << "SMS code  : " << smsmsg->getCode() << endl;
+   of << "nationalid: " << smsmsg->getClimano() << endl;
+   of << "wmono     : " << smsmsg->getSynopno() << endl;
 
    fakeComobsDecoder = new FakeComobsDecoder( *dummyCon, paramList, typesList, "", "", 1 );
 
@@ -213,25 +310,27 @@ runtestOnFile(const ParamList &paramList,
       of << rejected.begin()->comment() << endl;
 
    if( !data ){
-      cerr << "FAILED: cant decode smsmsg!" << endl;
+      of << "FAILED: cant decode smsmsg!" << endl;
    }else{
       kvalobs::decodeutil::TDecodedDataElem *elem = data->data();
 
       if( ! elem  ) {
-         cerr << "No data!\n";
+         of << "No data!\n";
       } else {
          cerr << endl << fcontent << endl;
 
-      for( kvalobs::decodeutil::TDecodedDataElem::iterator eit = elem->begin(); eit != elem->end(); ++eit ) {
-         for(std::list<kvalobs::kvData>::const_iterator dit=eit->data().begin(); dit!= eit->data().end(); dit++){
-            of << *dit << endl ;
-         cerr << *dit ;
-      }
-    }
+         for( kvalobs::decodeutil::TDecodedDataElem::iterator eit = elem->begin(); eit != elem->end(); ++eit ) {
+            for(std::list<kvalobs::kvData>::const_iterator dit=eit->data().begin(); dit!= eit->data().end(); dit++){
+               of << *dit << endl ;
+            //   cerr << *dit  << endl;
+            }
+         }
       }
    }
 
    of.close();
+
+   return data;
 }
 
 
