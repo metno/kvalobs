@@ -46,6 +46,7 @@ AC_CONFIG_FILES([Makefile
                  src/lib/decoder/kldecoder/Makefile
                  src/lib/decoder/autoobsdecoder/Makefile
                  src/lib/decoder/comobsdecoder/Makefile
+                 src/lib/decoder/comobsdecoder/test/Makefile
                  src/lib/decoder/synopdecoder/Makefile
                  src/service-libs/Makefile
                  src/service-libs/kvcpp/Makefile
