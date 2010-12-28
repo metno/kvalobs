@@ -32,6 +32,7 @@
 #include <stdexcept>
 #include <sstream>
 #include <kvdb/kvdb.h>
+#include <kvalobs/kvWorkelement.h>
 #include <miutil/miTimeParse.h>
 #include "DataUpdateTransaction.h"
 
@@ -46,10 +47,13 @@ DataUpdateTransaction::
 DataUpdateTransaction( const miutil::miTime &obstime,
                        int stationid,
                        int typeid_,
+                       int priority,
                        std::list<kvalobs::kvData> *newData,
                        std::list<kvalobs::kvTextData> *newTextData )
    : newData( newData ), newTextData( newTextData ), obstime( obstime ),
-     stationid( stationid ), typeid_( typeid_ ), ok_( new bool( false ) )
+     stationid( stationid ), typeid_( typeid_ ), priority( priority ),
+     stationInfoList_( new kvalobs::kvStationInfoList() ),
+     ok_( new bool( false ) )
 {
 }
 
@@ -57,9 +61,59 @@ DataUpdateTransaction::
 DataUpdateTransaction(const DataUpdateTransaction &dut )
    : newData( dut.newData ), newTextData( dut.newTextData ),
      obstime( dut.obstime ), stationid( dut.stationid ),
-     typeid_( dut.typeid_ )
+     typeid_( dut.typeid_ ), priority( dut.priority ),
+     stationInfoList_( dut.stationInfoList_ ),
+     ok_( dut.ok_ )
 {
 }
+
+void
+DataUpdateTransaction::
+addStationInfo( dnmi::db::Connection *con,
+                long stationID,
+                const miutil::miTime &obsTime,
+                long typeID,
+                const miutil::miTime &tbTime )
+{
+   IkvStationInfoList it=stationInfoList_->begin();
+
+   for(;it!=stationInfoList_->end(); it++){
+     if(it->stationID()==stationID &&
+        it->obstime()==obsTime     &&
+        it->typeID()==typeID){
+
+       return;
+     }
+   }
+
+   ostringstream q;
+   miutil::miTime undefTime;
+
+   q << "DELETE FROM workque WHERE stationid=" << stationID << " AND "
+     << "typeid=" << typeID << " obstime='" << obsTime << "'";
+
+   con->exec( q.str() );
+
+   kvalobs::kvWorkelement workque( stationID,
+                                   obsTime,
+                                   typeID,
+                                   tbTime,
+                                   priority,
+                                   undefTime,
+                                   undefTime,
+                                   undefTime,
+                                   undefTime,
+                                   undefTime );
+
+   q.str("");
+
+   q << "INSERT INTO " << workque.tableName()
+     << " VALUES" << workque.toSend() << ";";
+
+   con->exec( q.str() );
+   stationInfoList_->push_back( kvalobs::kvStationInfo( stationID, obsTime, typeID) );
+}
+
 
 bool
 DataUpdateTransaction::
@@ -262,12 +316,14 @@ insertData(dnmi::db::Connection *conection)
         nit != newData->end(); ++nit ) {
       nit->tbtime( tbtime, msec );
       insert( conection, *nit, "data" );
+      addStationInfo( conection, nit->stationID(), nit->obstime(), nit->typeID(), tbtime );
    }
 
    for( list<kvalobs::kvTextData>::iterator nit=newTextData->begin();
          nit != newTextData->end(); ++nit ) {
       nit->tbtime( tbtime, msec );
       insert( conection, *nit, "text_data" );
+      addStationInfo( conection, nit->stationID(), nit->obstime(), nit->typeID(), tbtime );
    }
 }
 
@@ -312,6 +368,8 @@ operator()( dnmi::db::Connection *conection )
    list<kvalobs::kvTextData> textDataList;
    miutil::miTime tbtime;
    int msec;
+
+   stationInfoList_->clear();
 
    if( ! getData( conection, stationid, typeid_, obstime, dataList, textDataList ) )
       return false;

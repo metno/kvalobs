@@ -43,6 +43,7 @@
 #include "decoder.h"
 #include "ConfParser.h"
 #include "metadata.h"
+#include "DataUpdateTransaction.h"
 
 using namespace std;
 using namespace kvalobs;
@@ -553,11 +554,15 @@ bool
 kvalobs::decoder::
 DecoderBase::
 addDataToDb( const miutil::miTime &obstime, int stationid, int typeid_,
-             const std::list<kvalobs::kvData> &sd,
-             const std::list<kvalobs::kvTextData> &textData,
+             std::list<kvalobs::kvData> &sd,
+             std::list<kvalobs::kvTextData> &textData,
              int priority)
 {
-   return false;
+   kvalobs::decoder::DataUpdateTransaction work( obstime,stationid, typeid_, priority, &sd, &textData );
+
+   con.perform( work );
+
+   return work.ok();
 }
 
 

@@ -34,6 +34,7 @@
 
 #include <list>
 #include <boost/shared_ptr.hpp>
+#include <kvalobs/kvStationInfo.h>
 #include <kvalobs/kvData.h>
 #include <kvalobs/kvTextData.h>
 #include <kvdb/transaction.h>
@@ -62,10 +63,18 @@ class DataUpdateTransaction : public dnmi::db::Transaction
    miutil::miTime obstime;
    int stationid;
    int typeid_;
+   int priority;
+   boost::shared_ptr<kvalobs::kvStationInfoList> stationInfoList_;
    boost::shared_ptr<bool> ok_;
 
 public:
    miutil::miTime getTimestamp( dnmi::db::Connection *conection, int &msec );
+   void addStationInfo( dnmi::db::Connection *con,
+                        long stationid,
+                        const miutil::miTime &obstime,
+                        long typeid_,
+                        const miutil::miTime &tbtime );
+
    bool getData( dnmi::db::Connection *conection,
                  int stationid,
                  int typeid_,
@@ -89,6 +98,7 @@ public:
    DataUpdateTransaction( const miutil::miTime &obstime,
                           int stationid,
                           int typeid_,
+                          int priority,
                           std::list<kvalobs::kvData> *newData,
                           std::list<kvalobs::kvTextData> *newTextData );
    DataUpdateTransaction(const DataUpdateTransaction &dut );
@@ -96,6 +106,7 @@ public:
    virtual bool operator()(dnmi::db::Connection *conection);
    virtual void onSuccess();
 
+   kvalobs::kvStationInfoList stationInfoList()const { return *stationInfoList_; }
    bool ok()const { return *ok_; }
 };
 

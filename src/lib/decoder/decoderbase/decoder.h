@@ -246,8 +246,8 @@ namespace kvalobs{
        * \return true if successful false otherwise.
        */
       bool addDataToDb( const miutil::miTime &obstime, int stationid, int typeid_,
-                        const std::list<kvalobs::kvData> &sd,
-                        const std::list<kvalobs::kvTextData> &textData,
+                        std::list<kvalobs::kvData> &sd,
+                        std::list<kvalobs::kvTextData> &textData,
                         int priority=5);
 
 
