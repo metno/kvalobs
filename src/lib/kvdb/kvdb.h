@@ -366,6 +366,11 @@ public:
    /**
     * Performs an transaction.
     *
+    * If an transaction is attempted retry times without success the
+    * transactions onMaxRetry is called. The default action to
+    * onMaxRetry is to throw SQLException with a message of the last
+    * error.
+    *
     * @param transaction
     * @param retry Number of times to retry a transaction before giving up.
     */

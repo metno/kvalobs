@@ -523,12 +523,22 @@ perform( dnmi::db::Connection *con_,
          dnmi::db::Transaction &transaction, int retry,
          dnmi::db::Connection::IsolationLevel isolation)
 {
+   std::string lastError;
    con = static_cast<PGConnection*>( con_ );
-
    while( retry > 0 ) {
       Transaction t( transaction );
 
-      beginTransaction( isolation );
+      try {
+         beginTransaction( isolation );
+      }
+      catch( ... ) {
+         if( ! con->tryReconnect() ) {
+            lastError=con->lastError();
+            break;
+         }
+         retry--;
+         continue;
+      }
 
       try {
          if( t( con ) ) {
@@ -543,7 +553,13 @@ perform( dnmi::db::Connection *con_,
       catch (const SQLAborted &e) {
          if( e.errorCode()!= "40001" ) //SERIALIZATION FAILURE
             retry--;
+         else
+            lastError = e.what();
          t.onAbort();
+      }
+      catch( const std::exception &ex ){
+         retry--;
+         lastError = ex.what();
       }
       catch( ... ) {
          retry--;
@@ -553,8 +569,12 @@ perform( dnmi::db::Connection *con_,
          con->rollBack();
       }
       catch( ... ) {
+         lastError = con->lastError();
+         con->tryReconnect();
       }
    }
+
+   transaction.onMaxRetry( lastError );
 
 }
 

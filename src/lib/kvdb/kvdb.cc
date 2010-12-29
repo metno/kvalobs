@@ -139,37 +139,53 @@ Connection::
 perform( dnmi::db::Transaction &transaction, int retry,
          IsolationLevel isolation )
 {
-
+   std::string lastError;
 
    if( pimpel ) {
       return static_cast<dnmi::db::priv::Pimpel*>(pimpel)->perform( this, transaction, retry, isolation);
    }
 
-   while( retry > 0 ) {
-      Transaction t( transaction );
+   try {
+      while( retry > 0 ) {
+         Transaction t( transaction );
 
-      beginTransaction();
+         beginTransaction();
 
-      try {
-         if( t(this ) ) {
-            t.onSuccess();
-            endTransaction();
-            return;
-         } else {
-            t.onFailure();
+         try {
+            if( t(this ) ) {
+               t.onSuccess();
+               endTransaction();
+               return;
+            } else {
+               t.onFailure();
+               retry--;
+            }
+         }
+         catch (const SQLAborted &e) {
+            retry--;
+            lastError=e.what();
+            t.onAbort();
+         }
+         catch (const std::exception &e) {
+            retry--;
+            lastError=e.what();
+         }
+         catch( ... ) {
+            lastError="Unknown exception.";
             retry--;
          }
-      }
-      catch (const SQLAborted &e) {
-         retry--;
-         t.onAbort();
-      }
-      catch( ... ) {
-         retry--;
-      }
 
-      rollBack();
+         rollBack();
+      }
    }
+   catch( const std::exception &ex ) {
+      lastError = ex.what();
+   }
+   catch( ... ) {
+      lastError = "Fatal: unknown exception.";
+   }
+
+   transaction.onMaxRetry( lastError );
 }
 
 

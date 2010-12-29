@@ -132,13 +132,14 @@ TEST_F( Sms2DecodeTest, MultiObsTime )
    EXPECT_TRUE( data != 0 );
    EXPECT_TRUE( data->size() == 1 ) << "DataSize: " << data->size();
 
+   /*
    for( TDecodedDataElem::iterator eit = data->data()->begin(); eit != data->data()->end(); ++eit ) {
       cerr << "Date: " << eit->getDate() << endl;
       for(std::list<kvalobs::kvData>::const_iterator dit=eit->data().begin(); dit!= eit->data().end(); dit++){
          cerr << *dit  << endl;
       }
       cerr << " ----------------------------- " << endl;
-   }
+   }*/
 
    DecodedDataElem elem = getDataSet( data, "2010-12-28 06:00:00" );
    EXPECT_TRUE( elem.dataSize() == 9 ) << " DataSet: size = " << elem.dataSize();

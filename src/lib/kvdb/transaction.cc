@@ -61,7 +61,17 @@ Transaction::
 onFailure()
 {
 }
+void
+Transaction::
+onMaxRetry( const std::string &lastError )
+{
+   std::string msg("Max retry reached.");
 
+   if( ! lastError.empty() )
+      msg=lastError;
+
+   throw SQLException( lastError );
+}
 
 }
 }

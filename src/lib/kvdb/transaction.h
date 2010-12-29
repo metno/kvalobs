@@ -48,6 +48,13 @@ public:
 
    ///Called if the operator() returns false;
    virtual void onFailure();
+
+   /**
+    * Called when max retry to perform the transaction is reached.
+    * Default action is to throw SQLException
+    * @throw SQLException
+    */
+   virtual void onMaxRetry( const std::string &lastError );
 };
 
 
