@@ -53,7 +53,7 @@ namespace syn {
   /// contains all extra information in the message
   /// that isn't defined as a parameter (like time etc.)
 
-  typedef struct info { 
+  struct info {
     int YY;                 ///< obs day 
     int GG;		    ///< obs hour
     int IIiii;              ///< wmo-nr
@@ -70,17 +70,17 @@ namespace syn {
 	     MMM(0),  UlaUlo(0), h0h0h0h0(0), im(0), GGgg(0) {}
   };
  
-  typedef enum windunit { MS, KT, NOWINDUNIT };
+  enum windunit { MS, KT, NOWINDUNIT };
 
   /// PARSE ELEMENT
-  typedef enum synopTokenType { 
+  enum synopTokenType {
     NORMALTOKEN,
     ICETEXTTOKEN,
     ICINGTEXTTOKEN
   };
 
   /// PARSE ELEMENT
-  typedef enum synopSection {
+  enum synopSection {
     S000,
     S111,
     S222,
@@ -92,14 +92,14 @@ namespace syn {
   };
   
   /// PARSE ELEMENT
-  typedef enum synopType {
+  enum synopType {
     SYNOP,
     SHIP,
     MOBIL
   };
 
   /// SIGNS: 
-  typedef enum signtype {
+  enum signtype {
     sn,        ///< +- (not stored! as is)
     sw,        ///< +- and wet bulb type
     ss,        ///< +- and SST type
