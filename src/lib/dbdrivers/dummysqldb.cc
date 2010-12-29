@@ -32,79 +32,126 @@
 
 using namespace std;
       
-dnmi::db::drivers::DummyDriver::DummyDriver()
+dnmi::db::drivers::
+DummyDriver::
+DummyDriver()
 {
 }
 
-dnmi::db::drivers::DummyDriver::~DummyDriver()
+dnmi::db::drivers::
+DummyDriver::
+~DummyDriver()
 {
 }
 	
 dnmi::db::Connection* 
-dnmi::db::drivers::DummyDriver::createConnection(const std::string &connect)
+dnmi::db::drivers::
+DummyDriver::
+createConnection(const std::string &connect)
 {
-	throw SQLNotSupported("createConnection: Not supported!");
+   return new DummyConnection( this->name() );
+	//throw SQLNotSupported("createConnection: Not supported!");
 }
 
 bool        
-dnmi::db::drivers::DummyDriver::releaseConnection(Connection *connect)
+dnmi::db::drivers::
+DummyDriver::
+releaseConnection(Connection *connect)
 {
-throw SQLNotSupported("releaseConnection: Not supported!");
+   delete connect;
+   //throw SQLNotSupported("releaseConnection: Not supported!");
 }
-    
+
+dnmi::db::drivers::
+DummyConnection::
+DummyConnection()
+   : Connection( "" )
+{
+}
+
+dnmi::db::drivers::
+DummyConnection::
+~DummyConnection()
+{
+}
+
+
+dnmi::db::drivers::
+DummyConnection::
+DummyConnection(const std::string &id )
+   : Connection( id )
+{
+}
 
 bool 
-dnmi::db::drivers::DummyConnection::isConnected()
+dnmi::db::drivers::
+DummyConnection::
+isConnected()
 {
 	return false;
 } 
 
 bool 
-dnmi::db::drivers::DummyConnection::tryReconnect()
+dnmi::db::drivers::
+DummyConnection::
+tryReconnect()
 {
 	throw SQLNotSupported("tryReconnection: Not supported!");
 }
 
 
 void
-dnmi::db::drivers::DummyConnection::beginTransaction()
+dnmi::db::drivers::
+DummyConnection::
+beginTransaction()
 {
 	throw SQLNotSupported("beginTransaction: Not supported!");
 }
 
 void 
-dnmi::db::drivers::DummyConnection::endTransaction()
+dnmi::db::drivers::
+DummyConnection::
+endTransaction()
 {
 	throw SQLNotSupported("endTransaction: Not supported!");
 }
 
 void 
-dnmi::db::drivers::DummyConnection::rollBack()
+dnmi::db::drivers::
+DummyConnection::
+rollBack()
 {
 	throw SQLNotSupported("rollBack: Not supported!");
 }
 
 void
-dnmi::db::drivers::DummyConnection::exec(const std::string &query)
+dnmi::db::drivers::
+DummyConnection::
+exec(const std::string &query)
 {
 	throw SQLNotSupported("exec: Not supported!");
 }
 
 
 dnmi::db::Result*
-dnmi::db::drivers::DummyConnection::execQuery(const std::string &query)
+dnmi::db::drivers::
+DummyConnection::
+execQuery(const std::string &query)
 {
 	throw SQLNotSupported("execQuery: Not supported!");
 }
       
 std::string 
-dnmi::db::drivers::DummyConnection::lastError()const
+dnmi::db::drivers::
+DummyConnection::
+lastError()const
 {
 	throw SQLNotSupported("lastError: Not supported!");
 }
 
 std::string
-dnmi::db::drivers::DummyConnection::
+dnmi::db::drivers::
+DummyConnection::
 esc( const std::string &stringToEscape )const
 {
 	return stringToEscape;
@@ -112,67 +159,89 @@ esc( const std::string &stringToEscape )const
 
 
 
-dnmi::db::drivers::DummyResult::~DummyResult()
+dnmi::db::drivers::
+DummyResult::
+~DummyResult()
 {
 }
 
 
 int                        
-dnmi::db::drivers::DummyResult::fields()const
+dnmi::db::drivers::
+DummyResult::
+fields()const
 {
 	throw SQLNotSupported();
 }
 
 std::string 
-dnmi::db::drivers::DummyResult::fieldName(int index)const
+dnmi::db::drivers::
+DummyResult::
+fieldName(int index)const
 {
 	throw SQLNotSupported();
 }
 
 int         
-dnmi::db::drivers::DummyResult::fieldIndex(const std::string &fieldName)const
+dnmi::db::drivers::
+DummyResult::
+fieldIndex(const std::string &fieldName)const
 {
 	throw SQLNotSupported();
 }
 
 dnmi::db::FieldType   
-dnmi::db::drivers::DummyResult::fieldType(int index)const
+dnmi::db::drivers::
+DummyResult::
+fieldType(int index)const
 {
 	throw SQLNotSupported();
 }
 
 dnmi::db::FieldType   
-dnmi::db::drivers::DummyResult::fieldType(const std::string &fieldName)const
+dnmi::db::drivers::
+DummyResult::
+fieldType(const std::string &fieldName)const
 {
 	throw SQLNotSupported();
 }
 
 int         
-dnmi::db::drivers::DummyResult::fieldSize(int index)const
+dnmi::db::drivers::
+DummyResult::
+fieldSize(int index)const
 {
 	throw SQLNotSupported();
 }
 
 int         
-dnmi::db::drivers::DummyResult::fieldSize(const std::string &fieldName)const
+dnmi::db::drivers::
+DummyResult::
+fieldSize(const std::string &fieldName)const
 {
 	throw SQLNotSupported();
 }
 
 int         
-dnmi::db::drivers::DummyResult::size()const
+dnmi::db::drivers::
+DummyResult::
+size()const
 {
 	throw SQLNotSupported();
 }
 
 bool        
-dnmi::db::drivers::DummyResult::hasNext()const
+dnmi::db::drivers::
+DummyResult::
+hasNext()const
 {
 	throw SQLNotSupported();
 }
 
 void
-dnmi::db::drivers::DummyResult::nextImpl()
+dnmi::db::drivers::
+DummyResult::
+nextImpl()
 {
 	throw SQLNotSupported();
 }

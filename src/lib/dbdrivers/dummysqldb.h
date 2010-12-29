@@ -93,6 +93,8 @@ namespace dnmi {
 	    	DummyConnection(const DummyConnection &);
 	    	DummyConnection& operator=(const DummyConnection &);
 	    
+	    	DummyConnection( const std::string &id );
+	    	friend class DummyDriver;
 		public:
 	    	~DummyConnection();
 
