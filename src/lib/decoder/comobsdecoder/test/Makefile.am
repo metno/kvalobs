@@ -1,6 +1,10 @@
 AM_CPPFLAGS = -I$(top_srcdir)/src/lib -I$(top_srcdir)/src/lib/decoder -I$(top_builddir)/src/lib $(putools_CFLAGS)  -D_REENTRANT
 
-bin_PROGRAMS = testsms2 gtestsms2 
+if HAVE_GMOCK 
+
+check_PROGRAMS = gtestsms2 
+TESTS = $(check_PROGRAMS)
+bin_PROGRAMS = testsms2  
 
 testsms2_SOURCES=testsms2.cc ReadParamsFromFile.cc \
 				 FakeComobsDecoder.h FakeComobsDecoder.cc \
@@ -9,7 +13,8 @@ testsms2_SOURCES=testsms2.cc ReadParamsFromFile.cc \
 				../sms2.cc ../smsbase.cc  ../smsdata.cc
 
 testsms2_CPPFLAGS = $(AM_CPPFLAGS) $(libxmlpp_CFLAGS) \
-					-DTESTDIR="\""$(top_srcdir)/src/lib/decoder/comobsdecoder/test"\""
+					-DTESTDIR="\""$(top_srcdir)/src/lib/decoder/comobsdecoder/test"\"" \
+					-DDBDIR="\""$(top_builddir)/src/lib/dbdrivers/.libs"\"" 
 testsms2_LDFLAGS =  -pthread -export-dynamic
 testsms2_LDADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs_decoderbase.la \
                $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
@@ -29,7 +34,8 @@ gtestsms2_SOURCES=gtestsms2.cc ReadParamsFromFile.cc \
 				../sms2.cc ../smsbase.cc  ../smsdata.cc
 
 gtestsms2_CPPFLAGS = $(AM_CPPFLAGS) $(libxmlpp_CFLAGS) $(synop_la_CPPFLAGS) $(gtest_CFLAGS) \
-					-DTESTDIR="\""$(top_srcdir)/src/lib/decoder/comobsdecoder/test"\""
+					-DTESTDIR="\""$(top_srcdir)/src/lib/decoder/comobsdecoder/test"\"" \
+					-DDBDIR="\""$(top_builddir)/src/lib/dbdrivers/.libs"\""
 gtestsms2_LDFLAGS =  -pthread -export-dynamic
 gtestsms2_LDADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs_decoderbase.la \
                $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
@@ -42,12 +48,7 @@ gtestsms2_LDADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs_decoder
 	 	        $(BOOST_THREAD_LIB) $(BOOST_REGEX_LIB) $(gtest_LIBS) \
 		        -lm -ldl
 
-
-
-#testsmsbasetimes: testsmsbasetimes.o ReadParamsFromFile.o
-#	$(CXX) $(CXXLDFLAGS) -o $@ testsmsbasetimes.o ReadParamsFromFile.o \
-#	     ../smsbase.o $(LIBS) -lmilog
-
+endif
 
 
 

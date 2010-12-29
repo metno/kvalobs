@@ -64,14 +64,17 @@ protected:
    string dbId;
    DriverManager dbMgr;
    string testdir;
+   string dbdir;
    ParamList        paramList;
    std::list<kvalobs::kvTypes> typesList;
 
    ///Called before each test case.
    virtual void SetUp() {
       testdir = TESTDIR;
+      dbdir = DBDIR;
+
       if( dbId.empty() )
-         ASSERT_TRUE( dbMgr.loadDriver( "./src/lib/dbdrivers/.libs/dummydriver.so", dbId ) )<<
+         ASSERT_TRUE( dbMgr.loadDriver( dbdir+"/dummydriver.so", dbId ) )<<
          "Failed to load Db driver.";
 
       if( paramList.empty() )
@@ -158,62 +161,6 @@ main(int argc, char **argv) {
    return RUN_ALL_TESTS();
 }
 
-#if 0
-int
-main(int argn, char **argv)
-{  
-   dnmi::file::Dir  dir;
-   dnmi::file::File file;
-   ParamList        paramList;
-   std::list<kvalobs::kvTypes> typesList;
-   string           inFile;
-
-   cerr << "TESTDIR: " << testdir << endl;
-   if( dbMgr.loadDriver( "./src/lib/dbdrivers/.libs/dummydriver.so", dbId ) ) {
-      cerr << "Db driver loaded: " << dbId << endl;
-   } else {
-      cerr << "Failed to laod db driver for: dummydriver. Reason: " << dbMgr.getErr() << endl;
-      return 1;
-   }
-
-   if(!ReadParamsFromFile(testdir+"/param.csv", paramList)){
-      cerr << "Cant read params from the file <param.csv>" << endl;
-   }
-
-   // if(!ReadTypesFromFile("types.csv", typesList)){
-   // 	cerr << "Cant read params from the file <types.csv>" << endl;
-   // }
-
-   if(argn>1){
-      file=dnmi::file::File(argv[1]);
-
-      if(!file.ok()){
-         cerr << "Cant read file <" << argv[1] << endl;
-         return 1;
-      }else{
-         cerr << "Reading file: " << file.name() << endl;
-
-         runtestOnFile(paramList, typesList, file);
-         return 0;
-      }
-   }
-
-   if(!dir.open( testdir+"/testdata", "sms\?\?-\?\?-????????????.xml")){
-      cerr << "Cant read data from the <testdata> directory!" << endl;
-      return 1;
-   }
-
-
-
-   while(dir.hasNext()){
-      dir.next(file);
-
-      runtestOnFile(paramList, typesList, file);
-   }
-
-
-}
-#endif
 kvalobs::decodeutil::DecodedData*
 Sms2DecodeTest::
 runtestOnFile(const ParamList &paramList,
@@ -233,8 +180,6 @@ runtestOnFile(const ParamList &paramList,
    bool             hasRejected;
    ofstream         of;
    miTime           nowTime;
-
-   cerr << "testfile: " << file.name() << endl;
 
    string fname=file.file();
    string::size_type i;
