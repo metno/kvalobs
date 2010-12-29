@@ -33,6 +33,7 @@
 
 #include <kvskel/commonStationInfo.hh>
 #include <kvalobs/kvStationInfo.h>
+#include <kvalobs/kvStationInfoExt.h>
 #include <dnmithread/CommandQue.h>
 
 namespace kvalobs{
@@ -49,8 +50,8 @@ namespace kvalobs{
    * The command can carry more than one kvStationInfo elements.   
    */
 class StationInfoCommand : public dnmi::thread::CommandBase{
-  kvalobs::kvStationInfoList stationInfoList;
-  
+  kvalobs::kvStationInfoExtList stationInfoList;
+  kvalobs::kvStationInfoList    stationInfoListLegacy;
  public:
   StationInfoCommand();
   
@@ -59,20 +60,28 @@ class StationInfoCommand : public dnmi::thread::CommandBase{
    * \param stInfo a CORBA StationInfoList object.
    */
   StationInfoCommand(const CKvalObs::StationInfoList &stInfo);
+  StationInfoCommand(const CKvalObs::StationInfoExtList &stInfo);
+
 
   /**
    * \brief initialize from the CORBA object CKvalObs::StationInfo.
    * \param a CORBA StationInfo object.
    */
   StationInfoCommand(const CKvalObs::StationInfo     &stInfo);
+  StationInfoCommand(const CKvalObs::StationInfoExt  &stInfo);
+
   virtual ~StationInfoCommand(){};
 
   /**
    * \brief get a list of all kvStationInfo object this command carries.
    * \return a list of kvStationInfo objects.
    */
-  kvalobs::kvStationInfoList& getStationInfo(){ return stationInfoList;}
-  const kvalobs::kvStationInfoList & getStationInfo() const { return stationInfoList; }
+  kvalobs::kvStationInfoList& getStationInfo();
+  const kvalobs::kvStationInfoList & getStationInfo() const;
+
+  kvalobs::kvStationInfoExtList& getStationInfoExt(){ return stationInfoList; }
+  const kvalobs::kvStationInfoExtList & getStationInfoExt() const { return stationInfoList; }
+
   
   /**
    *  \brief add a kvStationInfo object to this command.
@@ -82,6 +91,8 @@ class StationInfoCommand : public dnmi::thread::CommandBase{
    */
   bool       addStationInfo(const kvStationInfo &stationInfo);
   
+  bool       addStationInfo(const kvStationInfoExt &stationInfo);
+
   bool       executeImpl(){ return true; }; //Do nothing
 
   void       debugInfo(std::ostream &info)const;

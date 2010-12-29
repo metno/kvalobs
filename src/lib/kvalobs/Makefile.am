@@ -5,6 +5,7 @@ lib_LTLIBRARIES = libkvalobs_kvalobs.la
 libkvalobs_kvalobs_la_SOURCES = \
 	kvDbGate.cc \
 	kvStationInfo.cc \
+	kvStationInfoExt.cc \
 	kvAlgorithms.cc \
 	kvChecks.cc \
 	kvParam.cc \
@@ -65,6 +66,7 @@ kvalobsincludedir = $(pkgincludedir)/kvalobs
 kvalobsinclude_HEADERS = \
 	kvDbGate.h \
 	kvStationInfo.h \
+	kvStationInfoExt.h \
 	kvAlgorithms.h \
 	kvChecks.h \
 	kvParam.h \
