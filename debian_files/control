@@ -3,6 +3,7 @@ Section: science
 Priority: extra
 Maintainer: Borge Moe <borge.moe@met.no>
 Build-Depends: debhelper (>= 5), autotools-dev, g++ (>= 4.1.1), debconf,
+ devscripts, fakeroot, build-essential, lintian,
  automake, libtool, gfortran (>= 4.1.0), bison (>= 2.3) | bison-1.35, flex (>= 2.5.33), 
  sqlite3 (>= 3.3.8), libsqlite3-dev (>= 3.3.8),
  libxml2-dev (>= 2.6.27), libxml++2.6-dev (>= 2.14.0), libcppunit-dev (>= 1.12),
