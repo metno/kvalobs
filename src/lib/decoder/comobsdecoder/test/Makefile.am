@@ -1,12 +1,17 @@
 AM_CPPFLAGS = -I$(top_srcdir)/src/lib -I$(top_srcdir)/src/lib/decoder -I$(top_builddir)/src/lib $(putools_CFLAGS)  -D_REENTRANT
 
 if HAVE_GMOCK 
-
+EXTRA_DIST = param.csv \
+             testdata/sms02-29-201012280654.xml
+             
+CLEANFILES = testresult/sms02-29-201012280654.xml \
+			 testresult
+			 
 check_PROGRAMS = gtestsms2 
 TESTS = $(check_PROGRAMS)
 bin_PROGRAMS = testsms2  
 
-testsms2_SOURCES=testsms2.cc ReadParamsFromFile.cc \
+testsms2_SOURCES=testsms2.cc ReadParamsFromFile.cc ReadParamsFromFile.h\
 				 FakeComobsDecoder.h FakeComobsDecoder.cc \
 				 ../comobsdecode.cc ../decodeddata.cc \
 				  ../smsmeldingparser.cc ../smsmelding.cc\
