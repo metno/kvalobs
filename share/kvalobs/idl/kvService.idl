@@ -245,6 +245,11 @@ module CKvalObs{
                             in CKvalObs::StationInfoList data, 
 			                in CKvalObs::CManager::CheckedInput callback,
 			                out boolean bussy );
+			                
+	  boolean dataReadyWithParam( in string source,
+                                  in CKvalObs::StationInfoExtList data, 
+			                      in CKvalObs::CManager::CheckedInput callback,
+			                      out boolean bussy );
     };
 
   };
