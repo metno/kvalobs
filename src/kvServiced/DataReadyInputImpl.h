@@ -57,6 +57,12 @@ public:
                                const CKvalObs::StationInfoList& data,
                                CKvalObs::CManager::CheckedInput_ptr callback,
                                CORBA::Boolean& bussy);
+
+  CORBA::Boolean dataReadyWithParam( const char* source,
+                                     const CKvalObs::StationInfoExtList& data,
+                                     CKvalObs::CManager::CheckedInput_ptr callback,
+                                     CORBA::Boolean& bussy);
+
 };
 
 #endif

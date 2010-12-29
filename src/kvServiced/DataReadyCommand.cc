@@ -47,6 +47,16 @@ DataReadyCommand( const char *source,
       source_ = source;
 }
 
+DataReadyCommand::
+DataReadyCommand( const char *source,
+                  const CKvalObs::StationInfoExtList &stInfo,
+                  const CKvalObs::CManager::CheckedInput_ptr callback_)
+: kvalobs::StationInfoCommand( stInfo ), callback( callback_ )
+{
+   if( source )
+       source_ = source;
+}
+
   
  
 CKvalObs::CManager::CheckedInput_ptr 

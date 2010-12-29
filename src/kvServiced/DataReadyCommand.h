@@ -55,6 +55,11 @@ class DataReadyCommand : public kvalobs::StationInfoCommand{
                     const CKvalObs::StationInfoList &stInfo,
                     const CKvalObs::CManager::CheckedInput_ptr callback);
 
+  DataReadyCommand( const char *source,
+                    const CKvalObs::StationInfoExtList &stInfo,
+                    const CKvalObs::CManager::CheckedInput_ptr callback);
+
+
 
   ~DataReadyCommand(){};
   

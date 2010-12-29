@@ -86,8 +86,7 @@ DataReadyInputImpl::dataReady( const CKvalObs::StationInfoList& infoList,
 
    try{
       cmd=new DataReadyCommand( infoList,
-                                CKvalObs::CManager::CheckedInput::
-                                _duplicate(callback));
+                                CKvalObs::CManager::CheckedInput::_duplicate(callback));
       que.postAndBrodcast(cmd);
       return true;
    }catch(...){
@@ -149,8 +148,7 @@ dataReadyExt( const char* source,
    try{
       cmd=new DataReadyCommand( source,
                                 infoList,
-                                CKvalObs::CManager::CheckedInput::
-                                _duplicate(callback));
+                                CKvalObs::CManager::CheckedInput::_duplicate(callback));
       que.postAndBrodcast(cmd);
       return true;
    }catch(...){
@@ -174,3 +172,66 @@ dataReadyExt( const char* source,
 
 }
 
+CORBA::Boolean
+DataReadyInputImpl::
+dataReadyWithParam( const char* source,
+                    const CKvalObs::StationInfoExtList& infoList,
+                    CKvalObs::CManager::CheckedInput_ptr callback,
+                    CORBA::Boolean& bussy)
+{
+   string mysource( source );
+   string logid( source );
+   DataReadyCommand *cmd=0;
+
+   bussy=false;
+
+   LogContext context("dataReadyWithParam");
+
+   if( string(source) == string("__##kvManagerd@@very_secret_hash:-)##__") ) {
+      logid="kvManagerd";
+      mysource = logid;
+   }
+
+   app->createGlobalLogger( logid );
+
+   LOGDEBUG("New data from <" << mysource << ">!");
+
+   if( ! logid.empty() ) {
+      IDLOGDEBUG(logid, "New data ready to distribute! # of elements: " << infoList.length() );
+   }
+
+   if(que.size()>5){
+      if( ! logid.empty() ) {
+         IDLOGDEBUG(logid, "BUSSY, to high load at the moment.");
+      }
+
+      bussy=true;
+      return false;
+   }
+
+   try{
+      cmd=new DataReadyCommand( source,
+                                infoList,
+                                CKvalObs::CManager::CheckedInput::_duplicate( callback ) );
+      que.postAndBrodcast(cmd);
+      return true;
+   }catch(...){
+      if(cmd){
+         LOGERROR("Can post the data to the que! (NOMEM?)");
+
+         if( ! logid.empty() ) {
+            IDLOGERROR( logid, "Can post the data to the que! (NOMEM?)" );
+         }
+
+         delete cmd;
+      }else{
+         LOGFATAL("NOMEM!");
+
+         if( ! logid.empty() ) {
+            IDLOGFATAL( logid, "NOMEM" );
+         }
+      }
+      return false;
+   }
+
+}

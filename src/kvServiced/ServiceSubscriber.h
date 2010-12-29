@@ -87,7 +87,7 @@ typedef std::list<DataToSend>::const_iterator CIDataToSendList;
  */
 class DataNotifyFunc : public DataNotifySubscriberFuncBase
 {
-  const kvalobs::kvStationInfo     &stationInfo;
+  const kvalobs::kvStationInfoExt     &stationInfo;
   const std::list<kvalobs::kvData> &dataList;
  
   bool fqcLevel(CKvalObs::CService::QcId qcId, unsigned char flag);
@@ -95,7 +95,7 @@ class DataNotifyFunc : public DataNotifySubscriberFuncBase
   bool checkStatusAndQc(KvDataNotifySubscriberPtr ptr);
 
 public:
-  DataNotifyFunc(const kvalobs::kvStationInfo &sti,
+  DataNotifyFunc(const kvalobs::kvStationInfoExt &sti,
 		 const std::list<kvalobs::kvData> &dataList_)
     :stationInfo(sti), dataList(dataList_)
     {}
@@ -124,15 +124,15 @@ class ServiceSubscriber{
   dnmi::thread::CommandQue &inputque;
   dnmi::db::Connection     *dbCon;
 
-  void callDataNotifySubscribers(const kvalobs::kvStationInfo &stationInfo,
+  void callDataNotifySubscribers(const kvalobs::kvStationInfoExt &stationInfo,
                                  const std::string &logid);
-  void callDataSubscribers(const kvalobs::kvStationInfo &stationInfo,
+  void callDataSubscribers(const kvalobs::kvStationInfoExt &stationInfo,
                            const std::string &logid);
   void removeDeadConnections();
-  void updateWorkelementServiceStart(const kvalobs::kvStationInfo &st,
+  void updateWorkelementServiceStart(const kvalobs::kvStationInfoExt &st,
 				     dnmi::db::Connection *con,
                  const std::string &logid);
-  void updateWorkelementServiceStop(const kvalobs::kvStationInfo &st,
+  void updateWorkelementServiceStop(const kvalobs::kvStationInfoExt &st,
 				    dnmi::db::Connection *con,
                 const std::string &logid);
 

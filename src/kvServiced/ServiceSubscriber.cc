@@ -37,17 +37,73 @@
 #include <milog/milog.h>
 #include "ServiceSubscriber.h"
 
-namespace{
-const unsigned char QC1_mask=0x01;
-const unsigned char QC2d_mask=0x02;
-const unsigned char QC2m_mask=0x04;
-const unsigned char HQC_mask=0x08;
-};
 
 
 using namespace std;
 using namespace kvalobs;
 using namespace miutil;
+
+
+namespace{
+const unsigned char QC1_mask=0x01;
+const unsigned char QC2d_mask=0x02;
+const unsigned char QC2m_mask=0x04;
+const unsigned char HQC_mask=0x08;
+
+string
+buildDataQuery( const kvalobs::kvStationInfoExt &st )
+{
+   ostringstream q;
+   list<kvalobs::kvStationInfoExt::Param> params=st.params();
+
+   q << " WHERE stationid=" << st.stationID()
+        << " AND typeid="      << st.typeID()
+        << " AND obstime=\'"   << st.obstime().isoTime() << "\' " ;
+
+   if( params.size() !=0 ) {
+      list<kvalobs::kvStationInfoExt::Param>::const_iterator it = params.begin();
+      q << " AND ((paramid=" << it->paramid << "AND sensor='"<< it->sensor <<"' AND level=" << it->level << ")";
+      ++it;
+
+      for( ; it != params.end(); ++it )
+         q << " OR (paramid=" << it->paramid << "AND sensor='"<< it->sensor <<"' AND level="<< it->level << ")";
+
+      q << ")";
+   }
+
+   q << " ORDER BY paramid, level, sensor";
+   return q.str();
+}
+
+string
+buildTextDataQuery( const kvalobs::kvStationInfoExt &st )
+{
+   ostringstream q;
+   list<kvalobs::kvStationInfoExt::Param> params=st.params();
+
+   q << " WHERE stationid=" << st.stationID()
+        << " AND typeid="      << st.typeID()
+        << " AND obstime=\'"   << st.obstime().isoTime() << "\' " ;
+
+   if( params.size() !=0 ) {
+      list<kvalobs::kvStationInfoExt::Param>::const_iterator it = params.begin();
+      q << " AND ( paramid=" << it->paramid ;
+      ++it;
+
+      for( ; it != params.end(); ++it )
+         q << " OR paramid=" << it->paramid;
+
+      q << ")";
+   }
+
+   q << " ORDER BY paramid";
+   return q.str();
+}
+
+
+
+};
+
 
 ServiceSubscriber::
 ServiceSubscriber(ServiceApp &app_,
@@ -70,7 +126,7 @@ ServiceSubscriber::
 
 void 
 ServiceSubscriber::
-updateWorkelementServiceStart(const kvalobs::kvStationInfo &st,
+updateWorkelementServiceStart(const kvalobs::kvStationInfoExt &st,
                               dnmi::db::Connection *con,
                               const std::string &logid)
 {
@@ -98,7 +154,7 @@ updateWorkelementServiceStart(const kvalobs::kvStationInfo &st,
 
 void 
 ServiceSubscriber::
-updateWorkelementServiceStop(const kvalobs::kvStationInfo &st,
+updateWorkelementServiceStop(const kvalobs::kvStationInfoExt &st,
                              dnmi::db::Connection *con,
                              const std::string &logid)
 {
@@ -127,7 +183,7 @@ updateWorkelementServiceStop(const kvalobs::kvStationInfo &st,
 
 void 
 ServiceSubscriber::
-callDataNotifySubscribers(const kvalobs::kvStationInfo &si,
+callDataNotifySubscribers(const kvalobs::kvStationInfoExt &si,
                           const std::string &logid )
 {
    if(!app.subscribers.hasDataNotifySubscribers())
@@ -178,7 +234,7 @@ callDataNotifySubscribers(const kvalobs::kvStationInfo &si,
 
 void 
 ServiceSubscriber::
-callDataSubscribers(const kvalobs::kvStationInfo &si,
+callDataSubscribers(const kvalobs::kvStationInfoExt &si,
                     const std::string &logid)
 {
    long stationID;
@@ -201,17 +257,11 @@ callDataSubscribers(const kvalobs::kvStationInfo &si,
 
    kvalobs::kvDbGate gate(dbCon);
 
-   if(!gate.select(dataList,
-                   kvQueries::selectDataFromType(si.stationID(),
-                                                 si.typeID(),
-                                                 si.obstime()))){
+   if(!gate.select(dataList, buildDataQuery( si ) ) ){
       dataList.clear();
    }
 
-   if(!gate.select(textDataList,
-                   kvQueries::selectTextDataFromType(si.stationID(),
-                                                     si.typeID(),
-                                                     si.obstime()))){
+   if(!gate.select(textDataList, buildTextDataQuery( si ) ) ) {
       textDataList.clear();
    }
 
@@ -353,9 +403,9 @@ operator()()
       }
 
       conIdleTime=0;
-      kvalobs::IkvStationInfoList it=stInfoCmd->getStationInfo().begin();
+      kvalobs::IkvStationInfoExtList it=stInfoCmd->getStationInfoExt().begin();
 
-      for(;it!=stInfoCmd->getStationInfo().end(); it++){
+      for(;it!=stInfoCmd->getStationInfoExt().end(); it++){
          if( !logName.empty() ) {
             IDLOGDEBUG( logName, "Observation: stationid: " << it->stationID() << " typeid: " << it->typeID() << " obstime: " << it->obstime() );
          }

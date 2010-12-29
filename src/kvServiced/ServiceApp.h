@@ -78,8 +78,8 @@ class ServiceApp: public KvApp
   void doShutdown(){ shutdown_=true;}
   bool shutdown();
 
-  bool sendToManager(kvalobs::kvStationInfoList &retList,
-		     CKvalObs::CManager::CheckedInput_ptr callback);
+  bool sendToManager( kvalobs::kvStationInfoList &retList,
+		                CKvalObs::CManager::CheckedInput_ptr callback);
 
 
   /**
