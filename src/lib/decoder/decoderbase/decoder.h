@@ -115,6 +115,9 @@ namespace kvalobs{
 			  const miutil::miTime &tbtime,
 			  int priority);
 
+      void updateStationInfo( const kvalobs::kvStationInfoList stationInfo );
+
+
       /**
        * \brief  isGenerated looks up in the table 'generated_data' 
        * 
@@ -242,13 +245,14 @@ namespace kvalobs{
        * \param typeid The typeid.
        * \param sd data to insert.
        * \param textData to insert.
-       * \param priority The priority of the \em obs. Defaul value is 5.
+       * \param priority The priority of the \em obs. Default value is 5.
+       * \param logid Send all log to this logger.
        * \return true if successful false otherwise.
        */
       bool addDataToDb( const miutil::miTime &obstime, int stationid, int typeid_,
                         std::list<kvalobs::kvData> &sd,
                         std::list<kvalobs::kvTextData> &textData,
-                        int priority=5);
+                        int priority, const std::string &logid);
 
 
       /**

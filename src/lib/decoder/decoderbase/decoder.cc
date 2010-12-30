@@ -320,6 +320,26 @@ addStationInfo(long stationid,
   stationInfoList.push_back(kvStationInfo(stationid, obstime, typeid_));
 }
 
+void
+kvalobs::decoder::
+DecoderBase::
+updateStationInfo( const kvalobs::kvStationInfoList stationInfo )
+{
+   IkvStationInfoList it=stationInfoList.begin();
+
+   for( kvalobs::kvStationInfoList::const_iterator nit=stationInfo.begin();
+        nit != stationInfo.end(); ++ nit ) {
+      for(;it!=stationInfoList.end(); it++){
+         if(it->stationID()==nit->stationID() &&
+               it->obstime()==nit->obstime()     &&
+               it->typeID()==nit->typeID() ){
+            break;
+         }
+      }
+      if( it == stationInfoList.end() )
+         stationInfoList.push_back( *nit );
+   }
+}
 
 bool
 kvalobs::decoder::
@@ -556,11 +576,20 @@ DecoderBase::
 addDataToDb( const miutil::miTime &obstime, int stationid, int typeid_,
              std::list<kvalobs::kvData> &sd,
              std::list<kvalobs::kvTextData> &textData,
-             int priority)
+             int priority,
+             const std::string &logid )
 {
-   kvalobs::decoder::DataUpdateTransaction work( obstime,stationid, typeid_, priority, &sd, &textData );
+   kvalobs::decoder::DataUpdateTransaction work( obstime,stationid,
+                                                 typeid_, priority,
+                                                 &sd, &textData, logid );
 
-   con.perform( work );
+   try {
+      con.perform( work );
+      updateStationInfo( work.stationInfoList() );
+   }
+   catch( ... )
+   {
+   }
 
    return work.ok();
 }

@@ -38,6 +38,7 @@
 #include <kvalobs/kvData.h>
 #include <kvalobs/kvTextData.h>
 #include <kvdb/transaction.h>
+#include <sstream>
 
 namespace kvalobs{
 namespace decoder{
@@ -66,6 +67,8 @@ class DataUpdateTransaction : public dnmi::db::Transaction
    int priority;
    boost::shared_ptr<kvalobs::kvStationInfoList> stationInfoList_;
    boost::shared_ptr<bool> ok_;
+   std::ostringstream log;
+   std::string logid;
 
 public:
    miutil::miTime getTimestamp( dnmi::db::Connection *conection, int &msec );
@@ -81,6 +84,14 @@ public:
                  const miutil::miTime &obstime,
                  std::list<kvalobs::kvData> &data,
                  std::list<kvalobs::kvTextData> &textData );
+
+   bool getDataWithTbtime( dnmi::db::Connection *con,
+                           int stationid,
+                           int typeid_,
+                           const std::string &tbtime,
+                           std::list<kvalobs::kvData> &data,
+                           std::list<kvalobs::kvTextData> &textData );
+
    bool hasDataWithTbtime( dnmi::db::Connection *con, const miutil::miTime &tbtime, int &msec );
    miutil::miTime getUniqTbtime( dnmi::db::Connection *con, int &msec );
    bool isEqual( std::list<kvalobs::kvData> &oldData,
@@ -100,11 +111,14 @@ public:
                           int typeid_,
                           int priority,
                           std::list<kvalobs::kvData> *newData,
-                          std::list<kvalobs::kvTextData> *newTextData );
+                          std::list<kvalobs::kvTextData> *newTextData,
+                          const std::string &logid );
    DataUpdateTransaction(const DataUpdateTransaction &dut );
 
    virtual bool operator()(dnmi::db::Connection *conection);
    virtual void onSuccess();
+   virtual void onRetry();
+   virtual void onMaxRetry( const std::string &lastError );
 
    kvalobs::kvStationInfoList stationInfoList()const { return *stationInfoList_; }
    bool ok()const { return *ok_; }
