@@ -523,10 +523,11 @@ perform( dnmi::db::Connection *con_,
          dnmi::db::Transaction &transaction, int retry,
          dnmi::db::Connection::IsolationLevel isolation)
 {
+   dnmi::db::Transaction &t( transaction );
    std::string lastError;
    con = static_cast<PGConnection*>( con_ );
    while( retry > 0 ) {
-      Transaction t( transaction );
+
 
       try {
          beginTransaction( isolation );
@@ -564,6 +565,8 @@ perform( dnmi::db::Connection *con_,
       catch( ... ) {
          retry--;
       }
+
+      t.onRetry();
 
       try {
          con->rollBack();
