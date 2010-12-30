@@ -71,6 +71,7 @@ protected:
    bool getInData(const char *param, std::string &val);
 
 public:
+   std::string logid;
    SmsBase(const ParamList &paramList,
            kvalobs::decoder::comobsdecoder::ComObsDecoder &decoder);
    virtual ~SmsBase();

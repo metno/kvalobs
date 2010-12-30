@@ -166,6 +166,7 @@ execute(miutil::miString &msg)
    long   stationid;
    bool   hasRejected;
    DecodedData *data;
+   ostringstream logid;
 
    list<kvRejectdecode> rejected;
    milog::LogContext lcontext(name());
@@ -225,6 +226,9 @@ execute(miutil::miString &msg)
 
    decoder=smsfactory(smsMelding->getCode());
 
+   logid << "n" << stationid << "-t" << smsMelding->getCode() + 300 << ".log";
+   createLogger( logid.str() );
+
    if(!decoder){
       ostringstream ost;
       ostringstream ost1;
@@ -239,8 +243,11 @@ execute(miutil::miString &msg)
       putRejectdecodeInDb(myrejected);
 
       LOGWARN("Rejected!" << endl << ost.str() << endl);
+      IDLOGERROR( logid.str(), "Rejected!" << endl << ost.str() << endl );
+      removeLogger( logid.str() );
       return Rejected;
    }
+   decoder->logid = logid.str();
 
    data=decoder->decode(stationid,
                         smsMelding->getCode(),
@@ -251,8 +258,10 @@ execute(miutil::miString &msg)
 
    if(!data){
       msg="No mem!";
+      removeLogger( logid.str() );
       return Error;
    }
+
 
    if(hasRejected){
       list<kvRejectdecode>::iterator it=rejected.begin();
@@ -261,6 +270,7 @@ execute(miutil::miString &msg)
          putRejectdecodeInDb(*it);
 
       LOGWARN("Rejected!" << endl << msg << endl);
+      removeLogger( logid.str() );
       return Rejected;
    }
 
@@ -286,11 +296,24 @@ execute(miutil::miString &msg)
       LOGDEBUG3(*it);
 
       if( it->dataSize()>0 || it->textDataSize()>0 ) {
-         kvalobs::decoder::DataUpdateTransaction work( it->getDate(),
-                                                       it->stationID(), it->typeID(),
-                                                       priority, &d, &td );
+         try {
+            kvalobs::decoder::DataUpdateTransaction work( it->getDate(),
+                                                          it->stationID(), it->typeID(),
+                                                          priority, &d, &td, logid.str() );
 
-         con.perform( work );
+            con.perform( work );
+            updateStationInfo( work.stationInfoList() );
+            nData += it->dataSize() + it->textDataSize();
+         }
+         catch( const dnmi::db::SQLException &ex ) {
+            LOGERROR("Failed to save data: Reason: " << ex.what() );
+         }
+         catch( const std::exception &ex ) {
+            LOGERROR("Failed to save data: Reason: " << ex.what() << "(*)" );
+         }
+         catch( ... ) {
+            LOGERROR("Failed to save data. Reason: Unknown.");
+         }
       }
    }
 
@@ -303,10 +326,11 @@ execute(miutil::miString &msg)
       }else{
          msg="Can't save data to the database!";
       }
-
+      removeLogger( logid.str() );
       return NotSaved;
    }
 
+   removeLogger( logid.str() );
    LOGDEBUG("Saved " << nData << " data element to the database!");
 
    return Ok;
