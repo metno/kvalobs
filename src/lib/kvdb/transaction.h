@@ -50,6 +50,12 @@ public:
    virtual void onFailure();
 
    /**
+    * Called before each retry of the transaction.
+    * Do any cleanup before a new transaction is begin.
+    */
+   virtual void onRetry();
+
+   /**
     * Called when max retry to perform the transaction is reached.
     * Default action is to throw SQLException
     * @throw SQLException

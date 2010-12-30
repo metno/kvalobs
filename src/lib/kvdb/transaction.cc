@@ -55,12 +55,18 @@ onSuccess()
 {
 }
 
-
 void
 Transaction::
 onFailure()
 {
 }
+
+void
+Transaction::
+onRetry()
+{
+}
+
 void
 Transaction::
 onMaxRetry( const std::string &lastError )
