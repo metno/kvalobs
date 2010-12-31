@@ -69,6 +69,19 @@ DataUpdateTransaction(const DataUpdateTransaction &dut )
 {
 }
 
+
+void
+DataUpdateTransaction::
+addQuery( std::list<std::string> &qList, const std::string &query )
+{
+   for( std::list<std::string>::iterator it=qList.begin(); it != qList.end(); ++it ){
+      if( query == *it )
+         return;
+   }
+
+   qList.push_back( query );
+}
+
 void
 DataUpdateTransaction::
 addStationInfo( dnmi::db::Connection *con,
@@ -145,8 +158,12 @@ hasDataWithTbtime( dnmi::db::Connection *con, const miutil::miTime &tbtime, int 
    ostringstream q;
    dnmi::db::Result *dbRes;
 
+
+//   q << "SELECT * FROM data WHERE stationid=" << stationid << " AND "
+//     << "typeid=" << typeid_ << " AND "
+//     << "tbtime='" << tbtime << "." << msec <<"'";
+
    q << "SELECT * FROM data WHERE stationid=" << stationid << " AND "
-     << "typeid=" << typeid_ << " AND "
      << "tbtime='" << tbtime << "." << msec <<"'";
 
    auto_ptr<dnmi::db::Result> res;
@@ -311,8 +328,11 @@ getDataWithTbtime( dnmi::db::Connection *con,
    data.clear();
    textData.clear();
 
+//   q << "SELECT * FROM data WHERE stationid=" << stationid << " AND "
+//     << "typeid=" << typeid_ << " AND "
+//     << "tbtime='" << tbtime << "' AND original<>-32767";
+
    q << "SELECT * FROM data WHERE stationid=" << stationid << " AND "
-     << "typeid=" << typeid_ << " AND "
      << "tbtime='" << tbtime << "' AND original<>-32767";
 
 
@@ -343,8 +363,11 @@ getDataWithTbtime( dnmi::db::Connection *con,
    }
 
    q.str("");
+//   q << "SELECT * FROM text_data WHERE stationid=" << stationid << " AND "
+//     << "typeid=" << typeid_ << " AND "
+//     << "tbtime='" << tbtime << "'";
+
    q << "SELECT * FROM text_data WHERE stationid=" << stationid << " AND "
-     << "typeid=" << typeid_ << " AND "
      << "tbtime='" << tbtime << "'";
 
    try{
@@ -517,6 +540,7 @@ replaceData( dnmi::db::Connection *conection,
              const std::list<kvalobs::kvData> &dataList,
              const std::list<kvalobs::kvTextData> &textDataList )
 {
+   list<string> qList;
    ostringstream q;
    miutil::miTime tbtime;
    int msec;
@@ -529,35 +553,53 @@ replaceData( dnmi::db::Connection *conection,
       msec = textDataList.begin()->tbtimemsec();
    }
 
-   q << "DELETE FROM data WHERE stationid=" << stationid << " AND abs(typeid)=" << typeid_
-     << " AND (obstime='" << obstime << "' OR tbtime='" << tbtime << "." << msec << "')";
+   for( std::list<kvalobs::kvData>::const_iterator it=dataList.begin();
+         it != dataList.end(); ++it ) {
+      q.str("");
+      tbtime = it->tbtime();
+      msec = it->tbtimemsec();
+      q << "DELETE FROM data WHERE stationid=" << it->stationID()
+        << " AND abs(typeid)=" << it->typeID()
+        << " AND (obstime='" << obstime << "' OR tbtime='" << tbtime << "." << msec << "')";
+
+      addQuery( qList, q.str() );
+   }
+
+   for( std::list<kvalobs::kvTextData>::const_iterator it=textDataList.begin();
+            it != textDataList.end(); ++it ) {
+      q.str("");
+      tbtime = it->tbtime();
+      msec = it->tbtimemsec();
+      q << "DELETE FROM text_data WHERE stationid=" << it->stationID()
+        << " AND abs(typeid)=" << it->typeID()
+        << " AND (obstime='" << obstime << "' OR tbtime='" << tbtime << "." << msec << "')";
+
+      addQuery( qList, q.str() );
+   }
+
+   log << "replaceData: # of delete queries: " << qList.size() << endl;
+   for( list<string>::iterator it=qList.begin(); it!=qList.end(); ++it )
+      log << "\n  '" << q.str() << "'";
+   log << endl;
 
    try {
-      conection->exec( q.str() );
+      for( list<string>::iterator it=qList.begin(); it!=qList.end(); ++it )
+         conection->exec( *it );
    }
    catch( const std::exception &ex ) {
-      log << "replaceData: '" << q.str() << "' \nReason: " << ex.what() << "\n";
+      log << "replaceData: EXCEPTION: \nReason: " << ex.what() << endl
+          << "Queries: " << qList.size();
+      for( list<string>::iterator it=qList.begin(); it!=qList.end(); ++it )
+         log << "\n  '" << q.str() << "'";
+      log << endl;
       throw;
    }
    catch( ... ) {
-      log << "replaceData: '" << q.str() << "' \nReason: Unknown \n";
-      throw;
-   }
-
-   q.str("");
-
-   q << "DELETE FROM text_data WHERE stationid=" << stationid << " AND abs(typeid)=" << typeid_
-     << " AND (obstime='" << obstime << "' OR tbtime='" << tbtime << "." << msec << "')";
-
-   try {
-      conection->exec( q.str() );
-   }
-   catch( const std::exception &ex ) {
-      log << "replaceData: '" << q.str() << "' \nReason: " << ex.what() << "\n";
-      throw;
-   }
-   catch( ... ) {
-      log << "replaceData: '" << q.str() << "' \nReason: Unknown \n";
+      log << "replaceData: EXCEPTION: \nReason: Unknown" << endl
+               << "Queries: " << qList.size();
+           for( list<string>::iterator it=qList.begin(); it!=qList.end(); ++it )
+              log << "\n  '" << q.str() << "'";
+           log << endl;
       throw;
    }
 

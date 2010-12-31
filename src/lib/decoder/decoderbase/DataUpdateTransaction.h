@@ -71,6 +71,13 @@ class DataUpdateTransaction : public dnmi::db::Transaction
    std::string logid;
 
 public:
+   /**
+    * Add a query to the list qList if it not all ready exist in the list.
+    *
+    * @param qList The list to add the query.
+    * @param query The query to add.
+    */
+   void addQuery( std::list<std::string> &qList, const std::string &query );
    miutil::miTime getTimestamp( dnmi::db::Connection *conection, int &msec );
    void addStationInfo( dnmi::db::Connection *con,
                         long stationid,
