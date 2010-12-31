@@ -46,6 +46,24 @@ using namespace miutil;
 using namespace boost;
 using namespace kvalobs;
 
+namespace {
+  class LogidHelper {
+     kvalobs::decoder::DecoderBase *decoder;
+     std::string logid;
+
+  public:
+     LogidHelper( kvalobs::decoder::DecoderBase *decoder, const std::string &logid )
+        : decoder( decoder ), logid( logid )
+     {
+        decoder->createLogger( logid );
+     }
+
+     ~LogidHelper() {
+        decoder->removeLogger( logid );
+     }
+  };
+}
+
 AutoObsDecoder::
 AutoObsDecoder(
 	dnmi::db::Connection   &con,
@@ -283,6 +301,7 @@ execute(miutil::miString &msg)
   	miTime                tbtime(miTime::nowTime());
   	int                   typeId=getTypeId(msg); 
   	int                   useTypeid;
+  	int                   typeidWithSave=-1;
   	string                level;
   	int                   stationid=getStationId(msg);
   	float                 fval;
@@ -290,10 +309,12 @@ execute(miutil::miString &msg)
   	int                   nExpectedParams=0;
   	int                   priority=4;
   	int                   line=0;
-  	map<int,std::list<kvData> >           dataList;
-  	map<int,std::list<kvData> >::iterator itDataList;
-  	map<int,list<kvTextData> >            textDataList;
-  	map<int,list<kvTextData> >::iterator  itTextDataList;
+  	std::list<kvData>  dataList;
+  	std::list<kvData>::iterator itDataList;
+  	list<kvTextData>            textDataList;
+  	list<kvTextData>::iterator  itTextDataList;
+
+  	ostringstream logid;
 
   	milog::LogContext lcontext("AutoObsDecoder");
   
@@ -334,6 +355,10 @@ execute(miutil::miString &msg)
     	return Rejected;
   	}
   
+  	logid << "n" << stationid << "-t" << typeId << ".log";
+  	LogidHelper logContext( this, logid.str() );
+
+
   	obs.trim();
   	obs += "\n";
   
@@ -395,6 +420,15 @@ execute(miutil::miString &msg)
 				}
       	}
 
+      	//We use the first typeid that is not an VISUAL typeid
+      	//when we save the data. This does not mean that all the data
+      	//is saved with this typeid, but the logic that try to identify
+      	//the message use this typeid as a starting point.
+      	if( typeidWithSave < 0 ) {
+      	   if( useTypeid != VISUEL_TYPEID )
+      	      typeidWithSave = useTypeid;
+      	}
+
       	try {
 				try{
 	  				elems = converter.convert(header[i], data[i + 1], obstime);
@@ -434,7 +468,7 @@ execute(miutil::miString &msg)
 			 							 useTypeid);
 	    
 	    				logs << " (TEXTDATA)" << endl;
-	    				textDataList[useTypeid].push_back(d);
+	    				textDataList.push_back(d);
 
 	  				}else	if(elems[k].fVal(fval)){
 	      			kvData d(stationid, 
@@ -452,7 +486,7 @@ execute(miutil::miString &msg)
 	    
 	      			d.useinfo(7, checkObservationTime(typeId,tbtime, obstime));
 	      
-	      			dataList[useTypeid].push_back(d);
+	      			dataList.push_back(d);
 	    			}else{
 	      			LOGWARN("Cant convert param value to float <" 
 		      				  << elems[k].sVal() << ">");
@@ -492,7 +526,7 @@ execute(miutil::miString &msg)
 	      		d.useinfo(7, checkObservationTime(typeId, tbtime, obstime));
 	      		LOGDEBUG("RRRtr: " << paramid << " -- RR: " << rr );
 
-	      		dataList[useTypeid].push_back(d);
+	      		dataList.push_back(d);
 
 	      		paramid=12; //ITR
 	      		kvData dd(stationid, 
@@ -510,7 +544,7 @@ execute(miutil::miString &msg)
 	      
 	      		dd.useinfo(7, checkObservationTime(typeId, tbtime,	obstime));
 	      
-	      		dataList[useTypeid].push_back(dd);
+	      		dataList.push_back(dd);
 				}
 				catch(std::exception & ex) {
 	  				LOGERROR("Exception: " << ex.what() << endl <<
@@ -538,44 +572,24 @@ execute(miutil::miString &msg)
 			      
          if( DataConvert::SaSdEm::dataSa( saSdEmData, saSdEm, saSdEmTmp ) ) {
             nExpectedParams++;
-            dataList[useTypeid].push_back(saSdEmData );
+            dataList.push_back(saSdEmData );
          }
 				      
          if( DataConvert::SaSdEm::dataSd( saSdEmData, saSdEm, saSdEmTmp ) ) {
-            dataList[useTypeid].push_back(saSdEmData );
+            dataList.push_back(saSdEmData );
             nExpectedParams++;
          }
          
          if( DataConvert::SaSdEm::dataEm( saSdEmData, saSdEm, saSdEmTmp ) ) {
-            dataList[useTypeid].push_back(saSdEmData );
+            dataList.push_back(saSdEmData );
             nExpectedParams++;
          }
 		   
      	}
 
-    	for(itDataList=dataList.begin();
-			 itDataList!=dataList.end();
-			 itDataList++){
-      	if(!itDataList->second.empty()){
-				if(!putKvDataInDb(itDataList->second, priority)){
-	  				LOGERROR("Cant save data to database!");
-				}else{
-	  				count+=itDataList->second.size();
-				}
-      	}
-    	}
-
-		for(itTextDataList=textDataList.begin();
-			 itTextDataList!=textDataList.end();
-			 itTextDataList++){
-      	if(!itTextDataList->second.empty()){
-				if(!putkvTextDataInDb(itTextDataList->second, priority)){
-	  				LOGERROR("Cant save textdata to the database!");
-				}else{
-	  				count+=itTextDataList->second.size();
-				}
-      	}
-    	}
+		if( addDataToDb( obstime, stationid, typeidWithSave, dataList, textDataList, priority, logid.str() ) ) {
+		   count += dataList.size() + textDataList.size();
+		}
   	}
   
   	if(count>0){

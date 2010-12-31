@@ -122,7 +122,10 @@ kvalobs::decoder::kldecoder::
 KlDecoder::
 execute(miutil::miString &msg)
 {
-	list<kvalobs::kvData> data;
+   string logid;
+   ostringstream olog;
+	list<kvalobs::kvData> dataList;
+	list<kvalobs::kvTextData> textDataList;
 	miTime                nowTime(miTime::nowTime());
 	string                tmp;
 	miTime                obstime;
@@ -140,7 +143,6 @@ execute(miutil::miString &msg)
    int                   nLineWithData=0; //Number of line with data.
    int                   nElemsInLine;
 	int                   priority=10;
-	
 	milog::LogContext lcontext(name());
 	  
 	LOGINFO("New observation: stationid=" << stationid << endl <<
@@ -249,14 +251,7 @@ execute(miutil::miString &msg)
 		     				 tbtime,
 		     				 typeId);
 	    
-		
-				if(!putkvTextDataInDb(d, priority)){
-	  				LOGERROR("Can't save textdata. Stationid: " 
-		   					 << stationid <<"\n");
-	  				nErrors++;
-				}else{
-	  				count++;
-				}
+				textDataList.push_back( d );
       	}else{
 				if(params[index].code()){
 	  				if(params[index].name()=="VV"){
@@ -289,21 +284,31 @@ execute(miutil::miString &msg)
 				 		 data.cinfo(), 
 				 		 data.uinfo(),
 				 		 "");
-	      
-				if(!putKvDataInDb(d, priority)){
-	  				LOGERROR("Can't save data. Stationid: " 
-		  	 		 		 << stationid <<"\n");
-	  				nErrors++;
-				}else{
-	  				count++;
-				}
+
+				dataList.push_back( d );
       	}
     	}
       
+    	olog.str("");
+    	olog << "n"<<stationid << "-t" << typeId << ".log";
+
+    	if( logid != olog.str() ) {
+    	   if( ! logid.empty() )
+    	      removeLogger( logid );
+    	   createLogger( logid );
+    	}
+
+    	if( addDataToDb( obstime, stationid, typeId, dataList, textDataList, priority, logid) ) {
+    	   count += dataList.size() + textDataList.size();
+    	}
+
       if(nElemsInLine>0)
          nLineWithData++;
   	}
   
+  	if( !logid.empty() )
+  	   removeLogger( logid );
+
   	ostringstream ost;
    ost <<  "# Lines:             " << lines-1 << endl <<
            "# Lines with data:   " << nLineWithData << endl <<

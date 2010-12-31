@@ -126,6 +126,8 @@ saveData( list<kvalobs::kvData> &data,
           bool				 	     &rejected,
           std::string			  &rejectedMessage)
 {
+   ostringstream logid;
+   list<kvalobs::kvTextData> textData;
    list<kvalobs::kvData>::iterator it=data.begin();
    int i=0;
    int priority=10;
@@ -158,14 +160,19 @@ saveData( list<kvalobs::kvData> &data,
       }
    }
 
-   if(!putKvDataInDb(data, priority)){
-      it=data.begin();
-      LOGWARN("Cant save data: sid=" << it->stationID() << " tid=" << it->typeID()
-              << " obst=" << it->obstime());
-      return false;
+   logid << "n" << it->stationID() << "-t" << it->typeID() << ".log";
+   createLogger( logid.str() );
+   int ret=true;
+   it=data.begin();
+
+   if( !addDataToDb( it->obstime(), it->stationID(), it->typeID(), data, textData, priority, logid.str() ) ) {
+      ret = false;
    }
 
-   return true;
+   removeLogger( logid.str() );
+
+
+   return ret;
 }
 
 bool
