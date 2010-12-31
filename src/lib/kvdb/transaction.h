@@ -40,8 +40,16 @@ class Transaction{
 public:
    virtual bool operator()(dnmi::db::Connection *conection);
 
-   ///Called if the transaction is aborted.
-   virtual void onAbort();
+   /**
+    * Called if the transaction is aborted.
+    *
+    * @param driverid Which driver is running this transaction.
+    * @param errorMessage An error message about the reason to abort the transaction.
+    * @param errorCode A driver specific erro code.
+    */
+   virtual void onAbort(const std::string &driverid,
+                        const std::string &errorMessage,
+                        const std::string &errorCode );
 
    ///Called if the operator() returns true;
    virtual void onSuccess();

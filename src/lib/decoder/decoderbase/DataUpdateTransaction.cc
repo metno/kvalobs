@@ -603,7 +603,8 @@ void
 DataUpdateTransaction::
 onSuccess()
 {
-  LOGINFO( log.str() );
+  LOGINFO( "Success: stationid: " << stationid << " Typeid: "
+           << " obstime: " << obstime << "\n" << log.str() );
 
   if( ! logid.empty() ){
      IDLOGINFO( logid, log.str() );
@@ -616,7 +617,8 @@ void
 DataUpdateTransaction::
 onRetry()
 {
-   LOGDEBUG( "Retry transaction.\n" << log.str() );
+   LOGDEBUG( "Retry transaction. stationid: " << stationid << " Typeid: "
+            << " obstime: " << obstime << "\nMessage: " << log.str() );
 
    if( ! logid.empty() ) {
       IDLOGDEBUG( logid, "Retry transaction.\n" << log.str() );
@@ -628,9 +630,27 @@ onRetry()
 
 void
 DataUpdateTransaction::
+onAbort( const std::string &driverid,
+         const std::string &errorMessage,
+         const std::string &errorCode )
+{
+   LOGDEBUG("Transaction aborted: stationid: " << stationid << " Typeid: "
+            << " obstime: " << obstime << "\n Driver: '" << driverid << "' ErrorCode: '"
+            << errorCode << "\nReason: " << errorMessage );
+
+   if( !logid.empty() ) {
+      IDLOGINFO( logid, "Transaction aborted: Driver: '" << driverid << "' ErrorCode: '"
+                 << errorCode << "\nReason: " << errorMessage );
+   }
+}
+
+
+void
+DataUpdateTransaction::
 onMaxRetry( const std::string &lastError )
 {
-   LOGERROR("Transaction Failed.\n" << lastError << "\n" << log.str() );
+   LOGERROR("Transaction Failed. Stationid: " << stationid << " Typeid: "
+            << " obstime: " << obstime  << "\nLast error: " << log.str() );
 
    if( ! logid.empty() ) {
       IDLOGERROR( logid, "Transaction Failed.\n" << lastError << "\n" << log.str() );

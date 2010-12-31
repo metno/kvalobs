@@ -132,7 +132,6 @@ dnmi::db::Result::getFieldNames()const
   return ret;
 }
 
-
 void
 dnmi::db::
 Connection::
@@ -144,6 +143,8 @@ perform( dnmi::db::Transaction &transaction, int retry,
    if( pimpel ) {
       return static_cast<dnmi::db::priv::Pimpel*>(pimpel)->perform( this, transaction, retry, isolation);
    }
+
+   Transaction &t( transaction );
 
    try {
       while( retry > 0 ) {
@@ -164,7 +165,7 @@ perform( dnmi::db::Transaction &transaction, int retry,
          catch (const SQLAborted &e) {
             retry--;
             lastError=e.what();
-            t.onAbort();
+            t.onAbort( this->getDriverId(), lastError, e.errorCode() );
          }
          catch (const std::exception &e) {
             retry--;

@@ -45,7 +45,9 @@ operator()(dnmi::db::Connection *conection)
 ///Called if the transaction is aborted.
 void
 Transaction::
-onAbort()
+onAbort( const std::string &driverid,
+         const std::string &errorMessage,
+         const std::string &errorCode )
 {
 }
 

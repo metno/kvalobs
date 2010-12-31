@@ -131,6 +131,7 @@ class SQLiteConnection : public dnmi::db::Connection{
    SQLiteConnection(const std::string &connect,
                     const std::string &driverId);
 public:
+
    ~SQLiteConnection();
 
    virtual bool isConnected();

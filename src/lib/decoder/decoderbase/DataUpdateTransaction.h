@@ -116,6 +116,9 @@ public:
    DataUpdateTransaction(const DataUpdateTransaction &dut );
 
    virtual bool operator()(dnmi::db::Connection *conection);
+   virtual void onAbort( const std::string &driverid,
+                         const std::string &errorMessage,
+                         const std::string &errorCode );
    virtual void onSuccess();
    virtual void onRetry();
    virtual void onMaxRetry( const std::string &lastError );

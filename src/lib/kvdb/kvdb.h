@@ -278,7 +278,6 @@ class Result;
 class Connection{
 protected:
    std::string driverId;
-
    void *pimpel;
 
    Connection(const std::string &driverId_):driverId(driverId_),pimpel( 0 ){}

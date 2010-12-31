@@ -420,12 +420,11 @@ perform( dnmi::db::Connection *con_,
          dnmi::db::Transaction &transaction, int retry,
          dnmi::db::Connection::IsolationLevel isolation)
 {
+   dnmi::db::Transaction &t( transaction );
    std::string lastError;
    con = static_cast<SQLiteConnection*>( con_ );
 
    while( retry > 0 ) {
-      Transaction t( transaction );
-
       try {
          beginTransaction( isolation );
       }
@@ -452,7 +451,7 @@ perform( dnmi::db::Connection *con_,
       catch (const SQLAborted &e) {
          retry--;
          lastError=e.what();
-         t.onAbort();
+         t.onAbort( con->getDriverId(), lastError, e.errorCode() );
       }
       catch( const SQLBusy &e) {
          continue;
@@ -469,7 +468,7 @@ perform( dnmi::db::Connection *con_,
             catch( ... ) {
                lastError=con->lastError();
             }
-            t.onAbort();
+            t.onAbort( con->getDriverId(), e.what(), e.errorCode() );
             break;
          }
       }
@@ -480,6 +479,8 @@ perform( dnmi::db::Connection *con_,
       catch( ... ) {
          retry--;
       }
+
+      t.onRetry();
 
       try {
          con->rollBack();

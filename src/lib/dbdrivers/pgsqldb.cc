@@ -556,7 +556,7 @@ perform( dnmi::db::Connection *con_,
             retry--;
          else
             lastError = e.what();
-         t.onAbort();
+         t.onAbort( con->getDriverId(), e.what(), e.errorCode() );
       }
       catch( const std::exception &ex ){
          retry--;
