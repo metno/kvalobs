@@ -18,194 +18,416 @@
   modify it under the terms of the GNU General Public License as 
   published by the Free Software Foundation; either version 2 
   of the License, or (at your option) any later version.
-  
+
   KVALOBS is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License along 
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ */
 #include <stdlib.h>
 #include "PreProcessMissingData.h"
 #include <kvalobs/kvDbGate.h>
 #include <kvalobs/kvData.h>
 #include <kvalobs/kvObsPgm.h>
+#include <kvalobs/kvParam.h>
+#include <kvalobs/kvTypes.h>
 #include <milog/milog.h>
 #include "PreProcessWorker.h"
 
 using namespace kvalobs;
 using namespace milog;
 
-PreProcessMissingData::PreProcessMissingData()
+PreProcessMissingData::
+PreProcessMissingData()
 {
 }
 
-PreProcessMissingData::~PreProcessMissingData()
+PreProcessMissingData::
+~PreProcessMissingData()
 {
+}
+
+bool
+PreProcessMissingData::
+loadParamsAndTypes()
+{
+   miutil::miTime now( miutil::miTime::nowTime() );
+
+   if( ! nextDbCheck.undef() && now < nextDbCheck &&
+       !typeList.empty() && !paramList.empty() ) {
+      return true;
+   }
+
+   std::list<kvalobs::kvTypes> tmpTypeList;
+   std::list<kvalobs::kvParam> tmpParamList;
+
+   kvDbGate dbGate( con_);
+   std::string table;
+   bool result;
+   int  nOk=0;
+
+   try{
+      table = kvalobs::kvTypes().tableName();
+      result = dbGate.select(tmpTypeList );
+
+      if( result ) {
+         nOk++;
+         typeList = tmpTypeList;
+      } else {
+         LOGERROR("Failed to read the '" << table <<"' table from the database.\n" <<
+                  "Reason: " << dbGate.getErrorStr());
+      }
+
+      table = kvalobs::kvParam().tableName();
+      result = dbGate.select( tmpParamList );
+
+      if( result ) {
+         nOk++;
+         paramList = tmpParamList;
+      } else {
+         LOGERROR("Failed to read the '" << table <<"' table from the database.\n" <<
+                  "Reason: " << dbGate.getErrorStr());
+      }
+   }
+   catch(dnmi::db::SQLException &ex){
+         LOGERROR("Exception: Failed to read the '" << table <<"' table from the database.\n" <<
+                  "Reason: " << ex.what());
+   }
+   catch(...){
+      LOGERROR("Exception: Failed to read the '" << table <<"' table from the database.\n" <<
+               "Reason: Unknown." );
+   }
+
+   if( nOk == 2 ) {
+      now.addHour( 1 );
+      nextDbCheck = miutil::miTime( now.year(), now.month(), now.day(), now.hour(), 0, 0);
+   } else {
+      now.addMin( 5 );
+      nextDbCheck = now;
+   }
+
+   LOGDEBUG( "PreProcessMissingData: Next loading of 'types' and 'params' table: " + nextDbCheck.isoTime() );
+
+   return nOk == 2;
+}
+
+bool
+PreProcessMissingData::
+paramIsMinute( int typeid_, int paramid )
+{
+   bool isMinParam = false;
+   if( ! loadParamsAndTypes() ) {
+      LOGERROR("PreProcessMissingData: The 'param' and 'types' table is not available.\n" <<
+               "Can't decide if paramid (" << paramid << ") typeid (" << typeid_ << ") is minute data.");
+      return false;
+   }
+
+   for( std::list<kvalobs::kvParam>::const_iterator it = paramList.begin();
+        it != paramList.end(); it ) {
+      if( it->paramID() == paramid ) {
+         std::string name=it->name();
+         std::string::size_type i = name.find("_0");
+
+         if( i != std::string::npos )
+            isMinParam = true;
+         break;
+      }
+   }
+
+   for( std::list<kvalobs::kvTypes>::const_iterator it = typeList.begin();
+         it != typeList.end(); it ) {
+      if( it->typeID() == typeid_ ) {
+         std::string c = it->obspgm();
+
+         if( ! c.empty() && c[0]!='m' )
+            isMinParam = false;
+
+         break;
+      }
+   }
+
+   return isMinParam;
+}
+
+void
+PreProcessMissingData::
+flagDataNotInObsPgm( const std::list<kvalobs::kvObsPgm> &obsPgm,
+                     std::list<kvalobs::kvData> &data,
+                     std::list<kvalobs::kvData> &wildObs
+                   )
+{
+   bool hasThis;
+
+   for( std::list<kvalobs::kvData>::iterator it = data.begin();
+         it != data.end(); ++it ) {
+      std::list<kvalobs::kvObsPgm>::const_iterator itop;
+
+      hasThis=false;
+
+      for( std::list<kvalobs::kvObsPgm>::const_iterator itop=obsPgm.begin();
+            itop !=obsPgm.end(); itop++){
+         // no missing-check for collector=TRUE
+         //if (itop->collector())
+         //   continue;
+
+         int paramid= itop->paramID();
+         int level  = itop->level();
+         int sensor;
+         int nr_sensor= itop->nr_sensor();
+
+         if( it->paramID() == paramid &&
+               it->sensor() < nr_sensor &&
+               it->level() == level &&
+               itop->isOn( it->obstime() ) ) {
+            hasThis = true;
+            break;
+         }
+      }
+
+      if( ! hasThis ) {
+         //It seems that this parameter is not defined in the
+         //observation program.
+         wildObs.push_back( *it );
+      }
+   }
+}
+
+bool
+PreProcessMissingData::
+isMissingMessage( const std::list<kvalobs::kvData> &datalist )const {
+   if( datalist.empty() )
+      return true;
+
+   int fmis;
+   for( std::list<kvalobs::kvData>::const_iterator it=datalist.begin();
+         it != datalist.end(); ++it ) {
+     fmis = it->controlinfo().MissingFlag();
+
+     //Do we have a original value.
+     if( it->original() != -32767 || fmis==0 || fmis == 2 || fmis == 4 )
+        return false;
+   }
+   return true;
 }
 
 void 
-PreProcessMissingData::doJob(long                 stationId, 
-						     long                 typeId, 
-							 const miutil::miTime &obstime,
-							 dnmi::db::Connection &con)
+PreProcessMissingData::
+removeFromList( const kvalobs::kvData &data,
+               std::list<kvalobs::kvData> &dataList )const
 {
-  	std::ostringstream ost;
-  	ost << "PreProcessMissingData(stationid=" << stationId << ")";
-  	LogContext ctxt(ost.str());
-  	ost.str("");
+   for( std::list<kvalobs::kvData>::iterator it=dataList.begin();
+        it != dataList.end();
+        ++it ) {
+      if( data.stationID() == it->stationID() &&
+          data.typeID() == it->typeID() &&
+          data.paramID() == it->paramID() &&
+          data.level()== it->level() &&
+          data.sensor() == it->sensor() ) {
+         //Remove from the wildObsList
+         dataList.erase( it );
+         break;
+      }
+   }
+}
 
-  	if(typeId<0){
-    	LOGDEBUG1("Generated data has is not checked for missing. typeId=" << 
-	      		  typeId);
-    	return;
-  	}else{
-    	LOGINFO("doJob STARTING typeId:" << typeId << " obstime:"
-	    		<< obstime   << std::endl);
-  	}
-  	// init database connection
-  	kvDbGate dbGate(&con);
-  	bool     result;
-  	int      missingParamCount=0;  
-  	int      paramObsPgmCount=0;  //Counts of params that should be in the observation
-  
-  	// first fetch all observations matching stationId, obstime and typeId
-  	std::list<kvalobs::kvData> datalist;
-  
-  	try{
-    	result = dbGate.select(datalist,
-							   kvQueries::selectDataFromType(stationId,
-							   typeId,
-							   obstime));
-  	}
-  	catch(dnmi::db::SQLException &ex){
-    	LOGERROR("Exception: " << ex.what() << std::endl);
-  	}
-  	catch(...){
-    	LOGERROR("Unknown exception: con->exec(ctbl) .....\n");
-  	}
-  
-  	if (!result) 
-  		return;
-  
-  	// .. then fetch the observation program for this station
-  	std::list<kvalobs::kvObsPgm> obspgmlist;
-  
-  	try{
-    	result = dbGate.select(obspgmlist,
-							   kvQueries::selectObsPgm(stationId,
-													   typeId,
-						   	   						   obstime)
-						   	   );
-  	}
-  	catch(dnmi::db::SQLException &ex){
-    	LOGERROR("Exception: " << ex.what() << std::endl);
-  	}
-  	catch(...){
-    	LOGERROR("Unknown exception: con->exec(ctbl) .....\n");
-  	}
-  
-  	if (!result) 
-  		return;
-  
-  	miutil::miTime tbtime(miutil::miTime::nowTime());
-  	
-  	// loop through obs_pgm and check if we have data for each
-  	// active parameter
-  	std::list<kvalobs::kvObsPgm>::const_iterator itop;
-  
-  	for (itop=obspgmlist.begin(); itop!=obspgmlist.end(); itop++){
-    	// no missing-check for collector=TRUE
-    	if (itop->collector())
-     		continue;
-    
-    	// check if this obspgm is active now..
-    	if (!itop->isOn(obstime))
-      		continue;
-    
-    	paramObsPgmCount++;
+void
+PreProcessMissingData::doJob(long                 stationId, 
+                             long                 typeId,
+                             const miutil::miTime &obstime,
+                             dnmi::db::Connection &con)
+{
+   std::ostringstream ost;
+   bool  missingMessage;
+   ost << "PreProcessMissingData(stationid=" << stationId << ")";
+   LogContext ctxt(ost.str());
+   ost.str("");
 
-    	int paramid= itop->paramID();
-    	int level  = itop->level();
-    	int sensor, nr_sensor= itop->nr_sensor();
-   		bool countedThis=false;
-      
-    	// loop through all sensors
-    	for (sensor=0; sensor<nr_sensor; sensor++){
-      		// check if we have this parameter
-      		std::list<kvalobs::kvData>::const_iterator itd;
-      
-      		for (itd=datalist.begin(); itd!=datalist.end(); itd++){
-				if (itd->paramID() == paramid &&
-	    			itd->level()   == level &&
-	    			itd->sensor()  == sensor &&
-				itd->typeID()  == typeId)
-	  				break;
-      		}
-      
-      		if (itd==datalist.end()){ //paramid not found
-				if(!countedThis){
-	  				missingParamCount++;
-	  				countedThis=true;
-				}
-	
-				// insert missing data
-				float            original =-32767.0;
-				float            corrected=-32767.0;
-				kvControlInfo    controlinfo;
-				kvUseInfo        useinfo;
-				miutil::miString failed;
-		
-				controlinfo.MissingFlag(kvQCFlagTypes::status_orig_and_corr_missing);
-				
-				//NOTE:
-				//Børge Moe 2005.12.2005
-				//
-				//This should be taken care of in QAbase. But it is missed!
-				//Until this i fixed in QAbase it is set here.
-				useinfo.set(1, 8); //original value is missing
-				
-				//useinfo.setUseFlags(controlinfo);
-	
-	
-				kvData data(stationId,
-			    			obstime,
-			    			original,
-			    			paramid,
-			    			tbtime,
-			    			typeId,
-			    			sensor,
-			    			level,
-			    			corrected,
-			    			controlinfo,
-			    			useinfo,
-			    			failed);
-				try{
-	  				result = dbGate.insert(data,false);
-				}
-				catch(dnmi::db::SQLException &ex){
-	  				LOGERROR("Exception: " << ex.what() << std::endl);
-				}
-				catch(...){
-	  				LOGERROR("Unknown exception: con->exec(ctbl) .....\n");
-				}
-      		}
-    	}
-  	}
-  
-  	if(paramObsPgmCount>0){
-    	if(missingParamCount>0){
-      		LOGINFO("Missing " << missingParamCount << " parameters. Should be " 
-	      			<< paramObsPgmCount << " parameters for the station!");
-    	}else{
-      		LOGINFO("No missing parameters for the station!");
-    	}
-  	}else{
-    	LOGINFO("No parameters is expecting for the stations at this time!");
-  	}
-  
-  	LOGINFO("doJob FINISHED" << std::endl);
+   if(typeId<0){
+      LOGDEBUG1("Generated data is not checked for missing. typeId=" <<
+                typeId);
+      return;
+   }else{
+      LOGINFO("doJob STARTING typeId:" << typeId << " obstime:"
+              << obstime   << std::endl);
+   }
+   // init database connection
+   con_ = &con;
+   kvDbGate dbGate( con_);
+   bool     result;
+   int      missingParamCount=0;
+   int      paramObsPgmCount=0;  //Counts of params that should be in the observation
+
+   // first fetch all observations matching stationId, obstime and typeId
+   std::list<kvalobs::kvData> datalist;
+   std::list<kvalobs::kvData> dataToSave;
+   std::list<kvalobs::kvData> wildObsList;
+   std::list<kvalobs::kvTypes> typeList;
+
+   try{
+      result = dbGate.select(datalist,
+                             kvQueries::selectDataFromType(stationId,
+                                                           typeId,
+                                                           obstime));
+   }
+   catch(dnmi::db::SQLException &ex){
+      LOGERROR("Exception: " << ex.what() << std::endl);
+   }
+   catch(...){
+      LOGERROR("Unknown exception: con->exec(ctbl) .....\n");
+   }
+
+   if (!result)
+      return;
+
+   missingMessage = isMissingMessage( datalist );
+
+   // .. then fetch the observation program for this station
+   std::list<kvalobs::kvObsPgm> obspgmlist;
+
+   try{
+      result = dbGate.select( obspgmlist,
+                              kvQueries::selectObsPgm(stationId,
+                                                      typeId,
+                                                      obstime)
+      );
+   }
+   catch(dnmi::db::SQLException &ex){
+      LOGERROR("Exception: " << ex.what() << std::endl);
+   }
+   catch(...){
+      LOGERROR("Unknown exception: con->exec(ctbl) .....\n");
+   }
+
+   if (!result)
+      return;
+
+   flagDataNotInObsPgm( obspgmlist, datalist, wildObsList );
+
+   miutil::miTime tbtime(miutil::miTime::nowTime());
+
+   // loop through obs_pgm and check if we have data for each
+   // active parameter
+   std::list<kvalobs::kvObsPgm>::const_iterator itop;
+
+   for (itop=obspgmlist.begin(); itop!=obspgmlist.end(); itop++){
+      // no missing-check for collector=TRUE
+      if (itop->collector())
+         continue;
+
+      // check if this obspgm is active now..
+      if (!itop->isOn(obstime))
+         continue;
+
+      paramObsPgmCount++;
+
+      int paramid= itop->paramID();
+      int level  = itop->level();
+      int sensor, nr_sensor= itop->nr_sensor();
+      bool countedThis=false;
+
+      // loop through all sensors
+      for (sensor=0; sensor<nr_sensor; sensor++){
+         // check if we have this parameter
+         std::list<kvalobs::kvData>::const_iterator itd;
+
+         for (itd=datalist.begin(); itd!=datalist.end(); itd++){
+            if (itd->paramID() == paramid &&
+                  itd->level()   == level &&
+                  itd->sensor()  == sensor &&
+                  itd->typeID()  == typeId)
+               break;
+         }
+
+         if (itd==datalist.end()){ //paramid not found
+            if(!countedThis){
+               missingParamCount++;
+               countedThis=true;
+            }
+
+
+            // insert missing data
+            kvControlInfo    controlinfo;
+            kvUseInfo        useinfo;
+            miutil::miString failed;
+            float            original  = -32767;
+            float            corrected = -32767;
+            controlinfo.MissingFlag(kvQCFlagTypes::status_orig_and_corr_missing);
+
+            if( paramIsMinute( itd->typeID(), itd->paramID() ) ) {
+               original  = 0.0;
+               corrected = 0.0;
+               controlinfo.MissingFlag(kvQCFlagTypes::status_ok );
+            }
+
+            //NOTE:
+            //Børge Moe 2005.12.2005
+            //
+            //This should be taken care of in QAbase. But it is missed!
+            //Until this i fixed in QAbase it is set here.
+            useinfo.set(1, 8); //original value is missing
+
+            //useinfo.setUseFlags(controlinfo);
+
+
+            kvData data(stationId,
+                        obstime,
+                        original,
+                        paramid,
+                        tbtime,
+                        typeId,
+                        sensor,
+                        level,
+                        corrected,
+                        controlinfo,
+                        useinfo,
+                        failed);
+
+            removeFromList( data, wildObsList );
+            dataToSave.push_back( data );
+         }
+      }
+   }
+
+   if( ! dataToSave.empty() ) {
+      try{
+         result = dbGate.insert( dataToSave, false );
+      }
+      catch(dnmi::db::SQLException &ex){
+         LOGERROR("Exception: " << ex.what() << std::endl);
+      }
+      catch(...){
+         LOGERROR("Unknown exception: con->exec(ctbl) .....\n");
+      }
+   }
+
+#if 0
+   if( ! wildObsList.empty() ) {
+      try {
+         dbGate.insert( wildObsList, true );
+      }
+      catch(dnmi::db::SQLException &ex){
+         LOGERROR("Exception: " << ex.what() << std::endl);
+      }
+      catch(...){
+         LOGERROR("Unknown exception: con->exec(ctbl) .....\n");
+      }
+   }
+#endif
+
+   if(paramObsPgmCount>0){
+      if(missingParamCount>0){
+         LOGINFO("Missing " << missingParamCount << " parameters. Should be "
+                 << paramObsPgmCount << " parameters for the station!");
+      }else{
+         LOGINFO("No missing parameters for the station!");
+      }
+   }else{
+      LOGINFO("No parameters is expecting for the stations at this time!");
+   }
+
+   LOGINFO("doJob FINISHED" << std::endl);
 }
