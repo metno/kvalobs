@@ -43,4 +43,5 @@
 #include <milog/miloghelper.h>
 #include <milog/HtmlStream.h>
 #include <milog/macros.h>
+#include <milog/utility.h>
 #endif

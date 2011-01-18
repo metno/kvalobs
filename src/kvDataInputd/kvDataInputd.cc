@@ -50,8 +50,8 @@ static void  setSigHandlers();
 static bool  killThreadOnSignal();
 static bool  threadAfter(CommandBase *cmd);
 
-//F�lgende globale variabler brukes av funksjonen
-//killThreadOnSignal for � stoppe CORBA.
+//Følgende globale variabler brukes av funksjonen
+//killThreadOnSignal for å stoppe CORBA.
 static mutex          m;
 static CORBA::ORB_ptr orb;
 static bool           hintKilled=false;

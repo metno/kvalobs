@@ -69,8 +69,18 @@ class DataUpdateTransaction : public dnmi::db::Transaction
    boost::shared_ptr<bool> ok_;
    std::ostringstream log;
    std::string logid;
+   int nRetry;
 
 public:
+   void setTbtime( dnmi::db::Connection *conection );
+   bool addDataToList( const kvalobs::kvData &data,
+                       std::list<kvalobs::kvData> &dataList,
+                       bool replaceOnly=false );
+
+   bool addTextDataToList( const kvalobs::kvTextData &data,
+                           std::list<kvalobs::kvTextData> &dataList,
+                           bool replaceOnly=false );
+
    /**
     * Add a query to the list qList if it not all ready exist in the list.
     *
@@ -92,6 +102,14 @@ public:
                  std::list<kvalobs::kvData> &data,
                  std::list<kvalobs::kvTextData> &textData );
 
+   void getData( dnmi::db::Connection *conection,
+                 const std::list<std::string> &query,
+                 std::list<kvalobs::kvData> &data );
+   void getTextData( dnmi::db::Connection *conection,
+                     const std::list<std::string> &query,
+                     std::list<kvalobs::kvTextData> &data );
+
+
    bool getDataWithTbtime( dnmi::db::Connection *con,
                            int stationid,
                            int typeid_,
@@ -103,11 +121,17 @@ public:
    miutil::miTime getUniqTbtime( dnmi::db::Connection *con, int &msec );
    bool isEqual( std::list<kvalobs::kvData> &oldData,
                  std::list<kvalobs::kvTextData> &oldTextData );
-   void insertData(dnmi::db::Connection *conection);
+   void insertData( dnmi::db::Connection *conection,
+                    const std::list<kvalobs::kvData> &data,
+                    const std::list<kvalobs::kvTextData> &textData );
 
    void insert( dnmi::db::Connection *conection,
                 const kvalobs::kvDbBase &elem,
                 const std::string &tblName );
+   void update( dnmi::db::Connection *connection,
+                const std::list<kvalobs::kvData> &data,
+                const std::list<kvalobs::kvTextData> &textData );
+
 
    void replaceData( dnmi::db::Connection *conection,
                      const std::list<kvalobs::kvData> &dataList,

@@ -132,7 +132,7 @@ class DataSrcApp : public KvApp
   boost::mutex mutex;
 
  public:
-  typedef enum ErrCode {TimeOut, NoDecoder, NoDbConnection, NoMem}; 
+  typedef enum  {TimeOut, NoDecoder, NoDbConnection, NoMem} ErrCode;
   
 
   /**

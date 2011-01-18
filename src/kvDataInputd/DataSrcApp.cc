@@ -51,7 +51,7 @@ DataSrcApp::DataSrcApp(int argn, char **argv,
    ok(false), shutdown_(false)
 {
   miutil::conf::ConfSection *conf;
-  
+  string logdir( kvPath("logdir") );
   string myPath=kvPath("pkglibdir");
   myPath+="/decode";
   
@@ -88,6 +88,11 @@ DataSrcApp::DataSrcApp(int argn, char **argv,
 
   if(!registerTypes())
     return;
+
+  milog::createGlobalLogger( logdir, "kvDataInputd_transaction", "failed", milog::DEBUG );
+  milog::createGlobalLogger( logdir, "kvDataInputd_transaction", "duplicates", milog::DEBUG );
+  milog::createGlobalLogger( logdir, "kvDataInputd_transaction", "updated", milog::DEBUG );
+  milog::createGlobalLogger( logdir, "kvDataInputd_transaction", "retry", milog::DEBUG );
 
   ok=true;
 }

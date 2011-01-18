@@ -16,6 +16,7 @@ nobase_miloginclude_HEADERS = Logger.h \
 	miloghelper.h \
 	milog.h macros.h \
 	milogtypes.h \
+	utility.h \
 	private/LoggerImpl.h private/ThreadLogManager.h private/types.h \
 	thread/DummyThread.h thread/PThread.h thread/Thread.h
 
@@ -38,7 +39,8 @@ libkvalobs_milog_la_SOURCES = Logger.h Logger.cc \
 	PThread.cc \
 	miloghelper.h miloghelper.cc \
 	milog.h macros.h \
-	milogtypes.h 
+	milogtypes.h \
+	utility.h utility.cc 
 	
 
 # don't install: LoggerImpl.h ThreadLogManager.h types.h
