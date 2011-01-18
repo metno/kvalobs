@@ -1,6 +1,6 @@
 #!/bin/sh
 
-QABASELOGDIR=$(kvconfig --localstatedir)/log/kvalobs/checks
+QABASELOGDIR=$(kvconfig --localstatedir)/log/kvalobs/checks/
 
 find $QABASELOGDIR -xdev -type d -ctime +7 -empty -exec rmdir --ignore-fail-on-non-empty {} \;
 find $QABASELOGDIR -xdev -name '*.gz' -type f -mtime +7 -exec rm -f {} \;
