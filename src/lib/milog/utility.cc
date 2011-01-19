@@ -46,8 +46,9 @@ createGlobalLogger( const std::string &path,
 {
    try{
 
-      if( LogManager::hasLogger(id) )
+      if( LogManager::hasLogger(id) ) {
          return true;
+      }
 
       if( size < 200 ) //Must be at least 200k
          size = 200;
@@ -58,7 +59,9 @@ createGlobalLogger( const std::string &path,
          nFiles=1;
 
       FLogStream *logs = new FLogStream( nFiles, size );
-      std::ostringstream ost( path );
+      std::ostringstream ost;
+
+      ost << path;
 
       if( !path.empty() && path[path.length()-1] != '/' )
          ost << "/";
@@ -69,19 +72,21 @@ createGlobalLogger( const std::string &path,
          logs->loglevel( ll );
 
          if( !LogManager::createLogger( id, logs )){
+            LOGERROR("Failed to create logger '" << id << "'. Logfile: '" << ost.str()<<"'.");
             delete logs;
             return false;
          }
 
+         LOGINFO("Created logger '" << id << "'. Logfile: '" << ost.str() <<"'.");
          return true;
       }else{
-         LOGERROR("Cant open the logfile <" << ost.str() << ">!");
+         LOGERROR("Can't open the logfile <" << ost.str() << ">!");
          delete logs;
          return false;
       }
    }
    catch(...){
-      LOGERROR("Cant create a logstream for LOGID " << id);
+      LOGERROR("EXCEPTION: Can't create a logstream for logid '" << id << "'.");
       return false;
    }
 }
