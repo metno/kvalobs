@@ -226,7 +226,7 @@ execute(miutil::miString &msg)
 
    decoder=smsfactory(smsMelding->getCode());
 
-   logid << "n" << stationid << "-t" << smsMelding->getCode() + 300 << ".log";
+   logid << "n" << stationid << "-t" << smsMelding->getCode() + 300;
    createLogger( logid.str() );
 
    if(!decoder){

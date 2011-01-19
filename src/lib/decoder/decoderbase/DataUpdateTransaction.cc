@@ -833,10 +833,21 @@ bool
 DataUpdateTransaction::
 operator()( dnmi::db::Connection *conection )
 {
+   ostringstream mylog;
    list<kvalobs::kvData> dataList;
    list<kvalobs::kvTextData> textDataList;
    miutil::miTime tbtime;
    int msec;
+
+   if( !logid.empty() ) {
+      for( std::list<kvalobs::kvData>::const_iterator it=newData->begin();
+            it != newData->end(); ++it )
+         mylog << it->obstime() << "," << it->stationID() << "," << it->typeID() <<","
+               << it->paramID() << "," << it->sensor() <<"," << it->level()
+               << "," << it->original() << endl;
+      IDLOGDEBUG( logid, "NewData: stationid: " << stationid << " typeid: " << typeid_
+                  << " obstime: " << obstime << endl << mylog.str() );
+   }
 
    stationInfoList_->clear();
 
@@ -865,7 +876,7 @@ operator()( dnmi::db::Connection *conection )
    setTbtime( conection );
    replaceData( conection, dataList, textDataList );
 
-   ostringstream mylog;
+   mylog.str("");
    IkvStationInfoList it=stationInfoList_->begin();
 
    if( it != stationInfoList_->end() ) {
@@ -889,7 +900,7 @@ DataUpdateTransaction::
 onSuccess()
 {
   LOGINFO( "Success: stationid: " << stationid << " Typeid: "
-           << " obstime: " << obstime << "\n" << log.str() );
+           << typeid_ << " obstime: " << obstime << "\n" << log.str() );
 
   if( ! logid.empty() ){
      IDLOGINFO( logid, log.str() );
@@ -903,7 +914,7 @@ DataUpdateTransaction::
 onRetry()
 {
    LOGDEBUG( "Retry transaction. stationid: " << stationid << " Typeid: "
-            << " obstime: " << obstime << "\nMessage: " << log.str() );
+            << typeid_ << " obstime: " << obstime << "\nMessage: " << log.str() );
 
    if( ! logid.empty() ) {
       IDLOGDEBUG( logid, "Retry transaction.\n" << log.str() );
@@ -911,7 +922,7 @@ onRetry()
 
    nRetry++;
    IDLOGDEBUG("retry", "RETRY: " << nRetry << " stationid: " << stationid << " Typeid: "
-              << " obstime: " << obstime << "\nMessage: " << log.str() )
+              << typeid_ << " obstime: " << obstime << "\nMessage: " << log.str() )
    log.str("");
    stationInfoList_->clear();
 }
@@ -923,7 +934,7 @@ onAbort( const std::string &driverid,
          const std::string &errorCode )
 {
    LOGDEBUG("Transaction aborted: stationid: " << stationid << " Typeid: "
-            << " obstime: " << obstime << "\n Driver: '" << driverid << "' ErrorCode: '"
+            << typeid_ << " obstime: " << obstime << "\n Driver: '" << driverid << "' ErrorCode: '"
             << errorCode << "\nReason: " << errorMessage );
 
    if( !logid.empty() ) {
@@ -938,14 +949,14 @@ DataUpdateTransaction::
 onMaxRetry( const std::string &lastError )
 {
    LOGERROR("Transaction Failed. Stationid: " << stationid << " Typeid: "
-            << " obstime: " << obstime  << "\nLast error: " << log.str() );
+            << typeid_ << " obstime: " << obstime  << "\nLast error: " << log.str() );
 
    if( ! logid.empty() ) {
       IDLOGERROR( logid, "Transaction Failed.\n" << lastError << "\n" << log.str() );
    }
 
    IDLOGERROR( "failed", "Transaction Failed. Stationid: " << stationid << " Typeid: "
-               << " obstime: " << obstime  << "\nLast error: " << log.str() );
+               << typeid_ << " obstime: " << obstime  << "\nLast error: " << log.str() );
 }
 
 }

@@ -355,7 +355,7 @@ execute(miutil::miString &msg)
     	return Rejected;
   	}
   
-  	logid << "n" << stationid << "-t" << typeId << ".log";
+  	logid << "n" << stationid << "-t" << typeId;
   	LogidHelper logContext( this, logid.str() );
 
 

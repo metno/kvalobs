@@ -290,11 +290,12 @@ execute(miutil::miString &msg)
     	}
       
     	olog.str("");
-    	olog << "n"<<stationid << "-t" << typeId << ".log";
+    	olog << "n"<<stationid << "-t" << typeId;
 
     	if( logid != olog.str() ) {
     	   if( ! logid.empty() )
     	      removeLogger( logid );
+    	   logid = olog.str();
     	   createLogger( logid );
     	}
 
