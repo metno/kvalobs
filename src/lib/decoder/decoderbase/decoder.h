@@ -33,6 +33,7 @@
 
 #include <list>
 #include <set>
+#include <sstream>
 #include <miconfparser/miconfparser.h>
 #include <puTools/miString.h>
 #include <puTools/miTime.h>
@@ -69,6 +70,8 @@ namespace kvalobs{
 
 
     class ConfParser;
+
+
 
     typedef enum { YES, NO, MAYBE } Active; 
     
@@ -535,6 +538,44 @@ namespace kvalobs{
                                 ObsPgmParamInfo &paramInfo
                                 ) const;
 
+    };
+
+    /**
+     * Helper class to manage temporary id loggers
+     * for a thread.
+     *
+     * On construction an logger is created. On destruction
+     * the logger is removed.
+     *
+     * The filename of the logger is nN-tT.log.
+     * Where N is the stationid ant T is the typeid.
+     */
+    class IdlogHelper {
+       IdlogHelper();
+       IdlogHelper( const IdlogHelper &);
+       IdlogHelper operator=(const IdlogHelper &);
+       kvalobs::decoder::DecoderBase *decoder;
+       std::string logid_;
+
+    public:
+       IdlogHelper( int stationid, int typeid_,
+                    kvalobs::decoder::DecoderBase *decoder_ )
+       : decoder( decoder_ )
+       {
+          std::ostringstream ost;
+          ost << "n" << stationid << "-t" << typeid_;
+          logid_ = ost.str();
+
+          if( decoder )
+             decoder->createLogger( logid_ );
+       }
+
+       ~IdlogHelper() {
+          if( decoder )
+             decoder->removeLogger( logid_ );
+       }
+
+       std::string logid()const{ return logid_;}
     };
     
     /** @} */
