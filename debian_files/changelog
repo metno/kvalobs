@@ -1,3 +1,12 @@
+kvalobs (2.3.2~pre1-1) lucid; urgency=low
+
+  * kvDataInputd. Implemented use of transactor to add data to the db.
+  * kvDataInputd. Check for updated and duplicate message before inserting data to the db.
+  * kvDataInputd. Create a log file for each stationid, typeid and decoder combination.
+  * kvDataInputd. Lot of changes in the logging system. Maybe the log is useful fore the first time :-).
+  
+ -- Børge Moe <borge.moe@met.no>  Thu, 20 Jan 2011 17:20:00 +0100
+
 kvalobs (2.3.1~pre1-1) lucid; urgency=low
 
   * kvDataInputd. Implemented use of transactor to add data to the db.
@@ -5,7 +14,7 @@ kvalobs (2.3.1~pre1-1) lucid; urgency=low
   * kvDataInputd. Create a log file for each stationid, typeid and decoder combination.
   * kvDataInputd. Lot of changes in the logging system. Maybe the log is useful fore the first time :-).
   
- -- Børge Moe <borge.moe@met.no>  Mon, 22 Nov 2010 12:15:00 +0100
+ -- Børge Moe <borge.moe@met.no>  Thu, 20 Jan 2011 15:15:00 +0100
 
 kvalobs (2.3.1-1) lucid; urgency=low
 
