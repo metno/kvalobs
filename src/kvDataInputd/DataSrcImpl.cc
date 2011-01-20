@@ -58,9 +58,9 @@ DataSrcImpl::newData(const char* data, const char* obsType)
   
   milog::LogContext logContext("CORBA(DataSrcImpl)"); 
 
-  LOGINFO("newData: arrived!\n"); 
-  LOGDEBUG("obsType: " << obsType << 
-	   "\ndata: [" << data << "]");
+//  LOGINFO("newData: arrived!\n");
+//  LOGDEBUG("obsType: " << obsType <<
+//	   "\ndata: [" << data << "]");
 
   try{
     res=new Result();
@@ -92,7 +92,7 @@ DataSrcImpl::newData(const char* data, const char* obsType)
     app.releaseDecodeCommand(decCmd);
     res->res=CKvalObs::CDataSource::ERROR;
     res->message="SHUTDOWN: In the proccess of shuting down!";
-    LOGERROR("Shutdown in proccess!");
+    LOGINFO("Shutdown in proccess!");
     return res;
   }
 
