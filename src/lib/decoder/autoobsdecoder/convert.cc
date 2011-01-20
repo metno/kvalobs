@@ -155,16 +155,16 @@ namespace kvalobs {
          return true;
       }
       
-      DataConvert::DataConvert(ParamList &p)
+      DataConvert::DataConvert(ParamList &p, const std::string &logid_)
          :  paramList(p), hasRRRtr_(false), 
-            hasSa( false ), hasSd( false ), hasEm( false ) 
+            hasSa( false ), hasSd( false ), hasEm( false ), logid( logid_ )
       {
       }
 
       void DataConvert::setSaSdEm( const std::string &sa_sd_em)
       {
          if( sa_sd_em.length() != 3 ) {
-            LOGDEBUG("DataConvert::setSaSdEm: sa_sd_em.length()!=3: (" << sa_sd_em.length() << ")" );
+            IDLOGDEBUG(logid, "DataConvert::setSaSdEm: sa_sd_em.length()!=3: (" << sa_sd_em.length() << ")" );
             return;
          }
          
@@ -485,7 +485,7 @@ namespace kvalobs {
 	  
 	         if(id=="_Rt"){
 	            RRRtr_.rt=atoi(spVal.c_str());
-	            LOGDEBUG("-- _Rt (" << spVal << ") : " <<  RRRtr_.rt);
+	            IDLOGDEBUG( logid,"-- _Rt (" << spVal << ") : " <<  RRRtr_.rt);
 	            continue;
 	         }else if(id=="_RRR"){
 	            if(spVal.length()>=3){
@@ -493,13 +493,13 @@ namespace kvalobs {
 		               if(spVal[0]=='9' && spVal[1]=='9'){
 		                  RRRtr_.rt=spVal[2]-'0';
 		                  RRRtr_.RRR=0;
-		                  LOGDEBUG("-- _RRR (" << spVal << ") : " << RRRtr_.RRR <<
+		                  IDLOGDEBUG( logid, "-- _RRR (" << spVal << ") : " << RRRtr_.RRR <<
 			                        " rt: " << RRRtr_.rt);
 		               }else if(spVal=="000"){
 		                  RRRtr_.RRR=-1;
 		               }else{
 		                  RRRtr_.RRR=atoi(spVal.c_str());
-		                  LOGDEBUG("-- _RRR (" << spVal << ") : " << RRRtr_.RRR );
+		                  IDLOGDEBUG( logid, "-- _RRR (" << spVal << ") : " << RRRtr_.RRR );
 		               }
 				
 		               hasRRRtr_=true;
@@ -531,7 +531,7 @@ namespace kvalobs {
 	               f=lexical_cast<float>(spVal);
 	            }
 	            catch(...){
-	               LOGERROR("Format error (FX): (" << spVal << "). Not a number!");
+	               IDLOGERROR(logid, "Format error (FX): (" << spVal << "). Not a number!");
 	               continue;
 	            }
 	    
@@ -547,7 +547,7 @@ namespace kvalobs {
 	               i=lexical_cast<int>(spVal);
 	            }
 	            catch(...){
-	               LOGERROR("Format error (DD): (" << spVal << "). Not a number!");
+	               IDLOGERROR( logid, "Format error (DD): (" << spVal << "). Not a number!");
 	               continue;
 	            }
 	    
@@ -564,7 +564,7 @@ namespace kvalobs {
 	               tw=lexical_cast<float>(spVal.substr(1));
 	            }
 	            catch(...){
-	               LOGERROR("Format error (TW): (" << spVal << "). Not a number!");
+	               IDLOGERROR( logid,"Format error (TW): (" << spVal << "). Not a number!");
 	               continue;
 	            }
 	    
@@ -578,7 +578,7 @@ namespace kvalobs {
 	            }
 	            catch(...){
 	              //This shall newer happend, but you never know ....
-	               LOGERROR("Cant convert float (TW): " << tw << " to string!");
+	               IDLOGERROR( logid, "Cant convert float (TW): " << tw << " to string!");
 	               continue;
 	            }
 	         }else if(id=="V1" || id=="V2" || id=="V3" || id=="V4" || id=="V5" ||
@@ -795,7 +795,7 @@ namespace kvalobs {
             {
                string sa;
                
-               LOGDEBUG("hasSaSdEm: hasSa=" << (hasSa?"t":"f") << " hasSd=" << (hasSd?"t":"f") << " hasEm=" << (hasEm?"t":"f") << endl
+               IDLOGDEBUG(logid, "hasSaSdEm: hasSa=" << (hasSa?"t":"f") << " hasSd=" << (hasSd?"t":"f") << " hasEm=" << (hasEm?"t":"f") << endl
                         << " saSdEm_.hasEm=" << (saSdEm_.hasEm?"t":"f") << " saSdEm_.hasSa=" << (saSdEm_.hasSa?"t":"f") 
                         << " saSdEm_.hasSd=" << (saSdEm_.hasSd?"t":"f") << endl
                         << "saSdEm_.sa=" << saSdEm_.sa << " saSdEm_.em=" << saSdEm_.em 

@@ -46,24 +46,6 @@ using namespace miutil;
 using namespace boost;
 using namespace kvalobs;
 
-namespace {
-  class LogidHelper {
-     kvalobs::decoder::DecoderBase *decoder;
-     std::string logid;
-
-  public:
-     LogidHelper( kvalobs::decoder::DecoderBase *decoder, const std::string &logid )
-        : decoder( decoder ), logid( logid )
-     {
-        decoder->createLogger( logid );
-     }
-
-     ~LogidHelper() {
-        decoder->removeLogger( logid );
-     }
-  };
-}
-
 AutoObsDecoder::
 AutoObsDecoder(
 	dnmi::db::Connection   &con,
@@ -80,7 +62,6 @@ AutoObsDecoder(
 AutoObsDecoder::
 ~AutoObsDecoder()
 {
-	LOGDEBUG("DESTRUCTOR: AutoObsDecoder!!!");
 }
 
 miutil::miString 
@@ -99,8 +80,8 @@ getMetaSaSdEm( int stationid, int typeid_, const miutil::miTime &obstime )
    
    if( obsPgm.obstime.undef() || obsPgm.obstime != obstime ){
       if( ! loadObsPgmParamInfo( stationid, typeid_, obstime, obsPgm ) ){
+         IDLOGDEBUG( logid, "DBERROR: SaSdEm:  000");
          return "000";
-         LOGDEBUG("DBERROR: SaSdEm:  000");
       }
    }
    
@@ -121,7 +102,7 @@ getMetaSaSdEm( int stationid, int typeid_, const miutil::miTime &obstime )
          sasdem[2]='1';
    }
    
-   LOGDEBUG("SaSdEm: " << sasdem);
+   IDLOGDEBUG( logid, "SaSdEm: " << sasdem);
    
    return sasdem;
 }
@@ -233,7 +214,7 @@ checkObservationTime(int typeId,
   	const kvalobs::kvTypes *kvType=findType(typeId);
 
   	if(!kvType){
-    	LOGWARN("Unknown typeid: " << typeId);
+    	IDLOGWARN(logid, "Unknown typeid: " << typeId);
     	return 0;
   	} 
   
@@ -292,7 +273,6 @@ execute(miutil::miString &msg)
 {
   	const int             VISUEL_TYPEID=6;
   	const int             AWS_TYPEID=3;
-  	DataConvert           converter( paramList );
   	std::vector<DataElem> elems;
   	string                tmp;
   	CommaString           data;
@@ -314,14 +294,20 @@ execute(miutil::miString &msg)
   	list<kvTextData>            textDataList;
   	list<kvTextData>::iterator  itTextDataList;
 
-  	ostringstream logid;
+  	warnings = false;
+  	logid.clear();
 
   	milog::LogContext lcontext("AutoObsDecoder");
   
-  	LOGINFO("New observation: stationid=" << stationid << endl);
-  
-  	if(stationid== 0){
-    	LOGERROR("Missing stationid!\nSaved in table rejectdecode!");
+  	if( stationid == 0 ){
+  	   ostringstream o;
+  	   ostringstream omsg;
+  	   if( typeId <= 0 )
+  	      o << "<NA>";
+  	   else
+  	      o << typeId;
+
+    	omsg << "Decoder: " << name() << ". Format invalid. Missing stationid! typeid: " << o.str() << endl;
     	msg+="\n--- Missing stationid!";
 
     	ostringstream ost;
@@ -332,15 +318,24 @@ execute(miutil::miString &msg)
 													name(),
 				     								msg);
     
-    	if(!putRejectdecodeInDb(rejected))
-      	LOGERROR("Cant save rejected observation!");
-    
+    	if(!putRejectdecodeInDb(rejected)) {
+      	omsg << "Cant save rejected observation! typeid: "
+      	         << o.str() << endl << "Observation:" << endl << obs;
+    	} else {
+    	  omsg << "Saved rejected observation! typeid: " <<  o.str();
+    	}
+
+    	LOGERROR( omsg.str() );
     	return Rejected;
   	}
   
   	if(typeId<0){
-    	LOGERROR("Format error in type!\nSaved in table rejectdecode!");
+  	   ostringstream omsg;
+
+  	   omsg << "Decoder: " << name() << ". Format invalid. Missing typeid! stationid: "
+  	        << stationid << endl;
     	msg+="--- Format error in type!";
+
     	ostringstream ost;
     	ost << "<obsType: [" << obsType << "]> observation: [" << obs << "]";
 
@@ -349,15 +344,23 @@ execute(miutil::miString &msg)
 				     								name(),
 				     								msg);
     
-    	if(!putRejectdecodeInDb(rejected))
-      	LOGERROR("Cant save rejected observation!");
+    	if(!putRejectdecodeInDb(rejected)) {
+    	   omsg << "Cant save rejected observation! stationid: "
+    	        << stationid << endl << "Observation:" << endl << obs;
+    	} else {
+    	   omsg << "Saved rejected observation! stationid: " <<  stationid;
+    	}
+
+    	LOGERROR( omsg );
     
     	return Rejected;
   	}
   
-  	logid << "n" << stationid << "-t" << typeId;
-  	LogidHelper logContext( this, logid.str() );
+  	IdlogHelper idlogHelper( stationid, typeId, this );
+  	logid = idlogHelper.logid();
 
+  	LOGINFO("Decoder: " << name() << ". New observation: stationid=" << stationid << " typeid: " << typeId << endl);
+  	IDLOGINFO( logid, "New observation.");
 
   	obs.trim();
   	obs += "\n";
@@ -379,32 +382,44 @@ execute(miutil::miString &msg)
 				     								"Invalid format."
 				     								"First line must identify the station.");
     
-    	if(!putRejectdecodeInDb(rejected))
-      	LOGERROR("Cant save rejected observation!");
+    	if( !putRejectdecodeInDb( rejected ) ) {
+      	LOGERROR("Decoder: " << name() << ". Invalid format. Cant save rejected observation! stationid: "
+      	          << stationid << " typeid: " << typeId << endl
+      	          << "Observation:" << endl << obs );
+      	IDLOGERROR( logid, "Invalid format. Cant save rejected observation!"
+      	            << "Observation:" << endl << obs );
+    	} else {
+    	   LOGERROR("Decoder: " << name() << ". Invalid format. Saved rejected observation! stationid: "
+    	             << stationid << " typeid: " << typeId );
+    	   IDLOGERROR( logid, "Invalid format. Cant save rejected observation!"
+    	               << "Observation:" << endl << obs );
+    	}
     
     	return Rejected;
   	}
   
   	header.init(tmp);
-  
+  	DataConvert converter( paramList, logid );
+
   	while(getline(istr, tmp)){
     	dataList.clear();
     	textDataList.clear();
 
-    	LOGDEBUG("Data: " << tmp << endl);
+    	IDLOGDEBUG(logid, "Data: " << tmp << endl);
     	line++;
     
     	data.init(tmp);
     
     	if((data.size() - 1) != header.size()){
-      	LOGDEBUG("Inavlid dataformat: header.size=" << header.
+    	   warnings=true;
+      	IDLOGWARN(logid, "Invalid data format: header.size=" << header.
 	      			size() << endl << "                    data.size-1=" <<
 	       			data.size() - 1 << endl);
       	continue;
     	}	
     
     	obstime = miTime(data[0]);
-    	LOGDEBUG("  Data: obstime:  " << obstime << endl);
+    	IDLOGDEBUG( logid, "  Data: obstime:  " << obstime << endl);
     
     	converter.resetRRRtr();
     	converter.resetSaSdEm();
@@ -434,17 +449,20 @@ execute(miutil::miString &msg)
 	  				elems = converter.convert(header[i], data[i + 1], obstime);
 				}
 				catch(UnknownParam &ex){
-	  				LOGERROR("Exception: UnknownParam: " << ex.what() << endl <<
+	  				IDLOGERROR( logid, "Exception: UnknownParam: " << ex.what() << endl <<
 		   					"---------: data: " << data[i + 1] << endl);
+	  				warnings = true;
 	  				continue;
 				}
 				catch(BadFormat &ex){
-	  				LOGERROR("Exception: BadFormat" << ex.what() << endl <<
+	  				IDLOGERROR( logid, "Exception: BadFormat" << ex.what() << endl <<
 		   					"---------: data: " << data[i + 1] << endl);
 	  				continue;
+	  				warnings = true;
 				}
 				catch(...){
-	  				LOGERROR("Unknown EXCEPTION: from converter.convert!");
+				   warnings = true;
+	  				IDLOGERROR( logid, "Unknown EXCEPTION: from converter.convert!");
 	  				continue;
 				}
 	
@@ -488,16 +506,18 @@ execute(miutil::miString &msg)
 	      
 	      			dataList.push_back(d);
 	    			}else{
-	      			LOGWARN("Cant convert param value to float <" 
+	    			   warnings = true;
+	      			IDLOGWARN( logid, "Cant convert param value to float <"
 		      				  << elems[k].sVal() << ">");
 	    			}
 	  			}
 	
-				LOGDEBUG(logs.str());
+				IDLOGDEBUG( logid, logs.str());
       	}
       	catch(std::exception & ex) {
-				LOGERROR("Exception: " << ex.what() << endl <<
-		 					"---------: data: " << data[i + 1] << endl);
+      	   warnings = true;
+				IDLOGERROR( logid, "Exception: " << ex.what() << endl <<
+		 	    				"---------: data: " << data[i + 1] << endl);
       	}
     	}
     
@@ -524,7 +544,7 @@ execute(miutil::miString &msg)
 		   					"");
 	      
 	      		d.useinfo(7, checkObservationTime(typeId, tbtime, obstime));
-	      		LOGDEBUG("RRRtr: " << paramid << " -- RR: " << rr );
+	      		IDLOGDEBUG( logid, "RRRtr: " << paramid << " -- RR: " << rr );
 
 	      		dataList.push_back(d);
 
@@ -547,8 +567,9 @@ execute(miutil::miString &msg)
 	      		dataList.push_back(dd);
 				}
 				catch(std::exception & ex) {
-	  				LOGERROR("Exception: " << ex.what() << endl <<
-		   					"---------: DataConvert::RRRtr: paramid"<< paramid << endl);
+				   warnings = true;
+	  				IDLOGERROR( logid, "Exception: " << ex.what() << endl <<
+		   					   "---------: DataConvert::RRRtr: paramid"<< paramid << endl);
 				}
  
       	}	
@@ -587,24 +608,30 @@ execute(miutil::miString &msg)
 		   
      	}
 
-		if( addDataToDb( obstime, stationid, typeidWithSave, dataList, textDataList, priority, logid.str() ) ) {
+		if( addDataToDb( obstime, stationid, typeidWithSave, dataList, textDataList, priority, logid ) ) {
 		   count += dataList.size() + textDataList.size();
 		}
   	}
   
   	if(count>0){
     	if(count==nExpectedParams){
-      	LOGDEBUG("Return from decoder: Ok!\n");
+      	IDLOGDEBUG( logid, "Return from decoder: Ok!\n");
     	}else{
-      	LOGWARN("Expected: " <<  nExpectedParams << " got: " << count );
+      	IDLOGWARN(logid, "Expected: " <<  nExpectedParams << " got: " << count );
     	}
-    
+
+    	if( warnings ) {
+    	   LOGWARN("Decoder: " << name() << ". Data saved with warnings. stationid: " << stationid << " typeid: " << typeId);
+    	} else {
+    	  LOGINFO("Decoder: " << name() <<". Data saved. stationid: " << stationid << " typeid: " << typeId);
+    	}
+
    	return Ok;
   	}else if(nExpectedParams==0){
-    	LOGWARN("No data in message!");
+    	LOGINFO("Decoder: " << name() << ". No data in message! stationid: " << stationid << " typeid: " << typeId );
     	return Ok;
   	}else{
-    	LOGERROR("NotSaved: Data not saved!");
+    	LOGERROR("Decoder: " << name() <<". NotSaved: Data not saved! stationid: " << stationid << " typeid: " << typeId );
     	return NotSaved;
   	}
 }

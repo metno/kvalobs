@@ -278,9 +278,10 @@ namespace kvalobs{
 	     RRRtr RRRtr_;
 	     bool hasSa, hasSd, hasEm; //Is the station setup with Sa, SD and/or EM. 
 	     SaSdEm saSdEm_;
+	     std::string logid;
 
         public:
-	        DataConvert(ParamList &p );
+	        DataConvert(ParamList &p, const std::string &logid );
 	
 	        void setSaSdEm( const std::string &sa_sd_em);
 	        
