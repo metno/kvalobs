@@ -51,6 +51,8 @@ using namespace miutil;
 using namespace boost;
 using namespace kvalobs;
 
+
+
 kvalobs::decoder::kldecoder::
 KlDecoder::
 KlDecoder( dnmi::db::Connection   &con,
@@ -89,41 +91,12 @@ name() const
    return "KlDataDecoder";
 }
 
-bool
-kvalobs::decoder::kldecoder::
-KlDecoder::
-saveData(list<kvalobs::kvData> &data, 
-         bool &rejected,
-         std::string &rejectedMessage)
-{
-   list<kvalobs::kvData>::iterator it=data.begin();
-   int i=0;
-   rejected=false;
-
-   for(;it!=data.end(); it++){
-      if(it->obstime().undef() || it->tbtime().undef()){
-         rejectedMessage="Missing obsTime or tbtime for observation!";
-         rejected=true;
-         continue;
-      }
-
-      if(!putKvDataInDb(*it)){
-         LOGWARN("Cant save data:\n" << it->toSend());
-      }else{
-         i++;
-      }
-   }
-
-   return i!=0 && !rejected;
-}
 
 kvalobs::decoder::DecoderBase::DecodeResult 
 kvalobs::decoder::kldecoder::
 KlDecoder::
 execute(miutil::miString &msg)
 {
-   string logid;
-   ostringstream olog;
    list<kvalobs::kvData> dataList;
    list<kvalobs::kvTextData> textDataList;
    miTime                nowTime(miTime::nowTime());
@@ -145,62 +118,91 @@ execute(miutil::miString &msg)
    int                   priority=10;
    milog::LogContext lcontext(name());
 
-   LOGINFO( "New observation: stationid=" << stationid << endl <<
-            "----------------    typeid=" << typeId);
+   warnings=false;
+   logid.clear();
+
+   LOGINFO( "Decoder: " << name() << ". New observation. stationid: " <<
+            stationid << " typeid: " << typeId);
 
    if( stationid == 0 ) {
-      LOGERROR( "Missing stationid!\nSaved in table rejectdecode!" );
+      ostringstream o;
+      if( typeId > 0 )
+         o << typeId;
+      else
+         o << "<NA>";
+
       msg = "Missing stationid!";
       kvalobs::kvRejectdecode rejected( obs,
                                         tbtime,
                                         name(),
                                         msg );
 
-      if( !putRejectdecodeInDb( rejected ) )
-         LOGERROR( "Cant save rejected observation!" );
+      if( !putRejectdecodeInDb( rejected ) ) {
+         LOGERROR( "Decoder: " << name() << ". Can't save rejected observation!"
+                   << " typeid: " << o.str() << "."
+                   << endl << obs );
+      } else {
+         LOGERROR( "Decoder: " << name() << ". Missing stationid! typeid: " << o.str()
+                    << endl << "Saved in table rejectdecode!");
+      }
 
       return Rejected;
    }
 
    if( typeId<0 ) {
-      LOGERROR( "Format error in type!\nSaved in table rejectdecode!" );
       msg = "Format error in type!";
       kvalobs::kvRejectdecode rejected( obs,
                                         tbtime,
                                         name(),
                                         msg );
 
-      if( !putRejectdecodeInDb( rejected ) )
-         LOGERROR( "Can't save rejected observation!" );
+      if( !putRejectdecodeInDb( rejected ) ) {
+         LOGERROR( "Decoder: " << name() << ". Can't save rejected observation!"
+                            << " stationid: " << stationid << "."
+                            << endl << "Observation:" << endl << obs  );
+      } else {
+         LOGERROR( "Decoder: " << name() << ". Missing typeid! stationid: " << stationid
+                   << endl << " Saved in table rejectdecode!" );
+      }
 
       return Rejected;
    }
+
+   IdlogHelper idLog( stationid, typeId, this );
+   logid = idLog.logid();
 
    obs.trim();
    obs += "\n";
 
    istringstream istr(obs);
 
-   LOGINFO( name()                           << endl <<
-            "------------------------------" << endl <<
-            "ObstType : " << obsType         << endl <<
-            "Obs      : " << obs             << endl );
+   IDLOGINFO( idLog.logid(),
+              name()                           << endl <<
+              "------------------------------" << endl <<
+              "ObstType : " << obsType         << endl <<
+              "Obs      : " << obs             << endl );
 
    msg = "OK!";
 
    if( !getline( istr, tmp ) ) {
-      msg = "Inavlid format. No data?!!";
+      msg = "Invalid format. No data?!!";
+      IDLOGERROR( idLog.logid(), "Invalid format. No data.");
+      LOGERROR( "Invalid format. No data. stationid: " << stationid << " typeid: " << typeId );
       return Error;
    }else{
       if( !decodeHeader( tmp, params, msg ) ) {
-         LOGERROR( "INVALID header:" << endl << tmp );
+         LOGERROR("Decoder: " << name() << ". INVALID header. stationid: " <<
+                  stationid << " typeid: " << typeId );
+         IDLOGERROR( idLog.logid(), "INVALID header:" << endl << tmp );
          return Error;
       }
    }
 
    if( params.size() < 1 ) {
       msg = "No parameters in header!";
-      LOGINFO( "No parameters in header!" << endl << "Header: " << tmp );
+      LOGINFO( "Decoder: " << name() << ". No parameters in header! Stationid: "
+               << stationid << " typeid: " << typeId );
+      IDLOGINFO( idLog.logid(), "No parameters in header!" << endl << "Header: " << tmp );
       return Ok;
    }
 
@@ -215,7 +217,9 @@ execute(miutil::miString &msg)
       KlDataArray da;
 
       if( !decodeData( da, params.size(), tmp, lines, msg ) ) {
-         LOGERROR( "Can't decode the data. Reason: " << endl << msg );
+         LOGERROR( "Decoder: " << name() << ". Can't decode the data. Stationid: " <<
+                   stationid << " typeid: " << typeId );
+         IDLOGERROR(  idLog.logid(), "Can't decode the data. Reason: " << endl << msg );
          return Error;
       }
 
@@ -260,7 +264,8 @@ execute(miutil::miString &msg)
                }else if( params[index].name() == "HL" ) {
                   val = decodeutility::HL( val );
                }else{
-                  LOGWARN( "Unsupported as code value: " << params[index].name() );
+                  warnings=true;
+                  IDLOGWARN( idLog.logid(), "Unsupported as code value: " << params[index].name() );
                   continue;
                }
             }
@@ -269,7 +274,8 @@ execute(miutil::miString &msg)
                fval = lexical_cast<float>( val );
             }
             catch(...){
-               LOGERROR( "Invalid value: (" << val << ") not a float!" );
+               warnings = true;
+               IDLOGERROR( idLog.logid(), "Invalid value: (" << val << ") not a float!" );
                continue;
             }
 
@@ -290,27 +296,14 @@ execute(miutil::miString &msg)
          }
       }
 
-      olog.str( "" );
-      olog << "n" << stationid << "-t" << typeId;
 
-      if( logid != olog.str() ) {
-         if( ! logid.empty() )
-            removeLogger( logid );
-
-         logid = olog.str();
-         createLogger( logid );
-      }
-
-      if( addDataToDb( obstime, stationid, typeId, dataList, textDataList, priority, logid) ) {
+      if( addDataToDb( obstime, stationid, typeId, dataList, textDataList, priority, idLog.logid() ) ) {
          count += dataList.size() + textDataList.size();
       }
 
       if(nElemsInLine>0)
          nLineWithData++;
    }
-
-   if( !logid.empty() )
-      removeLogger( logid );
 
    ostringstream ost;
    ost << "# Lines:             " << lines-1 << endl
@@ -321,7 +314,7 @@ execute(miutil::miString &msg)
 
    msg = ost.str();
 
-   LOGINFO( msg );
+   IDLOGINFO( idLog.logid(), msg );
 
    if( lines==1 || ( count == 0 && nExpectedData == 0 ) ){
       msg += "No data!";
@@ -334,9 +327,16 @@ execute(miutil::miString &msg)
          ost << "WARNING: Expected to save " << nExpectedData 
              << " dataelements, but only "  << count
              << " dataelements was saved!";
-
+         warnings = true;
+         IDLOGWARN( idLog.logid(), ost.str() );
          msg += ost.str();
       }
+      if( warnings ) {
+         LOGWARN("Data saved with warnings. stationid: " << stationid << " typeid: " << typeId );
+      } else {
+         LOGINFO("Data saved. stationid: " << stationid << " typeid: " << typeId );
+      }
+
       return Ok;
    }
 
@@ -686,7 +686,7 @@ decodeData(KlDataArray &da,
       ost.str("");
       ost << "decodeData: expected #Data: " << daSize << endl
             << "Found in datastring #: " << dtmp.size() << " line: " << line;
-      LOGERROR(ost.str());
+      IDLOGERROR( logid, ost.str());
       msg=ost.str();
       return false;
    }
@@ -695,7 +695,7 @@ decodeData(KlDataArray &da,
    for(it=dtmp.begin();it!=dtmp.end(); it++)
       ost << " [" << *it<< "]";
 
-   LOGDEBUG("decodeData: Data in string: " << endl <<
+   IDLOGDEBUG( logid,"decodeData: Data in string: " << endl <<
             "[" << sdata<< "]" << endl <<
             ost.str());
 
@@ -724,7 +724,7 @@ decodeData(KlDataArray &da,
             ost << "Invalid format: missing ')' in data ["+buf+"]"
                   << " at index: " << index << " line: " << line;
             msg=ost.str();
-            LOGERROR("decodeData: " << ost.str());
+            IDLOGERROR(logid,"decodeData: " << ost.str());
             return false;
          }
 
@@ -738,7 +738,7 @@ decodeData(KlDataArray &da,
             ost << "Invalid format: wrong number of values in" <<
                   " optional part of data element: " << index << " line: " << line;
             msg=ost.str();
-            LOGERROR("decodeData: " << ost.str());
+            IDLOGERROR( logid, "decodeData: " << ost.str());
             return false;
          }
 
@@ -752,7 +752,8 @@ decodeData(KlDataArray &da,
                   << "found " << buf.length() << " characters at index: "
                   << index << " line: " << line;
             msg=ost.str();
-            LOGWARN("decodeData: " << ost.str());
+            warnings = true;
+            IDLOGWARN(logid,"decodeData: " << ost.str());
          }
 
          if(cs.size()==2){
@@ -766,7 +767,8 @@ decodeData(KlDataArray &da,
                      << "found " << buf.length() << " characters at index: "
                      << index << " line: " << line;
                msg=ost.str();
-               LOGWARN("decodeData: " << ost.str());
+               warnings = true;
+               IDLOGWARN( logid, "decodeData: " << ost.str());
             }
          }
       }
