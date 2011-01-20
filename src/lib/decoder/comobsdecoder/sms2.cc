@@ -125,7 +125,7 @@ Sms2::createObsTime(const std::string &YYMMDDhhmm,
    char buf[100];
    miTime now(nowTime());
 
-   LOGDEBUG5("SMSDecode2::createObsTime: <" << YYMMDDhhmm << ">" <<endl);
+   IDLOGDEBUG5( logid, "SMSDecode2::createObsTime: <" << YYMMDDhhmm << ">" <<endl);
 
    if(sscanf(YYMMDDhhmm.c_str(),"%2d%2d%2d%2d%2d", &year, &mnt, &d, &h, &m)!=5)
       return std::string();  //Null date
@@ -237,7 +237,7 @@ decodeV1V2V3(const std::string &w_,
 
    if((w.size()%2)!=0){
       err << "Ugyldig værtegn: antall siffer må være et partall!";
-      LOGERROR("Ugyldig værtegn: antall siffer må være et partall!");
+      IDLOGERROR( logid, "Ugyldig værtegn: antall siffer må være et partall!");
       return -1;
    }
 
@@ -286,8 +286,8 @@ decodeV1V2V3(const std::string &w_,
       else if(v==98)
          vs="28";
       else{
-         err << "ERROR: V�rtegn: " << k+1 << " ugyldig kode (" << vs << ")!\n";
-         LOGERROR("ERROR: V�rtegn: " << k+1 << " ugyldig kode (" << vs << ")!");
+         err << "ERROR: Værtegn: " << k+1 << " ugyldig kode (" << vs << ")!\n";
+         IDLOGERROR( logid, "ERROR: Værtegn: " << k+1 << " ugyldig kode (" << vs << ")!");
          return -1;
       }
 
@@ -300,7 +300,7 @@ decodeV1V2V3(const std::string &w_,
       else if(k==2)
          v3=vs;
       else{
-         LOGERROR("Sms2::decodeV1V2V3: Ugyldig værtegn. Mer enn 6 siffer.\n");
+         IDLOGERROR( logid, "Sms2::decodeV1V2V3: Ugyldig værtegn. Mer enn 6 siffer.\n");
          err << "Sms2::decodeV1V2V3: Ugyldig værtegn. Mer enn 6 siffer.\n";
          return -1;
       }
@@ -333,7 +333,7 @@ Sms2::decodeAndAddV1V2V3( DecodedDataElem &data,
          buf=sstrm.str();
 
          if(!buf.empty()){
-            LOGDEBUG1("decode2kv: Værtegn: " + what +" : " +buf);
+            IDLOGDEBUG1( logid, "decode2kv: Værtegn: " + what +" : " +buf);
          }
       }
    }
@@ -388,7 +388,7 @@ Sms2::decode(long stationid,
       smsData=new DecodedData(paramList, stationid, smscode+300);
    }
    catch(...){
-      LOGFATAL("NOMEM: failed to allocate memory for SmsData!" << endl);
+      IDLOGFATAL( logid, "NOMEM: failed to allocate memory for SmsData!" << endl);
       return 0;
    }
 
@@ -402,25 +402,25 @@ Sms2::decode(long stationid,
       stripNewLine(buf);
 
       if(buf.length()<3){
-         LOGERROR("Invalid format!");
+         IDLOGERROR( logid, "Invalid format!");
          continue;
       }
 
       sep=separator(buf);
 
       if(sep<0){
-         LOGERROR("Invalid dataformat. Unknown element separator.");
+         IDLOGERROR(logid, "Invalid dataformat. Unknown element separator.");
          continue;
       }
 
       sepBuf[0]=sep;
-      LOGINFO("Using seperator <" + string(sepBuf) + ">.");
+      IDLOGINFO( logid, "Using seperator <" + string(sepBuf) + ">.");
       CommaString cStr(buf, sep);
 
       initInData(&cStr, PARAM_IN);
 
       if(cStr.size()<3){
-         LOGERROR("Invalid dataformat. Too few elements.");
+         IDLOGERROR( logid, "Invalid dataformat. Too few elements.");
          continue;
       }
 
@@ -428,7 +428,7 @@ Sms2::decode(long stationid,
       if(!doKvPrecipitation(data, cStr, errs)){
          string mybuf;
          cStr.copy(mybuf);
-         LOGERROR("Invalid dataformat cant do precipitation.");
+         IDLOGERROR( logid, "Invalid dataformat cant do precipitation.");
          rejected.push_back(kvRejectdecode(mybuf, miTime::nowTime(), "comobs/typeid=302",
                                            errs.str()));
          hasRejected=true;
@@ -454,9 +454,9 @@ Sms2::decode(long stationid,
 
       if( data.dataSize() > 0 || data.textDataSize() > 0 ) {
          smsData->add( data );
-         LOGINFO("SmsMelding decoded." << endl);
+         IDLOGINFO( logid, "SmsMelding decoded." << endl);
       } else {
-         LOGINFO("No data." << endl);
+        IDLOGINFO( logid, "No data." << endl);
       }
    }
 
@@ -515,7 +515,7 @@ doKvPrecipitation(kvalobs::decodeutil::DecodedDataElem &data,
       sprintf(sRR, "%0.1f", RR);
    }
 
-   LOGDEBUG2("KLSTART: <" << klStart << ">" << endl
+   IDLOGDEBUG2( logid, "KLSTART: <" << klStart << ">" << endl
              << "KLOBS:   <" << klObs   << ">" << endl);
 
    //if one of klStart or klObs is empty and the other
@@ -531,16 +531,16 @@ doKvPrecipitation(kvalobs::decodeutil::DecodedDataElem &data,
       ret=createObsTime(klComObs, dtComObs);
 
       if(ret.empty()){
-         LOGWARN("Invalid KLCOMOBS" << endl);
+         IDLOGWARN( logid, "Invalid KLCOMOBS" << endl);
          dtComObs=miTime(); //Set obsTime til undef
       }else{
-         LOGDEBUG2("KLCOMOBS time: " << dtComObs << endl);
+         IDLOGDEBUG2( logid, "KLCOMOBS time: " << dtComObs << endl);
       }
    }
 
    if(dtComObs.undef()){
       dtComObs=nowTime();
-      LOGDEBUG2("CURRENT time: " << dtComObs << endl);
+      IDLOGDEBUG2( logid, "CURRENT time: " << dtComObs << endl);
    }
 
    if(klObs.empty() && klStart.empty()){
@@ -559,11 +559,11 @@ doKvPrecipitation(kvalobs::decodeutil::DecodedDataElem &data,
       //}
 
       if(abs(dif)>180){
-         LOGDEBUG6("Set useflag(1)=1!" << endl);
+         IDLOGDEBUG6( logid, "Set useflag(1)=1!" << endl);
          useInfo.set(1, 1);
       }
 
-      LOGDEBUG2("CORRECTED obstime: " << t6 << endl);
+      IDLOGDEBUG2( logid, "CORRECTED obstime: " << t6 << endl);
 
       data.setDate(t6);
       data.addData("RR_24", sRR, useInfo);
@@ -594,11 +594,11 @@ doKvPrecipitation(kvalobs::decodeutil::DecodedDataElem &data,
 
       if(dtStart.undef() || dtObs.undef()){
          ost << "Either <fradato> or <tildato> is invalid!!";
-         LOGWARN("Invalid KLSTART or KLOBS!" << endl);
+         IDLOGWARN( logid, "Invalid KLSTART or KLOBS!" << endl);
          return false;
       }
 
-      LOGDEBUG6("dtComObs: " << dtComObs << endl <<
+      IDLOGDEBUG6( logid, "dtComObs: " << dtComObs << endl <<
                 "dtStart:  " << dtStart << endl <<
                 "dtObs:    " << dtObs << endl <<
                 "dif:      " << miTime::minDiff(dtComObs, dtObs));
@@ -606,23 +606,23 @@ doKvPrecipitation(kvalobs::decodeutil::DecodedDataElem &data,
 
       if(miTime::minDiff(dtComObs, dtObs)<-60){
          ost << "The observation is to far in the future (>+1 hour)!";
-         LOGWARN("The observation is to far in the future (>+1 hour)!");
+         IDLOGWARN(logid,"The observation is to far in the future (>+1 hour)!");
          return false;
       }
 
       if(dtObs<dtStart){
          ost << "Invalid observation interval <tildato> < 'fradato'!";
-         LOGWARN("Invalid observation interval <tildato> < 'fradato'!");
+         IDLOGWARN( logid, "Invalid observation interval <tildato> < 'fradato'!");
          return false;
       }
 
       dif=miTime::minDiff(dtObs, dtStart);
-      LOGDEBUG("dif: " << dif << "(" << dif/1440 << " days " << dif%1440
+      IDLOGDEBUG( logid, "dif: " << dif << "(" << dif/1440 << " days " << dif%1440
                << " hour " << dif-(dif/1440)*1440 - dif%1440 << " min)");
 
       if(dif<1260){ //less than 21 hour
          ost << "Ivalid observation, to few hour (<21 hour)!";
-         LOGWARN("Ivalid observation, to few hour (<21 hour)!");
+         IDLOGWARN( logid, "Ivalid observation, to few hour (<21 hour)!");
          return false;
       }
 
@@ -673,7 +673,7 @@ doKvPrecipitation(kvalobs::decodeutil::DecodedDataElem &data,
    if( sSaSdEm[1] != '0')
       hasSd=true;
 
-   LOGERROR("sSaSdEm. " << sSaSdEm << " hasSa: " << (hasSa?"t":"f") << " hasSd: " << (hasSd?"t":"f"));
+   IDLOGERROR( logid, "sSaSdEm. " << sSaSdEm << " hasSa: " << (hasSa?"t":"f") << " hasSd: " << (hasSd?"t":"f"));
    cleanString(SA);
    cleanString(SD);
 

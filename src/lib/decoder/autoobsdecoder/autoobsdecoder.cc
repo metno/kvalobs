@@ -367,10 +367,9 @@ execute(miutil::miString &msg)
   
   	istringstream istr(obs);
   
-  	LOGINFO(name()                           << endl <<
-	  		  "------------------------------" << endl <<
-	  		  "ObstType : " << obsType         << endl << 
-	  		  "Obs      : " << obs             << endl);
+  	IDLOGINFO(logid,
+  	          "ObstType : " << obsType         << endl <<
+  	          "Obs      : " << obs             << endl);
   
   	msg = "OK!";
   

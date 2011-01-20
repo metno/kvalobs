@@ -111,11 +111,11 @@ addStationInfo( dnmi::db::Connection *con,
       con->exec( q.str() );
    }
    catch( const std::exception &ex ) {
-      cerr << "addStationInfo: '" << q.str() << "' \nReason: " << ex.what() << "\n";
+      log << "addStationInfo: '" << q.str() << "' \nReason: " << ex.what() << endl;
       throw;
    }
    catch( ... ) {
-      cerr << "addStationInfo: '" << q.str() << "' \nReason: Unknown \n";
+      log << "addStationInfo: '" << q.str() << "' \nReason: Unknown." << endl;
       throw;
    }
 
@@ -139,11 +139,11 @@ addStationInfo( dnmi::db::Connection *con,
       con->exec( q.str() );
    }
    catch( const std::exception &ex ) {
-      cerr << "addStationInfo: '" << q.str() << "' \nReason: " << ex.what() << "\n";
+      log << "addStationInfo: '" << q.str() << "' \nReason: " << ex.what() << endl;
       throw;
    }
    catch( ... ) {
-      cerr << "addStationInfo: '" << q.str() << "' \nReason: Unknown \n";
+      log << "addStationInfo: '" << q.str() << "' \nReason: Unknown." << endl;
       throw;
    }
 
@@ -216,7 +216,6 @@ getTimestamp( dnmi::db::Connection *con, int &msec )
 
    if (res->hasNext()) {
       dnmi::db::DRow & row = res->next();
-      cerr << "Now: " << row[0] << endl;
       return miutil::isoTimeWithMsec( row[0], msec );
    }
 
@@ -234,7 +233,6 @@ getUniqTbtime( dnmi::db::Connection *con, int &msec )
          t = getTimestamp(con, msec );
 
       if( t.undef() ) {
-         cerr << "getUniqTbtime: undef.\n";
          continue;
       }
 
@@ -374,7 +372,6 @@ getDataWithTbtime( dnmi::db::Connection *con,
       return false;
 
    res.reset( dbRes );
-
 
    while (res->hasNext()) {
       dnmi::db::DRow & row = res->next();
@@ -845,8 +842,8 @@ operator()( dnmi::db::Connection *conection )
          mylog << it->obstime() << "," << it->stationID() << "," << it->typeID() <<","
                << it->paramID() << "," << it->sensor() <<"," << it->level()
                << "," << it->original() << endl;
-      IDLOGDEBUG( logid, "NewData: stationid: " << stationid << " typeid: " << typeid_
-                  << " obstime: " << obstime << endl << mylog.str() );
+      log << "NewData: stationid: " << stationid << " typeid: " << typeid_
+          << " obstime: " << obstime << endl << mylog.str()  << endl;
    }
 
    stationInfoList_->clear();
@@ -899,22 +896,15 @@ void
 DataUpdateTransaction::
 onSuccess()
 {
-  LOGINFO( "Success: stationid: " << stationid << " Typeid: "
-           << typeid_ << " obstime: " << obstime << "\n" << log.str() );
+   IDLOGINFO( logid, log.str() );
 
-  if( ! logid.empty() ){
-     IDLOGINFO( logid, log.str() );
-  }
-
-  *ok_ = true;
+   *ok_ = true;
 }
 
 void
 DataUpdateTransaction::
 onRetry()
 {
-   LOGDEBUG( "Retry transaction. stationid: " << stationid << " Typeid: "
-            << typeid_ << " obstime: " << obstime << "\nMessage: " << log.str() );
 
    if( ! logid.empty() ) {
       IDLOGDEBUG( logid, "Retry transaction.\n" << log.str() );
@@ -933,10 +923,6 @@ onAbort( const std::string &driverid,
          const std::string &errorMessage,
          const std::string &errorCode )
 {
-   LOGDEBUG("Transaction aborted: stationid: " << stationid << " Typeid: "
-            << typeid_ << " obstime: " << obstime << "\n Driver: '" << driverid << "' ErrorCode: '"
-            << errorCode << "\nReason: " << errorMessage );
-
    if( !logid.empty() ) {
       IDLOGINFO( logid, "Transaction aborted: Driver: '" << driverid << "' ErrorCode: '"
                  << errorCode << "\nReason: " << errorMessage );
@@ -948,13 +934,7 @@ void
 DataUpdateTransaction::
 onMaxRetry( const std::string &lastError )
 {
-   LOGERROR("Transaction Failed. Stationid: " << stationid << " Typeid: "
-            << typeid_ << " obstime: " << obstime  << "\nLast error: " << log.str() );
-
-   if( ! logid.empty() ) {
-      IDLOGERROR( logid, "Transaction Failed.\n" << lastError << "\n" << log.str() );
-   }
-
+   IDLOGERROR( logid, "Transaction Failed.\n" << lastError << "\n" << log.str() );
    IDLOGERROR( "failed", "Transaction Failed. Stationid: " << stationid << " Typeid: "
                << typeid_ << " obstime: " << obstime  << "\nLast error: " << log.str() );
 }

@@ -176,7 +176,7 @@ execute(miutil::miString &msg)
 
    istringstream istr(obs);
 
-   IDLOGINFO( idLog.logid(),
+   IDLOGINFO( logid,
               name()                           << endl <<
               "------------------------------" << endl <<
               "ObstType : " << obsType         << endl <<
@@ -186,14 +186,14 @@ execute(miutil::miString &msg)
 
    if( !getline( istr, tmp ) ) {
       msg = "Invalid format. No data?!!";
-      IDLOGERROR( idLog.logid(), "Invalid format. No data.");
+      IDLOGERROR( logid, "Invalid format. No data.");
       LOGERROR( "Invalid format. No data. stationid: " << stationid << " typeid: " << typeId );
       return Error;
    }else{
       if( !decodeHeader( tmp, params, msg ) ) {
          LOGERROR("Decoder: " << name() << ". INVALID header. stationid: " <<
                   stationid << " typeid: " << typeId );
-         IDLOGERROR( idLog.logid(), "INVALID header:" << endl << tmp );
+         IDLOGERROR( logid, "INVALID header:" << endl << tmp );
          return Error;
       }
    }
@@ -202,7 +202,7 @@ execute(miutil::miString &msg)
       msg = "No parameters in header!";
       LOGINFO( "Decoder: " << name() << ". No parameters in header! Stationid: "
                << stationid << " typeid: " << typeId );
-      IDLOGINFO( idLog.logid(), "No parameters in header!" << endl << "Header: " << tmp );
+      IDLOGINFO( logid, "No parameters in header!" << endl << "Header: " << tmp );
       return Ok;
    }
 
@@ -219,7 +219,7 @@ execute(miutil::miString &msg)
       if( !decodeData( da, params.size(), tmp, lines, msg ) ) {
          LOGERROR( "Decoder: " << name() << ". Can't decode the data. Stationid: " <<
                    stationid << " typeid: " << typeId );
-         IDLOGERROR(  idLog.logid(), "Can't decode the data. Reason: " << endl << msg );
+         IDLOGERROR( logid, "Can't decode the data. Reason: " << endl << msg );
          return Error;
       }
 
@@ -232,7 +232,7 @@ execute(miutil::miString &msg)
              << da[index].val()<<"," << da[index].cinfo()<<"," << da[index].uinfo()
              << endl;
 
-      LOGDEBUG3( ost.str() );
+      IDLOGDEBUG3( logid, ost.str() );
       dataList.clear();
       textDataList.clear();
       nElemsInLine=0;
@@ -265,7 +265,7 @@ execute(miutil::miString &msg)
                   val = decodeutility::HL( val );
                }else{
                   warnings=true;
-                  IDLOGWARN( idLog.logid(), "Unsupported as code value: " << params[index].name() );
+                  IDLOGWARN( logid, "Unsupported as code value: " << params[index].name() );
                   continue;
                }
             }
@@ -275,7 +275,7 @@ execute(miutil::miString &msg)
             }
             catch(...){
                warnings = true;
-               IDLOGERROR( idLog.logid(), "Invalid value: (" << val << ") not a float!" );
+               IDLOGERROR( logid, "Invalid value: (" << val << ") not a float!" );
                continue;
             }
 
@@ -314,7 +314,7 @@ execute(miutil::miString &msg)
 
    msg = ost.str();
 
-   IDLOGINFO( idLog.logid(), msg );
+   IDLOGINFO( logid, msg );
 
    if( lines==1 || ( count == 0 && nExpectedData == 0 ) ){
       msg += "No data!";
@@ -328,7 +328,7 @@ execute(miutil::miString &msg)
              << " dataelements, but only "  << count
              << " dataelements was saved!";
          warnings = true;
-         IDLOGWARN( idLog.logid(), ost.str() );
+         IDLOGWARN( logid, ost.str() );
          msg += ost.str();
       }
       if( warnings ) {
@@ -592,7 +592,7 @@ decodeHeader(const std::string &header,
    for(;itParamsStrings!=paramStrings.end(); itParamsStrings++)
       ost << " [" << *itParamsStrings << "]";
 
-   LOGDEBUG(ost.str());
+   IDLOGDEBUG(logid, ost.str());
 
    itParamsStrings=paramStrings.begin();
 
@@ -678,7 +678,7 @@ decodeData(KlDataArray &da,
    string                 buf;
 
    if(!splitData(sdata, dtmp, msg)){
-      LOGERROR("decodeData: " << msg << endl);
+      IDLOGERROR( logid, "decodeData: " << msg << endl);
       return false;
    }
 

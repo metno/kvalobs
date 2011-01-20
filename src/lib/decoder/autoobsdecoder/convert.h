@@ -294,7 +294,6 @@ namespace kvalobs{
 
            void resetRRRtr(){ hasRRRtr_=false; RRRtr_=RRRtr();}
 	        bool hasRRRtr(RRRtr &rr){ rr=RRRtr_; 
-                                     std::cerr << "hasRRtr: " << hasRRRtr_ <<"  RR_N: " << rr.RR_N << std::endl;
                                      return hasRRRtr_ && !rr.RR_N;}
 	        
 	        void resetSaSdEm(){ saSdEm_ = SaSdEm(); }

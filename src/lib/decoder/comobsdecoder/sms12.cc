@@ -151,7 +151,7 @@ Sms12::decode(long stationid,
    smsData=new kvalobs::decodeutil::DecodedData(paramList, stationid, smscode);
   }
   catch(...){
-    LOGFATAL("NOMEM: failed to allocate memory for SmsData!" << endl);
+    IDLOGFATAL( logid, "NOMEM: failed to allocate memory for SmsData!" << endl);
     return 0;
   }
 
@@ -165,14 +165,14 @@ Sms12::decode(long stationid,
     stripNewLine(buf);
      
     if(buf.length()<8){
-      LOGERROR("Invalid format!");
+      IDLOGERROR(logid, "Invalid format!");
       continue;
     }
 
     sep=separator(buf);
 
     if(sep<0){
-      LOGERROR("Invalid dataformat. Unknown element separator.");
+      IDLOGERROR( logid, "Invalid dataformat. Unknown element separator.");
       continue;
     }
 
@@ -183,7 +183,7 @@ Sms12::decode(long stationid,
     initInData(&cStr, PARAM_IN);
 
     if(cStr.size()<8){
-      LOGERROR("Invalid dataformat. Too few elements.");
+      IDLOGERROR(logid,"Invalid dataformat. Too few elements.");
       continue;
     }
 
@@ -192,7 +192,7 @@ Sms12::decode(long stationid,
     if(obstime.undef()){
       string mybuf;
       cStr.copy(mybuf);
-      LOGERROR("Invalid obstime!");
+      IDLOGERROR( logid, "Invalid obstime!");
       rejected.push_back(kvRejectdecode(mybuf, miTime::nowTime(), "comobs/typeid=312",
 					errs.str()));
       hasRejected=true;
@@ -206,7 +206,7 @@ Sms12::decode(long stationid,
     if(!doPrecip(data, obstime.hour())){
       string mybuf;
       cStr.copy(mybuf);
-      LOGERROR("Invalid dataformat cant do precipitation.");
+      IDLOGERROR( logid, "Invalid dataformat cant do precipitation.");
       rejected.push_back(kvRejectdecode(mybuf, miTime::nowTime(), "comobs/typeid=312",
 					errs.str()));
       hasRejected=true;
@@ -252,7 +252,7 @@ Sms12::decode(long stationid,
 	  i=boost::lexical_cast<int>(buf);
 	}
 	catch(...){
-	  LOGERROR("Format error (DD): (" << buf 
+	  IDLOGERROR( logid, "Format error (DD): (" << buf
 		   << "). Not a number!");
 	  continue;
 	}
@@ -270,7 +270,7 @@ Sms12::decode(long stationid,
 	  f=boost::lexical_cast<float>(buf);
 	}
 	catch(...){
-	  LOGERROR("FORMAT error FF, FG, or FX: (" <<
+	  IDLOGERROR( logid, "FORMAT error FF, FG, or FX: (" <<
 		   buf << ")!");
 	  continue;
 	}
@@ -309,9 +309,9 @@ Sms12::decode(long stationid,
   nDataset++;
   
   if(nDataset>0){
-    LOGINFO("SmsMelding (312) decoded." << endl);
+    IDLOGINFO( logid, "SmsMelding (312) decoded." );
   }else{
-    LOGINFO("No data." << endl);
+    IDLOGINFO(logid, "No data." );
   }
   
   return smsData;
@@ -342,23 +342,23 @@ getObsTime(std::ostringstream &ost, miutil::miTime &klObs, bool &ccx)
     }
   }
   
-  LOGDEBUG("CCA: " << (ccx?"TRUE":"FALSE"));  
+  IDLOGDEBUG( logid, "CCA: " << (ccx?"TRUE":"FALSE"));
 
   if(!getInData("KLCOMOBS", buf)){
     ost << "0:  Internal error!";
-    LOGERROR(ost.str());
+    IDLOGERROR( logid, ost.str());
     return miTime();
   }
   
   klComObs=createDTFromYMDhm(buf);
 
   if(klComObs.undef()){
-    LOGWARN("Can't decode KLCOMOBS time <" << buf << ">!");
+    IDLOGWARN(logid,"Can't decode KLCOMOBS time <" << buf << ">!");
   }
   
   if(!getInData("KLOBS", buf)){
-    LOGWARN("1: Internal error!");
-    LOGERROR(ost.str());
+    IDLOGWARN(logid, "1: Internal error!");
+    IDLOGERROR( logid, ost.str());
     return miTime();
   }
 
@@ -368,14 +368,14 @@ getObsTime(std::ostringstream &ost, miutil::miTime &klObs, bool &ccx)
 
   if(klObs.undef()){
     ost <<"Observationtime inavlid (KLOBS): <" << buf << ">!" << endl;
-    LOGERROR(ost.str());
+    IDLOGERROR( logid, ost.str());
     
     return miTime();
   }
 
   if(!getInData("termin",buf)){    //synop termin ie. hour
     ost << "4:  Internal error!";
-    LOGERROR(ost.str());
+    IDLOGERROR(logid, ost.str());
     return miTime();
   }
 
@@ -383,14 +383,14 @@ getObsTime(std::ostringstream &ost, miutil::miTime &klObs, bool &ccx)
 
   if(hour<0 || hour>23){
     ost << "Invalid termin (" << hour << ")!";
-    LOGERROR(ost.str());
+    IDLOGERROR( logid, ost.str());
     return miTime();
   }
 
   if((hour%3)!=0){
     ost << "Termin not a SYNOP time, ie 0, 3, 6, 9, 12, 15, 18 or 21!" <<
       "Termin: " << hour << endl;
-    LOGERROR(ost.str());
+    IDLOGERROR( logid, ost.str());
     return miTime();
   }
   
@@ -408,7 +408,7 @@ getObsTime(std::ostringstream &ost, miutil::miTime &klObs, bool &ccx)
     ost << "observationtime (KLOBS) not in valid time interval: " << klObs
 	<< "lower limit: " << fromTime << endl 
 	<< "upper limit: " << toTime << endl;
-    LOGERROR(ost.str());
+    IDLOGERROR( logid, ost.str());
     return obstime;
   }
   
@@ -436,7 +436,7 @@ getObsTime(std::ostringstream &ost, miutil::miTime &klObs, bool &ccx)
     ost << "The observation time is not within �3 of the termin! " << endl
 	<< "Observationime: " << klObs << endl 
 	<< "Termin: " << hour << endl;
-    LOGERROR(ost.str());
+    IDLOGERROR( logid, ost.str());
   }
 
   return obstime;
@@ -457,13 +457,13 @@ doPrecip(kvalobs::decodeutil::DecodedDataElem &data,
   string sIx;
   
   if(!getInData("RR", RR)){
-    LOGERROR("doPrecip (1): Internal error!");
+    IDLOGERROR( logid,"doPrecip (1): Internal error!");
     return false;
   }
 
 
   if(!getInData("_irix", irix)){
-    LOGERROR("doPrecip (3): Internal error!");
+    IDLOGERROR( logid,"doPrecip (3): Internal error!");
     return false;
   }
 

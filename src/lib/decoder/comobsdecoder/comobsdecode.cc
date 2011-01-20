@@ -164,9 +164,10 @@ execute(miutil::miString &msg)
    long   obsid;
    bool   isWmono;
    long   stationid;
+   int typeId;
    bool   hasRejected;
    DecodedData *data;
-   ostringstream logid;
+   string logid;
 
    list<kvRejectdecode> rejected;
    milog::LogContext lcontext(name());
@@ -182,7 +183,7 @@ execute(miutil::miString &msg)
 
       putRejectdecodeInDb(myrejected);
 
-      LOGWARN("Rejected!" << endl << mParser.getErrMsg() << endl);
+      LOGWARN("Decoder: " << name() <<". Rejected!" << endl << mParser.getErrMsg() << endl);
       return Rejected;
    }
 
@@ -202,7 +203,7 @@ execute(miutil::miString &msg)
 
       putRejectdecodeInDb(myrejected);
 
-      LOGWARN("Rejected!" << endl <<"No identification!" << endl);
+      LOGWARN("Decoder: " << name() << ". Rejected! No identification!" << endl);
       return Rejected;
    }
 
@@ -219,15 +220,15 @@ execute(miutil::miString &msg)
 
       putRejectdecodeInDb(myrejected);
 
-      LOGWARN("Rejected!" << endl <<"Unknown station!" << endl);
+      LOGWARN("Decoder: " << name() << "Rejected!" << endl <<"Unknown station!" << endl);
       return Rejected;
    }
 
-
+   typeId = smsMelding->getCode() + 300;
    decoder=smsfactory(smsMelding->getCode());
 
-   logid << "n" << stationid << "-t" << smsMelding->getCode() + 300;
-   createLogger( logid.str() );
+   IdlogHelper idlogHelper( stationid, smsMelding->getCode() + 300, this );
+   logid = idlogHelper.logid();
 
    if(!decoder){
       ostringstream ost;
@@ -242,12 +243,12 @@ execute(miutil::miString &msg)
 
       putRejectdecodeInDb(myrejected);
 
-      LOGWARN("Rejected!" << endl << ost.str() << endl);
-      IDLOGERROR( logid.str(), "Rejected!" << endl << ost.str() << endl );
-      removeLogger( logid.str() );
+      LOGWARN("Decoder: " << name() << "Rejected! stationid: "<< stationid
+              << " typeid: " << typeId << endl << ost.str() << endl);
+      IDLOGERROR( logid, "Rejected!" << endl << ost.str() << endl );
       return Rejected;
    }
-   decoder->logid = logid.str();
+   decoder->logid = logid;
 
    data=decoder->decode(stationid,
                         smsMelding->getCode(),
@@ -258,7 +259,6 @@ execute(miutil::miString &msg)
 
    if(!data){
       msg="No mem!";
-      removeLogger( logid.str() );
       return Error;
    }
 
@@ -269,8 +269,8 @@ execute(miutil::miString &msg)
       for(;it!=rejected.end(); it++)
          putRejectdecodeInDb(*it);
 
-      LOGWARN("Rejected!" << endl << msg << endl);
-      removeLogger( logid.str() );
+      LOGWARN("Decoder: " << name() << ". Rejected! statioid: "<< stationid
+              << " typeid: " << typeId << endl << msg << endl);
       return Rejected;
    }
 
@@ -293,45 +293,49 @@ execute(miutil::miString &msg)
       else
          priority=4;
 
-      LOGDEBUG3(*it);
+      IDLOGDEBUG3(logid, *it);
 
       if( it->dataSize()>0 || it->textDataSize()>0 ) {
          try {
             kvalobs::decoder::DataUpdateTransaction work( it->getDate(),
                                                           it->stationID(), it->typeID(),
-                                                          priority, &d, &td, logid.str() );
+                                                          priority, &d, &td, logid);
 
             con.perform( work );
             updateStationInfo( work.stationInfoList() );
             nData += it->dataSize() + it->textDataSize();
          }
          catch( const dnmi::db::SQLException &ex ) {
-            LOGERROR("Failed to save data: Reason: " << ex.what() );
+            IDLOGERROR(logid, "Failed to save data: Reason: " << ex.what() );
          }
          catch( const std::exception &ex ) {
-            LOGERROR("Failed to save data: Reason: " << ex.what() << "(*)" );
+            IDLOGERROR(logid, "Failed to save data: Reason: " << ex.what() << "(*)" );
          }
          catch( ... ) {
-            LOGERROR("Failed to save data. Reason: Unknown.");
+            IDLOGERROR( logid, "Failed to save data. Reason: Unknown.");
          }
       }
    }
 
    if(error){
       if(nData>0){
-         LOGERROR("Not all data was saved to the data base!" << endl <<
+         IDLOGERROR(logid, "Not all data was saved to the data base!" << endl <<
                   "#saved: " << nData);
-
+         LOGWARN("Decoder: " << name() << ". Data saved with warnings. stationid: "
+                  << stationid << " typeid: " << typeId  );
          msg="Not all data could be saved to the database!";
       }else{
+         IDLOGERROR( logid, "Can't save data.");
+         LOGERROR( "Decoder: " << name() << ". Can't save data. stationid: " << stationid
+                   << " typeid: " << typeId );
+
          msg="Can't save data to the database!";
       }
-      removeLogger( logid.str() );
       return NotSaved;
    }
 
-   removeLogger( logid.str() );
-   LOGDEBUG("Saved " << nData << " data element to the database!");
+   LOGINFO("Decoder: " << name() <<". Saved data. stationid: " << stationid
+           << " typeid: " << typeId  );
 
    return Ok;
 
