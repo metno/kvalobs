@@ -42,7 +42,8 @@ createGlobalLogger( const std::string &path,
                     const std::string &id,
                     milog::LogLevel ll,
                     int size,
-                    int nFiles )
+                    int nFiles,
+                    StdLayout1 *layout)
 {
    try{
 
@@ -57,8 +58,13 @@ createGlobalLogger( const std::string &path,
 
       if( nFiles < 1 )
          nFiles=1;
+      FLogStream *logs;
 
-      FLogStream *logs = new FLogStream( nFiles, size );
+      if( layout )
+         logs = new FLogStream( layout, nFiles, size );
+      else
+         logs = new FLogStream( nFiles, size );
+
       std::ostringstream ost;
 
       ost << path;

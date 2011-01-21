@@ -23,7 +23,8 @@ createGlobalLogger( const std::string &path,
                     const std::string &id,
                     milog::LogLevel ll,
                     int size=200,
-                    int nFiles=2);
+                    int nFiles=2,
+                    StdLayout1 *layout = 0);
 }
 
 
