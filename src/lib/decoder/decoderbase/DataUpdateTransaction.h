@@ -69,6 +69,7 @@ class DataUpdateTransaction : public dnmi::db::Transaction
    boost::shared_ptr<bool> ok_;
    std::ostringstream log;
    std::string logid;
+   std::string insertType;
    int nRetry;
 
 public:

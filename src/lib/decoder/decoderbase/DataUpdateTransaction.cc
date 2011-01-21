@@ -867,10 +867,11 @@ operator()( dnmi::db::Connection *conection )
       return false;
 
    if( dataList.empty() && textDataList.empty() ) {
-      log << "New new data. stationid: " << stationid << " typeid: " << typeid_
+      log << "New data. stationid: " << stationid << " typeid: " << typeid_
           << " obstime: " << obstime << endl;
       setTbtime( conection );
       insertData( conection, *newData, *newTextData );
+      insertType = "   INSERT";
       return true;
    }
 
@@ -879,6 +880,7 @@ operator()( dnmi::db::Connection *conection )
           << " obstime: " << obstime << endl;
       IDLOGINFO("duplicates", "DUPLICATE: stationid: " << stationid << " typeid: " << typeid_
           << " obstime: " << obstime );
+      insertType = "DUPLICATE";
       return true;
    }
 
@@ -903,7 +905,7 @@ operator()( dnmi::db::Connection *conection )
    }
 
    IDLOGINFO( "updated", mylog.str() );
-
+   insertType = "   UPDATE";
    return true;
 }
 
@@ -911,8 +913,22 @@ void
 DataUpdateTransaction::
 onSuccess()
 {
-   IDLOGINFO( logid, log.str() );
+   ostringstream mylog;
+   IkvStationInfoList it=stationInfoList_->begin();
 
+   if( it != stationInfoList_->end() ) {
+      mylog << insertType << ": stationid: " << it->stationID() << " typeid: " << it->typeID()
+            << " obstime: " << it->obstime();
+      ++it;
+   }
+
+   for(;it!=stationInfoList_->end(); it++){
+      mylog << "\n          stationid: " << it->stationID() << " typeid: " << it->typeID()
+            << " obstime: " << it->obstime();
+   }
+
+   IDLOGINFO( logid, log.str() );
+   IDLOGINFO( "transaction", mylog.str() );
    *ok_ = true;
 }
 
@@ -959,6 +975,8 @@ onMaxRetry( const std::string &lastError )
    IDLOGERROR( "failed", "Transaction Failed. Stationid: " << stationid << " Typeid: "
                << typeid_ << " obstime: " << obstime  << "\nLast error: " << lastError
                << mylog.str() );
+   IDLOGERROR( "transaction", "   FAILED: Stationid: " << stationid << " Typeid: "
+               << typeid_ << " obstime: " << obstime );
 }
 
 }

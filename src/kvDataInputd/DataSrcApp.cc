@@ -93,6 +93,8 @@ DataSrcApp::DataSrcApp(int argn, char **argv,
   milog::createGlobalLogger( logdir, "kvDataInputd_transaction", "duplicates", milog::DEBUG );
   milog::createGlobalLogger( logdir, "kvDataInputd_transaction", "updated", milog::DEBUG );
   milog::createGlobalLogger( logdir, "kvDataInputd_transaction", "retry", milog::DEBUG );
+  milog::createGlobalLogger( logdir, "kvDataInputd", "transaction", milog::DEBUG,
+                             200, 1,  new milog::StdLayout1() );
 
   ok=true;
 }
