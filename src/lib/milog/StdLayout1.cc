@@ -51,7 +51,7 @@ milog::StdLayout1::formatMessage(const std::string &msg,
   std::stringstream os;
   struct tm tm_;
   time_t    t;
-  char      tb[20];
+  char      tb[32];
   string    ss;
   string::size_type i;
   string::size_type prev;
@@ -60,11 +60,11 @@ milog::StdLayout1::formatMessage(const std::string &msg,
   time(&t);
   localtime_r(&t, &tm_);
 
-  sprintf(tb, "%04d%02d%02d%02d%02d%02d", 
+  sprintf(tb, "%04d-%02d-%02d %02d:%02d:%02d ",
 	  tm_.tm_year+1900, tm_.tm_mon+1, tm_.tm_mday,
 	  tm_.tm_hour, tm_.tm_min, tm_.tm_sec);
 
-  os << tb << ": ";
+  os << tb;
 
   switch(ll){
   case NOTSET: os << "NOTSET "; break;
@@ -82,30 +82,39 @@ milog::StdLayout1::formatMessage(const std::string &msg,
   }
 
   if( ! context.empty()){
-      os << "(" << context << ") ";
-  }      
+      os << "(" << context << "): ";
+  } else {
+     os << ": ";
+  }
 
   if(msg.empty())
       return os.str();
 
-
-  prev=msg.find_first_not_of("\n", 0);
+  prev = msg.find_first_not_of("\n", 0);
 
   if(prev==string::npos)
       return os.str();
 
+  bool first=true;
   i=msg.find("\n", prev);
 
   while(i!=string::npos){
-      ss=msg.substr(prev, i-prev+1); //Includes the endl 
-      os << "--------------- " << ss;
+      ss=msg.substr(prev, i-prev+1); //Includes the endl
+
+      if( first ) {
+         os << ss;
+         first=false;
+      } else {
+         os << "-------------------- " << ss;
+      }
+
       prev=i+1;
       i=msg.find("\n", prev);
   }
 
   if(prev<msg.length()){
       ss=msg.substr(prev);
-      os << "--------------- " << ss << endl;
+      os << "-------------------- " << ss << endl;
   }
 
   return os.str();
