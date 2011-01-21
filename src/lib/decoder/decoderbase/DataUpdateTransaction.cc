@@ -809,6 +809,7 @@ update( dnmi::db::Connection *connection,
 
       ost << "UPDATE data SET "
           << "  corrected="    << it->corrected()
+          << ", original=" << it->original()
           << ", controlinfo='"    << it->controlinfo().flagstring() << "'"
           << ", useinfo='"        << it->useinfo().flagstring() << "'"
           << ", cfailed='"        << it->cfailed() << "'"
