@@ -924,7 +924,7 @@ onSuccess()
    }
 
    for(;it!=stationInfoList_->end(); it++){
-      mylog << "\n          stationid: " << it->stationID() << " typeid: " << it->typeID()
+      mylog << "\n           stationid: " << it->stationID() << " typeid: " << it->typeID()
             << " obstime: " << it->obstime();
    }
 

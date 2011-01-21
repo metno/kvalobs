@@ -53,6 +53,7 @@ milog::StdLayout1::formatMessage(const std::string &msg,
   time_t    t;
   char      tb[32];
   string    ss;
+  string    dash;
   string::size_type i;
   string::size_type prev;
   
@@ -90,6 +91,8 @@ milog::StdLayout1::formatMessage(const std::string &msg,
   if(msg.empty())
       return os.str();
 
+  dash = string( os.str().length()-1, '-' )+" ";
+
   prev = msg.find_first_not_of("\n", 0);
 
   if(prev==string::npos)
@@ -105,7 +108,7 @@ milog::StdLayout1::formatMessage(const std::string &msg,
          os << ss;
          first=false;
       } else {
-         os << "-------------------- " << ss;
+         os << dash << ss;
       }
 
       prev=i+1;
@@ -114,7 +117,10 @@ milog::StdLayout1::formatMessage(const std::string &msg,
 
   if(prev<msg.length()){
       ss=msg.substr(prev);
-      os << "-------------------- " << ss << endl;
+      if( first )
+         os << ss << endl;
+      else
+         os << dash << ss << endl;
   }
 
   return os.str();
