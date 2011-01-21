@@ -1,7 +1,7 @@
 /*
   Kvalobs - Free Quality Control Software for Meteorological Observations 
 
-  $Id: milog.h,v 1.1.2.2 2007/09/27 09:02:31 paule Exp $                                                       
+  $Id: StdLayout.h,v 1.1.2.2 2007/09/27 09:02:31 paule Exp $                                                       
 
   Copyright (C) 2007 met.no
 
@@ -28,21 +28,42 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#ifndef __milog_milog_h__
-#define __milog_milog_h__
+#ifndef __milog_stdlayout1_h__
+#define __milog_stdlayout1_h__
 
-#include <milog/milogtypes.h>
 #include <milog/Layout.h>
-#include <milog/Logger.h>
-#include <milog/StdLayout.h>
-#include <milog/StdLayout1.h>
-#include <milog/LogManager.h>
-#include <milog/TraceLayout.h>
-#include <milog/FLogStream.h>
-#include <milog/LogStream.h>
-#include <milog/StdErrStream.h>
-#include <milog/miloghelper.h>
-#include <milog/HtmlStream.h>
-#include <milog/macros.h>
-#include <milog/utility.h>
+
+namespace milog{
+
+  /**
+   * \addtogroup milog
+   *
+   * @{
+   */
+
+  /**
+   * \brief StdLayout1 formates the logmessage as follows:
+   * 
+   * timestamp: LogLevel (context) Message line one
+   * ---------- Message line two.
+   *
+   * ex:
+   *   20030213124536: WARNING (thread1/onread) Cant read from file <station.dat>
+   *   --------------- Reason. no such file!
+   */
+    class StdLayout1 : public Layout{
+    public:
+	StdLayout1();
+	~StdLayout1();
+
+	std::string formatMessage(const std::string &msg, 
+				  LogLevel ll,
+				  const std::string &context);
+	
+    };
+    
+    /** @} */
+}
+
+
 #endif

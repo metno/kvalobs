@@ -7,6 +7,7 @@ nobase_miloginclude_HEADERS = Logger.h \
 	LogStream.h \
 	Layout.h \
 	StdLayout.h \
+	StdLayout1.h \
 	FLogStream.h  \
 	TraceLayout.h \
 	LogManager.h \
@@ -28,6 +29,7 @@ libkvalobs_milog_la_SOURCES = Logger.h Logger.cc \
 	LogStream.h LogStream.cc \
 	Layout.h Layout.cc \
 	StdLayout.h StdLayout.cc \
+	StdLayout1.h StdLayout1.cc \
 	FLogStream.h FLogStream.cc \
 	LoggerImpl.cc \
 	TraceLayout.h TraceLayout.cc \
