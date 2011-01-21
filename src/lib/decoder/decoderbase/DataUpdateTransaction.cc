@@ -829,7 +829,7 @@ update( dnmi::db::Connection *connection,
       ost.str("");
 
       ost << "UPDATE text_data SET "
-          << "  original="    << it->original()
+          << "  original='"    << it->original() << "'"
           << ", tbtime='" << it->tbtime().isoTime() <<"." << it->tbtimemsec() << "'"
           << " WHERE stationid=" << it->stationID() << " AND "
           << "       obstime='"   << it->obstime().isoTime() << "' AND "
