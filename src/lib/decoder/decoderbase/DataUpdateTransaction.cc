@@ -949,9 +949,16 @@ void
 DataUpdateTransaction::
 onMaxRetry( const std::string &lastError )
 {
+   ostringstream mylog;
+
+   if( ! log.str().empty() ) {
+      mylog << endl << "Log: " << log.str();
+   }
+
    IDLOGERROR( logid, "Transaction Failed.\n" << lastError << "\n" << log.str() );
    IDLOGERROR( "failed", "Transaction Failed. Stationid: " << stationid << " Typeid: "
-               << typeid_ << " obstime: " << obstime  << "\nLast error: " << log.str() );
+               << typeid_ << " obstime: " << obstime  << "\nLast error: " << lastError
+               << mylog.str() );
 }
 
 }
