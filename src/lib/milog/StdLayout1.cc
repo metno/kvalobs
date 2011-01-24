@@ -35,18 +35,24 @@
 
 using namespace std;
 
-milog::StdLayout1::StdLayout1()
+milog::
+StdLayout1::
+StdLayout1()
 {
 }
 
-milog::StdLayout1::~StdLayout1()
+milog::
+StdLayout1::
+~StdLayout1()
 {
 }
 
 std::string 
-milog::StdLayout1::formatMessage(const std::string &msg,
-				LogLevel ll,
-				const std::string &context)
+milog::
+StdLayout1::
+formatMessage( const std::string &msg,
+               LogLevel ll,
+               const std::string &context )
 {
   std::stringstream os;
   struct tm tm_;
@@ -58,16 +64,16 @@ milog::StdLayout1::formatMessage(const std::string &msg,
   string::size_type prev;
   
 
-  time(&t);
-  localtime_r(&t, &tm_);
+  time( &t );
+  localtime_r( &t, &tm_ );
 
-  sprintf(tb, "%04d-%02d-%02d %02d:%02d:%02d ",
+  sprintf( tb, "%04d-%02d-%02d %02d:%02d:%02d ",
 	  tm_.tm_year+1900, tm_.tm_mon+1, tm_.tm_mday,
-	  tm_.tm_hour, tm_.tm_min, tm_.tm_sec);
+	  tm_.tm_hour, tm_.tm_min, tm_.tm_sec );
 
   os << tb;
 
-  switch(ll){
+  switch( ll ){
   case NOTSET: os << "NOTSET "; break;
   case FATAL:  os << "FATAL ";  break;
   case ERROR:  os << "ERROR ";  break;
@@ -82,41 +88,43 @@ milog::StdLayout1::formatMessage(const std::string &msg,
   case  DEBUG6: os << "DEBUG6 ";  break;
   }
 
-  if( ! context.empty()){
+  if( ! context.empty() ){
       os << "(" << context << "): ";
   } else {
      os << ": ";
   }
 
-  if(msg.empty())
-      return os.str() << endl;
+  if( msg.empty() ) {
+     os << endl;
+     return os.str();
+  }
 
-  dash = string( os.str().length()-1, '-' )+" ";
+  dash = string( os.str().length()-1, '-' ) + " ";
 
-  prev = msg.find_first_not_of("\n", 0);
+  prev = msg.find_first_not_of( "\n", 0 );
 
-  if(prev==string::npos)
+  if( prev == string::npos)
       return os.str();
 
   bool first=true;
-  i=msg.find("\n", prev);
+  i = msg.find("\n", prev);
 
-  while(i!=string::npos){
-      ss=msg.substr(prev, i-prev+1); //Includes the endl
+  while( i != string::npos ){
+      ss=msg.substr( prev, i-prev + 1 ); //Includes the endl
 
       if( first ) {
          os << ss;
-         first=false;
+         first = false;
       } else {
          os << dash << ss;
       }
 
-      prev=i+1;
-      i=msg.find("\n", prev);
+      prev = i+1;
+      i = msg.find( "\n", prev );
   }
 
-  if(prev<msg.length()){
-      ss=msg.substr(prev);
+  if( prev < msg.length() ){
+      ss = msg.substr(prev);
       if( first )
          os << ss << endl;
       else
