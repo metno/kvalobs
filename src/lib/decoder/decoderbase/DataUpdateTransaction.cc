@@ -872,7 +872,7 @@ operator()( dnmi::db::Connection *conection )
           << " obstime: " << obstime << endl;
       setTbtime( conection );
       insertData( conection, *newData, *newTextData );
-      insertType = "   INSERT";
+      insertType = "INSERT";
       return true;
    }
 
@@ -906,7 +906,7 @@ operator()( dnmi::db::Connection *conection )
    }
 
    IDLOGINFO( "updated", mylog.str() );
-   insertType = "   UPDATE";
+   insertType = "UPDATE";
    return true;
 }
 
@@ -915,6 +915,7 @@ DataUpdateTransaction::
 onSuccess()
 {
    ostringstream mylog;
+   string prefix( insertType.length(), ' ' );
    IkvStationInfoList it=stationInfoList_->begin();
 
    if( it != stationInfoList_->end() ) {
@@ -927,7 +928,8 @@ onSuccess()
    }
 
    for(;it!=stationInfoList_->end(); it++){
-      mylog << "\n           stationid: " << it->stationID() << " typeid: " << it->typeID()
+      mylog << "\n" << prefix
+            << "  stationid: " << it->stationID() << " typeid: " << it->typeID()
             << " obstime: " << it->obstime();
    }
 
