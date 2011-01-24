@@ -921,6 +921,9 @@ onSuccess()
       mylog << insertType << ": stationid: " << it->stationID() << " typeid: " << it->typeID()
             << " obstime: " << it->obstime();
       ++it;
+   } else {
+      mylog << insertType << ": stationid: " << stationid << " typeid: " << typeid_
+                  << " obstime: " << obstime;
    }
 
    for(;it!=stationInfoList_->end(); it++){
