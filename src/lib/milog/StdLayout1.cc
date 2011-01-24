@@ -89,7 +89,7 @@ milog::StdLayout1::formatMessage(const std::string &msg,
   }
 
   if(msg.empty())
-      return os.str();
+      return os.str() << endl;
 
   dash = string( os.str().length()-1, '-' )+" ";
 
