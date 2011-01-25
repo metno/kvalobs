@@ -12,6 +12,5 @@ SUBDIRS = \
 	kv2metdat \
 	kvalobs_database \
 	script \
-	norcom2kv \
 	kv2kro2 \
 	tools/kvpush

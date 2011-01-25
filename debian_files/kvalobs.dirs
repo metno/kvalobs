@@ -7,9 +7,6 @@ usr/share/kvalobs
 usr/share/kvalobs/db
 usr/share/kvalobs/db/upgrade/
 var/lib/kvalobs
-var/lib/kvalobs/norcom2kv
-var/lib/kvalobs/norcom2kv/data2kv
-var/lib/kvalobs/norcom2kv/tmp
 var/lib/kvalobs/lam2kv
 var/lib/kvalobs/lam2kv/log
 var/lib/kvalobs/lam2kv/upload
