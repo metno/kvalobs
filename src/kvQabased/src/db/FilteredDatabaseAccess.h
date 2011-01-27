@@ -78,6 +78,11 @@ public:
 		return baseImplementation_->getStationParam(si, parameter, qcx);
 	}
 
+	virtual kvalobs::kvStation getStation(int stationid) const
+	{
+		return baseImplementation_->getStation(stationid);
+	}
+
 	virtual void getModelData(ModelDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minutesBackInTime ) const
 	{
 		return baseImplementation_->getModelData(out, si, parameter, minutesBackInTime);

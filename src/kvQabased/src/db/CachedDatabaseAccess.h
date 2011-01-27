@@ -61,6 +61,8 @@ public:
 
 	virtual std::string getStationParam(const kvalobs::kvStationInfo & si, const std::string & parameter, const std::string & qcx) const;
 
+	virtual kvalobs::kvStation getStation(int stationid) const;
+
 	virtual void getModelData(ModelDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset ) const;
 	virtual void getData(DataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const;
 	virtual void getTextData(TextDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const;
@@ -79,6 +81,8 @@ private:
 		std::string result;
 	};
 	mutable StationParamSpec lastStationParamQuery_;
+
+	mutable std::map<int, kvalobs::kvStation *> stations_;
 
 	mutable DataCache<ModelDataList> modelDataCache_;
 	mutable DataCache<DataList> dataCache_;

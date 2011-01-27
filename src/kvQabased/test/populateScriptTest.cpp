@@ -131,11 +131,16 @@ TEST_F(populateScriptTest, minimalScript)
 	ASSERT_EQ(6u, v.size());
 	miutil::miTime t(v[0], v[1], v[2], v[3], v[4], v[5]);
 	EXPECT_EQ(observation.obstime(), t);
+
+	scriptrunner::ScriptInput::NumericParameters numeric = obs->numeric();
+	EXPECT_FLOAT_EQ(1.15, numeric["station_latitude"]);
+	EXPECT_FLOAT_EQ(12.5, numeric["station_longitude"]);
 }
 
 TEST_F(populateScriptTest, usesOriginalValueForObs)
 {
 	MockDatabaseAccess mockDatabase;
+	mockDatabase.setDefaultActions();
 	using namespace testing;
 
 	db::DatabaseAccess::DataList data;
@@ -177,6 +182,7 @@ TEST_F(populateScriptTest, usesOriginalValueForObs)
 TEST_F(populateScriptTest, flagsMissingValuesAsMissing)
 {
 	MockDatabaseAccess mockDatabase;
+	mockDatabase.setDefaultActions();
 	using namespace testing;
 
 	db::DatabaseAccess::DataList data;
@@ -226,6 +232,7 @@ TEST_F(populateScriptTest, flagsMissingValuesAsMissing)
 TEST_F(populateScriptTest, flagsRejectedValuesAsNotMissing)
 {
 	MockDatabaseAccess mockDatabase;
+	mockDatabase.setDefaultActions();
 	using namespace testing;
 
 	db::DatabaseAccess::DataList data;
@@ -311,6 +318,7 @@ TEST_F(populateScriptTest, missingRefobs)
 TEST_F(populateScriptTest, existingRefObs)
 {
 	MockDatabaseAccess mockDatabase;
+	mockDatabase.setDefaultActions();
 	using namespace testing;
 
 	db::DatabaseAccess::TextDataList klstart;
@@ -363,6 +371,7 @@ TEST_F(populateScriptTest, existingRefObs)
 TEST_F(populateScriptTest, oneRefObsNonexisting)
 {
 	MockDatabaseAccess mockDatabase;
+	mockDatabase.setDefaultActions();
 	using namespace testing;
 
 	db::DatabaseAccess::TextDataList klstart;

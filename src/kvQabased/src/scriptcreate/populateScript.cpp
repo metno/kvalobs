@@ -191,6 +191,14 @@ void addMetaDataToScript(scriptrunner::Script & script, const DataStore::Paramet
 void addDataToScript(scriptrunner::Script & script, const DataStore & dataStore)
 {
 	scriptrunner::ScriptInput input("general");
+
+	const kvalobs::kvStation & station = dataStore.station();
+//	std::ostringstream stationIdentifier;
+//	stationIdentifier << station.stationID() << " - " << station.name();
+//	input.add("station", stationIdentifier.str());
+	input.add("station_latitude", station.lat());
+	input.add("station_longitude", station.lon());
+
 	float time[6];
 	miutil::miTime t = dataStore.observation().obstime();
 	time[0] = t.year();
@@ -200,6 +208,7 @@ void addDataToScript(scriptrunner::Script & script, const DataStore & dataStore)
 	time[4] = t.min();
 	time[5] = t.sec();
 	input.add("obstime", time, time + 6);
+
 	script.addInput(input);
 
 	addObsDataToScript(script, dataStore.getObsData());

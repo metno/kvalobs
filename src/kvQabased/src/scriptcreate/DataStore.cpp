@@ -230,6 +230,18 @@ void DataStore::populateMeta_(
 	}
 }
 
+void DataStore::populateStation_(const db::DatabaseAccess & db)
+{
+	try
+	{
+		station_ = db.getStation(observation_.stationID());
+	}
+	catch( std::exception & e )
+	{
+		station_ = kvalobs::kvStation(observation_.stationID(), -1, -1, -1, 0, "unknown station", -1, -1, "", "", "", 0, true, "1900-01-01");
+	}
+}
+
 
 DataStore::DataStore(
 		const db::DatabaseAccess & db,
@@ -278,6 +290,8 @@ DataStore::DataStore(
 
 		populateMeta_(db, observation, qcx, * abstractMetaRequirement, * concreteMetaRequirement);
 	}
+
+	populateStation_(db);
 
 	flagPosition_ = db.getQcxFlagPosition(qcx);
 }

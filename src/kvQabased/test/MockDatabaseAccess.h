@@ -47,6 +47,8 @@ public:
 
 	MOCK_CONST_METHOD3(getStationParam, std::string (const kvalobs::kvStationInfo & si, const std::string & parameter, const std::string & qcx));
 
+	MOCK_CONST_METHOD1(getStation, kvalobs::kvStation (int stationid));
+
 	MOCK_CONST_METHOD4(getModelData, void (ModelDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minutesBackInTime ) );
 
 	MOCK_CONST_METHOD4(getData, void (DataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset));
@@ -72,6 +74,8 @@ public:
 				.WillByDefault(Invoke(&fake_, &FakeDatabaseAccess::getAlgorithm));
 		ON_CALL(*this, getStationParam(_,_,_))
 				.WillByDefault(Invoke(&fake_, &FakeDatabaseAccess::getStationParam));
+		ON_CALL(*this, getStation(_))
+				.WillByDefault(Invoke(&fake_, &FakeDatabaseAccess::getStation));
 		ON_CALL(*this, getModelData(_, _, _, _))
 				.WillByDefault(Invoke(&fake_, &FakeDatabaseAccess::getModelData));
 		ON_CALL(*this, getData(_, _, _, _))

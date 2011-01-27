@@ -91,6 +91,11 @@ std::string FakeDatabaseAccess::getStationParam(const kvalobs::kvStationInfo & s
 	return "max;min\n2.2;1.1";
 }
 
+kvalobs::kvStation FakeDatabaseAccess::getStation(int stationid) const
+{
+	return kvalobs::kvStation(stationid, 1.15, 12.5, 333, 0, "Test Station", 0, 0, "", "", "", 9, true, "1900-01-01");
+}
+
 void FakeDatabaseAccess::getModelData(ModelDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minutesBackInTime ) const
 {
 	kvalobs::kvModelData m(si.stationID(), si.obstime(), 110, 0, 0, 42.1);

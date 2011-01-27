@@ -38,6 +38,7 @@
 #include <kvalobs/kvTextData.h>
 #include <kvalobs/kvModelData.h>
 #include <kvalobs/kvStationInfo.h>
+#include <kvalobs/kvStation.h>
 #include <string>
 #include <list>
 #include <set>
@@ -115,6 +116,15 @@ public:
 	 *         resultfilter::parseStationParam()
 	 */
 	virtual std::string getStationParam(const kvalobs::kvStationInfo & si, const std::string & parameter, const std::string & qcx) const =0;
+
+	/**
+	 * Get information on the given station
+	 *
+	 * @param stationid identifier for the station we are interested in
+	 *
+	 * @return information about the station with the given id
+	 */
+	virtual kvalobs::kvStation getStation(int stationid) const =0;
 
 	typedef std::vector<kvalobs::kvModelData> ModelDataList;
 	/**

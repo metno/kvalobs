@@ -53,6 +53,8 @@ public:
 
 	virtual std::string getStationParam(const kvalobs::kvStationInfo & si, const std::string & parameter, const std::string & qcx) const;
 
+	virtual kvalobs::kvStation getStation(int stationid) const;
+
 	virtual void getTextData(TextDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const;
 
 	virtual void write(const DataList & data);

@@ -37,6 +37,7 @@
 #include <kvalobs/kvTextData.h>
 #include <kvalobs/kvModelData.h>
 #include <kvalobs/kvStationParam.h>
+#include <kvalobs/kvStation.h>
 #include <vector>
 #include <deque>
 #include <map>
@@ -95,6 +96,8 @@ public:
 
 	const kvalobs::kvStationInfo & observation() const { return observation_; }
 
+	const kvalobs::kvStation & station() const { return station_; }
+
 	void apply(const ScriptResultIdentifier & resultType, double value);
 
 	template<class Iterator>
@@ -126,12 +129,14 @@ private:
 			const std::string & qcx,
 			const qabase::DataRequirement & abstractMetaRequirement,
 			const qabase::DataRequirement & concreteMetaRequirement);
+	void populateStation_(const db::DatabaseAccess & db);
 
 	ParameterSortedDataList data_;
 	ParameterSortedRefDataList refData_;
 	ParameterSortedModelDataList modelData_;
 	ParameterSortedMetaDataList metaData_;
 	kvalobs::kvStationInfo observation_;
+	kvalobs::kvStation station_;
 	std::string qcx_;
 	int flagPosition_;
 	typedef std::set<kvalobs::kvData *, kvalobs::compare::lt_kvData> ModificationList;

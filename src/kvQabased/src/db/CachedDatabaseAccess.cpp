@@ -90,6 +90,33 @@ std::string CachedDatabaseAccess::getStationParam(const kvalobs::kvStationInfo &
 	return lastStationParamQuery_.result;
 }
 
+kvalobs::kvStation CachedDatabaseAccess::getStation(int stationid) const
+{
+	kvalobs::kvStation * station = 0;
+	std::map<int, kvalobs::kvStation *>::const_iterator find = stations_.find(stationid);
+	if ( find == stations_.end() )
+	{
+		try
+		{
+			station = new kvalobs::kvStation(FilteredDatabaseAccess::getStation(stationid));
+		}
+		catch ( std::exception & e )
+		{
+			station = 0;
+		}
+		stations_[stationid] = station;
+	}
+	else
+		station = find->second;
+	if ( ! station )
+	{
+		std::ostringstream s;
+		s << "Unable to find station information for station id " << stationid;
+		throw std::runtime_error(s.str());
+	}
+	return * station;
+}
+
 void CachedDatabaseAccess::getModelData(ModelDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset ) const
 {
 	if ( ! modelDataCache_.getData(out, si, parameter, minuteOffset) )

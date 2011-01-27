@@ -193,6 +193,27 @@ std::string KvalobsDatabaseAccess::getStationParam(const kvalobs::kvStationInfo 
 		throw std::runtime_error("Unable to find station_param for " + parameter + " for qcx=" + qcx);
 }
 
+kvalobs::kvStation KvalobsDatabaseAccess::getStation(int stationid) const
+{
+	std::ostringstream query;
+	query << "SELECT * FROM station WHERE stationid=" << stationid << " ORDER BY fromtime DESC LIMIT 1;";
+
+	ResultPtr result(connection_->execQuery(query.str()));
+
+	milog::LogContext context("query");
+	LOGDEBUG1(query.str());
+
+	if ( not result->hasNext() )
+	{
+		std::ostringstream s;
+		s << "Unable to find station information for station id " << stationid;
+		throw std::runtime_error(s.str());
+	}
+
+	kvalobs::kvStation ret(result->next());
+	return ret;
+}
+
 void KvalobsDatabaseAccess::getModelData(ModelDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minutesBackInTime ) const
 {
 	std::ostringstream query;
