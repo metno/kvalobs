@@ -128,7 +128,7 @@ void KvalobsDatabaseAccess::getExpectedParameters(ParameterList * out,
 		"stationid=" << si.stationID() << " AND "
 		"typeid=" << si.typeID() << " AND "
 		"fromtime<='" << si.obstime() << "' AND "
-		"(totime IS NULL OR totime<'" << si.obstime() << "'));";
+		"(totime IS NULL OR totime>'" << si.obstime() << "'));";
 // TODO: should this be in query?
 //		"(totime IS NULL OR totime<'" << si.obstime() << "') AND "
 //		"kl" << std::setfill('0') << std::setw(2) << si.obstime().hour() << "  AND " <<
