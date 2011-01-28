@@ -109,6 +109,7 @@ void CheckRunner::newObservation(const kvalobs::kvStationInfo & obs, std::ostrea
 
 	for ( db::DatabaseAccess::CheckList::const_iterator check = checkList.begin(); check != checkList.end(); ++ check )
 	{
+		milog::LogContext context(check->checkname());
 		try
 		{
 			if ( shouldRunCheck(obs, * check, expectedParameters) )
@@ -128,7 +129,7 @@ void CheckRunner::newObservation(const kvalobs::kvStationInfo & obs, std::ostrea
 					it->useinfo(ui);
 				}
 
-				LOGDEBUG("check " << check->checkname() << " done. modification size " << modifications.size());
+				LOGDEBUG("Check done. modification size " << modifications.size());
 
 				db.write(modifications);
 			}
