@@ -102,7 +102,7 @@ void CheckRunner::newObservation(const kvalobs::kvStationInfo & obs, std::ostrea
 
 	if ( qcxFilter_.empty() )
 	{
-		resetObservationDataFlags(observationData, expectedParameters);
+		resetObservationDataFlags(observationData);
 		resetCFailed(observationData);
 		db.write(observationData);
 	}
@@ -201,8 +201,6 @@ bool CheckRunner::shouldRunCheck(const kvalobs::kvStationInfo & obs,
 			not signatureMatchesExpectedParameters(CheckSignature(check.checksignature(), obs.stationID()), expectedParameters))
 		return false;
 
-
-
 	return true;
 }
 
@@ -212,7 +210,7 @@ bool CheckRunner::shouldRunAnyChecks(const kvalobs::kvStationInfo & obs) const
 }
 
 
-void CheckRunner::resetObservationDataFlags(db::DatabaseAccess::DataList & observationData, const db::DatabaseAccess::ParameterList & expectedParameters)
+void CheckRunner::resetObservationDataFlags(db::DatabaseAccess::DataList & observationData)
 {
 	for ( db::DatabaseAccess::DataList::iterator it = observationData.begin(); it != observationData.end(); ++ it )
 	{

@@ -109,8 +109,7 @@ private:
 	bool shouldRunAnyChecks(const kvalobs::kvStationInfo & obs) const;
 
 	void resetObservationDataFlags(
-			db::DatabaseAccess::DataList & observationData,
-			const db::DatabaseAccess::ParameterList & expectedParameters);
+			db::DatabaseAccess::DataList & observationData);
 
 	void resetCFailed(db::DatabaseAccess::DataList & observationData);
 
