@@ -1,4 +1,4 @@
-kvalobs (2.3.4~pre1-1) lucid; urgency=low
+kvalobs (2.3.3-1) lucid; urgency=low
 
   * Fix unlimited loop in missing calculation.
   
