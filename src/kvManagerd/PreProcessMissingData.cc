@@ -127,7 +127,7 @@ paramIsMinute( int typeid_, int paramid )
    }
 
    for( std::list<kvalobs::kvParam>::const_iterator it = paramList.begin();
-        it != paramList.end(); it ) {
+        it != paramList.end(); ++it ) {
       if( it->paramID() == paramid ) {
          std::string name=it->name();
          std::string::size_type i = name.find("_0");
@@ -139,7 +139,7 @@ paramIsMinute( int typeid_, int paramid )
    }
 
    for( std::list<kvalobs::kvTypes>::const_iterator it = typeList.begin();
-         it != typeList.end(); it ) {
+         it != typeList.end(); ++it ) {
       if( it->typeID() == typeid_ ) {
          std::string c = it->obspgm();
 
