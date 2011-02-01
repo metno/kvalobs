@@ -124,9 +124,9 @@ void KvalobsDatabaseAccess::getExpectedParameters(ParameterList * out,
 		const kvalobs::kvStationInfo & si) const
 {
 	std::ostringstream query;
-	query << "SELECT name FROM param WHERE paramid IN (SELECT paramid FROM obs_pgm WHERE "
+	query << "SELECT distinct name FROM param WHERE paramid IN (SELECT paramid FROM obs_pgm WHERE "
 		"stationid=" << si.stationID() << " AND "
-		"typeid=" << si.typeID() << " AND "
+		//"typeid=" << si.typeID() << " AND "
 		"fromtime<='" << si.obstime() << "' AND "
 		"(totime IS NULL OR totime>'" << si.obstime() << "'));";
 // TODO: should this be in query?

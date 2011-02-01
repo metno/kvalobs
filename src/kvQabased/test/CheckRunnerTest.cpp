@@ -80,6 +80,14 @@ TEST_F(CheckRunnerTest, resetsFlagsBeforeCheck)
 			.Times(AtLeast(1))
 			.WillRepeatedly(SetArgumentPointee<0>(dataFromDatabase));
 
+	// TAM_24 have got another typeid, and will not be used
+	kvalobs::kvDataFactory factory2(factory.stationID(), factory.obstime(), factory.typeID() +1);
+	db::DatabaseAccess::DataList taData = boost::assign::list_of(factory2.getData(23.0, 211));
+	EXPECT_CALL(database, getData(_, observation, qabase::DataRequirement::Parameter("TAM_24"), 0))
+			.Times(AtLeast(1))
+			.WillRepeatedly(SetArgumentPointee<0>(taData));
+
+
 	db::DatabaseAccess::DataList expectedScriptReturn = boost::assign::list_of(factory.getData(6.0, 110));
 	expectedScriptReturn.front().controlinfo(kvalobs::kvControlInfo("1040003000000000"));
 	expectedScriptReturn.front().cfailed("QC1-2-101"); // QC1-2-101 is the default qcx return from fake database
@@ -118,7 +126,8 @@ TEST_F(CheckRunnerTest, skipsHqcCorrectedData)
 	EXPECT_CALL(database, getData(_, observation, qabase::DataRequirement::Parameter("RR_24"), 0))
 			.Times(AtLeast(1))
 			.WillRepeatedly(SetArgumentPointee<0>(dataFromDatabase));
-
+	EXPECT_CALL(database, getData(_, observation, qabase::DataRequirement::Parameter("TAM_24"), 0))
+			.Times(AtLeast(1));
 	EXPECT_CALL(database, write(_))
 				.Times(0);
 
@@ -245,4 +254,33 @@ TEST_F(CheckRunnerTest, checkShipsEvenIfParameterMissingInObsPgm)
 					kvalobs::kvChecks(10000001, "QC1-2-101", "QC1-2", 1, "foo", "obs;TA_24;;", "* * * * *", "2010-01-01 00:00:00"),
 					expectedParameters)
 	);
+}
+
+TEST_F(CheckRunnerTest, checksParametersWithOtherTypeidInObsPgm)
+{
+	using namespace testing;
+
+	// other typeid
+	kvalobs::kvStationInfo observation(10,  "2010-05-12 06:00:00", 304);
+	kvalobs::kvDataFactory factory(10, "2010-05-12 06:00:00", 304);
+
+	db::DatabaseAccess::DataList dataFromDatabase = boost::assign::list_of(factory.getData(6.0, 110));
+
+	// Returned data will have typeid 304
+	EXPECT_CALL(database, getData(_, observation, qabase::DataRequirement::Parameter("RR_24"), 0))
+			.Times(AtLeast(1))
+			.WillRepeatedly(SetArgumentPointee<0>(dataFromDatabase));
+
+	// Default action
+	EXPECT_CALL(database, getData(_, observation, qabase::DataRequirement::Parameter("TAM_24"), 0))
+			.Times(AtLeast(1));
+
+	db::DatabaseAccess::DataList expectedScriptReturn = boost::assign::list_of(factory.getData(6.0, 110));
+	expectedScriptReturn.front().controlinfo(kvalobs::kvControlInfo("1040003000000000"));
+	expectedScriptReturn.front().cfailed("QC1-2-101"); // QC1-2-101 is the default qcx return from fake database
+
+	EXPECT_CALL(database, write(expectedScriptReturn))
+			.Times(1);
+
+	runner->newObservation(observation);
 }

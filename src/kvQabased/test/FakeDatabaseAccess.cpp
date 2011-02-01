@@ -64,6 +64,7 @@ int FakeDatabaseAccess::getQcxFlagPosition(const std::string & qcx) const
 void FakeDatabaseAccess::getExpectedParameters(ParameterList * out, const kvalobs::kvStationInfo & si) const
 {
 	out->insert("RR_24");
+	out->insert("TAM_24");
 }
 
 
@@ -121,6 +122,15 @@ void FakeDatabaseAccess::getData(DataList * out, const kvalobs::kvStationInfo & 
 		for (; t <= si.obstime(); t.addHour(12))
 			out->push_front(factory.getData(t.hour(), 109, t));
 	}
+	else if ( parameter.baseName() == "TAM_24" )
+	{
+		kvalobs::kvDataFactory factory(si.stationID(), si.obstime(), si.typeID() +1);
+		miutil::miTime t = si.obstime();
+		t.addMin(minuteOffset);
+		for (; t <= si.obstime(); t.addHour() )
+			out->push_front(factory.getData(t.hour(), 211, t));
+	}
+
 }
 
 void FakeDatabaseAccess::getTextData(TextDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const
