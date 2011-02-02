@@ -48,8 +48,8 @@ public:
                     const miutil::miString &obs,
                     int                    decoderId=-1);
 
-   kvalobs::decoder::comobsdecoder::SmsBase *smsfactory(int smscode);
-   long   getStationid(long obsid, bool isWmono);
+   long getStationid( int wmono )const;
+   bool getEarlyLateObs( int &early, int &late )const;
 
    void setSaSdEm(const std::string saSdEm_ ){ saSdEm = saSdEm_; }
    std::string getMetaSaSdEm( int stationid, int typeid_, const miutil::miTime &obstime );

@@ -831,7 +831,7 @@ openFLogStream(const std::string &filename)
 
 
   //string path=getenv("KVALOBS");
-  string path = kvPath(logdir);
+  string path = logdir();
 
   if(!path.empty() && path[path.length()-1]=='/')
      path.erase(path.length()-1);
@@ -967,4 +967,27 @@ loadObsPgmParamInfo( int stationid, int typeid_,
    }
 
    return true;
+}
+
+std::string
+kvalobs::decoder::
+DecoderBase::
+logdir()const
+{
+   if( ! logdir_.empty() )
+      return logdir_;
+   else
+      return kvPath( kvalobs::logdir );
+}
+
+void
+kvalobs::decoder::
+DecoderBase::
+logdir( const std::string &logdir )
+{
+   logdir_ = logdir;
+   miutil::trimstr( logdir_ );
+
+   if( ! logdir_.empty() && logdir_[logdir.length()-1] == '/')
+      logdir_.erase( logdir_.length() - 1 );
 }

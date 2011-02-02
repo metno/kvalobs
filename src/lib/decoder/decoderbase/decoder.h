@@ -171,6 +171,8 @@ namespace kvalobs{
        */
       miutil::miString     obs;
 
+      std::string logdir_; //Set the path to use for the logdir. Mainly for running tests.
+
       /**
        * \brief findTypes, look up the typeid in the typelist 
        * 
@@ -538,6 +540,8 @@ namespace kvalobs{
                                 ObsPgmParamInfo &paramInfo
                                 ) const;
 
+      std::string logdir()const;
+      void logdir( const std::string &logdir );
     };
 
     /**

@@ -1,3 +1,10 @@
+kvalobs (2.4.0~pre1-1) lucid; urgency=low
+
+  * Update qabase.
+  - Change in library version. Many programs need to be recompiled and linked.
+  
+ -- Børge Moe <borge.moe@met.no>  Wed, 02 Feb 2011 10:15:00 +0100
+
 kvalobs (2.3.4~pre1-1) lucid; urgency=low
 
   * Fix unlimited loop in missing calculation.

@@ -49,7 +49,7 @@ kvDataInputd_LDADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs_deco
                      $(putools_LIBS) $(omniORB4_LIBS) $(libxmlpp_LIBS) $(BOOST_THREAD_LIB)  -ldl
 
 
-kvdataclt_CPPFLAGS = $(AM_CPPFLAGS) -static \
+kvdataclt_CPPFLAGS = $(AM_CPPFLAGS) -static-libtool-libs \
                      -DPKGLIBDIR="\""$(pkglibdir)"\"" \
                      -DSYSCONFDIR="\""$(sysconfdir)"\"" \
                      -DLIBDIR="\""$(libdir)"\"" \
