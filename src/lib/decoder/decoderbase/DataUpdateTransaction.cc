@@ -269,9 +269,16 @@ setTbtime( dnmi::db::Connection *conection )
 
 bool
 DataUpdateTransaction::
-isEqual( list<kvalobs::kvData> &oldData,
+isEqual( list<kvalobs::kvData> &oldData_,
          list<kvalobs::kvTextData> &oldTextData )
 {
+
+   list<kvalobs::kvData> oldData( oldData_ );
+
+   for( list<kvalobs::kvData>::iterator it=oldData.begin(); it != oldData.end(); ++it ){
+      if( it->original() == -32767 )
+         it = oldData.erase( it );
+   }
 
    if( oldData.size() != newData->size() ||
        oldTextData.size() != newTextData->size() ) {
@@ -286,6 +293,7 @@ isEqual( list<kvalobs::kvData> &oldData,
    for( list<kvalobs::kvData>::const_iterator oit=oldData.begin();
         oit != oldData.end();  ++oit ) {
       found = false;
+
       for( list<kvalobs::kvData>::const_iterator nit=newData->begin();
             nit != newData->end();  ++nit ) {
          if( oit->obstime() == nit->obstime() &&
@@ -297,8 +305,8 @@ isEqual( list<kvalobs::kvData> &oldData,
             float nv = nit->original();
             float ov = oit->original();
 
-            if( static_cast<int>( (nv+0.05)*10 ) ==
-                static_cast<int>( (ov+0.05)*10 )    ){
+            if( static_cast<int>( (nv+0.005)*100 ) ==
+                static_cast<int>( (ov+0.005)*100 )    ){
                found=true;
                break;
             }
@@ -349,8 +357,10 @@ getDataWithTbtime( dnmi::db::Connection *con,
 //     << "typeid=" << typeid_ << " AND "
 //     << "tbtime='" << tbtime << "' AND original<>-32767";
 
+//   q << "SELECT * FROM data WHERE stationid=" << stationid << " AND "
+//     << "tbtime='" << tbtime << "' AND original<>-32767";
    q << "SELECT * FROM data WHERE stationid=" << stationid << " AND "
-     << "tbtime='" << tbtime << "' AND original<>-32767";
+     << "tbtime='" << tbtime << "'";
 
 
    auto_ptr<dnmi::db::Result> res;
@@ -427,10 +437,15 @@ getData( dnmi::db::Connection *con,
    data.clear();
    textData.clear();
 
+   /*
    q << "SELECT * FROM data WHERE stationid=" << stationid << " AND "
      << "typeid=" << typeid_ << " AND "
      << "obstime='" << obstime << "' AND original<>-32767";
+    */
 
+   q << "SELECT * FROM data WHERE stationid=" << stationid << " AND "
+       << "typeid=" << typeid_ << " AND "
+       << "obstime='" << obstime << "'";
 
    auto_ptr<dnmi::db::Result> res;
 
@@ -710,14 +725,36 @@ replaceData( dnmi::db::Connection *conection,
    ostringstream q;
    miutil::miTime tbtime;
    int msec;
+   bool onlyMissing=true;
 
-   if( ! dataList.empty()) {
+   for( list<kvalobs::kvData>::const_iterator it=dataList.begin(); it != dataList.end();
+         ++it ) {
+      if( it->original() != -32767 ) {
+         onlyMissing = false;
+         break;
+      }
+   }
+
+   if( onlyMissing && ! dataList.empty() ) {
       tbtime = dataList.begin()->tbtime();
       msec = dataList.begin()->tbtimemsec();
-   } else if( ! textDataList.empty() ) {
+   }else if( ! dataList.empty()) {
+      for( list<kvalobs::kvData>::const_iterator it=dataList.begin(); it != dataList.end();
+           ++it ) {
+         if( it->original() != -32767 ) {
+            tbtime = it->tbtime();
+            msec = it->tbtimemsec();
+            break;
+         }
+      }
+   }
+
+   if( tbtime.undef() && ! textDataList.empty() ) {
       tbtime = textDataList.begin()->tbtime();
       msec = textDataList.begin()->tbtimemsec();
-   } else {
+   }
+
+   if( tbtime.undef() ){
       insertData( conection, *newData, *newTextData );
       return;
    }
