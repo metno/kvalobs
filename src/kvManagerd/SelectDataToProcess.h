@@ -41,7 +41,7 @@
 
 /**
  * SelectDataToProcess get messages from inputQue. When a message 
- * arrive we now that new messages is put into the table 'workque'.
+ * arrive we know that new messages is put into the table 'workque'.
  * We selects job from the workque to be prosecced. The data is sendt to 
  * the outputque to be processed.
  */
