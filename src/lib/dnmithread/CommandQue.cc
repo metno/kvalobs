@@ -18,16 +18,16 @@
   modify it under the terms of the GNU General Public License as 
   published by the Free Software Foundation; either version 2 
   of the License, or (at your option) any later version.
-  
+
   KVALOBS is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License along 
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ */
 #include <stdlib.h>
 #include <boost/thread/xtime.hpp>
 #include "CommandQue.h"
@@ -40,7 +40,7 @@ dnmi::thread::
 CommandBase::
 execute()
 {
-  return executeImpl();
+   return executeImpl();
 }
 
 
@@ -49,13 +49,13 @@ dnmi::thread::
 CommandBase::
 debugInfo(std::ostream &info)const
 {
-  info << "No implementation for <CommandBase::debugInfo>.\n"; 
+   info << "No implementation for <CommandBase::debugInfo>.\n";
 } 
 
 dnmi::thread::
 CommandQue::
 CommandQue(bool suspended_):
-  suspended(suspended_)  
+suspended(suspended_)
 {
 }
 
@@ -63,11 +63,11 @@ dnmi::thread::
 CommandQue::
 ~CommandQue()
 {
-    Lock lock(m);;
-    QueIterator it=que.begin();
+   Lock lock(m);;
+   QueIterator it=que.begin();
 
-    for(;it!=que.end(); it++)
-	delete *it;
+   for(;it!=que.end(); it++)
+      delete *it;
 }
 
 void 
@@ -75,12 +75,12 @@ dnmi::thread::
 CommandQue::
 post(CommandBase *command)
 {
-    Lock lock(m);
+   Lock lock(m);
 
-    if(suspended)
+   if(suspended)
       throw QueSuspended();
 
-    que.push_back(command);
+   que.push_back(command);
 }
 
 void 
@@ -88,15 +88,15 @@ dnmi::thread::
 CommandQue::
 postAndBrodcast(CommandBase *command)
 {
-    Lock lock(m);
+   Lock lock(m);
 
-    if(suspended)
+   if(suspended)
       throw QueSuspended();
 
-    que.push_back(command);
+   que.push_back(command);
 
-    cond.notify_all();
- 
+   cond.notify_all();
+
 }
 
 dnmi::thread::CommandBase*
@@ -104,34 +104,34 @@ dnmi::thread::
 CommandQue::
 peek(int timeout)
 {
-  Lock lk(m);
-  
-  if(que.empty()){
-    if(timeout==0){
-	
-      while(que.empty()){
-	cond.wait(lk);
-	
-	if(suspended)
-	  throw QueSuspended();
+   Lock lk(m);
+
+   if(que.empty()){
+      if(timeout==0){
+
+         while(que.empty()){
+            cond.wait(lk);
+
+            if(suspended)
+               throw QueSuspended();
+         }
+      }else{
+         boost::xtime xt;
+
+         xtime_get(&xt, boost::TIME_UTC);
+         xt.sec+=timeout;
+
+         cond.timed_wait(lk, xt);
+
+         if(suspended)
+            throw QueSuspended();
+
+         if(que.empty())
+            return 0;
       }
-    }else{
-      boost::xtime xt;
-      
-      xtime_get(&xt, boost::TIME_UTC);
-      xt.sec+=timeout;
-      
-      cond.timed_wait(lk, xt);
-      
-      if(suspended)
-	throw QueSuspended();
-      
-      if(que.empty())
-	return 0;
-    }
-  }
-  CommandBase *tmp=que.front();  
-  return tmp;
+   }
+   CommandBase *tmp=que.front();
+   return tmp;
 }
 
 dnmi::thread::CommandBase*
@@ -177,21 +177,21 @@ dnmi::thread::
 CommandQue::
 remove(CommandBase *com)
 {
-  Lock lck(m);
-  
-  if(que.empty())
-    return 0;
+   Lock lck(m);
 
-  QueIterator it=que.begin();
-  
-  for(; it!=que.end(); it++){
-    if(*it==com){
-      que.erase(it);
-      return com;
-    }
-  }
-  
-  return 0;
+   if(que.empty())
+      return 0;
+
+   QueIterator it=que.begin();
+
+   for(; it!=que.end(); it++){
+      if(*it==com){
+         que.erase(it);
+         return com;
+      }
+   }
+
+   return 0;
 }
 
 void         
@@ -199,46 +199,46 @@ dnmi::thread::
 CommandQue::
 clear()
 {
-  Lock lck(m);
+   Lock lck(m);
 
-  que.clear();
+   que.clear();
 }
- 
+
 std::list<dnmi::thread::CommandBase*>*
 dnmi::thread::CommandQue::removeAll()
 {
-  std::list<CommandBase*> *toReturn;
-  Lock lck(m);
-  
-  if(que.empty())
-    return 0;
+   std::list<CommandBase*> *toReturn;
+   Lock lck(m);
 
-  
-  QueIterator it=que.begin();
-  
-  try{
-    toReturn=new std::list<CommandBase*>();
-  }
-  catch(...){
-    return 0;
-  }
- 
+   if(que.empty())
+      return 0;
 
-  for(; it!=que.end(); it++){
-    toReturn->push_back(*it);
-  }
-  
-  que.clear();
-  return toReturn;
+
+   QueIterator it=que.begin();
+
+   try{
+      toReturn=new std::list<CommandBase*>();
+   }
+   catch(...){
+      return 0;
+   }
+
+
+   for(; it!=que.end(); it++){
+      toReturn->push_back(*it);
+   }
+
+   que.clear();
+   return toReturn;
 }
 bool      
 dnmi::thread::
 CommandQue::
 empty()
 {
-     Lock lck(m);
+   Lock lck(m);
 
-     return que.empty();
+   return que.empty();
 }
 
 int       
@@ -246,9 +246,9 @@ dnmi::thread::
 CommandQue::
 size()
 {
-    Lock lck(m);
-    
-    return que.size();
+   Lock lck(m);
+
+   return que.size();
 }
 
 
@@ -257,10 +257,10 @@ dnmi::thread::
 CommandQue::
 brodcast()
 {
-    Lock lck(m);
-    
-    if(!que.empty())
-	cond.notify_all();
+   Lock lck(m);
+
+   if(!que.empty())
+      cond.notify_all();
 }
 
 
@@ -269,13 +269,13 @@ dnmi::thread::
 CommandQue::
 suspend()
 {
-  Lock lk(m);
+   Lock lk(m);
 
-  if(suspended)
-    return;
+   if(suspended)
+      return;
 
-  suspended=true;
-  cond.notify_all();
+   suspended=true;
+   cond.notify_all();
 }
 
 void         
@@ -283,13 +283,13 @@ dnmi::thread::
 CommandQue::
 resume()
 {
-  Lock lk(m);
+   Lock lk(m);
 
-  if(!suspended)
-    return;
+   if(!suspended)
+      return;
 
-  suspended=false;
-  cond.notify_all();
+   suspended=false;
+   cond.notify_all();
 }
 
 void
@@ -297,6 +297,6 @@ dnmi::thread::
 CommandQue::
 signal()
 {
-  Lock lk(m);
-  cond.notify_all();
+   Lock lk(m);
+   cond.notify_all();
 }
