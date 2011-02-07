@@ -232,16 +232,17 @@ operator()()
     	LOGDEBUG("DataReady received!");
     
     	conIdleTime=0;
-    	kvalobs::IkvStationInfoList it=stInfoCmd->getStationInfo().begin();
+    	kvalobs::kvStationInfoList stationInfoList = stInfoCmd->getStationInfo();
 
-    	for(;it!=stInfoCmd->getStationInfo().end(); it++){
+    	for( kvalobs::IkvStationInfoList it=stationInfoList.begin();
+           it!=stationInfoList.end(); it++){
       	updateWorkelementServiceStart(*it, dbCon);    
       	callSubscribers(*it);
       	updateWorkelementServiceStop(*it, dbCon);    
     	}
 
-    	app.sendToManager(stInfoCmd->getStationInfo(), 
-		      				stInfoCmd->getCallback());
+    	app.sendToManager( stationInfoList,
+		      				 stInfoCmd->getCallback());
     
    	delete stInfoCmd;
   	}

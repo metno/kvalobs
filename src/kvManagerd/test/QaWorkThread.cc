@@ -43,6 +43,7 @@ QaWork::operator()()
   dnmi::thread::CommandBase   *cmd;
   QaWorkCommand *work;
   IkvStationInfoList  it;
+  kvStationInfoList stationInfoList;
   kvalobs::kvStationInfoList retList;
   CERR("QaWork: starting work thread!\n");
 
@@ -64,12 +65,13 @@ QaWork::operator()()
 
 
     CKvalObs::CManager::CheckedInput_var manager=work->getCallback();
-    it=work->getStationInfo().begin();
+    stationInfoList = work->getStationInfo();
+    it = stationInfoList.begin();
 
     //The list wil have one and only one element when it is received from 
     //kvManager.
 
-    if(it!=work->getStationInfo().end()){ //Paranoia
+    if(it != stationInfoList.end()){ //Paranoia
       retList.clear();
       doWork(*it, retList);
       

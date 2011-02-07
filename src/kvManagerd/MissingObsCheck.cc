@@ -44,7 +44,7 @@ void
 MissingObsCheck::
 postCommandToQue(kvalobs::StationInfoCommand *cmd)
 {
-	kvalobs::kvStationInfoList &stationInfoList=cmd->getStationInfo();
+	kvalobs::kvStationInfoList stationInfoList=cmd->getStationInfo();
   	IkvStationInfoList it=stationInfoList.begin();
   	kvDbGate gate(con);
   	miutil::miTime undefTime;

@@ -104,7 +104,7 @@ void
 PreProcessWorker::postDataToOutputQue(StationInfoCommand   *infoCmd, 
                                       dnmi::db::Connection &con)
 {
-   kvStationInfoList      &infoList=infoCmd->getStationInfo();
+   kvStationInfoList      infoList=infoCmd->getStationInfo();
    IkvStationInfoList     it=infoList.begin();
    kvDbGate               gate(&con);
    list<kvData>           data;
@@ -260,7 +260,7 @@ PreProcessWorker::operator()()
 
       it=jobList->begin();
 
-      kvStationInfoList &infoList=infoCmd->getStationInfo();
+      kvStationInfoList infoList = infoCmd->getStationInfo();
       IkvStationInfoList itInfoList;
 
       if (!infoList.size())

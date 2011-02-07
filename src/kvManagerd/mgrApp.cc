@@ -121,10 +121,10 @@ isGenerated(long stationid,
 
 bool 
 ManagerApp::
-sendDataToQA(const kvalobs::kvStationInfo &info_,
+sendDataToQA(const kvalobs::kvStationInfo &info,
 			 bool &bussy)
 {
-  kvalobs::kvStationInfo     info=const_cast<kvalobs::kvStationInfo&>(info_);
+  //kvalobs::kvStationInfo     info=const_cast<kvalobs::kvStationInfo&>(info_);
   //  kvalobs::CIkvParamInfoList it;
   CKvalObs::StationInfo      stInfo;
   CORBA::Long i;
