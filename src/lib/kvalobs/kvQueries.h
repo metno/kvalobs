@@ -226,6 +226,7 @@ namespace kvQueries {
 
   miutil::miString selectStationOrdered();
   miutil::miString selectAllStations(const miutil::miString &orderby);
+  miutil::miString selectStationsByRange( long from, long to, bool order);
 
   /**
    * \brief Select all entries from \em obs_pgm matching typeid

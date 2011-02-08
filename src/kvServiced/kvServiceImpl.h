@@ -49,6 +49,11 @@ class KvServiceImpl: public virtual POA_CKvalObs::CService::kvServiceExt,
 		       std::list<kvalobs::kvObsPgm>    &obsPgms,
 		       bool                            aUnion);
 
+  bool appendWhichDataFromStationRange( dnmi::db::Connection *dbCon,
+                                        const CKvalObs::CService::WhichDataList &wData,
+                                        CORBA::Long startIndex,
+                                        CKvalObs::CService::WhichDataList *whichData );
+
   CKvalObs::CService::WhichDataList*
     createWhichDataListForAllStations(dnmi::db::Connection *dbCon, 
 				      const CKvalObs::CService::WhichData &wData);

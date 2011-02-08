@@ -436,6 +436,26 @@ kvQueries::selectAllStations(const miutil::miString &orderby)
   return ost.str();
 }
 
+
+miutil::miString
+kvQueries::
+selectStationsByRange( long from, long to, bool order)
+{
+   ostringstream ost;
+
+   if( from > to ) {
+      long tmp=from;
+      from = to;
+      to = tmp;
+   }
+   ost << " WHERE stationid >= " << from << " AND stationid < " << to;
+
+   if( order )
+      ost  << " order by stationid";
+
+   return ost.str();
+}
+
 /*
   Select all entries from obs_pgm matching stationid and
   valid fromtime

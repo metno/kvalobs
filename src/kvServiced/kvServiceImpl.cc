@@ -28,6 +28,7 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+#include <stdlib.h>
 #include <list>
 #include <string>
 #include <sstream>
@@ -304,6 +305,58 @@ addToObsPgmList(CKvalObs::CService::Obs_pgmList &pgmList,
 
 }
 
+bool
+KvServiceImpl::
+appendWhichDataFromStationRange( dnmi::db::Connection *dbCon,
+                              const CKvalObs::CService::WhichDataList &wData,
+                              CORBA::Long startIndex,
+                              CKvalObs::CService::WhichDataList *whichData
+                            )
+{
+   if( !dbCon ){
+      LOGERROR("INTERNAL: Database connection is 0 (dbCon==0)!");
+      return false;
+   }
+
+   if( (startIndex + 1) >= wData.length() ) {
+      LOGERROR("Get range of stations! " <<
+               "Starting from: " << labs( wData[startIndex].stationid) << ", but it is no ending station in the range." << endl
+                                 <<"Too few WhichData elements." );
+      return false;
+   }
+
+   kvDbGate gate(dbCon);
+   list<kvStation> stations;
+
+   if(!gate.select( stations,
+                    kvQueries::selectStationsByRange( labs( wData[startIndex].stationid ),
+                                                      labs( wData[startIndex+1].stationid ),
+                                                      true)
+                                                    )
+                  ){
+      LOGERROR("Failed to get the station range [" << labs( wData[startIndex].stationid ) << ","
+               <<labs( wData[startIndex+1].stationid ) << "> from the database!"
+               << endl << "Reason: " << gate.getErrorStr());
+      return false;
+   }
+
+   LOGDEBUG("Got the station range [" << labs( wData[startIndex].stationid ) << ","
+               <<labs( wData[startIndex+1].stationid ) << "> from the database!");
+
+   list<kvStation>::iterator it=stations.begin();
+   CORBA::Long insertFrom = whichData->length();
+   whichData->length( whichData->length() + stations.size() );
+
+   for(CORBA::Long i = insertFrom;
+       it!=stations.end();
+         it++, i++){
+      (*whichData)[i]=wData[startIndex];
+      (*whichData)[i].stationid=it->stationID();
+   }
+
+   return true;
+}
+
 
 CKvalObs::CService::WhichDataList*
 KvServiceImpl::
@@ -557,10 +610,27 @@ getData(const WhichDataList& whichData,
       pWhichData=createWhichDataListForAllStations(pCon, whichData[0]);
    }else{
       try{
-         pWhichData=new WhichDataList(whichData);
+         pWhichData = new WhichDataList();
+         CORBA::Long i=0;
+         while( i < whichData.length() ) {
+            if( whichData[i].stationid < 0 ) {
+               if( ! appendWhichDataFromStationRange( pCon, whichData, i, pWhichData) ) {
+                  delete pWhichData;
+                  it=DataIterator::_nil();
+                  app.releaseDbConnection(pCon);
+                  return false;
+               }
+               i += 2;
+            } else {
+               CORBA::Long insertAt = pWhichData->length();
+               pWhichData->length( insertAt + 1 );
+               (*pWhichData)[insertAt] = whichData[i];
+               ++i;
+            }
+         }
       }
-      catch(...){
-         pWhichData=0;
+      catch( ... ) {
+         delete pWhichData;
       }
    }
 
