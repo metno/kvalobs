@@ -1,3 +1,9 @@
+kvalobs (2.4.0~pre4-1) lucid; urgency=low
+
+  * Added a way to specify stations ranges in getData.
+  
+ -- Børge Moe <borge.moe@met.no>  Tue, 08 Feb 2011 15:30:00 +0100
+
 kvalobs (2.4.0~pre3-1) lucid; urgency=low
 
   * Fix crash in kvManagerd.
