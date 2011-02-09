@@ -94,10 +94,10 @@ function yes_no()
 if [ -e ${KVCONF}/kvname ]; then
     KVNAME=`cat ${KVCONF}/kvname`
     echo "Den som har stanset kvalobs er: $KVNAME"
-   echo "Ønsker du å starte kvalobs?"
+   echo "Ã¸nsker du Ã¥ starte kvalobs?"
    yes_no
    if [ $? -ne 0 ] ; then
-        echo "OK, du har valgt å starte kvalobs"
+        echo "OK, du har valgt Ã¥ starte kvalobs"
    else
       echo "OK, du vil ikke starte kvalobs - kvalobs blir ikke startet"
       exit 0
@@ -107,8 +107,8 @@ fi
 echo " "
 echo " "
 echo "  Starter kvalobs dette kan ta noe tid!"
-echo "  Hvis det ikke skjer noe på MER enn $TIMEOUT sekund"
-echo "  bruk CTRL-C for å avbryte!"
+echo "  Hvis det ikke skjer noe pÃ¥ MER enn $TIMEOUT sekund"
+echo "  bruk CTRL-C for Ã¥ avbryte!"
 echo " "
 echo " "
 

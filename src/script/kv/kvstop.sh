@@ -52,15 +52,16 @@ fi
 function use()
 {
     echo ""
-    echo " kvstop [-l] [-a] [-h]"
+    echo " kvstop [-l] [-a] [-h] [-n progname]"
     echo ""
-    echo " kvstop er et program for å stoppe program i kvalobs"
+    echo " kvstop er et program for Ã¥ stoppe program i kvalobs"
     echo " systemet. Man kan enten stoppe alle programmene eller"
     echo " velge et program fra en liste som skal stoppes."
     echo ""
     echo "  -l velg i en liste et program som skal stoppes"
     echo "  -a stop alle programmene"
     echo "  -h skriv ut denne hjelp teksten og avslutt!"
+    echo "  -n progname stopp kun programmet 'progname'.
     echo ""
     exit 1
 }
@@ -68,18 +69,20 @@ function use()
 killallopt=0
 listopt=0
 OPTERR=0
-getopts "alh" opt
+getopts "alhn:" opt
 optret=$?
+progname=
 
 while [ $optret -eq 0 ]; do
     case $opt in
 	a) killallopt=1;;
 	l) listopt=1;;
 	h) use;;
+	n) progname="$OPTARG";;
 	\?) echo "Ugyldig option: $OPTARG"; use;;
 	*) echo "Uventet, dette skal ikke skje!"; use;;
     esac
-    getopts "ahl" opt
+    getopts "ahln:" opt
     optret=$?
 done
 
@@ -88,6 +91,7 @@ echo "killallopt: $killallopt"
 echo "KVPID=$KVPID"
 echo "TIMEOUT=$TIMEOUT"
 echo "node: $NODENAME"
+echo "progname: $progname"
 
 #inlist tar to parametere
 function inlist()
@@ -219,7 +223,7 @@ function select_prog_to_stop()
     while [ -z $cmd  ]; do
 	clear
 	echo ""
-	echo "Velg et program å stoppe!"
+	echo "Velg et program ï¿½ stoppe!"
 	echo "-------------------------"
 	lineno=0
 	list=""
@@ -261,15 +265,35 @@ if [ $listopt -ne 0 ]; then
     exit 0
 fi
 
-
+if [ "z$progname"!="z" ]; then
+	echo " "
+	echo " "
+	echo "  Stopper '$progname' dette kan ta noe tid!"
+	echo "  Hvis det ikke skjer noe pÃ¥ MER enn $TIMEOUT sekund"
+	echo "  bruk CTRL-C for Ã¥ avbryte!"
+	echo " "
+	echo " "
+	for PROG in $STOP_PROGS ; do
+		if [ "$PROG" = "$progname" ]; then
+      		killprog $PROG
+      		exit $?
+      	fi
+	done
+	
+	echo " '$progname' er ikke spesifisert i ${KVCONF}/kv_ctl.conf
+	echo " "
+	echo " "
+	exit 2
+fi
+	
 
 
 
 echo " "
 echo " "
 echo "  Stopper kvalobs dette kan ta noe tid!"
-echo "  Hvis det ikke skjer noe på MER enn $TIMEOUT sekund"
-echo "  bruk CTRL-C for å avbryte!"
+echo "  Hvis det ikke skjer noe pÃ¥ MER enn $TIMEOUT sekund"
+echo "  bruk CTRL-C for Ã¥ avbryte!"
 echo " "
 echo " "
 
