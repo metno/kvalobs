@@ -1,3 +1,11 @@
+kvalobs (2.4.0~pre5-1) lucid; urgency=low
+
+  * kvQabased: Allow the command que to be processed before shutdown.
+  * kvstop: Added an option '-n progname' to stop the progname only.
+  
+ -- Børge Moe <borge.moe@met.no>  Wed, 09 Feb 2011 07:30:00 +0100
+
+
 kvalobs (2.4.0~pre4-1) lucid; urgency=low
 
   * Added a way to specify stations ranges in getData.
