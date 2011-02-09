@@ -207,22 +207,33 @@ void QaBaseApp::releaseDbConnection(dnmi::db::Connection *con)
 			<< ") released");
 }
 
+bool QaBaseApp::pendingShutdown()
+{
+   boost::mutex::scoped_lock l(mutex);
+
+   return shutdown_ || sigTerm;
+}
+
 bool QaBaseApp::shutdown()
 {
-	if (shutdown_ || sigTerm)
+	if ( pendingShutdown() )
 	{
 
 		boost::mutex::scoped_lock l(mutex);
 
-		if (!orbIsDown)
-		{
-			LOGDEBUG("shutdown CORBA!\n");
-			orbIsDown = true;
-			getOrb()->shutdown(false);
+		if( inQue.empty() ) {
+		   if( !orbIsDown ) {
+		      LOGDEBUG( "shutdown CORBA!\n" );
+		      orbIsDown = true;
+		      getOrb()->shutdown( false );
+		   }
+		   return true;
+		} else {
+		   return false;
 		}
 	}
 
-	return shutdown_ || sigTerm;
+	return false;
 }
 
 namespace

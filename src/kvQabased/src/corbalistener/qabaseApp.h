@@ -77,10 +77,16 @@ public:
 	}
 	/**
 	 * shutdown returns true when the application is in
-	 * the terminating state.
+	 * the terminating state. The command que 'inQue'
+	 * is allowed to be processed before we shutdown.
 	 */
 	bool shutdown();
 
+	/**
+	* The program is in shutdown sequence. Just waiting for
+	* the command que 'inQue' to be processed before shutdown.
+	*/
+	bool pendingShutdown();
 	/**
 	 * Creates a new connection to the database. The caller must
 	 * call releaseDbConnection after use.

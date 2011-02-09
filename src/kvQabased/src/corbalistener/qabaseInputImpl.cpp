@@ -47,12 +47,16 @@ CORBA::Boolean QaBaseInputImpl::newDataCB(const CKvalObs::StationInfo& data,
 		const micutil::KeyValList& args, CORBA::Boolean &bussy)
 {
 	milog::LogContext context("CORBA(QaBaseInputImpl::newDataCB)");
-
+	bool pendingShutdown = app.pendingShutdown();
 	bussy = false;
 
-	if (app.getInQue().size() > 2)
+	if ( pendingShutdown || app.getInQue().size() > 2)
 	{
-		LOGDEBUG6("BUSSY!\n");
+		if( pendingShutdown ) {
+		   LOGINFO("BUSSY! Shutdown is pending.");
+		} else {
+		   LOGDEBUG6("BUSSY!\n");
+		}
 
 		bussy = true;
 		return false;
