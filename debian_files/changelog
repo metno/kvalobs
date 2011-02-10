@@ -1,3 +1,11 @@
+kvalobs (2.4.0~pre6-1) lucid; urgency=low
+
+  * kvrestart, kvstopkv and kvstart updated.
+  * kvManagerd: fixed bug in search for missing minute values.
+  * Updated the kvcron script to restart kvQabased at 3:25 and 21:25
+  
+ -- Børge Moe <borge.moe@met.no>  Thu, 10 Feb 2011 15:15:00 +0100
+
 kvalobs (2.4.0~pre5-1) lucid; urgency=low
 
   * kvQabased: Allow the command que to be processed before shutdown.
