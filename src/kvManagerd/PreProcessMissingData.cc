@@ -40,6 +40,7 @@
 
 using namespace kvalobs;
 using namespace milog;
+using namespace std;
 
 PreProcessMissingData::
 PreProcessMissingData()
@@ -120,11 +121,13 @@ PreProcessMissingData::
 paramIsMinute( int typeid_, int paramid )
 {
    bool isMinParam = false;
+
    if( ! loadParamsAndTypes() ) {
       LOGERROR("PreProcessMissingData: The 'param' and 'types' table is not available.\n" <<
                "Can't decide if paramid (" << paramid << ") typeid (" << typeid_ << ") is minute data.");
       return false;
    }
+
 
    for( std::list<kvalobs::kvParam>::const_iterator it = paramList.begin();
         it != paramList.end(); ++it ) {
@@ -149,6 +152,7 @@ paramIsMinute( int typeid_, int paramid )
          break;
       }
    }
+
 
    return isMinParam;
 }
@@ -357,21 +361,11 @@ PreProcessMissingData::doJob(long                 stationId,
             float            corrected = -32767;
             controlinfo.MissingFlag(kvQCFlagTypes::status_orig_and_corr_missing);
 
-            if( paramIsMinute( itd->typeID(), itd->paramID() ) ) {
+            if( paramIsMinute( typeId, paramid ) ) {
                original  = 0.0;
                corrected = 0.0;
                controlinfo.MissingFlag(kvQCFlagTypes::status_ok );
             }
-
-            //NOTE:
-            //Børge Moe 2005.12.2005
-            //
-            //This should be taken care of in QAbase. But it is missed!
-            //Until this i fixed in QAbase it is set here.
-            useinfo.set(1, 8); //original value is missing
-
-            //useinfo.setUseFlags(controlinfo);
-
 
             kvData data(stationId,
                         obstime,
