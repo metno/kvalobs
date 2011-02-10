@@ -1,6 +1,6 @@
-bin_SCRIPTS = kvstart kvstop
+bin_SCRIPTS = kvstart kvstop kvrestart
 
-EXTRA_DIST = kvstart.sh kvstop.sh kvcron.template
+EXTRA_DIST = kvrestart.sh kvstart.sh kvstop.sh kvcron.template
 
 CLEANFILES = kvstart kvstop
 
@@ -11,3 +11,7 @@ kvstart:	kvstart.sh
 
 kvstop:	kvstop.sh
 	$(SED_SUBST)
+
+kvrestart:	kvrestart.sh
+	$(SED_SUBST)
+	
