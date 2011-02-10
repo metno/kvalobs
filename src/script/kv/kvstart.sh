@@ -46,6 +46,11 @@ if [ "$USER" != "$KVUSER" ]; then
    exit 1
 fi
 
+progname=
+
+if [ $# -ge 1 ]; then
+	progname=$1
+fi
 
 echo "KVBIN=$KVBIN"
 echo "KVPID=$KVPID"
@@ -113,8 +118,15 @@ echo " "
 echo " "
 
 for PROG in $START_PROGS ; do
-    echo -n "Starter $PROG ...."
-
+	if [ "z$progname" != "z" ]; then
+		if ! echo $PROG | grep $progname > /dev/null 2>&1 ; then  
+			continue
+		fi
+	fi
+	
+	echo -n "Starter $PROG ...."
+	
+	rm -f $KVPID/$PROG-$NODENAME.stopped
     isrunning $PROG
  
     if [ $? -eq 0 ]; then
@@ -127,7 +139,7 @@ for PROG in $START_PROGS ; do
 	n=0
 
         while [ $n -lt $TIMEOUT  -a ! -f "$KVPID/$PROG-$NODENAME.pid" ]; do
-	      let n=n+1
+	      n=$((n+1))
 	      sleep 1
 	done
  
