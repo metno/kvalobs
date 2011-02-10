@@ -28,6 +28,7 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+#include <stdlib.h>
 #include <puTools/miTime.h>
 #include <milog/milog.h>
 #include <kvalobs/kvDbGate.h>
@@ -216,7 +217,8 @@ findMissingData(const miutil::miTime& runtime,
 					 dnmi::db::Connection *con)
 {
  	string logfile;
-    
+   miutil::miTime startAt;
+   miutil::miTime stopAt;
    logfile = kvPath("logdir") + "/kvManagerd-missing.log";
 
 	milog::SetResetDefaultLoggerHelper loggerHelper(logfile, 1048576);
@@ -226,9 +228,13 @@ findMissingData(const miutil::miTime& runtime,
 	MissingObsCheck check(*con, outputQue, app.genCache(), 
 								boost::bind(&ManagerApp::shutdown, &app));
 	
+	startAt = miutil::miTime::nowTime();
 	check.findMissingData(runtime, lastMissingRun);
+	stopAt = miutil::miTime::nowTime();
 	
+	LOGINFO("Missing search: started: " << startAt << " Stopped: " << stopAt
+	        << " elpased time: " << abs( miutil::miTime::secDiff(stopAt, startAt) ) << " s.");
+
 	lastMissingRuntime(con, runtime);
-	
 }
 
