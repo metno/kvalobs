@@ -11,4 +11,4 @@ LOG=/var/log/kvalobs
 5  1 * * * $MYBIN/synopdecoder_cron.sh %
 #*/5 * * * * $MYBIN/check_kvsynopd.sh >> $LOG/check_kvsynopd.log %
 30 6 1 * * $MYBIN/save_last_month.sh
-25 3,21 * * * $MYBIN/kvrestart kvQabased > /dev/null 2>&1 %
+25 3,21 * * * /usr/bin/kvrestart kvQabased > /dev/null 2>&1 %
