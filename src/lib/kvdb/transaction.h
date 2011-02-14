@@ -45,7 +45,7 @@ public:
     *
     * @param driverid Which driver is running this transaction.
     * @param errorMessage An error message about the reason to abort the transaction.
-    * @param errorCode A driver specific erro code.
+    * @param errorCode A driver specific error code.
     */
    virtual void onAbort(const std::string &driverid,
                         const std::string &errorMessage,
