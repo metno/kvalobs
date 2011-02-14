@@ -1,3 +1,10 @@
+kvalobs (2.4.0~pre7-1) lucid; urgency=low
+
+  * Bugfix in the transaction method 'perform' for postgresql.
+  
+ -- Børge Moe <borge.moe@met.no>  Mon, 14 Feb 2011 09:45:00 +0100
+
+
 kvalobs (2.4.0~pre6-1) lucid; urgency=low
 
   * kvrestart, kvstopkv and kvstart updated.
