@@ -980,7 +980,7 @@ onRetry()
 
    nRetry++;
    IDLOGDEBUG("retry", "RETRY: " << nRetry << " stationid: " << stationid << " Typeid: "
-              << typeid_ << " obstime: " << obstime << "\nMessage: " << log.str() )
+              << typeid_ << " obstime: " << obstime << "\nMessage: " << log.str() );
    log.str("");
    stationInfoList_->clear();
 }
@@ -993,7 +993,7 @@ onAbort( const std::string &driverid,
 {
    if( !logid.empty() ) {
       IDLOGINFO( logid, "Transaction aborted: Driver: '" << driverid << "' ErrorCode: '"
-                 << errorCode << "\nReason: " << errorMessage );
+                 << errorCode << "'.\nReason: " << errorMessage );
    }
 }
 
