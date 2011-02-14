@@ -18,22 +18,23 @@
   modify it under the terms of the GNU General Public License as 
   published by the Free Software Foundation; either version 2 
   of the License, or (at your option) any later version.
-  
+
   KVALOBS is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License along 
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ */
 #include <unistd.h>
 #include <sstream>
+#include <time.h>
 #include "pgsqldb.h"
 
 using namespace std;
-      
+
 dnmi::db::drivers::PGDriver::PGDriver()
 {
 }
@@ -41,69 +42,69 @@ dnmi::db::drivers::PGDriver::PGDriver()
 dnmi::db::drivers::PGDriver::~PGDriver()
 {
 }
-	
+
 dnmi::db::Connection* 
 dnmi::db::drivers::PGDriver::createConnection(const std::string &connect)
 {
-  PGConnection *con;
+   PGConnection *con;
 
-  try{
-    con=new PGConnection(connect, name());
-  }
-  catch(...){
-    setErrMsg("Out of memmory!");
-    return 0;
-  }
+   try{
+      con=new PGConnection(connect, name());
+   }
+   catch(...){
+      setErrMsg("Out of memmory!");
+      return 0;
+   }
 
-  if(con->isConnected())
-    return con;
+   if(con->isConnected())
+      return con;
 
-  delete con;
-  
-  return 0;
+   delete con;
+
+   return 0;
 }
 
 bool        
 dnmi::db::drivers::PGDriver::releaseConnection(Connection *connect)
 {
-  if(connect->getDriverId()!=name()){
-    stringstream ost;
-    ost << "ERROR: trying to release a connection with driverId <" <<
-	 connect->getDriverId() << ">, but this driver har driverId <" <<
-	 name() << ">!\n";
-    setErrMsg(ost.str());
-    return false;
-  }
-  
-  delete connect;
-  
-  return true;
+   if(connect->getDriverId()!=name()){
+      stringstream ost;
+      ost << "ERROR: trying to release a connection with driverId <" <<
+            connect->getDriverId() << ">, but this driver har driverId <" <<
+            name() << ">!\n";
+      setErrMsg(ost.str());
+      return false;
+   }
+
+   delete connect;
+
+   return true;
 }
-    
+
 dnmi::db::drivers::PGConnection::PGConnection(const std::string &connect,
-					      const std::string &driverId)
-  :Connection(driverId), con(0)
+                                              const std::string &driverId)
+:Connection(driverId), con(0)
 {
-  char *msg;
+   char *msg;
 
-  pimpel = new PGPimpel();
+   pimpel = new PGPimpel();
 
-  con=PQconnectdb(connect.c_str());
-  
-  if(con){
-    if(PQstatus(con)!=CONNECTION_OK){
-      msg=PQerrorMessage(con);
-      
-      if(msg)
-	errMsg=msg;
-      else
-	errMsg="Can't connect to database, UNKNOWN ERROR!";
-      
-      PQfinish(con);
-      con=0;
-    }
-  }else
-    errMsg="Can't connect to database, OUT OF MEMMORY!";
+   con=PQconnectdb(connect.c_str());
+
+   if(con){
+      if(PQstatus(con)!=CONNECTION_OK){
+         msg=PQerrorMessage(con);
+
+         if(msg)
+            errMsg=msg;
+         else
+            errMsg="Can't connect to database, UNKNOWN ERROR!";
+
+         PQfinish(con);
+         con=0;
+      }
+   }else
+      errMsg="Can't connect to database, OUT OF MEMMORY!";
 }
 
 dnmi::db::drivers::PGConnection::~PGConnection()
@@ -122,236 +123,256 @@ dnmi::db::drivers::PGConnection::~PGConnection()
 bool 
 dnmi::db::drivers::PGConnection::isConnected()
 {
-  if(con==0)
-    return false;
+   if(con==0)
+      return false;
 
-  if(PQstatus(con)!=CONNECTION_OK){
-     char *msg=PQerrorMessage(con);
-    
-    if(msg)
-      errMsg=msg;
-    else
-      errMsg="Can't connect to database, UNKNOWN ERROR!";
-    
-    return false;
-  }
+   if(PQstatus(con)!=CONNECTION_OK){
+      char *msg=PQerrorMessage(con);
 
-  return true;
+      if(msg)
+         errMsg=msg;
+      else
+         errMsg="Can't connect to database, UNKNOWN ERROR!";
+
+      return false;
+   }
+
+   return true;
 } 
 
 bool 
 dnmi::db::drivers::PGConnection::tryReconnect()
 {
-  if(!con)
-    return false;
+   if(!con)
+      return false;
 
-  PQreset(con);
+   PQreset(con);
 
-  if(PQstatus(con)!=CONNECTION_OK){
-    char *msg=PQerrorMessage(con);
-    
-    if(msg)
-      errMsg=msg;
-    else
-      errMsg="Can't connect to database, UNKNOWN ERROR!";
+   if(PQstatus(con)!=CONNECTION_OK){
+      char *msg=PQerrorMessage(con);
 
-    PQfinish(con);
-    con=0;
+      if(msg)
+         errMsg=msg;
+      else
+         errMsg="Can't connect to database, UNKNOWN ERROR!";
 
-    return false;
-  }
+      PQfinish(con);
+      con=0;
 
-  return true;
+      return false;
+   }
+
+   return true;
 }
 
 
 void
 dnmi::db::drivers::PGConnection::beginTransaction()
 {
-  exec("BEGIN");
+   exec("BEGIN");
 }
 
 void 
 dnmi::db::drivers::PGConnection::endTransaction()
 {
-  exec("END");
+   exec("END");
 }
 
 void 
 dnmi::db::drivers::PGConnection::rollBack()
 {
-  exec("ROLLBACK");
+   exec("ROLLBACK");
 }
 
 void
 dnmi::db::drivers::PGConnection::exec(const std::string &query)
 {
-    PGresult *p;
-    ExecStatusType status;
-    bool           connected=false;
+   PGresult *p;
+   ExecStatusType status;
+   bool           connected=false;
 
-    if(!con)
-	throw SQLNotConnected("NO CONNECTION, not connected to any database!");
-
-    for(int i=0; i<2 && !connected; i++){
-      if(!isConnected()){
-	if(tryReconnect())
-	  connected=true;
-	else
-	  sleep(1);
-      }else
-	connected=true;
-    }
-    
-    if(!connected)
+   if(!con)
       throw SQLNotConnected("NO CONNECTION, not connected to any database!");
 
-    p=PQexec(con, query.c_str());
+   for(int i=0; i<2 && !connected; i++){
+      if(!isConnected()){
+         if(tryReconnect())
+            connected=true;
+         else
+            sleep(1);
+      }else
+         connected=true;
+   }
 
-    if(!p)
-	throw SQLException(lastError());
-    
-    status=PQresultStatus(p);
-    
-  
+   if(!connected)
+      throw SQLNotConnected("NO CONNECTION, not connected to any database!");
 
-    if(status==PGRES_COMMAND_OK || status==PGRES_TUPLES_OK ){
+   p=PQexec(con, query.c_str());
+
+   if(!p)
+      throw SQLException(lastError());
+
+   status=PQresultStatus(p);
+
+
+
+   if(status==PGRES_COMMAND_OK || status==PGRES_TUPLES_OK ){
       PQclear(p);
       return;
-    }
- 
-    char *msg=PQresStatus(status);
-    std::string msg2=PQresultErrorMessage(p);
-    std::string errorCode( PQresultErrorField( p, PG_DIAG_SQLSTATE ) );
-    std::string msgStr;
-    std::string::size_type i;
+   }
 
-    i=msg2.find("duplicate");
-    
-    if(i!=std::string::npos){
+   char *msg=PQresStatus(status);
+   std::string msg2=PQresultErrorMessage(p);
+   std::string errorCode( PQresultErrorField( p, PG_DIAG_SQLSTATE ) );
+   std::string msgStr;
+   std::string::size_type i;
+
+   i=msg2.find("duplicate");
+
+   if(i!=std::string::npos){
       i=msg2.find("key");
-      
-      if(i!=std::string::npos){
-	PQclear(p);
-	throw SQLDuplicate(msg2, errorCode);
-      }
-    }
 
-    i=msg2.find("aborted");
-    
-    if(i!=std::string::npos){
+      if(i!=std::string::npos){
+         PQclear(p);
+         throw SQLDuplicate(msg2, errorCode);
+      }
+   }
+
+   i=msg2.find("aborted");
+
+   if(i!=std::string::npos){
       i=msg2.find("transaction");
-      
+
       if(i!=std::string::npos){
-	PQclear(p);
-	throw SQLAborted(msg2, errorCode );
+         PQclear(p);
+         throw SQLAborted(msg2, errorCode );
       }
-    }
+   }
 
 
-    if(msg)
+   if(msg)
       msgStr=msg;
-    
-    if(!msg2.empty())
+
+   if(!msg2.empty())
       msgStr=msg2;
-    
 
-    PQclear(p);
 
-    if(!msgStr.empty())
-	throw SQLException( msgStr, errorCode );
-    else
-	throw SQLException("UNKNOWN ERROR!", errorCode );
+   PQclear(p);
+
+   if(!msgStr.empty())
+      throw SQLException( msgStr, errorCode );
+   else
+      throw SQLException("UNKNOWN ERROR!", errorCode );
 }
 
 
 dnmi::db::Result*
 dnmi::db::drivers::PGConnection::execQuery(const std::string &query)
 {
-  PGresult *p;
-  ExecStatusType status;
-  bool           connected=false;
+   PGresult *p;
+   ExecStatusType status;
+   bool           connected=false;
 
-  if(!con){
-    throw SQLNotConnected("NO CONNECTION, not connected to any database!");
-  }
+   if(!con){
+      throw SQLNotConnected("NO CONNECTION, not connected to any database!");
+   }
 
 
-  for(int i=0; i<2 && !connected; i++){
-    if(!isConnected()){
-      if(tryReconnect())
-	connected=true;
-      else
-	sleep(1);
-    }else
-      connected=true;
-  }
+   for(int i=0; i<2 && !connected; i++){
+      if(!isConnected()){
+         if(tryReconnect())
+            connected=true;
+         else
+            sleep(1);
+      }else
+         connected=true;
+   }
 
-  if(!connected)
-    throw SQLNotConnected("NO CONNECTION, not connected to any database!");
-  
-  p=PQexec(con, query.c_str());
+   if(!connected)
+      throw SQLNotConnected("NO CONNECTION, not connected to any database!");
 
-  if(!p){
-    throw SQLException(lastError());
-  }
+   p=PQexec(con, query.c_str());
 
-  status=PQresultStatus(p);
-  
-  if(status==PGRES_TUPLES_OK){
-    try{
-      return new PGResult(p);
-    }
-    catch(...){
+   if(!p){
+      throw SQLException(lastError());
+   }
+
+   status=PQresultStatus(p);
+
+   if(status==PGRES_TUPLES_OK){
+      try{
+         return new PGResult(p);
+      }
+      catch(...){
+         PQclear(p);
+         throw SQLException("OUT OF MEMMORY!");
+      }
+   }
+
+
+
+   if(status==PGRES_COMMAND_OK || status==PGRES_EMPTY_QUERY){
       PQclear(p);
-      throw SQLException("OUT OF MEMMORY!");
-    }
-  }
+      return 0;
+   }
 
-  
-  
-  if(status==PGRES_COMMAND_OK || status==PGRES_EMPTY_QUERY){
-    PQclear(p);
-     return 0;
-  }
+   std::string msg=PQresultErrorMessage(p);
+   std::string errorCode( PQresultErrorField( p, PG_DIAG_SQLSTATE ) );
+   std::string::size_type i;
 
-  std::string msg=PQresultErrorMessage(p);
-  std::string errorCode( PQresultErrorField( p, PG_DIAG_SQLSTATE ) );
-  std::string::size_type i;
+   PQclear(p);
 
-  PQclear(p);
+   i=msg.find("duplicate");
 
-  i=msg.find("duplicate");
-  
-  if(i!=std::string::npos){
-    i=msg.find("key");
-    
-    if(i!=std::string::npos){
-      throw SQLDuplicate(msg, errorCode );
-    }
-  }
+   if(i!=std::string::npos){
+      i=msg.find("key");
 
-  if(!msg.empty()){
-    throw SQLException(msg, errorCode );
-  }else{
-    throw SQLException("UNKNOWN ERROR!", errorCode );
-  }
+      if(i!=std::string::npos){
+         throw SQLDuplicate(msg, errorCode );
+      }
+   }
+
+   if( errorCode.length() >= 2 ) {
+      std::string errClass = errorCode.substr( 0, 2 );
+
+      if( errClass == "22 ") {
+         if(!msg.empty()){
+            throw SQLException(msg, errorCode );
+         }else{
+            throw SQLException("UNKNOWN ERROR!", errorCode );
+         }
+      }
+
+      if(!msg.empty()){
+         throw SQLAborted(msg, errorCode );
+      }else{
+         throw SQLAborted("UNKNOWN ERROR!", errorCode );
+      }
+   }
+
+   if(!msg.empty()){
+      throw SQLAborted(msg, errorCode );
+   }else{
+      throw SQLAborted("UNKNOWN ERROR!", errorCode );
+   }
+
+
 }
-      
+
 std::string 
 dnmi::db::drivers::PGConnection::lastError()const
 {
-  char *msg;
-  
-  if(!con)
-    return errMsg;
+   char *msg;
 
-  msg=PQerrorMessage(con);
-  
-  if(msg)
-    return msg;
-  else
-    return std::string("UNKNOWN ERROR, cant get error message!");
+   if(!con)
+      return errMsg;
+
+   msg=PQerrorMessage(con);
+
+   if(msg)
+      return msg;
+   else
+      return std::string("UNKNOWN ERROR, cant get error message!");
 }
 
 
@@ -360,81 +381,81 @@ dnmi::db::drivers::
 PGConnection::
 esc( const std::string &stringToEscape )const
 {
-	if(!con)
-		throw SQLException("NO CONNECTION: not connected to a database!");
-		
-	char *buf = 0;
+   if(!con)
+      throw SQLException("NO CONNECTION: not connected to a database!");
 
-	try { 
-		buf = new char[stringToEscape.length()*2 + 1];
+   char *buf = 0;
 
-		PQescapeStringConn( con, buf, 
-				              stringToEscape.c_str(), stringToEscape.length(),
-				              0 );
-	
-		string ret(buf);
-		delete[] buf;
-		buf=0;
-		return ret;
-	}
-	catch( ... ) {
-		if( buf )
-			delete[] buf; 
-		
-		throw SQLException("NOMEM: Cant escape the string.");
-	}
+   try {
+      buf = new char[stringToEscape.length()*2 + 1];
+
+      PQescapeStringConn( con, buf,
+                          stringToEscape.c_str(), stringToEscape.length(),
+                          0 );
+
+      string ret(buf);
+      delete[] buf;
+      buf=0;
+      return ret;
+   }
+   catch( ... ) {
+      if( buf )
+         delete[] buf;
+
+      throw SQLException("NOMEM: Cant escape the string.");
+   }
 }
 
 
 dnmi::db::drivers::PGResult::PGResult(PGresult *r):Result(PQnfields(r))
 { 
-  res=r;
-  nFields=PQnfields(res);
-  nTuples=PQntuples(res);
-  tupleIndex=0;
+   res=r;
+   nFields=PQnfields(res);
+   nTuples=PQntuples(res);
+   tupleIndex=0;
 
-  // cerr << "PGResult:ctor:: nFields=" << nFields << " nTuples=" << nTuples <<endl;
+   // cerr << "PGResult:ctor:: nFields=" << nFields << " nTuples=" << nTuples <<endl;
 }
 
 dnmi::db::drivers::PGResult::~PGResult()
 {
-  if(res)
-     PQclear(res);
+   if(res)
+      PQclear(res);
 }
 
 bool               
 dnmi::db::drivers::PGResult::hasResult()const
 {
-  return res!=0;
+   return res!=0;
 }
 
 int                        
 dnmi::db::drivers::PGResult::fields()const
 {
-  return nFields;
+   return nFields;
 }
 
 std::string 
 dnmi::db::drivers::PGResult::fieldName(int index)const
 {
-    if(index>=nFields)
-	throw SQLException("index out of range!");
-    
-    return PQfname(res, index);
-  
+   if(index>=nFields)
+      throw SQLException("index out of range!");
+
+   return PQfname(res, index);
+
 }
 
 int         
 dnmi::db::drivers::PGResult::fieldIndex(const std::string &fieldName)const
 {
-  return PQfnumber(res, fieldName.c_str());
+   return PQfnumber(res, fieldName.c_str());
 }
 
 dnmi::db::FieldType   
 dnmi::db::drivers::PGResult::fieldType(int index)const
 {
-    if(index>=nFields)
-	throw SQLException("index out of range!");
+   if(index>=nFields)
+      throw SQLException("index out of range!");
 }
 
 dnmi::db::FieldType   
@@ -445,45 +466,45 @@ dnmi::db::drivers::PGResult::fieldType(const std::string &fieldName)const
 int         
 dnmi::db::drivers::PGResult::fieldSize(int index)const
 {
-    if(index>=nFields)
-	throw SQLException("index out of range!");
+   if(index>=nFields)
+      throw SQLException("index out of range!");
 
-  return PQfsize(res, index);
+   return PQfsize(res, index);
 }
 
 int         
 dnmi::db::drivers::PGResult::fieldSize(const std::string &fieldName)const
 {
-  return fieldSize(fieldIndex(fieldName));
+   return fieldSize(fieldIndex(fieldName));
 }
 
 int         
 dnmi::db::drivers::PGResult::size()const
 {
-  return PQntuples(res);
+   return PQntuples(res);
 }
 
 bool        
 dnmi::db::drivers::PGResult::hasNext()const
 {
-  if(tupleIndex<nTuples)
-    return true;
+   if(tupleIndex<nTuples)
+      return true;
 
-  return false;
+   return false;
 }
 
 void
 dnmi::db::drivers::PGResult::nextImpl()
 {
-    if(tupleIndex>=nTuples)
-	throw SQLException("No more data!");
+   if(tupleIndex>=nTuples)
+      throw SQLException("No more data!");
 
-    for(int i=0; i<fields(); i++){
-	data[i]=PQgetvalue(res, tupleIndex, i);
-    }
+   for(int i=0; i<fields(); i++){
+      data[i]=PQgetvalue(res, tupleIndex, i);
+   }
 
-    tupleIndex++;
-    
+   tupleIndex++;
+
 }
 
 
@@ -499,10 +520,10 @@ beginTransaction(dnmi::db::Connection::IsolationLevel isolation)
       break;
    case Connection::READ_COMMITTED:
       con->exec("START TRANSACTION ISOLATION LEVEL READ COMMITTED");
-         break;
+      break;
    case Connection::READ_UNCOMMITTED:
       con->exec("START TRANSACTION ISOLATION LEVEL READ UNCOMMITTED" );
-            break;
+      break;
    case Connection::REPEATABLE_READ:
       con->exec("START TRANSACTION ISOLATION LEVEL REPEATABLE READ");
       break;
@@ -526,9 +547,12 @@ perform( dnmi::db::Connection *con_,
    dnmi::db::Transaction &t( transaction );
    std::string lastError;
    con = static_cast<PGConnection*>( con_ );
+   time_t start;
+   time_t now;
+
+   time( &start );
+
    while( retry > 0 ) {
-
-
       try {
          beginTransaction( isolation );
       }
@@ -552,10 +576,19 @@ perform( dnmi::db::Connection *con_,
          }
       }
       catch (const SQLAborted &e) {
-         if( e.errorCode()!= "40001" ) //SERIALIZATION FAILURE
+         if( e.errorCode() != "40001" ) //SERIALIZATION FAILURE
             retry--;
-         else
+         else { // e.errorCode() == "40001"
             lastError = e.what();
+            time( &now );
+
+            //We allow a three minutes periode of retry
+            //before we reduce the retry counter.
+            if( (now - start) > 180 ) {
+               time( &start ); //Reset the timeout counter.
+               retry--;
+            }
+         }
          t.onAbort( con->getDriverId(), e.what(), e.errorCode() );
       }
       catch( const std::exception &ex ){
