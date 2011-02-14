@@ -28,8 +28,11 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+#include <iostream>
 #include "kvdb.h"
 #include "Pimpel.h"
+
+using namespace std;
 
 void
 dnmi::db::DRow::setResult(Result *r)
@@ -141,8 +144,10 @@ perform( dnmi::db::Transaction &transaction, int retry,
    std::string lastError;
 
    if( pimpel ) {
+      //cerr << "Driverid: " << getDriverId() << ": Using: PGPimpel.\n";
       return static_cast<dnmi::db::priv::Pimpel*>(pimpel)->perform( this, transaction, retry, isolation);
    }
+   //cerr << "Driverid: " << getDriverId() << ": Using: General transaction.\n";
 
    Transaction &t( transaction );
 
