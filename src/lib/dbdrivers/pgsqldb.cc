@@ -221,48 +221,41 @@ dnmi::db::drivers::PGConnection::exec(const std::string &query)
       return;
    }
 
-   char *msg=PQresStatus(status);
-   std::string msg2=PQresultErrorMessage(p);
+   std::string msg = PQresStatus(status);
+   std::string msg2 = PQresultErrorMessage(p);
    std::string errorCode( PQresultErrorField( p, PG_DIAG_SQLSTATE ) );
-   std::string msgStr;
-   std::string::size_type i;
 
-   i=msg2.find("duplicate");
+   PQclear(p);
+
+   std::string::size_type i=msg2.find("duplicate");
 
    if(i!=std::string::npos){
       i=msg2.find("key");
 
       if(i!=std::string::npos){
-         PQclear(p);
+
          throw SQLDuplicate(msg2, errorCode);
       }
    }
 
-   i=msg2.find("aborted");
-
-   if(i!=std::string::npos){
-      i=msg2.find("transaction");
-
-      if(i!=std::string::npos){
-         PQclear(p);
-         throw SQLAborted(msg2, errorCode );
-      }
+   if( msg2.empty() )
+      if( msg.empty() )
+         msg = getDriverId() +": Unknow error!";
+   else {
+      msg = msg2;
    }
 
+   if( errorCode.length() >= 2 ) {
+      std::string errClass = errorCode.substr( 0, 2 );
 
-   if(msg)
-      msgStr=msg;
+      if( errClass == "22 ") {
+         throw SQLException( msg, errorCode );
+      }
 
-   if(!msg2.empty())
-      msgStr=msg2;
+      throw SQLAborted( msg, errorCode );
+   }
 
-
-   PQclear(p);
-
-   if(!msgStr.empty())
-      throw SQLException( msgStr, errorCode );
-   else
-      throw SQLException("UNKNOWN ERROR!", errorCode );
+   throw SQLAborted( msg, errorCode );
 }
 
 
@@ -309,8 +302,6 @@ dnmi::db::drivers::PGConnection::execQuery(const std::string &query)
       }
    }
 
-
-
    if(status==PGRES_COMMAND_OK || status==PGRES_EMPTY_QUERY){
       PQclear(p);
       return 0;
@@ -318,45 +309,31 @@ dnmi::db::drivers::PGConnection::execQuery(const std::string &query)
 
    std::string msg=PQresultErrorMessage(p);
    std::string errorCode( PQresultErrorField( p, PG_DIAG_SQLSTATE ) );
-   std::string::size_type i;
 
    PQclear(p);
 
-   i=msg.find("duplicate");
+   std::string::size_type i = msg.find("duplicate");
 
-   if(i!=std::string::npos){
+   if( i != std::string::npos){
       i=msg.find("key");
 
-      if(i!=std::string::npos){
+      if( i != std::string::npos)
          throw SQLDuplicate(msg, errorCode );
-      }
    }
+
+   if( msg.empty() )
+      msg = getDriverId() + ": Unknown error!";
 
    if( errorCode.length() >= 2 ) {
       std::string errClass = errorCode.substr( 0, 2 );
 
-      if( errClass == "22 ") {
-         if(!msg.empty()){
-            throw SQLException(msg, errorCode );
-         }else{
-            throw SQLException("UNKNOWN ERROR!", errorCode );
-         }
-      }
+      if( errClass == "22 ")
+         throw SQLException(msg, errorCode );
 
-      if(!msg.empty()){
-         throw SQLAborted(msg, errorCode );
-      }else{
-         throw SQLAborted("UNKNOWN ERROR!", errorCode );
-      }
+      throw SQLAborted( msg, errorCode );
    }
 
-   if(!msg.empty()){
-      throw SQLAborted(msg, errorCode );
-   }else{
-      throw SQLAborted("UNKNOWN ERROR!", errorCode );
-   }
-
-
+   throw SQLAborted(msg, errorCode );
 }
 
 std::string 
