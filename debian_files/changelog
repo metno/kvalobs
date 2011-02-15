@@ -1,3 +1,10 @@
+kvalobs (2.4.0~pre8-1) lucid; urgency=low
+
+  * For the pgdriver: Let exec and execQuery behave the same on exception.
+  * More logging in DataUpdateTransaction.
+  
+ -- Børge Moe <borge.moe@met.no>  Tue, 15 Feb 2011 10:20:00 +0100
+
 kvalobs (2.4.0~pre7-1) lucid; urgency=low
 
   * Bugfix in the transaction method 'perform' for postgresql.
