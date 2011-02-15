@@ -110,6 +110,11 @@ addStationInfo( dnmi::db::Connection *con,
    try {
       con->exec( q.str() );
    }
+   catch( const dnmi::db::SQLException &ex ) {
+      log << "addStationInfo (delete from workque): '" << q.str() << "' \nSQLState: " << ex.errorCode()
+          << "\nReason: " << ex.what() << endl;
+      throw;
+   }
    catch( const std::exception &ex ) {
       log << "addStationInfo: '" << q.str() << "' \nReason: " << ex.what() << endl;
       throw;
@@ -137,6 +142,11 @@ addStationInfo( dnmi::db::Connection *con,
 
    try {
       con->exec( q.str() );
+   }
+   catch( const dnmi::db::SQLException &ex ) {
+      log << "addStationInfo (add to workque): '" << q.str() << "' \nSQLState: " << ex.errorCode()
+          << "\nReason: " << ex.what() << endl;
+      throw;
    }
    catch( const std::exception &ex ) {
       log << "addStationInfo: '" << q.str() << "' \nReason: " << ex.what() << endl;
@@ -171,6 +181,11 @@ hasDataWithTbtime( dnmi::db::Connection *con, const miutil::miTime &tbtime, int 
    try {
       dbRes = con->execQuery( q.str() );
    }
+   catch( const dnmi::db::SQLException &ex ) {
+      log << "hasDataWithTbtime: '" << q.str() << "' \nSQLState: " << ex.errorCode()
+          << "\nReason: " << ex.what() << endl;
+      throw;
+   }
    catch( const std::exception &ex ) {
       log << "hasDataWithTbtime: '" << q.str() << "' \nReason: " << ex.what() << "\n";
       throw;
@@ -200,6 +215,11 @@ getTimestamp( dnmi::db::Connection *con, int &msec )
 
    try {
       res=con->execQuery( q );
+   }
+   catch( const dnmi::db::SQLException &ex ) {
+      log << "getTimestamp: '" << q << "' \nSQLState: " << ex.errorCode()
+          << "\nReason: " << ex.what() << endl;
+      throw;
    }
    catch( const std::exception &ex ) {
       log << "getTimestamp: '" << q << "' \nReason: " << ex.what() << "\n";
@@ -368,6 +388,11 @@ getDataWithTbtime( dnmi::db::Connection *con,
    try {
       dbRes = con->execQuery( q.str() );
    }
+   catch( const dnmi::db::SQLException &ex ) {
+      log << "getDataWithTbtime: '" << q.str() << "' \nSQLState: " << ex.errorCode()
+          << "\nReason: " << ex.what() << endl;
+      throw;
+   }
    catch( const std::exception &ex ) {
       log << "getDataWithTbtime: '" << q.str() << "' \nReason: " << ex.what() << "\n";
       throw;
@@ -398,6 +423,11 @@ getDataWithTbtime( dnmi::db::Connection *con,
 
    try{
       dbRes = con->execQuery( q.str() );
+   }
+   catch( const dnmi::db::SQLException &ex ) {
+      log << "getDataWithTbtime: '" << q.str() << "' \nSQLState: " << ex.errorCode()
+          << "\nReason: " << ex.what() << endl;
+      throw;
    }
    catch( const std::exception &ex ) {
       log << "getDataWithTbtime: '" << q.str() << "' \nReason: " << ex.what() << "\n";
@@ -452,6 +482,11 @@ getData( dnmi::db::Connection *con,
    try {
       dbRes = con->execQuery( q.str() );
    }
+   catch( const dnmi::db::SQLException &ex ) {
+      log << "getData: '" << q.str() << "' \nSQLState: " << ex.errorCode()
+          << "\nReason: " << ex.what() << endl;
+      throw;
+   }
    catch( const std::exception &ex ) {
       log << "getData: '" << q.str() << "' \nReason: " << ex.what() << "\n";
       throw;
@@ -493,6 +528,11 @@ getData( dnmi::db::Connection *con,
    try{
       dbRes = con->execQuery( q.str() );
    }
+   catch( const dnmi::db::SQLException &ex ) {
+      log << "getData: '" << q.str() << "' \nSQLState: " << ex.errorCode()
+          << "\nReason: " << ex.what() << endl;
+      throw;
+   }
    catch( const std::exception &ex ) {
       log << "getData: '" << q.str() << "' \nReason: " << ex.what() << "\n";
       throw;
@@ -528,6 +568,11 @@ insert( dnmi::db::Connection *conection,
 
   try {
      conection->exec( ost.str() );
+  }
+  catch( const dnmi::db::SQLException &ex ) {
+     log << "insert: '" << ost.str() << "' \nSQLState: " << ex.errorCode()
+         << "\nReason: " << ex.what() << endl;
+     throw;
   }
   catch( const std::exception &ex ) {
      log << "insert: '" << ost.str() << "' \nReason: " << ex.what() << "\n";
@@ -654,6 +699,11 @@ getData( dnmi::db::Connection *conection,
          }
       }
     }
+   catch( const dnmi::db::SQLException &ex ) {
+      log << "getData: '" << q << "' \nSQLState: " << ex.errorCode()
+          << "\nReason: " << ex.what() << endl;
+      throw;
+   }
     catch( const std::exception &ex ) {
        log << "getData: '" << q << "' \nReason: " << ex.what() << "\n";
        throw;
@@ -697,16 +747,20 @@ getTextData( dnmi::db::Connection *conection,
             addTextDataToList( kvalobs::kvTextData( row ), data );
          }
       }
-    }
-    catch( const std::exception &ex ) {
-       log << "getTextData: '" << q << "' \nReason: " << ex.what() << "\n";
-       throw;
-    }
-    catch( ... ) {
-       log << "getTextData: '" << q << "' \nReason: Unknown \n";
-       throw;
-    }
-
+   }
+   catch( const dnmi::db::SQLException &ex ) {
+      log << "getTextData: '" << q << "' \nSQLState: " << ex.errorCode()
+          << "\nReason: " << ex.what() << endl;
+      throw;
+   }
+   catch( const std::exception &ex ) {
+      log << "getTextData: '" << q << "' \nReason: " << ex.what() << "\n";
+      throw;
+   }
+   catch( ... ) {
+      log << "getTextData: '" << q << "' \nReason: Unknown \n";
+      throw;
+   }
 }
 
 
