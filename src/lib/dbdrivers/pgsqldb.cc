@@ -238,10 +238,10 @@ dnmi::db::drivers::PGConnection::exec(const std::string &query)
       }
    }
 
-   if( msg2.empty() )
+   if( msg2.empty() ) {
       if( msg.empty() )
          msg = getDriverId() +": Unknow error!";
-   else {
+   } else {
       msg = msg2;
    }
 
