@@ -105,7 +105,7 @@ addStationInfo( dnmi::db::Connection *con,
    miutil::miTime undefTime;
 
    q << "DELETE FROM workque WHERE stationid=" << stationID << " AND "
-     << "typeid=" << typeID << "AND obstime='" << obsTime << "'";
+     << "typeid=" << typeID << " AND obstime='" << obsTime << "'";
 
    try {
       con->exec( q.str() );
