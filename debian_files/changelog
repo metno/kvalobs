@@ -1,3 +1,10 @@
+kvalobs (2.4.0~pre9-1) lucid; urgency=low
+
+  * Fix bug in 'reason' for an exception.
+  * Fix space bug in an SQL query..
+  
+ -- Børge Moe <borge.moe@met.no>  Wed, 16 Feb 2011 08:05:00 +0100
+
 kvalobs (2.4.0~pre8-1) lucid; urgency=low
 
   * For the pgdriver: Let exec and execQuery behave the same on exception.
