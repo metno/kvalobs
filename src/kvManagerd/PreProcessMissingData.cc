@@ -195,6 +195,7 @@ flagDataNotInObsPgm( const std::list<kvalobs::kvObsPgm> &obsPgm,
       if( ! hasThis ) {
          //It seems that this parameter is not defined in the
          //observation program.
+         //TODO: Set a controll infoflag that identify this as a "wildobs".
          wildObs.push_back( *it );
       }
    }
