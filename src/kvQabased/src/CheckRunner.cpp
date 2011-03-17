@@ -214,13 +214,17 @@ void CheckRunner::resetObservationDataFlags(db::DatabaseAccess::DataList & obser
 {
 	for ( db::DatabaseAccess::DataList::iterator it = observationData.begin(); it != observationData.end(); ++ it )
 	{
-		kvalobs::kvControlInfo ci = it->controlinfo();
+		kvalobs::kvControlInfo oldCi = it->controlinfo();
 
-		// setting all flags but fagg(0) and fmis(6) to zero
-		for ( int i = 1; i < 16; ++ i )
-			if ( i != 6 )
-				ci.set(i, 0);
-		it->controlinfo(ci);
+		kvalobs::kvControlInfo newCi;
+
+		// All flags should be 0, with a few exceptions:
+		newCi.set(kvQCFlagTypes::f_fagg, oldCi.flag(kvQCFlagTypes::f_fagg));
+		newCi.set(kvQCFlagTypes::f_fmis, oldCi.flag(kvQCFlagTypes::f_fmis));
+		if ( oldCi.flag(kvQCFlagTypes::f_fpre) == 7 )
+			newCi.set(kvQCFlagTypes::f_fpre, 7);
+
+		it->controlinfo(newCi);
 	}
 }
 

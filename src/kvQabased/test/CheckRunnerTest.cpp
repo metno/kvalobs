@@ -75,7 +75,9 @@ TEST_F(CheckRunnerTest, resetsFlagsBeforeCheck)
 	using namespace testing;
 
 	db::DatabaseAccess::DataList dataFromDatabase = boost::assign::list_of(factory.getData(6.0, 110));
-	dataFromDatabase.front().controlinfo(kvalobs::kvControlInfo("1999993999999990"));
+	// Data has lots of rubbish flags, but fagg=1 fmis=3 and fpre=7.
+	// fagg and fmis flags should be preserved, and fmis should also be preserved if it equals 7
+	dataFromDatabase.front().controlinfo(kvalobs::kvControlInfo("1999993999999790"));
 	EXPECT_CALL(database, getData(_, observation, qabase::DataRequirement::Parameter("RR_24"), 0))
 			.Times(AtLeast(1))
 			.WillRepeatedly(SetArgumentPointee<0>(dataFromDatabase));
@@ -89,7 +91,7 @@ TEST_F(CheckRunnerTest, resetsFlagsBeforeCheck)
 
 
 	db::DatabaseAccess::DataList expectedScriptReturn = boost::assign::list_of(factory.getData(6.0, 110));
-	expectedScriptReturn.front().controlinfo(kvalobs::kvControlInfo("1040003000000000"));
+	expectedScriptReturn.front().controlinfo(kvalobs::kvControlInfo("1040003000000700"));
 	expectedScriptReturn.front().cfailed("QC1-2-101"); // QC1-2-101 is the default qcx return from fake database
 
 	// Typical error condition:
