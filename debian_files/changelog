@@ -1,3 +1,10 @@
+kvalobs (2.4.1~pre1-1) lucid; urgency=low
+
+  * DataUpdateTransaction, set the corrected value to -32766 for "deleted" data.
+  
+ -- Børge Moe <borge.moe@met.no>  Thu, 17 Feb 2011 14:50:00 +0100
+
+
 kvalobs (2.4.0-1) lucid; urgency=low
 
   * New release.
