@@ -846,7 +846,7 @@ replaceData( dnmi::db::Connection *conection,
 
    for( list<kvalobs::kvData>::iterator it = oldData.begin();
         it != oldData.end(); ++it ) {
-      it->corrected( -32767 );
+      it->corrected( -32766 );
 
       cinfo = it->controlinfo();
       cinfo.setControlFlag( kvQCFlagTypes::f_fpre, 7 );
