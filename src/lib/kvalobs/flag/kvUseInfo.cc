@@ -211,11 +211,11 @@ bool kvUseInfo::setUseFlags(const kvControlInfo& cinfo)
 			ui[2] = 2;
 
 		else if (fagg == 2 || fr == 2 || fr == 3 || fcc == 2 || fcp == 2 || fs
-				== 2 || fs == 4 || fs == 5 || fs == 7 || fw == 2 || fw == 3
+				== 2 ||  fs == 7 || fw == 2 || fw == 3
 				|| fclim == 2 || fcombi == 2)
 			ui[2] = 1;
 
-		else if (fagg == 1 || fr == 1 || fcc == 1 || fcp == 1 || fs == 1 || fw
+		else if (fagg == 1 || fr == 1 || fcc == 1 || fcp == 1 || fs == 1 || fs == 4 || fw
 				== 1 || fpos == 1 || fstat == 1 || fclim == 1 || fd == 1
 				|| fcombi == 1)
 			ui[2] = 0;
