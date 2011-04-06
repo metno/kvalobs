@@ -1,3 +1,10 @@
+kvalobs (2.4.2~rc1-1) lucid; urgency=low
+
+  * Do not mark missing and typid<0 as deleted from new observation.
+    
+ -- Børge Moe <borge.moe@met.no> Wed, 06 Apr 2011 07:10:00 +0200
+
+
 kvalobs (2.4.1-1) lucid; urgency=low
 
   * New release.
