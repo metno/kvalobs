@@ -845,14 +845,24 @@ replaceData( dnmi::db::Connection *conection,
    kvControlInfo cinfo;
 
    for( list<kvalobs::kvData>::iterator it = oldData.begin();
-        it != oldData.end(); ++it ) {
+        it != oldData.end();  ) {
+      cinfo = it->controlinfo();
+      fmis = cinfo.MissingFlag();
+
+      //Do not mark missing an negative typeids as deleted in the
+      //new message.
+      if( fmis != 0 && fmis != 2 && fmis != 4 && it->typeID() < 0 ) {
+         it = oldData.erase( it );
+         continue;
+      }
+
       it->corrected( -32766 );
 
-      cinfo = it->controlinfo();
       cinfo.setControlFlag( kvQCFlagTypes::f_fpre, 7 );
       cinfo.setControlFlag( kvQCFlagTypes::f_fmis, 2 );
 
       it->controlinfo( cinfo );
+      ++it;
    }
 
    //Mark the oldtextData as deleted
