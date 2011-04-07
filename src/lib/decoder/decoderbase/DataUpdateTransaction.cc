@@ -849,9 +849,10 @@ replaceData( dnmi::db::Connection *conection,
       cinfo = it->controlinfo();
       fmis = cinfo.MissingFlag();
 
-      //Do not mark missing an negative typeids as deleted in the
+      //Do not mark missing and negative typeids as deleted in the
       //new message.
-      if( fmis != 0 && fmis != 2 && fmis != 4 && it->typeID() < 0 ) {
+      if( ( fmis != 0 && fmis != 2 && fmis != 4 ) ||
+          ( it->typeID() < 0 ) ) {
          it = oldData.erase( it );
          continue;
       }
