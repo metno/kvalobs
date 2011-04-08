@@ -133,7 +133,8 @@ paramIsMinute( int typeid_, int paramid )
         it != paramList.end(); ++it ) {
       if( it->paramID() == paramid ) {
          std::string name=it->name();
-         std::string::size_type i = name.find("_0");
+         //std::string::size_type i = name.find("_0");
+         std::string::size_type i = name.find("RR_01");
 
          if( i != std::string::npos )
             isMinParam = true;
