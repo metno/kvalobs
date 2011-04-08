@@ -1,3 +1,9 @@
+kvalobs (2.4.3~rc3-1) lucid; urgency=low
+
+  * temporary fix for #1315.
+
+ -- Børge Moe <borge.moe@met.no>  Fri, 08 Apr 2011 13:45:00 +0200
+
 kvalobs (2.4.3~rc2-1) lucid; urgency=low
 
   * Fix bug in 'Do not mark missing and typid<0 as deleted from new observation'.
