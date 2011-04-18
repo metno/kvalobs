@@ -1,3 +1,10 @@
+kvalobs (2.4.3~rc4-1) lucid; urgency=low
+
+  * Bugfix in DataUpdateTransaction.
+
+ -- Børge Moe <borge.moe@met.no>  Mon, 18 Apr 2011 12:40:00 +0200
+
+
 kvalobs (2.4.3~rc3-1) lucid; urgency=low
 
   * temporary fix for #1315.
