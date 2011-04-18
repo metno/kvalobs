@@ -853,7 +853,7 @@ replaceData( dnmi::db::Connection *conection,
       //new message.
       if( ( fmis != 0 && fmis != 2 && fmis != 4 ) ||
           ( it->typeID() < 0 ) ) {
-         it = oldData.erase( it );
+         //it = oldData.erase( it );
          continue;
       }
 
