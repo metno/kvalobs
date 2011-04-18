@@ -98,7 +98,7 @@ else
     use
 fi
 
-if [ "$USER" != "$KVUSER" ]; then
+if [ "$USER" != "$KVUSER" -o "$LOGNAME" != "$KVUSER"]; then
    log "Bare kvalobs brukeren '$KVUSER' kan starte/stoppe kvalobs komponenter."
    log "Du er logget inn som bruker '$USER'."
    exit 1
