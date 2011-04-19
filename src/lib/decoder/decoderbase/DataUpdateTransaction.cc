@@ -845,7 +845,7 @@ replaceData( dnmi::db::Connection *conection,
    kvControlInfo cinfo;
 
    for( list<kvalobs::kvData>::iterator it = oldData.begin();
-        it != oldData.end();  ) {
+        it != oldData.end(); ++it ) {
       cinfo = it->controlinfo();
       fmis = cinfo.MissingFlag();
 
@@ -863,7 +863,6 @@ replaceData( dnmi::db::Connection *conection,
       cinfo.setControlFlag( kvQCFlagTypes::f_fmis, 2 );
 
       it->controlinfo( cinfo );
-      ++it;
    }
 
    //Mark the oldtextData as deleted
