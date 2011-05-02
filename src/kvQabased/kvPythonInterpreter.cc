@@ -207,7 +207,16 @@ static void add_value(PyObject* list, const std::string& value, int missing)
     Py_INCREF(Py_None);
     valueobj = Py_None;
   } else {
-    valueobj = PyFloat_FromDouble(atof(value.c_str()));
+	double d_value;
+	int result = sscanf(value.c_str(), "%lf", &d_value);
+	if (result <= 0)
+	{
+		IDLOGERROR("html", "add_value '" << value << "'" << missing << "'" << std::endl );
+		IDLOGERROR("html", "add_value failed to convert value to double "<< std::endl );
+		return;
+	}
+	valueobj = PyFloat_FromDouble(d_value);
+    //valueobj = PyFloat_FromDouble(atof(value.c_str()));
     if (!valueobj)
       return;
   }

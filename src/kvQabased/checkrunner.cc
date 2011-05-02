@@ -168,7 +168,8 @@ bool CheckRunner::dataWasCheckedBefore()
     const KvDL & dl = it->second;
     for ( KvDL::const_iterator itb = dl.begin(); itb != dl.end(); ++ itb ) {
 //      cout << "Considering: " << * itb << endl;
-      if ( itb->typeID() == stinfo.typeID() and itb->useinfo().flag( 0 ) == 9 )
+		// Data was newer checked or has gone through QC0.
+      if ( itb->typeID() == stinfo.typeID() && (itb->useinfo().flag( 0 ) == 9 || itb->useinfo().flag( 0 ) == 8) )
         return false;
     }
   }
