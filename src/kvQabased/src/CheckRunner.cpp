@@ -221,6 +221,7 @@ void CheckRunner::resetObservationDataFlags(db::DatabaseAccess::DataList & obser
 		// All flags should be 0, with a few exceptions:
 		newCi.set(kvQCFlagTypes::f_fagg, oldCi.flag(kvQCFlagTypes::f_fagg));
 		newCi.set(kvQCFlagTypes::f_fmis, oldCi.flag(kvQCFlagTypes::f_fmis));
+		newCi.set(kvQCFlagTypes::f_fd, oldCi.flag(kvQCFlagTypes::f_fd));
 		if ( oldCi.flag(kvQCFlagTypes::f_fpre) == 7 )
 			newCi.set(kvQCFlagTypes::f_fpre, 7);
 
