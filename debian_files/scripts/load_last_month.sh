@@ -1,6 +1,6 @@
 #! /bin/sh
 
-muser="kvdrift@met.no borgem@met.no nils.langgard@met.no"
+muser="kvdrift@met.no"
 
 set -a
 #set -e
@@ -12,8 +12,10 @@ fi
 
 PGPORT=5434
 PGUSER=kvalobs
-PGHOST=localhost
-# PGPASSWORD=`grep dbpass $KVALOBS/.kvpasswd | sed -e 's/ *dbpass *//'`
+PGHOST=`grep PGHOST $HOME/.bashrc|cut -f2 -d=`
+#PGHOST=localhost
+PGPASSWORD=`grep dbpass $KVALOBS/.kvpasswd | sed -e 's/ *dbpass *//'`
+
 
 backupdir=$KVALOBS/var/klima_backup
 logdir=$KVALOBS/var/log
