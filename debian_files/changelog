@@ -1,3 +1,9 @@
+kvalobs (2.4.4_amd64-1) lucid; urgency=low
+
+  * 64 bit release of kvalobs.
+
+ -- Borge Moe <borge.moe@met.no>  Mon, 8 Aug 2011 12:30:00 +0200
+
 kvalobs (2.4.4-1) lucid; urgency=low
 
   * New release 2.4.4. No change since rc1.
