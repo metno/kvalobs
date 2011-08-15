@@ -1,4 +1,4 @@
-kvalobs (2.4.4_amd64-2) lucid; urgency=low
+kvalobs (2.4.4~amd64-2) lucid; urgency=low
 
   * Fix bug in postgresql dependency.
   
