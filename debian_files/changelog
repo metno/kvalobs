@@ -2,7 +2,7 @@ kvalobs (2.4.4_amd64-2) lucid; urgency=low
 
   * Fix bug in postgresql dependency.
   
- -- Borge Moe <borge.moe@met.no>  Mon, 15 Aug 2011 12:30:00 +0200
+ -- Borge Moe <borge.moe@met.no>  Mon, 15 Aug 2011 07:55:00 +0200
 
 
 kvalobs (2.4.4_amd64-1) lucid; urgency=low
