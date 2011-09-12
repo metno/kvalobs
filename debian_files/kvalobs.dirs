@@ -4,7 +4,7 @@ usr/bin
 usr/lib
 usr/lib/kvalobs/bin
 usr/share/kvalobs
-usr/share/kvalobs/matadata
+usr/share/kvalobs/metadata
 usr/share/kvalobs/db
 usr/share/kvalobs/db/upgrade/
 var/lib/kvalobs
