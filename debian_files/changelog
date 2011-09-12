@@ -1,3 +1,9 @@
+kvalobs (2.4.4-3) lucid; urgency=low
+
+  * Remove "amd64" from the version number. 
+  
+ -- Borge Moe <borge.moe@met.no>  Mon, 15 Aug 2011 07:55:00 +0200
+
 kvalobs (2.4.4~amd64-2) lucid; urgency=low
 
   * Fix bug in postgresql dependency.

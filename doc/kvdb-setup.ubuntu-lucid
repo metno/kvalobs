@@ -1,29 +1,33 @@
-Oppsett av kvalobs databasekluster i debian
---------------------------------------------
-Testet postgresql versjon er 8.3.
-Testet debian versjon er etch.
+Oppsett av kvalobs databasekluster i ubuntu lucid
+-------------------------------------------------
+Testet postgresql versjon er 9.0.
+Testet debian versjon er ubuntu lucid.
 
 Kommandoen pg_createcluster brukes.
 
-Opprett en partisjon under /var/lib/postgresql/8.3/kvalobs.
+Opprett en partisjon under /var/lib/postgresql/9.0/kvalobs.
 Denne partisjonen bør ikke være mindre enn 50 GB.
 
 set locale til C eller POSIX.
 Set encoding til LATIN1 (ISO 8859-1)
 Set kvalobs til a vare superbruker.
 
-pg_createcluster --socketdir=/var/kvalobs/run --encoding=LATIN1 --locale=C --user=kvalobs --port=5433 --start 8.3 kvalobs 
+Logg inn som root bruker og utfør komandoen:
 
-Editer filen /etc/postgresql/8.3/kvalobs/postgresql.conf.
+pg_createcluster --socketdir=/var/run/kvalobs --encoding=LATIN1 --locale=C --user=kvalobs --port=5433 --start 9.0 kvalobs 
+
+Logg av som root bruker. Utfør resten av databaseoppsettet som kvalobs bruker. 
+
+Editer filen /etc/postgresql/9.0/kvalobs/postgresql.conf.
 Finn variablene 'listen_addresses' og sett den til riktig host.
 Set default timezone til UTC.
 
 I hjemmekatalogen til kvalobs opprett filen .postgresqlrc og legg inn
-folgende linje:
+følgende linje:
 
-8.3 kvalobs *
+    9.0 kvalobs *
 
-Login in i databsen med psql template1 og opprett databasen kvalobs.
+Login i databasen med psql template1 og opprett databasen kvalobs.
 
 Database schemaene kan nå legges inn databasen.
 

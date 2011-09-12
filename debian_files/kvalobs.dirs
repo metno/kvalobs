@@ -4,6 +4,7 @@ usr/bin
 usr/lib
 usr/lib/kvalobs/bin
 usr/share/kvalobs
+usr/share/kvalobs/matadata
 usr/share/kvalobs/db
 usr/share/kvalobs/db/upgrade/
 var/lib/kvalobs
@@ -13,6 +14,7 @@ var/lib/kvalobs/lam2kv/upload
 var/lib/kvalobs/lam2kv/data
 var/run/kvalobs
 var/log/kvalobs/
+var/log/kvalobs/lam2kv
 var/log/kvalobs/html
 var/log/kvalobs/decoders
 var/log/kvalobs/decoders/SynopDecoder

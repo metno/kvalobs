@@ -32,7 +32,8 @@ BIN="kv2kro kvDataInputd kvdataclt kvdbadmin
 KVBINDIR="/usr/lib/kvalobs/bin"
 KVBIN="hirlam2kvalobs.sh
        runbg
-       kvdbadmin.sh
+       metdat
+       posdat
        lam2kv.cron
        save_last_month.sh
        load_last_month.sh"
@@ -68,6 +69,7 @@ DIRS="/usr/share/kvalobs
       /var/lib/kvalobs/lam2kv/upload
       /var/lib/kvalobs/lam2kv/data
       /var/log/kvalobs
+      /var/log/kvalobs/lam2kv
       /var/log/kvalobs/decoders
       /var/log/kvalobs/decoders/SynopDecoder
       /var/log/kvalobs/kvsynopdbadmin
