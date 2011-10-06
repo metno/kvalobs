@@ -3,7 +3,6 @@
 #skript for å komprimere logfiler etter synopdecoderen.
 #Sletter også filer som er for gamle!
 
-
 DIR="$(kvconfig --localstatedir)/log/kvalobs/decoders/SynopDecoder"
 
 if ! cd $DIR ; then
@@ -11,17 +10,9 @@ if ! cd $DIR ; then
 	exit 0
 fi
 	
-files="*.raw"
 
-todayfile=$(date +%Y-%m-%d).raw
-
-for file in $files ; do
-	echo "file: $file"
-	if [ $file != $todayfile ]; then
-		echo "gzip $file"
-		gzip $file
-	fi
-done
+#Komprimer filer eldre enn 2 dager.
+find . -name '*.raw' -mtime +2 -exec gzip {} \;
 	
 #slett logfiler som er eldre enn 10 dager
 find . -name '*.raw.gz' -mtime +10 -exec rm -f {} \;
