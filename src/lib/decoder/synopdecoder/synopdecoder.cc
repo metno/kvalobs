@@ -38,6 +38,7 @@
 #include <kvalobs/kvDbGate.h>
 #include <kvalobs/kvQueries.h>
 #include <kvalobs/kvTypes.h>
+#include <kvalobs/kvPath.h>
 #include <fileutil/mkdir.h>
 #include "synopdecoder.h"
 #include "kvSynopDecoder.h"
@@ -172,18 +173,8 @@ void
 SynopDecoder::
 writeObsToLog(const std::string &obs)
 {
-   string path;
-   string logpath("var/log/decoders/"+name());
-
-   char *p=getenv("KVALOBS");
-
-   if(!p)
-      return;
-
-   path=p;
-
-   if(path.empty())
-      return;
+   string path( kvPath(kvalobs::logdir) );
+   string logpath("decoders/"+name());
 
    while(!path.empty() && path[path.length()-1]=='/')
       path.erase(path.length()-1);
