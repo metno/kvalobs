@@ -1,3 +1,11 @@
+kvalobs (2.4.5~rc1-1) lucid; urgency=low
+
+  * Fix creation of log files name in the synopdecoder.
+  * Fix the log script that compress raw SYNOP's. 
+  * Update the documentation for setting up a kvalobs database in ubuntu/debian.
+  
+ -- Borge Moe <borge.moe@met.no>  Thu, 06 Oct 2011 13:00:00 +0100
+
 kvalobs (2.4.4-3) lucid; urgency=low
 
   * Remove "amd64" from the version number. 
