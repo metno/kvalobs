@@ -1,31 +1,36 @@
 Oppsett av kvalobs databasekluster i ubuntu lucid
 -------------------------------------------------
-Testet postgresql versjon er 9.0.
+Testet postgresql versjon er 9.0 og 9.1.
 Testet debian versjon er ubuntu lucid.
 
 Kommandoen pg_createcluster brukes.
 
-Opprett en partisjon under /var/lib/postgresql/9.0/kvalobs.
+Opprett en partisjon under /var/lib/postgresql/9.1/kvalobs.
 Denne partisjonen bør ikke være mindre enn 50 GB.
 
-set locale til C eller POSIX.
-Set encoding til LATIN1 (ISO 8859-1)
-Set kvalobs til a vare superbruker.
+Database klusteret for kvalobs konfigureres med følgende konfigurasjon
+Locale settes til C eller POSIX.
+Encoding settes til LATIN1 (ISO 8859-1)
+kvalobs settes til a være superbruker.
 
-Logg inn som root bruker og utfør komandoen:
+For å sette opp database klusteret logg inn som root bruker og utfør komandoen:
 
-pg_createcluster --socketdir=/var/run/kvalobs --encoding=LATIN1 --locale=C --user=kvalobs --port=5433 --start 9.0 kvalobs 
+pg_createcluster --socketdir=/var/run/kvalobs --encoding=LATIN1 --locale=C --user=kvalobs --port=5435 --start 9.0 kvalobs 
 
 Logg av som root bruker. Utfør resten av databaseoppsettet som kvalobs bruker. 
 
-Editer filen /etc/postgresql/9.0/kvalobs/postgresql.conf.
+Editer filen /etc/postgresql/9.1/kvalobs/postgresql.conf.
 Finn variablene 'listen_addresses' og sett den til riktig host.
-Set default timezone til UTC.
+Sett default timezone til UTC.
+
+Restart postgres for at den nye konfigurasjon skal tre i kraft.
+
+pg_ctlcluster 9.1 kvalobs restart
 
 I hjemmekatalogen til kvalobs opprett filen .postgresqlrc og legg inn
 følgende linje:
 
-    9.0 kvalobs *
+    9.1 kvalobs *
 
 Login i databasen med psql template1 og opprett databasen kvalobs.
 
@@ -39,6 +44,8 @@ psql template1 < /usr/share/kvalobs/db/kvalobs_createdb.sql
 
 Opprett tabeller
 psql kvalobs < /usr/share/kvalobs/db/kvalobs_schema.sql
+
+Databasen er nå klar til bruk for kvalobs programvaren.
 
 
 
