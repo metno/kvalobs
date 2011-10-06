@@ -97,6 +97,8 @@ SynopDecoder::saveData(list<kvalobs::kvData> &data,
    if(it==data.end())
       return true;
 
+   logid << "n" << it->stationID() << "-t" << it->typeID();
+
    if(it->stationID()<100000){
       //National stations that is registred in table 'station'.
       priority=6;
@@ -120,8 +122,8 @@ SynopDecoder::saveData(list<kvalobs::kvData> &data,
       }
    }
 
-   logid << "n" << it->stationID() << "-t" << it->typeID();
    createLogger( logid.str() );
+
    int ret=true;
    it=data.begin();
 
