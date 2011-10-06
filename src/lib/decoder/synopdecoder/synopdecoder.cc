@@ -120,7 +120,7 @@ SynopDecoder::saveData(list<kvalobs::kvData> &data,
       }
    }
 
-   logid << "n" << it->stationID() << "-t" << it->typeID() << ".log";
+   logid << "n" << it->stationID() << "-t" << it->typeID();
    createLogger( logid.str() );
    int ret=true;
    it=data.begin();
