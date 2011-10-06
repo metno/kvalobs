@@ -41,6 +41,16 @@ using namespace kvalobs;
 using namespace miutil;
 
 
+namespace {
+miTime firstDayNextMonth( const miTime &mi )
+{
+   miTime ref(mi.year(), mi.month(), 28, 0, 0, 0 );
+   ref.addDay( 5 );
+   return miTime( ref.year(), ref.month(), 1, 0, 0, 0);
+}
+
+}
+
 
 bool kvSynopDecoder::initialise(const list<kvStation>& kpos, int earlyobs, int lateobs)
 {
@@ -132,6 +142,10 @@ miTime kvSynopDecoder::createObsTime()
 
   miTime obsT(yea,mon,YY,GG,gg,0); 
   miTime refT=ref;
+  miTime firstDay = firstDayNextMonth( ref );
+  miTime lastDay = firstDay;
+
+  lastDay.addDay( -1 );
   refT.addDay(10);
 
   if (obsT > refT ) {
@@ -141,6 +155,9 @@ miTime kvSynopDecoder::createObsTime()
       mon=12;
     }
     obsT.setTime(yea,mon,YY,GG,gg,0);
+  } else if( lastDay.date() == ref.date() &&  //We are at the last day in month.
+             abs( miTime::hourDiff( lastDay, obsT) ) > 48  ) {
+     obsT = miTime( firstDay.date(), obsT.clock() );
   }
 
   return  obsT;
@@ -220,9 +237,9 @@ char kvSynopDecoder::checkObservationTime(miutil::miTime tbt, miutil::miTime obt
 }
 
 /*
- * Fra Lars Andresen: Har jeg fått følgende spesifikasjon for å skille mellom HL=-3 og
+ * Fra Lars Andresen: Har jeg fï¿½tt fï¿½lgende spesifikasjon for ï¿½ skille mellom HL=-3 og
  * HL=-32767: Hvis skymengde, N, eller sikt, VV, mangler ("/"), enten den ene
- * eller andre eller begge (selv om gruppe 7 er med), så anses HL="/" som
+ * eller andre eller begge (selv om gruppe 7 er med), sï¿½ anses HL="/" som
  * manglende.
  *
  */
