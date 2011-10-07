@@ -85,6 +85,9 @@ private:
 
 
 public:
+  static miutil::miTime createObsTime( int day, int hour, const miutil::miTime &refTime );
+  static miutil::miTime firstDayNextMonth( const miutil::miTime &mi );
+  static miutil::miTime lastDayThisMonth( const miutil::miTime &mi );
   bool initialise(const std::list<kvalobs::kvStation>&, int e = 20, int l = 30 );
 
   void setReferenceTime(const miutil::miTime& r); ///< set ref, continuous = false

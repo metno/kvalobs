@@ -41,16 +41,55 @@ using namespace kvalobs;
 using namespace miutil;
 
 
-namespace {
-miTime firstDayNextMonth( const miTime &mi )
+miutil::miTime
+kvSynopDecoder::
+firstDayNextMonth( const miTime &mi )
 {
    miTime ref(mi.year(), mi.month(), 28, 0, 0, 0 );
-   ref.addDay( 5 );
+   ref.addDay( 5 ); //This is in the next month.
    return miTime( ref.year(), ref.month(), 1, 0, 0, 0);
 }
 
+miutil::miTime
+kvSynopDecoder::
+lastDayThisMonth( const miutil::miTime &mi )
+{
+   miTime firstDay = firstDayNextMonth( mi );
+   firstDay.addDay( -1 ); //Adjust it to last day in the previous month.
+   return firstDay;
 }
 
+
+miutil::miTime
+kvSynopDecoder::
+createObsTime( int day, int hour, const miTime &refTime )
+{
+   int mon = refTime.month();
+   int yea = refTime.year();
+
+   miTime obsT( yea, mon, day, hour, 0, 0);
+   miTime refT=refTime;
+   refT.addDay(10);
+
+   miTime lastDay = lastDayThisMonth( refTime );
+
+   if( refTime.day() == lastDay.day() && obsT.day() == 1 && obsT.month() == refTime.month() ) {
+      miTime newRef( lastDay );
+      newRef.addDay( 1 ); //First day next month
+      obsT = miTime( newRef.year(), newRef.month(), day, hour, 0, 0);
+   }
+
+   if (obsT > refT ) {
+     mon--;
+     if(mon < 1) {
+       yea--;
+       mon=12;
+     }
+     obsT.setTime( yea, mon, day, hour, 0, 0 );
+   }
+
+   return  obsT;
+}
 
 bool kvSynopDecoder::initialise(const list<kvStation>& kpos, int earlyobs, int lateobs)
 {
@@ -127,41 +166,8 @@ miTime kvSynopDecoder::createObsTime()
   if(continuous) 
     ref = miTime::nowTime();
  
-  int mon = ref.month();
-  int yea = ref.year();
-
-  int YY   = obs.Info()->YY;
-  int GG   = obs.Info()->GG;
-  int GGgg = obs.Info()->GGgg;
-  int gg   = 0;
-
-//   if( GGgg) {  
-//     GG = GGgg / 100;
-//     gg = GGgg % 100;
-//   }
-
-  miTime obsT(yea,mon,YY,GG,gg,0); 
-  miTime refT=ref;
-  miTime firstDay = firstDayNextMonth( ref );
-  miTime lastDay = firstDay;
-
-  lastDay.addDay( -1 );
-  refT.addDay(10);
-
-  if (obsT > refT ) {
-    mon--;
-    if(mon < 1) {
-      yea--;
-      mon=12;
-    }
-    obsT.setTime(yea,mon,YY,GG,gg,0);
-  } else if( lastDay.date() == ref.date() &&  //We are at the last day in month.
-             abs( miTime::hourDiff( lastDay, obsT) ) > 48  ) {
-     obsT = miTime( firstDay.date(), obsT.clock() );
-  }
-
-  return  obsT;
-}
+  return createObsTime( obs.Info()->YY, obs.Info()->GG, ref );
+ }
 
 int  kvSynopDecoder::findStationid()
 {

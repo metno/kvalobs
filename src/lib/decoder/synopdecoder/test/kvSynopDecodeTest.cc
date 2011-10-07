@@ -40,6 +40,7 @@
 #include <gtest/gtest.h>
 
 using namespace std;
+using namespace miutil;
 
 namespace {
 struct ParamVal {
@@ -142,9 +143,9 @@ protected:
 
 
 /*
- * Fra Lars Andresen: Har jeg fått følgende spesifikasjon for å skille mellom HL=-3 og
+ * Fra Lars Andresen: Har jeg fï¿½tt fï¿½lgende spesifikasjon for ï¿½ skille mellom HL=-3 og
  * HL=-32767: Hvis skymengde, N, eller sikt, VV, mangler ("/"), enten den ene
- * eller andre eller begge (selv om gruppe 7 er med), så anses HL="/" som
+ * eller andre eller begge (selv om gruppe 7 er med), sï¿½ anses HL="/" som
  * manglende.
  */
 TEST_F( SynopDecodeTest, hVVN_missing )
@@ -272,6 +273,51 @@ TEST_F( SynopDecodeTest, decode333_3Ejjj)
 	EXPECT_FLOAT_EQ( E, 1 ) << "Failed: (3Ejjj) E=" << E;
 }
 
+TEST_F( SynopDecodeTest, first_last_day_month )
+{
+   miTime ref("2012-02-01 23:59:59");
+   miTime firstDay = kvSynopDecoder::firstDayNextMonth( ref );
+   miTime lastDay = kvSynopDecoder::lastDayThisMonth( ref );
+
+   ASSERT_EQ( firstDay, miTime( "2012-03-01 00:00:00") );
+   ASSERT_EQ( lastDay, miTime( "2012-02-29 00:00:00") );
+
+   ref = miTime("2012-02-01 00:00:00");
+
+   ASSERT_EQ( firstDay, miTime( "2012-03-01 00:00:00") );
+   ASSERT_EQ( lastDay, miTime( "2012-02-29 00:00:00") );
+}
+
+TEST_F( SynopDecodeTest, createObsTime )
+{
+
+   miTime ref("2011-09-15 23:00:00");
+   miTime refT=ref;
+   refT.addDay( 10 ); //2011-09-25 23:00:00
+
+   miTime obsTime= kvSynopDecoder::createObsTime( 1, 0, ref );
+   ASSERT_EQ( obsTime, miTime( "2011-09-01 00:00:00") );
+
+   obsTime= kvSynopDecoder::createObsTime( 15, 0, ref );
+   ASSERT_EQ( obsTime, miTime( "2011-09-15 00:00:00") );
+
+   obsTime= kvSynopDecoder::createObsTime( 15, 21, ref );
+   ASSERT_EQ( obsTime, miTime( "2011-09-15 21:00:00") );
+
+   obsTime= kvSynopDecoder::createObsTime( 16, 00, ref );
+   ASSERT_EQ( obsTime, miTime( "2011-09-16 00:00:00") );
+
+   obsTime= kvSynopDecoder::createObsTime( 25, 23, ref );
+   ASSERT_EQ( obsTime, miTime( "2011-09-25 23:00:00") );
+
+   obsTime= kvSynopDecoder::createObsTime( 26, 0, ref );
+   ASSERT_EQ( obsTime, miTime( "2011-08-26 00:00:00") );
+
+   //Test for correct handling of lastday in month.
+   ref = miTime("2011-09-30 23:51:57");
+   obsTime= kvSynopDecoder::createObsTime( 1, 0, ref );
+   ASSERT_EQ( miTime( "2011-10-01 00:00:00"), obsTime );
+}
 
 
 int
