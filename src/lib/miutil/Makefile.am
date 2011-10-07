@@ -1,3 +1,5 @@
+AM_CPPFLAGS = -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib -I$(top_builddir)/src/lib/kvskel
+
 lib_LTLIBRARIES = libkvalobs_miutil.la
 
 libkvalobs_miutil_la_SOURCES = \
@@ -15,3 +17,20 @@ libkvalobs_miutil_la_LIBADD = $(putools_LIBS)
 
 miutilincludedir = $(pkgincludedir)/miutil
 miutilinclude_HEADERS = cmprspace.h commastring.h miTimeParse.h trimstr.h
+
+
+TESTS = libmiutiltest
+
+check_PROGRAMS = libmiutiltest
+
+libmiutiltest_SOURCES = \
+	test/miTimeParseTest.cc \
+	test/test.cc
+
+libmiutiltest_CPPFLAGS = $(AM_CPPFLAGS) $(libkvalobs_miutil_la_CPPFLAGS) $(gtest_CFLAGS)
+
+libmiutiltest_LDADD = \
+	libkvalobs_miutil.la \
+	$(libkvalobs_miutil_la_LIBADD) \
+	$(top_builddir)/src/lib/milog/libkvalobs_milog.la \
+	$(gtest_LIBS)
