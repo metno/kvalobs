@@ -1,3 +1,9 @@
+kvalobs (2.4.5~rc3-1) lucid; urgency=low
+
+  * Update crontab
+  
+ -- Borge Moe <borge.moe@met.no>  Tue, 08 Nov 2011 14:30:00 +0200
+
 kvalobs (2.4.5~rc2-1) lucid; urgency=low
 
   * Fix logging of raw SYNOP in the synopdecoder.
