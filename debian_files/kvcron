@@ -12,5 +12,3 @@ LOG=/var/log/kvalobs
 #*/5 * * * * $MYBIN/check_kvsynopd.sh >> $LOG/check_kvsynopd.log %
 30 6 1 * * $MYBIN/save_last_month.sh
 25 3,21 * * * /usr/bin/kvrestart kvQabased > /dev/null 2>&1 %
-23 0 * * 3 /etc/kvalobs/Qc2Config/Redistribution_120days_on_cron.sh
-23 0 * * 4 /etc/kvalobs/Qc2Config/Redistribution_120days_off_cron.sh
