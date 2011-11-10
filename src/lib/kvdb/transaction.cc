@@ -78,7 +78,7 @@ onMaxRetry( const std::string &lastError )
    if( ! lastError.empty() )
       msg=lastError;
 
-   throw SQLException( lastError );
+   throw SQLException( msg );
 }
 
 }
