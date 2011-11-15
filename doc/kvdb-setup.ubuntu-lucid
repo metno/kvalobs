@@ -15,7 +15,7 @@ kvalobs settes til a være superbruker.
 
 For å sette opp database klusteret logg inn som root bruker og utfør komandoen:
 
-pg_createcluster --socketdir=/var/run/kvalobs --encoding=LATIN1 --locale=C --user=kvalobs --port=5435 --start 9.0 kvalobs 
+pg_createcluster --datadir=/var/lib/postgresql/9.1/kvalobs/cluster --socketdir=/var/run/kvalobs --encoding=LATIN1 --locale=C --user=kvalobs --port=5435 --start 9.0 kvalobs 
 
 Logg av som root bruker. Utfør resten av databaseoppsettet som kvalobs bruker. 
 

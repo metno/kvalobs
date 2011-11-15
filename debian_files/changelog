@@ -1,3 +1,9 @@
+kvalobs (2.4.5~rc4-1) lucid; urgency=low
+
+  * Fix metdat and posdat so it works on read-only mounted filesystem.
+  
+ -- Borge Moe <borge.moe@met.no>  Tue, 15 Nov 2011 14:30:00 +0200
+
 kvalobs (2.4.5~rc3-1) lucid; urgency=low
 
   * Update crontab
