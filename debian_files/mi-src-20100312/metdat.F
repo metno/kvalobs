@@ -1321,6 +1321,9 @@ c
           open(ifile,file=filein,
      *               access='direct',form='unformatted',
      *               recl=2048/lrunit,
+#ifndef G77
+     *             action='read',
+#endif
      *               status='old',iostat=ios,err=900)
           swap= swapfile(-ifile)
           irec=1

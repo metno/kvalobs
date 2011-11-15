@@ -978,6 +978,9 @@ c
       open(iunit,file=filein,
      +           access='direct',form='unformatted',
      +           recl=(lbuff*2)/lrunit,
+#ifndef G77
+     +           action='read',
+#endif
      +           status='old',iostat=ios,err=920)
 c
       irec=0
