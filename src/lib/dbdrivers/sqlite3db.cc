@@ -159,42 +159,47 @@ dnmi::db::drivers::SQLiteConnection::exec(const std::string &query)
    //  string sMsg;
    int   sqliteRes;
    char  *msg=0;
-
+   bool busy=false;
    errMsg.erase();
 
    if(!con)
       throw SQLNotConnected("NO CONNECTION, not connected to any database!");
 
-   sqliteRes=sqlite3_exec(con, query.c_str(), 0, 0, &msg);
+   do {
+      sqliteRes=sqlite3_exec(con, query.c_str(), 0, 0, &msg);
 
-   if(msg){
-      errMsg=msg;
-      sqlite3_free(msg);
-   }
+      if(msg){
+         errMsg=msg;
+         sqlite3_free(msg);
+      }
 
-   ostringstream errorCode;
-   errorCode << sqliteRes;
+      ostringstream errorCode;
+      errorCode << sqliteRes;
 
-   if(sqliteRes!=SQLITE_OK){
-      ostringstream emsg;
-      //cerr << "ERROR: " << sqliteRes << endl;
+      if( sqliteRes == SQLITE_OK ) {
+         busy = false;
+      } else {
+         ostringstream emsg;
+         //cerr << "ERROR: " << sqliteRes << endl;
 
-      if(sqliteRes==SQLITE_CONSTRAINT){
-         string::size_type i=errMsg.find("unique");
+         if(sqliteRes==SQLITE_CONSTRAINT){
+            string::size_type i=errMsg.find("unique");
 
-         if(i!=string::npos){
-            throw SQLDuplicate("SQLite: Duplicate (" + errMsg +")", errorCode.str() );
+            if(i!=string::npos){
+               throw SQLDuplicate("SQLite: Duplicate (" + errMsg +")", errorCode.str() );
+            }else{
+               emsg << "SQLite: sqliteres(" << sqliteRes << "): " + errMsg;
+               throw SQLException( emsg.str(), errorCode.str() );
+            }
+         }else if(sqliteRes==SQLITE_BUSY){
+            busy = true;
+            //throw SQLBusy("SQLite: " + errMsg, errorCode.str() );
          }else{
             emsg << "SQLite: sqliteres(" << sqliteRes << "): " + errMsg;
             throw SQLException( emsg.str(), errorCode.str() );
          }
-      }else if(sqliteRes==SQLITE_BUSY){
-         throw SQLBusy("SQLite: " + errMsg, errorCode.str() );
-      }else{
-         emsg << "SQLite: sqliteres(" << sqliteRes << "): " + errMsg;
-         throw SQLException( emsg.str(), errorCode.str() );
       }
-   }
+   } while( busy );
 }
 
 
