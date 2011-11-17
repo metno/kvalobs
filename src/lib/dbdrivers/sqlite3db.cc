@@ -18,30 +18,33 @@
   modify it under the terms of the GNU General Public License as 
   published by the Free Software Foundation; either version 2 
   of the License, or (at your option) any later version.
-  
+
   KVALOBS is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License along 
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ */
 #include <stdlib.h>
 #include <unistd.h>
 #include <sstream>
 #include "sqlite3db.h"
 
+#define DB_NOTOPEN -1
+#define DB_NOMEM -2
+#define DB_DRIVERMISMATCH -2
 
 namespace {
-  int dataCallback(void *pArg, int argc, char **argv, char **columnNames);
+int dataCallback(void *pArg, int argc, char **argv, char **columnNames);
 }
 
 
 using namespace std;
 using namespace dnmi::db::drivers;
-      
+
 dnmi::db::drivers::SQLiteDriver::SQLiteDriver()
 {
 }
@@ -49,154 +52,242 @@ dnmi::db::drivers::SQLiteDriver::SQLiteDriver()
 dnmi::db::drivers::SQLiteDriver::~SQLiteDriver()
 {
 }
-	
+
 dnmi::db::Connection* 
 dnmi::db::drivers::SQLiteDriver::createConnection(const std::string &connect)
 {
-  SQLiteConnection *con;
+   SQLiteConnection *con;
 
-  try{
-    con=new SQLiteConnection(connect, name());
-  }
-  catch(...){
-    setErrMsg("Out of memory!");
-    return 0;
-  }
+   try{
+      con=new SQLiteConnection(connect, name());
+   }
+   catch(...){
+      setErrMsg( "SQLite: out of memmory." );
+      return 0;
+   }
 
-  if(con->isConnected())
-    return con;
+   if(con->isConnected())
+      return con;
 
-  delete con;
-  
-  return 0;
+   delete con;
+
+   return 0;
 }
 
 bool        
 dnmi::db::drivers::SQLiteDriver::releaseConnection(Connection *connect)
 {
-  if(connect->getDriverId()!=name()){
-    stringstream ost;
-    ost << "ERROR: trying to release a connection with driverId <" <<
-	 connect->getDriverId() << ">, but this driver har driverId <" <<
-	 name() << ">!\n";
-    setErrMsg(ost.str());
-    return false;
-  }
-  
-  delete connect;
-  
-  return true;
-}
-    
-dnmi::db::drivers::SQLiteConnection::SQLiteConnection(
-					       const std::string &connect,
-					      const std::string &driverId)
-  :Connection(driverId), con(0)
-{
-  int res = sqlite3_open( connect.c_str(), & con );
-  if ( SQLITE_OK != res )
-  {
-	  errMsg = sqlite3_errmsg(con);
-	  con = 0;
-  }
+   if(connect->getDriverId() != name()){
+      stringstream ost;
+      ost << "ERROR: trying to release a connection with driverId <"
+            << connect->getDriverId() << ">, but this driver har driverId <"
+            <<name() << ">!\n";
+      setErrMsg(ost.str());
+      return false;
+   }
 
-  if(con) {
-    sqlite3_busy_timeout(con, 5000); //sets busy timeout to 5 second.
-    pimpel = new SQLitePimpel();
-  }
+   delete connect;
+   return true;
+}
+
+dnmi::db::drivers::SQLiteConnection::SQLiteConnection(
+      const std::string &connect,
+      const std::string &driverId)
+:Connection(driverId), con(0)
+{
+   SQLitePimpel *myPimpel=new SQLitePimpel();
+   myPimpel->setConnect( connect );
+   pimpel = myPimpel;
+
+   int res = sqlite3_open( connect.c_str(), & con );
+
+   if ( SQLITE_OK != res ) {
+      if( con ) {
+         myPimpel->setErrInfo( res, sqlite3_errmsg(con) );
+         sqlite3_close(con);
+      } else {
+         errMsg = "SQLLite: NOMEM, when trying to connect to the data base '" + connect +"'.";
+         myPimpel->setErrInfo( res,  errMsg );
+
+      }
+
+      con = 0;
+   }
+
+
+   if(con) {
+      sqlite3_busy_timeout(con, 5000); //sets busy timeout to 5 second.
+   }
 }
 
 dnmi::db::drivers::SQLiteConnection::~SQLiteConnection()
 {
-  if(con)
-    sqlite3_close(con);
+   if(con)
+      sqlite3_close(con);
 
-  if( pimpel )
-     delete static_cast<SQLitePimpel*>( pimpel );
+   if( pimpel )
+      delete static_cast<SQLitePimpel*>( pimpel );
 }
 
 
 bool 
 dnmi::db::drivers::SQLiteConnection::isConnected()
 {
-  if(con==0)
-    return false;
+   if( ! pimpel ) {
+      errMsg = "SQLite: Driver internal error (no pimpel)!";
+      return false;
+   }
 
-  return true;
+   SQLitePimpel *myPimpel = static_cast<SQLitePimpel*>( pimpel );
+
+   if(con==0) {
+      errMsg = myPimpel->setErrInfo( DB_NOTOPEN );
+      return false;
+   }
+
+   return true;
 } 
 
 bool 
 dnmi::db::drivers::SQLiteConnection::tryReconnect()
 {
-  if(!con)
-    return false;
+   if( ! pimpel ) {
+      errMsg = "SQLite: Driver internal error (no pimpel)!";
+      return 0;
+   }
 
-  return true;
+   int res;
+   SQLitePimpel *myPimpel = static_cast<SQLitePimpel*>( pimpel );
+   string connect=myPimpel->getConnect();
+
+   if( connect.empty() ) {
+      errMsg = myPimpel->setErrInfo( DB_NOTOPEN );
+      return false;
+   }
+
+   if( con ) {
+      res = sqlite3_close( con );
+
+      if( res != SQLITE_OK ) {
+         errMsg = myPimpel->setErrInfo( res, sqlite3_errmsg( con ) );
+         return false;
+      }
+   }
+
+   res = sqlite3_open( connect.c_str(), & con );
+
+   if ( res != SQLITE_OK  ) {
+      if( con ) {
+         errMsg = myPimpel->setErrInfo( res, string("SQLite: tryReconnect: ") + sqlite3_errmsg(con) );
+         sqlite3_close( con );
+      } else {
+         errMsg = myPimpel->setErrInfo(DB_NOMEM,
+                                       string("SQLite: NOMEM, when trying to reconnect to the data base '")
+                                       + connect +"'." );
+      }
+      con = 0;
+      return false;
+   }
+
+   return true;
 }
 
 
 void
 dnmi::db::drivers::SQLiteConnection::beginTransaction()
 {
-  exec("BEGIN");
+   if( ! pimpel ) {
+      errMsg = "SQLite: Driver internal error (no pimpel)!";
+      throw SQLException( errMsg );
+   }
+
+   SQLitePimpel *myPimpel = static_cast<SQLitePimpel*>( pimpel );
+
+   if( ! con ) {
+      if( ! tryReconnect() )
+         throw SQLNotConnected( errMsg );
+   }
+
+   bool reconnect=false;
+
+   do {
+      try {
+         if( reconnect ) {
+            if( ! tryReconnect() ) {
+               throw SQLNotConnected( errMsg );
+            }
+         }
+
+         exec("BEGIN IMMEDIATE");
+         return;
+      }
+      catch( ... ) {
+         if( reconnect )
+            throw;
+
+         reconnect = true;
+      }
+   }while( reconnect );
 }
 
 void 
 dnmi::db::drivers::SQLiteConnection::endTransaction()
 {
-  exec("END");
+   exec("COMMIT");
 }
 
 void 
 dnmi::db::drivers::SQLiteConnection::rollBack()
 {
-  exec("ROLLBACK");
+   exec("ROLLBACK");
 }
 
 void
 dnmi::db::drivers::SQLiteConnection::exec(const std::string &query)
 {
-   //  string sMsg;
    int   sqliteRes;
    char  *msg=0;
    bool busy=false;
-   errMsg.erase();
 
-   if(!con)
-      throw SQLNotConnected("NO CONNECTION, not connected to any database!");
+   if( ! pimpel ) {
+      errMsg = "SQLite: Driver internal error (no pimpel)!";
+      throw SQLException( errMsg );
+   }
+
+   SQLitePimpel *myPimpel = static_cast<SQLitePimpel*>( pimpel );
+
+   if(!con) {
+      if( ! tryReconnect() )
+         throw SQLNotConnected( errMsg );
+   }
 
    do {
       sqliteRes=sqlite3_exec(con, query.c_str(), 0, 0, &msg);
 
       if(msg){
-         errMsg=msg;
+         myPimpel->setErrMsg( msg );
          sqlite3_free(msg);
       }
-
-      ostringstream errorCode;
-      errorCode << sqliteRes;
 
       if( sqliteRes == SQLITE_OK ) {
          busy = false;
       } else {
-         ostringstream emsg;
-         //cerr << "ERROR: " << sqliteRes << endl;
+         errMsg = myPimpel->setErrInfo( sqliteRes, errMsg );
 
          if(sqliteRes==SQLITE_CONSTRAINT){
             string::size_type i=errMsg.find("unique");
 
             if(i!=string::npos){
-               throw SQLDuplicate("SQLite: Duplicate (" + errMsg +")", errorCode.str() );
+               errMsg = myPimpel->setErrInfo( sqliteRes, "SQLite: Duplicate (" + errMsg +")");
+               throw SQLDuplicate( errMsg, myPimpel->getErrorCode() );
             }else{
-               emsg << "SQLite: sqliteres(" << sqliteRes << "): " + errMsg;
-               throw SQLException( emsg.str(), errorCode.str() );
+               throw SQLException( errMsg, myPimpel->getErrorCode() );
             }
          }else if(sqliteRes==SQLITE_BUSY){
             busy = true;
             //throw SQLBusy("SQLite: " + errMsg, errorCode.str() );
          }else{
-            emsg << "SQLite: sqliteres(" << sqliteRes << "): " + errMsg;
-            throw SQLException( emsg.str(), errorCode.str() );
+            throw SQLException(errMsg, myPimpel->getErrorCode());
          }
       }
    } while( busy );
@@ -206,60 +297,71 @@ dnmi::db::drivers::SQLiteConnection::exec(const std::string &query)
 dnmi::db::Result*
 dnmi::db::drivers::SQLiteConnection::execQuery(const std::string &query)
 {
-  string sMsg;
-  int    sqliteRes;
-  char   *msg=0;
-  SQLite::SQLiteData *data;
-  
-  if(!con)
-    throw SQLNotConnected("SQLite: NO CONNECTION, not connected to any database!");
-  
-  try{
-    data = new SQLite::SQLiteData();
-  }
-  catch(...){
-    throw SQLException("NOMEM: cant create 'SQLiteData'");
-  }  
+   int    sqliteRes;
+   char   *msg=0;
+   SQLite::SQLiteData *data;
+   bool busy=false;
 
-  sqliteRes=sqlite3_exec(con, query.c_str(), dataCallback, data, &msg);
+   if( ! pimpel ) {
+      errMsg = "SQLite: Driver internal error (no pimpel)!";
+      return false;
+   }
 
-  ostringstream errorCode;
-  errorCode << sqliteRes;
+   SQLitePimpel *myPimpel = static_cast<SQLitePimpel*>( pimpel );
 
-  if(msg){
-    sMsg=msg;
-    sqlite3_free(msg);
-  }else
-    sMsg="SQLite: Unknown error!";
+   if(!con) {
+      if( ! tryReconnect() )
+         throw SQLNotConnected( errMsg );
+   }
+
+   try{
+      data = new SQLite::SQLiteData();
+   }
+   catch(...){
+      errMsg = myPimpel->setErrInfo( DB_NOMEM );
+      throw SQLException( errMsg );
+   }
+
+   do {
+      busy = false;
+      sqliteRes=sqlite3_exec(con, query.c_str(), dataCallback, data, &msg);
 
 
-  if(sqliteRes!=SQLITE_OK){
-    delete data;
-    //cerr << "ERROR: " << sqliteRes << endl;
+      if(msg){
+         myPimpel->setErrMsg( msg );
+         sqlite3_free(msg);
+      }else
+         myPimpel->setErrMsg( "SQLite: Unknown error!" );
 
-    if(sqliteRes==SQLITE_BUSY){
-      throw SQLBusy("SQLiteBusy: " + sMsg, errorCode.str());
-    }else{
-      ostringstream  emsg;
-      emsg << "SQLite: sqliteres(" << sqliteRes << "): " + errMsg;
-      throw SQLException( emsg.str(), errorCode.str() );
-    }
-  }
-  
-  try{
-    SQLiteResult *res=new SQLiteResult(data);
-    return res;
-  }
-  catch(...){
-    delete data;
-    throw SQLException("NOMEM: cant create 'SQLiteResult'");
-  }
+      if(sqliteRes!=SQLITE_OK){
+         delete data;
+         //cerr << "ERROR: " << sqliteRes << endl;
+
+         if(sqliteRes==SQLITE_BUSY){
+            busy = true;
+            //throw SQLBusy("SQLiteBusy: " + sMsg, errorCode.str());
+         }else{
+            errMsg = myPimpel->setErrInfo( sqliteRes );
+            throw SQLException( errMsg, myPimpel->getErrorCode() );
+         }
+      }
+   }while( busy );
+
+   try{
+      SQLiteResult *res=new SQLiteResult(data);
+      return res;
+   }
+   catch(...){
+      delete data;
+      errMsg = myPimpel->setErrInfo( DB_NOMEM );
+      throw SQLException( errMsg );
+   }
 }
-      
+
 std::string 
 dnmi::db::drivers::SQLiteConnection::lastError()const
 {
-  return errMsg;
+   return errMsg;
 }
 
 std::string 
@@ -267,74 +369,74 @@ dnmi::db::drivers::
 SQLiteConnection::
 esc( const std::string &stringToEscape )const
 {
-	char *buf = sqlite3_mprintf("%q", stringToEscape.c_str() );
-	
-	if( ! buf )
-		throw SQLException("NOMEM: Cant escape the string.");
-	
-	try {
-		string ret( buf );
-		sqlite3_free( buf );
-		
-		return ret;
-	}
-	catch( ... ) {
-		throw SQLException("NOMEM: Cant escape the string.");
-	}
+   char *buf = sqlite3_mprintf("%q", stringToEscape.c_str() );
+
+   if( ! buf )
+      throw SQLException("NOMEM: Cant escape the string.");
+
+   try {
+      string ret( buf );
+      sqlite3_free( buf );
+
+      return ret;
+   }
+   catch( ... ) {
+      throw SQLException("NOMEM: Cant escape the string.");
+   }
 }
 
 
 dnmi::db::drivers::SQLiteResult::SQLiteResult(SQLite::SQLiteData *data_):
-  Result(data_->fieldNames.size()),sqlData(data_)
+        Result(data_->fieldNames.size()),sqlData(data_)
 { 
-  nextData=sqlData->data.begin();
+   nextData=sqlData->data.begin();
 }
 
 dnmi::db::drivers::SQLiteResult::~SQLiteResult()
 {
-  if(sqlData)
-     delete sqlData;
+   if(sqlData)
+      delete sqlData;
 }
 
 bool               
 dnmi::db::drivers::SQLiteResult::hasResult()const
 {
-  return sqlData->data.size()>0;
+   return sqlData->data.size()>0;
 }
 
 int                        
 dnmi::db::drivers::SQLiteResult::fields()const
 {
-  return sqlData->fieldNames.size();
+   return sqlData->fieldNames.size();
 }
 
 std::string 
 dnmi::db::drivers::SQLiteResult::fieldName(int index)const
 {
-    if(index>=sqlData->fieldNames.size())
-	throw SQLException("index out of range!");
-    
-    return sqlData->fieldNames[index];
-  
+   if(index>=sqlData->fieldNames.size())
+      throw SQLException("index out of range!");
+
+   return sqlData->fieldNames[index];
+
 }
 
 int         
 dnmi::db::drivers::SQLiteResult::fieldIndex(const std::string &fieldName)const
 {
 
-  for(int i=0; i<sqlData->fieldNames.size(); i++){
-    if(sqlData->fieldNames[i]==fieldName)
-      return i;
-  }
- 
-  throw SQLException("No fields with name: " + fieldName);
+   for(int i=0; i<sqlData->fieldNames.size(); i++){
+      if(sqlData->fieldNames[i]==fieldName)
+         return i;
+   }
+
+   throw SQLException("No fields with name: " + fieldName);
 }
 
 dnmi::db::FieldType   
 dnmi::db::drivers::SQLiteResult::fieldType(int index)const
 {
-    if(index>=sqlData->fieldNames.size())
-	throw SQLException("index out of range!");
+   if(index>=sqlData->fieldNames.size())
+      throw SQLException("index out of range!");
 }
 
 dnmi::db::FieldType   
@@ -345,47 +447,47 @@ dnmi::db::drivers::SQLiteResult::fieldType(const std::string &fieldName)const
 int         
 dnmi::db::drivers::SQLiteResult::fieldSize(int index)const
 {
-    if(index>=sqlData->fieldNames.size())
-	throw SQLException("index out of range!");
+   if(index>=sqlData->fieldNames.size())
+      throw SQLException("index out of range!");
 
-    throw SQLException("SQLite: fieldSize is not implemented!"); 
+   throw SQLException("SQLite: fieldSize is not implemented!");
 }
 
 int         
 dnmi::db::drivers::SQLiteResult::fieldSize(const std::string &fieldName)const
 {
-  return fieldSize(fieldIndex(fieldName));
+   return fieldSize(fieldIndex(fieldName));
 }
 
 int         
 dnmi::db::drivers::SQLiteResult::size()const
 {
-  return sqlData->data.size();
+   return sqlData->data.size();
 }
 
 bool        
 dnmi::db::drivers::SQLiteResult::hasNext()const
 {
-  if(nextData!=sqlData->data.end())
-    return true;
+   if(nextData!=sqlData->data.end())
+      return true;
 
-  return false;
+   return false;
 }
 
 void
 dnmi::db::drivers::SQLiteResult::nextImpl()
 {
-    if(nextData==sqlData->data.end())
-	throw SQLException("No more data!");
+   if(nextData==sqlData->data.end())
+      throw SQLException("No more data!");
 
-    if(data.size()!=nextData->size())
-      throw SQLException("INTERNAL ERROR: Incompatible datasize!");
-    
-    for(int i=0; i<nextData->size(); i++){
-	data[i]=(*nextData)[i];
-    }
+   if(data.size()!=nextData->size())
+      throw SQLException("INTERNAL ERROR: Incompatible data size!");
 
-    nextData++;
+   for(int i=0; i<nextData->size(); i++){
+      data[i]=(*nextData)[i];
+   }
+
+   nextData++;
 }
 
 
@@ -397,14 +499,14 @@ beginTransaction(dnmi::db::Connection::IsolationLevel isolation)
    using namespace dnmi::db::priv;
    switch( isolation ) {
    case Connection::SERIALIZABLE:
-      con->exec("BEGIN TRANSACTION");
+      con->exec("BEGIN EXCLUSIVE");
       break;
    case Connection::READ_COMMITTED:
       con->exec("BEGIN TRANSACTION");
-         break;
+      break;
    case Connection::READ_UNCOMMITTED:
       con->exec("BEGIN TRANSACTION");
-            break;
+      break;
    case Connection::REPEATABLE_READ:
       con->exec("BEGIN TRANSACTION");
       break;
@@ -417,6 +519,106 @@ SQLitePimpel::
 SQLitePimpel() : dnmi::db::priv::Pimpel()
 {
 }
+
+
+std::string
+dnmi::db::drivers::
+SQLitePimpel::
+getConnect()const
+{
+   return connect;
+}
+
+void
+dnmi::db::drivers::
+SQLitePimpel::
+setConnect( const std::string &connectString )
+{
+   connect = connectString;
+}
+
+
+std::string
+dnmi::db::drivers::
+SQLitePimpel::
+getErrorCode()const
+{
+   return errorCode;
+}
+
+void
+dnmi::db::drivers::
+SQLitePimpel::
+setErrorCode( int errCode )
+{
+   if( errCode < 0 ) {
+      if( errCode == DB_NOTOPEN ) {
+         errMsg = "SQLite: No database is open!";
+         this->errorCode = "DB_NOTOPEN";
+      } else if( errCode == DB_NOMEM ) {
+         errMsg = "SQLite: out of memmory!";
+         errorCode = "DB_NOMEM";
+      }else if( errCode == DB_DRIVERMISMATCH ) {
+         errMsg = "SQLite: Driver mismatch dected. (Internal error?!).";
+         errorCode = "DB_DRIVERMISMATCH";
+      } else {
+         errMsg = "SQLite: UNKNOWN error!";
+         errorCode = "UNKOWN";
+      }
+   } else {
+      ostringstream o;
+      o << errCode;
+      errorCode = o.str();
+   }
+
+}
+
+std::string
+dnmi::db::drivers::
+SQLitePimpel::
+setErrInfo( const int errCode, const char *errMsg )
+{
+   setErrorCode( errCode );
+
+   if( errMsg )
+      setErrMsg( errMsg );
+
+   return this->errMsg;
+}
+
+std::string
+dnmi::db::drivers::
+SQLitePimpel::
+setErrInfo( const int errCode, const std::string &errMsg )
+{
+   setErrorCode( errCode );
+
+   if( ! errMsg.empty() )
+      this->errMsg = errMsg;
+
+   return this->errMsg;
+}
+
+
+std::string
+dnmi::db::drivers::
+SQLitePimpel::
+getErrMsg()const
+{
+   return errMsg;
+}
+
+void
+dnmi::db::drivers::
+SQLitePimpel::
+setErrMsg( const char *errmsg )
+{
+   if( ! errmsg )
+      errMsg = "SQLite: UNKNOWN error!";
+   else
+      errMsg = errmsg;
+}
+
 
 void
 dnmi::db::drivers::
@@ -435,10 +637,6 @@ perform( dnmi::db::Connection *con_,
       }
       catch( ... ) {
          lastError = con->lastError();
-         if( ! con->tryReconnect() ) {
-            lastError = con->lastError();
-            break;
-         }
          retry--;
          continue;
       }
@@ -502,29 +700,29 @@ perform( dnmi::db::Connection *con_,
 
 
 namespace {
-  int 
-  dataCallback(void *pArg, int argc, char **argv, char **columnNames)
-  {
-    SQLite::SQLiteData *data=static_cast<SQLite::SQLiteData*>(pArg);
-    SQLite::Row row(argc);
-    
-    if(!data){
+int
+dataCallback(void *pArg, int argc, char **argv, char **columnNames)
+{
+   SQLite::SQLiteData *data=static_cast<SQLite::SQLiteData*>(pArg);
+   SQLite::Row row(argc);
+
+   if(!data){
       cerr << "DEBUG: Error data==0\n";
       return 1;
-    }
+   }
 
-    if(data->fieldNames.size()!=argc){
+   if(data->fieldNames.size()!=argc){
       for(int i=0; i<argc; i++){
-	data->fieldNames.push_back(columnNames[i]);
+         data->fieldNames.push_back(columnNames[i]);
       }
-    }
+   }
 
-    for(int i=0; i<argc; i++){
+   for(int i=0; i<argc; i++){
       row[i]=(argv[i]?argv[i]:"");
-    }
-    
-    data->data.push_back(row);
+   }
 
-    return 0;
-  }
+   data->data.push_back(row);
+
+   return 0;
+}
 }

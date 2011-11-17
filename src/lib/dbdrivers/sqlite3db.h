@@ -151,8 +151,23 @@ public:
 class SQLitePimpel : public dnmi::db::priv::Pimpel
 {
    SQLiteConnection *con;
-
+   std::string connect;
+   std::string errorCode;
+   std::string errMsg;
 public:
+
+   std::string setErrInfo( const int errCode, const char *errMsg=0 );
+   std::string setErrInfo( const int errCode, const std::string &errMsg );
+
+   std::string getErrorCode()const;
+   void setErrorCode( int errCode );
+
+   std::string getErrMsg()const;
+   void setErrMsg( const char *errmsg );
+
+   std::string getConnect()const;
+   void        setConnect( const std::string &connectString );
+
    SQLitePimpel();
    void beginTransaction(dnmi::db::Connection::IsolationLevel isolation);
    virtual void perform( dnmi::db::Connection *con,
