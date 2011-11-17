@@ -270,7 +270,7 @@ enum FieldType {Integer, ///An integer.
 class Result;
 
 /**
-* \brief A connnection to the database server.
+* \brief A connection to the database server.
 *
 * The connection class represent a connection to the database.
 * All communication to a databse server is trough a connection.
@@ -288,22 +288,22 @@ public:
    ///No public constructor
    virtual ~Connection(){};
 
-   ///The driver id for the databaseengine that we are using.
+   ///The driver id for the database engine that we are using.
    std::string getDriverId()const{ return driverId;}
 
    ///Are we connected to the database server.
    virtual bool isConnected()=0;
    /**
-   * tryRecconect wil try to reconnect to the database server
+   * tryRecconect will try to reconnect to the database server
    * if have lost the connection.
    *
-   * \return true if we the reconnectin succeeded. False otherwise.
+   * \return true if we the reconnection succeeded. False otherwise.
    */
    virtual bool tryReconnect()=0;
 
    /**
    * beginTransaction starts a database transaction.
-   * \exception SQLException if an database error was  encountred.
+   * \exception SQLException if an database error was  encountered.
    * \see endTransaction
    * \see rollBack
    */
@@ -314,7 +314,7 @@ public:
    * endTransaction  database transaction  that was previous started
    * with beginTransaction.
    *
-   * \exception SQLException if an database error was  encountred.
+   * \exception SQLException if an database error was  encountered.
    * \see beginTransaction.
    * \see rollBack
    */
@@ -324,7 +324,7 @@ public:
    * rollBack undo all changes made to the database since the start of
    * the transaction.
    *
-   * \exception SQLException if an database error was  encountred.
+   * \exception SQLException if an database error was  encountered.
    * \see beginTransaction.
    */
    virtual void rollBack()=0;
@@ -335,21 +335,21 @@ public:
    * execQuery throws  SQLException on error. The caller
    * must delete the result when not needed any longer.
    *
-   * \param SQLstmt the SQL stament.
+   * \param SQLstmt the SQL statement.
    * \return The  result set.
    *
-   * \exception SQLException on error.
+   * \exception SQLNotConnected, SQLAborted, SQLBusy, SQLDuplicate or SQLExcetion on error.
    */
    virtual Result *execQuery(const std::string &SQLstmt)=0;
 
    /**
-   * Use exec to send an SQL stmt to the server that NOT returns
+   * Use exec to send an SQL statement to the server that NOT returns
    * a result.
    * exec throws SQLException on error.
    *
    * \param SQLstmt The SQL statement.
    *
-   * \exception SQLExcetion on connection error.
+   * \exception SQLNotConnected, SQLAborted, SQLBusy, SQLDuplicate or SQLExcetion on error.
    */
    virtual void exec(const std::string &SQLstmt)=0;
 
