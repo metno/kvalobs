@@ -122,6 +122,11 @@ class SynopWorker {
 	      const std::string &wmomsg, 
 	      int ccx);
 
+  void saveToMora(StationInfoPtr inf,  
+	      const miutil::miTime &obstime, 
+	      const std::string &wmomsg, 
+	      int ccx);
+
   bool checkContinuesTypes(ObsEvent            &event, 
 			   const DataEntryList &data)const;
 

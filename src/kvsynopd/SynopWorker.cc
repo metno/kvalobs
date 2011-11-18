@@ -552,6 +552,9 @@ SynopWorker::newObs(ObsEvent &event)
 				LOGINFO("Synop information saved to database!");
 
      		saveTo(info, event.obstime(), sSynop, ccx);
+#ifdef USE_KVDATA
+			saveToMora(info, event.obstime(), sSynop, ccx);
+#endif
       
      		if(!bccx)
 				swmsg << "New synop created!" << endl;
@@ -844,6 +847,70 @@ saveTo(StationInfoPtr info,
 	<< ".synop";
   }else{ 
     ost << info->copyto() << "/" <<  info->wmono() << "-" 
+#ifdef USE_KVDATA
+	<< setfill('0') << setw(4) << obstime.year() << setw(2) << obstime.month() << setw(2) << obstime.day() << setw(2) 
+#else
+	<< setfill('0') << setw(2) << obstime.day() << setw(2)
+#endif
+	<< obstime.hour() << "-" << static_cast<char>('A'+(ccx-1))
+	<< ".synop";
+  }
+
+  f.open(ost.str().c_str());
+
+  if(f.is_open()){
+    LOGINFO("Writing SYNOP to file: " << ost.str());
+    f << wmomsg;
+    f.close();
+  }else{
+    LOGERROR("Cant write  SYNOP to file: " << ost.str());
+  }  
+}
+
+void
+SynopWorker::
+saveToMora(StationInfoPtr info, 
+       const miutil::miTime &obstime, 
+       const std::string &wmomsg,
+       int ccx)
+{
+  ostringstream ost;
+  ofstream      f;
+  struct stat   sbuf; 
+  
+  if(!info->copy())
+    return;
+
+  miutil::miString path = info->copyto() + "2";
+
+  if(stat(path.c_str(), &sbuf)<0){
+    if(errno==ENOENT || errno==ENOTDIR){
+      LOGERROR("copyto: <"<<path<<"> invalid path!");
+    }else if(errno==EACCES){
+      LOGERROR("copyto: <"<<path<<"> permission denied!");
+    }else{
+      LOGERROR("copyto: <"<<path<<">, lstat unknown error!");
+    }
+    
+    return;
+  }
+
+  if(!S_ISDIR(sbuf.st_mode)){
+    LOGERROR("copyto: <"<<path<<"> not a directory!");
+    return;
+  }
+
+  if(ccx==0){
+    ost << path << "/" <<  info->wmono() << "-"
+#ifdef USE_KVDATA
+	<< setfill('0') << setw(4) << obstime.year() << setw(2) << obstime.month() << setw(2) << obstime.day() << setw(2) 
+#else
+	<< setfill('0') << setw(2) << obstime.day() << setw(2)
+#endif
+	<< obstime.hour()
+	<< ".synop";
+  }else{ 
+    ost << path << "/" <<  info->wmono() << "-" 
 #ifdef USE_KVDATA
 	<< setfill('0') << setw(4) << obstime.year() << setw(2) << obstime.month() << setw(2) << obstime.day() << setw(2) 
 #else
