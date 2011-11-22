@@ -43,6 +43,9 @@ public:
    /**
     * Called if the transaction is aborted.
     *
+    * If an exception is thrown the transaction is canceled
+    * and the exception must be handled by the caller.
+    *
     * @param driverid Which driver is running this transaction.
     * @param errorMessage An error message about the reason to abort the transaction.
     * @param errorCode A driver specific error code.
@@ -60,6 +63,9 @@ public:
    /**
     * Called before each retry of the transaction.
     * Do any cleanup before a new transaction is begin.
+    *
+    * If an exception is thrown the transaction is canceled
+    * and the exception must be handled by the caller.
     */
    virtual void onRetry();
 
