@@ -1,4 +1,3 @@
-
 /*
   Kvalobs - Free Quality Control Software for Meteorological Observations
 
@@ -29,34 +28,41 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc.,
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#ifndef __dnmi_db_pimpel_h__
-#define __dnmi_db_pimpel_h__
 
-#include "kvdb.h"
+#include "Pimpel.h"
 namespace dnmi {
 namespace db {
 namespace priv {
 
-using namespace dnmi::db;
+Pimpel::~Pimpel()
+{
+}
 
-class Pimpel {
-public:
-   virtual ~Pimpel();
+void
+Pimpel::
+createSavepoint( const std::string &name )
+{
+}
 
-   virtual void createSavepoint( const std::string &name );
-   virtual void rollbackToSavepoint( const std::string &name );
-   virtual void releaseSavepoint( const std::string &name );
-   virtual void beginTransaction( Connection::IsolationLevel isolation=Connection::SERIALIZABLE );
+void
+Pimpel::
+rollbackToSavepoint( const std::string &name )
+{
+}
 
-   virtual void perform( dnmi::db::Connection *con,
-                         dnmi::db::Transaction &transaction, int retry,
-                         dnmi::db::Connection::IsolationLevel isolation)=0;
-};
+void
+Pimpel::
+releaseSavepoint( const std::string &name )
+{
+}
 
+void
+Pimpel::
+beginTransaction( Connection::IsolationLevel isolation )
+{
+}
 
 }
 }
 }
 
-
-#endif /* PIMPEL_H_ */

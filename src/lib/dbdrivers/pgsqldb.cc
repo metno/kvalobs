@@ -485,6 +485,32 @@ dnmi::db::drivers::PGResult::nextImpl()
 }
 
 
+
+void
+dnmi::db::drivers::
+PGPimpel::
+createSavepoint( const std::string &name )
+{
+   con->exec("SAVEPOINT " + name);
+}
+
+void
+dnmi::db::drivers::
+PGPimpel::
+rollbackToSavepoint( const std::string &name )
+{
+   con->exec("ROLLBACK TO SAVEPOINT " + name);
+}
+
+void
+dnmi::db::drivers::
+PGPimpel::
+releaseSavepoint( const std::string &name )
+{
+   con->exec("RELEASE SAVEPOINT " + name);
+}
+
+
 void
 dnmi::db::drivers::
 PGPimpel::
@@ -576,8 +602,6 @@ perform( dnmi::db::Connection *con_,
          retry--;
       }
 
-      t.onRetry();
-
       try {
          con->rollBack();
       }
@@ -585,6 +609,8 @@ perform( dnmi::db::Connection *con_,
          lastError = con->lastError();
          con->tryReconnect();
       }
+
+      t.onRetry();
    }
 
    transaction.onMaxRetry( lastError );

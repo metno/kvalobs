@@ -302,10 +302,48 @@ public:
    virtual bool tryReconnect()=0;
 
    /**
+    * Create a savepoint with the given name.
+    *
+    * The connection must be in a transaction before a call to savepoint.
+    *
+    * @param name The name of the savepoint to create.
+    * @exception SQLException
+    */
+   void createSavepoint( const std::string &name );
+
+   /**
+    * rollback to a previously created savepoint with name.
+    *
+    * @param name The name of the savepoint to rollback to.
+    * @exception SQLException
+    *  @see beginTransaction endTransaction createSavepoint rollbackToSavepoint releaseSavepoint
+    */
+
+   void rollbackToSavepoint( const std::string &name );
+
+   /**
+    * remove to a previously created savepoint with name.
+    *
+    * @param name The name of the savepoint to remove.
+    * @exception SQLException
+    *  @see beginTransaction endTransaction createSavepoint rollbackToSavepoint releaseSavepoint
+    */
+   void releaseSavepoint( const std::string &name );
+
+   /**
+    * beginTransaction starts a database transaction with the given IsolationLevel.
+    *
+    * @param isolation The transaction isolation level to run at.
+    * @exception SQLException if an database error was  encountered.
+    * @see beginTransaction endTransaction createSavepoint rollbackToSavepoint releaseSavepoint
+    */
+   void beginTransaction( IsolationLevel isolation );
+
+   /**
    * beginTransaction starts a database transaction.
    * \exception SQLException if an database error was  encountered.
    * \see endTransaction
-   * \see rollBack
+   * \see rollBack beginTransaction endTransaction createSavepoint rollbackToSavepoint releaseSavepoint
    */
 
    virtual void beginTransaction()=0;
@@ -316,7 +354,7 @@ public:
    *
    * \exception SQLException if an database error was  encountered.
    * \see beginTransaction.
-   * \see rollBack
+   * \see rollBack beginTransaction endTransaction createSavepoint rollbackToSavepoint releaseSavepoint
    */
    virtual void endTransaction()=0;
 
@@ -325,7 +363,7 @@ public:
    * the transaction.
    *
    * \exception SQLException if an database error was  encountered.
-   * \see beginTransaction.
+   * @see beginTransaction endTransaction createSavepoint rollbackToSavepoint releaseSavepoint.
    */
    virtual void rollBack()=0;
 
@@ -372,6 +410,7 @@ public:
     *
     * @param transaction
     * @param retry Number of times to retry a transaction before giving up.
+    * @exception SQLException. May throw a sub class of SQLException.
     */
    void perform( dnmi::db::Transaction &transaction, int retry = 3,
                  IsolationLevel isolation=Connection::SERIALIZABLE );

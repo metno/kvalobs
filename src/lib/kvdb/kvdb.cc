@@ -196,6 +196,70 @@ perform( dnmi::db::Transaction &transaction, int retry,
 
 
 
+void
+dnmi::db::
+Connection::
+createSavepoint( const std::string &name )
+{
+   if( pimpel ) {
+        //cerr << "Driverid: " << getDriverId() << ": Using: PGPimpel.\n";
+      return static_cast<dnmi::db::priv::Pimpel*>(pimpel)->createSavepoint( name );
+   }
+
+}
+
+/**
+ * rollback to a previously created savepoint with name.
+ *
+ * @param name The name of the savepoint to rollback to.
+ * @exception SQLException
+ */
+
+void
+dnmi::db::
+Connection::
+rollbackToSavepoint( const std::string &name )
+{
+   if( pimpel ) {
+      //cerr << "Driverid: " << getDriverId() << ": Using: PGPimpel.\n";
+      return static_cast<dnmi::db::priv::Pimpel*>(pimpel)->rollbackToSavepoint( name );
+   }
+}
+
+/**
+ * remove to a previously created savepoint with name.
+ *
+ * @param name The name of the savepoint to remove.
+ * @exception SQLException
+ */
+void
+dnmi::db::
+Connection::
+releaseSavepoint( const std::string &name )
+{
+   if( pimpel ) {
+         //cerr << "Driverid: " << getDriverId() << ": Using: PGPimpel.\n";
+       return static_cast<dnmi::db::priv::Pimpel*>(pimpel)->releaseSavepoint( name );
+   }
+
+}
+
+/**
+ * beginTransaction starts a database transaction with the given IsolationLevel.
+ *
+ * @param isolation The transaction isolation level to run at.
+ * @exception SQLException if an database error was  encountered.
+ */
+void
+dnmi::db::
+Connection::
+beginTransaction( IsolationLevel isolation )
+{
+   if( pimpel ) {
+         //cerr << "Driverid: " << getDriverId() << ": Using: PGPimpel.\n";
+       return static_cast<dnmi::db::priv::Pimpel*>(pimpel)->beginTransaction( isolation );
+   }
+}
 
 
 

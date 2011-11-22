@@ -619,6 +619,30 @@ setErrMsg( const char *errmsg )
       errMsg = errmsg;
 }
 
+void
+dnmi::db::drivers::
+SQLitePimpel::
+createSavepoint( const std::string &name )
+{
+   con->exec("SAVEPOINT " + name);
+}
+
+void
+dnmi::db::drivers::
+SQLitePimpel::
+rollbackToSavepoint( const std::string &name )
+{
+   con->exec("ROLLBACK TO SAVEPOINT " + name);
+}
+
+void
+dnmi::db::drivers::
+SQLitePimpel::
+releaseSavepoint( const std::string &name )
+{
+   con->exec("RELEASE SAVEPOINT " + name);
+}
+
 
 void
 dnmi::db::drivers::
@@ -683,8 +707,6 @@ perform( dnmi::db::Connection *con_,
          retry--;
       }
 
-      t.onRetry();
-
       try {
          con->rollBack();
       }
@@ -692,6 +714,7 @@ perform( dnmi::db::Connection *con_,
          lastError = con->lastError();
          con->tryReconnect();
       }
+      t.onRetry();
    }
 
    transaction.onMaxRetry( lastError );

@@ -140,6 +140,10 @@ namespace dnmi {
 
 	public:
 	   PGPimpel();
+	   virtual void createSavepoint( const std::string &name );
+	   virtual void rollbackToSavepoint( const std::string &name );
+	   virtual void releaseSavepoint( const std::string &name );
+
 	   void beginTransaction(dnmi::db::Connection::IsolationLevel isolation);
 	   virtual void perform( dnmi::db::Connection *con,
 	                         dnmi::db::Transaction &transaction, int retry,
