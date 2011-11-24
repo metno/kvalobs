@@ -112,7 +112,7 @@ insert( kvalobs::kvDbBase *data )
          ostringstream ost;
          ost << "INSERTONLY (duplicate) into '" << (tblName.empty()?data->tableName():tblName) << "' "
              << "with uniqueKey '" << data->uniqueKey() << "' failed.";
-
+         fastExit = true;
          throw ModeException( index, ost.str() );
       }
       return false;
@@ -137,7 +137,8 @@ DataInsertTransaction::
 replace( kvalobs::kvDbBase *data )
 {
    ostringstream ost;
-   ost << "DELETE FROM " << tblName << " " <<  data->uniqueKey() << ";"
+   ost << "DELETE FROM " << (tblName.empty()?data->tableName():tblName)
+       << " " <<  data->uniqueKey() << ";"
        << "INSERT INTO " << (tblName.empty()?data->tableName():tblName)
                       << " VALUES" << data->toSend() << ";";
    conection->exec( ost.str() );

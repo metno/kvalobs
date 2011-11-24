@@ -30,10 +30,10 @@
  */
 #include <string>
 #include <iostream>
+#include <kvalobs/kvData.h>
 #include <kvdb/dbdrivermgr.h>
-#include <kvalobs/kvDbGate.h>
 #include <kvalobs/DataInsertTransaction.h>
-
+#include <kvalobs/kvDbGate.h>
 #include <list>
 
 using namespace dnmi::db;
@@ -42,6 +42,7 @@ using namespace kvalobs;
 using namespace miutil;
 
 typedef list<kvData> KvDataList;
+typedef list<kvDbBase*> KvDbBaseList;
 
 int
 main(int argn, char *argv[])
@@ -53,6 +54,8 @@ main(int argn, char *argv[])
    string constr("dbname=kvalobs user=kvalobs port=5434 host=localhost");
    Connection *con;
    DriverManager dbmngr;
+
+
 
    if(!dbmngr.loadDriver(driver, drvId)){
       cerr << "Can't load driver <" << driver << ">\n";
@@ -73,24 +76,53 @@ main(int argn, char *argv[])
    cerr << "Connected to <" << drvId << ">\n";
 
 
-   kvDbGate gate( con );
-   KvDataList data;
-
-   kvData d(10, miTime::nowTime(), 3.14, 1,
-            miTime::nowTime(), 13, 2, 1, 0,
+   miTime now( miTime::nowTime() );
+   kvData d(10, now, 3.14, 1, now, 13, 2, 1, 0,
             kvControlInfo(), kvUseInfo(), "");
 
-   gate.insert(d);
+//   KvDbBaseList dbList;
+   KvDataList dbList;
+
+   dbList.push_back( d );
+   DataInsertTransaction t1( dbList );
+
+   try {
+      DataInsertTransaction t1( dbList );
+      con->perform( t1 );
+      cerr << "INSERT ok!" << endl;
+   }
+   catch( const std::exception &ex ) {
+      cerr << "Exception: " << ex.what() << endl;
+      con->tryReconnect();
+   }
+
+   try {
+      dbList.clear();
+      dbList.push_back( kvData(10, now, 3.18, 1, now, 13, 2, 1, 3.14,
+                                      kvControlInfo(), kvUseInfo(), "") );
+      DataInsertTransaction t1( dbList, DataInsertTransaction::INSERT_OR_UPDATE );
+      con->perform( t1 );
+      cerr << "INSERT ok!" << endl;
+   }
+   catch( const std::exception &ex ) {
+      cerr << "Exception: " << ex.what() << endl;
+      con->tryReconnect();
+   }
+
+   KvDataList data;
+   kvDbGate gate( con );
+
+   ostringstream ost;
+
+   ost << "WHERE stationid=10 AND typeid=13 AND obstime='"<<now.isoTime()<<"'";
 
    try{
-      gate.select(data, "");
+      gate.select(data, ost.str() );
    }
-   catch(const SQLException &ex){
+   catch(SQLException &ex){
       cerr << "Exception: " << ex.what() << endl;
    }
-   catch( const DataInsertTransaction::ModeException &ex ){
-      cerr << "Failed to insert object at: " << ex.index << " Error: " << ex.what() << endl;
-   }catch(...){
+   catch(...){
       cerr << "Unknown exception: con->exec(ctbl) .....\n";
    }
 

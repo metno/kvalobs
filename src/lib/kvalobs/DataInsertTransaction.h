@@ -60,7 +60,7 @@ namespace kvalobs {
  * The difference between INSERT_OR_UPDATE and INSERT_OR_REPLACE is that
  * INSERT_AND_REPLACE is dependent on the class that is inserted. For a kvData
  * element it means that both original and \em tbtime is updated for the key. In
- * INSERT_OR_UPDATE only the elements corrected, contrilinfo, useinfo and cfailed
+ * INSERT_OR_UPDATE only the elements corrected, controlinfo, useinfo and cfailed
  * is updated.
  *
  * On failure is an exception thrown. Possible exception is all from kvdb.h, ModeException and
@@ -130,9 +130,9 @@ public:
          deleteElems = true;
 
          for( ; it != li.end(); it++ ){
-            kvalobs::kvDbBase *dat = const_cast<T*> (&(*it));
+            kvalobs::kvDbBase *dat = const_cast<T*>( &(*it) );
 
-            elems->push_back( dat );
+            const_cast<std::list<kvalobs::kvDbBase*>* >(elems)->push_back(  dat  );
          }
       }
 
