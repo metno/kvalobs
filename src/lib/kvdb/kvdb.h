@@ -273,7 +273,7 @@ class Result;
 * \brief A connection to the database server.
 *
 * The connection class represent a connection to the database.
-* All communication to a databse server is trough a connection.
+* All communication to a database server is trough a connection.
 */
 class Connection{
 protected:
