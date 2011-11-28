@@ -1,3 +1,10 @@
+kvalobs (2.4.5~rc5-1) lucid; urgency=low
+
+  * Bugfix and additions in the db layer.
+  
+ -- Borge Moe <borge.moe@met.no>  Mon, 28 Nov 2011 12:55:00 +0100
+
+
 kvalobs (2.4.5~rc4-1) lucid; urgency=low
 
   * Fix metdat and posdat so it works on read-only mounted filesystem.
