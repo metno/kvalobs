@@ -105,7 +105,7 @@ protected:
     * On all other errors an exception is thrown.
     *
     * @param data The data to insert.
-    * @return false if the data element (key) all ready is in the databse. True if the
+    * @return false if the data element (key) all ready is in the database. True if the
     * data element is inserted.
     * @throw an exception on all other errors.
     */

@@ -75,12 +75,32 @@ main(int argn, char *argv[])
 
    kvDbGate gate( con );
    KvDataList data;
+   KvDataList insertData;
+   miTime now( miTime::nowTime() );
 
-   kvData d(10, miTime::nowTime(), 3.14, 1,
-            miTime::nowTime(), 13, 2, 1, 0,
-            kvControlInfo(), kvUseInfo(), "");
+   insertData.push_back( kvData(10, now, 3.14, 1,
+                                miTime::nowTime(), 13, 2, 1, 3.14,
+                                kvControlInfo(), kvUseInfo(), "") );
 
-   gate.insert(d);
+   insertData.push_back( kvData(10, now, 3.41, 1,
+                                   miTime::nowTime(), 13, 2, 1, 14.3,
+                                   kvControlInfo(), kvUseInfo(), "") );
+
+
+
+   try {
+      if( ! gate.insertList( insertData, kvDbGate::INSERT_OR_UPDATE ) )
+         cerr << "ERROR: " << gate.getErrorStr() << endl;
+   }
+   catch(const SQLException &ex){
+         cerr << "Exception: " << ex.what() << endl;
+   }
+   catch( const DataInsertTransaction::ModeException &ex ){
+      cerr << "Failed to insert object at: " << ex.index << " Error: " << ex.what() << endl;
+   }catch(...){
+      cerr << "Unknown exception: con->exec(ctbl) .....\n";
+   }
+
 
    try{
       gate.select(data, "");

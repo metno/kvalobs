@@ -102,6 +102,7 @@ insert( kvalobs::kvDbBase *data )
       conection->createSavepoint( savepoint );
       ost << "INSERT INTO " << (tblName.empty()?data->tableName():tblName)
                 << " VALUES" << data->toSend() << ";";
+
       conection->exec( ost.str() );
       conection->releaseSavepoint( savepoint );
       return true;
@@ -116,6 +117,9 @@ insert( kvalobs::kvDbBase *data )
          throw ModeException( index, ost.str() );
       }
       return false;
+   }
+   catch( const std::exception &ex ) {
+      throw;
    }
 
    conection->rollbackToSavepoint( savepoint );
@@ -167,10 +171,11 @@ run()
       }
 
       if( ! insert( *it )){
-         if( action == INSERT_OR_UPDATE )
+         if( action == INSERT_OR_UPDATE ) {
             update( *it );
-         else
+         } else {
             replace( *it );
+         }
       }
    }
 
@@ -222,6 +227,7 @@ operator()( dnmi::db::Connection *con )
 
    if( elems->empty() )
       return true;
+
 
    try {
       return run();
