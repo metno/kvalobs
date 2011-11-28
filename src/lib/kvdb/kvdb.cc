@@ -144,7 +144,7 @@ perform( dnmi::db::Transaction &transaction, int retry,
    std::string lastError;
 
    if( pimpel ) {
-      cerr << "Driverid: " << getDriverId() << ". Retry: " << retry <<" Using: PGPimpel.\n";
+      //cerr << "Driverid: " << getDriverId() << ". Retry: " << retry <<" Using: PGPimpel.\n";
       return static_cast<dnmi::db::priv::Pimpel*>(pimpel)->perform( this, transaction, retry, isolation);
    }
    //cerr << "Driverid: " << getDriverId() << ": Using: General transaction.\n";
