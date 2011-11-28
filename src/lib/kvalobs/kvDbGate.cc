@@ -29,8 +29,9 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include <time.h>
-#include <kvalobs/kvDbGate.h>
 #include <sstream>
+#include <kvalobs/DataInsertTransaction.h>
+#include <kvalobs/kvDbGate.h>
 //#include <milog/milog.h>
 
 using namespace std;
@@ -168,26 +169,73 @@ insertImpl(const std::list<kvalobs::kvDbBase*> &elem,
            const std::string &tblName,
            bool replace)
 {
-   ostringstream ost;
-   std::list<kvalobs::kvDbBase*>::const_iterator it;
+   InsertOption action(INSERTONLY);
 
-   if(elem.empty())
+   if( replace )
+      action = INSERT_OR_REPLACE;
+
+   return insertImpl( elem, tblName, action );
+}
+
+
+bool
+kvalobs::
+kvDbGate::
+insertImpl(const std::list<kvalobs::kvDbBase*> &elem,
+           const std::string &tblName,
+           InsertOption option)
+{
+   DataInsertTransaction::Action action( DataInsertTransaction::INSERTONLY );
+
+   if( option == INSERT_OR_REPLACE )
+      action = DataInsertTransaction::INSERT_OR_REPLACE;
+   else if( option == INSERT_OR_UPDATE )
+      action = DataInsertTransaction::INSERT_OR_UPDATE;
+
+   DataInsertTransaction transaction( elem, action, tblName );
+
+   try {
+      con->perform( transaction, 3, dnmi::db::Connection::SERIALIZABLE );
       return true;
+   }
+   catch( const dnmi::db::SQLDuplicate & ex) {
+      err_=Duplicate;
+      errStr_=string("Duplicate: [")+ex.what()+string("]");
+      return false;
 
-   if(!begintransaction()){
+   }
+   catch( const dnmi::db::SQLNotConnected & ex){
+      err_=NotConnected;
+      errStr_=string("NotConnected: [")+ex.what()+string("]");
+      return false;
+   }
+   catch( const dnmi::db::SQLBusy & ex){
+      err_=Busy;
+      errStr_=string("Busy: [") + ex.what()+string("]");
+   }
+   catch( const dnmi::db::SQLAborted &ex) {
+      err_=Aborted;
+      errStr_=string("Aborted: [") +
+            ex.what()+string("]");
+      return false;
+   }
+   catch( const dnmi::db::SQLException & ex){
+      err_=Error;
+      errStr_=string("Error: [") + ex.what() +string("]");
+      return false;
+   }
+   catch( const std::exception & ex){
+      err_=Error;
+      errStr_=string("Error: ") + ex.what() +string("]");
+      return false;
+   }
+   catch(...) {
+      err_=UnknownError;
+      errStr_="UnknownError. Unknown exception.";
       return false;
    }
 
-   for(it=elem.begin(); it!=elem.end(); it++){
-      if(!insert(*(*it), tblName, replace)){
-         rollback();
-         return false;
-      }
-   }
-
-   return endtransaction();
 }
-
 
 bool 
 kvalobs::

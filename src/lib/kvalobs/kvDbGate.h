@@ -81,7 +81,7 @@ public:
       ///an invalid kvDbBase object.
       UnknownError   ///An error that was not expected. This is a bug!
    } TError;
-
+   typedef enum { INSERTONLY, INSERT_OR_UPDATE, INSERT_OR_REPLACE} InsertOption;
 private:
 
    TError err_;
@@ -106,6 +106,10 @@ protected:
    bool insertImpl(const std::list<kvalobs::kvDbBase*> &elem,
                    const std::string &tblName,
                    bool replace=false);
+
+   bool insertImpl(const std::list<kvalobs::kvDbBase*> &elem,
+                   const std::string &tblName,
+                   InsertOption option );
 
    bool begintransaction();
    bool endtransaction();
@@ -225,6 +229,34 @@ public:
 
       return insertImpl(myList, tbl, replace);
    }
+
+
+   template<class T>
+      bool insertList(const std::list<T>& li , InsertOption option=INSERT_OR_UPDATE,
+                  const miutil::miString &tblName="")
+      {
+         typename std::list<T>::const_iterator it=li.begin();
+         std::list<kvalobs::kvDbBase*> myList;
+
+         if(it==li.end())
+            return true;
+
+         std::string tbl;
+
+         if(tblName.empty())
+            tbl=it->tableName();
+         else
+            tbl=tblName;
+
+
+         for(;it!=li.end(); it++){
+            kvalobs::kvDbBase *dat=const_cast<T*>(&(*it));
+
+            myList.push_back(dat);
+         }
+
+         return insertImpl(myList, tbl, option);
+      }
 
 
    /**
