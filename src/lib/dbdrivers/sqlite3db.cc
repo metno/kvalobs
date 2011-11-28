@@ -655,6 +655,9 @@ perform( dnmi::db::Connection *con_,
    std::string lastError;
    con = static_cast<SQLiteConnection*>( con_ );
 
+   if( retry <= 0 )
+      retry = 1;
+
    while( retry > 0 ) {
       try {
          beginTransaction( isolation );

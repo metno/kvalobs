@@ -555,6 +555,9 @@ perform( dnmi::db::Connection *con_,
 
    time( &start );
 
+   if( retry <=0 )
+      retry = 1;
+
    while( retry > 0 ) {
       try {
          beginTransaction( isolation );
