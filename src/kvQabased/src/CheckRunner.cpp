@@ -83,16 +83,29 @@ void CheckRunner::newObservation(const kvalobs::kvStationInfo & obs, std::ostrea
 	LOGDEBUG("Getting checks for observation");
 	db::DatabaseAccess::CheckList checkList;
 	db.getChecks(& checkList, obs);
+	LOGDEBUG1("Received " << checkList.size() << " checks to run");
+
 
 	LOGDEBUG("Getting list of expected parameters from station");
 	db::DatabaseAccess::ParameterList expectedParameters;
 	db.getExpectedParameters(& expectedParameters, obs);
 
+
 	LOGDEBUG("Fetching observation data from database");
+	std::set<std::string> parametersInData; // list of all parameters in observation data set
 	db::DatabaseAccess::DataList observationData;
 	for ( db::DatabaseAccess::ParameterList::const_iterator it = expectedParameters.begin(); it != expectedParameters.end(); ++ it )
-		db.getData(& observationData, obs, * it, 0);
-	observationData.remove_if(std::not1(have_typeid(obs.typeID())));
+	{
+		db::DatabaseAccess::DataList d;
+		db.getData(& d, obs, * it, 0);
+		d.remove_if(std::not1(have_typeid(obs.typeID())));
+		if ( not d.empty() )
+		{
+			parametersInData.insert(* it);
+			observationData.insert(observationData.end(), d.begin(), d.end());
+		}
+	}
+	//observationData.remove_if(std::not1(have_typeid(obs.typeID())));
 
 	if ( haveAnyHqcCorrectedElements(observationData) )
 	{
@@ -109,10 +122,28 @@ void CheckRunner::newObservation(const kvalobs::kvStationInfo & obs, std::ostrea
 
 	for ( db::DatabaseAccess::CheckList::const_iterator check = checkList.begin(); check != checkList.end(); ++ check )
 	{
-		milog::LogContext context(check->checkname());
+		std::string checkName = check->checkname();
+		milog::LogContext context(checkName);
 		try
 		{
-			if ( shouldRunCheck(obs, * check, expectedParameters) )
+			bool hasAnyParametersRequiredByCheck = false;
+
+			std::string signatureString = check->checksignature();
+			CheckSignature signature(signatureString.c_str(), obs.stationID());
+			const DataRequirement * obsRequirement = signature.obs();
+			if ( obsRequirement )
+			{
+				for ( std::set<std::string>::const_iterator it = parametersInData.begin(); it != parametersInData.end(); ++ it )
+					if ( obsRequirement->haveParameter(* it) )
+					{
+						hasAnyParametersRequiredByCheck = true;
+						break;
+					}
+			}
+			else
+				hasAnyParametersRequiredByCheck = true;
+
+			if ( hasAnyParametersRequiredByCheck and shouldRunCheck(obs, * check, expectedParameters) )
 			{
 				db::DatabaseAccess::DataList modifications;
 
@@ -133,6 +164,8 @@ void CheckRunner::newObservation(const kvalobs::kvStationInfo & obs, std::ostrea
 
 				db.write(modifications);
 			}
+			else
+				LOGDEBUG1("Skipping check " << check->qcx());
 		}
 		catch ( std::bad_alloc & e )
 		{

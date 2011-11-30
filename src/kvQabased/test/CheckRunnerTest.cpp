@@ -258,14 +258,11 @@ TEST_F(CheckRunnerTest, checkShipsEvenIfParameterMissingInObsPgm)
 	);
 }
 
-TEST_F(CheckRunnerTest, checksParametersWithOtherTypeidInObsPgm)
+TEST_F(CheckRunnerTest, skipsChecksWhereAllParametersAreFromOtherTypeId)
 {
 	using namespace testing;
 
-	// other typeid
-	kvalobs::kvStationInfo observation(10,  "2010-05-12 06:00:00", 304);
 	kvalobs::kvDataFactory factory(10, "2010-05-12 06:00:00", 304);
-
 	db::DatabaseAccess::DataList dataFromDatabase = boost::assign::list_of(factory.getData(6.0, 110));
 
 	// Returned data will have typeid 304
@@ -273,7 +270,6 @@ TEST_F(CheckRunnerTest, checksParametersWithOtherTypeidInObsPgm)
 			.Times(AtLeast(1))
 			.WillRepeatedly(SetArgumentPointee<0>(dataFromDatabase));
 
-	// Default action
 	EXPECT_CALL(database, getData(_, observation, qabase::DataRequirement::Parameter("TAM_24"), 0))
 			.Times(AtLeast(1));
 
@@ -282,7 +278,7 @@ TEST_F(CheckRunnerTest, checksParametersWithOtherTypeidInObsPgm)
 	expectedScriptReturn.front().cfailed("QC1-2-101"); // QC1-2-101 is the default qcx return from fake database
 
 	EXPECT_CALL(database, write(expectedScriptReturn))
-			.Times(1);
+			.Times(0);
 
 	runner->newObservation(observation);
 }
