@@ -121,7 +121,7 @@ Configuration::Configuration(int & argc, char ** argv) :
 	options_description database("Database");
 	database.add_options()
 			("database,d", value<std::string>(&databaseName_)->default_value("kvalobs"), "Name of database to connect to")
-			("host,h", value<std::string>(&host_)->default_value("localhost"), "Hostname of database")
+			("host,h", value<std::string>(&host_), "Hostname of database")
 			("port,p", value<int>(&port_)->default_value(5432), "Port of database")
 			("user,U", value<std::string>(&user_)->default_value(databaseUser), "Database user");
 
@@ -202,7 +202,10 @@ Configuration::~Configuration()
 std::string Configuration::databaseConnectString() const
 {
 	std::ostringstream dbConnect;
-	dbConnect << "dbname=" << databaseName_ << " host=" << host_ << " port=" << port_ << " user=" << user_;
+	dbConnect << "dbname=" << databaseName_;
+	if ( not host_.empty() )
+		dbConnect << " host=" << host_;
+	dbConnect << " port=" << port_ << " user=" << user_;
 	return dbConnect.str();
 }
 
