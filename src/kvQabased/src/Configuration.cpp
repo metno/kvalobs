@@ -98,7 +98,7 @@ void parse(const boost::filesystem::path & configFile, variables_map & vm, const
 }
 
 Configuration::Configuration(int & argc, char ** argv) :
-		runNormally_(true), observationToCheck_(0), logLevel_(milog::DEBUG)
+		runNormally_(true), observationToCheck_(0), logLevel_(milog::DEBUG), port_(0)
 {
 	const char * USER = std::getenv("USER");
 	const std::string databaseUser = USER ? USER : "kvalobs";
@@ -122,7 +122,7 @@ Configuration::Configuration(int & argc, char ** argv) :
 	database.add_options()
 			("database,d", value<std::string>(&databaseName_)->default_value("kvalobs"), "Name of database to connect to")
 			("host,h", value<std::string>(&host_), "Hostname of database")
-			("port,p", value<int>(&port_)->default_value(5432), "Port of database")
+			("port,p", value<int>(&port_), "Port of database")
 			("user,U", value<std::string>(&user_)->default_value(databaseUser), "Database user");
 
 	options_description generic("Generic");
@@ -205,7 +205,9 @@ std::string Configuration::databaseConnectString() const
 	dbConnect << "dbname=" << databaseName_;
 	if ( not host_.empty() )
 		dbConnect << " host=" << host_;
-	dbConnect << " port=" << port_ << " user=" << user_;
+	if ( port_ )
+		dbConnect << " port=" << port_;
+	dbConnect << " user=" << user_;
 	return dbConnect.str();
 }
 
