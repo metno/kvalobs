@@ -139,7 +139,7 @@ namespace dnmi {
 	   PGConnection *con;
 
 	public:
-	   PGPimpel();
+	   PGPimpel(PGConnection *con_ );
 	   virtual void createSavepoint( const std::string &name );
 	   virtual void rollbackToSavepoint( const std::string &name );
 	   virtual void releaseSavepoint( const std::string &name );

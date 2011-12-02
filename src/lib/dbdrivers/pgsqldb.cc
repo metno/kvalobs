@@ -87,7 +87,8 @@ dnmi::db::drivers::PGConnection::PGConnection(const std::string &connect,
 {
    char *msg;
 
-   pimpel = new PGPimpel();
+   pimpel=0;
+
 
    con=PQconnectdb(connect.c_str());
 
@@ -103,6 +104,7 @@ dnmi::db::drivers::PGConnection::PGConnection(const std::string &connect,
          PQfinish(con);
          con=0;
       }
+      pimpel = new PGPimpel( this );
    }else
       errMsg="Can't connect to database, OUT OF MEMMORY!";
 }
@@ -536,7 +538,7 @@ beginTransaction(dnmi::db::Connection::IsolationLevel isolation)
 
 dnmi::db::drivers::
 PGPimpel::
-PGPimpel() : dnmi::db::priv::Pimpel()
+PGPimpel( PGConnection *con_ ) : dnmi::db::priv::Pimpel(), con( con_ )
 {
 }
 
