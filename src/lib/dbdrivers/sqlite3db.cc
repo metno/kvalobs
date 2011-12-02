@@ -95,7 +95,7 @@ dnmi::db::drivers::SQLiteConnection::SQLiteConnection(
       const std::string &driverId)
 :Connection(driverId), con(0)
 {
-   SQLitePimpel *myPimpel=new SQLitePimpel();
+   SQLitePimpel *myPimpel=new SQLitePimpel( this );
    myPimpel->setConnect( connect );
    pimpel = myPimpel;
 
@@ -108,12 +108,10 @@ dnmi::db::drivers::SQLiteConnection::SQLiteConnection(
       } else {
          errMsg = "SQLLite: NOMEM, when trying to connect to the data base '" + connect +"'.";
          myPimpel->setErrInfo( res,  errMsg );
-
       }
 
       con = 0;
    }
-
 
    if(con) {
       sqlite3_busy_timeout(con, 5000); //sets busy timeout to 5 second.
@@ -516,7 +514,9 @@ beginTransaction(dnmi::db::Connection::IsolationLevel isolation)
 
 dnmi::db::drivers::
 SQLitePimpel::
-SQLitePimpel() : dnmi::db::priv::Pimpel()
+SQLitePimpel( SQLiteConnection *con_ )
+    : dnmi::db::priv::Pimpel(),
+      con( con_ )
 {
 }
 

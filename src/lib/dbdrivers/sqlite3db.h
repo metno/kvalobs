@@ -168,7 +168,7 @@ public:
    std::string getConnect()const;
    void        setConnect( const std::string &connectString );
 
-   SQLitePimpel();
+   SQLitePimpel( SQLiteConnection *con_ );
 
    virtual void createSavepoint( const std::string &name );
    virtual void rollbackToSavepoint( const std::string &name );
