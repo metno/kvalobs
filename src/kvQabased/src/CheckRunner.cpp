@@ -61,6 +61,39 @@ struct have_typeid : std::unary_function<kvalobs::kvData, bool>
 		return d.typeID() == type_;
 	}
 };
+
+class AutoRollbackTransaction
+{
+public:
+	explicit AutoRollbackTransaction(db::DatabaseAccess & db) :
+		db_(db), committed_(false)
+	{
+		db_.beginTransaction();
+	}
+	~AutoRollbackTransaction()
+	{
+		if ( not committed_ )
+		{
+			try
+			{
+				db_.rollback();
+			}
+			catch ( std::exception & )
+			{
+				milog::LogContext context("transaction");
+				LOGWARN("Error when attempting to rollback.");
+			}
+		}
+	}
+	void commit()
+	{
+		db_.commit();
+		committed_ = true;
+	}
+private:
+	db::DatabaseAccess & db_;
+	bool committed_;
+};
 }
 
 void CheckRunner::newObservation(const kvalobs::kvStationInfo & obs, std::ostream * scriptLog)
@@ -77,6 +110,7 @@ void CheckRunner::newObservation(const kvalobs::kvStationInfo & obs, std::ostrea
 
 	db::CachedDatabaseAccess cdb(db_, obs);
 	db::DelayedSaveDatabaseAccess db(& cdb);
+	AutoRollbackTransaction transaction(db);
 
 	LOGINFO("Checking " << obs);
 
@@ -185,7 +219,14 @@ void CheckRunner::newObservation(const kvalobs::kvStationInfo & obs, std::ostrea
 			(*scriptLog) << '\n' << * it;
 		(*scriptLog) << std::endl;
 	}
-	db.commit(); // hva hvis denne feiler?
+	try
+	{
+		transaction.commit();
+	}
+	catch ( std::exception & e )
+	{
+		LOGERROR(e.what());
+	}
 }
 
 namespace

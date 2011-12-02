@@ -51,14 +51,18 @@ public:
 
 	virtual ~DelayedSaveDatabaseAccess();
 
+	/**
+	 * Perform all previous writes
+	 */
+	virtual void commit();
+
+	virtual void rollback();
+
 	virtual void getData(DataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const;
 
 	virtual void write(const DataList & data);
 
-	/**
-	 * Perform all previous writes
-	 */
-	void commit();
+	virtual bool commitIsNeccessary() const { return true; }
 
 	typedef std::set<kvalobs::kvData, kvalobs::compare::lt_kvData> SavedData;
 	const SavedData & uncommitted() const

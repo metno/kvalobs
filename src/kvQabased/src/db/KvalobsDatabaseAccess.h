@@ -73,6 +73,14 @@ public:
 
 	virtual ~KvalobsDatabaseAccess();
 
+	virtual bool commitIsNeccessary() const { return true; }
+
+	virtual void beginTransaction();
+
+	virtual void commit();
+
+	virtual void rollback();
+
 	virtual void getChecks(CheckList * out, const kvalobs::kvStationInfo & si) const;
 
 	virtual int getQcxFlagPosition(const std::string & qcx) const;
@@ -94,8 +102,11 @@ public:
 	virtual void write(const DataList & data);
 
 private:
-	dnmi::db::Connection * connection_;
-	bool ownsConnection_;
+	class TransactionEnforcingDatabaseConnection;
+
+	TransactionEnforcingDatabaseConnection * connection_;
+	//dnmi::db::Connection * connection_;
+	//bool ownsConnection_;
 };
 
 }

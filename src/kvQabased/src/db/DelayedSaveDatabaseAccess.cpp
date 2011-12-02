@@ -71,8 +71,17 @@ void DelayedSaveDatabaseAccess::commit()
 	{
 		DataList saveData(savedData_.begin(), savedData_.end());
 		FilteredDatabaseAccess::write(saveData);
+		FilteredDatabaseAccess::commit();
 		savedData_.clear();
 	}
+	else
+		FilteredDatabaseAccess::commit();
+}
+
+void DelayedSaveDatabaseAccess::rollback()
+{
+	savedData_.clear();
+	FilteredDatabaseAccess::rollback();
 }
 
 }

@@ -45,8 +45,78 @@ namespace
 typedef boost::scoped_ptr<dnmi::db::Result> ResultPtr;
 }
 
-KvalobsDatabaseAccess::KvalobsDatabaseAccess(const std::string & databaseConnect) :
-		ownsConnection_(true)
+class KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection
+{
+public:
+	TransactionEnforcingDatabaseConnection(dnmi::db::Connection * connection, bool takeOwnershipOfConnection);
+	~TransactionEnforcingDatabaseConnection();
+	dnmi::db::Result *execQuery(const std::string & SQLstmt);
+	void exec(const std::string & SQLstmt);
+	void beginTransaction();
+	void commit();
+	void rollback();
+private:
+	dnmi::db::Connection * connection_;
+	bool transactionInProgress_;
+	bool ownsConnection_;
+};
+
+KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::TransactionEnforcingDatabaseConnection(dnmi::db::Connection * connection, bool takeOwnershipOfConnection) :
+	connection_(connection),
+	transactionInProgress_(false),
+	ownsConnection_(takeOwnershipOfConnection)
+{
+	if ( ! connection )
+		throw std::runtime_error("wtf??");
+}
+
+KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::~TransactionEnforcingDatabaseConnection()
+{
+	if ( transactionInProgress_ )
+	{
+		try
+		{
+			rollback();
+		}
+		catch ( std::exception & )
+		{}
+	}
+	if ( ownsConnection_ )
+		delete connection_;
+}
+
+dnmi::db::Result * KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::execQuery(const std::string & SQLstmt)
+{
+	if ( not transactionInProgress_ )
+		throw std::runtime_error("No transaction in progress");
+	return connection_->execQuery(SQLstmt);
+}
+
+void KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::exec(const std::string & SQLstmt)
+{
+	if ( not transactionInProgress_ )
+		throw std::runtime_error("No transaction in progress");
+	connection_->exec(SQLstmt);
+}
+void KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::beginTransaction()
+{
+	connection_->beginTransaction(dnmi::db::Connection::SERIALIZABLE);
+	transactionInProgress_ = true;
+}
+void KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::commit()
+{
+	connection_->endTransaction();
+	transactionInProgress_ = false;
+}
+void KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::rollback()
+{
+	connection_->rollBack();
+	transactionInProgress_ = false;
+}
+
+
+
+KvalobsDatabaseAccess::KvalobsDatabaseAccess(const std::string & databaseConnect)
 {
 	static dnmi::db::DriverManager dbMgr;
 	static std::string driverId;
@@ -57,20 +127,35 @@ KvalobsDatabaseAccess::KvalobsDatabaseAccess(const std::string & databaseConnect
 		if (!dbMgr.loadDriver(driver, driverId))
 			throw std::runtime_error("Unable to load driver " + driver);
 	}
-	connection_ = dbMgr.connect(driverId, databaseConnect);
-	if ( ! connection_ )
+
+	dnmi::db::Connection * conn = dbMgr.connect(driverId, databaseConnect);
+	if ( ! conn )
 		throw std::runtime_error("Unable to connect to database");
+	connection_ = new TransactionEnforcingDatabaseConnection(conn, true);
 }
 
 KvalobsDatabaseAccess::KvalobsDatabaseAccess(dnmi::db::Connection * connection, bool takeOwnershipOfConnection) :
-		connection_(connection),
-		ownsConnection_(takeOwnershipOfConnection)
+		connection_(new TransactionEnforcingDatabaseConnection(connection, takeOwnershipOfConnection))
 {}
 
 KvalobsDatabaseAccess::~KvalobsDatabaseAccess()
 {
-	if ( ownsConnection_ )
-		delete connection_;
+	delete connection_;
+}
+
+void KvalobsDatabaseAccess::beginTransaction()
+{
+	connection_->beginTransaction();
+}
+
+void KvalobsDatabaseAccess::commit()
+{
+	connection_->commit();
+}
+
+void KvalobsDatabaseAccess::rollback()
+{
+	connection_->rollback();
 }
 
 void KvalobsDatabaseAccess::getChecks(CheckList * out,
@@ -314,7 +399,7 @@ void KvalobsDatabaseAccess::write(const DataList & data)
 	{
 		try
 		{
-			connection_->beginTransaction();
+			//connection_->beginTransaction();
 
 			for ( DataList::const_iterator it = data.begin(); it != data.end(); ++ it )
 			{
@@ -330,13 +415,13 @@ void KvalobsDatabaseAccess::write(const DataList & data)
 				connection_->exec(query.str());
 			}
 
-			connection_->endTransaction();
+			//connection_->commit();
 			return;
 		}
 		catch (dnmi::db::SQLException & e)
 		{
 			LOGWARN(e.what());
-			connection_->rollBack();
+			//connection_->rollback();
 //			sleep(1);
 		}
 	}

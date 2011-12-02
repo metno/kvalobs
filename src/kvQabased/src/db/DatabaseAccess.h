@@ -67,6 +67,26 @@ class DatabaseAccess
 public:
 	virtual ~DatabaseAccess() {};
 
+	/**
+	 * Is it neccessry to call commit in order to save changes?
+	 */
+	virtual bool commitIsNeccessary() const { return false; }
+
+	/**
+	 * Start a new transaction. If commitIsNeccessary() returns true, this may be required for this class to work
+	 */
+	virtual void beginTransaction() {}
+
+	/**
+	 * Commit data to the data storage. If commitIsNeccessary() returns false, this will have no effect.
+	 */
+	virtual void commit() {}
+
+	/**
+	 * Undo any changes since last commit. If commitIsNeccessary() returns false, this will have no effect.
+	 */
+	virtual void rollback() {}
+
 	typedef std::vector<kvalobs::kvChecks> CheckList;
 	/**
 	 * Get all checks for the given observation

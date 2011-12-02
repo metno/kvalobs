@@ -53,6 +53,27 @@ public:
 		baseImplementation_(baseImplementation)
 	{}
 
+	virtual bool commitIsNeccessary() const
+	{
+		return baseImplementation_->commitIsNeccessary();
+	}
+
+	virtual void beginTransaction()
+	{
+		baseImplementation_->beginTransaction();
+	}
+
+	virtual void commit()
+	{
+		baseImplementation_->commit();
+	}
+
+	virtual void rollback()
+	{
+		baseImplementation_->rollback();
+	}
+
+
 	virtual void getChecks(CheckList * out, const kvalobs::kvStationInfo & si) const
 	{
 		baseImplementation_->getChecks(out, si);
