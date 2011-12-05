@@ -106,6 +106,8 @@ public:
 			const db::DatabaseAccess::ParameterList & expectedParameters) const;
 
 private:
+	void checkObservation(const kvalobs::kvStationInfo & obs, std::ostream * scriptLog);
+
 	bool shouldRunAnyChecks(const kvalobs::kvStationInfo & obs) const;
 
 	void resetObservationDataFlags(

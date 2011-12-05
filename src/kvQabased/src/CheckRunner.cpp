@@ -108,11 +108,37 @@ void CheckRunner::newObservation(const kvalobs::kvStationInfo & obs, std::ostrea
 		return;
 	}
 
+	LOGINFO("Checking " << obs);
+
+	// Will try up to three times in case of serialization error
+	try
+	{
+		for ( int i = 0; i < 2; ++ i )
+		{
+			try
+			{
+				checkObservation(obs, scriptLog);
+				return;
+			}
+			catch (db::DatabaseAccess::SerializationError & )
+			{
+				LOGWARN("Serialization error! Retrying");
+				continue;
+			}
+		}
+		checkObservation(obs, scriptLog);
+	}
+	catch ( std::exception & e )
+	{
+		LOGERROR(e.what());
+	}
+}
+
+void CheckRunner::checkObservation(const kvalobs::kvStationInfo & obs, std::ostream * scriptLog)
+{
 	db::CachedDatabaseAccess cdb(db_, obs);
 	db::DelayedSaveDatabaseAccess db(& cdb);
 	AutoRollbackTransaction transaction(db);
-
-	LOGINFO("Checking " << obs);
 
 	LOGDEBUG("Getting checks for observation");
 	db::DatabaseAccess::CheckList checkList;
@@ -219,14 +245,8 @@ void CheckRunner::newObservation(const kvalobs::kvStationInfo & obs, std::ostrea
 			(*scriptLog) << '\n' << * it;
 		(*scriptLog) << std::endl;
 	}
-	try
-	{
-		transaction.commit();
-	}
-	catch ( std::exception & e )
-	{
-		LOGERROR(e.what());
-	}
+
+	transaction.commit();
 }
 
 namespace

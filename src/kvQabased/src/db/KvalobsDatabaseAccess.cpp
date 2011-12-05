@@ -394,38 +394,30 @@ void KvalobsDatabaseAccess::write(const DataList & data)
 //	for ( DataList::const_iterator it = data.begin(); it != data.end(); ++ it )
 //		LOGINFO("Write to database: " << * it);
 
-
-	for (int i = 0; i < 3; ++i)
+	try
 	{
-		try
+		//connection_->beginTransaction();
+
+		for ( DataList::const_iterator it = data.begin(); it != data.end(); ++ it )
 		{
-			//connection_->beginTransaction();
+			std::ostringstream query;
+			query << "UPDATE data SET "
+					"controlinfo='" << it->controlinfo().flagstring() << "', "
+					"useinfo='" << it->useinfo().flagstring() << "', "
+					"corrected=" << it->corrected() << ", "
+					"cfailed='" << it->cfailed() << "'" <<
+					it->uniqueKey() << ';';
 
-			for ( DataList::const_iterator it = data.begin(); it != data.end(); ++ it )
-			{
-				std::ostringstream query;
-				query << "UPDATE data SET "
-						"controlinfo='" << it->controlinfo().flagstring() << "', "
-						"useinfo='" << it->useinfo().flagstring() << "', "
-						"corrected=" << it->corrected() << ", "
-						"cfailed='" << it->cfailed() << "'" <<
-						it->uniqueKey() << ';';
-
-				LOGDEBUG1(query.str());
-				connection_->exec(query.str());
-			}
-
-			//connection_->commit();
-			return;
-		}
-		catch (dnmi::db::SQLException & e)
-		{
-			LOGWARN(e.what());
-			//connection_->rollback();
-//			sleep(1);
+			LOGDEBUG1(query.str());
+			connection_->exec(query.str());
 		}
 	}
-	LOGERROR("Unable to save data!");
+	catch (dnmi::db::SQLException & e)
+	{
+		if ( e.errorCode() == "40001" ) // serialization error
+			throw SerializationError();
+		else throw;
+	}
 #endif
 }
 
