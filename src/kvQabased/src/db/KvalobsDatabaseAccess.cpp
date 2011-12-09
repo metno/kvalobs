@@ -211,12 +211,12 @@ void KvalobsDatabaseAccess::getExpectedParameters(ParameterList * out,
 	std::ostringstream query;
 	query << "SELECT distinct name FROM param WHERE paramid IN (SELECT paramid FROM obs_pgm WHERE "
 		"stationid=" << si.stationID() << " AND "
-		"typeid=" << si.typeID() << " AND "
+		//"typeid=" << si.typeID() << " AND "
 		"fromtime<='" << si.obstime() << "' AND "
-		//"(totime IS NULL OR totime>'" << si.obstime() << "'));";
-		"(totime IS NULL OR totime>'" << si.obstime() << "') AND "
-		"kl" << std::setfill('0') << std::setw(2) << si.obstime().hour() << "  AND " <<
-		si.obstime().date().shortweekday(miutil::miDate::English) << ");";
+		"(totime IS NULL OR totime>'" << si.obstime() << "'));";
+//		"(totime IS NULL OR totime>'" << si.obstime() << "') AND "
+//		"kl" << std::setfill('0') << std::setw(2) << si.obstime().hour() << "  AND " <<
+//		si.obstime().date().shortweekday(miutil::miDate::English) << ");";
 
 	milog::LogContext context("query");
 	LOGDEBUG1(query.str());
