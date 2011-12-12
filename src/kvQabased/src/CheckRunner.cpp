@@ -232,8 +232,15 @@ void CheckRunner::checkObservation(const kvalobs::kvStationInfo & obs, std::ostr
 			LOGFATAL(e.what());
 			throw;
 		}
+		catch (db::DatabaseAccess::SerializationError & )
+		{
+			// this cannot be handled here, so we throw it back to caller
+			throw;
+		}
 		catch ( std::exception & e )
 		{
+			// errors that are not related to database are merely logged, and
+			// we merely continue running next test
 			LOGERROR(e.what());
 		}
 	}
