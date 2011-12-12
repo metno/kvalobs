@@ -103,10 +103,7 @@ public:
 
 private:
 	class TransactionEnforcingDatabaseConnection;
-
 	TransactionEnforcingDatabaseConnection * connection_;
-	//dnmi::db::Connection * connection_;
-	//bool ownsConnection_;
 };
 
 }
