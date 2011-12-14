@@ -33,6 +33,7 @@
 #include <CheckRunner.h>
 #include <scriptcreate/DataStore.h>
 #include <scriptrunner/Script.h>
+#include <kvalobs/kvDataOperations.h>
 #include <boost/scoped_ptr.hpp>
 #include <boost/assign/list_of.hpp>
 #include <algorithm>
@@ -116,6 +117,56 @@ TEST_F(CheckRunnerTest, resetsFlagsBeforeCheck)
 
 	EXPECT_EQ(expectedData.controlinfo(), returnFromScript.controlinfo());
 }
+
+TEST_F(CheckRunnerTest, uncheckedObservationDataUpdatesUseinfo)
+{
+	using namespace testing;
+
+	db::DatabaseAccess::CheckList checks; // empty check list
+	EXPECT_CALL(database, getChecks(_, observation))
+			.Times(AtLeast(1))
+			.WillRepeatedly(SetArgumentPointee<0>(checks));
+
+	db::DatabaseAccess::ParameterList expectedParameters = boost::assign::list_of("RR_24");
+	EXPECT_CALL(database, getExpectedParameters(_, observation))
+			.Times(AtLeast(1))
+			.WillRepeatedly(SetArgumentPointee<0>(expectedParameters));
+
+	kvalobs::kvData expected = factory.getMissing(110);
+	kvalobs::kvControlInfo ci = expected.controlinfo();
+	ci.set(kvQCFlagTypes::f_fpre, 7);
+	expected.controlinfo(ci);
+
+	//getData(DataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const;
+	db::DatabaseAccess::DataList databaseReturn = boost::assign::list_of(expected);
+	EXPECT_CALL(database, getData(_, observation, qabase::DataRequirement::Parameter("RR_24"), 0))
+			.Times(AtLeast(1))
+			.WillRepeatedly(SetArgumentPointee<0>(databaseReturn));
+
+
+	kvalobs::kvUseInfo ui;
+	ui.setUseFlags(expected.controlinfo());
+	expected.useinfo(ui);
+
+	db::DatabaseAccess::DataList expectedScriptReturn = boost::assign::list_of(expected);
+
+	EXPECT_CALL(database, write(expectedScriptReturn))
+			.Times(AtLeast(1));
+
+	runner->newObservation(observation);
+
+
+	ASSERT_EQ(1u, database.savedData().size());
+	const kvalobs::kvData & returnFromScript = * database.savedData().begin();
+
+	kvalobs::kvData expectedData = expectedScriptReturn.front();
+	expectedData.useinfo(ui);
+
+	EXPECT_TRUE(kvalobs::compare::exactly_equal()(expectedData, returnFromScript));
+	EXPECT_EQ(expectedData.controlinfo(), returnFromScript.controlinfo());
+	EXPECT_EQ(expectedData.useinfo(), returnFromScript.useinfo());
+}
+
 
 TEST_F(CheckRunnerTest, skipsHqcCorrectedData)
 {

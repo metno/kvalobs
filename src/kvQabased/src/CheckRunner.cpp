@@ -327,6 +327,10 @@ void CheckRunner::resetObservationDataFlags(db::DatabaseAccess::DataList & obser
 			newCi.set(kvQCFlagTypes::f_fpre, 7);
 
 		it->controlinfo(newCi);
+
+		kvalobs::kvUseInfo ui = it->useinfo();
+		ui.setUseFlags(newCi);
+		it->useinfo(ui);
 	}
 }
 
