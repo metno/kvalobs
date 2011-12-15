@@ -2,7 +2,7 @@ bin_SCRIPTS = kvstart kvstop kvrestart
 
 EXTRA_DIST = kvrestart.sh kvstart.sh kvstop.sh kvcron.template
 
-CLEANFILES = kvstart kvstop
+CLEANFILES = kvstart kvstop kvrestart
 
 SED_SUBST = sed s,__KVCONFIG__,$(bindir)/kvconfig,g $< > $@ 
 
