@@ -50,31 +50,23 @@ const char* options[][2] =
 using namespace std;
 using namespace boost;
 
-int corbaMain(int argc, char** argv, const qabase::Configuration & config)
+namespace
 {
-	CORBA::ORB_ptr orb;
-	PortableServer::POA_ptr poa;
-	string dbdriver;
-	miutil::conf::ConfSection *conf = KvApp::getConfiguration();
-	//Read all connection information from $KVALOBS/etc/kvalobs.conf
-	//if it exist. Otherwise use the environment variables.
-	//ie: KVDB, KVDBUSER, PGHOST, PGPORT
-	string constr(KvApp::createConnectString());
-	bool error;
-
-	if (conf)
+std::string getDbDriver(miutil::conf::ConfSection * conf)
+{
+	if ( conf )
 	{
 		miutil::conf::ValElementList val = conf->getValue("database.dbdriver");
 
 		if (val.size() == 1)
-			dbdriver = val[0].valAsString();
+			return val[0].valAsString();
 	}
-
 	//Use postgresql as a last guess.
-	if (dbdriver.empty())
-		dbdriver = "pgdriver.so";
+	return "pgdriver.so";
+}
 
-	LOGINFO( "KvQabased: starting ...." );
+bool checkPidFile()
+{
 	filesystem::path rundir(kvPath("rundir"));
 	if (!boost::filesystem::exists(rundir))
 	{
@@ -84,17 +76,18 @@ int corbaMain(int argc, char** argv, const qabase::Configuration & config)
 		} catch (filesystem::filesystem_error & e)
 		{
 			LOGFATAL( e.what() );
-			return 1;
+			return false;
 		}
 	}
 	else if (!filesystem::is_directory(rundir))
 	{
 		LOGFATAL( rundir.native_file_string() << "exists but is not a directory" );
-		return 1;
+		return false;
 	}
 	filesystem::path pidfile(dnmi::file::createPidFileName(
 			rundir.native_file_string(), "kvQabased"));
 
+	bool error;
 	if (dnmi::file::isRunningPidFile(pidfile.native_file_string(), error))
 	{
 		if (error)
@@ -104,15 +97,30 @@ int corbaMain(int argc, char** argv, const qabase::Configuration & config)
 					<< endl << "kvQabased is not running. " <<
 					"If it is running and there is problems. Kill kvQabased and"
 					<< endl << "restart it." << endl << endl );
-			return 1;
+			return false;
 		}
 		else
 		{
 			LOGFATAL( "Is kvQabased allready running?" << endl
 					<< "If not remove the pidfile: " << pidfile.native_file_string() );
-			return 1;
+			return false;
 		}
 	}
+	return true;
+}
+}
+
+int corbaMain(int argc, char** argv, const qabase::Configuration & config)
+{
+	miutil::conf::ConfSection *conf = KvApp::getConfiguration();
+	string constr(KvApp::createConnectString());
+
+	string dbdriver = getDbDriver(conf);
+
+	LOGINFO( "KvQabased: starting ...." );
+
+	if ( ! checkPidFile() )
+		return 1;
 
 	QaBaseApp app(argc, argv, dbdriver, constr, options);
 
@@ -122,8 +130,8 @@ int corbaMain(int argc, char** argv, const qabase::Configuration & config)
 		return 1;
 	}
 
-	orb = app.getOrb();
-	poa = app.getPoa();
+	CORBA::ORB_ptr orb = app.getOrb();
+	PortableServer::POA_ptr poa = app.getPoa();
 
 	QaWork qaWork(app, config);
 	thread qaWorkThread(qaWork);
