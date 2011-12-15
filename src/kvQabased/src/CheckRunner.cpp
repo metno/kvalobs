@@ -62,6 +62,10 @@ struct have_typeid : std::unary_function<kvalobs::kvData, bool>
 	}
 };
 
+/**
+ * Start a transaction that will be rolled back upon object destruction,
+ * unless it has been explicitly committed first.
+ */
 class AutoRollbackTransaction
 {
 public:
