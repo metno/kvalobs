@@ -51,6 +51,9 @@ public:
 	TransactionEnforcingDatabaseConnection(dnmi::db::Connection * connection, bool takeOwnershipOfConnection);
 	~TransactionEnforcingDatabaseConnection();
 	dnmi::db::Result *execQuery(const std::string & SQLstmt);
+
+	std::string esc(const std::string & stringToEscape) const;
+
 	void exec(const std::string & SQLstmt);
 	void beginTransaction();
 	void commit();
@@ -67,7 +70,7 @@ KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::TransactionEnforc
 	ownsConnection_(takeOwnershipOfConnection)
 {
 	if ( ! connection )
-		throw std::runtime_error("wtf??");
+		throw std::runtime_error("No database connection");
 }
 
 KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::~TransactionEnforcingDatabaseConnection()
@@ -90,6 +93,11 @@ dnmi::db::Result * KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection
 	if ( not transactionInProgress_ )
 		throw std::runtime_error("No transaction in progress");
 	return connection_->execQuery(SQLstmt);
+}
+
+std::string KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::esc(const std::string & stringToEscape) const
+{
+	return connection_->esc(stringToEscape);
 }
 
 void KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::exec(const std::string & SQLstmt)
@@ -137,6 +145,13 @@ KvalobsDatabaseAccess::KvalobsDatabaseAccess(const std::string & databaseConnect
 KvalobsDatabaseAccess::KvalobsDatabaseAccess(dnmi::db::Connection * connection, bool takeOwnershipOfConnection) :
 		connection_(new TransactionEnforcingDatabaseConnection(connection, takeOwnershipOfConnection))
 {}
+
+std::string KvalobsDatabaseAccess::modelDataName_;
+
+void KvalobsDatabaseAccess::setModelDataName(const std::string & modelDataName)
+{
+	modelDataName_ = modelDataName;
+}
 
 KvalobsDatabaseAccess::~KvalobsDatabaseAccess()
 {
@@ -303,6 +318,10 @@ void KvalobsDatabaseAccess::getModelData(ModelDataList * out, const kvalobs::kvS
 	std::ostringstream query;
 	query << "SELECT * FROM model_data WHERE "
 			"stationid=" << si.stationID() << " AND ";
+
+	if ( not modelDataName_.empty() )
+		query << "modelid IN (SELECT modelid FROM model WHERE name='" << connection_->esc(modelDataName_) << "') AND ";
+
 	if ( minutesBackInTime != 0 )
 	{
 		miutil::miTime first = si.obstime();

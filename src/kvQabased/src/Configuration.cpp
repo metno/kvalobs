@@ -111,6 +111,7 @@ Configuration::Configuration(int & argc, char ** argv) :
 			("obstime,o", value<std::string>(), "Check the given obstime")
 			("typeid,t", value<int>(), "Check the given typeid")
 			("qcx", value<std::string>(), "Only run the given check. This also means that control flags will not be reset before checks are run");
+			("model-source", value<std::string>(& modelDataName_)->default_value("yr"), "Get model data from the given source (from model table in database");
 
 	options_description logging("Logging");
 	logging.add_options()

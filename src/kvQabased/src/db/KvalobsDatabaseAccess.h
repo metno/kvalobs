@@ -71,6 +71,8 @@ public:
 	 */
 	KvalobsDatabaseAccess(dnmi::db::Connection * connection, bool takeOwnershipOfConnection);
 
+	static void setModelDataName(const std::string & modelDataName);
+
 	virtual ~KvalobsDatabaseAccess();
 
 	virtual bool commitIsNeccessary() const { return true; }
@@ -104,6 +106,8 @@ public:
 private:
 	class TransactionEnforcingDatabaseConnection;
 	TransactionEnforcingDatabaseConnection * connection_;
+
+	static std::string modelDataName_;
 };
 
 }

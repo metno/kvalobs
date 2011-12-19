@@ -118,6 +118,8 @@ int main(int argc, char ** argv)
 		}
 		boost::scoped_ptr<milog::LogStream> logStream;
 
+		LOGDEBUG("Using model data name " << config.modelDataName());
+		db::KvalobsDatabaseAccess::setModelDataName(config.modelDataName());
 
 		if ( config.haveObservationToCheck() )
 		{

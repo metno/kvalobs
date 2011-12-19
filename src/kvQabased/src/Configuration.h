@@ -110,6 +110,11 @@ public:
 	 */
 	const QcxFilter & qcxFilter() const { return qcxFilter_; }
 
+	/**
+	 * Model data should be fetched from this source (name in kvalobs' model table)
+	 */
+	const std::string & modelDataName() const { return modelDataName_; }
+
 	const std::string & runLogFile() const
 	{
 		return runLogFile_;
@@ -150,6 +155,8 @@ private:
 	kvalobs::kvStationInfo * observationToCheck_;
 
 	QcxFilter qcxFilter_;
+
+	std::string modelDataName_;
 
 	std::string runLogFile_;
 	milog::LogLevel logLevel_;
