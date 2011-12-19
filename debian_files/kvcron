@@ -3,6 +3,7 @@
 
 MYBIN=/usr/lib/kvalobs/bin
 LOG=/var/log/kvalobs
+TZ=UTC
 
 30 5,11,17,23 * * * $MYBIN/lam2kv.cron %
 15 * * * * /usr/bin/qabase_log_cleanup > /dev/null 2>&1  %
