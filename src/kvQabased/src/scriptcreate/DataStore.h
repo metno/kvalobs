@@ -106,6 +106,7 @@ public:
 	QABASE_EXCEPTION(UnableToGetData);
 	QABASE_EXCEPTION(InvalidParameter);
 	QABASE_EXCEPTION(NoSuchData);
+	QABASE_DERIVED_EXCEPTION(MissingModelData, NoErrorLogException);
 
 private:
 	void populateObs_(

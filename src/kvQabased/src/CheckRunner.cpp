@@ -241,6 +241,10 @@ void CheckRunner::checkObservation(const kvalobs::kvStationInfo & obs, std::ostr
 			// this cannot be handled here, so we throw it back to caller
 			throw;
 		}
+		catch ( NoErrorLogException & e )
+		{
+			LOGINFO(e.what());
+		}
 		catch ( std::exception & e )
 		{
 			// errors that are not related to database are merely logged, and

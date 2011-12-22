@@ -67,6 +67,12 @@ public: \
 }
 
 /**
+ * Exceptions of this class should not be noted as errors in logs
+ */
+QABASE_EXCEPTION(NoErrorLogException);
+
+
+/**
  * Easy definition of exception subclasses derived from any class
  */
 #define QABASE_DERIVED_EXCEPTION(name, derivedfrom) \

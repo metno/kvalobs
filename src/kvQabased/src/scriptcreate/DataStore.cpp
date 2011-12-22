@@ -195,7 +195,7 @@ void DataStore::populateModel_(
 			modelData_[find->second].assign(modelData.begin(), modelData.end());
 		else
 		{
-			throw std::runtime_error("missing model data");
+			throw MissingModelData("missing model data");
 			kvalobs::kvModelData missingModel(observation.stationID(), observation.obstime(), 0, 0, 0, -32767);
 			modelData_[find->second].push_back(missingModel); // missing observation
 		}

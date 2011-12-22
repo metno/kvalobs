@@ -71,6 +71,14 @@ KvalobsCheckScript::KvalobsCheckScript(
 
 		addDataToScript(* script_, * store_);
 	}
+	catch ( NoErrorLogException & e )
+	{
+		// Missing model data is not logged as an error
+		if ( scriptLog_ )
+			(* scriptLog_) << "NOTE: Unable top run check: " << e.what() << "\n\n";
+		terminateLogEntry_();
+		throw;
+	}
 	catch ( std::exception & e )
 	{
 		if ( scriptLog_ )
