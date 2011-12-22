@@ -75,7 +75,7 @@ KvalobsCheckScript::KvalobsCheckScript(
 	{
 		// Missing model data is not logged as an error
 		if ( scriptLog_ )
-			(* scriptLog_) << "NOTE: Unable top run check: " << e.what() << "\n\n";
+			(* scriptLog_) << "NOTE: Unable run check: " << e.what() << "\n\n";
 		terminateLogEntry_();
 		throw;
 	}
