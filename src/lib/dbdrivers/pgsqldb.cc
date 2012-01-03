@@ -207,7 +207,7 @@ dnmi::db::drivers::PGConnection::exec(const std::string &query)
    }
 
    if(!connected)
-      throw SQLNotConnected("NO CONNECTION, not connected to any database!");
+      throw SQLNotConnected("NO CONNECTION, lost connection to the database!");
 
    p=PQexec(con, query.c_str());
 
