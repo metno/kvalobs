@@ -158,8 +158,8 @@ dnmi::db::drivers::PGConnection::tryReconnect()
       else
          errMsg="Can't connect to database, UNKNOWN ERROR!";
 
-      PQfinish(con);
-      con=0;
+//      PQfinish(con);
+//      con=0;
 
       return false;
    }
@@ -191,31 +191,35 @@ dnmi::db::drivers::PGConnection::exec(const std::string &query)
 {
    PGresult *p;
    ExecStatusType status;
-   bool           connected=false;
+   bool           again=false;
 
    if(!con)
       throw SQLNotConnected("NO CONNECTION, not connected to any database!");
 
-   for(int i=0; i<2 && !connected; i++){
-      if(!isConnected()){
-         if(tryReconnect())
-            connected=true;
-         else
-            sleep(1);
-      }else
-         connected=true;
-   }
+   do {
+      if( ! isConnected() ) {
+         if( ! tryReconnect() || again ) {
+            ostringstream err;
+            err << "NO CONNECTION, lost connection to the database!";
+            if( !errMsg.empty() )
+               err << " Reason(?): " << errMsg;
 
-   if(!connected)
-      throw SQLNotConnected("NO CONNECTION, lost connection to the database!");
+            throw SQLNotConnected( err.str());
+         }
 
-   p=PQexec(con, query.c_str());
+         again = true;
+         continue;
+      }
 
-   if(!p)
-      throw SQLException(lastError());
+      p=PQexec(con, query.c_str());
 
-   status=PQresultStatus(p);
+      status=PQresultStatus(p);
+      again = false;
 
+      if( status == PGRES_FATAL_ERROR )
+         again = true;
+
+   } while( again );
 
 
    if(status==PGRES_COMMAND_OK || status==PGRES_TUPLES_OK ){
@@ -266,33 +270,36 @@ dnmi::db::drivers::PGConnection::execQuery(const std::string &query)
 {
    PGresult *p;
    ExecStatusType status;
-   bool           connected=false;
+   bool again=false;
 
    if(!con){
       throw SQLNotConnected("NO CONNECTION, not connected to any database!");
    }
 
+   do {
+      if( ! isConnected() ) {
+         if( ! tryReconnect() || again ) {
+            ostringstream err;
+            err << "NO CONNECTION, lost connection to the database!";
+            if( !errMsg.empty() )
+               err << " Reason(?): " << errMsg;
 
-   for(int i=0; i<2 && !connected; i++){
-      if(!isConnected()){
-         if(tryReconnect())
-            connected=true;
-         else
-            sleep(1);
-      }else
-         connected=true;
-   }
+            throw SQLNotConnected( err.str());
+         }
 
-   if(!connected)
-      throw SQLNotConnected("NO CONNECTION, not connected to any database!");
+         again = true;
+         continue;
+      }
 
-   p=PQexec(con, query.c_str());
+      p=PQexec(con, query.c_str());
 
-   if(!p){
-      throw SQLException(lastError());
-   }
+      status=PQresultStatus(p);
+      again = false;
 
-   status=PQresultStatus(p);
+      if( status == PGRES_FATAL_ERROR )
+         again = true;
+
+   } while( again );
 
    if(status==PGRES_TUPLES_OK){
       try{
