@@ -196,7 +196,7 @@ dnmi::db::drivers::PGConnection::exec(const std::string &query)
    if(!con)
       throw SQLNotConnected("NO CONNECTION, not connected to any database!");
 
-   do {
+   for( int i=0; i<2; ++i ) {
       if( ! isConnected() ) {
          if( ! tryReconnect() || again ) {
             ostringstream err;
@@ -218,9 +218,10 @@ dnmi::db::drivers::PGConnection::exec(const std::string &query)
 
       if( status == PGRES_FATAL_ERROR )
          again = true;
+   };
 
-   } while( again );
-
+   if( ! p )
+      throw SQLException( lastError() );
 
    if(status==PGRES_COMMAND_OK || status==PGRES_TUPLES_OK ){
       PQclear(p);
@@ -276,7 +277,7 @@ dnmi::db::drivers::PGConnection::execQuery(const std::string &query)
       throw SQLNotConnected("NO CONNECTION, not connected to any database!");
    }
 
-   do {
+   for(int i=0; i<2; ++i ){
       if( ! isConnected() ) {
          if( ! tryReconnect() || again ) {
             ostringstream err;
@@ -298,8 +299,10 @@ dnmi::db::drivers::PGConnection::execQuery(const std::string &query)
 
       if( status == PGRES_FATAL_ERROR )
          again = true;
+   }
 
-   } while( again );
+   if( !p )
+      throw SQLException( lastError() );
 
    if(status==PGRES_TUPLES_OK){
       try{
@@ -309,9 +312,7 @@ dnmi::db::drivers::PGConnection::execQuery(const std::string &query)
          PQclear(p);
          throw SQLException("OUT OF MEMMORY!");
       }
-   }
-
-   if(status==PGRES_COMMAND_OK || status==PGRES_EMPTY_QUERY){
+   } else if(status==PGRES_COMMAND_OK || status==PGRES_EMPTY_QUERY){
       PQclear(p);
       return 0;
    }
