@@ -1,3 +1,9 @@
+kvalobs (2.4.5~rc6-1) lucid; urgency=low
+
+  * Bugfix in reconnect in the postgresdriver..
+  
+ -- Borge Moe <borge.moe@met.no>  Tue, 10 Jan 2012 11:55:00 +0100
+
 kvalobs (2.4.5~rc5-1) lucid; urgency=low
 
   * Bugfix and additions in the db layer.
