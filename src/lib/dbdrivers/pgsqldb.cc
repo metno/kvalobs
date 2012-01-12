@@ -189,7 +189,7 @@ dnmi::db::drivers::PGConnection::rollBack()
 void
 dnmi::db::drivers::PGConnection::exec(const std::string &query)
 {
-   PGresult *p;
+   PGresult *p=0;
    ExecStatusType status;
    bool           again=true;
 
@@ -272,9 +272,9 @@ dnmi::db::drivers::PGConnection::exec(const std::string &query)
 dnmi::db::Result*
 dnmi::db::drivers::PGConnection::execQuery(const std::string &query)
 {
-   PGresult *p;
+   PGresult *p=0;
    ExecStatusType status;
-   bool again=again;
+   bool again=true;
 
    if(!con){
       throw SQLNotConnected("NO CONNECTION, not connected to any database!");
