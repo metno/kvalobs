@@ -191,14 +191,14 @@ dnmi::db::drivers::PGConnection::exec(const std::string &query)
 {
    PGresult *p;
    ExecStatusType status;
-   bool           again=false;
+   bool           again=true;
 
    if(!con)
       throw SQLNotConnected("NO CONNECTION, not connected to any database!");
 
-   for( int i=0; i<2; ++i ) {
+   for( int i=0; i<2 && again; ++i ) {
       if( ! isConnected() ) {
-         if( ! tryReconnect() || again ) {
+         if( ! tryReconnect()  ) {
             ostringstream err;
             err << "NO CONNECTION, lost connection to the database!";
             if( !errMsg.empty() )
@@ -206,18 +206,21 @@ dnmi::db::drivers::PGConnection::exec(const std::string &query)
 
             throw SQLNotConnected( err.str());
          }
-
-         again = true;
-         continue;
       }
 
-      p=PQexec(con, query.c_str());
-
-      status=PQresultStatus(p);
       again = false;
+      p=PQexec(con, query.c_str());
+      status=PQresultStatus(p);
 
-      if( status == PGRES_FATAL_ERROR )
-         again = true;
+      if( status == PGRES_FATAL_ERROR ) {
+         if( ! isConnected() ) {
+            if( p ) {
+               PQclear(p);
+               p=0;
+            }
+            again = true;
+         }
+      }
    };
 
    if( ! p )
@@ -271,15 +274,15 @@ dnmi::db::drivers::PGConnection::execQuery(const std::string &query)
 {
    PGresult *p;
    ExecStatusType status;
-   bool again=false;
+   bool again=again;
 
    if(!con){
       throw SQLNotConnected("NO CONNECTION, not connected to any database!");
    }
 
-   for(int i=0; i<2; ++i ){
+   for(int i=0; i<2 && again; ++i ){
       if( ! isConnected() ) {
-         if( ! tryReconnect() || again ) {
+         if( ! tryReconnect() ) {
             ostringstream err;
             err << "NO CONNECTION, lost connection to the database!";
             if( !errMsg.empty() )
@@ -287,18 +290,21 @@ dnmi::db::drivers::PGConnection::execQuery(const std::string &query)
 
             throw SQLNotConnected( err.str());
          }
-
-         again = true;
-         continue;
       }
 
-      p=PQexec(con, query.c_str());
-
-      status=PQresultStatus(p);
       again = false;
+      p=PQexec(con, query.c_str());
+      status=PQresultStatus(p);
 
-      if( status == PGRES_FATAL_ERROR )
-         again = true;
+      if( status == PGRES_FATAL_ERROR ) {
+         if( ! isConnected() ) {
+            if( p ) {
+               PQclear(p);
+               p=0;
+            }
+            again = true;
+         }
+      }
    }
 
    if( !p )
