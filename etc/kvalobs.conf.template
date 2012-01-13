@@ -29,6 +29,11 @@ database{
   #Which database driver shall be used. 
   dbdriver="pgdriver.so"
 
+  #For database drivers that support it try to set the appname
+  #so that the application that has opened a connection get
+  #can be idetified in the log message to the database.
+  #At the moment only Postgresql >= 9.0 support this 
+  set_app_name=false
   #The string to be used to connect to the database.
   #ex. for a postgresql databse
   #dbconnect="user=kvalobs dbname=kvalobs password= host= port="

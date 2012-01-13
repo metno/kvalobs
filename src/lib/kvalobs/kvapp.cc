@@ -47,18 +47,22 @@ using namespace miutil::conf;
 
 namespace{
   ConfSection* confLoader();
+  std::string getAppName( const std::string &progname );
+
 }
 
 ConfSection* KvApp::conf=0;
 std::string KvApp::confFile;
 
 KvApp::KvApp(int argn, char **argv, const char *opt[0][2])
-  :CorbaHelper::CorbaApp(argn, argv, opt)
+  :CorbaHelper::CorbaApp(argn, argv, opt), setAppNameForDb( false )
 {
     string corbaNS;
     string kvconfig;
     ValElementList val;
     
+    appName = getAppName( argv[0] );
+
     kvPathInCorbaNS.erase();
 
     for(int i=0; i<argn; i++){
@@ -89,6 +93,15 @@ KvApp::KvApp(int argn, char **argv, const char *opt[0][2])
     //Sets the variable conf
     getConfiguration();
     
+    if( conf ) {
+       val=conf->getValue("database.set_app_name");
+
+       if(val.size()>0){
+          string sval=val[0].valAsString();
+          if( !sval.empty() && ( sval[0]=='t' || sval[0]=='T' ) )
+             setAppNameForDb = true;
+       }
+    }
 
     if(kvPathInCorbaNS.empty()){
        if(conf){
@@ -383,6 +396,26 @@ namespace{
 
     return 0;
   }
+
+  std::string
+  getAppName( const std::string &progname )
+  {
+     std::string name( progname );
+     std::string::size_type i;
+
+     i = name.find_last_of("/");
+
+     if( i != string::npos )
+        name.erase( 0, i + 1 );
+
+     i = name.find_first_of( '.' );
+
+     if( i != string::npos )
+        name.erase( i );
+
+     return name;
+  }
+
 }
 
 

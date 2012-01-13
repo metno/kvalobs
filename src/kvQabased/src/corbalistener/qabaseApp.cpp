@@ -68,6 +68,9 @@ QaBaseApp::QaBaseApp(int argn, char **argv, const std::string &driver_,
 		exit(1);
 	}
 
+	if( setAppNameForDb && !appName.empty() )
+	   dbMgr.setAppName( appName );
+
 	LOGINFO("Driver <" << dbDriverId<< "> loaded!\n");
 
 }

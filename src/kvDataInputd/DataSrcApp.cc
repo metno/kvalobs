@@ -240,6 +240,9 @@ DataSrcApp::registerDb(int nConn)
     return 0;
   }
   
+  if( setAppNameForDb && !appName.empty() )
+     dbMgr.setAppName( appName );
+
   LOGINFO("registerDb: Driver <" << drvId<< "> loaded!\n");
 
   for(int i=0; i<nConn; i++){

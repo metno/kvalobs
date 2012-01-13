@@ -42,6 +42,14 @@ DriverManager()
 
 dnmi::db::
 DriverManager::
+DriverManager( const std::string &appName_ )
+   : appName( appName_ )
+{
+}
+
+
+dnmi::db::
+DriverManager::
 ~DriverManager()
 {
   IDriverList it=drivers.begin();
@@ -51,7 +59,23 @@ DriverManager::
 
 }
 
-       
+void
+dnmi::db::
+DriverManager::
+setAppName( const std::string &appName_ )
+{
+   appName = appName_;
+}
+
+std::string
+dnmi::db::
+DriverManager::
+getAppName( ) const
+{
+   return appName;
+}
+
+
 bool 
 dnmi::db::
 DriverManager::
@@ -151,8 +175,9 @@ dnmi::db::Connection*
 dnmi::db::
 DriverManager::
 connect(const std::string &driverId, 
-	const std::string &connect)
+	const std::string &connect_ )
 {
+   std::string connect( connect_ );
   dnmi::db::Connection *con;
   
   IDriverList it=drivers.begin();
@@ -168,6 +193,9 @@ connect(const std::string &driverId,
     return 0;
   }
   
+  if( driverId == "PostgreSQL" && !appName.empty() )
+     connect += " application_name='" + appName + "'";
+
   con=(*it)->driver->createConnection(connect);
 
   if(!con){

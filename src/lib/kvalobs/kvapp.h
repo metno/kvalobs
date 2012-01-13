@@ -75,9 +75,13 @@ class KvApp : public CorbaHelper::CorbaApp
    * command line with the option --cnspath. Default value is
    * 'kvalobs'. The --cnspath override all other values.
    */
-  std::string kvPathInCorbaNS;  
+  std::string kvPathInCorbaNS;
+
 
  public:
+  bool setAppNameForDb;
+  std::string appName; //Set the application name from ARGV[0].
+
   KvApp(int argn, char **argv, const char *options[0][2]=0);
   virtual ~KvApp();
 

@@ -76,6 +76,9 @@ ManagerApp(int argn, char **argv,
     exit(1);
   }
   
+  if( setAppNameForDb && !appName.empty() )
+     dbMgr.setAppName( appName );
+
   LOGINFO("Driver <" << dbDriverId<< "> loaded!\n");
   
   
