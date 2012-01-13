@@ -1,3 +1,11 @@
+kvalobs (2.4.5~rc10-1) lucid; urgency=low
+
+  * Add support for logging of the application that use a postgres
+    connection to the postgres logs.
+  
+ -- Borge Moe <borge.moe@met.no>  Fri, 13 Jan 2012 11:15:00 +0100
+
+
 kvalobs (2.4.5~rc9-1) lucid; urgency=low
 
   * Fix bogus initialisation in the postgresdriver.
