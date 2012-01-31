@@ -199,38 +199,46 @@ namespace kvalobs{
 	        float  RR(int &paramid, const miutil::miTime &obstime);
 	     };
 	     
-	     struct SaSdEm {
+	     struct SaSdEmEi {
 	        std::string sa;
 	        std::string sd;
 	        std::string em;
+	        std::string ei;
 	        bool  hasSa;
 	        bool  hasSd;
 	        bool  hasEm;
+	        bool  hasEi;
 	        
-	        SaSdEm()
-	           :hasSa( false ), hasSd( false ), hasEm( false )
+	        SaSdEmEi()
+	           :hasSa( false ), hasSd( false ),
+	            hasEm( false ), hasEi( false )
 	        {}
 	        
-	        SaSdEm( const SaSdEm &cc )
-	           : sa(cc.sa), sd(cc.sd),em(cc.em), 
-	             hasSa( cc.hasSa ), hasSd( cc.hasSd ), hasEm( cc.hasEm )
+	        SaSdEmEi( const SaSdEmEi &cc )
+	           : sa(cc.sa), sd(cc.sd),em(cc.em), ei(cc.ei),
+	             hasSa( cc.hasSa ), hasSd( cc.hasSd ),
+	             hasEm( cc.hasEm ), hasEi( cc.hasEi )
 	             {}
 	        
-	        SaSdEm& operator=(const SaSdEm &rhs ) {
+	        SaSdEmEi& operator=(const SaSdEmEi &rhs ) {
 	           if( this != &rhs ) {
 	              sa = rhs.sa;
 	              sd = rhs.sd;
 	              em = rhs.em; 
+	              ei = rhs.ei;
 	              hasSa = rhs.hasSa;
 	              hasSd = rhs.hasSd;
 	              hasEm = rhs.hasEm;
+	              hasEi = rhs.hasEi;
 	           }
 	           return *this;
 	        }
 	        
-	        static bool dataSa( kvData &data, const SaSdEm &sa, const kvData &saSdEmTemplate );
-	        static bool dataSd( kvData &data, const SaSdEm &sd, const kvData &saSdEmTemplate );
-	        static bool dataEm( kvData &data, const SaSdEm &em, const kvData &saSdEmTemplate );
+	        static bool dataSa( kvData &data, const SaSdEmEi &sa, const kvData &saSdEmTemplate );
+	        static bool dataSd( kvData &data, const SaSdEmEi &sd, const kvData &saSdEmTemplate );
+	        static bool dataEm( kvData &data, const SaSdEmEi &em, const kvData &saSdEmTemplate );
+	        static bool dataEi( kvData &data, const SaSdEmEi &ei, const kvData &saSdEmTemplate );
+
 	     };
 
       private:
@@ -276,14 +284,14 @@ namespace kvalobs{
 	     
 	     bool  hasRRRtr_;
 	     RRRtr RRRtr_;
-	     bool hasSa, hasSd, hasEm; //Is the station setup with Sa, SD and/or EM. 
-	     SaSdEm saSdEm_;
+	     bool hasSa, hasSd, hasEm, hasEi; //Is the station setup with Sa, SD, Em and/or Ei.
+	     SaSdEmEi saSdEm_;
 	     std::string logid;
 
         public:
 	        DataConvert(ParamList &p, const std::string &logid );
 	
-	        void setSaSdEm( const std::string &sa_sd_em);
+	        void setSaSdEmEi( const std::string &sa_sd_em);
 	        
 	        /**
 	         * \exception BadFormat, UnkownParameter
@@ -296,8 +304,8 @@ namespace kvalobs{
 	        bool hasRRRtr(RRRtr &rr){ rr=RRRtr_; 
                                      return hasRRRtr_ && !rr.RR_N;}
 	        
-	        void resetSaSdEm(){ saSdEm_ = SaSdEm(); }
-	        bool hasSaSdEm( SaSdEm &saSdEm );
+	        void resetSaSdEm(){ saSdEm_ = SaSdEmEi(); }
+	        bool hasSaSdEmEi( SaSdEmEi &saSdEm );
          };
 
       /** @} */

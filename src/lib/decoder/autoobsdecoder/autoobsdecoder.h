@@ -55,7 +55,7 @@ class AutoObsDecoder : public DecoderBase{
    long getStationId(miutil::miString &msg);
    long getTypeId( miutil::miString &msg );
 
-   std::string getMetaSaSdEm( int stationid, int typeid_, const miutil::miTime &obstime );
+   std::string getMetaSaSdEmEi( int stationid, int typeid_, const miutil::miTime &obstime );
 
    char checkObservationTime(int typeId,
                              miutil::miTime tbt,

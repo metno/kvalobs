@@ -74,37 +74,46 @@ name() const
 
 std::string 
 AutoObsDecoder::
-getMetaSaSdEm( int stationid, int typeid_, const miutil::miTime &obstime )
+getMetaSaSdEmEi( int stationid, int typeid_, const miutil::miTime &obstime )
 {
-   string sasdem="000";
+   string saSdEmEi="0000";
    
    if( obsPgm.obstime.undef() || obsPgm.obstime != obstime ){
       if( ! loadObsPgmParamInfo( stationid, typeid_, obstime, obsPgm ) ){
          IDLOGDEBUG( logid, "DBERROR: SaSdEm:  000");
-         return "000";
+         return saSdEmEi;
       }
    }
    
    kvalobs::decoder::Active state;
    
+   //SA
    if( obsPgm.isActive( stationid, typeid_, 112, 0, 0, obstime, state ) ) {
       if( state == kvalobs::decoder::YES )
-         sasdem[0]='1';
+         saSdEmEi[0]='1';
    }
-    
+
+   //SD
    if( obsPgm.isActive( stationid, typeid_, 18, 0, 0, obstime, state ) ) {
          if( state == kvalobs::decoder::YES )
-            sasdem[1]='1';
+            saSdEmEi[1]='1';
    }
    
+   //Em
    if( obsPgm.isActive( stationid, typeid_, 7, 0, 0, obstime, state ) ) {
       if( state == kvalobs::decoder::YES )
-         sasdem[2]='1';
+         saSdEmEi[2]='1';
+   }
+
+   //Ei (E)
+   if( obsPgm.isActive( stationid, typeid_, 129, 0, 0, obstime, state ) ) {
+      if( state == kvalobs::decoder::YES )
+         saSdEmEi[3]='1';
    }
    
-   IDLOGDEBUG( logid, "SaSdEm: " << sasdem);
+   IDLOGDEBUG( logid, "SaSdEmEi: " << saSdEmEi);
    
-   return sasdem;
+   return saSdEmEi;
 }
 
 long 
@@ -575,11 +584,11 @@ execute(miutil::miString &msg)
     	}
       
       std::string         sSaSdEm;
-      DataConvert::SaSdEm saSdEm;
+      DataConvert::SaSdEmEi saSdEm;
 
-      converter.setSaSdEm( getMetaSaSdEm( stationid, useTypeid, obstime) );
+      converter.setSaSdEmEi( getMetaSaSdEmEi( stationid, useTypeid, obstime) );
       
-      if( converter.hasSaSdEm( saSdEm ) ) {
+      if( converter.hasSaSdEmEi( saSdEm ) ) {
          //Create a template to use
          //to hold all common parameters for SA, SD and EM.
          kvData saSdEmTmp(stationid, obstime, 
@@ -590,17 +599,22 @@ execute(miutil::miString &msg)
          saSdEmTmp.useinfo(7, checkObservationTime(typeId, tbtime, obstime));
          kvData saSdEmData;
 			      
-         if( DataConvert::SaSdEm::dataSa( saSdEmData, saSdEm, saSdEmTmp ) ) {
+         if( DataConvert::SaSdEmEi::dataSa( saSdEmData, saSdEm, saSdEmTmp ) ) {
             nExpectedParams++;
             dataList.push_back(saSdEmData );
          }
 				      
-         if( DataConvert::SaSdEm::dataSd( saSdEmData, saSdEm, saSdEmTmp ) ) {
+         if( DataConvert::SaSdEmEi::dataSd( saSdEmData, saSdEm, saSdEmTmp ) ) {
             dataList.push_back(saSdEmData );
             nExpectedParams++;
          }
          
-         if( DataConvert::SaSdEm::dataEm( saSdEmData, saSdEm, saSdEmTmp ) ) {
+         if( DataConvert::SaSdEmEi::dataEm( saSdEmData, saSdEm, saSdEmTmp ) ) {
+            dataList.push_back(saSdEmData );
+            nExpectedParams++;
+         }
+
+         if( DataConvert::SaSdEmEi::dataEi( saSdEmData, saSdEm, saSdEmTmp ) ) {
             dataList.push_back(saSdEmData );
             nExpectedParams++;
          }

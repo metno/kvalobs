@@ -93,8 +93,8 @@ namespace kvalobs {
       
 
       bool 
-      DataConvert::SaSdEm::
-      dataSa( kvData &data, const SaSdEm &sa, const kvData &saSdEmTemplate  ) 
+      DataConvert::SaSdEmEi::
+      dataSa( kvData &data, const SaSdEmEi &sa, const kvData &saSdEmTemplate  ) 
       {
          if( sa.sa.empty() )
             return false;
@@ -120,8 +120,8 @@ namespace kvalobs {
                   
       
       bool
-      DataConvert::SaSdEm::
-      dataSd( kvData &data, const SaSdEm &sd, const kvData &saSdEmTemplate  ) 
+      DataConvert::SaSdEmEi::
+      dataSd( kvData &data, const SaSdEmEi &sd, const kvData &saSdEmTemplate  ) 
       {
          if( sd.sd.empty() )
             return false;
@@ -138,8 +138,8 @@ namespace kvalobs {
       }
       
       bool 
-      DataConvert::SaSdEm::
-      dataEm( kvData &data, const SaSdEm &em, const kvData &saSdEmTemplate  )
+      DataConvert::SaSdEmEi::
+      dataEm( kvData &data, const SaSdEmEi &em, const kvData &saSdEmTemplate  )
       {
          if( em.em.empty() )
             return false;
@@ -154,32 +154,54 @@ namespace kvalobs {
                   
          return true;
       }
-      
+
+      bool
+      DataConvert::SaSdEmEi::
+      dataEi( kvData &data, const SaSdEmEi &ei, const kvData &saSdEmTemplate  )
+      {
+         if( ei.ei.empty() )
+            return false;
+
+         int v = atoi( ei.ei.c_str() );
+
+         data = kvData( saSdEmTemplate.stationID(), saSdEmTemplate.obstime(),
+                        v /*original*/, 129  /*paramid*/, saSdEmTemplate.tbtime(),
+                        saSdEmTemplate.typeID(), saSdEmTemplate.sensor(), saSdEmTemplate.level(),
+                        v /*corected*/, saSdEmTemplate.controlinfo(), saSdEmTemplate.useinfo(),
+                        saSdEmTemplate.cfailed() );
+
+         return true;
+      }
+
       DataConvert::DataConvert(ParamList &p, const std::string &logid_)
          :  paramList(p), hasRRRtr_(false), 
             hasSa( false ), hasSd( false ), hasEm( false ), logid( logid_ )
       {
       }
 
-      void DataConvert::setSaSdEm( const std::string &sa_sd_em)
+      void DataConvert::setSaSdEmEi( const std::string &sa_sd_em_ei)
       {
-         if( sa_sd_em.length() != 3 ) {
-            IDLOGDEBUG(logid, "DataConvert::setSaSdEm: sa_sd_em.length()!=3: (" << sa_sd_em.length() << ")" );
+         if( sa_sd_em_ei.length() != 4 ) {
+            IDLOGDEBUG(logid, "DataConvert::setSaSdEm: sa_sd_em_ei.length()!=3: (" << sa_sd_em_ei.length() << ")" );
             return;
          }
          
          hasSa = false;
          hasSd = false;
          hasEm = false;
+         hasEi = false;
          
-         if( sa_sd_em[0] == '1')
+         if( sa_sd_em_ei[0] == '1')
             hasSa = true;
          
-         if( sa_sd_em[1] == '1')
+         if( sa_sd_em_ei[1] == '1')
             hasSd = true;
          
-         if( sa_sd_em[2] == '1')
+         if( sa_sd_em_ei[2] == '1')
             hasEm = true;
+
+         if( sa_sd_em_ei[3] == '1')
+            hasEi = true;
       }
       
       bool 
@@ -221,6 +243,8 @@ namespace kvalobs {
       	   saSdEm_.hasEm = true;
       	else if( param=="SD")
       	   saSdEm_.hasSd = true;
+      	else if( param=="E" )
+      	   saSdEm_.hasEi = true;
       	else if( param == "_Esss") {
       	   saSdEm_.hasSa = true;
       	   saSdEm_.hasEm = true;
@@ -671,7 +695,7 @@ namespace kvalobs {
 	                  val.erase(0, 1);
 	               }
 	            }
-	         }else if(name=="SA" || name=="SD" || name=="EM"){
+	         }else if(name=="SA" || name=="SD" || name=="EM" || name=="E"){
 	            if( val.size() <= 0 )
 	               return;
 	            
@@ -681,7 +705,10 @@ namespace kvalobs {
 	            }else if( name == "SD") {
 	               saSdEm_.hasSd = true;
 	               saSdEm_.sd = val;
-	            } else {
+	            } else if( name == "E ") {
+	               saSdEm_.hasEi = true;
+	               saSdEm_.ei = val;
+	            } else{
 	               saSdEm_.hasEm = true;
 	               saSdEm_.em = val;
 	            }
@@ -791,18 +818,27 @@ namespace kvalobs {
 
             bool
             DataConvert::
-            hasSaSdEm( SaSdEm &saSdEm )
+            hasSaSdEmEi( SaSdEmEi &saSdEmEi )
             {
                string sa;
                
-               IDLOGDEBUG(logid, "hasSaSdEm: hasSa=" << (hasSa?"t":"f") << " hasSd=" << (hasSd?"t":"f") << " hasEm=" << (hasEm?"t":"f") << endl
-                        << " saSdEm_.hasEm=" << (saSdEm_.hasEm?"t":"f") << " saSdEm_.hasSa=" << (saSdEm_.hasSa?"t":"f") 
-                        << " saSdEm_.hasSd=" << (saSdEm_.hasSd?"t":"f") << endl
-                        << "saSdEm_.sa=" << saSdEm_.sa << " saSdEm_.em=" << saSdEm_.em 
-                        << " saSdEm_.sd=" << saSdEm_.sd);
+               IDLOGDEBUG(logid, "hasSaSdEmEi: hasSa=" << (hasSa?"t":"f")
+                          << " hasSd=" << (hasSd?"t":"f")
+                          << " hasEm=" << (hasEm?"t":"f")
+                          << " hasEi=" << (hasEi?"t":"f")<< endl
+                          << "saSdEmEi_.hasSa=" << (saSdEm_.hasSa?"t":"f")
+                          << " saSdEmEi_.hasSd=" << (saSdEm_.hasSd?"t":"f")
+                          << " saSdEmEi_.hasEm=" << (saSdEm_.hasEm?"t":"f")
+                          << " saSdEmEi_.hasEi=" << (saSdEm_.hasEi?"t":"f") << endl
+                          << "saSdEmEi_.sa=" << saSdEm_.sa
+                          << " saSdEmEi_.sd=" << saSdEm_.sd
+                          << " saSdEmEi_.em=" << saSdEm_.em
+                          << " saSdEmEi_.ei=" << saSdEm_.ei
+                          );
             
-               if( ! hasSa && ! hasSd && ! hasEm && 
-                   ! saSdEm_.hasSa  && ! saSdEm_.hasSd && ! saSdEm_.hasEm )
+               if( ! hasSa && ! hasSd && ! hasEm && !hasEi &&
+                   ! saSdEm_.hasSa  && ! saSdEm_.hasSd && ! saSdEm_.hasEm &&
+                   !saSdEm_.hasEi)
                   return false;
                
                
@@ -828,9 +864,17 @@ namespace kvalobs {
                   else
                      sa = saSdEm_.sa;
                }
-                              
+
+               if( hasEi || saSdEm_.hasEi ) {
+                  if( saSdEm_.ei.empty() || saSdEm_.ei=="33" ) {
+                     if( saSdEm_.sa == "998" )
+                        saSdEm_.ei = "11";
+                     else if ( hasEi && saSdEm_.hasEi)
+                        saSdEm_.ei = "33";
+                  }
+               }
                saSdEm_.sa = sa;
-               saSdEm = saSdEm_;
+               saSdEmEi = saSdEm_;
                
                return true;
             }
