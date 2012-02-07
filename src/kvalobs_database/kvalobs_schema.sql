@@ -448,6 +448,7 @@ CREATE TABLE obs_pgm (
 	level	  INTEGER NOT NULL,
         nr_sensor INTEGER DEFAULT 1,
 	typeid    INTEGER NOT NULL,
+	priority_message  BOOLEAN DEFAULT TRUE,
 	collector BOOLEAN DEFAULT FALSE,
 	kl00	BOOLEAN DEFAULT FALSE,
 	kl01	BOOLEAN DEFAULT FALSE,
@@ -482,7 +483,7 @@ CREATE TABLE obs_pgm (
 	sun	BOOLEAN DEFAULT FALSE,
         fromtime TIMESTAMP NOT NULL,
         totime   TIMESTAMP DEFAULT NULL,
-	UNIQUE ( stationid, typeid, paramid, level, fromtime, totime )	
+	UNIQUE ( stationid, typeid, paramid, level, fromtime )	
 );
 
 CREATE INDEX obs_pgm_index_fromtime_totime_typeid_stationid ON obs_pgm (fromtime, totime, typeid, stationid);

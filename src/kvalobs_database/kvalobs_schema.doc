@@ -470,7 +470,10 @@ nr_sensor: antall  sensorer for en gitt kombinasjon av paramid, stationid og
            i tabellen data.
            Hvis f.eks. nr_sensor har verdien 3, så har stasjonen 3 sensorer numerert 
            0, 1, og 2. Hva disse tallene betyr er ikke definert i kvalobs. 
-typeid: prioritert typeid som settes inn når noe mangler, se tabellen types. 
+typeid: meldingsformatet, se tabellen types.
+priority_message: angir om meldingsformatet er det prioriterte for gitt kombinasjon 
+                av stationid, paramid og level. Prioritering true innebærer at 
+                observasjonen med gitt typeid skal benyttes ved distribusjon. 
 collector: Observasjonen kan komme til ulike tider, men er ikke p&aring;krevet.
 	Operasjonelt så betyr dette at hvis collector er sann så trenger en ikke
         sjekke innsamlingstidspunkt, det er alltid OK.
