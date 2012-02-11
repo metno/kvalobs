@@ -1,3 +1,9 @@
+kvalobs (2.4.5~rc12-1) lucid; urgency=low
+
+  * Updated debian build script.
+  
+ -- Borge Moe <borge.moe@met.no>  Sat, 11 Feb 2012 17:00:00 +0100
+
 kvalobs (2.4.5~rc11-1) lucid; urgency=low
 
   * Add support for parameter id 129 (E). Use code table paramer 
