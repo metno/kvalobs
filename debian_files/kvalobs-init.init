@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# As start it checks to see if the routine.oslo.dnmi.no IP alias is
+# already defined on this or another machine then tries to run sms. As
+# stop it tries to stop sms then removes the IP alias.
+
+# ssh <host> <command> doesn't setup /usr/local/sbin; and
+# /usr/local/bin is missing from PATH after reboot as well
+PATH=/usr/local/sbin:/usr/local/bin:$PATH
+
+# Used for start_/stop_ program name checking in lib
+#NAME=kvalobs
+#PRIMARY_HOST="kvalobs1 kvalobs2"
+
+case "$1" in
+	start)
+		start kvalobs-start
+		;;
+	stop)
+		start kvalobs-stop
+		;;
+	*)
+	    echo "Usage: `basename $0` {start | stop}"
+		exit 1
+esac

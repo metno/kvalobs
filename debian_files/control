@@ -20,7 +20,7 @@ Standards-Version: 3.7.3
 Package: kvalobs
 Architecture: any
 Depends: kvalobsuser, postgresql | postgresql-8.3 | postgresql-8.4 | postgresql-9.0 | postgresql-9.1
- ,libkvalobs1 (= ${binary:Version})
+ ,libkvalobs1 (>= ${binary:Version})
  ,${shlibs:Depends}, ${misc:Depends}, adduser, debconf
  ,sqlite3
 Suggests: postgresql-client
@@ -47,17 +47,24 @@ Description: Runtime library for kvalobs clients
 Package: libkvcpp1
 Section: libdevel
 Architecture: any
-Depends:  libkvalobs1 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Depends:  libkvalobs1 (>= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: Runtime library for kvalobs clients
  Kvalobs is a quality assurance system for meteorological observations.
 
 Package: libkvcpp-dev
 Section: libdevel
 Architecture: any
-Depends: libkvcpp1 (= ${binary:Version}) , metlibs-putools-dev, 
+Depends: libkvcpp1 (>= ${binary:Version}) , metlibs-putools-dev, 
  ${shlibs:Depends}, ${misc:Depends}
 Description: Client development file for kvalobs
  Kvalobs is a quality assurance system for meteorological observations.
+
+Package: kvalobs-init
+Architecture: any
+Depends: kvalobsuser, metno-pgrepctl, kvalobs
+#Suggests: kvalobs
+Description: Install kvalobs init scripts.
+ Install the init script to start/stop kvalobs on boot and shutdown.
 
 
 #Package: kvdataclt
