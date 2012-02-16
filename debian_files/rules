@@ -135,7 +135,7 @@ install-arch:
 	cp $(CURDIR)/debian/scripts/*.sh $(CURDIR)/debian/tmp/usr/lib/kvalobs/bin
 	cp $(CURDIR)/debian/init/*.conf $(CURDIR)/debian/tmp/etc/init
 	cp $(CURDIR)/debian/init/*.sh $(CURDIR)/debian/tmp/usr/lib/kvalobs/bin
-	cp $(CURDIR)/debian/init/kvalobs-init.conf $(CURDIR)/debian/etc/kvalobs
+	cp $(CURDIR)/debian/init/kvalobs-init.conf $(CURDIR)/debian/tmp/etc/kvalobs
 	cp $(CURDIR)/debian/pgrepctl/kvalobs.conf $(CURDIR)/debian/tmp/etc/pgrepctl
 	#Make and install misrc, posdat and metdat.
 	(cd debian/mi-src-$(MI_SRC_DATE); $(MAKE) OSTYPE=linux; $(MAKE) OSTYPE=linux install)
