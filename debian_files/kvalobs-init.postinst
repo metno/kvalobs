@@ -55,7 +55,7 @@ case "$1" in
     #allow only root to modify kvalobs-init.conf 
     if ! dpkg-statoverride --list /etc/kvalobs/kvalobs-init.conf >/dev/null 2>&1
     then
-       dpkg-statoverride --update --add root $KV_USER 644 /etc/kvalobs/kvalobs-init.conf
+       dpkg-statoverride --update --add root $KV_USER 664 /etc/kvalobs/kvalobs-init.conf
     fi
   
     if ! dpkg-statoverride --list /etc/init.d/kvalobs >/dev/null 2>&1
