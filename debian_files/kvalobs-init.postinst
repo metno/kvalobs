@@ -57,6 +57,11 @@ case "$1" in
     then
        dpkg-statoverride --update --add root $KV_USER 644 /etc/kvalobs/kvalobs-init.conf
     fi
+  
+    if ! dpkg-statoverride --list /etc/init.d/kvalobs >/dev/null 2>&1
+    then
+       dpkg-statoverride --update --add root root 755 /etc/init.d/kvalobs
+    fi
     
     
     update-rc.d kvalobs defaults
