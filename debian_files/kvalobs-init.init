@@ -9,8 +9,6 @@
 PATH=/usr/local/sbin:/usr/local/bin:$PATH
 
 # Used for start_/stop_ program name checking in lib
-#NAME=kvalobs
-#PRIMARY_HOST="kvalobs1 kvalobs2"
 
 case "$1" in
 	start)

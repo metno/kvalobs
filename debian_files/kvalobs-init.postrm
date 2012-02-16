@@ -41,10 +41,12 @@ case "$1" in
 
   purge)
 	dpkg-statoverride --remove /etc/pgrepctl/kvalobs.conf
-   
+   	dpkg-statoverride --remove /etc/kvalobs/kvalobs-init.conf
+   	
    	if [ -h /usr/bin/pgrepctl-kvalobs ]; then
        rm -f /usr/bin/pgrepctl-kvalobs
     fi
+    
 	db_purge || true
 	update-rc.d kvalobs remove || true
     ;;

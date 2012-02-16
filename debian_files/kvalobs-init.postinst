@@ -52,6 +52,13 @@ case "$1" in
 		ln -fs /usr/bin/pgrepctl /usr/bin/pgrepctl-kvalobs 
     fi
     
+    #allow only root to modify kvalobs-init.conf 
+    if ! dpkg-statoverride --list /etc/kvalobs/kvalobs-init.conf >/dev/null 2>&1
+    then
+       dpkg-statoverride --update --add root $KV_USER 644 /etc/kvalobs/kvalobs-init.conf
+    fi
+    
+    
     update-rc.d kvalobs defaults
     ;;
 
