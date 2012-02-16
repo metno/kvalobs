@@ -1,8 +1,11 @@
 kvalobs (2.4.5~rc13-1) lucid; urgency=low
 
   * Add new package kvalobs-init.
+  * Make the init script useful on test machines.
+  * Use the /usr/local/sbin/alias_kvalobs if it exist. Otherwise
+    use the /home/borgem/alias_kvalobsnew as in the test setup.
   
- -- Borge Moe <borge.moe@met.no>  Thu, 16 Feb 2012 14:15:00 +0100
+ -- Borge Moe <borge.moe@met.no>  Thu, 16 Feb 2012 16:45:00 +0100
 
 
 kvalobs (2.4.5~rc12-1) lucid; urgency=low
