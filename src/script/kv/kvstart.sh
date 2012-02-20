@@ -31,7 +31,30 @@ KVCONFIG=__KVCONFIG__
 KVBIN=`$KVCONFIG --bindir`
 KVPID=`$KVCONFIG --localstatedir`/run/kvalobs
 KVCONF=`$KVCONFIG --sysconfdir`/kvalobs
+LIBDIR=$(kvconfig --pkglibdir)
+
+if [ ! -f "$LIBDIR/tool_funcs.sh" ]; then
+	echo "Cant load: $LIBDIR/tool_funcs.sh"
+	exit 1
+fi
+
+. $LIBDIR/tool_funcs.sh
+
 NODENAME=$(uname -n)
+
+res=0
+has_ip_alias=`ipalias_status` || res=$? 
+case "$has_ip_alias" in
+	true) echo "This node '$NODENAME' is the current kvalobs master!"
+		  ;;
+    test) echo "This node '$NODENAME' is an kvalobs test machine!"
+          ;;
+    *) echo
+       echo "  This node '$NODENAME' is NOT the kvalobs master "
+       echo "  or an test machine." 
+	   echo 
+	   exit 1
+esac
 
 if [ -e ${KVCONF}/kv_ctl.conf ]; then
     . ${KVCONF}/kv_ctl.conf
@@ -42,7 +65,7 @@ fi
 
 if [ "$USER" != "$KVUSER" ]; then
    echo "Only the '$KVUSER' user my start kvalobs."
-   echo "You are loggd in as user '$USER'"
+   echo "You are logged in as user '$USER'"
    exit 1
 fi
 

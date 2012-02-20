@@ -1,4 +1,4 @@
-#Orginalskript src/script/kv/kvcron
+#Orginalskript debian_files/kvcron
 #Alle endringer bør gjøres i orginalskripet!!!
 
 MYBIN=/usr/lib/kvalobs/bin

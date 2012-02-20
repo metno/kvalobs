@@ -1,3 +1,9 @@
+KVALOBS_HOSTS="kvalobs1 kvalobs2"
+CHECK_IPALIAS="/home/borgem/alias_kvalobsnew"
+#If it is an test machine comment out the CHECK_IPALIAS
+#CHECK_IPALIAS="/home/borgem/alias_kvalobsnew"
+
+
 KVUSER=kvalobs
 
 START_PROGS="kvQabased kvManagerd kvDataInputd kvServiced kvSynopd"
