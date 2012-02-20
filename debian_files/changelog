@@ -1,3 +1,12 @@
+kvalobs (2.4.5~rc14-1) lucid; urgency=low
+
+  * Install crontab for the kvalobs user on 
+    start as master and remove when stopped. 
+  * Fix cronjobs to sheck the ipalias/test status.
+  
+ -- Borge Moe <borge.moe@met.no>  Mon, 20 Feb 2012 16:45:00 +0100
+
+
 kvalobs (2.4.5~rc13-1) lucid; urgency=low
 
   * Add new package kvalobs-init.
