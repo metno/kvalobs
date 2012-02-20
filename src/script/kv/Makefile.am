@@ -1,6 +1,9 @@
 bin_SCRIPTS = kvstart kvstop kvrestart
+scriptdir = $(libdir)/kvalobs
+	script_DATA = tool_funcs.sh
 
-EXTRA_DIST = kvrestart.sh kvstart.sh kvstop.sh kvcron.template
+EXTRA_DIST = kvrestart.sh kvstart.sh kvstop.sh kvcron.template\
+             tool_funcs.sh
 
 CLEANFILES = kvstart kvstop kvrestart
 
