@@ -35,7 +35,7 @@ NODENAME=$(uname -n)
 KVSTART=$KVBIN/kvstart
 KVSTOP=$KVBIN/kvstop
 LOG=`$KVCONFIG --localstatedir`/log/kvalobs/kvrestart.log
-LIBDIR=$(kvconfig --pkglibdir)
+LIBDIR=`$KVCONFIG --pkglibdir`
 
 if [ ! -f "$LIBDIR/tool_funcs.sh" ]; then
 	echo "Cant load: $LIBDIR/tool_funcs.sh"

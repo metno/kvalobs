@@ -31,7 +31,7 @@ KVCONFIG=__KVCONFIG__
 KVBIN=`$KVCONFIG --bindir`
 KVPID=`$KVCONFIG --localstatedir`/run/kvalobs
 KVCONF=`$KVCONFIG --sysconfdir`/kvalobs
-LIBDIR=$(kvconfig --pkglibdir)
+LIBDIR=`$KVCONFIG --pkglibdir`
 
 if [ ! -f "$LIBDIR/tool_funcs.sh" ]; then
 	echo "Cant load: $LIBDIR/tool_funcs.sh"
