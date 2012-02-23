@@ -1,0 +1,81 @@
+primary_host=""
+ipalias=""
+
+if [ x"$KVCONFIG" = "x" ]; then
+    KVCONFIG=__KVCONFIG__
+fi
+
+if [ x"$KVCONF" = "x" ]; then
+    KVCONF=`$KVCONFIG --sysconfdir`/kvalobs
+fi
+
+
+if [ -f "/etc/kvalobs/kv-ipalias.conf" ]; then
+    . /etc/kvalobs/kv-ipalias.conf
+    mylog=/dev/null
+    [ x"$logfile" = "x" ] || mylog=$logfil
+    echo "Reading logfile '/etc/kvalobs/kv-ipalias.conf'!" | tee -a $mylog
+    return 1
+fi
+
+[ x"$PRIMARY_HOSTS" = "x" ] || primary_host="$PRIMARY_HOSTS" 
+
+if [ x"$IPALIAS_CHOICES" != "x" ]; then
+    for myalias in $ipalias_choices; do
+        if [ -x "$myalias" ]; then
+            ipalias=$myalias
+            break
+        fi
+    done
+fi
+
+
+log()
+{
+    local mylog=""
+	
+    if [ -z "$logfile" ]; then
+        mylog="/dev/null"
+    else
+        mylog=$logfile
+    fi
+    
+	echo "$@"  | tee -a $mylog
+}
+
+
+ipalias_status()
+{
+    local me=`uname -n`
+    local res=0
+    local mylog=""
+
+    if [ -z "$logfile" ]; then
+		mylog="/dev/null"
+    else
+		mylog=$logfile
+    fi
+
+
+    if [ -z "$ipalias" ]; then
+		echo "$me, is an test machine" | tee -a $logfile
+		echo "test"
+		return 0
+    fi
+
+	$ipalias status > /dev/null 2>&1 || res=$?
+	
+    if [ "$res" = "2" -o "$res" = "0" ]; then
+		echo "This machine has the kvalobs ip alias." | tee -a $logfile
+		echo "true" 
+		return 0
+    elif [ "$res" = "1" ]; then
+		echo "Another machine has the kvalobs ip alias." | tee -a $logfile
+		echo "false"
+		return 1
+    else
+		echo "FAILED - kvalobs ipalias status." | tee -a $logfile
+		echo "undefined"
+		return 2
+    fi
+}
