@@ -4,7 +4,7 @@ kvalobs (2.4.5~rc15-1) lucid; urgency=low
     checker silent at segmentation fault at exit.    
   * Fix a few small bugs in tool_funcs.sh.in.
   
- -- Borge Moe <borge.moe@met.no> Fri, 24 Feb 2012 08:45:00 +0100
+ -- Borge Moe <borge.moe@met.no>  Fri, 24 Feb 2012 08:45:00 +0100
 
 kvalobs (2.4.5~rc14-1) lucid; urgency=low
 
