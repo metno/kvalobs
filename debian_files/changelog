@@ -1,3 +1,9 @@
+kvalobs (2.4.5-1) lucid; urgency=low
+
+  * Release of 2.4.5.
+  
+ -- Borge Moe <borge.moe@met.no>  Fri, 24 Feb 2012 11:45:00 +0100
+
 kvalobs (2.4.5~rc15-1) lucid; urgency=low
 
   * Add MALLOC_CHECK_=0 to kv_ctl.conf to keep the heap 
