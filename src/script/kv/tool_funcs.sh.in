@@ -14,20 +14,26 @@ if [ -f "/etc/kvalobs/kv-ipalias.conf" ]; then
     . /etc/kvalobs/kv-ipalias.conf
     mylog=/dev/null
     [ x"$logfile" = "x" ] || mylog=$logfil
-    echo "Reading logfile '/etc/kvalobs/kv-ipalias.conf'!" | tee -a $mylog
-    return 1
+    echo "Reading '/etc/kvalobs/kv-ipalias.conf'!" | tee -a $mylog
 fi
+
+#echo "PRIMARY_HOSTS: $PRIMARY_HOSTS"
+#echo "IPALIAS_CHOICES: $IPALIAS_CHOICES"
+
 
 [ x"$PRIMARY_HOSTS" = "x" ] || primary_host="$PRIMARY_HOSTS" 
 
 if [ x"$IPALIAS_CHOICES" != "x" ]; then
-    for myalias in $ipalias_choices; do
+    for myalias in $IPALIAS_CHOICES; do
+#	echo "myalias: $myalias"
         if [ -x "$myalias" ]; then
             ipalias=$myalias
             break
         fi
     done
 fi
+
+
 
 
 log()
@@ -43,6 +49,7 @@ log()
 	echo "$@"  | tee -a $mylog
 }
 
+log "ipalias: $ipalias"
 
 ipalias_status()
 {
@@ -56,25 +63,24 @@ ipalias_status()
 		mylog=$logfile
     fi
 
-
     if [ -z "$ipalias" ]; then
-		echo "$me, is an test machine" | tee -a $logfile
-		echo "test"
-		return 0
+	echo "$me, is an test machine" >> $logfile
+	echo "test"
+	return 0
     fi
 
-	$ipalias status > /dev/null 2>&1 || res=$?
-	
+    $ipalias status > /dev/null 2>&1 || res=$?
+
     if [ "$res" = "2" -o "$res" = "0" ]; then
-		echo "This machine has the kvalobs ip alias." | tee -a $logfile
+		echo "This machine has the kvalobs ip alias." >> $mylog
 		echo "true" 
 		return 0
     elif [ "$res" = "1" ]; then
-		echo "Another machine has the kvalobs ip alias." | tee -a $logfile
+		echo "Another machine has the kvalobs ip alias." >> $mylog
 		echo "false"
 		return 1
     else
-		echo "FAILED - kvalobs ipalias status." | tee -a $logfile
+		echo "FAILED - kvalobs ipalias status." >> $mylog
 		echo "undefined"
 		return 2
     fi
