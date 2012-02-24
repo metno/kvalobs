@@ -1,3 +1,11 @@
+kvalobs (2.4.5~rc15-1) lucid; urgency=low
+
+  * Add MALLOC_CHECK_=0 to kv_ctl.conf to keep the heap 
+    checker silent at segmentation fault at exit.    
+  * Fix a few small bugs in tool_funcs.sh.in.
+  
+ -- Borge Moe <borge.moe@met.no> Fri, 24 Feb 2012 08:45:00 +0100
+
 kvalobs (2.4.5~rc14-1) lucid; urgency=low
 
   * Install crontab for the kvalobs user on 
