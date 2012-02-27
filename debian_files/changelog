@@ -1,3 +1,10 @@
+kvalobs (2.4.6-1) lucid; urgency=low
+
+  * Release 2.4.6.
+  
+ -- Borge Moe <borge.moe@met.no>  Mon, 27 Feb 2012 21:00:00 +0100
+
+
 kvalobs (2.4.6~rc1-1) lucid; urgency=low
 
   * Fix ipalias check bug.
