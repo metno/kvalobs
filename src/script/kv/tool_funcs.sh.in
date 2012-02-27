@@ -64,14 +64,14 @@ ipalias_status()
     fi
 
     if [ -z "$ipalias" ]; then
-	echo "$me, is an test machine" >> $logfile
-	echo "test"
-	return 0
+        echo "$me, is an test machine" >> $logfile
+        echo "test"
+        return 0
     fi
 
     $ipalias status > /dev/null 2>&1 || res=$?
 
-    if [ "$res" = "2" -o "$res" = "0" ]; then
+    if [ "$res" = "2" ]; then
 		echo "This machine has the kvalobs ip alias." >> $mylog
 		echo "true" 
 		return 0
@@ -79,6 +79,10 @@ ipalias_status()
 		echo "Another machine has the kvalobs ip alias." >> $mylog
 		echo "false"
 		return 1
+    elif [ "$res" = "0" ]; then
+        echo "No machine has the kvalobs ip alias." >> $mylog
+        echo "false"
+        return 1
     else
 		echo "FAILED - kvalobs ipalias status." >> $mylog
 		echo "undefined"
