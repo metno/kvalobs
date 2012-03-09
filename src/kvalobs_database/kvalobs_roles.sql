@@ -34,3 +34,7 @@ CREATE ROLE kvproc INHERIT LOGIN PASSWORD 'kvproc' IN ROLE kv_write ;
 --A kvalobs administration role.
 --Set a default password. This shuold be altered by an administrator.
 CREATE ROLE kvadmin INHERIT LOGIN PASSWORD 'kvadmin12' IN ROLE kv_admin ;
+
+
+--A role to use for replication.
+CREATE ROLE kvrep INHERIT LOGIN REPLICATION PASSWORD 'kvrep#21';
