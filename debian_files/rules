@@ -132,12 +132,14 @@ install-arch:
 	cp $(CURDIR)/debian/lam2kv/bin/hirlam2kvalobs.sh $(CURDIR)/debian/tmp/usr/lib/kvalobs/bin
 	cp $(CURDIR)/debian/lam2kv/bin/lam2kv.cron $(CURDIR)/debian/tmp/usr/lib/kvalobs/bin
 	cp $(CURDIR)/debian/kvcron $(CURDIR)/debian/tmp/etc/kvalobs
+	cp $(CURDIR)/debian/kvincron $(CURDIR)/debian/tmp/etc/kvalobs
 	cp $(CURDIR)/debian/scripts/*.sh $(CURDIR)/debian/tmp/usr/lib/kvalobs/bin
 	cp $(CURDIR)/debian/init/kvalobs $(CURDIR)/debian/tmp/etc/init.d
 	cp $(CURDIR)/debian/init/kvalobs-st*.conf $(CURDIR)/debian/tmp/etc/init
 	cp $(CURDIR)/debian/init/*.sh $(CURDIR)/debian/tmp/usr/lib/kvalobs/bin
 	cp $(CURDIR)/debian/init/kvalobs-init.conf $(CURDIR)/debian/tmp/etc/kvalobs
-	cp $(CURDIR)/debian/pgrepctl/kvalobs.conf $(CURDIR)/debian/tmp/etc/pgrepctl
+	cp $(CURDIR)/debian/pgrepctl/kvalobs.conf.template $(CURDIR)/debian/tmp/etc/pgrepctl
+	cp $(CURDIR)/etc/kv2norcom.conf.template $(CURDIR)/debian/tmp/etc/kvalobs
 #   cp $(CURDIR)/debian/kvstart-postgres $(CURDIR)/debian/tmp/usr/bin
 #   cp $(CURDIR)/debian/kvstop-postgres $(CURDIR)/debian/tmp/usr/bin
 

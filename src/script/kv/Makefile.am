@@ -1,9 +1,9 @@
-bin_SCRIPTS = kvstart kvstop kvrestart kvstatus
+bin_SCRIPTS = kvstart kvstop kvrestart kvstatus kv2norcom
 scriptdir = $(libdir)/kvalobs
 script_DATA = tool_funcs.sh
 
 EXTRA_DIST = kvrestart.sh kvstart.sh kvstop.sh kvstatus.sh\
-             kvcron.template tool_funcs.sh.in
+             kvcron.template tool_funcs.sh.in kv2norcom
 
 CLEANFILES = kvstart kvstop kvrestart kvstatus tool_funcs.sh
 

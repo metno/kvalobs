@@ -1,0 +1,9 @@
+MESSAGE_KEYS="synop bufr"
+SOURCE_AND_DEST_synop="/var/lib/kvsynopd/synop2norcom \
+                       /var/lib/kvalobs/synop2norcom"
+SOURCE_AND_DEST_bufr="/var/lib/kvbufrd/bufr2norcom \
+                      kvalobs@kvalobs.oslo.dnmi.no:/var/lib/kvalobs/bufr2norcom"
+ 
+
+
+

@@ -63,7 +63,7 @@ Description: Client development file for kvalobs
 
 Package: kvalobs-init
 Architecture: any
-Depends: kvalobsuser, metno-pgrepctl, kvalobs
+Depends: kvalobsuser, metno-pgrepctl, kvalobs, incron
 #Suggests: kvalobs
 Description: Install kvalobs init scripts.
  Install the init script to start/stop kvalobs on boot and shutdown.

@@ -1,0 +1,126 @@
+#! /bin/sh
+
+# This script assume one parameter that specify the directory to scan
+# for messages to transfer to NORCOM. It is expected to run from
+# incron. It assumes that incron stop listen on event when the script run.
+#
+# It is tested with the following incrontab specification.
+#
+#   /var/lib/kvbufrd/bufr2norcom IN_MOVED_TO,IN_NO_LOOP /metno/kvalobs/kvcp-bufr2norcom $@
+#   /var/lib/kvsynopd/synop2norcom IN_MOVED_TO,IN_NO_LOOP /metno/kvalobs/kvcp-synop2norcom $@
+# 
+# It reads the configuration from /etc/kvalobs/kv2norcom.conf
+#
+# The format to the configuratin file is 
+# 
+# DESTHOST - The host to send the messages to.
+# MESSAGES_KEYS - a list of keys to identify source and destination directories.
+# SOURCE_AND_DEST_key - One entry for each key in MESSAGES_KEYS.
+#
+# Ex.
+#
+# MESSAGE_KEYS="synop bufr"
+#
+# SOURCE_AND_DEST_synop="/var/lib/kvsynopd/synop2norcom  kvalobs@kvalobs.oslo.dnmi.no:/var/lib/kvalobs/synop2norcom"
+# SOURCE_AND_DEST_bufr="/var/lib/kvbufrd/bufr2norcom  kvalobs@kvalobs.oslo.dnmi.no:/var/lib/kvalobs/bufr2norcom"
+#
+# The script use rsync to copy the files. Ensure that kvalobs user account can log in with ssh on the destination accounts
+# without use off passwords.
+
+CONF=`kvconfig --sysconfdir`/kvalobs/kv2norcom.conf
+DESTDIR=""
+SRCDIR=""
+LOGDIR=$(kvconfig --logdir)
+LOG="$LOGDIR/kv2norcom.log"
+
+getconf()
+{
+   local myvar=""
+   local myval=""
+   local next="source"
+   local DIR=`basename $1`
+   local msg=""
+
+   for key in $MESSAGE_KEYS; do
+       #myvar="SOURCE_AND_DEST_$key"
+       myval=$(eval echo "\$SOURCE_AND_DEST_$key")
+
+       if [ -z "$myval" ]; then
+           log "Missing definition of key '$myvar' in the configuration file $CONF"
+           continue
+       fi
+
+       next=source
+
+       for val in $myval; do
+           case $next in
+               source) msg=`basename $val`
+                       if [ "$msg" != "$DIR" ]; then
+                           continue 2
+                       fi
+                       SRCDIR="$1/*"
+                       next=dest
+                       ;;
+               dest) DESTDIR="$val"
+                     LOG="$LOGDIR/kv2norcom-$key.log"
+                     break 2
+                     ;;
+               *) log "BUG in script!!!!!!"
+                  ;;
+           esac
+       done
+   done
+}
+
+truncatelog() 
+{
+    local tmplog="$1-tmp"
+    if [ -f $1 ]; then
+        tail -n 100 $1 > $tmplog
+        mv $tmplog $1
+    fi
+}
+
+log()
+{
+    local logtime=""
+    logtime=`date +'%Y-%m-%d %H:%M:%S:'`
+
+    [ -d $LOGDIR ] &&  echo "$logtime $@" >> $LOG
+}
+
+truncatelog $LOG
+
+if [ ! -f "$CONF" ]; then
+   log "Cant read the configuration file: '$CONF'"
+   exit 1
+fi
+
+. $CONF
+
+if [ $# -lt 1 ]; then 
+    log "Missing argument that specify the directory to scan."
+    exit 1
+fi
+
+if [ ! -d $1 ]; then
+    log "The directory, '$1', is not defined as source for any MESSAGES_KEYS in the configuration file '$CONF'."
+    log "This may be a wrong specification in the incrontab file."
+    exit 1
+fi 
+
+getconf $1
+
+if [ -z "$DESTDIR" ]; then
+    log "Ivalid message directory name '$1'. Not defined in $CONF."
+    exit 1
+fi
+
+truncatelog $LOG
+
+log "Transfer started: $SRCDIR -> $DESTDIR"
+
+rsync -t --exclude tmp --remove-source-files $SRCDIR $DESTDIR >> $LOG 2>&1
+
+log "Transfer ended."
+

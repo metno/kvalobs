@@ -1,0 +1,26 @@
+pg_version_and_cluster="9.1 kvalobs"
+
+master_host="kvalobsnew.met.no"
+nodes = (kvalobs1, kvalobs2 )
+
+kvalobs1 {
+        host = "kvalobs1.met.no"
+        pgconnect="host=kvalobs1.met.no port=5432 dbname=kvalobs user=kvrep password=kvrep#21"
+        pgcluster="/var/lib/postgresql/9.1/kvalobs/cluster"
+
+        recovery {
+                standby_mode = on
+                primary_conninfo = "host=157.249.16.86 port=5432 user=kvrep password=kvrep#21"
+        }               
+}
+
+kvalobs2 {
+        host = "kvalobs2.met.no"
+        pgconnect="host=kvalobs2.met.no port=5432 dbname=kvalobs user=kvrep password=kvrep#21"
+        pgcluster="/var/lib/postgresql/9.1/kvalobs/cluster"
+
+        recovery {
+                standby_mode = on
+                primary_conninfo = "host=157.249.16.61 port=5432 user=kvrep password=kvrep#21"
+        }
+}

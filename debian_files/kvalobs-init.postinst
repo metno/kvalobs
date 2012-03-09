@@ -43,9 +43,16 @@ case "$1" in
   configure)
     #Fix owner, group and permission. 
     # only do something when no setting exists
-    if ! dpkg-statoverride --list /etc/pgrepctl/kvalobs.conf >/dev/null 2>&1
-    then
-       dpkg-statoverride --update --add root $KV_USER 660 /etc/pgrepctl/kvalobs.conf
+    
+    if [ ! -f /etc/pgrepctl/kvalobs.conf ]; then
+        if [ -f  /etc/pgrepctl/kvalobs.conf.template ]; then
+            cp -f /etc/pgrepctl/kvalobs.conf.template /etc/pgrepctl/kvalobs.conf
+        fi
+    fi
+    
+    if [ -f  /etc/pgrepctl/kvalobs.conf ]; then
+        chown root.$KV_USER /etc/pgrepctl/kvalobs.conf
+        chmod 0660 /etc/kvalobs/kv2norcom.conf
     fi
 
 	if [ -x "/usr/bin/pgrepctl" ]; then
