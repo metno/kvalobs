@@ -18,4 +18,6 @@ install-data-hook:
 #pkgconfig_DATA = @PACKAGE_TARNAME@.pc
 #$(pkgconfig_DATA): config.status
 
+EXTRA_DIST = etc/kv2norcom.conf.template
+
 include mk/debian.mk
