@@ -1,3 +1,13 @@
+kvalobs (2.4.7~rc1-1) lucid; urgency=low
+
+  * New release candidate.
+  * Update the pkgscript with the new setup for transfer of data to NORCOM.
+  * Add script a script kv2norcom to transfer data to NORCOM.
+  * Add a new dependency on incron.
+  
+ -- Borge Moe <borge.moe@met.no>  Fri, 9 Mar 2012 17:30:00 +0100
+
+
 kvalobs (2.4.6-1) lucid; urgency=low
 
   * Release 2.4.6.
