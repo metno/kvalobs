@@ -6,16 +6,18 @@
 #
 # It is tested with the following incrontab specification.
 #
-#   /var/lib/kvbufrd/bufr2norcom IN_MOVED_TO,IN_NO_LOOP /metno/kvalobs/kvcp-bufr2norcom $@
-#   /var/lib/kvsynopd/synop2norcom IN_MOVED_TO,IN_NO_LOOP /metno/kvalobs/kvcp-synop2norcom $@
+#   /var/lib/kvbufrd/bufr2norcom IN_MOVED_TO,IN_NO_LOOP /metno/kvalobs/kv2norcom $@
+#   /var/lib/kvsynopd/synop2norcom IN_MOVED_TO,IN_NO_LOOP /metno/kvalobs/kv2norcom $@
 # 
 # It reads the configuration from /etc/kvalobs/kv2norcom.conf
 #
 # The format to the configuratin file is 
 # 
-# DESTHOST - The host to send the messages to.
 # MESSAGES_KEYS - a list of keys to identify source and destination directories.
 # SOURCE_AND_DEST_key - One entry for each key in MESSAGES_KEYS.
+#   It is a list of two components, the source  directory and the 
+#   destination directory. The source and destination dierctory
+#   must have a format accepted by rsync.  
 #
 # Ex.
 #
@@ -33,6 +35,10 @@ SRCDIR=""
 LOGDIR=$(kvconfig --logdir)
 LOG="$LOGDIR/kv2norcom.log"
 
+
+#getconf sets the variables DESTDIR, SRCDIR and LOG.
+#It use the variables MESSAGE_KEYS and SOURCE_AND_DEST_key
+#from the configuration file.
 getconf()
 {
    local myvar=""
