@@ -118,7 +118,7 @@ fi
 getconf $1
 
 if [ -z "$DESTDIR" ]; then
-    log "Ivalid message directory name '$1'. Not defined in $CONF."
+    log "Invalid message directory name '$1'. Not defined in $CONF."
     exit 1
 fi
 
