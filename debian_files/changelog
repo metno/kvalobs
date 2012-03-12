@@ -1,3 +1,10 @@
+kvalobs (2.4.7-1) lucid; urgency=low
+
+  * New release.
+  * Updated documentation in kv2norcom script.
+  
+ -- Borge Moe <borge.moe@met.no>  Mon, 12 Mar 2012 08:45:00 +0100
+
 kvalobs (2.4.7~rc1-1) lucid; urgency=low
 
   * New release candidate.
