@@ -41,6 +41,18 @@ namespace {
 
 using namespace std;
 
+bool
+dnmi::file::
+mkdir(const std::string &newdir, const char *path_)
+{
+   string path;
+
+   if( path_ )
+      path = path_;
+
+   return mkdir( newdir, path );
+}
+
 
 
 bool

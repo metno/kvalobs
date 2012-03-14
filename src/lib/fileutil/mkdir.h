@@ -57,7 +57,8 @@ namespace dnmi{
 	 * \path  create the new directoryes in this dierectory.
 	 * \return true if the newdir exist or was created. And false otherwise.
 	 */
-	bool mkdir(const std::string &newdir, const std::string &path=std::string());    
+	bool mkdir(const std::string &newdir, const std::string &path );
+	bool mkdir(const std::string &newdir, const char *path="");
     
     /** @} */
   }
