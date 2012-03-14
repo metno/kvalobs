@@ -29,6 +29,7 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include <stdio.h>
+#include <string.h>
 #include "miTimeParse.h"
 
 using namespace std;
@@ -38,7 +39,7 @@ namespace{
 enum TimeSpec{Year=0, Month, Day, Hour, Minute, Second,
               TimeSpecEnd};
 	
-const string validSpecifiers("YymdHMS");
+const char *validSpecifiers="YymdHMS";
 
 string::size_type 
 nextInFormat(string::size_type i, 
@@ -277,7 +278,7 @@ nextInFormat(string::size_type i,
 		if(nextChar=='%')		
 			return i;
 			
-		if(validSpecifiers.find(nextChar)==string::npos){
+		if( index( validSpecifiers, nextChar ) == NULL ){
 			ostringstream ost;
 			ost << "Format: Invalid specifier (" << nextChar << ") at: " << i-1;
 			throw  miutil::miTimeParseException(ost.str(), i-1, true);
