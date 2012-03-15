@@ -1,4 +1,4 @@
 usr/share/kvalobs/idl/*.idl
 usr/include/kvalobs/*
-usr/lib/libkvalobs_*.*a
+usr/lib/libkvalobs2_*.*a
 usr/lib/pkgconfig/*
