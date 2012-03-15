@@ -34,6 +34,7 @@ stressTestGetData_LDFLAGS =  -pthread
 stressTestGetData_LDADD =  $(top_builddir)/src/service-libs/kvcpp/libkvalobs_kvcpp.la \
                 $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
 				$(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
+				$(top_builddir)/src/service-libs/kvcpp/libkvalobs_kvcpp.la \
 				$(putools_LIBS)\
 				$(BOOST_THREAD_LIB) \
                 -lm
