@@ -5,8 +5,8 @@ bin_PROGRAMS = kv2metdat
 kv2metdat_SOURCES = kv2metdat.cc 
 kv2metdat_CPPFLAGS = $(AM_CPPFLAGS)
 kv2metdat_LDFLAGS = -pthread -export-dynamic
-kv2metdat_LDADD = $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
-                  $(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la \
-                  $(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la \
-                  $(top_builddir)/src/lib/dnmithread/libkvalobs_dnmithread.la\
+kv2metdat_LDADD = $(top_builddir)/src/lib/kvalobs/libkvalobs2_kvalobs.la \
+                  $(top_builddir)/src/lib/kvdb/libkvalobs2_kvdb.la \
+                  $(top_builddir)/src/lib/fileutil/libkvalobs2_fileutil.la \
+                  $(top_builddir)/src/lib/dnmithread/libkvalobs2_dnmithread.la\
                   $(putools_LIBS) $(BOOST_THREAD_LIB)  -ldl -lm

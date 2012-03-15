@@ -22,7 +22,7 @@ Standards-Version: 3.7.3
 Package: kvalobs
 Architecture: any
 Depends: kvalobsuser, postgresql | postgresql-8.3 | postgresql-8.4 | postgresql-9.0 | postgresql-9.1
- ,libkvalobs4 (>= ${binary:Version})
+ ,libkvalobs2 (>= ${binary:Version})
  ,${shlibs:Depends}, ${misc:Depends}, adduser, debconf
  ,sqlite3
 Suggests: postgresql-client
@@ -38,7 +38,7 @@ Description: Install kvalobs user
  run by this user.
 
 
-Package: libkvalobs4
+Package: libkvalobs2
 Section: libdevel
 Architecture: any
 Depends:  ${shlibs:Depends}, ${misc:Depends}
@@ -46,17 +46,17 @@ Description: Runtime library for kvalobs clients
  Kvalobs is a quality assurance system for meteorological observations.
 
 
-Package: libkvcpp4
+Package: libkvcpp2
 Section: libdevel
 Architecture: any
 Depends:  libkvalobs4 (>= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: Runtime library for kvalobs clients
  Kvalobs is a quality assurance system for meteorological observations.
 
-Package: libkvcpp-dev
+Package: libkvcpp2-dev
 Section: libdevel
 Architecture: any
-Depends: libkvcpp4 (>= ${binary:Version}) , metlibs-putools-dev, 
+Depends: libkvcpp2 (>= ${binary:Version}) , metlibs-putools-dev, 
  ${shlibs:Depends}, ${misc:Depends}
 Description: Client development file for kvalobs
  Kvalobs is a quality assurance system for meteorological observations.

@@ -1,8 +1,8 @@
 AM_CPPFLAGS = -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib -D_REENTRANT
 
-lib_LTLIBRARIES = libkvalobs_kvalobs.la
+lib_LTLIBRARIES = libkvalobs2_kvalobs.la
 
-libkvalobs_kvalobs_la_SOURCES = \
+libkvalobs2_kvalobs_la_SOURCES = \
 	kvDbGate.cc \
 	kvStationInfo.cc \
 	kvStationInfoExt.cc \
@@ -42,7 +42,7 @@ libkvalobs_kvalobs_la_SOURCES = \
 	DataInsertTransaction.cc
 
 
-libkvalobs_kvalobs_la_CPPFLAGS = $(AM_CPPFLAGS) $(putools_CFLAGS) \
+libkvalobs2_kvalobs_la_CPPFLAGS = $(AM_CPPFLAGS) $(putools_CFLAGS) \
                          -DPKGLIBDIR="\""$(pkglibdir)"\"" \
                          -DSYSCONFDIR="\""$(sysconfdir)"\"" \
                          -DLIBDIR="\""$(libdir)"\"" \
@@ -51,17 +51,17 @@ libkvalobs_kvalobs_la_CPPFLAGS = $(AM_CPPFLAGS) $(putools_CFLAGS) \
                          -DLOCALSTATEDIR="\""$(localstatedir)"\"" \
                          -DPREFIX="\""$(prefix)"\"" 
 
-#libkvalobs_kvalobs_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@ $(putools_LDFLAGS)
-libkvalobs_kvalobs_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@ 
+#libkvalobs2_kvalobs_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@ $(putools_LDFLAGS)
+libkvalobs2_kvalobs_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@ 
 
-libkvalobs_kvalobs_la_LIBADD = $(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
-                       $(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la \
-                       $(top_builddir)/src/lib/milog/libkvalobs_milog.la \
-                       $(top_builddir)/src/lib/dnmithread/libkvalobs_dnmithread.la \
-                       $(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la \
-                       $(top_builddir)/src/lib/corbahelper/libkvalobs_corbahelper.la \
-                       $(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la \
-                       $(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
+libkvalobs2_kvalobs_la_LIBADD = $(top_builddir)/src/lib/miutil/libkvalobs2_miutil.la \
+                       $(top_builddir)/src/lib/fileutil/libkvalobs2_fileutil.la \
+                       $(top_builddir)/src/lib/milog/libkvalobs2_milog.la \
+                       $(top_builddir)/src/lib/dnmithread/libkvalobs2_dnmithread.la \
+                       $(top_builddir)/src/lib/kvdb/libkvalobs2_kvdb.la \
+                       $(top_builddir)/src/lib/corbahelper/libkvalobs2_corbahelper.la \
+                       $(top_builddir)/src/lib/miconfparser/libkvalobs2_miconfparser.la \
+                       $(top_builddir)/src/lib/kvskel/libkvalobs2_kvskel.la \
 				       $(BOOST_THREAD_LIB) $(omniORB4_LIBS)
 
 kvalobsincludedir = $(pkgincludedir)/kvalobs

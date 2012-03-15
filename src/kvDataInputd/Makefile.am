@@ -34,18 +34,18 @@ kvdataclt_SOURCES =  $(top_srcdir)/src/lib/kvalobs/kvapp.h \
 
 kvDataInputd_CPPFLAGS = $(AM_CPPFLAGS) $(libxmlpp_CFLAGS)
 kvDataInputd_LDFLAGS = -pthread -export-dynamic
-kvDataInputd_LDADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs_decoderbase.la \
-		     		 $(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
-		     		 $(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
-                     $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
-                     $(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la \
-                     $(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la \
-                     $(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la \
-                     $(top_builddir)/src/lib/dnmithread/libkvalobs_dnmithread.la\
-                     $(top_builddir)/src/lib/corbahelper/libkvalobs_corbahelper.la \
-                     $(top_builddir)/src/lib/milog/libkvalobs_milog.la \
-                     $(top_builddir)/src/lib/kvskel/libkvalobs_kvadmininterface.la \
-                     $(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
+kvDataInputd_LDADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs2_decoderbase.la \
+		     		 $(top_builddir)/src/lib/decodeutility/libkvalobs2_decodeutility.la \
+		     		 $(top_builddir)/src/lib/miutil/libkvalobs2_miutil.la \
+                     $(top_builddir)/src/lib/kvalobs/libkvalobs2_kvalobs.la \
+                     $(top_builddir)/src/lib/kvdb/libkvalobs2_kvdb.la \
+                     $(top_builddir)/src/lib/fileutil/libkvalobs2_fileutil.la \
+                     $(top_builddir)/src/lib/miconfparser/libkvalobs2_miconfparser.la \
+                     $(top_builddir)/src/lib/dnmithread/libkvalobs2_dnmithread.la\
+                     $(top_builddir)/src/lib/corbahelper/libkvalobs2_corbahelper.la \
+                     $(top_builddir)/src/lib/milog/libkvalobs2_milog.la \
+                     $(top_builddir)/src/lib/kvskel/libkvalobs2_kvadmininterface.la \
+                     $(top_builddir)/src/lib/kvskel/libkvalobs2_kvskel.la \
                      $(putools_LIBS) $(omniORB4_LIBS) $(libxmlpp_LIBS) $(BOOST_THREAD_LIB)  -ldl
 
 
@@ -59,9 +59,9 @@ kvdataclt_CPPFLAGS = $(AM_CPPFLAGS) -static-libtool-libs \
                      -DPREFIX="\""$(prefix)"\"" 
 
 kvdataclt_LDFLAGS = -pthread -static  
-kvdataclt_LDADD = $(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la \
-                  $(top_builddir)/src/lib/dnmithread/libkvalobs_dnmithread.la\
-                  $(top_builddir)/src/lib/corbahelper/libkvalobs_corbahelper.la \
-                  $(top_builddir)/src/lib/milog/libkvalobs_milog.la \
-                  $(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
+kvdataclt_LDADD = $(top_builddir)/src/lib/miconfparser/libkvalobs2_miconfparser.la \
+                  $(top_builddir)/src/lib/dnmithread/libkvalobs2_dnmithread.la\
+                  $(top_builddir)/src/lib/corbahelper/libkvalobs2_corbahelper.la \
+                  $(top_builddir)/src/lib/milog/libkvalobs2_milog.la \
+                  $(top_builddir)/src/lib/kvskel/libkvalobs2_kvskel.la \
                   $(omniORB4_LIBS) 

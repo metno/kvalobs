@@ -14,8 +14,8 @@ AC_PROG_YACC
 AC_PROG_CXX
 AC_PROG_INSTALL
 
-AC_SUBST([OLD_KVALOBSLIBS_SO_VERSION], [3:0:0])
-AC_SUBST([KVALOBSLIBS_SO_VERSION], [4:0:0])
+AC_SUBST([OLD_KVALOBSLIBS_SO_VERSION], [0:0:0])
+AC_SUBST([KVALOBSLIBS_SO_VERSION], [1:0:0])
 
 AC_CONFIG_FILES([Makefile
                  kvconfig
@@ -50,7 +50,7 @@ AC_CONFIG_FILES([Makefile
                  src/lib/decoder/synopdecoder/Makefile
                  src/service-libs/Makefile
                  src/service-libs/kvcpp/Makefile
-                 src/service-libs/kvcpp/libkvcpp.pc
+                 src/service-libs/kvcpp/libkvcpp2.pc
                  src/service-libs/kvcpp/corba/Makefile
                  src/service-libs/kvcpp/mock/Makefile
                  src/data2kv/Makefile

@@ -1,6 +1,6 @@
 AM_CPPFLAGS = -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib/ -I$(top_builddir)/src/lib/kvskel
 
-lib_LTLIBRARIES = libkvalobs_decodeutility.la
+lib_LTLIBRARIES = libkvalobs2_decodeutility.la
 
 
 decodeutilityincludedir = $(pkgincludedir)/decodeutility
@@ -13,7 +13,7 @@ nobase_decodeutilityinclude_HEADERS = 	decodeutility.h \
 	sorteddata.h
 
 
-libkvalobs_decodeutility_la_SOURCES = \
+libkvalobs2_decodeutility_la_SOURCES = \
 	decodeutility.h decodeutility.cc \
 	kvalobsdata.h kvalobsdata.cc \
 	kvalobsdataparser.h kvalobsdataparser.cc \
@@ -22,12 +22,12 @@ libkvalobs_decodeutility_la_SOURCES = \
 	DataReinserter.h bits/DataReinserter.tcc \
 	sorteddata.h
 
-libkvalobs_decodeutility_la_CPPFLAGS = $(AM_CPPFLAGS) $(putools_CFLAGS) $(libxmlpp_CFLAGS) $(omniORB4_CFLAGS) $(BOOST_CPPFLAGS)
-libkvalobs_decodeutility_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@
-libkvalobs_decodeutility_la_LIBADD = $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
-                             $(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
-                             $(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
-			                 $(top_builddir)/src/lib/milog/libkvalobs_milog.la \
+libkvalobs2_decodeutility_la_CPPFLAGS = $(AM_CPPFLAGS) $(putools_CFLAGS) $(libxmlpp_CFLAGS) $(omniORB4_CFLAGS) $(BOOST_CPPFLAGS)
+libkvalobs2_decodeutility_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@
+libkvalobs2_decodeutility_la_LIBADD = $(top_builddir)/src/lib/kvalobs/libkvalobs2_kvalobs.la \
+                             $(top_builddir)/src/lib/kvskel/libkvalobs2_kvskel.la \
+                             $(top_builddir)/src/lib/miutil/libkvalobs2_miutil.la \
+			                 $(top_builddir)/src/lib/milog/libkvalobs2_milog.la \
                              $(libxmlpp_LIBS) \
                              $(omniORB4_LIBS) \
                              $(BOOST_LDFLAGS) \
@@ -44,11 +44,11 @@ decodeutilitytest_SOURCES = \
 	test/kvDataFormatterTest.cc \
 	test/test.cc
 
-decodeutilitytest_CPPFLAGS = $(libkvalobs_decodeutility_la_CPPFLAGS) $(gtest_CFLAGS)
+decodeutilitytest_CPPFLAGS = $(libkvalobs2_decodeutility_la_CPPFLAGS) $(gtest_CFLAGS)
 	
 
 decodeutilitytest_LDADD = \
-	libkvalobs_decodeutility.la \
-	$(libkvalobs_decodeutility_la_LIBADD) \
+	libkvalobs2_decodeutility.la \
+	$(libkvalobs2_decodeutility_la_LIBADD) \
 	$(putools_LIBS)\
 	$(gtest_LIBS)
