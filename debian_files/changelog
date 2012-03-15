@@ -1,6 +1,15 @@
+kvalobs (2.5.0~rc2-1) lucid; urgency=low
+
+  * New release candidate.
+  * Changed the name on the library package so multiple
+    versions of the package can exist on the system. 
+  
+ -- Borge Moe <borge.moe@met.no>  Thu, 15 Mar 2012 22:30:00 +0100
+
+
 kvalobs (2.5.0~rc1-1) lucid; urgency=low
 
-  * New releas candidate.
+  * New release candidate.
   * Changed the linking of static libs as puTools.
   
  -- Borge Moe <borge.moe@met.no>  Thu, 15 Mar 2012 13:45:00 +0100
