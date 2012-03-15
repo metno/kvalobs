@@ -29,6 +29,6 @@ libcorbakvapp_la_LIBADD = $(top_builddir)/src/lib/milog/libkvalobs_milog.la \
                           $(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
                           $(top_builddir)/src/lib/corbahelper/libkvalobs_corbahelper.la \
                           $(top_builddir)/src/lib/dnmithread/libkvalobs_dnmithread.la \
-                          $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la\
-                          $(putools_LIBS) 	
+                          $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la
  
+	

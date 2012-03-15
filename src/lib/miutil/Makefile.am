@@ -13,7 +13,7 @@ libkvalobs_miutil_la_SOURCES = \
 
 libkvalobs_miutil_la_CPPFLAGS = $(putools_CFLAGS)
 libkvalobs_miutil_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@
-libkvalobs_miutil_la_LIBADD = $(putools_LIBS)
+#libkvalobs_miutil_la_LIBADD = 
 
 miutilincludedir = $(pkgincludedir)/miutil
 miutilinclude_HEADERS = cmprspace.h commastring.h miTimeParse.h trimstr.h
@@ -33,4 +33,5 @@ libmiutiltest_LDADD = \
 	libkvalobs_miutil.la \
 	$(libkvalobs_miutil_la_LIBADD) \
 	$(top_builddir)/src/lib/milog/libkvalobs_milog.la \
+	$(putools_LIBS)\
 	$(gtest_LIBS)

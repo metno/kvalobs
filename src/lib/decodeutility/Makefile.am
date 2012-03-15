@@ -28,7 +28,6 @@ libkvalobs_decodeutility_la_LIBADD = $(top_builddir)/src/lib/kvalobs/libkvalobs_
                              $(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
                              $(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
 			                 $(top_builddir)/src/lib/milog/libkvalobs_milog.la \
-                             $(putools_LIBS)  \
                              $(libxmlpp_LIBS) \
                              $(omniORB4_LIBS) \
                              $(BOOST_LDFLAGS) \
@@ -51,4 +50,5 @@ decodeutilitytest_CPPFLAGS = $(libkvalobs_decodeutility_la_CPPFLAGS) $(gtest_CFL
 decodeutilitytest_LDADD = \
 	libkvalobs_decodeutility.la \
 	$(libkvalobs_decodeutility_la_LIBADD) \
+	$(putools_LIBS)\
 	$(gtest_LIBS)

@@ -27,6 +27,6 @@ comobsdecoder_la_LIBADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs
                           $(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la \
 			  			  $(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
                           $(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la \
-                          $(putools_LIBS) $(libxml2_LIBS)
+                          $(libxml2_LIBS)
 
 comobsdecoder_la_LDFLAGS = -module

@@ -20,6 +20,7 @@ AM_LDFLAGS = \
 	$(top_builddir)/src/lib/kvskel/libkvalobs_kvadmininterface.la \
 	$(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
 	$(top_builddir)/src/lib/dnmithread/libkvalobs_dnmithread.la \
+	$(putools_LIBS) \
 	$(BOOST_PROGRAM_OPTIONS_LIB) \
 	$(BOOST_FILESYSTEM_LIB) \
 	$(BOOST_REGEX_LIB) \

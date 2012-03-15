@@ -9,18 +9,21 @@ getdata_LDFLAGS =  -pthread
 getdata_LDADD = $(top_builddir)/src/service-libs/kvcpp/libkvalobs_kvcpp.la \
 		$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
 		$(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
-                -lm
+		$(putools_LIBS)\
+        -lm
 
 getstationmetadata_SOURCES=getstationmetadata.cc
 getstationmetadata_CPPFLAGS = $(AM_CPPFLAGS)
 getstationmetadata_LDFLAGS =  -pthread 
 getstationmetadata_LDADD = $(top_builddir)/src/service-libs/kvcpp/libkvalobs_kvcpp.la \
+						   $(putools_LIBS) \
                            -lm
                            
 getstationmetadatakvcpp_SOURCES=getstationmetadatakvcpp.cc
 getstationmetadatakvcpp_CPPFLAGS = $(AM_CPPFLAGS)
 getstationmetadatakvcpp_LDFLAGS =  -pthread 
 getstationmetadatakvcpp_LDADD = $(top_builddir)/src/service-libs/kvcpp/libkvalobs_kvcpp.la \
+								$(putools_LIBS)\
 						       -lm
 
 
@@ -31,6 +34,7 @@ stressTestGetData_LDFLAGS =  -pthread
 stressTestGetData_LDADD =  $(top_builddir)/src/service-libs/kvcpp/libkvalobs_kvcpp.la \
                 $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
 				$(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
+				$(putools_LIBS)\
 				$(BOOST_THREAD_LIB) \
                 -lm
  

@@ -7,5 +7,4 @@ rejectdecoder_la_LDFLAGS = -module
 rejectdecoder_la_LIBADD =$(top_builddir)/src/lib/decoder/decoderbase/libkvalobs_decoderbase.la \
 			                $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
                          $(top_builddir)/src/lib/milog/libkvalobs_milog.la \
-                         $(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la \
-                         $(putools_LIBS)
+                         $(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la 

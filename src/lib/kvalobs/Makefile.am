@@ -51,7 +51,8 @@ libkvalobs_kvalobs_la_CPPFLAGS = $(AM_CPPFLAGS) $(putools_CFLAGS) \
                          -DLOCALSTATEDIR="\""$(localstatedir)"\"" \
                          -DPREFIX="\""$(prefix)"\"" 
 
-libkvalobs_kvalobs_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@ $(putools_LDFLAGS)
+#libkvalobs_kvalobs_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@ $(putools_LDFLAGS)
+libkvalobs_kvalobs_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@ 
 
 libkvalobs_kvalobs_la_LIBADD = $(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
                        $(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la \

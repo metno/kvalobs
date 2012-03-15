@@ -20,7 +20,6 @@ bufrdecode_CPPFLAGS = -D_REENTRANT \
 
 bufrdecode_LDADD = $(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
 				    $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
-					$(putools_LIBS)\
 					-L$(HOME)/lib -lbufr -lgfortran \
                     -lm
 
