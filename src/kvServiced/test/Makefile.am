@@ -31,7 +31,8 @@ stressTestGetData_SOURCES=stressTestGetData.cc
 stressTestGetData_CPPFLAGS = $(AM_CPPFLAGS)
 #stressTestGetData_LDFLAGS =  -pthread  -rpath $(libdir)/kvalobs
 stressTestGetData_LDFLAGS =  -pthread  
-stressTestGetData_LDADD =  $(top_builddir)/src/service-libs/kvcpp/libkvalobs_kvcpp.la \
+stressTestGetData_LDADD =  \
+                $(top_builddir)/src/service-libs/kvcpp/libkvalobs_kvcpp.la \
                 $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
 				$(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
 				$(top_builddir)/src/service-libs/kvcpp/libkvalobs_kvcpp.la \
