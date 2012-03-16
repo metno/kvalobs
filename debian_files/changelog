@@ -1,3 +1,10 @@
+kvalobs (2.5.0~rc2-2) lucid; urgency=low
+
+  * New release candidate.
+  * Fix bug in the control file. 
+  
+ -- Borge Moe <borge.moe@met.no>  Fri, 16 Mar 2012 09:15:00 +0100
+
 kvalobs (2.5.0~rc2-1) lucid; urgency=low
 
   * New release candidate.
