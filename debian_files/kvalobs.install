@@ -1,5 +1,7 @@
 usr/bin/*
 usr/lib/kvalobs/bin/*
+usr/lib/kvalobs/decode/*.so.*
+usr/lib/libkvalobs2_decoderbase.so.*
 usr/lib/kvalobs/tool_funcs.sh
 usr/share/kvalobs/db/*.sql
 usr/share/kvalobs/db/upgrade/*.sql
