@@ -60,9 +60,11 @@ DecoderMgr::updateDecoders()
   DecoderItem        *decoder;
   int                id=0;
 
+
+
   decoders.clear();
   
-  if(!dir.open(decoderPath, "*.so")){
+  if(!dir.open( decoderPath, fixDecoderName("*.so") ) ){
     LOGERROR("DecoderMgr: Can't open directory <" << decoderPath << ">, " 
 	 << dir.getErr() << endl);
     return;
@@ -133,6 +135,42 @@ DecoderMgr::~DecoderMgr()
     delete *it;
   
 }
+
+std::string
+DecoderMgr::
+fixDecoderName( const std::string &decoder_ )
+{
+   string decoder( decoder_ );
+   size_t i;
+
+   if( soVersion.empty() ) {
+      soVersion=KVALOBSLIBS_SO_VERSION;
+       i=soVersion.find_first_of( ":" );
+
+      if( i != string::npos )
+        soVersion.erase( i );
+
+      soVersion.insert(0,".so.");
+   }
+
+   i=decoder.find( ".so" );
+
+   if( i != string::npos ) {
+      size_t k=decoder.find_first_not_of(".0123456789", i+3 );
+
+      if( k == string::npos ) {
+         decoder.erase( i );
+         decoder += soVersion;
+      }
+   } else {
+      decoder += soVersion;
+   }
+
+   return decoder;
+}
+
+
+
 
 kvalobs::decoder::DecoderBase*
 DecoderMgr::findDecoder(dnmi::db::Connection   &connection,

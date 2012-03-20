@@ -46,4 +46,4 @@ bufrdecoder_la_LIBADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs2_
                           $(top_builddir)/src/lib/miconfparser/libkvalobs2_miconfparser.la \
                           $(putools_LIBS) $(libxml2_LIBS)
 
-bufrdecoder_la_LDFLAGS = -module
+bufrdecoder_la_LDFLAGS = -module -version-info @KVALOBSLIBS_SO_VERSION@

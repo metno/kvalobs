@@ -10,4 +10,4 @@ kv2kvdecoder_la_LIBADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs2
              $(top_builddir)/src/lib/kvdb/libkvalobs2_kvdb.la 
 
 #$(libxml2_LIBS)
-kv2kvdecoder_la_LDFLAGS = -module
+kv2kvdecoder_la_LDFLAGS = -module -version-info @KVALOBSLIBS_SO_VERSION@

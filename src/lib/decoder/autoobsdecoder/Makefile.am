@@ -17,4 +17,4 @@ autoobs_la_LIBADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs2_deco
                     $(top_builddir)/src/lib/milog/libkvalobs2_milog.la \
                     $(top_builddir)/src/lib/kvdb/libkvalobs2_kvdb.la \
 		    		$(top_builddir)/src/lib/miutil/libkvalobs2_miutil.la 
-autoobs_la_LDFLAGS = -module
+autoobs_la_LDFLAGS = -module -version-info @KVALOBSLIBS_SO_VERSION@

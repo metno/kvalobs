@@ -8,4 +8,4 @@ dummydecoder_la_LIBADD = \
                  $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs2_decoderbase.la \
 		         $(top_builddir)/src/lib/milog/libkvalobs2_milog.la \
                  $(top_builddir)/src/lib/kvdb/libkvalobs2_kvdb.la 
-dummydecoder_la_LDFLAGS = -module
+dummydecoder_la_LDFLAGS = -module -version-info @KVALOBSLIBS_SO_VERSION@

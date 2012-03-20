@@ -29,4 +29,4 @@ comobsdecoder_la_LIBADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs
                           $(top_builddir)/src/lib/miconfparser/libkvalobs2_miconfparser.la \
                           $(libxml2_LIBS)
 
-comobsdecoder_la_LDFLAGS = -module
+comobsdecoder_la_LDFLAGS = -module -version-info @KVALOBSLIBS_SO_VERSION@
