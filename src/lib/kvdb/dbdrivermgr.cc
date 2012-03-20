@@ -33,6 +33,9 @@
 #include <sstream>
 #include "kvdb.h"
 
+
+using namespace std;
+
                          
 dnmi::db::
 DriverManager::
@@ -75,14 +78,59 @@ getAppName( ) const
    return appName;
 }
 
+std::string
+dnmi::db::
+DriverManager::
+fixDriverName( const std::string &driver_ )
+{
+   string driver( driver_ );
+   std::string dir( PKGLIB_DBDIR );
+
+   size_t i;
+   if( soVersion.empty() ) {
+      soVersion=KVALOBSLIBS_SO_VERSION;
+       i=soVersion.find_first_of( ":" );
+
+      if( i != string::npos )
+        soVersion.erase( i );
+
+      soVersion.insert(0,".so.");
+   }
+
+   i=driver.find( ".so" );
+
+   if( i != string::npos ) {
+      size_t k=driver.find_first_not_of(".0123456789", i+3 );
+
+      if( k == string::npos ) {
+         driver.erase( i );
+         driver += soVersion;
+      }
+   } else {
+      driver += soVersion;
+   }
+
+   //Add path if needed.
+   i = driver.find_first_of( "/" );
+
+   if( i == string::npos ) {
+      if( !dir.empty() && *dir.rbegin() != '/' )
+         dir += "/";
+
+      driver.insert( 0, dir );
+   }
+
+   return driver;
+}
 
 bool 
 dnmi::db::
 DriverManager::
-loadDriver(const std::string &driver,
+loadDriver(const std::string &driver_,
 	   std::string &driverId)
 {
   using namespace dnmi::file;
+  string driver( fixDriverName( driver_ ) );
   DriverBase *d;
   Driver *drv=0;
   DSO    *dso=0;
@@ -90,7 +138,7 @@ loadDriver(const std::string &driver,
   driverId.clear();
 
   try{
-    dso=new DSO(driver);
+    dso=new DSO( fixDriverName( driver ) );
   }catch(dnmi::file::DSOException &ex){
       err="Can't load driver <";
       err+=driver;

@@ -134,15 +134,19 @@ namespace dnmi {
 	  typedef std::list<Driver*>::iterator       IDriverList;
 	  typedef std::list<Driver*>::const_iterator CIDriverList;
 	  
+
 	  DriverList drivers;
 	  std::string err;
 	  std::string appName;
+	  std::string soVersion;
 
       public:
 	  DriverManager();
 	  DriverManager( const std::string &appName );
 	  ~DriverManager();
 	  
+	  std::string fixDriverName( const std::string &driver );
+
 	  void setAppName( const std::string &appName );
 	  std::string getAppName()const;
 	  bool loadDriver(const std::string &driver, std::string &driverId);
