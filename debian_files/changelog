@@ -1,3 +1,12 @@
+kvalobs (2.5.0~rc3-1) lucid; urgency=low
+
+  * New release candidate.
+  * Changed how plugins are identified when loaded, dbdrivers and decoders.
+  * Changed what is installed for the different debian packages. 
+  
+ -- Borge Moe <borge.moe@met.no>  Tue, 20 Mar 2012 15:15:00 +0100
+
+
 kvalobs (2.5.0~rc2-2) lucid; urgency=low
 
   * New release candidate.
