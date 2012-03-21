@@ -42,7 +42,7 @@ else
 fi
 
 if [ "$USER" != "$KVUSER"  -a "$USER" != "root" ]; then
-   echo "Only the '$KVUSER' user my start kvalobs."
+   echo "Only the '$KVUSER' user may start kvalobs."
    echo "You are loggd in as user '$USER'"
    exit 1
 fi
@@ -120,27 +120,35 @@ function inlist()
 
 function isrunning()
 {
+    local running=""
     prog=$1
-   
-    if [ -f $KVPID/$prog-$NODENAME.pid ]; then 
-		PID=`cat $KVPID/$prog-$NODENAME.pid`
-		#echo "PID: $prog: $PID"
-		#echo "	kill  -0 $PID"
-		kill  -0 $PID > /dev/null 2>&1
+     
+	PID=`cat $KVPID/$prog-$NODENAME.pid 2> /dev/null`
+    		
+	if [ $? -ne 0 ]; then
+	   if [ -f $KVPID/$prog-$NODENAME.pid ]; then
+	       echo "Cant read the file pid $KVPID/$prog-$NODENAME.pid" >&2
+	       return 0
+	   fi
+	   return 1
+	fi
+		
+	#echo "PID: $prog: $PID"
+	#echo "kill  -0 $PID"
+	kill  -0 $PID > /dev/null 2>&1
 
-		if [ $? -eq 0 ]; then
-	    	PIDS=`pgrep $prog 2>/dev/null`
-	    	running=`echo $PIDS | grep $PID`
+	if [ $? -eq 0 ]; then
+    	PIDS=`pgrep $prog 2>/dev/null`
+    	running=`echo $PIDS | grep $PID`
 	    
-	    	if [ ! -z "$running" ]; then
-				return 0
-	    	fi
-        fi
-
-        rm -f $KVPID/$prog-$NODENAME.pid
-   fi
+    	if [ ! -z "$running" ]; then
+			return 0
+    	fi
+    fi
     
-   return 1
+    rm -f $KVPID/$prog-$NODENAME.pid
+    
+    return 1
 }
 
 
@@ -148,6 +156,8 @@ function killprog()
 {
 	local wasruning=false
 	local markAsStopped=true
+	local running=0
+	
     prog=$1
     echo -n "$prog ....."
     
@@ -166,21 +176,21 @@ function killprog()
 			touch $KVPID/$prog-$NODENAME.stopped
 		fi
 		
-		kill $PID > /dev/null 2>&1
-	
 		n=0
+		
 		isrunning $prog
+        running=$?
+        kill $PID > /dev/null 2>&1
 			
-        while [ $? -eq 0 -a $n -lt $TIMEOUT  ]; do
+        while [ $running -eq 0 -a $n -lt $TIMEOUT  ]; do
 	    	n=$((n+1))
 	    	sleep 1
 	    	wasrunning=true
 	    	isrunning $prog
+	    	running=$?
 		done
 	
-		isrunning $prog
-	
-		if [ $? -eq 0 ]; then
+		if [ $running -eq 0 ]; then
 	    	kill -9 $PID > /dev/null 2>&1
 	    
 	    	n=0
