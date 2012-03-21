@@ -1,4 +1,6 @@
-AM_CPPFLAGS = -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib -D_REENTRANT
+AM_CPPFLAGS = -I$(top_srcdir)/src/lib \
+ 			  -I$(top_builddir)/src/lib \
+ 			  -D_REENTRANT
 
 lib_LTLIBRARIES = libkvalobs2_kvalobs.la
 

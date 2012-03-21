@@ -64,7 +64,7 @@ class LookUpException : public std::exception{
  */
 class KvApp : public CorbaHelper::CorbaApp
 {
-  std::string pidfile;
+  static std::string pidfile;
   static miutil::conf::ConfSection *conf;
   static std::string confFile;
   
@@ -190,8 +190,8 @@ class KvApp : public CorbaHelper::CorbaApp
    */  
   static std::string createPidFileName( const std::string &progname );
 
-  void createPidFile(const std::string &progname);
-  void deletePidFile();
+  static void createPidFile(const std::string &progname);
+  static void deletePidFile();
 
   /* I tenkeboksen
   template<class T>

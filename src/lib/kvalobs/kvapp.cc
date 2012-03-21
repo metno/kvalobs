@@ -53,6 +53,7 @@ namespace{
 
 ConfSection* KvApp::conf=0;
 std::string KvApp::confFile;
+std::string KvApp::pidfile;
 
 KvApp::KvApp(int argn, char **argv, const char *opt[0][2])
   :CorbaHelper::CorbaApp(argn, argv, opt), setAppNameForDb( false )
