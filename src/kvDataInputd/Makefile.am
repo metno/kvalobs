@@ -1,4 +1,9 @@
-AM_CPPFLAGS = -I$(top_srcdir)/src/lib -I$(top_srcdir)/src/lib/decoder -I$(top_builddir)/src/lib -I$(top_builddir)/src/lib/kvskel  $(omniORB4_CFLAGS)  $(putools_CFLAGS)  -D_REENTRANT
+AM_CPPFLAGS = -I$(top_srcdir)/src/lib \
+ 			  -I$(top_srcdir)/src/lib/decoder \
+ 			  -I$(top_builddir)/src/lib \
+ 			  -I$(top_builddir)/src/lib/kvskel  \
+ 			  $(omniORB4_CFLAGS)  $(putools_CFLAGS)\
+ 			  -D_REENTRANT
 
 noinst_PROGRAMS = createTestData
 
@@ -14,7 +19,7 @@ createTestData_LDADD = $(putools_LIBS)
 kvDataInputd_SOURCES=InitLogger.cc InitLogger.h \
                      DataSrcImpl.cc DataSrcImpl.h \
                      DecodeCommand.cc DecodeCommand.h \
-	             DataSrcApp.cc DataSrcApp.h \
+	          		 DataSrcApp.cc DataSrcApp.h \
                      ConnectionCache.cc ConnectionCache.h \
                      force.cc \
                      kvDataInputd.cc 
@@ -58,10 +63,11 @@ kvdataclt_CPPFLAGS = $(AM_CPPFLAGS) -static-libtool-libs \
                      -DLOCALSTATEDIR="\""$(localstatedir)"\"" \
                      -DPREFIX="\""$(prefix)"\"" 
 
-kvdataclt_LDFLAGS = -pthread -static  
-kvdataclt_LDADD = $(top_builddir)/src/lib/miconfparser/libkvalobs2_miconfparser.la \
-                  $(top_builddir)/src/lib/dnmithread/libkvalobs2_dnmithread.la\
-                  $(top_builddir)/src/lib/corbahelper/libkvalobs2_corbahelper.la \
-                  $(top_builddir)/src/lib/milog/libkvalobs2_milog.la \
-                  $(top_builddir)/src/lib/kvskel/libkvalobs2_kvskel.la \
+kvdataclt_LDFLAGS = -pthread  
+kvdataclt_LDADD = $(top_builddir)/src/lib/miconfparser/.libs/libkvalobs2_miconfparser.a \
+                  $(top_builddir)/src/lib/dnmithread/.libs/libkvalobs2_dnmithread.a\
+                  $(top_builddir)/src/lib/corbahelper/.libs/libkvalobs2_corbahelper.a \
+                  $(top_builddir)/src/lib/milog/.libs/libkvalobs2_milog.a \
+                  $(top_builddir)/src/lib/kvskel/.libs/libkvalobs2_kvskel.a \
+                  $(BOOST_THREAD_LIB) \
                   $(omniORB4_LIBS) 

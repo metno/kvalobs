@@ -97,6 +97,8 @@ main(int argn, char** argv)
 
    setSigHandlers();
 
+   KvApp::createPidFile("kvDataInputd");
+
    DataSrcApp app(argn, argv, nWorkerThreads);
 
    if(!app.isOk()){
@@ -108,6 +110,7 @@ main(int argn, char** argv)
 
    if(nWorkerThreads<1){
       LOGFATAL("No db connections. We cant do anything, so we quit!\n");
+      app.deletePidFile();
       return 1;
    }
 
@@ -142,6 +145,7 @@ main(int argn, char** argv)
          if(!app.putRefInNS( dataSource , "kvinput")){
             LOGFATAL("Can't register with CORBA nameservice!\n" <<
                      "Is the CORBA nameservice running!\n");
+            app.deletePidFile();
             return 1;
          }
       }
