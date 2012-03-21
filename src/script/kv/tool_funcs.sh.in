@@ -64,7 +64,7 @@ ipalias_status()
     fi
 
     if [ -z "$ipalias" ]; then
-        echo "$me, is an test machine" >> $logfile
+        echo "$me, is an test machine" >> $mylog
         echo "test"
         return 0
     fi
