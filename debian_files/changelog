@@ -1,3 +1,12 @@
+kvalobs (2.5.0~rc4-1) lucid; urgency=low
+
+  * New release candidate.
+  * Fix a few minor bugs in kvstop and kvstatus.
+  * Changed create the pidfile for kvDataInputd early in the startup. 
+  
+ -- Borge Moe <borge.moe@met.no>  Wed, 21 Mar 2012 14:00:00 +0100
+
+
 kvalobs (2.5.0~rc3-1) lucid; urgency=low
 
   * New release candidate.
