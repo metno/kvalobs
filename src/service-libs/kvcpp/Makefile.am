@@ -24,7 +24,8 @@ kvcppinclude_HEADERS = \
 	kvservicetypes.h \
 	kvWhat.h \
 	RejectdecodeIterator.h \
-	WhichDataHelper.h
+	WhichDataHelper.h\
+	KvWorkstatistikReceiver.h
 	
 libkvalobs2_kvcpp_la_LDFLAGS= -version-info @KVALOBSLIBS_SO_VERSION@
 
