@@ -45,6 +45,7 @@
 #include <kvalobs/kvOperator.h>
 #include "../RejectdecodeIterator.h"
 #include "../KvGetDataReceiver.h"
+#include "../KvWorkstatistikReceiver.h"
 
 namespace kvservice
 {
@@ -107,6 +108,26 @@ public:
 protected:
 	virtual bool process(CKvalObs::CService::kvService_ptr service);
 };
+
+
+class getKvWorkstatisticFunc: public CorbaGetFunction
+{
+   CKvalObs::CService::WorkstatistikTimeType timeType;
+   miutil::miTime from;
+   miutil::miTime to;
+   kvservice::KvWorkstatistikReceiver &receiver;
+   CKvalObs::CService::WorkstatistikIterator *it;
+
+public:
+   getKvWorkstatisticFunc(
+         const CKvalObs::CService::WorkstatistikTimeType,
+         const miutil::miTime &from,
+         const miutil::miTime &to,
+         kvservice::KvWorkstatistikReceiver &receiver );
+protected:
+   virtual bool process(CKvalObs::CService::kvService_ptr service);
+};
+
 
 class getKvParamsFunc: public CorbaGetFunction
 {

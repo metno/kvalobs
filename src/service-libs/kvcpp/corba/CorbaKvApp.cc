@@ -313,6 +313,18 @@ namespace kvservice
 
     bool
     CorbaKvApp::
+    getKvWorkstatistik( CKvalObs::CService::WorkstatistikTimeType timeType,
+                        const miutil::miTime &from, const miutil::miTime &to,
+                        KvWorkstatistikReceiver &receiver
+                    )
+    {
+       getKvWorkstatisticFunc func( timeType, from, to, receiver );
+       return func( "getKvWorkstatistik" );
+    }
+
+
+    bool
+    CorbaKvApp::
     connectToKvInput( bool reConnect ) {
 
       if ( reConnect || CORBA::is_nil(dataInput) ) {

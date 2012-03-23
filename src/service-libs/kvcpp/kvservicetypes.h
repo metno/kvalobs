@@ -34,6 +34,7 @@
 #include <list>
 #include <boost/shared_ptr.hpp>
 #include <kvalobs/kvData.h>
+#include <kvalobs/kvWorkelement.h>
 
 #include "kvWhat.h"
 #include "KvObsData.h"
@@ -56,6 +57,9 @@ namespace kvservice{
   typedef std::list<kvservice::KvWhat>::const_iterator CIKvWhatList;
   
   typedef boost::shared_ptr<KvWhatList> KvWhatListPtr;
+
+  typedef std::list<kvalobs::kvWorkelement> KvWorkelementList;
+  typedef boost::shared_ptr<KvWorkelementList> KvWorkelementListPtr;
 
 }
 #endif

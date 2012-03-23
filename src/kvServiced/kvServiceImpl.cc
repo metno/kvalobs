@@ -1301,14 +1301,17 @@ getStationParam( CKvalObs::CService::Station_paramList_out spList,
 }
 
 char*
-KvServiceImpl::registerDataNotify(const char* id, kvDataNotifySubscriberExt_ptr sub)
+KvServiceImpl::
+registerDataNotify(const char* id, kvDataNotifySubscriberExt_ptr sub)
 {
    LogContext context( "service/registerDataNotify" );
    LOGWARN("service/registerDataNotify: NOT SUPPORTED");
    return CORBA::string_dup("");
 }
+
 char*
-KvServiceImpl::registerData(const char* id, kvDataSubscriberExt_ptr sub)
+KvServiceImpl::
+registerData(const char* id, kvDataSubscriberExt_ptr sub)
 {
    LogContext context( "service/registerData" );
    LOGWARN("service/registerData: NOT SUPPORTED");
@@ -1316,7 +1319,8 @@ KvServiceImpl::registerData(const char* id, kvDataSubscriberExt_ptr sub)
 }
 
 CORBA::Boolean
-KvServiceImpl::unregisterSubscriber(const char *id)
+KvServiceImpl::
+unregisterSubscriber(const char *id)
 {
    LogContext context( "service/unregister" );
    LOGWARN("service/unregister: NOT SUPPORTED");
@@ -1324,7 +1328,8 @@ KvServiceImpl::unregisterSubscriber(const char *id)
 }
 
 CORBA::Boolean
-KvServiceImpl::getDataExt(const WhichDataExtList& whichData, DataIterator_out it)
+KvServiceImpl::
+getDataExt(const WhichDataExtList& whichData, DataIterator_out it)
 {
    LogContext context( "service/getDataExt" );
    LOGWARN("service/getDataExt: NOT SUPPORTED");
@@ -1332,7 +1337,8 @@ KvServiceImpl::getDataExt(const WhichDataExtList& whichData, DataIterator_out it
 }
 
 CORBA::Boolean
-KvServiceImpl::getStationMetaData( Station_metadataList_out stMeta,
+KvServiceImpl::
+getStationMetaData( Station_metadataList_out stMeta,
       CORBA::Long stationid, const char* obstime_,
       const char* metadataName )
 {
@@ -1439,6 +1445,19 @@ KvServiceImpl::getStationMetaData( Station_metadataList_out stMeta,
    app.releaseDbConnection(con);
 
    return retRes;
+}
+
+CORBA::Boolean
+KvServiceImpl::
+getWorkstatistik(
+      CKvalObs::CService::WorkstatistikTimeType timeType,
+      const char *fromTime, const char *toTime,
+      CKvalObs::CService::WorkstatistikIterator_out it )
+{
+   LogContext context( "service/getWorkstatistik" );
+   LOGWARN("service/getWorkstatistik: NOT SUPPORTED");
+   it=WorkstatistikIterator::_nil();
+   return false;
 }
 
 

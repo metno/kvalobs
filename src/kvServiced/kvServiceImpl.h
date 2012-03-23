@@ -121,7 +121,9 @@ public:
   CORBA::Boolean getDataExt(const CKvalObs::CService::WhichDataExtList& whichData, CKvalObs::CService::DataIterator_out it);
   CORBA::Boolean getStationMetaData( CKvalObs::CService::Station_metadataList_out stMeta,
 		                             CORBA::Long stationid, const char* obstime, const char* metadataName);
-
+  CORBA::Boolean getWorkstatistik( CKvalObs::CService::WorkstatistikTimeType timeType,
+                                   const char *fromTime, const char *toTime,
+                                   CKvalObs::CService::WorkstatistikIterator_out it );
 };
 
 

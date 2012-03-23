@@ -121,6 +121,26 @@ bool getKvRejectDecodeFunc::process(kvService_ptr service)
 	return service->getRejectdecode(decodeInfo, it.getCorbaObjPtr().out());
 }
 
+getKvWorkstatisticFunc::
+getKvWorkstatisticFunc(
+         const CKvalObs::CService::WorkstatistikTimeType timeType_,
+         const miutil::miTime &from_,
+         const miutil::miTime &to_,
+         kvservice::KvWorkstatistikReceiver &receiver_ )
+   : timeType( timeType_ ), from( from_ ), to( to_ ),
+     receiver( receiver_ ), it( 0 )
+{
+}
+
+bool
+getKvWorkstatisticFunc::
+process(CKvalObs::CService::kvService_ptr service)
+{
+   LOGERROR("getKvWorkstatisticFunc: NOT IMPLEMENTED");
+   return false;
+};
+
+
 getKvParamsFunc::getKvParamsFunc(list<kvParam> &paramList) :
 	paramList(paramList)
 {

@@ -7,10 +7,26 @@ module CKvalObs{
 	 typedef string SubscribeId;
     enum StatusId { All, OnlyFailed, OnlyOk };
     enum QcId { QC1, QC2d, QC2m, HQC };
-
+    enum WorkstatistikTimeType{ ObsTime, TbTime, ProcessStartTime, QaStartTime, QaStopTime, ServiceStartTime,ServiceStopTime};
+    
     typedef sequence<QcId> QcIdList;
 
     typedef sequence<long> StationIDList;
+
+    struct WorkstatistikElem {
+        long stationID;
+        string obstime;
+        short  typeID_;
+        string tbtime;
+        short  priority;
+        string processStart;
+        string qaStart;
+        string qaStop;
+        string serviceStart;
+        string serviceStop;
+    };	
+    
+    typedef sequence<WorkstatistikElem> WorkstatistikElemList;
 
     struct DataElem{
       long    stationID;

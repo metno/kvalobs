@@ -77,6 +77,11 @@ module CKvalObs{
       boolean next(out RejectdecodeList rejectedList_);
     };
 
+    interface WorkstatistikIterator{
+      void destroy();
+      boolean next(out WorkstatistikElemList WorkstatistikList_);
+    };
+
     
     interface kvService : micutil::Admin {
       SubscribeId subscribeDataNotify(in DataSubscribeInfo info, 
@@ -173,6 +178,10 @@ module CKvalObs{
 				   in long stationid, 
 				   in long paramid, 
 				   in long day );
+				   
+      /**
+       */
+	  boolean getWorkstatistik(in WorkstatistikTimeType timeType, in string fromTime, in string toTime, out WorkstatistikIterator it);
 
     };
 
@@ -231,7 +240,7 @@ module CKvalObs{
        * @param metadataName The name of the metadata we want. An empty string 
        *    request all metadata for the stationd.
        */   
-	  boolean getStationMetaData( out Station_metadataList stMeta, in long stationid, in string obstime, in string metadataName );
+	  boolean getStationMetaData( out Station_metadataList stMeta, in long stationid, in string obstime, in string metadataName);
     };
 
     interface DataReadyInput{

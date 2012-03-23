@@ -34,6 +34,7 @@
 #include <list>
 #include <boost/utility.hpp>
 #include <kvskel/datasource.hh>
+#include <kvskel/kvServiceCommon.hh>
 #include <kvalobs/kvData.h>
 #include <kvalobs/kvModelData.h>
 #include <kvalobs/kvReferenceStation.h>
@@ -47,6 +48,7 @@
 #include <dnmithread/CommandQue.h>
 #include "WhichDataHelper.h"
 #include "KvGetDataReceiver.h"
+#include "KvWorkstatistikReceiver.h"
 #include "RejectdecodeIterator.h"
 #include "kvDataSubscribeInfoHelper.h"
 
@@ -185,6 +187,11 @@ namespace kvservice
        * \return true ons success and false otherwise.
        */
       virtual bool getKvObsPgm( std::list<kvalobs::kvObsPgm> &obsPgm, const std::list<long> &stationList, bool aUnion ) =0;
+
+      virtual bool getKvWorkstatistik(CKvalObs::CService::WorkstatistikTimeType timeType,
+                                    const miutil::miTime &from, const miutil::miTime &to,
+                                    KvWorkstatistikReceiver &receiver
+                                    ) = 0;
 
       /**
        * \deprecated

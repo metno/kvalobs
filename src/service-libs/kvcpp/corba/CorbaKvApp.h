@@ -167,6 +167,11 @@ namespace kvservice
     		                             const std::string & metadataName = "");
       virtual bool getKvObsPgm( std::list<kvalobs::kvObsPgm> &obsPgm, const std::list<long> &stationList, bool aUnion );
       virtual bool getKvData( KvObsDataList &dataList, const WhichDataHelper &wd );
+      virtual bool getKvWorkstatistik(CKvalObs::CService::WorkstatistikTimeType timeType,
+                                      const miutil::miTime &from, const miutil::miTime &to,
+                                      KvWorkstatistikReceiver &receiver
+                                      );
+
 
       virtual const CKvalObs::CDataSource::Result_var sendDataToKv( const char *data, const char *obsType );
 
