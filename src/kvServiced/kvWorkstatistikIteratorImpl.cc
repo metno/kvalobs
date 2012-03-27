@@ -52,12 +52,9 @@ fillData(std::list<kvalobs::kvWorkelement> &toData,
 	 const std::list<kvalobs::kvWorkelement> &fromData,
 	 std::list<kvalobs::kvWorkelement>::iterator &fromDataIt)
 {
-	std::list<std::string>::iterator it;
-	string::size_type i;
-	
-  	for(; toData.size()<COUNT_MAX && 
-	 	   fromDataIt!=fromData.end(); 
-  	      fromDataIt++){
+  	for(; toData.size() < COUNT_MAX &&
+	 	   fromDataIt != fromData.end();
+  	      fromDataIt++ ){
     	toData.push_back(*fromDataIt);
   	}
 }
@@ -94,7 +91,7 @@ findData(std::list<kvalobs::kvWorkelement> &data)
 
     dataList.clear();
     
-    if(!gate.select(dataList, ost.str())){
+    if( ! gate.select( dataList, ost.str(), "workstatistik" ) ){
       LOGERROR("DBERROR: " << gate.getErrorStr());
       return false;
     }
@@ -110,11 +107,11 @@ findData(std::list<kvalobs::kvWorkelement> &data)
 WorkstatistikIteratorImpl::
 WorkstatistikIteratorImpl(
            dnmi::db::Connection  *dbCon_,
-		     const miutil::miTime  &fromTime,
+		     const miutil::miTime  &fromTime_,
 		     const miutil::miTime  &toTime_,
 		     WorkstatistikTimeType timeType_,
 		     ServiceApp            &app_)
-  :dbCon(dbCon_), currentEnd(fromTime), toTime(toTime_),
+  :dbCon(dbCon_), currentEnd(fromTime_), toTime(toTime_),
    dataIt( dataList.end() ),
    app(app_)
 {
