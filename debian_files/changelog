@@ -1,3 +1,10 @@
+kvalobs (2.5.0~rc7-1) lucid; urgency=low
+
+  * Use the workstatistik table, not the workque table, for getWorkstatistik.
+  
+ -- Borge Moe <borge.moe@met.no> Tue, 27 Mar 2012 17:45:00 +0200
+
+
 kvalobs (2.5.0~rc6-1) lucid; urgency=low
 
   * Implement workstatistik trough the CORBA interface.
