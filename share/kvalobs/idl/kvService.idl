@@ -178,10 +178,7 @@ module CKvalObs{
 				   in long stationid, 
 				   in long paramid, 
 				   in long day );
-				   
-      /**
-       */
-	  boolean getWorkstatistik(in WorkstatistikTimeType timeType, in string fromTime, in string toTime, out WorkstatistikIterator it);
+		   
 
     };
 
@@ -241,7 +238,15 @@ module CKvalObs{
        *    request all metadata for the stationd.
        */   
 	  boolean getStationMetaData( out Station_metadataList stMeta, in long stationid, in string obstime, in string metadataName);
+	  
     };
+
+    interface kvServiceExt2 : kvServiceExt {
+      /**
+       */
+	  boolean getWorkstatistik(in WorkstatistikTimeType timeType, in string fromTime, in string toTime, out WorkstatistikIterator it);
+	};
+
 
     interface DataReadyInput{
       boolean dataReady(in CKvalObs::StationInfoList data, 
