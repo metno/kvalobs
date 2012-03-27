@@ -1,4 +1,4 @@
-kvalobs (2.5.0~rc5-1) lucid; urgency=low
+kvalobs (2.5.0~rc6-1) lucid; urgency=low
 
   * Implement workstatistik trough the CORBA interface.
   * Make it compatible with earlier version of the the service interface.
