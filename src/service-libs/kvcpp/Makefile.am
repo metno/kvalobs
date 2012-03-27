@@ -10,7 +10,8 @@ libkvalobs2_kvcpp_la_SOURCES = \
 	KvObsData.cc \
 	kvWhat.cc \
 	RejectdecodeIterator.cc \
-	WhichDataHelper.cc
+	WhichDataHelper.cc\
+	WorkstatistikIterator.cc
 
 kvcppincludedir = $(pkgincludedir)/kvcpp
 	
@@ -24,8 +25,9 @@ kvcppinclude_HEADERS = \
 	kvservicetypes.h \
 	kvWhat.h \
 	RejectdecodeIterator.h \
-	WhichDataHelper.h\
-	KvWorkstatistikReceiver.h
+	WhichDataHelper.h \
+	WorkstatistikIterator.h
+	
 	
 libkvalobs2_kvcpp_la_LDFLAGS= -version-info @KVALOBSLIBS_SO_VERSION@
 
@@ -37,11 +39,11 @@ libkvalobs2_kvcpp_la_LIBADD = \
 	$(top_builddir)/src/lib/kvdb/libkvalobs2_kvdb.la \
 	$(top_builddir)/src/lib/fileutil/libkvalobs2_fileutil.la \
 	$(top_builddir)/src/lib/milog/libkvalobs2_milog.la \
-	$(top_builddir)/src/lib/kvskel/libkvalobs2_kvskel.la \
 	$(top_builddir)/src/lib/corbahelper/libkvalobs2_corbahelper.la \
 	$(top_builddir)/src/lib/dnmithread/libkvalobs2_dnmithread.la \
 	$(top_builddir)/src/lib/kvskel/libkvalobs2_kvadmininterface.la \
-	$(top_builddir)/src/lib/miconfparser/libkvalobs2_miconfparser.la  
+	$(top_builddir)/src/lib/miconfparser/libkvalobs2_miconfparser.la \
+	$(top_builddir)/src/lib/kvskel/libkvalobs2_kvskel.la   
 	
 	
 	

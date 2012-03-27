@@ -58,7 +58,7 @@ public:
   template<class Subscriber>
   std::string operator()( Subscriber *sub ) 
   {
-    kvService_ptr     service; 
+    kvServiceExt_ptr     service; 
     bool              forceNS=false;
     bool              usedNS;
     int               sensor;
@@ -86,7 +86,7 @@ public:
     
     try{
       for( int i = 0; i < 2; i++ ) {
-	service = lookUpManager(forceNS, usedNS);
+	service = lookUpService(forceNS, usedNS);
 
 	try {
 	  return doSubscribe();
@@ -169,7 +169,7 @@ subscribeDataNotify( const KvDataSubscribeInfoHelper &info,
   
   SI::Subscriber       *sub;  
   SI::kvSubscriber_var refSub;  
-  kvService_ptr     service; 
+  kvServiceExt_ptr     service; 
   CORBA::String_var ret;
   bool              forceNS=false;
   bool              usedNS;
@@ -206,7 +206,7 @@ subscribeDataNotify( const KvDataSubscribeInfoHelper &info,
   
   try{
     for(int i=0; i<2; i++){
-      service=lookUpManager(forceNS, usedNS);
+      service=lookUpService(forceNS, usedNS);
       
       try{
 	ret=service->subscribeDataNotify(*info.getDataSubscribeInfo(), 
@@ -268,7 +268,7 @@ CorbaKvApp::subscribeData( const KvDataSubscribeInfoHelper &info, dnmi::thread::
 {
   DataSubscriber       *sub;  
   kvDataSubscriber_var refSub;  
-  kvService_ptr     service; 
+  kvServiceExt_ptr     service; 
   CORBA::String_var ret;
   bool              forceNS=false;
   bool              usedNS;
@@ -311,7 +311,7 @@ CorbaKvApp::subscribeData( const KvDataSubscribeInfoHelper &info, dnmi::thread::
   
   try{
     for(int i=0; i<2; i++){
-      service=lookUpManager(forceNS, usedNS);
+      service=lookUpService(forceNS, usedNS);
       
       try{
 	ret=service->subscribeData(*info.getDataSubscribeInfo(), 
@@ -387,7 +387,7 @@ CorbaKvApp::subscribeData( const KvDataSubscribeInfoHelper &info, dnmi::thread::
     {
       HintSubscriber       *sub;  
       kvHintSubscriber_var refSub;  
-      kvService_ptr     service; 
+      kvServiceExt_ptr     service; 
       CORBA::String_var ret;
       bool              forceNS=false;
       bool              usedNS;
@@ -425,7 +425,7 @@ CorbaKvApp::subscribeData( const KvDataSubscribeInfoHelper &info, dnmi::thread::
       
       try{
 	for(int i=0; i<2; i++){
-	  service=lookUpManager(forceNS, usedNS);
+	  service=lookUpService(forceNS, usedNS);
 	  
 	  try{
 	    ret=service->subscribeKvHint(refSub);

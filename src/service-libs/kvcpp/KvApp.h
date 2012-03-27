@@ -48,7 +48,7 @@
 #include <dnmithread/CommandQue.h>
 #include "WhichDataHelper.h"
 #include "KvGetDataReceiver.h"
-#include "KvWorkstatistikReceiver.h"
+#include "WorkstatistikIterator.h"
 #include "RejectdecodeIterator.h"
 #include "kvDataSubscribeInfoHelper.h"
 
@@ -190,7 +190,7 @@ namespace kvservice
 
       virtual bool getKvWorkstatistik(CKvalObs::CService::WorkstatistikTimeType timeType,
                                     const miutil::miTime &from, const miutil::miTime &to,
-                                    KvWorkstatistikReceiver &receiver
+                                    kvservice::WorkstatistikIterator &it
                                     ) = 0;
 
       /**

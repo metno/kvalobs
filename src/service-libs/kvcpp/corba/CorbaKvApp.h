@@ -80,7 +80,7 @@ namespace kvservice
     protected:
       ::kvservice::priv::KvCorbaThread *corbaThread;
 
-      CKvalObs::CService::kvService_var  refService;
+      CKvalObs::CService::kvServiceExt_var  refService;
       CKvalObs::CDataSource::Data_ptr dataInput;
 
       std::string nameserverpath;
@@ -169,7 +169,7 @@ namespace kvservice
       virtual bool getKvData( KvObsDataList &dataList, const WhichDataHelper &wd );
       virtual bool getKvWorkstatistik(CKvalObs::CService::WorkstatistikTimeType timeType,
                                       const miutil::miTime &from, const miutil::miTime &to,
-                                      KvWorkstatistikReceiver &receiver
+                                      kvservice::WorkstatistikIterator &it
                                       );
 
 
@@ -181,7 +181,7 @@ namespace kvservice
       virtual void unsubscribe( const SubscriberID &subscriberid );
       virtual void unsubscribeAll();
 
-      CKvalObs::CService::kvService_ptr lookUpManager( bool forceNS, bool & usedNS );
+      CKvalObs::CService::kvServiceExt_ptr lookUpService( bool forceNS, bool & usedNS );
 
       virtual bool shutdown() const;
       virtual void doShutdown();

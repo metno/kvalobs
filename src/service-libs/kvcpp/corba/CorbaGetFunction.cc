@@ -48,7 +48,7 @@ CorbaKvApp *CorbaGetFunction::corbaApp = NULL;
 
 bool CorbaGetFunction::operator()(const char *name)
 {
-	CKvalObs::CService::kvService_var service;
+	CKvalObs::CService::kvServiceExt_var service;
 	bool forceNS = false;
 	bool usedNS;
 
@@ -64,7 +64,7 @@ bool CorbaGetFunction::operator()(const char *name)
 	{
 		for (int i = 0; i < 2; i++)
 		{
-			service = corbaApp->lookUpManager(forceNS, usedNS);
+			service = corbaApp->lookUpService(forceNS, usedNS);
 			try
 			{
 				bool result = this->process(service);
@@ -115,7 +115,7 @@ getKvRejectDecodeFunc::getKvRejectDecodeFunc(
 {
 }
 
-bool getKvRejectDecodeFunc::process(kvService_ptr service)
+bool getKvRejectDecodeFunc::process(kvServiceExt_ptr service)
 {
 	it.cleanup();
 	return service->getRejectdecode(decodeInfo, it.getCorbaObjPtr().out());
@@ -126,18 +126,30 @@ getKvWorkstatisticFunc(
          const CKvalObs::CService::WorkstatistikTimeType timeType_,
          const miutil::miTime &from_,
          const miutil::miTime &to_,
-         kvservice::KvWorkstatistikReceiver &receiver_ )
+         kvservice::WorkstatistikIterator &it_ )
    : timeType( timeType_ ), from( from_ ), to( to_ ),
-     receiver( receiver_ ), it( 0 )
+     it( it_ )
 {
 }
 
 bool
 getKvWorkstatisticFunc::
-process(CKvalObs::CService::kvService_ptr service)
+process(CKvalObs::CService::kvServiceExt_ptr service_)
 {
-   LOGERROR("getKvWorkstatisticFunc: NOT IMPLEMENTED");
-   return false;
+   CKvalObs::CService::kvServiceExt2_var service;
+
+   it.cleanup();
+   service = CKvalObs::CService::kvServiceExt2::_narrow( service_ );
+
+   if( CORBA::is_nil( service ) ) {
+      LogContext context("getKvStationMetaData");
+      LOGERROR("getKvStationMetaData: Is not supported by the server.");
+      return false;
+   }
+
+   //getWorkstatistik(in WorkstatistikTimeType timeType, in string fromTime, in string toTime, out WorkstatistikIterator it);
+   return service->getWorkstatistik( timeType, from.isoTime().c_str(),
+                                     to.isoTime().c_str(), it.getCorbaObjPtr().out() );
 };
 
 
@@ -146,7 +158,7 @@ getKvParamsFunc::getKvParamsFunc(list<kvParam> &paramList) :
 {
 }
 
-bool getKvParamsFunc::process(kvService_ptr service)
+bool getKvParamsFunc::process(kvServiceExt_ptr service)
 {
 	ParamList *params;
 	bool ok = service->getParams(params);
@@ -169,7 +181,7 @@ getKvStationsFunc::getKvStationsFunc(list<kvStation> &stationList) :
 {
 }
 
-bool getKvStationsFunc::process(kvService_ptr service)
+bool getKvStationsFunc::process(kvServiceExt_ptr service)
 {
 	CKvalObs::CService::StationList *stations;
 	bool ok = service->getStations(stations);
@@ -196,7 +208,7 @@ getKvModelDataFunc::getKvModelDataFunc(list<kvModelData> &dataList,
 {
 }
 
-bool getKvModelDataFunc::process(kvService_ptr service)
+bool getKvModelDataFunc::process(kvServiceExt_ptr service)
 {
 	ModelDataIterator_var it;
 	ModelDataList_var data;
@@ -240,7 +252,7 @@ getKvReferenceStationsFunc::getKvReferenceStationsFunc(int stationid,
 {
 }
 
-bool getKvReferenceStationsFunc::process(kvService_ptr service)
+bool getKvReferenceStationsFunc::process(kvServiceExt_ptr service)
 {
 	Reference_stationList *ref_;
 	bool ok = service->getReferenceStation(stationid, paramid, ref_);
@@ -259,7 +271,7 @@ getKvTypesFunc::getKvTypesFunc(list<kvTypes> &typeList) :
 {
 }
 
-bool getKvTypesFunc::process(kvService_ptr service)
+bool getKvTypesFunc::process(kvServiceExt_ptr service)
 {
 	CKvalObs::CService::TypeList *types;
 	bool ok = service->getTypes(types);
@@ -283,7 +295,7 @@ getKvOperatorFunc::getKvOperatorFunc(list<kvOperator> &operatorList) :
 {
 }
 
-bool getKvOperatorFunc::process(kvService_ptr service)
+bool getKvOperatorFunc::process(kvServiceExt_ptr service)
 {
 	CKvalObs::CService::OperatorList *operators;
 	bool ok = service->getOperator(operators);
@@ -306,7 +318,7 @@ getKvStationParamFunc::getKvStationParamFunc(list<kvStationParam> &stParam,
 {
 }
 
-bool getKvStationParamFunc::process(kvService_ptr service)
+bool getKvStationParamFunc::process(kvServiceExt_ptr service)
 {
 	CKvalObs::CService::Station_paramList *stp;
 	bool ok = service->getStationParam(stp, stationid, paramid, day);
@@ -334,18 +346,9 @@ getKvStationMetaDataFunc::getKvStationMetaDataFunc(list<kvStationMetadata> &stPa
 {
 }
 
-bool getKvStationMetaDataFunc::process(kvService_ptr service)
+bool getKvStationMetaDataFunc::process(kvServiceExt_ptr serviceext)
 {
-	CKvalObs::CService::kvServiceExt_var serviceext;
-
-	serviceext = CKvalObs::CService::kvServiceExt::_narrow( service );
-
-	if( CORBA::is_nil( serviceext ) ) {
-		LogContext context("getKvStationMetaData");
-		LOGERROR("getKvStationMetaData: Is not supported by the server.");
-		return false;
-	}
-	CKvalObs::CService::Station_metadataList *metadata;
+   CKvalObs::CService::Station_metadataList *metadata;
 	string myObstime;
 
 	if( ! obstime.undef() )
@@ -403,7 +406,7 @@ getKvObsPgmFunc::getKvObsPgmFunc(list<kvObsPgm> &obsPgm,
 {
 }
 
-bool getKvObsPgmFunc::process(kvService_ptr service)
+bool getKvObsPgmFunc::process(kvServiceExt_ptr service)
 {
 	CKvalObs::CService::Obs_pgmList *obspgm;
 	CKvalObs::CService::StationIDList idList;
@@ -450,7 +453,7 @@ getKvDataFunc_abstract::getKvDataFunc_abstract(termfunc terminate) :
 DataIterator_ptr getKvDataFunc_abstract::getDataIter(const WhichDataHelper &wd)
 {
 	DataIterator_ptr it;
-	kvService_ptr service;
+	kvServiceExt_ptr service;
 	bool forceNS = false;
 	bool usedNS;
 
@@ -460,7 +463,7 @@ DataIterator_ptr getKvDataFunc_abstract::getDataIter(const WhichDataHelper &wd)
 	{
 		for (int i = 0; i < 2; i++)
 		{
-			service = corbaApp->lookUpManager(forceNS, usedNS);
+			service = corbaApp->lookUpService(forceNS, usedNS);
 			try
 			{
 				if (!service->getData(*wd.whichData(), it))
@@ -511,7 +514,7 @@ getKvDataFunc::getKvDataFunc(KvGetDataReceiver &dataReceiver,
 {
 }
 
-bool getKvDataFunc::process(kvService_ptr service)
+bool getKvDataFunc::process(kvServiceExt_ptr service)
 {
 	DataIterator_var dataIt = getDataIter(wd);
 	ObsDataList_var data;
@@ -553,7 +556,7 @@ getKvDataFunc_deprecated::getKvDataFunc_deprecated(KvObsDataList &dataList,
 {
 }
 
-bool getKvDataFunc_deprecated::process(kvService_ptr service)
+bool getKvDataFunc_deprecated::process(kvServiceExt_ptr service)
 {
 	DataIterator_var dataIt = getDataIter(wd);
 	ObsDataList_var data;
