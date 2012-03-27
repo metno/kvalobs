@@ -87,7 +87,7 @@ main(int argn, char **argv)
 	   cerr << "Workstatistik (obstime): " << from << " - " << to << endl;
 
 	   if( ! app.getKvWorkstatistik( ObsTime, from, to, wit) ) {
-	      cerr << "Failed to get workstatistik data!" << end;
+	      cerr << "Failed to get workstatistik data!" << endl;
 	      return 1;
 	   }
 

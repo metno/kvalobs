@@ -17,11 +17,13 @@ kvServiced_SOURCES=kvServiced.cc \
                    kvModelDataIteratorImpl.cc kvModelDataIteratorImpl.h\
                    kvDataIteratorImpl.cc kvDataIteratorImpl.h\
                    kvRejectedIteratorImpl.cc kvRejectedIteratorImpl.h\
+                   kvWorkstatistikIteratorImpl.cc kvWorkstatistikIteratorImpl.h\
                    kvSubscriberBase.cc kvSubscriberBase.h\
                    kvDataNotifySubscriber.cc kvDataNotifySubscriber.h\
                    DataReadyCommand.cc DataReadyCommand.h\
                    SubscriberThread.cc SubscriberThread.h \
-                   kvHintSubscriber.h kvDataNotifySubscriberImpl.h
+                   kvHintSubscriber.h kvDataNotifySubscriberImpl.h 
+                   
              
 kvServiced_CPPFLAGS = $(AM_CPPFLAGS)
 kvServiced_LDFLAGS =  -pthread -export-dynamic

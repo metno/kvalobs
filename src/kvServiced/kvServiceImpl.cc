@@ -41,6 +41,7 @@
 #include "kvDataIteratorImpl.h"
 #include "kvRejectedIteratorImpl.h"
 #include "kvModelDataIteratorImpl.h"
+#include "kvWorkstatistikIteratorImpl.h"
 
 using namespace milog;
 using namespace CKvalObs::CService;
@@ -1451,13 +1452,90 @@ CORBA::Boolean
 KvServiceImpl::
 getWorkstatistik(
       CKvalObs::CService::WorkstatistikTimeType timeType,
-      const char *fromTime, const char *toTime,
+      const char *fromTime_, const char *toTime_,
       CKvalObs::CService::WorkstatistikIterator_out it )
 {
-   LogContext context( "service/getWorkstatistik" );
-   LOGWARN("service/getWorkstatistik: NOT SUPPORTED");
+   WorkstatistikIteratorImpl      *dataIt;
+   PortableServer::ObjectId *itId;
+   miTime                   fromTime, toTime;
+   list<string>             decodeList;
+
+   LogContext context("service/getWorkstatistik");
+
+   if(app.isMaxClientReached()){
+      LOGWARN("To many clients.....");
+      return false;
+   }
+
    it=WorkstatistikIterator::_nil();
-   return false;
+
+   if(strlen(fromTime_)==0){
+      fromTime=miTime::nowTime();
+      fromTime=miTime(fromTime.date(), miClock(0,0,0));
+   }else{
+      fromTime=miTime(fromTime_);
+   }
+
+   if(strlen(toTime_)==0){
+      toTime=miTime::nowTime();
+   }else{
+      toTime=miTime(toTime_);
+   }
+
+   if(fromTime.undef() || toTime.undef()){
+      if(fromTime.undef()){
+         LOGERROR("INVALID fromTime: <" << fromTime_ << ">");
+      }else{
+         LOGERROR("INVALID toTime: <" << toTime_ << ">");
+      }
+
+      return false;
+   }
+
+   Connection *pCon=app.getNewDbConnection();
+
+   if(!pCon)
+      return false;
+
+   try{
+      //dataIt becomes the owner of the pointers 'con' and 'pWhichData'
+      //and will delete them when dataIt is deleted.
+      dataIt=new WorkstatistikIteratorImpl(pCon, fromTime, toTime, timeType, app);
+   }
+   catch(...){
+      LOGERROR("OUT OF MEMMORY (2)");
+      app.releaseDbConnection(pCon);
+      return false;
+   }
+
+   try{
+      itId=app.getPoa()->activate_object(dataIt);
+      dataIt->setObjId(itId);
+   }
+   catch(...){
+      LOGERROR("Cant register the DataIteratorImpl in the poa!");
+      delete dataIt;
+      return false;
+   }
+
+   try{
+      it=dataIt->_this();
+   }
+   catch(...){
+      LOGERROR("Cant obtain a referanse to the DataIterator!\n");
+      delete dataIt;
+      return false;
+   }
+
+   if(CORBA::is_nil(it)){
+      LOGERROR("cant instatiate (DataIterator)!!!!");
+      delete dataIt;
+      return false;
+   }
+
+   app.addReaperObj(dataIt);
+
+   return true;
 }
 
 

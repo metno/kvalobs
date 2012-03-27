@@ -40,9 +40,10 @@
 #include <kvalobs/kvObsPgm.h>
 
 
-class KvServiceImpl: public virtual POA_CKvalObs::CService::kvServiceExt,
-		     public virtual micutil::AdminInterface,
-		     public PortableServer::RefCountServantBase {
+class KvServiceImpl:
+   public virtual POA_CKvalObs::CService::kvServiceExt2,
+	public virtual micutil::AdminInterface,
+	public PortableServer::RefCountServantBase {
   
   ServiceApp &app;
   void addToObsPgmList(CKvalObs::CService::Obs_pgmList &pgmList, 

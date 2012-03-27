@@ -53,7 +53,7 @@ main(int argn, char **argv)
 		return 1;
 	}
 	
-	kvService_var refKvService=kvService::_narrow(tmpObj);
+	kvServiceExt_var refKvService=kvServiceExt::_narrow(tmpObj);
 	
 	if(CORBA::is_nil(refKvService)){
 		cerr << "Cant cast to <kvService>!";
