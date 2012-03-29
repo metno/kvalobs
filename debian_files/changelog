@@ -1,3 +1,11 @@
+kvalobs (2.5.0-1) lucid; urgency=low
+
+  * New release.
+  * No change since 2.5.0~rc7-1.
+  
+ -- Borge Moe <borge.moe@met.no> Thu, 29 Mar 2012 13:15:00 +0200
+
+
 kvalobs (2.5.0~rc7-1) lucid; urgency=low
 
   * Use the workstatistik table, not the workque table, for getWorkstatistik.
