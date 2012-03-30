@@ -29,6 +29,7 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include <unistd.h>
+#include <iostream>
 #include <sstream>
 #include <time.h>
 #include "pgsqldb.h"

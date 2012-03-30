@@ -32,11 +32,9 @@
 #define __dnmi_db_db_h__
 
 #include <exception>
-#include <iostream>
 #include <string>
 #include <vector>
 #include <list>
-#include <stdio.h>
 #include <kvdb/transaction.h>
 
 

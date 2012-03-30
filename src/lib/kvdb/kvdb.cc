@@ -31,6 +31,7 @@
 #include <iostream>
 #include "kvdb.h"
 #include "Pimpel.h"
+#include <stdio.h>
 
 using namespace std;
 
@@ -49,7 +50,7 @@ dnmi::db::DRow::operator[](int i)
   
     if(i>=size()){
 	char buf[100];
-	sprintf(buf, "Range error (size=%d  index=%d)!", size(), i);
+	snprintf(buf, sizeof(buf), "Range error (size=%d  index=%d)!", size(), i);
 	throw SQLException(buf);
     }
 
