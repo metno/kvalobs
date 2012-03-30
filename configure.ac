@@ -8,7 +8,10 @@ AM_INIT_AUTOMAKE
 AC_CONFIG_MACRO_DIR([m4])
 
 AC_PROG_LIBTOOL
-AM_PROG_LEX
+AC_PROG_LEX
+if test "x$LEX" == "x:"; then
+	AC_MSG_ERROR([lex/flex not found])
+fi
 AM_PROG_CC_C_O
 AC_PROG_YACC
 AC_PROG_CXX
@@ -85,7 +88,7 @@ PKG_CHECK_MODULES(libxmlpp, libxml++-2.6)
 PKG_CHECK_MODULES(cppunit, cppunit)
 GTEST_CHECK
 GMOCK_CHECK
-
+AC_CHECK_LIB(perl, [main], [], [AC_MSG_ERROR([no libperl found])])
 
 KV_PERL
 AX_BOOST_BASE
