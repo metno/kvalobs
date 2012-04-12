@@ -45,4 +45,4 @@ gettimeofday();
 
 }
 
-#endif /*GETTIMEOFDAY_H_*/
+#endif

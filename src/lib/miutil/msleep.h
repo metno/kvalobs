@@ -42,4 +42,4 @@ void msleep( unsigned long millisecond );
 
 }
 
-#endif /* MSLEEP_H_ */
+#endif
