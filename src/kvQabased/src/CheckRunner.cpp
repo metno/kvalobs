@@ -34,6 +34,8 @@
 #include <db/returntypes/CheckSignature.h>
 #include <db/returntypes/kvCronString.h>
 #include <milog/milog.h>
+#include <miutil/gettimeofday.h>
+#include <miutil/msleep.h>
 #include <iterator>
 #include <new>
 
@@ -98,10 +100,57 @@ private:
 	db::DatabaseAccess & db_;
 	bool committed_;
 };
+
+void
+logTransaction( bool ok,
+                double start,
+                int shortRetries,
+                int longRetries,
+                std::exception *ex=0)
+{
+   using namespace std;
+
+   double duration( miutil::gettimeofday() - start );
+   string extra(".");
+
+   if( ex ) {
+      extra = string(" Excetion: ") + ex->what() + ".";
+   }
+
+   if( ok ) {
+      if( shortRetries == 0 && longRetries == 0 ) {
+         IDLOGINFO( "transaction", "SUCCESS duration: " <<
+                    fixed << setprecision(3) << duration <<
+                    " s #swait: " << shortRetries <<
+                    " #lwait: " << longRetries << extra );
+      } else {
+         IDLOGWARN( "transaction", "SUCCESS duration: " <<
+                    fixed << setprecision(3) << duration <<
+                    " s #swait: " << shortRetries <<
+                    " #lwait: " << longRetries << extra );
+      }
+   } else {
+      IDLOGERROR("transaction", "FAILED  duration: " <<
+                 fixed << setprecision(3) << duration <<
+                 " s #swait: " << shortRetries <<
+                 " #lwait: " << longRetries << extra);
+      IDLOGERROR("failed", "FAILED duration: " <<
+                 fixed << setprecision(3) << duration <<
+                 " s #swait: " << shortRetries <<
+                 " #lwait: " << longRetries << extra);
+   }
+}
 }
 
 void CheckRunner::newObservation(const kvalobs::kvStationInfo & obs, std::ostream * scriptLog)
 {
+   const int shortSleep=100;
+   const int longSleep=300;
+   const int nRetry=3;
+   double start;
+   int nLongRetries=0;
+   int nShortRetries=0;
+
 	std::ostringstream logContext;
 	logContext << obs.obstime() << '/' << obs.typeID() << '/' << obs.stationID();
 	milog::LogContext context(logContext.str());
@@ -113,27 +162,46 @@ void CheckRunner::newObservation(const kvalobs::kvStationInfo & obs, std::ostrea
 	}
 
 	LOGINFO("Checking " << obs);
+	start = miutil::gettimeofday();
 
-	// Will try up to three times in case of serialization error
+	// Will try up to nRetry*nRetry times in case of serialization error
 	try
 	{
-		for ( int i = 0; i < 2; ++ i )
-		{
-			try
-			{
-				checkObservation(obs, scriptLog);
-				return;
-			}
-			catch (db::DatabaseAccess::SerializationError & )
-			{
-				LOGWARN("Serialization error! Retrying");
-				continue;
-			}
-		}
-		checkObservation(obs, scriptLog);
+	   for ( int k = 0; k < nRetry; ++ k )
+	   {
+	      if( k != 0 )
+	      {
+	         nLongRetries++;
+	         miutil::msleep( longSleep );
+	      }
+
+	      for ( int i = 0; i < nRetry ; ++ i )
+	      {
+	         if( i != 0 )
+	         {
+	            nShortRetries++;
+	            miutil::msleep( shortSleep );
+	         }
+
+	         try
+	         {
+	            checkObservation(obs, scriptLog);
+	            logTransaction( true, start, nShortRetries, nLongRetries);
+	            return;
+	         }
+	         catch (db::DatabaseAccess::SerializationError & )
+	         {
+	            LOGWARN("Serialization error! Retrying");
+	         }
+	      }
+	   }
+
+	   LOGERROR("Serialization error!" );
+	   logTransaction( false, start, nShortRetries, nLongRetries);
 	}
 	catch ( std::exception & e )
 	{
+	   logTransaction( false, start, nShortRetries, nLongRetries, &e );
 		LOGERROR(e.what());
 	}
 }

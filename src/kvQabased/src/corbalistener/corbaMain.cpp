@@ -112,8 +112,14 @@ bool checkPidFile()
 
 int corbaMain(int argc, char** argv, const qabase::Configuration & config)
 {
+   string logdir( kvPath("logdir") );
 	miutil::conf::ConfSection *conf = KvApp::getConfiguration();
 	string constr(KvApp::createConnectString());
+
+	milog::createGlobalLogger( logdir, "kvQabased_transaction", "failed", milog::DEBUG );
+	milog::createGlobalLogger( logdir, "kvQabased", "transaction", milog::DEBUG,
+	                           200, 1,  new milog::StdLayout1() );
+
 
 	string dbdriver = getDbDriver(conf);
 
