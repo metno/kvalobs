@@ -118,7 +118,7 @@ int corbaMain(int argc, char** argv, const qabase::Configuration & config)
 
 	milog::createGlobalLogger( logdir, "kvQabased_transaction", "failed", milog::DEBUG );
 	milog::createGlobalLogger( logdir, "kvQabased", "transaction", milog::DEBUG,
-	                           200, 1,  new milog::StdLayout1() );
+	                           1024*10, 2,  new milog::StdLayout1() );
 
 
 	string dbdriver = getDbDriver(conf);
