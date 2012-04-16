@@ -171,6 +171,30 @@ public:
 };
 
 
+/**
+* \brief A transaction is aborted due to serialize error.
+*
+* SQLSerializeError is thrown if a transaction is aborted due to serialize
+* error. This may happen if the transaction isolation level is set to
+* SERIALIZABLE or an SELECT ... FOR UPDATE is issued. The transaction must
+* be rolled back and restarted.
+*/
+
+class SQLSerializeError: public SQLException{
+   bool deadLockDetected_;
+public:
+   explicit SQLSerializeError(const std::string &reason_)
+   :SQLException(reason_), deadLockDetected_( false ){}
+   explicit SQLSerializeError(const std::string &reason_,
+                              const std::string &errorCode, bool deadLockDetected=false )
+      :SQLException(reason_, errorCode ), deadLockDetected_( deadLockDetected ){}
+
+   bool deadLockDetected() const { return deadLockDetected_; }
+   ~SQLSerializeError()throw(){};
+};
+
+
+
 ///Is the base class of DRow, that represent a row in the reult set.
 typedef std::vector<std::string>                 Row;
 
@@ -374,7 +398,8 @@ public:
    * \param SQLstmt the SQL statement.
    * \return The  result set.
    *
-   * \exception SQLNotConnected, SQLAborted, SQLBusy, SQLDuplicate or SQLExcetion on error.
+   * \exception SQLNotConnected, SQLAborted, SQLBusy, SQLDuplicate,
+   * SQLSerializeError or SQLExcetion on error.
    */
    virtual Result *execQuery(const std::string &SQLstmt)=0;
 
@@ -385,7 +410,8 @@ public:
    *
    * \param SQLstmt The SQL statement.
    *
-   * \exception SQLNotConnected, SQLAborted, SQLBusy, SQLDuplicate or SQLExcetion on error.
+   * \exception SQLNotConnected, SQLAborted, SQLBusy,
+   * SQLDuplicate, SQLSerializeError or SQLExcetion on error.
    */
    virtual void exec(const std::string &SQLstmt)=0;
 

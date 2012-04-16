@@ -238,6 +238,10 @@ dnmi::db::drivers::PGConnection::exec(const std::string &query)
 
    PQclear(p);
 
+
+   if( errorCode == "40001" || errorCode == "40P01" )
+      throw SQLSerializeError("Seriallize error", errorCode, errorCode=="40P01" );
+
    std::string::size_type i=msg2.find("duplicate");
 
    if(i!=std::string::npos){
@@ -328,6 +332,9 @@ dnmi::db::drivers::PGConnection::execQuery(const std::string &query)
    std::string errorCode( PQresultErrorField( p, PG_DIAG_SQLSTATE ) );
 
    PQclear(p);
+
+   if(  errorCode == "40001" || errorCode=="40P01")
+      throw SQLSerializeError("Seriallize error", errorCode, errorCode=="40P01" );
 
    std::string::size_type i = msg.find("duplicate");
 
@@ -598,19 +605,25 @@ perform( dnmi::db::Connection *con_,
             retry--;
          }
       }
-      catch (const SQLAborted &e) {
-         if( e.errorCode() != "40001" ) //SERIALIZATION FAILURE
-            retry--;
-         else { // e.errorCode() == "40001"
-            lastError = e.what();
+      catch ( const SQLSerializeError &ex ) {
+         if( ex.deadLockDetected() ) {
             time( &now );
-
-            //We allow a three minutes periode of retry
-            //before we reduce the retry counter.
-            if( (now - start) > 180 ) {
+            if( (now - start) > 10 ) {
                time( &start ); //Reset the timeout counter.
                retry--;
             }
+         }
+         t.onAbort( con->getDriverId(), ex.what(), ex.errorCode() );
+      }
+      catch (const SQLAborted &e) {
+         lastError = e.what();
+         time( &now );
+
+         //We allow a one minutes periode of retry
+         //before we reduce the retry counter.
+         if( (now - start) > 60 ) {
+            time( &start ); //Reset the timeout counter.
+            retry--;
          }
          t.onAbort( con->getDriverId(), e.what(), e.errorCode() );
       }
