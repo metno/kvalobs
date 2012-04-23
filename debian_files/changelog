@@ -4,7 +4,7 @@ kvalobs (2.5.1-1) lucid; urgency=low
   * Make kvQabased try harder to update the database.
   * More loging for db transaction status in kvQabased.
     
- -- Borge Moe <borge.moe@met.no> Fri, 13 Apr 2012 07:00:00 +0200
+ -- Borge Moe <borge.moe@met.no> Mon, 23 Apr 2012 09:00:00 +0200
 
 kvalobs (2.5.0-1) lucid; urgency=low
 
