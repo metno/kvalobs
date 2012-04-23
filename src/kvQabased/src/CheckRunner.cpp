@@ -189,7 +189,7 @@ void CheckRunner::newObservation(const kvalobs::kvStationInfo & obs, std::ostrea
 	            logTransaction( true, start, nShortRetries, nLongRetries);
 	            return;
 	         }
-	         catch (db::DatabaseAccess::SerializationError & )
+	         catch (dnmi::db::SQLSerializeError & )
 	         {
 	            LOGWARN("Serialization error! Retrying");
 	         }
@@ -302,11 +302,6 @@ void CheckRunner::checkObservation(const kvalobs::kvStationInfo & obs, std::ostr
 		catch ( std::bad_alloc & e )
 		{
 			LOGFATAL(e.what());
-			throw;
-		}
-		catch (db::DatabaseAccess::SerializationError & )
-		{
-			// this cannot be handled here, so we throw it back to caller
 			throw;
 		}
 		catch ( NoErrorLogException & e )

@@ -182,13 +182,13 @@ public:
 	 */
 	virtual void getTextData(TextDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const =0;
 
-	/**
-	 * Error may be thrown by write method if a transaction serialization error occurred.
-	 */
-	struct SerializationError : public std::runtime_error
-	{
-		SerializationError() : std::runtime_error("serialization error") {}
-	};
+//	/**
+//	 * Error may be thrown by write method if a transaction serialization error occurred.
+//	 */
+//	struct SerializationError : public std::runtime_error
+//	{
+//		SerializationError() : std::runtime_error("serialization error") {}
+//	};
 
 	/**
 	 * Write data back to database

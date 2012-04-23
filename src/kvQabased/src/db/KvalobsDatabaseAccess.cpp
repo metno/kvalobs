@@ -359,7 +359,7 @@ void KvalobsDatabaseAccess::getData(DataList * out, const kvalobs::kvStationInfo
 	miutil::miTime t = si.obstime();
 	t.addMin(minuteOffset);
 	query << "obstime BETWEEN '" << t << "' AND '" << si.obstime() << "'";
-	query << " ORDER BY obstime DESC;";
+	query << " ORDER BY obstime DESC FOR UPDATE;";
 
 	milog::LogContext context("query");
 	LOGDEBUG1(query.str());
@@ -413,29 +413,18 @@ void KvalobsDatabaseAccess::write(const DataList & data)
 //	for ( DataList::const_iterator it = data.begin(); it != data.end(); ++ it )
 //		LOGINFO("Write to database: " << * it);
 
-	try
+	for ( DataList::const_iterator it = data.begin(); it != data.end(); ++ it )
 	{
-		//connection_->beginTransaction();
+		std::ostringstream query;
+		query << "UPDATE data SET "
+				"controlinfo='" << it->controlinfo().flagstring() << "', "
+				"useinfo='" << it->useinfo().flagstring() << "', "
+				"corrected=" << it->corrected() << ", "
+				"cfailed='" << it->cfailed() << "'" <<
+				it->uniqueKey() << ';';
 
-		for ( DataList::const_iterator it = data.begin(); it != data.end(); ++ it )
-		{
-			std::ostringstream query;
-			query << "UPDATE data SET "
-					"controlinfo='" << it->controlinfo().flagstring() << "', "
-					"useinfo='" << it->useinfo().flagstring() << "', "
-					"corrected=" << it->corrected() << ", "
-					"cfailed='" << it->cfailed() << "'" <<
-					it->uniqueKey() << ';';
-
-			LOGDEBUG1(query.str());
-			connection_->exec(query.str());
-		}
-	}
-	catch (dnmi::db::SQLException & e)
-	{
-		if ( e.errorCode() == "40001" ) // serialization error
-			throw SerializationError();
-		else throw;
+		LOGDEBUG1(query.str());
+		connection_->exec(query.str());
 	}
 #endif
 }
