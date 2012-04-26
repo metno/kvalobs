@@ -34,8 +34,6 @@ if [ x"$IPALIAS_CHOICES" != "x" ]; then
 fi
 
 
-
-
 log()
 {
     local mylog=""
@@ -46,25 +44,24 @@ log()
         mylog=$logfile
     fi
     
-	echo "$@"  | tee -a $mylog
+    echo "$@" >> $mylog
+#	echo "$@"  | tee -a $mylog
 }
 
-log "ipalias: $ipalias"
+if [ -z "$ipalias" ]; then
+    log "ipalias: NOT defined, this is ok if this instance of kvalobs do not use ip-alias." 
+else
+    log "ipalias: $ipalias" >> $logfile
+fi
+
 
 ipalias_status()
 {
     local me=`uname -n`
     local res=0
-    local mylog=""
-
-    if [ -z "$logfile" ]; then
-		mylog="/dev/null"
-    else
-		mylog=$logfile
-    fi
 
     if [ -z "$ipalias" ]; then
-        echo "$me, is an test machine" >> $mylog
+        log "$me, is a test machine (?)."
         echo "test"
         return 0
     fi
@@ -72,19 +69,19 @@ ipalias_status()
     $ipalias status > /dev/null 2>&1 || res=$?
 
     if [ "$res" = "2" ]; then
-		echo "This machine has the kvalobs ip alias." >> $mylog
+		log "This machine has the kvalobs ip alias."
 		echo "true" 
 		return 0
     elif [ "$res" = "1" ]; then
-		echo "Another machine has the kvalobs ip alias." >> $mylog
+		log "Another machine has the kvalobs ip alias."
 		echo "false"
 		return 1
     elif [ "$res" = "0" ]; then
-        echo "No machine has the kvalobs ip alias." >> $mylog
+        log "No machine has the kvalobs ip alias."
         echo "false"
         return 1
     else
-		echo "FAILED - kvalobs ipalias status." >> $mylog
+		log "FAILED - kvalobs ipalias status." 
 		echo "undefined"
 		return 2
     fi
