@@ -1,13 +1,29 @@
-#! /bin/sh
+    #! /bin/sh
 
 SQLDIR=`KVCONFIG --datadir`/kvalobs/db
 ETCDIR=`KVCONFIG --sysconfdir`/kvalobs
 LIBDIR=$(kvconfig --pkglibdir)
 
+LOGDIR=`KVCONFIG --localstatedir`/log/kvalobs/kvdbadmin
+
+if [ ! -d "$LOGDIR" ]; then
+    mkdir -p $LOGDIR || (echo "Failed create directory: $LOGDIR"; exit 1)
+fi
+
+DAY=`date '+%d'`
+LOG=$LOGDIR/kvdbadmin-$DAY.log
+
+echo "Start: $(date)" >> $LOG
+#date >> $LOG
+
 if [ ! -f "$LIBDIR/tool_funcs.sh" ]; then
-	echo "Cant load: $LIBDIR/tool_funcs.sh"
+	echo "Cant load: $LIBDIR/tool_funcs.sh" | tee -a $LOG
 	exit 1
 fi
+
+#Set logfile to LOG. This is used by the functions
+#in tool_funcs to write log tsatments.
+logfile=$LOG
 
 . $LIBDIR/tool_funcs.sh
 
@@ -22,12 +38,7 @@ else
 fi
 
 PSQL=psql
-LOGDIR=`KVCONFIG --localstatedir`/log/kvalobs
 
-DAY=`date '+%d'`
-LOG=$LOGDIR/kvdbadmin-$DAY.log
-echo -n "Start: " > $LOG
-date >> $LOG
 echo "Using clean script: $SQLCLEAN" >> $LOG 
 $PSQL -U kvalobs kvalobs < $SQLCLEAN >> $LOG  2>&1
 echo -n "Stop: " >> $LOG
