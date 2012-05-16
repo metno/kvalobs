@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #  Kvalobs - Free Quality Control Software for Meteorological Observations 
 #
 #  Copyright (C) 2007 met.no
@@ -28,9 +28,9 @@
 
 ( /usr/local/sbin/alias_list | /bin/grep -q kvalobs ) || exit 0
 
-PGPORT=`grep PGPORT $HOME/.bashrc|cut -f2 -d=`
-#echo $PGPORT
-#source $HOME/.bashrc
+#PGPORT=`grep PGPORT $HOME/.bashrc|cut -f2 -d=`
+
+source $HOME/.bashrc
 
 KVALOBS=$HOME
 DIR=$KVALOBS/db_backup
@@ -43,12 +43,25 @@ else
    exit 1
 fi
 
-/usr/lib/postgresql/8.3/bin/pg_dump -h localhost -p $PGPORT -U kvalobs kvalobs | gzip -9 > "kvalobs.`date +'%Y-%m-%d'`.gz"
+# echo $PGPORT > $DIR/test.out
+# echo $PATH > $DIR/test.out
+# which pg_dump >> $DIR/test.out
+# exit 0
+
+pg_dump -h localhost -p $PGPORT -U kvalobs kvalobs | gzip -9 > "kvalobs.`date +'%Y-%m-%d'`.gz"
 
 #-----------------------------------
 # DAYS means to delete files older than this number of days
-DAYS=+64
+# DAYS=+64
 #-----------------------------------
-find $DIR -name 'kvalobs.*.gz' -type f -mtime +7 -exec rm -f {} \;
-$KVALOBS/bin/db_backup/error_backup.pl    $DIR
 
+num_backups="`find $DIR -name 'kvalobs.*.gz' -type f | wc -l `"
+if [ $num_backups -le 1 ]
+then
+    echo "Warning" | mail -s "Warning - mulig feil med histkvalobsdb backup" $MAILTO
+    echo "Warning - mulig feil med histkvalobsdb backup"
+else
+    find $DIR -name 'kvalobs.*.gz' -type f -mtime +7 -exec rm -f {} \;
+fi
+
+$KVALOBS/bin/db_backup/error_backup.pl    $DIR
