@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 #  Kvalobs - Free Quality Control Software for Meteorological Observations 
 #
 #  Copyright (C) 2007 met.no
