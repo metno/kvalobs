@@ -177,14 +177,14 @@ bool kvUseInfo::setUseFlags(const kvControlInfo& cinfo)
 		else if (fd == 3 && ui[7] == 0)
 			ui[1] = 2;
 
-		else if ((fd == 2 || fd == 6 || fd == 7 || fd == 0xA || fd == 0xB)
+		else if ((fd == 2 || fd == 4 || fd == 7 || fd == 8 || fd == 9|| fd == 0xA)
 				&& ui[7] == 0)
 			ui[1] = 3;
 
 		else if (fd == 3 && ui[7] > 0)
 			ui[1] = 4;
 
-		else if ((fd == 2 || fd == 6 || fd == 7 || fd == 0xA || fd == 0xB)
+		else if ((fd == 2 || fd == 4 || fd == 7 || fd == 8 || fd == 9|| fd == 0xA)
 				&& ui[7] > 0)
 			ui[1] = 5;
 	}
@@ -200,7 +200,7 @@ bool kvUseInfo::setUseFlags(const kvControlInfo& cinfo)
 			ui[2] = 0;
 
 		else if (fagg > 4 || fr == 6 || fr == 0xA || fcc >= 0xA || fcp >= 0xA || fs >= 8
-				|| fnum == 6 || fw == 6 || fpos >= 4 || fd == 2 || fd >= 6
+				|| fnum == 6 || fw == 6 || fpos >= 4 || fd == 2 || fd == 4 || fd >= 7
 				|| fpre >= 4 || fclim == 3 || fcombi >= 9 || fhqc >= 6)
 			ui[2] = 3;
 
@@ -228,10 +228,10 @@ bool kvUseInfo::setUseFlags(const kvControlInfo& cinfo)
 		if (fmis == 3)
 			ui[3] = 9;
 
-		else if (fhqc == 6 || fagg == 8)
+		else if (fd == 9 || fd == 0xA || fagg == 8)
 			ui[3] = 5;
 
-		else if (fd > 5 || fagg == 9)
+		else if (fd == 7 || fd == 8 || fagg == 9)
 			ui[3] = 6;
 
 		else if (fhqc == 5 || fagg == 5 || (ftime == 1 && fmis == 1))
@@ -269,7 +269,7 @@ bool kvUseInfo::setUseFlags(const kvControlInfo& cinfo)
 		else if (fhqc >= 5)
 			ui[4] = 9;
 
-		else if (fd == 2 || fd >= 6 || fr == 7)
+		else if (fd == 2 || fd == 4 || fd >= 7 || fr == 7)
 			ui[4] = 9;
 
 		else if ((fr == 0xA || (7 > fr && fr > 1)) && fcc <= 1 && fcp <= 1 && fs <= 1 && fnum
