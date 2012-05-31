@@ -2,6 +2,7 @@ usr/share/kvalobs/idl/*.idl
 usr/include/kvalobs/*
 usr/lib/libkvalobs2_*.*a
 usr/lib/libkvalobs2_corbahelper.so
+usr/lib/libkvalobs2_decoderbase.so
 usr/lib/libkvalobs2_decodeutility.so
 usr/lib/libkvalobs2_dnmithread.so
 usr/lib/libkvalobs2_fileutil.so
