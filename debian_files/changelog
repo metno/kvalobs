@@ -11,8 +11,9 @@ kvalobs (2.5.2-1) lucid; urgency=low
   * New release.
   * Change the logging in tool_funcs.sh.
   * kvdbadmin logs to the directory /var/log/kvalobs/kvdbadmin.
-
- -- Borge Moe <borge.moe@met.no>  Thu, 26 Apr 2012 13:12:00 +0200
+  * Only check for ip-alias kvalobs on startup.
+    
+ -- Borge Moe <borge.moe@met.no> Tue, 29 May 2012 13:12:00 +0200
 
 kvalobs (2.5.1-1) lucid; urgency=low
 
