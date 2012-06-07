@@ -35,7 +35,7 @@
 #include "InitLogger.h"
 #include "DataSrcImpl.h"
 #include "DataSrcApp.h"
-#include <dnmithread//ThrPoolQue.h>
+#include <dnmithread/ThrPoolQue.h>
 #include "DecodeCommand.h"
 #include <miconfparser/miconfparser.h>
 #include <fileutil/pidfileutil.h>
@@ -232,17 +232,24 @@ killThreadOnSignal()
 bool 
 threadAfter(CommandBase *cmd)
 {
-   DecodeCommand *dec;
+   DecodeCommand *dec = dynamic_cast<DecodeCommand *>(cmd);;
+
+   if( ! dec ) {
+      LOGFATAL("kvDataInputd: threadAfter: failed dynamic_cast!\n");
+      return false;
+   }
 
    try{
-      dec=dynamic_cast<DecodeCommand *>(cmd);
       LOGDEBUG("kvDataInputd: threadAfter: BEFORE call too: dec->signal()!\n");
       dec->signal();
       LOGDEBUG("kvDataInputd: threadAfter: AFTER call too: dec->signal()!\n");
       return true;
    }
-   catch(...){
-      LOGFATAL("kvDataInputd: threadAfter: failed dynamic_cast!\n");
+   catch(std::exception& ex) {
+      LOGFATAL("kvDataInputd: exception in dec->signal: " << ex.what());
+   }
+   catch(...) {
+      LOGFATAL("kvDataInputd: unknown exception in dec->signal");
    }
 
    return false;
