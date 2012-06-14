@@ -208,13 +208,13 @@ miutil::miTime
 DataUpdateTransaction::
 getTimestamp( dnmi::db::Connection *con, int &msec )
 {
-   dnmi::db::Result *res;
+    std::auto_ptr<dnmi::db::Result> res;
    string q("SELECT now()");
 
    msec=0;
 
    try {
-      res=con->execQuery( q );
+       res.reset(con->execQuery( q ));
    }
    catch( const dnmi::db::SQLException &ex ) {
       log << "getTimestamp: '" << q << "' \nSQLState: " << ex.errorCode()
@@ -231,10 +231,7 @@ getTimestamp( dnmi::db::Connection *con, int &msec )
    }
 
 
-   if( ! res )
-      return miutil::miTime();
-
-   if (res->hasNext()) {
+   if( res.get() != 0 && res->hasNext() ) {
       dnmi::db::DRow & row = res->next();
       return miutil::isoTimeWithMsec( row[0], msec );
    }
