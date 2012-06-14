@@ -63,11 +63,7 @@ dnmi::thread::
 CommandQue::
 ~CommandQue()
 {
-   Lock lock(m);;
-   QueIterator it=que.begin();
-
-   for(;it!=que.end(); it++)
-      delete *it;
+    clear();
 }
 
 void 
@@ -200,7 +196,8 @@ CommandQue::
 clear()
 {
    Lock lck(m);
-
+   for(QueIterator it=que.begin(); it!=que.end(); it++)
+      delete *it;
    que.clear();
 }
 
