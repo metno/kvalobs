@@ -18,16 +18,16 @@
   modify it under the terms of the GNU General Public License as 
   published by the Free Software Foundation; either version 2 
   of the License, or (at your option) any later version.
-  
+
   KVALOBS is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License along 
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ */
 #include <milog/milog.h>
 #include "DecodeCommand.h"
 
@@ -37,7 +37,7 @@ DecodeCommand::~DecodeCommand()
 }
 
 DecodeCommand::DecodeCommand(kvalobs::decoder::DecoderBase *decoder_)
-  :decoder(decoder_)
+:decoder(decoder_)
 {
 }
 
@@ -45,55 +45,62 @@ DecodeCommand::DecodeCommand(kvalobs::decoder::DecoderBase *decoder_)
 kvalobs::kvStationInfoList& 
 DecodeCommand::getInfoList()
 {
-  return decoder->getStationList();
+   return decoder->getStationList();
 }
-  
+
 bool       
 DecodeCommand::executeImpl()
 {
-  LOGDEBUG("DecodeCommand::execute: called!\n");
+   LOGDEBUG("DecodeCommand::execute: called!\n");
 
-  result=decoder->execute(msg);
+   result=decoder->execute(msg);
 
-  LOGDEBUG("DecodeCommand::execute: return!\n");
-  return result==kvalobs::decoder::DecoderBase::Ok;
+   LOGDEBUG("DecodeCommand::execute: return!\n");
+   return result==kvalobs::decoder::DecoderBase::Ok;
 }
 
 void     
 DecodeCommand::debugInfo(std::iostream &info)
 {
-  
+
 }
 
-  
+
 DecodeCommand*
 DecodeCommand::wait(int timeoutInSecond)
 {
-  DecodeCommand* cmd;
+   DecodeCommand* cmd;
 
+   try{
+      dnmi::thread::CommandBase * msg = resQue.get(timeoutInSecond);
 
-  try{
-	  dnmi::thread::CommandBase * msg = resQue.get(timeoutInSecond);
-	  if ( ! msg )
-		  return 0;
-    cmd=dynamic_cast<DecodeCommand *>(msg);
+      if ( ! msg ) {
+         return 0;
+      }
 
-    if(!cmd){
-      LOGWARN("DecodeCommand::wait: timeout?? (failed dynamic_cast)!\n");
+      cmd=dynamic_cast<DecodeCommand *>(msg);
+
+      if(!cmd){
+         LOGWARN("DecodeCommand::wait: failed dynamic_cast!\n");
+         delete msg;
+         return 0;
+      }
+   }
+   catch( const dnmi::thread::QueSuspended &ex ) {
+      LOGERROR("DecodeCommand::wait: Result que suspended.\n");
       return 0;
-    }
-  }
-  catch(...){
-    LOGERROR("DecodeCommand::wait: failed dynamic_cast!\n");
-    return 0;
-  }
+   }
+   catch(...){
+      LOGERROR("DecodeCommand::wait: Unexpected exception!\n");
+      return 0;
+   }
 
-  return cmd;
+   return cmd;
 }
 
 
 void       
 DecodeCommand::signal()
 {
-  resQue.postAndBrodcast(this);
+   resQue.postAndBrodcast(this);
 }
