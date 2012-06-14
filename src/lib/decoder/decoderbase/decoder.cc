@@ -323,7 +323,7 @@ addStationInfo(long stationid,
 void
 kvalobs::decoder::
 DecoderBase::
-updateStationInfo( const kvalobs::kvStationInfoList stationInfo )
+updateStationInfo( const kvalobs::kvStationInfoList& stationInfo )
 {
    IkvStationInfoList it=stationInfoList.begin();
 

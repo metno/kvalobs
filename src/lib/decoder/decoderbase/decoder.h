@@ -118,7 +118,7 @@ namespace kvalobs{
 			  const miutil::miTime &tbtime,
 			  int priority);
 
-      void updateStationInfo( const kvalobs::kvStationInfoList stationInfo );
+      void updateStationInfo( const kvalobs::kvStationInfoList& stationInfo );
 
 
       /**
