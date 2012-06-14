@@ -1,0 +1,15 @@
+/m4
+/mk
+Makefile.in
+/aclocal.m4
+/compile
+/config.guess
+/config.h.in
+/config.sub
+/configure
+/depcomp
+/install-sh
+/ltmain.sh
+/missing
+/ylwrap
+/autom4te.cache
