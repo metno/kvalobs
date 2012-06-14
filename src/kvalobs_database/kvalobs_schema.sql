@@ -45,14 +45,6 @@ GRANT SELECT, UPDATE, INSERT, DELETE ON data TO kv_write;
 
 
 --
--- PDATA is a view to the data table that shows parameter names instead of parameter ids.
--- 
-CREATE VIEW pdata AS 
-    SELECT data.stationid, data.obstime, data.tbtime, data.typeid, (SELECT param.name FROM param WHERE (param.paramid = data.paramid)) 
-    AS paramid, data.original, data.corrected, data.sensor, data.level, data.controlinfo, data.useinfo, data.cfailed FROM data;
-
-
---
 -- This table maintains a complete history of everything that has happened to 
 -- the data table.
 -- The version row contains the version of the data - a higher number is newer.
@@ -337,6 +329,13 @@ REVOKE ALL ON param FROM public;
 GRANT ALL ON param TO kv_admin;
 GRANT SELECT ON param TO kv_read;
 GRANT SELECT, UPDATE, INSERT ON param TO kv_write;
+
+--
+-- PDATA is a view to the data table that shows parameter names instead of parameter ids.
+--
+CREATE VIEW pdata AS
+    SELECT data.stationid, data.obstime, data.tbtime, data.typeid, (SELECT param.name FROM param WHERE (param.paramid = data.paramid))
+    AS paramid, data.original, data.corrected, data.sensor, data.level, data.controlinfo, data.useinfo, data.cfailed FROM data;
 
 
 CREATE TABLE station (
