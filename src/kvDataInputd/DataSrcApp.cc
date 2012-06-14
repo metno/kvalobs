@@ -107,8 +107,6 @@ CKvalObs::CManager::ManagerInput_ptr
 DataSrcApp::lookUpManager(bool forceNS, bool &usedNS)
 {
    CORBA::Object_var obj;
-   CKvalObs::CManager::ManagerInput_ptr ptr;
-
    usedNS=false;
 
    while(true){
@@ -120,14 +118,12 @@ DataSrcApp::lookUpManager(bool forceNS, bool &usedNS)
          if(CORBA::is_nil(obj))
             throw LookUpException("EXCEPTION: Can't obtain a reference for 'kvManagerInput'\n           from the CORBA nameserver!");
 
-         ptr=CKvalObs::CManager::ManagerInput::_narrow(obj);
+         refMgr=CKvalObs::CManager::ManagerInput::_narrow(obj);
 
-         if(CORBA::is_nil(ptr))
+         if(CORBA::is_nil( refMgr ))
             throw LookUpException("EXCEPTION: Can't narrow reference for 'kvManagerInput'!");
 
-         refMgr=ptr;
-
-         return ptr;
+         return refMgr;
       }
 
       if(CORBA::is_nil(refMgr))
