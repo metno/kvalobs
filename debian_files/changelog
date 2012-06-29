@@ -1,8 +1,10 @@
-kvalobs (2.5.3-1) lucid; urgency=low
+kvalobs (2.5.3~rc1-1) lucid; urgency=low
 
   * fixed memory leak in DataUpdateTransaction
+  * kvcron: kvdbadmin.sh -> kvdbadmin
+  * save_las_month.sh. Use bash.
 
- -- Alexander Bürger <alexander.buerger@met.no> Fri, 15 Jun 2012 12:24:00 +0200
+ -- Borge Moe <borge.moe@met.no> Fri, 29 Jun 2012 13:15:00 +0200
 
 kvalobs (2.5.2a-1) lucid; urgency=low
 
