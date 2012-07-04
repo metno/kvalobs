@@ -1,2 +1,0 @@
-misc:Depends=debconf (>= 0.5) | debconf-2.0
-shlibs:Depends=libboost-filesystem1.33.1, libboost-program-options1.33.1, libboost-regex1.33.1, libboost-thread1.33.1, libc6 (>= 2.3.6-6), libg2c0 (>= 1:3.4.4-5), libgcc1 (>= 1:4.1.1-12), libglib2.0-0 (>= 2.12.0), libglibmm-2.4-1c2a, libmi1, libomniorb4c2 (>= 4.0.6), libomnithread3c2 (>= 4.0.6), libperl5.8 (>= 5.8.8), libpose1, libpq5 (>= 8.3~beta1), libsigc++-2.0-0c2a (>= 2.0.2), libsqlite3-0 (>= 3.3.8), libstdc++6 (>= 4.1.1-12), libxml++2.6-2, libxml2 (>= 2.6.27), parameter1, puctools1, putools1

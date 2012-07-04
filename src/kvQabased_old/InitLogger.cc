@@ -44,6 +44,23 @@ using namespace std;
 
 namespace{
     LogLevel getLogLevel(const char *c);
+
+#if BOOST_FILESYSTEM_VERSION >= 3
+    inline std::string to_native_file(const boost::filesystem::path& path) {
+        return path.native();
+    }
+    inline std::string to_native_dir(const boost::filesystem::path& path) {
+        return path.native();
+    }
+#else
+    inline std::string to_native_file(const boost::filesystem::path& path) {
+        return path.native_file_string();
+    }
+    inline std::string to_native_dir(const boost::filesystem::path& path) {
+        return path.native_directory_string();
+    }
+#endif
+
 }
 
 void
@@ -62,9 +79,9 @@ InitLogger(int argn, char **argv, const std::string &logname,
     if ( ! exists(html)  )
       create_directories(html);
     else if ( ! is_directory(html) )
-      throw std::runtime_error(html.native_file_string() + "exists but is not a directory");
+      throw std::runtime_error(to_native_file(html) + "exists but is not a directory");
 
-    htmlpath= html.native_directory_string();
+    htmlpath= to_native_dir(html);
     filename/=logname +".log";
     
     for(int i=0; i<argn; i++){
@@ -86,9 +103,9 @@ InitLogger(int argn, char **argv, const std::string &logname,
     try{
 	fs=new FLogStream(4);
 	
-	if(!fs->open(filename.native_file_string())){
+	if(!fs->open(to_native_file(filename))){
 	    std::cerr << "FATAL: Can't initialize the Logging system.\n";
-	    std::cerr << "------ Cant open the Logfile <" << filename.native_file_string() << ">\n";
+	    std::cerr << "------ Cant open the Logfile <" << to_native_file(filename) << ">\n";
 	    delete fs;
 	    exit(1);
 	}
@@ -118,7 +135,7 @@ InitLogger(int argn, char **argv, const std::string &logname,
 	exit(1);
     }
 
-    std::cerr << "Logging to file <" << filename.native_file_string() << ">!\n";
+    std::cerr << "Logging to file <" << to_native_file(filename) << ">!\n";
     
 }
 

@@ -16,7 +16,11 @@ kv2kro_LDFLAGS = -pthread
 kv2kro_LDADD = $(top_builddir)/src/service-libs/kvcpp/libkvalobs2_kvcpp.la \
                 $(top_builddir)/src/lib/kvalobs/libkvalobs2_kvalobs.la \
 		$(top_builddir)/src/lib/kvskel/libkvalobs2_kvskel.la \
+		$(top_builddir)/src/lib/corbahelper/libkvalobs2_corbahelper.la \
+		$(top_builddir)/src/lib/dnmithread/libkvalobs2_dnmithread.la \
+		$(top_builddir)/src/lib/miconfparser/libkvalobs2_miconfparser.la \
+		$(top_builddir)/src/lib/fileutil/libkvalobs2_fileutil.la \
                $(putools_LIBS) $(omniORB4_LIBS) $(BOOST_THREAD_LIB) \
               -lm 
-             
+
 EXTRA_DIST = README delete_oldfiles.pl obsInsert obsInsertTest.pl               

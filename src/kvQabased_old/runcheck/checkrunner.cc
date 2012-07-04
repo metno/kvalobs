@@ -55,12 +55,24 @@ using namespace kvalobs;
 using namespace milog;
 using boost::filesystem::path;
 
+namespace {
+#if BOOST_FILESYSTEM_VERSION >= 3
+    inline std::string to_native_dir(const boost::filesystem::path& path) {
+        return path.native();
+    }
+#else
+    inline std::string to_native_dir(const boost::filesystem::path& path) {
+        return path.native_directory_string();
+    }
+#endif
+}
+
 CheckRunner::CheckRunner(const kvStationInfo & params, kvQABaseDBConnection & con_, const path & logp) :
 	stinfo(params),
 	dbcon(con_),
 	meteod(con_, params),
 	checkCreator_(meteod, params, con_),
-	log_(params, logp.native_directory_string())
+	log_(params, to_native_dir(logp))
 {
 	if (!dbcon.dbOk())
 	{

@@ -41,6 +41,22 @@ namespace
 {
 QABASE_EXCEPTION(LogFileCreationError);
 
+#if BOOST_FILESYSTEM_VERSION >= 3
+    inline std::string to_native_file(const boost::filesystem::path& path) {
+        return path.native();
+    }
+    inline std::string to_native_dir(const boost::filesystem::path& path) {
+        return path.native();
+    }
+#else
+    inline std::string to_native_file(const boost::filesystem::path& path) {
+        return path.native_file_string();
+    }
+    inline std::string to_native_dir(const boost::filesystem::path& path) {
+        return path.native_directory_string();
+    }
+#endif
+
 boost::filesystem::path getLogFileName(const kvalobs::kvStationInfo & observationToCheck)
 {
   std::ostringstream name;
@@ -64,7 +80,7 @@ boost::filesystem::path getLogFile(const kvalobs::kvStationInfo & observationToC
 	{
 		boost::filesystem::path logFile(base);
 		logFile /= boost::lexical_cast<std::string>(observationToCheck.stationID());
-		logFile /= observationToCheck.obstime().isoDate();
+		logFile /= std::string(observationToCheck.obstime().isoDate());
 
 		if ( not exists(logFile) and ! create_directories(logFile) )
 			throw LogFileCreationError("Unable to create logging folder " + logFile.string() );
@@ -130,7 +146,7 @@ LogFileCreator::LogStreamPtr LogFileCreator::getLogStream(const kvalobs::kvStati
 			renameOldLogs(logFile);
 			LogStreamPtr logStream(new boost::filesystem::ofstream(logFile));
 			if ( not logStream->good() )
-				throw LogFileCreationError("Error when opening log file: " + logFile.native_file_string());
+				throw LogFileCreationError("Error when opening log file: " + to_native_file(logFile));
 			return logStream;
 		}
 		catch ( std::exception & e )

@@ -36,7 +36,7 @@ CC=gcc-4.1
 #	CFLAGS += -O2
 #endif
 
-config.status: configure
+config.status: 
 	dh_testdir
 	
 	# Add here commands to configure the package.	
@@ -46,8 +46,7 @@ endif
 ifneq "$(wildcard /usr/share/misc/config.guess)" ""
 	cp -f /usr/share/misc/config.guess config.guess
 endif
-
-
+	autoreconf -i
 
 	./configure --prefix=/usr  --enable-model2kv \
 	    --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info  \

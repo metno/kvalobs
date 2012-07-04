@@ -197,6 +197,8 @@ namespace miutil{
       typedef ValElementList::iterator        IValElementList;
       typedef ValElementList::const_iterator  CIValElementList;
 
+      std::ostream& operator<<(std::ostream &ost, const ValElementList &elemList);
+
       /** @} */
     }
 

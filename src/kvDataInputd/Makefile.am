@@ -1,9 +1,9 @@
 AM_CPPFLAGS = -I$(top_srcdir)/src/lib \
- 			  -I$(top_srcdir)/src/lib/decoder \
- 			  -I$(top_builddir)/src/lib \
- 			  -I$(top_builddir)/src/lib/kvskel  \
- 			  $(omniORB4_CFLAGS)  $(putools_CFLAGS)\
- 			  -D_REENTRANT
+               -I$(top_srcdir)/src/lib/decoder \
+               -I$(top_builddir)/src/lib \
+               -I$(top_builddir)/src/lib/kvskel  \
+               $(omniORB4_CFLAGS)  $(putools_CFLAGS)\
+               -D_REENTRANT
 
 noinst_PROGRAMS = createTestData
 
@@ -54,7 +54,7 @@ kvDataInputd_LDADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs2_dec
                      $(putools_LIBS) $(omniORB4_LIBS) $(libxmlpp_LIBS) $(BOOST_THREAD_LIB)  -ldl
 
 
-kvdataclt_CPPFLAGS = $(AM_CPPFLAGS) -static-libtool-libs \
+kvdataclt_CPPFLAGS = $(AM_CPPFLAGS) \
                      -DPKGLIBDIR="\""$(pkglibdir)"\"" \
                      -DSYSCONFDIR="\""$(sysconfdir)"\"" \
                      -DLIBDIR="\""$(libdir)"\"" \

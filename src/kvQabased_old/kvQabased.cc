@@ -53,6 +53,17 @@ const char* options[][ 2 ] =
 using namespace std;
 using namespace boost;
 
+namespace {
+#if BOOST_FILESYSTEM_VERSION >= 3
+    inline std::string to_native_file(const boost::filesystem::path& path) {
+        return path.native();
+    }
+#else
+    inline std::string to_native_file(const boost::filesystem::path& path) {
+        return path.native_file_string();
+    }
+#endif
+}
 
 int
 main( int argc, char** argv )
@@ -103,17 +114,17 @@ main( int argc, char** argv )
     }
   }
   else if ( ! filesystem::is_directory(rundir) ) {
-    LOGFATAL( rundir.native_file_string() << "exists but is not a directory" );
+    LOGFATAL( to_native_file(rundir) << "exists but is not a directory" );
     return 1;
   }
-  filesystem::path pidfile( dnmi::file::createPidFileName( rundir.native_file_string(), "kvQabased" ) );
+  filesystem::path pidfile( dnmi::file::createPidFileName( to_native_file(rundir), "kvQabased" ) );
 
-  if ( dnmi::file::isRunningPidFile( pidfile.native_file_string(), error ) )
+  if ( dnmi::file::isRunningPidFile( to_native_file(pidfile), error ) )
   {
     if ( error )
     {
       LOGFATAL( "An error occured while reading the pidfile:" << endl
-                << pidfile.native_file_string() << " remove the file if it exist and"
+                << to_native_file(pidfile) << " remove the file if it exist and"
                 << endl << "kvQabased is not running. " <<
                 "If it is running and there is problems. Kill kvQabased and"
                 << endl << "restart it." << endl << endl );
@@ -122,7 +133,7 @@ main( int argc, char** argv )
     else
     {
       LOGFATAL( "Is kvQabased allready running?" << endl
-                << "If not remove the pidfile: " << pidfile.native_file_string() );
+                << "If not remove the pidfile: " << to_native_file(pidfile) );
       return 1;
     }
   }

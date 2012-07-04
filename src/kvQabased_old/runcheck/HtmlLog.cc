@@ -42,6 +42,22 @@ using boost::filesystem::path;
 
 namespace
 {
+#if BOOST_FILESYSTEM_VERSION >= 3
+    inline std::string to_native_file(const boost::filesystem::path& path) {
+        return path.native();
+    }
+    inline std::string to_native_dir(const boost::filesystem::path& path) {
+        return path.native();
+    }
+#else
+    inline std::string to_native_file(const boost::filesystem::path& path) {
+        return path.native_file_string();
+    }
+    inline std::string to_native_dir(const boost::filesystem::path& path) {
+        return path.native_directory_string();
+    }
+#endif
+
 path logPath(const kvalobs::kvStationInfo & stinfo, const path & start_logpath)
 {
 	path log_dir(start_logpath);
@@ -85,7 +101,7 @@ path getLogfilePath(const kvalobs::kvStationInfo & stinfo,
 			fs::rename(log_file, rename_to);
 		}
 	}
-	return log_file.native_directory_string();
+	return to_native_dir(log_file);
 }
 }
 
@@ -97,15 +113,15 @@ HtmlLog::HtmlLog(const kvalobs::kvStationInfo & stinfo, const std::string & logP
 
 	LOGINFO( "CheckRunner::runChecks for station:" << stinfo.stationID()
 			<< " and obstime:" << stinfo.obstime() << endl
-			<< "Logging all activity to:" << logfile.native_file_string() << endl );
+			<< "Logging all activity to:" << to_native_file(logfile) << endl );
 
 	if ( logPath.empty() )
 		html->open("/dev/null");
 	else
 	{
-		if (!html->open(logfile.native_file_string()))
+		if (!html->open(to_native_file(logfile)))
 		{
-			LOGERROR("Failed to create logfile for the html output. Filename:\n" << logfile.native_file_string());
+			LOGERROR("Failed to create logfile for the html output. Filename:\n" << to_native_file(logfile));
 			html->open("/dev/null");
 		}
 	}

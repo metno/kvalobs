@@ -41,6 +41,23 @@
 
 using namespace boost::program_options;
 
+namespace {
+#if BOOST_FILESYSTEM_VERSION >= 3
+    inline std::string to_native_file(const boost::filesystem::path& path) {
+        return path.native();
+    }
+    inline std::string to_native_dir(const boost::filesystem::path& path) {
+        return path.native();
+    }
+#else
+    inline std::string to_native_file(const boost::filesystem::path& path) {
+        return path.native_file_string();
+    }
+    inline std::string to_native_dir(const boost::filesystem::path& path) {
+        return path.native_directory_string();
+    }
+#endif
+}
 
 namespace qabase
 {
@@ -87,9 +104,9 @@ void parse(const boost::filesystem::path & configFile, variables_map & vm, const
 	using namespace boost::filesystem;
 
 	if ( not exists(configFile) )
-		throw std::runtime_error(configFile.native_file_string() + ": no such file or directory");
+		throw std::runtime_error(to_native_file(configFile) + ": no such file or directory");
 	if ( is_directory(configFile) )
-		throw std::runtime_error(configFile.native_directory_string() + " is a directory");
+		throw std::runtime_error(to_native_dir(configFile) + " is a directory");
 
 	boost::filesystem::ifstream s(configFile);
 	store(parse_config_file(s, configFileOptions), vm);
@@ -234,7 +251,7 @@ std::ostream & Configuration::help(std::ostream & s, const boost::program_option
 	boost::filesystem::path defaultConfig = defaultConfigFile();
 	if (not defaultConfig.empty())
 		s << "Additional configuration is read from <"
-				<< defaultConfig.native_file_string() << ">\n\n";
+				<< to_native_file(defaultConfig) << ">\n\n";
 
 	s << options << std::endl;
 

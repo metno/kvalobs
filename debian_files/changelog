@@ -1,10 +1,16 @@
+kvalobs (2.5.4-1) unstable; urgency=low
+
+  * minor changes so that kvalobs compiles on precise and lucid
+
+ -- Alexander Bürger <alexander.buerger@met.no>  Wed, 04 Jul 2012 10:55:39 +0200
+
 kvalobs (2.5.3~rc1-1) lucid; urgency=low
 
   * fixed memory leak in DataUpdateTransaction
   * kvcron: kvdbadmin.sh -> kvdbadmin
   * save_las_month.sh. Use bash.
 
- -- Borge Moe <borge.moe@met.no> Fri, 29 Jun 2012 13:15:00 +0200
+ -- Borge Moe <borge.moe@met.no>  Fri, 29 Jun 2012 13:15:00 +0200
 
 kvalobs (2.5.2a-1) lucid; urgency=low
 
@@ -20,8 +26,8 @@ kvalobs (2.5.2-1) lucid; urgency=low
   * Change the logging in tool_funcs.sh.
   * kvdbadmin logs to the directory /var/log/kvalobs/kvdbadmin.
   * Only check for ip-alias kvalobs on startup.
-    
- -- Borge Moe <borge.moe@met.no> Tue, 29 May 2012 13:12:00 +0200
+
+ -- Borge Moe <borge.moe@met.no>  Tue, 29 May 2012 13:12:00 +0200
 
 kvalobs (2.5.1-1) lucid; urgency=low
 

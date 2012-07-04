@@ -22,7 +22,7 @@ kvQabased_old_CPPFLAGS = \
 	$(omniDynamic4_CFLAGS) \
 	$(putools_CFLAGS) \
 	$(perl_CFLAGS)
-	
+
 kvQabased_old_LDFLAGS = -pthread -export-dynamic	
 kvQabased_old_LDADD = \
 	$(top_builddir)/src/lib/milog/libkvalobs2_milog.la \
@@ -38,7 +38,7 @@ kvQabased_old_LDADD = \
 	$(putools_LIBS) \
 	$(BOOST_THREAD_LIB) \
 	$(BOOST_REGEX_LIB) \
-	$(BOOST_FILESYSTEM_LIB) \
+	$(BOOST_FILESYSTEM_LIB) -lboost_system \
 	$(omniDynamic4_LIBS) \
 	$(perl_LIBS) \
 	-ldl

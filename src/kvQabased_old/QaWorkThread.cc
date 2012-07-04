@@ -37,7 +37,7 @@
 #include <kvalobs/kvDbGate.h>
 #include <puTools/miTime.h>
 #include <boost/regex.hpp>
-#include <boost/filesystem/exception.hpp>
+#include <boost/filesystem.hpp>
 #include <memory>
 #include <stdexcept>
 
