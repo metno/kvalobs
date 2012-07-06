@@ -1,8 +1,10 @@
 kvalobs (2.5.4-1) unstable; urgency=low
 
-  * minor changes so that kvalobs compiles on precise and lucid
+  * minor changes so that kvalobs compiles on precise and lucid.
+  * Added kv2kvDataInputd. A helper program to setup a datastream on 
+    a test machine.
 
- -- Alexander Bürger <alexander.buerger@met.no>  Wed, 04 Jul 2012 10:55:39 +0200
+ -- Alexander Bürger <alexander.buerger@met.no>  Wed, 06 Jul 2012 10:55:39 +0200
 
 kvalobs (2.5.3~rc1-1) lucid; urgency=low
 
