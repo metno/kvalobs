@@ -13,4 +13,5 @@ SUBDIRS = \
 	kvalobs_database \
 	script \
 	kv2kro2 \
-	tools/kvpush
+	tools/kvpush \
+	tools/kv2kvDataInputd
