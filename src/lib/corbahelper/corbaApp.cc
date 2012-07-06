@@ -126,125 +126,6 @@ CorbaApp::isOk()const
 }
 
 
-#if 0
-bool  
-CorbaApp::putObjInNS(CORBA::Object_ptr objref, 
-		     const std::string &name_)
-{
-
-  if(!app){
-    CERR("FATAL CorbaApp::putObjInNS: No valid CorbaApp instance!\n");
-    return false;
-  }
-  string name(name_);
-  string nameContext;
-  string sObject;
-  string::size_type i;
-  CosNaming::NamingContextExt_var rootContext;
-  CosNaming::NamingContextExt_var toContext;
-  CosNaming::Name_var contextName;
-  CosNaming::Name_var objectName;
-
-  if(name.length()==0){
-    CERR("ERROR: name is empty!\n");
-    return false;
-  }
-
-  if(name[0]=='/'){
-    name.erase(0, 1);
-   
-    if(name.length()==0)
-      return false;
-  }
-
-  i=name.find_last_of("/");
-  
-  if(i!=string::npos){
-    nameContext=name.substr(0, i);
-    
-    if(i>=(name.length()-1)){
-      CERR("ERROR: no object name <" << name_ << ">\n");
-      return false;
-    }
-    
-    sObject=name.substr(i+1);
-  }
-
-
-
-  try{
-    try{
-      // Obtain a reference to the root context of the Name service:
-      CORBA::Object_var obj;
-      obj = orb->resolve_initial_references("NameService");
-
-      // Narrow the reference returned.
-      rootContext = CosNaming::NamingContextExt::_narrow(obj);
-      if( CORBA::is_nil(rootContext) ) {
-	CERR("Failed to narrow the root naming context." << endl);
-	return false;
-      }
-    }
-    catch(CORBA::ORB::InvalidName& ex) {
-      // This should not happen!
-      cerr << "Service required is invalid [does not exist]." << endl;
-      return 0;
-    }
-
-
-    if(!nameContext.empty()){
-      try{
-	contextName=rootContext->to_name(nameContext.c_str());
-	CORBA::Object_var obj = rootContext->bind_new_context(contextName);
-	toContext = CosNaming::NamingContextExt::_narrow(obj);
-      }
-      catch(CosNaming::NamingContext::AlreadyBound& ex) {
-	// The context already exists.
-	// Just resolve the name and assign toContext to the object returned.
-	
-	CERR("Context <" << nameContext << "> already exists , resolve context!\n");
-	CORBA::Object_var obj;
-	obj = rootContext->resolve(contextName);
-	toContext = CosNaming::NamingContextExt::_narrow(obj);
-	
-	if( CORBA::is_nil(toContext) ){
-	  CERR("ERROR: Failed to narrow naming context <" << nameContext << ">\n");
-	  return false;
-	}
-      }
-      catch(CosNaming::NamingContext::InvalidName &ex) {
-	CERR("Exception: InvalidName <" << name_ << ">\n");
-	return false;
-      }
-    }else
-      toContext=rootContext;
-
-
-    try{
-      objectName=rootContext->to_name(sObject.c_str());
-      toContext->bind(objectName, objref);
-    }
-    catch(CosNaming::NamingContext::AlreadyBound& ex) {
-      CERR("Object <" << sObject << "> already exists, rebind!\n");
-      toContext->rebind(objectName, objref);
-    }
-  }
-  catch(CORBA::COMM_FAILURE& ex) {
-    CERR("Caught system exception COMM_FAILURE -- unable to contact the "
-         << "naming service." << endl);
-    return false;
-  }
-  catch(CORBA::SystemException&) {
-    CERR("Caught a CORBA::SystemException while using the naming service."
-	 << endl);
-    return false;
-  }
-    
-  return true;
-}
-
-#endif
-
 bool  
 CorbaApp::putObjInNS(CORBA::Object_ptr objref, 
 		     const std::string &name_)
@@ -441,52 +322,6 @@ CorbaApp::corbaRef(const std::string &ref)
 
 
 
-
-
-
-#if 0
-CORBA::Object_ptr
-CorbaApp::getObjFromNS(const std::string &name_)
-{
-  CORBA::Object_ptr obj;
-  string name("corbaname:rir:#");
-
-  
-
- if(!app){
-    CERR("FATAL CorbaApp::getObjFromNS: No valid CorbaApp instance!\n");
-    return CORBA::Object::_nil();
-  }
-
-
-  if(name_.length()==0){
-    CERR("ERROR: name is empty!\n");
-    return CORBA::Object::_nil();
-  }
-
-
-  string::size_type i=name_.find_first_not_of('/');
-  
-  if(i==string::npos )
-    return CORBA::Object::_nil();
-    
-  name+=name_.substr(i);
-  
-  CERR("Looking up object in CORBA nameservice: " << name << endl); 
-
-  try{
-    obj=orb->string_to_object(name.c_str()); 
-  }
-  catch(...){
-    CERR("Exception: cant find object or nameservice\n");
-    return CORBA::Object::_nil();
-  }
-
-  return obj;
-
-}
-#endif
-
 CORBA::Object_ptr
 CorbaApp::getObjFromNS(const std::string &name_)
 {
@@ -508,12 +343,16 @@ getObjFromNS(const std::string &name_, const ServiceHost &ns )
 	string name("corbaname:");
 	string myNameservice( ns.toString() );
 	
+#if 0
 	if(nameservice_.empty())
 		name+="rir";
 	else{
 		name+=":";
 		name+=myNameservice;
 	}
+#endif
+   name+=":";
+   name+=myNameservice;
 	  
 	name+="#";
 
