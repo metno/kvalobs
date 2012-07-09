@@ -85,3 +85,4 @@ src/script/kv/tool_funcs.sh
 src/service-libs/kvcpp/libkvcpp2.pc
 src/tools/kvpush/kvpush
 stamp-h1
+/src/tools/kv2kvDataInputd/kv2kvDataInputd

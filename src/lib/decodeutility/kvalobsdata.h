@@ -120,8 +120,8 @@ public:
 			kvalobs::kvTextData> & out2, const miutil::miTime & tbtime =
 			miutil::miTime()) const
 	{
-		getData(out1);
-		getData(out2);
+            getData(out1, tbtime);
+            getData(out2, tbtime);
 	}
 
 	typedef std::vector<kvalobs::kvRejectdecode> RejectList;
