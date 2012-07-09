@@ -30,6 +30,8 @@
 */
 
 #include <stdlib.h>
+#include <fstream>
+#include <milog/milog.h>
 #include <miconfparser/miconfparser.h>
 #include <fileutil/pidfileutil.h>
 #include "App.h"
@@ -44,22 +46,37 @@ main( int argn, char **argv )
    string confile;
    bool   pidfileError;
    
+   confile = kvalobs::kvPath(kvalobs::sysconfdir) + "/kv2kvDataInputd.conf";
+   miutil::conf::ConfSection *conf = miutil::conf::ConfParser::parse( confile );
+
+   if( ! conf ) {
+      cerr << "Failed to read the configuration file <" << confile <<">."
+           <<endl;
+      string logfile=kvalobs::kvPath(kvalobs::logdir) + "/kv2kvDataInputd.log";
+      ofstream log( logfile.c_str(), ios_base::out | ios_base::app );
+
+      if( log ) {
+         log << "Failed to read the configuration file <" << confile <<">." << endl;
+         log.close();
+      }
+   }
+
+   App::createLogger( conf );
    
-   confile = kvPath("sysconfdir") + "/kv2kvDataInputd.conf";
-   pidfile = dnmi::file::createPidFileName( kvPath("localstatedir") + "/run",
-                                            "kv2kvDataInputd" );
+   pidfile = dnmi::file::createPidFileName( kvalobs::kvPath(kvalobs::sysconfdir),
+                            "kv2kvDataInputd" );
   
    if( dnmi::file::isRunningPidFile( pidfile, pidfileError ) ) {
       if( pidfileError ){
-         cerr << "An error occured while reading the pidfile:" << endl
+         LOGFATAL( "An error occured while reading the pidfile:" << endl
               << pidfile << " remove the file if it exist and" << endl
               << "kv2kvDataInputd is not running. If it is running and" << endl
               << "there is problems. Kill kv2kvDataInputd and" << endl
-              << "restart it." << endl << endl;
+              << "restart it." << endl << endl );
          return 1;
       }else{
-         cerr << "Is kv2kvDataInputd allready running?" << endl
-              << "If not remove the pidfile: " << pidfile << endl << endl;
+         LOGFATAL( "Is kv2kvDataInputd allready running?" << endl
+              << "If not remove the pidfile: " << pidfile << endl << endl);
          return 1;
       }
    }  
@@ -68,6 +85,6 @@ main( int argn, char **argv )
    //out of scope, ie when the main function end.
    dnmi::file::PidFileHelper thePidfile( pidfile );
   
-   App  app( argn, argv,  miutil::conf::ConfParser::parse( confile ) );
+   App  app( argn, argv, conf );
    app.run();
 }

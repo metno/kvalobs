@@ -67,6 +67,7 @@ public:
    App( int argn, char **argv, miutil::conf::ConfSection *conf );
    ~App();
 
+   static void createLogger( miutil::conf::ConfSection *conf );
 
    CORBA::Object_ptr getRefInNS(const CorbaServerConf &serverSpec,
                                 const std::string &interface );

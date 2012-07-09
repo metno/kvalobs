@@ -30,8 +30,11 @@
  */
 
 #include <stdio.h>
+#include <strings.h>
 #include <fstream>
 #include <puTools/miTime.h>
+#include <milog/milog.h>
+#include <kvalobs/kvPath.h>
 #include "App.h"
 
 using namespace std;
@@ -52,10 +55,14 @@ getConfValue( const char *key,
    valelem = conf->getValue( key );
 
    if( valelem.size() < 1 ) {
-      cerr << "No <" << key << "> in the confile." << endl;
 
-      if( exitIfNotFound )
+
+      if( exitIfNotFound ) {
+         LOGFATAL("No <" << key << "> in the confile.");
          exit( 1 );
+      } else {
+         LOGWARN("No <" << key << "> in the confile.");
+      }
 
       return ret;
    }
@@ -63,10 +70,14 @@ getConfValue( const char *key,
    ret = valelem[0].valAsString();
 
    if( ret.empty( ) ) {
-      cerr << "No value for key <" << key << "> in the confile." << endl;
 
-      if( exitIfNotFound )
+
+      if( exitIfNotFound ) {
+         LOGFATAL("No value for key <" << key << "> in the confile.");
          exit( 1 );
+      } else {
+         LOGWARN("No value for key <" << key << "> in the confile.");
+      }
    }
 
    return ret;
@@ -82,13 +93,43 @@ getPathConfValue( const char *key,
    CorbaServerConf sc;
 
    if( !sc.decodeConfspec( val, defaultNameserver ) ) {
-      cerr << "Invalid value <" << val << ">. Expecting"
+      LOGFATAL("Invalid value <" << val << ">. Expecting"
             << " a value on the form path[@nameserver[:port]]. "
-            << "where [] specify optional parts." << endl;
+            << "where [] specify optional parts." );
       exit(1);
    }
 
    return sc;
+}
+
+milog::LogLevel
+getLogLevel( miutil::conf::ConfSection *conf )
+{
+   string logLevel=getConfValue("loglevel", conf, false );
+   cerr << "loglevel: " << logLevel << endl;
+   if(strcasecmp("FATAL", logLevel.c_str() )==0){
+      return milog::FATAL;
+   }else if(strcasecmp("ERROR", logLevel.c_str())==0){
+      return milog::ERROR;
+   }else if(strcasecmp("WARN", logLevel.c_str())==0){
+      return milog::WARN;
+   }else if(strcasecmp("DEBUG", logLevel.c_str())==0){
+      return milog::DEBUG;
+   }else if(strcasecmp("INFO", logLevel.c_str())==0){
+      return milog::INFO;
+   }else if(strcasecmp("0", logLevel.c_str())==0){
+      return milog::FATAL;
+   }else if(strcasecmp("1", logLevel.c_str())==0){
+      return milog::ERROR;
+   }else if(strcasecmp("2", logLevel.c_str())==0){
+      return milog::WARN;
+   }else if(strcasecmp("3", logLevel.c_str())==0){
+      return milog::INFO;
+   }else if(strcasecmp("4", logLevel.c_str())==0){
+      return milog::DEBUG;
+   }else{
+      return milog::ERROR;
+   }
 }
 
 }
@@ -102,6 +143,7 @@ App( int argn, char **argv, miutil::conf::ConfSection *conf )
   dataReceiverAlive( false )
 {
    string defaultNameserver;
+   milog::LogLevel loglevel;
 
    if( ! corbaApp ) {
       cerr << "Can't initialize CORBA!" << endl;
@@ -111,14 +153,13 @@ App( int argn, char **argv, miutil::conf::ConfSection *conf )
    defaultNameserver = getConfValue("corba.nameserver", conf, true );
    sendToKvServer = getPathConfValue( "corba.destpath", conf, defaultNameserver);
    receiveFromKvServer = getPathConfValue( "corba.path", conf, defaultNameserver);
-
    setNameservice( receiveFromKvServer.ns.toString() );
 
    subscribeSetup();
    dataReceiverSetup();
 
-   clog << "Receiving data from: " << receiveFromKvServer << endl;
-   clog << "Sending data to:     " << sendToKvServer << endl;
+   LOGINFO("Receiving data from: " << receiveFromKvServer << endl <<
+           "Sending data to:     " << sendToKvServer );
 }
 
 App::
@@ -148,19 +189,19 @@ subscribeSetup()
    dataid = subscribeData( KvDataSubscribeInfoHelper(), eventQue );
 
    if( dataid.empty() ){
-      cerr << "Cant subscribe to KvData!" << endl;
+      LOGERROR("Cant subscribe to KvData!");
       return false;
    }else{
-      cerr << "Subscribe on KvData!" << endl;
+      LOGINFO("Subscribe on KvData!");
    }
 
    hintid = subscribeKvHint( eventQue );
 
    if( hintid.empty() ){
-      cerr << "Cant subscribe to KvHint!" << endl;
+      LOGERROR( "Cant subscribe to KvHint!" );
       return false;
    }else{
-      cerr << "Subscribe on KvHint!" << endl;
+      LOGINFO( "Subscribe on KvHint!" );
    }
 
 
@@ -207,7 +248,7 @@ getParamdefs()
    if(  paramdefs && paramdefs->size() > 0 )
       return paramdefs;
 
-   cerr << "App::getParamdefs() getting paramdefs\n";
+   LOGDEBUG("App::getParamdefs() getting paramdefs.");
 
    try {
       std::list<kvalobs::kvParam> kvParam;
@@ -221,9 +262,15 @@ getParamdefs()
          (*paramdefs)[it->paramID()] = it->name();
       }
 
+      if( paramdefs->size() == 0 )
+         LOGWARN("No(?) parameter defined on the kvalobs server <" <<
+                 receiveFromKvServer << ">.");
+
       return paramdefs;
    }
    catch( ... ) {
+      LOGWARN("Can't get the parameter definitions from the" <<
+              " kvalobs server <" << receiveFromKvServer << ">.");
       return paramdefs;
    }
 
@@ -238,6 +285,7 @@ sendData( const std::string &decoder, const std::string &data )
    int ret=-1;
    bool retry=true;
    Result *res;
+   ostringstream log;
 
    do {
       if( ! dataReceiverAlive && !timeLastDataReceiverAlive.undef() ) {
@@ -255,11 +303,11 @@ sendData( const std::string &decoder, const std::string &data )
 
       try {
          if( CORBA::is_nil( refDataReceiver ) ) {
-            cerr << "Looking up 'kvinput' on <"<<sendToKvServer <<">." << endl;
+            LOGINFO("Looking up 'kvinput' on <"<<sendToKvServer <<">.");
             refDataReceiver = Data::_narrow( getRefInNS( sendToKvServer, "kvinput" ) );
 
             if( CORBA::is_nil( refDataReceiver ) ){
-               CERR("Can't find 'kvinput' on <"<< sendToKvServer <<">\n");
+               LOGERROR("Can't find 'kvinput' on <"<< sendToKvServer <<">.");
                return -2;
             }
             retry = true;
@@ -268,54 +316,66 @@ sendData( const std::string &decoder, const std::string &data )
          res=refDataReceiver->newData(data.c_str(), decoder.c_str());
          retry = false;
          dataReceiverAlive = true;
-         cerr << "Sending data to <kvinput> on <" <<sendToKvServer <<"> : ";
+
+         log << "Sending data to <kvinput> on <" <<sendToKvServer <<">. Decoder: "
+             << decoder << ": ";
          switch(res->res){
             case OK:
-               cout << "OK";
-               cout << endl;
+               log << "OK";
                ret = 0;
                break;
             case NODECODER:
-               cout << "NODECODER: " << res->message << endl;
+               log << "NODECODER: " << res->message;
                ret = 1;
                break;
             case DECODEERROR:
-               cout << "DECODEERROR: " << res->message << endl;
+               log << "DECODEERROR: " << res->message;
                ret = 2;
                break;
             case NOTSAVED:
-               cout << "NOTSAVED: " << res->message << endl;
+               log << "NOTSAVED: " << res->message;
                ret = 3;
                break;
             case ERROR:
-               cout << "ERROR: " << res->message << endl;
+               log << "ERROR: " << res->message;
                ret = 4;
                break;
          }
-         cerr << endl;
+         log << endl << "Decoder: " << decoder;
+         if( res->res != OK ) {
+            LOGERROR( log.str() << endl << "Decoder: " << decoder );
+         } else {
+            LOGINFO( log.str() );
+         }
       }
       catch(CORBA::COMM_FAILURE& ex) {
-         cerr << "Caught system exception COMM_FAILURE -- unable to contact the "
-               << "object." << endl;
+         if( ! retry ) {
+            LOGERROR("Unable to contact the <kvDataInputd> at '" << sendToKvServer <<"'.");
+         }
          if( retry ) {
             refDataReceiver = Data::_nil();
             retry = false;
          }
       }
-      catch(CORBA::SystemException&) {
-         cerr << "Caught a CORBA::SystemException." << endl;
+      catch(CORBA::SystemException &ex) {
+         LOGERROR( "Unable to send data to <kvDataInputd>." << endl <<
+                   "CORBA::SystemException. " << ex._name() <<
+                   " (" << ex.NP_minorString()<<").");
       }
-      catch(CORBA::Exception&) {
-         cerr << "Caught CORBA::Exception." << endl;
+      catch(CORBA::Exception &ex) {
+         LOGERROR("Unable to send data to <kvDataInputd>." << endl <<
+                  "CORBA::Exception: " << ex._name() );
       }
       catch(omniORB::fatalException& fe) {
-         cerr << "Caught omniORB::fatalException:" << endl;
-         cerr << "  file: " << fe.file() << endl;
-         cerr << "  line: " << fe.line() << endl;
-         cerr << "  mesg: " << fe.errmsg() << endl;
+         LOGERROR("Unable to send data to <kvDataInputd>." << endl <<
+                  "omniORB::fatalException:" << endl <<
+                  "  file: " << fe.file() << endl <<
+                  "  line: " << fe.line() << endl <<
+                  "  mesg: " << fe.errmsg() );
       }
       catch(...) {
-         cerr << "Caught unknown exception." << endl;
+         LOGERROR("Unable to send data to <kvDataInputd>." << endl <<
+                  "Unknown exception.");
       }
    }while( retry );
 
@@ -323,6 +383,58 @@ sendData( const std::string &decoder, const std::string &data )
 }
 
 void 
+App::
+createLogger( miutil::conf::ConfSection *conf )
+{
+   using namespace milog;
+   string       filename;
+   LogLevel     traceLevel=milog::DEBUG;
+   LogLevel     logLevel=getLogLevel( conf );
+   FLogStream   *fs;
+   StdErrStream *trace;
+
+   filename=kvalobs::kvPath(kvalobs::logdir) + "/kv2kvDataInputd.log";
+
+   try{
+      fs=new FLogStream(4);
+
+      if(!fs->open(filename)){
+         std::cerr << "FATAL: Can't initialize the Logging system.\n";
+         std::cerr << "------ Cant open the Logfile <" << filename << ">\n";
+         delete fs;
+         exit(1);
+      }
+
+      trace=new StdErrStream();
+
+      if(!LogManager::createLogger("default", trace)){
+         std::cerr << "FATAL: Can't initialize the Logging system.\n";
+         std::cerr << "------ Cant create logger\n";
+         exit(1);
+      }
+
+      if(!LogManager::addStream("default", fs)){
+         std::cerr << "FATAL: Can't initialize the Logging system.\n";
+         std::cerr << "------ Cant add filelogging to the Logging system\n";
+         exit(1);
+      }
+
+      trace->loglevel(traceLevel);
+      fs->loglevel(logLevel);
+
+      LogManager::setDefaultLogger("default");
+   }
+   catch(...){
+      std::cerr << "FATAL: Can't initialize the Logging system.\n";
+      std::cerr << "------ OUT OF MEMMORY!!!\n";
+      exit(1);
+   }
+
+   std::cerr << "Logging to file <" << filename << ">!\n";
+}
+
+
+void
 App::
 run()
 {

@@ -33,6 +33,7 @@
 #include <set>
 #include <iostream>
 #include <dnmithread/CommandQue.h>
+#include <milog/milog.h>
 #include <kvcpp/kvevents.h>
 #include "App.h"
 #include "DataReceiver.h"
@@ -61,13 +62,14 @@ void
 DataReceiver::
 onKvDataEvent( kvservice::KvObsDataListPtr data )
 {
+   ostringstream log;
+   milog::LogLevel loglevel = milog::Logger::logger().logLevel();
+
+
    if( !paramdefs || paramdefs->size() == 0 )
       paramdefs = app.getParamdefs();
 
    if( !paramdefs || paramdefs->size() == 0 ) {
-      cerr << "--- [BEGIN] DataEvent received ---\n";
-      cerr << "ERROR: no parameters defined." << endl;
-      cerr << "--- [END] ------------------------\n";
       return;
    }
 
@@ -75,17 +77,18 @@ onKvDataEvent( kvservice::KvObsDataListPtr data )
    DataHelper dataHelper;
    kvservice::IKvObsDataList it=data->begin();
  
-   cerr << "--- [BEGIN] DataEvent received ---\n";
+   if( loglevel >= milog::DEBUG ) {
+      log << "--- [BEGIN] DataEvent received ---\n";
     
-   for( it=data->begin();   
-        it!=data->end();    
-        it++){              
-      if(it->dataList().size()>0)
-         cout << "stationID: " << it->stationid() 
-              << " obstime: " << it->dataList().front().obstime()
-              << " parameters: " << it->dataList().size() << endl;
+      for( it=data->begin();
+            it!=data->end();
+            it++){
+         if(it->dataList().size()>0)
+            log << "stationID: " << it->stationid()
+                << " obstime: " << it->dataList().front().obstime()
+                << " parameters: " << it->dataList().size() << endl;
+      }
    }
-
 
    dataHelper.addData( data );
 
@@ -99,19 +102,25 @@ onKvDataEvent( kvservice::KvObsDataListPtr data )
 
 
    while( dataHelper.nextData( newdata, decoder, paramdefs) ) {
-      cerr << "**** SEND: ";
-//      cerr << "[" << decoder<<"]" << endl;
-//      cerr << newdata << endl;
+      if( loglevel >= milog::DEBUG )
+         log << "**** SEND: ";
 
       if(  app.sendData( decoder, newdata )  != 0 ) {
-         cerr << "FAILED";
+         if( loglevel >= milog::DEBUG )
+            log << "FAILED";
       } else {
-         cerr << "OK";
+         if( loglevel >= milog::DEBUG )
+            log << "OK";
          ++nCount;
       }
-      cerr << " ****************" << endl;
+      if( loglevel >= milog::DEBUG )
+         log << " ****************" << endl;
    }
-   cerr << "--- [END] (" << nCount << ") -------------\n";
+
+   if( loglevel >= milog::DEBUG ) {
+      log << "--- [END] (" << nCount << ") -------------\n";
+      LOGDEBUG( log.str() );
+   }
 }
       
 void  
@@ -119,10 +128,11 @@ DataReceiver::
 onKvHintEvent( bool up )
 {
    if(up){
+      //Reload the parameter definitions.
       paramdefs = app.getParamdefs();
-      cerr << "KvUpEvent received! Reloaded the parameter defs." << endl;
+      LOGINFO("KvUpEvent received! Reloaded the parameter defs.");
    }else{
-      cerr << "KvDownEvent received!" << endl;
+      LOGINFO( "KvDownEvent received!");
    }
 }
 
@@ -130,7 +140,7 @@ void
 DataReceiver::
 onKvDataNotifyEvent( kvservice::KvWhatListPtr what )
 {
-   cerr << "KvDataNotifyEvent received!" << endl;
+   LOGINFO("KvDataNotifyEvent received!");
 }
       
       
@@ -151,7 +161,7 @@ run()
       event = dynamic_cast<kvservice::KvEventBase*>( cmd );
       
       if( ! event ) {
-         cerr << "DataReceiver::run: Unknown event!" << endl;
+         LOGERROR("DataReceiver::run: Unknown event!");
          continue; 
       }
          
