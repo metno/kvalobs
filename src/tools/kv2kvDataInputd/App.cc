@@ -341,9 +341,8 @@ sendData( const std::string &decoder, const std::string &data )
                ret = 4;
                break;
          }
-         log << endl << "Decoder: " << decoder;
          if( res->res != OK ) {
-            LOGERROR( log.str() << endl << "Decoder: " << decoder );
+            LOGERROR( log.str() );
          } else {
             LOGINFO( log.str() );
          }
