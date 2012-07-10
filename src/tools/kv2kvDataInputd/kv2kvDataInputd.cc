@@ -63,7 +63,7 @@ main( int argn, char **argv )
 
    App::createLogger( conf );
    
-   pidfile = dnmi::file::createPidFileName( kvalobs::kvPath(kvalobs::sysconfdir),
+   pidfile = dnmi::file::createPidFileName( kvalobs::kvPath(kvalobs::rundir),
                             "kv2kvDataInputd" );
   
    if( dnmi::file::isRunningPidFile( pidfile, pidfileError ) ) {
