@@ -14,6 +14,7 @@ install-data-hook:
 	$(install_sh) -m 755 -d $(DESTDIR)/$(localstatedir)/log/@PACKAGE_NAME@
 	$(install_sh) -m 755 -d $(DESTDIR)/$(localstatedir)/log/@PACKAGE_NAME@/html
 	$(install_sh) -m 755 -d $(DESTDIR)/$(datadir)/@PACKAGE_NAME@/metadata
+	$(install_sh) -m 755 -d $(DESTDIR)/$(sysconfdir)/@PACKAGE_NAME@
 	$(install_sh) -m 644 $(top_srcdir)/etc/kv2norcom.conf.template \
 	                     $(DESTDIR)/$(sysconfdir)/@PACKAGE_NAME@
 	$(install_sh) -m 644 $(top_srcdir)/etc/kv2kvDataInputd.conf.template \
