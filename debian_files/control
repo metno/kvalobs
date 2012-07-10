@@ -71,13 +71,22 @@ Description: Install kvalobs init scripts.
  Install the init script to start/stop kvalobs on boot and shutdown.
 
 
-#Package: kvdataclt
-#Architecture: any
-#Depends:  ${shlibs:Depends}, ${misc:Depends}
-#Description: Client program to send data to a kvalobs server
-# A client program to send data to a kvalobs server. The data to
-# send is in files with the "kvalobs format..
+Package: kvdataclt
+Architecture: any
+Depends:  ${shlibs:Depends}, ${misc:Depends}
+Description: Client program to send data to a kvalobs server
+ A client program to send data to a kvalobs server. The data to
+ send is in files with the "kvalobs format kldata".
 
+Package: kv2kvDataInputd
+Architecture: any
+Depends:  ${shlibs:Depends}, ${misc:Depends},
+ libkvalobs2 (>= ${binary:Version})
+Description: kv2kvDataInputd listen on data from one kvalobs server
+ and sends the data to kvDataInputd on another kvalobs server.
+ The data from source kvalobs is stripped so only the original data 
+ is sent to destination kvalobs.
+ The decoder format and decoder used is kldata.
 
 #Package: kvalobs-doc
 #Architecture: all
