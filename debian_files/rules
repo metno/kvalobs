@@ -115,7 +115,6 @@ install-arch:
 	# Add here commands to install the arch part of the package into 
 	# debian/tmp.
 	$(MAKE) DESTDIR=$(CURDIR)/debian/tmp install
-	mkdir -p $(CURDIR)/debian/tmp/etc/kvalobs
 	mkdir -p $(CURDIR)/debian/tmp/etc/pgrepctl
 	mkdir -p $(CURDIR)/debian/tmp/etc/kvalobs/lam2kv
 	mkdir -p $(CURDIR)/debian/tmp/usr/lib/kvalobs/bin
