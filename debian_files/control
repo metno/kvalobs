@@ -78,7 +78,7 @@ Description: Client program to send data to a kvalobs server
  A client program to send data to a kvalobs server. The data to
  send is in files with the "kvalobs format kldata".
 
-Package: kv2kvDataInputd
+Package: kv2kvdatainputd
 Architecture: any
 Depends:  ${shlibs:Depends}, ${misc:Depends},
  libkvalobs2 (>= ${binary:Version})
