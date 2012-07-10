@@ -25,17 +25,6 @@ kvDataInputd_SOURCES=InitLogger.cc InitLogger.h \
                      kvDataInputd.cc 
 
 
-#To prevent that we make dependency on a large number of
-#of package that we do not need we only compile the files that is needed.
-kvdataclt_SOURCES =  $(top_srcdir)/src/lib/kvalobs/kvapp.h \
-                     $(top_srcdir)/src/lib/kvalobs/kvapp.cc \
-                     $(top_srcdir)/src/lib/kvalobs/kvPath.h \
-                     $(top_srcdir)/src/lib/kvalobs/kvPath.cc \
-                     $(top_srcdir)/src/lib/fileutil/pidfileutil.h \
-                     $(top_srcdir)/src/lib/fileutil/pidfileutil.cc \
-                     $(top_srcdir)/src/lib/miutil/trimstr.h \
-                     $(top_srcdir)/src/lib/miutil/trimstr.cc \
-                     kvdataclt.cc
 
 kvDataInputd_CPPFLAGS = $(AM_CPPFLAGS) $(libxmlpp_CFLAGS)
 kvDataInputd_LDFLAGS = -pthread -export-dynamic
@@ -52,6 +41,19 @@ kvDataInputd_LDADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs2_dec
                      $(top_builddir)/src/lib/kvskel/libkvalobs2_kvadmininterface.la \
                      $(top_builddir)/src/lib/kvskel/libkvalobs2_kvskel.la \
                      $(putools_LIBS) $(omniORB4_LIBS) $(libxmlpp_LIBS) $(BOOST_THREAD_LIB)  -ldl
+
+
+#To prevent that we make dependency on a large number of
+#of package that we do not need we only compile the files that is needed.
+kvdataclt_SOURCES =  $(top_srcdir)/src/lib/kvalobs/kvapp.h \
+                     $(top_srcdir)/src/lib/kvalobs/kvapp.cc \
+                     $(top_srcdir)/src/lib/kvalobs/kvPath.h \
+                     $(top_srcdir)/src/lib/kvalobs/kvPath.cc \
+                     $(top_srcdir)/src/lib/fileutil/pidfileutil.h \
+                     $(top_srcdir)/src/lib/fileutil/pidfileutil.cc \
+                     $(top_srcdir)/src/lib/miutil/trimstr.h \
+                     $(top_srcdir)/src/lib/miutil/trimstr.cc \
+                     kvdataclt.cc
 
 
 kvdataclt_CPPFLAGS = $(AM_CPPFLAGS) \

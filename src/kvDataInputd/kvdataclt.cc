@@ -290,7 +290,7 @@ readFile(const std::string &file,
 void
 use(bool exit_)
 {
-  	cout << "\n\n  kvDataInput_clt [-d decoder] [-h] filename\n\n"
+  	cout << "\n\n  kvdataclt [-d decoder] [-h] filename\n\n"
         << "\t-d decoder, ex. synop, autoobs, ....\n"
         << "\t-h print this help screen and exit!\n\n"
         << "\t-s kvalobs server to send the data to.\n\n"
