@@ -3,7 +3,7 @@
 #kv2kvDataInputd listen on data from one kvalobs server (srckvalobs)
 #and sends the data to kvDataInputd on another kvalobs server (destkvalobs).
 #The data from srckvalobs is stripped so only the original data 
-#sent to destkvalobs.
+#is sent to destkvalobs.
 #The decoder format and decoder used is kldata. 
 
 # This configuration file has 3 ways to define a key:
@@ -16,15 +16,28 @@
 # key3   = list = ( "mystring", mynumber )
 # 
 
+#loglevel: fatal, error, warn, info and debug
+loglevel=warn
  
 corba{
   #Where is CORBA nameserver
   nameserver="corbans.met.no"
 
-  #Which path in CORBA nameserver shall we use for
-  #this instance of kvalobs (srckvalobs).
+  #Which kvalobs server shall we receive 
+  #data from. We look up the reference to the
+  #server in the CORBA nameserver. We specify the
+  #path in the nameserver to the reference. 
   path="srckvalobs"
   
+  #Which kvalobs server shall we send the
+  #data to. We look up the reference to the
+  #server in the CORBA nameserver. It is possible
+  #to to look up the CORBA reference in another
+  #nameserver than specified with the 'nameserver'
+  #variable above. Use the following format;
+  # destpath="destkvalobs@nameserver", 
+  # ex.
+  #  destpath="pc2896@pc2896.pc.met.no"
   destpath="destkvalobs"
 }
 
