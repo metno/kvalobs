@@ -24,5 +24,5 @@ etc/kvalobs/kvcron
 etc/kvalobs/kvincron
 etc/kvalobs/kv2norcom.conf.template
 etc/kvalobs/save_last_month.conf
-etc/kvalobs/pgclean-local.sql
+etc/kvalobs/pgclean-local.sql.template
 etc/kvalobs/lam2kv/*
