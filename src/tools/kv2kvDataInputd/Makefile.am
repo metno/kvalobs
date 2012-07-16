@@ -18,6 +18,7 @@ kv2kvDataInputd_LDFLAGS = -pthread
 kv2kvDataInputd_LDADD = $(top_builddir)/src/service-libs/kvcpp/libkvalobs2_kvcpp.la \
                 $(top_builddir)/src/lib/kvalobs/libkvalobs2_kvalobs.la \
 		$(top_builddir)/src/lib/kvskel/libkvalobs2_kvskel.la \
+		$(top_builddir)/src/lib/milog/libkvalobs2_milog.la \
 		$(top_builddir)/src/lib/corbahelper/libkvalobs2_corbahelper.la \
 		$(top_builddir)/src/lib/dnmithread/libkvalobs2_dnmithread.la \
 		$(top_builddir)/src/lib/miconfparser/libkvalobs2_miconfparser.la \
