@@ -186,7 +186,14 @@ void hqc_interpol( kvData & d, float new_val )
 void hqc_distribute( kvData & d, float new_val )
 {
   ::kvalobs::correct( d, new_val );
-  setFhqc_( d, 6 );
+
+  const int old_fd = c.controlinfo().flag( fd );
+  const int new_fd = (old_fd == 4 || old_fd == 8 || old_fd == 0xA) ? 0xA : 9;
+
+  kvControlInfo ci = d.controlinfo();
+  ci.set( fd, new_fd );
+  ci.set( fhqc, 6 ); // manual redistribution
+  d.controlinfo( ci );
 }
 
 void hqc_auto_correct( kvData & d, float new_val )
