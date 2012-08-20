@@ -13,7 +13,7 @@ fi
 if [ -f "/etc/kvalobs/kv-ipalias.conf" ]; then
     . /etc/kvalobs/kv-ipalias.conf
     mylog=/dev/null
-    [ x"$logfile" = "x" ] || mylog=$logfil
+    [ x"$logfile" = "x" ] || mylog=$logfile
     echo "Reading '/etc/kvalobs/kv-ipalias.conf'!" | tee -a $mylog
 fi
 
@@ -51,7 +51,7 @@ log()
 if [ -z "$ipalias" ]; then
     log "ipalias: NOT defined, this is ok if this instance of kvalobs do not use ip-alias." 
 else
-    log "ipalias: $ipalias" >> $logfile
+    log "ipalias: $ipalias"
 fi
 
 
