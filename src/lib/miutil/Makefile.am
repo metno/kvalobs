@@ -22,7 +22,9 @@ libkvalobs2_miutil_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@
 #libkvalobs2_miutil_la_LIBADD = 
 
 miutilincludedir = $(pkgincludedir)/miutil
-miutilinclude_HEADERS = cmprspace.h commastring.h miTimeParse.h trimstr.h
+miutilinclude_HEADERS = msleep.h replace.h cmprspace.h commastring.h \
+                        miTimeParse.h trimstr.h base64.h gettimeofday.h \
+                        splitstr.h
 
 
 TESTS = libmiutiltest
