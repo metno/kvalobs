@@ -78,6 +78,7 @@ private:
    TextDataList textData;
    Params header;
    Times obsTimes;
+   Times hqcTimes;
 
    std::string createHeader( ParamDefsPtr paramdefs );
    std::string getData( const Param &param, const miutil::miTime &obstime )const;

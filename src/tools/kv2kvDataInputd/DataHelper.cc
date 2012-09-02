@@ -150,6 +150,11 @@ add( const kvalobs::kvData &kvData )
       return false;
    }
 
+   if( kvData.cfailed().find("hqc") != string::npos ) {
+      hqcTimes.insert( kvData.obstime() );
+      return true;
+   }
+
    data[kvData.obstime()][Param(kvData)]=kvData.original();
    header.insert( Param( kvData ) );
    obsTimes.insert( kvData.obstime() );
@@ -167,6 +172,10 @@ add( const kvalobs::kvTextData &kvData )
    } else if( stationid != kvData.stationID() ||
               type != kvData.typeID() ) {
       return false;
+   }
+
+   if( hqcTimes.find( kvData.obstime() ) != hqcTimes.end() ) {
+      return true;
    }
 
    textData[kvData.obstime()][Param(kvData)] = kvData.original();
@@ -274,6 +283,10 @@ klData( std::string &data, std::string &decoder,
    ost << headerString;
 
    for( Times::iterator it=obsTimes.begin(); it != obsTimes.end(); ++it ) {
+      //We do not generate a message if the hqc has been involved.
+      if( hqcTimes.find( *it ) != hqcTimes.end() )
+         continue;
+
       nParams = 0;
       for( Params::iterator pit = header.begin(); pit != header.end(); ++pit ) {
          if( nParams == 0 )
