@@ -48,13 +48,13 @@ namespace miutil{
      * @{
      */ 
 
-
-    typedef std::map<std::string, ConfSection*>                 SectionList;
-    typedef std::map<std::string, ConfSection*>::iterator       ISectionList;
-    typedef std::map<std::string, ConfSection*>::const_iterator CISectionList;
-    typedef std::map<std::string, ValElementList>                   ValueList;
-    typedef std::map<std::string, ValElementList>::iterator         IValueList;
-    typedef std::map<std::string, ValElementList>::const_iterator   CIValueList;
+    typedef std::list<ConfSection*> ConfSectionList;
+    typedef std::map<std::string, ConfSectionList > SectionList;
+    typedef  SectionList::iterator                  ISectionList;
+    typedef  SectionList::const_iterator            CISectionList;
+    typedef std::map<std::string, ValElementList> ValueList;
+    typedef ValueList::iterator                   IValueList;
+    typedef ValueList::const_iterator             CIValueList;
     
     /**
      * \brief ConfSection holds the parsed result.
@@ -70,9 +70,12 @@ namespace miutil{
 
       SectionList sectionList;
       ValueList   valueList;
+      bool allowMultipleSections;
 
     public:
       ConfSection();
+      ConfSection( bool allowMultipleSections );
+
       virtual ~ConfSection();
       
       bool addSection(const std::string &name,
@@ -91,6 +94,7 @@ namespace miutil{
 		       const ValElement &value);
 
       ConfSection* getSection(const std::string &cf);
+      ConfSectionList getAllSection(const std::string &cf);
 
       ValElementList getValue(const std::string &key)const;
 

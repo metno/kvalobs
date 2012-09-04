@@ -34,15 +34,24 @@
 
 using namespace std;
 
-miutil::conf::ConfParser::
+miutil::conf::
+ConfParser::
 ConfParser()
-  :curIst(0), debugLevel_(0)
+  :curIst(0), debugLevel_(0), allowMultipleSections( false )
 {
 }
 
-miutil::conf::ConfParser::
-ConfParser(std::istream &ist)
-  :debugLevel_(0)
+miutil::conf::
+ConfParser::
+ConfParser( bool allowMultipleSections )
+   :curIst(0), debugLevel_(0), allowMultipleSections( allowMultipleSections )
+{
+}
+
+miutil::conf::
+ConfParser::
+ConfParser(std::istream &ist )
+  :debugLevel_(0), allowMultipleSections( false)
 {
 	try{
 		curIst=new TIstStack;
@@ -57,6 +66,26 @@ ConfParser(std::istream &ist)
 	curIst->lineno=0;
 	curIst->file="<STREAM>";
 }
+miutil::conf::
+ConfParser::
+ConfParser(std::istream &ist,  bool allowMultipleSections)
+  :debugLevel_(0), allowMultipleSections( allowMultipleSections )
+{
+   try{
+      curIst=new TIstStack;
+   }
+   catch(...){
+      curIst=0;
+      return;
+   }
+
+   curIst->state=0;
+   curIst->ist=&ist;
+   curIst->lineno=0;
+   curIst->file="<STREAM>";
+}
+
+
 
 miutil::conf::ConfParser::
 ~ConfParser()
@@ -160,7 +189,7 @@ parse()
   deleteTokenStack();
 
   try{
-    stack_.push_back(new ConfSection());
+    stack_.push_back(new ConfSection( allowMultipleSections ) );
   }
   catch(...){
     errs_ << "NO MEM";
@@ -401,7 +430,7 @@ checkToken(const Token &t)
     }
     
     try{
-      stack_.push_front(new ConfSection());
+      stack_.push_front(new ConfSection( allowMultipleSections ) );
     }
     catch(...){
       errs_ << "NO MEM";

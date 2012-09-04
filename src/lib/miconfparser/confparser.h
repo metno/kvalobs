@@ -147,13 +147,14 @@ namespace miutil{
       int          debugLevel_;
       std::stack<TIstStack*> istStack;
       TIstStack    *curIst;
+      bool allowMultipleSections;
       
     public:
       /**
        * The defaul contructor. It does nothing.
        */
       ConfParser();
-      
+      ConfParser( bool allowMultipleSections );
       /**
        * A constructor that set the input that shall be parsed.
        * To start the parsing of the data the function parse() must
@@ -161,7 +162,9 @@ namespace miutil{
        *
        * \param ist parse the input stream ist.
        */
-      ConfParser(std::istream &ist);
+      ConfParser(std::istream &ist );
+
+      ConfParser(std::istream &ist, bool allowMultipleSections );
       
       ~ConfParser();
 	    
