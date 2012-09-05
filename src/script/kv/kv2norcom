@@ -126,7 +126,7 @@ truncatelog $LOG
 
 log "Transfer started: $SRCDIR -> $DESTDIR"
 
-rsync -t --exclude tmp --remove-source-files $SRCDIR $DESTDIR >> $LOG 2>&1
+rsync --exclude tmp --remove-source-files $SRCDIR $DESTDIR >> $LOG 2>&1
 
 log "Transfer ended."
 
