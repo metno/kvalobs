@@ -135,8 +135,8 @@ namespace miutil{
       bool colapseList();
       bool colapseKeyVal(const Token &t);
       bool colapseSection();
-     
       
+
       //int  lineno_;
       //std::istream *ist_;
       std::stringstream errs_;
@@ -170,6 +170,7 @@ namespace miutil{
 	    
       
       int         lineno()const { return (curIst?curIst->lineno:0);}
+      std::string filename()const { return (curIst?curIst->file:"");}
       
       /**
        * \brief get the debug level
@@ -215,6 +216,8 @@ namespace miutil{
        * be opened or there is an error in the file. 
        */
       static ConfSection *parse( const std::string &filename );
+      static ConfSection *parse( const std::string &filename,
+                                 bool allowMultipleSections );
   
       /**
        * \brief parse a input stream

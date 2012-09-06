@@ -71,13 +71,20 @@ namespace miutil{
       SectionList sectionList;
       ValueList   valueList;
       bool allowMultipleSections;
+      int lineno;
+      std::string filename;
 
     public:
       ConfSection();
-      ConfSection( bool allowMultipleSections );
+      ConfSection( bool allowMultipleSections,
+                   const std::string &filename = "",
+                   int lineno=0 );
 
       virtual ~ConfSection();
       
+      int getLineno()const { return lineno; }
+      std::string getFilename()const { return filename; }
+
       bool addSection(const std::string &name,
 		      ConfSection *cs,
 		      bool replaceIfExist=true);

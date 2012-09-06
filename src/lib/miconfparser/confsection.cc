@@ -39,15 +39,22 @@ using std::endl;
 miutil::conf::
 ConfSection::
 ConfSection()
-: allowMultipleSections( false )
+: allowMultipleSections( false ), lineno( 0 )
 {
+//   std::cerr << "ConfSection: CTOR(): allowMultipleSections: "
+//             << (allowMultipleSections?"true":"false")<< std::endl;
 }
 
 miutil::conf::
 ConfSection::
-ConfSection( bool allowMultipleSections )
-: allowMultipleSections( allowMultipleSections )
+ConfSection( bool allowMultipleSections_,
+             const std::string &filename_ ,
+             int lineno_ )
+: allowMultipleSections( allowMultipleSections_ ),
+  lineno( lineno_ ), filename( filename_ )
 {
+//   std::cerr << "ConfSection: CTOR( bool ): allowMultipleSections: "
+//             << (allowMultipleSections?"true":"false")<< std::endl;
 }
 
 miutil::conf::ConfSection::
@@ -91,6 +98,7 @@ addSection(const std::string &name,
          it->second.push_back( cs );
          return true;
       } else {
+         std::cerr << "addSection: allowMultipleSections: " << (allowMultipleSections?"true":"false") << endl;
          return false;
       }
    }
