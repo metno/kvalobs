@@ -351,7 +351,7 @@ dnmi::db::drivers::PGConnection::execQuery(const std::string &query)
    if( errorCode.length() >= 2 ) {
       std::string errClass = errorCode.substr( 0, 2 );
 
-      if( errClass == "22 ")
+      if( errClass == "22")
          throw SQLException(msg, errorCode );
 
       throw SQLAborted( msg, errorCode );
