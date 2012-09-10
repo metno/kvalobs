@@ -91,6 +91,42 @@ name() const
    return "KlDataDecoder";
 }
 
+kvalobs::decoder::DecoderBase::DecodeResult
+kvalobs::decoder::kldecoder::
+KlDecoder::
+rejected( const std::string &msg, const std::string &logid )
+{
+   ostringstream ost;
+   bool saved=true;
+
+   miTime tbtime( miTime::nowTime());
+
+   ost << "REJECTED: Decoder: " << name() << endl
+       <<" message: " << msg  << endl << obs;
+
+
+   kvalobs::kvRejectdecode rejected( obs,
+                                     tbtime,
+                                     name(),
+                                     msg );
+
+   if( !putRejectdecodeInDb( rejected ) ) {
+      saved = false;
+      ost << endl << "Can't save rejected observation!";
+   } else {
+      ost << endl << "Saved to rejectdecode!";
+   }
+
+   if( ! logid.empty() ) {
+      IDLOGERROR( logid, "Rejected: " << msg << endl << obs.c_str()
+                  << (saved?"":"\nFailed to save to 'rejected'."));
+   }
+
+   LOGERROR( ost.str() );
+   return Rejected;
+}
+
+
 
 kvalobs::decoder::DecoderBase::DecodeResult 
 kvalobs::decoder::kldecoder::
@@ -126,46 +162,23 @@ execute(miutil::miString &msg)
 
    if( stationid == 0 ) {
       ostringstream o;
+
+      o << "Missing stationid! typeid: ";
+
       if( typeId > 0 )
          o << typeId;
       else
          o << "<NA>";
 
-      msg = "Missing stationid!";
-      kvalobs::kvRejectdecode rejected( obs,
-                                        tbtime,
-                                        name(),
-                                        msg );
-
-      if( !putRejectdecodeInDb( rejected ) ) {
-         LOGERROR( "Decoder: " << name() << ". Can't save rejected observation!"
-                   << " typeid: " << o.str() << "."
-                   << endl << obs );
-      } else {
-         LOGERROR( "Decoder: " << name() << ". Missing stationid! typeid: " << o.str()
-                    << endl << "Saved in table rejectdecode!");
-      }
-
-      return Rejected;
+      return rejected( o.str(), "" );
    }
 
    if( typeId<0 ) {
-      msg = "Format error in type!";
-      kvalobs::kvRejectdecode rejected( obs,
-                                        tbtime,
-                                        name(),
-                                        msg );
+      ostringstream o;
+      o << "Format error in type!"
+        << "stationid: " << stationid << ".";
 
-      if( !putRejectdecodeInDb( rejected ) ) {
-         LOGERROR( "Decoder: " << name() << ". Can't save rejected observation!"
-                            << " stationid: " << stationid << "."
-                            << endl << "Observation:" << endl << obs  );
-      } else {
-         LOGERROR( "Decoder: " << name() << ". Missing typeid! stationid: " << stationid
-                   << endl << " Saved in table rejectdecode!" );
-      }
-
-      return Rejected;
+      return rejected( o.str(), "");
    }
 
    IdlogHelper idLog( stationid, typeId, this );
@@ -185,16 +198,15 @@ execute(miutil::miString &msg)
    msg = "OK!";
 
    if( !getline( istr, tmp ) ) {
-      msg = "Invalid format. No data?!!";
-      IDLOGERROR( logid, "Invalid format. No data.");
-      LOGERROR( "Invalid format. No data. stationid: " << stationid << " typeid: " << typeId );
-      return Error;
+      ostringstream o;
+      o << "Invalid format. No data. stationid: " << stationid << " typeid: " << typeId;
+
+      return rejected( o.str(), logid );
    }else{
       if( !decodeHeader( tmp, params, msg ) ) {
-         LOGERROR("Decoder: " << name() << ". INVALID header. stationid: " <<
-                  stationid << " typeid: " << typeId );
-         IDLOGERROR( logid, "INVALID header:" << endl << tmp );
-         return Error;
+         ostringstream o;
+         o << "INVALID header. stationid: " << stationid << " typeid: " << typeId ;
+         return rejected( o.str(), logid );
       }
    }
 
@@ -212,15 +224,25 @@ execute(miutil::miString &msg)
       lines++;
       i = tmp.find_first_of( "," );
       obstime = miTime( tmp.substr( 0, i ) );
+
+      if( obstime.undef() ) {
+         ostringstream err;
+         err << "Invalid obstime. Line: " << tmp << endl
+             << "stationid: " << stationid << " typeid: " << typeId;
+
+         return rejected( err.str(), logid );
+      }
+
       tmp.erase(0, ( i == string::npos?i:i+1 ) );
 
       KlDataArray da;
 
       if( !decodeData( da, params.size(), tmp, lines, msg ) ) {
-         LOGERROR( "Decoder: " << name() << ". Can't decode the data. Stationid: " <<
-                   stationid << " typeid: " << typeId );
-         IDLOGERROR( logid, "Can't decode the data. Reason: " << endl << msg );
-         return Error;
+         ostringstream o;
+         o << "Cant decode data. Line: " << tmp << endl
+           << "Reason: " << msg <<  endl
+           << "Stationid: " <<  stationid << " typeid: " << typeId;
+         return rejected( o.str(), logid );
       }
 
       ostringstream ost;
@@ -341,7 +363,6 @@ execute(miutil::miString &msg)
    }
 
    return Rejected;
-
 }
 
 

@@ -104,6 +104,9 @@ class KlDecoder : public DecoderBase{
                    int line,
                    miutil::miString &msg);
 
+   kvalobs::decoder::DecoderBase::DecodeResult
+   rejected( const std::string &msg, const std::string &logid );
+
    std::string toupper(const std::string &s);
    bool warnings;
    std::string logid;
