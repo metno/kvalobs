@@ -263,7 +263,7 @@ dnmi::db::drivers::PGConnection::exec(const std::string &query)
    if( errorCode.length() >= 2 ) {
       std::string errClass = errorCode.substr( 0, 2 );
 
-      if( errClass == "22 ") {
+      if( errClass == "22") {
          throw SQLException( msg, errorCode );
       }
 
@@ -608,7 +608,7 @@ perform( dnmi::db::Connection *con_,
       catch ( const SQLSerializeError &ex ) {
          if( ex.deadLockDetected() ) {
             time( &now );
-            if( (now - start) > 10 ) {
+            if( (now - start) > 20 ) {
                time( &start ); //Reset the timeout counter.
                retry--;
             }
@@ -619,9 +619,9 @@ perform( dnmi::db::Connection *con_,
          lastError = e.what();
          time( &now );
 
-         //We allow a one minutes periode of retry
+         //We allow a 10 seconds periode of retry
          //before we reduce the retry counter.
-         if( (now - start) > 60 ) {
+         if( (now - start) > 10 ) {
             time( &start ); //Reset the timeout counter.
             retry--;
          }
