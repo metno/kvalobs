@@ -944,12 +944,34 @@ operator()( dnmi::db::Connection *conection )
    miutil::miTime tbtime;
    int msec;
 
+   if( obstime.undef() ) {
+      LOGERROR("NewData: stationid: " << stationid << " typeid: " << typeid_
+            << ". Invalid obstime.");
+      return false;
+   }
+
    if( !logid.empty() ) {
+      bool err=false;
       for( std::list<kvalobs::kvData>::const_iterator it=newData->begin();
-            it != newData->end(); ++it )
-         mylog << it->obstime() << "," << it->stationID() << "," << it->typeID() <<","
-               << it->paramID() << "," << it->sensor() <<"," << it->level()
-               << "," << it->original() << endl;
+            it != newData->end(); ++it ) {
+         if( it->obstime().undef() ) {
+            err = true;
+            mylog << "Invalid obstime: " << it->stationID() << "," << it->typeID() <<","
+                  << it->paramID() << "," << it->sensor() <<"," << it->level()
+                  << "," << it->original() << endl;
+         } else {
+            mylog << it->obstime() << "," << it->stationID() << "," << it->typeID() <<","
+                  << it->paramID() << "," << it->sensor() <<"," << it->level()
+                  << "," << it->original() << endl;
+         }
+      }
+
+      if( err ) {
+         LOGERROR("NewData: INVALID OBSTIME stationid: " << stationid << " typeid: " << typeid_ << endl
+                   << mylog.str() );
+         return false;
+      }
+
       log << "NewData: stationid: " << stationid << " typeid: " << typeid_
           << " obstime: " << obstime << endl << mylog.str()  << endl;
    }
