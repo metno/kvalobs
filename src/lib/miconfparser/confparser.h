@@ -37,6 +37,7 @@
 #include <list>
 #include <string>
 #include <stdexcept>
+#include <map>
 #include <miconfparser/confsection.h>
 
 
@@ -71,6 +72,7 @@ namespace miutil{
       void  cleanIstStack();
       
     private:
+      static std::map<const ConfParser*, void*> pimpel;
       ConfParser(const ConfParser&);
       ConfParser& operator=(const ConfParser&);
       
@@ -147,8 +149,6 @@ namespace miutil{
       int          debugLevel_;
       std::stack<TIstStack*> istStack;
       TIstStack    *curIst;
-      bool allowMultipleSections;
-      
     public:
       /**
        * The defaul contructor. It does nothing.
@@ -168,7 +168,7 @@ namespace miutil{
       
       ~ConfParser();
 	    
-      
+      bool        allowMultipleSections()const;
       int         lineno()const { return (curIst?curIst->lineno:0);}
       std::string filename()const { return (curIst?curIst->file:"");}
       

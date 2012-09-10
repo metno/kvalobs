@@ -36,11 +36,31 @@
 using std::string;
 using std::endl;
 
+namespace miutil {
+namespace conf {
+
+std::map<const ConfSection*,ConfSectionPimpel*> ConfSection::pimpel;
+
+class ConfSectionPimpel {
+public:
+   bool allowMultipleSections;
+   int lineno;
+   std::string filename;
+
+   ConfSectionPimpel( bool allowMultipleSections_,
+                      int lineno_=0,
+                      const std::string &filename_="" )
+      : allowMultipleSections( allowMultipleSections_),
+        lineno( lineno_ ), filename( filename_ ) {}
+};
+}
+}
+
 miutil::conf::
 ConfSection::
 ConfSection()
-: allowMultipleSections( false ), lineno( 0 )
 {
+   pimpel[this] = new ConfSectionPimpel( false );
 //   std::cerr << "ConfSection: CTOR(): allowMultipleSections: "
 //             << (allowMultipleSections?"true":"false")<< std::endl;
 }
@@ -50,16 +70,25 @@ ConfSection::
 ConfSection( bool allowMultipleSections_,
              const std::string &filename_ ,
              int lineno_ )
-: allowMultipleSections( allowMultipleSections_ ),
-  lineno( lineno_ ), filename( filename_ )
 {
+   pimpel[this] = new ConfSectionPimpel( allowMultipleSections_,
+                                         lineno_, filename_ );
 //   std::cerr << "ConfSection: CTOR( bool ): allowMultipleSections: "
 //             << (allowMultipleSections?"true":"false")<< std::endl;
 }
 
-miutil::conf::ConfSection::
+miutil::conf::
+ConfSection::
 ~ConfSection()
 {
+   std::map<const ConfSection*,ConfSectionPimpel*>::iterator pit;
+
+   pit = pimpel.find( this );
+   if( pit != pimpel.end() ) {
+      delete pit->second;
+      pimpel.erase( pit );
+   }
+
    ISectionList it=sectionList.begin();
 
    //  std::cerr << "DELETE.....\n";
@@ -72,6 +101,38 @@ miutil::conf::ConfSection::
 
    //std::cerr << "DELETE.....return\n";
 
+}
+
+int
+miutil::conf::
+ConfSection::
+getLineno()const
+{
+   std::map<const ConfSection*,ConfSectionPimpel*>::iterator pit;
+
+   pit = pimpel.find( this );
+   return pit!=pimpel.end()?pit->second->lineno:0;
+}
+
+std::string
+miutil::conf::ConfSection::
+getFilename()const
+{
+   std::map<const ConfSection*,ConfSectionPimpel*>::iterator pit;
+
+   pit = pimpel.find( this );
+   return pit!=pimpel.end()?pit->second->filename:"";
+}
+
+bool
+miutil::conf::
+ConfSection::
+allowMultipleSections()const
+{
+   std::map<const ConfSection*,ConfSectionPimpel*>::iterator pit;
+
+   pit = pimpel.find( this );
+   return pit!=pimpel.end()?pit->second->allowMultipleSections:false;
 }
 
 
@@ -94,11 +155,11 @@ addSection(const std::string &name,
          it->second.clear();
          it->second.push_back( cs );
          return true;
-      }else if( allowMultipleSections ) {
+      }else if( allowMultipleSections() ) {
          it->second.push_back( cs );
          return true;
       } else {
-         std::cerr << "addSection: allowMultipleSections: " << (allowMultipleSections?"true":"false") << endl;
+         std::cerr << "addSection: allowMultipleSections: " << (allowMultipleSections()?"true":"false") << endl;
          return false;
       }
    }

@@ -30,29 +30,56 @@
  */
 #include <iostream>
 #include <fstream>
+#include <boost/thread/mutex.hpp>
 #include <miconfparser/confparser.h>
 
 using namespace std;
 
+namespace miutil {
+   namespace conf {
+      typedef std::map<const ConfParser*, void*> PimpelType;
+      PimpelType ConfParser::pimpel;
+   }
+}
+
+namespace {
+
+boost::mutex mutex;
+
+struct MyPimpel {
+   bool allowMultipleSections;
+
+   MyPimpel( bool allowMultipleSections_ )
+      : allowMultipleSections( allowMultipleSections_ ) {}
+};
+}
+
 miutil::conf::
 ConfParser::
 ConfParser()
-:curIst(0), debugLevel_(0), allowMultipleSections( false )
+:curIst(0), debugLevel_(0)
 {
+   boost::mutex::scoped_lock lock( mutex );
+   pimpel[this] = new MyPimpel( false );
 }
 
 miutil::conf::
 ConfParser::
 ConfParser( bool allowMultipleSections_ )
-:curIst(0), debugLevel_(0), allowMultipleSections( allowMultipleSections_ )
+:curIst(0), debugLevel_(0)
 {
+   boost::mutex::scoped_lock lock( mutex );
+   pimpel[this] = new MyPimpel( allowMultipleSections_ );
 }
 
 miutil::conf::
 ConfParser::
 ConfParser(std::istream &ist )
-:debugLevel_(0), allowMultipleSections( false)
+:debugLevel_(0)
 {
+   boost::mutex::scoped_lock lock( mutex );
+   pimpel[this] = new MyPimpel( false );
+
    try{
       curIst=new TIstStack;
    }
@@ -66,11 +93,15 @@ ConfParser(std::istream &ist )
    curIst->lineno=0;
    curIst->file="<STREAM>";
 }
+
 miutil::conf::
 ConfParser::
-ConfParser(std::istream &ist,  bool allowMultipleSections_)
-:debugLevel_(0), allowMultipleSections( allowMultipleSections_ )
+ConfParser( std::istream &ist,  bool allowMultipleSections_)
+:debugLevel_(0)
 {
+   boost::mutex::scoped_lock lock( mutex );
+   pimpel[this] = new MyPimpel( allowMultipleSections_ );
+
    try{
       curIst=new TIstStack;
    }
@@ -90,9 +121,32 @@ ConfParser(std::istream &ist,  bool allowMultipleSections_)
 miutil::conf::ConfParser::
 ~ConfParser()
 {
+   boost::mutex::scoped_lock lock( mutex );
+   PimpelType::iterator it = pimpel.find( this );
+
+   if( it != pimpel.end() ) {
+      delete static_cast<MyPimpel*>(it->second);
+      pimpel.erase( it );
+   }
+
    if(curIst)
       delete curIst;
 }
+
+bool
+miutil::conf::
+ConfParser::
+allowMultipleSections()const
+{
+   boost::mutex::scoped_lock lock( mutex );
+   PimpelType::const_iterator it = pimpel.find( this );
+
+   if( it != pimpel.end() )
+      return static_cast<MyPimpel*>( it->second )->allowMultipleSections;
+
+   return false;
+}
+
 
 void 
 miutil::conf::ConfParser::
@@ -199,7 +253,7 @@ parse()
    try{
 //      cerr << "parse: allowMultipleSections: "
 //                       << (allowMultipleSections?"true":"false")<< endl;
-      stack_.push_back(new ConfSection( allowMultipleSections, filename(), lineno() ) );
+      stack_.push_back(new ConfSection( allowMultipleSections(), filename(), lineno() ) );
    }
    catch(...){
       errs_ << "NO MEM";
@@ -442,7 +496,7 @@ checkToken(const Token &t)
          try{
 //            cerr << "checkToken: allowMultipleSections: "
 //                 << (allowMultipleSections?"true":"false")<< endl;
-            stack_.push_front(new ConfSection( allowMultipleSections, filename(), lineno() ) );
+            stack_.push_front(new ConfSection( allowMultipleSections(), filename(), lineno() ) );
          }
          catch(...){
             errs_ << "NO MEM";
