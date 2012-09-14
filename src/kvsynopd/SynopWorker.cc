@@ -900,25 +900,25 @@ saveToMora(StationInfoPtr info,
     return;
   }
 
-  if(ccx==0){
-    ost << path << "/" <<  info->wmono() << "-"
-#ifdef USE_KVDATA
-	<< setfill('0') << setw(4) << obstime.year() << setw(2) << obstime.month() << setw(2) << obstime.day() << setw(2) 
-#else
-	<< setfill('0') << setw(2) << obstime.day() << setw(2)
-#endif
-	<< obstime.hour()
-	<< ".synop";
-  }else{ 
+//  if(ccx==0){
+//    ost << path << "/" <<  info->wmono() << "-"
+//#ifdef USE_KVDATA
+//	<< setfill('0') << setw(4) << obstime.year() << setw(2) << obstime.month() << setw(2) << obstime.day() << setw(2) 
+//#else
+//	<< setfill('0') << setw(2) << obstime.day() << setw(2)
+//#endif
+//	<< obstime.hour()
+//	<< ".synop";
+//  }else{ 
     ost << path << "/" <<  info->wmono() << "-" 
 #ifdef USE_KVDATA
 	<< setfill('0') << setw(4) << obstime.year() << setw(2) << obstime.month() << setw(2) << obstime.day() << setw(2) 
 #else
 	<< setfill('0') << setw(2) << obstime.day() << setw(2)
 #endif
-	<< obstime.hour() << "-" << static_cast<char>('A'+(ccx-1))
+	<< obstime.hour() << "-" << static_cast<char>('A'+(ccx))
 	<< ".synop";
-  }
+ /* }*/
 
   f.open(ost.str().c_str());
 
