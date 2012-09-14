@@ -32,6 +32,7 @@
 #include <iostream>
 #include <stdarg.h>
 #include <ctype.h>
+#include <string.h>
 #include <miutil/trimstr.h>
 #include <libxml/parser.h>
 #include "metadata.h"

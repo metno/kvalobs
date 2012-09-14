@@ -60,7 +60,7 @@ main(int argn, char **argv)
   }
   catch(...){
     LOGFATAL("FATAL: failed to initialize KVALOBS service interface!!");
-    exit(1);
+    return 1;
   }
   
   while(!corbaThread->isInitialized())

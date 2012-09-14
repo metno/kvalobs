@@ -30,6 +30,7 @@
 */
 
 #include <stdio.h>
+#include <string.h>
 #include <milog/milog.h>
 #include "comobsdecode.h"
 #include "smsbase.h"

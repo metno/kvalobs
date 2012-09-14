@@ -30,7 +30,7 @@ kvQabased_CPPFLAGS = \
 	$(omniDynamic4_CFLAGS) \
 	$(putools_CFLAGS) \
 	$(perl_CFLAGS)\
-	-I/usr/include/python2.4 -DSMHI_LOG -DUSE_PYTHON -DUSE_OPENSSL
+	-I/usr/include/python2.6 -DSMHI_LOG -DUSE_PYTHON -DUSE_OPENSSL
 	
 kvQabased_LDFLAGS = -pthread -export-dynamic	
 kvQabased_LDADD = \
@@ -51,7 +51,7 @@ kvQabased_LDADD = \
 	$(omniDynamic4_LIBS) \
 	-lomnisslTP4 $(OpenSSL_LIBS) \
 	$(perl_LIBS) \
-	-L/usr/lib64/python2.4 -lpython2.4 \
+	-L/usr/lib64/python2.6 -lpython2.6 \
 	-ldl
 
 

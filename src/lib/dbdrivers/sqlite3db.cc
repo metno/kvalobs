@@ -102,7 +102,7 @@ dnmi::db::drivers::SQLiteConnection::SQLiteConnection(
 
   if(msg){
     errMsg=msg;
-    free(msg);
+    sqlite3_free(msg);
   }
 }
 
@@ -166,7 +166,7 @@ dnmi::db::drivers::SQLiteConnection::exec(const std::string &query)
   
   if(msg){
     errMsg=msg;
-    free(msg);
+    sqlite3_free(msg);
   }
   
   if(sqliteRes!=SQLITE_OK){
@@ -211,7 +211,7 @@ dnmi::db::drivers::SQLiteConnection::execQuery(const std::string &query)
 
   if(msg){
     sMsg=msg;
-    free(msg);
+    sqlite3_free(msg);
   }else
     sMsg="SQLite: Unknown error!";
 

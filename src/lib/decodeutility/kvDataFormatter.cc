@@ -132,7 +132,7 @@ namespace decodeutility {
       			       tbt, typ, sen, lvl, 
       			       cor, cIn, uin, fai));
       	}
-      	catch(exception &e) {
+      	catch(std::exception &e) {
       	  LOGERROR( "Error during parsing of kvData!:" << endl <<
       		    "Line " << i << endl <<
       		    current << endl <<

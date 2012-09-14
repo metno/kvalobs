@@ -32,6 +32,7 @@
 #include <stdexcept>
 #include <algorithm>
 #include <sstream>
+#include <string.h>
 #include "commastring.h"
 #include "trimstr.h"
 

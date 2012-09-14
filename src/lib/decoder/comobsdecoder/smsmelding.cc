@@ -29,6 +29,7 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include <iostream>
+#include <string.h>
 #include <miutil/trimstr.h>
 #include "smsmelding.h"
 

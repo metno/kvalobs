@@ -31,6 +31,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string>
+#include <stdio.h>
 #include "decodeutility.h"
 
 

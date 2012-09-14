@@ -30,6 +30,8 @@
 */
 #include "synop.h"
 #include <math.h>
+#include <string.h>
+#include <stdlib.h>
 #include <sstream>
 
 using namespace syn;

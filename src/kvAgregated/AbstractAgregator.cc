@@ -168,7 +168,7 @@ namespace agregator
 	    {
 	      agregateValue = generateKvData( observations, data );
 	    }
-	    catch ( exception & err )
+	    catch ( std::exception & err )
 	    {
 	      if ( err.what() [ 0 ] != '\0' )
 	      {

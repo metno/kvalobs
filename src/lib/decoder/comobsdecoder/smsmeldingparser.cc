@@ -31,6 +31,7 @@
 #include <iostream>
 #include <stdarg.h>
 #include <ctype.h>
+#include <string.h>
 #include <miutil/trimstr.h>
 #include "smsmeldingparser.h"
 

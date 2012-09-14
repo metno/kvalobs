@@ -36,11 +36,12 @@
 #include <kvcpp/kvevents.h>
 #include <kvcpp/KvGetDataReceiver.h>
 #include <boost/thread/mutex.hpp>
+#include <boost/thread/condition.hpp>
 
-namespace boost
-{
-  class condition;
-}
+//namespace boost
+//{
+//  class condition;
+//}
 
 
 namespace kvservice

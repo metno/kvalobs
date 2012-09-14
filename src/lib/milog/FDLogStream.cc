@@ -36,6 +36,7 @@
 #include <unistd.h>
 #include <dirent.h> 
 #include <ctype.h>
+#include <string.h>
 #include <milog/FDLogStream.h>
 #include <milog/StdLayout.h>
 #include <set>

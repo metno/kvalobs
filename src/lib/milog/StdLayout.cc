@@ -30,6 +30,7 @@
 */
 #include <milog/StdLayout.h>
 #include <time.h>
+#include <stdio.h>
 #include <sstream>
 
 using namespace std;

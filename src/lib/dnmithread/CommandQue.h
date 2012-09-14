@@ -33,6 +33,7 @@
 
 #include <iostream>
 #include <boost/thread/thread.hpp>
+#include <boost/thread/condition.hpp>
 #include <string>
 #include <deque>
 

@@ -32,6 +32,7 @@
 #include <algorithm>
 #include <math.h>
 #include <float.h>
+#include <string.h>
 #include <milog/milog.h>
 #include <decodeutility/decodeutility.h>
 #include "synop.h"
