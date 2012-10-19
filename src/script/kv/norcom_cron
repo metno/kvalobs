@@ -1,0 +1,6 @@
+#! /bin/sh
+
+NORCOMDIR=/home/kvalobs/var/norcom
+
+find $NORCOMDIR -name '*' -type f -mmin 180 -exec rm -f {} \;
+ 

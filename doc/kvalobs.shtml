@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+               "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<!--#include file="header.shtml" -->
+
+<h1>KVALOBS DOKUMENTASJON</h1>
+<p>
+For dokumenter produsert i prosjektfasen i Kvalobs (fram til 4. januar
+2005) se <a href="http://kvproject">http://kvproject</a>
+
+<h2>
+A.  DRIFTSDOKUMENTASJON</H2>
+<p>
+        <a href="drift/kvoperdoc/kvalobs-operdok.html">Veiledning for IT-operat&oslash;rer</a>
+        <p>
+        <a href="drift/kompetanseliste.html">Liste over kompetansepersonene</a>
+        <p>
+        <a href="drift/driftsgruppen.shtml">Veiledning for driftsgruppen</a>
+        <p><i>Tillegg:</i>
+        <p>
+        <a href="drift/drift_metadata.html">Veileder for oppdatering av skript og metadata</a>
+        <p>&nbsp;
+
+<h2>
+B.  SYSTEMDOKUMENTASJON</h2>
+<p>
+        <a href="spesifikasjoner/innholdsbruker.shtml">Sekvensiell beskrivelse av gangen gjennom Kvalobs</a>
+        <p>
+        <a href="kvalobs-html/kvlibs/">Kvalobs-automaten</a>
+        <p>
+        <a href="system/utvekslingsformat.shtml">Utvekslingsformatene</a>
+        <p>
+        <a href="drift/kvsynop/kvsynop-conf.html">Konfigurasjon av synopgenerator</a>
+        <p>
+        <a href="system/kvAgregated.txt">Aggregering</a>
+        <p>
+        <a href="drift/oppdatering_fra_ST_INFO_SYS.html">Oppdatering av metadata fra St-info-sys</a>
+        <p>
+        <a href="model2kvalobs.html">Oppdatering av tabellen model_data</a>
+        <p>
+        <a href="system/systemdokumentasjon_kro.shtml">KRO</a>
+	<p>
+	<a href="http://dokit/brukerdok/mipkg">Pakkesystemet for Kvalobs programvare</a>
+        <p>&nbsp;
+
+
+<h2>
+C.  METADATA</h2>
+        <p>
+        <a href="metadata/flags.shtml">Flagg i Kvalobs</a>
+        <p>
+        <a href="script.create">Tabeller i Kvalobsdatabasen, deklarasjon</a>
+        <p>
+        <a href="script.create_doc">Tabeller i Kvalobsdatabasen, forklaring</a>
+        <p>
+        <a href="metadata/parameternrs.shtml">Parametere i Kvalobs, sortert etter nummer</a>
+        <p>
+        <a href="metadata/parameters.shtml">Parametere i Kvalobs, alfabetisk sortert etter kode</a>
+        <p>
+        <a href="metadata/skriptingsveil.shtml">Veiledning for koding av perl-skript og innlegging av sjekkenes metadata</a>
+        <p>
+        <a href="metadata/bruker_oppdatering_metadata.html">Veileder for overf&oslash;ring av skript til kvalobsdb p&aring;
+rime for godkjenningskj&oslash;ringer</a>
+        <p>
+        <a href="metadata/skriptbruker.shtml">Framgangsm&aring;te ved godkjenningskj&oslash;ringer av skript</a>
+        <p>&nbsp;</p>
+
+<h2>
+D.  KVALOBS-KONTROLLENES INNHOLD</h2>
+        <p>
+        <a href="spesifikasjoner/qc10.shtml">QC1-0 Forh&aring;ndsvurdert h&aring;ndtering</a>
+        <p>
+        <a href="spesifikasjoner/qc11.shtml">QC1-1 Grenseverdikontrollen</a>
+        <p>
+        <a href="spesifikasjoner/qc12.shtml">QC1-2 Kontroll av formell konsistens</a>
+        <p>
+        <a href="spesifikasjoner/qc13.shtml">QC1-3 Sprang- og frys-kontroll</a>
+        <p>
+        <a href="spesifikasjoner/quality/">QC1-4 Prognostisk romkontroll</a>
+        <p>
+        <a href="spesifikasjoner/qc15.shtml">QC1-5 Meldingskontroll</a>
+        <p>
+        <a href="spesifikasjoner/qc16.shtml">QC1-6 Kontroll av klimatologisk konsistens</a>
+        <p>
+        <a href="spesifikasjoner/qc17.shtml">QC1-7 P&aring;visning av oppsamlet verdi</a>
+        <p>
+        <a href="spesifikasjoner/qc19.shtml">QC1-9 Kombinert vurdering</a>
+        <p>
+        <a href="spesifikasjoner/generisk.shtml">Generiske algoritmer for konsistenskontroll</a>
+        <p>&nbsp;
+
+
+<h1>APPLIKASJONENE</h1>
+    <p>
+    <a href="http://kro">Kvalobs system for rapportering og overv&aring;king (KRO)</a></p>
+
+    <p>
+    <b>Manuell kvalitetskontroll (HQC)</b>
+    <p>
+    Skal finnes på menylinjen (under 'Meteorologisk Institutt') på de
+    fleste av arbeidsstasjonene.
+    <p>
+    <a href="spesifikasjoner/HQC_flagg_controlinfo.doc">H&aring;ndtering av controlinfo-flagg fra HQC-programmene</a></p>
+
+
+<p>&nbsp;
+<a href="kv_todo.html"><h1>TODO-liste for Kvalobs</h1></a>
+
+<p>&nbsp;
+<a href="ref_todo_11062007.txt"><h2>Referat fra m&oslash;te om
+TODO-listen 11. juni 2007</h2></a>
+
+<p>&nbsp;</p>
+<a href="ref_driftsstyret_12102005.html"><h2>Referat fra m&oslash;te i driftsstyret 12. oktober 2005</h2></a>
+
+
+</body>    
+</html>

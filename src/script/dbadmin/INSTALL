@@ -1,0 +1,22 @@
+#!/bin/sh
+
+DESTINATION=
+DIRECTORIES="bin var/log/kvsynopdbadmin share/kvdbadmin share/kvsynop"
+FILES=
+
+
+THISTOP=`pwd`
+
+mkdir -p bin
+cp -fuv *.sh bin
+
+mkdir -p share/kvsynop
+mkdir -p share/kvdbadmin
+
+cp -fuv cleansynopdb.sql share/kvsynop
+cp -fuv generated_synop.sql share/kvdbadmin
+cp -fuv pgclean.sql share/kvdbadmin
+
+
+. $KVDIR/conf/INSTALL.conf
+

@@ -1,0 +1,1963 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Important mails in Kvalobs</title>
+</head>
+<body>
+<h4>Subject:
+SV: Forslag til endring av tolking av obs_pgm i qaBased.</h4>
+<pre wrap="">Date: Wed, 18 May 2005 15:03:12 +0200<br>From: Per-Ove Kjensli &lt;per-ove.kjensli@met.no&gt;<br>To: &lt;pal.sannes@met.no&gt;, &lt;borge.moe@met.no&gt;<br>CC: 'Kvdrift' &lt;kvdrift@met.no&gt;,	 'Gabriel Kielland' &lt;gabriel.kielland@met.no&gt;,	 'Audun Christoffersen' &lt;audun.christoffersen@met.no&gt;,	 'Lars Andresen' &lt;lars.andresen@met.no&gt;,	 'Terje Erlend Reite' &lt;terje.reite@met.no&gt;<br><br>Kommentarer til dagens tema:<br><br>Kontroll av aggregerte verdier:<br>I QC1 har vi i dag ikke kontroll av aggregerte verdier. De brukes som<br>st&oslash;tte i HQC. I QC2 - romkontroll (skal utvikles) vil de v&aelig;re blant<br>elementene som skal kontrolleres. Retting og flagging skal imidlertid<br>foreg&aring; p&aring; grunnlagsdata - og aggregert verdi oppdateres etter retting.<br>Det er viktig i HQC &aring; kunne se hva som er tuklet med. Aggregerte<br>parametere b&oslash;r derfor kunne "arve" flagg fra grunnlagsdata. Prisippet<br>brukes i det nye Klimadatavarehuset. Blir ikke da status for aggregerte<br>verdier "en parameter som skal kontrolleres"?<br><br>Mangler m&aring; h&aring;ndteres av systemet:<br>Det m&aring; settes mangelverdier ihht forutsatt observasjonsprogram.<br>Brukere skal ogs&aring; ha komplette tidsserier for utenlandske stasjoner.<br>Modellverdier for manglende data er viktig for enkelte parametre for<br>alle stasjoner. Vi m&aring; derfor sette opp et observasjonsprogram for disse<br>utenlandske stasjoner ogs&aring;. Dette betyr jo at (eventuelt en delmengde<br>av) utenlandske stasjoner ogs&aring; skal kontrolleres (mangel, range -<br>fysikalske grenser)? Dette skal imidlertid ikke kontrolleres i HQC.<br><br>Historiske data:<br>Kan ikke se at vi kan unng&aring; &aring; m&aring;tte etablere et observasjonsprogram<br>tilsvarende aktuelle data. Mangler M&Aring; h&aring;ndteres. Styring av kontroller<br>likes&aring;.<br><br>Generelt:<br>Vi trenger et enklest mulig tabellverk som styrer kontroller og<br>mangelh&aring;ndtering.<br>Enklest mulig - slik at datamodellen blir raskt begripelig for en som<br>kommer utenfra. Da vil vi ha st&oslash;rst suksess med vedlikeholdet av<br>innholdet ogs&aring;. <br><br><br>Per-Ove<br><br><br><br>Fra: <a
+ class="moz-txt-link-abbreviated" href="mailto:pal.sannes@met.no">pal.sannes@met.no</a> [<a
+ class="moz-txt-link-freetext" href="mailto:pal.sannes@met.no">mailto:pal.sannes@met.no</a>] <br>Sendt: 18. mai 2005 11:44<br><br><br><a
+ class="moz-txt-link-abbreviated" href="mailto:borge.moe@met.no">borge.moe@met.no</a> wrote:<br></pre>
+<blockquote type="cite">
+  <pre wrap=""><span class="moz-txt-citetags">&gt; </span>Hei,<br><span
+ class="moz-txt-citetags">&gt; </span><br><span class="moz-txt-citetags">&gt; </span>I dag spiller obs_pgm to roller:<br><span
+ class="moz-txt-citetags">&gt; </span><br><span class="moz-txt-citetags">&gt; </span>1. Den angir hvilke parametere vi forventer fra stasjonene. 2. Styrer <br><span
+ class="moz-txt-citetags">&gt; </span>hvilke parametere som skal kontrolleres i kvQabase.<br><span
+ class="moz-txt-citetags">&gt; </span><br><span class="moz-txt-citetags">&gt; </span>Punkt to er uheldig da det gj&oslash;r at absolutt alle parametere som skal<br><span
+ class="moz-txt-citetags">&gt; </span>kontrolleres m&aring; v&aelig;re i obs_pgm, ogs&aring; aggregerte verdier. Det er blitt <br><span
+ class="moz-txt-citetags">&gt; </span>slik pga av at man &oslash;nsker  en mekanisme for &aring; velge ut hvilke<br></pre>
+</blockquote>
+<pre wrap=""><!---->stasjoner <br></pre>
+<blockquote type="cite">
+  <pre wrap=""><span class="moz-txt-citetags">&gt; </span>som skal kontrolleres. Stasjoner som ikke skal kontrolleres som feks <br><span
+ class="moz-txt-citetags">&gt; </span>utenlandske, har ingen parametere i obs_pgm.<br></pre>
+</blockquote>
+<pre wrap=""><!----><br>&Oslash;nsker vi virkelig &aring; kontrollere aggregerte verdier? Disse brukes jo <br>bare i HQC og g&aring;r ikke videre verken til synop eller til KlimaDB.<br><br>Selv om svaret skulle v&aelig;re nei, vil B&oslash;rges forslag fremdeles v&aelig;re <br>aktuelt &aring; overveie, idet aggregerte verdier jo i dag f&aring;r negativ typeid <br>og dermed kan utelukkes fra kontrollene p&aring; den m&aring;ten. Jeg synes selv det<br><br>virker unaturlig at parametere i dag ikke kvalitetskontrolleres hvis de <br>av en eller annen grunn ikke er med i obs_pgm (f.eks. fordi vi ikke har <br>rukket &aring; oppdatere obs_pgm).<br><br></pre>
+<blockquote type="cite">
+  <pre wrap=""><span class="moz-txt-citetags">&gt; </span><br><span
+ class="moz-txt-citetags">&gt; </span>Forslag til ny tolking av obs_pgm i kvQabase.<br><span
+ class="moz-txt-citetags">&gt; </span>Kun stasjoner som har minst en parameter i obs_pgm skal kontrolleres,<br><span
+ class="moz-txt-citetags">&gt; </span>men alle data fra denne stasjonen skal kontrolleres. Dette ivaretar <br><span
+ class="moz-txt-citetags">&gt; </span>obs_pgms rolle for &aring; utelukke stasjoner som IKKE skal kontrolleres,<br></pre>
+</blockquote>
+<pre wrap=""><!---->men <br></pre>
+<blockquote type="cite">
+  <pre wrap=""><span class="moz-txt-citetags">&gt; </span>samtidig trenger man ikke f&oslash;re opp feks aggregerte verdier. Og vi f&aring;r<br></pre>
+</blockquote>
+<pre wrap=""><!---->en <br></pre>
+<blockquote type="cite">
+  <pre wrap=""><span class="moz-txt-citetags">&gt; </span>sikkerhet i at ALLE verdiene for en stasjon vi &oslash;nsker skal<br></pre>
+</blockquote>
+<pre wrap=""><!---->kontrolleres <br></pre>
+<blockquote type="cite">
+  <pre wrap=""><span class="moz-txt-citetags">&gt; </span>faktisk blir kontrollert.<br></pre>
+</blockquote>
+<pre wrap=""><!----><br>Jeg er enig med Terje i at denne informasjonen mer naturlig h&oslash;rer inn i <br>tabellen station. Et forslag kan v&aelig;re &aring; opprette ny kolonne i tabellen <br>station kalt 'control' med 3 mulige verdier, svarende til 1) kontroller <br>ingenting 2) kontroller alt 3) kontroller kun det som er med i obs_pgm. <br>Kan det tenkes tilfeller hvor man foretrekker 3) framfor 2)?<br><br>P&aring;l<br></pre>
+<blockquote type="cite">
+  <pre wrap=""><span class="moz-txt-citetags">&gt; </span><br><span
+ class="moz-txt-citetags">&gt; </span>B&oslash;rge<br></pre>
+</blockquote>
+<br>
+<h4><a name="RE:_Forhandskvalifisering-_for_tungvint_i_dag"></a>Subject:
+RE: Forh&aring;ndskvalifisering- for tungvint i dag</h4>
+<pre wrap="">Date: Fri, 13 May 2005 12:23:45 +0200<br>From: Lars Andresen &lt;lars.andresen@met.no&gt;<br>To: 'Gabriel Kielland' &lt;gabriel.kielland@met.no&gt;,	 'Lars Andresen' &lt;lars.andresen@met.no&gt;<br>CC: '&Oslash;ystein Lie' &lt;oystein.lie@met.no&gt;,  "'Per-Ove Kjensli'" &lt;per-ove.kjensli@met.no&gt;, &lt;Kvdrift@met.no&gt;<br><br>Hei,<br><br>Jeg sender denne ogs&aring; til kvdrift, fordi dette har interesse for temaet:<br>utestengelse av observasjoner og hvor lenge.<br><br>Stasjonen sender antagelig ville nedb&oslash;rverdier, siden disse blir forkastet i<br>prekvalifiseringen. Det jeg lurer p&aring; er egentlig om stasjonen skal ha<br>nedb&oslash;rverdier. For hvis den skal det, hvorfor settes da stasjonen gr&oslash;nn og<br>ikke gul? Kanskje &Oslash;ystein kan svare p&aring; det. Med andre ord: Skal en stasjon<br>som "tas ut" (dvs.forkastes) i prekvalifisering flagges gr&oslash;nn? Hvor lenge<br>vil situasjonen p&aring;g&aring;? Er det ikke mulig &aring; deaktivere sensoren p&aring; stasjonen?<br>Det er slike ting jeg lurer p&aring;.<br><br>Hvis kvdrift sjekker flaggstatus, s&aring; vil de vel kanskje tro at stasjonen er<br>OK, og droppe forkast-flagget?<br><br>Hilsen Lars<br><br></pre>
+<blockquote type="cite">
+  <pre wrap=""><span class="moz-txt-citetags">&gt;</span>-----Original Message-----<br><span
+ class="moz-txt-citetags">&gt;</span>From: Gabriel Kielland [<a
+ class="moz-txt-link-freetext" href="mailto:gabriel.kielland@met.no">mailto:gabriel.kielland@met.no</a>] <br><span
+ class="moz-txt-citetags">&gt;</span>Sent: Friday, May 13, 2005 10:36 AM<br><span
+ class="moz-txt-citetags">&gt;</span>To: 'Lars Andresen'<br><span
+ class="moz-txt-citetags">&gt;</span>Cc: '&Oslash;ystein Lie'<br><span
+ class="moz-txt-citetags">&gt;</span>Subject: RE: Forh&aring;ndskvalifisering- for tungvint i dag<br><span
+ class="moz-txt-citetags">&gt;</span><br><span class="moz-txt-citetags">&gt;</span><br><span
+ class="moz-txt-citetags">&gt;</span>Hei Lars!<br><span
+ class="moz-txt-citetags">&gt;</span><br><span class="moz-txt-citetags">&gt;</span>Harstad har fortsatt ingen fungerende nedb&oslash;rm&aring;ler.<br><span
+ class="moz-txt-citetags">&gt;</span><br><span class="moz-txt-citetags">&gt;</span>vh Gabriel<br><span
+ class="moz-txt-citetags">&gt;</span><br>  </pre>
+  <blockquote type="cite">
+    <pre wrap=""><span class="moz-txt-citetags">&gt;&gt;</span>-----Original Message-----<br><span
+ class="moz-txt-citetags">&gt;&gt;</span>From: Lars Andresen [<a
+ class="moz-txt-link-freetext" href="mailto:lars.andresen@met.no">mailto:lars.andresen@met.no</a>]<br><span
+ class="moz-txt-citetags">&gt;&gt;</span>Sent: Friday, May 13, 2005 8:17 AM<br><span
+ class="moz-txt-citetags">&gt;&gt;</span>To: <a
+ class="moz-txt-link-abbreviated" href="mailto:pal.sannes@met.no">pal.sannes@met.no</a>; 'Gabriel Kielland'<br><span
+ class="moz-txt-citetags">&gt;&gt;</span>Cc: 'Lars Andresen'; <a
+ class="moz-txt-link-abbreviated" href="mailto:Kvdrift@met.no">Kvdrift@met.no</a>; 'Terje Erlend Reite'; <br><span
+ class="moz-txt-citetags">&gt;&gt;</span>'Per-Ove Kjensli'<br><span
+ class="moz-txt-citetags">&gt;&gt;</span>Subject: RE: Forh&aring;ndskvalifisering- for tungvint i dag<br><span
+ class="moz-txt-citetags">&gt;&gt;</span><br><span
+ class="moz-txt-citetags">&gt;&gt;</span><br><span
+ class="moz-txt-citetags">&gt;&gt;</span>Hei P&aring;l,<br><span
+ class="moz-txt-citetags">&gt;&gt;</span><br><span
+ class="moz-txt-citetags">&gt;&gt;</span>Jeg har ingen motforestillinger til det du skriver, men jeg<br><span
+ class="moz-txt-citetags">&gt;&gt;</span>vil gjerne at Obs.div klarerer Harstads situasjon, f&oslash;r kvdrift <br><span
+ class="moz-txt-citetags">&gt;&gt;</span>ev. gj&oslash;r noe med den. Akkurat dette eksempelet understreker <br><span
+ class="moz-txt-citetags">&gt;&gt;</span>faktisk ditt poeng!<br><span
+ class="moz-txt-citetags">&gt;&gt;</span><br><span
+ class="moz-txt-citetags">&gt;&gt;</span>Hilsen Lars<br><span
+ class="moz-txt-citetags">&gt;&gt;</span><br>    </pre>
+    <blockquote type="cite">
+      <pre wrap=""><span class="moz-txt-citetags">&gt;&gt;&gt;</span>-----Original Message-----<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;</span>From: <a
+ class="moz-txt-link-abbreviated" href="mailto:pal.sannes@met.no">pal.sannes@met.no</a> [<a
+ class="moz-txt-link-freetext" href="mailto:pal.sannes@met.no">mailto:pal.sannes@met.no</a>]<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;</span>Sent: Thursday, May 12, 2005 4:22 PM<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;</span>To: Gabriel Kielland<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;</span>Cc: 'Lars Andresen'; <a
+ class="moz-txt-link-abbreviated" href="mailto:Kvdrift@met.no">Kvdrift@met.no</a>; Terje Erlend Reite<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;</span>Subject: Forh&aring;ndskvalifisering- for tungvint i dag<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;</span><br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;</span><br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;</span>OK, vi (i kvdrift) skal fors&oslash;ke &aring; f&aring; rettet opp i feilene<br></pre>
+    </blockquote>
+    <pre wrap=""><span class="moz-txt-citetags">&gt;&gt;</span>Lars p&aring;peker.<br></pre>
+    <blockquote type="cite">
+      <pre wrap=""><span class="moz-txt-citetags">&gt;&gt;&gt;</span><br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;</span>Men dette er etter min mening ikke noe holdbart system i lengden.<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;</span><br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;</span>Det er blitt satt fram som forslag f&oslash;r, og jeg gjentar det:<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;</span><br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;</span>Det er Obs-div som sitter p&aring; opplysningene om m&aring;leinstrumenter som <br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;</span>sender up&aring;litelige verdier. Denne informasjonen b&oslash;r ligge i <br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;</span>St-info-sys og oppdateres manuelt av Obs-div. For Kvalobs sin del <br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;</span>synes det naturlige &aring; v&aelig;re &aring; legge denne informasjonen inn i <br></pre>
+    </blockquote>
+  </blockquote>
+  <pre wrap=""><span class="moz-txt-citetags">&gt;</span>obs_pgm. <br></pre>
+  <blockquote type="cite">
+    <blockquote type="cite">
+      <pre wrap=""><span class="moz-txt-citetags">&gt;&gt;&gt;</span>Dvs &aring; opprette en ny kolonne, for eksempel kalt 'unreliable' som<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;</span>blir satt lik <br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;</span>1 hvis man &oslash;nsker at verdien av denne parameteren for denne <br></pre>
+    </blockquote>
+  </blockquote>
+  <pre wrap=""><span class="moz-txt-citetags">&gt;</span>stasjonen <br></pre>
+  <blockquote type="cite">
+    <blockquote type="cite">
+      <pre wrap=""><span class="moz-txt-citetags">&gt;&gt;&gt;</span>skal forkastes av Kvalobs. Obs_pgm oppdateres som f&oslash;r tenkt <br></pre>
+    </blockquote>
+    <pre wrap=""><span class="moz-txt-citetags">&gt;&gt;</span>automatisk<br></pre>
+    <blockquote type="cite">
+      <pre wrap=""><span class="moz-txt-citetags">&gt;&gt;&gt;</span>fra St-info-sys.<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;</span><br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;</span>Jeg kan vanskelig tenke meg noen enklere og rensligere m&aring;te &aring; gj&oslash;re <br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;</span>dette p&aring;.<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;</span><br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;</span>Noen som har motforestillinger?<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;</span><br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;</span>P&aring;l<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;</span><br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;</span>Gabriel Kielland wrote:<br></pre>
+      <blockquote type="cite">
+        <pre wrap=""><span class="moz-txt-citetags">&gt;&gt;&gt;&gt; </span>Hei Lars!<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt; </span><br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt; </span>kvdrift har ansvaret. Hvis forh&aring;ndskvalifiseringen skal fungere m&aring; <br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt; </span>noen holde en logg.<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt; </span><br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt; </span>vh Gabriel<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt; </span><br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt; </span><br>        </pre>
+        <blockquote type="cite">
+          <pre wrap=""><span class="moz-txt-citetags">&gt;&gt;&gt;&gt;&gt;</span>-----Original Message-----<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt;&gt;</span>From: Lars Andresen [<a
+ class="moz-txt-link-freetext" href="mailto:lars.andresen@met.no">mailto:lars.andresen@met.no</a>]<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt;&gt;</span>Sent: Thursday, May 12, 2005 2:50 PM<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt;&gt;</span>To: <a
+ class="moz-txt-link-abbreviated" href="mailto:Kvdrift@met.no">Kvdrift@met.no</a>; Gabriel Kielland; 'Ragnar Br&aelig;kkan'<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt;&gt;</span>Cc: 'Per-Ove Kjensli'; <a
+ class="moz-txt-link-abbreviated" href="mailto:nils.langgard@met.no">nils.langgard@met.no</a>; &Aring;se Moen Vidal<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt;&gt;</span>Subject: Forh&aring;ndskvalifisering<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt;&gt;</span><br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt;&gt;</span><br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt;&gt;</span>Jeg sender ut noen sp&oslash;rsm&aring;l i flere retninger, da dette kanskje kan<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt;&gt;</span>interessere mer enn en, om enn ikke n&oslash;dvendigvis alle som st&aring;r som <br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt;&gt;</span>adressat.<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt;&gt;</span><br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt;&gt;</span>En sjekk p&aring; QC1-0 i Kvalobs-databasen viser at 87640<br></pre>
+        </blockquote>
+      </blockquote>
+    </blockquote>
+    <pre wrap=""><span class="moz-txt-citetags">&gt;&gt;</span>Harstad og 94500<br></pre>
+    <blockquote type="cite">
+      <blockquote type="cite">
+        <blockquote type="cite">
+          <pre wrap=""><span class="moz-txt-citetags">&gt;&gt;&gt;&gt;&gt;</span>Fruholmen fyr figurerer med s&aring;kalte forkastede verdier, den f&oslash;rste<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt;&gt;</span>med parameteren RA, den andre med DD og DX.<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt;&gt;</span><br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt;&gt;</span>En tur til KRO viser at begge stasjoner er "gr&oslash;nne", dvs. i orden<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt;&gt;</span>slik jeg forst&aring;r det.<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt;&gt;</span><br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt;&gt;</span>Det ser ut til at Harstad har en feil ved nedb&oslash;rm&aring;leren,<br></pre>
+        </blockquote>
+      </blockquote>
+    </blockquote>
+    <pre wrap=""><span class="moz-txt-citetags">&gt;&gt;</span>som ikke er<br></pre>
+    <blockquote type="cite">
+      <blockquote type="cite">
+        <blockquote type="cite">
+          <pre wrap=""><span class="moz-txt-citetags">&gt;&gt;&gt;&gt;&gt;</span>rettet. Det m&aring; enten bety at stasjonen ikke skal sende nedb&oslash;r, og<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt;&gt;</span>siden det andre er i orden, s&aring; skal stasjonen v&aelig;re gr&oslash;nn. Eller <br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt;&gt;</span>nedb&oslash;rfeilen skal rettes? Men har da stasjonen riktig farge?<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt;&gt;</span><br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt;&gt;</span>Feilen p&aring; Fruholmen ser ut til &aring; v&aelig;re rettet 21.februar eller<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt;&gt;</span>18.mars. Hvis dette er riktig, hvem har da ansvar for &aring; <br></pre>
+        </blockquote>
+      </blockquote>
+    </blockquote>
+  </blockquote>
+  <pre wrap=""><span class="moz-txt-citetags">&gt;</span>kvalifisere <br></pre>
+  <blockquote type="cite">
+    <blockquote type="cite">
+      <blockquote type="cite">
+        <blockquote type="cite">
+          <pre wrap=""><span class="moz-txt-citetags">&gt;&gt;&gt;&gt;&gt;</span>stasjonen for vanlig bruk igjen n&aring;r feilene er rettet?<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt;&gt;</span><br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt;&gt;</span>Hilsen Lars<br><span
+ class="moz-txt-citetags"></span>  </pre>
+        </blockquote>
+      </blockquote>
+    </blockquote>
+  </blockquote>
+</blockquote>
+<h4><a name="Re:_Checker_-_presisjon_feilmelding._Hvordan_implementere"></a>Subject:
+Re: Checker&nbsp; -&nbsp; presisjon feilmelding. Hvordan implementere</h4>
+Date: Mon, 23 May 2005 14:19:15 +0200<br>
+From: Audun D. Christoffersen &lt;audun.christoffersen@met.no&gt;<br>
+To: pal.sannes@met.no<br>
+CC: Kvdrift@met.no<br>
+<br>
+Hei,
+<br>
+Jeg har ikke studert dette grundig enn&aring;, men det du
+foresl&aring;r er helt klart et alternativ. Ulempen med dette er at den
+ikke vil v&aelig;re bakover-komp. med skripts som ikke sender et slikt
+element.
+<br>
+Et alternativ hadde v&aelig;rt &aring; legge inn denne informasjonen i
+retur-vektoren. Denne kan ha et variabelt antall elementer (NAVN/VERDI
+par), og vi kunne lagt til en som beskriver 'cfailed_info'. Dersom
+denne infoen skal v&aelig;re fritekst, og ikke numerisk som X_X_X_flag
+og X_X_X_missing er i dag, kan jeg kanskje st&oslash;te p&aring;
+problemer...
+<br>
+Jeg er borte neste uke, men foresl&aring;r at jeg ser p&aring; oppgaven
+i uke 23. Du har rett i at endringene i QaBase b&oslash;r v&aelig;re
+minimale, og hvis vi kan g&aring; for alternativ 2 over vil man kunne
+implementere det i skriptene etter behov.
+<br>
+<br>
+Audun
+<br>
+<br>
+<a class="moz-txt-link-abbreviated" href="mailto:pal.sannes@met.no">pal.sannes@met.no</a>
+wrote:
+<br>
+<br>
+Hei Audun,
+<br>
+<br>
+Som du ser &oslash;nsker Per-Ove dette implementert s&aring; snart som
+mulig. Jeg burde vel ikke blande meg bort i hvordan dette gj&oslash;res
+i praksis, men ser at samtlige algoritmer ser ut til &aring; slutte med
+<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; my $numout = @retvector; #
+antall returverdier
+<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return (@retvector,
+$numout);
+<br>
+<br>
+Kan en m&aring;te &aring; gj&oslash;re dette p&aring; (i tr&aring;d med
+ditt forslag) v&aelig;re &aring; erstatte siste linje med
+<br>
+<br>
+my $cfailed_info = ""; # used to append info to qcx in cfailed if
+desired
+<br>
+return (@retvector, $numout, $cfailed_info);
+<br>
+<br>
+i samtlige algoritmer, for s&aring; &aring; editere de av disse hvor
+man faktisk &oslash;nsker &aring; sette $cfailed_info til noe? Dette
+burde v&aelig;re kjapt &aring; implementere i algorithms, og jeg
+innbiller meg at det ikke burde v&aelig;re noen stor jobb &aring;
+omprogrammere i QAbase heller.
+<br>
+<br>
+N&aring;r kunne du evt f&aring; gjort n&oslash;dvendig endringer i
+QAbase?
+<br>
+<br>
+P&aring;l
+<br>
+<br>
+Per-Ove Kjensli wrote:
+<br>
+<br>
+Kan driftsgruppa sette i verk snarlig utf&oslash;relse av en
+<br>
+forbedringsoppgave?
+<br>
+<br>
+&Aring; kunne gi mer detaljert melding fra kontrollskript enn dagens
+<br>
+hovedniv&aring;.
+<br>
+Vi &oslash;nsker prioritet p&aring; skriptene QC1-2-72b og QC1-2-100.
+Men det finnes
+<br>
+ogs&aring; en del andre skript som har underniv&aring;er. De to nevnte
+er imidlertid
+<br>
+sv&aelig;rt viktig &aring; f&aring; detaljert informasjon fra. Uten mer
+presise meldinger
+<br>
+s&aring; er det sv&aelig;rt tungt &aring; finne &aring;rsaken til
+utslaget gjennom HQC.
+<br>
+<br>
+Se kommunikasjon mellom Bj&oslash;rn og Audun nedenfor.
+<br>
+<br>
+Mvh
+<br>
+Per-Ove
+<br>
+<br>
+<br>
+-----Opprinnelig melding-----
+<br>
+Fra: Audun D. Christoffersen [<a class="moz-txt-link-freetext"
+ href="mailto:audun.christoffersen@met.no">mailto:audun.christoffersen@met.no</a>]
+Sendt: 20. mai 2005 13:28
+<br>
+Til: <a class="moz-txt-link-abbreviated"
+ href="mailto:bjorn.nordin@met.no">bjorn.nordin@met.no</a>
+<br>
+Kopi: 'Per-Ove Kjensli'
+<br>
+Emne: Re: Checker - presisjon feilmelding.
+<br>
+<br>
+<br>
+Ahhh,
+<br>
+da m&aring; vi innf&oslash;re en ny returverdi fra skriptet som angir
+'delnavn' for fornuftig output.
+<br>
+(For qabase har n&aring; ingen kontroll/styring med hva som skjer i et
+perl-skript!)
+<br>
+<br>
+Dvs skriptforfatteren har ansvar for &aring; fortelle omverdenen
+hvilken algoritme som sl&aring;r ut
+<br>
+<br>
+Audun
+<br>
+<br>
+<a class="moz-txt-link-abbreviated" href="mailto:bjorn.nordin@met.no">bjorn.nordin@met.no</a>
+wrote:
+<br>
+<br>
+<blockquote type="cite">Hei, <br>
+  <br>
+Hver av feilsjekkene i kvalobs best&aring;r ofte av flere sm&aring;
+sjekker og algoritmer. Slik det er n&aring; f&aring;r man bare melding
+om hvilket 'hovedscript' som sl&aring;r ut. <br>
+  <br>
+N&aring;r alt funker som det skal, er ikke dette noe stort problem. <br>
+  <br>
+Noe helt annet er det n&aring;r checker sl&aring;r feil eller andre
+uventede ting skjer. Da hadde det v&aelig;rt til veldig stor hjelp
+&aring; f&aring; vite hvilken 'sm&aring;sjekk' som sl&aring;r ut.
+Spesielt n&aring;r det gjelder de store checkene, er det en nesten
+h&aring;pl&oslash;s oppgave &aring; finne ut av feil og mangler hvis
+ikke presisjonen p&aring; tilbakemeldingene er bedre. (Dette gjelder
+spesielt for de st&oslash;rste sjekkene, f.eks. QC1-2-100.) <br>
+  <br>
+Det vi &oslash;nsker &aring; f&aring; p&aring; plass, er alts&aring; at
+cfailed kommer tilbake med 'fullt navn'. <br>
+F.eks.: Istedenfor: 'QC1-2-72b' Skal v&aelig;re: 'QC1-2-72b.1' eller <br>
+</blockquote>
+<br>
+<br>
+'QC1-2-72b.8' osv.
+<br>
+<br>
+<blockquote type="cite"><br>
+mvh <br>
+Bj&oslash;rn Nordin <br>
+</blockquote>
+<blockquote type="cite"><br>
+</blockquote>
+<h4><a
+ name="Subject:_SV:_Detektering_av_mulig_feil_tidsstempling_av_observasjoner"></a>Subject:
+SV: Detektering av mulig feil tidsstempling av observasjoner</h4>
+-----Opprinnelig melding-----<br>
+Fra: pal.sannes@met.no [mailto:pal.sannes@met.no] <br>
+Sendt: 19. april 2005 11:40<br>
+Til: Margareth Moe<br>
+Kopi: Per-Ove Kjensli; 'Solfrid Agersten'; 'Gabriel Kielland';
+'B&oslash;rge<br>
+Moe'; '&Oslash;ystein Lie'<br>
+Emne: Detektering av mulig feil tidsstempling av observasjoner<br>
+<br>
+<br>
+Hei Margareth,<br>
+<br>
+Som du vil skj&oslash;nne fra Per-Oves kommentar under: her m&aring;
+Obs-div p&aring;<br>
+banen!<br>
+<br>
+Jeg vil tro at det burde v&aelig;re almenn enighet om at observasjoner
+som <br>
+&aring;penbart eller sv&aelig;rt sannsynlig har feil tidsstempel, ikke
+b&oslash;r f&aring; lov <br>
+til &aring; overskrive andre observasjoner/la seg overskrive av andre <br>
+observasjoner med korrekt tidsstempel i tabellen data i Kvalobs, og at <br>
+det heller ikke automatisk b&oslash;r lages synop av slike
+observasjoner.<br>
+<br>
+Det naturlige synes &aring; v&aelig;re &aring; legge slike suspekte
+meldinger i tabellen <br>
+rejectdecode, slik at de s&aring; kan puttes inn i systemet igjen med
+evt <br>
+korrigert tidsstempel via HQC.<br>
+<br>
+For en enkelt meldingstype har vi allerede etablert en slik forkastning
+<br>
+av antatt feil tidsstempel. Fra tabell rejectdecode finner jeg
+f&oslash;lgende <br>
+type feilmeldinger for decoder comobs (siste m&aring;ned):<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+comment&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+| count<br>
+------------------------------------------------------------+-------<br>
+&nbsp; &lt;tildato&gt; not between &plusmn;3 (6
+UTC)!&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp; 2<br>
+&nbsp; Either &lt;fradato&gt; or &lt;tildato&gt; is
+invalid!!&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp; 4<br>
+&nbsp; Missing a timestamp, &lt;tildato&gt; eller
+&lt;fradato&gt;!&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp; 14<br>
+&nbsp; The observation is to far in the future (&gt;+1
+hour)!&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp; 4<br>
+&nbsp; Uknown
+station!&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp; 14<br>
+&nbsp; Out of timespec COMOBSTIME (&plusmn; 3 hour):
+2005-.....&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+96<br>
+<br>
+Fra B&oslash;rge fikk jeg vite at decoder 'comobs' i kvalobs kun
+dekoder <br>
+meldingstype 2 (nedb&oslash;rstasjoner). Decoder 'AutoObsDecoder' tar
+seg av de<br>
+<br>
+&oslash;vrige meldingstypene fra AutoObs/Comobs. Litt forvirrende dette
+her, <br>
+men fikk n&aring; i alle fall dette oppklart.<br>
+<br>
+For andre meldingstyper enn type 2 er det i dag i dekoderne ingen sjekk
+<br>
+for om en melding er altfor tidlig/altfor sent ute.<br>
+<br>
+Det b&oslash;r inn!<br>
+<br>
+Men da trengs en spesifikasjon av hva som skal defineres som altfor <br>
+tidlig/altfor sent.<br>
+<br>
+Altfor tidlig: Er 1 time OK &aring; benytte for alle meldingstyper?<br>
+<br>
+For sent: Det mest sentrale sp&oslash;rsm&aring;let her er vel om vi
+skal tillate at <br>
+en tidligere innkommet observasjon blir overskrevet uten noen form for <br>
+manuell kontroll. Noen meldingstyper har kanskje etablert bedre/sikrere
+<br>
+systemer enn andre for &aring; angi at dette er en korreksjon av en
+tidligere <br>
+observasjon.<br>
+<br>
+Det er vel Obs-div som har de beste forutsetningene for &aring; lage en
+slik <br>
+spesifikasjon?<br>
+<br>
+I tillegg til &aring; f&aring; dette p&aring; plass og implementert,
+m&aring; vi ogs&aring; ta <br>
+stilling til Per-Oves pkt 1-3 under. Her m&aring; flere med enn
+Obs-div, men <br>
+kanskje du tar initiativet til &aring; f&aring; i gang en slik
+diskusjon? De som <br>
+jobber med HQC-systemet m&aring; vel i alle fall med. Det synes for meg
+<br>
+naturlig &aring; overveie &aring; etablere et direkte grensesnitt
+mellom HQC og <br>
+rejectdecode.<br>
+<br>
+P&aring;l<br>
+<br>
+<br>
+Per-Ove Kjensli wrote:<br>
+&gt; Kommentar:<br>
+&gt; <br>
+&gt; Meldinger som kommer mer enn 1 time for tidlig m&aring; legges i <br>
+&gt; rejectdecode. Driftsgruppa skal ikke selv m&aring;tte forholde seg
+til <br>
+&gt; dette. Driftsgruppam&aring; s&oslash;rge for at det lages en enkel
+rapportering fra<br>
+<br>
+&gt; rejectdecode (kan ikke v&aelig;re vanskelig det). Dette er
+h&oslash;yt p&aring; <br>
+&gt; &oslash;nskelista sett fra Klimaavdelingen. Gjelder alle manuelle
+stasjoner <br>
+&gt; (312,306,308,302...).<br>
+&gt; <br>
+&gt; Vi m&aring; finne hensiktsmessig adresse for slik rapportering:<br>
+&gt; <br>
+&gt; Det beste???:<br>
+&gt; 1 - De som snarest mulig kan kontakte observat&oslash;r og be om
+riktig <br>
+&gt; datert observasjon - VA/Operat&oslash;rene 2 - De som har ansvar
+for manuell <br>
+&gt; retting i Kvalobsdb - Klima - hvis punkt 1 svikter.<br>
+&gt; 3 - Stasjonsnett for videre oppf&oslash;lging mot stasjonen hvis
+gjentagende<br>
+&gt; feil.<br>
+&gt; <br>
+&gt; Gjelder ikke bare datofeil, men ogs&aring; uforst&aring;eligheter
+ellers i <br>
+&gt; formater.<br>
+&gt; <br>
+&gt; Apropos dette, s&aring; jobbes det mot en "endelig" versjon av
+dekoder for <br>
+&gt; SMS-2 som vil redusere volumet i rejectdecode for
+nedb&oslash;rstasjoner.<br>
+&gt; <br>
+&gt; Per-Ove<br>
+&gt; <br>
+&gt; <br>
+&gt; -----Opprinnelig melding-----<br>
+&gt; Fra: Solfrid Agersten [mailto:solfrid.agersten@met.no]<br>
+&gt; Sendt: 18. april 2005 13:13<br>
+&gt; Til: 'Gabriel Kielland'; pal.sannes@met.no<br>
+&gt; Kopi: 'B&oslash;rge Moe'; '&Oslash;ystein Lie'; 'Per-Ove Kjensli'<br>
+&gt; Emne: RE: 18 termin i dag kommet inn i g&aring;r for 61180 HJELVIK
+- MYRB&Oslash;<br>
+&gt; <br>
+&gt; <br>
+&gt; Hei<br>
+&gt; Er det ikke bedre &aring; legge til rette for at den manuelle
+rutinen p&aring; <br>
+&gt; Klima kan g&aring; inn &aring; rette/legge inn denne i ettertid?
+HQC er jo et <br>
+&gt; operativt system for &aring; korrigere data i n&aelig;r sanntid.<br>
+&gt; <br>
+&gt; mvh Solfrid<br>
+&gt; <br>
+&gt; -----Original Message-----<br>
+&gt; From: Gabriel Kielland [mailto:gabriel.kielland@met.no]<br>
+&gt; Sent: Monday, April 18, 2005 11:29 AM<br>
+&gt; To: pal.sannes@met.no<br>
+&gt; Cc: 'Solfrid Agersten'; 'B&oslash;rge Moe'; '&Oslash;ystein Lie'<br>
+&gt; Subject: RE: 18 termin i dag kommet inn i g&aring;r for 61180
+HJELVIK -<br>
+MYRB&Oslash;<br>
+&gt; <br>
+&gt; <br>
+&gt; Hei P&aring;l!<br>
+&gt; <br>
+&gt; I dette tilfellet vil observasjonene bli overskrevet idag kl. 18.
+Da <br>
+&gt; g&aring;r det en ny synop p&aring; GTS. Observasjonen fra
+ig&aring;r er tapt for <br>
+&gt; Klimadb.<br>
+&gt; <br>
+&gt; Den korrekte observasjonen er tilgjengelig ved et manuelt inngrep,
+men<br>
+<br>
+&gt; vi har ikke et operativt system for &aring; korrigere den i
+sanntid.<br>
+&gt; <br>
+&gt; Den beste l&oslash;sningen for &aring; sikre fullstendighet ville
+v&aelig;re &aring; mobilisere<br>
+<br>
+&gt; IT-operat&oslash;rene. Den nest beste l&oslash;sningen er &aring;
+legge 312-meldinger som <br>
+&gt; kommer mer enn 1 time for tidlig i rejectdecode. Da m&aring;
+driftsgruppen <br>
+&gt; legge inn det korrekte i ettertid.<br>
+&gt; <br>
+&gt; Jeg anbefaler en endring i 312-dekodingen.<br>
+&gt; <br>
+&gt; vh Gabriel<br>
+&gt; <br>
+&gt; <br>
+&gt;&gt;-----Original Message-----<br>
+&gt;&gt;From: pal.sannes@met.no [mailto:pal.sannes@met.no]<br>
+&gt;&gt;Sent: Thursday, April 14, 2005 4:37 PM<br>
+&gt;&gt;To: &Oslash;ystein Lie<br>
+&gt;&gt;Cc: Solfrid Agersten; Gabriel Kielland; B&oslash;rge Moe<br>
+&gt;&gt;Subject: 18 termin i dag kommet inn i g&aring;r for 61180
+HJELVIK - MYRB&Oslash;<br>
+&gt;&gt;<br>
+&gt;&gt;<br>
+&gt;&gt;Hei &Oslash;ystein,<br>
+&gt;&gt;<br>
+&gt;&gt;Nok en stasjon med feil inntastet dag. Er dette noe som jeg
+b&oslash;r si fra<br>
+&gt;&gt;om om jeg finner slikt, eller er det rutiner rundt
+comobs/kvalobs som <br>
+&gt;&gt;automatisk fanger opp slike &aring;penbare feil?<br>
+&gt;&gt;<br>
+&gt;&gt;Ser at useinfo(7) er korrekt satt til 3: 'Observasjonen er
+meldt for<br>
+&gt;&gt;tidlig', men det ble generert en synop med header 'SMNO99 PIOG
+141800'<br>
+<br>
+<h4><a name="Subject:_RE:_Sv&aelig;rt_mistenkelig_eller"></a>Subject: RE:
+Sv&aelig;rt mistenkelig eller forkastet</h4>
+Date: Tue, 7 Jun 2005 14:53:13 +0200<br>
+From: Gabriel Kielland &lt;gabriel.kielland@met.no&gt;<br>
+To: &lt;Kvdrift@met.no&gt;<br>
+CC: 'Lars Andresen' &lt;lars.andresen@met.no&gt;<br>
+<br>
+Til kvdrift!<br>
+<br>
+Det var hyggelig at Lars og jeg er enig!<br>
+<br>
+Jobben er:<br>
+1 ny rad i qcx_info<br>
+5 nye rader i checks (paramid=211, 212, 213, 215, 177)<br>
+1 ny rad i algorithms<br>
+<br>
+I tillegg m&aring; Audun endre algoritmen for tilordning av useinfo(2).
+Han m&aring;<br>
+ta hensyn til fcombi. Jeg tror heller ikke de nyeste flaggverdiene i fd<br>
+og fpre er tatt hensyn til i QABase.<br>
+<br>
+Av dokumentasjon m&aring; flaggdokumentet endres (++)<br>
+<br>
+vh Gabriel<br>
+<br>
+<br>
+&gt;-----Original Message-----<br>
+&gt;From: Lars Andresen [mailto:lars.andresen@met.no]<br>
+&gt;Sent: Thursday, June 02, 2005 9:52 AM<br>
+&gt;To: 'Gabriel Kielland'<br>
+&gt;Cc: Kvdrift@met.no; 'Per Ove Kjensli'<br>
+&gt;Subject: RE: Sv&aelig;rt mistenkelig eller forkastet<br>
+&gt;<br>
+&gt;<br>
+&gt;Hei Gabriel,<br>
+&gt;<br>
+&gt;Beklager at jeg ikke har hatt tid til &aring; svare f&oslash;r
+n&aring;.<br>
+&gt;<br>
+&gt;Jeg tror at et kontrollflagg for en kombinert vurdering kan<br>
+&gt;v&aelig;re en brukbar l&oslash;sning. Men jeg mener fortsatt at vi
+ikke b&oslash;r <br>
+&gt;bruke denne kontrollen for andre parametere enn temperatur og <br>
+&gt;lufttrykk, forel&oslash;pig. Jeg er spesielt redd for "ekstreme" <br>
+&gt;parameterverdier, som modellen ikke tar, og som dermed blir <br>
+&gt;forkastet. Jeg tror vi b&oslash;r pr&oslash;ve oss frem med de to
+nevnte <br>
+&gt;parametere f&oslash;rst, f&oslash;r vi g&aring;r videre. <br>
+&gt;<br>
+&gt;Jeg er enig i at vi kan pr&oslash;ve med de kombinasjonene som du<br>
+&gt;foresl&aring;r, inntil flere behov melder seg; det kreves en del <br>
+&gt;jobbing for &aring; f&aring; fullstendig overblikk over parametere
+og <br>
+&gt;kombinasjoner av kontroller, og vurdering av grad av mistenkelighet.<br>
+&gt;<br>
+&gt;Hilsen Lars<br>
+&gt;<br>
+&gt;&gt;-----Original Message-----<br>
+&gt;&gt;From: Gabriel Kielland [mailto:gabriel.kielland@met.no]<br>
+&gt;&gt;Sent: Monday, May 23, 2005 5:03 PM<br>
+&gt;&gt;To: 'Lars Andresen'<br>
+&gt;&gt;Cc: 'P&aring;l Sannes'; '&Oslash;ystein Lie'; 'Solfrid
+Agersten'; 'Per-Ove Kjensli'<br>
+&gt;&gt;Subject: RE: Sv&aelig;rt mistenkelig eller forkastet<br>
+&gt;&gt;<br>
+&gt;&gt;<br>
+&gt;&gt;Hei Lars!<br>
+&gt;&gt;<br>
+&gt;&gt;Situasjonen er her at kombinasjoner av kontrollflaggverdier
+skal <br>
+&gt;&gt;tolkes. Algoritmen for &aring; angi bruksflaggene b&oslash;r
+v&aelig;re uavhengig av <br>
+&gt;&gt;parameter. En ny l&oslash;sning er &aring; opprette et nytt
+kontrollflagg for <br>
+&gt;&gt;kombinert vurdering [fcombi - controlinfo(14)]. Den kombinerte <br>
+&gt;&gt;vurderingen kan vi kalle QC1-99 eller QC1-9. Den kj&oslash;rer
+alts&aring; p&aring; <br>
+&gt;&gt;etterskudd av de &oslash;vrige QC1-kontrollene.<br>
+&gt;&gt;<br>
+&gt;&gt;QABase tar hensyn til fcombi-verdien sammen med de andre <br>
+&gt;&gt;kontrollflaggene ved setting av useinfo(2). Settet av verdier
+for <br>
+&gt;&gt;fcombi kan vi utvide etterhvert som behovet melder seg.
+Algoritmene <br>
+&gt;&gt;som Lars har formulert nedenfor lar seg i f&oslash;rste omgang
+fordele mellom<br>
+<br>
+&gt;&gt;fire<br>
+&gt;&gt;flaggverdier:<br>
+&gt;&gt;<br>
+&gt;&gt;fr=4 &amp; fs=2 &amp;
+fnum=4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =&gt; fcombi=B =&gt;
+useinfo(2)=3, sikkert<br>
+&gt;&gt;feilaktig<br>
+&gt;&gt;fr=5 &amp; fs=2 &amp;
+fnum=5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =&gt; fcombi=B =&gt;
+useinfo(2)=3, sikkert<br>
+&gt;&gt;feilaktig<br>
+&gt;&gt;fr=4 &amp; fs=2 &amp;
+fnum!=4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =&gt; fcombi=A =&gt;
+useinfo(2)=3, sikkert<br>
+&gt;&gt;feilaktig<br>
+&gt;&gt;fr=5 &amp; fs=2 &amp;
+fnum!=5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =&gt; fcombi=A =&gt;
+useinfo(2)=3, sikkert<br>
+&gt;&gt;feilaktig<br>
+&gt;&gt;fr=4 &amp; fs!=2 &amp;
+fnum=4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =&gt; fcombi=9 =&gt;
+useinfo(2)=3, sikkert<br>
+&gt;&gt;feilaktig<br>
+&gt;&gt;fr=5 &amp; fs!=2 &amp;
+fnum=5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =&gt; fcombi=9 =&gt;
+useinfo(2)=3, sikkert<br>
+&gt;&gt;feilaktig<br>
+&gt;&gt;fr=4 &amp; fs!=2 &amp; fnum!=4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+=&gt; fcombi=2 =&gt; useinfo(2)=1, noe <br>
+&gt;&gt;mistenkelig<br>
+&gt;&gt;fr=5 &amp; fs!=2 &amp; fnum!=5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+=&gt; fcombi=2 =&gt; useinfo(2)=1, noe <br>
+&gt;&gt;mistenkelig<br>
+&gt;&gt;<br>
+&gt;&gt;vh Gabriel<br>
+&gt;&gt;<br>
+&gt;&gt;&gt;-----Original Message-----<br>
+&gt;&gt;&gt;From: Lars Andresen [mailto:lars.andresen@met.no]<br>
+&gt;&gt;&gt;Sent: Monday, April 25, 2005 11:27 AM<br>
+&gt;&gt;&gt;To: Gabriel Kielland<br>
+&gt;&gt;&gt;Cc: P&aring;l Sannes; &Oslash;ystein Lie; 'Solfrid
+Agersten'; 'Per-Ove Kjensli'<br>
+&gt;&gt;&gt;Subject: Sv&aelig;rt mistenkelig eller forkastet<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;Hei Gabriel,<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;Etter praten p&aring; torsdag har jeg pr&oslash;vd &aring;
+tenke konsekvenser av &aring;<br>
+&gt;&gt;&gt;stemple en observasjon sv&aelig;rt mistenkelig eller
+forkastet.<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;Jeg summerer opp hva jeg har kommet til s&aring; langt:<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;M&aring;lsettingen med hele denne diskusjonen er &aring;
+forhindre at &aring;penbart<br>
+&gt;&gt;&gt;feilaktige observasjoner kommer ut p&aring; GTS og WEB,
+dvs. ekstremt lave <br>
+&gt;&gt;&gt;eller h&oslash;ye verdier for &aring;rstiden slippes
+l&oslash;s p&aring; brukere. Samtidig <br>
+&gt;&gt;&gt;&oslash;nsker vi at reelle ekstremverdier ikke skal holdes
+tilbake av de <br>
+&gt;&gt;&gt;forordninger vi iverksetter. I vinter har vi opplevd
+uheldig <br>
+&gt;tilfelle<br>
+&gt;&gt;&gt;av begge typer problemstillinger. Vi m&aring; alts&aring;
+fors&oslash;ke &aring;<br>
+&gt;tilfredsstille<br>
+&gt;&gt;&gt;begge behov i samme l&oslash;sning.<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;QC1-kontrollene er bygget opp med flaggsett og metadata som
+virker<br>
+&gt;&gt;&gt;individuelt for den aktuelle kontrollen. Dette
+inneb&aelig;re at <br>
+&gt;det bare er<br>
+&gt;&gt;&gt;QC1-1<br>
+&gt;&gt;&gt;(grenseverdikontrollen) og QC1-2 (formell inkonsistens, men
+bare for <br>
+&gt;&gt;&gt;automatisk nedb&oslash;rkontroll) som har et
+"forkastet-flagg". Verken QC1-3<br>
+<br>
+&gt;&gt;&gt;(sprangkontroll - endring eller frys) eller QC1-4
+(prognostisk <br>
+&gt;&gt;&gt;romkontroll) har et slikt flagg, og kan etter min mening
+ikke ha det <br>
+&gt;&gt;&gt;p&aring; individuelt grunnlag, NB! med de metadata som
+n&aring; er knyttet til <br>
+&gt;&gt;&gt;kontrollene.<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;1)<br>
+&gt;&gt;&gt;Mitt opprinnelige forslag tok sikte p&aring; &aring;
+kombinere QC1-1 med enten<br>
+&gt;&gt;&gt;QC1-3 eller QC1-4, slik at n&aring;r en verdi stemples
+sv&aelig;rt <br>
+&gt;mistenkelig av<br>
+&gt;&gt;&gt;QC1-1, s&aring; reduseres dette til noe mistenkelig
+n&aring;r QC1-4 sier "OK"<br>
+&gt;&gt;&gt;eller "sannsyligvis OK" (og noe liknende for QC1-4 og
+QC1-3). Men <br>
+&gt;&gt;&gt;observasjonen opprettholder merkelappen sv&aelig;rt
+mistenkelig hvis ogs&aring; <br>
+&gt;&gt;&gt;QC1-4 sier "sv&aelig;rt<br>
+&gt;&gt;mistenkelig".<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;Tanken var at sv&aelig;rt mistenkelige observasjoner,
+bekreftet av to<br>
+&gt;&gt;&gt;forskjellige kontroller, kunne holdes unna ved &aring;
+teste p&aring;<br>
+&gt;&gt;&gt;fr- og fnum-flagg i kombinasjon. I datatabellen i KVDB vil<br>
+&gt;&gt;&gt;dette komme til uttrykk i useinfo(2)=2. I motsatt fall vil
+en <br>
+&gt;&gt;&gt;en sv&aelig;rt mistenkelig observasjon som blir frikjent av
+en annen <br>
+&gt;&gt;&gt;kontroll, f&aring; endret useinfo til useinfo(2)=1.
+Uansett, b&aring;de <br>
+&gt;&gt;&gt;originalverdi og korrigert verdi beholdes uendret, inntil <br>
+&gt;&gt;&gt;HQC-kontrollen ev. endrer korrigert verdi.<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;2)<br>
+&gt;&gt;&gt;Ditt nye forslag g&aring;r ut p&aring; &aring;
+innf&oslash;re "forkastet-flagg" i QC1-3 og<br>
+&gt;&gt;&gt;QC1-4, men da ikke p&aring; individuelt grunnlag, men i
+kombinasjon med <br>
+&gt;&gt;&gt;andre kontroller. Jeg tenker meg f.eks. fs=B: Forkastet i <br>
+&gt;kombinasjon<br>
+&gt;&gt;&gt;med QC1-1. Og fnum=7: Forkastet i kombinasjon med QC1-1
+eller QC1-3.<br>
+&gt;&gt;&gt;Dette vil inneb&aelig;re at useinfo settes til useinfo(2)=3
+(originalverdi <br>
+&gt;&gt;&gt;sikkert<br>
+&gt;&gt;&gt;feilaktig) og useinfo(3)=8 (originalverdi forkastet). Dette<br>
+&gt;&gt;&gt;inneb&aelig;rer i praksis at originalverdi beholdes, mens
+korrigert <br>
+&gt;&gt;&gt;verdi settes manglende: -32767. Korrigert verdi forblir <br>
+&gt;&gt;&gt;manglende inntil HQC-kontrollen ev. setter inn igjen <br>
+&gt;&gt;&gt;originalverdien eller en annen erstatningsverdi.<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;Uansett 1) eller 2) s&aring; vil den aktuelle verdien
+(sv&aelig;rt mistenkelig<br>
+&gt;&gt;&gt;eller<br>
+&gt;&gt;&gt;forkastet) ikke komme ut p&aring; GTS eller WEB, f&oslash;r
+etter at den<br>
+&gt;&gt;&gt;manuelle kontrollen (VA eller KLIMA) har vurdert <br>
+&gt;&gt;&gt;observasjonen. Og manuell kontroll m&aring; til i begge
+tilfelle.<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;Personlig ville jeg ha foretrukket l&oslash;sning 1) og
+samtidig (i<br>
+&gt;&gt;&gt;betydningen "i<br>
+&gt;&gt;&gt;tillegg") endret kriteriene for QC1-3 og QC1-4, dvs.
+innf&oslash;rt<br>
+&gt;&gt;&gt;en ny alvorlighetsgrad, som ville inneb&aelig;re
+forkastelse (p&aring; <br>
+&gt;&gt;&gt;bakgrunn av et ekstra sett med metadata) p&aring;
+individuelt <br>
+&gt;&gt;&gt;grunnlag. Jeg synes dette med &aring; innf&oslash;re
+"kombinasjonsflagg" <br>
+&gt;&gt;&gt;for forkastelse bryter med den grunnleggende ideen rundt <br>
+&gt;&gt;&gt;flaggsystemet (individuelle flagg). Jeg kan
+forel&oslash;pig ikke se <br>
+&gt;&gt;&gt;at 2) har noen annen fordel enn at man m&aring; teste
+p&aring; kun ett <br>
+&gt;&gt;&gt;kontrollflagg i stedet for to for &aring; avgj&oslash;re
+utestengelse (hvis <br>
+&gt;&gt;&gt;man da ikke kan teste direkte p&aring; useinfo(2)-flagget).
+Men <br>
+&gt;&gt;&gt;ellers er jeg, som det fremg&aring;r ovenfor, for &aring;
+utnytte <br>
+&gt;&gt;&gt;informasjonen fra to eller flere individuelle kontroller.<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;Jeg foresl&aring;r at andre involverte ogs&aring; tenker
+igjennom disse<br>
+&gt;&gt;&gt;problemstillingene.<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;Jeg ser for meg at forslag 1), kortsiktige tiltak, kan
+gjennomf&oslash;res<br>
+&gt;&gt;&gt;slik:<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;a) typeid=1, 312 - paramid=211:<br>
+&gt;&gt;&gt;(fr=4 og fnum=4) eller (fr=5 og fnum=5) f&oslash;rer til
+utestengelse.<br>
+&gt;&gt;&gt;Gjennomf&oslash;res straks.<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;b) 99754 Hornsund, 04440 Hakadal-Bliksrudhagan, 58070
+Sandane, 72060<br>
+&gt;&gt;&gt;Namdalseid-Vengstad (stasjoner i drift) f&aring;r
+implementert <br>
+&gt;metadata for<br>
+&gt;&gt;&gt;grenseverdikontroll. Gjennomf&oslash;res s&aring; snart som
+mulig.<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;c) typeid=3, 306, 308, 310, 311, 330 - paramid=211, 212,
+213, 215,<br>
+&gt;&gt;&gt;177: ((fr=4 og fs=2) eller (fr=4 og fnum=4)) eller ((fr=5
+og fs=2) <br>
+&gt;&gt;&gt;eller (fr=5 og fnum=5)) f&oslash;rer til utestengelse.
+Gjennomf&oslash;res straks.<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;d) En rekke automatstasjoner (ca 75 i drift) f&aring;r<br>
+&gt;implementert metadata<br>
+&gt;&gt;&gt;for grenseverdikontroll. Gjennomf&oslash;res s&aring; snart
+som mulig.<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;e) paramid=178 f&aring;r implementert metadata for
+sprangkontroll.<br>
+&gt;&gt;&gt;Gjennomf&oslash;res s&aring; snart som mulig. Da vil denne
+parameteren g&aring; inn i <br>
+&gt;&gt;&gt;punkt c).<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;Og s&aring; kan man ta de mer arbeidskrevende oppgavene
+etter det.<br>
+&gt;Men f&oslash;rst<br>
+&gt;&gt;&gt;m&aring; vi alts&aring; bli enige om prinsippene. Jeg kan
+gjerne v&aelig;re med p&aring; ev.<br>
+&gt;&gt;&gt;videre diskusjon om dette, men&nbsp; f&oslash;rst etter at
+den nye <br>
+&gt;&gt;&gt;kvalietskontrollrutinen er etablert (det er litt hektisk
+her akkurat <br>
+&gt;&gt;&gt;n&aring;).<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;Hilsen Lars<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;<br>
+&gt;&gt;<br>
+&gt;<br>
+&gt;<br>
+<br>
+<h4><a name="Subject:_level__sensor_oppsummering"></a>Subject: level
+&amp; sensor, oppsummering</h4>
+Date: Wed, 05 Oct 2005 09:36:38 +0200<br>
+From: P&aring;l Sannes &lt;Pal.Sannes@met.no&gt;<br>
+To: B&oslash;rge Moe &lt;borge.moe@met.no&gt;,&nbsp; "Audun D.
+Christoffersen" &lt;audun.christoffersen@met.no&gt;, Per-Ove Kjensli
+&lt;per-ove.kjensli@met.no&gt;,&nbsp; Lars Andresen
+&lt;lars.andresen@met.no&gt;, "Nils O. Langg&aring;rd"
+&lt;nils.langgard@met.no&gt;<br>
+CC: kvdrift@met.no<br>
+<br>
+Hei,<br>
+<br>
+Det har v&aelig;rt litt fram og tilbake omkring level og sensor i <br>
+Kvalobstabellene i det siste, s&aring; jeg f&oslash;ler behov for en
+oppsummering.<br>
+<br>
+Manglende verdier: For level ulik 0 blir det konsekvent lagt inn en <br>
+ekstra rad med manglende (original=-32767) i data-tabellen.
+B&oslash;rge m&aring; <br>
+fikse dette.<br>
+<br>
+Kvalitetskontroll: Data med level og sensor ulik 0 blir i dag ikke <br>
+kvalitetskontrollert. Dette er vel sant &aring; si ikke tilsiktet
+(alts&aring; en <br>
+bug), men kvalitetskontrollene er uansett ikke laget for &aring; kunne <br>
+h&aring;ndtere level og sensor ulik 0 p&aring; en skikkelig m&aring;te,
+s&aring; vi gj&oslash;r <br>
+ingenting med dette forel&oslash;pig. Vi har f&aring;tt aksept fra
+Klima-div om <br>
+inntil videre &aring; fortsette &aring; la v&aelig;re &aring;
+kvalitetskontrollere data med <br>
+level og sensor ulik 0.<br>
+<br>
+obs_pgm: Det er langt flere data som kommer inn med sensor &gt; 0 enn
+det <br>
+som forventes fra obs_pgm. Slik Kvalobs fungerer i dag f&aring;r dette
+ingen <br>
+andre praktiske konsekvenser enn at vi ikke f&aring;r fylt inn med
+manglende <br>
+verdier. &Oslash;nsker vi at dette blir gjort, eller kanskje vi
+&oslash;nsker &aring; f&aring; <br>
+oppdatert obs_pgm rett og slett for v&aring;r egen oversikts skyld?
+Hvem gj&oslash;r <br>
+i s&aring; fall jobben med &aring; oppdatere obs_pgm?<br>
+<br>
+Tabellene: Det er framkommet forslag om strukturelle endringer.<br>
+<br>
+- obs_pgm: Forslag om at 'nr_sensor' erstattes med 'sensor', samme <br>
+kolonne som vi jo ogs&aring; har i tabellen data. Det gir en enklere <br>
+datamodell og et mer oversiktlig system, men noen flere rader i
+obs_pgm. <br>
+Vi &aring;pner ogs&aring; for muligheten for at to sensorer kan ha
+forskjellig <br>
+observasjonsprogram.<br>
+<br>
+- data &amp; obs_pgm: 'level' er allerede omd&oslash;pt til 'hlevel' i
+st-info-sys, <br>
+men det er ogs&aring; forslag om at den redefineres til &aring; angi
+avvik fra <br>
+standard m&aring;leh&oslash;yde, og skifte navn til 'height_dev' eller
+noe lignende. <br>
+Begrunnelsen er dels &aring; f&aring; en intuitivt mer forst&aring;elig
+st&oslash;rrelse, dels &aring; <br>
+slippe problematikken rundt hva man skal sette inn for 'level' hvis det
+<br>
+m&aring;les i h&oslash;yden 0 n&aring;r standard m&aring;leh&oslash;yde
+er forskjellig fra 0.<br>
+<br>
+P&aring;l<br>
+<br>
+<h4><a name="SV:_obs_pgm__SASD"></a>Subject: SV: obs_pgm &amp;
+SA,SD</h4>
+Date: Fri, 30 Sep 2005 18:36:29 +0200<br>
+From: Per-Ove Kjensli &lt;per-ove.kjensli@met.no&gt;<br>
+To: &lt;pal.sannes@met.no&gt;<br>
+<br>
+<br>
+Noen videre kommentarer til dine kommentarer nedenfor .... S&aring;
+lenge<br>
+<br>
+God helg - om du er her!<br>
+<br>
+pok<br>
+<br>
+<br>
+&gt; -----Opprinnelig melding-----<br>
+&gt; Fra: pal.sannes@met.no [mailto:pal.sannes@met.no] <br>
+&gt; Sendt: 30. september 2005 16:38<br>
+&gt; Til: Per-Ove Kjensli<br>
+&gt; Kopi: kvdrift@met.no; b&oslash;rge moe<br>
+&gt; Emne: obs_pgm &amp; SA,SD<br>
+&gt; <br>
+&gt; <br>
+&gt; <br>
+&gt; <br>
+&gt; Per-Ove Kjensli wrote:<br>
+&gt; &gt; Kan det v&aelig;re grunn til &aring; holde et
+arbeidsm&oslash;te der vi <br>
+&gt; belyser behov og <br>
+&gt; &gt; l&oslash;sninger som ber&oslash;rer obs_pgm? Det begynner
+&aring; bli tungt &aring; holde <br>
+&gt; &gt; oversikten over innspill og synspunkter.<br>
+&gt; <br>
+&gt; Det er absolutt en god ide &aring; avholde et slikt
+arbeidsm&oslash;te, <br>
+&gt; men jeg vil <br>
+&gt; foretrekke &aring; vente litt, for f&oslash;rst &aring; f&aring;
+orden p&aring; en del andre <br>
+&gt; forhold i <br>
+&gt; Kvalobs som jeg anser som mer prek&aelig;re akkurat n&aring;.<br>
+&gt; <br>
+&gt; N&aring;r det gjelder det konkrete eksemplet under, kan jeg
+forst&aring; at B&oslash;rge <br>
+&gt; ikke liker tanken p&aring; at vi for 2 bestemte parametere skal
+gj&oslash;re noe <br>
+&gt; annet enn det som gj&oslash;res for alle andre: legge inn verdien <br>
+&gt; -32767 hvis <br>
+&gt; feltet ikke er fylt ut i SMS-meldingen. Ogs&aring; relevant er: <br>
+&gt; hvordan skal <br>
+&gt; vi skille mellom at en observat&oslash;r har glemt &aring; fylle
+inn SA og <br>
+&gt; SD og det <br>
+&gt; at feltene bevisst er satt blanke fordi det ikke er sn&oslash;?
+Det <br>
+&gt; synes for <br>
+&gt; meg &aring; v&aelig;re en liten svakhet i spesifikasjonen for
+SMS-meldingene her.<br>
+<br>
+Det er ikke mulig &aring; skille, men det er mulig &aring; lage gode<br>
+sn&oslash;dybdekontroller som avsl&oslash;rer om observat&oslash;ren
+har glemt &aring; skrive inn<br>
+sn&oslash;dybde og dekke. Normalt er observat&oslash;rene gode til
+&aring; f&aring; med seg sn&oslash;.<br>
+<br>
+&gt; <br>
+&gt; Vil det ikke v&aelig;re en ide f&oslash;rst &aring;
+unders&oslash;ke om vi kan f&aring; til <br>
+&gt; at stasjoner <br>
+&gt; som har SA og SD i sitt observasjonsprogram fyller ut med -1 i <br>
+&gt; SMS-meldingen hvis det ikke er sn&oslash;? Enten ved at
+observat&oslash;ren <br>
+&gt; gj&oslash;r dette <br>
+&gt; eksplisitt selv, eller ved at Gunnar programmerer inn -1 som <br>
+&gt; defaultverdi i mobiltelefonen.<br>
+<br>
+Jo, kunne en f&aring; til det, s&aring; er det ok, men jeg sa at: <br>
+"Hvis vi ikke legger slik sterk styring til obs_pgm, s&aring; f&aring;r
+vi en<br>
+utrolig tung jobb mot dataformatene i dataflyten."<br>
+<br>
+S&aring; det tror jeg ikke realiseres / vil fungere med dagens
+telefoner.<br>
+Noen sender sommerobser uten nedb&oslash;r som bare inneholder sted og
+tid.<br>
+Et sant virvar av strenger som kommer inn (det er jo problemet).<br>
+Kanskje med framtidige l&oslash;sninger. <br>
+I PC-l&oslash;sninger b&oslash;r det kunne funke.<br>
+<br>
+<br>
+&gt; <br>
+&gt; &gt; <br>
+&gt; &gt; Som B&oslash;rge sier s&aring; er det flere behov som peker
+mot obs_pgm, <br>
+&gt; men hvis <br>
+&gt; &gt; han er s&aring; sterkt imot &aring; legge avhengigheter mot
+obs_pgm s&aring; m&aring; disse <br>
+&gt; &gt; behovene finne en annen l&oslash;sning.<br>
+&gt; &gt; <br>
+&gt; &gt; Et eksempel jeg luftet med B&oslash;rge forleden dag (og som
+han <br>
+&gt; alts&aring; tenker<br>
+&gt; &gt; p&aring;):<br>
+&gt; &gt; <br>
+&gt; &gt; Alle stasjoner med type 302,306 eller 308 sender meldinger <br>
+&gt; med blanke <br>
+&gt; &gt; felt for SA og SD n&aring;r det ikke er sn&oslash; p&aring;
+bakken. Vi skal ha <br>
+&gt; SA=-1 og <br>
+&gt; &gt; SD=-1 i Kvalobs i dette tilfellet. Men det er ikke mulig
+&aring; skille i <br>
+&gt; &gt; dekoder mellom stasjoner som skal observere, og de som ikke
+skal <br>
+&gt; &gt; observere SA, SD!<br>
+&gt; &gt; <br>
+&gt; &gt; Vi m&aring; etter mitt syn koble dekoder mot obs_pgm slik at
+data kommer <br>
+&gt; &gt; riktig inn. Rader for SA for stasjoner som ikke observerer <br>
+&gt; det b&oslash;r jo <br>
+&gt; &gt; ikke komme inn i basen i det hele tatt!<br>
+&gt; <br>
+&gt; Det er vel dette du kaller 'Villobser'. I Obs-div har jeg
+h&oslash;rt at de <br>
+&gt; foretrekker &aring; kalle det 'Bonusobser':-)<br>
+&gt; <br>
+&gt; Her er det en s&aring; grunnleggende uenighet mellom Klima-div og <br>
+&gt; Obs-div at <br>
+&gt; en beslutning om dette m&aring; tas p&aring; h&oslash;yt
+niv&aring;. I alle fall er <br>
+&gt; det tydligvis <br>
+&gt; i dag en oppfatning i Obs-div om at det blir altfor strengt
+&aring; <br>
+&gt; begrense <br>
+&gt; innleggingen i Kvalobs til det som st&aring;r i obs_pgm. Selv har
+jeg ingen <br>
+&gt; formening i den saken.<br>
+&gt; <br>
+&gt; Men hvis n&aring; Obs-div f&aring;r viljen sin i at (som i dag)
+alle <br>
+&gt; parametere som <br>
+&gt; kommer inn (ogs&aring; 'Bonusobser') blir lagt inn i Kvalobs,
+kunne det jo <br>
+&gt; v&aelig;re en l&oslash;sning at man i overf&oslash;ringen til
+KlimaDB luker ut <br>
+&gt; 'Villobsene', <br>
+&gt; evt ogs&aring; gj&oslash;r endringen av verdiene fra -32767 til -1
+for SA og SD.<br>
+<br>
+Vi m&aring; ha l&oslash;sningen i Kvalobs p&aring; grunn av HQC - som
+m&aring; vite om<br>
+observasjonen mangler. De skal ikke interpolere s&oslash;dybder for
+stasjoner<br>
+som ikke har sn&oslash;obs.<br>
+<br>
+&gt; <br>
+&gt; P&aring;l<br>
+&gt; <br>
+&gt; &gt; Og for de som skal obse det s&aring;<br>
+&gt; &gt; m&aring; det komme inn default verdi -1 ved blanke felt.<br>
+&gt; &gt; <br>
+&gt; &gt; F&oslash;r vi tar beslutninger om obs_pgm s&aring; er det
+viktig at alle slike <br>
+&gt; &gt; behov er tenkt p&aring;.<br>
+&gt; &gt; <br>
+&gt; &gt; Hvis vi ikke legger slik sterk styring til obs_pgm, s&aring;
+f&aring;r vi en <br>
+&gt; &gt; utrolig tung jobb mot dataformatene i dataflyten.<br>
+&gt; &gt; <br>
+&gt; &gt; pok<br>
+&gt; &gt; <br>
+&gt; <br>
+&gt; <br>
+<br>
+<h4><a name="Subject:_Useinfo"></a>Subject: Useinfo</h4>
+Date: Tue, 20 Sep 2005 10:50:14 +0200<br>
+From: Lars Andresen &lt;lars.andresen@met.no&gt;<br>
+To: &lt;Kvdrift@met.no&gt;<br>
+CC: 'Per-Ove Kjensli' &lt;per-ove.kjensli@met.no&gt;<br>
+<br>
+Hei,<br>
+<br>
+Jeg har sett litt p&aring; hvordan manglende verdier h&aring;ndteres i
+Kvalobs.<br>
+Eksemplene gjelder 18.september 2005 for paramid=211 (TA) og typeid=330<br>
+(automatstasjoner):<br>
+<br>
+kvalobs=&gt; select * from data<br>
+kvalobs-&gt; where obstime between '2005-09-18' and '2005-09-18 23:00'<br>
+kvalobs-&gt; and paramid=211 and typeid=330<br>
+kvalobs-&gt; and useinfo like '__3%';<br>
+<br>
+1. Automatstasjonen setter antagelig inn 9999 for manglende, men Kvalobs<br>
+registrerer ikke dette som en manglende verdi (fmis=0), hvilket blir
+feil.<br>
+Systemet burde etter min mening ha konvertert 9999 og andre varianter av<br>
+denne (f.eks. 99 for AA) konsekvent til -32767.<br>
+<br>
+2. Kvalobs kontrollerer verdien 9999 og finner at den m&aring;
+forkastes av QC1-1:<br>
+fr=6. Enten verdien er forkastet eller manglende, setter Kvalobs inn en<br>
+erstatningsverdi fra tabell model_data, etter at QC1-4 er kj&oslash;rt,
+og setter<br>
+fnum=6, hvilket er korrekt. fqclevel=1 er korrekt s&aring; langt.<br>
+<br>
+3. Dette skulle f&oslash;re til f&oslash;lgende verdier for useinfo
+(s&aring; langt):<br>
+useinfo(0)=7<br>
+useinfo(1)=0<br>
+useinfo(2)=9 (9 ved manglende, 3 ved forkastet)<br>
+useinfo(3)=9 (9 ved manglende, 8 ved forkastet)<br>
+useinfo(4)=9 (9 ved manglende, 1 eller 7 ved forkastet, her passer nok 7<br>
+best),<br>
+<br>
+alts&aring; 70999, men siden systemet har forkastet observasjonen,
+settes 70387.<br>
+<br>
+4. Men s&aring; kommer den manuelle kontrollen. Kontroll&oslash;ren
+finner at<br>
+modellverdienene er for h&oslash;ye og korrigerer verdien i corrected.
+Det kan<br>
+diskuteres hvorvidt man skal sette fhqc=5 eller 7. N&aring;r
+modellverdi er satt<br>
+inn kan man sette 7 (eller 5), n&aring;r corrected er manglende
+m&aring; man sette 5.<br>
+V&aring;r kontroll&oslash;r har oppfattet observasjonen som manglende,
+hvilket i<br>
+utgangspunktet er riktig, og har satt 5. Vedkomende har sett p&aring;
+tidsserien<br>
+som "hullete" og har brukt verdiene innimellom til &aring; interpolere
+de<br>
+manglende verdiene.<br>
+<br>
+N&aring;r fhqc=5, s&aring; m&aring; b&aring;de controlinfo og useinfo
+endres:<br>
+controlinfo(0)=9 (ikke 1, for n&aring; er ogs&aring; HQC
+gjennomf&oslash;rt)<br>
+controlinfo(14)=0? (systemet har satt 1, men den er visstnok reservert)<br>
+controlinfo(15)=5 (som systemet har h&aring;ndtert korrekt)<br>
+<br>
+useinfo(0)=3 (for n&aring; er ogs&aring; HQC gjennomf&oslash;rt)<br>
+useinfo(1)=0 (som f&oslash;r)<br>
+useinfo(2)=9 (9 ved manglende, 3 ved forkastet)<br>
+useinfo(3)=2 (med fhqc=5, med fhqc=7 settes fhqc=1)<br>
+useinfo(4)=5 (her m&aring; det spesifiseres et valg for HQC,5 er
+antagelig mest<br>
+generell)<br>
+<br>
+Systemet fanger alts&aring; ikke opp HQC-kontrollen og at bruksverdien
+er endret<br>
+vesentlig. Men det er som nevnt ogs&aring; andre forhold som man
+b&oslash;r se p&aring;.<br>
+<br>
+Hilsen Lars<br>
+<br>
+<br>
+<h4><a name="Subject:_RE:_Fwd:_RE:_Kontrollflagg_og"></a>Subject: RE:
+[Fwd: RE: Kontrollflagg og bruksflagg]</h4>
+Subject: RE: [Fwd: RE: Kontrollflagg og bruksflagg]<br>
+Date: Thu, 17 Nov 2005 14:40:38 +0100<br>
+From: Lars Andresen &lt;lars.andresen@met.no&gt;<br>
+To: 'Audun D. Christoffersen' &lt;audun.christoffersen@met.no&gt;<br>
+CC: &lt;Kvdrift@met.no&gt;,&nbsp;&nbsp;&nbsp; &nbsp;"'Gabriel
+Kielland'" &lt;gabriel.kielland@met.no&gt;,&nbsp;&nbsp;&nbsp;
+&nbsp;&lt;vegard.bones@met.no&gt;,&nbsp;&nbsp;&nbsp; &nbsp;"'Per-Ove
+Kjensli'" &lt;per-ove.kjensli@met.no&gt;<br>
+<br>
+Hei Audun,<br>
+<br>
+Etter &aring; ha konferert med P&aring;l, sender jeg n&aring;
+oppsummeringen. Den<br>
+inneholder endringer b&aring;de til useinfo-flagg og controlinfo-flagg.
+Jeg<br>
+legger ved b&aring;de Word og Word-html-dokument (bruk det som passer
+best).<br>
+<br>
+Det er nok lurt &aring; sjekke e-postutvekslingen om dette temaet fra
+og med<br>
+den 16.11. ogs&aring;. Du er sikkert klar over at Gabriel allerede har
+gjort<br>
+visse endringer i flaggdokumentet, hva som er implementert finner du<br>
+sikkert ut av.<br>
+<br>
+Hilsen Lars<br>
+<br>
+&gt;-----Original Message-----<br>
+&gt;From: Audun D. Christoffersen [mailto:audun.christoffersen@met.no] <br>
+&gt;Sent: Thursday, November 10, 2005 2:31 PM<br>
+&gt;To: Lars Andresen<br>
+&gt;Subject: Re: [Fwd: RE: Kontrollflagg og bruksflagg]<br>
+&gt;<br>
+&gt;<br>
+&gt;Jeg kan godt sjekke implementasjonen p&aring; nytt mot
+flaggnotatet. <br>
+&gt;Jeg er ikke avhengig av at endringene kommer inn med i <br>
+&gt;flaggnotatet, men <br>
+&gt;vil gjerne ha en oppsummering av deg.<br>
+&gt;Det er mulig jeg mangler noe historikk her, men jeg finner listen
+litt <br>
+&gt;mangelfull:<br>
+&gt;<br>
+&gt;1) fqclevel blir ikke satt i HQC. Dette kan Vegard gj&oslash;re noe
+<br>
+&gt;med. Alternativt kan hele fcqlevel fjernes. fqclevel er den <br>
+&gt;eneste delen av controlinfo som ikke blir satt av skriptene. <br>
+&gt;useinfo(0) kan istedet avledes fra hvordan alle de andre <br>
+&gt;controlinfo-flaggene er satt. Den nye implementeringen av <br>
+&gt;useinfo(0) m&aring; implementeres i QABase.<br>
+&gt;<br>
+&gt;&gt;&gt;&gt; Hvilken implementering?<br>
+&gt;<br>
+&gt;<br>
+&gt;6) Ett tilleggskriterium for &aring; sette useinfo(3)=4. Enig.
+B&oslash;r <br>
+&gt;implemeteres i QABase av Audun.<br>
+&gt;<br>
+&gt; &gt;&gt;&gt; hva er dette?<br>
+&gt;<br>
+&gt;Lars Andresen wrote:<br>
+&gt;<br>
+&gt;&gt;Hei Audun,<br>
+&gt;&gt;<br>
+&gt;&gt;Det er riktig at det er b&aring;de endringer i reglene og feil
+i <br>
+&gt;eksisterende <br>
+&gt;&gt;kode for setting av useinfo. Det er dessuten foresl&aring;tt
+endringer i <br>
+&gt;&gt;deler av controlinfo.<br>
+&gt;&gt;<br>
+&gt;&gt;Det foreligger ikke noe oppdatert flaggnotat p&aring; dette.
+Hvis du er <br>
+&gt;&gt;avhengig av det, s&aring; skal jeg gjerne bidra der det er <br>
+&gt;endringer. Men det <br>
+&gt;&gt;kan ogs&aring; v&aelig;re at det er blitt noe feil i
+implementeringen i QABase. <br>
+&gt;&gt;Kanskje du kunne se litt p&aring; det mens jeg jobber med
+endringene?<br>
+&gt;&gt;<br>
+&gt;&gt;Hilsen Lars<br>
+&gt;&gt;<br>
+&gt;&gt;&nbsp; <br>
+&gt;&gt;<br>
+&gt;&gt;&gt;-----Original Message-----<br>
+&gt;&gt;&gt;From: Audun D. Christoffersen
+[mailto:audun.christoffersen@met.no]<br>
+&gt;&gt;&gt;Sent: Thursday, November 10, 2005 11:33 AM<br>
+&gt;&gt;&gt;To: Lars Andresen<br>
+&gt;&gt;&gt;Cc: pal.sannes@met.no; 'Vegard B&oslash;nes'; 'Gabriel
+Kielland'; <br>
+&gt;&gt;&gt;'Per-Ove Kjensli'; 'Nils O. Langg&aring;rd'; Kvdrift@met.no<br>
+&gt;&gt;&gt;Subject: Re: [Fwd: RE: Kontrollflagg og bruksflagg]<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;Beklager at jeg ikke har svart f&oslash;r - men har ikke
+hatt <br>
+&gt;kapasitet til &aring;<br>
+&gt;&gt;&gt;se p&aring; saken.<br>
+&gt;&gt;&gt;Har n&aring; sett igjennom de meldingene du har sendt
+kvdrift, Lars.<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;Ikke uventet klarer jeg ikke &aring; f&oslash;lge
+diskusjonen (jeg har ingen intim<br>
+&gt;&gt;&gt;forst&aring;else av flaggverdiene), men det er vel heller
+ikke <br>
+&gt;&gt;&gt;viktig. Det jeg <br>
+&gt;&gt;&gt;f&aring;r ut av det er:<br>
+&gt;&gt;&gt;1. endringer i regler for useinfo-flaggsetting<br>
+&gt;&gt;&gt;2. mulige feil i eksisterende kode for flaggsetting<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;Foreligger det et nytt flaggnotat etter de nye reglene?<br>
+&gt;&gt;&gt;I s&aring; fall kan jeg sette av tid til &aring; g&aring;
+igjennom useinfo settingen en<br>
+&gt;&gt;&gt;gang til, og dette kan jeg utf&oslash;re f&oslash;r
+utgangen av november.<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;Audun<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;Lars Andresen wrote:<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&nbsp;&nbsp;&nbsp; <br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;Hei,<br>
+&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;Som kjent er det nye klimadatavarehuset enn&aring; ikke
+&aring;pnet. Vi er under<br>
+&gt;&gt;&gt;&gt;stort press for &aring; f&aring; dette til i
+innev&aelig;rende m&aring;ned. Da er det <br>
+&gt;&gt;&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;viktig at<br>
+&gt;&gt;&gt;&nbsp;&nbsp;&nbsp; <br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;den kvalitetsinformasjonen vi g&aring;r ut med til
+brukerne er korrekt.<br>
+&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;Er det mulig &aring; f&aring; rettet de feilene som er
+p&aring;pekt i <br>
+&gt;bruksflaggene (og<br>
+&gt;&gt;&gt;&gt;kontrollflaggene) i l&oslash;pet av 14 dager? Dette er
+det viktigste (og<br>
+&gt;&gt;&gt;&gt;gjelder punktene 1-2, 4-6 nedenfor). Punkt 3(nedenfor)
+kan <br>
+&gt;&gt;&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;l&oslash;ses ved at<br>
+&gt;&gt;&gt;&nbsp;&nbsp;&nbsp; <br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;oppsamlingsperioden korrigeres til &aring; gjelde fra
+slutten p&aring;<br>
+&gt;&gt;&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;siste meldte<br>
+&gt;&gt;&gt;&nbsp;&nbsp;&nbsp; <br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;nedb&oslash;rperiode og fram til oppsamling.<br>
+&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;N&aring;r flaggsettingen er forbedret b&oslash;r vi
+f&aring; ajourf&oslash;rt flaggene<br>
+&gt;&gt;&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;(eller en<br>
+&gt;&gt;&gt;&nbsp;&nbsp;&nbsp; <br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;del av dem) bakover i tid for de dataene som fortsatt
+ligger inne i<br>
+&gt;&gt;&gt;&gt;Kvalobs, slik at disse kan overf&oslash;res til
+Klimadatabasen og <br>
+&gt;overskrive <br>
+&gt;&gt;&gt;&gt;de feilaktige flaggene der.<br>
+&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;Men igjen tilbake til p&aring;pekte feil. Har vi
+"krefter" til en<br>
+&gt;&gt;&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;sluttspurt<br>
+&gt;&gt;&gt;&nbsp;&nbsp;&nbsp; <br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;f&oslash;r klimadatavarehuset m&aring; p&aring; lufta?<br>
+&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;Hilsen Lars<br>
+&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt; <br>
+&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;-----Original Message-----<br>
+&gt;&gt;&gt;&gt;&gt;From: pal.sannes@met.no [mailto:pal.sannes@met.no]<br>
+&gt;&gt;&gt;&gt;&gt;Sent: Thursday, November 03, 2005 10:18 AM<br>
+&gt;&gt;&gt;&gt;&gt;To: Audun D. Christoffersen; Vegard B&oslash;nes<br>
+&gt;&gt;&gt;&gt;&gt;Cc: Gabriel Kielland; Lars Andresen; Per-Ove
+Kjensli; Nils O.<br>
+&gt;&gt;&gt;&gt;&gt;Langg&aring;rd; Kvdrift@met.no<br>
+&gt;&gt;&gt;&gt;&gt;Subject: [Fwd: RE: Kontrollflagg og bruksflagg]<br>
+&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;Hei Audun og Vegard,<br>
+&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;Dere har muligens ikke f&aring;tt denne?<br>
+&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;Vil gjerne ha deres synspunkter p&aring; punktene
+under (de som <br>
+&gt;dere f&oslash;ler <br>
+&gt;&gt;&gt;&gt;&gt;dere har grunnlag for &aring; uttale dere om).<br>
+&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;P&aring;l<br>
+&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;-------- Original Message --------<br>
+&gt;&gt;&gt;&gt;&gt;Subject: RE: Kontrollflagg og bruksflagg<br>
+&gt;&gt;&gt;&gt;&gt;Date: Mon, 24 Oct 2005 13:37:17 +0200<br>
+&gt;&gt;&gt;&gt;&gt;From: Gabriel Kielland
+&lt;gabriel.kielland@met.no&gt;<br>
+&gt;&gt;&gt;&gt;&gt;To: 'Lars Andresen'
+&lt;lars.andresen@met.no&gt;,&nbsp;&nbsp;&nbsp; &nbsp;'Kvdrift' <br>
+&gt;&gt;&gt;&gt;&gt;&lt;kvdrift@met.no&gt;<br>
+&gt;&gt;&gt;&gt;&gt;CC: 'Per-Ove Kjensli'
+&lt;per-ove.kjensli@met.no&gt;,&nbsp;&nbsp;&nbsp; &nbsp;<br>
+&gt;&gt;&gt;&gt;&gt;&lt;nils.langgard@met.no&gt;<br>
+&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;Kommentar til Lars' seks forslag:<br>
+&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;1) fqclevel blir ikke satt i HQC. Dette kan Vegard
+gj&oslash;re noe med. <br>
+&gt;&gt;&gt;&gt;&gt;Alternativt kan hele fcqlevel fjernes. fqclevel er
+den <br>
+&gt;eneste delen <br>
+&gt;&gt;&gt;&gt;&gt;av controlinfo som ikke blir satt av skriptene.<br>
+&gt;&gt;&gt;&gt;&gt;useinfo(0) kan istedet avledes fra hvordan alle de
+andre<br>
+&gt;&gt;&gt;&gt;&gt;controlinfo-flaggene er satt. Den nye
+implementeringen av <br>
+&gt;&gt;&gt;&gt;&gt;useinfo(0) m&aring; implementeres i QABase.<br>
+&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;2) fmis blir ikke endret i HQC. Dette er en
+forglemmelse <br>
+&gt;som Vegard <br>
+&gt;&gt;&gt;&gt;&gt;b&oslash;r gj&oslash;re noe med.<br>
+&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;3) fd. Lars foresl&aring;r flagging av en hel
+tidsserie n&aring;r det er <br>
+&gt;&gt;&gt;&gt;&gt;detektert oppsamling i QC1. Her m&aring; alle
+mulige tilfeller vurderes. <br>
+&gt;&gt;&gt;&gt;&gt;Hvordan skal flagget v&aelig;re n&aring;r
+oppsamlingsperioden dekker en <br>
+&gt;&gt;&gt;&gt;&gt;tidligere meldt nedb&oslash;rperiode? Enig ellers.<br>
+&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;4) Ny flaggverdi fpre=5. Enig. M&aring;
+implementeres i de to skriptene <br>
+&gt;&gt;&gt;&gt;&gt;push6flag.pl og push7flag.pl.<br>
+&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;5) Kommentarene til useinfo(2) ser ut til &aring;
+stemme overens med <br>
+&gt;&gt;&gt;&gt;&gt;speken. Er det implementeringen i QABase som er
+feil?<br>
+&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;6) Ett tilleggskriterium for &aring; sette
+useinfo(3)=4. Enig. B&oslash;r <br>
+&gt;&gt;&gt;&gt;&gt;implemeteres i QABase av Audun.<br>
+&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;vh Gabriel<br>
+&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;&nbsp;&nbsp; <br>
+&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;&gt;-----Original Message-----<br>
+&gt;&gt;&gt;&gt;&gt;&gt;From: Lars Andresen
+[mailto:lars.andresen@met.no]<br>
+&gt;&gt;&gt;&gt;&gt;&gt;Sent: Friday, October 21, 2005 12:58 PM<br>
+&gt;&gt;&gt;&gt;&gt;&gt;To: Kvdrift<br>
+&gt;&gt;&gt;&gt;&gt;&gt;Cc: 'Per-Ove Kjensli'; nils.langgard@met.no<br>
+&gt;&gt;&gt;&gt;&gt;&gt;Subject: Kontrollflagg og bruksflagg<br>
+&gt;&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;&gt;Hei,<br>
+&gt;&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;&gt;Basert p&aring; perioden 23.09.-30.09.2005,
+alts&aring; etter at Auduns jobb i<br>
+&gt;&gt;&gt;&gt;&gt;&gt;sommer ble implementert, har jeg n&aring;
+g&aring;tt gjennom noe av <br>
+&gt;&gt;&gt;&gt;&gt;&gt;flaggsettingen p&aring; nytt.<br>
+&gt;&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;&gt;Jeg legger ved resultatet av denne
+gjennomgangen: Melding til<br>
+&gt;&gt;&gt;&gt;&gt;&gt;kvdrift_flaggsetting_1005.<br>
+&gt;&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;&gt;Etterhvert som jeg gikk fram, noterte jeg det
+jeg fant og<br>
+&gt;&gt;&gt;&gt;&gt;&gt;konsekvensen av dette i eget dokument. Dette
+har <br>
+&gt;dessverre form av <br>
+&gt;&gt;&gt;&gt;&gt;&gt;noks&aring; usammenhengende prosa, men hvis noe
+er uklart ved <br>
+&gt;&gt;&gt;&gt;&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<br>
+&gt;&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;resultatene,<br>
+&gt;&gt;&gt;&nbsp;&nbsp;&nbsp; <br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;&gt;s&aring; kan det kanskje finnes en forklaring
+her. Jeg legger <br>
+&gt;derfor ogs&aring;<br>
+&gt;&gt;&gt;&gt;&gt;&gt;ved dette dokumentet: Kontroll av flaggsetting.<br>
+&gt;&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;&gt;Det er helt grunnleggende at Kvalobs opptrer
+entydig ved manglende<br>
+&gt;&gt;&gt;&gt;&gt;&gt;originalverdi og n&aring;r originalverdi blir
+forkastet. Jeg <br>
+&gt;har sett en <br>
+&gt;&gt;&gt;&gt;&gt;&gt;del p&aring; det. Og s&aring; er det
+naturligvis uhyre viktig at <br>
+&gt;&gt;&gt;&gt;&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<br>
+&gt;&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;useinfo(0-4) gir<br>
+&gt;&gt;&gt;&nbsp;&nbsp;&nbsp; <br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;&gt;korrekt informasjon, bl.a. av kvalitet p&aring;
+observasjonene.<br>
+&gt;&gt;&gt;&gt;&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<br>
+&gt;&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;Der mangler<br>
+&gt;&gt;&gt;&nbsp;&nbsp;&nbsp; <br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;&gt;det noe i dag, og dette b&oslash;r rettes
+snarest av hensyn til brukerne.<br>
+&gt;&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;&gt;Hilsen Lars<br>
+&gt;&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+&gt;&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<br>
+&gt;&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;&nbsp;&nbsp; <br>
+&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+&gt;&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt; <br>
+&gt;&gt;&gt;&gt;<br>
+&gt;&gt;&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+&gt;&gt;&gt;&gt;<br>
+&gt;&gt;<br>
+&gt;&gt;&nbsp; <br>
+&gt;&gt;<br>
+&gt;<br>
+<br>
+<br>
+<h4><a name="Subject:_Kontroll_av_korrigerte_verdier"></a>Subject:
+Kontroll av korrigerte verdier</h4>
+Date: Wed, 16 Nov 2005 13:57:54 +0100<br>
+From: P&aring;l Sannes &lt;Pal.Sannes@met.no&gt;<br>
+To: Audun D. Christoffersen &lt;audun.christoffersen@met.no&gt;<br>
+CC: Lars Andresen &lt;lars.andresen@met.no&gt;, B&oslash;rge Moe
+&lt;borge.moe@met.no&gt;, Vegard B&oslash;nes
+&lt;vegard.bones@met.no&gt;, Gabriel Kielland
+&lt;gabriel.kielland@met.no&gt;,&nbsp; Kvdrift@met.no, Per-Ove Kjensli
+&lt;per-ove.kjensli@met.no&gt;<br>
+<br>
+Hei,<br>
+<br>
+Vi har i det siste oppdaget en rekke feil i flaggsettingen, og Lars er
+i <br>
+ferd med &aring; lage en spesifikasjon for endringer i qaBase.
+Imidlertid vil <br>
+ikke dette rette opp alle feilene vi ser. For eksempel har vi mange <br>
+lange cfailed hvor kontroller p&aring; mystisk vis gjentas flere ganger.<br>
+<br>
+Jeg mener at tiden n&aring; er moden for en ny grundig gjennomgang av <br>
+flaggsettingen. Jeg &oslash;nsker bedre dokumentasjon av hvordan
+flaggsettingen <br>
+foreg&aring;r, slik ogs&aring; Lars tidligere har etterlyst. Samt enda
+viktigere: <br>
+klare retningslinjer for hva man gj&oslash;r i kvalitetskontrollen med
+verdier <br>
+som er blitt korrigert.<br>
+<br>
+Dette er en problemstilling som er blitt s&aelig;rlig sterkt
+aktualisert etter <br>
+at HQC ble tatt i bruk, og &aring;penbart en kilde til mange av de
+problemene <br>
+vi opplever med flaggsettingen i dag.<br>
+<br>
+Jeg har f&aring;tt opplyst at alle kontroller gj&oslash;res p&aring;
+'corrected' og ikke p&aring; <br>
+'original'. Videre at alle kontrollene gj&oslash;res i en bestemt
+rekkef&oslash;lge <br>
+(hvilken rekkef&oslash;lge burde vel v&aelig;rt dokumentert?), og at
+man ikke stopper <br>
+opp hvis en verdi er blitt korrigert eller forkastet.<br>
+<br>
+Alts&aring; vil vi med en gang en verdi er blitt korrigert, fortsette
+med &aring; <br>
+kontrollere den korrigerte verdien (og ikke originalverdien) i de <br>
+testene som gjenst&aring;r (burde vi ha kj&oslash;rt ogs&aring; de
+andre testene p&aring; nytt?). <br>
+Hvis HQC har gjort korreksjonen, vil samtlige tester kj&oslash;res
+p&aring; nytt. Det <br>
+er uklart for meg om en test som har korrigert en verdi kan
+overkj&oslash;res <br>
+av en annen test, dvs om en verdi kan korrigeres flere ganger.<br>
+<br>
+Dette betyr alts&aring; at med en gang en verdi er blitt korrigert, vil
+alle <br>
+flagg som deretter settes v&aelig;re flagging av den korrigerte
+verdien. Det <br>
+er mulig(?) at det er det vi &oslash;nsker n&aring;r det gjelder
+controlinfo (i <br>
+flaggdokumentet sies det i controlinfo-delen aldri eksplisitt noe om
+det <br>
+er originalverdi eller korrigert verdi vi flagger), mens det neppe er <br>
+det vi &oslash;nsker n&aring;r det gjelder useinfo, idet flere av
+flaggene her <br>
+eksplisitt refererer til 'originalverdi'.<br>
+<br>
+Om det virkelig er s&aring; at vi &oslash;nsker &aring; fortsette
+&aring; kvalitetskontrollere og <br>
+flagge etter at en verdi er blitt korrigert, er det klart at det blir <br>
+veldig rotete n&aring;r noen av flaggene er blitt satt med utgangspunkt
+i <br>
+originalverdien, mens andre er blitt satt (eller endret) med <br>
+utgangspunkt i den (eller de!) korrigerte verdien(e). I algoritmen for
+&aring; <br>
+avlede useinfo fra controlinfo er det jo kun de controlinfo-flaggene
+som <br>
+er satt blitt satt ut fra originalverdien som er interessante.<br>
+<br>
+Det kan synes som om flaggdokumentet er blitt laget under forutsetning <br>
+av at kontrollene kj&oslash;res gjennom en gang, og at ingen flere
+flagg settes <br>
+straks 'corrected' er blitt forandret. Her trenger vi &aring; tenke
+p&aring; nytt!<br>
+<br>
+P&aring;l<br>
+<br>
+<br>
+<h4><a name="Subject:_RE:_Norske_observasjoner_som"></a>Subject: RE:
+Norske observasjoner som blir forkastet av dekoderne</h4>
+<pre wrap="">En l&oslash;sning b&oslash;r ta h&oslash;yde for at alle forkastede meldinger fra manuelle<br>innsending kan h&aring;ndteres.<br>Alts&aring; tilrettelegge for at forkastede manulle SMS-meldinger kan trigge<br>tilbakemelding til Obsdiv - og direkte til observat&oslash;r (SMS-melding). Dette<br>&oslash;ker gevinsten av systemet.<br><br>I implementering s&aring; prioriterer vi SYNOP-h&aring;ndteringen f&oslash;rst.<br><br>pok<br><br></pre>
+<blockquote type="cite">
+  <pre wrap=""><span class="moz-txt-citetags">&gt;</span>-----Original Message-----<br><span
+ class="moz-txt-citetags">&gt;</span>From: B&oslash;rge Moe [<a
+ class="moz-txt-link-freetext" href="mailto:borge.moe@met.no">mailto:borge.moe@met.no</a>] <br><span
+ class="moz-txt-citetags">&gt;</span>Sent: Thursday, March 15, 2007 9:27 AM<br><span
+ class="moz-txt-citetags">&gt;</span>To: <a
+ class="moz-txt-link-abbreviated" href="mailto:pal.sannes@met.no">pal.sannes@met.no</a><br><span
+ class="moz-txt-citetags">&gt;</span>Cc: <a
+ class="moz-txt-link-abbreviated" href="mailto:borge.moe@met.no">borge.moe@met.no</a>; <a
+ class="moz-txt-link-abbreviated" href="mailto:juergen.schulze@met.no">juergen.schulze@met.no</a>; <br><span
+ class="moz-txt-citetags">&gt;</span><a class="moz-txt-link-abbreviated"
+ href="mailto:per-ove.kjensli@met.no">per-ove.kjensli@met.no</a>; <a
+ class="moz-txt-link-abbreviated" href="mailto:kvdrift@met.no">kvdrift@met.no</a>; <a
+ class="moz-txt-link-abbreviated" href="mailto:nils.langgard@met.no">nils.langgard@met.no</a><br><span
+ class="moz-txt-citetags">&gt;</span>Subject: Re: Norske observasjoner som blir forkastet av dekoderne<br><span
+ class="moz-txt-citetags">&gt;</span><br><span class="moz-txt-citetags">&gt;</span>
+  </pre>
+  <blockquote type="cite">
+    <pre wrap=""><span class="moz-txt-citetags">&gt;&gt;</span><br><span
+ class="moz-txt-citetags">&gt;&gt;</span><br><span
+ class="moz-txt-citetags">&gt;&gt; </span><a
+ class="moz-txt-link-abbreviated" href="mailto:borge.moe@met.no">borge.moe@met.no</a> wrote:<br></pre>
+    <blockquote type="cite">
+      <pre wrap=""><span class="moz-txt-citetags">&gt;&gt;&gt; </span><a
+ class="moz-txt-link-abbreviated" href="mailto:pal.sannes@met.no">pal.sannes@met.no</a> wrote:<br></pre>
+      <blockquote type="cite">
+        <pre wrap=""><span class="moz-txt-citetags">&gt;&gt;&gt;&gt; </span>John har gitt klarsignal til at operat&oslash;rene (Helpdesk) kan <br></pre>
+      </blockquote>
+    </blockquote>
+  </blockquote>
+  <pre wrap=""><span class="moz-txt-citetags">&gt;</span>p&aring;ta seg <br></pre>
+  <blockquote type="cite">
+    <blockquote type="cite">
+      <blockquote type="cite">
+        <pre wrap=""><span class="moz-txt-citetags">&gt;&gt;&gt;&gt; </span>oppgaven med retting av synoper/kontakt med stasjon for &aring; f&aring; sendt <br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt; </span>rettelse.<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt;</span><br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt; </span>S&aring; da blir sp&oslash;rsm&aring;let til deg Juergen: vil du kunne programmere <br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt; </span>&oslash;nsket  i avsnittet under, eller har du kanskje andre forslag til <br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt; </span>hvordan  operat&oslash;rene kan f&aring; (rask) beskjed om norske <br></pre>
+      </blockquote>
+    </blockquote>
+  </blockquote>
+  <pre wrap=""><span class="moz-txt-citetags">&gt;</span>synoper som er <br></pre>
+  <blockquote type="cite">
+    <blockquote type="cite">
+      <blockquote type="cite">
+        <pre wrap=""><span class="moz-txt-citetags">&gt;&gt;&gt;&gt; </span>blitt  forkastet av synopdekoderen?<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt;</span><br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt; </span>Gabriel nevnte for &oslash;vrig som et mulig &oslash;nske &aring; lage noe tilsvarende <br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt; </span>ogs&aring; for comobs-dekoderen, slik at noen (operat&oslash;rene?) f&aring;r beskjed <br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt; </span>med  en gang en sms-melding blir forkastet i <br></pre>
+      </blockquote>
+    </blockquote>
+  </blockquote>
+  <pre wrap=""><span class="moz-txt-citetags">&gt;</span>comobs-dekoderen. I dag <br></pre>
+  <blockquote type="cite">
+    <blockquote type="cite">
+      <blockquote type="cite">
+        <pre wrap=""><span class="moz-txt-citetags">&gt;&gt;&gt;&gt; </span>har vi  delvis opplegg for at HQC kan se p&aring; (deler av) <br></pre>
+      </blockquote>
+    </blockquote>
+  </blockquote>
+  <pre wrap=""><span class="moz-txt-citetags">&gt;</span>rejectdecode, <br></pre>
+  <blockquote type="cite">
+    <blockquote type="cite">
+      <blockquote type="cite">
+        <pre wrap=""><span class="moz-txt-citetags">&gt;&gt;&gt;&gt; </span>men dette  gjelder i ettertid, ikke i sanntid.<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;&gt;</span>
+        </pre>
+      </blockquote>
+      <pre wrap=""><span class="moz-txt-citetags">&gt;&gt;&gt; </span>Dette h&oslash;rer ikke hjemme i dekoderene. En renslig m&aring;te &aring; <br></pre>
+    </blockquote>
+  </blockquote>
+  <pre wrap=""><span class="moz-txt-citetags">&gt;</span>l&oslash;se dette p&aring; <br></pre>
+  <blockquote type="cite">
+    <blockquote type="cite">
+      <pre wrap=""><span class="moz-txt-citetags">&gt;&gt;&gt; </span>er  automatisk overv&aring;king av rejectdecode. Da l&oslash;ser man ogs&aring; <br><span
+ class="moz-txt-citetags">&gt;&gt;&gt; </span>problemet en  plass og man sprer ikke kode rundt i de forskjellige <br><span
+ class="moz-txt-citetags">&gt;&gt;&gt; </span>dekoderen. En mulig  l&oslash;sning er &aring; legge til en ny funksjon i CORBA <br><span
+ class="moz-txt-citetags">&gt;&gt;&gt; </span>grensesnittet slik at man  kan subscribe p&aring; rejectdecode meldinger.<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;</span><br><span
+ class="moz-txt-citetags">&gt;&gt;&gt; </span>B&oslash;rge<br><span
+ class="moz-txt-citetags">&gt;&gt;&gt;</span>
+      </pre>
+    </blockquote>
+    <pre wrap=""><span class="moz-txt-citetags">&gt;&gt;</span><br><span
+ class="moz-txt-citetags">&gt;&gt; </span>I s&aring; fall b&oslash;r rejectdecode utvides med en ny kolonne stationid (evt <br><span
+ class="moz-txt-citetags">&gt;&gt; </span>wmonr), som fylles ut s&aring; sant dekoderen mener &aring; ha klart &aring; dekode <br><span
+ class="moz-txt-citetags">&gt;&gt; </span>denne parameteren. For synopdekoderen er det jo kun norske <br></pre>
+  </blockquote>
+  <pre wrap=""><span class="moz-txt-citetags">&gt;</span>synoper vi <br></pre>
+  <blockquote type="cite">
+    <pre wrap=""><span class="moz-txt-citetags">&gt;&gt; </span>&oslash;nsker &aring;  spesialbehandle, og en overv&aring;king av rejectdecode slik den <br><span
+ class="moz-txt-citetags">&gt;&gt; </span>er i dag ville kreve at wmonummer trekkes ut av feltet <br></pre>
+  </blockquote>
+  <pre wrap=""><span class="moz-txt-citetags">&gt;</span>message, og det <br></pre>
+  <blockquote type="cite">
+    <pre wrap=""><span class="moz-txt-citetags">&gt;&gt; </span>er jo nettopp denslags man har dekodere for! Dessuten: <br></pre>
+  </blockquote>
+  <pre wrap=""><span class="moz-txt-citetags">&gt;</span>hvordan skal en <br></pre>
+  <blockquote type="cite">
+    <pre wrap=""><span class="moz-txt-citetags">&gt;&gt; </span>overv&aring;king av rejectdecode kunne klare &aring; f&aring; tak i ahl'en? Den er det <br><span
+ class="moz-txt-citetags">&gt;&gt; </span>jo bare dekoderen som ser (eller er ogs&aring; denne plukket bort f&oslash;r <br><span
+ class="moz-txt-citetags">&gt;&gt; </span>synopen kommer til dekoderen?) Vi trenger alts&aring; kanskje ogs&aring; en ny <br><span
+ class="moz-txt-citetags">&gt;&gt; </span>kolonne 'ahl'  i rejectdecode.<br><span
+ class="moz-txt-citetags">&gt;&gt;</span>
+    </pre>
+  </blockquote>
+  <pre wrap=""><span class="moz-txt-citetags">&gt;</span><br><span
+ class="moz-txt-citetags">&gt;</span>F&oslash;rst en avklaring av hva synopdekoderen f&aring;r av data. Under <br><span
+ class="moz-txt-citetags">&gt;</span>f&oslash;lger et eksempel p&aring; data som sendes til dekoderen.<br><span
+ class="moz-txt-citetags">&gt;</span><br><span class="moz-txt-citetags">&gt;</span>AAXX 06184<br><span
+ class="moz-txt-citetags">&gt;</span>01241 11588 21312 11072 21102 30068 40080 57004 60002<br><span
+ class="moz-txt-citetags">&gt;</span>70200 81501 333   11065 81620 61120 555   0/416<br><span
+ class="moz-txt-citetags">&gt;</span><br><span class="moz-txt-citetags">&gt;</span>Vi trenger ingen nye kolonner i rejectdecode. Dekoderene kan <br><span
+ class="moz-txt-citetags">&gt;</span>legge inn n&oslash;dvendig informasjon som er lett &aring; parse i <br><span
+ class="moz-txt-citetags">&gt;</span>'comment' kolonnen.<br><span
+ class="moz-txt-citetags">&gt;</span>
+  </pre>
+  <blockquote type="cite">
+    <pre wrap=""><span class="moz-txt-citetags">&gt;&gt; </span>Det kan godt v&aelig;re at en automatisk overv&aring;king av rejectdecode er den <br><span
+ class="moz-txt-citetags">&gt;&gt; </span>ryddigste m&aring;te &aring; gj&oslash;re dette p&aring;, men jeg vil ikke helt forkaste mitt <br><span
+ class="moz-txt-citetags">&gt;&gt; </span>opprinnelige forslag uten videre. Slik jeg ser det dreier det seg om <br><span
+ class="moz-txt-citetags">&gt;&gt; </span>om erstatte en operasjon - &aring; legge inn det dekoderen har funnet i <br><span
+ class="moz-txt-citetags">&gt;&gt; </span>tabellen rejectdecode - med en tilleggsoperasjon (som utf&oslash;res under <br><span
+ class="moz-txt-citetags">&gt;&gt; </span>visse<br><span
+ class="moz-txt-citetags">&gt;&gt; </span>betingelser): send en mail med samme informasjon som det man <br></pre>
+  </blockquote>
+  <pre wrap=""><span class="moz-txt-citetags">&gt;</span>legger inn<br></pre>
+  <blockquote type="cite">
+    <pre wrap=""><span class="moz-txt-citetags">&gt;&gt; </span>i rejectdecode. Dette kan sikkert helt eller delvis lages som en<br><span
+ class="moz-txt-citetags">&gt;&gt; </span>biblioteksrutine som flere enn en dekoder kan benytte, slik <br></pre>
+  </blockquote>
+  <pre wrap=""><span class="moz-txt-citetags">&gt;</span>at endringen<br></pre>
+  <blockquote type="cite">
+    <pre wrap=""><span class="moz-txt-citetags">&gt;&gt; </span> i kode i dekoderen (utenom det som trengs for de nye kolonnene i<br><span
+ class="moz-txt-citetags">&gt;&gt; </span>rejectdecode) blir minimal. For meg kan dette virke som en enklere<br><span
+ class="moz-txt-citetags">&gt;&gt; </span>l&oslash;sning &aring; implementere enn den automatiske overv&aring;kingen av <br></pre>
+  </blockquote>
+  <pre wrap=""><span class="moz-txt-citetags">&gt;</span>rejectdecode<br></pre>
+  <blockquote type="cite">
+    <pre wrap=""><span class="moz-txt-citetags">&gt;&gt; </span>som B&oslash;rge foresl&aring;r - men hva programmererne selv mener om dette er<br><span
+ class="moz-txt-citetags">&gt;&gt; </span>selvsagt det viktigste her.<br></pre>
+  </blockquote>
+  <pre wrap=""><span class="moz-txt-citetags">&gt;</span><br><span
+ class="moz-txt-citetags">&gt;</span>kvalobs dekoderen er en s&aring; viktig del for stabiliteten i <br><span
+ class="moz-txt-citetags">&gt;</span>kvalobs at &aring; legge til funksjonalitet som den ikke er designet <br><span
+ class="moz-txt-citetags">&gt;</span>for gj&oslash;r jeg bare ikke. Hvis dette skal implementers i <br><span
+ class="moz-txt-citetags">&gt;</span>dekoderene s&aring; blir det ikke aktuelt &aring; sende mail direkte fra <br><span
+ class="moz-txt-citetags">&gt;</span>dekoderen. Hvis vi skull g&aring; for denne l&oslash;sningen kan dekoderene <br><span
+ class="moz-txt-citetags">&gt;</span>entuelt skrive dataene til filer som plukkes opp av feks en <br><span
+ class="moz-txt-citetags">&gt;</span>cronjobb som sender mailen. Dette betyr ogs&aring; at hver gang man <br><span
+ class="moz-txt-citetags">&gt;</span>&oslash;nsker endringer i filteret som bestemmer hva som skal trigge <br><span
+ class="moz-txt-citetags">&gt;</span>en mail-utsendelse s&aring; m&aring; vi ha en full utrulling av kvalobs. <br><span
+ class="moz-txt-citetags">&gt;</span>Hvis vi derimot lager en automatisk overv&aring;king av rejectdecode <br><span
+ class="moz-txt-citetags">&gt;</span>kan denne ligge utenfor kvalobs og endres uavhengig av kvalobs.<br><span
+ class="moz-txt-citetags">&gt;</span><br><span class="moz-txt-citetags">&gt;</span>L&oslash;sningen med automatisk overv&aring;king av synop kan implementeres <br><span
+ class="moz-txt-citetags">&gt;</span>relativt raskt for utplukk basert p&aring; wmonummeret. Her trenger <br><span
+ class="moz-txt-citetags">&gt;</span>man egentlig ingen st&oslash;tte fra dekoderen. wmonummeret ligger <br><span
+ class="moz-txt-citetags">&gt;</span>f&oslash;rst i meldingen og trenger ingen avansert dekoder for &aring; plukkes ut.<br><span
+ class="moz-txt-citetags">&gt;</span><br><span class="moz-txt-citetags">&gt;</span>N&aring;r det gjelder Gabriel sitt &oslash;nske s&aring; regner jeg med at han <br><span
+ class="moz-txt-citetags">&gt;</span>&oslash;nsker melding om alle forkastede meldinger.<br><span
+ class="moz-txt-citetags">&gt;</span><br><span class="moz-txt-citetags">&gt;</span>---<br><span
+ class="moz-txt-citetags">&gt;</span>B&oslash;rge<br><span
+ class="moz-txt-citetags">&gt;</span><br><span class="moz-txt-citetags">&gt;</span><br><span
+ class="moz-txt-citetags">&gt;</span>
+  </pre>
+</blockquote>
+<h4><a name="Subject:_RE:_kvalobs_til_dokit"></a>Subject: RE: kvalobs
+til dokit?<br>
+</h4>
+<a class="moz-txt-link-freetext"
+ href="http://dokit/prosjekter/kvalobs/start">http://dokit/prosjekter/kvalobs/start</a>
+<br>
+<br>
+Per-Ove Kjensli wrote:
+<br>
+<blockquote type="cite">St&oslash;tter forslaget. <br>
+Etabler prosjektet i DokIT, s&aring; kan vi begynne &aring; bygge opp. <br>
+Paul, Bj&oslash;rn og Knut skal bidra med det de har/f&aring;r med
+&aring; gj&oslash;re. <br>
+Vi er iferd med &aring; begynne p&aring; tilsvarende for
+Klimasystemene. <br>
+  <br>
+pok <br>
+  <br>
+  <blockquote type="cite">-----Original Message----- <br>
+From: <a class="moz-txt-link-abbreviated"
+ href="mailto:pal.sannes@met.no">pal.sannes@met.no</a> [<a
+ class="moz-txt-link-freetext" href="mailto:pal.sannes@met.no">mailto:pal.sannes@met.no</a>]
+Sent: Monday, May 21, 2007 10:33 AM <br>
+To: <a class="moz-txt-link-abbreviated"
+ href="mailto:vegard.bones@met.no">vegard.bones@met.no</a> <br>
+Cc: Lars Andresen; 'B&oslash;rge Moe'; 'Gabriel Kielland';
+'&Oslash;ystein Lie'; "'\"Bj&oslash;rn H. Nordin\"'"; 'Per-Ove Kjensli'
+    <br>
+Subject: Re: kvalobs til dokit? <br>
+    <br>
+    <br>
+Enig i at dette b&oslash;r gj&oslash;res, ogs&aring; fordi det i dag er
+stor forvirring rundt hvor dokumentasjonen er sjekket inn (drift- eller
+uviklingstreet eller begge steder). <br>
+    <br>
+Men hvem skal gj&oslash;re jobben? <br>
+    <br>
+Det kunne v&aelig;rt en passe jobb for en sommervikar. <br>
+    <br>
+Eller finnes det verkt&oslash;y for automatisk konvertering fra html
+til dokit-formatet som gj&oslash;r at denne jobben ikke er s&aring;
+stor som jeg forestiller meg den? <br>
+    <br>
+P&aring;l <br>
+    <br>
+    <a class="moz-txt-link-abbreviated"
+ href="mailto:vegard.bones@met.no">vegard.bones@met.no</a> wrote: <br>
+    <blockquote type="cite">Her er en ting som jeg skulle &oslash;nske
+vi kunne ordne: <br>
+      <br>
+Kan vi flytte sidene <a class="moz-txt-link-freetext"
+ href="http://kvalobs/">http://kvalobs</a> til <a
+ class="moz-txt-link-freetext" href="http://dokit/">http://dokit</a>? <br>
+      <br>
+I tillegg til at kvalobs hadde blitt dokumentasjonsmessig like <br>
+tilgjengelig som de fleste andre IT-relaterte prosjekter vil </blockquote>
+vi f&aring; endel
+    <blockquote type="cite">andre fordeler ved dette: <br>
+      <br>
+Det hadde blitt mye enklere &aring; redigere sidene, for eksempel for
+&aring; <br>
+redigere innhold i dokumentasjon, eller for &aring; rette d&oslash;de </blockquote>
+linker (se for
+    <blockquote type="cite">eksempel link "Kvalobs-automaten" under <a
+ class="moz-txt-link-freetext" href="http://kvalobs/">http://kvalobs</a>)
+      <br>
+      <br>
+I tillegg hadde det blitt enklere &aring; lenke inn i
+kvalobs-dokumentasjonen. <br>
+I dag er adressen p&aring; alle sidene <a class="moz-txt-link-freetext"
+ href="http://kvalobs/">http://kvalobs</a> uansett </blockquote>
+hvilke linker du
+    <blockquote type="cite">klikker p&aring;. <br>
+      <br>
+      <br>
+VG <br>
+      <br>
+    </blockquote>
+  </blockquote>
+  <br>
+</blockquote>
+<h4><a name="Subject:_Metadata_for_QC1-1"></a>Subject: Metadata for
+QC1-1</h4>
+<pre wrap="">Hei P&aring;l, &Oslash;ystein og Bj&oslash;rn,<br><br>Vi &oslash;nsker en revisjon av metadataene for QC1-1, i retning av &aring;<br>mistenkeliggj&oslash;re f&aelig;rre observasjoner av temperatur spesielt (men ogs&aring;<br>lufttrykk har data med omtrent samme fordeling som temperatur, og er derfor<br>tatt med). Vi tenker da &aring; bruke en annen metodikk for &aring; f&aring; fram metadataene<br>h&oslash;yeste - h&oslash;y - lav -lavest. Dette ber&oslash;rer ikke kvdrift i s&aelig;rlig grad, vi<br>gj&oslash;r jobben i SKD.<br><br>Men vi tenker ogs&aring; &aring; endre fysikalsk grenseverdi (som er lik for alle<br>stasjoner til alle &aring;rstider) til en klimatologisk grenseverdi (som er<br>individuell for hver stasjon og endres fra m&aring;ned til m&aring;ned), og som vil<br>fange opp mange flere feil. Det er mest hensiktsmessig &aring; plassere denne<br>klimatologiske grenseverdien i samme tabell som h&oslash;yest - h&oslash;y - lav -lavest,<br>dvs man utvider disse 4 kolonnene til 6. Men dette krever en<br>omprogrammering. I s&aring; fall burde dette kanskje settes p&aring; TODO-lista?<br><br>Hilsen Lars</pre>
+</body>
+</html>

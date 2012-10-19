@@ -1,0 +1,1828 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<!--#include file="header.shtml" -->
+  <title>Kvalobs-parametere sortert</title>
+</head>
+<body>
+<p> </p>
+<h2>Parametere i  Kvalobs-databasen sortert etter nummer</h2>
+<br>
+<h3>(versjon 3.15)</h3>
+<p>
+<table border=1>
+  <tr>
+    <th align=center>paramid</th>
+    <th align=center>name</th>
+    <th align=center>description</th>
+    <th align=center>unit</th>
+    <th align=center>level_scale</th>
+    <th align=center>comment</th>
+  </tr>
+  <tr valign=top>
+    <td align=right>1</td>
+    <td align=left>AA</td>
+    <td align=left>Barografkurvens forl&oslash;p</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>Siste tre timer</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>2</td>
+    <td align=left>BI</td>
+    <td align=left>Sj&oslash;is kalvet fra bre</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>3</td>
+    <td align=left>BT</td>
+    <td align=left>bladfuktighet</td>
+    <td align=left>minutter</td>
+    <td align=right>0</td>
+    <td align=left>Antall i timen (Landbruks-parameter)</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>4</td>
+    <td align=left>CI</td>
+    <td align=left>Konsentrasjon av sj&oslash&oslash;is</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>6</td>
+    <td align=left>DI</td>
+    <td align=left>Retning til n&aelig;rmeste sj&oslash;iskant</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>7</td>
+    <td align=left>EM</td>
+    <td align=left>Markas tilstand</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>Verdien -1 angir at markas tilstand ikke er meldt</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>9</td>
+    <td align=left>IR</td>
+    <td align=left>Viser om nedb&oslash;rgruppe er oppgitt i meldingen</td>
+    <td align=left>ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>10</td>
+    <td align=left>IX</td>
+    <td align=left>Viser om v&aelig;rgruppe er oppgitt i meldingen</td>
+    <td align=left>ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>11</td>
+    <td align=left>XIS</td>
+    <td align=left>&Aring;rsak til ising p&aring; fart&oslash;y eller plattform</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>12</td>
+    <td align=left>ITR</td>
+    <td align=left>Antall 6-timers perioder som omfatter den m&aring;lte nedb&oslash;rmengde</td>
+    <td align=left>ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>13</td>
+    <td align=left>ITZ</td>
+    <td align=left>Tidsangivelse for maksimal middelvind</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>14</td>
+    <td align=left>NH</td>
+    <td align=left>Mengden av alle lave skyer eller mengden av mellomh&oslash;ye skyer hvis det ikke forekommer lave skyer</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>15</td>
+    <td align=left>NN</td>
+    <td align=left>Samlet skydekke</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>17</td>
+    <td align=left>RS</td>
+    <td align=left>Endring i ising p&aring; fart&oslash;y eller plattform</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>18</td>
+    <td align=left>SD</td>
+    <td align=left>Sn&oslash;dekke</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>Verdien -1 angir at sn&oslash;dekke ikke er meldt</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>19</td>
+    <td align=left>SG</td>
+    <td align=left>Sj&oslash;gang</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>20</td>
+    <td align=left>SI</td>
+    <td align=left>Utviklingsstadium av sj&oslash;is</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>21</td>
+    <td align=left>ZI</td>
+    <td align=left>Sj&oslash;isforhold i &oslash;yeblikket og utviklingen de siste 3 timer</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>22</td>
+    <td align=left>CH</td>
+    <td align=left>Skytype h&oslash;ye skyer</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>23</td>
+    <td align=left>CL</td>
+    <td align=left>Skytype lave skyer</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>24</td>
+    <td align=left>CM</td>
+    <td align=left>Skytype mellomh&oslash;ye skyer</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>25</td>
+    <td align=left>NS1</td>
+    <td align=left>Skydekke i ett skylag</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>SYNOP-kode. Tilsvarende METAR-kode er konvertert til synopkodeverdi</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>26</td>
+    <td align=left>NS2</td>
+    <td align=left>Skydekke i ett skylag</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>SYNOP-kode. Tilsvarende METAR-kode er konvertert til synopkodeverdi</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>27</td>
+    <td align=left>NS3</td>
+    <td align=left>Skydekke i ett skylag</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>SYNOP-kode. Tilsvarende METAR-kode er konvertert til synopkodeverdi</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>28</td>
+    <td align=left>NS4</td>
+    <td align=left>Skydekke i ett skylag</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>SYNOP-kode. Tilsvarende METAR-kode er konvertert til synopkodeverdi</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>31</td>
+    <td align=left>V1</td>
+    <td align=left>V&aelig;ret ved observasjonstiden, f&oslash;rste tegn</td>
+    <td align=left>kode to siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>32</td>
+    <td align=left>V2</td>
+    <td align=left>V&aelig;ret ved observasjonstiden, andre tegn</td>
+    <td align=left>kode to siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>33</td>
+    <td align=left>V3</td>
+    <td align=left>V&aelig;ret ved observasjonstiden, tredje tegn</td>
+    <td align=left>kode to siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>34</td>
+    <td align=left>V4</td>
+    <td align=left>V&aelig;ret siden forrige hovedobservasjon, f&oslash;rste tegn</td>
+    <td align=left>kode to siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>35</td>
+    <td align=left>V4S</td>
+    <td align=left>Styrke. Tilh&oslash;rer V4</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>36</td>
+    <td align=left>V5</td>
+    <td align=left>V&aelig;ret siden forrige hovedobservasjon, andre tegn</td>
+    <td align=left>kode to siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>37</td>
+    <td align=left>V5S</td>
+    <td align=left>Styrke. Tilh&oslash;rer V5</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>38</td>
+    <td align=left>V6</td>
+    <td align=left>V&aelig;ret siden forrige hovedobservasjon, tredje tegn</td>
+    <td align=left>kode to siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>39</td>
+    <td align=left>V6S</td>
+    <td align=left>Styrke. Tilh&oslash;rer V6</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>40</td>
+    <td align=left>V7</td>
+    <td align=left>V&aelig;ret siden forrige hovedobservasjon, fjerde tegn</td>
+    <td align=left>kode to siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>41</td>
+    <td align=left>WW</td>
+    <td align=left>V&aelig;ret ved observasjonstida</td>
+    <td align=left>kode to siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>42</td>
+    <td align=left>W1</td>
+    <td align=left>V&aelig;ret siden forrige hovedobservasjonstid</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>43</td>
+    <td align=left>W2</td>
+    <td align=left>V&aelig;ret siden forrige hovedobservasjonstid</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>44</td>
+    <td align=left>X1WD</td>
+    <td align=left>F&oslash;rste tilleggsopplysning om v&aelig;ret siden forrige hovedobs</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>45</td>
+    <td align=left>X2WD</td>
+    <td align=left>Andre tilleggsopplysning om v&aelig;ret siden forrige hovedobs</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>46</td>
+    <td align=left>X3WD</td>
+    <td align=left>Tredje tilleggsopplysning om v&aelig;ret siden forrige hovedobs</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>47</td>
+    <td align=left>WA1</td>
+    <td align=left>V&aelig;ret siden forrige observasjon automatisk m&aring;lt</td>
+    <td align=left>WMO-kode 4531</td>
+    <td align=right>0</td>
+    <td align=left>F&oslash;rste forekomst</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>48</td>
+    <td align=left>WA2</td>
+    <td align=left>V&aelig;ret siden forrige observasjon automatisk m&aring;lt</td>
+    <td align=left>WMO-kode 4531</td>
+    <td align=right>0</td>
+    <td align=left>Andre forekomst</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>49</td>
+    <td align=left>WAWA</td>
+    <td align=left>V&aelig;ret ved observasjonstiden automatisk m&aring;lt</td>
+    <td align=left>WMO-kode 4680</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>54</td>
+    <td align=left>HH</td>
+    <td align=left>H&oslash;yde til h&oslash;yeste skybase</td>
+    <td align=left>meter</td>
+    <td align=right>0</td>
+    <td align=left>beregnet etter algoritme</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>55</td>
+    <td align=left>HL</td>
+    <td align=left>H&oslash;yde til f&oslash;rste skybase</td>
+    <td align=left>meter</td>
+    <td align=right>0</td>
+    <td align=left>nedre intervallgrense. Synopkodeverdi X blir lagret i Kvalobs som -3</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>56</td>
+    <td align=left>HLN</td>
+    <td align=left>Minste m&aring;lte h&oslash;yde til 'f&oslash;rste' skybase</td>
+    <td align=left>meter</td>
+    <td align=right>0</td>
+    <td align=left>over én time</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>57</td>
+    <td align=left>HM</td>
+    <td align=left>H&oslash;yde til mellomste skybase</td>
+    <td align=left>meter</td>
+    <td align=right>0</td>
+    <td align=left>beregnet etter algoritme</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>61</td>
+    <td align=left>DD</td>
+    <td align=left>Vindretning 10 minutt</td>
+    <td align=left>vektoriell i grader</td>
+    <td align=right>0</td>
+    <td align=left>Level=0 angir 10 meter; Tilh&oslash;rer FF; Synopkodeverdi 99 blir lagret i Kvalobs som -3.</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>62</td>
+    <td align=left>DD_02</td>
+    <td align=left>Vindretning 2 minutt</td>
+    <td align=left>vektoriell i grader</td>
+    <td align=right>0</td>
+    <td align=left>Level=0 angir 10 meter; Tilh&oslash;rer FF_02</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>63</td>
+    <td align=left>DG</td>
+    <td align=left>Vindretning maks gust</td>
+    <td align=left>vektoriell i grader</td>
+    <td align=right>0</td>
+    <td align=left>tilh&oslash;rer FG</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>64</td>
+    <td align=left>DM</td>
+    <td align=left>Vindretning 60 minutt</td>
+    <td align=left>vektoriell i grader</td>
+    <td align=right>0</td>
+    <td align=left>tilh&oslash;rer FM</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>65</td>
+    <td align=left>DW1</td>
+    <td align=left>Retning av d&oslash;nningssystem 1</td>
+    <td align=left>vektoriell i grader</td>
+    <td align=right>0</td>
+    <td align=left>tilh&oslash;rer HW1</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>66</td>
+    <td align=left>DW2</td>
+    <td align=left>Retning av d&oslash;nningssystem 2</td>
+    <td align=left>vektoriell i grader</td>
+    <td align=right>0</td>
+    <td align=left>tilh&oslash;rer HW2</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>67</td>
+    <td align=left>DX</td>
+    <td align=left>Vindretning maks. 10 minutt glidende middel</td>
+    <td align=left>vektoriell i grader</td>
+    <td align=right>0</td>
+    <td align=left>tilh&oslash;rer FX</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>68</td>
+    <td align=left>WDMT</td>
+    <td align=left>Midlere b&oslash;lgeretning</td>
+    <td align=left>grader</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>69</td>
+    <td align=left>DVRBDN</td>
+    <td align=left>Variable vindretning. Nedre grense</td>
+    <td align=left>grader</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>70</td>
+    <td align=left>DVRBDX</td>
+    <td align=left>Variable vindretning. &Oslash;vre grense</td>
+    <td align=left>grader</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>71</td>
+    <td align=left>DVV</td>
+    <td align=left>Retning til VV</td>
+    <td align=left>grader</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>72</td>
+    <td align=left>DVX</td>
+    <td align=left>Retning til VX</td>
+    <td align=left>grader</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>73</td>
+    <td align=left>DX_1</td>
+    <td align=left>Vindretning maks. 10 minutt glidende middel siste time</td>
+    <td align=left>vektoriell i grader</td>
+    <td align=right>0</td>
+    <td align=left>tilh&oslash;rer FX_1</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>74</td>
+    <td align=left>DX_3</td>
+    <td align=left>Vindretning maks. 10 minutt glidende middel siste tre timer</td>
+    <td align=left>vektoriell i grader</td>
+    <td align=right>0</td>
+    <td align=left>tilh&oslash;rer FX_3</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>75</td>
+    <td align=left>DX_6</td>
+    <td align=left>Vindretning maks. 10 minutt glidende middel siste seks timer</td>
+    <td align=left>vektoriell i grader</td>
+    <td align=right>0</td>
+    <td align=left>tilh&oslash;rer FX_6</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>76</td>
+    <td align=left>DX_12</td>
+    <td align=left>Vindretning maks. 10 minutt glidende middel siste tolv timer</td>
+    <td align=left>vektoriell i grader</td>
+    <td align=right>0</td>
+    <td align=left>tilh&oslash;rer FX_12</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>77</td>
+    <td align=left>DG_010</td>
+    <td align=left>Vindretning maks gust siste ti minutter</td>
+    <td align=left>vektoriell i grader</td>
+    <td align=right>0</td>
+    <td align=left>tilh&oslash;rer FG_010</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>78</td>
+    <td align=left>DG_1</td>
+    <td align=left>Vindretning maks gust siste time</td>
+    <td align=left>vektoriell i grader</td>
+    <td align=right>0</td>
+    <td align=left>tilh&oslash;rer FG_1</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>79</td>
+    <td align=left>DG_6</td>
+    <td align=left>Vindretning maks gust siste seks timer</td>
+    <td align=left>vektoriell i grader</td>
+    <td align=right>0</td>
+    <td align=left>tilh&oslash;rer FG_6</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>80</td>
+    <td align=left>DG_12</td>
+    <td align=left>Vindretning maks gust siste tolv timer</td>
+    <td align=left>vektoriell i grader</td>
+    <td align=right>0</td>
+    <td align=left>tilh&oslash;rer FG_12</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>81</td>
+    <td align=left>FF</td>
+    <td align=left>Vindhastighet 10 minutt</td>
+    <td align=left>m/s</td>
+    <td align=right>0</td>
+    <td align=left>Level=0 angir 10 meter; 10 minutt n&aring;verdi</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>82</td>
+    <td align=left>FF_02</td>
+    <td align=left>Vindhastighet 2 minutt</td>
+    <td align=left>m/s</td>
+    <td align=right>0</td>
+    <td align=left>Level=0 angir 10 meter; 2 minutt n&aring;verdi</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>83</td>
+    <td align=left>FG</td>
+    <td align=left>Maks. gust siden forrige hovedobservasjon</td>
+    <td align=left>m/s</td>
+    <td align=right>0</td>
+    <td align=left>Vindhastighet, 10 meter, maks. 3 sek. gust siden kl. 00, 06, 12 eller 18</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>84</td>
+    <td align=left>FG_010</td>
+    <td align=left>Maks gust siste 10 minutt i timen</td>
+    <td align=left>m/s</td>
+    <td align=right>0</td>
+    <td align=left>Vindhastighet, maks. 3 sek. gust siste 10 minutt i timen; Level=0 angir 10 meter</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>85</td>
+    <td align=left>FM</td>
+    <td align=left>Vindhastighet, timesmiddel</td>
+    <td align=left>m/s</td>
+    <td align=right>0</td>
+    <td align=left>Middel av 60 minuttverdier; Level=0 angir 10 meter</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>86</td>
+    <td align=left>FX</td>
+    <td align=left>Maks. vindhastighet siden forrige hovedobservasjon</td>
+    <td align=left>m/s</td>
+    <td align=right>0</td>
+    <td align=left>Maks. 10 minutt glidende middel siden kl. 00, 06, 12 eller 18; Level=0 angir 10 meter</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>87</td>
+    <td align=left>FX_1</td>
+    <td align=left>Vindhastighet, maks. 10 minutt siste time</td>
+    <td align=left>m/s</td>
+    <td align=right>0</td>
+    <td align=left>Level=0 angir 10 meter</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>88</td>
+    <td align=left>FX_6</td>
+    <td align=left>Vindhastighet, maks. 10 minutt siste 6 timer</td>
+    <td align=left>m/s</td>
+    <td align=right>0</td>
+    <td align=left>Level=0 angir 10 meter</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>89</td>
+    <td align=left>FX_12</td>
+    <td align=left>Vindhastighet, maks. 10 minutt siste 12 timer</td>
+    <td align=left>m/s</td>
+    <td align=right>0</td>
+    <td align=left>Level=0 angir 10 meter</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>90</td>
+    <td align=left>FG_1</td>
+    <td align=left>Vindhastighet, maks. 3 sek. gust siste time</td>
+    <td align=left>m/s</td>
+    <td align=right>0</td>
+    <td align=left>Level=0 angir 10 meter</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>91</td>
+    <td align=left>FG_6</td>
+    <td align=left>Vindhastighet, maks. 3 sek. gust siste 6 timer</td>
+    <td align=left>m/s</td>
+    <td align=right>0</td>
+    <td align=left>Level=0 angir 10 meter</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>92</td>
+    <td align=left>FG_12</td>
+    <td align=left>Vindhastighet, maks. 3 sek. gust siste 12 timer</td>
+    <td align=left>m/s</td>
+    <td align=right>0</td>
+    <td align=left>Level=0 angir 10 meter</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>93</td>
+    <td align=left>FX_X</td>
+    <td align=left>Vindhastighet, maks. 10 minutter glidende middel</td>
+    <td align=left>m/s</td>
+    <td align=right>0</td>
+    <td align=left>Vilk&aring;rlig periode; Level=0 angir 10 meter</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>94</td>
+    <td align=left>FG_X</td>
+    <td align=left>Vindhastighet, maks. 3 sek. gust</td>
+    <td align=left>m/s</td>
+    <td align=right>0</td>
+    <td align=left>Vilk&aring;rlig periode; Level=0 angir 10 meter</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>95</td>
+    <td align=left>FX_3</td>
+    <td align=left>Vindhastighet, maks. 3 sek. gust siste 3 timer</td>
+    <td align=left>m/s</td>
+    <td align=right>0</td>
+    <td align=left>Maks. 10 minutt glidende middel siden kl. 00, 06, 12 eller 18; Level=0 angir 10 meter</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>101</td>
+    <td align=left>ES</td>
+    <td align=left>Istykkelse p&aring; fart&oslash;y eller plattform ved observasjonstida</td>
+    <td align=left>cm</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>102</td>
+    <td align=left>EV_1</td>
+    <td align=left>Fordampning fra fri vannflate siste time</td>
+    <td align=left>mm</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>103</td>
+    <td align=left>EV_24</td>
+    <td align=left>Fordampning fra fri vannflate siste 24 timer</td>
+    <td align=left>mm</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>104</td>
+    <td align=left>RA</td>
+    <td align=left>Nedb&oslash;r, totalt b&oslash;tteinnhold</td>
+    <td align=left>mm</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>105</td>
+    <td align=left>RR_01</td>
+    <td align=left>Nedb&oslash;r, tilvekst siste minutt</td>
+    <td align=left>mm</td>
+    <td align=right>0</td>
+    <td align=left>1 min akkumulert</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>106</td>
+    <td align=left>RR_1</td>
+    <td align=left>Nedb&oslash;r, tilvekst siste time</td>
+    <td align=left>mm</td>
+    <td align=right>0</td>
+    <td align=left>Verdien -1 angir at det er observert ingen nedb&oslash;r</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>107</td>
+    <td align=left>RR_3</td>
+    <td align=left>Nedb&oslash;r, tilvekst siste 3 timer</td>
+    <td align=left>mm</td>
+    <td align=right>0</td>
+    <td align=left>Verdien -1 angir at det er observert ingen nedb&oslash;r</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>108</td>
+    <td align=left>RR_6</td>
+    <td align=left>Nedb&oslash;r, tilvekst siste 6 timer</td>
+    <td align=left>mm</td>
+    <td align=right>0</td>
+    <td align=left>Verdien -1 angir at det er observert ingen nedb&oslash;r</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>109</td>
+    <td align=left>RR_12</td>
+    <td align=left>Nedb&oslash;r, tilvekst siste 12 timer</td>
+    <td align=left>mm</td>
+    <td align=right>0</td>
+    <td align=left>Verdien -1 angir at det er observert ingen nedb&oslash;r</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>110</td>
+    <td align=left>RR_24</td>
+    <td align=left>Nedb&oslash;r, tilvekst siste 24 timer</td>
+    <td align=left>mm</td>
+    <td align=right>0</td>
+    <td align=left>Verdien -1 angir at det er observert ingen nedb&oslash;r</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>111</td>
+    <td align=left>RX</td>
+    <td align=left>Maksimal nedb&oslash;rintensitet</td>
+    <td align=left>mm/minutt</td>
+    <td align=right>0</td>
+    <td align=left>minuttsintensitet siste time</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>112</td>
+    <td align=left>SA</td>
+    <td align=left>Sn&oslash;dybde</td>
+    <td align=left>cm</td>
+    <td align=right>0</td>
+    <td align=left>n&aring;verdi, totalt fra bakken. Synopkodeverdiene 997, 998 og 999 blir lagret i Kvalobs som hhv. 0, -1, og -3. Verdien -1 angir at sn&oslash;dybde ikke er meldt.</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>113</td>
+    <td align=left>SS_1</td>
+    <td align=left>Sn&oslash;dybde tilvekst siste time</td>
+    <td align=left>cm</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>114</td>
+    <td align=left>SS_24</td>
+    <td align=left>Sn&oslash;dybde tilvekst siste 24 timer</td>
+    <td align=left>cm</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>115</td>
+    <td align=left>RW</td>
+    <td align=left>Smeltevannsum siste time</td>
+    <td align=left>mm</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>116</td>
+    <td align=left>RWA</td>
+    <td align=left>Smeltevannsum totalt innhold</td>
+    <td align=left>mm</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>117</td>
+    <td align=left>RR_X</td>
+    <td align=left>Nedb&oslash;r, tilvekst</td>
+    <td align=left>mm</td>
+    <td align=right>0</td>
+    <td align=left>Vilk&aring;rlig periode</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>118</td>
+    <td align=left>RR_010</td>
+    <td align=left>Nedb&oslash;r, tilvekst siste ti minutter</td>
+    <td align=left>mm</td>
+    <td align=right>0</td>
+    <td align=left>10 min akkumulert</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>119</td>
+    <td align=left>RR_2</td>
+    <td align=left>Nedb&oslash;r, tilvekst siste to timer</td>
+    <td align=left>mm</td>
+    <td align=right>0</td>
+    <td align=left>Verdien -1 angir at det er observert ingen nedb&oslash;r</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>120</td>
+    <td align=left>RR_9</td>
+    <td align=left>Nedb&oslash;r, tilvekst siste ni timer</td>
+    <td align=left>mm</td>
+    <td align=right>0</td>
+    <td align=left>Verdien -1 angir at det er observert ingen nedb&oslash;r</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>121</td>
+    <td align=left>OT_1</td>
+    <td align=left>Soltid siste time</td>
+    <td align=left>antall minutter</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>122</td>
+    <td align=left>OT_24</td>
+    <td align=left>Soltid siste 24 timer</td>
+    <td align=left>antall minutter</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>123</td>
+    <td align=left>RT_1</td>
+    <td align=left>Nedb&oslash;rtid siste time</td>
+    <td align=left>Antall minutter</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>124</td>
+    <td align=left>RT_24</td>
+    <td align=left>Nedb&oslash;rtid siste 24 timer</td>
+    <td align=left>Antall minutter</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>125</td>
+    <td align=left>RR_15</td>
+    <td align=left>Nedb&oslash;r, tilvekst siste 15 timer</td>
+    <td align=left>mm</td>
+    <td align=right>0</td>
+    <td align=left>Verdien -1 angir at det er observert ingen nedb&oslash;r</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>126</td>
+    <td align=left>RR_18</td>
+    <td align=left>Nedb&oslash;r, tilvekst siste 18 timer</td>
+    <td align=left>mm</td>
+    <td align=right>0</td>
+    <td align=left>Verdien -1 angir at det er observert ingen nedb&oslash;r</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>127</td>
+    <td align=left>RI</td>
+    <td align=left>Nedb&oslash;rintensitet</td>
+    <td align=left>mm/h</td>
+    <td align=right>0</td>
+    <td align=left>Maksimal fluks over 1 minutt innenfor en gitt observasjonsperiode</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>128</td>
+    <td align=left>RT_01</td>
+    <td align=left>Nedb&oslash;rtid siste minutt</td>
+    <td align=left>Antall minutter</td>
+    <td align=right>0</td>
+    <td align=left>Egentlig boolsk parameter</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>131</td>
+    <td align=left>HW</td>
+    <td align=left>Vindb&oslash;lgenes h&oslash;yde</td>
+    <td align=left>meter</td>
+    <td align=right>0</td>
+    <td align=left>visuelt observert</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>132</td>
+    <td align=left>HW1</td>
+    <td align=left>H&oslash;yde av d&oslash;nningssystem 1</td>
+    <td align=left>meter</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>133</td>
+    <td align=left>HW2</td>
+    <td align=left>H&oslash;yde av d&oslash;nningssystem 2</td>
+    <td align=left>meter</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>134</td>
+    <td align=left>HWA</td>
+    <td align=left>Vindb&oslash;lgenes h&oslash;yde</td>
+    <td align=left>meter</td>
+    <td align=right>0</td>
+    <td align=left>m&aring;lt ved instrument</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>135</td>
+    <td align=left>WHMAX</td>
+    <td align=left>H&oslash;yde p&aring; den h&oslash;yeste individuelle b&oslash;lgen</td>
+    <td align=left>meter</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>136</td>
+    <td align=left>WHM0</td>
+    <td align=left>Estimat av Hs fra spektret</td>
+    <td align=left>meter</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>137</td>
+    <td align=left>WH13</td>
+    <td align=left>Gjennomsnitt av den h&oslash;yeste tredel av b&oslash;lgene</td>
+    <td align=left>meter</td>
+    <td align=right>0</td>
+    <td align=left>b&oslash;lgene i en m&aring;leserie</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>138</td>
+    <td align=left>WL</td>
+    <td align=left>Vannstand relatert til laveste astronomiske tidevann</td>
+    <td align=left>meter</td>
+    <td align=right>0</td>
+    <td align=left>middelverdi</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>151</td>
+    <td align=left>PW</td>
+    <td align=left>Vindb&oslash;lgenes periode</td>
+    <td align=left>sekund</td>
+    <td align=right>0</td>
+    <td align=left>visuelt observert</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>152</td>
+    <td align=left>PW1</td>
+    <td align=left>Periode av d&oslash;nningssystem 1</td>
+    <td align=left>sekund</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>153</td>
+    <td align=left>PW2</td>
+    <td align=left>Periode av d&oslash;nningssystem 2</td>
+    <td align=left>sekund</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>154</td>
+    <td align=left>PWA</td>
+    <td align=left>Vindb&oslash;lgenes periode</td>
+    <td align=left>sekund</td>
+    <td align=right>0</td>
+    <td align=left>m&aring;lt ved instrument</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>155</td>
+    <td align=left>WTHMAX</td>
+    <td align=left>Perioden til den h&oslash;yeste b&oslash;lgen</td>
+    <td align=left>sekund</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>156</td>
+    <td align=left>WTMAX</td>
+    <td align=left>Maksimal b&oslash;lgeperiode</td>
+    <td align=left>sekund</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>157</td>
+    <td align=left>WTP</td>
+    <td align=left>Perioden som svarer til maksimum i spektret</td>
+    <td align=left>sekund</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>158</td>
+    <td align=left>WTP2</td>
+    <td align=left>Perioden til sekund&aelig;rt maksimum i spektret</td>
+    <td align=left>sekund</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>159</td>
+    <td align=left>WTS</td>
+    <td align=left>Midlere periode av den h&oslash;yeste tredjedel av b&oslash;lgene</td>
+    <td align=left>sekund</td>
+    <td align=right>0</td>
+    <td align=left>b&oslash;lgene i en m&aring;leserie</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>160</td>
+    <td align=left>WTZ</td>
+    <td align=left>Midlere periode av individuelle b&oslash;lger</td>
+    <td align=left>sekund</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>171</td>
+    <td align=left>PB</td>
+    <td align=left>Trykk manuelt avlest</td>
+    <td align=left>hPa</td>
+    <td align=right>0</td>
+    <td align=left>barometer, n&aring;verdi</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>172</td>
+    <td align=left>PH</td>
+    <td align=left>Trykk QNH</td>
+    <td align=left>hPa</td>
+    <td align=right>0</td>
+    <td align=left>Trykket redusert til havets niv&aring; etter ICAO-standard, n&aring;verdi</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>173</td>
+    <td align=left>PO</td>
+    <td align=left>Trykk QFE</td>
+    <td align=left>hPa</td>
+    <td align=right>0</td>
+    <td align=left>Trykket i stasjonsniv&aring;, ett minutt n&aring;verdi</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>174</td>
+    <td align=left>POM</td>
+    <td align=left>Trykk QFE, middel i timen</td>
+    <td align=left>hPa</td>
+    <td align=right>0</td>
+    <td align=left>Trykket i stasjonsniv&aring;, middel i timen</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>175</td>
+    <td align=left>PON</td>
+    <td align=left>Trykk QFE, minimum</td>
+    <td align=left>hPa</td>
+    <td align=right>0</td>
+    <td align=left>minimum timeverdi</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>176</td>
+    <td align=left>POX</td>
+    <td align=left>Trykk QFE, maksimum</td>
+    <td align=left>hPa</td>
+    <td align=right>0</td>
+    <td align=left>maksimum timeverdi</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>177</td>
+    <td align=left>PP</td>
+    <td align=left>Trykktendens absoluttverdi</td>
+    <td align=left>hPa</td>
+    <td align=right>0</td>
+    <td align=left>3 timer differanse. Modelldata i Kvalobs har fortegn.</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>178</td>
+    <td align=left>PR</td>
+    <td align=left>Trykk QFF</td>
+    <td align=left>hPa</td>
+    <td align=right>0</td>
+    <td align=left>Trykket redusert til havets niv&aring; m/lufttemperatur n&aring;, n&aring;verdi. Inng&aring;r i SYNOP.</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>191</td>
+    <td align=left>QA</td>
+    <td align=left>Albedo</td>
+    <td align=left>Forholdstall</td>
+    <td align=right>0</td>
+    <td align=left>QR/QO siste time</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>192</td>
+    <td align=left>QB</td>
+    <td align=left>Bakgrunnslys</td>
+    <td align=left>&nbsp;</td>
+    <td align=right>0</td>
+    <td align=left>n&aring;verdi 10 minutt middel</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>193</td>
+    <td align=left>QBM</td>
+    <td align=left>Bakgrunnslys, timemiddel</td>
+    <td align=left>&nbsp;</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>194</td>
+    <td align=left>QBN</td>
+    <td align=left>Bakgrunnslys, minimum</td>
+    <td align=left>&nbsp;</td>
+    <td align=right>0</td>
+    <td align=left>minimum minuttverdi i timen</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>195</td>
+    <td align=left>QBX</td>
+    <td align=left>Bakgrunnslys, maksimum</td>
+    <td align=left>&nbsp;</td>
+    <td align=right>0</td>
+    <td align=left>maksimum minuttverdi i timen</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>196</td>
+    <td align=left>QD</td>
+    <td align=left>Diffus str&aring;ling</td>
+    <td align=left>Wh/m<sup>2</sup></td>
+    <td align=right>0</td>
+    <td align=left>"akkumulert" siste time</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>197</td>
+    <td align=left>QE</td>
+    <td align=left>Totalstr&aring;ling</td>
+    <td align=left>Wh/m<sup>2</sup></td>
+    <td align=right>0</td>
+    <td align=left>"akkumulert" siste time</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>198</td>
+    <td align=left>QL</td>
+    <td align=left>Langb&oslash;lget str&aring;ling</td>
+    <td align=left>Wh/m<sup>2</sup></td>
+    <td align=right>0</td>
+    <td align=left>"akkumulert" energi siste time</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>199</td>
+    <td align=left>QLX</td>
+    <td align=left>Maksimum langb&oslash;lget str&aring;ling</td>
+    <td align=left>Wh/m<sup>2</sup></td>
+    <td align=right>0</td>
+    <td align=left>st&oslash;rste minutt siste time</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>200</td>
+    <td align=left>QO</td>
+    <td align=left>Globalstr&aring;ling</td>
+    <td align=left>Wh/m<sup>2</sup></td>
+    <td align=right>0</td>
+    <td align=left>"akkumulert" energi siste time</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>201</td>
+    <td align=left>QOX</td>
+    <td align=left>Maksimum globalstr&aring;ling</td>
+    <td align=left>Wh/m<sup>2</sup></td>
+    <td align=right>0</td>
+    <td align=left>st&oslash;rste minutt siste time</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>202</td>
+    <td align=left>QR</td>
+    <td align=left>Reflektert str&aring;ling</td>
+    <td align=left>Wh/m<sup>2</sup></td>
+    <td align=right>0</td>
+    <td align=left>"akkumulert" siste time</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>211</td>
+    <td align=left>TA</td>
+    <td align=left>Temperatur</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>N&aring;verdi</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>212</td>
+    <td align=left>TAM</td>
+    <td align=left>Temperatur timemiddel</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>213</td>
+    <td align=left>TAN</td>
+    <td align=left>Temperatur minimum i timen</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>minimum minuttverdi i timen</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>214</td>
+    <td align=left>TAN_12</td>
+    <td align=left>Temperatur minimum siste 12 timer</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>minimum minuttverdi siste 12 timer</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>215</td>
+    <td align=left>TAX</td>
+    <td align=left>Temperatur maksimum i timen</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>maksimum minuttverdi i timen</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>216</td>
+    <td align=left>TAX_12</td>
+    <td align=left>Temperatur maksimum siste 12 timer</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>maksimum minuttverdi siste 12 timer</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>217</td>
+    <td align=left>TD</td>
+    <td align=left>Duggpunktstemperatur</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>N&aring;verdi</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>218</td>
+    <td align=left>TDM</td>
+    <td align=left>Duggpunktstemperatur timemiddel</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>219</td>
+    <td align=left>TDN</td>
+    <td align=left>Duggpunktstemperatur minimum i timen</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>minimum minuttverdi i timen</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>220</td>
+    <td align=left>TDX</td>
+    <td align=left>Duggpunktstemperatur maksimum i timen</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>maksimum minuttverdi i timen</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>221</td>
+    <td align=left>TG</td>
+    <td align=left>Gresstemperatur</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>N&aring;verdi</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>222</td>
+    <td align=left>TGM</td>
+    <td align=left>Gresstemperatur timemiddel</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>223</td>
+    <td align=left>TGN</td>
+    <td align=left>Gresstemperatur minimum i timen</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>minimum minuttverdi i timen</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>224</td>
+    <td align=left>TGN_12</td>
+    <td align=left>Gresstemperatur minimum siste 12 timer</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>minimum minuttverdi siste 12 timer</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>225</td>
+    <td align=left>TGX</td>
+    <td align=left>Gresstemperatur maksimum i timen</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>maksimum minuttverdi i timen</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>226</td>
+    <td align=left>TJ</td>
+    <td align=left>Jordtemperatur</td>
+    <td align=left>°C</td>
+    <td align=right>-2</td>
+    <td align=left>N&aring;verdi</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>227</td>
+    <td align=left>TJM</td>
+    <td align=left>Jordtemperatur timemiddel</td>
+    <td align=left>°C</td>
+    <td align=right>-2</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>228</td>
+    <td align=left>TNT</td>
+    <td align=left>Minimumstermometerets topp</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>229</td>
+    <td align=left>TP</td>
+    <td align=left>Barometertemperatur</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>230</td>
+    <td align=left>TR</td>
+    <td align=left>Rullebanetemperatur</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>n&aring;verdi i 1 minutt.</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>231</td>
+    <td align=left>TRM</td>
+    <td align=left>Rullebanetemperatur timemiddel</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>232</td>
+    <td align=left>TRN</td>
+    <td align=left>Rullebanetemperatur minimum i timen</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>minimum minuttverdi i timen</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>233</td>
+    <td align=left>TRX</td>
+    <td align=left>Rullebanetemperatur maksimum i timen</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>maksimum minuttverdi i timen</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>234</td>
+    <td align=left>TSA</td>
+    <td align=left>Sn&oslash;temperatur</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>N&aring;verdi</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>235</td>
+    <td align=left>TSM</td>
+    <td align=left>Sn&oslash;temperatur timemiddel</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>236</td>
+    <td align=left>TSN</td>
+    <td align=left>Sn&oslash;temperatur minimum i timen</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>minimum minuttverdi i timen</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>237</td>
+    <td align=left>TSX</td>
+    <td align=left>Sn&oslash;temperatur maksimum i timen</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>maksimum minuttverdi i timen</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>238</td>
+    <td align=left>TV</td>
+    <td align=left>Veibanetemperatur</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>N&aring;verdi</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>239</td>
+    <td align=left>TVM</td>
+    <td align=left>Veibanetemperatur timemiddel</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>240</td>
+    <td align=left>TVN</td>
+    <td align=left>Veibanetemperatur minimum i timen</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>minimum minuttverdi i timen</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>241</td>
+    <td align=left>TVX</td>
+    <td align=left>Veibanetemperatur maksimum i timen</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>maksimum minuttverdi i timen</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>242</td>
+    <td align=left>TW</td>
+    <td align=left>Sj&oslash;temperatur</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>N&aring;verdi</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>243</td>
+    <td align=left>TWM</td>
+    <td align=left>Sj&oslash;temperatur timemiddel</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>244</td>
+    <td align=left>TWN</td>
+    <td align=left>Sj&oslash;temperatur minimum i timen</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>minimum minuttverdi i timen</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>245</td>
+    <td align=left>TWX</td>
+    <td align=left>Sj&oslash;temperatur maksimum i timen</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>maksimum minuttverdi i timen</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>246</td>
+    <td align=left>TXT</td>
+    <td align=left>Maksimumstermometerets topp</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>247</td>
+    <td align=left>TAK</td>
+    <td align=left>Kalmanfiltrert temperatur</td>
+    <td align=left>&deg;C</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>248</td>
+    <td align=left>TAN_X</td>
+    <td align=left>Temperatur minimum</td>
+    <td align=left>&deg;C</td>
+    <td align=right>0</td>
+    <td align=left>vilk&aring;rlig periode</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>249</td>
+    <td align=left>TAX_X</td>
+    <td align=left>Temperatur maksimum</td>
+    <td align=left>&deg;C</td>
+    <td align=right>0</td>
+    <td align=left>vilk&aring;rlig periode</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>250</td>
+    <td align=left>TWF</td>
+    <td align=left>Vanntemperatur</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>N&aring;verdi. Ferskvann.</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>251</td>
+    <td align=left>TAN_24</td>
+    <td align=left>Temperatur minimum siste 24 timer</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>252</td>
+    <td align=left>TAX_24</td>
+    <td align=left>Temperatur maksimum siste 24 timer</td>
+    <td align=left>°C</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>261</td>
+    <td align=left>UH</td>
+    <td align=left>Hygrometerverdi</td>
+    <td align=left>%</td>
+    <td align=right>0</td>
+    <td align=left>Manuelt avlest</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>262</td>
+    <td align=left>UU</td>
+    <td align=left>Relativ fuktighet</td>
+    <td align=left>%</td>
+    <td align=right>0</td>
+    <td align=left>N&aring;verdi</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>263</td>
+    <td align=left>UM</td>
+    <td align=left>Relativ fuktighet timemiddel</td>
+    <td align=left>%</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>264</td>
+    <td align=left>UN</td>
+    <td align=left>Relativ fuktighet, minimum i timen</td>
+    <td align=left>%</td>
+    <td align=right>0</td>
+    <td align=left>minimum minuttverdi i timen</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>265</td>
+    <td align=left>UX</td>
+    <td align=left>Relativ fuktighet, maksimum i timen</td>
+    <td align=left>%</td>
+    <td align=right>0</td>
+    <td align=left>maksimum minuttverdi i timen</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>271</td>
+    <td align=left>VMOR</td>
+    <td align=left>MOR sikt</td>
+    <td align=left>meter</td>
+    <td align=right>0</td>
+    <td align=left>n&aring;verdi 10 minutt beregnet (etter algoritme)</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>272</td>
+    <td align=left>VR</td>
+    <td align=left>RVR sikt</td>
+    <td align=left>meter</td>
+    <td align=right>0</td>
+    <td align=left>n&aring;verdi 10 minutt beregnet (etter algoritme)</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>273</td>
+    <td align=left>VV</td>
+    <td align=left>Synsvidde</td>
+    <td align=left>meter</td>
+    <td align=right>0</td>
+    <td align=left>nedre intervallgrense</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>274</td>
+    <td align=left>VZ</td>
+    <td align=left>Vertikal sikt</td>
+    <td align=left>meter</td>
+    <td align=right>0</td>
+    <td align=left>n&aring;verdi 10 minutt beregnet (etter algoritme)</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>275</td>
+    <td align=left>VX</td>
+    <td align=left>Sikt i beste retning</td>
+    <td align=left>meter</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>281</td>
+    <td align=left>BAT</td>
+    <td align=left>Batterispenning</td>
+    <td align=left>volt</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>301</td>
+    <td align=left>HS1</td>
+    <td align=left>Skyh&oslash;yde</td>
+    <td align=left>kode to siffer</td>
+    <td align=right>0</td>
+    <td align=left>SYNOP-kode. Tilsvarende METAR-kode er konvertert til synopkodeverdi</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>302</td>
+    <td align=left>HS2</td>
+    <td align=left>Skyh&oslash;yde</td>
+    <td align=left>kode to siffer</td>
+    <td align=right>0</td>
+    <td align=left>SYNOP-kode. Tilsvarende METAR-kode er konvertert til synopkodeverdi</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>303</td>
+    <td align=left>HS3</td>
+    <td align=left>Skyh&oslash;yde</td>
+    <td align=left>kode to siffer</td>
+    <td align=right>0</td>
+    <td align=left>SYNOP-kode. Tilsvarende METAR-kode er konvertert til synopkodeverdi</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>304</td>
+    <td align=left>HS4</td>
+    <td align=left>Skyh&oslash;yde</td>
+    <td align=left>kode to siffer</td>
+    <td align=right>0</td>
+    <td align=left>SYNOP-kode. Tilsvarende METAR-kode er konvertert til synopkodeverdi</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>305</td>
+    <td align=left>CC1</td>
+    <td align=left>Skytype</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>SYNOP-kode. Tilsvarende METAR-kode er konvertert til synopkodeverdi</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>306</td>
+    <td align=left>CC2</td>
+    <td align=left>Skytype</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>SYNOP-kode. Tilsvarende METAR-kode er konvertert til synopkodeverdi</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>307</td>
+    <td align=left>CC3</td>
+    <td align=left>Skytype</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>SYNOP-kode. Tilsvarende METAR-kode er konvertert til synopkodeverdi</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>308</td>
+    <td align=left>CC4</td>
+    <td align=left>Skytype</td>
+    <td align=left>kode ett siffer</td>
+    <td align=right>0</td>
+    <td align=left>SYNOP-kode. Tilsvarende METAR-kode er konvertert til synopkodeverdi</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>401</td>
+    <td align=left>MLAT</td>
+    <td align=left>Fart&oslash;yets posisjon, bredde</td>
+    <td align=left>grader desimalt</td>
+    <td align=right>0</td>
+    <td align=left></td>
+  </tr>
+  <tr valign=top>
+    <td align=right>402</td>
+    <td align=left>MLON</td>
+    <td align=left>Fart&oslash;yets posisjon, lengde</td>
+    <td align=left>grader desimalt</td>
+    <td align=right>0</td>
+    <td align=left></td>
+  </tr>
+  <tr valign=top>
+    <td align=right>403</td>
+    <td align=left>MDIR</td>
+    <td align=left>Fart&oslash;yets retning</td>
+    <td align=left>grader</td>
+    <td align=right>0</td>
+    <td align=left></td>
+  </tr>
+  <tr valign=top>
+    <td align=right>404</td>
+    <td align=left>MSPEED</td>
+    <td align=left>Fart&oslash;yets hastighet</td>
+    <td align=left>m/s</td>
+    <td align=right>0</td>
+    <td align=left></td>
+  </tr>
+  <tr valign=top>
+    <td align=right>1000</td>
+    <td align=left>signature</td>
+    <td align=left>Observat&oslash;rens forbokstaver, to tegn</td>
+    <td align=left>&nbsp;</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>1001</td>
+    <td align=left>TEXT</td>
+    <td align=left>Enhver tekst som ikke er definert p&aring; annen m&aring;te</td>
+    <td align=left>&nbsp;</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>1021</td>
+    <td align=left>KLSTART</td>
+    <td align=left>Observasjonsintervallets starttid</td>
+    <td align=left>12 siffer: 4 siffer &aring;r, m&aring;ned, dag, time, minutt</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>1022</td>
+    <td align=left>KLOBS</td>
+    <td align=left>Observasjonstidspunkt</td>
+    <td align=left>12 siffer: 4 siffer &aring;r, m&aring;ned, dag, time, minutt</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>1025</td>
+    <td align=left>KLFG</td>
+    <td align=left>Klokkeslett for FG</td>
+    <td align=left>4 siffer time, minutt</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>1026</td>
+    <td align=left>KLFX</td>
+    <td align=left>Klokkeslett for FX</td>
+    <td align=left>4 siffer time, minutt</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>1039</td>
+    <td align=left>WWB1</td>
+    <td align=left>Signifikant v&aelig;r i METAR-kode</td>
+    <td align=left>&nbsp;</td>
+    <td align=right>0</td>
+    <td align=left>Tilsvarer f&oslash;rste forekomst i METAR-koden</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>1040</td>
+    <td align=left>WWB2</td>
+    <td align=left>Signifikant v&aelig;r i METAR-kode</td>
+    <td align=left>&nbsp;</td>
+    <td align=right>0</td>
+    <td align=left>Tilsvarer f&oslash;rste forekomst i METAR-koden</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>1041</td>
+    <td align=left>WWB3</td>
+    <td align=left>Signifikant v&aelig;r i METAR-kode</td>
+    <td align=left>&nbsp;</td>
+    <td align=right>0</td>
+    <td align=left>Tilsvarer f&oslash;rste forekomst i METAR-koden</td>
+  </tr>
+  <tr valign=top>
+    <td align=right>1042</td>
+    <td align=left>WWCAVOK</td>
+    <td align=left>Generell v&aelig;rindikator i METAR-kode, to tegn</td>
+    <td align=left>&nbsp;</td>
+    <td align=right>0</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+</table>
+(221 rader)<br>
+
+<p>
+
+
+   <!--#include file="footer.shtml" -->
+
+
+<!-- Created: Thu Sep 18 12:22:00 GMT 2003 -->
+<!-- hhmts start -->
+Last modified: Fri Jan  19 17:10:00 GMT 2007
+<!-- hhmts end -->
+  </body>
+</html>

@@ -1,0 +1,603 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Kvalobs todo-liste</title>
+</head>
+<body>
+<h2>TODO-liste for Kvalobs</h2>
+2007-09-06<br>
+<br>
+<ol>
+  <li><a href="#Oppdatering_av_enkelte_elementer_i_en">Oppdatering av
+enkelte elementer i en observasjon</a></li>
+  <li><a href="#Overv%E5kning_av_rejectdecode">Overv&aring;kning av
+rejectdecode</a></li>
+  <li><a href="#QABase_takler_ikke_mer_enn_en_typid_for">QABase takler
+ikke mer enn en typid for samme paramID</a></li>
+  <li><a href="kv_todo.html#mistenkelige">Flagging og h&aring;ndtering
+av
+sv&aelig;rt mistenkelige data</a></li>
+  <li><a href="#Retting_av_feil_uten_%E5_sende_inn_p%E5_nytt">Retting
+av feil uten &aring; sende inn p&aring; nytt (SMSedit)</a></li>
+  <li><a href="#Overf%F8ring_av_text_data_til_Klima">Overf&oslash;ring
+av text_data til KlimaDB</a><br>
+  </li>
+  <li><a href="#Dekoding_av_nye_SMS-formater">Dekoding av nye
+SMS-formater</a></li>
+  <li><a href="#Nye_metadata_for_QC1">Nye metadata for QC1</a><br>
+  </li>
+  <li><a href="#Forbedrede_html-logger">Forbedrede html-logger</a><br>
+  </li>
+  <li><a href="kv_todo.html#kvServiced_persistente_subscribere">kvServiced,
+persistente subscribere</a></li>
+  <li><a href="kv_todo.html#Kontroll_av_korrigerte_verdier">Kontroll av
+korrigerte
+verdier</a></li>
+  <li><a href="kv_todo.html#Repushing_av_data_over_til_KlimaDB">(Re)pushing
+av data
+over til KlimaDB</a></li>
+  <li><a href="kv_todo.html#Sommertid">Sommertid
+for
+nedb&oslash;rstasjoner</a></li>
+  <li><a href="#9999-data">9999-data</a></li>
+  <li><a href="kv_todo.html#Snoedybde_og_snoedekke">Sn&oslash;dybde og
+sn&oslash;dekke</a></li>
+  <li><a href="kv_todo.html#level_og_sensor">level og sensor</a></li>
+  <li><a href="kv_todo.html#Historisk_database">Historisk database</a></li>
+  <li><a href="kv_todo.html#kontrollere_hva">Hvordan bestemme hva som
+skal
+kontrolleres - betydning av obs_pgm</a></li>
+  <li><a href="kv_todo.html#Rutinemessig_sletting_av_data_i_Kvalobs">Rutinemessig
+sletting av data i Kvalobs</a></li>
+  <li><a href="#Backup_av_rader_i_data-tabellen_som">Backup av rader i
+data-tabellen som overskrives</a></li>
+  <li><a href="#Felles_synopenkoder_for_Kvalobs_og">Felles synopenkoder
+for Kvalobs og Autoobs</a></li>
+  <li><a href="kv_todo.html#tidsstempling">Meldinger med feil
+tidsstempling</a></li>
+  <li><a href="#Innlegging_av_korrigerte_meldinger">Innlegging av
+korrigerte meldinger</a></li>
+  <li><a href="#controlinfo_og_useinfo_-_ikke_samsvar">controlinfo og
+useinfo ikke samsvar</a><br>
+  </li>
+  <li><a href="kv_todo.html#forhaandskvalifisering">Forh&aring;ndskvalifisering
+(QC1-0)</a></li>
+  <li><a href="kv_todo.html#utenlandske_stasjoner">Utenlandske stasjoner</a></li>
+  <li><a href="kv_todo.html#Villobser">Villobser</a></li>
+  <li><a href="#Dokumentasjon_over_til_dokIT">Dokumentasjon over til
+dokIT</a><br>
+  </li>
+  <li><a href="kv_todo.html#treg">Treg Kvalobs</a></li>
+  <li><a href="kv_todo.html#Nye_sjekker">Nye sjekker</a></li>
+  <li><a href="kv_todo.html#cfailed">Mer detaljert melding fra
+kontrollskript til
+cfailed</a></li>
+  <li><a href="kv_todo.html#Oppsplitting_av_AutoobsComobs-dekoder">Oppsplitting
+av
+Autoobs/Comobs-dekoder</a></li>
+  <li><a href="#Oppgradering_av_PostgreSQL">Oppgradering av PostgreSQL</a><br>
+  </li>
+  <li><a href="kv_todo.html#Synopstr%C3%B8m_som_stopper_opp">Synopstr&oslash;m
+som stopper opp</a></li>
+  <li><a href="#HQC">HQC</a><br>
+  </li>
+  <li><a href="#QC2">QC2</a></li>
+  <li><a href="#Metar">Metar</a></li>
+</ol>
+<h4><a name="Kontroll_av_korrigerte_verdier"></a>Kontroll av korrigerte
+verdier</h4>
+Det er helt klart ikke tenkt grundig nok igjennom hva som b&oslash;r
+gj&oslash;res videre i kontrollene etter at en verdi f&oslash;rst er
+blitt korrigert. Spesielt store problemer ser vi i flaggsettingen der
+hvor en og samme parameter sendes gjennom kontrollsystemet mer enn en
+gang.<br>
+<br>
+Status: qaBase er endret slik at meldinger fra HQC og kvAggregatoren
+ikke blir kontrollert, kun bruksflagg blir satt. En arbeidsgruppe
+best&aring;ende av Vegard, Gabriel og Lars jobber med ny design for
+flaggsetting i qaBase. Det er besluttet &aring; g&aring; over til
+&aring; sende inn 'original' til testene, ikke 'corrected'. Vegard
+jobber med refaktorering av qaBase.<br>
+<br>
+Mail: <a href="kv_mails.html#Subject:_Kontroll_av_korrigerte_verdier">Subject:
+Kontroll av korrigerte verdier</a> (P&aring;l Wed, 16 Nov 2005
+13:57:54)
+<h4><a name="mistenkelige"></a>Flagging og h&aring;ndtering av
+sv&aelig;rt mistenkelige data</h4>
+Sv&aelig;rt mistenkelige data som er ekstra
+uheldig om g&aring;r ut fra
+met.no hvis de er feil (gjelder spesielt temperatur og nedb&oslash;r)
+b&oslash;r ikke g&aring; ut i synop, men heller forkastes av Kvalobs i
+f&oslash;rste omgang, for evt &aring; sendes senere som CCA hvis funnet
+OK. Lars og Gabriel m&aring; bli enige om prosedyren for utelukkelse.
+Vi
+m&aring; finne en metode for &aring; varsle Salen om slike sv&aelig;rt
+mistenkelige verdier, og Salen m&aring; bli i stand til &aring;
+korrigere i Kvalobs.<br>
+<br>
+Status: QC1-9 implementert for &aring; kunne forkaste verdier som flere
+sjekker har funnet sv&aelig;rt mistenkelige. VA (Salen) har sagt seg
+villig til &aring;
+overta ansvaret for avislistene fra
+IT-operat&oslash;rene. Varslingen av Salen begynner Paul &aring; jobbe
+med.<br>
+<br>
+Mail: <a href="kv_mails.html#Subject:_RE:_Sv%E6rt_mistenkelig_eller">Subject:
+RE:
+Sv&aelig;rt mistenkelig eller forkastet</a> (Gabriel Tue, 7 Jun 2005
+14:53:13)<br>
+Bugzilla: <a href="http://bugzilla/show_bug.cgi?id=900">900
+Sv&aelig;rt mistenkelige eller forkastet</a><br>
+<h4><a name="controlinfo_og_useinfo_-_ikke_samsvar"></a>controlinfo og
+useinfo ikke samsvar<br>
+</h4>
+&nbsp;Lars har p&aring;pekt en rekke feil i flaggsettingen i en mail av
+24. oktober 2005, blant annet manglende samsvar mellom controlinfo og
+useinfo. Dette har foranlediget en lengre mailutveksling som vi regner
+med vil ende opp med en spesifikasjon til Audun for endring i QAbase og
+en spesifikasjon til Vegard for endring i HQC. Legger ved lenke til
+siste mail (per 17. november 2005) i denne utvekslingen.<br>
+<br>
+Status: Det meste av feilsettingen av useinfo er rettet i kildekoden.
+Ny versjon (8.7) av Flaggdokumentet ble lagt ut 5. juni 2007 og er i
+ferd med &aring; bli implementert.<br>
+<br>
+Mail: <a href="kv_mails.html#Subject:_RE:_Fwd:_RE:_Kontrollflagg_og">Subject:
+RE: [Fwd: RE: Kontrollflagg og
+bruksflagg]</a> (Lars Mon, Thu, 17 Nov 2005 14:40:38)<br>
+<h4><a name="tidsstempling"></a>Meldinger med feil tidsstempling</h4>
+Dekoderne b&oslash;r oppdage meldinger hvor
+tidsstemplingen
+&aring;penbart er feil (f.eks. n&aring;r dagen som er oppgitt er i
+morgen) og enten endre til riktig obstime eller forkaste til
+rejectdecode. Gabriel har laget et forslag til hvordan dekoderen
+b&oslash;r behandle<span style="font-family: monospace;"> </span>meldingenes
+tidsinformasjon. PIO-stasjoner og
+nedb&oslash;rstasjoner er spesielle problemomr&aring;der. Trolig
+b&oslash;r det legges inn i HQC mulighet til &aring; se meldingene som
+forkastes til rejecdecode pga feil tidsstempling, og &aring; kunne
+sende meldingen inn i Kvalobs igjen med rettet tidsstempel.<br>
+<br>
+Mail: <a
+ href="kv_mails.html#Subject:_SV:_Detektering_av_mulig_feil_tidsstempling_av_observasjoner">Subject:
+SV: Detektering av mulig feil tidsstempling av observasjoner</a>
+(P&aring;l 19. april 2005)<br>
+Bugzilla: <a href="http://bugzilla/show_bug.cgi?id=882">882
+Tidsstempling i dekodere (spesielt SMS-2)</a><br>
+Status: Skal v&aelig;re l&oslash;st for SMS-2.<br>
+<h4><a name="cfailed"></a>Mer detaljert melding fra kontrollskript til
+cfailed</h4>
+Det m&aring; gis mer detaljert melding fra
+kontrollskript om hva som er
+&aring;rsaken til at en test sl&aring;r ut. I dag opplyses bare om
+hvilken test som sl&aring;r ut (i cfailed). <br>
+<br>
+Status: Melding om hvilken del av en st&oslash;rre algoritme/sjekk som
+slo ut kan n&aring; sendes ut i den vanlige returvektoren med
+n&oslash;kkel "subcheck".
+Gjenst&aring;r &aring; ta denne muligheten i bruk i kontrollskriptene.
+Viktigere ser det ut til &aring; v&aelig;re &aring; f&aring; delt opp
+skript hvor det er
+mulig &aring; f&aring; samtidige utslag i mer enn en test.
+"geok-skriptet" er blitt delt opp. For det andre virkelig store
+skriptet: QC1-200 ser det ut til at behovet for mer detajert melding
+allikevel ikke er til stede.<br>
+<br>
+Mail: <a
+ href="kv_mails.html#Re:_Checker_-_presisjon_feilmelding._Hvordan_implementere">Re:
+Checker&nbsp; -&nbsp; presisjon feilmelding. Hvordan implementere</a>
+(Audun 05/23/2005 02:19 PM)<br>
+<h4><a name="Oppsplitting_av_AutoobsComobs-dekoder"></a>Oppsplitting av
+Autoobs/Comobs-dekoder</h4>
+Autoobsdekoderen og Comobsdekoderen er i dag lagt i samme program. En
+oppsplitting vil gi et mer fleksibelt system. Flere av bugene
+rapportert i Bugzilla vil langt lettere la seg l&oslash;se n&aring;r
+dette er p&aring; plass.<br>
+<br>
+<h4><a name="Synopstr&oslash;m_som_stopper_opp"></a>Synopstr&oslash;m som
+stopper opp</h4>
+Enkelte ganger har det skjedd at synopstr&oslash;mmen fra Kvalobs til
+Norcom har stoppet helt opp. Dette er midlertidig l&oslash;st ved en
+cronjobb som jevnlig sjekker om s&aring; har skjedd og i s&aring; fall
+gir IT-operat&oslash;rene beskjed om &aring; restarte kvsynopd. En ny
+versjon av kvserviced er klar (testing gjenst&aring;r) som h&oslash;yst
+trolig vil&nbsp; eliminere dette problemet permanent.<br>
+<h4><a name="9999-data"></a>9999-data</h4>
+Enkelte automatstasjoner leverer fra seg manglende verdier som
+9999/999/99 etc. Disse blir lagt inn med denne verdien i original i
+data-tabellen; burde (?) v&aelig;rt lagt inn som -32767. <br>
+<br>
+Mail: <a href="kv_mails.html#Subject:_Useinfo">Useinfo</a> (Lars, Tue,
+20 Sep
+2005 10:50:14)<br>
+Bugzilla: <a href="http://bugzilla.dnmi.no/show_bug.cgi?id=932">932
+9999-data</a><br>
+<br>
+<h4><a name="level_og_sensor"></a>level og sensor</h4>
+Stasjoner med sensorer som ikke m&aring;ler i standardh&oslash;yde
+eller som har flere sensorer som m&aring;ler samme parameter, blir ikke
+behandlet tilfredsstillende i Kvalobs i dag. Vi kan ikke sette dette
+s&aring;
+lavt p&aring; prioritetslisten som antydet i mail-lenken, idet vi har
+en
+avtale med ITAS om &aring; kvalitetskontrollere deres data.<br>
+<br>
+Status: For den ene stasjonen vi har som leverer level &gt; 0, er det
+utarbeidet egne sjekker. For sensor sliter vi med at Autoobs ikke
+klarer &aring; sette p&aring; &oslash;nsket sensornummer. Vi m&aring;
+trolig vente p&aring; st-info-sys for &aring; f&aring; l&oslash;st
+dette problemet, eller alternativt la Kvalobs sette p&aring;
+&oslash;nsket sensornummer (p&aring; tvers av typeid) vha egne
+konfigurasjonsfiler.<br>
+<br>
+Mail: <a href="kv_mails.html#Subject:_level__sensor_oppsummering">level
+&amp; sensor, oppsummering</a>
+(P&aring;l 05/10/2005 09:36 AM)<br>
+<h4><a name="kontrollere_hva"></a>Hvordan bestemme hva som skal
+kontrolleres - betydning av obs_pgm</h4>
+I dag spiller obs_pgm to roller:
+<br>
+1. Den angir hvilke parametere vi forventer fra stasjonene.
+<br>
+2. Styrer hvilke parametere som skal kontrolleres i kvQabase (unntak:
+observasjoner fra skip kontrolleres uansett).<br>
+Det er reist sp&oslash;rsm&aring;l om vi b&oslash;r finne en annen
+m&aring;te &aring; bestemme 2) p&aring;. Problemet vil bli spesielt
+aktualisert n&aring;r vi senere &oslash;nsker &aring; kontrollere
+aggregerte verdier og utenlandske stasjoner.<br>
+<br>
+Mail: <a
+ href="kv_mails.html#SV:_Forslag_til_endring_av_tolking_av_obs_pgm_i_qaBased.">SV:
+Forslag til endring av tolking av obs_pgm i qaBased.</a> (fra Per-Ove
+05/18/2005 03:03 PM)<br>
+<br>
+Status: Det har v&aelig;rt avholdt 2 arbeidm&oslash;ter om obs_pgm (3/4
+og 24/4 2006). Det ser ut til &aring; v&aelig;re enighet om ikke lenger
+&aring; benytte obs_pgm til &aring; bestemme hva som skal
+kvalitetskontrollere (i stedet kontrollere alt vi legger inn i
+Kvalobs), men det vil ogs&aring; v&aelig;re aktuelt med andre
+bruksm&aring;ter for obs_pgm, som f.eks. en ny kolonne for &aring;
+flagge testdata. Enighet om ny kolonne 'to_time', som b&oslash;r
+implementeres snarest.<br>
+<h4><a name="Villobser"></a>Villobser</h4>
+Observasjoner som ikke er forventet i f&oslash;lge
+observasjonsprogrammet er antakelig feil og burde v&aelig;rt forkastet.<br>
+<br>
+Bugzilla: <a href="http://bugzilla/show_bug.cgi?id=902">902
+"Villobser" - behandling av data som ikke er definert i Obs_pgm</a><br>
+<a href="http://bugzilla.dnmi.no/show_bug.cgi?id=915"><span
+ style="text-decoration: underline;"></span></a><br>
+<h4><span style="font-weight: bold;"><a name="Sommertid"></a>Sommertid
+for nedb&oslash;rstasjoner</span></h4>
+<h4><span style="font-weight: bold;"></span></h4>
+Nedb&oslash;rstasjoner som sender inn ukekort (typeid=402) bryr seg
+ikke om UTC-tid, men tar observasjonen
+til samme klokkeslett (08 norsk tid) hele &aring;ret. Dette er
+problematisk da KvalobsDB og KlimaDB opererer i UTC. Ved sommertid
+kommer observasjonen inn for kl 06<span style="font-weight: bold;"> </span>UTC
+og om vinteren
+ved
+normaltid for kl 07 UTC. Dette gj&oslash;r det vanskelig &aring;
+holde obs_pgm riktig oppdatert slik den er i bruk idag. Det
+foresl&aring;s derfor &aring; legge til en kolonne med
+korriger_tid TRUE/FALSE som vil v&aelig;re satt til TRUE for typeid=402
+og FALSE for alle andre. Hvis den er satt til
+TRUE s&aring; m&aring; det sjekkes mot en hjelpetabell som inneholder
+en kolonne for alle datoer hvor tiden endres (p&aring; samme m&aring;te
+som fromtime i obs_pgm: tiden fra data i denne raden gjelder; man
+kan da hente maks dato fra hjelpetabellen som er mindre eller lik
+obs-tiden), og
+en kolonne for antall timer som det skal korrigeres for i obs_pgm (2
+timer for sommertid og 1 time for vintertid, eks 20.03.2005 2).
+Obs_pgm
+b&oslash;r holde seg til UTC tid. <br>
+<br>
+Bugzilla: <a href="http://bugzilla/show_bug.cgi?id=937">937 Sommertid
+for nedb&oslash;rstasjoner</a><br>
+<h4><a name="Nye_sjekker"></a>Nye sjekker</h4>
+Det m&aring; lages sjekker for paramid 47-49, 73-80, 95, 127, 227 og
+250. <br>
+<br>
+Status: 47-49 og 73 har f&aring;tt grenseverdisjekk (april 2006).<br>
+<h4><a name="Snoedybde_og_snoedekke"></a>Sn&oslash;dybde og
+sn&oslash;dekke</h4>
+Alle stasjoner med type 302, 306 eller 308 sender meldinger med blanke
+felt for SA og SD n&aring;r det ikke er sn&oslash; p&aring; bakken.
+Klima-div &oslash;nsker SA=-1 og SD=-1 i Kvalobs i dette tilfellet. En
+n&aelig;rliggende l&oslash;sning
+er &aring; koble dekoder og obs_pgm.<br>
+<br>
+Mail:&nbsp; <a href="kv_mails.html#SV:_obs_pgm__SASD">SV:
+obs_pgm &amp; SA,SD</a> (Per-Ove Fri, 30 Sep 2005 18:36:29)<br>
+Bugzilla: <a href="http://bugzilla.dnmi.no/show_bug.cgi?id=904">904
+Inkonsekvens i sn&oslash;kodingen (SA/SD/EM) i flere meldingstyper</a><br>
+<h4><a name="forhaandskvalifisering"></a>Forh&aring;ndskvalifisering</h4>
+Status: I st_info_sys er det i tabell sensor_level foresl&aring;tt en
+kolonne 'operational' som vil kunne brukes til &aring; oppdatere den
+nye kolonnen i obs_pgm som er foresl&aring;tt under. <br>
+<br>
+Dagens system med QC1-0 for
+&aring; forkaste parametere fra m&aring;leinstrumenter vi vet er
+up&aring;litelige, er for tungvint. Info om m&aring;lere som
+midlertidig sender feilaktige verdier b&oslash;r inn i en tabell i
+St-Info-Sys. For Kvalobs er et forslag &aring; opprette en ny kolonne i
+obs_pgm,
+for eksempel kalt 'unreliable' som blir satt lik 'true' hvis man
+&oslash;nsker at verdien av denne parameteren for denne stasjonen skal
+forkastes av Kvalobs. Men det kan tenkes andre m&aring;ter &aring;
+l&oslash;se dette p&aring;.<br>
+<br>
+Mail: <a
+ href="kv_mails.html#RE:_Forhandskvalifisering-_for_tungvint_i_dag">RE:
+Forh&aring;ndskvalifisering- for tungvint i dag</a> (Lars 05/13/2005
+12:23 PM)<br>
+<h4><a name="treg"></a>Treg Kvalobs</h4>
+Antall meldinger som Kvalobs behandler i dag ligger ubehagelig
+n&aelig;r grensen for hva systemet ser ut til &aring; t&aring;le. Vi
+har hatt noen tilfeller av terminer hvor meldinger har blitt
+k&oslash;et opp og levert ut fra Kvalobs sv&aelig;rt forsinket.&nbsp;
+HQC opplever ogs&aring; problemer med at mange
+enkle foresp&oslash;rsler tar lang tid &aring; f&aring;
+utf&oslash;rt. Det b&oslash;r tenkes ut m&aring;ter &aring; f&aring;
+Kvalobs (inkludert HQC) til &aring; g&aring; raskere.<br>
+<h4><a name="HQC"></a>HQC<br>
+</h4>
+Lars vedlikeholder en egen todo-liste for HQC.<br>
+<h4><a name="QC2"></a>QC2</h4>
+QC2-prosjektet er enn&aring; ikke kommet i gang. Klima-div
+&oslash;nsker
+spesielt dip-test for automatstasjoner implementert snarest mulig, samt
+<span style="font-family: monospace;">a</span>utomatisk fordeling av
+oppsamlet nedb&oslash;r. Lars har laget en spesifikasjon av en
+forenklet metode til fordeling av<span style="font-family: monospace;">
+</span>RR_24.
+<br>
+<br>
+Status: En ny utvikler Paul Eglitis har f&aring;tt til oppgave &aring;
+jobbe prim&aelig;rt med QC2: fordeling av oppsamlet RR_24, romkontroll
+og interpolasjon. Dip-testen utsettes. QC2 skal implementeres som en
+separat demon.<br>
+<br>
+<h4><a name="utenlandske_stasjoner"></a>Utenlandske stasjoner</h4>
+I alt 49 grensestasjoner ble 27 februar 2006 lagt inn i
+stasjonstabellen i Kvalobs, senere ogs&aring; i obs_pgm. Mariken har
+bestilt at de s&aring;kalte EWGLAM-stasjonene (i overkant av 400
+stasjoner) kan g&aring; via Kvalobs til<span
+ style="font-family: monospace;"> </span>Klimadb for
+verifisering av modellen. De parameterene hun er interessert i er NN,
+DD, FF, FX, RR_12, RR_24, PP, PR, TA, TD.&nbsp; Det er ogs&aring;
+&oslash;nske fra den nye v&aelig;rportalen om at alle utenlandske synop
+vi mottar blir videredistribuert til KlimaDVH via Kvalobs.
+Kvalitetskontroll&nbsp; er ikke p&aring;krevet, heller ikke lagring ut
+over et par dager.<br>
+<h4><a name="Metar"></a>Metar</h4>
+Dekoder for metar er laget og testet, men metar blir i dag ikke lagt
+inn i Kvalobs. Det er &oslash;nske om at metar skal inn!<br>
+<br>
+<h4><a name="Backup_av_rader_i_data-tabellen_som"></a>Backup av rader i
+data-tabellen som overskrives</h4>
+Hvis rader i data-tabellen overskrives, vil i dag de opprinnelige data
+ugjenkallelig v&aelig;re tapt. I noen tilfeller er dette sv&aelig;rt
+uheldig, f.eks. hvis en melding kommer inn med feil tidsstempling og
+overskriver en
+observasjon fra en tidligere termin.<br>
+<br>
+Bugzilla: <a href="http://bugzilla.dnmi.no/show_bug.cgi?id=933">933
+Backup av rader i data-tabellen som overskrives</a><br>
+<br>
+<br>
+<h4><a name="kvServiced_persistente_subscribere"></a>kvServiced,
+persistente subscribere<br>
+</h4>
+For &aring; f&aring; en enklere implementasjon av abonnenter av data
+fra kvalobs, er det &oslash;nskelig at kvalobs vet hvilke data en
+abonnent &oslash;nsker. Abonnenten kvitterer for mottatte data. Data
+det ikke er kvittert for vil bli sendt p&aring; nytt. Hvis abonnenten
+ikke er oppe n&aring;r data fors&oslash;kes sendes, vil kvalobs
+pr&oslash;ve &aring; sende dataene over n&aring;r den kommer opp igjen.
+Dette vil sikre at abonnenter som &oslash;nsker komplette data
+f&aring;r det. I dag er det slik at hvis for eksempel KlimaDB har
+v&aelig;rt nede i en periode, vet vi ikke om det er blitt hull i
+overf&oslash;ringen av data fra Kvalobs.&nbsp; Implementasjonen vil
+kreve endringer i CORBA grensesnittet.
+<br>
+<br>
+<h4><a name="Repushing_av_data_over_til_KlimaDB"></a>(Re)pushing av
+data over til KlimaDB</h4>
+Det hender at vi &oslash;nsker &aring; endre direkte i
+Kvalobs-databasen ved SQL-statements, fordi dette er den klart enkleste
+m&aring;ten &aring; f&aring; til enkelte typer endringer p&aring; (det
+er ikke alt som er like lett &aring; f&aring; til i HQC). Imidlertid
+vil data da ikke automatisk bli pushet over til for eksempel KlimaDB
+eller bli behandlet p&aring; nytt av Agregatoren. Det ville v&aelig;re
+sv&aelig;rt hendig om vi hadde et eget frittst&aring;ende program hvor
+vi kunne be om at utvalgte data ble pushet over til alle program som
+'lytter til' Kvalobs. <br>
+<br>
+Bugzilla: <a href="http://bugzilla.dnmi.no/show_bug.cgi?id=940">940
+Program for
+(re)pushing av data over til KlimaDB</a><br>
+<br>
+<h4><a name="Innlegging_av_korrigerte_meldinger"></a>Innlegging av
+korrigerte meldinger</h4>
+Hvis en melding kommer inn p&aring; nytt, f.eks. en SMS meldingstype 2,
+vil tidligere melding overskrives, men ikke for 'kan-komme'-parametere
+som kun var med i opprinnelig melding.
+Dette er ikke holdbart: korreksjonen kan best&aring; i at en parameter
+er blitt utelatt og da m&aring; vi s&oslash;rge for at denne
+parameteren slettes eller forkastes i Kvalobs. Men se ogs&aring; <a
+ href="#Oppdatering_av_enkelte_elementer_i_en">Oppdatering av enkelte
+elementer i en observasjon</a> for den motsatte problemstillingen!<br>
+<br>
+Bugzilla: <a href="http://bugzilla.dnmi.no/show_bug.cgi?id=941">941
+Innlegging av korrigerte meldinger</a><br>
+<br>
+<h4><a name="Historisk_database"></a>Historisk database</h4>
+Klima-div &oslash;nsker opprettet en historisk database i
+kvalobs-struktur for i f&oslash;rste omgang &aring; f&aring; vasket
+data som er blitt slettet fra Kvalobs ved den rutinemessige slettingen
+av mer enn 6 m&aring;neders gamle data, dernest for &aring; kunne
+kvalitetskontrollere historiske data mer generelt. For den
+f&oslash;rste oppgaven vil det holde &aring; benytte dagens metadata,
+men etterhvert m&aring; det ogs&aring; lages historiske metadata.
+Databasen m&aring; fortl&oslash;pende oppdateres med ny versjon av
+Kvalobs, m&aring; klargj&oslash;res for overf&oslash;ring av data til
+Klimadatabasen, og Klimadiv m&aring; (ved bruk av nye rettigheter og
+verkt&oslash;y) kunne endre/rette i databasen.<br>
+<br>
+Status: HIST_KVALOBS p&aring; maskinen poriaz er opprettet og tatt i
+bruk. Gjenst&aring;r &aring; lage historiske metadata.<br>
+<br>
+<h4><a name="Felles_synopenkoder_for_Kvalobs_og"></a>Felles
+synopenkoder for Kvalobs og Autoobs</h4>
+Hvis Kvalobs er nede, skal Autoobs ta over genereringen av synop.
+Imidlertid vil flere synoper da bli sv&aelig;rt mangelfulle, ettersom
+det er mye funksjonalitet i Kvalobs sin synopenkoder som ikke finnes i
+Autoobs sin enkoder. Synopenkoderen i Autoobs b&oslash;r derfor
+erstattes av synopenkoderen i Kvalobs.<br>
+<br>
+<h4><a name="Oppgradering_av_PostgreSQL"></a>Oppgradering av PostgreSQL</h4>
+Det er kommet mange nyere versjoner av PostgreSQL enn den som benyttes
+i Kvalobs i dag. Det er &oslash;nskelig &aring; oppgradere for &aring;
+f&aring; bedre ytelse og dra nytte av bugfix. Men aller f&oslash;rst
+m&aring; vi ha klart et opplegg for oppgradering av databasen som er
+rimelig rask og sikker.<br>
+<br>
+<h4><a name="QABase_takler_ikke_mer_enn_en_typid_for"></a>QABase takler
+ikke mer enn en typid for samme paramID</h4>
+N&aring;r data hentes ut fra databasen ser det ut til at hver paramid
+bare hentes ut en gang, selv om samme paramid fins i flere versjoner.
+Resultatet er at hvis en observasjon med samme parameter i flere typeid
+kommer inn, vil sjekkene bare bruke den ene av disse i kontrollene. Den
+andre blir ignorert.<br>
+<br>
+Bugzilla: <a href="http://bugzilla.dnmi.no/show_bug.cgi?id=967">967
+QABase takler ikke samme paramID med forskjellig typeid p&aring; samme
+stasjon</a><br>
+<br>
+<h4><a name="Oppdatering_av_enkelte_elementer_i_en"></a>Oppdatering av
+enkelte elementer i en observasjon</h4>
+I dag m&aring; ALLE 'skal-komme'-elementene i en observasjon - for en
+typeid -
+sendes inn i Kvalobs for &aring; unng&aring; at missingfunksjonen
+aktiveres. Sendes kun enkelte elementer, s&aring; blir eksisterende
+('skal-komme') data
+i Klima overskrevet av manglende data. Det b&oslash;r v&aelig;re mulig
+&aring; sende inn fra Klima til Kvalobs for &aring; oppdatere ENKELTE
+elementer i en observasjon. Eksempel: Forskerne har interpolert en
+lengre tidsserie for et element for en stasjon fordi originalverdiene
+er feil.<br>
+<br>
+Bugzilla: <a href="http://bugzilla.dnmi.no/show_bug.cgi?id=970">970
+M&aring; endre klima2kv innlasting - overskrivingsproblem i Klima</a><br>
+<h4><a name="Rutinemessig_sletting_av_data_i_Kvalobs"></a>Rutinemessig
+sletting av data i Kvalobs</h4>
+I dag slettes data automatisk i Kvalobs etter 8 m&aring;neder. Samtidig
+lages den f&oslash;rste i hver m&aring;ned en back-up av data som
+st&aring;r for tur til &aring; slettes, for innlesning til
+Hist-Kvalobs. Det er et &oslash;nske fra Klima-div at disse to
+oppgavene synkroniseres, slik at vi ikke p&aring; samme tid har samme
+data lagret b&aring;de i Kvalobs og Hist-Kvalobs.<br>
+<br>
+<br>
+<h4><a name="Overv&aring;kning_av_rejectdecode"></a>Overv&aring;kning av
+rejectdecode</h4>
+Det er &oslash;nskelig at operat&oslash;rene f&aring;r beskjed hver
+gang en manuell norsk observasjon forkastes av dekoderne, slik at de
+kan ta kontakt med observat&oslash;ren, og f&aring; denne til &aring;
+sende inn korrigert melding snarest mulig.<br>
+<br>
+Mail: <a href="kv_mails.html#Subject:_RE:_Norske_observasjoner_som">
+RE: Norske observasjoner som blir
+forkastet av dekoderne</a> (Per-Ove 15. mars 2007)<br>
+<br>
+Status: Paul og Bj&oslash;rn har f&aring;tt i oppgave &aring; jobbe med
+denne.<br>
+<br>
+<h4><a name="Retting_av_feil_uten_&aring;_sende_inn_p&aring;_nytt"></a>Retting av
+feil uten &aring; sende inn p&aring; nytt (SMSedit)<br>
+</h4>
+SMSedit er et program for &aring; rette sms-observasjoner etter de er
+mottatt ved met.no, uten &aring; m&aring;tte sende inn p&aring; nytt
+fra stasjonen. Det er utviklet for meldingstype 2, men det er
+&oslash;nske om at dette ogs&aring; skal kunne benyttes for
+meldingstype 8 og 12.<br>
+<br>
+<h4><a name="Dokumentasjon_over_til_dokIT"></a>Dokumentasjon over til
+dokIT</h4>
+Dokumentasjonen for Kvalobs finnes i dag p&aring; http://kvalobs, som
+html-filer sjekket inn i CVS. Det ville v&aelig;re en fordel &aring;
+f&aring; lagt dette inn i dokIT i stedet. Dessuten er
+systemdokumentasjonen generert fra Doxygen i dag ikke allment
+tilgjengelig.<br>
+<br>
+Mail: <a href="kv_mails.html#Subject:_RE:_kvalobs_til_dokit">RE:
+kvalobs til dokit?</a> (Vegard 21. mai 2007)<br>
+<br>
+<h4><a name="Dekoding_av_nye_SMS-formater"></a>Dekoding av nye
+SMS-formater</h4>
+Comobs-dekoderen m&aring; utvides til ogs&aring; &aring; kunne dekode
+de nye SMS-formatene 20 og 42.<br>
+<br>
+<h4><a name="Forbedrede_html-logger"></a>Forbedrede html-logger</h4>
+Html-loggene p&aring; /metno/kvalobs/var/log/html inneholder detaljert
+logging av kontrollene utf&oslash;rt i QaBase for hver enkelt stasjon,
+men g&aring;r bare 6 timer tilbake i tid, og blir overskrevet hvis en
+ny melding kommer inn. Det er &oslash;nskelig at html-loggene er
+fullstendige og g&aring;r flere dager tilbake i tid. Vesentlig plass
+kan spares ved &aring; ikke skrive ut kildekoden for hver kontroll som
+utf&oslash;res. Likevel b&oslash;r html-loggene legges p&aring; egen
+partisjon, for ikke &aring; risikere &aring; fylle opp samme disk som
+resten av Kvalobs benytter.<br>
+<br>
+Status: Hindring av overskriving er implementert (juni 2007), og kommer
+med i neste versjon av Kvalobs.<br>
+<br>
+<h4><a name="Nye_metadata_for_QC1"></a>Nye metadata for QC1<br>
+</h4>
+Lars har kommet med nytt forslag til beregning av metadata for QC1.
+Dette inneb&aelig;rer ogs&aring;&nbsp; at QC1-algoritmene m&aring;
+endres.<br>
+<br>
+Mail: <a href="kv_mails.html#Subject:_Metadata_for_QC1-1">
+Metadata for QC1-1</a> (Lars 14. august 2007)<br>
+<br>
+<h4><a name="Overf&oslash;ring_av_text_data_til_Klima"></a>Overf&oslash;ring
+av text_data til KlimaDB</h4>
+Det er behov for &aring; overf&oslash;re tabell text_data fra Kvalobs
+til Klima. Dette b&oslash;r v&aelig;re en ren kopi av tabellstruktur,
+med automatisk overf&oslash;ring til Klima ved innlegging av nye rader
+i Kvalobs. Tabellen m&aring; etableres i Klima (&Aring;se), og
+overf&oslash;ringsprogram m&aring; lages (B&oslash;rge). I
+f&oslash;rste rekke er det Obsdiv som har behovet, men senere
+ogs&aring; Klimadiv.<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+</body>
+</html>

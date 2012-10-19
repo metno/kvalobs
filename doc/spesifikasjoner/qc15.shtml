@@ -1,0 +1,24 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+               "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+
+  <!--#include file="header.shtml"-->
+
+
+<h3>Meldingskontroll (position)</h3>
+
+<p>
+Det er laget to tester for bevegelige stasjoner:<br>
+1) Sjekk av at bevegelige
+stasjoner har hatt en rimelig forflytning siden forrige observasjon;
+<p>
+2) Sjekk av at posisjonen for en bevegelig b&oslash;ye ikke er landbasert.
+Mens de &oslash;vrige testene er pr. parameter, er disse pr. melding og
+resultatet vil gjelde alle parameterne i meldingen.<br>
+<p>&nbsp;
+
+
+Last modified: Thu Oct 28 11:53:00 GMT 2004
+<!-- hhmts end -->
+  </body>
+</html>

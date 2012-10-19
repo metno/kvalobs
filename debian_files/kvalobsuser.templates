@@ -1,0 +1,11 @@
+Template: kvalobs/homedir
+Type: string
+Default: /home/kvalobs
+Description: Home directory for the kvalobs admin user:
+ Specify where the home directory for the admin user should be located.
+
+Template: kvalobs/user
+Type: string
+Default: kvalobs
+Description: Name of the kvalobs admin account:
+ Specify the name of the kvalobs admin account.

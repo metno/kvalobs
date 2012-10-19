@@ -1,0 +1,121 @@
+* The official PETS team parameter definition file.
+* Refurbished 20 Oct 1997, LBS.
+* A lex/yacc parser for this file is available from your fave PETS dealer.
+* 
+* But caveat lector! This file uses characters from the 8-bit ISO
+* Latin 1 character set (such as greek mu: µ; square: x², cube x³).
+
+PARAMETER "NULL" {
+  NUM=    0
+  NAME=   "Dummy parameter"
+  UNIT=   "-"
+  SCALE=  0
+  ORDER=  1
+  SIZE=   2
+  TYPE=   scalar
+  PLOT=   PLOT_LINE
+}
+
+PARAMETER "RR" {
+  NUM=    17
+  NAME=   "Total precipitation"
+  UNIT=   "[mm]"
+  SCALE=  -2
+  ORDER=  1
+  SIZE=   2
+  TYPE=   scalar
+  PLOT=   PLOT_HIST
+}
+
+PARAMETER "RR_12" {
+  NUM=    109
+  NAME=   "12 hrs precip"
+  UNIT=   "[mm]"
+  SCALE=  -2
+  ORDER=  1
+  SIZE=   2
+  TYPE=   scalar
+  PLOT=   PLOT_HIST
+}
+
+PARAMETER "RR_24" {
+  NUM=    110
+  NAME=   "12 hrs precip"
+  UNIT=   "[mm]"
+  SCALE=  -2
+  ORDER=  1
+  SIZE=   2
+  TYPE=   scalar
+  PLOT=   PLOT_HIST
+}
+
+
+PARAMETER "TA" {
+  NUM=    31
+  NAME=   "2 m temperature"
+  UNIT=   "[°C]"
+  SCALE=  -1
+  ORDER=  1
+  SIZE=   2
+  TYPE=   scalar
+  PLOT=   PLOT_LINE
+}
+
+
+PARAMETER "DD" {
+  NUM=    6
+  NAME=   "10 m wind x direction"
+  UNIT=   "[°]"
+  SCALE=  -2
+  ORDER=  1
+  SIZE=   2
+  TYPE=   scalar
+  PLOT=   PLOT_LINE
+}
+
+PARAMETER "FF" {
+  NUM=    7
+  NAME=   "10 m wind speed"
+  UNIT=   "[m/s]"
+  SCALE=  -2
+  ORDER=  1
+  SIZE=   2
+  TYPE=   scalar
+  PLOT=   PLOT_LINE
+}
+
+PARAMETER "PR" {
+  NUM=    58
+  NAME=   "Pressure"
+  UNIT=   "[hPa]"
+  SCALE=  -1
+  ORDER=  1
+  SIZE=   2
+  TYPE=   scalar
+  PLOT=   PLOT_LINE
+}
+
+PARAMETER "PP" {
+  NUM=    21
+  NAME=   "Pressure"
+  UNIT=   "[hPa]"
+  SCALE=  -1
+  ORDER=  1
+  SIZE=   2
+  TYPE=   scalar
+  PLOT=   PLOT_LINE
+}
+
+
+
+PARAMETER "UU" {
+  NUM=    32
+  NAME=   "Relative humidity"
+  UNIT=   "[%]"
+  SCALE=  -1
+  ORDER=  1
+  SIZE=   2
+  TYPE=   scalar
+  PLOT=   PLOT_LINE
+}
+

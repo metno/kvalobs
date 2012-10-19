@@ -1,0 +1,11 @@
+/**
+ * \defgroup milog A logging utility.
+ * \ingroup miutil
+ *
+ */
+
+/**
+ * \namespace milog
+ *
+ * \brief The namespace to the logging utility.
+ */ 

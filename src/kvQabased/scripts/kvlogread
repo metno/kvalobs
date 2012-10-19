@@ -1,0 +1,14 @@
+#!/bin/sh
+
+if [ $1 = --help ]; then
+	echo Usage: $0 KVALOBS_LOG_FILE
+	exit 0
+fi
+
+file -b $1 | grep -q gzip
+
+if [ $? = 0 ]; then
+	gunzip -c $1 | less
+else
+	less $1
+fi

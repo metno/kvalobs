@@ -1,0 +1,36 @@
+#!/bin/sh
+
+## Documentation for Kvalobs should first be checked out from CVS like this:
+##   cd /metno/kvalobsweb/ 
+##   cvs co -r kvalobs-drift-1-0 kvalobs
+
+HTTP_DIR=/metno/kvalobsweb/htdocs
+if ! test -d $HTTP_DIR; then
+    echo "mkdir $HTTP_DIR"
+    mkdir $HTTP_DIR
+fi 
+echo Skifter til http-katalogen
+cd $HTTP_DIR
+pwd
+ln -s /metno/kvalobsweb/kvalobs/doc/drift
+ln -s /metno/kvalobsweb/kvalobs/doc/header.shtml
+ln -s /metno/kvalobsweb/kvalobs/doc/index.html
+ln -s /metno/kvalobsweb/kvalobs/doc/images
+ln -s /metno/kvalobsweb/kvalobs/doc/ko.css
+ln -s /metno/kvalobsweb/kvalobs/doc/kv_mails.html
+ln -s /metno/kvalobsweb/kvalobs/doc/kv_todo.html
+ln -s /metno/kvalobsweb/kvalobs/doc/kvalobs-html
+ln -s /metno/kvalobsweb/kvalobs/doc/kvalobs.shtml
+ln -s /metno/kvalobsweb/kvalobs/doc/menu.shtml
+ln -s /metno/kvalobsweb/kvalobs/doc/metadata
+ln -s /metno/kvalobsweb/kvalobs/src/kvalobs_database/script.create
+ln -s /metno/kvalobsweb/kvalobs/src/kvalobs_database/script.create_doc
+ln -s /metno/kvalobsweb/kvalobs/src/script/model2kvalobs/doc/model2kvalobs.html
+ln -s /metno/kvalobsweb/kvalobs/doc/ref_driftsstyret_12102005.html
+ln -s /metno/kvalobsweb/kvalobs/doc/spesifikasjoner
+ln -s /metno/kvalobsweb/kvalobs/doc/system
+echo Softlinks opprettet
+
+# To get rid of "File does not exist: /metno/kvalobsweb/htdocs/favicon.ico"
+# in error.log
+touch favicon.ico

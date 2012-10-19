@@ -1,0 +1,49 @@
+INSTALATION NOTES:
+
+
+Requirements:
+
+Before installation, you will need several libraries:
+
+omniORB 4.0
+putools from met.no
+boost
+cppunit
+postgresql
+sqlite (for agregator and kvSynopd)
+Qt (for qt specific client libraries)
+(+ maybe some other tings - to be added)
+
+
+You may specify how to find these libraries by copying the file
+conf/myconf.template into conf/myconf, and then modifying the settings
+there.
+
+Note:
+
+Easiest way to install puTools:
+make DESTDIR=$HOME/local/ OSTYPE=linux-gnu all install
+
+
+
+Compiling:
+
+Compile with make, either from top level, or from a subdirectory.
+
+When compiling fails:
+
+If you have a hard time finding out why a compilation fails, it may be
+a good idea to check if (and why) compiling src/lib/kvalobs
+fails. Errors during compiling of this library will often ruin the
+compilation of the rest of kvalobs.
+
+
+
+Installing:
+
+Installing is done through the script INSTALL.main
+
+In order for this to work, two environment variables must be set:
+
+KVALOBS - This is the installation destination.
+KVDIR	- The kvalobs source tree location

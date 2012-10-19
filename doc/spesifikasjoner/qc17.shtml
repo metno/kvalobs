@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+               "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+
+  <!--#include file="header.shtml"-->
+
+  <p>	
+
+    <h1>QC1-7 DETECTION OF COLLECTED VALUES FOR SEPARATION</h1>
+
+
+<p>Gabriel Kielland
+<p>
+In the extended use and presentation of some observations there is a need to 
+infere a simulated observation taken to cover a shorter time span than 
+the one observed.
+<p>
+In Kvalobs the separation procedure will be implemented for precipitation, 
+maximum temperature and minimum temperature.
+
+<p>The Kvalobs parameters are:
+<ul>
+<li>RR_X - Amount of precipitation which has fallen during a period preceding the 
+standard time of observation;
+<li>TAX_X - Temperature in degrees C, maximum one minute value during a period preceding the
+standard time of observation;
+<li>TAN_X - Temperature in degrees C, minimum one minute value during a period preceding the
+standard time of observation.
+</ul>
+<p>
+The parameter values RR_X, TAX_X and TAN_X will be entered in the database together with values 
+to indicate commencement and ending of the period. The time parameters are:
+<ul>
+<li>KLSTART - Time of phenomenon commencement, 12 digits YYYYMMDDHHmm ("measurement from")
+<li>KLOBS - Time of phenomenon ending, 12 digits YYYYMMDDHHmm ("measurement untill")
+</ul>
+
+<p>
+The following flag values are available:
+<table>
+<tr><td>fd=0</td><td>Not considered as collected value</td></tr>
+<tr><td>fd=1</td><td>Normal observation, not collected value</td></tr>
+<tr><td>fd=2</td><td>The original value is a collected value not separated</td></tr>
+<tr><td>fd=3</td><td>Abnormal observation. The original value may be a collected value</td></tr>
+</table>
+
+<h3>The rules for applying the flag values is the following:</h3>
+<p>
+"measurement from" minus "measurement untill" < 23 hours => fd=3
+<p>
+"measurement from" minus "measurement untill"  >= 23 hours og<br>
+"measurement from" minus "measurement untill"  <= 25 hours => fd=1
+<p>
+"measurement from" minus "measurement untill"  > 25 hours og<br>
+"measurement from" minus "measurement untill"  < 47 hours => fd=3
+<p>
+"measurement from" minus "measurement untill"  >= 47 hours og<br>
+"measurement from" minus "measurement untill"  <= 73 hours => fd=2
+<p>
+"measurement from" minus " measurement untill"  > 73 hours => fd=3
+
+<p>
+Note that whenever KLOBS or KLSTART is a non valid time indication the <u>observationen</u> 
+is flagged with fd=3.
+<p>
+Also with KLOBS or KLSTART missing the observation is flagged with fd=3.
+<p>&nbsp;</p>
+
+
+<h2>Automatic separation of precipitation amount</h2>
+<p>
+The separation algorithms is to be implemented with QC2. The observation stored as an RR_X parameter will then 
+be translated into one or several RR_24 values. The observed value will be placed in the field 
+<i>data.original</i> and the separated partial value will be placed in the field <i>data.corrected</i>.
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+Last modified: Fri Dec 31 12:47:00 GMT 2004
+  </body>
+</html>
+

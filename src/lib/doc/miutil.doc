@@ -1,0 +1,19 @@
+/**
+ * \defgroup miutil miutil, a utility library.
+ *
+ * A losly set of utility class that is not specific to kvalobs.
+ */
+
+/**
+ * \defgroup pu_miutil The pu miutility library.
+ * \ingroup miutil
+ */
+
+ 
+
+/**
+ * \namespace miutil
+ *
+ * \brief The namespace the utility classes and functions in the miutil utility
+ * library is in.
+ */

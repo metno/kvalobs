@@ -1,0 +1,22 @@
+#ifndef __managerInput_idl__
+#define __managerInput_idl__
+
+#include "commonStationInfo.idl"
+
+module CKvalObs {
+  module CManager {
+ 
+    //Receives data from kvDataInputd
+    interface ManagerInput{
+      boolean newData(in CKvalObs::StationInfoList infoList);
+    };
+    
+    //Receives data from kvQaBased or other that checks data and sets 
+    //the flags.
+    interface CheckedInput{
+      boolean checkedData(in CKvalObs::StationInfoList data);
+    };
+  };
+};
+
+#endif

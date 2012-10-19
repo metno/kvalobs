@@ -1,0 +1,983 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+               "http://www.w3.org/TR/REC-html40/loose.dtd"> 
+<html>
+
+    <!--#include file="header.shtml" -->
+
+<h2>Kvalobsdatabasens tabeller</h2>
+<h3>Terje Reite november 2004.
+</h3>
+<hr>
+CREATE TABLE data (<br>
+	stationid   INTEGER NOT NULL,<br>
+	obstime     TIMESTAMP NOT NULL,<br>
+	original    FLOAT NOT NULL,<br>
+	paramid	    INTEGER NOT NULL,<br>
+	tbtime	    TIMESTAMP NOT NULL,<br>
+	typeid	    INTEGER NOT NULL,<br>
+	sensor	    CHAR(1) DEFAULT '0',<br>
+	level	    INTEGER DEFAULT 0,<br>
+	corrected   FLOAT NOT NULL,<br>
+	controlinfo CHAR(16) DEFAULT '0000000000000000',<br>
+	useinfo     CHAR(16) DEFAULT '0000000000000000',<br>
+	cfailed     TEXT DEFAULT NULL,    	<br>
+	UNIQUE ( stationid, obstime, paramid, level, sensor, typeid ) <br>
+);<br>
+<br>
+CREATE INDEX data_obstime_index ON data (obstime);<br>
+<br>
+CREATE TABLE text_data (<br>
+	stationid   INTEGER NOT NULL,<br>
+	obstime     TIMESTAMP NOT NULL,<br>
+	original    TEXT NOT NULL,<br>
+	paramid	    INTEGER NOT NULL,<br>
+	tbtime	    TIMESTAMP NOT NULL,<br>
+	typeid	    INTEGER NOT NULL,<br>
+	UNIQUE ( stationid, obstime, paramid, typeid ) <br>
+);<br>
+<br>
+<br>
+CREATE VIEW data_view AS<br>
+SELECT data.stationid, data.obstime, CAST(data.original AS TEXT), data.paramid, data.tbtime, data.typeid<br>
+FROM data, text_data<br>
+WHERE data.stationid=text_data.stationid and data.obstime=text_data.obstime<br>
+UNION ALL<br>
+SELECT text_data.stationid, text_data.obstime, text_data.original, text_data.paramid, text_data.tbtime, text_data.typeid<br>
+FROM data, text_data<br>
+WHERE data.stationid=text_data.stationid and data.obstime=text_data.obstime<br>
+UNION  ALL<br>
+SELECT data.stationid, data.obstime, CAST(data.original AS TEXT), data.paramid, data.tbtime, data.typeid<br>
+FROM data<br>
+WHERE (data.stationid NOT IN ( SELECT text_data.stationid FROM text_data )) OR <br>
+      (data.obstime NOT IN ( SELECT text_data.obstime FROM text_data ));<br>
+<br>
+<br>
+CREATE VIEW text_data_view AS<br>
+SELECT text_data.stationid, text_data.obstime, text_data.original, text_data.paramid, text_data.tbtime, text_data.typeid<br>
+FROM text_data<br>
+WHERE (text_data.stationid NOT IN ( SELECT data.stationid FROM data )) OR <br>
+      (text_data.obstime NOT IN ( SELECT data.obstime FROM data ));<br>
+<br>
+<br>
+<br>
+CREATE TABLE rejectdecode (<br>
+	message TEXT NOT NULL,<br>
+	tbtime TIMESTAMP NOT NULL,<br>
+	decoder TEXT NOT NULL,<br>
+	comment TEXT DEFAULT NULL,<br>
+	UNIQUE ( tbtime, message, decoder )<br>
+);<br>
+<br>
+<br>
+CREATE TABLE model_data (<br>
+	stationid INTEGER NOT NULL,<br>
+	obstime	  TIMESTAMP NOT NULL,<br>
+	paramid   INTEGER NOT NULL,<br>
+	level     INTEGER NOT NULL,<br>
+        modelid   INTEGER NOT NULL,<br>
+	original  FLOAT DEFAULT NULL,  <br>
+	UNIQUE ( stationid, obstime, paramid, level, modelid )<br>
+);<br>
+<br>
+<br>
+CREATE TABLE model (<br>
+	modelid  INTEGER NOT NULL,<br>
+	name    TEXT DEFAULT NULL,<br>
+	comment TEXT DEFAULT NULL,<br>
+	UNIQUE ( modelid )<br>
+);<br>
+<br>
+<br>
+CREATE TABLE types (<br>
+	typeid  INTEGER NOT NULL,<br>
+	format   TEXT DEFAULT NULL,<br>
+	earlyobs INTEGER DEFAULT NULL,<br>
+        lateobs  INTEGER DEFAULT NULL,<br>
+	read     TEXT DEFAULT NULL,<br>
+        obspgm   TEXT DEFAULT NULL,<br>
+	comment  TEXT DEFAULT NULL,<br>
+	UNIQUE ( typeid )<br>
+);<br>
+<br>
+<br>
+CREATE TABLE generated_types (<br>
+	stationid INTEGER NOT NULL,<br>
+	typeid  INTEGER NOT NULL,<br>
+	UNIQUE ( stationid, typeid )<br>
+);<br>
+<br>
+<br>
+CREATE TABLE param (<br>
+	paramid INTEGER NOT NULL,<br>
+	name    TEXT NOT NULL,<br>
+	description TEXT DEFAULT NULL,<br>
+	unit    TEXT DEFAULT NULL,<br>
+	level_scale INTEGER DEFAULT 0,<br>
+	comment TEXT DEFAULT NULL,<br>
+	UNIQUE ( paramid )<br>
+);<br>
+<br>
+<br>
+CREATE TABLE station (<br>
+	stationid INTEGER NOT NULL,<br>
+	lat FLOAT DEFAULT NULL,<br>
+	lon FLOAT DEFAULT NULL,<br>
+	height FLOAT DEFAULT NULL,<br>
+	maxspeed FLOAT DEFAULT NULL,<br>
+	name       TEXT DEFAULT NULL,<br>
+	wmonr      INTEGER DEFAULT NULL,<br>
+	nationalnr INTEGER DEFAULT NULL,<br>
+	ICAOid     CHAR(4) DEFAULT NULL,<br>
+	call_sign  CHAR(7) DEFAULT NULL, <br>
+	stationstr TEXT DEFAULT NULL,<br>
+        environmentid  INTEGER DEFAULT NULL,<br>
+	static    BOOLEAN DEFAULT FALSE,<br>
+        fromtime TIMESTAMP NOT NULL, <br>
+	UNIQUE ( stationid, fromtime )<br>
+);<br>
+<br>
+<br>
+<br>
+<br>
+CREATE TABLE checks (<br>
+	stationid INTEGER NOT NULL,<br>
+	qcx       TEXT NOT NULL,<br>
+	medium_qcx TEXT NOT NULL,<br>
+	language  INTEGER NOT NULL,<br>
+	checkname TEXT DEFAULT NULL,<br>
+	checksignature TEXT DEFAULT NULL,<br>
+        active   TEXT DEFAULT '* * * * *',   <br>
+	fromtime TIMESTAMP NOT NULL,<br>
+	UNIQUE ( stationid, qcx, language, fromtime )<br>
+);<br>
+<br>
+<br>
+CREATE TABLE station_param (<br>
+	stationid INTEGER NOT NULL,<br>
+	paramid   INTEGER NOT NULL,<br>
+	level	  INTEGER DEFAULT 0,	 <br>
+	sensor	  CHAR(1) DEFAULT '0',<br>
+	fromday	  INTEGER NOT NULL,<br>
+	today	  INTEGER NOT NULL,<br>
+	hour      INTEGER DEFAULT -1,<br>
+        qcx       TEXT NOT NULL,<br>
+	metadata  TEXT DEFAULT NULL,<br>
+        desc_metadata TEXT DEFAULT NULL,<br>
+        fromtime TIMESTAMP NOT NULL,<br>
+	UNIQUE ( stationid, paramid, level, sensor, fromday, today, hour, qcx, fromtime )<br>
+);<br>
+<br>
+<br>
+CREATE TABLE algorithms (<br>
+	language  INTEGER DEFAULT NULL,<br>
+	checkname TEXT NOT NULL,<br>
+	signature TEXT NOT NULL,<br>
+	script TEXT NOT NULL,<br>
+	UNIQUE ( checkname, language )<br>
+);<br>
+<br>
+<br>
+CREATE TABLE reference_station (<br>
+	stationid INTEGER NOT NULL,<br>
+        paramsetid   INTEGER NOT NULL,<br>
+	reference TEXT DEFAULT NULL,<br>
+	UNIQUE ( stationid, paramsetid ) <br>
+);<br>
+<br>
+<br>
+CREATE TABLE timecontrol (<br>
+	fromday	  INTEGER NOT NULL,<br>
+	today	  INTEGER NOT NULL,<br>
+	time      INTEGER NOT NULL,<br>
+	priority  INTEGER NOT NULL,<br>
+	qcx       TEXT NOT NULL,<br>
+	UNIQUE ( fromday, today, time, priority )  <br>
+);<br>
+<br>
+<br>
+CREATE TABLE obs_pgm (<br>
+	stationid INTEGER NOT NULL,<br>
+	paramid	  INTEGER NOT NULL,<br>
+	level	  INTEGER NOT NULL,<br>
+        nr_sensor INTEGER DEFAULT 1,<br>
+	typeid    INTEGER NOT NULL,<br>
+	collector BOOLEAN DEFAULT FALSE,<br>
+	kl00	BOOLEAN DEFAULT FALSE,<br>
+	kl01	BOOLEAN DEFAULT FALSE,<br>
+	kl02	BOOLEAN DEFAULT FALSE,<br>
+	kl03	BOOLEAN DEFAULT FALSE,<br>
+	kl04	BOOLEAN DEFAULT FALSE,<br>
+	kl05	BOOLEAN DEFAULT FALSE,<br>
+	kl06	BOOLEAN DEFAULT FALSE,	<br>
+	kl07	BOOLEAN DEFAULT FALSE,<br>
+	kl08	BOOLEAN DEFAULT FALSE,<br>
+	kl09	BOOLEAN DEFAULT FALSE,<br>
+	kl10	BOOLEAN DEFAULT FALSE,<br>
+	kl11	BOOLEAN DEFAULT FALSE,<br>
+	kl12	BOOLEAN DEFAULT FALSE,<br>
+	kl13	BOOLEAN DEFAULT FALSE,<br>
+	kl14	BOOLEAN DEFAULT FALSE,<br>
+	kl15	BOOLEAN DEFAULT FALSE,<br>
+	kl16	BOOLEAN DEFAULT FALSE,<br>
+	kl17	BOOLEAN DEFAULT FALSE,<br>
+	kl18	BOOLEAN DEFAULT FALSE,<br>
+	kl19	BOOLEAN DEFAULT FALSE,<br>
+	kl20	BOOLEAN DEFAULT FALSE,<br>
+	kl21	BOOLEAN DEFAULT FALSE,<br>
+	kl22	BOOLEAN DEFAULT FALSE,<br>
+	kl23	BOOLEAN DEFAULT FALSE,<br>
+	mon	BOOLEAN DEFAULT FALSE,<br>
+	tue	BOOLEAN DEFAULT FALSE,<br>
+	wed	BOOLEAN DEFAULT FALSE,<br>
+	thu	BOOLEAN DEFAULT FALSE,<br>
+	fri	BOOLEAN DEFAULT FALSE,<br>
+	sat	BOOLEAN DEFAULT FALSE,<br>
+	sun	BOOLEAN DEFAULT FALSE,<br>
+        fromtime TIMESTAMP NOT NULL,<br>
+	UNIQUE ( stationid, paramid, level, fromtime )	<br>
+);<br>
+<br>
+<br>
+CREATE TABLE operator (<br>
+	username TEXT NOT NULL,<br>
+	userid	 INTEGER NOT NULL,<br>
+	UNIQUE (username)<br>
+);<br>
+<br>
+<br>
+CREATE TABLE qcx_info (<br>
+	medium_qcx  TEXT NOT NULL,<br>
+	main_qcx    TEXT NOT NULL,  <br>
+ 	controlpart INTEGER DEFAULT NULL,<br>
+        comment	    TEXT DEFAULT NULL,<br>
+	UNIQUE (medium_qcx)<br>
+);<br>
+<br>
+<br>
+CREATE TABLE key_val (<br>
+	package TEXT NOT NULL,<br>
+	key 	TEXT NOT NULL,<br>
+	val   	TEXT,<br>
+	UNIQUE (package, key)<br>
+); <br>
+<br>
+<br>
+CREATE TABLE stationid_klima (<br>
+        stationid INTEGER NOT NULL,<br>
+        klima    INTEGER DEFAULT NULL,<br>
+        klop     INTEGER DEFAULT NULL,<br>
+        UNIQUE ( stationid )<br>
+);<br>
+<br>
+<br>
+CREATE TABLE param_feltfil (<br>
+	paramid INTEGER NOT NULL,<br>
+	level   INTEGER DEFAULT 0,	<br>
+	feltfil_code    INTEGER NOT NULL,<br>
+	feltfil_vertical_coordinate INTEGER DEFAULT 0,<br>
+	feltfil_level1  INTEGER DEFAULT NULL,<br>
+	feltfil_level2  INTEGER DEFAULT NULL,<br>
+	UNIQUE ( paramid, level, feltfil_vertical_coordinate )<br>
+);<br>
+<br>
+<br>
+<br>
+CREATE TABLE workque (<br>
+       stationid     INTEGER   NOT NULL,<br>
+       obstime       TIMESTAMP NOT NULL,<br>
+       typeid        INTEGER   NOT NULL,<br>
+       tbtime        TIMESTAMP NOT NULL,<br>
+       priority      INTEGER   NOT NULL,<br>
+       process_start TIMESTAMP ,<br>
+       qa_start      TIMESTAMP ,<br>
+       qa_stop       TIMESTAMP ,<br>
+       service_start TIMESTAMP ,<br>
+       service_stop  TIMESTAMP ,<br>
+       UNIQUE(stationid, obstime, typeid)<br>
+);<br>
+<br>
+CREATE INDEX workque_index_priority_stationid_typeid_obstime ON<br>
+workque (priority, stationid, typeid, obstime);<br>
+<br>
+<br>
+CREATE TABLE workstatistik  (<br>
+       stationid     INTEGER   NOT NULL,<br>
+       obstime       TIMESTAMP NOT NULL,<br>
+       typeid        INTEGER   NOT NULL,<br>
+       tbtime        TIMESTAMP NOT NULL,<br>
+       priority      INTEGER   NOT NULL,<br>
+       process_start TIMESTAMP ,<br>
+       qa_start      TIMESTAMP ,<br>
+       qa_stop       TIMESTAMP ,<br>
+       service_start TIMESTAMP ,<br>
+       service_stop  TIMESTAMP ,<br>
+       UNIQUE(stationid, obstime, typeid)<br>
+);<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<hr>
+DOKUMENTASJON AV TABELLENE.<br>
+Terje Reite november 2004.<br>
+<br>
+<br>
+GENERELL OVERSIKT.<br>
+Tabellene kan kategoriseres på 3 forskjellige måter:<br>
+1) den ene er kilden til innholdet i tabellene: runtime - metadata<br>
+2)den andre er model - observasjon<br>
+3)den tredje er hva eksterne brukere trenger: trenger - ikke trenger.<br>
+<br>
+<br>
+1) Kategorisert etter kilden til innholdet i tabellene får vi en <br>
+run_time gruppe og en metadatagruppe.<br>
+På mange måter kan vi oppfatte runtimegruppen som en datagruppe.<br>
+Tabellene i runtimegruppen er: data, text_data, rejectdecode og <br>
+model_data; blant disse er også to views: data_view og text_data_view.<br>
+Tabellene key_val, workque og workstatistik er tabeller til hjelp under runtime.<br>
+<br>
+Tabellene i metadatagruppen er resten av tabellene i databasen.<br>
+<br>
+2)En annen måte å dele tabellene inn etter grupper er etter modell - observasjon.<br>
+da blir tabellen model og model_data i en gruppe og resten av tabellene i en <br>
+annen gruppe. Tabellen model er da en metadata tabell og tabellen model_data er en <br>
+runtime tabell.<br>
+<br>
+3)En tredje måte å dele inn tabellene på er etter hva kundene SYNOP-enkoderen, Klimadatabasen, <br>
+KRO og eventuelle andre trenger<br>
+- kunder trenger ikke vite noe om modelldata, tabellene model_data og model blir <br>
+da uaktuelle<br>
+- kunder trenger ikke vite noe om ikke dekodede data, tabellen rejectdecode <br>
+forsvinner <br>
+- kunder trenger ikke vite noe om metadata og tabeller som har med <br>
+checker og algoritmer, flesteparten av metadatatabellen forsvinner bortsett fra<br>
+types<br>
+param<br>
+station<br>
+<br>
+<br>
+data.<br>
+KILDE: NORCOM, ComObs, AUtoObs, div. etterregistrering.<br>
+HVEM bruker tabellen: Alle moduler.<br>
+BESKRIVELSE av tabellen: Inndata meldinger blir parset til observasjoner og plassert her.<br>
+BESKRIVELSE av attributtene i tabellen:<br>
+stationid: Kvalobs-internt stasjonsnummer, se tabellen station.<br>
+obstime: Observasjonstermin. Tidspunkt for observasjonens gyldighet.<br>
+original: Observert parameterverdi<br>
+paramid: Kvalobs-internt parameternummer, se tabellen param.<br>
+tbtime: Tidspunkt for når raden ble generert i Kvalobsdb.<br>
+typeid: Se tabellen types.<br>
+sensor: Sensornummer der samme parameter observeres ved flere sensorer.<br>
+	I klimadatabasen er sensor en del av parameteren, det er den <br>
+	ikke i kvalobs.<br>
+level: Sensors høyde målt i forhold til bakkenive der samme parameter kan <br>
+       observeres i ulik høyde eller dybde. Defaultverdi er lik tallet 0. Hva defaultverdien<br>
+       egentlig er ligger utenfor kvalobs. <br>
+<br>
+Systemet virker slik at defaultverdien er symbolsk og satt lik 0, alle de andre høydene <br>
+er fysiske.<br>
+<br>
+Siden 0 er potensielt aktuelt å måle, så må den situasjonen også håndteres.<br>
+Løsningene som skal velges skal velges i følgende rekkefølge der 1) skal velges først osv. <br>
+Den første løsningen beskrevet her sier at dette rett og slett ikke er noe problem.<br>
+1) Det mest vanlige i de situasjoner der 0 er aktuelt å måle er faktisk at 0 er default. <br>
+   Dermed er default 0 ikke noe problem siden det sammenfaller med den fysiske verdien. <br>
+   Grunnen at vi i praksis har denne situasjonen er at det fysiske mediumet vi <br>
+   måler i er en del av parameterdefinisjonen i tillegg til den fysiske størrelsen.<br>
+2) En måler ikke i 0 meter, en kan måle i 0.0001 meter over bakken eller -0.0001 meter <br>
+   under bakken, legg merke til at dette er to forskjellige parametere siden de er målt i <br>
+   to forskjellige medium.<br>
+3) En kan dersom ikke noe annet nytter eller det har en fysikalsk begrunnelse definere en<br>
+   ny parameter ( temperaturen på 0 meter er vel ikke akkurat temperaturen i lufta, <br>
+   men den er heller ikke i bakken, den er en overflatetemperatur på bakken) <br>
+<br>
+   Målenheten for level er meter ganget med en <br>
+   skaleringsfaktor. Eksponenten til denne skaleringsfaktor heter<br>
+   level_scale og finnes i tabellen param. Verdien i meter tolkes slik:<br>
+   level*10 opphøyd i level_scale.<br>
+corrected: Observert verdi evt. endret i kontrollene.<br>
+controlinfo: Kodet informasjon om resultatet av kontrollene, koden er 64 bit.<br>
+useinfo: Kodet kvalitetsinformasjon om observasjonen, koden er 64 bit.<br>
+cfailed: tester som har gitt utslag; syntaksen for denne kolonnen er<br>
+         qcx:language i en kommaseparert liste der en får verdiene i fra tabellen checks.<br>
+<br>
+<br>
+text_data.<br>
+KILDE: INTERN.<br>
+HVEM bruker tabellen: Alle moduler.<br>
+BESKRIVELSE av tabellen: Inndata blir parset og plassert her.<br>
+     Poenget med denne tabellen er at det er noen data som ikke er tall. <br>
+     Denne tabellen er en variant av tabellen data og skal ved hjelp<br>
+     av et view sees på som en tabell sammen med tabellen data.  <br>
+     Dette viewet er en måte å se på at dataene data og text_data i en <br>
+     felles tabell(view) der dataene fra disse tabellene knyttes sammen<br>
+     med å være fra samme melding.<br>
+     En melding har stationid og obstime som en nøkkel.<br>
+         <br>
+stationid: Kvalobs-internt stasjonsnummer, se tabellen station.<br>
+obstime: Observasjonstid. Tidspunkt for observasjonens gyldighet.<br>
+original: Observert parameterverdi, tekststring som beskriver en signatur<br>
+          eller kode.<br>
+paramid: Kvalobs-internt parameternummer, se tabellen param.<br>
+tbtime: Tidspunkt for når posten ble generert i Kvalobsdb.<br>
+typeid: se tabellen types.<br>
+<br>
+<br>
+VIEW data_view<br>
+KILDE: tabellene data og text_data<br>
+BESKRIVELSE av viewet:<br>
+Outer join der en får med alle kolonner fra datatabellen og de kolonnene <br>
+i text_data tabellen som har felles stationid og paramid med data_tabellen.<br>
+<br>
+VIEW text_data_view<br>
+KILDE: tabellene data og text_data<br>
+BESKRIVELSE av viewet:<br>
+Outer join der en får med kolonner fra text_data tabellen<br>
+som ikke har felles stationid og paramid med data_tabellen.<br>
+<br>
+<br>
+<br>
+rejectdecode.<br>
+KILDE: INTERN<br>
+HVEM bruker tabellen: Modul for innlesning og diverse.<br>
+BESKRIVELSE av tabellen: Meldinger som kommer inn og som ikke kan dekodes.<br>
+message: Melding som har kommet inn og som ikke kunne dekodes<br>
+tbtime: Tidspunkt for når message ble lagret i Kvalobsdb.<br>
+decoder: Beskriver hvilken dekoder som er brukt <br>
+comment: kommentar. F.eks. tekst som beskriver hvorfor meldingen ble forkastet.<br>
+<br>
+<br>
+model_data.<br>
+KILDE: Pseudodata, fra modeller.<br>
+HVEM bruker tabellen: Prognostisk romkontroll (QC1-4) og HQC.<br>
+BESKRIVELSE av tabellen: Inndata fra modell-beregningene tilsvarende<br>
+observerte verdier, et eksempel her er HIRLAM.<br>
+BESKRIVELSE av attributtene i tabellen:<br>
+stationid: Kvalobs-internt stasjonsnummer, se tabellen station.<br>
+obstime: Observasjonstid. Tidspunkt for observasjonens gyldighet.<br>
+paramid: Kvalobs-internt parameternummer, se tabellen param.<br>
+level: Nivå der samme parameter observeres i ulik høyde eller dybde.<br>
+original: Beregnet parameterverdi.<br>
+modelid: En id som indikerer hvilken modell det er, jfr. tabellen model.<br>
+<br>
+<br>
+model<br>
+KILDE: METADATA, manuelt inntastet.<br>
+HVEM bruker tabellen: tabellen model_data<br>
+BESKRIVELSE av tabellen: Dette er en tabell for hvilken modell modelid i tabellen <br>
+                         model_data svarer til.<br>
+modelid: Betegnelse på modell gitt som integer. <br>
+name: navnet på modellen, f. eks. hirlam10 og EC240.<br>
+comment: kommentar.<br>
+<br>
+<br>
+types.<br>
+KILDE: METADATA, fra ST_INFO_SYS.<br>
+HVEM bruker tabellen: Data.<br>
+BESKRIVELSE av tabellen: Dette er en tabell for attributten typeid i tabellene <br>
+                         data og text_data.<br>
+BESKRIVELSE av attributtene i tabellen:<br>
+typeid: Et tall som identifiserer typiske trekk ved dataene fra en værstasjon som skyldes <br>
+	forskjellig avlesning, formatet som er brukt ved overføring/forsendelse av dataene og <br>
+        registrering av den avleste informasjonen fra samme sensor.<br>
+	Dette betyr at samme observasjon er blitt avlest forskjellig, men <br>
+	med samme sensor/måleinstrument og er sendt inn eller registrert forskjellig. <br>
+	Et eksempel på dette er at samme observasjon kan foreligge i flere ulike<br>
+	formater der presisjonen er forskjellig eller avlesningen er gjort ved <br>
+	litt forskjellig tidspunkt. Et annet eksempel er at samme måleinstrument<br>
+        avleses manuelt eller ved hjelp av automatstasjon.<br>
+<br>
+	De 4 første sifferne er den egentlige typeid, det 5. sifferet har med om <br>
+	det er avledet verdi eller ikke, er den avledet verdi så har det en verdi <br>
+	større en null, verdien er 1 for aggregerte verdier.<br>
+format: Navnet på meldingsformatet. Som eksempel har vi:<br>
+	autoobs<br>
+	dagbok<br>
+	metar<br>
+	miljødata<br>
+	pluviometerdata<br>
+	ship<br>
+	SMS meldingsformat <br>
+	synop<br>
+	ukekort<br>
+<br>
+earlyobs: INTEGER - tidsgrense i minutter for at en melding er &aring; betrakte som kommet for tidlig<br>
+lateobs:  INTEGER - tidsgrense i minutter for at meldingen er &aring; betrakte som kommet for sent<br>
+read: Dette har med hvordan observasjonen er avlest og vi har da 3 typer:<br>
+      M = Manuell, A = Automatisk, I = (Kvalobs)Intern.<br>
+obspgm: observasjonsprogrammet, er det time eller minutt.<br>
+comment: kommentar.<br>
+<br>
+<br>
+generated_types<br>
+KILDE: METADATA, fra ST_INFO_SYS.<br>
+HVEM bruker tabellen: Data.<br>
+BESKRIVELSE av tabellen: Dette er en tabell som viser hvilke stationid, paramid kombinasjoner av en typeid som er genererte<br>
+BESKRIVELSE av attributtene i tabellen:<br>
+stationid: se tabellen station<br>
+typeid:    se tabellen types<br>
+<br>
+<br>
+param.<br>
+KILDE: METADATA, fra ST_INFO_SYS.<br>
+HVEM bruker tabellen: Alle moduler<br>
+BESKRIVELSE av tabellen: Kode og beskrivelse for observerte værparametere<br>
+BESKRIVELSE av attributtene i tabellen:<br>
+paramid:  Kvalobs-internt parameternummer. Se eget dokument.<br>
+name: Parameterkode, det er et en-entydig forhold mellom kolonnene<br>
+      paramid og name.<br>
+description: Parameterbeskrivelse<br>
+unit: Måleenhet for parameteren<br>
+level_scale: Dette er en 10'er eksponent skala til level for denne <br>
+              parameteren, denne styrer hvordan level i tabellen<br>
+              data skal tolkes.<br>
+ 	      Da vil vi for meter ha verdien 0,<br>
+	      for cm vil vi ha -2<br>
+	      for km vil vi ha 3 osv.<br>
+comment: Tilleggstekst om spesielle forhold ved parameteren.<br>
+<br>
+<br>
+station.<br>
+KILDE: METADATA, fra ST_INFO_SYS.<br>
+HVEM bruker tabellen: Alle modulene<br>
+BESKRIVELSE av tabellen:<br>
+Denne tabellen inneholder informasjon om stasjonene.<br>
+BESKRIVELSE av attributtene i tabellen:<br>
+stationid:  Kvalobs-internt stasjonsnummer. Tallet 0 er forbeholdt å brukes som verdi i <br>
+	   tabellene checks og station_param som et flagg i betydningen alle stasjoner. <br>
+           Ingen stasjoner kan ha stationid 0.<br>
+<br>
+   1) Norske stasjoner.<br>
+	Norske stasjoner som har nationalnr får dette som stationid.<br>
+	Dette er da et tall på 5 siffere i intervallet [60,99999].<br>
+	Denne er ikke beskrevet i stationstr.<br>
+<br>
+   2) Utenlandske stasjoner med wmonr.<br>
+	Her tar en wmonr og legger til 2 nuller bakerst.<br>
+	<br>
+   3) Stasjoner som ikke faller inn under 1) eller 2) har stationid<br>
+      sekvensielt valgt fra tallverdier større enn +10 000 000.<br>
+           <br>
+lat: breddegrader måles i det samme system som diana, nemlig i desimalgrader.<br>
+lon: lengdegrader måles i det samme system som diana, nemlig i desimalgrader.<br>
+height: dette er høyden over havet målt i meter.<br>
+maxspeed: maximum farten til fartøyet, måles i m/s<br>
+name:  Stasjonsnavn.<br>
+       For alle stasjoner som hverken har nationalnr eller wmonr bruker vi samme <br>
+       struktur som beskrevet i stationstr.<br>
+wmonr: Stasjonsnummer inkl. områdenummer benyttet i synopmeldinger, <br>
+       fem siffer. De to første sifferne er områdenummer, de 3 siste<br>
+       er stasjonsnummer. Vi har kun lagret stasjoner som er gyldige i dag.<br>
+nationalnr: Stasjonsnummer benyttet i Klimadatabasen, fem siffer.<br>
+	    Verdiene [60,99999] er norske stasjoner. Verdiene [1,59]<br>
+            brukes i klimadatabasen til deres egen nummerering av<br>
+            utenlandske stasjoner, disse verdiene bruker vi ikke i <br>
+            kvalobsdatabasen.<br>
+ICAOid: Stasjonsbetegnelse benyttet i METAR-meldingene, fire karakterer.<br>
+call_sign: Stasjonsbetegnelse benyttet for båter i SHIP-meldinger, <br>
+            syv karakterer. <br>
+stationstr: For alle andre muligheter enn de overfor nevnte. <br>
+            Kodingen er her omr&aring;denummeret (d.e. de to f&oslash;rste sifferne) <br>
+            i wmonr ; og til slutt det originale nummer. Dersom<br>
+            ikke dette er entydig så kan en bruke firmanr eller organisasjonsnr i <br>
+            tillegg først etter wmonr med en semikolon i mellom. <br>
+	    Eks.<br>
+            XX = de to første sifferne i wmonr<br>
+            YY = firmakode eller organisasjonsnr<br>
+            NN = originalkode<br>
+            kodingen blir dermed: XX;NN eller XX;YY;NN<br>
+environmentid: En id som refererer til observasjonsmiljøet på stasjonen.<br>
+	environment  environmentid  environmentdescription<br>
+	FLY		1		Flyplass<br>
+	LANDBRUK	2		Landbruksfelt<br>
+	LOKALKLIMA	3		Lokalklima(oppstilling)<br>
+	MAR_M		4		Oljerigg(bevegelig)<br>
+	MAR_P		5		Oljeplattform<br>
+	MAR_S		6		Skip<br>
+	MAR_V		7		Værskip<br>
+	METNO		8		Områderepresentativ (land) - værstasjon<br>
+	NEDB		9		Nedbøroppstilling<br>
+	NEDB_OPPS	10		Nedbøroppstilling for oppsamling	<br>
+	T		11		Turistforeningshytte, etc<br>
+	VEG		12		Vegmiljø<br>
+	<br>
+static : boolsk variabel, default false; er bare true for de stasjoner som er <br>
+          manuelt godkjent. Aktuelt i første omgang for <br>
+          skip som bare legges inn automatisk i denne tabellen - <br>
+          de får dermed static lik false. Har static verdien false så kan <br>
+          disse radene i tabellen risikere å bli slettet ved  <br>
+          automatiske rutiner.<br>
+fromtime: Tiden fra dataene for denne stasjonen gjelder;            <br>
+          det betyr at det ikke nødvendigvis er tiden fra<br>
+          stasjonen ble opprettet.<br>
+<br>
+<br>
+environment.<br>
+KILDE: METADATA, basert på analyse av type_begrepet i klimadatabasen.<br>
+HVEM bruker tabellen: station<br>
+BESKRIVELSE av tabellen:<br>
+Denne tabellen inneholder en beskrivelse av forskjellige typer miljø for en stasjon.<br>
+BESKRIVELSE av attributtene i tabellen:<br>
+environmentid: et id nummer til tabellen environment som sier noe om observasjonsmiljøet på stasjonen<br>
+name: navnet på miljøet, en alfanumerisk navnekode<br>
+use: hva dataene kan brukes til<br>
+description: Beskrivelse av miljøet på stasjonen<br>
+<br>
+<br>
+checks.<br>
+KILDE:  METADATA, våre egne.<br>
+	Det er 2 hovedmåter tabellen checks mottar metadata på:<br>
+	1) Automatisk<br>
+	Metadataene i checkene er automatisk generert for disse filene og styres i fra station_param og et<br>
+        template for checken som gjør at en får autogenerert hvilke parametere den gjelder for.<br>
+	2) Manuelt<br>
+	Manuell punching av checks metadata i små filer som deretter leses inn i <br>
+      	databasen ved hjelp av et script.<br>
+ <br>
+HVEM bruker tabellen: QABase<br>
+BESKRIVELSE av tabellen: Holder rede på filnavn, type sjekk og qcx verdi for sjekker.<br>
+stationid: Kvalobs-internt stasjonsnummer, den stasjonen som en tester. Her skal <br>
+	0 bety at testen gjelder for alle stasjoner i tabellen station;<br>
+	se "OVERSIKT OVER stationid=0" nederst.<br>
+qcx : Hva slags kontroll. <br>
+      Datatypen er her en streng. Beskrivelsen er gitt i eget dokument. <br>
+      Eks. for tester for <br>
+      QC1-2 så benytter vi QC1-2 som prefiks i dette feltet.<br>
+      Vi kan slik fullstendig identifisere kontrollen i forhold til det<br>
+      som er i dokumentet, slik som qc1-2-311a.<br>
+medium_qcx: Kontrolltype, f.eks. 'QC1-1', 'QC1-2'. Avgj&oslash;r hvilket <br>
+      av kontrollflaggene som sjekken oppdaterer. Jfr. tabellen qcx_info.<br>
+language: er kode for språk slik som  perlscript, C-kode.<br>
+checkname: er navn på script lagret i tabellen algorithms.<br>
+checksignature: realiseringen av signature i tabellen algorithms.<br>
+      Her er det vesentlig at det som bare er en variabel for parameterne<br>
+      i algorithms faktisk har et navn fra kolonnen name i tabellen param<br>
+      og at metadataene faktisk finnes med det navnet de har i tabellen <br>
+      station_param. Disse signaturene i checksignature er ofte autogenererte<br>
+      ved hjelp av en mal som parameterne fylles inn i, men ikke alltid.<br>
+active: Defaultteksten '* * * * *' betyr at sjekken alltid skal kjøre når <br>
+        dataene kommer inn. Første asterisk angir minutt, andre time, tredje dag,<br>
+        fjerde måned, femte firesifret år. Komma kan angi flere forekomster.<br>
+        eks.<br>
+        5,10 * * * * betyr at sjekken skal kjøres 5 og 10 minutter over hver time.<br>
+fromtime: Tiden fra dataene for denne tabellen gjelder<br>
+<br>
+<br>
+station_param.<br>
+KILDE:  METADATA, eksterne og våre egne. Denne tabellen har mange externe kilder, <br>
+	men kjernen i mottakssystemet forholder seg bare til filer. <br>
+	Det er 2 hovedmåter tabellen station_param mottar metadata på: <br>
+<br>
+      1) Automatisk, stort sett eksterne.<br>
+      Det mottas station_param metadata fra tegnseparerte filer der hver kolonne skal transformeres/leses<br>
+      inn som en rad i databasen. Filer på formatet stationid paramid tid + metadata eller<br>
+      bare paramid tid + metadata. For nærmere beskrivelse av dette og for "tid" <br>
+      jfr. dokumentet Dokumentasjon.dbQC.pl. Disse filene legges inn under <br>
+      station_param_auto. Det som kjennetegner disse filene er at de er verktøy/datamaskingenerert og <br>
+      representerer ikke punching fra mennesker. Disse filene er store, og har relativt enkel struktur. <br>
+      Det er ofte stasjonsavhengigheter i metadataene for disse filene, noe som gir store <br>
+      metadatamengder/store filer for station_param metadata.<br>
+      Metadataene i checkene er automatisk generert for disse filene og styres fra station_param og et<br>
+      template for checken som gjør at en får autogenerert hvilke parametere den gjelder for.<br>
+<br>
+      2) Manuell, våre egne.<br>
+      Manuell punching av station_param metadata i små filer som deretter leses inn i <br>
+      databasen ved hjelp av et script. De tilsvarende sjekkene i checks må også der som regel punches <br>
+      inn fordi de ofte er så kompliserte eller de gjelder for så få parametere at en templateløsning <br>
+      har liten hensikt.<br>
+     <br>
+Under maskingenererte filer har vi flere leverandører og foreløpig to: <br>
+  1) Metadataene er beregnet ut fra hva som finnes i klimadatabasen.<br>
+  2) Metadata er beregnet fra modellkj&oslash;ringer og levert fra FoU-div.<br>
+<br>
+HVEM bruker tabellen: Kontrollmodulene<br>
+BESKRIVELSE av tabellen: Metadata til sjekkene i tabellen checks.<br>
+BESKRIVELSE av attributtene i tabellen:<br>
+stationid: Kvalobs-internt stasjonsnummer, se tabellen station.<br>
+	   Her skal 0 bety at metadataene gjelder for alle stasjoner;<br>
+	   se "OVERSIKT OVER stationid=0" nederst.<br>
+paramid: Kvalobs-internt parameternummer, se tabellen param.<br>
+level: se tabellen data.<br>
+sensor: se tabellen data<br>
+fromday: Fra og med hvilken dag i året metadataene gjelder<br>
+today: Til og med hvilken dag i året metadataene gjelder<br>
+hour: time på døgnet metadataene gjelder, -1 er default og det betyr at metadatene<br>
+      gjelder for alle timer i døgnet.<br>
+qcx : Hva slags kontroll. Se tabellen checks. <br>
+metadata: Informasjon som skal brukes til kontroll av observasjoner, vil v&aelig;re <br>
+	  avhengig av b&aring;de stasjon og parameter.<br>
+<br>
+Dette er formatet på metadataene til kvalobsdatabasen. <br>
+<br>
+Vi lagrer dataene i en tabell struktur<br>
+der første linje uttrykker kolonnenavn og linjene under er <br>
+rader til denne "tabellen".<br>
+navn1; ...; navnm <br>
+verdi11; ...; verdi1m<br>
+..<br>
+..<br>
+verdin1; ...; verdinm<br>
+<br>
+En har her en databasestruktur og det er fort <br>
+å endre metadataene dersom en har mange nedover som har samme struktur. <br>
+<br>
+Eksempel der tallverdiene er helt vilkårlige,<br>
+bare laget for å illustrere strukturen på et filformat:<br>
+<br>
+  høyde;max;min;frozen;dip<br>
+  2;5;2;3;4<br>
+  10;6;1;3;4<br>
+  50;7;-10;5;7<br>
+<br>
+  no;step;me<br>
+  2;5;2<br>
+  10;6;1<br>
+  50;7;1<br>
+<br>
+desc_metadata: Beskrivelse av hva metadataene er for noe.<br>
+fromtime: Tiden fra dataene for denne raden gjelder.<br>
+<br>
+algorithms<br>
+KILDE:  METADATA, våre egne.<br>
+HVEM bruker tabellen: QABase<br>
+BESKRIVELSE av tabellen: lagrer skript, dette er en skripttabell.<br>
+Det er nødvendig å ha denne tabellen i tillegg til checks fordi vi <br>
+blant annet har situasjoner der samme algoritme er benyttet for flere sjekker. <br>
+BESKRIVELSE av attributtene i tabellen:<br>
+language: er kode for skriptspråk. language = 1 tilsvarer  perlskript.<br>
+checkname: er navn på skriptet.<br>
+signature: signaturen til parametere, metadata og variabelnavn som en trenger<br>
+           til scriptet. <br>
+      Antall parametere for tester med flere parametere finnes her.<br>
+      Antall stasjoner  for tester med flere stasjoner finnes her.<br>
+      Numeriske modell-verdier er pseudodata som behandles tilsvarende<br>
+      som for data.     <br>
+script: koden for skriptet.<br>
+<br>
+<br>
+reference_station<br>
+KILDE:  METADATA, våre egne<br>
+HVEM bruker tabellen: Den brukes av det scriptet som skal<br>
+                      preprosessere kolonnene til checks.<br>
+BESKRIVELSE av tabellen:<br>
+BESKRIVELSE av attributtene i tabellen:<br>
+stationid: Kvalobs-internt stasjonsnummer, dette er stasjonen det skal <br>
+           tas referanser i forhold til<br>
+paramsetid: Dette er en gruppe parametere som er definert i tabellen<br>
+            paramset.<br>
+reference: kommaseparert liste av stationid for referansestasjonene.<br>
+<br>
+<br>
+<br>
+timecontrol<br>
+KILDE:  METADATA, våre egne.<br>
+HVEM bruker tabellen: Den som kontrollerer arbeidet.<br>
+BESKRIVELSE av tabellen: Denne tabellen er foreløpig bare for QC2 tester. <br>
+		Denne tabellen er for tidskontroll for når testene<br>
+                skal kjøres. Det som skjer er at en gang i timen<br>
+                så sjekker datamaskinen om noen tester skal kjøres.<br>
+                Dersom en får tilbake noe fra spørring til fromday, today<br>
+                og time så kjører en den med høyest prioritet. En får<br>
+                en bedre ytelse dersom testene lastes inn en gang i døgnet<br>
+                fra databasen til programmet. <br>
+BESKRIVELSE av attributtene i tabellen:<br>
+fromday: Fra og med hvilken dag i året testen gjelder<br>
+today: Til og med hvilken dag i året testen gjelder<br>
+time: Hele time for når testen skal kjøres<br>
+priority: Prioritering av rekkefølge for når testene skal kjøres;<br>
+          laveste tall har høyest prioritet. Vi begynner å telle fra og med 1<br>
+          og oppover.<br>
+qcx: Hva slags kontrolltype, se tabellen checks.<br>
+<br>
+<br>
+<br>
+obs_pgm <br>
+KILDE: METADATA, fra ST_INFO_SYS. <br>
+HVEM bruker tabellen:<br>
+ QABases modul for manglende observasjoner <br>
+BESKRIVELSE av tabellen:<br>
+Denne tabellen er observasjonsprogrammet for stasjoner som observerer ved <br>
+hele timer (minutt=00).<br>
+Observasjonsprogrammet styrer  når en parameter observert på en <br>
+stasjon skal kontrolleres. Ikke alle parametere blir observert for alle<br>
+terminer. En stasjon (observatør) trenger<br>
+heller ikke å observere for alle terminer. obs_pgm tabellen angir <br>
+når en parameter blir observert og brukes for å finne ut om en observasjon <br>
+mangler.<br>
+En observasjon mangler når en kombinasjon av stationid, paramid, level og sensor <br>
+ikke finnes. Da setter en inn en verdi fra obs_pgm for typeid. Dersom en <br>
+kombinasjon av  stationid, paramid, level og sensor ikke finnes så velger en ut<br>
+verdien for typeid i obs_pgm som verdien for denne manglende observasjonens typeid.<br>
+BESKRIVELSE av attributtene i tabellen: <br>
+stationid: Kvalobs-internt stasjonsnummer, se tabellen station. <br>
+paramid: Kvalobs-internt parameternummer, se tabellen param.<br>
+level: Nivå der samme parameter observeres i ulik høyde eller dybde,<br>
+       se tabellen data.<br>
+nr_sensor: antall  sensorer for en gitt kombinasjon av paramid, stationid og <br>
+           level (for en gitt fromtime). Siden sensor bare er et tall med <br>
+           verdi fra 0 til 9 så angir nr_sensor forventede verdier for sensor <br>
+           i tabellen data.<br>
+           Hvis f.eks. nr_sensor har verdien 3, så har stasjonen 3 sensorer numerert <br>
+           0, 1, og 2. Hva disse tallene betyr er ikke definert i kvalobs. <br>
+typeid: prioritert typeid som settes inn når noe mangler, se tabellen types. <br>
+collector: Observasjonen kan komme til ulike tider, men er ikke p&aring;krevet.<br>
+	Operasjonelt så betyr dette at hvis collector er sann så trenger en ikke<br>
+        sjekke innsamlingstidspunkt, det er alltid OK.<br>
+kl00 - kl23: Observasjonstidspunkt.<br>
+mon - son: Observasjonsdag.<br>
+fromtime: Tiden fra dataene i denne raden gjelder<br>
+<br>
+<br>
+<br>
+operator<br>
+KILDE: METADATA, våre egne - username skal stemme med ldap-brulernavnet<br>
+HVEM bruker tabellen: hqc<br>
+BESKRIVELSE av tabellen: Holder rede på sammenhengen mellom username og userid,<br>
+                         inneholder hvilke hqc operatører som har lov til å <br>
+                         justere data og sette flagg.<br>
+username: Brukernavnet til hqc-operatøren slik det er gitt i LDAP serveren.<br>
+userid: en id til brukernavnet, integer.<br>
+<br>
+<br>
+qcx_info<br>
+KILDE:  METADATA, våre egne.<br>
+HVEM bruker tabellen: QABase<br>
+HVEM opdaterer tabellen: Den samme som oppdaterer flaggene, og er ansvarlig <br>
+                         for flaggsetting i QABase.<br>
+BESKRIVELSE av tabellen: Holder rede på sammenhengen mellom kontroller p&aring; overordnet niv&aring;<br>
+medium_qcx: 'QC1-1', 'QC1-2' osv.<br>
+main_qcx: 'QC1', 'QC2d', 'QC2m', 'HQC'<br>
+controlpart: Hvilken del av controlinfo i tabellen data som blir oppdatert (0-15). <br>
+comment: beskrivelse av sjekken.<br>
+<br>
+<br>
+key_val<br>
+KILDE: INTERN<br>
+HVEM bruker tabellen: runtimesystemet<br>
+BESKRIVELSE av tabellen: Hjelpetabell som brukes av runtimesystemet, <br>
+ingen mennesker skal putte noe inn her. Jfr. systemdokumentasjonen.<br>
+BESKRIVELSE av attributtene i tabellen:<br>
+package: namespace for å beskrive område/modul og er en del av nøkkelen, package brukes <br>
+         for å lagre namespace. Et eksempel her er at alle nøkler for 'manageren' kan ha package 'kvManagerd'.<br>
+	 key's som er gyldig for alle modulene kan ha package 'kvalobs'.<br>
+key:     nøkkel sammen med package, en må oppfatte key som en subnøkkel for en gitt package<br>
+value:   verdi for en vilkårlig key.<br>
+<br>
+<br>
+stationid_klima<br>
+KILDE:  METADATA, fra ST_INFO_SYS.<br>
+HVEM bruker tabellen:<br>
+Hele Meteorologisk institutt, deriblant kvalobs.<br>
+BESKRIVELSE av tabellen:<br>
+Denne tabellen brukes til å finne sammenhengen mellom koden for en stasjon<br>
+i klimadatabasen og i kvalobs.<br>
+stationid: Kvalobs-internt stasjonsnummer, se tabellen station.<br>
+klima: klimadatabasens gamle system for utenlandske stasjoner<br>
+klop: klimadatabasens nye system for utenlandske stasjoner <br>
+<br>
+<br>
+<br>
+param_feltfil<br>
+KILDE:  METADATA, fra ST_INFO_SYS.<br>
+HVEM bruker tabellen:<br>
+Hele Meteorologisk institutt, deriblant kvalobs.<br>
+BESKRIVELSE av tabellen:<br>
+Denne tabellen brukes til å finne sammenhengen mellom koden for en parameter<br>
+i en feltfil og i kvalobs.<br>
+paramid: Kvalobs-internt parameternummer, se tabellen param.<br>
+level:  Nivå der samme fysiske parameter observeres i ulik høyde eller dybde<br>
+        målt i meter. For værkoder derimot er dette en tidsparameter som har en<br>
+        ubestemt verdi innenfor et bestemt tidsintervall. <br>
+feltfil_paramid: dette er en kode som er paramid for parameteren<br>
+feltfil_vertical_coordinate: dette sier noe om hvilken type vertikal koordinat<br>
+                             vi har.<br>
+feltfil_level1: dette er høyde nivået for parameteren.<br>
+feltfil_level2: dette er høyde nivå parameteren i de tilfellene parameteren<br>
+                beskriver et område mellom to høydeflater. <br>
+<br>
+<br>
+<br>
+<br>
+<br>
+paramset<br>
+Informasjonen om innholdet skal ligge i script.create_doc;<br>
+det skal lages en egen fil som vil fungere som bibliotek,<br>
+denne filen ligger i /kvalobs/src/lib/kvalobs/<br>
+paramset er ikke lenger noen tabell, derimot er det et bibliotek<br>
+Biblioteket brukes for &aring; gruppere parametere.<br>
+paramid: Kvalobs-internt parameternummer, se tabellen param.<br>
+paramsetid: en id for en gruppe av parametere, rader med felles paramsetid<br>
+            tilhører samme gruppe.<br>
+Kategoriseringer om sammenhengen paramid og paramsetid sortert<br>
+etter paramsetid:<br>
+INGEN INFORMASJON ER FOREL&Oslash;PIG SATT INN<br>
+<br>
+<br>
+OVERSIKT OVER stationid=0.<br>
+Mange tabeller som har stationid kan ha denne lik 0.<br>
+Disse tabellene er:<br>
+checks<br>
+station_param<br>
+<br>
+I tabellen obs_pgm kan ikke stationid være 0.<br>
+<br>
+Så hva betyr det at stationid=0 i checks og station_param?<br>
+Jo, det betyr at en henviser til en annen tabell for å vise hvilke<br>
+stasjoner som sjekken gjelder for.  Tabellen checks henviser til<br>
+station_param og tabellen station_param henviser til tabellen obs_pgm.<br>
+<br>
+Dette gir følgende rekkefølge i programmet under runtime:<br>
+1) En slår opp i tabellen checks for å finne ut hvilke tester som skal<br>
+kjøres, og hvilke metadata de trenger og hvilke stasjoner de skal kjøres<br>
+for. stationid=0 betyr her at hvilke stasjoner sjekken skal kjøres for<br>
+styres fra station_param. Dersom stationid er forskjellig fra 0 i<br>
+checks så er det checks som styrer hvilke stasjoner som sjekken skal<br>
+kjøres for.<br>
+Hva skjer dersom en både har stationid = 0 og stationid <> 0 for samme qcx i <br>
+tabellen checks?<br>
+<br>
+2) Etter å ha slått opp i checks så slår en opp i tabellen station_param.<br>
+ Dersom stationid er forskjellig<br>
+fra 0 i station_param så er det station_param som styrer hvilke<br>
+sjekker som skal kjøres. Dersom stationid=0 i station_param så må en<br>
+slå opp i tabellen obs_pgm for å se hvilke stasjoner sjekken skal kjøre for.<br>
+<br>
+Men en står overfor samme problemstilling i station_param som den en<br>
+hadde for checks: Hva skjer dersom en både har stationid = 0 og stationid <> 0 for samme qcx i <br>
+tabellen station_param?<br>
+Det valget som er gjort er følgende:<br>
+<br>
+En spesifikk stationid har forrang for stationid=0; Først kjøres alle sjekker med <br>
+spesifikk stationid, deretter blir de stasjonene som ikke har noen spesifikk stationid <br>
+styrt av stationid=0. For station_param betyr det at disse henvises<br>
+til og styres av obs_pgm. Spesifikk stationid betyr en stationid forskjellig fra null.<br>
+<br>
+<br>
+<br>
+samarbeid program database:<br>
+<img src="images/UML_samarbeid_program_database.gif"></td> 
+   <!--#include file="footer.shtml" --> 
+
+
+<!-- Created: Fri Aug 30 14:03:08 GMT 2002 -->
+<!-- hhmts start -->
+Last modified: 3/1 14:35:3 GMT 2005
+    </table>
+<!-- hhmts end -->
+</html>

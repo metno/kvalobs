@@ -1,0 +1,15 @@
+#Orginalskript debian_files/kvcron
+#Alle endringer bør gjøres i orginalskripet!!!
+
+MYBIN=/usr/lib/kvalobs/bin
+LOG=/var/log/kvalobs
+TZ=UTC
+
+30 5,11,17,23 * * * $MYBIN/lam2kv.cron %
+15 * * * * /usr/bin/qabase_log_cleanup > /dev/null 2>&1  %
+25 0 * * * /usr/bin/kvdbadmin %
+5  1 * * * $MYBIN/synopdecoder_cron.sh %
+#*/5 * * * * $MYBIN/check_kvsynopd.sh >> $LOG/check_kvsynopd.log %
+30 6 1 * * $MYBIN/save_last_month.sh
+#25 3,21 * * * /usr/bin/kvrestart kvQabased > /dev/null 2>&1 %
+*/5 * * * * $HOME/bin/synop_from_murky.sh > $LOG/synop_from_murky.log 2>&1 %

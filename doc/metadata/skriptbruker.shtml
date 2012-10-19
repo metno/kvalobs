@@ -1,0 +1,310 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<!--#include file="header.shtml"-->
+  <title>skriptbruker</title>
+</head>
+<body>
+<p> </p>
+<h1>FRAMGANGSM&Aring;TE -<br>
+GODKJENNINGSKJ&Oslash;RINGER AV SKRIPT</h1>
+<p>&nbsp;</p>
+<b>Oppdatert 18. oktober 2006 av &Oslash;ystein Lie</b> <br>
+<br>
+<br>
+Det forutsettes at skriptene er blitt overf&oslash;rt til kvalobsdb
+p&aring; testmaskinen (per dags dato 'rime')<br>
+<a href="http://kvalobs/metadata/bruker_oppdatering_metadata.html">-&gt;
+Veileder for overf&oslash;ring av skript til kvalobsdb p&aring; rime
+for godkjenningskj&oslash;ringer</a><br>
+<br>
+<ul>
+  <li>&Aring;pne opp 3 x-term-vinduer. Skriv 'ssh -X kvalobs@rime' med
+passord p&aring; hver.</li>
+</ul>
+I det f&oslash;rste vinduet redigerer vi oppsettsfilen, typisk
+'<span style="font-weight: bold;">&lt;mitt_navn&gt;_run_check.dat</span>'
+(se lenger ned).<br>
+Alternativt kan man bare redigere eksisterende <span
+ style="font-weight: bold;">run_check.dat</span>.<br>
+Oppsettsfilen inneholder tidsperioden for godkjenningskj&oslash;ringen,
+typeid for dataene
+og hvilke(n) stasjon(er) det skal testes p&aring;.<br>
+<br>
+I det andre vinduet kan vi f&oslash;lge med p&aring; loggen etter
+referansekj&oslash;ring og testkj&oslash;ring.<br>
+I det tredje vinduet starter vi Qabase som styrer kj&oslash;ringen av
+skriptene og flaggsetting. <br>
+Alternativt kan man &aring;pne et fjerde vindu og skrive 'psql Kvalobs'
+for &aring; komme inn i databasen.<br>
+<big><span style="font-weight: bold;"><br>
+N.B. Viktig! Obs_pgm (tabellen for observasjonsprogrammet)</span></big>
+<big><span style="font-weight: bold;">m&aring; stemme overens med
+dataene man skal teste,</span><span style="font-weight: bold;"> ellers
+f&aring;r man feilmelding. Alts&aring; m&aring; alle aktuelle parametre
+v&aelig;re beskrevet i obs_pgm for aktuell stasjon/aktuelle stasjoner,
+samt 'fromtime' i obs_pgm m&aring; v&aelig;re lik eller eldre enn
+'obstime' i dataene.</span></big><br>
+<br>
+<ul>
+  <li><b>Vindu 1: Skriv 'cd /home/kvalobs/test'</b></li>
+  <li><b>Vindu 2: Skriv 'cd /disk1/kvalobs/ref-log'</b></li>
+  <li><b>Vindu 3: Skriv 'cd /bin'</b></li>
+</ul>
+<p>I ett av vinduene skriv: <span style="font-weight: bold;">kvstop<br>
+</span>skriv s&aring;<span style="font-weight: bold;"> kvstart<br>
+</span></p>
+<p><span style="font-weight: bold;">F&oslash;lgende skal da komme
+p&aring; skjermen:<br>
+------------------------------</span><br>
+rime:bin% kvstart<br>
+KVBIN=/metno/kvalobs/bin<br>
+KVPID=/metno/kvalobs/var/run<br>
+TIMEOUT=60<br>
+<br>
+<br>
+&nbsp; Starter kvalobs dette kan ta noe tid!<br>
+&nbsp; Hvis det ikke skjer noe p&aring; MER enn 60 sekund<br>
+&nbsp; bruk CTRL-C for &aring; avbryte!<br>
+<br>
+<br>
+Starter kvQabased ....Ok!<span style="font-weight: bold;"><br>
+</span></p>
+<p><span style="font-weight: bold;">Dermed er vi sikre p&aring; at
+qabase startes (som m&aring; g&aring; for at flaggsettingen skal
+fungere).<br>
+<br>
+-------------------------------------<br>
+</span></p>
+<br>
+**
+<p>I vindu 1 (under /home/kvalobs/test):<br>
+</p>
+<p>Det eksisterer 3 "test"-filer: <span style="font-weight: bold;">'bjorn_check.dat',
+'oystein_check.dat' og
+'knut_check.dat'</span> utfra de<br>
+som har kj&oslash;rt godkjenningskj&oslash;ringer. I tillegg eksisterer
+en<span style="font-weight: bold;"> run_check.dat</span>.<br>
+Det enkleste er &aring; ta utgangspunkt i en av disse og lage en
+egen fil med mal fra disse og evn. lagre den som <br>
+"&lt;eget_navn&gt;_check.dat" eks. "per_check.dat".<br>
+</p>
+<p>Filen som brukes ser typisk slik ut:<br>
+<span style="font-weight: bold;">--------------------------------------------</span>&nbsp;&nbsp;
+<br>
+#Oppsettfil til &aring;&nbsp; brukes sammen med run_check<br>
+</p>
+data_start="2005-09-12 12"<br>
+data_stop="2005-09-12 13"<br>
+data_typeid="330"<br>
+<br>
+#data_stations="4780 17150 18700 27500"<br>
+#data_stations="TEST"<br>
+data_stations="39100"<span style="font-weight: bold;"><br>
+---------------------------------------------</span><br>
+<br>
+<p style="font-weight: bold;"><span style="font-weight: normal;"><span
+ style="font-weight: bold;">'data_start'</span> angir for hvilket
+tidspunkt
+godkjenningskj&oslash;ringen skal starte</span> <span
+ style="font-weight: normal;">og er p&aring; formen "YYYY-MM-DD
+TT:mm:ss", eks. "2001-01-01 12:00:00"<br>
+det holder &aring; skrive eks. </span><span
+ style="font-weight: normal;">"2001-01-01 12" for &aring; angi kl. 12
+den 01.01.</span><span style="font-weight: normal;"><br>
+<span style="font-weight: bold;">'data_stop' </span></span><span
+ style="font-weight: normal;">angir for hvilket tidspunkt
+godkjenningskj&oslash;ringen skal stoppe. Format tilsvarende som for </span><span
+ style="font-weight: normal;">'data_start'.<br>
+<span style="font-weight: bold;">'data_typeid' </span>her kan angis
+typeid.<br>
+</span><span style="font-weight: bold;">'data_stations' </span><span
+ style="font-weight: normal;">inneholder
+en liste med valgte teststasjoner. Her kan velges 1 eller
+flere stasjoner.<br>
+Man kan velge &aring; kommentere ut denne og heller bruke<br>
+</span><span style="font-weight: bold;">'data_stations' </span><span
+ style="font-weight: normal;">="TEST". Da velger man teststasjonssettet
+(16 stasjoner).</span></p>
+<p>N&aring;r man har valgt start, stopp-tidspunkt osv. skriver man <span
+ style="font-weight: bold;">run_check
+oystein_check.dat</span> (hvis oppsettsfilen er f.eks.
+oystein_check.dat).<br>
+(Man st&aring;r fortsatt i vindu1, under /home/kvalobs/test).
+</p>
+Det som skjer er at det automatisk genereres et SQL skript
+som sletter alle stationid fra data-tabellen for start- og
+stopptidspunktene. Og data blir kopiert over fra test_data tabellen til
+data
+for de samme tidspunktene.<br>
+<p></p>
+<ul>
+  <li><b>P&aring; sp&oslash;rsm&aring;l: Er dette en
+referansekj&oslash;ring, skriv j.</b> </li>
+  <li><b>Vil du legge inn originale test-data (tomme flaggverdier)? j</b><br>
+(N&aring; slettes data i tabellen <i>kvalobs.data</i> for valgt
+tidsrom,<br>
+originale testdata fra tabellen <i>kvalobs.test_data</i> kopieres til
+tabellen <i>kvalobs.data</i>.<br>
+Dette tar litt tid ... f&oslash;rst kommer DELETE ... s&aring; INSERT
+...<br>
+Vent til prosessen er ferdig). </li>
+  <li><b>Start? J</b><br>
+(Sjekkene i qabase g&aring;r n&aring; gjennom disse originale testdata
+som blir referansekj&oslash;ring. Flagg settes s&aring; i henhold til
+denne kj&oslash;ringen).<br>
+&nbsp;</li>
+</ul>
+<p>
+I vindu 2, skriv 'ls' (under /disk1/kvalobs/ref-log) sees progresjonen.
+Vent til referansekj&oslash;ringen er ferdig. (Hvis "TEST" er valgt i <span
+ style="font-weight: bold;">'data_stations' </span>vent til alle 16
+stasjonsnumre har innhold i seg, dette kan eventuelt ta litt tid).<br>
+</p>
+<br>
+<big><span style="font-weight: bold;">S&aring; har vi kommet til
+punktet der vi manipulerer data:</span></big>
+<ul>
+  <li><b>Hvis et psql-vindu ikke er &aring;pnet f&oslash;r, s&aring;
+gj&oslash;r det n&aring; (F.eks. ssh -X kvalobs@rime, deretter psql
+kvalobs). Gj&oslash;r endringer i tabellen 'test_data' (tast inn samme
+"nye" verdi i original og corrected,&nbsp; verdien m&aring; v&aelig;re
+slik at det &oslash;nskede/de &oslash;nskede skriptene sl&aring;r ut og
+setter forventet/forventede flaggverdi(er).</b><br>
+  </li>
+</ul>
+<p>
+F&oslash;lg s&aring; videre instruksjoner:
+</p>
+<p><b>I vindu 1 (under /home/kvalobs/test):</b>
+</p>
+<ul>
+  <li><b>Skriv </b><span style="font-weight: bold;">run_check </span><span
+ style="font-weight: bold;">oystein_</span><b>check.dat </b>(Hvis
+oppsettsfilen er f.eks. oystein_check.dat) </li>
+  <li><b>P&aring; sp&oslash;rsm&aring;l: Er dette en
+referansekj&oslash;ring, skriv j</b></li>
+  <li><b>Vil du legge inn originale test-data (tomme flaggverdier)? j</b></li>
+  <li><b>Start? J</b><br>
+(Qabase g&aring;r n&aring; gjennom settet med manipulert
+verdi og setter forh&aring;pentligvis ventet flagg i forhold til
+dette p&aring; bakgrunn av skriptet/skriptene man skal teste. </li>
+</ul>
+<p>
+<b>I vindu 2:</b>
+</p>
+<ul>
+  <li><b>skriv cd '/disk1/kvalobs/ref-log'.</b><br>
+Vent til godkjenningskj&oslash;ringen er ferdig (hvis "TEST" er valgt i
+    <span style="font-weight: bold;">'data_stations'</span> vent til
+alle 16
+stasjonsnummere er poppet opp og du ser at
+kj&oslash;ringen i vindu1
+er ferdig.&nbsp; </li>
+</ul>
+<p>OBS Alt dette m&aring; v&aelig;re ferdig f&oslash;r du
+g&aring;r videre, kan ta tid, sjekk at det er innhold under
+stasjonskatalogene.<small>
+</small></p>
+<h1><br>
+<small><small>N&aring;r dette er ferdig:</small></small></h1>
+<b></b>
+<p><span style="font-weight: bold;">I vindu 2 Sjekk i ref-log: <br>
+Hvis du allerede er under rime:ref-log/&nbsp;
+(/disk1/kvalobs/ref-log/evn underkataloger) s&aring; g&aring; helt opp
+i directoriet (cd ../.. osv) til </span><span
+ style="font-weight: bold;">/disk1/kvalobs/ Ta s&aring; cd ref-log og
+g&aring; inn i underkatalogen(e) p&aring; nytt.<br>
+Man ender da gjerne opp med en html fil (eks. log-13-00-00.html). Ta
+denne opp i emacs, CTRL s p&aring; den sjekken som er aktuell<br>
+eks. QC1-6-311.<br>
+For &aring; bevise at akkurat denne slo ut s&aring; let deg fram til
+linja eks<br>
+&nbsp;Got:Y_0_0_flag = 3<br>
+&nbsp; Got:X_0_0_flag = 3</span></p>
+<p><span style="font-weight: bold;">som kommer rett etter opplistingen
+av algoritmen.<br>
+Dette er bevis p&aring; at akkurat denne sjekken slo ut.<br>
+</span></p>
+<p><span style="font-weight: bold;">Vanlig prosedyre: Det er ogs&aring;
+vanlig
+&aring; ta et par "SELECT"-sp&oslash;rringer fra /data/-tabellen og
+legge ved det man
+lagrer, som "bevis".<br>
+Nedenfor vises et eksempel p&aring; dette.<br>
+</span>Her tester man stasjonen 39100 og manipulerer med parameteren
+273 (Sikt, VV).<span style="font-style: italic;"></span><span
+ style="font-style: italic;"></span><span style="font-weight: bold;"><span
+ style="font-style: italic;"><br>
+</span></span><span style="font-weight: bold;"><span
+ style="font-style: italic;"></span></span><span
+ style="font-style: italic;"></span>Dermed sl&aring;r sjekkene
+QC1-6-311 og QC1-6-315 til.<span style="font-weight: bold;"><span
+ style="font-style: italic;"><br>
+</span></span></p>
+<table style="width: 80%; text-align: left;" border="1" cellpadding="2"
+ cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-311<br>
+      </td>
+      <td style="vertical-align: top;"><font size="3">10000 &#8804; VV &#8804;
+75000 &amp; 04 &#8804; WW &#8804; 07<br>
+      </font><font size="3">10000 &#8804; VV &#8804; 75000 &amp; 38 &#8804; WW &#8804; 39</font></td>
+      <td style="vertical-align: top;">Inkonsistens mellom sikt og
+v&aelig;rkode</td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<table style="width: 80%; text-align: left;" border="1" cellpadding="2"
+ cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">QC1-6-315<br>
+      </td>
+      <td style="vertical-align: top;"><font size="3"><span lang="en-US">10000
+      </span>&#8804; <span lang="en-US">VV </span>&#8804; <span lang="en-US">50000
+&amp; 04 </span>&#8804; <span lang="en-US">WW </span>&#8804; <span lang="en-US">07<br>
+      </span></font><font size="3"><span lang="en-US">10000 </span>&#8804;
+VV &#8804; 50000 &amp; 38 &#8804; WW &#8804; 39</font></td>
+      <td style="vertical-align: top;">Inkonsistens mellom sikt og
+v&aelig;rkode</td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+<p>Eks. select * from test_data where stationid=39100 and paramid in
+(41, 273);</p>
+<p></p>
+<pre wrap="">39100 | 2005-09-12 13:00:00 |        5 |      41 | 2005-09-12 13:00:00 |    308 | 0      |     0 |         5 | 0000000000000000 | 0000000000000000 |<br>     39100 | 2005-09-12 13:00:00 |    5000 |     273 | 2005-09-12 13:00:00 |    308 | 0      |     0 |     5000 | 0000000000000000 | 0000000000000000 |<br><br>Etter referansekj&oslash;ring:<br>select * from data where stationid=39100 and paramid in (41, 273);<br>39100 | 2005-09-12 13:00:00 |        5 |      41 | 2005-09-12 13:00:00 |    308 | 0      |     0 |         5 | 1110000000100000 | 7000000000000000 |<br>     39100 | 2005-09-12 13:00:00 |     5000 |     273 | 2005-09-12 13:00:00 |    308 | 0      |     0 |      5000 | 1110000000100000 | 7000000000000000 |<br><br>Referansekj&oslash;ring gikk greit og en masse "verdi 1-flagg" er satt, dvs. ingen mistenkelig verdi.<br><br><br><br>Etter manipulert verdi, dvs. 5000 er byttet ut med 20000 for paramid 273 i test_data, og en ny referansekj&oslash;ring er gjort.<br>Eks. select * from data where stationid=39100 and paramid in (41,273);<br><br>39100 | 2005-09-12 13:00:00 |        5 |      41 | 2005-09-12 13:00:00 |    308 | 0      |     0 |         5 | 1110000000300000 | 7020200000000001 | QC1-6-311:1,QC1-6-315:1<br>     39100 | 2005-09-12 13:00:00 |    20000 |     273 | 2005-09-12 13:00:00 |    308 | 0      |     0 |     20000 | 1110000000300000 | 7020200000000001 | QC1-6-311:1,QC1-6-315:1<br><br>Her ser vi at denne nye verdien er innenfor sjekkenes "utslagsomr&aring;de" og forventede flagg blir satt.<br><br><br><br><br><br>I ett av vinduene (eller nytt vindu etter ssh -X kvalobs@rime):<br><br></pre>
+<ul>
+  <li>Som nevnt: Selve databasen er tilgjengelig ved kommandoen 'psql
+kvalobs'. psql
+avsluttes med '\q'. </li>
+</ul>
+<p>&nbsp;<br>
+</p>
+<p><span style="font-weight: bold;"></span></p>
+<hr>
+<p>Eventuelt fortsett med nye tester fra punktet merket <span
+ style="font-weight: bold;">** </span>med &aring; manipulere nye
+sjekker, nye parametere.
+</p>
+<span style="font-weight: bold;"></span><span
+ style="font-family: monospace;"><br>
+<br>
+</span>
+<p><big style="font-weight: bold;"><big>Hvis
+godkjenningskj&oslash;ringen ga ventede resultater (med riktige flagg)
+er
+sjekken klar for &aring; legges p&aring; operasjonell server. Ta
+kontakt med
+driftsgruppen , <a href="mailto:kvdrift@met.no"><span
+ style="font-style: italic;">kvdrift</span> .</a></big></big></p>
+<p><br>
+</p>
+Last modified:&nbsp; Oct 18 11:20:00 GMT 2006<!-- hhmts end -->
+</body>
+</html>

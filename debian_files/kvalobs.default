@@ -1,0 +1,11 @@
+#TRY_TO_GRAP_KVALOBS_ALIAS is set to yes if
+#the init script should try to grab the ipalaias.
+#The default value is set to 'no'. Only the production machines should set 
+#it to 'yes'.
+   
+#TRY_TO_GRAB_KVALOBS_ALIAS=yes
+TRY_TO_GRAB_KVALOBS_ALIAS=no
+#PGPORT=5433
+#PGHOST=localhost
+#PGDATABASE=kvalobs
+#PGUSER=kvalobs

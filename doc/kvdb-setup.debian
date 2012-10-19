@@ -1,0 +1,80 @@
+Diskkrav
+--------
+database kluster: >= 50 GB.
+
+Følgende to logkataloger bør ligge på en egen partisjon. 
+
+/var/kvalobs/log >= 5GB
+/var/kvalobs/log/html >= 15 GB
+
+Resten av /var/kvalobs tar  ~ 1 GB.  
+
+Kvalobs administrasjon kontoen bør ha ~ 5 GB tilgjengelig.
+
+I tillegg vil et fult sett av metadata for databasen alltid 
+være tilgjenegelig i /usr/share/kvalobs/metadata ( ~ 50 MB). 
+
+
+Oppsett av kvalobs databasekluster i debian
+--------------------------------------------
+Testet postgresql versjon er 8.3.
+Testet debian versjon er etch.
+
+Kommandoen pg_createcluster brukes.
+
+Opprett en partisjon under /var/lib/postgresql/8.3/kvalobs.
+Denne partisjonen bør være minst 50 GB.
+
+Sett locale til C eller POSIX.
+Sett encoding til LATIN1 (ISO 8859-1)
+Sett kvalobs til a vare superbruker.
+
+pg_createcluster --socketdir=/var/kvalobs/run --encoding=LATIN1 --locale=C --user=kvalobs --port=5433 --start 8.3 kvalobs 
+
+Editer filen /etc/postgresql/8.3/kvalobs/postgresql.conf.
+Finn variablene 'listen_addresses' og sett den til riktig host.
+Set default timezone til UTC.
+
+Opprettelse av databasen og innleggeing av metadata gjøres av kvdrift.
+---------------------------------------------------------------------
+
+I hjemmekatalogen til kvalobs opprett filen .postgresqlrc og legg inn
+folgende linje:
+
+8.3 kvalobs *
+
+Opprett også filen .pgpass og legg passordet til kvalobs brukeren som
+kvalobs programvaren bruker inn i filen. På denne måten trenger ikke 
+kvalobs.conf å innholde noen passord og vi trenger ikke sette environment
+variabelen PGPASSWORD for skriptene. Den foretrukne kvalobs brukeren for
+kvalobs programvaren er kvproc.
+
+Eks på .pgpass file er 
+
+localhost:5437:kvalobs:kvalobs:kvalobs#password
+localhost:5437:kvalobs:kvproc:kvproc#password
+
+Login i databasen med psql template1 og opprett databasen kvalobs.
+
+Database schemaene kan nå legges inn databasen.
+
+Opprett rollene først:
+psql template1 < /usr/share/kvalobs/db/kvalobs_roles.sql
+
+Opprett databasen
+psql template1 < /usr/share/kvalobs/db/kvalobs_createdb.sql
+
+Opprett tabeller
+psql kvalobs < /usr/share/kvalobs/db/kvalobs_schema.sql
+
+Før metadataene kan lastes inn må de legges in i /usr/share/kvalobs/metadata.
+
+Så må man sette environment variabelene
+PGHOST og PGPORT, perlscriptene er avhengig av disse.
+
+Eks.
+ PGPORT=5437
+ PGHOST=localhost
+
+Laste inn metadata i kavlobs databasen
+/usr/lib/kvalobs_metadata/bin/run_metadata

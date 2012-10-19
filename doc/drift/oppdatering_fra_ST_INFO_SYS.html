@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>oppdatering_stasjoner</title>
+</head>
+<body style="color: rgb(0, 0, 0);" alink="#ee0000" link="#0000ee"
+ vlink="#551a8b">
+<h1><span style="color: rgb(51, 51, 255);">Oppdatering fra ST_INFO_SYS
+og overf&oslash;ring til kvalobs.</span></h1>
+<h2>Bruksanvisning for &aring; sette opp systemet fra nytt,
+installeringsdokumentasjon:<br>
+</h2>
+En kan bruke en hvilken som helst maskin i prinsippet som har kvalobs
+sjekket ut ( $KVDIR er variabelen for det )<br>
+1. G&aring; til $KVDIR/src/script/stinfosys2kvalobs <br>
+&nbsp;&nbsp; ( p&aring; overcast er dette
+/home/kvalobsdev/src/kvalobsdrift/src/script/stinfosys2kvalobs; <br>
+&nbsp;&nbsp;&nbsp;&nbsp; p&aring; rime er
+dette /home/kvalobs/src/kvalobs/src/script/stinfosys2kvalobs )<br>
+2. Installer scriptene til cronjobben p&aring; riktig sted ved hjelp av
+kommandoen:&nbsp; ./INSTALL -d $KVALOBS<br>
+&nbsp;&nbsp;&nbsp; Denne INSTALL kommandoen har $KVALOBS som argument
+og <br>
+&nbsp;&nbsp;&nbsp; - kopierer
+run_stinfosys2kvalobs til bin katalogen<br>
+&nbsp;&nbsp;&nbsp; - kopierer scriptene run_stinfosys2kvalobs trenger i
+den opprettede katalogen
+stkv_cron under binkatalogen,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; per i dag er dette bare
+stinfosys2kvalobs.pl<br>
+&nbsp;&nbsp;&nbsp; - kopierer moduler som er n&oslash;dvendige i
+libkatalogen for perl,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; per i dag er dette stinfosys_path.pm og
+wmonr_stinfosys2kvalobs.pm<br>
+&nbsp;&nbsp;&nbsp; <br>
+3. Lag en cronjob som kj&oslash;rer scriptet run_stinfosys2kvalobs
+jevnlig, &nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp; Et eksempel p&aring; cronjob er:<br>
+&nbsp;&nbsp;&nbsp;&nbsp; MAILTO="kvdrift@met.no"<br>
+&nbsp;&nbsp;&nbsp; 30 13 * * *&nbsp;&nbsp;&nbsp;&nbsp;
+$HOME/bin/run_stinfosys2kvalobs<br>
+<br>
+<h2>Bruksanvisning for jevnlig drift og bruk av systemet<br>
+</h2>
+Manuell oppdatering ved hjelp av kommandoen cvs commit gj&oslash;res
+jevnlig for param, station, obs_pgm og types i kvalobs_metadata.<br>
+<br>
+<br>
+<h2>Hva cronjobben gj&oslash;r:<br>
+</h2>
+Det eneste cronjobben gj&oslash;r er at scriptet
+run_stinfosys2kvalobs&nbsp; kj&oslash;rer jevnlig<br>
+<br>
+<h2>Hva scriptet run_stinfosys2kvalobs&nbsp; gj&oslash;r:</h2>
+&nbsp;Scriptet run_stinfosys2kvalobs lager filer for tabellene station,
+param, obs_pgm og types i kvalobs og <br>
+&nbsp; dersom endring s&aring; kopieres de over til
+metadataene i kvalobs_metadata. Det som skjer mer i detalj er:<br>
+<br>
+1. scriptet leser inn konfigurasjonsfiler for kvalobs (source
+$HOME/.kvalobs) og st-info-sys (source $KVALOBS/etc/st-info-sys.conf)<br>
+2. variabelen DUMPDIR defineres
+(DUMPDIR=$KVALOBS/var/log/stkv_tabledump)<br>
+3. filen station.out genereres fra ST_INFO_SYS&nbsp; databasen ved
+hjelp av scriptet stinfosys2kvalobs.pl og
+legges i katalogen $DUMPDIR,<br>
+4. filer fra tabellene param, obs_pgm og message_format kopieres
+direkte fra ST_INFO_SYS og legges i katalogen $DUMPDIR som henholdsvis<br>
+&nbsp;&nbsp;&nbsp; filene param.out, obs_pgm.out og message_format.out.<br>
+<span style="font-weight: bold;"></span><span style="font-weight: bold;"></span>5.
+for station, param og obs_pgm sammenligner en filene i $DUMPDIR med de
+tilsvarende i $METADIR/share/metadata/$TABLE/,<br>
+&nbsp;&nbsp;&nbsp; dersom de er forskjellige s&aring; kopieres de over
+fra DUMPDIR til $METADIR/share/metadata/$TABLE/<br>
+6. tilsvarende skjer med filen message_format.out i $DUMPDIR, men her
+skjer det en navneendring under kopieringen til types.out.<br>
+<h2><span style="color: rgb(102, 0, 204);"></span><span
+ style="color: rgb(102, 0, 204);"></span><span
+ style="color: rgb(102, 0, 204);"><br>
+</span></h2>
+<br>
+<br>
+<span style="font-style: italic;"><span style="font-style: italic;"></span></span><span
+ style="font-style: italic;"><span style="font-style: italic;"><br>
+</span></span><span style="font-weight: bold;"><br>
+<br>
+<br>
+</span><br>
+<br>
+</body>
+</html>

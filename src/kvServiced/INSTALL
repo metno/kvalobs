@@ -1,0 +1,25 @@
+#!/bin/sh
+
+DESTINATION=
+DIRECTORIES="bin var/log var/run var/kvalobs/service/subscribers etc \
+             var/kvalobs/service/subscribers/terminated"
+FILES=
+
+THISTOP=`pwd`
+
+if [ -f "kvServiced" ]; then
+    mkdir -p bin
+    cp -fupv kvServiced bin
+else
+    echo "BUILD FIRST: `pwd`"
+    exit 0
+fi
+
+echo "THISTOP: $THISTOP"
+
+. $KVDIR/conf/INSTALL.conf
+
+
+
+
+

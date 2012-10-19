@@ -1,0 +1,199 @@
+Terje Reite 12. september 2003
+
+0. For at kvalobs skal virke må følgende virke og være oppe å kjøre:
+- serverne/daemonene
+- databasen
+
+
+1. Start og stopp av serverne/daemonene til kvalobs
+
+1.1   
+   kvstop stanser kvalobsserverne
+   kvstart starter kvalobsserverne
+   NB! disse her starter og stopper bare serverne, ikke databasen.
+
+I den grad filen kvname eksisterer så eksisterer den under bin katalogen 
+og skal inneholde navnet til den som stanset kvalobsserverne.
+
+Dersom kvalobsserverne er stanset av tekniske feilårsaker eller kvstop er 
+brukt uten noe ekstra argument på kommandolinja så genereres det ingen fil som 
+heter kvname.
+
+Dersom man gir med navnet som argument på kommandolinja til kvstop så 
+genereres det en fil som heter kvname som lagrer det argumentet en gir med. 
+Det skal være mulig å ta med flere argument -  de blir da lagret etter 
+hverandre i inntastingsrekkefølgen på fila kvname, det første blir da fornavn 
+osv. På den måten så kan personen som stanser kvalobsserverne signere at en 
+har stanset dem og at en ønsker ikke at andre uten videre skal restarte 
+kvalobsserverne, en skal ta kontakt med den personen som har stanset 
+kvalobsserverne.
+
+kvstart brukes uten argumenter alltid, men dersom det finnes en fil ved navn 
+kvname vil en under oppstarten få spørsmål om en vil starte kvalobsserverne , 
+svarer en j så starter kvalobsserverne, svarer en n så stanser scriptet og 
+kvalobsserverne starter ikke opp. En får også vite hvem som stanset 
+kvalobsserverne. kvstart tar til slutt og sletter filen kvname.
+
+
+1.2 
+   En kan starte de enkelte daemonene/serverne hver for seg.
+   De skal startes i følgende rekkefølge:
+   kvQabased
+   kvManagerd
+   kvDataInputd
+
+
+1.3
+Den enkelte server/daemon er et program.
+Det kan være nyttig å kunne slå av programmene hver for seg.
+Da må en få tak i pid nummeret til det enkelte programmet.
+Det gjør en ved å kjøre programmet fps med forskjellige opsjoner:  
+fps kv, det gir pid nummeret til alle programmene;
+fps kvMan, det gir pid nummeret til kvManagerd;
+fps kvQa, det gir pid nummeret til kvQabased;
+fps kvDa, det gir pid nummeret til kvDataInputd;
+
+NB! Det er det øverste tallet som er pidnummeret:
+
+Eks.
+rime:bin% fps kvDa
+UID        PID  PPID  C STIME TTY          TIME CMD
+kvalobs  30445     1  0 09:03 pts/2    00:00:00 /home/kvalobs/kvalobs/bin/kvDataInputd
+kvalobs  30447 30445  0 09:03 pts/2    00:00:00 /home/kvalobs/kvalobs/bin/kvDataInputd
+kvalobs  30448 30447  0 09:03 pts/2    00:00:00 /home/kvalobs/kvalobs/bin/kvDataInputd
+kvalobs  30452 30447  0 09:03 pts/2    00:00:01 /home/kvalobs/kvalobs/bin/kvDataInputd
+kvalobs  30453 30447  0 09:03 pts/2    00:00:01 /home/kvalobs/kvalobs/bin/kvDataInputd
+kvalobs  30454 30447  0 09:03 pts/2    00:00:00 /home/kvalobs/kvalobs/bin/kvDataInputd
+kvalobs  30455 30447  0 09:03 pts/2    00:00:00 /home/kvalobs/kvalobs/bin/kvDataInputd
+
+Her er det 30445 som er pidnummeret
+
+skal man kille denne prosessen må en skrive 
+kill 30445 
+
+Da er programmet kvDataInputd stoppet, men programmene kvQabased og kvManagerd 
+kjører fortsatt.
+
+
+
+2. Minnehåndtering
+
+2.1 Slette filer.
+Det skal kjøres en cronjob for å få slettet html filene som vokser.
+Disken kan bli full - det kan være en feilkilde.
+Spesielt loggfiler og filer på tmp området kan fylle opp disken.
+Skal bare slette de loggfilene som ligger under
+/home/kvalobs/kvalobs/var/log/html
+
+og i ytterste nødsfall:
+kvQabased.log*
+
+Ingen andre filer under denne katalogen /home/kvalobs/kvalobs/var/log/ 
+kan slettes. Det at de ikke kan slettes betyr at en ikke har lov til å 
+slette dem, da ødelegger en for systemet. Det skal heller ikke være
+behov for å slette dem.
+
+På alle kataloger som heter tmp kan en slette ting. Steder som har en tmp katalog er 
+langs roten på maskinen og under kvalobs brukeren.
+Eventuelle andre steder kan en finne ved å bruke find under kvalobsbrukeren
+find . -name tmp -type d
+
+Selve kvalobs skal ikke legge igjen filer andre steder på maskinen enn
+under /home/kvalobs. Skal en derimot av en eller annen grunn gjøre find på tmp fra roten
+av maskinen så må en ta med mount opsjonen for å sikre at en ikke søker i alle kataloger
+som maskinen er koblet opp til:
+find . -name tmp -type d -mount
+
+
+2.2 Varselsystem for at disken er full.
+Trenger et system for å overvåke resterende diskplass.
+Kjersti har laget noe slikt og det ligger på:
+/metop/diverse/job/check_disk_space.sms
+/metop/diverse/job/input_check_disk_space.xml
+
+Vi trenger her bare å endre xml filen, det vil si vi må putte inn kvalobs i xml filen.
+
+
+
+2.3 Kjøre Vacuum på databasen.
+Som regel skal dette være unødvendig fordi det skal kjøres som en cronjobb på rutine.
+Det første en bør gjøre er å få restartet databasen dersom den er stanset. Går ikke dette
+eller trenger man allikevel å gjøre dette manuelt, bruk kommandoen: vacuumdb 'databasenavn'.
+
+Er man inne som kvalobsbruker så går det fint med:
+vacuumdb  kvalobs
+
+Vi ønsker alltid å bruke --analyze opsjonen sammen med vakum så det en 
+som regel skal gjøre er :
+vacuumd --analyze kvalobs
+
+Bare i unntakstilfeller så er det nødvendig med --full opsjonen; 
+da blir mye diskplass slettet. I de tilfellene så skal kvalobs stanses, dette
+er viktig ellers så kan en ødelegge for synopgenereringen til autoobs.
+Ulempen er at dette vil stanse systemet, noe som er uheldig i en 
+drifssituasjon.
+vacuumdb --full --analyze kvalobs
+
+
+Dersom en ønsker full informasjon av analysen på skjermen så tar en med 
+-v opsjonen:
+vacuumdb -v --analyze kvalobs
+vacuumdb -v --full --analyze kvalobs
+
+
+
+
+3. starte og stoppe databasen
+
+cd /etc/init.d/
+postgresql start
+postgresql stop
+passordet her er postgres12
+
+Ved behov kan en skifte til postgres bruker
+su postgres
+postgres12
+
+
+
+4. Oversikt over cron-jobber:
+Alle cronjobbene skal styres av $HOME/cronjob/cron
+Vi ser i dette scriptet hvor cronjobben ligger.
+
+1) en for sletting av logfiler i qabase  $HOME/bin/qabase_cron
+2) en for overføring av modelldata til kvalobs $HOME/cronjob/lam2kv/lam2kv.cron. 
+3) Det skal gå en døgnlig jobb for opprydding i databasen (vacuumdb).
+   Først blir poster i data og model_data fjernet etter kriteriet tbtime eldre enn 6 måneder.
+   Deretter kjøres vacuumdb. cronjobben er ikke implementert ennå.
+  
+Hvis en cronjobb ikke kjøres kan den kjøres igjen som et vanlig script.
+Det kan oppstå feil i systemet som gjør at cronjobber ikke blir kjørt, 
+dette gjelder også andre feil enn at maskinen som cronjobben er på er nede. 
+
+
+5. Oversikt over sms-jobber.
+Overvåkingen over ledig diskplass skal gjøres ved hjelp av 
+sms jobben til Kjersti der det for oss bare er å putte systemet inn i xml-fila. 
+I begynnelse varsler vi ved 85%, denne grensen økes til 95% når systemet har stabilisert seg.
+
+
+6. Overvåking av datastrømmer
+Systemet mottar data dynamisk fra 3 kilder i drifssituasjonen:
+- autoobs
+- norcom
+- modelldata
+
+Det må utvikles verktøy for å overvåke disse datastrømmene.
+Det vesentlige her er om det kommer data eller ikke kommer data derifra.
+En kunne også spørre seg om hvor mye, altså intensiteten på datastrømmen.
+
+7. Start og stopp av datastrømmer
+Systemet mottar data dynamisk fra 3 kilder i drifssituasjonen:
+- autoobs
+- norcom
+- modelldata
+
+Det må utvikles verktøy for å kunne starte og stoppe disse datastrømmene.
+
+
+

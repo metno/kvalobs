@@ -1,0 +1,232 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+               "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+
+  <!--#include file="header.shtml"-->
+
+  <p>	
+
+    <h1>VEILEDER FOR DRIFTSGRUPPEN</h1>
+
+<h2>Hovedtrekk</h2>
+<p>
+Kvalobs er met.nos system for kvalitetssikring av observasjoner. Observasjonene 
+blir sendt til Kvalobs som del av en melding.</p>
+<p>
+Systemet best&aring;r av</p>
+<ul>
+<li>et automatisk kontrollsystem (kalt automaten) med 
+tilh&oslash;rende database (kvalobsdb);
+<li>en applikasjon for 
+meldinger om feil og tiltak i stasjonsnettet (kalt KRO) med 
+tilh&oslash;rende database (tiltaksdb).
+<li>en applikasjon for manuell kvalitetskontroll (kalt HQC);
+<li>skript og rutiner for vedlikehold av databasenes metadata;
+<li>en applikasjon for verifisering av kontrollene.
+</ul>
+<p>
+Driften av Kvalobs er et felles ansvar for Obsdiv, Metdiv, og ITdiv. Driftsgruppen skal ha ett medlem 
+fra hver divisjon. Driftsgruppens medlemmer skal ha duplisert kompetanse. I tillegg utf&oslash;rer 
+ITdiv driftsoppgaver som krever annen kompetanse eller d&oslash;gnkontinuerlig drift. Driftsgruppen er 
+sammen med IT-operat&oslash;rene ansvarlig for den daglige driften av Kvalobs.</p>
+<p>
+Driftsgruppen skal bidra til at programvaren utf&oslash;rer det som er forventet, og melde fra om 
+behov for feilretting og videreutvikling.
+<p>
+Driftsgruppen er underlagt en permanent styringsgruppe. Styringsgruppen fatter vedtak om 
+videreutviklingsprosjekter og annen ressursallokering.</p>
+<p>&nbsp;</p>
+
+
+<h2>Databaseadministrasjon</h2>
+
+<p>
+Kvalobsdb foreligger i to versjoner: En driftsversjon p&aring; serverparet warm/cool 
+og en versjon for utvikling og uttesting p&aring; serveren rime.<br> 
+Brukerne skal bare ha adgang til driftsversjonen gjennom spesielle biblioteker som 
+benytter CORBA-grensesnittet. Driftsgruppen skal ha utvidede tilgangsrettigheter for &aring; kunne 
+administrere metadataene gjennom skript og rutiner.
+<p>
+Driftsgruppens oppgaver m&aring; defineres i forhold til hva IT-operat&oslash;rene skal gj&oslash;re 
+og hva utviklerne har ansvaret for.</p>
+<p>
+Driftsgruppen har ansvaret for databasen p&aring; warm/cool, for testoppsettet p&aring; rime, og for 
+innholdet p&aring; CVS.</p>
+<p>
+Som beredskap for feilsituasjoner skal driftsgruppen vedlikeholde en liste over ressurspersoner som 
+skal kunne tilkalles ved ulike feilsituasjoner. Listen skal vedtas i styringsgruppen.
+<p>&nbsp;</p>
+
+
+<h2>Applikasjoner</h2>
+<p>
+<ul>
+<li>Applikasjonen KRO<br>
+* KRO er et system for stasjonsnettavdelingens serviceseksjon som prim&aelig;rbruker. Alle ansatte og observat&oslash;rene 
+har anledning til &aring; rapportere om feil gjennom systemet. Applikasjonen er skrevet i perl.<br>
+Brukerne av KRO skal melde til driftsgruppen om problemer og forbedrings&oslash;nsker.
+<li>HQC-applikasjonen<br>
+* HQC er et system for klimaavdelingens klimadataseksjon som prim&aelig;rbruker. Applikasjonen er det 
+eneste grafiske grensesnittet mot observasjonene i Kvalobs. HQC g&aring;r under Linux og er skrevet i C++. 
+Den benytter biblioteker som er felles med DIANA.<br>
+HQC-operat&oslash;rene skal melde til driftsgruppen om problemer og forbedrings&oslash;nsker.</p>
+<li>Vedlikehold av metadata<br>
+* All programvare og en vesentlig del av metadataene ligger i CVS-arkivet. Oppdateringen skjer via CVS. Vedlikeholdet av 
+metadataene skal samles i egne skript for driftsgruppens bruk.
+<li>Verifikasjon av kontrollene<br>
+* Applikasjonen run_check verifiserer kontrollene.
+</ul>
+<p>
+Driftsgruppen m&aring; bidra til &aring; samordne utviklingsprosjektenes behov.</p>
+<p>&nbsp;</p>
+
+
+<h2>Oppdatering av metadata</h2>
+<p>
+Kvalobsdatabasens metadata best&aring;r av elleve tabeller. &Aring;tte av dem blir oppdatert ved skript som skriver til CVS:
+<ul>
+<li>algorithms
+<li>checks
+<li>model
+<li>operator
+<li>reference_station
+<li>qcx_info
+<li>station_param
+<li>types
+</ul>
+<p>
+Tre av metadatatabellene blir oppdatert automatisk i CVS fra databasen ST_INFO_SYS. ST_INFO_SYS blir driftet av Obsdiv:
+<ul>
+<li>obs_pgm
+<li>station
+<li>param
+</ul>
+
+
+<p>
+<h3>Oppdatering ved driftsgruppen:</h3>
+<p>
+<ul>
+<li>Tabellen checks som angir hver enkeltsjekk. Oppdateres ved opprettelse av nye stasjoner.
+<li>Tabellen station_param som angir enkeltsjekkenes ulike parametrisering. Oppdateres ved opprettelse av nye stasjoner.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Referansedata blir bl.a. hentet fra Klimadatabasen.
+<li>Tabellen reference_station som angir nabostasjoner parameterspesifikt.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Oppdateres ved opprettelse av nye stasjoner og ved nedleggelser.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tabellen blir benyttet ved generering av metadataene i tabellen station_param, og ikke under run-time
+<li>Tabellen model angir hvilke ulike modeller som avgir referansedata. Oppdateres for nye modellvarianter.
+<li>Tabellen types angir inndataenes ulike format. Oppdateres ved innf&oslash;ring av nye formater.
+<li>Tabellen operator som identifiserer HQC-operat&oslash;rene. Oppdateres ved nyansettelse og endringer av rutiner i 
+Met-div.</p>
+</ul>
+
+<p>
+<h3>Oppdatering fra ST_INFO_SYS:</h3>
+<p>
+<ul>
+<li>Tabellen station som angir navn og nummer for de ulike stasjonene; norske, utenlandske 
+med WMO-nummer, eller andre. Av norske stasjoner er tabellen begrenset til 
+stasjoner som er i drift eller som er nedlagt i l&oslash;pet av de siste seks m&aring;neder.
+<li>Tabellen obs_pgm som angir observasjonsprogrammet. Kontrollene blir utf&oslash;rt p&aring; 
+alle kombinasjoner av stationid og paramid som finnes i obs_pgm, samt skip. Tabellen obs_pgm 
+angir ogs&aring; hvilke observasjoner som er forventet i forhold til &aring; kunne 
+oppdage manglende meldinger.
+<li>Tabellen param angir parameterkoder og parameternummere.
+</ul>
+
+<p>
+<h3>Oppdatering ved videreutvikling:</h3>
+<p>
+<ul>
+<li>Tabellen algorithms som inneholder algoritmene.
+<li>Tabellen checks n&aring;r ny algoritme legges inn eller endres.
+<li>Tabellen station_param n&aring;r ny algoritme legges inn eller endres.
+<li>Tabellen qcx_info som angir sammenhengen mellom sjekkene og plassering av tilh&oslash;rende kontrollflagg.
+</ul>
+
+<p>
+<h3>Oppdatering av KROs metadata</h3>
+<p>
+<ul>
+<li>stasjon
+<li>feiltype
+<li>tiltakstype
+</ul></p>
+
+<p>
+Oppdatering fra ST-INFO-SYS:<br>
+Tabellen stasjon som angir navn og nummer for de ulike stasjonene der met.no har 
+driftsansvaret.</p>
+<p>
+Tabellene feiltype og tiltakstype skal bare oppdateres ved videreutvikling.</p>
+
+<p>&nbsp;</p>
+
+<h2>Vedlikehold av meldingsflyt</h2>
+<p>
+Kvalobs mottar meldinger fra NORCOM, ComObs, AutoObs og manuelt fra flere systemer.<br>
+Det er avsender som er ansvarlig for hvilke data som blir sendt.</p>
+
+<h3>Kontroll av meldingenes format og syntaks</h3>
+<p>
+Meldinger som blir forkastet ved dekoding havner i tabellen rejectdecode.<br>
+Tabellen m&aring; inspiseres med jevne mellomrom. I dialog med ansvarlige for 
+avsendersystemene m&aring; 
+driftsgruppen bidra til at feilene blir reparert og at det blir utviklet rutiner som fjerner 
+&aring;rsakene til at meldinger blir forkastet.
+<p>
+Alle innkommende kallesignal fra SHIP-meldinger blir lagret i tabellen station med 
+l&oslash;penummergenereret stationid. N&aring;r kallesignalet er feil angitt skal 
+driftsgruppen bidra til &aring; reparere feilene i samsvar med brukerkrav, og bidra 
+til utviking av rutiner for &aring; unng&aring; feilene.</p>
+<p>
+Driftsgruppen har et redakt&oslash;ransvar for meldingene i KRO. Oppgaven best&aring;r i 
+fjerning av dubletter, holde oppsikt med skillet mellom feilmeldinger og meldinger til 
+informasjon, fjerne inkurier p&aring; foresp&oslash;rsel.</p>
+<p>&nbsp;</p>
+
+
+<h2>System for testing av Kvalobs</h2>
+Tabellen test_data inneholder et fast sett av observasjoner egnet til &aring; kontrollere nye 
+sjekker som legges inn. Testdataene har observasjonsdato innenfor &aring;ret 2001.</p>
+<p>
+Applikasjonen for testkj&oslash;ring ligger i et CGI-skript p&aring; serveren <i>rime</i> 
+<a href="http://kvproject/cgi-bin/siva/Test_Data/medium_qcx.pl">
+http://kvproject/cgi-bin/siva/Test_Data/medium_qcx.pl</a>.<br>
+Driftsgruppen har ansvaret for at applikasjonen er tilgjengelig for anvendelse i utviklingsprosjekter.
+<p>&nbsp;</p>
+
+
+
+<h2>Endringer og nye versjoner</h2>
+<p>
+Driftsgruppen skal kunne implementere mindre endringer i Kvalobs-systemet. St&oslash;rre 
+endringer b&oslash;r organiseres som eget prosjekt med levering av ferdige produkter til 
+driftsgruppen.</p>
+
+<p>&nbsp;</p>
+
+<h2>Dokumentasjon</h2>
+<p>
+Dokumentasjonen er samlet p&aring; nettsidene <a href="http://kvproject">http://kvproject</a>.<br>
+Driftsgruppen har ansvaret for at dokumentasjonen er tilgjengelig i oppdatert og fullstendig form.
+<p>&nbsp;</p>
+
+
+<h2>Oppl&aelig;ring</h2>
+<p>
+Driftsgruppen har ansvaret for &aring; holde oversikt over hvem som kan gi oppl&aelig;ring i bruk av 
+<ul>
+<li>KROs brukergrensesnitt (hele instituttet);
+<li>HQC (Klimaavdelingen);
+<li>bruk av inn- og utdatabibliotekene (programmerere ved behov).
+</ul>
+</p>
+<hr>
+
+<p>&nbsp;
+
+
+Last modified: Tue Dec  7 16:02:00 GMT 2004
+  </body>
+</html>
+

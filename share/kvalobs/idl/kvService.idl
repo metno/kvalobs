@@ -1,0 +1,272 @@
+#ifndef __kvService_h__
+#define __kvService_h__
+
+#include "managerInput.idl"
+#include "admin.idl"
+#include "commonStationInfo.idl"
+#include "kvDataNotifySubscriber.idl"
+#include "kvDataSubscriber.idl"
+#include "kvHintSubscriber.idl"
+
+module CKvalObs{
+  module CService{
+
+    struct DataSubscribeInfo{
+      StationIDList ids;  //Send info for all stations if the list is empty. 
+      StatusId      status; 
+      QcIdList      qc;   //Send info for all QC's if the list is empty.
+    };
+    
+    /**
+     * WhichData is used to describe which data and period we are interested in
+     * when getData and getModelData is called.
+     * 
+     * A stationid of 0 means all stations. fromObsTime an toObsTime is given
+     * in iso time format: YYYY-MM-DD hh:mm:ss.
+     */
+    struct WhichData{
+      long     stationid;
+      StatusId status;
+      string   fromObsTime;
+      string   toObsTime;
+    };
+    
+    typedef sequence<WhichData> WhichDataList;
+
+    /**
+     * WhichDataExt is used to describe which data and period we are interested in
+     * when getDataExt is called.
+     * 
+     * A stationid of 0 means all stations. A typeid_ of 0
+     * means all typeids. fromObsTime and toObsTime is given
+     * in iso time format: YYYY-MM-DD hh:mm:ss.
+     */
+
+    struct WhichDataExt{
+      long     stationid;
+      long     typeid_;
+      StatusId status;
+      string   fromObsTime;
+      string   toObsTime;
+    };
+
+    typedef sequence<WhichDataExt> WhichDataExtList;    
+
+
+    interface DataIterator{
+      void destroy();
+      boolean next(out ObsDataList obsData_);
+    };
+
+
+    interface ModelDataIterator{
+      void destroy();
+      boolean next(out ModelDataList modelData_);
+    };
+
+
+
+    struct RejectDecodeInfo{
+      sequence<string> decodeList;
+      string           fromTime;
+      string           toTime;
+    };
+
+    interface RejectedIterator{
+      void destroy();
+      boolean next(out RejectdecodeList rejectedList_);
+    };
+
+    interface WorkstatistikIterator{
+      void destroy();
+      boolean next(out WorkstatistikElemList WorkstatistikList_);
+    };
+
+    
+    interface kvService : micutil::Admin {
+      SubscribeId subscribeDataNotify(in DataSubscribeInfo info, 
+				      in kvDataNotifySubscriber sub);
+
+      SubscribeId subscribeData(in DataSubscribeInfo info, 
+				in kvDataSubscriber sub);
+
+      SubscribeId subscribeKvHint(in kvHintSubscriber sub);
+      
+      void        unsubscribe(in SubscribeId subid);
+      
+      boolean     getData(in WhichDataList whichData, out DataIterator it);
+  
+      boolean     getStations(out StationList  stationList_);
+
+      boolean     getParams(out ParamList paramList_);
+      
+      boolean     getModelData(in WhichDataList whichData, 
+			       out ModelDataIterator it);
+
+
+      /**
+       * getRejectdecode returns an iterator that can be used to get data 
+       * from the rejectdecode table.
+       *
+       * \param decodeInfo_ Gives some information on the message we are 
+       *                    interested in. 
+       *
+       *                    - decodeList A list of decoders we wnt rejected 
+       *                                 message for.If the list is empty
+       *                                 the message from all decoders is 
+       *                                 returned.
+       *                    - fromTime   from this time to the \a toTime.
+       *                    - toTime     from \a fromTime to this time.
+       *
+       *        If \a fromTime is empty, it is taken to mean from 00:00 today.
+       *        if \a to time is empty, it is taken to mean today current 
+       *        time. 
+       *        ie. if both are empty all rejected messages to day is received.
+       * \param it A iterator that can be used to traverse the rejceted data.
+       * \return true on success and false otherwise.
+       */
+      boolean     getRejectdecode(in RejectDecodeInfo decodeInfo_, 
+				  out RejectedIterator it); 
+
+
+      /**
+       * \param stationid the stationid we want reference stations for.
+       * \param paramsetid, the paramset we want. -1 means all.
+       * \param refStationList the result.
+       */
+      boolean     getReferenceStation(in long stationid, 
+				      in short paramsetid,
+				      out Reference_stationList refStationList);
+
+      /**
+       * getObsPgm returns the observation program for the stations given
+       * in stationIDList. If the stationIDList is empty the observation
+       * program for all stations is returned.
+       *
+       * If aUnion is true, only one obs_pgm structure is returned, but
+       * this structure is a union made of all parameters for the station.
+       * This means that we should expect at least one data entry for the 
+       * times in the returned record.
+       * 
+       * \param obs_pgmList_ the observation program for the stations given
+       *                     in the stationIDList_.
+       * \param stationIdList_ the list of stations we want the obs_pgm from.
+       * \param aUnion do we want a union of the obs_pgm for the stations.
+       *
+       * \return true on success, false otherwise.
+       */
+      boolean     getObsPgm(out Obs_pgmList obs_pgmList_,
+			    in StationIDList stationIDList_,
+			    in boolean aUnion);
+
+      boolean     getTypes(out TypeList typeList_);
+
+
+      /**
+       * \brief getOperator returns a list \em of operators that
+       * is alloved to modify data in the HQC application.
+       *
+       * The operators is defined in the operator table in the
+       * kvalobs database.
+       *
+       * \param[out] a list of operators.
+       * \return true ons success and false otherwise.
+       */
+      boolean     getOperator( out OperatorList operatorList_);
+
+      boolean     getStationParam( out Station_paramList spList,
+				   in long stationid, 
+				   in long paramid, 
+				   in long day );
+		   
+
+    };
+
+    interface kvServiceExt : kvService {
+
+	  /**
+	   * Register a persistent subscriber with the kvalobs server.
+	   * For this to succeed the it must be set up an 
+	   * persistent subscriber id in the server.
+	   *
+	   * @param id An predefined persistent subscriber id.
+	   * @param sub A callback to call to notify the subscriber.
+	   * @return An empty SubscriberId on failure and a SubscribeId on success. The returned
+	   *    subscriberid may be different from the persistent \a id used in the call. Use the returned 
+	   *    id to unregister the subscriber. 
+	   */
+      SubscribeId registerDataNotify(in SubscribeId id, 
+				     in kvDataNotifySubscriberExt sub);
+
+      /**
+	   * register a persistent subscriber with the kvalobs server.
+	   * For this to succeed the it must be set up an 
+	   * persistent subscriber id in the server.
+	   *
+	   * @param id An predefined persistent subscriber id.
+	   * @param sub A callback to call to send the data to the subscriber.
+	   * @return An empty SubscriberId on failure and a SubscribeId on success. The returned
+	   *    subscriberid may be different from the persistent \a id used in the call. Use the returned 
+	   *    id to unregister the subscriber.
+	   */
+      SubscribeId registerData(in SubscribeId id, 
+			       in kvDataSubscriberExt sub);
+			       
+	  /**
+	   * Unregister a persistent subcriber. 
+	   *
+	   * @param id A subscriber id. The subscriber id must have been obtained from
+	   *   a previous call to registerDataNotify or registerData.
+	   * @return True on success and false otherwise. It return false if the id
+	   *    was not obtained with registerDataNotify or registerData. It may also 
+	   *    be false if the server previous has tryed to send data or notify the
+	   *    subscriber without success over a longer period. 
+	   */
+	  boolean     unregisterSubscriber( in SubscribeId id );
+
+      boolean     getDataExt(in WhichDataExtList whichData, 
+                             out DataIterator it);
+                             
+      /**
+       * \brief Get metadata for a specific station.
+       *
+       * @param stMeta The list to be populated with station metadata.
+       * @param stationid the stationid for which parameters is to be fetched.
+       *    If stationid == -1, request metadata for all stations defined in the
+       *    station table.
+       * @param metadataName The name of the metadata we want. An empty string 
+       *    request all metadata for the stationd.
+       */   
+	  boolean getStationMetaData( out Station_metadataList stMeta, in long stationid, in string obstime, in string metadataName);
+	  
+    };
+
+    interface kvServiceExt2 : kvServiceExt {
+      /**
+       */
+	  boolean getWorkstatistik(in WorkstatistikTimeType timeType, in string fromTime, in string toTime, out WorkstatistikIterator it);
+	};
+
+
+    interface DataReadyInput{
+      boolean dataReady(in CKvalObs::StationInfoList data, 
+			in CKvalObs::CManager::CheckedInput callback,
+			out boolean bussy);
+    };
+
+    interface DataReadyInputExt : DataReadyInput{
+      boolean dataReadyExt( in string source,
+                            in CKvalObs::StationInfoList data, 
+			                in CKvalObs::CManager::CheckedInput callback,
+			                out boolean bussy );
+			                
+	  boolean dataReadyWithParam( in string source,
+                                  in CKvalObs::StationInfoExtList data, 
+			                      in CKvalObs::CManager::CheckedInput callback,
+			                      out boolean bussy );
+    };
+
+  };
+};
+
+#endif

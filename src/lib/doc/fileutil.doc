@@ -1,0 +1,11 @@
+/**
+ * \defgroup fileutil a collection of fileutilitys.
+ * \ingroup miutil
+ *
+ */
+
+/**
+ * \namespace dnmi::file
+ *
+ * \brief The namespace to the file utility.
+ */ 

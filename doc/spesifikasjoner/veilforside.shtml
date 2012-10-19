@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+               "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+
+  <!--#include file="header.shtml"-->
+<center>
+  <p>&nbsp;</p>	
+  <p>&nbsp;</p>	
+  <p>&nbsp;</p>	
+  <p>&nbsp;</p>	
+  <p>&nbsp;</p>	
+  <p>&nbsp;</p>	
+
+    <h1>PROGRAMMERINGSVEILEDNING</h1>
+
+  <p>&nbsp;</p>	
+  <p>&nbsp;</p>
+  </center>
+<font size="5">
+<table>
+<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td>&#025;  Veiledning for koding av perlskript<br>&nbsp;&nbsp;&nbsp;&nbsp;og innlegging av sjekkenes metadata</td></tr>
+<tr><td></td>
+    <td>&#025;  Sekvensiell beskrivelse av gangen gjennom Kvalobs</td></tr>
+<tr><td></td>
+    <td>&#025;  Framgangsm&aring;te ved godkjenningskj&oslash;ringer av skript</td></tr>
+<tr><td></td>
+    <td>&#025;  Parametere i Kvalobs-databasen, alfabetisk sortert etter kode</td></tr>
+<tr><td></td>
+    <td>&#025;  Parametere i Kvalobs-databasen, sortert etter nummer</td></tr>
+<tr><td></td>
+    <td>&#025;  Definisjoner av flagg i Kvalobs</td></tr>
+<tr><td></td>
+    <td>&#025;  Kvalobsdatabasens tabeller, deklarasjon og dokumentasjon</td></tr>
+</table>
+</font>
+  <p>&nbsp;</p>	
+  <p>&nbsp;</p>	
+  <p>&nbsp;</p>	
+  <p>&nbsp;</p>	
+  <p>&nbsp;</p>	
+  <p>&nbsp;</p>	
+<center>
+<p><b>Gabriel Kielland, &Oslash;ystein Lie, Terje Reite, Audun Christoffersen, Lars Andresen</b>
+<p>&nbsp;</p>
+<p>
+</center>
+<p>
+
+<p>
+
+
+
+
+<!-- Created: Wed Oct 18 16:13:08 GMT 2000 -->
+<!-- hhmts start -->
+<!-- Last modified: Tue Oct 12 15:11:00 GMT 2004>
+<!-- hhmts end -->
+  </body>
+</html>
+

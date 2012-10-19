@@ -1,0 +1,1116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:w="urn:schemas-microsoft-com:office:word"
+ xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=windows-1252">
+  <meta name="ProgId" content="Word.Document">
+  <meta name="Generator" content="Microsoft Word 9">
+  <meta name="Originator" content="Microsoft Word 9">
+  <link rel="File-List" href="./krotables-filer/filelist.xml">
+  <title>Tabelldokumentasjon i tiltak</title>
+<!--[if gte mso 9]><xml>
+ <o:DocumentProperties>
+  <o:Author>sivachn</o:Author>
+  <o:LastAuthor>sivachn</o:LastAuthor>
+  <o:Revision>2</o:Revision>
+  <o:TotalTime>25</o:TotalTime>
+  <o:Created>2003-03-06T14:44:00Z</o:Created>
+  <o:LastSaved>2003-03-06T14:44:00Z</o:LastSaved>
+  <o:Pages>2</o:Pages>
+  <o:Words>996</o:Words>
+  <o:Characters>5679</o:Characters>
+  <o:Company>DNMI</o:Company>
+  <o:Lines>47</o:Lines>
+  <o:Paragraphs>11</o:Paragraphs>
+  <o:CharactersWithSpaces>6974</o:CharactersWithSpaces>
+  <o:Version>9.3821</o:Version>
+ </o:DocumentProperties>
+</xml><![endif]--><!--[if gte mso 9]><xml>
+ <w:WordDocument>
+  <w:HyphenationZone>21</w:HyphenationZone>
+ </w:WordDocument>
+</xml><![endif]-->
+  <style>
+<!--
+ /* Font Definitions */
+@font-face
+	{font-family:"MS Sans Serif";
+	panose-1:0 0 0 0 0 0 0 0 0 0;
+	mso-font-charset:0;
+	mso-generic-font-family:swiss;
+	mso-font-format:other;
+	mso-font-pitch:variable;
+	mso-font-signature:3 0 0 0 1 0;}
+ /* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{mso-style-parent:"";
+	margin:0cm;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";}
+@page Section1
+	{size:595.3pt 841.9pt;
+	margin:70.85pt 70.85pt 70.85pt 70.85pt;
+	mso-header-margin:35.4pt;
+	mso-footer-margin:35.4pt;
+	mso-paper-source:0;}
+div.Section1
+	{page:Section1;}
+-->
+  </style>
+</head>
+<body lang="NO-BOK" style="">
+<div class="Section1">
+<p class="MsoNormal" style=""><span lang="EN-US"
+ style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><o:p></o:p></span></p>
+<p class="MsoNormal"><span lang="EN-US" style="font-size: 10pt;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+<p class="MsoNormal"><span
+ style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><o:p></o:p></span></p>
+<p class="MsoNormal"><span
+ style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+<div style="text-align: left;"><span style="font-weight: bold;"><br
+ style="font-weight: bold;">
+</span><span style="font-weight: bold;"></span><big><small><br>
+<br>
+&nbsp;
+<br>
+</small></big></div>
+<div style="text-align: center;"><big><big><span
+ style="font-weight: bold;">Systemdokumentasjon
+KRO-feilrapporteringssystem.</span></big></big></div>
+<pre><br><br><span style="font-weight: bold;">Opprettelse av tabeller</span><br
+ style="font-weight: bold;"><br style="font-weight: bold;"><br>CREATE TABLE datafeil (<br>    stationid integer NOT NULL,<br>    obstime timestamp with time zone NOT NULL,<br>    original double precision NOT NULL,<br>    paramid integer NOT NULL,<br>    tbtime timestamp with time zone NOT NULL,<br>    typeid integer NOT NULL,<br>    sensor character(1) DEFAULT '0',<br>    "level" integer,<br>    corrected double precision,<br>    controlinfo character(16) DEFAULT '0000000000000000',<br>    useinfo character(16) DEFAULT '0000000000000000',<br>    cfailed text,<br>    tack timestamp with time zone DEFAULT ('now'::text)::timestamp(6) with time zone,<br>    UNIQUE (stationid, obstime, paramid, level, sensor, typeid)<br>);<br><br><br>CREATE TABLE feil (<br>    nr integer DEFAULT nextval('"feil_nr_seq"'::text) NOT NULL,<br>    stasjonsnr integer NOT NULL,<br>    feiltypenr integer NOT NULL,<br>    tiltaksnr integer,<br>    kvittering boolean DEFAULT false,<br>    signaturnr integer,<br>    lestid timestamp with time zone,<br>    CONSTRAINT feil_pkey PRIMARY KEY (nr),<br>    CONSTRAINT feil_lestid CHECK (NULL::boolean)<br>);<br><br><br>CREATE TABLE feiltype (<br>    nr integer DEFAULT nextval('"feiltype_nr_seq"'::text) NOT NULL,<br>    tekst character varying(100) NOT NULL,<br>    CONSTRAINT feiltype_tekst_key UNIQUE (tekst),<br>    CONSTRAINT feiltype_pkey PRIMARY KEY (nr)<br>);<br><br><br>CREATE TABLE infomelding (<br>    nr integer DEFAULT nextval('"infomelding_nr_seq"'::text) NOT NULL,<br>    stasjonsnr integer NOT NULL,<br>    tekst character varying(1000) NOT NULL,<br>    infostatus integer DEFAULT 2,<br>    tid timestamp with time zone DEFAULT ('now'::text)::timestamp(6) with time zone,<br>    tid_ok timestamp with time zone,<br>    signaturnr integer,<br>    signaturnr_ok integer,<br>    CONSTRAINT infomelding_pkey PRIMARY KEY (nr)<br>);<br><br><br>CREATE TABLE kvalobstest (<br>    nr integer DEFAULT nextval('"kvalobstest_nr_seq"'::text) NOT NULL,<br>    navn character varying(100) NOT NULL,<br>    antalltekst integer,<br>    tekst character varying(100) DEFAULT 'Ingen beskrivelse foreligger...' NOT NULL,<br>    CONSTRAINT kvalobstest_pkey PRIMARY KEY (nr)<br>);<br><br><br>CREATE TABLE kvalobstype (<br>    nr integer NOT NULL,<br>    feiltypenr integer,<br>    CONSTRAINT kvalobstype_pkey PRIMARY KEY (nr)<br>);<br><br><br>CREATE TABLE lokal (<br>    nr integer DEFAULT nextval('"lokal_nr_seq"'::text) NOT NULL,<br>    ip_adr inet NOT NULL,<br>    lest_stasjon character varying(100) NOT NULL,<br>    CONSTRAINT lokal_pkey PRIMARY KEY (nr)<br>);<br><br><br>CREATE TABLE lokal2 (<br>    nr integer DEFAULT nextval('"lokal2_nr_seq"'::text) NOT NULL,<br>    ip_adr inet NOT NULL,<br>    lest_stasjon character varying(100) NOT NULL,<br>    st_type character(1) NOT NULL,<br>    brukernavn character(50),<br>    CONSTRAINT lokal2_nr_key UNIQUE (nr)<br>);<br><br><br>CREATE TABLE melding (<br>    nr integer DEFAULT nextval('"melding_nr_seq"'::text) NOT NULL,<br>    tekst character varying(1000) NOT NULL,<br>    feilnr integer NOT NULL,<br>    tid timestamp with time zone DEFAULT ('now'::text)::timestamp(6) with time zone,<br>    signaturnr integer,<br>    paramnr integer NOT NULL,<br>    paramverdi numeric(10,5),<br>    testnr integer NOT NULL,<br>    testparam numeric[],<br>    CONSTRAINT melding_pkey PRIMARY KEY (nr)<br>);<br><br><br>CREATE TABLE parameter (<br>    nr integer NOT NULL,<br>    kode character(10) NOT NULL,<br>    definisjon character varying(100),<br>    kategori character varying(100),<br>    kategoritekst character varying(100),<br>    CONSTRAINT parameter_kode_key UNIQUE (kode),<br>    CONSTRAINT parameter_nr_key UNIQUE (nr),    <br>    CONSTRAINT parameter_pkey PRIMARY KEY (nr, kode)<br>);<br><br><br>CREATE TABLE signatur (<br>    nr integer DEFAULT nextval('"signatur_nr_seq"'::text) NOT NULL,<br>    navn character(100) NOT NULL,<br>    tilgang integer,<br>    kommentar character(100),<br>    ip_adr inet NOT NULL,<br>    mailadresse character(50),<br>    brukernavn character(50),<br>    CONSTRAINT signatur_pkey PRIMARY KEY (nr)<br>);<br><br><br>CREATE TABLE status (<br>    nr integer NOT NULL,<br>    farge_norsk_txt character varying(100),<br>    farge_eng_txt character varying(100),<br>    CONSTRAINT status_pkey PRIMARY KEY (nr)<br>);<br><br><br>CREATE TABLE stasjon (<br>    nr integer NOT NULL,<br>    navn character varying(100) NOT NULL,<br>    lat numeric(6,4),<br>    lon numeric(6,4),<br>    synopnr integer,<br>    a boolean DEFAULT false,<br>    f boolean DEFAULT false,<br>    h boolean DEFAULT false,<br>    i boolean DEFAULT false,<br>    n boolean DEFAULT false,<br>    t boolean DEFAULT false,<br>    v boolean DEFAULT false,<br>    region character varying(50),<br>    status integer DEFAULT 1,<br>    CONSTRAINT stasjon_pkey PRIMARY KEY (nr),<br>    CONSTRAINT stasjon_lat CHECK (((lat &gt; -90.0000) AND (lat &lt; 90.0000))),<br>    CONSTRAINT stasjon_lon CHECK (((lon &gt; -90.0000) AND (lon &lt; 90.0000))),<br>    CONSTRAINT stasjon_region CHECK ((((((((((region = 'Øst'::character varying) OR NULL::boolean) OR (region = 'Vest'::character varying)) OR (region = 'Nord'::character varying)) OR (region = 'Sør'::character varying)) OR (region = 'MidtNorge'::character varying)) OR (region = 'Maritim'::character varying)) OR (region = 'Test'::character varying)) OR (region = 'Arktis'::character varying))),<br>    CONSTRAINT "&lt;unnamed&gt;" FOREIGN KEY (status) REFERENCES status (nr) ON DELETE NO ACTION ON UPDATE NO ACTION NOT DEFERRABLE INITIALLY IMMEDIATE<br>);<br><br><br>CREATE TABLE stasjon_inne (<br>    stationid integer NOT NULL,<br>    obstime timestamp with time zone NOT NULL,<br>UNIQUE (stationid, obstime)<br>);<br><br><br>CREATE TABLE stasjon_nede (<br>    stationid integer NOT NULL,<br>    obstime timestamp with time zone NOT NULL,<br>UNIQUE (stationid, obstime)<br>);<br><br><br>CREATE TABLE tiltakstype (<br>    nr integer DEFAULT nextval('"tiltakstype_nr_seq"'::text) NOT NULL,<br>    tekst character varying(100) NOT NULL,<br>    CONSTRAINT tiltakstype_pkey PRIMARY KEY (nr)<br>);<br><br><br>CREATE TABLE tiltak (<br>    nr integer DEFAULT nextval('"tiltak_nr_seq"'::text) NOT NULL,<br>    tekst character varying(1000) NOT NULL,<br>    tiltaktypenr integer NOT NULL,<br>    feilnr integer NOT NULL,<br>    beskrevet boolean DEFAULT false,<br>    beskrivtid timestamp with time zone,<br>    signaturnr integer NOT NULL,<br>    ferdig boolean DEFAULT false,<br>    slutttid timestamp with time zone,<br>    sluttfarnr integer,<br>    CONSTRAINT tiltak_pkey PRIMARY KEY (nr),<br>    CONSTRAINT tiltak_tiltaktypenr FOREIGN KEY (tiltaktypenr) REFERENCES tiltakstype (nr) ON DELETE RESTRICT ON UPDATE NO ACTION NOT DEFERRABLE INITIALLY IMMEDIATE,<br>    CONSTRAINT tiltak_signaturnr FOREIGN KEY (signaturnr) REFERENCES signatur (nr) ON DELETE RESTRICT ON UPDATE NO ACTION NOT DEFERRABLE INITIALLY IMMEDIATE<br>);<br><br><br></pre>
+<p class="MsoNormal"><span lang="EN-US" style="font-size: 10pt;"><!--[endif]--><o:p><br>
+</o:p></span></p>
+<b><font color="#000099">
+DOKUMENTASJON AV TABELLENE.</font></b><br>
+<b><br>
+For tabeller i bruk pr. idag:<br>
+Vi har de statiske tabellene feiltype, tiltakstype, status og signatur.
+Signatur vil dog endres når nye personer logger seg på. <br>
+De dynamiske tabellene er feil (inneholder alle feilsituasjoner),
+melding (alle meldingstekster generert), tiltak (alle beskrevne tiltak,
+boolsk verdi for bekreftet feil/feil rettet), stasjon (inneholder alle
+stasjoner, oppdateres mot st_info i klimadatabasen) og lokal2 (benyttes
+som midlertidig lagring av valgt stasjonsnavn til bruk i skript).<br>
+<br>
+</b><br>
+<b>feil:<br>
+</b> KILDE: Oppdateres manuelt i KRO<br>
+HVEM bruker tabellen: Alle de andre tabellene i tiltaksdatabasen <br>
+BESKRIVELSE av tabellen: Dette er den sentrale tabellen i
+tiltaksdatabasen , som kobler feiltype, stasjonsnummer, melding, tiltak
+og signatur.<br>
+BESKRIVELSE av attributtene i tabellen:<br>
+nr: Nummeret på feilsituasjonen<br>
+stasjonsnr: Stasjonsnummeret<br>
+feiltypenr: Nummeret på feiltypen<br>
+tiltaksnr: Nummeret på eventuelt tiltak som er beskrevet<br>
+kvittering: Boolsk verdi ('t'/'f') for om feilsituasjonen er bekreftet
+eller ikke<br>
+signaturnr: Signaturnummer på vedkommende som har bekreftet
+feilsituasjonen<br>
+lestid: Tidspunkt for når feilsituasjonen er bekreftet (er tom hvis
+feilsituasjonen ikke er bekreftet)<br>
+<br>
+<b><br>
+feiltype:<br>
+</b> KILDE: Statisk tabell, kan endres manuelt i tiltaksdatabasen.<br>
+HVEM bruker tabellen: Feil<br>
+BESKRIVELSE av tabellen: Inneholder alle feiltypekategoriene med
+tilhørende nr. <br>
+BESKRIVELSE av attributtene i tabellen:<br>
+nr: nummer på feiltype<b><br>
+</b>tekst: aktuell feiltype<br>
+<b><br>
+<br>
+infomelding:<br>
+</b>KILDE: Oppdateres manuelt i KRO.<br>
+HVEM bruker tabellen: Perlskript for å vise registrert infomelding.<br>
+BESKRIVELSE av tabellen: Inneholder alle infomeldinger av forskjellig
+slag (info om fravær, praktiske opplysninger.)<br>
+BESKRIVELSE av attributtene i tabellen:<br>
+nr: Løpenummer i tabellen<br>
+stasjonsnr: Stasjonsnummeret infomeldingen hører til<br>
+tekst: Infomeldingens innhold<br>
+infostatus: Infostatus 2 (Default): betyr at infomeldingen vises i
+'Stasjonsstatus-visning'. Status1 (kan settes av superbruker,: betyr at
+infomeldingen kun <br>
+vises i 'Historikk-visning'.<br>
+tid: Tid for infomeldingen<br>
+tid_ok: Ikke i bruk<br>
+signaturnr: Sigaturnummeret på den som står bak infomeldingen.<br>
+signaturnr_ok: ikke i bruk<br>
+<br>
+<br>
+<b> lokal2: <br>
+</b> KILDE: Tabell som fungerer som temporær lagring ved klikk på
+stasjon i KRO, slik at stasjonen "huskes". Denne plasseres da temporært
+i
+en ny rad.<br>
+HVEM bruker tabellen: Perlskriptet som viser resultatet av valget ditt.<br>
+BESKRIVELSE av tabellen: Brukes som mellomtabell for valgt stasjon,<br>
+dersom man trykker på "Registrering av ny melding", "Historikk" etc. så
+"huskes" stasjonen<br>
+man har valgt ved hjelp av denne tabellen (stasjonsvalget blir altså
+lagret midlertidig)<br>
+BESKRIVELSE av attributtene i tabellen:<br>
+nr: Løpenummer<br>
+ip_adr: IP-addressen til vedkommende som er inne på aktuell stasjon<br>
+lest_stasjon: Aktuell stasjon man har valgt<br>
+st_type: Type stasjon<br>
+brukernavn: Brukernavn<br>
+<br>
+<br>
+<b>melding</b>:<br>
+KILDE: Oppdateres manuelt i KRO<br>
+HVEM bruker tabellen: Perlskript for å vise registrert melding<br>
+BESKRIVELSE av tabellen: Denne tabellen inneholder alle meldinger som
+er registrert, med signatur, feilnummer og tidspunkt <br>
+BESKRIVELSE av attributtene i tabellen:<br>
+nr: løpenummeret på meldingen<br>
+tekst: meldingsteksten<br>
+feilnr: nummeret på feilsituasjonen som meldingen tilhører<br>
+tid: tid for innkommet melding<br>
+signaturnr: signaturnummeret til meldingskilden <br>
+paramnr: &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Ikke i bruk<br>
+paramverdi: &nbsp; &nbsp; Ikke i bruk<br>
+testnr: &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Ikke i
+bruki&nbsp; <br>
+testparam: &nbsp; &nbsp; &nbsp;&nbsp; Ikke i bruk<b><br>
+<br>
+</b><b><br>
+signatur: <br>
+</b>KILDE: Tiltaksdatabasen<br>
+HVEM bruker tabellen: Feil, Melding, Tiltak<br>
+BESKRIVELSE av tabellen: Signaturtabell. Inneholder alle registrerte
+brukernavn som har koblet seg på via LDAP<br>
+BESKRIVELSE av attributtene i tabellen:<br>
+nr: Signaturnummer<br>
+navn: Brukernavn <br>
+tilgang: Tall som angir rettigheter (1,2,3,4,5)<br>
+kommentar: Kommentarfelt<br>
+ip_adr<b>: </b>Brukerens ip-addresse<b><br>
+<br>
+<br>
+stasjon:</b><b><br>
+</b>KILDE: Klimadatabasen, senere St_Info_Sys<br>
+HVEM bruker tabellen: Feil<br>
+BESKRIVELSE av tabellen: Stasjonstabellen for KRO-systemet. Oppdateres
+automatisk fra klimadatabasen.<br>
+BESKRIVELSE av attributtene i tabellen:<br>
+nr: Stasjonsnummeret på stasjonen.<br>
+navn: Stasjonens navn.<br>
+lat: Breddegrad<br>
+lon: Lengdegrad<br>
+synopnr: Synopnummeret på stasjonen<br>
+a: &nbsp;Bool-verdi for automatstasjon<br>
+f: &nbsp;Bool-verdi for flyplass<br>
+h: &nbsp;Bool-verdi for hybridstasjon<br>
+i: &nbsp; Bool-verdi for piostasjon<br>
+m: Bool-verdi for manuell værstasjon <br>
+n: &nbsp;Bool-verdi for nedbørstasjon<br>
+t: &nbsp;Bool-verdi for teststasjon <br>
+v: &nbsp;Bool-verdi for værstasjon &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <br>
+region: Regiontilhørighet for stasjon (eks. Østlandet, Vestlandet,
+Nord-Norge)<br>
+status: Stasjonsstatus (eks. 3=rød, 2=gul, 1=grønn)<br>
+<br>
+<br>
+<b>stasjon_inne:<br>
+</b>KILDE: Tabellen data i Kvalobs, gjennom overføringsteknologi<br>
+HVEM bruker tabellen: Perl-skript bruker denne og obs_pgm for å lage en
+liste over stasjon_nede<br>
+BESKRIVELSE av tabellen: Inneholder stasjonsnr og obstid for stasjoner
+definert som 'inne'<br>
+BESKRIVELSE av attributtene i tabellen:<br>
+stationid: Stasjonsnr<br>
+obstime: Obstid<br>
+<br>
+<br>
+<b>stasjon_nede: <br>
+</b>KILDE: Stasjon_inne og obs_pgm<br>
+HVEM bruker tabellen: Perl-skript bruker denne for å generere
+web-meldinger til KRO om stasjoner nede. Ikke fullt implementert,
+gjenstår å <br>
+bli enig om kriterier for meldinger.<br>
+BESKRIVELSE av tabellen: Inneholder stasjonsnr og obstid for stasjoner
+definert som 'nede'<br>
+BESKRIVELSE av attributtene i tabellen:<br>
+stationid: Stasjonsnr<br>
+obstime: Obstid<br>
+<b></b>
+<pre><br></pre>
+<b>status:</b><br>
+KILDE: Tiltaksdatabasen<br>
+HVEM bruker tabellen: Stasjon<br>
+BESKRIVELSE av tabellen: Inneholder alle statustyper (1,2,3) kombinert
+med tekstlig forklaring på norsk og engelsk. <br>
+BESKRIVELSE av attributtene i tabellen:<br>
+nr: statusnummer<br>
+farge_norsk_txt: norsk tekst<br>
+farge_eng_txt: engelsk tekst<br>
+<br>
+<br>
+<b>tiltak:<br>
+</b>KILDE: Tiltaksdatabasen<br>
+HVEM bruker tabellen: Feil<br>
+BESKRIVELSE av tabellen: Inneholder alle tiltakene som er satt
+med type, tekst, tidspunkt og signatur og feilsituasjonsnummer<br>
+BESKRIVELSE av attributtene i tabellen:<br>
+nr: Tiltaksnummeret<br>
+tekst: Forklaring på tiltak<br>
+tiltaktypenr: Nummeret på tiltakstypen til tiltaket<br>
+feilnr: Nummeret på feilsituasjonen som tiltaket tilhører<br>
+beskrevet: Bool-verdi for beskrevet/ikke-beskrevet tiltak<br>
+beskrivtid: Tidspunkt for beskrevet tiltak<br>
+signaturnr: Signaturnummeret til den som har beskrevet tiltak<br>
+ferdig: Bool-verdi for rettet/ikke rettet feil<br>
+slutttid: Tidspunkt for feil rettet<br>
+sluttfarnr: Signaturnummer på den som rettet feilen<br>
+<br>
+<br>
+<b>tiltakstype:<br>
+</b>KILDE: Tiltaksdatabasen<br>
+HVEM bruker tabellen: Tiltak<br>
+BESKRIVELSE av tabellen: Inneholder alle tiltakstypene (eks. 'Kontakt
+observatør', 'Annet') med tilhørende nummer <br>
+BESKRIVELSE av attributtene i tabellen:<br>
+nr: nummer på tiltakstypen<br>
+tekst: aktuell tiltakstype<br>
+</div>
+<br>
+<b><br>
+</b><b>
+datafeil: </b>Ikke i bruk<br>
+<b>
+kvalobstest: </b>Ikke i bruk<br>
+<b>kvalobstype:</b> Ikke i bruk<br>
+<b>lokal:</b> Ikke i bruk<br>
+<span style="font-weight: bold;">parameter:</span> Ikke i bruk<br>
+<br>
+<br>
+<br>
+<font color="#000099"><big>------------------------------------------------------------------------------------<br>
+Dokumentasjon av alle skript som er med i KRO's webgrensesnitt</big></font><br>
+<br>
+<b>Alle perl-skriptene, websidene og bildene som er i bruk i
+KRO-systemet (database "tiltak", server "modon") <br>
+</b><span style="font-weight: bold; color: rgb(102, 51, 255);"></span><br>
+<span style="font-weight: bold;">Startsiden:</span>&nbsp;&nbsp;&nbsp;
+http:/modon/tiltak&nbsp; (<a href="http://modon/cgi-bin/tiltak/start.pl">http://modon/cgi-bin/tiltak/start.pl)</a><br>
+<br>
+<br>
+<br>
+<b>Forklaring av hvert perl-skript/hver webside:</b><br>
+<br>
+<table width="90%" border="1" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td colspan="2" rowspan="1" style="vertical-align: top;"><b>Skriptene
+under ligger på<br>
+      </b><b>http://modon.oslo.dnmi.no/tiltak/<br>
+(/var/www/tiltak/)</b><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold; background-color: rgb(204, 102, 0);"
+ valign="top"><br>
+      </td>
+      <td style="font-weight: bold; background-color: rgb(204, 102, 0);"
+ valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">index.html<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Siden som
+"redirigerer" addressen fra http://modon/tiltak til <br>
+http://modon.oslo.dnmi.no/cgi-bin/tiltak/start.pl &nbsp;(Dette for å ha
+en lettere startaddresse)<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold; background-color: rgb(204, 102, 0);"
+ valign="top"><br>
+      </td>
+      <td style="font-weight: bold; background-color: rgb(204, 102, 0);"
+ valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">kro.png<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Bilde-logo for KRO.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold; background-color: rgb(204, 102, 0);"
+ valign="top"><br>
+      </td>
+      <td style="font-weight: bold; background-color: rgb(204, 102, 0);"
+ valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">krodokumentasjon.html</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Dokumentasjon
+av hvordan KRO brukes.</span> <span style="font-weight: bold;">(Link
+nederst til høyre)</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold; background-color: rgb(204, 102, 0);"
+ valign="top"><br>
+      </td>
+      <td style="font-weight: bold; background-color: rgb(204, 102, 0);"
+ valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" rowspan="1" style="vertical-align: top;"> <b>Skriptene
+under ligger på<br>
+http://modon.oslo.dnmi.no/cgi-bin/tiltak/<br>
+(/usr/lib/cgi-bin/tiltak/)</b></td>
+    </tr>
+    <tr>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">af_frames_ver2.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Rammesett for visning
+av Stasjonsstatus for valgt stasjon i rubrikken "Alle stasjoner" på <br>
+startsiden (røde). Meny på venstre side, stasjonsstatusvisning i høyre
+ramme.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">af_frames_ver4.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Rammesett for visning
+av Stasjonsstatus for valgt stasjon i rubrikken "Automatstasjoner" på
+startsiden. Meny på venstre side, stasjonsstatusvisning i høyre
+ramme.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">af_frames_ver5.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Rammesett for visning
+av Stasjonsstatus for valgt stasjon i rubrikken "Flyplasser" <br>
+på startsiden. Meny på venstre side, stasjonsstatusvisning i høyre
+ramme.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">af_frames_ver6.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Rammesett for visning
+av Stasjonsstatus for valgt stasjon i rubrikken "Andre manuelle" <br>
+på startsiden. Meny på venstre side, stasjonsstatusvisning i høyre
+ramme.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">af_frames_ver7.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Rammesett for visning
+av Stasjonsstatus for valgt stasjon i rubrikken "Nedbørstasjoner" <br>
+på startsiden. Meny på venstre side, stasjonsstatusvisning i høyre
+ramme.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">af_frames_ver8.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Rammesett for visning
+av stasjonsstatus for valgt stasjon i rubrikken "Alle stasjoner" på <br>
+startsiden (gule). Meny på venstre side, stasjonsstatusvisning i høyre
+ramme.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">af_frames_ver8x.pl </td>
+      <td style="font-weight: bold;" valign="top">Rammesett for visning
+av stasjonsstatus for valgt stasjon i rubrikken 'Mine gule st.'. </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold;">af_frames_ver8y.pl</td>
+      <td style="vertical-align: top; font-weight: bold;">Rammesett for
+visning av stasjonsstatus for valgt stasjon i rubrikken '10 siste
+feilmeldinger'<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold;">af_frames_ver8z.pl</td>
+      <td style="vertical-align: top; font-weight: bold;">Rammesett for
+visning av stasjonsstatus for valgt stasjon i rubrikken '10 siste
+infomeldinger'<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold;">af_frames_ver9.pl</td>
+      <td style="vertical-align: top; font-weight: bold;">Rammesett for
+visning
+av Stasjonsstatus for valgt stasjon i rubrikken "PIO-stasjoner" <br>
+på startsiden. Meny på venstre side, stasjonsstatusvisning i høyre
+ramme.</td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">af_frames_ver12.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Rammesett for visning
+av Stasjonsstatus for valgt stasjon i rubrikken "Hybridstasjoner" <br>
+på startsiden. Meny på venstre side, stasjonsstatusvisning i høyre
+ramme.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">allefeil_ver2.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Velg stasjon i en av
+kategoriene (Automat, Nedbør etc.) på startsiden, trykk på 'Status'.
+Stasjonsstatus -visning i høyre ramme i neste skjermbilde.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold; background-color: rgb(204, 102, 0);"
+ valign="top"><br>
+      </td>
+      <td style="font-weight: bold; background-color: rgb(204, 102, 0);"
+ valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">endr_tiltak2.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Tar hånd om endring
+av eksisterende tiltak, ved trykk på "Registrer" etter å ha endret <br>
+tiltak.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold; background-color: rgb(204, 102, 0);"
+ valign="top"><br>
+      </td>
+      <td style="font-weight: bold; background-color: rgb(204, 102, 0);"
+ valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">feilrettet.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Ved trykk på
+"Feil-rettet"-knappen for "gul" stasjon. Oppdaterer feilsituasjonen med
+      <br>
+signatur, og setter
+stasjonsstatus tilbake til grønn.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">frames.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Eldre type rammesett
+for Stasjonsstatusvisning.<br>
+Trykk på 'Grønne st.' på startsiden. Trykk deretter "Velg region og
+stasjon". Valg av Region
+og Stasjon øverst, meny til venstre (med komplett stasjonsliste) og
+Stasjonsstatusvisning i nederste høyre ramme. <br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold; background-color: rgb(204, 102, 0);"
+ valign="top"><br>
+      </td>
+      <td style="font-weight: bold; background-color: rgb(204, 102, 0);"
+ valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">gamstasjonside.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Øverste høyre ramme i
+"frames.html". (Etter trykk på "Velg region og stasjon" fra <br>
+startsiden). Visning av stasjonsutvalg utfra valgt region. <br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold; background-color: rgb(204, 102, 0);"
+ valign="top"><br>
+      </td>
+      <td style="font-weight: bold; background-color: rgb(204, 102, 0);"
+ valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">hist1_ver2.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Historikk-visning for
+valgt stasjon. Nederste
+høyre ramme ved trykk på "Historikk" <br>
+i rammene "frames.html" og "meldingframes.html". Høyre ramme ved trykk
+på <br>
+"Historikk" i alle "af_frames"-rammene.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">hist1b.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Visning av historikk
+ved valg av en annen stasjon i en av "af-frames"-rammene, og <br>
+deretter trykk på "Historikk".<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold;">hist1bx.pl<br>
+      </td>
+      <td style="vertical-align: top; font-weight: bold;">Valgt 'Mine
+gule st.' fra startsiden. Valg av annen stasjon i venstre meny, dernest
+trykk på 'Historikk'.</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold;">hist1by.pl<br>
+      </td>
+      <td style="vertical-align: top; font-weight: bold;">Valgt 'Siste
+10 feilmeldinger' fra startsiden. Valg av annen stasjon i venstre meny,
+dernest trykk på 'Historikk'.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">histframes.pl</td>
+      <td style="font-weight: bold;" valign="top">Rammesett for visning
+av 'Historikk' i høyre ramme og menyvalg i venstre ramme. Framkommer
+ved valg av aktuell stasjon på startsiden, trykk på 'Status' og
+deretter trykk på 'Historikk' i venstre meny. Framkommer også ved valg
+av 'Siste 10 infomeldinger' fra startsiden, og deretter trykk på
+'Historikk' i venstre meny.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold;">histframesx.pl</td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Framkommer
+ved valg av 'Mine gule st.' fra startsiden, og deretter trykk på
+'Historikk' i venstre meny.<br>
+Rammesett for visning av 'Historikk'.</span> <br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold;">histframesy.pl</td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Framkommer
+ved valg av 'Siste 10 feilmeldinger' fra startsiden, og deretter trykk
+på 'Historikk' i venstre meny.<br>
+Rammesett for visning av 'Historikk'.</span></td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">htilkartsiden.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Venstre meny (ramme)
+ved trykk på "Historikk"
+i en av "af-frames"-rammene.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold;">htilkartsidenx.pl</td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Trykk
+på </span><span style="font-weight: bold;"><span
+ style="font-weight: bold;">'Mine gule st.' fra startsiden, deretter
+trykk på 'Historikk' i venstre meny. Denne rammen (venstre ramme) er da
+      </span></span><span style="font-weight: bold;"><span
+ style="font-weight: bold;">htilkartsidenx.pl</span></span></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold;">htilkartsideny.pl</td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Trykk
+på </span><span style="font-weight: bold;"><span
+ style="font-weight: bold;">'Siste 10 feilmeldinger' fra startsiden,
+deretter trykk på 'Historikk' i venstre meny. Denne rammen (venstre
+ramme) er da </span></span><span style="font-weight: bold;"><span
+ style="font-weight: bold;">htilkartsideny.pl</span></span></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">info_til_historikk.pl</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Oppdaterer
+infostatus fra '2 'til '1' på gamle 'Infomeldinger', dvs. slik at de
+kun vises i 'Historikk' og ikke i 'Stasjonsstatus'-visning. Virker på
+knappen 'Putt gamle Infomeldinger over i Historikk' som kun er
+tilgjengelig for superbruker.</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold; background-color: rgb(204, 102, 0);"
+ valign="top"><br>
+      </td>
+      <td style="font-weight: bold; background-color: rgb(204, 102, 0);"
+ valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">kart2.pl</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Gamle
+startsider, link til ny er plassert her i en overgangsperiode.</span><br>
+      </td>
+    </tr>
+    <tr style="font-weight: bold;">
+      <td style="vertical-align: top;">kart2b.pl</td>
+      <td style="vertical-align: top;">Gamle startsider, link til ny er
+plassert her i en overgangsperiode.</td>
+    </tr>
+    <tr style="font-weight: bold;">
+      <td style="vertical-align: top;">kart3.pl</td>
+      <td style="vertical-align: top;">Gamle startsider, link til ny er
+plassert her i en overgangsperiode.</td>
+    </tr>
+    <tr style="font-weight: bold;">
+      <td style="vertical-align: top;">kart4.pl</td>
+      <td style="vertical-align: top;">Gamle startsider, link til ny er
+plassert her i en overgangsperiode.</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold;">kart4b.pl</td>
+      <td style="vertical-align: top; font-weight: bold;">Gamle
+startsider, link til ny er plassert her i en overgangsperiode.</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">kro8.pl</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Program
+for overføring av PIO-servicemeldinger til KRO</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold;">meldingframes.pl</td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Trykk
+på 'Grønne stasjoner' fra startsiden, deretter knappen 'Registrering av
+ny melding'. Rammesett.</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">meldingframes1.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Valgt stasjon på
+startsiden&nbsp; (i en av kategoriene&nbsp; rød, gul, grønn, (info)),
+og trykk på knappen "STATUS". Deretter trykk på "Registrering av ny
+melding" i neste vindu). Rammesett med meny til venstre,
+meldingsregistrering i høyre ramme.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold;">meldingframes1x.pl</td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Trykk
+på </span><span style="font-weight: bold;"><span
+ style="font-weight: bold;">aktuell stasjon i 'Mine gule st.' fra
+startsiden, deretter
+trykk på 'Registrering av ny melding'. Websiden er da delt inn i
+rammesettet </span></span><span style="font-weight: bold;"><span
+ style="font-weight: bold;">meldingframes1x.pl</span></span></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold;">meldingframes1y.pl</td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Trykk
+på </span><span style="font-weight: bold;"><span
+ style="font-weight: bold;">aktuell stasjon i 'Siste 10 feilmeldinger'
+fra startsiden,
+deretter trykk på 'Registrering av ny melding'. </span></span><span
+ style="font-weight: bold;"><span style="font-weight: bold;"><span
+ style="font-weight: bold;"><span style="font-weight: bold;">Websiden
+er da delt inn i rammesettet </span></span><span
+ style="font-weight: bold;"><span style="font-weight: bold;">meldingframes1y.pl</span></span></span></span></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold;">meldingframes2.pl</td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Rammesett
+man kommer til dersom man velger stasjon i rubrikken 'VELG STASJON' på
+startsiden, der man velger aktuell stasjon man skal registrere melding
+på. (Navnsortert).</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold;">meldingframes3.pl</td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Rammesett
+man kommer til dersom man
+velger stasjon i rubrikken 'VELG STASJON' på startsiden, der man velger
+aktuell stasjon man skal registrere melding på. (Sortert på nr).</span></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold;">meldingframes4.pl</td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Rammesett
+man kommer til dersom man
+velger stasjon i rubrikken 'WMO-nr' på startsiden, der man velger
+aktuell stasjon man skal registrere melding på. <br>
+      </span></td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">mregionside.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Opplisting av
+regioner. <br>
+Trykk på 'VELG STASJON' (for meldingsregistrering) på startsiden.
+Venstre ramme (rubrikk Region) i neste vindu.<br>
+Vises også:<br>
+Trykk på 'Grønne stasjoner' fra startsiden, 'Registrering av ny
+melding'. Nederste venstre ramme.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">mregside.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Valg av stasjon i
+rubrikken 'VELG STASJON' på startsiden.&nbsp; Deretter valg av annen
+stasjon i&nbsp; neste&nbsp; vindu. Høyre ramme for
+meldingsregistrering. <br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">mregsidea.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Valg av stasjon i en
+av kategoriene (Automat, nedbør etc) på startsiden, trykk på 'STATUS'.
+Deretter trykk på 'Registrering av ny melding. Høyre ramme for
+meldingsregistrering. </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold;">mregsidex.pl<br>
+      </td>
+      <td style="vertical-align: top; font-weight: bold;">Valg av
+aktuell stasjon i 'Mine gule st.' Trykk på 'Registrering av ny melding'
+i neste skjermbilde. Deretter valg av annen stasjon i rubrikken 'Mine
+gule'. Registreringsvinduet til høyre.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold;">mregsidey.pl<br>
+      </td>
+      <td style="vertical-align: top; font-weight: bold;">Valg av
+aktuell stasjon i 'Siste 10 feilmeldinger'. Trykk på 'Registrering av
+ny
+melding' i neste skjermbilde. Deretter valg av annen stasjon i
+rubrikken '10 siste'. Registreringsvinduet til høyre.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold;">mregside_exp1.pl<br>
+      </td>
+      <td style="vertical-align: top; font-weight: bold;">Valg av
+stasjon i rubrikken 'VELG STASJON' (for meldingsregistrering) på
+startsiden. Registreringsvinduet til
+høyre. </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">mstasjonside.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Opplisting av
+stasjoner utfra valgt region. <br>
+Trykk på 'VELG STASJON' (for meldingsregistrering) på startsiden.
+Venstre del i nederste høyre ramme (rubrikk Stasjon) i neste vindu.<br>
+Vises også:<br>
+Trykk på 'Grønne stasjoner' fra startsiden, 'Registrering av ny
+melding'. Venstre del i nederste høyre ramme. </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">msynopregside.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Registrering av
+melding utfra valgt WMO-nr. <br>
+Trykk på 'VELG STASJON' (for meldingsregistrering) på startsiden.&nbsp;
+Velg stasjon utfra WMO-nr nederst til høyre. Øverste høyre ramme.<br>
+Vises også:<br>
+Trykk på 'Grønne stasjoner' fra startsiden, 'Registrering av ny
+melding'. Velg stasjon utfra WMO-nr nederst til høyre. Øverste høyre
+ramme for meldingsregistrering. </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">mtilkartsiden2.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Velg stasjon i en
+kategori (Automat, nedbør etc.), trykk på Status. Venstre ramme i neste
+vindu.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold;">mtilkartsiden2x.pl</td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Valg
+av
+aktuell stasjon i 'Mine gule st.' Trykk på 'Registrering av ny melding'
+i neste skjermbilde. Venstre meny.</span><span
+ style="font-weight: bold;"></span> </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold;">mtilkartsiden2y.pl</td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Valg
+av
+aktuell stasjon i 'Siste 10 feilmeldinger'. Trykk på 'Registrering av
+ny melding'
+i neste skjermbilde. Venstre meny .</span><span
+ style="font-weight: bold;"></span></td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">mtilkartsiden5.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Trykk på 'VELG
+STASJON' (for meldingsregistrering) på startsiden. Venstre øverste
+ramme i neste vindu. </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold; background-color: rgb(204, 102, 0);"
+ valign="top"><br>
+      </td>
+      <td style="font-weight: bold; background-color: rgb(204, 102, 0);"
+ valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">null_tiltak.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Skriptet som
+håndterer trykk på "Null-tiltak"
+i Stasjonsstatus-visning (ved rød status <br>
+og bekreftet feilsituasjon). "Null-tiltak" blir registrert, feil settes
+til "rettet" og <br>
+stasjonsstatus blir grønn igjen.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">nyallefeil.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Stasjonsstatusvisning
+ved trykk på "Bekreft feilsituasjon" for rød stasjon<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">nystatuside2.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Stasjonsstatusvisning
+ved trykk på "Bekreft feilsituasjon" for annen valgt rød stasjon<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">nyttend_2.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Registrering av nytt
+tiltak. Ved trykk på "Registrer" etter å ha trykket på "Beskriv tiltak"
+      <br>
+(og spesifisert tiltak) i stasjonsstatusvisning.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold; background-color: rgb(204, 102, 0);"
+ valign="top"><br>
+      </td>
+      <td style="font-weight: bold; background-color: rgb(204, 102, 0);"
+ valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">regendny_ver3.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top"><span
+ style="font-weight: bold;">Registrering av ny feilmelding.<br>
+Velg først stasjon i rubrikken 'VELG STASJON' (for
+meldingsregistrering) på startsiden.
+(Alternativt valg av stasjon på annen måte og trykk på knappen
+'Registrering av ny melding'). Beskriv feilmelding og trykk på
+knappen 'Registrer'.&nbsp; </span> </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold;">regendny_info_ver3.pl</td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Registrering
+av ny infomelding. <br>
+Velg først stasjon i
+rubrikken 'VELG STASJON'. (Alternativt valg av stasjon på annen måte og
+trykk på knappen 'Registrering av ny melding'). Beskriv infomelding og
+trykk på knappen 'Registrer'.&nbsp; </span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">regionside.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Trykk på knappen
+'Grønne stasjoner'. Trykk på 'Velg region og stasjon' i neste vindu.
+Øverste venstre ramme i neste skjermbilde.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold; background-color: rgb(204, 102, 0);"
+ valign="top"><br>
+      </td>
+      <td style="font-weight: bold; background-color: rgb(204, 102, 0);"
+ valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">start.pl</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;"><span
+ style="color: rgb(51, 51, 153);">"Startsiden"</span>.
+'start.pl' er åpningssiden på KRO, her er oversikt over alle
+stasjonstyper</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">og deres status (rød, gul,
+grønn)+infomeldinger.</span> <span style="font-weight: bold;">Stasjoner
+i rubrikken 'VELG STASJON' (der man registrerer feilmelding eller
+infomelding) er
+sortert på navn</span>, <span style="font-weight: bold;">stigende.
+Analoge startsider er startb.pl, </span><span
+ style="font-weight: bold;"><span style="font-weight: bold;">startc.pl,
+      </span></span><span style="font-weight: bold;"><span
+ style="font-weight: bold;"><span style="font-weight: bold;">startd.pl
+der stasjoner er
+sortert på navn eller nr. Dette kan velges på startsiden <br>
+10 siste feilmeldinger og 10 siste infomeldinger vises. <br>
+Link til 'HVORDAN BRUKE KRO' og statistikk på ulike typer feilmeldinger.<br>
+Visning av navn etter LDAP-registrering, link til Stasjonsendringer og
+grønne stasjoner.<br>
+      </span></span></span></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">startb.pl</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Startside
+der stasjoner i rubrikken 'VELG STASJON' er sortert på navn</span>, <span
+ style="font-weight: bold;">synkende.</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold;">startc.pl<br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Startside
+der stasjoner i rubrikken 'VELG STASJON' er sortert på nr, stigende</span>.</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">startd.pl</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Startside
+der stasjoner i rubrikken 'VELG STASJON' er sortert på nr, synkende</span>.</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">startf.pl</span><br>
+      </td>
+      <td style="vertical-align: top; font-weight: bold;">Denne siden
+viser
+alle "grønne" stasjoner, stasjoner der det ikke er registrert
+feilmeldinger på aktuelt tidspunkt.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">statistikk.pl</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Viser
+statistikk for valgt feiltype fra startsiden (Nederst til høyre)</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">statuside2.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Velg stasjon i en av
+kategoriene (Automat, Nedbør etc.) på startsiden, trykk på 'Status'.
+Velg en ny stasjon fra venstre meny i neste skjermbilde.
+Stasjonsstatusvisning i høyre ramme. </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold;">statuside2x.pl</td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Valg
+av stasjon i 'Mine gule st.'. Valg av annen stasjon i venstre meny i
+neste skjermbilde. Stasjonsstatus-</span><span
+ style="font-weight: bold;"><span style="font-weight: bold;"></span></span><span
+ style="font-weight: bold;">visning i høyre ramme.&nbsp;</span><span
+ style="font-weight: bold;"></span></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold;">statuside2y.pl</td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Valg
+av stasjon i 'Siste 10 feilmeldinger'. Valg av annen stasjon i venstre
+meny i neste skjermbilde. </span><span style="font-weight: bold;"><span
+ style="font-weight: bold;">Resultatet </span><span
+ style="font-weight: bold;"><span style="font-weight: bold;">(statuside2y.pl)</span></span><span
+ style="font-weight: bold;"> vises i høyre ramme. <br>
+      </span></span></td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold; background-color: rgb(204, 102, 0);"
+ valign="top"><br>
+      </td>
+      <td style="font-weight: bold; background-color: rgb(204, 102, 0);"
+ valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">tilkartsiden2.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Venstre meny ved
+trykk på "Status" for valgt stasjon på siden.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold;">tilkartsiden2x.pl</td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Valg
+av stasjon i 'Mine gule st.' Venstre meny i neste ramme (rammen
+af_frames_ver8x.pl)</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold;">tilkartsiden2y.pl</td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Valg
+av stasjon i 'Siste 10 feilmeldinger'</span><span
+ style="font-weight: bold;"><span style="font-weight: bold;">. Venstre
+meny i neste ramme (rammen af_frames_ver8y.pl)</span></span></td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">tilkartsiden3.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Nederste venstre meny
+etter trykk på "Velg region og stasjon" fra siden<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">tregsidea.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Registrering av nytt
+tiltak. Etter trykk på "Beskriv tiltak" i stasjonsstatus-visning<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold;" valign="top">tregsidea3.pl<br>
+      </td>
+      <td style="font-weight: bold;" valign="top">Endring av tiltak.
+Ved trykk på "Endre tiltak" i Stasjonsstatus-visning (for gul stasjon).<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+<br>
+<br>
+<b><font color="#000099">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;DATABASESTRUKTUR.</font></b>&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp; <br>
+<br>
+<br>
+<br>
+<img src="databasetegning.bmp" alt="" width="959" height="620"> <br>
+<br>
+<br>
+<br>
+<br>
+<br>
+</body>
+</html>

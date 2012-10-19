@@ -1,0 +1,169 @@
+Connected to <PostgreSQL>
+Disconnect from a PostgreSQL database!
+ reading input file:
+ /metno/kvalobs/cronjob/lam2kv/etc/metdat.1h                                                                                                                                                                                                                     
+ reading positions from file:
+ /metno/kvalobs/cronjob/lam2kv/etc/stations.kvalobs                                                                                                                                                                                                              
+ input o.k.
+  felt file: 
+ /opdata/hirlam12/h12sf12.dat                                                                                                                                                                                                                                    
+    time:  14:08:2008 1200 utc
+  ekstra.    produsent,grid:  88 12
+ file,produsent,grid,datatype,prog.tid:     12    88    12     4     0
+ input grid =  12
+ input grid type =  3
+ nx,ny =        864       698
+ grid =     -46.40    -36.40      0.11      0.11      0.00     65.00
+  prognose.  produsent,grid:  88 12
+ file,produsent,grid,datatype,prog.tid:     12    88    12     2     6
+ file,produsent,grid,datatype,prog.tid:     12    88    12     2     7
+ file,produsent,grid,datatype,prog.tid:     12    88    12     2     8
+ file,produsent,grid,datatype,prog.tid:     12    88    12     2     9
+ file,produsent,grid,datatype,prog.tid:     12    88    12     2    10
+ file,produsent,grid,datatype,prog.tid:     12    88    12     2    11
+  posisjon utenfor eller uten data: 92100                         
+  posisjon utenfor eller uten data: 52601                         
+  posisjon utenfor eller uten data: 99990                         
+  no. of parameters:              6
+  no. of positions input,output:  797 794
+  no. of timesteps input,output:  6 6
+  no. of extra parameters:        3
+    antall ord:      43815
+    antall records:  86
+    record-lengde:   512
+  output file: 
+ /metno/kvalobs/cronjob/lam2kv/data/last_tempo.dat                                                                                                                                                                                                               
+  output konvertering.  konvc,konvd:  0 1
+ reading input file:
+ /metno/kvalobs/cronjob/lam2kv/etc/metdat.1h                                                                                                                                                                                                                     
+ reading positions from file:
+ /metno/kvalobs/cronjob/lam2kv/etc/stations.kvalobs                                                                                                                                                                                                              
+ input o.k.
+  felt file: 
+ /opdata/hirlam12/h12sf12.dat                                                                                                                                                                                                                                    
+    time:  14:08:2008 1200 utc
+  ekstra.    produsent,grid:  88 12
+ file,produsent,grid,datatype,prog.tid:     12    88    12     4     0
+ input grid =  12
+ input grid type =  3
+ nx,ny =        864       698
+ grid =     -46.40    -36.40      0.11      0.11      0.00     65.00
+  prognose.  produsent,grid:  88 12
+ file,produsent,grid,datatype,prog.tid:     12    88    12     2    12
+ file,produsent,grid,datatype,prog.tid:     12    88    12     2    13
+ file,produsent,grid,datatype,prog.tid:     12    88    12     2    14
+ file,produsent,grid,datatype,prog.tid:     12    88    12     2    15
+ file,produsent,grid,datatype,prog.tid:     12    88    12     2    16
+ file,produsent,grid,datatype,prog.tid:     12    88    12     2    17
+  posisjon utenfor eller uten data: 92100                         
+  posisjon utenfor eller uten data: 52601                         
+  posisjon utenfor eller uten data: 99990                         
+  no. of parameters:              6
+  no. of positions input,output:  797 794
+  no. of timesteps input,output:  6 6
+  no. of extra parameters:        3
+    antall ord:      43815
+    antall records:  86
+    record-lengde:   512
+  output file: 
+ /metno/kvalobs/cronjob/lam2kv/data/last_tempo.back                                                                                                                                                                                                              
+  output konvertering.  konvc,konvd:  0 1
+ reading input file:
+ /metno/kvalobs/cronjob/lam2kv/etc/metdat.RR12                                                                                                                                                                                                                   
+ reading positions from file:
+ /metno/kvalobs/cronjob/lam2kv/etc/stations.kvalobs                                                                                                                                                                                                              
+ input o.k.
+  felt file: 
+ /opdata/hirlam12/h12sf12.dat                                                                                                                                                                                                                                    
+    time:  14:08:2008 1200 utc
+  ekstra.    produsent,grid:  88 12
+ file,produsent,grid,datatype,prog.tid:     12    88    12     4     0
+ input grid =  12
+ input grid type =  3
+ nx,ny =        864       698
+ grid =     -46.40    -36.40      0.11      0.11      0.00     65.00
+  prognose.  produsent,grid:  88 12
+ file,produsent,grid,datatype,prog.tid:     12    88    12     2     6
+ file,produsent,grid,datatype,prog.tid:     12    88    12     2    18
+  posisjon utenfor eller uten data: 92100                         
+  posisjon utenfor eller uten data: 52601                         
+  posisjon utenfor eller uten data: 99990                         
+  no. of parameters:              1
+  no. of positions input,output:  797 794
+  no. of timesteps input,output:  2 2
+  no. of extra parameters:        3
+    antall ord:      16789
+    antall records:  33
+    record-lengde:   512
+  output file: 
+ /metno/kvalobs/cronjob/lam2kv/data/RR12.tmp                                                                                                                                                                                                                     
+  output konvertering.  konvc,konvd:  0 1
+ reading input file:
+ /metno/kvalobs/cronjob/lam2kv/etc/posdat.RR12
+ input o.k.
+ read data from file:
+ /metno/kvalobs/cronjob/lam2kv/data/RR12.tmp
+     npos,npar,ntid:  794 1 2
+ time steps (forecast):    1
+     18
+ input  no. of timesteps:  2
+ output no. of timesteps:  1
+ output konvertering.  konvc,konvd:  0 1
+ output file: /metno/kvalobs/cronjob/lam2kv/data/RR12.dat
+     npos,npar,ntid:  794 1 1
+Reading setup file /metno/kvalobs/cronjob/lam2kv/etc/pose.kvalobs. . . /metno/kvalobs/cronjob/lam2kv/etc/pose.kvalobs OK.
+Reading data from /metno/kvalobs/cronjob/lam2kv/data/RR12.dat (metdat format). . .
+File /metno/kvalobs/cronjob/lam2kv/data/RR12.dat OK.
+Sorting positions, parameters, time, . . .done.
+ reading input file:
+ /metno/kvalobs/cronjob/lam2kv/etc/metdat.PP                                                                                                                                                                                                                     
+ reading positions from file:
+ /metno/kvalobs/cronjob/lam2kv/etc/stations.kvalobs                                                                                                                                                                                                              
+ input o.k.
+  felt file: 
+ /opdata/hirlam12/h12sf12.dat                                                                                                                                                                                                                                    
+    time:  14:08:2008 1200 utc
+  ekstra.    produsent,grid:  88 12
+ file,produsent,grid,datatype,prog.tid:     12    88    12     4     0
+ input grid =  12
+ input grid type =  3
+ nx,ny =        864       698
+ grid =     -46.40    -36.40      0.11      0.11      0.00     65.00
+  prognose.  produsent,grid:  88 12
+ file,produsent,grid,datatype,prog.tid:     12    88    12     2     3
+ file,produsent,grid,datatype,prog.tid:     12    88    12     2     6
+ file,produsent,grid,datatype,prog.tid:     12    88    12     2     9
+  posisjon utenfor eller uten data: 92100                         
+  posisjon utenfor eller uten data: 52601                         
+  posisjon utenfor eller uten data: 99990                         
+  no. of parameters:              1
+  no. of positions input,output:  797 794
+  no. of timesteps input,output:  3 3
+  no. of extra parameters:        3
+    antall ord:      17588
+    antall records:  35
+    record-lengde:   512
+  output file: 
+ /metno/kvalobs/cronjob/lam2kv/data/PP.tmp                                                                                                                                                                                                                       
+  output konvertering.  konvc,konvd:  0 1
+ reading input file:
+ /metno/kvalobs/cronjob/lam2kv/etc/posdat.PP
+ input o.k.
+ read data from file:
+ /metno/kvalobs/cronjob/lam2kv/data/PP.tmp
+     npos,npar,ntid:  794 1 3
+ time steps (forecast):    2
+      6      9
+ input  no. of timesteps:  3
+ output no. of timesteps:  2
+ output konvertering.  konvc,konvd:  0 1
+ output file: /metno/kvalobs/cronjob/lam2kv/data/PP.dat
+     npos,npar,ntid:  794 1 2
+Reading setup file /metno/kvalobs/cronjob/lam2kv/etc/pose.kvalobs. . . /metno/kvalobs/cronjob/lam2kv/etc/pose.kvalobs OK.
+Reading data from /metno/kvalobs/cronjob/lam2kv/data/PP.dat (metdat format). . .
+File /metno/kvalobs/cronjob/lam2kv/data/PP.dat OK.
+Sorting positions, parameters, time, . . .done.
+Reading setup file /metno/kvalobs/cronjob/lam2kv/etc/pose.kvalobs. . . /metno/kvalobs/cronjob/lam2kv/etc/pose.kvalobs OK.
+Reading data from /metno/kvalobs/cronjob/lam2kv/data/last_tempo.dat (metdat format). . .
+File /metno/kvalobs/cronjob/lam2kv/data/last_tempo.dat OK.
+Sorting positions, parameters, time, . . .done.

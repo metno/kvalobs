@@ -1,0 +1,362 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+
+     <!--#include file="header.shtml" -->
+   <p>
+
+<h1>Spesifikasjon av QC0</h1>
+<h4>Forslag om implementering av standard servicemeldinger fra automatstasjoner
+og PiO værstasjoner, forslag om routing av meldingene til KVALOBS’ system for
+overvåking, forslag om videreutvikling av mottakssystemet KommObs med en
+kontrollmodul for å gi sanntids tilbakemelding til observatørene om feil i de
+manuelt innsendte meldingene, og forslag om modernisering av PiO-applikasjonen.</h4>
+<hr>
+<h2>Bakgrunn</h2>
+<p>I henhold til prosjektdirektivet for KVALOBS (Kvalitetssikring av met.nos
+observasjoner) skal arbeidspakke 2.1 omfatte detaljert utvikling av QC0
+(kvalitetskontroll som utføres på stasjonen), QC1 (nær sanntids
+kvalitetskontroll), og QC2 (ikke sanntids kvalitetskontroll). Modulene skal
+utvikles slik at behovet for ytterligere datakontroll minimaliseres. Flest mulig
+kvalitets­kontroller skal flyttes til så tidlig som mulig i
+innsamlingsprosessen.</p>
+<p>I KVALOBS’ Overordnet design [1] er det gitt en vurdering av at
+kontrollinformasjonen fra umiddelbar feilretting ved stasjonene ikke skal følge
+observasjonene. Typiske QC0-kontroller nevnt er grenseverdikontroll,
+konsistenskontroll og tidspunktkontroll.</p>
+<p>Dette dokumentet inneholder forslag til detaljert spesifikasjon av QC0
+utarbeidet av Gabriel Kielland, Lasse Stenberg og Øystein Lie. Knut Bjørheim,
+Margareth Moe, Ragnar Brækkan, Ola Bondlid og Håvard Østby har bidratt til
+idéutviklingen. Realisering av spesifikasjonene er ikke planlagt innenfor
+Kvalobs-prosjektet.</p>
+<p>met.nos stasjonsnett består i denne sammenhengen av de tre typene stasjoner
+automatiske stasjoner, PiO værstasjoner og manuelle stasjoner. Det er også
+andre måter å dele inn stasjonsnettet for andre formål enn QC0.
+Automatstasjonene er ubetjente stasjoner som enten satt opp med ulike loggere av
+typen MILOS, Scanmatic eller Campbell, sender via PC på stasjonen, eller er
+begrenset til lagring av data på lokalt medium. PiO værstasjoner er betjente
+stasjoner med prosesseringskapasitet. Alle de synoptiske værstasjonene vil på
+sikt bli satt opp med PC for automatisert QC0 og synoptisk dataoverføring. De
+manuelle stasjonene er betjente stasjoner uten automatisk prosessering, men
+utstyrt med mobiltelefon for sending av tekstmeldinger. Automatisert QC0 er ikke
+mulig for de totalt manuelle nedbørstasjonene som også vil inngå i
+stasjonsnettet i lang tid framover.<br>
+<br>
+</p>
+<h2>Kontrollregime i stasjonsnettet</h2>
+<p>Mulighetene for QC0 avhenger av stasjonens prosesseringskapasitet og
+kommunikasjons­system. Det kan tenkes fire nivåer eller grader av
+prosessering:</p>
+<blockquote>
+  <p>1. Oversending av observasjonen<br>
+  2. Automatisk QC0 av observerte nåverdier<br>
+  3. Automatisk QC0 av observerte nåverdier med referanse til tidligere
+  observasjoner<br>
+  4. Automatisk QC0 av observerte nåverdier med referanse til innhentede
+  pseudodata</p>
+</blockquote>
+<p>Nedbørstasjonene og de framtidige stasjonene som bare observerer de visuelle
+værelementene representerer den laveste graden. Kvaliteten av observatørens
+egenkontroll vil avhenge av den opplæringen som blir gitt sammen med hvilken
+systematiske oppfølging som blir gitt basert på hvordan observatøren utfører
+oppgaven. For de manuelle stasjonene vil en automatisert kontroll være mulig
+gjennom met.nos mottakssystem i de tilfellene det er praktisk mulig med
+tilbakemeldinger og fornyet melding. De fleste observatørene leverer hittil
+meldingene i postforsendelse. Ved overgang til GSM tekstmeldinger vil det for
+første gang være mulig å forbedre kvaliteten ved et system hos met.no som
+kontrollerer meldingen og sender en tekstmelding i retur til observatøren om
+eventuelle feil og mangler som blir oppdaget. Det er laget en brukerveiledning
+for nedbørstasjonene [2] som kan utvides i forhold til en sentral
+kvalitetskontroll.</p>
+<p>Det er implementert kontroller av observerte nåverdier ved automatstasjonene
+og PiO værstasjoner. Omfanget av ønskede kontroller i met.nos automatstasjoner
+er spesifisert i et eget dokumentet [3]. For de fleste stasjonene avviker
+imidlertid implementeringen fra spesifikasjonen. Kun MILOS har implementert
+kvalitetskontroll av dataverdiene. Program­varen på PiO værstasjoner
+inneholder kontrollfunksjoner med sjekk av konsistens mellom elementene i
+synop-strengen [4]. Gjeldende parametrisering av grenseverdi og sprangtester i
+MILOS 500 er gjengitt i tabellen.</p>
+<table border="1" width="708">
+  <tr>
+    <td width="140">Parameter</td>
+    <td width="159">Max. grense</td>
+    <td width="149">Min. grense</td>
+    <td width="232">Sprangtest hvert 5. eller 10. sekund</td>
+  </tr>
+  <tr>
+    <td width="140">Lufttemp</td>
+    <td width="159">60</td>
+    <td width="149">-60</td>
+    <td width="232">0.5</td>
+  </tr>
+  <tr>
+    <td width="140">Rel. fukt.</td>
+    <td width="159">110%</td>
+    <td width="149">0%</td>
+    <td width="232">1.0</td>
+  </tr>
+  <tr>
+    <td width="140">Vindhast.</td>
+    <td width="159">60 m/s</td>
+    <td width="149">0 m/s</td>
+    <td width="232">15</td>
+  </tr>
+  <tr>
+    <td width="140">Vindretn.</td>
+    <td width="159">360 gr.</td>
+    <td width="149">0 gr.</td>
+    <td width="232">Ingen test.</td>
+  </tr>
+</table>
+<p><br>
+</p>
+<p>I tråd med et mål om at kvalitetskontrollene skal foregå så tidlig i
+innsamlingsprosessen som mulig, vil det være ønskelig å utvide kontrollene
+på stasjonene. Det er imidlertid lite hensiktsmessig å vedlikeholde mange
+ulike stasjonsløsninger. I planleggingen av utvidelser bør det tas praktiske
+hensyn i forhold til at utvidelsen kan gjelde for mange av stasjonene samtidig.
+I Obsdivs virksomhetsplan er det oppført en prosjekt om enhetlige løsninger i
+stasjonsnettet. Vurderingen av kontrollenes omfang ved automatstasjonene bør
+inngå i dette prosjektet.</p>
+<p>I forhold til automatstasjonene vil det foreløpig ikke være mulig å utvide
+kontrollen til å benytte tidligere observasjoner som referanseverdier. Slike
+kontroller kan likevel implementeres i en utvidelse av PiO programvare.</p>
+<p>En videre utvidelse av kontrollene er mulig ved at observatøren får flere
+type referansedata tilgjengelig for å manuelt vurdere om observasjonen han har
+tenkt å sende er god. Bruk av pseudodata som prognostiske verdier og
+fjernmålte referanseverdier i kvalitets­kontrollen vil bli utprøvd i det
+sentrale KVALOBS-systemet, men kan også være tjenlig ved stasjonen så fremt
+de økte kommunikasjonskostnadene blir bedømt til å være forsvarlig. Teknisk
+bør PiO programvare på noe sikt fornyes for bedre bruk av internett-teknologi.
+Fornyelsen vil lette utviklingen av metoder for bruk av pseudodata.<br>
+<br>
+</p>
+<h2>Meldinger om stasjonskvalitet</h2>
+<p>I henhold til overordnet design [1] skal kontrollinformasjonen ikke følge
+observasjonene. Ved MILOS 500 produsert av Vaisala er det imidlertid
+implementert et system for QC0 som sender flaggverdier som en del av
+meldingssystemet. Resultatet av de interne kontrollene i MILOS blir oversendt
+som flagg i datastrømmen. Ved feilsituasjoner vil det være mulig å analysere
+strengen med rådata som er mottatt hos met.no og tolke flaggene. De øvrige
+automatstasjonene overfører ingen QC0-informasjon.</p>
+<p>Ved overgang fra oppringt samband til sending av tekstmeldinger vil det bli
+en grense for mengden av informasjon som hver melding kan inneholde. Det er
+nylig utarbeidet et separat servicemeldingsformat fra automatstasjonene (separat
+melding atskilt fra vanlig dataflyt) til erstatning for flaggene i
+rådatastrengen [5]. Forslaget er gjengitt i tabellen nedenfor. Alle elementene
+i meldingen skal være separert med komma eller asterisk. Det er ingen
+begrensning i lengden av hvert tekstelement, men det totale antallet tegn i
+meldingen kan ikke overstige 160.</p>
+<table border="1" width="705">
+  <tr>
+    <td width="146">&nbsp;</td>
+    <td width="364">&nbsp;</td>
+    <td width="88">&nbsp;</td>
+    <td width="79" align="center">Antall tegn</td>
+  </tr>
+  <tr>
+    <td width="146">STID&nbsp;</td>
+    <td width="364">Stasjons id&nbsp;</td>
+    <td width="88">Tall&nbsp;</td>
+    <td width="79" align="center">4</td>
+  </tr>
+  <tr>
+    <td width="146">MSG&nbsp;</td>
+    <td width="364">Meldingstype&nbsp;</td>
+    <td width="88">Tall&nbsp;</td>
+    <td width="79" align="center">2</td>
+  </tr>
+  <tr>
+    <td width="146">TIME&nbsp;</td>
+    <td width="364">MMDDHHmm&nbsp;</td>
+    <td width="88">Tekst&nbsp;</td>
+    <td width="79" align="center">8</td>
+  </tr>
+  <tr>
+    <td width="146">Statuskode maskinvare&nbsp;</td>
+    <td width="364">Kode som beskriver hvilken maskinvaremodul og hva som feilet
+      i denne modulen&nbsp;</td>
+    <td width="88">Kodetall&nbsp;</td>
+    <td width="79" align="center">inntil 8</td>
+  </tr>
+  <tr>
+    <td width="146">Tekst til status­kode maskinvare&nbsp;</td>
+    <td width="364">Kort beskrivende tekst til statuskode maskinvare&nbsp;</td>
+    <td width="88">Tekst</td>
+  </tr>
+  <tr>
+    <td width="146">Statuskode sensorer/måleverdier&nbsp;</td>
+    <td width="364">Kode som beskriver hvilken parameter og hva som feilet ved
+      beregningen av denne&nbsp;</td>
+    <td width="88">Kodetall&nbsp;</td>
+    <td width="79" align="center">inntil 8</td>
+  </tr>
+  <tr>
+    <td width="146">Tekst til status­kode sensorer/måleverdier&nbsp;</td>
+    <td width="364">Kort beskrivende tekst for statuskode
+      sensorer/måleverdier&nbsp;</td>
+    <td width="88">Tekst</td>
+  </tr>
+  <tr>
+    <td width="146">Statuskode programvare&nbsp;</td>
+    <td width="364">Kode som beskriver hvilken programvare­modul og hva som
+      feilet i denne modulen&nbsp;</td>
+    <td width="88">Kodetall&nbsp;</td>
+    <td width="79" align="center">inntil 8</td>
+  </tr>
+  <tr>
+    <td width="146">Tekst til status­kode programvare&nbsp;</td>
+    <td width="364">Kort beskrivende tekst for statuskode programvare&nbsp;</td>
+    <td width="88">Tekst</td>
+  </tr>
+</table>
+<p><br>
+Statusmeldingen bør implementeres på alle stasjoner med MILOS-loggere og
+eventuelt på flyplassenes PTU/vind-anlegg. For de øvrige automatstasjonene
+bør standard servicemelding innføres generelt over noe tid i takt med at mer
+intelligente loggere blir satt ut.</p>
+<p>Ved innføring av tekstmeldinger som standard teknikk for overføring av data
+fra PiO-stasjonene til met.no sentralt åpner det seg nye muligheter for
+tilleggsmeldinger og systematiserte tilbakemeldinger. Det bør for disse legges
+opp til en standard servicemelding for benyttelse i avvikssituasjoner.</p>
+<p>PiO programvare gir nå muligheten til å sende fritekst meldinger til
+met.no. Fritekstmuligheten bør utvikles noe, til å kunne skille mellom ulike
+typer meldinger. Forslag til format for service­meldinger er gjengitt i
+tabellen. Kodens hensikt er å kunne ”route” de ulike meldingene til rett
+person hos met.no. Applikasjonen bør i første omgang programmeres til å
+skille mellom fire hendelsestyper.</p>
+<blockquote>
+  <p>1. melding om observatørstatus (spesielt om fravær)<br>
+  2. melding om teknisk feil (servicemelding)<br>
+  3. melding om meteorologiske forhold<br>
+  4. meldinger med annet innhold</p>
+</blockquote>
+<p>Servicemeldingenes format er gjengitt i tabellen. Hendelsestypene er angitt
+som KODE.</p>
+<table border="1" width="544">
+  <tr>
+    <td width="69">&nbsp;</td>
+    <td width="266">&nbsp;</td>
+    <td width="85">&nbsp;</td>
+    <td width="96">Antall tegn</td>
+  </tr>
+  <tr>
+    <td width="69">STID&nbsp;</td>
+    <td width="266">Stasjons id&nbsp;</td>
+    <td width="85">Tall&nbsp;</td>
+    <td width="96">4</td>
+  </tr>
+  <tr>
+    <td width="69">MSG&nbsp;</td>
+    <td width="266">Meldingstype&nbsp;</td>
+    <td width="85">Tall&nbsp;</td>
+    <td width="96">2</td>
+  </tr>
+  <tr>
+    <td width="69">TIME&nbsp;</td>
+    <td width="266">MMDDHHmm&nbsp;</td>
+    <td width="85">Tekst&nbsp;</td>
+    <td width="96">8</td>
+  </tr>
+  <tr>
+    <td width="69">KODE&nbsp;</td>
+    <td width="266">Kode som beskriver hendelsen&nbsp;</td>
+    <td width="85">Kodetall&nbsp;</td>
+    <td width="96">3</td>
+  </tr>
+  <tr>
+    <td width="69">TEKST&nbsp;</td>
+    <td width="266">Beskrivelse av hendelsen&nbsp;</td>
+    <td width="85">Tekst&nbsp;</td>
+    <td width="96">inntil 139</td>
+  </tr>
+</table>
+<p>Mottakssystemet KommObs må utvides til å kunne fordele meldingene til ulike
+målgrupper. Meldingene om teknisk feil bør plasseres i KVALOBS’ database for
+overvåking (Tiltaks­databasen).</p>
+<p>Meldingene fra de manuelle stasjonene blir mottatt av met.nos mottakssystem
+(KommObs) som kommuniserer med Telenors SMS-server. KommObs bør i sammenheng
+med manuelle stasjoner utvides med kontroller i en selvstendig programmodul. I
+feilsituasjoner skal kontrollmodulen sende automatiske tilbakemeldinger med
+forventning om at observatøren sender meldingen på nytt eller bekrefter
+meldingsinnholdet. Det kan forslagsvis utvikles fire typer kontroller i
+mottakssystemet. De fire typene er i prioritert rekkefølge:</p>
+<blockquote>
+  <p>1. Melding ikke mottatt<br>
+  2. Feil i meldingsformatet. Send på nytt.<br>
+  3. Feil i parameterverdi. Bekreft melding.<br>
+  4. Mistanke om feil i parameterverdi. Bekreft melding.</p>
+</blockquote>
+<p>’Melding ikke mottatt’ krever at programmodulen har tilgang til
+stasjonenes observasjons­program og oversikt over forhåndsavtalt fravær. ’Feil
+i meldingsformatet’ omfatter syntakskontroller og forventer at observatøren
+sender meldingen en gang til. ’Feil i parameterverdi’ er sjekk av fysikalske
+verdier og sjekk av gyldige kodeverdier. ’Mistanke om feil i parameterverdi’
+kan i første omgang baseres på sprangtest og konsistenskontroll, og eventuelt
+senere utvides. Det samme kontrollregimet kan gjelde både nedbørstasjoner og
+stasjoner som skal melde de visuelle værelementene synoptisk.<br>
+<br>
+</p>
+<h2>Ansvarsfordeling</h2>
+<p>Observasjonsdivisjonen/stasjonsnettavdelingen har ansvaret for utvikling og
+drift av stasjons­nettet. IT-divisjonen har ansvaret for driften av mottakssystemene.
+Ved utviklingen av QC0-kontroller, meldingssystemer og systemer for
+tilbakemelding er det vesentlig at kompetansen i begge divisjoner blir utnyttet
+og konsultert. Prosjekter med utvikling av programvare for stasjonene bør ledes
+i Stasjonsnettavdelingen med deltagelse fra IT-divisjonen. Prosjekter med
+utvikling av mottakssystemenes QC0-kontroller bør også ledes i
+Stasjonsnettavdelingen med deltagelse fra IT-divisjonen.<br>
+<br>
+</p>
+<h2>Forslag om tiltak</h2>
+<p>Vi foreslår åtte separate tiltak for videre utvikling av QC0.</p>
+<p>I forhold til automatstasjonene bør servicemeldingene prøves ut før
+utvidelse til mange stasjoner.<br>
+1. Videre arbeid blir å beskrive og sette opp kodetall for de ulike
+avviksmeldingene og teste sending av standard servicemelding fra en
+MILOS-stasjon.<br>
+2. I mottakssystemet (KommObs) må det implementeres routing av
+servicemeldingene og plassering av meldingene i KVALOBS’ system for
+overvåking (Tiltaksdatabasen).</p>
+<p>Spesifikasjonen av ønskede kontroller i automatstasjonene bør utvikles
+videre ved at dokumentet [3] blir utvidet.</p>
+<p>I forhold til PiO værstasjonene bør implementering av servicemeldinger skje
+innenfor pågående prosjekter.<br>
+4. Implementere skillet mellom fire typer fritekst servicemeldinger i
+PiO-programvaren.<br>
+5. Implementere routing av PiO servicemeldinger i mottakssystemet (KommObs).<br>
+6. Videreutvikle kontrollene i PiO-programvaren. Inkludere tidligere
+observasjoner i kontrollene.</p>
+<p>På lengre sikt bør det settes i gang et eget prosjekt for videreutvikling
+av PiO-programvaren.<br>
+7. Skrive om PiO-applikasjonen i et nyere verktøy for bedre nyttiggjøring av
+mulighetene ved Internett, og med tanke på framtidig utnyttelse av pseudodata i
+kontrollsammenheng.<br>
+<br>
+I forhold til nedbørstasjonene er videreutviklingen av mottakssystemet det
+viktigste tiltaket:<br>
+8. Kontrollene som genererer de ulike tilbakemeldingene må implementeres i
+met.nos mottakssystem (KommObs).<br>
+<br>
+<br>
+</p>
+<p>Referanser:</p>
+<p>[1] Margareth Moe et al.: ”KVALOBS overordnet design” DNMI teknisk
+rapport nr. 139 (august 2001).</p>
+<p>[2] Gustav Bjørbæk og Ola Bondlid: ”Brukerveiledning - inntasting av
+nedbørobservasjoner på mobiltelefon” (desember 2001).</p>
+<p>[3] ”General specification of automatic weather stations for DNMI” (april
+1992).</p>
+<p>[4] Margareth Moe: “Inntastingsprogram for Synopstasjoner. Brukerveiledning
+for PiO versjon 6.0” (september 2001).</p>
+<p>[5] Håvard Østby: ”Alarmkonfigurering i MILOS med SMS type 14” (mars
+2002).</p>
+
+    <!--#include file="footer.shtml" -->
+
+
+<!-- Created: Wed Oct 18 16:13:08 GMT 2000 -->
+<!-- hhmts start -->
+Last modified: Wed Nov  8 10:05:27 GMT 2000
+<!-- hhmts end -->
+</html>

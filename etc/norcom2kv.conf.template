@@ -1,0 +1,19 @@
+#This is the configuration file for norcom2kv
+
+#synopdi, tmpdir and logdir must be an absolute path
+synopdir="/opdata/norcom/norsyn/"
+tmpdir="/home/dabmo/projects/kvalobs/kvalobs/src/norcom2kv/tmp"
+logdir="/home/dabmo/projects/kvalobs/kvalobs/src/norcom2kv/log"
+
+#loglevel and tracelevel: FATAL, ERROR, WARN, INFO, DEBUG
+#defult loglevel=INFO og tracelevel=DEBUG
+loglevel=INFO
+tracelevel=DEBUG
+
+corba{
+   #CORBA nameserver to be used.
+   nameserver="corbans.met.no"
+   
+   #Which kvalobs servers shall we send observations to.
+   kvservers=("kvtest")
+}		

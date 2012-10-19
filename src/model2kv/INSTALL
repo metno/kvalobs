@@ -1,0 +1,7 @@
+#!/bin/sh
+
+DESTINATION=bin
+DIRECTORIES=
+FILES=model2kv
+
+. $KVDIR/conf/INSTALL.conf

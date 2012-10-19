@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+               "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+
+  <!--#include file="header.shtml"-->
+
+
+<h3>Generic consistency algorithms</h3>
+
+<p>
+The consistency checks QC1-2 and QC1-6 is run on perl algorithms. Most of these are written 
+to fit a specific situation. There is also a number of generic algorithms that are used 
+as such in several different checks. The generic algorithms are the following:</p>
+
+<table border=1 width=90%>
+<tr>
+  <th>name</th><th>parameters</th><th>implementation</th><th>example use</th></tr>
+<tr>
+  <td>eq_between.pl</td><td>obs;X,Y;;|meta;X_C,Y_LO,Y_HI;;</td>
+<td>$X[0] == $X_C[0]) &amp;&amp; ($Y[0] &ge; $Y_LO[0]) &amp;&amp; ($Y[0] &le; $Y_HI[0]</td><td>QC1-2-137<br>QC1-6-328</td></tr>
+<tr>
+  <td>eq_uneq.pl</td><td>obs;X,Y;;|meta;X_CX,Y_CY;;</td><td>$X[0] == $X_CX[0]) &amp;&amp; ($Y[0] != $Y_CY[0]</td>
+<td>QC1-2-42<br>QC1-6-278</td></tr>
+<tr>
+  <td>gt_between.pl</td><td>obs;X1,X2;;|meta;R1,R2,R3;;</td><td>$X1[0] &gt; $R1[0] &amp;&amp; ($X2[0] &ge; $R2[0] &amp;&amp; $X2[0] &le; $R3[0])</td>
+<td>QC1-6-251<br>QC1-6-258</td></tr>
+<tr>
+  <td>gt_eq.pl</td><td>obs;X,Y;;|meta;X_CX,Y_CY;;</td><td>$X[0] &gt; $X_CX[0] &amp;&amp; $Y[0] == $Y_CY[0]</td><td>QC1-2-23<br>QC1-6-176</td></tr>
+<tr>
+  <td>gt_exist.pl</td><td>obs;X1,X2;;|meta;LIM;;</td><td>$X1[0] &gt; $LIM[0] &amp;&amp; $X2_missing[0]==0</td><td>QC1-6-259<br>QC1-6-266</td></tr>
+<tr>
+  <td>gt.pl</td><td>obs;X,Y;;|meta;X_C;;</td><td>$X[0] + $X_C[0] &gt; $Y[0]</td><td>QC1-2-32<br>QC1-6-213</td></tr>
+<tr>
+  <td>lt_eq.pl</td><td>obs;X,Y;;|meta;X_CX,Y_CY;;</td><td>$X[0] &lt; $X_CX[0] &amp;&amp; $Y[0] == $Y_CY[0]</td><td>QC1-2-175<br>
+QC1-6-305</td></tr>
+<tr>
+  <td>max_gt.pl</td><td>obs;X1,X2;;|meta;R1;;</td><td>@X2 = sort{$b &lt;=&gt; $a} @X2;<br>$X1[0] &lt; $X2[0] + $R1[0]</td>
+<td>QC1-2-34<br>QC1-2-45</td></tr>
+<tr>
+  <td>max_lt.pl</td><td>obs;X1,X2;;|meta;R1;;</td><td>@X2 = sort{$b &lt;=&gt; $a} @X2;<br>$X1[0] &gt; $X2[0] + $R1[0]</td>
+<td>QC1-6-216<br>QC1-6-271</td></tr>
+<tr>
+  <td>min_gt.pl</td><td>obs;X1,X2;;|meta;R1;;</td><td>the array X2less is X2 excluded missing values;<br>
+@X2less = sort{$a &lt;=&gt; $b} @X2less;<br>$X1[0] &lt; $X2less[0] + $R1[0]</td><td>QC1-6-211<br>QC1-6-212</td></tr>
+<tr>
+  <td>min_lt.pl</td><td>obs;X1,X2;;|meta;R1;;</td><td>the array X2less is X2 excluded missing value;<br>
+@X2less = sort{$a &lt;=&gt; $b} @X2less;<br>$X1[0] &gt; $X2less[0] + $R1[0]</td><td>QC1-2-35</td></tr>
+<tr>
+  <td>notbetween_between.pl</td><td>obs;X1,X2;;|meta;R1,R2,R3,R4;;</td>
+<td>$X1[0] &lt; $R1[0] || $X1[0] &gt; $R2[0]) &amp;&amp; ($X2[0] &ge; $R3[0] &amp;&amp; $X2[0] &le; $R4[0]</td>
+<td>QC1-6-281<br>QC1-6-295</td></tr>
+</table>
+<p>&nbsp;</p>
+<p>
+
+Last modified: Fri Apr 29 08:06:00 GMT 2005
+<!-- hhmts end -->
+  </body>
+</html>

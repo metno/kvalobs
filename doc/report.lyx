@@ -1,0 +1,294 @@
+#LyX 1.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 218
+\textclass report
+\language norsk
+\inputencoding auto
+\fontscheme default
+\graphics default
+\paperfontsize 12
+\spacing single 
+\papersize a4paper
+\paperpackage a4
+\use_geometry 0
+\use_amsmath 0
+\paperorientation portrait
+\secnumdepth 2
+\tocdepth 2
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\quotes_times 2
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+
+\layout Title
+
+KvalObs
+\newline 
+Status rapport
+\layout Chapter
+
+Oversikt
+\layout Standard
+
+I det følgende vil jeg gi en oversikt over designet av KvalObs slik det
+ er pr.
+ 26 mars 2002.
+ Jeg vil videre gi en beskrivelse av forskjellige grensesnitt sett fra eksterne
+ programmer.
+ Til slutt vil jeg se på en del problemer.
+\layout Section
+
+Moduler i KvalObs
+\layout Standard
+
+KvalObs består av tre hoved moduler: Innlesning (Innlesning) av data til
+ databasen, jobb kontroll (jobbkontroll) modul og test modul (test).
+ I tillegg har vi tre eksterne grensesnitt.
+\layout Description
+
+Innlesing\SpecialChar ~
+(DataSourceInterface) Denne modulen mottar data fra eksterne kilder.
+ Dataene dekodes og legges inn i tabellen 
+\emph on 
+data
+\emph default 
+ i 
+\emph on 
+KvalObs
+\emph default 
+ databasen.
+ Når data er lagt inn i tabellen data sendes det informasjon om dette til
+ 
+\emph on 
+jobbkontroll
+\emph default 
+ modulen.
+ Hvis dataene ikke kan dekodes legges de inn i reject tabellen og det sendes
+ informasjon om dette til jobb kontroll modulen.
+ Det er to grensesnitt for innlesning av data fra eksterne enheter.
+ 
+\newline 
+
+\newline 
+CORBA grensesnitt: Dette grensesnittet er annonsert gjennom CORBA navnetjener.
+ CORBA navnetjeneren går på 
+\emph on 
+monsoon
+\emph default 
+.
+ 
+\newline 
+
+\newline 
+Katalog grensesnitt: Eksterne program kan legge data for innlesning i gitte
+ kataloger og Innlesnings modulen fanger dataene opp og legger dem inn i
+ KvalObs databasen.
+ Dette grensesnittet er laget spesielt for NORCOM og er ikke ment brukt
+ av andre eksterne program.
+\layout Description
+
+Jobbkontroll\SpecialChar ~
+(WorkManager) Denne modulen har ansvaret for fordeling av oppgavene
+ i systemet og at oppgavene kjøres etter gitte program for stasjonene.
+ Den får meldinger fra Innlesnings modulene når data er lagt i databasen.
+ I meldingen fra Innlesning går det frem hvilke data som er lagt i databasen.
+ Når en melding er mottatt fra Innlesning modulen brukes informasjonen i
+ meldingen for å finne rette test rutiner og metadata for test rutinene
+ for den gitte stasjonen.
+ Det sendes så en melding til QABase med all informasjon som er nødvendig
+ for å kjøre datakontrollen.
+ QABase sender tilbake melding om hvordan kontrollen gikk.
+ Jobbkontrolleren har også ansvaret for informasjonsflyt ut mot eksterne
+ program via grensesnittene ReportManager og QAData.
+\layout Description
+
+test\SpecialChar ~
+(QABase) test modulen har ansvaret for å kjøre selve testen av dataene.
+ Den får melding fra 
+\emph on 
+jobbkontrolleren
+\emph default 
+ med informasjon om data, test rutine og metadata.
+ Med utgangspunkt i disse dataene henter den test rutine, data og metadata
+ fra databasen og starter testen.
+ Testene er perl skript.
+ Resultatet fra testene sendes tilbake til jobbkontrolleren.
+\layout Section
+
+Eksterne grensesnitt
+\layout Standard
+
+Det er fem eksterne grensesnitt DataSource, DataSorceDir ReportManager,
+ QAData og QADataFactory.
+ 
+\layout Description
+
+DataSource data til KvalObs sendes via dette (CORBA) grensesnittet.
+ Eksterne program finner dette grensesnittet i CORBA navnetjener.
+\layout Description
+
+DataSourceDir eksterne program kan kopiere data til gitte kataloger som
+ Innlesnings modulen overvåker.
+ Dette grensesnittet er i utgangspunktet kun ment brukt av NORCOM.
+\layout Description
+
+ReportManager eksterne program som er interessert i hvordan det går med
+ kontrollene kobler seg opp via dette grensesnittet.
+ De angir filter for hvilke kontrollflagg de er interessert og hvilke stasjoner
+ de ønsker data fra.
+ De må også gi en CORBA 'callback' referanse som jobbkontrolleren kan bruke
+ til å sende meldinger tilbake til programmet.
+ ReportManager finnes gjennom CORBA navnetjeneren.
+ 
+\newline 
+
+\newline 
+I meldingen som sendes tilbake til programmet inngår hele datasettet samt
+ hvilke test som feilet med tilhørende metadata.
+\layout Description
+
+QAData eksterne program som ønsker data som har blitt kontrollert kan få
+ opprettet en datastrøm som dataene kan bli levert gjennom.
+ Denne datastrømmen er QAData.
+ Får å opprette en datastrøm kontaktes QADataFactory som returnerer QAData.
+\layout Description
+
+QADataFactory dette er grensesnittet eksterne program som ønsker data fra
+ KvalObs registrerer seg gjennom.
+ Det settes opp et filter for hvilke data man ønsker og en tidsangivelse
+ for første datasett man ønsker.
+ Man kan angi om man ønsker å få data returnert etter hvert som de blir
+ klar (push) eller at dette er en Engans lesing (pull).
+ QADataFactory returnerer QAData.
+ For push overføring må programmet må avregistrere QAData når man ikke lenger
+ ønsker data.
+ For pull overføring blir QAData automatisk avregistrert når siste datasett
+ er overført til programmet.
+ QADataFactory finnes gjennom CORBA navnetjeneren.
+\layout Section
+
+Status
+\layout Standard
+
+Status pr.
+ 26 mars 2002.
+ 
+\layout Description
+
+Innlesning Vi har en innlesning modul som fungerer for DataSource grensesnittet.
+ Dataene mottas dekodes og legges inn i databasen og melding blir sendt
+ til jobbkontroll modulen.
+ Innlesning via DataSourceDir er ikke implementert.
+ RejectDb er heller ikke implementert.
+ Det er også implementert en modul i AutoObs som leverer data til KvalObs
+ denne er testet og fungerer.
+ Dette betyr at vi for øyeblikket har en full dataleveranse fra AutoObs.
+\layout Description
+
+jobbkontroll Grensesnittet mot Innlesnings modulen er implementert.
+ Her gjenstår det mye jobb.
+ Ingen av de eksterne grensesnittene er implementert.
+\layout Description
+
+QABase vi eksperimenterer med perl integreringen.
+ Her har det imidlertid oppstått problemer.
+ De tingene vi har forsøkt har resultert i store minne lekkasjer.
+ Vi har søkt på mailingslistene til perl og har sett at dette har vært tatt
+ opp gjentatte ganger uten at det har vært svart på meldingene.
+ Vi skal prøve en løsning hvor vi ikke de-allokerer perl mellom hver test
+ og se om dette hjelper på problemet.
+\layout Description
+
+KvalObs\SpecialChar ~
+databasen De viktigste tabellene for å utføre QC1 er på plass.
+ 
+\layout Subsection
+
+fremdriftsplan
+\layout Standard
+
+I den videre fremdriften har vi full fokus på å implementere en full kontrollfly
+t for QC1.
+ Dette innebærer at jobbkontroller mottar meldingene fra Innlesning, finner
+ test rutinene og metadataene og sender disse til QABase.
+ QABase utfører kontrollen og sender melding tilbake til jobbkontrolleren
+ om hvordan testen gikk.
+ Jobbkontroller sender meldinger via ReportManager.
+ Vi venter med QAData og QADataFactory.
+\layout Section
+
+Skjer i sjøen
+\layout Description
+
+perl finner vi en løsning på problemene vi har hatt? Mulige løsninger: 
+\newline 
+
+\newline 
+Skrive hele QABase i perl, problem perl samfunnet har aldri greid å enes
+ om CORBA bindinger slik at vi må implementere en 
+\begin_inset Quotes eld
+\end_inset 
+
+ikke CORBA løsning
+\begin_inset Quotes erd
+\end_inset 
+
+ for kommunikasjonene mot QABase.
+ 
+\newline 
+
+\newline 
+Forkaste perl og gå for Python som var ønsket i utgangspunktet.
+\newline 
+
+\newline 
+Forkaste hele iden med å integrere en interpreterer i systemet og skrive
+ alle testene i C/C++.
+ Testene kan skrives som dynamiske linkbare moduler slik at kun modulene
+ trenges å rekompileres når tester endres og nye blir lagt til.
+ Ulempen er at en kritisk bug i en test vil påvirke hele QABase med høy
+ sannsynlighet for kræsj.
+ Faren her kan reduseres med at alle test rutiner først testes på et test
+ oppsett før de legges inn i KvalObs.
+\layout Description
+
+CORBA Ettersom prosjektet skrider fremover og jeg ser hva de andre gruppene
+ jobber med og hvilke verktøy som blir brukt begynner jeg å få en urolig
+ mage følelse.
+ Slik som jeg har forstått det skal mange klienter kjøres under Windows.
+ Dette er ikke et problem i seg selv, problemet er at de utvikles med Microsoft
+ baserte verktøy.
+ Microsoft har aldri vært glad i CORBA og har derfor ingen CORBA støtte
+ i verktøyene sine.
+ Bruk av CORBA og Visual Studio for C går greit, her er det full støtte
+ i omniORB.
+ Visual Studio for Visual Basic, her kjenner jeg ikke til noen CORBA løsning,
+ men jeg har heller aldri undersøkt dette spesielt.
+ Visual Studio for .NET her er det for øyeblikket ingen CORBA løsning, men
+ her jobber flere grupper med løsninger.
+ 
+\newline 
+
+\newline 
+Java har full CORBA støtte.
+ Men her har man et problem med ytelse.
+ Jeg vil tro at for de applikasjonene det er snakk om i KvalObs vil ytelsen
+ være grei for maskiner med en CPU på minimum 800 Mhz og har minimum 128
+ MB intern minne.
+ Her finnes det flere gode utviklingsverktøy fra flere leverandører Borland,
+ SUN, IBM,...
+ de nevnte leverandørene har versjoner som fritt kan lastes ned.
+\newline 
+
+\newline 
+Bekymringen min gjelder bare de eksterne grensesnittene: ReportManager,
+ DataSource, QAData og QADataFactory.
+ Det er ingen problem med å bruke CORBA intern i KvalObs.
+\newline 
+
+\newline 
+En mulig løsning for å omgås dette problemet, hvis det blir et problem,
+ er og implementere grensesnittene som SOAP grensesnitt i tillegg til CORBA.
+\the_end

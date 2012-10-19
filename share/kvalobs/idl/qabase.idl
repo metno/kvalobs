@@ -1,0 +1,20 @@
+#ifndef __qabase_ild__
+#define __qabase_idl__
+
+#include "commonStationInfo.idl"
+#include "managerInput.idl"
+#include "KeyVal.idl"
+
+
+module CKvalObs{
+  
+  module CQaBase{
+    interface QaBaseInput{
+       boolean newDataCB(in StationInfo data, 
+			in CKvalObs::CManager::CheckedInput callback, 
+			 in micutil::KeyValList args,
+			 out boolean bussy); 
+    };
+  };
+};
+#endif

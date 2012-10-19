@@ -1,0 +1,65 @@
+AM_CPPFLAGS = \
+	-I$(top_srcdir)/src/lib \
+	-I$(top_srcdir)/src/lib/decoder \
+	-I$(top_builddir)/src/lib \
+	$(putools_CFLAGS) \
+	-D_REENTRANT
+
+if HAVE_GMOCK 
+EXTRA_DIST = param.csv \
+             testdata/sms02-29-201012280654.xml
+             
+CLEANFILES = testresult/sms02-29-201012280654.xml \
+			 testresult
+			 
+check_PROGRAMS = gtestsms2 
+TESTS = $(check_PROGRAMS)
+bin_PROGRAMS = testsms2  
+
+testsms2_SOURCES=testsms2.cc ReadParamsFromFile.cc ReadParamsFromFile.h\
+				 FakeComobsDecoder.h FakeComobsDecoder.cc \
+				 ../comobsdecode.cc ../decodeddata.cc \
+				  ../smsmeldingparser.cc ../smsmelding.cc\
+				../sms2.cc ../smsbase.cc  ../smsdata.cc
+
+testsms2_CPPFLAGS = $(AM_CPPFLAGS) $(libxmlpp_CFLAGS) \
+					-DTESTDIR="\""$(top_srcdir)/src/lib/decoder/comobsdecoder/test"\"" \
+					-DDBDIR="\""$(top_builddir)/src/lib/dbdrivers/.libs"\"" 
+testsms2_LDFLAGS =  -pthread -export-dynamic
+testsms2_LDADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs2_decoderbase.la \
+               $(top_builddir)/src/lib/kvalobs/libkvalobs2_kvalobs.la \
+                $(top_builddir)/src/lib/kvdb/libkvalobs2_kvdb.la \
+                $(top_builddir)/src/lib/dnmithread/libkvalobs2_dnmithread.la\
+                $(top_builddir)/src/lib/fileutil/libkvalobs2_fileutil.la \
+                $(top_builddir)/src/lib/milog/libkvalobs2_milog.la \
+                $(top_builddir)/src/lib/miutil/libkvalobs2_miutil.la \
+                $(putools_LIBS) $(libxml2_LIBS) \
+	 	        $(BOOST_THREAD_LIB) $(BOOST_REGEX_LIB) \
+		        -lm -ldl
+
+gtestsms2_SOURCES=gtestsms2.cc ReadParamsFromFile.cc \
+				 FakeComobsDecoder.h FakeComobsDecoder.cc \
+				 ../comobsdecode.cc ../decodeddata.cc \
+				  ../smsmeldingparser.cc ../smsmelding.cc\
+				../sms2.cc ../smsbase.cc  ../smsdata.cc
+
+gtestsms2_CPPFLAGS = $(AM_CPPFLAGS) $(libxmlpp_CFLAGS) $(synop_la_CPPFLAGS) $(gtest_CFLAGS) \
+					-DTESTDIR="\""$(top_srcdir)/src/lib/decoder/comobsdecoder/test"\"" \
+					-DDBDIR="\""$(top_builddir)/src/lib/dbdrivers/.libs"\""
+gtestsms2_LDFLAGS =  -pthread -export-dynamic
+gtestsms2_LDADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs2_decoderbase.la \
+               $(top_builddir)/src/lib/kvalobs/libkvalobs2_kvalobs.la \
+                $(top_builddir)/src/lib/kvdb/libkvalobs2_kvdb.la \
+                $(top_builddir)/src/lib/dnmithread/libkvalobs2_dnmithread.la\
+                $(top_builddir)/src/lib/fileutil/libkvalobs2_fileutil.la \
+                $(top_builddir)/src/lib/milog/libkvalobs2_milog.la \
+                $(top_builddir)/src/lib/miutil/libkvalobs2_miutil.la \
+                $(putools_LIBS) $(libxml2_LIBS) \
+	 	        $(BOOST_THREAD_LIB) $(BOOST_REGEX_LIB) $(gtest_LIBS) \
+		        -lm -ldl
+
+endif
+
+
+
+

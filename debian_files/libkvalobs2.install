@@ -1,0 +1,13 @@
+usr/lib/libkvalobs2_corbahelper.so.*
+usr/lib/libkvalobs2_decoderbase.so.*
+usr/lib/libkvalobs2_decodeutility.so.*
+usr/lib/libkvalobs2_dnmithread.so.*
+usr/lib/libkvalobs2_fileutil.so.*
+usr/lib/libkvalobs2_kvadmininterface.so.*
+usr/lib/libkvalobs2_kvalobs.so.*
+usr/lib/libkvalobs2_kvdb.so.*
+usr/lib/libkvalobs2_kvskel.so.*
+usr/lib/libkvalobs2_miconfparser.so.*
+usr/lib/libkvalobs2_milog.so.*
+usr/lib/libkvalobs2_miutil.so.*
+usr/lib/kvalobs/db/*.so.*

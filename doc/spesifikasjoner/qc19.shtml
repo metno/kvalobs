@@ -1,0 +1,27 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+               "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+
+  <!--#include file="header.shtml"-->
+
+
+<h3>QC1-9: Vurdering basert p&aring; en kombinasjon av QC1-kontrollene</h3>
+
+<p>
+Hovedpoenget er &aring; utnytte muligheten for automatisk retting i QC1.
+
+<p>
+For kombinasjonen av grenseverdikontroll, sprangkontroll og prognostisk romkontroll 
+er det implementert en algoritme:
+<p>
+<img src="qc19.png" align=left>
+<p>&nbsp;
+<p>
+Algoritmen er anvendt p&aring; parameterne TA, TAN, TAX, TAM og PP.
+
+<p>
+<hr>
+Last modified: Thu Feb 01 09:00:00 GMT 2007
+<!-- hhmts end -->
+  </body>
+</html>

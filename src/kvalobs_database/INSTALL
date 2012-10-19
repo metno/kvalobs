@@ -1,0 +1,31 @@
+#! /bin/sh
+
+DBSCRIPT=bin/dbscript
+SHAREDIR=share/kvalobs/kvservice
+
+DESTINATION=
+DIRECTORIES=$DBSCRIPT
+FILES=
+
+#Prepare the install
+
+mkdir -p $DBSCRIPT
+
+if ! [ -d $DBSRIPT ]; then
+   echo Cant create directory `pwd`/$DBSCRIPT
+   exit 1
+fi
+
+mkdir -p $SHAREDIR
+
+if ! [ -d $SHAREDIR ]; then
+   echo Cant create directory `pwd`/$SHAREDIR
+   exit 1
+fi
+
+cp -upvf create_ps_subscriber.sql.template $SHAREDIR
+cp -upvf script.create $DBSCRIPT
+cp -upvf   cleanup_kvalobsdb.sql  $DBSCRIPT/cleanup_kvalobsdb.sql.template
+
+#Do the install
+. $KVDIR/conf/INSTALL.conf

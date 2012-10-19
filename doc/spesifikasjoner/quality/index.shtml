@@ -1,0 +1,576 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN""http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>         
+    <!--#include file="header.shtml" -->
+ <p>   
+
+<h1>QC1-4  Kvalitetskontroll basert på numeriske modeller.</h1>
+
+<p>Mariken Homleid
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+
+<h2>1. Vurdering av modellparametere</h2>
+<p>
+Den prognostiske romkontrollen best&aring;r av en sammenligning mellom observasjon og 
+modellverdi. Observasjonen blir flagget i forhold til overskridelsen av fire grenseverdier: 
+H&oslash;yeste testverdi, h&oslash;y testverdi, lav testverdi, og minste testverdi.
+<p>
+For å vurdere hvilke modellparametere som kan brukes i QC1-4, har vi 
+sammenlignet modell og observasjoner for de parametrene og observasjonsstedene som er 
+listet opp under. 
+<p>
+De forskjellige parametrene ble vurdert etter visuell betraktning av figurer 
+med månedlige midlere feil (ME), standardavvik av feilen (SDE), minimum feil og maksimum feil for Hirlam10, 
+<a href="#Figtxt">se figuroversikten lenger ned</a>. Slike figurer er laget for ni værstasjoner, 
+maritimstasjonen Heidrun og to automatstasjoner (bare RR_12/RR_24).</p>
+<p>
+F&#248;lgende parametere er vurdert:<br>
+<ul>
+<li>PR - Trykk, QFF n&aring;verdi, i hPa
+<li>PP - Trykktendens, 3 timer differanse
+<li>FF - Vindhastighet, 10 meter, 10 minutt n&aring;verdi, m/s
+<li>DD - Vindretning, 10 meter, grader
+<li>TA - Temperatur n&aring;verdi i &deg;C
+<li>UU - Relativ fuktighet n&aring;verdi i %
+<li>TD - Duggpunktstemperatur n&aring;verdi i &deg;C
+<li>RR_12 - Nedb&oslash;r, tilvekst siste 12 timer i mm
+<li>RR_24 - Nedb&oslash;r, tilvekst siste 24 timer i mm
+<li>NN - Samlet skydekke, kode ett siffer
+<li>CL - Skytype lave skyer
+<li>CM - Skytype mellomh&oslash;ye skyer
+<li>CH - Skytype h&oslash;ye skyer
+<li>SA - Sn&oslash;dybde n&aring;verdi, totalt fra bakken i cm
+<li>SD - Sn&oslash;dekke, kode ett siffer
+<li>TG - Gresstemperatur n&aring;verdi i &deg;C
+<li>TJ - Jordtemperatur n&aring;verdi ved 10 cm i &deg;C
+</ul>
+<p>
+F&#248;lgende parametere er valgt i f&#248;rste omgang:
+<br>PR, PP, FF, TA, UU, TD, RR_12, RR_24
+<p>&nbsp;</p>
+
+<h2>2.  Vurdering av hvilke statistiske verdier som skal beregnes</h2>
+
+<h3>2.1 Vurdere for de aktuelle parametrene om flaggene skal baseres på verdier som
+avhenger av stasjonspunkt/årstid/tid på døgnet.</h3>
+<p>
+Noen parametere som f.eks. n&aring;temperatur TA, har helt klar variasjon med stasjonspunkt/årstid/tid på døgnet,
+PR har derimot ingen døgnlig variasjon, liten årstidsvariasjon, men litt
+høyere m&#229;nedlige middelfeil i innlandet.</p>
+<p>
+KONKLUSJON: For enkelthets skyld produseres stasjonsvis månedsverdier for hver parameter.</p>
+<p>&nbsp;</p>
+
+<h3>2.2 Prosentiler eller middelverdier (ME) og standardavvik (SDE)?</h3>
+<p>
+95.45% av normalfordelte verdier ligger i intervallet (ME-2*SDE , ME+2*SDE).
+<p>
+Flere av parametrene har modellfeil som IKKE er normalfordelt.
+F.eks. vil flagging av verdier utenfor intervallet (ME-2*SDE , ME+2*SDE)
+medf&#248;re relativt hyppig flagging av "STORE" nedb&#248;rmengder om sommeren.
+Grenser beregnet fra 2- og 98-prosentiler gir mye romsligere grenser om
+sommeren.
+Ved bruk av ME+/-2*SDE som high/low og maks/min-avvik som highest/lowest 
+vil en kunne f&#229; high>highest eller low&lt;lowest.</p>
+<p>
+Estimering av de ekstreme kvantilene gir litt mer ustabile resultater
+enn middelverdier/standardavvik.</p>
+<p>
+Dersom en skulle satse p&#229; &#229; bruke middelverdier/standardavvik burde en
+antagelig bruke det til &#229; konstruere b&#229;de grenseverdiene high/low og
+highest/lowest, f.eks. high/low: ME = 2*SDE og  highest/lowest: ME = 3*SDE
+<p>
+KONKLUSJON: I f&#248;rste omgang produseres f&#248;lgende grenseverdier for alle
+parametere, basert p&#229; avvik mellom observasjon og modell (m&#229;nedsverdiene 
+baserer seg p&#229; tre m&#229;neder med data fra foreg&#229;ende &#229;r):<br>
+highest: maksimalt avvik<br>
+high: 98 prosentil avvik<br>
+low: 2 prosentil avvik<br>
+lowest: st&#248;rste negative avvik</p>
+<p>&nbsp;</p>
+
+<h3>2.3  Aktuelle stasjonstyper og parametere</h3>
+<p>
+Tabellen viser aktuelle sammenhenger mellom stasjonstyper og parametere. Stasjonstypene er
+<ul>
+<li>V - Manuell v&aelig;rstasjon som produserer SYNOP-meldinger
+<li>A - Automatstasjon
+<li>M - Maritim stasjon
+<li>N - Nedb&oslash;rstasjon
+</ul>
+
+<table border=1 cellspacing=20>
+<tr>
+<td></td><td>PR</td><td>AA</td><td>PP</td><td>FF</td><td>TA</td><td>UU</td><td>TD</td><td>RR</td></tr>
+<tr>
+<td>V</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>&nbsp;</td><td>RR_12 (RR_6 kontrolleres ikke i QC1-4)</td></tr>
+<tr>
+<td>A</td><td>(x)</td><td>(x)</td><td>(x)</td><td>(x)</td><td>x</td><td>x</td><td>&nbsp;</td><td>(RR_1 kontrolleres ikke i QC1-4)</td></tr>
+<tr>
+<td>M</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>&nbsp;</td><td>x</td><td></td></tr>
+<tr>
+<td>N</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>RR_24</td></tr>
+</table>
+<p>&nbsp;</p>
+
+<h2>3. Summarisk statistikk</h2>
+<p>
+N&#229;r KVALOBS starter opp, vil Hirlam20 v&aelig;re den operasjonelle modellen
+som det er naturlig &#229; sammenligne observasjonene med. Det beste ville
+v&#230;rt &#229; beregne den summariske statistikken (stasjonsvise middelfeil, 
+standardavvik minste testverdi og st&#248;rste testverdi) p&#229; grunnlag av siste &#229;rs
+observasjoner og Hirlam20-verdier. Men n&#229;r Hirlam20 starter opp, vil
+det ikke v&#230;re tilgjengelig slike verdier ett &#229;r tilbake i tid.
+Vi har derfor valgt &#229; beregne summarisk statistikk p&#229; grunnlag
+av Hirlam50/ECMWF-data i f&#248;rste omgang. Kvaliteten p&#229; modellene vil endre seg. 
+Ved en &#229;rlig oppdatering av den summariske statistikken skal det inng&aring; en 
+vurdering av hvilken modell eller modeller som skal benyttes.</p>
+<p>
+
+<h3>3.1 Beregning</h3>
+<p>
+Produksjonen av summarisk statistikk er i f&oslash;rste omgang basert p&#229; Hirlam50/ECMWF-data.
+
+<p>
+<b>3.1.1 V&#230;rstasjonene</b></p>
+<p>
+For v&#230;rstasjoner beregnes stasjonsvise m&#229;nedlige middelverdier og
+ekstreme avvik p&#229; grunnlag av observasjoner hentet fra klimadatabasen og
+Hirlam50-prognoser hentet fra verifidatabasen.<br>
+<ul>
+<li>Hirlam50: 00+6,12 og 12+6,12 (for alle parametere untatt nedb&#248;r)<br>
+<li>Hirlam50: 00+18 og 12+18 for RR_12
+<li>Hirlam50: 00+30 for RR_24
+</ul>
+
+<p>
+Et program skrevet i R henter ut data, beregner summarisk statistikk og skriver 
+ut resultatene p&#229; ascii-filer som kan lastes inn i kvalobs-delen av CVS.
+<p>
+Resultatene vil foreligge som filene P.dat, PP.dat, FF.dat, TT.dat, UU.dat, RR_12.dat og RR_24.dat
+<p>
+<b>3.1.2 Nedb&#248;rstasjonene</b></p>
+<p>
+verifidatabasen inneholder prognoser for v&#230;rstasjoner, automatstasjoner 
+og flyplassobservasjoner, men ikke nedb&#248;rstasjoner. Hirlam10- og
+ECMWF-felter er tilgjengelige p&#229; disk. Grenseverdier basert 
+p&#229; Hirlam10 viser sv&#230;rt variabel kvalitet, f.eks. stor overestimering av nedb&#248;ren p&#229; mange 
+stasjoner p&#229; Vestlandet, mest ekstrem er Gr&#248;ndalen (57780). I f&oslash;rste omgang 
+beregnes derfor grenseverdier basert p&aring; ECMWF-prognoser.
+<ul>
+<li>ECMWF: 12+42 for RR_24.
+</ul>
+<p>
+Resultatene vil foreligge som filen RR_24n.dat. Selv om grenseverdiene for 24-timers nedb&oslash;r 
+er beregnet fra ECMWF-prognoser kan observasjonene sammenlignes med Hirlam20-prognoser av nedb&oslash;r.
+</p>
+<p>&nbsp;</p>
+
+<p>
+<h3>3.2 Oppdatering</h3>
+<p>
+Oppdatering av den summariske statistikken forutsetter tilgang p&#229;
+kontrollerte observasjoner og tilsvarende modellprognoser og
+programvare for &#229; hente ut data og beregne statistikk.</p>
+<p>
+<b>3.2.1 Tilgang p&aring; observasjoner og modellprognoser</b> 
+<p>
+Observasjoner kan hentes fra klimadatabasen.</p>
+<p>
+Modellprognosene som brukes ved oppdatering av statistikken er de samme som lagres i 
+Kvalobsdatabasen for &aring; v&aelig;re tilgjengelige ved den prognostiske romkontrollen. 
+Siden det skal v&aelig;re mulig &aring; foreta kontroll i ettertid, skal alle datalagre 
+if&oslash;lge spesifikasjonen ha en kapasitet p&aring; minst 6 m&aring;neder. 
+Dette er et tilstrekkelig grunnlag for jevnlig oppdatering av statistikken.
+<p>
+<b>3.2.2 Programvare for oppdatering av summarisk statistikk</b></p>
+<p>
+Et R-program genererer SQL-kommandoer for &aring; hente ut observasjoner og modell-prognoser 
+fra kvalobs-databasen, leser data inn i R, beregner og skriver ut summarisk statistikk til 
+ascii-filer.
+<p>
+Programmet kan kj&oslash;res en gang per m&aring;ned. Under forutsetning av at data ligger 
+i Kvalobs minst 6 m&aring;neder, kan en i desember f.eks. oppdatere statistikken for august 
+p&aring; grunnlag av data fra juli-september.
+<p>&nbsp;</p>
+
+<h3>3.3 Nye observasjonssteder</h3>
+<p>
+   Den valgte strategien for &#229; velge ut best egnet statistikk til nye
+   observasjonssteder, og alle de som ikke er i verifi-database er
+<ul>
+<li>Bruker et sett av generelle grenseverdier, markert i metadataene med stationid=0
+<li>Disse grensene er romslige:
+	<ul>
+	<li> lowest/low er 10 prosentilen av alle stasjoners lowest/low
+	<li> highest/high er 90 prosentilen av alle stasjoners highest/high 
+	</ul>
+</ul>
+<p>&nbsp;</p>
+
+<h2>4. Tilrettelegging av modellverdier til prognostisk romkontroll</h2>
+
+<h3>Den prognostiske romkontrollen bruker f&#248;lgende Hirlam20-verdier 
+interpolert til punkter:</h3>
+<p>
+<ul>
+<li>RR_12: Hirlam20 00+18 og 12+18 (for beregning av RR_12 trengs ogs&#229; Hirlam20 00+6 og 12+6
+<li>RR_24: Hirlam20 00+30 (for beregning av RR_24 trengs ogs&#229; Hirlam20 00+6)<br>&nbsp;
+<li>PR, PP, FF, TA, UU, TD:  Hirlam00/06/12/18 +6,+7, ... , +11 (for beregning av PP trengs ogs&#229; Hirlam00/06/12/18 +3,+4,+5)
+</ul>
+</p>
+
+<p>
+Fra Hirlam10/50 legges det ut timesvise verdier for alle disse
+parametrene bortsett fra UU (felt 32).<br>
+F&#248;lgende parametere brukes som de er: PR (felt 58), TA (felt 31), UU (felt 32)</p>
+
+<p>
+F&#248;lgende parametere blir beregnet:
+<ul>
+<li>PP - trykktendens, 3 timers differanse - beregnes fra PR (felt 58)<br>
+<li>FF - vindhastighet - beregnes fra U10 og V10 (felt 33 og 34)<br>
+<li>RR_12/RR_24 - beregnes fra RR (felt 17) som er nedb&#248;r akkumulert fra +0.<br>
+<li>TD - duggpunktstemperatur - beregnes fra TA (felt 31) og UU (felt 32)</p>
+</ul>
+
+<p>
+Filene til de operasjonelle Hirlam20-feltene heter pr. desember 2004:<br>
+/opdata/hirlam/grdnm00.dat, grdnm06.dat, grdnm12.dat og grdnm18.dat
+<p>
+Spesifikasjon av 'in' ved lesing av feltfil med rfelt:
+<table border=0>
+<tr>
+  <td>in( 1) =</td><td>   88</td><td></td><td>producer no.</td></tr>
+<tr>
+  <td>in( 2) =</td><td> 2006</td><td></td><td>grid no.</td></tr>
+<tr>
+  <td>in( 3) =</td><td>-32767</td><td>  or</td><td>  year</td></tr>
+<tr>
+  <td>in( 4) =</td><td>-32767</td><td>  or</td><td>  month*100+day</td></tr>
+<tr>
+  <td>in( 5) =</td><td>-32767</td><td>  or</td><td>  hour*100+minute</td></tr>
+<tr>
+  <td>in( 9) =</td></td><td></td><td><td>data type</td></tr>
+<tr>
+  <td>in(10) =</td><td></td><td></td><td>forecast length (hours)</td></tr>
+<tr>
+  <td>in(11) =</td><td></td><td></td><td>vertical coordinate</td></tr>
+<tr>
+  <td>in(12) =</td><td></td><td></td><td>parameter no.</td></tr>
+<tr>
+  <td>in(13) =</td><td></td><td></td><td>level 1</td></tr>
+<tr>
+  <td>in(14) =</td><td></td><td></td><td>level 2 (usually 0)</td></tr>
+</table>  
+
+<p>
+Tabell med in(11, 12, 13, 14, 9, 10)
+
+<table border=0>
+<tr>
+  <td></td><td>in(11)</td><td>in(12)</td><td>in(13)</td><td>in(14)</td><td>in(9),in(10)</td><td></td></tr>
+<tr>
+  <td>TA (paramid=211)</td><td>2</td><td>31</td><td>1000</td><td>0</td><td>3,0  2,1...2,48</td><td>/1</td></tr>
+<tr>
+  <td>UU (paramid=262)</td><td>2</td><td>32</td><td>1000</td><td>0</td><td>3,0  2,3...2,48</td><td>/3</td></tr>
+<tr>
+  <td>TD (paramid=217) fra TA og UU</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr>
+  <td>FF (paramid=81) fra U10</td><td>2</td><td>33</td><td>1000</td><td>0</td><td>3,0  2,1...2,48</td><td>/1</td></tr>
+<tr>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  og V10</td><td>2</td><td>34</td><td>1000</td><td>0</td><td>3,0  2,1...2,48</td><td>/1</td></tr>
+<tr>
+  <td>PR (paramid=178)</td><td>2</td><td>58</td><td>1000</td><td>0</td><td>3,0  2,1...2,48</td><td>/1</td></tr>
+<tr>  
+  <td>PP (paramid=177) fra</td><td>2</td><td>58</td><td>1000</td><td>0</td><td>3,0  2,1...2,48</td><td>/1</td></tr>
+<tr>
+  <td>RR_12 (paramid=109) fra RR</td><td>2</td><td>17</td><td>1000</td><td>0</td><td>3,0  2,1...2,48</td><td>/1</td></tr>
+<tr>
+  <td>RR_24 (paramid=110) fra RR</td><td>2</td><td>17</td><td>1000</td><td>0</td><td>3,0  2,1...2,48</td><td>/1</td></tr>
+</table>
+<p>&nbsp;</p>
+
+
+<h2>5. Resultater</h2>
+
+<h3>Parameteroversikt</h3>
+<ul>
+<table>
+<tr> <th>Kode</th><th>Parameterdefinisjon</th> <th>Hirlam10 parameternummer</th> 
+<tr> <td><a href="#PRtxt">PR</td><td>Trykk, QNH, nåverdi                </td><td align="center">58</td>
+<tr> <td><a href="#PPtxt">PP</td><td>Trykktendens, 3 timer differanse  </td><td align="center">avledet fra 58</td>
+<tr> <td><a href="#FFtxt">FF</td><td>Vindhastighet, 10 meter           </td><td align="center">34</td>
+<tr> <td><a href="#DDtxt">DD</td><td>Vindretning, 10 meter             </td><td align="center">33</td>
+<tr> <td><a href="#TAtxt">TA</td><td>Temperatur, nåverdi               </td><td align="center">31</td>
+<tr> <td><a href="#UUtxt">UU</td><td>Relativ fuktighet i %, nåverdi    </td><td align="center">32</td>
+<tr> <td><a href="#TDtxt">TD</td><td>Duggpunktstemperatur, nåverdi     </td><td align="center">avledet fra 31,32</td>
+<tr> <td><a href="#RRtxt">RR_12</td><td>Nedbør, tilvekst siste 12 timer</td><td align="center">31</td>
+<tr> <td><a href="#RRtxt">RR_24</td><td>Nedbør, tilvekst siste 24 timer</td><td align="center">31</td>
+<tr> <td><a href="#NNtxt">NN</td><td>Samlet skydekke                   </td><td align="center">25</td>
+<tr> <td><a href="#NNtxt">CL</td><td>Skytype lave skyer                </td><td align="center">39</td>
+<tr> <td><a href="#NNtxt">CM</td><td>Skytype mellomhøye skyer          </td><td align="center">39</td>
+<tr> <td><a href="#NNtxt">CH</td><td>Skytype høye skyer                </td><td align="center">39</td>
+<tr> <td><a href="#SAtxt">SA</td><td>Snødybde                          </td><td align="center">66</td>
+<tr> <td><a href="#SAtxt">SD</td><td>Snødekke                          </td><td align="center">&nbsp;</td>
+<tr> <td><a href="#TGtxt">TG</td><td>Gresstemperatur                   </td><td align="center">30</td>
+<tr> <td><a href="#TGtxt">TJ</td><td>Jordtemperatur                    </td><td align="center">&nbsp;</td>
+</table>
+</ul>
+
+<br>
+<h3>Stasjoner benyttet i analysen</h3>
+<ul>
+<table>
+<tr> <th>Tabell</th><th>Stasjonsnavn</th> <th>Stasjonshøyde</th> 
+<tr> <td>V00700</td><td>Drevsjø         </td><td align="right">672 moh</td>
+<tr> <td>V04780</td><td>Gardermoen      </td><td align="right">202 moh</td>
+<tr> <td>V16610</td><td>Fokstua         </td><td align="right">930 moh</td>
+<tr> <td>V27500</td><td>Færder fyr      </td><td align="right">  6 moh</td>
+<tr> <td>V32920</td><td>&Oslash;yfjell-Trovatn </td><td align="right">715 moh</td>
+<tr> <td>V57770</td><td>Ytterøyane fyr  </td><td align="right"> 26 moh</td>
+<tr> <td>V72100</td><td>Namdalseid      </td><td align="right"> 86 moh</td>
+<tr> <td>V90450</td><td>Tromsø          </td><td align="right">100 moh</td>
+<tr> <td>V97250</td><td>Karasjok        </td><td align="right">129 moh</td>
+<tr> <td>M76928</td><td>Heidrun         </td><td align="right">&nbsp;</td>
+<tr> <td>A25830</td><td>Finsevatn       </td><td align="right">1210 moh</td>
+<tr> <td>A53101</td><td>Vangsnes        </td><td align="right">51 moh</td>
+<tr> <td>A11500</td><td>Østre Toten-Apelsvoll</td><td align="right">264 moh</td>
+<tr> <td>A82260</td><td>Bodø-Vågønes    </td><td align="right">30 moh</td>
+<tr> <td>N63530</td><td>Hafsås          </td><td align="right">698 moh</td>
+</table>
+</ul>
+
+<h3>Tolkning og oppsummering av resultater:</h3>
+
+<p>Parametervis gjennomgang av resultatene. For hver parameter ble f&oslash;lgende vurdert
+<ol type=a>
+<li>Døgnlig variasjon?
+<li>Årstidsvariasjon?
+<li>Variasjon fra sted til sted?
+<li>Kvalitet som funksjon av prognoselengde; hvilke prognoselengder/modeller
+       er best egnet? 
+<li>Oppsummering
+</ol>
+
+<p><a name="PRtxt"><strong>PR - bakketrykk</strong><br>
+Figur: <a href="#PRimga"> PR for Drevsjø, Gardermoen, Færder</a>
+<ol type=a>
+<li>Døgnlig variasjon: nei
+<li>Årstidsvariasjon: muligens for høyereliggende stasjoner
+<li>Variasjon fra sted til sted: størst feil på høyereliggende stasjoner
+<li>Kvaliteten av trykk-prognosene avtar forholdsvis raskt som funksjon
+   av prognoselengde, så selv om EC-prognosene er bedre enn Hirlam-prognosene
+   vil Hirlam-prognosene gi best resultater i QC1-4 fordi de er tilgjengelig
+   mye før.
+<li>Oppsummering for Hirlam10-prognosene fra R1-figurene:
+<br>   Lavereliggende stasjoner: ME   < 1      SDE 0.9-1.3  maks. feil ~ 10
+<br>   Høyereliggende stasjoner: ME  1.3-1.6   SDE 1.3-1.5  maks. feil ~ 10
+</ol>
+
+
+
+<p><a name="PPtxt"><strong>PP - trykktendens, 3 timer differanse</strong> (absoluttverdi; positiv når A<=3, negativ når A>=5)<br>
+Figur:  <a href="#PPimga"> PP for Drevsjø, Gardermoen, Færder</a>
+<ol type=a>
+<li>Døgnlig variasjon: nei
+<li>Årstidsvariasjon: litt større feil om vinteren
+<li>Variasjon fra sted til sted: ofte positiv ME på høyereliggende stasjoner
+<li>Som for PR
+<li>Oppsummering for Hirlam10-prognosene:
+<br>   Lavereliggende stasjoner: ME  (-0.5,0.4)   SDE ~0.55  maks. feil ~ 4
+<br>   Høyereliggende stasjoner: ME  (-0.2,0.7)   SDE ~0.65  maks. feil ~ 6
+</ol>
+
+<p><a name="FFtxt"><strong>FF - vindstyrke, 10 meter</strong><br>
+Figur: <a href="#FFimga"> FF for Drevsjø, Gardermoen, Færder</a> 
+<ol type=a>
+<li>Døgnlig variasjon, noen steder og årstider
+<li>Årstidsvariasjon, på noen stasjoner, bl.a. Karasjok, Namdalseid, Øyfjell,
+   Gardermoen og Drevsjø; for mye vind om vinteren for lite om sommeren
+<li>Variasjon fra sted til sted: JA 
+<li>Som for PR  
+<li>Oppsummering:
+<br>Positiv ME (for mye vind) : Tromsø (1.4), Karasjok (1.3), Øyfjell (1.2)
+<br>Negativ ME (for lite vind): Færder (-1.6), Namdalseid (-0.5), Ytterøyene (-0.5)
+<br>SDE ~ 2  (0.8 - 4)
+<br>maks. abs. feil ~ 10m/s
+</ol>
+
+<p><a name="DDtxt"><strong><p>DD - vindretning, 10 meter</strong>
+<br>Resultater basert på situasjoner med Hirlam10.ff > 3.3 avdekker ikke så mye mer
+systematikk enn resultater basert på alle vindstyrker.<br>
+Figur: <a href="#DDimga"> DD for Drevsjø, Gardermoen, Færder</a>
+
+<ol type=a>
+<li>Døgnlig variasjon: nei
+<li>Årstidsvariasjon: muligens større feil om vinteren enkelte steder
+<li>Variasjon fra sted til sted: ja
+<li>Som for PR
+<li>Oppsummering
+<br>MAE ~ 30 (5,130)
+<br>SDE ~ 30 (4,65)
+<br>maks. abs. feil ~ 180 grader
+<br>Forslag: IKKE prognostisk romkontroll av DD i første omgang
+</ol>
+
+<p><a name="TAtxt"><strong>TA  - temperatur</strong><br>
+Figur: <a href="#TAimga"> TA for Drevsjø, Gardermoen, Færder</a>
+<ol type=a>
+<li>Døgnlig variasjon: ja
+<li>Årstidsvariasjon: ja
+<li>Variasjon fra sted til sted: ja
+<li>Kvaliteten av TT-prognosene avtar ganske langsomt som funksjon av 
+   prognoselengde, og summarisk er EC litt bedre enn Hirlam. Antagelig
+   er Hirlam10/50 +6 like godt egnet som EC 12+18,...,36 
+<li>Som for PR
+<li>Oppsummering
+<br> - På innlandsstasjonene er det stor årstidsvariasjon. De største feilene finner
+en om vinteren på de kaldeste stasjonene. Modellene gir sjelden lavere temperatur
+enn -20, dermed kan prognosene være mer enn 20 grader for varme. I sommerhalvåret
+er prognosefeilene stort sett < 10 grader.
+<br> - På kyststasjonene er det ikke så stor årstidsvariasjon, 
+vanligvis er feilen < 10 grader.
+<br> - Kalman-filteret reduserer den månedlige middelfeilen til verdier nær 0
+for de korteste temperaturprognosene. På steder med stor bias vil som regel
+de korrigerte prognosene være mye bedre enn de ukorrigerte.
+</ol>
+
+
+<p><a name="UUtxt"><strong>UU - relativ fuktighet</strong><br>
+Figur: <a href="#UUimga"> UU for Drevsjø, Gardermoen, Færder</a>
+<ol type=a>
+<li>Døgnlig variasjon: ja, størst vår og sommer på innlandet, liten ved kysten
+<li>Årstidsvariasjon: ja
+<li>Variasjon fra sted til sted: ja
+<li>Som for PR
+<li>Oppsummering
+Spin-up-problemer for Færder og Ytterøyene: stor negativ bias i 00+0 og 12+0;
+ +6 og +12-prognosene ser ut til å være OK.
+<br>ME i intervallet (-20,20) Store positive verdier i mars-april-mai
+<br>SDE ~ 10% (Tromsø ~ 15%)
+<br>maks. feil 60-70 på flere innlandsstasjoner, 35-40 på Ytterøyene og Færder 
+</ol>
+
+<p><a name="TDtxt"><strong>TD - duggpunktstemperatur</strong> NB! Basert på resultater kun fra Heidrun<br>
+Figur: <a href="#TDimgd"> TD for Heidrun</a>
+<ol type=a>
+<li>Døgnlig variasjon?
+<li>Årstidsvariasjon: ja
+<li>Variasjon fra sted til sted?
+<li>Som for PR
+<li>Oppsummering
+<br>ME - opp mot 2 om vinteren, nær 0 om sommeren
+<br>SDE - rundt 2 vinter og vår, godt under 1.5 om sommerer
+<br>maks.feil ~ 8
+</ol>
+
+<p><a name="RRtxt"><strong>RR_12, RR_24 - nedbør siste 12/24 timer</strong>
+<br>Nedbørstasjonene gir 24-timers nedbør observert 06 UTC
+<br>Værstasjonene gir 12-timers nedbør observert 06 og 18 UTC
+<br>Automatstasjonene gir både 12- og 24-timers nedbør, samt timesverdier<br>
+Figur: <a href="#RRimga"> RR_12/RR_24 for Vangsnes</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#RRimgb"> RR_12/RR_24 for Finsevatn</a>
+<ol type=a>
+<li>Døgnlig variasjon: nei
+<li>Årstidsvariasjon: ja
+<li>Variasjon fra sted til sted: ja
+<li>Som for PR
+<li>Oppsummering ( har foreløpig bare sett på to stasjoner, Finsevatn og Vangsnes)
+<br>ME - stasjonsavhengig
+<br>SDE - ofte de største verdiene om sommeren
+<br>max.feil vil nok variere mye fra måned til måned og år til år
+</ol>
+
+
+<p><a name="NNtxt"><strong>NN - skydekke</strong>
+<br>HIRLAM10 underestimerer skydekke MYE, gir ofte 0 når det er observert 100.
+<br>HIRLAM50 underestimerer skydekke litt, kan også gi 0 når det er observert 100.
+<br>Vi kan håpe på bedre skydekke-prognoser i Hirlam20
+<br>Det ser ut til at ECMWF-prognosene har litt bedre skydekkeprognoser enn Hirlam10/50.<br>
+Figur: <a href="#NNimga"> NN for Drevsjø, Gardermoen, Færder</a>
+
+<p><strong>CL,CM,CH</strong> - kvalitet på linje med N-prognosene.<br>
+Figur: <a href="#CLimga"> CL, CM, CH for Drevsjø, Gardermoen, Færder</a>
+
+
+<p><a name="TGtxt"><strong>TG - gresstemperatur
+<br>TJM - jordtemperatur</strong>
+<br>Hirlam10's T0m (30) og Tsoil (29) er foreløpig ikke av en slik kvalitet at
+de er kan brukes til kvalitetskontroll av temperaturobservasjoner på eller
+i bakken. Disse parametrene analyseres ikke, og har i utgangspunktet
+klimatologiske verdier.
+
+<p><a name="SAtxt"><strong>SA - snødybde
+<br>SD - snødekke</strong>
+<br>Hirlam10's snødekke fåes fra digitaliserte snøanalysekart fra Tromsø. Disse
+analysene baserer seg på snødekkeobservasjoner fra nedbørstasjonene og
+satelittbilder, og oppdateres en gang i uken.
+<br>Snødybde er en prognostisk variabel i Hirlam10. Hittil har ikke kvaliteten
+av denne parameteren vært så god. Smelteprosessen er ikke så enkel
+å modellere fysisk, bl.a. er den veldig følsom for skydekke som er en usikker
+parameter i Hirlam10. 
+
+
+<h4><a name="Figtxt">Figuroversikt:</h4>
+<ul>
+<li><a href="#PRimga"> PR for Drevsjø, Gardermoen, Færder</a>
+<li><a href="#PPimga"> PP for Drevsjø, Gardermoen, Færder</a>
+<li><a href="#FFimga"> FF for Drevsjø, Gardermoen, Færder</a>
+<li><a href="#DDimga"> DD for Drevsjø, Gardermoen, Færder</a>
+<li><a href="#TAimga"> TA for Drevsjø, Gardermoen, Færder</a>
+<li><a href="#UUimga"> UU for Drevsjø, Gardermoen, Færder</a>
+<li><a href="#TDimgd"> TD for Heidrun</a>
+<li><a href="#RRimga"> RR12/RR24 for Vangsnes</a>
+<li><a href="#RRimgb"> RR12/RR24 for Finsevatn</a>
+<li><a href="#NNimga"> NN for Drevsjø, Gardermoen, Færder</a>
+<li><a href="#CLimga"> CL for Drevsjø, Gardermoen, Færder</a>
+<li><a href="#CMimga"> CM for Drevsjø, Gardermoen, Færder</a>
+<li><a href="#CHimga"> CH for Drevsjø, Gardermoen, Færder</a>
+</ul>
+
+<p>
+<br><a name="PRimga"><img src="figures/P.1393.1384.1482.gif"></a>
+<br><a href="#Figtxt">Figuroversikt</a>
+<br><a name="PPimga"><img src="figures/PP.1393.1384.1482.gif"></a>
+<br><a href="#Figtxt">Figuroversikt</a>
+<br><a name="FFimga"><img src="figures/FF.1393.1384.1482.gif"></a>
+<br><a href="#Figtxt">Figuroversikt</a>
+<br><a name="DDimga"><img src="figures/DD.1393.1384.1482.gif"></a>
+<br><a href="#Figtxt">Figuroversikt</a>
+<br><a name="TAimga"><img src="figures/TT.1393.1384.1482.gif"></a>
+<br><a href="#Figtxt">Figuroversikt</a>
+<br><a name="UUimga"><img src="figures/UU.1393.1384.1482.gif"></a>
+<br><a href="#Figtxt">Figuroversikt</a>
+<br><a name="TDimgd"><img src="figures/TD.Heidrun.gif"></a>
+<br><a href="#Figtxt">Figuroversikt</a>
+<br><a name="RRimga"><img src="figures/RR.1338.gif"></a>
+<br><a href="#Figtxt">Figuroversikt</a>
+<br><a name="RRimgb"><img src="figures/RR.1350.gif"></a>
+<br><a href="#Figtxt">Figuroversikt</a>
+<br><a name="NNimga"><img src="figures/N.1393.1384.1482.gif"></a>
+<br><a href="#Figtxt">Figuroversikt</a>
+<br><a name="CLimga"><img src="figures/CL.1393.1384.1482.gif"></a>
+<br><a href="#Figtxt">Figuroversikt</a>
+<br><a name="CMimga"><img src="figures/CM.1393.1384.1482.gif"></a>
+<br><a href="#Figtxt">Figuroversikt</a>
+<br><a name="CHimga"><img src="figures/CH.1393.1384.1482.gif"></a>
+<br><a href="#Figtxt">Figuroversikt</a>
+
+<p>&nbsp;<br>&nbsp;</p>
+
+<table width =500 BGCOLOR="#005500">
+<td>
+<a href="mailto:m.homleid@met.no"> 
+<img src="images/mail.gif" border= 0>      </a>&nbsp;
+<small><font  color = "#ffffff">Ansvarlig for denne siden: Mariken
+Homleid </font></small>
+
+</table>
+
+Last modified: Wed Dec 15 10:13:00 GMT 2004
+  </body>
+</html>
+

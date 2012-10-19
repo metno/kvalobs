@@ -1,0 +1,22 @@
+Først må dokumentene script.create og script.create_doc oppdateres
+Disse finnes under src/kvalobs_database
+script.create oppretter databasetabellen med sine create table kommandoer.
+script.create_doc er en dokumentasjon av kvalobsdatabasen.
+
+Deretter må det gjøres endringer i kildekoden:
+src/lib/kvalobs sin include og src katalog må oppdateres
+
+
+Vi har to hovedtilfeller
+Dersom ikke Corba grensesnittet skal oppgraderes, og tabellen skal være 
+tilgjengelig utenfor Corba grensesnittet så holder det over.
+
+Ellers dersom Corba grensesnittet skal brukes så må noe annet gjøres i tillegg:
+$KVDIR/share/kvalobs/idl/kvServiceCommon.idl
+$KVDIR/src/service/kvServiceImpl.cc
+$KVDIR/src/service-libs/kvcpp/kvCorbaApp.cc
+$KVDIR/src/service-libs/qt/kvQtCorbaApp.cc
+
+
+Selvfølgelig så kan variabelen være i bruk i andre steder i koden og en må ta en 
+grep -r variabelnavn * for å sjekke om den kan endres og eventuelt gå inn og endre der det er nødvendig.

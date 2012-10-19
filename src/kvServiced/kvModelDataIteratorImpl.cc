@@ -1,0 +1,224 @@
+/*
+  Kvalobs - Free Quality Control Software for Meteorological Observations 
+
+  $Id: kvModelDataIteratorImpl.cc,v 1.1.6.4 2007/09/27 09:02:39 paule Exp $                                                       
+
+  Copyright (C) 2007 met.no
+
+  Contact information:
+  Norwegian Meteorological Institute
+  Box 43 Blindern
+  0313 OSLO
+  NORWAY
+  email: kvalobs-dev@met.no
+
+  This file is part of KVALOBS
+
+  KVALOBS is free software; you can redistribute it and/or
+  modify it under the terms of the GNU General Public License as 
+  published by the Free Software Foundation; either version 2 
+  of the License, or (at your option) any later version.
+  
+  KVALOBS is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License along 
+  with KVALOBS; if not, write to the Free Software Foundation Inc., 
+  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
+#include <list>
+#include <milog/milog.h>
+#include <kvalobs/kvDbGate.h>
+#include <kvalobs/kvModelData.h>
+#include "kvModelDataIteratorImpl.h"
+
+using namespace std;
+using namespace kvalobs;
+using namespace CKvalObs::CService;
+using namespace milog;
+
+ModelDataIteratorImpl::ModelDataIteratorImpl(dnmi::db::Connection *dbCon_,
+				   WhichDataList *whichData_,
+				   ServiceApp &app_)
+  :dbCon(dbCon_), whichData(whichData_), iData(0), app(app_)
+{
+}
+
+ModelDataIteratorImpl::~ModelDataIteratorImpl()
+{
+  
+	LOGDEBUG("DTOR: ModelDataIteratorImpl::~ModelDataIteratorImpl...\n");
+  
+	if(whichData)
+		delete whichData;
+
+	if(dbCon)
+		app.releaseDbConnection(dbCon);
+	
+	LOGDEBUG("DTOR: ModelDataIteratorImpl::~ModelDataIteratorImpl ... 1 ...\n");
+}
+
+
+void  
+ModelDataIteratorImpl::destroy()
+{
+	// We just deactivate the object here. The cleanup thread will release the resources
+	// and remove it from the reaperObjList.
+	
+	LOGDEBUG("ModelDataIteratorImpl::destroy: called!\n");
+	deactivate();
+	LOGDEBUG("ModelDataIteratorImpl::destroy: leaving!\n");
+}
+
+CORBA::Boolean  
+ModelDataIteratorImpl::next(CKvalObs::CService::ModelDataList_out modelDataList)
+{
+	list<kvModelData>           dataList;
+	list<kvModelData>::iterator it;
+	miutil::miTime         thisTime;
+	CORBA::Long            obsi=0;
+	CORBA::Long            datai=0;
+	char                   *sTmp;
+	bool                   active;
+  //ObsDataList          obsDataList;
+
+	LogContext context("service/ModelDataIterator");
+	IsRunningHelper(*this, active );
+
+	LOGDEBUG("ModelDataIteratorImpl::next: called ... \n");
+  
+	//Check if we are deactivated. If so just return false.
+	if( ! active ) {
+		LOGDEBUG( "next: deactivated ( returning false)");
+		return false;
+	} 
+  
+	modelDataList =new CKvalObs::CService::ModelDataList();
+	
+	do{
+		if(iData>=whichData->length()){
+			LOGDEBUG("ModelDataIteratorImpl::next: End of data reached (return false)!\n");
+			return false;
+		}
+    
+		try{
+			if(!findData(dataList, (*whichData)[iData])){
+				LOGWARN("ModelDataIteratorImpl::next: Cant find data (return false)!\n");
+				//CODE:
+				//We have a problem with the connection to the database.
+				//We return false. false is used to mark the end of stream. So
+				//the caller sees this as an end of stream, that is wrong. We 
+				//may add an exception here later to tell the caller that we
+				//had problems. Anyway, the caller must react the same and
+				//call destroy on the iterator.
+				return false;
+			}
+		}
+		catch(InvalidWhichData &ex){
+			LOGERROR("ModelDataIteratorImpl::next: EXCEPTION: \n" << "   " << ex.what() << endl);
+			return false;
+		}
+		catch(...){
+			LOGERROR("ModelDataIteratorImpl::next: UNKNOWN EXCEPTION: \n");
+			return false;
+		}
+     
+		iData++;
+	}while(dataList.empty());
+
+	it=dataList.begin();
+  
+	if(it!=dataList.end()){
+		modelDataList->length(obsi+1);
+		thisTime=it->obstime();
+	}
+
+	while(it!=dataList.end()){
+		if(it->obstime()!=thisTime){
+			//New record
+			obsi++;
+			datai=0;
+			thisTime=it->obstime();
+			modelDataList->length(obsi+1);
+			LOGDEBUG( "ModelDataIteratorImpl::next: obsDataList[" << obsi-1 << "].dataList.length()="
+					    << (*modelDataList)[obsi-1].dataList.length() << endl);
+		}
+   
+		(*modelDataList)[obsi].dataList.length(datai+1);
+		(*modelDataList)[obsi].dataList[datai].stationID=it->stationID(); 
+		(*modelDataList)[obsi].dataList[datai].obstime=
+                                  it->obstime().isoTime().c_str();
+		(*modelDataList)[obsi].dataList[datai].paramID=it->paramID();
+		(*modelDataList)[obsi].dataList[datai].level=it->level();
+		(*modelDataList)[obsi].dataList[datai].modelID=it->modelID();
+		(*modelDataList)[obsi].dataList[datai].original=it->original();  
+     
+		datai++;
+		it++; //Move to the next data in dataList.
+	}
+    
+	LOGDEBUG( "ModelDataIteratorImpl::next: obsDataList->length()=" 
+             << modelDataList->length() << endl);
+
+	return true;
+}
+
+bool
+ModelDataIteratorImpl::findData(list<kvModelData> &data, 
+			   const CKvalObs::CService::WhichData &wData)
+{
+	kvDbGate gate(dbCon);
+	miutil::miTime stime(wData.fromObsTime);
+	miutil::miTime etime(wData.toObsTime);
+
+	if(stime.undef() || etime.undef()){
+		if(stime.undef()){
+			ostringstream os;
+			os << "Inavlid time spec (fromObsTime): ";
+
+			if(wData.fromObsTime)
+				os <<  wData.fromObsTime;
+			else
+				os << "(NULL POINTER)";
+
+			os << "!";
+	 
+			throw InvalidWhichData(os.str());
+		}
+
+		if(etime.undef()){
+			etime=etime.nowTime();
+		}
+	}
+     
+	LOGDEBUG("ModelDataIteratorImpl::findData: calling gate.select(data, .... \n");
+
+	if( gate.select(data, kvQueries::selectModelData(wData.stationid, stime, etime))){
+		LOGDEBUG( "ModelDataIteratorImpl::findData: nElements=" << data.size() 
+				    << " (return true)\n");
+		return true;
+	}
+
+	LOGDEBUG("ModelDataIteratorImpl::findData: return false\n");
+	return false;
+}
+  
+/*
+ * TODO: Implement the cleanup, ie move the cleanup of the database object and whichData
+ * from the deactivate method to this method. Remember to add a call to cleanup in 
+ * the method ServiceApp::cleanUpReaperObj()
+ */ 
+void 
+ModelDataIteratorImpl::
+cleanUp()
+{
+	app.releaseDbConnection(dbCon);
+	delete whichData;
+
+	whichData=0;
+	dbCon=0;
+}
+  
+

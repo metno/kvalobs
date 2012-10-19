@@ -1,0 +1,1037 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+  <title>kvalobs operatør dokumentasjon.</title>
+</head>
+<body>
+
+<div align="center">
+<h1>Kvalobs</h1>
+<em>Driftsdokumentasjon for IT-operatører</em>
+<br/>
+</div>
+
+<h1>Indeks</h1>
+<div style="margin-left: 30px;">
+<table>
+	<tbody>
+	<tr>
+		<td>1</td>
+		<td>
+			<a href="#oversikt_1">
+			Oversikt
+			</a>
+		</td>
+	</tr>
+	<tr>
+		<td>1.1</td>
+		<td>
+			<a href="#oversikt_1_1">
+			Kvalobsmodulene
+			</a>
+		</td>
+	</tr>
+	<tr>
+		<td>1.1.1</td>
+		<td>
+			<a href="#oversikt_1_1_1">
+			Beskrivelse av modulene og samspillet mellom dem.
+			</a>
+		</td>
+	</tr>
+	<tr>
+		<td>1.2</td>
+		<td>
+			<a href="#oversikt_1_2">
+			Katalogstruktur
+			</a>
+		</td>
+	</tr>
+	<tr>
+		<td>1.3</td>
+		<td>
+			<a href="#oversikt_1_3">
+			Programmene, environmentvariablene og hvilke filer de bruker.	
+			</a>
+		</td>
+	</tr>
+	<tr>
+		<td>1.3.1</td>
+		<td>
+			<a href="#oversikt_1_3_1">
+			kvDataInputd
+			</a>
+		</td>
+	</tr>
+	<tr>
+		<td>1.3.2</td>
+		<td>
+			<a href="#oversikt_1_3_2">
+			kvManagerd
+			</a>
+		</td>
+	</tr>
+	<tr>
+		<td>1.3.3</td>
+		<td>
+			<a href="#oversikt_1_3_3">
+			kvQabased
+			</a>
+		</td>
+	</tr>
+	<tr>
+		<td>1.3.4</td>
+		<td>
+			<a href="#oversikt_1_3_4">
+			kvServiced
+			</a>
+		</td>
+	</tr>
+	<tr>
+		<td>1.4</td>
+		<td>
+			<a href="#oversikt_1_4">
+			Cronjobber som kjører
+			</a>
+		</td>
+	</tr>
+	<tr>
+		<td>1.5</td>
+		<td>
+			<a href="#oversikt_1_5">
+			Generering av SYNOP
+			</a>
+		</td>
+	</tr>
+	<tr>
+		<td>1.6</td>
+		<td>
+			<a href="#oversikt_1_6">
+			Dataleverandører til kvalobs
+			</a>
+		</td>
+	</tr>
+		<tr>
+		<td>1.6.1</td>
+		<td>
+			<a href="#oversikt_1_6_1">
+			AutoObs og ComObs
+			</a>
+		</td>
+	</tr>
+	<tr>
+		<td>1.6.2</td>
+		<td>
+			<a href="#oversikt_1_6_2">
+			NORCOM
+			</a>
+		</td>
+	</tr>
+	<tr>
+		<td>1.6.3</td>
+		<td>
+			<a href="#oversikt_1_6_3">
+			Oppsummering av dataleverandører til kvalobs
+			</a>
+		</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>
+			<a href="#drift_2">
+			Drift av kvalobs
+			</a>
+		</td>
+	</tr>
+	<tr>
+		<td>2.1</td>
+		<td>
+			<a href="#drift_2_1">
+			Start og stop av postgresql
+			</a>
+		</td>
+	</tr>
+	<tr>
+		<td>2.2</td>
+		<td>
+			<a href="#drift_2_2">
+			Start og stop av kvalobs
+			</a>
+		</td>
+	</tr>
+	<tr>
+		<td>2.3</td>
+		<td>
+			<a href="#drift_2_3">
+			Feilsituasjoner
+			</a>
+		</td>
+	</tr>
+	<tr>
+		<td>2.3.1</td>
+		<td>
+			<a href="#drift_2_3_1">
+			Feil i kvalobs
+			</a>
+		</td>
+	</tr>
+	<tr>
+		<td>2.3.1.1</td>
+		<td>
+			<a href="#drift_2_3_1_1">
+			Databasen er nede
+			</a>
+		</td>
+	</tr>
+	<tr>
+		<td>2.3.1.2</td>
+		<td>
+			<a href="#drift_2_3_1_2">
+			Noen av kvalobs prosessene er nede
+			</a>
+		</td>
+	</tr>
+
+	<tr>
+		<td>2.3.2</td>
+		<td>
+			<a href="#drift_2_3_2">
+			Feil i dataleverandører
+			</a>
+		</td>
+	</tr>
+	<tr>
+		<td>2.3.3</td>
+		<td>
+			<a href="#drift_2_3_3">
+			Overvåking av kvalobs
+			</a>
+		</td>
+	</tr>
+
+	<tr>
+		<td>3</td>
+		<td>
+			<a href="#reserve_3">
+			Skifte til reservemaskin for kvalobs
+			</a>
+		</td>
+	</tr>
+
+
+	<tr>
+		<td>4</td>
+		<td>
+			<a href="#reserve_4">
+			Skifte til AutoObs for produksjon av SYNOP
+			</a>
+		</td>
+	</tr>
+
+
+
+	</tbody>
+	</table>
+</div>
+
+
+<h1 id="oversikt_1">1 Oversikt</h1>
+<p>
+Kvalobs er met.nos system for kvalitetssikring av observasjoner.
+Observasjoner som behandles av kvalobs er norske synop/ship, data fra
+AutoObs/ComObs og data registrert manuelt fra dagbøker eller
+overført fra fil. Etter at dataene har blitt behandlet av
+kvalobs og kvalitetsflagg er satt kan dataene bli tatt i bruk.
+Typiske brukere er klimadatabasen og produksjon av synop.
+</p>
+<p>
+Kvalobs er designet rundt en database. Databasemotoren som brukes
+er PostgreSQL. 
+</p>
+<p>Kvalobs kjører på<i>warm</i> med <i>cool</i> som 
+reservemaskinen.
+<p>
+<p>Driftsgruppen for <i>kvalobs</i> står ansvarlig for driften!</p>
+
+<h2 id="oversikt_1_1">1.1 Kvalobsmodulene</h2>
+<p>Kvalobs består av fire program som må kjøre for
+at systemet skal være operativt. Disse programmene er
+kvDataInputd, kvManagerd, kvQabased og kvServiced. I tillegg må
+det gå program som leverer data til kvalobs. Disse programmene
+vil bli beskrevet senere.
+</p>
+<br/>
+<table align="center" border="0" cellpadding="2" cellspacing="2">
+<caption align="bottom"> <b><i>Figur 1:</i></b> Oversikt over kontroll og 
+dataflyt i kvalobs. De heltrukne pilene angir dataflyt, de stiplede pilene 
+angir kontrollflyt.
+</caption>
+  <tbody>
+    <tr>
+      <td><img alt="kvalobs-oversikt" src="kvalobs-oversikt.png">
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p><br>
+</p>
+
+<h3 id="oversikt_1_1_1">1.1.1 Beskrivelse av modulene og samspillet mellom dem</h3>
+<p><i>KvManagerd</i> står for tidstyring og kontroll av dataflyten i
+systemet. 
+</p>
+<p>Mottak av data til kvalobs skjer via <i>kvDataInputd</i>. Denne 
+dekoder dataene som kommer inn og laster dem inn i databasen. Den 
+signalerer så til <i>kvManagerd</i> at en ny melding er mottatt.
+<i>KvManagerd</i> ruter meldingen videre til <i>kvQabased</i> som 
+kjører alle oppsatte sjekker. Når <i>kvQabased</i>, er ferdig 
+signalerer den tilbake til <i>kvManagerd</i>, som signalerer til 
+<i>kvService</i> at en ny melding har passert gjennom kvalitetssjekken 
+og er tilgjengelig for bruk. <i>KvServiced</i> sender beskjed om at 
+data er tilgjengelig til alle prosesser som har registrert at de er 
+interessert i å få beskjed om at nye data er tilgjengelig.
+</p>
+
+
+<h2 id="oversikt_1_2">1.2 Katalogstruktur</h2>
+<p>Kvalobs er avhengig av en gitt katalogstruktur. Toppen
+av katalogstrukturen angis med environmentvariablen KVALOBS. Da
+kvalobs er satt opp som en egen bruker på de maskinene som
+kjører kvalobs, settes KVALOBS til å være toppen
+på hjemmekatalogen. 
+</p>
+<p>Den grunnleggende katalogstrukturen følger en
+standard UNIX katalogstruktur:
+</p>
+<p><i> $KVALOBS</i></p>
+	
+
+<div style="margin-left: 40px;">
+<i>bin</i><br/>
+<i>cronjob</i><br/>
+<i>&nbsp;&nbsp;&nbsp; lam2kv (*)</i><br/>
+<i>etc</i><br/>
+<i>lib</i><br/>
+<i>&nbsp;&nbsp;&nbsp; db</i><br/>
+<i>&nbsp;&nbsp;&nbsp; decode</i><br/>
+<i>share</i><br/>
+<i>&nbsp;&nbsp;&nbsp; kvalobs</i><br/>
+<i>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; metadata (*)</i><br/>
+<i>&nbsp;&nbsp;&nbsp; kvsynop (*)</i><br/>
+<i>var</i><br/>
+<i>&nbsp;&nbsp;&nbsp; html</i><br/>
+<i>&nbsp;&nbsp;&nbsp; kvalobs</i><br/>
+<i>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; service</i><br/>
+<i>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; subscribers</i><br/>
+<i>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; kvsynop (*)</i><br/>
+<i>&nbsp;&nbsp;&nbsp; log</i><br/>
+<i>&nbsp;&nbsp;&nbsp; norcom2kv</i><br/>
+<i>&nbsp;&nbsp;&nbsp; postgres</i><br/>
+<i>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; data</i><br/>
+<i>&nbsp;&nbsp;&nbsp; run</i><br/>
+</div>
+
+<p>
+Katalogene som er merket med (*) har underkataloger, jeg vil komme 
+tilbake til disse senere.
+</p>
+
+<p>
+Kort beskrivelse av katalogene:
+</p>
+<div style="margin-left: 40px;" align="center">
+    <table border="1" cellpadding="0" cellspacing="0">
+    	<thead> 
+    	<tr valign="middle">
+        <th>Katalog</th>
+        <th>Beskrivelse</th>
+      </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <i>bin</i>
+          </td>
+          <td>
+          	Her ligger alle programmene som kvalobs består av.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <i>etc</i> 
+          </td>
+          <td>
+            Her ligger alle konfigurasjonsfilene.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <i>lib</i>
+          </td>
+          <td>
+            Her ligger alle dynamisk linkbare bibliotek som kvalobs er 
+            avhengig av i tillegg til standardbibliotekene.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <i>lib/db</i>
+          </td>
+          <td>
+            Denne katalogen innholder drivere for forskjellige databaser 
+            som kvalobs kan koble opp mot.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <i>lib/decode</i>
+          </td>
+          <td>
+            Denne katalogen innholder alle dekoderene som brukes av 
+            kvDataInputd for å dekode forskjellige meldingsformat.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <i>share</i>
+          </td>
+          <td>
+            Her ligger alle data som brukes til å initialisere 
+            databasen og IDL-filene for CORBA-grensesnittet til kvalobs.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <i>share/kvalobs/metadata</i>
+          </td>
+          <td>
+            Her ligger alle filene som brukes til å fylle 
+            databasen med metadata.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <i>var</i>
+          </td>
+          <td>
+           	Her ligger alle logger, arbeidsfiler og selve postgres-databasefilene.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+</div>
+
+
+<h2 id="oversikt_1_3">1.3 Programmene, environmentvariablene og hvilke filer de bruker.</h2>
+<p>
+Alle programmene i kvalobs bruker konfigurasjonsfilen <i>kvalobs.conf</i>
+som ligger i <i>etc</i>-katalogen. Alle programmene leser seksjonene 
+<i>corba</i> og <i>database</i> fra konfigurasjonsfilen. I tillegg 
+leser de seksjonen med samme navn som programmet. Alle programmene 
+genererer logfiler på formen &lt;<i>programnavn</i>&gt;. <i>log</i>
+logfilene ligger i katalogen <i>var/log</i>.
+</p>
+<p>
+Environmentvariablene kan deles inn i kategoriene: egne variabler, 
+systemvariablene, perlvariablene og postgresqlvariablene. Disse 
+variablene ligger i filen <i>.kvalobs</i> i hjemmekatalogen. 
+Environmentvariablene i kvalobs er:
+</p>
+<br/>
+
+<h4>Egne variabler</h4>
+<div style="margin-left: 30px;">
+	<table border="1" align="left" valign="top">
+		<thead>
+			<tr>
+				<th align="left">Variabel</th>
+				<th>Beskrivelse</th>
+			</tr>
+		</thead>
+		<tbody align="left" valign="middle">
+		<tr>
+			<td>KVALOBS</td>
+			<td>
+				Stien til toppen av katalogstrukturen for runtimesystemet,
+				er nødvendig for at kvalobsprosessene skal finne 
+				toppen av katalogstrukturen.
+			</td>	
+		</tr>
+		<tr>
+			<td>KVDIR</td>
+			<td>
+				Stien til toppen av CVS treet for kildekoden til kvalobs. 
+				Denne brukes blant annet av innstalleringsskriptene.
+			</td>
+		</tr>
+		<tr>
+			<td>METADIR</td>
+			<td>
+				Stien til toppen av CVS treet for kvalobs metadata.
+			</td>
+		</tr>
+		<tr>
+			<td>POSTGRES_LOG</td>
+			<td>
+				Hvor skal logfilen legges. Settes til $HOME/var/postgres/postgres.log. 
+				Brukes av skript for å rydde i databasen.
+			</td>
+		</tr>
+		<tr>
+			<td>margin-bottom:PERL_BIN</td>
+			<td>
+				Stien til binærversjonen, brukes bare av QABase. Er nødvendig
+				fordi kvalobs trenger nyere perlversjon enn det som nå 
+				er i drift. Denne trenges bare for kompilering av kvalobs. 
+			</td>
+		</tr>
+		</tbody>
+	</table>
+</div>
+
+&nbsp;<br/>
+
+<h4>Systemvariablene er (brukes av operativsystemet)</h4>
+
+<div style="margin-left: 30px;">
+	<table border="1">
+		<thead>
+			<tr>
+				<th>Variable</th>	
+				<th>Beskrivelse</th>
+			</tr>
+		</thead>
+		<tbody>
+		<tr>
+			<td>LD_LIBRARY_PATH</td>
+			<td>
+				for å finne delte bibliotek som brukes av kvalobs og 
+				dynamisk linkes. $HOME/lib legges til på slutten av LD_LIBRARY_PATH.
+			</td>
+		</tr>
+		<tr>
+			<td>PATH</td>
+			<td>
+				 for å finne programfilene til kvalobs. $KVALOBS/bin:$KVALOBS/bin/dbscript
+				 settes inn på begynnelsen av PATH.
+			</td>
+		</tr>
+		</tbody>
+	</table>
+</div>
+
+<p>
+
+<h4>Perlvariablene er (brukes av perl)</h4>
+PERL5LIB ekstra bibliotek til perl som brukes av kvalobs. 
+'$HOME/lib/perl:$HOME/lib/perl5/5.8.0/i686-linux-thread-multi:$HOME/lib/perl5/5.8.0'
+legges til på slutten av PERL5LIB.
+$HOME/lib/perl er egenutviklede perlrutiner. Se <kbd>man perlrun</kbd> for 
+dokumentasjon.
+</p>
+
+
+<p>
+<h4>Postgresql</h4>
+<p>
+Følgende environment variabler må settes for at KVALOBS skal kunne
+kontakte korrekt databaseserver.
+</p>
+<div style="margin-left: 30px">
+	<table border="1">
+	<thead th align="left" valign="middle">
+	<tr>
+		<th>Variabel</th>
+		<th>Beskrivelse</th>
+	</tr>
+	</thead>
+	<tbody>
+	<tr>
+		<td>PGHOST</td>
+		<td>
+			Navnet på serveren hvor databasen er (warm.oslo.dnmi.no)
+		</td>
+	</tr>
+	<tr>
+		<td>PGDATA</td>
+		<td>
+			Angir hvor databasen fysisk er. Settes til $HOME/var/postgres/data
+		</td>
+	</tr>
+	<tr>
+		<td>PGPORT</td>
+		<td>
+			Hvilken port skal brukes for å kontakte database 
+			serveren. Sette til 5434.
+		</td>
+	</tr>
+	</tbody>
+	</table>
+</div>
+
+<h3 id="oversikt_1_3_1"> 1.3.1 kvDataInputd</h3>
+<p>
+	<ul align="center">
+		<li>Leser konfigurasjonsfilen <i>etc/kvalobs.conf</i></li>
+		<li>Laster databasedriver fra katalogen <i>lib/db/</i></li>	
+		<li>Skriver til loggfilen <i>var/log/kvDataInputd.log</i></li>
+		<li>
+			Hver dekoder kan skrive egne logger til katalogen
+			<i>var/log/decoders/&lt;decodername&gt;/</i>
+		</li>
+		<li>Laster dekodere fra katalogen <i>lib/decode</i></li>
+</ul>
+</p>
+
+<h3 id="oversikt_1_3_2">1.3.2 kvManagerd</h3>
+<p>
+	<ul align="center">
+		<li>Leser konfigurasjonsfilen <i>etc/kvalobs.conf</i></li>
+		<li>Laster databasedriver fra katalogen <i>lib/db/</i></li>	
+		<li>Skriver til loggfilen <i>var/log/kvManagerd.log</i></li>
+	</ul>
+</p>
+
+<h3 id="oversikt_1_3_3">1.3.3 kvQabased</h3>
+<p>
+	<ul align="center">
+		<li>Leser konfigurasjonsfilen <i>etc/kvalobs.conf</i></li>
+		<li>Laster databasedriver fra katalogen <i>lib/db/</i></li>	
+		<li>Skriver til loggfilen <i>var/log/kvQabased.log</i></li>
+		<li>
+			kvQabased genererer en loggfil for hver melding som blir
+			kontrollert. Denne logfilen er htmlformatert slik at den kan leses i
+			en webbrowser. Filene ligger i katalogen
+			<i>var</i>/<i>html</i>/<u><i>YYYYMMDDhh</i></u>/<i>stasjonsid</i>,
+			hvor YYYY er årstallet, MM er måneden, DD er dagen og hh
+			er observasjonstiden.
+		</li>
+	</ul>
+</p>
+
+<h3 id="oversikt_1_3_4"> 1.3.4 kvServiced</h3>
+<p>
+	<ul align="center">
+		<li>Leser konfigurasjonsfilen <i>etc/kvalobs.conf</i></li>
+		<li>Laster databasedriver fra katalogen <i>lib/db/</i></li>	
+		<li>Skriver til loggfilen <i>var/log/kvServiced.log</i></li>
+		<li>
+			Skriver subscriber informasjon til katalogen 
+		   <i>var/kvalobs/service/subscribers</i>
+		</li>
+	</ul>
+
+</p>
+
+<h2 id="oversikt_1_4">1.4 Cronjobber som kjører</h2>
+<p>
+Følgende cron-jobber er satt opp.
+</p>
+<ol>
+    <li>
+      <p>Overføring av modelldata fra HIRLAM-modellen til 
+      kvalobs, <i>cronjob/lam2kv/bin/lam2kv.cron,</i> kjører 
+      fire gang i døgnet ved klokkeslettene 5:30, 11:30, 17:30 
+      og 23:30.</p>
+    </li>
+    <li>
+      <p>Vedlikehold av postgresql-databasen, <i>bin/kvdbadmin.sh</i>,
+       kjører kl 1:25 om natten.</p>
+    </li>
+    <li>
+      <p>Sletting av html logfiler fra kvQabase, <i>bin/qabase_cron</i>,
+       kjører hvert 15 minutt.</p>
+    </li>
+    <li>
+      <p>Vedlikehold av synopdatabasen til synopgeneratoren, <i>kvsynopd</i>
+      Skritptet som kjøres er <i>kvsynopdbadmin.sh</i> og kjøres 
+      en gang i døgnet kl 5:15.</p>
+    </li>
+</ol>
+<p>For å se hvilke cronjobber som kjører, logg inn 
+på kvalobsserveren (ssh kvalobs@kvalobs) og utfør 
+komandoen:&nbsp; <i>crontab -l</i>
+</p>
+
+<h2 id="oversikt_1_5"> 1.5 Generering av SYNOP</h2>
+<p>kvsynop er en prosess som mottar data fra kvalobs og genererer
+SYNOP-formaterte meldinger som overføres til NORCOM. Denne
+prosessen kan i prinsippet kjøre på en hvilken som helst
+maskin, men det er mest hensiktsmessig å kjøre den
+på samme maskin som kvalobs. kvsynop leser konfigurasjonsfilen
+$KVALOBS/etc/kvsynop.conf. Alle stasjoner det skal genereres SYNOP
+for må være satt opp i denne konfigurasjonsfilen.
+<br/>
+
+<div style="margin-left: 30px; margin-right: 30px;">
+		<blockquote>$KVALOBS/etc/kvsynop.conf blir for øyeblikket oppdatert av 
+		<i>Børge Moe</i>, men skal overtas av driftsgruppen eller operatørene. 
+		På sikt skal man få data fra ST-INFOSYS.
+	 	</blockquote>
+</div>
+</p>
+
+<h2 id="oversikt_1_6"> 1.6 Dataleverandører til kvalobs</h2>
+<p>
+Data til kvalobs kommer inn fra AutoObs, ComObs, NORCOM
+og klimadatabasen. Stopper datastrømmen fra AutoObs, ComObs
+eller NORCOM <b>må</b> det iverksettes tiltak. For produksjon
+av SYNOP meldinger fra våre nasjonale stasjoner er dataene fra
+AutoObs og ComObs helt avgjørende.
+</p>
+
+<h3 id="oversikt_1_6_1">1.6.1 AutoObs og ComObs</h3>
+<p>Dataene fra AutoObs og ComObs behandles av samme system
+og kjører under ip-aliaset <i>autoobs</i>. Dataene fra ComObs
+er mottatt av <i>aosmsd</i> som kjører under AutoObs. <i>aosmsd</i>
+mottar melding fra ComObs via en egen XML-basert nettverksprotokol. <i>aosmsd</i>
+dekoder meldingen og ruter dem til <i>AutoObs</i> og <i>kvalobs</i>. Meldingene til
+kvalobs legges i katalogen <i>$AUTOOBS/data2kv</i>. Alle meldingene i katalogen
+<i>$AUTOOBS/data2kv</i> har samme format. Dataene fra <i>AutoObs</i> legges også 
+i denne katalogen. Produktgeneratoren i <i>AutoObs</i> som legger ut data til kvalobs 
+er <i>kvprod</i>.
+</p>
+<p>Katalogen <i>$AUTOOBS/data2kv</i> overvåkes av <i>autoobs2kv</i>
+som snapper opp meldingene og sender dem til <i>kvalobs</i>.
+<i>autoobs2kv</i> bruker environmentvariablen AUTOOBS til å
+ finne konfigurasjonsfilen. Konfigurasjonsfilen er $AUTOOBS/etc/autoobs2kv.conf.
+</p>
+<div align="center">
+<table border="0" cellpadding="2" cellspacing="2">
+<caption align="bottom" align="left"><b><i>Figure 2:</i></b>
+	Oversikt over dataflyt fra AutoObs/ComObs til kvalobs. Heltrukne 
+	piler angir lesing/skriving av filer. Pil fra prosessboks angir 
+	skriving av fil, og pil til prosessboks angir lesing av filer. 	 
+</caption>
+  <tbody>
+    <tr>
+      <td><img alt="autoobs til kvalobs" src="autoobs2kv.png">
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+<h3 id="oversikt_1_6_2"> 1.6.2 NORCOM</h3>
+<p>Prosessen som overvåker NORCOM og som snapper opp nye
+SYNOP-meldinger er <i>norcom2kv</i>. <i>Norcom2kv</i> kjører 
+på warm/cool og leser data fra katalogen &nbsp;
+<i>/dnmi/norcom/data/kvalobs</i>. <i>norcom2kv</i> leser SYNOP/SHIP 
+reporter og splitter den opp i enkelte SYNOP'er som den overfører
+til kvalobs. <i>norcom2kv</i> leser konfigurasjonsfilen <i>norcom2kv.conf</i> 
+som den ser etter i katalogen <i>$KVALOBS/etc</i>.
+</p>
+
+<h3 id="oversikt_1_6_3">1.6.3 Oppsummering av dataleverandører til kvalobs</h3>
+<p>
+<ul>
+	<li>NORCOM<br/>
+	Fra NORCOM kommer norske manuelle SYNOP, utenlandske SYNOP og SHIP.
+	Disse meldingene blir lagt ut til <i>kvalobs</i> i katalogen: <br><br>
+	<span style="margin-left: 30px;"><i>/dnmi/norcom/data/kvalobs</i></span><br><br> 
+	Denne katalogen overvåkes av <i>norcom2kv</i> som fanger opp
+	ny SYNOP og sender dem til <i>kvalobs</i>.
+	<br/>
+	&nbsp;<br/>
+	</li>
+	<li>AutoObs<br/>
+	Data fra <i>AutoObs</i> sendes i to omganger. Først 
+	formateres dataene i et format som er felles for <i>AutoObs</i> og
+	<i>ComObs</i>. Denne formateringen gjøres av <i>kvprod</i> i
+	<i>AutoObs</i>. Dataene legges så i katalogen:<br/><br/>
+	<span style="margin-left: 30px;">data2kv</span><br/><br/>
+	Katalogen <i>data2kv</i> overvåkes av programmet <i>autoobs2kv</i>
+	som fanger opp de nye observasjonene og sender dem til <i>kvalobs</i>.
+	<br/>&nbsp;<br/>
+	</li>
+	<li>ComObs<br/>
+	Dataene legges i katalogen:<br/><br/>
+	<span style="margin-left: 30px;">data2kv</span><br/><br/>
+	hvor de fanges opp av <i>autoobs2kv</i> som sender dem til 
+	<i>kvalobs</i>.
+	<br/>
+	</li>
+</ul>
+</p>
+
+
+<h1 id="drift_2"> 2 Drift av kvalobs </h1>
+<p>
+Kvalobs er avhengig av en database. Databasen som brukes er
+postgresql. Postgresql må være oppe og kjøre til
+enhver tid for at kvalobs skal fungere. 
+</p>
+<p>Det antas at alle kommandoer i det følgende blir
+utført fra <i>kvalobs</i>kontoen på <i>warm/cool</i>.
+Det vil være en ip-alias med navnet <i>kvalobs</i> som alltid
+vil peke på maskinen som til enhver tid kjører 
+<i>kvalobs</i>.
+</p>
+<p>
+For å logge inn på <i>kvalobs</i> ved hjelp av
+ip-aliaset bruk følgende kommando:<br\>
+<br\>
+<kbd style="margin-left: 30px;">ssh kvalobs@kvalobs</kbd>
+</p>
+<h2 id="drift_2_1">2.1 Start og stopp av postgresql</h2>
+<p>Postgresql vil startes automatisk når <i>kvalobs</i>
+startes, hvis den ikke allerede kjører. Hvis det blir
+nødvendig å starte og stoppe postgresqldatabasen manuelt
+kan følgende kommandoer benyttes:<br>
+<br>
+<div style="margin-left: 30px">
+<table cellspacing="10">
+	<tr>
+		<td><kbd>pg_ctl start &gt; /dev/null 2&gt;&amp;1</kbd></td>
+		<td>, starter postgresql.</td>
+	</tr>
+	<tr>
+		<td><kbd>pg_ctl stop &gt; /dev/null 2&gt;&amp;1</kbd></td>
+		<td>, stopper postgresql.</td>
+	</tr>
+	<tr>
+		<td><kbd>pg_ctl status</kbd></td> 
+		<td>, statusen til pstgresql.</td>
+	</tr>
+</table>
+</div>
+<p>
+Hvis postgresql har stoppet av en eller annen grunn, må kvalobs
+stoppes før postgresql startes på nytt. Når 
+postgresql kjører startes kvalobs opp på nytt.
+</p>
+<h2 id="drift_2_2">2.2 start og stopp av kvalobs</h2>
+<p>Kvalobs startes og stoppes ved hjelp av kommandoene:<br>
+&nbsp;<br/>
+<kbd style="margin-left: 30px;">kvstart</kbd>, starter
+kvalobs og postgresql hvis den ikke kjører.<br>
+<kbd style="margin-left: 30px;">kvstop</kbd>, stopper kvalobs, 
+men ikke postgresql.
+</p>
+<p><kbd>kvstart</kbd> og <kbd>kvstop</kbd> vil liste opp hvilke 
+prosesser som startes og stoppes. For å sjekke om alle 
+prosessene kjører kan kommandoen <kbd>kvstart</kbd> brukes.
+</p>
+<h2 id="drift_2_3">2.3 Feilsituasjoner</h2>
+<p>
+Det er to hvedtyper av feil.
+</p>
+<p>
+<ol>
+	<li>Feil med kvalobs</li>
+	<li>Feil med en av dataleverandørene til kvalobs.</li>
+</ol> 
+</p>
+<p>
+Feil i kvalobs vil medføre at alle data ut fra <i>kvalobs</i> 
+opphører.
+</p>
+<p>
+Hvis kun en eller flere typer stasjoner opphører å komme
+er det et tegn på at en eller flere dataleverandører til 
+kvalobs ikke fungerer. For øyeblikket har vi 3 
+leverandører til <i>kvalobs</i>. Se punkt <a href="#oversikt_1_6_3">1.6</a>
+</p>
+
+<h3 id="drift_2_3_1">2.3.1 Feil i kvalobs</h3>
+<ol>
+	<li id="drift_2_3_1_1"><b>Databasen er nede</b><br/><br/>
+		<ol>
+		  <li>
+				Logg inn på kvalobs med kommandoen:<br/>
+		  		<kbd>ssh kvalobs@kvalobs</kbd><br/>&nbsp;<br/>
+		  	</li>
+		  	<li>
+		  		Sjekk om databasen kjører med kommandoen:<br/>
+		  		<kbd>pg_ctl status</kbd><br/>&nbsp;<br/>
+		  	</li>
+		  	<li>
+				Stopp kvalobs med <kbd>kvstop</kbd><br/>&nbsp;<br/>
+			</li>
+      	<li>
+      		Start databasen med kommandoen:<br/></br>
+				<kbd>pg_ctl start &gt; /dev/null 2&gt;&amp;1</kbd><br/>&nbsp;<br/>
+			</li>
+    		<li>
+				Sjekk om databasen kjører med kommandoen:<br/></br>
+				<kbd>pg_ctl status</kbd><br/>&nbsp;<br/>
+			</li>		
+    		<li>
+				Hvis databasen ikke kjører nå. Prøv og 
+				start den på nytt med kommandoen:<br/></br>
+				<kbd>pg_ctl start</kbd><br/></br>
+				Følg med på hvilke feilmeldinger som kommer og 
+				prøv å gjør noe for å rette problemet.<br/>
+	   		<br/>
+				Feil som kan oppstå<br/><br/>
+				<ul>
+ 					<li>Disken er full</li>
+					<li>Nettverksproblemer, NettApp'en, delfi, kan ikke kontaktes.</li>
+				</ul></br>
+				Disken ryddes av en cronjobb som kjøres en gang i 
+				døgnet. Hvis disken er full kan denne jobben kjøres manuelt med 
+				kommandoen:<br/></br>
+				<kbd>~/bin/qabase_cron</kbd><br/>
+    			<br/>
+				Når databasen er oppe og kjører igjen, kan 
+				kvalobs startes opp på nytt med kommandoen:<br/><br/>
+				<kbd>kvstart</kbd><br/><br/>
+			</li>
+		</ol>
+	</li>
+	<li id="drift_2_3_1_2"><b>Noen av kvalobs prosessene er nede.</b><br/>
+		Hvis en av prosessene <kbd>kvDataInputd</kbd>, 
+		<kbd>kvManagerd</kbd>, <kbd>kvQabased</kbd>, 
+		<kbd>kvServiced</kbd>, <kbd>kvSynopd</kbd> eller 
+		<kbd>norcom2kv</kbd> er nede kan man forsøke og 
+		starte dem opp igjen med kommandoen:<br/><br/>
+  		<kbd>kvstart</kbd><br/><br/>
+		Hvis dette ikke hjelper, prøv å starte programmet 
+		manuelt og se hvilke feilmeldinger som kommer. 
+		Prøv å ta aksjon ut fra disse feilmeldingene.<br/><br/>
+		Mulige feil er:<br/><br/>
+		<ul>
+			<li>Disken er full.</li>
+			<li>CORBA navnetjeneren er nede eller ikke virker som 
+				den skal.
+			</li>
+			<li>Databasen er nede.</li>
+		</ul>
+  		<br/><br/>
+		Da AutoObs og kvalobs bruker samme navnetjener gjelder samme
+		prosedyrer her som for AutoObs.Se operdok for 
+		<a href="http://heat/3-autoobs/autoobs_feilretting/"><i>AutoObs</i></a><br>
+	</li>
+</ol>
+
+<h3 id="drift_2_3_2">2.3.2 Feil i dataleverandører</h3>
+<p>
+Hvis det ikke kommer noe data fra <i>AutoObs</i> eller <i>ComObs</i>
+er det mest sannsynlig at <i>autoobs2kv</i> har krasjet eller ikke
+fungerer som den skal. Restart <i>autoobs2kv</i>.<br/>
+<ol>
+	<li>
+		Logg inn på AutoObs med kommandoen:<br/>&nbsp;<br/>
+		<kbd>ssh autoobs@autoobs</kbd><br/>&nbsp;<br/>
+	</li>
+	<li>
+		Start <i>autoobs2kv</i> med kommandoen:<br/>&nbsp;<br>
+		<kbd>start_main</kbd>&nbsp;<br/>&nbsp;<br/>
+	</li>
+	<li>
+		Sjekk om <i>autoobs2kv</i> er startet med kommandoen:<br/>&nbsp;<br/>
+		<kbd>ps x | grep autoobs2kv</kbd><br/> 
+		Hvis er omtrent som følger er kjører <i>autoobs2kv</i>:<br/>&nbsp;<br/>
+		<pre>
+      18628 pts/5    S      0:00 /metno/routine/autoobs/bin/autoobs2kv
+      18630 pts/5    S      0:06 /metno/routine/autoobs/bin/autoobs2kv
+      18631 pts/5    S      6:25 /metno/routine/autoobs/bin/autoobs2kv
+      18632 pts/5    S      0:48 /metno/routine/autoobs/bin/autoobs2kv
+      18633 pts/5    S      0:03 /metno/routine/autoobs/bin/autoobs2kv
+      27652 pts/1    S      0:00 grep autoobs2kv
+      </pre>
+		Hvis bare den siste linjen vises har ikke programmet startet som det skal.
+		Start <i>autoobs2kv</i> manuelt med kommandoen:<br/>&nbsp;<br>
+		<kbd>autoobs2kv</kbd><br/>&nbsp;<br/>
+		Følg med på ustskriften og ta aksjon ut fra denne.<br/>
+		Mulige feil kan være:<br/>&nbsp;<br/>		
+	   <ul>
+	 		<li>Disken er full.</li>
+			<li>CORBA navnetjeneren er nede eller ikke virker som 
+				den skal.
+			</li>
+		</ul>
+	</li>
+</ol>
+</p>
+<p>
+Hvis oppringte stasjoner ikke kommer som f.eks landbruks og
+pluviometerstasjoner. Bruk feilrettings prosedyrene i 
+<a href="http://heat/3-autoobs/autoobs_feilretting/"><i>AutoObs</i></a> for å 
+rette på problemet.
+</p>
+<p>
+Hvis data fra <i>ComObs</i> mangler, er det enten et problem med 
+<i>ComObs</i> eller <i>aosmsd</i>. Prøv først å restarte 
+<i>aosmsd</i> og send alle data på nytt fra <i>ComObs</i>. Hvis ikke
+dette hjelper, restart <i>ComObs</i>. 
+</p>
+
+<h3 id="drift_2_3_3"> 2.3.3 Overvåking av kvalobs</h3>
+<p>Overvåking av kvalobs skjer ved hjelp av 
+AutoObs-brukergrensesnittet. Se <i>figur 3</i> under. Når alt 
+fungere som det skal er alle feltene grønn. Hvis et eller 
+flere felt er rød må man logge inn på kvalobsserveren og
+sjekke om programmene kjører. 
+</p>
+<table align="center" border="0" cellpadding="2" cellspacing="2">
+<caption align="bottom"><i><b>Figur 3:</b></i> Figuren viser statuspanelene i 
+	AutoObsGui for kvalobs og AutoObs. 
+</caption>
+<tbody>
+	<tr>
+      <td><img alt="AutoObsGui" src="autoobsgui.png">
+    	</td>
+  	</tr>
+</tbody>
+</table>
+
+<h1 id="reserve_3">3 Skifte til reservemaskin for kvalobs</h1>
+<p>
+Hvis kvalobs ikke starter på hovedmaskinen, <em>warm</em>, kan man prøve og 
+starte kvalobs på reservemaskinen, <em>cool</em>. 
+</p>
+<p>
+<ol>
+	<li>Logg inn på maskinen som kjører kvalobs som root, feks warm og
+		 stop kvalobs.<br/>&nbsp;<br/>
+		 <ol>
+		 	<li>Logg inn som root med kommandoen:<br/>&nbsp;<br/>
+		 	    <kbd> ssh root@warm</kbd><br/>&nbsp;<br/>
+		 	</li>
+		 	<li>Stopp kvalobs med kommandoen:<br/>&nbsp;<br/>
+		 	    <kbd> /etc/init.d/kvalobs stop</kbd><br/>&nbsp;<br/>
+		 	</li>
+		 </ol>
+	</li>
+	<li>Logg inn på reservemaskinen, feks cool og start kvalobs.<br/>&nbsp;<br/>
+		<ol>
+			<li>Logg inn som root med kommandoen:<br/>&nbsp;<br/>
+			    <kbd>ssh root@cool</kbd><br/>&nbsp;<br/>
+			</li>
+			<li>Start kvalobs med kommandoen:<br/>&nbsp;<br/>
+			    <kbd>/etc/init.d/kvalobs start</kbd>
+			</li>
+		</ol>
+	</li>
+</ol>
+</p>
+<p>
+Følg med i AutoObsGui for å se om alt kommer opp som det skal.
+</p>
+
+<h1 id="reserve_4">4 Skifte til AutoObs for produksjon av SYNOP</h1>
+<p>
+Hvis det ikke er mulig å få <i>kvalobs</i> i gang 
+igjen kan man la AutoObs produsere SYNOP. Synopproduksjonenen i <i>AutoObs</i> vil gå
+parallelt med <i>kvalobs</i>, men SYNOP'ene fra <i>AutoObs</i> 
+vil ikke bli overført til NORCOM.
+</p>
+<p>For å sette i gang produksjonen av SYNOP i 
+<i>AutoObs</i> utfør følgende kommandoer:<br/>
+Logg in på maskinen som kjører <i>AutoObs</i><br><br/>
+<kbd style="margin-left: 30px;">ssh autoobs@autoobs</kbd><br/><br/>
+Utfør så følgende kommando for å starte 
+overføring av SYNOP til NORCOM:<br/><br/>
+<kbd style="margin-left: 30px;">aosynop2norcom_start</kbd><br/><br/>
+Når man har fått <i>kvalobs</i> igang igjen, kan man stoppe 
+produksjon av SYNOP fra <i>AutoObs</i> med 
+kommandoen:<br/><br/>
+<kbd style="margin-left: 30px;">aosynop2norcom_stop</kbd>
+</p>
+
+
+</body>
+</html>

@@ -1,0 +1,57 @@
+#!/bin/sh
+
+# As start it checks to see if the kvalobs.oslo.dnmi.no IP alias is
+# already defined on this or another machine then tries to run kvalobs. As
+# stop it tries to stop kvalobs then removes the IP alias.
+
+# ssh <host> <command> doesn't setup /usr/local/sbin; and
+# /usr/local/bin is missing from PATH after reboot as well
+PATH=/usr/local/sbin:/usr/local/bin:$PATH
+
+# Used for start_/stop_ program name checking in lib
+NAME=kvalobs
+PRIMARY_HOST=warm
+
+case "$1" in
+	start)
+        # When this script is being run in the background with no
+		# terminal then delay the startup so that the "primary host" 
+                # can setup the alias first
+		me=$(uname -n)
+		tty -s
+		if [ $? = 1 -a -n "${PRIMARY_HOST}" -a ${PRIMARY_HOST} != ${me} ]; then
+			echo This is not the primary host - delaying 1 minute before setting up the IP alias
+			sleep 60
+		fi
+
+		echo "Configuring kvalobs alias"
+		alias_kvalobs start || exit 1
+
+		echo "Starting postgreSQL for kvalobs"
+		runbg --exit-after=60 --login-env --user=kvalobs start_postgres
+
+		echo "Starting kvalobs"
+		runbg --exit-after=60 --login-env --user=kvalobs kvstart
+
+		echo "Fixing kvalobs users crontab"
+		crontab -u kvalobs /metno/kvalobs/cronjob/kvcron
+
+		;;
+	stop)
+		echo "Stopping kvalobs"
+		runbg --exit-after=120 --login-env --user=kvalobs kvstop
+
+		echo "Stoping postgreSQL for kvalobs"
+		runbg --exit-after=60 --login-env --user=kvalobs stop_postgres
+
+		echo "Removing kvalobs users crontab"
+		crontab -r -u kvalobs
+
+		echo "Removing kvalobs alias"
+		alias_kvalobs stop
+
+		;;
+	*)
+	    echo "Usage: `basename $0` {start | stop}"
+		exit 1
+esac

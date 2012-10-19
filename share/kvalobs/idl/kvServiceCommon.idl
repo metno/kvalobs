@@ -1,0 +1,256 @@
+#ifndef __kvServiceCommon_h__
+#define __kvServiceCommon_h__
+
+module CKvalObs{
+  module CService{
+  
+	 typedef string SubscribeId;
+    enum StatusId { All, OnlyFailed, OnlyOk };
+    enum QcId { QC1, QC2d, QC2m, HQC };
+    enum WorkstatistikTimeType{ ObsTime, TbTime, ProcessStartTime, QaStartTime, QaStopTime, ServiceStartTime,ServiceStopTime};
+    
+    typedef sequence<QcId> QcIdList;
+
+    typedef sequence<long> StationIDList;
+
+    struct WorkstatistikElem {
+        long stationID;
+        string obstime;
+        short  typeID_;
+        string tbtime;
+        short  priority;
+        string processStart;
+        string qaStart;
+        string qaStop;
+        string serviceStart;
+        string serviceStop;
+    };	
+    
+    typedef sequence<WorkstatistikElem> WorkstatistikElemList;
+
+    struct DataElem{
+      long    stationID;
+      string  obstime;
+      double  original;
+      short   paramID;
+      string  tbtime;
+      short   typeID_;
+      string  sensor;
+      short   level;
+      double  corrected;
+      string  controlinfo;
+      string  useinfo;
+      string  cfailed;
+    };
+    
+    struct TextDataElem{
+      long   stationID;
+      string obstime;
+      string original;
+      short  paramID;
+      string tbtime;
+      short  typeID_;
+    };
+      
+    
+    typedef sequence<DataElem>       DataElemList;
+    typedef sequence<TextDataElem>   TextDataElemList;
+
+    struct ObsData{
+      long               stationid;  
+      DataElemList       dataList;     
+      TextDataElemList   textDataList;
+    };
+    
+    typedef sequence<ObsData>  ObsDataList;
+
+    struct ModelDataElem{
+      long    stationID;
+      string  obstime;
+      short   paramID;
+      short   level;
+      long    modelID;
+      double  original;
+    };
+    
+    
+    typedef sequence<ModelDataElem> ModelDataElemList;
+    
+    struct ModelData{
+      long         stationid;  
+      ModelDataElemList dataList;  //The data
+    };
+    
+    typedef sequence<ModelData>  ModelDataList;
+
+    /**
+     * \brief An interface for the operator table in the kvalobs database.
+     */
+    struct Operator{
+      ///A username of a operaor that can manipulate data in kvalobs
+      string  username;
+      
+      ///The userid of the operator. This id is set in \em data::controlinfo
+      long    userid;
+    };
+
+    typedef sequence<Operator> OperatorList;
+
+
+    struct Param{
+      long   paramID;    
+      string name;
+      string description;
+      string unit;
+      long   level_scale;
+      string comment;
+    };
+ 
+    typedef sequence<Param>  ParamList;
+
+    struct Station{
+      long stationID;
+      double lat;
+      double lon;
+      double height;
+      double maxspeed;
+      string name;
+      long   wmonr;
+      long   nationalnr;
+      string ICAOid;
+      string call_sign;
+      string stationstr;
+      long   environmentid;
+      boolean static_;
+      string fromtime;
+    };
+    
+    typedef sequence<Station> StationList;
+
+    
+    struct Types{
+      long   typeID_;
+      string format;
+      long   earlyobs;
+      long   lateobs;
+      string read;
+      string obspgm;
+      string comment;
+    };
+
+    typedef sequence<Types> TypeList;
+
+
+
+    struct Reference_station{
+      long  stationID;
+      short paramsetID;
+      string reference;
+    };
+
+    typedef sequence<Reference_station> Reference_stationList;
+
+
+
+
+    struct Obs_pgm{
+      long    stationID;
+      long    paramID;
+      long    level;
+      long    nr_sensor;
+      long    typeID_;
+      boolean collector;
+      boolean kl00;
+      boolean kl01;
+      boolean kl02;
+      boolean kl03;
+      boolean kl04;
+      boolean kl05;
+      boolean kl06;
+      boolean kl07;
+      boolean kl08;
+      boolean kl09;
+      boolean kl10;
+      boolean kl11;
+      boolean kl12;
+      boolean kl13;
+      boolean kl14;
+      boolean kl15;
+      boolean kl16;
+      boolean kl17;
+      boolean kl18;
+      boolean kl19;
+      boolean kl20;
+      boolean kl21;
+      boolean kl22;
+      boolean kl23;
+      boolean mon;
+      boolean tue;
+      boolean wed;
+      boolean thu;
+      boolean fri;
+      boolean sat;
+      boolean sun;
+      string  fromtime;
+      string  totime;
+    };
+
+    typedef sequence<Obs_pgm> Obs_pgmList;
+    
+    struct Station_param {
+      long stationid;
+      long paramid;
+      long level;
+      string sensor;
+      long fromday;
+      long today;
+      long hour;
+      string qcx;
+      string metadata;
+      string desc_metadata;
+      string fromtime;
+    };
+
+    typedef sequence<Station_param> Station_paramList;
+
+    
+    struct Station_metadata {
+        long stationid;
+        long paramid;
+        long typeID_;
+        long level;
+        long sensor;
+        string metadatatypename;
+        float metadata;
+        string metadataDescription;
+        string fromtime;
+        string totime;
+    };
+
+    typedef sequence<Station_metadata> Station_metadataList;
+
+    
+    struct Rejectdecode{
+      string message;
+      string tbtime;
+      string decoder;
+      string comment;
+      boolean is_fixed;
+    };
+
+    typedef sequence<Rejectdecode> RejectdecodeList;
+
+  };
+};
+
+
+
+
+
+
+#endif
+
+
+
+
+

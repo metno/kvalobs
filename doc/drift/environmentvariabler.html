@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>environmentvariabler</title>
+</head>
+<body>
+<big><big><small><small><big>Environmentvariablene kan finnes
+b&aring;de i .bashrc filen, .bash_profile filen og filen .kvalobs.
+Filen .kvalobs blir kalt opp enten av </big></small></small></big></big><big><big><small><small><big>.bashrc
+filen eller av </big></small></small></big></big><big><big><small><small><big>.bash_profile
+filen.</big></small></small></big></big><small><br>
+</small><big><big><small><small><big><br>
+PATH= Generell systemvariabel i UNIX for pathene til bin&aelig;rfilene
+og er her:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pathen til der scriptene for blant annet
+installasjon av metadata <small><small><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </small></small>til
+databasen ligger;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pathen til bin katalogen;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pathen til bin for postgresql;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; andre pather</big><br>
+</small></small><br>
+<small>LD_LIBRARY_PATH= pathen til bin&aelig;re biblioteker som
+dynamisk linkes<br>
+<br>
+KVALOBS= dette er pathen til standardkatalogene for runtime:<br>
+&nbsp;&nbsp;&nbsp;&nbsp; bin, var, etc, share og lib; der lib
+inneholder db og decode.<br>
+&nbsp;&nbsp;&nbsp; KVALOBS variabelen er ikke pathen til CVS treet.<br>
+<br>
+KVDIR=&nbsp;&nbsp; pathen til CVS treet for kvalobs kildekoden til
+serversystemet<br>
+METADIR= pathen til </small></big></big><big><big><small>CVS treet for
+kvalobs metadata</small></big></big><small><br>
+</small><big><big><small><br>
+KVDB= navnet p&aring; databasen; brukes av hvem ???<br>
+KVDBUSER= navnet p&aring; databasebrukeren</small></big></big><big><big><small>;
+brukes av hvem ???</small></big></big><small><br>
+</small><big><big><small>KVPATH_IN_NS= dette er pathen i navnetjeneren
+som brukes til &aring; sette hvilken&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+versjon av kvalobs en kan forholde seg til, kvalobs er warm og
+kvproject er rime</small></big></big><big><big><small>; brukes av hvem
+???<br>
+</small></big></big><big><big><small>PERL_BIN= pathen til
+bin&aelig;rv&aelig;rsjonen, brukes bare av QAbase. Er n&oslash;dvendig
+fordi kvalobs bruker nyere teknologi enn det som n&aring; er i drift.</small></big></big><small><br>
+</small><big><big><small>PERL5LIB</small></big></big><big><big><small>=
+se man perlrun: <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "A
+colon-separated list of directories in which to look for<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Perl
+library files before looking in the standard library<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; and
+the current directory."</small></big></big><small><br>
+</small><big><big><small><br>
+</small></big></big><big><big><big><small><small>PGHOST= navnet
+p&aring; serveren hvor databasen er (warm.oslo.dnmi.no)<br>
+PGDATA= pathen til dataene ???<br>
+PGPORT= den porten en m&aring; kommunisere til databasen med, brukes av
+hvem???<br>
+POSTGRES_LOG= pathen til loggfilen for databasen ???<br>
+<br>
+<br>
+</small><br>
+</small></big></big></big>
+</body>
+</html>

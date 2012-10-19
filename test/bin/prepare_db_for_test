@@ -1,0 +1,27 @@
+#! /bin/sh
+
+## Prepare the database for test.
+
+
+set -a  # export variables to the environment of subsequent commands
+set -e  # Exit if a simple shell command fails
+#set -x  # for debugging, remove later
+
+if [ -z "$KVTESTDIR" ]; then
+	echo "Environment variabelen KVALOBS må være satt!"
+	exit 2
+fi 
+
+
+if ! [ $PGHOST ]; then
+    echo "PGHOST er ikke satt! Avslutter..."
+    exit 1
+fi
+
+PGDATABASE=kvalobs
+PGUSER=kvalobs
+
+psql  < $KVTESTDIR/sql/delete_data.sql
+sqlite3 /var/kvalobs/kvsynop/kvsynopd.sqlite < $KVTESTDIR/sql/delete_synop.sql
+sqlite3 /var/kvalobs/agregate/database.sqlite < $KVTESTDIR/sql/delete_agregator.sql
+

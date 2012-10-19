@@ -1,0 +1,1212 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head>
+                     
+  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+                     
+  <meta name="ProgId" content="Word.Document">
+                     
+  <meta name="Generator" content="Microsoft Word 9">
+                     
+  <meta name="Originator" content="Microsoft Word 9">
+                     
+  <link rel="File-List" href="./krotables-filer/filelist.xml"><title>Tabelldokumentasjon i tiltak</title><!--[if gte mso 9]><xml>
+ <o:DocumentProperties>
+  <o:Author>sivachn</o:Author>
+  <o:LastAuthor>sivachn</o:LastAuthor>
+  <o:Revision>2</o:Revision>
+  <o:TotalTime>25</o:TotalTime>
+  <o:Created>2003-03-06T14:44:00Z</o:Created>
+  <o:LastSaved>2003-03-06T14:44:00Z</o:LastSaved>
+  <o:Pages>2</o:Pages>
+  <o:Words>996</o:Words>
+  <o:Characters>5679</o:Characters>
+  <o:Company>DNMI</o:Company>
+  <o:Lines>47</o:Lines>
+  <o:Paragraphs>11</o:Paragraphs>
+  <o:CharactersWithSpaces>6974</o:CharactersWithSpaces>
+  <o:Version>9.3821</o:Version>
+ </o:DocumentProperties>
+</xml><![endif]--><!--[if gte mso 9]><xml>
+ <w:WordDocument>
+  <w:HyphenationZone>21</w:HyphenationZone>
+ </w:WordDocument>
+</xml><![endif]-->
+  
+                       
+                    
+  <style>
+<!--
+ /* Font Definitions */
+@font-face
+	{font-family:"MS Sans Serif";
+	panose-1:0 0 0 0 0 0 0 0 0 0;
+	mso-font-charset:0;
+	mso-generic-font-family:swiss;
+	mso-font-format:other;
+	mso-font-pitch:variable;
+	mso-font-signature:3 0 0 0 1 0;}
+ /* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{mso-style-parent:"";
+	margin:0cm;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";}
+@page Section1
+	{size:595.3pt 841.9pt;
+	margin:70.85pt 70.85pt 70.85pt 70.85pt;
+	mso-header-margin:35.4pt;
+	mso-footer-margin:35.4pt;
+	mso-paper-source:0;}
+div.Section1
+	{page:Section1;}
+-->
+  </style></head>
+
+<body lang="NO-BOK" style="">
+   
+<div class="Section1">  
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span lang="EN-US" style="font-size: 10pt;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><b><font color="#000099">TILTAKSDATABASENS
+TABELLER.</font></b><br>
+</p>
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><big><b><font color="#000099">Øystein Lie 15/10-03</font></b></big><br>
+</span></p>
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><br>
+<br>
+</span></p>
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;">   
+ CREATE</span><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style="color: red;">  TABLE</span> datafeil (<o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ stationid int4 NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ obstime timestamptz NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ original float8 NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ paramid int4 NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ tbtime timestamptz NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ typeid int4 NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ sensor char(1) DEFAULT '0', <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ level int4, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ corrected float8, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ controlinfo char(16) DEFAULT '0000000000000000', <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span></span><span lang="DE" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">     useinfo
+char(16) DEFAULT '0000000000000000', <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="DE" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span></span><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">   
+ cfailed text, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ metadata text, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ tack timestamptz DEFAULT ('now'::text)::timestamp(6) with time  zone, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ tmesg timestamptz, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span><span style="color: red;">  CONSTRAINT</span> datafeil_stationid_key  UNIQUE (stationid,
+obstime, paramid,  level, sensor, typeid)<o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">     );<o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><br>
+<br>
+</span></p>
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;">   
+ CREATE</span><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style="color: red;">  TABLE</span> feil (<o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ nr int4 DEFAULT nextval('"feil_nr_seq"'::text) NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span></span><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">     stasjonsnr int4
+NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span></span><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">   
+ feiltypenr int4 NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span></span><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">     tiltaksnr int4,
+<o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ kvittering bool DEFAULT 'f'::bool, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span></span><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">   
+ signaturnr int4, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ lestid timestamptz, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span><span style="color: red;">  CONSTRAINT</span> feil_pkey PRIMARY  KEY (nr), <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span><span style="color: red;">  CONSTRAINT</span> feil_lestid CHECK  (NULL::bool)<o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">     );<o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><br>
+<span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"></span></p>
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;">   
+ CREATE</span><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style="color: red;">  TABLE</span> feiltype (<o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ nr int4 DEFAULT nextval('"feiltype_nr_seq"'::text) NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span></span><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">     tekst varchar(100)
+NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span></span><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: red;">    
+CONSTRAINT</span><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">      feiltype_tekst_key
+UNIQUE (tekst), <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span><span style="color: red;">  CONSTRAINT</span> feiltype_pkey PRIMARY  KEY (nr)<o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">     );<o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><br>
+</span></p>
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><br>
+     CREATE</span><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style="color: red;">  TABLE</span> kvalobstest (<o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ nr int4 DEFAULT nextval('"kvalobstest_nr_seq"'::text) NOT NULL,  <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span></span><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">     navn varchar(100)
+NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ antalltekst int4, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ tekst varchar(100) DEFAULT 'Ingen beskrivelse foreligger...' </span><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">   
+ NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span><span style="color: red;">  CONSTRAINT</span> kvalobstest_pkey PRIMARY  KEY (nr)<o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">     );<o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><br>
+</span></p>
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><br>
+     CREATE</span><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style="color: red;">  TABLE</span> kvalobstype (<o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ nr int4 NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ feiltypenr int4, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span><span style="color: red;">  CONSTRAINT</span> kvalobstype_pkey PRIMARY  KEY (nr)<o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">     );<o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><br>
+</span></p>
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><br>
+     CREATE</span><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style="color: red;">  TABLE</span> lokal (<o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ nr int4 DEFAULT nextval('"lokal_nr_seq"'::text) NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ ip_adr inet NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span></span><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">     lest_stasjon
+varchar(100) NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span></span><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: red;">    
+CONSTRAINT</span><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">      lokal_pkey
+PRIMARY KEY (nr)<o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">     );<o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><br>
+</span></p>
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><br>
+     CREATE</span><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style="color: red;">  TABLE</span> lokal2 (<o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ nr int4 DEFAULT nextval('"lokal2_nr_seq"'::text) NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ ip_adr inet NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span></span><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">     lest_stasjon
+varchar(100) NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span></span><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">   
+ st_type char(1) NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span><span style="color: red;">  CONSTRAINT</span> lokal2_nr_key UNIQUE  (nr)<o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">     );<o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;">   
+ <br>
+</span></p>
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><br>
+CREATE</span><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style="color: red;">  TABLE</span> melding (<o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ nr int4 DEFAULT nextval('"melding_nr_seq"'::text) NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span></span><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">     tekst varchar(1000)
+NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span></span><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">   
+ feilnr int4 NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ tid timestamptz DEFAULT ('now'::text)::timestamp(6) with time zone,  <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ signaturnr int4, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ paramnr int4 NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ paramverdi numeric(10, 5), <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ testnr int4 NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ testparam numeric[], <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span><span style="color: red;">  CONSTRAINT</span> melding_pkey PRIMARY  KEY (nr)<o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">     );<o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><br>
+</span></p>
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><br>
+     CREATE</span><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style="color: red;">  TABLE</span> parameter (<o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ nr int4 NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ kode char(10) NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span></span><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">     definisjon varchar(100),
+<o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ kategori varchar(100), <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span></span><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">   
+ kategoritekst varchar(100), <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span><span style="color: red;">  CONSTRAINT</span> parameter_kode_key  UNIQUE (kode),
+<o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span><span style="color: red;">  CONSTRAINT</span> parameter_nr_key UNIQUE  (nr), <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span><span style="color: red;">  CONSTRAINT</span> parameter_pkey PRIMARY  KEY (nr,
+kode)<o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">     );<o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><o:p></o:p><o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><br>
+</span></p>
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><br>
+     CREATE</span><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style="color: red;">  TABLE</span> signatur (<o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ nr int4 DEFAULT nextval('"signatur_nr_seq"'::text) NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ navn char(100) NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span></span><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">     tilgang int4,
+<o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ kommentar char(100), <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span></span><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">   
+ ip_adr inet NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span><span style="color: red;">  CONSTRAINT</span> signatur_pkey PRIMARY  KEY (nr)<o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">     );<o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><br>
+</span></p>
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><br>
+     CREATE</span><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style="color: red;">  TABLE</span> stasjon (<o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ nr int4 NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ navn varchar(100) NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ lat numeric(6, 4), <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ lon numeric(6, 4), <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ synopnr int4, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ a bool DEFAULT 'f'::bool, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ f bool DEFAULT 'f'::bool, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ h bool DEFAULT 'f'::bool, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ i bool DEFAULT 'f'::bool, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ n bool DEFAULT 'f'::bool, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ t bool DEFAULT 'f'::bool, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ v bool DEFAULT 'f'::bool, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ region varchar(50), <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ status int4 DEFAULT 1, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span><span style="color: red;">  CONSTRAINT</span> stasjon_pkey PRIMARY  KEY (nr),
+<o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span><span style="color: red;">  CONSTRAINT</span> stasjon_lat CHECK  (((lat &gt; '-90.0000'::"numeric") 
+<span style="color: green;"> AND</span>   (lat &lt; '90.0000'::"numeric"))), 
+<o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span><span style="color: red;">  CONSTRAINT</span> stasjon_lon CHECK  (((lon &gt; '-90.0000'::"numeric") 
+<span style="color: green;"> AND</span>   (lon &lt; '90.0000'::"numeric"))), 
+<o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span><span style="color: red;">  CONSTRAINT</span> stasjon_region CHECK  ((((((((((region
+= 'Øst'::"varchar")  <span style="color: green;">OR</span>    NULL::bool)
+<span style="color: green;">  OR</span> (region = 'Vest'::"varchar"))  <span style="color: green;">OR</span>   (region = 'Nord'::"varchar")) <span style="color: green;">   OR</span>  (region = 'Sør'::"varchar")) <span style="color: green;">OR</span>    (region  = 'MidtNorge'::"varchar")) <span style="color: green;">OR</span>    (region  = 'Maritim'::"varchar")) <span style="color: green;">OR</span>   (region  = 'Test'::"varchar")) <span style="color: green;">OR</span> (region  = 'Arktis'::"varchar"))),  <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span><span style="color: red;">  CONSTRAINT</span> "&lt;unnamed&gt;"  FOREIGN KEY (status)
+REFERENCES status  (nr) <span style="color: green;">  ON</span><span style="color: blue;">  DELETE</span> NO ACTION <span style="color: green;">   ON</span><span style="color: blue;">  UPDATE</span>
+NO ACTION NOT DEFERRABLE  INITIALLY IMMEDIATE<o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">     );<o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><br>
+</span></p>
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><br>
+     CREATE</span><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style="color: red;">  TABLE</span> status (<o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ nr int4 NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span></span><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">     farge_norsk_txt
+varchar(100), <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ farge_eng_txt varchar(100), <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span></span><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: red;">    
+CONSTRAINT</span><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">      status_pkey
+PRIMARY KEY (nr)<o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">     );<o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><br>
+</span></p>
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><br>
+     CREATE</span><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style="color: red;">  TABLE</span> tiltak (<o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ nr int4 DEFAULT nextval('"tiltak_nr_seq"'::text) NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ tekst varchar(1000) NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ tiltaktypenr int4 NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span></span><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">   
+ feilnr int4 NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span></span><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">     beskrevet bool
+DEFAULT 'f'::bool, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ beskrivtid timestamptz, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ signaturnr int4 NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ ferdig bool DEFAULT 'f'::bool, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ slutttid timestamptz, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ sluttfarnr int4, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span></span><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: red;">    
+CONSTRAINT</span><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">      tiltak_pkey
+PRIMARY KEY (nr), <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span><span style="color: red;">  CONSTRAINT</span> "&lt;unnamed&gt;"  FOREIGN KEY (tiltaktypenr)
+REFERENCES  tiltakstype (nr) <span style="color: green;">   ON</span><span style="color: blue;">  DELETE</span> RESTRICT <span style="color: green;">   ON</span><span style="color: blue;">  UPDATE</span>
+NO ACTION NOT DEFERRABLE  INITIALLY IMMEDIATE, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span><span style="color: red;">  CONSTRAINT</span> "&lt;unnamed&gt;"  FOREIGN KEY (signaturnr)
+REFERENCES  signatur (nr) <span style="color: green;">  ON</span><span style="color: blue;">  DELETE</span> RESTRICT <span style="color: green;">   ON</span><span style="color: blue;">  UPDATE</span>
+NO ACTION NOT DEFERRABLE  INITIALLY IMMEDIATE<o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">     );<o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><!--[if !supportEmptyParas]--><!--[endif]--><o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><br>
+</span></p>
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;; color: blue;"><br>
+     CREATE</span><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style="color: red;">  TABLE</span> tiltakstype (<o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ nr int4 DEFAULT nextval('"tiltakstype_nr_seq"'::text) NOT NULL,  <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span> 
+ tekst varchar(100) NOT NULL, <o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span lang="EN-US" style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;"><span style=""></span><span style="color: red;">  CONSTRAINT</span> tiltakstype_pkey PRIMARY  KEY (nr)<o:p></o:p></span></p>
+   
+<p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: &quot;MS Sans Serif&quot;;">     );<o:p></o:p></span></p>
+   
+<p class="MsoNormal"><span lang="EN-US" style="font-size: 10pt;"><!--[endif]--><o:p></o:p></span></p>
+  <br>
+  <br>
+  <br>
+<b><font color="#000099"><br>
+DOKUMENTASJON AV TABELLENE.</font></b><br>
+  <b><br>
+For tabeller i bruk pr. idag:<br>
+Vi har de statiske tabellene feiltype, tiltakstype, status og signatur. Signatur
+vil dog endres når nye personer logger seg på. <br>
+De dynamiske tabellene er feil (inneholder alle feilsituasjoner), melding
+(alle meldingstekster generert), tiltak (alle beskrevne tiltak, boolsk verdi
+for bekreftet feil/feil rettet), stasjon (inneholder alle stasjoner, oppdateres
+mot st_info i klimadatabasen) og lokal2 (benyttes som midlertidig lagring
+av valgt stasjonsnavn til bruk i skript).<br>
+<br>
+datafeil: (Ikke i bruk enda, i bruk når overføringer av feilposter fra Kvalobs
+starter) <br>
+  </b> KILDE: Kvalobs<br>
+         HVEM bruker tabellen: Perlskript for å generere tekstlig feilmelding
+til visning i KRO  <br>
+         BESKRIVELSE av tabellen: Dette er en kopi av tabellen 'data' i Kvalobs
+som inneholder èn post for hver inkommende observasjon. <br>
+I vårt tilfelle blir det èn post for hver observasjon som er flagget med
+indikasjoner av mistenksomhet/feil<br>
+         BESKRIVELSE av attributtene i tabellen:<br>
+     stationid: Stasjonsnummer<br>
+     obstime:  Observasjonstid. Tidspunkt for observasjonens gyldighet.<br>
+     original:  Observert parameterverdi<br>
+     paramid:  Kvalobs-internt parameternummer<br>
+     tbtime:  Tidspunkt for når posten ble generert i Kvalobsdb.<br>
+     typeid:  Betegnelse på meldingsformat. Samme observasjon kan foreligge 
+ i flere<br>
+             ulike formater.<br>
+     sensor:  Sensornummer der samme parameter observeres ved flere sensorer.<br>
+     level:  Nivå der samme parameter observeres i ulik høyde eller dybde,<br>
+corrected:  Observert verdi evt. endret i kontrollene.<br>
+     controlinfo:  Kodet informasjon om resultatet av kontrollene, koden
+er  64 bit.<br>
+     useinfo:  Kodet kvalitetsinformasjon om observasjonen, koden er 64 bit.<br>
+     cfailed:  tester som har gitt utslag; syntaksen for denne kolonnen er<br>
+              qcx:  language der en får verdiene i fra tabellen checks.<br>
+    tack:  Tidspunktet for når posten ble generert i Tiltaksdatabasen.<br>
+    tmesg:  <br>
+  <br>
+  <br>
+  <b>feil:<br>
+  </b> KILDE:  Tiltaksdatabasen<br>
+        HVEM bruker tabellen:  Alle de andre tabellene i tiltaksdatabasen 
+<br>
+        BESKRIVELSE av tabellen:  Dette er den sentrale tabellen i tiltaksdatabasen
+  , som kobler feiltype, stasjonsnummer, melding, tiltak og signatur.<br>
+        BESKRIVELSE av attributtene i tabellen:<br>
+    nr:  Nummeret på feilsituasjonen<br>
+    stasjonsnr:  Stasjonsnummeret<br>
+    feiltypenr:  Nummeret på feiltypen<br>
+    tiltaksnr:  Nummeret på eventuelt tiltak som er beskrevet<br>
+    kvittering:  Boolsk verdi ('t'/'f') for om feilsituasjonen er bekreftet
+eller ikke<br>
+    signaturnr:  Signaturnummer på vedkommende som har bekreftet feilsituasjonen<br>
+    lestid:  Tidspunkt for når feilsituasjonen er bekreftet (er tom hvis
+feilsituasjonen ikke er bekreftet)<br>
+  <br>
+  <b><br>
+    feiltype:<br>
+  </b> KILDE:  Tiltaksdatabasen<br>
+       HVEM bruker tabellen:  Feil<br>
+       BESKRIVELSE av tabellen: Inneholder alle feiltypekategoriene med tilhørende
+  nr. <br>
+       BESKRIVELSE av attributtene i tabellen:<br>
+    nr:  nummer på feiltype<b><br>
+  </b>tekst:  aktuell feiltype<br>
+  <b><br>
+ <br>
+kvalobstest: </b>Pr. idag ikke i bruk<br>
+<b>kvalobstype:</b> Pr. idag ikke i bruk<br>
+<b>lokal:</b> Pr. idag ikke i bruk<br>
+<br>
+<br>
+<b> lokal2:<br>
+  </b>    KILDE:  Tiltaksdatabasen<br>
+      HVEM bruker tabellen: Perlskriptet som viser resultatet av valget ditt<br>
+      BESKRIVELSE av tabellen: Brukes som mellomtabell for valgt stasjon,<br>
+ dersom man trykker på "Registrering av ny melding", "Historikk" etc. så
+"huskes" stasjonen<br>
+ man har valgt ved hjelp av denne tabellen (stasjonsvalget blir altså lagret
+midlertidig)<br>
+      BESKRIVELSE av attributtene i tabellen:<br>
+ nr: Løpenummer<br>
+ ip_adr: IP-addressen til vedkommende som er inne på aktuell stasjon<br>
+ lest_stasjon: Aktuell stasjon man har valgt<br>
+  st_type: Type stasjon<br>
+ <br>
+ <br>
+  <b>melding</b>:<br>
+     KILDE:  Tiltaksdatabasen<br>
+      HVEM bruker tabellen: Perlskript for å vise registrert melding<br>
+      BESKRIVELSE av tabellen: Denne tabellen inneholder alle meldinger som
+er registrert, med signatur, feilnummer og tidspunkt <br>
+      BESKRIVELSE av attributtene i tabellen:<br>
+     nr:  løpenummeret på meldingen<br>
+     tekst:  meldingsteksten<br>
+     feilnr:  nummeret på feilsituasjonen som meldingen tilhører<br>
+     tid:  tid for innkommet melding<br>
+     signaturnr:  signaturnummeret til meldingskilden  <br>
+paramnr:          Ikke i bruk<br>
+     paramverdi:     Ikke i bruk<br>
+     testnr:               Ikke i bruki  <br>
+     testparam:        Ikke i bruk<b><br>
+  <br>
+<br>
+    parameter: (pr. 15/10-2003 ikke i bruk, men benyttes så snart overføring
+av feil fra Kvalobs starter)<br>
+  </b>KILDE:  Kopiert fra 'Param'-tabellen i Kvalobs<br>
+     HVEM bruker tabellen: Meldingstabellen<br>
+     BESKRIVELSE av tabellen:  Tabellen inneholder alle parametre i Kvalobs 
+ og tilhørende parameternummer, kode og kategori.<br>
+Denne benyttes så snart overføring av feil fra Kvalobs starter, og benyttes
+som oppslag til parametertekst for generert feilmelding.  <br>
+     BESKRIVELSE av attributtene i tabellen:<br>
+    nr:  Parameternummer<br>
+    kode:  Parameterkode<br>
+    definisjon:  Parameterdefinisjon<br>
+    kategori:  Parameterkategori  <br>
+    kategoritekst:  Kategoritekst på parameteren<br>
+  <br>
+  <b><br>
+    signatur: (Denne tabellen skal modifiseres med LDAP-tilknytning, er under
+utarbeidelse nå. Det som står nå er altså slik situasjonen fungerer pr. idag)<br>
+  </b>KILDE:  Tiltaksdatabasen<br>
+     HVEM bruker tabellen: Feil, Melding, Tiltak<br>
+     BESKRIVELSE av tabellen:  Signaturtabell. Inneholder alle registrerte
+ brukere  med selvvalgt brukernavn, tilhørende ip-adresse og nummer <br>
+     BESKRIVELSE av attributtene i tabellen:<br>
+    nr:  Signaturnummer<br>
+    navn:  Brukernavn <br>
+    tilgang:  Tall som angir rettigheter (1,2,3,4,5)<br>
+    kommentar:  Kommentarfelt<br>
+    ip_adr<b>:  </b>Brukerens ip-addresse<b><br>
+  <br>
+  <br>
+    stasjon:</b><b><br>
+  </b>KILDE: Klimadatabasen, senere St_Info_Sys<br>
+     HVEM bruker tabellen: Feil<br>
+     BESKRIVELSE av tabellen: Stasjonstabellen for KRO-systemet. Oppdateres 
+ automatisk  fra klimadatabasen.<br>
+     BESKRIVELSE av attributtene i tabellen:<br>
+     nr:  Stasjonsnummeret på stasjonen.<br>
+     navn:  Stasjonens navn.<br>
+     lat:  Breddegrad<br>
+     lon:  Lengdegrad<br>
+     synopnr:  Synopnummeret på stasjonen<br>
+     a:   Bool-verdi for automatstasjon<br>
+     f:   Bool-verdi for flyplass<br>
+     h:   Bool-verdi for hybridstasjon<br>
+     i:    Bool-verdi for piostasjon<br>
+     m: Bool-verdi for manuell værstasjon <br>
+     n:   Bool-verdi for nedbørstasjon<br>
+     t:   Bool-verdi for teststasjon <br>
+     v:   Bool-verdi for værstasjon                                      
+                        <br>
+     region:  Regiontilhørighet for stasjon (eks. Østlandet, Vestlandet,
+Nord-Norge)<br>
+     status: Stasjonsstatus (eks. 3=rød, 2=gul, 1=grønn)<br>
+  <br>
+  <b><br>
+    status:</b><br>
+     KILDE:  Tiltaksdatabasen<br>
+       HVEM bruker tabellen:  Stasjon<br>
+       BESKRIVELSE av tabellen:  Inneholder alle statustyper (1,2,3) kombinert
+med tekstlig forklaring på norsk og engelsk. <br>
+       BESKRIVELSE av attributtene i tabellen:<br>
+    nr:  statusnummer<br>
+    farge_norsk_txt:  norsk tekst<br>
+    farge_eng_txt:  engelsk tekst<br>
+  <br>
+  <br>
+  <b>tiltak:<br>
+  </b>KILDE:  Tiltaksdatabasen<br>
+       HVEM bruker tabellen:  Feil<br>
+       BESKRIVELSE av tabellen:  Inneholder alle tiltakene som er satt med
+type, tekst, tidspunkt og signatur og feilsituasjonsnummer<br>
+       BESKRIVELSE av attributtene i tabellen:<br>
+     nr:  Tiltaksnummeret<br>
+     tekst:  Forklaring på tiltak<br>
+     tiltaktypenr: Nummeret på tiltakstypen til tiltaket<br>
+     feilnr:  Nummeret på feilsituasjonen som tiltaket tilhører<br>
+     beskrevet:  Bool-verdi for beskrevet/ikke-beskrevet tiltak<br>
+     beskrivtid:  Tidspunkt for beskrevet tiltak<br>
+     signaturnr:  Signaturnummeret til den som har beskrevet tiltak<br>
+     ferdig:  Bool-verdi for rettet/ikke rettet feil<br>
+     slutttid:  Tidspunkt for feil rettet<br>
+     sluttfarnr:  Signaturnummer på den som rettet feilen<br>
+  <br>
+  <br>
+  <b>tiltakstype:<br>
+  </b>KILDE:  Tiltaksdatabasen<br>
+       HVEM bruker tabellen:  Tiltak<br>
+       BESKRIVELSE av tabellen:  Inneholder alle tiltakstypene (eks. 'Kontakt
+observatør', 'Annet') med tilhørende   nummer <br>
+       BESKRIVELSE av attributtene i tabellen:<br>
+    nr:  nummer på tiltakstypen<br>
+    tekst:  aktuell tiltakstype<br>
+  </div>
+   <br>
+<br>
+<br>
+<font color="#000099"><big><br>
+Dokumentasjon av alle skript som er med i KRO's webgrensesnitt</big></font><br>
+    <br>
+  <b>Alle perl-skriptene, websidene og bildene som er i bruk i KRO-systemet
+(database "tiltak", server "modon") <br>
+  Dato: versjon 1: 12/03 03.<br>
+Versjon 2: 15/10-03.</b>  <br>
+<br>
+<b>  http://modon.oslo.dnmi.no/tiltak/<br>
+  (/var/www/tiltak/):</b><br>
+  <br>
+  1 Bn.html<br>
+  2 frames.html<br>
+  3 histframes.html<br>
+  4  index.html<br>
+  5 meldingframes.html<br>
+  6 meldingframes1.html<br>
+  7 met.gif<br>
+  <br>
+<b>  http://modon.oslo.dnmi.no/cgi-bin/tiltak/<br>
+  (/usr/lib/cgi-bin/tiltak/):</b><br>
+  <br>
+  8 af_frames_ver2.pl<br>
+  9 af_frames_ver4.pl<br>
+  10 af_frames_ver5.pl<br>
+  11 af_frames_ver6.pl<br>
+  12 af_frames_ver7.pl<br>
+  13 af_frames_ver8.pl<br>
+  14 af_frames_ver9.pl<br>
+  15  af_frames_ver_12.pl<br>
+  16 allefeil_ver2.pl<br>
+  17 brukerreg.pl<br>
+  18 endr_tiltak2.pl<br>
+  19 feilrettet.pl<br>
+  20 gamstasjonside.pl<br>
+  21 hist1_ver2.pl<br>
+   22 hist1b.pl<br>
+   23 htilkartsiden.pl<br>
+  24 kart2.pl<br>
+  25 kart3.pl<br>
+  26 mregionside.pl<br>
+  27 mregside.pl<br>
+  28 mregsidea.pl<br>
+  29 mstasjonside.pl<br>
+   30 msynopregside.pl<br>
+  31 mtilkartsiden2.pl<br>
+    32 mtilkartsiden5.pl<br>
+  <br>
+  33 null_tiltak.pl<br>
+  34 nyallefeil.pl<br>
+  <br>
+  35 nystatuside2.pl<br>
+  36 nyttend2.pl<br>
+  37 regendny_ver3.pl<br>
+  38 regionside.pl<br>
+  39 statuside2.pl<br>
+  <br>
+  40 tilkartsiden2.pl<br>
+  41 tilkartsiden3.pl<br>
+  42 tregsidea.pl<br>
+  43 tregsidea3.pl<br>
+  <br>
+<br>
+  <b>Forklaring av hvert perl-skript/hver webside:</b><br>
+  <br>
+   
+<table width="90%" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+      <tr>
+        <td valign="top">kart2.pl</td>
+        <td valign="top">"kartsiden". 'kart2.pl' er åpningssiden på  KRO,
+her er oversikt over alle stasjonstyper<br>
+  og deres status (rød, gul, grønn) Man har knapp for å  registrere brukernavn
+og melding.<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">Bn.html<br>
+        </td>
+        <td valign="top">Dette er siden for å registrere ny bruker/endre
+ brukernavn <br>
+  (ved trykk på "Hvis du ikke er........" fra kartsiden<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">frames.html<br>
+        </td>
+        <td valign="top">Rammesett for å velge stasjon ut fra region eller
+fra komplett stasjonsliste. <br>
+  (Ved trykk på "Velg region og stasjon" fra kartsiden). Valg av region og
+stasjon øverst, <br>
+ meny til venstre og stasjonsstatusvisning i nederste høyre ramme.<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">histframes.html</td>
+        <td valign="top">Rammesett for å vise historikk, ut fra trykk på
+knappen "Vis historikk" i Stasjonsstatus-<br>
+ visning. Meny på venstre side, historikk-visning i høyre ramme.<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">index.html<br>
+        </td>
+        <td valign="top">Siden som "redirigerer" addressen fra http://modon/tiltak
+ til <br>
+  http://modon.oslo.dnmi.no/cgi-bin/tiltak/kart2.pl  (Dette for å  ha en
+lettere startaddresse)<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">meldingframes.html<br>
+        </td>
+        <td valign="top">Rammesett for å registrere ny melding på selvvalgt
+stasjon (Ved trykk på "Registrering <br>
+ av ny melding" fra kartsiden). Valg av region, stasjon øverst, meny til
+venstre og<br>
+ meldingsregistrering i nederste høyre ramme.<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">meldingframes1.html<br>
+        </td>
+        <td valign="top">For å registrere melding på forhåndsvalgt  stasjon
+fra kartsiden (Ved trykk på <br>
+ "Registrering av ny melding" i neste vindu). Meny til venstre, meldingsregistrering 
+i<br>
+ høyre ramme.<br>
+        </td>
+              </tr>
+      <tr>
+      <td valign="top">met.gif<br>
+      </td>
+      <td valign="top">Bilde-logo for Meteorologisk institutt.<br>
+      </td>
+    </tr>
+    <tr>
+        <td valign="top">af_frames_ver2.pl<br>
+        </td>
+        <td valign="top">Rammesett for visning av stasjonsstatus for valgt 
+stasjon i rubrikken "Alle stasjoner" på <br>
+ kartsiden (røde). Meny på venstre side, stasjonsstatusvisning i høyre ramme.<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">af_frames_ver4.pl<br>
+        </td>
+        <td valign="top">Rammesett for visning av stasjonssatus for valgt 
+stasjon i rubrikken "Automatstasjoner" <br>
+ på kartsiden. Meny på venstre side, stasjonsstatusvisning i høyre ramme.<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">af_frames_ver5.pl<br>
+        </td>
+        <td valign="top">Rammesett for visning av stasjonssatus for valgt 
+stasjon i rubrikken "Flyplasser" <br>
+  på kartsiden. Meny på venstre side, stasjonsstatusvisning i høyre ramme.<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">af_frames_ver6.pl<br>
+        </td>
+        <td valign="top">Rammesett for visning av stasjonssatus for valgt 
+stasjon i rubrikken "Andre manuelle" <br>
+   på kartsiden. Meny på venstre side, stasjonsstatusvisning i høyre ramme.<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">af_frames_ver7.pl<br>
+        </td>
+        <td valign="top">Rammesett for visning av stasjonssatus for valgt 
+stasjon i rubrikken "Nedbørstasjoner" <br>
+    på kartsiden. Meny på venstre side, stasjonsstatusvisning i høyre ramme.<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">af_frames_ver8.pl<br>
+        </td>
+        <td valign="top">Rammesett for visning av stasjonsstatus for valgt 
+stasjon i rubrikken "Alle stasjoner" på <br>
+  kartsiden (gule). Meny på venstre side, stasjonsstatusvisning i høyre ramme.<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">af_frames_ver9.pl<br>
+        </td>
+        <td valign="top">Rammesett for visning av stasjonssatus for valgt 
+stasjon i rubrikken "PIO-stasjoner" <br>
+     på kartsiden. Meny på venstre side, stasjonsstatusvisning i høyre ramme.<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">af_frames_ver12.pl<br>
+        </td>
+        <td valign="top">Rammesett for visning av stasjonssatus for valgt 
+stasjon i rubrikken "Hybridstasjoner" <br>
+      på kartsiden. Meny på venstre side, stasjonsstatusvisning i høyre ramme.<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">allefeil_ver2.pl<br>
+        </td>
+        <td valign="top">Visning av stasjonsstatus. Høyre ramme i en av "af_frames"-rammene
+(se over). <br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">brukerreg.pl<br>
+        </td>
+        <td valign="top">Tar hånd om all brukerregistrering. Inntastingfelt, 
+"Registrer" og "Avbryt"-knapp. <br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">endr_tiltak2.pl<br>
+        </td>
+        <td valign="top">Tar hånd om endring av eksisterende tiltak, ved
+trykk på "Registrer" etter å ha endret <br>
+ tiltak.<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">feilrettet.pl<br>
+        </td>
+        <td valign="top">Ved trykk på "Feil-rettet"-knappen for "gul" stasjon.
+Oppdaterer feilsituasjonen med <br>
+ signatur, setter "ferdig"="true" i tabellen "Tiltak"og setter stasjonsstatus 
+tilbake til grønn.<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">gamstasjonside.pl<br>
+        </td>
+        <td valign="top">Øverste høyre ramme i "frames.html". (Etter trykk
+på "Velg region og stasjon" fra <br>
+ kartsiden). Visning av stasjonsutvalg utfra valgt region. <br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">hist1_ver2.pl<br>
+        </td>
+        <td valign="top">Historikk-visning for valgt stasjon. Nederste høyre 
+ramme ved trykk på "Historikk" <br>
+ i rammene "frames.html" og "meldingframes.html". Høyre ramme ved trykk på
+      <br>
+ "Historikk" i alle "af_frames"-rammene.<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">hist1b.pl<br>
+        </td>
+        <td valign="top">Visning av historikk ved valg av en annen stasjon 
+i en av "af-frames"-rammene, og <br>
+ deretter trykk på "Historikk".<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">htilkartsiden.pl<br>
+        </td>
+        <td valign="top">Venstre meny (ramme) ved trykk på "Historikk" i
+en av "af-frames"-rammene.<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">kart3.pl<br>
+        </td>
+        <td valign="top">Denne siden viser alle "grønne" stasjoner.<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">mregionside.pl<br>
+        </td>
+        <td valign="top">Opplisting av regioner. Øverste venstre ramme i
+"meldingframes.html" ved trykk på <br>
+ "Registrering av ny melding" fra kartsiden.<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">mregside.pl<br>
+        </td>
+        <td valign="top">Siden for å registrere ny melding. Nederste høyre
+ramme i "meldingframes.html" ved <br>
+ trykk på "Registrering av ny melding" fra kartsiden. Brukes også ved valg
+av <br>
+ annen stasjon i en av "af-frames"-rammene og trykk på "Registrering av ny
+melding".<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">mregsidea.pl<br>
+        </td>
+        <td valign="top">Registrering av ny melding. Nederste høyre ramme
+ved trykk på "Registrering av <br>
+ ny melding" i rammen "frames.html". Brukes også ved trykk på "Registrering
+av ny <br>
+ melding" i en av "af-frames"-rammene utfra valgt stasjon på kartsiden. 
+     <br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">mstasjonside.pl<br>
+        </td>
+        <td valign="top">Stasjonsliste (utfra valgt region). Øverste høyre
+ramme i "meldingframes.html" ved <br>
+ trykk på "Registrering av ny melding" fra kartsiden.<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">msynopregside.pl<br>
+        </td>
+        <td valign="top">Nederste høyre ramme i "meldingframes.html", ved
+valg og trykk på "Synopnr valgt" <br>
+ i "meldingframes.html"<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">mtilkartsiden2.pl<br>
+        </td>
+        <td valign="top">Venstre meny i "meldingframes1.html". Ved trykk
+på "Registrering av ny melding" i <br>
+ en av "af-frames"-rammene.<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">mtilkartsiden5.pl<br>
+        </td>
+        <td valign="top">Nederste venstre meny i "meldingframes.html". Ved 
+trykk på "Registrering av ny <br>
+ melding" fra kartsiden. <br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">null_tiltak.pl<br>
+        </td>
+        <td valign="top">Skriptet som håndterer trykk på "Null-tiltak" i
+Stasjonsstatus-visning (ved rød status <br>
+ og bekreftet feilsituasjon). "Null-tiltak" blir registrert, feil settes
+til "rettet" og <br>
+ stasjonsstatus blir grønn igjen.<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">nyallefeil.pl<br>
+        </td>
+        <td valign="top">Stasjonsstatusvisning ved trykk på "Bekreft feilsituasjon"
+for rød stasjon<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">nystatuside2.pl<br>
+        </td>
+        <td valign="top">Stasjonsstatusvisning ved trykk på "Bekreft feilsituasjon"
+for annen valgt rød stasjon<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">nyttend_2.pl<br>
+        </td>
+        <td valign="top">Registrering av nytt tiltak. Ved trykk på "Registrer" 
+etter å ha trykket på "Beskriv tiltak" <br>
+ (og spesifisert tiltak) i stasjonsstatusvisning.<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">regendny_ver3.pl<br>
+        </td>
+        <td valign="top">Registrering av ny feilmelding. Ved trykk på "Registrer"
+etter å ha trykket "Registrering <br>
+ av ny melding" (og spesifisert melding).<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">regionside.pl<br>
+        </td>
+        <td valign="top">Opplisting av regioner. Øverste venstre ramme i
+"frames.html" (etter trykk på "Velg region <br>
+ og stasjon" fra kartsiden.<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">statuside2.pl<br>
+        </td>
+        <td valign="top">Stasjonsstatusvisning ved valg av ny stasjon i en 
+av "af-frames"-rammene (etter trykk på <br>
+ "Status" på kartsiden).<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">tilkartsiden2.pl<br>
+        </td>
+        <td valign="top">Venstre meny ved trykk på "Status" for valgt stasjon
+på kartsiden.<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">tilkartsiden3.pl<br>
+        </td>
+        <td valign="top">Nederste venstre meny etter trykk på "Velg region
+og stasjon" fra kartsiden<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">tregsidea.pl<br>
+        </td>
+        <td valign="top">Registrering av nytt tiltak. Etter trykk på "Beskriv
+tiltak" i stasjonsstatus-visning<br>
+        </td>
+              </tr>
+      <tr>
+        <td valign="top">tregsidea3.pl<br>
+        </td>
+        <td valign="top">Endring av tiltak. Ved trykk på "Endre tiltak" i
+Stasjonsstatus-visning (for gul stasjon).<br>
+        </td>
+              </tr>
+                                          
+  </tbody>
+</table>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+</body></html>

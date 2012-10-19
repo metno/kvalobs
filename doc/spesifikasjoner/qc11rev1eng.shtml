@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+
+     <!--#include file="header.shtml" -->
+
+<H1>QC1-1: PREDEFINED CLIMATOLOGICAL TEST VALUES</H1>
+
+<p>&nbsp;</p>
+
+<h4>Knut Johansen</h4>
+
+<p>&nbsp;</p>
+
+<p>
+The KVALOBS range control applies climatological test values, i.e. each station is attributed a set
+of values with upper and lower limits for each month.</p>
+<p>
+Every station has a set of range limit values comprising six values for each month.
+The values are:
+<ul class=ragged>
+<li>Upper physical limit value
+<li>Highest test threshold value
+<li>High test threshold value
+<li>Low test threshold value
+<li>Lowest test threshold value
+<li>Lower physical limit value
+</ul>
+
+<p>
+There are two kinds of observation. One is the physical parameters like for
+example wind speed measured in m/s. The other is code parameters, for example total cloudiness 
+with valid integer values between 0 and 9. The climatological threshold values for the code 
+parameters will be identical to upper and lower limit on valid codes.<br>
+The physical parameters will have their range limit values set in the following manner:<br>
+The upper and lower physical limit value will be identical to the limit values inherited from
+the current control system applied to messages from automatic stations.<br>
+The highest and lowest test threshold value is initially set to the highest and lowest value 
+measured during the latest 10 years period. The high test threshold value is set equal to
+the highest test threshold value minus 10 per cent of the difference between the highest and 
+lowest test threshold value. The low test threshold value is set equal to the lowest test threshold value 
+plus 10 per cent of the difference between the highest and lowest test threshold value.<br>
+The exception from these rules is relative humidity and wind direction with fixed limit values, 
+0 - 100% and 0 - 360 degrees respectively.</p>
+<p>
+The range limit values are stored in the Kvalobs CVS archive. Because the physical limits 
+are the same for all stations and months, these limit values are stored in a separate file with 
+parameterid and associated limit values only. The other limit values are tabulated with seven 
+columns as shown below. The detailed file contains column headers and rows as exemplified below:
+</p>
+
+<table border="1" width="90%">
+  <tr>
+    <td width="14%">Stationid</td>
+    <td width="14%">parameterid</td>
+    <td width="14%">month </td>
+    <td width="14%">highest </td>
+    <td width="14%">high </td>
+    <td width="15%">lowest </td>
+    <td width="15%">low </td>
+  </tr>
+  <tr>
+    <td width="14%">18700 </td>
+    <td width="14%">173 </td>
+    <td width="14%">1 </td>
+    <td width="14%">1032.6 </td>
+    <td width="14%">1023.4 </td>
+    <td width="15%">940.2 </td>
+    <td width="15%">949.4 </td>
+  </tr>
+</table>
+
+<p>
+The input to the Kvalobs database is a table with the same structure as the above.
+The table contains limit values for all stations (except automatic stations) in 
+operation during the last 10 years. In total there is 914 stations. Only the physical  
+parameters at each station is included in the table. The table then consists of some 
+100 000 rows.</p>
+
+<p>
+New stations established reasonably close to an exisiting one will have applied the same 
+limit values as the existing station. In other cases interpolation of limit values from 
+near by stations will be used. The interpolation will be relatively simple taking into 
+account the distance to existing stations and eventually the difference in elevation.
+When there is no existing station sufficiently close model data and for marine stations 
+Hindcast data will be applied. The latter also applies to stations which are not 
+included in the calculation described above because of deficient quality control as for 
+example automatic stations.</p>
+
+
+</body>
+</html>

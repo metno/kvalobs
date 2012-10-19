@@ -1,0 +1,30 @@
+KVALOBS=$HOME/projects/kvalobs/runtime
+
+#exported variables
+###########################
+
+PATH=$KVALOBS/bin:$KVALOBS/bin/dbscript:$PATH:.
+export KVALOBS
+# KVALOBS variabelen er pathen til standardkatalogene for runtime:
+# bin, var, etc, share og lib. lib inneholder db og decode
+# KVALOBS variabelen er ikke pathen til CVS treet, eventuelt sammenfall
+# er tilfeldig og det skal egentlig ikke være slik
+# strengt tatt så skulle CVS pathen på rime være =$HOME/kvalobs og
+# KVALOBS pathen skulle være $HOME
+# Dette blir rettet i fremtiden
+
+
+export PGHOST=localhost
+export PGPORT=5433
+export PGDATA=$KVALOBS/var/postgres
+export HOSTNAME=localhost
+
+#export METADATA
+
+#Which perl to use to build kvalobs.
+export PERL_BIN=/usr/bin/perl
+
+export PERL5LIB=$KVALOBS/lib/perl:PERL5LIB
+#export LD_LIBRARY_PATH=$HOME/lib
+
+

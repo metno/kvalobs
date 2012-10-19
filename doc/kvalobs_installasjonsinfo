@@ -1,0 +1,55 @@
+Full installasjon av kvalobs.
+
+1. Få alt som skal være i CVS inn i CVS.
+2. Sjekke ut siste versjon av CVS på overcast under brukeren kvalobsdev
+   - cvs update -d på /home/kvalobsdev/src/kvalobs/
+   - kjør veryclean og deretter make på /home/kvalobsdev/src/kvalobs/
+   - hvis ikke kvDataInputd, kvManagerd og kvQabased finnes i ny
+     utgave under /home/kvalobsdev/src/kvalobs/bin kompiler opp 
+     kvalobs under /home/kvalobsdev/src/kvalobs/src
+     kvDataInputd finnes under /home/kvalobsdev/src/kvalobs/src/data_source_server/obj 
+     kvManagerd finnes under   /home/kvalobsdev/src/kvalobs/src/manager/obj 
+     kvQabased  finnes under   /home/kvalobsdev/src/kvalobs/src/qabase/obj
+     kvServiced finnes under   /home/kvalobsdev/src/kvalobs/src/service
+   - kopier kvDataInputd, kvManagerd, kvQabased og kvServiced over til
+     binkatalogen på warm.
+
+3. Sjekke ut alt som er i CVS på en maskin (warm har ikke CVS).
+   - lag en komprimert tar fil og lagre det på warm under brukeren kvalobs 
+     og lagre det under src katalogen:/metno/kvalobs/src
+   - start databasen ved hjelp av pg_ctl start
+   - slett de tabellene som er for gamle, eventuelt alle.
+   - opprett tabeller fra databasescriptet som ligger på
+     CVS/kvalobs/src/kvalobs_database/script.create
+     
+4. - putte metadataene på riktid sted(eller la de være der de er) og
+     sørg for at environmentvariabelen METADATA er satt riktig.
+   - kjør komandoen run eller les scriptet som heter run og kjør et og
+     et script om gangen, dette siste er sikrere hvis noe går feil.
+
+5. Dokumentasjon av environmentvariable:
+Sammenligning av Environmentvariabler som skal finnes på warm, men ikke på rime:
+PGDATA=$HOME/var/postgres/data
+PGPORT=5434
+Dette har med at på warm er det egen database til hver bruker
+
+Environmentvariabler som metadataene bruker:
+export METADATA=$HOME/share/metadata
+
+ellers så finnes følgende variable som jeg lurer på om  trenger vi alle de?
+LD_LIBRARY_PATH="/metno/kvalobs/lib:$LD_LIBRARY_PATH"
+PATH=$HOME/bin:/usr/lib/postgresql/bin/:$PATH:.
+PGHOST=warm.oslo.dnmi.no
+HOSTNAME=warm.oslo.dnmi.no
+KVDB=kvalobs
+KVDBUSER=kvalobs
+KVPATH_IN_NS=kvalobs
+KVALOBS=$HOME    # dette er pathen til kjøretreet og ikke til øverst på CVS treet 
+PERL_BIN=/usr/local/bin/perl
+PERL5LIB=$HOME/lib/perl
+
+ellers så får jeg tilføye at KVALOBS variabelen er pathen til
+kjøretreet og ikke til øverst på CVS treet - dette er tilfeldigvis det
+samme på rime.
+
+Sjekk at alle disse environmentvariablene er satt på driftsmaskinen.

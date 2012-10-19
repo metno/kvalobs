@@ -1,0 +1,4 @@
+etc/init/*.conf
+etc/kvalobs/kvalobs-init.conf
+etc/init.d/kvalobs
+etc/pgrepctl/kvalobs.conf.template

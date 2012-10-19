@@ -1,0 +1,12 @@
+#!/bin/sh
+
+DESTINATION=cronjob/lam2kv 
+DIRECTORIES=
+FILES=
+
+mkdir -p upload
+mkdir -p data
+mkdir -p log
+
+. $KVDIR/conf/INSTALL.conf
+

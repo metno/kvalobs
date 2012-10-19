@@ -1,0 +1,119 @@
+#! /bin/sh
+
+if [ -z "$KVTESTDIR" ]; then
+	echo "Environment variabelen KVALOBS må være satt!"
+	exit 2
+fi 
+
+TESTRAPORT=$KVTESTDIR/testraport-$(date +'%Y-%m-%d')
+DATADIR=$KVTESTDIR/data_from_kvalobs/synop
+DATADIR_TMP=$KVTESTDIR/tmp
+EXPECTED_DATADIR=$KVTESTDIR/expected_result/synop
+
+echo "" >> $TESTRAPORT 
+echo "--- Test av kvsynopd (SYNOP) ---" >> $TESTRAPORT 
+echo "" >> $TESTRAPORT 
+echo " * Forventet datakatalog: $EXPECTED_DATADIR" >> $TESTRAPORT
+echo " * Synop katalog: $DATADIR"  >> $TESTRAPORT
+echo -e "\n\n">> $TESTRAPORT
+
+N_TEST_RUN=0
+N_TEST_FAILED=0
+N_TEST_OK=0
+
+GETSYNOP=$(which kvsynopdbclt 2> /dev/null)
+
+if ! mkdir -p $DATADIR; then
+	echo "Kan ikke opprette katalogen: $DATADIR ! " >> $TESTRAPORT 
+	exit 2
+fi 
+
+rm -f $DATADIR/*.dat
+
+if ! mkdir -p $DATADIR_TMP; then
+	echo "Kan ikke opprette katalogen: $DATADIR_TMP ! " >> $TESTRAPORT 
+	exit 2
+fi 
+
+rm -f $DATADIR_TMP/*.syn
+
+if [ ! -d "$EXPECTED_DATADIR" ]; then
+ 	echo "Katalogen med forventet SYNOP finnes ikke: $EXPECTED_DATADIR">> $TESTRAPORT 
+ 	exit 2
+fi
+
+
+if [ ! -x "$GETSYNOP" ]; then
+	echo "Klienten for å hente ut SYNOP finnes ikke: 'kvsynopdbclt'">> $TESTRAPORT 
+	exit 2
+fi
+
+if cd $KVTESTDIR ; then
+	$GETSYNOP  --only-synoptimes -f all -o tmp
+	
+	if [ ! $? ]; then
+		echo "Kan ikke hente SYNOP ut av SYNOP databasen!">> $TESTRAPORT 
+		cd ..
+		exit 2
+	fi
+	
+	if cd tmp ; then
+		TMPSYNOP=$(ls -1 *.syn)
+		
+		for f in $TMPSYNOP ; do
+			sed -e '/\[Created/d' $f > $f.tmp
+			sed -e '/^S/d' $f.tmp > $DATADIR/$f
+		done
+	fi
+	
+	cd ..
+else
+	echo "Kan ikke skifte til testkatalogen!">> $TESTRAPORT 
+	exit 2
+fi
+
+
+if ! cd $EXPECTED_DATADIR ; then
+	echo "Kan ikke skifte til katalogen med forventet data etter decoding!">> $TESTRAPORT 
+	echo "  $EXPECTED_DATADIR">> $TESTRAPORT 
+	exit 2
+fi
+
+EXPECTED=$(ls -1 *.syn)
+cd ..
+
+for f in $EXPECTED ; do
+	let N_TEST_RUN=N_TEST_RUN+1
+	diff -u -b -B $EXPECTED_DATADIR/$f $DATADIR/$f
+	
+	RES=$?
+	 
+	if [ "$RES" -eq 1 ]; then
+		let N_TEST_FAILED=N_TEST_FAILED+1
+		echo "Feilet - $EXPECTED_DATADIR/$f" >> $TESTRAPORT
+	elif [ "$RES" -ne 0 ]; then
+		echo "Diff Problemer - $EXPECTED_DATADIR/$f" >> $TESTRAPORT
+		let N_TEST_FAILED=N_TEST_FAILED+1
+	else
+		echo "OK     - $EXPECTED_DATADIR/$f" >> $TESTRAPORT
+		let N_TEST_OK=N_TEST_OK+1
+	fi
+done
+
+echo -e "\n\n">> $TESTRAPORT
+echo "Testresultat:"  >> $TESTRAPORT
+echo "   # tester kjørt:  $N_TEST_RUN"  >> $TESTRAPORT
+echo "   # tester ok:     $N_TEST_OK"  >> $TESTRAPORT
+echo "   # feilet tester: $N_TEST_FAILED"  >> $TESTRAPORT
+echo "">> $TESTRAPORT
+echo -e "--- Test fullført ---\n\n">> $TESTRAPORT
+
+
+
+if [ $N_TEST_RUN -eq $N_TEST_OK ]; then
+	echo "Test passert ok!"
+	exit 0
+fi
+	
+echo "Test feilet!"
+exit 1

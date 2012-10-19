@@ -1,0 +1,14 @@
+#
+BINDIR=../../bin
+LIBDIR=../../lib
+
+FC= gfortran
+CXX= g++
+
+FCFLAGS=-O2 -Wall
+CXXFLAGS=-O2 -Wall
+LDFLAGS=
+LIBS=-L$(LIBDIR) -lmi
+
+V5DINC=/usr/local/include/vis5d+
+V5DLIB=-L/usr/local/lib -lv5d

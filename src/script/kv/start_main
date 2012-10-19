@@ -1,0 +1,92 @@
+#! /bin/sh
+
+if [ -e ${HOME}/.kvalobs ]; then
+    . ${HOME}/.kvalobs
+else
+    echo "FATAL: Kan ikke finne .kvalobs"
+    exit 1
+fi
+
+echo "\n\n  Starter kvalobs dette kan ta noe tid!"
+echo "  Hvis det ikke skjer noe på MER enn $TIMEOUT sekund"
+echo "  bruk CTRL-C for å avbryte!\n\n"
+
+
+
+echo -n "Starter kvManagerd ......... "
+fps -n -e kvManagerd 
+
+if [ $? -eq 1 ]; then
+    rm -f $PIDMANAGER
+    ${KVBIN}/kvManagerd > /dev/null  2>&1 &
+
+    let n=0
+    
+    while [ $n -lt $TIMEOUT   -a ! -f $PIDMANAGER ]; do
+	let n=n+1
+	sleep 1
+    done
+
+    if [ -f $PIDMANAGER ]; then
+       echo "Ok!"
+    else
+       echo "Failed!"
+       echo "  FATAL! Kan ikke starte kvManagerd!"
+       echo "  Prøv å start AutoObsMaster med komandoen: kvManagerd &"
+       echo "  og se hvilke feilmeldinger som skrives."
+       exit 1
+    fi
+else
+    echo "kjører allerede!"
+fi
+
+
+echo -n "Starter kvQabased .......... "
+fps -n -e kvQabased
+
+if [ $? -eq 1 ]; then
+    rm -f $PIDQABASE
+    ${KVBIN}/kvQabased > /dev/null  2>&1 &
+
+    let n=0
+    
+    while [ $n -lt $TIMEOUT   -a ! -f $PIDQABASE ]; do
+        let n=n+1
+	sleep 1
+    done
+
+    if [ -f $PIDQABASE ]; then
+       echo "Ok!"
+    else
+       echo "Failed!"
+    fi
+else
+    echo "kjører allerede!"
+fi
+
+
+echo -n "Starter kvDataInputd .............. "
+fps -n -e  kvDataInputd
+
+if [ $? -eq 1 ]; then
+    rm -f $PIDDATAINPUT
+    ${KVBIN}/kvDataInputd > /dev/null  2>&1 &
+
+    let n=0
+    
+    while [ $n -lt $TIMEOUT   -a ! -f $$PIDDATAINPUT ]; do
+	let n=n+1
+	sleep 1
+    done
+
+    if [ -f $$PIDDATAINPUT ]; then
+       echo "Ok!"
+    else
+       echo "Failed!"
+    fi
+else
+    echo "kjører allerede!"
+fi
+
+exit 0
+

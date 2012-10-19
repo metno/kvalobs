@@ -1,0 +1,15 @@
+This package was debianized by Kvalobs runtime account. <kvalobs@met.no> on
+Wed,  7 May 2008 06:02:35 +0000.
+
+It was downloaded from https://svn.met.no/kvoss/kvalobs/trunk.
+
+Upstream Author: met.no
+
+Copyright: 2006 2007 2008 2009 2010 met.no
+License:
+
+GPL
+
+
+The Debian packaging is (C) 2008 2009, 2010, Kvalobs runtime account. <kvalobs@met.no> and
+is licensed under the GPL, see `/usr/share/common-licenses/GPL'.

@@ -1,0 +1,157 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html lang=no> <head>
+<meta content="text/html; charset=ISO-8859-1"
+        http-equiv="content-type">
+<title>kvDataInputd - Dokumentasjon</title>
+</head>
+
+<body>
+<h1>kvDataInputd</h1>
+
+<p>kvDataInputd er den delen av Kvalobs som mottar observasjoner etter
+at de har blitt gjort. Etter at en observasjon er mottatt vil
+kvDataInputd tolke og lagre denne i databasen. Deretter sender den et
+signal til <a href=../kvManagerd/>kvManagerd</a> om at nye
+observasjoner har kommet.
+
+<h2>Oversikt</h2>
+
+<p>Observasjoner mottas gjennom et CORBA-grensesnitt, kalt <a
+href=../../kvalobs/share/kvalobs/idl/datasource.idl>Data</a>. Dette
+grensesnittet tar inn to parametre. Det første er selve observasjonen,
+som er en tekststreng. Den andre parameteren, som også er en
+tekststreng, angir observasjons<em>type</em> - det vil si hvordan
+observasjonen skal tolkes. Stort sett tilsvarer parameteren for
+observasjonstype de forskjellige formatene som observasjoner kan komme
+inn på fra observasjonsstasjoner, men i tillegg defineres visse
+interne formater, pluss at formatene for enkelte observasjoner er så
+like at de slås sammen under tolkning. Tolkningen av observasjonene
+gjørese ved hjelp av egne fortolkerobjekt. De objektene som brukes per
+i dag er som følger:
+
+<ul>
+  <li>synop</li>
+  <li>autoobs</li>
+  <li>kldecoder</li>
+  <li>kv2kvDecoder</li>
+</ul>
+
+<p>Hver av disse er i stand til å generere et sett med <a
+href=../../kvalobs/src/lib/kvalobs/include/kvData.h>
+kvData</a>-objekter på grunnlag av observasjonsstrengen. Når disse
+objektene er generert, skrives de til databasen. Deretter sendes et
+signal til et CORBA-objekt, <a
+href=../../kvalobs/share/kvalobs/idl/managerInput.idl>ManagerInput</a>,
+om at ny data har blitt lagt til databasen. Dette objektet eies av
+kvManagerd, og denne demonen vil overta ansvaret for observasjonene
+etter dette.
+
+<h2>Objektene for tolkning av observasjoner</h2>
+
+<p>Vi vil her behandle objektene som tolker observasjonene som kommer
+inn til Kvalobs. Først vil vi se på hvilke objekter som allerede
+eksisterer, og deretter vil vi se på hvordan nye objekter av denne
+typen kan implementeres.
+
+<p>Alle dekoderobjekter er subklasser av objektet <a
+href=../../kvalobs/src/lib/decoderbase/include/decoder.h>DecoderBase</a>.
+Dette vil blant annet si at objektene tilbyr metoden
+<code>execute</code>, som returnerer et objekt av klassen <a
+href=../../kvalobs/share/kvalobs/idl/datasource.idl>DecodeResult</a>. Dette
+inneholder en returkode og en streng med en forklaring på hva som har
+skjedd. De mulige returkodene er OK, NODECODER, DECODEERROR, NOTSAVED og ERROR.
+
+<h3>Eksisterende dekoderobjekter</h3>
+
+<p>Som tidligere beskrever er det implementert fire objekter som
+håndterer innkommende observasjoner av forskjellige typer. Vi vil her
+kun se på en av disse - kv2kvDecoder, siden denne er intern for kvalobs.
+
+<h4>kv2kvDecoder</h4>
+
+<p>Denne brukes når korrigerte observasjoner blir sendt tilbake til
+kvalobssystemet av en kontrollør. Det er altså et internt format som
+kan brukes for å endre allerede eksisterende data i
+databasen. Formatet kan brukes til å sende flere enkeltobservasjoner
+samtidig.
+
+<p>Dekoderen gjør en enkel test av data som skal skrives tilbake;
+dersom datafeltet "original" i databasen ikke er lik
+"original"-verdien i <em>samtlige</em> korreksjoner som mottas, blir
+ingenting lagret, og feilmeldinga "Rejected" blir returnert. Det samme
+skjer hvis hele eller deler av meldingen ikke kan tolkes av dekoderen.
+
+<p>kv2kvDecoder bruker et enkelt dataformat, hvor hvert felt er
+skrevet med ascii-karakterer og adskilt med tegnet ' | '. Hver enkel
+observasjon skilles med en linjeskift (' \n '). Metoder for å generere
+og tolke dette formatet er definert i <a
+href=../../kvalobs/src/lib/decodeutility/include/kvDataFormatter.h>kvDataFormatter.h</a>,
+som er en del av decodeutility-biblioteket.
+
+
+<h3>Hvordan lage nye objekter</h3>
+
+Objekter som skal tolke observasjoner må være utvidelser av klassen <a
+href=../../kvalobs/src/lib/decoderbase/include/decoder.h>DecoderBase</a>.
+De må derfor definere metodene <code>name()</code> og
+<code>execute()</code>, som beskrevet i dokumentasjonen til
+DecoderBase.
+
+<p>I tillegg til utvidlesene av DecoderBase må inngangspunkter til
+hver enkel klasse lages. Disse ser ut som <a
+href=../../kvalobs/src/lib/kldecoder/klentry.h>dette</a>.
+
+<p>Dekoderobjektene kompileres ikke inn i kvDataInputd. I stedet må de
+eksistere som delte objekter. Det er klassen <a
+href=../../kvalobs/src/lib/decoderbase/include/decodermgr.h>DecoderMgr</a>
+som håndterer innlasting av disse. For at dekoderobjektene skal kunne
+lastes, må de normalt ligge i mappen $KVALOBS/lib/decode/.
+
+
+<h2>Dataflyt</h2>
+
+<p>Når en observasjon kommer inn til kvDataInputd skjer følgende:
+
+<p>Først mottas observasjonen over CORBA-grensesnittet <a
+href=../../kvalobs/share/kvalobs/idl/datasource.idl>Data</a>. Dette
+CORBA-objektet er implementert av klassen <a
+href=../../kvalobs/src/data_source_server/include/DataSrcImpl.h>DataSrcImpl</a>.
+Når data kommer inn, og metoden <code>newData(data, obstype)</code>
+kalles, opprettes et <a
+href=../../kvalobs/src/data_source_server/include/DecodeCommand.h>
+DecodeCommand</a>-objekt, som inneholder en referanse til
+fortolkningsobjektet for observasjonen. Dette objektet blir så lagt i
+en kø for prosessering.
+
+<p>Når objektene blir tatt ut av køen, skjer dette i samme rekkefølge
+som de ble lagt inn. Dekoderobjektet må da gjøre to ting med dem. Det
+første er å lage et eller flere kvData-objekt på grunnlag av
+observasjonen, og det andre er å legge disse objektene i
+databasen. Dette siste gjøres ved hjelp av metoden
+<code>putKvDataInDb</code>, som defineres i klassen DecoderBase. Til
+denne metoden angis også en prioritet. De med høyest prioritet
+(dvs. lavest verdi) blir først lagt inn i databasen. Prioriteten er
+normalt definert i dekoderobjektet, og kan ikke settes eller endres
+utenfra.
+
+<h2>Tråder i kvDataInputd</h2>
+
+<p>kvDataInputd bruker flere tråder. Disse opprettes to forskjellige
+steder. For det første oppretter og håndterer CORBA sine egne
+tråder. De av disse som har dirkete innvirkning på systemets
+hovedfunksjonalitet har som oppgave å motta observasjoner og å legge
+dem i kø for prosessering. Deretter tar kvDataInputd sine egne tråder
+over.
+
+<p>Når kvDataInputd startes opprettes et visst antall forbindelser med
+databasen (for tiden tre). For hver av disse opprettes en tråd. Disse
+trådene har som oppgave å hente ut og prosessere observasjonene som
+CORBA-trådene har lagt i kø. Som nevnt over består denne
+prosesseringen av tolkning og lagring av data. Når dette er gjort
+sender i tillegg trådene signalet til kvManagerd om at ny data har
+kommet.
+
+<hr>
+<address><a href="mailto:vegardb@met.no">Vegard Bønes</a></address>
+<!-- hhmts start --> Last modified: Fri Dec 17 15:17:12 CET 2004 <!-- hhmts end -->
+</body> </html>

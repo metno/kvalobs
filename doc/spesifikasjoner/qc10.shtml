@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+               "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+
+  <!--#include file="header.shtml"-->
+
+  <p>	
+
+    <h1>QC1-0 PREQUALIFICATION</h1>
+
+
+<p>&nbsp;</p>
+<p><b>Gabriel Kielland</b>
+<p>&nbsp;</p>
+<p>
+The prequalification of observations are implemented in the steps:
+<ol>
+<li>Removal of values known to be in error;
+<li>Insertion of values when the message is missing.
+</ol>
+
+<p>
+There are two instances of removal by prequalification. In one instance the false observation is   
+expected to be received as a fixed value within the message. In the other instance the value is 
+assumed sent from the station as a noise signal. In both instances the removal may be  
+remitted with the manual control at a later stage (HQC).
+<p>
+The noise signal includes instruments which is known to transmit unreliable observations in a manner 
+that makes it impossible to apply an automatic correction. The signal received is still stored in 
+data.original.
+<p>
+Working example: The Geonor precipitation bucket readings is known to malfunction during very 
+cold periods. Bucket readings are removed when the temperature is below a threshold value.
+<p>&nbsp;</p>
+
+<p>
+The table obs_pgm contains the full list of expected observation, the observation program, 
+characterised by stationid, parameterid, level, hour of the day and obs_pgm.collector set to false. 
+Whenever an expected observation is not recieved the value is inserted in the database as missing and 
+flagged accordingly.
+<p>
+Last modified: Wed Dec 15 09:57:00 GMT 2004
+  </body>
+</html>
+

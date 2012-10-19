@@ -1,0 +1,27 @@
+Dokumentasjon over strukturen i CVS filtreet.Den beste måten å finne
+ut av den på er jo å kikke litt på CVS web.
+http://cvs/cgi-bin/cvsweb/
+deretter trykker en på kvalobs:
+For de som kan lite om systemet er det tre kataloger en skal merke
+seg:
+
+- share
+under her ligger metadataene(kvalobs/share/kvalobs/metadata) og 
+statiske data (kvalobs/share/kvalobs/statiskedata).
+statiske data er taret og komprimert før de legges inn i CVS hvis ikke
+så overbelaster vi CVS serveren fordi datamengdene blir for store.
+Under metadata så ligger det kataloger sortert etter metadatatabell.
+Tabellene checks og station_param er delt opp i to underkataloger:
+en som ender på manual og en som ender på auto. Dette kommer av de to måtene
+som disse mottar metadata for. I auto så autogenereres stort sett
+sjekkene og metadataene er i veldig lange filer. En kan si at auto er
+koblet mot metadata med en  relativt enkel struktur som
+gjelder for de fleste parametere, mens manual er vilkårlige saker som
+gjelder bare for noen parametere og kanskje også bare for noen få
+stasjoner.Manual er tastet inn av mennesker mens auto genereres av maskiner.
+
+-src
+Her er kildekoden
+
+- doc
+Her er dokumentasjonen

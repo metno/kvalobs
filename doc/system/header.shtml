@@ -1,0 +1,34 @@
+<head>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <LINK href="http://kvproject/ko.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#ffffff">
+
+
+<table bgcolor="#00367e" cellpadding=3>
+<tr>
+<td><b>
+<a href="http://klima.dnmi.no/" target="_top"><font size=2 color="#FFFFFFF">KLIMA</font></a>
+</b><td><b>
+<a href="http://instrument/obs/" target="_top"><font size=2 color="#FFFFFFF">OBSERVASJON</font></a>
+</b><td><b>
+<a href="http://cyclone.oslo.dnmi.no:8001/intern/index.shtml" target="_top"><font size=2 color="#FFFFFFF">FOU</font></a></b>
+</b><td><b>
+<a href="http://it.dnmi.no/" target="_top"><font size=2 color="#FFFFFFF">IT</font></a></b>
+</table>
+
+<p>
+<img src="images/metno.png" align=right hspace=20>
+<font style="font-family: palatino, serif; font-size: 16pt; color: green;">
+KVALOBS
+</font>
+<br>
+<font style="font-family: palatino, serif; font-size: 12pt; color: green;">
+Kvalitetssikring av observasjoner
+</font>
+<br>
+
+
+<hr noshade>
+<p>

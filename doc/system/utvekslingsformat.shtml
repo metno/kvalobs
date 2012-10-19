@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+               "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+
+    <!--#include file="header.shtml" -->
+  <p>	
+<h1>Utvekslingsformater</h1>
+<p>
+Kvalobs f&oslash;rste versjon mottar meldinger fra Comobs, fra AutoObs, fra NORCOM og fra applikasjonen kvDataInputd_clt
+for lagring i tabellene data og text_data.
+<p>
+Kvalobs f&oslash;rste versjon sender observasjoner til IT-divisjonens synopgenerator, til KRO og til KLIMA.
+
+<h3>Formater inn til Kvalobs</h3>
+<ol>
+<li>
+Meldingene mottatt i Comobs blir videresendt uforandret. 
+<a href="http://obsdiv.oslo.dnmi.no/stasjon_dir/SMS_protokoller.html">
+Meldingsformatene er spesifisert av Observasjonsdivisjonen</a>.<p></li>
+<li>
+Meldingene i AutoObs blir videresendt i et standardformat:
+<p>
+&obsType: [autoobs/nationalnr=(.....)/type=(...)> observation: [(parameterkode1)][,(parameterkode2),...,(parameterkodeN)]<br>
+YYYYMMDDHHMMSS,&lt;original1i>,&lt;original2i>,...,&lt;originalNi><br>
+YYYYMMDDHHMMSS,&lt;original1j>,&lt;original2j>,...,&lt;originalNj><br>
+...<br>
+YYYYMMDDHHMMSS,&lt;original1n>,&lt;original2n>,...,&lt;originalNn><br>
+<p>
+NB! Parameterkodene er de som blir brukt i AutoObs.<br>
+&nbsp;<br>
+<li>
+Meldingene fra NORCOM er i SYNOP- eller SHIP-format. (METAR-format kan komme til senere).<p></li>
+<li>
+Meldinger fra alle andre systemer inkludert KLIMA blir oversendt i et standardformat:
+<p>
+kldata/nationalnr=&lt;----->/type=&lt;---><br>
+&lt;parameterkode1>[(&lt;sensor1>,&lt;level1>)][,&lt;parameterkode2>,...,&lt;parameterkodeN(&lt;sensorN,levelN)>]<br>
+YYYYMMDDHHMMSS,&lt;original1i>,&lt;original2i>,...,&lt;originalNi><br>
+YYYYMMDDHHMMSS,&lt;original1j>,&lt;original2j>,...,&lt;originalNj><br>
+...<br>
+YYYYMMDDHHMMSS,&lt;original1n>,&lt;original2n>,...,&lt;originalNn><br>
+</li>
+</ol>
+<p>
+Klokkene YYYYMMDDHHMMSS blir lagret i <i>data.obstime</i>
+
+
+<h3>Format ut fra Kvalobs</h3>
+<p>
+Observasjonene som sendes fra Kvalobs foreligger i samme struktur som i tabellen <i>data</i>.
+</p>
+<p>
+Sist oppdatert av Gabriel Kielland 21. juni 2006.
+</body>
+</html>
+

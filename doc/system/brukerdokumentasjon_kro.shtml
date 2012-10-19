@@ -1,0 +1,352 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<!--#include file="header.shtml"-->
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Brukerdokumentasjon_KRO</title>
+</head>
+<body>
+<div style="text-align: center;"><big><big><span
+ style="font-weight: bold;"><br>
+Brukerdokumentasjon KRO-feilrapporteringssystem.<br>
+</span></big></big>
+<div style="text-align: left;"><big><big><span
+ style="font-weight: bold;"><small><small><small><small><small><span
+ style="font-weight: bold;"></span></small></small><big><span
+ style="font-weight: bold;"></span></big></small></small></small></span><small><small><br>
+</small></small></big></big><big><big><small><small>KRO
+st&aring;r for "Kvalobs' Rapporterings- og Overv&aring;kingssystem"</small></small>.
+<small><small>Dette er forel&oslash;pig et manuelt
+feilrapporteringssystem. Alle har anledning til &aring; registrere
+feilmeldinger. KRO er til praktisk nytte for Service-seksjonens
+oppf&oslash;lging av stasjonsnettet (instrumenter,
+kommunikasjonssystem etc.).</small></small></big></big><br>
+<big><big><small><small><br>
+<big><span style="font-weight: bold;">NB! Husk &aring; oppdatere
+nettleservinduet jevnlig, i Internet Explorer gj&oslash;res dette ved
+F5, i Netscape/Mozilla CTRL+R. Alternativt trykk oppdateringsknappen
+&oslash;verst i nettlesermenyen.<br>
+</span></big><br>
+<br>
+<span style="font-weight: bold;">Startsiden</span> er&nbsp; </small></small></big></big><small><small><small><big><big><br>
+<big><a href="http://modon/tiltak">http://modon/tiltak</a><br>
+(Alternativt:<br>
+</big></big></big></small></small><span style="font-weight: bold;"></span></small></div>
+<div style="text-align: left;"><small><small><span
+ style="font-weight: bold;"></span></small></small><big><small><a
+ href="http://modon/cgi-bin/tiltak/start.pl">http://modon/cgi-bin/tiltak/start.pl</a>)<br>
+<br>
+<br>
+<span style="font-weight: bold;">LDAP:</span><br>
+F&oslash;rste gang man er inne logger man seg p&aring; vha.
+LDAP-autentisering (Lighweight Directory Access Protocol), dvs. man
+skriver inn det brukernavnet man har i mailsystemet, med
+tilh&oslash;rende passord. Dette registreres i databasen KRO bruker (se
+'Systemdokumentasjon KRO-feilrapporteringssystem'), og alle
+'Feilmeldinger' som vedkommende skriver inn registreres dermed med
+fullt navn basert p&aring; LDAP-autentiseringen.<br>
+<br>
+<br>
+</small></big>
+<div style="text-align: center;"><big><small><big
+ style="font-weight: bold;">Visningsbildet p&aring; Startsiden:</big></small></big><br>
+</div>
+<big><small><br>
+Her vises Stasjonsstatus for alle stasjoner og typer.<br>
+<span style="font-weight: bold; color: rgb(255, 0, 0);">R&oslash;d
+status</span> betyr at en feil eller avvik er rapportert p&aring;
+stasjonen, og m&aring; tas h&aring;nd om av Serviceseksjonen.<br>
+<span style="font-weight: bold; color: rgb(255, 255, 0);">Gul status</span>&nbsp;
+(Gul status) betyr at feilen er under utbedring, og tiltak er beskrevet.<br>
+<span style="font-weight: bold; color: rgb(0, 153, 0);">Gr&oslash;nn
+status</span><span style="color: rgb(0, 153, 0);"> </span>betyr at
+ingen feil p&aring; det n&aring;v&aelig;rende tidspunkt er rapportert
+p&aring; stasjonen. <br>
+Til h&oslash;yre i rubrikken '<span style="color: rgb(255, 204, 0);">Infomeldinger</span>'
+(Infomeldinger)
+vises de siste innkomne infomeldinger p&aring; de ulike stasjonstypene.<br>
+(Infomeldinger brukes til meldinger av praktisk art som <span
+ style="font-style: italic;">ikke</span> har noe &aring; gj&oslash;re
+med feilmeldinger, f.eks.
+melding om observat&oslash;rfrav&aelig;r/ferie.)<br>
+<br>
+<span style="font-weight: bold;"></span>For &aring; registrere ny
+feilmelding
+(se lenger ned) velger man stasjon i rubrikken '<span
+ style="font-weight: bold;">VELG STASJON</span>'. Man kan sortere
+p&aring;
+navn eller nummer. Man kan ogs&aring; velge direkte fra <span
+ style="font-weight: bold;">WMO-nr</span> -liste til venstre.<br>
+<br>
+Nederst i midten vises '<span style="font-weight: bold;">Siste 10
+infomeldinger</span>' og '<span style="font-weight: bold;">Siste 10
+feilmeldinger</span>'. Dette er spesielt nyttig for &aring; se hva som
+har skjedd i det siste, hvilke nye meldinger/endringer som har dukket
+opp.<br>
+<br>
+Nederst til venstre st&aring;r '<span style="font-weight: bold;">Velkommen
++ ditt navn/gruppe</span>' (etter at du f&oslash;rste gang registrerte
+deg/din gruppe i LDAP-vinduet som kom opp). <br>
+<br>
+Helt nederst er link til '<a
+ href="http://obs/stasjon_dir/stasjonsendringer.html">Stasjonsendringer'</a>
+(som er en logg over alle aktuelle stasjonsendringer, ligger p&aring;
+sidene til Observasjonsdivisjonen).<br>
+Linken '<span style="font-weight: bold;">Gr&oslash;nne st.</span>': Her
+man f&aring;r opp en oversikt over alle stasjoner som det p&aring; det
+aktuelle tidspunkt ikke er registrert noen feilmeldinger for, sortert i
+stasjonstype osv. <br>
+<br>
+<br>
+<br>
+</small></big>
+<div style="text-align: center;"><big><small><big><span
+ style="font-weight: bold;">Registrering av ny feilmelding:</span>
+<br>
+<br>
+</big></small></big></div>
+<big><small>Registering av ny feilmelding foreg&aring;r ved &aring;
+velge aktuell stasjon i rubrikken <span style="font-weight: bold;">'VELG
+STASJON' </span></small></big><big><small>til h&oslash;yre for teksten
+<span style="font-weight: bold;">'MELDINGSREGISTRERING'</span> </small></big><big><small>p&aring;
+Startsiden.<br>
+Man kan sortere p&aring; navn eller nummer<span
+ style="font-style: italic;"> <span style="font-weight: bold;">stigende</span>
+</span>eller<span style="font-style: italic;"> <span
+ style="font-weight: bold;">synkende</span> </span></small></big><big><small><span
+ style="font-style: italic;"></span><span style="font-style: italic;"></span>ved
+&aring; trykke p&aring; respektive linker over og under rubrikken.<br>
+<br>
+</small></big><big><small>Etter &aring; ha valgt aktuell stasjon kommer
+man inn i et vindu der man registrerer <span style="font-weight: bold;">Feilmelding
+&oslash;verst til h&oslash;yre</span>.<br>
+Velg feiltype under rubrikken <span style="font-weight: bold;">'Velg
+feiltype</span>'(m&aring;
+velges) og spesifiser tekst under <span style="font-weight: bold;">'Tekst
+feilmelding:</span>. Trykk p&aring; knappen '<span
+ style="font-weight: bold;">Registrer'</span>.<br>
+(Infomelding kan registreres hvis det er en melding av ren informativ
+art som ikke har noe med <span style="font-style: italic;"></span>feilmelding
+&aring; gj&oslash;re.)<br>
+<br>
+Man kan velge annen stasjon ved &aring; bla i Stasjonslisten
+&oslash;verst til venstre, eller velge 'Region' og
+deretter 'Stasjon'&nbsp; nederst, eller bare velge fra WMO-nr nederst
+til h&oslash;yre. I alle tilfeller vil valgt stasjon komme opp i
+registreringsvinduet &oslash;verst til h&oslash;yre.<br>
+<span style="font-weight: bold;">Feilmelding</span> <span
+ style="font-weight: bold;">brukes om reelle
+feil eller avvik p&aring; en stasjon. <br>
+Infomelding</span>
+<span style="font-weight: bold;">brukes om praktiske opplysninger, eks.
+observat&oslash;rferie/frav&aelig;r etc..</span><br>
+<br style="font-weight: bold;">
+Til venstre har man en knapp '<span style="font-weight: bold;">Vis
+historikk</span>' for &aring; vise hva som har
+skjedd tidligere p&aring; en stasjon. Knappen '<span
+ style="font-weight: bold;">Stasjonsstatus'</span> viser
+n&aring;v&aelig;rende status.<br>
+<br>
+Alternativt: Dersom man skal registrere en ny melding p&aring; en
+stasjon som allerede vises p&aring; Startsiden i '<span
+ style="color: rgb(255, 0, 0);">R&oslash;d status'</span> , '</small></big><big><small><span
+ style="font-weight: bold; color: rgb(255, 255, 0);">Gul status</span>'(Gul
+status),
+eller under '<span style="color: rgb(255, 204, 0);">Infomeldinger<span
+ style="color: rgb(0, 0, 0);">'(Infomeldinger) kan man velge aktuell
+stasjon her og
+trykke 'Status'-knappen, s&aring; kommer man inn i et nytt vindu hvor
+Stasjonssstatus med tilh&oslash;rende knapper vises.</span></span></small></big><big><small><br>
+Til venstre vises stasjoner gruppert i r&oslash;d, gul og gr&oslash;nn
+status for den aktuelle stasjonstypen+infomeldinger. Desssuten fins
+knappene 'Registrering av ny melding' og 'Vis historikk'.<br>
+<br>
+<br>
+</small></big>
+<div style="text-align: center;"><big><small><big
+ style="font-weight: bold;">Etter registrering av feilmelding:<br>
+<br>
+</big></small></big></div>
+<big><small>Etter at man har
+registrert feilmeldingen vil <span style="font-weight: bold;">Stasjonsstatus
+g&aring; over til <span style="color: rgb(255, 0, 0);">r&oslash;d</span>
+</span>(dersom den var gr&oslash;nn fra
+f&oslash;r). En stasjon som var <span style="font-weight: bold;">gul </span>fra
+f&oslash;r vil forbli <span style="font-weight: bold;">gul,</span> men
+meldingen vil dukke opp &oslash;verst&nbsp; i Stasjonsstatus-visning.<br>
+<span style="font-weight: bold;">I alle tilfeller vil samtlige nye
+registrerte feilmeldinger dukker opp
+i 'Siste 10 feilmeldinger' nederst p&aring; Startsiden.</span><br>
+Ny registrert info-melding vil dukke opp i 'Siste 10 infomeldinger'.<br>
+<span style="font-weight: bold;">Stasjonsstatus endrer seg ikke</span>
+ved registrering av ny Info-melding.<br>
+<br>
+<br>
+</small></big>
+<div style="text-align: center;"><big><small><big><span
+ style="font-weight: bold;">Historikk ("Logg"):<br>
+<br>
+</span></big></small></big>
+<div style="text-align: left;"><span style="font-weight: bold;">'Vis
+historikk'-knappen </span>er spesielt nyttig for &aring; f&oslash;lge
+med p&aring; hvordan en
+stasjon er fulgt opp, og se hva som har skjedd tidligere p&aring; en
+stasjon.
+<br>
+<span style="font-weight: bold;"></span></div>
+<big><small><big><span style="font-weight: bold;"></span></big></small></big></div>
+<big><small><big><span style="font-weight: bold;"><small><span
+ style="font-weight: bold;"><span style="font-weight: bold;"></span><big><span
+ style="font-weight: bold;"></span></big></span></small></span></big></small></big>N&aring;r
+stasjonen har g&aring;tt over til <span style="color: rgb(0, 153, 0);">gr&oslash;nn</span>
+status igjen (etter rapportert feil, <span
+ style="color: rgb(255, 0, 0);">r&oslash;d</span> status), kan man
+velge aktuell stasjon og trykke p&aring; knappen <span
+ style="font-weight: bold;">'Historikk'</span> for &aring; se hvilket
+tiltak som ble spesifisert.<br>
+Det kan ogs&aring; hende samme feil er rapportert f&oslash;r, det vil
+man is&aring;fall se&nbsp; i 'Historikk'. <br>
+<span style="font-weight: bold;">'Historikk'-knappen viser alltid
+n&aring;v&aelig;rende Stasjonsstatus (&oslash;verst) og historikken
+under.<br>
+<br>
+<br>
+</span>
+<div style="text-align: center;"><big><small><big><span
+ style="font-weight: bold;">Flytting av feilmelding:<br>
+<br>
+</span></big></small></big>
+<div style="text-align: left;">S&aring;fremt det eksisterer en
+feilsituasjon p&aring; stasjonen (den har gul eller r&oslash;d status)
+har vi rubrikken<span style="font-weight: bold;"> 'Nedenfor kan du
+flytte feilmelding til infomelding'</span> nederst i visning av
+Stasjonsstatus for en stasjon. Et scrollevindu med alle meldingene (1
+eller flere) som tilh&oslash;rer den aktuelle feilsituasjonen vises, og
+man har knappen <span style="font-weight: bold;">'Velg og trykk her'</span>.
+Man kan da velge (kun 1 melding av gangen) og trykke p&aring; knappen
+for &aring; flytte feilmelding til infomelding.<br>
+Intensjonen bak dette er hvis en melding er feilaktig registrert som
+feilmelding, eller hvis den av ulike &aring;rsaker (pga. tidsperspektiv
+osv.) passer bedre som en infomelding enn en feilmelding.<br>
+<big><small><big><span style="font-weight: bold;"></span></big></small></big></div>
+</div>
+<span style="font-weight: bold;"><br>
+<br>
+</span>
+<div style="text-align: center;"><big><small><big><span
+ style="font-weight: bold;">Sletting av infomelding</span></big></small></big>:<br>
+<br>
+<div style="text-align: left;">Man har mulighet til &aring; slette 1
+eller flere infomeldinger (dersom de "har g&aring;tt ut p&aring; dato",
+og ikke har noen praktisk informasjonsverdi lenger).<br>
+Dette gj&oslash;res ved &aring; krysse av i (klikke p&aring;)
+checkboksen til h&oslash;yre for en infomelding, og trykke p&aring;
+knappen <span style="font-weight: bold;">"Slett"</span>. Alternativt
+kan man krysse av flere og trykke p&aring; en av "Slett"-knappene hvis
+man vil slette flere infomeldinger. <br>
+</div>
+</div>
+<span style="font-weight: bold;"><br>
+<br>
+</span>
+<div style="text-align: center;"><big><span style="font-weight: bold;">Ulike
+rettigheter:<br>
+<br>
+MERK:<br>
+</span></big><span style="font-weight: bold;"></span></div>
+<span style="font-weight: bold;">KRO-systemet er bygd opp slik at alle
+p&aring;</span><span style="font-style: italic; font-weight: bold;">
+met.no </span><span style="font-weight: bold;">kan registrere
+feilmelding og se p&aring; Stasjonsstatus/Historikk.</span><br>
+<span style="font-weight: bold;">Imidlertid kan bare Service-personell
+i OBS-divisjonen bekrefte feilmelding og spesifisere tiltak, eller angi
+at en feil er rettet. Knappene til dette er derfor IKKE synlig for
+andre brukere. Rettighetene administreres av systemadministrator.</span><br>
+<br>
+<br>
+<div style="text-align: center;"><big><span style="font-weight: bold;">Knapper
+som ikke er synlige for andre enn service-personell:</span></big><br>
+</div>
+<br>
+<span style="font-weight: bold;">"Bekreft feilsituasjon": </span>Ved
+trykk p&aring; denne bekrefter man at man tar tak i situasjonen. I
+'Stasjonsstatus'-visning og 'Historikk' blir navnet lagret etter
+teksten "Bekreftet feilsituasjon".<br>
+<span style="font-weight: bold;">"Beskriv tiltak": </span>Etter
+&aring; ha krysset av p&aring; "Bekreft feilsituasjon" kommer man
+automatisk inn p&aring; Stasjonsstatusvisning med knappene "Beskriv
+tiltak" og "Null-tiltak". Ved trykk p&aring; <span
+ style="font-weight: bold;">"Beskriv tiltak" </span>kommer man inn i
+skjermvisning med teksten<span style="font-weight: bold;">
+"Registrering av nytt tiltak". </span>Her velges tiltakstype nederst
+til venstre, man skriver tekst under rubrikken "Forklaring tiltak", og
+trykker p&aring; knappen <span style="font-weight: bold;">"Registrer".
+</span>Tiltaket blir registrert med alle opplysninger og navn.<br>
+<span style="font-weight: bold;">"Null-tiltak":</span> Alternativt kan
+man trykke p&aring; <span style="font-weight: bold;">"Null-tiltak"</span>
+istedenfor "Beskriv tiltak". Da vil stasjonen automatisk bli satt til
+gr&oslash;nn, og feilsituasjonen markeres 'rettet'. Dette er for
+&aring; kunne raskt rette opp en situasjon som ikke n&oslash;dvendigvis
+indikerer en stor feilsituasjon, eller trenger mange eksplisitte tiltak.<br>
+<br>
+<span style="font-weight: bold;">"Feil rettet": </span>Ved gul
+stasjonsstatus vises knappene <span style="font-weight: bold;">"Feil
+rettet"</span> og <span style="font-weight: bold;">"Endre tiltak"</span>.
+N&aring;r tiltak er gjennomf&oslash;rt og stasjonen er iorden igjen
+trykker man p&aring; <span style="font-weight: bold;">"Feil rettet". </span>Den
+som er ansvarlig for &aring; ha rettet feilen blir da registrert med
+navn. Stasjonsstatus blir gr&oslash;nn igjen, og stasjonen er
+friskmeldt.<br>
+<span style="font-weight: bold;">"Endre tiltak": </span>Dersom aktuelt
+tiltak er feil eller man har behov for &aring; supplere eksisterende
+tiltak, trykker man p&aring; "Endre tiltak". Man kommer inn i
+skjermbilde "Endring av tiltak". Eksisterende "Tiltakstype" og
+"Forklaring tiltak" vises. Her kan man enten slette det eksisterende
+eller legge til ny informasjon. <br>
+<br>
+<br>
+<br>
+<span style="font-weight: bold;">Sp&oslash;rsm&aring;l om
+webgrensesnittet/KRO-systemet kan rettes til &Oslash;ystein Lie, <a
+ href="mailto:oystein.lie@met.no">oystein.lie@met.no</a><br>
+<br>
+<br>
+<br>
+<br>
+</span>
+<div style="text-align: center;"><span style="font-weight: bold;"><big>Skjermdump
+av KRO-grensesnittet, startsiden:<br>
+</big><br>
+<img alt="" src="../../../images/krosn1.png"
+ style="width: 1057px; height: 849px;"><br style="font-weight: bold;">
+</span><span style="font-weight: bold;"></span></div>
+<span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><big><small><br>
+<br>
+<br>
+<big><br style="font-weight: bold;">
+</big></small></big>
+<div style="text-align: center;"><big><big style="font-weight: bold;"><small>Skjermdump
+av registreringsvinduet for feilmelding og infomelding: </small></big></big><br>
+</div>
+<big><small></small><big><span style="font-weight: bold;"></span></big></big></div>
+</div>
+<p style="text-align: center;">&nbsp;<img alt=""
+ src="../../../images/krosn2.png" style="width: 1057px; height: 882px;"><br>
+</p>
+<div style="text-align: center;"><br>
+<br>
+<br>
+<big><span style="font-weight: bold;">Skjermdump av Stasjonsstatus-side</span></big><br>
+<br>
+<img alt="" src="../../../images/krosn3.png"
+ style="width: 1057px; height: 882px;"><br>
+</div>
+<p><br>
+<br>
+</p>
+<!--#include file="footer.shtml" --><!-- Created: Wed Oct 10 16:13:08 GMT 2003 --><!-- hhmts start -->
+Last modified by &Oslash;ystein Lie: Mon Nov 29 14:18:24 GMT 2004
+<!-- hhmts end -->
+</body>
+</html>

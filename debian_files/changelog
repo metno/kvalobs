@@ -1,0 +1,694 @@
+kvalobs (2.5.4-1) unstable; urgency=low
+
+  * minor changes so that kvalobs compiles on precise and lucid.
+  * Added kv2kvDataInputd. A helper program to setup a datastream on 
+    a test machine.
+  * Add a new package for kvdataclt.
+
+ -- Alexander Bürger <alexander.buerger@met.no>  Wed, 06 Jul 2012 10:55:39 +0200
+
+kvalobs (2.5.3~rc1-1) lucid; urgency=low
+
+  * fixed memory leak in DataUpdateTransaction
+  * kvcron: kvdbadmin.sh -> kvdbadmin
+  * save_las_month.sh. Use bash.
+
+ -- Borge Moe <borge.moe@met.no>  Fri, 29 Jun 2012 13:15:00 +0200
+
+kvalobs (2.5.2a-1) lucid; urgency=low
+
+  * Minor packaging changes.
+  * Package files for compilation of external decoder library,
+    used for the METAR decoder.
+
+ -- Alexander Bürger <alexander.buerger@met.no>  Thu, 31 May 2012 16:34:00 +0200
+
+kvalobs (2.5.2-1) lucid; urgency=low
+
+  * New release.
+  * Change the logging in tool_funcs.sh.
+  * kvdbadmin logs to the directory /var/log/kvalobs/kvdbadmin.
+  * Only check for ip-alias kvalobs on startup.
+
+ -- Borge Moe <borge.moe@met.no>  Tue, 29 May 2012 13:12:00 +0200
+
+kvalobs (2.5.1-1) lucid; urgency=low
+
+  * New release.
+  * Make kvQabased try harder to update the database.
+  * More loging for db transaction status in kvQabased.
+
+ -- Borge Moe <borge.moe@met.no>  Mon, 23 Apr 2012 09:00:00 +0200
+
+kvalobs (2.5.0-1) lucid; urgency=low
+
+  * New release.
+  * No change since 2.5.0~rc7-1.
+
+ -- Borge Moe <borge.moe@met.no>  Thu, 29 Mar 2012 13:15:00 +0200
+
+
+kvalobs (2.5.0~rc7-1) lucid; urgency=low
+
+  * Use the workstatistik table, not the workque table, for getWorkstatistik.
+
+ -- Borge Moe <borge.moe@met.no>  Tue, 27 Mar 2012 17:45:00 +0200
+
+
+kvalobs (2.5.0~rc6-1) lucid; urgency=low
+
+  * Implement workstatistik trough the CORBA interface.
+  * Make it compatible with earlier version of the the service interface.
+
+ -- Borge Moe <borge.moe@met.no>  Tue, 27 Mar 2012 14:30:00 +0200
+
+
+kvalobs (2.5.0~rc5-1) lucid; urgency=low
+
+  * Added a method to get workstatistik trough the CORBA interface.
+
+ -- Borge Moe <borge.moe@met.no>  Fri, 23 Mar 2012 13:30:00 +0100
+
+
+kvalobs (2.5.0~rc4-1) lucid; urgency=low
+
+  * New release candidate.
+  * Fix a few minor bugs in kvstop and kvstatus.
+  * Changed create the pidfile for kvDataInputd early in the startup.
+
+ -- Borge Moe <borge.moe@met.no>  Wed, 21 Mar 2012 14:00:00 +0100
+
+
+kvalobs (2.5.0~rc3-1) lucid; urgency=low
+
+  * New release candidate.
+  * Changed how plugins are identified when loaded, dbdrivers and decoders.
+  * Changed what is installed for the different debian packages.
+
+ -- Borge Moe <borge.moe@met.no>  Tue, 20 Mar 2012 15:15:00 +0100
+
+
+kvalobs (2.5.0~rc2-2) lucid; urgency=low
+
+  * New release candidate.
+  * Fix bug in the control file.
+
+ -- Borge Moe <borge.moe@met.no>  Fri, 16 Mar 2012 09:15:00 +0100
+
+kvalobs (2.5.0~rc2-1) lucid; urgency=low
+
+  * New release candidate.
+  * Changed the name on the library package so multiple
+    versions of the package can exist on the system.
+
+ -- Borge Moe <borge.moe@met.no>  Thu, 15 Mar 2012 22:30:00 +0100
+
+
+kvalobs (2.5.0~rc1-1) lucid; urgency=low
+
+  * New release candidate.
+  * Changed the linking of static libs as puTools.
+
+ -- Borge Moe <borge.moe@met.no>  Thu, 15 Mar 2012 13:45:00 +0100
+
+
+kvalobs (2.4.7-1) lucid; urgency=low
+
+  * New release.
+  * Updated documentation in kv2norcom script.
+
+ -- Borge Moe <borge.moe@met.no>  Mon, 12 Mar 2012 08:45:00 +0100
+
+kvalobs (2.4.7~rc1-1) lucid; urgency=low
+
+  * New release candidate.
+  * Update the pkgscript with the new setup for transfer of data to NORCOM.
+  * Add script a script kv2norcom to transfer data to NORCOM.
+  * Add a new dependency on incron.
+
+ -- Borge Moe <borge.moe@met.no>  Fri, 9 Mar 2012 17:30:00 +0100
+
+
+kvalobs (2.4.6-1) lucid; urgency=low
+
+  * Release 2.4.6.
+
+ -- Borge Moe <borge.moe@met.no>  Mon, 27 Feb 2012 21:00:00 +0100
+
+
+kvalobs (2.4.6~rc1-1) lucid; urgency=low
+
+  * Fix ipalias check bug.
+
+ -- Borge Moe <borge.moe@met.no>  Mon, 27 Feb 2012 16:45:00 +0100
+
+kvalobs (2.4.5-1) lucid; urgency=low
+
+  * Release of 2.4.5.
+
+ -- Borge Moe <borge.moe@met.no>  Fri, 24 Feb 2012 11:45:00 +0100
+
+kvalobs (2.4.5~rc15-1) lucid; urgency=low
+
+  * Add MALLOC_CHECK_=0 to kv_ctl.conf to keep the heap
+    checker silent at segmentation fault at exit.
+  * Fix a few small bugs in tool_funcs.sh.in.
+
+ -- Borge Moe <borge.moe@met.no>  Fri, 24 Feb 2012 08:45:00 +0100
+
+kvalobs (2.4.5~rc14-1) lucid; urgency=low
+
+  * Install crontab for the kvalobs user on
+    start as master and remove when stopped.
+  * Fix cronjobs to sheck the ipalias/test status.
+
+ -- Borge Moe <borge.moe@met.no>  Mon, 20 Feb 2012 16:45:00 +0100
+
+
+kvalobs (2.4.5~rc13-1) lucid; urgency=low
+
+  * Add new package kvalobs-init.
+  * Make the init script useful on test machines.
+  * Use the /usr/local/sbin/alias_kvalobs if it exist. Otherwise
+    use the /home/borgem/alias_kvalobsnew as in the test setup.
+
+ -- Borge Moe <borge.moe@met.no>  Thu, 16 Feb 2012 16:45:00 +0100
+
+
+kvalobs (2.4.5~rc12-1) lucid; urgency=low
+
+  * Updated debian build script.
+
+ -- Borge Moe <borge.moe@met.no>  Sat, 11 Feb 2012 17:00:00 +0100
+
+kvalobs (2.4.5~rc11-1) lucid; urgency=low
+
+  * Add support for parameter id 129 (E). Use code table paramer
+    0 20 062 (E or E') in BUFR.
+
+ -- Borge Moe <borge.moe@met.no>  Tue, 31 Jan 2012 12:45:00 +0100
+
+
+kvalobs (2.4.5~rc10-1) lucid; urgency=low
+
+  * Add support for logging of the application that use a postgres
+    connection to the postgres logs.
+
+ -- Borge Moe <borge.moe@met.no>  Fri, 13 Jan 2012 11:15:00 +0100
+
+
+kvalobs (2.4.5~rc9-1) lucid; urgency=low
+
+  * Fix bogus initialisation in the postgresdriver.
+
+ -- Borge Moe <borge.moe@met.no>  Thu, 12 Jan 2012 13:15:00 +0100
+
+kvalobs (2.4.5~rc8-1) lucid; urgency=low
+
+  * Fix memmory leak in the postgresdriver.
+
+ -- Borge Moe <borge.moe@met.no>  Thu, 12 Jan 2012 08:15:00 +0100
+
+kvalobs (2.4.5~rc7-1) lucid; urgency=low
+
+  * fix buggy loop in the postgresdriver.
+
+ -- Borge Moe <borge.moe@met.no>  Tue, 10 Jan 2012 15:00:00 +0100
+
+kvalobs (2.4.5~rc6-1) lucid; urgency=low
+
+  * Bugfix in reconnect in the postgresdriver..
+
+ -- Borge Moe <borge.moe@met.no>  Tue, 10 Jan 2012 11:55:00 +0100
+
+kvalobs (2.4.5~rc5-1) lucid; urgency=low
+
+  * Bugfix and additions in the db layer.
+
+ -- Borge Moe <borge.moe@met.no>  Mon, 28 Nov 2011 12:55:00 +0100
+
+
+kvalobs (2.4.5~rc4-1) lucid; urgency=low
+
+  * Fix metdat and posdat so it works on read-only mounted filesystem.
+
+ -- Borge Moe <borge.moe@met.no>  Tue, 15 Nov 2011 14:30:00 +0200
+
+kvalobs (2.4.5~rc3-1) lucid; urgency=low
+
+  * Update crontab
+
+ -- Borge Moe <borge.moe@met.no>  Tue, 08 Nov 2011 14:30:00 +0200
+
+kvalobs (2.4.5~rc2-1) lucid; urgency=low
+
+  * Fix logging of raw SYNOP in the synopdecoder.
+  * Fix bogus obstime in synop decoder at end of month.
+
+ -- Borge Moe <borge.moe@met.no>  Thu, 06 Oct 2011 16:45:00 +0100
+
+kvalobs (2.4.5~rc1-1) lucid; urgency=low
+
+  * Fix creation of log files name in the synopdecoder.
+  * Fix the log script that compress raw SYNOP's.
+  * Update the documentation for setting up a kvalobs database in ubuntu/debian.
+
+ -- Borge Moe <borge.moe@met.no>  Thu, 06 Oct 2011 13:00:00 +0100
+
+kvalobs (2.4.4-3) lucid; urgency=low
+
+  * Remove "amd64" from the version number.
+
+ -- Borge Moe <borge.moe@met.no>  Mon, 15 Aug 2011 07:55:00 +0200
+
+kvalobs (2.4.4~amd64-2) lucid; urgency=low
+
+  * Fix bug in postgresql dependency.
+
+ -- Borge Moe <borge.moe@met.no>  Mon, 15 Aug 2011 07:55:00 +0200
+
+
+kvalobs (2.4.4_amd64-1) lucid; urgency=low
+
+  * 64 bit release of kvalobs.
+
+ -- Borge Moe <borge.moe@met.no>  Mon, 8 Aug 2011 12:30:00 +0200
+
+kvalobs (2.4.4-1) lucid; urgency=low
+
+  * New release 2.4.4. No change since rc1.
+
+ -- Borge Moe <borge.moe@met.no>  Mon, 27 Jun 2011 14:40:00 +0200
+
+kvalobs (2.4.4~rc1-1) lucid; urgency=low
+
+  * Updated the flag setting in kvAqbased.
+
+ -- Borge Moe <borge.moe@met.no>  Mon, 27 Jun 2011 09:00:00 +0200
+
+
+kvalobs (2.4.3-1) lucid; urgency=low
+
+  * New release.
+
+ -- Borge Moe <borge.moe@met.no>  Tue, 26 Apr 2011 14:00:00 +0200
+
+kvalobs (2.4.3~rc5-1) lucid; urgency=low
+
+  * Fix endless loop
+
+ -- Børge Moe <borge.moe@met.no>  Tue, 19 Apr 2011 07:40:00 +0200
+
+
+kvalobs (2.4.3~rc4-1) lucid; urgency=low
+
+  * Bugfix in DataUpdateTransaction.
+
+ -- Børge Moe <borge.moe@met.no>  Mon, 18 Apr 2011 12:40:00 +0200
+
+
+kvalobs (2.4.3~rc3-1) lucid; urgency=low
+
+  * temporary fix for #1315.
+
+ -- Børge Moe <borge.moe@met.no>  Fri, 08 Apr 2011 13:45:00 +0200
+
+kvalobs (2.4.3~rc2-1) lucid; urgency=low
+
+  * Fix bug in 'Do not mark missing and typid<0 as deleted from new observation'.
+
+ -- Børge Moe <borge.moe@met.no>  Thu, 07 Apr 2011 08:10:00 +0200
+
+kvalobs (2.4.3~rc1-1) lucid; urgency=low
+
+  * Do not mark missing and typid<0 as deleted from new observation.
+
+ -- Børge Moe <borge.moe@met.no>  Wed, 06 Apr 2011 07:10:00 +0200
+
+kvalobs (2.4.2~rc1-1) lucid; urgency=low
+
+  * Do not mark missing and typid<0 as deleted from new observation.
+
+ -- Børge Moe <borge.moe@met.no>  Wed, 06 Apr 2011 07:10:00 +0200
+
+
+kvalobs (2.4.1-1) lucid; urgency=low
+
+  * New release.
+  * No changes since pre1.
+
+ -- Børge Moe <borge.moe@met.no>  Fri, 25 Mar 2011 13:10:00 +0100
+
+
+kvalobs (2.4.1~pre1-1) lucid; urgency=low
+
+  * DataUpdateTransaction, set the corrected value to -32766 for "deleted" data.
+  * Qabsed, do not reset the fpre flag if set to 7.
+
+ -- Børge Moe <borge.moe@met.no>  Thu, 17 Mar 2011 10:40:00 +0100
+
+
+kvalobs (2.4.0-1) lucid; urgency=low
+
+  * New release.
+
+ -- Børge Moe <borge.moe@met.no>  Thu, 17 Feb 2011 14:50:00 +0100
+
+kvalobs (2.4.0~pre9-1) lucid; urgency=low
+
+  * Fix bug in 'reason' for an exception.
+  * Fix space bug in an SQL query..
+
+ -- Børge Moe <borge.moe@met.no>  Wed, 16 Feb 2011 08:05:00 +0100
+
+kvalobs (2.4.0~pre8-1) lucid; urgency=low
+
+  * For the pgdriver: Let exec and execQuery behave the same on exception.
+  * More logging in DataUpdateTransaction.
+
+ -- Børge Moe <borge.moe@met.no>  Tue, 15 Feb 2011 10:20:00 +0100
+
+kvalobs (2.4.0~pre7-1) lucid; urgency=low
+
+  * Bugfix in the transaction method 'perform' for postgresql.
+
+ -- Børge Moe <borge.moe@met.no>  Mon, 14 Feb 2011 09:45:00 +0100
+
+
+kvalobs (2.4.0~pre6-1) lucid; urgency=low
+
+  * kvrestart, kvstopkv and kvstart updated.
+  * kvManagerd: fixed bug in search for missing minute values.
+  * Updated the kvcron script to restart kvQabased at 3:25 and 21:25
+
+ -- Børge Moe <borge.moe@met.no>  Thu, 10 Feb 2011 15:15:00 +0100
+
+kvalobs (2.4.0~pre5-1) lucid; urgency=low
+
+  * kvQabased: Allow the command que to be processed before shutdown.
+  * kvstop: Added an option '-n progname' to stop the progname only.
+
+ -- Børge Moe <borge.moe@met.no>  Wed, 09 Feb 2011 07:30:00 +0100
+
+
+kvalobs (2.4.0~pre4-1) lucid; urgency=low
+
+  * Added a way to specify stations ranges in getData.
+
+ -- Børge Moe <borge.moe@met.no>  Tue, 08 Feb 2011 15:30:00 +0100
+
+kvalobs (2.4.0~pre3-1) lucid; urgency=low
+
+  * Fix crash in kvManagerd.
+
+ -- Børge Moe <borge.moe@met.no>  Mon, 07 Feb 2011 07:00:00 +0100
+
+
+kvalobs (2.4.0~pre2-1) lucid; urgency=low
+
+  * Handle update correct when only missing values exist.
+
+ -- Børge Moe <borge.moe@met.no>  Wed, 03 Feb 2011 10:00:00 +0100
+
+
+kvalobs (2.4.0~pre1-1) lucid; urgency=low
+
+  * Update qabase.
+  - Change in library version. Many programs need to be recompiled and linked.
+
+ -- Børge Moe <borge.moe@met.no>  Wed, 02 Feb 2011 10:15:00 +0100
+
+kvalobs (2.3.4~pre1-1) lucid; urgency=low
+
+  * Fix unlimited loop in missing calculation.
+
+ -- Børge Moe <borge.moe@met.no>  Mon, 31 Jan 2011 13:45:00 +0100
+
+
+kvalobs (2.3.3-1) lucid; urgency=low
+
+  * new kvalobs version
+
+ --  Børge Moe <borge.moe@met.no>  Thu, 27 Jan 2011 11:11:04 +0100
+
+kvalobs (2.3.2~pre6-3) lucid; urgency=low
+
+  * Add postgresql-8.4 to the dependency list.
+
+ -- Børge Moe <borge.moe@met.no>  Wed, 26 Jan 2011 09:30:00 +0100
+
+kvalobs (2.3.2~pre6-2) lucid; urgency=low
+
+  * Add postgresql-8.6 to the dependency list.
+
+ -- Børge Moe <borge.moe@met.no>  Wed, 26 Jan 2011 08:30:00 +0100
+
+kvalobs (2.3.2~pre6-1) lucid; urgency=low
+
+  * Loging.
+
+ -- Børge Moe <borge.moe@met.no>  Tue, 25 Jan 2011 09:30:00 +0100
+
+kvalobs (2.3.2~pre5-1) lucid; urgency=low
+
+  * Loging.
+
+ -- Børge Moe <borge.moe@met.no>  Mon, 24 Jan 2011 07:50:00 +0100
+
+
+kvalobs (2.3.2~pre4-1) lucid; urgency=low
+
+  * Loging.
+  * Fix update bug in DataUpdateTransactor.
+
+ -- Børge Moe <borge.moe@met.no>  Fri, 21 Jan 2011 13:46:00 +0100
+
+kvalobs (2.3.2~pre3-1) lucid; urgency=low
+
+  * Fix bug in StdLayout1.
+  * Change timestamp format in the logfiles.
+
+ -- Børge Moe <borge.moe@met.no>  Fri, 21 Jan 2011 09:27:00 +0100
+
+kvalobs (2.3.2~pre2-1) lucid; urgency=low
+
+  * Quote original correct when updating text_data in DataUpdateTransaction.
+  * Added a new LayOut, StdLayout1, to the logger system.
+  * Added a summary logfile for the DataUpdateTransaction.
+
+ -- Børge Moe <borge.moe@met.no>  Fri, 21 Jan 2011 07:40:00 +0100
+
+
+kvalobs (2.3.2~pre1-1) lucid; urgency=low
+
+  * kvDataInputd. Implemented use of transactor to add data to the db.
+  * kvDataInputd. Check for updated and duplicate message before inserting data to the db.
+  * kvDataInputd. Create a log file for each stationid, typeid and decoder combination.
+  * kvDataInputd. Lot of changes in the logging system. Maybe the log is useful fore the first time :-).
+
+ -- Børge Moe <borge.moe@met.no>  Thu, 20 Jan 2011 17:20:00 +0100
+
+kvalobs (2.3.1~pre1-1) lucid; urgency=low
+
+  * kvDataInputd. Implemented use of transactor to add data to the db.
+  * kvDataInputd. Check for updated and duplicate message before inserting data to the db.
+  * kvDataInputd. Create a log file for each stationid, typeid and decoder combination.
+  * kvDataInputd. Lot of changes in the logging system. Maybe the log is useful fore the first time :-).
+
+ -- Børge Moe <borge.moe@met.no>  Thu, 20 Jan 2011 15:15:00 +0100
+
+kvalobs (2.3.1-1) lucid; urgency=low
+
+  * moved files
+
+ -- B�rge Moe <borge.moe@met.no>  Mon, 22 Nov 2010 12:15:00 +0100
+
+kvalobs (2.3.0.5-1) lucid; urgency=low
+  * kvServiced. More logging.
+
+ -- B�rge Moe <borge.moe@met.no>  Wed, 18 Nov 2010 09:00:00 +0100
+
+
+kvalobs (2.3.0.4-1) lucid; urgency=low
+  * kvServiced. More logging.
+
+ -- B�rge Moe <borge.moe@met.no>  Wed, 17 Nov 2010 13:10:00 +0100
+
+
+kvalobs (2.3.0.3-1) lucid; urgency=low
+  * kvServiced. More logging.
+
+ -- B�rge Moe <borge.moe@met.no>  Wed, 17 Nov 2010 10:58:00 +0100
+
+
+kvalobs (2.3.0.2-1) lucid; urgency=low
+  * kvServiced. Fix bug in logging.
+
+ -- B�rge Moe <borge.moe@met.no>  Wed, 17 Nov 2010 08:45:00 +0100
+
+
+kvalobs (2.3.0.1-1) lucid; urgency=low
+
+  * Added a new CORBA interface DataReadyInputExt with a new method dataReadyExt. This
+    is the same method as dataReady with a extra paramtere 'source'. The changes is
+    compatible with old versions of kvalobs.
+  * Added dataReadyExt support to kvServiced.
+  * Update kvManagerd to use dataReadyExt.
+  * getData sort the data on typeids so the negative type id comes last.
+
+ -- B�rge Moe <borge.moe@met.no>  Wed, 17 Nov 2010 07:38:00 +0100
+
+
+kvalobs (2.3.0-1) lucid; urgency=low
+
+  * new version
+
+ -- Vegard Bones <vegard.bones@met.no>  Mon, 15 Nov 2010 12:35:09 +0100
+
+kvalobs (2.2.0-1) unstable; urgency=low
+
+  * new version, with interface change
+
+ --  <vegardb@met.no>  Mon,  6 Sep 2010 08:42:08 +0200
+
+kvalobs (2.1.6-1) unstable; urgency=low
+
+  * new version
+
+ -- Borge Moe <borge.moe@met.no>  Wed,  3 Sep 2010 15:48:00 +0200
+
+kvalobs (2.1.5-1) unstable; urgency=low
+
+  * new version
+
+ -- Borge Moe <borge.moe@met.no>  Wed, 21 Jul 2010 10:56:28 +0200
+
+kvalobs (2.1.4-3) unstable; urgency=low
+
+  * new version.
+  * Added a configuration file to save_last_month. ( /etc/kvalobs/save_last_month.conf)
+  * Added a pgclean-local.sql script to /etc/kvalobs. Configuration.
+  * Fixed a lot of bugs in the scripts.
+  * flagg changes.
+
+ -- Borge Moe <borge.moe@met.no>  Fri, 18 Jun 2010 09:41:00 +0200
+
+kvalobs (2.1.3-1) unstable; urgency=low
+
+  * new version
+
+ -- Borge Moe <borge.moe@met.no>  Mon, 31 May 2010 12:59:39 +0200
+
+kvalobs (2.1.2-2) hardy; urgency=low
+
+  * removed dbconfig-common from package
+
+ -- Borge Moe <borge.moe@met.no>  Fri, 21 May 2010 12:56:41 +0200
+
+kvalobs (2.1.2-1) unstable; urgency=low
+
+  * new release
+
+ --  Borge Moe <borge.moe@met.no>  Mon, 19 Apr 2010 09:54:48 +0200
+
+kvalobs (2.1.1-8) unstable; urgency=low
+
+  * Correct 2.1.1 build
+
+ --  Borge Moe <borge.moe@met.no>  Mon, 19 Apr 2010 08:23:05 +0200
+
+kvalobs (2.1.1-7) unstable; urgency=low
+
+  * Correct 2.1.1 build
+
+ --  <vegardb@met.no>  Fri, 16 Apr 2010 15:04:15 +0200
+
+kvalobs (2.1.1-6) unstable; urgency=low
+
+  * Fix rundir in kvstart.
+
+ -- Borge Moe <borge.moe@met.no>  Tue, 23 Mar 2010 15:23:00 +0100
+
+kvalobs (2.1.1-5) unstable; urgency=low
+
+  * Move all so files from /us/lib/kvalobs/lib to /us/lib
+    and add kkalobs to the names.
+  * Put the pid files into /var/run/kvalobs dir.
+
+ -- Borge Moe <borge.moe@met.no>  Tue, 23 Mar 2010 14:13:00 +0100
+
+kvalobs (2.1.1-4) unstable; urgency=low
+
+  * Add a kvalobsuser package that creates the kvalobs user if it not exist.
+
+ -- Borge Moe <borge.moe@met.no>  Mon, 22 Mar 2010 09:08:00 +0100
+
+
+kvalobs (2.1.1-3) unstable; urgency=low
+
+  * Yet another dupload.
+
+ -- Borge Moe <borge.moe@met.no>  Fri, 19 Mar 2010 10:35:00 +0100
+
+
+kvalobs (2.1.1-2) unstable; urgency=low
+
+  * Yet another dupload.
+
+ -- Borge Moe <borge.moe@met.no>  Thu, 18 Mar 2010 12:17:00 +0100
+
+
+kvalobs (2.1.1-1) unstable; urgency=low
+
+  * Try another dupload.
+
+ -- Borge Moe <borge.moe@met.no>  Thu, 18 Mar 2010 10:39:00 +0100
+
+kvalobs (2.1.0-2) unstable; urgency=low
+
+  * Rename kvcpp.pc to libkvcpp.pc.
+
+ -- Borge Moe <borge.moe@met.no>  Thu, 18 Mar 2010 09:16:00 +0100
+
+
+kvalobs (2.1.0-1) unstable; urgency=low
+
+  * Split out kvsynopd to its own project.
+  * Update the package system to be more compatible with the FHS.
+
+ -- Borge Moe <borge.moe@met.no>  Tue, 16 Mar 2010 19:25:00 +0100
+
+
+kvalobs (2.0.3-1) unstable; urgency=low
+
+  * kvsynopclt. Use corba.kvpath, corba.path and corba.nameserver from kvsynopd.conf as default values.
+  * Moved autoobs2kv from AutoObs to kvalobs an renamed it to data2kv. Added the posibility to use
+    different nameservers for receiving kvalobs instances.
+  * #1244. kvServiced. Fix a race condition in kvDataIteratorImpl, kvModelDataIteratorImpl,
+    kvRejectedIteratorImpl.
+  * Updated a few config files.
+
+ -- Kvalobs <kvalobs@met.no>  Fri, 12 Jun 2009 10:45:00 +0200
+
+kvalobs (2.0.2-1) unstable; urgency=low
+
+  * kvsynopd, corrected bug in hourly precipitation from RR_1, #1241.
+  * kv2metdat. Transfer only modeldata for norwegians station to kvalobsdb, ie stationid < 100000.
+  * Fixed a bug in the option parser for initialization og the logger,
+    reported by Yngve.Einarsson@smhi.se.
+  * Updated a few config files.
+
+ -- Kvalobs <kvalobs@met.no>  Mon, 25 Mar 2009 08:00:00 +0200
+
+kvalobs (2.0.1-1) unstable; urgency=low
+
+  * kvsynopd, fixed roundings error in Gust, max wind and E'sss.
+
+ -- Kvalobs <kvalobs@met.no>  Fri, 26 Sep 2008 08:26:00 +0200
+
+kvalobs (2.0.0-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Kvalobs <kvalobs@met.no>  Wed,  7 May 2008 06:02:35 +0000
+

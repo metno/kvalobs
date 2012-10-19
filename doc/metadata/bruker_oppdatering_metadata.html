@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title></title>
+</head>
+<body>
+<span style="font-style: italic; font-weight: bold;"><big><big><small
+ style="color: rgb(51, 102, 255);">Oppdatering/overf&oslash;ring av
+skript til kvalobsdb p&aring; rime for godkjenningskj&oslash;ringer</small></big></big></span><br>
+<br>
+Det eksisterer to CVS-tre for kvalobs: Du m&aring; ha begge checket ut
+p&aring; din egen maskin. Filene .kvalobs, .bashrc og .kvpasswd&nbsp;
+m&aring; eksistere p&aring; din egen maskin med pathene til de to
+cvs-tr&aelig;rne(kvalobs og kvalobs_metadata) satt riktig i .kvalobs
+filen og du m&aring; ogs&aring; ha en runtime katalog:<br>
+kvalobs (fra cvs): pathen settes i <span style="font-weight: bold;">$KVDIR</span>
+variabelen i .kvalobs scriptet<br>
+kvalobs_metadata(fra cvs): pathen settes i <span
+ style="font-weight: bold;">$METADIR</span> variabelen i .kvalobs
+scriptet <br>
+kvalobs_runtime: (runtimemilj&oslash;et p&aring; din egen maskin,)
+pathen settes i $KVALOBS variabelen i .kvalobs scriptet <br>
+<br>
+I det f&oslash;lgende forutsettes det at systemet er satt opp riktig
+p&aring; din egen maskin, operasjonene blir utf&oslash;rt mot den
+databasen du har satt opp. Det kan v&aelig;re database p&aring; din
+egen maskin eller rime. Uansett s&aring; legges scriptene/metadataene
+inn i CVS treet kvalobs_metadata p&aring; din egen maskin.<br>
+<br>
+<br>
+<br>
+Oppdater skript p&aring; egen maskin:<br>
+<span style="font-weight: bold;"><br>
+P&aring;</span> <span style="font-weight: bold;">egen maskin katalog:
+$METADIR/share/metadata<br>
+</span>for oppdatering av algoritmer: <span style="font-weight: bold;">cd
+algorithms<br>
+</span>for oppdatering av checks:<span style="font-weight: bold;"> <span
+ style="font-weight: bold;">cd checks/checks_manual<br>
+</span></span>for oppdatering av metadata:<span
+ style="font-weight: bold;"><span style="font-weight: bold;"> <span
+ style="font-weight: bold;">cd station_param/station_param_manual<br>
+<br>
+For checks og station_param: G&aring; inn i aktuell QC-katalog, eks.
+QC1-2, QC1-6 etc.<br>
+</span></span></span><br>
+Ved oppdatering av eksisterende materiale, ta dette<br>
+opp i Emacs-vindu, rediger, <span style="font-weight: bold;">lagre </span>p&aring;
+aktuell katalog.<br>
+Ved nytt: Lag det nye i Emacs, <span style="font-weight: bold;">lagre</span>
+p&aring; aktuell katalog.<br>
+<br>
+<span style="font-weight: bold;">For overf&oslash;ring til kvalobsdb
+p&aring; rime av nytt materiale eller oppdatering: </span><br>
+<span style="font-weight: bold;"><span style="font-weight: bold;"><span
+ style="font-weight: bold;"></span></span></span>St&aring; i aktuell
+katalog, <br>
+<span style="font-weight: bold;">hvis katalog algorithms: </span><br>
+<span style="font-weight: bold;">Innlegging/Oppdatering gj&oslash;res
+ved: <br>
+algorithm &lt;din algoritme&gt; R</span><span style="font-weight: bold;"></span><br>
+<br style="font-weight: bold;">
+<span style="font-weight: bold;">hvis katalog checks_manual: </span><br>
+<span style="font-weight: bold;"><span style="font-weight: bold;">Innlegging/Oppdatering
+gj&oslash;res ved: </span></span><span style="font-weight: bold;"><br>
+checks &lt;din check&gt; R</span><br style="font-weight: bold;">
+<span style="font-weight: bold;"><br>
+hvis katalog station_param_manual: </span><br>
+<span style="font-weight: bold;"><span style="font-weight: bold;">Innlegging/Oppdatering
+gj&oslash;res ved: </span></span><span style="font-weight: bold;"><br>
+station_param &lt;din station_param&gt;</span> <span
+ style="font-weight: bold;">R</span><br>
+<span style="font-weight: bold;"><br>
+</span><big><span style="font-weight: bold;"><span
+ style="font-weight: bold;"><span
+ style="font-style: italic; font-weight: bold;"><span
+ style="color: rgb(51, 102, 255);"><span style="font-weight: bold;">Disse
+scriptene over (dvs. algorithm, checks</span></span></span></span></span><span
+ style="font-weight: bold;"><span style="font-weight: bold;"><span
+ style="font-style: italic; font-weight: bold;"><span
+ style="color: rgb(51, 102, 255);"><span style="font-weight: bold;"><span
+ style="font-weight: bold;"><span
+ style="font-style: italic; font-weight: bold;"><span
+ style="color: rgb(51, 102, 255);"><span style="font-weight: bold;"><big>
+<small>og station_param) legger inn metadata i kvalobsdatabasen og
+kopierer filene over til CVS katalogen p&aring; din egen maskin.
+N&aring;r en er sikker p&aring;
+at det en skal ha er riktig, etter testing, <br>
+<!--<a href="http://kvproject/notes/skriptbruker.shtml">-->
+<a href="http://kvalobs/metadata/skriptbruker.shtml">-&gt;
+Framgangsm&aring;te ved godkjenningskj&oslash;ringer av skript</a><br>
+s&aring; g&aring;r en inn
+p&aring; riktig sted i CVS- treet og skriver cvs commit &lt;filnavn&gt;
+(evt cvs add &lt;filnavn&gt; dersom filen ikke finnes i fra f&oslash;r).</small></big></span></span></span></span></span></span></span></span></span></big><span
+ style="font-weight: bold;"><span style="font-weight: bold;"><span
+ style="font-style: italic; font-weight: bold;"><span
+ style="color: rgb(51, 102, 255);"><span style="font-weight: bold;"></span></span></span></span><br>
+</span><span style="font-weight: bold;"><span
+ style="font-style: italic; font-weight: bold;"><big><big><small
+ style="color: rgb(51, 102, 255);"> </small></big></big></span></span><span
+ style="font-weight: bold;"><span
+ style="font-style: italic; font-weight: bold;"><span
+ style="color: rgb(51, 102, 255);"><span style="font-weight: bold;"><big>Gi
+s&aring; beskjed til driftsgruppen, <a href="mailto:kvdrift@met.no">kvdrift</a>,
+om at nytt skript/endret skript er testet ut og lagt inn i CVS. Driftsgruppen foretar s&aring; oppdatering p&aring; operasjonell server.<br>
+</big></span></span></span></span>
+</body>
+</html>

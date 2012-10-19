@@ -1,0 +1,13 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+pkglibdir=${libdir}/kvalobs
+includedir=@includedir@
+idldir=@datadir@/@PACKAGE@/idl
+
+Name: kvcpp
+Description: Client library for Kvalobs
+Version: @VERSION@
+Requires: puTools >= 3.3.0, omniDynamic4
+Libs: -L${libdir} -lkvalobs2_kvcpp
+Cflags: -D_REENTRANT -I${includedir}/@PACKAGE@ -I${includedir}/@PACKAGE@/kvskel -I${includedir}/@PACKAGE@/decoder

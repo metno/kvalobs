@@ -1,0 +1,18 @@
+#ifndef __KeyVal_idl__
+#define __KeyVal_idl__
+
+//KeyVal is a utility to send information on the form key=value.
+//It is put in the micutil (Meteorological Institute CORBA utility) module.
+
+
+module micutil {
+  struct KeyVal{
+    string key;
+    string val;
+  };
+
+  typedef sequence<KeyVal> KeyValList;
+};
+
+#endif
+  

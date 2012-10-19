@@ -1,0 +1,15 @@
+#ifndef __kvHintSubsriber_h__
+#define __kvHintSubsriber_h__
+
+#include "kvServiceCommon.idl"
+
+module CKvalObs{
+  module CService{
+    interface kvHintSubscriber{
+      void kvUp();
+      void kvDown();
+    };  
+  };
+};
+
+#endif

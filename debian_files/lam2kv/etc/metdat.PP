@@ -1,0 +1,120 @@
+*** metdat.lam  ('metdat.input')
+***
+*=> Meteogram data from DNMI LAM's, 3 hour timestep.
+*=>
+*=> Environment var:
+*=>  none
+*=> Command format:
+*=>  metdat metdat.lam stations.list felt.dat +0,+48 1234  LAMxx  met.dat
+*=>                  <position_file> <input> <prog> <grid> <text> <output>
+***
+***---------------------------------------------------------------------
+**
+** Options:
+** --------
+** FILE=<output_file>
+** FORMAT.STANDARD ................................ (default)
+** FORMAT.SWAP
+** FORMAT.PC
+** FORMAT.IBM
+** POSITIONS.HERE ................................. (default)
+** POSITIONS.FILE=<file>
+** GRID=<producer,grid>
+** PROG_LIMIT=<min_prog_hour,max_prog_hour> ..... (default = no limit)
+** INTERP.BESSEL
+** INTERP.BILINEAR ................................ (default)
+** INTERP.NEAREST
+** PRINT_POS
+** PRINT_DATA_IN
+** PRINT_DATA_OUT
+** PRINT_DATA_EXTRA
+** INFO.OFF
+** INFO.ON ........................................ (default)
+** INFO.MAX
+** END
+**
+**++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+** Options    Remember '......' syntax.
+** ($... = environment var. ; #n = coomand line arg. no. n)
+*>
+'FILE= #7'               <<< 'FILE= met.dat'
+'FORMAT.STANDARD'
+'POSITIONS.FILE= #2'     <<< 'POSITIONS.FILE= stations.list'
+'GRID= 88,#5'            <<< 'GRID= 88,1814'
+'PROG_LIMIT= #4'         <<< 'PROG_LIMIT= +0,+48'
+'INTERP.BILINEAR'
+'END'
+**++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+**
+** 'file': 'file.dat' -  file name
+**         '$.....'   -  environment var.
+**         '#n'       -  command line argument no. n
+**         '='        -  same file as previous timestep
+**
+** no. of timesteps
+*> each timestep: 'file',data_type,forecast_length_hour
+3
+'#3',2,3,'=',2,6,'=',2,9,        
+**
+** 'code':  '='          : no special treatment
+**          '0.AT+0'     : not reading field at +0 forecast, value=0.
+**          'PRECIP.MI'  : MI precipitation, accum. between timesteps
+**          'PRECIP.EC'  : EC precipitation, accum from +0.
+**          'T(K)->T(C)' : Temperature from Kelvin to Celsius
+**          'U->U.EW(K)' : U(x) or U(e/w) in m/s to U(e/w) in knots
+**          'V->V.NS(K)' : V(y) or V(n/s) in m/s to V(n/s) in knots
+**          'U->U.EW'    : U(x) or U(e/w) to U(e/w) (no scaling)
+**          'V->V.NS'    : V(y) or V(n/s) to V(n/s) (no scaling)
+**          'U->DD'      : U(x) or U(e/w) to DD (direction)
+**          'V->FF'      : V(y) or V(n/s) to FF (speed), no scaling
+**          'V->FF(K)'   : V(y) or V(n/s) to FF (speed), m/s to knots
+**         'T(K)->T(C)'   : Temperature from Kelvin to Celsius
+**         'TD(K)->TD(C)' : Temperature from Kelvin to Celsius
+**         'RH+T->TD(C)'  : relative humidity (%) to Td(Celsius)
+**         'RH+T->TD.ICE(C)': relative humidity (%) to Td(Celsius) ICE table
+**         'TD+T->RH'     : Temp. and dew point to relative humidity (%)
+**          'ZERO'       : Make a dummy parameter, always 0.
+**
+** No. of parameters
+*> each parameter: vertical_coord,parameter,lvl_1,lvl_2,'code(s)', scale
+1
+2,58,1000,0, 'make.increments param=21 ', -1    <-- TRYKKTENDENS
+**
+** For extra parameters (not time dependant):
+** 'code':  '='          : no special treatment (field is read)
+**          'G.LAT'      : compute and store geographic latitude
+**          'G.LONG'     : compute and store geographic longitude
+**
+** No. of extra parameters (not time dependant)
+** each parameter: 'file(*)', data_type,forecast_length,
+*>                  vertical_coord,parameter,level_1,level_2,code,scale
+3                            <-- Antall 'ekstra' parametre
+'*', 0,0,0, -1,0000,0,'G.LAT', -2  <-- Lagrer geografisk bredde
+'*', 0,0,0, -2,0000,0,'G.LONG',-2  <-- Lagrer geografisk lengde
+'#3',4,0,2,101,1000,0,'=',     0  <-- Interpolerer og lagrer topografi
+**
+** No. of text lines     .... max 10 lines
+*> 'text_line(s)'        .... may include '$...' or '#n' variables
+2
+'METEOGRAM --- DNMI #6 :S:'
+'Temperatur-prog. ikke korrigert :S:'
+**
+** When 'POSITIONS.FILE=.....' : positions in separate file
+**
+**----------------------------
+** When 'POSITIONS.HERE' :
+**
+** pos_type:  1 : pos_1,pos_2  - grid  i,j  (integer)
+**            2 : pos_1,pos_2  - grid  x,y  (real)
+**            3 : pos_1,pos_2  - geographic latitude,longitude (real)
+**            4 : pos_1,pos_2  - geographic latitude,longitude
+**                                          as degrees*100+minutes
+**            0 : pos_1,pos_2  - end_of_list
+**
+** pos_type, pos_1, pos_2, 'name'
+**
+**----------------------------------------------------------------------
+
+
+
+

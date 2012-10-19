@@ -1,0 +1,42 @@
+#! /bin/sh
+
+DESTINATION=
+DIRECTORIES="bin cronjob share/cronjob"
+FILES=
+
+
+#Prepare the install
+
+MYBIN="bin"
+CRONBIN="cronjob"
+TEMPLATEDIR="share/cronjob"
+
+if ! mkdir -p "$MYBIN" ; then
+   echo "Cant create directory `pwd`/$MYBIN"
+   exit 1
+fi
+
+if ! mkdir -p "$CRONBIN" ; then
+   echo "Cant create directory `pwd`/$CRONBIN"
+   exit 1
+fi
+
+if ! mkdir -p "$TEMPLATEDIR" ; then
+	echo "Cant create directory `pwd`/$TEMPLATEDIR"
+   	exit 1
+fi
+
+cp -upfv kvstart "$MYBIN"
+cp -upfv kvstop "$MYBIN"
+cp -upfv start_postgres "$MYBIN"
+cp -upfv stop_postgres "$MYBIN"
+cp -upfv check_kvsynopd.sh  "$MYBIN"
+cp -upfv kvcron.template "$TEMPLATEDIR"
+cp -upfv qabase_cron.template "$TEMPLATEDIR"
+cp -upfv save_last_month "$MYBIN"
+
+chmod -Rf +x $MYBIN
+
+
+#Do the install
+. $KVDIR/conf/INSTALL.conf

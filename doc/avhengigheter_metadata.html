@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Avhengigheter metadata</title>
+</head>
+<body>
+<big><span style="font-weight: bold;"></span></big>
+<h1><big><span style="font-weight: bold;">Avhengigheter av metadata</span></big></h1>
+<h2>Logiske avhengigheter av metadata<br>
+</h2>
+<big><span style="font-weight: bold;"></span><small>Tabellene i kvalobs
+er ikke uavhengige av hverandre.<br>
+Det er 6 tabeller som er helt uavhengige:<br>
+<br>
+station<br>
+types<br>
+param<br>
+model<br>
+qcx_info<br>
+algorithms<br>
+<br>
+Tabellen </small></big><big><small>
+obs_pgm er </small></big><big><small>avhengig av </small></big><big><small>station,
+</small></big>p<big><small>aram og types.<br>
+</small></big><big><small>Tabellen station_param er
+avhengig av </small></big><big><small> </small></big><big><small>station,
+</small></big>p<big><small>aram, </small></big><big><small>o</small></big><big><small>bs_pgm</small></big>
+og <big><small>qcx_info.</small></big> <br>
+<big><small>Tabellen checks er
+avhengig av </small></big><big><small> </small></big><big><small>station,
+</small></big>p<big><small>aram, </small></big><big><small>o</small></big><big><small>bs_pgm</small></big>,
+<big><small>qcx_info og </small></big><big><small>
+algorithms</small></big><br>
+Egentlig har tabellen checks p&aring; grunn av checksignature avhengig
+av n&aelig;r sagt hva son helst avhengig av hvordan en kan redefinere
+signaturen. Per i dag s&aring; har checks p&aring; grunn av
+checksignature definisjonen avhengigheter til tabellen model direkte (
+i tillegg til de andre avhengighetene).<br>
+<br>
+<h2><big><span style="font-weight: bold;">Installeringsavhengigheter av
+metadata</span></big></h2>
+<big><small>Dette er en delmengde av de faktiske avhengighetene. <br>
+<br>
+Kolonnen </small></big>checksignature
+i tabellen checks
+brukes ikke til &aring; styre avhengigheter til systemet ved
+installering av
+metadata.<big><small><br>
+</small></big><big><small><br>
+Tabellen obs_pgm er </small></big><big><small>under
+installeringen</small></big><big><small> uavhengig av station, param og
+types. Under
+installeringen er den behandlet som en uavhengig tabell.<br>
+</small></big><br>
+De scriptene som er koblet til station_param_auto er avhengige av
+station, param og obs_pgm under installeringen. Disse scriptene er
+run_QCX script og er per i dag run_QC1-1, run_QC1-3 og run_QC1-4.<br>
+<br>
+Scriptet checks_auto ( i cvs checks_auto.pl )&nbsp; er avhengig av
+den delmengden av station_param tabellen som er generert av det
+tilsvarende station_param_auto scriptet, i tillegg kommer en
+avhengighet til parametertabellen direkte.&nbsp; Denne avhengigheten
+skjer ved at metadataene til
+checks_auto genereres automatisk ved hjelp av et template og det
+som finnes av parametere i station_param for den tilsvarende checken (
+eks. QC1-1 ).&nbsp; Eksempel p&aring; dette er avhengigheen mellom
+scriptet checks_auto kj&oslash;rt med argumentet <span
+ style="font-style: italic;">QC1-1_checks</span> og de metadataene i
+tabellen station_param generert ved hjelp av scriptet run_QC1-1 (med
+argumentet <span style="font-style: italic;">all</span>).<br>
+Indirekte blir ogs&aring;
+ogs&aring; scriptet checks_auto avhengig av det samme som for
+station_param_auto scriptene, nemlig station, param og obs_pgm under
+installeringen.<br>
+<br>
+Station_param_manual og checks_manual er ikke avhengig av disse
+konsistenssjekkene.<br>
+<br>
+Enkelte checker er puttet inn med stationid i checks_manual, men det
+eksisterer ingen konsistenssjekk der og derfor ingen avhengigheter til
+tabellen station under installeringen.<br>
+<br>
+Dette betyr at hver gang <big><small> </small></big><big><small> </small></big><big><small>station,
+</small></big>p<big><small>aram eller </small></big><big><small>o</small></big><big><small>bs_pgm</small></big>
+oppdateres s&aring; m&aring; checks_auto og station_param_auto
+oppdateres.<br>
+<br>
+Eks. p&aring; konsekvenser og feilsituasjoner som kan oppst&aring; og
+som m&aring; h&aring;ndteres.<br>
+1. En oppdaterer station_param_auto slik som for QC1-1 uten &aring;
+samtidig kj&oslash;re det tilsvarende checks scriptet.<br>
+<br>
+2. En oppdaterer obs_pgm og kj&oslash;rer run_metadata. Det er en feil
+og tabellen obs_pgm er tom.<br>
+&nbsp;&nbsp;&nbsp; En reparerer feilen og tenker at en bare trenger
+&aring; kj&oslash;re run_obs_pgm, men der tar en feil. Den forrige gale
+utgaven av obs_pgm har p&aring;virket innholdet i blant annet
+station_param tabellen direkte. Kj&oslash;rer en bare obs_pgm s&aring;
+blir QC1-1 st&aring;ende uten stasjonsavhengige grenser. Dette kan
+ogs&aring; forplante seg til QC1-1 checker. Tilsvarende problemer med
+f&oslash;lgefeil f&aring;r en for feil i tabellene station og param.<br>
+<br>
+<br>
+<big><small></small></big>
+</body>
+</html>

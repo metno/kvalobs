@@ -1,0 +1,24 @@
+#ifndef __kvDataSubscriber_h__
+#define __kvDataSubscriber_h__
+
+#include "kvServiceCommon.idl"
+
+module CKvalObs{
+  module CService{
+    interface kvDataSubscriber{
+      void callback(in ObsDataList obsDataList_); 
+    };  
+    
+    /**
+     * @return true if more data is accepted and 
+     *         false if we are about to shutdown 
+     *         or an error in the client has occured.
+     */
+    interface kvDataSubscriberExt{
+      boolean callback(in ObsDataList obsDataList_, in SubscribeId subid); 
+    };  
+    
+  };
+};
+
+#endif

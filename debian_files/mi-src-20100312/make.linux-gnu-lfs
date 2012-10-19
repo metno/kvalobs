@@ -1,0 +1,14 @@
+#
+BINDIR=../../bin-lfs
+LIBDIR=../../lib-lfs
+
+FC= g77
+CXX= g++
+
+FCFLAGS=-O2 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE
+CXXFLAGS=-O2 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE
+LDFLAGS=
+LIBS=-L$(LIBDIR) -lmi
+
+V5DINC=/usr/local/include/vis5d+
+V5DLIB=-L/usr/local/lib -lv5d
