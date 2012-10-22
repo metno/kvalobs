@@ -69,6 +69,10 @@ DataUpdateTransaction(const DataUpdateTransaction &dut )
 {
 }
 
+DataUpdateTransaction::
+~DataUpdateTransaction()
+{
+}
 
 void
 DataUpdateTransaction::

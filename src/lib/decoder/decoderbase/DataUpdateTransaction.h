@@ -147,6 +147,7 @@ public:
                           const std::string &logid );
    DataUpdateTransaction(const DataUpdateTransaction &dut );
 
+   virtual ~DataUpdateTransaction();
    virtual bool operator()(dnmi::db::Connection *conection);
    virtual void onAbort( const std::string &driverid,
                          const std::string &errorMessage,
