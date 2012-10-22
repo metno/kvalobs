@@ -5,7 +5,6 @@ SUBDIRS = \
 	kvDataInputd \
 	kvServiced \
 	kvServiced/test \
-	kvQabased_old \
 	kvQabased \
 	kvManagerd \
 	model2kv \

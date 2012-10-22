@@ -60,7 +60,6 @@ AC_CONFIG_FILES([Makefile
                  src/kvDataInputd/Makefile
                  src/kvServiced/test/Makefile
                  src/kvServiced/Makefile
-                 src/kvQabased_old/Makefile
                  src/kvQabased/Makefile
                  src/kvManagerd/Makefile
                  src/model2kv/Makefile
