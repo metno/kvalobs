@@ -35,6 +35,7 @@
 #include <boost/lexical_cast.hpp>
 #include <puTools/miTime.h>
 #include <miutil/commastring.h>
+#include <miutil/trimstr.h>
 #include <milog/milog.h>
 #include "convert.h"
 #include "autoobsdecoder.h"
@@ -51,9 +52,9 @@ AutoObsDecoder(
 	dnmi::db::Connection   &con,
    const ParamList        &params,
    const std::list<kvalobs::kvTypes> &typeList,
-   const miutil::miString &obsType,
-   const miutil::miString &obs, 
-   int                    decoderId)
+   const std::string &obsType,
+   const std::string &obs,
+   int               decoderId)
   	:DecoderBase(con, params, typeList, obsType, obs, decoderId),
     checkRet(0)
 {
@@ -64,7 +65,7 @@ AutoObsDecoder::
 {
 }
 
-miutil::miString 
+std::string
 AutoObsDecoder::
 name() const
 {
@@ -118,12 +119,12 @@ getMetaSaSdEmEi( int stationid, int typeid_, const miutil::miTime &obstime )
 
 long 
 AutoObsDecoder::
-getStationId(miutil::miString &msg)
+getStationId(std::string &msg)
 {
-   miString keyval;
-   miString key;
-   miString val;
-   miString::size_type i;
+   string keyval;
+   string key;
+   string val;
+   string::size_type i;
    CommaString cstr(obsType, '/');
    long  id;
 
@@ -139,7 +140,7 @@ getStationId(miutil::miString &msg)
     
    i = keyval.find('=');
   
-   if (i == miString::npos) {
+   if (i == string::npos) {
 		msg = "obsType: <id> Invalid format!";
 		return 0;
    }
@@ -147,8 +148,8 @@ getStationId(miutil::miString &msg)
    key = keyval.substr(0, i);
    val = keyval.substr(i + 1);
     
-   val.trim();
-   key.trim();
+   trimstr( val );
+   trimstr( key );
     
    if (key.empty() || val.empty()) {
 		msg = "obsType: Invalid format!";
@@ -179,7 +180,7 @@ getStationId(miutil::miString &msg)
 
 long 
 AutoObsDecoder::
-getTypeId(miutil::miString &msg)
+getTypeId(std::string &msg)
 {
 	string keyval;
    string key;
@@ -278,7 +279,7 @@ checkObservationTime(int typeId,
  */
 kvalobs::decoder::DecoderBase::DecodeResult
 AutoObsDecoder::
-execute(miutil::miString &msg)
+execute(std::string &msg)
 {
   	const int             VISUEL_TYPEID=6;
   	const int             AWS_TYPEID=3;
@@ -371,7 +372,7 @@ execute(miutil::miString &msg)
   	LOGINFO("Decoder: " << name() << ". New observation: stationid=" << stationid << " typeid: " << typeId << endl);
   	IDLOGINFO( logid, "New observation.");
 
-  	obs.trim();
+  	trimstr( obs );
   	obs += "\n";
   
   	istringstream istr(obs);

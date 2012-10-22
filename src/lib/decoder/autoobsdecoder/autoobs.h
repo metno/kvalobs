@@ -47,12 +47,12 @@ extern "C" {
 		 const ParamList &params,
 		 const std::list<kvalobs::kvTypes> &typeList,
 		 int   decoderId_,
-		 const miutil::miString &observationType_,
-		 const miutil::miString &observation_);
+		 const std::string &observationType_,
+		 const std::string &observation_);
 
   void releaseDecoder(kvalobs::decoder::DecoderBase* decoder);
 
-  std::list<miutil::miString> getObsTypes();
+  std::list<std::string> getObsTypes();
 }  
 
 /** @} */

@@ -18,8 +18,8 @@ public:
    MOCK_METHOD1( smsfactory, SmsBase * (int smscode) );
    MOCK_METHOD2(getStationid, long (long obsid, bool isWmono) );
    MOCK_METHOD3(  getMetaSaSdEm, std::string ( int stationid, int typeid_, const miutil::miTime &obstime ) );
-   MOCK_CONST_METHOD0(  name(), miutil::miString () );
-   MOCK_METHOD1( execute, DecodeResult (miutil::miString &msg) );
+   MOCK_CONST_METHOD0(  name(), std::string () );
+   MOCK_METHOD1( execute, DecodeResult (std::string &msg) );
    void setDefaultActions()
    {
       using namespace testing;

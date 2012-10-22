@@ -60,9 +60,9 @@ SynopDecoder::SynopDecoder(
       dnmi::db::Connection   &con,
       const ParamList        &params,
       const std::list<kvalobs::kvTypes> &typeList,
-      const miutil::miString &obsType,
-      const miutil::miString &obs,
-      int                    decoderId)
+      const std::string &obsType,
+      const std::string &obs,
+      int               decoderId)
 :DecoderBase(con, params, typeList, obsType, obs, decoderId)
 {
 }
@@ -71,14 +71,14 @@ SynopDecoder::~SynopDecoder()
 {
 }
 
-miutil::miString 
+std::string
 SynopDecoder::name() const
 {
    return "SynopDecoder";
 }
 
 long 
-SynopDecoder::getStationId(miutil::miString & msg)
+SynopDecoder::getStationId(std::string & msg)
 {
 }
 
@@ -206,7 +206,7 @@ writeObsToLog(const std::string &obs)
 }
 
 kvalobs::decoder::DecoderBase::DecodeResult 
-SynopDecoder::execute(miutil::miString &msg)
+SynopDecoder::execute( std::string &msg)
 {
    kvalobs::kvStation       tstat;
 

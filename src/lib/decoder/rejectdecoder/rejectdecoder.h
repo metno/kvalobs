@@ -18,16 +18,16 @@
   modify it under the terms of the GNU General Public License as 
   published by the Free Software Foundation; either version 2 
   of the License, or (at your option) any later version.
-  
+
   KVALOBS is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License along 
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ */
 #ifndef __kvalobs_decoder_rejectdecoder_h__
 #define __kvalobs_decoder_rejectdecoder_h__
 
@@ -37,49 +37,49 @@
 
 
 namespace kvalobs{
-  namespace decoder{
-    namespace rejectdecoder{
-      
-      /**
-       * \addtogroup rejectdecode
-       *
-       * @{
-       */
+namespace decoder{
+namespace rejectdecoder{
 
-      typedef boost::mutex::scoped_lock    Lock;
-      
-      /**
-       * \brief implements the interface  DecoderBase.
-       *
-       * This is a decoder for rejected messages.
-       */
-      class RejectDecoder : public DecoderBase{
-	RejectDecoder();
-	RejectDecoder(const RejectDecoder &);
-	RejectDecoder& operator=(const RejectDecoder &);
-	
-      protected:
-	bool doDecode(const std::string &message, 
-		      kvalobs::kvRejectdecode &reject);
+/**
+ * \addtogroup rejectdecode
+ *
+ * @{
+ */
 
-      public:
-	RejectDecoder(dnmi::db::Connection     &con,
-		     const ParamList        &params,
-		     const std::list<kvalobs::kvTypes> &typeList,
-		     const miutil::miString &obsType,
-		     const miutil::miString &obs, 
-		     int                    decoderId=-1);
-	
-	virtual ~RejectDecoder();
-	
-	virtual miutil::miString name()const;
-	
-	virtual DecodeResult execute(miutil::miString &msg);
-      };
-      
-      /** @} */
-    }
-  }
+typedef boost::mutex::scoped_lock    Lock;
+
+/**
+ * \brief implements the interface  DecoderBase.
+ *
+ * This is a decoder for rejected messages.
+ */
+class RejectDecoder : public DecoderBase{
+   RejectDecoder();
+   RejectDecoder(const RejectDecoder &);
+   RejectDecoder& operator=(const RejectDecoder &);
+
+protected:
+   bool doDecode(const std::string &message,
+                 kvalobs::kvRejectdecode &reject);
+
+public:
+   RejectDecoder(dnmi::db::Connection     &con,
+                 const ParamList        &params,
+                 const std::list<kvalobs::kvTypes> &typeList,
+                 const std::string &obsType,
+                 const std::string &obs,
+                 int                    decoderId=-1);
+
+   virtual ~RejectDecoder();
+
+   virtual std::string name()const;
+
+   virtual DecodeResult execute(std::string &msg);
+};
+
+/** @} */
+}
+}
 }
 
 #endif

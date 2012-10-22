@@ -21,8 +21,8 @@ public:
    FakeComobsDecoder(dnmi::db::Connection     &con,
                      const ParamList        &params,
                      const std::list<kvalobs::kvTypes> &typeList,
-                     const miutil::miString &obsType,
-                     const miutil::miString &obs,
+                     const std::string &obsType,
+                     const std::string &obs,
                      int                    decoderId=-1);
 
    kvalobs::decoder::comobsdecoder::SmsBase *smsfactory(int smscode);
@@ -31,9 +31,9 @@ public:
    void setSaSdEm(const std::string saSdEm_ ){ saSdEm = saSdEm_; }
    std::string getMetaSaSdEm( int stationid, int typeid_, const miutil::miTime &obstime );
 
-   virtual miutil::miString name()const;
+   virtual std::string name()const;
 
-   virtual kvalobs::decoder::DecoderBase::DecodeResult execute(miutil::miString &msg);
+   virtual kvalobs::decoder::DecoderBase::DecodeResult execute(std::string &msg);
 
 };
 

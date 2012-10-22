@@ -18,40 +18,40 @@
   modify it under the terms of the GNU General Public License as 
   published by the Free Software Foundation; either version 2 
   of the License, or (at your option) any later version.
-  
+
   KVALOBS is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License along 
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ */
 #ifndef __kvalobs_decoder_comobs_ConfInfo12_h__
 #define __kvalobs_decoder_comobs_ConfInfo12_h__
 
 #include <decoderbase/ConfParser.h>
 
 namespace kvalobs{
-  namespace decoder{
-    namespace comobsdecoder{
-      
-      class ConfInfo12 : public kvalobs::decoder::ConfParser{
-	int tr_[24];
+namespace decoder{
+namespace comobsdecoder{
 
-	void doPrecip(miutil::conf::ConfSection &sect);
-      public:
-	ConfInfo12();
+class ConfInfo12 : public kvalobs::decoder::ConfParser{
+   int tr_[24];
 
-	void parse(miutil::conf::ConfSection &conf);
-	
-	int tr(int hour);
-	
-	
-      };
-    }
-  }
+   void doPrecip(miutil::conf::ConfSection &sect);
+public:
+   ConfInfo12();
+
+   void parse(miutil::conf::ConfSection &conf);
+
+   int tr(int hour);
+
+
+};
+}
+}
 }
 
 #endif

@@ -51,8 +51,8 @@ ComObsDecoder(
       dnmi::db::Connection   &con,
       const ParamList        &params,
       const std::list<kvalobs::kvTypes> &typeList,
-      const miutil::miString &obsType,
-      const miutil::miString &obs,
+      const std::string &obsType,
+      const std::string &obs,
       int                    decoderId)
 :DecoderBase(con, params, typeList, obsType, obs, decoderId)
 {
@@ -64,7 +64,7 @@ ComObsDecoder::
 {
 }
 
-miutil::miString 
+std::string
 kvalobs::decoder::comobsdecoder::
 ComObsDecoder::
 name() const
@@ -156,7 +156,7 @@ getMetaSaSdEm( int stationid, int typeid_, const miutil::miTime &obstime )
 kvalobs::decoder::DecoderBase::DecodeResult 
 kvalobs::decoder::comobsdecoder::
 ComObsDecoder::
-execute(miutil::miString &msg)
+execute(std::string &msg)
 {
    SmsMeldingParser mParser;
    SmsMelding       *smsMelding;

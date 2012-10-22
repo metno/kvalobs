@@ -86,7 +86,7 @@ namespace {
 
   void dummyFunc3(){
     decodeutility::kvdataformatter::kvDataList dummy;
-    miutil::miString    dummy1;
+    std::string    dummy1;
 
     dummy=decodeutility::kvdataformatter::getKvData(dummy1);
   }

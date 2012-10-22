@@ -31,13 +31,14 @@
 #ifndef __dnmi_decoder_DecoderMgr_h__
 #define __dnmi_decoder_DecoderMgr_h__
 
-#include <puTools/miString.h>
+#include <list>
+#include <string>
 #include <kvdb/kvdb.h>
 #include <fileutil/dso.h>
 #include <decoderbase/decoder.h>
 #include <kvalobs/kvTypes.h>
 #include <boost/noncopyable.hpp>
-#include <list>
+
 
 /**
 * \addtogroup kvdecoder
@@ -52,15 +53,15 @@ extern "C" {
            const ParamList &params,
            const std::list<kvalobs::kvTypes> &typeList,
            int   decoderId_,
-           const miutil::miString &observationType_,
-           const miutil::miString &observation_
+           const std::string &observationType_,
+           const std::string &observation_
            );
 
 typedef void (*releaseDecoderFunc)(
                kvalobs::decoder::DecoderBase* decoder
                );
 
-typedef std::list<miutil::miString> (*getObsTypes)();
+typedef std::list<std::string> (*getObsTypes)();
 }
 
 namespace kvalobs{
@@ -77,7 +78,7 @@ class DecoderMgr{
       time_t             modTime;
       int                decoderCount;
       int                decoderId;
-      std::list<miutil::miString> obsTypes;
+      std::list<std::string> obsTypes;
 
 
       DecoderItem(decoderFactory     factory_,
@@ -100,17 +101,17 @@ class DecoderMgr{
    typedef std::list<DecoderItem*>::const_iterator CIDecoderList;
 
    DecoderList      decoders;
-   miutil::miString decoderPath;
+   std::string decoderPath;
    std::string soVersion;
 
 public:
-   DecoderMgr(const miutil::miString &decoderPath_);
+   DecoderMgr(const std::string &decoderPath_);
    DecoderMgr(){};
    ~DecoderMgr();
 
    std::string fixDecoderName( const std::string &driver );
 
-   void setDecoderPath(const miutil::miString &decoderPath_);
+   void setDecoderPath(const std::string &decoderPath_);
 
 
    /**
@@ -123,9 +124,9 @@ public:
    DecoderBase *findDecoder(dnmi::db::Connection   &connection,
                             const ParamList        &params,
                             const std::list<kvalobs::kvTypes> &typeList,
-                            const miutil::miString &obsType,
-                            const miutil::miString &obs,
-                            miutil::miString &errorMsg);
+                            const std::string &obsType,
+                            const std::string &obs,
+                            std::string &errorMsg);
 
    void releaseDecoder(DecoderBase *dec);
 

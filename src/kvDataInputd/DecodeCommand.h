@@ -33,7 +33,6 @@
 
 #include <dnmithread/CommandQue.h>
 #include <decoderbase/decoder.h>
-#include <puTools/miString.h>
 
 
 /**
@@ -53,7 +52,7 @@ class DecodeCommand : public dnmi::thread::CommandBase{
 
   kvalobs::decoder::DecoderBase  *decoder;
   kvalobs::decoder::DecoderBase::DecodeResult result;
-  miutil::miString               msg;
+  std::string               msg;
   dnmi::thread::CommandQue       resQue;
   
   
@@ -67,7 +66,7 @@ class DecodeCommand : public dnmi::thread::CommandBase{
  public:
   kvalobs::decoder::DecoderBase::DecodeResult getResult()const{ return result;}
   
-  miutil::miString getMsg()const{ return msg;}
+  std::string getMsg()const{ return msg;}
 
   kvalobs::kvStationInfoList& getInfoList();
 

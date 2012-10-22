@@ -39,8 +39,8 @@ decoderFactory(dnmi::db::Connection &con,
 	       const ParamList      &params,
 	       const std::list<kvalobs::kvTypes> &typeList,
 	       int   decoderId,
-	       const miutil::miString &obsType,
-	       const miutil::miString &obs)
+	       const std::string &obsType,
+	       const std::string &obs)
 {
   AutoObsDecoder *dec;
 
@@ -61,10 +61,10 @@ releaseDecoder(kvalobs::decoder::DecoderBase* decoder)
 }
 
 
-std::list<miutil::miString> 
+std::list<std::string>
 getObsTypes()
 {
-  std::list<miutil::miString> list;
+  std::list<std::string> list;
 
   list.push_back("autoobs");
 

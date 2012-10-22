@@ -42,8 +42,8 @@ RejectDecoder::RejectDecoder(
     dnmi::db::Connection   &con,
     const ParamList        &params,
     const std::list<kvalobs::kvTypes> &typeList,
-    const miutil::miString &obsType,
-    const miutil::miString &obs, 
+    const std::string &obsType,
+    const std::string &obs,
     int                    decoderId)
     :DecoderBase(con, params, typeList, obsType, obs, decoderId)
 {
@@ -54,7 +54,7 @@ RejectDecoder::~RejectDecoder()
 {
 }
 
-miutil::miString 
+std::string
 kvalobs::decoder::rejectdecoder::
 RejectDecoder::name() const
 {
@@ -95,7 +95,7 @@ RejectDecoder::doDecode(const std::string &message,
 
 kvalobs::decoder::DecoderBase::DecodeResult 
 kvalobs::decoder::rejectdecoder::
-RejectDecoder::execute(miutil::miString &msg)
+RejectDecoder::execute(std::string &msg)
 {
   kvRejectdecode rejected;
   milog::LogContext lcontext(name());

@@ -18,165 +18,165 @@
   modify it under the terms of the GNU General Public License as 
   published by the Free Software Foundation; either version 2 
   of the License, or (at your option) any later version.
-  
+
   KVALOBS is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License along 
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ */
 #ifndef __DSO_H__
 #define __DSO_H__
 
 #include <string>
 
 namespace dnmi{
-  namespace file{
+namespace file{
 
-    /**
-     * \addtogroup fileutil
-     *
-     * @{
-     */
+/**
+ * \addtogroup fileutil
+ *
+ * @{
+ */
 
-      class DSOException : public std::exception{
-	std::string reason;
-      public:
-	  DSOException(const std::string &reason_):reason(reason_){
-	  }
-	  ~DSOException()throw(){}
-	  
-	  const char *what()const throw(){ return reason.c_str();}
-      };
+class DSOException : public std::exception{
+   std::string reason;
+public:
+   DSOException(const std::string &reason_):reason(reason_){
+   }
+   ~DSOException()throw(){}
 
-    /**
-     * \brief DSO (Dynamic Shared Object).
-     *
-     * Klassen brukes for å laste i shared objekt  dynamisk under 
-     * programkjøring. Det kan bare være et shared objekt assossiert
-     * med en instance av DSO over objektets levetid.
-     *
-     * \code
-      Eks på bruk:
+   const char *what()const throw(){ return reason.c_str();}
+};
+
+/**
+ * \brief DSO (Dynamic Shared Object).
+ *
+ * Klassen brukes for ï¿½ laste i shared objekt  dynamisk under
+ * programkjï¿½ring. Det kan bare vï¿½re et shared objekt assossiert
+ * med en instance av DSO over objektets levetid.
+ *
+ * \code
+      Eks pï¿½ bruk:
           Anta vi har en shared objekt file med navnet my_dso.so.
           Filen har definert en funksjone   void func(int)
-     
+
        void (*f)(int);
-     
+
        try{
          DSO dso("my_dso.so");
-     
+
          //Laster inn func
          f=dso["func"];
-     
-         //Kan nå bruke func.
+
+         //Kan nï¿½ bruke func.
          f(19);
        }catch(const DSOException &e){
          std::cerr << "DSO: problemer <grunn: " << e << ">\n";
        }
-       
+
        //Vi kan ikke bruke f her da det my_dso automatisk lukkes
-       //når dso går ut av scope.
+       //nï¿½r dso gï¿½r ut av scope.
        \endcode
-     */
-          
-    class DSO{
-      DSO(const DSO &);
-      DSO& operator=(const DSO &);
+ */
 
-      void *handle;
-      std::string dsofile;
-      
-    public:
-      
-      /**
-       * Default konstruktor. Laster ingen fil.
-       */
-      DSO():handle(0)
-	{
-	}
-      
-      /**
-       * \brief Konstruktor som laster dsoFile. 
-       * 
-       * Flagget resolveNow bestemmer om  alle eksterne referanser blir
-       * løst nå eller ved første gangs bruk.
-       *
-       * \param dsoFile navnet på det dynamisk lastbare objektet vi ønsker
-       *                å laste. Dette inkluderer også en path.
-       * \param resolveNow Skal vi løse ut alle eksterne referanser med 
-       *                   en gang eller vente.
-       * \exception DSOException Hvis filen dsoFile ikke finnes eller
-       *            det oppstår andre feil under lastingen av dsoFileen
-       *            vil det bli gitt DSOException.
-       * \see DLOPEN(3)
-       */
-      
-      DSO(const std::string &dsoFile, bool resolveNow=true);
-      
-      /**
-       * \brief Destruktoren lukker det dynamisk lastbare objektet. 
-       *
-       * Alle referanser til objektet vil være udefinert. Bruk av 
-       * klasser/funksjoner som er lastet via denne instansen vil 
-       * sannsynligvis føre til segmentation fault.
-       */
-      virtual ~DSO();
-      
-      /**
-       * \brief Prøver å laste dsoFile. 
-       *
-       * Hvis det allerede er assosiert en dso fil til denne instansen
-       * vil vi få DSOException.
-       *
-       * \param dsoFile dsoFilen vi ønsker å laste.
-       * \param resolveNow Når skal vi løse ut eksterne referanser i dsoFilen.
-       * \exception DSOException Hvis filen ikke finnes, det oppstår 
-       *            problemer med å laste dsoFile 
-       *            eller denne instansen representerer allerede en dsoFile.
-       */
-      void  load(const std::string &dsoFile, bool resolveNow=true);
+class DSO{
+   DSO(const DSO &);
+   DSO& operator=(const DSO &);
 
-      /**
-       * \brief isValid kan kalles for å sjekke om instansen representerer en
-       * gyldig dsoFile.
-       *
-       * \return true hvis instansen rtepresenterer en gyldig dsoFile. False
-       *         ellers.
-       */
-      bool  isValid()const { return handle!=0;}
+   void *handle;
+   std::string dsofile;
 
- 
-      /**
-       * \brief returner navnet på DSO filen denne instansen representerer.
-       */
-      std::string getDsofile()const { return dsofile;}
+public:
 
-      /**
-       * \brief getLastError returnerer siste feil som har oppstått ved bruk
-       * av dsoFile.
-       *
-       * \return en error streng.
-       */
-      std::string getLastError();
+   /**
+    * Default konstruktor. Laster ingen fil.
+    */
+   DSO():handle(0)
+   {
+   }
 
-      /**
-       * \brief Denne operatoren kan brukes for å finne symboler i dsoFilen.
-       *
-       * \param name Symbolet vi ønsker en referanse til.
-       * \exception DSOException blir gitt dersom symbolet name
-       *            ikke kan finnes i filen eller annen feil oppstår.
-       *
-       * \see DLSYM(3)
-       */
-      void* operator[](const std::string &name);
-    };
-    
-    /** @} */
-  };
+   /**
+    * \brief Konstruktor som laster dsoFile.
+    *
+    * Flagget resolveNow bestemmer om  alle eksterne referanser blir
+    * lï¿½st nï¿½ eller ved fï¿½rste gangs bruk.
+    *
+    * \param dsoFile navnet pï¿½ det dynamisk lastbare objektet vi ï¿½nsker
+    *                ï¿½ laste. Dette inkluderer ogsï¿½ en path.
+    * \param resolveNow Skal vi lï¿½se ut alle eksterne referanser med
+    *                   en gang eller vente.
+    * \exception DSOException Hvis filen dsoFile ikke finnes eller
+    *            det oppstï¿½r andre feil under lastingen av dsoFileen
+    *            vil det bli gitt DSOException.
+    * \see DLOPEN(3)
+    */
+
+   DSO(const std::string &dsoFile, bool resolveNow=true);
+
+   /**
+    * \brief Destruktoren lukker det dynamisk lastbare objektet.
+    *
+    * Alle referanser til objektet vil vï¿½re udefinert. Bruk av
+    * klasser/funksjoner som er lastet via denne instansen vil
+    * sannsynligvis fï¿½re til segmentation fault.
+    */
+   virtual ~DSO();
+
+   /**
+    * \brief Prï¿½ver ï¿½ laste dsoFile.
+    *
+    * Hvis det allerede er assosiert en dso fil til denne instansen
+    * vil vi fï¿½ DSOException.
+    *
+    * \param dsoFile dsoFilen vi ï¿½nsker ï¿½ laste.
+    * \param resolveNow Nï¿½r skal vi lï¿½se ut eksterne referanser i dsoFilen.
+    * \exception DSOException Hvis filen ikke finnes, det oppstï¿½r
+    *            problemer med ï¿½ laste dsoFile
+    *            eller denne instansen representerer allerede en dsoFile.
+    */
+   void  load(const std::string &dsoFile, bool resolveNow=true);
+
+   /**
+    * \brief isValid kan kalles for ï¿½ sjekke om instansen representerer en
+    * gyldig dsoFile.
+    *
+    * \return true hvis instansen rtepresenterer en gyldig dsoFile. False
+    *         ellers.
+    */
+   bool  isValid()const { return handle!=0;}
+
+
+   /**
+    * \brief returner navnet pï¿½ DSO filen denne instansen representerer.
+    */
+   std::string getDsofile()const { return dsofile;}
+
+   /**
+    * \brief getLastError returnerer siste feil som har oppstï¿½tt ved bruk
+    * av dsoFile.
+    *
+    * \return en error streng.
+    */
+   std::string getLastError();
+
+   /**
+    * \brief Denne operatoren kan brukes for ï¿½ finne symboler i dsoFilen.
+    *
+    * \param name Symbolet vi ï¿½nsker en referanse til.
+    * \exception DSOException blir gitt dersom symbolet name
+    *            ikke kan finnes i filen eller annen feil oppstï¿½r.
+    *
+    *ï¿½\see DLSYM(3)
+    */
+   void* operator[](const std::string &name);
+};
+
+/** @} */
+};
 };
 
 #endif

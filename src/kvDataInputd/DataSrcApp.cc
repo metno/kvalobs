@@ -35,6 +35,7 @@
 #include <kvalobs/bitmanip.h>
 #include <kvalobs/kvDbGate.h>
 #include <kvalobs/kvPath.h>
+
 using namespace dnmi::file;
 using namespace std;
 using namespace dnmi::db;
@@ -281,8 +282,8 @@ DataSrcApp::registerParams()
 {
    Result     *res=0;
    Connection *con;
-   miString    msg;
-   miString    kode;
+   string    msg;
+   string    kode;
    int         id;
    con=conCache.findFreeConnection();
 
@@ -365,7 +366,7 @@ DataSrcApp::create(const char  *obsType_,
    DecoderBase   *dec;
    DecodeCommand *decCmd;
    Connection    *con;
-   miString      myErr;
+   string    myErr;
 
    //The call to conCache will block until a connection object
    //is ready in the cache.

@@ -18,16 +18,16 @@
   modify it under the terms of the GNU General Public License as 
   published by the Free Software Foundation; either version 2 
   of the License, or (at your option) any later version.
-  
+
   KVALOBS is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License along 
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ */
 #include <milog/milog.h>
 #include <puTools/miTime.h>
 #include "dummydecoder.h"
@@ -36,13 +36,13 @@
 
 kvalobs::decoder::dummydecoder::
 DummyDecoder::DummyDecoder(
-    dnmi::db::Connection   &con,
-    const ParamList        &params,
-    const std::list<kvalobs::kvTypes> &typeList,
-    const miutil::miString &obsType,
-    const miutil::miString &obs, 
-    int                    decoderId)
-    :DecoderBase(con, params, typeList, obsType, obs, decoderId)
+      dnmi::db::Connection   &con,
+      const ParamList        &params,
+      const std::list<kvalobs::kvTypes> &typeList,
+      const std::string &obsType,
+      const std::string &obs,
+      int   decoderId)
+:DecoderBase(con, params, typeList, obsType, obs, decoderId)
 {
 }
 
@@ -51,23 +51,23 @@ DummyDecoder::~DummyDecoder()
 {
 }
 
-miutil::miString 
+std::string
 kvalobs::decoder::dummydecoder::
 DummyDecoder::name() const
 {
-    return "DummyDecoder";
+   return "DummyDecoder";
 }
 
 kvalobs::decoder::DecoderBase::DecodeResult 
 kvalobs::decoder::dummydecoder::
-DummyDecoder::execute(miutil::miString &msg)
+DummyDecoder::execute(std::string &msg)
 {
-  milog::LogContext lcontext(name());
-  
-  LOGINFO("New observation!  " << miutil::miTime::nowTime());
- 
+   milog::LogContext lcontext(name());
 
-  return Ok;
-  
- }
+   LOGINFO("New observation!  " << miutil::miTime::nowTime());
+
+
+   return Ok;
+
+}
 
