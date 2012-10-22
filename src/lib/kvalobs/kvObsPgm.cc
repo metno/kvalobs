@@ -28,7 +28,8 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#include <kvalobs/kvObsPgm.h> 
+#include <kvalobs/kvObsPgm.h>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace miutil;
@@ -159,7 +160,7 @@ bool kvalobs::kvObsPgm::set( int stationid,
   sun_ = sun;
   fromtime_ = fromtime;
   totime_ = totime;
-  sortBy_= miString(stationid_);
+  sortBy_= boost::lexical_cast<std::string>(stationid_);
   return true;
 }
 
@@ -265,7 +266,7 @@ bool kvalobs::kvObsPgm::set(const dnmi::db::DRow& r_)
       CERR("kvObsPgm: exception ..... \n");
     }
   }
-  sortBy_= miString(stationid_);
+  sortBy_= boost::lexical_cast<std::string>(stationid_);
   return true;
 }
 

@@ -32,6 +32,7 @@
 #include <string.h>
 #include <kvalobs/kvDbBase.h>
 #include <miutil/miTimeParse.h>
+#include <boost/lexical_cast.hpp>
 #include <sstream>
 #include <limits.h>
 #include <float.h>
@@ -94,7 +95,7 @@ miString
 kvalobs::kvDbBase::
 quoted(const int& in) const
 {
-  return quoted(miString(in));
+	return quoted(boost::lexical_cast<std::string>(in));
 }
 
 miString 

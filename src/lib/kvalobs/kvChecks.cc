@@ -31,6 +31,7 @@
 #include <stdlib.h>
 #include <kvalobs/kvChecks.h>
 #include <dnmithread/mtcout.h>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace miutil;
@@ -87,7 +88,8 @@ kvalobs::kvChecks::set(const dnmi::db::DRow &r_)
       CERR("kvChecks: unexpected exception ..... \n");
     }  
   }
-   sortBy_=miString(stationid_);
+   sortBy_= boost::lexical_cast<std::string>(stationid_);
+
   
   return true;  
 }
@@ -112,7 +114,7 @@ kvalobs::kvChecks::set(int stationid,
     active_    =active;
     fromtime_  = fromtime;
 
-    sortBy_=miString(stationid_);
+    sortBy_=boost::lexical_cast<std::string>(stationid_);
 
     return true;
 }

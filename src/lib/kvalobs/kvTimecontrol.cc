@@ -29,6 +29,7 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include <kvalobs/kvTimecontrol.h>
+#include <sstream>
 
 using namespace std;
 using namespace miutil;
@@ -57,7 +58,12 @@ bool kvalobs::kvTimecontrol::set( int fromday__,
   time_    = time__;    
   priority_= priority__;
   qcx_     = qcx__;     
-  sortBy_  = miString(fromday_)+ miString(today_) + miString(time_);
+
+  std::ostringstream s;
+  s << fromday_;
+  s << today_;
+  s << time_;
+  sortBy_  = s.str();
   return true;
 }
 
@@ -92,7 +98,12 @@ bool kvalobs::kvTimecontrol::set(const dnmi::db::DRow& r_)
     }  
   }
   
-  sortBy_= miString(fromday_) + miString(today_) + miString(time_);
+  std::ostringstream s;
+  s << fromday_;
+  s << today_;
+  s << time_;
+  sortBy_  = s.str();
+
   return true;
 }
 

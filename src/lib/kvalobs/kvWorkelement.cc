@@ -29,6 +29,7 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include <kvalobs/kvWorkelement.h>
+#include <sstream>
 
 using namespace miutil;
 using namespace std;
@@ -38,7 +39,11 @@ void
 kvalobs::kvWorkelement::
 createSortIndex()
 {
-  sortBy_=miString(stationid_)+obstime_.isoTime()+miString(typeid_);
+	std::ostringstream s;
+	s << stationid_;
+	s << obstime_.isoTime();
+	s << typeid_;
+	sortBy_ = s.str();
 }
 
 kvalobs::kvWorkelement::

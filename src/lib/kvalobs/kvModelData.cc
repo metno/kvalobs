@@ -33,6 +33,8 @@
 #include <stdio.h>
 #include <kvalobs/kvModelData.h>
 #include <dnmithread/mtcout.h>
+#include <sstream>
+
 /*
  * Created by DNMI/IT: borge.moe@met.no
  * at Tue Aug 28 14:53:16 2002 
@@ -57,8 +59,12 @@ kvalobs::kvModelData::set(int stationid,
   modelid_=modelid;
   original_=original;
 
-  sortBy_=miString(stationid_)+miString(paramid_)
-    +miString(level_)+obstime_.isoTime();
+  std::ostringstream s;
+  s << stationid_;
+  s << paramid_;
+  s << level_;
+  s << obstime_.isoTime();
+  sortBy_ = s.str();
   
   return true;
 }
@@ -95,9 +101,12 @@ kvalobs::kvModelData::set(const dnmi::db::DRow &r_)
     }  
   }
 
-  sortBy_=miString(stationid_)+miString(paramid_)
-    +miString(level_)+obstime_.isoTime();
-
+  std::ostringstream s;
+  s << stationid_;
+  s << paramid_;
+  s << level_;
+  s << obstime_.isoTime();
+  sortBy_ = s.str();
   
   return true;
 }

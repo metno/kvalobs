@@ -28,7 +28,8 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#include <kvalobs/kvGeneratedTypes.h> 
+#include <kvalobs/kvGeneratedTypes.h>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace miutil;
@@ -48,7 +49,7 @@ bool kvalobs::kvGeneratedTypes::set( int stationid__,
                                      int typeid__ ){
   stationid_ = stationid__;
   typeid_ = typeid__;
-  sortBy_= miString(stationid_);
+  sortBy_= boost::lexical_cast<std::string>(stationid_);
   return true;
 }
 
@@ -74,7 +75,7 @@ bool kvalobs::kvGeneratedTypes::set(const dnmi::db::DRow& r_)
       CERR("kvGeneratedTypes: exception ..... \n");
     }
   }
-  sortBy_= miString(stationid_);
+  sortBy_= boost::lexical_cast<std::string>(stationid_);
   return true;
 }
 

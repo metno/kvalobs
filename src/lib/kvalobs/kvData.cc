@@ -29,6 +29,7 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include <list>
+#include <sstream>
 #include <stdlib.h>
 #include <stdio.h>
 #include <kvalobs/kvData.h>
@@ -63,8 +64,13 @@ kvalobs::kvData::kvData( const kvalobs::kvData &d ) :
 void 
 kvalobs::kvData::createSortIndex() 
 {
-  sortBy_=miString(stationid_)+miString(paramid_)+miString(sensor_)+
-    miString(level_)+obstime_.isoTime();
+	std::ostringstream s;
+	s << stationid_;
+	s << paramid_;
+	s << sensor_;
+	s << level_;
+	s << obstime_.isoTime();
+	sortBy_ = s.str();
 }
   
 void 

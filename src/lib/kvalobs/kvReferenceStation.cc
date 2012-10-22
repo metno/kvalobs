@@ -28,7 +28,8 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#include <kvalobs/kvReferenceStation.h> 
+#include <kvalobs/kvReferenceStation.h>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace miutil;
@@ -51,7 +52,7 @@ bool kvalobs::kvReferenceStation::set( int stationid,
   stationid_ = stationid;
   paramsetid_ = paramsetid;
   reference_ = reference;
-  sortBy_= miString(stationid_);
+  sortBy_= boost::lexical_cast<std::string>(stationid_);
   return true;
 }
 
@@ -79,7 +80,7 @@ bool kvalobs::kvReferenceStation::set(const dnmi::db::DRow& r_)
       CERR("kvReferenceStation: exception ..... \n");
     }
   }
-  sortBy_= miString(stationid_);
+  sortBy_= boost::lexical_cast<std::string>(stationid_);
   return true;
 }
 

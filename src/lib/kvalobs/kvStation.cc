@@ -29,6 +29,7 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include <kvalobs/kvStation.h>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace miutil;
@@ -131,7 +132,7 @@ bool kvalobs::kvStation::set( int   stationid__,
   environmentid_ = environmentid__;
   static_      = static__;
   fromtime_    = fromtime__;
-  sortBy_      = miString(stationid_);
+  sortBy_      = boost::lexical_cast<std::string>(stationid_);
   return true;
 }
 
@@ -167,7 +168,7 @@ bool kvalobs::kvStation::set(const dnmi::db::DRow& r_)
       CERR("kvStation: exception ..... \n");
     }  
   }
-  sortBy_= miString(stationid_);
+  sortBy_= boost::lexical_cast<std::string>(stationid_);
   return true;
 }
 

@@ -28,7 +28,8 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#include <kvalobs/kvTextData.h> 
+#include <kvalobs/kvTextData.h>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace miutil;
@@ -74,7 +75,7 @@ bool kvalobs::kvTextData::set( int                     sta,
   tbtime_    = tbt;
   tbtimemsec_= 0;
   typeid_    = typ;
-  sortBy_    = miString(sta)+obt.isoTime();
+  sortBy_    = boost::lexical_cast<std::string>(sta)+obt.isoTime();
   return true;
 }
 
@@ -107,7 +108,7 @@ bool kvalobs::kvTextData::set(const dnmi::db::DRow& r_)
       CERR("kvTextData: exception ..... \n");
     }
   }
-  sortBy_= miString(stationid_)+obstime_.isoTime();
+  sortBy_= boost::lexical_cast<std::string>(stationid_)+obstime_.isoTime();
   return true;
 }
 

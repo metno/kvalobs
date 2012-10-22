@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include <kvalobs/kvParam.h>
 #include <dnmithread/mtcout.h>
+#include <boost/lexical_cast.hpp>
 /*
  * Created by DNMI/IT: borge.moe@met.no
  * at Tue Aug 28 15:23:16 2002 
@@ -74,7 +75,7 @@ kvalobs::kvParam::set(const dnmi::db::DRow &r_)
     }  
   }
 
-  sortBy_=miString(paramid_);
+  sortBy_=boost::lexical_cast<std::string>(paramid_);
   return true;
 }
 
@@ -94,7 +95,7 @@ kvalobs::kvParam::set(int              paramid,
   level_scale_=level_scale;
   comment_=comment;
 
-  sortBy_=miString(paramid_);
+  sortBy_=boost::lexical_cast<std::string>(paramid_);
 
   return true;
 }
