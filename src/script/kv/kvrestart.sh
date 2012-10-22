@@ -153,7 +153,7 @@ fi
 found=false;
 for PROG in $STOP_PROGS ; do
 	if [ "z$progname" != "z" ]; then
-		if ! echo $PROG | grep $progname > /dev/null 2>&1 ; then  
+		if ! echo $PROG | grep "^$progname" > /dev/null 2>&1 ; then  
 			continue
 		fi
 	fi
