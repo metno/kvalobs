@@ -66,16 +66,16 @@ public:
 		set(r);
 	}
 	kvRejectdecode(const std::string &me, const miutil::miTime &tb,
-			const std::string &decode, const std::string &comment,
-			bool fixed = false)
+			const std::string &decode, const std::string &comment, bool fixed =
+					false)
 	{
 		set(me, tb, decode, comment, fixed);
 	}
 
 	bool set(const dnmi::db::DRow&);
 	bool set(const std::string &message, const miutil::miTime &tbtime,
-			const std::string &decoder, const std::string &comment,
-			bool fixed = false);
+			const std::string &decoder, const std::string &comment, bool fixed =
+					false);
 
 	const char* tableName() const
 	{

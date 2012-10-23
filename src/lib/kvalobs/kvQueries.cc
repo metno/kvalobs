@@ -1,204 +1,176 @@
 /*
-  Kvalobs - Free Quality Control Software for Meteorological Observations 
+ Kvalobs - Free Quality Control Software for Meteorological Observations
 
-  $Id: kvQueries.cc,v 1.30.2.10 2007/09/27 09:02:30 paule Exp $                                                       
+ $Id: kvQueries.cc,v 1.30.2.10 2007/09/27 09:02:30 paule Exp $
 
-  Copyright (C) 2007 met.no
+ Copyright (C) 2007 met.no
 
-  Contact information:
-  Norwegian Meteorological Institute
-  Box 43 Blindern
-  0313 OSLO
-  NORWAY
-  email: kvalobs-dev@met.no
+ Contact information:
+ Norwegian Meteorological Institute
+ Box 43 Blindern
+ 0313 OSLO
+ NORWAY
+ email: kvalobs-dev@met.no
 
-  This file is part of KVALOBS
+ This file is part of KVALOBS
 
-  KVALOBS is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License as 
-  published by the Free Software Foundation; either version 2 
-  of the License, or (at your option) any later version.
-  
-  KVALOBS is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License along 
-  with KVALOBS; if not, write to the Free Software Foundation Inc., 
-  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ KVALOBS is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as
+ published by the Free Software Foundation; either version 2
+ of the License, or (at your option) any later version.
+
+ KVALOBS is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along
+ with KVALOBS; if not, write to the Free Software Foundation Inc.,
+ 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
 #include <kvalobs/kvQueries.h>
-
 
 using namespace std;
 using namespace miutil;
 
-
 /*
-  Select all rows from table checks matching 
-  stationid in slist, language=lan and valid fromtime
-  - Sort by qcx, stationid
-  - Valid fromtime is found by using a 'correlated subquery'
-*/
-std::string kvQueries::selectChecks(const std::list<int> slist,
-				 const int lan,
-				 const miTime& otime)
+ Select all rows from table checks matching
+ stationid in slist, language=lan and valid fromtime
+ - Sort by qcx, stationid
+ - Valid fromtime is found by using a 'correlated subquery'
+ */
+std::string kvQueries::selectChecks(const std::list<int> slist, const int lan,
+		const miTime& otime)
 {
-  ostringstream ost;
+	ostringstream ost;
 
-  ost << " C1 WHERE C1.stationid IN (";
+	ost << " C1 WHERE C1.stationid IN (";
 
-  std::list<int>::const_iterator sp= slist.begin();
-  for (; sp!=slist.end(); sp++)
-    ost << (sp==slist.begin() ? "" : ",") << *sp;
-  
-  ost << ") AND C1.language=" << lan
-      << "  AND  C1.fromtime=("
-      << "         SELECT MAX(C2.fromtime) FROM checks C2 WHERE"
-      << "         C2.fromtime<=\'" << otime.isoTime() << "\'"
-      << "         AND  C2.stationid =C1.stationid"
-      << "         AND  C2.qcx =C1.qcx "
-      << "         AND  C2.language =C1.language "
-      << " ) ORDER BY C1.qcx,C1.stationid";
+	std::list<int>::const_iterator sp = slist.begin();
+	for (; sp != slist.end(); sp++)
+		ost << (sp == slist.begin() ? "" : ",") << *sp;
 
-  return ost.str();
+	ost << ") AND C1.language=" << lan << "  AND  C1.fromtime=("
+			<< "         SELECT MAX(C2.fromtime) FROM checks C2 WHERE"
+			<< "         C2.fromtime<=\'" << otime.isoTime() << "\'"
+			<< "         AND  C2.stationid =C1.stationid"
+			<< "         AND  C2.qcx =C1.qcx "
+			<< "         AND  C2.language =C1.language "
+			<< " ) ORDER BY C1.qcx,C1.stationid";
+
+	return ost.str();
 }
 
-
 /*
-  Select all rows from table station_param matching 
-  stationid in slist, otime in [fromday - today],
-  qcx = qcx and valid fromtime
-  - Sort by descending stationid
-  - Valid fromtime is found by using a 'correlated subquery'
-*/
+ Select all rows from table station_param matching
+ stationid in slist, otime in [fromday - today],
+ qcx = qcx and valid fromtime
+ - Sort by descending stationid
+ - Valid fromtime is found by using a 'correlated subquery'
+ */
 std::string kvQueries::selectStationParam(const std::list<int> slist,
-				       const miTime& otime,
-				       const string& qcx)
+		const miTime& otime, const string& qcx)
 {
-  ostringstream ost;
-  
+	ostringstream ost;
 
-  ost << " SP1 WHERE SP1.stationid IN (";
+	ost << " SP1 WHERE SP1.stationid IN (";
 
-  std::list<int>::const_iterator sp= slist.begin();
-  for (; sp!=slist.end(); sp++)
-    ost << (sp==slist.begin() ? "" : ",") << *sp;
-  
-  ost << ") AND SP1.qcx=\'"      << qcx << "\'"
-      << " AND SP1.fromday<="  << otime.dayOfYear()
-      << " AND SP1.today>="     << otime.dayOfYear()
-      << " AND SP1.fromtime=("
-      << "         SELECT MAX(SP2.fromtime) FROM station_param SP2 WHERE"
-      << "         SP2.fromtime<=\'" << otime.isoTime() << "\'"
-      << "         AND  SP2.stationid =SP1.stationid"
-      << "         AND  SP2.paramid =SP1.paramid"
-      << "         AND  SP2.level =SP1.level"
-      << "         AND  SP2.sensor =SP1.sensor"
-      << "         AND  SP2.fromday =SP1.fromday"
-      << "         AND  SP2.today =SP1.today"
-      << "         AND  SP2.qcx =SP1.qcx "
-      << " ) ORDER BY SP1.stationid DESC";
+	std::list<int>::const_iterator sp = slist.begin();
+	for (; sp != slist.end(); sp++)
+		ost << (sp == slist.begin() ? "" : ",") << *sp;
 
-  return ost.str();
+	ost << ") AND SP1.qcx=\'" << qcx << "\'" << " AND SP1.fromday<="
+			<< otime.dayOfYear() << " AND SP1.today>=" << otime.dayOfYear()
+			<< " AND SP1.fromtime=("
+			<< "         SELECT MAX(SP2.fromtime) FROM station_param SP2 WHERE"
+			<< "         SP2.fromtime<=\'" << otime.isoTime() << "\'"
+			<< "         AND  SP2.stationid =SP1.stationid"
+			<< "         AND  SP2.paramid =SP1.paramid"
+			<< "         AND  SP2.level =SP1.level"
+			<< "         AND  SP2.sensor =SP1.sensor"
+			<< "         AND  SP2.fromday =SP1.fromday"
+			<< "         AND  SP2.today =SP1.today"
+			<< "         AND  SP2.qcx =SP1.qcx "
+			<< " ) ORDER BY SP1.stationid DESC";
+
+	return ost.str();
 }
-
 
 std::string kvQueries::selectData(const miTime& otime)
 {
-  ostringstream ost;
-  
-  ost << " where obstime=\'"   << otime.isoTime() << "\'";
-  
-  return ost.str();
+	ostringstream ost;
+
+	ost << " where obstime=\'" << otime.isoTime() << "\'";
+
+	return ost.str();
 }
 
-
-std::string kvQueries::selectData(const int sid,
-			       const int pid,
-			       const miTime& otime)
+std::string kvQueries::selectData(const int sid, const int pid,
+		const miTime& otime)
 {
-  ostringstream ost;
-  
-  ost << " where stationid=" << sid
-      << " and paramid="     << pid
-      << " and obstime=\'"   << otime.isoTime() << "\'";
-  
-  return ost.str();
+	ostringstream ost;
+
+	ost << " where stationid=" << sid << " and paramid=" << pid
+			<< " and obstime=\'" << otime.isoTime() << "\'";
+
+	return ost.str();
 }
 
-std::string 
-kvQueries::selectDataFromType(const int sid,
-			      const int tid,
-			      const miTime& otime)
+std::string kvQueries::selectDataFromType(const int sid, const int tid,
+		const miTime& otime)
 {
-  ostringstream ost;
-  
-  ost << " where stationid=" << sid
-      << " and typeid="      << tid
-      << " and obstime=\'"   << otime.isoTime() << "\' ORDER BY paramid, level, sensor";
-  
-  return ost.str();
+	ostringstream ost;
+
+	ost << " where stationid=" << sid << " and typeid=" << tid
+			<< " and obstime=\'" << otime.isoTime()
+			<< "\' ORDER BY paramid, level, sensor";
+
+	return ost.str();
 }
 
-std::string 
-kvQueries::selectTextDataFromType(const int sid,
-			      const int tid,
-			      const miTime& otime)
+std::string kvQueries::selectTextDataFromType(const int sid, const int tid,
+		const miTime& otime)
 {
-  ostringstream ost;
-  
-  ost << " where stationid=" << sid
-      << " and typeid="      << tid
-      << " and obstime=\'"   << otime.isoTime() << "\' ORDER BY paramid";
-  
-  return ost.str();
+	ostringstream ost;
+
+	ost << " where stationid=" << sid << " and typeid=" << tid
+			<< " and obstime=\'" << otime.isoTime() << "\' ORDER BY paramid";
+
+	return ost.str();
 }
 
-
-std::string 
-kvQueries::selectDataFromAbsType(const int sid,
-				 const int tid,
-				 const miTime& otime)
+std::string kvQueries::selectDataFromAbsType(const int sid, const int tid,
+		const miTime& otime)
 {
-  ostringstream ost;
-  
-  ost << " where stationid=" << sid
-      << " and abs(typeid)=" << tid
-      << " and obstime=\'"   << otime.isoTime() << "\'";
-  
-  return ost.str();
+	ostringstream ost;
+
+	ost << " where stationid=" << sid << " and abs(typeid)=" << tid
+			<< " and obstime=\'" << otime.isoTime() << "\'";
+
+	return ost.str();
 }
 
-
-
-std::string kvQueries::selectData(const miTime& stime,
-			       const miTime& etime,
-			       const std::string& ob)
+std::string kvQueries::selectData(const miTime& stime, const miTime& etime,
+		const std::string& ob)
 {
-  ostringstream ost;
-  
-  ost << " where obstime>=\'"  << stime.isoTime() << "\'"
-      << " and obstime<=\'"  << etime.isoTime() << "\'"
-      << " order by " << ob;
-  
-  return ost.str();
+	ostringstream ost;
+
+	ost << " where obstime>=\'" << stime.isoTime() << "\'" << " and obstime<=\'"
+			<< etime.isoTime() << "\'" << " order by " << ob;
+
+	return ost.str();
 }
 
 std::string kvQueries::selectDataByTabletime(const miTime& stime,
-					  const miTime& etime,
-					  const std::string& ob)
+		const miTime& etime, const std::string& ob)
 {
-  ostringstream ost;
-  
-  ost << " where tbtime>=\'"  << stime.isoTime() << "\'"
-      << " and tbtime<=\'"  << etime.isoTime() << "\'"
-      << " order by " << ob;
-  
-  return ost.str();
-}
+	ostringstream ost;
 
+	ost << " where tbtime>=\'" << stime.isoTime() << "\'" << " and tbtime<=\'"
+			<< etime.isoTime() << "\'" << " order by " << ob;
+
+	return ost.str();
+}
 
 //Bxrge Moe
 //16 oct 2002
@@ -207,55 +179,41 @@ std::string kvQueries::selectDataByTabletime(const miTime& stime,
 //will also guarantee that all data with a given obstime will be kept 
 //together.
 
-std::string 
-kvQueries::selectData(const int sid,
-		      const miTime& stime,
-		      const miTime& etime)
+std::string kvQueries::selectData(const int sid, const miTime& stime,
+		const miTime& etime)
 {
-  ostringstream ost;
-  
-  ost << " where stationid=" << sid
-      << " and obstime>=\'"  << stime.isoTime() << "\'"
-      << " and obstime<=\'"  << etime.isoTime() << "\'"
-      << " order by obstime, typeid DESC";
-  
-  return ost.str();
+	ostringstream ost;
+
+	ost << " where stationid=" << sid << " and obstime>=\'" << stime.isoTime()
+			<< "\'" << " and obstime<=\'" << etime.isoTime() << "\'"
+			<< " order by obstime, typeid DESC";
+
+	return ost.str();
 }
 
-
-std::string 
-kvQueries::selectTextData(const int sid,
-			  const miTime& stime,
-			  const miTime& etime)
+std::string kvQueries::selectTextData(const int sid, const miTime& stime,
+		const miTime& etime)
 {
-  ostringstream ost;
-  
-  ost << " where stationid=" << sid
-      << " and obstime>=\'"  << stime.isoTime() << "\'"
-      << " and obstime<=\'"  << etime.isoTime() << "\'"
-      << " order by obstime,typeid DESC";
-  
-  return ost.str();
+	ostringstream ost;
+
+	ost << " where stationid=" << sid << " and obstime>=\'" << stime.isoTime()
+			<< "\'" << " and obstime<=\'" << etime.isoTime() << "\'"
+			<< " order by obstime,typeid DESC";
+
+	return ost.str();
 }
 
-
-std::string 
-kvQueries::selectDataByTbtime(const int sid,
-			      const miutil::miTime& stime,
-			      const miutil::miTime& etime)
+std::string kvQueries::selectDataByTbtime(const int sid,
+		const miutil::miTime& stime, const miutil::miTime& etime)
 {
-  ostringstream ost;
-  
-  ost << " where stationid=" << sid
-      << " and tbtime>=\'"  << stime.isoTime() << "\'"
-      << " and tbtime<=\'"  << etime.isoTime() << "\'"
-      << " order by tbtime,typeid";
-  
-  return ost.str();
+	ostringstream ost;
+
+	ost << " where stationid=" << sid << " and tbtime>=\'" << stime.isoTime()
+			<< "\'" << " and tbtime<=\'" << etime.isoTime() << "\'"
+			<< " order by tbtime,typeid";
+
+	return ost.str();
 }
-			
-
-
 
 //Knut Johansen
 //22 jan 2003
@@ -266,479 +224,429 @@ kvQueries::selectDataByTbtime(const int sid,
 
 std::string kvQueries::selectData(const std::string& ob)
 {
-  ostringstream ost;
-  
-  ost << " order by " << ob;
-  return ost.str();
+	ostringstream ost;
+
+	ost << " order by " << ob;
+	return ost.str();
 }
 //Knut Johansen
 //2 sep 2003
 //Select data from only a few stations
-std::string 
-kvQueries::selectDataStat(const miTime& stime,
-			  const miTime& etime,
-			  const std::string& statList)
+std::string kvQueries::selectDataStat(const miTime& stime, const miTime& etime,
+		const std::string& statList)
 {
-  ostringstream ost;
-  
-  ost << " where obstime>=\'"  << stime.isoTime() << "\'"
-      << " and obstime<=\'"  << etime.isoTime() << "\'"
-      << " and stationid in (" << statList
-      << ") order by stationid,obstime";
-  
-  return ost.str();
+	ostringstream ost;
+
+	ost << " where obstime>=\'" << stime.isoTime() << "\'" << " and obstime<=\'"
+			<< etime.isoTime() << "\'" << " and stationid in (" << statList
+			<< ") order by stationid,obstime";
+
+	return ost.str();
 }
 
-std::string
-kvQueries::selectData(const miTime& stime,
-		      const miTime& etime)
+std::string kvQueries::selectData(const miTime& stime, const miTime& etime)
 {
-  ostringstream ost;
-  
-  ost << " where obstime>=\'"  << stime.isoTime() << "\'"
-      << " and obstime<=\'"  << etime.isoTime() << "\'"
-      << " order by stationid,obstime";
-  
-  return ost.str();
+	ostringstream ost;
+
+	ost << " where obstime>=\'" << stime.isoTime() << "\'" << " and obstime<=\'"
+			<< etime.isoTime() << "\'" << " order by stationid,obstime";
+
+	return ost.str();
 }
 
-
-std::string 
-kvQueries::selectData(const kvalobs::kvData &d)
+std::string kvQueries::selectData(const kvalobs::kvData &d)
 {
-  ostringstream ost;
-  
-  ost << " where"
-      <<   " stationid=" << d.stationID()         << " and "
-      <<   " obstime=\'" << d.obstime().isoTime() << "\' and " 
-      <<   " paramid=" << d.paramID()             << " and "
-      <<   " level=" << d.level()                 << " and "
-      <<   " sensor=\'" << d.sensor()             << "\' and"
-      <<   " typeid=" << d.typeID();
+	ostringstream ost;
 
+	ost << " where" << " stationid=" << d.stationID() << " and "
+			<< " obstime=\'" << d.obstime().isoTime() << "\' and "
+			<< " paramid=" << d.paramID() << " and " << " level=" << d.level()
+			<< " and " << " sensor=\'" << d.sensor() << "\' and" << " typeid="
+			<< d.typeID();
 
-  return ost.str();
+	return ost.str();
 }
-
 
 std::string kvQueries::selectParam(const std::string& ob)
 {
-  ostringstream ost;
-  
-  ost << " order by " << ob;
-  return ost.str();
+	ostringstream ost;
+
+	ost << " order by " << ob;
+	return ost.str();
 }
 
-
-std::string kvQueries::selectModelData(const int sid,
-				    const miTime& stime,
-				    const miTime& etime)
+std::string kvQueries::selectModelData(const int sid, const miTime& stime,
+		const miTime& etime)
 {
-  ostringstream ost;
-  
-  ost << " where stationid=" << sid
-      << " and obstime>=\'"  << stime.isoTime() << "\'"
-      << " and obstime<=\'"  << etime.isoTime() << "\'"
-      << " order by obstime";
-  
-  return ost.str();
+	ostringstream ost;
+
+	ost << " where stationid=" << sid << " and obstime>=\'" << stime.isoTime()
+			<< "\'" << " and obstime<=\'" << etime.isoTime() << "\'"
+			<< " order by obstime";
+
+	return ost.str();
 }
 
-
-std::string
-kvQueries::selectReferenceStation(long stationid, long paramsetid)
+std::string kvQueries::selectReferenceStation(long stationid, long paramsetid)
 {
-  ostringstream ost;
-  
-  ost << " where stationid=" << stationid;
+	ostringstream ost;
 
-  if(paramsetid>=0){
-    ost << " and paramsetid=" << paramsetid;
-  }
-  
-  return ost.str();
+	ost << " where stationid=" << stationid;
+
+	if (paramsetid >= 0)
+	{
+		ost << " and paramsetid=" << paramsetid;
+	}
+
+	return ost.str();
 
 }
 
-
-std::string
-kvQueries::selectStationByStationId(long stationid)
+std::string kvQueries::selectStationByStationId(long stationid)
 {
-  ostringstream ost;
-  
-  ost << " where stationid=" << stationid;
-  
-  return ost.str();
-} 
+	ostringstream ost;
 
-std::string
-kvQueries::selectStationByWmonr(long wmonr)
-{
-  ostringstream ost;
-  
-  ost << " where wmonr=" << wmonr;
-  
-  return ost.str();
+	ost << " where stationid=" << stationid;
+
+	return ost.str();
 }
 
-std::string
-kvQueries::selectStationByNationalnr(long nationalnr)
+std::string kvQueries::selectStationByWmonr(long wmonr)
 {
-  ostringstream ost;
-  
-  ost << " where nationalnr=" << nationalnr;
-  
-  return ost.str();
+	ostringstream ost;
+
+	ost << " where wmonr=" << wmonr;
+
+	return ost.str();
 }
 
-std::string
-kvQueries::selectStationByIcaoId(long icaoid)
+std::string kvQueries::selectStationByNationalnr(long nationalnr)
 {
-  ostringstream ost;
-  
-  ost << " where icaoid=" << icaoid;
-  
-  return ost.str();
+	ostringstream ost;
+
+	ost << " where nationalnr=" << nationalnr;
+
+	return ost.str();
 }
 
-
-
-std::string
-kvQueries::selectStationByCall_sign(const std::string &cs)
+std::string kvQueries::selectStationByIcaoId(long icaoid)
 {
-  ostringstream ost;
-  
-  ost << " where call_sign=\'" << cs << "\'";
-  
-  return ost.str();
+	ostringstream ost;
+
+	ost << " where icaoid=" << icaoid;
+
+	return ost.str();
+}
+
+std::string kvQueries::selectStationByCall_sign(const std::string &cs)
+{
+	ostringstream ost;
+
+	ost << " where call_sign=\'" << cs << "\'";
+
+	return ost.str();
 }
 
 //milib/kvalobs/src/kvQueries.ccutil::
-std::string
-kvQueries::selectStationOrdered()
-{
-  ostringstream ost;
-  
-  ost << " order by stationid";
-  
-  return ost.str();
-}
-
-std::string
-kvQueries::selectAllStations(const std::string &orderby)
-{
-  ostringstream ost;
- 
-  ost << " order by " << orderby;
-
-  return ost.str();
-}
-
-
-std::string
-kvQueries::
-selectStationsByRange( long from, long to, bool order)
-{
-   ostringstream ost;
-
-   if( from > to ) {
-      long tmp=from;
-      from = to;
-      to = tmp;
-   }
-   ost << " WHERE stationid >= " << from << " AND stationid < " << to;
-
-   if( order )
-      ost  << " order by stationid";
-
-   return ost.str();
-}
-
-/*
-  Select all entries from obs_pgm matching stationid and
-  valid fromtime
-  - Sort by paramid
-  - Valid fromtime is found by using a 'correlated subquery'
-*/
-std::string
-kvQueries::selectObsPgm(long stationid,
-			const miutil::miTime& otime)
-{
-  ostringstream ost;
-  string obst("\'" + otime.isoTime() +"\'");
-  
-  ost << " WHERE stationid=" << stationid  << " AND "
-      << "       (( fromtime<=" << obst << " AND totime>" << obst << ") OR "
-      << "        ( fromtime<=" << obst << " AND totime IS NULL ) "
-      << "       ) ORDER BY paramid";
-/*  
-  ost << " OP1 WHERE OP1.stationid=" << stationid
-      << " AND OP1.fromtime=("
-      << "         SELECT MAX(OP2.fromtime) FROM obs_pgm OP2 WHERE"
-      << "         OP2.fromtime<=\'" << otime.isoTime() << "\'"
-      << "         AND OP2.stationid = OP1.stationid"
-      << "         AND OP2.paramid  = OP1.paramid"
-      << " ) ORDER BY OP1.paramid";
-*/
-  return ost.str();
-}
-
-/*
-  Select all entries from obs_pgm matching stationid, typeid and
-  valid fromtime and totime
-  - Sort by paramid
-  - Valid fromtime is found by using a 'correlated subquery'
-*/
-std::string
-kvQueries::selectObsPgm(long stationid,
-			long tid,
-			const miutil::miTime& otime) 
+std::string kvQueries::selectStationOrdered()
 {
 	ostringstream ost;
-	string obst("\'" + otime.isoTime() +"\'");
-    
-   ost << " WHERE stationid=" << stationid  << " AND typeid=" << tid << " AND "
-       << "       (( fromtime<=" << obst << " AND totime>" << obst << ") OR "
-       << "        ( fromtime<=" << obst << " AND totime IS NULL ) "
-       << "       ) ORDER BY paramid";
-  
-/*  ost << " OP1 WHERE OP1.typeid=" << tid << " AND OP1.stationid=" << stationid
-      << " AND OP1.fromtime=("
-      << "         SELECT MAX(OP2.fromtime) FROM obs_pgm OP2 WHERE"
-      << "         OP2.fromtime<=\'" << otime.isoTime() << "\'"
-      << "         AND OP2.stationid = OP1.stationid"
-      << "         AND OP2.paramid  = OP1.paramid"
-      << "         AND OP2.typeid  = OP1.typeid"
-      << " ) ORDER BY OP1.paramid";
-*/ 
-  return ost.str();
+
+	ost << " order by stationid";
+
+	return ost.str();
+}
+
+std::string kvQueries::selectAllStations(const std::string &orderby)
+{
+	ostringstream ost;
+
+	ost << " order by " << orderby;
+
+	return ost.str();
+}
+
+std::string kvQueries::selectStationsByRange(long from, long to, bool order)
+{
+	ostringstream ost;
+
+	if (from > to)
+	{
+		long tmp = from;
+		from = to;
+		to = tmp;
+	}
+	ost << " WHERE stationid >= " << from << " AND stationid < " << to;
+
+	if (order)
+		ost << " order by stationid";
+
+	return ost.str();
 }
 
 /*
-  Select all entries from obs_pgm matching typeid and
-  valid fromtime and totime.
-  - Sort by stationid.
-  - Valid fromtime is found by using a 'correlated subquery'
-*/
-std::string
-kvQueries::selectObsPgmByTypeid(long tid,
-			                      const miutil::miTime& otime) 
+ Select all entries from obs_pgm matching stationid and
+ valid fromtime
+ - Sort by paramid
+ - Valid fromtime is found by using a 'correlated subquery'
+ */
+std::string kvQueries::selectObsPgm(long stationid, const miutil::miTime& otime)
 {
 	ostringstream ost;
-	string obst("\'" + otime.isoTime() +"\'");
-      
-	ost << " WHERE typeid=" << tid << " AND "
-	    << "       (( fromtime<=" << obst << " AND totime>" << obst << ") OR "
-	    << "        ( fromtime<=" << obst << " AND totime IS NULL ) "
-	    << "       ) ORDER BY stationid, typeid";
-/*    
-  ost << " OP1 WHERE OP1.typeid=" << tid   
-      << " AND OP1.fromtime=("
-      << "         SELECT MAX(OP2.fromtime) FROM obs_pgm OP2 WHERE"
-      << "             OP2.fromtime<=\'" << otime.isoTime() << "\' AND"
-      << "             OP2.stationid  = OP1.stationid AND"
-      << "             OP2.typeid     = OP1.typeid    AND"
-      << "             OP2.paramid    = OP1.paramid   AND"
-      << "             OP2.level      = OP1.level"
-      << " ) ORDER BY OP1.stationid, OP1.typeid";
-*/ 
-  return ost.str();
+	string obst("\'" + otime.isoTime() + "\'");
+
+	ost << " WHERE stationid=" << stationid << " AND " << "       (( fromtime<="
+			<< obst << " AND totime>" << obst << ") OR "
+			<< "        ( fromtime<=" << obst << " AND totime IS NULL ) "
+			<< "       ) ORDER BY paramid";
+	/*
+	 ost << " OP1 WHERE OP1.stationid=" << stationid
+	 << " AND OP1.fromtime=("
+	 << "         SELECT MAX(OP2.fromtime) FROM obs_pgm OP2 WHERE"
+	 << "         OP2.fromtime<=\'" << otime.isoTime() << "\'"
+	 << "         AND OP2.stationid = OP1.stationid"
+	 << "         AND OP2.paramid  = OP1.paramid"
+	 << " ) ORDER BY OP1.paramid";
+	 */
+	return ost.str();
 }
-
-
-std::string
-kvQueries::selectObsPgm( long stationid )
-{
-  ostringstream ss;
-  ss << "WHERE stationid=" << stationid << " ORDER BY stationid, typeid, paramid";
-  return ss.str();
-}
-
-
 
 /*
-  Select all entries from obs_pgm with valid fromtime and totime 
-  - Sort by stationid, typeid and paramid
-  - Valid fromtime is found by using a 'correlated subquery'
-*/
-std::string
-kvQueries::selectObsPgm(const miutil::miTime& otime)
-{	
+ Select all entries from obs_pgm matching stationid, typeid and
+ valid fromtime and totime
+ - Sort by paramid
+ - Valid fromtime is found by using a 'correlated subquery'
+ */
+std::string kvQueries::selectObsPgm(long stationid, long tid,
+		const miutil::miTime& otime)
+{
 	ostringstream ost;
-	string obst("\'" + otime.isoTime() +"\'");
-        
-  	ost << " WHERE ( fromtime<=" << obst << " AND totime>" << obst << ") OR "
-  	    << "       ( fromtime<=" << obst << " AND totime IS NULL ) "
-  	    << "        ORDER BY stationid, typeid, paramid";
- 
-  /*	ost << " OP1 WHERE OP1.fromtime=("
-      << "         SELECT MAX(OP2.fromtime) FROM obs_pgm OP2 WHERE"
-      << "         OP2.fromtime<=\'" << otime.isoTime() << "\'"
-      << "         AND OP2.stationid = OP1.stationid"
-      << "         AND OP2.paramid  = OP1.paramid"
-      << " ) ORDER BY OP1.stationid,OP1.typeid,OP1.paramid";
-  */
-  return ost.str();
+	string obst("\'" + otime.isoTime() + "\'");
+
+	ost << " WHERE stationid=" << stationid << " AND typeid=" << tid << " AND "
+			<< "       (( fromtime<=" << obst << " AND totime>" << obst
+			<< ") OR " << "        ( fromtime<=" << obst
+			<< " AND totime IS NULL ) " << "       ) ORDER BY paramid";
+
+	/*  ost << " OP1 WHERE OP1.typeid=" << tid << " AND OP1.stationid=" << stationid
+	 << " AND OP1.fromtime=("
+	 << "         SELECT MAX(OP2.fromtime) FROM obs_pgm OP2 WHERE"
+	 << "         OP2.fromtime<=\'" << otime.isoTime() << "\'"
+	 << "         AND OP2.stationid = OP1.stationid"
+	 << "         AND OP2.paramid  = OP1.paramid"
+	 << "         AND OP2.typeid  = OP1.typeid"
+	 << " ) ORDER BY OP1.paramid";
+	 */
+	return ost.str();
 }
 
-std::string
-kvQueries::selectKeyValues(const std::string& package,
-			   const std::string& key)
+/*
+ Select all entries from obs_pgm matching typeid and
+ valid fromtime and totime.
+ - Sort by stationid.
+ - Valid fromtime is found by using a 'correlated subquery'
+ */
+std::string kvQueries::selectObsPgmByTypeid(long tid,
+		const miutil::miTime& otime)
 {
-  ostringstream ost;
-  
-  ost << " WHERE package=\'" << package
-      << "\' AND key=\'" << key << "\'";
-  
-  return ost.str();
+	ostringstream ost;
+	string obst("\'" + otime.isoTime() + "\'");
+
+	ost << " WHERE typeid=" << tid << " AND " << "       (( fromtime<=" << obst
+			<< " AND totime>" << obst << ") OR " << "        ( fromtime<="
+			<< obst << " AND totime IS NULL ) "
+			<< "       ) ORDER BY stationid, typeid";
+	/*
+	 ost << " OP1 WHERE OP1.typeid=" << tid
+	 << " AND OP1.fromtime=("
+	 << "         SELECT MAX(OP2.fromtime) FROM obs_pgm OP2 WHERE"
+	 << "             OP2.fromtime<=\'" << otime.isoTime() << "\' AND"
+	 << "             OP2.stationid  = OP1.stationid AND"
+	 << "             OP2.typeid     = OP1.typeid    AND"
+	 << "             OP2.paramid    = OP1.paramid   AND"
+	 << "             OP2.level      = OP1.level"
+	 << " ) ORDER BY OP1.stationid, OP1.typeid";
+	 */
+	return ost.str();
 }
 
-std::string
-kvQueries::
-selectIsGenerated(long stationid, int typeid_)
+std::string kvQueries::selectObsPgm(long stationid)
 {
-  ostringstream ost;
-  
-  ost << " WHERE stationid=" << stationid << " AND typeid=" << typeid_;
-  
-  return ost.str();
+	ostringstream ss;
+	ss << "WHERE stationid=" << stationid
+			<< " ORDER BY stationid, typeid, paramid";
+	return ss.str();
 }
 
-  /** EGLITIS (for Qc2)
-   * \brief select all rows from table \em data matching
-   *  stationid in list, paramid=pid and obstime in [stime - etime]
-   */
-std::string
-kvQueries::selectData(const std::list<int> slist, const int pid, const miutil::miTime& stime, const miutil::miTime& etime)
+/*
+ Select all entries from obs_pgm with valid fromtime and totime
+ - Sort by stationid, typeid and paramid
+ - Valid fromtime is found by using a 'correlated subquery'
+ */
+std::string kvQueries::selectObsPgm(const miutil::miTime& otime)
 {
-  ostringstream ost;
+	ostringstream ost;
+	string obst("\'" + otime.isoTime() + "\'");
 
-  ost << " WHERE stationid IN (";
+	ost << " WHERE ( fromtime<=" << obst << " AND totime>" << obst << ") OR "
+			<< "       ( fromtime<=" << obst << " AND totime IS NULL ) "
+			<< "        ORDER BY stationid, typeid, paramid";
 
-  std::list<int>::const_iterator sp= slist.begin();
-  for (; sp!=slist.end(); sp++)
-    ost << (sp==slist.begin() ? "" : ",") << *sp;
-
-  ost << ") and paramid="     << pid
-      << " and obstime>=\'"  << stime.isoTime() << "\'"
-      << " and obstime<=\'"  << etime.isoTime() << "\'"
-      << " order by obstime";
-
-  return ost.str();
+	/*	ost << " OP1 WHERE OP1.fromtime=("
+	 << "         SELECT MAX(OP2.fromtime) FROM obs_pgm OP2 WHERE"
+	 << "         OP2.fromtime<=\'" << otime.isoTime() << "\'"
+	 << "         AND OP2.stationid = OP1.stationid"
+	 << "         AND OP2.paramid  = OP1.paramid"
+	 << " ) ORDER BY OP1.stationid,OP1.typeid,OP1.paramid";
+	 */
+	return ost.str();
 }
 
-  /** EGLITIS (for Qc2)
-   * \brief select all rows from table \em data matching
-   *  stationid in list, paramid=pid and obstime in [stime - etime]
-   */
-std::string
-kvQueries::selectData(const std::list<int> slist, const int pid, const int tid, const miutil::miTime& stime, const miutil::miTime& etime)
+std::string kvQueries::selectKeyValues(const std::string& package,
+		const std::string& key)
 {
-  ostringstream ost;
+	ostringstream ost;
 
-  ost << " WHERE stationid IN (";
+	ost << " WHERE package=\'" << package << "\' AND key=\'" << key << "\'";
 
-  std::list<int>::const_iterator sp= slist.begin();
-  for (; sp!=slist.end(); sp++)
-    ost << (sp==slist.begin() ? "" : ",") << *sp;
-
-  ost << ") and paramid="    << pid
-      << " and typeid="      << tid
-      << " and obstime>=\'"  << stime.isoTime() << "\'"
-      << " and obstime<=\'"  << etime.isoTime() << "\'"
-      << " order by obstime";
-
-  return ost.str();
+	return ost.str();
 }
 
-  /** EGLITIS (for Qc2)
-   * \brief select all rows from table \em data matching
-   *  a single stationid, paramid=pid and obstime in [stime - etime]
-   */
-std::string
-kvQueries::selectData(const int stid, const int pid, const int tid, const miutil::miTime& stime, const miutil::miTime& etime)
+std::string kvQueries::selectIsGenerated(long stationid, int typeid_)
 {
-  ostringstream ost;
+	ostringstream ost;
 
-  ost << " WHERE stationid=" <<stid
-      << " and paramid="    << pid
-      << " and typeid="      << tid
-      << " and obstime>=\'"  << stime.isoTime() << "\'"
-      << " and obstime<=\'"  << etime.isoTime() << "\'"
-      << " order by obstime";
+	ost << " WHERE stationid=" << stationid << " AND typeid=" << typeid_;
 
-  return ost.str();
+	return ost.str();
 }
 
-  /** EGLITIS (for Qc2)
-   * \brief select all rows from table \em data matching
-   *  a single stationid, paramid=pid and obstime in [stime - etime]
-   */
-std::string
-kvQueries::selectData(const int stid, const int pid, const miutil::miTime& stime, const miutil::miTime& etime)
+/** EGLITIS (for Qc2)
+ * \brief select all rows from table \em data matching
+ *  stationid in list, paramid=pid and obstime in [stime - etime]
+ */
+std::string kvQueries::selectData(const std::list<int> slist, const int pid,
+		const miutil::miTime& stime, const miutil::miTime& etime)
 {
-  ostringstream ost;
+	ostringstream ost;
 
-  ost << " WHERE stationid=" <<stid
-      << " and paramid="    << pid
-      << " and obstime>=\'"  << stime.isoTime() << "\'"
-      << " and obstime<=\'"  << etime.isoTime() << "\'"
-      << " order by obstime";
+	ost << " WHERE stationid IN (";
 
-  return ost.str();
+	std::list<int>::const_iterator sp = slist.begin();
+	for (; sp != slist.end(); sp++)
+		ost << (sp == slist.begin() ? "" : ",") << *sp;
+
+	ost << ") and paramid=" << pid << " and obstime>=\'" << stime.isoTime()
+			<< "\'" << " and obstime<=\'" << etime.isoTime() << "\'"
+			<< " order by obstime";
+
+	return ost.str();
 }
 
-  /** EGLITIS (for Qc2)
-   * \brief select all rows from table \em data matching
-   *  paramid=pid and obstime in [stime - etime] and controlinfo="control string"
-   */
-std::string
-kvQueries::selectData(const int pid, const int tid, const miutil::miTime& stime, const miutil::miTime& etime, const string& controlString)
+/** EGLITIS (for Qc2)
+ * \brief select all rows from table \em data matching
+ *  stationid in list, paramid=pid and obstime in [stime - etime]
+ */
+std::string kvQueries::selectData(const std::list<int> slist, const int pid,
+		const int tid, const miutil::miTime& stime, const miutil::miTime& etime)
 {
-  ostringstream ost;
+	ostringstream ost;
 
-  ost << " WHERE paramid="     << pid
-      << " and typeid="        << tid
-      << " and controlinfo=\'" << controlString   << "\'" 
-      << " and obstime>=\'"    << stime.isoTime() << "\'"
-      << " and obstime<=\'"    << etime.isoTime() << "\'"
-      << " order by obstime";
+	ost << " WHERE stationid IN (";
 
-  return ost.str();
+	std::list<int>::const_iterator sp = slist.begin();
+	for (; sp != slist.end(); sp++)
+		ost << (sp == slist.begin() ? "" : ",") << *sp;
+
+	ost << ") and paramid=" << pid << " and typeid=" << tid
+			<< " and obstime>=\'" << stime.isoTime() << "\'"
+			<< " and obstime<=\'" << etime.isoTime() << "\'"
+			<< " order by obstime";
+
+	return ost.str();
 }
 
-
-  /** EGLITIS (for Qc2)
-   * \brief A query to pick out missing float values especially
-   *  for Qc2 tests, for all stations at one particular time
-   */
-std::string
-kvQueries::selectMissingData(const float value, const int pid, const miutil::miTime& Ptime)
+/** EGLITIS (for Qc2)
+ * \brief select all rows from table \em data matching
+ *  a single stationid, paramid=pid and obstime in [stime - etime]
+ */
+std::string kvQueries::selectData(const int stid, const int pid, const int tid,
+		const miutil::miTime& stime, const miutil::miTime& etime)
 {
-  ostringstream ost;
+	ostringstream ost;
 
-  ost << " WHERE original="     << value
-      << " and paramid="        << pid
-      << " and obstime=\'"      << Ptime.isoTime() << "\'"
-      << " order by obstime";
+	ost << " WHERE stationid=" << stid << " and paramid=" << pid
+			<< " and typeid=" << tid << " and obstime>=\'" << stime.isoTime()
+			<< "\'" << " and obstime<=\'" << etime.isoTime() << "\'"
+			<< " order by obstime";
 
-  return ost.str();
+	return ost.str();
 }
 
-  /** EGLITIS (for Qc2)
-   * \brief A query to pick out missing float values especially
-   *  for Qc2 tests, for all stations at one particular time
-   */
-std::string
-kvQueries::selectMissingData(const float value, const int pid, const int tid, const miutil::miTime& Ptime)
+/** EGLITIS (for Qc2)
+ * \brief select all rows from table \em data matching
+ *  a single stationid, paramid=pid and obstime in [stime - etime]
+ */
+std::string kvQueries::selectData(const int stid, const int pid,
+		const miutil::miTime& stime, const miutil::miTime& etime)
 {
-  ostringstream ost;
+	ostringstream ost;
 
-  ost << " WHERE original="     << value
-      << " and paramid="        << pid
-      << " and typeid="        << tid
-      << " and obstime=\'"      << Ptime.isoTime() << "\'"
-      << " order by obstime";
+	ost << " WHERE stationid=" << stid << " and paramid=" << pid
+			<< " and obstime>=\'" << stime.isoTime() << "\'"
+			<< " and obstime<=\'" << etime.isoTime() << "\'"
+			<< " order by obstime";
 
-  return ost.str();
+	return ost.str();
+}
+
+/** EGLITIS (for Qc2)
+ * \brief select all rows from table \em data matching
+ *  paramid=pid and obstime in [stime - etime] and controlinfo="control string"
+ */
+std::string kvQueries::selectData(const int pid, const int tid,
+		const miutil::miTime& stime, const miutil::miTime& etime,
+		const string& controlString)
+{
+	ostringstream ost;
+
+	ost << " WHERE paramid=" << pid << " and typeid=" << tid
+			<< " and controlinfo=\'" << controlString << "\'"
+			<< " and obstime>=\'" << stime.isoTime() << "\'"
+			<< " and obstime<=\'" << etime.isoTime() << "\'"
+			<< " order by obstime";
+
+	return ost.str();
+}
+
+/** EGLITIS (for Qc2)
+ * \brief A query to pick out missing float values especially
+ *  for Qc2 tests, for all stations at one particular time
+ */
+std::string kvQueries::selectMissingData(const float value, const int pid,
+		const miutil::miTime& Ptime)
+{
+	ostringstream ost;
+
+	ost << " WHERE original=" << value << " and paramid=" << pid
+			<< " and obstime=\'" << Ptime.isoTime() << "\'"
+			<< " order by obstime";
+
+	return ost.str();
+}
+
+/** EGLITIS (for Qc2)
+ * \brief A query to pick out missing float values especially
+ *  for Qc2 tests, for all stations at one particular time
+ */
+std::string kvQueries::selectMissingData(const float value, const int pid,
+		const int tid, const miutil::miTime& Ptime)
+{
+	ostringstream ost;
+
+	ost << " WHERE original=" << value << " and paramid=" << pid
+			<< " and typeid=" << tid << " and obstime=\'" << Ptime.isoTime()
+			<< "\'" << " order by obstime";
+
+	return ost.str();
 }
