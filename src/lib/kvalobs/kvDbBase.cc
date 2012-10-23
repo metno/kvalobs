@@ -57,14 +57,14 @@ kvalobs::kvDbBase::
 }
 
 
-miString 
+std::string 
 kvalobs::kvDbBase::
 toUpdate()const
 {
-  return miString();
+  return std::string();
 }
 
-miString 
+std::string 
 kvalobs::kvDbBase::
 insertQuery(bool replace) const
 {
@@ -75,41 +75,41 @@ insertQuery(bool replace) const
 }
 
 
-miString 
+std::string 
 kvalobs::kvDbBase::
 selectAllQuery() const
 {
   return  selectAllQuery(tableName());
 }
 
-miString 
+std::string 
 kvalobs::kvDbBase::
-selectAllQuery(const miutil::miString &tblName)const
+selectAllQuery(const std::string &tblName)const
 {
   ostringstream ost;
   ost <<"select * from " << tblName << " ";
   return ost.str();
 }
 
-miString 
+std::string 
 kvalobs::kvDbBase::
 quoted(const int& in) const
 {
 	return quoted(boost::lexical_cast<std::string>(in));
 }
 
-miString 
+std::string 
 kvalobs::kvDbBase::
 quoted(const miTime& in) const
 {
   return quoted(in.isoTime());
 }
 
-miString 
+std::string 
 kvalobs::kvDbBase::
-quoted(const miString& in) const
+quoted(const std::string& in) const
 {
-  miString out = "\'";
+  std::string out = "\'";
   out+=in+"\'";
   return out;
 }

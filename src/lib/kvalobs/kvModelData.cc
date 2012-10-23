@@ -111,7 +111,7 @@ kvalobs::kvModelData::set(const dnmi::db::DRow &r_)
   return true;
 }
 
-miutil::miString 
+std::string
 kvalobs::kvModelData::toSend() const
 {
   ostringstream ost;
@@ -127,7 +127,7 @@ kvalobs::kvModelData::toSend() const
   return ost.str();
 }
 
-miutil::miString 
+std::string
 kvalobs::kvModelData::uniqueKey()const
 {
   ostringstream ost;

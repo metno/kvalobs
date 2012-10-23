@@ -173,7 +173,7 @@ kvalobs::kvData::set(int pos, const miutil::miTime &obt,
 		     float org, int par, const miutil::miTime &tbt,     
 		     int   typ, int sen, int lvl, float cor,  
 		     const kvControlInfo &cin, const kvUseInfo &uin,
-		     const miutil::miString &fai)
+		     const std::string &fai)
 {
   stationid_   = pos;   
   obstime_     = obt;     
@@ -217,7 +217,7 @@ kvalobs::kvData::set(int pos, const miutil::miTime &obt,
 
 
 
-miutil::miString 
+std::string
 kvalobs::kvData::toSend() const
 {
   ostringstream ost;
@@ -250,7 +250,7 @@ kvalobs::kvData::toSend() const
   return ost.str();
 }
 
-miutil::miString 
+std::string
 kvalobs::kvData::toUpload() const
 {
   ostringstream ost;
@@ -284,7 +284,7 @@ kvalobs::kvData::toUpload() const
 
 
 
-miutil::miString 
+std::string
 kvalobs::kvData::uniqueKey()const
 {
   ostringstream ost;
@@ -301,7 +301,7 @@ kvalobs::kvData::uniqueKey()const
 
 
 
-miutil::miString 
+std::string
 kvalobs::kvData::toUpdate()const
 {
   ostringstream ost;

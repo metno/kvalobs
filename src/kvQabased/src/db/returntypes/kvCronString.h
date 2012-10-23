@@ -35,7 +35,6 @@
  at Wed May 14 17:12:03 2003 */
 
 #include <string>
-#include <puTools/miString.h>
 #include <puTools/miTime.h>
 #include <vector>
 
@@ -70,7 +69,7 @@ namespace kvalobs
 class CronString
 {
 private:
-	miutil::miString str_;
+	std::string str_;
 	bool isempty;
 
 	/// to skip using years - set NT to 4 - etc.

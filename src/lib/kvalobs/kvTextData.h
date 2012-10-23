@@ -51,7 +51,7 @@ class kvTextData : public kvDbBase {
 private:
   int              stationid_;
   miutil::miTime   obstime_;
-  miutil::miString original_;
+  std::string original_;
   int              paramid_;
   miutil::miTime   tbtime_;
   int              tbtimemsec_;
@@ -63,7 +63,7 @@ public:
   kvTextData(const dnmi::db::DRow& r) {set(r);}
   kvTextData(int                     sta,
              const miutil::miTime&   obt,
-             const miutil::miString& org,
+             const std::string& org,
              int                     pid,
              const miutil::miTime&   tbt,
 	     int                     typ )
@@ -72,19 +72,19 @@ public:
   bool set(const dnmi::db::DRow& );
   bool set(int                     sta,
            const miutil::miTime&   obt,
-           const miutil::miString& org,
+           const std::string& org,
            int                     pid,
            const miutil::miTime&   tbt,
            int                     typ );
 
 
   const char* tableName() const {return "text_data";}
-  miutil::miString toSend() const;
-  miutil::miString uniqueKey()const;
+  std::string toSend() const;
+  std::string uniqueKey()const;
 
   int              stationID() const { return stationid_;}
   miutil::miTime   obstime()   const { return obstime_;  }
-  miutil::miString original()  const { return original_; }
+  std::string original()  const { return original_; }
   int              paramID()   const { return paramid_;  }
   miutil::miTime   tbtime()    const { return tbtime_;   }
   int              tbtimemsec()const { return tbtimemsec_; }

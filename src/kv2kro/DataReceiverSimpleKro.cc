@@ -364,7 +364,7 @@ void kv2kro::storeToFile(  string& filename, miutil::miTime& toTime ){
 miutil::miTime kv2kro::lastFromTime(string& filename){
 
     miutil::miTime time;
-    miutil::miString str;
+    miutil::std::string str;
 
     cerr<<"filename= "<<filename<<endl;
 

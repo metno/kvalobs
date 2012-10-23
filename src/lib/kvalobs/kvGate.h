@@ -66,7 +66,7 @@ namespace kvalobs {
     kvGate() {}
     
     template<class T>
-    bool select(std::list<T>& li , miutils::miString q="")
+    bool select(std::list<T>& li , std::string q="")
     {
       li.clear();
       std::string query = T::selectAllQuery() + q;

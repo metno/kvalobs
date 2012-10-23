@@ -56,28 +56,28 @@ namespace kvalobs {
     int today_;
     int time_;
     int priority_;
-    miutil::miString qcx_;
+    std::string qcx_;
 
   public:
     kvTimecontrol() {}
     kvTimecontrol( const dnmi::db::DRow& r) {set(r);}
     kvTimecontrol( int fr, int to,int ti, int pr,
-		   const miutil::miString& qc)
+		   const std::string& qc)
     {set(fr,to,ti,pr,qc);}
 
     bool set(const dnmi::db::DRow&);
-    bool set(int, int,int, int,  const miutil::miString& );
+    bool set(int, int,int, int,  const std::string& );
 
 
     const char* tableName() const {return "timecontrol";}
-    miutil::miString toSend() const;
-    miutil::miString uniqueKey()const;
+    std::string toSend() const;
+    std::string uniqueKey()const;
 
     int fromday()          const { return fromday_; }
     int today()            const { return today_;   }
     int time()             const { return time_;    }
     int priority()         const { return priority_;}
-    miutil::miString qcx() const { return qcx_;     }
+    std::string qcx() const { return qcx_;     }
 
 
     miutil::miDate fromDAY(int y=-1) const

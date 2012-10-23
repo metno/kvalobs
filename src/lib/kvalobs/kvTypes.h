@@ -51,36 +51,36 @@ namespace kvalobs {
   class kvTypes :  public kvDbBase {
   private:
     int typeid_;
-    miutil::miString format_;
+    std::string format_;
     int earlyobs_;
     int lateobs_;
-    miutil::miString read_;
-    miutil::miString obspgm_;
-    miutil::miString comment_;
+    std::string read_;
+    std::string obspgm_;
+    std::string comment_;
 
   public:
     kvTypes() {}
     kvTypes(const dnmi::db::DRow& r) { set(r);}
-    kvTypes( int ty, miutil::miString na, int earlyobs, int lateobs,
-	     miutil::miString read, miutil::miString obs, miutil::miString co )
+    kvTypes( int ty, std::string na, int earlyobs, int lateobs,
+	     std::string read, std::string obs, std::string co )
     {set(ty, na, earlyobs, lateobs, read, obs, co);}
 
     bool set(const dnmi::db::DRow&);
-    bool set(int, miutil::miString, int, int, miutil::miString,  miutil::miString, miutil::miString );
+    bool set(int, std::string, int, int, std::string,  std::string, std::string );
 
-    miutil::miString uniqueKey()const;
+    std::string uniqueKey()const;
 
     int typeID()               const {return typeid_; }
-    miutil::miString format()  const {return format_;   }
+    std::string format()  const {return format_;   }
     int earlyobs()             const {return earlyobs_;}
     int lateobs()              const {return lateobs_;}
-    miutil::miString read()    const {return read_;}
-    miutil::miString obspgm()  const {return obspgm_;}
-    miutil::miString comment() const {return comment_;}
+    std::string read()    const {return read_;}
+    std::string obspgm()  const {return obspgm_;}
+    std::string comment() const {return comment_;}
 
 
     const char* tableName() const {return "types";}
-    miutil::miString toSend() const;
+    std::string toSend() const;
 
   };
 

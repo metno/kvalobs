@@ -37,7 +37,7 @@ using namespace std;
 using namespace miutil;
 using namespace dnmi;
 
-miString 
+std::string 
 kvalobs::kvChecks::toSend() const
 {
   ostringstream ost;
@@ -97,12 +97,12 @@ kvalobs::kvChecks::set(const dnmi::db::DRow &r_)
 
 bool
 kvalobs::kvChecks::set(int stationid,  
-		       const miutil::miString &qcx,
-		       const miutil::miString &medium_qcx,
+		       const std::string &qcx,
+		       const std::string &medium_qcx,
 		       int  language,  
-		       const miutil::miString &checkname,
-		       const  miutil::miString &checksignature,
-		       const  miutil::miString &active,
+		       const std::string &checkname,
+		       const  std::string &checksignature,
+		       const  std::string &active,
                        const miutil::miTime& fromtime )
 {
     stationid_ =stationid;
@@ -119,7 +119,7 @@ kvalobs::kvChecks::set(int stationid,
     return true;
 }
 
-miutil::miString 
+std::string
 kvalobs::kvChecks::uniqueKey()const
 {
   ostringstream ost;

@@ -338,8 +338,8 @@ DataIteratorImpl::findData(list<kvData> &data,
 	   		 iData);
 
   	if(currentEndTime.undef()){
-    	stime.setTime(miString(wData.fromObsTime));
-    	endTime.setTime(miString(wData.toObsTime));
+    	stime.setTime(std::string(wData.fromObsTime));
+    	endTime.setTime(std::string(wData.toObsTime));
 
     	if(stime.undef() || endTime.undef()){
       		if(stime.undef()){

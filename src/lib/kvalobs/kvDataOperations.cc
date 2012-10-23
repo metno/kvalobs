@@ -108,16 +108,6 @@ kvData getMissingKvData( int stationID, const miutil::miTime & obsTime,
 {
   kvDataFactory f( stationID, obsTime, typeID, sensor, level );
   return f.getMissing( paramID );
-  /*
-  kvControlInfo ci;
-  ci.set( fmis, 3 );
-  kvUseInfo ui;
-  kvData ret( stationID, obsTime, missingValue_, paramID,
-  miutil::miTime::nowTime(),
-  typeID, sensor, level, missingValue_, ci, ui,
-  miutil::miString("") );
-  return ret;
-  */
 }
 
 kvDataFactory::kvDataFactory( int stationID, const miutil::miTime & obstime, int typeID, int sensor, int level )
@@ -143,7 +133,7 @@ kvData kvDataFactory::getData( float val, int paramID, const miutil::miTime & ob
   kvData ret( stationID_, obstime.undef() ? obstime_ : obstime, val, paramID,
               miutil::miTime::nowTime(),
               typeID_, sensor_, level_, val, kvControlInfo(), kvUseInfo(),
-              miutil::miString("") );
+              std::string("") );
   return ret;
 
 }

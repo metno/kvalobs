@@ -32,7 +32,6 @@
 #define __DATATBLVIEW_H__
 
 #include <kvalobs/kvDbBase.h>
-#include <puTools/miString.h>
 #include <puTools/miTime.h>
 #include <kvdb/kvdb.h>
 
@@ -64,10 +63,10 @@ class DataTblView : public kvalobs::kvDbBase{
 		bool set(const dnmi::db::DRow&);
 		
 		/** Not implemented, not needed!*/
-		miutil::miString toSend()const;
+		std::string toSend()const;
 		
 		/** Not implemented, not needed!*/
-		miutil::miString uniqueKey()const;
+		std::string uniqueKey()const;
 		
 		const char* tableName()const;
 		

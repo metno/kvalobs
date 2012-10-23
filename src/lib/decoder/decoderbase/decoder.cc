@@ -427,7 +427,7 @@ deleteKvDataFromDb(const kvalobs::kvData &sd)
 {
    kvDbGate gate(&con);
    std::list<kvalobs::kvData> dataList;
-   miutil::miString query(kvQueries::selectData(sd));
+   std::string query(kvQueries::selectData(sd));
    std::ostringstream ost;
 
    ost << "delete from " << sd.tableName() << " " << query;

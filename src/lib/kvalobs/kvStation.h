@@ -57,12 +57,12 @@ namespace kvalobs {
     float lon_;
     float height_;
     float maxspeed_;
-    miutil::miString name_;
+    std::string name_;
     int wmonr_;
     int nationalnr_;
-    miutil::miString ICAOid_;
-    miutil::miString call_sign_;
-    miutil::miString stationstr_;
+    std::string ICAOid_;
+    std::string call_sign_;
+    std::string stationstr_;
     int environmentid_;
     bool static_;
     miutil::miTime fromtime_;
@@ -71,34 +71,34 @@ namespace kvalobs {
     kvStation() {}
     kvStation(const dnmi::db::DRow& r) {set(r);}
     kvStation( int st, float la, float lo, float he, float max,
-	       const miutil::miString& na, int wm, int nn,
-	       const miutil::miString& ic, const miutil::miString& ca,
-	       const miutil::miString& ss, int environmentid,
+	       const std::string& na, int wm, int nn,
+	       const std::string& ic, const std::string& ca,
+	       const std::string& ss, int environmentid,
 	       bool static_, const miutil::miTime& fromtime)
       {set(st,la,lo,he,max,na,wm,nn,ic,ca,ss,environmentid,static_,fromtime);}
 
     bool set(const dnmi::db::DRow&);
 
-    bool set( int, float, float, float, float, const miutil::miString&,
-	      int, int, const miutil::miString&, const miutil::miString&,
-	      const miutil::miString&, int,
+    bool set( int, float, float, float, float, const std::string&,
+	      int, int, const std::string&, const std::string&,
+	      const std::string&, int,
 	      bool, const miutil::miTime& );
 
     const char* tableName() const {return "station";}
-    miutil::miString toSend() const;
-    miutil::miString uniqueKey()const;
+    std::string toSend() const;
+    std::string uniqueKey()const;
 
     int stationID()                const {return stationid_;  }
     float lat()                    const {return lat_;        }
     float lon()                    const {return lon_;        }
     float height()                 const {return height_;     }
     float maxspeed()               const {return maxspeed_;   }
-    miutil::miString name()        const {return name_;       }
+    std::string name()        const {return name_;       }
     int wmonr()                    const {return wmonr_;      }
     int nationalnr()               const {return nationalnr_; }
-    miutil::miString ICAOID()      const {return ICAOid_;     }
-    miutil::miString call_sign()   const {return call_sign_;  }
-    miutil::miString stationstr()  const {return stationstr_; }
+    std::string ICAOID()      const {return ICAOid_;     }
+    std::string call_sign()   const {return call_sign_;  }
+    std::string stationstr()  const {return stationstr_; }
     int environmentid()            const {return environmentid_;}
     bool _static()                 const {return static_;     }
     miutil::miTime fromtime()      const {return fromtime_;   }

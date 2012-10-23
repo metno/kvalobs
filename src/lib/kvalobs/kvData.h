@@ -67,7 +67,7 @@ private:
   float            corrected_;
   kvControlInfo    controlinfo_;
   kvUseInfo        useinfo_;
-  miutil::miString cfailed_;
+  std::string cfailed_;
 
   void createSortIndex();
 
@@ -87,7 +87,7 @@ public:
 	 float                    cor,
 	 const kvControlInfo &    cin,
 	 const kvUseInfo &        uin,
-         const miutil::miString & fai)
+         const std::string & fai)
   { set(pos, obt, org, par, tbt, typ, sen, lvl, cor, cin, uin, fai);}
 
   bool set(int                      pos,
@@ -101,7 +101,7 @@ public:
 	   float                    cor,
 	   const kvControlInfo &    cin,
 	   const kvUseInfo &        uin,
-	   const miutil::miString & fai);
+	   const std::string & fai);
 
   bool set(int                   pos,
 	   const miutil::miTime& obt,
@@ -123,10 +123,10 @@ public:
 
   kvData& operator=(const kvData &rhs );
 
-  miutil::miString toSend()   const;
-  miutil::miString toUpdate() const;
-  miutil::miString toUpload() const;
-  miutil::miString uniqueKey() const;
+  std::string toSend()   const;
+  std::string toUpdate() const;
+  std::string toUpload() const;
+  std::string uniqueKey() const;
 
   int              stationID()   const { return stationid_;  }
   miutil::miTime   obstime()     const { return obstime_;    }
@@ -140,7 +140,7 @@ public:
   float            corrected()   const { return corrected_;  }
   kvControlInfo    controlinfo() const { return controlinfo_;}
   kvUseInfo        useinfo()     const { return useinfo_;    }
-  miutil::miString cfailed()     const { return cfailed_;    }
+  std::string cfailed()     const { return cfailed_;    }
 
   void tbtime( const miutil::miTime &tbtime, int msec=0);
   void typeID(int t)                       { typeid_      =t; }
@@ -148,7 +148,7 @@ public:
   void controlinfo(const kvControlInfo &f) { controlinfo_ = f;}
   void useinfo(const kvUseInfo &f)         { useinfo_     = f;}
   void useinfo(int flag, char newVal);
-  void cfailed(const miutil::miString& cf) { cfailed_     =cf;}
+  void cfailed(const std::string& cf) { cfailed_     =cf;}
 
   friend std::ostream& operator<<( std::ostream& output,
                                    const kvalobs::kvData &d );

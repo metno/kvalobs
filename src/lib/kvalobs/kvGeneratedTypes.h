@@ -67,10 +67,10 @@ public:
   bool set( int, int );
   bool set(const dnmi::db::DRow&);
 
-  miutil::miString uniqueKey() const;
+  std::string uniqueKey() const;
 
   const char* tableName() const {return "generated_types";}
-  miutil::miString toSend() const;
+  std::string toSend() const;
 
 
   int stationID() const {return stationid_; }

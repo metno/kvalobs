@@ -50,38 +50,38 @@ namespace kvalobs {
 
 class kvQcxInfo : public kvDbBase {
 private:
-  miutil::miString medium_qcx_;
-  miutil::miString main_qcx_;
+  std::string medium_qcx_;
+  std::string main_qcx_;
   int              controlpart_;
-  miutil::miString comment_;
+  std::string comment_;
 
 public:
 
   kvQcxInfo() {};
   kvQcxInfo( const dnmi::db::DRow& r) {set(r);}
-  kvQcxInfo( const miutil::miString& medium_qcx,
-	     const miutil::miString& main_qcx,
+  kvQcxInfo( const std::string& medium_qcx,
+	     const std::string& main_qcx,
              int controlpart,
-	     const miutil::miString& comment
+	     const std::string& comment
 	     )
       { set( medium_qcx, main_qcx, controlpart, comment);}
   ~kvQcxInfo();
 
-  bool set( const miutil::miString& medium_qcx,
-	    const miutil::miString& main_qcx,
+  bool set( const std::string& medium_qcx,
+	    const std::string& main_qcx,
             int controlpart,
-	    const miutil::miString& comment);
+	    const std::string& comment);
 
 
   bool set(const dnmi::db::DRow&);
   const char* tableName() const {return "qcx_info";}
-  miutil::miString toSend() const;
-  miutil::miString uniqueKey()const;
+  std::string toSend() const;
+  std::string uniqueKey()const;
 
-  miutil::miString medium_qcx() const {return medium_qcx_; }
-  miutil::miString main_qcx() const {return main_qcx_; }
+  std::string medium_qcx() const {return medium_qcx_; }
+  std::string main_qcx() const {return main_qcx_; }
   int controlpart()          const {return controlpart_; }
-  miutil::miString comment() const {return comment_; }
+  std::string comment() const {return comment_; }
   };
 
 /** @} */

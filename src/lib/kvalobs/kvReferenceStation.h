@@ -52,7 +52,7 @@ class kvReferenceStation : public kvDbBase {
 private:
   int stationid_;
   int paramsetid_;
-  miutil::miString reference_;
+  std::string reference_;
 
 public:
 
@@ -60,22 +60,22 @@ public:
   kvReferenceStation(const dnmi::db::DRow& r) {set(r);}
   kvReferenceStation( int stationid,
                       int paramsetid,
-                      const miutil::miString& reference )
+                      const std::string& reference )
   { set(stationid, paramsetid, reference);}
 
   bool set( int stationid,
             int paramsetid,
-            const miutil::miString& reference );
+            const std::string& reference );
 
   bool set(const dnmi::db::DRow&);
   const char* tableName() const {return "reference_station";}
-  miutil::miString toSend() const;
-  miutil::miString uniqueKey()const;
+  std::string toSend() const;
+  std::string uniqueKey()const;
 
 
   int stationID()              const {return stationid_; }
   int paramsetID()             const {return paramsetid_; }
-  miutil::miString reference() const {return reference_; }
+  std::string reference() const {return reference_; }
 
   };
 

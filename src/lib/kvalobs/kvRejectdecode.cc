@@ -33,7 +33,7 @@
 using namespace std;
 using namespace miutil;
 
-miString kvalobs::kvRejectdecode::toSend() const
+std::string kvalobs::kvRejectdecode::toSend() const
 {
 	ostringstream ost;
 	ost << "(" << quoted(message_) << "," << quoted(tbtime_) << "," << quoted(
@@ -41,9 +41,9 @@ miString kvalobs::kvRejectdecode::toSend() const
 	return ost.str();
 }
 
-bool kvalobs::kvRejectdecode::set(const miString &message__,
-		const miTime &tbtime__, const miString &decoder__,
-		const miString &comment__,
+bool kvalobs::kvRejectdecode::set(const std::string &message__,
+		const miTime &tbtime__, const std::string &decoder__,
+		const std::string &comment__,
 		bool fixed)
 {
 	message_ = message__;
@@ -90,7 +90,7 @@ bool kvalobs::kvRejectdecode::set(const dnmi::db::DRow& r_)
 	return true;
 }
 
-miutil::miString kvalobs::kvRejectdecode::uniqueKey() const
+std::string kvalobs::kvRejectdecode::uniqueKey() const
 {
 	ostringstream ost;
 

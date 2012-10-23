@@ -82,11 +82,11 @@ kvalobs::kvParam::set(const dnmi::db::DRow &r_)
 
 bool
 kvalobs::kvParam::set(int              paramid,    
-		      const miutil::miString &name,       
-		      const miutil::miString &description,
-		      const miutil::miString &unit,
+		      const std::string &name,
+		      const std::string &description,
+		      const std::string &unit,
 		      int              level_scale,
-		      const miutil::miString &comment)
+		      const std::string &comment)
 {
   paramid_=paramid;
   name_=name;
@@ -101,7 +101,7 @@ kvalobs::kvParam::set(int              paramid,
 }
 
 
-miutil::miString 
+std::string
 kvalobs::kvParam::toSend() const
 {
   ostringstream ost;
@@ -118,7 +118,7 @@ kvalobs::kvParam::toSend() const
 }
 
 
-miutil::miString 
+std::string
 kvalobs::kvParam::uniqueKey()const
 {
   ostringstream ost;

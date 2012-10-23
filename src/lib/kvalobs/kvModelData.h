@@ -85,8 +85,8 @@ class kvModelData : public kvDbBase {
 
   bool set(const dnmi::db::DRow&);
   const char* tableName() const {return "model_data";}
-  miutil::miString toSend()   const;
-  miutil::miString uniqueKey()const;
+  std::string toSend()   const;
+  std::string uniqueKey()const;
 
   int              stationID() const { return stationid_;}
   miutil::miTime   obstime()   const { return obstime_;}

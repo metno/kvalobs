@@ -31,7 +31,6 @@
 #include <map>
 #include <kvalobs/kvParamset.h> 
 #include <kvalobs/kvParamsetdef.h>
-#include <puTools/miString.h>
 
 
 using namespace std;
@@ -44,8 +43,8 @@ kvalobs::kvParamset::kvParamset() {
            paramset t = paramset_[i];
            int paramsetid = t.paramsetid;
            char * set     = t.set;
-           miString str   = miString(set);
-           vector<miString> vstr = str.split(str);
+           std::string str   = std::string(set);
+           vector<std::string> vstr = str.split(str);
            m_str_paramset[paramsetid] = vstr;
            vector<int> vi;
            for(  int k = 0; k < vstr.size(); k++ ){
@@ -75,7 +74,7 @@ vector<int> kvalobs::kvParamset::get_param( int paramsetid ){
 
 
 
-vector<miString> kvalobs::kvParamset::get_param_str( int paramsetid ){
+vector<std::string> kvalobs::kvParamset::get_param_str( int paramsetid ){
     return m_str_paramset[paramsetid];
 }
 

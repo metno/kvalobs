@@ -35,7 +35,7 @@ using namespace std;
 using namespace miutil;
 
 
-miString kvalobs::kvTextData::toSend() const
+std::string kvalobs::kvTextData::toSend() const
 {
    ostringstream ost;
    string myTbtime;
@@ -63,7 +63,7 @@ miString kvalobs::kvTextData::toSend() const
 
 bool kvalobs::kvTextData::set( int                     sta,
                                const miutil::miTime&   obt,
-                               const miutil::miString& org,
+                               const std::string& org,
                                int                     pid,
                                const miutil::miTime&   tbt,
                                int                     typ )
@@ -85,7 +85,7 @@ bool kvalobs::kvTextData::set(const dnmi::db::DRow& r_)
   dnmi::db::DRow &       r     = const_cast<dnmi::db::DRow&>(r_);
   list<string>           names = r.getFieldNames();
   list<string>::iterator it    = names.begin();
-  miString               buf;
+  std::string               buf;
 
   for(;it!=names.end(); it++){
     try{
@@ -124,7 +124,7 @@ tbtime( const miutil::miTime &tbtime, int msec)
       tbtimemsec_ = 0;
 }
 
-miutil::miString 
+std::string
 kvalobs::kvTextData::uniqueKey()const
 {
   ostringstream ost;

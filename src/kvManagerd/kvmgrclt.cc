@@ -39,7 +39,6 @@
 #include <kvalobs/kvStation.h>
 #include <kvalobs/kvData.h>
 #include <kvalobs/kvWorkelement.h>
-#include <puTools/miString.h>
 #include "kvmgrcltApp.h"
 
 using namespace std; 

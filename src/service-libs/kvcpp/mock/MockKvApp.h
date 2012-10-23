@@ -50,6 +50,7 @@ public:
 	MOCK_METHOD1(getKvOperator, bool( std::list<kvalobs::kvOperator> &operatorList ));
 	MOCK_METHOD4(getKvStationParam, bool( std::list<kvalobs::kvStationParam> &stParam, int stationid, int paramid, int day ));
 	MOCK_METHOD4(getKvStationMetaData, bool( std::list<kvalobs::kvStationMetadata> &stMeta, int stationid, const miutil::miTime &obstime, const std::string & metadataName ));
+	MOCK_METHOD4(getKvWorkstatistik, bool(CKvalObs::CService::WorkstatistikTimeType timeType, const miutil::miTime &from, const miutil::miTime &to, kvservice::WorkstatistikIterator &it));
 
 	MOCK_METHOD3(getKvObsPgm, bool( std::list<kvalobs::kvObsPgm> &obsPgm, const std::list<long> &stationList, bool aUnion ));
 	MOCK_METHOD2(getKvData, bool( kvservice::KvObsDataList &dataList, const kvservice::WhichDataHelper &wd ));
@@ -79,6 +80,7 @@ public:
 		ON_CALL(*this, getKvOperator(_)).WillByDefault(Return(true));
 		ON_CALL(*this, getKvStationParam(_,_,_,_)).WillByDefault(Return(true));
 		ON_CALL(*this, getKvStationMetaData(_,_,_,_)).WillByDefault(Return(true));
+		ON_CALL(*this, getKvWorkstatistik(_,_,_,_)).WillByDefault(Return(true));
 		ON_CALL(*this, getKvObsPgm(_,_,_)).WillByDefault(Return(true));
 		ON_CALL(*this, getKvData(An<kvservice::KvObsDataList &>(),_)).WillByDefault(Return(true));
 

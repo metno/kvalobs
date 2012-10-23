@@ -35,7 +35,7 @@ using namespace std;
 using namespace miutil;
 
 
-miString kvalobs::kvObsPgm::toSend() const
+std::string kvalobs::kvObsPgm::toSend() const
 {
    ostringstream ost;
    ost << "("
@@ -355,7 +355,7 @@ bool kvalobs::kvObsPgm::isOn(const miutil::miTime& t) const
 }
 
 
-miutil::miString 
+std::string
 kvalobs::kvObsPgm::uniqueKey()const
 {
   ostringstream ost;

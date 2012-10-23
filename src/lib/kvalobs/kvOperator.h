@@ -52,31 +52,31 @@ namespace kvalobs {
 
 class kvOperator : public kvDbBase {
 private:
-  miutil::miString username_;
+  std::string username_;
   int userid_;
 
 public:
 
   kvOperator() {};
   kvOperator(const dnmi::db::DRow& r) {set(r);}
-  kvOperator( const miutil::miString& username,
+  kvOperator( const std::string& username,
               int userid )
   { set(username, userid);}
 
-  bool set( const miutil::miString& username,
+  bool set( const std::string& username,
             int userid );
 
   bool set(const dnmi::db::DRow&);
   const char* tableName() const {return "operator";}
-  miutil::miString toSend() const;
-  miutil::miString uniqueKey()const;
+  std::string toSend() const;
+  std::string uniqueKey()const;
 
 
   /**
    * \brief Name of a user that is permited to access HQC.
    * \return A user name.
    */
-  miutil::miString username() const {return username_; }
+  std::string username() const {return username_; }
 
   /**
    * \brief the userid for a that is permited to access HQC.

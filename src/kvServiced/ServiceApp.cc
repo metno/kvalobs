@@ -142,7 +142,7 @@ isOk()const
 
 kvalobs::kvStation 
 ServiceApp::
-lookUpStation(const miutil::miString &kvQuerie)
+lookUpStation(const std::string &kvQuerie)
 {
   return kvalobs::kvStation();
 }

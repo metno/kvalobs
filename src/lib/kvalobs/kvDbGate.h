@@ -31,7 +31,6 @@
 #ifndef _kvDbGate_h
 #define _kvDbGate_h
 
-#include <puTools/miString.h>
 #include <kvalobs/kvAlgorithms.h>
 #include <kvalobs/kvChecks.h>
 #include <kvalobs/kvData.h>
@@ -205,7 +204,7 @@ public:
 
    template<class T>
    bool insert(const std::list<T>& li , bool replace=false,
-               const miutil::miString &tblName="")
+               const std::string &tblName="")
    {
       typename std::list<T>::const_iterator it=li.begin();
       std::list<kvalobs::kvDbBase*> myList;
@@ -233,7 +232,7 @@ public:
 
    template<class T>
       bool insertList(const std::list<T>& li , InsertOption option=INSERT_OR_UPDATE,
-                  const miutil::miString &tblName="")
+                  const std::string &tblName="")
       {
          typename std::list<T>::const_iterator it=li.begin();
          std::list<kvalobs::kvDbBase*> myList;
@@ -465,8 +464,8 @@ public:
    *         or getError() to get information on the error.
    */
    template<class T>
-   bool select(std::list<T>& li , const miutil::miString &q="",
-               const miutil::miString &tblName="")
+   bool select(std::list<T>& li , const std::string &q="",
+               const std::string &tblName="")
    {
       time_t timeout;
       time_t now;

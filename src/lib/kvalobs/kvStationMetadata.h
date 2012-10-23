@@ -76,8 +76,8 @@ public:
 	bool haveSpecificSensor() const { return sensor_ != INT_NULL; }
 
 
-    virtual miutil::miString toSend() const;
-    virtual miutil::miString uniqueKey() const;
+    virtual std::string toSend() const;
+    virtual std::string uniqueKey() const;
     virtual const char* tableName() const;
 
 private:

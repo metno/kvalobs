@@ -33,7 +33,6 @@
 
 #include <vector>
 #include <map>
-#include <puTools/miString.h>
 
 /* Dette er ingen databaseconnection- men et bibliotek */
 
@@ -54,7 +53,7 @@ namespace kvalobs {
 
      private:
         std::map< int, std::vector<int> > m_int_paramset;
-	std::map< int, std::vector< miutil::miString> > m_str_paramset;
+	std::map< int, std::vector< miutil::std::string> > m_str_paramset;
 	std::map< int, std::vector<int> > m_int_param;
 
 	void add_inverse( int paramsetid, std::vector<int> vi );
@@ -68,7 +67,7 @@ namespace kvalobs {
 	 * 
 	 * \note get_param og  get_param_str er egentlig samme funksjone, 
 	 * de returnerer bare verdien som forskjellig datatype - henholdsvis 
-	 * som en vector<int> og en vector<miString>
+	 * som en vector<int> og en vector<string>
 	 * get_param og get_paramset er omvendte funksjoner
 	 */
 	std::vector<int> get_param( int paramsetid );
@@ -79,10 +78,10 @@ namespace kvalobs {
 	 * 
 	 * \note get_param og  get_param_str er egentlig samme funksjone, 
 	 * de returnerer bare verdien som forskjellig datatype - henholdsvis 
-	 * som en vector<int> og en vector<miString>
+	 * som en vector<int> og en vector<string>
 	 *  get_param og get_paramset er omvendte funksjoner
 	 */
-	std::vector< miutil::miString> get_param_str( int paramsetid );
+	std::vector< miutil::std::string> get_param_str( int paramsetid );
 	
 	/**
 	 * \brief returnerer en vector av paramset som inneholder mengden

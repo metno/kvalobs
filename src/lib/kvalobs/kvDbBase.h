@@ -32,7 +32,6 @@
 #define _kvDbBase_h
 
 #include <kvdb/kvdb.h>
-#include <puTools/miString.h>
 #include <iostream>
 #include <fstream>
 #include <puTools/miTime.h>
@@ -67,7 +66,7 @@ namespace kvalobs {
   class kvDbBase {
 
   protected:
-    miutil::miString sortBy_;
+    std::string sortBy_;
     miutil::miDate julianDayThatYear(int addOn,int year=-1) const;
 
   public:
@@ -106,7 +105,7 @@ namespace kvalobs {
      * \return The value part of a SQL insert statment.
      *
      */
-    virtual miutil::miString toSend()const=0;
+    virtual std::string toSend()const=0;
 
     /**
      * \brief make quoted string of the input parameter.
@@ -114,7 +113,7 @@ namespace kvalobs {
      * \param toQuote the string to be quoted.
      * \return a quoted version of the toQuote string.
      */
-    miutil::miString quoted(const miutil::miString &toQuote) const;
+    std::string quoted(const std::string &toQuote) const;
 
     /**
      * /brief make a quoted ISO time.
@@ -122,7 +121,7 @@ namespace kvalobs {
      * \param timeToQuote the time we want a quoted ISO time.
      * \return a quoted ISO time formatted version of timetoQuote.
      */
-    miutil::miString quoted(const miutil::miTime& timeToQuote) const;
+    std::string quoted(const miutil::miTime& timeToQuote) const;
 
     /**
      * \brief create a quoted string versjon of a integer.
@@ -130,14 +129,14 @@ namespace kvalobs {
      * \param intToQuote the integer to create a quoted string version of.
      * \return a quoted string version of intToQuote.
      */
-    miutil::miString quoted(const int &intToQuote) const;
+    std::string quoted(const int &intToQuote) const;
 
     /**
      * /brief is this instance initialized with walues.
      *
      * \return true if initialized and false otherwise.
      */
-    bool exists() const {return sortBy_.exists();}
+    bool exists() const {return not sortBy_.empty();}
 
     /**
      * \brief generate a string that can be used to update the table from
@@ -145,7 +144,7 @@ namespace kvalobs {
      *
      *  \return A string that can be used to update a row in the table.
      */
-    virtual miutil::miString toUpdate()const;
+    virtual std::string toUpdate()const;
 
     /**
      * \brief create a string that uniqly idenitify this instance
@@ -154,12 +153,12 @@ namespace kvalobs {
      * \return a string that can be used in a query to uniqly indentify
      *         the data in this instance.
      */
-    virtual miutil::miString uniqueKey()const =0;
+    virtual std::string uniqueKey()const =0;
 
 
-    miutil::miString insertQuery(const bool replace) const;
-    miutil::miString selectAllQuery() const;
-    miutil::miString selectAllQuery(const miutil::miString &tblName) const;
+    std::string insertQuery(const bool replace) const;
+    std::string selectAllQuery() const;
+    std::string selectAllQuery(const std::string &tblName) const;
 
     /**
      * Decode an time string with microseconds. Valid time string format

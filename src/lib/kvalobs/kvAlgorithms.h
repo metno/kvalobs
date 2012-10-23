@@ -52,17 +52,17 @@ namespace kvalobs{
 class kvAlgorithms : public kvDbBase {
 private:
   int              language_;
-  miutil::miString checkname_;
-  miutil::miString signature_;
-  miutil::miString script_;
+  std::string checkname_;
+  std::string signature_;
+  std::string script_;
 
 public:
   kvAlgorithms() {}
   kvAlgorithms(const dnmi::db::DRow &r){set(r);}
   kvAlgorithms(int   language,
-	       const miutil::miString &checkname,
-	       const miutil::miString &signature,
-	       const miutil::miString &script)
+	       const std::string &checkname,
+	       const std::string &signature,
+	       const std::string &script)
       {
 	set(language, checkname, signature, script);
       }
@@ -70,20 +70,20 @@ public:
 
 
   bool set(int   language,
-	   const miutil::miString &checkname,
-	   const miutil::miString &signature,
-	   const miutil::miString &script);
+	   const std::string &checkname,
+	   const std::string &signature,
+	   const std::string &script);
 
   bool set(const dnmi::db::DRow&);
   const char* tableName() const {return "algorithms";}
-  miutil::miString toSend() const;
+  std::string toSend() const;
 
-  miutil::miString uniqueKey()const;
+  std::string uniqueKey()const;
 
   int language()              const { return language_; }
-  miutil::miString checkname()const { return checkname_;}
-  miutil::miString signature()const { return signature_;}
-  miutil::miString script()   const { return script_;}
+  std::string checkname()const { return checkname_;}
+  std::string signature()const { return signature_;}
+  std::string script()   const { return script_;}
 
 };
 

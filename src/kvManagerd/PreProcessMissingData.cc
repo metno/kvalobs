@@ -358,7 +358,7 @@ PreProcessMissingData::doJob(long                 stationId,
             // insert missing data
             kvControlInfo    controlinfo;
             kvUseInfo        useinfo;
-            miutil::miString failed;
+            std::string failed;
             float            original  = -32767;
             float            corrected = -32767;
             controlinfo.MissingFlag(kvQCFlagTypes::status_orig_and_corr_missing);

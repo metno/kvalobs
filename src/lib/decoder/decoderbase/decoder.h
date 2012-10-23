@@ -477,7 +477,7 @@ namespace kvalobs{
        * and the the type of the message was given as the obsType_ parameter 
        * to the constructor:  
        *
-       *  DecoderBase(dnmi::db::Connection   &con_,const ParamList        &params,const std::list<kvalobs::kvTypes> &typeList,const miutil::miString &obsType_,const miutil::miString &obs_,int                    decoderId_)
+       *  DecoderBase(dnmi::db::Connection   &con_,const ParamList        &params,const std::list<kvalobs::kvTypes> &typeList,const std::string &obsType_,const std::string &obs_,int                    decoderId_)
        *
        * The observation message and the observation type (format) is 
        * avalable to the decoder as the protected variables \em obs and 

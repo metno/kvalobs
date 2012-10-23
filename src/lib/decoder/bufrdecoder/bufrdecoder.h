@@ -63,7 +63,7 @@ class BufrDecoder : public DecoderBase{
    int earlyobs;
    int lateobs;
 
-   long getStationId(miutil::miString &msg);
+   long getStationId(miutil::std::string &msg);
    bool initialize();
 
 
@@ -71,8 +71,8 @@ public:
    BufrDecoder( dnmi::db::Connection     &con,
                 const ParamList        &params,
                 const std::list<kvalobs::kvTypes> &typeList,
-                const miutil::miString &obsType,
-                const miutil::miString &obs,
+                const miutil::std::string &obsType,
+                const miutil::std::string &obs,
                 int                    decoderId=-1);
    virtual ~BufrDecoder();
 
@@ -88,9 +88,9 @@ public:
    bool getEarlyLateObs( int &early, int &late )const;
 
 
-   virtual miutil::miString name()const;
+   virtual miutil::std::string name()const;
 
-   virtual DecodeResult execute(miutil::miString &msg);
+   virtual DecodeResult execute(miutil::std::string &msg);
 };
 }
 }

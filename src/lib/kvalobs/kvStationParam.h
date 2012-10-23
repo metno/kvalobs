@@ -59,27 +59,27 @@ namespace kvalobs {
     int fromday_;
     int today_;
     int hour_;
-    miutil::miString qcx_;
-    miutil::miString metadata_;
-    miutil::miString descMetadata_;
+    std::string qcx_;
+    std::string metadata_;
+    std::string descMetadata_;
     miutil::miTime fromtime_;
 
   public:
     kvStationParam() {}
     kvStationParam(const dnmi::db::DRow& r) {set(r);}
-    kvStationParam(int st, int pa, int lev, int sen, int fr, int to, int hour, const miutil::miString& qc,
-		   const miutil::miString& md, const miutil::miString& dm,
+    kvStationParam(int st, int pa, int lev, int sen, int fr, int to, int hour, const std::string& qc,
+		   const std::string& md, const std::string& dm,
 		   const miutil::miTime& fromtime)
     {set(st,pa,lev,sen,fr,to,hour,qc,md,dm,fromtime);}
 
     bool set(const dnmi::db::DRow&);
-    bool set(int, int, int, int, int, int, int, const miutil::miString&,
-	     const miutil::miString&, const miutil::miString&, const miutil::miTime&);
+    bool set(int, int, int, int, int, int, int, const std::string&,
+	     const std::string&, const std::string&, const miutil::miTime&);
 
 
     const char* tableName() const {return "station_param";}
-    miutil::miString toSend() const;
-    miutil::miString uniqueKey()const;
+    std::string toSend() const;
+    std::string uniqueKey()const;
 
     int stationID()                 const { return stationid_;   }
     int paramID()                   const { return paramid_;     }
@@ -88,9 +88,9 @@ namespace kvalobs {
     int fromday()                   const { return fromday_;     }
     int today()                     const { return today_;       }
     int hour()                      const { return hour_;        }
-    miutil::miString qcx()          const { return qcx_;         }
-    miutil::miString metadata()     const { return metadata_;    }
-    miutil::miString descMetadata() const { return descMetadata_;}
+    std::string qcx()          const { return qcx_;         }
+    std::string metadata()     const { return metadata_;    }
+    std::string descMetadata() const { return descMetadata_;}
     miutil::miTime fromtime()       const { return fromtime_;    }
 
 

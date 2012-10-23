@@ -34,7 +34,7 @@ using namespace std;
 using namespace miutil;
 
 
-miString kvalobs::kvTypes::toSend() const
+std::string kvalobs::kvTypes::toSend() const
 {
   ostringstream ost;
   ost << "(" 
@@ -50,12 +50,12 @@ miString kvalobs::kvTypes::toSend() const
 
 
 bool kvalobs::kvTypes::set( int typeid__,
-			    miString format__,
+			    std::string format__,
 			    int earlyobs__,
 			    int lateobs__,
-			    miString read__,
-			    miString obspgm__,
-			    miString comment__)
+			    std::string read__,
+			    std::string obspgm__,
+			    std::string comment__)
 {			   
   typeid_ = typeid__;
   format_   = format__;
@@ -64,7 +64,7 @@ bool kvalobs::kvTypes::set( int typeid__,
   read_ = read__,
   obspgm_ = obspgm__,
   comment_= comment__;
-  sortBy_= miString(format_);
+  sortBy_= std::string(format_);
   return true;
 }		   
 
@@ -101,11 +101,11 @@ bool kvalobs::kvTypes::set(const dnmi::db::DRow& r_)
     }  
   }
   
-  sortBy_= miString(format_);
+  sortBy_= std::string(format_);
   return true;
 }
 
-miutil::miString 
+std::string
 kvalobs::kvTypes::uniqueKey()const
 {
   ostringstream ost;

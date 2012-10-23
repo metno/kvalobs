@@ -38,7 +38,7 @@ kvalobs::kvQcxInfo::~kvQcxInfo()
 {
 }
 
-miString kvalobs::kvQcxInfo::toSend() const
+std::string kvalobs::kvQcxInfo::toSend() const
 {
    ostringstream ost;
    ost << "("
@@ -50,17 +50,17 @@ miString kvalobs::kvQcxInfo::toSend() const
 }
 
 
-bool kvalobs::kvQcxInfo::set( const miString& medium_qcx__,
-			      const miString& main_qcx__,
+bool kvalobs::kvQcxInfo::set( const std::string& medium_qcx__,
+			      const std::string& main_qcx__,
 			      int controlpart__,
-			      const miString& comment__)
+			      const std::string& comment__)
 {
   medium_qcx_  = medium_qcx__;
   main_qcx_  = main_qcx__;
   controlpart_ = controlpart__; 
   comment_     = comment__;
 
-  sortBy_= miString(medium_qcx_);
+  sortBy_= std::string(medium_qcx_);
   return true;
 }
 
@@ -90,12 +90,12 @@ bool kvalobs::kvQcxInfo::set(const dnmi::db::DRow& r_)
       CERR("kvQcxInfo: exception ..... \n");
     }  
   }
-  sortBy_= miString(medium_qcx_);
+  sortBy_= std::string(medium_qcx_);
   return true;
 }
 
 
-miutil::miString 
+std::string
 kvalobs::kvQcxInfo::uniqueKey()const
 {
   ostringstream ost;

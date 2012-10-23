@@ -77,9 +77,9 @@ namespace kvalobs{
     void clean();
 
     const char* tableName()            const {return "key_val";}
-    miutil::miString toSend()    const;
-    miutil::miString toUpdate()  const;
-    miutil::miString uniqueKey() const;
+    std::string toSend()    const;
+    std::string toUpdate()  const;
+    std::string uniqueKey() const;
 
     std::string package() const { return package_;}
     std::string key()     const { return key_;    }

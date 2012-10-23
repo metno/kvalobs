@@ -167,10 +167,10 @@ bool getKvParamsFunc::process(kvServiceExt_ptr service)
 		paramList.clear();
 		for (CORBA::ULong i = 0; i < params->length(); i++)
 		{
-			paramList.push_back(kvParam((*params)[i].paramID, miString(
-					(*params)[i].name), miString((*params)[i].description),
-					miString((*params)[i].unit), (*params)[i].level_scale,
-					miString((*params)[i].comment)));
+			paramList.push_back(kvParam((*params)[i].paramID, std::string(
+					(*params)[i].name), std::string((*params)[i].description),
+					std::string((*params)[i].unit), (*params)[i].level_scale,
+					std::string((*params)[i].comment)));
 		}
 	}
 	return ok;
@@ -191,13 +191,13 @@ bool getKvStationsFunc::process(kvServiceExt_ptr service)
 		for (CORBA::ULong i = 0; i < stations->length(); i++)
 			stationList.push_back(kvStation((*stations)[i].stationID,
 					(*stations)[i].lat, (*stations)[i].lon,
-					(*stations)[i].height, (*stations)[i].maxspeed, miString(
+					(*stations)[i].height, (*stations)[i].maxspeed, std::string(
 							(*stations)[i].name), (*stations)[i].wmonr,
-					(*stations)[i].nationalnr, miString((*stations)[i].ICAOid),
-					miString((*stations)[i].call_sign), miString(
+					(*stations)[i].nationalnr, std::string((*stations)[i].ICAOid),
+					std::string((*stations)[i].call_sign), std::string(
 							(*stations)[i].stationstr),
 					(*stations)[i].environmentid, (*stations)[i].static_,
-					miTime(miString((*stations)[i].fromtime))));
+					miTime(std::string((*stations)[i].fromtime))));
 	}
 	return ok;
 }
@@ -261,7 +261,7 @@ bool getKvReferenceStationsFunc::process(kvServiceExt_ptr service)
 		refList.clear();
 		for (CORBA::ULong i = 0; i < ref_->length(); i++)
 			refList.push_back(kvReferenceStation((*ref_)[i].stationID,
-					(*ref_)[i].paramsetID, miString((*ref_)[i].reference)));
+					(*ref_)[i].paramsetID, std::string((*ref_)[i].reference)));
 	}
 	return ok;
 }
@@ -280,10 +280,10 @@ bool getKvTypesFunc::process(kvServiceExt_ptr service)
 		typeList.clear();
 		for (CORBA::ULong i = 0; i < types->length(); i++)
 		{
-			kvTypes type((*types)[i].typeID_, miString((*types)[i].format),
-					(*types)[i].earlyobs, (*types)[i].lateobs, miString(
-							(*types)[i].read), miString((*types)[i].obspgm),
-					miString((*types)[i].comment));
+			kvTypes type((*types)[i].typeID_, std::string((*types)[i].format),
+					(*types)[i].earlyobs, (*types)[i].lateobs, std::string(
+							(*types)[i].read), std::string((*types)[i].obspgm),
+					std::string((*types)[i].comment));
 			typeList.push_back(type);
 		}
 	}
@@ -304,7 +304,7 @@ bool getKvOperatorFunc::process(kvServiceExt_ptr service)
 		operatorList.clear();
 		for (CORBA::ULong i = 0; i < operators->length(); i++)
 		{
-			miString name((*operators)[i].username);
+			std::string name((*operators)[i].username);
 			kvOperator oper(name, (*operators)[i].userid);
 			operatorList.push_back(oper);
 		}
@@ -330,8 +330,8 @@ bool getKvStationParamFunc::process(kvServiceExt_ptr service)
 			kvStationParam param((*stp)[i].stationid, (*stp)[i].paramid,
 					(*stp)[i].level, ((char*) (*stp)[i].sensor)[0] - '0',
 					(*stp)[i].fromday, (*stp)[i].today, (*stp)[i].hour,
-					miString((*stp)[i].qcx), miString((*stp)[i].metadata),
-					miString((*stp)[i].desc_metadata), miTime(
+					std::string((*stp)[i].qcx), std::string((*stp)[i].metadata),
+					std::string((*stp)[i].desc_metadata), miTime(
 							(*stp)[i].fromtime));
 			stParam.push_back(param);
 		}

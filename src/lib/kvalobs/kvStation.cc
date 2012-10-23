@@ -30,11 +30,12 @@
 */
 #include <kvalobs/kvStation.h>
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
 using namespace miutil;
 
-miString kvalobs::kvStation::toSend() const
+std::string kvalobs::kvStation::toSend() const
 {
   ostringstream ost;
   ost << "("
@@ -107,12 +108,12 @@ bool kvalobs::kvStation::set( int   stationid__,
 			      float lon__,
 			      float height__,
 			      float maxspeed__,
-			      const miString& name__,
+			      const std::string& name__,
 			      int   wmonr__,
 			      int   nationalnr__,
-			      const miString& ICAOid__,
-			      const miString& call_sign__,
-			      const miString& stationstr__,
+			      const std::string& ICAOid__,
+			      const std::string& call_sign__,
+			      const std::string& stationstr__,
 			      int   environmentid__,
 			      bool  static__,
 			      const miutil::miTime& fromtime__)
@@ -140,7 +141,7 @@ bool kvalobs::kvStation::set( int   stationid__,
 bool kvalobs::kvStation::set(const dnmi::db::DRow& r_)
 {
   dnmi::db::DRow &r=const_cast<dnmi::db::DRow&>(r_);
-  miString       buf;
+  std::string buf;
   list<string> names=r.getFieldNames();
   list<string>::iterator it=names.begin();
   
@@ -148,7 +149,7 @@ bool kvalobs::kvStation::set(const dnmi::db::DRow& r_)
   for(;it!=names.end(); it++){
     try{
       buf=r[*it];
-      buf.trim();
+      boost::trim(buf);
       if(*it=="stationid"       )  stationid_  = atoi(buf.c_str());
       else if( *it=="lat"       )  lat_        = atof(buf.c_str());
       else if( *it=="lon"       )  lon_        = atof(buf.c_str());
@@ -172,7 +173,7 @@ bool kvalobs::kvStation::set(const dnmi::db::DRow& r_)
   return true;
 }
 
-miutil::miString 
+std::string
 kvalobs::kvStation::uniqueKey()const
 {
   ostringstream ost;

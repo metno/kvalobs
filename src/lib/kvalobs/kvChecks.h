@@ -52,24 +52,24 @@ namespace kvalobs{
 class kvChecks : public kvDbBase {
 private:
   int              stationid_;
-  miutil::miString qcx_;
-  miutil::miString medium_qcx_;
+  std::string qcx_;
+  std::string medium_qcx_;
   int              language_;
-  miutil::miString checkname_;
-  miutil::miString checksignature_;
-  miutil::miString active_;
+  std::string checkname_;
+  std::string checksignature_;
+  std::string active_;
   miutil::miTime   fromtime_;
 
 public:
   kvChecks() {}
   kvChecks(const dnmi::db::DRow &r){ set(r);}
   kvChecks(int stationid,
-	   const  miutil::miString &qcx,
-           const  miutil::miString &medium_qcx,
+	   const  std::string &qcx,
+           const  std::string &medium_qcx,
 	   int  language,
-	   const miutil::miString &checkname,
-	   const miutil::miString &checksignature,
-           const miutil::miString &active,
+	   const std::string &checkname,
+	   const std::string &checksignature,
+           const std::string &active,
 	   const miutil::miTime &fromtime)
     {
       set(stationid, qcx, medium_qcx, language,
@@ -77,26 +77,26 @@ public:
     }
 
   bool set(int stationid,
-	   const miutil::miString &qcx,
-	   const  miutil::miString &medium_qcx,
+	   const std::string &qcx,
+	   const  std::string &medium_qcx,
 	   int  language,
-	   const miutil::miString &checkname,
-	   const  miutil::miString &checksignature,
-           const  miutil::miString &active,
+	   const std::string &checkname,
+	   const  std::string &checksignature,
+           const  std::string &active,
 	   const miutil::miTime &fromtime);
 
   bool set(const dnmi::db::DRow&);
   const char* tableName() const {return "checks";}
-  miutil::miString toSend() const;
-  miutil::miString uniqueKey()const;
+  std::string toSend() const;
+  std::string uniqueKey()const;
 
   int stationID()                  const { return stationid_;   }
-  miutil::miString qcx()           const { return qcx_;         }
-  miutil::miString medium_qcx()    const { return medium_qcx_;  }
+  std::string qcx()           const { return qcx_;         }
+  std::string medium_qcx()    const { return medium_qcx_;  }
   int language()                   const { return language_;    }
-  miutil::miString checkname()     const { return checkname_;   }
-  miutil::miString checksignature()const { return checksignature_;}
-  miutil::miString active()        const { return active_;  }
+  std::string checkname()     const { return checkname_;   }
+  std::string checksignature()const { return checksignature_;}
+  std::string active()        const { return active_;  }
   const miutil::miTime fromtime()  const { return fromtime_;}
 
 /*

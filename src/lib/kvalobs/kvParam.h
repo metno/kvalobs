@@ -55,43 +55,43 @@ namespace kvalobs{
 class kvParam : public kvDbBase {
 private:
   int              paramid_;
-  miutil::miString name_;
-  miutil::miString description_;
-  miutil::miString unit_;
+  std::string name_;
+  std::string description_;
+  std::string unit_;
   int              level_scale_;
-  miutil::miString comment_;
+  std::string comment_;
 
  public:
   kvParam() {}
   kvParam(const dnmi::db::DRow &r){ set(r);}
   kvParam(int              paramid,
-	  const miutil::miString &name,
-	  const miutil::miString &description,
-	  const miutil::miString &unit,
+	  const std::string &name,
+	  const std::string &description,
+	  const std::string &unit,
 	  int              level_scale,
-	  const miutil::miString &comment)
+	  const std::string &comment)
       {
 	set(paramid, name, description, unit, level_scale, comment);
       }
 
   bool set(int              paramid,
-	   const miutil::miString &name,
-	   const miutil::miString &description,
-	   const miutil::miString &unit,
+	   const std::string &name,
+	   const std::string &description,
+	   const std::string &unit,
 	   int              level_scale,
-	   const miutil::miString &comment);
+	   const std::string &comment);
 
   bool set(const dnmi::db::DRow&);
   const char* tableName() const {return "param";}
-  miutil::miString toSend() const;
-  miutil::miString uniqueKey()const;
+  std::string toSend() const;
+  std::string uniqueKey()const;
 
   int              paramID()const { return paramid_;}
-  miutil::miString name()const    { return name_;}
-  miutil::miString description() const { return description_;}
-  miutil::miString unit()const    { return unit_;}
+  std::string name()const    { return name_;}
+  std::string description() const { return description_;}
+  std::string unit()const    { return unit_;}
   int              level_scale()const { return level_scale_;}
-  miutil::miString comment()const { return comment_;}
+  std::string comment()const { return comment_;}
 };
 
 /** @} */

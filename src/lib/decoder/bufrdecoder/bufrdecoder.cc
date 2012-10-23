@@ -63,8 +63,8 @@ BufrDecoder::
 BufrDecoder( dnmi::db::Connection   &con,
              const ParamList        &params,
              const std::list<kvalobs::kvTypes> &typeList,
-             const miutil::miString &obsType,
-             const miutil::miString &obs,
+             const miutil::std::string &obsType,
+             const miutil::std::string &obs,
              int                    decoderId)
    : DecoderBase(con, params, typeList, obsType, obs, decoderId), earlyobs(INT_MAX),
      lateobs( INT_MAX )
@@ -77,7 +77,7 @@ BufrDecoder::
 {
 }
 
-miutil::miString 
+miutil::std::string 
 BufrDecoder::
 name() const
 {
@@ -86,7 +86,7 @@ name() const
 
 long 
 BufrDecoder::
-getStationId(miutil::miString & msg)
+getStationId(miutil::std::string & msg)
 {
 }
 
@@ -261,7 +261,7 @@ getFormat()const
 }
 
 kvalobs::decoder::DecoderBase::DecodeResult 
-BufrDecoder::execute(miutil::miString &msg)
+BufrDecoder::execute(miutil::std::string &msg)
 {
    kvalobs::kvRejectdecode  reject;
    bool                     saveReject;

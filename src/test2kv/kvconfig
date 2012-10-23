@@ -1,0 +1,81 @@
+#!/bin/sh
+
+#  Kvalobs - Free Quality Control Software for Meteorological Observations 
+#
+#  Copyright (C) 2007 met.no
+#
+#  Contact information:
+#  Norwegian Meteorological Institute
+#  Box 43 Blindern
+#  0313 OSLO
+#  NORWAY
+#  email: kvalobs-dev@met.no
+#
+#  This file is part of KVALOBS
+#
+#  KVALOBS is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License as 
+#  published by the Free Software Foundation; either version 2 
+#  of the License, or (at your option) any later version.
+#  
+#  KVALOBS is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#  General Public License for more details.
+#  
+#  You should have received a copy of the GNU General Public License along 
+#  with KVALOBS; if not, write to the Free Software Foundation Inc., 
+#  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+
+
+prefix=/disk1/kvalobs
+exec_prefix=${prefix}
+
+VERSION="kvconfig (kvalobs) 2.5.4"
+
+if [ x$1 = x ]; then
+	echo Usage kvconfig OPTION
+	echo Run kvconfig --help for more information
+	exit 1
+fi
+
+if [ x$2 != x ]; then
+	echo Only one option is allowed at a time.
+	echo Run kvconfig --help for more information
+	exit 1
+fi 
+
+case $1 in 
+    --prefix) echo /disk1/kvalobs	;;
+    --bindir) echo ${exec_prefix}/bin	;;
+    --libexecdir) echo ${exec_prefix}/libexec ;;
+	--libdir) echo ${exec_prefix}/lib ;;
+	--includedir) echo @pkgincludedir@ ;;
+	--datadir) echo ${prefix}/share ;;
+	--idldir) echo ${prefix}/share/kvalobs/idl ;;
+	--sysconfdir) echo ${prefix}/etc ;;
+	--localstatedir) echo ${prefix}/var ;;
+	--kvstatedir) echo ${prefix}/var/kvalobs ;;
+	--rundir) echo ${prefix}/var/run/kvalobs ;;
+	--logdir) echo ${prefix}/var/log/kvalobs ;;
+	--pkglibdir) echo ${exec_prefix}/lib/kvalobs ;;
+	--version) echo $VERSION ;;
+	--help) 
+		echo $VERSION
+		echo 
+		echo Get information about kvalobs installation
+		echo 
+		echo Usage: kvconfig OPTION
+		echo
+		echo Options:
+		echo 
+		echo Use exactly one of the following options:
+		echo
+		echo --prefix --bindir --libexecdir --libdir --includedir --datadir --idldir --sysconfdir --localstatedir --pkglibdir --version --help
+	;;
+    *) 
+    	echo Unkonwn option: $1
+    	exit 1 
+	;;
+esac

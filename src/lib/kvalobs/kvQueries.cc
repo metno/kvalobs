@@ -41,7 +41,7 @@ using namespace miutil;
   - Sort by qcx, stationid
   - Valid fromtime is found by using a 'correlated subquery'
 */
-miString kvQueries::selectChecks(const std::list<int> slist,
+std::string kvQueries::selectChecks(const std::list<int> slist,
 				 const int lan,
 				 const miTime& otime)
 {
@@ -73,7 +73,7 @@ miString kvQueries::selectChecks(const std::list<int> slist,
   - Sort by descending stationid
   - Valid fromtime is found by using a 'correlated subquery'
 */
-miString kvQueries::selectStationParam(const std::list<int> slist,
+std::string kvQueries::selectStationParam(const std::list<int> slist,
 				       const miTime& otime,
 				       const string& qcx)
 {
@@ -105,7 +105,7 @@ miString kvQueries::selectStationParam(const std::list<int> slist,
 }
 
 
-miString kvQueries::selectData(const miTime& otime)
+std::string kvQueries::selectData(const miTime& otime)
 {
   ostringstream ost;
   
@@ -115,7 +115,7 @@ miString kvQueries::selectData(const miTime& otime)
 }
 
 
-miString kvQueries::selectData(const int sid,
+std::string kvQueries::selectData(const int sid,
 			       const int pid,
 			       const miTime& otime)
 {
@@ -128,7 +128,7 @@ miString kvQueries::selectData(const int sid,
   return ost.str();
 }
 
-miString 
+std::string 
 kvQueries::selectDataFromType(const int sid,
 			      const int tid,
 			      const miTime& otime)
@@ -142,7 +142,7 @@ kvQueries::selectDataFromType(const int sid,
   return ost.str();
 }
 
-miString 
+std::string 
 kvQueries::selectTextDataFromType(const int sid,
 			      const int tid,
 			      const miTime& otime)
@@ -157,7 +157,7 @@ kvQueries::selectTextDataFromType(const int sid,
 }
 
 
-miString 
+std::string 
 kvQueries::selectDataFromAbsType(const int sid,
 				 const int tid,
 				 const miTime& otime)
@@ -173,9 +173,9 @@ kvQueries::selectDataFromAbsType(const int sid,
 
 
 
-miString kvQueries::selectData(const miTime& stime,
+std::string kvQueries::selectData(const miTime& stime,
 			       const miTime& etime,
-			       const miString& ob)
+			       const std::string& ob)
 {
   ostringstream ost;
   
@@ -186,9 +186,9 @@ miString kvQueries::selectData(const miTime& stime,
   return ost.str();
 }
 
-miString kvQueries::selectDataByTabletime(const miTime& stime,
+std::string kvQueries::selectDataByTabletime(const miTime& stime,
 					  const miTime& etime,
-					  const miString& ob)
+					  const std::string& ob)
 {
   ostringstream ost;
   
@@ -207,7 +207,7 @@ miString kvQueries::selectDataByTabletime(const miTime& stime,
 //will also guarantee that all data with a given obstime will be kept 
 //together.
 
-miString 
+std::string 
 kvQueries::selectData(const int sid,
 		      const miTime& stime,
 		      const miTime& etime)
@@ -223,7 +223,7 @@ kvQueries::selectData(const int sid,
 }
 
 
-miString 
+std::string 
 kvQueries::selectTextData(const int sid,
 			  const miTime& stime,
 			  const miTime& etime)
@@ -239,7 +239,7 @@ kvQueries::selectTextData(const int sid,
 }
 
 
-miString 
+std::string 
 kvQueries::selectDataByTbtime(const int sid,
 			      const miutil::miTime& stime,
 			      const miutil::miTime& etime)
@@ -264,7 +264,7 @@ kvQueries::selectDataByTbtime(const int sid,
 // by station number. It will also guarantee that all data with 
 //a given obstime will be kept together.
 
-miString kvQueries::selectData(const miString& ob)
+std::string kvQueries::selectData(const std::string& ob)
 {
   ostringstream ost;
   
@@ -274,10 +274,10 @@ miString kvQueries::selectData(const miString& ob)
 //Knut Johansen
 //2 sep 2003
 //Select data from only a few stations
-miString 
+std::string 
 kvQueries::selectDataStat(const miTime& stime,
 			  const miTime& etime,
-			  const miString& statList)
+			  const std::string& statList)
 {
   ostringstream ost;
   
@@ -289,7 +289,7 @@ kvQueries::selectDataStat(const miTime& stime,
   return ost.str();
 }
 
-miString
+std::string
 kvQueries::selectData(const miTime& stime,
 		      const miTime& etime)
 {
@@ -303,7 +303,7 @@ kvQueries::selectData(const miTime& stime,
 }
 
 
-miString 
+std::string 
 kvQueries::selectData(const kvalobs::kvData &d)
 {
   ostringstream ost;
@@ -321,9 +321,7 @@ kvQueries::selectData(const kvalobs::kvData &d)
 }
 
 
-/* Knut Johansen 23 jan 2003 */
-/* Audun C. changed to miString */
-miString kvQueries::selectParam(const miString& ob)
+std::string kvQueries::selectParam(const std::string& ob)
 {
   ostringstream ost;
   
@@ -332,7 +330,7 @@ miString kvQueries::selectParam(const miString& ob)
 }
 
 
-miString kvQueries::selectModelData(const int sid,
+std::string kvQueries::selectModelData(const int sid,
 				    const miTime& stime,
 				    const miTime& etime)
 {
@@ -347,7 +345,7 @@ miString kvQueries::selectModelData(const int sid,
 }
 
 
-miutil::miString 
+std::string
 kvQueries::selectReferenceStation(long stationid, long paramsetid)
 {
   ostringstream ost;
@@ -363,7 +361,7 @@ kvQueries::selectReferenceStation(long stationid, long paramsetid)
 }
 
 
-miutil::miString 
+std::string
 kvQueries::selectStationByStationId(long stationid)
 {
   ostringstream ost;
@@ -373,7 +371,7 @@ kvQueries::selectStationByStationId(long stationid)
   return ost.str();
 } 
 
-miutil::miString 
+std::string
 kvQueries::selectStationByWmonr(long wmonr)
 {
   ostringstream ost;
@@ -383,7 +381,7 @@ kvQueries::selectStationByWmonr(long wmonr)
   return ost.str();
 }
 
-miutil::miString 
+std::string
 kvQueries::selectStationByNationalnr(long nationalnr)
 {
   ostringstream ost;
@@ -393,7 +391,7 @@ kvQueries::selectStationByNationalnr(long nationalnr)
   return ost.str();
 }
 
-miutil::miString 
+std::string
 kvQueries::selectStationByIcaoId(long icaoid)
 {
   ostringstream ost;
@@ -405,7 +403,7 @@ kvQueries::selectStationByIcaoId(long icaoid)
 
 
 
-miutil::miString 
+std::string
 kvQueries::selectStationByCall_sign(const std::string &cs)
 {
   ostringstream ost;
@@ -416,7 +414,7 @@ kvQueries::selectStationByCall_sign(const std::string &cs)
 }
 
 //milib/kvalobs/src/kvQueries.ccutil::
-miutil::miString 
+std::string
 kvQueries::selectStationOrdered()
 {
   ostringstream ost;
@@ -426,8 +424,8 @@ kvQueries::selectStationOrdered()
   return ost.str();
 }
 
-miutil::miString 
-kvQueries::selectAllStations(const miutil::miString &orderby)
+std::string
+kvQueries::selectAllStations(const std::string &orderby)
 {
   ostringstream ost;
  
@@ -437,7 +435,7 @@ kvQueries::selectAllStations(const miutil::miString &orderby)
 }
 
 
-miutil::miString
+std::string
 kvQueries::
 selectStationsByRange( long from, long to, bool order)
 {
@@ -462,7 +460,7 @@ selectStationsByRange( long from, long to, bool order)
   - Sort by paramid
   - Valid fromtime is found by using a 'correlated subquery'
 */
-miutil::miString
+std::string
 kvQueries::selectObsPgm(long stationid,
 			const miutil::miTime& otime)
 {
@@ -491,7 +489,7 @@ kvQueries::selectObsPgm(long stationid,
   - Sort by paramid
   - Valid fromtime is found by using a 'correlated subquery'
 */
-miutil::miString
+std::string
 kvQueries::selectObsPgm(long stationid,
 			long tid,
 			const miutil::miTime& otime) 
@@ -522,7 +520,7 @@ kvQueries::selectObsPgm(long stationid,
   - Sort by stationid.
   - Valid fromtime is found by using a 'correlated subquery'
 */
-miutil::miString
+std::string
 kvQueries::selectObsPgmByTypeid(long tid,
 			                      const miutil::miTime& otime) 
 {
@@ -548,7 +546,7 @@ kvQueries::selectObsPgmByTypeid(long tid,
 }
 
 
-miutil::miString 
+std::string
 kvQueries::selectObsPgm( long stationid )
 {
   ostringstream ss;
@@ -563,7 +561,7 @@ kvQueries::selectObsPgm( long stationid )
   - Sort by stationid, typeid and paramid
   - Valid fromtime is found by using a 'correlated subquery'
 */
-miutil::miString
+std::string
 kvQueries::selectObsPgm(const miutil::miTime& otime)
 {	
 	ostringstream ost;
@@ -583,9 +581,9 @@ kvQueries::selectObsPgm(const miutil::miTime& otime)
   return ost.str();
 }
 
-miutil::miString
-kvQueries::selectKeyValues(const miutil::miString& package,
-			   const miutil::miString& key)
+std::string
+kvQueries::selectKeyValues(const std::string& package,
+			   const std::string& key)
 {
   ostringstream ost;
   
@@ -595,7 +593,7 @@ kvQueries::selectKeyValues(const miutil::miString& package,
   return ost.str();
 }
 
-miutil::miString 
+std::string
 kvQueries::
 selectIsGenerated(long stationid, int typeid_)
 {
@@ -610,7 +608,7 @@ selectIsGenerated(long stationid, int typeid_)
    * \brief select all rows from table \em data matching
    *  stationid in list, paramid=pid and obstime in [stime - etime]
    */
-miutil::miString 
+std::string
 kvQueries::selectData(const std::list<int> slist, const int pid, const miutil::miTime& stime, const miutil::miTime& etime)
 {
   ostringstream ost;
@@ -633,7 +631,7 @@ kvQueries::selectData(const std::list<int> slist, const int pid, const miutil::m
    * \brief select all rows from table \em data matching
    *  stationid in list, paramid=pid and obstime in [stime - etime]
    */
-miutil::miString 
+std::string
 kvQueries::selectData(const std::list<int> slist, const int pid, const int tid, const miutil::miTime& stime, const miutil::miTime& etime)
 {
   ostringstream ost;
@@ -657,7 +655,7 @@ kvQueries::selectData(const std::list<int> slist, const int pid, const int tid, 
    * \brief select all rows from table \em data matching
    *  a single stationid, paramid=pid and obstime in [stime - etime]
    */
-miutil::miString 
+std::string
 kvQueries::selectData(const int stid, const int pid, const int tid, const miutil::miTime& stime, const miutil::miTime& etime)
 {
   ostringstream ost;
@@ -676,7 +674,7 @@ kvQueries::selectData(const int stid, const int pid, const int tid, const miutil
    * \brief select all rows from table \em data matching
    *  a single stationid, paramid=pid and obstime in [stime - etime]
    */
-miutil::miString 
+std::string
 kvQueries::selectData(const int stid, const int pid, const miutil::miTime& stime, const miutil::miTime& etime)
 {
   ostringstream ost;
@@ -694,7 +692,7 @@ kvQueries::selectData(const int stid, const int pid, const miutil::miTime& stime
    * \brief select all rows from table \em data matching
    *  paramid=pid and obstime in [stime - etime] and controlinfo="control string"
    */
-miutil::miString 
+std::string
 kvQueries::selectData(const int pid, const int tid, const miutil::miTime& stime, const miutil::miTime& etime, const string& controlString)
 {
   ostringstream ost;
@@ -714,7 +712,7 @@ kvQueries::selectData(const int pid, const int tid, const miutil::miTime& stime,
    * \brief A query to pick out missing float values especially
    *  for Qc2 tests, for all stations at one particular time
    */
-miutil::miString 
+std::string
 kvQueries::selectMissingData(const float value, const int pid, const miutil::miTime& Ptime)
 {
   ostringstream ost;
@@ -731,7 +729,7 @@ kvQueries::selectMissingData(const float value, const int pid, const miutil::miT
    * \brief A query to pick out missing float values especially
    *  for Qc2 tests, for all stations at one particular time
    */
-miutil::miString 
+std::string
 kvQueries::selectMissingData(const float value, const int pid, const int tid, const miutil::miTime& Ptime)
 {
   ostringstream ost;

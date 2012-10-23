@@ -38,6 +38,7 @@
 #include <stdio.h>
 #include <iomanip>
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 #include <unistd.h>
 #include <fileutil/dir.h>
 #include <kvalobs/kvPath.h>
@@ -730,18 +731,18 @@ KvSubscriberCollection::readAllSubscribersFromFile()
 bool 
 KvSubscriberCollection::readSubscriberFile(const std::string &fname)
 {
-    miString::size_type i;
-    miString  buf;
-    miString key;
-    miString val;
+    std::string::size_type i;
+    std::string  buf;
+    std::string key;
+    std::string val;
     ifstream fs;
     miTime   lastCall;
     miTime   created;
-    miString subid;
-    miString cref;
-    miString statusid;
-    vector<miutil::miString> qcIdList;
-    vector<miutil::miString> stationList;
+    std::string subid;
+    std::string cref;
+    std::string statusid;
+    vector<std::string> qcIdList;
+    vector<std::string> stationList;
     bool hasStationKey=false;
     bool allStations=false;
     bool hasQcIdKey=false;
@@ -763,7 +764,7 @@ KvSubscriberCollection::readSubscriberFile(const std::string &fname)
 	if(!getline(fs, buf))
 	  continue;
 	
-	buf.trim();
+	boost::trim(buf);
 
 	if(buf.empty())
 	  continue;
@@ -780,7 +781,7 @@ KvSubscriberCollection::readSubscriberFile(const std::string &fname)
 	key=buf.substr(0, i);
 	val=buf.substr(i+1);
 	
-	val.trim();
+	boost::trim(val);
 	
 	if(key.find("Last call")!=string::npos){
 	    lastCall=miTime(val);
@@ -794,7 +795,7 @@ KvSubscriberCollection::readSubscriberFile(const std::string &fname)
 	    statusid=val;
 	}else if(key.find("QcId")!=string::npos){
 	    hasQcIdKey=true;
-	    qcIdList=val.split();
+	    boost::split(qcIdList, val, boost::algorithm::is_space(), boost::algorithm::token_compress_on);
 	}else if(key.find("Stations")!=string::npos){
 	    hasStationKey=true;
 
@@ -807,7 +808,7 @@ KvSubscriberCollection::readSubscriberFile(const std::string &fname)
 		allStations=false;
 	    }else{
 		allStations=false;
-		stationList=val.split();
+		boost::split(stationList, val, boost::algorithm::is_space(), boost::algorithm::token_compress_on);
 	    }
 	}else{
 	    LOGWARN("Uknown key <" << key << ">: readSubscriberFile <" 
@@ -1119,16 +1120,16 @@ KvSubscriberCollection::writeKvHintFile(const std::string &subid)
 
 bool 
 KvSubscriberCollection::addDataNotifyFromFileFile(
-    const miutil::miString &subid,
-    const miutil::miString &cref, 
-    const miutil::miString &statusid, 
-    const std::vector<miutil::miString> &qcIdList, 
-    const std::vector<miutil::miString> &stationList)
+    const std::string &subid,
+    const std::string &cref,
+    const std::string &statusid,
+    const std::vector<std::string> &qcIdList,
+    const std::vector<std::string> &stationList)
 {
     CorbaHelper::CorbaApp *cApp=CorbaHelper::CorbaApp::getCorbaApp();
     CKvalObs::CService::kvDataNotifySubscriber_ptr cptrSub;
     CORBA::Object_var                              cptrCO;
-    std::vector<miutil::miString>::const_iterator  it;
+    std::vector<std::string>::const_iterator  it;
     KvDataNotifySubscriberPtr                      subPtr;
     KvDataNotifySubscriber                         *p;
     long                                           stationid;
@@ -1217,12 +1218,12 @@ KvSubscriberCollection::addDataNotifyFromFileFile(
 
 kvalobs::KvDataSubscriberInfo
 KvSubscriberCollection::createKvDataInfo(
-    const miutil::miString              &statusid,
-    const std::vector<miutil::miString> &qcIdList)
+    const std::string              &statusid,
+    const std::vector<std::string> &qcIdList)
 {
     CKvalObs::CService::QcIdList                   qcList;
     CKvalObs::CService::StatusId                   sid;
-    std::vector<miutil::miString>::const_iterator  it;
+    std::vector<std::string>::const_iterator  it;
     CKvalObs::CService::QcId                       qcId;
 
     if(statusid=="All")
@@ -1266,16 +1267,16 @@ KvSubscriberCollection::createKvDataInfo(
 
 bool 
 KvSubscriberCollection::addDataFromFile(
-    const miutil::miString              &subid,
-    const miutil::miString              &cref, 
-    const miutil::miString              &statusid, 
-    const std::vector<miutil::miString> &qcIdList, 
-    const std::vector<miutil::miString> &stationList)
+    const std::string              &subid,
+    const std::string              &cref,
+    const std::string              &statusid,
+    const std::vector<std::string> &qcIdList,
+    const std::vector<std::string> &stationList)
 {
     CorbaHelper::CorbaApp *cApp=CorbaHelper::CorbaApp::getCorbaApp();
     CKvalObs::CService::kvDataSubscriber_ptr       cptrSub;
     CORBA::Object_var                              cptrCO;
-    std::vector<miutil::miString>::const_iterator  it;
+    std::vector<std::string>::const_iterator  it;
     KvDataSubscriberPtr                            subPtr;
     KvDataSubscriber                               *p;
     long                                           stationid;
@@ -1363,13 +1364,13 @@ KvSubscriberCollection::addDataFromFile(
 }
 
 bool 
-KvSubscriberCollection::addKvHintFromFile(const miutil::miString &subid, 
-			 const miutil::miString &cref)
+KvSubscriberCollection::addKvHintFromFile(const std::string &subid,
+			 const std::string &cref)
 {
     CorbaHelper::CorbaApp *cApp=CorbaHelper::CorbaApp::getCorbaApp();
     CKvalObs::CService::kvHintSubscriber_ptr       cptrSub;
     CORBA::Object_var                              cptrCO;
-    std::vector<miutil::miString>::const_iterator  it;
+    std::vector<std::string>::const_iterator  it;
     KvHintSubscriberPtr                            subPtr;
     KvHintSubscriber                               *p;
 

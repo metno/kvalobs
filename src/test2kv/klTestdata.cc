@@ -129,7 +129,7 @@ int main(int argc, char** argv)
   }
     
   set<int>      posfail;
-  set<miString> parfail;
+  set<std::string> parfail;
   string kvalobs = getenv("KVALOBS");
 
   if(kvalobs.empty() ) {
@@ -180,7 +180,7 @@ int main(int argc, char** argv)
     list<kvParam>::iterator pa=par.begin();
     par_lvl pl;
 
-    map<miString,par_lvl> parmap,nmap;
+    map<std::string,par_lvl> parmap,nmap;
 
     for(;pa!=par.end();pa++) {
       pl.set(pa->paramID(),0);
@@ -188,8 +188,8 @@ int main(int argc, char** argv)
     }
     delete con;
 
-    miString line;
-    vector<miString> words;
+    std::string line;
+    vector<std::string> words;
     ifstream special("specialparmap.txt");
     
     if(!special) {
@@ -252,10 +252,10 @@ int main(int argc, char** argv)
       m     = atoi(words[2].cStr());
       d     = atoi(words[3].cStr());
       h     = atoi(words[4].cStr());
-      miString stype = words[6];
+      std::string stype = words[6];
 
       float org = atof(words[5].cStr());
-      miString  pname = words[7];
+      std::string  pname = words[7];
       valid.setTime(y,m,d,h,0,0);
       par_lvl pl;
 
@@ -296,7 +296,7 @@ int main(int argc, char** argv)
 	cout << " > " << *posi << endl;
     }
     if(parfail.size()) {
-      set<miString>::iterator pari = parfail.begin();
+      set<std::string>::iterator pari = parfail.begin();
       cout << "failed for parameters: " << endl;
       for(;pari!=parfail.end();pari++)
 	cout << " > " << *pari << endl;

@@ -49,7 +49,7 @@ set(	int                  stationID,
 	tbtime_   =miTime::nowTime();
 	touched_  =tbtime_;
 	
-	sortBy_=miString(stationID_)+miString(typeID_)+obstime_.isoTime();
+	sortBy_=std::string(stationID_)+std::string(typeID_)+obstime_.isoTime();
 	   		
 }  
 
@@ -85,12 +85,12 @@ set(const dnmi::db::DRow& r_)
     	}  
   	}
    
-   sortBy_=miString(stationID_)+miString(typeID_)+obstime_.isoTime();
+   sortBy_=std::string(stationID_)+std::string(typeID_)+obstime_.isoTime();
   
   	return true;  
 }
 
-miString 
+std::string 
 kvPsSubscriber::
 toSend() const
 {
@@ -108,7 +108,7 @@ toSend() const
 
 
 
-miutil::miString 
+miutil::std::string 
 kvPsSubscriber::
 uniqueKey()const
 {
@@ -121,7 +121,7 @@ uniqueKey()const
   return ost.str();
 }
 
-miutil::miString 
+miutil::std::string 
 kvPsSubscriber::
 toUpdate()const
 {

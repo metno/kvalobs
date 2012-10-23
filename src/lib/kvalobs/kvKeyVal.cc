@@ -42,7 +42,7 @@ void
 kvalobs::kvKeyVal::
 createSortIndex() 
 {
-  sortBy_=miString(package_)+miString(key_);
+  sortBy_=std::string(package_)+std::string(key_);
 }
   
 void 
@@ -119,7 +119,7 @@ set(const std::string &package,
   return true;
 }
 
-miutil::miString 
+std::string
 kvalobs::kvKeyVal::
 toSend() const
 {
@@ -135,7 +135,7 @@ toSend() const
 }
 
 
-miutil::miString 
+std::string
 kvalobs::kvKeyVal::
 uniqueKey()const
 {
@@ -148,7 +148,7 @@ uniqueKey()const
 
 
 
-miutil::miString 
+std::string
 kvalobs::kvKeyVal::
 toUpdate()const
 {

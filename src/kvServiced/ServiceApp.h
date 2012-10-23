@@ -95,7 +95,7 @@ class ServiceApp: public KvApp
 
 	bool isMaxClientReached();
 
-  kvalobs::kvStation lookUpStation(const miutil::miString &kvQuerie);
+  kvalobs::kvStation lookUpStation(const std::string &kvQuerie);
 
   void notifyAllKvHintSubscribers();
 };

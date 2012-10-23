@@ -31,6 +31,7 @@
 
 #include <stdio.h>
 #include <fstream>
+#include <boost/algorithm/string.hpp>
 #include <puTools/miTime.h>
 #include "GetData.h"
 #include "App.h"
@@ -147,7 +148,7 @@ App::
 lastFromTime( const string& filename )
 {
    miutil::miTime time;
-   miutil::miString str;
+   std::string str;
 
    cerr<<"filename= "<<filename<<endl;
 
@@ -168,7 +169,7 @@ lastFromTime( const string& filename )
       cerr<<"try lastFromTime"<<endl;
 
       while(getline(fin,str)){
-         str.trim();
+         boost::trim(str);
          cerr<<"str= "<<str<<endl;
          
          if(!str.empty()){

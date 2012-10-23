@@ -6,8 +6,8 @@ FakeComobsDecoder::
 FakeComobsDecoder(dnmi::db::Connection     &con,
                   const ParamList        &params,
                   const std::list<kvalobs::kvTypes> &typeList,
-                  const miutil::miString &obsType,
-                  const miutil::miString &obs,
+                  const std::string &obsType,
+                  const std::string &obs,
                   int                    decoderId )
    : kvalobs::decoder::comobsdecoder::ComObsDecoder( con, params, typeList, obsType, obs, decoderId)
 {
@@ -40,7 +40,7 @@ getMetaSaSdEm( int stationid, int typeid_, const miutil::miTime &obstime )
    return saSdEm;
 }
 
-miutil::miString
+std::string
 FakeComobsDecoder::
 name()const
 {
@@ -49,7 +49,7 @@ name()const
 
 kvalobs::decoder::DecoderBase::DecodeResult
 FakeComobsDecoder::
-execute(miutil::miString &msg)
+execute(std::string &msg)
 {
   return kvalobs::decoder::DecoderBase::Ok;
 }

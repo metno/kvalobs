@@ -63,9 +63,9 @@ protected:
 
 		/*
 		 *     kvStation( int st, float la, float lo, float he, float max,
-		 *                const miutil::miString& na, int wm, int nn,
-		 *                const miutil::miString& ic, const miutil::miString& ca,
-		 *                const miutil::miString& ss, int environmentid,
+		 *                const std::string& na, int wm, int nn,
+		 *                const std::string& ic, const std::string& ca,
+		 *                const std::string& ss, int environmentid,
 		 *                bool static_, const miutil::miTime& fromtime)
 		 *
 		 */

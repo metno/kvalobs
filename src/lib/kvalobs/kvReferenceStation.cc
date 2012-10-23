@@ -35,7 +35,7 @@ using namespace std;
 using namespace miutil;
 
 
-miString kvalobs::kvReferenceStation::toSend() const
+std::string kvalobs::kvReferenceStation::toSend() const
 {
    ostringstream ost;
    ost << "("
@@ -48,7 +48,7 @@ miString kvalobs::kvReferenceStation::toSend() const
 
 bool kvalobs::kvReferenceStation::set( int stationid,
                                        int paramsetid,
-                                       const miutil::miString& reference ){
+                                       const std::string& reference ){
   stationid_ = stationid;
   paramsetid_ = paramsetid;
   reference_ = reference;
@@ -84,7 +84,7 @@ bool kvalobs::kvReferenceStation::set(const dnmi::db::DRow& r_)
   return true;
 }
 
-miutil::miString 
+std::string
 kvalobs::kvReferenceStation::uniqueKey()const
 {
   ostringstream ost;

@@ -43,7 +43,6 @@
 #include <kvskel/kvService.hh>
 #include <stdio.h>
 #include <puTools/miTime.h>
-#include <puTools/miString.h>
 #include <fstream>
 
 class KvSubscriberCollection{
@@ -103,24 +102,24 @@ class KvSubscriberCollection{
 
 
   bool addDataNotifyFromFileFile(
-                const miutil::miString &subid,
-		const miutil::miString &cref, 
-		const miutil::miString &statusid, 
-		const std::vector<miutil::miString> &qcIdList, 
-		const std::vector<miutil::miString> &stationList);
+                const std::string &subid,
+		const std::string &cref,
+		const std::string &statusid,
+		const std::vector<std::string> &qcIdList,
+		const std::vector<std::string> &stationList);
 
-  bool addDataFromFile(const miutil::miString &subid,
-		       const miutil::miString &cref, 
-		       const miutil::miString &statusid, 
-		       const std::vector<miutil::miString> &qcIdList, 
-		       const std::vector<miutil::miString> &stationList);
+  bool addDataFromFile(const std::string &subid,
+		       const std::string &cref,
+		       const std::string &statusid,
+		       const std::vector<std::string> &qcIdList,
+		       const std::vector<std::string> &stationList);
 
-  bool addKvHintFromFile(const miutil::miString &subid, 
-			   const miutil::miString &icref);
+  bool addKvHintFromFile(const std::string &subid,
+			   const std::string &icref);
 
   kvalobs::KvDataSubscriberInfo createKvDataInfo(
-                          const miutil::miString              &statusid,
-			  const std::vector<miutil::miString> &qcIdList);
+                          const std::string              &statusid,
+			  const std::vector<std::string> &qcIdList);
     
   boost::mutex mutex;
   std::string subPath; //The path to the directory where we shall save

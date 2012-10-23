@@ -31,7 +31,6 @@
 #ifndef _kvQueries_h
 #define _kvQueries_h
 
-#include <puTools/miString.h>
 #include <puTools/miTime.h>
 #include <sstream>
 #include <kvalobs/kvData.h>
@@ -57,7 +56,7 @@ namespace kvQueries {
    * \brief select all rows from table \em checks matching
    *  stationid in slist, language=lan and valid fromtime
    */
-  miutil::miString selectChecks(const std::list<int> slist,
+  std::string selectChecks(const std::list<int> slist,
 				const int lan,
 				const miutil::miTime& otime);
 
@@ -66,7 +65,7 @@ namespace kvQueries {
    *  stationid in slist, otime in [fromday - today],
    *  qcx = qcx and valid fromtime
    */
-    miutil::miString selectStationParam(const std::list<int> slist,
+    std::string selectStationParam(const std::list<int> slist,
 				      const miutil::miTime& otime,
 				      const std::string& qcx);
 
@@ -74,13 +73,13 @@ namespace kvQueries {
      * \brief select all rows from table \em data matching
      *  obstime=otime
      */
-  miutil::miString selectData(const miutil::miTime& otime);
+  std::string selectData(const miutil::miTime& otime);
 
   /**
    * \brief select all rows from table \em data matching
    *  stationid=sid, paramid=pid and obstime=otime
    */
-  miutil::miString selectData(const int sid,
+  std::string selectData(const int sid,
 			      const int pid,
 			      const miutil::miTime& otime);
 
@@ -89,13 +88,13 @@ namespace kvQueries {
    * ie. match what is speciefied in the unique index.
    *�(stationid, obstime, paramid, level, sensor and typeid)
    */
-  miutil::miString selectData(const kvalobs::kvData &d);
+  std::string selectData(const kvalobs::kvData &d);
 
   /**
    * \brief select all rows from table \em data matching
    *  stationid=sid, typeid=tid and obstime=otime
    */
-  miutil::miString selectDataFromType(const int sid,
+  std::string selectDataFromType(const int sid,
 				      const int tid,
 				      const miutil::miTime& otime);
 
@@ -106,7 +105,7 @@ namespace kvQueries {
    * 
    * The result is sorted by paramid.
    */
-  miutil::miString  selectTextDataFromType(const int sid,
+  std::string  selectTextDataFromType(const int sid,
 		  							                const int tid,
 	                                        const miutil::miTime& otime);
 
@@ -115,7 +114,7 @@ namespace kvQueries {
    * \brief select all rows from table \em data matching
    *  stationid=sid, abs(typeid)=abs(tid) and obstime=otime
    */
-  miutil::miString selectDataFromAbsType(const int sid,
+  std::string selectDataFromAbsType(const int sid,
 				      const int tid,
 				      const miutil::miTime& otime);
 
@@ -124,23 +123,23 @@ namespace kvQueries {
    * \brief select all rows from table \em data matching
    *  obstime in [stime - etime], order by ob
    */
-  miutil::miString selectData(const miutil::miTime& stime,
+  std::string selectData(const miutil::miTime& stime,
 			      const miutil::miTime& etime,
-			      const miutil::miString& ob);
+			      const std::string& ob);
 
   /**
    * \brief select all rows from table \em data matching
    *  tbtime in [stime - etime], order by ob.
    */
-  miutil::miString selectDataByTabletime(const miutil::miTime& stime,
+  std::string selectDataByTabletime(const miutil::miTime& stime,
 					 const miutil::miTime& etime,
-					 const miutil::miString& ob);
+					 const std::string& ob);
 
   /**
    * \brief select all rows from table \em data matching
    *  stationid=sid, and obstime in [stime - etime]
    */
-  miutil::miString selectData(const int sid,
+  std::string selectData(const int sid,
 			      const miutil::miTime& stime,
 			      const miutil::miTime& etime);
 
@@ -150,7 +149,7 @@ namespace kvQueries {
    * \brief select all rows from table \em text_data matching
    *  stationid=sid, and obstime in [stime - etime]
    */
-  miutil::miString selectTextData(const int sid,
+  std::string selectTextData(const int sid,
 				  const miutil::miTime& stime,
 				  const miutil::miTime& etime);
 
@@ -159,80 +158,80 @@ namespace kvQueries {
    * \brief select all rows from table \em data matching
    *  stationid=sid, and tbtime in [stime - etime]
    */
-  miutil::miString selectDataByTbtime(const int sid,
+  std::string selectDataByTbtime(const int sid,
 				      const miutil::miTime& stime,
 				      const miutil::miTime& etime);
 
   /**
    * \brief select all rows from table \em data order by ob
    */
-  miutil::miString selectData(const miutil::miString& ob);
+  std::string selectData(const std::string& ob);
 
   /**
    * \briefselect all rows from table \em data matching
    *  obstime in [stime - etime]
    */
-  miutil::miString selectData(const miutil::miTime& stime,
+  std::string selectData(const miutil::miTime& stime,
 			      const miutil::miTime& etime);
 
-  miutil::miString selectReferenceStation(long stationid, long paramsetid);
+  std::string selectReferenceStation(long stationid, long paramsetid);
 
   /**
    * \brief select a few stations from table \em data matching
    *  obstime in [stime - etime]
    */
-  miutil::miString selectDataStat(const miutil::miTime& stime,
+  std::string selectDataStat(const miutil::miTime& stime,
 				  const miutil::miTime& etime,
-				  const miutil::miString& statList);
+				  const std::string& statList);
 
   /**
    * \brief select all rows from table \em param order by ob
    */
-  miutil::miString selectParam(const miutil::miString& ob);
+  std::string selectParam(const std::string& ob);
 
   /**
    * \brief select all rows from table \em model_data matching
    *  stationid=sid, and obstime in [stime - etime]
    */
-  miutil::miString selectModelData(const int sid,
+  std::string selectModelData(const int sid,
 				   const miutil::miTime& stime,
 				   const miutil::miTime& etime);
 
   /**
    * \brief Select a station from the \em station table based on stationid.
    */
-  miutil::miString selectStationByStationId(long stationid);
+  std::string selectStationByStationId(long stationid);
 
   /**
    * \brief Select a station from the \em station table based on wmono.
    */
-  miutil::miString selectStationByWmonr(long wmonr);
+  std::string selectStationByWmonr(long wmonr);
 
   /**
    * \brief Select a station from the \em station table based on nationalid.
    */
-  miutil::miString selectStationByNationalnr(long nationalnr);
+  std::string selectStationByNationalnr(long nationalnr);
 
   /**
    * \brief Select a station from the \em station table based on ICAOID.
    */
-  miutil::miString selectStationByIcaoId(long icaoid);
+  std::string selectStationByIcaoId(long icaoid);
 
   /**
    * \brief Select a station from the \em station table based on call sign.
    */
-  miutil::miString selectStationByCall_sign(const std::string &cs);
+  std::string selectStationByCall_sign(const std::string &cs);
 
 
-  miutil::miString selectStationOrdered();
-  miutil::miString selectAllStations(const miutil::miString &orderby);
-  miutil::miString selectStationsByRange( long from, long to, bool order);
+  std::string selectStationOrdered();
+  std::string selectAllStations(const std::string &orderby);
+  std::string selectStationsByRange( long from, long to, bool order);
 
   /**
    * \brief Select all entries from \em obs_pgm matching typeid
    * and time
    */
- 	miutil::miString
+ 	std::string
 	selectObsPgmByTypeid(long tid,
 	                     const miutil::miTime& otime); 
 
@@ -240,19 +239,19 @@ namespace kvQueries {
   /**
    * \brief Select all obs_pgm entries for the given station.
    */
-  miutil::miString selectObsPgm( long stationid );
+  std::string selectObsPgm( long stationid );
   
   /**
    * \brief Select all entries from \em obs_pgm matching stationid and time
    */
-  miutil::miString selectObsPgm(long stationid,
+  std::string selectObsPgm(long stationid,
 				const miutil::miTime& otime);
 
   /**
    * \brief Select all entries from \em obs_pgm matching stationid, typeid
    * and time
    */
-  miutil::miString selectObsPgm(long stationid,
+  std::string selectObsPgm(long stationid,
 					   long tid,
 					   const miutil::miTime& otime);
 
@@ -260,13 +259,13 @@ namespace kvQueries {
   /**
    * \brief Select all entries from \em obs_pgm matching time
    */
-  miutil::miString selectObsPgm(const miutil::miTime& otime);
+  std::string selectObsPgm(const miutil::miTime& otime);
 
   /**
    * \brief Select all \em KeyValues matching package and key
    */
-  miutil::miString selectKeyValues(const miutil::miString& package,
-				   const miutil::miString& key);
+  std::string selectKeyValues(const std::string& package,
+				   const std::string& key);
 
 
   /**
@@ -280,13 +279,13 @@ namespace kvQueries {
    * \param typeid_   The typeid to test
    * \return A query to be used in gate::select.
    */
-  miutil::miString selectIsGenerated(long stationid, int typeid_);
+  std::string selectIsGenerated(long stationid, int typeid_);
 
   /** EGLITIS (for Qc2)
    * \brief select all rows from table \em data matching
    *  stationid in list, paramid=pid and obstime in [stime - etime]
    */
-  miutil::miString selectData(const std::list<int> slist,
+  std::string selectData(const std::list<int> slist,
                               const int pid,
                               const miutil::miTime& stime,
                               const miutil::miTime& etime);
@@ -294,7 +293,7 @@ namespace kvQueries {
    * \brief select all rows from table \em data matching
    *  stationid in list, paramid=pid and obstime in [stime - etime]
    */
-  miutil::miString selectData(const std::list<int> slist,
+  std::string selectData(const std::list<int> slist,
                               const int pid,
                               const int tid,
                               const miutil::miTime& stime,
@@ -306,7 +305,7 @@ namespace kvQueries {
    *  and controlinfo=controlString
    */
 
-   miutil::miString selectData(const int pid, 
+   std::string selectData(const int pid,
                                const int tid, 
                                const miutil::miTime& stime, 
                                const miutil::miTime& etime, 
@@ -316,7 +315,7 @@ namespace kvQueries {
    * \brief select all rows from table \em data matching
    *  a single stationid, paramid=pid and obstime in [stime - etime]
    */
-   miutil::miString selectData(const int stid,
+   std::string selectData(const int stid,
                                const int pid, 
                                const int tid, 
                                const miutil::miTime& stime, 
@@ -325,7 +324,7 @@ namespace kvQueries {
    * \brief select all rows from table \em data matching
    *  a single stationid, paramid=pid and obstime in [stime - etime]
    */
-   miutil::miString selectData(const int stid,
+   std::string selectData(const int stid,
                                const int pid,
                                const miutil::miTime& stime,
                                const miutil::miTime& etime);
@@ -334,7 +333,7 @@ namespace kvQueries {
    * \brief A query to pick out missing float values especially
    *  for Qc2 tests, for all stations at one particular time
    */
-   miutil::miString selectMissingData(const float value,
+   std::string selectMissingData(const float value,
                                       const int pid, 
                                       const miutil::miTime& Ptime);
 
@@ -342,7 +341,7 @@ namespace kvQueries {
    * \brief A query to pick out missing float values especially
    *  for Qc2 tests, for all stations at one particular time
    */
-   miutil::miString selectMissingData(const float value,
+   std::string selectMissingData(const float value,
                                       const int pid, 
                                       const int tid, 
                                       const miutil::miTime& Ptime);

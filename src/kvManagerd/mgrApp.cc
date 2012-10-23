@@ -359,7 +359,7 @@ lookUpQabase(bool forceNS, bool &usedNS)
 
 kvalobs::kvStation 
 ManagerApp::
-lookUpStation(const miutil::miString &kvQuerie)
+lookUpStation(const std::string &kvQuerie)
 {
   return kvalobs::kvStation();
 }

@@ -100,6 +100,14 @@ public:
 		return true;
 	}
 
+	virtual bool getKvWorkstatistik(CKvalObs::CService::WorkstatistikTimeType timeType,
+	                                    const miutil::miTime &from, const miutil::miTime &to,
+	                                    kvservice::WorkstatistikIterator &it
+	                                    )
+	{
+		return true;
+	}
+
 	virtual bool getKvData(kvservice::KvObsDataList &dataList, const kvservice::WhichDataHelper &wd)
 	{
 		return true;

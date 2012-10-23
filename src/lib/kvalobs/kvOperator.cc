@@ -34,7 +34,7 @@ using namespace std;
 using namespace miutil;
 
 
-miString kvalobs::kvOperator::toSend() const
+std::string kvalobs::kvOperator::toSend() const
 {
    ostringstream ost;
    ost << "("
@@ -44,11 +44,11 @@ miString kvalobs::kvOperator::toSend() const
 }
 
 
-bool kvalobs::kvOperator::set( const miutil::miString& username,
+bool kvalobs::kvOperator::set( const std::string& username,
                                int userid ){
   username_ = username;
   userid_ = userid;
-  sortBy_= miString(username_);
+  sortBy_= std::string(username_);
   return true;
 }
 
@@ -74,11 +74,11 @@ bool kvalobs::kvOperator::set(const dnmi::db::DRow& r_)
       CERR("kvOperator: exception ..... \n");
     }
   }
-  sortBy_= miString(username_);
+  sortBy_= std::string(username_);
   return true;
 }
 
-miutil::miString
+std::string
 kvalobs::
 kvOperator::
 uniqueKey()const

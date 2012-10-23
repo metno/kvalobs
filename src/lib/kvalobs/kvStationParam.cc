@@ -34,7 +34,7 @@
 using namespace std;
 using namespace miutil;
 
-miString kvalobs::kvStationParam::toSend() const
+std::string kvalobs::kvStationParam::toSend() const
 {
   ostringstream ost;
   ost << "("
@@ -60,9 +60,9 @@ bool kvalobs::kvStationParam::set(int stationid__,
 				  int fromday__,
 				  int today__,
 				  int hour__,
-				  const miutil::miString& qcx__,
-				  const miutil::miString& metadata__,
-				  const miutil::miString& descMetadata__,
+				  const std::string& qcx__,
+				  const std::string& metadata__,
+				  const std::string& descMetadata__,
 				  const miutil::miTime& fromtime__)
 {
   stationid_    = stationid__;   
@@ -124,7 +124,7 @@ bool kvalobs::kvStationParam::set(const dnmi::db::DRow& r_)
   return true;
 }
 
-miutil::miString 
+std::string
 kvalobs::kvStationParam::uniqueKey()const
 {
   ostringstream ost;

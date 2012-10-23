@@ -53,39 +53,39 @@ namespace kvalobs{
 class kvPsSubscribers : public kvDbBase {
 private:
 
-	miutil::miString name_;
+	std::string name_;
    int              subscribertype_;
-   miutil::miString comment_;
+   std::string comment_;
    int              delete_after_hours_;
-   miutil::miString sior_;
+   std::string sior_;
    miutil::miTime   created_;
 
 public:
   	kvPsSubscribers() {}
   	kvPsSubscribers(const dnmi::db::DRow &r){ set(r);}
-  	kvPsSubscribers(const  miutil::miString &name,
+  	kvPsSubscribers(const  std::string &name,
    	             int                     subscribertype,
-                   const  miutil::miString &comment,
+                   const  std::string &comment,
                    int                     &delete_after_hours,
-                   const  miutil::miString &sior,
+                   const  std::string &sior,
                    const  miutil::miTime   &created){
 			set(name, subscribertype, comment, delete_after_hours, sior, created);
 
     	}
 
-  	bool set(const  miutil::miString &name,
+  	bool set(const  std::string &name,
             int                     subscribertype,
-            const  miutil::miString &comment,
+            const  std::string &comment,
             int                     &delete_after_hours,
-            const  miutil::miString &sior,
+            const  std::string &sior,
             const  miutil::miTime   &created);
 
   	bool set(const dnmi::db::DRow&);
 
   	const char* tableName() const {return "ps_subscribers";}
-  	miutil::miString toSend() const;
-  	miutil::miString toUpdate() const;
-  	miutil::miString uniqueKey()const;
+  	std::string toSend() const;
+  	std::string toUpdate() const;
+  	std::string uniqueKey()const;
 
    /**
     * Return a subscriberid agregated from name and subscribertype.
@@ -101,7 +101,7 @@ public:
     *   If we have defined a data subscriber with name dvh the subscriberid
     *   is: ps_data_dvh.
     */
-   miutil::miString subscriberid()const;
+   std::string subscriberid()const;
 
 	/**
 	 * Find the subscribername from an subscriberid.
@@ -113,7 +113,7 @@ public:
 	 *    - The name for the subscriberid ps_data_dvh_test is
 	 *      dvh_test.
 	 */
-	static miutil::miString nameFromSubscriberid(const miutil::miString &subscriberid);
+	static std::string nameFromSubscriberid(const std::string &subscriberid);
 
 	/**
 	 * Find the subscriber type from an subscriberid.
@@ -125,20 +125,20 @@ public:
 	 *    - The subscriber type for the subscriberid ps_notify_dvh_test is
 	 *      1.
 	 */
-	static int typeFromSubscriberid(const miutil::miString &subscriberid);
+	static int typeFromSubscriberid(const std::string &subscriberid);
 
 
-  	miutil::miString name()const { return name_; }
+  	std::string name()const { return name_; }
    int              subscribertype()const{ return subscribertype_;};
-   miutil::miString comment()const { return comment_; }
+   std::string comment()const { return comment_; }
    int              deleteAfterHours()const { return delete_after_hours_; }
-   miutil::miString sior()const { return sior_; }
+   std::string sior()const { return sior_; }
    miutil::miTime   created()const { return created_; }
 
    void subscribertype(int subtype) { subscribertype_=subtype;}
-   void comment(const miutil::miString &comment) { comment_=comment; }
+   void comment(const std::string &comment) { comment_=comment; }
    void deleteAfterHours(int hours) { delete_after_hours_=hours; }
-   void sior(const miutil::miString& sior__) { sior_=sior__; }
+   void sior(const std::string& sior__) { sior_=sior__; }
    void created(const miutil::miTime& created__) { created_=created__; }
 };
 

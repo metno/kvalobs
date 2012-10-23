@@ -35,7 +35,7 @@ using namespace std;
 using namespace miutil;
 
 
-miString kvalobs::kvGeneratedTypes::toSend() const
+std::string kvalobs::kvGeneratedTypes::toSend() const
 {
    ostringstream ost;
    ost << "("
@@ -81,7 +81,7 @@ bool kvalobs::kvGeneratedTypes::set(const dnmi::db::DRow& r_)
 
 
 
-miutil::miString
+std::string
 kvalobs::kvGeneratedTypes::uniqueKey()const
 {
   ostringstream ost;

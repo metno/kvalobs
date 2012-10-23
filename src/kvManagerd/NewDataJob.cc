@@ -106,7 +106,7 @@ void NewDataJob::doJob(dnmi::db::Connection &con)
   std::list<kvKeyVal>::const_iterator itk;
   
   for (itk=values.begin(); itk!=values.end(); itk++){
-    miutil::miString s= itk->val();
+    std::string s= itk->val();
     if (miutil::miTime::isValid(s))
       startime= miutil::miTime(s);
   }

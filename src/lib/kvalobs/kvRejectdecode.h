@@ -51,10 +51,10 @@ namespace kvalobs
 class kvRejectdecode: public kvDbBase
 {
 private:
-	miutil::miString message_;
+	std::string message_;
 	miutil::miTime tbtime_;
-	miutil::miString decoder_;
-	miutil::miString comment_;
+	std::string decoder_;
+	std::string comment_;
 	bool fixed_;
 
 public:
@@ -65,26 +65,26 @@ public:
 	{
 		set(r);
 	}
-	kvRejectdecode(const miutil::miString &me, const miutil::miTime &tb,
-			const miutil::miString &decode, const miutil::miString &comment,
+	kvRejectdecode(const std::string &me, const miutil::miTime &tb,
+			const std::string &decode, const std::string &comment,
 			bool fixed = false)
 	{
 		set(me, tb, decode, comment, fixed);
 	}
 
 	bool set(const dnmi::db::DRow&);
-	bool set(const miutil::miString &message, const miutil::miTime &tbtime,
-			const miutil::miString &decoder, const miutil::miString &comment,
+	bool set(const std::string &message, const miutil::miTime &tbtime,
+			const std::string &decoder, const std::string &comment,
 			bool fixed = false);
 
 	const char* tableName() const
 	{
 		return "rejectdecode";
 	}
-	miutil::miString toSend() const;
-	miutil::miString uniqueKey() const;
+	std::string toSend() const;
+	std::string uniqueKey() const;
 
-	miutil::miString message() const
+	std::string message() const
 	{
 		return message_;
 	}
@@ -92,11 +92,11 @@ public:
 	{
 		return tbtime_;
 	}
-	miutil::miString decoder() const
+	std::string decoder() const
 	{
 		return decoder_;
 	}
-	miutil::miString comment() const
+	std::string comment() const
 	{
 		return comment_;
 	}

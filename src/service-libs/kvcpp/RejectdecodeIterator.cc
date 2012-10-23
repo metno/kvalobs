@@ -103,10 +103,10 @@ namespace kvservice
     assert( index < rejectedList->length() );
 
     const Rejectdecode &rd = rejectedList[ index++ ];
-    reject.set( miutil::miString( rd.message ),
+    reject.set( std::string( rd.message ),
 		miutil::miTime  ( rd.tbtime  ), 
-		miutil::miString( rd.decoder ),
-		miutil::miString( rd.comment ),
+		std::string( rd.decoder ),
+		std::string( rd.comment ),
 		bool( rd.is_fixed ));
     return true;
   }

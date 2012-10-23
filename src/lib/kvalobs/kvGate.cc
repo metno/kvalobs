@@ -32,15 +32,14 @@
 /* Created by DNMI/PU: j.schulze@met.no
    at Wed Aug 28 14:09:50 2002 */
 
-#include <puTools/miString.h>
 
 using namespace std; 
 using namespace miutil;
 
 
-bool kvGate::select(list<kvAlgorithms>& list_ , miString q)
+bool kvGate::select(list<kvAlgorithms>& list_ , std::string q)
 {
-  miString query = kvAlgorithms::selectAllQuery() + q;
+  std::string query = kvAlgorithms::selectAllQuery() + q;
   
   Result *res = 0;
   

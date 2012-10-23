@@ -110,7 +110,7 @@ std::ostream & possiblyNull(std::ostream & s, int i)
 }
 }
 
-miutil::miString kvStationMetadata::toSend() const
+std::string kvStationMetadata::toSend() const
 {
 	std::ostringstream q;
 	q << "(" << station_ << ", ";
@@ -140,7 +140,7 @@ std::ostream & maybeNullKey(std::ostream & s, const char * key, int value)
 }
 }
 
-miutil::miString kvStationMetadata::uniqueKey() const
+std::string kvStationMetadata::uniqueKey() const
 {
 	std::ostringstream q;
 

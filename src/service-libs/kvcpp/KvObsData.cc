@@ -30,7 +30,6 @@
 */
 #include "KvObsData.h"
 #include <puTools/miTime.h>
-#include <puTools/miString.h>
 
 using namespace kvalobs;
 using namespace miutil;
@@ -63,7 +62,7 @@ namespace kvservice
 		     miTime( d.tbtime ), d.typeID_, 
 		     strlen(d.sensor) > 0 ? (int) *d.sensor : 0,
 		     d.level, d.corrected, kvControlInfo((char*)d.controlinfo), 
-		     kvUseInfo((char*)d.useinfo), miString(d.cfailed) );
+		     kvUseInfo((char*)d.useinfo), std::string(d.cfailed) );
 	dataList().push_back( data );
       }
     }
@@ -74,7 +73,7 @@ namespace kvservice
       for ( CORBA::ULong i = 0; i < obsData.textDataList.length(); i++ ) {
 	TextDataElem &d = obsData.textDataList[ i ];
 	kvTextData textData( d.stationID, miTime(d.obstime), 
-			     miString(d.original), d.paramID, 
+			     std::string(d.original), d.paramID, 
 			     miTime(d.tbtime), d.typeID_ );
 	textDataList_.push_back( textData );
       }

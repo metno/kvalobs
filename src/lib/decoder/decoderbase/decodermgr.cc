@@ -186,7 +186,7 @@ DecoderMgr::findDecoder(dnmi::db::Connection   &connection,
 
    i=myObsType.find_first_of("/\n");
 
-   if(i!=miString::npos){
+   if(i!=std::string::npos){
       decoderName=myObsType.substr(0, i);
       trimstr(decoderName);
    }

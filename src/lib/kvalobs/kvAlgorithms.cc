@@ -35,7 +35,7 @@ using namespace std;
 using namespace dnmi;
 using namespace miutil;
 
-miString 
+std::string 
 kvalobs::kvAlgorithms::toSend() const
 {
   ostringstream ost;
@@ -84,9 +84,9 @@ kvalobs::kvAlgorithms::set(const dnmi::db::DRow& r_)
 
 bool 
 kvalobs::kvAlgorithms::set(int                    language, 
-			   const miutil::miString &checkname,
-			   const miutil::miString &signature, 
-			   const miutil::miString &script)
+			   const std::string &checkname,
+			   const std::string &signature,
+			   const std::string &script)
 {  
 
   language_=language;
@@ -99,7 +99,7 @@ kvalobs::kvAlgorithms::set(int                    language,
   return true;
 }
 
-miutil::miString 
+std::string
 kvalobs::kvAlgorithms::uniqueKey()const
 {
  ostringstream ost;

@@ -34,7 +34,7 @@
 using namespace std;
 using namespace miutil;
 
-miString  kvalobs::kvTimecontrol::toSend() const
+std::string  kvalobs::kvTimecontrol::toSend() const
 {
   ostringstream ost;
   ost << "("
@@ -51,7 +51,7 @@ bool kvalobs::kvTimecontrol::set( int fromday__,
 				  int today__,
 				  int time__,
 				  int priority__,
-				  const miutil::miString& qcx__)
+				  const std::string& qcx__)
 {
   fromday_ = fromday__; 
   today_   = today__;   
@@ -109,7 +109,7 @@ bool kvalobs::kvTimecontrol::set(const dnmi::db::DRow& r_)
 
 
 
-miutil::miString 
+std::string
 kvalobs::kvTimecontrol::uniqueKey()const
 {
   ostringstream ost;

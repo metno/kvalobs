@@ -183,8 +183,8 @@ public:
 
   bool set(const dnmi::db::DRow&);
   const char* tableName() const {return "obs_pgm";}
-  miutil::miString toSend() const;
-  miutil::miString uniqueKey()const;
+  std::string toSend() const;
+  std::string uniqueKey()const;
 
   int stationID()           const {return stationid_; }
   int paramID()             const {return paramid_; }

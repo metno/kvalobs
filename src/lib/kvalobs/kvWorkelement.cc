@@ -160,7 +160,7 @@ set(const dnmi::db::DRow &r_)
 
 }
 
-miutil::miString 
+std::string
 kvalobs::kvWorkelement::
 toSend()const
 {
@@ -182,7 +182,7 @@ toSend()const
   return ost.str();
 }
 
-miutil::miString 
+std::string
 kvalobs::kvWorkelement::
 toUpdate()const
 {
@@ -236,7 +236,7 @@ toUpdate()const
 
 }
 
-miutil::miString 
+std::string
 kvalobs::kvWorkelement::
 uniqueKey()const
 {

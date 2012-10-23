@@ -41,11 +41,11 @@ using namespace dnmi;
 bool 
 kvalobs::
 kvPsSubscribers::
-set(const  miutil::miString &name,
+set(const  std::string &name,
     int                     subscribertype,
-    const  miutil::miString &comment,
+    const  std::string &comment,
     int                     &delete_after_hours,
-    const  miutil::miString &sior,
+    const  std::string &sior,
     const  miutil::miTime   &created)
 {
 	
@@ -102,7 +102,7 @@ set(const dnmi::db::DRow& r_)
   	return true;  
 }
 
-miString 
+std::string 
 kvalobs::
 kvPsSubscribers::
 toSend() const
@@ -122,7 +122,7 @@ toSend() const
 
 
 
-miutil::miString 
+std::string
 kvalobs::
 kvPsSubscribers::
 uniqueKey()const
@@ -134,7 +134,7 @@ uniqueKey()const
   return ost.str();
 }
 
-miutil::miString 
+std::string
 kvalobs::
 kvPsSubscribers::
 toUpdate()const
@@ -152,7 +152,7 @@ toUpdate()const
 }
 
 
-miutil::miString 
+std::string
 kvalobs::
 kvPsSubscribers::
 subscriberid()const
@@ -161,24 +161,24 @@ subscriberid()const
 	ostringstream ost;
 	
 	if(name_.empty())
-		return miutil::miString();
+		return std::string();
 	
 	if(subscribertype_==0)
 		type_="data";
 	else if(subscribertype_==1)
 		type_="notify";
 	else
-		return miutil::miString();
+		return std::string();
 	
 	ost << "ps_" << type_ << "_" << name_; 	
 	
 	return ost.str();
 }
 
-miutil::miString 
+std::string
 kvalobs::
 kvPsSubscribers::
-nameFromSubscriberid(const miutil::miString &subscriberid)
+nameFromSubscriberid(const std::string &subscriberid)
 {
 	ostringstream ost;
 	CommaString cs(subscriberid, "_");
@@ -199,7 +199,7 @@ nameFromSubscriberid(const miutil::miString &subscriberid)
 int 
 kvalobs::
 kvPsSubscribers::
-typeFromSubscriberid(const miutil::miString &subscriberid)
+typeFromSubscriberid(const std::string &subscriberid)
 {
 	ostringstream ost;
 	CommaString cs(subscriberid, "_");

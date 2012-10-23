@@ -115,7 +115,7 @@ const std::string createString( Iterator first, Iterator last )
  *
  * @return a list of the kvData objects.
  */
-kvDataList getKvData( const miutil::miString & s );
+kvDataList getKvData( const std::string & s );
 };
 };
 
