@@ -195,8 +195,8 @@ TEST_F(CheckRunnerTest, reusesResultsFromOtherChecks)
 	using namespace testing;
 
 	db::DatabaseAccess::CheckList checks;
-	checks.push_back(kvalobs::kvChecks(10, "QC1-2-101", "QC1-2", 1, "foo", "obs;RR_24;;", "* * * * *", "2010-01-01 00:00:00"));
-	checks.push_back(kvalobs::kvChecks(10, "QC1-3-101", "QC1-3", 1, "foo", "obs;RR_24;;", "* * * * *", "2010-01-01 00:00:00"));
+	checks.push_back(kvalobs::kvChecks(10, "QC1-2-101", "QC1-2", 1, "foo", "obs;RR_24;;", "* * * * *", boost::posix_time::time_from_string("2010-01-01 00:00:00")));
+	checks.push_back(kvalobs::kvChecks(10, "QC1-3-101", "QC1-3", 1, "foo", "obs;RR_24;;", "* * * * *", boost::posix_time::time_from_string("2010-01-01 00:00:00")));
 	EXPECT_CALL(database, getChecks(_, observation))
 			.Times(AtLeast(1))
 			.WillRepeatedly(SetArgumentPointee<0>(checks));
@@ -232,7 +232,7 @@ TEST_F(CheckRunnerTest, runDecision)
 
 	EXPECT_TRUE(
 			runner->shouldRunCheck(observation,
-					kvalobs::kvChecks(10, "QC1-2-101", "QC1-2", 1, "foo", "obs;RR_24;;", "* * * * *", "2010-01-01 00:00:00"),
+					kvalobs::kvChecks(10, "QC1-2-101", "QC1-2", 1, "foo", "obs;RR_24;;", "* * * * *", boost::posix_time::time_from_string("2010-01-01 00:00:00")),
 					expectedParameters)
 	);
 }
@@ -246,7 +246,7 @@ TEST_F(CheckRunnerTest, willNotRunChecksWithoutAnyExpectedParametersForTypeid)
 
 	EXPECT_FALSE(
 			runner->shouldRunCheck(observation,
-					kvalobs::kvChecks(10, "QC1-2-101", "QC1-2", 1, "foo", "obs;TAM;;", "* * * * *", "2010-01-01 00:00:00"),
+					kvalobs::kvChecks(10, "QC1-2-101", "QC1-2", 1, "foo", "obs;TAM;;", "* * * * *", boost::posix_time::time_from_string("2010-01-01 00:00:00")),
 					expectedParameters)
 	);
 }
@@ -261,7 +261,7 @@ TEST_F(CheckRunnerTest, runCheckWithOneButNotAllParametersExpectedForTypeid)
 
 	EXPECT_TRUE(
 			runner->shouldRunCheck(observation,
-					kvalobs::kvChecks(10, "QC1-2-101", "QC1-2", 1, "foo", "obs;RR_24,TAM;;", "* * * * *", "2010-01-01 00:00:00"),
+					kvalobs::kvChecks(10, "QC1-2-101", "QC1-2", 1, "foo", "obs;RR_24,TAM;;", "* * * * *", boost::posix_time::time_from_string("2010-01-01 00:00:00")),
 					expectedParameters)
 	);
 }
@@ -276,7 +276,7 @@ TEST_F(CheckRunnerTest, respectsChecksActiveColumn)
 
 	EXPECT_FALSE(
 			runner->shouldRunCheck(observation,
-					kvalobs::kvChecks(10, "QC1-2-101", "QC1-2", 1, "foo", "obs;RR_24;;", "* 13 * * *", "2010-01-01 00:00:00"),
+					kvalobs::kvChecks(10, "QC1-2-101", "QC1-2", 1, "foo", "obs;RR_24;;", "* 13 * * *", boost::posix_time::time_from_string("2010-01-01 00:00:00")),
 					expectedParameters)
 	);
 }
@@ -290,7 +290,7 @@ TEST_F(CheckRunnerTest, skipChecksWithMissingParametersInObsPgm)
 
 	EXPECT_FALSE(
 			runner->shouldRunCheck(observation,
-					kvalobs::kvChecks(10, "QC1-2-101", "QC1-2", 1, "foo", "obs;TA_24;;", "* * * * *", "2010-01-01 00:00:00"),
+					kvalobs::kvChecks(10, "QC1-2-101", "QC1-2", 1, "foo", "obs;TA_24;;", "* * * * *", boost::posix_time::time_from_string("2010-01-01 00:00:00")),
 					expectedParameters)
 	);
 }
@@ -307,7 +307,7 @@ TEST_F(CheckRunnerTest, checkShipsEvenIfParameterMissingInObsPgm)
 	EXPECT_TRUE(
 			runner->shouldRunCheck(
 					kvalobs::kvStationInfo(10000001, observation.obstime(), observation.typeID()),
-					kvalobs::kvChecks(10000001, "QC1-2-101", "QC1-2", 1, "foo", "obs;TA_24;;", "* * * * *", "2010-01-01 00:00:00"),
+					kvalobs::kvChecks(10000001, "QC1-2-101", "QC1-2", 1, "foo", "obs;TA_24;;", "* * * * *", boost::posix_time::time_from_string("2010-01-01 00:00:00")),
 					expectedParameters)
 	);
 }

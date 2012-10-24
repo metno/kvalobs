@@ -59,7 +59,7 @@ private:
 	std::string checkname_;
 	std::string checksignature_;
 	std::string active_;
-	miutil::miTime fromtime_;
+	boost::posix_time::ptime fromtime_;
 
 public:
 	kvChecks()
@@ -72,7 +72,7 @@ public:
 	kvChecks(int stationid, const std::string &qcx,
 			const std::string &medium_qcx, int language,
 			const std::string &checkname, const std::string &checksignature,
-			const std::string &active, const miutil::miTime &fromtime)
+			const std::string &active, const boost::posix_time::ptime &fromtime)
 	{
 		set(stationid, qcx, medium_qcx, language, checkname, checksignature,
 				active, fromtime);
@@ -81,7 +81,7 @@ public:
 	bool set(int stationid, const std::string &qcx,
 			const std::string &medium_qcx, int language,
 			const std::string &checkname, const std::string &checksignature,
-			const std::string &active, const miutil::miTime &fromtime);
+			const std::string &active, const boost::posix_time::ptime &fromtime);
 
 	bool set(const dnmi::db::DRow&);
 	const char* tableName() const
@@ -119,7 +119,7 @@ public:
 	{
 		return active_;
 	}
-	const miutil::miTime fromtime() const
+	const boost::posix_time::ptime fromtime() const
 	{
 		return fromtime_;
 	}

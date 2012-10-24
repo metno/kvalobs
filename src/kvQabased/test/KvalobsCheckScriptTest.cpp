@@ -58,7 +58,7 @@ namespace
 {
 kvalobs::kvChecks makeCheck(const std::string & signature, const std::string & name = "test_check_1")
 {
-	return kvalobs::kvChecks(10, "QC1-2-101", "QC1-2", 1, name, signature, "* * * * *", "2010-01-01 00:00:00");
+	return kvalobs::kvChecks(10, "QC1-2-101", "QC1-2", 1, name, signature, "* * * * *", boost::posix_time::time_from_string("2010-01-01 00:00:00"));
 }
 
 kvalobs::kvAlgorithms makeAlgorithm(const std::string & signature, const std::string & script, const std::string & name = "test_check_1")
@@ -173,7 +173,7 @@ TEST_F(KvalobsCheckScriptTest, setsFlagInCorrectPosition)
 				.WillRepeatedly(SetArgumentPointee<0>(dataList));
 
 	KvalobsCheckScript script(database, observation,
-			kvalobs::kvChecks(observation.stationID(), "QC1-3-101", "QC1-3", 1, __func__, "obs;RR_24;;", "* * * * *", "2010-01-01 00:00:00"));
+			kvalobs::kvChecks(observation.stationID(), "QC1-3-101", "QC1-3", 1, __func__, "obs;RR_24;;", "* * * * *", boost::posix_time::time_from_string("2010-01-01 00:00:00")));
 	db::DatabaseAccess::DataList modifications;
 	script.run(& modifications);
 

@@ -90,7 +90,7 @@ bool kvalobs::kvChecks::set(const dnmi::db::DRow &r_)
 			}
 			else if (*it == "fromtime")
 			{
-				fromtime_ = miTime(buf);
+				fromtime_ = boost::posix_time::time_from_string(buf);
 			}
 		} catch (...)
 		{
@@ -105,7 +105,7 @@ bool kvalobs::kvChecks::set(const dnmi::db::DRow &r_)
 bool kvalobs::kvChecks::set(int stationid, const std::string &qcx,
 		const std::string &medium_qcx, int language,
 		const std::string &checkname, const std::string &checksignature,
-		const std::string &active, const miutil::miTime& fromtime)
+		const std::string &active, const boost::posix_time::ptime & fromtime)
 {
 	stationid_ = stationid;
 	qcx_ = qcx;
@@ -127,7 +127,7 @@ std::string kvalobs::kvChecks::uniqueKey() const
 
 	ost << " WHERE stationid=" << stationid_ << " AND " << "       qcx="
 			<< quoted(qcx_) << " AND " << "       language=" << language_
-			<< " AND " << "       fromtime=" << quoted(fromtime_.isoTime());
+			<< " AND " << "       fromtime=" << quoted(to_iso_extended_string(fromtime_));
 
 	return ost.str();
 }

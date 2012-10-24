@@ -46,7 +46,7 @@ void FakeDatabaseAccess::getChecks(CheckList * out, const kvalobs::kvStationInfo
 	switch ( si.stationID() )
 	{
 	case 10:
-		kvalobs::kvChecks check(10, "QC1-2-101", "QC1-2", 1, "foo", "obs;RR_24;;", "* * * * *", "2010-01-01 00:00:00");
+		kvalobs::kvChecks check(10, "QC1-2-101", "QC1-2", 1, "foo", "obs;RR_24;;", "* * * * *", boost::posix_time::time_from_string("2010-01-01 00:00:00"));
 		out->push_back(check);
 		break;
 	}
