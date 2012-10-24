@@ -96,7 +96,7 @@ kvalobs::kvStationInfo * getStationInfo(const variables_map & vm)
 	if ( t.undef() )
 		throw std::runtime_error("Cannot recognize time format: " + obstime);
 
-	return new kvalobs::kvStationInfo(station, miutil::miTime(obstime), type);
+	return new kvalobs::kvStationInfo(station, boost::posix_time::time_from_string(obstime), type);
 }
 
 void parse(const boost::filesystem::path & configFile, variables_map & vm, const options_description & configFileOptions)

@@ -146,7 +146,7 @@ void NewDataJob::doJob(dnmi::db::Connection &con)
   int num_mis_stations= 0;
   int stationid= -1;
   int typeID   = -1;
-  miutil::miTime obstime= miutil::miTime::nowTime();
+  boost::posix_time::ptime obstime = boost::posix_time::microsec_clock::universal_time();
 
   kvStationInfo stationinfo(stationid,obstime,typeID);
   std::list<kvData>::const_iterator itd;

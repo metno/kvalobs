@@ -35,7 +35,7 @@ class DelayedSaveDatabaseAccessTest : public testing::Test
 {
 public:
 	DelayedSaveDatabaseAccessTest() :
-		observation(10, "2010-05-26 06:00:00", 302)
+		observation(10, boost::posix_time::time_from_string("2010-05-26 06:00:00"), 302)
 	{}
 protected:
 	FakeDatabaseAccess fakeDb;

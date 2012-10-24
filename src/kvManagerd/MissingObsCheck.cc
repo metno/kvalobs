@@ -250,7 +250,7 @@ findMissingData(const miutil::miTime& runtime,
       		LOGINFO("Missing observation: stationid: " << sid << " typeid: " << 
 	      				tid << endl << "For obstime: " << obstime << endl);
 
-      		cmd->addStationInfo(kvStationInfo(sid, obstime, tid));
+      		cmd->addStationInfo(kvStationInfo(sid, to_ptime(obstime), tid));
       
       		stationCount++;
 

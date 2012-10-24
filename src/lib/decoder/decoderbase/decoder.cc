@@ -317,7 +317,7 @@ addStationInfo(long stationid,
          "-- typeid:    " << typeid_ << endl <<
          "-- priority:  " << priority );
 
-   stationInfoList.push_back(kvStationInfo(stationid, obstime, typeid_));
+   stationInfoList.push_back(kvStationInfo(stationid, to_ptime(obstime), typeid_));
 }
 
 void

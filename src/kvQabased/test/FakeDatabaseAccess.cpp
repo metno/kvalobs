@@ -105,10 +105,10 @@ void FakeDatabaseAccess::getModelData(ModelDataList * out, const kvalobs::kvStat
 
 void FakeDatabaseAccess::getData(DataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const
 {
-	kvalobs::kvDataFactory factory(si.stationID(), to_ptime(si.obstime()), si.typeID());
+	kvalobs::kvDataFactory factory(si.stationID(), si.obstime(), si.typeID());
 	if ( parameter.baseName() == "RR_24" )
 	{
-		boost::posix_time::ptime t = to_ptime(si.obstime());
+		boost::posix_time::ptime t = si.obstime();
 		boost::posix_time::ptime last = t;
 		t += boost::posix_time::minutes(minuteOffset);
 		t += boost::posix_time::hours((24 - ((t.time_of_day().hours() - 6) % 24)) % 24);
@@ -117,7 +117,7 @@ void FakeDatabaseAccess::getData(DataList * out, const kvalobs::kvStationInfo & 
 	}
 	else if ( parameter.baseName() == "RR_12" )
 	{
-		boost::posix_time::ptime t = to_ptime(si.obstime());
+		boost::posix_time::ptime t = si.obstime();
 		boost::posix_time::ptime last = t;
 		t += boost::posix_time::minutes(minuteOffset);
 		t += boost::posix_time::hours((12 - ((t.time_of_day().hours() - 6) % 12)) % 12);
@@ -126,9 +126,9 @@ void FakeDatabaseAccess::getData(DataList * out, const kvalobs::kvStationInfo & 
 	}
 	else if ( parameter.baseName() == "TAM_24" )
 	{
-		kvalobs::kvDataFactory factory(si.stationID(), to_ptime(si.obstime()), si.typeID() +1);
+		kvalobs::kvDataFactory factory(si.stationID(), si.obstime(), si.typeID() +1);
 
-		boost::posix_time::ptime t = to_ptime(si.obstime());
+		boost::posix_time::ptime t = si.obstime();
 		boost::posix_time::ptime last = t;
 		t += boost::posix_time::minutes(minuteOffset);
 		for (; t <= last; t += boost::posix_time::hours(1));

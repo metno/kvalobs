@@ -128,7 +128,7 @@ void DataStore::populateObs_(
 
 		if ( dbdata.empty() )
 		{
-			kvalobs::kvDataFactory factory(observation.stationID(), to_ptime(observation.obstime()),
+			kvalobs::kvDataFactory factory(observation.stationID(), observation.obstime(),
 					parameter->haveType() ? parameter->type() : observation.typeID(),
 					parameter->haveSensor() ? parameter->sensor() : 0 ,
 					parameter->haveLevel() ? parameter->level() : 0);
@@ -159,7 +159,7 @@ void DataStore::populateRefObs_(
 		db.getTextData(& textData, observation, * parameter, concreteRefObsRequirement.firstTime());
 		if ( textData.empty() )
 		{
-			kvalobs::kvTextData td(observation.stationID(), to_ptime(observation.obstime()), "", 0, boost::posix_time::ptime(), observation.typeID());
+			kvalobs::kvTextData td(observation.stationID(), observation.obstime(), "", 0, boost::posix_time::ptime(), observation.typeID());
 			textData.push_back(td);
 		}
 

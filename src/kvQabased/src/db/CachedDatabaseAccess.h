@@ -73,7 +73,7 @@ private:
 
 	struct StationParamSpec
 	{
-		StationParamSpec() : si(0, "", 0) {}
+		StationParamSpec() : si(0, boost::posix_time::ptime(), 0) {}
 		kvalobs::kvStationInfo si;
 		std::string parameter;
 		std::string qcx;

@@ -172,7 +172,7 @@ processStartedElements(int wait_on_qabase)
          }
 
          if(sendData(kvStationInfo(it->stationID(),
-                                   it->obstime(),
+                                   to_ptime(it->obstime()),
                                    it->typeID()))){
             break;
          }else{

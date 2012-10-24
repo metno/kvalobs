@@ -55,7 +55,7 @@ class kvModelData: public kvDbBase
 {
 private:
 	int stationid_;
-	miutil::miTime obstime_;
+	boost::posix_time::ptime obstime_;
 	int paramid_;
 	int level_;
 	int modelid_;
@@ -69,14 +69,14 @@ public:
 	{
 		set(r);
 	}
-	kvModelData(int stationid, const miutil::miTime &obstime, int paramid,
+	kvModelData(int stationid, const boost::posix_time::ptime &obstime, int paramid,
 			int level, int modelid, float original)
 
 	{
 		set(stationid, obstime, paramid, level, modelid, original);
 	}
 
-	bool set(int stationid, const miutil::miTime &obstime, int paramid,
+	bool set(int stationid, const boost::posix_time::ptime &obstime, int paramid,
 			int level, int modelid, float original);
 
 	bool set(const dnmi::db::DRow&);
@@ -91,7 +91,7 @@ public:
 	{
 		return stationid_;
 	}
-	miutil::miTime obstime() const
+	boost::posix_time::ptime obstime() const
 	{
 		return obstime_;
 	}

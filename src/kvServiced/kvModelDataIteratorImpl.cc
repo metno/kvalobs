@@ -149,7 +149,7 @@ ModelDataIteratorImpl::next(CKvalObs::CService::ModelDataList_out modelDataList)
 		(*modelDataList)[obsi].dataList.length(datai+1);
 		(*modelDataList)[obsi].dataList[datai].stationID=it->stationID(); 
 		(*modelDataList)[obsi].dataList[datai].obstime=
-                                  it->obstime().isoTime().c_str();
+                                  to_iso_extended_string(it->obstime()).c_str();
 		(*modelDataList)[obsi].dataList[datai].paramID=it->paramID();
 		(*modelDataList)[obsi].dataList[datai].level=it->level();
 		(*modelDataList)[obsi].dataList[datai].modelID=it->modelID();

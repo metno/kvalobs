@@ -24,7 +24,7 @@ AM_LDFLAGS = \
 	$(BOOST_PROGRAM_OPTIONS_LIB) \
 	$(BOOST_FILESYSTEM_LIB) \
 	$(BOOST_REGEX_LIB) \
-	$(BOOST_THREAD_LIB) -lboost_system \
+	$(BOOST_THREAD_LIB) $(BOOST_DATE_TIME_LIB) -lboost_system \
 	$(omniORB4_LIBS) \
 	$(perl_LIBS)
 

@@ -265,7 +265,10 @@ kvalobs::kvAlgorithms KvalobsDatabaseAccess::getAlgorithm(
 
 std::string KvalobsDatabaseAccess::getStationParam(const kvalobs::kvStationInfo & si, const std::string & parameter, const std::string & qcx) const
 {
-	int dayNumber = si.obstime().dayOfYear();
+	const boost::gregorian::date & date = si.obstime().date();
+	const boost::gregorian::date firstDayOfYear(date.year(), 1, 1);
+	int dayNumber = (date - firstDayOfYear).days() + 1;
+	//int dayNumber = si.obstime().dayOfYear();
 
 	std::ostringstream query;
 	query << "SELECT metadata FROM station_param WHERE "

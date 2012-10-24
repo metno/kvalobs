@@ -55,7 +55,7 @@ class kvStationInfo
 {
 private:
 	long stationid_;
-	miutil::miTime obstime_;
+	boost::posix_time::ptime obstime_;
 	int typeid_;
 
 public:
@@ -66,7 +66,7 @@ public:
 	 * \param obstime The observation time for this observation.
 	 * \param typeId The typeid to the observation.
 	 */
-	kvStationInfo(long stationid, const miutil::miTime &obstime, int typeId) :
+	kvStationInfo(long stationid, const boost::posix_time::ptime &obstime, int typeId) :
 			stationid_(stationid), obstime_(obstime), typeid_(typeId)
 	{
 	}
@@ -81,7 +81,7 @@ public:
 	}
 
 	///The observation time for this observation
-	miutil::miTime obstime() const
+	boost::posix_time::ptime obstime() const
 	{
 		return obstime_;
 	}

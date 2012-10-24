@@ -225,7 +225,7 @@ bool getKvModelDataFunc::process(kvServiceExt_ptr service)
 				for (CORBA::ULong k = 0; k < data[i].dataList.length(); k++)
 				{
 					kvalobs::kvModelData myData(data[i].dataList[k].stationID,
-							miutil::miTime(data[i].dataList[k].obstime),
+							boost::posix_time::time_from_string((const char *) data[i].dataList[k].obstime),
 							data[i].dataList[k].paramID,
 							data[i].dataList[k].level,
 							data[i].dataList[k].modelID,

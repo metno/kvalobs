@@ -164,7 +164,7 @@ DataSrcApp::sendInfoToManager(const kvalobs::kvStationInfoList &info_)
 
    for(infoIndex=0; it!=info.end(); it++, infoIndex++){
       infoList[infoIndex].stationId=it->stationID();
-      infoList[infoIndex].obstime=it->obstime().isoTime().c_str();
+      infoList[infoIndex].obstime=to_iso_extended_string(it->obstime()).c_str();
       infoList[infoIndex].typeId_=it->typeID();
    }
 

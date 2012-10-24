@@ -141,7 +141,7 @@ processElements(std::list<kvalobs::kvWorkelement> &workList,
 
 
       cmd->addStationInfo(kvStationInfo(it->stationID(),
-                                        it->obstime(),
+                                        to_ptime(it->obstime()),
                                         it->typeID()));
 
       try{

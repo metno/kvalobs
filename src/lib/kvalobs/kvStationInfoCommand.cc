@@ -132,7 +132,7 @@ kvalobs::StationInfoCommand::getStationInfo()
 	for (kvStationInfoExtList::const_iterator it = stationInfoList.begin();
 			it != stationInfoList.end(); ++it)
 		stationInfoListLegacy.push_back(
-				kvStationInfo(it->stationID(), it->obstime(), it->typeID()));
+				kvStationInfo(it->stationID(), to_ptime(it->obstime()), it->typeID()));
 
 	return stationInfoListLegacy;
 }
@@ -146,7 +146,7 @@ kvalobs::StationInfoCommand::getStationInfo() const
 	for (kvStationInfoExtList::const_iterator it = stationInfoList.begin();
 			it != stationInfoList.end(); ++it)
 		const_cast<kvalobs::StationInfoCommand*>(this)->stationInfoListLegacy.push_back(
-				kvStationInfo(it->stationID(), it->obstime(), it->typeID()));
+				kvStationInfo(it->stationID(), to_ptime(it->obstime()), it->typeID()));
 
 	return stationInfoListLegacy;
 }

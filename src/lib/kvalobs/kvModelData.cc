@@ -43,7 +43,7 @@ using namespace std;
 using namespace miutil;
 using namespace dnmi;
 
-bool kvalobs::kvModelData::set(int stationid, const miutil::miTime &obstime,
+bool kvalobs::kvModelData::set(int stationid, const boost::posix_time::ptime &obstime,
 		int paramid, int level, int modelid, float original)
 {
 	stationid_ = stationid;
@@ -57,7 +57,7 @@ bool kvalobs::kvModelData::set(int stationid, const miutil::miTime &obstime,
 	s << stationid_;
 	s << paramid_;
 	s << level_;
-	s << obstime_.isoTime();
+	s << obstime_;
 	sortBy_ = s.str();
 
 	return true;
@@ -82,7 +82,7 @@ bool kvalobs::kvModelData::set(const dnmi::db::DRow &r_)
 			}
 			else if (*it == "obstime")
 			{
-				obstime_ = miTime(buf);
+				obstime_ = boost::posix_time::time_from_string(buf);
 			}
 			else if (*it == "paramid")
 			{
@@ -110,7 +110,7 @@ bool kvalobs::kvModelData::set(const dnmi::db::DRow &r_)
 	s << stationid_;
 	s << paramid_;
 	s << level_;
-	s << obstime_.isoTime();
+	s << obstime_;
 	sortBy_ = s.str();
 
 	return true;
@@ -131,7 +131,7 @@ std::string kvalobs::kvModelData::uniqueKey() const
 	ostringstream ost;
 
 	ost << " WHERE stationid=" << stationid_ << " AND " << "       obstime="
-			<< quoted(obstime_.isoTime()) << " AND " << "       paramid="
+			<< quoted(to_iso_extended_string(obstime_)) << " AND " << "       paramid="
 			<< paramid_ << " AND " << "       level=" << level_ << " AND "
 			<< "       modelid=" << modelid_;
 

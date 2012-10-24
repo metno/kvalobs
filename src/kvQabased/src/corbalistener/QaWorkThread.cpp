@@ -62,8 +62,8 @@ void doUpdateWorkQue(kvDbGate & gate, const kvStationInfo & si,
 	LOGDEBUG( "UPDATE: workque!" );
 	ostringstream ost;
 	ost << "UPDATE workque SET " << colName << "='"
-			<< miTime::nowTime().isoTime() << "' WHERE stationid="
-			<< si.stationID() << "  AND obstime='" << si.obstime().isoTime()
+			<< to_iso_extended_string(boost::posix_time::second_clock::universal_time()) << "' WHERE stationid="
+			<< si.stationID() << "  AND obstime='" << to_iso_extended_string(si.obstime())
 			<< "' AND typeid=" << si.typeID();
 
 	if (!gate.exec(ost.str()))

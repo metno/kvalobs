@@ -216,10 +216,10 @@ processWaitingObs(CheckedDataHelper &helper)
 
          if(sit==sendtList.end()){
             stList.push_front(kvalobs::kvStationInfo(it->stationID(),
-                                                     it->obstime(),
+                                                     to_ptime(it->obstime()),
                                                      it->typeID()));
             sendtList.push_back(kvalobs::kvStationInfo(it->stationID(),
-                                                       it->obstime(),
+                                                       to_ptime(it->obstime()),
                                                        it->typeID()));
          }
       }
