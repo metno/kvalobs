@@ -105,20 +105,20 @@ public:
 	 * Get all data from object, with the given tbtime
 	 */
 	void getData(std::list<kvalobs::kvData> & out,
-			const miutil::miTime & tbtime = miutil::miTime()) const;
+			const boost::posix_time::ptime & tbtime = boost::posix_time::ptime()) const;
 
 	/**
 	 * Get all text data from object, with the given tbtime
 	 */
 	void getData(std::list<kvalobs::kvTextData> & out,
-			const miutil::miTime & tbtime = miutil::miTime()) const;
+			const boost::posix_time::ptime & tbtime = boost::posix_time::ptime()) const;
 
 	/**
 	 * Get all data and text datafrom object, with the given tbtime
 	 */
 	void getData(std::list<kvalobs::kvData> & out1, std::list<
-			kvalobs::kvTextData> & out2, const miutil::miTime & tbtime =
-			miutil::miTime()) const
+			kvalobs::kvTextData> & out2, const boost::posix_time::ptime & tbtime =
+			boost::posix_time::ptime()) const
 	{
             getData(out1, tbtime);
             getData(out2, tbtime);
@@ -160,7 +160,7 @@ public:
 	 * inserting the new values.
 	 */
 	void invalidate(bool doit, int station, int typeID,
-			const miutil::miTime & obstime);
+			const boost::posix_time::ptime & obstime);
 
 	/**
 	 * Query invalidate specification. Shall the given station, typeId, and
@@ -170,7 +170,7 @@ public:
 	 */
 	bool
 			isInvalidate(int station, int typeID,
-					const miutil::miTime & obstime) const;
+					const boost::posix_time::ptime & obstime) const;
 
 	/**
 	 * Specification for what observations will be invalidated
@@ -181,8 +181,8 @@ public:
 	{
 		int station;
 		int typeID;
-		miutil::miTime obstime;
-		InvalidateSpec(int st, int ty, miutil::miTime ot) :
+		boost::posix_time::ptime obstime;
+		InvalidateSpec(int st, int ty, boost::posix_time::ptime ot) :
 			station(st), typeID(ty), obstime(ot)
 		{
 		}

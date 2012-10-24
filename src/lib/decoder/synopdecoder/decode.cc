@@ -244,9 +244,9 @@ bool checktimes(list<kvalobs::kvData> &data)
   list<kvalobs::kvData>::iterator it=data.begin();
     
   for(;it!=data.end(); it++){
-    if(it->obstime().undef()) 
+    if(it->obstime().is_not_a_date_time())
       cout << "obstime undef() tbtime= "<< it->tbtime() << endl;
-    if(it->tbtime().undef())
+    if(it->tbtime().is_not_a_date_time())
       cout  << "tbtime undef() obstime= "<< it->obstime() << endl;
 
 	continue;

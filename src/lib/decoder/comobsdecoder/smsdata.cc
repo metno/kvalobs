@@ -60,10 +60,10 @@ addData(const std::string &param,
 
   if(isText){
     kvalobs::kvTextData mydata(sid, 
-			       dtObs,
+    		to_ptime(dtObs),
 			       data__,
 			       pid,
-			       tbtime,
+			       to_ptime(tbtime),
 			       tid);
 
     list<kvalobs::kvTextData>::iterator it=textData_.begin();
@@ -88,10 +88,10 @@ addData(const std::string &param,
     }
 
     kvalobs::kvData mydata(sid, 
-			   dtObs,
+    		to_ptime(dtObs),
 			   fval,
 			   pid,
-			   tbtime,
+			   to_ptime(tbtime),
 			   tid,
 			   sensor,
 			   level,

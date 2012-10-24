@@ -144,7 +144,7 @@ TEST_F(populateScriptTest, usesOriginalValueForObs)
 	using namespace testing;
 
 	db::DatabaseAccess::DataList data;
-	kvalobs::kvDataFactory factory(observation.stationID(), observation.obstime(), observation.typeID());
+	kvalobs::kvDataFactory factory(observation.stationID(), to_ptime(observation.obstime()), observation.typeID());
 	kvalobs::kvData d = factory.getData(10, 110);
 	kvalobs::correct(d, 42);
 	data.push_back(d);
@@ -186,7 +186,7 @@ TEST_F(populateScriptTest, flagsMissingValuesAsMissing)
 	using namespace testing;
 
 	db::DatabaseAccess::DataList data;
-	kvalobs::kvDataFactory factory(observation.stationID(), observation.obstime(), observation.typeID());
+	kvalobs::kvDataFactory factory(observation.stationID(), to_ptime(observation.obstime()), observation.typeID());
 	kvalobs::kvData d = factory.getMissing(110);
 	kvalobs::correct(d, 42);
 	data.push_back(d);
@@ -236,7 +236,7 @@ TEST_F(populateScriptTest, flagsRejectedValuesAsNotMissing)
 	using namespace testing;
 
 	db::DatabaseAccess::DataList data;
-	kvalobs::kvDataFactory factory(observation.stationID(), observation.obstime(), observation.typeID());
+	kvalobs::kvDataFactory factory(observation.stationID(), to_ptime(observation.obstime()), observation.typeID());
 	kvalobs::kvData d = factory.getData(10, 110);
 	kvalobs::reject(d);
 	data.push_back(d);
@@ -322,13 +322,13 @@ TEST_F(populateScriptTest, existingRefObs)
 	using namespace testing;
 
 	db::DatabaseAccess::TextDataList klstart;
-	klstart.push_back(kvalobs::kvTextData(observation.stationID(), observation.obstime(), "2010010106", 1021, miutil::miTime(), observation.typeID()));
+	klstart.push_back(kvalobs::kvTextData(observation.stationID(), to_ptime(observation.obstime()), "2010010106", 1021, boost::posix_time::ptime(), observation.typeID()));
 	EXPECT_CALL(mockDatabase, getTextData(_, observation, qabase::DataRequirement::Parameter("KLSTART"), 0))
 				.Times(AtLeast(1))
 				.WillRepeatedly(SetArgumentPointee<0>(klstart));
 
 	db::DatabaseAccess::TextDataList klobs;
-	klobs.push_back(kvalobs::kvTextData(observation.stationID(), observation.obstime(), "2010050106", 1022, miutil::miTime(), observation.typeID()));
+	klobs.push_back(kvalobs::kvTextData(observation.stationID(), to_ptime(observation.obstime()), "2010050106", 1022, boost::posix_time::ptime(), observation.typeID()));
 	EXPECT_CALL(mockDatabase, getTextData(_, observation, qabase::DataRequirement::Parameter("KLOBS"), 0))
 				.Times(AtLeast(1))
 				.WillRepeatedly(SetArgumentPointee<0>(klobs));
@@ -375,16 +375,16 @@ TEST_F(populateScriptTest, oneRefObsNonexisting)
 	using namespace testing;
 
 	db::DatabaseAccess::TextDataList klstart;
-	miutil::miTime t = observation.obstime();
-	klstart.push_back(kvalobs::kvTextData(observation.stationID(), t, "2010010206", 1021, miutil::miTime(), observation.typeID()));
-	t.addHour(-1);
-	klstart.push_back(kvalobs::kvTextData(observation.stationID(), t, "2010010106", 1021, miutil::miTime(), observation.typeID()));
+	boost::posix_time::ptime t = to_ptime(observation.obstime());
+	klstart.push_back(kvalobs::kvTextData(observation.stationID(), t, "2010010206", 1021, boost::posix_time::ptime(), observation.typeID()));
+	t -= boost::posix_time::hours(1);
+	klstart.push_back(kvalobs::kvTextData(observation.stationID(), t, "2010010106", 1021, boost::posix_time::ptime(), observation.typeID()));
 	EXPECT_CALL(mockDatabase, getTextData(_, observation, qabase::DataRequirement::Parameter("KLSTART"), -60))
 				.Times(AtLeast(1))
 				.WillRepeatedly(SetArgumentPointee<0>(klstart));
 
 	db::DatabaseAccess::TextDataList klobs;
-	klobs.push_back(kvalobs::kvTextData(observation.stationID(), observation.obstime(), "2010050106", 1022, miutil::miTime(), observation.typeID()));
+	klobs.push_back(kvalobs::kvTextData(observation.stationID(), to_ptime(observation.obstime()), "2010050106", 1022, boost::posix_time::ptime(), observation.typeID()));
 	EXPECT_CALL(mockDatabase, getTextData(_, observation, qabase::DataRequirement::Parameter("KLOBS"), -60))
 				.Times(AtLeast(1))
 				.WillRepeatedly(SetArgumentPointee<0>(klobs));

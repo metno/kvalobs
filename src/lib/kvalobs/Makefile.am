@@ -64,7 +64,7 @@ libkvalobs2_kvalobs_la_LIBADD = $(top_builddir)/src/lib/miutil/libkvalobs2_miuti
                        $(top_builddir)/src/lib/corbahelper/libkvalobs2_corbahelper.la \
                        $(top_builddir)/src/lib/miconfparser/libkvalobs2_miconfparser.la \
                        $(top_builddir)/src/lib/kvskel/libkvalobs2_kvskel.la \
-				       $(BOOST_THREAD_LIB) $(omniORB4_LIBS)
+				       $(BOOST_THREAD_LIB) $(BOOST_DATE_TIME_LIB) $(omniORB4_LIBS)
 
 kvalobsincludedir = $(pkgincludedir)/kvalobs
 kvalobsinclude_HEADERS = \

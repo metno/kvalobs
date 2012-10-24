@@ -32,7 +32,7 @@
 #include <boost/lexical_cast.hpp>
 
 using namespace std;
-using namespace miutil;
+namespace pt = boost::posix_time;
 
 std::string kvalobs::kvTextData::toSend() const
 {
@@ -52,14 +52,14 @@ std::string kvalobs::kvTextData::toSend() const
 
 	ost.str("");
 
-	ost << "(" << stationid_ << "," << quoted(obstime_) << ","
+	ost << "(" << stationid_ << "," << quoted(to_iso_extended_string(obstime_)) << ","
 			<< quoted(original_) << "," << paramid_ << "," << quoted(myTbtime)
 			<< "," << typeid_ << ")";
 	return ost.str();
 }
 
-bool kvalobs::kvTextData::set(int sta, const miutil::miTime& obt,
-		const std::string& org, int pid, const miutil::miTime& tbt, int typ)
+bool kvalobs::kvTextData::set(int sta, const boost::posix_time::ptime& obt,
+		const std::string& org, int pid, const boost::posix_time::ptime& tbt, int typ)
 {
 	stationid_ = sta;
 	obstime_ = obt;
@@ -68,7 +68,7 @@ bool kvalobs::kvTextData::set(int sta, const miutil::miTime& obt,
 	tbtime_ = tbt;
 	tbtimemsec_ = 0;
 	typeid_ = typ;
-	sortBy_ = boost::lexical_cast<std::string>(sta) + obt.isoTime();
+	sortBy_ = boost::lexical_cast<std::string>(sta) + to_iso_extended_string(obt);
 	return true;
 }
 
@@ -90,7 +90,7 @@ bool kvalobs::kvTextData::set(const dnmi::db::DRow& r_)
 			}
 			else if (*it == "obstime")
 			{
-				obstime_ = miTime(buf);
+				obstime_ = pt::time_from_string(buf);
 			}
 			else if (*it == "original")
 			{
@@ -102,7 +102,7 @@ bool kvalobs::kvTextData::set(const dnmi::db::DRow& r_)
 			}
 			else if (*it == "tbtime")
 			{
-				tbtime_ = decodeTimeWithMsec(buf, tbtimemsec_);
+				tbtime_ = pt::time_from_string(buf);
 			}
 			else if (*it == "typeid")
 			{
@@ -113,18 +113,8 @@ bool kvalobs::kvTextData::set(const dnmi::db::DRow& r_)
 			CERR("kvTextData: exception ..... \n");
 		}
 	}
-	sortBy_ = boost::lexical_cast<std::string>(stationid_) + obstime_.isoTime();
+	sortBy_ = boost::lexical_cast<std::string>(stationid_) + to_iso_extended_string(obstime_);
 	return true;
-}
-
-void kvalobs::kvTextData::tbtime(const miutil::miTime &tbtime, int msec)
-{
-	tbtime_ = tbtime;
-
-	if (msec > 0)
-		tbtimemsec_ = msec;
-	else
-		tbtimemsec_ = 0;
 }
 
 std::string kvalobs::kvTextData::uniqueKey() const
@@ -132,7 +122,7 @@ std::string kvalobs::kvTextData::uniqueKey() const
 	ostringstream ost;
 
 	ost << " WHERE stationid=" << stationid_ << " AND " << "       obstime="
-			<< quoted(obstime_.isoTime()) << " AND " << "       paramid="
+			<< quoted(to_iso_extended_string(obstime_)) << " AND " << "       paramid="
 			<< paramid_ << " AND " << "       typeid=" << typeid_;
 
 	return ost.str();

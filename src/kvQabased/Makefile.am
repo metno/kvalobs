@@ -49,7 +49,7 @@ check_PROGRAMS = qabasetest
 TESTS = $(check_PROGRAMS)
 qabasetest_SOURCES = $(qabase_src_SOURCES)
 qabasetest_CPPFLAGS = $(AM_CPPFLAGS) $(gmock_CFLAGS)
-qabasetest_LDADD = $(gmock_LIBS)
+qabasetest_LDADD = $(BOOST_DATE_TIME_LIB) $(gmock_LIBS)
 
 include test/qabase.mk
 

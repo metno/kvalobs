@@ -292,7 +292,7 @@ bool kvSynopDecoder::decode(const std::string &raw, list<kvData>&   data)
 
    kvData d;
 
-   miTime tbt = miTime::nowTime();
+   boost::posix_time::ptime tbt = boost::posix_time::microsec_clock::universal_time();
    miTime obt = createObsTime();
    int    pos = findStationid();
    int typeID = obs.typeID();
@@ -310,7 +310,7 @@ bool kvSynopDecoder::decode(const std::string &raw, list<kvData>&   data)
                /// itr->second = value          ( float )
 
 
-               d.set(pos, obt, itr->second, itr->first, tbt, typeID,0);
+               d.set(pos, to_ptime(obt), itr->second, itr->first, tbt, typeID,0);
                /// set useifo (7) not for ship!!!
                d.useinfo(7, ( typeID == 11 ? 0 : checkObservationTime(tbt,obt)) );
                data.push_back(d);

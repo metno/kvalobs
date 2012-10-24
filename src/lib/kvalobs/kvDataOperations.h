@@ -81,7 +81,7 @@ void correct(kvData & d, float new_val);
 /**
  * \brief Generate a missing data object for the given parameters.
  */
-kvData getMissingKvData(int stationID, const miutil::miTime & obsTime,
+kvData getMissingKvData(int stationID, const boost::posix_time::ptime & obsTime,
 		int paramID, int typeID, int sensor, int level);
 
 /**
@@ -95,7 +95,7 @@ kvData getMissingKvData(int stationID, const miutil::miTime & obsTime,
 class kvDataFactory
 {
 public:
-	kvDataFactory(int stationID, const miutil::miTime & obsTime, int typeID,
+	kvDataFactory(int stationID, const boost::posix_time::ptime & obsTime, int typeID,
 			int sensor = 0, int level = 0);
 
 	/**
@@ -107,14 +107,14 @@ public:
 	/**
 	 * Get a missing parameter for the given observation.
 	 */
-	kvData getMissing(int paramID, const miutil::miTime & obsTime =
-			miutil::miTime()) const;
+	kvData getMissing(int paramID, const boost::posix_time::ptime & obsTime =
+			boost::posix_time::ptime()) const;
 
 	/**
 	 * Get one piece of data for the observation.
 	 */
-	kvData getData(float val, int paramID, const miutil::miTime & obsTime =
-			miutil::miTime()) const;
+	kvData getData(float val, int paramID, const boost::posix_time::ptime & obsTime =
+			boost::posix_time::ptime()) const;
 
 	int stationID() const
 	{
@@ -124,7 +124,7 @@ public:
 	{
 		return typeID_;
 	}
-	const miutil::miTime & obstime() const
+	const boost::posix_time::ptime & obstime() const
 	{
 		return obstime_;
 	}
@@ -140,7 +140,7 @@ public:
 private:
 	const int stationID_;
 	const int typeID_;
-	const miutil::miTime obstime_;
+	const boost::posix_time::ptime obstime_;
 	const int sensor_;
 	const int level_;
 };

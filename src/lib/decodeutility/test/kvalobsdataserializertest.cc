@@ -64,12 +64,12 @@ protected:
 
 	KvalobsDataSerializerTest()
 	{
-		kvalobs::kvDataFactory f(42, "2006-04-26 06:00:00", 302);
+		kvalobs::kvDataFactory f(42, boost::posix_time::time_from_string("2006-04-26 06:00:00"), 302);
 		indata.insert(f.getData(1.0, 110));
 		indata.insert(f.getData(4, 112));
 		indata.insert(f.getData(3, 18));
 		indata.insert(f.getData(3, 34));
-		indata.insert(f.getData(3, 34, "2006-04-25 18:00:00"));
+		indata.insert(f.getData(3, 34, boost::posix_time::time_from_string("2006-04-25 18:00:00")));
 
 		in.insert(indata.begin(), indata.end());
 	}
@@ -97,16 +97,16 @@ TEST_F(KvalobsDataSerializerTest, testPreserveOverwrite)
 
 TEST_F(KvalobsDataSerializerTest, testPreserveInvalidate)
 {
-	in.invalidate(true, 42, 302, "2006-04-26 06:00:00");
-	in.invalidate(true, 42, 302, "2006-04-25 18:00:00");
-	in.invalidate(true, 42, 302, "2006-04-25 12:00:00");
+	in.invalidate(true, 42, 302, boost::posix_time::time_from_string("2006-04-26 06:00:00"));
+	in.invalidate(true, 42, 302, boost::posix_time::time_from_string("2006-04-25 18:00:00"));
+	in.invalidate(true, 42, 302, boost::posix_time::time_from_string("2006-04-25 12:00:00"));
 
 	KvalobsDataPtr out = loop();
 
-	EXPECT_TRUE( out->isInvalidate( 42, 302, "2006-04-26 06:00:00" ) );
-	EXPECT_TRUE( out->isInvalidate( 42, 302, "2006-04-25 18:00:00" ) );
-	EXPECT_TRUE( out->isInvalidate( 42, 302, "2006-04-25 12:00:00" ) );
-	EXPECT_TRUE( not out->isInvalidate( 42, 302, "2006-04-26 12:00:00" ) );
+	EXPECT_TRUE( out->isInvalidate( 42, 302, boost::posix_time::time_from_string("2006-04-26 06:00:00") ) );
+	EXPECT_TRUE( out->isInvalidate( 42, 302, boost::posix_time::time_from_string("2006-04-25 18:00:00") ) );
+	EXPECT_TRUE( out->isInvalidate( 42, 302, boost::posix_time::time_from_string("2006-04-25 12:00:00") ) );
+	EXPECT_TRUE( not out->isInvalidate( 42, 302, boost::posix_time::time_from_string("2006-04-26 12:00:00") ) );
 }
 
 TEST_F(KvalobsDataSerializerTest, testPreserveFixedRejectedList)

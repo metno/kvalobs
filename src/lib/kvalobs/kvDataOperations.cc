@@ -101,14 +101,14 @@ void correct(kvData & d, float new_val)
 	d.corrected(new_val);
 }
 
-kvData getMissingKvData(int stationID, const miutil::miTime & obsTime,
+kvData getMissingKvData(int stationID, const boost::posix_time::ptime & obsTime,
 		int paramID, int typeID, int sensor, int level)
 {
 	kvDataFactory f(stationID, obsTime, typeID, sensor, level);
 	return f.getMissing(paramID);
 }
 
-kvDataFactory::kvDataFactory(int stationID, const miutil::miTime & obstime,
+kvDataFactory::kvDataFactory(int stationID, const boost::posix_time::ptime & obstime,
 		int typeID, int sensor, int level) :
 		stationID_(stationID), obstime_(obstime), typeID_(typeID), sensor_(
 				sensor), level_(level)
@@ -122,7 +122,7 @@ kvDataFactory::kvDataFactory(const kvData & d) :
 }
 
 kvData kvDataFactory::getMissing(int paramID,
-		const miutil::miTime & obstime) const
+		const boost::posix_time::ptime & obstime) const
 {
 	kvData ret = getData(missingValue_, paramID, obstime);
 	kvControlInfo ci = ret.controlinfo();
@@ -132,10 +132,10 @@ kvData kvDataFactory::getMissing(int paramID,
 }
 
 kvData kvDataFactory::getData(float val, int paramID,
-		const miutil::miTime & obstime) const
+		const boost::posix_time::ptime & obstime) const
 {
-	kvData ret(stationID_, obstime.undef() ? obstime_ : obstime, val, paramID,
-			miutil::miTime::nowTime(), typeID_, sensor_, level_, val,
+	kvData ret(stationID_, obstime.is_not_a_date_time() ? obstime_ : obstime, val, paramID,
+			boost::posix_time::microsec_clock::universal_time(), typeID_, sensor_, level_, val,
 			kvControlInfo(), kvUseInfo(), std::string(""));
 	return ret;
 

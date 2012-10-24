@@ -25,4 +25,4 @@ data2kv_LDADD = $(top_builddir)/src/lib/kvalobs/libkvalobs2_kvalobs.la \
                 $(top_builddir)/src/lib/milog/libkvalobs2_milog.la \
                 $(top_builddir)/src/lib/kvskel/libkvalobs2_kvskel.la \
                 $(top_builddir)/src/lib/miutil/libkvalobs2_miutil.la \
-                $(putools_LIBS) $(omniORB4_LIBS) $(BOOST_THREAD_LIB)
+                $(putools_LIBS) $(omniORB4_LIBS) $(BOOST_THREAD_LIB) $(BOOST_DATE_TIME_LIB)

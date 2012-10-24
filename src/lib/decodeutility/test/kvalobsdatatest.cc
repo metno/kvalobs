@@ -64,7 +64,7 @@ TEST_F(KvalobsDataTest, testContructor)
 
 TEST_F(KvalobsDataTest, testInsertKvData)
 {
-  kvalobs::kvDataFactory f( 42, "2006-04-26 06:00:00", 302 );
+  kvalobs::kvDataFactory f( 42, boost::posix_time::time_from_string("2006-04-26 06:00:00"), 302 );
   kvData d = f.getData(  0.1, 110 );
   data.insert( d );
   list<kvData> out;
@@ -78,11 +78,11 @@ TEST_F(KvalobsDataTest, testInsertKvData)
 
 TEST_F(KvalobsDataTest, testInsertKvDataMultipleSensors_a)
 {
-  kvalobs::kvDataFactory f0( 42, "2006-04-26 06:00:00", 302 );
+  kvalobs::kvDataFactory f0( 42, boost::posix_time::time_from_string("2006-04-26 06:00:00"), 302 );
   kvData d0 = f0.getData(  0.1, 110 );
   data.insert( d0 );
 
-  kvalobs::kvDataFactory f1( 42, "2006-04-26 06:00:00", 302, '1' );
+  kvalobs::kvDataFactory f1( 42, boost::posix_time::time_from_string("2006-04-26 06:00:00"), 302, '1' );
   kvData d1 = f1.getData(  0.2, 110 );
   data.insert( d1 );
 
@@ -99,11 +99,11 @@ TEST_F(KvalobsDataTest, testInsertKvDataMultipleSensors_a)
 
 TEST_F(KvalobsDataTest, testInsertKvDataMultipleSensors_b)
 {
-  kvalobs::kvDataFactory f0( 42, "2006-04-26 06:00:00", 302 );
+  kvalobs::kvDataFactory f0( 42, boost::posix_time::time_from_string("2006-04-26 06:00:00"), 302 );
   kvData d0 = f0.getData(  0.1, 110 );
   data.insert( d0 );
 
-  kvalobs::kvDataFactory f1( 42, "2006-04-26 06:00:00", 302, 1 );
+  kvalobs::kvDataFactory f1( 42, boost::posix_time::time_from_string("2006-04-26 06:00:00"), 302, 1 );
   kvData d1 = f1.getData(  0.2, 110 );
   data.insert( d1 );
 
@@ -121,7 +121,7 @@ TEST_F(KvalobsDataTest, testInsertKvDataMultipleSensors_b)
 
 TEST_F(KvalobsDataTest, testInsertKvTextData)
 {
-  kvTextDataFactory f( 42, "2006-04-26 06:00:00", 302 );
+  kvTextDataFactory f( 42, boost::posix_time::time_from_string("2006-04-26 06:00:00"), 302 );
   kvTextData d = f.getData( "FOO", 1021 );
   data.insert( d );
   list<kvTextData> out;
@@ -137,7 +137,7 @@ TEST_F(KvalobsDataTest, testInvalidate)
 {
   int st = 4;
   int tp = 5;
-  miutil::miTime ot = "2006-04-26 06:00:00";
+  boost::posix_time::ptime ot = boost::posix_time::time_from_string("2006-04-26 06:00:00");
   data.invalidate( true, st, tp, ot );
 
   EXPECT_TRUE( data.isInvalidate( st, tp, ot ) );

@@ -55,7 +55,7 @@ protected:
 
 TEST_F(DelayedSaveDatabaseAccessTest, onlySaveOnCommit)
 {
-	kvalobs::kvDataFactory f(10, "2010-05-26 06:00:00", 302);
+	kvalobs::kvDataFactory f(10, boost::posix_time::time_from_string("2010-05-26 06:00:00"), 302);
 
 	db::DatabaseAccess::DataList toSave;
 	toSave.push_back(f.getData(42.0, 110));

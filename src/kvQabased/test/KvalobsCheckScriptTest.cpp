@@ -43,8 +43,8 @@ class KvalobsCheckScriptTest: public testing::Test
 {
 public:
 	KvalobsCheckScriptTest() :
-		observation(10, "2010-05-12 06:00:00", 302),
-		factory    (10, "2010-05-12 06:00:00", 302)
+		observation(10, boost::posix_time::time_from_string("2010-05-12 06:00:00"), 302),
+		factory    (10, boost::posix_time::time_from_string("2010-05-12 06:00:00"), 302)
 	{
 		database.setDefaultActions();
 	}
@@ -140,7 +140,7 @@ TEST_F(KvalobsCheckScriptTest, setsGreatestFlag)
 			.Times(AtLeast(1))
 			.WillRepeatedly(Return(makeAlgorithm("obs;X;;", simpleFlagScript, __func__)));
 
-	kvalobs::kvDataFactory factory(10, "2010-05-25 06:00:00", 302);
+	kvalobs::kvDataFactory factory(10, boost::posix_time::time_from_string("2010-05-25 06:00:00"), 302);
 	db::DatabaseAccess::DataList dataList;
 	kvalobs::kvData data = factory.getData(1, 110);
 	data.controlinfo(kvalobs::kvControlInfo("0050000000000000"));
@@ -165,7 +165,7 @@ TEST_F(KvalobsCheckScriptTest, setsFlagInCorrectPosition)
 			.Times(AtLeast(1))
 			.WillRepeatedly(Return(makeAlgorithm("obs;X;;", simpleFlagScript, __func__)));
 
-	kvalobs::kvDataFactory factory(10, "2010-05-25 06:00:00", 302);
+	kvalobs::kvDataFactory factory(10, boost::posix_time::time_from_string("2010-05-25 06:00:00"), 302);
 	db::DatabaseAccess::DataList dataList;
 	dataList.push_back(factory.getData(4, 110));
 	EXPECT_CALL(database, getData(_, observation, qabase::DataRequirement::Parameter("RR_24"), 0))

@@ -101,7 +101,7 @@ private:
    DecodeResult parseResult_;
    std::string parseMessage_;
    int priority_;
-   const miutil::miTime tbtime;
+   const boost::posix_time::ptime tbtime;
 };
 
 }

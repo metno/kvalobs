@@ -579,7 +579,12 @@ addDataToDb( const miutil::miTime &obstime, int stationid, int typeid_,
              int priority,
              const std::string &logid )
 {
-   kvalobs::decoder::DataUpdateTransaction work( obstime,stationid,
+	using namespace boost::posix_time;
+	boost::gregorian::date date(obstime.year(), obstime.month(), obstime.day());
+	boost::posix_time::time_duration clock(hours(obstime.hour()) + minutes(obstime.min()) + seconds(obstime.sec()));
+	boost::posix_time::ptime pt_obstime(date, clock);
+
+   kvalobs::decoder::DataUpdateTransaction work( pt_obstime,stationid,
                                                  typeid_, priority,
                                                  &sd, &textData, logid );
 

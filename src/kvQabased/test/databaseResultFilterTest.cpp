@@ -80,9 +80,9 @@ TEST(databaseResultFilterTest, getStationParamWrongKeyThrows)
 
 TEST(databaseResultFilterTest, getDataSimpleCase)
 {
-	kvalobs::kvDataFactory f(10, "2010-06-11 06:00:00", 302);
+	kvalobs::kvDataFactory f(10, boost::posix_time::time_from_string("2010-06-11 06:00:00"), 302);
 	db::DatabaseAccess::DataList data;
-	for ( miutil::miTime t = "2010-06-11 06:00:00"; t > "2010-06-05 06:00:00"; t.addHour(-12) )
+	for ( boost::posix_time::ptime t = boost::posix_time::time_from_string("2010-06-11 06:00:00"); t > boost::posix_time::time_from_string("2010-06-05 06:00:00"); t += boost::posix_time::hours(-12) )
 		data.push_back(f.getData(1.0, 1, t));
 
 	db::DatabaseAccess::DataList expectedResult = data;
@@ -94,9 +94,9 @@ TEST(databaseResultFilterTest, getDataSimpleCase)
 
 TEST(databaseResultFilterTest, getDataSimpleCaseNonstandardLevelAndSensor)
 {
-	kvalobs::kvDataFactory f(10, "2010-06-11 06:00:00", 302, 1, 10);
+	kvalobs::kvDataFactory f(10, boost::posix_time::time_from_string("2010-06-11 06:00:00"), 302, 1, 10);
 	db::DatabaseAccess::DataList data;
-	for ( miutil::miTime t = "2010-06-11 06:00:00"; t > "2010-06-05 06:00:00"; t.addHour(-12) )
+	for ( boost::posix_time::ptime t = boost::posix_time::time_from_string("2010-06-11 06:00:00"); t > boost::posix_time::time_from_string("2010-06-05 06:00:00"); t += boost::posix_time::hours(-12) )
 		data.push_back(f.getData(1.0, 1, t));
 
 	db::DatabaseAccess::DataList expectedResult = data;
@@ -109,13 +109,13 @@ TEST(databaseResultFilterTest, getDataSimpleCaseNonstandardLevelAndSensor)
 
 TEST(databaseResultFilterTest, getDataFiltersOutExtraLevels)
 {
-	kvalobs::kvDataFactory f0(10, "2010-06-11 06:00:00", 302, 0, 0);
-	kvalobs::kvDataFactory f10(10, "2010-06-11 06:00:00", 302, 0, 10);
+	kvalobs::kvDataFactory f0(10, boost::posix_time::time_from_string("2010-06-11 06:00:00"), 302, 0, 0);
+	kvalobs::kvDataFactory f10(10, boost::posix_time::time_from_string("2010-06-11 06:00:00"), 302, 0, 10);
 
 	db::DatabaseAccess::DataList data;
 	db::DatabaseAccess::DataList expectedResult;
 
-	for ( miutil::miTime t = "2010-06-11 06:00:00"; t > "2010-06-05 06:00:00"; t.addHour(-12) )
+	for ( boost::posix_time::ptime t = boost::posix_time::time_from_string("2010-06-11 06:00:00"); t > boost::posix_time::time_from_string("2010-06-05 06:00:00"); t += boost::posix_time::hours(-12) )
 	{
 		data.push_back(f0.getData(1.0, 1, t));
 		data.push_back(f10.getData(1.0, 1, t));
@@ -129,13 +129,13 @@ TEST(databaseResultFilterTest, getDataFiltersOutExtraLevels)
 
 TEST(databaseResultFilterTest, getDataFiltersOutExtraSensors)
 {
-	kvalobs::kvDataFactory f0(10, "2010-06-11 06:00:00", 302, 0, 0);
-	kvalobs::kvDataFactory f1(10, "2010-06-11 06:00:00", 302, 1, 0);
+	kvalobs::kvDataFactory f0(10, boost::posix_time::time_from_string("2010-06-11 06:00:00"), 302, 0, 0);
+	kvalobs::kvDataFactory f1(10, boost::posix_time::time_from_string("2010-06-11 06:00:00"), 302, 1, 0);
 
 	db::DatabaseAccess::DataList data;
 	db::DatabaseAccess::DataList expectedResult;
 
-	for ( miutil::miTime t = "2010-06-11 06:00:00"; t > "2010-06-05 06:00:00"; t.addHour(-12) )
+	for ( boost::posix_time::ptime t = boost::posix_time::time_from_string("2010-06-11 06:00:00"); t > boost::posix_time::time_from_string("2010-06-05 06:00:00"); t += boost::posix_time::hours(-12) )
 	{
 		data.push_back(f0.getData(1.0, 1, t));
 		data.push_back(f1.getData(1.0, 1, t));
@@ -149,13 +149,13 @@ TEST(databaseResultFilterTest, getDataFiltersOutExtraSensors)
 
 TEST(databaseResultFilterTest, getDataChoosesPreferredTypeId)
 {
-	kvalobs::kvDataFactory f0(10, "2010-06-11 06:00:00", 302);
-	kvalobs::kvDataFactory f1(10, "2010-06-11 06:00:00", 311);
+	kvalobs::kvDataFactory f0(10, boost::posix_time::time_from_string("2010-06-11 06:00:00"), 302);
+	kvalobs::kvDataFactory f1(10, boost::posix_time::time_from_string("2010-06-11 06:00:00"), 311);
 
 	db::DatabaseAccess::DataList data;
 	db::DatabaseAccess::DataList expectedResult;
 
-	for ( miutil::miTime t = "2010-06-11 06:00:00"; t > "2010-06-05 06:00:00"; t.addHour(-12) )
+	for ( boost::posix_time::ptime t = boost::posix_time::time_from_string("2010-06-11 06:00:00"); t > boost::posix_time::time_from_string("2010-06-05 06:00:00"); t += boost::posix_time::hours(-12) )
 	{
 		data.push_back(f0.getData(1.0, 1, t));
 		data.push_back(f1.getData(1.0, 1, t));
@@ -169,13 +169,13 @@ TEST(databaseResultFilterTest, getDataChoosesPreferredTypeId)
 
 TEST(databaseResultFilterTest, getDataFiltersOutExtraTypes)
 {
-	kvalobs::kvDataFactory f0(10, "2010-06-11 06:00:00", 302);
-	kvalobs::kvDataFactory f1(10, "2010-06-11 06:00:00", 311);
+	kvalobs::kvDataFactory f0(10, boost::posix_time::time_from_string("2010-06-11 06:00:00"), 302);
+	kvalobs::kvDataFactory f1(10, boost::posix_time::time_from_string("2010-06-11 06:00:00"), 311);
 
 	db::DatabaseAccess::DataList data;
 	db::DatabaseAccess::DataList expectedResult;
 
-	for ( miutil::miTime t = "2010-06-11 06:00:00"; t > "2010-06-05 06:00:00"; t.addHour(-12) )
+	for ( boost::posix_time::ptime t = boost::posix_time::time_from_string("2010-06-11 06:00:00"); t > boost::posix_time::time_from_string("2010-06-05 06:00:00"); t += boost::posix_time::hours(-12) )
 	{
 		data.push_back(f0.getData(1.0, 1, t));
 		data.push_back(f1.getData(1.0, 1, t));

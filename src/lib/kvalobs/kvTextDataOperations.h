@@ -39,18 +39,18 @@ namespace kvalobs
 class kvTextDataFactory
 {
 public:
-	kvTextDataFactory(int stationID, const miutil::miTime & obsTime,
+	kvTextDataFactory(int stationID, const boost::posix_time::ptime & obsTime,
 			int typeID);
 
 	explicit kvTextDataFactory(const kvTextData & data);
 
 	kvTextData getData(std::string val, int paramID,
-			const miutil::miTime & obsTime = miutil::miTime()) const;
+			const boost::posix_time::ptime & obsTime = boost::posix_time::ptime()) const;
 
 private:
 	const int stationID_;
 	const int typeID_;
-	const miutil::miTime obstime_;
+	const boost::posix_time::ptime obstime_;
 };
 
 namespace compare

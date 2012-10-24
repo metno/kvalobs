@@ -728,10 +728,10 @@ DataFunc::DataFunc(const DataToSendList &dataList)
       	  LOGDEBUG("DS: " << *it );
              */
             data[obsi].dataList[datai].stationID   = it->stationID();
-            data[obsi].dataList[datai].obstime     = it->obstime().isoTime().c_str();
+            data[obsi].dataList[datai].obstime     = to_iso_extended_string(it->obstime()).c_str();
             data[obsi].dataList[datai].original    = it->original();
             data[obsi].dataList[datai].paramID     = it->paramID();
-            data[obsi].dataList[datai].tbtime      = it->tbtime().isoTime().c_str();
+            data[obsi].dataList[datai].tbtime      = to_iso_extended_string(it->tbtime()).c_str();
             data[obsi].dataList[datai].typeID_     = it->typeID();
             data[obsi].dataList[datai].level       = it->level();
             data[obsi].dataList[datai].corrected   = it->corrected();
@@ -769,10 +769,10 @@ DataFunc::DataFunc(const DataToSendList &dataList)
                it!=itd->textDataList.end();
                it++) {
             data[obsi].textDataList[datai].stationID=it->stationID();
-            data[obsi].textDataList[datai].obstime=it->obstime().isoTime().c_str();
+            data[obsi].textDataList[datai].obstime=to_iso_extended_string(it->obstime()).c_str();
             data[obsi].textDataList[datai].original=it->original().c_str();
             data[obsi].textDataList[datai].paramID=it->paramID();
-            data[obsi].textDataList[datai].tbtime=it->tbtime().isoTime().c_str();
+            data[obsi].textDataList[datai].tbtime=to_iso_extended_string(it->tbtime()).c_str();
             data[obsi].textDataList[datai].typeID_=it->typeID();
 
             datai++;

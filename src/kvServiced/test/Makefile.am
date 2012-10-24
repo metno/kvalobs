@@ -48,7 +48,7 @@ getworkstatistik_LDADD = \
 	$(top_builddir)/src/lib/kvalobs/libkvalobs2_kvalobs.la \
 	$(top_builddir)/src/lib/kvskel/libkvalobs2_kvskel.la \
 	$(top_builddir)/src/lib/miconfparser/libkvalobs2_miconfparser.la \
-	$(putools_LIBS)\
+	$(putools_LIBS) $(BOOST_DATE_TIME_LIB) \
         $(omniORB4_LIBS) -lm
 
 stressTestGetData_SOURCES=stressTestGetData.cc

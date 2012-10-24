@@ -45,7 +45,7 @@ namespace decoder{
 
 
 DataUpdateTransaction::
-DataUpdateTransaction( const miutil::miTime &obstime,
+DataUpdateTransaction( const boost::posix_time::ptime &obstime,
                        int stationid,
                        int typeid_,
                        int priority,
@@ -86,9 +86,9 @@ void
 DataUpdateTransaction::
 addStationInfo( dnmi::db::Connection *con,
                 long stationID,
-                const miutil::miTime &obsTime,
+                const boost::posix_time::ptime &obsTime,
                 long typeID,
-                const miutil::miTime &tbTime )
+                const boost::posix_time::ptime &tbTime )
 {
    IkvStationInfoList it=stationInfoList_->begin();
 
@@ -102,7 +102,7 @@ addStationInfo( dnmi::db::Connection *con,
    }
 
    ostringstream q;
-   miutil::miTime undefTime;
+   boost::posix_time::ptime undefTime;
 
    q << "DELETE FROM workque WHERE stationid=" << stationID << " AND "
      << "typeid=" << typeID << " AND obstime='" << obsTime << "'";
@@ -163,7 +163,7 @@ addStationInfo( dnmi::db::Connection *con,
 
 bool
 DataUpdateTransaction::
-hasDataWithTbtime( dnmi::db::Connection *con, const miutil::miTime &tbtime, int &msec )
+hasDataWithTbtime( dnmi::db::Connection *con, const boost::posix_time::ptime &tbtime )
 {
    ostringstream q;
    dnmi::db::Result *dbRes;
@@ -174,7 +174,7 @@ hasDataWithTbtime( dnmi::db::Connection *con, const miutil::miTime &tbtime, int 
 //     << "tbtime='" << tbtime << "." << msec <<"'";
 
    q << "SELECT * FROM data WHERE stationid=" << stationid << " AND "
-     << "tbtime='" << tbtime << "." << msec <<"'";
+     << "tbtime='" << to_iso_extended_string(tbtime) <<"'";
 
    auto_ptr<dnmi::db::Result> res;
 
@@ -204,14 +204,12 @@ hasDataWithTbtime( dnmi::db::Connection *con, const miutil::miTime &tbtime, int 
 }
 
 
-miutil::miTime
+boost::posix_time::ptime
 DataUpdateTransaction::
-getTimestamp( dnmi::db::Connection *con, int &msec )
+getTimestamp( dnmi::db::Connection *con )
 {
     std::auto_ptr<dnmi::db::Result> res;
    string q("SELECT now()");
-
-   msec=0;
 
    try {
        res.reset(con->execQuery( q ));
@@ -233,30 +231,28 @@ getTimestamp( dnmi::db::Connection *con, int &msec )
 
    if( res.get() != 0 && res->hasNext() ) {
       dnmi::db::DRow & row = res->next();
-      return miutil::isoTimeWithMsec( row[0], msec );
+      return boost::posix_time::time_from_string(row[0]);
    }
 
-   return miutil::miTime();
+   return boost::posix_time::ptime();
 }
 
-miutil::miTime
+boost::posix_time::ptime
 DataUpdateTransaction::
-getUniqTbtime( dnmi::db::Connection *con, int &msec )
+getUniqTbtime( dnmi::db::Connection *con )
 {
-   miutil::miTime t;
+   boost::posix_time::ptime t;
 
    for( int i=0; i<10000; ++i ) {
-      if( t.undef() )
-         t = getTimestamp(con, msec );
+      if( t.is_not_a_date_time() )
+         t = getTimestamp(con);
 
-      if( t.undef() ) {
+      if( t.is_not_a_date_time() ) {
          continue;
       }
 
-      msec = msec % 1000000;
-
-      if( hasDataWithTbtime( con, t, msec ) ) {
-         msec++;
+      if( hasDataWithTbtime( con, t ) ) {
+         t += boost::posix_time::microseconds(1);
          continue;
       }
 
@@ -268,19 +264,18 @@ void
 DataUpdateTransaction::
 setTbtime( dnmi::db::Connection *conection )
 {
-   int msec;
-   miutil::miTime tbtime;
+   boost::posix_time::ptime tbtime;
 
-   tbtime=getUniqTbtime( conection, msec );
+   tbtime=getUniqTbtime( conection );
 
    for( list<kvalobs::kvData>::iterator nit=newData->begin();
         nit != newData->end(); ++nit ) {
-      nit->tbtime( tbtime, msec );
+      nit->tbtime( tbtime );
    }
 
    for( list<kvalobs::kvTextData>::iterator nit=newTextData->begin();
          nit != newTextData->end(); ++nit ) {
-      nit->tbtime( tbtime, msec );
+      nit->tbtime( tbtime );
    }
 }
 
@@ -454,7 +449,7 @@ DataUpdateTransaction::
 getData( dnmi::db::Connection *con,
          int stationid,
          int typeid_,
-         const miutil::miTime &obstime,
+         const boost::posix_time::ptime &obstime,
          list<kvalobs::kvData> &data,
          list<kvalobs::kvTextData> &textData )
 {
@@ -590,7 +585,7 @@ insertData(dnmi::db::Connection *conection,
            const std::list<kvalobs::kvTextData> &textData )
 {
 
-   miutil::miTime tbtime(miutil::miTime::nowTime() );
+   boost::posix_time::ptime tbtime(boost::posix_time::microsec_clock::universal_time() );
 
    for( list<kvalobs::kvData>::const_iterator nit=data.begin();
         nit != data.end(); ++nit ) {
@@ -774,8 +769,7 @@ replaceData( dnmi::db::Connection *conection,
    list<kvalobs::kvData> myNewData;
    list<kvalobs::kvTextData> myNewTextData;
    ostringstream q;
-   miutil::miTime tbtime;
-   int msec;
+   boost::posix_time::ptime tbtime;
    bool onlyMissing=true;
 
    for( list<kvalobs::kvData>::const_iterator it=dataList.begin(); it != dataList.end();
@@ -788,24 +782,20 @@ replaceData( dnmi::db::Connection *conection,
 
    if( onlyMissing && ! dataList.empty() ) {
       tbtime = dataList.begin()->tbtime();
-      msec = dataList.begin()->tbtimemsec();
    }else if( ! dataList.empty()) {
       for( list<kvalobs::kvData>::const_iterator it=dataList.begin(); it != dataList.end();
            ++it ) {
          if( it->original() != -32767 ) {
             tbtime = it->tbtime();
-            msec = it->tbtimemsec();
             break;
          }
       }
    }
 
-   if( tbtime.undef() && ! textDataList.empty() ) {
+   if( tbtime.is_not_a_date_time() && ! textDataList.empty() )
       tbtime = textDataList.begin()->tbtime();
-      msec = textDataList.begin()->tbtimemsec();
-   }
 
-   if( tbtime.undef() ){
+   if( tbtime.is_not_a_date_time() ){
       insertData( conection, *newData, *newTextData );
       return;
    }
@@ -814,10 +804,9 @@ replaceData( dnmi::db::Connection *conection,
          it != dataList.end(); ++it ) {
       q.str("");
       tbtime = it->tbtime();
-      msec = it->tbtimemsec();
       q << "SELECT * FROM data WHERE stationid=" << it->stationID()
         << " AND abs(typeid)=" << it->typeID()
-        << " AND (obstime='" << obstime << "' OR tbtime='" << tbtime << "." << msec << "')";
+        << " AND (obstime='" << obstime << "' OR tbtime='" << to_iso_extended_string(tbtime) << "')";
 
       addQuery( qDataList, q.str() );
    }
@@ -826,10 +815,9 @@ replaceData( dnmi::db::Connection *conection,
             it != textDataList.end(); ++it ) {
       q.str("");
       tbtime = it->tbtime();
-      msec = it->tbtimemsec();
       q << "SELECT * FROM text_data WHERE stationid=" << it->stationID()
         << " AND abs(typeid)=" << it->typeID()
-        << " AND (obstime='" << obstime << "' OR tbtime='" << tbtime << "." << msec << "')";
+        << " AND (obstime='" << obstime << "' OR tbtime='" << to_iso_extended_string(tbtime) << "')";
 
       addQuery( qTextDataList, q.str() );
    }
@@ -865,7 +853,7 @@ replaceData( dnmi::db::Connection *conection,
    //Mark the oldtextData as deleted
    for( list<kvalobs::kvTextData>::iterator it = oldTextData.begin();
          it != oldTextData.end(); ++it ) {
-      it->tbtime( it->tbtime(), it->tbtimemsec() );
+      it->tbtime( it->tbtime() );
       it->set( it->stationID(), it->obstime(), "", it->paramID(), it->tbtime(), it->typeID() );
    }
 
@@ -893,7 +881,7 @@ update( dnmi::db::Connection *connection,
         const std::list<kvalobs::kvTextData> &textData )
 {
    ostringstream ost;
-   miutil::miTime tbtime( miutil::miTime::nowTime() );
+   boost::posix_time::ptime tbtime( boost::posix_time::microsec_clock::universal_time() );
 
    for( std::list<kvalobs::kvData>::const_iterator it=data.begin();
         it != data.end(); ++it ) {
@@ -905,9 +893,9 @@ update( dnmi::db::Connection *connection,
           << ", controlinfo='"    << it->controlinfo().flagstring() << "'"
           << ", useinfo='"        << it->useinfo().flagstring() << "'"
           << ", cfailed='"        << it->cfailed() << "'"
-          << ", tbtime='" << it->tbtime().isoTime() <<"." << it->tbtimemsec() << "'"
+          << ", tbtime='" << to_iso_extended_string(it->tbtime()) << "'"
           << " WHERE stationid=" << it->stationID() << " AND "
-          << "       obstime='"   << it->obstime().isoTime() << "' AND "
+          << "       obstime='"   << to_iso_extended_string(it->obstime()) << "' AND "
           << "       paramid="   << it->paramID() << " AND "
           << "       typeid="    << it->typeID() << " AND "
           << "       sensor='"    << it->sensor() << "' AND "
@@ -923,9 +911,9 @@ update( dnmi::db::Connection *connection,
 
       ost << "UPDATE text_data SET "
           << "  original='"    << it->original() << "'"
-          << ", tbtime='" << it->tbtime().isoTime() <<"." << it->tbtimemsec() << "'"
+          << ", tbtime='" << to_iso_extended_string(it->tbtime()) <<"." << it->tbtimemsec() << "'"
           << " WHERE stationid=" << it->stationID() << " AND "
-          << "       obstime='"   << it->obstime().isoTime() << "' AND "
+          << "       obstime='"   << to_iso_extended_string(it->obstime()) << "' AND "
           << "       paramid="   << it->paramID() << " AND "
           << "       typeid="    << it->typeID();
 
@@ -941,10 +929,10 @@ operator()( dnmi::db::Connection *conection )
    ostringstream mylog;
    list<kvalobs::kvData> dataList;
    list<kvalobs::kvTextData> textDataList;
-   miutil::miTime tbtime;
+   boost::posix_time::ptime tbtime;
    int msec;
 
-   if( obstime.undef() ) {
+   if( obstime.is_not_a_date_time() ) {
       LOGERROR("NewData: stationid: " << stationid << " typeid: " << typeid_
             << ". Invalid obstime.");
       return false;
@@ -954,7 +942,7 @@ operator()( dnmi::db::Connection *conection )
       bool err=false;
       for( std::list<kvalobs::kvData>::const_iterator it=newData->begin();
             it != newData->end(); ++it ) {
-         if( it->obstime().undef() ) {
+         if( it->obstime().is_not_a_date_time() ) {
             err = true;
             mylog << "Invalid obstime: " << it->stationID() << "," << it->typeID() <<","
                   << it->paramID() << "," << it->sensor() <<"," << it->level()

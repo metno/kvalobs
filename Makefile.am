@@ -23,7 +23,6 @@ pkgsysconf_DATA = \
 	etc/kvdataclt.conf.template \
 	etc/norcom2kv.conf.template
 	
-
 #pkgconfig_DATA = @PACKAGE_TARNAME@.pc
 #$(pkgconfig_DATA): config.status
 

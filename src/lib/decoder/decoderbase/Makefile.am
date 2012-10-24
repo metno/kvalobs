@@ -23,4 +23,5 @@ libkvalobs2_decoderbase_la_LIBADD =   $(top_builddir)/src/lib/kvalobs/libkvalobs
                              $(top_builddir)/src/lib/milog/libkvalobs2_milog.la \
                              $(top_builddir)/src/lib/kvdb/libkvalobs2_kvdb.la \
                              $(top_builddir)/src/lib/fileutil/libkvalobs2_fileutil.la \
+                             $(BOOST_DATE_TIME_LIB) \
                              $(libxml2_LIBS)

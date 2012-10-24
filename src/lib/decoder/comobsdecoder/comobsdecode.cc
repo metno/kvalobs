@@ -297,7 +297,7 @@ execute(std::string &msg)
 
       if( it->dataSize()>0 || it->textDataSize()>0 ) {
          try {
-            kvalobs::decoder::DataUpdateTransaction work( it->getDate(),
+            kvalobs::decoder::DataUpdateTransaction work( to_ptime(it->getDate()),
                                                           it->stationID(), it->typeID(),
                                                           priority, &d, &td, logid);
 

@@ -32,6 +32,7 @@
 #define _kvTextData_h
 
 #include <kvalobs/kvDbBase.h>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace kvalobs
 {
@@ -50,10 +51,10 @@ class kvTextData: public kvDbBase
 {
 private:
 	int stationid_;
-	miutil::miTime obstime_;
+	boost::posix_time::ptime obstime_;
 	std::string original_;
 	int paramid_;
-	miutil::miTime tbtime_;
+	boost::posix_time::ptime tbtime_;
 	int tbtimemsec_;
 	int typeid_;
 
@@ -67,15 +68,15 @@ public:
 	{
 		set(r);
 	}
-	kvTextData(int sta, const miutil::miTime& obt, const std::string& org,
-			int pid, const miutil::miTime& tbt, int typ)
+	kvTextData(int sta, const boost::posix_time::ptime& obt, const std::string& org,
+			int pid, const boost::posix_time::ptime& tbt, int typ)
 	{
 		set(sta, obt, org, pid, tbt, typ);
 	}
 
 	bool set(const dnmi::db::DRow&);
-	bool set(int sta, const miutil::miTime& obt, const std::string& org,
-			int pid, const miutil::miTime& tbt, int typ);
+	bool set(int sta, const boost::posix_time::ptime& obt, const std::string& org,
+			int pid, const boost::posix_time::ptime& tbt, int typ);
 
 	const char* tableName() const
 	{
@@ -88,7 +89,7 @@ public:
 	{
 		return stationid_;
 	}
-	miutil::miTime obstime() const
+	boost::posix_time::ptime obstime() const
 	{
 		return obstime_;
 	}
@@ -100,7 +101,7 @@ public:
 	{
 		return paramid_;
 	}
-	miutil::miTime tbtime() const
+	boost::posix_time::ptime tbtime() const
 	{
 		return tbtime_;
 	}
@@ -113,7 +114,10 @@ public:
 		return typeid_;
 	}
 
-	void tbtime(const miutil::miTime &tbtime, int msec = 0);
+	void tbtime(const boost::posix_time::ptime &tbtime)
+	{
+		tbtime_ = tbtime;
+	}
 	void typeID(int t)
 	{
 		typeid_ = t;

@@ -86,7 +86,7 @@ void KvalobsData::insert(const kvTextData & d)
 			= d;
 }
 
-void KvalobsData::getData(list<kvData> & out, const miutil::miTime & tbtime) const
+void KvalobsData::getData(list<kvData> & out, const boost::posix_time::ptime & tbtime) const
 {
 	using namespace internal;
 	for (Observations::const_iterator s = obs_.begin(); s != obs_.end(); ++s)
@@ -119,7 +119,7 @@ void KvalobsData::getData(list<kvData> & out, const miutil::miTime & tbtime) con
 	}
 }
 
-void KvalobsData::getData(list<kvTextData> & out, const miutil::miTime & tbtime) const
+void KvalobsData::getData(list<kvTextData> & out, const boost::posix_time::ptime & tbtime) const
 {
 	using namespace internal;
 	for (Observations::const_iterator s = obs_.begin(); s != obs_.end(); ++s)
@@ -142,13 +142,13 @@ void KvalobsData::getData(list<kvTextData> & out, const miutil::miTime & tbtime)
 }
 
 void KvalobsData::invalidate(bool doit, int station, int typeID,
-		const miutil::miTime & obstime)
+		const boost::posix_time::ptime & obstime)
 {
 	obs_[station][typeID][obstime].invalidate(doit);
 }
 
 bool KvalobsData::isInvalidate(int station, int typeID,
-		const miutil::miTime & obstime) const
+		const boost::posix_time::ptime & obstime) const
 {
 	return obs_[station][typeID][obstime].invalidate();
 }

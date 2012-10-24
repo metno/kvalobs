@@ -272,10 +272,10 @@ execute(std::string &msg)
 
          if( isTextParam( params[index].id() ) ) {
             kvTextData d( stationid,
-                          obstime,
+                          to_ptime(obstime),
                           val,
                           params[index].id(),
-                          tbtime,
+                          to_ptime(tbtime),
                           typeId );
 
             textDataList.push_back( d );
@@ -302,10 +302,10 @@ execute(std::string &msg)
             }
 
             kvData d( stationid,
-                      obstime,
+            		to_ptime(obstime),
                       fval,
                       params[index].id(),
-                      tbtime,
+                      to_ptime(tbtime),
                       typeId,
                       params[index].sensor(),
                       params[index].level(),

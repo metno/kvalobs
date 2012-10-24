@@ -116,7 +116,7 @@ SynopDecoder::saveData(list<kvalobs::kvData> &data,
    }
 
    for(;it!=data.end(); it++){
-      if(it->obstime().undef() || it->tbtime().undef()){
+      if(it->obstime().is_not_a_date_time() || it->tbtime().is_not_a_date_time()){
          rejectedMessage="Missing obsTime or tbtime for observation!";
          rejected=true;
          return false;

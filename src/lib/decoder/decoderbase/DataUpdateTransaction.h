@@ -61,7 +61,7 @@ class DataUpdateTransaction : public dnmi::db::Transaction
    DataUpdateTransaction operator=( const DataUpdateTransaction &rhs);
    std::list<kvalobs::kvData> *newData;
    std::list<kvalobs::kvTextData> *newTextData;
-   miutil::miTime obstime;
+   boost::posix_time::ptime obstime;
    int stationid;
    int typeid_;
    int priority;
@@ -89,17 +89,17 @@ public:
     * @param query The query to add.
     */
    void addQuery( std::list<std::string> &qList, const std::string &query );
-   miutil::miTime getTimestamp( dnmi::db::Connection *conection, int &msec );
+   boost::posix_time::ptime getTimestamp( dnmi::db::Connection *conection );
    void addStationInfo( dnmi::db::Connection *con,
                         long stationid,
-                        const miutil::miTime &obstime,
+                        const boost::posix_time::ptime &obstime,
                         long typeid_,
-                        const miutil::miTime &tbtime );
+                        const boost::posix_time::ptime &tbtime );
 
    bool getData( dnmi::db::Connection *conection,
                  int stationid,
                  int typeid_,
-                 const miutil::miTime &obstime,
+                 const boost::posix_time::ptime &obstime,
                  std::list<kvalobs::kvData> &data,
                  std::list<kvalobs::kvTextData> &textData );
 
@@ -118,8 +118,8 @@ public:
                            std::list<kvalobs::kvData> &data,
                            std::list<kvalobs::kvTextData> &textData );
 
-   bool hasDataWithTbtime( dnmi::db::Connection *con, const miutil::miTime &tbtime, int &msec );
-   miutil::miTime getUniqTbtime( dnmi::db::Connection *con, int &msec );
+   bool hasDataWithTbtime( dnmi::db::Connection *con, const boost::posix_time::ptime &tbtime );
+   boost::posix_time::ptime getUniqTbtime( dnmi::db::Connection *con );
    bool isEqual( std::list<kvalobs::kvData> &oldData,
                  std::list<kvalobs::kvTextData> &oldTextData );
    void insertData( dnmi::db::Connection *conection,
@@ -138,7 +138,7 @@ public:
                      const std::list<kvalobs::kvData> &dataList,
                      const std::list<kvalobs::kvTextData> &textDataList );
 
-   DataUpdateTransaction( const miutil::miTime &obstime,
+   DataUpdateTransaction( const boost::posix_time::ptime &obstime,
                           int stationid,
                           int typeid_,
                           int priority,

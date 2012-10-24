@@ -51,4 +51,5 @@ decodeutilitytest_LDADD = \
 	libkvalobs2_decodeutility.la \
 	$(libkvalobs2_decodeutility_la_LIBADD) \
 	$(putools_LIBS)\
+	$(BOOST_DATE_TIME_LIB) \
 	$(gtest_LIBS)

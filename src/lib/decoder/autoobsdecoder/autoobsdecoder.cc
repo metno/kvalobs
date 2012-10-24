@@ -488,10 +488,10 @@ execute(std::string &msg)
 	  
 	  				if(isTextParam(findParamIdInList(paramList, elems[k].id()))){
 	    				kvTextData d(stationid,
-			 							 obstime,
+			 							 to_ptime(obstime),
 			 							 elems[k].sVal(),
 			 							 elems[k].id(),
-			 							 tbtime,
+			 							to_ptime(tbtime),
 			 							 useTypeid);
 	    
 	    				logs << " (TEXTDATA)" << endl;
@@ -499,10 +499,10 @@ execute(std::string &msg)
 
 	  				}else	if(elems[k].fVal(fval)){
 	      			kvData d(stationid, 
-		       					obstime, 
+	      					to_ptime(obstime),
 		       					fval, 
 		       					elems[k].id(), 
-		       					tbtime,
+		       					to_ptime(tbtime),
 		       					useTypeid,
 		       					elems[k].sensorno(),
 		       					elems[k].height(), 
@@ -540,10 +540,10 @@ execute(std::string &msg)
       	if(rr!=FLT_MAX && paramid>0){
 				try{
 	  				kvData d(stationid, 
-		   					obstime, 
+	  						to_ptime(obstime),
 		   					rr, 
 		   					paramid, 
-		   					tbtime,
+		   					to_ptime(tbtime),
 		   					useTypeid,
 		   					0,
 		   					0, 
@@ -559,10 +559,10 @@ execute(std::string &msg)
 
 	      		paramid=12; //ITR
 	      		kvData dd(stationid, 
-								 obstime, 
+	      				to_ptime(obstime),
 								 RRRtr.tr, 
 								 paramid,
-								 tbtime,
+								 to_ptime(tbtime),
 								 useTypeid,
 								 0,
 								 0, 
@@ -592,8 +592,8 @@ execute(std::string &msg)
       if( converter.hasSaSdEmEi( saSdEm ) ) {
          //Create a template to use
          //to hold all common parameters for SA, SD and EM.
-         kvData saSdEmTmp(stationid, obstime, 
-                          -32767 /*original*/, 0  /*paramid*/, tbtime,
+         kvData saSdEmTmp(stationid, to_ptime(obstime),
+                          -32767 /*original*/, 0  /*paramid*/, to_ptime(tbtime),
                           useTypeid, 0 /*sensor*/, 0 /*level*/, 
                           -32767 /*corected*/, kvControlInfo(), kvUseInfo(), "");
 			      

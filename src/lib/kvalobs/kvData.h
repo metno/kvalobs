@@ -32,6 +32,7 @@
 #define __kvData_h__
 
 #include <ostream>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <kvalobs/kvDbBase.h>
 #include <kvalobs/kvDataFlag.h>
 
@@ -54,23 +55,6 @@ namespace kvalobs
 
 class kvData: public kvDbBase
 {
-private:
-	int stationid_;
-	miutil::miTime obstime_;
-	float original_;
-	int paramid_;
-	miutil::miTime tbtime_;
-	int tbtimemsec_;
-	int typeid_;
-	int sensor_;
-	int level_;
-	float corrected_;
-	kvControlInfo controlinfo_;
-	kvUseInfo useinfo_;
-	std::string cfailed_;
-
-	void createSortIndex();
-
 public:
 	kvData()
 	{
@@ -82,21 +66,21 @@ public:
 	{
 		set(r);
 	}
-	kvData(int pos, const miutil::miTime & obt, float org, int par,
-			const miutil::miTime & tbt, int typ, int sen, int lvl, float cor,
+	kvData(int pos, const boost::posix_time::ptime & obt, float org, int par,
+			const boost::posix_time::ptime & tbt, int typ, int sen, int lvl, float cor,
 			const kvControlInfo & cin, const kvUseInfo & uin,
 			const std::string & fai)
 	{
 		set(pos, obt, org, par, tbt, typ, sen, lvl, cor, cin, uin, fai);
 	}
 
-	bool set(int pos, const miutil::miTime & obt, float org, int par,
-			const miutil::miTime & tbt, int typ, int sen, int lvl, float cor,
+	bool set(int pos, const boost::posix_time::ptime & obt, float org, int par,
+			const boost::posix_time::ptime & tbt, int typ, int sen, int lvl, float cor,
 			const kvControlInfo & cin, const kvUseInfo & uin,
 			const std::string & fai);
 
-	bool set(int pos, const miutil::miTime& obt, float org, int par,
-			const miutil::miTime &tbt, int typ, int lvl);
+	bool set(int pos, const boost::posix_time::ptime& obt, float org, int par,
+			const boost::posix_time::ptime &tbt, int typ, int lvl);
 
 	bool set(const dnmi::db::DRow&);
 
@@ -124,7 +108,7 @@ public:
 	{
 		return stationid_;
 	}
-	miutil::miTime obstime() const
+	boost::posix_time::ptime obstime() const
 	{
 		return obstime_;
 	}
@@ -136,13 +120,9 @@ public:
 	{
 		return paramid_;
 	}
-	miutil::miTime tbtime() const
+	boost::posix_time::ptime tbtime() const
 	{
 		return tbtime_;
-	}
-	int tbtimemsec() const
-	{
-		return tbtimemsec_;
 	}
 	int typeID() const
 	{
@@ -173,7 +153,10 @@ public:
 		return cfailed_;
 	}
 
-	void tbtime(const miutil::miTime &tbtime, int msec = 0);
+	void tbtime(const boost::posix_time::ptime &tbtime)
+	{
+		tbtime_ = tbtime;
+	}
 	void typeID(int t)
 	{
 		typeid_ = t;
@@ -198,6 +181,22 @@ public:
 
 	friend std::ostream& operator<<(std::ostream& output,
 			const kvalobs::kvData &d);
+
+private:
+	int stationid_;
+	boost::posix_time::ptime obstime_;
+	float original_;
+	int paramid_;
+	boost::posix_time::ptime tbtime_;
+	int typeid_;
+	int sensor_;
+	int level_;
+	float corrected_;
+	kvControlInfo controlinfo_;
+	kvUseInfo useinfo_;
+	std::string cfailed_;
+
+	void createSortIndex();
 };
 
 /** @} */

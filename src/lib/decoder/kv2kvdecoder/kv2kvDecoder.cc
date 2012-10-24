@@ -69,7 +69,7 @@ kv2kvDecoder::kv2kvDecoder(dnmi::db::Connection & con,
                            const std::string & obsType, const std::string & obs,
                            int decoderId) :
 	      DecoderBase(con, params, typeList, obsType, obs, decoderId), dbGate(&con),
-	      priority_(5), tbtime(miutil::miTime::nowTime())
+	      priority_(5), tbtime(boost::posix_time::microsec_clock::universal_time())
 {
    milog::LogContext lcontext(name());
    LOGDEBUG( "kv2kvDecoder object created" );

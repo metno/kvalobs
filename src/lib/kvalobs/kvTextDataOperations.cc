@@ -34,7 +34,7 @@ namespace kvalobs
 {
 
 kvTextDataFactory::kvTextDataFactory(int stationID,
-		const miutil::miTime & obsTime, int typeID) :
+		const boost::posix_time::ptime & obsTime, int typeID) :
 		stationID_(stationID), typeID_(typeID), obstime_(obsTime)
 {
 }
@@ -45,10 +45,10 @@ kvTextDataFactory::kvTextDataFactory(const kvTextData & d) :
 }
 
 kvTextData kvTextDataFactory::getData(std::string val, int paramID,
-		const miutil::miTime & obsTime) const
+		const boost::posix_time::ptime & obsTime) const
 {
-	kvTextData ret(stationID_, obsTime.undef() ? obstime_ : obsTime, val,
-			paramID, miutil::miTime::nowTime(), typeID_);
+	kvTextData ret(stationID_, obsTime.is_not_a_date_time() ? obstime_ : obsTime, val,
+			paramID, boost::posix_time::microsec_clock::universal_time(), typeID_);
 	return ret;
 }
 

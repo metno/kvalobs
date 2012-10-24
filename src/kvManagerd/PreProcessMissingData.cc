@@ -313,7 +313,7 @@ PreProcessMissingData::doJob(long                 stationId,
 
    flagDataNotInObsPgm( obspgmlist, datalist, wildObsList );
 
-   miutil::miTime tbtime(miutil::miTime::nowTime());
+   boost::posix_time::ptime tbtime(boost::posix_time::microsec_clock::universal_time());
 
    // loop through obs_pgm and check if we have data for each
    // active parameter
@@ -370,7 +370,7 @@ PreProcessMissingData::doJob(long                 stationId,
             }
 
             kvData data(stationId,
-                        obstime,
+                        to_ptime(obstime),
                         original,
                         paramid,
                         tbtime,

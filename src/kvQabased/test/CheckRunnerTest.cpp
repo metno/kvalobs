@@ -44,8 +44,8 @@ class CheckRunnerTest: public testing::Test
 {
 public:
 	CheckRunnerTest() :
-		observation(10, "2010-05-12 06:00:00", 302),
-		factory    (10, "2010-05-12 06:00:00", 302)
+		observation(10, boost::posix_time::time_from_string("2010-05-12 06:00:00"), 302),
+		factory    (10, boost::posix_time::time_from_string("2010-05-12 06:00:00"), 302)
 	{
 	}
 protected:
@@ -94,6 +94,7 @@ TEST_F(CheckRunnerTest, resetsFlagsBeforeCheck)
 	db::DatabaseAccess::DataList expectedScriptReturn = boost::assign::list_of(factory.getData(6.0, 110));
 	expectedScriptReturn.front().controlinfo(kvalobs::kvControlInfo("1040003000002700"));
 	expectedScriptReturn.front().cfailed("QC1-2-101"); // QC1-2-101 is the default qcx return from fake database
+	expectedScriptReturn.front().tbtime(dataFromDatabase.front().tbtime());
 
 	// Typical error condition:
 	// checkrunner fails to reset flags before check, causing no update (since
@@ -112,6 +113,8 @@ TEST_F(CheckRunnerTest, resetsFlagsBeforeCheck)
 	kvalobs::kvUseInfo ui = expectedData.useinfo();
 	ui.setUseFlags(expectedData.controlinfo());
 	expectedData.useinfo(ui);
+
+	std::cout << expectedData.tbtime() << " <-> " << returnFromScript.tbtime() << std::endl;
 
 	EXPECT_TRUE(kvalobs::compare::exactly_equal()(expectedData, returnFromScript));
 
@@ -215,7 +218,7 @@ TEST_F(CheckRunnerTest, reusesResultsFromOtherChecks)
 	ui.setUseFlags(expectedData.controlinfo());
 	expectedData.useinfo(ui);
 
-	EXPECT_TRUE(kvalobs::compare::exactly_equal()(expectedData, returnFromScript));
+	EXPECT_TRUE(kvalobs::compare::exactly_equal_ex_tbtime()(expectedData, returnFromScript));
 
 	EXPECT_EQ(expectedData.controlinfo(), returnFromScript.controlinfo());
 }
@@ -313,7 +316,7 @@ TEST_F(CheckRunnerTest, skipsChecksWhereAllParametersAreFromOtherTypeId)
 {
 	using namespace testing;
 
-	kvalobs::kvDataFactory factory(10, "2010-05-12 06:00:00", 304);
+	kvalobs::kvDataFactory factory(10, boost::posix_time::time_from_string("2010-05-12 06:00:00"), 304);
 	db::DatabaseAccess::DataList dataFromDatabase = boost::assign::list_of(factory.getData(6.0, 110));
 
 	// Returned data will have typeid 304
