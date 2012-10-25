@@ -54,7 +54,7 @@ class kvParamset
 
 private:
 	std::map<int, std::vector<int> > m_int_paramset;
-	std::map<int, std::vector<miutil::std::string> > m_str_paramset;
+	std::map<int, std::vector<std::string> > m_str_paramset;
 	std::map<int, std::vector<int> > m_int_param;
 
 	void add_inverse(int paramsetid, std::vector<int> vi);
@@ -82,7 +82,7 @@ public:
 	 * som en vector<int> og en vector<string>
 	 *  get_param og get_paramset er omvendte funksjoner
 	 */
-	std::vector<miutil::std::string> get_param_str(int paramsetid);
+	std::vector<std::string> get_param_str(int paramsetid);
 
 	/**
 	 * \brief returnerer en vector av paramset som inneholder mengden
