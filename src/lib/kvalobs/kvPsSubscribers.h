@@ -58,7 +58,7 @@ private:
 	std::string comment_;
 	int delete_after_hours_;
 	std::string sior_;
-	miutil::miTime created_;
+	boost::posix_time::ptime created_;
 
 public:
 	kvPsSubscribers()
@@ -70,7 +70,7 @@ public:
 	}
 	kvPsSubscribers(const std::string &name, int subscribertype,
 			const std::string &comment, int &delete_after_hours,
-			const std::string &sior, const miutil::miTime &created)
+			const std::string &sior, const boost::posix_time::ptime &created)
 	{
 		set(name, subscribertype, comment, delete_after_hours, sior, created);
 
@@ -78,7 +78,7 @@ public:
 
 	bool set(const std::string &name, int subscribertype,
 			const std::string &comment, int &delete_after_hours,
-			const std::string &sior, const miutil::miTime &created);
+			const std::string &sior, const boost::posix_time::ptime &created);
 
 	bool set(const dnmi::db::DRow&);
 
@@ -151,7 +151,7 @@ public:
 	{
 		return sior_;
 	}
-	miutil::miTime created() const
+	boost::posix_time::ptime created() const
 	{
 		return created_;
 	}
@@ -172,7 +172,7 @@ public:
 	{
 		sior_ = sior__;
 	}
-	void created(const miutil::miTime& created__)
+	void created(const boost::posix_time::ptime& created__)
 	{
 		created_ = created__;
 	}

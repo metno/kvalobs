@@ -38,7 +38,7 @@ using namespace dnmi;
 
 bool kvalobs::kvPsSubscribers::set(const std::string &name, int subscribertype,
 		const std::string &comment, int &delete_after_hours,
-		const std::string &sior, const miutil::miTime &created)
+		const std::string &sior, const boost::posix_time::ptime &created)
 {
 
 	name_ = name;
@@ -89,7 +89,7 @@ bool kvalobs::kvPsSubscribers::set(const dnmi::db::DRow& r_)
 			}
 			else if (*it == "created")
 			{
-				created_ = miTime(buf);
+				created_ = boost::posix_time::time_from_string(buf);
 			}
 			else
 			{

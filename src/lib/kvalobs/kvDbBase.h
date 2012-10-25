@@ -124,6 +124,8 @@ public:
 	 */
 	std::string quoted(const miutil::miTime& timeToQuote) const;
 
+	std::string quoted(const boost::posix_time::ptime & timeToQuote) const;
+
 	/**
 	 * \brief create a quoted string versjon of a integer.
 	 *
