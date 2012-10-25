@@ -104,7 +104,7 @@ namespace kvservice
 
     const Rejectdecode &rd = rejectedList[ index++ ];
     reject.set( std::string( rd.message ),
-		miutil::miTime  ( rd.tbtime  ), 
+		boost::posix_time::time_from_string( (const char *) rd.tbtime  ),
 		std::string( rd.decoder ),
 		std::string( rd.comment ),
 		bool( rd.is_fixed ));

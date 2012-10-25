@@ -413,8 +413,8 @@ kvalobs::kvObsPgm::uniqueKey()const
       << "       typeid="    << typeid_                     << " AND " 
       << "       paramid="   << paramid_                    << " AND "
       << "       level="     << level_                      << " AND "
-      << "       fromtime="  << quoted(to_iso_extended_string(fromtime_)) << " AND "
-      << "       totime="    << quoted(to_iso_extended_string(totime_));
+      << "       fromtime="  << quoted(to_simple_string(fromtime_)) << " AND "
+      << "       totime="    << quoted(to_simple_string(totime_));
  
 	return ost.str();
 }

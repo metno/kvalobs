@@ -145,7 +145,7 @@ sendDataToQA(const kvalobs::kvStationInfo &info,
   }
 
   stInfo.stationId=info.stationID();
-  stInfo.obstime=CORBA::string_dup(to_iso_extended_string(info.obstime()).c_str());
+  stInfo.obstime=CORBA::string_dup(to_simple_string(info.obstime()).c_str());
   stInfo.typeId_=info.typeID();
 
   try{
@@ -222,7 +222,7 @@ sendDataToKvService(const kvalobs::kvStationInfoList &info_,
 
   for(CORBA::Long k=0; itInfoList!=info.end(); k++, itInfoList++){
     stInfoList[k].stationId=itInfoList->stationID();
-    stInfoList[k].obstime=CORBA::string_dup(to_iso_extended_string(itInfoList->obstime()).c_str());
+    stInfoList[k].obstime=CORBA::string_dup(to_simple_string(itInfoList->obstime()).c_str());
     stInfoList[k].typeId_=itInfoList->typeID();
   }
 

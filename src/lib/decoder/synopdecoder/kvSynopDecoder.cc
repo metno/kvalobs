@@ -338,8 +338,7 @@ bool kvSynopDecoder::tmpStation(kvalobs::kvStation& kvs)
 kvRejectdecode kvSynopDecoder::rejected(const std::string &decoder)
 {
    string message   = obs.Raw();
-   miTime   timestamp = miTime::nowTime();
-   return kvRejectdecode(message,timestamp,decoder,rejectComment);
+   return kvRejectdecode(message,boost::posix_time::microsec_clock::universal_time(),decoder,rejectComment);
 }
 
 

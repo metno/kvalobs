@@ -131,7 +131,7 @@ std::string kvalobs::kvModelData::uniqueKey() const
 	ostringstream ost;
 
 	ost << " WHERE stationid=" << stationid_ << " AND " << "       obstime="
-			<< quoted(to_iso_extended_string(obstime_)) << " AND " << "       paramid="
+			<< quoted(to_simple_string(obstime_)) << " AND " << "       paramid="
 			<< paramid_ << " AND " << "       level=" << level_ << " AND "
 			<< "       modelid=" << modelid_;
 

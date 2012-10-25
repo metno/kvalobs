@@ -42,7 +42,7 @@ std::string kvalobs::kvRejectdecode::toSend() const
 }
 
 bool kvalobs::kvRejectdecode::set(const std::string &message__,
-		const miTime &tbtime__, const std::string &decoder__,
+		const boost::posix_time::ptime &tbtime__, const std::string &decoder__,
 		const std::string &comment__, bool fixed)
 {
 	message_ = message__;
@@ -50,7 +50,7 @@ bool kvalobs::kvRejectdecode::set(const std::string &message__,
 	decoder_ = decoder__;
 	comment_ = comment__;
 	fixed_ = fixed;
-	sortBy_ = tbtime_.isoTime();
+	sortBy_ = to_simple_string(tbtime_);
 }
 
 bool kvalobs::kvRejectdecode::set(const dnmi::db::DRow& r_)
@@ -69,7 +69,7 @@ bool kvalobs::kvRejectdecode::set(const dnmi::db::DRow& r_)
 			if (*it == "message")
 				message_ = buf;
 			else if (*it == "tbtime")
-				tbtime_ = miTime(buf);
+				tbtime_ = boost::posix_time::time_from_string(buf);
 			else if (*it == "decoder")
 				decoder_ = buf;
 			else if (*it == "comment")
@@ -85,7 +85,7 @@ bool kvalobs::kvRejectdecode::set(const dnmi::db::DRow& r_)
 			CERR("kvRejectdecode: exception ..... \n");
 		}
 	}
-	sortBy_ = tbtime_.isoTime();
+	sortBy_ = to_simple_string(tbtime_);
 	return true;
 }
 
@@ -93,7 +93,7 @@ std::string kvalobs::kvRejectdecode::uniqueKey() const
 {
 	ostringstream ost;
 
-	ost << " WHERE  tbtime=" << quoted(tbtime_.isoTime()) << " AND "
+	ost << " WHERE  tbtime=" << quoted(tbtime_) << " AND "
 			<< "        message=" << quoted(message_) << " AND "
 			<< "        decoder=" << quoted(decoder_);
 

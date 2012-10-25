@@ -96,7 +96,7 @@ std::string kvalobs::kvDbBase::quoted(const std::string& in) const
 
 std::string kvalobs::kvDbBase::quoted(const boost::posix_time::ptime & timeToQuote) const
 {
-	return quoted(to_iso_extended_string(timeToQuote));
+	return quoted(to_simple_string(timeToQuote));
 }
 
 miDate kvalobs::kvDbBase::julianDayThatYear(int addOn, int year) const

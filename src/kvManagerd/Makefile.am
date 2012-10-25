@@ -38,7 +38,7 @@ kvManagerd_LDADD = $(top_builddir)/src/lib/kvalobs/libkvalobs2_kvalobs.la \
                    $(top_builddir)/src/lib/dnmithread/libkvalobs2_dnmithread.la \
                    $(top_builddir)/src/lib/kvskel/libkvalobs2_kvadmininterface.la \
                    $(top_builddir)/src/lib/kvskel/libkvalobs2_kvskel.la \
-                   $(putools_LIBS) $(omniORB4_LIBS) $(BOOST_THREAD_LIB) \
+                   $(putools_LIBS) $(omniORB4_LIBS) $(BOOST_THREAD_LIB) $(BOOST_DATE_TIME_LIB) \
                    -ldl -lm
 
 

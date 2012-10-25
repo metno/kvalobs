@@ -52,7 +52,7 @@ class kvRejectdecode: public kvDbBase
 {
 private:
 	std::string message_;
-	miutil::miTime tbtime_;
+	boost::posix_time::ptime tbtime_;
 	std::string decoder_;
 	std::string comment_;
 	bool fixed_;
@@ -65,7 +65,7 @@ public:
 	{
 		set(r);
 	}
-	kvRejectdecode(const std::string &me, const miutil::miTime &tb,
+	kvRejectdecode(const std::string &me, const boost::posix_time::ptime &tb,
 			const std::string &decode, const std::string &comment, bool fixed =
 					false)
 	{
@@ -73,7 +73,7 @@ public:
 	}
 
 	bool set(const dnmi::db::DRow&);
-	bool set(const std::string &message, const miutil::miTime &tbtime,
+	bool set(const std::string &message, const boost::posix_time::ptime &tbtime,
 			const std::string &decoder, const std::string &comment, bool fixed =
 					false);
 
@@ -88,7 +88,7 @@ public:
 	{
 		return message_;
 	}
-	miutil::miTime tbtime() const
+	boost::posix_time::ptime tbtime() const
 	{
 		return tbtime_;
 	}

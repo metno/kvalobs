@@ -167,12 +167,12 @@ addToObsPgmList(CKvalObs::CService::Obs_pgmList &pgmList,
       if( it->fromtime().is_not_a_date_time() )
          pgm.fromtime=(const char*)MIN_DATE;
       else
-         pgm.fromtime=to_iso_extended_string(it->fromtime()).c_str();
+         pgm.fromtime=to_simple_string(it->fromtime()).c_str();
 
       if( it->totime().is_not_a_date_time() )
          pgm.totime = (const char*)MAX_DATE;
       else
-         pgm.totime=to_iso_extended_string(it->totime()).c_str();
+         pgm.totime=to_simple_string(it->totime()).c_str();
 
 
       if(aUnion){

@@ -214,7 +214,7 @@ SynopDecoder::execute( std::string &msg)
    bool                     saveReject;
    std::string              saveRejectMessage;
    list<kvalobs::kvData>    data;
-   miTime                   nowTime(miTime::nowTime());
+   boost::posix_time::ptime nowTime(boost::posix_time::microsec_clock::universal_time());
 
    Lock lock(mutex);
 

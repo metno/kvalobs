@@ -429,7 +429,7 @@ Sms2::decode(long stationid,
          string mybuf;
          cStr.copy(mybuf);
          IDLOGERROR( logid, "Invalid dataformat cant do precipitation.");
-         rejected.push_back(kvRejectdecode(mybuf, miTime::nowTime(), "comobs/typeid=302",
+         rejected.push_back(kvRejectdecode(mybuf, boost::posix_time::microsec_clock::universal_time(), "comobs/typeid=302",
                                            errs.str()));
          hasRejected=true;
          continue;

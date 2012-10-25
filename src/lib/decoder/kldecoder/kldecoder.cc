@@ -99,7 +99,7 @@ rejected( const std::string &msg, const std::string &logid )
    ostringstream ost;
    bool saved=true;
 
-   miTime tbtime( miTime::nowTime());
+   boost::posix_time::ptime tbtime( boost::posix_time::microsec_clock::universal_time());
 
    ost << "REJECTED: Decoder: " << name() << endl
          <<" message: " << msg  << endl << obs;

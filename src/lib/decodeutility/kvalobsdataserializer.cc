@@ -191,7 +191,7 @@ std::string KvalobsDataSerializer::toString() const
 			{
 
 				Element * message = decoderElement->add_child("message");
-				message->set_attribute("tbtime", it->tbtime().isoTime());
+				message->set_attribute("tbtime", to_simple_string(it->tbtime()));
 				message->add_child_text(it->message());
 			}
 		}

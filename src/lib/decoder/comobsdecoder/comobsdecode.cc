@@ -177,7 +177,7 @@ execute(std::string &msg)
    smsMelding=mParser.parse(obs);
 
    if(!smsMelding){
-      kvRejectdecode myrejected=kvRejectdecode(obs, miTime::nowTime(), "comobs/typeid=<UNKNOWN>",
+      kvRejectdecode myrejected=kvRejectdecode(obs, boost::posix_time::microsec_clock::universal_time(), "comobs/typeid=<UNKNOWN>",
                                                mParser.getErrMsg());
 
 
@@ -197,7 +197,7 @@ execute(std::string &msg)
       ost << "comobs/typeid=" << smsMelding->getCode() +300;
 
       kvRejectdecode myrejected=kvRejectdecode(obs,
-                                               miTime::nowTime(),
+    		  boost::posix_time::microsec_clock::universal_time(),
                                                ost.str(),
                                                "No identification!");
 
@@ -213,7 +213,7 @@ execute(std::string &msg)
       ost << "comobs/typeid=" << smsMelding->getCode() +300;
 
       kvRejectdecode myrejected=kvRejectdecode(obs,
-                                               miTime::nowTime(),
+    		  boost::posix_time::microsec_clock::universal_time(),
                                                ost.str(),
                                                "Uknown station!");
 
@@ -237,7 +237,7 @@ execute(std::string &msg)
       ost1 << "comobs/typeid=" << smsMelding->getCode() +300;
       ost << "No decoder for SMS code <" << smsMelding->getCode() << ">!";
 
-      kvRejectdecode myrejected=kvRejectdecode(obs, miTime::nowTime(), ost1.str(),
+      kvRejectdecode myrejected=kvRejectdecode(obs, boost::posix_time::microsec_clock::universal_time(), ost1.str(),
                                                ost.str());
 
 

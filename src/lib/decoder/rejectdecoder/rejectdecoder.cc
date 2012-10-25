@@ -89,7 +89,7 @@ RejectDecoder::doDecode(const std::string &message,
     n++;
   }
 
-  return reject.set(elems[0], miutil::miTime::nowTime(), elems[1], elems[2]);
+  return reject.set(elems[0], boost::posix_time::microsec_clock::universal_time(), elems[1], elems[2]);
 }
 
 

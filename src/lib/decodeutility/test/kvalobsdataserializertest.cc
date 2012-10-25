@@ -111,7 +111,7 @@ TEST_F(KvalobsDataSerializerTest, testPreserveInvalidate)
 
 TEST_F(KvalobsDataSerializerTest, testPreserveFixedRejectedList)
 {
-	kvalobs::kvRejectdecode rejected("hallo?", "2010-08-11 12:00:00",
+	kvalobs::kvRejectdecode rejected("hallo?", boost::posix_time::time_from_string("2010-08-11 12:00:00"),
 			"somedecoder", "unknown message");
 	in.setMessageCorrectsThisRejection(rejected);
 
@@ -125,9 +125,9 @@ TEST_F(KvalobsDataSerializerTest, testPreserveFixedRejectedList)
 
 TEST_F(KvalobsDataSerializerTest, testPreserveMultipleFixedRejectedList)
 {
-	kvalobs::kvRejectdecode r1("hallo?", "2010-08-11 12:00:00", "somedecoder", "unknown message");
-	kvalobs::kvRejectdecode r2("wrong msg", "2010-08-12 12:12:41", "some_other_decoder", "");
-	kvalobs::kvRejectdecode r3("wrong msg", "2010-08-12 12:12:45", "somedecoder", "");
+	kvalobs::kvRejectdecode r1("hallo?", boost::posix_time::time_from_string("2010-08-11 12:00:00"), "somedecoder", "unknown message");
+	kvalobs::kvRejectdecode r2("wrong msg", boost::posix_time::time_from_string("2010-08-12 12:12:41"), "some_other_decoder", "");
+	kvalobs::kvRejectdecode r3("wrong msg", boost::posix_time::time_from_string("2010-08-12 12:12:45"), "somedecoder", "");
 
 	in.setMessageCorrectsThisRejection(r1);
 	in.setMessageCorrectsThisRejection(r2);

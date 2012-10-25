@@ -288,7 +288,7 @@ execute(std::string &msg)
   	CommaString           data;
   	CommaString           header;
   	miTime                obstime;
-  	miTime                tbtime(miTime::nowTime());
+  	boost::posix_time::ptime tbtime(boost::posix_time::microsec_clock::universal_time());
   	int                   typeId=getTypeId(msg); 
   	int                   useTypeid;
   	int                   typeidWithSave=-1;
