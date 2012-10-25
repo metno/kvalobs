@@ -437,8 +437,8 @@ bool getKvObsPgmFunc::process(kvServiceExt_ptr service)
 					(*obspgm)[i].thu, (*obspgm)[i].fri, (*obspgm)[i].sat,
 					(*obspgm)[i].sun,
 					// UNDEF:
-					miutil::miTime((*obspgm)[i].fromtime), miutil::miTime(
-							(*obspgm)[i].totime));
+					boost::posix_time::time_from_string((const char *) (*obspgm)[i].fromtime),
+					boost::posix_time::time_from_string((const char *) (*obspgm)[i].totime));
 			obsPgmList.push_back(obsp);
 		}
 	}

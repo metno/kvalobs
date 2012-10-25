@@ -201,7 +201,7 @@ findMissingData(const miutil::miTime& runtime,
       			continue;
       		
       		// check if this obspgm is active now..
-      		if (!itop->isOn(obstime))
+      		if (!itop->isOn(to_ptime(obstime)))
 					continue;
       
       		// once per station and typeid

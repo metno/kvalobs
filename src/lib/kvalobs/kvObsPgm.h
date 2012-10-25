@@ -88,8 +88,8 @@ private:
 	bool fri_;
 	bool sat_;
 	bool sun_;
-	miutil::miTime fromtime_;
-	miutil::miTime totime_;
+	boost::posix_time::ptime fromtime_;
+	boost::posix_time::ptime totime_;
 
 public:
 
@@ -107,8 +107,8 @@ public:
 			bool kl10, bool kl11, bool kl12, bool kl13, bool kl14, bool kl15,
 			bool kl16, bool kl17, bool kl18, bool kl19, bool kl20, bool kl21,
 			bool kl22, bool kl23, bool mon, bool tue, bool wed, bool thu,
-			bool fri, bool sat, bool sun, const miutil::miTime& fromtime,
-			const miutil::miTime& totime)
+			bool fri, bool sat, bool sun, const boost::posix_time::ptime& fromtime,
+			const boost::posix_time::ptime& totime)
 	{
 		set(stationid, paramid, level, nr_sensor, typ, collector, kl00, kl01,
 				kl02, kl03, kl04, kl05, kl06, kl07, kl08, kl09, kl10, kl11,
@@ -123,8 +123,8 @@ public:
 			bool kl10, bool kl11, bool kl12, bool kl13, bool kl14, bool kl15,
 			bool kl16, bool kl17, bool kl18, bool kl19, bool kl20, bool kl21,
 			bool kl22, bool kl23, bool mon, bool tue, bool wed, bool thu,
-			bool fri, bool sat, bool sun, const miutil::miTime& fromtime,
-			const miutil::miTime& totime);
+			bool fri, bool sat, bool sun, const boost::posix_time::ptime& fromtime,
+			const boost::posix_time::ptime& totime);
 
 	bool set(const dnmi::db::DRow&);
 	const char* tableName() const
@@ -282,16 +282,16 @@ public:
 	{
 		return sun_;
 	}
-	miutil::miTime fromtime() const
+	boost::posix_time::ptime fromtime() const
 	{
 		return fromtime_;
 	}
-	miutil::miTime totime() const
+	boost::posix_time::ptime totime() const
 	{
 		return totime_;
 	}
 
-	bool isOn(const miutil::miTime&) const;
+	bool isOn(const boost::posix_time::ptime&) const;
 };
 /** @} */
 }

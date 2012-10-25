@@ -122,7 +122,7 @@ isActive( int stationid,
             it->level() == level &&
             it->nr_sensor() > sensor ) {
 
-         if( it->isOn( obstime ) ) {
+         if( it->isOn( to_ptime(obstime) ) ) {
             if( it->collector() )
                state = MAYBE;
             else

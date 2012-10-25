@@ -88,8 +88,8 @@ bool kvalobs::kvObsPgm::set(int stationid, int paramid, int level,
 		bool kl09, bool kl10, bool kl11, bool kl12, bool kl13, bool kl14,
 		bool kl15, bool kl16, bool kl17, bool kl18, bool kl19, bool kl20,
 		bool kl21, bool kl22, bool kl23, bool mon, bool tue, bool wed, bool thu,
-		bool fri, bool sat, bool sun, const miutil::miTime& fromtime,
-		const miutil::miTime& totime)
+		bool fri, bool sat, bool sun, const boost::posix_time::ptime& fromtime,
+		const boost::posix_time::ptime& totime)
 {
 	stationid_ = stationid;
 	paramid_ = paramid;
@@ -297,16 +297,16 @@ bool kvalobs::kvObsPgm::set(const dnmi::db::DRow& r_)
 			else if (*it == "fromtime")
 			{
 				if (!buf.empty())
-					fromtime_ = miTime(buf);
+					fromtime_ = boost::posix_time::time_from_string(buf);
 				else
-					fromtime_ = miTime();
+					fromtime_ = boost::posix_time::ptime();
 			}
 			else if (*it == "totime")
 			{
 				if (!buf.empty())
-					totime_ = miTime(buf);
+					totime_ = boost::posix_time::time_from_string(buf);
 				else
-					totime_ = miTime();
+					totime_ = boost::posix_time::ptime();
 			}
 		} catch (...)
 		{
@@ -317,10 +317,13 @@ bool kvalobs::kvObsPgm::set(const dnmi::db::DRow& r_)
 	return true;
 }
 
-bool kvalobs::kvObsPgm::isOn(const miutil::miTime& t) const
+bool kvalobs::kvObsPgm::isOn(const boost::posix_time::ptime& t) const
 {
-	int dayW = t.dayOfWeek();
-	int hour = t.hour();
+	int dayW = days_before_weekday(t.date(), boost::gregorian::greg_weekday(boost::gregorian::Sunday)).days();
+	int hour = t.time_of_day().hours();
+
+	// int dayW = t.dayOfWeek();
+	// int hour = t.hour();
 
 	//Borge Moe
 	//2005.11.22
@@ -328,7 +331,7 @@ bool kvalobs::kvObsPgm::isOn(const miutil::miTime& t) const
 	//The resolution of time is one hour and
 	//obspgm assumes observations with obstimes  
 	//hh:00:00.
-	if (t.min() != 0 || t.sec() != 0)
+	if (t.time_of_day().minutes() != 0 || t.time_of_day().seconds() != 0)
 		return false;
 
 	// first check weekday..
@@ -410,8 +413,8 @@ kvalobs::kvObsPgm::uniqueKey()const
       << "       typeid="    << typeid_                     << " AND " 
       << "       paramid="   << paramid_                    << " AND "
       << "       level="     << level_                      << " AND "
-      << "       fromtime="  << quoted(fromtime_.isoTime()) << " AND " 
-      << "       totime="    << quoted(totime_.isoTime());
+      << "       fromtime="  << quoted(to_iso_extended_string(fromtime_)) << " AND "
+      << "       totime="    << quoted(to_iso_extended_string(totime_));
  
 	return ost.str();
 }
