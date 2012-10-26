@@ -33,7 +33,6 @@
  at Wed Aug 28 14:09:50 2002 */
 
 using namespace std;
-using namespace miutil;
 
 bool kvGate::select(list<kvAlgorithms>& list_, std::string q)
 {

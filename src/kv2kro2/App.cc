@@ -93,7 +93,7 @@ subscribeSetup()
 
    kvservice::WhichDataHelper whichData;
   
-   whichData.addStation( 0, fromTime );
+   whichData.addStation( 0, to_ptime(fromTime) );
 
    GetData dataReceiver;
 

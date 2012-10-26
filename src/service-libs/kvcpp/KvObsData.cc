@@ -29,10 +29,8 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include "KvObsData.h"
-#include <puTools/miTime.h>
 
 using namespace kvalobs;
-using namespace miutil;
 using namespace CKvalObs::CService;
 
 namespace kvservice

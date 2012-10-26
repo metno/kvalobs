@@ -31,13 +31,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <kvalobs/kvDbBase.h>
-#include <miutil/miTimeParse.h>
 #include <boost/lexical_cast.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <sstream>
 #include <limits.h>
 #include <float.h>
 
-using namespace miutil;
 using namespace std;
 
 const float kvalobs::kvDbBase::FLT_NULL = FLT_MAX;

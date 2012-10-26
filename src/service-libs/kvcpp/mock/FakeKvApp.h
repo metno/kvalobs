@@ -89,7 +89,7 @@ public:
 		return true;
 	}
 
-    virtual bool getKvStationMetaData( std::list<kvalobs::kvStationMetadata> &stMeta, int stationid, const miutil::miTime &obstime, const std::string & metadataName = "")
+    virtual bool getKvStationMetaData( std::list<kvalobs::kvStationMetadata> &stMeta, int stationid, const boost::posix_time::ptime &obstime, const std::string & metadataName = "")
     {
     	return true;
     }
@@ -101,7 +101,7 @@ public:
 	}
 
 	virtual bool getKvWorkstatistik(CKvalObs::CService::WorkstatistikTimeType timeType,
-	                                    const miutil::miTime &from, const miutil::miTime &to,
+	                                    const boost::posix_time::ptime &from, const boost::posix_time::ptime &to,
 	                                    kvservice::WorkstatistikIterator &it
 	                                    )
 	{

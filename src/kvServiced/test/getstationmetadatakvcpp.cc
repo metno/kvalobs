@@ -77,7 +77,7 @@ main(int argn, char **argv)
 			
 	try {
 	   std::list<kvalobs::kvStationMetadata> stMeta;
-	   miutil::miTime obstime( miutil::miTime::nowTime() );
+	   boost::posix_time::ptime obstime = boost::posix_time::second_clock::universal_time();
 
 	   if( ! app.getKvStationMetaData( stMeta, 18700, obstime , "" ) ) {
 	      cerr << "Cant get Station metadata." << endl;

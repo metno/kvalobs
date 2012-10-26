@@ -63,5 +63,5 @@ stressTestGetData_LDADD =  \
 				$(top_builddir)/src/lib/kvskel/libkvalobs2_kvskel.la \
                 $(top_builddir)/src/service-libs/kvcpp/libkvalobs2_kvcpp.la \
 				$(putools_LIBS)\
-				$(BOOST_THREAD_LIB) \
+				$(BOOST_THREAD_LIB) $(BOOST_DATE_TIME_LIB) \
                 $(omniORB4_LIBS) -lm
