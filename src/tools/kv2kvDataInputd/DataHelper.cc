@@ -356,7 +356,7 @@ operator<<( std::ostream &out, const ObsData &od)
    }
    out << ")"  << endl;
 
-
+   return out;
 
 }
 
@@ -439,4 +439,5 @@ operator<<( std::ostream &out, const DataHelper &dh )
 
    }
    out << "------ [END DataHelper] ---------------" << endl;
+   return out;
 }
