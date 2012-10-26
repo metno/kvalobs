@@ -47,7 +47,7 @@ std::string kvalobs::kvStationParam::toSend() const
 bool kvalobs::kvStationParam::set(int stationid__, int paramid__, int level__,
 		int sensor__, int fromday__, int today__, int hour__,
 		const std::string& qcx__, const std::string& metadata__,
-		const std::string& descMetadata__, const miutil::miTime& fromtime__)
+		const std::string& descMetadata__, const boost::posix_time::ptime& fromtime__)
 {
 	stationid_ = stationid__;
 	paramid_ = paramid__;
@@ -119,7 +119,7 @@ bool kvalobs::kvStationParam::set(const dnmi::db::DRow& r_)
 			}
 			else if (*it == "fromtime")
 			{
-				fromtime_ = miTime(buf);
+				fromtime_ = boost::posix_time::time_from_string(buf);
 			}
 		} catch (...)
 		{
@@ -142,7 +142,7 @@ std::string kvalobs::kvStationParam::uniqueKey() const
 			<< "       fromday=" << fromday_ << " AND " << "       today="
 			<< today_ << " AND " << "       hour=" << hour_ << " AND "
 			<< "       qcx=" << quoted(qcx_) << " AND " << "       fromtime="
-			<< quoted(fromtime_.isoTime());
+			<< quoted(fromtime_);
 
 	return ost.str();
 

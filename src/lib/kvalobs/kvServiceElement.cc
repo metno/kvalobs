@@ -39,7 +39,7 @@ void kvalobs::kvServiceElement::createSortIndex()
 {
 	std::ostringstream s;
 	s << stationid_;
-	s << obstime_.isoTime();
+	s << obstime_;
 	s << typeid_;
 	sortBy_ = s.str();
 }
@@ -48,7 +48,7 @@ kvalobs::kvServiceElement::kvServiceElement()
 {
 }
 
-bool kvalobs::kvServiceElement::set(int sid, const miutil::miTime &obt, int tid)
+bool kvalobs::kvServiceElement::set(int sid, const boost::posix_time::ptime &obt, int tid)
 {
 	stationid_ = sid;
 	obstime_ = obt;
@@ -78,7 +78,7 @@ bool kvalobs::kvServiceElement::set(const dnmi::db::DRow& r_)
 			}
 			else if (*it == "obstime")
 			{
-				obstime_ = miTime(buf);
+				obstime_ = boost::posix_time::time_from_string(buf);
 			}
 			else if (*it == "typeid")
 			{
@@ -122,7 +122,7 @@ std::string kvalobs::kvServiceElement::uniqueKey() const
 	ostringstream ost;
 
 	ost << " WHERE stationid=" << stationid_ << " AND " << "       obstime="
-			<< quoted(obstime_.isoTime()) << " AND " << "       typeid="
+			<< quoted(obstime_) << " AND " << "       typeid="
 			<< typeid_;
 
 	return ost.str();

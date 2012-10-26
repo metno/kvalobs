@@ -101,14 +101,14 @@ processElements(std::list<kvalobs::kvWorkelement> &workList,
          return;
       }
 
-      it->process_start(miTime::nowTime());
+      it->process_start(boost::posix_time::microsec_clock::universal_time());
 
       ost.str("");
 
       ost << "UPDATE workque SET process_start='"
-            << it->process_start().isoTime()
+            << to_simple_string(it->process_start())
             << "' WHERE stationid=" << it->stationID()
-            << "  AND obstime='" << it->obstime().isoTime()
+            << "  AND obstime='" << to_simple_string(it->obstime())
             << "' AND typeid=" << it->typeID();
 
       try{
@@ -155,7 +155,7 @@ processElements(std::list<kvalobs::kvWorkelement> &workList,
                   "-- priority:  " << it->priority());
       }
       catch(...){
-         it->process_start(miTime()); //Set to NULL
+         it->process_start(boost::posix_time::ptime()); //Set to NULL
 
          try{
             con->rollBack();

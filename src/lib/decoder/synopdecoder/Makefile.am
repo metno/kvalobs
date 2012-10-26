@@ -19,7 +19,7 @@ synop_la_LIBADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs2_decode
                   $(top_builddir)/src/lib/milog/libkvalobs2_milog.la \
                   $(top_builddir)/src/lib/kvdb/libkvalobs2_kvdb.la \
                   $(top_builddir)/src/lib/fileutil/libkvalobs2_fileutil.la \
-                  $(BOOST_THREAD_LIB)
+                  $(BOOST_THREAD_LIB) $(BOOST_DATE_TIME_LIB)
 
 synop_la_LDFLAGS = -module -version-info @KVALOBSLIBS_SO_VERSION@
 

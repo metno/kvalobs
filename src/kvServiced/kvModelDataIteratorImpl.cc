@@ -170,11 +170,11 @@ ModelDataIteratorImpl::findData(list<kvModelData> &data,
 			   const CKvalObs::CService::WhichData &wData)
 {
 	kvDbGate gate(dbCon);
-	miutil::miTime stime(wData.fromObsTime);
-	miutil::miTime etime(wData.toObsTime);
+	boost::posix_time::ptime stime = boost::posix_time::time_from_string((const char *) wData.fromObsTime);
+	boost::posix_time::ptime etime = boost::posix_time::time_from_string((const char *) wData.toObsTime);
 
-	if(stime.undef() || etime.undef()){
-		if(stime.undef()){
+	if(stime.is_not_a_date_time() || etime.is_not_a_date_time()){
+		if(stime.is_not_a_date_time()){
 			ostringstream os;
 			os << "Inavlid time spec (fromObsTime): ";
 
@@ -188,8 +188,8 @@ ModelDataIteratorImpl::findData(list<kvModelData> &data,
 			throw InvalidWhichData(os.str());
 		}
 
-		if(etime.undef()){
-			etime=etime.nowTime();
+		if(etime.is_not_a_date_time()){
+			etime=boost::posix_time::second_clock::universal_time();
 		}
 	}
      

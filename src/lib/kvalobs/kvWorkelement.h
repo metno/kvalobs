@@ -55,15 +55,15 @@ class kvWorkelement: public kvDbBase
 {
 private:
 	int stationid_;
-	miutil::miTime obstime_;
+	boost::posix_time::ptime obstime_;
 	int typeid_;
-	miutil::miTime tbtime_;
+	boost::posix_time::ptime tbtime_;
 	int priority_;
-	miutil::miTime process_start_;
-	miutil::miTime qa_start_;
-	miutil::miTime qa_stop_;
-	miutil::miTime service_start_;
-	miutil::miTime service_stop_;
+	boost::posix_time::ptime process_start_;
+	boost::posix_time::ptime qa_start_;
+	boost::posix_time::ptime qa_stop_;
+	boost::posix_time::ptime service_start_;
+	boost::posix_time::ptime service_stop_;
 
 	void createSortIndex();
 
@@ -75,11 +75,11 @@ public:
 	{
 		set(r);
 	}
-	kvWorkelement(int sid, const miutil::miTime &obt, int tid,
-			const miutil::miTime &tbt, int pri,
-			const miutil::miTime &process_start, const miutil::miTime &qa_start,
-			const miutil::miTime &qa_stop, const miutil::miTime &service_start,
-			const miutil::miTime &service_stop)
+	kvWorkelement(int sid, const boost::posix_time::ptime &obt, int tid,
+			const boost::posix_time::ptime &tbt, int pri,
+			const boost::posix_time::ptime &process_start, const boost::posix_time::ptime &qa_start,
+			const boost::posix_time::ptime &qa_stop, const boost::posix_time::ptime &service_start,
+			const boost::posix_time::ptime &service_stop)
 	{
 		set(sid, obt, tid, tbt, pri, process_start, qa_start, qa_stop,
 				service_start, service_stop);
@@ -94,11 +94,11 @@ public:
 
 	kvWorkelement& operator=(const kvWorkelement &rhs);
 
-	bool set(int sid, const miutil::miTime &obt, int tid,
-			const miutil::miTime &tbt, int pri,
-			const miutil::miTime &process_start, const miutil::miTime &qa_start,
-			const miutil::miTime &qa_stop, const miutil::miTime &service_start,
-			const miutil::miTime &service_stop);
+	bool set(int sid, const boost::posix_time::ptime &obt, int tid,
+			const boost::posix_time::ptime &tbt, int pri,
+			const boost::posix_time::ptime &process_start, const boost::posix_time::ptime &qa_start,
+			const boost::posix_time::ptime &qa_stop, const boost::posix_time::ptime &service_start,
+			const boost::posix_time::ptime &service_stop);
 
 	bool set(const dnmi::db::DRow&);
 
@@ -114,7 +114,7 @@ public:
 	{
 		return stationid_;
 	}
-	miutil::miTime obstime() const
+	boost::posix_time::ptime obstime() const
 	{
 		return obstime_;
 	}
@@ -122,7 +122,7 @@ public:
 	{
 		return typeid_;
 	}
-	miutil::miTime tbtime() const
+	boost::posix_time::ptime tbtime() const
 	{
 		return tbtime_;
 	}
@@ -130,32 +130,32 @@ public:
 	{
 		return priority_;
 	}
-	miutil::miTime process_start() const
+	boost::posix_time::ptime process_start() const
 	{
 		return process_start_;
 	}
-	miutil::miTime qa_start() const
+	boost::posix_time::ptime qa_start() const
 	{
 		return qa_start_;
 	}
-	miutil::miTime qa_stop() const
+	boost::posix_time::ptime qa_stop() const
 	{
 		return qa_stop_;
 	}
-	miutil::miTime service_start() const
+	boost::posix_time::ptime service_start() const
 	{
 		return service_start_;
 	}
-	miutil::miTime service_stop() const
+	boost::posix_time::ptime service_stop() const
 	{
 		return service_stop_;
 	}
 
-	void process_start(const miutil::miTime &start);
-	void qa_start(const miutil::miTime &start);
-	void qa_stop(const miutil::miTime &stop);
-	void service_start(const miutil::miTime &start);
-	void service_stop(const miutil::miTime &stop);
+	void process_start(const boost::posix_time::ptime &start);
+	void qa_start(const boost::posix_time::ptime &start);
+	void qa_stop(const boost::posix_time::ptime &stop);
+	void service_start(const boost::posix_time::ptime &start);
+	void service_stop(const boost::posix_time::ptime &stop);
 };
 
 /** @} */

@@ -47,8 +47,8 @@ postCommandToQue(kvalobs::StationInfoCommand *cmd)
 	kvalobs::kvStationInfoList stationInfoList=cmd->getStationInfo();
   	IkvStationInfoList it=stationInfoList.begin();
   	kvDbGate gate(con);
-  	miutil::miTime undefTime;
-  	miutil::miTime tbtime(miutil::miTime::nowTime());
+  	boost::posix_time::ptime undefTime;
+  	boost::posix_time::ptime tbtime = boost::posix_time::microsec_clock::universal_time();
 
   	for(;it!=stationInfoList.end(); it++){
     	if(!gate.insert(kvWorkelement(it->stationID(), 
@@ -174,7 +174,7 @@ findMissingData(const miutil::miTime& runtime,
   			obspgmlist.clear();
     		result=dbGate.select(obspgmlist,
 				 						kvQueries::selectObsPgmByTypeid(itTypes->typeID(),
-				 						                                obstime));
+				 						                                to_ptime(obstime)));
     
     		if(!result){
       		LOGERROR("SELECT: (obsPgm)" << dbGate.getErrorStr());
@@ -218,7 +218,7 @@ findMissingData(const miutil::miTime& runtime,
       		result = dbGate.select(datalist,
 			   	  						  kvQueries::selectDataFromType(sid,
 							   		  										  	  tid,
-							   		                                   obstime));
+							   		                                   to_ptime(obstime)));
 
       		if(!result){
 					LOGERROR("SELECT (data): " << dbGate.getErrorStr());

@@ -290,12 +290,12 @@ addStationInfo(long stationid,
 
 
    kvDbGate gate(&con);
-   miutil::miTime undefTime;
+   boost::posix_time::ptime undefTime;
 
    if(!gate.insert(kvWorkelement(stationid,
-                                 obstime,
+                                 to_ptime(obstime),
                                  typeid_,
-                                 tbtime,
+                                 to_ptime(tbtime),
                                  priority,
                                  undefTime,
                                  undefTime,
@@ -964,7 +964,7 @@ loadObsPgmParamInfo( int stationid, int typeid_,
    kvDbGate gate( &con );
 
    if( !gate.select( paramInfo.obsPgm,
-                     kvQueries::selectObsPgm( stationid, typeid_, obstime)
+                     kvQueries::selectObsPgm( stationid, typeid_, to_ptime(obstime))
    )
    ){
       LOGWARN("DBError: Cant access obs_pgm: " << endl << "Reason: " << gate.getErrorStr());

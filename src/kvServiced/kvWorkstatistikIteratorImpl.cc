@@ -195,15 +195,15 @@ next(CKvalObs::CService::WorkstatistikElemList_out wsList)
   
 	for(CORBA::Long datai=0;it!=dataList.end(); datai++, it++){
 	   (*wsList)[datai].stationID = it->stationID();
-	   (*wsList)[datai].obstime = it->obstime().isoTime().c_str();
+	   (*wsList)[datai].obstime = to_simple_string(it->obstime()).c_str();
 	   (*wsList)[datai].typeID_ = it->typeID();
-	   (*wsList)[datai].tbtime= it->tbtime().isoTime().c_str();
+	   (*wsList)[datai].tbtime= to_simple_string(it->tbtime()).c_str();
 	   (*wsList)[datai].priority = it->priority();
-	   (*wsList)[datai].processStart = it->process_start().isoTime().c_str();
-	   (*wsList)[datai].qaStart = it->qa_start().isoTime().c_str();
-	   (*wsList)[datai].qaStop = it->qa_stop().isoTime().c_str();
-	   (*wsList)[datai].serviceStart = it->service_start().isoTime().c_str();
-	   (*wsList)[datai].serviceStop = it->service_stop().isoTime().c_str();
+	   (*wsList)[datai].processStart = to_simple_string(it->process_start()).c_str();
+	   (*wsList)[datai].qaStart = to_simple_string(it->qa_start()).c_str();
+	   (*wsList)[datai].qaStop = to_simple_string(it->qa_stop()).c_str();
+	   (*wsList)[datai].serviceStart = to_simple_string(it->service_start()).c_str();
+	   (*wsList)[datai].serviceStop = to_simple_string(it->service_stop()).c_str();
 	}
     
 	LOGDEBUG("next: return " << wsList->length() << " elements!" <<endl);

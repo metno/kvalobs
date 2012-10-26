@@ -94,7 +94,8 @@ std::string FakeDatabaseAccess::getStationParam(const kvalobs::kvStationInfo & s
 
 kvalobs::kvStation FakeDatabaseAccess::getStation(int stationid) const
 {
-	return kvalobs::kvStation(stationid, 1.15, 12.5, 333, 0, "Test Station", 0, 0, "", "", "", 9, true, "1900-01-01");
+	return kvalobs::kvStation(stationid, 1.15, 12.5, 333, 0, "Test Station", 0, 0, "", "", "", 9, true,
+			boost::posix_time::ptime(boost::gregorian::date(1900,1,1), boost::posix_time::time_duration(0,0,0)));
 }
 
 void FakeDatabaseAccess::getModelData(ModelDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minutesBackInTime ) const

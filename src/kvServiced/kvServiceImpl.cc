@@ -977,7 +977,7 @@ getStations(CKvalObs::CService::StationList_out stationList)
       (*stationList)[i].stationstr=it->stationstr().c_str();
       (*stationList)[i].environmentid=it->environmentid();
       (*stationList)[i].static_=it->_static();
-      (*stationList)[i].fromtime=it->fromtime().isoTime().c_str();
+      (*stationList)[i].fromtime=to_simple_string(it->fromtime()).c_str();
    }
 
    return true;

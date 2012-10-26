@@ -45,8 +45,8 @@ kvStationMetadata::kvStationMetadata() :
 kvStationMetadata::kvStationMetadata(int station, const int * param,
 		const int * type, const int * level, const int * sensor,
 		const std::string & name, float metadata,
-		const std::string & description, const miutil::miTime & fromtime,
-		const miutil::miTime & totime) :
+		const std::string & description, const boost::posix_time::ptime & fromtime,
+		const boost::posix_time::ptime & totime) :
 		station_(station), param_(param ? *param : INT_NULL), type_(
 				type ? *type : INT_NULL), level_(level ? *level : INT_NULL), sensor_(
 				sensor ? *sensor : INT_NULL), name_(name), metadata_(metadata), description_(
@@ -106,8 +106,8 @@ std::string kvStationMetadata::toSend() const
 	possiblyNull(q, sensor()) << ", ";
 	q << quoted(name()) << ", ";
 	q << metadata() << ", ";
-	q << quoted(fromtime().isoTime()) << ", ";
-	if (totime().undef())
+	q << quoted(fromtime()) << ", ";
+	if (totime().is_not_a_date_time())
 		q << "NULL";
 	else
 		q << quoted(totime());
@@ -137,7 +137,7 @@ std::string kvStationMetadata::uniqueKey() const
 	maybeNullKey(q, "level", level_) << " AND ";
 	maybeNullKey(q, "sensor", sensor_) << " AND ";
 	q << "metadatatypename = " << quoted(name()) << " AND ";
-	q << "fromtime = " << quoted(fromtime().isoTime());
+	q << "fromtime = " << quoted(fromtime());
 
 	return q.str();
 }

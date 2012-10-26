@@ -456,7 +456,7 @@ public:
 
 	 kvDbGate gate( a pointer to dnmi::db::Connection )
 	 std::list<kvalobs::kvData> dataList;
-	 miutil::miTime obsTime(2004, 10, 23, 9, 0, 0);
+	 boost::posix_time::ptime obstime(boost::gregorian::date(2004,10,23), boost::posix_time::time_duration(9,0,0));
 
 
 	 if(!gate.select(dataList, kvQueries::selectDataFromType(18700,3,obsTime)){

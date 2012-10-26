@@ -197,7 +197,7 @@ bool getKvStationsFunc::process(kvServiceExt_ptr service)
 					std::string((*stations)[i].call_sign), std::string(
 							(*stations)[i].stationstr),
 					(*stations)[i].environmentid, (*stations)[i].static_,
-					miTime(std::string((*stations)[i].fromtime))));
+					boost::posix_time::time_from_string(std::string((*stations)[i].fromtime))));
 	}
 	return ok;
 }
@@ -331,8 +331,8 @@ bool getKvStationParamFunc::process(kvServiceExt_ptr service)
 					(*stp)[i].level, ((char*) (*stp)[i].sensor)[0] - '0',
 					(*stp)[i].fromday, (*stp)[i].today, (*stp)[i].hour,
 					std::string((*stp)[i].qcx), std::string((*stp)[i].metadata),
-					std::string((*stp)[i].desc_metadata), miTime(
-							(*stp)[i].fromtime));
+					std::string((*stp)[i].desc_metadata),
+					boost::posix_time::time_from_string(std::string((*stp)[i].fromtime)));
 			stParam.push_back(param);
 		}
 	}
@@ -391,8 +391,10 @@ bool getKvStationMetaDataFunc::process(kvServiceExt_ptr serviceext)
 									 string( (*metadata)[i].metadatatypename ),
 									 (*metadata)[i].metadata,
 									 string( (*metadata)[i].metadataDescription ),
-									 miTime( (*metadata)[i].fromtime ),
-									 ( strlen( (*metadata)[i].totime ) == 0 ? miTime():miTime( (*metadata)[i].totime ) ) );
+									 boost::posix_time::time_from_string( std::string((*metadata)[i].fromtime) ),
+									 ( strlen( (*metadata)[i].totime ) == 0 ?
+											 boost::posix_time::ptime() :
+											 boost::posix_time::time_from_string( std::string( (*metadata)[i].totime ) ) ));
 			stParam.push_back( meta );
 		}
 	}

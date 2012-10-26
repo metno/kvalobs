@@ -33,7 +33,6 @@
 
 #include <iostream>
 #include <list>
-#include <puTools/miTime.h>
 #include <kvalobs/kvDataFlag.h>
 #include <kvalobs/kvData.h>
 #include <kvskel/commonStationInfo.hh>
@@ -69,7 +68,7 @@ public:
 
 private:
 	long stationid_;
-	miutil::miTime obstime_;
+	boost::posix_time::ptime obstime_;
 	int typeid_;
 	std::list<Param> params_;
 
@@ -81,19 +80,19 @@ public:
 	 * \param obstime The observation time for this observation.
 	 * \param typeId The typeid to the observation.
 	 */
-	kvStationInfoExt(long stationid, const miutil::miTime &obstime, int typeId) :
+	kvStationInfoExt(long stationid, const boost::posix_time::ptime &obstime, int typeId) :
 			stationid_(stationid), obstime_(obstime), typeid_(typeId)
 	{
 	}
 
-	kvStationInfoExt(long stationid, const miutil::miTime &obstime, int typeId,
+	kvStationInfoExt(long stationid, const boost::posix_time::ptime &obstime, int typeId,
 			int paramid) :
 			stationid_(stationid), obstime_(obstime), typeid_(typeId)
 	{
 		params_.push_back(Param(paramid));
 	}
 
-	kvStationInfoExt(long stationid, const miutil::miTime &obstime, int typeId,
+	kvStationInfoExt(long stationid, const boost::posix_time::ptime &obstime, int typeId,
 			std::list<kvStationInfoExt::Param> &params) :
 			stationid_(stationid), obstime_(obstime), typeid_(typeId), params_(
 					params)
@@ -110,7 +109,7 @@ public:
 	}
 
 	///The observation time for this observation
-	miutil::miTime obstime() const
+	boost::posix_time::ptime obstime() const
 	{
 		return obstime_;
 	}

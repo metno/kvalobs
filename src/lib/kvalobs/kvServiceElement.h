@@ -54,7 +54,7 @@ class kvServiceElement: public kvDbBase
 {
 private:
 	int stationid_;
-	miutil::miTime obstime_;
+	boost::posix_time::ptime obstime_;
 	int typeid_;
 
 	void createSortIndex();
@@ -65,12 +65,12 @@ public:
 	{
 		set(r);
 	}
-	kvServiceElement(int sid, const miutil::miTime &obt, int tid)
+	kvServiceElement(int sid, const boost::posix_time::ptime &obt, int tid)
 	{
 		set(sid, obt, tid);
 	}
 
-	bool set(int sid, const miutil::miTime &obt, int tid);
+	bool set(int sid, const boost::posix_time::ptime &obt, int tid);
 
 	bool set(const dnmi::db::DRow&);
 
@@ -86,7 +86,7 @@ public:
 	{
 		return stationid_;
 	}
-	miutil::miTime obstime() const
+	boost::posix_time::ptime obstime() const
 	{
 		return obstime_;
 	}

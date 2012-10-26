@@ -108,15 +108,15 @@ next( kvalobs::kvWorkelement &ws )
 
    const  WorkstatistikElem &rd = dataList[ index++ ];
    ws.set( rd.stationID,
-           miutil::miTime( rd.obstime ),
+           boost::posix_time::time_from_string( std::string(rd.obstime) ),
            rd.typeID_,
-           miutil::miTime( rd.tbtime ),
+           boost::posix_time::time_from_string( std::string(rd.tbtime) ),
            rd.priority,
-           miutil::miTime(rd.processStart),
-           miutil::miTime(rd.qaStart),
-           miutil::miTime(rd.qaStop),
-           miutil::miTime(rd.serviceStart),
-           miutil::miTime(rd.serviceStop) );
+           boost::posix_time::time_from_string(std::string(rd.processStart)),
+           boost::posix_time::time_from_string(std::string(rd.qaStart)),
+           boost::posix_time::time_from_string(std::string(rd.qaStop)),
+           boost::posix_time::time_from_string(std::string(rd.serviceStart)),
+           boost::posix_time::time_from_string(std::string(rd.serviceStop)) );
    return true;
 }
 

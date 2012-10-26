@@ -104,7 +104,7 @@ bool kvalobs::kvStation::set(int stationid__, float lat__, float lon__,
 		float height__, float maxspeed__, const std::string& name__,
 		int wmonr__, int nationalnr__, const std::string& ICAOid__,
 		const std::string& call_sign__, const std::string& stationstr__,
-		int environmentid__, bool static__, const miutil::miTime& fromtime__)
+		int environmentid__, bool static__, const boost::posix_time::ptime& fromtime__)
 {
 
 	stationid_ = stationid__;
@@ -165,7 +165,7 @@ bool kvalobs::kvStation::set(const dnmi::db::DRow& r_)
 			else if (*it == "static")
 				static_ = (buf == "t");
 			else if (*it == "fromtime")
-				fromtime_ = miTime(buf);
+				fromtime_ = boost::posix_time::time_from_string(buf);
 		} catch (...)
 		{
 			CERR("kvStation: exception ..... \n");
@@ -180,7 +180,7 @@ std::string kvalobs::kvStation::uniqueKey() const
 	ostringstream ost;
 
 	ost << " WHERE  stationid=" << stationid_ << " AND " << "        fromtime="
-			<< quoted(fromtime_.isoTime());
+			<< quoted(fromtime_);
 
 	return ost.str();
 }

@@ -72,8 +72,8 @@ void NewDataJob::doJob(dnmi::db::Connection &con)
     Start searching for unprocessed data from tbtime>= startime
     Ignore data younger than stoptime
   */ 
-  miutil::miTime startime = miutil::miTime::nowTime();
-  miutil::miTime stoptime = miutil::miTime::nowTime();
+  boost::posix_time::ptime startime = boost::posix_time::second_clock::universal_time();
+  boost::posix_time::ptime stoptime = boost::posix_time::second_clock::universal_time();
 
   bool result;
 
@@ -107,14 +107,18 @@ void NewDataJob::doJob(dnmi::db::Connection &con)
   
   for (itk=values.begin(); itk!=values.end(); itk++){
     std::string s= itk->val();
-    if (miutil::miTime::isValid(s))
-      startime= miutil::miTime(s);
+    try
+    {
+    	startime = boost::posix_time::time_from_string(s);
+    }
+    catch ( std::exception & )
+    {}
   }
   
   LOGDEBUG(jobName() << ": Got tabletime for previous qabase run:" << startime);
   
   // to be on the safe side, reduce startime by one hour
-  startime.addHour(-1);
+  startime -= boost::posix_time::hours(1);
   
   /*
     ==============================================================

@@ -238,7 +238,8 @@ void DataStore::populateStation_(const db::DatabaseAccess & db)
 	}
 	catch( std::exception & e )
 	{
-		station_ = kvalobs::kvStation(observation_.stationID(), -1, -1, -1, 0, "unknown station", -1, -1, "", "", "", 0, true, "1900-01-01");
+		station_ = kvalobs::kvStation(observation_.stationID(), -1, -1, -1, 0, "unknown station", -1, -1, "", "", "", 0, true,
+				boost::posix_time::ptime(boost::gregorian::date(1900,1,1), boost::posix_time::time_duration(0,0,0)));
 	}
 }
 

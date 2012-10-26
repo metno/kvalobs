@@ -47,7 +47,7 @@ public:
 	kvStationMetadata(int station, const int * param, const int * type,
 			const int * level, const int * sensor, const std::string & name,
 			float metadata, const std::string & description,
-			const miutil::miTime & fromtime, const miutil::miTime & totime);
+			const boost::posix_time::ptime & fromtime, const boost::posix_time::ptime & totime);
 
 	kvStationMetadata(const kvStationMetadata & d);
 
@@ -90,11 +90,11 @@ public:
 		return description_;
 	}
 
-	const miutil::miTime & fromtime() const
+	const boost::posix_time::ptime & fromtime() const
 	{
 		return fromtime_;
 	}
-	const miutil::miTime & totime() const
+	const boost::posix_time::ptime & totime() const
 	{
 		return totime_;
 	}
@@ -129,8 +129,8 @@ private:
 	std::string name_;
 	float metadata_;
 	std::string description_;
-	miutil::miTime fromtime_;
-	miutil::miTime totime_;
+	boost::posix_time::ptime fromtime_;
+	boost::posix_time::ptime totime_;
 };
 
 }

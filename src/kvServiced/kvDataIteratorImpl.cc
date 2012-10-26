@@ -46,7 +46,7 @@ DataIteratorImpl::DataIteratorImpl(dnmi::db::Connection *dbCon_,
                                    dbCon(dbCon_),
                                    whichData(whichData_),
                                    iData(0),
-                                   startTimeOfGetData(miutil::miTime::nowTime()),app(app_)
+                                   startTimeOfGetData(boost::posix_time::second_clock::universal_time()),app(app_)
 {
 }
 
@@ -116,7 +116,7 @@ DataIteratorImpl::next(CKvalObs::CService::ObsDataList_out obsDataList)
    list<kvData>::iterator     it;
    list<kvTextData>           textDataList;
    list<kvTextData>::iterator tit;
-   miTime                 thisTime;
+   boost::posix_time::ptime                 thisTime;
    CORBA::Long            obsi=0;
    CORBA::Long            datai=0;
    char                   *sTmp;
@@ -336,9 +336,9 @@ DataIteratorImpl::findData(list<kvData> &data,
                            const CKvalObs::CService::WhichData &wData)
 {
    kvDbGate gate(dbCon);
-   miTime   stime;
-   miTime   etime;
-   miTime   tmpTime;
+   boost::posix_time::ptime stime;
+   boost::posix_time::ptime etime;
+   boost::posix_time::ptime tmpTime;
    bool     ret=true;
 
    LogContext context("findData");
@@ -350,12 +350,12 @@ DataIteratorImpl::findData(list<kvData> &data,
             << currentEndTime << " endTime: " << endTime << " iData: " <<
             iData);
 
-   if(currentEndTime.undef()){
-      stime.setTime(std::string(wData.fromObsTime));
-      endTime.setTime(std::string(wData.toObsTime));
+   if(currentEndTime.is_not_a_date_time()){
+      stime = boost::posix_time::time_from_string(std::string(wData.fromObsTime));
+      endTime = boost::posix_time::time_from_string(std::string(wData.toObsTime));
 
-      if(stime.undef() || endTime.undef()){
-         if(stime.undef()){
+      if(stime.is_not_a_date_time() || endTime.is_not_a_date_time()){
+         if(stime.is_not_a_date_time()){
             ostringstream os;
             os << "Inavlid time spec (fromObsTime): ";
 
@@ -369,7 +369,7 @@ DataIteratorImpl::findData(list<kvData> &data,
             throw InvalidWhichData(os.str());
          }
 
-         if(endTime.undef()){
+         if(endTime.is_not_a_date_time()){
             endTime=startTimeOfGetData;
          }
       }
@@ -378,7 +378,7 @@ DataIteratorImpl::findData(list<kvData> &data,
    }
 
    tmpTime=stime;
-   tmpTime.addHour(12);
+   tmpTime += boost::posix_time::hours(12);
 
    if(tmpTime<endTime){
       currentEndTime=tmpTime;
@@ -388,9 +388,9 @@ DataIteratorImpl::findData(list<kvData> &data,
       //we get data which is in the period [stime,currendEndTime>. This since
       //the  kvQueries::selectData get the data in the period [stime,etime], but
       //we will not have the endpoint twice.
-      etime.addSec(-1);
+      etime -= boost::posix_time::seconds(1);
    }else{
-      currentEndTime=miTime(); //set currentEndTime to undef.
+      currentEndTime=boost::posix_time::ptime(); //set currentEndTime to not_a_date_time.
       etime=endTime;
       iData++;
    }
@@ -428,24 +428,24 @@ insertTextData(CKvalObs::CService::ObsDataList *obsDataList,
                const TextDataElemList           &textData)
 {
    CORBA::Long i=0;
-   miTime  obsTime;
-   miTime  textTime;
+   boost::posix_time::ptime  obsTime;
+   boost::posix_time::ptime  textTime;
 
    if(textData.length()==0)
       return;
 
-   textTime=miTime(textData[0].obstime);
+   textTime=boost::posix_time::time_from_string(std::string(textData[0].obstime));
 
-   if(textTime.undef())//Should never happend
+   if(textTime.is_not_a_date_time())//Should never happend
       return;
 
    for(i=0; i<obsDataList->length(); i++){
       if((*obsDataList)[i].dataList.length()==0) //Should never happend.
          continue;
 
-      obsTime=miTime((*obsDataList)[i].dataList[0].obstime);
+      obsTime=boost::posix_time::time_from_string(std::string((*obsDataList)[i].dataList[0].obstime));
 
-      if(obsTime.undef()) //Should never happend.
+      if(obsTime.is_not_a_date_time()) //Should never happend.
          continue;
 
       if(obsTime>=textTime)

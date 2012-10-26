@@ -49,7 +49,7 @@ using namespace dnmi::db;
 
 int main(int argc, char** argv)
 {
-	miutil::miTime undefTime;
+	boost::posix_time::ptime undefTime;
   	Connection    *con;
 
 	KvMgrCltApp app(argc, argv);
@@ -130,8 +130,8 @@ int main(int argc, char** argv)
 		while(dit!=data.end()){
 			int      tid=dit->typeID();
 			int      sid=dit->stationID();
-			miTime dObst=dit->obstime();
-			miTime tbt=dit->tbtime();
+			const boost::posix_time::ptime & dObst=dit->obstime();
+			const boost::posix_time::ptime & tbt=dit->tbtime();
 			bool     qc1=false;  
 
 			for(; dit!=data.end() && dit->typeID()==tid; ++dit);

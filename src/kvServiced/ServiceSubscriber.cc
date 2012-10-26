@@ -58,7 +58,7 @@ buildDataQuery( const kvalobs::kvStationInfoExt &st )
 
    q << " WHERE stationid=" << st.stationID()
         << " AND typeid="      << st.typeID()
-        << " AND obstime=\'"   << st.obstime().isoTime() << "\' " ;
+        << " AND obstime=\'"   << to_simple_string(st.obstime()) << "\' " ;
 
    if( params.size() !=0 ) {
       list<kvalobs::kvStationInfoExt::Param>::const_iterator it = params.begin();
@@ -83,7 +83,7 @@ buildTextDataQuery( const kvalobs::kvStationInfoExt &st )
 
    q << " WHERE stationid=" << st.stationID()
         << " AND typeid="      << st.typeID()
-        << " AND obstime=\'"   << st.obstime().isoTime() << "\' " ;
+        << " AND obstime=\'"   << to_simple_string(st.obstime()) << "\' " ;
 
    if( params.size() !=0 ) {
       list<kvalobs::kvStationInfoExt::Param>::const_iterator it = params.begin();
@@ -136,7 +136,7 @@ updateWorkelementServiceStart(const kvalobs::kvStationInfoExt &st,
    ost << "UPDATE workque SET service_start='"
          << miTime::nowTime()
    << "' WHERE stationid=" << st.stationID()
-   << "  AND obstime='" << st.obstime().isoTime()
+   << "  AND obstime='" << to_simple_string(st.obstime())
    << "' AND typeid=" << st.typeID();
 
 
@@ -165,7 +165,7 @@ updateWorkelementServiceStop(const kvalobs::kvStationInfoExt &st,
    ost << "UPDATE workque SET service_stop='"
          << miTime::nowTime()
    << "' WHERE stationid=" << st.stationID()
-   << "  AND obstime='" << st.obstime().isoTime()
+   << "  AND obstime='" << to_simple_string(st.obstime())
    << "' AND typeid=" << st.typeID();
 
 
@@ -206,7 +206,7 @@ callDataNotifySubscribers(const kvalobs::kvStationInfoExt &si,
    if(!gate.select(dataList,
                    kvQueries::selectDataFromType(si.stationID(),
                                                  si.typeID(),
-                                                 si.obstime()))){
+                                                 to_ptime(si.obstime())))){
       if( logid.empty() ) {
          LOGWARN( "NODATA (notifysub) source <?>: stationid: " << si.stationID() << " typeid: " << si.typeID() << " obstime: " << si.obstime() );
       } else {
@@ -482,7 +482,7 @@ DataNotifyFunc::buildWhatList(
    wl.length(wli+1);
    wl[wli].stationID=stationInfo.stationID();
    wl[wli].typeID_=stationInfo.typeID();
-   wl[wli].obsTime=stationInfo.obstime().isoTime().c_str();
+   wl[wli].obsTime=to_simple_string(stationInfo.obstime()).c_str();
 
 
    for(list<kvData>::const_iterator it=dataList.begin();

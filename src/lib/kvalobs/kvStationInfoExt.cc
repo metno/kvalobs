@@ -84,7 +84,7 @@ void kvalobs::populateCorbaKvStationInfoExtList(
 	for (it = stList.begin(), k = 0; it != stList.end(); ++it, ++k)
 	{
 		cstList[k].stationId = it->stationID();
-		cstList[k].obstime = CORBA::string_dup(it->obstime().isoTime().c_str());
+		cstList[k].obstime = CORBA::string_dup(to_simple_string(it->obstime()).c_str());
 		cstList[k].typeId_ = it->typeID();
 		params = it->params();
 

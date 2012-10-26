@@ -219,7 +219,7 @@ int kvSynopDecoder::temporaryRegister( std::string uknown)
    //  tstat.set(lastTempoIndex,0,0,0,0,"",0,0,"",uknown,"",6,false, miutil::miTime::nowTime());
 
    tstat.set(lastTempoIndex, kvDbBase::FLT_NULL, kvDbBase::FLT_NULL, kvDbBase::FLT_NULL, kvDbBase::FLT_NULL,
-             "", kvDbBase::INT_NULL, kvDbBase::INT_NULL, "", uknown, "", 6, false, miutil::miTime::nowTime());
+             "", kvDbBase::INT_NULL, kvDbBase::INT_NULL, "", uknown, "", 6, false, boost::posix_time::microsec_clock::universal_time());
 
    needTmp=true;
 

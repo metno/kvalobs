@@ -277,7 +277,7 @@ PreProcessMissingData::doJob(long                 stationId,
       result = dbGate.select(datalist,
                              kvQueries::selectDataFromType(stationId,
                                                            typeId,
-                                                           obstime));
+                                                           to_ptime(obstime)));
    }
    catch(dnmi::db::SQLException &ex){
       LOGERROR("Exception: " << ex.what() << std::endl);
@@ -298,7 +298,7 @@ PreProcessMissingData::doJob(long                 stationId,
       result = dbGate.select( obspgmlist,
                               kvQueries::selectObsPgm(stationId,
                                                       typeId,
-                                                      obstime)
+                                                      to_ptime(obstime))
       );
    }
    catch(dnmi::db::SQLException &ex){

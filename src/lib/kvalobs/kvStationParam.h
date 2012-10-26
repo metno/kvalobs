@@ -63,7 +63,7 @@ private:
 	std::string qcx_;
 	std::string metadata_;
 	std::string descMetadata_;
-	miutil::miTime fromtime_;
+	boost::posix_time::ptime fromtime_;
 
 public:
 	kvStationParam()
@@ -75,14 +75,14 @@ public:
 	}
 	kvStationParam(int st, int pa, int lev, int sen, int fr, int to, int hour,
 			const std::string& qc, const std::string& md, const std::string& dm,
-			const miutil::miTime& fromtime)
+			const boost::posix_time::ptime& fromtime)
 	{
 		set(st, pa, lev, sen, fr, to, hour, qc, md, dm, fromtime);
 	}
 
 	bool set(const dnmi::db::DRow&);
 	bool set(int, int, int, int, int, int, int, const std::string&,
-			const std::string&, const std::string&, const miutil::miTime&);
+			const std::string&, const std::string&, const boost::posix_time::ptime&);
 
 	const char* tableName() const
 	{
@@ -131,7 +131,7 @@ public:
 	{
 		return descMetadata_;
 	}
-	miutil::miTime fromtime() const
+	boost::posix_time::ptime fromtime() const
 	{
 		return fromtime_;
 	}

@@ -65,7 +65,7 @@ private:
 	std::string stationstr_;
 	int environmentid_;
 	bool static_;
-	miutil::miTime fromtime_;
+	boost::posix_time::ptime fromtime_;
 
 public:
 	kvStation()
@@ -78,7 +78,7 @@ public:
 	kvStation(int st, float la, float lo, float he, float max,
 			const std::string& na, int wm, int nn, const std::string& ic,
 			const std::string& ca, const std::string& ss, int environmentid,
-			bool static_, const miutil::miTime& fromtime)
+			bool static_, const boost::posix_time::ptime& fromtime)
 	{
 		set(st, la, lo, he, max, na, wm, nn, ic, ca, ss, environmentid, static_,
 				fromtime);
@@ -88,7 +88,7 @@ public:
 
 	bool set(int, float, float, float, float, const std::string&, int, int,
 			const std::string&, const std::string&, const std::string&, int,
-			bool, const miutil::miTime&);
+			bool, const boost::posix_time::ptime&);
 
 	const char* tableName() const
 	{
@@ -149,7 +149,7 @@ public:
 	{
 		return static_;
 	}
-	miutil::miTime fromtime() const
+	boost::posix_time::ptime fromtime() const
 	{
 		return fromtime_;
 	}
