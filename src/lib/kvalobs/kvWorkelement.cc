@@ -29,9 +29,9 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include <kvalobs/kvWorkelement.h>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <sstream>
 
-using namespace miutil;
 using namespace std;
 using namespace dnmi;
 

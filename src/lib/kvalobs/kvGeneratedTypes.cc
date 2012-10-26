@@ -32,7 +32,6 @@
 #include <boost/lexical_cast.hpp>
 
 using namespace std;
-using namespace miutil;
 
 std::string kvalobs::kvGeneratedTypes::toSend() const
 {

@@ -30,6 +30,7 @@
 #ifndef KVDATACACHE_H_
 #define KVDATACACHE_H_
 
+#include <puTools/miTime.h>
 #include <db/DatabaseAccess.h>
 #include <kvalobs/kvStationInfo.h>
 #include <boost/noncopyable.hpp>

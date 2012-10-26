@@ -327,9 +327,8 @@ void KvalobsDatabaseAccess::getModelData(ModelDataList * out, const kvalobs::kvS
 
 	if ( minutesBackInTime != 0 )
 	{
-		miutil::miTime first = si.obstime();
-		first.addMin(minutesBackInTime);
-		query << "obstime BETWEEN '" << first << "' AND '" << si.obstime() << "' AND ";
+		boost::posix_time::ptime first = si.obstime() + boost::posix_time::minutes(minutesBackInTime);
+		query << "obstime BETWEEN '" << to_simple_string(first) << "' AND '" << to_simple_string(si.obstime()) << "' AND ";
 	}
 	else
 		query << "obstime = '" << si.obstime() << "' AND ";
@@ -359,8 +358,7 @@ void KvalobsDatabaseAccess::getData(DataList * out, const kvalobs::kvStationInfo
 		query << "sensor='" << parameter.sensor() << "' AND ";
 	if ( parameter.haveType() )
 		query << "typeid=" << parameter.type() << " AND ";
-	miutil::miTime t = si.obstime();
-	t.addMin(minuteOffset);
+	boost::posix_time::ptime t = si.obstime() + boost::posix_time::minutes(minuteOffset);
 	query << "obstime BETWEEN '" << t << "' AND '" << si.obstime() << "'";
 	query << " ORDER BY obstime DESC FOR UPDATE;";
 
@@ -386,8 +384,7 @@ void KvalobsDatabaseAccess::getTextData(TextDataList * out, const kvalobs::kvSta
 	query << "paramid IN (SELECT paramid FROM param WHERE name='" << parameter.baseName() << "') AND ";
 	if ( parameter.haveType() )
 		query << "typeid=" << parameter.type() << " AND ";
-	miutil::miTime t = si.obstime();
-	t.addMin(minuteOffset);
+	boost::posix_time::ptime t = si.obstime() + boost::posix_time::minutes(minuteOffset);
 	query << "obstime BETWEEN '" << t << "' AND '" << si.obstime() << "'";
 	query << " ORDER BY obstime DESC;";
 

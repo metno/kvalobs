@@ -31,7 +31,6 @@
 #include <kvalobs/kvQueries.h>
 
 using namespace std;
-using namespace miutil;
 
 /*
  Select all rows from table checks matching

@@ -37,6 +37,7 @@
 #include <kvalobs/kvStation.h>
 #include <kvalobs/kvData.h>
 #include <kvalobs/kvRejectdecode.h>
+#include <puTools/miTime.h>
 #include <string>
 #include "synop.h"
 #include <iostream>

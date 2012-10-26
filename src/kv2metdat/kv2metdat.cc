@@ -54,7 +54,6 @@
 ///  is skipped and the last files will be used......
 
 using namespace std; 
-using namespace miutil;
 using namespace kvalobs;
 using namespace dnmi::db;
 

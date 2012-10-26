@@ -92,10 +92,6 @@ kvalobs::kvStationInfo * getStationInfo(const variables_map & vm)
 	std::string obstime = vm["obstime"].as<std::string>();
 	int type = vm["typeid"].as<int>();
 
-	miutil::miTime t(obstime);
-	if ( t.undef() )
-		throw std::runtime_error("Cannot recognize time format: " + obstime);
-
 	return new kvalobs::kvStationInfo(station, boost::posix_time::time_from_string(obstime), type);
 }
 

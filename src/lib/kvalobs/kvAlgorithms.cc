@@ -33,7 +33,6 @@
 
 using namespace std;
 using namespace dnmi;
-using namespace miutil;
 
 std::string kvalobs::kvAlgorithms::toSend() const
 {

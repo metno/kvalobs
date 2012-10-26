@@ -39,7 +39,6 @@
  * at Tue Aug 28 15:23:16 2002 
  */
 using namespace std;
-using namespace miutil;
 using namespace dnmi;
 
 bool kvalobs::kvParam::set(const dnmi::db::DRow &r_)

@@ -30,7 +30,6 @@
  */
 #include "QaWorkCommand.h"
 
-using namespace miutil;
 using namespace kvalobs;
 using namespace std;
 

@@ -136,12 +136,12 @@ public:
 		return fromtime_;
 	}
 
-	miutil::miDate fromDAY(int y = -1) const
+	boost::gregorian::date fromDAY(int y = -1) const
 	{
 		return julianDayThatYear(fromday_, y);
 	}
 
-	miutil::miDate toDAY(int y = -1) const
+	boost::gregorian::date toDAY(int y = -1) const
 	{
 		return julianDayThatYear(today_, y);
 	}

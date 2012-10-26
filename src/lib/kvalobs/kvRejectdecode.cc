@@ -29,9 +29,10 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include <kvalobs/kvRejectdecode.h>
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 
 using namespace std;
-using namespace miutil;
 
 std::string kvalobs::kvRejectdecode::toSend() const
 {

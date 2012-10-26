@@ -34,7 +34,6 @@
 #include <kvdb/kvdb.h>
 #include <iostream>
 #include <fstream>
-#include <puTools/miTime.h>
 #include <dnmithread/mtcout.h>
 
 /* Created  by JS at Mon Aug 26 13:25:00 2002 */
@@ -69,7 +68,7 @@ class kvDbBase
 
 protected:
 	std::string sortBy_;
-	miutil::miDate julianDayThatYear(int addOn, int year = -1) const;
+	boost::gregorian::date julianDayThatYear(int addOn, int year = -1) const;
 
 public:
 
@@ -122,8 +121,6 @@ public:
 	 * \param timeToQuote the time we want a quoted ISO time.
 	 * \return a quoted ISO time formatted version of timetoQuote.
 	 */
-	std::string quoted(const miutil::miTime& timeToQuote) const;
-
 	std::string quoted(const boost::posix_time::ptime & timeToQuote) const;
 
 	/**
@@ -177,7 +174,7 @@ public:
 	 * @param[out] msec The microsecond part.
 	 * @return A UTC time.
 	 */
-	miutil::miTime decodeTimeWithMsec(const std::string &timespec, int &msec);
+	//miutil::miTime decodeTimeWithMsec(const std::string &timespec, int &msec);
 
 	/**
 	 * \brief the table name/view class represent.

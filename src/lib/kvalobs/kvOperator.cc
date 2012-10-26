@@ -31,7 +31,6 @@
 #include <kvalobs/kvOperator.h> 
 
 using namespace std;
-using namespace miutil;
 
 std::string kvalobs::kvOperator::toSend() const
 {

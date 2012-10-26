@@ -82,11 +82,6 @@ std::string kvalobs::kvDbBase::quoted(const int& in) const
 	return quoted(boost::lexical_cast<std::string>(in));
 }
 
-std::string kvalobs::kvDbBase::quoted(const miTime& in) const
-{
-	return quoted(in.isoTime());
-}
-
 std::string kvalobs::kvDbBase::quoted(const std::string& in) const
 {
 	std::string out = "\'";
@@ -99,24 +94,24 @@ std::string kvalobs::kvDbBase::quoted(const boost::posix_time::ptime & timeToQuo
 	return quoted(to_simple_string(timeToQuote));
 }
 
-miDate kvalobs::kvDbBase::julianDayThatYear(int addOn, int year) const
+boost::gregorian::date kvalobs::kvDbBase::julianDayThatYear(int addOn, int year) const
 {
-	miDate date;
-	if (year < 1)
+	boost::gregorian::date date;
+	if ( year < 1 )
 	{
-		date = miDate::today();
+		date = boost::gregorian::day_clock::universal_day();
 		year = date.year();
 	}
-	date.setDate(year, 1, 1);
-	date.addDay(addOn);
+	date = boost::gregorian::date(year, 1, 1);
+	date += boost::gregorian::days(addOn);
 	return date;
 }
 
-miutil::miTime kvalobs::kvDbBase::decodeTimeWithMsec(
-		const std::string &timespec, int &msec)
-{
-	return miutil::isoTimeWithMsec(timespec, msec);
-}
+//miutil::miTime kvalobs::kvDbBase::decodeTimeWithMsec(
+//		const std::string &timespec, int &msec)
+//{
+//	return miutil::isoTimeWithMsec(timespec, msec);
+//}
 
 ostream&
 kvalobs::operator<<(ostream& out, const kvalobs::kvDbBase& rhs)

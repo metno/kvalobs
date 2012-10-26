@@ -31,7 +31,6 @@
 #include <kvalobs/kvQcxInfo.h>
 
 using namespace std;
-using namespace miutil;
 
 kvalobs::kvQcxInfo::~kvQcxInfo()
 {

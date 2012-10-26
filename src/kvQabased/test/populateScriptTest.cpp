@@ -129,7 +129,9 @@ TEST_F(populateScriptTest, minimalScript)
 	NumList numericList = obs->numericList();
 	const scriptrunner::ScriptInput::ValueList & v = numericList["obstime"];
 	ASSERT_EQ(6u, v.size());
-	miutil::miTime t(v[0], v[1], v[2], v[3], v[4], v[5]);
+	boost::posix_time::ptime t(
+			boost::gregorian::date(v[0], v[1], v[2]),
+			boost::posix_time::time_duration(v[3], v[4], v[5]));
 	EXPECT_EQ(observation.obstime(), t);
 
 	scriptrunner::ScriptInput::NumericParameters numeric = obs->numeric();

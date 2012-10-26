@@ -35,7 +35,6 @@
 //#include <milog/milog.h>
 
 using namespace std;
-using namespace miutil;
 using namespace dnmi::db;
 
 /* Created by met.no/IT: borge.moe@met.no

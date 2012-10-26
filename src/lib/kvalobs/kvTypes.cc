@@ -31,7 +31,6 @@
 #include <kvalobs/kvTypes.h>
 
 using namespace std;
-using namespace miutil;
 
 std::string kvalobs::kvTypes::toSend() const
 {

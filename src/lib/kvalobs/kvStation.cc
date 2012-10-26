@@ -31,9 +31,10 @@
 #include <kvalobs/kvStation.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 
 using namespace std;
-using namespace miutil;
 
 std::string kvalobs::kvStation::toSend() const
 {

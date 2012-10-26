@@ -31,6 +31,7 @@
 #include <list>
 #include <stdlib.h>
 #include <stdio.h>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <kvalobs/kvModelData.h>
 #include <dnmithread/mtcout.h>
 #include <sstream>
@@ -40,7 +41,6 @@
  * at Tue Aug 28 14:53:16 2002 
  */
 using namespace std;
-using namespace miutil;
 using namespace dnmi;
 
 bool kvalobs::kvModelData::set(int stationid, const boost::posix_time::ptime &obstime,

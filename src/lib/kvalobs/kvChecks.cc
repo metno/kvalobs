@@ -31,10 +31,10 @@
 #include <stdlib.h>
 #include <kvalobs/kvChecks.h>
 #include <dnmithread/mtcout.h>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/lexical_cast.hpp>
 
 using namespace std;
-using namespace miutil;
 using namespace dnmi;
 
 std::string kvalobs::kvChecks::toSend() const

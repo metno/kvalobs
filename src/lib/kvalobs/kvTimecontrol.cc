@@ -32,7 +32,6 @@
 #include <sstream>
 
 using namespace std;
-using namespace miutil;
 
 std::string kvalobs::kvTimecontrol::toSend() const
 {

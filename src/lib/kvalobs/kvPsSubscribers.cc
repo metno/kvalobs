@@ -29,6 +29,7 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include <stdlib.h>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <kvalobs/kvPsSubscribers.h>
 #include <dnmithread/mtcout.h>
 

@@ -30,6 +30,7 @@
 */
 #include "WorkstatistikIterator.h"
 #include <typeinfo>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <milog/milog.h>
 #include <ctime>
 

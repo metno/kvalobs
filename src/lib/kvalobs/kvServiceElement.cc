@@ -29,10 +29,10 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include <kvalobs/kvServiceElement.h>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <sstream>
 
 using namespace std;
-using namespace miutil;
 using namespace dnmi;
 
 void kvalobs::kvServiceElement::createSortIndex()
