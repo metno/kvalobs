@@ -169,12 +169,11 @@ putObjInNS(CORBA::Object_ptr objref,
 		return false;
 	}
 
-	if(name[0]=='/'){
-		name.erase(0, 1);
+	while( !name.empty() && name[0] == '/' )
+	   name.erase(0, 1);
 	   
-		if(name.length()==0)
-			return false;
-	}
+	if( name.empty())
+	   return false;
 
 	i=name.find_last_of("/");
 	  
