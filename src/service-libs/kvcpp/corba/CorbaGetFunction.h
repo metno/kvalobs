@@ -113,15 +113,15 @@ protected:
 class getKvWorkstatisticFunc: public CorbaGetFunction
 {
    CKvalObs::CService::WorkstatistikTimeType timeType;
-   miutil::miTime from;
-   miutil::miTime to;
+   boost::posix_time::ptime from;
+   boost::posix_time::ptime to;
    kvservice::WorkstatistikIterator &it;
 
 public:
    getKvWorkstatisticFunc(
          const CKvalObs::CService::WorkstatistikTimeType,
-         const miutil::miTime &from,
-         const miutil::miTime &to,
+         const boost::posix_time::ptime &from,
+         const boost::posix_time::ptime &to,
          kvservice::WorkstatistikIterator &it );
 protected:
    virtual bool process(CKvalObs::CService::kvServiceExt_ptr service);
@@ -204,11 +204,11 @@ class getKvStationMetaDataFunc: public CorbaGetFunction
 {
 	std::list<kvalobs::kvStationMetadata> &stParam;
 	int stationid;
-	miutil::miTime obstime;
+	boost::posix_time::ptime obstime;
 	std::string metadataName_;
 public:
 	getKvStationMetaDataFunc(std::list<kvalobs::kvStationMetadata> &stParam,
-			int stationid, const miutil::miTime &obstime, const std::string & metadataName);
+			int stationid, const boost::posix_time::ptime &obstime, const std::string & metadataName);
 protected:
 	virtual bool process(CKvalObs::CService::kvServiceExt_ptr service);
 };

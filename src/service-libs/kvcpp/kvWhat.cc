@@ -43,7 +43,7 @@ kvservice::KvWhat::KvWhat(
 {
   stationID_=what.stationID;
   typeID_=what.typeID_;
-  obsTime_.setTime(std::string(what.obsTime));
+  obsTime_ = boost::posix_time::time_from_string(std::string(what.obsTime));
   
   for(CORBA::ULong i=0; i<what.qc.length(); i++)
     qcID_[what.qc[i]]=true; 

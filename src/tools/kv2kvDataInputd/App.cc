@@ -288,7 +288,7 @@ sendData( const std::string &decoder, const std::string &data )
    ostringstream log;
 
    do {
-      if( ! dataReceiverAlive && !timeLastTryToSendData.undef() ) {
+      if( ! dataReceiverAlive && !timeLastTryToSendData.is_not_a_date_time() ) {
          miTime now( miTime::nowTime() );
          now.addMin( -5 );
 
@@ -299,7 +299,7 @@ sendData( const std::string &decoder, const std::string &data )
       }
 
       dataReceiverAlive = false;
-      timeLastTryToSendData = miTime::nowTime();
+      timeLastTryToSendData = boost::posix_time::microsec_clock::universal_time();
 
       try {
          if( CORBA::is_nil( refDataReceiver ) ) {

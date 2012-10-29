@@ -38,7 +38,6 @@
 #include "DataHelper.h"
 
 using namespace std;
-using namespace miutil;
 using namespace std;
 using namespace kvservice;
 
@@ -224,7 +223,7 @@ createHeader( ParamDefsPtr paramdefs )
 
 std::string
 ObsData::
-getData( const Param &param, const miutil::miTime &obstime )const
+getData( const Param &param, const boost::posix_time::ptime &obstime )const
 {
    if( param.isTextData() ) {
       TextDataList::const_iterator obstimeIt = textData.find( obstime );

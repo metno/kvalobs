@@ -35,8 +35,8 @@
 #include <string>
 #include <list>
 #include <boost/shared_ptr.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <kvskel/kvDataNotifySubscriber.hh>
-#include <puTools/miTime.h>
 
 namespace kvservice{
     class KvWhat{
@@ -47,7 +47,7 @@ namespace kvservice{
 	long                       stationID_;
 	long                       typeID_;
 	QcId                       qcID_;
-	miutil::miTime             obsTime_;
+	boost::posix_time::ptime             obsTime_;
 	
     public:
 	KvWhat(const KvWhat &w);
@@ -60,7 +60,7 @@ namespace kvservice{
 	    { return qcID_.find(id)!=qcID_.end();}
 	long  stationID()const { return stationID_;}
 	long  typeID()const {return typeID_;}
-	miutil::miTime obsTime()const { return obsTime_;}
+	boost::posix_time::ptime obsTime()const { return obsTime_;}
     };
 
     typedef std::list<KvWhat>                   KvWhatList;

@@ -32,7 +32,6 @@
 #include "../kvevents.h"
 #include "kvDataSubscriberImpl.h"
 #include "../kvservicetypes.h"
-#include <puTools/miTime.h>
 #include <string>
 
 using namespace kvalobs;

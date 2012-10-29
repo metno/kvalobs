@@ -63,7 +63,7 @@ class GetDataReceiver :
 
   public:
 
-	miutil::miTime prevTime;
+	boost::posix_time::ptime prevTime;
 	int nObstimes;
 	int nParams;
 
@@ -81,7 +81,7 @@ class GetDataReceiver :
     		KvObsData::kvTextDataList textData=it->textDataList();
 
     		for( KvObsData::kvDataList::iterator dit=data.begin(); dit != data.end(); ++dit ) {
-    			if( prevTime.undef() ) {
+    			if( prevTime.is_not_a_date_time() ) {
     				prevTime = dit->obstime();
     				nObstimes++;
     			} else if( prevTime != dit->obstime() ) {

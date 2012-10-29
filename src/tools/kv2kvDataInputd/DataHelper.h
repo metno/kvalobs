@@ -66,10 +66,10 @@ operator<<( std::ostream &out, const Param &param );
 
 class ObsData {
 public:
-   typedef std::map<miutil::miTime, std::map<Param, float > > DataList;
-   typedef std::map<miutil::miTime, std::map<Param, std::string> > TextDataList;
+   typedef std::map<boost::posix_time::ptime, std::map<Param, float > > DataList;
+   typedef std::map<boost::posix_time::ptime, std::map<Param, std::string> > TextDataList;
    typedef std::set<Param > Params;
-   typedef std::set<miutil::miTime> Times;
+   typedef std::set<boost::posix_time::ptime> Times;
 
 private:
    int stationid;
@@ -81,7 +81,7 @@ private:
    Times hqcTimes;
 
    std::string createHeader( ParamDefsPtr paramdefs );
-   std::string getData( const Param &param, const miutil::miTime &obstime )const;
+   std::string getData( const Param &param, const boost::posix_time::ptime &obstime )const;
 
 public:
    ObsData();

@@ -121,11 +121,12 @@ bool getKvRejectDecodeFunc::process(kvServiceExt_ptr service)
 	return service->getRejectdecode(decodeInfo, it.getCorbaObjPtr().out());
 }
 
+
 getKvWorkstatisticFunc::
 getKvWorkstatisticFunc(
          const CKvalObs::CService::WorkstatistikTimeType timeType_,
-         const miutil::miTime &from_,
-         const miutil::miTime &to_,
+         const boost::posix_time::ptime &from_,
+         const boost::posix_time::ptime &to_,
          kvservice::WorkstatistikIterator &it_ )
    : timeType( timeType_ ), from( from_ ), to( to_ ),
      it( it_ )
@@ -148,8 +149,8 @@ process(CKvalObs::CService::kvServiceExt_ptr service_)
    }
 
    //getWorkstatistik(in WorkstatistikTimeType timeType, in string fromTime, in string toTime, out WorkstatistikIterator it);
-   return service->getWorkstatistik( timeType, from.isoTime().c_str(),
-                                     to.isoTime().c_str(), it.getCorbaObjPtr().out() );
+   return service->getWorkstatistik( timeType, to_simple_string(from).c_str(),
+		   to_simple_string(to).c_str(), it.getCorbaObjPtr().out() );
 };
 
 
@@ -341,7 +342,7 @@ bool getKvStationParamFunc::process(kvServiceExt_ptr service)
 
 
 getKvStationMetaDataFunc::getKvStationMetaDataFunc(list<kvStationMetadata> &stParam,
-		int stationid, const miutil::miTime &obstime, const std::string & metadataName) :
+		int stationid, const boost::posix_time::ptime &obstime, const std::string & metadataName) :
 	stParam(stParam), stationid(stationid), obstime(obstime), metadataName_(metadataName)
 {
 }
@@ -351,8 +352,8 @@ bool getKvStationMetaDataFunc::process(kvServiceExt_ptr serviceext)
    CKvalObs::CService::Station_metadataList *metadata;
 	string myObstime;
 
-	if( ! obstime.undef() )
-	   myObstime = obstime.isoTime();
+	if( ! obstime.is_not_a_date_time() )
+	   myObstime = to_simple_string(obstime);
 
 	bool ok = serviceext->getStationMetaData( metadata, stationid, myObstime.c_str(), metadataName_.c_str() );
 
