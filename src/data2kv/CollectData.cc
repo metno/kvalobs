@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <milog/milog.h>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <sstream>
 #include <fstream>
 #include <fileutil/dir.h>
@@ -183,16 +184,16 @@ void*
 CollectData::
 run_undetached(void*)
 {
-	miutil::miTime nextTime;
+	boost::posix_time::ptime nextTime;
 	bool     timeout;
 	bool     hasData=true;
-	miutil::miTime dtNow;
+	boost::posix_time::ptime dtNow;
 	//  bool     firstTime=true;
 
-	nextTime=miutil::miTime::nowTime();
+	nextTime=boost::posix_time::second_clock::universal_time();
 
 	while(!app.inShutdown()){
-		dtNow=miutil::miTime::nowTime();
+		dtNow=boost::posix_time::second_clock::universal_time();
     
 		if(!dataReady(2, timeout)){
       
@@ -203,7 +204,7 @@ run_undetached(void*)
     
 		if(lowpri){
 			if( server.isNull() && 
-				 !server.nextTry().undef() && 
+				 !server.nextTry().is_not_a_date_time() &&
 				 server.nextTry()>dtNow) 
 			{
 				removeFiles();
@@ -216,21 +217,21 @@ run_undetached(void*)
 				removeFiles();
 	
 				//Set the next time to retry.
-				if(dtNow.min()<30){
-					miutil::miClock t(dtNow.hour(), 30, 0);
-					server.nextTry(miutil::miTime(dtNow.date(), t));
+				if(dtNow.time_of_day().minutes()<30){
+					boost::posix_time::time_duration t(dtNow.time_of_day().hours(), 30, 0);
+					server.nextTry(boost::posix_time::ptime(dtNow.date(), t));
 				}else{
-					dtNow.addSec(3600);
-					miutil::miClock t(dtNow.hour(), 30, 0 );
-					server.nextTry( miutil::miTime(dtNow.date(), t));
+					dtNow += boost::posix_time::hours(1);
+					boost::posix_time::time_duration t(dtNow.time_of_day().hours(), 30, 0);
+					server.nextTry( boost::posix_time::ptime(dtNow.date(), t));
 				}
 	
 				hasData=false;
 	
 				LOGINFO("Retry after: " << server.nextTry() << endl);
 			}else{
-				dtNow=miutil::miTime::nowTime();
-				nextTime.addSec(60); //try again in 1 minute
+				dtNow=boost::posix_time::second_clock::universal_time();
+				nextTime += boost::posix_time::minutes(1);
 				hasData=true;
 			}
 		}else{

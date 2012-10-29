@@ -3,8 +3,8 @@
 
 #include <string>
 #include <kvskel/datasource.hh>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <list>
-#include <puTools/miTime.h>
 #include <corbahelper/corbaApp.h>
 
 struct KvDataReceiver {
@@ -37,7 +37,7 @@ typedef std::list<KvDataReceiver> TKvDataReceiverList;
 class KvDataSrc{
 	KvDataReceiver                  dataReceiver_;
 	CKvalObs::CDataSource::Data_var ref_;
-	miutil::miTime                  dt;
+	boost::posix_time::ptime                  dt;
 
 public:
 	KvDataSrc( const KvDataReceiver &dataReceiver__, 
@@ -63,8 +63,8 @@ public:
   		}
 
   	bool           isNull()const{ return CORBA::is_nil(ref_);}
-  	void           nextTry(const miutil::miTime &newDt){ dt=newDt;}
-  	miutil::miTime nextTry()const { return dt;}
+  	void           nextTry(const boost::posix_time::ptime &newDt){ dt=newDt;}
+  	boost::posix_time::ptime nextTry()const { return dt;}
   	KvDataReceiver dataReceiver()const { return dataReceiver_; }
   	CKvalObs::CDataSource::Data_ptr ref()const{ return ref_;}
   	void ref(const CKvalObs::CDataSource::Data_ptr ref__){ ref_=ref__;}
