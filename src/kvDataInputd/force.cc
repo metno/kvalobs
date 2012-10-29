@@ -56,7 +56,6 @@
 #include <fileutil/mkdir.h>
 #include <kvalobs/kvDataOperations.h>
 
-//class kvDataFactory( 0, miutil::miTime(), 0 ); 
 
 
 namespace {
