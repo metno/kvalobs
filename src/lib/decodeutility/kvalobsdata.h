@@ -38,7 +38,6 @@
 #include <utility>
 #include <kvalobs/kvDataFlag.h>
 #include <kvalobs/kvRejectdecode.h>
-#include <puTools/miTime.h>
 
 namespace kvalobs
 {

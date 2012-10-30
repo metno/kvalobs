@@ -240,7 +240,6 @@ namespace
   {
     string ot = context_[ "obstime" ];
     return ot.empty() ? boost::posix_time::ptime() : boost::posix_time::time_from_string( ot );
-    //return miutil::miTime( context_[ "obstime" ] );
   }
   int get_sensor( std::map<std::string, std::string> & context_ )
   {
