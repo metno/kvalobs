@@ -33,7 +33,6 @@
 #include <dnmithread/mtcout.h>
 #include <sstream>
 #include <boost/lexical_cast.hpp>
-#include <puTools/miTime.h>
 #include <miutil/commastring.h>
 #include <miutil/trimstr.h>
 #include <milog/milog.h>
@@ -75,7 +74,7 @@ name() const
 
 std::string 
 AutoObsDecoder::
-getMetaSaSdEmEi( int stationid, int typeid_, const miutil::miTime &obstime )
+getMetaSaSdEmEi( int stationid, int typeid_, const boost::posix_time::ptime &obstime )
 {
    string saSdEmEi="0000";
    
@@ -217,8 +216,8 @@ getTypeId(std::string &msg)
 char 
 AutoObsDecoder::
 checkObservationTime(int typeId,
-							miutil::miTime tbt, 
-							miutil::miTime obt)
+							boost::posix_time::ptime tbt,
+							boost::posix_time::ptime obt)
 {
 	
   	const kvalobs::kvTypes *kvType=findType(typeId);
@@ -228,7 +227,7 @@ checkObservationTime(int typeId,
     	return 0;
   	} 
   
-  	if(firstObsTime.undef())
+  	if(firstObsTime.is_not_a_date_time())
 		firstObsTime=obt;
 
   //It is only the first obsTime in a typeId==302 message that
@@ -238,7 +237,7 @@ checkObservationTime(int typeId,
   	if(typeId==302 && firstObsTime!=obt)
     	return checkRet;
 
-  	int diff = miTime::minDiff(tbt,obt);
+  	int diff = (tbt - obt).total_seconds() / 60; // difference in minutes
   
   	if(diff > kvType->lateobs()){ //tbt>obt  (diff>=0)
     	//Used by checkObservationTime.
@@ -287,7 +286,7 @@ execute(std::string &msg)
   	string                tmp;
   	CommaString           data;
   	CommaString           header;
-  	miTime                obstime;
+  	boost::posix_time::ptime  obstime;
   	boost::posix_time::ptime tbtime(boost::posix_time::microsec_clock::universal_time());
   	int                   typeId=getTypeId(msg); 
   	int                   useTypeid;
@@ -427,7 +426,7 @@ execute(std::string &msg)
       	continue;
     	}	
     
-    	obstime = miTime(data[0]);
+    	obstime = boost::posix_time::time_from_string(data[0]);
     	IDLOGDEBUG( logid, "  Data: obstime:  " << obstime << endl);
     
     	converter.resetRRRtr();

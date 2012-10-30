@@ -55,12 +55,12 @@ class AutoObsDecoder : public DecoderBase{
    long getStationId( std::string &msg);
    long getTypeId( std::string &msg );
 
-   std::string getMetaSaSdEmEi( int stationid, int typeid_, const miutil::miTime &obstime );
+   std::string getMetaSaSdEmEi( int stationid, int typeid_, const boost::posix_time::ptime &obstime );
 
    char checkObservationTime(int typeId,
-                             miutil::miTime tbt,
-                             miutil::miTime obt);
-   miutil::miTime firstObsTime; //Used by checkObservationTime.
+                             boost::posix_time::ptime tbt,
+                             boost::posix_time::ptime obt);
+   boost::posix_time::ptime firstObsTime; //Used by checkObservationTime.
    char           checkRet;     //Used by checkObservationTime.
    kvalobs::decoder::ObsPgmParamInfo obsPgm;
    bool warnings;

@@ -36,7 +36,6 @@
 #include <string>
 #include <exception>
 #include <vector>
-#include <puTools/miTime.h>
 #include <kvalobs/paramlist.h>
 #include <kvalobs/kvData.h>
 namespace kvalobs{
@@ -196,7 +195,7 @@ public:
           return *this;
        }
 
-       float  RR(int &paramid, const miutil::miTime &obstime);
+       float  RR(int &paramid, const boost::posix_time::ptime &obstime);
     };
 
     struct SaSdEmEi {
@@ -263,7 +262,7 @@ public:
      * \exception BadFormat, UnknownParam
      */
     void decodeVal(std::vector<DataElem>  &data,
-                   const miutil::miTime   &obsTime,
+                   const boost::posix_time::ptime   &obsTime,
                    const std::string      &param,
                    const std::string      &val,
                    int                    sensor,
@@ -277,7 +276,7 @@ public:
                      int               &mod);
 
 
-    miutil::miTime convertToMiTimeFromHHMM(const miutil::miTime &obst,
+    boost::posix_time::ptime convertToMiTimeFromHHMM(const boost::posix_time::ptime &obst,
                                            const std::string &val);
 
     ParamList &paramList;
@@ -298,7 +297,7 @@ public:
      */
     std::vector<DataElem> convert(const std::string &param,
                                   const std::string &val,
-                                  const miutil::miTime &obsTime);
+                                  const boost::posix_time::ptime &obsTime);
 
     void resetRRRtr(){ hasRRRtr_=false; RRRtr_=RRRtr();}
     bool hasRRRtr(RRRtr &rr){ rr=RRRtr_;

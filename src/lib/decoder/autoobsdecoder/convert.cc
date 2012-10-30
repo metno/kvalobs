@@ -36,7 +36,6 @@
 #include <string.h>
 #include "convert.h"
 #include <milog/milog.h>
-#include <puTools/miTime.h>
 #include <dnmithread/mtcout.h>
 #include <sstream>
 #include <decodeutility/decodeutility.h>
@@ -45,7 +44,6 @@
 //using namespace kvalobs::decoder::autoobs;
 using namespace boost;
 using namespace std;
-using namespace miutil;
 
 namespace kvalobs { 
 namespace decoder {
@@ -226,7 +224,7 @@ DataConvert::allCh(const std::string &val, char ch){
 std::vector<DataElem>
 DataConvert::convert(const std::string &param_,
                      const std::string &val,
-                     const miutil::miTime   &obsTime){
+                     const boost::posix_time::ptime   &obsTime){
    SplitDef              *spDef;
    std::string     param(param_);
    int                   totSize;
@@ -652,7 +650,7 @@ DataConvert::decodeSpDef(std::vector<DataElem> &data,
 
 void
 DataConvert::decodeVal(std::vector<DataElem> &data,
-                       const miutil::miTime  &obsTime,
+                       const boost::posix_time::ptime  &obsTime,
                        const std::string     &param,
                        const std::string     &val_,
                        int                   sensor,
@@ -660,7 +658,7 @@ DataConvert::decodeVal(std::vector<DataElem> &data,
                        int                   mod){
    IParamList it;
    std::string name;
-   miTime      ts;
+   boost::posix_time::ptime      ts;
    string      val(val_);
 
    name=convertName(param);
@@ -684,9 +682,9 @@ DataConvert::decodeVal(std::vector<DataElem> &data,
       //catch the exception.
       ts=convertToMiTimeFromHHMM(obsTime,val);
 
-      if(!ts.undef()){
+      if(!ts.is_not_a_date_time()){
          char myBuf[8];
-         sprintf(myBuf, "%02d%02d", ts.hour(), ts.min());
+         sprintf(myBuf, "%02d%02d", ts.time_of_day().hours(), ts.time_of_day().minutes());
          val=myBuf;
       }
    }else if(name=="PP"){
@@ -723,17 +721,17 @@ DataConvert::decodeVal(std::vector<DataElem> &data,
 }
 
 
-miutil::miTime
-DataConvert::convertToMiTimeFromHHMM(const miutil::miTime &obst_,
+boost::posix_time::ptime
+DataConvert::convertToMiTimeFromHHMM(const boost::posix_time::ptime &obst_,
                                      const std::string &val_){
    ostringstream ost;
    string        val(val_);
    char          buf[100];
-   miClock       ti;
-   miTime        obst(obst_);
+   boost::posix_time::time_duration       ti;
+   boost::posix_time::ptime        obst(obst_);
 
    if(val.empty())
-      return miTime(); //Undef
+      return boost::posix_time::ptime(); //Undef
 
    if(val.length()!=4 ){
       ost << "Invalid timeformat, length <" << val.length()
@@ -744,17 +742,21 @@ DataConvert::convertToMiTimeFromHHMM(const miutil::miTime &obst_,
    //Create a time with the format hh:mm:ss, from hhmm.
    val.insert(2, ":");
    val.append(":00");
-   ti.setClock(val);
-
-   if(ti.undef())
+   try
+   {
+	   ti = boost::posix_time::duration_from_string(val);
+   }
+   catch ( std::exception & )
+   {
       throw BadFormat("Invalid time format. Expecting 'hh:mm:ss'!");
+   }
 
-   return miTime(obst.date(), ti);
+   return boost::posix_time::ptime(obst.date(), ti);
 }
 
 float
 DataConvert::
-RRRtr::RR(int &paramid, const miutil::miTime &obstime){
+RRRtr::RR(int &paramid, const boost::posix_time::ptime &obstime){
    float rr;
    int   RRR_;
 
@@ -762,11 +764,11 @@ RRRtr::RR(int &paramid, const miutil::miTime &obstime){
 
    if(RRR==INT_MAX && tr<0){
       if(ir==3){
-         if(obstime.hour()==6 || obstime.hour()==18){
+         if(obstime.time_of_day().hours()==6 || obstime.time_of_day().hours()==18){
             paramid=109; //RR_12
             tr=2;
             return -1.0;
-         }else if(obstime.hour()==0 || obstime.hour()==12){
+         }else if(obstime.time_of_day().hours()==0 || obstime.time_of_day().hours()==12){
             paramid=108;
             tr=1;
             return -1.0;
