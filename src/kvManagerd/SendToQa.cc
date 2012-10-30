@@ -176,8 +176,8 @@ PreProcessWorker::operator()()
 
   bool                      check_missing_data= false;
   const                     int PROC_MISSING_DATA_MINUTE= 30;
-  miutil::miTime            nowtime= miutil::miTime::nowTime();
-  miutil::miTime            runtime= nowtime;
+  boost::posix_time::ptime            nowtime= boost::posix_time::ptime::nowTime();
+  boost::posix_time::ptime            runtime= nowtime;
   runtime.addHour(-1);
 
   milog::LogContext logContext("Preprocess");

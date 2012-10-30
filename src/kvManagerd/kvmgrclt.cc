@@ -66,9 +66,9 @@ int main(int argc, char** argv)
 
 
 //	if(!gate.insert(kvWorkelement(180,
-//								  miTime("2005-12-16 06:00:00"), 
+//								  boost::posix_time::ptime("2005-12-16 06:00:00"),
 //								  330, 
-//								  miTime::nowTime(), 
+//								  boost::posix_time::ptime::nowTime(),
 //								  10,
 //								  undefTime,
 //				                  undefTime, 
@@ -80,7 +80,7 @@ int main(int argc, char** argv)
 //	    		"the table 'workque' in  the database!" << endl <<
 //	    		"[" << gate.getErrorStr() << "]" << endl;
 //	}else{
-//		app.sendSignalToManager(180, 330, miTime("2005-12-16 06:00:00"));
+//		app.sendSignalToManager(180, 330, boost::posix_time::ptime("2005-12-16 06:00:00"));
 //	}
 //	
 //	return 0;
@@ -98,9 +98,9 @@ int main(int argc, char** argv)
 	list<kvData>::iterator dit;	
 	ostringstream          ost;
 	
-	miTime startObst("2010-06-08 10:00:00");
-	miTime endObst("2010-06-09 08:00:00");
-	miTime obst(startObst);
+	boost::posix_time::ptime startObst = boost::posix_time::time_from_string("2010-06-08 10:00:00");
+	boost::posix_time::ptime endObst = boost::posix_time::time_from_string("2010-06-09 08:00:00");
+	boost::posix_time::ptime obst(startObst);
 	//endObst.addDay(1);
 	
 	cerr << "Obstime: " << obst << endl;
@@ -111,7 +111,7 @@ int main(int argc, char** argv)
 					
 		ost.str("");
 		ost << " where stationid=" << sit->stationID() << " AND "
-			<< "       obstime='" << obst.isoTime() << "'" 
+			<< "       obstime='" << to_simple_string(obst) << "'"
 			<< "       order by typeid";
 	
 		if(!gate.select(data, ost.str())){

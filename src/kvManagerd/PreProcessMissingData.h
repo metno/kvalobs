@@ -36,7 +36,6 @@
 #include <kvalobs/kvTypes.h>
 #include <kvalobs/kvObsPgm.h>
 #include <kvalobs/kvData.h>
-#include <puTools/miTime.h>
 #include "PreProcessJob.h"
 
 /**
@@ -63,7 +62,7 @@
  */
 class PreProcessMissingData : public PreProcessJob {
 protected:
-   miutil::miTime nextDbCheck;
+   boost::posix_time::ptime nextDbCheck;
    std::list<kvalobs::kvTypes> typeList;
    std::list<kvalobs::kvParam> paramList;
    dnmi::db::Connection        *con_;
@@ -114,7 +113,7 @@ public:
 
   void doJob(long                 stationId,
 	     long                 typeId,
-	     const miutil::miTime &obstime,
+	     const boost::posix_time::ptime &obstime,
 	     dnmi::db::Connection &con);
 
 };

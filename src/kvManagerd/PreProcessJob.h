@@ -31,7 +31,7 @@
 #ifndef __preprocessjob_h__
 #define __preprocessjob_h__
 
-#include <puTools/miTime.h>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <kvdb/kvdb.h>
 
 
@@ -46,7 +46,7 @@ public:
 
     virtual void doJob(long                 stationId,
 		       long                 typeId,
-		       const miutil::miTime &obstime,
+		       const boost::posix_time::ptime &obstime,
 		       dnmi::db::Connection &con)=0;
 };
 

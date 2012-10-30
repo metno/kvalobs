@@ -107,7 +107,7 @@ KvMgrCltApp::
 
 bool 
 KvMgrCltApp::
-sendSignalToManager(int sid, int tid, const miutil::miTime &obstime)
+sendSignalToManager(int sid, int tid, const boost::posix_time::ptime &obstime)
 {
 	using namespace CKvalObs::CManager;
 	
@@ -116,7 +116,7 @@ sendSignalToManager(int sid, int tid, const miutil::miTime &obstime)
 	
   	st.length(1);
 	st[0].stationId=sid;
-  	st[0].obstime=obstime.isoTime().c_str();
+  	st[0].obstime=to_simple_string(obstime).c_str();
   	st[0].typeId_=tid;
 	
 	

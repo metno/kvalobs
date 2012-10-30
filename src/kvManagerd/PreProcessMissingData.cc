@@ -56,9 +56,9 @@ bool
 PreProcessMissingData::
 loadParamsAndTypes()
 {
-   miutil::miTime now( miutil::miTime::nowTime() );
+   boost::posix_time::ptime now( boost::posix_time::microsec_clock::universal_time() );
 
-   if( ! nextDbCheck.undef() && now < nextDbCheck &&
+   if( ! nextDbCheck.is_not_a_date_time() && now < nextDbCheck &&
        !typeList.empty() && !paramList.empty() ) {
       return true;
    }
@@ -104,14 +104,14 @@ loadParamsAndTypes()
    }
 
    if( nOk == 2 ) {
-      now.addHour( 1 );
-      nextDbCheck = miutil::miTime( now.year(), now.month(), now.day(), now.hour(), 0, 0);
+      now += boost::posix_time::hours( 1 );
+      nextDbCheck = boost::posix_time::ptime( now.date(), boost::posix_time::time_duration(now.time_of_day().hours(), 0, 0));
    } else {
-      now.addMin( 5 );
+      now += boost::posix_time::minutes( 5 );
       nextDbCheck = now;
    }
 
-   LOGDEBUG( "PreProcessMissingData: Next loading of 'types' and 'params' table: " + nextDbCheck.isoTime() );
+   LOGDEBUG( "PreProcessMissingData: Next loading of 'types' and 'params' table: " + to_simple_string(nextDbCheck));
 
    return nOk == 2;
 }
@@ -243,7 +243,7 @@ removeFromList( const kvalobs::kvData &data,
 void
 PreProcessMissingData::doJob(long                 stationId, 
                              long                 typeId,
-                             const miutil::miTime &obstime,
+                             const boost::posix_time::ptime &obstime,
                              dnmi::db::Connection &con)
 {
    std::ostringstream ost;
@@ -277,7 +277,7 @@ PreProcessMissingData::doJob(long                 stationId,
       result = dbGate.select(datalist,
                              kvQueries::selectDataFromType(stationId,
                                                            typeId,
-                                                           to_ptime(obstime)));
+                                                           obstime));
    }
    catch(dnmi::db::SQLException &ex){
       LOGERROR("Exception: " << ex.what() << std::endl);
@@ -298,7 +298,7 @@ PreProcessMissingData::doJob(long                 stationId,
       result = dbGate.select( obspgmlist,
                               kvQueries::selectObsPgm(stationId,
                                                       typeId,
-                                                      to_ptime(obstime))
+                                                      obstime)
       );
    }
    catch(dnmi::db::SQLException &ex){
@@ -325,7 +325,7 @@ PreProcessMissingData::doJob(long                 stationId,
          continue;
 
       // check if this obspgm is active now..
-      if (!itop->isOn(to_ptime(obstime)))
+      if (!itop->isOn(obstime))
          continue;
 
       paramObsPgmCount++;
@@ -370,7 +370,7 @@ PreProcessMissingData::doJob(long                 stationId,
             }
 
             kvData data(stationId,
-                        to_ptime(obstime),
+                        obstime,
                         original,
                         paramid,
                         tbtime,

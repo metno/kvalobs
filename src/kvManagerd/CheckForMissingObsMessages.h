@@ -34,21 +34,20 @@
 #include "mgrApp.h"
 #include <dnmithread/CommandQue.h>
 #include <kvdb/kvdb.h>
-#include <puTools/miTime.h>
 
 
 class CheckForMissingObsMessages
 {
   	ManagerApp               &app;
   	dnmi::thread::CommandQue &outputQue;
-  	miutil::miTime           lastMissingRunTime_;
+  	boost::posix_time::ptime           lastMissingRunTime_;
 
-	void findMissingData(const miutil::miTime& runtime,
+	void findMissingData(const boost::posix_time::ptime& runtime,
 						   	dnmi::db::Connection *con);
 						   	
-   miutil::miTime lastMissingRuntime(dnmi::db::Connection *con);
+   boost::posix_time::ptime lastMissingRuntime(dnmi::db::Connection *con);
    void           lastMissingRuntime(dnmi::db::Connection *con, 
-                                      const miutil::miTime &newLastMissingRuntime);
+                                      const boost::posix_time::ptime &newLastMissingRuntime);
    
 public:
     CheckForMissingObsMessages(ManagerApp               &app,

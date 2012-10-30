@@ -35,7 +35,6 @@
 #include <stdio.h>
 #include <dnmithread/mtcout.h>
 #include <kvskel/datasource.hh>
-#include <puTools/miTime.h>
 #include <kvalobs/kvapp.h>
 
 using namespace CKvalObs::CDataSource;

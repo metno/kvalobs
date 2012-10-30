@@ -80,8 +80,8 @@ postCommandToQue(kvalobs::StationInfoCommand *cmd)
 
 bool 
 MissingObsCheck::
-checkObstime(const miutil::miTime &runTime, 
-                    miutil::miTime &obstime, 
+checkObstime(const boost::posix_time::ptime &runTime,
+                    boost::posix_time::ptime &obstime,
 	                    const long lateobsInMinute)
 {
 	int min=20;
@@ -90,13 +90,13 @@ checkObstime(const miutil::miTime &runTime,
 	h=lateobsInMinute/60;
 	m=lateobsInMinute%60;
 	
-	miutil::miTime checkTime=miutil::miTime(runTime.date(), 
-	                                        miutil::miClock(runTime.hour(), 0, 0));
+	boost::posix_time::ptime checkTime=boost::posix_time::ptime(runTime.date(),
+	                                        boost::posix_time::time_duration(runTime.time_of_day().hours(), 0, 0));
 	
-	checkTime.addHour(-1*h);
-	checkTime.addMin(m);
+	checkTime -= boost::posix_time::hours(h);
+	checkTime += boost::posix_time::minutes(m);
 	
-	obstime=miutil::miTime(checkTime.date(), miutil::miClock(checkTime.hour(), 0, 0));
+	obstime=boost::posix_time::ptime(checkTime.date(), boost::posix_time::time_duration(checkTime.time_of_day().hours(), 0, 0));
 	
 	return checkTime<runTime;
 }
@@ -120,17 +120,17 @@ MissingObsCheck::
 
 void 
 MissingObsCheck::
-findMissingData(const miutil::miTime& runtime,
-  	   	       const miutil::miTime& lastSearchForMissing)
+findMissingData(const boost::posix_time::ptime& runtime,
+  	   	       const boost::posix_time::ptime& lastSearchForMissing)
 {
 	//We send a StationInfoCommand for every
   	//MAX_STATIONS. Sin
   	const int MAX_STATIONS=10;
   	int   stationCount=0;
   	StationInfoCommand  *cmd=0;
-  	miutil::miTime searchUntilObstime(lastSearchForMissing);
-  	miutil::miTime obstime;
-  	miutil::miTime nowObstime(runtime.date(), miutil::miClock(runtime.hour(), 0, 0));
+  	boost::posix_time::ptime searchUntilObstime(lastSearchForMissing);
+  	boost::posix_time::ptime obstime;
+  	boost::posix_time::ptime nowObstime(runtime.date(), boost::posix_time::time_duration(runtime.time_of_day().hours(), 0, 0));
   	int            nTimes;
     
   	// init database connection
@@ -141,11 +141,14 @@ findMissingData(const miutil::miTime& runtime,
   	list<kvalobs::kvObsPgm> obspgmlist;
   	list<kvalobs::kvTypes>  typeslist;
 	
-	searchUntilObstime=miutil::miTime(lastSearchForMissing.date(),
-	                                  miutil::miClock(lastSearchForMissing.hour(), 0, 0));
+	searchUntilObstime=boost::posix_time::ptime(lastSearchForMissing.date(),
+	                                  boost::posix_time::time_duration(lastSearchForMissing.time_of_day().hours(), 0, 0));
 	
-	nTimes=miutil::miTime::hourDiff(nowObstime, searchUntilObstime);
 	
+
+	nTimes = (nowObstime - searchUntilObstime).total_seconds() / 3600;
+	//nTimes=boost::posix_time::ptime::hourDiff(nowObstime, searchUntilObstime);
+
 	LOGINFO("Start search: " << runtime << endl <<
 	        "Last search:  " << lastSearchForMissing << endl <<
 	        "obstime:      " << nowObstime << endl << 
@@ -164,7 +167,7 @@ findMissingData(const miutil::miTime& runtime,
   		  	
 	  	if(!checkObstime(runtime, obstime, itTypes->lateobs())){
 	  		//Adjust the obstime with one hour earlyer.
-	  		obstime.addHour(-1);
+	  		obstime -= boost::posix_time::hours(1);
 	  	}
   		
   		LOGINFO("Searching for typeid: " << itTypes->typeID() << " lateobs: " << itTypes->lateobs() << endl
@@ -174,7 +177,7 @@ findMissingData(const miutil::miTime& runtime,
   			obspgmlist.clear();
     		result=dbGate.select(obspgmlist,
 				 						kvQueries::selectObsPgmByTypeid(itTypes->typeID(),
-				 						                                to_ptime(obstime)));
+				 						                                obstime));
     
     		if(!result){
       		LOGERROR("SELECT: (obsPgm)" << dbGate.getErrorStr());
@@ -201,7 +204,7 @@ findMissingData(const miutil::miTime& runtime,
       			continue;
       		
       		// check if this obspgm is active now..
-      		if (!itop->isOn(to_ptime(obstime)))
+      		if (!itop->isOn(obstime))
 					continue;
       
       		// once per station and typeid
@@ -218,7 +221,7 @@ findMissingData(const miutil::miTime& runtime,
       		result = dbGate.select(datalist,
 			   	  						  kvQueries::selectDataFromType(sid,
 							   		  										  	  tid,
-							   		                                   to_ptime(obstime)));
+							   		                                   obstime));
 
       		if(!result){
 					LOGERROR("SELECT (data): " << dbGate.getErrorStr());
@@ -250,7 +253,7 @@ findMissingData(const miutil::miTime& runtime,
       		LOGINFO("Missing observation: stationid: " << sid << " typeid: " << 
 	      				tid << endl << "For obstime: " << obstime << endl);
 
-      		cmd->addStationInfo(kvStationInfo(sid, to_ptime(obstime), tid));
+      		cmd->addStationInfo(kvStationInfo(sid, obstime, tid));
       
       		stationCount++;
 
@@ -266,7 +269,7 @@ findMissingData(const miutil::miTime& runtime,
     		}
     
     		// step one hour back - and repeat
-    		obstime.addHour(-1);
+    		obstime -= boost::posix_time::hours(-1);
   		}
 	}
   
