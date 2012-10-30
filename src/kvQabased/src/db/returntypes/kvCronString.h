@@ -35,8 +35,8 @@
  at Wed May 14 17:12:03 2003 */
 
 #include <string>
-#include <puTools/miTime.h>
 #include <vector>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace kvalobs
 {
@@ -62,7 +62,7 @@ namespace kvalobs
  *   0 3 15 6 2004 : exactly 3 AM on 15th June 2004
  * </code>
  *
- * Use active(miTime) to check if a particular time gives a match with the cronstring
+ * Use active(boost::posix_time::ptime) to check if a particular time gives a match with the cronstring
  *
  * \ingroup group_db
  */
@@ -128,7 +128,7 @@ public:
 	 *
 	 * @return True if time matches the cron time specification.
 	 */
-	bool active(const miutil::miTime& t);
+	bool active(const boost::posix_time::ptime& t);
 
 };
 

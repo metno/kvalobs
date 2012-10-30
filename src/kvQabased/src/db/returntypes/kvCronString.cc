@@ -33,7 +33,6 @@
 #include <boost/lexical_cast.hpp>
 
 using namespace std;
-using namespace miutil;
 using namespace kvalobs;
 
 kvalobs::CronString::CronString(const std::string& str)
@@ -95,7 +94,7 @@ kvalobs::CronString::str(const std::string& str)
 }
 
 bool
-kvalobs::CronString::active(const miutil::miTime& t)
+kvalobs::CronString::active(const boost::posix_time::ptime& t)
 {
   if (isempty) return true;
 
@@ -103,11 +102,11 @@ kvalobs::CronString::active(const miutil::miTime& t)
 
   int thistime[5];
 
-  thistime[0]= t.min();
-  thistime[1]= t.hour();
-  thistime[2]= t.day();
-  thistime[3]= t.month();
-  thistime[4]= t.year();
+  thistime[0]= t.time_of_day().minutes();
+  thistime[1]= t.time_of_day().hours();
+  thistime[2]= t.date().day();
+  thistime[3]= t.date().month();
+  thistime[4]= t.date().year();
 
   // check backwards (year,month,day,hour,minute)
   // note that using NT<5 enables skipping year,month,...

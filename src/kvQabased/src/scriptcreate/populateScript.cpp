@@ -30,7 +30,6 @@
 #include "populateScript.h"
 #include <scriptrunner/Script.h>
 #include <boost/lexical_cast.hpp>
-#include <puTools/miTime.h>
 #include <vector>
 #include <algorithm>
 
@@ -52,7 +51,8 @@ void addObsDataToScript(scriptrunner::Script & script, const DataStore::Paramete
 	std::vector<float> timeoffset;
 	const DataStore::DataList & dl = obsdata.begin()->second;
 	for ( DataStore::DataList::const_iterator it = dl.begin(); it != dl.end(); ++ it )
-		timeoffset.push_back(miutil::miTime::minDiff(it->obstime(), dl.front().obstime()));
+		timeoffset.push_back((it->obstime() - dl.front().obstime()).total_seconds() / 60);
+
 	std::size_t numtimes = timeoffset.size();
 
 	for ( DataStore::ParameterSortedDataList::const_iterator param = obsdata.begin(); param != obsdata.end(); ++ param )
@@ -96,7 +96,7 @@ void addRefObsDataToScript(scriptrunner::Script & script, const DataStore::Param
 		std::vector<float> timeoffset;
 		const DataStore::RefDataList & dl = refobsdata.begin()->second;
 		for ( DataStore::RefDataList::const_iterator it = dl.begin(); it != dl.end(); ++ it )
-			timeoffset.push_back(miutil::miTime::minDiff(it->obstime(), dl.front().obstime()));
+			timeoffset.push_back((it->obstime() - dl.front().obstime()).total_seconds() / 60);
 		std::size_t numtimes = timeoffset.size();
 
 		for ( DataStore::ParameterSortedRefDataList::const_iterator param = refobsdata.begin(); param != refobsdata.end(); ++ param )
@@ -138,7 +138,7 @@ void addModelDataToScript(scriptrunner::Script & script, const DataStore::Parame
 		std::vector<float> timeoffset;
 		const DataStore::ModelDataList & dl = modeldata.begin()->second;
 		for ( DataStore::ModelDataList::const_iterator it = dl.begin(); it != dl.end(); ++ it )
-			timeoffset.push_back(miutil::miTime::minDiff(it->obstime(), dl.front().obstime()));
+			timeoffset.push_back((it->obstime() - dl.front().obstime()).total_seconds() / 60);
 		std::size_t numtimes = timeoffset.size();
 
 		for ( DataStore::ParameterSortedModelDataList::const_iterator param = modeldata.begin(); param != modeldata.end(); ++ param )
@@ -201,13 +201,13 @@ void addDataToScript(scriptrunner::Script & script, const DataStore & dataStore)
 	input.add("station_longitude", station.lon());
 
 	float time[6];
-	miutil::miTime t = dataStore.observation().obstime();
-	time[0] = t.year();
-	time[1] = t.month();
-	time[2] = t.day();
-	time[3] = t.hour();
-	time[4] = t.min();
-	time[5] = t.sec();
+	boost::posix_time::ptime t = dataStore.observation().obstime();
+	time[0] = t.date().year();
+	time[1] = t.date().month();
+	time[2] = t.date().day();
+	time[3] = t.time_of_day().hours();
+	time[4] = t.time_of_day().minutes();
+	time[5] = t.time_of_day().seconds();
 	input.add("obstime", time, time + 6);
 
 	script.addInput(input);

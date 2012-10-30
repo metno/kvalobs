@@ -32,14 +32,17 @@
 
 using kvalobs::CronString;
 
+using namespace boost::posix_time;
+using namespace boost::gregorian;
+
 TEST(kvCronStringTest, fiveStarsMatchAnything)
 {
 	CronString cs("* * * * *");
 
-	for ( miutil::miTime t("2010-04-22 00:00:00"); t < "2010-04-23 00:00:00"; t.addHour() )
+	for ( ptime t = time_from_string("2010-04-22 00:00:00"); t < time_from_string("2010-04-23 00:00:00"); t += hours(1) )
 		EXPECT_TRUE(cs.active(t)) << t;
 
-	for ( miutil::miTime t("2010-04-01 00:00:00"); t < "2010-05-01 00:00:00"; t.addDay() )
+	for ( ptime t = time_from_string("2010-04-01 00:00:00"); t < time_from_string("2010-05-01 00:00:00"); t += days(1) )
 		EXPECT_TRUE(cs.active(t)) << t;
 }
 
@@ -47,21 +50,21 @@ TEST(kvCronStringTest, specificHour)
 {
 	CronString cs("* 6 * * *");
 
-	for ( miutil::miTime t("2010-04-22 07:00:00"); t < "2010-04-23 06:00:00"; t.addHour() )
+	for ( ptime t = time_from_string("2010-04-22 07:00:00"); t < time_from_string("2010-04-23 06:00:00"); t += hours(1) )
 		EXPECT_FALSE(cs.active(t)) << t;
 
-	EXPECT_TRUE(cs.active("2010-04-22 06:00:00"));
+	EXPECT_TRUE(cs.active(time_from_string("2010-04-22 06:00:00")));
 }
 
 TEST(kvCronStringTest, multipleHours)
 {
 	CronString cs("* 6,18 * * *");
 
-	for ( miutil::miTime t("2010-04-22 07:00:00"); t < "2010-04-22 18:00:00"; t.addHour() )
+	for ( ptime t = time_from_string("2010-04-22 07:00:00"); t <  time_from_string("2010-04-22 18:00:00"); t += hours(1) )
 		EXPECT_FALSE(cs.active(t)) << t;
-	for ( miutil::miTime t("2010-04-22 19:00:00"); t < "2010-04-23 06:00:00"; t.addHour() )
+	for ( ptime t = time_from_string("2010-04-22 19:00:00"); t < time_from_string("2010-04-23 06:00:00"); t += hours(1) )
 		EXPECT_FALSE(cs.active(t)) << t;
 
-	EXPECT_TRUE(cs.active("2010-04-22 06:00:00"));
-	EXPECT_TRUE(cs.active("2010-04-22 18:00:00"));
+	EXPECT_TRUE(cs.active(time_from_string("2010-04-22 06:00:00")));
+	EXPECT_TRUE(cs.active(time_from_string("2010-04-22 18:00:00")));
 }

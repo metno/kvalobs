@@ -38,7 +38,6 @@
 #include <db/KvalobsDatabaseAccess.h>
 #include <sstream>
 #include <kvalobs/kvDbGate.h>
-#include <puTools/miTime.h>
 #include <boost/regex.hpp>
 #include <memory>
 #include <stdexcept>
@@ -175,7 +174,7 @@ void QaWork::doWork(const kvalobs::kvStationInfo & params,
 {
 	retList.push_back(params);
 
-	LOGDEBUG( "QaWork::doWork at:" << miutil::miTime::nowTime() << "  Processing " << params );
+	LOGDEBUG( "QaWork::doWork at:" << boost::posix_time::microsec_clock::universal_time() << "  Processing " << params );
 
 	db::KvalobsDatabaseAccess db(& con, false);
 	qabase::CheckRunner checkRunner(db);

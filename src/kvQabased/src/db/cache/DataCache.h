@@ -30,7 +30,6 @@
 #ifndef KVDATACACHE_H_
 #define KVDATACACHE_H_
 
-#include <puTools/miTime.h>
 #include <db/DatabaseAccess.h>
 #include <kvalobs/kvStationInfo.h>
 #include <boost/noncopyable.hpp>
@@ -65,8 +64,8 @@ public:
 		if ( cache.timeOffset > minuteOffset)
 			return false;
 
-		miutil::miTime earliestWantedObsTime = si_.obstime();
-		earliestWantedObsTime.addMin(minuteOffset);
+		boost::posix_time::ptime earliestWantedObsTime = si_.obstime();
+		earliestWantedObsTime += boost::posix_time::minutes(minuteOffset);
 
 		for ( typename DataList::const_iterator it = cache.data.begin(); it != cache.data.end(); ++ it )
 			if ( it->obstime() >= earliestWantedObsTime)
