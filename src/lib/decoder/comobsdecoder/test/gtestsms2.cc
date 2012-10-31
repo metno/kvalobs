@@ -38,6 +38,7 @@
 #include <fileutil/readfile.h>
 #include <fileutil/dir.h>
 #include <fileutil/file.h>
+#include <miutil/timeconvert.h>
 #include <dbdrivers/dummysqldb.h>
 #include "../smsdata.h"
 #include "../sms2.h"
@@ -105,7 +106,7 @@ protected:
    {
       for( std::list<kvalobs::kvData>::const_iterator it=data.data().begin();
             it != data.data().end(); ++it ){
-         if( it->obstime()==obstime && it->paramID()==paramid &&
+         if( to_miTime(it->obstime())==obstime && it->paramID()==paramid &&
                it->sensor() == sensor && it->level() == level )
             return it->original();
       }

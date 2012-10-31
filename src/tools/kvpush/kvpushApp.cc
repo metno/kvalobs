@@ -39,6 +39,7 @@
 #include <miconfparser/confparser.h>
 #include <kvskel/managerInput.hh>
 #include <miutil/commastring.h>
+#include <miutil/timeconvert.h>
 #include <sstream>
 #include <string>
 #include <kvalobs/kvPath.h>

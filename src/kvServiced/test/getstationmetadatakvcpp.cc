@@ -85,11 +85,11 @@ main(int argn, char **argv)
 	   }
 
 	   for( std::list<kvalobs::kvStationMetadata>::iterator it = stMeta.begin(); it != stMeta.end(); ++it ) {
-	      miutil::miTime totime=it->totime();
+	      const boost::posix_time::ptime & totime = it->totime();
 
 	      cerr << it->stationID() << "," << it->typeID() << "," << it->paramID() << "," << it->sensor() << "," << it->level()
 	           << "," << it->name() << "," << it->metadata() << "," << it->fromtime() << ","
-	           << (totime.undef()?"(NULL)":totime.isoTime()) << ",'" << it->metadataDescription()<< "'"
+	           << (totime.is_not_a_date_time()?"(NULL)":to_simple_string(totime)) << ",'" << it->metadataDescription()<< "'"
 	           << "," << "SpecificLevel: "<< (it->haveSpecificLevel()?"true":"false")
 	           << "," << "SpecificType: "<< (it->haveSpecificType()?"true":"false")
 	           << "," << "SpecificParam: "<< (it->haveSpecificParam()?"true":"false")

@@ -35,6 +35,7 @@
 #include <boost/lexical_cast.hpp>
 #include <miutil/commastring.h>
 #include <miutil/trimstr.h>
+#include <miutil/timeconvert.h>
 #include <milog/milog.h>
 #include "convert.h"
 #include "autoobsdecoder.h"
@@ -78,8 +79,8 @@ getMetaSaSdEmEi( int stationid, int typeid_, const boost::posix_time::ptime &obs
 {
    string saSdEmEi="0000";
    
-   if( obsPgm.obstime.undef() || obsPgm.obstime != obstime ){
-      if( ! loadObsPgmParamInfo( stationid, typeid_, obstime, obsPgm ) ){
+   if( obsPgm.obstime.undef() || obsPgm.obstime != to_miTime(obstime) ){
+      if( ! loadObsPgmParamInfo( stationid, typeid_, to_miTime(obstime), obsPgm ) ){
          IDLOGDEBUG( logid, "DBERROR: SaSdEm:  000");
          return saSdEmEi;
       }
@@ -88,25 +89,25 @@ getMetaSaSdEmEi( int stationid, int typeid_, const boost::posix_time::ptime &obs
    kvalobs::decoder::Active state;
    
    //SA
-   if( obsPgm.isActive( stationid, typeid_, 112, 0, 0, obstime, state ) ) {
+   if( obsPgm.isActive( stationid, typeid_, 112, 0, 0, to_miTime(obstime), state ) ) {
       if( state == kvalobs::decoder::YES )
          saSdEmEi[0]='1';
    }
 
    //SD
-   if( obsPgm.isActive( stationid, typeid_, 18, 0, 0, obstime, state ) ) {
+   if( obsPgm.isActive( stationid, typeid_, 18, 0, 0, to_miTime(obstime), state ) ) {
          if( state == kvalobs::decoder::YES )
             saSdEmEi[1]='1';
    }
    
    //Em
-   if( obsPgm.isActive( stationid, typeid_, 7, 0, 0, obstime, state ) ) {
+   if( obsPgm.isActive( stationid, typeid_, 7, 0, 0, to_miTime(obstime), state ) ) {
       if( state == kvalobs::decoder::YES )
          saSdEmEi[2]='1';
    }
 
    //Ei (E)
-   if( obsPgm.isActive( stationid, typeid_, 129, 0, 0, obstime, state ) ) {
+   if( obsPgm.isActive( stationid, typeid_, 129, 0, 0, to_miTime(obstime), state ) ) {
       if( state == kvalobs::decoder::YES )
          saSdEmEi[3]='1';
    }
@@ -487,10 +488,10 @@ execute(std::string &msg)
 	  
 	  				if(isTextParam(findParamIdInList(paramList, elems[k].id()))){
 	    				kvTextData d(stationid,
-			 							 to_ptime(obstime),
+			 							 obstime,
 			 							 elems[k].sVal(),
 			 							 elems[k].id(),
-			 							to_ptime(tbtime),
+			 							tbtime,
 			 							 useTypeid);
 	    
 	    				logs << " (TEXTDATA)" << endl;
@@ -498,10 +499,10 @@ execute(std::string &msg)
 
 	  				}else	if(elems[k].fVal(fval)){
 	      			kvData d(stationid, 
-	      					to_ptime(obstime),
+	      					obstime,
 		       					fval, 
 		       					elems[k].id(), 
-		       					to_ptime(tbtime),
+		       					tbtime,
 		       					useTypeid,
 		       					elems[k].sensorno(),
 		       					elems[k].height(), 
@@ -539,10 +540,10 @@ execute(std::string &msg)
       	if(rr!=FLT_MAX && paramid>0){
 				try{
 	  				kvData d(stationid, 
-	  						to_ptime(obstime),
+	  						obstime,
 		   					rr, 
 		   					paramid, 
-		   					to_ptime(tbtime),
+		   					tbtime,
 		   					useTypeid,
 		   					0,
 		   					0, 
@@ -558,10 +559,10 @@ execute(std::string &msg)
 
 	      		paramid=12; //ITR
 	      		kvData dd(stationid, 
-	      				to_ptime(obstime),
+	      				obstime,
 								 RRRtr.tr, 
 								 paramid,
-								 to_ptime(tbtime),
+								 tbtime,
 								 useTypeid,
 								 0,
 								 0, 
@@ -591,8 +592,8 @@ execute(std::string &msg)
       if( converter.hasSaSdEmEi( saSdEm ) ) {
          //Create a template to use
          //to hold all common parameters for SA, SD and EM.
-         kvData saSdEmTmp(stationid, to_ptime(obstime),
-                          -32767 /*original*/, 0  /*paramid*/, to_ptime(tbtime),
+         kvData saSdEmTmp(stationid, obstime,
+                          -32767 /*original*/, 0  /*paramid*/, tbtime,
                           useTypeid, 0 /*sensor*/, 0 /*level*/, 
                           -32767 /*corected*/, kvControlInfo(), kvUseInfo(), "");
 			      
@@ -621,7 +622,7 @@ execute(std::string &msg)
 		   
      	}
 
-		if( addDataToDb( obstime, stationid, typeidWithSave, dataList, textDataList, priority, logid ) ) {
+		if( addDataToDb( to_miTime(obstime), stationid, typeidWithSave, dataList, textDataList, priority, logid ) ) {
 		   count += dataList.size() + textDataList.size();
 		}
   	}

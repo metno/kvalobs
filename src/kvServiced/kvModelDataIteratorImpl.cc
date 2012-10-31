@@ -77,7 +77,7 @@ ModelDataIteratorImpl::next(CKvalObs::CService::ModelDataList_out modelDataList)
 {
 	list<kvModelData>           dataList;
 	list<kvModelData>::iterator it;
-	miutil::miTime         thisTime;
+	boost::posix_time::ptime thisTime;
 	CORBA::Long            obsi=0;
 	CORBA::Long            datai=0;
 	char                   *sTmp;

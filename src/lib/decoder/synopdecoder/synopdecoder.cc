@@ -34,6 +34,7 @@
 #include <boost/lexical_cast.hpp>
 #include <puTools/miTime.h>
 #include <miutil/commastring.h>
+#include <miutil/timeconvert.h>
 #include <milog/milog.h>
 #include <kvalobs/kvDbGate.h>
 #include <kvalobs/kvQueries.h>
@@ -128,7 +129,7 @@ SynopDecoder::saveData(list<kvalobs::kvData> &data,
    int ret=true;
    it=data.begin();
 
-   if( !addDataToDb( it->obstime(), it->stationID(), it->typeID(), data, textData, priority, logid.str() ) ) {
+   if( !addDataToDb( to_miTime(it->obstime()), it->stationID(), it->typeID(), data, textData, priority, logid.str() ) ) {
       ret = false;
    }
 
@@ -229,7 +230,7 @@ SynopDecoder::execute( std::string &msg)
    writeObsToLog(obs);
 
    if(lastStationCheck.undef() ||
-         abs(miTime::hourDiff(lastStationCheck, nowTime))>3){
+         abs(miTime::hourDiff(lastStationCheck, to_miTime(nowTime)))>3){
       LOGINFO("Initialize the station information from the database.");
 
       if(!initializeKvSynopDecoder()){

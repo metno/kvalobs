@@ -15,6 +15,7 @@ getdata_LDADD = \
 	$(top_builddir)/src/lib/kvalobs/libkvalobs2_kvalobs.la \
 	$(top_builddir)/src/lib/kvskel/libkvalobs2_kvskel.la \
 	$(putools_LIBS) \
+	$(BOOST_DATE_TIME_LIB) \
         $(omniORB4_LIBS) -lm
 
 getstationmetadata_SOURCES=getstationmetadata.cc
@@ -27,6 +28,7 @@ getstationmetadata_LDADD = \
 	$(top_builddir)/src/lib/miutil/libkvalobs2_miutil.la \
 	$(top_builddir)/src/lib/kvdb/libkvalobs2_kvdb.la \
 	$(putools_LIBS) \
+	$(BOOST_DATE_TIME_LIB) \
         $(omniORB4_LIBS) -lm
 
 getstationmetadatakvcpp_SOURCES=getstationmetadatakvcpp.cc
@@ -38,6 +40,7 @@ getstationmetadatakvcpp_LDADD = \
 	$(top_builddir)/src/lib/kvskel/libkvalobs2_kvskel.la \
 	$(top_builddir)/src/lib/miconfparser/libkvalobs2_miconfparser.la \
 	$(putools_LIBS)\
+	$(BOOST_DATE_TIME_LIB) \
         $(omniORB4_LIBS) -lm
 
 getworkstatistik_SOURCES=getworkstatistik.cc

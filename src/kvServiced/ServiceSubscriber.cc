@@ -34,6 +34,7 @@
 #include <cstring>
 #include <kvalobs/kvDbGate.h>
 #include <kvalobs/kvWorkelement.h>
+#include <miutil/timeconvert.h>
 #include <milog/milog.h>
 #include "ServiceSubscriber.h"
 
@@ -206,7 +207,7 @@ callDataNotifySubscribers(const kvalobs::kvStationInfoExt &si,
    if(!gate.select(dataList,
                    kvQueries::selectDataFromType(si.stationID(),
                                                  si.typeID(),
-                                                 to_ptime(si.obstime())))){
+                                                 si.obstime()))){
       if( logid.empty() ) {
          LOGWARN( "NODATA (notifysub) source <?>: stationid: " << si.stationID() << " typeid: " << si.typeID() << " obstime: " << si.obstime() );
       } else {

@@ -33,6 +33,7 @@
 #include <milog/milog.h>
 #include <puTools/miTime.h>
 #include <miutil/trimstr.h>
+#include <miutil/timeconvert.h>
 #include <kvalobs/kvDbGate.h>
 #include <decoder/decoderbase/DataUpdateTransaction.h>
 #include "smsmeldingparser.h"

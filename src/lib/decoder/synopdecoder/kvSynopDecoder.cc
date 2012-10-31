@@ -29,6 +29,7 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include <boost/lexical_cast.hpp>
+#include <miutil/timeconvert.h>
 #include "kvSynopDecoder.h"
 #include "synopLexer.h"
 
@@ -117,7 +118,7 @@ bool kvSynopDecoder::initialise(const list<kvStation>& kpos, int earlyobs, int l
       stat = itr->stationID();
       call = itr->call_sign();
       syno = itr->wmonr();
-      from = itr->fromtime();
+      from = to_miTime(itr->fromtime());
 
       if(from > now ) // station is not active yet!
          continue;
@@ -312,7 +313,7 @@ bool kvSynopDecoder::decode(const std::string &raw, list<kvData>&   data)
 
                d.set(pos, to_ptime(obt), itr->second, itr->first, tbt, typeID,0);
                /// set useifo (7) not for ship!!!
-               d.useinfo(7, ( typeID == 11 ? 0 : checkObservationTime(tbt,obt)) );
+               d.useinfo(7, ( typeID == 11 ? 0 : checkObservationTime(to_miTime(tbt),obt)) );
                data.push_back(d);
             }
          }

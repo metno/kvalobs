@@ -39,6 +39,7 @@
 #include <kvalobs/kvQueries.h>
 #include <kvalobs/kvTypes.h>
 #include <miutil/trimstr.h>
+#include <miutil/timeconvert.h>
 #include "kldecoder.h"
 #include <decodeutility/decodeutility.h>
 

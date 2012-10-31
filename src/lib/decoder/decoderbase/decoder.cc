@@ -40,6 +40,7 @@
 #include <kvalobs/kvPath.h>
 #include <miutil/commastring.h>
 #include <miutil/trimstr.h>
+#include <miutil/timeconvert.h>
 #include "decoder.h"
 #include "ConfParser.h"
 #include "metadata.h"
@@ -281,7 +282,7 @@ addStationInfo(long stationid,
 
    for(;it!=stationInfoList.end(); it++){
       if(it->stationID()==stationid &&
-            it->obstime()==obstime     &&
+            it->obstime()==to_ptime(obstime)     &&
             it->typeID()==typeid_){
 
          return;
@@ -478,9 +479,9 @@ putKvDataInDb(const kvalobs::kvData &sd_,
 
 
    addStationInfo(sd.stationID(),
-                  sd.obstime(),
+		   to_miTime(sd.obstime()),
                   sd.typeID(),
-                  sd.tbtime(),
+                  to_miTime(sd.tbtime()),
                   priority);
 
    return true;
@@ -508,8 +509,8 @@ putKvDataInDb(const std::list<kvalobs::kvData> &sd_,
 
    sid=it->stationID();
    tid=it->typeID();
-   obsTime=it->obstime();
-   tbTime=it->tbtime();
+   obsTime=to_miTime(it->obstime());
+   tbTime=to_miTime(it->tbtime());
    myTid=tid;
 
    try{
@@ -529,14 +530,14 @@ putKvDataInDb(const std::list<kvalobs::kvData> &sd_,
    while(it!=sd.end()){
       if(sid!=it->stationID() ||
             tid!=it->typeID() ||
-            obsTime!=it->obstime()){
+            obsTime!=to_miTime(it->obstime())){
 
          addStationInfo(sid,obsTime, myTid, tbTime, priority);
 
          sid=it->stationID();
          tid=it->typeID();
-         obsTime=it->obstime();
-         tbTime=it->tbtime();
+         obsTime=to_miTime(it->obstime());
+         tbTime=to_miTime(it->tbtime());
          myTid=tid;
 
          try{
@@ -632,9 +633,9 @@ putkvTextDataInDb(const kvalobs::kvTextData &td_, int priority)
    }
 
    addStationInfo(td.stationID(),
-                  td.obstime(),
+		   to_miTime(td.obstime()),
                   td.typeID(),
-                  td.tbtime(),
+                  to_miTime(td.tbtime()),
                   priority);
 
    return true;
@@ -663,7 +664,7 @@ putkvTextDataInDb(const std::list<kvalobs::kvTextData> &td_, int priority)
       if(sid==-1 ||
             sid!=it->stationID() ||
             tid!=it->typeID() ||
-            obsTime!=it->obstime()){
+            obsTime!=to_miTime(it->obstime())){
 
          if(sid!=-1){
             addStationInfo(sid, obsTime, tid, tbTime, priority);
@@ -671,8 +672,8 @@ putkvTextDataInDb(const std::list<kvalobs::kvTextData> &td_, int priority)
 
          sid=it->stationID();
          tid=it->typeID();
-         obsTime=it->obstime();
-         tbTime=it->tbtime();
+         obsTime=to_miTime(it->obstime());
+         tbTime=to_miTime(it->tbtime());
          myTid=tid;
 
          try{

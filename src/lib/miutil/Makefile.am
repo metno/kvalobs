@@ -15,7 +15,8 @@ libkvalobs2_miutil_la_SOURCES = \
 	base64.h base64.cc \
 	splitstr.h splitstr.cc \
 	gettimeofday.h gettimeofday.cc \
-	msleep.h msleep.cc
+	msleep.h msleep.cc \
+	timeconvert.h
 
 libkvalobs2_miutil_la_CPPFLAGS = $(putools_CFLAGS)
 libkvalobs2_miutil_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@ $(putools_LIBS)
@@ -24,7 +25,7 @@ libkvalobs2_miutil_la_LIBADD = $(putools_LIBS)
 miutilincludedir = $(pkgincludedir)/miutil
 miutilinclude_HEADERS = msleep.h replace.h cmprspace.h commastring.h \
                         miTimeParse.h trimstr.h base64.h gettimeofday.h \
-                        splitstr.h
+                        splitstr.h timeconvert.h
 
 
 TESTS = libmiutiltest
