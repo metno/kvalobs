@@ -106,7 +106,7 @@ addStationInfo( dnmi::db::Connection *con,
    boost::posix_time::ptime undefTime;
 
    q << "DELETE FROM workque WHERE stationid=" << stationID << " AND "
-     << "typeid=" << typeID << " AND obstime='" << obsTime << "'";
+     << "typeid=" << typeID << " AND obstime='" << to_kvalobs_string(obsTime) << "'";
 
    try {
       con->exec( q.str() );
@@ -468,7 +468,7 @@ getData( dnmi::db::Connection *con,
 
    q << "SELECT * FROM data WHERE stationid=" << stationid << " AND "
        << "typeid=" << typeid_ << " AND "
-       << "obstime='" << obstime << "'";
+       << "obstime='" << to_kvalobs_string(obstime) << "'";
 
    auto_ptr<dnmi::db::Result> res;
 
@@ -516,7 +516,7 @@ getData( dnmi::db::Connection *con,
    q.str("");
    q << "SELECT * FROM text_data WHERE stationid=" << stationid << " AND "
      << "typeid=" << typeid_ << " AND "
-     << "obstime='" << obstime << "'";
+     << "obstime='" << to_kvalobs_string(obstime) << "'";
 
    try{
       dbRes = con->execQuery( q.str() );
@@ -807,7 +807,7 @@ replaceData( dnmi::db::Connection *conection,
       tbtime = it->tbtime();
       q << "SELECT * FROM data WHERE stationid=" << it->stationID()
         << " AND abs(typeid)=" << it->typeID()
-        << " AND (obstime='" << obstime << "' OR tbtime='" << to_kvalobs_string(tbtime) << "')";
+        << " AND (obstime='" << to_kvalobs_string(obstime) << "' OR tbtime='" << to_kvalobs_string(tbtime) << "')";
 
       addQuery( qDataList, q.str() );
    }
@@ -818,7 +818,7 @@ replaceData( dnmi::db::Connection *conection,
       tbtime = it->tbtime();
       q << "SELECT * FROM text_data WHERE stationid=" << it->stationID()
         << " AND abs(typeid)=" << it->typeID()
-        << " AND (obstime='" << obstime << "' OR tbtime='" << to_kvalobs_string(tbtime) << "')";
+        << " AND (obstime='" << to_kvalobs_string(obstime) << "' OR tbtime='" << to_kvalobs_string(tbtime) << "')";
 
       addQuery( qTextDataList, q.str() );
    }

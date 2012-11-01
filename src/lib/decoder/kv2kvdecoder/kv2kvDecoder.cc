@@ -37,6 +37,7 @@
 #include <decoderbase/decoder.h>
 #include <puTools/miTime.h>
 #include <milog/milog.h>
+#include <miutil/timeconvert.h>
 #include <kvdb/transactionhelper.h>
 #include <memory>
 #include <cstdio>
@@ -196,7 +197,7 @@ void kv2kvDecoder::save(const list<kvData> & dl, const list<kvTextData> & tdl)
             ostringstream ss;
             ss << "update text_data set original=\'" << it->original()
 						      << '\'' << " where stationid=" << it->stationID()
-						      << " and obstime=\'" << it->obstime() << '\''
+						      << " and obstime=\'" << to_kvalobs_string(it->obstime()) << '\''
 						      << " and paramid=" << it->paramID() << " and typeid="
 						      << it->typeID();
             try

@@ -114,8 +114,6 @@ TEST_F(CheckRunnerTest, resetsFlagsBeforeCheck)
 	ui.setUseFlags(expectedData.controlinfo());
 	expectedData.useinfo(ui);
 
-	std::cout << expectedData.tbtime() << " <-> " << returnFromScript.tbtime() << std::endl;
-
 	EXPECT_TRUE(kvalobs::compare::exactly_equal()(expectedData, returnFromScript));
 
 	EXPECT_EQ(expectedData.controlinfo(), returnFromScript.controlinfo());

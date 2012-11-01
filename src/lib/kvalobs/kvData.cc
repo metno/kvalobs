@@ -238,8 +238,8 @@ std::string kvalobs::kvData::toUpload() const
 {
 	ostringstream ost;
 
-	ost << stationid_ << "," << obstime_ << "," << original_ << "," << paramid_
-			<< "," << tbtime_ << "," << typeid_ << "," << sensor_ << ","
+	ost << stationid_ << "," << to_kvalobs_string(obstime_) << "," << original_ << "," << paramid_
+			<< "," << to_kvalobs_string(tbtime_) << "," << typeid_ << "," << sensor_ << ","
 			<< level_ << "," << corrected_ << "," << controlinfo_.flagstring()
 			<< "," << useinfo_.flagstring() << "," << cfailed_;
 

@@ -88,8 +88,8 @@ subscribeSetup()
    boost::posix_time::ptime toTime = boost::posix_time::second_clock::universal_time();
    boost::posix_time::ptime fromTime = lastFromTime( m_fileFromTime );
 
-   cout << "toTime= " << toTime << endl;
-   cout << "fromTime= " << fromTime << endl;
+   cout << "toTime= " << to_kvalobs_string(toTime) << endl;
+   cout << "fromTime= " << to_kvalobs_string(fromTime) << endl;
 
    kvservice::WhichDataHelper whichData;
   
@@ -250,8 +250,8 @@ printObsDataList( KvObsDataList& dataList )
               it != dit->dataList().end();
               it++){
             char c= it->sensor();
-            fout << it->stationID() << "|" << it->obstime() << "|" << it->original() 
-                 << "|" << it->paramID()<< "|" <<  it->tbtime() << "|" 
+            fout << it->stationID() << "|" << to_kvalobs_string(it->obstime()) << "|" << it->original()
+                 << "|" << it->paramID()<< "|" <<  to_kvalobs_string(it->tbtime()) << "|"
                  << it->typeID() << "|" << c << "|" << it->level() << "|" 
                  << it->corrected() << "|" << it->controlinfo().flagstring() 
                  << "|" << it->useinfo().flagstring() << "|" << it->cfailed() 
@@ -279,8 +279,8 @@ printObsDataList( KvObsDataList& dataList )
          for( ;
               i !=dit->textDataList().end();
               i ++){
-            tfout << i->stationID() << "|" << i->obstime() << "|" << i->original() 
-                  << "|" << i->paramID()<< "|" <<  i->tbtime() << "|" 
+            tfout << i->stationID() << "|" << to_kvalobs_string(i->obstime()) << "|" << i->original()
+                  << "|" << i->paramID()<< "|" <<  to_kvalobs_string(i->tbtime()) << "|"
                   << i->typeID() << endl;
          }
       }

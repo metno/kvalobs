@@ -33,6 +33,7 @@
 #include <map>
 #include <set>
 #include <iostream>
+#include <miutil/timeconvert.h>
 #include <boost/algorithm/string.hpp>
 #include <kvcpp/kvevents.h>
 #include "DataHelper.h"
@@ -289,7 +290,7 @@ klData( std::string &data, std::string &decoder,
       nParams = 0;
       for( Params::iterator pit = header.begin(); pit != header.end(); ++pit ) {
          if( nParams == 0 )
-            ost << *it;
+            ost << to_kvalobs_string(*it);
 
          ost << ",";
 
@@ -335,7 +336,7 @@ operator<<( std::ostream &out, const ObsData &od)
    out << "(";
    for( ObsData::DataList::const_iterator dit=od.data.begin();
         dit != od.data.end(); ++dit ) {
-      out << dit->first;
+      out << to_kvalobs_string(dit->first);
       for(std::map<Param, float>::const_iterator pit=dit->second.begin();
             pit != dit->second.end(); ++pit ) {
          out << ","<<pit->first << ":"<<pit->second;
@@ -346,7 +347,7 @@ operator<<( std::ostream &out, const ObsData &od)
    out << "(";
    for( ObsData::TextDataList::const_iterator dit=od.textData.begin();
          dit != od.textData.end(); ++dit ) {
-      out << dit->first;
+      out << to_kvalobs_string(dit->first);
       for(std::map<Param, string>::const_iterator pit=dit->second.begin();
             pit != dit->second.end(); ++pit ) {
          out << ","<<pit->first << ":"<<pit->second;

@@ -32,6 +32,7 @@
 #include <kvalobs/kvDataFlag.h>
 #include <kvalobs/kvexception.h>
 #include <miutil/commastring.h>
+#include <miutil/timeconvert.h>
 #include <milog/milog.h>
 #include <boost/lexical_cast.hpp>
 #include <sstream>
@@ -64,10 +65,10 @@ const string createString(const kvData &d) {
    // 42.1 and not 42.10099212:
    //ss << setprecision(1) << setiosflags(ios::fixed);
    ss << d.stationID()                << internSeparator
-         << d.obstime()                  << internSeparator
+         << to_kvalobs_string(d.obstime()) << internSeparator
          << d.original()                 << internSeparator
          << d.paramID()                  << internSeparator
-         << d.tbtime()                   << internSeparator
+         << to_kvalobs_string(d.tbtime())<< internSeparator
          << d.typeID()                   << internSeparator
          <<   sensor                     << internSeparator
          << d.level()                    << internSeparator

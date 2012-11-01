@@ -181,7 +181,7 @@ operator<<(std::ostream &s,
 
   for(;it!=elem.data().end(); it++){
     s << it->stationID() << "," 
-      << it->obstime()   << "," 
+      << to_kvalobs_string(it->obstime())   << ","
       << it->typeID()    << ","
       << elem.findParam(it->paramID()) << "(" << it->paramID() << ")," 
       << it->original()  << ","
@@ -193,7 +193,7 @@ operator<<(std::ostream &s,
 
   for(;itt!=elem.textData().end(); itt++){
     s << itt->stationID() << "," 
-      << itt->obstime()   << "," 
+      << to_kvalobs_string(itt->obstime())   << ","
       << itt->typeID()    << ","
       << elem.findParam(itt->paramID()) << "(" << itt->paramID() << ")," 
       << itt->original()  << endl;

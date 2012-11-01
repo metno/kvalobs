@@ -278,8 +278,8 @@ void kv2kro::printObsDataList( KvObsDataList&   dataList ){
 	  it!=dit->dataList().end();
 	  it++){
 	char c= it->sensor();
-	fout << it->stationID() << "|" << it->obstime() << "|" << it->original() 
-	   << "|" << it->paramID()<< "|" <<  it->tbtime() << "|" 
+	fout << it->stationID() << "|" << to_kvalobs_string(it->obstime()) << "|" << it->original()
+	   << "|" << it->paramID()<< "|" <<  to_kvalobs_string(it->tbtime()) << "|"
 	   << it->typeID() << "|" << c << "|" << it->level() << "|" 
 	   << it->corrected() << "|" << it->controlinfo().flagstring() 
 	   << "|" << it->useinfo().flagstring() << "|" << it->cfailed() 
@@ -308,8 +308,8 @@ void kv2kro::printObsDataList( KvObsDataList&   dataList ){
       for(;
 	  i !=dit->textDataList().end();
 	  i ++){
-	 tfout << i->stationID() << "|" << i->obstime() << "|" << i->original(); 
-	 tfout << "|" << i->paramID()<< "|" <<  i->tbtime() << "|";	
+	 tfout << i->stationID() << "|" << to_kvalobs_string(i->obstime()) << "|" << i->original();
+	 tfout << "|" << i->paramID()<< "|" <<  to_kvalobs_string(i->tbtime()) << "|";
 	 tfout << i->typeID() << endl;
       }
     }

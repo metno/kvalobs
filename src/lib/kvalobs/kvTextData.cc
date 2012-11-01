@@ -42,12 +42,12 @@ std::string kvalobs::kvTextData::toSend() const
 
 	if (tbtimemsec_ > 0)
 	{
-		ost << tbtime_ << "." << tbtimemsec_;
+		ost << to_kvalobs_string(tbtime_) << "." << tbtimemsec_;
 		myTbtime = ost.str();
 	}
 	else
 	{
-		ost << tbtime_;
+		ost << to_kvalobs_string(tbtime_);
 		myTbtime = ost.str();
 	}
 
