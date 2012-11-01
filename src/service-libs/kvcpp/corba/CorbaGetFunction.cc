@@ -30,6 +30,7 @@
  */
 #include "CorbaGetFunction.h"
 #include "CorbaKvApp.h"
+#include <miutil/timeconvert.h>
 #include <milog/milog.h>
 
 using namespace std;
@@ -149,8 +150,8 @@ process(CKvalObs::CService::kvServiceExt_ptr service_)
    }
 
    //getWorkstatistik(in WorkstatistikTimeType timeType, in string fromTime, in string toTime, out WorkstatistikIterator it);
-   return service->getWorkstatistik( timeType, to_simple_string(from).c_str(),
-		   to_simple_string(to).c_str(), it.getCorbaObjPtr().out() );
+   return service->getWorkstatistik( timeType, to_kvalobs_string(from).c_str(),
+		   to_kvalobs_string(to).c_str(), it.getCorbaObjPtr().out() );
 };
 
 
@@ -353,7 +354,7 @@ bool getKvStationMetaDataFunc::process(kvServiceExt_ptr serviceext)
 	string myObstime;
 
 	if( ! obstime.is_not_a_date_time() )
-	   myObstime = to_simple_string(obstime);
+	   myObstime = to_kvalobs_string(obstime);
 
 	bool ok = serviceext->getStationMetaData( metadata, stationid, myObstime.c_str(), metadataName_.c_str() );
 

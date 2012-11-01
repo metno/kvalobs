@@ -32,6 +32,7 @@
 #include <kvskel/kvService.hh>
 #include <corbahelper/corbaApp.h>
 #include <puTools/miTime.h>
+#include <miutil/timeconvert.h>
 #include <kvcpp/corba/CorbaKvApp.h>
 
 using namespace CorbaHelper;
@@ -89,7 +90,7 @@ main(int argn, char **argv)
 
 	      cerr << it->stationID() << "," << it->typeID() << "," << it->paramID() << "," << it->sensor() << "," << it->level()
 	           << "," << it->name() << "," << it->metadata() << "," << it->fromtime() << ","
-	           << (totime.is_not_a_date_time()?"(NULL)":to_simple_string(totime)) << ",'" << it->metadataDescription()<< "'"
+	           << (totime.is_not_a_date_time()?"(NULL)":to_kvalobs_string(totime)) << ",'" << it->metadataDescription()<< "'"
 	           << "," << "SpecificLevel: "<< (it->haveSpecificLevel()?"true":"false")
 	           << "," << "SpecificType: "<< (it->haveSpecificType()?"true":"false")
 	           << "," << "SpecificParam: "<< (it->haveSpecificParam()?"true":"false")

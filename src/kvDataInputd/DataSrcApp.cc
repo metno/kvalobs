@@ -32,6 +32,7 @@
 #include <boost/lexical_cast.hpp>
 #include <milog/milog.h>
 #include "DataSrcApp.h"
+#include <miutil/timeconvert.h>
 #include <kvalobs/bitmanip.h>
 #include <kvalobs/kvDbGate.h>
 #include <kvalobs/kvPath.h>
@@ -164,7 +165,7 @@ DataSrcApp::sendInfoToManager(const kvalobs::kvStationInfoList &info_)
 
    for(infoIndex=0; it!=info.end(); it++, infoIndex++){
       infoList[infoIndex].stationId=it->stationID();
-      infoList[infoIndex].obstime=to_simple_string(it->obstime()).c_str();
+      infoList[infoIndex].obstime=to_kvalobs_string(it->obstime()).c_str();
       infoList[infoIndex].typeId_=it->typeID();
    }
 

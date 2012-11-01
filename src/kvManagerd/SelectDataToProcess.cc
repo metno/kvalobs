@@ -30,6 +30,7 @@
  */
 #include "SelectDataToProcess.h"
 #include <milog/milog.h>
+#include <miutil/timeconvert.h>
 #include <kvalobs/kvStationInfoCommand.h>
 
 using namespace std;
@@ -106,9 +107,9 @@ processElements(std::list<kvalobs::kvWorkelement> &workList,
       ost.str("");
 
       ost << "UPDATE workque SET process_start='"
-            << to_simple_string(it->process_start())
+            << to_kvalobs_string(it->process_start())
             << "' WHERE stationid=" << it->stationID()
-            << "  AND obstime='" << to_simple_string(it->obstime())
+            << "  AND obstime='" << to_kvalobs_string(it->obstime())
             << "' AND typeid=" << it->typeID();
 
       try{
@@ -232,8 +233,8 @@ processLowPriData(const boost::posix_time::ptime &baseTime)
                " lowerBound: " << lowerBound << endl <<
                " upperBound: " << upperBound );
 
-      ost << "WHERE obstime>='" << to_simple_string(lowerBound) << "' AND "
-            << "obstime<'" << to_simple_string(upperBound) << "' AND "
+      ost << "WHERE obstime>='" << to_kvalobs_string(lowerBound) << "' AND "
+            << "obstime<'" << to_kvalobs_string(upperBound) << "' AND "
             << "process_start IS NULL "
             << "ORDER BY priority, stationid, typeid, "
             << "         obstime DESC "
@@ -258,7 +259,7 @@ processLowPriData(const boost::posix_time::ptime &baseTime)
                "   baseTime: " << baseTime  << endl <<
                " upperBound: " << upperBound );
 
-      ost << "WHERE obstime<'"  << to_simple_string(upperBound) << "' AND "
+      ost << "WHERE obstime<'"  << to_kvalobs_string(upperBound) << "' AND "
             << "process_start IS NULL "
             << "ORDER BY priority, stationid, typeid, "
             << "         obstime DESC "
@@ -357,7 +358,7 @@ operator()()
       lowerBound -= boost::gregorian::days(1);
 
       ost.str("");
-      ost << "WHERE obstime>='" << to_simple_string(lowerBound) << "' AND "
+      ost << "WHERE obstime>='" << to_kvalobs_string(lowerBound) << "' AND "
             << "process_start IS NULL "
             << "ORDER BY priority, obstime, tbtime, typeid DESC "
             << "LIMIT " << HIGH_PRI_LIMIT;

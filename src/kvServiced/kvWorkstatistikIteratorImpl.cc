@@ -32,6 +32,7 @@
 #include <kvalobs/kvDbGate.h>
 #include <kvalobs/kvWorkelement.h>
 #include <milog/milog.h>
+#include <miutil/timeconvert.h>
 #include <miutil/trimstr.h>
 #include "kvWorkstatistikIteratorImpl.h"
 
@@ -195,15 +196,15 @@ next(CKvalObs::CService::WorkstatistikElemList_out wsList)
   
 	for(CORBA::Long datai=0;it!=dataList.end(); datai++, it++){
 	   (*wsList)[datai].stationID = it->stationID();
-	   (*wsList)[datai].obstime = to_simple_string(it->obstime()).c_str();
+	   (*wsList)[datai].obstime = to_kvalobs_string(it->obstime()).c_str();
 	   (*wsList)[datai].typeID_ = it->typeID();
-	   (*wsList)[datai].tbtime= to_simple_string(it->tbtime()).c_str();
+	   (*wsList)[datai].tbtime= to_kvalobs_string(it->tbtime()).c_str();
 	   (*wsList)[datai].priority = it->priority();
-	   (*wsList)[datai].processStart = to_simple_string(it->process_start()).c_str();
-	   (*wsList)[datai].qaStart = to_simple_string(it->qa_start()).c_str();
-	   (*wsList)[datai].qaStop = to_simple_string(it->qa_stop()).c_str();
-	   (*wsList)[datai].serviceStart = to_simple_string(it->service_start()).c_str();
-	   (*wsList)[datai].serviceStop = to_simple_string(it->service_stop()).c_str();
+	   (*wsList)[datai].processStart = to_kvalobs_string(it->process_start()).c_str();
+	   (*wsList)[datai].qaStart = to_kvalobs_string(it->qa_start()).c_str();
+	   (*wsList)[datai].qaStop = to_kvalobs_string(it->qa_stop()).c_str();
+	   (*wsList)[datai].serviceStart = to_kvalobs_string(it->service_start()).c_str();
+	   (*wsList)[datai].serviceStop = to_kvalobs_string(it->service_stop()).c_str();
 	}
     
 	LOGDEBUG("next: return " << wsList->length() << " elements!" <<endl);

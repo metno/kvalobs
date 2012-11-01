@@ -30,6 +30,7 @@
 */
 #include <stdlib.h>
 #include <milog/milog.h>
+#include <miutil/timeconvert.h>
 #include <kvalobs/kvDbGate.h>
 #include <kvalobs/kvQueries.h>
 #include <kvalobs/kvKeyVal.h>
@@ -80,7 +81,7 @@ lastMissingRuntime(dnmi::db::Connection *con)
   			LOGWARN("Cant access the key 'kvManagerd.LastMissingRun' from the 'key_val' table!" << endl << 
   						  "Reason: " << gate.getErrorStr());
   		}else if(keys.empty()){
-  			kvKeyVal keyVal("kvManagerd", "LastMissingRun", to_simple_string(lastMissingRunTime_));
+  			kvKeyVal keyVal("kvManagerd", "LastMissingRun", to_kvalobs_string(lastMissingRunTime_));
   			
   			if(!gate.insert(keyVal, true)){
   				LOGWARN("Cant insert the key 'kvManagerd.LastMissingRun' into the 'key_val' table!" << endl <<
@@ -113,7 +114,7 @@ lastMissingRuntime(dnmi::db::Connection *con,
 {
 	kvDbGate gate(con);
 	
-	kvKeyVal keyVal("kvManagerd", "LastMissingRun", to_simple_string(newLastMissingRuntime));
+	kvKeyVal keyVal("kvManagerd", "LastMissingRun", to_kvalobs_string(newLastMissingRuntime));
 	
 	lastMissingRunTime_=newLastMissingRuntime;
 	

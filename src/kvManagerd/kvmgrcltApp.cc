@@ -30,6 +30,7 @@
 */
 #include <iostream>
 #include <stdlib.h>
+#include <miutil/timeconvert.h>
 #include <miconfparser/confparser.h>
 #include <kvskel/managerInput.hh>
 #include "kvmgrcltApp.h"
@@ -116,7 +117,7 @@ sendSignalToManager(int sid, int tid, const boost::posix_time::ptime &obstime)
 	
   	st.length(1);
 	st[0].stationId=sid;
-  	st[0].obstime=to_simple_string(obstime).c_str();
+  	st[0].obstime=to_kvalobs_string(obstime).c_str();
   	st[0].typeId_=tid;
 	
 	

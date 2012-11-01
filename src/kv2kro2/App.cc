@@ -32,6 +32,7 @@
 #include <stdio.h>
 #include <fstream>
 #include <boost/algorithm/string.hpp>
+#include <miutil/timeconvert.h>
 #include "GetData.h"
 #include "App.h"
 
@@ -216,12 +217,12 @@ printObsDataList( KvObsDataList& dataList )
   
    boost::posix_time::ptime toTime = boost::posix_time::second_clock::universal_time();
   
-   string filename = fileDataList + "." + to_simple_string(toTime.date()) + "_"
-                     + to_simple_string(toTime.time_of_day());
+   string filename = fileDataList + "." + to_kvalobs_string(toTime.date()) + "_"
+                     + to_kvalobs_string(toTime.time_of_day());
    string pfilename = filename + ".new";
 
-   string textfilename = fileTextDataList + "." + to_simple_string(toTime.date()) + "_"
-                         + to_simple_string(toTime.time_of_day());
+   string textfilename = fileTextDataList + "." + to_kvalobs_string(toTime.date()) + "_"
+                         + to_kvalobs_string(toTime.time_of_day());
    string ptextfilename = textfilename + ".new";
 
    ofstream fout( pfilename.c_str() );
@@ -306,5 +307,5 @@ App::
 storeToFile( const std::string& filename, const boost::posix_time::ptime& toTime )
 {
    ofstream fout(filename.c_str());
-   fout << to_simple_string(toTime);
+   fout << to_kvalobs_string(toTime);
 }

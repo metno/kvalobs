@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <kvskel/commonStationInfo.hh>
+#include <miutil/timeconvert.h>
 #include <milog/milog.h>
 #include <puTools/miTime.h>
 #include <kvalobs/kvPath.h>
@@ -222,7 +223,7 @@ sendToManager(kvalobs::kvStationInfoList &retList,
   
   for(k=0;it!=retList.end(); it++, k++){
     stInfo[k].stationId=it->stationID();
-    stInfo[k].obstime=CORBA::string_dup(to_simple_string(it->obstime()).c_str());
+    stInfo[k].obstime=CORBA::string_dup(to_kvalobs_string(it->obstime()).c_str());
     stInfo[k].typeId_=it->typeID();
   }
   

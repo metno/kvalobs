@@ -25,6 +25,7 @@
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <puTools/miTime.h>
+#include <sstream>
 
 namespace miutil
 {
@@ -45,6 +46,51 @@ inline miutil::miTime to_miTime(const ptime & t)
 	const boost::gregorian::date & d = t.date();
 	const boost::posix_time::time_duration c = t.time_of_day();
 	return miutil::miTime(d.year(), d.month(), d.day(), c.hours(), c.minutes(), c.seconds());
+}
+
+inline std::string to_kvalobs_string(const ptime & t)
+{
+	static std::ostringstream * ss = 0;
+	if ( ! ss )
+	{
+		ss = new std::ostringstream;
+		time_facet * facet = new time_facet;
+		const char * format = "%Y-%m-%d %H:%M:%S";
+		facet->format(format);
+		ss->imbue(std::locale(std::cout.getloc(), facet));
+	}
+	else
+		ss->str(std::string());
+
+	(*ss) << t;
+
+	return ss->str();
+}
+
+inline std::string to_kvalobs_string(const time_duration & t)
+{
+	return to_simple_string(t);
+}
+}
+namespace gregorian
+{
+inline std::string to_kvalobs_string(const date & d)
+{
+	static std::ostringstream * ss = 0;
+	if ( ! ss )
+	{
+		ss = new std::ostringstream;
+		date_facet * facet = new date_facet;
+		const char * format = "%Y-%m-%d";
+		facet->format(format);
+		ss->imbue(std::locale(std::cout.getloc(), facet));
+	}
+	else
+		ss->str(std::string());
+
+	(*ss) << d;
+
+	return ss->str();
 }
 }
 }

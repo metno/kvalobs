@@ -29,6 +29,7 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include <kvalobs/kvTextData.h>
+#include <miutil/timeconvert.h>
 #include <boost/lexical_cast.hpp>
 
 using namespace std;
@@ -52,7 +53,7 @@ std::string kvalobs::kvTextData::toSend() const
 
 	ost.str("");
 
-	ost << "(" << stationid_ << "," << quoted(to_simple_string(obstime_)) << ","
+	ost << "(" << stationid_ << "," << quoted(to_kvalobs_string(obstime_)) << ","
 			<< quoted(original_) << "," << paramid_ << "," << quoted(myTbtime)
 			<< "," << typeid_ << ")";
 	return ost.str();
@@ -68,7 +69,7 @@ bool kvalobs::kvTextData::set(int sta, const boost::posix_time::ptime& obt,
 	tbtime_ = tbt;
 	tbtimemsec_ = 0;
 	typeid_ = typ;
-	sortBy_ = boost::lexical_cast<std::string>(sta) + to_simple_string(obt);
+	sortBy_ = boost::lexical_cast<std::string>(sta) + to_kvalobs_string(obt);
 	return true;
 }
 
@@ -113,7 +114,7 @@ bool kvalobs::kvTextData::set(const dnmi::db::DRow& r_)
 			CERR("kvTextData: exception ..... \n");
 		}
 	}
-	sortBy_ = boost::lexical_cast<std::string>(stationid_) + to_simple_string(obstime_);
+	sortBy_ = boost::lexical_cast<std::string>(stationid_) + to_kvalobs_string(obstime_);
 	return true;
 }
 
@@ -122,7 +123,7 @@ std::string kvalobs::kvTextData::uniqueKey() const
 	ostringstream ost;
 
 	ost << " WHERE stationid=" << stationid_ << " AND " << "       obstime="
-			<< quoted(to_simple_string(obstime_)) << " AND " << "       paramid="
+			<< quoted(to_kvalobs_string(obstime_)) << " AND " << "       paramid="
 			<< paramid_ << " AND " << "       typeid=" << typeid_;
 
 	return ost.str();

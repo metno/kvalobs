@@ -29,6 +29,7 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include <milog/milog.h>
+#include <miutil/timeconvert.h>
 #include <cstring>
 #include "kvDataIteratorImpl.h"
 #include <kvalobs/kvDbGate.h>
@@ -215,10 +216,10 @@ DataIteratorImpl::next(CKvalObs::CService::ObsDataList_out obsDataList)
          );
 
       (*obsDataList)[obsi].dataList[datai].stationID=it->stationID();
-      (*obsDataList)[obsi].dataList[datai].obstime=to_simple_string(it->obstime()).c_str();
+      (*obsDataList)[obsi].dataList[datai].obstime=to_kvalobs_string(it->obstime()).c_str();
       (*obsDataList)[obsi].dataList[datai].original=it->original();
       (*obsDataList)[obsi].dataList[datai].paramID=it->paramID();
-      (*obsDataList)[obsi].dataList[datai].tbtime=to_simple_string(it->tbtime()).c_str();
+      (*obsDataList)[obsi].dataList[datai].tbtime=to_kvalobs_string(it->tbtime()).c_str();
       (*obsDataList)[obsi].dataList[datai].typeID_=it->typeID();
 
       sprintf(buf, "%d", it->sensor());
@@ -284,10 +285,10 @@ DataIteratorImpl::next(CKvalObs::CService::ObsDataList_out obsDataList)
          textData.length(textData.length()+TEXTDATALIST_DELTA);
 
       textData[datai].stationID=tit->stationID();
-      textData[datai].obstime=to_simple_string(tit->obstime()).c_str();
+      textData[datai].obstime=to_kvalobs_string(tit->obstime()).c_str();
       textData[datai].original=tit->original().c_str();
       textData[datai].paramID=tit->paramID();
-      textData[datai].tbtime=to_simple_string(tit->tbtime()).c_str();
+      textData[datai].tbtime=to_kvalobs_string(tit->tbtime()).c_str();
       textData[datai].typeID_=tit->typeID();
 
       tit++;

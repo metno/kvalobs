@@ -29,6 +29,7 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include <kvalobs/kvQueries.h>
+#include <miutil/timeconvert.h>
 
 using namespace std;
 
@@ -51,7 +52,7 @@ std::string kvQueries::selectChecks(const std::list<int> slist, const int lan,
 
 	ost << ") AND C1.language=" << lan << "  AND  C1.fromtime=("
 			<< "         SELECT MAX(C2.fromtime) FROM checks C2 WHERE"
-			<< "         C2.fromtime<=\'" << to_simple_string(otime) << "\'"
+			<< "         C2.fromtime<=\'" << to_kvalobs_string(otime) << "\'"
 			<< "         AND  C2.stationid =C1.stationid"
 			<< "         AND  C2.qcx =C1.qcx "
 			<< "         AND  C2.language =C1.language "
@@ -95,7 +96,7 @@ std::string kvQueries::selectStationParam(const std::list<int> slist,
 			<< dayOfYear(otime) << " AND SP1.today>=" << dayOfYear(otime)
 			<< " AND SP1.fromtime=("
 			<< "         SELECT MAX(SP2.fromtime) FROM station_param SP2 WHERE"
-			<< "         SP2.fromtime<=\'" << to_simple_string(otime) << "\'"
+			<< "         SP2.fromtime<=\'" << to_kvalobs_string(otime) << "\'"
 			<< "         AND  SP2.stationid =SP1.stationid"
 			<< "         AND  SP2.paramid =SP1.paramid"
 			<< "         AND  SP2.level =SP1.level"
@@ -112,7 +113,7 @@ std::string kvQueries::selectData(const boost::posix_time::ptime& otime)
 {
 	ostringstream ost;
 
-	ost << " where obstime=\'" << to_simple_string(otime) << "\'";
+	ost << " where obstime=\'" << to_kvalobs_string(otime) << "\'";
 
 	return ost.str();
 }
@@ -123,7 +124,7 @@ std::string kvQueries::selectData(const int sid, const int pid,
 	ostringstream ost;
 
 	ost << " where stationid=" << sid << " and paramid=" << pid
-			<< " and obstime=\'" << to_simple_string(otime) << "\'";
+			<< " and obstime=\'" << to_kvalobs_string(otime) << "\'";
 
 	return ost.str();
 }
@@ -134,7 +135,7 @@ std::string kvQueries::selectDataFromType(const int sid, const int tid,
 	ostringstream ost;
 
 	ost << " where stationid=" << sid << " and typeid=" << tid
-			<< " and obstime=\'" << to_simple_string(otime)
+			<< " and obstime=\'" << to_kvalobs_string(otime)
 			<< "\' ORDER BY paramid, level, sensor";
 
 	return ost.str();
@@ -146,7 +147,7 @@ std::string kvQueries::selectTextDataFromType(const int sid, const int tid,
 	ostringstream ost;
 
 	ost << " where stationid=" << sid << " and typeid=" << tid
-			<< " and obstime=\'" << to_simple_string(otime) << "\' ORDER BY paramid";
+			<< " and obstime=\'" << to_kvalobs_string(otime) << "\' ORDER BY paramid";
 
 	return ost.str();
 }
@@ -157,7 +158,7 @@ std::string kvQueries::selectDataFromAbsType(const int sid, const int tid,
 	ostringstream ost;
 
 	ost << " where stationid=" << sid << " and abs(typeid)=" << tid
-			<< " and obstime=\'" << to_simple_string(otime) << "\'";
+			<< " and obstime=\'" << to_kvalobs_string(otime) << "\'";
 
 	return ost.str();
 }
@@ -167,8 +168,8 @@ std::string kvQueries::selectData(const boost::posix_time::ptime& stime, const b
 {
 	ostringstream ost;
 
-	ost << " where obstime>=\'" << to_simple_string(stime) << "\'" << " and obstime<=\'"
-			<< to_simple_string(etime) << "\'" << " order by " << ob;
+	ost << " where obstime>=\'" << to_kvalobs_string(stime) << "\'" << " and obstime<=\'"
+			<< to_kvalobs_string(etime) << "\'" << " order by " << ob;
 
 	return ost.str();
 }
@@ -178,8 +179,8 @@ std::string kvQueries::selectDataByTabletime(const boost::posix_time::ptime& sti
 {
 	ostringstream ost;
 
-	ost << " where tbtime>=\'" << to_simple_string(stime) << "\'" << " and tbtime<=\'"
-			<< to_simple_string(etime) << "\'" << " order by " << ob;
+	ost << " where tbtime>=\'" << to_kvalobs_string(stime) << "\'" << " and tbtime<=\'"
+			<< to_kvalobs_string(etime) << "\'" << " order by " << ob;
 
 	return ost.str();
 }
@@ -196,8 +197,8 @@ std::string kvQueries::selectData(const int sid, const boost::posix_time::ptime&
 {
 	ostringstream ost;
 
-	ost << " where stationid=" << sid << " and obstime>=\'" << to_simple_string(stime)
-			<< "\'" << " and obstime<=\'" << to_simple_string(etime) << "\'"
+	ost << " where stationid=" << sid << " and obstime>=\'" << to_kvalobs_string(stime)
+			<< "\'" << " and obstime<=\'" << to_kvalobs_string(etime) << "\'"
 			<< " order by obstime, typeid DESC";
 
 	return ost.str();
@@ -208,8 +209,8 @@ std::string kvQueries::selectTextData(const int sid, const boost::posix_time::pt
 {
 	ostringstream ost;
 
-	ost << " where stationid=" << sid << " and obstime>=\'" << to_simple_string(stime)
-			<< "\'" << " and obstime<=\'" << to_simple_string(etime) << "\'"
+	ost << " where stationid=" << sid << " and obstime>=\'" << to_kvalobs_string(stime)
+			<< "\'" << " and obstime<=\'" << to_kvalobs_string(etime) << "\'"
 			<< " order by obstime,typeid DESC";
 
 	return ost.str();
@@ -220,8 +221,8 @@ std::string kvQueries::selectDataByTbtime(const int sid,
 {
 	ostringstream ost;
 
-	ost << " where stationid=" << sid << " and tbtime>=\'" << to_simple_string(stime)
-			<< "\'" << " and tbtime<=\'" << to_simple_string(etime) << "\'"
+	ost << " where stationid=" << sid << " and tbtime>=\'" << to_kvalobs_string(stime)
+			<< "\'" << " and tbtime<=\'" << to_kvalobs_string(etime) << "\'"
 			<< " order by tbtime,typeid";
 
 	return ost.str();
@@ -249,8 +250,8 @@ std::string kvQueries::selectDataStat(const boost::posix_time::ptime& stime, con
 {
 	ostringstream ost;
 
-	ost << " where obstime>=\'" << to_simple_string(stime) << "\'" << " and obstime<=\'"
-			<< to_simple_string(etime) << "\'" << " and stationid in (" << statList
+	ost << " where obstime>=\'" << to_kvalobs_string(stime) << "\'" << " and obstime<=\'"
+			<< to_kvalobs_string(etime) << "\'" << " and stationid in (" << statList
 			<< ") order by stationid,obstime";
 
 	return ost.str();
@@ -260,8 +261,8 @@ std::string kvQueries::selectData(const boost::posix_time::ptime& stime, const b
 {
 	ostringstream ost;
 
-	ost << " where obstime>=\'" << to_simple_string(stime) << "\'" << " and obstime<=\'"
-			<< to_simple_string(etime) << "\'" << " order by stationid,obstime";
+	ost << " where obstime>=\'" << to_kvalobs_string(stime) << "\'" << " and obstime<=\'"
+			<< to_kvalobs_string(etime) << "\'" << " order by stationid,obstime";
 
 	return ost.str();
 }
@@ -292,8 +293,8 @@ std::string kvQueries::selectModelData(const int sid, const boost::posix_time::p
 {
 	ostringstream ost;
 
-	ost << " where stationid=" << sid << " and obstime>=\'" << to_simple_string(stime)
-			<< "\'" << " and obstime<=\'" << to_simple_string(etime) << "\'"
+	ost << " where stationid=" << sid << " and obstime>=\'" << to_kvalobs_string(stime)
+			<< "\'" << " and obstime<=\'" << to_kvalobs_string(etime) << "\'"
 			<< " order by obstime";
 
 	return ost.str();
@@ -405,7 +406,7 @@ std::string kvQueries::selectStationsByRange(long from, long to, bool order)
 std::string kvQueries::selectObsPgm(long stationid, const boost::posix_time::ptime& otime)
 {
 	ostringstream ost;
-	string obst("\'" + to_simple_string(otime) + "\'");
+	string obst("\'" + to_kvalobs_string(otime) + "\'");
 
 	ost << " WHERE stationid=" << stationid << " AND " << "       (( fromtime<="
 			<< obst << " AND totime>" << obst << ") OR "
@@ -415,7 +416,7 @@ std::string kvQueries::selectObsPgm(long stationid, const boost::posix_time::pti
 	 ost << " OP1 WHERE OP1.stationid=" << stationid
 	 << " AND OP1.fromtime=("
 	 << "         SELECT MAX(OP2.fromtime) FROM obs_pgm OP2 WHERE"
-	 << "         OP2.fromtime<=\'" << to_simple_string(otime) << "\'"
+	 << "         OP2.fromtime<=\'" << to_kvalobs_string(otime) << "\'"
 	 << "         AND OP2.stationid = OP1.stationid"
 	 << "         AND OP2.paramid  = OP1.paramid"
 	 << " ) ORDER BY OP1.paramid";
@@ -433,7 +434,7 @@ std::string kvQueries::selectObsPgm(long stationid, long tid,
 		const boost::posix_time::ptime& otime)
 {
 	ostringstream ost;
-	string obst("\'" + to_simple_string(otime) + "\'");
+	string obst("\'" + to_kvalobs_string(otime) + "\'");
 
 	ost << " WHERE stationid=" << stationid << " AND typeid=" << tid << " AND "
 			<< "       (( fromtime<=" << obst << " AND totime>" << obst
@@ -443,7 +444,7 @@ std::string kvQueries::selectObsPgm(long stationid, long tid,
 	/*  ost << " OP1 WHERE OP1.typeid=" << tid << " AND OP1.stationid=" << stationid
 	 << " AND OP1.fromtime=("
 	 << "         SELECT MAX(OP2.fromtime) FROM obs_pgm OP2 WHERE"
-	 << "         OP2.fromtime<=\'" << to_simple_string(otime) << "\'"
+	 << "         OP2.fromtime<=\'" << to_kvalobs_string(otime) << "\'"
 	 << "         AND OP2.stationid = OP1.stationid"
 	 << "         AND OP2.paramid  = OP1.paramid"
 	 << "         AND OP2.typeid  = OP1.typeid"
@@ -462,7 +463,7 @@ std::string kvQueries::selectObsPgmByTypeid(long tid,
 		const boost::posix_time::ptime& otime)
 {
 	ostringstream ost;
-	string obst("\'" + to_simple_string(otime) + "\'");
+	string obst("\'" + to_kvalobs_string(otime) + "\'");
 
 	ost << " WHERE typeid=" << tid << " AND " << "       (( fromtime<=" << obst
 			<< " AND totime>" << obst << ") OR " << "        ( fromtime<="
@@ -472,7 +473,7 @@ std::string kvQueries::selectObsPgmByTypeid(long tid,
 	 ost << " OP1 WHERE OP1.typeid=" << tid
 	 << " AND OP1.fromtime=("
 	 << "         SELECT MAX(OP2.fromtime) FROM obs_pgm OP2 WHERE"
-	 << "             OP2.fromtime<=\'" << to_simple_string(otime) << "\' AND"
+	 << "             OP2.fromtime<=\'" << to_kvalobs_string(otime) << "\' AND"
 	 << "             OP2.stationid  = OP1.stationid AND"
 	 << "             OP2.typeid     = OP1.typeid    AND"
 	 << "             OP2.paramid    = OP1.paramid   AND"
@@ -498,7 +499,7 @@ std::string kvQueries::selectObsPgm(long stationid)
 std::string kvQueries::selectObsPgm(const boost::posix_time::ptime& otime)
 {
 	ostringstream ost;
-	string obst("\'" + to_simple_string(otime) + "\'");
+	string obst("\'" + to_kvalobs_string(otime) + "\'");
 
 	ost << " WHERE ( fromtime<=" << obst << " AND totime>" << obst << ") OR "
 			<< "       ( fromtime<=" << obst << " AND totime IS NULL ) "
@@ -506,7 +507,7 @@ std::string kvQueries::selectObsPgm(const boost::posix_time::ptime& otime)
 
 	/*	ost << " OP1 WHERE OP1.fromtime=("
 	 << "         SELECT MAX(OP2.fromtime) FROM obs_pgm OP2 WHERE"
-	 << "         OP2.fromtime<=\'" << to_simple_string(otime) << "\'"
+	 << "         OP2.fromtime<=\'" << to_kvalobs_string(otime) << "\'"
 	 << "         AND OP2.stationid = OP1.stationid"
 	 << "         AND OP2.paramid  = OP1.paramid"
 	 << " ) ORDER BY OP1.stationid,OP1.typeid,OP1.paramid";
@@ -548,8 +549,8 @@ std::string kvQueries::selectData(const std::list<int> slist, const int pid,
 	for (; sp != slist.end(); sp++)
 		ost << (sp == slist.begin() ? "" : ",") << *sp;
 
-	ost << ") and paramid=" << pid << " and obstime>=\'" << to_simple_string(stime)
-			<< "\'" << " and obstime<=\'" << to_simple_string(etime) << "\'"
+	ost << ") and paramid=" << pid << " and obstime>=\'" << to_kvalobs_string(stime)
+			<< "\'" << " and obstime<=\'" << to_kvalobs_string(etime) << "\'"
 			<< " order by obstime";
 
 	return ost.str();
@@ -571,8 +572,8 @@ std::string kvQueries::selectData(const std::list<int> slist, const int pid,
 		ost << (sp == slist.begin() ? "" : ",") << *sp;
 
 	ost << ") and paramid=" << pid << " and typeid=" << tid
-			<< " and obstime>=\'" << to_simple_string(stime) << "\'"
-			<< " and obstime<=\'" << to_simple_string(etime) << "\'"
+			<< " and obstime>=\'" << to_kvalobs_string(stime) << "\'"
+			<< " and obstime<=\'" << to_kvalobs_string(etime) << "\'"
 			<< " order by obstime";
 
 	return ost.str();
@@ -588,8 +589,8 @@ std::string kvQueries::selectData(const int stid, const int pid, const int tid,
 	ostringstream ost;
 
 	ost << " WHERE stationid=" << stid << " and paramid=" << pid
-			<< " and typeid=" << tid << " and obstime>=\'" << to_simple_string(stime)
-			<< "\'" << " and obstime<=\'" << to_simple_string(etime) << "\'"
+			<< " and typeid=" << tid << " and obstime>=\'" << to_kvalobs_string(stime)
+			<< "\'" << " and obstime<=\'" << to_kvalobs_string(etime) << "\'"
 			<< " order by obstime";
 
 	return ost.str();
@@ -605,8 +606,8 @@ std::string kvQueries::selectData(const int stid, const int pid,
 	ostringstream ost;
 
 	ost << " WHERE stationid=" << stid << " and paramid=" << pid
-			<< " and obstime>=\'" << to_simple_string(stime) << "\'"
-			<< " and obstime<=\'" << to_simple_string(etime) << "\'"
+			<< " and obstime>=\'" << to_kvalobs_string(stime) << "\'"
+			<< " and obstime<=\'" << to_kvalobs_string(etime) << "\'"
 			<< " order by obstime";
 
 	return ost.str();
@@ -624,8 +625,8 @@ std::string kvQueries::selectData(const int pid, const int tid,
 
 	ost << " WHERE paramid=" << pid << " and typeid=" << tid
 			<< " and controlinfo=\'" << controlString << "\'"
-			<< " and obstime>=\'" << to_simple_string(stime) << "\'"
-			<< " and obstime<=\'" << to_simple_string(etime) << "\'"
+			<< " and obstime>=\'" << to_kvalobs_string(stime) << "\'"
+			<< " and obstime<=\'" << to_kvalobs_string(etime) << "\'"
 			<< " order by obstime";
 
 	return ost.str();
@@ -641,7 +642,7 @@ std::string kvQueries::selectMissingData(const float value, const int pid,
 	ostringstream ost;
 
 	ost << " WHERE original=" << value << " and paramid=" << pid
-			<< " and obstime=\'" << to_simple_string(Ptime) << "\'"
+			<< " and obstime=\'" << to_kvalobs_string(Ptime) << "\'"
 			<< " order by obstime";
 
 	return ost.str();
@@ -657,7 +658,7 @@ std::string kvQueries::selectMissingData(const float value, const int pid,
 	ostringstream ost;
 
 	ost << " WHERE original=" << value << " and paramid=" << pid
-			<< " and typeid=" << tid << " and obstime=\'" << to_simple_string(Ptime)
+			<< " and typeid=" << tid << " and obstime=\'" << to_kvalobs_string(Ptime)
 			<< "\'" << " order by obstime";
 
 	return ost.str();

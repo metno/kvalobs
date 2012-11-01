@@ -29,6 +29,7 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include <kvalobs/kvObsPgm.h>
+#include <miutil/timeconvert.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
@@ -414,8 +415,8 @@ kvalobs::kvObsPgm::uniqueKey()const
       << "       typeid="    << typeid_                     << " AND " 
       << "       paramid="   << paramid_                    << " AND "
       << "       level="     << level_                      << " AND "
-      << "       fromtime="  << quoted(to_simple_string(fromtime_)) << " AND "
-      << "       totime="    << quoted(to_simple_string(totime_));
+      << "       fromtime="  << quoted(to_kvalobs_string(fromtime_)) << " AND "
+      << "       totime="    << quoted(to_kvalobs_string(totime_));
  
 	return ost.str();
 }

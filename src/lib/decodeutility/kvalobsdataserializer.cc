@@ -30,6 +30,7 @@
  */
 #include "kvalobsdataserializer.h"
 #include "kvalobsdataparser.h"
+#include <miutil/timeconvert.h>
 #include <libxml++/parsers/domparser.h>
 #include <boost/lexical_cast.hpp>
 #include <cmath>
@@ -191,7 +192,7 @@ std::string KvalobsDataSerializer::toString() const
 			{
 
 				Element * message = decoderElement->add_child("message");
-				message->set_attribute("tbtime", to_simple_string(it->tbtime()));
+				message->set_attribute("tbtime", to_kvalobs_string(it->tbtime()));
 				message->add_child_text(it->message());
 			}
 		}

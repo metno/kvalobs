@@ -35,6 +35,7 @@
 
 #include <sstream>
 #include <kvdb/dbdrivermgr.h>
+#include <miutil/timeconvert.h>
 #include <kvalobs/kvDbGate.h>
 #include <kvalobs/kvStation.h>
 #include <kvalobs/kvData.h>
@@ -111,7 +112,7 @@ int main(int argc, char** argv)
 					
 		ost.str("");
 		ost << " where stationid=" << sit->stationID() << " AND "
-			<< "       obstime='" << to_simple_string(obst) << "'"
+			<< "       obstime='" << to_kvalobs_string(obst) << "'"
 			<< "       order by typeid";
 	
 		if(!gate.select(data, ost.str())){

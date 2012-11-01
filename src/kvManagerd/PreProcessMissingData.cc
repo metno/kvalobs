@@ -35,6 +35,7 @@
 #include <kvalobs/kvObsPgm.h>
 #include <kvalobs/kvParam.h>
 #include <kvalobs/kvTypes.h>
+#include <miutil/timeconvert.h>
 #include <milog/milog.h>
 #include "PreProcessWorker.h"
 
@@ -111,7 +112,7 @@ loadParamsAndTypes()
       nextDbCheck = now;
    }
 
-   LOGDEBUG( "PreProcessMissingData: Next loading of 'types' and 'params' table: " + to_simple_string(nextDbCheck));
+   LOGDEBUG( "PreProcessMissingData: Next loading of 'types' and 'params' table: " + to_kvalobs_string(nextDbCheck));
 
    return nOk == 2;
 }

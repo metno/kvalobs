@@ -31,6 +31,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <kvalobs/kvDbBase.h>
+#include <miutil/timeconvert.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <sstream>
@@ -90,7 +91,7 @@ std::string kvalobs::kvDbBase::quoted(const std::string& in) const
 
 std::string kvalobs::kvDbBase::quoted(const boost::posix_time::ptime & timeToQuote) const
 {
-	return quoted(to_simple_string(timeToQuote));
+	return quoted(to_kvalobs_string(timeToQuote));
 }
 
 boost::gregorian::date kvalobs::kvDbBase::julianDayThatYear(int addOn, int year) const

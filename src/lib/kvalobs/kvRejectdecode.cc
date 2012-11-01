@@ -29,6 +29,7 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include <kvalobs/kvRejectdecode.h>
+#include <miutil/timeconvert.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 
@@ -51,7 +52,7 @@ bool kvalobs::kvRejectdecode::set(const std::string &message__,
 	decoder_ = decoder__;
 	comment_ = comment__;
 	fixed_ = fixed;
-	sortBy_ = to_simple_string(tbtime_);
+	sortBy_ = to_kvalobs_string(tbtime_);
 }
 
 bool kvalobs::kvRejectdecode::set(const dnmi::db::DRow& r_)
@@ -86,7 +87,7 @@ bool kvalobs::kvRejectdecode::set(const dnmi::db::DRow& r_)
 			CERR("kvRejectdecode: exception ..... \n");
 		}
 	}
-	sortBy_ = to_simple_string(tbtime_);
+	sortBy_ = to_kvalobs_string(tbtime_);
 	return true;
 }
 

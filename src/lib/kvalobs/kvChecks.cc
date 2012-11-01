@@ -31,6 +31,7 @@
 #include <stdlib.h>
 #include <kvalobs/kvChecks.h>
 #include <dnmithread/mtcout.h>
+#include <miutil/timeconvert.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -127,7 +128,7 @@ std::string kvalobs::kvChecks::uniqueKey() const
 
 	ost << " WHERE stationid=" << stationid_ << " AND " << "       qcx="
 			<< quoted(qcx_) << " AND " << "       language=" << language_
-			<< " AND " << "       fromtime=" << quoted(to_simple_string(fromtime_));
+			<< " AND " << "       fromtime=" << quoted(to_kvalobs_string(fromtime_));
 
 	return ost.str();
 }

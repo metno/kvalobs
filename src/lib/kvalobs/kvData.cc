@@ -33,6 +33,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <kvalobs/kvData.h>
+#include <miutil/timeconvert.h>
 #include <dnmithread/mtcout.h>
 /*
  * Created by DNMI/IT: borge.moe@met.no
@@ -224,8 +225,8 @@ std::string kvalobs::kvData::toSend() const
 {
 	ostringstream ost;
 
-	ost << "(" << stationid_ << "," << quoted(to_simple_string(obstime_)) << "," << original_
-			<< "," << paramid_ << "," << quoted(to_simple_string(tbtime_)) << "," << typeid_
+	ost << "(" << stationid_ << "," << quoted(to_kvalobs_string(obstime_)) << "," << original_
+			<< "," << paramid_ << "," << quoted(to_kvalobs_string(tbtime_)) << "," << typeid_
 			<< "," << quoted(sensor_) << "," << level_ << "," << corrected_
 			<< "," << quoted(controlinfo_.flagstring()) << ","
 			<< quoted(useinfo_.flagstring()) << "," << quoted(cfailed_) << ")";
@@ -250,7 +251,7 @@ std::string kvalobs::kvData::uniqueKey() const
 	ostringstream ost;
 
 	ost << " WHERE stationid=" << stationid_ << " AND " << "       obstime="
-			<< quoted(to_simple_string(obstime_)) << " AND " << "       paramid="
+			<< quoted(to_kvalobs_string(obstime_)) << " AND " << "       paramid="
 			<< paramid_ << " AND " << "       typeid=" << typeid_ << " AND "
 			<< "       sensor=" << quoted(sensor_) << " AND " << "       level="
 			<< level_;
@@ -266,7 +267,7 @@ std::string kvalobs::kvData::toUpdate() const
 			<< quoted(controlinfo_.flagstring()) << ", useinfo="
 			<< quoted(useinfo_.flagstring()) << ", cfailed=" << quoted(cfailed_)
 			<< " WHERE stationid=" << stationid_ << " AND " << "       obstime="
-			<< quoted(to_simple_string(obstime_)) << " AND " << "       paramid="
+			<< quoted(to_kvalobs_string(obstime_)) << " AND " << "       paramid="
 			<< paramid_ << " AND " << "       typeid=" << typeid_ << " AND "
 			<< "       sensor=" << quoted(sensor_) << " AND " << "       level="
 			<< level_;

@@ -35,6 +35,7 @@
 #include <memory>
 #include <kvalobs/kvQueries.h>
 #include <milog/milog.h>
+#include <miutil/timeconvert.h>
 #include <kvalobs/kvDbGate.h>
 #include <kvalobs/kvOperator.h>
 #include "kvServiceImpl.h"
@@ -167,12 +168,12 @@ addToObsPgmList(CKvalObs::CService::Obs_pgmList &pgmList,
       if( it->fromtime().is_not_a_date_time() )
          pgm.fromtime=(const char*)MIN_DATE;
       else
-         pgm.fromtime=to_simple_string(it->fromtime()).c_str();
+         pgm.fromtime=to_kvalobs_string(it->fromtime()).c_str();
 
       if( it->totime().is_not_a_date_time() )
          pgm.totime = (const char*)MAX_DATE;
       else
-         pgm.totime=to_simple_string(it->totime()).c_str();
+         pgm.totime=to_kvalobs_string(it->totime()).c_str();
 
 
       if(aUnion){
@@ -977,7 +978,7 @@ getStations(CKvalObs::CService::StationList_out stationList)
       (*stationList)[i].stationstr=it->stationstr().c_str();
       (*stationList)[i].environmentid=it->environmentid();
       (*stationList)[i].static_=it->_static();
-      (*stationList)[i].fromtime=to_simple_string(it->fromtime()).c_str();
+      (*stationList)[i].fromtime=to_kvalobs_string(it->fromtime()).c_str();
    }
 
    return true;

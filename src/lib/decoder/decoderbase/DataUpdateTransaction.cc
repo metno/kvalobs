@@ -34,6 +34,7 @@
 #include <kvdb/kvdb.h>
 #include <milog/milog.h>
 #include <kvalobs/kvWorkelement.h>
+#include <miutil/timeconvert.h>
 #include <miutil/miTimeParse.h>
 #include "DataUpdateTransaction.h"
 
@@ -174,7 +175,7 @@ hasDataWithTbtime( dnmi::db::Connection *con, const boost::posix_time::ptime &tb
 //     << "tbtime='" << tbtime << "." << msec <<"'";
 
    q << "SELECT * FROM data WHERE stationid=" << stationid << " AND "
-     << "tbtime='" << to_simple_string(tbtime) <<"'";
+     << "tbtime='" << to_kvalobs_string(tbtime) <<"'";
 
    auto_ptr<dnmi::db::Result> res;
 
@@ -806,7 +807,7 @@ replaceData( dnmi::db::Connection *conection,
       tbtime = it->tbtime();
       q << "SELECT * FROM data WHERE stationid=" << it->stationID()
         << " AND abs(typeid)=" << it->typeID()
-        << " AND (obstime='" << obstime << "' OR tbtime='" << to_simple_string(tbtime) << "')";
+        << " AND (obstime='" << obstime << "' OR tbtime='" << to_kvalobs_string(tbtime) << "')";
 
       addQuery( qDataList, q.str() );
    }
@@ -817,7 +818,7 @@ replaceData( dnmi::db::Connection *conection,
       tbtime = it->tbtime();
       q << "SELECT * FROM text_data WHERE stationid=" << it->stationID()
         << " AND abs(typeid)=" << it->typeID()
-        << " AND (obstime='" << obstime << "' OR tbtime='" << to_simple_string(tbtime) << "')";
+        << " AND (obstime='" << obstime << "' OR tbtime='" << to_kvalobs_string(tbtime) << "')";
 
       addQuery( qTextDataList, q.str() );
    }
@@ -893,9 +894,9 @@ update( dnmi::db::Connection *connection,
           << ", controlinfo='"    << it->controlinfo().flagstring() << "'"
           << ", useinfo='"        << it->useinfo().flagstring() << "'"
           << ", cfailed='"        << it->cfailed() << "'"
-          << ", tbtime='" << to_simple_string(it->tbtime()) << "'"
+          << ", tbtime='" << to_kvalobs_string(it->tbtime()) << "'"
           << " WHERE stationid=" << it->stationID() << " AND "
-          << "       obstime='"   << to_simple_string(it->obstime()) << "' AND "
+          << "       obstime='"   << to_kvalobs_string(it->obstime()) << "' AND "
           << "       paramid="   << it->paramID() << " AND "
           << "       typeid="    << it->typeID() << " AND "
           << "       sensor='"    << it->sensor() << "' AND "
@@ -911,9 +912,9 @@ update( dnmi::db::Connection *connection,
 
       ost << "UPDATE text_data SET "
           << "  original='"    << it->original() << "'"
-          << ", tbtime='" << to_simple_string(it->tbtime()) <<"." << it->tbtimemsec() << "'"
+          << ", tbtime='" << to_kvalobs_string(it->tbtime()) <<"." << it->tbtimemsec() << "'"
           << " WHERE stationid=" << it->stationID() << " AND "
-          << "       obstime='"   << to_simple_string(it->obstime()) << "' AND "
+          << "       obstime='"   << to_kvalobs_string(it->obstime()) << "' AND "
           << "       paramid="   << it->paramID() << " AND "
           << "       typeid="    << it->typeID();
 
