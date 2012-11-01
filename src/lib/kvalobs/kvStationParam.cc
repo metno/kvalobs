@@ -29,6 +29,7 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include <kvalobs/kvStationParam.h>
+#include <miutil/timeconvert.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
@@ -120,7 +121,7 @@ bool kvalobs::kvStationParam::set(const dnmi::db::DRow& r_)
 			}
 			else if (*it == "fromtime")
 			{
-				fromtime_ = boost::posix_time::time_from_string(buf);
+				fromtime_ = boost::posix_time::time_from_string_nothrow(buf);
 			}
 		} catch (...)
 		{

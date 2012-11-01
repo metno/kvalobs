@@ -33,6 +33,7 @@
 #include <functional>
 #include <iostream>
 #include <miutil/trimstr.h>
+#include <miutil/timeconvert.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/assign.hpp>
 #include <boost/shared_ptr.hpp>
@@ -108,7 +109,7 @@ namespace
         try {
           data_.invalidate( true, lexical_cast<int>(context_[ "station" ] ),
                             lexical_cast<int>(context_["typeid"] ),
-                            obstime.empty() ? boost::posix_time::ptime() : boost::posix_time::time_from_string( obstime ) );
+                            obstime.empty() ? boost::posix_time::ptime() : boost::posix_time::time_from_string_nothrow( obstime ) );
         }
         catch ( bad_lexical_cast & ) {
           throw parse_error( "Invalid parameter values" );
@@ -199,7 +200,7 @@ void KvalobsDataParser::on_end_element( const Glib::ustring & name )
   else if ( name == "message")
   {
 	  std::string message = context_["message"];
-	  boost::posix_time::ptime tbtime(boost::posix_time::time_from_string(context_["message/tbtime"]));
+	  boost::posix_time::ptime tbtime(boost::posix_time::time_from_string_nothrow(context_["message/tbtime"]));
 	  std::string decoder = context_["decoder"];
 	  kvalobs::kvRejectdecode reject(message, tbtime, decoder, "");
 	  std::cout << reject.toSend() << std::endl;
@@ -239,7 +240,7 @@ namespace
   boost::posix_time::ptime get_obstime( std::map<std::string, std::string> & context_ )
   {
     string ot = context_[ "obstime" ];
-    return ot.empty() ? boost::posix_time::ptime() : boost::posix_time::time_from_string( ot );
+    return ot.empty() ? boost::posix_time::ptime() : boost::posix_time::time_from_string_nothrow( ot );
   }
   int get_sensor( std::map<std::string, std::string> & context_ )
   {

@@ -30,6 +30,7 @@
 */
 #include "NewDataJob.h"
 #include <milog/milog.h>
+#include <miutil/timeconvert.h>
 
 #include <list>
 #include <kvalobs/kvDbGate.h>
@@ -108,7 +109,7 @@ void NewDataJob::doJob(dnmi::db::Connection &con)
     std::string s= itk->val();
     try
     {
-    	startime = boost::posix_time::time_from_string(s);
+    	startime = boost::posix_time::time_from_string_nothrow(s);
     }
     catch ( std::exception & )
     {}

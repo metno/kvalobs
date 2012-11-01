@@ -427,7 +427,7 @@ execute(std::string &msg)
       	continue;
     	}	
     
-    	obstime = boost::posix_time::time_from_string(data[0]);
+    	obstime = boost::posix_time::time_from_string_nothrow(data[0]);
     	IDLOGDEBUG( logid, "  Data: obstime:  " << obstime << endl);
     
     	converter.resetRRRtr();

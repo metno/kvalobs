@@ -71,7 +71,20 @@ inline std::string to_kvalobs_string(const time_duration & t)
 {
 	return to_simple_string(t);
 }
+
+inline boost::posix_time::ptime time_from_string_nothrow(const std::string & s)
+{
+	try
+	{
+		return boost::posix_time::time_from_string(s);
+	}
+	catch ( std::exception & e )
+	{
+		return boost::posix_time::ptime();
+	}
 }
+}
+
 namespace gregorian
 {
 inline std::string to_kvalobs_string(const date & d)

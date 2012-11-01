@@ -91,7 +91,7 @@ bool kvalobs::kvTextData::set(const dnmi::db::DRow& r_)
 			}
 			else if (*it == "obstime")
 			{
-				obstime_ = pt::time_from_string(buf);
+				obstime_ = pt::time_from_string_nothrow(buf);
 			}
 			else if (*it == "original")
 			{
@@ -103,7 +103,7 @@ bool kvalobs::kvTextData::set(const dnmi::db::DRow& r_)
 			}
 			else if (*it == "tbtime")
 			{
-				tbtime_ = pt::time_from_string(buf);
+				tbtime_ = pt::time_from_string_nothrow(buf);
 			}
 			else if (*it == "typeid")
 			{

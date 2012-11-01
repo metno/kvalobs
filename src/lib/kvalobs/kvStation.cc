@@ -29,6 +29,7 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include <kvalobs/kvStation.h>
+#include <miutil/timeconvert.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -166,7 +167,7 @@ bool kvalobs::kvStation::set(const dnmi::db::DRow& r_)
 			else if (*it == "static")
 				static_ = (buf == "t");
 			else if (*it == "fromtime")
-				fromtime_ = boost::posix_time::time_from_string(buf);
+				fromtime_ = boost::posix_time::time_from_string_nothrow(buf);
 		} catch (...)
 		{
 			CERR("kvStation: exception ..... \n");

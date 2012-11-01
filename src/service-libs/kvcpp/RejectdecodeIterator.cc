@@ -31,6 +31,7 @@
 #include "RejectdecodeIterator.h"
 #include <typeinfo>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <miutil/timeconvert.h>
 #include <milog/milog.h>
 #include <ctime>
 
@@ -105,7 +106,7 @@ namespace kvservice
 
     const Rejectdecode &rd = rejectedList[ index++ ];
     reject.set( std::string( rd.message ),
-		boost::posix_time::time_from_string( (const char *) rd.tbtime  ),
+		boost::posix_time::time_from_string_nothrow( (const char *) rd.tbtime  ),
 		std::string( rd.decoder ),
 		std::string( rd.comment ),
 		bool( rd.is_fixed ));

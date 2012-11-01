@@ -29,6 +29,7 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include <kvalobs/kvWorkelement.h>
+#include <miutil/timeconvert.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <sstream>
 
@@ -115,7 +116,7 @@ bool kvalobs::kvWorkelement::set(const dnmi::db::DRow &r_)
 			}
 			else if (*it == "obstime")
 			{
-				obstime_ = boost::posix_time::time_from_string(buf);
+				obstime_ = boost::posix_time::time_from_string_nothrow(buf);
 			}
 			else if (*it == "typeid")
 			{
@@ -123,7 +124,7 @@ bool kvalobs::kvWorkelement::set(const dnmi::db::DRow &r_)
 			}
 			else if (*it == "tbtime")
 			{
-				tbtime_ = boost::posix_time::time_from_string(buf);
+				tbtime_ = boost::posix_time::time_from_string_nothrow(buf);
 			}
 			else if (*it == "priority")
 			{
@@ -132,27 +133,27 @@ bool kvalobs::kvWorkelement::set(const dnmi::db::DRow &r_)
 			else if (*it == "process_start")
 			{
 				if (!buf.empty())
-					process_start_ = boost::posix_time::time_from_string(buf);
+					process_start_ = boost::posix_time::time_from_string_nothrow(buf);
 			}
 			else if (*it == "qa_start")
 			{
 				if (!buf.empty())
-					qa_start_ = boost::posix_time::time_from_string(buf);
+					qa_start_ = boost::posix_time::time_from_string_nothrow(buf);
 			}
 			else if (*it == "qa_stop")
 			{
 				if (!buf.empty())
-					qa_stop_ = boost::posix_time::time_from_string(buf);
+					qa_stop_ = boost::posix_time::time_from_string_nothrow(buf);
 			}
 			else if (*it == "service_start")
 			{
 				if (!buf.empty())
-					service_start_ = boost::posix_time::time_from_string(buf);
+					service_start_ = boost::posix_time::time_from_string_nothrow(buf);
 			}
 			else if (*it == "service_stop")
 			{
 				if (!buf.empty())
-					service_stop_ = boost::posix_time::time_from_string(buf);
+					service_stop_ = boost::posix_time::time_from_string_nothrow(buf);
 			}
 			else
 			{

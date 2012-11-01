@@ -352,8 +352,8 @@ DataIteratorImpl::findData(list<kvData> &data,
             iData);
 
    if(currentEndTime.is_not_a_date_time()){
-      stime = boost::posix_time::time_from_string(std::string(wData.fromObsTime));
-      endTime = boost::posix_time::time_from_string(std::string(wData.toObsTime));
+      stime = boost::posix_time::time_from_string_nothrow(std::string(wData.fromObsTime));
+      endTime = boost::posix_time::time_from_string_nothrow(std::string(wData.toObsTime));
 
       if(stime.is_not_a_date_time() || endTime.is_not_a_date_time()){
          if(stime.is_not_a_date_time()){
@@ -435,7 +435,7 @@ insertTextData(CKvalObs::CService::ObsDataList *obsDataList,
    if(textData.length()==0)
       return;
 
-   textTime=boost::posix_time::time_from_string(std::string(textData[0].obstime));
+   textTime=boost::posix_time::time_from_string_nothrow(std::string(textData[0].obstime));
 
    if(textTime.is_not_a_date_time())//Should never happend
       return;
@@ -444,7 +444,7 @@ insertTextData(CKvalObs::CService::ObsDataList *obsDataList,
       if((*obsDataList)[i].dataList.length()==0) //Should never happend.
          continue;
 
-      obsTime=boost::posix_time::time_from_string(std::string((*obsDataList)[i].dataList[0].obstime));
+      obsTime=boost::posix_time::time_from_string_nothrow(std::string((*obsDataList)[i].dataList[0].obstime));
 
       if(obsTime.is_not_a_date_time()) //Should never happend.
          continue;

@@ -299,14 +299,14 @@ bool kvalobs::kvObsPgm::set(const dnmi::db::DRow& r_)
 			else if (*it == "fromtime")
 			{
 				if (!buf.empty())
-					fromtime_ = boost::posix_time::time_from_string(buf);
+					fromtime_ = boost::posix_time::time_from_string_nothrow(buf);
 				else
 					fromtime_ = boost::posix_time::ptime();
 			}
 			else if (*it == "totime")
 			{
 				if (!buf.empty())
-					totime_ = boost::posix_time::time_from_string(buf);
+					totime_ = boost::posix_time::time_from_string_nothrow(buf);
 				else
 					totime_ = boost::posix_time::ptime();
 			}

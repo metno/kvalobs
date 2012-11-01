@@ -29,6 +29,7 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include "kvWhat.h"
+#include <miutil/timeconvert.h>
 
 kvservice::KvWhat::KvWhat(const KvWhat &w):
   stationID_(w.stationID_), typeID_(w.typeID_), qcID_(w.qcID_), 
@@ -43,7 +44,7 @@ kvservice::KvWhat::KvWhat(
 {
   stationID_=what.stationID;
   typeID_=what.typeID_;
-  obsTime_ = boost::posix_time::time_from_string(std::string(what.obsTime));
+  obsTime_ = boost::posix_time::time_from_string_nothrow(std::string(what.obsTime));
   
   for(CORBA::ULong i=0; i<what.qc.length(); i++)
     qcID_[what.qc[i]]=true; 

@@ -29,6 +29,7 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include <kvalobs/kvServiceElement.h>
+#include <miutil/timeconvert.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <sstream>
 
@@ -78,7 +79,7 @@ bool kvalobs::kvServiceElement::set(const dnmi::db::DRow& r_)
 			}
 			else if (*it == "obstime")
 			{
-				obstime_ = boost::posix_time::time_from_string(buf);
+				obstime_ = boost::posix_time::time_from_string_nothrow(buf);
 			}
 			else if (*it == "typeid")
 			{

@@ -99,8 +99,8 @@ int main(int argc, char** argv)
 	list<kvData>::iterator dit;	
 	ostringstream          ost;
 	
-	boost::posix_time::ptime startObst = boost::posix_time::time_from_string("2010-06-08 10:00:00");
-	boost::posix_time::ptime endObst = boost::posix_time::time_from_string("2010-06-09 08:00:00");
+	boost::posix_time::ptime startObst = boost::posix_time::time_from_string_nothrow("2010-06-08 10:00:00");
+	boost::posix_time::ptime endObst = boost::posix_time::time_from_string_nothrow("2010-06-09 08:00:00");
 	boost::posix_time::ptime obst(startObst);
 	//endObst.addDay(1);
 	

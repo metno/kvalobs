@@ -91,7 +91,7 @@ bool kvalobs::kvChecks::set(const dnmi::db::DRow &r_)
 			}
 			else if (*it == "fromtime")
 			{
-				fromtime_ = boost::posix_time::time_from_string(buf);
+				fromtime_ = boost::posix_time::time_from_string_nothrow(buf);
 			}
 		} catch (...)
 		{

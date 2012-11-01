@@ -232,7 +232,7 @@ getTimestamp( dnmi::db::Connection *con )
 
    if( res.get() != 0 && res->hasNext() ) {
       dnmi::db::DRow & row = res->next();
-      return boost::posix_time::time_from_string(row[0]);
+      return boost::posix_time::time_from_string_nothrow(row[0]);
    }
 
    return boost::posix_time::ptime();

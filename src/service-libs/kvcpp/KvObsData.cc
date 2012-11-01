@@ -29,6 +29,7 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include "KvObsData.h"
+#include <miutil/timeconvert.h>
 
 using namespace kvalobs;
 using namespace CKvalObs::CService;
@@ -56,8 +57,8 @@ namespace kvservice
       stationid_ = obsData.dataList[0].stationID;
       for ( CORBA::ULong i = 0; i < obsData.dataList.length(); i++ ) {
 	DataElem &d = obsData.dataList[ i ];
-	kvData data( d.stationID, boost::posix_time::time_from_string( (const char*) d.obstime ), d.original, d.paramID,
-			boost::posix_time::time_from_string( (const char*) d.tbtime ), d.typeID_,
+	kvData data( d.stationID, boost::posix_time::time_from_string_nothrow( (const char*) d.obstime ), d.original, d.paramID,
+			boost::posix_time::time_from_string_nothrow( (const char*) d.tbtime ), d.typeID_,
 		     strlen(d.sensor) > 0 ? (int) *d.sensor : 0,
 		     d.level, d.corrected, kvControlInfo((char*)d.controlinfo), 
 		     kvUseInfo((char*)d.useinfo), std::string(d.cfailed) );
@@ -70,9 +71,9 @@ namespace kvservice
       	
       for ( CORBA::ULong i = 0; i < obsData.textDataList.length(); i++ ) {
 	TextDataElem &d = obsData.textDataList[ i ];
-	kvTextData textData( d.stationID, boost::posix_time::time_from_string((const char*) d.obstime),
+	kvTextData textData( d.stationID, boost::posix_time::time_from_string_nothrow((const char*) d.obstime),
 			     std::string(d.original), d.paramID, 
-			     boost::posix_time::time_from_string((const char*) d.tbtime), d.typeID_ );
+			     boost::posix_time::time_from_string_nothrow((const char*) d.tbtime), d.typeID_ );
 	textDataList_.push_back( textData );
       }
     }

@@ -175,7 +175,7 @@ lastFromTime( const string& filename )
          if(!str.empty()){
         	 try
         	 {
-        		 time = boost::posix_time::time_from_string(str);
+        		 time = boost::posix_time::time_from_string_nothrow(str);
         	 }
         	 catch ( std::exception &)
         	 {}

@@ -31,6 +31,7 @@
 #include "WorkstatistikIterator.h"
 #include <typeinfo>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <miutil/timeconvert.h>
 #include <milog/milog.h>
 #include <ctime>
 
@@ -109,15 +110,15 @@ next( kvalobs::kvWorkelement &ws )
 
    const  WorkstatistikElem &rd = dataList[ index++ ];
    ws.set( rd.stationID,
-           boost::posix_time::time_from_string( std::string(rd.obstime) ),
+           boost::posix_time::time_from_string_nothrow( std::string(rd.obstime) ),
            rd.typeID_,
-           boost::posix_time::time_from_string( std::string(rd.tbtime) ),
+           boost::posix_time::time_from_string_nothrow( std::string(rd.tbtime) ),
            rd.priority,
-           boost::posix_time::time_from_string(std::string(rd.processStart)),
-           boost::posix_time::time_from_string(std::string(rd.qaStart)),
-           boost::posix_time::time_from_string(std::string(rd.qaStop)),
-           boost::posix_time::time_from_string(std::string(rd.serviceStart)),
-           boost::posix_time::time_from_string(std::string(rd.serviceStop)) );
+           boost::posix_time::time_from_string_nothrow(std::string(rd.processStart)),
+           boost::posix_time::time_from_string_nothrow(std::string(rd.qaStart)),
+           boost::posix_time::time_from_string_nothrow(std::string(rd.qaStop)),
+           boost::posix_time::time_from_string_nothrow(std::string(rd.serviceStart)),
+           boost::posix_time::time_from_string_nothrow(std::string(rd.serviceStop)) );
    return true;
 }
 

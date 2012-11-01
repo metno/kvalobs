@@ -71,7 +71,7 @@ bool kvalobs::kvRejectdecode::set(const dnmi::db::DRow& r_)
 			if (*it == "message")
 				message_ = buf;
 			else if (*it == "tbtime")
-				tbtime_ = boost::posix_time::time_from_string(buf);
+				tbtime_ = boost::posix_time::time_from_string_nothrow(buf);
 			else if (*it == "decoder")
 				decoder_ = buf;
 			else if (*it == "comment")

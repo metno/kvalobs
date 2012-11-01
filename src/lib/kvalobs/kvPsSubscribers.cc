@@ -30,6 +30,7 @@
  */
 #include <stdlib.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <miutil/timeconvert.h>
 #include <kvalobs/kvPsSubscribers.h>
 #include <dnmithread/mtcout.h>
 
@@ -90,7 +91,7 @@ bool kvalobs::kvPsSubscribers::set(const dnmi::db::DRow& r_)
 			}
 			else if (*it == "created")
 			{
-				created_ = boost::posix_time::time_from_string(buf);
+				created_ = boost::posix_time::time_from_string_nothrow(buf);
 			}
 			else
 			{

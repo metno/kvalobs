@@ -83,7 +83,7 @@ bool kvalobs::kvModelData::set(const dnmi::db::DRow &r_)
 			}
 			else if (*it == "obstime")
 			{
-				obstime_ = boost::posix_time::time_from_string(buf);
+				obstime_ = boost::posix_time::time_from_string_nothrow(buf);
 			}
 			else if (*it == "paramid")
 			{

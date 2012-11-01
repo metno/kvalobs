@@ -29,6 +29,7 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include <kvalobs/kvStationInfoCommand.h>
+#include <miutil/timeconvert.h>
 
 using namespace kvalobs;
 using namespace std;
@@ -43,7 +44,7 @@ kvalobs::StationInfoCommand::StationInfoCommand(
 {
 	for (CORBA::Long i = 0; i < st.length(); i++)
 	{
-		kvStationInfoExt stationInfo(st[i].stationId, boost::posix_time::time_from_string(std::string(st[i].obstime)),
+		kvStationInfoExt stationInfo(st[i].stationId, boost::posix_time::time_from_string_nothrow(std::string(st[i].obstime)),
 				st[i].typeId_);
 		stationInfoList.push_back(stationInfo);
 	}
@@ -54,7 +55,7 @@ kvalobs::StationInfoCommand::StationInfoCommand(
 {
 	for (CORBA::Long i = 0; i < st.length(); i++)
 	{
-		kvStationInfoExt stationInfo(st[i].stationId, boost::posix_time::time_from_string(std::string(st[i].obstime)),
+		kvStationInfoExt stationInfo(st[i].stationId, boost::posix_time::time_from_string_nothrow(std::string(st[i].obstime)),
 				st[i].typeId_);
 		for (CORBA::Long j = 0; j < st[i].params.length(); ++j)
 			stationInfo.addParam(
@@ -69,7 +70,7 @@ kvalobs::StationInfoCommand::StationInfoCommand(
 kvalobs::StationInfoCommand::StationInfoCommand(
 		const CKvalObs::StationInfoExt &st)
 {
-	kvStationInfoExt sti(st.stationId, boost::posix_time::time_from_string(std::string(st.obstime)), st.typeId_);
+	kvStationInfoExt sti(st.stationId, boost::posix_time::time_from_string_nothrow(std::string(st.obstime)), st.typeId_);
 
 	for (CORBA::Long i = 0; i < st.params.length(); ++i)
 		sti.addParam(
@@ -81,7 +82,7 @@ kvalobs::StationInfoCommand::StationInfoCommand(
 kvalobs::StationInfoCommand::StationInfoCommand(const CKvalObs::StationInfo &st)
 {
 	stationInfoList.push_back(
-			kvStationInfoExt(st.stationId, boost::posix_time::time_from_string(std::string(st.obstime)), st.typeId_));
+			kvStationInfoExt(st.stationId, boost::posix_time::time_from_string_nothrow(std::string(st.obstime)), st.typeId_));
 }
 
 bool kvalobs::StationInfoCommand::addStationInfo(const kvStationInfo &si)

@@ -90,7 +90,7 @@ lastMissingRuntime(dnmi::db::Connection *con)
   				LOGINFO("Created new key 'kvManagerd.LastMissingRun' in the 'key_val' table!");
   			}
   		}else{
-  			lastMissingRunTime_=boost::posix_time::time_from_string(keys.begin()->val());
+  			lastMissingRunTime_=boost::posix_time::time_from_string_nothrow(keys.begin()->val());
   			boost::posix_time::ptime tmp(boost::posix_time::microsec_clock::universal_time());
   			tmp -= boost::gregorian::days(7);
   			
