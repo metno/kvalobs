@@ -31,6 +31,7 @@
 #include "Exception.h"
 #include <kvalobs/kvStationInfo.h>
 #include <milog/milog.h>
+#include <miutil/timeconvert.h>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -80,7 +81,7 @@ boost::filesystem::path getLogFile(const kvalobs::kvStationInfo & observationToC
 	{
 		boost::filesystem::path logFile(base);
 		logFile /= boost::lexical_cast<std::string>(observationToCheck.stationID());
-		logFile /= to_iso_extended_string(observationToCheck.obstime().date());
+		logFile /= to_kvalobs_string(observationToCheck.obstime().date());
 
 		if ( not exists(logFile) and ! create_directories(logFile) )
 			throw LogFileCreationError("Unable to create logging folder " + logFile.string() );

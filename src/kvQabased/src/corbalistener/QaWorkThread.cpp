@@ -38,6 +38,7 @@
 #include <db/KvalobsDatabaseAccess.h>
 #include <sstream>
 #include <kvalobs/kvDbGate.h>
+#include <miutil/timeconvert.h>
 #include <boost/regex.hpp>
 #include <memory>
 #include <stdexcept>
@@ -61,8 +62,8 @@ void doUpdateWorkQue(kvDbGate & gate, const kvStationInfo & si,
 	LOGDEBUG( "UPDATE: workque!" );
 	ostringstream ost;
 	ost << "UPDATE workque SET " << colName << "='"
-			<< to_iso_extended_string(boost::posix_time::second_clock::universal_time()) << "' WHERE stationid="
-			<< si.stationID() << "  AND obstime='" << to_iso_extended_string(si.obstime())
+			<< to_kvalobs_string(boost::posix_time::second_clock::universal_time()) << "' WHERE stationid="
+			<< si.stationID() << "  AND obstime='" << to_kvalobs_string(si.obstime())
 			<< "' AND typeid=" << si.typeID();
 
 	if (!gate.exec(ost.str()))
