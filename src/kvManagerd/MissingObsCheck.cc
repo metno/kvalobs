@@ -84,6 +84,9 @@ checkObstime(const boost::posix_time::ptime &runTime,
                     boost::posix_time::ptime &obstime,
 	                    const long lateobsInMinute)
 {
+	if ( lateobsInMinute > 100000 )
+		return false;
+
 	int min=20;
 	int h, m;
 	
