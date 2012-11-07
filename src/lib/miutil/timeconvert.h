@@ -82,6 +82,14 @@ inline boost::posix_time::ptime time_from_string_nothrow(const std::string & s)
 {
 	try
 	{
+		std::string::size_type pos = s.find('+');
+		if  ( pos != std::string::npos )
+		{
+			// remove time zone specifiers from string
+			std::string time = s.substr(0, pos);
+			boost::posix_time::time_duration offset = boost::posix_time::hours(boost::lexical_cast<int>(s.substr(pos)));
+			return boost::posix_time::time_from_string(time) - offset;
+		}
 		return boost::posix_time::time_from_string(s);
 	}
 	catch ( std::exception & e )
