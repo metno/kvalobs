@@ -912,7 +912,7 @@ update( dnmi::db::Connection *connection,
 
       ost << "UPDATE text_data SET "
           << "  original='"    << it->original() << "'"
-          << ", tbtime='" << to_kvalobs_string(it->tbtime()) <<"." << it->tbtimemsec() << "'"
+          << ", tbtime='" << to_kvalobs_string(it->tbtime()) << "'"
           << " WHERE stationid=" << it->stationID() << " AND "
           << "       obstime='"   << to_kvalobs_string(it->obstime()) << "' AND "
           << "       paramid="   << it->paramID() << " AND "

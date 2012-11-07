@@ -55,7 +55,6 @@ private:
 	std::string original_;
 	int paramid_;
 	boost::posix_time::ptime tbtime_;
-	int tbtimemsec_;
 	int typeid_;
 
 public:
@@ -104,10 +103,6 @@ public:
 	boost::posix_time::ptime tbtime() const
 	{
 		return tbtime_;
-	}
-	int tbtimemsec() const
-	{
-		return tbtimemsec_;
 	}
 	int typeID() const
 	{

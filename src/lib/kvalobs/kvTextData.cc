@@ -38,23 +38,9 @@ namespace pt = boost::posix_time;
 std::string kvalobs::kvTextData::toSend() const
 {
 	ostringstream ost;
-	string myTbtime;
-
-	if (tbtimemsec_ > 0)
-	{
-		ost << to_kvalobs_string(tbtime_) << "." << tbtimemsec_;
-		myTbtime = ost.str();
-	}
-	else
-	{
-		ost << to_kvalobs_string(tbtime_);
-		myTbtime = ost.str();
-	}
-
-	ost.str("");
 
 	ost << "(" << stationid_ << "," << quoted(to_kvalobs_string(obstime_)) << ","
-			<< quoted(original_) << "," << paramid_ << "," << quoted(myTbtime)
+			<< quoted(original_) << "," << paramid_ << "," << quoted(to_kvalobs_string(tbtime_))
 			<< "," << typeid_ << ")";
 	return ost.str();
 }
@@ -67,7 +53,6 @@ bool kvalobs::kvTextData::set(int sta, const boost::posix_time::ptime& obt,
 	original_ = org;
 	paramid_ = pid;
 	tbtime_ = tbt;
-	tbtimemsec_ = 0;
 	typeid_ = typ;
 	sortBy_ = boost::lexical_cast<std::string>(sta) + to_kvalobs_string(obt);
 	return true;
