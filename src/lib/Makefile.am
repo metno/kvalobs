@@ -1,4 +1,5 @@
 SUBDIRS = \
+	gtest \
 	kvskel \
 	dnmithread \
 	miutil \

@@ -27,6 +27,7 @@ AC_CONFIG_FILES([Makefile
                  share/kvalobs/idl/Makefile
                  src/Makefile
                  src/lib/Makefile
+                 src/lib/gtest/Makefile
                  src/lib/kvskel/Makefile
                  src/lib/miutil/Makefile
                  src/lib/decodeutility/Makefile
@@ -86,7 +87,8 @@ PKG_CHECK_MODULES(libxml2, libxml-2.0)
 PKG_CHECK_MODULES(libxmlpp, libxml++-2.6)
 
 PKG_CHECK_MODULES(cppunit, cppunit)
-GTEST_CHECK
+AC_PATH_PROG(CMAKE, cmake, false)
+GTEST_CHECK(src/lib/gtest)
 GMOCK_CHECK
 AC_CHECK_LIB(perl, [main], [], [AC_MSG_ERROR([no libperl found])])
 
