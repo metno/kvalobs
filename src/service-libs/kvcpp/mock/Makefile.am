@@ -1,17 +1,19 @@
+
+if HAVE_GMOCK
 libmockkvappincludedir =  $(pkgincludedir)/kvcpp/mock
 libmockkvappinclude_HEADERS = \
 	FakeKvApp.h \
 	MockKvApp.h
-	
+
 TESTS = testTestingKvApp
-	
+
 check_PROGRAMS = testTestingKvApp
 
 testTestingKvApp_SOURCES = \
 	FakeKvApp.h \
 	MockKvApp.h \
 	test.cc
-	
+
 testTestingKvApp_CPPFLAGS = -I$(srcdir)/../.. -I$(top_srcdir)/src/lib/  \
                             -I$(top_builddir)/src/lib \
                             -I$(top_builddir)/src/lib/kvskel \
@@ -32,3 +34,5 @@ testTestingKvApp_LDADD = $(gtest_LIBS) $(gmock_LIBS) \
 	$(top_builddir)/src/lib/kvskel/libkvalobs2_kvadmininterface.la \
 	$(top_builddir)/src/lib/miconfparser/libkvalobs2_miconfparser.la \
 	$(putools_LIBS) 
+
+endif # HAVE_GMOCK
