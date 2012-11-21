@@ -35,6 +35,7 @@
 #include <map>
 #include <puTools/miTime.h>
 #include <puCtools/timemanip.h>
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
 
@@ -63,17 +64,17 @@ void setTime(miTime& to, timeline t)
 
 bool readPindexMap(const std::string& fname)
 {
-  ifstream pin(fname.cStr());
+  ifstream pin(fname.c_str());
   
   std::string line;
   vector<std::string> words;
 
   while(pin) {
     getline(pin,line);
-    line.trim();
-    if(!line.exists())
+    boost::trim(line);
+    if(line.empty())
       continue;
-    words = line.split(":");
+    boost::split(words, line, boost::is_any_of(":"));
     if(words.size() < 2 )
       continue;
     pi_map[words[0]] = words[1];
