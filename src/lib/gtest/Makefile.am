@@ -2,6 +2,9 @@ if MUST_COMPILE_GTEST
 
 check_LIBRARIES = libgtest.a libgtest_main.a
 
+libgtest_a_SOURCES = 
+libgtest_main_a_SOURCES = 
+
 libs:
 	mkdir -p libs
 	cd libs; $(CMAKE) /usr/src/gtest && $(MAKE)

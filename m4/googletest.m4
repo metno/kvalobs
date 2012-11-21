@@ -7,9 +7,14 @@
 AC_DEFUN([GTEST_CHECK],
 [
 AC_LANG_PUSH([C++])
-AC_CHECK_HEADERS([gtest.h gtest/gtest.h], [have_gtest=true])
+AC_CHECK_HEADERS([gtest/gtest.h], [have_gtest=true])
 gtest_CFLAGS=
-AC_CHECK_LIB(gtest, testing::TestResult::Clear(), 
+
+OLD_LIBS=$LIBS
+LIBS=-lgtest
+OLD_LDFLAGS=$LDFLAGS
+LDFLAGS=-pthread
+AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <gtest/gtest.h>], [testing::AssertionResult r(true)])],
 	[gtest_LIBS=-lgtest],
 	[
 	if test $1; then
@@ -21,6 +26,8 @@ AC_CHECK_LIB(gtest, testing::TestResult::Clear(),
 		have_gtest=false
 	fi
 ])
+LIBS=$OLD_LIBS
+LDFLAGS=$OLD_LDFLAGS
 AM_CONDITIONAL(HAVE_GTEST, [test x${have_gtest} != x])
 AM_CONDITIONAL(MUST_COMPILE_GTEST, [test x${must_compile_gtest} = xtrue])
 
