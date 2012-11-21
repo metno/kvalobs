@@ -12,9 +12,7 @@ gtest_CFLAGS=
 
 OLD_LIBS=$LIBS
 LIBS=-lgtest
-OLD_LDFLAGS=$LDFLAGS
-LDFLAGS=-pthread
-AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <gtest/gtest.h>], [testing::AssertionResult r(true)])],
+AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <gtest/gtest.h>], [])],
 	[gtest_LIBS=-lgtest],
 	[
 	if test $1; then
@@ -27,7 +25,6 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <gtest/gtest.h>], [testing::AssertionR
 	fi
 ])
 LIBS=$OLD_LIBS
-LDFLAGS=$OLD_LDFLAGS
 AM_CONDITIONAL(HAVE_GTEST, [test x${have_gtest} != x])
 AM_CONDITIONAL(MUST_COMPILE_GTEST, [test x${must_compile_gtest} = xtrue])
 
