@@ -1,7 +1,6 @@
 AM_CPPFLAGS = -I$(top_srcdir)/src/lib -I$(top_srcdir)/src/service-libs  -I$(top_builddir)/src/lib -I$(top_builddir)/src/lib/kvskel  $(omniORB4_CFLAGS)  $(putools_CFLAGS)  -D_REENTRANT
 
-bin_PROGRAMS=stressTestGetData 
-noinst_PROGRAMS =\
+EXTRA_PROGRAMS=stressTestGetData \
 	getdata getstationmetadata getstationmetadatakvcpp\
 	getworkstatistik
 

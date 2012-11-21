@@ -20,6 +20,8 @@ kv2kro_LDADD = $(top_builddir)/src/service-libs/kvcpp/libkvalobs2_kvcpp.la \
 		$(top_builddir)/src/lib/dnmithread/libkvalobs2_dnmithread.la \
 		$(top_builddir)/src/lib/miconfparser/libkvalobs2_miconfparser.la \
 		$(top_builddir)/src/lib/fileutil/libkvalobs2_fileutil.la \
+		$(top_builddir)/src/lib/miutil/libkvalobs2_miutil.la\
+		$(putools_LIBS) \
                $(omniORB4_LIBS) $(BOOST_THREAD_LIB) $(BOOST_DATE_TIME_LIB) \
               -lm 
 

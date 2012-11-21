@@ -37,4 +37,4 @@ CREATE ROLE kvadmin INHERIT LOGIN PASSWORD 'kvadmin12' IN ROLE kv_admin ;
 
 
 --A role to use for replication.
-CREATE ROLE kvrep INHERIT LOGIN REPLICATION PASSWORD 'kvrep#21';
+--CREATE ROLE kvrep INHERIT LOGIN REPLICATION PASSWORD 'kvrep#21';

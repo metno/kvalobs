@@ -40,6 +40,7 @@ kvDataInputd_LDADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs2_dec
                      $(top_builddir)/src/lib/milog/libkvalobs2_milog.la \
                      $(top_builddir)/src/lib/kvskel/libkvalobs2_kvadmininterface.la \
                      $(top_builddir)/src/lib/kvskel/libkvalobs2_kvskel.la \
+		     $(top_builddir)/src/lib/miutil/libkvalobs2_miutil.la\
                      $(putools_LIBS) $(omniORB4_LIBS) $(libxmlpp_LIBS) $(BOOST_THREAD_LIB) $(BOOST_DATE_TIME_LIB) -ldl
 
 
@@ -71,5 +72,7 @@ kvdataclt_LDADD = $(top_builddir)/src/lib/miconfparser/.libs/libkvalobs2_miconfp
                   $(top_builddir)/src/lib/corbahelper/.libs/libkvalobs2_corbahelper.a \
                   $(top_builddir)/src/lib/milog/.libs/libkvalobs2_milog.a \
                   $(top_builddir)/src/lib/kvskel/.libs/libkvalobs2_kvskel.a \
+		  $(top_builddir)/src/lib/miutil/libkvalobs2_miutil.la\
+                  $(putools_LIBS) \
                   $(BOOST_THREAD_LIB) \
                   $(omniORB4_LIBS) 
