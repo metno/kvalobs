@@ -38,6 +38,7 @@
 #include <fileutil/readfile.h>
 #include <fileutil/dir.h>
 #include <fileutil/file.h>
+#include <puTools/miTime.h>
 #include <miutil/timeconvert.h>
 #include <dbdrivers/dummysqldb.h>
 #include "../smsdata.h"

@@ -29,6 +29,7 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include <boost/lexical_cast.hpp>
+#include <puTools/miTime.h>
 #include <miutil/timeconvert.h>
 #include "kvSynopDecoder.h"
 #include "synopLexer.h"

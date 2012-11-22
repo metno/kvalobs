@@ -30,6 +30,7 @@
  */
 #include <stdio.h>
 #include <milog/milog.h>
+#include <puTools/miTime.h>
 #include <miutil/timeconvert.h>
 #include "decodeddata.h"
 

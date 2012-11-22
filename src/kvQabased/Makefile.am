@@ -5,7 +5,6 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/src/lib \
 	-I$(top_builddir)/src/lib \
 	-I$(top_builddir)/src/lib/kvskel \
-	$(putools_CFLAGS) \
 	$(BOOST_CPPFLAGS) \
 	$(perl_CFLAGS)
 
@@ -20,7 +19,6 @@ AM_LDFLAGS = \
 	$(top_builddir)/src/lib/kvskel/libkvalobs2_kvadmininterface.la \
 	$(top_builddir)/src/lib/kvskel/libkvalobs2_kvskel.la \
 	$(top_builddir)/src/lib/dnmithread/libkvalobs2_dnmithread.la \
-	$(putools_LIBS) \
 	$(BOOST_PROGRAM_OPTIONS_LIB) \
 	$(BOOST_FILESYSTEM_LIB) \
 	$(BOOST_REGEX_LIB) \

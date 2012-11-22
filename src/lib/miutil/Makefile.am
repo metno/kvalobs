@@ -20,7 +20,7 @@ libkvalobs2_miutil_la_SOURCES = \
 
 libkvalobs2_miutil_la_CPPFLAGS = $(putools_CFLAGS) -fPIC
 libkvalobs2_miutil_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@ -fPIC
-libkvalobs2_miutil_la_LIBADD = #$(putools_LIBS)
+libkvalobs2_miutil_la_LIBADD = $(putools_LIBS)
 
 miutilincludedir = $(pkgincludedir)/miutil
 miutilinclude_HEADERS = msleep.h replace.h cmprspace.h commastring.h \

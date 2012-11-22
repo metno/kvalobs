@@ -38,6 +38,7 @@
 #include <kvalobs/kvGeneratedTypes.h>
 #include <kvalobs/kvWorkelement.h>
 #include <kvalobs/kvPath.h>
+#include <puTools/miTime.h>
 #include <miutil/commastring.h>
 #include <miutil/trimstr.h>
 #include <miutil/timeconvert.h>

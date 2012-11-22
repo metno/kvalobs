@@ -24,10 +24,10 @@
 #define TIMECONVERT_H_
 
 #include <boost/date_time/posix_time/posix_time.hpp>
-#include <puTools/miTime.h>
 #include <sstream>
 #include <iomanip>
 
+#ifdef __dnmi_miTime__
 namespace miutil
 {
 inline boost::posix_time::ptime to_ptime(const miTime & mt)
@@ -39,6 +39,7 @@ inline boost::posix_time::ptime to_ptime(const miTime & mt)
 			boost::posix_time::time_duration(mt.hour(), mt.min(), mt.sec()));
 }
 }
+#endif
 
 namespace boost
 {
@@ -55,7 +56,7 @@ inline std::string to_kvalobs_string(const date & d)
 }
 namespace posix_time
 {
-
+#ifdef __dnmi_miTime__
 inline miutil::miTime to_miTime(const ptime & t)
 {
 	if ( t.is_not_a_date_time() )
@@ -65,6 +66,7 @@ inline miutil::miTime to_miTime(const ptime & t)
 	const boost::posix_time::time_duration c = t.time_of_day();
 	return miutil::miTime(d.year(), d.month(), d.day(), c.hours(), c.minutes(), c.seconds());
 }
+#endif
 
 inline std::string to_kvalobs_string(const time_duration & t)
 {
