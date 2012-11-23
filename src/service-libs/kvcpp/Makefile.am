@@ -35,7 +35,6 @@ libkvalobs2_kvcpp_la_LIBADD = \
 	$(top_builddir)/src/service-libs/kvcpp/corba/libcorbakvapp.la \
 	$(top_builddir)/src/lib/decodeutility/libkvalobs2_decodeutility.la \
 	$(top_builddir)/src/lib/kvalobs/libkvalobs2_kvalobs.la \
-	$(top_builddir)/src/lib/miutil/libkvalobs2_miutil.la \
 	$(top_builddir)/src/lib/kvdb/libkvalobs2_kvdb.la \
 	$(top_builddir)/src/lib/fileutil/libkvalobs2_fileutil.la \
 	$(top_builddir)/src/lib/milog/libkvalobs2_milog.la \

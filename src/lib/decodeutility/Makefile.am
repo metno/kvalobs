@@ -26,7 +26,6 @@ libkvalobs2_decodeutility_la_CPPFLAGS = $(AM_CPPFLAGS) $(putools_CFLAGS) $(libxm
 libkvalobs2_decodeutility_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@
 libkvalobs2_decodeutility_la_LIBADD = $(top_builddir)/src/lib/kvalobs/libkvalobs2_kvalobs.la \
                              $(top_builddir)/src/lib/kvskel/libkvalobs2_kvskel.la \
-                             $(top_builddir)/src/lib/miutil/libkvalobs2_miutil.la \
 			                 $(top_builddir)/src/lib/milog/libkvalobs2_milog.la \
                              $(libxmlpp_LIBS) \
                              $(omniORB4_LIBS) \

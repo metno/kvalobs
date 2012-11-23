@@ -37,8 +37,6 @@ libkvdbtest_CPPFLAGS = \
     -DPKGLIB_DBDIR="\""$(top_builddir)/src/lib/dbdrivers/.libs"\""
 
 libkvdbtest_LDADD = \
-	$(top_builddir)/src/lib/miutil/libkvalobs2_miutil.la \
 	$(top_builddir)/src/lib/milog/libkvalobs2_milog.la \
 	$(libkvalobs2_kvdb_la_LIBADD) \
-	$(putools_LIBS) \
 	$(gtest_LIBS)

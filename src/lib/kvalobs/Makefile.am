@@ -56,7 +56,7 @@ libkvalobs2_kvalobs_la_CPPFLAGS = $(AM_CPPFLAGS) $(putools_CFLAGS) \
 #libkvalobs2_kvalobs_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@ $(putools_LDFLAGS)
 libkvalobs2_kvalobs_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@ 
 
-libkvalobs2_kvalobs_la_LIBADD = $(top_builddir)/src/lib/miutil/libkvalobs2_miutil.la \
+libkvalobs2_kvalobs_la_LIBADD = \
                        $(top_builddir)/src/lib/fileutil/libkvalobs2_fileutil.la \
                        $(top_builddir)/src/lib/milog/libkvalobs2_milog.la \
                        $(top_builddir)/src/lib/dnmithread/libkvalobs2_dnmithread.la \
