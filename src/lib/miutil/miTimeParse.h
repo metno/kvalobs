@@ -85,7 +85,7 @@ namespace miutil{
     * @param[out] msec The microsecond part.
     * @return A UTC time.
     */
-	miutil::miTime isoTimeWithMsec( const std::string &timespec, int &msec );
+	//miutil::miTime isoTimeWithMsec( const std::string &timespec, int &msec );
 
 }
 

@@ -212,24 +212,24 @@ miTimeParse(const std::string &format,
 }	
 
 //TODO: This code must be fixed to match the documentation.
-miutil::miTime
-miutil::
-isoTimeWithMsec( const std::string &timespec, int &msec )
-{
-   msec = 0;
-
-   if( timespec.empty() )
-      return miutil::miTime();
-
-   std::string::size_type p = timespec.find( '.' );
-
-   if( p != std::string::npos ) {
-      sscanf( timespec.substr(p+1).c_str(), "%d", &msec);
-      return miutil::miTime( timespec.substr(0, p) );
-   } else {
-      return miutil::miTime( timespec );
-   }
-}
+//miutil::miTime
+//miutil::
+//isoTimeWithMsec( const std::string &timespec, int &msec )
+//{
+//   msec = 0;
+//
+//   if( timespec.empty() )
+//      return miutil::miTime();
+//
+//   std::string::size_type p = timespec.find( '.' );
+//
+//   if( p != std::string::npos ) {
+//      sscanf( timespec.substr(p+1).c_str(), "%d", &msec);
+//      return miutil::miTime( timespec.substr(0, p) );
+//   } else {
+//      return miutil::miTime( timespec );
+//   }
+//}
 
 		
 namespace{
