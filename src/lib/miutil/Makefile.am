@@ -27,6 +27,7 @@ miutilinclude_HEADERS = msleep.h replace.h cmprspace.h commastring.h \
                         splitstr.h
 
 
+if HAVE_GTEST
 TESTS = libmiutiltest
 
 check_PROGRAMS = libmiutiltest
@@ -46,3 +47,4 @@ libmiutiltest_LDADD = \
 	$(top_builddir)/src/lib/milog/libkvalobs2_milog.la \
 	$(putools_LIBS)\
 	$(gtest_LIBS)
+endif

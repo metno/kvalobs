@@ -23,6 +23,8 @@ synop_la_LIBADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs2_decode
 
 synop_la_LDFLAGS = -module -version-info @KVALOBSLIBS_SO_VERSION@
 
+if HAVE_GTEST
+
 TESTS=kvSynopDecodeTest
 check_PROGRAMS=kvSynopDecodeTest
 
@@ -37,3 +39,6 @@ kvSynopDecodeTest_LDFLAGS = \
 	$(putools_LIBS) \
 	$(gtest_LIBS) \
     $(synop_la_LIBADD)
+
+endif
+

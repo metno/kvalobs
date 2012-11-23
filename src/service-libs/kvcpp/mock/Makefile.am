@@ -1,3 +1,5 @@
+if HAVE_GMOCK
+
 libmockkvappincludedir =  $(pkgincludedir)/kvcpp/mock
 libmockkvappinclude_HEADERS = \
 	FakeKvApp.h \
@@ -32,3 +34,5 @@ testTestingKvApp_LDADD = $(gtest_LIBS) $(gmock_LIBS) \
 	$(top_builddir)/src/lib/kvskel/libkvalobs2_kvadmininterface.la \
 	$(top_builddir)/src/lib/miconfparser/libkvalobs2_miconfparser.la \
 	$(putools_LIBS) 
+
+endif

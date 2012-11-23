@@ -33,6 +33,7 @@ libkvalobs2_decodeutility_la_LIBADD = $(top_builddir)/src/lib/kvalobs/libkvalobs
                              $(BOOST_LDFLAGS) \
                              $(BOOST_THREAD_LIB)
 
+if HAVE_GTEST
 TESTS = decodeutilitytest
 
 check_PROGRAMS = decodeutilitytest
@@ -52,3 +53,5 @@ decodeutilitytest_LDADD = \
 	$(libkvalobs2_decodeutility_la_LIBADD) \
 	$(putools_LIBS)\
 	$(gtest_LIBS)
+
+endif

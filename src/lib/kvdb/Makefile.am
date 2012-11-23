@@ -18,6 +18,8 @@ libkvalobs2_kvdb_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@
 libkvalobs2_kvdb_la_LIBADD= $(top_builddir)/src/lib/fileutil/libkvalobs2_fileutil.la 
 
 
+if HAVE_GTEST
+
 TESTS = libkvdbtest
 
 check_PROGRAMS = libkvdbtest
@@ -42,3 +44,6 @@ libkvdbtest_LDADD = \
 	$(libkvalobs2_kvdb_la_LIBADD) \
 	$(putools_LIBS) \
 	$(gtest_LIBS)
+
+endif
+

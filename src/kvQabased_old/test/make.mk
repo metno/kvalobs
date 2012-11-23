@@ -1,6 +1,8 @@
 clean-local:
 	rm -rf test/var
 
+if HAVE_GTEST
+
 TESTS = kvQabasedTest
 
 check_PROGRAMS = kvQabasedTest
@@ -30,7 +32,10 @@ kvQabasedTest_CPPFLAGS = \
 kvQabasedTest_LDADD = \
 	$(kvQabased_old_LDADD) \
 	$(gtest_LIBS)
-	
+
+endif
+
 EXTRA_DIST = \
 	test/database/setupdb.sql \
 	test/share/checkrunnertest.init.sql
+
