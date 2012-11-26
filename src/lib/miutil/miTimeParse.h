@@ -32,7 +32,8 @@
 #define __MITIMEPARSE_H__
 
 #include <exception>
-#include <puTools/miTime.h>
+#include <string>
+//#include <puTools/miTime.h>
 
 namespace miutil{
 	
@@ -67,11 +68,11 @@ namespace miutil{
  	 * 
  	 * @exception miTimeParseException
  	 */
-	std::string::size_type 
-	miTimeParse( const std::string &format, 
-				 const std::string &stringToParse,
-				 miTime &time,
-				 const miTime &nearestToThisTime=miTime());
+//	std::string::size_type
+//	miTimeParse( const std::string &format,
+//				 const std::string &stringToParse,
+//				 miTime &time,
+//				 const miTime &nearestToThisTime=miTime());
 	
    /**
     * Decode an time string with microseconds. Valid time string format
