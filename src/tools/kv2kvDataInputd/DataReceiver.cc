@@ -162,10 +162,12 @@ run()
       
       if( ! event ) {
          LOGERROR("DataReceiver::run: Unknown event!");
+         delete cmd;
          continue; 
       }
          
       event->dispatchEvent( *this );
+      delete event;
    }
    
    return 0;
