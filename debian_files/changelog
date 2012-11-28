@@ -1,3 +1,9 @@
+kvalobs (2.6.0~b1-1) unstable; urgency=low
+  * Remove puTols (miString,miTime) from kvalobs. We replace it with the boost::date_time 
+    libray. 
+
+ -- Borge Moe <borge.moe@met.no>  Wed, 28 Nov 2012 09:15:00 +0100
+
 kvalobs (2.5.4-1) unstable; urgency=low
 
   * minor changes so that kvalobs compiles on precise and lucid.
