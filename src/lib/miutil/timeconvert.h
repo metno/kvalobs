@@ -24,8 +24,11 @@
 #define TIMECONVERT_H_
 
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/algorithm/string.hpp>
 #include <sstream>
 #include <iomanip>
+#include <string>
+#include <cstdio>
 
 #ifdef __dnmi_miTime__
 namespace miutil
@@ -49,8 +52,8 @@ inline std::string to_kvalobs_string(const date & d)
 {
 	std::ostringstream s;
 	s << d.year() << '-'
-			<< std::setfill('0') << std::setw(2) << std::right << d.month().as_number() << '-'
-			<< std::setfill('0') << std::setw(2) << std::right << d.day();
+	  << std::setfill('0') << std::setw(2) << std::right << d.month().as_number() << '-'
+	  << std::setfill('0') << std::setw(2) << std::right << d.day();
 	return s.str();
 }
 }
@@ -84,13 +87,27 @@ inline boost::posix_time::ptime time_from_string_nothrow(const std::string & s)
 {
 	try
 	{
-		std::string::size_type pos = s.find('+');
+		std::string::size_type pos = s.find_last_of("+-Z");
+
+		if( pos != std::string::npos && (s[pos] == '-' && pos < 10) )
+		    pos = std::string::npos;
+
 		if  ( pos != std::string::npos )
 		{
 			// remove time zone specifiers from string
+		    boost::posix_time::time_duration offset(0,0,0);
 			std::string time = s.substr(0, pos);
-			boost::posix_time::time_duration offset = boost::posix_time::hours(boost::lexical_cast<int>(s.substr(pos)));
-			return boost::posix_time::time_from_string(time) - offset;
+			if( s[pos] != 'Z') {
+			    std::string so=boost::trim_copy( s.substr(pos) );
+			    if( so.length() == 3)
+			        offset = boost::posix_time::hours(boost::lexical_cast<int>( so ) );
+			    else if( so.length() == 5 )
+			        offset =boost::posix_time::time_duration( boost::lexical_cast<int>(so.substr(0,3)),
+			                boost::lexical_cast<int>(so.substr(3)), 0 );
+			    else
+			        return boost::posix_time::ptime();
+			}
+			return boost::posix_time::time_from_string( boost::trim_copy(time) ) - offset;
 		}
 		return boost::posix_time::time_from_string(s);
 	}
@@ -99,8 +116,32 @@ inline boost::posix_time::ptime time_from_string_nothrow(const std::string & s)
 #ifdef LOGWARN
 		LOGWARN("Unable to interpret string as time: " << s);
 #endif
-		return boost::posix_time::ptime();
+		 int yy, mm, dd;
+		 int h   = 0;
+		 int m   = 0;
+		 int sec   = 0;
+
+		 switch( s.length() ) {
+		 case 14: if(std::sscanf(s.c_str(), "%4d%2d%2d%2d%2d%2d", &yy,&mm,&dd, &h,&m,&sec)!=6)
+		             return boost::posix_time::ptime();
+		 break;
+		 case 12: if( std::sscanf(s.c_str(), "%4d%2d%2d%2d%2d", &yy,&mm,&dd, &h,&m)!=5)
+		              return boost::posix_time::ptime();
+		 break;
+		 case 10: if( std::sscanf(s.c_str(), "%4d%2d%2d%2d", &yy,&mm,&dd, &h)!=4)
+		              return boost::posix_time::ptime();
+		 break;
+		 case 8: if(std::sscanf(s.c_str(), "%4d%2d%2d", &yy,&mm,&dd) != 3)
+		      return boost::posix_time::ptime();
+		    break;
+		 default:
+		    return boost::posix_time::ptime();
+		 }
+
+		return boost::posix_time::ptime( boost::gregorian::date( yy, mm, dd ),
+		                                 boost::posix_time::time_duration( h, m, sec) );
 	}
+	return boost::posix_time::ptime();
 }
 }
 }
