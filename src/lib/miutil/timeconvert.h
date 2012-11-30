@@ -104,8 +104,13 @@ inline boost::posix_time::ptime time_from_string_nothrow(const std::string & s)
 			    else if( so.length() == 5 )
 			        offset =boost::posix_time::time_duration( boost::lexical_cast<int>(so.substr(0,3)),
 			                boost::lexical_cast<int>(so.substr(3)), 0 );
-			    else
+			    else {
+#ifdef LOGWARN
+             LOGWARN("Unable to interpret string with timezpne as time: " << s);
+#endif
 			        return boost::posix_time::ptime();
+			    }
+
 			}
 			return boost::posix_time::time_from_string( boost::trim_copy(time) ) - offset;
 		}
@@ -113,9 +118,6 @@ inline boost::posix_time::ptime time_from_string_nothrow(const std::string & s)
 	}
 	catch ( std::exception & e )
 	{
-#ifdef LOGWARN
-		LOGWARN("Unable to interpret string as time: " << s);
-#endif
 		 int yy, mm, dd;
 		 int h   = 0;
 		 int m   = 0;
@@ -135,6 +137,9 @@ inline boost::posix_time::ptime time_from_string_nothrow(const std::string & s)
 		      return boost::posix_time::ptime();
 		    break;
 		 default:
+#ifdef LOGWARN
+		     LOGWARN("Unable to interpret string as time: " << s);
+#endif
 		    return boost::posix_time::ptime();
 		 }
 
