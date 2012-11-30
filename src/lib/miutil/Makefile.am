@@ -20,7 +20,7 @@ libkvalobs2_miutil_la_SOURCES = \
 
 libkvalobs2_miutil_la_CPPFLAGS = $(putools_CFLAGS) -fPIC
 libkvalobs2_miutil_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@ -fPIC
-libkvalobs2_miutil_la_LIBADD = #$(putools_LIBS)
+libkvalobs2_miutil_la_LIBADD = $(BOOST_DATE_TIME_LIB)
 
 miutilincludedir = $(pkgincludedir)/miutil
 miutilinclude_HEADERS = msleep.h replace.h cmprspace.h commastring.h \
@@ -45,5 +45,5 @@ libmiutiltest_LDADD = \
 	libkvalobs2_miutil.la \
 	$(libkvalobs_miutil_la_LIBADD) \
 	$(top_builddir)/src/lib/milog/libkvalobs2_milog.la \
-	$(putools_LIBS)\
+	$(BOOST_DATE_TIME_LIB)\
 	$(gtest_LIBS)
