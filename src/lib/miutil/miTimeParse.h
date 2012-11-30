@@ -33,6 +33,7 @@
 
 #include <exception>
 #include <string>
+#include <boost/date_time.hpp>
 //#include <puTools/miTime.h>
 
 namespace miutil{
@@ -68,11 +69,11 @@ namespace miutil{
  	 * 
  	 * @exception miTimeParseException
  	 */
-//	std::string::size_type
-//	miTimeParse( const std::string &format,
-//				 const std::string &stringToParse,
-//				 miTime &time,
-//				 const miTime &nearestToThisTime=miTime());
+	std::string::size_type
+	miTimeParse( const std::string &format,
+				 const std::string &stringToParse,
+				 boost::posix_time::ptime &time,
+				 const boost::posix_time::ptime &nearestToThisTime=boost::posix_time::ptime() );
 	
    /**
     * Decode an time string with microseconds. Valid time string format
