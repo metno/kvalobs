@@ -60,6 +60,11 @@ class AutoObsDecoder : public DecoderBase{
    char checkObservationTime(int typeId,
                              boost::posix_time::ptime tbt,
                              boost::posix_time::ptime obt);
+   DecodeResult rejected( const kvalobs::kvRejectdecode &rejectEntry,
+                          const std::string &logmsg,
+                          const std::string &logid="",
+                          const std::string &idlogMsg="");
+
    boost::posix_time::ptime firstObsTime; //Used by checkObservationTime.
    char           checkRet;     //Used by checkObservationTime.
    kvalobs::decoder::ObsPgmParamInfo obsPgm;
