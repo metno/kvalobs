@@ -158,8 +158,8 @@ LDFLAGS=${ldflags_old}
 
 AM_CONDITIONAL(HAVE_GTEST, [test x${have_gtest} = xtrue])
 AM_CONDITIONAL(HAVE_GMOCK, [test x${have_gmock} = xtrue])
-AM_CONDITIONAL(MUST_COMPILE_GTEST, [test x${must_compile_gtest} = xtrue])
-AM_CONDITIONAL(MUST_COMPILE_GMOCK, [test x${must_compile_gmock} = xtrue])
+AM_CONDITIONAL(MUST_COMPILE_GTEST, [test x${must_compile_gtest} = xtrue -a x${have_gtest} = xtrue])
+AM_CONDITIONAL(MUST_COMPILE_GMOCK, [test x${must_compile_gmock} = xtrue -a x${have_gmock} = xtrue])
 
 AC_SUBST(gtest_src)
 AC_SUBST(gmock_src)
