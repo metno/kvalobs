@@ -70,7 +70,14 @@ TEST_F( miTimeParseTest, timeconvert)
     ASSERT_EQ( time_from_string_nothrow("2006-02-06 10:00:00+0100"),
                ptime( date(2006,2,6), time_duration( 9, 0, 0)));
 
+    ASSERT_EQ( time_from_string_nothrow("2006-02-06 10:00:00+01"),
+               ptime( date(2006,2,6), time_duration( 9, 0, 0)));
+
+
     ASSERT_EQ( time_from_string_nothrow("2006-02-06 10:00:00-0100"),
+               ptime( date(2006,2,6), time_duration( 11, 0, 0)));
+
+    ASSERT_EQ( time_from_string_nothrow("2006-02-06 10:00:00-01"),
                ptime( date(2006,2,6), time_duration( 11, 0, 0)));
 
 }
