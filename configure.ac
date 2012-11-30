@@ -88,8 +88,9 @@ PKG_CHECK_MODULES(libxmlpp, libxml++-2.6)
 
 PKG_CHECK_MODULES(cppunit, cppunit)
 AC_PATH_PROG(CMAKE, cmake, false)
-GTEST_CHECK([src/lib/gtest])
-GMOCK_CHECK
+GMOCK_DIST_CHECK([src/lib/gtest])
+#GTEST_CHECK([src/lib/gtest])
+#GMOCK_CHECK
 AC_CHECK_LIB(perl, [main], [], [AC_MSG_ERROR([no libperl found])])
 
 KV_PERL
