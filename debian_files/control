@@ -60,6 +60,7 @@ Section: libdevel
 Architecture: any
 Depends: libkvcpp (= ${binary:Version}), metlibs-putools-dev,
  ${shlibs:Depends}, ${misc:Depends}
+Conflicts: libkvcpp2-dev
 Description: Client development file for kvalobs
  Kvalobs is a quality assurance system for meteorological observations.
 
