@@ -1,21 +1,21 @@
 AM_CPPFLAGS = -I $(top_srcdir)/src/lib -D_REENTRANT 
 
-lib_LTLIBRARIES = libkvalobs2_kvdb.la
+lib_LTLIBRARIES = libkvalobs_kvdb.la
 
 kvdbincludedir =  $(pkgincludedir)/kvdb
 kvdbinclude_HEADERS = kvdb.h dbdrivermgr.h transactionhelper.h transaction.h
-libkvalobs2_kvdb_la_SOURCES = kvdb.h kvdb.cc \
+libkvalobs_kvdb_la_SOURCES = kvdb.h kvdb.cc \
                              dbdrivermgr.h dbdrivermgr.cc \
                              Pimpel.h Pimpel.cc \
                              transaction.cc transactionhelper.h \
                              transactionhelper.cc
-libkvalobs2_kvdb_la_CPPFLAGS = \
+libkvalobs_kvdb_la_CPPFLAGS = \
    $(AM_CPPFLAGS) \
    -DKVALOBSLIBS_SO_VERSION="\""@KVALOBSLIBS_SO_VERSION@"\"" \
    -DPKGLIB_DBDIR="\""$(pkglibdir)/db"\""
 
-libkvalobs2_kvdb_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@
-libkvalobs2_kvdb_la_LIBADD= $(top_builddir)/src/lib/fileutil/libkvalobs2_fileutil.la 
+libkvalobs_kvdb_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@
+libkvalobs_kvdb_la_LIBADD= $(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la 
 
 
 TESTS = libkvdbtest
@@ -37,6 +37,6 @@ libkvdbtest_CPPFLAGS = \
     -DPKGLIB_DBDIR="\""$(top_builddir)/src/lib/dbdrivers/.libs"\""
 
 libkvdbtest_LDADD = \
-	$(top_builddir)/src/lib/milog/libkvalobs2_milog.la \
-	$(libkvalobs2_kvdb_la_LIBADD) \
+	$(top_builddir)/src/lib/milog/libkvalobs_milog.la \
+	$(libkvalobs_kvdb_la_LIBADD) \
 	$(gtest_LIBS)

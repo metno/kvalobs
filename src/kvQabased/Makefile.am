@@ -9,16 +9,16 @@ AM_CPPFLAGS = \
 	$(perl_CFLAGS)
 
 AM_LDFLAGS = \
-	$(top_builddir)/src/lib/milog/libkvalobs2_milog.la \
-	$(top_builddir)/src/lib/kvalobs/libkvalobs2_kvalobs.la \
-	$(top_builddir)/src/lib/kvdb/libkvalobs2_kvdb.la \
-	$(top_builddir)/src/lib/fileutil/libkvalobs2_fileutil.la \
-	$(top_builddir)/src/lib/miconfparser/libkvalobs2_miconfparser.la \
-	$(top_builddir)/src/lib/corbahelper/libkvalobs2_corbahelper.la \
-	$(top_builddir)/src/lib/kvskel/libkvalobs2_kvadmininterface.la \
-	$(top_builddir)/src/lib/kvskel/libkvalobs2_kvskel.la \
-	$(top_builddir)/src/lib/dnmithread/libkvalobs2_dnmithread.la \
-	$(top_builddir)/src/lib/miutil/libkvalobs2_miutil.la \
+	$(top_builddir)/src/lib/milog/libkvalobs_milog.la \
+	$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
+	$(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la \
+	$(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la \
+	$(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la \
+	$(top_builddir)/src/lib/corbahelper/libkvalobs_corbahelper.la \
+	$(top_builddir)/src/lib/kvskel/libkvalobs_kvadmininterface.la \
+	$(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
+	$(top_builddir)/src/lib/dnmithread/libkvalobs_dnmithread.la \
+	$(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
 	$(putools_LIBS) \
 	$(BOOST_PROGRAM_OPTIONS_LIB) \
 	$(BOOST_FILESYSTEM_LIB) \

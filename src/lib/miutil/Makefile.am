@@ -4,9 +4,9 @@ AM_CPPFLAGS = \
 	-I$(top_builddir)/src/lib/kvskel \
 	-D_REENTRANT
 
-lib_LTLIBRARIES = libkvalobs2_miutil.la
+lib_LTLIBRARIES = libkvalobs_miutil.la
 
-libkvalobs2_miutil_la_SOURCES = \
+libkvalobs_miutil_la_SOURCES = \
 	commastring.h commastring.cc \
 	trimstr.h trimstr.cc \
 	cmprspace.h cmprspace.cc \
@@ -18,9 +18,9 @@ libkvalobs2_miutil_la_SOURCES = \
 	msleep.h msleep.cc \
 	timeconvert.h
 
-libkvalobs2_miutil_la_CPPFLAGS = $(putools_CFLAGS) -fPIC
-libkvalobs2_miutil_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@ -fPIC
-libkvalobs2_miutil_la_LIBADD = $(BOOST_DATE_TIME_LIB)
+libkvalobs_miutil_la_CPPFLAGS = $(putools_CFLAGS) -fPIC
+libkvalobs_miutil_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@ -fPIC
+libkvalobs_miutil_la_LIBADD = $(BOOST_DATE_TIME_LIB)
 
 miutilincludedir = $(pkgincludedir)/miutil
 miutilinclude_HEADERS = msleep.h replace.h cmprspace.h commastring.h \
@@ -38,12 +38,12 @@ libmiutiltest_SOURCES = \
 
 libmiutiltest_CPPFLAGS = \
 	$(AM_CPPFLAGS) \
-	$(libkvalobs2_miutil_la_CPPFLAGS) \
+	$(libkvalobs_miutil_la_CPPFLAGS) \
 	$(gtest_CFLAGS)
 
 libmiutiltest_LDADD = \
-	libkvalobs2_miutil.la \
+	libkvalobs_miutil.la \
 	$(libkvalobs_miutil_la_LIBADD) \
-	$(top_builddir)/src/lib/milog/libkvalobs2_milog.la \
+	$(top_builddir)/src/lib/milog/libkvalobs_milog.la \
 	$(BOOST_DATE_TIME_LIB)\
 	$(gtest_LIBS)

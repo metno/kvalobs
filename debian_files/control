@@ -23,7 +23,7 @@ Standards-Version: 3.7.3
 Package: kvalobs
 Architecture: any
 Depends: kvalobsuser, postgresql | postgresql-8.3 | postgresql-8.4 | postgresql-9.0 | postgresql-9.1
- ,libkvalobs2 (>= ${binary:Version})
+ ,libkvalobs (>= ${binary:Version})
  ,${shlibs:Depends}, ${misc:Depends}, adduser, debconf
  ,sqlite3
 Suggests: postgresql-client
@@ -39,7 +39,7 @@ Description: Install kvalobs user
  run by this user.
 
 
-Package: libkvalobs2
+Package: libkvalobs
 Section: libdevel
 Architecture: any
 Depends:  ${shlibs:Depends}, ${misc:Depends}
@@ -47,18 +47,18 @@ Description: Runtime library for kvalobs clients
  Kvalobs is a quality assurance system for meteorological observations.
 
 
-Package: libkvcpp2
+Package: libkvcpp
 Section: libdevel
 Architecture: any
-Depends:  libkvalobs2 (>= ${binary:Version}),
+Depends:  libkvalobs (>= ${binary:Version}),
  ${shlibs:Depends}, ${misc:Depends}
 Description: Runtime library for kvalobs clients
  Kvalobs is a quality assurance system for meteorological observations.
 
-Package: libkvcpp2-dev
+Package: libkvcpp-dev
 Section: libdevel
 Architecture: any
-Depends: libkvcpp2 (= ${binary:Version}), metlibs-putools-dev,
+Depends: libkvcpp (= ${binary:Version}), metlibs-putools-dev,
  ${shlibs:Depends}, ${misc:Depends}
 Description: Client development file for kvalobs
  Kvalobs is a quality assurance system for meteorological observations.
@@ -81,7 +81,7 @@ Description: Client program to send data to a kvalobs server
 Package: kv2kvdatainputd
 Architecture: any
 Depends:  ${shlibs:Depends}, ${misc:Depends},
- libkvalobs2 (>= ${binary:Version})
+ libkvalobs (>= ${binary:Version})
 Description: kv2kvDataInputd listen on data from one kvalobs server
  and sends the data to kvDataInputd on another kvalobs server.
  The data from source kvalobs is stripped so only the original data 

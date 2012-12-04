@@ -1,5 +1,5 @@
 AC_PREREQ([2.59])
-AC_INIT([kvalobs], [2.6.0~b1], [kvoss@met.no])
+AC_INIT([kvalobs], [2.7.0~rc1], [kvoss@met.no])
 AM_INIT_AUTOMAKE
 #METNO_SET_VERSION_INFO
 
@@ -17,8 +17,8 @@ AC_PROG_YACC
 AC_PROG_CXX
 AC_PROG_INSTALL
 
-AC_SUBST([OLD_KVALOBSLIBS_SO_VERSION], [2:0:0])
-AC_SUBST([KVALOBSLIBS_SO_VERSION], [3:0:0])
+AC_SUBST([OLD_KVALOBSLIBS_SO_VERSION], [3:0:0])
+AC_SUBST([KVALOBSLIBS_SO_VERSION], [4:0:0])
 
 AC_CONFIG_FILES([Makefile
                  kvconfig
@@ -54,7 +54,7 @@ AC_CONFIG_FILES([Makefile
                  src/lib/decoder/synopdecoder/Makefile
                  src/service-libs/Makefile
                  src/service-libs/kvcpp/Makefile
-                 src/service-libs/kvcpp/libkvcpp2.pc
+                 src/service-libs/kvcpp/libkvcpp.pc
                  src/service-libs/kvcpp/corba/Makefile
                  src/service-libs/kvcpp/mock/Makefile
                  src/data2kv/Makefile
