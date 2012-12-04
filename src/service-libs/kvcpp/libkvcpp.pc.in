@@ -9,5 +9,5 @@ Name: kvcpp
 Description: Client library for Kvalobs
 Version: @VERSION@
 Requires: omniDynamic4
-Libs: -L${libdir} -lkvalobs2_kvcpp
+Libs: -L${libdir} -lkvalobs_kvcpp
 Cflags: -D_REENTRANT -I${includedir}/@PACKAGE@ -I${includedir}/@PACKAGE@/kvskel -I${includedir}/@PACKAGE@/decoder
