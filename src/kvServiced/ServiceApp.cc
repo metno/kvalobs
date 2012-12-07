@@ -55,7 +55,7 @@ ServiceApp(int argn, char **argv,
 	   const std::string &connect_,
 	   const char *opt[][2])
   :KvApp(argn, argv, opt), dbDriver(driver_), dbConnect(connect_), 
-   shutdown_(false), orbIsDown(false)
+   shutdown_(false), orbIsDown(false), subscribers( *this )
 {
   LogContext context("ApplicationInit");
 

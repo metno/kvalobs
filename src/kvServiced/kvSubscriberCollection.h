@@ -31,22 +31,30 @@
 #ifndef __kvSubscriberCollection_h__
 #define __kvSubscriberCollection_h__
 
-#include <boost/thread/thread.hpp>
+#include <stdio.h>
+
 #include <set>
 #include <map>
 #include <list>
 #include <vector>
+#include <sstream>
+#include <boost/thread/thread.hpp>
+#include <puTools/miTime.h>
+#include <kvdb/kvdb.h>
+#include <kvskel/kvService.hh>
 #include "kvDataNotifySubscriber.h"
 #include "kvDataSubscriber.h"
 #include "kvHintSubscriber.h"
 #include "kvSubscriberBase.h"
-#include <kvskel/kvService.hh>
-#include <stdio.h>
-#include <puTools/miTime.h>
-#include <fstream>
+
+
+
+
+class ServiceApp;
 
 class KvSubscriberCollection{
-  std::set<KvSubscriberBasePtr, KvSubscriberBasePtrOps> subscribers_;
+
+    std::set<KvSubscriberBasePtr, KvSubscriberBasePtrOps> subscribers_;
 
   //Subscribers that listen on dataNotify for all stations.
   std::list<KvDataNotifySubscriberPtr> allStationsDataNotifySubscribers;
@@ -65,7 +73,7 @@ class KvSubscriberCollection{
                         
   std::list<KvHintSubscriberPtr> hintSubscriberList;
 
-
+  void doRemoveSubscriber(const std::string &subscriberid);
   void removeDataNotifySubscriber(const std::string &subscriberid);
 
   void removeDataSubscriber(const std::string &subscriberid);
@@ -85,52 +93,69 @@ class KvSubscriberCollection{
   void removeSubscriberid(KvSubscriberBasePtr p);
   void removeSubscriberid(const std::string &subscriberid);
 
-  bool writeDataNotifyFile(const std::string &subscriberid);
-  bool writeDataFile(const std::string &subscriberid);
-  bool writeKvHintFile(const std::string &subscriberid);
+  bool writeDataNotifyToDb(const std::string &subscriberid);
+  bool writeDataToDb(const std::string &subscriberid);
+  bool writeKvHintToDb(const std::string &subscriberid);
 
-  std::ofstream *writeFileHeader(
+  std::ostringstream *writeHeader(
       const std::string &subscriberid, 
       const kvalobs::KvDataSubscriberInfo *subscriberInfo,
       const std::string &corbaref);
 
-  bool readSubscriberFile(const std::string &fname);
-  bool writeSubscriberFile(const std::string &subscriberid);
-  bool updateSubscriberFile(const std::string &subscriberid,
-			     const miutil::miTime &timeForLastCall);
-  bool removeSubscriberFile(const std::string &subscriberid); 
+  bool readSubscriberFromDb( const std::string &subscriberid,
+                           const std::string &content);
+  bool writeSubscriberFromDb(const std::string &subscriberid);
+//  bool updateSubscriberFile(const std::string &subscriberid,
+//			     const miutil::miTime &timeForLastCall);
+  bool removeSubscriberFromDb(const std::string &subscriberid); 
 
 
-  bool addDataNotifyFromFileFile(
+  bool addDataNotifyFromDb(
                 const std::string &subid,
 		const std::string &cref,
 		const std::string &statusid,
 		const std::vector<std::string> &qcIdList,
 		const std::vector<std::string> &stationList);
 
-  bool addDataFromFile(const std::string &subid,
+  bool addDataFromDb(const std::string &subid,
 		       const std::string &cref,
 		       const std::string &statusid,
 		       const std::vector<std::string> &qcIdList,
 		       const std::vector<std::string> &stationList);
 
-  bool addKvHintFromFile(const std::string &subid,
+  bool addKvHintFromDb(const std::string &subid,
 			   const std::string &icref);
 
   kvalobs::KvDataSubscriberInfo createKvDataInfo(
                           const std::string              &statusid,
 			  const std::vector<std::string> &qcIdList);
     
+
+  /**
+   * Create a db connection for this thread. Use a thread specific
+   * storage variable to hold the connection.
+   */
+  dnmi::db::Connection *getDbConnection();
+
+
+
+  void updateSubscriberInDb( const std::string &subid,
+                             const std::string &content );
+
+  void readAllSubscribersFromDb();
+
   boost::mutex mutex;
-  std::string subPath; //The path to the directory where we shall save
-                       //subscriber information. 
-                       //Default: $KAVLOBS/var/kvalobs/manager/subscriber 
+  ServiceApp &app;
+  bool isInitialized;
 
  public:
-  KvSubscriberCollection();
-  KvSubscriberCollection(const std::string &subscriberpath);
+  KvSubscriberCollection( ServiceApp &app );
   ~KvSubscriberCollection();
 
+  /**
+   * Release the db connection for this thread, if any.
+   */
+  void releaseThisThreadsDbConnection();
   
   void removeDeadSubscribers(int durationInSeconds);
 
@@ -209,10 +234,10 @@ class KvSubscriberCollection{
 
   void removeSubscriber(const std::string &subscriberid);
 
-  bool hasDataSubscribers()const;
-  bool hasDataNotifySubscribers()const;
+  bool hasDataSubscribers();
+  bool hasDataNotifySubscribers();
 
-  void readAllSubscribersFromFile();
+
 
   friend std::ostream& operator<<(std::ostream& os, 
 				  const KvSubscriberCollection &c);

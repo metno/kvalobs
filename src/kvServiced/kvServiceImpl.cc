@@ -569,8 +569,10 @@ unsubscribe(const char *subid)
    LogContext context("service/unsubscribe");
    LOGDEBUG("subscriberid: " << subid);
 
-   if(subid)
+   if(subid) {
       app.subscribers.removeSubscriber(subid);
+      app.subscribers.releaseThisThreadsDbConnection();
+   }
 }
 
 CORBA::Boolean 
