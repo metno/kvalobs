@@ -60,6 +60,10 @@ typedef std::list<Row>::const_iterator           CIRowList;
 struct SQLiteData{
    RowList data;
    Row     fieldNames;
+   void clear() {
+       data.clear();
+       fieldNames.clear();
+   }
 };
 }
 

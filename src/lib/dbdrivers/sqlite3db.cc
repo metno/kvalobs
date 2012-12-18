@@ -325,7 +325,6 @@ dnmi::db::drivers::SQLiteConnection::execQuery(const std::string &query)
       busy = false;
       sqliteRes=sqlite3_exec(con, query.c_str(), dataCallback, data, &msg);
 
-
       if(msg){
          myPimpel->setErrMsg( msg );
          sqlite3_free(msg);
@@ -333,13 +332,14 @@ dnmi::db::drivers::SQLiteConnection::execQuery(const std::string &query)
          myPimpel->setErrMsg( "SQLite: Unknown error!" );
 
       if(sqliteRes!=SQLITE_OK){
-         delete data;
-         //cerr << "ERROR: " << sqliteRes << endl;
+          //cerr << "ERROR: " << sqliteRes << endl;
 
          if(sqliteRes==SQLITE_BUSY){
             busy = true;
+            data->clear();
             //throw SQLBusy("SQLiteBusy: " + sMsg, errorCode.str());
          }else{
+             delete data;
             errMsg = myPimpel->setErrInfo( sqliteRes );
             throw SQLException( errMsg, myPimpel->getErrorCode() );
          }
@@ -436,11 +436,14 @@ dnmi::db::drivers::SQLiteResult::fieldType(int index)const
 {
    if(index>=sqlData->fieldNames.size())
       throw SQLException("index out of range!");
+
+   throw SQLException("SQLite: fieldType is not implemented!");
 }
 
 dnmi::db::FieldType   
 dnmi::db::drivers::SQLiteResult::fieldType(const std::string &fieldName)const
 {
+    throw SQLException("SQLite: fieldType is not implemented!");
 }
 
 int         
@@ -727,6 +730,7 @@ perform( dnmi::db::Connection *con_,
 
 
 namespace {
+
 int
 dataCallback(void *pArg, int argc, char **argv, char **columnNames)
 {
@@ -738,18 +742,26 @@ dataCallback(void *pArg, int argc, char **argv, char **columnNames)
       return 1;
    }
 
-   if(data->fieldNames.size()!=argc){
-      for(int i=0; i<argc; i++){
-         data->fieldNames.push_back(columnNames[i]);
-      }
-   }
+   try {
+       if(data->fieldNames.size()!=argc){
+           data->fieldNames.resize(argc);
+           for(int i=0; i<argc; i++){
+               data->fieldNames[i]=(columnNames[i]?columnNames[i]:"");
+           }
+       }
 
-   for(int i=0; i<argc; i++){
-      row[i]=(argv[i]?argv[i]:"");
-   }
+       for(int i=0; i<argc; i++){
+           row[i]=(argv[i]?argv[i]:"");
+       }
 
-   data->data.push_back(row);
+       data->data.push_back(row);
+   }
+   catch( const std::bad_alloc &ex ) {
+       cerr << "DEBUG: OUT OF MEM\n";
+       return 0;
+   }
 
    return 0;
 }
+
 }
