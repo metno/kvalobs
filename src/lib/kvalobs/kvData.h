@@ -108,7 +108,7 @@ public:
 	{
 		return stationid_;
 	}
-	boost::posix_time::ptime obstime() const
+	const boost::posix_time::ptime & obstime() const
 	{
 		return obstime_;
 	}
@@ -120,7 +120,7 @@ public:
 	{
 		return paramid_;
 	}
-	boost::posix_time::ptime tbtime() const
+	const boost::posix_time::ptime & tbtime() const
 	{
 		return tbtime_;
 	}
@@ -140,15 +140,15 @@ public:
 	{
 		return corrected_;
 	}
-	kvControlInfo controlinfo() const
+	const kvControlInfo & controlinfo() const
 	{
 		return controlinfo_;
 	}
-	kvUseInfo useinfo() const
+	const kvUseInfo & useinfo() const
 	{
 		return useinfo_;
 	}
-	std::string cfailed() const
+	const std::string & cfailed() const
 	{
 		return cfailed_;
 	}
