@@ -125,12 +125,12 @@ LIBS="${LIBS} -lgtest"
 AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <gtest/gtest.h>], [])],
 	[gtest_LIBS=-lgtest],
 	[
-	if test $1; then
+	if test -n "$1"; then
 		AC_MSG_NOTICE([Unable to find precompiled googletest libraries - must compile own version])
 		must_compile_gtest=true
 		gtest_LIBS="-L\$(top_builddir)/$1 -lgtest"
 	else
-		AC_MSG_WARN([Found headers but no precompiled googletest libraries - uanble to use googletest])
+		AC_MSG_WARN([Found headers but no precompiled googletest libraries - unable to use googletest])
 		have_gtest=false
 	fi
 ])
@@ -139,17 +139,17 @@ AS_IF([test "x$gmock_base" = "x/usr"],
     [],
     [gmock_ldflags="-L${gmock_base}/lib"])
 LDFLAGS="${LDFLAGS} ${gmock_ldflags}"
-LIBS="${LIBS} -lgmock"
-AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <gtest/gtest.h>], [])],
+LIBS="${OLD_LIBS} -lgmock"
+AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <gmock/gmock.h>], [])],
 	[gmock_LIBS=-lgmock],
 	[
-	if test $1; then
+	if test -n "$1"; then
 		AC_MSG_NOTICE([Unable to find precompiled googlemock libraries - must compile own version])
 		must_compile_gmock=true
 		gmock_LIBS="-L\$(top_builddir)/$1 -lgmock"
 	else
-		AC_MSG_WARN([Found headers but no precompiled googlemock libraries - uanble to use googletest])
-		have_gtest=false
+		AC_MSG_WARN([Found headers but no precompiled googlemock libraries - unable to use googlemock])
+		have_gmock=false
 	fi
 ])
 
