@@ -130,7 +130,7 @@ public:
 	 */
 	static int typeFromSubscriberid(const std::string &subscriberid);
 
-	std::string name() const
+	const std::string & name() const
 	{
 		return name_;
 	}
@@ -138,8 +138,7 @@ public:
 	{
 		return subscribertype_;
 	}
-	;
-	std::string comment() const
+	const std::string & comment() const
 	{
 		return comment_;
 	}
@@ -147,11 +146,11 @@ public:
 	{
 		return delete_after_hours_;
 	}
-	std::string sior() const
+	const std::string & sior() const
 	{
 		return sior_;
 	}
-	boost::posix_time::ptime created() const
+	const boost::posix_time::ptime & created() const
 	{
 		return created_;
 	}

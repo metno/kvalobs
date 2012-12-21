@@ -84,19 +84,19 @@ public:
 	std::string toSend() const;
 	std::string uniqueKey() const;
 
-	std::string message() const
+	const std::string & message() const
 	{
 		return message_;
 	}
-	boost::posix_time::ptime tbtime() const
+	const boost::posix_time::ptime & tbtime() const
 	{
 		return tbtime_;
 	}
-	std::string decoder() const
+	const std::string & decoder() const
 	{
 		return decoder_;
 	}
-	std::string comment() const
+	const std::string & comment() const
 	{
 		return comment_;
 	}

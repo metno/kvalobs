@@ -32,6 +32,7 @@
 #include <sys/types.h>
 #include <errno.h>
 #include <sstream>
+#include <fstream>
 #include <cstring>
 #include <kvalobs/kvDbGate.h>
 #include <kvalobs/kvQueries.h>

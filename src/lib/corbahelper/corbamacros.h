@@ -29,7 +29,6 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include <milog/milog.h>
-#include <iostream>
 #include <sstream>
 
 

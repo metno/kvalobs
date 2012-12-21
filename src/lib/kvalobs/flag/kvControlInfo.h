@@ -51,7 +51,7 @@ public:
 	kvControlInfo(const std::string& s);
 	kvControlInfo(const unsigned char f[kvDataFlag::size]);
 	kvControlInfo(const kvControlInfo& df);
-	kvControlInfo(const kvDataFlag& df);
+	explicit kvControlInfo(const kvDataFlag& df);
 
 	/**
 	 * \brief Fill static structures from list of kvQcxInfo

@@ -96,15 +96,15 @@ public:
 	std::string toUpdate() const;
 	std::string uniqueKey() const;
 
-	std::string package() const
+	const std::string & package() const
 	{
 		return package_;
 	}
-	std::string key() const
+	const std::string & key() const
 	{
 		return key_;
 	}
-	std::string val() const
+	const std::string & val() const
 	{
 		return val_;
 	}

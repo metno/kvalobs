@@ -114,7 +114,7 @@ public:
 	{
 		return stationid_;
 	}
-	boost::posix_time::ptime obstime() const
+	const boost::posix_time::ptime & obstime() const
 	{
 		return obstime_;
 	}
@@ -122,7 +122,7 @@ public:
 	{
 		return typeid_;
 	}
-	boost::posix_time::ptime tbtime() const
+	const boost::posix_time::ptime & tbtime() const
 	{
 		return tbtime_;
 	}
@@ -130,23 +130,23 @@ public:
 	{
 		return priority_;
 	}
-	boost::posix_time::ptime process_start() const
+	const boost::posix_time::ptime & process_start() const
 	{
 		return process_start_;
 	}
-	boost::posix_time::ptime qa_start() const
+	const boost::posix_time::ptime & qa_start() const
 	{
 		return qa_start_;
 	}
-	boost::posix_time::ptime qa_stop() const
+	const boost::posix_time::ptime & qa_stop() const
 	{
 		return qa_stop_;
 	}
-	boost::posix_time::ptime service_start() const
+	const boost::posix_time::ptime & service_start() const
 	{
 		return service_start_;
 	}
-	boost::posix_time::ptime service_stop() const
+	const boost::posix_time::ptime & service_stop() const
 	{
 		return service_stop_;
 	}

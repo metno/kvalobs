@@ -95,11 +95,11 @@ public:
 	{
 		return stationid_;
 	}
-	std::string qcx() const
+	const std::string & qcx() const
 	{
 		return qcx_;
 	}
-	std::string medium_qcx() const
+	const std::string & medium_qcx() const
 	{
 		return medium_qcx_;
 	}
@@ -107,19 +107,19 @@ public:
 	{
 		return language_;
 	}
-	std::string checkname() const
+	const std::string & checkname() const
 	{
 		return checkname_;
 	}
-	std::string checksignature() const
+	const std::string & checksignature() const
 	{
 		return checksignature_;
 	}
-	std::string active() const
+	const std::string & active() const
 	{
 		return active_;
 	}
-	const boost::posix_time::ptime fromtime() const
+	const boost::posix_time::ptime & fromtime() const
 	{
 		return fromtime_;
 	}

@@ -31,7 +31,7 @@
 #ifndef __kvStationInfo_h__
 #define __kvStationInfo_h__
 
-#include <iostream>
+#include <iosfwd>
 #include <list>
 #include <kvalobs/kvDataFlag.h>
 #include <kvalobs/kvData.h>
@@ -80,7 +80,7 @@ public:
 	}
 
 	///The observation time for this observation
-	boost::posix_time::ptime obstime() const
+	const boost::posix_time::ptime & obstime() const
 	{
 		return obstime_;
 	}

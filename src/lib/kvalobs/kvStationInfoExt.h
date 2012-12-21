@@ -31,7 +31,7 @@
 #ifndef __kvStationInfoExt_h__
 #define __kvStationInfoExt_h__
 
-#include <iostream>
+#include <iosfwd>
 #include <list>
 #include <kvalobs/kvDataFlag.h>
 #include <kvalobs/kvData.h>
@@ -109,7 +109,7 @@ public:
 	}
 
 	///The observation time for this observation
-	boost::posix_time::ptime obstime() const
+	const boost::posix_time::ptime & obstime() const
 	{
 		return obstime_;
 	}
@@ -120,7 +120,7 @@ public:
 		return typeid_;
 	}
 
-	std::list<kvStationInfoExt::Param> params() const
+	const std::list<kvStationInfoExt::Param> & params() const
 	{
 		return params_;
 	}

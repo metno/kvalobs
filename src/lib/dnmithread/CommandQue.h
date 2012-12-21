@@ -31,7 +31,7 @@
 #ifndef __CommandQue_bm314_h__
 #define __CommandQue_bm314_h__
 
-#include <iostream>
+#include <iosfwd>
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
 #include <string>

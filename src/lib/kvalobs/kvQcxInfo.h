@@ -83,11 +83,11 @@ public:
 	std::string toSend() const;
 	std::string uniqueKey() const;
 
-	std::string medium_qcx() const
+	const std::string & medium_qcx() const
 	{
 		return medium_qcx_;
 	}
-	std::string main_qcx() const
+	const std::string & main_qcx() const
 	{
 		return main_qcx_;
 	}
@@ -95,7 +95,7 @@ public:
 	{
 		return controlpart_;
 	}
-	std::string comment() const
+	const std::string & comment() const
 	{
 		return comment_;
 	}

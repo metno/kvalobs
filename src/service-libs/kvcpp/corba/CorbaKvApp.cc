@@ -34,6 +34,7 @@
 #include <miconfparser/confparser.h>
 #include <kvskel/kvService.hh>
 #include <miconfparser/valelement.h>
+#include <fstream>
 #include <signal.h>
 
 using namespace std;

@@ -86,7 +86,7 @@ public:
 	{
 		return stationid_;
 	}
-	boost::posix_time::ptime obstime() const
+	const boost::posix_time::ptime & obstime() const
 	{
 		return obstime_;
 	}

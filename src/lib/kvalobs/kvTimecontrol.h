@@ -98,7 +98,7 @@ public:
 	{
 		return priority_;
 	}
-	std::string qcx() const
+	const std::string & qcx() const
 	{
 		return qcx_;
 	}

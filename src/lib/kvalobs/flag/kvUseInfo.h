@@ -47,7 +47,7 @@ public:
 	kvUseInfo(const std::string& s);
 	kvUseInfo(const unsigned char f[kvDataFlag::size]);
 	kvUseInfo(const kvUseInfo& df);
-	kvUseInfo(const kvDataFlag& df);
+	explicit kvUseInfo(const kvDataFlag& df);
 
 	/// clear flag
 	void clear();

@@ -84,7 +84,7 @@ public:
 	 * \brief Name of a user that is permited to access HQC.
 	 * \return A user name.
 	 */
-	std::string username() const
+	const std::string & username() const
 	{
 		return username_;
 	}

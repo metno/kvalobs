@@ -88,7 +88,7 @@ public:
 	{
 		return paramsetid_;
 	}
-	std::string reference() const
+	const std::string & reference() const
 	{
 		return reference_;
 	}

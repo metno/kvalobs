@@ -31,7 +31,6 @@
 #ifndef __convert_h__
 #define __convert_h__
 
-#include <iostream>
 #include <limits.h>
 #include <string>
 #include <exception>

@@ -33,7 +33,7 @@
 
 #include <kvskel/kvServiceCommon.hh>
 #include <kvskel/kvService.hh>
-#include <iostream>
+#include <iosfwd>
 #include <string>
 #include <boost/shared_ptr.hpp>
 

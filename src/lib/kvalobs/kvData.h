@@ -31,7 +31,7 @@
 #ifndef __kvData_h__
 #define __kvData_h__
 
-#include <ostream>
+#include <iosfwd>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <kvalobs/kvDbBase.h>
 #include <kvalobs/kvDataFlag.h>

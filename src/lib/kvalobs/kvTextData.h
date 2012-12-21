@@ -88,11 +88,11 @@ public:
 	{
 		return stationid_;
 	}
-	boost::posix_time::ptime obstime() const
+	const boost::posix_time::ptime & obstime() const
 	{
 		return obstime_;
 	}
-	std::string original() const
+	const std::string & original() const
 	{
 		return original_;
 	}
@@ -100,7 +100,7 @@ public:
 	{
 		return paramid_;
 	}
-	boost::posix_time::ptime tbtime() const
+	const boost::posix_time::ptime & tbtime() const
 	{
 		return tbtime_;
 	}

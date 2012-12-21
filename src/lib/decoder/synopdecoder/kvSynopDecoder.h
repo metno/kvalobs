@@ -31,16 +31,15 @@
 #ifndef _kvSynopDecoder_h
 #define _kvSynopDecoder_h
 
-#include <map>
-#include <list>
+#include "synop.h"
 
 #include <kvalobs/kvStation.h>
 #include <kvalobs/kvData.h>
 #include <kvalobs/kvRejectdecode.h>
 #include <puTools/miTime.h>
+#include <list>
+#include <map>
 #include <string>
-#include "synop.h"
-#include <iostream>
 
 /** Created by met.no/FoU/PU: j.schulze@met.no
     at Thu Jan 23 13:24:08 2003 */

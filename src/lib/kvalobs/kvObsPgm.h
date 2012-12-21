@@ -282,11 +282,11 @@ public:
 	{
 		return sun_;
 	}
-	boost::posix_time::ptime fromtime() const
+	const boost::posix_time::ptime & fromtime() const
 	{
 		return fromtime_;
 	}
-	boost::posix_time::ptime totime() const
+	const boost::posix_time::ptime & totime() const
 	{
 		return totime_;
 	}

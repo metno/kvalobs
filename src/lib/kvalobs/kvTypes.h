@@ -82,7 +82,7 @@ public:
 	{
 		return typeid_;
 	}
-	std::string format() const
+	const std::string & format() const
 	{
 		return format_;
 	}
@@ -94,15 +94,15 @@ public:
 	{
 		return lateobs_;
 	}
-	std::string read() const
+	const std::string & read() const
 	{
 		return read_;
 	}
-	std::string obspgm() const
+	const std::string & obspgm() const
 	{
 		return obspgm_;
 	}
-	std::string comment() const
+	const std::string & comment() const
 	{
 		return comment_;
 	}

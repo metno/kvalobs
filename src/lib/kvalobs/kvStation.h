@@ -117,7 +117,7 @@ public:
 	{
 		return maxspeed_;
 	}
-	std::string name() const
+	const std::string & name() const
 	{
 		return name_;
 	}
@@ -129,15 +129,15 @@ public:
 	{
 		return nationalnr_;
 	}
-	std::string ICAOID() const
+	const std::string & ICAOID() const
 	{
 		return ICAOid_;
 	}
-	std::string call_sign() const
+	const std::string & call_sign() const
 	{
 		return call_sign_;
 	}
-	std::string stationstr() const
+	const std::string & stationstr() const
 	{
 		return stationstr_;
 	}
@@ -149,7 +149,7 @@ public:
 	{
 		return static_;
 	}
-	boost::posix_time::ptime fromtime() const
+	const boost::posix_time::ptime & fromtime() const
 	{
 		return fromtime_;
 	}

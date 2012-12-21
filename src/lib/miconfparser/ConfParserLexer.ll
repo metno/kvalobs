@@ -1,6 +1,7 @@
 %{
-#include <fstream>
 #include "miconfparser/confparser.h"
+#include <fstream>
+#include <iostream>
 
 namespace{
   miutil::conf::ConfParser    *theParser;

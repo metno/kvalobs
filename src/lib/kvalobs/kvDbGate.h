@@ -142,7 +142,7 @@ public:
 	/**
 	 * \brief Get a description of the error.
 	 */
-	std::string getErrorStr() const
+	const std::string & getErrorStr() const
 	{
 		return errStr_;
 	}

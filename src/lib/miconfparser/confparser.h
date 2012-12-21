@@ -33,7 +33,7 @@
 
 #include <stack>
 #include <sstream>
-#include <iostream>
+#include <iosfwd>
 #include <list>
 #include <string>
 #include <stdexcept>

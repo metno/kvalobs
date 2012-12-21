@@ -119,19 +119,19 @@ public:
 	{
 		return hour_;
 	}
-	std::string qcx() const
+	const std::string & qcx() const
 	{
 		return qcx_;
 	}
-	std::string metadata() const
+	const std::string & metadata() const
 	{
 		return metadata_;
 	}
-	std::string descMetadata() const
+	const std::string & descMetadata() const
 	{
 		return descMetadata_;
 	}
-	boost::posix_time::ptime fromtime() const
+	const boost::posix_time::ptime & fromtime() const
 	{
 		return fromtime_;
 	}

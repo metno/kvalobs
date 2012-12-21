@@ -92,15 +92,15 @@ public:
 	{
 		return paramid_;
 	}
-	std::string name() const
+	const std::string & name() const
 	{
 		return name_;
 	}
-	std::string description() const
+	const std::string & description() const
 	{
 		return description_;
 	}
-	std::string unit() const
+	const std::string & unit() const
 	{
 		return unit_;
 	}
@@ -108,7 +108,7 @@ public:
 	{
 		return level_scale_;
 	}
-	std::string comment() const
+	const std::string & comment() const
 	{
 		return comment_;
 	}

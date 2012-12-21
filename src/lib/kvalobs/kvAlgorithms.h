@@ -86,15 +86,15 @@ public:
 	{
 		return language_;
 	}
-	std::string checkname() const
+	const std::string & checkname() const
 	{
 		return checkname_;
 	}
-	std::string signature() const
+	const std::string & signature() const
 	{
 		return signature_;
 	}
-	std::string script() const
+	const std::string & script() const
 	{
 		return script_;
 	}

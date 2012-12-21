@@ -30,6 +30,7 @@
 */
 #include <milog/StdErrStream.h>
 #include <milog/TraceLayout.h>
+#include <iostream>
 
 namespace milog{
 
