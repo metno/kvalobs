@@ -40,27 +40,27 @@ Description: Install kvalobs user
 
 
 Package: libkvalobs4
-Section: libdevel
+Section: libs
 Architecture: any
 Depends:  ${shlibs:Depends}, ${misc:Depends}
+Conflicts: libkvalobs (<< 2.7.0~rc3)
 Description: Runtime library for kvalobs clients
  Kvalobs is a quality assurance system for meteorological observations.
 
 
 Package: libkvcpp4
-Section: libdevel
+Section: libs
 Architecture: any
-Depends:  libkvalobs (>= ${binary:Version}),
- ${shlibs:Depends}, ${misc:Depends}
+Depends:  libkvalobs4 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Conflicts: libkvcpp (<< 2.7.0~rc3)
 Description: Runtime library for kvalobs clients
  Kvalobs is a quality assurance system for meteorological observations.
 
 Package: libkvcpp-dev
 Section: libdevel
 Architecture: any
-Depends: libkvcpp (= ${binary:Version}),
- ${shlibs:Depends}, ${misc:Depends}
-Conflicts: libkvcpp2-dev
+Depends: libkvcpp4 (= ${binary:Version}), ${misc:Depends}
+Conflicts: libkvcpp2-dev, libkvcpp-dev (<< 2.7.0~rc3)
 Description: Client development file for kvalobs
  Kvalobs is a quality assurance system for meteorological observations.
 

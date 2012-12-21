@@ -1,5 +1,5 @@
 AC_PREREQ([2.59])
-AC_INIT([kvalobs], [2.7.0~rc2], [kvoss@met.no])
+AC_INIT([kvalobs], [2.7.0~rc3], [kvoss@met.no])
 AM_INIT_AUTOMAKE
 #METNO_SET_VERSION_INFO
 
@@ -54,7 +54,6 @@ AC_CONFIG_FILES([Makefile
                  src/lib/decoder/synopdecoder/Makefile
                  src/service-libs/Makefile
                  src/service-libs/kvcpp/Makefile
-                 src/service-libs/kvcpp/libkvcpp.pc
                  src/service-libs/kvcpp/corba/Makefile
                  src/service-libs/kvcpp/mock/Makefile
                  src/data2kv/Makefile
@@ -74,15 +73,24 @@ AC_CONFIG_FILES([Makefile
                  src/script/kv/Makefile
                  src/script/dbadmin/Makefile
                  doc/Makefile
+                 src/service-libs/kvcpp/libkvcpp.pc
+                 src/lib/kvdb/libkvalobs_kvdb.pc
+                 src/lib/decodeutility/libkvalobs_decodeutility.pc
+                 src/lib/dnmithread/libkvalobs_dnmithread.pc
+                 src/lib/miconfparser/libkvalobs_miconfparser.pc
+                 src/lib/miutil/libkvalobs_miutil.pc
+                 src/lib/milog/libkvalobs_milog.pc
+                 src/lib/corbahelper/libkvalobs_corbahelper.pc
+                 src/lib/fileutil/libkvalobs_fileutil.pc
+                 src/lib/kvalobs/libkvalobs_kvalobs.pc
+                 src/lib/kvskel/libkvalobs_kvskel.pc
+                 src/lib/kvskel/libkvalobs_kvadmininterface.pc
 ])
-
-
 
 PKG_CHECK_MODULES(putools, puTools)
 KV_FIND_OMNIORB4
 KV_POSTGRESQL
 PKG_CHECK_MODULES(sqlite3, sqlite3)
-#PKG_CHECK_MODULES(sqlite2, sqlite)
 PKG_CHECK_MODULES(libxml2, libxml-2.0)
 PKG_CHECK_MODULES(libxmlpp, libxml++-2.6)
 

@@ -44,7 +44,6 @@ decodeutilitytest_SOURCES = \
 	test/test.cc
 
 decodeutilitytest_CPPFLAGS = $(libkvalobs_decodeutility_la_CPPFLAGS) $(gtest_CFLAGS)
-	
 
 decodeutilitytest_LDADD = \
 	libkvalobs_decodeutility.la \
@@ -52,3 +51,7 @@ decodeutilitytest_LDADD = \
 	$(putools_LIBS)\
 	$(BOOST_DATE_TIME_LIB) \
 	$(gtest_LIBS)
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libkvalobs_decodeutility.pc
+$(pkgconfig_DATA): $(top_builddir)/config.status

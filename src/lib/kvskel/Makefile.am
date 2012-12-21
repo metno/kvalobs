@@ -38,3 +38,7 @@ CLEANFILES = $(idl_sources:.idl=SK.cc) $(idl_sources:.idl=.hh)
 	$(IDL) -bcxx $<
 
 INSTALL=install -p # tells install to preserve timestamp
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libkvalobs_kvskel.pc libkvalobs_kvadmininterface.pc
+$(pkgconfig_DATA): $(top_builddir)/config.status

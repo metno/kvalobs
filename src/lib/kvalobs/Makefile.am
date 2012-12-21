@@ -1,6 +1,6 @@
 AM_CPPFLAGS = -I$(top_srcdir)/src/lib \
- 			  -I$(top_builddir)/src/lib \
- 			  -D_REENTRANT
+	-I$(top_builddir)/src/lib \
+	-D_REENTRANT
 
 lib_LTLIBRARIES = libkvalobs_kvalobs.la
 
@@ -112,3 +112,7 @@ kvalobsflaginclude_HEADERS = \
 	flag/kvDataFlag.h \
 	flag/kvControlInfo.h \
 	flag/kvUseInfo.h
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libkvalobs_kvalobs.pc
+$(pkgconfig_DATA): $(top_builddir)/config.status

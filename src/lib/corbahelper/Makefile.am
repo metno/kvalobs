@@ -8,6 +8,10 @@ libkvalobs_corbahelper_la_LIBADD = $(top_builddir)/src/lib/dnmithread/libkvalobs
                            $(top_builddir)/src/lib/milog/libkvalobs_milog.la \
                            $(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la \
 			   			   $(BOOST_THREAD_LIB) $(omniORB4_LIBS) 
-                           
+
 corbahelperincludedir = $(pkgincludedir)/corbahelper
 corbahelperinclude_HEADERS = corbaApp.h corbamacros.h
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libkvalobs_corbahelper.pc
+$(pkgconfig_DATA): $(top_builddir)/config.status

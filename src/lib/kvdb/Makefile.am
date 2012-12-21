@@ -40,3 +40,7 @@ libkvdbtest_LDADD = \
 	$(top_builddir)/src/lib/milog/libkvalobs_milog.la \
 	$(libkvalobs_kvdb_la_LIBADD) \
 	$(gtest_LIBS)
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libkvalobs_kvdb.pc
+$(pkgconfig_DATA): $(top_builddir)/config.status

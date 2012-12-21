@@ -43,7 +43,6 @@ libkvalobs_milog_la_SOURCES = Logger.h Logger.cc \
 	milog.h macros.h \
 	milogtypes.h \
 	utility.h utility.cc 
-	
 
 # don't install: LoggerImpl.h ThreadLogManager.h types.h
 
@@ -51,3 +50,7 @@ SUBDIRS = private thread
 
 libkvalobs_milog_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@ -pthread
 libkvalobs_milog_la_LIBADD = -lpthread
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libkvalobs_milog.pc
+$(pkgconfig_DATA): $(top_builddir)/config.status

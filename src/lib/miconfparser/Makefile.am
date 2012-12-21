@@ -25,3 +25,7 @@ miconfparserinclude_HEADERS = \
 EXTRA_PROGRAMS = miconfparse 
 miconfparse_SOURCES = miconfparse.cc
 miconfparse_LDADD = libkvalobs_miconfparser.la
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libkvalobs_miconfparser.pc
+$(pkgconfig_DATA): $(top_builddir)/config.status

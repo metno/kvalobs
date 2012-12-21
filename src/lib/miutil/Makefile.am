@@ -47,3 +47,7 @@ libmiutiltest_LDADD = \
 	$(top_builddir)/src/lib/milog/libkvalobs_milog.la \
 	$(BOOST_DATE_TIME_LIB)\
 	$(gtest_LIBS)
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libkvalobs_miutil.pc
+$(pkgconfig_DATA): $(top_builddir)/config.status

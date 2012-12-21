@@ -9,3 +9,6 @@ libkvalobs_fileutil_la_LIBADD = $(putools_LIBS) -ldl
 fileutilincludedir = $(pkgincludedir)/fileutil
 fileutilinclude_HEADERS = copyfile.h dir.h dso.h file.h mkdir.h pidfileutil.h readfile.h
 
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libkvalobs_fileutil.pc
+$(pkgconfig_DATA): $(top_builddir)/config.status
