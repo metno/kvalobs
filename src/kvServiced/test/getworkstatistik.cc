@@ -80,9 +80,8 @@ main(int argn, char **argv)
 	try {
 	   kvalobs::kvWorkelement data;
 	   kvservice::WorkstatistikIterator wit;
-	   miutil::miTime to(miTime::nowTime());
-	   miutil::miTime from( to );
-	   from.addHour( -2 );
+	   boost::posix_time::ptime to = boost::posix_time::second_clock::universal_time();
+	   boost::posix_time::ptime from = to - boost::posix_time::hours(2);
 
 	   cerr << "Workstatistik (obstime): " << from << " - " << to << endl;
 

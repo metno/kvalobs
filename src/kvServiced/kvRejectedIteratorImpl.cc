@@ -32,6 +32,7 @@
 #include <kvalobs/kvDbGate.h>
 #include <kvalobs/kvRejectdecode.h>
 #include <milog/milog.h>
+#include <miutil/timeconvert.h>
 #include <miutil/trimstr.h>
 #include "kvRejectedIteratorImpl.h"
 
@@ -216,7 +217,7 @@ next(CKvalObs::CService::RejectdecodeList_out rejectedList)
   
 	for(CORBA::Long datai=0;it!=dataList.end(); datai++, it++){
 		(*rejectedList)[datai].message=it->message().c_str();
-		(*rejectedList)[datai].tbtime=it->tbtime().isoTime().c_str();
+		(*rejectedList)[datai].tbtime=to_kvalobs_string(it->tbtime()).c_str();
 		(*rejectedList)[datai].decoder=it->decoder().c_str();
 		(*rejectedList)[datai].comment=it->comment().c_str();
 	    (*rejectedList)[datai].is_fixed=it->fixed();

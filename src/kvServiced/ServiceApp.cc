@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <kvskel/commonStationInfo.hh>
+#include <miutil/timeconvert.h>
 #include <milog/milog.h>
 #include <puTools/miTime.h>
 #include <kvalobs/kvPath.h>
@@ -54,7 +55,7 @@ ServiceApp(int argn, char **argv,
 	   const std::string &connect_,
 	   const char *opt[][2])
   :KvApp(argn, argv, opt), dbDriver(driver_), dbConnect(connect_), 
-   shutdown_(false), orbIsDown(false)
+   shutdown_(false), orbIsDown(false), subscribers( *this )
 {
   LogContext context("ApplicationInit");
 
@@ -142,7 +143,7 @@ isOk()const
 
 kvalobs::kvStation 
 ServiceApp::
-lookUpStation(const miutil::miString &kvQuerie)
+lookUpStation(const std::string &kvQuerie)
 {
   return kvalobs::kvStation();
 }
@@ -222,7 +223,7 @@ sendToManager(kvalobs::kvStationInfoList &retList,
   
   for(k=0;it!=retList.end(); it++, k++){
     stInfo[k].stationId=it->stationID();
-    stInfo[k].obstime=CORBA::string_dup(it->obstime().isoTime().c_str());
+    stInfo[k].obstime=CORBA::string_dup(to_kvalobs_string(it->obstime()).c_str());
     stInfo[k].typeId_=it->typeID();
   }
   

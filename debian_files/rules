@@ -38,8 +38,6 @@ CC=gcc-4.1
 
 config.status: 
 	dh_testdir
-	
-	# Add here commands to configure the package.	
 ifneq "$(wildcard /usr/share/misc/config.sub)" ""
 	cp -f /usr/share/misc/config.sub config.sub
 endif
@@ -66,16 +64,10 @@ build: build-arch build-indep
 
 build-arch: build-arch-stamp
 build-arch-stamp:  config.status
-
-	# Add here commands to compile the arch part of the package.
-	#$(MAKE) 
 	touch $@
 
 build-indep: build-indep-stamp
 build-indep-stamp:  config.status
-
-	# Add here commands to compile the indep part of the package.
-	#$(MAKE) doc
 	touch $@
 
 clean:
@@ -83,7 +75,6 @@ clean:
 	dh_testroot
 	rm -f build-arch-stamp build-indep-stamp #CONFIGURE-STAMP#
 
-	# Add here commands to clean up after the build process.
 	[ ! -f Makefile ] || $(MAKE) distclean
 	( if test -d debian/mi-src-$(MI_SRC_DATE) ; then cd debian/mi-src-$(MI_SRC_DATE); $(MAKE) OSTYPE=linux clean; rm -rf ../mi-src/; fi)
 
@@ -95,11 +86,6 @@ install-indep:
 	dh_testroot
 	dh_clean -k -i 
 	dh_installdirs -i
-
-	# Add here commands to install the indep part of the package into
-	# debian/<package>-doc.
-	#INSTALLDOC#
-
 	dh_install -i
 
 %.sh: %.sql
@@ -112,8 +98,6 @@ install-arch:
 	dh_clean -k -s 
 	dh_installdirs -s
 
-	# Add here commands to install the arch part of the package into 
-	# debian/tmp.
 	$(MAKE) DESTDIR=$(CURDIR)/debian/tmp install
 	mkdir -p $(CURDIR)/debian/tmp/etc/pgrepctl
 	mkdir -p $(CURDIR)/debian/tmp/etc/kvalobs/lam2kv

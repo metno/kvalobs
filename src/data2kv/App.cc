@@ -12,7 +12,6 @@
 #include <miutil/trimstr.h>
 #include <kvalobs/kvPath.h>
 #include <fileutil/dir.h>
-#include <puTools/miTime.h>
 #include "App.h"
 #include "CollectData.h"
 
@@ -469,12 +468,12 @@ writeFile( const std::string &path,
 
 	ost << path <<"/";
   
-	miutil::miTime t(miutil::miTime::nowTime() );
+	boost::posix_time::ptime t(boost::posix_time::second_clock::universal_time() );
 
 	for(unique=0; unique<UNIQUE; unique++){
 		sprintf( buf, "-%04d%02d%02d%02d-%d.dat", 
-				   t.year(), t.month(), t.day(),
-				   t.hour(), unique);
+				   t.date().year(), t.date().month(), t.date().day(),
+				   t.time_of_day().hours(), unique);
 		ost.str("");
 		ost << path  << "/" << name << buf;
     

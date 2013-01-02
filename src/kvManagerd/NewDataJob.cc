@@ -30,9 +30,9 @@
 */
 #include "NewDataJob.h"
 #include <milog/milog.h>
+#include <miutil/timeconvert.h>
 
 #include <list>
-#include <puTools/miTime.h>
 #include <kvalobs/kvDbGate.h>
 #include <kvalobs/kvQueries.h>
 #include <kvalobs/kvKeyVal.h>
@@ -72,8 +72,8 @@ void NewDataJob::doJob(dnmi::db::Connection &con)
     Start searching for unprocessed data from tbtime>= startime
     Ignore data younger than stoptime
   */ 
-  miutil::miTime startime = miutil::miTime::nowTime();
-  miutil::miTime stoptime = miutil::miTime::nowTime();
+  boost::posix_time::ptime startime = boost::posix_time::second_clock::universal_time();
+  boost::posix_time::ptime stoptime = boost::posix_time::second_clock::universal_time();
 
   bool result;
 
@@ -106,15 +106,19 @@ void NewDataJob::doJob(dnmi::db::Connection &con)
   std::list<kvKeyVal>::const_iterator itk;
   
   for (itk=values.begin(); itk!=values.end(); itk++){
-    miutil::miString s= itk->val();
-    if (miutil::miTime::isValid(s))
-      startime= miutil::miTime(s);
+    std::string s= itk->val();
+    try
+    {
+    	startime = boost::posix_time::time_from_string_nothrow(s);
+    }
+    catch ( std::exception & )
+    {}
   }
   
   LOGDEBUG(jobName() << ": Got tabletime for previous qabase run:" << startime);
   
   // to be on the safe side, reduce startime by one hour
-  startime.addHour(-1);
+  startime -= boost::posix_time::hours(1);
   
   /*
     ==============================================================
@@ -146,7 +150,7 @@ void NewDataJob::doJob(dnmi::db::Connection &con)
   int num_mis_stations= 0;
   int stationid= -1;
   int typeID   = -1;
-  miutil::miTime obstime= miutil::miTime::nowTime();
+  boost::posix_time::ptime obstime = boost::posix_time::microsec_clock::universal_time();
 
   kvStationInfo stationinfo(stationid,obstime,typeID);
   std::list<kvData>::const_iterator itd;

@@ -34,6 +34,7 @@
 #include <boost/lexical_cast.hpp>
 #include <puTools/miTime.h>
 #include <miutil/commastring.h>
+#include <miutil/timeconvert.h>
 #include <milog/milog.h>
 #include <kvalobs/kvDbGate.h>
 #include <kvalobs/kvQueries.h>
@@ -60,9 +61,9 @@ SynopDecoder::SynopDecoder(
       dnmi::db::Connection   &con,
       const ParamList        &params,
       const std::list<kvalobs::kvTypes> &typeList,
-      const miutil::miString &obsType,
-      const miutil::miString &obs,
-      int                    decoderId)
+      const std::string &obsType,
+      const std::string &obs,
+      int               decoderId)
 :DecoderBase(con, params, typeList, obsType, obs, decoderId)
 {
 }
@@ -71,14 +72,14 @@ SynopDecoder::~SynopDecoder()
 {
 }
 
-miutil::miString 
+std::string
 SynopDecoder::name() const
 {
    return "SynopDecoder";
 }
 
 long 
-SynopDecoder::getStationId(miutil::miString & msg)
+SynopDecoder::getStationId(std::string & msg)
 {
 }
 
@@ -116,7 +117,7 @@ SynopDecoder::saveData(list<kvalobs::kvData> &data,
    }
 
    for(;it!=data.end(); it++){
-      if(it->obstime().undef() || it->tbtime().undef()){
+      if(it->obstime().is_not_a_date_time() || it->tbtime().is_not_a_date_time()){
          rejectedMessage="Missing obsTime or tbtime for observation!";
          rejected=true;
          return false;
@@ -128,7 +129,7 @@ SynopDecoder::saveData(list<kvalobs::kvData> &data,
    int ret=true;
    it=data.begin();
 
-   if( !addDataToDb( it->obstime(), it->stationID(), it->typeID(), data, textData, priority, logid.str() ) ) {
+   if( !addDataToDb( to_miTime(it->obstime()), it->stationID(), it->typeID(), data, textData, priority, logid.str() ) ) {
       ret = false;
    }
 
@@ -206,7 +207,7 @@ writeObsToLog(const std::string &obs)
 }
 
 kvalobs::decoder::DecoderBase::DecodeResult 
-SynopDecoder::execute(miutil::miString &msg)
+SynopDecoder::execute( std::string &msg)
 {
    kvalobs::kvStation       tstat;
 
@@ -214,7 +215,7 @@ SynopDecoder::execute(miutil::miString &msg)
    bool                     saveReject;
    std::string              saveRejectMessage;
    list<kvalobs::kvData>    data;
-   miTime                   nowTime(miTime::nowTime());
+   boost::posix_time::ptime nowTime(boost::posix_time::microsec_clock::universal_time());
 
    Lock lock(mutex);
 
@@ -229,7 +230,7 @@ SynopDecoder::execute(miutil::miString &msg)
    writeObsToLog(obs);
 
    if(lastStationCheck.undef() ||
-         abs(miTime::hourDiff(lastStationCheck, nowTime))>3){
+         abs(miTime::hourDiff(lastStationCheck, to_miTime(nowTime)))>3){
       LOGINFO("Initialize the station information from the database.");
 
       if(!initializeKvSynopDecoder()){

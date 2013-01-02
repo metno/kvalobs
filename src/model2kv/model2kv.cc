@@ -33,9 +33,9 @@
 #include <fstream>
 #include <sstream>
 #include <map>
-#include <puTools/miString.h>
 #include <puTools/miTime.h>
 #include <puCtools/timemanip.h>
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
 
@@ -45,11 +45,11 @@ using namespace miutil;
 /// the kvalobs table format
 /// juergens@met.no
 
-map<miString,miString> pi_map;
-miString          model_id;
+map<std::string,std::string> pi_map;
+std::string          model_id;
 miTime            from;
 miTime            to;
-vector<miString>  allpar;
+vector<std::string>  allpar;
 
 void setTime(miTime& to, timeline t)
 {
@@ -62,19 +62,19 @@ void setTime(miTime& to, timeline t)
 /// independently from this job. So the system can 
 /// run without an existing database
 
-bool readPindexMap(const miString& fname)
+bool readPindexMap(const std::string& fname)
 {
-  ifstream pin(fname.cStr());
+  ifstream pin(fname.c_str());
   
-  miString line;
-  vector<miString> words;
+  std::string line;
+  vector<std::string> words;
 
   while(pin) {
     getline(pin,line);
-    line.trim();
-    if(!line.exists())
+    boost::trim(line);
+    if(line.empty())
       continue;
-    words = line.split(":");
+    boost::split(words, line, boost::is_any_of(":"));
     if(words.size() < 2 )
       continue;
     pi_map[words[0]] = words[1];
@@ -88,13 +88,13 @@ bool readPindexMap(const miString& fname)
 /// (see $KVALOBS/src/script/model2kvalobs/bin)
 
 
-miString format2kvalobs(struct filecontents* datain)
+std::string format2kvalobs(struct filecontents* datain)
 {
 
   ostringstream out;
 
   int i,j,k;
-  miString station,pindex,pi;
+  std::string station,pindex,pi;
   float scale;
   miTime valid;
 
@@ -104,14 +104,14 @@ miString format2kvalobs(struct filecontents* datain)
     
 
       for (j=0; j<datain->npar; j++) {
-	pi = miString(datain->par[j]->alias);
+	pi = std::string(datain->par[j]->alias);
 	
 	if( bool(pi_map.count(pi)) ){
 	  pindex = pi_map[pi];
 	  allpar.push_back(pindex);
 
 	  for (i=0; i<datain->npos; i++){ 
-	    station = miString( datain->pos[i]->name );
+	    station = std::string( datain->pos[i]->name );
 	    
 	    scale = powf(10,float(datain->par[j]->scale ));
 	    
@@ -213,7 +213,7 @@ int main(int argc, char** argv){
   clean_setup();
   
 
-  miString buf =  format2kvalobs(datain);
+  std::string buf =  format2kvalobs(datain);
 
   pout <<  "COPY  model_data from stdin using delimiters ',';" << endl
        <<  buf

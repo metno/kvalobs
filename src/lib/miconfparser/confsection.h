@@ -31,7 +31,7 @@
 #ifndef __miutil_conf_confsection_h__
 #define __miutil_conf_confsection_h__
 
-#include <iostream>
+#include <iosfwd>
 #include <string>
 #include <map>
 #include <list>

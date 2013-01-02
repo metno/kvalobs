@@ -37,7 +37,7 @@ class kvDataFormatterTest : public testing::Test
 {
 public:
 	kvDataFormatterTest() :
-		f(10, "2010-02-25 00:00:00", 1)
+		f(10, boost::posix_time::time_from_string("2010-02-25 00:00:00"), 1)
 	{}
 
 protected:
@@ -48,7 +48,7 @@ TEST_F(kvDataFormatterTest, noDecimal)
 {
 	kvalobs::kvData in = f.getData(1, 100);
 
-	miutil::miString s = createString(in);
+	std::string s = createString(in);
 
 	kvDataList out = getKvData(s);
 	ASSERT_EQ(1u, out.size());
@@ -58,10 +58,10 @@ TEST_F(kvDataFormatterTest, noDecimal)
 
 TEST_F(kvDataFormatterTest, oneDecimal)
 {
-	kvalobs::kvDataFactory f(10, "2010-02-25 00:00:00", 1);
+	kvalobs::kvDataFactory f(10, boost::posix_time::time_from_string("2010-02-25 00:00:00"), 1);
 	kvalobs::kvData in = f.getData(1.3, 100);
 
-	miutil::miString s = createString(in);
+	std::string s = createString(in);
 
 	kvDataList out = getKvData(s);
 	ASSERT_EQ(1u, out.size());
@@ -71,10 +71,10 @@ TEST_F(kvDataFormatterTest, oneDecimal)
 
 TEST_F(kvDataFormatterTest, multipleDecimals)
 {
-	kvalobs::kvDataFactory f(10, "2010-02-25 00:00:00", 1);
+	kvalobs::kvDataFactory f(10, boost::posix_time::time_from_string("2010-02-25 00:00:00"), 1);
 	kvalobs::kvData in = f.getData(1.12345, 100);
 
-	miutil::miString s = createString(in);
+	std::string s = createString(in);
 
 	kvDataList out = getKvData(s);
 	ASSERT_EQ(1u, out.size());

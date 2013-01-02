@@ -36,7 +36,7 @@
 namespace kvalobs
 {
 
-class kvStationMetadata : public kvDbBase
+class kvStationMetadata: public kvDbBase
 {
 public:
 	kvStationMetadata();
@@ -47,7 +47,7 @@ public:
 	kvStationMetadata(int station, const int * param, const int * type,
 			const int * level, const int * sensor, const std::string & name,
 			float metadata, const std::string & description,
-			const miutil::miTime & fromtime, const miutil::miTime & totime);
+			const boost::posix_time::ptime & fromtime, const boost::posix_time::ptime & totime);
 
 	kvStationMetadata(const kvStationMetadata & d);
 
@@ -55,42 +55,82 @@ public:
 
 	kvStationMetadata & operator =(const kvStationMetadata & d);
 
-    int stationID() const { return station_; }
-    int paramID() const { return param_; }
-    int typeID() const { return type_; }
-    int level() const { return level_; }
-    int sensor() const { return sensor_; }
+	int stationID() const
+	{
+		return station_;
+	}
+	int paramID() const
+	{
+		return param_;
+	}
+	int typeID() const
+	{
+		return type_;
+	}
+	int level() const
+	{
+		return level_;
+	}
+	int sensor() const
+	{
+		return sensor_;
+	}
 
-    const std::string & name() const { return name_; }
-    float metadata() const { return metadata_; }
+	const std::string & name() const
+	{
+		return name_;
+	}
+	float metadata() const
+	{
+		return metadata_;
+	}
 
-    const std::string & metadataDescription() const { return description_; }
+	const std::string & metadataDescription() const
+	{
+		return description_;
+	}
 
-    const miutil::miTime & fromtime() const { return fromtime_; }
-    const miutil::miTime & totime() const { return totime_; }
+	const boost::posix_time::ptime & fromtime() const
+	{
+		return fromtime_;
+	}
+	const boost::posix_time::ptime & totime() const
+	{
+		return totime_;
+	}
 
+	bool haveSpecificParam() const
+	{
+		return param_ != INT_NULL;
+	}
+	bool haveSpecificType() const
+	{
+		return type_ != INT_NULL;
+	}
+	bool haveSpecificLevel() const
+	{
+		return level_ != INT_NULL;
+	}
+	bool haveSpecificSensor() const
+	{
+		return sensor_ != INT_NULL;
+	}
 
-	bool haveSpecificParam() const { return param_ != INT_NULL; }
-	bool haveSpecificType() const { return type_ != INT_NULL; }
-	bool haveSpecificLevel() const { return level_ != INT_NULL; }
-	bool haveSpecificSensor() const { return sensor_ != INT_NULL; }
-
-
-    virtual miutil::miString toSend() const;
-    virtual miutil::miString uniqueKey() const;
-    virtual const char* tableName() const;
+	virtual std::string toSend() const;
+	virtual std::string uniqueKey() const;
+	virtual const char* tableName() const;
 
 private:
-    int station_;
-    int param_;
-    int type_;
-    int level_;
-    int sensor_;
-    std::string name_;
-    float metadata_;
-    std::string description_;
-    miutil::miTime fromtime_;
-    miutil::miTime totime_;
+	int station_;
+	int param_;
+	int type_;
+	int level_;
+	int sensor_;
+	std::string name_;
+	float metadata_;
+	std::string description_;
+	boost::posix_time::ptime fromtime_;
+	boost::posix_time::ptime totime_;
 };
 
 }

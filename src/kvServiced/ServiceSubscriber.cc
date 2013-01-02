@@ -34,6 +34,7 @@
 #include <cstring>
 #include <kvalobs/kvDbGate.h>
 #include <kvalobs/kvWorkelement.h>
+#include <miutil/timeconvert.h>
 #include <milog/milog.h>
 #include "ServiceSubscriber.h"
 
@@ -58,7 +59,7 @@ buildDataQuery( const kvalobs::kvStationInfoExt &st )
 
    q << " WHERE stationid=" << st.stationID()
         << " AND typeid="      << st.typeID()
-        << " AND obstime=\'"   << st.obstime().isoTime() << "\' " ;
+        << " AND obstime=\'"   << to_kvalobs_string(st.obstime()) << "\' " ;
 
    if( params.size() !=0 ) {
       list<kvalobs::kvStationInfoExt::Param>::const_iterator it = params.begin();
@@ -83,7 +84,7 @@ buildTextDataQuery( const kvalobs::kvStationInfoExt &st )
 
    q << " WHERE stationid=" << st.stationID()
         << " AND typeid="      << st.typeID()
-        << " AND obstime=\'"   << st.obstime().isoTime() << "\' " ;
+        << " AND obstime=\'"   << to_kvalobs_string(st.obstime()) << "\' " ;
 
    if( params.size() !=0 ) {
       list<kvalobs::kvStationInfoExt::Param>::const_iterator it = params.begin();
@@ -136,7 +137,7 @@ updateWorkelementServiceStart(const kvalobs::kvStationInfoExt &st,
    ost << "UPDATE workque SET service_start='"
          << miTime::nowTime()
    << "' WHERE stationid=" << st.stationID()
-   << "  AND obstime='" << st.obstime().isoTime()
+   << "  AND obstime='" << to_kvalobs_string(st.obstime())
    << "' AND typeid=" << st.typeID();
 
 
@@ -165,7 +166,7 @@ updateWorkelementServiceStop(const kvalobs::kvStationInfoExt &st,
    ost << "UPDATE workque SET service_stop='"
          << miTime::nowTime()
    << "' WHERE stationid=" << st.stationID()
-   << "  AND obstime='" << st.obstime().isoTime()
+   << "  AND obstime='" << to_kvalobs_string(st.obstime())
    << "' AND typeid=" << st.typeID();
 
 
@@ -482,7 +483,7 @@ DataNotifyFunc::buildWhatList(
    wl.length(wli+1);
    wl[wli].stationID=stationInfo.stationID();
    wl[wli].typeID_=stationInfo.typeID();
-   wl[wli].obsTime=stationInfo.obstime().isoTime().c_str();
+   wl[wli].obsTime=to_kvalobs_string(stationInfo.obstime()).c_str();
 
 
    for(list<kvData>::const_iterator it=dataList.begin();
@@ -728,10 +729,10 @@ DataFunc::DataFunc(const DataToSendList &dataList)
       	  LOGDEBUG("DS: " << *it );
              */
             data[obsi].dataList[datai].stationID   = it->stationID();
-            data[obsi].dataList[datai].obstime     = it->obstime().isoTime().c_str();
+            data[obsi].dataList[datai].obstime     = to_kvalobs_string(it->obstime()).c_str();
             data[obsi].dataList[datai].original    = it->original();
             data[obsi].dataList[datai].paramID     = it->paramID();
-            data[obsi].dataList[datai].tbtime      = it->tbtime().isoTime().c_str();
+            data[obsi].dataList[datai].tbtime      = to_kvalobs_string(it->tbtime()).c_str();
             data[obsi].dataList[datai].typeID_     = it->typeID();
             data[obsi].dataList[datai].level       = it->level();
             data[obsi].dataList[datai].corrected   = it->corrected();
@@ -769,10 +770,10 @@ DataFunc::DataFunc(const DataToSendList &dataList)
                it!=itd->textDataList.end();
                it++) {
             data[obsi].textDataList[datai].stationID=it->stationID();
-            data[obsi].textDataList[datai].obstime=it->obstime().isoTime().c_str();
+            data[obsi].textDataList[datai].obstime=to_kvalobs_string(it->obstime()).c_str();
             data[obsi].textDataList[datai].original=it->original().c_str();
             data[obsi].textDataList[datai].paramID=it->paramID();
-            data[obsi].textDataList[datai].tbtime=it->tbtime().isoTime().c_str();
+            data[obsi].textDataList[datai].tbtime=to_kvalobs_string(it->tbtime()).c_str();
             data[obsi].textDataList[datai].typeID_=it->typeID();
 
             datai++;

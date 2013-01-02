@@ -34,6 +34,7 @@
 #include <miconfparser/confparser.h>
 #include <kvskel/kvService.hh>
 #include <miconfparser/valelement.h>
+#include <fstream>
 #include <signal.h>
 
 using namespace std;
@@ -297,7 +298,7 @@ getKvStationParam( list<kvStationParam> &stParam,
 }
 bool
 CorbaKvApp::
-getKvStationMetaData( std::list<kvalobs::kvStationMetadata> &stMeta, int stationid, const miutil::miTime &obstime, const std::string & metadataName)
+getKvStationMetaData( std::list<kvalobs::kvStationMetadata> &stMeta, int stationid, const boost::posix_time::ptime &obstime, const std::string & metadataName)
 {
    getKvStationMetaDataFunc func( stMeta, stationid, obstime, metadataName );
    return func( __func__ );
@@ -314,7 +315,7 @@ getKvObsPgm( list<kvObsPgm> &obsPgm,
 bool
 CorbaKvApp::
 getKvWorkstatistik( CKvalObs::CService::WorkstatistikTimeType timeType,
-                    const miutil::miTime &from, const miutil::miTime &to,
+                    const boost::posix_time::ptime &from, const boost::posix_time::ptime &to,
                     kvservice::WorkstatistikIterator &it
 )
 {

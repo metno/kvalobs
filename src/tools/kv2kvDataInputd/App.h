@@ -57,7 +57,7 @@ public kvservice::corba::CorbaKvApp
    CKvalObs::CDataSource::Data_var refDataReceiver;
    CorbaHelper::CorbaApp *corbaApp;
    ParamDefsPtr paramdefs;
-   miutil::miTime timeLastTryToSendData;
+   boost::posix_time::ptime timeLastTryToSendData;
    bool           dataReceiverAlive;
 
    bool subscribeSetup();

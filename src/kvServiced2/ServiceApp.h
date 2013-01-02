@@ -98,7 +98,7 @@ public:
 	void removeReaperObj(ReaperBase *rb);
 	bool isMaxClientReached();
 
-  	kvalobs::kvStation lookUpStation(const miutil::miString &kvQuerie);
+  	kvalobs::kvStation lookUpStation(const miutil::std::string &kvQuerie);
 
   	void notifyAllKvHintSubscribers(bool kvup=true);
 };

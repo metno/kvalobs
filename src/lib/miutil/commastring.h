@@ -31,7 +31,7 @@
 #ifndef __commastring_h__
 #define __commastring_h__
 
-#include <iostream>
+#include <iosfwd>
 #include <vector>
 #include <string>
 

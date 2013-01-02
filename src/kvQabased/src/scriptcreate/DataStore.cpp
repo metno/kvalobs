@@ -41,7 +41,7 @@ void fillMissing(ParameterSortedList & dataList)
 {
 	typedef typename ParameterSortedList::mapped_type DataList;
 
-	std::set<miutil::miTime> obsTimes;
+	std::set<boost::posix_time::ptime> obsTimes;
 	for ( typename ParameterSortedList::const_iterator parameter = dataList.begin(); parameter != dataList.end(); ++ parameter )
 		for ( typename DataList::const_iterator it = parameter->second.begin(); it != parameter->second.end(); ++ it )
 			obsTimes.insert(it->obstime());
@@ -59,7 +59,7 @@ void fillMissing(ParameterSortedList & dataList)
 
 		MissingFactory factory(dataList.front());
 
-		for ( std::set<miutil::miTime>::const_reverse_iterator times = obsTimes.rbegin(); times != obsTimes.rend(); ++ times )
+		for ( std::set<boost::posix_time::ptime>::const_reverse_iterator times = obsTimes.rbegin(); times != obsTimes.rend(); ++ times )
 		{
 			typename DataList::iterator find = dataList.begin();
 			while ( find != dataList.end() and find->obstime() > * times )
@@ -76,7 +76,7 @@ struct data_factory
 	const kvalobs::kvDataFactory f_;
 	data_factory(const kvalobs::kvData & d ) : f_(d) {}
 
-	kvalobs::kvData operator () (const miutil::miTime & t) const
+	kvalobs::kvData operator () (const boost::posix_time::ptime & t) const
 	{
 		return f_.getMissing(0, t);
 	}
@@ -86,7 +86,7 @@ struct text_data_factory
 	const kvalobs::kvTextData d_;
 	text_data_factory(const kvalobs::kvTextData & d ) : d_(d) {}
 
-	kvalobs::kvTextData operator () (const miutil::miTime & t) const
+	kvalobs::kvTextData operator () (const boost::posix_time::ptime & t) const
 	{
 		return kvalobs::kvTextData(d_.stationID(), t, "-32767", 0, d_.tbtime(), d_.typeID());
 	}
@@ -110,8 +110,8 @@ void DataStore::populateObs_(
 		const DataRequirement & abstractObsRequirement,
 		const DataRequirement & concreteObsRequirement)
 {
-//	miutil::miTime from = observation.obstime();
-//	miutil::miTime to = observation.obstime();
+//	boost::posix_time::ptime from = observation.obstime();
+//	boost::posix_time::ptime to = observation.obstime();
 //	from.addMin(concreteObsRequirement.firstTime());
 //	to.addMin(concreteObsRequirement.lastTime());
 
@@ -159,7 +159,7 @@ void DataStore::populateRefObs_(
 		db.getTextData(& textData, observation, * parameter, concreteRefObsRequirement.firstTime());
 		if ( textData.empty() )
 		{
-			kvalobs::kvTextData td(observation.stationID(), observation.obstime(), "", 0, miutil::miTime(), observation.typeID());
+			kvalobs::kvTextData td(observation.stationID(), observation.obstime(), "", 0, boost::posix_time::ptime(), observation.typeID());
 			textData.push_back(td);
 		}
 
@@ -176,8 +176,8 @@ void DataStore::populateModel_(
 			const qabase::DataRequirement & abstractModelRequirement,
 			const qabase::DataRequirement & concreteModelRequirement)
 {
-//	miutil::miTime from = observation.obstime();
-//	miutil::miTime to = observation.obstime();
+//	boost::posix_time::ptime from = observation.obstime();
+//	boost::posix_time::ptime to = observation.obstime();
 //	from.addMin(concreteModelRequirement.firstTime());
 //	to.addMin(concreteModelRequirement.lastTime());
 
@@ -238,7 +238,8 @@ void DataStore::populateStation_(const db::DatabaseAccess & db)
 	}
 	catch( std::exception & e )
 	{
-		station_ = kvalobs::kvStation(observation_.stationID(), -1, -1, -1, 0, "unknown station", -1, -1, "", "", "", 0, true, "1900-01-01");
+		station_ = kvalobs::kvStation(observation_.stationID(), -1, -1, -1, 0, "unknown station", -1, -1, "", "", "", 0, true,
+				boost::posix_time::ptime(boost::gregorian::date(1900,1,1), boost::posix_time::time_duration(0,0,0)));
 	}
 }
 
@@ -298,7 +299,7 @@ DataStore::DataStore(
 
 DataStore::DataStore(const DataStore::ParameterSortedDataList & data, int flagPosition) :
 		data_(data),
-		observation_(0, miutil::miTime(miutil::miDate::today(), miutil::miClock(6,0,0)), 1),
+		observation_(0, boost::posix_time::ptime(boost::gregorian::day_clock::universal_day(), boost::posix_time::hours(6)), 1),
 		qcx_("undefined"),
 		flagPosition_(flagPosition)
 {

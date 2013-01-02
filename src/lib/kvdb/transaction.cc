@@ -35,6 +35,11 @@
 namespace dnmi {
 namespace db {
 
+Transaction::
+~Transaction()
+{
+}
+
 bool
 Transaction::
 operator()(dnmi::db::Connection *conection)

@@ -4,9 +4,9 @@ AM_CPPFLAGS = \
 	-I$(top_builddir)/src/lib/kvskel \
 	-D_REENTRANT
 
-lib_LTLIBRARIES = libkvalobs2_miutil.la
+lib_LTLIBRARIES = libkvalobs_miutil.la
 
-libkvalobs2_miutil_la_SOURCES = \
+libkvalobs_miutil_la_SOURCES = \
 	commastring.h commastring.cc \
 	trimstr.h trimstr.cc \
 	cmprspace.h cmprspace.cc \
@@ -15,19 +15,19 @@ libkvalobs2_miutil_la_SOURCES = \
 	base64.h base64.cc \
 	splitstr.h splitstr.cc \
 	gettimeofday.h gettimeofday.cc \
-	msleep.h msleep.cc
+	msleep.h msleep.cc \
+	timeconvert.h
 
-libkvalobs2_miutil_la_CPPFLAGS = $(putools_CFLAGS)
-libkvalobs2_miutil_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@
-#libkvalobs2_miutil_la_LIBADD = 
+libkvalobs_miutil_la_CPPFLAGS = $(putools_CFLAGS) -fPIC
+libkvalobs_miutil_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@ -fPIC
+libkvalobs_miutil_la_LIBADD = $(BOOST_DATE_TIME_LIB)
 
 miutilincludedir = $(pkgincludedir)/miutil
 miutilinclude_HEADERS = msleep.h replace.h cmprspace.h commastring.h \
                         miTimeParse.h trimstr.h base64.h gettimeofday.h \
-                        splitstr.h
+                        splitstr.h timeconvert.h
 
 
-if HAVE_GTEST
 TESTS = libmiutiltest
 
 check_PROGRAMS = libmiutiltest
@@ -38,13 +38,16 @@ libmiutiltest_SOURCES = \
 
 libmiutiltest_CPPFLAGS = \
 	$(AM_CPPFLAGS) \
-	$(libkvalobs2_miutil_la_CPPFLAGS) \
+	$(libkvalobs_miutil_la_CPPFLAGS) \
 	$(gtest_CFLAGS)
 
 libmiutiltest_LDADD = \
-	libkvalobs2_miutil.la \
+	libkvalobs_miutil.la \
 	$(libkvalobs_miutil_la_LIBADD) \
-	$(top_builddir)/src/lib/milog/libkvalobs2_milog.la \
-	$(putools_LIBS)\
+	$(top_builddir)/src/lib/milog/libkvalobs_milog.la \
+	$(BOOST_DATE_TIME_LIB)\
 	$(gtest_LIBS)
-endif
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libkvalobs_miutil.pc
+$(pkgconfig_DATA): $(top_builddir)/config.status

@@ -30,6 +30,8 @@
  */
 #include <stdio.h>
 #include <milog/milog.h>
+#include <puTools/miTime.h>
+#include <miutil/timeconvert.h>
 #include "decodeddata.h"
 
 using namespace std;
@@ -80,10 +82,10 @@ addDataObstime( const std::string &param,
 
    if(isText){
       kvalobs::kvTextData mydata(sid,
-                                 myDtObs,
+    		  to_ptime(myDtObs),
                                  data__,
                                  pid,
-                                 tbtime,
+                                 to_ptime(tbtime),
                                  tid);
 
       list<kvalobs::kvTextData>::iterator it=textData_.begin();
@@ -108,10 +110,10 @@ addDataObstime( const std::string &param,
       }
 
       kvalobs::kvData mydata(sid,
-                             myDtObs,
+    		  to_ptime(myDtObs),
                              fval,
                              pid,
-                             tbtime,
+                             to_ptime(tbtime),
                              tid,
                              sensor,
                              level,
@@ -202,7 +204,7 @@ operator<<(std::ostream &s,
 
    for(;it!=elem.data().end(); it++){
       s << it->stationID() << ","
-            << it->obstime()   << ","
+            << to_kvalobs_string(it->obstime())   << ","
             << it->typeID()    << ","
             << elem.findParam(it->paramID()) << "(" << it->paramID() << "),"
             << it->original()  << ","
@@ -214,7 +216,7 @@ operator<<(std::ostream &s,
 
    for(;itt!=elem.textData().end(); itt++){
       s << itt->stationID() << ","
-            << itt->obstime()   << ","
+            << to_kvalobs_string(itt->obstime())   << ","
             << itt->typeID()    << ","
             << elem.findParam(itt->paramID()) << "(" << itt->paramID() << "),"
             << itt->original()  << endl;

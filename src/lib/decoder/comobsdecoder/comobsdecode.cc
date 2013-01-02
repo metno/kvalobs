@@ -33,6 +33,7 @@
 #include <milog/milog.h>
 #include <puTools/miTime.h>
 #include <miutil/trimstr.h>
+#include <miutil/timeconvert.h>
 #include <kvalobs/kvDbGate.h>
 #include <decoder/decoderbase/DataUpdateTransaction.h>
 #include "smsmeldingparser.h"
@@ -51,8 +52,8 @@ ComObsDecoder(
       dnmi::db::Connection   &con,
       const ParamList        &params,
       const std::list<kvalobs::kvTypes> &typeList,
-      const miutil::miString &obsType,
-      const miutil::miString &obs,
+      const std::string &obsType,
+      const std::string &obs,
       int                    decoderId)
 :DecoderBase(con, params, typeList, obsType, obs, decoderId)
 {
@@ -64,7 +65,7 @@ ComObsDecoder::
 {
 }
 
-miutil::miString 
+std::string
 kvalobs::decoder::comobsdecoder::
 ComObsDecoder::
 name() const
@@ -156,7 +157,7 @@ getMetaSaSdEm( int stationid, int typeid_, const miutil::miTime &obstime )
 kvalobs::decoder::DecoderBase::DecodeResult 
 kvalobs::decoder::comobsdecoder::
 ComObsDecoder::
-execute(miutil::miString &msg)
+execute(std::string &msg)
 {
    SmsMeldingParser mParser;
    SmsMelding       *smsMelding;
@@ -177,7 +178,7 @@ execute(miutil::miString &msg)
    smsMelding=mParser.parse(obs);
 
    if(!smsMelding){
-      kvRejectdecode myrejected=kvRejectdecode(obs, miTime::nowTime(), "comobs/typeid=<UNKNOWN>",
+      kvRejectdecode myrejected=kvRejectdecode(obs, boost::posix_time::microsec_clock::universal_time(), "comobs/typeid=<UNKNOWN>",
                                                mParser.getErrMsg());
 
 
@@ -197,7 +198,7 @@ execute(miutil::miString &msg)
       ost << "comobs/typeid=" << smsMelding->getCode() +300;
 
       kvRejectdecode myrejected=kvRejectdecode(obs,
-                                               miTime::nowTime(),
+    		  boost::posix_time::microsec_clock::universal_time(),
                                                ost.str(),
                                                "No identification!");
 
@@ -213,7 +214,7 @@ execute(miutil::miString &msg)
       ost << "comobs/typeid=" << smsMelding->getCode() +300;
 
       kvRejectdecode myrejected=kvRejectdecode(obs,
-                                               miTime::nowTime(),
+    		  boost::posix_time::microsec_clock::universal_time(),
                                                ost.str(),
                                                "Uknown station!");
 
@@ -237,7 +238,7 @@ execute(miutil::miString &msg)
       ost1 << "comobs/typeid=" << smsMelding->getCode() +300;
       ost << "No decoder for SMS code <" << smsMelding->getCode() << ">!";
 
-      kvRejectdecode myrejected=kvRejectdecode(obs, miTime::nowTime(), ost1.str(),
+      kvRejectdecode myrejected=kvRejectdecode(obs, boost::posix_time::microsec_clock::universal_time(), ost1.str(),
                                                ost.str());
 
 
@@ -297,7 +298,7 @@ execute(miutil::miString &msg)
 
       if( it->dataSize()>0 || it->textDataSize()>0 ) {
          try {
-            kvalobs::decoder::DataUpdateTransaction work( it->getDate(),
+            kvalobs::decoder::DataUpdateTransaction work( to_ptime(it->getDate()),
                                                           it->stationID(), it->typeID(),
                                                           priority, &d, &td, logid);
 

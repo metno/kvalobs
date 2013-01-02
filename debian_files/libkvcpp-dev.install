@@ -1,0 +1,17 @@
+usr/share/kvalobs/idl/*.idl
+usr/include/kvalobs/*
+usr/lib/libkvalobs_*.*a
+usr/lib/libkvalobs_corbahelper.so
+usr/lib/libkvalobs_decoderbase.so
+usr/lib/libkvalobs_decodeutility.so
+usr/lib/libkvalobs_dnmithread.so
+usr/lib/libkvalobs_fileutil.so
+usr/lib/libkvalobs_kvadmininterface.so
+usr/lib/libkvalobs_kvalobs.so
+usr/lib/libkvalobs_kvdb.so
+usr/lib/libkvalobs_kvskel.so
+usr/lib/libkvalobs_miconfparser.so
+usr/lib/libkvalobs_milog.so
+usr/lib/libkvalobs_miutil.so
+usr/lib/libkvalobs_kvcpp.so
+usr/lib/pkgconfig/*

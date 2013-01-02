@@ -31,8 +31,12 @@
 #include <stdio.h>
 #include <string.h>
 #include "miTimeParse.h"
+#include <sstream>
+#include <cstdlib>
 
 using namespace std;
+using namespace boost::posix_time;
+using namespace boost::gregorian;
 
 namespace{
 
@@ -59,9 +63,9 @@ readFromString(string::size_type ipos,
 			   int               &number);
 			   
 void
-computeNearestTime(int times[], 
-				   const miutil::miTime &nearestToThisTime, 
-				   miutil::miTime &time_,
+computeNearestTime(int times[],
+				   const boost::posix_time::ptime &nearestToThisTime,
+				   boost::posix_time::ptime &time_,
 				   std::string::size_type pos);
 			 	 
 }
@@ -71,8 +75,8 @@ std::string::size_type
 miutil::
 miTimeParse(const std::string &format, 
 		   	const std::string &stringToParse,
-		   	miutil::miTime &time_,
-			const miutil::miTime &nearestToThisTime)
+		   	boost::posix_time::ptime &time_,
+			const boost::posix_time::ptime &nearestToThisTime)
 {
 	int  times[TimeSpecEnd];
 	char nextCh;
@@ -116,7 +120,7 @@ miTimeParse(const std::string &format,
 			string buf;
 			int    n;
 			
-			cerr << "Format: " << nextCh << endl;
+	//		cerr << "Format: " << nextCh << endl;
 			
 			switch(nextCh){
 			case 'Y':
@@ -160,7 +164,7 @@ miTimeParse(const std::string &format,
 	}
 	
 	
-	if(!nearestToThisTime.undef()){
+	if( ! nearestToThisTime.is_special() ){
 		computeNearestTime(times, nearestToThisTime, time_, i);
 	}else{
 		if(times[Second]==-1)
@@ -192,8 +196,9 @@ miTimeParse(const std::string &format,
 				times[Year]+=2000;
 		}
 		
-		if(!miTime::isValid(times[Year], times[Month], times[Day], 
-				  	 	   times[Hour], times[Minute], times[Second])){
+		time_=ptime( date( times[Year], times[Month], times[Day] ),
+		             time_duration( times[Hour], times[Minute], times[Second] ) );
+		if( time_.is_special() ){
 			ostringstream ost;
 			ost << "Not a valid time: "
 				<< times[Year] << "-" << times[Month] << "-" << times[Day]
@@ -201,35 +206,30 @@ miTimeParse(const std::string &format,
 			
 			throw miTimeParseException(ost.str(), i, false);
 		}
-		
-		time_=miTime(times[Year], times[Month], times[Day], 
-				  	 times[Hour], times[Minute], times[Second]);
-				  	 
-	
 	}
 	
 	return i;
 }	
 
 //TODO: This code must be fixed to match the documentation.
-miutil::miTime
-miutil::
-isoTimeWithMsec( const std::string &timespec, int &msec )
-{
-   msec = 0;
-
-   if( timespec.empty() )
-      return miutil::miTime();
-
-   std::string::size_type p = timespec.find( '.' );
-
-   if( p != std::string::npos ) {
-      sscanf( timespec.substr(p+1).c_str(), "%d", &msec);
-      return miutil::miTime( timespec.substr(0, p) );
-   } else {
-      return miutil::miTime( timespec );
-   }
-}
+//miutil::miTime
+//miutil::
+//isoTimeWithMsec( const std::string &timespec, int &msec )
+//{
+//   msec = 0;
+//
+//   if( timespec.empty() )
+//      return miutil::miTime();
+//
+//   std::string::size_type p = timespec.find( '.' );
+//
+//   if( p != std::string::npos ) {
+//      sscanf( timespec.substr(p+1).c_str(), "%d", &msec);
+//      return miutil::miTime( timespec.substr(0, p) );
+//   } else {
+//      return miutil::miTime( timespec );
+//   }
+//}
 
 		
 namespace{
@@ -330,9 +330,9 @@ readFromString(string::size_type ipos,
 }
 
 void
-computeNearestTime(int times[], 
-				   const miutil::miTime &nt, 
-				   miutil::miTime &time_,
+computeNearestTime(int times[],
+				   const boost::posix_time::ptime &nt,
+				   boost::posix_time::ptime &time_,
 				   std::string::size_type pos)
 {
 	using namespace miutil;
@@ -341,19 +341,19 @@ computeNearestTime(int times[],
 	int last;
 
 	for(;i<TimeSpecEnd && times[i]==-1; i++);
-		
+
 	first=i;
-		
+
 	if(i==TimeSpecEnd) //Should not happend.
 		throw miTimeParseException("Unexpected: No time information parsed!",
 									pos, false);
-										
+
 	for(;i<TimeSpecEnd && times[i]!=-1; i++)
 	last=i;
-		
+
 	if(i<TimeSpecEnd){
 		for(;i<TimeSpecEnd && times[i]==-1; i++);
-			
+
 		if(i!=TimeSpecEnd)
 			throw miTimeParseException("Unable to deduce a time to nearest time!",
 										pos, false);
@@ -361,86 +361,94 @@ computeNearestTime(int times[],
 
 	if(times[Second]==-1)
 		times[Second]=0;
-		
+
 	if(times[Minute]==-1)
 		times[Minute]=0;
-		
+
 	if(times[Hour]==-1)
 		times[Hour]=0;
-		
-	miutil::miTime tmp(nt);
-	time_=miTime(); //Undef state
-	
+
+	ptime tmp(nt);
+	time_ = ptime(); //Undef state
+
 	switch(first){
 	case Second:
-		if(times[Second]>tmp.sec())
-			tmp.addMin(-1);
+		if(times[Second]>tmp.time_of_day().seconds() )
+			tmp += seconds(-1);
 
-		time_=miTime(tmp.year(), tmp.month(), tmp.day(),
-				     tmp.hour(), tmp.min(), times[Second]);		
+		time_ = ptime( tmp.date(),
+		               time_duration( tmp.time_of_day().hours(),
+		                              tmp.time_of_day().minutes(),
+		                              times[Second]) );
 		break;
 	case Minute:
-		if( times[Minute]>tmp.min() ||
-		   (times[Minute]==tmp.min() && times[Second]>tmp.sec())
+		if( times[Minute]>tmp.time_of_day().minutes() ||
+		    ( times[Minute]==tmp.time_of_day().minutes() && times[Second]>tmp.time_of_day().seconds())
 		  )
-			tmp.addHour(-1);
-			
-		time_=miTime(tmp.year(), tmp.month(), tmp.day(),
-				     tmp.hour(), times[Minute], times[Second]);		
+			tmp += hours( -1 );
+
+		time_ = ptime( tmp.date(),
+		               time_duration( tmp.time_of_day().hours(),
+		                              times[Minute],
+		                              times[Second]) );
 		break;
 	case Hour:
-		if( times[Hour]>tmp.hour() ||
-		   (times[Hour]==tmp.hour() && times[Minute]>tmp.min()) ||
-		   (times[Hour]==tmp.hour() && times[Minute]==tmp.min()
-		   	  && times[Second]>tmp.sec())
+		if( times[Hour]>tmp.time_of_day().hours() ||
+		    ( times[Hour]==tmp.time_of_day().hours() && times[Minute]>tmp.time_of_day().minutes()) ||
+		    ( times[Hour]==tmp.time_of_day().hours() && times[Minute]==tmp.time_of_day().minutes()
+		   	  && times[Second]>tmp.time_of_day().seconds() )
 		  )
-			tmp.addDay(-1);
-		
-		time_=miTime(tmp.year(), tmp.month(), tmp.day(),
-				     times[Hour], times[Minute], times[Second]);			
+			tmp += days( -1 );
+
+		time_ = ptime( tmp.date(),
+		               time_duration( times[Hour],
+		                              times[Minute],
+		                              times[Second]) );
 		break;
 	case Day:{
-		int y=tmp.year();
-		int m=tmp.month();
-		
-		if(times[Day]>tmp.day()   ||
-		   (times[Day]==tmp.day() && times[Hour]>tmp.hour()) ||
-		   (times[Day]==tmp.day() && times[Hour]==tmp.hour() 
-		   	  && times[Minute]>tmp.min())                    ||
-		   (times[Day]==tmp.day() && times[Hour]==tmp.hour() 
-		   	  && times[Minute]==tmp.min() && times[Second]>tmp.sec())
-		  ){
+		int y=tmp.date().year();
+		int m=tmp.date().month();
+
+		if( times[Day]>tmp.date().day()   ||
+		    ( times[Day]==tmp.date().day() && times[Hour]>tmp.time_of_day().hours()) ||
+		    ( times[Day]==tmp.date().day() && times[Hour]==tmp.time_of_day().hours()
+		   	  && times[Minute]>tmp.time_of_day().minutes())                    ||
+		    ( times[Day]==tmp.date().day() && times[Hour]==tmp.time_of_day().hours()
+		   	  && times[Minute]==tmp.time_of_day().minutes() && times[Second]>tmp.time_of_day().seconds() ) ){
 			m--;
 			if(m<1){
 				y--;
 				m=12;
 			}
 		}
-			
-		time_=miTime(y, m, times[Day],
-				     times[Hour], times[Minute], times[Second]);		
+		time_ = ptime( date( y, m, times[Day]),
+		               time_duration( times[Hour],
+		                              times[Minute],
+		                              times[Second]) );
 		}
 		break;
 	case Month:{
-		int y=tmp.year();
-		
-		if( times[Month]>tmp.month()                           || 
-		   (times[Month]==tmp.month() && times[Day]>tmp.day()) ||
-		   (times[Month]==tmp.month() && times[Day]==tmp.day()
-		     && times[Hour]>tmp.hour())                         ||
-		   (times[Month]==tmp.month() && times[Day]==tmp.day() 
-		   	 && times[Hour]==tmp.hour() && times[Minute]>tmp.min()) ||
-		   (times[Month]==tmp.month() && times[Day]==tmp.day() 
-		   	 && times[Hour]==tmp.hour() && times[Minute]==tmp.min()
-		   	 && times[Second]>tmp.sec())
-		   )
-			y--;			
-			
-		time_=miTime(y, times[Month], times[Day],
-				     times[Hour], times[Minute], times[Second]);
-		}
-				
-		break;
+		int y=tmp.date().year();
+
+		if( times[Month]>tmp.date().month()                           ||
+		    ( times[Month]==tmp.date().month() && times[Day]>tmp.date().day() ) ||
+		    ( times[Month]==tmp.date().month() && times[Day]==tmp.date().day()
+		      && times[Hour]>tmp.time_of_day().hours() )                         ||
+		    ( times[Month]==tmp.date().month() && times[Day]==tmp.date().day()
+		   	  && times[Hour]==tmp.time_of_day().hours() && times[Minute]>tmp.time_of_day().minutes()) ||
+		    ( times[Month]==tmp.date().month() && times[Day]==tmp.date().day()
+		   	  && times[Hour]==tmp.time_of_day().hours() && times[Minute]==tmp.time_of_day().minutes()
+		   	  && times[Second]>tmp.time_of_day().seconds() ) )
+			y--;
+
+        time_ = ptime( date( y, times[Month], times[Day]),
+                       time_duration( times[Hour],
+                                      times[Minute],
+                                      times[Second]) );
+
+	}
+
+	break;
 	case Year:
 		if(times[Year]<100){
 			if(times[Year]>50)
@@ -448,28 +456,26 @@ computeNearestTime(int times[],
 			else
 				times[Year]+=2000;
 		}
-	
-		if(!miTime::isValid(times[Year], times[Month], times[Day], 
-				  	 	   times[Hour], times[Minute], times[Second])){
+
+        time_ = ptime( date( times[Year], times[Month], times[Day]),
+                       time_duration( times[Hour],
+                                      times[Minute],
+                                      times[Second]) );
+
+		if( time_.is_special() ){
 			ostringstream ost;
 			ost << "Not a valid time: "
 				<< times[Year] << "-" << times[Month] << "-" << times[Day]
 				<< " " << times[Hour] << ":" << times[Minute] << ":" << times[Second];
-			
 			throw miTimeParseException(ost.str(), pos, false);
 		}
 
 
-		time_=miTime(times[Year], times[Month], times[Day],
-				     times[Hour], times[Minute], times[Second]);
 		break;
 	default:
 		throw miTimeParseException("Unexpected No \"first\" timeSpec!",
 											pos, false);
 	}
-	
-	
-			
 }
 
 }

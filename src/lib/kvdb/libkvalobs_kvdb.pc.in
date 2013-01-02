@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+pkglibdir=${libdir}/kvalobs
+includedir=@includedir@
+
+Name: libkvalobs_kvdb
+Description: kvalobs kvdb library
+Version: @VERSION@
+Requires: libkvalobs_fileutil
+Libs: -L${libdir} -lkvalobs_kvdb
+Cflags: -D_REENTRANT -I${includedir}/@PACKAGE@

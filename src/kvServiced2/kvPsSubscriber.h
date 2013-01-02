@@ -104,11 +104,11 @@ public:
   	std::string name()const { return name_;}
   	void name(const std::string &n) { name_=n;}
   	
-  	miutil::miString toSend() const;
-  	miutil::miString toUpdate() const;
-  	miutil::miString uniqueKey()const;
-  	miutil::miString createStatement()const;
-  	miutil::miString deleteStatement()const;
+  	miutil::std::string toSend() const;
+  	miutil::std::string toUpdate() const;
+  	miutil::std::string uniqueKey()const;
+  	miutil::std::string createStatement()const;
+  	miutil::std::string deleteStatement()const;
   
   	int            stationID()const { return stationID_; }
    int            typeID()const {return typeID_;}

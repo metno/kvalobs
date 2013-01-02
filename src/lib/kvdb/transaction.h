@@ -38,6 +38,8 @@ class Connection;
 
 class Transaction{
 public:
+    virtual ~Transaction();
+
    virtual bool operator()(dnmi::db::Connection *conection);
 
    /**

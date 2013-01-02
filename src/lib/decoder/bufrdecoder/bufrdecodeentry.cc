@@ -41,8 +41,8 @@ decoderFactory(dnmi::db::Connection &con,
 	       const ParamList      &params,
 	       const std::list<kvalobs::kvTypes> &typeList,
 	       int   decoderId,
-	       const miutil::miString &obsType,
-	       const miutil::miString &obs)
+	       const miutil::std::string &obsType,
+	       const miutil::std::string &obs)
 {
    /*
   BufrDecodeSynoptic *dec;
@@ -66,10 +66,10 @@ releaseDecoder(kvalobs::decoder::DecoderBase* decoder)
 }
 
 
-std::list<miutil::miString> 
+std::list<miutil::std::string> 
 getObsTypes()
 {
-  std::list<miutil::miString> list;
+  std::list<miutil::std::string> list;
 
   list.push_back("BUFR");
 

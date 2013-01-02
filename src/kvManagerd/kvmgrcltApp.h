@@ -32,8 +32,8 @@
 #define __kvmgrcltApp_h__
 
 #include <kvdb/dbdrivermgr.h>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <kvalobs/kvapp.h>
-#include <puTools/miTime.h>
 
 class KvMgrCltApp : public KvApp 
 {
@@ -45,7 +45,7 @@ class KvMgrCltApp : public KvApp
 		KvMgrCltApp(int argn, char **argv, const char *options[0][2]=0);
 		~KvMgrCltApp();
 
-		bool sendSignalToManager(int sid, int tid, const miutil::miTime &obstime);
+		bool sendSignalToManager(int sid, int tid, const boost::posix_time::ptime &obstime);
 
   		dnmi::db::Connection *getNewDbConnection();
   		void                 releaseDbConnection(dnmi::db::Connection *con);

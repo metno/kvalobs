@@ -33,11 +33,11 @@
 #include <list>
 #include <vector>
 
+#include <boost/algorithm/string.hpp>
 #include <kvdb/dbdrivermgr.h>
 #include <kvalobs/kvDbGate.h>
 #include <kvalobs/kvStation.h>
 #include <kvalobs/kvParam.h>
-#include <puTools/miString.h>
 #include <kvalobs/kvPath.h>
 
 
@@ -54,7 +54,6 @@
 ///  is skipped and the last files will be used......
 
 using namespace std; 
-using namespace miutil;
 using namespace kvalobs;
 using namespace dnmi::db;
 
@@ -73,12 +72,12 @@ int main(int argc, char** argv)
   string passwdfile(home+"/.kvpasswd");
   ifstream passf(passwdfile.c_str());
 
-  vector<miString> words;
-  miString line;
+  vector<std::string> words;
+  std::string line;
   
   while(passf) {
     getline(passf,line);
-    words=line.split();
+    boost::split(words, line, boost::algorithm::is_space(), boost::algorithm::token_compress_on);
     if(words.size() < 2)
       continue;
     

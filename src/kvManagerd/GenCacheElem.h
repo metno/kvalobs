@@ -31,7 +31,6 @@
 #ifndef __menager_gen_cache_element_h__
 #define __menager_gen_cache_element_h__
 
-#include <puTools/miTime.h>
 #include <kvdb/kvdb.h>
 #include <boost/thread/mutex.hpp>
 /**
@@ -79,7 +78,7 @@ class GenCache{
 	GenCache& operator=(const GenCache &);
 
   	std::list<GenCachElem>             genCachElem;
-  	miutil::miTime                     genCacheFlush;
+  	boost::posix_time::ptime                     genCacheFlush;
 	
 	boost::mutex genCacheMutex;
 	

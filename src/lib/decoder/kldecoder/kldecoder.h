@@ -46,63 +46,63 @@ namespace kldecoder{
 
 
 /**
-* \addtogroup kldecode
-*
-* @{
-*/
+ * \addtogroup kldecode
+ *
+ * @{
+ */
 
 typedef boost::mutex::scoped_lock    Lock;
 
 /**
-* \brief implements the interface  DecoderBase.
-*
-* <pre>
-* Dataformat for message.
-*
-* obsType: kldata/nationalnr=<nummer>/type=<typeid>
-* obs:
-*   <pc1>[(<sensor>,<level>)],...,pcN[(<sensor>,<level>)]
-*   YYYYMMDDhhmmss,<pc1_value[(<cinfo>,<uinfo>)]>,...,<pcN_value[(<cinfo>,<uinfo>)]>
-*   YYYYMMDDhhmmss,<pc1_value[(<cinfo>,<uinfo>)]>,....,<pcN_value[(<cinfo>,<uinfo>)]>
-*   ....
-*   YYYYMMDDhhmmss,<pc1_value[(<cinfo>,<uinfo>)]>,....,<pcN_value[(<cinfo>,<uinfo>)]>
-*
-*  pc - paramcode, the name of the parameter. An underscore indicate that
-*                  this is a code value. Suported pc that can have a code
-*                  value is: HL and VV. The value vil be converted til meter.
-*  If sensor or level is not specified. The default would apply. If both shall
-*  take the default value, the paranteses can be left out.
-*
-*  cinfo - controlinfo
-*  uinfo - useinfo
-*  </pre>
-*
-*/
+ * \brief implements the interface  DecoderBase.
+ *
+ * <pre>
+ * Dataformat for message.
+ *
+ * obsType: kldata/nationalnr=<nummer>/type=<typeid>
+ * obs:
+ *   <pc1>[(<sensor>,<level>)],...,pcN[(<sensor>,<level>)]
+ *   YYYYMMDDhhmmss,<pc1_value[(<cinfo>,<uinfo>)]>,...,<pcN_value[(<cinfo>,<uinfo>)]>
+ *   YYYYMMDDhhmmss,<pc1_value[(<cinfo>,<uinfo>)]>,....,<pcN_value[(<cinfo>,<uinfo>)]>
+ *   ....
+ *   YYYYMMDDhhmmss,<pc1_value[(<cinfo>,<uinfo>)]>,....,<pcN_value[(<cinfo>,<uinfo>)]>
+ *
+ *  pc - paramcode, the name of the parameter. An underscore indicate that
+ *                  this is a code value. Suported pc that can have a code
+ *                  value is: HL and VV. The value vil be converted til meter.
+ *  If sensor or level is not specified. The default would apply. If both shall
+ *  take the default value, the paranteses can be left out.
+ *
+ *  cinfo - controlinfo
+ *  uinfo - useinfo
+ *  </pre>
+ *
+ */
 class KlDecoder : public DecoderBase{
    KlDecoder();
    KlDecoder(const KlDecoder &);
    KlDecoder& operator=(const KlDecoder &);
 
-   long getStationId(miutil::miString &msg);
-   long getTypeId(miutil::miString &msg)const;
+   long getStationId(std::string &msg);
+   long getTypeId(std::string &msg)const;
 
    bool splitParams(const std::string &header,
                     std::list<std::string> &params,
-                    miutil::miString &msg);
+                    std::string &msg);
 
    bool splitData(const std::string &sdata,
                   std::list<std::string> &datalist,
-                  miutil::miString &msg);
+                  std::string &msg);
 
    bool decodeHeader(const std::string &header,
                      std::vector<ParamDef> &params,
-                     miutil::miString &message);
+                     std::string &message);
 
    bool decodeData(KlDataArray &da,
                    KlDataArray::size_type daSize,
                    const std::string &sdata,
                    int line,
-                   miutil::miString &msg);
+                   std::string &msg);
 
    kvalobs::decoder::DecoderBase::DecodeResult
    rejected( const std::string &msg, const std::string &logid );
@@ -115,15 +115,15 @@ public:
    KlDecoder(dnmi::db::Connection     &con,
              const ParamList        &params,
              const std::list<kvalobs::kvTypes> &typeList,
-             const miutil::miString &obsType,
-             const miutil::miString &obs,
+             const std::string &obsType,
+             const std::string &obs,
              int                    decoderId=-1);
 
    virtual ~KlDecoder();
 
-   virtual miutil::miString name()const;
+   virtual std::string name()const;
 
-   virtual DecodeResult execute(miutil::miString &msg);
+   virtual DecodeResult execute(std::string &msg);
 };
 
 /** @} */

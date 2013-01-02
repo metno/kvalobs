@@ -59,9 +59,9 @@ class DataIteratorImpl:
   dnmi::db::Connection              *dbCon;
   CKvalObs::CService::WhichDataList *whichData;
   CORBA::Long                       iData;
-  miutil::miTime                    currentEndTime;
-  miutil::miTime                    endTime;
-  miutil::miTime                    startTimeOfGetData;
+  boost::posix_time::ptime                    currentEndTime;
+  boost::posix_time::ptime                    endTime;
+  boost::posix_time::ptime                    startTimeOfGetData;
   ServiceApp                        &app;
   boost::mutex                      mutex;
 

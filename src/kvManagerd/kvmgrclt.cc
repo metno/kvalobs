@@ -35,11 +35,11 @@
 
 #include <sstream>
 #include <kvdb/dbdrivermgr.h>
+#include <miutil/timeconvert.h>
 #include <kvalobs/kvDbGate.h>
 #include <kvalobs/kvStation.h>
 #include <kvalobs/kvData.h>
 #include <kvalobs/kvWorkelement.h>
-#include <puTools/miString.h>
 #include "kvmgrcltApp.h"
 
 using namespace std; 
@@ -50,7 +50,7 @@ using namespace dnmi::db;
 
 int main(int argc, char** argv)
 {
-	miutil::miTime undefTime;
+	boost::posix_time::ptime undefTime;
   	Connection    *con;
 
 	KvMgrCltApp app(argc, argv);
@@ -67,9 +67,9 @@ int main(int argc, char** argv)
 
 
 //	if(!gate.insert(kvWorkelement(180,
-//								  miTime("2005-12-16 06:00:00"), 
+//								  boost::posix_time::ptime("2005-12-16 06:00:00"),
 //								  330, 
-//								  miTime::nowTime(), 
+//								  boost::posix_time::ptime::nowTime(),
 //								  10,
 //								  undefTime,
 //				                  undefTime, 
@@ -81,7 +81,7 @@ int main(int argc, char** argv)
 //	    		"the table 'workque' in  the database!" << endl <<
 //	    		"[" << gate.getErrorStr() << "]" << endl;
 //	}else{
-//		app.sendSignalToManager(180, 330, miTime("2005-12-16 06:00:00"));
+//		app.sendSignalToManager(180, 330, boost::posix_time::ptime("2005-12-16 06:00:00"));
 //	}
 //	
 //	return 0;
@@ -99,9 +99,9 @@ int main(int argc, char** argv)
 	list<kvData>::iterator dit;	
 	ostringstream          ost;
 	
-	miTime startObst("2010-06-08 10:00:00");
-	miTime endObst("2010-06-09 08:00:00");
-	miTime obst(startObst);
+	boost::posix_time::ptime startObst = boost::posix_time::time_from_string_nothrow("2010-06-08 10:00:00");
+	boost::posix_time::ptime endObst = boost::posix_time::time_from_string_nothrow("2010-06-09 08:00:00");
+	boost::posix_time::ptime obst(startObst);
 	//endObst.addDay(1);
 	
 	cerr << "Obstime: " << obst << endl;
@@ -112,7 +112,7 @@ int main(int argc, char** argv)
 					
 		ost.str("");
 		ost << " where stationid=" << sit->stationID() << " AND "
-			<< "       obstime='" << obst.isoTime() << "'" 
+			<< "       obstime='" << to_kvalobs_string(obst) << "'"
 			<< "       order by typeid";
 	
 		if(!gate.select(data, ost.str())){
@@ -131,8 +131,8 @@ int main(int argc, char** argv)
 		while(dit!=data.end()){
 			int      tid=dit->typeID();
 			int      sid=dit->stationID();
-			miTime dObst=dit->obstime();
-			miTime tbt=dit->tbtime();
+			const boost::posix_time::ptime & dObst=dit->obstime();
+			const boost::posix_time::ptime & tbt=dit->tbtime();
 			bool     qc1=false;  
 
 			for(; dit!=data.end() && dit->typeID()==tid; ++dit);

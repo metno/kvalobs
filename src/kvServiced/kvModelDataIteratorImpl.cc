@@ -30,6 +30,7 @@
 */
 #include <list>
 #include <milog/milog.h>
+#include <miutil/timeconvert.h>
 #include <kvalobs/kvDbGate.h>
 #include <kvalobs/kvModelData.h>
 #include "kvModelDataIteratorImpl.h"
@@ -77,7 +78,7 @@ ModelDataIteratorImpl::next(CKvalObs::CService::ModelDataList_out modelDataList)
 {
 	list<kvModelData>           dataList;
 	list<kvModelData>::iterator it;
-	miutil::miTime         thisTime;
+	boost::posix_time::ptime thisTime;
 	CORBA::Long            obsi=0;
 	CORBA::Long            datai=0;
 	char                   *sTmp;
@@ -149,7 +150,7 @@ ModelDataIteratorImpl::next(CKvalObs::CService::ModelDataList_out modelDataList)
 		(*modelDataList)[obsi].dataList.length(datai+1);
 		(*modelDataList)[obsi].dataList[datai].stationID=it->stationID(); 
 		(*modelDataList)[obsi].dataList[datai].obstime=
-                                  it->obstime().isoTime().c_str();
+                                  to_kvalobs_string(it->obstime()).c_str();
 		(*modelDataList)[obsi].dataList[datai].paramID=it->paramID();
 		(*modelDataList)[obsi].dataList[datai].level=it->level();
 		(*modelDataList)[obsi].dataList[datai].modelID=it->modelID();
@@ -170,11 +171,11 @@ ModelDataIteratorImpl::findData(list<kvModelData> &data,
 			   const CKvalObs::CService::WhichData &wData)
 {
 	kvDbGate gate(dbCon);
-	miutil::miTime stime(wData.fromObsTime);
-	miutil::miTime etime(wData.toObsTime);
+	boost::posix_time::ptime stime = boost::posix_time::time_from_string_nothrow((const char *) wData.fromObsTime);
+	boost::posix_time::ptime etime = boost::posix_time::time_from_string_nothrow((const char *) wData.toObsTime);
 
-	if(stime.undef() || etime.undef()){
-		if(stime.undef()){
+	if(stime.is_not_a_date_time() || etime.is_not_a_date_time()){
+		if(stime.is_not_a_date_time()){
 			ostringstream os;
 			os << "Inavlid time spec (fromObsTime): ";
 
@@ -188,8 +189,8 @@ ModelDataIteratorImpl::findData(list<kvModelData> &data,
 			throw InvalidWhichData(os.str());
 		}
 
-		if(etime.undef()){
-			etime=etime.nowTime();
+		if(etime.is_not_a_date_time()){
+			etime=boost::posix_time::second_clock::universal_time();
 		}
 	}
      

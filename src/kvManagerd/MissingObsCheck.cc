@@ -47,8 +47,8 @@ postCommandToQue(kvalobs::StationInfoCommand *cmd)
 	kvalobs::kvStationInfoList stationInfoList=cmd->getStationInfo();
   	IkvStationInfoList it=stationInfoList.begin();
   	kvDbGate gate(con);
-  	miutil::miTime undefTime;
-  	miutil::miTime tbtime(miutil::miTime::nowTime());
+  	boost::posix_time::ptime undefTime;
+  	boost::posix_time::ptime tbtime = boost::posix_time::microsec_clock::universal_time();
 
   	for(;it!=stationInfoList.end(); it++){
     	if(!gate.insert(kvWorkelement(it->stationID(), 
@@ -80,23 +80,26 @@ postCommandToQue(kvalobs::StationInfoCommand *cmd)
 
 bool 
 MissingObsCheck::
-checkObstime(const miutil::miTime &runTime, 
-                    miutil::miTime &obstime, 
+checkObstime(const boost::posix_time::ptime &runTime,
+                    boost::posix_time::ptime &obstime,
 	                    const long lateobsInMinute)
 {
+	if ( lateobsInMinute > 100000 )
+		return false;
+
 	int min=20;
 	int h, m;
 	
 	h=lateobsInMinute/60;
 	m=lateobsInMinute%60;
 	
-	miutil::miTime checkTime=miutil::miTime(runTime.date(), 
-	                                        miutil::miClock(runTime.hour(), 0, 0));
+	boost::posix_time::ptime checkTime=boost::posix_time::ptime(runTime.date(),
+	                                        boost::posix_time::time_duration(runTime.time_of_day().hours(), 0, 0));
 	
-	checkTime.addHour(-1*h);
-	checkTime.addMin(m);
+	checkTime -= boost::posix_time::hours(h);
+	checkTime += boost::posix_time::minutes(m);
 	
-	obstime=miutil::miTime(checkTime.date(), miutil::miClock(checkTime.hour(), 0, 0));
+	obstime=boost::posix_time::ptime(checkTime.date(), boost::posix_time::time_duration(checkTime.time_of_day().hours(), 0, 0));
 	
 	return checkTime<runTime;
 }
@@ -120,17 +123,17 @@ MissingObsCheck::
 
 void 
 MissingObsCheck::
-findMissingData(const miutil::miTime& runtime,
-  	   	       const miutil::miTime& lastSearchForMissing)
+findMissingData(const boost::posix_time::ptime& runtime,
+  	   	       const boost::posix_time::ptime& lastSearchForMissing)
 {
 	//We send a StationInfoCommand for every
   	//MAX_STATIONS. Sin
   	const int MAX_STATIONS=10;
   	int   stationCount=0;
   	StationInfoCommand  *cmd=0;
-  	miutil::miTime searchUntilObstime(lastSearchForMissing);
-  	miutil::miTime obstime;
-  	miutil::miTime nowObstime(runtime.date(), miutil::miClock(runtime.hour(), 0, 0));
+  	boost::posix_time::ptime searchUntilObstime(lastSearchForMissing);
+  	boost::posix_time::ptime obstime;
+  	boost::posix_time::ptime nowObstime(runtime.date(), boost::posix_time::time_duration(runtime.time_of_day().hours(), 0, 0));
   	int            nTimes;
     
   	// init database connection
@@ -141,11 +144,14 @@ findMissingData(const miutil::miTime& runtime,
   	list<kvalobs::kvObsPgm> obspgmlist;
   	list<kvalobs::kvTypes>  typeslist;
 	
-	searchUntilObstime=miutil::miTime(lastSearchForMissing.date(),
-	                                  miutil::miClock(lastSearchForMissing.hour(), 0, 0));
+	searchUntilObstime=boost::posix_time::ptime(lastSearchForMissing.date(),
+	                                  boost::posix_time::time_duration(lastSearchForMissing.time_of_day().hours(), 0, 0));
 	
-	nTimes=miutil::miTime::hourDiff(nowObstime, searchUntilObstime);
 	
+
+	nTimes = (nowObstime - searchUntilObstime).total_seconds() / 3600;
+	//nTimes=boost::posix_time::ptime::hourDiff(nowObstime, searchUntilObstime);
+
 	LOGINFO("Start search: " << runtime << endl <<
 	        "Last search:  " << lastSearchForMissing << endl <<
 	        "obstime:      " << nowObstime << endl << 
@@ -164,7 +170,7 @@ findMissingData(const miutil::miTime& runtime,
   		  	
 	  	if(!checkObstime(runtime, obstime, itTypes->lateobs())){
 	  		//Adjust the obstime with one hour earlyer.
-	  		obstime.addHour(-1);
+	  		obstime -= boost::posix_time::hours(1);
 	  	}
   		
   		LOGINFO("Searching for typeid: " << itTypes->typeID() << " lateobs: " << itTypes->lateobs() << endl
@@ -266,7 +272,7 @@ findMissingData(const miutil::miTime& runtime,
     		}
     
     		// step one hour back - and repeat
-    		obstime.addHour(-1);
+    		obstime -= boost::posix_time::hours(-1);
   		}
 	}
   

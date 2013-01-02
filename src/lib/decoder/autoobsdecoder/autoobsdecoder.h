@@ -39,28 +39,33 @@ namespace kvalobs{
 namespace decoder{
 namespace autoobs{
 /**
-* \addtogroup decodeautoobs.
-*
-* @{
-*/
+ * \addtogroup decodeautoobs.
+ *
+ * @{
+ */
 
 /**
-* \brief implement the interface DecoderBase.
-*/
+ * \brief implement the interface DecoderBase.
+ */
 class AutoObsDecoder : public DecoderBase{
    AutoObsDecoder();
    AutoObsDecoder(const AutoObsDecoder &);
    AutoObsDecoder& operator=(const AutoObsDecoder &);
 
-   long getStationId(miutil::miString &msg);
-   long getTypeId( miutil::miString &msg );
+   long getStationId( std::string &msg);
+   long getTypeId( std::string &msg );
 
-   std::string getMetaSaSdEmEi( int stationid, int typeid_, const miutil::miTime &obstime );
+   std::string getMetaSaSdEmEi( int stationid, int typeid_, const boost::posix_time::ptime &obstime );
 
    char checkObservationTime(int typeId,
-                             miutil::miTime tbt,
-                             miutil::miTime obt);
-   miutil::miTime firstObsTime; //Used by checkObservationTime.
+                             boost::posix_time::ptime tbt,
+                             boost::posix_time::ptime obt);
+   DecodeResult rejected( const kvalobs::kvRejectdecode &rejectEntry,
+                          const std::string &logmsg,
+                          const std::string &logid="",
+                          const std::string &idlogMsg="");
+
+   boost::posix_time::ptime firstObsTime; //Used by checkObservationTime.
    char           checkRet;     //Used by checkObservationTime.
    kvalobs::decoder::ObsPgmParamInfo obsPgm;
    bool warnings;
@@ -70,15 +75,15 @@ public:
    AutoObsDecoder(dnmi::db::Connection   &con,
                   const ParamList        &params,
                   const std::list<kvalobs::kvTypes> &typeList,
-                  const miutil::miString &obsType,
-                  const miutil::miString &obs,
+                  const std::string &obsType,
+                  const std::string &obs,
                   int                    decoderId=-1);
 
    virtual ~AutoObsDecoder();
 
-   virtual miutil::miString name()const;
+   virtual std::string name()const;
 
-   virtual DecodeResult execute(miutil::miString &msg);
+   virtual DecodeResult execute(std::string &msg);
 };
 
 /** @} */

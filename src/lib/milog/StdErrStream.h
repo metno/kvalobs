@@ -31,7 +31,6 @@
 #ifndef __milog_stderrstream_h__
 #define __milog_stderrstream_h__
 
-#include <iostream>
 #include <milog/LogStream.h>
 
 namespace milog{

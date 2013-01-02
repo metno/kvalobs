@@ -3,7 +3,7 @@ include $(TOP)/conf/make.$(OSTYPE)
 
 INCLUDE=-I$(TOP)/include $(BOOSTINCLUDE)
 LIBDIR=-L$(TOP)/lib $(BOOSTLIB) 
-LIBS=-ldecoderbase -lmiutil -lkvdb -lfileutil -ldnmithread -lboost_thread \
+LIBS=-ldecoderbase -lmiutil -lkvdb -lfileutil -ldnmithread -lboost_thread -lboost_date_time\
 	-lpthread  -ldl  
 
 %.o: %.cc

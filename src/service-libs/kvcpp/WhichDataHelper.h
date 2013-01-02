@@ -32,7 +32,7 @@
 #define __kvservice_whichdatahelper__
 
 #include <kvskel/kvService.hh>
-#include <puTools/miTime.h>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace kvservice{
 
@@ -58,8 +58,8 @@ namespace kvservice{
     WhichDataHelper& operator=(const WhichDataHelper &wd);
     
     bool addStation(long stationid, 
-		    const miutil::miTime &from,
-		    const miutil::miTime &to=miutil::miTime());
+		    const boost::posix_time::ptime &from,
+		    const boost::posix_time::ptime &to=boost::posix_time::ptime());
     
     const CKvalObs::CService::WhichDataList* whichData()const{ return &whichData_;}
   };

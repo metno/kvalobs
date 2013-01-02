@@ -34,7 +34,6 @@
 #include <decoderbase/decoder.h>
 #include <kvalobs/kvDbGate.h>
 #include <decodeutility/kvalobsdata.h>
-#include <puTools/miString.h>
 #include <list>
 #include <stdexcept>
 #include <boost/utility.hpp>
@@ -52,57 +51,57 @@ namespace kv2kvDecoder
 class kv2kvDecoder: public DecoderBase, public boost::noncopyable
 {
 public:
-	kv2kvDecoder(dnmi::db::Connection &con, const ParamList &params,
-			const std::list<kvalobs::kvTypes> &typeList,
-			const miutil::miString &obsType, const miutil::miString &obs,
-			int decoderId = -1);
+   kv2kvDecoder(dnmi::db::Connection &con, const ParamList &params,
+                const std::list<kvalobs::kvTypes> &typeList,
+                const std::string &obsType, const std::string &obs,
+                int decoderId = -1);
 
-	virtual ~kv2kvDecoder();
+   virtual ~kv2kvDecoder();
 
-	virtual miutil::miString name() const
-	{
-		return "kv2kvDecoder";
-	}
+   virtual std::string name() const
+   {
+      return "kv2kvDecoder";
+   }
 
-	virtual DecodeResult execute(miutil::miString & msg);
+   virtual DecodeResult execute(std::string & msg);
 
 private:
-	kvDbGate dbGate;
+   kvDbGate dbGate;
 
-	void saveInRejectDecode();
-	void parse(serialize::KvalobsData & data, const miutil::miString & obs) const;
-	void verifyAndAdapt(serialize::KvalobsData & data, std::list<
-			kvalobs::kvData> & out);
-	//     void save( const serialize::KvalobsData & data );
-	void save(const std::list<kvalobs::kvData> & dl, const std::list<
-			kvalobs::kvTextData> & tdl);
-	void markAsFixed(const serialize::KvalobsData::RejectList & rejectedMesage);
+   void saveInRejectDecode();
+   void parse(serialize::KvalobsData & data, const std::string & obs) const;
+   void verifyAndAdapt(serialize::KvalobsData & data, std::list<
+                       kvalobs::kvData> & out);
+   //     void save( const serialize::KvalobsData & data );
+   void save(const std::list<kvalobs::kvData> & dl, const std::list<
+             kvalobs::kvTextData> & tdl);
+   void markAsFixed(const serialize::KvalobsData::RejectList & rejectedMesage);
 
-	typedef boost::shared_ptr<const kvalobs::kvData> kvDataPtr;
-	kvDataPtr getDbData(const kvalobs::kvData d);
-	void verify(const kvalobs::kvData & d, kvDataPtr dbData) const;
-	void adapt(kvalobs::kvData & d, kvDataPtr dbData, bool overwrite) const;
-	void invalidatePrevious(serialize::KvalobsData & data);
-	void invalidatePreviousData(serialize::KvalobsData & data, const std::list<
-			serialize::KvalobsData::InvalidateSpec> & inv);
-	void invalidatePreviousTextData(serialize::KvalobsData & data,
-			const std::list<serialize::KvalobsData::InvalidateSpec> & inv);
+   typedef boost::shared_ptr<const kvalobs::kvData> kvDataPtr;
+   kvDataPtr getDbData(const kvalobs::kvData d);
+   void verify(const kvalobs::kvData & d, kvDataPtr dbData) const;
+   void adapt(kvalobs::kvData & d, kvDataPtr dbData, bool overwrite) const;
+   void invalidatePrevious(serialize::KvalobsData & data);
+   void invalidatePreviousData(serialize::KvalobsData & data, const std::list<
+                               serialize::KvalobsData::InvalidateSpec> & inv);
+   void invalidatePreviousTextData(serialize::KvalobsData & data,
+                                   const std::list<serialize::KvalobsData::InvalidateSpec> & inv);
 
-	struct DecoderError: public std::runtime_error
-	{
-		const kvalobs::decoder::DecoderBase::DecodeResult res;
-		DecoderError(kvalobs::decoder::DecoderBase::DecodeResult res_,
-				const std::string & reason) :
-			std::runtime_error(reason), res(res_)
-		{
-		}
-	};
+   struct DecoderError: public std::runtime_error
+   {
+      const kvalobs::decoder::DecoderBase::DecodeResult res;
+      DecoderError(kvalobs::decoder::DecoderBase::DecodeResult res_,
+                   const std::string & reason)
+      : std::runtime_error(reason), res(res_)
+      {
+      }
+   };
 
-	serialize::KvalobsData data;
-	DecodeResult parseResult_;
-	miutil::miString parseMessage_;
-	int priority_;
-	const miutil::miTime tbtime;
+   serialize::KvalobsData data;
+   DecodeResult parseResult_;
+   std::string parseMessage_;
+   int priority_;
+   const boost::posix_time::ptime tbtime;
 };
 
 }

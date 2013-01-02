@@ -34,8 +34,8 @@
 #include <list>
 #include <set>
 #include <sstream>
+#include <string>
 #include <miconfparser/miconfparser.h>
-#include <puTools/miString.h>
 #include <puTools/miTime.h>
 #include <kvdb/kvdb.h>
 #include <fileutil/dso.h>
@@ -161,7 +161,7 @@ namespace kvalobs{
        * 
        * It is an input parameter to the constructor. 
        */
-      miutil::miString     obsType;
+      std::string  obsType;
       
       /**
        * \brief This is the message that is to be decoded 
@@ -169,7 +169,7 @@ namespace kvalobs{
        * and inserted into the tables \em data and \em text_data. 
        * It is an input parameter to the constructor. 
        */
-      miutil::miString     obs;
+      std::string     obs;
 
       std::string logdir_; //Set the path to use for the logdir. Mainly for running tests.
 
@@ -194,8 +194,8 @@ namespace kvalobs{
        *          =-1 when the key=value is not found.
        *          <-1 when the key is invalid.
        */
-      long  getStationId(const miutil::miString &key, 
-			 const miutil::miString &value);
+      long  getStationId(const std::string &key,
+			 const std::string &value);
 
 
       /**
@@ -357,13 +357,13 @@ namespace kvalobs{
       DecoderBase(dnmi::db::Connection   &con_,
 		  const ParamList        &params,
 		  const std::list<kvalobs::kvTypes> &typeList,
-		  const miutil::miString &obsType_,
-		  const miutil::miString &obs_, 
-		  int                    decoderId_=-1);
+		  const std::string &obsType_,
+		  const std::string &obs_,
+		  int               decoderId_=-1);
 
       virtual ~DecoderBase();
       
-      void setMetaconf(const miutil::miString &metaconf);
+      void setMetaconf(const std::string &metaconf);
 
       
       /**
@@ -464,8 +464,8 @@ namespace kvalobs{
        *
        * \return The name of the decoder.
        */
-      virtual miutil::miString name()const =0;
-      
+      virtual std::string name()const =0;
+
       /**
        * \brief call this funtction to decode a message.
        * This is a virtual function that must be implemented by 
@@ -477,7 +477,7 @@ namespace kvalobs{
        * and the the type of the message was given as the obsType_ parameter 
        * to the constructor:  
        *
-       *  DecoderBase(dnmi::db::Connection   &con_,const ParamList        &params,const std::list<kvalobs::kvTypes> &typeList,const miutil::miString &obsType_,const miutil::miString &obs_,int                    decoderId_)
+       *  DecoderBase(dnmi::db::Connection   &con_,const ParamList        &params,const std::list<kvalobs::kvTypes> &typeList,const std::string &obsType_,const std::string &obs_,int                    decoderId_)
        *
        * The observation message and the observation type (format) is 
        * avalable to the decoder as the protected variables \em obs and 
@@ -486,7 +486,7 @@ namespace kvalobs{
        * \param[out] msg a status message on return.
        * \return The decoding status after decoding the message.
        */
-      virtual DecodeResult execute(miutil::miString &msg)=0;
+      virtual DecodeResult execute(std::string &msg)=0;
 
       /**
        * \brief Create a logger that logs to a file.

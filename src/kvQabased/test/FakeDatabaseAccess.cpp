@@ -46,7 +46,7 @@ void FakeDatabaseAccess::getChecks(CheckList * out, const kvalobs::kvStationInfo
 	switch ( si.stationID() )
 	{
 	case 10:
-		kvalobs::kvChecks check(10, "QC1-2-101", "QC1-2", 1, "foo", "obs;RR_24;;", "* * * * *", "2010-01-01 00:00:00");
+		kvalobs::kvChecks check(10, "QC1-2-101", "QC1-2", 1, "foo", "obs;RR_24;;", "* * * * *", boost::posix_time::time_from_string("2010-01-01 00:00:00"));
 		out->push_back(check);
 		break;
 	}
@@ -94,7 +94,8 @@ std::string FakeDatabaseAccess::getStationParam(const kvalobs::kvStationInfo & s
 
 kvalobs::kvStation FakeDatabaseAccess::getStation(int stationid) const
 {
-	return kvalobs::kvStation(stationid, 1.15, 12.5, 333, 0, "Test Station", 0, 0, "", "", "", 9, true, "1900-01-01");
+	return kvalobs::kvStation(stationid, 1.15, 12.5, 333, 0, "Test Station", 0, 0, "", "", "", 9, true,
+			boost::posix_time::ptime(boost::gregorian::date(1900,1,1), boost::posix_time::time_duration(0,0,0)));
 }
 
 void FakeDatabaseAccess::getModelData(ModelDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minutesBackInTime ) const
@@ -108,27 +109,31 @@ void FakeDatabaseAccess::getData(DataList * out, const kvalobs::kvStationInfo & 
 	kvalobs::kvDataFactory factory(si.stationID(), si.obstime(), si.typeID());
 	if ( parameter.baseName() == "RR_24" )
 	{
-		miutil::miTime t = si.obstime();
-		t.addMin(minuteOffset);
-		t.addHour((24 - ((t.hour() - 6) % 24)) % 24);
-		for (; t <= si.obstime(); t.addHour(24))
-			out->push_front(factory.getData(t.hour(), 110, t)); // value = observation hour
+		boost::posix_time::ptime t = si.obstime();
+		boost::posix_time::ptime last = t;
+		t += boost::posix_time::minutes(minuteOffset);
+		t += boost::posix_time::hours((24 - ((t.time_of_day().hours() - 6) % 24)) % 24);
+		for (; t <= last; t += boost::posix_time::hours(24))
+			out->push_front(factory.getData(t.time_of_day().hours(), 110, t)); // value = observation hour
 	}
 	else if ( parameter.baseName() == "RR_12" )
 	{
-		miutil::miTime t = si.obstime();
-		t.addMin(minuteOffset);
-		t.addHour((12 - ((t.hour() - 6) % 12)) % 12);
-		for (; t <= si.obstime(); t.addHour(12))
-			out->push_front(factory.getData(t.hour(), 109, t));
+		boost::posix_time::ptime t = si.obstime();
+		boost::posix_time::ptime last = t;
+		t += boost::posix_time::minutes(minuteOffset);
+		t += boost::posix_time::hours((12 - ((t.time_of_day().hours() - 6) % 12)) % 12);
+		for (; t <= last; t += boost::posix_time::hours(12))
+			out->push_front(factory.getData(t.time_of_day().hours(), 109, t)); // value = observation hour
 	}
 	else if ( parameter.baseName() == "TAM_24" )
 	{
 		kvalobs::kvDataFactory factory(si.stationID(), si.obstime(), si.typeID() +1);
-		miutil::miTime t = si.obstime();
-		t.addMin(minuteOffset);
-		for (; t <= si.obstime(); t.addHour() )
-			out->push_front(factory.getData(t.hour(), 211, t));
+
+		boost::posix_time::ptime t = si.obstime();
+		boost::posix_time::ptime last = t;
+		t += boost::posix_time::minutes(minuteOffset);
+		for (; t <= last; t += boost::posix_time::hours(1));
+			out->push_front(factory.getData(t.time_of_day().hours(), 109, t)); // value = observation hour
 	}
 
 }

@@ -38,7 +38,7 @@
 #include <db/KvalobsDatabaseAccess.h>
 #include <sstream>
 #include <kvalobs/kvDbGate.h>
-#include <puTools/miTime.h>
+#include <miutil/timeconvert.h>
 #include <boost/regex.hpp>
 #include <memory>
 #include <stdexcept>
@@ -62,8 +62,8 @@ void doUpdateWorkQue(kvDbGate & gate, const kvStationInfo & si,
 	LOGDEBUG( "UPDATE: workque!" );
 	ostringstream ost;
 	ost << "UPDATE workque SET " << colName << "='"
-			<< miTime::nowTime().isoTime() << "' WHERE stationid="
-			<< si.stationID() << "  AND obstime='" << si.obstime().isoTime()
+			<< to_kvalobs_string(boost::posix_time::second_clock::universal_time()) << "' WHERE stationid="
+			<< si.stationID() << "  AND obstime='" << to_kvalobs_string(si.obstime())
 			<< "' AND typeid=" << si.typeID();
 
 	if (!gate.exec(ost.str()))
@@ -175,7 +175,7 @@ void QaWork::doWork(const kvalobs::kvStationInfo & params,
 {
 	retList.push_back(params);
 
-	LOGDEBUG( "QaWork::doWork at:" << miutil::miTime::nowTime() << "  Processing " << params );
+	LOGDEBUG( "QaWork::doWork at:" << boost::posix_time::microsec_clock::universal_time() << "  Processing " << params );
 
 	db::KvalobsDatabaseAccess db(& con, false);
 	qabase::CheckRunner checkRunner(db);

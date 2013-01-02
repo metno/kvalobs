@@ -122,7 +122,7 @@ class ManagerApp: public KvApp
   dnmi::db::Connection *getNewDbConnection();
   void                 releaseDbConnection(dnmi::db::Connection *con);
 
-  kvalobs::kvStation lookUpStation(const miutil::miString &kvQuerie);
+  kvalobs::kvStation lookUpStation(const std::string &kvQuerie);
 
   void ok(bool f);
   bool ok()const;

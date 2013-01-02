@@ -31,6 +31,7 @@
 #include <signal.h>
 #include <stdlib.h>
 #include "qabaseApp.h"
+#include <miutil/timeconvert.h>
 #include <milog/milog.h>
 #include <string>
 #include <kvalobs/kvPath.h>
@@ -151,7 +152,7 @@ bool QaBaseApp::sendToManager(kvalobs::kvStationInfoList &retList,
 	for (k = 0; it != retList.end(); it++, k++)
 	{
 		stInfo[k].stationId = it->stationID();
-		stInfo[k].obstime = CORBA::string_dup(it->obstime().isoTime().c_str());
+		stInfo[k].obstime = CORBA::string_dup(to_kvalobs_string(it->obstime()).c_str());
 		stInfo[k].typeId_ = it->typeID();
 	}
 

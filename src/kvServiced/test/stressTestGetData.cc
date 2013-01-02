@@ -63,7 +63,7 @@ class GetDataReceiver :
 
   public:
 
-	miutil::miTime prevTime;
+	boost::posix_time::ptime prevTime;
 	int nObstimes;
 	int nParams;
 
@@ -81,7 +81,7 @@ class GetDataReceiver :
     		KvObsData::kvTextDataList textData=it->textDataList();
 
     		for( KvObsData::kvDataList::iterator dit=data.begin(); dit != data.end(); ++dit ) {
-    			if( prevTime.undef() ) {
+    			if( prevTime.is_not_a_date_time() ) {
     				prevTime = dit->obstime();
     				nObstimes++;
     			} else if( prevTime != dit->obstime() ) {
@@ -143,7 +143,7 @@ public:
 		int nParams;
 		kvservice::WhichDataHelper whichData;
         //whichData.addStation( 18700, miutil::miTime("2006-02-06 06:00:00"), miutil::miTime("2006-02-06 06:00:00"));
-		whichData.addStation( 0, miutil::miTime("2010-02-22 06:00:00"), miutil::miTime("2010-02-22 06:00:00"));
+		whichData.addStation( 0, boost::posix_time::time_from_string("2010-02-22 06:00:00"), boost::posix_time::time_from_string("2010-02-22 06:00:00"));
 		//whichData.addStation( 18700, miutil::miTime("2006-02-06 06:00:00"), miutil::miTime("2006-02-10 06:00:00"));
 		//whichData.addStation( 18700, miutil::miTime("2010-02-11 10:00:00"), miutil::miTime("2010-02-12 09:00:00"));
 

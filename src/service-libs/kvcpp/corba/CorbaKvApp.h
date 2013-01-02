@@ -163,12 +163,12 @@ namespace kvservice
       virtual bool getKvOperator( std::list<kvalobs::kvOperator> &operatorList );
       virtual bool getKvStationParam( std::list<kvalobs::kvStationParam> &stParam, int stationid, int paramid = -1, int day = -1 );
       virtual bool getKvStationMetaData( std::list<kvalobs::kvStationMetadata> &stMeta,
-    		                             int stationid, const miutil::miTime &obstime,
+    		                             int stationid, const boost::posix_time::ptime &obstime,
     		                             const std::string & metadataName = "");
       virtual bool getKvObsPgm( std::list<kvalobs::kvObsPgm> &obsPgm, const std::list<long> &stationList, bool aUnion );
       virtual bool getKvData( KvObsDataList &dataList, const WhichDataHelper &wd );
       virtual bool getKvWorkstatistik(CKvalObs::CService::WorkstatistikTimeType timeType,
-                                      const miutil::miTime &from, const miutil::miTime &to,
+                                      const boost::posix_time::ptime &from, const boost::posix_time::ptime &to,
                                       kvservice::WorkstatistikIterator &it
                                       );
 

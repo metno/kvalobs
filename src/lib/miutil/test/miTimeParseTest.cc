@@ -28,10 +28,13 @@
 */
 
 #include <gtest/gtest.h>
+#include <miutil/timeconvert.h>
 #include <miutil/miTimeParse.h>
 
 using namespace miutil;
 using namespace std;
+using namespace boost::posix_time;
+using namespace boost::gregorian;
 
 class miTimeParseTest : public testing::Test
 {
@@ -39,20 +42,62 @@ public:
 	miTimeParseTest()
 	{}
 };
+TEST_F( miTimeParseTest, timeconvert)
+{
+    ptime t(time_from_string_nothrow("20060206100000"));
+
+    ASSERT_EQ( time_from_string_nothrow("20060206100000"),
+               ptime( date(2006,2,6), time_duration( 10, 0, 0)));
+
+    ASSERT_EQ( time_from_string_nothrow("200602061000"),
+                   ptime( date(2006,2,6), time_duration( 10, 0, 0)));
+
+    ASSERT_EQ( time_from_string_nothrow("2006020610"),
+               ptime( date(2006,2,6), time_duration( 10, 0, 0)));
+
+    ASSERT_EQ( time_from_string_nothrow("20060206"),
+               ptime( date(2006,2,6), time_duration( 0, 0, 0)));
+
+    ASSERT_EQ( time_from_string_nothrow("2006-02-06 10:00:00"),
+               ptime( date(2006,2,6), time_duration( 10, 0, 0)));
+
+    ASSERT_EQ( time_from_string_nothrow("2006-02-06 10:00:00Z"),
+               ptime( date(2006,2,6), time_duration( 10, 0, 0)));
+
+    ASSERT_EQ( time_from_string_nothrow("2006-02-06 10:00:00 Z"),
+               ptime( date(2006,2,6), time_duration( 10, 0, 0)));
+
+    ASSERT_EQ( time_from_string_nothrow("2006-02-06 10:00:00+0100"),
+               ptime( date(2006,2,6), time_duration( 9, 0, 0)));
+
+    ASSERT_EQ( time_from_string_nothrow("2006-02-06 10:00:00+01"),
+               ptime( date(2006,2,6), time_duration( 9, 0, 0)));
+
+
+    ASSERT_EQ( time_from_string_nothrow("2006-02-06 10:00:00-0100"),
+               ptime( date(2006,2,6), time_duration( 11, 0, 0)));
+
+    ASSERT_EQ( time_from_string_nothrow("2006-02-06 10:00:00-01"),
+               ptime( date(2006,2,6), time_duration( 11, 0, 0)));
+
+}
+
+
 
 TEST_F( miTimeParseTest, parse)
 {
 
-   miTime nt("2006-01-02 19:30:00");
+   ptime nt(time_from_string("2006-01-02 19:30:00") );
    string buf("200601020930bla");
-   miTime time;
+   ptime time;
 
    try{
        string::size_type i=miTimeParse("%Y%m%d%H%M", buf, time, nt);
-       ASSERT_EQ( time,  miTime( 2006, 1, 2, 9, 30 ) );
+       ASSERT_EQ( time,  ptime( date(2006, 1, 2),
+                                time_duration( 9, 30, 0) ));
        ASSERT_EQ( i, 12 );
     }
-    catch(miTimeParseException ex){
+    catch(const miTimeParseException &ex){
        cerr << ex.what() << endl;
        FAIL();
     }
@@ -61,32 +106,29 @@ TEST_F( miTimeParseTest, parse)
     try{
        buf="010220";
        string::size_type i=miTimeParse("%m%d%H", buf, time, nt);
-       ASSERT_EQ( time,  miTime( "2005-01-02 20:00:00") );
+       ASSERT_EQ( time,  ptime( time_from_string("2005-01-02 20:00:00")) );
        ASSERT_EQ( i, 6 );
     }
-    catch(miTimeParseException ex){
+    catch(const miTimeParseException &ex){
        cerr << ex.what() << endl;
        FAIL();
     }
 
     try{
-       miTime nt("2011-10-25 18:51:57");
-       nt.addHour( 3 );
+       ptime nt(time_from_string("2011-10-25 18:51:57"));
+       nt += hours( 3 );
        //nt.addDay( 10 );
        buf="2522";
        string::size_type i=miTimeParse("%d%H", buf, time, nt);
-       cout << "myTime: " << time << " refTime: " << nt << endl;
-//       ASSERT_EQ( time,  miTime( "2005-01-02 20:00:00") );
-//       ASSERT_EQ( i, 6 );
     }
-    catch(miTimeParseException ex){
+    catch(const miTimeParseException &ex){
        cerr << ex.what() << endl;
        FAIL();
     }
-
 
 //	ASSERT_EQ(1u, out.size());
 //
 //	EXPECT_FLOAT_EQ(in.corrected(), out.front().corrected());
 }
+
 

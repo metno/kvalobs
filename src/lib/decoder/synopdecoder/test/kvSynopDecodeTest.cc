@@ -63,20 +63,20 @@ protected:
 
 		/*
 		 *     kvStation( int st, float la, float lo, float he, float max,
-		 *                const miutil::miString& na, int wm, int nn,
-		 *                const miutil::miString& ic, const miutil::miString& ca,
-		 *                const miutil::miString& ss, int environmentid,
+		 *                const std::string& na, int wm, int nn,
+		 *                const std::string& ic, const std::string& ca,
+		 *                const std::string& ss, int environmentid,
 		 *                bool static_, const miutil::miTime& fromtime)
 		 *
 		 */
 		stationList.push_back( kvalobs::kvStation(4460, 60.1173, 10.829, 170, 0,"Hakadal jernbanestasjon", 1488, 4460, "", "","",8, true,
-				                                  miutil::miTime("2007-01-08 00:00:00")));
+				                                  boost::posix_time::time_from_string("2007-01-08 00:00:00")));
 
 		stationList.push_back( kvalobs::kvStation(76900, 66, 2, 6, 0,"MIKE", 0, 76900, "", "LDWR","",7, true,
-				                                  miutil::miTime("1977-01-01 00:00:00")));
+				boost::posix_time::time_from_string("1977-01-01 00:00:00")));
 
 		stationList.push_back( kvalobs::kvStation( 40745, 60.1173, 10.829, 170, 0,"Test1", 40745, 40745, "", "","",8, true,
-						                                  miutil::miTime("2007-01-08 00:00:00")));
+				boost::posix_time::time_from_string("2007-01-08 00:00:00")));
 
 
 		ASSERT_TRUE( synopDecoder.initialise( stationList, 10, 20 ) ) << "Cant initialize the synopdecoder.";

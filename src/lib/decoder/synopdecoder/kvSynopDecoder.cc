@@ -18,16 +18,19 @@
   modify it under the terms of the GNU General Public License as 
   published by the Free Software Foundation; either version 2 
   of the License, or (at your option) any later version.
-  
+
   KVALOBS is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License along 
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ */
+#include <boost/lexical_cast.hpp>
+#include <puTools/miTime.h>
+#include <miutil/timeconvert.h>
 #include "kvSynopDecoder.h"
 #include "synopLexer.h"
 
@@ -80,12 +83,12 @@ createObsTime( int day, int hour, const miTime &refTime )
    }
 
    if (obsT > refT ) {
-     mon--;
-     if(mon < 1) {
-       yea--;
-       mon=12;
-     }
-     obsT.setTime( yea, mon, day, hour, 0, 0 );
+      mon--;
+      if(mon < 1) {
+         yea--;
+         mon=12;
+      }
+      obsT.setTime( yea, mon, day, hour, 0, 0 );
    }
 
    return  obsT;
@@ -93,153 +96,153 @@ createObsTime( int day, int hour, const miTime &refTime )
 
 bool kvSynopDecoder::initialise(const list<kvStation>& kpos, int earlyobs, int lateobs)
 {
-  autoReferenceTime();
-  early = earlyobs * (-1);
-  late  = lateobs;
+   autoReferenceTime();
+   early = earlyobs * (-1);
+   late  = lateobs;
 
-  synopRegister.clear();
-  shipRegister.clear();
-  tempoRegister.clear();
+   synopRegister.clear();
+   shipRegister.clear();
+   tempoRegister.clear();
 
-  map<int,miTime> fromtimes;
+   map<int,miTime> fromtimes;
 
-  miTime now = miTime::nowTime();
-  miTime from;
+   miTime now = miTime::nowTime();
+   miTime from;
 
-  miString call;
-  int      syno;
-  int      stat;
-  
-  list<kvStation>::const_iterator itr=kpos.begin();
+   string call;
+   int    syno;
+   int    stat;
 
-  for(;itr!=kpos.end();itr++) {
-    stat = itr->stationID();
-    call = itr->call_sign();
-    syno = itr->wmonr();
-    from = itr->fromtime();
+   list<kvStation>::const_iterator itr=kpos.begin();
 
-    if(from > now ) // station is not active yet!
-    	continue;
-    
-    if(fromtimes.count(syno))
-      if(fromtimes[syno] > from )// there is allready a newer
-    	  continue;                 // record for this station ...
+   for(;itr!=kpos.end();itr++) {
+      stat = itr->stationID();
+      call = itr->call_sign();
+      syno = itr->wmonr();
+      from = to_miTime(itr->fromtime());
 
-    if(syno > 0 )
-      fromtimes[syno] = from;
-    
-    if(!stat)
-      continue;
+      if(from > now ) // station is not active yet!
+         continue;
 
-    if(syno)
-      synopRegister[syno] = stat;
-    
-    if(call.exists())
-      shipRegister[call]  = stat;
-  }
+      if(fromtimes.count(syno))
+         if(fromtimes[syno] > from )// there is allready a newer
+            continue;                 // record for this station ...
 
-  lastTempoIndex  
-    = now.month() * 10000000  
-    + now.day()   * 100000
-    + now.hour()  * 1000
-    + now.min()   * 10;
-  
-  return ! ( synopRegister.empty() && shipRegister.empty() );
+      if(syno > 0 )
+         fromtimes[syno] = from;
+
+      if(!stat)
+         continue;
+
+      if(syno)
+         synopRegister[syno] = stat;
+
+      if( ! call.empty() )
+         shipRegister[call]  = stat;
+   }
+
+   lastTempoIndex
+   = now.month() * 10000000
+   + now.day()   * 100000
+   + now.hour()  * 1000
+   + now.min()   * 10;
+
+   return ! ( synopRegister.empty() && shipRegister.empty() );
 }
 
 
 void kvSynopDecoder::setReferenceTime(const miTime& r)
 {
-  ref        = r;
-  continuous = false;
+   ref        = r;
+   continuous = false;
 }
 
 void kvSynopDecoder::autoReferenceTime()
 {
-  ref        = miTime::nowTime();
-  continuous = true;
+   ref        = miTime::nowTime();
+   continuous = true;
 }
- 
+
 miTime kvSynopDecoder::createObsTime()
 {
- 
-  if(continuous) 
-    ref = miTime::nowTime();
- 
-  return createObsTime( obs.Info()->YY, obs.Info()->GG, ref );
- }
+
+   if(continuous)
+      ref = miTime::nowTime();
+
+   return createObsTime( obs.Info()->YY, obs.Info()->GG, ref );
+}
 
 int  kvSynopDecoder::findStationid()
 {
-  int      land = obs.Info()->IIiii;
-  int      boat = obs.Info()->A1BwNb;
-  miString call = obs.Info()->callSign;
+   int      land = obs.Info()->IIiii;
+   int      boat = obs.Info()->A1BwNb;
+   string call = obs.Info()->callSign;
 
 
-  needTmp = false;
+   needTmp = false;
 
-  if(land) {
-    if(synopRegister.count(land))
-      return synopRegister[land];
-    return 0;
-  }
+   if(land) {
+      if(synopRegister.count(land))
+         return synopRegister[land];
+      return 0;
+   }
 
-  if(call.exists()) {
-    if(call != "SHIP" && call != "SYNOP" ) {
-      if(shipRegister.count(call))
-	return shipRegister[call];
-      return temporaryRegister(call);
-    }
-  }
- 
-  if(boat) {
-    return temporaryRegister(boat);
-  }
+   if( ! call.empty() ) {
+      if(call != "SHIP" && call != "SYNOP" ) {
+         if(shipRegister.count(call))
+            return shipRegister[call];
+         return temporaryRegister(call);
+      }
+   }
 
-  return 0;
+   if(boat) {
+      return temporaryRegister(boat);
+   }
+
+   return 0;
 }
 
 int kvSynopDecoder::temporaryRegister(int uknown)
 {
-  miString uk = miString(uknown);
-  return temporaryRegister(uk);
+   string uk = boost::lexical_cast<string>(uknown);
+   return temporaryRegister(uk);
 }
 
 
-int kvSynopDecoder::temporaryRegister(miString uknown)
+int kvSynopDecoder::temporaryRegister( std::string uknown)
 {
-  if ( tempoRegister.count(uknown))
-    return tempoRegister[uknown];
+   if ( tempoRegister.count(uknown))
+      return tempoRegister[uknown];
 
-  lastTempoIndex++;
-  tempoRegister[uknown] = lastTempoIndex;
- 
-  // build a new station with an index and the callsign starting from now
-  //  tstat.set(lastTempoIndex,0,0,0,0,"",0,0,"",uknown,"",6,false, miutil::miTime::nowTime());
+   lastTempoIndex++;
+   tempoRegister[uknown] = lastTempoIndex;
 
-  tstat.set(lastTempoIndex, kvDbBase::FLT_NULL, kvDbBase::FLT_NULL, kvDbBase::FLT_NULL, kvDbBase::FLT_NULL,
-	    "", kvDbBase::INT_NULL, kvDbBase::INT_NULL, "", uknown, "", 6, false, miutil::miTime::nowTime());
+   // build a new station with an index and the callsign starting from now
+   //  tstat.set(lastTempoIndex,0,0,0,0,"",0,0,"",uknown,"",6,false, miutil::miTime::nowTime());
 
-  needTmp=true;
+   tstat.set(lastTempoIndex, kvDbBase::FLT_NULL, kvDbBase::FLT_NULL, kvDbBase::FLT_NULL, kvDbBase::FLT_NULL,
+             "", kvDbBase::INT_NULL, kvDbBase::INT_NULL, "", uknown, "", 6, false, boost::posix_time::microsec_clock::universal_time());
 
-  return lastTempoIndex;
+   needTmp=true;
+
+   return lastTempoIndex;
 }
 
 
 char kvSynopDecoder::checkObservationTime(miutil::miTime tbt, miutil::miTime obt)
 {
-  if(!continuous)
-    return 0;
- 
-  int diff = miTime::minDiff(tbt,obt);
-  
-  if ( diff < early )
-    return 3;
-  
-  if ( diff > late )
-    return 4;
+   if(!continuous)
+      return 0;
 
-  return 0;
+   int diff = miTime::minDiff(tbt,obt);
+
+   if ( diff < early )
+      return 3;
+
+   if ( diff > late )
+      return 4;
+
+   return 0;
 }
 
 /*
@@ -254,91 +257,90 @@ void
 kvSynopDecoder::
 correct_h_VV_N( std::list<kvalobs::kvData> &data ) const
 {
-	int h=INT_MAX;  //paramid 55
-	int VV=INT_MAX; //paramid 273
-	int N=INT_MAX;  //paramid 15
-	list<kvalobs::kvData>::iterator ith=data.end();
+   int h=INT_MAX;  //paramid 55
+   int VV=INT_MAX; //paramid 273
+   int N=INT_MAX;  //paramid 15
+   list<kvalobs::kvData>::iterator ith=data.end();
 
-	for( list<kvalobs::kvData>::iterator it=data.begin(); it != data.end(); ++it ) {
-		if( it->paramID() == 55 ) {
-			ith = it;
-			h = static_cast<int>(it->original());
-		} else if( it->paramID() == 273 )
-			VV = static_cast<int>( it->original() );
-		else if( it->paramID() == 15 )
-			N = static_cast<int>( it->original() );
-	}
+   for( list<kvalobs::kvData>::iterator it=data.begin(); it != data.end(); ++it ) {
+      if( it->paramID() == 55 ) {
+         ith = it;
+         h = static_cast<int>(it->original());
+      } else if( it->paramID() == 273 )
+         VV = static_cast<int>( it->original() );
+      else if( it->paramID() == 15 )
+         N = static_cast<int>( it->original() );
+   }
 
-	if( h == -3 && (VV == INT_MAX || N == INT_MAX) ) {
-		if( ith != data.end() )
-			data.erase( ith );
-	}
+   if( h == -3 && (VV == INT_MAX || N == INT_MAX) ) {
+      if( ith != data.end() )
+         data.erase( ith );
+   }
 
 }
 
 bool kvSynopDecoder::decode(const std::string &raw, list<kvData>&   data)
 {     
-  obs =  lexSynop(raw);
-  data.clear();
+   obs =  lexSynop(raw);
+   data.clear();
 
-  if(obs.hasUnrecognised()) {
-    rejectComment = obs.Unrecognised();
-    return false;
-  }
+   if(obs.hasUnrecognised()) {
+      rejectComment = obs.Unrecognised();
+      return false;
+   }
 
-  map<int,float>  deco         = obs.Data();
-  map<int,float>::iterator itr = deco.begin();
- 
-  kvData d;
+   map<int,float>  deco         = obs.Data();
+   map<int,float>::iterator itr = deco.begin();
 
-  miTime tbt = miTime::nowTime();
-  miTime obt = createObsTime();
-  int    pos = findStationid();
-  int typeID = obs.typeID();
+   kvData d;
 
-  if(!pos) {
-    rejectComment = "unknown station/position";
-    return false;
-  }
-  else {
-    for(;itr!=deco.end();itr++) {
-      if(itr->first) {
-	if(itr->second > -5000 )  {// filter any kind of undef 
+   boost::posix_time::ptime tbt = boost::posix_time::microsec_clock::universal_time();
+   miTime obt = createObsTime();
+   int    pos = findStationid();
+   int typeID = obs.typeID();
 
-	  /// itr->first  = parameterindex ( int   )
- 	  /// itr->second = value          ( float )
+   if(!pos) {
+      rejectComment = "unknown station/position";
+      return false;
+   }
+   else {
+      for(;itr!=deco.end();itr++) {
+         if(itr->first) {
+            if(itr->second > -5000 )  {// filter any kind of undef
+
+               /// itr->first  = parameterindex ( int   )
+               /// itr->second = value          ( float )
 
 
-	  d.set(pos, obt, itr->second, itr->first, tbt, typeID,0);
-	  /// set useifo (7) not for ship!!!
-	  d.useinfo(7, ( typeID == 11 ? 0 : checkObservationTime(tbt,obt)) );
-	  data.push_back(d);
-	}
+               d.set(pos, to_ptime(obt), itr->second, itr->first, tbt, typeID,0);
+               /// set useifo (7) not for ship!!!
+               d.useinfo(7, ( typeID == 11 ? 0 : checkObservationTime(to_miTime(tbt),obt)) );
+               data.push_back(d);
+            }
+         }
       }
-    }
 
-    correct_h_VV_N( data );
+      correct_h_VV_N( data );
 
-  }
-  return true;
+   }
+   return true;
 }
 
 
 bool kvSynopDecoder::tmpStation(kvalobs::kvStation& kvs)
 {
-  if(needTmp)
-    kvs = tstat;
-  return needTmp;
+   if(needTmp)
+      kvs = tstat;
+   return needTmp;
 }
 
 
 
 
-kvRejectdecode kvSynopDecoder::rejected(const miutil::miString &decoder)
+kvRejectdecode kvSynopDecoder::rejected(const std::string &decoder)
 {
-  miString message   = obs.Raw();
-  miTime   timestamp = miTime::nowTime();
-  return kvRejectdecode(message,timestamp,decoder,rejectComment);
+   string message   = obs.Raw();
+   return kvRejectdecode(message,boost::posix_time::microsec_clock::universal_time(),decoder,rejectComment);
 }
 
 

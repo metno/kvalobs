@@ -53,7 +53,17 @@ DecodeCommand::executeImpl()
 {
    LOGDEBUG("DecodeCommand::execute: called!\n");
 
-   result=decoder->execute(msg);
+   try {
+       result=decoder->execute(msg);
+   }
+   catch( const std::exception &ex ) {
+       LOGERROR("UNEXPECTED EXCEPTION from <"<< decoder->name() << ">\n Reason: " << ex.what() );
+       result = kvalobs::decoder::DecoderBase::Error;
+   }
+   catch( ...){
+       LOGERROR("UNEXPECTED EXCEPTION from <"<< decoder->name() << ">\n Reason: Unknown" );
+       result = kvalobs::decoder::DecoderBase::Error;
+   }
 
    LOGDEBUG("DecodeCommand::execute: return!\n");
    return result==kvalobs::decoder::DecoderBase::Ok;

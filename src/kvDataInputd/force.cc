@@ -56,7 +56,6 @@
 #include <fileutil/mkdir.h>
 #include <kvalobs/kvDataOperations.h>
 
-//class kvDataFactory( 0, miutil::miTime(), 0 ); 
 
 
 namespace {
@@ -86,7 +85,7 @@ namespace {
 
   void dummyFunc3(){
     decodeutility::kvdataformatter::kvDataList dummy;
-    miutil::miString    dummy1;
+    std::string    dummy1;
 
     dummy=decodeutility::kvdataformatter::getKvData(dummy1);
   }

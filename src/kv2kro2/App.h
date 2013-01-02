@@ -60,8 +60,8 @@ class App :
       ~App();
       
       static void printObsDataList( kvservice::KvObsDataList& dataList );
-      static void storeToFile( const std::string& filename, const miutil::miTime& toTime );
-      miutil::miTime lastFromTime( const std::string& filename );
+      static void storeToFile( const std::string& filename, const boost::posix_time::ptime& toTime );
+      boost::posix_time::ptime lastFromTime( const std::string& filename );
       
       void run();
 };      

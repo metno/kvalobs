@@ -64,8 +64,8 @@ public:
 		if ( cache.timeOffset > minuteOffset)
 			return false;
 
-		miutil::miTime earliestWantedObsTime = si_.obstime();
-		earliestWantedObsTime.addMin(minuteOffset);
+		boost::posix_time::ptime earliestWantedObsTime = si_.obstime();
+		earliestWantedObsTime += boost::posix_time::minutes(minuteOffset);
 
 		for ( typename DataList::const_iterator it = cache.data.begin(); it != cache.data.end(); ++ it )
 			if ( it->obstime() >= earliestWantedObsTime)

@@ -39,6 +39,7 @@
 #include <miconfparser/confparser.h>
 #include <kvskel/managerInput.hh>
 #include <miutil/commastring.h>
+#include <miutil/timeconvert.h>
 #include <sstream>
 #include <string>
 #include <kvalobs/kvPath.h>
@@ -417,8 +418,8 @@ updateWorkque(dnmi::db::Result *res, dnmi::db::Connection *con)
 	using namespace kvalobs;
 	int nTry;
 	bool retry;
-	miutil::miTime now(miutil::miTime::nowTime());
-	miutil::miTime undefTime;
+	boost::posix_time::ptime now = boost::posix_time::microsec_clock::universal_time();
+	boost::posix_time::ptime undefTime;
 	DataTblView data;
 	
 	while(res->hasNext()){
@@ -447,7 +448,7 @@ updateWorkque(dnmi::db::Result *res, dnmi::db::Connection *con)
 		gate.busytimeout(120); //2 minutter
 		
 		if(!gate.insert(kvWorkelement(data.stationID(),
-												data.obstime(), 
+												to_ptime(data.obstime()),
 										  		data.typeID(), 
 										  		now, 
 										  		10,

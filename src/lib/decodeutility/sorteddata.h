@@ -33,7 +33,6 @@
 
 #include <set>
 #include <utility>
-#include <puTools/miTime.h>
 #include <kvalobs/kvData.h>
 #include <kvalobs/kvTextData.h>
 
@@ -178,15 +177,15 @@ typedef SortedData<int, Level> Sensor;
 /**
  * \see Observations
  */
-class ObsTime : public SortedData<miutil::miTime, Sensor>
+class ObsTime : public SortedData<boost::posix_time::ptime, Sensor>
 {
   bool invalidate_;
   public:
-    ObsTime( miutil::miTime t ) : SortedData<miutil::miTime, Sensor>( t ), invalidate_( false ) {}
+    ObsTime( boost::posix_time::ptime t ) : SortedData<boost::posix_time::ptime, Sensor>( t ), invalidate_( false ) {}
 
     Container<TextDataItem> textData;
 
-    virtual size_t count() const { return SortedData<miutil::miTime, Sensor>::count() + textData.count(); }
+    virtual size_t count() const { return SortedData<boost::posix_time::ptime, Sensor>::count() + textData.count(); }
 
     void invalidate( bool doit ) { invalidate_ = doit; }
     bool invalidate() const { return invalidate_; }

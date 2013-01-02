@@ -34,7 +34,6 @@
 #include <boost/function.hpp>
 #include <dnmithread/CommandQue.h>
 #include <kvdb/kvdb.h>
-#include <puTools/miTime.h>
 #include <kvalobs/kvStationInfoCommand.h>
 #include "GenCacheElem.h"
 
@@ -71,8 +70,8 @@ class MissingObsCheck
 	 * \return true if we shall check for missing observations for the
 	 *              computed obstime and false otherwise.  
 	 */
-	bool checkObstime(const miutil::miTime &runTime, 
-   	                      miutil::miTime &obstime, 
+	bool checkObstime(const boost::posix_time::ptime &runTime,
+   	                      boost::posix_time::ptime &obstime,
        	                      const long lateobsInMinute);
 	public:
     	MissingObsCheck(dnmi::db::Connection     &con,
@@ -82,8 +81,8 @@ class MissingObsCheck
 		   				 
     	~MissingObsCheck();
 
-  		void findMissingData(const miutil::miTime& runtime,
-  	   	                  const miutil::miTime& lastSearchForMissing);
+  		void findMissingData(const boost::posix_time::ptime& runtime,
+  	   	                  const boost::posix_time::ptime& lastSearchForMissing);
    
 };
 

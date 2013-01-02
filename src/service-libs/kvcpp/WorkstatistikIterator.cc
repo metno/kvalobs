@@ -30,6 +30,8 @@
 */
 #include "WorkstatistikIterator.h"
 #include <typeinfo>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <miutil/timeconvert.h>
 #include <milog/milog.h>
 #include <ctime>
 
@@ -108,15 +110,15 @@ next( kvalobs::kvWorkelement &ws )
 
    const  WorkstatistikElem &rd = dataList[ index++ ];
    ws.set( rd.stationID,
-           miutil::miTime( rd.obstime ),
+           boost::posix_time::time_from_string_nothrow( std::string(rd.obstime) ),
            rd.typeID_,
-           miutil::miTime( rd.tbtime ),
+           boost::posix_time::time_from_string_nothrow( std::string(rd.tbtime) ),
            rd.priority,
-           miutil::miTime(rd.processStart),
-           miutil::miTime(rd.qaStart),
-           miutil::miTime(rd.qaStop),
-           miutil::miTime(rd.serviceStart),
-           miutil::miTime(rd.serviceStop) );
+           boost::posix_time::time_from_string_nothrow(std::string(rd.processStart)),
+           boost::posix_time::time_from_string_nothrow(std::string(rd.qaStart)),
+           boost::posix_time::time_from_string_nothrow(std::string(rd.qaStop)),
+           boost::posix_time::time_from_string_nothrow(std::string(rd.serviceStart)),
+           boost::posix_time::time_from_string_nothrow(std::string(rd.serviceStop)) );
    return true;
 }
 

@@ -288,9 +288,8 @@ sendData( const std::string &decoder, const std::string &data )
    ostringstream log;
 
    do {
-      if( ! dataReceiverAlive && !timeLastTryToSendData.undef() ) {
-         miTime now( miTime::nowTime() );
-         now.addMin( -5 );
+      if( ! dataReceiverAlive && !timeLastTryToSendData.is_not_a_date_time() ) {
+         boost::posix_time::ptime now = boost::posix_time::microsec_clock::universal_time() - boost::posix_time::minutes(5);
 
          //If the kvalobs server receiving data is down,
          //wait 5 minutes before retrying to send data to the server.
@@ -299,7 +298,7 @@ sendData( const std::string &decoder, const std::string &data )
       }
 
       dataReceiverAlive = false;
-      timeLastTryToSendData = miTime::nowTime();
+      timeLastTryToSendData = boost::posix_time::microsec_clock::universal_time();
 
       try {
          if( CORBA::is_nil( refDataReceiver ) ) {

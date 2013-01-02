@@ -33,7 +33,6 @@
 #include <kvalobs/kvGeneratedTypes.h>
 #include "GenCacheElem.h"
 
-using namespace miutil;
 using namespace std;
 using namespace kvalobs;
 
@@ -46,10 +45,10 @@ isGenerated(long stationid, long typeid_, dnmi::db::Connection *con)
 
   	boost::mutex::scoped_lock l(genCacheMutex);  
   
-  	if(genCacheFlush.undef()){
-   	genCacheFlush=miTime::nowTime();
-  	}else if(miTime::hourDiff(miTime::nowTime(), genCacheFlush)>24){
-    	genCacheFlush=miTime::nowTime();
+  	if(genCacheFlush.is_not_a_date_time()){
+   	genCacheFlush=boost::posix_time::microsec_clock::universal_time();
+  	}else if(boost::posix_time::microsec_clock::universal_time() - genCacheFlush > boost::posix_time::hours(24)){
+    	genCacheFlush=boost::posix_time::microsec_clock::universal_time();
     	genCachElem.clear();
   	}
 

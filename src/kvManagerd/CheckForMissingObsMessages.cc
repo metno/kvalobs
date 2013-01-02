@@ -29,8 +29,8 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include <stdlib.h>
-#include <puTools/miTime.h>
 #include <milog/milog.h>
+#include <miutil/timeconvert.h>
 #include <kvalobs/kvDbGate.h>
 #include <kvalobs/kvQueries.h>
 #include <kvalobs/kvKeyVal.h>
@@ -62,26 +62,26 @@ CheckForMissingObsMessages::
 {
 }
 
-miutil::miTime 
+boost::posix_time::ptime
 CheckForMissingObsMessages::
 lastMissingRuntime(dnmi::db::Connection *con)
 {
 	const int NUM_HOURS = 6;
 	
 	
-  	if(lastMissingRunTime_.undef()){
+  	if(lastMissingRunTime_.is_not_a_date_time()){
   		std::list<kvKeyVal> keys;
   		
   		kvDbGate gate(con);
   		
-  		lastMissingRunTime_=miutil::miTime::nowTime();
-  		lastMissingRunTime_.addHour(-1*NUM_HOURS);
+  		lastMissingRunTime_=boost::posix_time::microsec_clock::universal_time();
+  		lastMissingRunTime_ -= boost::posix_time::hours(NUM_HOURS);
   		
   		if(!gate.select(keys, kvQueries::selectKeyValues(	"kvManagerd", 	"LastMissingRun"))){
   			LOGWARN("Cant access the key 'kvManagerd.LastMissingRun' from the 'key_val' table!" << endl << 
   						  "Reason: " << gate.getErrorStr());
   		}else if(keys.empty()){
-  			kvKeyVal keyVal("kvManagerd", "LastMissingRun", lastMissingRunTime_.isoTime());
+  			kvKeyVal keyVal("kvManagerd", "LastMissingRun", to_kvalobs_string(lastMissingRunTime_));
   			
   			if(!gate.insert(keyVal, true)){
   				LOGWARN("Cant insert the key 'kvManagerd.LastMissingRun' into the 'key_val' table!" << endl <<
@@ -90,9 +90,9 @@ lastMissingRuntime(dnmi::db::Connection *con)
   				LOGINFO("Created new key 'kvManagerd.LastMissingRun' in the 'key_val' table!");
   			}
   		}else{
-  			lastMissingRunTime_=miutil::miTime(keys.begin()->val());
-  			miutil::miTime tmp(miutil::miTime::nowTime());
-  			tmp.addDay(-7); 
+  			lastMissingRunTime_=boost::posix_time::time_from_string_nothrow(keys.begin()->val());
+  			boost::posix_time::ptime tmp(boost::posix_time::microsec_clock::universal_time());
+  			tmp -= boost::gregorian::days(7);
   			
   			LOGINFO("key_val table: Key 'kvManagerd.LastMissingRun': " <<lastMissingRunTime_);
   			
@@ -110,11 +110,11 @@ lastMissingRuntime(dnmi::db::Connection *con)
 void
 CheckForMissingObsMessages::
 lastMissingRuntime(dnmi::db::Connection *con, 
-                   const miutil::miTime &newLastMissingRuntime)
+                   const boost::posix_time::ptime &newLastMissingRuntime)
 {
 	kvDbGate gate(con);
 	
-	kvKeyVal keyVal("kvManagerd", "LastMissingRun", newLastMissingRuntime.isoTime());
+	kvKeyVal keyVal("kvManagerd", "LastMissingRun", to_kvalobs_string(newLastMissingRuntime));
 	
 	lastMissingRunTime_=newLastMissingRuntime;
 	
@@ -131,11 +131,11 @@ operator()()
 {
 	const int PROC_MISSING_DATA_MINUTE= 30;
   	dnmi::db::Connection *con=0;
-  	miutil::miTime        nowtime= miutil::miTime::nowTime();
-  	miutil::miTime        runtime= nowtime;
+  	boost::posix_time::ptime        nowtime= boost::posix_time::microsec_clock::universal_time();
+  	boost::posix_time::ptime        runtime= nowtime;
   
   	
-  	runtime.addHour(-1);
+  	runtime -= boost::posix_time::hours(1);
 
   	milog::LogContext logContext("CheckForMissingObsMessages");
 
@@ -145,11 +145,11 @@ operator()()
     	// the observation program (obs_pgm) as reference
     	// - use proper time to ensure that the check is run every hour
     	//  (offset from 00 hours is 'PROC_MISSING_DATA_MINUTE')
-    	nowtime= miutil::miTime::nowTime();
+    	nowtime= boost::posix_time::microsec_clock::universal_time();
 
-    	if((nowtime.min() >= PROC_MISSING_DATA_MINUTE &&
-	 		  nowtime.hour() != runtime.hour()) || 
-		    miutil::miTime::hourDiff(nowtime,runtime)>2){
+    	if((nowtime.time_of_day().minutes() >= PROC_MISSING_DATA_MINUTE &&
+	 		  nowtime.time_of_day().hours() != runtime.time_of_day().hours()) ||
+    			nowtime - runtime > boost::posix_time::hours(2) ) {
       	runtime= nowtime;
     	}else{
        	sleep(1);      
@@ -213,27 +213,27 @@ operator()()
 */
 void 
 CheckForMissingObsMessages::
-findMissingData(const miutil::miTime& runtime,
+findMissingData(const boost::posix_time::ptime& runtime,
 					 dnmi::db::Connection *con)
 {
  	string logfile;
-   miutil::miTime startAt;
-   miutil::miTime stopAt;
+   boost::posix_time::ptime startAt;
+   boost::posix_time::ptime stopAt;
    logfile = kvPath("logdir") + "/kvManagerd-missing.log";
 
 	milog::SetResetDefaultLoggerHelper loggerHelper(logfile, 1048576);
 
-   miutil::miTime lastMissingRun=lastMissingRuntime(con);
+   boost::posix_time::ptime lastMissingRun=lastMissingRuntime(con);
 
 	MissingObsCheck check(*con, outputQue, app.genCache(), 
 								boost::bind(&ManagerApp::shutdown, &app));
 	
-	startAt = miutil::miTime::nowTime();
+	startAt = boost::posix_time::microsec_clock::universal_time();
 	check.findMissingData(runtime, lastMissingRun);
-	stopAt = miutil::miTime::nowTime();
+	stopAt = boost::posix_time::microsec_clock::universal_time();
 	
 	LOGINFO("Missing search: started: " << startAt << " Stopped: " << stopAt
-	        << " elpased time: " << abs( miutil::miTime::secDiff(stopAt, startAt) ) << " s.");
+	        << " elpased time: " << stopAt - startAt);
 
 	lastMissingRuntime(con, runtime);
 }

@@ -93,7 +93,7 @@ isOk()const
 
 kvalobs::kvStation 
 ServiceApp::
-lookUpStation(const miutil::miString &kvQuerie)
+lookUpStation(const miutil::std::string &kvQuerie)
 {
   return kvalobs::kvStation();
 }

@@ -18,319 +18,428 @@
   modify it under the terms of the GNU General Public License as 
   published by the Free Software Foundation; either version 2 
   of the License, or (at your option) any later version.
-  
+
   KVALOBS is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License along 
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
-#include <dnmithread/mtcout.h>
+ */
 #include <time.h>
-#include <sstream>
-#include "kvSubscriberCollection.h"
-#include <milog/milog.h>
-#include <string>
-#include <corbahelper/corbaApp.h>
 #include <stdio.h>
+#include <unistd.h>
+#include <sstream>
+#include <string>
 #include <iomanip>
 #include <boost/lexical_cast.hpp>
-#include <unistd.h>
+#include <boost/algorithm/string.hpp>
+#include <boost/thread.hpp>
+#include <dnmithread/mtcout.h>
+#include <milog/milog.h>
+#include <corbahelper/corbaApp.h>
 #include <fileutil/dir.h>
 #include <kvalobs/kvPath.h>
+#include <kvalobs/kvDbGate.h>
+#include "kvSubscriberCollection.h"
+#include "KeyValSubscriberTransaction.h"
+#include "ServiceApp.h"
 
 using namespace std;
 using namespace miutil;
-
-KvSubscriberCollection::KvSubscriberCollection()
-{
-
-	subPath = kvPath("localstatedir") +"/service/subscribers/";
-    
-    readAllSubscribersFromFile();
-	
-}
-
-KvSubscriberCollection::KvSubscriberCollection(const std::string &fname)
-{
-    subPath=fname;
-
-    if(!subPath.empty() && subPath[subPath.length()-1]!='/')
-	subPath+="/";
-
-    readAllSubscribersFromFile();
-}
-
-KvSubscriberCollection::~KvSubscriberCollection()
-{
-  LOGDEBUG("KvSubscriberCollection::deleted!");
-}
+using namespace kvalobs;
 
 
-bool
-KvSubscriberCollection::createSubscriberid(
-    KvSubscriberBasePtr p,
-    const std::string &servicename
-    )
-{
-  int                COUNT_MAX=1000;
-  int                count=0;
-  std::ostringstream ost;
-  std::string        subid;
-  time_t             t;
-  char               tBuf[30];
-  struct tm          tTm;
-  std::set<KvSubscriberBasePtr, KvSubscriberBasePtrOps>::iterator it;
-  
-  // The chema used to create a uniqe subscriberid:
-  // 'kvalobs_service_servicename_datotid_helper'
-  // helper is used too garanti uniqnes if datotid and servicename 
-  // is equal. 
+namespace {
+const std::string SubScriberID("'KvServiceSubcriberIDS'");
 
-  if(time(&t)<0){
-    LOGERROR("createSubscriberid: time() failed!");
-    return false;
-  }
+struct DbConnectionHolder {
+    dnmi::db::Connection *con;
+    ServiceApp &app;
 
-  if(!gmtime_r( &t, &tTm)){
-    LOGERROR("createSubscriberid: gmtime_r() failed!");
-    return false;
-  }
-    
-  sprintf(tBuf, "%04d%02d%02dT%02d%02d%02d", 
-	  tTm.tm_year+1900, tTm.tm_mon+1, tTm.tm_mday,
-	  tTm.tm_hour, tTm.tm_min, tTm.tm_sec);
-  
-  for(count=0; 
-      count<COUNT_MAX && subid.empty(); 
-      count++){
-    ost.str("");   //reset ost.
-    ost << "kvalobs_service_" << servicename << "_" << tBuf << "_" << count;
-    
-    subid=ost.str();
-
-    for(it=subscribers_.begin(); it!=subscribers_.end(); it++){
-      if((*it)->subscriberid()==subid)
-	break;
+    DbConnectionHolder( ServiceApp &app_, dnmi::db::Connection *con_ )
+    : app( app_), con( con_ ){
+        LOGDEBUG("DbConnectionHolder: thread new db connection.")
     }
 
-    if(it!=subscribers_.end())
-      subid.erase();
-  }
-  
-  if(subid.empty()){
-    LOGERROR("createSubscriberid: cant create subscriberid!\n");
-    return false;
-  }
+    ~DbConnectionHolder() {
+        LOGDEBUG("DbConnectionHolder: thread release db connection.")
+                app.releaseDbConnection( con );
+    }
 
-  p->subscriberid(subid);
-  subscribers_.insert(p);
+};
 
-  LOGDEBUG("#subscribers_: " << subscribers_.size());
 
-  return true;
+boost::thread_specific_ptr<DbConnectionHolder> dbConectionHolder;
+
+
+
+}
+
+
+KvSubscriberCollection::
+KvSubscriberCollection( ServiceApp &app_ )
+: app( app_ ), isInitialized( false )
+{
+}
+
+
+KvSubscriberCollection::
+~KvSubscriberCollection()
+{
+    LOGDEBUG("KvSubscriberCollection::deleted!");
+}
+
+
+
+dnmi::db::Connection*
+KvSubscriberCollection::
+getDbConnection()
+{
+    DbConnectionHolder *dbHolder=dbConectionHolder.get();
+
+    if( ! dbHolder ) {
+        dnmi::db::Connection *con = app.getNewDbConnection();
+        if( con ) {
+            dbConectionHolder.reset( new DbConnectionHolder( app, con ) );
+        }
+        return con;
+    } else {
+        return dbHolder->con;
+    }
+}
+
+void
+KvSubscriberCollection::
+releaseThisThreadsDbConnection( )
+{
+    DbConnectionHolder *dbHolder=dbConectionHolder.get();
+
+    if( dbHolder ) {
+        dbConectionHolder.reset(0);
+    }
+}
+
+void
+KvSubscriberCollection::
+updateSubscriberInDb(
+        const std::string &subid,
+        const std::string &content )
+{
+    dnmi::db::Connection *con = getDbConnection();
+
+    if( ! con ) {
+        LOGERROR("KvSubscriberCollection: No db connection. Cant read subscribers from the database.");
+        return;
+    }
+
+    //Get all subscribers stored in the KeyVal table in the database.
+    KeyValSubscriberTransaction tran( subid, content );
+
+    try {
+        con->perform( tran );
+        if( ! tran.isOk() ) {
+            LOGERROR("KvSubscriberCollection: Insert/Update subscriber <" << subid << "> FAILED."
+                    << endl << "Reason: " << tran.getMsg() );
+            return;
+        } else {
+            LOGDEBUG("KvSubscriberCollection: Inserted/Updated subscriber <" << subid << ">."
+                    << endl << "Msg: " << tran.getMsg() );
+        }
+    }
+    catch( const std::exception &ex ) {
+        LOGERROR("KvSubscriberCollection: Insert/Update subscriber <" << subid << "> FAILED."
+                << endl << "Reason: (exception)" << ex.what() << endl
+                << tran.getMsg() );
+        return;
+    }
+}
+
+
+
+bool
+KvSubscriberCollection::
+createSubscriberid(
+        KvSubscriberBasePtr p,
+        const std::string &servicename
+)
+{
+    int                COUNT_MAX=1000;
+    int                count=0;
+    std::ostringstream ost;
+    std::string        subid;
+    time_t             t;
+    char               tBuf[30];
+    struct tm          tTm;
+    std::set<KvSubscriberBasePtr, KvSubscriberBasePtrOps>::iterator it;
+
+    // The chema used to create a uniqe subscriberid:
+    // 'kvalobs_service_servicename_datotid_helper'
+    // helper is used too garanti uniqnes if datotid and servicename
+    // is equal.
+
+    if(time(&t)<0){
+        LOGERROR("createSubscriberid: time() failed!");
+        return false;
+    }
+
+    if(!gmtime_r( &t, &tTm)){
+        LOGERROR("createSubscriberid: gmtime_r() failed!");
+        return false;
+    }
+
+    sprintf(tBuf, "%04d%02d%02dT%02d%02d%02d",
+            tTm.tm_year+1900, tTm.tm_mon+1, tTm.tm_mday,
+            tTm.tm_hour, tTm.tm_min, tTm.tm_sec);
+
+    for(count=0;
+            count<COUNT_MAX && subid.empty();
+            count++){
+        ost.str("");   //reset ost.
+        ost << servicename << "_" << tBuf << "_" << count;
+
+        subid=ost.str();
+
+        for(it=subscribers_.begin(); it!=subscribers_.end(); it++){
+            if((*it)->subscriberid()==subid)
+                break;
+        }
+
+        if(it!=subscribers_.end())
+            subid.erase();
+    }
+
+    if(subid.empty()){
+        LOGERROR("createSubscriberid: cant create subscriberid!\n");
+        return false;
+    }
+
+    p->subscriberid(subid);
+    subscribers_.insert(p);
+
+    LOGDEBUG("#subscribers_: " << subscribers_.size());
+
+    return true;
 }
 
 
 
 void 
-KvSubscriberCollection::removeSubscriberid(KvSubscriberBasePtr p)
+KvSubscriberCollection::
+removeSubscriberid(KvSubscriberBasePtr p)
 {
-  std::set<KvSubscriberBasePtr, KvSubscriberBasePtrOps>::iterator it;
-  
-  it=subscribers_.find(p);
+    std::set<KvSubscriberBasePtr, KvSubscriberBasePtrOps>::iterator it;
 
-  if(it!=subscribers_.end()){
-    subscribers_.erase(it);
-    LOGDEBUG("KvSubscriberCollection::removeSubscriberid: " 
-	     << p->subscriberid()
-	     << endl);
-    removeSubscriberFile(p->subscriberid());
+    it=subscribers_.find(p);
 
-    return;
-  }
+    if(it!=subscribers_.end()){
+        subscribers_.erase(it);
+        LOGDEBUG("KvSubscriberCollection::removeSubscriberid: "
+                << p->subscriberid()
+                << endl);
+        removeSubscriberFromDb(p->subscriberid());
 
-  LOGDEBUG("KvSubscriberCollection::removeSubscriberid: " 
-	   << p->subscriberid()
-	   << " is not among the subscribers!");
+        return;
+    }
+
+    LOGDEBUG("KvSubscriberCollection::removeSubscriberid: "
+            << p->subscriberid()
+            << " is not among the subscribers!");
 }
 
 void 
-KvSubscriberCollection::removeSubscriberid(const std::string &subscriberid)
+KvSubscriberCollection::
+removeSubscriberid(const std::string &subscriberid)
 {
-  std::set<KvSubscriberBasePtr, KvSubscriberBasePtrOps>::iterator it;
+    std::set<KvSubscriberBasePtr, KvSubscriberBasePtrOps>::iterator it;
 
-  LOGDEBUG("removeSubscriberid(" << subscriberid <<").....!\n");
+    LOGDEBUG("removeSubscriberid(" << subscriberid <<").....!\n");
 
-  for(it=subscribers_.begin(); 
-      it!=subscribers_.end(); 
-      it++){
+    for(it=subscribers_.begin();
+            it!=subscribers_.end();
+            it++){
 
-      if((*it)->subscriberid()==subscriberid){
-	  LOGDEBUG("KvSubscriberCollection::removeSubscriberid: " 
-		   << (*it)->subscriberid()
-		   << endl);
-	  subscribers_.erase(it);
-	  removeSubscriberFile(subscriberid);
-	  return;
-      }
-  }
-  
-  LOGDEBUG("KvSubscriberCollection::removeSubscriberid: " 
-	   << subscriberid
-	   << " is not among the subscribers. (FATAL?)");
-	   
+        if((*it)->subscriberid()==subscriberid){
+            LOGDEBUG("KvSubscriberCollection::removeSubscriberid: "
+                    << (*it)->subscriberid()
+                    << endl);
+            subscribers_.erase(it);
+            removeSubscriberFromDb(subscriberid);
+            return;
+        }
+    }
+
+    LOGDEBUG("KvSubscriberCollection::removeSubscriberid: "
+            << subscriberid
+            << " is not among the subscribers. (FATAL?)");
+
 }
 
 
 
 
 bool
-KvSubscriberCollection::addDataNotifySubscriber(
-			  KvDataNotifySubscriberPtr p
-			  )
+KvSubscriberCollection::
+addDataNotifySubscriber( KvDataNotifySubscriberPtr p )
 {
-  boost::mutex::scoped_lock lock(mutex);
-  
+    //This method is called from kvServiceImpl only.
+    //We release the database connection before
+    //we return.
+    boost::mutex::scoped_lock lock(mutex);
 
-  if(!createSubscriberid(p, "datanotify"))
-    return false;
+    readAllSubscribersFromDb();
 
-  allStationsDataNotifySubscribers.push_back(p);
-  writeSubscriberFile(p->subscriberid());
-
-  return true;
-}
-
-bool
-KvSubscriberCollection::addDataNotifySubscriber(
-                                KvDataNotifySubscriberPtr p, 
-				long                      stationid 
-				)
-{
-  boost::mutex::scoped_lock lock(mutex);
-
-  std::string subscriberid;
-  bool subscriberidCreated=false;
-
-  if(p->subscriberid().empty()){
     if(!createSubscriberid(p, "datanotify"))
-      return false;
+        return false;
 
-    subscriberidCreated=true;
-  }
-
-  try{
-    stationDataNotifySubscribers.insert(make_pair(stationid, p));
-  }
-  catch(...){
-    if(subscriberidCreated)
-      removeSubscriberid(p);
-
-    return false;
-   }
-
-   writeSubscriberFile(p->subscriberid());
-   return true;
+    allStationsDataNotifySubscribers.push_back(p);
+    writeSubscriberFromDb(p->subscriberid());
+    releaseThisThreadsDbConnection();
+    return true;
 }
 
-
-
-
-void 
-KvSubscriberCollection::removeDataNotifySubscriber(const std::string &subscriberid)
+bool
+KvSubscriberCollection::
+addDataNotifySubscriber( KvDataNotifySubscriberPtr p, long stationid )
 {
-  list<KvDataNotifySubscriberPtr>::iterator it;
+    //This method is called from kvServiceImpl only.
+    //We release the database connection before
+    //we return.
+    boost::mutex::scoped_lock lock(mutex);
 
-  LOGDEBUG("removeDataNotifySubscriberid(" <<subscriberid <<").....!\n");
+    readAllSubscribersFromDb();
 
-  it=allStationsDataNotifySubscribers.begin(); 
+    std::string subscriberid;
+    bool subscriberidCreated=false;
 
-  while(it!=allStationsDataNotifySubscribers.end()){
-    if((*it)->subscriberid()==subscriberid){
-      allStationsDataNotifySubscribers.erase(it);
-      it=allStationsDataNotifySubscribers.begin(); 
-    }else
-	it++;
-  }
+    if(p->subscriberid().empty()){
+        if(!createSubscriberid(p, "datanotify"))
+            return false;
 
-  multimap<long, KvDataNotifySubscriberPtr>::iterator it1,ittmp;
-  
-  it1=stationDataNotifySubscribers.begin();
-
-  while(it1!=stationDataNotifySubscribers.end()){
-    ittmp=it1;
-    it1++;
-
-    if(ittmp->second->subscriberid()==subscriberid){
-      stationDataNotifySubscribers.erase(ittmp);
+        subscriberidCreated=true;
     }
-  }
+
+    try{
+        stationDataNotifySubscribers.insert(make_pair(stationid, p));
+    }
+    catch(...){
+        if(subscriberidCreated)
+            removeSubscriberid(p);
+
+        return false;
+    }
+
+    writeSubscriberFromDb(p->subscriberid());
+    releaseThisThreadsDbConnection();
+    return true;
+}
+
+
+
+
+void 
+KvSubscriberCollection::
+removeDataNotifySubscriber(const std::string &subscriberid)
+{
+    list<KvDataNotifySubscriberPtr>::iterator it;
+
+    LOGDEBUG("removeDataNotifySubscriberid(" <<subscriberid <<").....!\n");
+
+    it=allStationsDataNotifySubscribers.begin();
+
+    while(it!=allStationsDataNotifySubscribers.end()){
+        if((*it)->subscriberid()==subscriberid){
+            allStationsDataNotifySubscribers.erase(it);
+            it=allStationsDataNotifySubscribers.begin();
+        }else
+            it++;
+    }
+
+    multimap<long, KvDataNotifySubscriberPtr>::iterator it1,ittmp;
+
+    it1=stationDataNotifySubscribers.begin();
+
+    while(it1!=stationDataNotifySubscribers.end()){
+        ittmp=it1;
+        it1++;
+
+        if(ittmp->second->subscriberid()==subscriberid){
+            stationDataNotifySubscribers.erase(ittmp);
+        }
+    }
 }
 
 void 
-KvSubscriberCollection::removeHintSubscriber(const std::string &subscriberid)
+KvSubscriberCollection::
+removeHintSubscriber(const std::string &subscriberid)
 {
     std::list<KvHintSubscriberPtr>::iterator it;
-    
+
     it=hintSubscriberList.begin();
-    
+
     for(;it!=hintSubscriberList.end(); it++){
-	if((*it)->subscriberid()==subscriberid){
-	    hintSubscriberList.erase(it);
-	    return;
-	}
+        if((*it)->subscriberid()==subscriberid){
+            hintSubscriberList.erase(it);
+            return;
+        }
     }
 }
 
 
 void 
-KvSubscriberCollection::removeDataSubscriber(const std::string &subscriberid)
+KvSubscriberCollection::
+removeDataSubscriber(const std::string &subscriberid)
 {
-  list<KvDataSubscriberPtr>::iterator it;
+    list<KvDataSubscriberPtr>::iterator it;
 
-  LOGDEBUG("removeDataSubscriberid(" <<subscriberid <<").....!\n");
+    LOGDEBUG("removeDataSubscriberid(" <<subscriberid <<").....!\n");
 
-  it=allStationsDataSubscribers.begin(); 
+    it=allStationsDataSubscribers.begin();
 
-  while(it!=allStationsDataSubscribers.end()){
-    if((*it)->subscriberid()==subscriberid){
-      allStationsDataSubscribers.erase(it);
-      it=allStationsDataSubscribers.begin(); 
-    }else
-	it++;
-  }
-
-  multimap<long, KvDataSubscriberPtr>::iterator it1,ittmp;
-  
-  it1=stationDataSubscribers.begin();
-
-  while(it1!=stationDataSubscribers.end()){
-    ittmp=it1;
-    it1++;
-
-    if(ittmp->second->subscriberid()==subscriberid){
-      stationDataSubscribers.erase(ittmp);
+    while(it!=allStationsDataSubscribers.end()){
+        if((*it)->subscriberid()==subscriberid){
+            allStationsDataSubscribers.erase(it);
+            it=allStationsDataSubscribers.begin();
+        }else
+            it++;
     }
-  }
+
+    multimap<long, KvDataSubscriberPtr>::iterator it1,ittmp;
+
+    it1=stationDataSubscribers.begin();
+
+    while(it1!=stationDataSubscribers.end()){
+        ittmp=it1;
+        it1++;
+
+        if(ittmp->second->subscriberid()==subscriberid){
+            stationDataSubscribers.erase(ittmp);
+        }
+    }
 
 }
 
-
-
 void 
-KvSubscriberCollection::removeSubscriber(const std::string &subscriberid)
+KvSubscriberCollection::
+doRemoveSubscriber(const std::string &subscriberid)
 {
-  boost::mutex::scoped_lock lock(mutex);
+    removeDataNotifySubscriber(subscriberid);
+    removeDataSubscriber(subscriberid);
+    removeHintSubscriber(subscriberid);
+    removeSubscriberid(subscriberid);
+    removeSubscriberFromDb(subscriberid);
+}
 
-  removeDataNotifySubscriber(subscriberid);
-  removeDataSubscriber(subscriberid);
-  removeHintSubscriber(subscriberid);
-  removeSubscriberid(subscriberid);
-  removeSubscriberFile(subscriberid);
+
+void
+KvSubscriberCollection::
+removeSubscriber(const std::string &subscriberid)
+{
+    boost::mutex::scoped_lock lock(mutex);
+    readAllSubscribersFromDb();
+    doRemoveSubscriber( subscriberid );
 }
 
 /*
@@ -341,84 +450,86 @@ void
 KvSubscriberCollection::
 removeDeadSubscribers(int durationInSeconds)
 {
-  std::list<std::string> subList;
+    std::list<std::string> subList;
 
-  {
-    boost::mutex::scoped_lock lock(mutex);
-    
-    for(std::list<KvDataNotifySubscriberPtr>::iterator 
-	  it=allStationsDataNotifySubscribers.begin();
-	it!=allStationsDataNotifySubscribers.end();
-	it++){
-      if((*it)->removeThisSubscriber(durationInSeconds)){
-	subList.push_back((*it)->subscriberid());
-      }
+        boost::mutex::scoped_lock lock(mutex);
+
+        readAllSubscribersFromDb();
+
+        for(std::list<KvDataNotifySubscriberPtr>::iterator
+                it=allStationsDataNotifySubscribers.begin();
+                it!=allStationsDataNotifySubscribers.end();
+                it++){
+            if((*it)->removeThisSubscriber(durationInSeconds)){
+                subList.push_back((*it)->subscriberid());
+            }
+        }
+
+
+        for(std::multimap<long, KvDataNotifySubscriberPtr>::iterator
+                it=stationDataNotifySubscribers.begin();
+                it!=stationDataNotifySubscribers.end();
+                it++){
+            if(it->second->removeThisSubscriber(durationInSeconds)){
+                subList.push_back(it->second->subscriberid());
+            }
+        }
+
+        for(std::list<KvDataSubscriberPtr>::iterator
+                it=allStationsDataSubscribers.begin();
+                it!=allStationsDataSubscribers.end();
+                it++){
+            if((*it)->removeThisSubscriber(durationInSeconds)){
+                subList.push_back((*it)->subscriberid());
+            }
+        }
+
+        for(std::multimap<long, KvDataSubscriberPtr>::iterator
+                it=stationDataSubscribers.begin();
+                it!=stationDataSubscribers.end();
+                it++){
+            if(it->second->removeThisSubscriber(durationInSeconds)){
+                subList.push_back(it->second->subscriberid());
+            }
+        }
+
+    for(std::list<std::string>::iterator it=subList.begin();
+            it!=subList.end();
+            it++){
+        doRemoveSubscriber(*it);
     }
-    
-    
-    for(std::multimap<long, KvDataNotifySubscriberPtr>::iterator 
-	  it=stationDataNotifySubscribers.begin();
-	it!=stationDataNotifySubscribers.end();
-	it++){
-      if(it->second->removeThisSubscriber(durationInSeconds)){
-	subList.push_back(it->second->subscriberid());
-      }
-    }
-    
-    for(std::list<KvDataSubscriberPtr>::iterator 
-	  it=allStationsDataSubscribers.begin();
-	it!=allStationsDataSubscribers.end();
-	it++){
-      if((*it)->removeThisSubscriber(durationInSeconds)){
-	subList.push_back((*it)->subscriberid());
-      }
-    }
-  
-    for(std::multimap<long, KvDataSubscriberPtr>::iterator 
-	  it=stationDataSubscribers.begin();
-	it!=stationDataSubscribers.end();
-	it++){
-      if(it->second->removeThisSubscriber(durationInSeconds)){
-	subList.push_back(it->second->subscriberid());
-      }
-    }
-  }
-  
-  for(std::list<std::string>::iterator it=subList.begin();
-      it!=subList.end();
-      it++){
-    removeSubscriber(*it);
-  }
 }
 
 
 void 
-KvSubscriberCollection::forAllDataNotifySubscribers(
-			   DataNotifySubscriberFuncBase &obj,
-			   long                         stationid
-			   )
+KvSubscriberCollection::
+forAllDataNotifySubscribers(
+        DataNotifySubscriberFuncBase &obj,
+        long                         stationid
+)
 {
-  list<KvDataNotifySubscriberPtr>::iterator it;
-  
-  boost::mutex::scoped_lock lock(mutex);
+    list<KvDataNotifySubscriberPtr>::iterator it;
 
-  it=allStationsDataNotifySubscribers.begin(); 
+    boost::mutex::scoped_lock lock(mutex);
+    readAllSubscribersFromDb();
 
-  for(;it!=allStationsDataNotifySubscribers.end(); it++){
-    obj.func(*it);
-  }
+    it=allStationsDataNotifySubscribers.begin();
 
-  multimap<long, KvDataNotifySubscriberPtr>::iterator itu, itl;
-   
-  itu=stationDataNotifySubscribers.lower_bound(stationid);
+    for(;it!=allStationsDataNotifySubscribers.end(); it++){
+        obj.func(*it);
+    }
 
-  if(itu!=stationDataNotifySubscribers.end()){
-     itl=stationDataNotifySubscribers.upper_bound(stationid);
-     
-     for(;itu!=itl; itu++){
-       obj.func(itu->second);
-     }
-  }
+    multimap<long, KvDataNotifySubscriberPtr>::iterator itu, itl;
+
+    itu=stationDataNotifySubscribers.lower_bound(stationid);
+
+    if(itu!=stationDataNotifySubscribers.end()){
+        itl=stationDataNotifySubscribers.upper_bound(stationid);
+
+        for(;itu!=itl; itu++){
+            obj.func(itu->second);
+        }
+    }
 }
 
 
@@ -428,193 +539,224 @@ KvSubscriberCollection::forAllDataNotifySubscribers(
 
 
 bool 
-KvSubscriberCollection::addDataSubscriber(KvDataSubscriberPtr p)
+KvSubscriberCollection::
+addDataSubscriber(KvDataSubscriberPtr p)
 {
-  boost::mutex::scoped_lock lock(mutex);
-  
-  if(!createSubscriberid(p, "data"))
-    return false;
+    //This method is called from kvServiceImpl only.
+    //We release the database connection before
+    //we return.
+    boost::mutex::scoped_lock lock(mutex);
 
-  allStationsDataSubscribers.push_back(p);
+    readAllSubscribersFromDb();
 
-  writeSubscriberFile(p->subscriberid());
-  return true;
-
-}
-
-
-bool 
-KvSubscriberCollection::addDataSubscriber(KvDataSubscriberPtr p, 
-					  long stationid)
-{
-  boost::mutex::scoped_lock lock(mutex);
-
-  multimap<long, KvDataSubscriberPtr>::iterator itu, itl;
-  bool subscriberidCreated=false;
-
-  if(p->subscriberid().empty()){
     if(!createSubscriberid(p, "data"))
-      return false;
+        return false;
 
-    subscriberidCreated=true;
-  }
+    allStationsDataSubscribers.push_back(p);
 
-  try{
-      stationDataSubscribers.insert(make_pair(stationid, p));
-  }
-  catch(...){
-    if(subscriberidCreated)
-      removeSubscriberid(p);
-    
-    return false;
-   }
+    writeSubscriberFromDb(p->subscriberid());
+    releaseThisThreadsDbConnection();
+    return true;
 
-  writeSubscriberFile(p->subscriberid());
-   return true;
+}
+
+
+bool 
+KvSubscriberCollection::
+addDataSubscriber(KvDataSubscriberPtr p, long stationid)
+{
+    //This method is called from kvServiceImpl only.
+    //We release the database connection before
+    //we return.
+    boost::mutex::scoped_lock lock(mutex);
+
+    readAllSubscribersFromDb();
+
+    multimap<long, KvDataSubscriberPtr>::iterator itu, itl;
+    bool subscriberidCreated=false;
+
+    if(p->subscriberid().empty()){
+        if(!createSubscriberid(p, "data"))
+            return false;
+
+        subscriberidCreated=true;
+    }
+
+    try{
+        stationDataSubscribers.insert(make_pair(stationid, p));
+    }
+    catch(...){
+        if(subscriberidCreated)
+            removeSubscriberid(p);
+
+        return false;
+    }
+
+    writeSubscriberFromDb(p->subscriberid());
+    releaseThisThreadsDbConnection();
+    return true;
 }
 
 bool  
-KvSubscriberCollection::addKvHintSubscriber(KvHintSubscriberPtr sub )
+KvSubscriberCollection::
+addKvHintSubscriber(KvHintSubscriberPtr sub )
 {
+    //This method is called from kvServiceImpl only.
+    //We release the database connection before
+    //we return.
     using namespace CKvalObs::CService;
 
+    boost::mutex::scoped_lock lock( mutex );
+    readAllSubscribersFromDb();
+
     if(!createSubscriberid(sub, "kvHint"))
-	return false;
-    
+        return false;
+
+
     hintSubscriberList.push_back(sub);
-    writeSubscriberFile(sub->subscriberid());
+    writeSubscriberFromDb(sub->subscriberid());
+    releaseThisThreadsDbConnection();
 
     return true;
 }
 
 
-  
+
 void 
-KvSubscriberCollection::sendKvHintUp()
+KvSubscriberCollection::
+sendKvHintUp()
 {
     using namespace CKvalObs::CService;
 
     std::list<KvHintSubscriberPtr>::iterator it;
     kvHintSubscriber_var sub;
+
+    boost::mutex::scoped_lock lock( mutex );
+
+    readAllSubscribersFromDb();
+
     it=hintSubscriberList.begin();
-    
+
     while(it!=hintSubscriberList.end()){
-	try{
-	    sub=(*it)->subscriber();
-	    sub->kvUp();
-	    it++;
-	}
-	catch(...){
-	  std::list<KvHintSubscriberPtr>::iterator itTmp=it;
-	  it++;
-	  LOGINFO("SUBSCRIBER NOT LISTNING: Deletes the subscriber <" 
-		  << (*itTmp)->subscriberid() << "> from the list of\n" <<
-		  "kvHint subscribers.");
-	  removeSubscriber((*itTmp)->subscriberid());
-	}
+        try{
+            sub=(*it)->subscriber();
+            sub->kvUp();
+            it++;
+        }
+        catch(...){
+            std::list<KvHintSubscriberPtr>::iterator itTmp=it;
+            it++;
+            LOGINFO("SUBSCRIBER NOT LISTNING: Deletes the subscriber <"
+                    << (*itTmp)->subscriberid() << "> from the list of\n" <<
+                    "kvHint subscribers.");
+            doRemoveSubscriber((*itTmp)->subscriberid());
+        }
     }
 }
 
 void 
-KvSubscriberCollection::sendKvHintDown()
+KvSubscriberCollection::
+sendKvHintDown()
 {
     using namespace CKvalObs::CService; 
     kvHintSubscriber_var sub;
     std::list<KvHintSubscriberPtr>::iterator it;
-    
+    boost::mutex::scoped_lock lock( mutex );
+
+    readAllSubscribersFromDb();
+
     it=hintSubscriberList.begin();
-    
+
     for(;it!=hintSubscriberList.end(); it++){
-	try{
-	    sub=(*it)->subscriber();
-	    sub->kvDown();
-	}
-	catch(...){
-	  LOGINFO("SUBSCRIBER NOT LISTNING: Deletes the subscriber <" 
-		  << (*it)->subscriberid() << "> from the list of\n" <<
-		  "kvHint subscribers.");
-	  removeSubscriber((*it)->subscriberid());
-	}
+        try{
+            sub=(*it)->subscriber();
+            sub->kvDown();
+        }
+        catch(...){
+            LOGINFO("SUBSCRIBER NOT LISTNING: Deletes the subscriber <"
+                    << (*it)->subscriberid() << "> from the list of\n" <<
+                    "kvHint subscribers.");
+            doRemoveSubscriber((*it)->subscriberid());
+        }
     }
 
 }
-  
+
 
 void 
-KvSubscriberCollection::forAllDataSubscribers(DataSubscriberFuncBase &obj, 
-					      long stationid)
+KvSubscriberCollection::
+forAllDataSubscribers( DataSubscriberFuncBase &obj,
+        long stationid)
 {
-  list<KvDataSubscriberPtr>::iterator it;
-  
-  boost::mutex::scoped_lock lock(mutex);
+    list<KvDataSubscriberPtr>::iterator it;
 
-  it=allStationsDataSubscribers.begin(); 
+    boost::mutex::scoped_lock lock(mutex);
 
-  for(;it!=allStationsDataSubscribers.end(); it++){
-    obj.func(*it);
-  }
+    readAllSubscribersFromDb();
 
-  multimap<long, KvDataSubscriberPtr>::iterator itu, itl;
-   
-  itl=stationDataSubscribers.lower_bound(stationid);
+    it=allStationsDataSubscribers.begin();
 
-  if(itl!=stationDataSubscribers.end()){
-     itu=stationDataSubscribers.upper_bound(stationid);
-     
-     for(;itl!=itu; itl++){
-       obj.func(itl->second);
-     }
-  }
+    for(;it!=allStationsDataSubscribers.end(); it++){
+        obj.func(*it);
+    }
+
+    multimap<long, KvDataSubscriberPtr>::iterator itu, itl;
+
+    itl=stationDataSubscribers.lower_bound(stationid);
+
+    if(itl!=stationDataSubscribers.end()){
+        itu=stationDataSubscribers.upper_bound(stationid);
+
+        for(;itl!=itu; itl++){
+            obj.func(itl->second);
+        }
+    }
 
 }
 
 
 
 bool 
-KvSubscriberCollection::hasDataSubscribers()const
+KvSubscriberCollection::
+hasDataSubscribers()
 {
-  if(allStationsDataSubscribers.empty() &&
-     stationDataSubscribers.empty())
-    return false;
+    boost::mutex::scoped_lock lock( mutex );
+    readAllSubscribersFromDb();
+    if(allStationsDataSubscribers.empty() &&
+            stationDataSubscribers.empty())
+        return false;
 
-  return true;
+    return true;
 }
+
 bool 
-KvSubscriberCollection::hasDataNotifySubscribers()const
+KvSubscriberCollection::
+hasDataNotifySubscribers()
 {
-  if(allStationsDataNotifySubscribers.empty() &&
-     stationDataNotifySubscribers.empty())
-    return false;
+    boost::mutex::scoped_lock lock( mutex );
+    readAllSubscribersFromDb();
+    if(allStationsDataNotifySubscribers.empty() &&
+            stationDataNotifySubscribers.empty())
+        return false;
 
-  return true;
+    return true;
 }
 
 
-std::ofstream*
-KvSubscriberCollection::writeFileHeader(
-    const std::string &subscriberid, 
-    const kvalobs::KvDataSubscriberInfo *si,
-    const std::string &corbaref)
+std::ostringstream*
+KvSubscriberCollection::
+writeHeader( const std::string &subscriberid,
+        const kvalobs::KvDataSubscriberInfo *si,
+        const std::string &corbaref)
 {
-    ofstream *fs;
-    string path(subPath+subscriberid+".sub");
+    ostringstream *fs;
     miTime tNow(miTime::nowTime());
 
     try{
-	fs=new ofstream();  
-	fs->open(path.c_str(), ios_base::out|ios_base::trunc); 
-	
-	if(!fs->is_open()){
-	    LOGERROR("Cant create subscriber info file <" << path << ">!");
-	    delete fs;
-	    return 0;
-	}else{
-	    LOGINFO("Writing subscriber <" << subscriberid << "> " << endl
-		    <<"to file <" << path << ">!");
-	}
+        fs=new ostringstream();
     }catch(...){
-	LOGERROR("OUT OF MEM: cant create an instance of ofstream!");
-   	return 0;
+        LOGERROR("OUT OF MEM: cant create an instance of ofstream!");
+        return 0;
     }
 
     /*
@@ -624,312 +766,312 @@ KvSubscriberCollection::writeFileHeader(
      */
 
     (*fs) << "Last call: " 
-	  << left << setw(30) << setfill('#') << tNow.isoTime() << endl;
+          << tNow.isoTime() << endl;
 
     (*fs) << "Created: "  << tNow.isoTime() << endl
-	  << "Subid: " << subscriberid << endl
-	  << "CORBA ref: " << corbaref << endl
-	  << "StatusId: ";
+            << "Subid: " << subscriberid << endl
+            << "CORBA ref: " << corbaref << endl
+            << "StatusId: ";
 
 
     if(si){
-	switch(si->status()){
-	case CKvalObs::CService::All:        (*fs) << "All";        break;
-	case CKvalObs::CService::OnlyFailed: (*fs) << "OnlyFailed"; break;
-	case CKvalObs::CService::OnlyOk:     (*fs) << "OnlyOk";     break;
-	}
+        switch(si->status()){
+        case CKvalObs::CService::All:        (*fs) << "All";        break;
+        case CKvalObs::CService::OnlyFailed: (*fs) << "OnlyFailed"; break;
+        case CKvalObs::CService::OnlyOk:     (*fs) << "OnlyOk";     break;
+        }
     }
-    
-    
+
+
     (*fs) << endl;
     (*fs) << "QcId:";
-    
+
     if(si){
-	if(!si->qcAll()){
-	    for(int i=0; i<si->qc().length(); i++){
-		switch(si->qc()[i]){
-		case CKvalObs::CService::QC1:  (*fs) << " QC1";  break;
-		case CKvalObs::CService::QC2d: (*fs) << " QC2d"; break;
-		case CKvalObs::CService::QC2m: (*fs) << " QC2m"; break;
-		case CKvalObs::CService::HQC:  (*fs) << " HQC";  break;
-		}
-	    }
-	}
+        if(!si->qcAll()){
+            for(int i=0; i<si->qc().length(); i++){
+                switch(si->qc()[i]){
+                case CKvalObs::CService::QC1:  (*fs) << " QC1";  break;
+                case CKvalObs::CService::QC2d: (*fs) << " QC2d"; break;
+                case CKvalObs::CService::QC2m: (*fs) << " QC2m"; break;
+                case CKvalObs::CService::HQC:  (*fs) << " HQC";  break;
+                }
+            }
+        }
     }
-    
+
     (*fs) << endl;
     (*fs) << "Stations:";
-       
+
     return fs;
 }
 
-bool 
-KvSubscriberCollection::updateSubscriberFile(
-    const std::string &subscriberid,
-    const miutil::miTime &timeForLastCall
-    )
-{
-    string path(subPath+subscriberid+".sub");
-    fstream fs;
-
-    fs.open(path.c_str(), ios_base::out|ios_base::in); 
-
-    if(!fs.is_open()){
-	LOGERROR("Can't open file: <" << path <<">");
-	return false;
-    }
- 
-    /*
-     * OBS, OBS, OBS, OBS, OBS
-     * The 'Last Call: ' line must match the 'Last Call: ' line in the function
-     * writeFileHeader. 
-     */
-    fs << "Last call: " 
-	<< left << setw(30) << setfill('#') << timeForLastCall.isoTime() 
-	<< endl;
-
-    fs.close();
-
-    return true;
-}
+//bool
+//KvSubscriberCollection::
+//updateSubscriberFile(
+//        const std::string &subscriberid,
+//        const miutil::miTime &timeForLastCall
+//)
+//{
+//
+//    dnmi::db::Connection *con = getDbConnection();
+//
+//    if( ! con ) {
+//        LOGERROR("KvSubscriberCollection: No db connection. Cant read subscribers from the database.");
+//        return false;
+//    }
+//
+//    //Update lastCall for a subscriber stored in the KeyVal table in the database.
+//    KeyValSubscriberTransaction tran( subscriberid, timeForLastCall );
+//
+//    try {
+//        con->perform( tran );
+//        if( ! tran.isOk() ) {
+//            LOGERROR("KvSubscriberCollection: Update last call for subscriber <" << subscriberid <<"> FAILED."
+//                    << endl << "Reason: " << tran.getMsg() );
+//            return false;
+//        } else {
+//                LOGDEBUG("KvSubscriberCollection: Updated last call for subscriber <" << subscriberid <<"> to " << timeForLastCall.isoTime() << "."
+//                        << endl << "Msg: " << tran.getMsg() );
+//        }
+//    }
+//    catch( const std::exception &ex ) {
+//        LOGERROR("KvSubscriberCollection: Read all from subscribers from the database FAILED."
+//                << endl << "Reason: (exception)" << ex.what() << endl
+//                << tran.getMsg() );
+//        return false;
+//    }
+//
+//    return true;
+//}
 
 
 void
-KvSubscriberCollection::readAllSubscribersFromFile()
+KvSubscriberCollection::
+readAllSubscribersFromDb()
 {
-    dnmi::file::Dir dir;
-    string          file;
-    
+    if( ! isInitialized ) {
+        dnmi::db::Connection *con = getDbConnection();
 
-    if(!dir.open(subPath,"*.sub")){
-      LOGERROR("DIR OPEN ERROR: Cant open directory <" << subPath << ">. " << dir.getErr());
-      return;
-    }
+        LOGDEBUG("@@@@@@ readAllSubscribersFromDb 1 ");
 
-    try{
-      while(dir.hasNext()){
-	file=dir.next();
-	
-	//I dont check the return value from readSubscriberFromFile
- 	//because the errors are reported in the function. And it doesn't
-	//matter for the controll flow here.
-	readSubscriberFile(subPath+file);
-      }
-    }
-    catch(dnmi::file::DirException &ex) {
-      LOGERROR("SUBSCRIBER READ DIR ERROR: cant read the subscribers in the\n"
-	       << "directory <" << subPath << ">. " << ex.what());
-    }
-    catch(...){
-      LOGERROR("UNEXPECTED EXCEPTION: While reading the subscribers in the\n"
-	       << "directory <" << subPath << ">");
+        if( ! con ) {
+            LOGERROR("KvSubscriberCollection: No db connection. Cant read subscribers from the database.");
+            return;
+        }
+
+        LOGDEBUG("@@@@@@ readAllSubscribersFromDb 2 ");
+        //Get all subscribers stored in the KeyVal table in the database.
+        KeyValSubscriberTransaction tran("", KeyValSubscriberTransaction::GET_SUBSCRIBER );
+
+        try {
+            con->perform( tran );
+            if( ! tran.isOk() ) {
+                LOGERROR("KvSubscriberCollection: Read all from subscribers from the database FAILED."
+                        << endl << "Reason: " << tran.getMsg() );
+                return;
+            } else {
+                LOGDEBUG("KvSubscriberCollection: Read all from subscribers from the database OK."
+                        << endl << "Msg: " << tran.getMsg() );
+            }
+        }
+        catch( const std::exception &ex ) {
+            LOGERROR("KvSubscriberCollection: Read all from subscribers from the database FAILED."
+                    << endl << "Reason: (exception)" << ex.what() << endl
+                    << tran.getMsg() );
+            return;
+        }
+
+        list<kvKeyVal> allSubscribers = tran.getKeyVals();
+
+        for( list<kvKeyVal>::iterator it = allSubscribers.begin();
+                it != allSubscribers.end(); ++it ) {
+
+            //I dont check the return value from readSubscriberFromFile
+            //because the errors are reported in the function. And it doesn't
+            //matter for the controll flow here.
+            readSubscriberFromDb(it->key(), it->val() );
+        }
+        isInitialized = true;
     }
 }
 
 
 bool 
-KvSubscriberCollection::readSubscriberFile(const std::string &fname)
+KvSubscriberCollection::
+readSubscriberFromDb(
+        const std::string &subscriberid,
+        const std::string &content
+)
 {
-    miString::size_type i;
-    miString  buf;
-    miString key;
-    miString val;
-    ifstream fs;
+    std::string::size_type i;
+    std::string  buf;
+    std::string key;
+    std::string val;
+    istringstream fs( content );
     miTime   lastCall;
     miTime   created;
-    miString subid;
-    miString cref;
-    miString statusid;
-    vector<miutil::miString> qcIdList;
-    vector<miutil::miString> stationList;
+    std::string subid;
+    std::string cref;
+    std::string statusid;
+    vector<std::string> qcIdList;
+    vector<std::string> stationList;
     bool hasStationKey=false;
     bool allStations=false;
     bool hasQcIdKey=false;
-    string prefix("kvalobs_service_");
     string subtype;   //Subscriber type 
     bool   res;
 
-    fs.open(fname.c_str(), ios_base::in);
-
-    if(!fs.is_open()){
-	LOGERROR("OPEN ERROR: readSubscriberFile <" << fname << ">!");
-	return false;
-    }
-
     while(!fs.eof()){
-	if(!fs.good())
-	    break;
+        if(!getline(fs, buf))
+            continue;
 
-	if(!getline(fs, buf))
-	  continue;
-	
-	buf.trim();
+        boost::trim(buf);
 
-	if(buf.empty())
-	  continue;
+        if(buf.empty())
+            continue;
 
-	i=buf.find(":");
-	
-	if(i==string::npos){
-	    LOGERROR("FORMAT ERROR: readSubscriberFile <" 
-		     << fname << "> failed!");
-	    fs.close();
-	    return false;
-	}
-	
-	key=buf.substr(0, i);
-	val=buf.substr(i+1);
-	
-	val.trim();
-	
-	if(key.find("Last call")!=string::npos){
-	    lastCall=miTime(val);
-	}else if(key.find("Created")!=string::npos){
-	    created=miTime(val);
-	}else if(key.find("Subid")!=string::npos){
-	    subid=val;
-	}else if(key.find("CORBA ref")!=string::npos){
-	    cref=val;
-	}else if(key.find("StatusId")!=string::npos){
-	    statusid=val;
-	}else if(key.find("QcId")!=string::npos){
-	    hasQcIdKey=true;
-	    qcIdList=val.split();
-	}else if(key.find("Stations")!=string::npos){
-	    hasStationKey=true;
+        i=buf.find(":");
 
-	    if(val.empty()){
-		//Threat as "None"
-		allStations=false;
-	    }else if(val.find("All")){
-		allStations=true;
-	    }else if(val.find("None")){
-		allStations=false;
-	    }else{
-		allStations=false;
-		stationList=val.split();
-	    }
-	}else{
-	    LOGWARN("Uknown key <" << key << ">: readSubscriberFile <" 
-		    << fname << ">!");  
-	}
+        if(i==string::npos){
+            LOGERROR("FORMAT ERROR: readSubscriber <"
+                    << subscriberid << "> failed!");
+            return false;
+        }
+
+        key=buf.substr(0, i);
+        val=buf.substr(i+1);
+
+        boost::trim(val);
+
+        if(key.find("Last call")!=string::npos){
+            lastCall=miTime(val);
+        }else if(key.find("Created")!=string::npos){
+            created=miTime(val);
+        }else if(key.find("Subid")!=string::npos){
+            subid=val;
+        }else if(key.find("CORBA ref")!=string::npos){
+            cref=val;
+        }else if(key.find("StatusId")!=string::npos){
+            statusid=val;
+        }else if(key.find("QcId")!=string::npos){
+            hasQcIdKey=true;
+            boost::split(qcIdList, val, boost::algorithm::is_space(), boost::algorithm::token_compress_on);
+        }else if(key.find("Stations")!=string::npos){
+            hasStationKey=true;
+
+            if(val.empty()){
+                //Threat as "None"
+                allStations=false;
+            }else if(val.find("All")){
+                allStations=true;
+            }else if(val.find("None")){
+                allStations=false;
+            }else{
+                allStations=false;
+                boost::split(stationList, val, boost::algorithm::is_space(), boost::algorithm::token_compress_on);
+            }
+        }else{
+            LOGWARN("Uknown key <" << key << ">: readSubscriber <"
+                    << subscriberid << ">!");
+        }
 
 
     }
-  
-    if(!fs.eof()){
-	LOGERROR("IO Error: readSubscriberFile <" << fname << "> failed!");
-	fs.close();
-	return false;
-    }
-    
-    fs.close();
 
     if(subid.empty() || cref.empty()){
-	LOGERROR("Format error: readSubscriberFile <" << fname << "> "
-		 << "missing key <Subid> or <CORBA ref>!");
-	return false;
+        LOGERROR("Format error: readSubscriber <" << subscriberid << "> "
+                << "missing key <Subid> or <CORBA ref>!");
+        return false;
     }
 
 
-
-    i=subid.find(prefix);
+    i=subid.find("_");
 
     if(i==string::npos){
-	LOGERROR("Inavlid subscriberid [missing prefix]: subid <" << subid <<
-		 ">,  readSubscriberFile <" << fname << ">!");
-	return false;
+        LOGERROR("Ivalid subscriberid [missing subscriber type]: " << subid <<
+                ">,  readSubscriber <" << subscriberid << ">!");
+        return false;
     }
 
-    i=subid.find("_", prefix.length());
+    subtype=subid.substr(0, i);
 
-    if(i==string::npos){
-	LOGERROR("Inavlid subscriberid [missing subscriber type]: " << subid <<
-		 ">,  readSubscriberFile <" << fname << ">!");
-	return false;
-    }
-    
-    subtype=subid.substr(prefix.length(), i-prefix.length());
-    
+    boost::trim( subtype );
+
     if(subtype=="datanotify"){
-	if(!hasStationKey){
-	    LOGERROR("Missing key <Stations> for datanotify subscriber: " <<
-		     "readSubscriberFile <" << fname << ">!");
-	    return false;
-	}
+        if(!hasStationKey){
+            LOGERROR("Missing key <Stations> for datanotify subscriber: " <<
+                    "readSubscriber <" << subid << ">!");
+            return false;
+        }
 
-	res=addDataNotifyFromFileFile(subid,
-				      cref, 
-				      statusid, 
-				      qcIdList, 
-				      stationList);
-	  
+        res=addDataNotifyFromDb(subid,
+                cref,
+                statusid,
+                qcIdList,
+                stationList);
+
     }else if(subtype=="data"){
-	if(!hasStationKey){
-	    LOGERROR("Missing key <Stations> for data subscriber: " <<
-		     "readSubscriberFile <" << fname << ">!");
-	    return false;
-	}
+        if(!hasStationKey){
+            LOGERROR("Missing key <Stations> for data subscriber: " <<
+                    "readSubscriber <" << subid << ">!");
+            return false;
+        }
 
-	res=addDataFromFile(subid,
-			       cref, 
-			       statusid, 
-			       qcIdList, 
-			       stationList);
+        res=addDataFromDb(subid,
+                cref,
+                statusid,
+                qcIdList,
+                stationList);
     }else if(subtype=="kvHint"){
-	res=addKvHintFromFile(subid, cref);
+        res=addKvHintFromDb(subid, cref);
     }else{
-	LOGERROR("Unknown subscriber type: " << subtype << 
-		 "\nsubscriberid:          " << subid   << 
-		 "\nreadSubscriberFile:    " << fname      );
-	return false;
+        LOGERROR("Unknown subscriber type: " << subtype <<
+                "\nsubscriberid:          " << subid   <<
+                "\nreadSubscriber:    " << subscriberid      );
+        return false;
     }
 
     if(res){
-      LOGINFO("Added subscriber <" << subtype 
-	      << "> from file <" << fname << ">!");
-      return true;
+        LOGINFO("Added subscriber <" << subtype
+                << ">  id <" << subid << ">!");
+        return true;
     }else{
-      LOGERROR("Could not add subscriber <" << subtype 
-	      << "> from file <" << fname << ">!");
-      return false;
+        LOGERROR("Could not add subscriber <" << subtype
+                << "> id <" << subid << ">!");
+        return false;
     }
-
- }
+}
 
 bool 
-KvSubscriberCollection::writeSubscriberFile(const std::string &subid)
+KvSubscriberCollection::
+writeSubscriberFromDb(const std::string &subid)
 {
-    string prefix("kvalobs_service_");
+
     string::size_type i;
     string subtype;   //Subscriber type 
 
-    i=subid.find(prefix);
+
+    i=subid.find( "_" );
 
     if(i==string::npos){
-	LOGERROR("Inavlid subscriberid [missing prefix]: " << subid );
-	return false;
+        LOGERROR("Inavlid subscriberid [missing subscriber type]: " << subid );
+        return false;
     }
 
-    i=subid.find("_", prefix.length());
+    subtype=subid.substr( 0, i );
 
-    if(i==string::npos){
-	LOGERROR("Inavlid subscriberid [missing subscriber type]: " << subid );
-	return false;
-    }
-    
-    subtype=subid.substr(prefix.length(), i-prefix.length());
+    boost::trim( subtype );
 
     if(subtype=="datanotify"){
-	return writeDataNotifyFile(subid);
+        return writeDataNotifyToDb(subid);
     }else if(subtype=="data"){
-	return writeDataFile(subid);
+        return writeDataToDb(subid);
     }else if(subtype=="kvHint"){
-	return writeKvHintFile(subid);
+        return writeKvHintToDb(subid);
     }else{
-	LOGERROR("Unknown subscriber type: " << subtype << 
-		 " [subscriberid: " << subid << "]");
-	return false;
+        LOGERROR("Unknown subscriber type: " << subtype <<
+                " [subscriberid: " << subid << "]");
+        return false;
     }
 
     //Not reached!!!!!!
@@ -937,326 +1079,329 @@ KvSubscriberCollection::writeSubscriberFile(const std::string &subid)
 }
 
 bool
-KvSubscriberCollection::writeDataNotifyFile(const std::string &subid)
+KvSubscriberCollection::
+writeDataNotifyToDb(const std::string &subid)
 {
     CorbaHelper::CorbaApp *cApp=CorbaHelper::CorbaApp::getCorbaApp();
     CKvalObs::CService::kvDataNotifySubscriber_var subscriber;
-    ofstream *fs=0;
+    ostringstream *fs=0;
     std::list<KvDataNotifySubscriberPtr>::iterator itAllStations;
     std::multimap<long, KvDataNotifySubscriberPtr>::iterator it; 
     string  corbaRef;
     kvalobs::KvDataSubscriberInfo info;
 
     if(!cApp){
-	LOGFATAL("Cant obtain a referance to CorbaHelper::CorbaApp.");
-	return false;
+        LOGFATAL("Cant obtain a referance to CorbaHelper::CorbaApp.");
+        return false;
     }
 
     for(itAllStations=allStationsDataNotifySubscribers.begin();
-	itAllStations!=allStationsDataNotifySubscribers.end();
-	itAllStations++){
+            itAllStations!=allStationsDataNotifySubscribers.end();
+            itAllStations++){
 
-	if((*itAllStations)->subscriberid()==subid)
-	    break;
+        if((*itAllStations)->subscriberid()==subid)
+            break;
     }
 
     if(itAllStations!=allStationsDataNotifySubscribers.end()){
-	subscriber=(*itAllStations)->subscriber();
-	corbaRef=cApp->corbaRef(subscriber);
-	info=(*itAllStations)->subscriberInfo();
+        subscriber=(*itAllStations)->subscriber();
+        corbaRef=cApp->corbaRef(subscriber);
+        info=(*itAllStations)->subscriberInfo();
 
-	fs=writeFileHeader(subid, &info, corbaRef);
+        fs=writeHeader(subid, &info, corbaRef);
 
-	if(fs){
-	    (*fs) << "All\n";
-	    fs->close();
-	    delete fs;
-	    return true;
-	}else
-	    return false;
+        if(fs){
+            (*fs) << "All\n";
+            updateSubscriberInDb( subid, fs->str() );
+            delete fs;
+            return true;
+        }else
+            return false;
     }
-	
+
     for(it=stationDataNotifySubscribers.begin();
-	it!=stationDataNotifySubscribers.end();
-	it++){
-	
-	if(it->second->subscriberid()==subid){
-	    if(!fs){
-		subscriber=it->second->subscriber();
-		corbaRef=cApp->corbaRef(subscriber);
-		info=it->second->subscriberInfo();
-		
-		fs=writeFileHeader(subid, &info, corbaRef);
-	
-		if(!fs)
-		    return false;
-		else
-		    (*fs) << it->first;
-	    }else{
-		(*fs) << " " << it->first;
-	    }
-	}
+            it!=stationDataNotifySubscribers.end();
+            it++){
+
+        if(it->second->subscriberid()==subid){
+            if(!fs){
+                subscriber=it->second->subscriber();
+                corbaRef=cApp->corbaRef(subscriber);
+                info=it->second->subscriberInfo();
+
+                fs=writeHeader(subid, &info, corbaRef);
+
+                if(!fs)
+                    return false;
+                else
+                    (*fs) << it->first;
+            }else{
+                (*fs) << " " << it->first;
+            }
+        }
     }
-	
+
     if(fs){
-	(*fs) << std::endl;
-	fs->close();
-	delete fs;
+        (*fs) << std::endl;
+        updateSubscriberInDb( subid, fs->str() );
+        delete fs;
     }
-	
 
     return true;
 }
 
 bool
-KvSubscriberCollection::writeDataFile(const std::string &subid)
+KvSubscriberCollection::
+writeDataToDb(const std::string &subid)
 {
-
     CorbaHelper::CorbaApp *cApp=CorbaHelper::CorbaApp::getCorbaApp();
     CKvalObs::CService::kvDataSubscriber_var subscriber;
-    ofstream *fs=0;
+    ostringstream *fs=0;
     std::list<KvDataSubscriberPtr>::iterator itAllStations;
     std::multimap<long, KvDataSubscriberPtr>::iterator it; 
     string  corbaRef;
     kvalobs::KvDataSubscriberInfo info;
 
     if(!cApp){
-	LOGFATAL("Cant obtain a referance to CorbaHelper::CorbaApp.");
-	return false;
+        LOGFATAL("Cant obtain a referance to CorbaHelper::CorbaApp.");
+        return false;
     }
 
     for(itAllStations=allStationsDataSubscribers.begin();
-	itAllStations!=allStationsDataSubscribers.end();
-	itAllStations++){
+            itAllStations!=allStationsDataSubscribers.end();
+            itAllStations++){
 
-	if((*itAllStations)->subscriberid()==subid)
-	    break;
+        if((*itAllStations)->subscriberid()==subid)
+            break;
     }
 
     if(itAllStations!=allStationsDataSubscribers.end()){
-	subscriber=(*itAllStations)->subscriber();
-	corbaRef=cApp->corbaRef(subscriber);
-	info=(*itAllStations)->subscriberInfo();
-	
-	fs=writeFileHeader(subid, &info, corbaRef);
+        subscriber=(*itAllStations)->subscriber();
+        corbaRef=cApp->corbaRef(subscriber);
+        info=(*itAllStations)->subscriberInfo();
 
-	if(fs){
-	    (*fs) << "All\n";
-	    fs->close();
-	    delete fs;
-	    return true;
-	}else
-	    return false;
+        fs=writeHeader(subid, &info, corbaRef);
+
+        if(fs){
+            (*fs) << "All\n";
+            updateSubscriberInDb( subid, fs->str() );
+            delete fs;
+            return true;
+        }else
+            return false;
     }
-	
+
     for(it=stationDataSubscribers.begin();
-	it!=stationDataSubscribers.end();
-	it++){
-	
-	if(it->second->subscriberid()==subid){
-	    if(!fs){
-		subscriber=it->second->subscriber();
-		corbaRef=cApp->corbaRef(subscriber);
-		info=it->second->subscriberInfo();
+            it!=stationDataSubscribers.end();
+            it++){
 
-		fs=writeFileHeader(subid, &info, corbaRef);
-	
-		if(!fs)
-		    return false;
-		else
-		    (*fs) << it->first;
-	    }else{
-		(*fs) << " " << it->first;
-	    }
-	}
+        if(it->second->subscriberid()==subid){
+            if(!fs){
+                subscriber=it->second->subscriber();
+                corbaRef=cApp->corbaRef(subscriber);
+                info=it->second->subscriberInfo();
+
+                fs=writeHeader(subid, &info, corbaRef);
+
+                if(!fs)
+                    return false;
+                else
+                    (*fs) << it->first;
+            }else{
+                (*fs) << " " << it->first;
+            }
+        }
     }
-	
+
     if(fs){
-	(*fs) << std::endl;
-	fs->close();
-	delete fs;
+        (*fs) << std::endl;
+        updateSubscriberInDb( subid, fs->str() );
+        delete fs;
     }
 
     return true;;
 }
 
 bool
-KvSubscriberCollection::writeKvHintFile(const std::string &subid)
+KvSubscriberCollection::
+writeKvHintToDb(const std::string &subid)
 {
     CorbaHelper::CorbaApp *cApp=CorbaHelper::CorbaApp::getCorbaApp();
     CKvalObs::CService::kvHintSubscriber_var subscriber;
     std::list<KvHintSubscriberPtr>::iterator it;
-    ofstream *fs=0;
+    ostringstream *fs=0;
     string  corbaRef;
 
     if(!cApp){
-	LOGFATAL("Cant obtain a referance to CorbaHelper::CorbaApp.");
-	return false;
+        LOGFATAL("Cant obtain a referance to CorbaHelper::CorbaApp.");
+        return false;
     }
 
     for(it=hintSubscriberList.begin();
-	it!=hintSubscriberList.end();
-	it++){
+            it!=hintSubscriberList.end();
+            it++){
 
-	if((*it)->subscriberid()==subid){
-	  subscriber=(*it)->subscriber();
-	  corbaRef=cApp->corbaRef(subscriber);
-	  fs=writeFileHeader(subid, 0, corbaRef);
-	  
-	  if(fs){
-	    (*fs) << "None\n";
-	    fs->close();
-	    delete fs;
-	    return true;
-	  }else{
-	    return false;
-	  }
-	}
+        if((*it)->subscriberid()==subid){
+            subscriber=(*it)->subscriber();
+            corbaRef=cApp->corbaRef(subscriber);
+            fs=writeHeader(subid, 0, corbaRef);
+
+            if(fs){
+                (*fs) << "None\n";
+                updateSubscriberInDb( subid, fs->str() );
+                delete fs;
+                return true;
+            }else{
+                return false;
+            }
+        }
     }   
-    
+
     return false;
 }
 
 bool 
-KvSubscriberCollection::addDataNotifyFromFileFile(
-    const miutil::miString &subid,
-    const miutil::miString &cref, 
-    const miutil::miString &statusid, 
-    const std::vector<miutil::miString> &qcIdList, 
-    const std::vector<miutil::miString> &stationList)
+KvSubscriberCollection::
+addDataNotifyFromDb(
+        const std::string &subid,
+        const std::string &cref,
+        const std::string &statusid,
+        const std::vector<std::string> &qcIdList,
+        const std::vector<std::string> &stationList)
 {
     CorbaHelper::CorbaApp *cApp=CorbaHelper::CorbaApp::getCorbaApp();
     CKvalObs::CService::kvDataNotifySubscriber_ptr cptrSub;
     CORBA::Object_var                              cptrCO;
-    std::vector<miutil::miString>::const_iterator  it;
+    std::vector<std::string>::const_iterator  it;
     KvDataNotifySubscriberPtr                      subPtr;
     KvDataNotifySubscriber                         *p;
     long                                           stationid;
     int                                            nStations=0;
 
     if(!cApp){
-	LOGFATAL("Cant obtain a referance to CorbaHelper::CorbaApp.");
-	return false;
+        LOGFATAL("Cant obtain a referance to CorbaHelper::CorbaApp.");
+        return false;
     }
-	
+
     cptrCO=cApp->corbaRef(cref);
 
     if(CORBA::is_nil(cptrCO)){
-	LOGERROR("CORBA: null refernce!");
-	return false;
+        LOGERROR("CORBA: null refernce!");
+        return false;
     }
 
     try{
-	cptrSub=CKvalObs::CService::kvDataNotifySubscriber::_narrow(cptrCO);
-	
-	if(CORBA::is_nil(cptrSub)){
-	    LOGERROR("CORBA: null refernce! Wrong type.");
-	    CORBA::release(cptrSub);
-	    return false;
-	}
+        cptrSub=CKvalObs::CService::kvDataNotifySubscriber::_narrow(cptrCO);
+
+        if(CORBA::is_nil(cptrSub)){
+            LOGERROR("CORBA: null refernce! Wrong type.");
+            CORBA::release(cptrSub);
+            return false;
+        }
     }
     catch(...){
-	LOGERROR("EXCEPTION: CORBA: null refernce! Wrong type.");
-	return false;
+        LOGERROR("EXCEPTION: CORBA: null refernce! Wrong type.");
+        return false;
     }
-    
+
 
     kvalobs::KvDataSubscriberInfo info=createKvDataInfo(statusid, qcIdList);
-    
+
 
     try{
-	p=new KvDataNotifySubscriber(info, cptrSub);
-	subPtr.reset(p);
+        p=new KvDataNotifySubscriber(info, cptrSub);
+        subPtr.reset(p);
     }
     catch(...){
-	CORBA::release(cptrSub);
-	LOGERROR("OUT OF MEMMORY: KvSubscriberCollection::addDataNotifyFromFileFile!"); 
-	return false;
+        CORBA::release(cptrSub);
+        LOGERROR("OUT OF MEMMORY: KvSubscriberCollection::addDataNotifyFromFileFile!");
+        return false;
     }
 
     subPtr->subscriberid(static_cast<std::string>(subid));
 
     if(stationList.empty()){
-	allStationsDataNotifySubscribers.push_back(subPtr);
-	subscribers_.insert(subPtr);
-	return true;
+        allStationsDataNotifySubscribers.push_back(subPtr);
+        subscribers_.insert(subPtr);
+        return true;
     }
 
     for(it=stationList.begin();
-	it!=stationList.end();
-	it++){
-	
-	try{
-	    stationid=boost::lexical_cast<long>(*it);
-	}
-	catch(boost::bad_lexical_cast &ex){
-	    LOGERROR("NOT A NUMBER: " << *it);
-	    continue;
-	}
-	catch(...){
-	    LOGERROR("UNKNOWN Exception: trying stationid=boost::numeric_cast<long>(*it)!");
-	    continue;
-	}
+            it!=stationList.end();
+            it++){
 
-	try{
-	    stationDataNotifySubscribers.insert(make_pair(stationid, subPtr));
-	    nStations++;
-	}
-	catch(...){
-	  LOGWARN("OUT OF MEMMORY: cant add datanotify subscriber!");
-	}
+        try{
+            stationid=boost::lexical_cast<long>(*it);
+        }
+        catch(boost::bad_lexical_cast &ex){
+            LOGERROR("NOT A NUMBER: " << *it);
+            continue;
+        }
+        catch(...){
+            LOGERROR("UNKNOWN Exception: trying stationid=boost::numeric_cast<long>(*it)!");
+            continue;
+        }
+
+        try{
+            stationDataNotifySubscribers.insert(make_pair(stationid, subPtr));
+            nStations++;
+        }
+        catch(...){
+            LOGWARN("OUT OF MEMMORY: cant add datanotify subscriber!");
+        }
     }
-    
+
     if(nStations>0){
-      subscribers_.insert(subPtr);
-      return true;
+        subscribers_.insert(subPtr);
+        return true;
     }
 
     return false;
 }
 
 kvalobs::KvDataSubscriberInfo
-KvSubscriberCollection::createKvDataInfo(
-    const miutil::miString              &statusid,
-    const std::vector<miutil::miString> &qcIdList)
+KvSubscriberCollection::
+createKvDataInfo(
+        const std::string              &statusid,
+        const std::vector<std::string> &qcIdList)
 {
     CKvalObs::CService::QcIdList                   qcList;
     CKvalObs::CService::StatusId                   sid;
-    std::vector<miutil::miString>::const_iterator  it;
+    std::vector<std::string>::const_iterator  it;
     CKvalObs::CService::QcId                       qcId;
 
     if(statusid=="All")
-	sid=CKvalObs::CService::All;
+        sid=CKvalObs::CService::All;
     else if(statusid=="OnlyFailed")
-	sid=CKvalObs::CService::OnlyFailed;
+        sid=CKvalObs::CService::OnlyFailed;
     else if(statusid=="OnlyOk")
-	sid=CKvalObs::CService::OnlyOk;
+        sid=CKvalObs::CService::OnlyOk;
     else{
-	LOGERROR("UNKOWNN CKvalObs::CService::StatusId: <" << statusid
-		 << ">!");
-	sid=CKvalObs::CService::All;
+        LOGERROR("UNKOWNN CKvalObs::CService::StatusId: <" << statusid
+                << ">!");
+        sid=CKvalObs::CService::All;
     }
-    
+
     it=qcIdList.begin();
-    
+
     for(CORBA::Long i=0;
-	it!=qcIdList.end();
-	it++, i++){
-	
-	if(*it=="QC1")
-	    qcId=CKvalObs::CService::QC1;
-	else if(*it=="QC2d")
-	    qcId=CKvalObs::CService::QC2d;
-	else if(*it=="QC2m")
-	    qcId=CKvalObs::CService::QC2m;
-	else if(*it=="HQC")
-	    qcId=CKvalObs::CService::HQC;
-	else{
-	    LOGERROR("UNKNOWN CKvalObs::CService::qcId: < " << *it << ">!");
-	    continue;
-	}
-	qcList.length(i+1);
-	qcList[i]=qcId;
+            it!=qcIdList.end();
+            it++, i++){
+
+        if(*it=="QC1")
+            qcId=CKvalObs::CService::QC1;
+        else if(*it=="QC2d")
+            qcId=CKvalObs::CService::QC2d;
+        else if(*it=="QC2m")
+            qcId=CKvalObs::CService::QC2m;
+        else if(*it=="HQC")
+            qcId=CKvalObs::CService::HQC;
+        else{
+            LOGERROR("UNKNOWN CKvalObs::CService::qcId: < " << *it << ">!");
+            continue;
+        }
+        qcList.length(i+1);
+        qcList[i]=qcId;
     }
 
     return kvalobs::KvDataSubscriberInfo(sid, qcList);
@@ -1265,148 +1410,150 @@ KvSubscriberCollection::createKvDataInfo(
 
 
 bool 
-KvSubscriberCollection::addDataFromFile(
-    const miutil::miString              &subid,
-    const miutil::miString              &cref, 
-    const miutil::miString              &statusid, 
-    const std::vector<miutil::miString> &qcIdList, 
-    const std::vector<miutil::miString> &stationList)
+KvSubscriberCollection::
+addDataFromDb(
+        const std::string              &subid,
+        const std::string              &cref,
+        const std::string              &statusid,
+        const std::vector<std::string> &qcIdList,
+        const std::vector<std::string> &stationList)
 {
     CorbaHelper::CorbaApp *cApp=CorbaHelper::CorbaApp::getCorbaApp();
     CKvalObs::CService::kvDataSubscriber_ptr       cptrSub;
     CORBA::Object_var                              cptrCO;
-    std::vector<miutil::miString>::const_iterator  it;
+    std::vector<std::string>::const_iterator  it;
     KvDataSubscriberPtr                            subPtr;
     KvDataSubscriber                               *p;
     long                                           stationid;
     int                                            nStations=0;
 
     if(!cApp){
-	LOGFATAL("Cant obtain a referance to CorbaHelper::CorbaApp.");
-	return false;
+        LOGFATAL("Cant obtain a referance to CorbaHelper::CorbaApp.");
+        return false;
     }
-	
+
     cptrCO=cApp->corbaRef(cref);
 
     if(CORBA::is_nil(cptrCO)){
-	LOGERROR("CORBA: null refernce!");
-	return false;
+        LOGERROR("CORBA: null refernce!");
+        return false;
     }
 
     try{
-	cptrSub=CKvalObs::CService::kvDataSubscriber::_narrow(cptrCO);
-	
-	if(CORBA::is_nil(cptrSub)){
-	    LOGERROR("CORBA: null refernce! Wrong type.");
-	    CORBA::release(cptrSub);
-	    return false;
-	}
+        cptrSub=CKvalObs::CService::kvDataSubscriber::_narrow(cptrCO);
+
+        if(CORBA::is_nil(cptrSub)){
+            LOGERROR("CORBA: null refernce! Wrong type.");
+            CORBA::release(cptrSub);
+            return false;
+        }
     }
     catch(...){
-	LOGERROR("EXCEPTION: CORBA: null refernce! Wrong type.");
-	return false;
+        LOGERROR("EXCEPTION: CORBA: null refernce! Wrong type.");
+        return false;
     }
-    
+
 
     kvalobs::KvDataSubscriberInfo info=createKvDataInfo(statusid, qcIdList);
-    
+
 
     try{
-	p=new KvDataSubscriber(info, cptrSub);
-	subPtr.reset(p);
+        p=new KvDataSubscriber(info, cptrSub);
+        subPtr.reset(p);
     }
     catch(...){
-	CORBA::release(cptrSub);
-	LOGERROR("OUT OF MEMMORY: KvSubscriberCollection::addDataFromFileFile!"); 
-	return false;
+        CORBA::release(cptrSub);
+        LOGERROR("OUT OF MEMMORY: KvSubscriberCollection::addDataFromFileFile!");
+        return false;
     }
 
     subPtr->subscriberid(static_cast<std::string>(subid));
 
     if(stationList.empty()){
-	allStationsDataSubscribers.push_back(subPtr);
-	subscribers_.insert(subPtr);
-	return true;
+        allStationsDataSubscribers.push_back(subPtr);
+        subscribers_.insert(subPtr);
+        return true;
     }
 
     for(it=stationList.begin();
-	it!=stationList.end();
-	it++){
-	
-	try{
-	    stationid=boost::lexical_cast<long>(*it);
-	}
-	catch(boost::bad_lexical_cast &ex){
-	    LOGERROR("NOT A NUMBER: " << *it);
-	    continue;
-	}
-	catch(...){
-	    LOGERROR("UNKNOWN Exception: trying stationid=boost::numeric_cast<long>(*it)!");
-	    continue;
-	}
+            it!=stationList.end();
+            it++){
 
-	try{
-	    stationDataSubscribers.insert(make_pair(stationid, subPtr));
-	    nStations++;
-	}
-	catch(...){
-	  LOGWARN("OUT OF MEMMORY: cant add data subscriber!");
-	}
+        try{
+            stationid=boost::lexical_cast<long>(*it);
+        }
+        catch(boost::bad_lexical_cast &ex){
+            LOGERROR("NOT A NUMBER: " << *it);
+            continue;
+        }
+        catch(...){
+            LOGERROR("UNKNOWN Exception: trying stationid=boost::numeric_cast<long>(*it)!");
+            continue;
+        }
+
+        try{
+            stationDataSubscribers.insert(make_pair(stationid, subPtr));
+            nStations++;
+        }
+        catch(...){
+            LOGWARN("OUT OF MEMMORY: cant add data subscriber!");
+        }
     }
-    
+
     if(nStations>0){
-      subscribers_.insert(subPtr);
-      return true;
+        subscribers_.insert(subPtr);
+        return true;
     }
 
     return false;
 }
 
 bool 
-KvSubscriberCollection::addKvHintFromFile(const miutil::miString &subid, 
-			 const miutil::miString &cref)
+KvSubscriberCollection::
+addKvHintFromDb(const std::string &subid,
+        const std::string &cref)
 {
     CorbaHelper::CorbaApp *cApp=CorbaHelper::CorbaApp::getCorbaApp();
     CKvalObs::CService::kvHintSubscriber_ptr       cptrSub;
     CORBA::Object_var                              cptrCO;
-    std::vector<miutil::miString>::const_iterator  it;
+    std::vector<std::string>::const_iterator  it;
     KvHintSubscriberPtr                            subPtr;
     KvHintSubscriber                               *p;
 
     if(!cApp){
-	LOGFATAL("Cant obtain a referance to CorbaHelper::CorbaApp.");
-	return false;
+        LOGFATAL("Cant obtain a referance to CorbaHelper::CorbaApp.");
+        return false;
     }
-	
+
     cptrCO=cApp->corbaRef(cref);
 
     if(CORBA::is_nil(cptrCO)){
-	LOGERROR("CORBA: null refernce!");
-	return false;
+        LOGERROR("CORBA: null refernce!");
+        return false;
     }
 
     try{
-	cptrSub=CKvalObs::CService::kvHintSubscriber::_narrow(cptrCO);
-	
-	if(CORBA::is_nil(cptrSub)){
-	    LOGERROR("CORBA: null refernce! Wrong type.");
-	    CORBA::release(cptrSub);
-	    return false;
-	}
+        cptrSub=CKvalObs::CService::kvHintSubscriber::_narrow(cptrCO);
+
+        if(CORBA::is_nil(cptrSub)){
+            LOGERROR("CORBA: null refernce! Wrong type.");
+            CORBA::release(cptrSub);
+            return false;
+        }
     }
     catch(...){
-	LOGERROR("EXCEPTION: CORBA: null refernce! Wrong type.");
-	return false;
+        LOGERROR("EXCEPTION: CORBA: null refernce! Wrong type.");
+        return false;
     }
-    
+
     try{
-      p=new KvHintSubscriber(cptrSub);
-      subPtr.reset(p);
-       }
+        p=new KvHintSubscriber(cptrSub);
+        subPtr.reset(p);
+    }
     catch(...){
-      CORBA::release(cptrSub);
-      LOGERROR("OUT OF MEMMORY: KvSubscriberCollection::addKvHintFromFileFile!"); 
-      return false;
+        CORBA::release(cptrSub);
+        LOGERROR("OUT OF MEMMORY: KvSubscriberCollection::addKvHintFromFileFile!");
+        return false;
     }
 
     subPtr->subscriberid(static_cast<std::string>(subid));
@@ -1419,63 +1566,81 @@ KvSubscriberCollection::addKvHintFromFile(const miutil::miString &subid,
 
 
 bool 
-KvSubscriberCollection::removeSubscriberFile(const std::string &subscriberid)
+KvSubscriberCollection::
+removeSubscriberFromDb(const std::string &subscriberid)
 {
-  string path(subPath+subscriberid+".sub");
-  string newpath(subPath+"/terminated/"+subscriberid+".sub");
-  
-  if(rename(path.c_str(), newpath.c_str())!=0){
-    if(unlink(path.c_str())<0)
-      return false;
-  }
+    dnmi::db::Connection *con = getDbConnection();
 
-  return true;
+    if( ! con ) {
+         LOGERROR("KvSubscriberCollection: No db connection. Cant read subscribers from the database.");
+         return false;
+    }
+
+    KeyValSubscriberTransaction tran( subscriberid, KeyValSubscriberTransaction::DELETE_SUBSCRIBER );
+
+    try{
+        con->perform( tran );
+        if( ! tran.isOk() ) {
+            LOGERROR("KvSubscriberCollection: can't remove <" << subscriberid << "> from the database."
+                        << endl << "Reason: " << tran.getMsg()  );
+            return false;
+        } else {
+            LOGDEBUG("KvSubscriberCollection: Removed <" << subscriberid << "> from the database."
+                      << endl << "Msg: " << tran.getMsg()  );
+        }
+        return true;
+    }
+    catch (const std::exception &e) {
+        LOGERROR("KvSubscriberCollection: can't remove <" << subscriberid << "> from the database."
+                << endl << "Reason: (exception): " << e.what() << endl << "Msg: " << tran.getMsg()  );
+    }
+    return true;
 }
 
 
 
 std::ostream& operator<<(std::ostream& os, 
-			 const KvSubscriberCollection &c)
+        const KvSubscriberCollection &c)
 {
     boost::mutex::scoped_lock lock(const_cast<KvSubscriberCollection&>(c).mutex);
-  os << "\nKvSubscriberCollection: \n";
-  os << "  allStationDataNotifySubscribers: Antall: " 
-     << c.allStationsDataNotifySubscribers.size() 
-     << endl;
-  
-  list<KvDataNotifySubscriberPtr>::const_iterator it;
-  
-  it=c.allStationsDataNotifySubscribers.begin(); 
+    os << "\nKvSubscriberCollection: \n";
+    os << "  allStationDataNotifySubscribers: Antall: "
+            << c.allStationsDataNotifySubscribers.size()
+            << endl;
 
-  
-  for(;it!=c.allStationsDataNotifySubscribers.end(); it++){
-    os << "      subscriberid: " << (*it)->subscriberid() 
-       << "  " << (*it)->subscriberInfo() << endl;
-  }
+    list<KvDataNotifySubscriberPtr>::const_iterator it;
 
-  os << "\n  stationsDataNotifySubscribers: Antall: " 
-     << c.stationDataNotifySubscribers.size() 
-     << endl;
-  
-  multimap<long, KvDataNotifySubscriberPtr>::const_iterator it1, itl, itu;
-  
-  it1=c.stationDataNotifySubscribers.begin();
+    it=c.allStationsDataNotifySubscribers.begin();
 
-  for(;it1!=c.stationDataNotifySubscribers.end(); it1++){
-      os << "   stationid: " << it1->first << endl;
-         
-      itl=c.stationDataNotifySubscribers.lower_bound(it1->first);
-      
-      if(itl!=c.stationDataNotifySubscribers.end()){
-	  itu=c.stationDataNotifySubscribers.upper_bound(it1->first);
-	  
-	  for(;itl!=itu; itl++){
-	      os << "      subscriberid: " << itl->second->subscriberid()
-		 << "  " <<  itl->second->subscriberInfo() << endl;
-	  }
-      }
-  }
-  
-  return os;
+
+    for(;it!=c.allStationsDataNotifySubscribers.end(); it++){
+        os << "      subscriberid: " << (*it)->subscriberid()
+               << "  " << (*it)->subscriberInfo() << endl;
+    }
+
+    os << "\n  stationsDataNotifySubscribers: Antall: "
+            << c.stationDataNotifySubscribers.size()
+            << endl;
+
+    multimap<long, KvDataNotifySubscriberPtr>::const_iterator it1, itl, itu;
+
+    it1=c.stationDataNotifySubscribers.begin();
+
+    for(;it1!=c.stationDataNotifySubscribers.end(); it1++){
+        os << "   stationid: " << it1->first << endl;
+
+        itl=c.stationDataNotifySubscribers.lower_bound(it1->first);
+
+        if(itl!=c.stationDataNotifySubscribers.end()){
+            itu=c.stationDataNotifySubscribers.upper_bound(it1->first);
+
+            for(;itl!=itu; itl++){
+                os << "      subscriberid: " << itl->second->subscriberid()
+		         << "  " <<  itl->second->subscriberInfo() << endl;
+            }
+        }
+    }
+
+    return os;
 }
 

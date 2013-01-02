@@ -35,45 +35,30 @@ namespace kvalobs
 {
 
 kvStationMetadata::kvStationMetadata() :
-	station_(0),
-	param_(INT_NULL),
-	type_(INT_NULL),
-	level_(INT_NULL),
-	sensor_(INT_NULL),
-	name_(""),
-	metadata_(std::numeric_limits<float>::quiet_NaN()),
-	description_("invalid")
+		station_(0), param_(INT_NULL), type_(INT_NULL), level_(INT_NULL), sensor_(
+				INT_NULL), name_(""), metadata_(
+				std::numeric_limits<float>::quiet_NaN()), description_(
+				"invalid")
 {
 }
 
-kvStationMetadata::kvStationMetadata(int station, const int * param, const int * type, const int * level,
-		const int * sensor, const std::string & name, float metadata,
-		const std::string & description, const miutil::miTime & fromtime,
-		const miutil::miTime & totime) :
-	station_(station),
-	param_(param ? * param : INT_NULL),
-	type_(type ? * type : INT_NULL),
-	level_(level ? * level : INT_NULL),
-	sensor_(sensor ? * sensor : INT_NULL),
-	name_(name),
-	metadata_(metadata),
-	description_(description),
-	fromtime_(fromtime),
-	totime_(totime)
+kvStationMetadata::kvStationMetadata(int station, const int * param,
+		const int * type, const int * level, const int * sensor,
+		const std::string & name, float metadata,
+		const std::string & description, const boost::posix_time::ptime & fromtime,
+		const boost::posix_time::ptime & totime) :
+		station_(station), param_(param ? *param : INT_NULL), type_(
+				type ? *type : INT_NULL), level_(level ? *level : INT_NULL), sensor_(
+				sensor ? *sensor : INT_NULL), name_(name), metadata_(metadata), description_(
+				description), fromtime_(fromtime), totime_(totime)
 {
 }
 
-kvStationMetadata::kvStationMetadata(const kvStationMetadata & d):
-		station_(d.station_),
-		param_(d.param_),
-		type_(d.type_ ),
-		level_(d.level_),
-		sensor_(d.sensor_),
-		name_(d.name_),
-		metadata_(d.metadata_),
-		description_(d.description_),
-		fromtime_(d.fromtime_),
-		totime_(d.totime_)
+kvStationMetadata::kvStationMetadata(const kvStationMetadata & d) :
+		station_(d.station_), param_(d.param_), type_(d.type_), level_(
+				d.level_), sensor_(d.sensor_), name_(d.name_), metadata_(
+				d.metadata_), description_(d.description_), fromtime_(
+				d.fromtime_), totime_(d.totime_)
 {
 }
 
@@ -85,32 +70,33 @@ kvStationMetadata::~kvStationMetadata()
 kvStationMetadata&
 kvStationMetadata::operator =(const kvStationMetadata & rhs)
 {
-   if( &rhs != this ) {
-      station_ = rhs.station_;
-      param_ = rhs.param_;
-      type_ = rhs.type_;
-      level_ = rhs.level_;
-      sensor_ = rhs.sensor_;
-      name_ = rhs.name_;
-      metadata_ = rhs.metadata_;
-      description_ = rhs.description_;
-      fromtime_ = rhs.fromtime_;
-      totime_ = rhs.totime_;
-   }
-   return *this;
+	if (&rhs != this)
+	{
+		station_ = rhs.station_;
+		param_ = rhs.param_;
+		type_ = rhs.type_;
+		level_ = rhs.level_;
+		sensor_ = rhs.sensor_;
+		name_ = rhs.name_;
+		metadata_ = rhs.metadata_;
+		description_ = rhs.description_;
+		fromtime_ = rhs.fromtime_;
+		totime_ = rhs.totime_;
+	}
+	return *this;
 }
 
 namespace
 {
 std::ostream & possiblyNull(std::ostream & s, int i)
 {
-	if ( i == kvStationMetadata::INT_NULL )
+	if (i == kvStationMetadata::INT_NULL)
 		return s << "NULL";
 	return s << i;
 }
 }
 
-miutil::miString kvStationMetadata::toSend() const
+std::string kvStationMetadata::toSend() const
 {
 	std::ostringstream q;
 	q << "(" << station_ << ", ";
@@ -120,8 +106,8 @@ miutil::miString kvStationMetadata::toSend() const
 	possiblyNull(q, sensor()) << ", ";
 	q << quoted(name()) << ", ";
 	q << metadata() << ", ";
-	q << quoted(fromtime().isoTime()) << ", ";
-	if ( totime().undef() )
+	q << quoted(fromtime()) << ", ";
+	if (totime().is_not_a_date_time())
 		q << "NULL";
 	else
 		q << quoted(totime());
@@ -134,13 +120,13 @@ namespace
 {
 std::ostream & maybeNullKey(std::ostream & s, const char * key, int value)
 {
- 	if ( value == kvStationMetadata::INT_NULL )
- 		return s << key << " IS NULL";
- 	return s << key << " = " << value;
+	if (value == kvStationMetadata::INT_NULL)
+		return s << key << " IS NULL";
+	return s << key << " = " << value;
 }
 }
 
-miutil::miString kvStationMetadata::uniqueKey() const
+std::string kvStationMetadata::uniqueKey() const
 {
 	std::ostringstream q;
 
@@ -151,7 +137,7 @@ miutil::miString kvStationMetadata::uniqueKey() const
 	maybeNullKey(q, "level", level_) << " AND ";
 	maybeNullKey(q, "sensor", sensor_) << " AND ";
 	q << "metadatatypename = " << quoted(name()) << " AND ";
-	q << "fromtime = " << quoted(fromtime().isoTime());
+	q << "fromtime = " << quoted(fromtime());
 
 	return q.str();
 }
@@ -160,6 +146,5 @@ const char* kvStationMetadata::tableName() const
 {
 	return "station_metadata";
 }
-
 
 }

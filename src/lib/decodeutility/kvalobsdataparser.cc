@@ -33,6 +33,7 @@
 #include <functional>
 #include <iostream>
 #include <miutil/trimstr.h>
+#include <miutil/timeconvert.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/assign.hpp>
 #include <boost/shared_ptr.hpp>
@@ -108,7 +109,7 @@ namespace
         try {
           data_.invalidate( true, lexical_cast<int>(context_[ "station" ] ),
                             lexical_cast<int>(context_["typeid"] ),
-                            obstime.empty() ? miutil::miTime() : miutil::miTime( obstime ) );
+                            obstime.empty() ? boost::posix_time::ptime() : boost::posix_time::time_from_string_nothrow( obstime ) );
         }
         catch ( bad_lexical_cast & ) {
           throw parse_error( "Invalid parameter values" );
@@ -145,6 +146,7 @@ namespace
 void KvalobsDataParser::parse( const string & xml, KvalobsData & d )
 {
   KvalobsDataParser parser( d );
+  std::cout << xml << std::endl;
   parser.parse_memory( xml );
 }
 
@@ -161,6 +163,8 @@ KvalobsDataParser::~KvalobsDataParser()
 void KvalobsDataParser::on_start_element( const Glib::ustring & name, const AttributeList & attributes )
 {
   currentContext_.push( name );
+
+  std::cout << name << std::endl;
 
   HandlerMap::const_iterator handler = handlers_.find( name );
   if ( handler != handlers_.end() ) {
@@ -196,9 +200,10 @@ void KvalobsDataParser::on_end_element( const Glib::ustring & name )
   else if ( name == "message")
   {
 	  std::string message = context_["message"];
-	  miutil::miTime tbtime(context_["message/tbtime"]);
+	  boost::posix_time::ptime tbtime(boost::posix_time::time_from_string_nothrow(context_["message/tbtime"]));
 	  std::string decoder = context_["decoder"];
 	  kvalobs::kvRejectdecode reject(message, tbtime, decoder, "");
+	  std::cout << reject.toSend() << std::endl;
 	  data_.setMessageCorrectsThisRejection(reject);
 	  context_.erase("message");
 	  context_.erase("message/tbtime");
@@ -232,11 +237,10 @@ namespace
   {
     return lexical_cast<int>( context_[ "typeid" ] );
   }
-  miutil::miTime get_obstime( std::map<std::string, std::string> & context_ )
+  boost::posix_time::ptime get_obstime( std::map<std::string, std::string> & context_ )
   {
     string ot = context_[ "obstime" ];
-    return ot.empty() ? miutil::miTime() : miutil::miTime( ot );
-    //return miutil::miTime( context_[ "obstime" ] );
+    return ot.empty() ? boost::posix_time::ptime() : boost::posix_time::time_from_string_nothrow( ot );
   }
   int get_sensor( std::map<std::string, std::string> & context_ )
   {
@@ -284,7 +288,7 @@ void KvalobsDataParser::insertData()
   try {
     int station_ = get_station( context_ );
     int typeid_ = get_typeid( context_ );
-    miutil::miTime obstime_ = get_obstime( context_ );
+    boost::posix_time::ptime obstime_ = get_obstime( context_ );
     int sensor_ = get_sensor( context_ );
     int level_ = get_level( context_ );
     int paramid_ = get_paramid( context_ );
@@ -294,7 +298,7 @@ void KvalobsDataParser::insertData()
     kvUseInfo useinfo_ = get_useinfo( context_ );
     string cfailed_ = get_cfailed( context_ );
 
-    data_.insert( kvData( station_, obstime_, original_, paramid_, miutil::miTime(),
+    data_.insert( kvData( station_, obstime_, original_, paramid_, boost::posix_time::ptime(),
                   typeid_, sensor_, level_, corrected_, controlinfo_, useinfo_, cfailed_ ) );
   }
   catch( ... ) {
@@ -307,12 +311,12 @@ void KvalobsDataParser::insertTextData()
   try {
     int station_ = get_station( context_ );
     int typeid_ = get_typeid( context_ );
-    miutil::miTime obstime_ = get_obstime( context_ );
+    boost::posix_time::ptime obstime_ = get_obstime( context_ );
     int paramid_ = get_paramid( context_ );
     string original_ = get_original<string>( context_ );
 
     data_.insert( kvTextData( station_, obstime_, original_, paramid_,
-                  miutil::miTime(), typeid_ ) );
+                  boost::posix_time::ptime(), typeid_ ) );
   }
   catch( ... ) {
     throw parse_error( "Invalid parameter values" );

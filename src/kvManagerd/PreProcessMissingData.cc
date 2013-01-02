@@ -35,6 +35,7 @@
 #include <kvalobs/kvObsPgm.h>
 #include <kvalobs/kvParam.h>
 #include <kvalobs/kvTypes.h>
+#include <miutil/timeconvert.h>
 #include <milog/milog.h>
 #include "PreProcessWorker.h"
 
@@ -56,9 +57,9 @@ bool
 PreProcessMissingData::
 loadParamsAndTypes()
 {
-   miutil::miTime now( miutil::miTime::nowTime() );
+   boost::posix_time::ptime now( boost::posix_time::microsec_clock::universal_time() );
 
-   if( ! nextDbCheck.undef() && now < nextDbCheck &&
+   if( ! nextDbCheck.is_not_a_date_time() && now < nextDbCheck &&
        !typeList.empty() && !paramList.empty() ) {
       return true;
    }
@@ -104,14 +105,14 @@ loadParamsAndTypes()
    }
 
    if( nOk == 2 ) {
-      now.addHour( 1 );
-      nextDbCheck = miutil::miTime( now.year(), now.month(), now.day(), now.hour(), 0, 0);
+      now += boost::posix_time::hours( 1 );
+      nextDbCheck = boost::posix_time::ptime( now.date(), boost::posix_time::time_duration(now.time_of_day().hours(), 0, 0));
    } else {
-      now.addMin( 5 );
+      now += boost::posix_time::minutes( 5 );
       nextDbCheck = now;
    }
 
-   LOGDEBUG( "PreProcessMissingData: Next loading of 'types' and 'params' table: " + nextDbCheck.isoTime() );
+   LOGDEBUG( "PreProcessMissingData: Next loading of 'types' and 'params' table: " + to_kvalobs_string(nextDbCheck));
 
    return nOk == 2;
 }
@@ -243,7 +244,7 @@ removeFromList( const kvalobs::kvData &data,
 void
 PreProcessMissingData::doJob(long                 stationId, 
                              long                 typeId,
-                             const miutil::miTime &obstime,
+                             const boost::posix_time::ptime &obstime,
                              dnmi::db::Connection &con)
 {
    std::ostringstream ost;
@@ -313,7 +314,7 @@ PreProcessMissingData::doJob(long                 stationId,
 
    flagDataNotInObsPgm( obspgmlist, datalist, wildObsList );
 
-   miutil::miTime tbtime(miutil::miTime::nowTime());
+   boost::posix_time::ptime tbtime(boost::posix_time::microsec_clock::universal_time());
 
    // loop through obs_pgm and check if we have data for each
    // active parameter
@@ -358,7 +359,7 @@ PreProcessMissingData::doJob(long                 stationId,
             // insert missing data
             kvControlInfo    controlinfo;
             kvUseInfo        useinfo;
-            miutil::miString failed;
+            std::string failed;
             float            original  = -32767;
             float            corrected = -32767;
             controlinfo.MissingFlag(kvQCFlagTypes::status_orig_and_corr_missing);

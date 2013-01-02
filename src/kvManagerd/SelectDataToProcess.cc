@@ -30,6 +30,7 @@
  */
 #include "SelectDataToProcess.h"
 #include <milog/milog.h>
+#include <miutil/timeconvert.h>
 #include <kvalobs/kvStationInfoCommand.h>
 
 using namespace std;
@@ -101,14 +102,14 @@ processElements(std::list<kvalobs::kvWorkelement> &workList,
          return;
       }
 
-      it->process_start(miTime::nowTime());
+      it->process_start(boost::posix_time::microsec_clock::universal_time());
 
       ost.str("");
 
       ost << "UPDATE workque SET process_start='"
-            << it->process_start().isoTime()
+            << to_kvalobs_string(it->process_start())
             << "' WHERE stationid=" << it->stationID()
-            << "  AND obstime='" << it->obstime().isoTime()
+            << "  AND obstime='" << to_kvalobs_string(it->obstime())
             << "' AND typeid=" << it->typeID();
 
       try{
@@ -155,7 +156,7 @@ processElements(std::list<kvalobs::kvWorkelement> &workList,
                   "-- priority:  " << it->priority());
       }
       catch(...){
-         it->process_start(miTime()); //Set to NULL
+         it->process_start(boost::posix_time::ptime()); //Set to NULL
 
          try{
             con->rollBack();
@@ -200,12 +201,12 @@ newConnection()
 
 bool
 SelectDataToProcess::
-processLowPriData(const miutil::miTime &baseTime)
+processLowPriData(const boost::posix_time::ptime &baseTime)
 {
    const int DAY_LIMIT=7;
    const int LOW_PRI_LIMIT=10;
-   miTime              lowerBound;
-   miTime              upperBound;
+   boost::posix_time::ptime              lowerBound;
+   boost::posix_time::ptime              upperBound;
    bool                moreData=true;
    ostringstream       ost;
    list<kvWorkelement> workList;
@@ -224,16 +225,16 @@ processLowPriData(const miutil::miTime &baseTime)
       lowerBound=baseTime;
       upperBound=baseTime;
 
-      lowerBound.addDay(-1*(iRange+1));
-      upperBound.addDay(-1*iRange);
+      lowerBound -= boost::gregorian::days(iRange+1);
+      upperBound -= boost::gregorian::days(iRange);
 
       LOGDEBUG("processLowPriData: iRange=" << iRange << endl <<
                "   baseTime: " << baseTime  << endl <<
                " lowerBound: " << lowerBound << endl <<
                " upperBound: " << upperBound );
 
-      ost << "WHERE obstime>='" << lowerBound.isoTime() << "' AND "
-            << "obstime<'" << upperBound.isoTime() << "' AND "
+      ost << "WHERE obstime>='" << to_kvalobs_string(lowerBound) << "' AND "
+            << "obstime<'" << to_kvalobs_string(upperBound) << "' AND "
             << "process_start IS NULL "
             << "ORDER BY priority, stationid, typeid, "
             << "         obstime DESC "
@@ -252,13 +253,13 @@ processLowPriData(const miutil::miTime &baseTime)
       //process data older than DAY_LIMIT days.
 
       upperBound=baseTime;
-      upperBound.addDay(-1*DAY_LIMIT);
+      upperBound -= boost::gregorian::days(DAY_LIMIT);
 
       LOGDEBUG("processLowPriData: iRange<" << DAY_LIMIT << endl <<
                "   baseTime: " << baseTime  << endl <<
                " upperBound: " << upperBound );
 
-      ost << "WHERE obstime<'"  << upperBound.isoTime() << "' AND "
+      ost << "WHERE obstime<'"  << to_kvalobs_string(upperBound) << "' AND "
             << "process_start IS NULL "
             << "ORDER BY priority, stationid, typeid, "
             << "         obstime DESC "
@@ -291,7 +292,7 @@ operator()()
    dnmi::thread::CommandBase *cmd;
    list<kvWorkelement>       workList;
    ostringstream             ost;
-   miTime                    baseTime;
+   boost::posix_time::ptime                    baseTime;
    int                       nElements;
    bool                      moreData=true;
    bool                      starting=true;
@@ -311,7 +312,7 @@ operator()()
       }
 
       if(!cmd && !starting){
-         if(!baseTime.undef() && moreData){
+         if(!baseTime.is_not_a_date_time() && moreData){
             moreData=processLowPriData(baseTime);
             continue;
          }else{
@@ -349,15 +350,15 @@ operator()()
       moreData=true;
       iRange=1;
       conIdleTime=0;
-      baseTime=miTime::nowTime();
-      miTime  lowerBound;
+      baseTime=boost::posix_time::microsec_clock::universal_time();
+      boost::posix_time::ptime  lowerBound;
 
       lowpri=false;
       lowerBound=baseTime;
-      lowerBound.addDay(-1);
+      lowerBound -= boost::gregorian::days(1);
 
       ost.str("");
-      ost << "WHERE obstime>='" << lowerBound.isoTime() << "' AND "
+      ost << "WHERE obstime>='" << to_kvalobs_string(lowerBound) << "' AND "
             << "process_start IS NULL "
             << "ORDER BY priority, obstime, tbtime, typeid DESC "
             << "LIMIT " << HIGH_PRI_LIMIT;

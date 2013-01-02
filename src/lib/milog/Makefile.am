@@ -1,6 +1,6 @@
 AM_CPPFLAGS = -I $(top_srcdir)/src/lib -D_REENTRANT
 
-lib_LTLIBRARIES = libkvalobs2_milog.la
+lib_LTLIBRARIES = libkvalobs_milog.la
 
 milogincludedir =$(pkgincludedir)/milog
 nobase_miloginclude_HEADERS = Logger.h \
@@ -25,7 +25,7 @@ nobase_miloginclude_HEADERS = Logger.h \
 #milogprivateinclude_HEADERS = private/LoggerImpl.h private/ThreadLogManager.h private/types.h
 
 
-libkvalobs2_milog_la_SOURCES = Logger.h Logger.cc \
+libkvalobs_milog_la_SOURCES = Logger.h Logger.cc \
 	LogStream.h LogStream.cc \
 	Layout.h Layout.cc \
 	StdLayout.h StdLayout.cc \
@@ -43,11 +43,14 @@ libkvalobs2_milog_la_SOURCES = Logger.h Logger.cc \
 	milog.h macros.h \
 	milogtypes.h \
 	utility.h utility.cc 
-	
 
 # don't install: LoggerImpl.h ThreadLogManager.h types.h
 
 SUBDIRS = private thread
 
-libkvalobs2_milog_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@ -pthread
-libkvalobs2_milog_la_LIBADD = -lpthread
+libkvalobs_milog_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@ -pthread
+libkvalobs_milog_la_LIBADD = -lpthread
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libkvalobs_milog.pc
+$(pkgconfig_DATA): $(top_builddir)/config.status

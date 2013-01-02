@@ -67,7 +67,7 @@ class SelectDataToProcess
 
   void  processElements(std::list<kvalobs::kvWorkelement> &workList, 
 			dnmi::db::Connection  *con);
-  bool processLowPriData(const miutil::miTime &baseTime);
+  bool processLowPriData(const boost::posix_time::ptime &baseTime);
   
 
 public:

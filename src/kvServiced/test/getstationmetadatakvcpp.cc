@@ -32,6 +32,7 @@
 #include <kvskel/kvService.hh>
 #include <corbahelper/corbaApp.h>
 #include <puTools/miTime.h>
+#include <miutil/timeconvert.h>
 #include <kvcpp/corba/CorbaKvApp.h>
 
 using namespace CorbaHelper;
@@ -77,7 +78,7 @@ main(int argn, char **argv)
 			
 	try {
 	   std::list<kvalobs::kvStationMetadata> stMeta;
-	   miutil::miTime obstime( miutil::miTime::nowTime() );
+	   boost::posix_time::ptime obstime = boost::posix_time::second_clock::universal_time();
 
 	   if( ! app.getKvStationMetaData( stMeta, 18700, obstime , "" ) ) {
 	      cerr << "Cant get Station metadata." << endl;
@@ -85,11 +86,11 @@ main(int argn, char **argv)
 	   }
 
 	   for( std::list<kvalobs::kvStationMetadata>::iterator it = stMeta.begin(); it != stMeta.end(); ++it ) {
-	      miutil::miTime totime=it->totime();
+	      const boost::posix_time::ptime & totime = it->totime();
 
 	      cerr << it->stationID() << "," << it->typeID() << "," << it->paramID() << "," << it->sensor() << "," << it->level()
 	           << "," << it->name() << "," << it->metadata() << "," << it->fromtime() << ","
-	           << (totime.undef()?"(NULL)":totime.isoTime()) << ",'" << it->metadataDescription()<< "'"
+	           << (totime.is_not_a_date_time()?"(NULL)":to_kvalobs_string(totime)) << ",'" << it->metadataDescription()<< "'"
 	           << "," << "SpecificLevel: "<< (it->haveSpecificLevel()?"true":"false")
 	           << "," << "SpecificType: "<< (it->haveSpecificType()?"true":"false")
 	           << "," << "SpecificParam: "<< (it->haveSpecificParam()?"true":"false")

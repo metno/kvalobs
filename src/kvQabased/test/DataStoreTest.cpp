@@ -36,15 +36,15 @@ using qabase::DataStore;
 
 TEST(DataStore_ParameterSortedDataListTest, fillMissing_nothingToFill)
 {
-	kvalobs::kvDataFactory factory(10, "2010-06-09 06:00:00", 302);
+	kvalobs::kvDataFactory factory(10, boost::posix_time::time_from_string("2010-06-09 06:00:00"), 302);
 
 	DataStore::ParameterSortedDataList dl;
-	dl["A"].push_back(factory.getData(10, 1.1, "2010-06-09 06:00:00"));
-	dl["A"].push_back(factory.getData(10, 1.1, "2010-06-08 06:00:00"));
-	dl["A"].push_back(factory.getData(10, 1.1, "2010-06-07 06:00:00"));
-	dl["B"].push_back(factory.getData(10, 1.1, "2010-06-09 06:00:00"));
-	dl["B"].push_back(factory.getData(10, 1.1, "2010-06-08 06:00:00"));
-	dl["B"].push_back(factory.getData(10, 1.1, "2010-06-07 06:00:00"));
+	dl["A"].push_back(factory.getData(10, 1.1, boost::posix_time::time_from_string("2010-06-09 06:00:00")));
+	dl["A"].push_back(factory.getData(10, 1.1, boost::posix_time::time_from_string("2010-06-08 06:00:00")));
+	dl["A"].push_back(factory.getData(10, 1.1, boost::posix_time::time_from_string("2010-06-07 06:00:00")));
+	dl["B"].push_back(factory.getData(10, 1.1, boost::posix_time::time_from_string("2010-06-09 06:00:00")));
+	dl["B"].push_back(factory.getData(10, 1.1, boost::posix_time::time_from_string("2010-06-08 06:00:00")));
+	dl["B"].push_back(factory.getData(10, 1.1, boost::posix_time::time_from_string("2010-06-07 06:00:00")));
 
 	DataStore::ParameterSortedDataList expectedResult = dl;
 
@@ -55,92 +55,92 @@ TEST(DataStore_ParameterSortedDataListTest, fillMissing_nothingToFill)
 
 TEST(DataStore_ParameterSortedDataListTest, fillMissing_missingLastEntry)
 {
-	kvalobs::kvDataFactory factory(10, "2010-06-09 06:00:00", 302);
+	kvalobs::kvDataFactory factory(10, boost::posix_time::time_from_string("2010-06-09 06:00:00"), 302);
 
 	DataStore::ParameterSortedDataList dl;
-	dl["A"].push_back(factory.getData(10, 1.1, "2010-06-09 06:00:00"));
-	dl["A"].push_back(factory.getData(10, 1.1, "2010-06-08 06:00:00"));
-	dl["A"].push_back(factory.getData(10, 1.1, "2010-06-07 06:00:00"));
-	dl["B"].push_back(factory.getData(10, 1.1, "2010-06-09 06:00:00"));
-	dl["B"].push_back(factory.getData(10, 1.1, "2010-06-08 06:00:00"));
+	dl["A"].push_back(factory.getData(10, 1.1, boost::posix_time::time_from_string("2010-06-09 06:00:00")));
+	dl["A"].push_back(factory.getData(10, 1.1, boost::posix_time::time_from_string("2010-06-08 06:00:00")));
+	dl["A"].push_back(factory.getData(10, 1.1, boost::posix_time::time_from_string("2010-06-07 06:00:00")));
+	dl["B"].push_back(factory.getData(10, 1.1, boost::posix_time::time_from_string("2010-06-09 06:00:00")));
+	dl["B"].push_back(factory.getData(10, 1.1, boost::posix_time::time_from_string("2010-06-08 06:00:00")));
 
 	DataStore::ParameterSortedDataList expectedResult = dl;
-	expectedResult["B"].push_back(factory.getMissing(0, "2010-06-07 06:00:00"));
+	expectedResult["B"].push_back(factory.getMissing(0, boost::posix_time::time_from_string("2010-06-07 06:00:00")));
 
 	qabase::fillMissing(dl);
 
 	ASSERT_EQ(3u, dl["B"].size());
-	EXPECT_EQ("2010-06-07 06:00:00", dl["B"][2].obstime());
+	EXPECT_EQ(boost::posix_time::time_from_string("2010-06-07 06:00:00"), dl["B"][2].obstime());
 	EXPECT_TRUE(kvalobs::missing(dl["B"][2]));
 }
 
 TEST(DataStore_ParameterSortedDataListTest, fillMissing_missingLastEntry2)
 {
-	kvalobs::kvDataFactory factory(10, "2010-06-09 06:00:00", 302);
+	kvalobs::kvDataFactory factory(10, boost::posix_time::time_from_string("2010-06-09 06:00:00"), 302);
 
 	DataStore::ParameterSortedDataList dl;
-	dl["A"].push_back(factory.getData(10, 1.1, "2010-06-09 06:00:00"));
-	dl["A"].push_back(factory.getData(10, 1.1, "2010-06-08 06:00:00"));
-	dl["B"].push_back(factory.getData(10, 1.1, "2010-06-09 06:00:00"));
-	dl["B"].push_back(factory.getData(10, 1.1, "2010-06-08 06:00:00"));
-	dl["B"].push_back(factory.getData(10, 1.1, "2010-06-07 06:00:00"));
+	dl["A"].push_back(factory.getData(10, 1.1, boost::posix_time::time_from_string("2010-06-09 06:00:00")));
+	dl["A"].push_back(factory.getData(10, 1.1, boost::posix_time::time_from_string("2010-06-08 06:00:00")));
+	dl["B"].push_back(factory.getData(10, 1.1, boost::posix_time::time_from_string("2010-06-09 06:00:00")));
+	dl["B"].push_back(factory.getData(10, 1.1, boost::posix_time::time_from_string("2010-06-08 06:00:00")));
+	dl["B"].push_back(factory.getData(10, 1.1, boost::posix_time::time_from_string("2010-06-07 06:00:00")));
 
 	DataStore::ParameterSortedDataList expectedResult = dl;
-	expectedResult["A"].push_back(factory.getMissing(0, "2010-06-07 06:00:00"));
+	expectedResult["A"].push_back(factory.getMissing(0, boost::posix_time::time_from_string("2010-06-07 06:00:00")));
 
 	qabase::fillMissing(dl);
 
 	ASSERT_EQ(3u, dl["A"].size());
-	EXPECT_EQ("2010-06-07 06:00:00", dl["A"][2].obstime());
+	EXPECT_EQ(boost::posix_time::time_from_string("2010-06-07 06:00:00"), dl["A"][2].obstime());
 	EXPECT_TRUE(kvalobs::missing(dl["A"][2]));
 }
 
 TEST(DataStore_ParameterSortedDataListTest, fillMissing_manyMissingLastEntries)
 {
-	kvalobs::kvDataFactory factory(10, "2010-06-09 06:00:00", 302);
+	kvalobs::kvDataFactory factory(10, boost::posix_time::time_from_string("2010-06-09 06:00:00"), 302);
 
 	DataStore::ParameterSortedDataList dl;
-	dl["A"].push_back(factory.getData(10, 1.1, "2010-06-09 06:00:00"));
-	dl["B"].push_back(factory.getData(10, 1.1, "2010-06-09 06:00:00"));
-	dl["B"].push_back(factory.getData(10, 1.1, "2010-06-08 06:00:00"));
-	dl["B"].push_back(factory.getData(10, 1.1, "2010-06-07 06:00:00"));
+	dl["A"].push_back(factory.getData(10, 1.1, boost::posix_time::time_from_string("2010-06-09 06:00:00")));
+	dl["B"].push_back(factory.getData(10, 1.1, boost::posix_time::time_from_string("2010-06-09 06:00:00")));
+	dl["B"].push_back(factory.getData(10, 1.1, boost::posix_time::time_from_string("2010-06-08 06:00:00")));
+	dl["B"].push_back(factory.getData(10, 1.1, boost::posix_time::time_from_string("2010-06-07 06:00:00")));
 
 	DataStore::ParameterSortedDataList expectedResult = dl;
-	expectedResult["A"].push_back(factory.getMissing(0, "2010-06-07 06:00:00"));
+	expectedResult["A"].push_back(factory.getMissing(0, boost::posix_time::time_from_string("2010-06-07 06:00:00")));
 
 	qabase::fillMissing(dl);
 
 	ASSERT_EQ(3u, dl["A"].size());
-	EXPECT_EQ("2010-06-08 06:00:00", dl["A"][1].obstime());
+	EXPECT_EQ(boost::posix_time::time_from_string("2010-06-08 06:00:00"), dl["A"][1].obstime());
 	EXPECT_TRUE(kvalobs::missing(dl["A"][1]));
-	EXPECT_EQ("2010-06-07 06:00:00", dl["A"][2].obstime());
+	EXPECT_EQ(boost::posix_time::time_from_string("2010-06-07 06:00:00"), dl["A"][2].obstime());
 	EXPECT_TRUE(kvalobs::missing(dl["A"][2]));
 }
 
 
 TEST(DataStore_ParameterSortedDataListTest, fillMissing_missingInAllSets)
 {
-	kvalobs::kvDataFactory factory(10, "2010-06-09 06:00:00", 302);
+	kvalobs::kvDataFactory factory(10, boost::posix_time::time_from_string("2010-06-09 06:00:00"), 302);
 
 	DataStore::ParameterSortedDataList dl;
-	//dl["A"].push_back(factory.getData(10, 1.1, "2010-06-09 06:00:00"));
-	dl["A"].push_back(factory.getData(10, 1.1, "2010-06-08 06:00:00"));
-	dl["A"].push_back(factory.getData(10, 1.1, "2010-06-07 06:00:00"));
+	//dl["A"].push_back(factory.getData(10, 1.1, boost::posix_time::time_from_string("2010-06-09 06:00:00")));
+	dl["A"].push_back(factory.getData(10, 1.1, boost::posix_time::time_from_string("2010-06-08 06:00:00")));
+	dl["A"].push_back(factory.getData(10, 1.1, boost::posix_time::time_from_string("2010-06-07 06:00:00")));
 
-	dl["B"].push_back(factory.getData(10, 1.1, "2010-06-09 06:00:00"));
-	//dl["B"].push_back(factory.getData(10, 1.1, "2010-06-08 06:00:00"));
-	dl["B"].push_back(factory.getData(10, 1.1, "2010-06-07 06:00:00"));
+	dl["B"].push_back(factory.getData(10, 1.1, boost::posix_time::time_from_string("2010-06-09 06:00:00")));
+	//dl["B"].push_back(factory.getData(10, 1.1, boost::posix_time::time_from_string("2010-06-08 06:00:00")));
+	dl["B"].push_back(factory.getData(10, 1.1, boost::posix_time::time_from_string("2010-06-07 06:00:00")));
 
 	DataStore::ParameterSortedDataList expectedResult = dl;
-	expectedResult["A"].push_back(factory.getMissing(0, "2010-06-07 06:00:00"));
+	expectedResult["A"].push_back(factory.getMissing(0, boost::posix_time::time_from_string("2010-06-07 06:00:00")));
 
 	qabase::fillMissing(dl);
 
 	ASSERT_EQ(3u, dl["A"].size());
-	EXPECT_EQ("2010-06-09 06:00:00", dl["A"][0].obstime());
+	EXPECT_EQ(boost::posix_time::time_from_string("2010-06-09 06:00:00"), dl["A"][0].obstime());
 	EXPECT_TRUE(kvalobs::missing(dl["A"][0]));
 
 	ASSERT_EQ(3u, dl["B"].size());
-	EXPECT_EQ("2010-06-08 06:00:00", dl["B"][1].obstime());
+	EXPECT_EQ(boost::posix_time::time_from_string("2010-06-08 06:00:00"), dl["B"][1].obstime());
 	EXPECT_TRUE(kvalobs::missing(dl["B"][1]));
 }

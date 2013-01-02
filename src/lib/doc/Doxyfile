@@ -438,7 +438,6 @@ INPUT                  = miutil.doc        \
 			 ../miutil/include/miClock \
 			 ../miutil/include/miTime \
 			 ../miutil/include/miDate \
-			 ../miutil/include/miString \
 			 ../threadutil     \
 			 ../fileutil       \
 			 ../../service-libs/kvcpp \       

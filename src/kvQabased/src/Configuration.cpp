@@ -31,6 +31,7 @@
 #include "Configuration.h"
 #include <kvalobs/kvStationInfo.h>
 #include <kvalobs/kvPath.h>
+#include <miutil/timeconvert.h>
 #include <boost/program_options.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -92,11 +93,7 @@ kvalobs::kvStationInfo * getStationInfo(const variables_map & vm)
 	std::string obstime = vm["obstime"].as<std::string>();
 	int type = vm["typeid"].as<int>();
 
-	miutil::miTime t(obstime);
-	if ( t.undef() )
-		throw std::runtime_error("Cannot recognize time format: " + obstime);
-
-	return new kvalobs::kvStationInfo(station, miutil::miTime(obstime), type);
+	return new kvalobs::kvStationInfo(station, boost::posix_time::time_from_string_nothrow(obstime), type);
 }
 
 void parse(const boost::filesystem::path & configFile, variables_map & vm, const options_description & configFileOptions)

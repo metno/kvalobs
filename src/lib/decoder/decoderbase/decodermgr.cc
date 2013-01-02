@@ -27,7 +27,7 @@
   You should have received a copy of the GNU General Public License along
   with KVALOBS; if not, write to the Free Software Foundation Inc.,
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ */
 #include <fileutil/dir.h>
 #include "decodermgr.h"
 #include <milog/milog.h>
@@ -51,85 +51,85 @@ DecoderMgr::readyForUpdate()
 void
 DecoderMgr::updateDecoders()
 {
-  Dir                dir;
-  std::string        name;
-  DSO                *dso;
-  decoderFactory     fac;
-  releaseDecoderFunc releaseFunc;
-  getObsTypes        obsTypes;
-  DecoderItem        *decoder;
-  int                id=0;
+   Dir                dir;
+   std::string        name;
+   DSO                *dso;
+   decoderFactory     fac;
+   releaseDecoderFunc releaseFunc;
+   getObsTypes        obsTypes;
+   DecoderItem        *decoder;
+   int                id=0;
 
 
 
-  clearDecoders();
+   clearDecoders();
 
-  if(!dir.open( decoderPath, fixDecoderName("*.so") ) ){
-    LOGERROR("DecoderMgr: Can't open directory <" << decoderPath << ">, "
-         << dir.getErr() << endl);
-    return;
-  }
-
-  while(dir.hasNext()){
-    name=dir.next();
-    dso=0;
-    fac=0;
-    releaseFunc=0;
-    obsTypes=0;
-
-    LOGDEBUG("DecoderMgr: loading <" << name << ">\n");
-
-    try{
-      dso=new DSO(decoderPath+"/"+name);
-      fac=(decoderFactory) (*dso)["decoderFactory"];
-      obsTypes=(getObsTypes)(*dso)["getObsTypes"];
-      releaseFunc=(releaseDecoderFunc)(*dso)["releaseDecoder"];
-      decoder=new DecoderItem(fac, releaseFunc, dso, modTime(name));
-      decoder->obsTypes=obsTypes();
-      decoder->decoderId=id;
-      id++;
-      decoders.push_back(decoder);
-    }
-    catch(dnmi::file::DSOException &ex){
-      LOGDEBUG("DecoderMgr: can't load <" << name
-           << ">\n reason: " << ex.what() << endl);
-      delete dso;
-    }
-    catch(...){
-      LOGERROR("DecoderMgr: can't load <" << name
-           << ">\n reason: out of memmory\n");
-      delete dso;
+   if(!dir.open( decoderPath, fixDecoderName("*.so") ) ){
+      LOGERROR("DecoderMgr: Can't open directory <" << decoderPath << ">, "
+               << dir.getErr() << endl);
       return;
-    }
-  }
+   }
+
+   while(dir.hasNext()){
+      name=dir.next();
+      dso=0;
+      fac=0;
+      releaseFunc=0;
+      obsTypes=0;
+
+      LOGDEBUG("DecoderMgr: loading <" << name << ">\n");
+
+      try{
+         dso=new DSO(decoderPath+"/"+name);
+         fac=(decoderFactory) (*dso)["decoderFactory"];
+         obsTypes=(getObsTypes)(*dso)["getObsTypes"];
+         releaseFunc=(releaseDecoderFunc)(*dso)["releaseDecoder"];
+         decoder=new DecoderItem(fac, releaseFunc, dso, modTime(name));
+         decoder->obsTypes=obsTypes();
+         decoder->decoderId=id;
+         id++;
+         decoders.push_back(decoder);
+      }
+      catch(dnmi::file::DSOException &ex){
+         LOGDEBUG("DecoderMgr: can't load <" << name
+                  << ">\n reason: " << ex.what() << endl);
+         delete dso;
+      }
+      catch(...){
+         LOGERROR("DecoderMgr: can't load <" << name
+                  << ">\n reason: out of memmory\n");
+         delete dso;
+         return;
+      }
+   }
 }
 
 
-DecoderMgr::DecoderMgr(const miutil::miString &decoderPath_)
+DecoderMgr::DecoderMgr(const std::string &decoderPath_)
 {
-  setDecoderPath(decoderPath_);
+   setDecoderPath(decoderPath_);
 }
 
 
 void
-DecoderMgr::setDecoderPath(const miutil::miString &decoderPath_)
+DecoderMgr::setDecoderPath(const std::string &decoderPath_)
 
 {
-  decoderPath=decoderPath_;
-  string::reverse_iterator rit=decoderPath.rbegin();
+   decoderPath=decoderPath_;
+   string::reverse_iterator rit=decoderPath.rbegin();
 
-  if(rit!=decoderPath.rend() && *rit=='/')
-    decoderPath.erase(decoderPath.length()-1);
+   if(rit!=decoderPath.rend() && *rit=='/')
+      decoderPath.erase(decoderPath.length()-1);
 
 
-  updateDecoders();
+   updateDecoders();
 }
 
 
 
 DecoderMgr::~DecoderMgr()
 {
-    clearDecoders();
+   clearDecoders();
 }
 
 std::string
@@ -141,10 +141,10 @@ fixDecoderName( const std::string &decoder_ )
 
    if( soVersion.empty() ) {
       soVersion=KVALOBSLIBS_SO_VERSION;
-       i=soVersion.find_first_of( ":" );
+      i=soVersion.find_first_of( ":" );
 
       if( i != string::npos )
-        soVersion.erase( i );
+         soVersion.erase( i );
 
       soVersion.insert(0,".so.");
    }
@@ -172,110 +172,110 @@ kvalobs::decoder::DecoderBase*
 DecoderMgr::findDecoder(dnmi::db::Connection   &connection,
                         const ParamList        &params,
                         const std::list<kvalobs::kvTypes> &typeList,
-                        const miutil::miString &obsType_,
-                        const miutil::miString &obs,
-                        miutil::miString &errorMsg)
+                        const std::string &obsType_,
+                        const std::string &obs,
+                        std::string &errorMsg)
 {
-        miString myObsType(obsType_);
-        miString decoderName;
-        miString::size_type i;
-        IDecoderList it=decoders.begin();
-        std::list<miutil::miString>::iterator itOT;
-        DecoderBase *dec;
-        miString    metaconf;
+   string myObsType(obsType_);
+   string decoderName;
+   string::size_type i;
+   IDecoderList it=decoders.begin();
+   list<string>::iterator itOT;
+   DecoderBase *dec;
+   std::string    metaconf;
 
-        i=myObsType.find_first_of("/\n");
+   i=myObsType.find_first_of("/\n");
 
-        if(i!=miString::npos){
-        decoderName=myObsType.substr(0, i);
-        trimstr(decoderName);
-        }
+   if(i!=std::string::npos){
+      decoderName=myObsType.substr(0, i);
+      trimstr(decoderName);
+   }
 
-        i=myObsType.find("<?xml");
+   i=myObsType.find("<?xml");
 
-        if(i!=miString::npos){
-        metaconf=myObsType.substr(i);
-        myObsType.erase(i);
-        }
+   if(i!=string::npos){
+      metaconf=myObsType.substr(i);
+      myObsType.erase(i);
+   }
 
-        if(decoderName.empty()){
-                decoderName=myObsType;
-                trimstr(decoderName);
-        }
+   if(decoderName.empty()){
+      decoderName=myObsType;
+      trimstr(decoderName);
+   }
 
 
-  for(; it!=decoders.end(); it++){
+   for(; it!=decoders.end(); it++){
       itOT=(*it)->obsTypes.begin();
 
-    for(;itOT!=(*it)->obsTypes.end(); itOT++){
-      if(*itOT==decoderName){
-          dec=(*it)->factory(connection,
-                             params,
-                             typeList,
-                             (*it)->decoderId,
-                             myObsType,
-                             obs);
+      for(;itOT!=(*it)->obsTypes.end(); itOT++){
+         if(*itOT==decoderName){
+            dec=(*it)->factory(connection,
+                               params,
+                               typeList,
+                               (*it)->decoderId,
+                               myObsType,
+                               obs);
 
-          if(!dec){
-            errorMsg="ERROR, Cant create a decoder. (out of memmory?)";
-            return 0;
-          }
+            if(!dec){
+               errorMsg="ERROR, Cant create a decoder. (out of memmory?)";
+               return 0;
+            }
 
-          (*it)->decoderCount++;
+            (*it)->decoderCount++;
 
-          if(!metaconf.empty())
-            dec->setMetaconf(metaconf);
+            if(!metaconf.empty())
+               dec->setMetaconf(metaconf);
 
-          return dec;
+            return dec;
+         }
       }
-    }
-  }
+   }
 
-  LOGDEBUG("DecoderMgr: Unknown observation type <" << decoderName << ">!\n");
-  errorMsg="Unknown observation type <"+decoderName+">!";
-  return 0;
+   LOGDEBUG("DecoderMgr: Unknown observation type <" << decoderName << ">!\n");
+   errorMsg="Unknown observation type <"+decoderName+">!";
+   return 0;
 }
 
 void
 DecoderMgr::releaseDecoder(DecoderBase *decoder)
 {
-  IDecoderList it=decoders.begin();
+   IDecoderList it=decoders.begin();
 
-  for(; it!=decoders.end(); it++){
-    if((*it)->decoderId==decoder->getDecoderId()){
-      (*it)->decoderCount--;
-      (*it)->releaseFunc(decoder);
-      break;
-    }
-  }
+   for(; it!=decoders.end(); it++){
+      if((*it)->decoderId==decoder->getDecoderId()){
+         (*it)->decoderCount--;
+         (*it)->releaseFunc(decoder);
+         break;
+      }
+   }
 
-  if(it==decoders.end())
-    LOGINFO("DecoderMgr: Unknown decoderId (" << decoder->getDecoderId()
-             << "  Decoder <" << decoder->name() << ">\n");
+   if(it==decoders.end())
+      LOGINFO("DecoderMgr: Unknown decoderId (" << decoder->getDecoderId()
+              << "  Decoder <" << decoder->name() << ">\n");
 }
 
 
 void
 DecoderMgr::obsTypes(std::list<std::string> &list)
 {
-  CIDecoderList it=decoders.begin();
-  std::list<miutil::miString>::const_iterator cit;
+   CIDecoderList it=decoders.begin();
+   std::list<string>::const_iterator cit;
 
-  list.clear();
+   list.clear();
 
-  for(; it!=decoders.end(); it++){
-    cit=(*it)->obsTypes.begin();
+   for(; it!=decoders.end(); it++){
+      cit=(*it)->obsTypes.begin();
 
-    for(;cit!=(*it)->obsTypes.end(); cit++)
-      list.push_back(*cit);
-  }
+      for(;cit!=(*it)->obsTypes.end(); cit++)
+         list.push_back(*cit);
+   }
 }
 
 void DecoderMgr::clearDecoders()
 {
-    for(IDecoderList it=decoders.begin(); it!=decoders.end(); it++) {
-        if( (*it)->decoderCount != 0 )
-            LOGERROR("destroying decoder which is in use " << (*it)->decoderCount << " times");
-        delete *it;
-    }
+   for(IDecoderList it=decoders.begin(); it!=decoders.end(); it++) {
+      if( (*it)->decoderCount != 0 )
+         LOGERROR("destroying decoder which is in use " << (*it)->decoderCount << " times");
+      delete *it;
+   }
 }

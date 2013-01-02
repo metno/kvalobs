@@ -29,9 +29,10 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include "kvCronString.h"
+#include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
-using namespace miutil;
 using namespace kvalobs;
 
 kvalobs::CronString::CronString(const std::string& str)
@@ -40,15 +41,33 @@ kvalobs::CronString::CronString(const std::string& str)
   unpackString();
 }
 
+namespace
+{
+bool isNumber(std::string s)
+{
+	try
+	{
+		boost::trim(s);
+		boost::lexical_cast<int>(s);
+		return true;
+	}
+	catch ( boost::bad_lexical_cast &)
+	{
+		return false;
+	}
+}
+}
+
 void
 kvalobs::CronString::unpackString()
 {
   for (int i=0; i<NT; i++) numbers[i].clear();
   isempty= true;
 
-  str_.trim();
+  boost::trim(str_);
 
-  vector<miString> v= str_.split(" "), v2;
+  vector<std::string> v, v2;
+  boost::split(v, str_, boost::algorithm::is_space(), boost::algorithm::token_compress_on);
 
   if (v.size() < NT){
     return;
@@ -57,9 +76,9 @@ kvalobs::CronString::unpackString()
   for (int i=0; i<NT; i++){
     if (v[i] != "*"){
       isempty= false;
-      v2= v[i].split(",");
+      boost::split(v2, v[i], boost::algorithm::is_any_of(","), boost::algorithm::token_compress_on);
       for (size_t j=0; j<v2.size(); j++)
-	if (v2[j].isNumber())
+	if (isNumber(v2[j]))
 	  numbers[i].push_back(atoi(v2[j].c_str()));
     }
   }
@@ -75,7 +94,7 @@ kvalobs::CronString::str(const std::string& str)
 }
 
 bool
-kvalobs::CronString::active(const miutil::miTime& t)
+kvalobs::CronString::active(const boost::posix_time::ptime& t)
 {
   if (isempty) return true;
 
@@ -83,11 +102,11 @@ kvalobs::CronString::active(const miutil::miTime& t)
 
   int thistime[5];
 
-  thistime[0]= t.min();
-  thistime[1]= t.hour();
-  thistime[2]= t.day();
-  thistime[3]= t.month();
-  thistime[4]= t.year();
+  thistime[0]= t.time_of_day().minutes();
+  thistime[1]= t.time_of_day().hours();
+  thistime[2]= t.date().day();
+  thistime[3]= t.date().month();
+  thistime[4]= t.date().year();
 
   // check backwards (year,month,day,hour,minute)
   // note that using NT<5 enables skipping year,month,...

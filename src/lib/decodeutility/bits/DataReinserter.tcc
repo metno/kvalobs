@@ -38,8 +38,8 @@ template<class kvApp>
   i.HQCid( this->operatorID );
   d.useinfo(i);
 
-  miutil::miString s = decodeutility::kvdataformatter::createString( d );
-  const char * send = s.cStr();
+  std::string s = decodeutility::kvdataformatter::createString( d );
+  const char * send = s.c_str();
 
   return app->sendDataToKv( send, decoderID );
 }
@@ -54,8 +54,8 @@ template<class kvApp>
     it->useinfo(i);
   }
 
-  miutil::miString s = decodeutility::kvdataformatter::createString( dl );
-  const char * send = s.cStr();
+  std::string s = decodeutility::kvdataformatter::createString( dl );
+  const char * send = s.c_str();
 
   const CKvalObs::CDataSource::Result_var ret = app->sendDataToKv( send, decoderID );
 

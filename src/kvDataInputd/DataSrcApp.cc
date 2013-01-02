@@ -32,9 +32,11 @@
 #include <boost/lexical_cast.hpp>
 #include <milog/milog.h>
 #include "DataSrcApp.h"
+#include <miutil/timeconvert.h>
 #include <kvalobs/bitmanip.h>
 #include <kvalobs/kvDbGate.h>
 #include <kvalobs/kvPath.h>
+
 using namespace dnmi::file;
 using namespace std;
 using namespace dnmi::db;
@@ -163,7 +165,7 @@ DataSrcApp::sendInfoToManager(const kvalobs::kvStationInfoList &info_)
 
    for(infoIndex=0; it!=info.end(); it++, infoIndex++){
       infoList[infoIndex].stationId=it->stationID();
-      infoList[infoIndex].obstime=it->obstime().isoTime().c_str();
+      infoList[infoIndex].obstime=to_kvalobs_string(it->obstime()).c_str();
       infoList[infoIndex].typeId_=it->typeID();
    }
 
@@ -281,8 +283,8 @@ DataSrcApp::registerParams()
 {
    Result     *res=0;
    Connection *con;
-   miString    msg;
-   miString    kode;
+   string    msg;
+   string    kode;
    int         id;
    con=conCache.findFreeConnection();
 
@@ -365,7 +367,7 @@ DataSrcApp::create(const char  *obsType_,
    DecoderBase   *dec;
    DecodeCommand *decCmd;
    Connection    *con;
-   miString      myErr;
+   string    myErr;
 
    //The call to conCache will block until a connection object
    //is ready in the cache.

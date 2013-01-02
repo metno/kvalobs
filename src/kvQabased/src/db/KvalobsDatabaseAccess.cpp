@@ -32,6 +32,7 @@
 #include <kvdb/dbdrivermgr.h>
 #include <kvalobs/kvPath.h>
 #include <milog/milog.h>
+#include <miutil/timeconvert.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <iomanip>
@@ -179,7 +180,7 @@ void KvalobsDatabaseAccess::getChecks(CheckList * out,
 	std::ostringstream query;
 	query << "SELECT * FROM checks WHERE ";
 	query << "(stationid=0 OR stationid=" << si.stationID() << ")";
-	query << " AND fromtime<='" << si.obstime() << "'";
+	query << " AND fromtime<='" << to_kvalobs_string(si.obstime()) << "'";
 	query << " ORDER BY stationid, fromtime;";
 
 
@@ -227,8 +228,8 @@ void KvalobsDatabaseAccess::getExpectedParameters(ParameterList * out,
 	query << "SELECT distinct name FROM param WHERE paramid IN (SELECT paramid FROM obs_pgm WHERE "
 		"stationid=" << si.stationID() << " AND "
 		//"typeid=" << si.typeID() << " AND "
-		"fromtime<='" << si.obstime() << "' AND "
-		"(totime IS NULL OR totime>'" << si.obstime() << "'));";
+		"fromtime<='" << to_kvalobs_string(si.obstime()) << "' AND "
+		"(totime IS NULL OR totime>'" << to_kvalobs_string(si.obstime()) << "'));";
 //		"(totime IS NULL OR totime>'" << si.obstime() << "') AND "
 //		"kl" << std::setfill('0') << std::setw(2) << si.obstime().hour() << "  AND " <<
 //		si.obstime().date().shortweekday(miutil::miDate::English) << ");";
@@ -265,7 +266,10 @@ kvalobs::kvAlgorithms KvalobsDatabaseAccess::getAlgorithm(
 
 std::string KvalobsDatabaseAccess::getStationParam(const kvalobs::kvStationInfo & si, const std::string & parameter, const std::string & qcx) const
 {
-	int dayNumber = si.obstime().dayOfYear();
+	const boost::gregorian::date & date = si.obstime().date();
+	const boost::gregorian::date firstDayOfYear(date.year(), 1, 1);
+	int dayNumber = (date - firstDayOfYear).days() + 1;
+	//int dayNumber = si.obstime().dayOfYear();
 
 	std::ostringstream query;
 	query << "SELECT metadata FROM station_param WHERE "
@@ -274,7 +278,7 @@ std::string KvalobsDatabaseAccess::getStationParam(const kvalobs::kvStationInfo 
 			"fromday<=" << dayNumber << " AND " << dayNumber << "<=today AND "
 			"qcx='" << qcx << "' AND "
 			"level=0 AND sensor='0' AND "
-			"fromtime<='" << si.obstime() << "' "
+			"fromtime<='" << to_kvalobs_string(si.obstime()) << "' "
 			"ORDER BY stationid DESC, fromtime DESC "
 			"LIMIT 1;";
 
@@ -324,12 +328,11 @@ void KvalobsDatabaseAccess::getModelData(ModelDataList * out, const kvalobs::kvS
 
 	if ( minutesBackInTime != 0 )
 	{
-		miutil::miTime first = si.obstime();
-		first.addMin(minutesBackInTime);
-		query << "obstime BETWEEN '" << first << "' AND '" << si.obstime() << "' AND ";
+		boost::posix_time::ptime first = si.obstime() + boost::posix_time::minutes(minutesBackInTime);
+		query << "obstime BETWEEN '" << to_kvalobs_string(first) << "' AND '" << to_kvalobs_string(si.obstime()) << "' AND ";
 	}
 	else
-		query << "obstime = '" << si.obstime() << "' AND ";
+		query << "obstime = '" << to_kvalobs_string(si.obstime()) << "' AND ";
 	query << "paramid = (SELECT paramid FROM param WHERE name='" << parameter.baseName() << "')";
 	if ( parameter.haveLevel() )
 		query << " AND level=" << parameter.level();
@@ -356,9 +359,8 @@ void KvalobsDatabaseAccess::getData(DataList * out, const kvalobs::kvStationInfo
 		query << "sensor='" << parameter.sensor() << "' AND ";
 	if ( parameter.haveType() )
 		query << "typeid=" << parameter.type() << " AND ";
-	miutil::miTime t = si.obstime();
-	t.addMin(minuteOffset);
-	query << "obstime BETWEEN '" << t << "' AND '" << si.obstime() << "'";
+	boost::posix_time::ptime t = si.obstime() + boost::posix_time::minutes(minuteOffset);
+	query << "obstime BETWEEN '" << to_kvalobs_string(t) << "' AND '" << to_kvalobs_string(si.obstime()) << "'";
 	query << " ORDER BY obstime DESC FOR UPDATE;";
 
 	milog::LogContext context("query");
@@ -383,9 +385,8 @@ void KvalobsDatabaseAccess::getTextData(TextDataList * out, const kvalobs::kvSta
 	query << "paramid IN (SELECT paramid FROM param WHERE name='" << parameter.baseName() << "') AND ";
 	if ( parameter.haveType() )
 		query << "typeid=" << parameter.type() << " AND ";
-	miutil::miTime t = si.obstime();
-	t.addMin(minuteOffset);
-	query << "obstime BETWEEN '" << t << "' AND '" << si.obstime() << "'";
+	boost::posix_time::ptime t = si.obstime() + boost::posix_time::minutes(minuteOffset);
+	query << "obstime BETWEEN '" << to_kvalobs_string(t) << "' AND '" << to_kvalobs_string(si.obstime()) << "'";
 	query << " ORDER BY obstime DESC;";
 
 	milog::LogContext context("query");

@@ -65,7 +65,7 @@ set(const dnmi::db::DRow &r_)
   return true;
 }
 		
-miutil::miString 
+std::string
 DataTblView::
 toSend()const
 {
@@ -74,7 +74,7 @@ toSend()const
 }
 		
 
-miutil::miString
+std::string
 DataTblView:: 
 uniqueKey()const
 {

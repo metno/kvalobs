@@ -31,15 +31,15 @@
 #ifndef _kvSynopDecoder_h
 #define _kvSynopDecoder_h
 
-#include <map>
-#include <list>
+#include "synop.h"
 
 #include <kvalobs/kvStation.h>
 #include <kvalobs/kvData.h>
 #include <kvalobs/kvRejectdecode.h>
+#include <puTools/miTime.h>
+#include <list>
+#include <map>
 #include <string>
-#include "synop.h"
-#include <iostream>
 
 /** Created by met.no/FoU/PU: j.schulze@met.no
     at Thu Jan 23 13:24:08 2003 */
@@ -64,11 +64,11 @@ private:
  
 
   std::map<int,int>              synopRegister;
-  std::map<miutil::miString,int> tempoRegister;
-  std::map<miutil::miString,int> shipRegister;
+  std::map<std::string,int> tempoRegister;
+  std::map<std::string,int> shipRegister;
 
-  int temporaryRegister(int);
-  int temporaryRegister(miutil::miString);
+  int temporaryRegister( int );
+  int temporaryRegister( std::string );
 
   bool needTmp;                    ///</ need a temporary station?
   int  lastTempoIndex;             ///</ the newest index
@@ -78,7 +78,7 @@ private:
   int late;                        ///</ time check ( 2 late ? in min)
 
 
-  miutil::miString rejectComment;
+  std::string rejectComment;
   
   char checkObservationTime(miutil::miTime tbt, miutil::miTime obt);
   void correct_h_VV_N( std::list<kvalobs::kvData> &data )const;
@@ -94,7 +94,7 @@ public:
   void autoReferenceTime();                       ///< continuous = true; ref=now
 
   bool decode(const  std::string &,std::list<kvalobs::kvData>& );        ///< false for rejected
-  kvalobs::kvRejectdecode  rejected(const miutil::miString &decoder=""); ///< use in case of repel
+  kvalobs::kvRejectdecode  rejected(const std::string &decoder=""); ///< use in case of repel
   bool tmpStation(kvalobs::kvStation&);                                  ///< true if any ...
 
 };

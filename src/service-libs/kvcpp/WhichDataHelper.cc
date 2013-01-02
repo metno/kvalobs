@@ -29,6 +29,7 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include "WhichDataHelper.h"
+#include <miutil/timeconvert.h>
 
 kvservice::WhichDataHelper::WhichDataHelper(
     CKvalObs::CService::StatusId status	  
@@ -66,24 +67,24 @@ kvservice::WhichDataHelper::operator=(const WhichDataHelper &wd)
  
 bool 
 kvservice::WhichDataHelper::addStation(long stationid, 
-				       const miutil::miTime &from,
-				       const miutil::miTime &to)
+				       const boost::posix_time::ptime &from,
+				       const boost::posix_time::ptime &to)
 {
     CORBA::Long i=whichData_.length();
     
-    if(from.undef())
+    if(from.is_not_a_date_time())
 	return false;
 
     whichData_.length(i+1);
 
     whichData_[i].stationid=stationid;
     whichData_[i].status=statusId_;
-    whichData_[i].fromObsTime=from.isoTime().c_str();
+    whichData_[i].fromObsTime=to_kvalobs_string(from).c_str();
     
-    if(to.undef())
+    if(to.is_not_a_date_time())
 	whichData_[i].toObsTime=(const char*)"";
     else
-	whichData_[i].toObsTime=to.isoTime().c_str();
+	whichData_[i].toObsTime=to_kvalobs_string(to).c_str();
 
     return true;
 }

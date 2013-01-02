@@ -31,7 +31,8 @@
 
 #include <stdio.h>
 #include <fstream>
-#include <puTools/miTime.h>
+#include <boost/algorithm/string.hpp>
+#include <miutil/timeconvert.h>
 #include "GetData.h"
 #include "App.h"
 
@@ -84,11 +85,11 @@ subscribeSetup()
       cerr << "Subscribe on KvHint!" << endl;
    }
 
-   miutil::miTime toTime = miutil::miTime::nowTime();
-   miutil::miTime fromTime = lastFromTime( m_fileFromTime );
+   boost::posix_time::ptime toTime = boost::posix_time::second_clock::universal_time();
+   boost::posix_time::ptime fromTime = lastFromTime( m_fileFromTime );
 
-   cout << "toTime= " << toTime.isoTime() << endl;
-   cout << "fromTime= " << fromTime.isoTime() << endl;
+   cout << "toTime= " << to_kvalobs_string(toTime) << endl;
+   cout << "fromTime= " << to_kvalobs_string(fromTime) << endl;
 
    kvservice::WhichDataHelper whichData;
   
@@ -142,20 +143,20 @@ run()
    kvservice::corba::CorbaKvApp::run();
 }      
     
-miutil::miTime 
+boost::posix_time::ptime
 App::
 lastFromTime( const string& filename )
 {
-   miutil::miTime time;
-   miutil::miString str;
+   boost::posix_time::ptime time;
+   std::string str;
 
    cerr<<"filename= "<<filename<<endl;
 
    ifstream fin( filename.c_str() );
    if(!fin){
       cerr<<"the file "<<filename<<" does not exist"<<endl;
-      time = miutil::miTime::nowTime();
-      time.addDay(-1);
+      time = boost::posix_time::second_clock::universal_time();
+      time -= boost::gregorian::days(1);
       cerr<<"return lastFromTime: no file"<<endl;
       return time;
    }
@@ -168,33 +169,36 @@ lastFromTime( const string& filename )
       cerr<<"try lastFromTime"<<endl;
 
       while(getline(fin,str)){
-         str.trim();
+         boost::trim(str);
          cerr<<"str= "<<str<<endl;
          
          if(!str.empty()){
-            if( time.isValid(str) ){
-               time.setTime(str);
+        	 try
+        	 {
+        		 time = boost::posix_time::time_from_string_nothrow(str);
+        	 }
+        	 catch ( std::exception &)
+        	 {}
                
-               if(time.undef()){
+               if(time.is_not_a_date_time()){
                   cerr<<"time is undef"<<endl;
-                  time = miutil::miTime::nowTime();
-                  time.addDay(-1);
+                  time = boost::posix_time::second_clock::universal_time();
+                  time -= boost::gregorian::days(1);
                }
             }else{
                cerr<<"time is not valid"<<endl;
-               time = miutil::miTime::nowTime();
-               time.addDay(-1);
+               time = boost::posix_time::second_clock::universal_time();
+               time -= boost::gregorian::days(1);
             }
          }
-      }
    }catch( std::ios_base::failure ){
       cerr<<"catch( std::ios_base::failure )"<<endl;
-      time = miutil::miTime::nowTime();
-      time.addDay(-1);
+      time = boost::posix_time::second_clock::universal_time();
+      time -= boost::gregorian::days(1);
    }catch(...){
       cerr<<"catch(...)"<<endl;
-      time = miutil::miTime::nowTime();
-      time.addDay(-1);
+      time = boost::posix_time::second_clock::universal_time();
+      time -= boost::gregorian::days(1);
    }
 
    cerr<<"return lastFromTime"<<endl;
@@ -211,14 +215,14 @@ printObsDataList( KvObsDataList& dataList )
    string fileDataList = datadir + "/" + "obsDataList";
    string fileTextDataList= datadir + "/" + "textDataList";
   
-   miutil::miTime toTime = miutil::miTime::nowTime();
+   boost::posix_time::ptime toTime = boost::posix_time::second_clock::universal_time();
   
-   string filename = fileDataList + "." + toTime.isoDate() + "_" 
-                     + toTime.isoClock();
+   string filename = fileDataList + "." + to_kvalobs_string(toTime.date()) + "_"
+                     + to_kvalobs_string(toTime.time_of_day());
    string pfilename = filename + ".new";
 
-   string textfilename = fileTextDataList + "." + toTime.isoDate() + "_" 
-                         + toTime.isoClock();
+   string textfilename = fileTextDataList + "." + to_kvalobs_string(toTime.date()) + "_"
+                         + to_kvalobs_string(toTime.time_of_day());
    string ptextfilename = textfilename + ".new";
 
    ofstream fout( pfilename.c_str() );
@@ -232,8 +236,8 @@ printObsDataList( KvObsDataList& dataList )
       KvObsData::kvDataList::iterator it=dit->dataList().begin();
     
       if(dit->dataList().size()>0){
-         miutil::miTime obstime= it->obstime();
-         miutil::miTime tbtime= it->tbtime();
+         boost::posix_time::ptime obstime= it->obstime();
+         boost::posix_time::ptime tbtime= it->tbtime();
 
          if( obstime < toTime )
             toTime = obstime;
@@ -246,8 +250,8 @@ printObsDataList( KvObsDataList& dataList )
               it != dit->dataList().end();
               it++){
             char c= it->sensor();
-            fout << it->stationID() << "|" << it->obstime() << "|" << it->original() 
-                 << "|" << it->paramID()<< "|" <<  it->tbtime() << "|" 
+            fout << it->stationID() << "|" << to_kvalobs_string(it->obstime()) << "|" << it->original()
+                 << "|" << it->paramID()<< "|" <<  to_kvalobs_string(it->tbtime()) << "|"
                  << it->typeID() << "|" << c << "|" << it->level() << "|" 
                  << it->corrected() << "|" << it->controlinfo().flagstring() 
                  << "|" << it->useinfo().flagstring() << "|" << it->cfailed() 
@@ -263,8 +267,8 @@ printObsDataList( KvObsDataList& dataList )
             tfout.open( ptextfilename.c_str() );
          }
       
-         miutil::miTime obstime= i->obstime();
-         miutil::miTime tbtime= i->tbtime();
+         boost::posix_time::ptime obstime= i->obstime();
+         boost::posix_time::ptime tbtime= i->tbtime();
 
          if( obstime < toTime )
             toTime = obstime;
@@ -275,8 +279,8 @@ printObsDataList( KvObsDataList& dataList )
          for( ;
               i !=dit->textDataList().end();
               i ++){
-            tfout << i->stationID() << "|" << i->obstime() << "|" << i->original() 
-                  << "|" << i->paramID()<< "|" <<  i->tbtime() << "|" 
+            tfout << i->stationID() << "|" << to_kvalobs_string(i->obstime()) << "|" << i->original()
+                  << "|" << i->paramID()<< "|" <<  to_kvalobs_string(i->tbtime()) << "|"
                   << i->typeID() << endl;
          }
       }
@@ -293,15 +297,15 @@ printObsDataList( KvObsDataList& dataList )
       cerr<<"can not rename file"<<ptextfilename<<endl;
    }
   
-   toTime.addHour(-6);
+   toTime -= boost::posix_time::hours(6);
    storeToFile( fileFromTime, toTime );
    cout<<"**  printObsDataList is finished **"<<endl;
 }
 
 void 
 App::
-storeToFile( const std::string& filename, const miutil::miTime& toTime )
+storeToFile( const std::string& filename, const boost::posix_time::ptime& toTime )
 {
    ofstream fout(filename.c_str());
-   fout <<toTime.isoTime();
+   fout << to_kvalobs_string(toTime);
 }

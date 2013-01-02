@@ -89,13 +89,21 @@ public:
 		return true;
 	}
 
-    virtual bool getKvStationMetaData( std::list<kvalobs::kvStationMetadata> &stMeta, int stationid, const miutil::miTime &obstime, const std::string & metadataName = "")
+    virtual bool getKvStationMetaData( std::list<kvalobs::kvStationMetadata> &stMeta, int stationid, const boost::posix_time::ptime &obstime, const std::string & metadataName = "")
     {
     	return true;
     }
 
 	virtual bool getKvObsPgm(std::list<kvalobs::kvObsPgm> &obsPgm,
 			const std::list<long> &stationList, bool aUnion)
+	{
+		return true;
+	}
+
+	virtual bool getKvWorkstatistik(CKvalObs::CService::WorkstatistikTimeType timeType,
+	                                    const boost::posix_time::ptime &from, const boost::posix_time::ptime &to,
+	                                    kvservice::WorkstatistikIterator &it
+	                                    )
 	{
 		return true;
 	}

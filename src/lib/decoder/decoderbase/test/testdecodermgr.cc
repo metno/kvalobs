@@ -68,9 +68,9 @@ main(int argn, char **argv)
 
     cerr << "Connected to <" << drvId << ">\n";
 
-    miString obsType("autoobs");
-    miString obs("autoobs::obs");
-    miString errMsg;
+    std::string obsType("autoobs");
+    std::string obs("autoobs::obs");
+    std::string errMsg;
 
     decoder=dcdmgr.findDecoder(*con, 10224, obsType, obs, errMsg);
     

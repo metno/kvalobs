@@ -41,7 +41,7 @@ class populateScriptTest: public testing::Test
 {
 public:
 	populateScriptTest() :
-		observation(10, "2010-05-12 06:00:00", 302),
+		observation(10, boost::posix_time::time_from_string("2010-05-12 06:00:00"), 302),
 		script("sub check() { print \"ok\\n\"; }", scriptrunner::language::Interpreter::get("perl"))
 	{}
 protected:
@@ -129,7 +129,9 @@ TEST_F(populateScriptTest, minimalScript)
 	NumList numericList = obs->numericList();
 	const scriptrunner::ScriptInput::ValueList & v = numericList["obstime"];
 	ASSERT_EQ(6u, v.size());
-	miutil::miTime t(v[0], v[1], v[2], v[3], v[4], v[5]);
+	boost::posix_time::ptime t(
+			boost::gregorian::date(v[0], v[1], v[2]),
+			boost::posix_time::time_duration(v[3], v[4], v[5]));
 	EXPECT_EQ(observation.obstime(), t);
 
 	scriptrunner::ScriptInput::NumericParameters numeric = obs->numeric();
@@ -322,13 +324,13 @@ TEST_F(populateScriptTest, existingRefObs)
 	using namespace testing;
 
 	db::DatabaseAccess::TextDataList klstart;
-	klstart.push_back(kvalobs::kvTextData(observation.stationID(), observation.obstime(), "2010010106", 1021, miutil::miTime(), observation.typeID()));
+	klstart.push_back(kvalobs::kvTextData(observation.stationID(), observation.obstime(), "2010010106", 1021, boost::posix_time::ptime(), observation.typeID()));
 	EXPECT_CALL(mockDatabase, getTextData(_, observation, qabase::DataRequirement::Parameter("KLSTART"), 0))
 				.Times(AtLeast(1))
 				.WillRepeatedly(SetArgumentPointee<0>(klstart));
 
 	db::DatabaseAccess::TextDataList klobs;
-	klobs.push_back(kvalobs::kvTextData(observation.stationID(), observation.obstime(), "2010050106", 1022, miutil::miTime(), observation.typeID()));
+	klobs.push_back(kvalobs::kvTextData(observation.stationID(), observation.obstime(), "2010050106", 1022, boost::posix_time::ptime(), observation.typeID()));
 	EXPECT_CALL(mockDatabase, getTextData(_, observation, qabase::DataRequirement::Parameter("KLOBS"), 0))
 				.Times(AtLeast(1))
 				.WillRepeatedly(SetArgumentPointee<0>(klobs));
@@ -375,16 +377,16 @@ TEST_F(populateScriptTest, oneRefObsNonexisting)
 	using namespace testing;
 
 	db::DatabaseAccess::TextDataList klstart;
-	miutil::miTime t = observation.obstime();
-	klstart.push_back(kvalobs::kvTextData(observation.stationID(), t, "2010010206", 1021, miutil::miTime(), observation.typeID()));
-	t.addHour(-1);
-	klstart.push_back(kvalobs::kvTextData(observation.stationID(), t, "2010010106", 1021, miutil::miTime(), observation.typeID()));
+	boost::posix_time::ptime t = observation.obstime();
+	klstart.push_back(kvalobs::kvTextData(observation.stationID(), t, "2010010206", 1021, boost::posix_time::ptime(), observation.typeID()));
+	t -= boost::posix_time::hours(1);
+	klstart.push_back(kvalobs::kvTextData(observation.stationID(), t, "2010010106", 1021, boost::posix_time::ptime(), observation.typeID()));
 	EXPECT_CALL(mockDatabase, getTextData(_, observation, qabase::DataRequirement::Parameter("KLSTART"), -60))
 				.Times(AtLeast(1))
 				.WillRepeatedly(SetArgumentPointee<0>(klstart));
 
 	db::DatabaseAccess::TextDataList klobs;
-	klobs.push_back(kvalobs::kvTextData(observation.stationID(), observation.obstime(), "2010050106", 1022, miutil::miTime(), observation.typeID()));
+	klobs.push_back(kvalobs::kvTextData(observation.stationID(), observation.obstime(), "2010050106", 1022, boost::posix_time::ptime(), observation.typeID()));
 	EXPECT_CALL(mockDatabase, getTextData(_, observation, qabase::DataRequirement::Parameter("KLOBS"), -60))
 				.Times(AtLeast(1))
 				.WillRepeatedly(SetArgumentPointee<0>(klobs));

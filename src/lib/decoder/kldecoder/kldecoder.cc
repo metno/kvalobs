@@ -39,6 +39,7 @@
 #include <kvalobs/kvQueries.h>
 #include <kvalobs/kvTypes.h>
 #include <miutil/trimstr.h>
+#include <miutil/timeconvert.h>
 #include "kldecoder.h"
 #include <decodeutility/decodeutility.h>
 
@@ -58,8 +59,8 @@ KlDecoder::
 KlDecoder( dnmi::db::Connection   &con,
            const ParamList        &params,
            const std::list<kvalobs::kvTypes> &typeList,
-           const miutil::miString &obsType,
-           const miutil::miString &obs,
+           const std::string &obsType,
+           const std::string &obs,
            int                    decoderId)
 :DecoderBase(con, params, typeList, obsType, obs, decoderId)
 {
@@ -83,7 +84,7 @@ toupper(const std::string &s_){
    return string(s);
 }
 
-miutil::miString 
+std::string
 kvalobs::decoder::kldecoder::
 KlDecoder::
 name() const
@@ -99,10 +100,10 @@ rejected( const std::string &msg, const std::string &logid )
    ostringstream ost;
    bool saved=true;
 
-   miTime tbtime( miTime::nowTime());
+   boost::posix_time::ptime tbtime( boost::posix_time::microsec_clock::universal_time());
 
    ost << "REJECTED: Decoder: " << name() << endl
-       <<" message: " << msg  << endl << obs;
+         <<" message: " << msg  << endl << obs;
 
 
    kvalobs::kvRejectdecode rejected( obs,
@@ -131,7 +132,7 @@ rejected( const std::string &msg, const std::string &logid )
 kvalobs::decoder::DecoderBase::DecodeResult 
 kvalobs::decoder::kldecoder::
 KlDecoder::
-execute(miutil::miString &msg)
+execute(std::string &msg)
 {
    list<kvalobs::kvData> dataList;
    list<kvalobs::kvTextData> textDataList;
@@ -176,7 +177,7 @@ execute(miutil::miString &msg)
    if( typeId<0 ) {
       ostringstream o;
       o << "Format error in type!"
-        << "stationid: " << stationid << ".";
+            << "stationid: " << stationid << ".";
 
       return rejected( o.str(), "");
    }
@@ -184,7 +185,7 @@ execute(miutil::miString &msg)
    IdlogHelper idLog( stationid, typeId, this );
    logid = idLog.logid();
 
-   obs.trim();
+   trimstr( obs );
    obs += "\n";
 
    istringstream istr(obs);
@@ -228,7 +229,7 @@ execute(miutil::miString &msg)
       if( obstime.undef() ) {
          ostringstream err;
          err << "Invalid obstime. Line: " << tmp << endl
-             << "stationid: " << stationid << " typeid: " << typeId;
+               << "stationid: " << stationid << " typeid: " << typeId;
 
          return rejected( err.str(), logid );
       }
@@ -240,8 +241,8 @@ execute(miutil::miString &msg)
       if( !decodeData( da, params.size(), tmp, lines, msg ) ) {
          ostringstream o;
          o << "Cant decode data. Line: " << tmp << endl
-           << "Reason: " << msg <<  endl
-           << "Stationid: " <<  stationid << " typeid: " << typeId;
+               << "Reason: " << msg <<  endl
+               << "Stationid: " <<  stationid << " typeid: " << typeId;
          return rejected( o.str(), logid );
       }
 
@@ -250,9 +251,9 @@ execute(miutil::miString &msg)
 
       for(KlDataArray::size_type index=0; index<da.size(); index++)
          ost << params[index].name() << "("<< params[index].id() << ")["
-             << params[index].sensor() << "," << params[index].level() << "]=("
-             << da[index].val()<<"," << da[index].cinfo()<<"," << da[index].uinfo()
-             << endl;
+         << params[index].sensor() << "," << params[index].level() << "]=("
+         << da[index].val()<<"," << da[index].cinfo()<<"," << da[index].uinfo()
+         << endl;
 
       IDLOGDEBUG3( logid, ost.str() );
       dataList.clear();
@@ -272,10 +273,10 @@ execute(miutil::miString &msg)
 
          if( isTextParam( params[index].id() ) ) {
             kvTextData d( stationid,
-                          obstime,
+                          to_ptime(obstime),
                           val,
                           params[index].id(),
-                          tbtime,
+                          to_ptime(tbtime),
                           typeId );
 
             textDataList.push_back( d );
@@ -302,10 +303,10 @@ execute(miutil::miString &msg)
             }
 
             kvData d( stationid,
-                      obstime,
+            		to_ptime(obstime),
                       fval,
                       params[index].id(),
-                      tbtime,
+                      to_ptime(tbtime),
                       typeId,
                       params[index].sensor(),
                       params[index].level(),
@@ -329,10 +330,10 @@ execute(miutil::miString &msg)
 
    ostringstream ost;
    ost << "# Lines:             " << lines-1 << endl
-       << "# Lines with data:   " << nLineWithData << endl
-       << "# dataelements:      " << nExpectedData << endl
-       << "# Saved datarecords: " << count <<  endl
-       << "# Error in save:     " << nErrors;
+         << "# Lines with data:   " << nLineWithData << endl
+         << "# dataelements:      " << nExpectedData << endl
+         << "# Saved datarecords: " << count <<  endl
+         << "# Error in save:     " << nErrors;
 
    msg = ost.str();
 
@@ -347,8 +348,8 @@ execute(miutil::miString &msg)
       if( nExpectedData != count ) {
          ostringstream  ost;
          ost << "WARNING: Expected to save " << nExpectedData 
-             << " dataelements, but only "  << count
-             << " dataelements was saved!";
+               << " dataelements, but only "  << count
+               << " dataelements was saved!";
          warnings = true;
          IDLOGWARN( logid, ost.str() );
          msg += ost.str();
@@ -369,12 +370,12 @@ execute(miutil::miString &msg)
 long 
 kvalobs::decoder::kldecoder::
 KlDecoder::
-getStationId(miutil::miString &msg)
+getStationId(std::string &msg)
 {	
-   miString keyval;
-   miString key;
-   miString val;
-   miString::size_type i;
+   string keyval;
+   string key;
+   string val;
+   string::size_type i;
    CommaString cstr(obsType, '/');
    long  id;
 
@@ -390,7 +391,7 @@ getStationId(miutil::miString &msg)
 
    i = keyval.find('=');
 
-   if (i == miString::npos) {
+   if (i == string::npos) {
       msg = "obsType: <id> Invalid format!";
       return 0;
    }
@@ -398,8 +399,8 @@ getStationId(miutil::miString &msg)
    key = keyval.substr(0, i);
    val = keyval.substr(i + 1);
 
-   val.trim();
-   key.trim();
+   trimstr( val );
+   trimstr( key );
 
    if (key.empty() || val.empty()) {
       msg = "obsType: Invalid format!";
@@ -431,7 +432,7 @@ getStationId(miutil::miString &msg)
 long 
 kvalobs::decoder::kldecoder::
 KlDecoder::
-getTypeId(miutil::miString &msg)const
+getTypeId(std::string &msg)const
 {
    string keyval;
    string key;
@@ -477,7 +478,7 @@ kvalobs::decoder::kldecoder::
 KlDecoder::
 splitParams(const std::string &header, 
             std::list<std::string> &params,
-            miutil::miString &msg)
+            std::string &msg)
 {
    string param;
    string::size_type iEnd=0;
@@ -537,7 +538,7 @@ kvalobs::decoder::kldecoder::
 KlDecoder::
 splitData(const std::string &sdata, 
           std::list<std::string> &datalist,
-          miutil::miString &msg)
+          std::string &msg)
 {
    string val;
    string::size_type iEnd=0;
@@ -587,7 +588,7 @@ kvalobs::decoder::kldecoder::
 KlDecoder::
 decodeHeader(const std::string &header, 
              std::vector<ParamDef> &params,
-             miutil::miString &msg)
+             std::string &msg)
 {
    string::size_type i;
    string::size_type iEnd=0;
@@ -689,7 +690,7 @@ decodeData(KlDataArray &da,
            KlDataArray::size_type daSize,
            const std::string &sdata,
            int line,
-           miutil::miString &msg)
+           std::string &msg)
 {
    string::size_type      i;
    string::size_type      iEnd;
@@ -717,8 +718,8 @@ decodeData(KlDataArray &da,
       ost << " [" << *it<< "]";
 
    IDLOGDEBUG( logid,"decodeData: Data in string: " << endl <<
-            "[" << sdata<< "]" << endl <<
-            ost.str());
+               "[" << sdata<< "]" << endl <<
+               ost.str());
 
 
    da=KlDataArray(daSize);
