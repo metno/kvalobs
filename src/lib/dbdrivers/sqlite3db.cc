@@ -152,7 +152,7 @@ dnmi::db::drivers::SQLiteConnection::tryReconnect()
 {
    if( ! pimpel ) {
       errMsg = "SQLite: Driver internal error (no pimpel)!";
-      return 0;
+      return false;
    }
 
    int res;
@@ -303,7 +303,7 @@ dnmi::db::drivers::SQLiteConnection::execQuery(const std::string &query)
 
    if( ! pimpel ) {
       errMsg = "SQLite: Driver internal error (no pimpel)!";
-      return false;
+      return 0;
    }
 
    SQLitePimpel *myPimpel = static_cast<SQLitePimpel*>( pimpel );
