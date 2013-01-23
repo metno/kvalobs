@@ -1,3 +1,11 @@
+kvalobs (2.7.0~rc4-1) unstable; urgency=low
+
+  * do not depend on libkvalobs, which does not exist, but
+    on libkvalobs4
+  * updated kvUseInfo to flag-specification 9.13
+
+ -- Alexander Bürger <alexander.buerger@met.no>  Wed, 16 Jan 2013 14:36:00 +0100
+
 kvalobs (2.7.0~rc3-1) unstable; urgency=low
 
   * added const-ref for many kvXyz accessors

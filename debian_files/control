@@ -23,7 +23,7 @@ Standards-Version: 3.7.3
 Package: kvalobs
 Architecture: any
 Depends: kvalobsuser, postgresql | postgresql-8.3 | postgresql-8.4 | postgresql-9.0 | postgresql-9.1
- ,libkvalobs (>= ${binary:Version})
+ ,libkvalobs4 (>= ${binary:Version})
  ,${shlibs:Depends}, ${misc:Depends}, adduser, debconf
  ,sqlite3
 Suggests: postgresql-client
@@ -82,7 +82,7 @@ Description: Client program to send data to a kvalobs server
 Package: kv2kvdatainputd
 Architecture: any
 Depends:  ${shlibs:Depends}, ${misc:Depends},
- libkvalobs (>= ${binary:Version})
+ libkvalobs4 (>= ${binary:Version})
 Description: kv2kvDataInputd listen on data from one kvalobs server
  and sends the data to kvDataInputd on another kvalobs server.
  The data from source kvalobs is stripped so only the original data 
