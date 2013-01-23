@@ -248,7 +248,7 @@ void synop::squareDetection()
 
   if(hasobs(LaLaLa))
     if(pinfo.Qc == 5 || pinfo.Qc == 3 )
-      obs[LaLaLa]=(-1);  
+      obs[LaLaLa]*=(-1);
 }
 
 void synop::checkOrder(const char* token) {
