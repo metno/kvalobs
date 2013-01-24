@@ -71,6 +71,7 @@ class DataUpdateTransaction : public dnmi::db::Transaction
    std::string logid;
    std::string insertType;
    int nRetry;
+   bool onlyAddOrUpdateData;
 
 public:
    void setTbtime( dnmi::db::Connection *conection );
@@ -133,6 +134,15 @@ public:
                 const std::list<kvalobs::kvData> &data,
                 const std::list<kvalobs::kvTextData> &textData );
 
+   /**
+    * Insert or update data. This method do not mark data in the
+    * database for the same "message" as deleted. We just insert
+    * or update data.
+    */
+   bool doInsertOrUpdate( dnmi::db::Connection *conection,
+                          std::list<kvalobs::kvData> &dataList,
+                          std::list<kvalobs::kvTextData> &textDataList );
+
 
    void replaceData( dnmi::db::Connection *conection,
                      const std::list<kvalobs::kvData> &dataList,
@@ -144,7 +154,8 @@ public:
                           int priority,
                           std::list<kvalobs::kvData> *newData,
                           std::list<kvalobs::kvTextData> *newTextData,
-                          const std::string &logid );
+                          const std::string &logid,
+                          bool onlyAddOrUpdateData = false );
    DataUpdateTransaction(const DataUpdateTransaction &dut );
 
    virtual ~DataUpdateTransaction();

@@ -39,6 +39,75 @@
 
 using namespace std;
 
+namespace {
+
+bool
+isKvDataEqual( const kvalobs::kvData &rhs, const kvalobs::kvData &lhs )
+{
+    if( rhs.obstime() == lhs.obstime() &&
+        rhs.stationID() == lhs.stationID() &&
+        rhs.typeID() == lhs.typeID() &&
+        rhs.paramID() == lhs.paramID() &&
+        rhs.sensor() == lhs.sensor() &&
+        rhs.level() == lhs.level() ) {
+             float nv = lhs.original();
+             float ov = rhs.original();
+
+             if( static_cast<int>( (nv+0.005)*100 ) ==
+                 static_cast<int>( (ov+0.005)*100 )    )
+                 return true;
+    }
+
+    return false;
+}
+
+bool
+isKvTextDataEqual( const kvalobs::kvTextData &rhs, const kvalobs::kvTextData &lhs )
+{
+    if( rhs.obstime() == lhs.obstime() &&
+           rhs.stationID() == lhs.stationID() &&
+           rhs.typeID() == lhs.typeID() &&
+           rhs.paramID() == lhs.paramID() &&
+           rhs.original() == lhs.original() )
+        return true;
+    else
+        return false;
+}
+
+std::list<kvalobs::kvData>::const_iterator
+findElem( const kvalobs::kvData &elem, const std::list<kvalobs::kvData> &list )
+{
+    for( std::list<kvalobs::kvData>::const_iterator it = list.begin();
+          it != list.end(); ++it ) {
+        if( elem.obstime() == it->obstime() &&
+            elem.stationID() == it->stationID() &&
+            elem.typeID() == it->typeID() &&
+            elem.paramID() == it->paramID() &&
+            elem.sensor() == it->sensor() &&
+            elem.level() == it->level() )
+            return it;
+    }
+
+    return list.end();
+}
+
+std::list<kvalobs::kvTextData>::const_iterator
+findElem( const kvalobs::kvTextData &elem, const std::list<kvalobs::kvTextData> &list )
+{
+    for( std::list<kvalobs::kvTextData>::const_iterator it = list.begin();
+          it != list.end(); ++it ) {
+        if( elem.obstime() == it->obstime() &&
+            elem.stationID() == it->stationID() &&
+            elem.typeID() == it->typeID() &&
+            elem.paramID() == it->paramID() )
+            return it;
+     }
+
+    return list.end();
+}
+
+}
+
 namespace kvalobs{
 
 namespace decoder{
@@ -51,11 +120,13 @@ DataUpdateTransaction( const boost::posix_time::ptime &obstime,
                        int priority,
                        std::list<kvalobs::kvData> *newData,
                        std::list<kvalobs::kvTextData> *newTextData,
-                       const std::string &logid )
+                       const std::string &logid,
+                       bool onlyAddOrUpdateData_ )
    : newData( newData ), newTextData( newTextData ), obstime( obstime ),
      stationid( stationid ), typeid_( typeid_ ), priority( priority ),
      stationInfoList_( new kvalobs::kvStationInfoList() ),
-     ok_( new bool( false ) ), logid( logid ), nRetry( 0 )
+     ok_( new bool( false ) ), logid( logid ), nRetry( 0 ),
+     onlyAddOrUpdateData( onlyAddOrUpdateData_ )
 {
 }
 
@@ -65,7 +136,8 @@ DataUpdateTransaction(const DataUpdateTransaction &dut )
      obstime( dut.obstime ), stationid( dut.stationid ),
      typeid_( dut.typeid_ ), priority( dut.priority ),
      stationInfoList_( dut.stationInfoList_ ),
-     ok_( dut.ok_ ), logid( dut.logid ), nRetry( dut.nRetry )
+     ok_( dut.ok_ ), logid( dut.logid ), nRetry( dut.nRetry ),
+     onlyAddOrUpdateData( dut.onlyAddOrUpdateData )
 {
 }
 
@@ -262,6 +334,8 @@ getUniqTbtime( dnmi::db::Connection *con )
 
       return t;
    }
+
+   return boost::posix_time::microsec_clock::universal_time();
 }
 
 void
@@ -885,7 +959,12 @@ update( dnmi::db::Connection *connection,
         const std::list<kvalobs::kvTextData> &textData )
 {
    ostringstream ost;
-   boost::posix_time::ptime tbtime( boost::posix_time::microsec_clock::universal_time() );
+   boost::posix_time::ptime tbtime;
+
+   if( ! data.empty() )
+       tbtime = data.begin()->tbtime();
+   else if( ! textData.empty() )
+       tbtime = textData.begin()->tbtime();
 
    for( std::list<kvalobs::kvData>::const_iterator it=data.begin();
         it != data.end(); ++it ) {
@@ -928,6 +1007,53 @@ update( dnmi::db::Connection *connection,
 
 bool
 DataUpdateTransaction::
+doInsertOrUpdate( dnmi::db::Connection *conection,
+                  list<kvalobs::kvData> &oldData,
+                  list<kvalobs::kvTextData> &oldTextData )
+{
+    list<kvalobs::kvData> toUpdateData;
+    list<kvalobs::kvTextData> toUpdateTextData;
+    list<kvalobs::kvData> toInsertData;
+    list<kvalobs::kvTextData> toInsertTextData;
+    list<kvalobs::kvData>::const_iterator itData;
+    list<kvalobs::kvTextData>::const_iterator itTextData;
+
+    boost::posix_time::ptime tbtime( boost::posix_time::microsec_clock::universal_time() );
+
+    for( list<kvalobs::kvData>::iterator it = newData->begin();
+         it != newData->end(); ++it ) {
+        it->tbtime( tbtime );
+
+        itData = findElem( *it, oldData );
+        if( itData != oldData.end() ) {
+            if( ! isKvDataEqual( *itData, *it ) )
+                toUpdateData.push_back( *it );
+        } else {
+            toInsertData.push_back( *it );
+        }
+    }
+
+    for( list<kvalobs::kvTextData>::iterator it = oldTextData.begin();
+         it != oldTextData.end(); ++it ) {
+        it->tbtime( tbtime );
+
+        itTextData = findElem( *it, oldTextData );
+        if( itTextData != oldTextData.end() ) {
+            if( ! isKvTextDataEqual( *itTextData, *it ) )
+                toUpdateTextData.push_back( *it );
+        } else {
+            toInsertTextData.push_back( *it );
+        }
+    }
+
+    update( conection, toUpdateData, toUpdateTextData );
+    insertData( conection, toInsertData, toInsertTextData );
+
+    return true;
+}
+
+bool
+DataUpdateTransaction::
 operator()( dnmi::db::Connection *conection )
 {
    ostringstream mylog;
@@ -964,7 +1090,7 @@ operator()( dnmi::db::Connection *conection )
          return false;
       }
 
-      log << "NewData: stationid: " << stationid << " typeid: " << typeid_
+      log << "NewData " << (onlyAddOrUpdateData?"(replenish):":":") << "stationid: " << stationid << " typeid: " << typeid_
           << " obstime: " << obstime << endl << mylog.str()  << endl;
    }
 
@@ -989,6 +1115,11 @@ operator()( dnmi::db::Connection *conection )
           << " obstime: " << obstime );
       insertType = "DUPLICATE";
       return true;
+   }
+
+   if( onlyAddOrUpdateData ) {
+       insertType = "REPLENISH";
+       return doInsertOrUpdate( conection, dataList, textDataList );
    }
 
    log << "Replace data.stationid: " << stationid << " typeid: " << typeid_
