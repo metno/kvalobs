@@ -64,12 +64,91 @@ KlDecoder( dnmi::db::Connection   &con,
            int                    decoderId)
 :DecoderBase(con, params, typeList, obsType, obs, decoderId)
 {
+    decodeObsType();
 }
 
 kvalobs::decoder::kldecoder::
 KlDecoder::
 ~KlDecoder()
 {
+}
+
+void
+kvalobs::decoder::kldecoder::
+KlDecoder::
+decodeObsType()
+{
+    string keyval;
+    string key;
+    string val;
+    string::size_type i;
+    string::size_type iKey;
+    CommaString cstr(obsType, '/');
+    long  id;
+    const char *keys[] = {"nationalnr","stationid","wmonr","icaoid","call_sign",
+                    "type", "update", 0};
+
+    typeID = INT_MAX;
+    stationID = INT_MAX;
+    onlyInsertOrUpdate = false;
+
+    if(cstr.size()<2){
+//        msg="obsType: Invalid Format!";
+        return;
+    }
+
+    for( int index = 1; index < cstr.size(); ++index ) {
+        if(!cstr.get( index, keyval)){
+            //msg="INTERNALERROR: InvalidFormat!";
+            return;
+        }
+
+        for( iKey=0; keys[iKey]; ++iKey ) {
+            i = keyval.find( keys[iKey] );
+            if( iKey != string::npos )
+                break;
+        }
+
+         if( ! keys[iKey] ) {
+             //Unknown key
+             continue;
+         }
+
+         if( strcmp( keys[iKey], "update" ) == 0 ) {
+             onlyInsertOrUpdate = true;
+             continue;
+         }
+
+         i = keyval.find_first_of("=");
+
+         if (i == string::npos) {
+             //msg = "obsType: <id> Invalid format!";
+             continue;
+         }
+
+         key = keyval.substr(0, i);
+         val = keyval.substr(i + 1);
+
+         trimstr( val );
+         trimstr( key );
+
+         if (key.empty() || val.empty()) {
+             //msg = "obsType: Invalid format!";
+             continue;
+         }
+
+         if( strcmp( keys[iKey], "type" ) == 0 ) {
+             typeID = atoi(val.c_str());
+         } else {
+             stationID = DecoderBase::getStationId(key, val);
+
+             if(stationID < 0) {
+                 stationID = INT_MAX;
+                 //ost << "Now station with id (" << key << "=" << val << ")";
+                 continue;
+             }
+         }
+     }
 }
 
 std::string
@@ -161,7 +240,7 @@ execute(std::string &msg)
    LOGINFO( "Decoder: " << name() << ". New observation. stationid: " <<
             stationid << " typeid: " << typeId);
 
-   if( stationid == 0 ) {
+   if( stationid == INT_MAX ) {
       ostringstream o;
 
       o << "Missing stationid! typeid: ";
@@ -174,7 +253,7 @@ execute(std::string &msg)
       return rejected( o.str(), "" );
    }
 
-   if( typeId<0 ) {
+   if( typeId<=0 || typeId == INT_MAX) {
       ostringstream o;
       o << "Format error in type!"
             << "stationid: " << stationid << ".";
@@ -320,7 +399,7 @@ execute(std::string &msg)
       }
 
 
-      if( addDataToDb( obstime, stationid, typeId, dataList, textDataList, priority, idLog.logid() ) ) {
+      if( addDataToDb( obstime, stationid, typeId, dataList, textDataList, priority, idLog.logid(), onlyInsertOrUpdate) ) {
          count += dataList.size() + textDataList.size();
       }
 
@@ -371,61 +450,8 @@ long
 kvalobs::decoder::kldecoder::
 KlDecoder::
 getStationId(std::string &msg)
-{	
-   string keyval;
-   string key;
-   string val;
-   string::size_type i;
-   CommaString cstr(obsType, '/');
-   long  id;
-
-   if(cstr.size()<2){
-      msg="obsType: Invalid Format!";
-      return 0;
-   }
-
-   if(!cstr.get(1, keyval)){
-      msg="INTERNALERROR: InvalidFormat!";
-      return 0;
-   }
-
-   i = keyval.find('=');
-
-   if (i == string::npos) {
-      msg = "obsType: <id> Invalid format!";
-      return 0;
-   }
-
-   key = keyval.substr(0, i);
-   val = keyval.substr(i + 1);
-
-   trimstr( val );
-   trimstr( key );
-
-   if (key.empty() || val.empty()) {
-      msg = "obsType: Invalid format!";
-      return false;
-   }
-
-   id=DecoderBase::getStationId(key, val);
-
-   if(id>=0)
-      return id;
-
-   //Error
-
-   stringstream ost;
-
-   if(id==-1){
-      ost << "Now station with id (" << key << "=" << val << ")";
-
-   }else{
-      ost << "Now coloumn in the station table with the name: " << key <<
-            " (=" << val << ")";
-   }
-   msg=ost.str();
-
-   return 0;
+{
+    return stationID;
 }
 
 
@@ -434,43 +460,7 @@ kvalobs::decoder::kldecoder::
 KlDecoder::
 getTypeId(std::string &msg)const
 {
-   string keyval;
-   string key;
-   string val;
-   string::size_type i;
-
-   CommaString cstr(obsType, '/');
-
-   if(cstr.size()<3){
-      msg="To few element in, expecting 3. <obsType>(" + obsType + ")!";
-      return -1;
-   }
-
-   if(!cstr.get(2, keyval))
-      return -1;
-
-   i=keyval.find("=");
-
-   if(i==string::npos){
-      msg="Invalid format <obsType>(" + obsType + ")!";
-      return -1;
-   }
-
-   key=keyval.substr(0, i);
-
-   if(key!="type"){
-      msg="Invalid format, expecting <type>. <obsType>(" + obsType + ")!";
-      return -1;
-   }
-
-   val=keyval.substr(i+1);
-
-   if(val.empty()){
-      msg="Invalid format, no value for <type>. <obsType>(" + obsType + ")!";
-      return -1;
-   }
-
-   return atoi(val.c_str());
+    return typeID;
 }
 
 bool 

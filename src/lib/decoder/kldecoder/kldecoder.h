@@ -104,12 +104,17 @@ class KlDecoder : public DecoderBase{
                    int line,
                    std::string &msg);
 
+   void decodeObsType();
+
    kvalobs::decoder::DecoderBase::DecodeResult
    rejected( const std::string &msg, const std::string &logid );
 
    std::string toupper(const std::string &s);
    bool warnings;
    std::string logid;
+   int typeID;
+   int stationID;
+   bool onlyInsertOrUpdate;
 
 public:
    KlDecoder(dnmi::db::Connection     &con,
