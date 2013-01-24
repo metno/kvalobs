@@ -234,16 +234,13 @@ namespace kvalobs{
       /**
        * \brief Inserts data and textdata into the database.
        *
-       * It calls addStationInfo, so the caller must NOT do this.
-       * The field tbtime will be updated if it is not set.
-       *
-       * Before data is inserted into the database we checks if the
-       * data already exist and is equal to the data we are trying to insert.
-       * If it does, the method just returns true without actually inserting
-       * the data.
-       *
-       * If there exist data for the dataset but the data is not equal all
-       * data is deleted before the new dataset is inserted.
+       * Call the  addDataToDb( const miutil::miTime &obstime, int stationid, int typeid_,
+       *                 std::list<kvalobs::kvData> &sd,
+       *                 std::list<kvalobs::kvTextData> &textData,
+       *                 int priority, const std::string &logid,
+       *                 bool onlyAddOrUpdateData )
+       * with onlyAddOrUpdateData set to false. That it exist two variant
+       * is for backward binary comaptibility.
        *
        * \param obstime The observation time.
        * \param stationid The stationid.
@@ -253,12 +250,54 @@ namespace kvalobs{
        * \param priority The priority of the \em obs. Default value is 5.
        * \param logid Send all log to this logger.
        * \return true if successful false otherwise.
+       * \see bool addDataToDb( const miutil::miTime &obstime, int stationid, int typeid_,
+       *                 std::list<kvalobs::kvData> &sd,
+       *                 std::list<kvalobs::kvTextData> &textData,
+       *                 int priority, const std::string &logid,
+       *                 bool onlyAddOrUpdateData )
        */
       bool addDataToDb( const miutil::miTime &obstime, int stationid, int typeid_,
                         std::list<kvalobs::kvData> &sd,
                         std::list<kvalobs::kvTextData> &textData,
                         int priority, const std::string &logid);
 
+
+      /**
+       * \brief Inserts data and textdata into the database.
+       *
+       * It calls addStationInfo, so the caller must NOT do this.
+       * The field tbtime will be updated if it is not set.
+       *
+       * Before data is inserted into the database we checks if the
+       * data already exist and is equal to the data we are trying to insert.
+       * If it does, the method just returns true without actually inserting
+       * the data.
+       *
+       * How the data is inserted depends on the value of paramter onlyAddOrUpdateData.
+       *
+       * onlyAddOrUpdateDate is false:
+       * If there exist data for the dataset but the data is not equal all
+       * data is marked as deleted before the new dataset is inserted.
+       *
+       * onlyAddOrUpdateDate is true:
+       * If data all ready exist for a parameter, but the original value differs
+       * in new and old data the data is updated. Data that do not exist is inserted.
+       *
+       * \param obstime The observation time.
+       * \param stationid The stationid.
+       * \param typeid The typeid.
+       * \param sd data to insert.
+       * \param textData to insert.
+       * \param priority The priority of the \em obs. Default value is 5.
+       * \param logid Send all log to this logger.
+       * \param onlyAddOrUpdateDate if true only update or insert data.
+       * \return true if successful false otherwise.
+       */
+      bool addDataToDb( const miutil::miTime &obstime, int stationid, int typeid_,
+                        std::list<kvalobs::kvData> &sd,
+                        std::list<kvalobs::kvTextData> &textData,
+                        int priority, const std::string &logid,
+                        bool onlyAddOrUpdateData );
 
       /**
        * \brief insert the \em obs message into the table \em rejectdecode. 

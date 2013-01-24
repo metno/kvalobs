@@ -582,14 +582,28 @@ addDataToDb( const miutil::miTime &obstime, int stationid, int typeid_,
              int priority,
              const std::string &logid )
 {
-	using namespace boost::posix_time;
-	boost::gregorian::date date(obstime.year(), obstime.month(), obstime.day());
-	boost::posix_time::time_duration clock(hours(obstime.hour()) + minutes(obstime.min()) + seconds(obstime.sec()));
-	boost::posix_time::ptime pt_obstime(date, clock);
+    return addDataToDb( obstime, stationid, typeid_, sd, textData, priority, logid, false );
+}
+
+
+bool
+kvalobs::decoder::
+DecoderBase::
+addDataToDb( const miutil::miTime &obstime, int stationid, int typeid_,
+             std::list<kvalobs::kvData> &sd,
+             std::list<kvalobs::kvTextData> &textData,
+             int priority,
+             const std::string &logid,
+             bool onlyAddOrUpdateData)
+{
+    using namespace boost::posix_time;
+    boost::gregorian::date date(obstime.year(), obstime.month(), obstime.day());
+    boost::posix_time::time_duration clock(hours(obstime.hour()) + minutes(obstime.min()) + seconds(obstime.sec()));
+    boost::posix_time::ptime pt_obstime(date, clock);
 
    kvalobs::decoder::DataUpdateTransaction work( pt_obstime,stationid,
                                                  typeid_, priority,
-                                                 &sd, &textData, logid );
+                                                 &sd, &textData, logid, onlyAddOrUpdateData );
 
    try {
       con.perform( work );
@@ -601,6 +615,7 @@ addDataToDb( const miutil::miTime &obstime, int stationid, int typeid_,
 
    return work.ok();
 }
+
 
 
 bool
