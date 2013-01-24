@@ -115,11 +115,13 @@ bool DataInsertTransaction::insert(kvalobs::kvDbBase *data)
 		return false;
 	} catch (const std::exception &ex)
 	{
+	    conection->rollbackToSavepoint(savepoint);
 		throw;
 	}
-
-	conection->rollbackToSavepoint(savepoint);
-	//All other exception is propagated out of the routine
+	catch( ... ) {
+        conection->rollbackToSavepoint(savepoint);
+        throw;
+    }
 }
 
 void DataInsertTransaction::update(kvalobs::kvDbBase *data)
@@ -145,36 +147,28 @@ bool DataInsertTransaction::run()
 {
 	std::list<kvalobs::kvDbBase*>::const_iterator it;
 
-	for (it = elems->begin(), index = 0; it != elems->end(); ++it, ++index)
-	{
-		if (!*it || !(*it)->exists())
-		{
+	for (it = elems->begin(), index = 0; it != elems->end(); ++it, ++index)	{
+		if (!*it || !(*it)->exists()) {
 			fastExit = true;
 
-			if (*it)
-			{
+			if (*it) {
 				ostringstream ost;
 				ost << "InvalidObject: The kvDbBase object for table <"
 						<< (tblName.empty() ? (*it)->tableName() : tblName)
 						<< "> is invalid!";
 				lastError = ost.str();
-			}
-			else
+			} else
 				lastError =
 						"DataInsertTransaction::run: NULL pointer to a kvDbBase!";
 
 			throw logic_error(lastError);
 		}
 
-		if (!insert(*it))
-		{
-			if (action == INSERT_OR_UPDATE)
-			{
+		if ( ! insert(*it) ) {
+			if (action == INSERT_OR_UPDATE)	{
 				update(*it);
-			}
-			else
-			{
-				replace(*it);
+			} else {
+			    replace(*it);
 			}
 		}
 	}
