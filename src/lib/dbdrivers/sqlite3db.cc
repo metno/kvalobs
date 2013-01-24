@@ -261,6 +261,7 @@ dnmi::db::drivers::SQLiteConnection::exec(const std::string &query)
    }
 
    do {
+      busy = false;
       sqliteRes=sqlite3_exec(con, query.c_str(), 0, 0, &msg);
 
       if(msg){
@@ -691,8 +692,10 @@ perform( dnmi::db::Connection *con_,
          continue;
       }
       catch( const SQLException &e) {
+          retry--;
          istringstream is( e.errorCode() );
          int i;
+
          is >> i;
 
          if( i == SQLITE_INTERRUPT ) {
