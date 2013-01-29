@@ -856,12 +856,21 @@ void synop::sort222Token(const char *token)
 
 void synop::setShipDirectionAndVelocity(const char *token)
 {
+    //vs is given as a code that specify an velocity
+    //interval in knots. We decode this to a value
+    //in m/s (Table lookup).
+    int code2mps[] = {0,1,4,7,9,12,14,17,20,22};
 
+    if(type == SHIP ) {
+        setToken(ds,token,3);
 
-  if(type == SHIP ) {
-    setToken(ds,token,3);
-    setToken(vs,token,4);
-  }
+        int iVs = readToken( token, 4 );
+
+        if( iVs >= 0 && iVs < 10 )
+            setBuffer( vs, code2mps[iVs] );
+
+        //setToken(vs,token,4);
+    }
 }
 
 // SECTION 3 ----------------------------------
