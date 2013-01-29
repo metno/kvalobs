@@ -1,9 +1,9 @@
 kvalobs (2.7.0~rc5-1) unstable; urgency=low   
 
-   * synopdecoder: 222Dsvs. WMO-kode 4451 (velocity interval in knots). 
-	 Decode to representative value in m/s (paramid=202, MSPEED).
+  * synopdecoder: 222Dsvs. WMO-kode 4451 (velocity interval in knots). 
+	Decode to representative value in m/s (paramid=202, MSPEED).
 	
-   * ( ADD MORE )
+  * ( ADD MORE )
    
  -- Borge Moe <borge.moe@met.no>  Tue, 29 Jan 2013 08:45:00 +0100   
 
