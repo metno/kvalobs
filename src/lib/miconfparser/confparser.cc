@@ -57,7 +57,7 @@ struct MyPimpel {
 miutil::conf::
 ConfParser::
 ConfParser()
-:curIst(0), debugLevel_(0)
+:curIst(0), debugLevel_(0), deleteIgnoredSections( true )
 {
    boost::mutex::scoped_lock lock( mutex );
    pimpel[this] = new MyPimpel( false );
@@ -66,7 +66,7 @@ ConfParser()
 miutil::conf::
 ConfParser::
 ConfParser( bool allowMultipleSections_ )
-:curIst(0), debugLevel_(0)
+:curIst(0), debugLevel_(0), deleteIgnoredSections( true )
 {
    boost::mutex::scoped_lock lock( mutex );
    pimpel[this] = new MyPimpel( allowMultipleSections_ );
@@ -75,7 +75,7 @@ ConfParser( bool allowMultipleSections_ )
 miutil::conf::
 ConfParser::
 ConfParser(std::istream &ist )
-:debugLevel_(0)
+:debugLevel_(0), deleteIgnoredSections( true )
 {
    boost::mutex::scoped_lock lock( mutex );
    pimpel[this] = new MyPimpel( false );
@@ -97,7 +97,7 @@ ConfParser(std::istream &ist )
 miutil::conf::
 ConfParser::
 ConfParser( std::istream &ist,  bool allowMultipleSections_)
-:debugLevel_(0)
+:debugLevel_(0), deleteIgnoredSections( true )
 {
    boost::mutex::scoped_lock lock( mutex );
    pimpel[this] = new MyPimpel( allowMultipleSections_ );
@@ -175,6 +175,13 @@ printTokenStack(std::ostream &ost)const
    }
 
    return ost;
+}
+
+void
+miutil::conf::ConfParser::
+keepIgnoredSection()
+{
+    deleteIgnoredSections = false;
 }
 
 miutil::conf::ConfSection*
@@ -345,6 +352,18 @@ idToken(const char *id)
    checkToken(Token(MiTT_ID, id, curIst->lineno));
 }
 
+void
+miutil::conf::ConfParser::
+ignoreIdToken(const char *id)
+{
+
+    if(debugLevel_>0)
+        cout << "ignoreIdToken: " << id << endl;
+
+    checkToken(Token(MiTT_IGNORE_ID, id, curIst->lineno ));
+
+}
+
 void  
 miutil::conf::ConfParser::
 aliasToken(const char *id)
@@ -383,6 +402,7 @@ charToken(char ch)
          errs_ << "File: " << curIst->file << " Line: " << curIst->lineno
          << ": Invalid token, (" << ch << ")";
          error_=true;
+         break;
    }
 }
 
@@ -485,8 +505,9 @@ checkToken(const Token &t)
          tokenStack_.push_front(Token(MiTT_EQUAL, "", curIst->lineno));
          return true;
       case MiTT_OB:
-         if(!tokenStack_.empty() &&
-               tokenStack_.front().tt!=MiTT_ID){
+         if( !tokenStack_.empty() &&
+             ( tokenStack_.front().tt != MiTT_ID &&
+               tokenStack_.front().tt != MiTT_IGNORE_ID) ) {
             errs_ << "File: " << curIst->file << " Line: " << curIst->lineno
                   << ": Cant start a new section here!";
             error_=true;
@@ -496,7 +517,12 @@ checkToken(const Token &t)
          try{
 //            cerr << "checkToken: allowMultipleSections: "
 //                 << (allowMultipleSections?"true":"false")<< endl;
-            stack_.push_front(new ConfSection( allowMultipleSections(), filename(), lineno() ) );
+            stack_.push_front(new ConfSection( allowMultipleSections(),
+                                               filename(),
+                                               lineno() ) );
+            if( tokenStack_.front().tt != MiTT_IGNORE_ID ) {
+                stack_.front()->ignoreThisSection( true );
+            }
          }
          catch(...){
             errs_ << "NO MEM";
@@ -733,7 +759,7 @@ colapseSection()
       return false;
    }
 
-   if(tokenStack_.front().tt!=MiTT_OB){
+   if( tokenStack_.front().tt != MiTT_OB ){
       errs_ << "File: " << curIst->file << " Line: " << curIst->lineno
             << ": Unexpected token <" << tokenStack_.front().val << ">!";
       error_=true;
@@ -742,7 +768,8 @@ colapseSection()
 
    tokenStack_.pop_front();
 
-   if(tokenStack_.front().tt!=MiTT_ID){
+   if( tokenStack_.front().tt != MiTT_ID  &&
+       tokenStack_.front().tt != MiTT_IGNORE_ID){
       errs_ << "File: " << curIst->file << " Line: " << curIst->lineno
             << ": Unexpected token <" << tokenStack_.front().val << ">!";
       error_=true;
@@ -760,13 +787,24 @@ colapseSection()
    ConfSection *sect=stack_.front();
    stack_.pop_front();
 
-   if(!stack_.front()->addSection(tokenStack_.front().val, sect, false)){
-      errs_ << "File: " << curIst->file << " Line: " << curIst->lineno
-            << ": overwriting section variable <" << tokenStack_.front().val
-            << ">!";
-      error_=true;
-      delete sect;
-      return false;
+   if( tokenStack_.front().tt == MiTT_ID ||
+       tokenStack_.front().tt == MiTT_IGNORE_ID ) {
+
+       if(tokenStack_.front().tt == MiTT_IGNORE_ID && deleteIgnoredSections ) {
+           delete sect;
+           sect = 0;
+       }
+
+       if( sect ) {
+           if(!stack_.front()->addSection(tokenStack_.front().val, sect, false)){
+               errs_ << "File: " << curIst->file << " Line: " << curIst->lineno
+                       << ": overwriting section variable <" << tokenStack_.front().val
+                       << ">!";
+               error_=true;
+               delete sect;
+               return false;
+           }
+       }
    }
 
    //get rid of ID
@@ -808,28 +846,20 @@ print()const
    ost << "Line: " << line << " <" << val << "> Tokentype: ";
 
    switch(tt){
-      case MiTT_ID:     ost << "ID";
-      break;
-      case MiTT_STRING: ost << "STRING";
-      break;
-      case MiTT_INT:    ost << "INT";
-      break;
-      case MiTT_FLOAT:  ost << "FLOAT";
-      break;
-      case MiTT_ALIAS:  ost << "ALIAS";
-      break;
-      case MiTT_EQUAL:  ost << "EQUAL"; //=
-      break;
-      case MiTT_OB:     ost << "OB";    //{
-      break;
-      case MiTT_CB:     ost << "CB";    //}
-      break;
-      case MiTT_OP:     ost << "OP";    //(
-      break;
-      case MiTT_CP:     ost << "CP";    //)
-      break;
-      case MiTT_COMMA:  ost << "COMMA"; //,
-      break;
+      case MiTT_ID:     ost << "ID";     break;
+      case MiTT_IGNORE_ID: ost << "IGNORE ID";  break;
+      case MiTT_STRING: ost << "STRING"; break;
+      case MiTT_INT:    ost << "INT";    break;
+      case MiTT_FLOAT:  ost << "FLOAT";  break;
+      case MiTT_ALIAS:  ost << "ALIAS";  break;
+      case MiTT_EQUAL:  ost << "EQUAL";  break; //=
+      case MiTT_OB:     ost << "OB";     break; //{
+      case MiTT_CB:     ost << "CB";     break; //}
+      case MiTT_OP:     ost << "OP";     break; //(
+      case MiTT_CP:     ost << "CP";     break; //)
+      case MiTT_COMMA:  ost << "COMMA";  break; //,
+      default:
+          break;
    }
 
    return ost.str();

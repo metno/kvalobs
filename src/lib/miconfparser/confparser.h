@@ -80,7 +80,7 @@ namespace miutil{
       
       
       typedef enum{ 
-      		MiTT_ID, MiTT_STRING, MiTT_INT, 
+      		 MiTT_ID, MiTT_IGNORE_ID, MiTT_STRING, MiTT_INT,
 		      MiTT_FLOAT, MiTT_ALIAS,
 		      MiTT_EQUAL,  //= 
 		      MiTT_OB,     //{
@@ -96,7 +96,7 @@ namespace miutil{
 			std::string val; 
 			int         line;
 			Token(TokenType tt_, const std::string &val_, int line_):
-	  			tt(tt_), val(val_), line(line_){}
+	  			tt(tt_), val(val_), line(line_) {}
 			Token(const Token &t):tt(t.tt), val(t.val), line(t.line){}
 			Token &operator=(const Token &t){
 	  			if(this!=&t){
@@ -127,6 +127,7 @@ namespace miutil{
       void intToken(const char *i);
       void floatToken(const char *d);
       void idToken(const char *id);
+      void ignoreIdToken(const char *id);
       void aliasToken(const char *id);
       void charToken(char token);
       void stringToken(const char *s);
@@ -149,6 +150,8 @@ namespace miutil{
       int          debugLevel_;
       std::stack<TIstStack*> istStack;
       TIstStack    *curIst;
+      bool deleteIgnoredSections;
+
     public:
       /**
        * The defaul contructor. It does nothing.
@@ -167,7 +170,9 @@ namespace miutil{
       ConfParser(std::istream &ist, bool allowMultipleSections );
       
       ~ConfParser();
-	    
+
+      void        keepIgnoredSection();
+
       bool        allowMultipleSections()const;
       int         lineno()const { return (curIst?curIst->lineno:0);}
       std::string filename()const { return (curIst?curIst->file:"");}

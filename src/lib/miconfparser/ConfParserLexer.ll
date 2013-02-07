@@ -62,6 +62,8 @@ FLOAT  [-+]?{DIGIT}+\.{DIGIT}*
 
 {ID}        {  theParser->idToken(yyConfParsertext);}
 
+!{ID}        {  theParser->ignoreIdToken(yyConfParsertext);}
+
 
 ${ID}       {  theParser->aliasToken(yyConfParsertext);}
 

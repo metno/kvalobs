@@ -113,6 +113,11 @@ public:
 
    void print(std::ostream &ost, bool pritty)const;
 
+   bool ignoreThisSection()const;
+   void ignoreThisSection( bool f );
+
+   void deleteAllIgnoredSections();
+
    friend std::ostream&
    operator<<(std::ostream &str, const miutil::conf::ConfSection &cs);
 

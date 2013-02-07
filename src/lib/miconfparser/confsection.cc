@@ -46,12 +46,13 @@ public:
    bool allowMultipleSections;
    int lineno;
    std::string filename;
+   bool ignore;
 
    ConfSectionPimpel( bool allowMultipleSections_,
                       int lineno_=0,
                       const std::string &filename_="" )
       : allowMultipleSections( allowMultipleSections_),
-        lineno( lineno_ ), filename( filename_ ) {}
+        lineno( lineno_ ), filename( filename_ ), ignore(false) {}
 };
 }
 }
@@ -102,6 +103,31 @@ ConfSection::
    //std::cerr << "DELETE.....return\n";
 
 }
+
+bool
+miutil::conf::
+ConfSection::
+ignoreThisSection()const
+{
+    std::map<const ConfSection*,ConfSectionPimpel*>::iterator pit;
+
+    pit = pimpel.find( this );
+    return pit!=pimpel.end()?pit->second->ignore:false;
+}
+
+void
+miutil::conf::
+ConfSection::
+ignoreThisSection( bool f )
+{
+    std::map<const ConfSection*,ConfSectionPimpel*>::iterator pit;
+
+    pit = pimpel.find( this );
+    if( pit != pimpel.end() )
+        pit->second->ignore = f;
+}
+
+
 
 int
 miutil::conf::
@@ -404,6 +430,33 @@ getSubSections()const
 
 
 void 
+miutil::conf::ConfSection::
+deleteAllIgnoredSections()
+{
+    ISectionList     itSec = sectionList.begin();
+
+    while( itSec != sectionList.end()){
+        ConfSectionList::iterator cit = itSec->second.begin();
+
+        while( cit != itSec->second.end() ) {
+           if( (*cit)->ignoreThisSection() ) {
+               delete *cit;
+               cit = itSec->second.erase( cit );
+           } else {
+               (*cit)->deleteAllIgnoredSections();
+               ++cit;
+           }
+        }
+
+        SectionList::iterator itTmp=itSec;
+        ++itSec;
+        if( itTmp->second.empty() ) {
+            sectionList.erase( itTmp );
+        }
+     }
+}
+
+void
 miutil::conf::ConfSection::
 printImple(std::ostream &ost, 
            int          nSpace,
