@@ -150,7 +150,7 @@ namespace miutil{
       int          debugLevel_;
       std::stack<TIstStack*> istStack;
       TIstStack    *curIst;
-      bool deleteIgnoredSections;
+
 
     public:
       /**

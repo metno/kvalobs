@@ -48,16 +48,18 @@ boost::mutex mutex;
 
 struct MyPimpel {
    bool allowMultipleSections;
+   bool deleteIgnoredSections;
 
    MyPimpel( bool allowMultipleSections_ )
-      : allowMultipleSections( allowMultipleSections_ ) {}
+      : allowMultipleSections( allowMultipleSections_ ),
+        deleteIgnoredSections( true ){}
 };
 }
 
 miutil::conf::
 ConfParser::
 ConfParser()
-:curIst(0), debugLevel_(0), deleteIgnoredSections( true )
+:curIst(0), debugLevel_(0)
 {
    boost::mutex::scoped_lock lock( mutex );
    pimpel[this] = new MyPimpel( false );
@@ -66,7 +68,7 @@ ConfParser()
 miutil::conf::
 ConfParser::
 ConfParser( bool allowMultipleSections_ )
-:curIst(0), debugLevel_(0), deleteIgnoredSections( true )
+:curIst(0), debugLevel_(0)
 {
    boost::mutex::scoped_lock lock( mutex );
    pimpel[this] = new MyPimpel( allowMultipleSections_ );
@@ -75,7 +77,7 @@ ConfParser( bool allowMultipleSections_ )
 miutil::conf::
 ConfParser::
 ConfParser(std::istream &ist )
-:debugLevel_(0), deleteIgnoredSections( true )
+:debugLevel_(0)
 {
    boost::mutex::scoped_lock lock( mutex );
    pimpel[this] = new MyPimpel( false );
@@ -97,7 +99,7 @@ ConfParser(std::istream &ist )
 miutil::conf::
 ConfParser::
 ConfParser( std::istream &ist,  bool allowMultipleSections_)
-:debugLevel_(0), deleteIgnoredSections( true )
+:debugLevel_(0)
 {
    boost::mutex::scoped_lock lock( mutex );
    pimpel[this] = new MyPimpel( allowMultipleSections_ );
@@ -181,7 +183,11 @@ void
 miutil::conf::ConfParser::
 keepIgnoredSection()
 {
-    deleteIgnoredSections = false;
+    boost::mutex::scoped_lock lock( mutex );
+    PimpelType::const_iterator it = pimpel.find( this );
+
+    if( it != pimpel.end() )
+        static_cast<MyPimpel*>( it->second )->deleteIgnoredSections = false;
 }
 
 miutil::conf::ConfSection*
@@ -738,6 +744,16 @@ miutil::conf::ConfParser::
 colapseSection()
 {
    //The token stack must have the elements OB and ID on the top
+    bool deleteIgnoredSections=true;
+
+    {
+        boost::mutex::scoped_lock lock( mutex );
+        PimpelType::const_iterator it = pimpel.find( this );
+
+        if( it != pimpel.end() )
+          deleteIgnoredSections =  static_cast<MyPimpel*>( it->second )->deleteIgnoredSections;
+    }
+
 
    if(debugLevel_>1){
       if(debugLevel_>2){
