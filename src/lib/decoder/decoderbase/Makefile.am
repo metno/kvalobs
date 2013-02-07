@@ -25,3 +25,7 @@ libkvalobs_decoderbase_la_LIBADD =   $(top_builddir)/src/lib/kvalobs/libkvalobs_
                              $(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la \
                              $(BOOST_DATE_TIME_LIB) \
                              $(libxml2_LIBS)
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libkvalobs_decoderbase.pc
+$(pkgconfig_DATA): $(top_builddir)/config.status

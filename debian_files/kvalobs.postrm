@@ -114,8 +114,6 @@ case "$1" in
      #Delete my debconf entries in the database.
      db_purge || true
 
-     update-rc.d kvalobs remove || true
-   
      ;;
    
     *)

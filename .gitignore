@@ -90,3 +90,13 @@ stamp-h1
 /INSTALL
 /src/lib/*/libkvalobs_*.pc
 /src/service-libs/kvcpp/libkvcpp.pc
+/src/lib/decoder/decoderbase/libkvalobs_decoderbase.pc
+/configure-stamp
+/src/kvQabased/qabasetest
+/src/lib/decoder/comobsdecoder/test/gtestsms2
+/src/lib/decoder/comobsdecoder/test/testresult/sms02-29-201012280654.xml
+/src/lib/decoder/synopdecoder/kvSynopDecodeTest
+/src/lib/decodeutility/decodeutilitytest
+/src/lib/kvdb/libkvdbtest
+/src/lib/miutil/libmiutiltest
+/src/service-libs/kvcpp/mock/testTestingKvApp

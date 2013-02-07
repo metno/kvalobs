@@ -7,5 +7,5 @@ includedir=@includedir@
 Name: libkvalobs_milog
 Description: kvalobs milog library
 Version: @VERSION@
-Libs: -L${libdir} -lkvalobs_milog
+Libs: -L${libdir} -lkvalobs_milog -lperl
 Cflags: -D_REENTRANT -I${includedir}/@PACKAGE@

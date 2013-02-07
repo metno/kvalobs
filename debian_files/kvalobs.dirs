@@ -1,7 +1,5 @@
 etc/kvalobs
 etc/kvalobs/lam2kv
-usr/bin
-usr/lib
 usr/lib/kvalobs/bin
 usr/share/kvalobs
 usr/share/kvalobs/metadata

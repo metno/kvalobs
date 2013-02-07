@@ -7,5 +7,5 @@ includedir=@includedir@
 Name: libkvalobs_miconfparser
 Description: kvalobs miconfparser library
 Version: @VERSION@
-Libs: -L${libdir} -lkvalobs_miconfparser
+Libs: -L${libdir} -lkvalobs_miconfparser -lperl
 Cflags: -D_REENTRANT -I${includedir}/@PACKAGE@

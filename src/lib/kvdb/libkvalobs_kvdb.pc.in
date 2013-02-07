@@ -7,6 +7,6 @@ includedir=@includedir@
 Name: libkvalobs_kvdb
 Description: kvalobs kvdb library
 Version: @VERSION@
-Requires: libkvalobs_fileutil
-Libs: -L${libdir} -lkvalobs_kvdb
+Requires: libkvalobs_fileutil libcurl
+Libs: -L${libdir} -lkvalobs_kvdb -lperl
 Cflags: -D_REENTRANT -I${includedir}/@PACKAGE@

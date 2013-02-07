@@ -7,5 +7,6 @@ includedir=@includedir@
 Name: libkvalobs_fileutil
 Description: kvalobs fileutil library
 Version: @VERSION@
-Libs: -L${libdir} -lkvalobs_fileutil
+Requires: libcurl
+Libs: -L${libdir} -lkvalobs_fileutil -lperl
 Cflags: -D_REENTRANT -I${includedir}/@PACKAGE@

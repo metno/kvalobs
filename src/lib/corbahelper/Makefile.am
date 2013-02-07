@@ -7,7 +7,7 @@ libkvalobs_corbahelper_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@
 libkvalobs_corbahelper_la_LIBADD = $(top_builddir)/src/lib/dnmithread/libkvalobs_dnmithread.la \
                            $(top_builddir)/src/lib/milog/libkvalobs_milog.la \
                            $(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la \
-			   			   $(BOOST_THREAD_LIB) $(omniORB4_LIBS) 
+			   			   $(BOOST_THREAD_LIB) $(omniORB4_LIBS)
 
 corbahelperincludedir = $(pkgincludedir)/corbahelper
 corbahelperinclude_HEADERS = corbaApp.h corbamacros.h

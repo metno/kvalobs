@@ -7,5 +7,6 @@ includedir=@includedir@
 Name: libkvalobs_kvskel
 Description: kvalobs kvskel library
 Version: @VERSION@
-Libs: -L${libdir} -lkvalobs_kvskel
+Requires: omniDynamic4
+Libs: -L${libdir} -lkvalobs_kvskel -lperl
 Cflags: -D_REENTRANT -I${includedir}/@PACKAGE@

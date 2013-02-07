@@ -1,3 +1,5 @@
+#!/bin/bash
+
 primary_host="kvalobs1 kvalobs2"
 ipalias="/usr/local/sbin/alias_kvalobs"
 
@@ -190,3 +192,4 @@ stop_kvalobs()
 		echo "kvalobs - Failed to stop kvalobs. ($cmd)" | tee -a $mylog
     fi
 }
+

@@ -1,5 +1,5 @@
 AC_PREREQ([2.59])
-AC_INIT([kvalobs], [2.7.0~rc4], [kvoss@met.no])
+AC_INIT([kvalobs], [2.7.0~rc5], [kvoss@met.no])
 AM_INIT_AUTOMAKE
 #METNO_SET_VERSION_INFO
 
@@ -75,6 +75,7 @@ AC_CONFIG_FILES([Makefile
                  doc/Makefile
                  src/service-libs/kvcpp/libkvcpp.pc
                  src/lib/kvdb/libkvalobs_kvdb.pc
+                 src/lib/decoder/decoderbase/libkvalobs_decoderbase.pc
                  src/lib/decodeutility/libkvalobs_decodeutility.pc
                  src/lib/dnmithread/libkvalobs_dnmithread.pc
                  src/lib/miconfparser/libkvalobs_miconfparser.pc

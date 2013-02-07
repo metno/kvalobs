@@ -7,6 +7,6 @@ includedir=@includedir@
 Name: libkvalobs_kvadmininterface
 Description: kvalobs admin interface library
 Version: @VERSION@
-Requires: libkvalobs_kvskel
-Libs: -L${libdir} -lkvalobs_kvadmininterface
+Requires: libkvalobs_kvskel omniDynamic4
+Libs: -L${libdir} -lkvalobs_kvadmininterface -lperl
 Cflags: -D_REENTRANT -I${includedir}/@PACKAGE@

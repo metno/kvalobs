@@ -1,6 +1,0 @@
-usr/include/kvalobs/*
-usr/lib/kvalobs/lib*.a
-usr/lib/kvalobs/lib*.so
-usr/lib/pkgconfig/*
-usr/lib/kvalobs/*.la
-usr/lib/libkvcpp.so

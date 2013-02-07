@@ -1,7 +1,0 @@
-#!/bin/sh
-
-if ! pg_ctlcluster --force 8.3 kvalobs stop ; then
-  exit 1
-fi
-
-exit 0

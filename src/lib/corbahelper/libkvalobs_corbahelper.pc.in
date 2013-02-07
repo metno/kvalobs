@@ -8,6 +8,6 @@ idldir=@datarootdir@/@PACKAGE@/idl
 Name: libkvalobs_corbahelper
 Description: kvalobs corbahelper library
 Version: @VERSION@
-Requires: omniDynamic4
-Libs: -L${libdir} -lkvalobs_corbahelper
+Requires: omniDynamic4 libkvalobs_milog libkvalobs_dnmithread libkvalobs_miconfparser
+Libs: -L${libdir} -lkvalobs_corbahelper @BOOST_THREAD_LIB@ @omniORB4_LIBS@ -lperl
 Cflags: -D_REENTRANT -I${includedir}/@PACKAGE@
