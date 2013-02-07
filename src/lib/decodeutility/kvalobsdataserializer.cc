@@ -111,7 +111,7 @@ std::string KvalobsDataSerializer::toString() const
 			for (TypeID::const_iterator obstime = type->begin(); obstime
 					!= type->end(); ++obstime)
 			{
-				Element * ot = set_(tp, "obstime", obstime->get());
+				Element * ot = set_(tp, "obstime", to_kvalobs_string(obstime->get()));
 				if (obstime->invalidate())
 					ot->set_attribute("invalidate", "1");
 
