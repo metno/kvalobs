@@ -1,3 +1,9 @@
+kvalobs (2.7.0~rc6-1) unstable; urgency=low
+
+  * fixed typo in libkvcpp.pc.in
+
+ -- Alexander Bürger <alexander.buerger@met.no>  Mon, 11 Feb 2013 18:58:46 +0100
+
 kvalobs (2.7.0~rc5-1) unstable; urgency=low
 
   * synopdecoder: 222Dsvs. WMO-kode 4451 (velocity interval in knots).
