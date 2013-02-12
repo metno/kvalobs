@@ -38,6 +38,7 @@
 #include "DataUpdateTransaction.h"
 
 using namespace std;
+namespace pt=boost::posix_time;
 
 namespace {
 
@@ -1078,7 +1079,7 @@ operator()( dnmi::db::Connection *conection )
                   << it->paramID() << "," << it->sensor() <<"," << it->level()
                   << "," << it->original() << endl;
          } else {
-            mylog << it->obstime() << "," << it->stationID() << "," << it->typeID() <<","
+            mylog << pt::to_kvalobs_string( it->obstime() ) << "," << it->stationID() << "," << it->typeID() <<","
                   << it->paramID() << "," << it->sensor() <<"," << it->level()
                   << "," << it->original() << endl;
          }
@@ -1091,7 +1092,7 @@ operator()( dnmi::db::Connection *conection )
       }
 
       log << "NewData " << (onlyAddOrUpdateData?"(replenish):":":") << "stationid: " << stationid << " typeid: " << typeid_
-          << " obstime: " << obstime << endl << mylog.str()  << endl;
+          << " obstime: " << pt::to_kvalobs_string( obstime ) << endl << mylog.str()  << endl;
    }
 
    stationInfoList_->clear();
@@ -1101,7 +1102,7 @@ operator()( dnmi::db::Connection *conection )
 
    if( dataList.empty() && textDataList.empty() ) {
       log << "New data. stationid: " << stationid << " typeid: " << typeid_
-          << " obstime: " << obstime << endl;
+          << " obstime: " << pt::to_kvalobs_string( obstime ) << endl;
       setTbtime( conection );
       insertData( conection, *newData, *newTextData );
       insertType = "INSERT";
@@ -1110,9 +1111,9 @@ operator()( dnmi::db::Connection *conection )
 
    if( isEqual( dataList, textDataList ) ) {
       log << "Data allready exist. stationid: " << stationid << " typeid: " << typeid_
-          << " obstime: " << obstime << endl;
+          << " obstime: " << pt::to_kvalobs_string( obstime ) << endl;
       IDLOGINFO("duplicates", "DUPLICATE: stationid: " << stationid << " typeid: " << typeid_
-          << " obstime: " << obstime );
+          << " obstime: " << pt::to_kvalobs_string( obstime ) );
       insertType = "DUPLICATE";
       return true;
    }
@@ -1123,7 +1124,7 @@ operator()( dnmi::db::Connection *conection )
    }
 
    log << "Replace data.stationid: " << stationid << " typeid: " << typeid_
-       << " obstime: " << obstime << endl;
+       << " obstime: " << pt::to_kvalobs_string( obstime ) << endl;
 
    setTbtime( conection );
    replaceData( conection, dataList, textDataList );
@@ -1133,13 +1134,13 @@ operator()( dnmi::db::Connection *conection )
 
    if( it != stationInfoList_->end() ) {
       mylog << "UPDATED: stationid: " << it->stationID() << " typeid: " << it->typeID()
-            << " obstime: " << it->obstime();
+            << " obstime: " << pt::to_kvalobs_string( it->obstime() );
       ++it;
    }
 
    for(;it!=stationInfoList_->end(); it++){
       mylog << "\n         stationid: " << it->stationID() << " typeid: " << it->typeID()
-            << " obstime: " << it->obstime();
+            << " obstime: " << pt::to_kvalobs_string( it->obstime() );
    }
 
    IDLOGINFO( "updated", mylog.str() );
@@ -1157,17 +1158,17 @@ onSuccess()
 
    if( it != stationInfoList_->end() ) {
       mylog << insertType << ": stationid: " << it->stationID() << " typeid: " << it->typeID()
-            << " obstime: " << it->obstime();
+            << " obstime: " << pt::to_kvalobs_string( it->obstime() );
       ++it;
    } else {
       mylog << insertType << ": stationid: " << stationid << " typeid: " << typeid_
-                  << " obstime: " << obstime;
+                  << " obstime: " << pt::to_kvalobs_string( obstime );
    }
 
    for(;it!=stationInfoList_->end(); it++){
       mylog << "\n" << prefix
             << "  stationid: " << it->stationID() << " typeid: " << it->typeID()
-            << " obstime: " << it->obstime();
+            << " obstime: " << pt::to_kvalobs_string( it->obstime() );
    }
 
    IDLOGINFO( logid, log.str() );
@@ -1186,7 +1187,7 @@ onRetry()
 
    nRetry++;
    IDLOGDEBUG("retry", "RETRY: " << nRetry << " stationid: " << stationid << " Typeid: "
-              << typeid_ << " obstime: " << obstime << "\nMessage: " << log.str() );
+              << typeid_ << " obstime: " << pt::to_kvalobs_string( obstime ) << "\nMessage: " << log.str() );
    log.str("");
    stationInfoList_->clear();
 }
@@ -1216,10 +1217,10 @@ onMaxRetry( const std::string &lastError )
 
    IDLOGERROR( logid, "Transaction Failed.\n" << lastError << "\n" << log.str() );
    IDLOGERROR( "failed", "Transaction Failed. Stationid: " << stationid << " Typeid: "
-               << typeid_ << " obstime: " << obstime  << "\nLast error: " << lastError
+               << typeid_ << " obstime: " << pt::to_kvalobs_string( obstime ) << "\nLast error: " << lastError
                << mylog.str() );
    IDLOGERROR( "transaction", "   FAILED: Stationid: " << stationid << " Typeid: "
-               << typeid_ << " obstime: " << obstime );
+               << typeid_ << " obstime: " << pt::to_kvalobs_string( obstime ) );
 }
 
 }
