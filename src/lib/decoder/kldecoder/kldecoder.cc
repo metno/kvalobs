@@ -30,6 +30,7 @@
  */
 #include <cctype>
 #include <sstream>
+#include <limits.h>
 #include <boost/lexical_cast.hpp>
 #include <puTools/miTime.h>
 #include <miutil/commastring.h>
@@ -52,7 +53,26 @@ using namespace miutil;
 using namespace boost;
 using namespace kvalobs;
 
+namespace {
+bool
+decodeKeyVal( const string &keyval, string &key, string &val ){
+    string::size_type i = keyval.find_first_of("=");
 
+    if (i == string::npos) {
+    	key = keyval;
+    	val.erase();
+    } else {
+    	key = keyval.substr(0, i);
+      	val = keyval.substr(i + 1);
+    }
+
+    trimstr( key );
+    trimstr( val );
+
+    return ! key.empty();
+}
+
+}
 
 kvalobs::decoder::kldecoder::
 KlDecoder::
@@ -62,7 +82,9 @@ KlDecoder( dnmi::db::Connection   &con,
            const std::string &obsType,
            const std::string &obs,
            int                    decoderId)
-:DecoderBase(con, params, typeList, obsType, obs, decoderId)
+:DecoderBase(con, params, typeList, obsType, obs, decoderId),
+ typeID( INT_MAX ), stationID(INT_MAX), onlyInsertOrUpdate( false )
+
 {
     decodeObsType();
 }
@@ -88,54 +110,44 @@ decodeObsType()
     const char *keys[] = {"nationalnr","stationid","wmonr","icaoid","call_sign",
                     "type", "update", 0};
 
+    LOGDEBUG("decodeObsType: '" << obsType << "'");
     typeID = INT_MAX;
     stationID = INT_MAX;
     onlyInsertOrUpdate = false;
 
     if(cstr.size()<2){
+    	LOGERROR("decodeObsType: To few keys!");
 //        msg="obsType: Invalid Format!";
         return;
     }
 
     for( int index = 1; index < cstr.size(); ++index ) {
         if(!cstr.get( index, keyval)){
-            //msg="INTERNALERROR: InvalidFormat!";
+        	LOGERROR("decodeObsType: INTERNALERROR: InvalidFormat!");
             return;
         }
 
+        if( ! decodeKeyVal( keyval, key, val ) ) //keyval empty
+        	continue;
+
         for( iKey=0; keys[iKey]; ++iKey ) {
-            i = keyval.find( keys[iKey] );
-            if( iKey != string::npos )
-                break;
+        	if(  key == keys[iKey] )
+        		break;
         }
 
          if( ! keys[iKey] ) {
-             //Unknown key
+        	 LOGWARN("decodeObsType: unknown key '" <<  key << "'");
              continue;
          }
 
-         if( strcmp( keys[iKey], "update" ) == 0 ) {
-             onlyInsertOrUpdate = true;
+         if( key == "update" ) { //Value is optional
+        	 if( val.empty() || val[0]=='t' || val[0]=='T')
+        		 onlyInsertOrUpdate = true;
              continue;
          }
 
-         i = keyval.find_first_of("=");
-
-         if (i == string::npos) {
-             //msg = "obsType: <id> Invalid format!";
+         if ( val.empty() ) //Must have a value
              continue;
-         }
-
-         key = keyval.substr(0, i);
-         val = keyval.substr(i + 1);
-
-         trimstr( val );
-         trimstr( key );
-
-         if (key.empty() || val.empty()) {
-             //msg = "obsType: Invalid format!";
-             continue;
-         }
 
          if( strcmp( keys[iKey], "type" ) == 0 ) {
              typeID = atoi(val.c_str());
@@ -149,6 +161,9 @@ decodeObsType()
              }
          }
      }
+
+    LOGDEBUG("decodeObsType: stationID: " << stationID <<  " typeid: " << typeID
+    		<< " update: " << (onlyInsertOrUpdate?"true":"false") );
 }
 
 std::string
