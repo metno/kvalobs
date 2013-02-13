@@ -162,7 +162,7 @@ getKvParamsFunc::getKvParamsFunc(list<kvParam> &paramList) :
 
 bool getKvParamsFunc::process(kvServiceExt_ptr service)
 {
-	ParamList *params;
+	ParamList *params=0;
 	bool ok = service->getParams(params);
 	if (ok)
 	{
@@ -175,6 +175,10 @@ bool getKvParamsFunc::process(kvServiceExt_ptr service)
 					std::string((*params)[i].comment)));
 		}
 	}
+
+	if( params )
+		delete params;
+
 	return ok;
 }
 
@@ -185,7 +189,7 @@ getKvStationsFunc::getKvStationsFunc(list<kvStation> &stationList) :
 
 bool getKvStationsFunc::process(kvServiceExt_ptr service)
 {
-	CKvalObs::CService::StationList *stations;
+	CKvalObs::CService::StationList *stations=0;
 	bool ok = service->getStations(stations);
 	if (ok)
 	{
@@ -201,6 +205,9 @@ bool getKvStationsFunc::process(kvServiceExt_ptr service)
 					(*stations)[i].environmentid, (*stations)[i].static_,
 					boost::posix_time::time_from_string_nothrow(std::string((*stations)[i].fromtime))));
 	}
+	if( stations )
+		delete stations;
+
 	return ok;
 }
 
@@ -256,7 +263,7 @@ getKvReferenceStationsFunc::getKvReferenceStationsFunc(int stationid,
 
 bool getKvReferenceStationsFunc::process(kvServiceExt_ptr service)
 {
-	Reference_stationList *ref_;
+	Reference_stationList *ref_=0;
 	bool ok = service->getReferenceStation(stationid, paramid, ref_);
 	if (ok)
 	{
@@ -265,6 +272,10 @@ bool getKvReferenceStationsFunc::process(kvServiceExt_ptr service)
 			refList.push_back(kvReferenceStation((*ref_)[i].stationID,
 					(*ref_)[i].paramsetID, std::string((*ref_)[i].reference)));
 	}
+
+	if( ref_ )
+		delete ref_;
+
 	return ok;
 }
 
@@ -275,7 +286,7 @@ getKvTypesFunc::getKvTypesFunc(list<kvTypes> &typeList) :
 
 bool getKvTypesFunc::process(kvServiceExt_ptr service)
 {
-	CKvalObs::CService::TypeList *types;
+	CKvalObs::CService::TypeList *types=0;
 	bool ok = service->getTypes(types);
 	if (ok)
 	{
@@ -289,6 +300,10 @@ bool getKvTypesFunc::process(kvServiceExt_ptr service)
 			typeList.push_back(type);
 		}
 	}
+
+	if( types )
+		delete types;
+
 	return ok;
 }
 
@@ -299,7 +314,7 @@ getKvOperatorFunc::getKvOperatorFunc(list<kvOperator> &operatorList) :
 
 bool getKvOperatorFunc::process(kvServiceExt_ptr service)
 {
-	CKvalObs::CService::OperatorList *operators;
+	CKvalObs::CService::OperatorList *operators=0;
 	bool ok = service->getOperator(operators);
 	if (ok)
 	{
@@ -311,6 +326,10 @@ bool getKvOperatorFunc::process(kvServiceExt_ptr service)
 			operatorList.push_back(oper);
 		}
 	}
+
+	if( operators )
+		delete operators;
+
 	return ok;
 }
 
@@ -412,7 +431,7 @@ getKvObsPgmFunc::getKvObsPgmFunc(list<kvObsPgm> &obsPgm,
 
 bool getKvObsPgmFunc::process(kvServiceExt_ptr service)
 {
-	CKvalObs::CService::Obs_pgmList *obspgm;
+	CKvalObs::CService::Obs_pgmList *obspgm=0;
 	CKvalObs::CService::StationIDList idList;
 	idList.length(stationList.size());
 
@@ -446,6 +465,10 @@ bool getKvObsPgmFunc::process(kvServiceExt_ptr service)
 			obsPgmList.push_back(obsp);
 		}
 	}
+
+	if( obspgm )
+		delete obspgm;
+
 	return ok;
 }
 
