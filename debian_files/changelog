@@ -2,8 +2,11 @@ kvalobs (2.7.0~rc7-1) unstable; urgency=low
 
   * Fixed a bug in decoding of obsType in KlDataDecoder. The bug was introduced
     when "replenish" of data was implemented. 
+  * Fixed a bunch of memory leaks in the kvService CORBA interface.
+    (Or created a bunch of coredumps :-) )
+  * KlDataDecoder: Renamed the replenish 'operator' from 'update' to 'add'.
 
- -- Borge Moe <borge.moe@met.no>  Wed, 13 Feb 2013 09:30:00 +0100
+ -- Borge Moe <borge.moe@met.no>  Wed, 13 Feb 2013 14:00:00 +0100
 
 kvalobs (2.7.0~rc6-1) unstable; urgency=low
 
