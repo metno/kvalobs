@@ -108,7 +108,7 @@ decodeObsType()
     CommaString cstr(obsType, '/');
     long  id;
     const char *keys[] = {"nationalnr","stationid","wmonr","icaoid","call_sign",
-                    "type", "update", 0};
+                    "type", "add", 0};
 
     LOGDEBUG("decodeObsType: '" << obsType << "'");
     typeID = INT_MAX;
@@ -140,7 +140,7 @@ decodeObsType()
              continue;
          }
 
-         if( key == "update" ) { //Value is optional
+         if( key == "add" ) { //Value is optional
         	 if( val.empty() || val[0]=='t' || val[0]=='T')
         		 onlyInsertOrUpdate = true;
              continue;
