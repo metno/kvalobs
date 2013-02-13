@@ -39,8 +39,8 @@ std::string kvalobs::kvTextData::toSend() const
 {
 	ostringstream ost;
 
-	ost << "(" << stationid_ << "," << quoted(to_kvalobs_string(obstime_)) << ","
-			<< quoted(original_) << "," << paramid_ << "," << quoted(to_kvalobs_string(tbtime_))
+	ost << "(" << stationid_ << "," << quoted( pt::to_kvalobs_string(obstime_)) << ","
+			<< quoted(original_) << "," << paramid_ << "," << quoted( pt::to_kvalobs_string(tbtime_))
 			<< "," << typeid_ << ")";
 	return ost.str();
 }
@@ -54,7 +54,7 @@ bool kvalobs::kvTextData::set(int sta, const boost::posix_time::ptime& obt,
 	paramid_ = pid;
 	tbtime_ = tbt;
 	typeid_ = typ;
-	sortBy_ = boost::lexical_cast<std::string>(sta) + to_kvalobs_string(obt);
+	sortBy_ = boost::lexical_cast<std::string>(sta) + pt::to_kvalobs_string(obt);
 	return true;
 }
 
@@ -99,7 +99,7 @@ bool kvalobs::kvTextData::set(const dnmi::db::DRow& r_)
 			CERR("kvTextData: exception ..... \n");
 		}
 	}
-	sortBy_ = boost::lexical_cast<std::string>(stationid_) + to_kvalobs_string(obstime_);
+	sortBy_ = boost::lexical_cast<std::string>(stationid_) + pt::to_kvalobs_string(obstime_);
 	return true;
 }
 
@@ -108,7 +108,7 @@ std::string kvalobs::kvTextData::uniqueKey() const
 	ostringstream ost;
 
 	ost << " WHERE stationid=" << stationid_ << " AND " << "       obstime="
-			<< quoted(to_kvalobs_string(obstime_)) << " AND " << "       paramid="
+			<< quoted(pt::to_kvalobs_string(obstime_)) << " AND " << "       paramid="
 			<< paramid_ << " AND " << "       typeid=" << typeid_;
 
 	return ost.str();
