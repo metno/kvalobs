@@ -336,6 +336,9 @@ GRANT SELECT, UPDATE, INSERT ON param TO kv_write;
 CREATE VIEW pdata AS
     SELECT data.stationid, data.obstime, data.tbtime, data.typeid, (SELECT param.name FROM param WHERE (param.paramid = data.paramid))
     AS paramid, data.original, data.corrected, data.sensor, data.level, data.controlinfo, data.useinfo, data.cfailed FROM data;
+REVOKE ALL ON pdata FROM public;
+GRANT ALL ON pdata TO kv_admin;
+GRANT SELECT ON pdata TO kv_read;
 
 
 CREATE TABLE station (
