@@ -121,8 +121,8 @@ public:
 
    bool hasDataWithTbtime( dnmi::db::Connection *con, const boost::posix_time::ptime &tbtime );
    boost::posix_time::ptime getUniqTbtime( dnmi::db::Connection *con );
-   bool isEqual( std::list<kvalobs::kvData> &oldData,
-                 std::list<kvalobs::kvTextData> &oldTextData );
+   bool isEqual( const std::list<kvalobs::kvData> &oldData,
+                 const std::list<kvalobs::kvTextData> &oldTextData );
    void insertData( dnmi::db::Connection *conection,
                     const std::list<kvalobs::kvData> &data,
                     const std::list<kvalobs::kvTextData> &textData );

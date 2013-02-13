@@ -358,11 +358,14 @@ setTbtime( dnmi::db::Connection *conection )
    }
 }
 
+#if 0
 bool
 DataUpdateTransaction::
-isEqual( list<kvalobs::kvData> &oldData_,
-         list<kvalobs::kvTextData> &oldTextData )
+isEqual( const list<kvalobs::kvData> &oldData_,
+         const list<kvalobs::kvTextData> &oldTextData )const
 {
+	if( onlyAddOrUpdateData )
+		return isContainedEqual( oldData_, oldTextData );
 
    list<kvalobs::kvData> oldData( oldData_ );
 
@@ -429,6 +432,87 @@ isEqual( list<kvalobs::kvData> &oldData_,
 
    return true;
 }
+#endif
+
+bool
+DataUpdateTransaction::
+isEqual( const std::list<kvalobs::kvData> &oldData_,
+		 const std::list<kvalobs::kvTextData> &oldTextData )
+{
+	list<kvalobs::kvData> oldData( oldData_ );
+
+	for( list<kvalobs::kvData>::iterator it=oldData.begin(); it != oldData.end(); ++it ){
+		 if( it->original() == -32767 )
+			 it = oldData.erase( it );
+	}
+
+	if( ! onlyAddOrUpdateData ) {
+		if( oldData.size() != newData->size() ||
+			oldTextData.size() != newTextData->size() )
+		{
+			log << "isEqual: size differ: " << oldData.size() << " (" << newData->size() << ") "
+				<< "- " << oldTextData.size() << " (" << newTextData->size() << ")\n";
+
+			return false;
+		}
+	}
+
+	bool found;
+
+	for( list<kvalobs::kvData>::const_iterator nit=newData->begin();
+			nit != newData->end();  ++nit ) {
+		found = false;
+
+		for( list<kvalobs::kvData>::const_iterator oit=oldData.begin();
+             oit != oldData.end();  ++oit )
+		{
+			if( oit->obstime() == nit->obstime() &&
+				oit->stationID() == nit->stationID() &&
+                oit->typeID() == nit->typeID() &&
+                oit->paramID() == nit->paramID() &&
+                oit->sensor() == nit->sensor() &&
+                oit->level() == nit->level() )
+			{
+				float nv = nit->original();
+				float ov = oit->original();
+
+				if( static_cast<int>( (nv+0.005)*100 ) ==
+					static_cast<int>( (ov+0.005)*100 )    ){
+					found=true;
+					break;
+				}
+			}
+		}
+
+		if( ! found )
+			return false;
+	}
+
+	for( list<kvalobs::kvTextData>::const_iterator nit=newTextData->begin();
+		 nit != newTextData->end();  ++nit )
+	{
+		found = false;
+		for( list<kvalobs::kvTextData>::const_iterator oit=oldTextData.begin();
+		     oit != oldTextData.end();  ++oit )
+		{
+			if( oit->obstime() == nit->obstime() &&
+				oit->stationID() == nit->stationID() &&
+                oit->typeID() == nit->typeID() &&
+                oit->paramID() == nit->paramID() &&
+                oit->original() == nit->original() )
+			{
+				found=true;
+				break;
+			}
+		}
+
+		if( ! found )
+			return false;
+	}
+
+	return true;
+}
+
 bool
 DataUpdateTransaction::
 getDataWithTbtime( dnmi::db::Connection *con,
