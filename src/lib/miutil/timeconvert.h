@@ -76,10 +76,20 @@ inline std::string to_kvalobs_string(const time_duration & t)
 	return to_simple_string(t);
 }
 
-inline std::string to_kvalobs_string(const ptime & t, char separator = ' ')
-{
+inline std::string to_kvalobs_string(const ptime & t, char separator = ' ') {
 	std::ostringstream s;
 	s << to_kvalobs_string(t.date()) << separator << to_kvalobs_string(t.time_of_day());
+	return s.str();
+}
+
+inline std::string to_kvalobs_string_without_decimal_secound(const ptime & t, char separator = ' ') {
+	std::ostringstream s;
+	time_duration td=t.time_of_day();
+	s << to_kvalobs_string(t.date()) << separator
+	  << std::setfill('0') << std::setw(2) << std::right << td.hours() << ":"
+	  << std::setfill('0') << std::setw(2) << std::right << td.minutes() << ":"
+	  << std::setfill('0') << std::setw(2) << std::right << td.seconds();
+
 	return s.str();
 }
 
