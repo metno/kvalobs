@@ -1,3 +1,11 @@
+kvalobs (2.7.0~rc8-1) unstable; urgency=low
+
+  * Do not encode decimalsecond for obstime and tbtime in the CORBA interface.
+    This is only implemented for kvData and kvTextData.
+
+ -- Borge Moe <borge.moe@met.no>  Tue, 13 Mar 2013 14:00:00 +0100
+
+
 kvalobs (2.7.0~rc7-1) unstable; urgency=low
 
   * Fixed a bug in decoding of obsType in KlDataDecoder. The bug was introduced
