@@ -106,12 +106,12 @@ public:
 
 	typedef std::set<std::string> ParameterList;
 	/**
-	 * What parameters are expected in this observation?
+	 * What parameters are we supposed to check for the given observation
 	 *
 	 * @param[out] out parameters goes into this list
 	 * @param si Observation we want the parameter list from
 	 */
-	virtual void getExpectedParameters(ParameterList * out, const kvalobs::kvStationInfo & si) const =0;
+	virtual void getParametersToCheck(ParameterList * out, const kvalobs::kvStationInfo & si) const =0;
 
 	/**
 	 * Get an algorithm with the specified name

@@ -61,7 +61,7 @@ int FakeDatabaseAccess::getQcxFlagPosition(const std::string & qcx) const
 }
 
 
-void FakeDatabaseAccess::getExpectedParameters(ParameterList * out, const kvalobs::kvStationInfo & si) const
+void FakeDatabaseAccess::getParametersToCheck(ParameterList * out, const kvalobs::kvStationInfo & si) const
 {
 	out->insert("RR_24");
 	out->insert("TAM_24");

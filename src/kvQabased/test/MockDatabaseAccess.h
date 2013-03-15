@@ -41,7 +41,7 @@ public:
 
 	MOCK_CONST_METHOD1(getQcxFlagPosition, int (const std::string & qcx));
 
-	MOCK_CONST_METHOD2(getExpectedParameters, void (ParameterList * out, const kvalobs::kvStationInfo & si));
+	MOCK_CONST_METHOD2(getParametersToCheck, void (ParameterList * out, const kvalobs::kvStationInfo & si));
 
 	MOCK_CONST_METHOD1(getAlgorithm, kvalobs::kvAlgorithms (const std::string & algorithmName));
 
@@ -68,8 +68,8 @@ public:
 		        .WillByDefault(Invoke(&fake_, &FakeDatabaseAccess::getChecks));
 		ON_CALL(*this, getQcxFlagPosition(_))
 		        .WillByDefault(Invoke(&fake_, &FakeDatabaseAccess::getQcxFlagPosition));
-		ON_CALL(*this, getExpectedParameters(_, _))
-				.WillByDefault(Invoke(&fake_, &FakeDatabaseAccess::getExpectedParameters));
+		ON_CALL(*this, getParametersToCheck(_, _))
+				.WillByDefault(Invoke(&fake_, &FakeDatabaseAccess::getParametersToCheck));
 		ON_CALL(*this, getAlgorithm(_))
 				.WillByDefault(Invoke(&fake_, &FakeDatabaseAccess::getAlgorithm));
 		ON_CALL(*this, getStationParam(_,_,_))

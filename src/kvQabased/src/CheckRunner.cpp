@@ -231,7 +231,7 @@ void CheckRunner::checkObservation(const kvalobs::kvStationInfo & obs, std::ostr
 
    LOGDEBUG("Getting list of expected parameters from station");
    db::DatabaseAccess::ParameterList expectedParameters;
-   db.getExpectedParameters(& expectedParameters, obs);
+   db.getParametersToCheck(& expectedParameters, obs);
 
 
    LOGDEBUG("Fetching observation data from database");
@@ -387,8 +387,9 @@ bool CheckRunner::shouldRunCheck(const kvalobs::kvStationInfo & obs,
    if (not checkShouldRunAtThisHour(check.active(), obs))
       return false;
 
-   if (not isShip(obs) and
-         not signatureMatchesExpectedParameters(CheckSignature(check.checksignature(), obs.stationID()), expectedParameters))
+   if ( (not isShip(obs))
+		   //or expectedParameters.empty() )
+         and not signatureMatchesExpectedParameters(CheckSignature(check.checksignature(), obs.stationID()), expectedParameters))
       return false;
 
    return true;

@@ -84,9 +84,9 @@ public:
 		return baseImplementation_->getQcxFlagPosition(qcx);
 	}
 
-	virtual void getExpectedParameters(ParameterList * out, const kvalobs::kvStationInfo & si) const
+	virtual void getParametersToCheck(ParameterList * out, const kvalobs::kvStationInfo & si) const
 	{
-		baseImplementation_->getExpectedParameters(out, si);
+		baseImplementation_->getParametersToCheck(out, si);
 	}
 
 	virtual kvalobs::kvAlgorithms getAlgorithm(const std::string & algorithmName) const

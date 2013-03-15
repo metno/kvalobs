@@ -43,7 +43,7 @@ public:
 
 	virtual int getQcxFlagPosition(const std::string & qcx) const;
 
-	virtual void getExpectedParameters(ParameterList * out, const kvalobs::kvStationInfo & si) const;
+	virtual void getParametersToCheck(ParameterList * out, const kvalobs::kvStationInfo & si) const;
 
 	virtual kvalobs::kvAlgorithms getAlgorithm(const std::string & algorithmName) const;
 

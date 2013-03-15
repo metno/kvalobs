@@ -129,7 +129,7 @@ TEST_F(CheckRunnerTest, uncheckedObservationDataUpdatesUseinfo)
 			.WillRepeatedly(SetArgumentPointee<0>(checks));
 
 	db::DatabaseAccess::ParameterList expectedParameters = boost::assign::list_of("RR_24");
-	EXPECT_CALL(database, getExpectedParameters(_, observation))
+	EXPECT_CALL(database, getParametersToCheck(_, observation))
 			.Times(AtLeast(1))
 			.WillRepeatedly(SetArgumentPointee<0>(expectedParameters));
 
@@ -224,7 +224,7 @@ TEST_F(CheckRunnerTest, reusesResultsFromOtherChecks)
 TEST_F(CheckRunnerTest, runDecision)
 {
 	db::DatabaseAccess::ParameterList expectedParameters;
-	database.getExpectedParameters(& expectedParameters, observation);
+	database.getParametersToCheck(& expectedParameters, observation);
 
 	ASSERT_TRUE(expectedParameters.find("RR_24") != expectedParameters.end()) << "Check precondition error";
 
@@ -238,7 +238,7 @@ TEST_F(CheckRunnerTest, runDecision)
 TEST_F(CheckRunnerTest, willNotRunChecksWithoutAnyExpectedParametersForTypeid)
 {
 	db::DatabaseAccess::ParameterList expectedParameters;
-	database.getExpectedParameters(& expectedParameters, observation);
+	database.getParametersToCheck(& expectedParameters, observation);
 
 	ASSERT_TRUE(expectedParameters.find("TAM") == expectedParameters.end()) << "Check precondition error";
 
@@ -252,7 +252,7 @@ TEST_F(CheckRunnerTest, willNotRunChecksWithoutAnyExpectedParametersForTypeid)
 TEST_F(CheckRunnerTest, runCheckWithOneButNotAllParametersExpectedForTypeid)
 {
 	db::DatabaseAccess::ParameterList expectedParameters;
-	database.getExpectedParameters(& expectedParameters, observation);
+	database.getParametersToCheck(& expectedParameters, observation);
 
 	ASSERT_TRUE(expectedParameters.find("RR_24") != expectedParameters.end()) << "Check precondition error";
 	ASSERT_TRUE(expectedParameters.find("TAM") == expectedParameters.end()) << "Check precondition error";
@@ -268,7 +268,7 @@ TEST_F(CheckRunnerTest, runCheckWithOneButNotAllParametersExpectedForTypeid)
 TEST_F(CheckRunnerTest, respectsChecksActiveColumn)
 {
 	db::DatabaseAccess::ParameterList expectedParameters;
-	database.getExpectedParameters(& expectedParameters, observation);
+	database.getParametersToCheck(& expectedParameters, observation);
 
 	ASSERT_TRUE(expectedParameters.find("RR_24") != expectedParameters.end()) << "Check precondition error";
 
@@ -279,10 +279,10 @@ TEST_F(CheckRunnerTest, respectsChecksActiveColumn)
 	);
 }
 
-TEST_F(CheckRunnerTest, skipChecksWithMissingParametersInObsPgm)
+TEST_F(CheckRunnerTest, skipChecksForMissingParameters)
 {
 	db::DatabaseAccess::ParameterList expectedParameters;
-	database.getExpectedParameters(& expectedParameters, observation);
+	database.getParametersToCheck(& expectedParameters, observation);
 
 	ASSERT_TRUE(expectedParameters.find("TA_24") == expectedParameters.end()) << "Check precondition error";
 
@@ -296,7 +296,7 @@ TEST_F(CheckRunnerTest, skipChecksWithMissingParametersInObsPgm)
 TEST_F(CheckRunnerTest, checkShipsEvenIfParameterMissingInObsPgm)
 {
 	db::DatabaseAccess::ParameterList expectedParameters;
-	database.getExpectedParameters(& expectedParameters, observation);
+	database.getParametersToCheck(& expectedParameters, observation);
 
 	ASSERT_TRUE(expectedParameters.find("TA_24") == expectedParameters.end()) << "Check precondition error";
 

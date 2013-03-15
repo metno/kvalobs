@@ -221,22 +221,29 @@ int KvalobsDatabaseAccess::getQcxFlagPosition(const std::string & qcx) const
 }
 
 
-void KvalobsDatabaseAccess::getExpectedParameters(ParameterList * out,
+void KvalobsDatabaseAccess::getParametersToCheck(ParameterList * out,
 		const kvalobs::kvStationInfo & si) const
 {
-	std::ostringstream query;
-	query << "SELECT distinct name FROM param WHERE paramid IN (SELECT paramid FROM obs_pgm WHERE "
-		"stationid=" << si.stationID() << " AND "
-		//"typeid=" << si.typeID() << " AND "
-		"fromtime<='" << to_kvalobs_string(si.obstime()) << "' AND "
-		"(totime IS NULL OR totime>'" << to_kvalobs_string(si.obstime()) << "'));";
-//		"(totime IS NULL OR totime>'" << si.obstime() << "') AND "
-//		"kl" << std::setfill('0') << std::setw(2) << si.obstime().hour() << "  AND " <<
-//		si.obstime().date().shortweekday(miutil::miDate::English) << ");";
-
 	milog::LogContext context("query");
-	LOGDEBUG1(query.str());
+	{
+		std::ostringstream query;
+		query << "SELECT * FROM obs_pgm WHERE stationid=" << si.stationID()
+//				<< " AND typeid=" << si.typeID() << " AND "
+//				"fromtime<='" << to_kvalobs_string(si.obstime()) << "' AND "
+//				"(totime IS NULL OR totime>'" << to_kvalobs_string(si.obstime()) << "')"
+				<< " LIMIT 1;";
+		LOGDEBUG1(query.str());
+		ResultPtr result(connection_->execQuery(query.str()));
+		if ( not result->hasNext() )
+			return; // no expected parameters
+	}
 
+	std::ostringstream query;
+	query << "SELECT distinct name FROM param WHERE paramid IN (SELECT paramid FROM data WHERE "
+			"stationid=" << si.stationID() << " AND "
+			"typeid=" << si.typeID() << " AND "
+			"obstime='" << to_kvalobs_string(si.obstime()) << "')";
+	LOGDEBUG1(query.str());
 	ResultPtr result(connection_->execQuery(query.str()));
 	while ( result->hasNext() )
 	{
