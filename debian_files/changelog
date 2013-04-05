@@ -1,3 +1,9 @@
+kvalobs (2.7.0~rc9-1) lucid; urgency=low
+
+  * qabase check decision tests
+
+ -- Borge Moe <borge.moe@met.no>  Thu, 14 Mar 2013 14:31:23 +0100
+
 kvalobs (2.7.0~rc8-1) unstable; urgency=low
 
   * Do not encode decimalsecond for obstime and tbtime in the CORBA interface.
