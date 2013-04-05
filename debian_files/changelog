@@ -1,3 +1,9 @@
+kvalobs (2.7.0-1) lucid; urgency=low
+
+  * New release. No change since last RC.
+
+ -- Borge Moe <borge.moe@met.no>  Fri, 5 Apr 2013 10:30:00 +0200
+
 kvalobs (2.7.0~rc9-1) lucid; urgency=low
 
   * qabase check decision tests
