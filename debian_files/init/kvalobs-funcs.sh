@@ -1,7 +1,7 @@
 #!/bin/bash
 
 primary_host="kvalobs1 kvalobs2"
-ipalias="/usr/local/sbin/alias_kvalobs"
+ipalias="/usr/local/bin/alias_kvalobs"
 
 if [ ! -x "$ipalias" ]; then
 	ipalias="/home/borgem/alias_kvalobsnew"
