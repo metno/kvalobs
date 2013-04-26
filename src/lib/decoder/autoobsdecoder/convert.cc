@@ -262,7 +262,7 @@ DataConvert::convert(const std::string &param_,
       return data;
 
    if(!decodeParam(param, paramName, sensor, height, mod))
-      BadFormat("Bad parameter format. (Inavilid coding of parameter name)");
+      throw BadFormat("Bad parameter format. (Invalid coding of parameter name)");
 
    spDef=findSplitDef(paramName, totSize);
 
