@@ -28,6 +28,8 @@ miutilinclude_HEADERS = msleep.h replace.h cmprspace.h commastring.h \
                         splitstr.h timeconvert.h
 
 
+if HAVE_GMOCK 
+
 TESTS = libmiutiltest
 
 check_PROGRAMS = libmiutiltest
@@ -47,6 +49,7 @@ libmiutiltest_LDADD = \
 	$(top_builddir)/src/lib/milog/libkvalobs_milog.la \
 	$(BOOST_DATE_TIME_LIB)\
 	$(gtest_LIBS)
+endif
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libkvalobs_miutil.pc

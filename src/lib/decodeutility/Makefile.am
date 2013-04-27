@@ -31,6 +31,7 @@ libkvalobs_decodeutility_la_LIBADD = $(top_builddir)/src/lib/kvalobs/libkvalobs_
                              $(omniORB4_LIBS) \
                              $(BOOST_LDFLAGS) \
                              $(BOOST_THREAD_LIB)
+if HAVE_GMOCK
 
 TESTS = decodeutilitytest
 
@@ -51,6 +52,7 @@ decodeutilitytest_LDADD = \
 	$(putools_LIBS)\
 	$(BOOST_DATE_TIME_LIB) \
 	$(gtest_LIBS)
+endif
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libkvalobs_decodeutility.pc

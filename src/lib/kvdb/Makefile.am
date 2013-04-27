@@ -17,7 +17,7 @@ libkvalobs_kvdb_la_CPPFLAGS = \
 libkvalobs_kvdb_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@
 libkvalobs_kvdb_la_LIBADD= $(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la 
 
-
+if HAVE_GMOCK
 TESTS = libkvdbtest
 
 check_PROGRAMS = libkvdbtest
@@ -40,6 +40,7 @@ libkvdbtest_LDADD = \
 	$(top_builddir)/src/lib/milog/libkvalobs_milog.la \
 	$(libkvalobs_kvdb_la_LIBADD) \
 	$(gtest_LIBS)
+endif
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libkvalobs_kvdb.pc

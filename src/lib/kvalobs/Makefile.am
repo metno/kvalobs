@@ -30,7 +30,8 @@ libkvalobs_kvalobs_la_SOURCES = \
 	kvTextData.cc \
 	kvReferenceStation.cc \
 	kvKeyVal.cc \
-	kvWorkelement.cc \
+	kvWorkStatistic.cc \
+	kvWorkQue.cc \
 	kvServiceElement.cc \
 	kvGeneratedTypes.cc \
 	kvOperator.cc \
@@ -95,7 +96,8 @@ kvalobsinclude_HEADERS = \
 	kvTextData.h \
 	kvReferenceStation.h \
 	kvKeyVal.h \
-	kvWorkelement.h \
+	kvWorkStatistic.h \
+	kvWorkQue.h \
 	kvServiceElement.h \
 	kvGeneratedTypes.h \
 	kvOperator.h \
