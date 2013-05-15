@@ -192,13 +192,21 @@ void CheckRunner::newObservation(const kvalobs::kvStationInfo & obs, std::ostrea
 
             try
             {
-               checkObservation(obs, scriptLog);
-               logTransaction( true, start, nShortRetries, nLongRetries, aborted );
-               return;
-            }
-            catch (dnmi::db::SQLSerializeError & )
-            {
-               LOGWARN("Serialization error! Retrying");
+				for ( int i = 0; i < 256; ++ i )
+				{
+					try
+					{
+					   checkObservation(obs, scriptLog);
+					   logTransaction( true, start, nShortRetries, nLongRetries, aborted );
+					   return;
+					}
+					catch (dnmi::db::SQLSerializeError & )
+					{
+					   LOGWARN("Serialization error! Retrying");
+					}
+				}
+				// Happens if we get more than 256 serialization errors in a row
+				throw std::runtime_error("Serialization error!");
             }
             catch( const dnmi::db::SQLAborted &ex ) {
                LOGWARN("Aborted error! Retrying Reason: " << ex.what() );
@@ -207,13 +215,15 @@ void CheckRunner::newObservation(const kvalobs::kvStationInfo & obs, std::ostrea
          }
       }
 
-      LOGERROR("Serialization error!" );
+      //LOGERROR("Serialization error!" );
       logTransaction( false, start, nShortRetries, nLongRetries, aborted );
+      throw std::runtime_error("Serialization error!");
    }
    catch ( std::exception & e )
    {
       logTransaction( false, start, nShortRetries, nLongRetries, aborted, &e );
-      LOGERROR(e.what());
+      //LOGERROR(e.what());
+      throw;
    }
 }
 
