@@ -368,7 +368,7 @@ void KvalobsDatabaseAccess::getData(DataList * out, const kvalobs::kvStationInfo
 		query << "typeid=" << parameter.type() << " AND ";
 	boost::posix_time::ptime t = si.obstime() + boost::posix_time::minutes(minuteOffset);
 	query << "obstime BETWEEN '" << to_kvalobs_string(t) << "' AND '" << to_kvalobs_string(si.obstime()) << "'";
-	query << " ORDER BY obstime DESC FOR UPDATE;";
+	query << " ORDER BY obstime DESC;";
 
 	milog::LogContext context("query");
 	LOGDEBUG1(query.str());
