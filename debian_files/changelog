@@ -1,3 +1,9 @@
+kvalobs (2.7.1~rc1-1) lucid; urgency=low
+
+  * Flag-specification 9.14
+
+ -- Alexander Bürger <alexander.buerger@met.no>  Wed, 22 May 2013 10:58:46 +0200
+
 kvalobs (2.7.0-1) lucid; urgency=low
 
   * New release. No change since last RC.
@@ -17,11 +23,10 @@ kvalobs (2.7.0~rc8-1) unstable; urgency=low
 
  -- Borge Moe <borge.moe@met.no>  Tue, 13 Mar 2013 14:00:00 +0100
 
-
 kvalobs (2.7.0~rc7-1) unstable; urgency=low
 
   * Fixed a bug in decoding of obsType in KlDataDecoder. The bug was introduced
-    when "replenish" of data was implemented. 
+    when "replenish" of data was implemented.
   * Fixed a bunch of memory leaks in the kvService CORBA interface.
     (Or created a bunch of coredumps :-) )
   * KlDataDecoder: Renamed the replenish 'operator' from 'update' to 'add'.
