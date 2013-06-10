@@ -171,7 +171,7 @@ void CheckRunner::newObservation(const kvalobs::kvStationInfo & obs, std::ostrea
    LOGINFO("Checking " << obs);
    start = miutil::gettimeofday();
 
-   // Will try up to nRetry*nRetry times in case of serialization error
+   // Will try up to nRetry*nRetry times in case of error
    try
    {
       for ( int k = 0; k < nRetry; ++ k )
@@ -215,9 +215,9 @@ void CheckRunner::newObservation(const kvalobs::kvStationInfo & obs, std::ostrea
          }
       }
 
-      //LOGERROR("Serialization error!" );
-      logTransaction( false, start, nShortRetries, nLongRetries, aborted );
-      throw std::runtime_error("Serialization error!");
+      // final attempt:
+      checkObservation(obs, scriptLog);
+      logTransaction( true, start, nShortRetries, nLongRetries, aborted );
    }
    catch ( std::exception & e )
    {
