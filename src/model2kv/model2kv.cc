@@ -32,6 +32,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <vector>
 #include <map>
 #include <puTools/miTime.h>
 #include <puCtools/timemanip.h>

@@ -15,7 +15,7 @@ Build-Depends: debhelper (>= 7.0.50), autotools-dev, g++ (>= 4.4.0), debconf,
  liblog4cpp5-dev, libcppunit-dev (>= 1.12),
  metlibs-puctools-dev (>= 4.4.0), metlibs-parameter-dev (>= 4.4.0),
  metlibs-putools-dev (>= 4.4.0), metlibs-libmi-dev (>= 4.4.0),
- metlibs-milogger-dev (>= 4.4.0)
+ metlibs-milogger-dev (>= 4.4.0), libpose-dev
 Standards-Version: 3.7.3
 
 Package: kvalobs

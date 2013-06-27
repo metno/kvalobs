@@ -143,7 +143,7 @@ TEST_F( Sms2DecodeTest, MultiObsTime )
       cerr << " ----------------------------- " << endl;
    }*/
 
-   DecodedDataElem elem = getDataSet( data, "2010-12-28 06:00:00" );
+   DecodedDataElem elem = getDataSet( data, miTime("2010-12-28 06:00:00") );
    EXPECT_TRUE( elem.dataSize() == 9 ) << " DataSet: size = " << elem.dataSize();
    EXPECT_TRUE( elem.getDate() == miTime("2010-12-28 06:00:00") ) << "Date: " << elem.getDate();
    EXPECT_FLOAT_EQ( getData( elem, miTime("2010-12-28 06:00:00"), 34), 2 )    << "Val: " << getData( elem, miTime("2010-12-28 06:00:00"), 34);
