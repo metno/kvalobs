@@ -1350,22 +1350,18 @@ getStationMetaData( Station_metadataList_out stMeta,
    Connection *con = app.getNewDbConnection();
    miutil::miTime obstime;
 
+   try {
+   	   stMeta = new CKvalObs::CService::Station_metadataList();
+   }
+   catch(...){
+	   LOGWARN("NOMEM - Failed to allocate Station_metadataList.");
+	   return false;
+   }
+
    if(!con) {
       LOGWARN("Unable to create db connection.");
       return false;
    }
-
-   try {
-      stMeta = new CKvalObs::CService::Station_metadataList();
-   }
-   catch(...){
-      if( con )
-         app.releaseDbConnection(con);
-
-      LOGDEBUG("NOMEM!!!");
-      return false;
-   }
-
 
    if( obstime_ && strlen( obstime_ ) > 0 ) {
       obstime = miutil::miTime( obstime_ );
@@ -1412,7 +1408,8 @@ getStationMetaData( Station_metadataList_out stMeta,
          DRow r = res->next();
          rPos = 0;
          pos++;
-         Station_metadata &md = (*stMeta)[ pos ];
+         //Station_metadata &md = (*stMeta)[ pos ];
+         Station_metadata md;
 
          val = r[rPos++];
          md.stationid = (val.empty()?-32767:atol(val.c_str()));
@@ -1435,6 +1432,7 @@ getStationMetaData( Station_metadataList_out stMeta,
          md.metadataDescription = r[rPos++].c_str();
          md.fromtime            = r[rPos++].c_str();
          md.totime              = r[rPos++].c_str();
+         (*stMeta)[ pos ] = md;
       }
    }
    catch( const std::exception &ex ) {
