@@ -1,3 +1,18 @@
+kvalobs (2.7.2-1) lucid; urgency=low
+
+  * New release.
+  * kvServiced: Try to fix a segmentationfault.
+
+ -- Borge Moe <borge.moe@met.no>  Mon, 8 Jul 2013 13:30:00 +0200
+
+
+kvalobs (2.7.1-2) precise; urgency=low
+
+  * Fix compilation error on Ubuntu 12.04.
+  * Built with metlibs 4.11.0-1 on Ubuntu 12.04.
+
+ -- Alexander Bürger <alexander.buerger@met.no>  Thu, 27 Jun 2013 09:25:00 +0200
+
 kvalobs (2.7.1-2) precise; urgency=low
 
   * Fix compilation error on Ubuntu 12.04.
