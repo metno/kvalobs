@@ -95,7 +95,7 @@ main(int argc, char** argv)
    if(dbdriver.empty())
       dbdriver="pgdriver.so";
 
-   InitLogger(argc, argv, "kvManagerd");
+   InitLogger(argc, argv, "kvManagerd", conf);
 
    LOGINFO("check_for_missing_obs=" << (docheckForMissingObs?"true":"false"));
 

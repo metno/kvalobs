@@ -51,8 +51,8 @@ class ServiceApp: public KvApp
   bool                         orbIsDown;
   std::list<ReaperBase*>       reaperObjList;
   bool shutdown_;
-  boost::mutex mutex;
-  boost::mutex reaperMutex;
+  mutable boost::mutex mutex;
+  mutable boost::mutex reaperMutex;
  public:
   KvSubscriberCollection subscribers;
 

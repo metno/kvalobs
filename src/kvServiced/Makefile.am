@@ -4,6 +4,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/src/lib  -I$(top_builddir)/src/lib -I$(top_builddi
 bin_PROGRAMS = kvServiced 
 
 kvServiced_SOURCES= \
+	toStringHelper.cc toStringHelper.h \
 	kvServiced.cc \
 	KeyValSubscriberTransaction.cc KeyValSubscriberTransaction.h \
     ServiceApp.cc  ServiceApp.h\

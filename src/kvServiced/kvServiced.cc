@@ -73,7 +73,7 @@ main(int argc, char** argv)
   if(dbdriver.empty())
     dbdriver="pgdriver.so";
 
-  InitLogger(argc, argv, "kvServiced");
+  InitLogger(argc, argv, "kvServiced", conf);
 
   
   pidfile = KvApp::createPidFileName( "kvServiced" );

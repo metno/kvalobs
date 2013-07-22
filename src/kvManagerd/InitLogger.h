@@ -1,7 +1,7 @@
 /*
   Kvalobs - Free Quality Control Software for Meteorological Observations 
 
-  $Id: InitLogger.h,v 1.2.2.1 2007/09/27 09:02:34 paule Exp $                                                       
+  $Id: InitLogger.h,v 1.1.6.1 2007/09/27 09:02:39 paule Exp $                                                       
 
   Copyright (C) 2007 met.no
 
@@ -31,7 +31,12 @@
 #ifndef __initlogger_h__
 #define __initlogger_h__
 
+#include <miconfparser/miconfparser.h>
+
 void
-InitLogger(int argn, char **argv, const std::string &logname);
+InitLogger( int argn, char **argv,
+		    const std::string &logname,
+		    miutil::conf::ConfSection *conf = 0
+		  );
 
 #endif

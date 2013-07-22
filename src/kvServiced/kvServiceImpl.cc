@@ -43,6 +43,7 @@
 #include "kvRejectedIteratorImpl.h"
 #include "kvModelDataIteratorImpl.h"
 #include "kvWorkstatistikIteratorImpl.h"
+#include "toStringHelper.h"
 
 using namespace milog;
 using namespace CKvalObs::CService;
@@ -51,6 +52,7 @@ using namespace std;
 using namespace dnmi::db;
 using namespace milog;
 using namespace miutil;
+
 
 
 #define MAX_DATE "3000-01-01 00:00:00"
@@ -699,7 +701,7 @@ getModelData(const CKvalObs::CService::WhichDataList& whichData,
    LOGDEBUG("called ...\n");
 
    if(app.isMaxClientReached()){
-      LOGWARN("To many clients.....");
+      LOGWARN("To many clients....." << endl << toString( whichData ));
       return false;
    }
 
@@ -709,14 +711,18 @@ getModelData(const CKvalObs::CService::WhichDataList& whichData,
    PortableServer::ObjectId *itId;
 
 
-   if(!pCon)
+   if(!pCon) {
+	   LOGWARN("Failed: No database connection .... (Increase max_connections in postgresql.conf?)." <<
+			    endl << toString( whichData ));
       return false;
+   }
 
    try{
       pWhichData=new WhichDataList(whichData);
    }
    catch(...){
-      LOGERROR("OUT OF MEMMORY ...");
+      LOGERROR("OUT OF MEMMORY ... Failed to make a copy of WhichDataList." << endl
+    		   << toString( whichData ) );
       it=ModelDataIterator::_nil();
       app.releaseDbConnection(pCon);
       return false;
@@ -728,7 +734,7 @@ getModelData(const CKvalObs::CService::WhichDataList& whichData,
       dataIt=new ModelDataIteratorImpl(pCon, pWhichData, app);
    }
    catch(...){
-      LOGERROR("OUT OF MEMMORY (2)");
+      LOGERROR("OUT OF MEMMORY. Failed to create a ModelDataIterator." << endl << toString(whichData));
       app.releaseDbConnection(pCon);
       delete pWhichData;
       it=ModelDataIterator::_nil();
@@ -740,7 +746,7 @@ getModelData(const CKvalObs::CService::WhichDataList& whichData,
       dataIt->setObjId(itId);
    }
    catch(...){
-      LOGERROR("Cant register the DataIteratorImpl in the poa!");
+      LOGERROR("Cant register the DataIteratorImpl in the poa!" << endl << toString( whichData ) );
       delete dataIt;
       it=ModelDataIterator::_nil();
       return false;
@@ -750,14 +756,14 @@ getModelData(const CKvalObs::CService::WhichDataList& whichData,
       it=dataIt->_this();
    }
    catch(...){
-      LOGERROR("Cant obtain a referanse to the DataIterator!\n");
+      LOGERROR("Cant obtain a referanse to the DataIterator!" << endl << toString( whichData ) );
       delete dataIt;
       it=ModelDataIterator::_nil();
       return false;
    }
 
    if(CORBA::is_nil(it)){
-      LOGERROR("cant instatiate (DataIterator)!!!!");
+      LOGERROR("cant instatiate (DataIterator)!!!!" << endl << toString( whichData ));
       delete dataIt;
       return false;
    }

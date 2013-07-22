@@ -253,8 +253,10 @@ isMaxClientReached()
 	boost::mutex::scoped_lock l(reaperMutex);
 	
 	LOGDEBUG("isMaxClientReached: # : " << reaperObjList.size() << " max: " << MAX_CLIENTS );
-	if(reaperObjList.size()>MAX_CLIENTS)
+	if( reaperObjList.size() > MAX_CLIENTS) {
+		LOGWARN("Max number of clients reached (" << MAX_CLIENTS <<").");
 		return true;
+	}
 		
 	return false;
 }

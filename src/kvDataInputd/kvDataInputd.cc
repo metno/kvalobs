@@ -62,8 +62,9 @@ main(int argn, char** argv)
 {
    bool error;
    string pidfile;
+   miutil::conf::ConfSection *conf=KvApp::getConfiguration();
 
-   InitLogger(argn, argv);
+   InitLogger(argn, argv, "kvDataInputd", conf );
 
    pidfile= KvApp::createPidFileName( "kvDataInputd" );
 
