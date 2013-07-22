@@ -1,3 +1,12 @@
+kvalobs (2.7.3~rc1-1) lucid; urgency=low
+
+  * kvServiced: Release DB connections when 'destroy' is called on CORBA data iterators. 
+  * kvServiced: Better logging.
+  * Add configuration option for loglevel and tracelevel.
+
+ -- Borge Moe <borge.moe@met.no>  Mon, 22 Jul 2013 13:00:00 +0200
+
+
 kvalobs (2.7.2-1) lucid; urgency=low
 
   * New release.
