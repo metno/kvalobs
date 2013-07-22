@@ -57,6 +57,8 @@ class ModelDataIteratorImpl:
     const char *what()const throw(){ return reason.c_str();}
   };
 
+  mutable boost::mutex mutex;
+
   dnmi::db::Connection              *dbCon;
   CKvalObs::CService::WhichDataList *whichData;
   CORBA::Long                       iData;

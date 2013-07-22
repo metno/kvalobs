@@ -34,6 +34,7 @@
 #include <kvalobs/kvDbGate.h>
 #include <kvalobs/kvModelData.h>
 #include "kvModelDataIteratorImpl.h"
+#include "toStringHelper.h"
 
 using namespace std;
 using namespace kvalobs;
@@ -54,9 +55,13 @@ ModelDataIteratorImpl::~ModelDataIteratorImpl()
   
 	if(whichData)
 		delete whichData;
-
-	if(dbCon)
-		app.releaseDbConnection(dbCon);
+	{
+		boost::mutex::scoped_lock lock( mutex );
+		if(dbCon) {
+			app.releaseDbConnection(dbCon);
+			dbCon = 0;
+		}
+	}
 	
 	LOGDEBUG("DTOR: ModelDataIteratorImpl::~ModelDataIteratorImpl ... 1 ...\n");
 }
@@ -70,6 +75,14 @@ ModelDataIteratorImpl::destroy()
 	
 	LOGDEBUG("ModelDataIteratorImpl::destroy: called!\n");
 	deactivate();
+
+	{
+		boost::mutex::scoped_lock lock( mutex );
+		if(dbCon) {
+			app.releaseDbConnection(dbCon);
+			dbCon = 0;
+		}
+	}
 	LOGDEBUG("ModelDataIteratorImpl::destroy: leaving!\n");
 }
 
@@ -88,11 +101,18 @@ ModelDataIteratorImpl::next(CKvalObs::CService::ModelDataList_out modelDataList)
 	LogContext context("service/ModelDataIterator");
 	IsRunningHelper(*this, active );
 
+	boost::mutex::scoped_lock lock( mutex );
+
 	LOGDEBUG("ModelDataIteratorImpl::next: called ... \n");
   
+	if( ! dbCon ) {
+		LOGERROR( "next:  No db connection (returning false)." << endl << toString(*whichData));
+		return false;
+	}
+
 	//Check if we are deactivated. If so just return false.
 	if( ! active ) {
-		LOGDEBUG( "next: deactivated ( returning false)");
+		LOGWARN( "next: deactivated ( returning false)." << endl << toString(*whichData));
 		return false;
 	} 
   
@@ -100,7 +120,7 @@ ModelDataIteratorImpl::next(CKvalObs::CService::ModelDataList_out modelDataList)
 	
 	do{
 		if(iData>=whichData->length()){
-			LOGDEBUG("ModelDataIteratorImpl::next: End of data reached (return false)!\n");
+			LOGDEBUG("ModelDataIteratorImpl::next: End of data reached (return false)!\n" << endl << toString( *whichData ));
 			return false;
 		}
     
@@ -118,11 +138,11 @@ ModelDataIteratorImpl::next(CKvalObs::CService::ModelDataList_out modelDataList)
 			}
 		}
 		catch(InvalidWhichData &ex){
-			LOGERROR("ModelDataIteratorImpl::next: EXCEPTION: \n" << "   " << ex.what() << endl);
+			LOGERROR("ModelDataIteratorImpl::next: EXCEPTION: \n" << "   " << ex.what() << endl << toString( *whichData ));
 			return false;
 		}
 		catch(...){
-			LOGERROR("ModelDataIteratorImpl::next: UNKNOWN EXCEPTION: \n");
+			LOGERROR("ModelDataIteratorImpl::next: UNKNOWN EXCEPTION." << endl << toString( *whichData ));
 			return false;
 		}
      
@@ -215,7 +235,11 @@ void
 ModelDataIteratorImpl::
 cleanUp()
 {
-	app.releaseDbConnection(dbCon);
+	boost::mutex::scoped_lock lock( mutex );
+
+	if(dbCon)
+		app.releaseDbConnection(dbCon);
+
 	delete whichData;
 
 	whichData=0;

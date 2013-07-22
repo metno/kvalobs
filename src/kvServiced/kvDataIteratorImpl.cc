@@ -60,8 +60,12 @@ DataIteratorImpl::~DataIteratorImpl()
    if(whichData)
       delete whichData;
 
-   if(dbCon)
-      app.releaseDbConnection(dbCon);
+   {
+	   boost::mutex::scoped_lock lock( mutex );
+
+	   if(dbCon)
+		   app.releaseDbConnection(dbCon);
+   }
 
    LOGDEBUG("DTOR: DataIteratorImpl::~DataIteratorImpl ... 1 ...\n");
 }
@@ -133,6 +137,11 @@ DataIteratorImpl::next(CKvalObs::CService::ObsDataList_out obsDataList)
    LogContext context("service/DataIterator");
 
    LOGDEBUG("next: called ..." );
+
+   if( !dbCon ) {
+	   LOGERROR( "next:  No db connection (returning false)." );
+	   return false;
+   }
 
    //Check if we are deactivated. If so just return false.
    if( ! active ) {

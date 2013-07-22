@@ -136,8 +136,11 @@ WorkstatistikIteratorImpl::
   LogContext context("service/getWorkstatistikIterator");
   LOGDEBUG("DTOR: called\n");
   
-  if(dbCon)
+  boost::mutex::scoped_lock lock( mutex );
+  if(dbCon) {
     app.releaseDbConnection(dbCon);
+    dbCon = 0;
+  }
 
 }
 
@@ -155,6 +158,16 @@ destroy()
 
   LOGDEBUG4("getWorkstatistikIterator::destroy: called!\n");
   deactivate();
+
+  {
+	  boost::mutex::scoped_lock lock( mutex );
+
+	  if(dbCon) {
+		  app.releaseDbConnection(dbCon);
+	      dbCon = 0;
+	  }
+  }
+
   LOGDEBUG6("getWorkstatistikIterator::destroy: leaving!\n");
 }
 
@@ -169,9 +182,16 @@ next(CKvalObs::CService::WorkstatistikElemList_out wsList)
 
 	IsRunningHelper running(*this, active );
   
+	boost::mutex::scoped_lock lock( mutex );
+
 	LogContext context("service/getWorkstatistikIterator");
 	LOGDEBUG("getWorkstatistikIterator::next: called ... \n");
   
+	if( ! dbCon) {
+		LOGERROR( "next:  No db connection (returning false)." );
+		return false;
+	}
+
 	//Check if we are deactivated. If so just return false.
 	if( ! active ) {
 		LOGDEBUG( "next: deactivated ( returning false)");
@@ -221,6 +241,10 @@ void
 WorkstatistikIteratorImpl::
 cleanUp()
 {
-	app.releaseDbConnection(dbCon);
-	dbCon=0;
+	boost::mutex::scoped_lock lock( mutex );
+
+	if( dbCon ) {
+		app.releaseDbConnection(dbCon);
+		dbCon=0;
+	}
 }

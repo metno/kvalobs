@@ -46,7 +46,7 @@ class WorkstatistikIteratorImpl :
   public PortableServer::RefCountServantBase,
   public ReaperBase
 {
-  
+  mutable boost::mutex mutex;
   dnmi::db::Connection                         *dbCon;
   std::list<kvalobs::kvWorkelement>           dataList;
   std::list<kvalobs::kvWorkelement>::iterator dataIt;

@@ -46,7 +46,7 @@ class RejectedIteratorImpl :
   public PortableServer::RefCountServantBase,
   public ReaperBase
 {
-  
+  mutable boost::mutex mutex;
   dnmi::db::Connection                         *dbCon;
   std::list<kvalobs::kvRejectdecode>           dataList;
   std::list<kvalobs::kvRejectdecode>::iterator dataIt;

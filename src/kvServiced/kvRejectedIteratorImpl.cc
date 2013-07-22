@@ -155,8 +155,12 @@ RejectedIteratorImpl::
   LogContext context("service/RejectedIterator");
   LOGDEBUG("DTOR: called\n");
   
-  if(dbCon)
+  boost::mutex::scoped_lock lock( mutex );
+
+  if(dbCon) {
     app.releaseDbConnection(dbCon);
+    dbCon = 0;
+  }
 
 }
 
@@ -174,6 +178,16 @@ destroy()
 
   LOGDEBUG4("RejectedIteratorImpl::destroy: called!\n");
   deactivate();
+
+  {
+	  boost::mutex::scoped_lock lock( mutex );
+
+	  if(dbCon) {
+		  app.releaseDbConnection(dbCon);
+		  dbCon = 0;
+	  }
+  }
+
   LOGDEBUG6("RejectedIteratorImpl::destroy: leaving!\n");
 }
 
@@ -190,7 +204,15 @@ next(CKvalObs::CService::RejectdecodeList_out rejectedList)
   
 	LogContext context("service/RejectedIterator");
 	LOGDEBUG("RejectedIteratorImpl::next: called ... \n");
-  
+
+	boost::mutex::scoped_lock lock( mutex );
+
+	if( ! dbCon ) {
+		LOGERROR( "next:  No db connection (returning false)." );
+		return false;
+	}
+
+
 	//Check if we are deactivated. If so just return false.
 	if( ! active ) {
 		LOGDEBUG( "next: deactivated ( returning false)");
@@ -237,6 +259,10 @@ void
 RejectedIteratorImpl::
 cleanUp()
 {
-	app.releaseDbConnection(dbCon);
-	dbCon=0;
+	boost::mutex::scoped_lock lock( mutex );
+
+	if( dbCon ) {
+		app.releaseDbConnection(dbCon);
+		dbCon=0;
+	}
 }
