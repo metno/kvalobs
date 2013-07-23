@@ -69,14 +69,13 @@ bool CorbaGetFunction::operator()(const char *name)
 			try
 			{
 				bool result = this->process(service);
-				if (!result)
-				{
+
+				if (!result) {
 					LOGWARN("Can't get data from kvalobs!!");
 				}
-				else
-				{
-					return result;
-				}
+
+				return result;
+
 			} catch (CORBA::TRANSIENT &ex)
 			{
 				LOGWARN("Exception CORBA::TRANSIENT!");
