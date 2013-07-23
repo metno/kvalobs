@@ -66,8 +66,7 @@ bool CorbaGetFunction::operator()(const char *name)
 		for (int i = 0; i < 2; i++)
 		{
 			service = corbaApp->lookUpService(forceNS, usedNS);
-			try
-			{
+			try {
 				bool result = this->process(service);
 
 				if (!result) {
@@ -76,19 +75,16 @@ bool CorbaGetFunction::operator()(const char *name)
 
 				return result;
 
-			} catch (CORBA::TRANSIENT &ex)
-			{
+			} catch (CORBA::TRANSIENT &ex) {
 				LOGWARN("Exception CORBA::TRANSIENT!");
-			} catch (CORBA::COMM_FAILURE &ex)
-			{
+			} catch (CORBA::COMM_FAILURE &ex) {
 				LOGWARN( "Exception CORBA::COMM_FAILURE!");
-			} catch (...)
-			{
+			} catch (...) {
 				LOGERROR("Exception unknown!");
 				return false;
 			}
-			if (usedNS)
-			{
+
+			if (usedNS) {
 				LOGERROR("Can't connect to kvalobs!");
 				return false;
 			}
