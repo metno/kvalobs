@@ -116,7 +116,7 @@ inline boost::posix_time::ptime time_from_string_nothrow(const std::string & s)
 			                boost::lexical_cast<int>(so.substr(3)), 0 );
 			    else {
 #ifdef LOGWARN
-             LOGWARN("Unable to interpret string with timezpne as time: " << s);
+             LOGWARN("Unable to interpret string with timezpne as time: '" << s << "'.");
 #endif
 			        return boost::posix_time::ptime();
 			    }
