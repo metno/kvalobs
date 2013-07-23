@@ -362,12 +362,14 @@ DataIteratorImpl::findData(list<kvData> &data,
 
    if(currentEndTime.is_not_a_date_time()){
       stime = boost::posix_time::time_from_string_nothrow(std::string(wData.fromObsTime));
-      endTime = boost::posix_time::time_from_string_nothrow(std::string(wData.toObsTime));
+
+      if( strlen( wData.toObsTime ) > 0 )
+          endTime = boost::posix_time::time_from_string_nothrow(std::string(wData.toObsTime));
 
       if(stime.is_not_a_date_time() || endTime.is_not_a_date_time()){
          if(stime.is_not_a_date_time()){
             ostringstream os;
-            os << "Inavlid time spec (fromObsTime): ";
+            os << "Invalid timespec (fromObsTime): ";
 
             if(wData.fromObsTime)
                os <<  wData.fromObsTime;
