@@ -192,7 +192,10 @@ ModelDataIteratorImpl::findData(list<kvModelData> &data,
 {
 	kvDbGate gate(dbCon);
 	boost::posix_time::ptime stime = boost::posix_time::time_from_string_nothrow((const char *) wData.fromObsTime);
-	boost::posix_time::ptime etime = boost::posix_time::time_from_string_nothrow((const char *) wData.toObsTime);
+	boost::posix_time::ptime etime;
+
+	if( strlen( wData.toObsTime ) > 0 )
+	    etime = boost::posix_time::time_from_string_nothrow((const char *) wData.toObsTime);
 
 	if(stime.is_not_a_date_time() || etime.is_not_a_date_time()){
 		if(stime.is_not_a_date_time()){
