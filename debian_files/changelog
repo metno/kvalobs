@@ -1,3 +1,9 @@
+kvalobs (2.7.3~rc3-1) lucid; urgency=low
+
+  * kvServiced: Fix a locking bug.
+
+ -- Borge Moe <borge.moe@met.no>  Wed, 24 Jul 2013 09:15:00 +0200
+
 kvalobs (2.7.3~rc2-1) lucid; urgency=low
 
   * kvServiced: Remove some wrong warnings.
