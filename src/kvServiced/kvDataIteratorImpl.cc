@@ -60,12 +60,8 @@ DataIteratorImpl::~DataIteratorImpl()
    if(whichData)
       delete whichData;
 
-   {
-	   boost::mutex::scoped_lock lock( mutex );
-
-	   if(dbCon)
-		   app.releaseDbConnection(dbCon);
-   }
+   if(dbCon)
+       app.releaseDbConnection(dbCon);
 
    LOGDEBUG("DTOR: DataIteratorImpl::~DataIteratorImpl ... 1 ...\n");
 }

@@ -152,43 +152,35 @@ RejectedIteratorImpl(dnmi::db::Connection         *dbCon_,
 RejectedIteratorImpl::
 ~RejectedIteratorImpl()
 {
-  LogContext context("service/RejectedIterator");
-  LOGDEBUG("DTOR: called\n");
+    boost::mutex::scoped_lock lock( mutex );
+    LogContext context("service/RejectedIterator");
+    LOGDEBUG("DTOR: called\n");
   
-  boost::mutex::scoped_lock lock( mutex );
-
-  if(dbCon) {
-    app.releaseDbConnection(dbCon);
-    dbCon = 0;
-  }
-
+    if(dbCon)
+        app.releaseDbConnection(dbCon);
 }
 
 void
 RejectedIteratorImpl::
 destroy()
 {
-  
-  LogContext context("service/RejectedIterator");
+    boost::mutex::scoped_lock lock( mutex );
+    LogContext context("service/RejectedIterator");
   //CODE:
   // We must delete this instance of ModelDataIteratorImpl. We cant just 
   // call 'delete this'. We must also implement some mean of cleaning up
   // this instance if the client dont behave as expected or crash before
   // destroy is called.
 
-  LOGDEBUG4("RejectedIteratorImpl::destroy: called!\n");
-  deactivate();
+    LOGDEBUG4("RejectedIteratorImpl::destroy: called!\n");
+    deactivate();
 
-  {
-	  boost::mutex::scoped_lock lock( mutex );
+    if(dbCon) {
+        app.releaseDbConnection(dbCon);
+        dbCon = 0;
+    }
 
-	  if(dbCon) {
-		  app.releaseDbConnection(dbCon);
-		  dbCon = 0;
-	  }
-  }
-
-  LOGDEBUG6("RejectedIteratorImpl::destroy: leaving!\n");
+    LOGDEBUG6("RejectedIteratorImpl::destroy: leaving!\n");
 }
 
 
@@ -200,12 +192,12 @@ next(CKvalObs::CService::RejectdecodeList_out rejectedList)
 	list<kvRejectdecode>::iterator it;
 	bool active;
 
+	boost::mutex::scoped_lock lock( mutex );
+
 	IsRunningHelper running(*this, active );
   
 	LogContext context("service/RejectedIterator");
 	LOGDEBUG("RejectedIteratorImpl::next: called ... \n");
-
-	boost::mutex::scoped_lock lock( mutex );
 
 	if( ! dbCon ) {
 		LOGERROR( "next:  No db connection (returning false)." );
@@ -220,8 +212,6 @@ next(CKvalObs::CService::RejectdecodeList_out rejectedList)
   	}
   
 	rejectedList =new CKvalObs::CService::RejectdecodeList();
-  
-  
 
 	if(!findData(dataList)){
 		//An error occured.

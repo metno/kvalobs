@@ -52,16 +52,13 @@ ModelDataIteratorImpl::~ModelDataIteratorImpl()
 {
   
 	LOGDEBUG("DTOR: ModelDataIteratorImpl::~ModelDataIteratorImpl...\n");
-  
+	boost::mutex::scoped_lock lock( mutex );
+
 	if(whichData)
 		delete whichData;
-	{
-		boost::mutex::scoped_lock lock( mutex );
-		if(dbCon) {
-			app.releaseDbConnection(dbCon);
-			dbCon = 0;
-		}
-	}
+
+	if(dbCon)
+	    app.releaseDbConnection(dbCon);
 	
 	LOGDEBUG("DTOR: ModelDataIteratorImpl::~ModelDataIteratorImpl ... 1 ...\n");
 }
@@ -72,17 +69,15 @@ ModelDataIteratorImpl::destroy()
 {
 	// We just deactivate the object here. The cleanup thread will release the resources
 	// and remove it from the reaperObjList.
-	
+    boost::mutex::scoped_lock lock( mutex );
 	LOGDEBUG("ModelDataIteratorImpl::destroy: called!\n");
 	deactivate();
 
-	{
-		boost::mutex::scoped_lock lock( mutex );
-		if(dbCon) {
-			app.releaseDbConnection(dbCon);
-			dbCon = 0;
-		}
+	if(dbCon) {
+	    app.releaseDbConnection(dbCon);
+	    dbCon = 0;
 	}
+
 	LOGDEBUG("ModelDataIteratorImpl::destroy: leaving!\n");
 }
 
@@ -98,10 +93,10 @@ ModelDataIteratorImpl::next(CKvalObs::CService::ModelDataList_out modelDataList)
 	bool                   active;
   //ObsDataList          obsDataList;
 
+	boost::mutex::scoped_lock lock( mutex );
+
 	LogContext context("service/ModelDataIterator");
 	IsRunningHelper(*this, active );
-
-	boost::mutex::scoped_lock lock( mutex );
 
 	LOGDEBUG("ModelDataIteratorImpl::next: called ... \n");
   

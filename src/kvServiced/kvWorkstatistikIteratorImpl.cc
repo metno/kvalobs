@@ -133,14 +133,15 @@ WorkstatistikIteratorImpl(
 WorkstatistikIteratorImpl::
 ~WorkstatistikIteratorImpl()
 {
-  LogContext context("service/getWorkstatistikIterator");
-  LOGDEBUG("DTOR: called\n");
+    boost::mutex::scoped_lock lock( mutex );
+
+    LogContext context("service/getWorkstatistikIterator");
+    LOGDEBUG("DTOR: called\n");
   
-  boost::mutex::scoped_lock lock( mutex );
-  if(dbCon) {
-    app.releaseDbConnection(dbCon);
-    dbCon = 0;
-  }
+    if(dbCon) {
+        app.releaseDbConnection(dbCon);
+        dbCon = 0;
+    }
 
 }
 
@@ -148,27 +149,20 @@ void
 WorkstatistikIteratorImpl::
 destroy()
 {
-  
-  LogContext context("service/getWorkstatistikIterator");
-  //CODE:
-  // We must delete this instance of ModelDataIteratorImpl. We cant just 
-  // call 'delete this'. We must also implement some mean of cleaning up
-  // this instance if the client dont behave as expected or crash before
-  // destroy is called.
+    boost::mutex::scoped_lock lock( mutex );
+    LogContext context("service/getWorkstatistikIterator");
 
-  LOGDEBUG4("getWorkstatistikIterator::destroy: called!\n");
-  deactivate();
+    //The instance is deleted in ObjReaper.
 
-  {
-	  boost::mutex::scoped_lock lock( mutex );
+    LOGDEBUG4("getWorkstatistikIterator::destroy: called!\n");
+    deactivate();
 
-	  if(dbCon) {
-		  app.releaseDbConnection(dbCon);
-	      dbCon = 0;
-	  }
-  }
+    if(dbCon) {
+        app.releaseDbConnection(dbCon);
+        dbCon = 0;
+    }
 
-  LOGDEBUG6("getWorkstatistikIterator::destroy: leaving!\n");
+    LOGDEBUG6("getWorkstatistikIterator::destroy: leaving!\n");
 }
 
 
@@ -180,9 +174,9 @@ next(CKvalObs::CService::WorkstatistikElemList_out wsList)
 	list<kvWorkelement>::iterator it;
 	bool active;
 
-	IsRunningHelper running(*this, active );
-  
 	boost::mutex::scoped_lock lock( mutex );
+
+	IsRunningHelper running(*this, active );
 
 	LogContext context("service/getWorkstatistikIterator");
 	LOGDEBUG("getWorkstatistikIterator::next: called ... \n");
