@@ -1,7 +1,8 @@
 kvalobs (2.7.3~rc4-1) lucid; urgency=low
 
-  * #1364. Enhencment the kldata-decoderen may set the useinfo(7) flag
-   (eralyobs/lateobs). 
+  * #1364. Enhencment: The kldata-decoderen may set the useinfo(7) flag
+   (eralyobs/lateobs) when configured to do so or specified in the obsType
+   header. 
 
  -- Borge Moe <borge.moe@met.no>  Sun, 29 Sep 2013 13:15:00 +0200
 
