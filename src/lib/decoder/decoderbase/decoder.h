@@ -51,10 +51,16 @@
 #include <decoderbase/GenCacheElem.h>
 #include <decoderbase/metadata.h>
 
+
+
 namespace kvalobs{
-  /**
+
+
+
+/**
    * \brief The namespace the decoder interface is in.
    */
+
   namespace decoder{
     /**
      * \defgroup kvdecoder Data decoders
@@ -108,6 +114,7 @@ namespace kvalobs{
       kvalobs::kvStationInfoList stationInfoList;
       std::list<std::string>     createdLoggers;
       std::list<GenCachElem>          genCachElem;
+      miutil::conf::ConfSection *theKvConf;
     
     protected:
       milog::FLogStream *openFLogStream(const std::string &filename);
@@ -398,10 +405,29 @@ namespace kvalobs{
 		  const std::list<kvalobs::kvTypes> &typeList,
 		  const std::string &obsType_,
 		  const std::string &obs_,
-		  int               decoderId_=-1);
+		  int               decoderId_=-1 );
 
       virtual ~DecoderBase();
       
+      /**
+       * Set the configuration of the <kvalobs.conf> that is in effect.
+       */
+      void setKvConf( miutil::conf::ConfSection *theKvConf );
+
+      /**
+       * Compute the useinfo flag 7 (to late or to early observation).
+       * It use data from the obspgm.
+       *
+       * \param typeid The typeid to the observation.
+       * \param nowTime The wall clock time that we use as the base in the check.
+       * \param obstime The time the observation was taken.
+       * \param logid Which logger should log messages be written to.
+       */
+      char getUseinfo7Code( int typeId,
+              	  	  	  	const boost::posix_time::ptime &nowTime,
+              	  	  	  	const boost::posix_time::ptime &obstime,
+              	  	  	  	const std::string &logid="" );
+
       void setMetaconf(const std::string &metaconf);
 
       
@@ -571,6 +597,15 @@ namespace kvalobs{
       bool loadConf(int sid, int tid, 
 		    kvalobs::decoder::ConfParser &parser);
 
+      /**
+       * Return the configuration section for the specific driver
+       * from the kvalobs.conf. The driver specific part is in
+       * the section to kvDataInputd and has the same name as
+       * returned by DecoderBase::name.
+       * \return The ConfSection if one is defined or 0 if non is defined in
+       * the configuration file.
+       */
+      miutil::conf::ConfSection *myConfSection();
       /**
        * \brief Load the observation program.
        */

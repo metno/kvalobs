@@ -38,6 +38,7 @@
 #include <decoderbase/decoder.h>
 #include <kvalobs/kvTypes.h>
 #include <boost/noncopyable.hpp>
+#include <miconfparser/miconfparser.h>
 
 
 /**
@@ -62,9 +63,17 @@ typedef void (*releaseDecoderFunc)(
                );
 
 typedef std::list<std::string> (*getObsTypes)();
+
+typedef void (*setKvConf)(
+               kvalobs::decoder::DecoderBase* decoder,
+               miutil::conf::ConfSection *theKvConf
+			);
+
+
 }
 
 namespace kvalobs{
+
 namespace decoder{
 
 /**
@@ -74,6 +83,7 @@ class DecoderMgr{
     struct DecoderItem : public boost::noncopyable {
       decoderFactory     factory;
       releaseDecoderFunc releaseFunc;
+      setKvConf          setConf;
       dnmi::file::DSO    *dso;
       time_t             modTime;
       int                decoderCount;
@@ -83,10 +93,11 @@ class DecoderMgr{
 
       DecoderItem(decoderFactory     factory_,
                   releaseDecoderFunc releaseFunc_,
+                  setKvConf          setKvConf_,
                   dnmi::file::DSO    *dso_,
                   time_t             mTime)
-      :factory(factory_), releaseFunc(releaseFunc_), dso(dso_),
-       modTime(mTime), decoderCount(0), decoderId(-1)
+      :factory(factory_), releaseFunc(releaseFunc_), setConf( setKvConf_),
+       dso(dso_), modTime(mTime), decoderCount(0), decoderId(-1)
       {
       }
 
@@ -103,14 +114,17 @@ class DecoderMgr{
    DecoderList      decoders;
    std::string decoderPath;
    std::string soVersion;
+   miutil::conf::ConfSection *theKvConf;
 
 public:
-   DecoderMgr(const std::string &decoderPath_);
-   DecoderMgr(){};
+   DecoderMgr(const std::string &decoderPath_,
+		      miutil::conf::ConfSection *theKvConf );
+   DecoderMgr():theKvConf( 0 ){};
    ~DecoderMgr();
 
    std::string fixDecoderName( const std::string &driver );
 
+   void setTheKvConf( miutil::conf::ConfSection *theKvConf );
    void setDecoderPath(const std::string &decoderPath_);
 
 

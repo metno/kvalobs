@@ -57,6 +57,7 @@ DecoderMgr::updateDecoders()
    decoderFactory     fac;
    releaseDecoderFunc releaseFunc;
    getObsTypes        obsTypes;
+   setKvConf          setConf;
    DecoderItem        *decoder;
    int                id=0;
 
@@ -84,10 +85,12 @@ DecoderMgr::updateDecoders()
          fac=(decoderFactory) (*dso)["decoderFactory"];
          obsTypes=(getObsTypes)(*dso)["getObsTypes"];
          releaseFunc=(releaseDecoderFunc)(*dso)["releaseDecoder"];
-         decoder=new DecoderItem(fac, releaseFunc, dso, modTime(name));
+         setConf = (setKvConf)dso->loadSymbol("setKvConf");
+         decoder=new DecoderItem(fac, releaseFunc, setConf, dso, modTime(name));
          decoder->obsTypes=obsTypes();
          decoder->decoderId=id;
          id++;
+
          decoders.push_back(decoder);
       }
       catch(dnmi::file::DSOException &ex){
@@ -105,11 +108,18 @@ DecoderMgr::updateDecoders()
 }
 
 
-DecoderMgr::DecoderMgr(const std::string &decoderPath_)
+DecoderMgr::DecoderMgr(const std::string &decoderPath_,
+		miutil::conf::ConfSection *theKvConf_ )
+	: theKvConf( theKvConf_ )
 {
    setDecoderPath(decoderPath_);
 }
 
+void
+DecoderMgr::setTheKvConf( miutil::conf::ConfSection *theKvConf_ )
+{
+	theKvConf = theKvConf_;
+}
 
 void
 DecoderMgr::setDecoderPath(const std::string &decoderPath_)
@@ -174,6 +184,7 @@ DecoderMgr::findDecoder(dnmi::db::Connection   &connection,
                         const std::list<kvalobs::kvTypes> &typeList,
                         const std::string &obsType_,
                         const std::string &obs,
+
                         std::string &errorMsg)
 {
    string myObsType(obsType_);
@@ -225,6 +236,9 @@ DecoderMgr::findDecoder(dnmi::db::Connection   &connection,
 
             if(!metaconf.empty())
                dec->setMetaconf(metaconf);
+
+            if( (*it)->setConf )
+            	(*it)->setConf( dec, theKvConf );
 
             return dec;
          }

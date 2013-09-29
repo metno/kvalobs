@@ -48,6 +48,7 @@ volatile sig_atomic_t sigTerm=0;
 
 DataSrcApp::DataSrcApp(int argn, char **argv,
                        int               nConnections_,
+                       miutil::conf::ConfSection *theKvConf,
                        const char *opt[][2])
 :KvApp(argn, argv, opt), refMgr(CKvalObs::CManager::ManagerInput::_nil()),
  ok(false), shutdown_(false)
@@ -76,6 +77,7 @@ DataSrcApp::DataSrcApp(int argn, char **argv,
       dbDriver="pgdriver.so";
 
    decoderMgr.setDecoderPath(myPath);
+   decoderMgr.setTheKvConf( theKvConf );
 
    nConnections=registerDb(nConnections_);
 

@@ -149,9 +149,9 @@ DecoderBase(
       const std::list<kvalobs::kvTypes> &typeList_,
       const std::string &obsType_,
       const std::string &obs_,
-      int                    decoderId_)
+      int                    decoderId_ )
 :decoderId(decoderId_), con(con_), paramList(params), typeList(typeList_),
- obsType(obsType_),obs(obs_)
+ obsType(obsType_),obs(obs_), theKvConf( 0 )
 {
 }
 
@@ -166,6 +166,44 @@ DecoderBase::
    for(;it!=createdLoggers.end(); it++){
       milog::Logger::removeLogger(*it);
    }
+}
+
+void
+kvalobs::decoder::
+DecoderBase::
+setKvConf( miutil::conf::ConfSection *theKvConf_ )
+{
+	theKvConf = theKvConf_;
+}
+
+char
+kvalobs::decoder::
+DecoderBase::
+getUseinfo7Code( int typeId,
+                 const boost::posix_time::ptime &now,
+                 const boost::posix_time::ptime &obt,
+                 const std::string &logid )
+{
+	const kvalobs::kvTypes *kvType=findType(typeId);
+
+	if(!kvType){
+		if( logid.empty() ) {
+			LOGWARN("Unknown typeid: " << typeId);
+		} else {
+			IDLOGWARN(logid, "Unknown typeid: " << typeId);
+		}
+
+		return 0;
+	}
+
+	int diff = (now - obt).total_seconds() / 60; // difference in minutes
+
+	if(diff > kvType->lateobs()) //tbt>obt  (diff>=0)
+		return 4;
+	else if(diff < (-1*kvType->earlyobs())) //tbt<obt (diff<0)
+		return 3;
+	else
+		return 0;
 }
 
 
@@ -831,6 +869,29 @@ loadConf(int sid, int tid,
 }
 
 
+miutil::conf::ConfSection*
+kvalobs::decoder::
+DecoderBase::
+myConfSection()
+{
+	miutil::conf::ConfSection *conf;
+	ostringstream sectionName;
+
+	if( ! theKvConf ) {
+		LOGDEBUG( "myConfSection: driver <" << name() << "> has NOT implemented use of data from <kvalobs.conf>.");
+		return 0;
+	}
+
+	sectionName << "kvDataInputd." << name();
+	conf = theKvConf->getSection( sectionName.str() );
+
+	if( !conf ) {
+		LOGDEBUG( "No configuration section defined in <kvalobs.conf> for the section '" << sectionName.str()<<"'.");
+	}
+
+	return conf;
+}
+
 
 milog::FLogStream*
 kvalobs::decoder::
@@ -852,8 +913,6 @@ openFLogStream(const std::string &filename)
       return 0;
    }
 
-
-   //string path=getenv("KVALOBS");
    string path = logdir();
 
    if(!path.empty() && path[path.length()-1]=='/')

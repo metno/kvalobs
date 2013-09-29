@@ -98,3 +98,20 @@ dnmi::file::DSO::operator[](const std::string &name)
   return ret;
 }
 
+void*
+dnmi::file::DSO::loadSymbol( const std::string &name )
+{
+	void *ret;
+	const char *error;
+
+	if(!handle)
+		DSOException("No DSO file is open!");
+
+	ret=dlsym(handle, name.c_str());
+	error=dlerror();
+
+	if( error!=0)
+	    return 0;
+
+	return ret;
+}

@@ -154,6 +154,7 @@ class DataSrcApp : public KvApp
    */
   DataSrcApp(int argn, char **argv,
 	          int              numberOfConnections,
+	          miutil::conf::ConfSection *theKvConf,
 	          const char      *opt[][2]=0);
 
   /**

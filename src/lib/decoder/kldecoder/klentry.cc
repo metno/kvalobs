@@ -72,3 +72,11 @@ getObsTypes()
   return list;
 }
 
+void
+setKvConf( kvalobs::decoder::DecoderBase* decoder,
+           miutil::conf::ConfSection *theKvConf )
+{
+	decoder->setKvConf( theKvConf );
+}
+
+

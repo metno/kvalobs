@@ -57,14 +57,17 @@ static CORBA::ORB_ptr orb;
 static bool           hintKilled=false;
 
 
+
+using namespace kvalobs;
+
 int 
 main(int argn, char** argv)
 {
    bool error;
    string pidfile;
-   miutil::conf::ConfSection *conf=KvApp::getConfiguration();
+   miutil::conf::ConfSection *theKvConf=KvApp::getConfiguration();
 
-   InitLogger(argn, argv, "kvDataInputd", conf );
+   InitLogger(argn, argv, "kvDataInputd", theKvConf );
 
    pidfile= KvApp::createPidFileName( "kvDataInputd" );
 
@@ -83,13 +86,10 @@ main(int argn, char** argv)
       }
    }
 
-
    //Read all connection information from the config file
    //$KVALOBS/etc/kvalobs.conf or environment.
    //ie: KVDB, KVDBUSER, PGHOST, PGPORT
 
-
-   //  miutil::conf::ConfSection *conf;
    int          nWorkerThreads=3;
    CKvalObs::CDataSource::Data_ptr dataSource;
 
@@ -100,7 +100,7 @@ main(int argn, char** argv)
 
    KvApp::createPidFile("kvDataInputd");
 
-   DataSrcApp app(argn, argv, nWorkerThreads);
+   DataSrcApp app(argn, argv, nWorkerThreads, theKvConf);
 
    if(!app.isOk()){
       LOGFATAL("Problems with initializing of kvDataInputd!\n");

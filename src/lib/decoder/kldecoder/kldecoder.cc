@@ -43,9 +43,11 @@
 #include <miutil/timeconvert.h>
 #include "kldecoder.h"
 #include <decodeutility/decodeutility.h>
+#include <kvalobs/kvPath.h>
 
 
 
+namespace pt=boost::posix_time;
 using namespace kvalobs::decoder::kldecoder;
 using namespace std;
 using namespace dnmi::db;
@@ -83,9 +85,19 @@ KlDecoder( dnmi::db::Connection   &con,
            const std::string &obs,
            int                    decoderId)
 :DecoderBase(con, params, typeList, obsType, obs, decoderId),
- typeID( INT_MAX ), stationID(INT_MAX), onlyInsertOrUpdate( false )
+ typeID( INT_MAX ), stationID(INT_MAX), onlyInsertOrUpdate( false ),
+ setUsinfo7( false )
 
 {
+	miutil::conf::ConfSection *conf = myConfSection();
+	miutil::conf::ValElementList val=conf->getValue("set_useinfo7");
+
+	if( val.size() > 0 ) {
+		string v = val[0].valAsString();
+		if( v.size() > 0 && (v[0]=='t' || v[0]=='T') )
+			setUsinfo7 = true;
+	}
+
     decodeObsType();
 }
 
@@ -108,7 +120,7 @@ decodeObsType()
     CommaString cstr(obsType, '/');
     long  id;
     const char *keys[] = {"nationalnr","stationid","wmonr","icaoid","call_sign",
-                    "type", "add", 0};
+                    "type", "add", "received_time", 0};
 
     LOGDEBUG("decodeObsType: '" << obsType << "'");
     typeID = INT_MAX;
@@ -140,16 +152,16 @@ decodeObsType()
              continue;
          }
 
+
+         if ( val.empty() && key != "add" ) //Must have a value
+             continue;
+
          if( key == "add" ) { //Value is optional
         	 if( val.empty() || val[0]=='t' || val[0]=='T')
         		 onlyInsertOrUpdate = true;
-             continue;
-         }
-
-         if ( val.empty() ) //Must have a value
-             continue;
-
-         if( strcmp( keys[iKey], "type" ) == 0 ) {
+         } else if( key == "received_time" ) {
+        	 receivedTime = pt::time_from_string_nothrow( val );
+         }else if( key ==  "type"  ) {
              typeID = atoi(val.c_str());
          } else {
              stationID = DecoderBase::getStationId(key, val);
@@ -230,10 +242,10 @@ execute(std::string &msg)
 {
    list<kvalobs::kvData> dataList;
    list<kvalobs::kvTextData> textDataList;
-   miTime                nowTime(miTime::nowTime());
+   pt::ptime             nowTime( pt::second_clock::universal_time() );
    string                tmp;
-   miTime                obstime;
-   miTime                tbtime(nowTime);
+   pt::ptime             obstime;
+   pt::ptime             tbtime( pt::second_clock::universal_time() );
    int                   typeId=getTypeId(msg);
    string                level;
    int                   stationid=getStationId(msg);
@@ -251,6 +263,9 @@ execute(std::string &msg)
 
    warnings=false;
    logid.clear();
+
+   if( receivedTime.is_special() && setUsinfo7 )
+	   receivedTime = pt::second_clock::universal_time();
 
    LOGINFO( "Decoder: " << name() << ". New observation. stationid: " <<
             stationid << " typeid: " << typeId);
@@ -318,9 +333,9 @@ execute(std::string &msg)
    while( getline( istr, tmp ) ) {
       lines++;
       i = tmp.find_first_of( "," );
-      obstime = miTime( tmp.substr( 0, i ) );
+      obstime = pt::time_from_string_nothrow( tmp.substr( 0, i ) );
 
-      if( obstime.undef() ) {
+      if( obstime.is_special() ) {
          ostringstream err;
          err << "Invalid obstime. Line: " << tmp << endl
                << "stationid: " << stationid << " typeid: " << typeId;
@@ -332,7 +347,7 @@ execute(std::string &msg)
 
       KlDataArray da;
 
-      if( !decodeData( da, params.size(), tmp, lines, msg ) ) {
+      if( !decodeData( da, params.size(), obstime, tmp, lines, msg ) ) {
          ostringstream o;
          o << "Cant decode data. Line: " << tmp << endl
                << "Reason: " << msg <<  endl
@@ -367,10 +382,10 @@ execute(std::string &msg)
 
          if( isTextParam( params[index].id() ) ) {
             kvTextData d( stationid,
-                          to_ptime(obstime),
+                          obstime,
                           val,
                           params[index].id(),
-                          to_ptime(tbtime),
+                          tbtime,
                           typeId );
 
             textDataList.push_back( d );
@@ -397,10 +412,10 @@ execute(std::string &msg)
             }
 
             kvData d( stationid,
-            		to_ptime(obstime),
+            		  obstime,
                       fval,
                       params[index].id(),
-                      to_ptime(tbtime),
+                      tbtime,
                       typeId,
                       params[index].sensor(),
                       params[index].level(),
@@ -414,7 +429,7 @@ execute(std::string &msg)
       }
 
 
-      if( addDataToDb( obstime, stationid, typeId, dataList, textDataList, priority, idLog.logid(), onlyInsertOrUpdate) ) {
+      if( addDataToDb( pt::to_miTime( obstime ), stationid, typeId, dataList, textDataList, priority, idLog.logid(), onlyInsertOrUpdate) ) {
          count += dataList.size() + textDataList.size();
       }
 
@@ -693,6 +708,7 @@ kvalobs::decoder::kldecoder::
 KlDecoder::
 decodeData(KlDataArray &da, 
            KlDataArray::size_type daSize,
+           const boost::posix_time::ptime &obstime,
            const std::string &sdata,
            int line,
            std::string &msg)
@@ -799,6 +815,9 @@ decodeData(KlDataArray &da,
             }
          }
       }
+
+      if( ! receivedTime.is_special() )
+    	  u.set( 7, getUseinfo7Code( typeID, receivedTime, obstime, logid) );
 
       if(!val.empty())
          da[index]=KlData(val, c, u);

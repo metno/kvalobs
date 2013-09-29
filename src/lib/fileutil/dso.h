@@ -173,6 +173,14 @@ public:
     *�\see DLSYM(3)
     */
    void* operator[](const std::string &name);
+
+   /**
+    * load a symbol from the DSO if it exist.
+    *
+    * \param name The name of the symbol to load.
+    * \return A pointer to the symbol if it exist and 0 if it does not exist.
+    */
+   void* loadSymbol( const std::string &name );
 };
 
 /** @} */

@@ -29,9 +29,12 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+
 #include <limits.h>
 #include <stdlib.h>
 #include <milog/milog.h>
+#include <puTools/miTime.h>
+#include <miutil/timeconvert.h>
 #include "sms2.h"
 
 /**
@@ -79,6 +82,7 @@
 using namespace std;
 using namespace miutil;
 using namespace kvalobs::decodeutil;
+namespace pt=boost::posix_time;
 
 namespace {
 
@@ -563,6 +567,8 @@ doKvPrecipitation(kvalobs::decodeutil::DecodedDataElem &data,
          useInfo.set(1, 1);
       }
 
+      useInfo.set( 7, ComObsDec.getUseinfo7Code( 302, to_ptime( dtComObs ),
+    		                                     pt::second_clock::universal_time(), logid) );
       IDLOGDEBUG2( logid, "CORRECTED obstime: " << t6 << endl);
 
       data.setDate(t6);

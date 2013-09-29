@@ -31,6 +31,7 @@
 #ifndef __kvalobs_decoder_kldecoder_h__
 #define __kvalobs_decoder_kldecoder_h__
 
+#include <boost/date_time/posix_time/ptime.hpp>
 #include <kvalobs/kvData.h>
 #include <list>
 #include <kvalobs/kvStation.h>
@@ -56,10 +57,19 @@ typedef boost::mutex::scoped_lock    Lock;
 /**
  * \brief implements the interface  DecoderBase.
  *
+ * Variables that can be defined for the driver in the section
+ * 'kvDataInputd.KlDataDecoder' for the driver in the configuration file
+ * kvalobs.conf.
+ *
+ *  - set_useinfo7, valid values true or false.
+ *    This value set how a missing received_time in obsType shall be
+ *    interpreted. If false useinfo(7) is NOT set. If true useinfo(7)
+ *    is set with a received_time set to current date and time.
+ *
  * <pre>
  * Dataformat for message.
  *
- * obsType: kldata/nationalnr=<nummer>/type=<typeid>
+ * obsType: kldata/nationalnr=<nummer>/type=<typeid>/add=<true¦false>/received_time=<ISO time>
  * obs:
  *   <pc1>[(<sensor>,<level>)],...,pcN[(<sensor>,<level>)]
  *   YYYYMMDDhhmmss,<pc1_value[(<cinfo>,<uinfo>)]>,...,<pcN_value[(<cinfo>,<uinfo>)]>
@@ -100,6 +110,7 @@ class KlDecoder : public DecoderBase{
 
    bool decodeData(KlDataArray &da,
                    KlDataArray::size_type daSize,
+                   const boost::posix_time::ptime &obstime,
                    const std::string &sdata,
                    int line,
                    std::string &msg);
@@ -115,6 +126,8 @@ class KlDecoder : public DecoderBase{
    int typeID;
    int stationID;
    bool onlyInsertOrUpdate;
+   boost::posix_time::ptime receivedTime;
+   bool setUsinfo7;
 
 public:
    KlDecoder(dnmi::db::Connection     &con,
