@@ -53,6 +53,8 @@ extern "C" {
 		 const std::string &observation_);
 
   void releaseDecoder(kvalobs::decoder::DecoderBase* decoder);
+  void  setKvConf( kvalobs::decoder::DecoderBase* decoder,
+             miutil::conf::ConfSection *theKvConf );
 
   std::list<std::string> getObsTypes();
 }  

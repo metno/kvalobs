@@ -62,6 +62,14 @@ releaseDecoder(kvalobs::decoder::DecoderBase* decoder)
   delete decoder;
 }
 
+void
+setKvConf( kvalobs::decoder::DecoderBase* decoder,
+           miutil::conf::ConfSection *theKvConf )
+{
+    decoder->setKvConf( theKvConf );
+}
+
+
 
 std::list<std::string>
 getObsTypes()
