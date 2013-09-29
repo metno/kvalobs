@@ -1,3 +1,11 @@
+kvalobs (2.7.3~rc4-1) lucid; urgency=low
+
+  * #1364. Enhencment the kldata-decoderen may set the useinfo(7) flag
+   (eralyobs/lateobs). 
+
+ -- Borge Moe <borge.moe@met.no>  Sun, 29 Sep 2013 13:15:00 +0200
+
+
 kvalobs (2.7.3~rc3-1) lucid; urgency=low
 
   * kvServiced: Fix a locking bug.
