@@ -5,6 +5,8 @@ lib_LTLIBRARIES = libkvalobs_decodeutility.la
 
 decodeutilityincludedir = $(pkgincludedir)/decodeutility
 nobase_decodeutilityinclude_HEADERS = 	decodeutility.h \
+	isTextParam.h \
+	getUseInfo7.h \
 	kvalobsdata.h \
 	kvalobsdataparser.h \
 	kvalobsdataserializer.h \
@@ -14,6 +16,8 @@ nobase_decodeutilityinclude_HEADERS = 	decodeutility.h \
 
 
 libkvalobs_decodeutility_la_SOURCES = \
+	isTextParam.h isTextParam.cc \
+    getUseInfo7.h getUseInfo7.cc \
 	decodeutility.h decodeutility.cc \
 	kvalobsdata.h kvalobsdata.cc \
 	kvalobsdataparser.h kvalobsdataparser.cc \
@@ -27,6 +31,7 @@ libkvalobs_decodeutility_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@
 libkvalobs_decodeutility_la_LIBADD = $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
                              $(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
 			                 $(top_builddir)/src/lib/milog/libkvalobs_milog.la \
+			                 $(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
                              $(libxmlpp_LIBS) \
                              $(omniORB4_LIBS) \
                              $(BOOST_LDFLAGS) \
@@ -42,6 +47,7 @@ decodeutilitytest_SOURCES = \
 	test/kvalobsdataserializertest.cc \
 	test/kvalobsdatatest.cc \
 	test/kvDataFormatterTest.cc \
+	test/getUseinfo7Test.cc \
 	test/test.cc
 
 decodeutilitytest_CPPFLAGS = $(libkvalobs_decodeutility_la_CPPFLAGS) $(gtest_CFLAGS)
