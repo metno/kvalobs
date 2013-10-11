@@ -88,9 +88,16 @@ class Container
     iterator begin() { return next.begin(); }
     iterator end() { return next.end(); }
 
+
     typedef typename NextData::const_iterator const_iterator;
     const_iterator begin() const { return next.begin(); }
     const_iterator end() const { return next.end(); }
+
+    typedef typename NextData::value_type value_type;
+    iterator find( const value_type &what ) { return next.find( what ); }
+    const_iterator find( const value_type &what ) const { return next.find( what ); }
+
+
 };
 
 /**
