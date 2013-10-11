@@ -161,11 +161,13 @@ miutil::
 CommaString::
 init(const std::string &str, char sep)
 {
+	string tmp;
   ostringstream ost;
   char          ch=0;
   bool          inString=false;
   bool          isString=false;
   int i=0;
+
   int n=count(str, sep);
   
   data.resize(n+1);
@@ -189,15 +191,16 @@ init(const std::string &str, char sep)
       ost << *it;
     }else{
       isString=false;
-      data[i]=Elem(ost.str(), isString);
-      trimstr(data[i].data);
+      tmp = ost.str();
+      trimstr( tmp );
+      data[i]=Elem( tmp, isString);
       i++;
       ost.str("");
     }
   }
 
   data[i]=Elem(ost.str(), isString);
-  trimstr(data[i].data);
+  trimstr( data[i] );
 }
 
 void 
@@ -330,7 +333,7 @@ get(unsigned int index, std::string &str)const
     if(index>=data.size())
 	return false;
     
-    str=data[index].data;
+    str=data[index];
 
     return true;
 }
@@ -350,9 +353,9 @@ copy(char *str, int size)const
   for(int i=0; i<data.size(); i++){
     if(data[i].isString){
       val="\"\"";
-      val.insert(1, data[i].data);
+      val.insert(1, data[i] );
     }else{
-      val=data[i].data;
+      val=data[i];
     }
     
     
@@ -380,9 +383,9 @@ copy(std::string &str)const
   for(int i=0; i<data.size(); i++){
     if(data[i].isString){
       val="\"\"";
-      val.insert(1, data[i].data);
+      val.insert(1, data[i]);
     }else{
-      val=data[i].data;
+      val=data[i];
     }
     
     if(first){
@@ -408,9 +411,9 @@ miutil::CommaString::print(std::ostream &ostr)const
   for(int i=0; i<data.size(); i++){
     if(data[i].isString){
       val="\"\"";
-      val.insert(1, data[i].data);
+      val.insert(1, data[i]);
     }else{
-      val=data[i].data;
+      val=data[i];
     }
     
     if(first){
@@ -437,7 +440,7 @@ length()const
   int n=(data.size()-1)*separator.length();
 
   for(int i=0; i<data.size(); i++){
-    n+=data[i].data.length();
+    n+=data[i].length();
    
     if(data[i].isString)
       n+=2;
@@ -446,22 +449,22 @@ length()const
   return n;
 }
 
-std::string& 
+miutil::CommaString::Elem&
 miutil::CommaString::operator[](const int index)
 {
   if(index>=data.size())
     throw std::range_error("ERROR: Bad index!");
 
-  return data[index].data;
+  return data[index];
 }
 
-const std::string& 
+const miutil::CommaString::Elem&
 miutil::CommaString::operator[](const int index)const
 {
   if(index>=data.size())
     throw std::range_error("ERROR: Bad index!");
 
-  return data[index].data;
+  return data[index];
 }
 
 
@@ -469,4 +472,19 @@ std::ostream&
 miutil::operator<<(std::ostream &os, const CommaString &val)
 {
     return val.print(os);
+}
+
+std::ostream&
+miutil::operator<<(std::ostream &os, const  CommaString::Elem &elem)
+{
+	string val;
+	if( elem.isString){
+		val="\"\"";
+		val.insert(1, elem );
+	}else{
+		val=elem;
+	}
+
+	os << val;
+	return os;
 }

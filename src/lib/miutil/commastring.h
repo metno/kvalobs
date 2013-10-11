@@ -34,6 +34,8 @@
 #include <iosfwd>
 #include <vector>
 #include <string>
+#include <iostream>
+#include <boost/lexical_cast.hpp>
 
 namespace miutil{
   
@@ -47,41 +49,61 @@ namespace miutil{
    *
    * Verdiene har index fra [0, maxverdier>.
    *
-   * Listen kan faktisk vaere separert med et hvilket som helst tegn også
+   * Listen kan faktisk vaere separert med et hvilket som helst tegn ogsï¿½
    * en sekvens av tegn (streng), men default brukes et komma. Det finnes 
    * forskjellige konstruktorer som kan brukes for aa angi et annet separator 
    * tegn.
    *
-   * Hvis et element har en verdi hvor separator tegnet ingår må verdien
+   * Hvis et element har en verdi hvor separator tegnet ingï¿½r mï¿½ verdien
    * omsluttes med ". 
    *
    *  Eks.
    *     Separator tegn er et komma, (,).
    *
-   *     Verdi: 3,14 dette må settes in som "3,14".
+   *     Verdi: 3,14 dette mï¿½ settes in som "3,14".
    */
 class CommaString
 {
-  struct Elem{
-    std::string data;
+public:
+  struct Elem : virtual public std::string {
+    //std::string data_;
     bool        isString;
 
-    Elem(const std::string &d, bool b=false):data(d), isString(b){}
-    Elem(const Elem &e):data(e.data), isString(e.isString){}
+    Elem(const std::string &d, bool b=false): std::string(d), isString(b){
+    	if( d.size() >= 2 && d[0]=='\"' && d[d.size()-1]== '\"') {
+    		assign( d, 1, d.size() - 2 );
+    		isString = true;
+    	}
+    }
+    Elem(const Elem &e):std::string( e ), isString(e.isString){}
     Elem():isString(false){}
     
+
     Elem& operator=(const Elem &rhs){
       if(this!=&rhs){
-	data=rhs.data;
-	isString=rhs.isString;
+    	  assign( rhs );
+    	  isString=rhs.isString;
       }
 
       return *this;
     }
 
-    void erase(){ data.erase(); isString=false;}
+	template <typename T> T as( const T &defaultValue ) const
+	{
+		if( empty() )
+			return defaultValue;
+
+		return boost::lexical_cast<T>( *this );
+	}
+
+	template <typename T> T as() const
+	{
+		return boost::lexical_cast<T>( *this );
+	}
+
+    void erase(){ erase(); isString=false;}
   };
-    
+private:
   std::vector<Elem> data;
   std::string       separator;
   
@@ -208,23 +230,23 @@ class CommaString
     /**
      * \brief Sett in \em val at index.
      * 
-     * Indekser er i område [0,size()>. Funksjonen returnerer false
+     * Indekser er i omrï¿½de [0,size()>. Funksjonen returnerer false
      * hvis val ikke kan settes inn i kommalisten. Insert trimmer val 
-     * for space (både forran og bak) før den settes inn i kommastrengen. Dette
-     * gjøres uten å endre val.
+     * for space (bï¿½de forran og bak) fï¿½r den settes inn i kommastrengen. Dette
+     * gjï¿½res uten ï¿½ endre val.
      */
     bool  insert(unsigned int index, const char *val);
     bool  insert(unsigned int index, const std::string &val);
     
     /**
-     * \exception std::range_error når index er >= antall element 
+     * \exception std::range_error nï¿½r index er >= antall element 
      *  i listen.
      */
-    std::string& operator[](const int index);
-    const std::string& operator[](const int index)const;
+    Elem& operator[](const int index);
+    const Elem& operator[](const int index)const;
 
     /**
-     * returns false når index >= anatall element i listen.
+     * returns false nï¿½r index >= anatall element i listen.
      */
     bool  get(unsigned int index, std::string &)const;
     std::string  getSeparator()const{ return separator;}
@@ -244,14 +266,14 @@ class CommaString
     /**
      * copy kopirerer kommalisten over i en (char*) streng. Hvis
      * strengen vi skal kopiere data til er mindre enn kommastrengen
-     * vil strengen bli trunkert. Bufferet må være stort nok til å
-     * holde '\0' termineringen. Dvs. størrelsen må væreminst  length()+1.
+     * vil strengen bli trunkert. Bufferet mï¿½ vï¿½re stort nok til ï¿½
+     * holde '\0' termineringen. Dvs. stï¿½rrelsen mï¿½ vï¿½reminst  length()+1.
      *
      * @param str en peker til bufferet vi skal kopierer den komma
      *            separerte strengen til.
-     * @param size størrelsen på str.
+     * @param size stï¿½rrelsen pï¿½ str.
      * @ret   true  dersom helestrengen lot seg kopiere over i str.
-     *        false dersom bufferet ikke er stort nok til å holde hele
+     *        false dersom bufferet ikke er stort nok til ï¿½ holde hele
      *              strengen + '\0'.
      */
     bool copy(char *str, int size)const;
@@ -264,6 +286,7 @@ class CommaString
 
 
 std::ostream& operator<<(std::ostream &, const CommaString &);
+std::ostream& operator<<(std::ostream &, const  CommaString::Elem &elem);
 
 /** @} */ 
 }
