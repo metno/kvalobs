@@ -32,11 +32,12 @@
 
 ParamDef::
 ParamDef()
+	: id_(-1), sensor_(0), level_(0), code_(false)
 {
 }
 
 ParamDef::
-ParamDef(std::string &name, int id, int sensor, int level, bool code):
+ParamDef(const std::string &name, int id, int sensor, int level, bool code):
   	name_(name), id_(id), sensor_(sensor), level_(level), code_(code)
 {
 }
@@ -53,6 +54,23 @@ ParamDef::
 {
 }
 
+bool
+ParamDef::
+operator==(const ParamDef &rhs)const
+{
+	if( rhs.name_ == name_  && rhs.id_ == id_&& rhs.sensor_ == sensor_
+	    && rhs.level_ == level_ && rhs.code_ == code_)
+		return true;
+	else
+		return false;
+}
+
+bool
+ParamDef::
+operator!=(const ParamDef &rhs)const
+{
+	return ! (*this == rhs);
+}
 
 ParamDef& 
 ParamDef::

@@ -37,9 +37,7 @@
 #include <kvalobs/kvStation.h>
 #include <decoderbase/decoder.h>
 #include <vector>
-#include "kldata.h"
-#include "paramdef.h"
-
+#include "DataDecode.h"
 
 namespace kvalobs{
 namespace decoder{
@@ -79,9 +77,9 @@ typedef boost::mutex::scoped_lock    Lock;
  *
  *  pc - paramcode, the name of the parameter. An underscore indicate that
  *                  this is a code value. Suported pc that can have a code
- *                  value is: HL and VV. The value vil be converted til meter.
+ *                  value is: HL and VV. The value will be converted to meter.
  *  If sensor or level is not specified. The default would apply. If both shall
- *  take the default value, the paranteses can be left out.
+ *  take the default value, the paranteces can be left out.
  *
  *  cinfo - controlinfo
  *  uinfo - useinfo
@@ -93,34 +91,14 @@ class KlDecoder : public DecoderBase{
    KlDecoder(const KlDecoder &);
    KlDecoder& operator=(const KlDecoder &);
 
-   long getStationId(std::string &msg);
-   long getTypeId(std::string &msg)const;
-
-   bool splitParams(const std::string &header,
-                    std::list<std::string> &params,
-                    std::string &msg);
-
-   bool splitData(const std::string &sdata,
-                  std::list<std::string> &datalist,
-                  std::string &msg);
-
-   bool decodeHeader(const std::string &header,
-                     std::vector<ParamDef> &params,
-                     std::string &message);
-
-   bool decodeData(KlDataArray &da,
-                   KlDataArray::size_type daSize,
-                   const boost::posix_time::ptime &obstime,
-                   const std::string &sdata,
-                   int line,
-                   std::string &msg);
+protected:
 
    void decodeObsType();
 
    kvalobs::decoder::DecoderBase::DecodeResult
    rejected( const std::string &msg, const std::string &logid );
 
-   std::string toupper(const std::string &s);
+   bits::DataDecoder datadecoder;
    bool warnings;
    std::string logid;
    int typeID;
@@ -138,6 +116,14 @@ public:
              int                    decoderId=-1);
 
    virtual ~KlDecoder();
+
+   bool getSetUsinfo7()const;
+   bool getOnlyInsertOrUpdate()const;
+   long getStationId(std::string &msg) const;
+   long getTypeId(std::string &msg)const;
+   DecodeResult insertDataInDb( kvalobs::serialize::KvalobsData *theData,
+		                     int stationid, int typeId,
+		                     const std::string &logid );
 
    virtual std::string name()const;
 

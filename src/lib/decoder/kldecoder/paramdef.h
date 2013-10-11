@@ -43,11 +43,13 @@ class ParamDef
 
  public:
   	ParamDef();
-  	ParamDef(std::string &name, int id, int sensor, int level, bool code);
+  	ParamDef(const std::string &name, int id, int sensor=0, int level=0, bool code=false);
   	ParamDef(const ParamDef &pd);
   	~ParamDef();
 
   	ParamDef& operator=(const ParamDef &rhs);
+  	bool operator==(const ParamDef &rhs)const;
+  	bool operator!=(const ParamDef &rhs)const;
 
   	std::string name()const { return name_; } 
   	int           id()const { return id_; }

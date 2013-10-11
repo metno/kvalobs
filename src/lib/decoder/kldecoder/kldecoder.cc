@@ -40,6 +40,7 @@
 #include <kvalobs/kvQueries.h>
 #include <kvalobs/kvTypes.h>
 #include <miutil/trimstr.h>
+#include "KvDataContainer.h"
 #include <miutil/timeconvert.h>
 #include "kldecoder.h"
 #include <decodeutility/decodeutility.h>
@@ -85,6 +86,7 @@ KlDecoder( dnmi::db::Connection   &con,
            const std::string &obs,
            int                    decoderId)
 :DecoderBase(con, params, typeList, obsType, obs, decoderId),
+ datadecoder( paramList, typeList ),
  typeID( INT_MAX ), stationID(INT_MAX), onlyInsertOrUpdate( false ),
  setUsinfo7( false )
 
@@ -181,21 +183,9 @@ decodeObsType()
 std::string
 kvalobs::decoder::kldecoder::
 KlDecoder::
-toupper(const std::string &s_){
-   string s(s_);
-
-   for(string::size_type i=0; i<s.length(); i++)
-      s[i]=std::toupper(s[i]);
-
-   return string(s);
-}
-
-std::string
-kvalobs::decoder::kldecoder::
-KlDecoder::
 name() const
 {
-   return "KlDataDecoder";
+   return string("KlDataDecoder");
 }
 
 kvalobs::decoder::DecoderBase::DecodeResult
@@ -234,8 +224,175 @@ rejected( const std::string &msg, const std::string &logid )
 }
 
 
+kvalobs::decoder::DecoderBase::DecodeResult
+kvalobs::decoder::kldecoder::
+KlDecoder::
+insertDataInDb( kvalobs::serialize::KvalobsData *theData,
+	         int stationid, int typeId,
+	         const std::string &logid )
+{
+	using namespace boost::posix_time;
+	KvDataContainer::DataByObstime data;
+	KvDataContainer::TextDataByObstime textData;
+	KvDataContainer::TextDataByObstime::iterator tid;
+	KvDataContainer::TextDataList td;
+
+
+	KvDataContainer container( theData );
+	int priority=4;
+
+	if( receivedTime.is_special() )
+		priority = 10;
+
+	if( container.get( data, textData, stationid, typeId, pt::second_clock::universal_time()) < 0 ){
+		IDLOGINFO( logid, "No Data.");
+		return Ok;
+	}
+
+	for( KvDataContainer::DataByObstime::iterator it = data.begin();
+		 it != data.end(); ++it  ) {
+
+		td.clear();
+		tid = textData.find( it->first );
+
+		if( tid != textData.end() ) {
+			td = tid->second;
+			textData.erase( tid );
+		}
+
+		/*
+		bool addDataToDb( const miutil::miTime &obstime, int stationid, int typeid_,
+		                        std::list<kvalobs::kvData> &sd,
+		                        std::list<kvalobs::kvTextData> &textData,
+		                        int priority, const std::string &logid,
+		                        bool onlyAddOrUpdateData );
+*/
+
+		if( ! addDataToDb( to_miTime( it->first ), stationid, typeId, it->second, td,
+				           priority, logid, onlyInsertOrUpdate ) ) {
+			LOGERROR( "DBERROR: stationid: " << stationid << " typeid: " << typeId << " obstime: " << it->first );
+			IDLOGERROR( logid, "DBERROR: stationid: " << stationid << " typeid: " << typeId << " obstime: " << it->first );
+			return NotSaved;
+		}
+	}
+
+	//Is there any left over text data.
+	if( ! textData.empty() ) {
+		KvDataContainer::DataList dl;
+		for( KvDataContainer::TextDataByObstime::iterator it = textData.begin();
+			 it != textData.end(); ++it  ) {
+			if( ! addDataToDb( to_miTime( it->first ), stationid, typeId, dl, it->second,
+					           priority, logid, onlyInsertOrUpdate) ) {
+				LOGERROR( "DBERROR: stationid: " << stationid << " typeid: " << typeId << " obstime: " << it->first );
+				IDLOGERROR( logid, "DBERROR: stationid: " << stationid << " typeid: " << typeId << " obstime: " << it->first );
+				return NotSaved;
+			}
+		}
+	}
+
+	return Ok;
+}
+
 
 kvalobs::decoder::DecoderBase::DecodeResult 
+kvalobs::decoder::kldecoder::
+KlDecoder::
+execute(std::string &msg)
+{
+   int                   typeId=getTypeId(msg);
+   int                   stationid=getStationId(msg);
+
+   warnings=false;
+   logid.clear();
+
+   if( receivedTime.is_special() && setUsinfo7 )
+	   receivedTime = pt::second_clock::universal_time();
+
+   LOGINFO( "Decoder: " << name() << ". New observation. stationid: " <<
+            stationid << " typeid: " << typeId);
+
+   if( stationid == INT_MAX ) {
+      ostringstream o;
+
+      o << "Missing stationid! typeid: ";
+
+      if( typeId > 0 )
+         o << typeId;
+      else
+         o << "<NA>";
+
+      return rejected( o.str(), "" );
+   }
+
+   if( typeId<=0 || typeId == INT_MAX) {
+      ostringstream o;
+      o << "Format error in type!"
+            << "stationid: " << stationid << ".";
+
+      return rejected( o.str(), "");
+   }
+
+   IdlogHelper idLog( stationid, typeId, this );
+   logid = idLog.logid();
+
+   trimstr( obs );
+   obs += "\n";
+
+   IDLOGINFO( logid,
+              name()                           << endl <<
+              "------------------------------" << endl <<
+              "ObstType : " << obsType         << endl <<
+              "Obs      : " << obs             << endl );
+
+
+   datadecoder.logid = logid;
+   datadecoder.decoderName = name();
+
+   serialize::KvalobsData *kvData;
+   kvData = datadecoder.decodeData( obs, stationid,  typeId, receivedTime, logid, name() );
+
+   if( ! kvData )
+	   return rejected( datadecoder.messages, logid );
+
+   return insertDataInDb( kvData, stationid, typeId, logid );
+}
+
+
+long 
+kvalobs::decoder::kldecoder::
+KlDecoder::
+getStationId(std::string &msg)const
+{
+    return stationID;
+}
+
+bool
+kvalobs::decoder::kldecoder::
+KlDecoder::
+getOnlyInsertOrUpdate()const
+{
+	return onlyInsertOrUpdate;
+}
+
+
+bool
+kvalobs::decoder::kldecoder::
+KlDecoder::
+getSetUsinfo7()const
+{
+	return setUsinfo7;
+}
+
+long 
+kvalobs::decoder::kldecoder::
+KlDecoder::
+getTypeId(std::string &msg)const
+{
+    return typeID;
+}
+
+#if 0
+kvalobs::decoder::DecoderBase::DecodeResult
 kvalobs::decoder::kldecoder::
 KlDecoder::
 execute(std::string &msg)
@@ -456,7 +613,7 @@ execute(std::string &msg)
    if( count > 0 ){
       if( nExpectedData != count ) {
          ostringstream  ost;
-         ost << "WARNING: Expected to save " << nExpectedData 
+         ost << "WARNING: Expected to save " << nExpectedData
                << " dataelements, but only "  << count
                << " dataelements was saved!";
          warnings = true;
@@ -474,356 +631,4 @@ execute(std::string &msg)
 
    return Rejected;
 }
-
-
-long 
-kvalobs::decoder::kldecoder::
-KlDecoder::
-getStationId(std::string &msg)
-{
-    return stationID;
-}
-
-
-long 
-kvalobs::decoder::kldecoder::
-KlDecoder::
-getTypeId(std::string &msg)const
-{
-    return typeID;
-}
-
-bool 
-kvalobs::decoder::kldecoder::
-KlDecoder::
-splitParams(const std::string &header, 
-            std::list<std::string> &params,
-            std::string &msg)
-{
-   string param;
-   string::size_type iEnd=0;
-   string::size_type i;
-
-   params.clear();
-
-   while(iEnd!=string::npos){
-      i=iEnd;
-      iEnd=header.find_first_of(",(", i);
-
-      if(iEnd==string::npos){
-         param=header.substr(i);
-      }else if(header[iEnd]==','){
-         param=header.substr(i, iEnd-i);
-         iEnd++;
-      }else{
-         //header[iEnd]=='('
-         int n=0; //Count of commas (,).
-
-         iEnd=header.find_first_of(",)", iEnd);
-
-         while(header[iEnd]==','){
-            iEnd=header.find_first_of(",)", iEnd+1);
-            n++;
-         }
-
-         if(iEnd==string::npos){
-            msg="Invalid parameter format: missing ')'!";
-            return false;
-         }
-
-         if(n!=1){
-            msg="Invalid parameter format: Expecting one comma only in optional part!";
-            return false;
-         }
-
-         iEnd=header.find_first_of(",", iEnd+1);
-
-         if(iEnd==string::npos){
-            param=header.substr(i);
-         }else{ //iEnd==','
-            param=header.substr(i, iEnd-i);
-            iEnd++;
-         }
-      }
-
-      params.push_back(param);
-   }
-
-   return true;
-}
-
-
-bool 
-kvalobs::decoder::kldecoder::
-KlDecoder::
-splitData(const std::string &sdata, 
-          std::list<std::string> &datalist,
-          std::string &msg)
-{
-   string val;
-   string::size_type iEnd=0;
-   string::size_type i;
-
-   datalist.clear();
-
-   while(iEnd!=string::npos){
-      i=iEnd;
-      iEnd=sdata.find_first_of(",(", i);
-
-      if(iEnd==string::npos){
-         val=sdata.substr(i);
-      }else if(sdata[iEnd]==','){
-         val=sdata.substr(i, iEnd-i);
-         iEnd++;
-      }else{
-         iEnd=sdata.find_first_of(",)", iEnd);
-
-         while(sdata[iEnd]==',')
-            iEnd=sdata.find_first_of(",)", iEnd+1);
-
-         if(iEnd==string::npos){
-            msg="Invalid parameter format: missing ')'!";
-            return false;
-         }
-
-         iEnd=sdata.find_first_of(",", iEnd+1);
-
-         if(iEnd==string::npos){
-            val=sdata.substr(i);
-         }else{ //iEnd==','
-            val=sdata.substr(i, iEnd-i);
-            iEnd++;
-         }
-      }
-
-      datalist.push_back(val);
-   }
-
-   return true;
-}
-
-
-bool 
-kvalobs::decoder::kldecoder::
-KlDecoder::
-decodeHeader(const std::string &header, 
-             std::vector<ParamDef> &params,
-             std::string &msg)
-{
-   string::size_type i;
-   string::size_type iEnd=0;
-   string            param;
-   string            name;
-   string            buf;
-   int               sensor;
-   int               level;
-   bool              isCode;
-   IParamList        it;
-   list<string>      paramStrings;
-   ostringstream    ost;
-
-   params.clear();
-
-   if(!splitParams(header, paramStrings, msg))
-      return false;
-
-   list<string>::iterator itParamsStrings=paramStrings.begin();
-
-   ost << "ParamStrings: " << endl;
-
-   for(;itParamsStrings!=paramStrings.end(); itParamsStrings++)
-      ost << " [" << *itParamsStrings << "]";
-
-   IDLOGDEBUG(logid, ost.str());
-
-   itParamsStrings=paramStrings.begin();
-
-   for(;itParamsStrings!=paramStrings.end(); itParamsStrings++){
-      param=*itParamsStrings;
-
-      trimstr(param);
-      sensor=0;
-      level=0;
-
-      i=param.find_first_of("(", 0);
-
-      if(i==string::npos){
-         name=param;
-      }else{
-         name=param.substr(0, i);
-         trimstr(name);
-         iEnd=param.find_first_of(")", i);
-
-         if(iEnd==string::npos){ //paranoia
-            msg="Invalid format: missing ')' in param [" +name +"]";
-            return false;
-         }
-
-         i++;
-         param=param.substr(i, iEnd-i);
-
-         CommaString cs(param);
-
-         if(cs.size()!=2){//paranoia
-            msg="Invalid format: wrong number of parameteres in optional part of"+
-                  string(" param  [") +name +"]";
-            return false;
-         }
-
-         cs.get(0, buf);
-         sensor=atoi(buf.c_str());
-         cs.get(1, buf);
-         level=atoi(buf.c_str());
-      }
-
-      if(name.empty())
-         return false;
-
-      if(name[0]=='_'){
-         isCode=true;
-         name.erase(0, 1);
-
-         if(name.empty()){
-            msg="Invalid parameter format: paramname missing!";
-            return false;
-         }
-      }else{
-         isCode=false;
-      }
-
-      it=paramList.find(Param(toupper(name), -1));
-
-      if(it==paramList.end()){
-         params.push_back(ParamDef(name, -1, sensor, level, isCode));
-      }else{
-         params.push_back(ParamDef(name, it->id(), sensor, level, isCode));
-      }
-   }
-
-   return true;
-}
-
-bool 
-kvalobs::decoder::kldecoder::
-KlDecoder::
-decodeData(KlDataArray &da, 
-           KlDataArray::size_type daSize,
-           const boost::posix_time::ptime &obstime,
-           const std::string &sdata,
-           int line,
-           std::string &msg)
-{
-   string::size_type      i;
-   string::size_type      iEnd;
-   list<string>           dtmp;
-   list<string>::iterator it;
-   ostringstream          ost;
-   string                 buf;
-
-   if(!splitData(sdata, dtmp, msg)){
-      IDLOGERROR( logid, "decodeData: " << msg << endl);
-      return false;
-   }
-
-   if(daSize!=dtmp.size()){
-      ost.str("");
-      ost << "decodeData: expected #Data: " << daSize << endl
-            << "Found in datastring #: " << dtmp.size() << " line: " << line;
-      IDLOGERROR( logid, ost.str());
-      msg=ost.str();
-      return false;
-   }
-
-
-   for(it=dtmp.begin();it!=dtmp.end(); it++)
-      ost << " [" << *it<< "]";
-
-   IDLOGDEBUG( logid,"decodeData: Data in string: " << endl <<
-               "[" << sdata<< "]" << endl <<
-               ost.str());
-
-
-   da=KlDataArray(daSize);
-   KlDataArray::size_type index=0;
-
-   for(it=dtmp.begin(); it!=dtmp.end(); it++){
-      string val;
-      kvControlInfo c;
-      kvUseInfo     u;
-
-      buf=*it;
-      trimstr(buf);
-      i=buf.find_first_of("(", 0);
-
-      if(i==string::npos){
-         val=buf;
-      }else{
-         val=buf.substr(0, i);
-         trimstr(val);
-         iEnd=buf.find_first_of(")", i);
-
-         if(iEnd==string::npos){ //paranoia
-            ost.str("");
-            ost << "Invalid format: missing ')' in data ["+buf+"]"
-                  << " at index: " << index << " line: " << line;
-            msg=ost.str();
-            IDLOGERROR(logid,"decodeData: " << ost.str());
-            return false;
-         }
-
-         i++;
-         buf=buf.substr(i, iEnd-i);
-
-         CommaString cs(buf);
-
-         if(cs.size()==0 || cs.size()>2){//paranoia
-            ost.str("");
-            ost << "Invalid format: wrong number of values in" <<
-                  " optional part of data element: " << index << " line: " << line;
-            msg=ost.str();
-            IDLOGERROR( logid, "decodeData: " << ost.str());
-            return false;
-         }
-
-         cs.get(0, buf);
-
-         if(buf.length()==16){
-            c=kvControlInfo(buf);
-         }else if(buf.length()>0){
-            ost.str("");
-            ost << "Expected 16 character in <controlinfo>: "
-                  << "found " << buf.length() << " characters at index: "
-                  << index << " line: " << line;
-            msg=ost.str();
-            warnings = true;
-            IDLOGWARN(logid,"decodeData: " << ost.str());
-         }
-
-         if(cs.size()==2){
-            cs.get(1, buf);
-
-            if(buf.length()==16){
-               u=kvUseInfo(buf);
-            }else if(buf.length()>0){
-               ost.str("");
-               ost << "Expected 16 character in <useinfo>: "
-                     << "found " << buf.length() << " characters at index: "
-                     << index << " line: " << line;
-               msg=ost.str();
-               warnings = true;
-               IDLOGWARN( logid, "decodeData: " << ost.str());
-            }
-         }
-      }
-
-      if( ! receivedTime.is_special() )
-    	  u.set( 7, getUseinfo7Code( typeID, receivedTime, obstime, logid) );
-
-      if(!val.empty())
-         da[index]=KlData(val, c, u);
-
-      index++;
-   }
-
-   return true;
-} 
+#endif

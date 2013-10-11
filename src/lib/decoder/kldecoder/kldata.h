@@ -51,6 +51,13 @@ public:
    KlData(const std::string &v,
           const kvalobs::kvControlInfo &c,
           const kvalobs::kvUseInfo &u):val_(v), cinfo_(c), uinfo_(u){}
+   KlData( const std::string &v ):val_(v){}
+
+   KlData( const std::string &v,
+		   const std::string &c,
+           const std::string &u)
+   	   :val_(v), cinfo_(c), uinfo_(u){}
+
 
    KlData& operator=(const KlData &rhs){
       if(this!=&rhs){
@@ -62,6 +69,10 @@ public:
       return *this;
    }
 
+   bool operator==( const KlData &rhs ) const {
+	   return val_ == rhs.val_ && cinfo_ == rhs.cinfo_ && uinfo_ == rhs.uinfo_;
+   }
+
    bool empty()const { return val_.empty();}
    std::string              val()const { return val_;}
    kvalobs::kvControlInfo cinfo()const { return cinfo_; }
@@ -71,6 +82,8 @@ public:
 typedef std::vector<KlData>                 KlDataArray;
 typedef std::vector<KlData>::iterator       IKlDataArray;
 typedef std::vector<KlData>::const_iterator CIKlDataArray;
+
+
 }
 }
 }
