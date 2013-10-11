@@ -369,6 +369,7 @@ TEST_F( KlDecoderTest, decodeData )
 	KvTypeList types;
 	int useinfo7; //tolate/toearly flag
 	conf::ConfSection *conf=0;
+	string decoderName;
 
 	filename = testdir+"/n59680-t311.dat";
 	ASSERT_TRUE( ReadDataFromFile( filename, obsType, obsData ) )<< "Cant read testdata: " << filename << ".";
@@ -381,13 +382,29 @@ TEST_F( KlDecoderTest, decodeData )
 	dc::DecoderBase *dec=decoderMgr.findDecoder( *con, paramList, typesList, obsType, obsData, error);
 	ASSERT_TRUE( dec  ) << "Cant create test decoder. obsType: '" << obsType << "'.";
 
-
-	createConfSection( "kvDataInputd", dec->name(), conf );
+	decoderName = dec->name();
 
 	kvalobs::decoder::kldecoder::KlDecoder *klDecoder = static_cast<kvalobs::decoder::kldecoder::KlDecoder*>(dec);
 	ASSERT_TRUE( ! klDecoder->getSetUsinfo7() );
 
 	decoderMgr.releaseDecoder( dec );
+
+	createConfSection( "kvDataInputd", decoderName, conf );
+
+	ASSERT_TRUE( conf );
+
+	conf::ConfSection *decoderConf = conf->getSection("kvDataInputd." + decoderName );
+	ASSERT_TRUE( decoderConf );
+	conf::ValElement val("true");
+	ASSERT_TRUE( decoderConf->addValue( "set_useinfo7", val ) );
+
+	decoderMgr.setTheKvConf( conf );
+	dec=decoderMgr.findDecoder( *con, paramList, typesList, obsType, obsData, error);
+	ASSERT_TRUE( dec  ) << "Cant create test decoder. obsType: '" << obsType << "'.";
+	klDecoder = static_cast<kvalobs::decoder::kldecoder::KlDecoder*>(dec);
+	ASSERT_TRUE(  klDecoder->getSetUsinfo7() );
+	decoderMgr.releaseDecoder( dec );
+	decoderMgr.setTheKvConf( 0 );
 }
 
 

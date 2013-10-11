@@ -105,7 +105,7 @@ protected:
    int stationID;
    bool onlyInsertOrUpdate;
    boost::posix_time::ptime receivedTime;
-   bool setUsinfo7;
+
 
 public:
    KlDecoder(dnmi::db::Connection     &con,
@@ -117,7 +117,7 @@ public:
 
    virtual ~KlDecoder();
 
-   bool getSetUsinfo7()const;
+   bool getSetUsinfo7();
    bool getOnlyInsertOrUpdate()const;
    long getStationId(std::string &msg) const;
    long getTypeId(std::string &msg)const;
