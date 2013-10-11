@@ -87,18 +87,9 @@ KlDecoder( dnmi::db::Connection   &con,
            int                    decoderId)
 :DecoderBase(con, params, typeList, obsType, obs, decoderId),
  datadecoder( paramList, typeList ),
- typeID( INT_MAX ), stationID(INT_MAX), onlyInsertOrUpdate( false ),
- setUsinfo7( false )
+ typeID( INT_MAX ), stationID(INT_MAX), onlyInsertOrUpdate( false )
 
 {
-	miutil::conf::ConfSection *conf = myConfSection();
-	miutil::conf::ValElementList val=conf->getValue("set_useinfo7");
-
-	if( val.size() > 0 ) {
-		string v = val[0].valAsString();
-		if( v.size() > 0 && (v[0]=='t' || v[0]=='T') )
-			setUsinfo7 = true;
-	}
 
     decodeObsType();
 }
@@ -299,8 +290,9 @@ kvalobs::decoder::kldecoder::
 KlDecoder::
 execute(std::string &msg)
 {
-   int                   typeId=getTypeId(msg);
-   int                   stationid=getStationId(msg);
+   bool setUsinfo7 = getSetUsinfo7();
+   int typeId=getTypeId(msg);
+   int stationid=getStationId(msg);
 
    warnings=false;
    logid.clear();
@@ -308,11 +300,17 @@ execute(std::string &msg)
    if( receivedTime.is_special() && setUsinfo7 )
 	   receivedTime = pt::second_clock::universal_time();
 
-   LOGINFO( "Decoder: " << name() << ". New observation. stationid: " <<
-            stationid << " typeid: " << typeId);
+   ostringstream o;
+   o << "Decoder: " << name() << ". New observation. stationid: " <<
+            stationid << " typeid: " << typeId;
+
+   if( ! receivedTime.is_special() )
+	   o << " Obs. received: " << receivedTime;
+
+   LOGINFO( o.str() );
 
    if( stationid == INT_MAX ) {
-      ostringstream o;
+      o.str("");
 
       o << "Missing stationid! typeid: ";
 
@@ -325,7 +323,7 @@ execute(std::string &msg)
    }
 
    if( typeId<=0 || typeId == INT_MAX) {
-      ostringstream o;
+      o.str("");
       o << "Format error in type!"
             << "stationid: " << stationid << ".";
 
@@ -338,15 +336,19 @@ execute(std::string &msg)
    trimstr( obs );
    obs += "\n";
 
-   IDLOGINFO( logid,
-              name()                           << endl <<
-              "------------------------------" << endl <<
-              "ObstType : " << obsType         << endl <<
-              "Obs      : " << obs             << endl );
+   o.str("");
+   o << name() << endl
+     <<	"------------------------------" << endl
+     << "ReceivedTime: ";
+   if( receivedTime.is_special() )
+	   o << " NOT given or set_useinfo7 is not set.";
+   else
+	   o << receivedTime;
+   o << endl
+     << "ObstType    : " << obsType         << endl
+     << "Obs         : " << obs             << endl;
 
-
-   datadecoder.logid = logid;
-   datadecoder.decoderName = name();
+   IDLOGINFO( logid, o.str() );
 
    serialize::KvalobsData *kvData;
    kvData = datadecoder.decodeData( obs, stationid,  typeId, receivedTime, logid, name() );
@@ -378,8 +380,18 @@ getOnlyInsertOrUpdate()const
 bool
 kvalobs::decoder::kldecoder::
 KlDecoder::
-getSetUsinfo7()const
+getSetUsinfo7()
 {
+	bool setUsinfo7 = false;
+	miutil::conf::ConfSection *conf = myConfSection();
+	miutil::conf::ValElementList val=conf->getValue("set_useinfo7");
+
+	if( val.size() > 0 ) {
+		string v = val[0].valAsString();
+		if( v.size() > 0 && (v[0]=='t' || v[0]=='T') )
+			setUsinfo7 = true;
+	}
+
 	return setUsinfo7;
 }
 
