@@ -33,6 +33,7 @@ testsms2_LDADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs_decoderb
                 $(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la \
                 $(top_builddir)/src/lib/milog/libkvalobs_milog.la \
                 $(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
+                $(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
                 $(putools_LIBS) $(libxml2_LIBS) \
 	 	        $(BOOST_THREAD_LIB) $(BOOST_REGEX_LIB) \
 		        -lm -ldl
@@ -54,6 +55,7 @@ gtestsms2_LDADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs_decoder
                 $(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la \
                 $(top_builddir)/src/lib/milog/libkvalobs_milog.la \
                 $(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
+                $(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
                 $(putools_LIBS) $(libxml2_LIBS) \
 	 	        $(BOOST_THREAD_LIB) $(BOOST_REGEX_LIB) $(gtest_LIBS) \
 		        -lm -ldl

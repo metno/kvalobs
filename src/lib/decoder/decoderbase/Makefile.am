@@ -1,16 +1,17 @@
-AM_CPPFLAGS = -I$(top_srcdir)/src/lib -I$(top_srcdir)/src/lib/decoder -D_REENTRANT
+SUBDIRS=test
+AM_CPPFLAGS = -I$(top_srcdir)/src/lib -I$(top_srcdir)/src/lib/decoder -D_REENTRANT 
 
 lib_LTLIBRARIES = libkvalobs_decoderbase.la
 
 decoderbaseincludedir = $(pkgincludedir)/decoder/decoderbase
-decoderbaseinclude_HEADERS = decoder.h GenCacheElem.h metadata.h
+decoderbaseinclude_HEADERS = \
+	decoder.h GenCacheElem.h metadata.h 
 
 libkvalobs_decoderbase_la_SOURCES = decodermgr.cc decodermgr.h \
-                            decoder.cc decoder.h\
+							decoder.cc decoder.h\
                             metadata.cc metadata.h \
                             DataUpdateTransaction.h DataUpdateTransaction.cc \
                             GenCacheElem.h ConfParser.h
-
 libkvalobs_decoderbase_la_CPPFLAGS = \
 	$(AM_CPPFLAGS) \
 	-DKVALOBSLIBS_SO_VERSION="\""@KVALOBSLIBS_SO_VERSION@"\"" \
@@ -23,6 +24,7 @@ libkvalobs_decoderbase_la_LIBADD =   $(top_builddir)/src/lib/kvalobs/libkvalobs_
                              $(top_builddir)/src/lib/milog/libkvalobs_milog.la \
                              $(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la \
                              $(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la \
+                             $(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
                              $(BOOST_DATE_TIME_LIB) \
                              $(libxml2_LIBS)
 

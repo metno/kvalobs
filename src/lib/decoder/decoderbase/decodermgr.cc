@@ -61,8 +61,6 @@ DecoderMgr::updateDecoders()
    DecoderItem        *decoder;
    int                id=0;
 
-
-
    clearDecoders();
 
    if(!dir.open( decoderPath, fixDecoderName("*.so") ) ){

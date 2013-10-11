@@ -506,7 +506,7 @@ namespace kvalobs{
        * \param paramname The parameter to test.
        * \return true if \em paramname is a text param and false if not.
        */
-      static bool isTextParam(const std::string &paramname);
+       bool isTextParam(const std::string &paramname);
 
       /**
        * \brief is the \em paramid a textparam.

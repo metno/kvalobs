@@ -36,6 +36,7 @@ kvSynopDecodeTest_SOURCES = test/kvSynopDecodeTest.cc \
 
 kvSynopDecodeTest_CPPFLAGS = $(synop_la_CPPFLAGS) $(gtest_CFLAGS)
 kvSynopDecodeTest_LDFLAGS = \
+	$(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
 	$(putools_LIBS) \
 	$(gtest_LIBS) \
     $(synop_la_LIBADD)

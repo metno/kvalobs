@@ -222,12 +222,6 @@ checkObservationTime(int typeId,
         boost::posix_time::ptime obt)
 {
 
-    const kvalobs::kvTypes *kvType=findType(typeId);
-
-    if(!kvType){
-        IDLOGWARN(logid, "Unknown typeid: " << typeId);
-        return 0;
-    }
 
     if(firstObsTime.is_not_a_date_time())
         firstObsTime=obt;
@@ -236,24 +230,12 @@ checkObservationTime(int typeId,
     //is subject to testing for 'to late' or 'to early'
     //message. The rest must return the same result as the first
     //obstime. 'checkRet' is used for this.
-    if(typeId==302 && firstObsTime!=obt)
+    if( typeId == 302 && firstObsTime != obt)
         return checkRet;
 
-    int diff = (tbt - obt).total_seconds() / 60; // difference in minutes
+    checkRet = getUseinfo7Code( typeId, tbt, obt, logid );
+    return checkRet;
 
-    if(diff > kvType->lateobs()){ //tbt>obt  (diff>=0)
-        //Used by checkObservationTime.
-        checkRet=4;
-        return 4;
-    }
-
-    if(diff < (-1*kvType->earlyobs())){ //tbt<obt (diff<0)
-        checkRet=3;
-        return 3;
-    }
-
-    checkRet=0;
-    return 0;
 }
 
 kvalobs::decoder::DecoderBase::DecodeResult
@@ -455,6 +437,7 @@ execute(std::string &msg)
         IDLOGDEBUG( logid, "  Data: obstime:  "
                     << boost::posix_time::to_kvalobs_string( obstime ));
 
+        firstObsTime = boost::posix_time::ptime(); //Reset to undefined.
         converter.resetRRRtr();
         converter.resetSaSdEm();
 

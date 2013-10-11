@@ -43,6 +43,8 @@
 #include <miutil/commastring.h>
 #include <miutil/trimstr.h>
 #include <miutil/timeconvert.h>
+#include <decodeutility/getUseInfo7.h>
+#include <decodeutility/isTextParam.h>
 #include "decoder.h"
 #include "ConfParser.h"
 #include "metadata.h"
@@ -50,27 +52,6 @@
 
 using namespace std;
 using namespace kvalobs;
-
-namespace{
-struct TextParam{
-   const char *name;
-   int  paramid;
-};
-
-TextParam textParams[]={
-                        {"signature", 1000},
-                        {"TEXT",      1001},
-                        {"KLSTART",   1021},
-                        {"KLOBS",     1022},
-                        {"WWB1",      1039},
-                        {"WWB2",      1040},
-                        {"WWB3",      1041},
-                        {"WWCAVOK",   1042},
-                        {"KLFG",      1025},
-                        {"KLFX",      1026},
-                        {0, 0}
-};
-}
 
 
 
@@ -184,9 +165,10 @@ getUseinfo7Code( int typeId,
                  const boost::posix_time::ptime &obt,
                  const std::string &logid )
 {
-	const kvalobs::kvTypes *kvType=findType(typeId);
+	int flag = decodeutility::getUseinfo7Code( typeId, now, obt, typeList );
 
-	if(!kvType){
+
+	if( flag < 0 ){
 		if( logid.empty() ) {
 			LOGWARN("Unknown typeid: " << typeId);
 		} else {
@@ -196,14 +178,7 @@ getUseinfo7Code( int typeId,
 		return 0;
 	}
 
-	int diff = (now - obt).total_seconds() / 60; // difference in minutes
-
-	if(diff > kvType->lateobs()) //tbt>obt  (diff>=0)
-		return 4;
-	else if(diff < (-1*kvType->earlyobs())) //tbt<obt (diff<0)
-		return 3;
-	else
-		return 0;
+	return flag;
 }
 
 
@@ -809,12 +784,7 @@ kvalobs::decoder::
 DecoderBase::
 isTextParam(const std::string &paramname)
 {
-   for(int i=0; textParams[i].name; i++){
-      if(textParams[i].name==paramname)
-         return true;
-   }
-
-   return false;
+	return decodeutility::isTextParam( paramname, paramList );
 }
 
 bool
@@ -822,12 +792,7 @@ kvalobs::decoder::
 DecoderBase::
 isTextParam(int paramid)
 {
-   for(int i=0; textParams[i].name; i++){
-      if(textParams[i].paramid==paramid)
-         return true;
-   }
-
-   return false;
+	return decodeutility::isTextParam( paramid );
 }
 
 bool
