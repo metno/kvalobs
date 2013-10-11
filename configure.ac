@@ -1,5 +1,5 @@
 AC_PREREQ([2.59])
-AC_INIT([kvalobs], [2.7.3~rc4], [kvoss@met.no])
+AC_INIT([kvalobs], [2.8.0~rc1], [kvoss@met.no])
 AM_INIT_AUTOMAKE
 #METNO_SET_VERSION_INFO
 
@@ -43,11 +43,13 @@ AC_CONFIG_FILES([Makefile
                  src/lib/kvalobs/Makefile
                  src/lib/decoder/Makefile
                  src/lib/decoder/decoderbase/Makefile
+                 src/lib/decoder/decoderbase/test/Makefile
                  src/lib/decoder/bufrdecoder/Makefile
                  src/lib/decoder/rejectdecoder/Makefile
                  src/lib/decoder/kv2kvdecoder/Makefile
                  src/lib/decoder/dummydecoder/Makefile
                  src/lib/decoder/kldecoder/Makefile
+                 src/lib/decoder/kldecoder/test/Makefile
                  src/lib/decoder/autoobsdecoder/Makefile
                  src/lib/decoder/comobsdecoder/Makefile
                  src/lib/decoder/comobsdecoder/test/Makefile

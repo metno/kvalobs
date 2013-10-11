@@ -1,3 +1,11 @@
+kvalobs (2.7.3~rc5-1) lucid; urgency=low
+
+  * Refactor kldecoder and add tests.
+  * Refactor out common code in div decoders and put it in decodeutility.
+  * Add test for the common code and decoderbase.
+
+ -- Borge Moe <borge.moe@met.no>  Fri, 11 Oct 2013 09:45:00 +0200
+
 kvalobs (2.7.3~rc4-1) lucid; urgency=low
 
   * #1364. Enhencment: The kldata-decoderen may set the useinfo(7) flag
