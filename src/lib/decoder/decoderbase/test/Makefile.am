@@ -24,7 +24,7 @@ testdecoder_la_LIBADD = \
 testdecoder_la_LDFLAGS = -module -rpath /nowhere -version-info @KVALOBSLIBS_SO_VERSION@
 
 testdb=$(top_builddir)/src/lib/decoder/decoderbase/test/testdb.sqlite
-EXTRA_DIST = kvparam.csv \
+EXTRA_DIST = kvparams.csv \
              kvtypes.csv 
              
 CLEANFILES = $(testdb)
