@@ -226,6 +226,79 @@ get( DataByObstime &data,
 
 
 
+bool
+KvDataContainer::
+getData( kvalobs::kvData &data, int stationid, int typeId, int paramid, const boost::posix_time::ptime &obstime, char sensor, int level )const
+{
+    DataByObstime tmpData;
+
+    if( getData( tmpData, stationid, typeId ) == 0 )
+        return false;
+
+    const DataList &theData = tmpData[obstime];
+
+    for( DataList::const_iterator it = theData.begin();
+         it != theData.end(); ++it ){
+        if(it->paramID() == paramid && it->sensor() == sensor && it->level() == level ) {
+            data = *it;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool
+KvDataContainer::
+getTextData( kvalobs::kvTextData &data, int stationid, int typeId, int paramid, const boost::posix_time::ptime &obstime )const
+{
+    TextDataByObstime tmpData;
+
+    if( getTextData( tmpData, stationid, typeId ) == 0 )
+        return false;
+
+    const TextDataList &theData = tmpData[obstime];
+
+    for( TextDataList::const_iterator it = theData.begin();
+            it != theData.end(); ++it ){
+        if(it->paramID() == paramid  ) {
+            data = *it;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+///The total count in this collection
+int
+KvDataContainer::
+count()const
+{
+    Data data;
+    TextData textData;
+
+    return getData( data ) + getTextData( textData );
+}
+
+///The total count of data for a specific stationid, typeid and obstime.
+int
+KvDataContainer::
+count(int stationid, int typeId, const boost::posix_time::ptime &obstime )const
+{
+    DataByObstime data;
+    TextDataByObstime textData;
+
+    int n = getData( data, stationid, typeId ) + getTextData( textData, stationid, typeId );
+
+    if( obstime.is_special() )
+        return n;
+
+    return data[obstime].size() + textData[obstime].size();
+}
+
+
+
 ///Deletes kvData after it is consumed.
 void KvDataContainer::
 set( kvalobs::serialize::KvalobsData *kvData_ )

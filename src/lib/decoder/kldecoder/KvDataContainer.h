@@ -79,6 +79,15 @@ public:
 		     int stationid, int typeId,
 		     const boost::posix_time::ptime &tbtime=boost::posix_time::ptime())const;
 
+	bool getData( kvalobs::kvData &data, int stationid, int typeId, int paramid, const boost::posix_time::ptime &obstime, char sensor='0', int level=0 )const;
+	bool getTextData( kvalobs::kvTextData &data, int stationid, int typeId, int paramid, const boost::posix_time::ptime &obstime )const;
+
+	///The total count in this collection
+	int count()const;
+
+	///The total count of data for a specific stationid, typeid and obstime.
+	int count(int stationid, int typeId, const boost::posix_time::ptime &obstime=boost::posix_time::ptime() )const;
+
 
 	///Deletes kvData after it is consumed.
 	void set( kvalobs::serialize::KvalobsData *kvData );

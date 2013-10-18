@@ -271,9 +271,15 @@ TEST_F( KlDecoderTest, DataDecodeTest )
 	ASSERT_TRUE( definedParams[1]== ParamDef( "DD", 61, 0, 0 ) );
 	ASSERT_TRUE( definedParams[2]== ParamDef( "DX_1" ,73, 1, 2) );
 
-	header="AA,DD,DX_1";
-	ASSERT_TRUE( decoder.decodeHeader( header, definedParams, message ) );
-	obsData = "201310051000,3,276,254";
+
+
+    header="AA,DD,IvalidParam";
+    ASSERT_TRUE( decoder.decodeHeader( header, definedParams, message ) );
+    ASSERT_TRUE( definedParams[2].id() == -1 );
+
+    header="AA,DD,DX_1";
+    ASSERT_TRUE( decoder.decodeHeader( header, definedParams, message ) );
+    obsData = "201310051000,3,276,254";
 
 	ASSERT_TRUE( decoder.decodeData( klData, definedParams.size(), obstime, receivedTime, 311, obsData, 2, message) );
     ASSERT_TRUE( obstime == pt::time_from_string_nothrow("201310051000") );
@@ -357,6 +363,58 @@ TEST_F( KlDecoderTest, DataDecodeTest )
     ASSERT_TRUE( getTextData( textObsData[obstime], textData, 59680, 311, 1000 /*signature*/) );
     ASSERT_TRUE( textData.original() == "bm" /* signature */);
 }
+
+TEST_F( KlDecoderTest, InvalidParamDecodeTest )
+{
+    string obsData;
+    string header;
+    KvTypeList types;
+    list<string> strParams;
+    list<string> expectedStrParams;
+    string message;
+    pt::ptime obstime;
+    pt::ptime receivedTime;
+    kvalobs::serialize::KvalobsData *data;
+
+    types.push_back(kvTypes(311,"",60, 60,"I","h","For test"));
+    receivedTime = pt::time_from_string_nothrow("2013-10-05 10:04:56");
+
+    header="AA,DD,InvalidParam";
+    vector<ParamDef> definedParams;
+
+    bits::DataDecoder decoder( paramList, typesList );
+
+    ASSERT_TRUE( decoder.splitParams( header, strParams, message) ) << "Cant split params '" << header << "'.";
+    ba::push_back( expectedStrParams )("AA")("DD")("InvalidParam");
+    ASSERT_TRUE( equal( strParams.begin(), strParams.end(), expectedStrParams.begin()  ) );
+
+    ASSERT_TRUE( decoder.decodeHeader( header, definedParams, message ) );
+    ASSERT_TRUE( definedParams.size() == 3 );
+    ASSERT_TRUE( definedParams[0]== ParamDef( "AA", 1 ) );
+    ASSERT_TRUE( definedParams[1]== ParamDef( "DD", 61 ) );
+    ASSERT_TRUE( definedParams[2]== ParamDef( "InvalidParam",-1) );
+
+    obsData = "AA,DD,InvalidParam\n"
+              "201310051000,3,276,254";
+
+    data = decoder.decodeData( obsData, 59680, 311, receivedTime, "", "" );
+
+    ASSERT_TRUE( data ) << decoder.messages;
+
+
+
+    KvDataContainer dataContainer( data );
+    KvDataContainer::DataByObstime obsData1;
+    kvalobs::kvData kvData;
+
+    obstime = pt::time_from_string_nothrow("2013-10-05 10:00:00");
+
+    ASSERT_TRUE(  dataContainer.getData(  obsData1, 59680, 311 ) == 2 );
+    ASSERT_FALSE( getData( obsData1[obstime], kvData, 59680, 311, -1 ) );
+    ASSERT_TRUE( getData( obsData1[obstime], kvData, 59680, 311, 1 ) );
+    ASSERT_TRUE( getData( obsData1[obstime], kvData, 59680, 311, 61 ) );
+}
+
 
 
 TEST_F( KlDecoderTest, decodeData )

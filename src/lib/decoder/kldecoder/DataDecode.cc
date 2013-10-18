@@ -366,6 +366,7 @@ decodeHeader( const std::string &header,
 		it=params.find(Param( name, -1));
 
 		if(it==params.end()){
+		    message += "Unknown parameter name '" + name + "'\n";
 			paramsList.push_back(ParamDef(name, -1, sensor, level, isCode));
 		}else{
 			paramsList.push_back(ParamDef(name, it->id(), sensor, level, isCode));
@@ -450,7 +451,6 @@ decodeData( const std::string &obsData,
 	pt::ptime obstime;
 	int nLineWithData=0; //Number of line with data.
 	int nElemsInLine;
-	int nExpectedData;
 	int line=1;
 
 	logid = logid_;
@@ -514,7 +514,10 @@ decodeData( const std::string &obsData,
 	            continue;
 	         }
 
-	         nExpectedData++;
+	         if( params[index].id() < 0 ) //Unknown param
+	             continue;
+
+
 	         nElemsInLine++;
 
 	         string val=data.val();
@@ -570,14 +573,21 @@ decodeData( const std::string &obsData,
 	    	nLineWithData++;
 	}
 
+	string unknownParams;
+	for( int i=0; i<params.size(); ++i ) {
+	    if( params[i].id() < 0 )
+	        unknownParams += (i==0?"":", ") + params[i].name();
+	}
+
 	ostringstream ost;
 	ost << "# Lines:             " << line-1 << endl
 		<< "# Lines with data:   " << nLineWithData << endl
-		<< "# dataelements:      " << nExpectedData;
+		<< "# parameter:         " << params.size();
 
+	if( !  unknownParams.empty() )
+	    ost << endl << "Unknown parameters:  " << unknownParams;
 
 	IDLOGINFO( logid, ost.str() );
-	messages = ost.str();
 
 	return kvData;
 }
