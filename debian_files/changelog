@@ -2,7 +2,7 @@ kvalobs (2.7.3~rc8-1) lucid; urgency=low
 
   * kldecoder: WARN about text_data with sensor and/or level values greater than 1. Better logging.
 
--- Borge Moe <borge.moe@met.no>  Mon, 21 Oct 2013 08:00:00 +0200
+ -- Borge Moe <borge.moe@met.no>  Mon, 21 Oct 2013 08:00:00 +0200
 
 kvalobs (2.7.3~rc7-1) lucid; urgency=low
 
