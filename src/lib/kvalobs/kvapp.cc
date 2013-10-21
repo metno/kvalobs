@@ -55,6 +55,7 @@ std::string getAppName(const std::string &progname);
 ConfSection* KvApp::conf = 0;
 std::string KvApp::confFile;
 std::string KvApp::pidfile;
+milog::LogLevel KvApp::globalLogLevel=milog::WARN;
 
 KvApp::KvApp(int argn, char **argv, const char *opt[0][2]) :
 		CorbaHelper::CorbaApp(argn, argv, opt), setAppNameForDb(false)
@@ -359,11 +360,70 @@ std::string KvApp::createConnectString(const std::string &dbname,
 miutil::conf::ConfSection*
 KvApp::getConfiguration()
 {
-	if (!KvApp::conf)
+	if (!KvApp::conf) {
 		KvApp::conf = confLoader();
+
+		if( conf )
+		    globalLogLevel = getLogLevel( "", conf);
+	}
 
 	return conf;
 }
+
+milog::LogLevel
+KvApp::
+getLogLevel( const std::string &section, miutil::conf::ConfSection *conf )
+{
+    string key;
+
+    if( ! conf )
+        conf = getConfiguration();
+
+    if( ! conf )
+        return milog::WARN;
+
+    if( section.empty() )
+        key = "loglevel";
+    else
+        key = section + ".loglevel";
+
+    miutil::conf::ValElementList vals = conf->getValue( key );
+
+    if( vals.size() == 0 )
+        return milog::WARN;
+
+    string val = vals[0].valAsString();
+
+    if(strcasecmp("FATAL", val.c_str() )==0){
+        return milog::FATAL;
+    }else if(strcasecmp("ERROR", val.c_str())==0){
+        return milog::ERROR;
+    }else if(strcasecmp("WARN", val.c_str())==0){
+        return milog::WARN;
+    }else if(strcasecmp("DEBUG", val.c_str())==0){
+        return milog::DEBUG;
+    }else if(strcasecmp("INFO", val.c_str())==0){
+        return milog::INFO;
+    }else if(strcmp("0", val.c_str())==0){
+        return milog::FATAL;
+    }else if(strcmp("1", val.c_str())==0){
+        return milog::ERROR;
+    }else if(strcmp("2", val.c_str())==0){
+        return milog::WARN;
+    }else if(strcmp("3", val.c_str())==0){
+        return milog::INFO;
+    }else if(strcmp("4", val.c_str() )==0){
+        return milog::DEBUG;
+    }else{
+        if( section.empty() )
+            key = "globale";
+        else
+            key = section;
+        LOGERROR("Invalid loglevel value: '" << val << "' in section '"<<key<< "'. Valid values fatal, error, warn, info or debug.");
+        return milog::WARN;
+    }
+}
+
 
 std::string KvApp::getConfFile(const std::string &ifNotSetReturn)
 {

@@ -33,6 +33,7 @@
 
 #include <exception>
 #include <corbahelper/corbaApp.h>
+#include <milog/milog.h>
 
 namespace miutil
 {
@@ -77,6 +78,7 @@ class KvApp: public CorbaHelper::CorbaApp
 	static miutil::conf::ConfSection *conf;
 	static std::string confFile;
 
+
 	/**
 	 * kvPathInCorbaNS, this variable holds the path in CORBA
 	 * nameserver that shall be used. This path can be given
@@ -87,6 +89,7 @@ class KvApp: public CorbaHelper::CorbaApp
 	std::string kvPathInCorbaNS;
 
 public:
+	static milog::LogLevel globalLogLevel;
 	bool setAppNameForDb;
 	std::string appName; //Set the application name from ARGV[0].
 
@@ -156,6 +159,8 @@ public:
 	 * \note  WARNING: dont delete the returned pointer.
 	 */
 	static miutil::conf::ConfSection* getConfiguration();
+
+	static milog::LogLevel getLogLevel( const std::string &section="", miutil::conf::ConfSection *conf=0 );
 
 	/**
 	 * \brief get the name of the configuration file that is used.
