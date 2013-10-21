@@ -367,8 +367,21 @@ decodeHeader( const std::string &header,
 
 		if(it==params.end()){
 		    message += "Unknown parameter name '" + name + "'\n";
+		    warnings = true;
 			paramsList.push_back(ParamDef(name, -1, sensor, level, isCode));
-		}else{
+		}else if( decodeutility::isTextParam( it->id() && (sensor>0 || level>0 ) ) ) {
+		    ostringstream ost;
+		    warnings = true;
+		    ost << "Parameter name '" << name << "' is a 'text_data' parameter and "
+		           "the level and/or sensor values must be 0.";
+		    if( sensor > 0 )
+		        ost << " Invalid sensor value: '"<<sensor<<".";
+		    if( level > 0 )
+		        ost << " Invalid level value: '"<< level <<".";
+		    ost << "\n";
+		    message += ost.str();
+		    paramsList.push_back(ParamDef(name, -2, sensor, level, isCode));
+		}else {
 			paramsList.push_back(ParamDef(name, it->id(), sensor, level, isCode));
 		}
 	}
@@ -449,10 +462,13 @@ decodeData( const std::string &obsData,
 	vector<ParamDef>      params;
 	KlDataArray klData;
 	pt::ptime obstime;
+	string unknownParams;
+	string invalidTextParams;
 	int nLineWithData=0; //Number of line with data.
 	int nElemsInLine;
 	int line=1;
 
+	warnings = false;
 	logid = logid_;
 	decoderName = decodername_;
 	messages.erase();
@@ -573,19 +589,25 @@ decodeData( const std::string &obsData,
 	    	nLineWithData++;
 	}
 
-	string unknownParams;
 	for( int i=0; i<params.size(); ++i ) {
-	    if( params[i].id() < 0 )
-	        unknownParams += (i==0?"":", ") + params[i].name();
+	    if( params[i].id() == -1 )
+	        unknownParams += " [" + params[i].name() + "]";
 	}
 
+	for( int i=0; i<params.size(); ++i ) {
+	    if( params[i].id() == -2 )
+	       invalidTextParams += " [" + params[i].name() + "]";
+	}
 	ostringstream ost;
 	ost << "# Lines:             " << line-1 << endl
 		<< "# Lines with data:   " << nLineWithData << endl
 		<< "# parameter:         " << params.size();
 
 	if( !  unknownParams.empty() )
-	    ost << endl << "Unknown parameters:  " << unknownParams;
+	    ost << endl << "Unknown parameters: " << unknownParams;
+
+	if( ! invalidTextParams.empty() )
+	    ost << endl << "Invalid text parameters: " << invalidTextParams;
 
 	IDLOGINFO( logid, ost.str() );
 

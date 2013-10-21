@@ -227,6 +227,7 @@ insertDataInDb( kvalobs::serialize::KvalobsData *theData,
 	KvDataContainer::TextDataByObstime textData;
 	KvDataContainer::TextDataByObstime::iterator tid;
 	KvDataContainer::TextDataList td;
+	map<ptime,int> observations;
 
 
 	KvDataContainer container( theData );
@@ -265,6 +266,8 @@ insertDataInDb( kvalobs::serialize::KvalobsData *theData,
 			IDLOGERROR( logid, "DBERROR: stationid: " << stationid << " typeid: " << typeId << " obstime: " << it->first );
 			return NotSaved;
 		}
+
+		observations[it->first] += it->second.size();
 	}
 
 	//Is there any left over text data.
@@ -278,9 +281,22 @@ insertDataInDb( kvalobs::serialize::KvalobsData *theData,
 				IDLOGERROR( logid, "DBERROR: stationid: " << stationid << " typeid: " << typeId << " obstime: " << it->first );
 				return NotSaved;
 			}
+			observations[it->first] += it->second.size();
 		}
 	}
 
+	ostringstream ost;
+	int totalObservations=0;
+	if( observations.size() > 0 ) {
+	    for( map<ptime,int>::const_iterator it = observations.begin();
+	         it != observations.end(); ++it ) {
+	        ost << "  # observations: " << to_kvalobs_string( it->first ) <<": " << it->second << endl;
+	        totalObservations += it->second;
+	    }
+	}
+
+	IDLOGINFO(logid, "Observations saved to DB: " << totalObservations << " stationid: " << stationid << " typeid: " << typeId << endl << ost.str() );
+	LOGINFO("Observations saved to DB: " << totalObservations << " stationid: " << stationid << " typeid: " << typeId  );
 	return Ok;
 }
 
@@ -356,6 +372,9 @@ execute(std::string &msg)
    if( ! kvData )
 	   return rejected( datadecoder.messages, logid );
 
+   if( datadecoder.warnings ) {
+       IDLOGWARN( logid, datadecoder.messages );
+   }
    return insertDataInDb( kvData, stationid, typeId, logid );
 }
 
