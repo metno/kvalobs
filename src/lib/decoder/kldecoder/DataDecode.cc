@@ -561,7 +561,7 @@ decodeData( const std::string &obsData,
 	                  val = decodeutility::HL( val );
 	               }else{
 	                  warnings=true;
-	                  IDLOGWARN( logid, "Unsupported as code value: " << params[index].name() );
+	                  messages += "Unsupported as code value: " + params[index].name() +"\n";
 	                  continue;
 	               }
 	            }
@@ -616,6 +616,12 @@ decodeData( const std::string &obsData,
 	    ost << endl << "Invalid text parameters: " << invalidTextParams;
 
 	IDLOGINFO( logid, ost.str() );
+
+	if( warnings ) {
+	    IDLOGWARN( logid, "Observation with decoding warnings." << endl << ost.str()
+	              << endl << "Warnings: " << endl << messages
+	              << endl << "Observation data: " << endl << obsData );
+	}
 
 	return kvData;
 }
