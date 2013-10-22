@@ -161,7 +161,7 @@ decodeObsType()
 
              if(stationID < 0) {
                  stationID = INT_MAX;
-                 //ost << "Now station with id (" << key << "=" << val << ")";
+                 LOGERROR("Now station with stationid '" << key << "=" << val << "'" );
                  continue;
              }
          }
@@ -185,15 +185,19 @@ KlDecoder::
 rejected( const std::string &msg, const std::string &logid )
 {
    ostringstream ost;
+   ostringstream myObs;
    bool saved=true;
 
    boost::posix_time::ptime tbtime( boost::posix_time::microsec_clock::universal_time());
 
    ost << "REJECTED: Decoder: " << name() << endl
-         <<" message: " << msg  << endl << obs;
+         <<"message: " << msg  << endl
+         <<"obsType: " << obsType << endl
+         <<"obs: [" << obs << "]";
 
+   myObs << obsType << "\n" << obs;
 
-   kvalobs::kvRejectdecode rejected( obs,
+   kvalobs::kvRejectdecode rejected( myObs.str(),
                                      tbtime,
                                      name(),
                                      msg );
@@ -327,7 +331,7 @@ execute(std::string &msg)
    if( stationid == INT_MAX ) {
       o.str("");
 
-      o << "Missing stationid! typeid: ";
+      o << "Missing or unknown stationid! typeid: ";
 
       if( typeId > 0 )
          o << typeId;
