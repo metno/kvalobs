@@ -1,3 +1,10 @@
+kvalobs (2.7.3~rc9-1) lucid; urgency=low
+
+  * kldecoder: Log more info when a observation is rejected.
+
+ -- Borge Moe <borge.moe@met.no>  Tue, 22 Oct 2013 18:30:00 +0200
+
+
 kvalobs (2.7.3~rc8-1) lucid; urgency=low
 
   * kldecoder: WARN about text_data with sensor and/or level values greater than 1. Better logging.
