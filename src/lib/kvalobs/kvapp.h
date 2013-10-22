@@ -68,6 +68,8 @@ public:
 };
 //
 
+
+
 /**
  * \brief This class encapsulate functions that is common for 
  * most applications in kvalobs. 

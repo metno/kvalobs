@@ -87,7 +87,7 @@ milog::FLogStream::FLogStream(int nRotate, int maxSize)
 {
 
     nRotate_=nRotate<1?1:nRotate;
-    maxSize_=maxSize<10240?10240:maxSize;
+    maxSize_=maxSize<102400?102400:maxSize;
     
     try{
 	StdLayout *l=new StdLayout();
@@ -105,7 +105,7 @@ milog::FLogStream::FLogStream(Layout *layout,
 {
 
     nRotate_=nRotate<1?1:nRotate;
-    maxSize_=maxSize<10240?10240:maxSize;
+    maxSize_=maxSize<102400?102400:maxSize;
 }
 
 milog::FLogStream::FLogStream(const std::string &fname,   
@@ -115,7 +115,7 @@ milog::FLogStream::FLogStream(const std::string &fname,
 {
 
     nRotate_=nRotate<1?1:nRotate;
-    maxSize_=maxSize<10240?10240:maxSize;
+    maxSize_=maxSize<102400?102400:maxSize;
 
     if(open(fname)){
 	try{

@@ -9,5 +9,6 @@ kv2metdat_LDADD = $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
                   $(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la \
                   $(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la \
                   $(top_builddir)/src/lib/dnmithread/libkvalobs_dnmithread.la\
+                  $(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la \
 		  $(top_builddir)/src/lib/miutil/libkvalobs_miutil.la\
                   $(putools_LIBS) $(BOOST_THREAD_LIB)  -ldl -lm

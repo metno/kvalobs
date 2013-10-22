@@ -48,6 +48,8 @@ kvDataInputd_LDADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs_deco
 #of package that we do not need we only compile the files that is needed.
 kvdataclt_SOURCES =  $(top_srcdir)/src/lib/kvalobs/kvapp.h \
                      $(top_srcdir)/src/lib/kvalobs/kvapp.cc \
+                     $(top_srcdir)/src/lib/kvalobs/getLogInfo.h \
+                     $(top_srcdir)/src/lib/kvalobs/getLogInfo.cc \
                      $(top_srcdir)/src/lib/kvalobs/kvPath.h \
                      $(top_srcdir)/src/lib/kvalobs/kvPath.cc \
                      $(top_srcdir)/src/lib/fileutil/pidfileutil.h \

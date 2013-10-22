@@ -41,6 +41,7 @@
 #include <kvalobs/kvapp.h>
 #include <kvalobs/kvPath.h>
 #include <fileutil/pidfileutil.h>
+#include <kvalobs/getLogInfo.h>
 
 using namespace std;
 using namespace miutil::conf;
@@ -51,6 +52,8 @@ ConfSection* confLoader();
 std::string getAppName(const std::string &progname);
 
 }
+
+
 
 ConfSection* KvApp::conf = 0;
 std::string KvApp::confFile;
@@ -379,51 +382,13 @@ getLogLevel( const std::string &section, miutil::conf::ConfSection *conf )
     if( ! conf )
         conf = getConfiguration();
 
-    if( ! conf )
-        return milog::WARN;
+    milog::LogLevel ll = ::getLoglevel( conf, section );
 
-    if( section.empty() )
-        key = "loglevel";
-    else
-        key = section + ".loglevel";
+    if( ll == milog::NOTSET )
+        ll = milog::WARN;
 
-    miutil::conf::ValElementList vals = conf->getValue( key );
-
-    if( vals.size() == 0 )
-        return milog::WARN;
-
-    string val = vals[0].valAsString();
-
-    if(strcasecmp("FATAL", val.c_str() )==0){
-        return milog::FATAL;
-    }else if(strcasecmp("ERROR", val.c_str())==0){
-        return milog::ERROR;
-    }else if(strcasecmp("WARN", val.c_str())==0){
-        return milog::WARN;
-    }else if(strcasecmp("DEBUG", val.c_str())==0){
-        return milog::DEBUG;
-    }else if(strcasecmp("INFO", val.c_str())==0){
-        return milog::INFO;
-    }else if(strcmp("0", val.c_str())==0){
-        return milog::FATAL;
-    }else if(strcmp("1", val.c_str())==0){
-        return milog::ERROR;
-    }else if(strcmp("2", val.c_str())==0){
-        return milog::WARN;
-    }else if(strcmp("3", val.c_str())==0){
-        return milog::INFO;
-    }else if(strcmp("4", val.c_str() )==0){
-        return milog::DEBUG;
-    }else{
-        if( section.empty() )
-            key = "globale";
-        else
-            key = section;
-        LOGERROR("Invalid loglevel value: '" << val << "' in section '"<<key<< "'. Valid values fatal, error, warn, info or debug.");
-        return milog::WARN;
-    }
+    return ll;
 }
-
 
 std::string KvApp::getConfFile(const std::string &ifNotSetReturn)
 {

@@ -583,6 +583,7 @@ namespace kvalobs{
        */
       void loglevel(const std::string &logname, milog::LogLevel loglevel);
 
+      milog::LogLevel getConfLoglevel() const;
       
       /**
        * \brief Load a decoder specific configurationfile.

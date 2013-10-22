@@ -261,7 +261,7 @@ insertDataInDb( kvalobs::serialize::KvalobsData *theData,
 */
 
 		if( ! addDataToDb( to_miTime( it->first ), stationid, typeId, it->second, td,
-				           priority, logid, onlyInsertOrUpdate ) ) {
+				           priority, logid, getOnlyInsertOrUpdate() ) ) {
 			LOGERROR( "DBERROR: stationid: " << stationid << " typeid: " << typeId << " obstime: " << it->first );
 			IDLOGERROR( logid, "DBERROR: stationid: " << stationid << " typeid: " << typeId << " obstime: " << it->first );
 			return NotSaved;
@@ -276,7 +276,7 @@ insertDataInDb( kvalobs::serialize::KvalobsData *theData,
 		for( KvDataContainer::TextDataByObstime::iterator it = textData.begin();
 			 it != textData.end(); ++it  ) {
 			if( ! addDataToDb( to_miTime( it->first ), stationid, typeId, dl, it->second,
-					           priority, logid, onlyInsertOrUpdate) ) {
+					           priority, logid, getOnlyInsertOrUpdate() ) ) {
 				LOGERROR( "DBERROR: stationid: " << stationid << " typeid: " << typeId << " obstime: " << it->first );
 				IDLOGERROR( logid, "DBERROR: stationid: " << stationid << " typeid: " << typeId << " obstime: " << it->first );
 				return NotSaved;
@@ -310,7 +310,6 @@ execute(std::string &msg)
    int typeId=getTypeId(msg);
    int stationid=getStationId(msg);
 
-   warnings=false;
    logid.clear();
 
    if( receivedTime.is_special() && setUsinfo7 )
@@ -360,6 +359,9 @@ execute(std::string &msg)
 	   o << " NOT given or set_useinfo7 is not set.";
    else
 	   o << receivedTime;
+
+   o << endl << "Insert type : " << (getOnlyInsertOrUpdate()?"update (replenish)":"insert");
+
    o << endl
      << "ObstType    : " << obsType         << endl
      << "Obs         : " << obs             << endl;

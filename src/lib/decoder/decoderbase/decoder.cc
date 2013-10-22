@@ -45,6 +45,7 @@
 #include <miutil/timeconvert.h>
 #include <decodeutility/getUseInfo7.h>
 #include <decodeutility/isTextParam.h>
+#include <kvalobs/getLogInfo.h>
 #include "decoder.h"
 #include "ConfParser.h"
 #include "metadata.h"
@@ -864,14 +865,23 @@ DecoderBase::
 openFLogStream(const std::string &filename)
 {
    using namespace std;
-
+   const int defSize=1024*100;
    milog::FLogStream *fs;
    ostringstream     ost;
    list<string>      pathlist;
    bool              error=false;
+   int nRotate=2;
+   int fileSize=defSize;
+
+   if( theKvConf ) {
+       getLogfileInfo( theKvConf, "kvDataInputd." + name(), nRotate, fileSize );
+
+       nRotate = nRotate<1?2:nRotate;
+       fileSize= fileSize<defSize?defSize:fileSize;
+   }
 
    try{
-      fs=new milog::FLogStream(2);
+      fs=new milog::FLogStream(nRotate, fileSize );
    }
    catch(...){
       LOGERROR("OUT OF MEMMORY, cant allocate FLogStream!");
@@ -954,7 +964,7 @@ createLogger(const std::string &logname)
    createdLoggers.push_back(logname);
 
    milog::Logger::createLogger(logname, ls);
-   milog::Logger::logger(logname).logLevel(milog::DEBUG);
+   milog::Logger::logger(logname).logLevel( getConfLoglevel() );
 }
 
 void
@@ -991,6 +1001,23 @@ loglevel(const std::string &logname, milog::LogLevel loglevel)
          return;
       }
    }
+}
+
+
+milog::LogLevel
+kvalobs::decoder::
+DecoderBase::
+getConfLoglevel() const
+{
+    string sectionName;
+    milog::LogLevel ll = milog::NOTSET;
+
+    if( ! theKvConf )
+        return milog::DEBUG;
+
+    sectionName = "kvDataInputd." + name();
+
+    return getLoglevelRecursivt( theKvConf, sectionName, milog::DEBUG );
 }
 
 bool

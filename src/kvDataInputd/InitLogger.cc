@@ -36,13 +36,10 @@
 #include "InitLogger.h"
 #include <iostream>
 #include <kvalobs/kvPath.h>
+#include <kvalobs/getLogInfo.h>
 
 using namespace milog;
 using namespace std;
-
-namespace{
-LogLevel getLogLevel(const char *c);
-}
 
 void
 InitLogger( int argn, char **argv,
@@ -54,6 +51,8 @@ InitLogger( int argn, char **argv,
 	LogLevel     logLevel=milog::NOTSET;
 	FLogStream   *fs;
 	StdErrStream *trace;
+	int nRotate=4;
+	int fileSize=102400;
 
 	filename = kvPath("logdir") +"/" + logname + ".log";
 
@@ -62,45 +61,27 @@ InitLogger( int argn, char **argv,
 			i++;
 
 			if(i<argn){
-				traceLevel=getLogLevel(argv[i]);
+				traceLevel=loglevelFromString( argv[i] );
 			}
 		}else if(strcmp("--loglevel", argv[i])==0){
 			i++;
 
 			if(i<argn){
-				logLevel=getLogLevel(argv[i]);
+				logLevel=loglevelFromString( argv[i] );
 			}
 		}
 	}
 
-	if( traceLevel == milog::NOTSET && conf ) {
-		miutil::conf::ValElementList val=conf->getValue( logname+".tracelevel" );
+	getLogfileInfo( conf, "kvDataInputd", nRotate, fileSize );
 
-		if( val.size() == 0 )
-			val=conf->getValue( "tracelevel" );
+	if( traceLevel == milog::NOTSET && conf )
+	    traceLevel = getTracelevelRecursivt( conf, logname, milog::DEBUG );
 
-		if( val.size() > 0 )
-			traceLevel = getLogLevel( val[0].valAsString().c_str() );
-	}
-
-	if( logLevel == milog::NOTSET && conf ) {
-		miutil::conf::ValElementList val=conf->getValue( logname+".loglevel" );
-
-		if( val.size() == 0 )
-			val=conf->getValue( "loglevel" );
-
-		if( val.size() > 0 )
-			logLevel = getLogLevel( val[0].valAsString().c_str() );
-	}
-
-	if( traceLevel == milog::NOTSET )
-		traceLevel = milog::DEBUG;
-
-	if( logLevel == milog::NOTSET )
-		logLevel = milog::WARN;
+	if( logLevel == milog::NOTSET && conf )
+	    logLevel = getLoglevelRecursivt( conf, logname, milog::WARN );
 
 	try{
-		fs=new FLogStream(4);
+		fs=new FLogStream(nRotate, fileSize );
 
 		if(!fs->open(filename)){
 			std::cerr << "FATAL: Can't initialize the Logging system.\n";
@@ -137,34 +118,4 @@ InitLogger( int argn, char **argv,
 	std::cerr << "Logging to file <" << filename << ">!\n";
 
 }
-
-namespace{
-LogLevel getLogLevel(const char *str)
-{
-	if(strcasecmp("FATAL", str)==0){
-		return milog::FATAL;
-	}else if(strcasecmp("ERROR", str)==0){
-		return milog::ERROR;
-	}else if(strcasecmp("WARN", str)==0){
-		return milog::WARN;
-	}else if(strcasecmp("DEBUG", str)==0){
-		return milog::DEBUG;
-	}else if(strcasecmp("INFO", str)==0){
-		return milog::INFO;
-	}else if(strcmp("0", str)==0){
-		return milog::FATAL;
-	}else if(strcmp("1", str)==0){
-		return milog::ERROR;
-	}else if(strcmp("2", str)==0){
-		return milog::WARN;
-	}else if(strcmp("3", str)==0){
-		return milog::INFO;
-	}else if(strcmp("4", str)==0){
-		return milog::DEBUG;
-	}else{
-		return milog::NOTSET;
-	}
-}
-}
-
 

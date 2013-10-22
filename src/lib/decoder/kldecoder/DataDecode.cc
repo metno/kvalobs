@@ -309,6 +309,7 @@ decodeHeader( const std::string &header,
 		ost << " [" << *itParamsStrings << "]";
 
 	IDLOGDEBUG(logid, ost.str());
+	ost.str("");
 
 	itParamsStrings=paramStrings.begin();
 
@@ -366,24 +367,29 @@ decodeHeader( const std::string &header,
 		it=params.find(Param( name, -1));
 
 		if(it==params.end()){
-		    message += "Unknown parameter name '" + name + "'\n";
+		    ost << "Unknown parameter name '" << name << "'\n";
 		    warnings = true;
 			paramsList.push_back(ParamDef(name, -1, sensor, level, isCode));
-		}else if( decodeutility::isTextParam( it->id() && (sensor>0 || level>0 ) ) ) {
+		}else if( decodeutility::isTextParam( it->id() ) && (sensor>0 || level>0 ) ) {
 		    ostringstream ost;
 		    warnings = true;
-		    ost << "Parameter name '" << name << "' is a 'text_data' parameter and "
-		           "the level and/or sensor values must be 0.";
+		    ost << "Text parameter: name '" << name << "'. Level and/or sensor values must be 0.";
 		    if( sensor > 0 )
 		        ost << " Invalid sensor value: '"<<sensor<<".";
 		    if( level > 0 )
 		        ost << " Invalid level value: '"<< level <<".";
 		    ost << "\n";
-		    message += ost.str();
 		    paramsList.push_back(ParamDef(name, -2, sensor, level, isCode));
 		}else {
 			paramsList.push_back(ParamDef(name, it->id(), sensor, level, isCode));
 		}
+	}
+
+	string tmp=ost.str();
+
+	if( ! tmp.empty() ) {
+	    message += tmp;
+	    IDLOGWARN( logid, tmp );
 	}
 
 	return true;

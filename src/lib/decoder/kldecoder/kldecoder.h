@@ -99,7 +99,6 @@ protected:
    rejected( const std::string &msg, const std::string &logid );
 
    bits::DataDecoder datadecoder;
-   bool warnings;
    std::string logid;
    int typeID;
    int stationID;
