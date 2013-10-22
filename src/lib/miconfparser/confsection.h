@@ -107,6 +107,10 @@ public:
    ConfSectionList getAllSection(const std::string &cf);
 
    ValElementList getValue(const std::string &key)const;
+   ValElementList getValueRecursivt( const std::string &startInSection,
+                                     const std::string &key,
+                                     std::string &foundKeInSection,
+                                     const ValElementList &defValue=ValElementList())const;
 
    std::list<std::string> getKeys()const;
    std::list<std::string> getSubSections()const;

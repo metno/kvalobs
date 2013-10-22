@@ -30,6 +30,7 @@
  */
 #include <iostream>
 #include <string>
+#include <algorithm>
 #include <miconfparser/trimstr.h>
 #include <miconfparser/confsection.h>
 
@@ -399,6 +400,48 @@ getValue(const std::string &key_)const
 
    return it->second;
 }
+
+miutil::conf::ValElementList
+miutil::conf::
+ConfSection::
+getValueRecursivt( const std::string &startInSection,
+                   const std::string &key,
+                   std::string &foundKeyInSection,
+                   const ValElementList &defValue )const
+{
+    string::size_type pos;
+    ValElementList val;
+    std::string myKey;
+    string section = startInSection;
+    int n = count( section.begin(), section.end(), '.');
+
+    if( n != 0 || ! section.empty() )
+        ++n;
+
+    for( int i=n; i >= 0; --i ) {
+        if( section.empty() )
+            myKey = key;
+        else
+            myKey = section + "." + key;
+
+        val = getValue( myKey );
+
+        if( ! val.empty()  ) {
+            foundKeyInSection = section;
+            return val;
+        }
+
+        pos = section.find_last_of( '.' );
+
+        if( pos == string::npos )
+            section.erase();
+        else
+            section.erase( pos );
+    }
+
+    return defValue;
+}
+
 
 std::list<string> 
 miutil::conf::ConfSection::
