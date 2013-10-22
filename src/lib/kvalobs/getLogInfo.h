@@ -29,14 +29,33 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef __GETLOGLEVEL_H__
-#define __GETLOGLEVEL_H__
+#ifndef __GETLOGINFO_H__
+#define __GETLOGINFO_H__
 
 #include <string>
 #include <milog/milog.h>
 #include <miconfparser/miconfparser.h>
 
 milog::LogLevel
-getLoglevel( const miutil::conf::ConfSection *conf, const std::string &section );
+loglevelFromString( const std::string &level);
+
+milog::LogLevel
+getLoglevel( const miutil::conf::ConfSection *conf, const std::string &section, const milog::LogLevel defLoglevel=milog::NOTSET );
+
+milog::LogLevel
+getLoglevelRecursivt( const miutil::conf::ConfSection *conf, const std::string &startAtSection,
+                      const milog::LogLevel defLoglevel=milog::NOTSET );
+
+
+milog::LogLevel
+getTracelevel( const miutil::conf::ConfSection *conf, const std::string &section, const milog::LogLevel defLoglevel=milog::NOTSET );
+
+milog::LogLevel
+getTracelevelRecursivt( const miutil::conf::ConfSection *conf, const std::string &startAtSection,
+                      const milog::LogLevel defLoglevel=milog::NOTSET );
+
+void
+getLogfileInfo( const miutil::conf::ConfSection *conf, const std::string &startAtSection,
+                int &nRotation, int &fileSize );
 
 #endif /* GETLOGLEVEL_H_ */
