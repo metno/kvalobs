@@ -1,3 +1,9 @@
+kvalobs (2.7.3~rc11-1) lucid; urgency=low
+
+  * kldecoder: Fix error message to the data sender on error.
+
+ -- Borge Moe <borge.moe@met.no>  Wed, 23 Oct 2013 15:00:00 +0200
+
 kvalobs (2.7.3~rc10-1) lucid; urgency=low
 
   * kldecoder: Fix: Typeid==0 is a vallid typeid.
