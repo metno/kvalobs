@@ -1,3 +1,10 @@
+kvalobs (2.7.3~rc10-1) lucid; urgency=low
+
+  * kldecoder: Fix: Typeid==0 is a vallid typeid.
+  * kldecoder: Return a error message to the data sender on error.
+
+ -- Borge Moe <borge.moe@met.no>  Wed, 23 Oct 2013 13:45:00 +0200
+
 kvalobs (2.7.3~rc9-1) lucid; urgency=low
 
   * kldecoder: Log more info when a observation is rejected.
