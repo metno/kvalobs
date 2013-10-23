@@ -341,7 +341,7 @@ execute(std::string &msg)
       return rejected( o.str(), "" );
    }
 
-   if( typeId<=0 || typeId == INT_MAX) {
+   if( typeId<0 || typeId == INT_MAX) {
       o.str("");
       o << "Format error in type!"
             << "stationid: " << stationid << ".";
