@@ -90,7 +90,7 @@ decodeData( KlDataArray &da,
 	}
 
 	if( dtmp.size() < 2 ) {
-		msg = "Invalid dataline: no parameter data in the line. Line: '"+sdata+"'.";
+		msg += "\nInvalid dataline: no parameter data in the line. Line: '"+sdata+"'.";
 		return false;
 	}
 	//Remember first element is the obstime
@@ -99,7 +99,7 @@ decodeData( KlDataArray &da,
 		ost << "decodeData: expected # data elements: " << daSize << endl
 				<< "Found in datastring #: " << dtmp.size() << " line: " << line;
 		IDLOGERROR( logid, ost.str());
-		msg=ost.str();
+		msg += "\n" + ost.str();
 		return false;
 	}
 	it=dtmp.begin();
@@ -109,7 +109,7 @@ decodeData( KlDataArray &da,
 	if( obstime.is_special() ) {
 		ost.str("");
 		ost << "Invalid obstime '" << *it << "'. Line: " << line;
-		msg = ost.str();
+		msg += "\n" + ost.str();
 		return false;
 	}
 
@@ -144,7 +144,7 @@ decodeData( KlDataArray &da,
 				ost.str("");
 				ost << "Invalid format: missing ')' in data ["+buf+"]"
 						<< " at index: " << index << " line: " << line;
-				msg=ost.str();
+				msg += "\n" + ost.str();
 				IDLOGERROR(logid,"decodeData: " << ost.str());
 				return false;
 			}
@@ -161,7 +161,7 @@ decodeData( KlDataArray &da,
 				ost.str("");
 				ost << "Invalid format: wrong number of values in" <<
 						" optional part of data element: " << index << " line: " << line;
-				msg=ost.str();
+				msg += "\n" + ost.str();
 				IDLOGERROR( logid, "decodeData: " << ost.str());
 				return false;
 			}
@@ -175,9 +175,8 @@ decodeData( KlDataArray &da,
 				ost << "Expected 16 character in <controlinfo>: "
 						<< "found " << buf.length() << " characters at index: "
 						<< index << " line: " << line;
-				msg=ost.str();
+				msg += "\n" + ost.str();
 				warnings = true;
-				IDLOGWARN(logid,"decodeData: " << ost.str());
 			}
 
 			if(cs.size()==2){
@@ -190,9 +189,8 @@ decodeData( KlDataArray &da,
 					ost << "Expected 16 character in <useinfo>: "
 							<< "found " << buf.length() << " characters at index: "
 							<< index << " line: " << line;
-					msg=ost.str();
+					msg += "\n" + ost.str();
 					warnings = true;
-					IDLOGWARN( logid, "decodeData: " << ost.str());
 				}
 			}
 		}
@@ -338,7 +336,7 @@ decodeHeader( const std::string &header,
 			miutil::CommaString cs(param);
 
 			if(cs.size() > 2 ){
-				message="Invalid format: wrong number of parameteres in optional part of"+
+				message += "\nInvalid format: wrong number of parameteres in optional part of"+
 						string(" param  [") +name +"]";
 				return false;
 			}
@@ -357,7 +355,7 @@ decodeHeader( const std::string &header,
 			name.erase(0, 1);
 
 			if(name.empty()){
-				message="Invalid parameter format: paramname missing!";
+				message += "\nInvalid parameter format: paramname missing!";
 				return false;
 			}
 		}else{
@@ -367,7 +365,7 @@ decodeHeader( const std::string &header,
 		it=params.find(Param( name, -1));
 
 		if(it==params.end()){
-		    ost << "Unknown parameter name '" << name << "'\n";
+		    ost << "Unknown parameter name '" << name << "'.";
 		    warnings = true;
 			paramsList.push_back(ParamDef(name, -1, sensor, level, isCode));
 		}else if( decodeutility::isTextParam( it->id() ) && (sensor>0 || level>0 ) ) {
@@ -378,7 +376,6 @@ decodeHeader( const std::string &header,
 		        ost << " Invalid sensor value: '"<<sensor<<".";
 		    if( level > 0 )
 		        ost << " Invalid level value: '"<< level <<".";
-		    ost << "\n";
 		    paramsList.push_back(ParamDef(name, -2, sensor, level, isCode));
 		}else {
 			paramsList.push_back(ParamDef(name, it->id(), sensor, level, isCode));
@@ -388,8 +385,7 @@ decodeHeader( const std::string &header,
 	string tmp=ost.str();
 
 	if( ! tmp.empty() ) {
-	    message += tmp;
-	    IDLOGWARN( logid, tmp );
+	    message += "\n" + tmp;
 	}
 
 	return true;
@@ -497,9 +493,6 @@ decodeData( const std::string &obsData,
 
 	if( params.size() < 1 ) {
 		messages = "No parameters in header!";
-		LOGINFO( "Decoder: '" << decoderName << "'. No parameters in header! Stationid: "
-				<< stationid << " typeid: " << typeId );
-		IDLOGINFO( logid, "No parameters in header!" << endl << "Header: " << tmp );
 		return 0;
 	}
 
@@ -561,7 +554,7 @@ decodeData( const std::string &obsData,
 	                  val = decodeutility::HL( val );
 	               }else{
 	                  warnings=true;
-	                  messages += "Unsupported as code value: " + params[index].name() +"\n";
+	                  messages += "\nUnsupported as code value: " + params[index].name() +"\n";
 	                  continue;
 	               }
 	            }
@@ -615,12 +608,17 @@ decodeData( const std::string &obsData,
 	if( ! invalidTextParams.empty() )
 	    ost << endl << "Invalid text parameters: " << invalidTextParams;
 
-	IDLOGINFO( logid, ost.str() );
+	if( messages.size() > 0 && messages[0]=='\n')
+	    messages.erase(0, 1 );
 
 	if( warnings ) {
-	    IDLOGWARN( logid, "Observation with decoding warnings." << endl << ost.str()
-	              << endl << "Warnings: " << endl << messages
-	              << endl << "Observation data: " << endl << obsData );
+	    ostringstream otmp;
+	    otmp << "Observation with decoding warnings." << endl << ost.str()
+             << endl << "Warnings: " << endl << messages
+             << endl << "Observation data: " << endl << obsData;
+	    messages = otmp.str();
+	} else {
+	    messages = ost.str();
 	}
 
 	return kvData;

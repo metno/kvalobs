@@ -394,7 +394,11 @@ execute(std::string &msg)
 
    if( datadecoder.warnings ) {
        IDLOGWARN( logid, datadecoder.messages );
+   } else {
+       IDLOGINFO( logid, datadecoder.messages );
    }
+
+   msg = datadecoder.messages;
    return insertDataInDb( kvData, stationid, typeId, logid, msg );
 }
 
