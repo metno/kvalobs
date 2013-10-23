@@ -55,6 +55,7 @@ decodeutilitytest_CPPFLAGS = $(libkvalobs_decodeutility_la_CPPFLAGS) $(gtest_CFL
 decodeutilitytest_LDADD = \
 	libkvalobs_decodeutility.la \
 	$(libkvalobs_decodeutility_la_LIBADD) \
+	$(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la \
 	$(putools_LIBS)\
 	$(BOOST_DATE_TIME_LIB) \
 	$(gtest_LIBS)

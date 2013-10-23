@@ -18,7 +18,8 @@ testdecoder_la_LIBADD = \
                  $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs_decoderbase.la \
 		         $(top_builddir)/src/lib/milog/libkvalobs_milog.la \
 		         $(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
-                 $(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la
+                 $(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la \
+                 $(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la 
                  
 #The -rpath /nowhere is a hack to force check_LTLIBRARIES to create a shared library
 testdecoder_la_LDFLAGS = -module -rpath /nowhere -version-info @KVALOBSLIBS_SO_VERSION@
@@ -50,6 +51,7 @@ testDecoderBase_LDADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs_d
                 $(top_builddir)/src/lib/milog/libkvalobs_milog.la \
                 $(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
                 $(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
+                $(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la \
                 $(putools_LIBS) $(libxml2_LIBS) \
 	 	        $(BOOST_THREAD_LIB) $(BOOST_REGEX_LIB) $(gtest_LIBS) \
 	 	        $(BOOST_DATE_TIME_LIB) \
