@@ -185,24 +185,25 @@ KlDecoder::
 rejected( const std::string &msg, const std::string &logid, std::string &msgToSender  )
 {
    ostringstream ost;
-   ostringstream myObs;
    bool saved=true;
 
    boost::posix_time::ptime tbtime( boost::posix_time::microsec_clock::universal_time());
 
    ost << "REJECTED: Decoder: " << name() << endl
-         <<"message: " << msg  << endl
-         <<"obsType: " << obsType << endl
-         <<"obs: [" << obs << "]";
+       << "message: " << msg  << endl
+       << "obsType: " << obsType << endl
+       << "obs: [" << obs << "]";
 
-   myObs << obsType << "\n" << obs;
+   ostringstream myObs;
 
-   msgToSender += myObs.str();
+   myObs << obsType << endl << obs;
+   msgToSender += ost.str();
 
    kvalobs::kvRejectdecode rejected( myObs.str(),
                                      tbtime,
                                      name(),
                                      msg );
+
 
    if( !putRejectdecodeInDb( rejected ) ) {
       saved = false;
@@ -304,17 +305,18 @@ insertDataInDb( kvalobs::serialize::KvalobsData *theData,
 	if( observations.size() > 0 ) {
 	    for( map<ptime,int>::const_iterator it = observations.begin();
 	         it != observations.end(); ++it ) {
-	        ost << "  # observations: " << to_kvalobs_string( it->first ) <<": " << it->second << endl;
+	        ost << "\n# observations " << to_kvalobs_string( it->first ) <<": " << it->second ;
 	        totalObservations += it->second;
 	    }
 	}
 
 	ostringstream msgOst;
-	IDLOGINFO(logid, "Observations saved to DB: " << totalObservations << " stationid: " << stationid << " typeid: " << typeId << endl << ost.str() );
-	LOGINFO(         "Observations saved to DB: " << totalObservations << " stationid: " << stationid << " typeid: " << typeId  );
+	IDLOGINFO(logid, "Total number of observations saved to DB: " << totalObservations << " stationid '" << stationid << "' typeid '" << typeId << "'" << endl << ost.str() );
+	LOGINFO("Total number of observations saved to DB: " << totalObservations << " stationid '" << stationid << "' typeid '" << typeId << "'" );
 
-	msgOst << "Observations saved to DB: " << totalObservations << " stationid: " << stationid << " typeid: " << typeId << endl << ost.str();
-	msgToSender += msgOst.str();
+	msgOst << "Total number of observations saved to DB: " << totalObservations << " for stationid '" << stationid << "', typeid '" << typeId << "'"
+	       << endl << ost.str();
+	msgToSender += "\n" + msgOst.str();
 	return Ok;
 }
 
