@@ -182,7 +182,7 @@ name() const
 kvalobs::decoder::DecoderBase::DecodeResult
 kvalobs::decoder::kldecoder::
 KlDecoder::
-rejected( const std::string &msg, const std::string &logid )
+rejected( const std::string &msg, const std::string &logid, std::string &msgToSender  )
 {
    ostringstream ost;
    ostringstream myObs;
@@ -196,6 +196,8 @@ rejected( const std::string &msg, const std::string &logid )
          <<"obs: [" << obs << "]";
 
    myObs << obsType << "\n" << obs;
+
+   msgToSender += myObs.str();
 
    kvalobs::kvRejectdecode rejected( myObs.str(),
                                      tbtime,
@@ -224,7 +226,8 @@ kvalobs::decoder::kldecoder::
 KlDecoder::
 insertDataInDb( kvalobs::serialize::KvalobsData *theData,
 	         int stationid, int typeId,
-	         const std::string &logid )
+	         const std::string &logid,
+	         std::string &msgToSender )
 {
 	using namespace boost::posix_time;
 	KvDataContainer::DataByObstime data;
@@ -266,8 +269,12 @@ insertDataInDb( kvalobs::serialize::KvalobsData *theData,
 
 		if( ! addDataToDb( to_miTime( it->first ), stationid, typeId, it->second, td,
 				           priority, logid, getOnlyInsertOrUpdate() ) ) {
-			LOGERROR( "DBERROR: stationid: " << stationid << " typeid: " << typeId << " obstime: " << it->first );
-			IDLOGERROR( logid, "DBERROR: stationid: " << stationid << " typeid: " << typeId << " obstime: " << it->first );
+		    ostringstream ost;
+
+		    ost << "DBERROR: stationid: " << stationid << " typeid: " << typeId << " obstime: " << it->first;
+			LOGERROR( ost.str() );
+			IDLOGERROR( logid, ost.str() );
+			msgToSender += "\n" + ost.str();
 			return NotSaved;
 		}
 
@@ -281,8 +288,11 @@ insertDataInDb( kvalobs::serialize::KvalobsData *theData,
 			 it != textData.end(); ++it  ) {
 			if( ! addDataToDb( to_miTime( it->first ), stationid, typeId, dl, it->second,
 					           priority, logid, getOnlyInsertOrUpdate() ) ) {
-				LOGERROR( "DBERROR: stationid: " << stationid << " typeid: " << typeId << " obstime: " << it->first );
-				IDLOGERROR( logid, "DBERROR: stationid: " << stationid << " typeid: " << typeId << " obstime: " << it->first );
+			    ostringstream ost;
+			    ost << "DBERROR: TextData: stationid: " << stationid << " typeid: " << typeId << " obstime: " << it->first;
+				LOGERROR( ost.str() );
+				IDLOGERROR( logid, ost.str() );
+				msgToSender += "\n" + ost.str();
 				return NotSaved;
 			}
 			observations[it->first] += it->second.size();
@@ -299,8 +309,12 @@ insertDataInDb( kvalobs::serialize::KvalobsData *theData,
 	    }
 	}
 
+	ostringstream msgOst;
 	IDLOGINFO(logid, "Observations saved to DB: " << totalObservations << " stationid: " << stationid << " typeid: " << typeId << endl << ost.str() );
-	LOGINFO("Observations saved to DB: " << totalObservations << " stationid: " << stationid << " typeid: " << typeId  );
+	LOGINFO(         "Observations saved to DB: " << totalObservations << " stationid: " << stationid << " typeid: " << typeId  );
+
+	msgOst << "Observations saved to DB: " << totalObservations << " stationid: " << stationid << " typeid: " << typeId << endl << ost.str();
+	msgToSender += msgOst.str();
 	return Ok;
 }
 
@@ -338,7 +352,7 @@ execute(std::string &msg)
       else
          o << "<NA>";
 
-      return rejected( o.str(), "" );
+      return rejected( o.str(), "", msg );
    }
 
    if( typeId<0 || typeId == INT_MAX) {
@@ -346,7 +360,7 @@ execute(std::string &msg)
       o << "Format error in type!"
             << "stationid: " << stationid << ".";
 
-      return rejected( o.str(), "");
+      return rejected( o.str(), "", msg );
    }
 
    IdlogHelper idLog( stationid, typeId, this );
@@ -376,12 +390,12 @@ execute(std::string &msg)
    kvData = datadecoder.decodeData( obs, stationid,  typeId, receivedTime, logid, name() );
 
    if( ! kvData )
-	   return rejected( datadecoder.messages, logid );
+	   return rejected( datadecoder.messages, logid, msg );
 
    if( datadecoder.warnings ) {
        IDLOGWARN( logid, datadecoder.messages );
    }
-   return insertDataInDb( kvData, stationid, typeId, logid );
+   return insertDataInDb( kvData, stationid, typeId, logid, msg );
 }
 
 

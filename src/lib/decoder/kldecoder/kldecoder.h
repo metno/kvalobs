@@ -96,7 +96,7 @@ protected:
    void decodeObsType();
 
    kvalobs::decoder::DecoderBase::DecodeResult
-   rejected( const std::string &msg, const std::string &logid );
+   rejected( const std::string &msg, const std::string &logid, std::string &msgToSender );
 
    bits::DataDecoder datadecoder;
    std::string logid;
@@ -122,7 +122,8 @@ public:
    long getTypeId(std::string &msg)const;
    DecodeResult insertDataInDb( kvalobs::serialize::KvalobsData *theData,
 		                     int stationid, int typeId,
-		                     const std::string &logid );
+		                     const std::string &logid,
+		                     std::string &msgToSender );
 
    virtual std::string name()const;
 
