@@ -201,7 +201,7 @@ int main(int argc, char** argv)
     	case OK:
     		cout << "OK";
     		if( verbose )
-    	    	cout << ": " << res->message;
+    	    	cout << endl << res->message;
     		cout << endl;
     		ok=true;
     		break;
