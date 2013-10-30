@@ -33,6 +33,7 @@
 #include <sstream>
 #include <stdio.h>
 #include <sstream>
+#include <boost/lexical_cast.hpp>
 #include <miconfparser/trimstr.h>
 #include <miconfparser/valelement.h>
 
@@ -90,11 +91,16 @@ valAsInt()const
     sscanf(val_.c_str(), "%lf", &d);
     d+=0.5;
     l=static_cast<long>(floor(d));
-  }else
-    throw InvalidTypeEx();
+  }else {
+    try {
+        l = boost::lexical_cast<long>( val_ );
+    }catch( const boost::bad_lexical_cast &ex ) {
+        throw InvalidTypeEx();
+    }
+  }
   
   return l;
-  
+
 }
 
 double
@@ -102,16 +108,21 @@ miutil::conf::ValElement::
 valAsFloat()const
 {
   double d=0;
-  
+
   if(valType_==INT){
     long l=0;
     sscanf(val_.c_str(), "%ld", &l);
     d=static_cast<double>(l);
   }else if(valType_==FLOAT){
     sscanf(val_.c_str(), "%lf", &d);
-  }else
-    throw InvalidTypeEx();
-  
+  }else{
+      try {
+          d = boost::lexical_cast<double>( val_ );
+      }catch( const boost::bad_lexical_cast &ex ) {
+          throw InvalidTypeEx();
+      }
+  }
+
   return d;
 }
 
