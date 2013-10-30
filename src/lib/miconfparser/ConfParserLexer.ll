@@ -34,6 +34,7 @@ ID     [_a-zA-Z]+[a-zA-Z0-9_]*
 STRING [^"]*
 FILENAME [^"]*
 FLOAT  [-+]?{DIGIT}+\.{DIGIT}*
+INT  [-+]?{DIGIT}+
    
 %%
 [ \r\t]+      /*Eat whitespace*/
@@ -55,7 +56,8 @@ FLOAT  [-+]?{DIGIT}+\.{DIGIT}*
                     theParser->curIst->lineno++;
                     BEGIN(INITIAL);
                   } 
-{DIGIT}+    { theParser->intToken(yyConfParsertext);}
+   /* {DIGIT}+    { theParser->intToken(yyConfParsertext);} */
+{INT}    { theParser->intToken(yyConfParsertext);}
               
 
 {FLOAT}     { theParser->floatToken(yyConfParsertext); }
