@@ -1,3 +1,11 @@
+kvalobs (2.7.3~rc12-1) lucid; urgency=low
+
+  * miconfparser: Allow integer to be negative.
+  * ComObsDecoder: Typeid=302. Do NOT use SD to correct SA=-1.
+
+ -- Borge Moe <borge.moe@met.no>  Wed, 30 Oct 2013 13:00:00 +0100
+
+
 kvalobs (2.7.3~rc11-1) lucid; urgency=low
 
   * kldecoder: Fix error message to the data sender on error.
