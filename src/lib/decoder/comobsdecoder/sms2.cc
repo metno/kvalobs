@@ -703,9 +703,9 @@ doKvPrecipitation(kvalobs::decodeutil::DecodedDataElem &data,
    if( (SA.empty() || SA=="0") && hasSa )
       SA="-1";
 
-   if(iSD==1 || iSD==2){
-      SA="-1"; //Flekkvis sne
-   }
+//   if(iSD==1 || iSD==2){
+//      SA="-1"; //Flekkvis sne
+//   }
 
    if(!SA.empty())
       data.addData("SA", SA, useInfo);
