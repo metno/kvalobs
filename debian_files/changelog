@@ -1,3 +1,10 @@
+kvalobs (2.7.3~rc13-1) lucid; urgency=low
+
+  * kldata: Reject data with inconsitent header.
+  * kvdataclt: Make the error messages slightly more descriptive.
+
+ -- Borge Moe <borge.moe@met.no>  Fri, 01 Nov 2013 08:00:00 +0100
+
 kvalobs (2.7.3~rc12-1) lucid; urgency=low
 
   * miconfparser: Allow integer to be negative.
