@@ -276,119 +276,145 @@ splitString( const std::string &header,
 	return true;
 }
 
+void
+DataDecoder::
+updateParamList( std::vector<ParamDef> &paramsList, const ParamDef &param )
+{
+    int i=0;
+    for( std::vector<ParamDef>::iterator it = paramsList.begin();
+         it != paramsList.end(); ++it, ++i ) {
+        if( *it == param ) {
+            ostringstream  ost;
+            ost << "More than one parameter of '" << param.name() << "("<<param.sensor()
+                << "," << param.level()<< ")', first occurance at index "<<i <<".";
+            throw std::logic_error( ost.str() );
+        }
+    }
+
+    paramsList.push_back( param );
+}
+
+
 bool
 DataDecoder::
 decodeHeader( const std::string &header,
 		std::vector<ParamDef> &paramsList,
 		std::string &message )
 {
-	string::size_type i;
-	string::size_type iEnd=0;
-	string            param;
-	string            name;
-	string            buf;
-	int               sensor;
-	int               level;
-	bool              isCode;
-	IParamList        it;
-	list<string>      paramStrings;
-	ostringstream    ost;
+    string::size_type i;
+    string::size_type iEnd=0;
+    string            param;
+    string            name;
+    string            buf;
+    int               sensor;
+    int               level;
+    bool              isCode;
+    IParamList        it;
+    list<string>      paramStrings;
+    ostringstream    ost;
+    bool ret = true;
+    paramsList.clear();
 
-	paramsList.clear();
+    if(!splitParams( header, paramStrings, message) )
+        return false;
 
-	if(!splitParams( header, paramStrings, message) )
-		return false;
+    try {
+        list<string>::iterator itParamsStrings=paramStrings.begin();
 
-	list<string>::iterator itParamsStrings=paramStrings.begin();
+        ost << "ParamStrings: " << endl;
 
-	ost << "ParamStrings: " << endl;
+        for(;itParamsStrings!=paramStrings.end(); itParamsStrings++)
+            ost << " [" << *itParamsStrings << "]";
 
-	for(;itParamsStrings!=paramStrings.end(); itParamsStrings++)
-		ost << " [" << *itParamsStrings << "]";
+        IDLOGDEBUG(logid, ost.str());
+        ost.str("");
 
-	IDLOGDEBUG(logid, ost.str());
-	ost.str("");
+        itParamsStrings=paramStrings.begin();
 
-	itParamsStrings=paramStrings.begin();
+        for(;itParamsStrings!=paramStrings.end(); itParamsStrings++){
+            param=*itParamsStrings;
+            sensor=0;
+            level=0;
 
-	for(;itParamsStrings!=paramStrings.end(); itParamsStrings++){
-		param=*itParamsStrings;
-		sensor=0;
-		level=0;
+            i=param.find_first_of("(", 0);
 
-		i=param.find_first_of("(", 0);
+            if(i==string::npos){
+                name=param;
+            }else{
+                name=param.substr(0, i);
+                miutil::trimstr(name);
+                iEnd=param.find_first_of(")", i);
 
-		if(i==string::npos){
-			name=param;
-		}else{
-			name=param.substr(0, i);
-			miutil::trimstr(name);
-			iEnd=param.find_first_of(")", i);
+                if(iEnd==string::npos){ //paranoia
+                    message="Invalid format: missing ')' in param [" +name +"]";
+                    return false;
+                }
 
-			if(iEnd==string::npos){ //paranoia
-				message="Invalid format: missing ')' in param [" +name +"]";
-				return false;
-			}
+                i++;
+                param=param.substr(i, iEnd-i);
 
-			i++;
-			param=param.substr(i, iEnd-i);
+                miutil::CommaString cs(param);
 
-			miutil::CommaString cs(param);
+                if(cs.size() > 2 ){
+                    message += "\nInvalid format: wrong number of parameteres in optional part of"+
+                            string(" param  [") +name +"]";
+                    return false;
+                }
 
-			if(cs.size() > 2 ){
-				message += "\nInvalid format: wrong number of parameteres in optional part of"+
-						string(" param  [") +name +"]";
-				return false;
-			}
+                cs.get(0, buf);
+                sensor=atoi(buf.c_str());
+                cs.get(1, buf);
+                level=atoi(buf.c_str());
+            }
 
-			cs.get(0, buf);
-			sensor=atoi(buf.c_str());
-			cs.get(1, buf);
-			level=atoi(buf.c_str());
-		}
+            if(name.empty())
+                return false;
 
-		if(name.empty())
-			return false;
+            if(name[0]=='_'){
+                isCode=true;
+                name.erase(0, 1);
 
-		if(name[0]=='_'){
-			isCode=true;
-			name.erase(0, 1);
+                if(name.empty()){
+                    message += "\nInvalid parameter format: paramname missing!";
+                    return false;
+                }
+            }else{
+                isCode=false;
+            }
 
-			if(name.empty()){
-				message += "\nInvalid parameter format: paramname missing!";
-				return false;
-			}
-		}else{
-			isCode=false;
-		}
+            it=params.find(Param( name, -1));
 
-		it=params.find(Param( name, -1));
+            if(it==params.end()){
+                ost << "Unknown parameter name '" << name << "'.";
+                warnings = true;
+                updateParamList( paramsList, ParamDef(name, -1, sensor, level, isCode) );
+            }else if( decodeutility::isTextParam( it->id() ) && (sensor>0 || level>0 ) ) {
+                warnings = true;
+                ost << "\nText parameter: name '" << name << "'. Level and/or sensor values must be 0.";
+                if( sensor > 0 )
+                    ost << " Invalid sensor value: '"<<sensor<<".";
+                if( level > 0 )
+                    ost << " Invalid level value: '"<< level <<".";
+                updateParamList( paramsList, ParamDef(name, -2, sensor, level, isCode) );
+            }else {
+                updateParamList( paramsList, ParamDef(name, it->id(), sensor, level, isCode) );
+            }
+        }
+    }
+    catch( const std::exception &ex ){
+        ret = false;
+        ost << "\n" << ex.what();
+    }
 
-		if(it==params.end()){
-		    ost << "Unknown parameter name '" << name << "'.";
-		    warnings = true;
-			paramsList.push_back(ParamDef(name, -1, sensor, level, isCode));
-		}else if( decodeutility::isTextParam( it->id() ) && (sensor>0 || level>0 ) ) {
-		    ostringstream ost;
-		    warnings = true;
-		    ost << "Text parameter: name '" << name << "'. Level and/or sensor values must be 0.";
-		    if( sensor > 0 )
-		        ost << " Invalid sensor value: '"<<sensor<<".";
-		    if( level > 0 )
-		        ost << " Invalid level value: '"<< level <<".";
-		    paramsList.push_back(ParamDef(name, -2, sensor, level, isCode));
-		}else {
-			paramsList.push_back(ParamDef(name, it->id(), sensor, level, isCode));
-		}
-	}
+    string tmp=ost.str();
 
-	string tmp=ost.str();
+    if( ! tmp.empty() ) {
+        if( tmp[0] == '\n')
+            tmp.erase( 0, 1 );
+        message += "\n" + tmp;
+    }
 
-	if( ! tmp.empty() ) {
-	    message += "\n" + tmp;
-	}
-
-	return true;
+    return ret;
 }
 
 int

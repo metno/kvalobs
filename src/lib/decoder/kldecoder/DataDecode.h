@@ -91,6 +91,8 @@ struct DataDecoder {
 	                  int maxNumberOfOtionalElements,
 	                  std::string &msg)const;
 
+	///throws logical_error if duplicate params is defined.
+	void updateParamList( std::vector<ParamDef> &paramsList, const ParamDef &param );
 	bool decodeHeader( const std::string &header,
 	                   std::vector<ParamDef> &params,
 	                   std::string &message);
