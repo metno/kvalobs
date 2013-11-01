@@ -215,6 +215,28 @@ protected:
    }
 };
 
+TEST_F( KlDecoderTest, DuplicatedParamsTest )
+{
+    KvTypeList types;
+    vector<ParamDef> definedParams;
+    list<string> strParams;
+    string message;
+    list<string> expectedStrParams;
+    string header="TAN,TAX,TA,TJM(0,10),TJM(0,20),TA";
+
+    types.push_back(kvTypes(502,"",60, 60,"I","h","For test"));
+    bits::DataDecoder decoder( paramList, typesList );
+
+    ASSERT_TRUE( decoder.splitParams( header, strParams, message) ) << "Cant split params '" << header << "'.";
+
+    ba::push_back( expectedStrParams )("TAN")("TAX")("TA")("TJM(0,10)")("TJM(0,20)")
+            ("TA");
+
+    ASSERT_TRUE( equal( strParams.begin(), strParams.end(), expectedStrParams.begin()  ) );
+
+    ASSERT_FALSE( decoder.decodeHeader( header, definedParams, message ) ) << message;
+}
+
 TEST_F( KlDecoderTest, DataDecodeTest )
 {
 	string error;
