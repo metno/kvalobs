@@ -222,10 +222,14 @@ int main(int argc, char** argv)
     	orb->destroy();
   	}
   	catch(CORBA::COMM_FAILURE& ex) {
-    	cerr << "Caught system exception COMM_FAILURE -- unable to contact the "
-      	     << "object." << endl;
+    	cerr << "Caught system exception COMM_FAILURE -- unable to contact <kvDataInputd> at '"
+                 << kvserver << "'." << endl;
   	}
-  	catch(CORBA::SystemException&) {
+  	catch(CORBA::TRANSIENT & ex) {
+  	        cerr << "Caught system exception TRANSIENT -- unable to contact <kvDataInputd> at '"
+  	             << kvserver << "'." << endl;
+  	}
+  	catch(CORBA::SystemException& ex) {
     	cerr << "Caught a CORBA::SystemException." << endl;
   	}
   	catch(CORBA::Exception&) {
