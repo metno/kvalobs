@@ -1,3 +1,15 @@
+kvalobs (2.7.3~rc14-1) lucid; urgency=low
+
+  * #1369: Use 'scalar' from stinfosys to decide if the data is for
+    the 'text_data' or 'data' table. 
+  * New script kv_get_stinfosys_params to get param information from
+    stinfosys and put them in the file /etc/kvalobs/stinfosys_params.csv.
+  * kvstart updated to use kv_get_stinfosys_params.
+  * #1368: Workaround fro "thread safty" bug in dnmi::db::DriverManager.
+    Affected programs is kvServiced and kvManagerd. 
+
+ -- Borge Moe <borge.moe@met.no>  Thu, 14 Nov 2013 10:00:00 +0100
+
 kvalobs (2.7.3~rc13-1) lucid; urgency=low
 
   * kldata: Reject data with inconsitent header.
