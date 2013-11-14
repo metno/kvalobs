@@ -1,3 +1,11 @@
+kvalobs (2.7.3~rc14-2) lucid; urgency=low
+
+  * Update the package with the the files /etc/kvalobs/stinfosys.conf and
+    /etc/kvalobs/stinfosys_params.csv.default.
+
+ -- Borge Moe <borge.moe@met.no>  Thu, 14 Nov 2013 16:15:00 +0100
+
+
 kvalobs (2.7.3~rc14-1) lucid; urgency=low
 
   * #1369: Use 'scalar' from stinfosys to decide if the data is for
