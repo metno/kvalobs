@@ -370,7 +370,12 @@ dnmi::db::Connection*
 ManagerApp::
 getNewDbConnection()
 {
-  Connection *con;
+    //Due to a 'race condition' error i dbMgr.connect(  ... )
+    //that can cause a severe error we must use a protect
+    //connect and releaseConnection with a mutex.
+    boost::mutex::scoped_lock l(mutex);
+    Connection *con;
+
   
   con=dbMgr.connect(dbDriverId, dbConnect);
 
@@ -389,7 +394,11 @@ void
 ManagerApp::
 releaseDbConnection(dnmi::db::Connection *con)
 {
-  dbMgr.releaseConnection(con);
+    //Due to a 'race condition' error i dbMgr.connect(  ... )
+    //that can cause a severe error we must use a protect
+    //connect and releaseConnection with a mutex.
+    boost::mutex::scoped_lock l(mutex);
+    dbMgr.releaseConnection(con);
 }
 
 

@@ -153,6 +153,9 @@ dnmi::db::Connection*
 ServiceApp::
 getNewDbConnection()
 {
+    //ERROR: 13.11.2013 discovered a bug in dnmi::db::DriverManager
+    //that implies that it is NOT thread safe.
+    boost::mutex::scoped_lock l(mutex);
   Connection *con;
   
   con=dbMgr.connect(dbDriverId, dbConnect);
@@ -173,7 +176,10 @@ void
 ServiceApp::
 releaseDbConnection(dnmi::db::Connection *con)
 {
-  dbMgr.releaseConnection(con);
+    //ERROR: 13.11.2013 discovered a bug in dnmi::db::DriverManager
+    //that implies that it is NOT thread safe.
+    boost::mutex::scoped_lock l(mutex);
+    dbMgr.releaseConnection(con);
 }
 
 
