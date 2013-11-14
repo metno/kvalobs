@@ -199,6 +199,10 @@ if [ $debug = true ]; then
 fi
 
 if [ "$crcOldFile" = "$crcNewFile" ]; then
+    #Use touch to update the modification time så 
+    #we can use this time to check when we last 
+    #checked stinfosys for parameter information.
+    touch $OUTFILE
     log "No change!"
 else 
     mv $TMP_OUTFILE $OUTFILE
