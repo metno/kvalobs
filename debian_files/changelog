@@ -1,4 +1,4 @@
-kvalobs (2.7.3~rc14-2) lucid; urgency=low
+kvalobs (2.7.3~rc15-1) lucid; urgency=low
 
   * Update the package with the the files /etc/kvalobs/stinfosys.conf and
     /etc/kvalobs/stinfosys_params.csv.default.
