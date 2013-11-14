@@ -44,7 +44,7 @@
 #include <puTools/miTime.h>
 #include <miutil/timeconvert.h>
 #include <dbdrivers/dummysqldb.h>
-#include "ReadParamsFromFile.h"
+//#include "ReadParamsFromFile.h"
 #include "ReadTypesFromFile.h"
 #include <gtest/gtest.h>
 
@@ -85,7 +85,7 @@ protected:
       }
 
       if( paramList.empty() ) {
-         ASSERT_TRUE( ReadParamsFromFile(testdir+"/kvparams.csv", paramList ) ) <<
+         ASSERT_TRUE( readParamsFromFile(testdir+"/kvparams.csv", paramList ) ) <<
          "Cant read params from the file <kvparams.csv>";
       }
 

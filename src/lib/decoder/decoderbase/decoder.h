@@ -516,7 +516,8 @@ namespace kvalobs{
        * \param paramid The parameter to test.
        * \return true if \em paramid is a text param and false if not.
        */
-      static bool isTextParam(int paramid);
+      //static bool isTextParam(int paramid);
+       bool isTextParam(int paramid);
 
       /**
        * \brief the name of the decoder.

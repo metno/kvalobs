@@ -33,9 +33,10 @@ TESTS = $(check_PROGRAMS)
  
 testDecoderBase_SOURCES=\
 	testDecoderBase.cc \
-	ReadParamsFromFile.h ReadParamsFromFile.cc \
 	ReadTypesFromFile.h ReadTypesFromFile.cc \
 	ReadDataFromFile.h ReadDataFromFile.cc
+	
+#ReadParamsFromFile.h ReadParamsFromFile.cc 
 
 testDecoderBase_CPPFLAGS = $(AM_CPPFLAGS) $(libxmlpp_CFLAGS) $(synop_la_CPPFLAGS) $(gtest_CFLAGS) \
 					-DTESTDIR="\""$(top_srcdir)/src/lib/decoder/decoderbase/test"\"" \

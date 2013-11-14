@@ -58,24 +58,35 @@ TextParam textParams[]={
 
 namespace decodeutility {
 
+/*
 bool
 isTextParam( int paramid )
 {
 	return paramid >= 1000;
 }
+*/
 
 bool
 isTextParam( const std::string &paramName, const ParamList &params )
 {
-	ParamList::const_iterator it = params.find( Param( paramName, -1 ) );
+    Param param;
 
-	if( it == params.end() ) {
-		it = params.find( Param( paramName , -1 ) );
-		if( it == params.end() )
-			return false;
-	}
+    if( ! findParamInList(params, paramName, param ) )
+        return false;
 
-	return isTextParam( it->id() );
+	return ! param.isScalar();
+}
+
+bool
+isTextParam( int paramid, const ParamList &params )
+{
+    for( ParamList::const_iterator it = params.begin();
+         it != params.end(); ++it ) {
+        if( it->id() == paramid )
+            return ! it->isScalar();
+    }
+
+    return false;
 }
 
 #if 0

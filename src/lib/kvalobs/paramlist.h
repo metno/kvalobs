@@ -42,26 +42,36 @@
  */
 
 /**
- * \brief used as a cache element for an param cache. 
+ * \brief Param is used as a cache element for an param cache.
+ *
  */
 class Param
 {
+    ///The name the param is identified with in the param table in kvalobs
 	std::string kode_;
+
+	///The paramid the param is identified with in the param table in kvalobs
 	int id_;
+
+	/**
+	 * Tells if the data for this parameter is to be loaded into
+	 * the data table (isScalar=true) or the text_data table (isScalar=false).
+	 */
+	bool isScalar_;
 
 public:
 	Param() :
-			id_(-1)
+	    kode_(""), id_(-1), isScalar_(false)
 	{
 	}
 
 	Param(const Param &p) :
-			kode_(p.kode_), id_(p.id_)
+			kode_(p.kode_), id_(p.id_), isScalar_( p.isScalar_ )
 	{
 	}
 
-	Param(const std::string &kode, int id) :
-			kode_(kode), id_(id)
+	Param(const std::string &kode, int id, bool isScalar) :
+			kode_(kode), id_(id), isScalar_( isScalar )
 	{
 	}
 
@@ -72,21 +82,48 @@ public:
 
 		kode_ = p.kode_;
 		id_ = p.id_;
+		isScalar_ = p.isScalar_;
 		return *this;
 	}
 
+	/**
+	 * The parametere is a valid parameter definition if
+	 * the paramid >= 0.
+	 *
+	 * \return true if this is a valid parameter definition and false otherwise.
+	 */
 	bool valid() const
 	{
 		return (id_ >= 0);
 	}
 
+	/**
+	 * Return the paramid the parameter is has in kvalobs.
+	 * \return The paramid to the parameter.
+	 */
 	int id() const
 	{
 		return id_;
 	}
+
+	/**
+	 * Return the param name the parameter is known by in kvalobs.
+	 * \return The name of the parameter.
+	 */
 	std::string kode() const
 	{
 		return kode_;
+	}
+
+	/**
+	 * Tells if the data for this parameter is to be loaded into
+	 * the data table or the text_data table.
+	 *
+	 * @return true if the data is for the data table and false if the data
+	 * is for the text_data table.
+	 */
+	bool isScalar()const {
+	    return isScalar_;
 	}
 };
 
@@ -120,6 +157,38 @@ typedef std::set<Param, ParamPredicate>::const_iterator CIParamList;
  */
 std::string
 findParamIdInList(const ParamList &pl, int id);
+
+/**
+ * findParamInList, finds the Param definition where name is equal to paramName
+ * in the ParamList.
+ *
+ * \param pl the ParamList to search.
+ * \param paramName the name to search after in the ParamList, pl.
+ * \param[out] The param definition for the paramName, if defined in the param table.
+ * \return true if paramName is defined and false of not.
+ */
+bool
+findParamInList(const ParamList &pl, const std::string &paramName, Param &param );
+
+
+/**
+ * Reads the param definitions from a CSV file with the following format:
+ * paramid,name,scalar
+ *
+ * Lines that starts with a the character '#' (comment) is ignored.
+ *
+ * The file can be generated from stinfosys with the command:
+ * \copy (select paramid,name,scalar from param  order by paramid) to 'params.csv' delimiter as ',';
+ *
+ * \param filename The CSV file to read the parameters from.
+ * \param[out] paramList The list that the parameters is saved to.
+ * \return true if the method succeed to read the file and false otherwise.
+ */
+bool
+readParamsFromFile(const std::string &filename, ParamList &paramList);
+
+bool
+isParamListsEqual( const ParamList &oldList, const ParamList &newList );
 
 std::ostream&
 operator<<(std::ostream &os, const ParamList &p);

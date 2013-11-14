@@ -793,7 +793,7 @@ kvalobs::decoder::
 DecoderBase::
 isTextParam(int paramid)
 {
-	return decodeutility::isTextParam( paramid );
+	return decodeutility::isTextParam( paramid, paramList );
 }
 
 bool

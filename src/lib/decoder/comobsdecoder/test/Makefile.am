@@ -46,6 +46,7 @@ gtestsms2_SOURCES=gtestsms2.cc ReadParamsFromFile.cc \
 				../sms2.cc ../smsbase.cc  ../smsdata.cc
 
 gtestsms2_CPPFLAGS = $(AM_CPPFLAGS) $(libxmlpp_CFLAGS) $(synop_la_CPPFLAGS) $(gtest_CFLAGS) \
+					-DDECODERBASE_TESTDIR="\""$(top_srcdir)/src/lib/decoder/decoderbase/test"\"" \
 					-DTESTDIR="\""$(top_srcdir)/src/lib/decoder/comobsdecoder/test"\"" \
 					-DDBDIR="\""$(top_builddir)/src/lib/dbdrivers/.libs"\""
 gtestsms2_LDFLAGS =  -pthread -export-dynamic

@@ -32,6 +32,7 @@ KVBIN=`$KVCONFIG --bindir`
 KVPID=`$KVCONFIG --localstatedir`/run/kvalobs
 KVCONF=`$KVCONFIG --sysconfdir`/kvalobs
 LIBDIR=`$KVCONFIG --pkglibdir`
+LOGDIR=`$KVCONFIG --logdir`
 
 if [ ! -f "$LIBDIR/tool_funcs.sh" ]; then
 	echo "Cant load: $LIBDIR/tool_funcs.sh"
@@ -42,10 +43,12 @@ fi
 
 NODENAME=$(uname -n)
 
+is_master=false
 res=0
 has_ip_alias=`ipalias_status` || res=$? 
 case "$has_ip_alias" in
 	true) echo "This node '$NODENAME' is the current kvalobs master!"
+              is_master=true
 		  ;;
     test) echo "This node '$NODENAME' is an kvalobs test machine!"
           ;;
@@ -67,6 +70,21 @@ if [ "$USER" != "$KVUSER" ]; then
    echo "Only the '$KVUSER' user my start kvalobs."
    echo "You are logged in as user '$USER'"
    exit 1
+fi
+
+if [ $is_master = "true" -o -f "$KVCONF/stinfosys.conf"  ]; then
+   kv_get_stinfosys_params -n
+   if [ $? -ne 0 ]; then
+	echo "Failed to look up the 'parameter definitions' from stinfosys."
+	echo "Check the log '$LOGDIR/kv_get_stinfosys_params.log' for more information."
+   fi
+else 
+   echo "WARNING the configurationfile ${KVCONF}/stinfosys.conf" 
+   echo "is missing so kv_get_stinfosys_params cant be run to generate"
+   echo "the file $KVCONF/stinfosys_params.csv."
+   echo "This file is used by kvDataInputd to decide"
+   echo "if a parameter is for the 'data' or for the 'text_data' table."
+   echo "For more information run 'kv_get_stinfosys_params -h'."
 fi
 
 progname=

@@ -67,6 +67,7 @@ protected:
    DriverManager dbMgr;
    string testdir;
    string dbdir;
+   string decoderBaseTestDir;
    ParamList        paramList;
    std::list<kvalobs::kvTypes> typesList;
 
@@ -74,14 +75,15 @@ protected:
    virtual void SetUp() {
       testdir = TESTDIR;
       dbdir = DBDIR;
+      decoderBaseTestDir = DECODERBASE_TESTDIR;
 
       if( dbId.empty() )
          ASSERT_TRUE( dbMgr.loadDriver( dbdir+"/dummydriver.so", dbId ) )<<
          "Failed to load Db driver.";
 
       if( paramList.empty() )
-         ASSERT_TRUE( ReadParamsFromFile(testdir+"/param.csv", paramList ) ) <<
-         "Cant read params from the file <param.csv>";
+         ASSERT_TRUE( ReadParamsFromFile( decoderBaseTestDir+"/kvparams.csv", paramList ) ) <<
+         "Cant read params from the file <" << decoderBaseTestDir+"/kvparams.csv" << ">.";
    }
 
    ///Called after each test case.

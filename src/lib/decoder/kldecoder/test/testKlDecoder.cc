@@ -47,7 +47,7 @@
 #include <miutil/timeconvert.h>
 #include <miconfparser/miconfparser.h>
 #include <dbdrivers/dummysqldb.h>
-#include <decoderbase/test/ReadParamsFromFile.h>
+//#include <decoderbase/test/ReadParamsFromFile.h>
 #include <decoderbase/test/ReadTypesFromFile.h>
 #include <decoderbase/test/ReadDataFromFile.h>
 #include "../KvDataContainer.h"
@@ -129,7 +129,7 @@ protected:
       }
 
       if( paramList.empty() ) {
-         ASSERT_TRUE( ReadParamsFromFile( decoderBaseTestDir+"/kvparams.csv", paramList ) ) <<
+         ASSERT_TRUE( readParamsFromFile( decoderBaseTestDir+"/kvparams.csv", paramList ) ) <<
          "Cant read params from the file <kvparams.csv>";
       }
 

@@ -30,7 +30,6 @@ CLEANFILES = $(testdb)
 TESTS = $(check_PROGRAMS)
  
 testKlDecoder_SOURCES=testKlDecoder.cc\
-                      $(top_srcdir)/src/lib/decoder/decoderbase/test/ReadParamsFromFile.cc \
                       $(top_srcdir)/src/lib/decoder/decoderbase/test/ReadTypesFromFile.cc \
                       $(top_srcdir)/src/lib/decoder/decoderbase/test/ReadDataFromFile.cc \
                       $(top_srcdir)/src/lib/decoder/kldecoder/DataDecode.cc \

@@ -79,8 +79,7 @@ namespace {
     std::string dummy1;
     int         dummy2;
 
-    //DecoderBase::isTextParam(dummy1);
-    DecoderBase::isTextParam(dummy2);
+    //DecoderBase::isTextParam(dummy2);
   }
 
   void dummyFunc3(){

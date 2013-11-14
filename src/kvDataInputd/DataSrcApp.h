@@ -34,6 +34,7 @@
 #include <exception>
 #include <omniORB4/CORBA.h>
 #include <boost/thread/thread.hpp>
+#include <boost/date_time/posix_time/ptime.hpp>
 #include <string>
 #include <kvskel/managerInput.hh>
 #include <kvalobs/kvapp.h>
@@ -76,6 +77,7 @@ class DataSrcApp : public KvApp
   ParamList                            paramList;
   std::list<kvalobs::kvTypes>          typeList;
   bool                                 shutdown_;
+  boost::posix_time::ptime             nextParamCheckTime;
 
   /**
    * \brief registerParams reads parameter information from the table

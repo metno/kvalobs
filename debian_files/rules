@@ -64,3 +64,5 @@ override_dh_auto_install:
 	    mv init/kvalobs-init.conf $(DEBETC)/kvalobs && \
 	    mv pgrepctl/kvalobs.conf.template $(DEBETC)/pgrepctl
 	cp $(CURDIR)/etc/kv2norcom.conf.template $(DEBETC)/kvalobs
+	cp $(CURDIR)/etc/stinfosys.conf $(DEBETC)/kvalobs
+	cp $(CURDIR)/etc/stinfosys_params.csv.default $(DEBETC)/kvalobs

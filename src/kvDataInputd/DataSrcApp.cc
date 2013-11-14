@@ -87,11 +87,14 @@ DataSrcApp::DataSrcApp(int argn, char **argv,
    if(!registerAllDecoders())
       return;
 
+   milog::createGlobalLogger( logdir, "kvDataInputd", "param_update", milog::DEBUG );
+
    if(!registerParams())
       return;
 
    if(!registerTypes())
       return;
+
 
    milog::createGlobalLogger( logdir, "kvDataInputd_transaction", "failed", milog::DEBUG );
    milog::createGlobalLogger( logdir, "kvDataInputd_transaction", "duplicates", milog::DEBUG );
@@ -288,6 +291,23 @@ DataSrcApp::registerParams()
    string    msg;
    string    kode;
    int         id;
+   ParamList tmpParams;
+   ParamList newParams;
+   Param param;
+   string paramFile;
+   bool scalar;
+   ostringstream textParams;
+   boost::posix_time::ptime now;
+
+   now = boost::posix_time::second_clock::universal_time();
+
+   if( ! nextParamCheckTime.is_special() && now > nextParamCheckTime )
+       return true;
+
+   paramFile = kvalobs::kvPath( kvalobs::sysconfdir );
+
+   paramFile += "/stinfosys_params.csv";
+
    con=conCache.findFreeConnection();
 
    if(!con){
@@ -295,8 +315,33 @@ DataSrcApp::registerParams()
       return false;
    }
 
-   try{
+   if( ! readParamsFromFile( paramFile, tmpParams ) ) {
+       string pfile=paramFile;
+       paramFile = kvalobs::kvPath( kvalobs::sysconfdir ) +
+                          "/stinfosys_params.csv.default";
 
+       IDLOGERROR("param_update", "Cant read parameter information from file <" << pfile << ">." << endl
+                  << "Trying to load parameter information from default file <" << paramFile << endl
+                  << ">. This file may be incomplete. Use 'kv_get_stinfosys_params' to generate the file" << endl
+                  << "'" << pfile << "'.");
+
+       LOGERROR("Cant read parameter information from file <" << pfile << ">." << endl
+                << "Trying to load parameter information from default file <" << paramFile << endl
+                << ">. This file may be incomplete. Use 'kv_get_stinfosys_params' to generate the file" << endl
+                << "'" << pfile << "'.");
+
+       if( ! readParamsFromFile( paramFile, tmpParams ) ) {
+           IDLOGERROR("param_update", "Cant read parameter information from file <" << paramFile << ">.");
+           LOGERROR("Cant read parameter information from file <" << paramFile << ">.");
+       }
+   }
+
+   if( ! tmpParams.empty() ) {
+       IDLOGINFO("param_update", "Loaded #" << tmpParams.size()
+                   << " 'stinfosys' param definitions from file <" << paramFile << ">." );
+   }
+
+   try{
       res=con->execQuery("SELECT paramid,name FROM param");
 
       if(res && res->size()>0){
@@ -306,11 +351,19 @@ DataSrcApp::registerParams()
 
             try{
                id=lexical_cast<int>(row[0]);
-               paramList.insert(Param(row[1], id));
+               if( id>=1000 ) scalar = false;
+               else scalar = true;
+
+               if( findParamInList( tmpParams, row[1], param) ) {
+                   if( ! param.isScalar() )
+                       textParams << param.kode()<<"(" << param.id()<< ") ";
+                   scalar = param.isScalar();
+               }
+               newParams.insert(Param(row[1], id, scalar ));
             }
             catch(bad_lexical_cast &){
-               LOGERROR("registerParams: BADNUM: kvnumber is not a number\n" <<
-                        "   kvnumber(" << row[0] << ")\n");
+               LOGERROR("registerParams: BADNUM: paramid is not a number\n" <<
+                        "   paramid(" << row[0] << ")\n");
             }
          }
 
@@ -326,11 +379,23 @@ DataSrcApp::registerParams()
    catch(...){
       delete res;
       conCache.freeConnection(con);
-      LOGERROR("registerParams: Exception: Unkown\n");
+      LOGERROR("registerParams: Exception: Unknown!\n");
    }
 
+
+   IDLOGINFO("param_update", "Defined text parameters: " << textParams.str() );
    conCache.freeConnection(con);
 
+   if( ! isParamListsEqual( paramList, newParams) ) {
+       if( ! paramList.empty() ) {
+           IDLOGINFO( "param_update", "New, deleted or changed parameter definition in kvalobs.");
+       } else {
+           IDLOGDEBUG( "param_update", "Parameter definitions is initialized.");
+       }
+       paramList = newParams;
+   }
+
+   nextParamCheckTime = now + boost::posix_time::hours( 1 );
    //CERR(paramList);
 
    return true;
@@ -384,6 +449,9 @@ DataSrcApp::create(const char  *obsType_,
    //lookup the decoder based on obsType.
    {
       Lock lck(mutex);
+
+      //Check for updated params.
+      registerParams();
 
       dec=decoderMgr.findDecoder(*con,
                                  paramList,

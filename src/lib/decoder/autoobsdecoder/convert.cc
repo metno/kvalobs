@@ -626,7 +626,7 @@ DataConvert::decodeSpDef(std::vector<DataElem> &data,
          continue;
       }
 
-      it=paramList.find(Param(id, -1));
+      it=paramList.find(Param(id, -1, false));
 
       if(it==paramList.end()){
          ostringstream ost;
@@ -663,7 +663,7 @@ DataConvert::decodeVal(std::vector<DataElem> &data,
 
    name=convertName(param);
 
-   it=paramList.find(Param(name, -1));
+   it=paramList.find(Param(name, -1, false));
 
    if(it==paramList.end())
       throw UnknownParam(std::string("Unknown Parameter: ")+param+" --> "

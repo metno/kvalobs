@@ -37,8 +37,9 @@
 
 namespace decodeutility {
 
-bool isTextParam( int paramid );
+//bool isTextParam( int paramid );
 bool isTextParam( const std::string &paramname, const ParamList &params );
+bool isTextParam( int paramid, const ParamList &params );
 
 }
 

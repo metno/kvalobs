@@ -54,14 +54,12 @@ int
 DataDecoder::
 findParamId( const std::string &paramname )const
 {
-	ParamList::const_iterator it;
+    Param param;
 
-	it = params.find( Param( boost::to_upper_copy( paramname ), -1 ) );
+    if( ! findParamInList(params, paramname, param) )
+        return -1;
 
-	if(it==params.end())
-		return -1;
-	else
-		return it->id();
+	return param.id();
 }
 
 
@@ -382,13 +380,13 @@ decodeHeader( const std::string &header,
                 isCode=false;
             }
 
-            it=params.find(Param( name, -1));
+            it=params.find(Param( name, -1, false));
 
             if(it==params.end()){
                 ost << "Unknown parameter name '" << name << "'.";
                 warnings = true;
                 updateParamList( paramsList, ParamDef(name, -1, sensor, level, isCode) );
-            }else if( decodeutility::isTextParam( it->id() ) && (sensor>0 || level>0 ) ) {
+            }else if( decodeutility::isTextParam( it->id(), params ) && (sensor>0 || level>0 ) ) {
                 warnings = true;
                 ost << "\nText parameter: name '" << name << "'. Level and/or sensor values must be 0.";
                 if( sensor > 0 )
@@ -563,7 +561,7 @@ decodeData( const std::string &obsData,
 
 	         string val=data.val();
 
-	         if( decodeutility::isTextParam( params[index].id() ) ) {
+	         if( decodeutility::isTextParam( params[index].id(), this->params ) ) {
 	            kvTextData d( stationid,
 	                          obstime,
 	                          val,

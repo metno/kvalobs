@@ -37,6 +37,12 @@
 #include <fstream>
 #include <iostream>
 
+/*
+ * To generate the param file connect to stinfosys and execute the following
+ * command
+ * \copy (select paramid,name,scalar from param  order by paramid) to 'params.csv' delimiter as ',';
+ */
+
 using namespace std;
 using namespace miutil;
 
@@ -47,6 +53,7 @@ ReadParamsFromFile(const std::string &filename, ParamList &paramList)
   string   buf;
   string   sparamid;
   string   name;
+  bool isScalar;
 
   paramList.clear();
   fs.open(filename.c_str());
@@ -59,12 +66,17 @@ ReadParamsFromFile(const std::string &filename, ParamList &paramList)
   while(getline(fs, buf)){
     CommaString cStr(buf, ',');
 
-    if(cStr.size()<2){
+    if(cStr.size()<3){
       cerr << "To few elements!" << endl;
       continue;
     }
 
-    paramList.insert(Param(cStr[1], atoi(cStr[0].c_str())));
+    isScalar = true;
+
+    if( cStr[2]=="f" || cStr[2]=="F" )
+        isScalar = false;
+
+    paramList.insert( Param(cStr[1], atoi(cStr[0].c_str()), isScalar) );
   } 
 
   fs.close();
