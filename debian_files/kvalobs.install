@@ -27,3 +27,5 @@ etc/kvalobs/kv2norcom.conf.template
 etc/kvalobs/save_last_month.conf
 etc/kvalobs/pgclean-local.sql.template
 etc/kvalobs/lam2kv/*
+etc/kvalobs/stinfosys.conf
+etc/kvalobs/stinfosys_params.csv.default
