@@ -111,6 +111,19 @@ namespace dnmi {
       *
       * It is also used to create connections to the databases and release
       * the connections after use. 
+      *
+      * WARNING WARNING
+      * There is a race condition on the variable 'err' in the
+      * DriverManager that may crash a program if multiple threads
+      * call for instance connect on the same time and fails to connect to
+      * the database. By the way so is this a bad interface for error
+      * reporting since the error a thread get could be caused by another thread.
+      * But there is NOT much we can do about it now. We can depricate
+      * the current interface and create a new interface that throws a
+      * exception or return the error message in a output variable.
+      *
+      * The DriverManager is NOT thread safe. Bugzilla: #1368
+      *
       */
       class DriverManager{
 	  struct Driver{

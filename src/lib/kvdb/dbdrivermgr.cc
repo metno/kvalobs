@@ -36,6 +36,8 @@
 
 using namespace std;
 
+
+
                          
 dnmi::db::
 DriverManager::
@@ -237,6 +239,7 @@ connect(const std::string &driverId,
   }
 
   if(it==drivers.end()){
+      //ERROR: Possible race condition.
     err="No driver named <"+driverId+">!";
     return 0;
   }
@@ -247,6 +250,7 @@ connect(const std::string &driverId,
   con=(*it)->driver->createConnection(connect);
 
   if(!con){
+      //ERROR: Possible race condition.
     err="Can't connect: "+(*it)->driver->getErr();
     return 0;
   }
@@ -273,6 +277,7 @@ releaseConnection(Connection *con)
 	ost << "ERROR: dnmi::db::DriverManager: No driver named <" 
 	    << con->getDriverId() << ">!";
 	
+	//ERROR: Possible race condition.
 	err=ost.str();
 	
 	return false;
