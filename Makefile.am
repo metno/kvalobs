@@ -22,7 +22,8 @@ pkgsysconf_DATA = \
 	etc/kv2kvDataInputd.conf.template \
 	etc/kvdataclt.conf.template \
 	etc/norcom2kv.conf.template \
-	etc/stinfosys.conf
+	etc/stinfosys.conf \
+	etc/stinfosys_params.csv.default
 	
 #pkgconfig_DATA = @PACKAGE_TARNAME@.pc
 #$(pkgconfig_DATA): config.status
@@ -31,6 +32,7 @@ EXTRA_DIST = etc/kv2norcom.conf.template \
              etc/kv2kvDataInputd.conf.template \
              etc/kvdataclt.conf.template \
              etc/norcom2kv.conf.template \
-             etc/stinfosys.conf
+             etc/stinfosys.conf \
+             etc/stinfosys_params.csv.default
 
 include mk/debian.mk
