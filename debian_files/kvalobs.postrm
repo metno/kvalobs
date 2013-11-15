@@ -48,6 +48,8 @@ ETC_FILES="kv_ctl.conf
            kv-ipalias.conf
            pgclean-local.sql
            save_last_month.conf
+           stinfosys_params.csv.default
+           stinfosys.conf
            lam2kv/metdat.1h    
            lam2kv/metdat.RR24         
            lam2kv/posdat.PP    
