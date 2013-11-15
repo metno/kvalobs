@@ -1,3 +1,11 @@
+kvalobs (2.7.3~rc16-1) lucid; urgency=low
+
+  * Package: Change the owner of the files /etc/kvalobs/stinfosys.conf and
+    /etc/kvalobs/stinfosys_params.csv.default kvalobs.kvalobs.
+
+ -- Borge Moe <borge.moe@met.no>  Fri, 14 Nov 2013 10:00:00 +0100
+
+
 kvalobs (2.7.3~rc15-1) lucid; urgency=low
 
   * Update the package with the the files /etc/kvalobs/stinfosys.conf and
