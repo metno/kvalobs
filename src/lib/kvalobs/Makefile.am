@@ -115,6 +115,29 @@ kvalobsflaginclude_HEADERS = \
 	flag/kvControlInfo.h \
 	flag/kvUseInfo.h
 
+
+if HAVE_GMOCK
+
+TESTS = gtest
+
+check_PROGRAMS = gtest
+
+gtest_SOURCES = \
+	test/gtest.cc
+
+gtest_CPPFLAGS = \
+	-DTESTDIR="\""$(top_srcdir)/src/lib/kvalobs/test"\"" \
+	$(libkvalobs_kvalobs_la_CPPFLAGS) \
+	$(gtest_CFLAGS)
+
+gtest_LDADD = \
+	$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
+	$(libkvalobs_kvalobs_la_LIBADD) \
+	$(gtest_LIBS)
+endif
+
+
+
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libkvalobs_kvalobs.pc
 $(pkgconfig_DATA): $(top_builddir)/config.status
