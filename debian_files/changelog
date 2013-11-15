@@ -1,3 +1,11 @@
+kvalobs (2.7.3~rc17-1) lucid; urgency=low
+
+  * Fix a bug in paramlist.
+  * Fix a bug for when it is checked for new parameter. It is only checked
+    once an hour.
+
+ -- Borge Moe <borge.moe@met.no>  Fri, 15 Nov 2013 14:00:00 +0100
+
 kvalobs (2.7.3~rc16-1) lucid; urgency=low
 
   * Package: Change the owner of the files /etc/kvalobs/stinfosys.conf and
