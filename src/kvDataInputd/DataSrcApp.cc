@@ -301,7 +301,7 @@ DataSrcApp::registerParams()
 
    now = boost::posix_time::second_clock::universal_time();
 
-   if( ! nextParamCheckTime.is_special() && now > nextParamCheckTime )
+   if( ! nextParamCheckTime.is_special() && now < nextParamCheckTime )
        return true;
 
    paramFile = kvalobs::kvPath( kvalobs::sysconfdir );
@@ -396,6 +396,7 @@ DataSrcApp::registerParams()
    }
 
    nextParamCheckTime = now + boost::posix_time::hours( 1 );
+   IDLOGDEBUG("param_update", "nextParamCheckTime: " << nextParamCheckTime << "."  );
    //CERR(paramList);
 
    return true;
