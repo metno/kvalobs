@@ -64,7 +64,7 @@ findParamInList(const ParamList &pl, const std::string &name, Param &param )
         return false;
 
     param = *it;
-    return false;
+    return true;
 }
 
 bool
