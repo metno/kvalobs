@@ -1,3 +1,9 @@
+kvalobs (2.7.3-1) lucid; urgency=low
+
+  * New release, no change since last RC.
+
+ -- Borge Moe <borge.moe@met.no>  Mon, 25 Nov 2013 13:00:00 +0100
+
 kvalobs (2.7.3~rc17-1) lucid; urgency=low
 
   * Fix a bug in paramlist.
