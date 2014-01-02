@@ -122,7 +122,57 @@ protected:
                   std::list<kvalobs::kvTypes> typesList,
                   const dnmi::file::File &file);
 
+   kvalobs::decodeutil::DecodedData*
+      runtest( const ParamList &paramList,
+               std::list<kvalobs::kvTypes> typesList,
+               const SmsMelding &melding,
+               const miTime &nowTime);
+
+
 };
+
+
+
+TEST_F( Sms2DecodeTest, MultiObsTime_81900 )
+{
+
+    kvalobs::decodeutil::DecodedData *data;
+
+    miTime refTime("201401020553");
+    SmsMelding melding(81900, -1, 2 );
+
+    melding.addMelding("81900,2,1401020553,,,,,,3,13123108,14010208");
+
+    data = runtest( paramList, typesList, melding, refTime );
+
+    EXPECT_TRUE( data != 0 );
+    EXPECT_TRUE( data->size() == 1 ) << "DataSize: " << data->size();
+
+    /*
+    for( TDecodedDataElem::iterator eit = data->data()->begin(); eit != data->data()->end(); ++eit ) {
+       cerr << "Date: " << eit->getDate() << endl;
+       for(std::list<kvalobs::kvData>::const_iterator dit=eit->data().begin(); dit!= eit->data().end(); dit++){
+          cerr << *dit  << endl;
+       }
+       cerr << " ----------------------------- " << endl;
+    }*/
+
+    /*
+    DecodedDataElem elem = getDataSet( data, miTime("2010-12-28 06:00:00") );
+    EXPECT_TRUE( elem.dataSize() == 9 ) << " DataSet: size = " << elem.dataSize();
+    EXPECT_TRUE( elem.getDate() == miTime("2010-12-28 06:00:00") ) << "Date: " << elem.getDate();
+    EXPECT_FLOAT_EQ( getData( elem, miTime("2010-12-28 06:00:00"), 34), 2 )    << "Val: " << getData( elem, miTime("2010-12-28 06:00:00"), 34);
+    EXPECT_FLOAT_EQ( getData( elem, miTime("2010-12-28 06:00:00"), 35), 0 )    << "Val: " << getData( elem, miTime("2010-12-28 06:00:00"), 35);
+    EXPECT_FLOAT_EQ( getData( elem, miTime("2010-12-28 06:00:00"), 110), 0.1 ) << "Val: " << getData( elem, miTime("2010-12-28 06:00:00"), 110);
+    EXPECT_FLOAT_EQ( getData( elem, miTime("2010-12-28 06:00:00"), 112), 49 )  << "Val: " << getData( elem, miTime("2010-12-28 06:00:00"), 112);
+
+    EXPECT_FLOAT_EQ( getData( elem, miTime("2010-12-27 12:00:00"), 34), 2 )    << "Val: " << getData( elem, miTime("2010-12-28 06:00:00"), 34);
+    EXPECT_FLOAT_EQ( getData( elem, miTime("2010-12-27 12:00:00"), 35), 0 )    << "Val: " << getData( elem, miTime("2010-12-28 06:00:00"), 35);
+
+    EXPECT_FLOAT_EQ( getData( elem, miTime("2010-12-27 18:00:00"), 34), 2 )    << "Val: " << getData( elem, miTime("2010-12-28 06:00:00"), 34);
+    EXPECT_FLOAT_EQ( getData( elem, miTime("2010-12-27 18:00:00"), 35), 0 )    << "Val: " << getData( elem, miTime("2010-12-28 06:00:00"), 35);
+    */
+ }
 
 
 TEST_F( Sms2DecodeTest, MultiObsTime )
@@ -165,6 +215,93 @@ main(int argc, char **argv) {
    ::testing::InitGoogleTest(&argc, argv);
    return RUN_ALL_TESTS();
 }
+
+
+kvalobs::decodeutil::DecodedData*
+Sms2DecodeTest::
+runtest(const ParamList &paramList,
+        const std::list<kvalobs::kvTypes> typesList,
+        const SmsMelding &melding,
+        const miTime &nowTime
+        )
+{
+   dnmi::db::Connection *dummyCon= dbMgr.connect( dbId, "" );
+   FakeComobsDecoder *fakeComobsDecoder;
+   string           fcontent;
+   miTime           obst;
+   kvalobs::decodeutil::DecodedData *data;
+   string           returnMsg;
+   list<kvalobs::kvRejectdecode> rejected;
+   bool             hasRejected;
+   ofstream         of;
+   char buf[64];
+
+   sprintf( buf, "sms_%05d_%03d_%4d%02d%02dT%02d%02d.txt",
+            melding.getClimano(), melding.getCode(),
+            nowTime.year(), nowTime.month(), nowTime.day(),
+            nowTime.hour(), nowTime.min() );
+
+   for( int i=0; i<2; ++i ) {
+      if( of.is_open() )
+         of.close();
+
+      string myFile( string("testresult/")+buf );
+      of.open( myFile.c_str());
+
+      if(!of.is_open() ){
+         if( i>0 ) {
+            cerr << "Cant open result file: " << myFile << endl;
+            return 0;
+         }
+
+         mkdir( "./testresult", 0775 );
+      } else {
+         break;
+      }
+   }
+
+   of << "Timestamp: " << nowTime <<endl;
+   of << "SMS code  : " << melding.getCode() << endl;
+   of << "nationalid: " << melding.getClimano() << endl;
+   of << "wmono     : " << melding.getSynopno() << endl;
+
+   fakeComobsDecoder = new FakeComobsDecoder( *dummyCon, paramList, typesList, "", "", 1 );
+
+   Sms2 sms(paramList, *fakeComobsDecoder );
+
+   sms.setNowTime(nowTime);
+
+   data=sms.decode(melding.getClimano(), melding.getCode(),
+                   melding.getMeldingList(), returnMsg, rejected,
+                   hasRejected);
+
+   if( hasRejected )
+      of << rejected.begin()->comment() << endl;
+
+   if( !data ){
+      of << "FAILED: cant decode smsmsg!" << endl;
+   }else{
+      kvalobs::decodeutil::TDecodedDataElem *elem = data->data();
+
+      if( ! elem  ) {
+         of << "No data!\n";
+      } else {
+         of << "Melding: [" << endl << melding << endl << "]" << endl;
+
+         for( kvalobs::decodeutil::TDecodedDataElem::iterator eit = elem->begin(); eit != elem->end(); ++eit ) {
+            for(std::list<kvalobs::kvData>::const_iterator dit=eit->data().begin(); dit!= eit->data().end(); dit++){
+               of << *dit << endl ;
+            //   cerr << *dit  << endl;
+            }
+         }
+      }
+   }
+
+   of.close();
+
+   return data;
+}
+
 
 kvalobs::decodeutil::DecodedData*
 Sms2DecodeTest::
@@ -282,5 +419,4 @@ runtestOnFile(const ParamList &paramList,
 
    return data;
 }
-
 

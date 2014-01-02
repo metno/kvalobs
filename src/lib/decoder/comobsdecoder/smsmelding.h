@@ -65,6 +65,9 @@ class SmsMelding
 
  public:
   SmsMelding();
+  SmsMelding(int stationid, int wmono, int code )
+      : resCode( OK ), synopno( wmono), climano( stationid ),
+        code( code ){}
   SmsMelding(const std::string &autoObsPath_);
   ~SmsMelding()
     {
@@ -73,6 +76,11 @@ class SmsMelding
   int getSynopno()const{ return synopno;}
   int getClimano()const{ return climano;}
   int getCode()const { return code;}
+
+  void addMelding( const std::string &melding ) {
+      meldingList.push_back( melding );
+  }
+
   bool hasClimanoOrSynopno()const{ return climano>0 || synopno>0;}
   const MeldingList& getMeldingList()const { return meldingList;}
 

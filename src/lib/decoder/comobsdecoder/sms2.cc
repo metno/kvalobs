@@ -610,15 +610,16 @@ doKvPrecipitation(kvalobs::decodeutil::DecodedDataElem &data,
                 "dif:      " << miTime::minDiff(dtComObs, dtObs));
 
 
-      if(miTime::minDiff(dtComObs, dtObs)<-60){
-         ost << "The observation is to far in the future (>+1 hour)!";
-         IDLOGWARN(logid,"The observation is to far in the future (>+1 hour)!");
-         return false;
-      }
+//      if(miTime::minDiff(dtComObs, dtObs)<-360){
+//         // cerr << "dtComObs: " << dtComObs << " dtObs: " << dtObs << " diff: " << miTime::minDiff(dtComObs, dtObs) << endl;
+//         ost << "The observation is to far in the future (>+1 hour)!";
+//         IDLOGERROR(logid,"The observation is to far in the future (>+1 hour)!");
+//         return false;
+//      }
 
       if(dtObs<dtStart){
          ost << "Invalid observation interval <tildato> < 'fradato'!";
-         IDLOGWARN( logid, "Invalid observation interval <tildato> < 'fradato'!");
+         IDLOGERROR( logid, "Invalid observation interval <tildato> < 'fradato'!");
          return false;
       }
 
@@ -628,7 +629,7 @@ doKvPrecipitation(kvalobs::decodeutil::DecodedDataElem &data,
 
       if(dif<1260){ //less than 21 hour
          ost << "Ivalid observation, to few hour (<21 hour)!";
-         IDLOGWARN( logid, "Ivalid observation, to few hour (<21 hour)!");
+         IDLOGERROR( logid, "Ivalid observation, to few hour (<21 hour)!");
          return false;
       }
 
@@ -679,7 +680,7 @@ doKvPrecipitation(kvalobs::decodeutil::DecodedDataElem &data,
    if( sSaSdEm[1] != '0')
       hasSd=true;
 
-   IDLOGERROR( logid, "sSaSdEm. " << sSaSdEm << " hasSa: " << (hasSa?"t":"f") << " hasSd: " << (hasSd?"t":"f"));
+   IDLOGDEBUG( logid, "sSaSdEm. " << sSaSdEm << " hasSa: " << (hasSa?"t":"f") << " hasSd: " << (hasSd?"t":"f"));
    cleanString(SA);
    cleanString(SD);
 
