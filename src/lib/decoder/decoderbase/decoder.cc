@@ -747,9 +747,11 @@ putRejectdecodeInDb(const kvalobs::kvRejectdecode &sd)
 {
 
    kvDbGate gate(&con);
+   kvRejectdecode reject( gate.esc( sd.message() ), sd.tbtime(),
+                          gate.esc( sd.decoder() ), gate.esc( sd.comment() ), sd.fixed() );
 
-   if(!gate.insert(sd, true)){
-      LOGDEBUG("putRejectdecodeInDb: can't save kvRejectdecode to the database!\n" <<
+   if(!gate.insert( reject, true)){
+      LOGERROR("putRejectdecodeInDb: can't save kvRejectdecode to the database!\n" <<
                "[" << gate.getErrorStr() << "]");
 
 
@@ -768,7 +770,7 @@ putkvStationInDb(const kvalobs::kvStation &st)
    kvDbGate gate(&con);
 
    if(!gate.insert(st, true)){
-      LOGDEBUG("kvStationInDb: can't save kvStation to the database!\n" <<
+      LOGERROR("kvStationInDb: can't save kvStation to the database!\n" <<
                "[" << gate.getErrorStr() << "]");
 
       return false;
