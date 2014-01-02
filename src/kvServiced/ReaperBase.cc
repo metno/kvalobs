@@ -33,7 +33,7 @@
 
 ReaperBase::
 ReaperBase()
-  :lastAccess_(time(0)), running(false), active(true), timedout( false )
+  :lastAccess_(time(0)), running(false), active(true), timedout( false ),timeToLive_(60)
 {
 }
 
@@ -70,14 +70,29 @@ deactivate()
 
 void
 ReaperBase::
-setRunning(bool running, bool &isActive )
+setRunning(bool running_, bool &isActive )
 {
   boost::mutex::scoped_lock lock(const_cast<boost::mutex&>(mutex));
   time(&lastAccess_);
   isActive = active;
-  running=running;
+  running=running_;
 }
 
+void
+ReaperBase::
+setTimeToLive( int sec )
+{
+    boost::mutex::scoped_lock lock(const_cast<boost::mutex&>(mutex));
+    timeToLive_ = sec;
+}
+
+int
+ReaperBase::
+getTimeToLive()const
+{
+    boost::mutex::scoped_lock lock(const_cast<boost::mutex&>(mutex));
+    return timeToLive_;
+}
 
 bool 
 ReaperBase::

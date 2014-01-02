@@ -344,7 +344,7 @@ cleanUpReaperObj()
       	//garbage collect it. We assume that the client has crashed
       	//or has forgotten about us. This is a bug in the client.
 
-      	if((now-lastAccess)>=TIMEOUT){
+      	if((now-lastAccess) >= (*it)->getTimeToLive() ){
 				LOGWARN("TIMEOUT, a ReaperBase object is scheduled for garbage collection!");
 				//Only deactivate the object here. It is removed from
 				//reaperObjList the next time around.

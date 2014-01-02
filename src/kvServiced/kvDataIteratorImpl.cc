@@ -41,13 +41,36 @@ using namespace kvalobs;
 using namespace CKvalObs::CService;
 using namespace milog;
 
+namespace {
+
+bool
+isHourDataCheck( const list<kvData> &dataList ) {
+    map<int,int> minuteMap;
+    int minute;
+
+    for( list<kvData>::const_iterator it = dataList.begin();
+         it != dataList.end(); ++it ) {
+         minute = it->obstime().time_of_day().minutes();
+         ++minuteMap[minute];
+    }
+
+    return minuteMap.size() <= 1;
+}
+
+
+}
+
+
+
 DataIteratorImpl::DataIteratorImpl(dnmi::db::Connection *dbCon_,
                                    WhichDataList *whichData_,
                                    ServiceApp &app_):
                                    dbCon(dbCon_),
                                    whichData(whichData_),
                                    iData(0),
-                                   startTimeOfGetData(boost::posix_time::second_clock::universal_time()),app(app_)
+                                   startTimeOfGetData(boost::posix_time::second_clock::universal_time()),
+                                   isHourData( -1 ),
+                                   app(app_)
 {
 }
 
@@ -132,7 +155,7 @@ DataIteratorImpl::next(CKvalObs::CService::ObsDataList_out obsDataList)
 
    LogContext context("service/DataIterator");
 
-   LOGDEBUG("next: called ..." );
+   LOGDEBUG("next: isHourData: " << isHourData);
 
    if( !dbCon ) {
 	   LOGERROR( "next:  No db connection (returning false)." );
@@ -354,7 +377,7 @@ DataIteratorImpl::findData(list<kvData> &data,
 
    LOGDEBUG("stationid: " << wData.stationid << " currentEndTime: "
             << currentEndTime << " endTime: " << endTime << " iData: " <<
-            iData);
+            iData << " isHourData: " << isHourData );
 
    if(currentEndTime.is_not_a_date_time()){
       stime = boost::posix_time::time_from_string_nothrow(std::string(wData.fromObsTime));
@@ -386,33 +409,47 @@ DataIteratorImpl::findData(list<kvData> &data,
    }
 
    tmpTime=stime;
-   tmpTime += boost::posix_time::hours(12);
+
+   if( isHourData > 0  )
+       tmpTime += boost::posix_time::hours(12);
+   else
+       tmpTime += boost::posix_time::hours(3);
 
    if(tmpTime<endTime){
       currentEndTime=tmpTime;
       etime=currentEndTime;
 
       //We adjust the etime with one second, so that in effect
-      //we get data which is in the period [stime,currendEndTime>. This since
-      //the  kvQueries::selectData get the data in the period [stime,etime], but
+      //we get data which is in the period [stime,currendEndTime>.
+      //The  kvQueries::selectData get the data in the period [stime,etime], but
       //we will not have the endpoint twice.
       etime -= boost::posix_time::seconds(1);
    }else{
       currentEndTime=boost::posix_time::ptime(); //set currentEndTime to not_a_date_time.
       etime=endTime;
       iData++;
+      isHourData = -2; //New station, must reset test for hour data.
+                       //The test for isHourData should happen the next time findData is called.
+
    }
 
-
-   LOGDEBUG("select(" << wData.stationid << ", " << stime << ", " << etime);
+   LOGDEBUG("select(" << wData.stationid << ", " << stime << ", " << etime << "): isHourData: " << isHourData );
 
    if(gate.select(data, kvQueries::selectData(wData.stationid, stime, etime))){
       LOGDEBUG("data: nElements=" << data.size());
+      if( isHourData == -1 ) {
+          isHourData = 0;
+          if( isHourDataCheck( data ) )
+              isHourData = 1;
+      }
    }else{
       LOGERROR("Error fetching <data>! stationid: " << wData.stationid <<
                " timeinterval:" << stime << " - " << etime );
       ret=false;
    }
+
+   if( isHourData < -1 )
+       isHourData = -1;
 
    if(gate.select(textData,
                   kvQueries::selectTextData(wData.stationid,

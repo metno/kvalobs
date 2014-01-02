@@ -44,6 +44,7 @@ class ReaperBase
   bool                         active;
   PortableServer::ObjectId_var objId;
   bool                         timedout;
+  int                          timeToLive_;
   boost::mutex mutex;
 
  public:
@@ -71,6 +72,9 @@ class ReaperBase
   bool isTimedout() const { return timedout; }
   void setTimedout() { timedout = true; }
   
+  void setTimeToLive( int sec );
+  int getTimeToLive()const;
+
   //Cleanup the resources this object is using.
   virtual void cleanUp()=0;
   virtual void addRef()=0;

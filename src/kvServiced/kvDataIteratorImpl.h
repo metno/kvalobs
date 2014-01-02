@@ -59,9 +59,10 @@ class DataIteratorImpl:
   dnmi::db::Connection              *dbCon;
   CKvalObs::CService::WhichDataList *whichData;
   CORBA::Long                       iData;
-  boost::posix_time::ptime                    currentEndTime;
-  boost::posix_time::ptime                    endTime;
-  boost::posix_time::ptime                    startTimeOfGetData;
+  boost::posix_time::ptime          currentEndTime;
+  boost::posix_time::ptime          endTime;
+  boost::posix_time::ptime          startTimeOfGetData;
+  int isHourData;  //-1 - Not initialized, 0 - hour data, 1 - Not hour data.
   ServiceApp                        &app;
   boost::mutex                      mutex;
 
