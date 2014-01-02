@@ -1,4 +1,14 @@
-kvalobs (2.7.3-1) lucid; urgency=low
+kvalobs (2.7.4~rc1-1) lucid; urgency=low
+
+  * ComObsdecoder (typeid=302): Fix #1371. Do not reject messages when
+    'measurment from - to' is used.
+  * DecoderBase: Properly esc rejected messageses. 
+  * kvServiced: When getData is used to get minute data, chunk the data in
+    3 hours chunks instead of 12 hours.
+
+ -- Borge Moe <borge.moe@met.no>  Thu, 02 Jan 2013 15:30:00 +0100
+ 
+ kvalobs (2.7.3-1) lucid; urgency=low
 
   * New release, no change since last RC.
 
