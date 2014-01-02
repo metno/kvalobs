@@ -223,6 +223,14 @@ bool kvalobs::kvDbGate::insertImpl(const std::list<kvalobs::kvDbBase*> &elem,
 
 }
 
+
+std::string
+kvalobs::kvDbGate::
+esc( const std::string &src )const
+{
+    return con->esc( src );
+}
+
 bool kvalobs::kvDbGate::insert(const kvalobs::kvDbBase &elem,
 		const std::string &tblName, bool replace)
 {

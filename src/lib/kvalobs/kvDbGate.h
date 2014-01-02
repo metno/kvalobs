@@ -139,6 +139,8 @@ public:
 		return err_;
 	}
 
+	std::string esc( const std::string &src )const;
+
 	/**
 	 * \brief Get a description of the error.
 	 */
