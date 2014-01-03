@@ -122,7 +122,7 @@ bool checkPidFile()
 
 int corbaMain(int argc, char** argv, const qabase::Configuration & config)
 {
-   string logdir( kvPath("logdir") );
+	string logdir( kvPath("logdir") );
 	miutil::conf::ConfSection *conf = KvApp::getConfiguration();
 	string constr(KvApp::createConnectString());
 

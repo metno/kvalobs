@@ -221,6 +221,44 @@ TEST_F(CheckRunnerTest, reusesResultsFromOtherChecks)
 	EXPECT_EQ(expectedData.controlinfo(), returnFromScript.controlinfo());
 }
 
+TEST_F(CheckRunnerTest, runCheckWithOneParameterAtOddLevel)
+{
+	using namespace testing;
+
+	kvalobs::kvStationInfo observation(20, boost::posix_time::time_from_string("2010-05-12 06:00:00"), 302);
+	kvalobs::kvDataFactory factory(20, boost::posix_time::time_from_string("2010-05-12 06:00:00"), 302);
+
+	db::DatabaseAccess::DataList rrFromDatabase;
+	kvalobs::kvData rr = factory.getData(6.0, 110);
+	rrFromDatabase.push_back(rr);
+
+	// Placing tam data at level 10:
+	kvalobs::kvDataFactory f2(factory.stationID(), factory.obstime(), factory.typeID(), 0, 10);
+	db::DatabaseAccess::DataList tamFromDatabase;
+	kvalobs::kvData tam = f2.getData(19, 109);
+	tamFromDatabase.push_back(tam);
+
+	// NOTE: The controlinfo flags are not checked in the EXPECT_CALL(.., write(..)) call, below.
+	rr.controlinfo(kvalobs::kvControlInfo("0010000000000000"));
+	tam.controlinfo(kvalobs::kvControlInfo("0020000000000000"));
+	db::DatabaseAccess::DataList expectedWrite;
+	expectedWrite.push_back(rr);
+	expectedWrite.push_back(tam);
+
+	EXPECT_CALL(database, getData(_, observation, qabase::DataRequirement::Parameter("RR_24"), 0))
+			.Times(AtLeast(1))
+			.WillRepeatedly(SetArgumentPointee<0>(rrFromDatabase));
+	EXPECT_CALL(database, getData(_, observation, qabase::DataRequirement::Parameter("TAM_24"), 0))
+			.Times(AtLeast(1))
+			.WillRepeatedly(SetArgumentPointee<0>(tamFromDatabase));
+	EXPECT_CALL(database, write(expectedWrite))
+				.Times(1);
+
+	runner->newObservation(observation);
+}
+
+
+
 TEST_F(CheckRunnerTest, runDecision)
 {
 	db::DatabaseAccess::ParameterList expectedParameters;
@@ -263,7 +301,6 @@ TEST_F(CheckRunnerTest, runCheckWithOneButNotAllParametersExpectedForTypeid)
 					expectedParameters)
 	);
 }
-
 
 TEST_F(CheckRunnerTest, respectsChecksActiveColumn)
 {

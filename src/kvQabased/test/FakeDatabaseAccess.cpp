@@ -46,8 +46,10 @@ void FakeDatabaseAccess::getChecks(CheckList * out, const kvalobs::kvStationInfo
 	switch ( si.stationID() )
 	{
 	case 10:
-		kvalobs::kvChecks check(10, "QC1-2-101", "QC1-2", 1, "foo", "obs;RR_24;;", "* * * * *", boost::posix_time::time_from_string("2010-01-01 00:00:00"));
-		out->push_back(check);
+		out->push_back(kvalobs::kvChecks(10, "QC1-2-101", "QC1-2", 1, "foo", "obs;RR_24;;", "* * * * *", boost::posix_time::time_from_string("2010-01-01 00:00:00")));
+		break;
+	case 20:
+		out->push_back(kvalobs::kvChecks(20, "QC1-2-102", "QC1-2", 1, "bar", "obs;RR_24,TAM_24;;", "* * * * *", boost::posix_time::time_from_string("2010-01-01 00:00:00")));
 		break;
 	}
 }
@@ -82,6 +84,21 @@ kvalobs::kvAlgorithms FakeDatabaseAccess::getAlgorithm(const std::string & algor
 				"}\n";
 
 		return kvalobs::kvAlgorithms(1, "foo", "obs;X;;", simpleScript);
+	}
+	else if ( algorithmName == "bar" )
+	{
+		std::string simpleScript =
+				"sub check() {\n"
+				" my @retvector;\n"
+				" push(@retvector, \"X_0_0_flag\");\n"
+				" push(@retvector, 1);\n"
+				" push(@retvector, \"Y_0_0_flag\");\n"
+				" push(@retvector, 2);\n"
+				" my $numout = @retvector;\n"
+				" return(@retvector,$numout);\n"
+				"}\n";
+
+		return kvalobs::kvAlgorithms(1, "bar", "obs;X,Y;;", simpleScript);
 	}
 	else
 		throw std::exception();
