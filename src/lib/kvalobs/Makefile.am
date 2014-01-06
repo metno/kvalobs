@@ -136,6 +136,8 @@ gtest_LDADD = \
 	$(gtest_LIBS)
 endif
 
+EXTRA_DIST = test/stinfosys_params.csv
+
 
 
 pkgconfigdir = $(libdir)/pkgconfig

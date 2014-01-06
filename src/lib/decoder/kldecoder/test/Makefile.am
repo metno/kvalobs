@@ -26,6 +26,7 @@ testdb=$(top_builddir)/src/lib/decoder/kldecoder/test/testdb.sqlite
 #EXTRA_DIST = kvparam.csv \
 #             kvtypes.csv 
              
+EXTRA_DIST = n59680-t311.dat
 CLEANFILES = $(testdb)
 TESTS = $(check_PROGRAMS)
  

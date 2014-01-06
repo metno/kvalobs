@@ -9,8 +9,8 @@ if HAVE_GMOCK
 EXTRA_DIST = param.csv \
              testdata/sms02-29-201012280654.xml
              
-CLEANFILES = testresult/sms02-29-201012280654.xml \
-			 testresult
+clean-local:
+	rm -rf testresult
 			 
 check_PROGRAMS = gtestsms2 
 TESTS = $(check_PROGRAMS)
