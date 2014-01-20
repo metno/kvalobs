@@ -1,3 +1,9 @@
+kvalobs (2.7.4-1) lucid; urgency=low
+
+    * New release, no change since last RC.
+    
+ -- Borge Moe <borge.moe@met.no>  Mon, 20 Jan 2013 10:30:00 +0100
+    
 kvalobs (2.7.4~rc1-1) lucid; urgency=low
 
   * ComObsdecoder (typeid=302): Fix #1371. Do not reject messages when
