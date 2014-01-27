@@ -1,3 +1,9 @@
+kvalobs (2.7.5~rc1-1) lucid; urgency=low
+
+    * #1306, Synop decoder: Reject SYNOP MOBIL.
+    
+ -- Borge Moe <borge.moe@met.no>  Mon, 27 Jan 2013 09:30:00 +0100
+
 kvalobs (2.7.4-1) lucid; urgency=low
 
     * New release, no change since last RC.
