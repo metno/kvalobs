@@ -96,6 +96,8 @@ public:
 
   int typeID();
 
+  //SYNOP, SHIP or MOBIL
+  syn::synopType getType()const { return type; }
  
   /// The external interface ends HERE!!!!!================================ 
 

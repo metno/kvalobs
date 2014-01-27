@@ -240,8 +240,10 @@ SynopDecoder::execute( std::string &msg)
       }
    }
 
+
    if(synopDec.decode(obs, data)){
-      LOGINFO("SUCCESS: Synop decoded!");
+
+       LOGINFO("SUCCESS: Synop decoded!");
 
       try{
          if(!saveData(data, saveReject, saveRejectMessage)){
@@ -295,9 +297,15 @@ SynopDecoder::execute( std::string &msg)
       }
 
    }else{
-      LOGWARN("Synop REJECTED: invalid format!\n");
       reject = synopDec.rejected("synop");
 
+      //We reject SYNOP MOBIL silently.
+      if( reject.comment() == "MOBIL" ) {
+          LOGWARN("Synop MOBIL rejected (not supported).");
+          return Ok;
+      }
+
+      LOGWARN("Synop REJECTED: invalid format!\n");
       LOGDEBUG("Rejected: ------------\n" << reject.toSend() << endl);
       msg="Synop REJECTED: " + reject.comment();
 

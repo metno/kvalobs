@@ -284,6 +284,12 @@ bool kvSynopDecoder::decode(const std::string &raw, list<kvData>&   data)
    obs =  lexSynop(raw);
    data.clear();
 
+   if( obs.getType() == syn::MOBIL ) {
+       //We do NOT support SYNOP MOBIL.
+       rejectComment = "MOBIL";
+       return false;
+   }
+
    if(obs.hasUnrecognised()) {
       rejectComment = obs.Unrecognised();
       return false;
