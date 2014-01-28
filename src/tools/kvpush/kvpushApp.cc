@@ -189,11 +189,14 @@ getOpt(int argn, char **argv, Options &opt)
 {
 	int ch;
 		
-	while((ch=getopt(argn, argv, "hi:s:t:f:"))>-1){
+	while((ch=getopt(argn, argv, "hqi:s:t:f:"))>-1){
 		switch(ch){
 			case 'h':
 				opt.help=true;
 				break;
+			case 'q':
+			    opt.doQa = true;
+			    break;
 			case 'i':
 				readIntList(optarg, opt.typeids);
 				break;
@@ -289,9 +292,10 @@ replace(std::string &src, const std::string &what, const std::string &with){
 bool 
 KvPushApp::
 selectAllTypeids(const Options::List &stationList,  
-   				  const miutil::miTime &fromtime,
-					  const miutil::miTime &totime,
-					  dnmi::db::Connection *con)
+   				 const miutil::miTime &fromtime,
+				 const miutil::miTime &totime,
+				 bool doQa,
+				 dnmi::db::Connection *con)
 {
 	ostringstream ost;
 	bool ret=true;
@@ -304,7 +308,7 @@ selectAllTypeids(const Options::List &stationList,
 		 	 << "   WHERE stationid=" << *it << " AND " << endl
 		 	 << "         obstime>='@fromtime@' AND obstime<='@totime@'";
 		
-		ret=selectData(ost.str(), fromtime, totime, con);
+		ret=selectData(ost.str(), fromtime, totime, doQa, con);
 	}
 	
 	return ret;
@@ -313,9 +317,10 @@ selectAllTypeids(const Options::List &stationList,
 bool 
 KvPushApp::
 selectAllStations(const Options::List &typeidList,  
-					   const miutil::miTime &fromtime,
-					   const miutil::miTime &totime,
-					   dnmi::db::Connection *con)
+			      const miutil::miTime &fromtime,
+				  const miutil::miTime &totime,
+				  bool doQa,
+				  dnmi::db::Connection *con)
 {
 	ostringstream ost;
 	bool ret=true;
@@ -329,7 +334,7 @@ selectAllStations(const Options::List &typeidList,
 		 	 << "   WHERE typeid=" << *it << " AND " << endl
 		 	 << "         obstime>='@fromtime@' AND obstime<='@totime@'";
 		
-		ret=selectData(ost.str(), fromtime, totime, con);
+		ret=selectData(ost.str(), fromtime, totime, doQa, con);
 	}
 	
 	return ret;
@@ -339,9 +344,10 @@ bool
 KvPushApp:: 
 selectFrom(const Options::List &stationidList,
            const Options::List &typeidList,  
-   		  const miutil::miTime &fromtime,
-	    	  const miutil::miTime &totime,
-	    	  dnmi::db::Connection *con)
+   		   const miutil::miTime &fromtime,
+	       const miutil::miTime &totime,
+	       bool doQa,
+	       dnmi::db::Connection *con)
 {
 	ostringstream ost;
 	bool ret=true;
@@ -358,7 +364,7 @@ selectFrom(const Options::List &stationidList,
 		 	 	 << "   WHERE stationid=" << *sit << " AND typeid=" << *tit << " AND " << endl
 		 	    << "         obstime>='@fromtime@' AND obstime<='@totime@'";
 		
-			ret=selectData(ost.str(), fromtime, totime, con);
+			ret=selectData(ost.str(), fromtime, totime, doQa, con);
 		}
 	}
 	
@@ -368,9 +374,10 @@ selectFrom(const Options::List &stationidList,
 bool 
 KvPushApp::
 selectData(const std::string &query_,	
-	  	     const miutil::miTime &fromtime_,
-			  const miutil::miTime &totime_,
-			  dnmi::db::Connection *con)
+	  	   const miutil::miTime &fromtime_,
+		   const miutil::miTime &totime_,
+		   bool doQa,
+		   dnmi::db::Connection *con)
 {
 	miutil::miTime	fromtime(fromtime_);
 	miutil::miTime totime(fromtime);
@@ -393,7 +400,7 @@ selectData(const std::string &query_,
 			cout << "SQLquery[" << endl << query << endl << "]" << endl;
 			dbRes=con->execQuery(query);
 			
-			if(!updateWorkque(dbRes, con)){
+			if(!updateWorkque(dbRes, doQa, con)){
 				ret=false;
 			}
 			
@@ -413,7 +420,7 @@ selectData(const std::string &query_,
 						 
 bool 
 KvPushApp::
-updateWorkque(dnmi::db::Result *res, dnmi::db::Connection *con)
+updateWorkque(dnmi::db::Result *res, bool doQa, dnmi::db::Connection *con)
 {
 	using namespace kvalobs;
 	int nTry;
@@ -421,6 +428,7 @@ updateWorkque(dnmi::db::Result *res, dnmi::db::Connection *con)
 	boost::posix_time::ptime now = boost::posix_time::microsec_clock::universal_time();
 	boost::posix_time::ptime undefTime;
 	DataTblView data;
+	bool insertOk;
 	
 	while(res->hasNext()){
 		nTry=0;
@@ -447,17 +455,34 @@ updateWorkque(dnmi::db::Result *res, dnmi::db::Connection *con)
 		
 		gate.busytimeout(120); //2 minutter
 		
-		if(!gate.insert(kvWorkelement(data.stationID(),
-												to_ptime(data.obstime()),
-										  		data.typeID(), 
-										  		now, 
-										  		10,
-										  		now,
-			                       		now, 
-			                       		now, 
-			                       		undefTime, 
-			                       		undefTime), 
-		                false)){
+		if( doQa ) {
+		    insertOk = gate.insert( kvWorkelement(data.stationID(),
+		                                          to_ptime(data.obstime()),
+		                                          data.typeID(),
+		                                          now,
+		                                          10,
+		                                          now,
+		                                          undefTime,
+		                                          undefTime,
+		                                          undefTime,
+		                                          undefTime),
+		                              false );
+		} else {
+		   insertOk = gate.insert( kvWorkelement(data.stationID(),
+		                                         to_ptime(data.obstime()),
+		                                         data.typeID(),
+		                                         now,
+		                                         10,
+		                                         now,
+		                                         now,
+		                                         now,
+		                                         undefTime,
+		                                         undefTime),
+		                            false );
+		}
+
+
+		if( ! insertOk ){
 			if(gate.getError()!=kvalobs::kvDbGate::Duplicate){
 				cerr << "ERROR: " << gate.getErrorStr() << endl;
 				return false;
@@ -485,11 +510,11 @@ selectDataAndUpdateWorkque(const Options &opt)
 	}
 	
 	if(opt.typeids.empty())
-		return selectAllTypeids(opt.stations, opt.fromtime, opt.totime, con);
+		return selectAllTypeids(opt.stations, opt.fromtime, opt.totime, opt.doQa, con);
 	else if(opt.stations.empty())
-		return selectAllStations(opt.typeids,opt.fromtime, opt.totime, con);
+		return selectAllStations(opt.typeids,opt.fromtime, opt.totime, opt.doQa, con);
 	else
-		return selectFrom(opt.stations, opt.typeids, opt.fromtime, opt.totime, con);
+		return selectFrom(opt.stations, opt.typeids, opt.fromtime, opt.totime, opt.doQa, con);
 }
 
 std::ostream& 

@@ -61,10 +61,11 @@ struct Options{
 	typedef List::const_iterator CIList;
 	
 	Options()
-		:help(false), totime(miutil::miTime::nowTime()){
+		:help(false), doQa( false ), totime(miutil::miTime::nowTime()){
 	}
 
 	bool           help;
+	bool           doQa;
 	List           stations;
 	List           typeids;
 	miutil::miTime fromtime;
@@ -99,27 +100,31 @@ class KvPushApp : public KvApp
 	void replace(std::string &src, const std::string &what, const std::string &with);
 	
 	bool selectAllTypeids(const Options::List &stationList,  
-								  const miutil::miTime &fromtime,
-								  const miutil::miTime &totime,
-								  dnmi::db::Connection *con);
-								  
-	bool selectAllStations(const Options::List &typeidList,  
-								   const miutil::miTime &fromtime,
-								   const miutil::miTime &totime,
-								   dnmi::db::Connection *con);
-								   
-   bool selectFrom(const Options::List &stationidList,
-   	              const Options::List &typeidList,  
 						  const miutil::miTime &fromtime,
 						  const miutil::miTime &totime,
+						  bool doQa,
 						  dnmi::db::Connection *con);
+								  
+	bool selectAllStations(const Options::List &typeidList,  
+						   const miutil::miTime &fromtime,
+						   const miutil::miTime &totime,
+						   bool doQa,
+						   dnmi::db::Connection *con);
+								   
+   bool selectFrom(const Options::List &stationidList,
+   	               const Options::List &typeidList,
+				   const miutil::miTime &fromtime,
+				   const miutil::miTime &totime,
+				   bool doQa,
+				   dnmi::db::Connection *con);
 						  
    bool selectData(const std::string &query,	
-   					 const miutil::miTime &fromtime,
-						 const miutil::miTime &totime,
-						 dnmi::db::Connection *con);
+   				   const miutil::miTime &fromtime,
+   				   const miutil::miTime &totime,
+   				   bool doQa,
+   				   dnmi::db::Connection *con);
 						 
-	bool updateWorkque(dnmi::db::Result *res, dnmi::db::Connection *con);
+	bool updateWorkque(dnmi::db::Result *res, bool doQa, dnmi::db::Connection *con);
 		
 		
 public:

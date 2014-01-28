@@ -112,8 +112,9 @@ use(int exitcode)
 	cout << "kvpush, a helper program to trigger pushing of" << endl
 		  << "data to subscribers of kvalobs data.!" << endl << endl 
 		  << "Use" << endl
-		  << "   kvpush [-h] [-i typeidlist] -s stationlist -f fromdate [-t todate]" << endl
+		  << "   kvpush [-h] [-q] [-i typeidlist] -s stationlist -f fromdate [-t todate]" << endl
 		  << "\t-h            Print this help screen and exit!" << endl
+		  << "\t-q            Trigger a new QA check and a push to subscribers." << endl
 		  << "\t-i typeidlist The typeid(s) of the data to push. This is a list" << endl
 		  << "\t              on the form typeid1,typeid2,typeid3" << endl
 		  << "\t              There must be no space between the the commas" << endl
