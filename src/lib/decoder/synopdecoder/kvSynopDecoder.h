@@ -80,22 +80,26 @@ private:
 
   std::string rejectComment;
   
+
   char checkObservationTime(miutil::miTime tbt, miutil::miTime obt);
   void correct_h_VV_N( std::list<kvalobs::kvData> &data )const;
 
 
 public:
+  std::string msgid; //Set by findStationid to identify the msg when writing errorlog.
+
   static miutil::miTime createObsTime( int day, int hour, const miutil::miTime &refTime );
   static miutil::miTime firstDayNextMonth( const miutil::miTime &mi );
   static miutil::miTime lastDayThisMonth( const miutil::miTime &mi );
-  bool initialise(const std::list<kvalobs::kvStation>&, int e = 20, int l = 30 );
 
+  bool initialise(const std::list<kvalobs::kvStation>&, int e = 20, int l = 30 );
   void setReferenceTime(const miutil::miTime& r); ///< set ref, continuous = false
   void autoReferenceTime();                       ///< continuous = true; ref=now
 
   bool decode(const  std::string &,std::list<kvalobs::kvData>& );        ///< false for rejected
   kvalobs::kvRejectdecode  rejected(const std::string &decoder=""); ///< use in case of repel
   bool tmpStation(kvalobs::kvStation&);                                  ///< true if any ...
+
 
 };
 

@@ -178,16 +178,20 @@ int  kvSynopDecoder::findStationid()
    int      boat = obs.Info()->A1BwNb;
    string call = obs.Info()->callSign;
 
-
+   msgid.clear();
    needTmp = false;
 
    if(land) {
+       ostringstream o;
+       o << land;
+       msgid = o.str();
       if(synopRegister.count(land))
          return synopRegister[land];
       return 0;
    }
 
    if( ! call.empty() ) {
+       msgid = call;
       if(call != "SHIP" && call != "SYNOP" ) {
          if(shipRegister.count(call))
             return shipRegister[call];
@@ -196,6 +200,9 @@ int  kvSynopDecoder::findStationid()
    }
 
    if(boat) {
+       ostringstream o;
+       o << boat;
+       msgid = o.str();
       return temporaryRegister(boat);
    }
 
