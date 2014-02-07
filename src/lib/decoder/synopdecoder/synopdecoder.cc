@@ -292,7 +292,7 @@ SynopDecoder::execute( std::string &msg)
          }
 
          if(!putkvStationInDb(tstat)){
-            LOGDEBUG("Cant save station data in database!");
+            LOGDEBUG("Can't save station data in the database!");
          }
       }
 
@@ -305,8 +305,7 @@ SynopDecoder::execute( std::string &msg)
           return Ok;
       }
 
-      LOGWARN("Synop REJECTED: invalid format!\n");
-      LOGDEBUG("Rejected: ------------\n" << reject.toSend() << endl);
+
       msg="Synop REJECTED: " + reject.comment();
 
       /**COMMENT:
@@ -319,9 +318,26 @@ SynopDecoder::execute( std::string &msg)
       */
 
       if(reject.comment()!="unknown station/position"){
+         LOGWARN("Synop REJECTED: invalid format!\n");
+         LOGDEBUG("Rejected: ------------\n" << reject.toSend() << endl);
          if(!putRejectdecodeInDb(reject)){
             LOGDEBUG("Cant save rejected data in database!");
          }
+      } else {
+          ostringstream o;
+          o << "Synop REJECTED: ";
+          if( ! synopDec.msgid.empty() )
+              o << "Unknown station '" << synopDec.msgid << "'.";
+          else
+              o << " Unknown station.";
+          o << "\n";
+
+          //Check if this is a norwgians station.
+          if( synopDec.msgid.length() == 4 && synopDec.msgid[0]=='1' ) {
+              LOGWARN( o.str() );
+          } else {
+              LOGINFO( o.str() );
+          }
       }
 
       return Rejected;
@@ -329,7 +345,7 @@ SynopDecoder::execute( std::string &msg)
 
    msg="OK!";
 
-   LOGINFO("SUCCESS:Observation(s) decoded and saved!");
+   LOGINFO("SUCCESS:Observation '" << synopDec.msgid << "' decoded and saved!");
 
    return Ok;
 }
