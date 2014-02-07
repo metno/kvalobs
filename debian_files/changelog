@@ -1,20 +1,26 @@
+kvalobs (2.7.5~rc3-1) lucid; urgency=low
+
+    * kvDataInputd: synopdecoder: Better logging for unknown stations.
+    
+ -- Borge Moe <borge.moe@met.no>  Fri, 7 Feb 2014 12:00:00 +0100
+
 kvalobs (2.7.5~rc2-1) lucid; urgency=low
 
     * kvpush: New option -q to also trigger a new run in kvQaBased.
     
- -- Borge Moe <borge.moe@met.no>  Tue, 28 Jan 2013 08:45:00 +0100
+ -- Borge Moe <borge.moe@met.no>  Tue, 28 Jan 2014 08:45:00 +0100
 
 kvalobs (2.7.5~rc1-1) lucid; urgency=low
 
     * #1306, Synop decoder: Reject SYNOP MOBIL.
     
- -- Borge Moe <borge.moe@met.no>  Mon, 27 Jan 2013 09:30:00 +0100
+ -- Borge Moe <borge.moe@met.no>  Mon, 27 Jan 2014 09:30:00 +0100
 
 kvalobs (2.7.4-1) lucid; urgency=low
 
     * New release, no change since last RC.
     
- -- Borge Moe <borge.moe@met.no>  Mon, 20 Jan 2013 10:30:00 +0100
+ -- Borge Moe <borge.moe@met.no>  Mon, 20 Jan 2014 10:30:00 +0100
     
 kvalobs (2.7.4~rc1-1) lucid; urgency=low
 
@@ -24,7 +30,7 @@ kvalobs (2.7.4~rc1-1) lucid; urgency=low
   * kvServiced: When getData is used to get minute data, chunk the data in
     3 hours chunks instead of 12 hours.
 
- -- Borge Moe <borge.moe@met.no>  Thu, 02 Jan 2013 15:30:00 +0100
+ -- Borge Moe <borge.moe@met.no>  Thu, 02 Jan 2014 15:30:00 +0100
  
  kvalobs (2.7.3-1) lucid; urgency=low
 
