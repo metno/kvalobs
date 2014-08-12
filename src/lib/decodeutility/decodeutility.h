@@ -49,6 +49,20 @@ namespace decodeutility{
     std::string VVKode(float meter);
     int         V456( int val );
 
+    /**
+     * hsCode2m converts WMO-code hshs, code table 1677,
+     * to meter.
+     *
+     * It returns INT_MAX on failure.
+     */
+    int hsCode2m( int iCode );
+
+    /**
+     * hs2Code converts an height in meter to
+     * a code.  WMO code table 1677.
+     */
+    std::string hs2Code( int hsInMeter );
+
     /** @} */
 
 };

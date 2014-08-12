@@ -31,6 +31,10 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string>
+#include <limits.h>
+#include <boost/lexical_cast.hpp>
+#include <iomanip>
+#include <sstream>
 #include "decodeutility.h"
 
 
@@ -220,6 +224,79 @@ V456(int val)
   default:
     return -1;
   }
+}
+
+
+
+
+int
+decodeutility::
+hsCode2m( int code )
+{
+    try {
+        if (code < 0 || code > 99 || (code > 50 && code < 56))
+            return INT_MAX;
+        else if (code <= 50)
+            return code * 30;
+        else if (code <= 80)
+            return (code - 56) * 300 + 1800;
+        else if (code < 89)
+            return (code - 81) * 1500 + 10500;
+        else if ( code == 89)  // never seen this in synop
+            return 21000;
+        else if (code == 90)
+            return 0;
+        else if (code == 91)
+            return 50;
+        else if (code == 92)
+            return 100;
+        else if (code == 93)
+            return 200;
+        else if (code == 94)
+            return 300;
+        else if ( code == 95)
+            return 600;
+        else if (code == 96)
+            return 1000;
+        else if ( code == 97)
+            return 1500;
+        else if ( code == 98)
+            return 2000;
+        else if ( code == 99)
+            return 2500; // could also mean no clouds
+    }
+    catch( ... ) {
+        return INT_MAX;
+    }
+    return INT_MAX;
+}
+
+
+std::string
+decodeutility::
+hs2Code( int hs )
+{
+    int code;
+
+    if( hs < 0 )
+        return "";
+
+    if( hs <= 1500 )
+        code =  hs/30.0 ;
+    else if( hs < 1800 )
+        code = 50;
+    else if ( hs <= 9000 )
+        code = (hs - 1800)/300 + 56;
+    else if( hs < 10500 )
+        code = 80;
+    else if (hs <= 21000)
+        code = (hs-10500)/1500 + 81;
+    else
+        code = 89;
+
+    std::ostringstream ost;
+    ost << std::setfill( '0' ) << std::setw( 2 ) << code;
+    return ost.str();
 }
 
 
