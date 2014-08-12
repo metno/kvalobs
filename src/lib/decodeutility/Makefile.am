@@ -43,6 +43,7 @@ TESTS = decodeutilitytest
 check_PROGRAMS = decodeutilitytest
 
 decodeutilitytest_SOURCES = \
+	test/decodeutilityTest.cc \
 	test/datareinsertertest.cc \
 	test/kvalobsdataserializertest.cc \
 	test/kvalobsdatatest.cc \
