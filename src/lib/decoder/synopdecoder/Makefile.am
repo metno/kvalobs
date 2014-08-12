@@ -1,3 +1,4 @@
+SUBDIRS=test
 decoderdir=$(pkglibdir)/decode
 
 decoder_LTLIBRARIES = synop.la
@@ -23,24 +24,4 @@ synop_la_LIBADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs_decoder
 
 synop_la_LDFLAGS = -module -version-info @KVALOBSLIBS_SO_VERSION@
 
-if HAVE_GTEST
-
-TESTS=kvSynopDecodeTest
-check_PROGRAMS=kvSynopDecodeTest
-
-kvSynopDecodeTest_SOURCES = test/kvSynopDecodeTest.cc \
-							kvSynopDecoder.cc  kvSynopDecoder.h \
-							synop.cc  synop.h \
-							synopElements.h \
-							synopLexer.h synopLexer.ll
-
-kvSynopDecodeTest_CPPFLAGS = $(synop_la_CPPFLAGS) $(gtest_CFLAGS)
-kvSynopDecodeTest_LDFLAGS = \
-	$(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
-	$(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la \
-	$(putools_LIBS) \
-	$(gtest_LIBS) \
-    $(synop_la_LIBADD)
-
-endif
 

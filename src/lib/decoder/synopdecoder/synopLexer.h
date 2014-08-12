@@ -36,6 +36,6 @@
 
 /// \brief synop lex function
 
-synop lexSynop(const std::string&);
+synop lexSynop(const std::string &synopStr, bool hshsInMeter = false );
 
 #endif

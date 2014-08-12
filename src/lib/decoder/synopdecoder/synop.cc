@@ -29,10 +29,12 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include "synop.h"
+#include <limits.h>
 #include <math.h>
 #include <sstream>
 #include <cstring>
 #include <cstdlib>
+#include <decodeutility/decodeutility.h>
 
 using namespace syn;
 using namespace std;
@@ -124,6 +126,26 @@ void synop::setToken(const int par, const char* token, int a, int b)
 void synop::setStaticToken(int& par, const char* token, int a, int b)
 {
   par= readToken(token,a,b);
+}
+
+
+void synop::setHsHsToken(const int par, const char *token, int pos, int len )
+{
+    int val = readToken( token, pos, len );
+
+    if( val == undef )
+        return;
+
+    if( hshsInMeter ) {
+        val = decodeutility::hsCode2m( val );
+
+        if( val == INT_MAX ) {
+            addError(errorToken+" (invalid code)", token );
+            return;
+        }
+    }
+
+    setBuffer( par, val );
 }
 
 
@@ -943,10 +965,9 @@ void synop::setExtraClouds(const char* token)
     return;
   }
    
-  setToken( Ns1  +clCounter, token, 1   );
-  setToken( C1   +clCounter, token, 2   );
-  setToken( hshs1+clCounter, token, 3, 2);
-
+  setHsHsToken( Ns1  +clCounter, token, 1   );
+  setHsHsToken( C1   +clCounter, token, 2   );
+  setHsHsToken( hshs1+clCounter, token, 3, 2);
 }
 
 void synop::sort333Token(const char *token)

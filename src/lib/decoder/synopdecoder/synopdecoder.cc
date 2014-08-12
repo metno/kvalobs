@@ -78,6 +78,24 @@ SynopDecoder::name() const
    return "SynopDecoder";
 }
 
+bool
+SynopDecoder::getHsInMeter()
+{
+    bool inMeter = false;
+    miutil::conf::ConfSection *conf = myConfSection();
+    miutil::conf::ValElementList val=conf->getValue("hshs_in_meter");
+
+    if( val.size() > 0 ) {
+        string v = val[0].valAsString();
+        if( v.size() > 0 && (v[0]=='t' || v[0]=='T') )
+            inMeter = true;
+    }
+
+    return inMeter;
+}
+
+
+
 long 
 SynopDecoder::getStationId(std::string & msg)
 {
@@ -145,6 +163,7 @@ SynopDecoder::initializeKvSynopDecoder()
    list<kvStation> stat;
    list<kvTypes>   synoptypes;
 
+   synopDec.setHshsInMeter( getHsInMeter() );
    //Get stations from the database
 
    if(!gate.select(stat, kvQueries::selectAllStations("stationid"))){
@@ -167,7 +186,7 @@ SynopDecoder::initializeKvSynopDecoder()
          lateobs  = synoptypes.begin()->lateobs();
       }
 
-   return synopDec.initialise(stat,earlyobs,lateobs);
+   return synopDec.initialise( stat, earlyobs, lateobs );
 }
 
 void

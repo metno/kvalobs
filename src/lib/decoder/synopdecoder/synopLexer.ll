@@ -76,9 +76,9 @@ static int synop_yyinput(char* buf, int max_size)
  * 2003.11.25 Bxrge
  * Fixed a memmory leak. synopToParse was never deleted!
  */
-synop lexSynop(const std::string& synopStr)
+synop lexSynop(const std::string& synopStr, bool hshsInMeter )
 {
-  synop newSynop;
+  synop newSynop( hshsInMeter );
   Synop = &newSynop;
 
   //synopToParse =  (char*)malloc((synopStr.size()+1)*sizeof(char));

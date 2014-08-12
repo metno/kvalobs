@@ -32,15 +32,33 @@
 #include <float.h>
 #include <limits.h>
 #include <string>
-#include <kvalobs/kvData.h>
 #include <list>
+#include <boost/assign.hpp>
+#include <kvalobs/kvData.h>
+#include <decoder/decoderbase/decodermgr.h>
+#include <decoder/synopdecoder/synopdecoder.h>
+#include <kvdb/dbdrivermgr.h>
+#include <dbdrivers/dummysqldb.h>
 #include <kvalobs/kvStation.h>
-#include "kvSynopDecoder.h"
+#include <decoderbase/test/ReadTypesFromFile.h>
+#include <decoderbase/test/ReadDataFromFile.h>
+#include <decoder/synopdecoder/synopElements.h>
 
+#include "../kvSynopDecoder.h"
 #include <gtest/gtest.h>
 
 using namespace std;
 using namespace miutil;
+using namespace std;
+using namespace kvalobs;
+using namespace miutil;
+using namespace dnmi::file;
+using namespace dnmi::db;
+
+namespace dc = kvalobs::decoder;
+namespace pt = boost::posix_time;
+namespace ba = boost::assign;
+
 
 namespace {
 struct ParamVal {
@@ -54,10 +72,43 @@ class SynopDecodeTest : public testing::Test
 {
 
 protected:
+    string dbId;
+    string testdb;
+    DriverManager dbMgr;
+    dc::DecoderMgr decoderMgr;
+    string decoderBaseTestDir;
+    string testdir;
+    string dbdir;
+    string decoderdir;
+    ParamList        paramList;
+    KvTypeList typesList;
 	kvSynopDecoder synopDecoder;
 
 	///Called before each test case.
 	virtual void SetUp() {
+	    testdb= TESTDB;
+	    testdir = TESTDIR;
+	    dbdir = DBDIR;
+	    decoderdir = DECODERDIR;
+	    decoderBaseTestDir = DECODERBASE_TESTDIR;
+	    decoderMgr.setDecoderPath( decoderdir );
+
+	    if( dbId.empty() ) {
+	        ASSERT_TRUE( dbMgr.loadDriver( dbdir+"/sqlite3driver.so", dbId ) )<<
+	         "Failed to load Db driver. Reason: " << dbMgr.getErr();
+	    }
+
+	    if( paramList.empty() ) {
+	        ASSERT_TRUE( readParamsFromFile( decoderBaseTestDir+"/kvparams.csv", paramList ) ) <<
+	                "Cant read params from the file <kvparams.csv>";
+	    }
+
+	    if( typesList.empty() ) {
+	        ASSERT_TRUE( ReadTypesFromFile(decoderBaseTestDir+"/kvtypes.csv", typesList) ) <<
+	                "Cant read types from the file <kvtypes.csv>";
+	    }
+
+	    setUpDb();
 		//Populate a station list and initialize the synop decoder with it.
 		list<kvalobs::kvStation> stationList;
 
@@ -82,6 +133,16 @@ protected:
 		ASSERT_TRUE( synopDecoder.initialise( stationList, 10, 20 ) ) << "Cant initialize the synopdecoder.";
 
 	}
+	void setUpDb() {
+	       unlink( TESTDB );
+	       dnmi::db::Connection *con = dbMgr.connect( dbId, testdb );
+	       ASSERT_TRUE( con != 0 )<< "Cant open database connection: " << testdb << ".";
+	       //ASSERT_NO_THROW( con->exec( schemaKvStation ) ) << "DB: cant create table 'stations'.";
+	       //cerr << stations << endl;
+	       //ASSERT_NO_THROW( con->exec( stations ) ) << "DB: cant insert into table 'stations'.";
+
+
+	   }
 
 	///Called after each test case.
 	virtual void TearDown() {
@@ -113,8 +174,13 @@ protected:
 
 	}
 
-	bool decode2ParamVal( const std::string &synop, ParamVal *paramval, kvalobs::kvRejectdecode &rejectInfo ) {
+	bool decode2ParamVal( const std::string &synop,
+	                      ParamVal *paramval,
+	                      kvalobs::kvRejectdecode &rejectInfo,
+	                      bool hshsInMeter=false) {
 		list<kvalobs::kvData> dataList;
+
+		synopDecoder.setHshsInMeter( hshsInMeter );
 
 		for( int i=0; paramval[i].paramid; ++i )
 			*paramval[i].val = FLT_MAX;
@@ -136,7 +202,22 @@ protected:
 		return true;
 
 	}
+	void createConfSection( const string &programName,
+	                        const string &decoderName,
+	                        miutil::conf::ConfSection *&conf)
+	{
+	    conf = new miutil::conf::ConfSection();
+	    miutil::conf::ConfSection *programConf = new miutil::conf::ConfSection();
+	    miutil::conf::ConfSection *tmp = new miutil::conf::ConfSection();
 
+	    ASSERT_TRUE( programConf->addSection( decoderName, tmp ) );
+	    ASSERT_TRUE( conf->addSection( programName, programConf ) );
+
+	    string sectionName = programName+"."+decoderName;
+	    miutil::conf::ConfSection *hasSection = conf->getSection( sectionName );
+
+	    ASSERT_TRUE( hasSection ) << "Can't create conf section '" << sectionName  << "'.";
+	}
 
 };
 
@@ -318,6 +399,64 @@ TEST_F( SynopDecodeTest, createObsTime )
    obsTime= kvSynopDecoder::createObsTime( 1, 0, ref );
    ASSERT_EQ( miTime( "2011-10-01 00:00:00"), obsTime );
 }
+
+
+TEST_F( SynopDecodeTest, getHsInMeter )
+{
+    string error;
+    string filename;
+    string obsType="synop";
+    string obsData ;
+    string header;
+    conf::ConfSection *conf=0;
+    string decoderName="SynopDecoder";
+    dc::DecoderBase *dec;
+    kvalobs::decoder::synop::SynopDecoder *synopDecoder;
+
+    dnmi::db::Connection *con = dbMgr.connect( dbId, testdb );
+    ASSERT_TRUE( con  )<< "Cant open database connection: " << string(testdb) << ".";
+    createConfSection( "kvDataInputd", decoderName, conf );
+
+    ASSERT_TRUE( conf );
+
+
+    conf::ConfSection *decoderConf = conf->getSection("kvDataInputd." + decoderName );
+    ASSERT_TRUE( decoderConf );
+    conf::ValElement val("true");
+    ASSERT_TRUE( decoderConf->addValue( "hshs_in_meter", val) );
+
+    decoderMgr.setTheKvConf( conf );
+    dec=decoderMgr.findDecoder( *con, paramList, typesList, obsType, obsData, error);
+    ASSERT_TRUE( dec  ) << "Cant create test decoder. obsType: '" << obsType << "'.";
+    synopDecoder = static_cast<kvalobs::decoder::synop::SynopDecoder*>(dec);
+    ASSERT_TRUE( synopDecoder->getHsInMeter() );
+
+    val.val("false");
+    ASSERT_TRUE( decoderConf->addValue( "hshs_in_meter", val) );
+    ASSERT_FALSE( synopDecoder->getHsInMeter() );
+
+    decoderMgr.releaseDecoder( dec );
+    decoderMgr.setTheKvConf( 0 );
+}
+
+
+TEST_F( SynopDecodeTest, decode333_8NsChshs )
+{
+    kvalobs::kvRejectdecode rejectInfo;
+    string synop="AAXX 18061 40745 46/// ///// 333 82930=";
+    float hshs;
+    ParamVal param[]={{syn::hshs1,   &hshs},
+                      {0, 0} };
+
+    //Test decoding hshs to meter.
+    EXPECT_TRUE( decode2ParamVal( synop, param, rejectInfo, true ) ) << "Rejected: " << rejectInfo.comment();
+    EXPECT_FLOAT_EQ( 900, hshs );
+
+    //Test decoding hshs to code.
+    EXPECT_TRUE( decode2ParamVal( synop, param, rejectInfo, false ) ) << "Rejected: " << rejectInfo.comment();
+    EXPECT_FLOAT_EQ( 30, hshs );
+}
+
 
 
 int

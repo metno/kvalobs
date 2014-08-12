@@ -288,7 +288,7 @@ correct_h_VV_N( std::list<kvalobs::kvData> &data ) const
 
 bool kvSynopDecoder::decode(const std::string &raw, list<kvData>&   data)
 {     
-   obs =  lexSynop(raw);
+   obs =  lexSynop( raw, hshsInMeter );
    data.clear();
 
    if( obs.getType() == syn::MOBIL ) {

@@ -76,11 +76,16 @@ private:
       
   std::map<int,float> obs;            ///< all data storage 
   syn::info   pinfo;                  ///< extra info (lon lat etc.)
+  bool hshsInMeter;
 
 public:
-  synop() : element(0), group(-1), clCounter(-1), type(syn::SYNOP), 
+  synop() : element(0), group(-1), clCounter(-1), type(syn::SYNOP),
 	    section(syn::S000), tokenType(syn::NORMALTOKEN), 
-	    sjj(0), extra333(false)  {}
+	    sjj(0), extra333(false), hshsInMeter( false )  {}
+
+  synop( bool hshsInMeter_ ) : element(0), group(-1), clCounter(-1), type(syn::SYNOP),
+          section(syn::S000), tokenType(syn::NORMALTOKEN),
+          sjj(0), extra333(false), hshsInMeter( hshsInMeter_ )  {}
 
   
   bool hasUnrecognised() { return !unrecognised.empty();}
@@ -137,7 +142,7 @@ private:
   void setSnowToken(const int& par,const char* token, int a, int b);       ///< adapt to klimadb 
   void setScaledSubstituteToken(const int, const char*,float,
 				int fsub, int tosub,int pos=0, int len=0); ///< adapt to klimadb 
-
+  void setHsHsToken(const int par, const char *token,int pos=0, int len=0);              ///< Convert to height in meter.
 
   bool value(int par,float& o);
   bool value(int par,int&   o);

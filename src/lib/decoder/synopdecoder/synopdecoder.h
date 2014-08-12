@@ -61,6 +61,7 @@ class SynopDecoder : public DecoderBase{
 
    void writeObsToLog(const std::string &obs);
 
+
 public:
    SynopDecoder(dnmi::db::Connection     &con,
                 const ParamList        &params,
@@ -70,6 +71,8 @@ public:
                 int               decoderId=-1);
 
    virtual ~SynopDecoder();
+
+   bool getHsInMeter();
 
    virtual std::string name()const;
 

@@ -79,7 +79,7 @@ private:
 
 
   std::string rejectComment;
-  
+  bool hshsInMeter;
 
   char checkObservationTime(miutil::miTime tbt, miutil::miTime obt);
   void correct_h_VV_N( std::list<kvalobs::kvData> &data )const;
@@ -92,6 +92,7 @@ public:
   static miutil::miTime firstDayNextMonth( const miutil::miTime &mi );
   static miutil::miTime lastDayThisMonth( const miutil::miTime &mi );
 
+  void setHshsInMeter( bool hshsInMeter_ ) { hshsInMeter = hshsInMeter_; }
   bool initialise(const std::list<kvalobs::kvStation>&, int e = 20, int l = 30 );
   void setReferenceTime(const miutil::miTime& r); ///< set ref, continuous = false
   void autoReferenceTime();                       ///< continuous = true; ref=now
