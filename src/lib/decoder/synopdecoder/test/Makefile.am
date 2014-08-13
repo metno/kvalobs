@@ -14,7 +14,7 @@ AM_LFLAGS = -PyySynop -olex.yy.c
 
 testdb=$(top_builddir)/src/lib/decoder/synopdecoder/test/testdb.sqlite
 
-CLEANFILES = $(testdb)
+CLEANFILES = $(testdb) synopLexer.cc
 
 
 kvSynopDecodeTest_SOURCES = \

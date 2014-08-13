@@ -25,3 +25,4 @@ synop_la_LIBADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs_decoder
 synop_la_LDFLAGS = -module -version-info @KVALOBSLIBS_SO_VERSION@
 
 
+CLEANFILES = synopLexer.cc
