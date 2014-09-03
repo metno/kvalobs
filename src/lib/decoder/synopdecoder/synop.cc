@@ -129,7 +129,7 @@ void synop::setStaticToken(int& par, const char* token, int a, int b)
 }
 
 
-void synop::setHsHsToken(const int par, const char *token, int pos, int len )
+void synop::setExtraCloudHsToken(const int par, const char *token, int pos, int len )
 {
     int val = readToken( token, pos, len );
 
@@ -144,6 +144,26 @@ void synop::setHsHsToken(const int par, const char *token, int pos, int len )
             return;
         }
     }
+
+    setBuffer( par, val );
+}
+
+void synop::setExtraCloudClToken(const int par, const char *token, int pos, int len )
+{
+    int val = readToken( token, pos, len );
+
+    if( val == undef )
+        return;
+
+    setBuffer( par, val );
+}
+
+void synop::setExtraCloudNsToken( const int par, const char *token, int pos, int len )
+{
+    int val = readToken( token, pos, len );
+
+    if( val == undef )
+        return;
 
     setBuffer( par, val );
 }
@@ -965,9 +985,9 @@ void synop::setExtraClouds(const char* token)
     return;
   }
    
-  setHsHsToken( Ns1  +clCounter, token, 1   );
-  setHsHsToken( C1   +clCounter, token, 2   );
-  setHsHsToken( hshs1+clCounter, token, 3, 2);
+  setExtraCloudNsToken( Ns1  +clCounter, token, 1   );
+  setExtraCloudClToken( C1   +clCounter, token, 2   );
+  setExtraCloudHsToken( hshs1+clCounter, token, 3, 2);
 }
 
 void synop::sort333Token(const char *token)

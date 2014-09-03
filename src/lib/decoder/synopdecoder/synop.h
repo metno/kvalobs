@@ -142,7 +142,9 @@ private:
   void setSnowToken(const int& par,const char* token, int a, int b);       ///< adapt to klimadb 
   void setScaledSubstituteToken(const int, const char*,float,
 				int fsub, int tosub,int pos=0, int len=0); ///< adapt to klimadb 
-  void setHsHsToken(const int par, const char *token,int pos=0, int len=0);              ///< Convert to height in meter.
+  void setExtraCloudHsToken(const int par, const char *token,int pos=0, int len=0);              ///< Convert to height in meter.
+  void setExtraCloudNsToken(const int par, const char *token,int pos=0, int len=0);              ///< Convert to height in meter.
+  void setExtraCloudClToken(const int par, const char *token,int pos=0, int len=0);              ///< Convert to height in meter.
 
   bool value(int par,float& o);
   bool value(int par,int&   o);
