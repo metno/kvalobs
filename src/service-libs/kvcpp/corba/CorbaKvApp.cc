@@ -771,7 +771,7 @@ bool CorbaKvApp::unsubscribe( const string &id, SubList &subList )
 void
 CorbaKvApp::unsubscribe( const string &id )
 {
-   cerr << "CorbaKvApp::unsubscribe( " << id << ");" << endl;
+   LOGDEBUG("CorbaKvApp::unsubscribe( " << id << ");\n");
    if ( unsubscribe( id, dataNotifySubs ) )
       return;
    if ( unsubscribe( id, dataSubs ) )
@@ -796,7 +796,7 @@ void CorbaKvApp::unsubscribeAll( SubList &subList )
 void
 CorbaKvApp::unsubscribeAll()
 {
-   cerr << "CorbaKvApp::unsubscribeAll( );" << endl;
+   LOGDEBUG("CorbaKvApp::unsubscribeAll( );\n");
    unsubscribeAll( dataNotifySubs );
    unsubscribeAll( dataSubs );
    unsubscribeAll( hintSubs );
