@@ -25,7 +25,7 @@ testsms2_SOURCES=testsms2.cc ReadParamsFromFile.cc ReadParamsFromFile.h\
 testsms2_CPPFLAGS = $(AM_CPPFLAGS) $(libxmlpp_CFLAGS) \
 					-DTESTDIR="\""$(top_srcdir)/src/lib/decoder/comobsdecoder/test"\"" \
 					-DDBDIR="\""$(top_builddir)/src/lib/dbdrivers/.libs"\"" 
-testsms2_LDFLAGS =  -pthread -export-dynamic
+testsms2_LDFLAGS = -pthread -export-dynamic
 testsms2_LDADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs_decoderbase.la \
                $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
                 $(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la \

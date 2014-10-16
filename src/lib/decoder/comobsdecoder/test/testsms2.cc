@@ -33,6 +33,7 @@
 #include <unistd.h>
 #include <fstream>
 #include <iostream>
+#include <boost/thread.hpp>
 #include <kvdb/dbdrivermgr.h>
 #include <fileutil/readfile.h>
 #include <fileutil/dir.h>
@@ -43,6 +44,7 @@
 #include "ReadParamsFromFile.h"
 #include "../smsmeldingparser.h"
 #include "FakeComobsDecoder.h"
+#include "../../decoderbase/RedirectInfo.h"
 
 using namespace std;
 using namespace kvalobs;
@@ -53,6 +55,13 @@ using namespace dnmi::db;
 void runtestOnFile(const ParamList &paramList,
                    std::list<kvalobs::kvTypes> typesList,
                    const dnmi::file::File &file);
+
+namespace kvdatainput {
+namespace decodecommand {
+boost::thread_specific_ptr<kvalobs::decoder::RedirectInfo> ptrRedirect;
+}
+}
+
 
 string dbId;
 DriverManager dbMgr;

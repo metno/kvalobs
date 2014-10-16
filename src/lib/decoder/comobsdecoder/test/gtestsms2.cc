@@ -56,6 +56,11 @@ using namespace dnmi::file;
 using namespace dnmi::db;
 using namespace kvalobs::decodeutil;
 
+namespace kvdatainput {
+namespace decodecommand {
+boost::thread_specific_ptr<kvalobs::decoder::RedirectInfo> ptrRedirect;
+}
+}
 
 
 
