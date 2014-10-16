@@ -39,7 +39,7 @@ namespace miutil{
    * @{
    */
 
-	/* @brif split a string separated with 'saparator'.
+	/* @brif split a string separated with 'separator'.
 	 * 
 	 * @param str the string to split.
 	 * @param separator Split the string at this separator.
