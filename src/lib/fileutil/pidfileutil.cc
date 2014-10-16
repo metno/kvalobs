@@ -164,6 +164,13 @@ dnmi::file::PidFileHelper::
     dnmi::file::deletePidFile(pidfile);
 }
 
+void
+dnmi::file::PidFileHelper::
+forget()
+{
+    pidfile.erase();
+}
+
 bool 
 dnmi::file::PidFileHelper::
 createPidFile(const std::string &pidfile_)

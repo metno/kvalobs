@@ -164,6 +164,11 @@ namespace dnmi{
       ~PidFileHelper();
 
       /**
+       * Forget this pidfile, in case of a fork, the child shall forget the pidfile.
+       */
+      void forget();
+
+      /**
        * \brief create a pidfile.
        */
       bool createPidFile(const std::string &pidfile);
