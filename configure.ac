@@ -48,6 +48,7 @@ AC_CONFIG_FILES([Makefile
                  src/lib/decoder/rejectdecoder/Makefile
                  src/lib/decoder/kv2kvdecoder/Makefile
                  src/lib/decoder/dummydecoder/Makefile
+                 src/lib/decoder/execdecoder/Makefile
                  src/lib/decoder/kldecoder/Makefile
                  src/lib/decoder/kldecoder/test/Makefile
                  src/lib/decoder/autoobsdecoder/Makefile
@@ -70,6 +71,7 @@ AC_CONFIG_FILES([Makefile
                  src/kv2kro2/Makefile
                  src/tools/kvpush/Makefile
                  src/tools/kv2kvDataInputd/Makefile
+                 src/tools/aexecd/Makefile
                  src/kvalobs_database/Makefile
                  src/kvalobs_database/upgrade/Makefile
                  src/script/Makefile
