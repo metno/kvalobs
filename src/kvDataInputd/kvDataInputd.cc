@@ -56,6 +56,11 @@ static mutex          m;
 static CORBA::ORB_ptr orb;
 static bool           hintKilled=false;
 
+namespace kvdatainput {
+namespace decodecommand {
+boost::thread_specific_ptr<kvalobs::decoder::RedirectInfo> ptrRedirect;
+}
+}
 
 
 using namespace kvalobs;

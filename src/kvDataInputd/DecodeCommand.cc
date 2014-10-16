@@ -29,15 +29,24 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include <milog/milog.h>
+#include <boost/thread.hpp>
 #include "DecodeCommand.h"
+
+namespace kvdatainput {
+namespace decodecommand {
+extern boost::thread_specific_ptr<kvalobs::decoder::RedirectInfo> ptrRedirect;
+}
+}
 
 
 DecodeCommand::~DecodeCommand()
 {
+    if( redirect_ )
+        delete redirect_;
 }
 
 DecodeCommand::DecodeCommand(kvalobs::decoder::DecoderBase *decoder_)
-:decoder(decoder_)
+:decoder(decoder_), redirect_( 0 )
 {
 }
 
@@ -54,7 +63,14 @@ DecodeCommand::executeImpl()
    LOGDEBUG("DecodeCommand::execute: called!\n");
 
    try {
+       kvdatainput::decodecommand::ptrRedirect.reset( new kvalobs::decoder::RedirectInfo() );
        result=decoder->execute(msg);
+       redirect_ = kvdatainput::decodecommand::ptrRedirect.release();
+       if( result != kvalobs::decoder::DecoderBase::Redirect ) {
+           delete redirect_;
+           redirect_ = 0;
+       }
+       LOGDEBUG("DecodeCommand::execute: Redirect: " << (redirect_?"redirected":"NOT redirected")<< " Result: " << result <<"\n");
    }
    catch( const std::exception &ex ) {
        LOGERROR("UNEXPECTED EXCEPTION from <"<< decoder->name() << ">\n Reason: " << ex.what() );

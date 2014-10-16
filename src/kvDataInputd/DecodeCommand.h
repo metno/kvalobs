@@ -33,6 +33,8 @@
 
 #include <dnmithread/CommandQue.h>
 #include <decoderbase/decoder.h>
+#include <decoderbase/RedirectInfo.h>
+
 
 
 /**
@@ -54,6 +56,7 @@ class DecodeCommand : public dnmi::thread::CommandBase{
   kvalobs::decoder::DecoderBase::DecodeResult result;
   std::string               msg;
   dnmi::thread::CommandQue       resQue;
+  kvalobs::decoder::RedirectInfo *redirect_;
   
   
   friend class DataSrcApp;
@@ -67,8 +70,10 @@ class DecodeCommand : public dnmi::thread::CommandBase{
   kvalobs::decoder::DecoderBase::DecodeResult getResult()const{ return result;}
   
   std::string getMsg()const{ return msg;}
+  void setMsg( const std::string &m ){ msg = m; }
 
   kvalobs::kvStationInfoList& getInfoList();
+  kvalobs::decoder::RedirectInfo *getRedirctInfo()const{ return redirect_; }
 
   DecodeCommand *wait(int timeoutInSecond=0);
   void       signal();
