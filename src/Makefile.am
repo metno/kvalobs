@@ -13,4 +13,5 @@ SUBDIRS = \
 	script \
 	kv2kro2 \
 	tools/kvpush \
-	tools/kv2kvDataInputd
+	tools/kv2kvDataInputd \
+	tools/aexecd
