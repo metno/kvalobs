@@ -85,7 +85,8 @@ valAsInt()const
   long l=0;
 
   if(valType_==INT){
-    sscanf(val_.c_str(), "%ld", &l);
+    if( sscanf(val_.c_str(), "%ld", &l) != 1 )
+        throw InvalidTypeEx();
   }else if(valType_==FLOAT){
     double d=0.0;
     sscanf(val_.c_str(), "%lf", &d);
@@ -103,6 +104,18 @@ valAsInt()const
 
 }
 
+long
+miutil::conf::ValElement::
+valAsInt( long defaultValue )const
+{
+    try {
+        return valAsInt();
+    }
+    catch (  ... ) {
+        return defaultValue;
+    }
+}
+
 double
 miutil::conf::ValElement::
 valAsFloat()const
@@ -111,7 +124,8 @@ valAsFloat()const
 
   if(valType_==INT){
     long l=0;
-    sscanf(val_.c_str(), "%ld", &l);
+    if( sscanf(val_.c_str(), "%ld", &l) != 1 )
+        throw InvalidTypeEx();
     d=static_cast<double>(l);
   }else if(valType_==FLOAT){
     sscanf(val_.c_str(), "%lf", &d);
@@ -124,6 +138,18 @@ valAsFloat()const
   }
 
   return d;
+}
+
+double
+miutil::conf::ValElement::
+valAsFloat( double defaultValue )const
+{
+    try {
+        return valAsFloat();
+    }
+    catch (  ... ) {
+        return defaultValue;
+    }
 }
 
 
