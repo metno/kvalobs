@@ -16,9 +16,14 @@ libkvalobs_miutil_la_SOURCES = \
 	splitstr.h splitstr.cc \
 	gettimeofday.h gettimeofday.cc \
 	msleep.h msleep.cc \
-	timeconvert.h
+	timeconvert.h \
+	sockethelper.h sockethelper.cc \
+	simplesocket.h simplesocket.cc \
+	aexecclient.h aexecclient.cc \
+	ArgvClass.h ArgvClass.cc \
+	signalhelpers.h signalhelpers.cc
 
-libkvalobs_miutil_la_CPPFLAGS = $(putools_CFLAGS) -fPIC
+libkvalobs_miutil_la_CPPFLAGS = -I$(top_srcdir)/src/lib $(putools_CFLAGS)  -fPIC
 libkvalobs_miutil_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@ -fPIC
 libkvalobs_miutil_la_LIBADD = $(BOOST_DATE_TIME_LIB)
 
