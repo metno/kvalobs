@@ -34,6 +34,7 @@
 #include <sstream>
 #include <fstream>
 #include <cstring>
+#include <boost/thread.hpp>
 #include <kvalobs/kvDbGate.h>
 #include <kvalobs/kvQueries.h>
 #include <kvalobs/kvGeneratedTypes.h>
@@ -46,6 +47,7 @@
 #include <decodeutility/getUseInfo7.h>
 #include <decodeutility/isTextParam.h>
 #include <kvalobs/getLogInfo.h>
+#include "RedirectInfo.h"
 #include "decoder.h"
 #include "ConfParser.h"
 #include "metadata.h"
@@ -54,6 +56,11 @@
 using namespace std;
 using namespace kvalobs;
 
+namespace kvdatainput {
+namespace decodecommand {
+extern boost::thread_specific_ptr<kvalobs::decoder::RedirectInfo> ptrRedirect;
+}
+}
 
 
 
@@ -148,6 +155,31 @@ DecoderBase::
    for(;it!=createdLoggers.end(); it++){
       milog::Logger::removeLogger(*it);
    }
+}
+
+
+
+/**
+ * This is a creative use of thread specific data to make a
+ * binary compatible transfer of data between a decoder and
+ * a decoder command. The DecoderBase class is binary compatible
+ * with old code that use it.
+ */
+bool
+kvalobs::decoder::
+DecoderBase::
+setRedirectInfo( const std::string &obsType, const std::string &data )
+{
+     RedirectInfo *redirectInfo = kvdatainput::decodecommand::ptrRedirect.get();
+
+     if( ! redirectInfo )
+         return false;
+
+     redirectInfo->decoder( name() );
+     redirectInfo->obsType( obsType );
+     redirectInfo->data( data );
+
+     return true;
 }
 
 void

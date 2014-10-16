@@ -51,8 +51,6 @@
 #include <decoderbase/GenCacheElem.h>
 #include <decoderbase/metadata.h>
 
-
-
 namespace kvalobs{
 
 
@@ -105,6 +103,9 @@ namespace kvalobs{
                       Active &state ) const;
     };
     
+
+
+
     class DecoderBase{
       DecoderBase();
       DecoderBase(const DecoderBase &);
@@ -347,11 +348,13 @@ namespace kvalobs{
 	  Ok,
 	    ///The \em obs was decoded, but not inserted into the database due to a database error.. 
 	    NotSaved, 
-	    ///There was an error while deoding the \em obs. The obs is inserted into the table \em rejectdecode.
-	    Rejected, 
+	    ///There was an error while decoding the \em obs. The obs is inserted into the table \em rejectdecode.
+	    Rejected,
 	    ///There was an unrecoverable error in the decoder. Not releated
 	    ///to the \em obs.
-	    Error} DecodeResult;
+	    Error,
+	    ///Redirect the message to the decoder in msg, from execute.
+	    Redirect} DecodeResult;
 
       /**
        * \brief This is the only avalable constructor, all classes that 
@@ -409,6 +412,9 @@ namespace kvalobs{
 
       virtual ~DecoderBase();
       
+
+      bool setRedirectInfo( const std::string &obsType, const std::string &data );
+
       /**
        * Set the configuration of the <kvalobs.conf> that is in effect.
        */

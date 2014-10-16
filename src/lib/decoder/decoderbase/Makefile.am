@@ -5,13 +5,15 @@ lib_LTLIBRARIES = libkvalobs_decoderbase.la
 
 decoderbaseincludedir = $(pkgincludedir)/decoder/decoderbase
 decoderbaseinclude_HEADERS = \
-	decoder.h GenCacheElem.h metadata.h 
+	decoder.h GenCacheElem.h metadata.h
 
 libkvalobs_decoderbase_la_SOURCES = decodermgr.cc decodermgr.h \
 							decoder.cc decoder.h\
-                            metadata.cc metadata.h \
-                            DataUpdateTransaction.h DataUpdateTransaction.cc \
-                            GenCacheElem.h ConfParser.h
+                     metadata.cc metadata.h \
+                     DataUpdateTransaction.h DataUpdateTransaction.cc \
+                     GenCacheElem.h ConfParser.h \
+                     RedirectInfo.cc RedirectInfo.h
+                     
 libkvalobs_decoderbase_la_CPPFLAGS = \
 	$(AM_CPPFLAGS) \
 	-DKVALOBSLIBS_SO_VERSION="\""@KVALOBSLIBS_SO_VERSION@"\"" \
