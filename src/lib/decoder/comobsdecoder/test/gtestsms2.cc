@@ -34,6 +34,8 @@
 #include <unistd.h>
 #include <fstream>
 #include <iostream>
+#include <boost/thread.hpp>
+#include <boost/shared_ptr.hpp>
 #include <kvdb/dbdrivermgr.h>
 #include <fileutil/readfile.h>
 #include <fileutil/dir.h>
@@ -46,6 +48,7 @@
 #include "ReadParamsFromFile.h"
 #include "../smsmeldingparser.h"
 #include "FakeComobsDecoder.h"
+#include "../../decoderbase/RedirectInfo.h"
 #include <gtest/gtest.h>
 
 using namespace std;

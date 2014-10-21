@@ -34,6 +34,8 @@
 #include <string>
 #include <list>
 #include <boost/assign.hpp>
+#include <boost/thread.hpp>
+#include <boost/shared_ptr.hpp>
 #include <kvalobs/kvData.h>
 #include <decoder/decoderbase/decodermgr.h>
 #include <decoder/synopdecoder/synopdecoder.h>
@@ -43,7 +45,7 @@
 #include <decoderbase/test/ReadTypesFromFile.h>
 #include <decoderbase/test/ReadDataFromFile.h>
 #include <decoder/synopdecoder/synopElements.h>
-
+#include "../../decoderbase/RedirectInfo.h"
 #include "../kvSynopDecoder.h"
 #include <gtest/gtest.h>
 
@@ -59,6 +61,11 @@ namespace dc = kvalobs::decoder;
 namespace pt = boost::posix_time;
 namespace ba = boost::assign;
 
+namespace kvdatainput {
+namespace decodecommand {
+boost::thread_specific_ptr<kvalobs::decoder::RedirectInfo> ptrRedirect;
+}
+}
 
 namespace {
 struct ParamVal {
@@ -92,6 +99,7 @@ protected:
 	    decoderdir = DECODERDIR;
 	    decoderBaseTestDir = DECODERBASE_TESTDIR;
 	    decoderMgr.setDecoderPath( decoderdir );
+	    decoderMgr.updateDecoders();
 
 	    if( dbId.empty() ) {
 	        ASSERT_TRUE( dbMgr.loadDriver( dbdir+"/sqlite3driver.so", dbId ) )<<

@@ -36,6 +36,8 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <boost/shared_ptr.hpp>
+#include <boost/thread.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/assign.hpp>
 #include <decoder/decoderbase/decodermgr.h>
@@ -54,6 +56,7 @@
 #include "../kldata.h"
 #include "../kldecoder.h"
 #include "../DataDecode.h"
+#include "../../decoderbase/RedirectInfo.h"
 #include <gtest/gtest.h>
 
 using namespace std;
@@ -67,6 +70,12 @@ using namespace kvalobs::decoder::kldecoder;
 namespace dc = kvalobs::decoder;
 namespace pt = boost::posix_time;
 namespace ba = boost::assign;
+
+namespace kvdatainput {
+namespace decodecommand {
+boost::thread_specific_ptr<kvalobs::decoder::RedirectInfo> ptrRedirect;
+}
+}
 
 namespace {
 const char *schemaKvStation = "CREATE TABLE station (	"
@@ -122,6 +131,7 @@ protected:
       decoderdir = DECODERDIR;
       decoderBaseTestDir = DECODERBASE_TESTDIR;
       decoderMgr.setDecoderPath( decoderdir );
+      decoderMgr.updateDecoders();
 
       if( dbId.empty() ) {
          ASSERT_TRUE( dbMgr.loadDriver( dbdir+"/sqlite3driver.so", dbId ) )<<

@@ -36,6 +36,8 @@
 #include <iostream>
 #include <string>
 #include <boost/date_time/posix_time/ptime.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/thread.hpp>
 #include <decoder/decoderbase/decodermgr.h>
 #include <kvdb/dbdrivermgr.h>
 #include <fileutil/readfile.h>
@@ -47,6 +49,7 @@
 //#include "ReadParamsFromFile.h"
 #include "ReadTypesFromFile.h"
 #include <gtest/gtest.h>
+#include "../RedirectInfo.h"
 
 using namespace std;
 using namespace kvalobs;
@@ -55,6 +58,12 @@ using namespace dnmi::file;
 using namespace dnmi::db;
 namespace dc = kvalobs::decoder;
 namespace pt = boost::posix_time;
+
+namespace kvdatainput {
+namespace decodecommand {
+boost::thread_specific_ptr<kvalobs::decoder::RedirectInfo> ptrRedirect;
+}
+}
 
 class DecoderBaseTest : public testing::Test
 {
@@ -78,6 +87,7 @@ protected:
       dbdir = DBDIR;
       decoderdir = DECODERDIR;
       decoderMgr.setDecoderPath( decoderdir );
+      decoderMgr.updateDecoders();
 
       if( dbId.empty() ) {
          ASSERT_TRUE( dbMgr.loadDriver( dbdir+"/sqlite3driver.so", dbId ) )<<
