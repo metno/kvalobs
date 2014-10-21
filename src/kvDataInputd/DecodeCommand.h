@@ -73,7 +73,13 @@ class DecodeCommand : public dnmi::thread::CommandBase{
   void setMsg( const std::string &m ){ msg = m; }
 
   kvalobs::kvStationInfoList& getInfoList();
-  kvalobs::decoder::RedirectInfo *getRedirctInfo()const{ return redirect_; }
+
+  /**
+   * The caller must delete the pointer.
+   */
+  kvalobs::decoder::RedirectInfo *getRedirctInfo(){ kvalobs::decoder::RedirectInfo *ret = redirect_;
+                                                         redirect_ = 0;
+                                                         return ret; }
 
   DecodeCommand *wait(int timeoutInSecond=0);
   void       signal();

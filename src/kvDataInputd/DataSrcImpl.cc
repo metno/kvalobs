@@ -61,6 +61,7 @@ DataSrcImpl::newData(const char* data_, const char* obsType_)
     string redirectedData;
     string redirectedObsType;
     bool redirect = false;
+    boost::shared_ptr<kvalobs::decoder::RedirectInfo> redirected;
 
     Result *res;
 
@@ -153,9 +154,10 @@ DataSrcImpl::newData(const char* data_, const char* obsType_)
         }
 
         kvalobs::decoder::DecoderBase::DecodeResult decodeResult=decCmdRet->getResult();
+        redirect = false;
 
         if(decodeResult==kvalobs::decoder::DecoderBase::Redirect ){
-            kvalobs::decoder::RedirectInfo *redirected = decCmd->getRedirctInfo();
+            redirected.reset( decCmd->getRedirctInfo() );
             LOGDEBUG("Decode: Redirect: Checkpoint");
             if( redirected ) {
                 string redirectedFromDecoder=redirected->decoder();

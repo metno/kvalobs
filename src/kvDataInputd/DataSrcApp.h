@@ -45,6 +45,7 @@
 #include "ConnectionCache.h"
 #include <kvalobs/paramlist.h>
 #include <kvalobs/kvTypes.h>
+#include "miconfparser/miconfparser.h"
 #include <list>
 
 /**
@@ -78,6 +79,8 @@ class DataSrcApp : public KvApp
   std::list<kvalobs::kvTypes>          typeList;
   bool                                 shutdown_;
   boost::posix_time::ptime             nextParamCheckTime;
+  std::string                          amqpUrl;
+  std::string                          amqpPasswd;
 
   /**
    * \brief registerParams reads parameter information from the table
@@ -116,7 +119,7 @@ class DataSrcApp : public KvApp
    * \returns true if we find at least one decoder. false if no decoders is 
    * found.
    */
-  bool registerAllDecoders();
+  bool registerAllDecoders( miutil::conf::ConfSection *theConf );
 
   /**
    *\brief lookUpManager, use the CORBA nameserver if necessary, to
@@ -196,6 +199,9 @@ class DataSrcApp : public KvApp
 
   bool sendInfoToManager(const kvalobs::kvStationInfoList &info);
   
+  std::string getAmqpUrl()const { return amqpUrl; }
+  std::string getAmqpPasswd()const { return amqpPasswd;  }
+
   /**
    * \brief put is used to send the command to the consument threads.
    *

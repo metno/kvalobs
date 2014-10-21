@@ -66,7 +66,18 @@ DataSrcApp::DataSrcApp(int argn, char **argv,
       exit(1);
    }
 
-   miutil::conf::ValElementList val=conf->getValue("database.dbdriver");
+   miutil::conf::ValElementList val=conf->getValue("amqp.url");
+
+   if(val.size()==1) {
+      amqpUrl  = val[0].valAsString();
+      val=conf->getValue("amqp.passwd");
+
+      if(val.size()==1) {
+          amqpPasswd = val[0].valAsString();
+      }
+   }
+
+   val=conf->getValue("database.dbdriver");
 
    if(val.size()==1)
       dbDriver=val[0].valAsString();
@@ -76,15 +87,15 @@ DataSrcApp::DataSrcApp(int argn, char **argv,
    if(dbDriver.empty())
       dbDriver="pgdriver.so";
 
-   decoderMgr.setDecoderPath(myPath);
    decoderMgr.setTheKvConf( theKvConf );
+   decoderMgr.setDecoderPath(myPath);
 
    nConnections=registerDb(nConnections_);
 
    if(nConnections<1)
       return;
 
-   if(!registerAllDecoders())
+   if(!registerAllDecoders( theKvConf) )
       return;
 
    milog::createGlobalLogger( logdir, "kvDataInputd", "param_update", milog::DEBUG );
@@ -271,8 +282,9 @@ DataSrcApp::registerDb(int nConn)
 }
 
 bool 
-DataSrcApp::registerAllDecoders()
+DataSrcApp::registerAllDecoders( miutil::conf::ConfSection *theConf )
 {
+    decoderMgr.updateDecoders( theConf );
    if(decoderMgr.numberOfDecoders()<1){
       LOGERROR("registerAllDecoders: Can't registers decoders!\n");
       return false;
