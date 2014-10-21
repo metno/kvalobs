@@ -29,11 +29,13 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include <list>
+#include <iostream>
 #include "execentry.h"
 #include "execdecoder.h"
 #include <milog/milog.h>
 
 using namespace kvalobs::decoder::execdecoder;
+using namespace std;
 
 kvalobs::decoder::DecoderBase* 
 decoderFactory(dnmi::db::Connection &con,
@@ -74,8 +76,27 @@ getObsTypes()
 {
   std::list<std::string> list;
 
-  list.push_back("bufr");
+  LOGDEBUG( "ExecDecoder::getObsTypes: called.");
+  //list.push_back("bufr");
 
   return list;
 }
 
+std::list<std::string>
+getObsTypesExt( miutil::conf::ConfSection *theKvConf )
+{
+    using namespace miutil::conf;
+    std::list<std::string> list;
+    LOGDEBUG("ExecDecoder::getObsTypesExt: theKvConf: " << (theKvConf?"NOT null":"NULL"));
+
+    if( ! theKvConf )
+        return list;
+
+    ConfSection *mySection=theKvConf->getSection("kvDataInputd.ExecDecoder.decoders");
+
+    if( ! mySection )
+        return list;
+
+    list = mySection->getSubSections();
+    return list;
+}

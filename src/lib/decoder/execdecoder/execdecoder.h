@@ -43,18 +43,49 @@ namespace execdecoder{
  * @{
  */
 
-typedef boost::mutex::scoped_lock    Lock;
 
 /**
  * \brief implements the interface  DecoderBase.
  *
- * This is a dummydecoder that is used to test the dataflow. It
- * return allways true;
+ * ExecDecoder, call an external program to decode the received data.
+ * The external program writes the decoded data to a file in the kldata
+ * format. The decoder redirect to the kldata decoder. The kldata loads
+ * the data into the database and the result returned to the data sender
+ * is from kldata.
+ *
+ * The program to decode the data is configured in the configuration file
+ * kvalobs.conf in the section:
+ *
+ *    kvDataInputd {
+ *       ExecDecoder {
+ *           aexecd = ("localhost", 6666)
+ *           bindir="/home/borgem/projects/build/kvalobs_1"
+ *           loglevel=debug
+ *
+ *           decoders {
+ *              bufr {
+ *                 decoder="mytest.sh"
+ *              }
+ *           }
+ *       }
+ *    }
  */
 class ExecDecoder : public DecoderBase{
     ExecDecoder();
     ExecDecoder(const ExecDecoder &);
     ExecDecoder& operator=(const ExecDecoder &);
+
+protected:
+    std::string getDecoderProg();
+    std::string getDecoderName();
+    std::string getBindir();
+    std::string loglevel();
+    bool getAexecd( std::string &host, int &port );
+    bool createInputFile( const std::string &filename );
+    int  getProgTimeout( int defaultTimeout=10 );
+    int  runProg( const std::string &cmd, const std::string &logfile );
+
+    DecoderBase::DecodeResult  doRedirect( const std::string &kvdata, std::string &msg  );
 
 public:
     ExecDecoder(dnmi::db::Connection     &con,

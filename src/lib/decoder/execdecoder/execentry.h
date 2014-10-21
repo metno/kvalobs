@@ -59,6 +59,7 @@ extern "C" {
              miutil::conf::ConfSection *theKvConf );
 
   std::list<std::string> getObsTypes();
+  std::list<std::string> getObsTypesExt( miutil::conf::ConfSection *theKvConf );
 }  
 
 /** @} */
