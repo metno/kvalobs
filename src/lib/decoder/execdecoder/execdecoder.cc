@@ -28,17 +28,19 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+#include <unistd.h>
 #include <vector>
 #include <fstream>
 #include <stdexcept>
-#include <unistd.h>
+#include <utility>
+#include <boost/algorithm/string.hpp>
 #include <milog/milog.h>
-#include <puTools/miTime.h>
 #include "kvalobs/kvPath.h"
 #include "fileutil/fileutil.h"
 #include "fileutil/readfile.h"
 #include "miutil/aexecclient.h"
 #include "miutil/base64.h"
+#include "miutil/splitstr.h"
 
 #include "execdecoder.h"
 
@@ -49,6 +51,7 @@ namespace kvalobs {
 namespace decoder {
 namespace execdecoder{
 
+namespace {
 class aexecd_error : public exception {
 public:
     typedef enum  { FormatError, Timeout, Error }ErrorType;
@@ -68,7 +71,24 @@ public:
     const char *what() const throw() { return msg.c_str(); }
 };
 
+pair<string, string>
+getKey( const std::string &keyval  )
+{
+    string key;
+    string val;
+    string::size_type i=keyval.find("=");
 
+    if( i == string::npos )
+        return make_pair( boost::trim_copy( keyval ), "" );
+
+    key = keyval.substr( 0, i );
+    val = keyval.substr( i+1 );
+    boost::trim( key );
+    boost::trim( val );
+    return make_pair( key, val );
+}
+
+}
 using namespace miutil::conf;
 
 ExecDecoder::
@@ -81,11 +101,62 @@ ExecDecoder(
       int   decoderId)
 :DecoderBase(con, params, typeList, obsType, obs, decoderId)
 {
+    decodeObstype();
 }
 
 ExecDecoder::
 ~ExecDecoder()
 {
+}
+
+
+
+void
+ExecDecoder::
+decodeObstype()
+{
+    //decodeObsType, decodes the obsType.
+    //obsType is on the form: decoder/keyval1/keyval2/.../keyvalN
+    //Where keyval is either a key or key=value.
+    //It creates a new obsType_, where the decoder is removed. It also
+    //removes the keyval encoding.
+    //It sets the variables decoderName_ and encoding_.
+
+    list<string> obsTypeList;
+    vector<string> elems;
+    obsTypePart_ = obsType;
+    string tmp;
+
+    string::size_type i = obsTypePart_.find("/");
+
+    if( i != string::npos ) {
+        decoderName_ = obsTypePart_.substr( 0, i );
+        obsTypePart_.erase( 0, i+1 );
+        boost::trim( decoderName_ );
+    }
+
+    pair<string,string> keyval;
+    elems = miutil::splitstr( obsTypePart_, '/', '"');
+    vector<string>::iterator it = elems.begin();
+
+    while( it != elems.end() ) {
+        keyval = getKey( *it );
+        if( keyval.first == "encoding" ) {
+            encoding_ = keyval.second;
+            it = elems.erase( it );
+        } else {
+            obsTypeList.push_back( *it );
+            ++it;
+        }
+    }
+
+    ostringstream ost;
+    for( list<string>::iterator it=obsTypeList.begin(); it != obsTypeList.end(); ++it ) {
+        if( it != obsTypeList.begin() )
+            ost << "/";
+        ost << *it;
+    }
+    obsTypePart_ = ost.str();
 }
 
 std::string
@@ -141,11 +212,9 @@ std::string
 ExecDecoder::
 getDecoderName()
 {
-    string decoder( obsType );
-    string::size_type i = decoder.find("/");
 
-    if( i != string::npos )
-        decoder.erase( i );
+    if( decoderName_.empty() )
+        return "";
 
     ConfSection *conf = myConfSection();
 
@@ -155,16 +224,16 @@ getDecoderName()
         return "";
     }
 
-    string decoderkey = "decoders."+decoder;
+    string decoderkey = "decoders."+decoderName_;
     ConfSection *decoderSection=conf->getSection( decoderkey );
 
     if( ! decoderSection ) {
         string myName = name();
-        LOGERROR("No section defined for obstype '" << decoder << "' in section 'kvDataInpud." << myName << ".decoders' in the configuration file.");
+        LOGERROR("No section defined for obstype '" << decoderName_ << "' in section 'kvDataInpud." << myName << ".decoders' in the configuration file.");
         return "";
     }
 
-    return decoder;
+    return decoderName_;
 }
 
 std::string
@@ -251,7 +320,7 @@ bool
 ExecDecoder::
 createInputFile( const std::string &filename )
 {
-    string val = getObsTypeKey( "encoding" );
+    string val = getEncoding();
     bool base64 = (val == "base64");
     ofstream f( filename.c_str(), ofstream::out | ofstream::trunc | ofstream::binary );
 
@@ -370,6 +439,7 @@ doRedirect( const std::string &kvdata, std::string &msg  )
 {
     string buf;
     string obstype;
+    string part=getObsTypeParts();
 
     if( !dnmi::file::ReadFile( kvdata, buf ) ) {
         LOGERROR("Could not read file '"<< kvdata <<"'.");
@@ -397,6 +467,12 @@ doRedirect( const std::string &kvdata, std::string &msg  )
 
     obstype = buf.substr( 0, i );
     buf.erase( 0, i+1 );
+
+    boost::trim_if( obstype, boost::is_any_of("\r\n /"));
+
+    if( ! part.empty() )
+        obstype += "/" + part;
+
     setRedirectInfo( obstype, buf );
     unlink( kvdata.c_str() );
     return Redirect;

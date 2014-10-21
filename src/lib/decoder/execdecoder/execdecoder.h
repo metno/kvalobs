@@ -75,11 +75,19 @@ class ExecDecoder : public DecoderBase{
     ExecDecoder(const ExecDecoder &);
     ExecDecoder& operator=(const ExecDecoder &);
 
+    std::string obsTypePart_;
+    std::string encoding_;
+    std::string decoderName_;
+
+    void decodeObstype();
+
 protected:
     std::string getDecoderProg();
     std::string getDecoderName();
     std::string getBindir();
     std::string loglevel();
+    std::string getEncoding()const{ return encoding_; }
+    std::string getObsTypeParts() const { return obsTypePart_; }
     bool getAexecd( std::string &host, int &port );
     bool createInputFile( const std::string &filename );
     int  getProgTimeout( int defaultTimeout=10 );
