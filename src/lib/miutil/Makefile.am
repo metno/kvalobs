@@ -21,7 +21,9 @@ libkvalobs_miutil_la_SOURCES = \
 	simplesocket.h simplesocket.cc \
 	aexecclient.h aexecclient.cc \
 	ArgvClass.h ArgvClass.cc \
-	signalhelpers.h signalhelpers.cc
+	signalhelpers.h signalhelpers.cc \
+	strerror.h strerror.cc \
+	SemiUniqueName.h SemiUniqueName.cc
 
 libkvalobs_miutil_la_CPPFLAGS = -I$(top_srcdir)/src/lib $(putools_CFLAGS)  -fPIC
 libkvalobs_miutil_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@ -fPIC
@@ -30,7 +32,8 @@ libkvalobs_miutil_la_LIBADD = $(BOOST_DATE_TIME_LIB)
 miutilincludedir = $(pkgincludedir)/miutil
 miutilinclude_HEADERS = msleep.h replace.h cmprspace.h commastring.h \
                         miTimeParse.h trimstr.h base64.h gettimeofday.h \
-                        splitstr.h timeconvert.h
+                        splitstr.h timeconvert.h strerror.h signalhelpers.h \
+                        sockethelper.h simplesocket.h aexecclient.h SemiUniqueName.h
 
 
 if HAVE_GMOCK 
