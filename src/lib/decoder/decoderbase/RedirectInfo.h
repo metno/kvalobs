@@ -33,7 +33,10 @@
 #define __REDIRECTINFO_H__
 
 #include <string>
+#include <list>
 #include <boost/utility.hpp>
+
+class DataSrcImpl;
 
 namespace kvalobs{
 namespace decoder{
@@ -43,6 +46,7 @@ class RedirectInfo : boost::noncopyable {
     std::string obsType_;
     std::string data_;
     std::string decoder_;
+
 public:
     RedirectInfo();
     RedirectInfo( const std::string &decoderName );
@@ -56,6 +60,7 @@ public:
     std::string obsType()const;
     std::string data()const;
     std::string decoder()const;
+
 };
 }
 }

@@ -44,6 +44,7 @@
 #include <miutil/commastring.h>
 #include <miutil/trimstr.h>
 #include <miutil/timeconvert.h>
+#include <miutil/SemiUniqueName.h>
 #include <decodeutility/getUseInfo7.h>
 #include <decodeutility/isTextParam.h>
 #include <kvalobs/getLogInfo.h>
@@ -157,7 +158,13 @@ DecoderBase::
    }
 }
 
-
+std::string
+kvalobs::decoder::
+DecoderBase::
+semiuniqueName( const std::string &prefix, const char *endsWith )
+{
+    return miutil::SemiUniqueName::uniqueName( prefix, endsWith );
+}
 
 /**
  * This is a creative use of thread specific data to make a
@@ -890,6 +897,88 @@ myConfSection()
 	}
 
 	return conf;
+}
+
+std::string
+kvalobs::decoder::
+DecoderBase::
+createOrCheckDir( const std::string &where, const std::string &dir )
+{
+    list<string> pathlist;
+    string path=where;
+    ostringstream     ost;
+    bool error=false;
+
+    if(!path.empty() && path[path.length()-1]=='/')
+           path.erase(path.length()-1);
+
+    pathlist.push_back( path );
+    pathlist.push_back( "decoders" );
+    pathlist.push_back( name() );
+
+    if( ! dir.empty() ) {
+        path = dir;
+
+        if(!path.empty() && path[path.length()-1]=='/')
+            path.erase(path.length()-1);
+
+        vector<string> d;
+        string part;
+        boost::split( d, path, boost::is_any_of("/"));
+        for( vector<string>::iterator it = d.begin(); it != d.end(); ++it ) {
+            part = boost::trim_copy_if( *it , boost::is_any_of(" \r\t\n"));
+            if( !part.empty() )
+                pathlist.push_back( part );
+        }
+    }
+
+
+    ost.str("");
+
+    for(list<string>::iterator it=pathlist.begin();
+          it!=pathlist.end() && !error;
+          it++){
+        ost << *it;
+
+       if(mkdir(ost.str().c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)<-1){
+          if(errno==EEXIST){
+             continue;
+          }else{
+             error=true;
+          }
+       }
+       ost << "/";
+    }
+
+    if(error){
+        ost.str("");
+        for( list<string>::iterator it=pathlist.begin();
+             it!=pathlist.end() && !error;
+             it++)
+            ost << *it << "/";
+
+       LOGERROR("Can NOT create the dierctory. A directory in the path maybe missing or a dangling link!\n"
+             << "Path: '" << ost.str() << "'.");
+
+       return "";
+    }
+    return ost.str();
+}
+
+std::string
+kvalobs::decoder::
+DecoderBase::
+logdirForLogger( const std::string &dir)
+{
+    return createOrCheckDir( logdir(), dir );
+}
+
+std::string
+kvalobs::decoder::
+DecoderBase::
+datdirForLogger( const std::string &dir )
+{
+    return createOrCheckDir( kvPath( localstatedir ), dir );
 }
 
 

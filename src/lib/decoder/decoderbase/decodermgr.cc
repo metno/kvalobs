@@ -49,7 +49,13 @@ DecoderMgr::readyForUpdate()
 }
 
 void
-DecoderMgr::updateDecoders()
+DecoderMgr::updateDecoders( )
+{
+    updateDecoders( theKvConf );
+}
+
+void
+DecoderMgr::updateDecoders( miutil::conf::ConfSection *theKvConf )
 {
    Dir                dir;
    std::string        name;
@@ -57,6 +63,7 @@ DecoderMgr::updateDecoders()
    decoderFactory     fac;
    releaseDecoderFunc releaseFunc;
    getObsTypes        obsTypes;
+   getObsTypesExt     obsTypesExt;
    setKvConf          setConf;
    DecoderItem        *decoder;
    int                id=0;
@@ -84,8 +91,23 @@ DecoderMgr::updateDecoders()
          obsTypes=(getObsTypes)(*dso)["getObsTypes"];
          releaseFunc=(releaseDecoderFunc)(*dso)["releaseDecoder"];
          setConf = (setKvConf)dso->loadSymbol("setKvConf");
+         obsTypesExt =(getObsTypesExt)dso->loadSymbol("getObsTypesExt");
          decoder=new DecoderItem(fac, releaseFunc, setConf, dso, modTime(name));
-         decoder->obsTypes=obsTypes();
+
+         if( obsTypesExt )
+             decoder->obsTypes=obsTypesExt( theKvConf );
+         else
+             decoder->obsTypes=obsTypes();
+
+         {//Debug
+             ostringstream ost;
+             ost << "Id: '" << name << "' (" << id << ").\nDecoders:";
+             for( list<string>::const_iterator it = decoder->obsTypes.begin(); it != decoder->obsTypes.end(); ++it ){
+                 ost << " '" << *it << "'";
+             }
+             LOGDEBUG( ost.str() );
+         }
+
          decoder->decoderId=id;
          id++;
 
@@ -128,9 +150,6 @@ DecoderMgr::setDecoderPath(const std::string &decoderPath_)
 
    if(rit!=decoderPath.rend() && *rit=='/')
       decoderPath.erase(decoderPath.length()-1);
-
-
-   updateDecoders();
 }
 
 

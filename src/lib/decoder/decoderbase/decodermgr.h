@@ -63,6 +63,7 @@ typedef void (*releaseDecoderFunc)(
                );
 
 typedef std::list<std::string> (*getObsTypes)();
+typedef std::list<std::string> (*getObsTypesExt)( miutil::conf::ConfSection *theKvConf );
 
 typedef void (*setKvConf)(
                kvalobs::decoder::DecoderBase* decoder,
@@ -132,8 +133,8 @@ public:
    * returns true when all decoder has a decoderCount of 0.
    */
    bool readyForUpdate();
+   void updateDecoders( miutil::conf::ConfSection *theKvConf );
    void updateDecoders();
-
 
    DecoderBase *findDecoder(dnmi::db::Connection   &connection,
                             const ParamList        &params,

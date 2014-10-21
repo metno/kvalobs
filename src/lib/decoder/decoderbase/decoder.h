@@ -120,6 +120,32 @@ namespace kvalobs{
     protected:
       milog::FLogStream *openFLogStream(const std::string &filename);
       
+      std::string createOrCheckDir(  const std::string &where, const std::string &dir );
+
+      /**
+       * Return a decoder specific logdir, ie
+       * kvPath(logidir)/decoders/name().
+       * If the input parameter is not empty
+       * the kvPath(logidir)/decoders/name()/path
+       * is created if it does not exist.
+       *
+       * @param dir create this directory in the decoder specific log directory.
+       * @return the path to the decoder specific directory/dir.
+       */
+      std::string logdirForLogger( const std::string &dir="");
+
+      /**
+       * Return a decoder specific datadir, ie
+       * kvPath(datadir)/decoders/name().
+       * If the input parameter is not empty
+       * the kvPath(datadir)/decoders/name()/path
+       * is created if it does not exist.
+       *
+       * @param dir create this directory in the decoder specific data directory.
+       * @return the path to the decoder specific directory/dir.
+       */
+      std::string datdirForLogger( const std::string &dir="");
+
       void addStationInfo(long stationid,
 			  const miutil::miTime &obstime,
 			  long typeid_,
@@ -412,6 +438,7 @@ namespace kvalobs{
 
       virtual ~DecoderBase();
       
+      std::string semiuniqueName( const std::string &prefix, const char *endsWith );
 
       bool setRedirectInfo( const std::string &obsType, const std::string &data );
 

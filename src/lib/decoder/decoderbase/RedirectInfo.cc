@@ -31,6 +31,8 @@
 
 #include "RedirectInfo.h"
 
+using namespace std;
+
 namespace kvalobs{
 namespace decoder{
 
@@ -71,8 +73,6 @@ RedirectInfo::
     if( pimpl )
         delete static_cast<ThePimpel*>(pimpl);
 }
-
-
 
 void
 RedirectInfo::
