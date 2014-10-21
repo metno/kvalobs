@@ -156,14 +156,17 @@ decodeObsType()
         	 receivedTime = pt::time_from_string_nothrow( val );
          }else if( key ==  "type"  ) {
              typeID = atoi(val.c_str());
-         } else {
+         } else if( key=="nationalnr" || key=="stationid" || key=="wmonr" ||
+                    key=="icaoid" || key=="call_sign") {
              stationID = DecoderBase::getStationId(key, val);
 
              if(stationID < 0) {
                  stationID = INT_MAX;
-                 LOGERROR("Now station with stationid '" << key << "=" << val << "'" );
+                 LOGERROR("No station with stationid '" << key << "=" << val << "'" );
                  continue;
              }
+         } else {
+             LOGERROR("decodeObsType: INTERNAL: unhandled key '" <<  key << "', this is a error and must be fixed.");
          }
      }
 
