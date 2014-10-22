@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/dash
 #  Kvalobs - Free Quality Control Software for Meteorological Observations 
 #
 #  Copyright (C) 2007 met.no
@@ -32,7 +32,15 @@ KVCONFIG=__KVCONFIG__
 KVBIN=`$KVCONFIG --bindir`
 KVPID=`$KVCONFIG --localstatedir`/run/kvalobs
 KVCONF=`$KVCONFIG --sysconfdir`/kvalobs
+LIBDIR=`$KVCONFIG --pkglibdir`
 NODENAME=$(uname -n)
+
+if [ ! -f "$LIBDIR/tool_funcs.sh" ]; then
+	echo "Cant load: $LIBDIR/tool_funcs.sh"
+	exit 1
+fi
+
+. $LIBDIR/tool_funcs.sh
 
 if [ -e ${KVCONF}/kv_ctl.conf ]; then
     . ${KVCONF}/kv_ctl.conf
@@ -49,7 +57,7 @@ fi
 
 
 
-function use()
+use()
 {
     echo ""
     echo " kvstop [-l] [-a] [-h] progname"
@@ -102,7 +110,7 @@ echo "node: $NODENAME"
 echo "progname: $progname"
 
 #inlist tar to parametere
-function inlist()
+inlist()
 {
     cmd=$1
     list=$2
@@ -118,46 +126,19 @@ function inlist()
     return 1
 }
 
-function isrunning()
+
+
+killprog()
 {
-    local running=""
-    prog=$1
-     
-	PID=`cat $KVPID/$prog-$NODENAME.pid 2> /dev/null`
-    		
-	if [ $? -ne 0 ]; then
-	   if [ -f $KVPID/$prog-$NODENAME.pid ]; then
-	       echo "Cant read the file pid $KVPID/$prog-$NODENAME.pid" >&2
-	       return 0
-	   fi
-	   return 1
-	fi
-		
-	#echo "PID: $prog: $PID"
-	#echo "kill  -0 $PID"
-	kill  -0 $PID > /dev/null 2>&1
+	local wasruning
+	local markAsStopped
+	local running
 
-	if [ $? -eq 0 ]; then
-    	PIDS=`pgrep $prog 2>/dev/null`
-    	running=`echo $PIDS | grep $PID`
-	    
-    	if [ ! -z "$running" ]; then
-			return 0
-    	fi
-    fi
-    
-    rm -f $KVPID/$prog-$NODENAME.pid
-    
-    return 1
-}
-
-
-function killprog()
-{
-	local wasruning=false
-	local markAsStopped=true
-	local running=0
+	wasruning=false
+	markAsStopped=true
+	running=0
 	
+   
     prog=$1
     echo -n "$prog ....."
     
@@ -178,7 +159,7 @@ function killprog()
 		
 		n=0
 		
-		isrunning $prog
+		isProgRunning $prog
         running=$?
         kill $PID > /dev/null 2>&1
 			
@@ -186,7 +167,7 @@ function killprog()
 	    	n=$((n+1))
 	    	sleep 1
 	    	wasrunning=true
-	    	isrunning $prog
+	    	isProgRunning $prog
 	    	running=$?
 		done
 	
@@ -194,15 +175,15 @@ function killprog()
 	    	kill -9 $PID > /dev/null 2>&1
 	    
 	    	n=0
-	    	isrunning $prog
+	    	isProgRunning $prog
 	    
 	    	while [ $? -eq 0 -a $n -lt $TIMEOUT  ]; do
 	      		n=$((n+1))
 	      		sleep 1
-	      		isrunning $prog
+	      		isProgRunning $prog
 	    	done
 
-	    	isrunning $prog
+	    	isProgRunning $prog
 	    
 	    	if [ $? -eq 0 ]; then
 	       		echo "failed!"
@@ -225,7 +206,7 @@ function killprog()
 }
 
 
-function findprog()
+findprog()
 {
     progno=$1
     proglist=$2
@@ -246,7 +227,7 @@ function findprog()
 
 
 
-function select_prog_to_stop()
+select_prog_to_stop()
 {
     cmd=""
     lineno=0

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/dash
 #  Kvalobs - Free Quality Control Software for Meteorological Observations 
 #
 #  Copyright (C) 2007 met.no
@@ -46,15 +46,16 @@ NODENAME=$(uname -n)
 is_master=false
 res=0
 has_ip_alias=`ipalias_status` || res=$? 
+
 case "$has_ip_alias" in
-	true) echo "This node '$NODENAME' is the current kvalobs master!"
-              is_master=true
+   true) echo "This node '$NODENAME' is the current kvalobs master!"
+         is_master=true
 		  ;;
-    test) echo "This node '$NODENAME' is an kvalobs test machine!"
-          ;;
-    *) echo
-       echo "  This node '$NODENAME' is NOT the kvalobs master "
-       echo "  or an test machine." 
+   test) echo "This node '$NODENAME' is an kvalobs test machine!"
+        ;;
+   *) echo
+      echo "  This node '$NODENAME' is NOT the kvalobs master "
+      echo "  or an test machine." 
 	   echo 
 	   exit 1
 esac
@@ -97,32 +98,7 @@ echo "KVBIN=$KVBIN"
 echo "KVPID=$KVPID"
 echo "TIMEOUT=$TIMEOUT"
 
-
-function isrunning()
-{
-    prog=$1
-   
-    if [ -f $KVPID/$prog-$NODENAME.pid ]; then 
-	PID=`cat $KVPID/$prog-$NODENAME.pid`
-	#echo "PID: $PROG: $PID"
-	kill  -0 $PID > /dev/null 2>&1
-
-	if [ $? -eq 0 ]; then
-	    PIDS=`pgrep $prog 2>/dev/null`
-	    running=`echo $PIDS | grep $PID`
-	    
-	    if [ ! -z "$running" ]; then
-		return 0
-	    else
-		rm -f $KVPID/$prog-$NODENAME.pid
-	    fi	
-        fi
-   fi
-    
-   return 1
-}
-
-function yes_no()
+yes_no()
 {
     echo -n "[j/n] : "
     stty raw         # Get one Character 
@@ -168,7 +144,7 @@ for PROG in $START_PROGS ; do
 	echo -n "Starter $PROG ...."
 	
 	rm -f $KVPID/$PROG-$NODENAME.stopped
-    isrunning $PROG
+   isProgRunning $PROG
  
     if [ $? -eq 0 ]; then
 	echo "running"
