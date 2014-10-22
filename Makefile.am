@@ -8,6 +8,7 @@ pkgconfigdir = $(libdir)/pkgconfig
 
 install-data-hook:
 	$(install_sh) -m 755 -d $(DESTDIR)/$(localstatedir)/lib/@PACKAGE_NAME@
+	$(install_sh) -m 755 -d $(DESTDIR)/$(localstatedir)/lib/@PACKAGE_NAME@/decoders
 	$(install_sh) -m 755 -d $(DESTDIR)/$(localstatedir)/lib/@PACKAGE_NAME@/service
 	$(install_sh) -m 755 -d $(DESTDIR)/$(localstatedir)/lib/@PACKAGE_NAME@/service/subscribers
 	$(install_sh) -m 755 -d $(DESTDIR)/$(localstatedir)/run/@PACKAGE_NAME@
@@ -22,6 +23,7 @@ pkgsysconf_DATA = \
 	etc/kv2kvDataInputd.conf.template \
 	etc/kvdataclt.conf.template \
 	etc/norcom2kv.conf.template \
+	etc/aexecd.conf.template \
 	etc/stinfosys.conf \
 	etc/stinfosys_params.csv.default
 	
@@ -32,6 +34,7 @@ EXTRA_DIST = etc/kv2norcom.conf.template \
              etc/kv2kvDataInputd.conf.template \
              etc/kvdataclt.conf.template \
              etc/norcom2kv.conf.template \
+             etc/aexecd.conf.template \
              etc/stinfosys.conf \
              etc/stinfosys_params.csv.default
 

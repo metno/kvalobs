@@ -41,6 +41,27 @@ database{
 }
 
 kvManagerd{
+ KlDataDecoder {
+#    set_useinfo7=false
+    set_useinfo7=true
+  }
+
+  ExecDecoder {
+    loglevel=info
+    #aexecd=("host", port)       
+    aexecd=("localhost", 6666)
+    #bindir, where we search for decoders.'decoder'.decoder programs
+    #Default is kvPath( bindir )
+    #bindir="/disk1/kvalobs/bin"
+    decoders {
+       bufr {
+           timeout=60
+           decoder="BufrDecode.pl"
+           #Exstra arguments to give when we call the program given with the decoder variabel.
+           decoderarg="--bufrtables /disk1/kvbufrd/share/kvbufrd/bufrtables"
+       }
+    }
+  }
 }
 
 kvDataInputd{

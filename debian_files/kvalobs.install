@@ -2,6 +2,7 @@ usr/bin/kv2metdat
 usr/bin/kv2norcom
 usr/bin/kvconfig
 usr/bin/kvDataInputd
+usr/bin/aexecd
 usr/bin/kvdbadmin
 usr/bin/kvlogread
 usr/bin/kvManagerd

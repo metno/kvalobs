@@ -28,8 +28,8 @@ db_get kvalobs/homedir && KV_HOME="$RET"
 #BINDIR, BIN and DIR must be in sync with the respectives variables in postrm.
 BINDIR="/usr/bin"
 BIN="kv2kro  kvDataInputd kvdataclt kvdbadmin 
-     kvManagerd kvmgrclt kvQabased kvServiced 
-     kvstart kvstop kvrestart
+     kvManagerd kvmgrclt kvQabased kvServiced
+     aexecd kvstart kvstop kvrestart
      kvstatus kv2norcom
      qabase_log_cleanup"
 
@@ -87,6 +87,7 @@ DIRS="/usr/share/kvalobs
       /var/log/kvalobs/kvService
       /var/log/kvalobs/kvdbadmin
       /var/run/kvalobs
+      /var/lib/kvalobs/decoders
       /var/lib/kvalobs/service
       /var/lib/kvalobs/service/subscribers"     
 

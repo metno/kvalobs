@@ -25,7 +25,7 @@ set -e
 BINDIR="/usr/bin"
 BIN="kv2kro kvDataInputd kvdataclt kvdbadmin 
      kvManagerd kvmgrclt kvQabased kvServiced 
-     kvstart kvstop kvstatus kvrestart 
+     aexecd kvstart kvstop kvstatus kvrestart 
      kvsynopdparse 
      qabase_log_cleanup"
 
@@ -83,6 +83,7 @@ DIRS="/usr/share/kvalobs
       /var/log/kvalobs/html
       /var/log/kvalobs/kvService
       /var/run/kvalobs
+      /var/lib/kvalobs/decoders
       /var/lib/kvalobs/service
       /var/lib/kvalobs/service/subscribers"     
 
