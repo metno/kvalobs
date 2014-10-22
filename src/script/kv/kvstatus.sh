@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/dash
 #  Kvalobs - Free Quality Control Software for Meteorological Observations 
 #
 #  Copyright (C) 2007 met.no
@@ -70,31 +70,8 @@ if [ $# -ge 1 ]; then
 	progname=$1
 fi
 
-function isrunning()
-{
-    prog=$1
-   
-    if [ -f $KVPID/$prog-$NODENAME.pid ]; then 
-		PID=`cat $KVPID/$prog-$NODENAME.pid`
-		#echo "PID: $PROG: $PID"
-		kill  -0 $PID > /dev/null 2>&1
 
-		if [ $? -eq 0 ]; then
-	    	PIDS=`pgrep $prog 2>/dev/null`
-	    	running=`echo $PIDS | grep $PID`
-	    
-	    	if [ ! -z "$running" ]; then
-				return 0
-	    	else
-				rm -f $KVPID/$prog-$NODENAME.pid
-	    	fi	
-        fi
-   fi
-    
-   return 1
-}
-
-function yes_no()
+yes_no()
 {
     echo -n "[j/n] : "
     stty raw         # Get one Character 
@@ -117,7 +94,7 @@ for PROG in $START_PROGS ; do
 	
 	echo -n "$PROG .... "
 	
-	isrunning $PROG
+	isProgRunning $PROG
  
     if [ $? -eq 0 ]; then
 		echo "OK"
