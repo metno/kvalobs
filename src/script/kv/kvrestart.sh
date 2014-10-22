@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/dash
 #  Kvalobs - Free Quality Control Software for Meteorological Observations 
 #
 #  Copyright (C) 2007 met.no
@@ -34,7 +34,7 @@ KVCONF=`$KVCONFIG --sysconfdir`/kvalobs
 NODENAME=$(uname -n)
 KVSTART=$KVBIN/kvstart
 KVSTOP=$KVBIN/kvstop
-LOG=`$KVCONFIG --localstatedir`/log/kvalobs/kvrestart.log
+logfile=`$KVCONFIG --localstatedir`/log/kvalobs/kvrestart.log
 LIBDIR=`$KVCONFIG --pkglibdir`
 
 if [ ! -f "$LIBDIR/tool_funcs.sh" ]; then
@@ -42,19 +42,24 @@ if [ ! -f "$LIBDIR/tool_funcs.sh" ]; then
 	exit 1
 fi
 
+#SILENT er brukt av log i tool_funcs
+SILENT=true
+DOLOG=false
 . $LIBDIR/tool_funcs.sh
 
-silent=false
+SILENT=false
 force=false
+only_start_if_stopped=false
+DOLOG=true
 
-function use( )
+use( )
 {
 	local ret=1
 	if [ $# -ge 1 ]; then
 		ret = $1
 	fi
 	
-	echo " kvrestart [-s] [-f] [-h] progname"
+    echo " kvrestart [-s] [-f] [-h] [-r] [-n] progname"
     echo " "
     echo " Omstart av programmet angitt med 'progname'."
     echo " Hvis filen $KVPID/'progname'-$NODENAME.stopped eksisterer"
@@ -67,7 +72,9 @@ function use( )
     echo " "
     echo " kvrestart skriver til logfilen $LOG."
     echo " "
+    echo " -r Start programmet dersom det ikke kjører, ikke stop det først."
     echo " -s Ingen output til skjerm."
+    echo " -n Ikke log noe dersom det ikke er problemer"
     echo " -f Tving oppstart av programmet hvis det er stoppet."
     echo " -h Skriv denne hjelpe skjermen."
     echo " "
@@ -75,41 +82,17 @@ function use( )
     exit $ret
 }
 
-function log()
-{
-	local runTime=$(date +'%Y-%m-%d %H:%M:%S')
-	
-	if [ "$silent" = "false" ]; then
-		echo $1
-	fi
-	
-	if [ -f $LOG ]; then
-		size=$(stat -c '%s' $LOG)
-	
-		if [ $size -gt 10240 ]; then
-			mv $LOG $LOG.tmp
-			tail -n 10 $LOG.tmp > $LOG
-			newSize=$(stat -c '%s' $LOG)
-			runTime=$(date +'%Y-%m-%d %H:%M:%S')
-			echo "$runTime - Logfile truncated - size before truncate $size new size $newSize." >> $LOG
-			rm -f $LOG.tmp
-		fi
-	fi
-
-	echo "$runTime - $1" >> $LOG
-}
-
 
 if [ -e ${KVCONF}/kv_ctl.conf ]; then
     . ${KVCONF}/kv_ctl.conf
 else
-    log "Filen ${KVCONF}/kv_ctl.conf finnes ikke."
+    logerror "Filen ${KVCONF}/kv_ctl.conf finnes ikke."
     use
 fi
 
 if [ "$USER" != "$KVUSER" -a "$LOGNAME" != "$KVUSER" ]; then
-   log "Bare kvalobs brukeren '$KVUSER' kan starte/stoppe kvalobs komponenter."
-   log "Du er logget inn som bruker '$USER'."
+   logerror "Bare kvalobs brukeren '$KVUSER' kan starte/stoppe kvalobs komponenter."
+   logerror "Du er logget inn som bruker '$USER'."
    exit 1
 fi
 
@@ -119,11 +102,13 @@ fi
 #echo "TIMEOUT=$TIMEOUT"
 
 
-while getopts sfh f
+while getopts sfrnh f
 do
   case $f in
-    s) silent=true;;
+    s) SILENT=true;;
     f) force=true;;
+    r) only_start_if_stopped=true;;
+    n) DOLOG=false ;;
     h) use 0;;
     \?) use 1;;
   esac
@@ -142,7 +127,7 @@ fi
 
 progname=$1
 
-if [ $silent = false ]; then
+if [ $SILENT = false -a $only_start_if_stopped = false ]; then
 	echo " "
 	echo "  Stopper '$progname' dette kan ta noe tid!"
 	echo "  Hvis det ikke skjer noe på MER enn $TIMEOUT sekund"
@@ -150,42 +135,58 @@ if [ $silent = false ]; then
 	echo " "
 fi
 
+
+
 found=false;
 for PROG in $STOP_PROGS ; do
 	if [ "z$progname" != "z" ]; then
-		if ! echo $PROG | grep "^$progname" > /dev/null 2>&1 ; then  
+      if ! echo $PROG | grep "^$progname" > /dev/null 2>&1 ; then  
 			continue
 		fi
 	fi
 
 	found=true
-	
+
 	if [ $force = false -a -f "$KVPID/$PROG-$NODENAME.stopped" ]; then
-	    runTime=$(date +'%Y-%m-%d %H:%M:%S')
 		log "'$PROG' er stoppet av administrator."
 		continue
 	fi
 
-   	$KVSTOP $PROG > /dev/null 2>&1
+	if [ $only_start_if_stopped = false ]; then
+      $KVSTOP $PROG > /dev/null 2>&1
+   else
+      #Set the exit status to $? to 0.
+	   true
+   fi
       		
-   	if [ $? -eq 0 ]; then 
-   		$KVSTART $PROG > /dev/null 2>&1
+   if [ $? -eq 0 ]; then 
+      running=false
+      if isProgRunning $PROG ; then
+         running=true
+      fi      
 
-   		if [ $? -eq 0 ]; then
-   			runTime=$(date +'%Y-%m-%d %H:%M:%S')
-   			log "RESTARTET '$PROG'."
-   		else
-   		    runTime=$(date +'%Y-%m-%d %H:%M:%S') 
-   			log "FEILET - Kan ikke starte $PROG."
-   		fi
+      $KVSTART $PROG > /dev/null 2>&1
+
+      if [ $? -eq 0 ]; then
+         if [ $only_start_if_stopped = true ]; then
+            if [ $running = false ]; then
+               loginfo "STARTET '$PROG'."
+            else 
+               log "RUNNING '$PROG'." $DOLOG
+            fi
+         else
+            loginfo "RESTARTET '$PROG'."
+         fi
+      else
+         logerror "FEILET - Kan ikke starte $PROG."
+      fi
 	else 
-	    runTime=$(date +'%Y-%m-%d %H:%M:%S')
-		log "FEILET - Kan ikke stoppe $PROG."
+	   logerror "FEILET - Kan ikke stoppe $PROG."
 	fi
 done
 
 if [ $found = false ]; then
-	log "$progname er ikke spesifisert i STOP_PROGS ${KVCONF}/kv_ctl.conf."
+	logerror "$progname er ikke spesifisert i STOP_PROGS ${KVCONF}/kv_ctl.conf."
 fi
 
 exit 0
