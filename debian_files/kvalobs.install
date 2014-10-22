@@ -25,6 +25,7 @@ etc/kvalobs/kv-ipalias.conf
 etc/kvalobs/kvcron
 etc/kvalobs/kvincron
 etc/kvalobs/kv2norcom.conf.template
+etc/kvalobs/aexecd.conf.template
 etc/kvalobs/save_last_month.conf
 etc/kvalobs/pgclean-local.sql.template
 etc/kvalobs/lam2kv/*
