@@ -1,6 +1,15 @@
 primary_host=""
 ipalias=""
 
+#INPUT variable that can be defined 
+#logfile - A file to log to. /dev/null if not defined.
+#SILENT - (true|false) Write to the terminal if false.
+#DOLOG - (true|false) Write to the logfile if true. 
+
+if [ -z "$DOLOG" ]; then
+   DOLOG=true
+fi
+
 if [ x"$KVCONFIG" = "x" ]; then
     KVCONFIG=__KVCONFIG__
 fi
@@ -33,20 +42,67 @@ if [ x"$IPALIAS_CHOICES" != "x" ]; then
     done
 fi
 
-
 log()
 {
-    local mylog=""
-	
+   local mylog; local log
+   local runTime; local size
+   mylog=""
+   runTime=$(date +'%Y-%m-%d %H:%M:%S')
+   
+   log=true
+   if [ "$DOLOG" = false ]; then 
+      log=false
+   fi
+
+   if [ $# -gt 1 ]; then
+      log=$2
+   fi
+
+   if [ -z "$SILENT" ]; then
+      SILENT=true
+   fi   
+   
+   if [ "$SILENT" = "false" ]; then
+      echo $1
+   fi
+
     if [ -z "$logfile" ]; then
         mylog="/dev/null"
     else
         mylog=$logfile
     fi
-    
-    echo "$@" >> $mylog
-#	echo "$@"  | tee -a $mylog
+            
+   if [ -f $mylog ]; then
+      size=$(stat -c '%s' $mylog)
+   
+      if [ $size -gt 10240 ]; then
+         mv $mylog $mylog.tmp
+         tail -n 10 $mylog.tmp > $mylog
+         newSize=$(stat -c '%s' $mylog)
+         runTime=$(date +'%Y-%m-%d %H:%M:%S')
+         echo "$runTime - Logfile truncated - size before truncate $size new size $newSize." >> $mylog
+         rm -f $mylog.tmp
+      fi
+   fi
+
+   if [ "$log" = true ]; then
+      echo "$runTime - $1" >> $mylog
+   else
+      #At least touch the logfile so it shows some sign of that the program is alive.
+      touch $mylog
+   fi
 }
+
+logerror()
+{  
+   log "$@" true
+}
+
+loginfo()
+{  
+   log "$@" true
+}
+
 
 if [ -z "$ipalias" ]; then
     log "ipalias: NOT defined, this is ok if this instance of kvalobs do not use ip-alias." 
@@ -61,7 +117,9 @@ ipalias_status()
     local res=0
 
     if [ -z "$ipalias" ]; then
-        log "$me, is a test machine (?)."
+        if [ "$SILENT" != true ]; then
+           log "$me, is a test machine (?)."
+        fi
         echo "test"
         return 0
     fi
@@ -81,8 +139,42 @@ ipalias_status()
         echo "false"
         return 1
     else
-		log "FAILED - kvalobs ipalias status." 
+		logerror "FAILED - kvalobs ipalias status." 
 		echo "undefined"
 		return 2
     fi
+}
+
+isProgRunning()
+{
+    local PID; local running 
+    local piddir; local nodename 
+    local pidfile; local pid
+    
+    running="" 
+    piddir=`$KVCONFIG --localstatedir`/run/kvalobs
+    nodename=`uname -n`
+    pidfile=$piddir/$1-$nodename.pid
+    prog=$1
+   
+    #echo "pidfile: $pidfile"
+    
+    if [ -f "$pidfile" ]; then 
+      PID=`cat $pidfile`
+      #echo "PID: $prog: $PID"
+      kill  -0 $PID > /dev/null 2>&1
+
+      if [ $? -eq 0 ]; then
+         PIDS=`pgrep $prog 2>/dev/null`
+         running=`echo $PIDS | grep $PID`
+       
+         if [ ! -z "$running" ]; then
+            return 0
+         else
+            rm -f $pidfile
+         fi 
+        fi
+   fi
+    
+   return 1
 }
