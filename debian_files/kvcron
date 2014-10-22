@@ -12,4 +12,5 @@ TZ=UTC
 #*/5 * * * * $MYBIN/check_kvsynopd.sh >> $LOG/check_kvsynopd.log %
 30 6 1 * * $MYBIN/save_last_month.sh
 #25 3,21 * * * /usr/bin/kvrestart kvQabased > /dev/null 2>&1 %
+*/5 * * * * /usr/bin/kvrestart -r -s -n aexecd > /dev/null 2>&1 %
 */5 * * * * $HOME/bin/synop_from_murky.sh > $LOG/synop_from_murky.log 2>&1 %
