@@ -145,7 +145,10 @@ decodeObstype()
             encoding_ = keyval.second;
             it = elems.erase( it );
         } else {
-            obsTypeList.push_back( *it );
+            tmp = *it;
+            boost::trim( tmp );
+            if( !tmp.empty() )
+                obsTypeList.push_back( *it );
             ++it;
         }
     }
@@ -156,7 +159,11 @@ decodeObstype()
             ost << "/";
         ost << *it;
     }
+
     obsTypePart_ = ost.str();
+    if( ! obsTypePart_.empty() )
+        obsTypePart_ += "/";
+    obsTypePart_ += "redirected=" + name() + "." + decoderName_;
 }
 
 std::string
@@ -278,7 +285,6 @@ getDecoderProg()
 
        val=conf->getValue( decoderargs );
 
-       LOGDEBUG("ARGS KEY: '" << decoderargs << "'  " << val.size() );
        if( ! val.empty() ) {
             string args =val[0].valAsString();
             LOGDEBUG("ARGS: " << decoderargs << ": '"  << args << "'.");
@@ -404,7 +410,7 @@ getProgTimeout( int defaultTimeout )
 
 int
 ExecDecoder::
-runProg( const std::string &cmd, const std::string &logfile )
+runProg( const std::string &cmd, const std::string &logfile, const std::string &someId )
 {
     string host;
     int port;
@@ -423,8 +429,16 @@ runProg( const std::string &cmd, const std::string &logfile )
 
     int ret = aclient.wait( timeout );
 
-    if( ret >= 0  )
+    if( ret >= 0  ) {
+        using namespace boost::posix_time;
+        time_duration t = aclient.getExecutionTime();
+        if( ! t.is_special() ) {
+            LOGINFO("Time: " << (double(t.total_microseconds())/1.0e6) << " second. Id: " << someId << ".");
+        } else {
+            LOGWARN("Time: <missing>. Id: " << someId <<".");
+        }
         return ret;
+    }
 
     if( aclient.timeout() )
         aexecd_error( "The command timed out, the process is killed.", aexecd_error::Timeout );
@@ -478,6 +492,21 @@ doRedirect( const std::string &kvdata, std::string &msg  )
     return Redirect;
 }
 
+namespace {
+class LogLevel {
+    milog::Logger &log;
+    milog::LogLevel llsaved;
+public:
+    LogLevel( milog::LogLevel ll )
+        : log( milog::Logger::logger() ) {
+        llsaved = log.logLevel();
+        log.logLevel( ll );
+    }
+    ~LogLevel( ) {
+        log.logLevel( llsaved );
+    }
+};
+}
 
 DecoderBase::DecodeResult
 ExecDecoder::
@@ -487,6 +516,8 @@ execute(std::string &msg)
    ostringstream ost;
    ostringstream cmd;
    LOGINFO("New observation!  " << miutil::miTime::nowTime());
+
+   LogLevel changeLogLevel( getConfLoglevel() );
 
 //   std::cerr << name() << ": " << obsType <<  endl;
 //   std::cerr << "[" << obs << "]" << endl << endl;
@@ -517,7 +548,7 @@ execute(std::string &msg)
    LOGDEBUG("Running decoder prog '" << cmd.str() << "'\nlogfile '" << logfile << "'\n"<< decoder << " '" <<  inputFile << "'\nkvdata '" << kvdataFile <<"'.");
 
    try {
-       int exitcode = runProg( cmd.str(), logfile );
+       int exitcode = runProg( cmd.str(), logfile, tmpName );
        LOGDEBUG("exitcode: "<< exitcode << ".");
 
        unlink( inputFile.c_str() );

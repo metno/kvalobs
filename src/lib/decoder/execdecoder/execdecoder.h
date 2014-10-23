@@ -91,7 +91,7 @@ protected:
     bool getAexecd( std::string &host, int &port );
     bool createInputFile( const std::string &filename );
     int  getProgTimeout( int defaultTimeout=10 );
-    int  runProg( const std::string &cmd, const std::string &logfile );
+    int  runProg( const std::string &cmd, const std::string &logfile, const std::string &someId );
 
     DecoderBase::DecodeResult  doRedirect( const std::string &kvdata, std::string &msg  );
 
