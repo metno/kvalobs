@@ -74,7 +74,7 @@ RejectDecoder::doDecode(const std::string &message,
 
   i1=0;
   
-  while(i2!=string::npos){
+  while(i2!=string::npos && n<3){
     i2=message.find(sep, i1);
     
     if(i2==string::npos && n<2)
@@ -88,6 +88,9 @@ RejectDecoder::doDecode(const std::string &message,
     i1=i2+sep.length();
     n++;
   }
+
+  if( n >= 3)
+      return false;
 
   return reject.set(elems[0], boost::posix_time::microsec_clock::universal_time(), elems[1], elems[2]);
 }
