@@ -7,7 +7,47 @@
 
 using namespace std;
 
+namespace pt = boost::posix_time;
+
 namespace miutil {
+
+int
+AExecClient::
+getExitCode( const std::string &buf_ )
+{
+    string buf=buf_;
+    string tmp;
+    long elapsedTime=LONG_MIN;
+    int exitCode=INT_MIN;
+
+    try {
+        string::size_type i;
+        i = buf.find_first_not_of( "0123456789" );
+
+        if( i == string::npos )
+            return boost::lexical_cast<int>( buf );
+
+        tmp = buf.substr( 0, i);
+        exitCode = boost::lexical_cast<int>( tmp );
+
+        tmp = buf.substr( i );
+        boost::trim_if( tmp , boost::is_any_of("\t\n\r ") );
+
+        if( tmp.empty() )
+            return exitCode;
+
+        elapsedTime = boost::lexical_cast<long>( tmp );
+        executionTime = pt::microseconds( elapsedTime );
+        return exitCode;
+    }
+    catch( ... ) {
+        if( exitCode != INT_MIN )
+            return exitCode;
+
+        errMsg = "FORMATERROR: EXITCODE: '"+buf_+"'. expecting 'exitcode executiontime'";
+        return -1;
+    }
+}
 
 pid_t 
 AExecClient::
@@ -23,6 +63,7 @@ exec(const std::string &command,
     unsigned long pid;
     bool separator=false;
     string::reverse_iterator rit;
+
 
     if(port<0)
         return 0;
@@ -96,6 +137,7 @@ wait( int timeoutInSecondBetweenChar )
 {
     string buf;
     timeout_ = false;
+    executionTime = pt::time_duration( pt::not_a_date_time );
 
     if( !sock.connected() ) {
         std::ostringstream ost;
@@ -130,26 +172,12 @@ wait( int timeoutInSecondBetweenChar )
         errMsg = buf.substr( i+1 );
         return -1;
     } else if( what == "EXITCODE" ){
-        string exitcode=buf.substr( i+1 );
-        boost::trim_if( exitcode , boost::is_any_of("\t\n\r "));
-
-        try {
-            return boost::lexical_cast<int>( exitcode );
-        }
-        catch( ... ) {
-            errMsg = "FORMATERROR: EXITCODE: '"+buf.substr(i+1)+"'.";
-            return -1;
-        }
-    } else if( what == "TIMEOUT" ) {
-        string t=buf.substr( i+1 );
-        boost::trim_if( t , boost::is_any_of("\t\n\r "));
-        errMsg = "Timeout: "+ t +".";
-        timeout_ = true;
-        return -2;
+        string tmp=buf.substr( i+1 );
+        boost::trim_if( tmp , boost::is_any_of("\t\n\r "));
+        return getExitCode( tmp );
     } else {
         errMsg = "FORMATERROR: Unexpected result '" + buf +"'.";
         return -1;
     }
-
 }
 }

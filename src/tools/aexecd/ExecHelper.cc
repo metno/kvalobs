@@ -18,7 +18,9 @@ using namespace std;
 
 namespace {
 /*
- * The code for system is mostly copied from the book "Advanced Programming in the UNIX environment 3. ed."
+ * The code for system is mostly copied from the book
+ * "Advanced Programming in the UNIX environment 3. ed."
+ * and adapted our use.
  */
 
 int
@@ -44,9 +46,9 @@ system(const char *cmdstring, miutil::SimpleSocket *pSocket, int timeout )
     if (sigprocmask(SIG_BLOCK, &chldmask, &savemask) < 0)
         return -1;
 
-    std::cout << "Executing: '" << cmdstring << "'." << std::endl;
-    std::cout << "------------- LOG: '" << cmdstring << "' ----------------------" << std::endl;
-
+    cout << "---- BEGIN PROGRAM LOG ---------------------------------------------------------" << endl;
+    cout << "---- " << cmdstring << endl;
+    cout << "--------------------------------------------------------------------------------" << endl;
     if ((pid = fork()) < 0) {
         status = -1;    /* probably out of processes */
     } else if (pid == 0) {          /* child */
@@ -101,12 +103,16 @@ system(const char *cmdstring, miutil::SimpleSocket *pSocket, int timeout )
             }
         }
     }
-    std::cout << "------------- END LOG: '" << cmdstring << "' ------------------" << std::endl;
+
+    cout << "---- END PROGRAM LOG -----------------------------------------------------------" << endl;
+
     /* restore previous signal actions & reset signal mask */
     if (sigaction(SIGINT, &saveintr, NULL) < 0)
         return -1;
+
     if (sigaction(SIGQUIT, &savequit, NULL) < 0)
         return -1;
+
     if (sigprocmask(SIG_SETMASK, &savemask, NULL) < 0)
         return -1;
 
@@ -123,7 +129,9 @@ exec( miutil::SimpleSocket *pSocket,
     std::string  sRet;
     char  sPid[100];
     int   ret;
-
+    pt::ptime startAt;
+    pt::ptime stopAt;
+    pt::time_duration elapsedTime;
 
     if( cmdstring.empty() ) {
         sRet="ERROR: NOCMD\n";
@@ -132,7 +140,13 @@ exec( miutil::SimpleSocket *pSocket,
         return;
     }
 
+    startAt = pt::microsec_clock::universal_time();
+
     ret = system( cmdstring.c_str(), pSocket, timeout  );
+
+    stopAt = pt::microsec_clock::universal_time();
+
+    elapsedTime = stopAt - startAt;
 
     std::ostringstream ost;
 
@@ -145,7 +159,9 @@ exec( miutil::SimpleSocket *pSocket,
         if( ret == 127 ) {
             ost << "ERROR: Could not execute command '" << cmdstring << "'.";
         } else {
-            ost << "EXITCODE: " << ret;
+            ost.setf(ios::fixed, ios::floatfield );
+
+            ost << "EXITCODE: " << ret << " " << elapsedTime.total_microseconds();
         }
     }
     ost << "\n";

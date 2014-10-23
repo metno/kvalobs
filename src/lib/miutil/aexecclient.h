@@ -3,6 +3,7 @@
 
 #include <unistd.h>
 #include <string>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include "miutil/simplesocket.h"
 
 namespace miutil {
@@ -17,8 +18,10 @@ class AExecClient
     std::string host;
     std::string errMsg;
     bool timeout_;
+    boost::posix_time::time_duration executionTime;
     SimpleSocketClient sock;
 
+    int getExitCode( const std::string &buf );
  public:
     AExecClient(const std::string &host_, int port_)
      :port(port_),host(host_), timeout_( false ), sock( host, port )
@@ -38,6 +41,7 @@ class AExecClient
     int wait( int timeoutInSecondBetweenChar=60 );
 
     bool timeout()const { return timeout_; }
+    boost::posix_time::time_duration getExecutionTime()const { return executionTime; }
     std::string getErrMsg()const { return errMsg;} 
 };
 }
