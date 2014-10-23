@@ -53,7 +53,7 @@ SimpleSocket::
 close()
 {
     if(mConnected){
-        std::cerr << "SimpleSocket::close() \n";
+        //std::cerr << "SimpleSocket::close() \n";
         ::close(fd);
     }
 
@@ -67,7 +67,7 @@ SimpleSocket::
 getCh(char &ch, bool &timedout, int timeoutInSec)
 {
     if(!mConnected){
-        std::cerr << "SimpleSocket::getCh: NOT CONNECTED!\n";
+        //std::cerr << "SimpleSocket::getCh: NOT CONNECTED!\n";
         return -1;
     }
 
@@ -79,7 +79,7 @@ SimpleSocket::
 getChExt(char &ch, bool &timedout, int timeoutInMilliSec)
 {
     if(!mConnected){
-        std::cerr << "SimpleSocket::getCh: NOT CONNECTED!\n";
+        //std::cerr << "SimpleSocket::getCh: NOT CONNECTED!\n";
         return -1;
     }
 
@@ -319,14 +319,14 @@ accept(bool &interupted, int timeout)
         //#ifdef __IRIX_6__
 
         /* For IRIX, og sikkert andre system, returnerer ikke
-         * accept n�r et signal mottas, men blir
+         * accept når et signal mottas, men blir
          * hengende til en forbindelse er opprettet eller at
-         * det oppst�r en feil p� socketen vi lytter p�.
-         * Vi kan omg� dette problemet med � gj�re en read select
-         * p� filedeskriptoren vi aksepterer forbindelser over. Dette
-         * vil returnerer 0 n�r en forbindelse kan bli opprettet med accept.
-         * Samtidig vil select avbrytes n�r et signal mottas  og errno blir
-         * satt til EINTR. Dette vil virke for alle system ogs� de som
+         * det oppstår en feil på socketen vi lytter på.
+         * Vi kan omgå dette problemet med å gjøre en read select
+         * på filedeskriptoren vi aksepterer forbindelser over. Dette
+         * vil returnerer 0 når en forbindelse kan bli opprettet med accept.
+         * Samtidig vil select avbrytes når et signal mottas  og errno blir
+         * satt til EINTR. Dette vil virke for alle system også de som
          * avbryter accept ved signal.
          */
 
