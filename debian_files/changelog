@@ -1,3 +1,11 @@
+kvalobs (2.7.5~rc7-1) lucid; urgency=low
+
+    * fix build script.
+    * ExecDecoder: change log behavior.
+    * kldecoder: Add log context so we se if it is called by a redirect.
+             
+ -- Borge Moe <borge.moe@met.no>  Wed, 22 Oct 2014 16:00:00 +0200
+
 kvalobs (2.7.5~rc6-1) lucid; urgency=low
 
     * kvDataInputd: New decoder, execdecoder.
