@@ -84,11 +84,11 @@ DataSrcImpl::newData(const char* data_, const char* obsType_)
             decCmd=app.create(obsType, data, 60000, errCode, errMsg);
         }
         catch( const std::exception &ex ){
-            LOGERROR("Exception: " << ex.what() << " <" << obsType << ">. Data <"<< data << ">.");
+            LOGERROR("Exception: " << ex.what() << " <" << obsType << ">.\nData <"<< data << ">.");
             decCmd = 0;
         }
         catch( ... ){
-            LOGERROR("Exception:  <" << obsType << ">. Data <"<< data << ">.");
+            LOGERROR("Exception:  <" << obsType << ">.\nData <"<< data << ">.");
             decCmd = 0;
         }
 
@@ -158,7 +158,6 @@ DataSrcImpl::newData(const char* data_, const char* obsType_)
 
         if(decodeResult==kvalobs::decoder::DecoderBase::Redirect ){
             redirected.reset( decCmd->getRedirctInfo() );
-            LOGDEBUG("Decode: Redirect: Checkpoint");
             if( redirected ) {
                 string redirectedFromDecoder=redirected->decoder();
                 redirect = true;
@@ -168,7 +167,7 @@ DataSrcImpl::newData(const char* data_, const char* obsType_)
                 data = redirectedData.c_str();
 
                 app.releaseDecodeCommand( decCmd );
-                LOGDEBUG("Decode: Redirect <"<< obsType << ">, redirected from: " << redirectedFromDecoder << " Data: " << data << ".");
+                LOGDEBUG("Decode: Redirect <"<< obsType << ">, redirected from: " << redirectedFromDecoder << ".\nData: " << data << ".");
             } else {
                 LOGDEBUG("Decode: Redirect, format error.");
                 decCmd->setMsg("Redirected: Missing data.");
