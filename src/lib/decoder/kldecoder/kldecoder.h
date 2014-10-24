@@ -96,12 +96,14 @@ protected:
    void decodeObsType();
 
    kvalobs::decoder::DecoderBase::DecodeResult
-   rejected( const std::string &msg, const std::string &logid, std::string &msgToSender );
+   rejected( const std::string &msg, const std::string &logid, std::string &msgToSender, bool includeObs=true );
 
    bits::DataDecoder datadecoder;
    std::string logid;
    int typeID;
    int stationID;
+   std::string stationidIn;
+   std::string redirectedFrom;
    bool onlyInsertOrUpdate;
    boost::posix_time::ptime receivedTime;
 

@@ -113,7 +113,7 @@ decodeObsType()
     CommaString cstr(obsType, '/');
     long  id;
     const char *keys[] = {"nationalnr","stationid","wmonr","icaoid","call_sign",
-                    "type", "add", "received_time", 0};
+                    "type", "add", "received_time", "redirected", 0};
 
     LOGDEBUG("decodeObsType: '" << obsType << "'");
     typeID = INT_MAX;
@@ -154,10 +154,14 @@ decodeObsType()
         		 onlyInsertOrUpdate = true;
          } else if( key == "received_time" ) {
         	 receivedTime = pt::time_from_string_nothrow( val );
+         }else if( key == "redirected") {
+             redirectedFrom = val;
          }else if( key ==  "type"  ) {
              typeID = atoi(val.c_str());
          } else if( key=="nationalnr" || key=="stationid" || key=="wmonr" ||
                     key=="icaoid" || key=="call_sign") {
+
+             stationidIn = key +"="+val;
              stationID = DecoderBase::getStationId(key, val);
 
              if(stationID < 0) {
@@ -185,21 +189,38 @@ name() const
 kvalobs::decoder::DecoderBase::DecodeResult
 kvalobs::decoder::kldecoder::
 KlDecoder::
-rejected( const std::string &msg, const std::string &logid, std::string &msgToSender  )
+rejected( const std::string &msg, const std::string &logid, std::string &msgToSender, bool includeObs )
 {
    ostringstream ost;
+   string decoder;
+   boost::posix_time::ptime tbtime;
    bool saved=true;
 
-   boost::posix_time::ptime tbtime( boost::posix_time::microsec_clock::universal_time());
+   ost << name();
 
-   ost << "REJECTED: Decoder: " << name() << endl
-       << "message: " << msg  << endl
-       << "obsType: " << obsType << endl
-       << "obs: [" << obs << "]";
+   if( ! redirectedFrom.empty() ) {
+       ost << " (" << redirectedFrom << ")";
+   }
+
+   decoder = ost.str();
+   ost.str("");
+
+   tbtime = boost::posix_time::microsec_clock::universal_time();
+
+   ost << "REJECTED: Decoder: " << decoder << endl
+       << "message: " << msg;
+
+   if( includeObs )
+       ost << endl << "obsType: " << obsType << endl
+           << "obs: [" << obs << "]";
 
    ostringstream myObs;
 
-   myObs << obsType << endl << obs;
+   myObs << obsType;
+
+   if( includeObs)
+       myObs << endl << obs;
+
    msgToSender += ost.str();
 
    kvalobs::kvRejectdecode rejected( myObs.str(),
@@ -332,15 +353,20 @@ execute(std::string &msg)
    bool setUsinfo7 = getSetUsinfo7();
    int typeId=getTypeId(msg);
    int stationid=getStationId(msg);
+   string decoder=name();
 
+   if( ! redirectedFrom.empty() )
+       decoder += "."+redirectedFrom;
+
+   milog::LogContext lcontext( decoder );
    logid.clear();
 
    if( receivedTime.is_special() && setUsinfo7 )
 	   receivedTime = pt::second_clock::universal_time();
 
    ostringstream o;
-   o << "Decoder: " << name() << ". New observation. stationid: " <<
-            stationid << " typeid: " << typeId;
+   o << "New observation. stationid: "
+     << stationid << " typeid: " << typeId;
 
    if( ! receivedTime.is_special() )
 	   o << " Obs. received: " << receivedTime;
@@ -357,15 +383,17 @@ execute(std::string &msg)
       else
          o << "<NA>";
 
-      return rejected( o.str(), "", msg );
+      o << " " << stationidIn << ".";
+
+      return rejected( o.str(), "", msg, false );
    }
 
    if( typeId<0 || typeId == INT_MAX) {
       o.str("");
       o << "Format error in type!"
-            << "stationid: " << stationid << ".";
+            << stationidIn << ".";
 
-      return rejected( o.str(), "", msg );
+      return rejected( o.str(), "", msg, false );
    }
 
    IdlogHelper idLog( stationid, typeId, this );
