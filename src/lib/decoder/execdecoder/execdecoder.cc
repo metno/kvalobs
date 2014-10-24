@@ -29,6 +29,7 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include <unistd.h>
+#include <stdio.h>
 #include <vector>
 #include <fstream>
 #include <stdexcept>
@@ -41,6 +42,8 @@
 #include "miutil/aexecclient.h"
 #include "miutil/base64.h"
 #include "miutil/splitstr.h"
+#include "fileutil/mkdir.h"
+
 
 #include "execdecoder.h"
 
@@ -71,6 +74,7 @@ public:
     const char *what() const throw() { return msg.c_str(); }
 };
 
+
 pair<string, string>
 getKey( const std::string &keyval  )
 {
@@ -91,6 +95,9 @@ getKey( const std::string &keyval  )
 }
 using namespace miutil::conf;
 
+boost::mutex   ExecDecoder::mutex;
+boost::posix_time::ptime ExecDecoder::logCleanUpTime;
+
 ExecDecoder::
 ExecDecoder(
       dnmi::db::Connection   &con,
@@ -110,6 +117,53 @@ ExecDecoder::
 }
 
 
+void
+ExecDecoder::
+writeProgLog(const std::string &logfileToWrite, const std::string &someId )
+{
+    using namespace boost::posix_time;
+   string buf;
+    string path( kvPath(kvalobs::logdir) );
+   string logpath("decoders/"+name());
+
+   while(!path.empty() && path[path.length()-1]=='/')
+      path.erase(path.length()-1);
+
+   if(path.empty())
+      return;
+
+   if(!dnmi::file::mkdir(logpath, path))
+      return;
+
+   if( ! dnmi::file::ReadFile( logfileToWrite, buf ) ) {
+       LOGERROR("Cant read the logfile: " << logfileToWrite << ".");
+       return;
+   }
+
+   ptime now( second_clock::universal_time() );
+   ofstream of;
+   char tb[32];
+
+   sprintf(tb, "%04d%02d%02d",
+           int(now.date().year()), now.date().month().as_number(), now.date().day().as_number());
+
+   string logfile=path+"/"+logpath+"/"+decoderName_ +"_decoder-" +tb + ".log";
+
+   Lock lock( mutex );
+   of.open(logfile.c_str(), ios::out|ios::app);
+
+   if(!of.is_open())
+      return;
+
+   of << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
+   of << ">>> BEGIN: " << now << "   " << someId << endl;
+   of << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
+   of << buf << endl;
+   of << "<<< END <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
+
+   of.close();
+   unlink( logfileToWrite.c_str() );
+}
 
 void
 ExecDecoder::
@@ -298,6 +352,34 @@ getDecoderProg()
        LOGERROR("The decoder '" << prog << " does NOT exist or we do not have permission to access it. (" << ex.what() <<".)");
        return "";
    }
+}
+
+bool
+ExecDecoder::
+getKeepAllLogs()
+{
+   ConfSection *conf = myConfSection();
+
+   if( !conf )
+       return "";
+
+   string decoder = getDecoderName();
+
+   if( decoder.empty() )
+       return false;
+   string key="decoders."+ decoder +".keep_all_logs";
+
+   ValElementList val=conf->getValue( key );
+
+   if( val.empty() || val[0].valAsString().empty() )
+       return false;
+
+   string v = val[0].valAsString();
+
+   if( v[0] == 't' || v[0] == 'T' )
+       return true;
+   else
+       return false;
 }
 
 
@@ -553,9 +635,12 @@ execute(std::string &msg)
 
        unlink( inputFile.c_str() );
 
-       if( exitcode == 0 && ll != "debug") {
-           unlink( logfile.c_str() );
+       if( exitcode > 0 || getKeepAllLogs() || ll != "debug" ) {
+           writeProgLog( logfile,  tmpName  );
        }
+
+       unlink( logfile.c_str() );
+       logfile.erase();
 
        if( exitcode == 0 || exitcode == 1 ) {
            return doRedirect( kvdataFile, msg );
@@ -571,6 +656,10 @@ execute(std::string &msg)
    catch( const std::exception &ex) {
        LOGERROR( "aexecd: " << ex.what() )
    }
+
+   if( ! logfile.empty() )
+       unlink( logfile.c_str() );
+
    unlink( inputFile.c_str() );
    unlink( kvdataFile.c_str() );
    return Error;

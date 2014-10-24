@@ -31,6 +31,7 @@
 #ifndef __kvalobs_decoder_dummydecoder_h__
 #define  __kvalobs_decoder_dummydecoder_h__
 
+
 #include <decoderbase/decoder.h>
 
 namespace kvalobs{
@@ -43,7 +44,7 @@ namespace execdecoder{
  * @{
  */
 
-
+typedef boost::mutex::scoped_lock    Lock;
 /**
  * \brief implements the interface  DecoderBase.
  *
@@ -78,21 +79,22 @@ class ExecDecoder : public DecoderBase{
     std::string obsTypePart_;
     std::string encoding_;
     std::string decoderName_;
-
+    static boost::posix_time::ptime logCleanUpTime;
+    static boost::mutex   mutex;
     void decodeObstype();
-
-protected:
+    void writeProgLog(const std::string &logfileToWrite, const std::string &someId );
     std::string getDecoderProg();
     std::string getDecoderName();
     std::string getBindir();
     std::string loglevel();
+    bool getKeepAllLogs();
+
     std::string getEncoding()const{ return encoding_; }
     std::string getObsTypeParts() const { return obsTypePart_; }
     bool getAexecd( std::string &host, int &port );
     bool createInputFile( const std::string &filename );
     int  getProgTimeout( int defaultTimeout=10 );
     int  runProg( const std::string &cmd, const std::string &logfile, const std::string &someId );
-
     DecoderBase::DecodeResult  doRedirect( const std::string &kvdata, std::string &msg  );
 
 public:
