@@ -1,0 +1,19 @@
+#!/bin/sh
+
+LIBDIR=$(kvconfig --pkglibdir)
+
+if [ ! -f "$LIBDIR/tool_funcs.sh" ]; then
+	echo "Cant load: $LIBDIR/tool_funcs.sh"
+	exit 1
+fi
+
+. $LIBDIR/tool_funcs.sh
+
+#Exit if the machines do NOT hold the ipalias or is an test machine.
+ipalias_status > /dev/null || exit 0 
+
+DECODERLOGDIR=$(kvconfig --logdir)/decoders/ExecDecoder
+
+find $DECODERLOGDIR -xdev -name '*.log.gz' -type f -mtime +30 -exec rm -f {} \;
+find $DECODERLOGDIR -xdev -name '*.log' -type f -mtime +1 -exec gzip {} \;
+
