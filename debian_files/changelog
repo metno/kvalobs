@@ -2,8 +2,9 @@ kvalobs (2.7.5~rc8-1) lucid; urgency=low
 
     * ExecDecoder: Add option to keep files to decode and the decoded result.
     * kldecoder: Add support to send data for multiple stastions in one message. 
-             
- -- Borge Moe <borge.moe@met.no>  Sun, 26 Oct 2014 12:00:00 +0100
+    * Add maintenance script for logs from the ExecDecoder.
+         
+ -- Borge Moe <borge.moe@met.no>  Sun, 26 Oct 2014 15:00:00 +0100
 
 kvalobs (2.7.5~rc7-1) lucid; urgency=low
 
