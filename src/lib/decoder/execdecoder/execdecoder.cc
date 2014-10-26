@@ -49,6 +49,7 @@
 
 
 using namespace std;
+using namespace miutil::conf;
 
 namespace kvalobs {
 namespace decoder {
@@ -100,12 +101,12 @@ boost::posix_time::ptime ExecDecoder::logCleanUpTime;
 
 ExecDecoder::
 ExecDecoder(
-      dnmi::db::Connection   &con,
-      const ParamList        &params,
-      const std::list<kvalobs::kvTypes> &typeList,
-      const std::string &obsType,
-      const std::string &obs,
-      int   decoderId)
+        dnmi::db::Connection   &con,
+        const ParamList        &params,
+        const std::list<kvalobs::kvTypes> &typeList,
+        const std::string &obsType,
+        const std::string &obs,
+        int   decoderId)
 :DecoderBase(con, params, typeList, obsType, obs, decoderId)
 {
     decodeObstype();
@@ -122,47 +123,47 @@ ExecDecoder::
 writeProgLog(const std::string &logfileToWrite, const std::string &someId )
 {
     using namespace boost::posix_time;
-   string buf;
+    string buf;
     string path( kvPath(kvalobs::logdir) );
-   string logpath("decoders/"+name());
+    string logpath("decoders/"+name());
 
-   while(!path.empty() && path[path.length()-1]=='/')
-      path.erase(path.length()-1);
+    while(!path.empty() && path[path.length()-1]=='/')
+        path.erase(path.length()-1);
 
-   if(path.empty())
-      return;
+    if(path.empty())
+        return;
 
-   if(!dnmi::file::mkdir(logpath, path))
-      return;
+    if(!dnmi::file::mkdir(logpath, path))
+        return;
 
-   if( ! dnmi::file::ReadFile( logfileToWrite, buf ) ) {
-       LOGERROR("Cant read the logfile: " << logfileToWrite << ".");
-       return;
-   }
+    if( ! dnmi::file::ReadFile( logfileToWrite, buf ) ) {
+        LOGERROR("Cant read the logfile: " << logfileToWrite << ".");
+        return;
+    }
 
-   ptime now( second_clock::universal_time() );
-   ofstream of;
-   char tb[32];
+    ptime now( second_clock::universal_time() );
+    ofstream of;
+    char tb[32];
 
-   sprintf(tb, "%04d%02d%02d",
-           int(now.date().year()), now.date().month().as_number(), now.date().day().as_number());
+    sprintf(tb, "%04d%02d%02d",
+            int(now.date().year()), now.date().month().as_number(), now.date().day().as_number());
 
-   string logfile=path+"/"+logpath+"/"+decoderName_ +"_decoder-" +tb + ".log";
+    string logfile=path+"/"+logpath+"/"+decoderName_ +"_decoder-" +tb + ".log";
 
-   Lock lock( mutex );
-   of.open(logfile.c_str(), ios::out|ios::app);
+    Lock lock( mutex );
+    of.open(logfile.c_str(), ios::out|ios::app);
 
-   if(!of.is_open())
-      return;
+    if(!of.is_open())
+        return;
 
-   of << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
-   of << ">>> BEGIN: " << now << "   " << someId << endl;
-   of << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
-   of << buf << endl;
-   of << "<<< END <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
+    of << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
+    of << ">>> BEGIN: " << now << "   " << someId << endl;
+    of << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
+    of << buf << endl;
+    of << "<<< END <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
 
-   of.close();
-   unlink( logfileToWrite.c_str() );
+    of.close();
+    unlink( logfileToWrite.c_str() );
 }
 
 void
@@ -220,11 +221,47 @@ decodeObstype()
     obsTypePart_ += "redirected=" + name() + "." + decoderName_;
 }
 
+bool
+ExecDecoder::
+hasDecoderConfSection()
+{
+    ConfSection *conf = myConfSection();
+
+    if( !conf ) {
+        string myName = name();
+        LOGERROR("No decoder section defined for '" << myName << "'.");
+        return false;
+    }
+
+    string decoderkey = createDecoderConfKey("");
+
+    ConfSection *decoderSection=conf->getSection( decoderkey );
+
+    if( ! decoderSection ) {
+        string myName = name();
+        LOGERROR("No section defined for obstype '" << decoderName_ << "' in section 'kvDataInpud." << myName << ".decoders' in the configuration file.");
+        decoderName_.erase();
+        return false;
+    }
+
+    return true;
+}
+
+std::string
+ExecDecoder::
+createDecoderConfKey( const std::string &key )const
+{
+    if( key.empty() )
+        return "decoders."+decoderName_;
+    else
+        return "decoders."+decoderName_ + "." + key;
+}
+
 std::string
 ExecDecoder::
 name() const
 {
-   return string("ExecDecoder");
+    return string("ExecDecoder");
 }
 
 std::string
@@ -237,7 +274,7 @@ getBindir()
     if( !conf )
         return "";
 
-    ValElementList val=conf->getValue("bindir" );
+    string val=conf->getValue("bindir" ).valAsString("");
 
     if( val.empty() ) {
         bindir = kvalobs::kvPath( kvalobs::bindir );
@@ -250,7 +287,7 @@ getBindir()
     }
 
     try {
-        bindir = val[0].valAsString();
+        bindir = val;
         if( bindir.empty() )
             return "";
         if( bindir[0] != '/') {
@@ -267,32 +304,14 @@ getBindir()
         LOGERROR("The bindir '" << bindir << " does NOT exist or we do not have permission to access it. (" << ex.what()<<".)" );
         return "";
     }
-
 }
+
 std::string
 ExecDecoder::
 getDecoderName()
 {
-
     if( decoderName_.empty() )
         return "";
-
-    ConfSection *conf = myConfSection();
-
-    if( !conf ) {
-        string myName = name();
-        LOGERROR("No decoder section defined for '" << myName << "'.");
-        return "";
-    }
-
-    string decoderkey = "decoders."+decoderName_;
-    ConfSection *decoderSection=conf->getSection( decoderkey );
-
-    if( ! decoderSection ) {
-        string myName = name();
-        LOGERROR("No section defined for obstype '" << decoderName_ << "' in section 'kvDataInpud." << myName << ".decoders' in the configuration file.");
-        return "";
-    }
 
     return decoderName_;
 }
@@ -301,85 +320,94 @@ std::string
 ExecDecoder::
 getDecoderProg()
 {
-   ConfSection *conf = myConfSection();
+    string decoder = getDecoderName();
+    if( decoder.empty() ) {
+        LOGERROR("No decoder section defined for '" << decoderNamePart_ << "'.");
+        return "";
+    }
 
-   if( !conf )
-       return "";
+    string progkey = createDecoderConfKey( "decoder" );
+    string argkey = createDecoderConfKey( "decoderarg" );
+    string prog = getConfKey( progkey ).valAsString("");
+    string args = getConfKey( argkey ).valAsString("");
 
-   string decoder = getDecoderName();
+    if(  prog.empty() ) {
+        LOGERROR("No decoder program defined '" << progkey <<"'.");
+        return "";
+    }
 
-   if( decoder.empty() )
-       return "";
-   string decoderkey="decoders."+ decoder +".decoder";
-   string decoderargs="decoders."+ decoder +".decoderarg";
-   ValElementList val=conf->getValue( decoderkey );
+    try {
+        if( prog[0] != '/') {
+            string bindir = getBindir();
 
-   if( val.empty() || val[0].valAsString().empty() ) {
-       LOGERROR("No decoder program defined '" << decoderkey <<"'.");
-       return "";
-   }
+            if( bindir.empty() ) {
+                LOGERROR( "The '" << progkey << "' must be an absolute path or relative to bindir, but bindir is undefined or invalid.");
+                return "";
+            }
 
-   string prog = val[0].valAsString();
+            prog = bindir +"/" +prog;
+        }
+        if( ! miutil::file::isRunable( prog ) ){
+            LOGERROR( "The decoder: '" << prog << "' do NOT exist or is NOT executable.");
+            return "";
+        }
 
-   try {
-       if( prog[0] != '/') {
-           string bindir = getBindir();
-
-           if( bindir.empty() ) {
-               LOGERROR( "The '" << decoderkey << "' must be an absolute path or relative to bindir, but bindir is undefined or invalid.");
-               return "";
-           }
-
-           prog = bindir +"/" +prog;
-       }
-       if( ! miutil::file::isRunable( prog ) ){
-           LOGERROR( "The decoder: '" << prog << "' do NOT exist or is NOT executable.");
-           return "";
-       }
-
-       val=conf->getValue( decoderargs );
-
-       if( ! val.empty() ) {
-            string args =val[0].valAsString();
-            LOGDEBUG("ARGS: " << decoderargs << ": '"  << args << "'.");
-
+        if( ! args.empty() ) {
             if( ! args.empty() )
-                prog += " " + val[0].valAsString();
-       }
+                prog += " " + args;
+        }
 
-       return prog + " ";
-   }catch( const std::exception &ex ) {
-       LOGERROR("The decoder '" << prog << " does NOT exist or we do not have permission to access it. (" << ex.what() <<".)");
-       return "";
-   }
+        return prog + " ";
+    }catch( const std::exception &ex ) {
+        LOGERROR("The decoder '" << prog << " does NOT exist or we do not have permission to access it. (" << ex.what() <<".)");
+        return "";
+    }
+}
+
+
+
+
+miutil::conf::ValElementList
+ExecDecoder::
+getConfKey( const std::string &key, const miutil::conf::ValElementList &defaultVal )
+{
+    return getKeyInMyConfSection( key, defaultVal );
+}
+
+miutil::conf::ValElementList
+ExecDecoder::
+getDecoderConfKey( const std::string &key, const miutil::conf::ValElementList &defaultVal )
+{
+    string decoder = getDecoderName();
+
+    if( decoder.empty() )
+        return defaultVal;
+
+    string theKey=createDecoderConfKey( key );
+
+    return getConfKey( theKey, defaultVal );
+}
+
+
+bool
+ExecDecoder::
+removeProgLogs()
+{
+    return ! getDecoderConfKey( "keep_decoder_logs" ).valAsBool( false );
 }
 
 bool
 ExecDecoder::
-getKeepAllLogs()
+removeFileToDecode()
 {
-   ConfSection *conf = myConfSection();
+    return ! getDecoderConfKey( "keep_file_to_decode" ).valAsBool( false );
+}
 
-   if( !conf )
-       return "";
-
-   string decoder = getDecoderName();
-
-   if( decoder.empty() )
-       return false;
-   string key="decoders."+ decoder +".keep_all_logs";
-
-   ValElementList val=conf->getValue( key );
-
-   if( val.empty() || val[0].valAsString().empty() )
-       return false;
-
-   string v = val[0].valAsString();
-
-   if( v[0] == 't' || v[0] == 'T' )
-       return true;
-   else
-       return false;
+bool
+ExecDecoder::
+removeKvData()
+{
+    return ! getDecoderConfKey( "keep_kvdata_file" ).valAsBool( false );
 }
 
 
@@ -441,20 +469,15 @@ bool
 ExecDecoder::
 getAexecd( std::string &host, int &port )
 {
-    ConfSection *conf = myConfSection();
-
-    if( !conf )
-        return false;
-
-    ValElementList val=conf->getValue( "aexecd" );
+    ValElementList val=getKeyInMyConfSection("aexecd" );
 
     if( val.size() != 2 ) {
         LOGERROR("Format error: aexecd=(\"hostname\", port).");
         return false;
     }
 
-    host = val[0].valAsString();
-    port = val[1].valAsInt( -1 );
+    host = val.valAsString("", 0);
+    port = val.valAsInt( -1, 1 );
 
     if( port < 0 || host.empty() ) {
         LOGERROR("Format error: aexecd=(\"hostname\", port). Values: host '" << host << "' port '" <<val[1].valAsString() <<"'.");
@@ -468,25 +491,7 @@ int
 ExecDecoder::
 getProgTimeout( int defaultTimeout )
 {
-   ConfSection *conf = myConfSection();
-
-   if( !conf )
-       return defaultTimeout;
-
-   string decoder = getDecoderName();
-
-   if( decoder.empty() )
-       return defaultTimeout;
-
-   string timeoutkey="decoders."+ decoder +".timeout";
-   ValElementList val=conf->getValue( timeoutkey );
-
-   if( val.empty() || val[0].valAsString().empty() ) {
-       LOGERROR("No no timeout defined '" << timeoutkey <<"'.");
-       return defaultTimeout;
-   }
-
-   return val[0].valAsInt( defaultTimeout );
+    return getDecoderConfKey( "timeout" ).valAsInt( defaultTimeout );
 }
 
 
@@ -570,9 +575,24 @@ doRedirect( const std::string &kvdata, std::string &msg  )
         obstype += "/" + part;
 
     setRedirectInfo( obstype, buf );
-    unlink( kvdata.c_str() );
+    removeFile( kvdata, removeKvData() );
     return Redirect;
 }
+
+std::string
+ExecDecoder::
+removeFile( const std::string &filename, bool doRemove )
+{
+    if( ! doRemove )
+        return filename;
+
+    if( filename.empty() )
+        return filename;
+
+    unlink( filename.c_str() );
+    return "";
+}
+
 
 namespace {
 class LogLevel {
@@ -580,7 +600,7 @@ class LogLevel {
     milog::LogLevel llsaved;
 public:
     LogLevel( milog::LogLevel ll )
-        : log( milog::Logger::logger() ) {
+: log( milog::Logger::logger() ) {
         llsaved = log.logLevel();
         log.logLevel( ll );
     }
@@ -594,75 +614,73 @@ DecoderBase::DecodeResult
 ExecDecoder::
 execute(std::string &msg)
 {
-   milog::LogContext lcontext(name());
-   ostringstream ost;
-   ostringstream cmd;
-   LOGINFO("New observation!  " << miutil::miTime::nowTime());
+    milog::LogContext lcontext(name());
+    ostringstream ost;
+    ostringstream cmd;
+    LOGINFO("New observation!  " << miutil::miTime::nowTime());
 
-   LogLevel changeLogLevel( getConfLoglevel() );
+    if( ! hasDecoderConfSection() ) {
+        LOGERROR("No decoder defined for '" << decoderName_ << "'.")
+        msg = "NODECODER: No decoder defined for '" + decoderName_ +"'.";
+        return Error;
+    }
 
-//   std::cerr << name() << ": " << obsType <<  endl;
-//   std::cerr << "[" << obs << "]" << endl << endl;
+    LogLevel changeLogLevel( getConfLoglevel() );
+    string decoder = getDecoderName();
+    string prog = getDecoderProg();
+    string logdir = logdirForLogger( decoder );
+    string tmpdir = datdirForLogger("tmp");
+    string tmpName = semiuniqueName(decoder, "");
+    string inputFile=tmpdir+tmpName+".bufr";
+    string kvdataFile=tmpdir+tmpName+".kvdata";
+    string logfile=logdir+tmpName+".log";
+    string ll = loglevel();
 
-   string decoder = getDecoderName();
-   string prog = getDecoderProg();
-   string logdir = logdirForLogger( decoder );
-   string tmpdir = datdirForLogger("tmp");
-   string tmpName = semiuniqueName(decoder, "");
-   string inputFile=tmpdir+tmpName+".bufr";
-   string kvdataFile=tmpdir+tmpName+".kvdata";
-   string logfile=logdir+tmpName+".log";
-   string ll = loglevel();
+    if( prog.empty() ) {
+        LOGERROR("No decoder defined for '"<< obsType << "'.");
+        msg = "NO DECODER";
+        return Error;
+    }
 
-   if( prog.empty() ) {
-       LOGERROR("No decoder defined for '"<< obsType << "'.");
-       msg = "NO DECODER";
-       return Error;
-   }
+    if( ! createInputFile( inputFile ) ) {
+        msg = "Internal error in the decoder.";
+        return Error;
+    }
 
+    cmd << prog << "--" << decoder << " " << inputFile << " --kvdata " << kvdataFile << " --loglevel " << ll;
+    LOGDEBUG("Running decoder prog '" << cmd.str() << "'\nlogfile '" << logfile << "'\n"<< decoder << " '" <<  inputFile << "'\nkvdata '" << kvdataFile <<"'.");
 
-   if( ! createInputFile( inputFile ) ) {
-       msg = "Internal error in the decoder.";
-       return Error;
-   }
+    try {
+        int exitcode = runProg( cmd.str(), logfile, tmpName );
+        LOGDEBUG("exitcode: "<< exitcode << ".");
 
-   cmd << prog << "--" << decoder << " " << inputFile << " --kvdata " << kvdataFile << " --loglevel " << ll;
-   LOGDEBUG("Running decoder prog '" << cmd.str() << "'\nlogfile '" << logfile << "'\n"<< decoder << " '" <<  inputFile << "'\nkvdata '" << kvdataFile <<"'.");
+        inputFile = removeFile( inputFile, removeFileToDecode() );
 
-   try {
-       int exitcode = runProg( cmd.str(), logfile, tmpName );
-       LOGDEBUG("exitcode: "<< exitcode << ".");
+        if( exitcode > 0 || ! removeProgLogs() || ll == "debug" ) {
+            writeProgLog( logfile,  tmpName  );
+        }
 
-       unlink( inputFile.c_str() );
+        logfile = removeFile( logfile );
 
-       if( exitcode > 0 || getKeepAllLogs() || ll != "debug" ) {
-           writeProgLog( logfile,  tmpName  );
-       }
+        if( exitcode == 0 || exitcode == 1 ) {
+            return doRedirect( kvdataFile, msg );
+        } else {
+            LOGERROR("The '" << decoder << "' failed exitcode '" << exitcode << "'. See logfile '" << logfile << "'.");
+            msg = "DECODE ERROR.";
+            return Error;
+        }
+    }
+    catch( const aexecd_error &ex ) {
+        LOGERROR( "aexecd error: " << ex.what() );
+    }
+    catch( const std::exception &ex) {
+        LOGERROR( "aexecd: " << ex.what() )
+    }
 
-       unlink( logfile.c_str() );
-       logfile.erase();
-
-       if( exitcode == 0 || exitcode == 1 ) {
-           return doRedirect( kvdataFile, msg );
-       } else {
-           LOGERROR("The '" << decoder << "' failed exitcode '" << exitcode << "'. See logfile '" << logfile << "'.");
-           msg = "DECODE ERROR.";
-           return Error;
-       }
-   }
-   catch( const aexecd_error &ex ) {
-       LOGERROR( "aexecd error: " << ex.what() );
-   }
-   catch( const std::exception &ex) {
-       LOGERROR( "aexecd: " << ex.what() )
-   }
-
-   if( ! logfile.empty() )
-       unlink( logfile.c_str() );
-
-   unlink( inputFile.c_str() );
-   unlink( kvdataFile.c_str() );
-   return Error;
+    logfile = removeFile( logfile );
+    inputFile = removeFile( inputFile, removeFileToDecode() );
+    kvdataFile = removeFile( kvdataFile, removeKvData() );
+    return Error;
 }
 
 
