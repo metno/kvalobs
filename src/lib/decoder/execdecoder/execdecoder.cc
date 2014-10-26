@@ -124,16 +124,12 @@ writeProgLog(const std::string &logfileToWrite, const std::string &someId )
 {
     using namespace boost::posix_time;
     string buf;
-    string path( kvPath(kvalobs::logdir) );
-    string logpath("decoders/"+name());
+    string logpath=logdirForLogger( getDecoderName() );
 
-    while(!path.empty() && path[path.length()-1]=='/')
-        path.erase(path.length()-1);
+    while(!logpath.empty() && logpath[logpath.length()-1]=='/')
+        logpath.erase(logpath.length()-1);
 
-    if(path.empty())
-        return;
-
-    if(!dnmi::file::mkdir(logpath, path))
+    if(logpath.empty())
         return;
 
     if( ! dnmi::file::ReadFile( logfileToWrite, buf ) ) {
@@ -148,7 +144,7 @@ writeProgLog(const std::string &logfileToWrite, const std::string &someId )
     sprintf(tb, "%04d%02d%02d",
             int(now.date().year()), now.date().month().as_number(), now.date().day().as_number());
 
-    string logfile=path+"/"+logpath+"/"+decoderName_ +"_decoder-" +tb + ".log";
+    string logfile=logpath+"/" + decoderName_ +"_decoder-" +tb + ".log";
 
     Lock lock( mutex );
     of.open(logfile.c_str(), ios::out|ios::app);
