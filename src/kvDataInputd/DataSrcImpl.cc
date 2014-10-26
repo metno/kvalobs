@@ -183,13 +183,19 @@ DataSrcImpl::newData(const char* data_, const char* obsType_)
             LOGDEBUG("Decode: NotSaved.");
             res->res=CKvalObs::CDataSource::NOTSAVED;
         }else{
+            res->res=CKvalObs::CDataSource::DECODEERROR;
+
             if(decodeResult==kvalobs::decoder::DecoderBase::Error){
-                LOGERROR("Unrecoverable error!");
+                string::size_type i = decCmd->getMsg().find("NODECODER:");
+                if( i != string::npos ) {
+                    res->res=CKvalObs::CDataSource::NODECODER;
+                    LOGERROR("No decoder!");
+                } else {
+                    LOGERROR("Unrecoverable error!");
+                }
             }else{
                 LOGDEBUG("Rejected.");
             }
-
-            res->res=CKvalObs::CDataSource::DECODEERROR;
         }
     }while ( redirect );
 

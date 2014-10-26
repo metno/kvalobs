@@ -295,7 +295,9 @@ use(bool exit_)
 {
   	cout << "\n\n  kvdataclt [-d decoder] [-h] filename\n\n"
         << "\t-d decoder, ex. synop, autoobs, ....\n"
-        << "\t-h print this help screen and exit!\n\n"
+        << "\t-c conffile use this confile instead of kvdataclt.conf\n"
+        << "\t-h print this help screen and exit!\n"
+        << "\t-v be verbose.\n"
         << "\t-s kvalobs server to send the data to.\n\n"
         << "  Assume the decoder is given as the first line of filename, if \n"
         << "  the -d option is not given.\n\n"
