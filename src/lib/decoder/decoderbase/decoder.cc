@@ -899,6 +899,50 @@ myConfSection()
 	return conf;
 }
 
+
+miutil::conf::ValElementList
+kvalobs::decoder::
+DecoderBase::
+getKeyFromConf( const std::string &key,
+                const miutil::conf::ValElementList &defaultValue )
+{
+    using namespace miutil::conf;
+    ostringstream sectionName;
+
+    if( ! theKvConf ) {
+        LOGDEBUG( "getKeyFromConf: driver <" << name() << "> has NOT implemented use of data from <kvalobs.conf>.");
+        return defaultValue;
+    }
+
+    ValElementList val = theKvConf->getValue( key );
+
+    if( val.empty() )
+        return defaultValue;
+    else
+        return val;
+}
+
+
+miutil::conf::ValElementList
+kvalobs::decoder::
+DecoderBase::
+getKeyInMyConfSection( const std::string &key,
+                       const miutil::conf::ValElementList &defaultValue )
+{
+    using namespace miutil::conf;
+    ConfSection *conf = myConfSection();
+
+    if( ! conf )
+        return defaultValue;
+
+    ValElementList val = conf->getValue( key );
+
+    if( val.empty() )
+        return defaultValue;
+    else
+        return val;
+}
+
 std::string
 kvalobs::decoder::
 DecoderBase::

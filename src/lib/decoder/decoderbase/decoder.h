@@ -641,6 +641,15 @@ namespace kvalobs{
        * the configuration file.
        */
       miutil::conf::ConfSection *myConfSection();
+
+      miutil::conf::ValElementList
+      getKeyInMyConfSection( const std::string &key,
+                             const miutil::conf::ValElementList &defaultValue=miutil::conf::ValElementList() );
+
+      miutil::conf::ValElementList
+      getKeyFromConf( const std::string &key,
+                      const miutil::conf::ValElementList &defaultValue=miutil::conf::ValElementList() );
+
       /**
        * \brief Load the observation program.
        */
