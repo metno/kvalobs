@@ -129,6 +129,16 @@ public:
     long valAsInt( long defaultValue )const;
 
     /**
+     * return the value as an bool. Throws InvalidTypeEx
+     * if the value is not a bool. Bool is the values true and false.
+     *
+     * @exception InvalidTypeEx
+     */
+
+    bool valAsBool()const;
+    bool valAsBool( bool defaultValue )const;
+
+    /**
      * return the value as an float. Throws InvalidTypeEx
      * if the value is not an float or integer.
      *
@@ -175,6 +185,21 @@ class ValElementList : public std::list<ValElement>{
 public:
     ValElementList(){}
 
+    ValElementList( double val )
+    {
+        push_back( ValElement( val ) );
+    }
+
+    ValElementList( long  val )
+    {
+        push_back( ValElement( val ) );
+    }
+
+    ValElementList( const std::string  &val )
+    {
+        push_back( ValElement( val ) );
+    }
+
     ValElementList(const ValElementList &ve):
         std::list<ValElement>(ve){}
 
@@ -184,6 +209,12 @@ public:
         }
         return *this;
     }
+
+    std::string valAsString( const std::string &defaultVal="", int index=0 )const;
+    long valAsInt( long defaultValue, int index=0 )const;
+    bool valAsBool( bool defaultValue, int index=0 )const;
+    double valAsFloat( double deefaultValue, int ondex=0 )const;
+
 
 
     /**

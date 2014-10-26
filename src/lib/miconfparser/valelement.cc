@@ -116,6 +116,34 @@ valAsInt( long defaultValue )const
     }
 }
 
+
+
+bool
+miutil::conf::ValElement::
+valAsBool( bool defaultValue )const
+{
+    try {
+        return valAsBool();
+    }
+    catch (  ... ) {
+        return defaultValue;
+    }
+}
+
+bool
+miutil::conf::ValElement::
+valAsBool( )const
+{
+    if(valType_==STRING && !val_.empty()) {
+        if( val_[0] == 't' || val_[0] == 'T' )
+            return true;
+        else if(val_[0] == 'f' || val_[0] == 'F')
+            return false;
+    }
+    throw InvalidTypeEx();
+}
+
+
 double
 miutil::conf::ValElement::
 valAsFloat()const
@@ -239,6 +267,58 @@ val(const std::string &val){
   compress(val_);
 }
 
+
+std::string
+miutil::conf::ValElementList::
+valAsString( const std::string &defaultVal, int index )const
+{
+    try {
+        string val = (*const_cast<ValElementList*>(this))[index].valAsString();
+        if( val.empty() )
+            return defaultVal;
+        else
+            return val;
+    }
+    catch ( ... ) {
+        return defaultVal;
+    }
+}
+
+long
+miutil::conf::ValElementList::
+valAsInt( long defaultValue, int index )const
+{
+    try {
+        return (*const_cast<ValElementList*>(this))[index].valAsInt( defaultValue );
+    }
+    catch ( ... ) {
+        return defaultValue;
+    }
+}
+
+bool
+miutil::conf::ValElementList::
+valAsBool( bool defaultValue, int index )const
+{
+    try {
+        return (*const_cast<ValElementList*>(this))[index].valAsBool( defaultValue );
+    }
+    catch ( ... ) {
+        return defaultValue;
+    }
+}
+
+double
+miutil::conf::ValElementList::
+valAsFloat( double defaultValue, int index )const
+{
+    try {
+        return (*const_cast<ValElementList*>(this))[index].valAsFloat( defaultValue );
+    }
+    catch ( ... ) {
+        return defaultValue;
+    }
+}
 
 miutil::conf::ValElement& 
 miutil::conf::ValElementList::
