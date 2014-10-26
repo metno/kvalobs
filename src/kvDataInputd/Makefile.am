@@ -8,6 +8,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/src/lib \
 noinst_PROGRAMS = createTestData
 
 bin_PROGRAMS = kvDataInputd kvdataclt
+dist_bin_SCRIPTS = kvDataInputd_ExecDecoder_log_cleanup
 
 
 createTestData_SOURCES = createTestData.cc
