@@ -32,6 +32,7 @@
 #include <sstream>
 #include <limits.h>
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 #include <puTools/miTime.h>
 #include <miutil/commastring.h>
 #include <milog/milog.h>
@@ -75,6 +76,106 @@ decodeKeyVal( const string &keyval, string &key, string &val ){
     return ! key.empty();
 }
 
+
+class GetObsHelper
+{
+    istringstream in_;
+    string obstype_;
+    int nMessages;
+
+    bool getLine( string &line, bool &isObsType ) {
+        isObsType = false;
+        string::size_type i;
+        while( getline( in_, line ) ) {
+            boost::trim( line );
+            if( line.empty() )
+                continue;
+            i=line.find("kldata");
+
+            if( i != string::npos ) {
+                isObsType = true;
+                obstype_=line;
+            }
+            return true;
+        }
+        return false;
+    }
+
+
+    bool getObsType( string &obstype ) {
+        obstype.erase();
+        bool isObsType;
+        string dummy;
+
+        if( obstype_.empty() ) {
+            while( getLine( dummy, isObsType))
+                if( isObsType ) break;
+        }
+        obstype = obstype_;
+        obstype_.erase();
+        return ! obstype.empty();
+    }
+
+public:
+    GetObsHelper( const std::string &data, const std::string &obsType_)
+        :in_( boost::trim_copy( data ) ), obstype_( boost::trim_copy( obsType_ ) ),
+         nMessages( 0 ){}
+
+    bool eof()const { return in_.eof(); }
+
+    bool getObs( string &obstype, string &data ) {
+       ostringstream buf;
+       bool isObsType;
+       data.erase();
+
+       if( ! getObsType( obstype) ) return false;
+
+       while( getLine( data, isObsType) ) {
+           if( isObsType ) break;
+           buf << data << "\n";
+       }
+       data = buf.str();
+
+       if( !data.empty())
+           ++nMessages;
+
+       return ! data.empty();
+    }
+
+    bool multiMessage()const { return nMessages > 1; }
+};
+
+string
+getFirstLine( const std::string &buf )
+{
+    string::size_type i=buf.find("\n");
+    if( i != string::npos ) return buf.substr(0, i);
+    else return buf;
+}
+
+std::string
+removeRedirectFromObsType( const std::string &obstype )
+{
+    string::size_type i = obstype.find( "redirected" );
+    string buf;
+    string ret;
+
+    if( i == string::npos )
+        return obstype;
+    ret = obstype.substr( 0, i );
+    buf = obstype.substr( i );
+
+    i = buf.find('/');
+
+    if( i != string::npos )
+        buf = buf.substr( i );
+    else
+        buf.erase();
+
+    boost::trim_if( ret, boost::is_any_of( " \r\n/"));
+    return ret+buf;
+}
+
 }
 
 kvalobs::decoder::kldecoder::
@@ -90,8 +191,7 @@ KlDecoder( dnmi::db::Connection   &con,
  typeID( INT_MAX ), stationID(INT_MAX), onlyInsertOrUpdate( false )
 
 {
-
-    decodeObsType();
+    decodeObsType( obsType );
 }
 
 kvalobs::decoder::kldecoder::
@@ -103,19 +203,19 @@ KlDecoder::
 void
 kvalobs::decoder::kldecoder::
 KlDecoder::
-decodeObsType()
+decodeObsType( const std::string &obstype )
 {
     string keyval;
     string key;
     string val;
     string::size_type i;
     string::size_type iKey;
-    CommaString cstr(obsType, '/');
+    CommaString cstr(obstype, '/');
     long  id;
     const char *keys[] = {"nationalnr","stationid","wmonr","icaoid","call_sign",
                     "type", "add", "received_time", "redirected", 0};
 
-    LOGDEBUG("decodeObsType: '" << obsType << "'");
+    LOGDEBUG("decodeObsType: '" << obstype << "'");
     typeID = INT_MAX;
     stationID = INT_MAX;
     onlyInsertOrUpdate = false;
@@ -196,19 +296,12 @@ rejected( const std::string &msg, const std::string &logid, std::string &msgToSe
    boost::posix_time::ptime tbtime;
    bool saved=true;
 
-   ost << name();
-
-   if( ! redirectedFrom.empty() ) {
-       ost << " (" << redirectedFrom << ")";
-   }
-
    decoder = ost.str();
    ost.str("");
 
    tbtime = boost::posix_time::microsec_clock::universal_time();
 
-   ost << "REJECTED: Decoder: " << decoder << endl
-       << "message: " << msg;
+   ost << "message: " << msg;
 
    if( includeObs )
        ost << endl << "obsType: " << obsType << endl
@@ -284,13 +377,6 @@ insertDataInDb( kvalobs::serialize::KvalobsData *theData,
 			textData.erase( tid );
 		}
 
-		/*
-		bool addDataToDb( const miutil::miTime &obstime, int stationid, int typeid_,
-		                        std::list<kvalobs::kvData> &sd,
-		                        std::list<kvalobs::kvTextData> &textData,
-		                        int priority, const std::string &logid,
-		                        bool onlyAddOrUpdateData );
-*/
 
 		if( ! addDataToDb( to_miTime( it->first ), stationid, typeId, it->second, td,
 				           priority, logid, getOnlyInsertOrUpdate() ) ) {
@@ -350,51 +436,97 @@ kvalobs::decoder::kldecoder::
 KlDecoder::
 execute(std::string &msg)
 {
+    ostringstream ostMsg;
+    GetObsHelper helper( obs, obsType );
+    bool error=false;
+    DecodeResult ret;
+    string retMsg;
+    string line;
+
+    while( helper.getObs( obsType, obs ) && !error ) {
+        if( helper.multiMessage() )
+            ostMsg << "<<<<<<<<<<<<<<<<<<<< DECODER RESULT >>>>>>>>>>>>>>>>>>>>\n";
+
+        decodeObsType( obsType );
+        obsType = removeRedirectFromObsType( obsType );
+        retMsg.erase();
+        ret = doExecute( retMsg );
+
+        switch( ret ) {
+        case Ok: ostMsg << "OK"; break;
+        case NotSaved: ostMsg << "NOTSAVED"; error = true; break;
+        case Rejected: ostMsg << "REJECTED"; break;
+        case Error: ostMsg << "ERROR"; error = true; break;
+        case Redirect: ostMsg << "REDIRECT"; break;
+        }
+        ostMsg << ": " << obsType << endl << retMsg << "\n";
+    }
+
+    if( helper.multiMessage() )
+        msg = "<<<<<<<<<<<<<<<<<<<< DECODER RESULT >>>>>>>>>>>>>>>>>>>>\n";
+
+    msg += ostMsg.str();
+
+    if( helper.multiMessage() )
+        msg += "\n<<<<<<<<<<<<<<<<<<<< END >>>>>>>>>>>>>>>>>>>>\n";
+
+
+    if( error || ! helper.multiMessage()) return ret;
+    else return Ok;
+}
+
+
+
+kvalobs::decoder::DecoderBase::DecodeResult
+kvalobs::decoder::kldecoder::
+KlDecoder::
+doExecute(std::string &msg )
+{
    bool setUsinfo7 = getSetUsinfo7();
    int typeId=getTypeId(msg);
    int stationid=getStationId(msg);
    string decoder=name();
+   ostringstream o;
 
    if( ! redirectedFrom.empty() )
        decoder += "."+redirectedFrom;
 
    milog::LogContext lcontext( decoder );
+   LOGDEBUG( obsType << "\n" << obs );
    logid.clear();
-
-   if( receivedTime.is_special() && setUsinfo7 )
-	   receivedTime = pt::second_clock::universal_time();
-
-   ostringstream o;
-   o << "New observation. stationid: "
-     << stationid << " typeid: " << typeId;
-
-   if( ! receivedTime.is_special() )
-	   o << " Obs. received: " << receivedTime;
-
-   LOGINFO( o.str() );
 
    if( stationid == INT_MAX ) {
       o.str("");
 
-      o << "Missing or unknown stationid! typeid: ";
+      o << "Missing or unknown stationid! " << stationidIn << " typeid: ";
 
       if( typeId > 0 )
          o << typeId;
       else
          o << "<NA>";
 
-      o << " " << stationidIn << ".";
-
       return rejected( o.str(), "", msg, false );
    }
 
    if( typeId<0 || typeId == INT_MAX) {
       o.str("");
-      o << "Format error in type!"
-            << stationidIn << ".";
+      o << "Format error in type. "  << stationidIn << ".";
 
       return rejected( o.str(), "", msg, false );
    }
+
+
+   if( receivedTime.is_special() && setUsinfo7 )
+       receivedTime = pt::second_clock::universal_time();
+
+   o.str("");
+   o << "New observation. stationid: "
+     << stationid << " typeid: " << typeId;
+
+   if( ! receivedTime.is_special() )
+       o << " Obs. received: " << receivedTime;
+
+   LOGINFO( o.str() );
 
    IdlogHelper idLog( stationid, typeId, this );
    logid = idLog.logid();

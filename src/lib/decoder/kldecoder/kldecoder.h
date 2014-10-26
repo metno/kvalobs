@@ -93,7 +93,7 @@ class KlDecoder : public DecoderBase{
 
 protected:
 
-   void decodeObsType();
+   void decodeObsType( const std::string &obstype);
 
    kvalobs::decoder::DecoderBase::DecodeResult
    rejected( const std::string &msg, const std::string &logid, std::string &msgToSender, bool includeObs=true );
@@ -129,6 +129,7 @@ public:
 
    virtual std::string name()const;
 
+   DecodeResult doExecute(std::string &msg );
    virtual DecodeResult execute(std::string &msg);
 };
 
