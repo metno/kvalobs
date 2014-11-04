@@ -524,7 +524,7 @@ runProg( const std::string &cmd, const std::string &logfile, const std::string &
     }
 
     if( aclient.timeout() )
-        aexecd_error( "The command timed out, the process is killed.", aexecd_error::Timeout );
+        throw aexecd_error( "The command timed out, the process is killed.", aexecd_error::Timeout );
     else
         throw aexecd_error( aclient.getErrMsg(), aexecd_error::Error );
 
