@@ -163,7 +163,8 @@ getNewDbConnection()
   if(!con){
     LOGERROR( "Can't create a database connection  (" 
 	           << dbDriverId << ")" << endl << "Connect string: <" 
-	           << dbConnect << ">!");
+	           << dbConnect << ">" << endl
+	           << "Reason: " << dbMgr.getErr() << ".");
     return 0;
   }
 
