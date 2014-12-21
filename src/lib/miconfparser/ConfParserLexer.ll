@@ -247,7 +247,7 @@ deleteStream()
 	yyConfParser_switch_to_buffer(static_cast<YY_BUFFER_STATE>(curIst->state));
 	
 	if(debugLevel_>0)
-		cout << "\nReading from prev stream: "<<curIst->file << endl;
+		cerr << "\nReading from prev stream: "<<curIst->file << endl;
 		
 	return true;
 }
