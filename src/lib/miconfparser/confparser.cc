@@ -154,9 +154,7 @@ void
 miutil::conf::ConfParser::
 deleteTokenStack()
 {
-   while(!tokenStack_.empty()){
-      tokenStack_.pop_front();
-   }
+    tokenStack_.clear();
 }
 
 std::ostream&
@@ -333,7 +331,7 @@ miutil::conf::ConfParser::
 intToken(const char *i)
 {
    if(debugLevel_>0)
-      cout << "intToken: " << i << endl;
+      cerr << "intToken: " << i << endl;
 
    checkToken(Token(MiTT_INT, i, curIst->lineno));
 }
@@ -343,7 +341,7 @@ miutil::conf::ConfParser::
 floatToken(const char *d)
 {
    if(debugLevel_>0)
-      cout << "floatToken: " << d << endl;
+      cerr << "floatToken: " << d << endl;
 
    checkToken(Token(MiTT_FLOAT, d, curIst->lineno));
 }
@@ -353,7 +351,7 @@ miutil::conf::ConfParser::
 idToken(const char *id)
 {
    if(debugLevel_>0)
-      cout << "idToken: " << id << endl;
+      cerr << "idToken: " << id << endl;
 
    checkToken(Token(MiTT_ID, id, curIst->lineno));
 }
@@ -364,7 +362,7 @@ ignoreIdToken(const char *id)
 {
 
     if(debugLevel_>0)
-        cout << "ignoreIdToken: " << id << endl;
+        cerr << "ignoreIdToken: " << id << endl;
 
     checkToken(Token(MiTT_IGNORE_ID, id, curIst->lineno ));
 
@@ -375,7 +373,7 @@ miutil::conf::ConfParser::
 aliasToken(const char *id)
 {
    if(debugLevel_>0)
-      cout << "aliasToken: " << id << endl;
+      cerr << "aliasToken: " << id << endl;
 }
 
 void  
@@ -386,7 +384,7 @@ charToken(char ch)
       char buf[2];
       buf[0]=ch;
       buf[1]='\0';
-      cout << "charToken: " << (ch=='\n'?"\\n":buf) << endl;
+      cerr << "charToken: " << (ch=='\n'?"\\n":buf) << endl;
    }
 
    switch(ch){
@@ -417,7 +415,7 @@ miutil::conf::ConfParser::
 stringToken(const char *s)
 {
    if(debugLevel_>0)
-      cout << "stringToken: " << s << endl;
+      cerr << "stringToken: " << s << endl;
 
    checkToken(Token(MiTT_STRING, s, curIst->lineno));
 }
@@ -433,7 +431,7 @@ checkToken(const Token &t)
 
    if(tokenStack_.empty()){
       if(debugLevel_>1)
-         cout << "PUSH token: " << t.val << (t.tt==MiTT_NL?" ignored":"") << endl;
+         cerr << "PUSH token: " << t.val << (t.tt==MiTT_NL?" ignored":"") << endl;
 
       if(t.tt==MiTT_NL)
          return true;
@@ -448,7 +446,7 @@ checkToken(const Token &t)
       switch(t.tt){
          case MiTT_NL: //Just ignore newline.
             if(debugLevel_>1)
-               cout << "Token: \\n ignored!" << endl;
+               cerr << "Token: \\n ignored!" << endl;
 
             return true;
          case MiTT_STRING:
@@ -470,7 +468,7 @@ checkToken(const Token &t)
 
    if(t.tt==MiTT_OP){  //Start of a list context
       if(debugLevel_>1)
-         cout << "Start of listContext!" << endl;
+         cerr << "Start of listContext!" << endl;
 
       if(prevToken.tt==MiTT_EQUAL){
          listContext_=true;
@@ -504,7 +502,7 @@ checkToken(const Token &t)
    switch(t.tt){
       case MiTT_NL:  //Just ignore newline here.
          if(debugLevel_>1)
-            cout << "Token: \\n ignored!" << endl;
+            cerr << "Token: \\n ignored!" << endl;
 
          return true;
       case MiTT_EQUAL:
@@ -526,7 +524,7 @@ checkToken(const Token &t)
             stack_.push_front(new ConfSection( allowMultipleSections(),
                                                filename(),
                                                lineno() ) );
-            if( tokenStack_.front().tt != MiTT_IGNORE_ID ) {
+            if( tokenStack_.front().tt == MiTT_IGNORE_ID ) {
                 stack_.front()->ignoreThisSection( true );
             }
          }
@@ -557,10 +555,10 @@ colapseList()
 
    if(debugLevel_>1){
       if(debugLevel_>2){
-         cout << "Tokenstack before colapseList ....\n";
-         printTokenStack(cout);
+         cerr << "Tokenstack before colapseList ....\n";
+         printTokenStack(cerr);
       }else
-         cout << "colapseList......\n";
+         cerr << "colapseList......\n";
    }
 
 
@@ -590,10 +588,10 @@ colapseList()
 
                if(debugLevel_>1){
                   if(debugLevel_>2){
-                     cout << "Tokenstack after colapseList ....\n";
-                     printTokenStack(cout);
+                     cerr << "Tokenstack after colapseList ....\n";
+                     printTokenStack(cerr);
                   }else
-                     cout << "colapseList (colapsed, leaving listContext)\n";
+                     cerr << "colapseList (colapsed, leaving listContext)\n";
                }
 
 
@@ -655,10 +653,10 @@ colapseKeyVal(const Token &t)
 
    if(debugLevel_>1){
       if(debugLevel_>2){
-         cout << "Tokenstack before colapseKeyVal ....\n";
-         printTokenStack(cout);
+         cerr << "Tokenstack before colapseKeyVal ....\n";
+         printTokenStack(cerr);
       }else
-         cout << "colapseKeyVal ... \n";
+         cerr << "colapseKeyVal ... \n";
    }
 
 
@@ -698,7 +696,7 @@ colapseKeyVal(const Token &t)
       case MiTT_NL:  //New line, ignore the key.
          ignore=true;
          if(debugLevel_>1)
-            cout << "Key: " << tt.val << ". Missing value, ignored! File: " << curIst->file << " Line: " << curIst->lineno  << endl;
+            cerr << "Key: " << tt.val << ". Missing value, ignored! File: " << curIst->file << " Line: " << curIst->lineno  << endl;
          break;
       default:
          errs_ << "File: " << curIst->file << " Line: " << curIst->lineno << ": Internal, unexpected token!";
@@ -718,10 +716,10 @@ colapseKeyVal(const Token &t)
 
    if(debugLevel_>1){
       if(debugLevel_>2){
-         cout << "Tokenstack after colapseKeyVal ....\n";
-         printTokenStack(cout);
+         cerr << "Tokenstack after colapseKeyVal ....\n";
+         printTokenStack(cerr);
       }else
-         cout << "colapseKeyVal (colapsed)\n";
+         cerr << "colapseKeyVal (colapsed)\n";
    }
 
    //After we have colapsed the key=val the token stack should
@@ -757,10 +755,10 @@ colapseSection()
 
    if(debugLevel_>1){
       if(debugLevel_>2){
-         cout << "Tokenstack before colapseSection ....\n";
-         printTokenStack(cout);
+         cerr << "Tokenstack before colapseSection ....\n";
+         printTokenStack(cerr);
       }else
-         cout << "colapseSection ... \n";
+         cerr << "colapseSection ... \n";
    }
 
 
@@ -829,10 +827,10 @@ colapseSection()
 
    if(debugLevel_>1){
       if(debugLevel_>2){
-         cout << "Tokenstack after colapseSection ....\n";
-         printTokenStack(cout);
+         cerr << "Tokenstack after colapseSection ....\n";
+         printTokenStack(cerr);
       }else
-         cout << "colapseSection (colapsed) ... \n";
+         cerr << "colapseSection (colapsed) ... \n";
    }
 
 
