@@ -42,6 +42,7 @@
 #include "miutil/aexecclient.h"
 #include "miutil/base64.h"
 #include "miutil/splitstr.h"
+#include "miutil/timeconvert.h"
 #include "fileutil/mkdir.h"
 
 
@@ -613,7 +614,10 @@ execute(std::string &msg)
     milog::LogContext lcontext(name());
     ostringstream ost;
     ostringstream cmd;
-    LOGINFO("New observation!  " << miutil::miTime::nowTime());
+    LOGINFO("New observation!  "
+            << boost::posix_time::to_kvalobs_string(
+                           boost::posix_time::second_clock::universal_time()
+                ));
 
     if( ! hasDecoderConfSection() ) {
         LOGERROR("No decoder defined for '" << decoderName_ << "'.")
