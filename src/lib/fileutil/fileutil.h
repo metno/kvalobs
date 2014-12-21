@@ -37,6 +37,7 @@
 namespace miutil {
 namespace file {
 
+
 class file_error : public std::exception
 {
     int errno_;
@@ -87,6 +88,16 @@ bool permissionToWrite( const std::string &path );
  * @throw path_error, file_error
  */
 bool permissionToRead( const std::string &path );
+
+/**
+ * @throw permission_error, file_error
+ */
+bool pathExist( const std::string &path, bool onlyDirAndRegularFiles=true );
+
+/**
+ * @throw path_error, permission_error, file_error
+ */
+long fileSize( const std::string &filepath );
 
 }
 

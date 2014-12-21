@@ -29,6 +29,9 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include <sstream>
 #include "file.h"
 #include "fileutil.h"
@@ -54,6 +57,28 @@ throwOnError( const File &f )
             throw file_error( errno, "stat failed.");
     }
 }
+
+/**
+ * @return true if the file exist and sbuf is set.
+ *         false if the file do not exist.
+ * @throws on error except file existence.
+ */
+bool
+getStatOrThrow( const string &path, struct stat &sbuf, bool throwIfFileDoNotExist=false )
+{
+    if( stat( path.c_str(), &sbuf ) < 0 ) {
+        if( errno == ENOENT || errno == ENOTDIR ) {
+            if( throwIfFileDoNotExist) throw path_error( errno );
+            else return false;
+        }else if( errno == EACCES ) {
+            throw permission_error();
+        } else {
+            throw file_error( errno, "stat failed.");
+        }
+    }
+    return true;
+}
+
 }
 
 file_error::
@@ -151,6 +176,31 @@ permissionToRead( const std::string &path )
     return f.ownerCanRead();
 
 }
+
+
+bool
+pathExist( const std::string &path, bool onlyDirAndRegularFiles )
+{
+    struct stat sbuf;
+    if( ! getStatOrThrow( path, sbuf ) )
+        return false;
+
+    if( onlyDirAndRegularFiles )
+        return S_ISREG( sbuf.st_mode ) || S_ISDIR( sbuf.st_mode );
+    else
+        return true;
+}
+
+long
+fileSize( const std::string &filepath )
+{
+    struct stat sbuf;
+
+    getStatOrThrow( filepath, sbuf, true );
+    return sbuf.st_size;
+}
+
+
 
 }
 }
