@@ -1,3 +1,13 @@
+kvalobs (2.7.6~rc2-1) lucid; urgency=low
+
+    * New release 2.7.6. 
+    * kvServiced: Log more information on failed db connections.
+    * bugfix, ignore sections.
+    * ExecDecoder: allow empty or missing kvdata files from the decoder.
+            
+ -- Borge Moe <borge.moe@met.no>  Sun, 21 Dec 2014 08:45:00 +0100
+
+
 kvalobs (2.7.6~rc1-1) lucid; urgency=low
 
     * New release 2.7.6. 
