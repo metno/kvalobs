@@ -659,15 +659,30 @@ execute(std::string &msg)
         logfile = removeFile( logfile );
 
         if( exitcode == 0 || exitcode == 1 ) {
-            return doRedirect( kvdataFile, msg );
+            if( ! miutil::file::pathExist(kvdataFile) ) {
+                LOGINFO("Missing 'kvdata' file from decoder program, this is ok, no data to decode. (" << prog << ")." );
+                return Ok;
+            } else if( miutil::file::fileSize( kvdataFile) == 0 ) {
+                LOGINFO("'kvdata' file from decoder program has length 0. This is ok, no data to decode. (" << prog << ")." );
+                return Ok;
+            } else {
+                return  doRedirect( kvdataFile, msg );
+            }
         } else {
             LOGERROR("The '" << decoder << "' failed exitcode '" << exitcode << "'. See logfile '" << logfile << "'.");
             msg = "DECODE ERROR.";
             return Error;
         }
     }
+    catch( const miutil::file::file_error &ex ) {
+        LOGERROR("Problems with the kvdata file from the decoder program."
+                << "\nDecoder: " << prog
+                << "\nkvdata: " << kvdataFile
+                << "\nReason: " << ex.what() );
+    }
     catch( const aexecd_error &ex ) {
         LOGERROR( "aexecd error: " << ex.what() );
+        msg = "RETRY";
     }
     catch( const std::exception &ex) {
         LOGERROR( "aexecd: " << ex.what() )
