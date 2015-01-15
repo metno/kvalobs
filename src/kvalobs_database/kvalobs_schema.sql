@@ -322,6 +322,7 @@ CREATE TABLE param (
 	unit    TEXT DEFAULT NULL,
 	level_scale INTEGER DEFAULT 0,
 	comment TEXT DEFAULT NULL,
+	scalar BOOLEAN DEFAULT TRUE,
 	UNIQUE ( paramid )
 );
 
