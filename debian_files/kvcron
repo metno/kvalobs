@@ -15,3 +15,4 @@ TZ=UTC
 #25 3,21 * * * /usr/bin/kvrestart kvQabased > /dev/null 2>&1 %
 */5 * * * * /usr/bin/kvrestart -r -s -n aexecd > /dev/null 2>&1 %
 */5 * * * * $HOME/bin/synop_from_murky.sh > $LOG/synop_from_murky.log 2>&1 %
+15,45 * * * * $HOME/bin/kvget_utesperring > $LOG/kvget_utesperring.log 2>&1 %
