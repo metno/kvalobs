@@ -70,6 +70,7 @@ dnmi::db::drivers::SQLiteDriver::createConnection(const std::string &connect)
    if(con->isConnected())
       return con;
 
+   setErrMsg( con->lastError() );
    delete con;
 
    return 0;
@@ -110,7 +111,7 @@ dnmi::db::drivers::SQLiteConnection::SQLiteConnection(
          errMsg = "SQLLite: NOMEM, when trying to connect to the data base '" + connect +"'.";
          myPimpel->setErrInfo( res,  errMsg );
       }
-
+      errMsg = myPimpel->getErrMsg();
       con = 0;
    }
 
@@ -564,7 +565,7 @@ setErrorCode( int errCode )
          errMsg = "SQLite: out of memmory!";
          errorCode = "DB_NOMEM";
       }else if( errCode == DB_DRIVERMISMATCH ) {
-         errMsg = "SQLite: Driver mismatch dected. (Internal error?!).";
+         errMsg = "SQLite: Driver mismatch detected. (Internal error?!).";
          errorCode = "DB_DRIVERMISMATCH";
       } else {
          errMsg = "SQLite: UNKNOWN error!";

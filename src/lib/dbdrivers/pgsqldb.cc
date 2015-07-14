@@ -60,6 +60,7 @@ dnmi::db::drivers::PGDriver::createConnection(const std::string &connect)
    if(con->isConnected())
       return con;
 
+   setErrMsg( con->errMsg );
    delete con;
 
    return 0;
