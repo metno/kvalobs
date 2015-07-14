@@ -37,6 +37,7 @@
 #include <list>
 #include <exception>
 #include <string>
+#include <boost/date_time/posix_time/ptime.hpp>
 #include <kvalobs/kvData.h>
 #include "BufrMessage.h"
 
@@ -50,8 +51,8 @@ public:
    BufrDecodeResultBase(){}
    virtual ~BufrDecodeResultBase(){}
 
-   virtual void setObstime( const miutil::miTime &obstime ) = 0;
-   virtual miutil::miTime getObstime()const = 0;
+   virtual void setObstime( const boost::posix_time::ptime &obstime ) = 0;
+   virtual boost::posix_time::ptime getObstime()const = 0;
    virtual void setStationid( int wmono ) = 0;
    virtual void setLatLong( double latitude, double longitude ) = 0;
    virtual void add( float value, int kvparamid, const miutil::miTime &obstime ) = 0;
@@ -154,7 +155,7 @@ protected:
    bool getDescriptor( int descriptor,  std::string &value, bool mustexist=true );
 
    /**
-    * Get the next descriptor and move the get pointer to the next decriptor.
+    * Get the next descriptor and move the get pointer to the next descriptor.
     *
     * @param descriptor The descriptor.
     * @param value The value,

@@ -63,8 +63,8 @@ BufrDecoder::
 BufrDecoder( dnmi::db::Connection   &con,
              const ParamList        &params,
              const std::list<kvalobs::kvTypes> &typeList,
-             const miutil::std::string &obsType,
-             const miutil::std::string &obs,
+             const std::string &obsType,
+             const std::string &obs,
              int                    decoderId)
    : DecoderBase(con, params, typeList, obsType, obs, decoderId), earlyobs(INT_MAX),
      lateobs( INT_MAX )
@@ -77,7 +77,7 @@ BufrDecoder::
 {
 }
 
-miutil::std::string 
+std::string
 BufrDecoder::
 name() const
 {
@@ -86,7 +86,7 @@ name() const
 
 long 
 BufrDecoder::
-getStationId(miutil::std::string & msg)
+getStationId( std::string & msg)
 {
 }
 
@@ -153,7 +153,7 @@ saveData( list<kvalobs::kvData> &data,
    }
 
    for(;it!=data.end(); it++){
-      if(it->obstime().undef() || it->tbtime().undef()){
+      if(it->obstime().is_special() || it->tbtime().is_special()){
          rejectedMessage="Missing obsTime or tbtime for observation!";
          rejected=true;
          return false;
@@ -261,7 +261,7 @@ getFormat()const
 }
 
 kvalobs::decoder::DecoderBase::DecodeResult 
-BufrDecoder::execute(miutil::std::string &msg)
+BufrDecoder::execute( std::string &msg)
 {
    kvalobs::kvRejectdecode  reject;
    bool                     saveReject;
