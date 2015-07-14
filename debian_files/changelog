@@ -1,3 +1,9 @@
+kvalobs (2.7.7~rc1-1) lucid; urgency=low
+
+    * Fix error message when a create connections fails.
+
+ -- Borge Moe <borge.moe@met.no>  Tue, 14 Jul 2015 13:00:00 +0200
+
 kvalobs (2.7.6-1) lucid; urgency=low
 
     * New release 2.7.6. (No change since last rc.)
