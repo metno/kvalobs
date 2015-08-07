@@ -1,0 +1,13 @@
+Compiling on Ubuntu 14.4 (trusty)
+=================================
+
+There is a bug in the m4 macros for boost on trusty, causing configure
+to not find the boost libraries correctly. To fix this, you need to
+add the following option to configure:
+
+--with-boost-libdir=/usr/lib/x86_64-linux-gnu/
+
+
+Also, there is an undocumented conflict between the google-mock
+package and libgtest-dev. If you want to run tests, make sure that
+google-mock is installed, and libgtest-dev is not!
