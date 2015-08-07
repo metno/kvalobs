@@ -42,7 +42,7 @@ include src/qabase.mk
 include scripts/qabase.mk
 
 
-if HAVE_GMOCK 
+#if HAVE_GMOCK 
 
 check_PROGRAMS = qabasetest
 TESTS = $(check_PROGRAMS)
@@ -52,4 +52,4 @@ qabasetest_LDADD = $(BOOST_DATE_TIME_LIB) $(gmock_LIBS) $(gtest_LIBS)
 
 include test/qabase.mk
 
-endif
+#endif

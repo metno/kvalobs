@@ -18,6 +18,7 @@ libgtest_main.a: lib_gtest
 
 endif
 
+
 if MUST_COMPILE_GMOCK
 gmockdir=${checkdir}
 gmock_LIBRARIES = libgmock.a libgmock_main.a

@@ -36,7 +36,7 @@ testsms2_LDADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs_decoderb
                 $(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
                 $(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la \
                 $(putools_LIBS) $(libxml2_LIBS) \
-	 	        $(BOOST_THREAD_LIB) $(BOOST_REGEX_LIB) \
+	 	        $(BOOST_THREAD_LIB) $(BOOST_REGEX_LIB) $(BOOST_SYSTEM_LIB) \
 		        -lm -ldl
 
 gtestsms2_SOURCES=gtestsms2.cc ReadParamsFromFile.cc \
@@ -60,8 +60,9 @@ gtestsms2_LDADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs_decoder
                 $(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
                 $(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la \
                 $(putools_LIBS) $(libxml2_LIBS) \
-	 	        $(BOOST_THREAD_LIB) $(BOOST_REGEX_LIB) $(gtest_LIBS) \
-		        -lm -ldl
+	 	$(BOOST_THREAD_LIB) $(BOOST_REGEX_LIB) $(BOOST_SYSTEM_LIB) \
+		$(gtest_LIBS) \
+		-lm -ldl
 
 endif
 

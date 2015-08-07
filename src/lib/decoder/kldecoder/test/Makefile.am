@@ -30,22 +30,22 @@ EXTRA_DIST = n59680-t311.dat
 CLEANFILES = $(testdb)
 TESTS = $(check_PROGRAMS)
  
-testKlDecoder_SOURCES=testKlDecoder.cc\
-                      $(top_srcdir)/src/lib/decoder/decoderbase/test/ReadTypesFromFile.cc \
-                      $(top_srcdir)/src/lib/decoder/decoderbase/test/ReadDataFromFile.cc \
-                      $(top_srcdir)/src/lib/decoder/kldecoder/DataDecode.cc \
-                      $(top_srcdir)/src/lib/decoder/kldecoder/KvDataContainer.cc
+testKlDecoder_SOURCES=testKlDecoder.cc \
+	../DataDecode.cc \
+	../KvDataContainer.cc
 
 testKlDecoder_CPPFLAGS = $(AM_CPPFLAGS) $(libxmlpp_CFLAGS) $(synop_la_CPPFLAGS) $(gtest_CFLAGS) \
-					-DDECODERBASE_TESTDIR="\""$(top_srcdir)/src/lib/decoder/decoderbase/test"\"" \
-					-DTESTDIR="\""$(top_srcdir)/src/lib/decoder/kldecoder/test"\"" \
-					-DTESTDB="\""$(testdb)"\"" \
-					-DDECODERDIR="\""$(top_builddir)/src/lib/decoder/kldecoder/.libs"\"" \
-					-DDBDIR="\""$(top_builddir)/src/lib/dbdrivers/.libs"\""
+					-DDECODERBASE_TESTDIR=\"$(top_srcdir)/src/lib/decoder/decoderbase/test\" \
+					-DTESTDIR=\"$(top_srcdir)/src/lib/decoder/kldecoder/test\" \
+					-DTESTDB=\"$(testdb)\" \
+					-DDECODERDIR=\"$(top_builddir)/src/lib/decoder/kldecoder/.libs\" \
+					-DDBDIR=\"$(top_builddir)/src/lib/dbdrivers/.libs\"
 testKlDecoder_LDFLAGS =  -pthread -export-dynamic
-testKlDecoder_LDADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs_decoderbase.la \
+testKlDecoder_LDADD = \
+				$(top_builddir)/src/lib/decoder/decoderbase/test/libtestdecoder.a \
+				$(top_builddir)/src/lib/decoder/decoderbase/libkvalobs_decoderbase.la \
 				$(top_builddir)/src/lib/decoder/kldecoder/kldecoder.la \
-               $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
+               	$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
                 $(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la \
                 $(top_builddir)/src/lib/dnmithread/libkvalobs_dnmithread.la\
                 $(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la \
@@ -55,7 +55,7 @@ testKlDecoder_LDADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs_dec
                 $(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
                 $(putools_LIBS) $(libxml2_LIBS) \
 	 	        $(BOOST_THREAD_LIB) $(BOOST_REGEX_LIB) $(gtest_LIBS) \
-	 	        $(BOOST_DATE_TIME_LIB) \
+	 	        $(BOOST_DATE_TIME_LIB) $(BOOST_SYSTEM_LIB) \
 		        -lm -ldl
 
 endif

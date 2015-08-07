@@ -114,7 +114,7 @@ peek(int timeout)
       }else{
          boost::xtime xt;
 
-         xtime_get(&xt, boost::TIME_UTC);
+         xtime_get(&xt, boost::TIME_UTC_);
          xt.sec+=timeout;
 
          cond.timed_wait(lk, xt);
@@ -148,7 +148,7 @@ CommandQue::get(int timeout)
       }else{
          boost::xtime xt;
 
-         xtime_get(&xt, boost::TIME_UTC);
+         xtime_get(&xt, boost::TIME_UTC_);
          xt.sec+=timeout;
 
          cond.timed_wait(lk, xt);

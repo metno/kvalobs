@@ -42,22 +42,10 @@ kvDataInputd_LDADD = $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs_deco
                      $(top_builddir)/src/lib/kvskel/libkvalobs_kvadmininterface.la \
                      $(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
 		     $(top_builddir)/src/lib/miutil/libkvalobs_miutil.la\
-                     $(putools_LIBS) $(omniORB4_LIBS) $(libxmlpp_LIBS) $(BOOST_THREAD_LIB) $(BOOST_DATE_TIME_LIB) -ldl
+                     $(putools_LIBS) $(omniORB4_LIBS) $(libxmlpp_LIBS) $(BOOST_THREAD_LIB) $(BOOST_DATE_TIME_LIB) -lboost_system -ldl
 
 
-#To prevent that we make dependency on a large number of
-#of package that we do not need we only compile the files that is needed.
-kvdataclt_SOURCES =  $(top_srcdir)/src/lib/kvalobs/kvapp.h \
-                     $(top_srcdir)/src/lib/kvalobs/kvapp.cc \
-                     $(top_srcdir)/src/lib/kvalobs/getLogInfo.h \
-                     $(top_srcdir)/src/lib/kvalobs/getLogInfo.cc \
-                     $(top_srcdir)/src/lib/kvalobs/kvPath.h \
-                     $(top_srcdir)/src/lib/kvalobs/kvPath.cc \
-                     $(top_srcdir)/src/lib/fileutil/pidfileutil.h \
-                     $(top_srcdir)/src/lib/fileutil/pidfileutil.cc \
-                     $(top_srcdir)/src/lib/miutil/trimstr.h \
-                     $(top_srcdir)/src/lib/miutil/trimstr.cc \
-                     kvdataclt.cc
+kvdataclt_SOURCES =  kvdataclt.cc
 
 
 kvdataclt_CPPFLAGS = $(AM_CPPFLAGS) \
@@ -70,12 +58,14 @@ kvdataclt_CPPFLAGS = $(AM_CPPFLAGS) \
                      -DPREFIX="\""$(prefix)"\"" 
 
 kvdataclt_LDFLAGS = -pthread  
-kvdataclt_LDADD = $(top_builddir)/src/lib/miconfparser/.libs/libkvalobs_miconfparser.a \
-                  $(top_builddir)/src/lib/dnmithread/.libs/libkvalobs_dnmithread.a\
-                  $(top_builddir)/src/lib/corbahelper/.libs/libkvalobs_corbahelper.a \
-                  $(top_builddir)/src/lib/milog/.libs/libkvalobs_milog.a \
-                  $(top_builddir)/src/lib/kvskel/.libs/libkvalobs_kvskel.a \
-		  $(top_builddir)/src/lib/miutil/libkvalobs_miutil.la\
+kvdataclt_LDADD = $(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la \
+                  $(top_builddir)/src/lib/dnmithread/libkvalobs_dnmithread.la \
+                  $(top_builddir)/src/lib/corbahelper/libkvalobs_corbahelper.la \
+                  $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
+                  $(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la \
+                  $(top_builddir)/src/lib/milog/libkvalobs_milog.la \
+                  $(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
+		  		  $(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
                   $(putools_LIBS) \
-                  $(BOOST_THREAD_LIB) \
+                  $(BOOST_THREAD_LIB)  $(BOOST_SYSTEM_LIB) \
                   $(omniORB4_LIBS) 

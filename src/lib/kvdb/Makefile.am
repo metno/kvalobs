@@ -40,7 +40,7 @@ libkvdbtest_CPPFLAGS = \
 libkvdbtest_LDADD = \
 	$(top_builddir)/src/lib/milog/libkvalobs_milog.la \
 	$(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
-	$(libkvalobs_kvdb_la_LIBADD) \
+	$(libkvalobs_kvdb_la_LIBADD) $(BOOST_SYSTEM_LIB) \
 	$(gtest_LIBS)
 endif
 

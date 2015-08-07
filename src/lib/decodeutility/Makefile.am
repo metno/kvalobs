@@ -35,7 +35,8 @@ libkvalobs_decodeutility_la_LIBADD = $(top_builddir)/src/lib/kvalobs/libkvalobs_
                              $(libxmlpp_LIBS) \
                              $(omniORB4_LIBS) \
                              $(BOOST_LDFLAGS) \
-                             $(BOOST_THREAD_LIB)
+                             $(BOOST_THREAD_LIB) \
+			     $(BOOST_SYSTEM_LIB)
 if HAVE_GMOCK
 
 TESTS = decodeutilitytest
@@ -59,6 +60,7 @@ decodeutilitytest_LDADD = \
 	$(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la \
 	$(putools_LIBS)\
 	$(BOOST_DATE_TIME_LIB) \
+	$(BOOST_SYSTEM_LIB) \
 	$(gtest_LIBS)
 endif
 

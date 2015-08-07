@@ -55,7 +55,7 @@ libmiutiltest_LDADD = \
 	libkvalobs_miutil.la \
 	$(libkvalobs_miutil_la_LIBADD) \
 	$(top_builddir)/src/lib/milog/libkvalobs_milog.la \
-	$(BOOST_DATE_TIME_LIB)\
+	$(BOOST_DATE_TIME_LIB) $(BOOST_SYSTEM_LIB) \
 	$(gtest_LIBS)
 endif
 

@@ -17,5 +17,7 @@ kvpush_LDADD = $(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
                $(top_builddir)/src/lib/milog/libkvalobs_milog.la \
                $(top_builddir)/src/lib/kvskel/libkvalobs_kvadmininterface.la \
                $(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
-               $(putools_LIBS) $(omniORB4_LIBS) $(libxmlpp_LIBS) $(BOOST_THREAD_LIB)  -ldl
+               $(putools_LIBS) $(omniORB4_LIBS) $(libxmlpp_LIBS) \
+               $(BOOST_THREAD_LIB) $(BOOST_SYSTEM_LIB) \
+               -ldl
 

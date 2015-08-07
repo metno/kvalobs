@@ -41,5 +41,5 @@ kvServiced_LDADD = $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
                    $(top_builddir)/src/lib/kvskel/libkvalobs_kvadmininterface.la \
                    $(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
                    $(top_builddir)/src/lib/milog/libkvalobs_milog.la \
-                   $(putools_LIBS) $(omniORB4_LIBS) $(BOOST_THREAD_LIB) $(BOOST_DATE_TIME_LIB) \
+                   $(putools_LIBS) $(omniORB4_LIBS) $(BOOST_THREAD_LIB) $(BOOST_DATE_TIME_LIB) $(BOOST_SYSTEM_LIB) \
                    -ldl -lm

@@ -19,19 +19,18 @@ CLEANFILES = $(testdb) synopLexer.cc
 
 kvSynopDecodeTest_SOURCES = \
 	kvSynopDecodeTest.cc \
-	$(top_srcdir)/src/lib/decoder/decoderbase/test/ReadTypesFromFile.cc \
-   $(top_srcdir)/src/lib/decoder/decoderbase/test/ReadDataFromFile.cc \
-	$(top_srcdir)/src/lib/decoder/synopdecoder/kvSynopDecoder.cc  \
-	$(top_srcdir)/src/lib/decoder/synopdecoder/synop.cc \
-	$(top_srcdir)/src/lib/decoder/synopdecoder/synopLexer.ll
+	../kvSynopDecoder.cc  \
+	../synop.cc \
+	../synopLexer.ll
 
 kvSynopDecodeTest_CPPFLAGS = $(AM_CPPFLAGS) $(synop_la_CPPFLAGS) $(gtest_CFLAGS) \
-					-DDECODERBASE_TESTDIR="\""$(top_srcdir)/src/lib/decoder/decoderbase/test"\"" \
-					-DTESTDIR="\""$(top_srcdir)/src/lib/decoder/synopdecoder/test"\"" \
-					-DTESTDB="\""$(testdb)"\"" \
-					-DDECODERDIR="\""$(top_builddir)/src/lib/decoder/synopdecoder/.libs"\"" \
-					-DDBDIR="\""$(top_builddir)/src/lib/dbdrivers/.libs"\""
+					-DDECODERBASE_TESTDIR=\"$(top_srcdir)/src/lib/decoder/decoderbase/test\" \
+					-DTESTDIR=\"$(top_srcdir)/src/lib/decoder/synopdecoder/test\" \
+					-DTESTDB=\"$(testdb)\" \
+					-DDECODERDIR=\"$(top_builddir)/src/lib/decoder/synopdecoder/.libs\" \
+					-DDBDIR=\"$(top_builddir)/src/lib/dbdrivers/.libs\"
 kvSynopDecodeTest_LDFLAGS = \
+				$(top_builddir)/src/lib/decoder/decoderbase/test/libtestdecoder.a \
 				$(top_builddir)/src/lib/decoder/decoderbase/libkvalobs_decoderbase.la \
 				$(top_builddir)/src/lib/decoder/synopdecoder/synop.la \
             $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
@@ -45,7 +44,7 @@ kvSynopDecodeTest_LDFLAGS = \
 				$(putools_LIBS) \
 				$(gtest_LIBS) \
     			$(synop_la_LIBADD) \
-    			$(BOOST_THREAD_LIB) $(BOOST_DATE_TIME_LIB)
+    			$(BOOST_THREAD_LIB) $(BOOST_DATE_TIME_LIB) $(BOOST_SYSTEM_LIB)
 
 endif
 

@@ -1,6 +1,6 @@
 AC_PREREQ([2.59])
 AC_INIT([kvalobs], [2.7.6], [kvoss@met.no])
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([subdir-objects])
 #METNO_SET_VERSION_INFO
 
 #AC_CONFIG_SRCDIR([src/diNetCDF.cc])
@@ -119,7 +119,8 @@ AX_BOOST_PROGRAM_OPTIONS
 if test -z $BOOST_PROGRAM_OPTIONS_LIB; then AC_MSG_ERROR([Unable to find boost program_options library]); fi
 AX_BOOST_DATE_TIME
 if test -z $BOOST_DATE_TIME_LIB; then AC_MSG_ERROR([Unable to find boost date_time library]); fi
- 
+AX_BOOST_SYSTEM
+
 KV_MODEL2KV
 
 AC_CONFIG_HEADERS(config.h)

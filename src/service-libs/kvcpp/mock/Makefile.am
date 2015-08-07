@@ -32,6 +32,7 @@ testTestingKvApp_LDADD = $(gtest_LIBS) $(gmock_LIBS) \
 	$(top_builddir)/src/lib/dnmithread/libkvalobs_dnmithread.la \
 	$(top_builddir)/src/lib/kvskel/libkvalobs_kvadmininterface.la \
 	$(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la \
+	$(BOOST_SYSTEM_LIB) \
 	$(putools_LIBS) 
 
 endif # HAVE_GMOCK

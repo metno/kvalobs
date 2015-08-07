@@ -24,7 +24,7 @@ kv2kvDataInputd_LDADD = $(top_builddir)/src/service-libs/kvcpp/libkvalobs_kvcpp.
 		$(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la \
 		$(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la \
 		$(top_builddir)/src/lib/miutil/libkvalobs_miutil.la\
-               $(putools_LIBS) $(omniORB4_LIBS) $(BOOST_THREAD_LIB) \
+               $(putools_LIBS) $(omniORB4_LIBS) $(BOOST_THREAD_LIB) $(BOOST_SYSTEM_LIB) \
               -lm 
 
 #EXTRA_DIST =                

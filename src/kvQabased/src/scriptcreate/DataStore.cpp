@@ -220,10 +220,10 @@ void DataStore::populateMeta_(
 		std::string::size_type splitPoint = find->first.str().find_last_of('_');
 		if ( std::string::npos == splitPoint )
 			throw UnableToGetData("Cannot understand metadata: " + find->first.str());
-		std::string parameter = find->first.str().substr(0, splitPoint);
+		std::string param = find->first.str().substr(0, splitPoint);
 		std::string metadataType = find->first.str().substr(splitPoint +1);
 
-		std::string stationParam = db.getStationParam(observation, parameter, qcx);
+		std::string stationParam = db.getStationParam(observation, param, qcx);
 
 		float val = db::resultfilter::parseStationParam(stationParam, metadataType);
 		metaData_[find->second].push_back(val);
