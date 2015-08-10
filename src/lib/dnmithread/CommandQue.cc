@@ -114,7 +114,12 @@ peek(int timeout)
       }else{
          boost::xtime xt;
 
+#if BOOST_VERSION >= 105000
          xtime_get(&xt, boost::TIME_UTC_);
+#else
+         xtime_get(&xt, boost::TIME_UTC);
+#endif
+
          xt.sec+=timeout;
 
          cond.timed_wait(lk, xt);
@@ -148,7 +153,11 @@ CommandQue::get(int timeout)
       }else{
          boost::xtime xt;
 
+#if BOOST_VERSION >= 105000
          xtime_get(&xt, boost::TIME_UTC_);
+#else
+         xtime_get(&xt, boost::TIME_UTC);
+#endif
          xt.sec+=timeout;
 
          cond.timed_wait(lk, xt);
