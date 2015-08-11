@@ -3,8 +3,6 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-MI_SRC_DATE=20100312
-MI_DIR=debian/mi-src-$(MI_SRC_DATE)
 DEBTMP=$(CURDIR)/debian/tmp
 DEBETC=$(DEBTMP)/etc
 
@@ -19,9 +17,10 @@ override_dh_auto_configure: pre-build configure-stamp
 
 configure-stamp:
 	autoreconf -i
-	./configure --prefix=/usr  --enable-model2kv \
+	./configure --prefix=/usr  \
 	    --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info  \
-	    --localstatedir=/var --sysconfdir=/etc
+	    --localstatedir=/var --sysconfdir=/etc \
+	    --with-boost-libdir=/usr/lib/x86_64-linux-gnu/
 	touch $@
 
 pre-build :: version-deb-autotools
@@ -40,18 +39,14 @@ version-deb-autotools:
 
 override_dh_auto_clean:
 	dh_auto_clean
-	test -d debian/mi-src-$(MI_SRC_DATE) && $(MAKE) -C $(MI_DIR) OSTYPE=linux clean
 
 override_dh_auto_build:
 	dh_auto_build
-	test -d debian/mi-src-$(MI_SRC_DATE) && $(MAKE) -C $(MI_DIR) OSTYPE=linux
 
 override_dh_auto_install:
 	dh_auto_install
 
 	find $(DEBTMP) -name "lib*.la" | xargs sed -i "/dependency_libs/ s/'.*'/''/"
-
-	test -d debian/mi-src-$(MI_SRC_DATE) && $(MAKE) -C $(MI_DIR) OSTYPE=linux DESTDIR=$(DEBTMP)/usr install
 
 	cd $(DEBTMP) && mkdir -p etc/pgrepctl etc/kvalobs/lam2kv usr/lib/kvalobs/bin etc/init etc/init.d
 	cd $(CURDIR)/debian && \
