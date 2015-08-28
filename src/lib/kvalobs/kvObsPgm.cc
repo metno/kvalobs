@@ -36,6 +36,14 @@
 
 using namespace std;
 
+static std::string quoted_null(const boost::posix_time::ptime& t)
+{
+    if (t.is_not_a_date_time())
+        return "NULL";
+    else
+	return quoted(to_kvalobs_string(timeToQuote));
+}
+
 
 std::string kvalobs::kvObsPgm::toSend() const
 {
@@ -78,8 +86,8 @@ std::string kvalobs::kvObsPgm::toSend() const
        << quoted(fri_)            << ","
        << quoted(sat_)            << ","
        << quoted(sun_)            << ","
-       << quoted(fromtime_)       << ","
-       << quoted(totime_)         << ")";
+       << quoted_null(fromtime_)  << ","
+       << quoted_null(totime_)    << ")";
 	return ost.str();
 }
 
@@ -411,12 +419,12 @@ kvalobs::kvObsPgm::uniqueKey()const
 {
 	ostringstream ost;
   
-	ost << " WHERE stationid=" << stationid_                  << " AND "
+	ost << " WHERE stationid=" << stationid_            << " AND "
       << "       typeid="    << typeid_                     << " AND " 
       << "       paramid="   << paramid_                    << " AND "
       << "       level="     << level_                      << " AND "
-      << "       fromtime="  << quoted(to_kvalobs_string(fromtime_)) << " AND "
-      << "       totime="    << quoted(to_kvalobs_string(totime_));
+      << "       fromtime="  << quoted_null(fromtime_)      << " AND "
+      << "       totime="    << quoted_null(totime_);
  
 	return ost.str();
 }
