@@ -100,14 +100,12 @@ PROGRAMS = $(bin_PROGRAMS)
 am_aexecd_OBJECTS = aexecd-aexecd.$(OBJEXT) \
 	aexecd-ExecHelper.$(OBJEXT) aexecd-InitLogger.$(OBJEXT)
 aexecd_OBJECTS = $(am_aexecd_OBJECTS)
-am__DEPENDENCIES_1 =
 aexecd_DEPENDENCIES =  \
 	$(top_builddir)/src/lib/milog/libkvalobs_milog.la \
 	$(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la \
 	$(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
 	$(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la \
-	$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
-	$(am__DEPENDENCIES_1)
+	$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
@@ -122,8 +120,7 @@ aexecdclt_DEPENDENCIES =  \
 	$(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la \
 	$(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
 	$(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la \
-	$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
-	$(am__DEPENDENCIES_1)
+	$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la
 aexecdclt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(aexecdclt_LDFLAGS) $(LDFLAGS) -o $@
@@ -214,14 +211,6 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
-BOOST_CPPFLAGS = @BOOST_CPPFLAGS@
-BOOST_DATE_TIME_LIB = @BOOST_DATE_TIME_LIB@
-BOOST_FILESYSTEM_LIB = @BOOST_FILESYSTEM_LIB@
-BOOST_LDFLAGS = @BOOST_LDFLAGS@
-BOOST_PROGRAM_OPTIONS_LIB = @BOOST_PROGRAM_OPTIONS_LIB@
-BOOST_REGEX_LIB = @BOOST_REGEX_LIB@
-BOOST_SYSTEM_LIB = @BOOST_SYSTEM_LIB@
-BOOST_THREAD_LIB = @BOOST_THREAD_LIB@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
