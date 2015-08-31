@@ -100,3 +100,5 @@ stamp-h1
 /src/lib/kvdb/libkvdbtest
 /src/lib/miutil/libmiutiltest
 /src/service-libs/kvcpp/mock/testTestingKvApp
+test-driver
+build/
