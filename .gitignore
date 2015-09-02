@@ -102,3 +102,8 @@ stamp-h1
 /src/service-libs/kvcpp/mock/testTestingKvApp
 test-driver
 build/
+.autotools
+.cproject
+.project
+.settings/
+
