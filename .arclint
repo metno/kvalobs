@@ -1,12 +1,65 @@
 {
+  "exclude": [
+    "(^legacy/)",
+    "(\\.project$)",
+    "(\\.cproject$)"
+  ],
   "linters": {
-    "cppcheck": {
-      "type": "cppcheck",
-      "include": "(\\.cpp$|\\.hpp|\\.c|\\.h)"
+    "chmod": {
+      "type": "chmod"
+    },
+    "filename": {
+      "type": "filename"
+    },
+    "generated": {
+      "type": "generated"
+    },
+    "json": {
+      "type": "json",
+      "include": [
+        "(^\\.arcconfig$)",
+        "(^\\.arclint$)",
+        "(\\.json$)"
+      ]
+    },
+    "nolint": {
+      "type": "nolint"
+    },
+    "spelling": {
+      "type": "spelling",
+      "exclude": [
+        "(\\.html$)",
+        "(\\.shtml$)"
+      ]
+    },
+    "text": {
+      "type": "text",
+      "severity": {
+        "3": "disabled",
+        "5": "advice"
+      },
+      "exclude": [
+        "(COPYING)",
+        "(README)",
+        "(configure.)",
+        "(Makefile)",
+        "(^debian_files/)"
+      ]
     },
     "xml": {
       "type": "xml",
-      "include": "(\\.xml$)"
+      "include": [
+        "(\\.xml$)"
+      ]
+    },
+    "ccpcheck": {
+      "type": "cppcheck",
+      "include": [
+        "(\\.cpp$)",
+        "(\\.c$)",
+        "(\\.h$)",
+        "(\\.hpp$)"
+      ]
     }
   }
 }
