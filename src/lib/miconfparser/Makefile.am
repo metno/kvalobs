@@ -9,7 +9,9 @@ libkvalobs_miconfparser_la_SOURCES = valelement.h valelement.cc \
 	miconfparser.h \
 	confexception.h ConfParserLexer.ll
 
-libkvalobs_miconfparser_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@
+libkvalobs_miconfparser_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@ \
+	@BOOST_LDFLAGS@
+libkvalobs_miconfparser_la_LIBADD = @BOOST_SYSTEM_LIB@
 AM_LFLAGS = -PyyConfParser -olex.yy.c
 
 miconfparserincludedir = $(pkgincludedir)/miconfparser
