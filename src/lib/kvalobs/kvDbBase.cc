@@ -91,6 +91,9 @@ std::string kvalobs::kvDbBase::quoted(const std::string& in) const
 
 std::string kvalobs::kvDbBase::quoted(const boost::posix_time::ptime & timeToQuote) const
 {
+    if (timeToQuote.is_not_a_date_time())
+        return "NULL";
+    else
 	return quoted(to_kvalobs_string(timeToQuote));
 }
 
