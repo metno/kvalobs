@@ -20,72 +20,34 @@ set -e
 
 . /usr/share/debconf/confmodule
 
-#BINDIR, BIN and DIR must be in sync with the respectives variables in postinst.
-
-BINDIR="/usr/bin"
-BIN="kv2kro kvDataInputd kvdataclt kvdbadmin 
-     kvManagerd kvmgrclt kvQabased kvServiced 
-     aexecd kvstart kvstop kvstatus kvrestart 
-     kvsynopdparse 
-     qabase_log_cleanup"
-
-#     kvstart-postgres
-#     kvstop-postgres
-
-
-KVBINDIR="/usr/lib/kvalobs/bin"
-KVBIN="hirlam2kvalobs.sh
-       runbg
-       metdat
-       posdat
-       lam2kv.cron
-       save_last_month.sh
-       load_last_month.sh"
-
-
-ETC_FILES="kv_ctl.conf 
-           kvcron
-           kv-ipalias.conf
-           pgclean-local.sql
-           save_last_month.conf
-           stinfosys_params.csv.default
-           stinfosys.conf
-           lam2kv/metdat.1h    
-           lam2kv/metdat.RR24         
-           lam2kv/posdat.PP    
-           lam2kv/pose.kvalobs
-           lam2kv/metdat.PP    
-           lam2kv/parameters.kvalobs  
-           lam2kv/posdat.RR12  
-           lam2kv/metdat.RR12  
-           lam2kv/parmap.kvalobs      
-           lam2kv/posdat.RR24  
-           lam2kv/stations.kvalobs
-           "
-
-
-DIRS="/usr/share/kvalobs 
-      /usr/share/kvalobs/db
-      /usr/share/kvalobs/kvsynop 
-      /usr/share/kvalobs/metadata 
-      /etc/kvalobs
-      /etc/kvalobs/lam2kv
-      /var/lib/kvalobs
-      /var/lib/kvalobs/lam2kv
-      /var/lib/kvalobs/lam2kv/log
-      /var/lib/kvalobs/lam2kv/upload
-      /var/lib/kvalobs/lam2kv/data
-      /var/log/kvalobs
-      /var/log/kvalobs/lam2kv
-      /var/log/kvalobs/decoders
-      /var/log/kvalobs/decoders/SynopDecoder
-      /var/log/kvalobs/kvsynopdbadmin
-      /var/log/kvalobs/html
-      /var/log/kvalobs/kvService
-      /var/run/kvalobs
-      /var/lib/kvalobs/decoders
-      /var/lib/kvalobs/service
-      /var/lib/kvalobs/service/subscribers"     
+# BIN and KVBIN must be in sync with the respectives variables in postinst.
+BIN="/usr/bin/kv2metdat \
+	/usr/bin/kv2norcom \
+	/usr/bin/kvconfig \
+	/usr/bin/kvDataInputd \
+	/usr/bin/kvdbadmin \
+	/usr/bin/kv_get_stinfosys_params \
+	/usr/bin/kvlogread \
+	/usr/bin/kvManagerd \
+	/usr/bin/kvpush \
+	/usr/bin/kvQabased \
+	/usr/bin/kvrestart \
+	/usr/bin/kvServiced \
+	/usr/bin/kvstart \
+	/usr/bin/kvstatus \
+	/usr/bin/kvstop \
+	/usr/bin/aexecd \
+	/usr/bin/qabase_log_cleanup \
+	/usr/lib/kvalobs/bin/hirlam2kvalobs.sh \
+	/usr/lib/kvalobs/bin/kvalobs-funcs.sh \
+	/usr/lib/kvalobs/bin/kvalobs-start-as-master.sh \
+	/usr/lib/kvalobs/bin/kvalobs-start-as-slave.sh \
+	/usr/lib/kvalobs/bin/kvalobs-stop-cluster.sh \
+	/usr/lib/kvalobs/bin/kvalobs-stop-slave.sh \
+	/usr/lib/kvalobs/bin/lam2kv.cron \
+	/usr/lib/kvalobs/bin/load_last_month.sh \
+	/usr/lib/kvalobs/bin/save_last_month.sh \
+	/usr/lib/kvalobs/bin/synopdecoder_cron.sh"
 
 
 case "$1" in
@@ -94,26 +56,14 @@ case "$1" in
 
   purge)
     for i in $BIN; do
-        dpkg-statoverride --remove $BINDIR/$i
-     done
+		if dpkg-statoverride --list $i >/dev/null 2>&1
+	    then
+	    	dpkg-statoverride --remove $i
+	    fi
+	done
 
-    for i in $KVBIN; do
-        dpkg-statoverride --remove $KVBINDIR/$i
-     done
+     rm -f /etc/kvalobs/kv2norcom.conf
 
-     for i in $DIRS; do
-        dpkg-statoverride --remove $i
-     done
-
-     #Remove the cache databases.
-     for i in $SQLLITE_DB; do
-        dpkg-statoverride --remove $i
-        rm -f $i 
-     done
-     for i in $ETC_FILES; do
-	 dpkg-statoverride --remove /etc/kvalobs/$i
-     done
-     
      #Delete my debconf entries in the database.
      db_purge || true
 
