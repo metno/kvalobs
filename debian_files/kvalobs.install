@@ -18,8 +18,6 @@ usr/bin/qabase_log_cleanup
 usr/lib/kvalobs/bin/*
 usr/lib/kvalobs/decode/*.so.*
 usr/lib/kvalobs/tool_funcs.sh
-usr/share/kvalobs/db/*.sql
-usr/share/kvalobs/db/upgrade/*.sql
 etc/kvalobs/kv_ctl.conf
 etc/kvalobs/kv-ipalias.conf
 etc/kvalobs/kvcron

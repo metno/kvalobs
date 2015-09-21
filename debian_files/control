@@ -33,6 +33,13 @@ Description: Install kvalobs user
  Create a user for the kvalobs package. All kvalobs programs are supposed to be
  run by this user.
 
+Package: kvalobs-database-files
+Architecture: all
+Depends: ${misc:Depends}
+Suggests: kvalobs
+Description: Install sql files for creating kvalobs database
+ This will install the sql files for installing a kvalobs database.
+
 Package: libkvalobs4
 Section: libs
 Architecture: any

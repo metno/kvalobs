@@ -18,6 +18,7 @@
 --
 -- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+BEGIN;
 
 CREATE TABLE data (
 	stationid   INTEGER NOT NULL,
@@ -80,8 +81,6 @@ GRANT SELECT ON data_history TO kv_read;
 GRANT SELECT, UPDATE, INSERT, DELETE ON data_history TO kv_write;
 GRANT USAGE ON SEQUENCE data_history_version_seq TO kv_write;
 
-
-CREATE LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION 
 kvalobs_database_version()
@@ -626,3 +625,5 @@ REVOKE ALL ON qc2_interpolation_best_neighbors FROM public;
 GRANT ALL ON qc2_interpolation_best_neighbors TO kv_admin;
 GRANT SELECT ON qc2_interpolation_best_neighbors TO kv_read;
 GRANT SELECT, UPDATE, INSERT, DELETE ON qc2_interpolation_best_neighbors TO kv_write;
+
+END;

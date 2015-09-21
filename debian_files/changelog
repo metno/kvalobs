@@ -1,4 +1,4 @@
-kvalobs (2.7.7~rc1-1) lucid; urgency=low
+kvalobs (2.7.7-1) lucid; urgency=low
 
     * Fix error message when a create connections fails.
 
