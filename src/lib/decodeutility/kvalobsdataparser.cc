@@ -121,14 +121,14 @@ namespace
   class CorrectedRejectionHandler : public HandlerFunction
   {
   public:
-	  void operator()( const AttributeList & attr, KvalobsData & data_, map<string, string> & context_ ) const
-	  {
-		  std::string tbtime = get_attr(attr, "tbtime");
-		  context_["message/tbtime"] = tbtime;
-	  }
+      void operator()( const AttributeList & attr, KvalobsData & data_, map<string, string> & context_ ) const
+      {
+          std::string tbtime = get_attr(attr, "tbtime");
+          context_["message/tbtime"] = tbtime;
+      }
   };
 
-  typedef shared_ptr<HandlerFunction> hfp;
+  typedef boost::shared_ptr<HandlerFunction> hfp;
   typedef map<string, hfp> HandlerMap;
   const HandlerMap handlers_ = assign::map_list_of
       ("KvalobsData", hfp( new KvalobsDataHandler ) )
@@ -199,23 +199,23 @@ void KvalobsDataParser::on_end_element( const Glib::ustring & name )
   }
   else if ( name == "message")
   {
-	  std::string message = context_["message"];
-	  boost::posix_time::ptime tbtime(boost::posix_time::time_from_string_nothrow(context_["message/tbtime"]));
-	  std::string decoder = context_["decoder"];
-	  kvalobs::kvRejectdecode reject(message, tbtime, decoder, "");
-	  std::cout << reject.toSend() << std::endl;
-	  data_.setMessageCorrectsThisRejection(reject);
-	  context_.erase("message");
-	  context_.erase("message/tbtime");
+      std::string message = context_["message"];
+      boost::posix_time::ptime tbtime(boost::posix_time::time_from_string_nothrow(context_["message/tbtime"]));
+      std::string decoder = context_["decoder"];
+      kvalobs::kvRejectdecode reject(message, tbtime, decoder, "");
+      std::cout << reject.toSend() << std::endl;
+      data_.setMessageCorrectsThisRejection(reject);
+      context_.erase("message");
+      context_.erase("message/tbtime");
   }
   else if ( name == "level" )
     context_.erase( "level" );
   else if ( name == "sensor" )
     context_.erase( "sensor" );
   else if ( name == "decoder" )
-	  context_.erase("decoder");
+      context_.erase("decoder");
   else if ( name == "fixed_rejected_message" )
-	  context_.erase("fixed_rejected_message");
+      context_.erase("fixed_rejected_message");
 }
 
 void KvalobsDataParser::on_characters( const Glib::ustring & characters )
