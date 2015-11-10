@@ -1,5 +1,5 @@
 AC_PREREQ([2.59])
-AC_INIT([kvalobs], [2.7.7], [kvoss@met.no])
+AC_INIT([kvalobs], [2.7.8~rc1], [kvoss@met.no])
 AM_INIT_AUTOMAKE([subdir-objects])
 #METNO_SET_VERSION_INFO
 
