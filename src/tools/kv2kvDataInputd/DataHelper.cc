@@ -52,7 +52,7 @@ Param(const Param &p )
 Param::
 Param(const kvalobs::kvData &data )
    : paramid( data.paramID() ),
-     sensor( data.sensor()-'0' ),
+     sensor( data.sensor() ),
      level( data.level() )
 {
 }
