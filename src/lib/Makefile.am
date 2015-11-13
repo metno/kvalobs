@@ -11,4 +11,6 @@ SUBDIRS = \
 	kvalobs \
 	decodeutility \
 	dbdrivers \
-	decoder
+	decoder \
+	kvsubscribe
+

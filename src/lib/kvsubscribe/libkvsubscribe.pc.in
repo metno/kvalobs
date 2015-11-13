@@ -1,0 +1,13 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+pkglibdir=${libdir}/kvalobs
+includedir=@includedir@
+idldir=@datarootdir@/@PACKAGE@/idl
+
+Name: libkvsubscribe
+Description: Data subscription library for Kvalobs
+Version: @VERSION@
+Requires: jsoncpp libkvalobs_decodeutility
+Libs: -L${libdir} -lkvalobs_kvsubscribe -lrdkafka++ -lrdkafka
+Cflags: -I@includedir@/kvalobs

@@ -19,6 +19,8 @@ AM_LDFLAGS = \
 	$(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
 	$(top_builddir)/src/lib/dnmithread/libkvalobs_dnmithread.la \
 	$(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
+	$(top_builddir)/src/lib/kvsubscribe/libkvalobs_kvsubscribe.la \
+	$(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
 	$(putools_LIBS) \
 	$(BOOST_PROGRAM_OPTIONS_LIB) \
 	$(BOOST_FILESYSTEM_LIB) \

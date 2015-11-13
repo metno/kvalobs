@@ -1,0 +1,4 @@
+usr/include/kvalobs/kvsubscribe/*
+usr/lib/libkvalobs_kvsubscribe.so
+usr/lib/libkvalobs_kvsubscribe.a
+usr/lib/pkgconfig/libkvsubscribe.pc

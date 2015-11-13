@@ -36,6 +36,12 @@
 #include <Configuration.h>
 #include <CheckRunner.h>
 #include <db/KvalobsDatabaseAccess.h>
+#include <kvsubscribe/KafkaProducer.h>
+#include <kvsubscribe/Notification.h>
+#include <kvsubscribe/NotificationSubscriber.h>
+#include <kvsubscribe/DataSubscriber.h>
+#include <decodeutility/kvalobsdata.h>
+#include <decodeutility/kvalobsdataserializer.h>
 #include <sstream>
 #include <kvalobs/kvDbGate.h>
 #include <miutil/timeconvert.h>
@@ -47,10 +53,32 @@ using namespace kvalobs;
 using namespace std;
 using namespace miutil;
 
+namespace
+{
+void processNotficationErrors(const std::string & data,
+        const std::string & errorMessage)
+{
+    LOGERROR("Unable to send notification: " + errorMessage + "  Data: <" + data + ">");
+}
+void processDataErrors(const std::string & data,
+        const std::string & errorMessage)
+{
+    LOGERROR("Unable to send data: " + errorMessage + "  Data: <" + data + ">");
+}
+}
+
+
+
 QaWork::QaWork(QaBaseApp & app, const qabase::Configuration & config) :
 	app(app),
+	notifier_(new subscribe::KafkaProducer(
+				subscribe::NotificationSubscriber::topic(),
+				processNotficationErrors)),
+	dataSender_(new subscribe::KafkaProducer(subscribe::DataSubscriber::topic(),
+				processDataErrors)),
 	logCreator_(config.baseLogDir()),
 	logLevel_(config.logLevel())
+
 {
 }
 
@@ -161,6 +189,8 @@ void QaWork::process(dnmi::db::Connection & con, const QaWorkCommand & work)
 		CKvalObs::CManager::CheckedInput_var callback = work.getCallback();
 		app.sendToManager(retList, callback);
 	}
+
+	notifySubscribers_(retList);
 }
 
 /**
@@ -182,4 +212,78 @@ void QaWork::doWork(const kvalobs::kvStationInfo & params,
 
 	qabase::LogFileCreator::LogStreamPtr log = logCreator_.getLogStream(params);
 	checkRunner.newObservation(params, log.get());
+}
+
+void QaWork::notifySubscribers_(const kvalobs::kvStationInfoList & changeList)
+{
+    sendNotifications_(changeList);
+    sendData_(changeList);
+}
+
+void QaWork::sendNotifications_(const kvalobs::kvStationInfoList & changeList)
+{
+    for (const kvalobs::kvStationInfo & info : changeList)
+    {
+        kvalobs::subscribe::Notification n(info.stationID(), info.typeID(),
+                info.obstime());
+        notifier_->send(n.str());
+    }
+    notifier_->catchup();
+}
+
+class AutoReleaseConnection
+{
+public:
+    AutoReleaseConnection(QaBaseApp & app) :
+            app_(app)
+    {
+        connection_ = app_.getNewDbConnection();
+    }
+
+    ~AutoReleaseConnection()
+    {
+        app_.releaseDbConnection(connection_);
+    }
+
+    dnmi::db::Connection & connection()
+    {
+        return *connection_;
+    }
+
+private:
+    QaBaseApp & app_;
+    dnmi::db::Connection * connection_;
+};
+
+void QaWork::sendData_(const kvalobs::kvStationInfoList & changeList)
+{
+    AutoReleaseConnection arc(app);
+    dnmi::db::Connection & connection = arc.connection();
+
+    for (const kvStationInfo & info : changeList)
+    {
+        kvalobs::serialize::KvalobsData d;
+
+        std::ostringstream q;
+        q << "SELECT * FROM data WHERE stationid=" << info.stationID()
+                << " AND typeid=" << info.typeID() << " AND obstime='"
+                << to_kvalobs_string(info.obstime()) << "';";
+        std::unique_ptr<dnmi::db::Result> r(connection.execQuery(q.str()));
+        while (r->hasNext())
+            d.insert(kvalobs::kvData(r->next()));
+
+        q.clear();
+        q << "SELECT * FROM text_data WHERE stationid=" << info.stationID()
+                << " AND typeid=" << info.typeID() << " AND obstime='"
+                << to_kvalobs_string(info.obstime()) << "';";
+        r.reset(connection.execQuery(q.str()));
+        while (r->hasNext())
+            d.insert(kvalobs::kvTextData(r->next()));
+
+        std::string data = kvalobs::serialize::KvalobsDataSerializer::serialize(
+                d);
+        dataSender_->send(data);
+    }
+
+    dataSender_->catchup();
 }

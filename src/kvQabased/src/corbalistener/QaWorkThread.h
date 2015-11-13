@@ -36,9 +36,21 @@
 #include <milog/milog.h>
 #include <string>
 #include <stack>
+#include <memory>
 
 class QaBaseApp;
 class QaWorkCommand;
+namespace kvalobs
+{
+namespace subscribe
+{
+class KafkaProducer;
+}
+}
+
+
+
+
 namespace qabase
 {
 class Configuration;
@@ -68,6 +80,14 @@ public:
 	void operator()();
 
 private:
+	void notifySubscribers_(const kvalobs::kvStationInfoList & changeList);
+	void sendNotifications_(const kvalobs::kvStationInfoList & changeList);
+	void sendData_(const kvalobs::kvStationInfoList & changeList);
+
+	std::shared_ptr<kvalobs::subscribe::KafkaProducer> notifier_;
+	std::shared_ptr<kvalobs::subscribe::KafkaProducer> dataSender_;
+
+
 	qabase::LogFileCreator logCreator_;
 	milog::LogLevel  logLevel_;
 };

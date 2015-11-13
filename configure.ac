@@ -1,5 +1,5 @@
 AC_PREREQ([2.59])
-AC_INIT([kvalobs], [2.7.8~rc1], [kvoss@met.no])
+AC_INIT([kvalobs], [2.7.8~rckafka1], [kvoss@met.no])
 AM_INIT_AUTOMAKE([subdir-objects])
 #METNO_SET_VERSION_INFO
 
@@ -43,6 +43,7 @@ AC_CONFIG_FILES([Makefile
                  src/lib/fileutil/Makefile
                  src/lib/kvdb/Makefile
                  src/lib/kvalobs/Makefile
+                 src/lib/kvsubscribe/Makefile
                  src/lib/decoder/Makefile
                  src/lib/decoder/decoderbase/Makefile
                  src/lib/decoder/decoderbase/test/Makefile
@@ -93,6 +94,7 @@ AC_CONFIG_FILES([Makefile
                  src/lib/kvalobs/libkvalobs_kvalobs.pc
                  src/lib/kvskel/libkvalobs_kvskel.pc
                  src/lib/kvskel/libkvalobs_kvadmininterface.pc
+                 src/lib/kvsubscribe/libkvsubscribe.pc
 ])
 
 PKG_CHECK_MODULES(putools, puTools)
@@ -101,6 +103,9 @@ KV_POSTGRESQL
 PKG_CHECK_MODULES(sqlite3, sqlite3)
 PKG_CHECK_MODULES(libxml2, libxml-2.0)
 PKG_CHECK_MODULES(libxmlpp, libxml++-2.6)
+PKG_CHECK_MODULES(jsoncpp, jsoncpp)
+
+RDKAFKA_CHECK
 
 PKG_CHECK_MODULES(cppunit, cppunit)
 AC_PATH_PROG(CMAKE, cmake, false)
