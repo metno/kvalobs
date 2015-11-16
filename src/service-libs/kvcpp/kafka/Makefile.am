@@ -1,0 +1,26 @@
+noinst_LTLIBRARIES = libkafkakvapp.la
+
+libkafkakvappincludedir =  $(pkgincludedir)/kvcpp/kafka
+libkafkakvappinclude_HEADERS = \
+	KafkaKvApp.h \
+	KafkaSubscribe.h
+
+libkafkakvapp_la_SOURCES = \
+	KafkaKvApp.cpp \
+	KafkaSubscribe.cpp
+
+libkafkakvapp_la_CPPFLAGS = \
+	-I$(top_srcdir)/src/service-libs/kvcpp \
+	-D_REENTRANT \
+	-I$(top_srcdir)/src/lib \
+	-I$(top_builddir)/src/lib \
+	-I$(top_builddir)/src/lib/kvskel \
+	$(omniORB4_CFLAGS) \
+	$(putools_CFLAGS) 
+	
+
+libkafkakvapp_la_LIBADD = \
+	$(top_builddir)/src/lib/kvsubscribe/libkvalobs_kvsubscribe.la \
+	$(top_builddir)/src/service-libs/kvcpp/corba/libcorbakvapp.la
+ 
+	

@@ -51,6 +51,11 @@ namespace kvservice{
 	
     public:
 	KvWhat(const KvWhat &w);
+    KvWhat(long stationID, long typeID, const boost::posix_time::ptime & obsTime) :
+        stationID_(stationID),
+        typeID_(typeID),
+        obsTime_(obsTime)
+    {}
 	KvWhat(const CKvalObs::CService::kvDataNotifySubscriber::What &what);
 	~KvWhat(){}
 	

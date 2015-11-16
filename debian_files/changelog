@@ -1,9 +1,8 @@
-kvalobs (2.7.8~rckafka1-1) UNRELEASED; urgency=medium
+kvalobs (2.7.8~rckafka7-1) UNRELEASED; urgency=medium
 
-  * correcting compilation of wrong sources in rc1
-  * kafka version
+  * new version, with KafkaKvApp
 
- -- Borge Moe <borge.moe@met.no>  Wed, 11 Nov 2015 14:00:56 +0100
+ -- Borge Moe <borge.moe@met.no>  Fri, 13 Nov 2015 14:21:22 +0100
 
 kvalobs (2.7.8~rc1-1) lucid; urgency=low
 

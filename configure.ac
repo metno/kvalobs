@@ -1,5 +1,5 @@
 AC_PREREQ([2.59])
-AC_INIT([kvalobs], [2.7.8~rckafka1], [kvoss@met.no])
+AC_INIT([kvalobs], [2.7.8~rckafka7], [kvoss@met.no])
 AM_INIT_AUTOMAKE([subdir-objects])
 #METNO_SET_VERSION_INFO
 
@@ -62,6 +62,7 @@ AC_CONFIG_FILES([Makefile
                  src/service-libs/Makefile
                  src/service-libs/kvcpp/Makefile
                  src/service-libs/kvcpp/corba/Makefile
+                 src/service-libs/kvcpp/kafka/Makefile
                  src/service-libs/kvcpp/mock/Makefile
                  src/data2kv/Makefile
                  src/kvDataInputd/Makefile

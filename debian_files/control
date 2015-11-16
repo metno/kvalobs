@@ -60,7 +60,9 @@ Description: Runtime library for kvalobs clients
 Package: libkvcpp-dev
 Section: libdevel
 Architecture: any
-Depends: libkvcpp4 (= ${binary:Version}), libxml++2.6-dev (>= 2.14.0),
+Depends: libkvcpp4 (= ${binary:Version}), 
+ libkvsubscribe-dev  (= ${binary:Version}),
+ libxml++2.6-dev (>= 2.14.0),
  libboost-dev (>= 1.40.0), libboost-thread-dev (>= 1.40.0),
  libboost-regex-dev (>= 1.40.0), libboost-filesystem-dev (>= 1.40.0),
  libboost-program-options-dev (>= 1.40.0),
@@ -82,7 +84,7 @@ Description: Subscription library for kvalobs clients
 Package: libkvsubscribe-dev
 Section: libdevel
 Architecture: any
-Depends: libkvsubscribe0, ${shlibs:Depends}, ${misc:Depends} 
+Depends: libkvsubscribe0 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends} 
 Description: Subscription library for kvalobs clients - development files
  This allows other programs to pick up changes to data in kvalobs.
  Kvalobs is a quality control system for meteorological observations.

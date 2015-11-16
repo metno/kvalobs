@@ -1,4 +1,4 @@
-SUBDIRS = corba mock
+SUBDIRS = corba kafka mock
 
 lib_LTLIBRARIES = libkvalobs_kvcpp.la
 
@@ -32,7 +32,7 @@ kvcppinclude_HEADERS = \
 libkvalobs_kvcpp_la_LDFLAGS= -version-info @KVALOBSLIBS_SO_VERSION@
 
 libkvalobs_kvcpp_la_LIBADD = \
-	$(top_builddir)/src/service-libs/kvcpp/corba/libcorbakvapp.la \
+	$(top_builddir)/src/service-libs/kvcpp/kafka/libkafkakvapp.la \
 	$(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
 	$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
 	$(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la \

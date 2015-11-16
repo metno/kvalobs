@@ -69,6 +69,17 @@ namespace kvservice
      */
     KvObsData( const CKvalObs::CService::ObsData &obsData );
 
+	/**
+	 * Create an empty data list, for the given station.
+	 *
+	 * Data may later be added with the dataList() and textDataList()
+	 * methods. But note that they do not guard against wrong data (wrong
+	 * stationid).
+	 */
+	KvObsData(int stationid) :
+		stationid_(stationid)
+	{}
+
     virtual ~KvObsData( );
 
     virtual void operator=( const CKvalObs::CService::ObsData &obsData );

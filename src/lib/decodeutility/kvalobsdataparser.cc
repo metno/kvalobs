@@ -146,7 +146,6 @@ namespace
 void KvalobsDataParser::parse( const string & xml, KvalobsData & d )
 {
   KvalobsDataParser parser( d );
-  std::cout << xml << std::endl;
   parser.parse_memory( xml );
 }
 
@@ -163,8 +162,6 @@ KvalobsDataParser::~KvalobsDataParser()
 void KvalobsDataParser::on_start_element( const Glib::ustring & name, const AttributeList & attributes )
 {
   currentContext_.push( name );
-
-  std::cout << name << std::endl;
 
   HandlerMap::const_iterator handler = handlers_.find( name );
   if ( handler != handlers_.end() ) {
@@ -203,7 +200,6 @@ void KvalobsDataParser::on_end_element( const Glib::ustring & name )
       boost::posix_time::ptime tbtime(boost::posix_time::time_from_string_nothrow(context_["message/tbtime"]));
       std::string decoder = context_["decoder"];
       kvalobs::kvRejectdecode reject(message, tbtime, decoder, "");
-      std::cout << reject.toSend() << std::endl;
       data_.setMessageCorrectsThisRejection(reject);
       context_.erase("message");
       context_.erase("message/tbtime");
