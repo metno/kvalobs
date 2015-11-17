@@ -30,6 +30,7 @@
 
 #include "NotificationSubscriber.h"
 #include "Notification.h"
+#include "queue.h"
 #include <milog/milog.h>
 #include <iostream>
 
@@ -47,7 +48,7 @@ NotificationSubscriber::NotificationSubscriber(Handler handler, ConsumptionStart
 
 std::string NotificationSubscriber::topic()
 {
-    return "kvalobs.notifications.test";
+    return queue::notification();
 }
 
 void NotificationSubscriber::data(const char * msg, unsigned length)

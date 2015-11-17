@@ -56,9 +56,10 @@ public:
 
 
     explicit KafkaProducer(const std::string & topic,
+    		const std::string & brokers = "localhost",
             ErrorHandler onFailedDelivery = [](const std::string &, const std::string &){},
-            SuccessHandler onSuccessfulDelivery = [](const std::string &){},
-            const std::string & brokers = "localhost");
+            SuccessHandler onSuccessfulDelivery = [](const std::string &){}
+            );
 
     ~KafkaProducer();
 

@@ -20,7 +20,8 @@ configure-stamp:
 	./configure --prefix=/usr  \
 	    --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info  \
 	    --localstatedir=/var --sysconfdir=/etc \
-	    --with-boost-libdir=/usr/lib/x86_64-linux-gnu/
+	    --with-boost-libdir=/usr/lib/x86_64-linux-gnu/ \
+	    --with-gmock-dist=/usr/src/gmock
 	touch $@
 
 pre-build :: version-deb-autotools

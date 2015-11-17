@@ -27,42 +27,31 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "DataSubscriber.h"
-#include <decodeutility/kvalobsdata.h>
-#include <decodeutility/kvalobsdataparser.h>
-#include <milog/milog.h>
-#include <iostream>
+#include "DataProducer.h"
 #include "queue.h"
+#include <decodeutility/kvalobsdata.h>
+#include <decodeutility/kvalobsdataserializer.h>
+
 
 namespace kvalobs
 {
 namespace subscribe
 {
 
-DataSubscriber::DataSubscriber(Handler handler, ConsumptionStart startAt, const std::string & brokers) :
-    KafkaConsumer(startAt, topic(), brokers),
-    handler_(handler)
+DataProducer::DataProducer(const std::string & brokers,	KafkaProducer::ErrorHandler onFailedDelivery, KafkaProducer::SuccessHandler onSuccessfulDelivery) :
+		producer_(queue::data(), brokers, onFailedDelivery, onSuccessfulDelivery)
 {
 }
 
-std::string DataSubscriber::topic()
+DataProducer::~DataProducer()
 {
-    return queue::data();
 }
 
-void DataSubscriber::data(const char * msg, unsigned length)
+void DataProducer::send(const serialize::KvalobsData & data)
 {
-    std::string message(msg, length);
-    serialize::KvalobsData d;
-    serialize::KvalobsDataParser::parse(message, d);
-    handler_(d);
+	producer_.send(serialize::KvalobsDataSerializer::serialize(data));
 }
 
-void DataSubscriber::error(int code, const std::string & msg)
-{
-    milog::LogContext context("DataSubscriber");
-    LOGERROR(msg);
-}
 
-} /* namespace subscribe */
-} /* namespace kvalobs */
+} /* namespace kafka */
+} /* namespace kvservice */

@@ -96,12 +96,14 @@ namespace kvservice
     /**
      * \brief Get the list of KvData elements.
      **/ 
-    inline kvDataList &dataList() { return dataList_; }
+    kvDataList &dataList() { return dataList_; }
+    const kvDataList &dataList() const { return dataList_; }
 
     /**
      * \brief Get the list of KvTextData elements.
      */
-    inline kvTextDataList &textDataList() { return textDataList_; }
+    kvTextDataList &textDataList() { return textDataList_; }
+    const kvTextDataList &textDataList() const { return textDataList_; }
 
     /**
      * \brief clear all internal lists, that is: make this object

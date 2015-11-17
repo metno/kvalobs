@@ -1,6 +1,7 @@
 SUBDIRS = \
 	lib \
 	service-libs \
+	kafka-util \
 	data2kv \
 	kvDataInputd \
 	kvServiced \

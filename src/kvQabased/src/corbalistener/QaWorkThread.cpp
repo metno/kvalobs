@@ -73,8 +73,10 @@ QaWork::QaWork(QaBaseApp & app, const qabase::Configuration & config) :
 	app(app),
 	notifier_(new subscribe::KafkaProducer(
 				subscribe::NotificationSubscriber::topic(),
+				"localhost",
 				processNotficationErrors)),
 	dataSender_(new subscribe::KafkaProducer(subscribe::DataSubscriber::topic(),
+				"localhost",
 				processDataErrors)),
 	logCreator_(config.baseLogDir()),
 	logLevel_(config.logLevel())

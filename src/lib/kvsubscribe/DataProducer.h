@@ -27,42 +27,50 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "DataSubscriber.h"
-#include <decodeutility/kvalobsdata.h>
-#include <decodeutility/kvalobsdataparser.h>
-#include <milog/milog.h>
-#include <iostream>
-#include "queue.h"
+#ifndef SRC_LIB_KVSUBSCRIBE_DATAPRODUCER_H_
+#define SRC_LIB_KVSUBSCRIBE_DATAPRODUCER_H_
+
+#include "KafkaProducer.h"
+
 
 namespace kvalobs
 {
+namespace serialize
+{
+class KvalobsData;
+}
+
 namespace subscribe
 {
 
-DataSubscriber::DataSubscriber(Handler handler, ConsumptionStart startAt, const std::string & brokers) :
-    KafkaConsumer(startAt, topic(), brokers),
-    handler_(handler)
+class DataProducer
 {
-}
+public:
+	DataProducer(const std::string & brokers = "localhost",
+            KafkaProducer::ErrorHandler onFailedDelivery = [](const std::string &, const std::string &){},
+			KafkaProducer::SuccessHandler onSuccessfulDelivery = [](const std::string &){}
+            );
+	~DataProducer();
 
-std::string DataSubscriber::topic()
-{
-    return queue::data();
-}
 
-void DataSubscriber::data(const char * msg, unsigned length)
-{
-    std::string message(msg, length);
-    serialize::KvalobsData d;
-    serialize::KvalobsDataParser::parse(message, d);
-    handler_(d);
-}
+	void send(const serialize::KvalobsData & data);
 
-void DataSubscriber::error(int code, const std::string & msg)
-{
-    milog::LogContext context("DataSubscriber");
-    LOGERROR(msg);
-}
+    /**
+     * Process all awaiting delivery reports.
+     *
+     * @param timeout Maximum time to wait for delivery report to become available, in milliseconds
+     */
+    void catchup(unsigned timeout = 0)
+    {
+    	producer_.catchup(timeout);
+    }
 
-} /* namespace subscribe */
-} /* namespace kvalobs */
+
+private:
+	KafkaProducer producer_;
+};
+
+} /* namespace kafka */
+} /* namespace kvservice */
+
+#endif /* SRC_LIB_KVSUBSCRIBE_DATAPRODUCER_H_ */

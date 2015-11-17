@@ -27,42 +27,37 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "DataSubscriber.h"
-#include <decodeutility/kvalobsdata.h>
-#include <decodeutility/kvalobsdataparser.h>
-#include <milog/milog.h>
-#include <iostream>
-#include "queue.h"
+#ifndef SRC_LIB_KVSUBSCRIBE_QUEUES_H_
+#define SRC_LIB_KVSUBSCRIBE_QUEUES_H_
+
 
 namespace kvalobs
 {
 namespace subscribe
 {
-
-DataSubscriber::DataSubscriber(Handler handler, ConsumptionStart startAt, const std::string & brokers) :
-    KafkaConsumer(startAt, topic(), brokers),
-    handler_(handler)
+namespace queue
 {
+inline const char * notification()
+{
+	return "kvalobs.notifications";
 }
 
-std::string DataSubscriber::topic()
+inline const char * data()
 {
-    return queue::data();
+	return "kvalobs.data";
 }
 
-void DataSubscriber::data(const char * msg, unsigned length)
+inline const char * hint()
 {
-    std::string message(msg, length);
-    serialize::KvalobsData d;
-    serialize::KvalobsDataParser::parse(message, d);
-    handler_(d);
+	return "kvalobs.hint";
 }
 
-void DataSubscriber::error(int code, const std::string & msg)
-{
-    milog::LogContext context("DataSubscriber");
-    LOGERROR(msg);
+
+}
+}
 }
 
-} /* namespace subscribe */
-} /* namespace kvalobs */
+
+
+
+#endif /* SRC_LIB_KVSUBSCRIBE_QUEUES_H_ */

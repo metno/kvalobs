@@ -66,9 +66,10 @@ private:
 }
 
 KafkaProducer::KafkaProducer(const std::string & topic,
+		const std::string & brokers,
         KafkaProducer::ErrorHandler onFailedDelivery,
-        KafkaProducer::SuccessHandler onSuccessfulDelivery,
-        const std::string & brokers) :
+        KafkaProducer::SuccessHandler onSuccessfulDelivery
+        ) :
         deliveryReportHandler_(new DeliveryReport(onFailedDelivery, onSuccessfulDelivery))
 {
     std::string errstr;

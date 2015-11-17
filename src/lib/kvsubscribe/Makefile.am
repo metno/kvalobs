@@ -10,22 +10,28 @@ libkvalobs_kvsubscribe_la_SOURCES = \
 	KafkaConsumer.cpp \
 	DataSubscriber.cpp \
 	NotificationSubscriber.cpp \
-	KafkaProducer.cpp
+	KafkaProducer.cpp \
+	DataProducer.cpp \
+	NotificationProducer.cpp
 	
 libkvalobs_kvsubscribe_la_LIBADD = ../decodeutility/libkvalobs_decodeutility.la $(jsoncpp_LIBS) $(rdkafka_LIBS)
 
 kvsubscribeincludedir = $(pkgincludedir)/kvsubscribe
 	
 kvsubscribeinclude_HEADERS = \
+	queue.h \
 	Notification.h \
 	KafkaConsumer.h \
 	NotificationSubscriber.h \
 	DataSubscriber.h \
-	KafkaProducer.h
+	KafkaProducer.h \
+	DataProducer.h \
+	NotificationProducer.h
 
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libkvsubscribe.pc
 $(pkgconfig_DATA): $(top_builddir)/config.status
 
-#include test/kvsubscribe.mk
+
+include test/kvsubscribe.mk
