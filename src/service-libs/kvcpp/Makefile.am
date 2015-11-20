@@ -1,4 +1,4 @@
-SUBDIRS = corba kafka mock
+SUBDIRS = corba sql kafka mock
 
 lib_LTLIBRARIES = libkvalobs_kvcpp.la
 
@@ -46,7 +46,7 @@ libkvalobs_kvcpp_la_LIBADD = \
 	
 	
 	
-libkvalobs_kvcpp_la_CPPFLAGS = \
+AM_CPPFLAGS = \
 	-D_REENTRANT \
 	-I$(top_srcdir)/src/lib \
 	-I$(top_builddir)/src/lib \
@@ -58,3 +58,18 @@ libkvalobs_kvcpp_la_CPPFLAGS = \
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libkvcpp.pc
 $(pkgconfig_DATA): $(top_builddir)/config.status
+
+
+noinst_PROGRAMS = runit
+
+runit_SOURCES = runit.cpp
+
+runit_LDFLAGS = \
+	sql/libsqlkvapp.la \
+	corba/libcorbakvapp.la \
+	libkvalobs_kvcpp.la \
+	$(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
+	$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
+	$(top_builddir)/src/lib/dnmithread/libkvalobs_dnmithread.la \
+	$(top_builddir)/src/lib/milog/libkvalobs_milog.la \
+	-lboost_system -lomniDynamic4 -lomniORB4 -lomnithread

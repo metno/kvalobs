@@ -155,6 +155,18 @@ conf::ConfSection* CorbaKvApp::readConf( const string &fname )
    return 0;
 }
 
+miutil::conf::ConfSection* CorbaKvApp::readConf(std::initializer_list<std::string> fileNameAlternatives)
+{
+	for ( const std::string & fileName : fileNameAlternatives )
+	{
+		conf::ConfSection * ret = readConf(fileName);
+		if ( ret )
+			return ret;
+	}
+	return nullptr;
+}
+
+
 std::string CorbaKvApp::kvpathInCorbaNameserver() const
 {
    string::size_type len = nameserverpath.size();

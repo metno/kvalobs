@@ -382,7 +382,6 @@ namespace kvservice
               
     KvApp();
 
-  protected:
     virtual ~KvApp();
   };
 

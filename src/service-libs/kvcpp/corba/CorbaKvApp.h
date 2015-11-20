@@ -41,6 +41,7 @@
 #include <kvskel/kvService.hh>
 #include <stdexcept>
 #include <string>
+#include <initializer_list>
 
 namespace kvservice
 {
@@ -150,6 +151,12 @@ namespace kvservice
        * \return The configuration.
        */
       static miutil::conf::ConfSection* readConf(const std::string &fname);
+
+      /**
+       * Read config from the given files. Only the first one to succeed will
+       * be returned, or a nullptr if no files are read successfully.
+       */
+      static miutil::conf::ConfSection* readConf(std::initializer_list<std::string> fileNameAlternatives);
 
       std::string kvpathInCorbaNameserver() const;
 
