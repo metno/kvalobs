@@ -5,7 +5,9 @@ libsqlkvappinclude_HEADERS = \
 	SqlKvApp.h
 
 libsqlkvapp_la_SOURCES = \
-	SqlKvApp.cpp
+	SqlKvApp.cpp \
+	KvDataHandler.h \
+	KvDataHandler.cpp
 
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/src/service-libs/kvcpp \

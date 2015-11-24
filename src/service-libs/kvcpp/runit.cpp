@@ -30,6 +30,7 @@
 
 #include "sql/SqlKvApp.h"
 #include <kvalobs/kvPath.h>
+#include <miutil/timeconvert.h>
 #include <iostream>
 #include <stdexcept>
 #include <memory>
@@ -42,11 +43,36 @@ kvservice::KvApp * getApp(int argc, char ** argv)
 	return new SqlKvApp(argc, argv, SqlKvApp::readConf({"runit.conf", "kvalobs.conf", kvPath("sysconfdir") + "/kvalobs.conf"}));
 }
 
+void readKvData()
+{
+	kvservice::KvObsDataList dataList;
+	kvservice::WhichDataHelper whichData;
+	whichData.addStation(4260,
+			boost::posix_time::time_from_string("2015-11-09 12:00:00"),
+			boost::posix_time::time_from_string("2015-11-09 12:00:00")
+			);
+	whichData.addStation(180,
+			boost::posix_time::time_from_string("2015-11-09 12:00:00"),
+			boost::posix_time::time_from_string("2015-11-09 12:00:00")
+			);
+	if ( ! KvApp::kvApp->getKvData(dataList, whichData) )
+		throw std::runtime_error("Unable to read data");
+	for ( auto dl : dataList )
+	{
+		for ( auto d: dl.dataList() )
+			std::cout << "d :" << d.stationID() << '/' << d.paramID() << ":\t" << d.original() << std::endl;
+		for ( auto d: dl.textDataList() )
+			std::cout << "t: " << d.stationID() << '/' << d.paramID() << ":\t" << d.original() << std::endl;
+
+		std::cout << std::endl;
+	}
+}
+
 void readParam()
 {
 	std::list<kvalobs::kvParam> paramList;
 	if ( ! KvApp::kvApp->getKvParams(paramList) )
-		throw std::runtime_error("Uanble to read param");
+		throw std::runtime_error("Unable to read param");
 	for ( auto p : paramList )
 		std::cout << p.name() << ":\t" << p.paramID() << std::endl;
 }
@@ -55,5 +81,6 @@ void readParam()
 int main(int argc, char ** argv)
 {
 	std::unique_ptr<kvservice::KvApp> app(getApp(argc, argv));
-	readParam();
+	//readParam();
+	readKvData();
 }

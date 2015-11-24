@@ -75,7 +75,10 @@ public:
                                     );
 
 private:
-    std::unique_ptr<dnmi::db::Connection> connection_;
+    dnmi::db::Connection * connection(int id = 0);
+
+    std::map<int, std::shared_ptr<dnmi::db::Connection>> connections_;
+    miutil::conf::ConfSection * conf_;
 };
 
 } /* namespace sql */

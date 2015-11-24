@@ -28,10 +28,13 @@
  */
 
 #include "SqlKvApp.h"
+#include "KvDataHandler.h"
 #include <kvdb/kvdb.h>
 #include <kvdb/dbdrivermgr.h>
 #include <kvalobs/kvPath.h>
 #include <milog/milog.h>
+#include <sstream>
+
 
 namespace kvservice
 {
@@ -78,6 +81,8 @@ bool query(dnmi::db::Connection * connection, std::string q, std::function<void(
 			if ( ! connection->tryReconnect() )
 				throw std::runtime_error("Database connection unavailable!");
 
+		LOGDEBUG(q);
+
 		std::unique_ptr<dnmi::db::Result> result(connection->execQuery(q));
 		while ( result->hasNext() )
 			handler(result->next());
@@ -91,9 +96,17 @@ bool query(dnmi::db::Connection * connection, std::string q, std::function<void(
 }
 }
 
+dnmi::db::Connection * SqlKvApp::connection(int id)
+{
+	std::shared_ptr<dnmi::db::Connection> & connection = connections_[id];
+	if ( ! connection )
+		connection.reset(createConnection(conf_));
+	return connection.get();
+}
+
 SqlKvApp::SqlKvApp(int &argc, char **argv, miutil::conf::ConfSection *conf) :
 		corba::CorbaKvApp(argc, argv, conf),
-		connection_(createConnection(conf))
+		conf_(conf)
 {
 }
 
@@ -103,7 +116,17 @@ SqlKvApp::~SqlKvApp()
 
 bool SqlKvApp::getKvData( KvGetDataReceiver &dataReceiver, const WhichDataHelper &wd )
 {
-	return CorbaKvApp::getKvData(dataReceiver, wd);
+	try
+	{
+		internal::KvDataHandler handler(* connection(0), * connection(1), dataReceiver);
+		handler(wd);
+		return true;
+	}
+	catch ( std::exception & e)
+	{
+		LOGERROR(e.what());
+		return false;
+	}
 }
 
 bool SqlKvApp::getKvRejectDecode( const CKvalObs::CService::RejectDecodeInfo &decodeInfo, kvservice::RejectDecodeIterator &it )
@@ -113,11 +136,19 @@ bool SqlKvApp::getKvRejectDecode( const CKvalObs::CService::RejectDecodeInfo &de
 
 bool SqlKvApp::getKvParams( std::list<kvalobs::kvParam> &paramList )
 {
-	return query(connection_.get(),
-			"select * from param",
-			[&paramList](const dnmi::db::DRow & row) {
-		paramList.push_back(kvalobs::kvParam(row));
-	});
+	try
+	{
+		return query(connection(),
+				"select * from param",
+				[&paramList](const dnmi::db::DRow & row) {
+			paramList.push_back(kvalobs::kvParam(row));
+		});
+	}
+	catch ( std::exception & e )
+	{
+		LOGERROR(e.what());
+		return false;
+	}
 }
 
 bool SqlKvApp::getKvStations( std::list<kvalobs::kvStation> &stationList )
@@ -164,7 +195,20 @@ bool SqlKvApp::getKvObsPgm( std::list<kvalobs::kvObsPgm> &obsPgm, const std::lis
 
 bool SqlKvApp::getKvData( KvObsDataList &dataList, const WhichDataHelper &wd )
 {
-	return CorbaKvApp::getKvData(dataList, wd);
+	class Appender : public KvGetDataReceiver
+	{
+	public:
+		Appender(KvObsDataList & dataList) : dataList_(dataList) {}
+	    virtual bool next(KvObsDataList & d)
+	    {
+	    	dataList_.insert(dataList_.end(), d.begin(), d.end());
+	    	return true;
+	    }
+	private:
+	    KvObsDataList & dataList_;
+	} appender(dataList);
+
+	return getKvData(appender, wd);
 }
 
 bool SqlKvApp::getKvWorkstatistik(CKvalObs::CService::WorkstatistikTimeType timeType,
