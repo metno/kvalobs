@@ -39,6 +39,9 @@ using kvservice::KvApp;
 
 kvservice::KvApp * getApp(int argc, char ** argv)
 {
+//	using namespace kvservice::corba;
+//	return new CorbaKvApp(argc, argv, CorbaKvApp::readConf({"runit.conf", "kvalobs.conf", kvPath("sysconfdir") + "/kvalobs.conf"}));
+
 	using kvservice::sql::SqlKvApp;
 	return new SqlKvApp(argc, argv, SqlKvApp::readConf({"runit.conf", "kvalobs.conf", kvPath("sysconfdir") + "/kvalobs.conf"}));
 }
@@ -91,6 +94,19 @@ void readParam()
 		std::cout << p.name() << ":\t" << p.paramID() << std::endl;
 }
 
+void readRejectDecode()
+{
+	CKvalObs::CService::RejectDecodeInfo decodeInfo;
+	decodeInfo.fromTime = "2015-11-10 12:00:00";
+	decodeInfo.toTime = "2015-11-10 12:30:00";
+	kvservice::RejectDecodeIterator it;
+	if ( ! KvApp::kvApp->getKvRejectDecode(decodeInfo, it) )
+		throw std::runtime_error("Unable to get rejectdecode messages");
+	kvalobs::kvRejectdecode d;
+	while ( it.next(d) )
+		std::cout << d.tbtime() << ":\t" << d.message() << std::endl;
+}
+
 void readStationMetaData()
 {
 	std::list<kvalobs::kvStationMetadata> stMeta;
@@ -108,6 +124,7 @@ void readStationMetaData()
 int main(int argc, char ** argv)
 {
 	std::unique_ptr<kvservice::KvApp> app(getApp(argc, argv));
+	readRejectDecode();
 	//readParam();
 	//readKvData();
 	readModelData();

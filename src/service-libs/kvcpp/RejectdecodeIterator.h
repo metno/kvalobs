@@ -33,18 +33,15 @@
 
 #include <kvskel/kvService.hh>
 #include <kvalobs/kvRejectdecode.h>
-
+#include <memory>
 
 namespace kvservice
 {
   class RejectDecodeIterator
   {
-    CKvalObs::CService::RejectedIterator_var rejectIter;
-    CKvalObs::CService::RejectdecodeList_var rejectedList;
-    CORBA::ULong index;
-    
   public:
     RejectDecodeIterator();
+    RejectDecodeIterator(const std::vector<kvalobs::kvRejectdecode> & rejected);
     ~RejectDecodeIterator();
 
     bool next( kvalobs::kvRejectdecode &reject );
@@ -52,6 +49,10 @@ namespace kvservice
     CKvalObs::CService::RejectedIterator_var &getCorbaObjPtr();
 
     void cleanup();
+
+    class Implementation;
+  private:
+    std::shared_ptr<Implementation> impl_;
   };
 }
 

@@ -132,7 +132,35 @@ bool SqlKvApp::getKvData( KvGetDataReceiver &dataReceiver, const WhichDataHelper
 
 bool SqlKvApp::getKvRejectDecode( const CKvalObs::CService::RejectDecodeInfo &decodeInfo, kvservice::RejectDecodeIterator &it )
 {
-	return CorbaKvApp::getKvRejectDecode(decodeInfo, it);
+	std::ostringstream q;
+	q << "select * from rejectdecode where tbtime between '" << decodeInfo.fromTime  << "' and '" << decodeInfo.toTime << "'";
+	if ( decodeInfo.decodeList.length() > 0 )
+	{
+		q << " and (";
+		q << "decoder='" << decodeInfo.decodeList[0] << "'";
+		for ( int i = 1; i < decodeInfo.decodeList.length(); ++ i )
+			q << " or decoder='" << decodeInfo.decodeList[i] << "'";
+		q << ")";
+	}
+	q << " order by tbtime";
+
+	try
+	{
+		std::vector<kvalobs::kvRejectdecode> rejected;
+		bool ok = query(connection(),
+				q.str(),
+				[& rejected](const dnmi::db::DRow & row) {
+			kvalobs::kvRejectdecode r(row);
+			rejected.push_back(r);
+		});
+		it = kvservice::RejectDecodeIterator(rejected);
+		return ok;
+	}
+	catch ( std::exception & e )
+	{
+		LOGERROR(e.what());
+		return false;
+	}
 }
 
 bool SqlKvApp::getKvParams( std::list<kvalobs::kvParam> &paramList )

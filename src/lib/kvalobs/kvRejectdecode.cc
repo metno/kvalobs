@@ -78,7 +78,7 @@ bool kvalobs::kvRejectdecode::set(const dnmi::db::DRow& r_)
 				comment_ = buf;
 			else if (*it == "fixed")
 			{
-				std::cout << buf << std::endl;
+				//std::cout << buf << std::endl;
 				if ((not buf.empty()) and (buf[0] == 't' or buf[0] == 'T'))
 					fixed_ = true;
 			}
