@@ -43,6 +43,20 @@ kvservice::KvApp * getApp(int argc, char ** argv)
 	return new SqlKvApp(argc, argv, SqlKvApp::readConf({"runit.conf", "kvalobs.conf", kvPath("sysconfdir") + "/kvalobs.conf"}));
 }
 
+void readModelData()
+{
+	kvservice::WhichDataHelper whichData;
+	whichData.addStation(100,
+			boost::posix_time::time_from_string("2015-12-02 00:00:00"),
+			boost::posix_time::time_from_string("2015-12-02 12:00:00"));
+
+	std::list<kvalobs::kvModelData> data;
+	if ( ! KvApp::kvApp->getKvModelData(data, whichData) )
+		throw std::runtime_error("Unable to read data");
+	for ( auto d : data )
+		std::cout << d.insertQuery(false) << std::endl;
+}
+
 void readKvData()
 {
 	kvservice::KvObsDataList dataList;
@@ -96,5 +110,6 @@ int main(int argc, char ** argv)
 	std::unique_ptr<kvservice::KvApp> app(getApp(argc, argv));
 	//readParam();
 	//readKvData();
+	readModelData();
 	readStationMetaData();
 }

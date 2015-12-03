@@ -159,7 +159,31 @@ bool SqlKvApp::getKvStations( std::list<kvalobs::kvStation> &stationList )
 
 bool SqlKvApp::getKvModelData( std::list<kvalobs::kvModelData> &dataList, const WhichDataHelper &wd )
 {
-	return CorbaKvApp::getKvModelData(dataList, wd);
+	std::ostringstream q;
+	q << "select * from model_data";
+	auto * whichData = wd.whichData();
+	if ( whichData and whichData->length() > 0)
+	{
+		q << " where ";
+		for ( int i = 0; i < whichData->length(); ++ i )
+		{
+			if ( i != 0 )
+				q << " or ";
+			auto dataElement = (*whichData)[i];
+			q << "(stationid=" << dataElement.stationid << " and ";
+			if ( strcmp(dataElement.fromObsTime, dataElement.toObsTime) == 0 )
+				q << "obstime='" << dataElement.fromObsTime << "')";
+			else
+				q << "obstime between '" << dataElement.fromObsTime << "' and '" << dataElement.toObsTime << "')";
+		}
+	}
+
+	return query(
+			connection(),
+			q.str(),
+			[&dataList](const dnmi::db::DRow & row) {
+		dataList.push_back(kvalobs::kvModelData(row));
+	});
 }
 
 bool SqlKvApp::getKvReferenceStations( int stationid, int paramid, std::list<kvalobs::kvReferenceStation> &refList )
