@@ -77,10 +77,24 @@ void readParam()
 		std::cout << p.name() << ":\t" << p.paramID() << std::endl;
 }
 
+void readStationMetaData()
+{
+	std::list<kvalobs::kvStationMetadata> stMeta;
+	int stationid = 0;
+	auto obstime = boost::posix_time::time_from_string("2015-11-24 12:00:00");
+	std::string metadataName; // = "VS";
+
+	if ( ! KvApp::kvApp->getKvStationMetaData(stMeta, stationid, obstime, metadataName) )
+		throw std::runtime_error("Unable to read metadata");
+	for ( auto m : stMeta )
+		std::cout << "METADATA: " << m.paramID() << " (" << m.name() << "): " << m.metadata() << std::endl;
+}
+
 
 int main(int argc, char ** argv)
 {
 	std::unique_ptr<kvservice::KvApp> app(getApp(argc, argv));
 	//readParam();
-	readKvData();
+	//readKvData();
+	readStationMetaData();
 }

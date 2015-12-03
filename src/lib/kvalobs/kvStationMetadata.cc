@@ -28,11 +28,45 @@
  */
 
 #include "kvStationMetadata.h"
+#include <miutil/timeconvert.h>
+#include <boost/lexical_cast.hpp>
 #include <limits>
 #include <sstream>
+#include <memory>
 
 namespace kvalobs
 {
+namespace
+{
+template<typename T>
+class Interpreted
+{
+public:
+	typedef T value_type;
+
+	Interpreted(const std::string & s)
+	{
+		if ( not s.empty() )
+			data_.reset(new value_type(boost::lexical_cast<value_type>(s)));
+	}
+
+	operator value_type () const
+	{
+		if ( data_ )
+			return * data_;
+		else
+			throw std::logic_error("NULL value");
+	}
+
+	operator const value_type * () const
+	{
+		return data_.get();
+	}
+
+private:
+	std::unique_ptr<value_type> data_;
+};
+}
 
 kvStationMetadata::kvStationMetadata() :
 		station_(0), param_(INT_NULL), type_(INT_NULL), level_(INT_NULL), sensor_(
@@ -51,6 +85,22 @@ kvStationMetadata::kvStationMetadata(int station, const int * param,
 				type ? *type : INT_NULL), level_(level ? *level : INT_NULL), sensor_(
 				sensor ? *sensor : INT_NULL), name_(name), metadata_(metadata), description_(
 				description), fromtime_(fromtime), totime_(totime)
+{
+}
+
+kvStationMetadata::kvStationMetadata(dnmi::db::DRow & r) :
+		kvStationMetadata(
+			Interpreted<int>(r["stationid"]),
+			Interpreted<int>(r["paramid"]),
+			Interpreted<int>(r["typeid"]),
+			Interpreted<int>(r["level"]),
+			Interpreted<int>(r["sensor"]),
+			r["metadatatypename"],
+			Interpreted<float>(r["metadata"]),
+			std::string(),
+			boost::posix_time::time_from_string(r["fromtime"]),
+			boost::posix_time::time_from_string_nothrow(r["totime"])
+		)
 {
 }
 

@@ -49,6 +49,8 @@ public:
 			float metadata, const std::string & description,
 			const boost::posix_time::ptime & fromtime, const boost::posix_time::ptime & totime);
 
+	explicit kvStationMetadata(dnmi::db::DRow & r);
+
 	kvStationMetadata(const kvStationMetadata & d);
 
 	virtual ~kvStationMetadata();

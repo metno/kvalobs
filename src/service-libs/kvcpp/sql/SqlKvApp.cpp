@@ -32,6 +32,7 @@
 #include <kvdb/kvdb.h>
 #include <kvdb/dbdrivermgr.h>
 #include <kvalobs/kvPath.h>
+#include <miutil/timeconvert.h>
 #include <milog/milog.h>
 #include <sstream>
 
@@ -185,7 +186,31 @@ bool SqlKvApp::getKvStationMetaData( std::list<kvalobs::kvStationMetadata> &stMe
 		                             int stationid, const boost::posix_time::ptime &obstime,
 		                             const std::string & metadataName)
 {
-	return CorbaKvApp::getKvStationMetaData(stMeta, stationid, obstime, metadataName);
+	try
+	{
+		std::ostringstream q;
+		q << "select * from station_metadata where ";
+		if ( stationid != 0 )
+			q << " stationid=" << stationid << " and ";
+		q << " fromtime<='" << to_kvalobs_string(obstime) << "' and ";
+		q << " (totime is NULL or totime <'" << to_kvalobs_string(obstime) << "')";
+		if ( not metadataName.empty() )
+			q << " and metadatatypename='" << metadataName << "'";
+
+		query(connection(), q.str(), [&stMeta](const dnmi::db::DRow & row) {
+
+			dnmi::db::DRow & r = const_cast<dnmi::db::DRow &>(row);
+			kvalobs::kvStationMetadata d(r);
+			stMeta.push_back(d);
+		});
+
+		return true;
+	}
+	catch (std::exception & e)
+	{
+		LOGERROR(e.what());
+		return false;
+	}
 }
 
 bool SqlKvApp::getKvObsPgm( std::list<kvalobs::kvObsPgm> &obsPgm, const std::list<long> &stationList, bool aUnion )
