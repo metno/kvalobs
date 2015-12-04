@@ -94,6 +94,20 @@ void readParam()
 		std::cout << p.name() << ":\t" << p.paramID() << std::endl;
 }
 
+void readWorkStatistik()
+{
+	kvservice::WorkstatistikIterator it;
+	if (!KvApp::kvApp->getKvWorkstatistik(
+			CKvalObs::CService::TbTime,
+			boost::posix_time::time_from_string("2015-11-09 12:00:00"),
+			boost::posix_time::time_from_string("2015-11-09 12:30:00"),
+			it))
+		throw std::runtime_error("Unable to get workstatistik messages");
+	kvalobs::kvWorkelement e;
+	while (it.next(e))
+		std::cout << e.insertQuery(false) << std::endl;
+}
+
 void readRejectDecode()
 {
 	CKvalObs::CService::RejectDecodeInfo decodeInfo;
@@ -136,6 +150,9 @@ void readObsPgm()
 int main(int argc, char ** argv)
 {
 	std::unique_ptr<kvservice::KvApp> app(getApp(argc, argv));
+	readWorkStatistik();
+	//readParam();
+//	readKvData();
 	readObsPgm();
 	//readRejectDecode();
 	//readParam();

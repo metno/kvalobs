@@ -33,17 +33,17 @@
 
 #include <kvskel/kvService.hh>
 #include <kvalobs/kvWorkelement.h>
+#include <memory>
+#include <vector>
 
 namespace kvservice
 {
   class WorkstatistikIterator
   {
-    CKvalObs::CService::WorkstatistikIterator_var iter;
-    CKvalObs::CService::WorkstatistikElemList_var dataList;
-    CORBA::ULong index;
     
   public:
     WorkstatistikIterator();
+    explicit WorkstatistikIterator(const std::vector<kvalobs::kvWorkelement> & elements);
     ~WorkstatistikIterator();
 
     bool next( kvalobs::kvWorkelement &workstatistik );
@@ -51,6 +51,11 @@ namespace kvservice
     CKvalObs::CService::WorkstatistikIterator_var &getCorbaObjPtr();
 
     void cleanup();
+
+    class Implementation;
+  private:
+    std::shared_ptr<Implementation> impl_;
+
   };
 }
 

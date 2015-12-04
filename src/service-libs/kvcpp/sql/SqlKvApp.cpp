@@ -34,6 +34,7 @@
 #include <kvalobs/kvPath.h>
 #include <miutil/timeconvert.h>
 #include <milog/milog.h>
+#include <miutil/timeconvert.h>
 #include <sstream>
 #include <iomanip>
 
@@ -322,12 +323,53 @@ bool SqlKvApp::getKvData( KvObsDataList &dataList, const WhichDataHelper &wd )
 	return getKvData(appender, wd);
 }
 
+namespace
+{
+std::string workstatistikRowName(CKvalObs::CService::WorkstatistikTimeType timeType)
+{
+	switch (timeType) {
+	case CKvalObs::CService::ObsTime: return "obstime";
+	case CKvalObs::CService::TbTime: return "tbtime";
+	case CKvalObs::CService::ProcessStartTime: return "process_start";
+	case CKvalObs::CService::QaStartTime: return "qa_start";
+	case CKvalObs::CService::QaStopTime: return "qa_stop";
+	case CKvalObs::CService::ServiceStartTime: return "service_start";
+	case CKvalObs::CService::ServiceStopTime: return "service_stop";
+	default: throw std::logic_error("Invalid WorkstatistikTimeType");
+	}
+}
+}
+
 bool SqlKvApp::getKvWorkstatistik(CKvalObs::CService::WorkstatistikTimeType timeType,
                                 const boost::posix_time::ptime &from, const boost::posix_time::ptime &to,
                                 kvservice::WorkstatistikIterator &it
                                 )
 {
-	return CorbaKvApp::getKvWorkstatistik(timeType, from, to, it);
+	std::ostringstream q;
+	q << "select * from workstatistik where " << workstatistikRowName(timeType);
+	if ( from == to )
+		q << "='" << to_kvalobs_string(from) << "' ";
+	else
+		q << " between '" << to_kvalobs_string(from) << "' and '" << to_kvalobs_string(to) << "' ";
+	q << "order by tbtime";
+
+	try
+	{
+		std::vector<kvalobs::kvWorkelement> ret;
+		bool ok = query(connection(),
+				q.str(),
+				[&ret](const dnmi::db::DRow & row) {
+			ret.push_back(kvalobs::kvWorkelement(row));
+		});
+		if ( ok )
+			it = kvservice::WorkstatistikIterator(ret);
+		return ok;
+	}
+	catch ( std::exception & e )
+	{
+		LOGERROR(e.what());
+		return false;
+	}
 }
 
 
