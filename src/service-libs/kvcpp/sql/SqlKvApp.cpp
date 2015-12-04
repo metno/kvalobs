@@ -35,6 +35,7 @@
 #include <miutil/timeconvert.h>
 #include <milog/milog.h>
 #include <sstream>
+#include <iomanip>
 
 
 namespace kvservice
@@ -267,7 +268,40 @@ bool SqlKvApp::getKvStationMetaData( std::list<kvalobs::kvStationMetadata> &stMe
 
 bool SqlKvApp::getKvObsPgm( std::list<kvalobs::kvObsPgm> &obsPgm, const std::list<long> &stationList, bool aUnion )
 {
-	return CorbaKvApp::getKvObsPgm(obsPgm, stationList, aUnion);
+	std::ostringstream q;
+	q << "select ";
+	if ( aUnion )
+	{
+		q << "stationid, -1 as paramid, 0 as level, max(nr_sensor) as nr_sensor, ";
+		q << "min(typeid) as typeid, 'false'::bool as priority_message, ";
+		q << "'false'::bool as collector, ";
+		for ( int i = 0; i < 24; ++ i )
+			q << "bool_or(kl" << std::setw(2) << std::setfill('0') << i << ") as kl" << std::setw(2) << std::setfill('0') << i << ", ";
+		for ( auto day : {"mon", "tue", "wed", "thu", "fri", "sat", "sun"})
+			q << "bool_or(" << day << ") as " << day << ", ";
+		q << "min(fromtime) as fromtime, max(totime) as totime";
+	}
+	else
+		q << "*";
+	q  << " from obs_pgm";
+	if ( not stationList.empty() )
+	{
+		auto it = stationList.begin();
+		q << " where stationid in (" << * it;
+		while ( it != stationList.end() )
+			q << ", " << *(it ++);
+		q << ")";
+	}
+	if ( aUnion )
+		q << " group by stationid";
+	q << " order by stationid";
+
+	return query(
+			connection(),
+			q.str(),
+			[&obsPgm](const dnmi::db::DRow & row) {
+		obsPgm.push_back(kvalobs::kvObsPgm(row));
+	});
 }
 
 bool SqlKvApp::getKvData( KvObsDataList &dataList, const WhichDataHelper &wd )
