@@ -26,7 +26,6 @@
  with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
 #include "SqlKvApp.h"
 #include "KvDataHandler.h"
 #include <kvdb/kvdb.h>
@@ -64,6 +63,7 @@ dnmi::db::Connection * createConnection(const miutil::conf::ConfSection *conf)
 	static dnmi::db::DriverManager dbMgr;
 	if ( ! dbMgr.loadDriver(driver, driverId) )
 		throw std::runtime_error("Unable to load driver " + driver);
+
 	dnmi::db::Connection * connection = dbMgr.connect(driverId, connectString);
 	if ( ! connection or not connection->isConnected() )
 		throw std::runtime_error("Unable to connect to database");
@@ -184,7 +184,20 @@ bool SqlKvApp::getKvParams( std::list<kvalobs::kvParam> &paramList )
 
 bool SqlKvApp::getKvStations( std::list<kvalobs::kvStation> &stationList )
 {
-	return CorbaKvApp::getKvStations(stationList);
+	try
+	{
+		return query(connection(),
+					"select * "
+					"from station",
+					[&stationList](const dnmi::db::DRow & row) {
+						stationList.push_back(kvalobs::kvStation(row));
+					});
+	}
+	catch ( std::exception & e )
+	{
+		LOGERROR(e.what());
+		return false;
+	}
 }
 
 bool SqlKvApp::getKvModelData( std::list<kvalobs::kvModelData> &dataList, const WhichDataHelper &wd )

@@ -27,24 +27,36 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-
 #include "sql/SqlKvApp.h"
+#include <boost/timer/timer.hpp>
 #include <kvalobs/kvPath.h>
 #include <miutil/timeconvert.h>
 #include <iostream>
 #include <stdexcept>
 #include <memory>
 
+using boost::timer::cpu_timer;
 using kvservice::KvApp;
+
+static const std::string OK = "\t\033[1;32m+";
+static const std::string NOT_OK = "\t\033[1;31m-";
+static const std::string EOL = "\033[0m\n";
 
 kvservice::KvApp * getApp(int argc, char ** argv)
 {
-//	using namespace kvservice::corba;
-//	return new CorbaKvApp(argc, argv, CorbaKvApp::readConf({"runit.conf", "kvalobs.conf", kvPath("sysconfdir") + "/kvalobs.conf"}));
-
 	using kvservice::sql::SqlKvApp;
 	return new SqlKvApp(argc, argv, SqlKvApp::readConf({"runit.conf", "kvalobs.conf", kvPath("sysconfdir") + "/kvalobs.conf"}));
 }
+
+int test(std::string testDescription, bool test) {
+	if ( test ) {
+		std::cout << OK << testDescription << EOL;
+		return 1;
+	}
+	std::cout << NOT_OK << testDescription << EOL;
+	return 0;
+}
+
 
 void readModelData()
 {
@@ -60,7 +72,7 @@ void readModelData()
 		std::cout << d.insertQuery(false) << std::endl;
 }
 
-void readKvData()
+void readData()
 {
 	kvservice::KvObsDataList dataList;
 	kvservice::WhichDataHelper whichData;
@@ -85,13 +97,13 @@ void readKvData()
 	}
 }
 
-void readParam()
+int readParams()
 {
 	std::list<kvalobs::kvParam> paramList;
-	if ( ! KvApp::kvApp->getKvParams(paramList) )
-		throw std::runtime_error("Unable to read param");
-	for ( auto p : paramList )
-		std::cout << p.name() << ":\t" << p.paramID() << std::endl;
+	return test(" retrieve parameters from the database. ",
+			KvApp::kvApp->getKvParams(paramList));
+	//for ( auto p : paramList )
+	//	std::cout << p.name() << ":\t" << p.paramID() << std::endl;
 }
 
 void readWorkStatistik()
@@ -134,6 +146,15 @@ void readStationMetaData()
 		std::cout << "METADATA: " << m.paramID() << " (" << m.name() << "): " << m.metadata() << std::endl;
 }
 
+int readStations()
+{
+	std::list<kvalobs::kvStation> stationList;
+	return test(" retrieve stations from the database. ",
+				KvApp::kvApp->getKvStations(stationList));
+	//for ( auto s : stationList )
+	//	std::cout << s.name() << ":\t" << s.stationID() << std::endl;
+}
+
 void readObsPgm()
 {
 	std::list<kvalobs::kvObsPgm> obsPgm;
@@ -150,13 +171,21 @@ void readObsPgm()
 int main(int argc, char ** argv)
 {
 	std::unique_ptr<kvservice::KvApp> app(getApp(argc, argv));
-	readWorkStatistik();
-	//readParam();
-//	readKvData();
-	readObsPgm();
-	//readRejectDecode();
-	//readParam();
+	const int totalTests = 2;
+	int t = 0;
+	std::cout << "\033[1;36mSqlKvApp should" << EOL;
+	cpu_timer test_timer;
+	// Actual tests
+	t += readParams();
+	t += readStations();
+	//readWorkStatistik();
 	//readKvData();
+	//readObsPgm();
 	//readModelData();
 	//readStationMetaData();
+	// Print out results
+	int time = test_timer.elapsed().wall / 1000000;
+	std::cout << "\033[1;36mFinished in " << time << "ms" << EOL;
+	std::cout << "\033[1;36mPassed " << t << " of " << totalTests << " tests"<< EOL;
+	return (t == totalTests ? 0 : 1);
 }
