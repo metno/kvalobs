@@ -31,6 +31,7 @@
 #include <boost/timer/timer.hpp>
 #include <kvalobs/kvPath.h>
 #include <miutil/timeconvert.h>
+#include <milog/milog.h>
 #include <iostream>
 #include <stdexcept>
 #include <memory>
@@ -100,7 +101,7 @@ void readData()
 int readParams()
 {
 	std::list<kvalobs::kvParam> paramList;
-	return test(" retrieve parameters from the database. ",
+	return test(" retrieve parameter metadata for all parameters.",
 			KvApp::kvApp->getKvParams(paramList));
 	//for ( auto p : paramList )
 	//	std::cout << p.name() << ":\t" << p.paramID() << std::endl;
@@ -155,13 +156,73 @@ void readOperator()
 		std::cout << o.insertQuery(false) << ';' << std::endl;
 }
 
+int readStationParamAll()
+{
+	std::list<kvalobs::kvStationParam> stParamList;
+	int res = test(" retrieve parameter data for a given station. ",
+			       KvApp::kvApp->getKvStationParam( stParamList,
+			    		 	 	 	 	 	 	    18700,
+												    -1,
+												    -1 ));
+	//for ( auto s : stParamList )
+	//	std::cout << s.stationID() << ":\t" << s.paramID() << ":\t" << s.fromday()
+	//			  << ":\t" << s.today() << std::endl;
+	std::ostringstream log;
+	log << "retrieved " << stParamList.size() << " rows";
+	LOGDEBUG(log.str());
+	return res;
+}
+
+int readStationParamForParamId()
+{
+	std::list<kvalobs::kvStationParam> stParamList;
+	int res = test(" retrieve parameter data for a given station and paramid.",
+			       KvApp::kvApp->getKvStationParam( stParamList,
+			    		 	 	 	 	 	 	    18700,
+												    251,
+												    -1 ));
+	std::ostringstream log;
+	log << "retrieved " << stParamList.size() << " rows";
+	LOGDEBUG(log.str());
+	return res;
+}
+
+int readStationParamForDay()
+{
+	std::list<kvalobs::kvStationParam> stParamList;
+	int res = test(" retrieve parameter data for a given station and day.",
+			       KvApp::kvApp->getKvStationParam( stParamList,
+			    		 	 	 	 	 	 	    18700,
+												    -1,
+												    200 ));
+	std::ostringstream log;
+	log << "retrieved " << stParamList.size() << " rows";
+	LOGDEBUG(log.str());
+	return res;
+}
+
+int readStationParamForParamIdAndDay()
+{
+	std::list<kvalobs::kvStationParam> stParamList;
+	int res = test(" retrieve parameter data for a given station, paramid, and day.",
+			       KvApp::kvApp->getKvStationParam( stParamList,
+			    		 	 	 	 	 	 	    18700,
+												    251,
+												    200 ));
+	std::ostringstream log;
+	log << "retrieved " << stParamList.size() << " rows";
+	LOGDEBUG(log.str());
+	return res;
+}
+
 int readStations()
 {
 	std::list<kvalobs::kvStation> stationList;
-	return test(" retrieve stations from the database. ",
+	int res = test(" retrieve stations metadata for all stations.",
 				KvApp::kvApp->getKvStations(stationList));
 	//for ( auto s : stationList )
 	//	std::cout << s.name() << ":\t" << s.stationID() << std::endl;
+	return res;
 }
 
 void readObsPgm()
@@ -180,19 +241,18 @@ void readObsPgm()
 int main(int argc, char ** argv)
 {
 	std::unique_ptr<kvservice::KvApp> app(getApp(argc, argv));
-	readOperator();
-	//readRejectDecode();
-	//readParam();
-	//readKvData();
-	//readModelData();
-	//readStationMetaData();
-	const int totalTests = 2;
+	const int totalTests = 6;
 	int t = 0;
 	std::cout << "\033[1;36mSqlKvApp should" << EOL;
 	cpu_timer test_timer;
 	// Actual tests
 	t += readParams();
 	t += readStations();
+	t += readStationParamAll();
+	t += readStationParamForParamId();
+	t += readStationParamForDay();
+	t += readStationParamForParamIdAndDay();
+	//readOperator();
 	//readWorkStatistik();
 	//readKvData();
 	//readObsPgm();

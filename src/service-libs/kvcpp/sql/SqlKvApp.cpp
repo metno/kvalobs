@@ -260,9 +260,33 @@ bool SqlKvApp::getKvOperator( std::list<kvalobs::kvOperator> &operatorList )
 	}
 }
 
-bool SqlKvApp::getKvStationParam( std::list<kvalobs::kvStationParam> &stParam, int stationid, int paramid, int day )
+bool SqlKvApp::getKvStationParam( std::list<kvalobs::kvStationParam> &stParam,
+								  int stationid,
+								  int paramid,
+								  int day )
 {
-	return CorbaKvApp::getKvStationParam(stParam, stationid, paramid, day);
+	try {
+		std::ostringstream q;
+		q << "select * "
+		 << "from station_param "
+		 << "where stationid=" << stationid;
+		if ( paramid >= 0 )
+		   q << " and paramid=" << paramid;
+		if ( day >= 0 )
+		   q << " and fromday<=" << day
+			 << " and today>=" << day;
+		q << " order by paramid, fromday";
+		return query(connection(),
+					 q.str(),
+					[&stParam](const dnmi::db::DRow & row) {
+						stParam.push_back(kvalobs::kvStationParam(row));
+					});
+	}
+	catch (std::exception & e)
+	{
+		LOGERROR(e.what());
+		return false;
+	}
 }
 
 bool SqlKvApp::getKvStationMetaData( std::list<kvalobs::kvStationMetadata> &stMeta,
