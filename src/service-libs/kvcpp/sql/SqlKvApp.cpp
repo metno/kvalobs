@@ -237,11 +237,6 @@ bool SqlKvApp::getKvModelData( std::list<kvalobs::kvModelData> &dataList, const 
 	}
 }
 
-bool SqlKvApp::getKvReferenceStations( int stationid, int paramid, std::list<kvalobs::kvReferenceStation> &refList )
-{
-	return CorbaKvApp::getKvReferenceStations(stationid, paramid, refList);
-}
-
 bool SqlKvApp::getKvTypes( std::list<kvalobs::kvTypes> &typeList )
 {
 	return CorbaKvApp::getKvTypes(typeList);

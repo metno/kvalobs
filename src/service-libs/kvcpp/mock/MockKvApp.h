@@ -45,7 +45,6 @@ public:
 	MOCK_METHOD1(getKvParams, bool( std::list<kvalobs::kvParam> &paramList ));
 	MOCK_METHOD1(getKvStations, bool( std::list<kvalobs::kvStation> &stationList ));
 	MOCK_METHOD2(getKvModelData, bool( std::list<kvalobs::kvModelData> &dataList, const kvservice::WhichDataHelper &wd ));
-	MOCK_METHOD3(getKvReferenceStations, bool( int stationid, int paramid, std::list<kvalobs::kvReferenceStation> &refList ));
 	MOCK_METHOD1(getKvTypes, bool( std::list<kvalobs::kvTypes> &typeList ));
 	MOCK_METHOD1(getKvOperator, bool( std::list<kvalobs::kvOperator> &operatorList ));
 	MOCK_METHOD4(getKvStationParam, bool( std::list<kvalobs::kvStationParam> &stParam, int stationid, int paramid, int day ));
@@ -75,7 +74,6 @@ public:
 		ON_CALL(*this, getKvStations(_)).WillByDefault(Return(true));
 		ON_CALL(*this, getKvStations(_)).WillByDefault(Return(true));
 		ON_CALL(*this, getKvModelData(_,_)).WillByDefault(Return(true));
-		ON_CALL(*this, getKvReferenceStations(_,_,_)).WillByDefault(Return(true));
 		ON_CALL(*this, getKvTypes(_)).WillByDefault(Return(true));
 		ON_CALL(*this, getKvOperator(_)).WillByDefault(Return(true));
 		ON_CALL(*this, getKvStationParam(_,_,_,_)).WillByDefault(Return(true));

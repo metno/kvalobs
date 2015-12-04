@@ -157,18 +157,6 @@ protected:
 	virtual bool process(CKvalObs::CService::kvServiceExt_ptr service);
 };
 
-class getKvReferenceStationsFunc: public CorbaGetFunction
-{
-	int stationid;
-	int paramid;
-	std::list<kvalobs::kvReferenceStation> &refList;
-public:
-	getKvReferenceStationsFunc(int stationid, int paramid, std::list<
-			kvalobs::kvReferenceStation> &refList);
-protected:
-	virtual bool process(CKvalObs::CService::kvServiceExt_ptr service);
-};
-
 class getKvTypesFunc: public CorbaGetFunction
 {
 	std::list<kvalobs::kvTypes> &typeList;

@@ -165,7 +165,6 @@ namespace kvservice
       virtual bool getKvParams( std::list<kvalobs::kvParam> &paramList );
       virtual bool getKvStations( std::list<kvalobs::kvStation> &stationList );
       virtual bool getKvModelData( std::list<kvalobs::kvModelData> &dataList, const WhichDataHelper &wd );
-      virtual bool getKvReferenceStations( int stationid, int paramid, std::list<kvalobs::kvReferenceStation> &refList );
       virtual bool getKvTypes( std::list<kvalobs::kvTypes> &typeList );
       virtual bool getKvOperator( std::list<kvalobs::kvOperator> &operatorList );
       virtual bool getKvStationParam( std::list<kvalobs::kvStationParam> &stParam, int stationid, int paramid = -1, int day = -1 );

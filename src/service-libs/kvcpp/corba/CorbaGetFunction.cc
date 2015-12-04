@@ -250,30 +250,6 @@ bool getKvModelDataFunc::process(kvServiceExt_ptr service)
 	return ok;
 }
 
-getKvReferenceStationsFunc::getKvReferenceStationsFunc(int stationid,
-		int paramid, list<kvReferenceStation> &refList) :
-	stationid(stationid), paramid(paramid), refList(refList)
-{
-}
-
-bool getKvReferenceStationsFunc::process(kvServiceExt_ptr service)
-{
-	Reference_stationList *ref_=0;
-	bool ok = service->getReferenceStation(stationid, paramid, ref_);
-	if (ok)
-	{
-		refList.clear();
-		for (CORBA::ULong i = 0; i < ref_->length(); i++)
-			refList.push_back(kvReferenceStation((*ref_)[i].stationID,
-					(*ref_)[i].paramsetID, std::string((*ref_)[i].reference)));
-	}
-
-	if( ref_ )
-		delete ref_;
-
-	return ok;
-}
-
 getKvTypesFunc::getKvTypesFunc(list<kvTypes> &typeList) :
 	typeList(typeList)
 {

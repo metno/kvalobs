@@ -280,14 +280,6 @@ getKvModelData( list<kvModelData> &dataList,
 }
 bool
 CorbaKvApp::
-getKvReferenceStations( int stationid, int paramid,
-                        list<kvReferenceStation> &refList )
-{
-   getKvReferenceStationsFunc func( stationid, paramid, refList );
-   return func( "getKvReferenceStations" );
-}
-bool
-CorbaKvApp::
 getKvTypes( list<kvTypes> &typeList )
 {
    getKvTypesFunc func( typeList );

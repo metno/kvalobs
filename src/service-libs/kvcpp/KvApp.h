@@ -117,16 +117,6 @@ namespace kvservice
       virtual bool getKvModelData( std::list<kvalobs::kvModelData> &dataList, const WhichDataHelper &wd ) =0;
 
       /**
-       * \brief return the referance stastions for a given stationid.
-       *
-       * \param stationid The stationid for the station we want the referance station too.
-       * \param paramid The paramid we are interested in.
-       * \param[out] refList A list of referance statioins to stationid.
-       * \return true ons success and false otherwise.
-       */
-      virtual bool getKvReferenceStations( int stationid, int paramid, std::list<kvalobs::kvReferenceStation> &refList ) =0;
-
-      /**
        * \brief return the tyeps that is used in kvalobs.
        *
        * \param[out] typeList The typeList on return.

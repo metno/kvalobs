@@ -67,12 +67,6 @@ public:
 		return true;
 	}
 
-	virtual bool getKvReferenceStations(int stationid, int paramid, std::list<
-			kvalobs::kvReferenceStation> &refList)
-	{
-		return true;
-	}
-
 	virtual bool getKvTypes(std::list<kvalobs::kvTypes> &typeList)
 	{
 		return true;
