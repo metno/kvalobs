@@ -242,11 +242,21 @@ int readObsPgm()
 	return res;
 }
 
+int readTypes()
+{
+	std::list<kvalobs::kvTypes> types;
+	int res = test(" retrieve types metadata.",
+			KvApp::kvApp->getKvTypes(types));
+	//for ( auto tp : types )
+	//  std::cout << tp.typeID() << std::endl;
+	return res;
+}
+
 
 int main(int argc, char ** argv)
 {
 	std::unique_ptr<kvservice::KvApp> app(getApp(argc, argv));
-	const int totalTests = 12;
+	const int totalTests = 13;
 	int t = 0;
 	std::cout << "\033[1;36mSqlKvApp should" << EOL;
 	cpu_timer test_timer;
@@ -263,6 +273,7 @@ int main(int argc, char ** argv)
 	t += readObsPgm();
 	t += readModelData();
 	t += readStationMetaData();
+	t += readTypes();
 	// Print out results
 	int time = test_timer.elapsed().wall / 1000000;
 	std::cout << "\033[1;36mFinished in " << time << "ms" << EOL;

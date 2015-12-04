@@ -239,7 +239,21 @@ bool SqlKvApp::getKvModelData( std::list<kvalobs::kvModelData> &dataList, const 
 
 bool SqlKvApp::getKvTypes( std::list<kvalobs::kvTypes> &typeList )
 {
-	return CorbaKvApp::getKvTypes(typeList);
+	try
+	{
+		return query(connection(),
+					"select * "
+					"from types "
+					"order by typeid",
+					[&typeList](const dnmi::db::DRow & row) {
+						typeList.push_back(kvalobs::kvTypes(row));
+					});
+	}
+	catch ( std::exception & e )
+	{
+		LOGERROR(e.what());
+		return false;
+	}
 }
 
 bool SqlKvApp::getKvOperator( std::list<kvalobs::kvOperator> &operatorList )
