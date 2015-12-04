@@ -58,8 +58,7 @@ int test(std::string testDescription, bool test) {
 	return 0;
 }
 
-
-void readModelData()
+int readModelData()
 {
 	kvservice::WhichDataHelper whichData;
 	whichData.addStation(100,
@@ -67,13 +66,14 @@ void readModelData()
 			boost::posix_time::time_from_string("2015-12-02 12:00:00"));
 
 	std::list<kvalobs::kvModelData> data;
-	if ( ! KvApp::kvApp->getKvModelData(data, whichData) )
-		throw std::runtime_error("Unable to read data");
-	for ( auto d : data )
-		std::cout << d.insertQuery(false) << std::endl;
+	int res = test(" retrieve model data.",
+			KvApp::kvApp->getKvModelData(data, whichData) );
+	//for ( auto d : data )
+	//	std::cout << d.insertQuery(false) << std::endl;
+	return res;
 }
 
-void readData()
+int readData()
 {
 	kvservice::KvObsDataList dataList;
 	kvservice::WhichDataHelper whichData;
@@ -85,8 +85,9 @@ void readData()
 			boost::posix_time::time_from_string("2015-11-09 12:00:00"),
 			boost::posix_time::time_from_string("2015-11-09 12:00:00")
 			);
-	if ( ! KvApp::kvApp->getKvData(dataList, whichData) )
-		throw std::runtime_error("Unable to read data");
+	int res = test(" retrieve observation data.",
+			KvApp::kvApp->getKvData(dataList, whichData) );
+	/*
 	for ( auto dl : dataList )
 	{
 		for ( auto d: dl.dataList() )
@@ -96,6 +97,8 @@ void readData()
 
 		std::cout << std::endl;
 	}
+	*/
+	return res;
 }
 
 int readParams()
@@ -107,53 +110,56 @@ int readParams()
 	//	std::cout << p.name() << ":\t" << p.paramID() << std::endl;
 }
 
-void readWorkStatistik()
+int readWorkStatistik()
 {
 	kvservice::WorkstatistikIterator it;
-	if (!KvApp::kvApp->getKvWorkstatistik(
-			CKvalObs::CService::TbTime,
-			boost::posix_time::time_from_string("2015-11-09 12:00:00"),
-			boost::posix_time::time_from_string("2015-11-09 12:30:00"),
-			it))
-		throw std::runtime_error("Unable to get workstatistik messages");
-	kvalobs::kvWorkelement e;
-	while (it.next(e))
-		std::cout << e.insertQuery(false) << std::endl;
+	int res = test(" retrieve wirk statistics metadata.",
+			KvApp::kvApp->getKvWorkstatistik(
+				CKvalObs::CService::TbTime,
+				boost::posix_time::time_from_string("2015-11-09 12:00:00"),
+				boost::posix_time::time_from_string("2015-11-09 12:30:00"),
+				it));
+	//kvalobs::kvWorkelement e;
+	//while (it.next(e))
+	//	std::cout << e.insertQuery(false) << std::endl;
+	return res;
 }
 
-void readRejectDecode()
+int readRejectDecode()
 {
 	CKvalObs::CService::RejectDecodeInfo decodeInfo;
 	decodeInfo.fromTime = "2015-11-10 12:00:00";
 	decodeInfo.toTime = "2015-11-10 12:30:00";
 	kvservice::RejectDecodeIterator it;
-	if ( ! KvApp::kvApp->getKvRejectDecode(decodeInfo, it) )
-		throw std::runtime_error("Unable to get rejectdecode messages");
-	kvalobs::kvRejectdecode d;
-	while ( it.next(d) )
-		std::cout << d.tbtime() << ":\t" << d.message() << std::endl;
+	int res = test(" retrieve rejectdecode messages.",
+			KvApp::kvApp->getKvRejectDecode(decodeInfo, it) );
+	//kvalobs::kvRejectdecode d;
+	//while ( it.next(d) )
+	//	std::cout << d.tbtime() << ":\t" << d.message() << std::endl;
+	return res;
 }
 
-void readStationMetaData()
+int readStationMetaData()
 {
 	std::list<kvalobs::kvStationMetadata> stMeta;
 	int stationid = 0;
 	auto obstime = boost::posix_time::time_from_string("2015-11-24 12:00:00");
 	std::string metadataName; // = "VS";
-
-	if ( ! KvApp::kvApp->getKvStationMetaData(stMeta, stationid, obstime, metadataName) )
-		throw std::runtime_error("Unable to read metadata");
-	for ( auto m : stMeta )
-		std::cout << "METADATA: " << m.paramID() << " (" << m.name() << "): " << m.metadata() << std::endl;
+	int res = test(" retrieve obspgm metadata.",
+			KvApp::kvApp->getKvStationMetaData(stMeta, stationid, obstime, metadataName) );
+	//for ( auto m : stMeta )
+	//	std::cout << "METADATA: " << m.paramID() << " (" << m.name() << "): " << m.metadata() << std::endl;
+	return res;
 }
 
-void readOperator()
+int readOperator()
 {
 	std::list<kvalobs::kvOperator> operatorList;
-	if ( ! KvApp::kvApp->getKvOperator(operatorList) )
-		throw std::runtime_error("Unable to read metadata");
-	for ( auto o : operatorList )
-		std::cout << o.insertQuery(false) << ';' << std::endl;
+	int res = test(" retrieve operator metadata.",
+			KvApp::kvApp->getKvOperator(operatorList) );
+	//for ( auto o : operatorList )
+	//	std::cout << o.insertQuery(false) << ';' << std::endl;
+	return res;
 }
 
 int readStationParamAll()
@@ -225,23 +231,22 @@ int readStations()
 	return res;
 }
 
-void readObsPgm()
+int readObsPgm()
 {
 	std::list<kvalobs::kvObsPgm> obsPgm;
 	const std::list<long> stationList = {180, 100};
-
-	if ( ! KvApp::kvApp->getKvObsPgm(obsPgm, stationList, true) )
-		throw std::runtime_error("Unable to read metadata");
-
-	for ( auto op : obsPgm )
-		std::cout << op.insertQuery(false) << std::endl;
+	int res = test(" retrieve obspgm metadata.",
+			KvApp::kvApp->getKvObsPgm(obsPgm, stationList, true));
+	//for ( auto op : obsPgm )
+	//  std::cout << op.insertQuery(false) << std::endl;
+	return res;
 }
 
 
 int main(int argc, char ** argv)
 {
 	std::unique_ptr<kvservice::KvApp> app(getApp(argc, argv));
-	const int totalTests = 6;
+	const int totalTests = 12;
 	int t = 0;
 	std::cout << "\033[1;36mSqlKvApp should" << EOL;
 	cpu_timer test_timer;
@@ -252,12 +257,12 @@ int main(int argc, char ** argv)
 	t += readStationParamForParamId();
 	t += readStationParamForDay();
 	t += readStationParamForParamIdAndDay();
-	//readOperator();
-	//readWorkStatistik();
-	//readKvData();
-	//readObsPgm();
-	//readModelData();
-	//readStationMetaData();
+	t += readOperator();
+	t += readWorkStatistik();
+	t += readData();
+	t += readObsPgm();
+	t += readModelData();
+	t += readStationMetaData();
 	// Print out results
 	int time = test_timer.elapsed().wall / 1000000;
 	std::cout << "\033[1;36mFinished in " << time << "ms" << EOL;
