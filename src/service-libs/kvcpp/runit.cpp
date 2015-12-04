@@ -146,6 +146,15 @@ void readStationMetaData()
 		std::cout << "METADATA: " << m.paramID() << " (" << m.name() << "): " << m.metadata() << std::endl;
 }
 
+void readOperator()
+{
+	std::list<kvalobs::kvOperator> operatorList;
+	if ( ! KvApp::kvApp->getKvOperator(operatorList) )
+		throw std::runtime_error("Unable to read metadata");
+	for ( auto o : operatorList )
+		std::cout << o.insertQuery(false) << ';' << std::endl;
+}
+
 int readStations()
 {
 	std::list<kvalobs::kvStation> stationList;
@@ -171,6 +180,12 @@ void readObsPgm()
 int main(int argc, char ** argv)
 {
 	std::unique_ptr<kvservice::KvApp> app(getApp(argc, argv));
+	readOperator();
+	//readRejectDecode();
+	//readParam();
+	//readKvData();
+	//readModelData();
+	//readStationMetaData();
 	const int totalTests = 2;
 	int t = 0;
 	std::cout << "\033[1;36mSqlKvApp should" << EOL;

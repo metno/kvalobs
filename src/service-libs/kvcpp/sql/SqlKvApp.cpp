@@ -221,12 +221,20 @@ bool SqlKvApp::getKvModelData( std::list<kvalobs::kvModelData> &dataList, const 
 		}
 	}
 
-	return query(
-			connection(),
-			q.str(),
-			[&dataList](const dnmi::db::DRow & row) {
-		dataList.push_back(kvalobs::kvModelData(row));
-	});
+	try
+	{
+		return query(
+				connection(),
+				q.str(),
+				[&dataList](const dnmi::db::DRow & row) {
+			dataList.push_back(kvalobs::kvModelData(row));
+		});
+	}
+	catch (std::exception & e)
+	{
+		LOGERROR(e.what());
+		return false;
+	}
 }
 
 bool SqlKvApp::getKvReferenceStations( int stationid, int paramid, std::list<kvalobs::kvReferenceStation> &refList )
@@ -241,7 +249,20 @@ bool SqlKvApp::getKvTypes( std::list<kvalobs::kvTypes> &typeList )
 
 bool SqlKvApp::getKvOperator( std::list<kvalobs::kvOperator> &operatorList )
 {
-	return CorbaKvApp::getKvOperator(operatorList);
+	try
+	{
+		return query(
+				connection(),
+				"select * from operator",
+				[&operatorList](const dnmi::db::DRow & row){
+			operatorList.push_back(row);
+		});
+	}
+	catch (std::exception & e)
+	{
+		LOGERROR(e.what());
+		return false;
+	}
 }
 
 bool SqlKvApp::getKvStationParam( std::list<kvalobs::kvStationParam> &stParam, int stationid, int paramid, int day )
