@@ -28,7 +28,7 @@
  */
 
 #include "DataRequirement.h"
-#include <boost/spirit.hpp>
+#include <boost/spirit/include/classic.hpp>
 #include <sstream>
 
 namespace qabase
@@ -48,7 +48,7 @@ DataRequirement::DataRequirement(const char * signature, int stationid) :
 	if ( signature[0] == '\0' )
 		return;
 
-	using namespace boost::spirit;
+	using namespace boost::spirit::classic;
 
 	bool ok =
 	parse(signature,
@@ -175,7 +175,7 @@ std::string DataRequirement::Parameter::str() const
 
 void DataRequirement::Parameter::parse_(const std::string & parameterString)
 {
-	using namespace boost::spirit;
+	using namespace boost::spirit::classic;
 
 	bool ok =
 		parse(parameterString.c_str(),
