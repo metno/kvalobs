@@ -55,14 +55,13 @@ public:
 				data_.push_back(current);
 			else
 			{
-				std::list<Data> ret = data_;
-				data_.clear();
-				data_.push_back(current);
+				std::list<Data> ret(1, current);
+				std::swap(ret, data_);
 				return ret;
 			}
 		}
-		std::list<Data> ret = data_;
-		data_.clear();
+		std::list<Data> ret;
+		std::swap(ret, data_);
 		return ret;
 	}
 
