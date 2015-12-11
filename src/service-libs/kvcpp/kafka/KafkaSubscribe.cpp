@@ -30,16 +30,14 @@
 
 #include "KafkaSubscribe.h"
 #include "../kvevents.h"
-#include <kvsubscribe/NotificationSubscriber.h>
 #include <kvsubscribe/DataSubscriber.h>
-#include <kvsubscribe/Notification.h>
 #include <decodeutility/kvalobsdata.h>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <stdexcept>
 #include <list>
-
+#include <set>
 
 using namespace kvalobs::subscribe;
 using namespace kvalobs;
@@ -55,27 +53,6 @@ std::string uniqueString()
 {
     static boost::uuids::random_generator generator;
     return boost::uuids::to_string(generator());
-}
-
-bool match(const KvDataSubscribeInfoHelper &info, const Notification & n)
-{
-    auto info_ = info.getDataSubscribeInfo();
-
-    if ( info_->ids.length() == 0 )
-        return true;
-    for ( int i = 0; i < info_->ids.length(); ++ i )
-        if ( info_->ids[i] == n.station() )
-            return true;
-    return false;
-
-}
-
-void broadcast(const Notification & n, dnmi::thread::CommandQue &queue)
-{
-    KvWhatListPtr newData(new KvWhatList);
-    newData->push_back(KvWhat(n.station(), n.type(), n.obstime()));
-    kvservice::DataNotifyEvent * event = new kvservice::DataNotifyEvent(newData);
-    queue.postAndBrodcast(event);
 }
 
 void broadcast(const ::kvalobs::serialize::KvalobsData & d, dnmi::thread::CommandQue & queue)
@@ -150,9 +127,39 @@ void broadcast(const ::kvalobs::serialize::KvalobsData & d, const KvDataSubscrib
     broadcast(serialize::KvalobsData(data, textData), queue);
 }
 
+struct cmpWhat
+{
+	bool operator () (const KvWhat & a, const KvWhat & b)
+	{
+		if ( a.stationID() != b.stationID() )
+			return a.stationID() < b.stationID();
+		if ( a.typeID() != b.typeID() )
+			return a.typeID() < b.typeID();
+		return a.obsTime() < b.obsTime();
+	}
+};
+
+void broadcastNotification(const ::kvalobs::serialize::KvalobsData & kvalobsData, dnmi::thread::CommandQue &queue)
+{
+
+    std::set<KvWhat, cmpWhat> elements;
+    std::list<kvalobs::kvData> data;
+    std::list<kvalobs::kvTextData> textData;
+    kvalobsData.getData(data, textData);
+    for ( auto d : data )
+    	elements.insert(KvWhat(d.stationID(), d.typeID(), d.obstime()));
+    for ( auto d : textData )
+    	elements.insert(KvWhat(d.stationID(), d.typeID(), d.obstime()));
+
+    KvWhatListPtr newData(new KvWhatList(elements.begin(), elements.end()));
+    kvservice::DataNotifyEvent * event = new kvservice::DataNotifyEvent(newData);
+    queue.postAndBrodcast(event);
 }
 
-KafkaSubscribe::KafkaSubscribe(const std::string & brokers) :
+}
+
+KafkaSubscribe::KafkaSubscribe(const std::string & domain, const std::string & brokers) :
+		domain_(domain),
         brokers_(brokers)
 {
 }
@@ -162,30 +169,14 @@ KafkaSubscribe::~KafkaSubscribe()
     joinAll();
 }
 
-KafkaSubscribe::SubscriberID KafkaSubscribe::subscribeDataNotify( const KvDataSubscribeInfoHelper &info, dnmi::thread::CommandQue &queue )
-{
-    ConsumerPtr runner(new NotificationSubscriber(
-            [info, & queue](const Notification & n) {
-                if (match(info, n))
-                    broadcast(n, queue);
-            },
-            NotificationSubscriber::Latest,
-            brokers_
-    ));
-
-
-    std::string ret = uniqueString();
-    consumers_[ret] = std::make_pair(runner, std::thread([runner](){runner->run();}));
-    return ret;
-}
-
 KafkaSubscribe::SubscriberID KafkaSubscribe::subscribeData( const KvDataSubscribeInfoHelper &info, dnmi::thread::CommandQue &queue )
 {
     ConsumerPtr runner(new DataSubscriber(
             [info, & queue](const ::kvalobs::serialize::KvalobsData & d) {
                 broadcast(d, info, queue);
             },
-            NotificationSubscriber::Latest,
+			domain_,
+            DataSubscriber::Latest,
             brokers_
     ));
 
@@ -194,6 +185,23 @@ KafkaSubscribe::SubscriberID KafkaSubscribe::subscribeData( const KvDataSubscrib
     consumers_[ret] = std::make_pair(runner, std::thread([runner](){runner->run();}));
     return ret;
 }
+
+KafkaSubscribe::SubscriberID KafkaSubscribe::subscribeDataNotify( const KvDataSubscribeInfoHelper &info, dnmi::thread::CommandQue &queue )
+{
+    ConsumerPtr runner(new DataSubscriber(
+            [info, & queue](const ::kvalobs::serialize::KvalobsData & d) {
+                broadcastNotification(d, queue);
+            },
+			domain_,
+            DataSubscriber::Latest,
+            brokers_
+    ));
+
+    std::string ret = uniqueString();
+    consumers_[ret] = std::make_pair(runner, std::thread([runner](){runner->run();}));
+    return ret;
+}
+
 
 KafkaSubscribe::SubscriberID KafkaSubscribe::subscribeKvHint( dnmi::thread::CommandQue &queue )
 {

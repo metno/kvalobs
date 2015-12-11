@@ -31,6 +31,7 @@
 #include "Configuration.h"
 #include <kvalobs/kvStationInfo.h>
 #include <kvalobs/kvPath.h>
+#include <kvsubscribe/DataSubscriber.h>
 #include <miutil/timeconvert.h>
 #include <boost/program_options.hpp>
 #include <boost/filesystem/path.hpp>
@@ -140,13 +141,19 @@ Configuration::Configuration(int & argc, char ** argv) :
 			("port,p", value<int>(&port_), "Port of database")
 			("user,U", value<std::string>(&user_)->default_value(databaseUser), "Database user");
 
+	options_description kafka("Kafka Connection");
+	kafka.add_options()
+			("brokers", value<std::string>(&kafkaBrokers_)->default_value("localhost"), "List of kafka brokers to connect to, comma-separated")
+			("domain", value<std::string>(&kafkaDomain_)->default_value("test"), "Kvalobs domain to use in kafka queues, to separate your instance from others that use the same kafka servers");
+
+
 	options_description generic("Generic");
 	generic.add_options()
 			("config", value<std::string>(), "Read configuration from the given file")
 			("version",	"Produce version information")
 			("help", "Produce help message");
 
-	commandLine.add(observation).add(logging).add(database).add(generic);
+	commandLine.add(observation).add(logging).add(database).add(kafka).add(generic);
 
 	parsed_options parsed =
 	    command_line_parser(argc, argv).
@@ -171,7 +178,7 @@ Configuration::Configuration(int & argc, char ** argv) :
 	}
 
 	options_description configFileOptions;
-	configFileOptions.add(logging).add(database);
+	configFileOptions.add(logging).add(database).add(kafka);
 
 	if (vm.count("config"))
 		parse(vm["config"].as<std::string> (), vm, configFileOptions);
@@ -224,6 +231,27 @@ std::string Configuration::databaseConnectString() const
 		dbConnect << " port=" << port_;
 	dbConnect << " user=" << user_;
 	return dbConnect.str();
+}
+
+
+namespace
+{
+void processDataErrors(const std::string & data,
+        const std::string & errorMessage)
+{
+    LOGERROR("Unable to send data: " + errorMessage + "  Data: <" + data + ">");
+}
+}
+
+std::shared_ptr<kvalobs::subscribe::KafkaProducer> Configuration::kafkaProducer() const
+{
+	LOGINFO("Creating kafka connection on " << kafkaBrokers_ << ", using topic " << kvalobs::subscribe::DataSubscriber::topic(kafkaDomain_));
+
+	return std::make_shared<kvalobs::subscribe::KafkaProducer>(
+	//kvalobs::subscribe::KafkaProducer dataSender(
+			kvalobs::subscribe::DataSubscriber::topic(kafkaDomain_),
+			kafkaBrokers_,
+			processDataErrors);
 }
 
 std::ostream & Configuration::version(std::ostream & s) const

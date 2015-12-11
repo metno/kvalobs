@@ -33,8 +33,6 @@
 #include <thread>
 #include <kvsubscribe/DataProducer.h>
 #include <kvsubscribe/queue.h>
-#include <kvsubscribe/NotificationProducer.h>
-#include <kvsubscribe/Notification.h>
 #include <kvcpp/corba/CorbaKvApp.h>
 #include <kvcpp/kvevents.h>
 #include <kvalobs/kvPath.h>
@@ -74,16 +72,16 @@ miutil::conf::ConfSection * getConfSection()
 }
 
 
-void produceData(const std::string brokers = "localhost")
+void produceData(const std::string & domain, const std::string brokers = "localhost")
 {
 	dnmi::thread::CommandQue queue;
 	kvservice::KvDataSubscribeInfoHelper helper;
 	auto id = kvservice::KvApp::kvApp->subscribeData(helper, queue);
 	if ( id.empty() )
 		throw std::runtime_error("Subscription error!");
-	DataProducer output(brokers, onError);
+	DataProducer output(domain, brokers, onError);
 
-	std::clog << "Data queue ready (" << queue::data() << ")" << std::endl;
+	std::clog << "Data queue ready (" << queue::checked(domain) << ")" << std::endl;
 
 	long long count = 0;
 	while ( not shutdown )
@@ -110,41 +108,6 @@ void produceData(const std::string brokers = "localhost")
 	std::clog << "done" << std::endl;
 }
 
-void produceNotifications(const std::string brokers = "localhost")
-{
-	dnmi::thread::CommandQue queue;
-	kvservice::KvDataSubscribeInfoHelper helper;
-	auto id = kvservice::KvApp::kvApp->subscribeDataNotify(helper, queue);
-	if ( id.empty() )
-		throw std::runtime_error("Subscription error!");
-	NotificationProducer output(brokers, onError);
-
-	std::clog << "Data queue ready (" << queue::notification() << ")" << std::endl;
-
-	long long count = 0;
-	while ( not shutdown )
-	{
-		output.catchup();
-		boost::scoped_ptr<dnmi::thread::CommandBase> base(queue.get(1));
-		if ( ! base )
-			continue;
-
-		kvservice::DataNotifyEvent * event = dynamic_cast<kvservice::DataNotifyEvent *>(base.get());
-		if ( ! event )
-		{
-			std::clog << "Unable to understand incoming notification" << std::endl;
-			continue;
-		}
-
-		for ( auto what : * event->what() )
-		{
-			Notification n(what.stationID(), what.typeID(), what.obsTime());
-			output.send(n);
-		}
-	}
-	std::clog << "done" << std::endl;
-}
-
 
 int main(int argc, char ** argv)
 {
@@ -157,10 +120,9 @@ int main(int argc, char ** argv)
 	signal(SIGTERM, stopApplication);
 
 	std::string brokers = "localhost";
-	std::thread data([&](){produceData(brokers);});
-	//std::thread notify([&](){produceNotifications(brokers);});
+	std::string domain = "test";
+	std::thread data([&](){produceData(domain, brokers);});
 
 	app.run();
 	data.join();
-	//notify.join();
 }

@@ -83,6 +83,8 @@ public:
      */
     void catchup(unsigned timeout = 0);
 
+    std::string topic() const;
+
 private:
     std::unique_ptr<RdKafka::Producer> producer_;
     std::unique_ptr<RdKafka::Topic> topic_;

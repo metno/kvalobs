@@ -39,15 +39,15 @@ namespace kvalobs
 namespace subscribe
 {
 
-DataSubscriber::DataSubscriber(Handler handler, ConsumptionStart startAt, const std::string & brokers) :
-    KafkaConsumer(startAt, topic(), brokers),
+DataSubscriber::DataSubscriber(Handler handler, const std::string & domain, ConsumptionStart startAt, const std::string & brokers) :
+    KafkaConsumer(startAt, topic(domain), brokers),
     handler_(handler)
 {
 }
 
-std::string DataSubscriber::topic()
+std::string DataSubscriber::topic(const std::string & domain)
 {
-    return queue::data();
+    return queue::checked(domain);
 }
 
 void DataSubscriber::data(const char * msg, unsigned length)

@@ -31,26 +31,21 @@
 #define SRC_LIB_KVSUBSCRIBE_QUEUES_H_
 
 
+#include <string>
+
 namespace kvalobs
 {
 namespace subscribe
 {
 namespace queue
 {
-inline const char * notification()
-{
-	return "kvalobs.notifications";
-}
+std::string raw(const std::string & domain);
 
-inline const char * data()
-{
-	return "kvalobs.data";
-}
+std::string decoded(const std::string & domain, bool withMissing = true);
 
-inline const char * hint()
-{
-	return "kvalobs.hint";
-}
+std::string checked(const std::string & domain);
+
+std::string hint(const std::string & domain);
 
 
 }

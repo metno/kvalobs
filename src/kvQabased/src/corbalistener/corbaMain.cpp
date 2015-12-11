@@ -40,6 +40,7 @@
 #include <fileutil/pidfileutil.h>
 #include "AdminImpl.h"
 #include <kvalobs/kvPath.h>
+#include <thread>
 
 //For test
 const char* options[][2] =
@@ -149,8 +150,8 @@ int corbaMain(int argc, char** argv, const qabase::Configuration & config)
 	CORBA::ORB_ptr orb = app.getOrb();
 	PortableServer::POA_ptr poa = app.getPoa();
 
-	QaWork qaWork(app, config);
-	thread qaWorkThread(qaWork);
+	QaWorkLoop qaWork(app, config);
+	std::thread qaWorkThread(qaWork);
 
 	try
 	{

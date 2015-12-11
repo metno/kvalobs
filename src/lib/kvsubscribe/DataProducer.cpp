@@ -38,8 +38,8 @@ namespace kvalobs
 namespace subscribe
 {
 
-DataProducer::DataProducer(const std::string & brokers,	KafkaProducer::ErrorHandler onFailedDelivery, KafkaProducer::SuccessHandler onSuccessfulDelivery) :
-		producer_(queue::data(), brokers, onFailedDelivery, onSuccessfulDelivery)
+DataProducer::DataProducer(const std::string & domain, const std::string & brokers,	KafkaProducer::ErrorHandler onFailedDelivery, KafkaProducer::SuccessHandler onSuccessfulDelivery) :
+		producer_(queue::checked(domain), brokers, onFailedDelivery, onSuccessfulDelivery)
 {
 }
 

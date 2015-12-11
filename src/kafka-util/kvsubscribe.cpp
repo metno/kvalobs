@@ -28,8 +28,6 @@
 */
 
 //#include "../HintSubscriber.h"
-#include <kvsubscribe/NotificationSubscriber.h>
-#include <kvsubscribe/Notification.h>
 #include <kvsubscribe/DataSubscriber.h>
 #include <decodeutility/kvalobsdataserializer.h>
 #include <iostream>
@@ -49,13 +47,6 @@ void down()
 	std::cout << "kvalobs going down" << std::endl;
 }
 }
-namespace notify
-{
-void note(const Notification & n)
-{
-	std::cout << n.str() << std::endl;
-}
-}
 namespace data
 {
 void message(const kvalobs::serialize::KvalobsData & data)
@@ -72,23 +63,18 @@ void stopListening(int singal)
 
 void help(std::ostream & s, const std::string & applicationName)
 {
-	s << "Usage: " << applicationName << " hint|notify|data" << std::endl;
+	s << "Usage: " << applicationName << " hint|data" << std::endl;
 }
-KafkaConsumer * getConsumer(const std::string & type,
+KafkaConsumer * getConsumer(const std::string & type, const std::string & domain,
 		const std::string & brokers)
 {
 	if (type == "hint")
 	{	//return new HintSubscriber(hint::up, hint::down, brokers);
 		throw std::logic_error("Not implemented consumer type: " + type);
 	}
-	else if (type == "notify")
-	{
-		return new NotificationSubscriber(notify::note,
-				NotificationSubscriber::Latest, brokers);
-	}
 	else if (type == "data")
 	{
-		return new DataSubscriber(data::message, DataSubscriber::Latest,
+		return new DataSubscriber(data::message, domain, DataSubscriber::Latest,
 				brokers);
 	}
 
@@ -114,7 +100,7 @@ int main(int argc, char ** argv)
 			return 0;
 		}
 		else
-			consumer.reset(getConsumer(arg, "localhost"));
+			consumer.reset(getConsumer(arg, "test", "localhost"));
 
 		signal(SIGINT, stopListening);
 		signal(SIGTERM, stopListening);

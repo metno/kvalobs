@@ -55,12 +55,12 @@ namespace kafka
 class KafkaSubscribe: public details::KvalobsSubscribe, boost::noncopyable
 {
 public:
-    explicit KafkaSubscribe(const std::string & brokers);
+    KafkaSubscribe(const std::string & domain, const std::string & brokers);
     ~KafkaSubscribe();
 
-    virtual SubscriberID subscribeDataNotify( const KvDataSubscribeInfoHelper &info, dnmi::thread::CommandQue &queue );
-
     virtual SubscriberID subscribeData( const KvDataSubscribeInfoHelper &info, dnmi::thread::CommandQue &queue );
+
+    virtual SubscriberID subscribeDataNotify( const KvDataSubscribeInfoHelper &info, dnmi::thread::CommandQue &que );
 
     virtual SubscriberID subscribeKvHint( dnmi::thread::CommandQue &queue );
 
@@ -85,6 +85,7 @@ private:
     typedef std::pair<ConsumerPtr, std::thread> RunnableConsumer;
     typedef std::map<std::string, RunnableConsumer> ConsumerCollection;
 
+    std::string domain_;
     std::string brokers_;
     ConsumerCollection consumers_;
 

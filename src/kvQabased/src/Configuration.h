@@ -31,6 +31,7 @@
 #define CONFIGURATION_H_
 
 #include <milog/milog.h>
+#include <kvsubscribe/KafkaProducer.h>
 #include <kvalobs/kvStationInfo.h>
 #include <string>
 #include <iosfwd>
@@ -43,6 +44,7 @@ namespace program_options
 class options_description;
 }
 }
+
 
 namespace qabase
 {
@@ -120,6 +122,8 @@ public:
 		return runLogFile_;
 	}
 
+	std::shared_ptr<kvalobs::subscribe::KafkaProducer> kafkaProducer() const;
+
 	/**
 	 * Get the desired logging level.
 	 * @return Selected logging level.
@@ -167,6 +171,8 @@ private:
 	int port_;
 	std::string user_;
 
+	std::string kafkaBrokers_;
+	std::string kafkaDomain_;
 };
 
 }

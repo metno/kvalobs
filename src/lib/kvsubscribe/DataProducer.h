@@ -46,7 +46,8 @@ namespace subscribe
 class DataProducer
 {
 public:
-	DataProducer(const std::string & brokers = "localhost",
+	DataProducer(const std::string & domain,
+			const std::string & brokers = "localhost",
             KafkaProducer::ErrorHandler onFailedDelivery = [](const std::string &, const std::string &){},
 			KafkaProducer::SuccessHandler onSuccessfulDelivery = [](const std::string &){}
             );

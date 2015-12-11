@@ -15,24 +15,32 @@ namespace kafka
 {
 namespace
 {
-std::string getBrokers(miutil::conf::ConfSection * conf)
+std::string value(miutil::conf::ConfSection * conf, const std::string & key, const std::string & fallback)
 {
-	static const std::string DEFAULT = "localhost";
-
-	auto value = conf->getValue("kafka.brokers");
+	auto value = conf->getValue(key);
 
 	if ( value.empty() )
-		return DEFAULT;
+		return fallback;
 	if ( value.size() > 1 )
-		return DEFAULT;
+		return fallback;
 
 	return value.front().valAsString();
+}
+
+std::string getDomain(miutil::conf::ConfSection * conf)
+{
+	return value(conf, "kafka.domain", "test");
+}
+
+std::string getBrokers(miutil::conf::ConfSection * conf)
+{
+	return value(conf, "kafka.brokers", "localhost");
 }
 }
 
 KafkaKvApp::KafkaKvApp(int &argc, char **argv,  miutil::conf::ConfSection *conf, const char *options[][2]) :
 		corba::CorbaKvApp(argc, argv, conf, options),
-		subscriptionHandler_(getBrokers(conf))
+		subscriptionHandler_(getDomain(conf), getBrokers(conf))
 {
 }
 

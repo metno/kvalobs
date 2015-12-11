@@ -27,46 +27,45 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-
-#include "NotificationSubscriber.h"
-#include "Notification.h"
 #include "queue.h"
-#include <milog/milog.h>
-#include <iostream>
 
 namespace kvalobs
 {
 namespace subscribe
 {
-
-NotificationSubscriber::NotificationSubscriber(Handler handler, ConsumptionStart startAt, const std::string & brokers) :
-        KafkaConsumer(startAt, topic(), brokers),
-        handler_(handler)
-
+namespace queue
 {
+namespace
+{
+std::string name(const std::string & domain, const std::string service)
+{
+	return "kvalobs." + domain + "." + service;
+}
 }
 
-std::string NotificationSubscriber::topic()
+std::string raw(const std::string & domain)
 {
-    return queue::notification();
+	return name(domain, "raw");
 }
 
-void NotificationSubscriber::data(const char * msg, unsigned length)
+std::string decoded(const std::string & domain, bool withMissing)
 {
-    std::string message(msg, length);
-    Notification n(message);
-    handler_(n);
+	if (withMissing)
+		return name(domain, "decoded-with-missing");
+	else
+		return name(domain, "decoded");
 }
 
-void NotificationSubscriber::error(int code, const std::string & msg)
+std::string checked(const std::string & domain)
 {
-    milog::LogContext context("NotificationSubscriber");
-    LOGERROR(msg);
-
-    std::clog << "ERORR:\t" << msg << std::endl;
+	return name(domain, "checked");
 }
 
+std::string hint(const std::string & domain)
+{
+	return name(domain, "hint");
+}
 
-
-} /* namespace subscribe */
-} /* namespace kvalobs */
+}
+}
+}

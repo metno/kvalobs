@@ -34,6 +34,10 @@
 #include "LogFileCreator.h"
 #include <corbalistener/corbaMain.h>
 #include "db/KvalobsDatabaseAccess.h"
+#include <decodeutility/kvalobsdata.h>
+#include <decodeutility/kvalobsdataserializer.h>
+#include <kvsubscribe/KafkaProducer.h>
+#include <kvsubscribe/DataSubscriber.h>
 #include <milog/milog.h>
 #include <milog/FLogStream.h>
 #include <boost/lexical_cast.hpp>
@@ -85,12 +89,19 @@ using namespace boost::program_options;
 
 namespace
 {
-void runChecks(qabase::CheckRunner & checkRunner, const kvalobs::kvStationInfo & observationToCheck, const std::string & baseLogDir)
-{
-	qabase::LogFileCreator logCreator(baseLogDir);
 
-	qabase::LogFileCreator::LogStreamPtr logStream = logCreator.getLogStream(observationToCheck);
-	checkRunner.newObservation(observationToCheck, logStream.get());
+void runChecks(qabase::CheckRunner & checkRunner, const qabase::Configuration & config)
+{
+	qabase::LogFileCreator logCreator(config.baseLogDir());
+
+	qabase::LogFileCreator::LogStreamPtr logStream = logCreator.getLogStream(* config.observationToCheck());
+	qabase::CheckRunner::DataListPtr data = checkRunner.newObservation(* config.observationToCheck(), logStream.get());
+
+	kvalobs::serialize::KvalobsData d(* data);
+
+	auto dataSender = config.kafkaProducer();
+	dataSender->send(kvalobs::serialize::KvalobsDataSerializer::serialize(d));
+	dataSender->catchup(1000);
 }
 }
 
@@ -134,7 +145,7 @@ int main(int argc, char ** argv)
 			if ( config.onlySpecificQcx() )
 				checkRunner.setQcxFilter(config.qcxFilter().begin(), config.qcxFilter().end());
 
-			runChecks(checkRunner, * observationToCheck, config.baseLogDir());
+			runChecks(checkRunner, config);
 		}
 		else
 			return corbaMain(argc, argv, config);

@@ -72,6 +72,9 @@ KafkaProducer::KafkaProducer(const std::string & topic,
         ) :
         deliveryReportHandler_(new DeliveryReport(onFailedDelivery, onSuccessfulDelivery))
 {
+	if ( brokers.empty() )
+		throw std::logic_error("Empty kafka broker list");
+
     std::string errstr;
 
     std::unique_ptr<RdKafka::Conf> conf(
@@ -120,6 +123,11 @@ void KafkaProducer::send(const char * data, unsigned length)
 void KafkaProducer::catchup(unsigned timeout)
 {
     producer_->poll(timeout);
+}
+
+std::string KafkaProducer::topic() const
+{
+	return topic_->name();
 }
 
 }

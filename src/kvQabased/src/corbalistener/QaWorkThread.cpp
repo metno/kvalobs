@@ -37,8 +37,6 @@
 #include <CheckRunner.h>
 #include <db/KvalobsDatabaseAccess.h>
 #include <kvsubscribe/KafkaProducer.h>
-#include <kvsubscribe/Notification.h>
-#include <kvsubscribe/NotificationSubscriber.h>
 #include <kvsubscribe/DataSubscriber.h>
 #include <decodeutility/kvalobsdata.h>
 #include <decodeutility/kvalobsdataserializer.h>
@@ -52,37 +50,6 @@
 using namespace kvalobs;
 using namespace std;
 using namespace miutil;
-
-namespace
-{
-void processNotficationErrors(const std::string & data,
-        const std::string & errorMessage)
-{
-    LOGERROR("Unable to send notification: " + errorMessage + "  Data: <" + data + ">");
-}
-void processDataErrors(const std::string & data,
-        const std::string & errorMessage)
-{
-    LOGERROR("Unable to send data: " + errorMessage + "  Data: <" + data + ">");
-}
-}
-
-
-
-QaWork::QaWork(QaBaseApp & app, const qabase::Configuration & config) :
-	app(app),
-	notifier_(new subscribe::KafkaProducer(
-				subscribe::NotificationSubscriber::topic(),
-				"localhost",
-				processNotficationErrors)),
-	dataSender_(new subscribe::KafkaProducer(subscribe::DataSubscriber::topic(),
-				"localhost",
-				processDataErrors)),
-	logCreator_(config.baseLogDir()),
-	logLevel_(config.logLevel())
-
-{
-}
 
 namespace
 {
@@ -115,7 +82,76 @@ bool updateWorkQue_(const QaWorkCommand & work)
 }
 }
 
-void QaWork::operator()()
+
+QaWork::QaWork(const qabase::Configuration & config) :
+	dataSender_(config.kafkaProducer()),
+	logCreator_(config.baseLogDir())
+{}
+
+
+void QaWork::process(dnmi::db::Connection & con, const kvStationInfo & si, bool updateWorkQueue)
+{
+	kvDbGate gate(&con);
+	//const kvStationInfo & si = work.getStationInfo().front();
+
+	if ( updateWorkQueue )
+		doUpdateWorkQue(gate, si, "qa_start");
+	else
+		LOGDEBUG( "NO UPDATE: workque!" );
+
+	kvalobs::kvStationInfoList retList;
+	QaWork::DataListPtr modified = doWork_(si, retList, con);
+
+	if (!retList.empty())
+	{
+		if ( updateWorkQueue )
+			doUpdateWorkQue(gate, si, "qa_stop");
+	}
+
+	notifySubscribers_(modified);
+
+	LOGDEBUG("Done processing");
+}
+
+/**
+ * The retList must contain the result that is to be returned to
+ * the kvManager. The result may contain more parameters and there
+ * may be results for additional stations. But the station that came
+ * in and is to be processed must be at the head of the retList. Other
+ * stations that is touched in the processing must be pushed at the tail.
+ */
+QaWork::DataListPtr QaWork::doWork_(const kvalobs::kvStationInfo & params,
+		kvalobs::kvStationInfoList & retList, dnmi::db::Connection & con)
+{
+	retList.push_back(params);
+
+	LOGDEBUG( "QaWork::doWork at:" << boost::posix_time::microsec_clock::universal_time() << "  Processing " << params );
+
+	db::KvalobsDatabaseAccess db(& con, false);
+	qabase::CheckRunner checkRunner(db);
+
+	qabase::LogFileCreator::LogStreamPtr log = logCreator_.getLogStream(params);
+	return checkRunner.newObservation(params, log.get());
+}
+
+void QaWork::notifySubscribers_(const QaWork::DataListPtr & data)
+{
+	kvalobs::serialize::KvalobsData d(* data);
+	std::string msg = kvalobs::serialize::KvalobsDataSerializer::serialize(d);
+
+	dataSender_->send(msg);
+	dataSender_->catchup(250);
+}
+
+QaWorkLoop::QaWorkLoop(QaBaseApp & app, const qabase::Configuration & config) :
+	work_(config),
+	app(app),
+	logLevel_(config.logLevel())
+{
+}
+
+
+void QaWorkLoop::operator()()
 {
 	milog::Logger::logger().logLevel(logLevel_);
 
@@ -152,7 +188,10 @@ void QaWork::operator()()
 					continue;
 				}
 				if (not app.shutdown())
-					process(*con, *work);
+				{
+					const kvStationInfo info = work->getStationInfo().front();
+					work_.process(*con, info, updateWorkQue_(* work));
+				}
 			}
 				else
 				LOGERROR( "QaWork: Unexpected command ....\n" );
@@ -169,123 +208,3 @@ void QaWork::operator()()
 	LOGDEBUG( "QaWork: Thread terminating!" );
 }
 
-void QaWork::process(dnmi::db::Connection & con, const QaWorkCommand & work)
-{
-	kvDbGate gate(&con);
-	const kvStationInfo & si = work.getStationInfo().front();
-
-	if (updateWorkQue_(work))
-		doUpdateWorkQue(gate, si, "qa_start");
-		else
-		LOGDEBUG( "NO UPDATE: workque!" );
-
-	kvalobs::kvStationInfoList retList;
-	doWork(si, retList, con);
-
-	if (!retList.empty())
-	{
-		if (updateWorkQue_(work))
-			doUpdateWorkQue(gate, si, "qa_stop");
-
-		//Return the result to kvManager.
-		CKvalObs::CManager::CheckedInput_var callback = work.getCallback();
-		app.sendToManager(retList, callback);
-	}
-
-	notifySubscribers_(retList);
-}
-
-/**
- * The retList must contain the result that is to be returned to
- * the kvManager. The result may contain more parameters and there
- * may be results for additional stations. But the station that came
- * in and is to be processed must be at the head of the retList. Other
- * stations that is touched in the processing must be pushed at the tail.
- */
-void QaWork::doWork(const kvalobs::kvStationInfo & params,
-		kvalobs::kvStationInfoList & retList, dnmi::db::Connection & con)
-{
-	retList.push_back(params);
-
-	LOGDEBUG( "QaWork::doWork at:" << boost::posix_time::microsec_clock::universal_time() << "  Processing " << params );
-
-	db::KvalobsDatabaseAccess db(& con, false);
-	qabase::CheckRunner checkRunner(db);
-
-	qabase::LogFileCreator::LogStreamPtr log = logCreator_.getLogStream(params);
-	checkRunner.newObservation(params, log.get());
-}
-
-void QaWork::notifySubscribers_(const kvalobs::kvStationInfoList & changeList)
-{
-    sendNotifications_(changeList);
-    sendData_(changeList);
-}
-
-void QaWork::sendNotifications_(const kvalobs::kvStationInfoList & changeList)
-{
-    for (const kvalobs::kvStationInfo & info : changeList)
-    {
-        kvalobs::subscribe::Notification n(info.stationID(), info.typeID(),
-                info.obstime());
-        notifier_->send(n.str());
-    }
-    notifier_->catchup();
-}
-
-class AutoReleaseConnection
-{
-public:
-    AutoReleaseConnection(QaBaseApp & app) :
-            app_(app)
-    {
-        connection_ = app_.getNewDbConnection();
-    }
-
-    ~AutoReleaseConnection()
-    {
-        app_.releaseDbConnection(connection_);
-    }
-
-    dnmi::db::Connection & connection()
-    {
-        return *connection_;
-    }
-
-private:
-    QaBaseApp & app_;
-    dnmi::db::Connection * connection_;
-};
-
-void QaWork::sendData_(const kvalobs::kvStationInfoList & changeList)
-{
-    AutoReleaseConnection arc(app);
-    dnmi::db::Connection & connection = arc.connection();
-
-    for (const kvStationInfo & info : changeList)
-    {
-        kvalobs::serialize::KvalobsData d;
-
-        std::ostringstream q;
-        q << "SELECT * FROM data WHERE stationid=" << info.stationID()
-                << " AND typeid=" << info.typeID() << " AND obstime='"
-                << to_kvalobs_string(info.obstime()) << "';";
-        std::unique_ptr<dnmi::db::Result> r(connection.execQuery(q.str()));
-        while (r->hasNext())
-            d.insert(kvalobs::kvData(r->next()));
-
-        q.clear();
-        q << "SELECT * FROM text_data WHERE stationid=" << info.stationID()
-                << " AND typeid=" << info.typeID() << " AND obstime='"
-                << to_kvalobs_string(info.obstime()) << "';";
-        r.reset(connection.execQuery(q.str()));
-        while (r->hasNext())
-            d.insert(kvalobs::kvTextData(r->next()));
-
-        std::string data = kvalobs::serialize::KvalobsDataSerializer::serialize(
-                d);
-        dataSender_->send(data);
-    }
-
-    dataSender_->catchup();
-}

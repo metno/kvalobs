@@ -61,7 +61,7 @@ public:
 	explicit LogFileCreator(const std::string & baseDirectory);
 	~LogFileCreator();
 
-	typedef std::auto_ptr<std::ostream> LogStreamPtr;
+	typedef std::shared_ptr<std::ostream> LogStreamPtr;
 
 	/**
 	 * Create and return a file for logging

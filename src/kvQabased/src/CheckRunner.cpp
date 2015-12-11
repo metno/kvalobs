@@ -148,7 +148,7 @@ logTransaction( bool ok,
 }
 }
 
-void CheckRunner::newObservation(const kvalobs::kvStationInfo & obs, std::ostream * scriptLog)
+CheckRunner::DataListPtr CheckRunner::newObservation(const kvalobs::kvStationInfo & obs, std::ostream * scriptLog)
 {
    const int shortSleep=100;
    const int longSleep=300;
@@ -165,7 +165,7 @@ void CheckRunner::newObservation(const kvalobs::kvStationInfo & obs, std::ostrea
    if ( not shouldRunAnyChecks(obs) )
    {
       LOGDEBUG("Will not run any checks on observation: " << obs);
-      return;
+      return DataListPtr(new DataList);
    }
 
    LOGINFO("Checking " << obs);
@@ -196,9 +196,9 @@ void CheckRunner::newObservation(const kvalobs::kvStationInfo & obs, std::ostrea
 				{
 					try
 					{
-					   checkObservation(obs, scriptLog);
+					   DataListPtr ret = checkObservation(obs, scriptLog);
 					   logTransaction( true, start, nShortRetries, nLongRetries, aborted );
-					   return;
+					   return ret;
 					}
 					catch (dnmi::db::SQLSerializeError & )
 					{
@@ -216,8 +216,9 @@ void CheckRunner::newObservation(const kvalobs::kvStationInfo & obs, std::ostrea
       }
 
       // final attempt:
-      checkObservation(obs, scriptLog);
+      DataListPtr ret = checkObservation(obs, scriptLog);
       logTransaction( true, start, nShortRetries, nLongRetries, aborted );
+      return ret;
    }
    catch ( std::exception & e )
    {
@@ -225,9 +226,10 @@ void CheckRunner::newObservation(const kvalobs::kvStationInfo & obs, std::ostrea
       //LOGERROR(e.what());
       throw;
    }
+   return DataListPtr(new DataList); // never reached
 }
 
-void CheckRunner::checkObservation(const kvalobs::kvStationInfo & obs, std::ostream * scriptLog)
+CheckRunner::DataListPtr CheckRunner::checkObservation(const kvalobs::kvStationInfo & obs, std::ostream * scriptLog)
 {
    db::CachedDatabaseAccess cdb(db_, obs);
    db::DelayedSaveDatabaseAccess db(& cdb);
@@ -263,7 +265,7 @@ void CheckRunner::checkObservation(const kvalobs::kvStationInfo & obs, std::ostr
    if ( haveAnyHqcCorrectedElements(observationData) )
    {
       LOGINFO("Observation is HQC-modified. Will not run tests on this");
-      return;
+      return DataListPtr(new DataList);
    }
 
    if ( qcxFilter_.empty() )
@@ -344,6 +346,8 @@ void CheckRunner::checkObservation(const kvalobs::kvStationInfo & obs, std::ostr
       }
    }
 
+   DataListPtr ret(new DataList(db.uncommitted().begin(), db.uncommitted().end()));
+
    if ( scriptLog and not db.uncommitted().empty() )
    {
       (*scriptLog) << "Saving " << db.uncommitted().size() << " elements to database:";
@@ -353,6 +357,7 @@ void CheckRunner::checkObservation(const kvalobs::kvStationInfo & obs, std::ostr
    }
 
    transaction.commit();
+   return ret;
 }
 
 namespace

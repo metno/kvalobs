@@ -31,6 +31,7 @@
 #define CHECKCONTROL_H_
 
 #include <db/DatabaseAccess.h>
+#include <memory>
 
 
 namespace qabase
@@ -68,6 +69,9 @@ public:
 	explicit CheckRunner(db::DatabaseAccess & database);
 	~CheckRunner();
 
+	typedef std::list<kvalobs::kvData> DataList;
+	typedef std::shared_ptr<DataList> DataListPtr;
+
 	/**
 	 * Signal that a new observation is ready for being checked. Checks will
 	 * immediately start running.
@@ -76,7 +80,7 @@ public:
 	 * @param scriptLog Where to log scripts and script results. Nothing will
 	 *                  be logged if scripLog is NULL.
 	 */
-	void newObservation(const kvalobs::kvStationInfo & obs, std::ostream * scriptLog = 0);
+	DataListPtr newObservation(const kvalobs::kvStationInfo & obs, std::ostream * scriptLog = 0);
 
 	/**
 	 * Set a filter for checks to run. The given input should be an iterator
@@ -106,7 +110,7 @@ public:
 			const db::DatabaseAccess::ParameterList & expectedParameters) const;
 
 private:
-	void checkObservation(const kvalobs::kvStationInfo & obs, std::ostream * scriptLog);
+	DataListPtr checkObservation(const kvalobs::kvStationInfo & obs, std::ostream * scriptLog);
 
 	bool shouldRunAnyChecks(const kvalobs::kvStationInfo & obs) const;
 

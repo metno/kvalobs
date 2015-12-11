@@ -67,29 +67,36 @@ class Configuration;
 
 class QaWork
 {
-	QaBaseApp & app;
-
 public:
-	QaWork(QaBaseApp & app, const qabase::Configuration & config);
+	explicit QaWork(const qabase::Configuration & config);
 
-	void doWork(const kvalobs::kvStationInfo & params,
-			kvalobs::kvStationInfoList & retParams, dnmi::db::Connection & con);
-
-	void process(dnmi::db::Connection & con, const QaWorkCommand & work);
-
-	void operator()();
+	void process(dnmi::db::Connection & con, const kvalobs::kvStationInfo & si, bool updateWorkQueue = true);
 
 private:
-	void notifySubscribers_(const kvalobs::kvStationInfoList & changeList);
-	void sendNotifications_(const kvalobs::kvStationInfoList & changeList);
-	void sendData_(const kvalobs::kvStationInfoList & changeList);
 
-	std::shared_ptr<kvalobs::subscribe::KafkaProducer> notifier_;
+	typedef std::list<kvalobs::kvData> DataList;
+	typedef std::shared_ptr<DataList> DataListPtr;
+
+	DataListPtr doWork_(const kvalobs::kvStationInfo & params,
+			kvalobs::kvStationInfoList & retParams, dnmi::db::Connection & con);
+
+
+	void notifySubscribers_(const DataListPtr & data);
+
 	std::shared_ptr<kvalobs::subscribe::KafkaProducer> dataSender_;
 
-
 	qabase::LogFileCreator logCreator_;
-	milog::LogLevel  logLevel_;
+};
+
+class QaWorkLoop
+{
+public:
+	QaWorkLoop(QaBaseApp & app, const qabase::Configuration & config);
+	void operator()();
+private:
+	QaWork work_;
+	QaBaseApp & app;
+	milog::LogLevel logLevel_;
 };
 
 #endif

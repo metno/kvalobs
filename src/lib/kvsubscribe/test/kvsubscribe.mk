@@ -10,7 +10,6 @@ kvsubscribetest_LDADD = libkvalobs_kvsubscribe.la $(BOOST_DATE_TIME_LIB) $(gmock
 endif # HAVE_GMOCK
 
 kvsubscribetest_SOURCES = \
-    test/test.cpp \
-    test/NotificationTest.cpp
+    test/test.cpp
 
 EXTRA_DIST = $(kvsubscribetest_SOURCES)

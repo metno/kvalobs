@@ -60,7 +60,7 @@ public:
 	KvalobsData();
 
 	KvalobsData(const std::list<kvData> & data,
-			const std::list<kvTextData> & tdata);
+			const std::list<kvTextData> & tdata = std::list<kvTextData>());
 
 	~KvalobsData();
 

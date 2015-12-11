@@ -65,12 +65,12 @@ public:
     typedef std::function<void(const ::kvalobs::serialize::KvalobsData &)> Handler;
 
 
-    DataSubscriber(Handler handler, ConsumptionStart startAt = Stored, const std::string & brokers = "localhost");
+    DataSubscriber(Handler handler, const std::string & domain, ConsumptionStart startAt = Stored, const std::string & brokers = "localhost");
 
     /**
      * The identifying string for this message stream
      */
-    static std::string topic();
+    static std::string topic(const std::string & domain);
 
 protected:
 

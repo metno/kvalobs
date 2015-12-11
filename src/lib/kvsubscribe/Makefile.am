@@ -6,13 +6,11 @@ libkvalobs_kvsubscribe_la_CPPFLAGS = \
 	$(libxmlpp_CFLAGS) 
 
 libkvalobs_kvsubscribe_la_SOURCES = \
-	Notification.cpp \
+	queue.cpp \
 	KafkaConsumer.cpp \
 	DataSubscriber.cpp \
-	NotificationSubscriber.cpp \
 	KafkaProducer.cpp \
-	DataProducer.cpp \
-	NotificationProducer.cpp
+	DataProducer.cpp
 	
 libkvalobs_kvsubscribe_la_LIBADD = ../decodeutility/libkvalobs_decodeutility.la $(jsoncpp_LIBS) $(rdkafka_LIBS)
 
@@ -20,13 +18,10 @@ kvsubscribeincludedir = $(pkgincludedir)/kvsubscribe
 	
 kvsubscribeinclude_HEADERS = \
 	queue.h \
-	Notification.h \
 	KafkaConsumer.h \
-	NotificationSubscriber.h \
 	DataSubscriber.h \
 	KafkaProducer.h \
-	DataProducer.h \
-	NotificationProducer.h
+	DataProducer.h
 
 
 pkgconfigdir = $(libdir)/pkgconfig
