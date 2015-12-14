@@ -57,9 +57,20 @@
       "type": "cppcheck",
       "include": [
         "(\\.cpp$)",
+        "(\\.cc$)",
         "(\\.c$)",
-        "(\\.h$)",
-        "(\\.hpp$)"
+        "(\\.hpp$)",
+        "(\\.h$)"
+      ]
+    },
+    "googleccplint": {
+      "type": "googlecpplint",
+      "include": [
+        "(\\.cpp$)",
+        "(\\.cc$)",
+        "(\\.c$)",
+        "(\\.hpp$)",
+        "(\\.h$)"
       ]
     }
   }
