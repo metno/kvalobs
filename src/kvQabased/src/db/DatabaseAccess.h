@@ -68,7 +68,7 @@ public:
 	virtual ~DatabaseAccess() {};
 
 	/**
-	 * Is it neccessry to call commit in order to save changes?
+	 * Is it necessary to call commit in order to save changes?
 	 */
 	virtual bool commitIsNeccessary() const { return false; }
 
@@ -86,6 +86,10 @@ public:
 	 * Undo any changes since last commit. If commitIsNeccessary() returns false, this will have no effect.
 	 */
 	virtual void rollback() {}
+
+	virtual void markProcessStart(const kvalobs::kvStationInfo & si) =0;
+
+	virtual void markProcessDone(const kvalobs::kvStationInfo & si) =0;
 
 	typedef std::vector<kvalobs::kvChecks> CheckList;
 	/**

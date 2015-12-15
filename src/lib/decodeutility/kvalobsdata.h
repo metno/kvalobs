@@ -35,9 +35,11 @@
 #include <string>
 #include <map>
 #include <list>
+#include <set>
 #include <utility>
 #include <kvalobs/kvDataFlag.h>
 #include <kvalobs/kvRejectdecode.h>
+#include <kvalobs/kvStationInfo.h>
 
 namespace kvalobs
 {
@@ -201,6 +203,11 @@ public:
 	{
 		return obs_;
 	}
+
+	/**
+	 * Get the set of station/typeid/obstime contained here. Does not include rejected data
+	 */
+	std::set<kvalobs::kvStationInfo> summary() const;
 
 private:
 	bool overwrite_;

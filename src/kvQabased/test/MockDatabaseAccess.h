@@ -37,6 +37,10 @@
 class MockDatabaseAccess : public db::DatabaseAccess
 {
 public:
+	MOCK_METHOD1(markProcessStart, void (const kvalobs::kvStationInfo & si));
+
+	MOCK_METHOD1(markProcessDone, void (const kvalobs::kvStationInfo & si));
+
 	MOCK_CONST_METHOD2(getChecks, void (CheckList * out, const kvalobs::kvStationInfo & si));
 
 	MOCK_CONST_METHOD1(getQcxFlagPosition, int (const std::string & qcx));

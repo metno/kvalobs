@@ -73,6 +73,15 @@ public:
 		baseImplementation_->rollback();
 	}
 
+	virtual void markProcessStart(const kvalobs::kvStationInfo & si)
+	{
+		baseImplementation_->markProcessStart(si);
+	}
+
+	virtual void markProcessDone(const kvalobs::kvStationInfo & si)
+	{
+		baseImplementation_->markProcessDone(si);
+	}
 
 	virtual void getChecks(CheckList * out, const kvalobs::kvStationInfo & si) const
 	{

@@ -109,6 +109,15 @@ inline bool operator !=(const kvStationInfo & a, const kvStationInfo & b)
 	return not operator ==(a, b);
 }
 
+inline bool operator <(const kvStationInfo & a, const kvStationInfo & b)
+{
+	if ( a.stationID() != b.stationID() )
+		return a.stationID() < b.stationID();
+	if ( a.obstime() != b.obstime() )
+		return a.obstime() < b.obstime();
+	return a.typeID() < b.typeID();
+}
+
 /** @} */
 }
 ;

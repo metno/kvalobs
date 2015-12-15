@@ -122,6 +122,8 @@ public:
 		return runLogFile_;
 	}
 
+	const std::string & kafkaDomain() const { return kafkaDomain_; }
+	const std::string & kafkaBrokers() const { return kafkaBrokers_; }
 	std::shared_ptr<kvalobs::subscribe::KafkaProducer> kafkaProducer() const;
 
 	/**

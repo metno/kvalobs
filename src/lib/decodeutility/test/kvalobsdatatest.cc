@@ -152,3 +152,20 @@ TEST_F(KvalobsDataTest, testInvalidate)
   EXPECT_EQ( tp, i.typeID );
   EXPECT_EQ( ot, i.obstime );
 }
+
+TEST_F(KvalobsDataTest, testSummary)
+{
+	kvalobs::kvDataFactory f( 42, boost::posix_time::time_from_string("2006-04-26 06:00:00"), 302 );
+	kvData d = f.getData(  0.1, 110 );
+	data.insert( d );
+
+	const std::set<kvalobs::kvStationInfo> & si = data.summary();
+
+	ASSERT_EQ(1u, si.size());
+
+	const kvalobs::kvStationInfo & s = * si.begin();
+
+	EXPECT_EQ(42, s.stationID());
+	EXPECT_EQ(boost::posix_time::time_from_string("2006-04-26 06:00:00"), s.obstime());
+	EXPECT_EQ(302, s.typeID());
+}

@@ -170,6 +170,19 @@ void KvalobsData::getInvalidate(std::list<InvalidateSpec> & invSpec)
 	}
 }
 
+std::set<kvalobs::kvStationInfo> KvalobsData::summary() const
+{
+	std::set<kvalobs::kvStationInfo> ret;
+
+	using namespace internal;
+	for (Observations::const_iterator s = obs_.begin(); s != obs_.end(); ++s)
+		for (StationID::const_iterator t = s->begin(); t != s->end(); ++t)
+			for (TypeID::const_iterator o = t->begin(); o != t->end(); ++o)
+				ret.insert(kvalobs::kvStationInfo(s->get(), o->get(), t->get()));
+
+	return ret;
+}
+
 }
 
 }

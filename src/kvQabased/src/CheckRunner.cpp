@@ -28,6 +28,7 @@
  */
 
 #include "CheckRunner.h"
+#include "db/KvalobsDatabaseAccess.h"
 #include <scriptcreate/KvalobsCheckScript.h>
 #include <db/DelayedSaveDatabaseAccess.h>
 #include <db/CachedDatabaseAccess.h>
@@ -42,10 +43,18 @@
 namespace qabase
 {
 
-CheckRunner::CheckRunner(db::DatabaseAccess & database) :
-		      db_(& database)
+CheckRunner::CheckRunner(std::shared_ptr<db::DatabaseAccess> database) :
+		      db_(database)
 {
 }
+
+std::shared_ptr<CheckRunner> CheckRunner::create(const std::string & dbConnect)
+{
+	LOGDEBUG("Connecting to database: " << dbConnect);
+	auto db = std::make_shared<db::KvalobsDatabaseAccess>(dbConnect);
+	return std::make_shared<qabase::CheckRunner>(db);
+}
+
 
 CheckRunner::~CheckRunner()
 {
@@ -171,6 +180,8 @@ CheckRunner::DataListPtr CheckRunner::newObservation(const kvalobs::kvStationInf
    LOGINFO("Checking " << obs);
    start = miutil::gettimeofday();
 
+   markStart_(obs);
+
    // Will try up to nRetry*nRetry times in case of error
    try
    {
@@ -198,6 +209,7 @@ CheckRunner::DataListPtr CheckRunner::newObservation(const kvalobs::kvStationInf
 					{
 					   DataListPtr ret = checkObservation(obs, scriptLog);
 					   logTransaction( true, start, nShortRetries, nLongRetries, aborted );
+					   markStop_(obs);
 					   return ret;
 					}
 					catch (dnmi::db::SQLSerializeError & )
@@ -218,6 +230,7 @@ CheckRunner::DataListPtr CheckRunner::newObservation(const kvalobs::kvStationInf
       // final attempt:
       DataListPtr ret = checkObservation(obs, scriptLog);
       logTransaction( true, start, nShortRetries, nLongRetries, aborted );
+      markStop_(obs);
       return ret;
    }
    catch ( std::exception & e )
@@ -229,9 +242,27 @@ CheckRunner::DataListPtr CheckRunner::newObservation(const kvalobs::kvStationInf
    return DataListPtr(new DataList); // never reached
 }
 
+void CheckRunner::markStart_(const kvalobs::kvStationInfo & si)
+{
+	if ( shouldMarkStartAndStop_() )
+		db_->markProcessStart(si);
+}
+
+void CheckRunner::markStop_(const kvalobs::kvStationInfo & si)
+{
+	if ( shouldMarkStartAndStop_() )
+		db_->markProcessDone(si);
+}
+
+bool CheckRunner::shouldMarkStartAndStop_()
+{
+	// Will not update working tables if only parts of checks are run
+	return qcxFilter_.empty();
+}
+
 CheckRunner::DataListPtr CheckRunner::checkObservation(const kvalobs::kvStationInfo & obs, std::ostream * scriptLog)
 {
-   db::CachedDatabaseAccess cdb(db_, obs);
+   db::CachedDatabaseAccess cdb(db_.get(), obs);
    db::DelayedSaveDatabaseAccess db(& cdb);
    AutoRollbackTransaction transaction(db);
 

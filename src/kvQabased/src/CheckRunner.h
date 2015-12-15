@@ -66,7 +66,10 @@ public:
 	 * will itself take care of database caching, so from here there is no
 	 * point in thinking of that.
 	 */
-	explicit CheckRunner(db::DatabaseAccess & database);
+	explicit CheckRunner(std::shared_ptr<db::DatabaseAccess> database);
+
+	static std::shared_ptr<CheckRunner> create(const std::string & dbConnect);
+
 	~CheckRunner();
 
 	typedef std::list<kvalobs::kvData> DataList;
@@ -110,6 +113,10 @@ public:
 			const db::DatabaseAccess::ParameterList & expectedParameters) const;
 
 private:
+	void markStart_(const kvalobs::kvStationInfo & si);
+	void markStop_(const kvalobs::kvStationInfo & si);
+	bool shouldMarkStartAndStop_();
+
 	DataListPtr checkObservation(const kvalobs::kvStationInfo & obs, std::ostream * scriptLog);
 
 	bool shouldRunAnyChecks(const kvalobs::kvStationInfo & obs) const;
@@ -122,7 +129,7 @@ private:
 
 	bool haveAnyHqcCorrectedElements(const db::DatabaseAccess::DataList & observationData) const;
 
-	db::DatabaseAccess * db_;
+	std::shared_ptr<db::DatabaseAccess> db_;
 
 	// If this is nonempty, only qcx checks listed here will run
 	std::set<std::string> qcxFilter_;

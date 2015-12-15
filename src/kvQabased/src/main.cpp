@@ -28,11 +28,12 @@
 */
 
 #include "Configuration.h"
+#include "CheckRequestConsumer.h"
 #include "CheckRunner.h"
+#include "DataProcessor.h"
 #include "scriptcreate/KvalobsCheckScript.h"
 #include "Exception.h"
 #include "LogFileCreator.h"
-#include <corbalistener/corbaMain.h>
 #include "db/KvalobsDatabaseAccess.h"
 #include <decodeutility/kvalobsdata.h>
 #include <decodeutility/kvalobsdataserializer.h>
@@ -41,6 +42,7 @@
 #include <milog/milog.h>
 #include <milog/FLogStream.h>
 #include <boost/lexical_cast.hpp>
+#include <csignal>
 
 
 /**
@@ -89,19 +91,9 @@ using namespace boost::program_options;
 
 namespace
 {
-
-void runChecks(qabase::CheckRunner & checkRunner, const qabase::Configuration & config)
+void terminate(int /*signal*/)
 {
-	qabase::LogFileCreator logCreator(config.baseLogDir());
-
-	qabase::LogFileCreator::LogStreamPtr logStream = logCreator.getLogStream(* config.observationToCheck());
-	qabase::CheckRunner::DataListPtr data = checkRunner.newObservation(* config.observationToCheck(), logStream.get());
-
-	kvalobs::serialize::KvalobsData d(* data);
-
-	auto dataSender = config.kafkaProducer();
-	dataSender->send(kvalobs::serialize::KvalobsDataSerializer::serialize(d));
-	dataSender->catchup(1000);
+	kvalobs::subscribe::KafkaConsumer::stopAll();
 }
 }
 
@@ -134,21 +126,22 @@ int main(int argc, char ** argv)
 
 		if ( config.haveObservationToCheck() )
 		{
-			const kvalobs::kvStationInfo * observationToCheck = config.observationToCheck();
-
-			std::string dbConnect = config.databaseConnectString();
-
-			LOGDEBUG("Connecting to database: " << dbConnect);
-			db::KvalobsDatabaseAccess db(dbConnect);
-			qabase::CheckRunner checkRunner(db);
+			auto checkRunner = qabase::CheckRunner::create(config.databaseConnectString());
 
 			if ( config.onlySpecificQcx() )
-				checkRunner.setQcxFilter(config.qcxFilter().begin(), config.qcxFilter().end());
+				checkRunner->setQcxFilter(config.qcxFilter().begin(), config.qcxFilter().end());
 
-			runChecks(checkRunner, config);
+			qabase::DataProcessor processor(checkRunner, config);
+			processor.process(* config.observationToCheck());
 		}
 		else
-			return corbaMain(argc, argv, config);
+		{
+			signal(SIGINT, terminate);
+			signal(SIGKILL, terminate);
+
+			qabase::CheckRequestConsumer consumer(config);
+			consumer.run();
+		}
 	}
 	catch ( std::exception & e )
 	{

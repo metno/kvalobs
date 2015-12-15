@@ -45,22 +45,26 @@ class CheckRunnerTest: public testing::Test
 public:
 	CheckRunnerTest() :
 		observation(10, boost::posix_time::time_from_string("2010-05-12 06:00:00"), 302),
-		factory    (10, boost::posix_time::time_from_string("2010-05-12 06:00:00"), 302)
+		factory    (10, boost::posix_time::time_from_string("2010-05-12 06:00:00"), 302),
+		runner     (nullptr)
 	{
 	}
 protected:
 	virtual void SetUp()
 	{
-		database.setDefaultActions();
+		auto db = std::make_shared<MockDatabaseAccess>();
+		db->setDefaultActions();
+		database = db;
 		runner = new CheckRunner(database);
 	}
 
 	virtual void TearDown()
 	{
 		delete runner;
+		database.reset();
 	}
 
-	MockDatabaseAccess database;
+	std::shared_ptr<MockDatabaseAccess> database;
 	CheckRunner * runner;
 	kvalobs::kvStationInfo observation;
 	kvalobs::kvDataFactory factory;
@@ -79,14 +83,14 @@ TEST_F(CheckRunnerTest, resetsFlagsBeforeCheck)
 	// Data has lots of rubbish flags, but fagg=1 fmis=3 fd=2 and fpre=7
 	// fagg and fmis flags should be preserved, and fmis should also be preserved if it equals 7
 	dataFromDatabase.front().controlinfo(kvalobs::kvControlInfo("1999993999992790"));
-	EXPECT_CALL(database, getData(_, observation, qabase::DataRequirement::Parameter("RR_24"), 0))
+	EXPECT_CALL(*database, getData(_, observation, qabase::DataRequirement::Parameter("RR_24"), 0))
 			.Times(AtLeast(1))
 			.WillRepeatedly(SetArgumentPointee<0>(dataFromDatabase));
 
 	// TAM_24 have got another typeid, and will not be used
 	kvalobs::kvDataFactory factory2(factory.stationID(), factory.obstime(), factory.typeID() +1);
 	db::DatabaseAccess::DataList taData = boost::assign::list_of(factory2.getData(23.0, 211));
-	EXPECT_CALL(database, getData(_, observation, qabase::DataRequirement::Parameter("TAM_24"), 0))
+	EXPECT_CALL(*database, getData(_, observation, qabase::DataRequirement::Parameter("TAM_24"), 0))
 			.Times(AtLeast(1))
 			.WillRepeatedly(SetArgumentPointee<0>(taData));
 
@@ -101,13 +105,13 @@ TEST_F(CheckRunnerTest, resetsFlagsBeforeCheck)
 	// new flag < old flag). Since data have not been changed, it will not be
 	// written to database.
 
-	EXPECT_CALL(database, write(expectedScriptReturn))
+	EXPECT_CALL(*database, write(expectedScriptReturn))
 			.Times(1);
 
 	runner->newObservation(observation);
 
-	ASSERT_EQ(1u, database.savedData().size());
-	const kvalobs::kvData & returnFromScript = * database.savedData().begin();
+	ASSERT_EQ(1u, database->savedData().size());
+	const kvalobs::kvData & returnFromScript = * database->savedData().begin();
 
 	kvalobs::kvData expectedData = expectedScriptReturn.front();
 	kvalobs::kvUseInfo ui = expectedData.useinfo();
@@ -124,12 +128,12 @@ TEST_F(CheckRunnerTest, uncheckedObservationDataUpdatesUseinfo)
 	using namespace testing;
 
 	db::DatabaseAccess::CheckList checks; // empty check list
-	EXPECT_CALL(database, getChecks(_, observation))
+	EXPECT_CALL(*database, getChecks(_, observation))
 			.Times(AtLeast(1))
 			.WillRepeatedly(SetArgumentPointee<0>(checks));
 
 	db::DatabaseAccess::ParameterList expectedParameters = boost::assign::list_of("RR_24");
-	EXPECT_CALL(database, getParametersToCheck(_, observation))
+	EXPECT_CALL(*database, getParametersToCheck(_, observation))
 			.Times(AtLeast(1))
 			.WillRepeatedly(SetArgumentPointee<0>(expectedParameters));
 
@@ -140,7 +144,7 @@ TEST_F(CheckRunnerTest, uncheckedObservationDataUpdatesUseinfo)
 
 	//getData(DataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const;
 	db::DatabaseAccess::DataList databaseReturn = boost::assign::list_of(expected);
-	EXPECT_CALL(database, getData(_, observation, qabase::DataRequirement::Parameter("RR_24"), 0))
+	EXPECT_CALL(*database, getData(_, observation, qabase::DataRequirement::Parameter("RR_24"), 0))
 			.Times(AtLeast(1))
 			.WillRepeatedly(SetArgumentPointee<0>(databaseReturn));
 
@@ -151,14 +155,14 @@ TEST_F(CheckRunnerTest, uncheckedObservationDataUpdatesUseinfo)
 
 	db::DatabaseAccess::DataList expectedScriptReturn = boost::assign::list_of(expected);
 
-	EXPECT_CALL(database, write(expectedScriptReturn))
+	EXPECT_CALL(*database, write(expectedScriptReturn))
 			.Times(AtLeast(1));
 
 	runner->newObservation(observation);
 
 
-	ASSERT_EQ(1u, database.savedData().size());
-	const kvalobs::kvData & returnFromScript = * database.savedData().begin();
+	ASSERT_EQ(1u, database->savedData().size());
+	const kvalobs::kvData & returnFromScript = * database->savedData().begin();
 
 	kvalobs::kvData expectedData = expectedScriptReturn.front();
 	expectedData.useinfo(ui);
@@ -177,12 +181,12 @@ TEST_F(CheckRunnerTest, skipsHqcCorrectedData)
 			boost::assign::list_of
 			(factory.getData(6.0, 110));
 	dataFromDatabase.front().controlinfo(kvalobs::kvControlInfo("0000000000000001"));
-	EXPECT_CALL(database, getData(_, observation, qabase::DataRequirement::Parameter("RR_24"), 0))
+	EXPECT_CALL(*database, getData(_, observation, qabase::DataRequirement::Parameter("RR_24"), 0))
 			.Times(AtLeast(1))
 			.WillRepeatedly(SetArgumentPointee<0>(dataFromDatabase));
-	EXPECT_CALL(database, getData(_, observation, qabase::DataRequirement::Parameter("TAM_24"), 0))
+	EXPECT_CALL(*database, getData(_, observation, qabase::DataRequirement::Parameter("TAM_24"), 0))
 			.Times(AtLeast(1));
-	EXPECT_CALL(database, write(_))
+	EXPECT_CALL(*database, write(_))
 				.Times(0);
 
 	runner->newObservation(observation);
@@ -195,21 +199,21 @@ TEST_F(CheckRunnerTest, reusesResultsFromOtherChecks)
 	db::DatabaseAccess::CheckList checks;
 	checks.push_back(kvalobs::kvChecks(10, "QC1-2-101", "QC1-2", 1, "foo", "obs;RR_24;;", "* * * * *", boost::posix_time::time_from_string("2010-01-01 00:00:00")));
 	checks.push_back(kvalobs::kvChecks(10, "QC1-3-101", "QC1-3", 1, "foo", "obs;RR_24;;", "* * * * *", boost::posix_time::time_from_string("2010-01-01 00:00:00")));
-	EXPECT_CALL(database, getChecks(_, observation))
+	EXPECT_CALL(*database, getChecks(_, observation))
 			.Times(AtLeast(1))
 			.WillRepeatedly(SetArgumentPointee<0>(checks));
 
 	db::DatabaseAccess::DataList expectedScriptReturn = boost::assign::list_of(factory.getData(6.0, 110));
 	expectedScriptReturn.front().controlinfo(kvalobs::kvControlInfo("0044000000000000"));
 	expectedScriptReturn.front().cfailed("QC1-2-101,QC1-3-101");
-	EXPECT_CALL(database, write(expectedScriptReturn))
+	EXPECT_CALL(*database, write(expectedScriptReturn))
 			.Times(AtLeast(1));
 
 
 	runner->newObservation(observation);
 
-	ASSERT_EQ(1u, database.savedData().size());
-	const kvalobs::kvData & returnFromScript = * database.savedData().begin();
+	ASSERT_EQ(1u, database->savedData().size());
+	const kvalobs::kvData & returnFromScript = * database->savedData().begin();
 
 	kvalobs::kvData expectedData = expectedScriptReturn.front();
 	kvalobs::kvUseInfo ui = expectedData.useinfo();
@@ -245,13 +249,13 @@ TEST_F(CheckRunnerTest, runCheckWithOneParameterAtOddLevel)
 	expectedWrite.push_back(rr);
 	expectedWrite.push_back(tam);
 
-	EXPECT_CALL(database, getData(_, observation, qabase::DataRequirement::Parameter("RR_24"), 0))
+	EXPECT_CALL(*database, getData(_, observation, qabase::DataRequirement::Parameter("RR_24"), 0))
 			.Times(AtLeast(1))
 			.WillRepeatedly(SetArgumentPointee<0>(rrFromDatabase));
-	EXPECT_CALL(database, getData(_, observation, qabase::DataRequirement::Parameter("TAM_24"), 0))
+	EXPECT_CALL(*database, getData(_, observation, qabase::DataRequirement::Parameter("TAM_24"), 0))
 			.Times(AtLeast(1))
 			.WillRepeatedly(SetArgumentPointee<0>(tamFromDatabase));
-	EXPECT_CALL(database, write(expectedWrite))
+	EXPECT_CALL(*database, write(expectedWrite))
 				.Times(1);
 
 	runner->newObservation(observation);
@@ -262,7 +266,7 @@ TEST_F(CheckRunnerTest, runCheckWithOneParameterAtOddLevel)
 TEST_F(CheckRunnerTest, runDecision)
 {
 	db::DatabaseAccess::ParameterList expectedParameters;
-	database.getParametersToCheck(& expectedParameters, observation);
+	database->getParametersToCheck(& expectedParameters, observation);
 
 	ASSERT_TRUE(expectedParameters.find("RR_24") != expectedParameters.end()) << "Check precondition error";
 
@@ -276,7 +280,7 @@ TEST_F(CheckRunnerTest, runDecision)
 TEST_F(CheckRunnerTest, willNotRunChecksWithoutAnyExpectedParametersForTypeid)
 {
 	db::DatabaseAccess::ParameterList expectedParameters;
-	database.getParametersToCheck(& expectedParameters, observation);
+	database->getParametersToCheck(& expectedParameters, observation);
 
 	ASSERT_TRUE(expectedParameters.find("TAM") == expectedParameters.end()) << "Check precondition error";
 
@@ -290,7 +294,7 @@ TEST_F(CheckRunnerTest, willNotRunChecksWithoutAnyExpectedParametersForTypeid)
 TEST_F(CheckRunnerTest, runCheckWithOneButNotAllParametersExpectedForTypeid)
 {
 	db::DatabaseAccess::ParameterList expectedParameters;
-	database.getParametersToCheck(& expectedParameters, observation);
+	database->getParametersToCheck(& expectedParameters, observation);
 
 	ASSERT_TRUE(expectedParameters.find("RR_24") != expectedParameters.end()) << "Check precondition error";
 	ASSERT_TRUE(expectedParameters.find("TAM") == expectedParameters.end()) << "Check precondition error";
@@ -305,7 +309,7 @@ TEST_F(CheckRunnerTest, runCheckWithOneButNotAllParametersExpectedForTypeid)
 TEST_F(CheckRunnerTest, respectsChecksActiveColumn)
 {
 	db::DatabaseAccess::ParameterList expectedParameters;
-	database.getParametersToCheck(& expectedParameters, observation);
+	database->getParametersToCheck(& expectedParameters, observation);
 
 	ASSERT_TRUE(expectedParameters.find("RR_24") != expectedParameters.end()) << "Check precondition error";
 
@@ -319,7 +323,7 @@ TEST_F(CheckRunnerTest, respectsChecksActiveColumn)
 TEST_F(CheckRunnerTest, skipChecksForMissingParameters)
 {
 	db::DatabaseAccess::ParameterList expectedParameters;
-	database.getParametersToCheck(& expectedParameters, observation);
+	database->getParametersToCheck(& expectedParameters, observation);
 
 	ASSERT_TRUE(expectedParameters.find("TA_24") == expectedParameters.end()) << "Check precondition error";
 
@@ -333,7 +337,7 @@ TEST_F(CheckRunnerTest, skipChecksForMissingParameters)
 TEST_F(CheckRunnerTest, checkShipsEvenIfParameterMissingInObsPgm)
 {
 	db::DatabaseAccess::ParameterList expectedParameters;
-	database.getParametersToCheck(& expectedParameters, observation);
+	database->getParametersToCheck(& expectedParameters, observation);
 
 	ASSERT_TRUE(expectedParameters.find("TA_24") == expectedParameters.end()) << "Check precondition error";
 
@@ -355,18 +359,18 @@ TEST_F(CheckRunnerTest, skipsChecksWhereAllParametersAreFromOtherTypeId)
 	db::DatabaseAccess::DataList dataFromDatabase = boost::assign::list_of(factory.getData(6.0, 110));
 
 	// Returned data will have typeid 304
-	EXPECT_CALL(database, getData(_, observation, qabase::DataRequirement::Parameter("RR_24"), 0))
+	EXPECT_CALL(*database, getData(_, observation, qabase::DataRequirement::Parameter("RR_24"), 0))
 			.Times(AtLeast(1))
 			.WillRepeatedly(SetArgumentPointee<0>(dataFromDatabase));
 
-	EXPECT_CALL(database, getData(_, observation, qabase::DataRequirement::Parameter("TAM_24"), 0))
+	EXPECT_CALL(*database, getData(_, observation, qabase::DataRequirement::Parameter("TAM_24"), 0))
 			.Times(AtLeast(1));
 
 	db::DatabaseAccess::DataList expectedScriptReturn = boost::assign::list_of(factory.getData(6.0, 110));
 	expectedScriptReturn.front().controlinfo(kvalobs::kvControlInfo("1040003000000000"));
 	expectedScriptReturn.front().cfailed("QC1-2-101"); // QC1-2-101 is the default qcx return from fake database
 
-	EXPECT_CALL(database, write(expectedScriptReturn))
+	EXPECT_CALL(*database, write(expectedScriptReturn))
 			.Times(0);
 
 	runner->newObservation(observation);

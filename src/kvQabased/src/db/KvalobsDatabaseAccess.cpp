@@ -174,6 +174,34 @@ void KvalobsDatabaseAccess::rollback()
 	connection_->rollback();
 }
 
+void KvalobsDatabaseAccess::markProcessStart(const kvalobs::kvStationInfo & si)
+{
+	std::ostringstream query;
+	query << "UPDATE workque SET qa_start=statement_timestamp() WHERE ";
+	query << "stationid=" << si.stationID();
+	query << " AND typeid=" << si.typeID();
+	query << " AND obstime='" << to_kvalobs_string(si.obstime()) << "'";
+
+	milog::LogContext context("query");
+	LOGDEBUG1(query.str());
+
+	connection_->exec(query.str());
+}
+
+void KvalobsDatabaseAccess::markProcessDone(const kvalobs::kvStationInfo & si)
+{
+	std::ostringstream query;
+	query << "UPDATE workque SET qa_stop=statement_timestamp() WHERE ";
+	query << "stationid=" << si.stationID();
+	query << " AND typeid=" << si.typeID();
+	query << " AND obstime='" << to_kvalobs_string(si.obstime()) << "'";
+
+	milog::LogContext context("query");
+	LOGDEBUG1(query.str());
+
+	connection_->exec(query.str());
+}
+
 void KvalobsDatabaseAccess::getChecks(CheckList * out,
 		const kvalobs::kvStationInfo & si) const
 {

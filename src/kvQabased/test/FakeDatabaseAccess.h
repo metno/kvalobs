@@ -39,6 +39,10 @@ public:
 	FakeDatabaseAccess();
 	virtual ~FakeDatabaseAccess();
 
+	virtual void markProcessStart(const kvalobs::kvStationInfo & si) {}
+
+	virtual void markProcessDone(const kvalobs::kvStationInfo & si) {}
+
 	virtual void getChecks(CheckList * out, const kvalobs::kvStationInfo & si) const;
 
 	virtual int getQcxFlagPosition(const std::string & qcx) const;
