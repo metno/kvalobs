@@ -15,6 +15,7 @@ libkvalobs_kvalobs_la_SOURCES = \
 	kvData.cc \
 	paramlist.cc \
 	kvapp.cc \
+	kvbaseapp.cc \
 	bitmanip.cc \
 	kvDbBase.cc \
 	kvTypes.cc \
@@ -80,6 +81,7 @@ kvalobsinclude_HEADERS = \
 	kvData.h \
 	paramlist.h \
 	kvapp.h \
+	kvbaseapp.h \
 	bitmanip.h \
 	kvDbBase.h \
 	kvTypes.h \
