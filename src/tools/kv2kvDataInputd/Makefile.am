@@ -15,8 +15,10 @@ kv2kvDataInputd_CPPFLAGS = -D_REENTRANT \
                   $(omniORB4_CFLAGS)  \
                   $(putools_CFLAGS)  
 kv2kvDataInputd_LDFLAGS = -pthread 
-kv2kvDataInputd_LDADD = $(top_builddir)/src/service-libs/kvcpp/libkvalobs_kvcpp.la \
-                $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
+kv2kvDataInputd_LDADD = \
+		$(top_builddir)/src/service-libs/kvcpp/libkvalobs_kvcpp.la \
+		$(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
+		$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
 		$(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
 		$(top_builddir)/src/lib/milog/libkvalobs_milog.la \
 		$(top_builddir)/src/lib/corbahelper/libkvalobs_corbahelper.la \

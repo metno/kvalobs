@@ -56,25 +56,14 @@ getTextData( TextData &textData, const boost::posix_time::ptime &tbtime )const
 {
 	int n=0;
 	textData.clear();
-	const Observations &obs_ = data_->obs();
+	std::list<kvalobs::kvTextData> td;
+	data_->data(td, true, tbtime);
 
-	for (Observations::const_iterator s = obs_.begin(); s != obs_.end(); ++s)
-	{
-		for (StationID::const_iterator t = s->begin(); t != s->end(); ++t)
-		{
-			for (TypeID::const_iterator o = t->begin(); o != t->end(); ++o)
-			{
-				for (Container<TextDataItem>::const_iterator param =
-						o->textData.begin(); param != o->textData.end(); ++param)
-				{
-					kvTextData d(s->get(), o->get(), param->content().original,
-							     param->paramID(), tbtime, t->get());
-					textData[s->get()][t->get()][o->get()].push_back(d);
-					n++;
-				}
-			}
-		}
+	for( auto &&elem: td) {
+	  textData[elem.stationID()][elem.typeID()][elem.obstime()].push_back(elem);
+	  ++n;
 	}
+
 	return n;
 }
 
@@ -83,42 +72,15 @@ KvDataContainer::
 getData( Data &data, const boost::posix_time::ptime &tbtime )const
 {
 	int n=0;
+	std::list<kvalobs::kvData> d;
+	data_->data(d, true, tbtime);
 	data.clear();
-
-	const Observations &obs_ = data_->obs();
-
-	for (Observations::const_iterator s = obs_.begin(); s != obs_.end(); ++s)
-	{
-		for (StationID::const_iterator t = s->begin(); t != s->end(); ++t)
-		{
-			for (TypeID::const_iterator o = t->begin(); o != t->end(); ++o)
-			{
-				for (ObsTime::const_iterator sensor = o->begin(); sensor
-						!= o->end(); ++sensor)
-				{
-					for (Sensor::const_iterator level = sensor->begin(); level
-							!= sensor->end(); ++level)
-					{
-						for (Level::const_iterator param = level->begin(); param
-								!= level->end(); ++param)
-						{
-
-							const DataContent & c = param->content();
-
-							kvData d(s->get(), o->get(), c.original,
-									param->paramID(), tbtime, t->get(),
-									sensor->get(), level->get(), c.corrected,
-									c.controlinfo, c.useinfo, c.cfailed);
-
-							data[s->get()][t->get()][o->get()].push_back(d);
-							n++;
-						}
-					}
-				}
-			}
-		}
+	for( auto &&elem: d) {
+	  data[elem.stationID()][elem.typeID()][elem.obstime()].push_back(elem);
+	  ++n;
 	}
-	return n;
+
+		return n;
 }
 
 int
@@ -134,34 +96,20 @@ getTextData( TextDataByObstime &textData,
 		     int stationid, int typeId,
 		     const boost::posix_time::ptime &tbtime )const
 {
-	int n=0;
-	textData.clear();
-	const Observations &obs_ = data_->obs();
+  int n=0;
+  textData.clear();
+  std::list<kvalobs::kvTextData> td;
+  data_->data(td, true, tbtime);
 
+  for( auto &&elem: td) {
+    if( elem.stationID() != stationid || elem.typeID() != typeId)
+      continue;
 
-	Observations::const_iterator s = obs_.find( stationid );
+    textData[elem.obstime()].push_back(elem);
+    ++n;
+  }
 
-	if( s == obs_.end() )
-		return 0;
-
-	StationID::const_iterator t = s->find( typeId) ;
-	if( t == s->end() )
-		return 0;
-
-
-	for (TypeID::const_iterator o = t->begin(); o != t->end(); ++o)
-	{
-		for (Container<TextDataItem>::const_iterator param =
-			  o->textData.begin(); param != o->textData.end(); ++param)
-		{
-					kvTextData d(s->get(), o->get(), param->content().original,
-							     param->paramID(), tbtime, t->get());
-					textData[o->get()].push_back(d);
-					n++;
-		}
-	}
-
-	return n;
+  return n;
 }
 
 int
@@ -170,47 +118,20 @@ getData( DataByObstime &data,
          int stationid, int typeId,
          const boost::posix_time::ptime &tbtime )const
 {
-	int n=0;
-	data.clear();
+  int n=0;
+  data.clear();
+  std::list<kvalobs::kvData> d;
+  data_->data(d, true, tbtime);
 
-	const Observations &obs_ = data_->obs();
+  for( auto &&elem: d) {
+    if( elem.stationID() != stationid || elem.typeID() != typeId)
+      continue;
 
-	Observations::const_iterator s = obs_.find( stationid );
+    data[elem.obstime()].push_back(elem);
+    ++n;
+  }
 
-	if( s == obs_.end() )
-		return 0;
-
-
-	StationID::const_iterator t = s->find( typeId);
-	if( t == s->end() )
-		return 0;
-
-	for ( TypeID::const_iterator o = t->begin(); o != t->end(); ++o)
-	{
-		for ( ObsTime::const_iterator sensor = o->begin();
-			  sensor != o->end(); ++sensor )
-		{
-			for ( Sensor::const_iterator level = sensor->begin();
-				  level != sensor->end(); ++level)
-			{
-				for ( Level::const_iterator param = level->begin();
-					  param != level->end(); ++param )
-				{
-					const DataContent & c = param->content();
-
-					kvData d(s->get(), o->get(), c.original,
-							 param->paramID(), tbtime, t->get(),
-							 sensor->get(), level->get(), c.corrected,
-							 c.controlinfo, c.useinfo, c.cfailed);
-
-					data[o->get()].push_back(d);
-					n++;
-				}
-			}
-		}
-	}
-
-	return n;
+  return n;
 }
 
 int

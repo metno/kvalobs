@@ -41,13 +41,11 @@
 #include <kvalobs/kvRejectdecode.h>
 #include <kvalobs/kvStationInfo.h>
 
-namespace kvalobs
-{
+namespace kvalobs {
 class kvData;
 class kvTextData;
 
-namespace serialize
-{
+namespace serialize {
 
 /**
  * The content of a serialized message.
@@ -56,164 +54,207 @@ namespace serialize
  *
  * @author Vegard B�nes
  */
-class KvalobsData
-{
-public:
-	KvalobsData();
+class KvalobsData {
+ public:
+  KvalobsData();
 
-	KvalobsData(const std::list<kvData> & data,
-			const std::list<kvTextData> & tdata = std::list<kvTextData>());
+  KvalobsData(const std::list<kvData> & data,
+              const std::list<kvTextData> & tdata = std::list<kvTextData>());
 
-	~KvalobsData();
+  ~KvalobsData();
 
-	/**
-	 * True if no data is contained in this object.
-	 */
-	bool empty() const;
+  /**
+   * True if no data is contained in this object.
+   */
+  bool empty() const;
 
-	/**
-	 * Number of observations (not parameters) in this object.
-	 */
-	size_t size() const;
+  /**
+   * Number of observations (not parameters) in this object.
+   */
+  size_t size() const;
 
-	/**
-	 * Add data to object
-	 */
-	void insert(const kvalobs::kvData & d);
+  /**
+   * Add data to object
+   */
+  void insert(const kvalobs::kvData & d);
 
-	/**
-	 * Add text data to object
-	 */
-	void insert(const kvalobs::kvTextData & d);
+  /**
+   * Add text data to object
+   */
+  void insert(const kvalobs::kvTextData & d);
 
-	/**
-	 * Add data to object, from an iterator range.
-	 */
-	template<typename InputIterator>
-	void insert(InputIterator begin, InputIterator end)
-	{
-		for (; begin != end; ++begin)
-			insert(*begin);
-	}
+  /**
+   * Add data to object, from an iterator range.
+   */
+  template<typename InputIterator>
+  void insert(InputIterator begin, InputIterator end) {
+    for (; begin != end; ++begin)
+      insert(*begin);
+  }
 
-	void setMessageCorrectsThisRejection(
-			const kvalobs::kvRejectdecode & previouslyRejectedMessage)
-	{
-		correctedMessages_.push_back(previouslyRejectedMessage);
-	}
+  void setMessageCorrectsThisRejection(
+      const kvalobs::kvRejectdecode & previouslyRejectedMessage) {
+    correctedMessages_.push_back(previouslyRejectedMessage);
+  }
 
-	/**
-	 * Get all data from object, with the given tbtime
-	 */
-	void getData(std::list<kvalobs::kvData> & out,
-			const boost::posix_time::ptime & tbtime = boost::posix_time::ptime()) const;
+  /**
+   * Get all data from object, with the given tbtime
+   */
+  void getData(std::list<kvalobs::kvData> & out,
+               const boost::posix_time::ptime & tbtime =
+                   boost::posix_time::ptime()) const {
+    data(out, true, tbtime);
+  }
 
-	/**
-	 * Get all text data from object, with the given tbtime
-	 */
-	void getData(std::list<kvalobs::kvTextData> & out,
-			const boost::posix_time::ptime & tbtime = boost::posix_time::ptime()) const;
+  /**
+   * Get all text data from object, with the given tbtime
+   */
+  void getData(std::list<kvalobs::kvTextData> & out,
+               const boost::posix_time::ptime & tbtime =
+                   boost::posix_time::ptime()) const {
+    data(out, true, tbtime);
+  }
 
-	/**
-	 * Get all data and text datafrom object, with the given tbtime
-	 */
-	void getData(std::list<kvalobs::kvData> & out1, std::list<
-			kvalobs::kvTextData> & out2, const boost::posix_time::ptime & tbtime =
-			boost::posix_time::ptime()) const
-	{
-            getData(out1, tbtime);
-            getData(out2, tbtime);
-	}
+  /**
+   * Get all data and text datafrom object, with the given tbtime
+   */
+  void getData(std::list<kvalobs::kvData> & out1,
+               std::list<kvalobs::kvTextData> & out2,
+               const boost::posix_time::ptime & tbtime =
+                   boost::posix_time::ptime()) const {
+    data(out1, out2, true, tbtime);
+  }
 
-	typedef std::vector<kvalobs::kvRejectdecode> RejectList;
-	void getRejectedCorrections(RejectList & out) const
-	{
-		out = correctedMessages_;
-	}
+  /**
+   * Get all data from object.
+   *
+   * @param setTbtime if true set the \em tbtime to the value of the input
+   * parameter tbtime.
+   * @param tbtime The value to set tbtime to.
+   */
+  void data(std::list<kvalobs::kvData> & out, bool setTbtime = false,
+            const boost::posix_time::ptime & tbtime =
+                boost::posix_time::ptime()) const;
 
-	/**
-	 * Set overwrite specification
-	 *
-	 * Shall the kvalobs decoder ignore and overwrite any values in the database?
-	 */
-	void overwrite(bool doit)
-	{
-		overwrite_ = doit;
-	}
+  /**
+   * Get all text data from object.
+   *
+   * @param setTbtime if true set the \em tbtime to the value of the input
+   * parameter tbtime.
+   * @param tbtime The value to set tbtime to.
+   */
+  void data(std::list<kvalobs::kvTextData> & out, bool setTbtime = false,
+            const boost::posix_time::ptime & tbtime =
+                boost::posix_time::ptime()) const;
 
-	/**
-	 * Get overwrite specification
-	 *
-	 * Shall the kvalobs decoder ignore and overwrite any values in the database?
-	 */
-	bool overwrite() const
-	{
-		return overwrite_;
-	}
+  /**
+   * Get all data and text data from object.
+   *
+   * @param setTbtime if true set the \em tbtime to the value of the input
+   * parameter tbtime.
+   * @param tbtime The value to set tbtime to.
+   */
+  void data(std::list<kvalobs::kvData> & out1,
+            std::list<kvalobs::kvTextData> & out2, bool setTbtime = false,
+            const boost::posix_time::ptime & tbtime =
+                boost::posix_time::ptime()) const {
+    data(out1, setTbtime, tbtime);
+    data(out2, setTbtime, tbtime);
+  }
 
-	/**
-	 * Set invalidate specification.
-	 *
-	 * If invalidate is true, all parametes which forms a specific observation
-	 * will be rejected, before the new data is inserted.
-	 *
-	 * If overwrite() is true as well, all data will be deleted before
-	 * inserting the new values.
-	 */
-	void invalidate(bool doit, int station, int typeID,
-			const boost::posix_time::ptime & obstime);
+  typedef std::vector<kvalobs::kvRejectdecode> RejectList;
+  void getRejectedCorrections(RejectList & out) const {
+    out = correctedMessages_;
+  }
 
-	/**
-	 * Query invalidate specification. Shall the given station, typeId, and
-	 * obstime be invalidated?
-	 *
-	 * @see invalidate
-	 */
-	bool
-			isInvalidate(int station, int typeID,
-					const boost::posix_time::ptime & obstime) const;
+  /**
+   * Set overwrite specification
+   *
+   * Shall the kvalobs decoder ignore and overwrite any values in the database?
+   */
+  void overwrite(bool doit) {
+    overwrite_ = doit;
+  }
 
-	/**
-	 * Specification for what observations will be invalidated
-	 *
-	 * @see invalidate
-	 */
-	struct InvalidateSpec
-	{
-		int station;
-		int typeID;
-		boost::posix_time::ptime obstime;
-		InvalidateSpec(int st, int ty, boost::posix_time::ptime ot) :
-			station(st), typeID(ty), obstime(ot)
-		{
-		}
-	};
+  /**
+   * Get overwrite specification
+   *
+   * Shall the kvalobs decoder ignore and overwrite any values in the database?
+   */
+  bool overwrite() const {
+    return overwrite_;
+  }
 
-	/**
-	 * Get a complete list of observations to be invalidated.
-	 *
-	 * @see invalidate
-	 */
-	void getInvalidate(std::list<InvalidateSpec> & invSpec);
+  /**
+   * Remove all data and reset the overwrite flag to false.
+   */
+  void clear() {
+    overwrite_ = false;
+    obs_.clear();
+  }
 
-	/**
-	 * Const access to data holder
-	 */
-	const internal::Observations & obs() const
-	{
-		return obs_;
-	}
+  /**
+   * Set invalidate specification.
+   *
+   * If invalidate is true, all parametes which forms a specific observation
+   * will be rejected, before the new data is inserted.
+   *
+   * If overwrite() is true as well, all data will be deleted before
+   * inserting the new values.
+   */
+  void invalidate(bool doit, int station, int typeID,
+                  const boost::posix_time::ptime & obstime);
 
-	/**
-	 * Get the set of station/typeid/obstime contained here. Does not include rejected data
-	 */
-	std::set<kvalobs::kvStationInfo> summary() const;
+  /**
+   * Query invalidate specification. Shall the given station, typeId, and
+   * obstime be invalidated?
+   *
+   * @see invalidate
+   */
+  bool
+  isInvalidate(int station, int typeID,
+               const boost::posix_time::ptime & obstime) const;
 
-private:
-	bool overwrite_;
-	internal::Observations obs_;
+  /**
+   * Specification for what observations will be invalidated
+   *
+   * @see invalidate
+   */
+  struct InvalidateSpec {
+    int station;
+    int typeID;
+    boost::posix_time::ptime obstime;
+    InvalidateSpec(int st, int ty, boost::posix_time::ptime ot)
+        : station(st),
+          typeID(ty),
+          obstime(ot) {
+    }
+  };
 
-	RejectList correctedMessages_;
+  /**
+   * Get a complete list of observations to be invalidated.
+   *
+   * @see invalidate
+   */
+  void getInvalidate(std::list<InvalidateSpec> & invSpec);
+
+  /**
+   * Const access to data holder
+   */
+  const internal::Observations & obs() const {
+    return obs_;
+  }
+
+  /**
+   * Get the set of station/typeid/obstime contained here. Does not include rejected data
+   */
+  std::set<kvalobs::kvStationInfo> summary() const;
+
+ private:
+  bool overwrite_;
+  internal::Observations obs_;
+
+  RejectList correctedMessages_;
 };
 
 }

@@ -28,15 +28,16 @@ libkvalobs_decodeutility_la_SOURCES = \
 
 libkvalobs_decodeutility_la_CPPFLAGS = $(AM_CPPFLAGS) $(putools_CFLAGS) $(libxmlpp_CFLAGS) $(omniORB4_CFLAGS) $(BOOST_CPPFLAGS)
 libkvalobs_decodeutility_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@
-libkvalobs_decodeutility_la_LIBADD = $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
-                             $(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
-			                 $(top_builddir)/src/lib/milog/libkvalobs_milog.la \
-			                 $(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
-                             $(libxmlpp_LIBS) \
-                             $(omniORB4_LIBS) \
-                             $(BOOST_LDFLAGS) \
-                             $(BOOST_THREAD_LIB) \
-			     $(BOOST_SYSTEM_LIB)
+libkvalobs_decodeutility_la_LIBADD = \
+	$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
+   $(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
+	$(top_builddir)/src/lib/milog/libkvalobs_milog.la \
+	$(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
+   $(libxmlpp_LIBS) \
+   $(omniORB4_LIBS) \
+   $(BOOST_LDFLAGS) \
+   $(BOOST_THREAD_LIB) \
+	$(BOOST_SYSTEM_LIB)
 if HAVE_GMOCK
 
 TESTS = decodeutilitytest
