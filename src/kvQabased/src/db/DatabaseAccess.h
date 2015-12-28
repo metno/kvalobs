@@ -43,8 +43,7 @@
 #include <list>
 #include <set>
 
-namespace db
-{
+namespace db {
 
 /**
  * \defgroup group_db Database access
@@ -62,129 +61,144 @@ namespace db
  *
  * \ingroup group_db
  */
-class DatabaseAccess
-{
-public:
-	virtual ~DatabaseAccess() {};
+class DatabaseAccess {
+ public:
+  virtual ~DatabaseAccess() {
+  }
+  ;
 
-	/**
-	 * Is it necessary to call commit in order to save changes?
-	 */
-	virtual bool commitIsNeccessary() const { return false; }
+  /**
+   * Is it necessary to call commit in order to save changes?
+   */
+  virtual bool commitIsNeccessary() const {
+    return false;
+  }
 
-	/**
-	 * Start a new transaction. If commitIsNeccessary() returns true, this may be required for this class to work
-	 */
-	virtual void beginTransaction() {}
+  /**
+   * Start a new transaction. If commitIsNeccessary() returns true, this may be required for this class to work
+   */
+  virtual void beginTransaction() {
+  }
 
-	/**
-	 * Commit data to the data storage. If commitIsNeccessary() returns false, this will have no effect.
-	 */
-	virtual void commit() {}
+  /**
+   * Commit data to the data storage. If commitIsNeccessary() returns false, this will have no effect.
+   */
+  virtual void commit() {
+  }
 
-	/**
-	 * Undo any changes since last commit. If commitIsNeccessary() returns false, this will have no effect.
-	 */
-	virtual void rollback() {}
+  /**
+   * Undo any changes since last commit. If commitIsNeccessary() returns false, this will have no effect.
+   */
+  virtual void rollback() {
+  }
 
-	virtual void markProcessStart(const kvalobs::kvStationInfo & si) =0;
+  typedef std::vector<kvalobs::kvChecks> CheckList;
+  /**
+   * Get all checks for the given observation
+   *
+   * @param[out] out Checks for observation goes into this list
+   * @param si The observation we wants checks for
+   */
+  virtual void getChecks(CheckList * out,
+                         const kvalobs::kvStationInfo & si) const =0;
 
-	virtual void markProcessDone(const kvalobs::kvStationInfo & si) =0;
+  /**
+   * Find index of controlinfo flag for the given qcx.
+   *
+   * @param qcx The medium qcx we want to find flag position for. Example: "QC1-4"
+   * @return index in controlinfo string.
+   */
+  virtual int getQcxFlagPosition(const std::string & qcx) const =0;
 
-	typedef std::vector<kvalobs::kvChecks> CheckList;
-	/**
-	 * Get all checks for the given observation
-	 *
-	 * @param[out] out Checks for observation goes into this list
-	 * @param si The observation we wants checks for
-	 */
-	virtual void getChecks(CheckList * out, const kvalobs::kvStationInfo & si) const =0;
+  typedef std::set<std::string> ParameterList;
+  /**
+   * What parameters are we supposed to check for the given observation
+   *
+   * @param[out] out parameters goes into this list
+   * @param si Observation we want the parameter list from
+   */
+  virtual void getParametersToCheck(ParameterList * out,
+                                    const kvalobs::kvStationInfo & si) const =0;
 
-	/**
-	 * Find index of controlinfo flag for the given qcx.
-	 *
-	 * @param qcx The medium qcx we want to find flag position for. Example: "QC1-4"
-	 * @return index in controlinfo string.
-	 */
-	virtual int getQcxFlagPosition(const std::string & qcx) const =0;
+  /**
+   * Get an algorithm with the specified name
+   *
+   * @param algorithmName Identifier of the wanted algorithm
+   * @return A base algorithm for a check, which must be populated with data
+   *         to be runnable
+   */
+  virtual kvalobs::kvAlgorithms getAlgorithm(
+      const std::string & algorithmName) const =0;
 
-	typedef std::set<std::string> ParameterList;
-	/**
-	 * What parameters are we supposed to check for the given observation
-	 *
-	 * @param[out] out parameters goes into this list
-	 * @param si Observation we want the parameter list from
-	 */
-	virtual void getParametersToCheck(ParameterList * out, const kvalobs::kvStationInfo & si) const =0;
+  /**
+   * Get station's parameter's metadata.
+   *
+   * @param si Observation we are interested in. Note that obstime must be
+   *           correct in order to get a correct answer.
+   * @param parameter Meteorological phenomenon we are interested in
+   * @param qcx Identifier for the check we are going to run.
+   *
+   * @return An entry from the station_param table. As the format of some of
+   *         this table's contents is a bit weird, you must probably parse
+   *         the result later, using the function
+   *         resultfilter::parseStationParam()
+   */
+  virtual std::string getStationParam(const kvalobs::kvStationInfo & si,
+                                      const std::string & parameter,
+                                      const std::string & qcx) const =0;
 
-	/**
-	 * Get an algorithm with the specified name
-	 *
-	 * @param algorithmName Identifier of the wanted algorithm
-	 * @return A base algorithm for a check, which must be populated with data
-	 *         to be runnable
-	 */
-	virtual kvalobs::kvAlgorithms getAlgorithm(const std::string & algorithmName) const =0;
+  /**
+   * Get information on the given station
+   *
+   * @param stationid identifier for the station we are interested in
+   *
+   * @return information about the station with the given id
+   */
+  virtual kvalobs::kvStation getStation(int stationid) const =0;
 
-	/**
-	 * Get station's parameter's metadata.
-	 *
-	 * @param si Observation we are interested in. Note that obstime must be
-	 *           correct in order to get a correct answer.
-	 * @param parameter Meteorological phenomenon we are interested in
-	 * @param qcx Identifier for the check we are going to run.
-	 *
-	 * @return An entry from the station_param table. As the format of some of
-	 *         this table's contents is a bit weird, you must probably parse
-	 *         the result later, using the function
-	 *         resultfilter::parseStationParam()
-	 */
-	virtual std::string getStationParam(const kvalobs::kvStationInfo & si, const std::string & parameter, const std::string & qcx) const =0;
+  typedef std::vector<kvalobs::kvModelData> ModelDataList;
+  /**
+   * Get forecast for a particular observation and parameter
+   * @param[out] out Return data goes here
+   * @param si Observation we are interested in.
+   * @param parameter Meteorological phenomenon we are interested in
+   * @param minutesBackInTime For what point in time do we want data. This
+   *                          is expressed as an offset in minutes from
+   *                          observation time.
+   */
+  virtual void getModelData(
+      ModelDataList * out, const kvalobs::kvStationInfo & si,
+      const qabase::DataRequirement::Parameter & parameter,
+      int minutesBackInTime) const =0;
 
-	/**
-	 * Get information on the given station
-	 *
-	 * @param stationid identifier for the station we are interested in
-	 *
-	 * @return information about the station with the given id
-	 */
-	virtual kvalobs::kvStation getStation(int stationid) const =0;
+  typedef std::list<kvalobs::kvData> DataList;
+  /**
+   * Get observation data from database
+   *
+   * @param[out] out Return data goes here
+   * @param si Observation we are interested in.
+   * @param parameter Meteorological phenomenon we are interested in
+   * @param minuteOffset How far back in time from obstime do we want data
+   *                     for?
+   */
+  virtual void getData(DataList * out, const kvalobs::kvStationInfo & si,
+                       const qabase::DataRequirement::Parameter & parameter,
+                       int minuteOffset) const =0;
 
-	typedef std::vector<kvalobs::kvModelData> ModelDataList;
-	/**
-	 * Get forecast for a particular observation and parameter
-	 * @param[out] out Return data goes here
-	 * @param si Observation we are interested in.
-	 * @param parameter Meteorological phenomenon we are interested in
-	 * @param minutesBackInTime For what point in time do we want data. This
-	 *                          is expressed as an offset in minutes from
-	 *                          observation time.
-	 */
-	virtual void getModelData(ModelDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minutesBackInTime ) const =0;
-
-	typedef std::list<kvalobs::kvData> DataList;
-	/**
-	 * Get observation data from database
-	 *
-	 * @param[out] out Return data goes here
-	 * @param si Observation we are interested in.
-	 * @param parameter Meteorological phenomenon we are interested in
-	 * @param minuteOffset How far back in time from obstime do we want data
-	 *                     for?
-	 */
-	virtual void getData(DataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const =0;
-
-	typedef std::list<kvalobs::kvTextData> TextDataList;
-	/**
-	 * Get observation data from database - data which is not representable as a float
-	 *
-	 * @param[out] out Return data goes here
-	 * @param si Observation we are interested in.
-	 * @param parameter Meteorological phenomenon we are interested in
-	 * @param minuteOffset How far back in time from obstime do we want data
-	 *                     for?
-	 */
-	virtual void getTextData(TextDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const =0;
+  typedef std::list<kvalobs::kvTextData> TextDataList;
+  /**
+   * Get observation data from database - data which is not representable as a float
+   *
+   * @param[out] out Return data goes here
+   * @param si Observation we are interested in.
+   * @param parameter Meteorological phenomenon we are interested in
+   * @param minuteOffset How far back in time from obstime do we want data
+   *                     for?
+   */
+  virtual void getTextData(TextDataList * out,
+                           const kvalobs::kvStationInfo & si,
+                           const qabase::DataRequirement::Parameter & parameter,
+                           int minuteOffset) const =0;
 
 //	/**
 //	 * Error may be thrown by write method if a transaction serialization error occurred.
@@ -194,12 +208,16 @@ public:
 //		SerializationError() : std::runtime_error("serialization error") {}
 //	};
 
-	/**
-	 * Write data back to database
-	 *
-	 * @param data The data that we are interested in writing.
-	 */
-	virtual void write(const DataList & data) = 0;
+  /**
+   * Write data back to database
+   *
+   * @param data The data that we are interested in writing.
+   */
+  virtual void write(const DataList & data) = 0;
+
+  virtual kvalobs::kvStationInfo * selectDataForControl() =0;
+
+  virtual void markProcessDone(const kvalobs::kvStationInfo & si) =0;
 };
 
 }

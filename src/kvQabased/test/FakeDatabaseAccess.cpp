@@ -167,3 +167,8 @@ void FakeDatabaseAccess::write(const DataList & data)
 		savedData.insert(* it);
 	}
 }
+
+kvalobs::kvStationInfo * FakeDatabaseAccess::selectDataForControl()
+{
+  return nullptr;
+}

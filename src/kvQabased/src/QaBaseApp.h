@@ -27,38 +27,41 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "CheckRequestConsumer.h"
-#include "CheckRunner.h"
-#include "QaBaseApp.h"
-#include <kvsubscribe/queue.h>
-#include <milog/milog.h>
+#ifndef SRC_KVQABASED_SRC_QABASEAPP_H_
+#define SRC_KVQABASED_SRC_QABASEAPP_H_
+
+#include <kvalobs/kvbaseapp.h>
+#include <memory>
+#include <string>
+
+
+namespace kvalobs {
+namespace subscribe {
+class KafkaProducer;
+}
+}
+
 
 namespace qabase {
-namespace {
-kvalobs::subscribe::KafkaConsumer::ConsumptionStart startTime =
-    kvalobs::subscribe::KafkaConsumer::Stored;
-}
 
-CheckRequestConsumer::CheckRequestConsumer()
-    : kvalobs::subscribe::KafkaConsumer(
-          startTime,
-          kvalobs::subscribe::queue::decoded(QaBaseApp::kafkaDomain(), true),
-          QaBaseApp::kafkaBrokers()),
-      processor_(CheckRunner::create(QaBaseApp::createConnectString()))
+class QaBaseApp : public KvBaseApp {
+ public:
+  QaBaseApp(int argc, char ** argv);
+  virtual ~QaBaseApp();
 
-{
+  static const std::string & kafkaDomain() { return kafkaDomain_; }
+  static const std::string & kafkaBrokers() { return kafkaBrokers_; }
+  static std::shared_ptr<kvalobs::subscribe::KafkaProducer> kafkaProducer();
 
-}
+  static const std::string & baseLogDir();
 
-CheckRequestConsumer::~CheckRequestConsumer() {
-}
 
-void CheckRequestConsumer::data(const char * msg, unsigned length) {
-  processor_.process(std::string(msg, length));
-}
+ private:
+  static std::string kafkaBrokers_;
+  static std::string kafkaDomain_;
 
-void CheckRequestConsumer::error(int code, const std::string & msg) {
-  LOGERROR(msg);
-}
+};
 
 } /* namespace qabase */
+
+#endif /* SRC_KVQABASED_SRC_QABASEAPP_H_ */

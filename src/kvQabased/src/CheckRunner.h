@@ -113,8 +113,6 @@ public:
 			const db::DatabaseAccess::ParameterList & expectedParameters) const;
 
 private:
-	void markStart_(const kvalobs::kvStationInfo & si);
-	void markStop_(const kvalobs::kvStationInfo & si);
 	bool shouldMarkStartAndStop_();
 
 	DataListPtr checkObservation(const kvalobs::kvStationInfo & obs, std::ostream * scriptLog);

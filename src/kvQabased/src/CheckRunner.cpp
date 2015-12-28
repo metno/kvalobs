@@ -55,7 +55,6 @@ std::shared_ptr<CheckRunner> CheckRunner::create(const std::string & dbConnect)
 	return std::make_shared<qabase::CheckRunner>(db);
 }
 
-
 CheckRunner::~CheckRunner()
 {
 }
@@ -180,8 +179,6 @@ CheckRunner::DataListPtr CheckRunner::newObservation(const kvalobs::kvStationInf
    LOGINFO("Checking " << obs);
    start = miutil::gettimeofday();
 
-   markStart_(obs);
-
    // Will try up to nRetry*nRetry times in case of error
    try
    {
@@ -209,7 +206,6 @@ CheckRunner::DataListPtr CheckRunner::newObservation(const kvalobs::kvStationInf
 					{
 					   DataListPtr ret = checkObservation(obs, scriptLog);
 					   logTransaction( true, start, nShortRetries, nLongRetries, aborted );
-					   markStop_(obs);
 					   return ret;
 					}
 					catch (dnmi::db::SQLSerializeError & )
@@ -230,7 +226,6 @@ CheckRunner::DataListPtr CheckRunner::newObservation(const kvalobs::kvStationInf
       // final attempt:
       DataListPtr ret = checkObservation(obs, scriptLog);
       logTransaction( true, start, nShortRetries, nLongRetries, aborted );
-      markStop_(obs);
       return ret;
    }
    catch ( std::exception & e )
@@ -240,18 +235,6 @@ CheckRunner::DataListPtr CheckRunner::newObservation(const kvalobs::kvStationInf
       throw;
    }
    return DataListPtr(new DataList); // never reached
-}
-
-void CheckRunner::markStart_(const kvalobs::kvStationInfo & si)
-{
-	if ( shouldMarkStartAndStop_() )
-		db_->markProcessStart(si);
-}
-
-void CheckRunner::markStop_(const kvalobs::kvStationInfo & si)
-{
-	if ( shouldMarkStartAndStop_() )
-		db_->markProcessDone(si);
 }
 
 bool CheckRunner::shouldMarkStartAndStop_()

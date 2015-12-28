@@ -37,9 +37,6 @@
 class MockDatabaseAccess : public db::DatabaseAccess
 {
 public:
-	MOCK_METHOD1(markProcessStart, void (const kvalobs::kvStationInfo & si));
-
-	MOCK_METHOD1(markProcessDone, void (const kvalobs::kvStationInfo & si));
 
 	MOCK_CONST_METHOD2(getChecks, void (CheckList * out, const kvalobs::kvStationInfo & si));
 
@@ -60,6 +57,10 @@ public:
 	MOCK_CONST_METHOD4(getTextData, void (TextDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset));
 
 	MOCK_METHOD1(write, void (const DataList & data));
+
+  MOCK_METHOD0(selectDataForControl, kvalobs::kvStationInfo*());
+
+  MOCK_METHOD1(markProcessDone, void (const kvalobs::kvStationInfo & si));
 
 	// Will only work if setDefaultActions() have been called
 	const FakeDatabaseAccess::SavedData & savedData() const { return fake_.savedData; }

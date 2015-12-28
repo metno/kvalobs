@@ -39,9 +39,6 @@ public:
 	FakeDatabaseAccess();
 	virtual ~FakeDatabaseAccess();
 
-	virtual void markProcessStart(const kvalobs::kvStationInfo & si) {}
-
-	virtual void markProcessDone(const kvalobs::kvStationInfo & si) {}
 
 	virtual void getChecks(CheckList * out, const kvalobs::kvStationInfo & si) const;
 
@@ -62,6 +59,10 @@ public:
 	virtual void getTextData(TextDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const;
 
 	virtual void write(const DataList & data);
+
+  virtual kvalobs::kvStationInfo * selectDataForControl();
+
+  virtual void markProcessDone(const kvalobs::kvStationInfo & si) {}
 
 	typedef std::set<kvalobs::kvData, kvalobs::compare::lt_kvData> SavedData;
 	SavedData savedData;

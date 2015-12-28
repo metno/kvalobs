@@ -9,7 +9,12 @@ qabase_src_SOURCES += \
 	src/CheckRequestConsumer.cpp \
 	src/CheckRequestConsumer.h \
 	src/DataProcessor.cpp \
-	src/DataProcessor.h
+	src/DataProcessor.h \
+	src/QaBaseApp.cpp \
+	src/QaBaseApp.h \
+	src/NewDataListener.cpp \
+	src/NewDataListener.h
+	
 	
 kvQabased_SOURCES += src/main.cpp
 

@@ -33,16 +33,13 @@
 #include "DatabaseAccess.h"
 #include <string>
 
-namespace dnmi
-{
-namespace db
-{
+namespace dnmi {
+namespace db {
 class Connection;
 }
 }
 
-namespace db
-{
+namespace db {
 
 /**
  * Direct access to kvalobs database. All function calls here result in a call
@@ -50,69 +47,85 @@ namespace db
  *
  * \ingroup group_db
  */
-class KvalobsDatabaseAccess: public db::DatabaseAccess
-{
-public:
-	/**
-	 * Construct, creating a database connection with this object
-	 *
-	 * @param databaseConnect postgresql database connection string, as
-	 *                        specified in postgresql documentation.
-	 */
-	explicit KvalobsDatabaseAccess(const std::string & databaseConnect);
+class KvalobsDatabaseAccess : public db::DatabaseAccess {
+ public:
+  /**
+   * Construct, creating a database connection with this object
+   *
+   * @param databaseConnect postgresql database connection string, as
+   *                        specified in postgresql documentation.
+   */
+  explicit KvalobsDatabaseAccess(const std::string & databaseConnect);
 
-	/**
-	 * Construct object, using the provided connection.
-	 *
-	 * @param connection Use this connection when accessing kvalobs
-	 * @param takeOwnershipOfConnection If true, the provided connection will
-	 *                                  be deleted when this object's
-	 *                                  destructor is called.
-	 */
-	KvalobsDatabaseAccess(dnmi::db::Connection * connection, bool takeOwnershipOfConnection);
+  /**
+   * Construct object, using the provided connection.
+   *
+   * @param connection Use this connection when accessing kvalobs
+   * @param takeOwnershipOfConnection If true, the provided connection will
+   *                                  be deleted when this object's
+   *                                  destructor is called.
+   */
+  KvalobsDatabaseAccess(dnmi::db::Connection * connection,
+                        bool takeOwnershipOfConnection);
 
-	static void setModelDataName(const std::string & modelDataName);
+  static void setModelDataName(const std::string & modelDataName);
 
-	virtual ~KvalobsDatabaseAccess();
+  virtual ~KvalobsDatabaseAccess();
 
-	virtual bool commitIsNeccessary() const { return true; }
+  virtual bool commitIsNeccessary() const {
+    return true;
+  }
 
-	virtual void beginTransaction();
+  virtual void beginTransaction();
 
-	virtual void commit();
+  virtual void commit();
 
-	virtual void rollback();
+  virtual void rollback();
 
-	virtual void markProcessStart(const kvalobs::kvStationInfo & si);
+  virtual void getChecks(CheckList * out,
+                         const kvalobs::kvStationInfo & si) const;
 
-	virtual void markProcessDone(const kvalobs::kvStationInfo & si);
+  virtual int getQcxFlagPosition(const std::string & qcx) const;
 
+  virtual void getParametersToCheck(ParameterList * out,
+                                    const kvalobs::kvStationInfo & si) const;
 
-	virtual void getChecks(CheckList * out, const kvalobs::kvStationInfo & si) const;
+  virtual kvalobs::kvAlgorithms getAlgorithm(
+      const std::string & algorithmName) const;
 
-	virtual int getQcxFlagPosition(const std::string & qcx) const;
+  virtual std::string getStationParam(const kvalobs::kvStationInfo & si,
+                                      const std::string & parameter,
+                                      const std::string & qcx) const;
 
-	virtual void getParametersToCheck(ParameterList * out, const kvalobs::kvStationInfo & si) const;
+  virtual kvalobs::kvStation getStation(int stationid) const;
 
-	virtual kvalobs::kvAlgorithms getAlgorithm(const std::string & algorithmName) const;
+  virtual void getModelData(
+      ModelDataList * out, const kvalobs::kvStationInfo & si,
+      const qabase::DataRequirement::Parameter & parameter,
+      int minutesBackInTime) const;
 
-	virtual std::string getStationParam(const kvalobs::kvStationInfo & si, const std::string & parameter, const std::string & qcx) const;
+  virtual void getData(DataList * out, const kvalobs::kvStationInfo & si,
+                       const qabase::DataRequirement::Parameter & parameter,
+                       int minuteOffset) const;
 
-	virtual kvalobs::kvStation getStation(int stationid) const;
+  virtual void getTextData(TextDataList * out,
+                           const kvalobs::kvStationInfo & si,
+                           const qabase::DataRequirement::Parameter & parameter,
+                           int minuteOffset) const;
 
-	virtual void getModelData(ModelDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minutesBackInTime ) const;
+  virtual void write(const DataList & data);
 
-	virtual void getData(DataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const;
+  virtual kvalobs::kvStationInfo * selectDataForControl();
 
-	virtual void getTextData(TextDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const;
+  virtual void markProcessDone(const kvalobs::kvStationInfo & si);
 
-	virtual void write(const DataList & data);
+ private:
+  static dnmi::db::Connection * createConnection(
+      const std::string & databaseConnect);
+  class TransactionEnforcingDatabaseConnection;
+  TransactionEnforcingDatabaseConnection * connection_;
 
-private:
-	class TransactionEnforcingDatabaseConnection;
-	TransactionEnforcingDatabaseConnection * connection_;
-
-	static std::string modelDataName_;
+  static std::string modelDataName_;
 };
 
 }

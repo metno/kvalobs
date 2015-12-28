@@ -73,16 +73,6 @@ public:
 		baseImplementation_->rollback();
 	}
 
-	virtual void markProcessStart(const kvalobs::kvStationInfo & si)
-	{
-		baseImplementation_->markProcessStart(si);
-	}
-
-	virtual void markProcessDone(const kvalobs::kvStationInfo & si)
-	{
-		baseImplementation_->markProcessDone(si);
-	}
-
 	virtual void getChecks(CheckList * out, const kvalobs::kvStationInfo & si) const
 	{
 		baseImplementation_->getChecks(out, si);
@@ -132,6 +122,15 @@ public:
 	{
 		baseImplementation_->write(data);
 	}
+
+  virtual kvalobs::kvStationInfo * selectDataForControl() {
+    return baseImplementation_->selectDataForControl();
+  }
+
+  virtual void markProcessDone(const kvalobs::kvStationInfo & si) {
+    baseImplementation_->markProcessDone(si);
+  }
+
 
 private:
 	DatabaseAccess * baseImplementation_;
