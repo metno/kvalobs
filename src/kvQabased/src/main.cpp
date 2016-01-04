@@ -121,32 +121,35 @@ void createPidFile() {
     throw std::runtime_error("Unable to create pidfile!");
 }
 
+
+
 void setupLogging(const qabase::Configuration& config) {
-  milog::Logger::logger().logLevel(milog::INFO);
-  std::unique_ptr<milog::LogStream> s;
   if (!config.runLogFile().empty()) {
     milog::FLogStream* fs = new milog::FLogStream(9, 1024 * 1024);
     fs->open(config.runLogFile());
     fs->loglevel(config.logLevel());
-    bool ok = milog::LogManager::createLogger("filelog", fs);
-    ok = milog::LogManager::setDefaultLogger("filelog");
-    s.reset(fs);
+    if (!milog::LogManager::createLogger("filelog", fs)) {
+      LOGERROR("Unable to create logger for file " << config.runLogFile());
+      delete fs;
+      return;
+    }
+    if (!milog::LogManager::setDefaultLogger("filelog"))
+      LOGERROR("Unable to register file logger as default logger");
   }
 }
 }
 
 int main(int argc, char ** argv) {
-  milog::LogContext context("qabase");
 
   try {
     qabase::Configuration config(argc, argv);
+    setupLogging(config);
     qabase::QaBaseApp app(argc, argv);
     if (not config.runNormally())
       return 0;
 
-    setupLogging(config);
-
     LOGDEBUG("Using model data name " << config.modelDataName());
+
     db::KvalobsDatabaseAccess::setModelDataName(config.modelDataName());
 
     if (config.haveObservationToCheck()) {
