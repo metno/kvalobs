@@ -8,6 +8,7 @@ kv2kvDataInputd_SOURCES = \
                  kv2kvDataInputd.cc
 
 kv2kvDataInputd_CPPFLAGS = -D_REENTRANT \
+                  -I$(top_srcdir)/src \
                   -I$(top_builddir)/src/lib \
                   -I$(top_builddir)/src/lib/kvskel \
                   -I$(top_srcdir)/src/lib  \

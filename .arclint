@@ -65,6 +65,11 @@
     },
     "googleccplint": {
       "type": "googlecpplint",
+      "severity": {
+        "runtime/int": "advice",
+        "runtime/references": "disabled",
+        "whitespace/line_length": "disabled"
+      },
       "include": [
         "(\\.cpp$)",
         "(\\.cc$)",

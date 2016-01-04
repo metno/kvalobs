@@ -10,9 +10,11 @@ libkafkakvapp_la_SOURCES = \
 	KafkaSubscribe.cpp
 
 libkafkakvapp_la_CPPFLAGS = \
-	-I$(top_srcdir)/src/service-libs/kvcpp \
 	-D_REENTRANT \
+	-I$(top_srcdir)/src \
 	-I$(top_srcdir)/src/lib \
+	-I$(top_srcdir)/src/service-libs \
+	-I$(top_srcdir)/src/service-libs/kvcpp \
 	-I$(top_builddir)/src/lib \
 	-I$(top_builddir)/src/lib/kvskel \
 	$(omniORB4_CFLAGS) \

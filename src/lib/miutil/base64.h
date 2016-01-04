@@ -232,5 +232,6 @@ encode64(const char *source, int size, std::string &dest_, int linesize =
 void decode64(const std::string &source, std::string &dest);
 
 }
-#endif
+
+#endif  // namespace miutil
 

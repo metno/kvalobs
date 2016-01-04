@@ -1,7 +1,8 @@
 AM_DEFAULT_SOURCE_EXT = .cpp
 
 LDADD = $(top_builddir)/src/lib/kvsubscribe/libkvalobs_kvsubscribe.la
-AM_CPPFLAGS = -I$(top_srcdir)/src/lib
+AM_CPPFLAGS = 	-I$(top_srcdir)/src \
+				-I$(top_srcdir)/src/lib
 
 bin_PROGRAMS = kvsubscribe kvalobs-queue-transfer
 

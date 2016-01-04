@@ -6,6 +6,7 @@ kv2kro_SOURCES = GetData.cc GetData.h \
                  kv2kro.cc
 
 kv2kro_CPPFLAGS = -D_REENTRANT \
+				  -I$(top_srcdir)/src \
                   -I$(top_builddir)/src/lib \
                   -I$(top_builddir)/src/lib/kvskel \
                   -I$(top_srcdir)/src/lib  \

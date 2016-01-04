@@ -1,7 +1,7 @@
 /*
- Kvalobs - Free Quality Control Software for Meteorological Observations 
+ Kvalobs - Free Quality Control Software for Meteorological Observations
 
- $Id: KvApp.h,v 1.3.2.4 2007/09/27 09:02:45 paule Exp $                                                       
+ $Id: KvApp.h,v 1.3.2.4 2007/09/27 09:02:45 paule Exp $
 
  Copyright (C) 2007 met.no
 
@@ -15,42 +15,43 @@
  This file is part of KVALOBS
 
  KVALOBS is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License as 
- published by the Free Software Foundation; either version 2 
+ modify it under the terms of the GNU General Public License as
+ published by the Free Software Foundation; either version 2
  of the License, or (at your option) any later version.
- 
+
  KVALOBS is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  General Public License for more details.
- 
- You should have received a copy of the GNU General Public License along 
- with KVALOBS; if not, write to the Free Software Foundation Inc., 
+
+ You should have received a copy of the GNU General Public License along
+ with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#ifndef __kvservice__KvApp_h__
-#define __kvservice__KvApp_h__
+#ifndef SRC_SERVICE_LIBS_KVCPP_KVAPP_H_
+#define SRC_SERVICE_LIBS_KVCPP_KVAPP_H_
 
-#include <list>
 #include <boost/utility.hpp>
-#include <kvskel/datasource.hh>
-#include <kvskel/kvServiceCommon.hh>
-#include <kvalobs/kvData.h>
-#include <kvalobs/kvModelData.h>
-#include <kvalobs/kvReferenceStation.h>
-#include <kvalobs/kvParam.h>
-#include <kvalobs/kvStation.h>
-#include <kvalobs/kvStationParam.h>
-#include <kvalobs/kvStationMetadata.h>
-#include <kvalobs/kvTypes.h>
-#include <kvalobs/kvObsPgm.h>
-#include <kvalobs/kvOperator.h>
-#include <dnmithread/CommandQue.h>
-#include "WhichDataHelper.h"
-#include "KvGetDataReceiver.h"
-#include "WorkstatistikIterator.h"
-#include "RejectdecodeIterator.h"
-#include "kvDataSubscribeInfoHelper.h"
+#include <list>
+#include <string>
+#include "dnmithread/CommandQue.h"
+#include "kvalobs/kvData.h"
+#include "kvalobs/kvModelData.h"
+#include "kvalobs/kvObsPgm.h"
+#include "kvalobs/kvOperator.h"
+#include "kvalobs/kvParam.h"
+#include "kvalobs/kvReferenceStation.h"
+#include "kvalobs/kvStation.h"
+#include "kvalobs/kvStationMetadata.h"
+#include "kvalobs/kvStationParam.h"
+#include "kvalobs/kvTypes.h"
+#include "kvskel/datasource.hh"
+#include "kvskel/kvServiceCommon.hh"
+#include "kvcpp/kvDataSubscribeInfoHelper.h"
+#include "kvcpp/KvGetDataReceiver.h"
+#include "kvcpp/RejectdecodeIterator.h"
+#include "kvcpp/WhichDataHelper.h"
+#include "kvcpp/WorkstatistikIterator.h"
 
 namespace kvservice {
 /**
@@ -75,7 +76,7 @@ class KvalobsGet {
    * \return True on success, otherwise false.
    */
   virtual bool getKvData(KvGetDataReceiver &dataReceiver,
-                         const WhichDataHelper &wd) =0;
+                         const WhichDataHelper &wd) = 0;
 
   /**
    * \brief Get messages that kvalobs has rejected. \brief
@@ -86,7 +87,7 @@ class KvalobsGet {
    */
   virtual bool getKvRejectDecode(
       const CKvalObs::CService::RejectDecodeInfo &decodeInfo,
-      kvservice::RejectDecodeIterator &it) =0;
+      kvservice::RejectDecodeIterator &it) = 0;
 
   /**
    * \brief return the param list from kvalobs.
@@ -94,7 +95,7 @@ class KvalobsGet {
    * \param[out] paramList The paramlist kvalobs use on return.
    * \return true ons success and false otherwise.
    */
-  virtual bool getKvParams(std::list<kvalobs::kvParam> &paramList) =0;
+  virtual bool getKvParams(std::list<kvalobs::kvParam> &paramList) = 0;
 
   /**
    * \brief return the stationlist in kvalobs.
@@ -102,7 +103,7 @@ class KvalobsGet {
    * \param stationList[out] The station list in kvalobs on return.
    * \return true ons success and false otherwise.
    */
-  virtual bool getKvStations(std::list<kvalobs::kvStation> &stationList) =0;
+  virtual bool getKvStations(std::list<kvalobs::kvStation> &stationList) = 0;
 
   /**
    * \brief return model data.
@@ -114,7 +115,7 @@ class KvalobsGet {
    *
    */
   virtual bool getKvModelData(std::list<kvalobs::kvModelData> &dataList,
-                              const WhichDataHelper &wd) =0;
+                              const WhichDataHelper &wd) = 0;
 
   /**
    * \brief return the tyeps that is used in kvalobs.
@@ -122,7 +123,7 @@ class KvalobsGet {
    * \param[out] typeList The typeList on return.
    * \return true ons success and false otherwise.
    */
-  virtual bool getKvTypes(std::list<kvalobs::kvTypes> &typeList) =0;
+  virtual bool getKvTypes(std::list<kvalobs::kvTypes> &typeList) = 0;
 
   /**
    * \brief Get station parameters from the kvalobs database.
@@ -134,7 +135,7 @@ class KvalobsGet {
    *
    * \return true on success, otherwqise false.
    */
-  virtual bool getKvOperator(std::list<kvalobs::kvOperator> &operatorList) =0;
+  virtual bool getKvOperator(std::list<kvalobs::kvOperator> &operatorList) = 0;
 
   /**
    * \brief Get station parameters from the kvalobs database.
@@ -148,7 +149,7 @@ class KvalobsGet {
    */
   virtual bool getKvStationParam(std::list<kvalobs::kvStationParam> &stParam,
                                  int stationid, int paramid = -1,
-                                 int day = -1) =0;
+                                 int day = -1) = 0;
 
   /**
    * \brief Get metadata for a specific station.
@@ -166,23 +167,23 @@ class KvalobsGet {
   virtual bool getKvStationMetaData(
       std::list<kvalobs::kvStationMetadata> &stMeta, int stationid,
       const boost::posix_time::ptime &obstime,
-      const std::string & metadataName = "") =0;
+      const std::string & metadataName = "") = 0;
 
   /**
    * \brief return the observation programs.
    *
    * \param[out] obsPgm The observations programs.
    * \param stationList Return the observations program for this stations.
-   *                    A empty list returns the observations program for 
+   *                    A empty list returns the observations program for
    *                    all stations.
-   * \param aUnion Return a only one kvObsPgm for every station. This 
+   * \param aUnion Return a only one kvObsPgm for every station. This
    *               kvObsPgm is a union of of all paramid in a obsservation
-   *               prorogram for a station. ie. we expect some sort of 
-   *               data for the timespec in the kvObsPgm. 
+   *               prorogram for a station. ie. we expect some sort of
+   *               data for the timespec in the kvObsPgm.
    * \return true ons success and false otherwise.
    */
   virtual bool getKvObsPgm(std::list<kvalobs::kvObsPgm> &obsPgm,
-                           const std::list<long> &stationList, bool aUnion) =0;
+                           const std::list<long> &stationList, bool aUnion) = 0;
 
   virtual bool getKvWorkstatistik(
       CKvalObs::CService::WorkstatistikTimeType timeType,
@@ -192,7 +193,7 @@ class KvalobsGet {
   /**
    * \deprecated
    */
-  virtual bool getKvData(KvObsDataList &dataList, const WhichDataHelper &wd) =0;
+  virtual bool getKvData(KvObsDataList &dataList, const WhichDataHelper &wd) = 0;
 };
 
 /**
@@ -204,12 +205,12 @@ class KvalobsSend {
   }
 
   /**
-   * \brief sendDataToKv, sends data to kvalobs, kvDataInputd. 
-   * 
-   * ObsType is used to tell kvalobs what format the data is coded in. It 
+   * \brief sendDataToKv, sends data to kvalobs, kvDataInputd.
+   *
+   * ObsType is used to tell kvalobs what format the data is coded in. It
    * is used by kvDataInputd to select the proper decoder to be used
    * to decode the data.  <p\>
-   * 
+   *
    * The method return a Result. The Result has two fields.
    * <pre>
    * - EResult res
@@ -223,23 +224,23 @@ class KvalobsSend {
    *     DECODEERROR, cant decode the message. The
    *                  message is saved to rejectdecode.
    *     NOTSAVED,    the message is not SAVED to the database,
-   *                  if possible try to resend it later, after 
+   *                  if possible try to resend it later, after
    *                  a delay.
    *     ERROR,       A general error. Look at the 'message'. The
    *                  observation is not saved to the database.
-   *     OK           The message is decoded and saved to the 
+   *     OK           The message is decoded and saved to the
    *                  database.
    * </pre>
    *  If the value of res is NOT OK a error message is written in message.
    *
    * @param data the data coded in the format given with obsType.
    * @param obsType the format of the data.
-   * @return A reference to a Result if we successfully connected to 
-   *         kvinput. nil if we failed to connect with kvinput. kvinput 
+   * @return A reference to a Result if we successfully connected to
+   *         kvinput. nil if we failed to connect with kvinput. kvinput
    *         may be down or the CORBA nameserver may be down.
    */
   virtual const CKvalObs::CDataSource::Result_var sendDataToKv(
-      const char *data, const char *obsType) =0;
+      const char *data, const char *obsType) = 0;
 };
 
 /**
@@ -253,108 +254,106 @@ class KvalobsSubscribe {
   }
 
   /**
-   * \brief Subscribe to DataNotify events. 
+   * \brief Subscribe to DataNotify events.
    *
-   * The events is posted on the que as DataNotifyEvent. The 
+   * The events is posted on the que as DataNotifyEvent. The
    * DataNotifyEvent is declared in the file \em kvevents.h.
    *
    * \param que The que to receive DataNotifyEvent.
    * \return subscriberid on success and a empty string on failure.
    */
   virtual SubscriberID subscribeDataNotify(
-      const KvDataSubscribeInfoHelper &info, dnmi::thread::CommandQue &que) =0;
+      const KvDataSubscribeInfoHelper &info, dnmi::thread::CommandQue &que) = 0;
 
   /**
-   * \brief Subscribe to Data events. 
+   * \brief Subscribe to Data events.
    *
-   * The events is posted on the que as DataEvent. The DataEvent 
+   * The events is posted on the que as DataEvent. The DataEvent
    * is declared in the file \em kvevents.h.
    *
    * \param que The que to receive DataEvent.
    * \return subscriberid on success and a empty string on failure.
    */
   virtual SubscriberID subscribeData(const KvDataSubscribeInfoHelper &info,
-                                     dnmi::thread::CommandQue &que) =0;
+                                     dnmi::thread::CommandQue &que) = 0;
 
   /**
-   * \brief Subscribe to Hint events. 
+   * \brief Subscribe to Hint events.
    *
-   * The events is posted on the que as HintEvent. The HintEvent is 
+   * The events is posted on the que as HintEvent. The HintEvent is
    * declared in the file \em kvevents.h.
    *
    * \param que The que to receive HintEvent.
    * \return subscriberid on success and a empty string on failure.
    */
-  virtual SubscriberID subscribeKvHint(dnmi::thread::CommandQue &que) =0;
+  virtual SubscriberID subscribeKvHint(dnmi::thread::CommandQue &que) = 0;
 
   /**
    * \brief Unsubscribe from a service.
    *
-   * Tell the kvService that we are no longer interessted in 
+   * Tell the kvService that we are no longer interested in
    * notifications.
    */
-  virtual void unsubscribe(const SubscriberID &subscriberid) =0;
+  virtual void unsubscribe(const SubscriberID &subscriberid) = 0;
 
   /**
    * Unsubscribe from all services.
    */
-  virtual void unsubscribeAll() =0;
+  virtual void unsubscribeAll() = 0;
 };
 
 class KvAppControl {
  public:
-
   /**
    * \brief the shutdown status.
    *
    * \return true if we are in a shutdown.
    */
-  virtual bool shutdown() const =0;
+  virtual bool shutdown() const = 0;
 
   /**
    * \brief request shutdown, ie we want to terminate.
    */
-  virtual void doShutdown() =0;
+  virtual void doShutdown() = 0;
 
   /**
-   * \brief start the eventloop.
-   * 
-   * Must be called for every aplication that calls one of the subscriber
+   * \brief start the event loop.
+   *
+   * Must be called for every application that calls one of the subscriber
    * functions.
    *
    * It doesn't return before the application is ready to terminate,
    * ie doShutdown is called or SIGQUIT/SIGINT is received.
-   * 
-   * The event loop is in principle run as follow 
-   * 
+   *
+   * The event loop is in principle run as follow
+   *
    * run() {
-   * 	
-   *    ......   
-   * 
+   *
+   *    ......
+   *
    *    while( not in shutdown ) {
-   * 		work();
-   * 		
-   *       ....
+   *        work();
+   *
+   *        ....
    *    }
-   *   
+   *
    *     .....
    * }
-   * 
+   *
    */
-  virtual void run() =0;
+  virtual void run() = 0;
 
   /**
    * \brief work is called on every turn of the event loop.
    */
   virtual void work() {
   }
-  ;
 
  protected:
   virtual ~KvAppControl() {
   }
 };
-}
+}  // namespace details
 
 /**
  * \brief A application singleton class for kvservice applications.
@@ -368,7 +367,6 @@ class KvApp : private boost::noncopyable, public details::KvalobsGet,
     public details::KvalobsSend, public details::KvalobsSubscribe,
     public details::KvAppControl {
  public:
-
   /**
    * \brief A pointer to the KvApp singleton, if one has been instatiated.
    */
@@ -380,6 +378,6 @@ class KvApp : private boost::noncopyable, public details::KvalobsGet,
 };
 
 /** @} */
-}
+}  // namespace kvservice
 
-#endif //__kvservice__KvApp_h__
+#endif  // SRC_SERVICE_LIBS_KVCPP_KVAPP_H_

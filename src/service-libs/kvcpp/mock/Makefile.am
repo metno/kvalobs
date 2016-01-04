@@ -14,7 +14,9 @@ testTestingKvApp_SOURCES = \
 	MockKvApp.h \
 	test.cc
 
-testTestingKvApp_CPPFLAGS = -I$(srcdir)/../.. -I$(top_srcdir)/src/lib/  \
+testTestingKvApp_CPPFLAGS = -I$(top_srcdir)/src \
+							-I$(top_srcdir)/src/lib  \
+							-I$(top_srcdir)/src/service-libs \
                             -I$(top_builddir)/src/lib \
                             -I$(top_builddir)/src/lib/kvskel \
                             $(putools_CFLAGS) $(gtest_CFLAGS) $(gmock_CFLAGS)

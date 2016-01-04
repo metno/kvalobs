@@ -43,12 +43,14 @@ libkvalobs_kvcpp_la_LIBADD = \
 	$(top_builddir)/src/lib/kvskel/libkvalobs_kvadmininterface.la \
 	$(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la \
 	$(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la   
-	
-	
-	
+
+
+
 AM_CPPFLAGS = \
 	-D_REENTRANT \
+	-I$(top_srcdir)/src \
 	-I$(top_srcdir)/src/lib \
+	-I$(top_srcdir)/src/service-libs \
 	-I$(top_builddir)/src/lib \
 	-I$(top_builddir)/src/lib/kvskel \
 	$(omniORB4_CFLAGS) \
