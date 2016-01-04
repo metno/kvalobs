@@ -34,35 +34,35 @@
 #include <scriptrunner/Script.h>
 #include <iosfwd>
 
-namespace scriptrunner
-{
-namespace language
-{
-namespace perl
-{
+namespace scriptrunner {
+namespace language {
+namespace perl {
 
 /**
  * Perl interpreter.
  *
  * \ingroup group_scriptrunner
  */
-class PerlInterpreter: public Interpreter
-{
-public:
-	PerlInterpreter();
-	virtual ~PerlInterpreter();
+class PerlInterpreter : public Interpreter {
+ public:
+  PerlInterpreter();
+  virtual ~PerlInterpreter();
 
-	virtual RunResult run(const Script & s) const;
+  virtual RunResult run(const Script & s) const;
 
-	virtual std::string fullScript(const Script & script) const;
+  virtual std::string fullScript(const Script & script) const;
 
-private:
-	std::ostream & numericDeclarations(std::ostream & s, const Script::Input & input) const;
-	std::ostream & stringDeclarations(std::ostream & s, const Script::Input & input) const;
-	std::ostream & numericListDeclarations(std::ostream & s, const Script::Input & input) const;
-	std::ostream & stringListDeclarations(std::ostream & s, const Script::Input & input) const;
+ private:
+  std::ostream & numericDeclarations(std::ostream & s,
+                                     const Script::Input & input) const;
+  std::ostream & stringDeclarations(std::ostream & s,
+                                    const Script::Input & input) const;
+  std::ostream & numericListDeclarations(std::ostream & s,
+                                         const Script::Input & input) const;
+  std::ostream & stringListDeclarations(std::ostream & s,
+                                        const Script::Input & input) const;
 
-	std::string quote(const std::string & s) const;
+  std::string quote(const std::string & s) const;
 };
 
 }

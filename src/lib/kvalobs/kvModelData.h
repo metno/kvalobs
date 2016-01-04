@@ -38,8 +38,7 @@
  * at Tue Aug 28 07:53:16 2002
  */
 
-namespace kvalobs
-{
+namespace kvalobs {
 
 /**
  * \addtogroup  dbinterface
@@ -51,66 +50,56 @@ namespace kvalobs
  * \brief Interface to the table model_data in the kvalobs database.
  */
 
-class kvModelData: public kvDbBase
-{
-private:
-	int stationid_;
-	boost::posix_time::ptime obstime_;
-	int paramid_;
-	int level_;
-	int modelid_;
-	float original_;
+class kvModelData : public kvDbBase {
+ private:
+  int stationid_;
+  boost::posix_time::ptime obstime_;
+  int paramid_;
+  int level_;
+  int modelid_;
+  float original_;
 
-public:
-	kvModelData()
-	{
-	}
-	kvModelData(const dnmi::db::DRow &r)
-	{
-		set(r);
-	}
-	kvModelData(int stationid, const boost::posix_time::ptime &obstime, int paramid,
-			int level, int modelid, float original)
+ public:
+  kvModelData() {
+  }
+  kvModelData(const dnmi::db::DRow &r) {
+    set(r);
+  }
+  kvModelData(int stationid, const boost::posix_time::ptime &obstime,
+              int paramid, int level, int modelid, float original)
 
-	{
-		set(stationid, obstime, paramid, level, modelid, original);
-	}
+              {
+    set(stationid, obstime, paramid, level, modelid, original);
+  }
 
-	bool set(int stationid, const boost::posix_time::ptime &obstime, int paramid,
-			int level, int modelid, float original);
+  bool set(int stationid, const boost::posix_time::ptime &obstime, int paramid,
+           int level, int modelid, float original);
 
-	bool set(const dnmi::db::DRow&);
-	const char* tableName() const
-	{
-		return "model_data";
-	}
-	std::string toSend() const;
-	std::string uniqueKey() const;
+  bool set(const dnmi::db::DRow&);
+  const char* tableName() const {
+    return "model_data";
+  }
+  std::string toSend() const;
+  std::string uniqueKey() const;
 
-	int stationID() const
-	{
-		return stationid_;
-	}
-	const boost::posix_time::ptime& obstime() const
-	{
-		return obstime_;
-	}
-	int paramID() const
-	{
-		return paramid_;
-	}
-	int level() const
-	{
-		return level_;
-	}
-	int modelID() const
-	{
-		return modelid_;
-	}
-	float original() const
-	{
-		return original_;
-	}
+  int stationID() const {
+    return stationid_;
+  }
+  const boost::posix_time::ptime& obstime() const {
+    return obstime_;
+  }
+  int paramID() const {
+    return paramid_;
+  }
+  int level() const {
+    return level_;
+  }
+  int modelID() const {
+    return modelid_;
+  }
+  float original() const {
+    return original_;
+  }
 };
 
 /** @} */

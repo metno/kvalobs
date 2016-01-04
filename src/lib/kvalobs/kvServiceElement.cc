@@ -36,97 +36,79 @@
 using namespace std;
 using namespace dnmi;
 
-void kvalobs::kvServiceElement::createSortIndex()
-{
-	std::ostringstream s;
-	s << stationid_;
-	s << obstime_;
-	s << typeid_;
-	sortBy_ = s.str();
+void kvalobs::kvServiceElement::createSortIndex() {
+  std::ostringstream s;
+  s << stationid_;
+  s << obstime_;
+  s << typeid_;
+  sortBy_ = s.str();
 }
 
-kvalobs::kvServiceElement::kvServiceElement()
-{
+kvalobs::kvServiceElement::kvServiceElement() {
 }
 
-bool kvalobs::kvServiceElement::set(int sid, const boost::posix_time::ptime &obt, int tid)
-{
-	stationid_ = sid;
-	obstime_ = obt;
-	typeid_ = tid;
+bool kvalobs::kvServiceElement::set(int sid,
+                                    const boost::posix_time::ptime &obt,
+                                    int tid) {
+  stationid_ = sid;
+  obstime_ = obt;
+  typeid_ = tid;
 
-	createSortIndex();
+  createSortIndex();
 
-	return true;
+  return true;
 }
 
-bool kvalobs::kvServiceElement::set(const dnmi::db::DRow& r_)
-{
-	db::DRow &r = const_cast<db::DRow&>(r_);
-	string buf;
-	list<string> names = r.getFieldNames();
-	list<string>::iterator it = names.begin();
+bool kvalobs::kvServiceElement::set(const dnmi::db::DRow& r_) {
+  db::DRow &r = const_cast<db::DRow&>(r_);
+  string buf;
+  list<string> names = r.getFieldNames();
+  list<string>::iterator it = names.begin();
 
-	for (; it != names.end(); it++)
-	{
-		try
-		{
-			buf = r[*it];
+  for (; it != names.end(); it++) {
+    try {
+      buf = r[*it];
 
-			if (*it == "stationid")
-			{
-				stationid_ = atoi(buf.c_str());
-			}
-			else if (*it == "obstime")
-			{
-				obstime_ = boost::posix_time::time_from_string_nothrow(buf);
-			}
-			else if (*it == "typeid")
-			{
-				typeid_ = atoi(buf.c_str());
-			}
-			else
-			{
-				CERR(
-						"kvServiceElement::set .. unknown entry:" << *it << std::endl);
-			}
-		} catch (...)
-		{
-			CERR("kvServiceElement: unexpected exception ..... \n");
-		}
-	}
+      if (*it == "stationid") {
+        stationid_ = atoi(buf.c_str());
+      } else if (*it == "obstime") {
+        obstime_ = boost::posix_time::time_from_string_nothrow(buf);
+      } else if (*it == "typeid") {
+        typeid_ = atoi(buf.c_str());
+      } else {
+        CERR("kvServiceElement::set .. unknown entry:" << *it << std::endl);
+      }
+    } catch (...) {
+      CERR("kvServiceElement: unexpected exception ..... \n");
+    }
+  }
 
-	createSortIndex();
-	return true;
+  createSortIndex();
+  return true;
 
 }
 
-std::string kvalobs::kvServiceElement::toSend() const
-{
-	ostringstream ost;
+std::string kvalobs::kvServiceElement::toSend() const {
+  ostringstream ost;
 
-	ost << "(" << stationid_ << "," << quoted(obstime_) << "," << typeid_
-			<< ")";
+  ost << "(" << stationid_ << "," << quoted(obstime_) << "," << typeid_ << ")";
 
-	return ost.str();
+  return ost.str();
 
 }
 
-std::string kvalobs::kvServiceElement::toUpdate() const
-{
-	//Nothing to update
-	return "";
+std::string kvalobs::kvServiceElement::toUpdate() const {
+  //Nothing to update
+  return "";
 }
 
-std::string kvalobs::kvServiceElement::uniqueKey() const
-{
-	ostringstream ost;
+std::string kvalobs::kvServiceElement::uniqueKey() const {
+  ostringstream ost;
 
-	ost << " WHERE stationid=" << stationid_ << " AND " << "       obstime="
-			<< quoted(obstime_) << " AND " << "       typeid="
-			<< typeid_;
+  ost << " WHERE stationid=" << stationid_ << " AND " << "       obstime="
+      << quoted(obstime_) << " AND " << "       typeid=" << typeid_;
 
-	return ost.str();
+  return ost.str();
 
 }
 

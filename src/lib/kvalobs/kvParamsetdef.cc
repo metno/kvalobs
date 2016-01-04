@@ -32,14 +32,10 @@
 
 #define NPARAMSET  sizeof paramset_/sizeof paramset_[0]
 
-namespace kvalobs
-{
+namespace kvalobs {
 
 nparamset = NPARAMSET;
 
-paramset paramset_[] =
-{
-{ 1, "1,4,5" },
-{ 2, "3,7,8" } };
+paramset paramset_[] = { { 1, "1,4,5" }, { 2, "3,7,8" } };
 
 }

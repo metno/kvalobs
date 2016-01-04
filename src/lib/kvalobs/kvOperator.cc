@@ -32,56 +32,46 @@
 
 using namespace std;
 
-std::string kvalobs::kvOperator::toSend() const
-{
-	ostringstream ost;
-	ost << "(" << quoted(username_) << "," << userid_ << ")";
-	return ost.str();
+std::string kvalobs::kvOperator::toSend() const {
+  ostringstream ost;
+  ost << "(" << quoted(username_) << "," << userid_ << ")";
+  return ost.str();
 }
 
-bool kvalobs::kvOperator::set(const std::string& username, int userid)
-{
-	username_ = username;
-	userid_ = userid;
-	sortBy_ = std::string(username_);
-	return true;
+bool kvalobs::kvOperator::set(const std::string& username, int userid) {
+  username_ = username;
+  userid_ = userid;
+  sortBy_ = std::string(username_);
+  return true;
 }
 
-bool kvalobs::kvOperator::set(const dnmi::db::DRow& r_)
-{
-	dnmi::db::DRow &r = const_cast<dnmi::db::DRow&>(r_);
-	string buf;
-	list<string> names = r.getFieldNames();
-	list<string>::iterator it = names.begin();
+bool kvalobs::kvOperator::set(const dnmi::db::DRow& r_) {
+  dnmi::db::DRow &r = const_cast<dnmi::db::DRow&>(r_);
+  string buf;
+  list<string> names = r.getFieldNames();
+  list<string>::iterator it = names.begin();
 
-	for (; it != names.end(); it++)
-	{
-		try
-		{
-			buf = r[*it];
-			if (*it == "username")
-			{
-				username_ = buf;
-			}
-			else if (*it == "userid")
-			{
-				userid_ = atoi(buf.c_str());
-			}
-		} catch (...)
-		{
-			CERR("kvOperator: exception ..... \n");
-		}
-	}
-	sortBy_ = std::string(username_);
-	return true;
+  for (; it != names.end(); it++) {
+    try {
+      buf = r[*it];
+      if (*it == "username") {
+        username_ = buf;
+      } else if (*it == "userid") {
+        userid_ = atoi(buf.c_str());
+      }
+    } catch (...) {
+      CERR("kvOperator: exception ..... \n");
+    }
+  }
+  sortBy_ = std::string(username_);
+  return true;
 }
 
-std::string kvalobs::kvOperator::uniqueKey() const
-{
-	ostringstream ost;
+std::string kvalobs::kvOperator::uniqueKey() const {
+  ostringstream ost;
 
-	ost << " WHERE  username=" << quoted(username_);
+  ost << " WHERE  username=" << quoted(username_);
 
-	return ost.str();
+  return ost.str();
 }
 

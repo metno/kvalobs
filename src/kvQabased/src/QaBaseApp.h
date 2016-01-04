@@ -34,13 +34,11 @@
 #include <memory>
 #include <string>
 
-
 namespace kvalobs {
 namespace subscribe {
 class KafkaProducer;
 }
 }
-
 
 namespace qabase {
 
@@ -49,12 +47,15 @@ class QaBaseApp : public KvBaseApp {
   QaBaseApp(int argc, char ** argv);
   virtual ~QaBaseApp();
 
-  static const std::string & kafkaDomain() { return kafkaDomain_; }
-  static const std::string & kafkaBrokers() { return kafkaBrokers_; }
+  static const std::string & kafkaDomain() {
+    return kafkaDomain_;
+  }
+  static const std::string & kafkaBrokers() {
+    return kafkaBrokers_;
+  }
   static std::shared_ptr<kvalobs::subscribe::KafkaProducer> kafkaProducer();
 
   static const std::string & baseLogDir();
-
 
  private:
   static std::string kafkaBrokers_;

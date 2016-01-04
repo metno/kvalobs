@@ -104,8 +104,8 @@ void KvBaseApp::useMessage(std::ostream &os) {
   os << appName << endl << endl;
   os << "Use: " << endl << endl;
   os << "Standard kvalobs configuration options:\n\n"
-         << "\t\t--kv-config <filename> Read the configuration file <filename>\n"
-         << "\t\t                       instead of the kvalobs.conf\n";
+     << "\t\t--kv-config <filename> Read the configuration file <filename>\n"
+     << "\t\t                       instead of the kvalobs.conf\n";
   os << "\t\t--help Print this help message and exit!\n\n";
 }
 
@@ -158,7 +158,7 @@ std::string KvBaseApp::createConnectString(const std::string &dbname,
   if (myConf) {
     string val = myConf->getValue("database.dbconnect").valAsString("");
 
-    if (! val.empty()) {
+    if (!val.empty()) {
       LOGINFO("Using 'database.dbconnect' from configuration file");
       return val;
     }

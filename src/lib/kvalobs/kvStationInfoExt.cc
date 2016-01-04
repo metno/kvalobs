@@ -34,81 +34,75 @@
 using namespace std;
 
 kvalobs::kvStationInfoExt::kvStationInfoExt(
-		const kvalobs::kvStationInfoExt &info) :
-		stationid_(info.stationid_), obstime_(info.obstime_), typeid_(
-				info.typeid_), params_(info.params_)
-{
+    const kvalobs::kvStationInfoExt &info)
+    : stationid_(info.stationid_),
+      obstime_(info.obstime_),
+      typeid_(info.typeid_),
+      params_(info.params_) {
 }
 
 kvalobs::kvStationInfoExt&
-kvalobs::kvStationInfoExt::operator=(const kvStationInfoExt &info)
-{
-	if (this == &info)
-		return *this;
+kvalobs::kvStationInfoExt::operator=(const kvStationInfoExt &info) {
+  if (this == &info)
+    return *this;
 
-	stationid_ = info.stationid_;
-	obstime_ = info.obstime_;
-	typeid_ = info.typeid_;
-	params_ = info.params_;
+  stationid_ = info.stationid_;
+  obstime_ = info.obstime_;
+  typeid_ = info.typeid_;
+  params_ = info.params_;
 
-	return *this;
+  return *this;
 }
 
-void kvalobs::kvStationInfoExt::addParam(const Param &param)
-{
-	for (list<Param>::iterator it = params_.begin(); it != params_.end(); ++it)
-		if (it->paramid == param.paramid && it->sensor == param.sensor
-				&& it->level == param.level)
-			return;
+void kvalobs::kvStationInfoExt::addParam(const Param &param) {
+  for (list<Param>::iterator it = params_.begin(); it != params_.end(); ++it)
+    if (it->paramid == param.paramid && it->sensor == param.sensor
+        && it->level == param.level)
+      return;
 
-	params_.push_back(param);
+  params_.push_back(param);
 }
 
 void kvalobs::populateCorbaKvStationInfoExtList(
-		const kvalobs::kvStationInfoExtList &stList,
-		CKvalObs::StationInfoExtList &cstList)
-{
-	kvalobs::kvStationInfoExtList::const_iterator it;
-	CORBA::Long i, k;
-	list<kvalobs::kvStationInfoExt::Param> params;
-	list<kvalobs::kvStationInfoExt::Param>::const_iterator pit;
+    const kvalobs::kvStationInfoExtList &stList,
+    CKvalObs::StationInfoExtList &cstList) {
+  kvalobs::kvStationInfoExtList::const_iterator it;
+  CORBA::Long i, k;
+  list<kvalobs::kvStationInfoExt::Param> params;
+  list<kvalobs::kvStationInfoExt::Param>::const_iterator pit;
 
-	if (stList.empty())
-	{
-		cstList.length(0);
-		return;
-	}
+  if (stList.empty()) {
+    cstList.length(0);
+    return;
+  }
 
-	cstList.length(stList.size());
-	it = stList.begin();
+  cstList.length(stList.size());
+  it = stList.begin();
 
-	for (it = stList.begin(), k = 0; it != stList.end(); ++it, ++k)
-	{
-		cstList[k].stationId = it->stationID();
-		cstList[k].obstime = CORBA::string_dup(to_kvalobs_string(it->obstime()).c_str());
-		cstList[k].typeId_ = it->typeID();
-		params = it->params();
+  for (it = stList.begin(), k = 0; it != stList.end(); ++it, ++k) {
+    cstList[k].stationId = it->stationID();
+    cstList[k].obstime = CORBA::string_dup(
+        to_kvalobs_string(it->obstime()).c_str());
+    cstList[k].typeId_ = it->typeID();
+    params = it->params();
 
-		cstList[k].params.length(params.size());
-		for (pit = params.begin(), i = 0; pit != params.end(); ++pit, ++i)
-		{
-			cstList[k].params[i].paramid = pit->paramid;
-			cstList[k].params[i].sensor = pit->sensor;
-			cstList[k].params[i].level = pit->level;
-		}
-	}
+    cstList[k].params.length(params.size());
+    for (pit = params.begin(), i = 0; pit != params.end(); ++pit, ++i) {
+      cstList[k].params[i].paramid = pit->paramid;
+      cstList[k].params[i].sensor = pit->sensor;
+      cstList[k].params[i].level = pit->level;
+    }
+  }
 
 }
 
 std::ostream&
-kvalobs::operator<<(std::ostream& os, const kvalobs::kvStationInfoExt &inf_)
-{
-	kvalobs::kvStationInfoExt &inf =
-			const_cast<kvalobs::kvStationInfoExt&>(inf_);
+kvalobs::operator<<(std::ostream& os, const kvalobs::kvStationInfoExt &inf_) {
+  kvalobs::kvStationInfoExt &inf = const_cast<kvalobs::kvStationInfoExt&>(inf_);
 
-	os << "kvStationInfoExt: stationid: " << inf.stationID() << " obstime: "
-			<< inf.obstime() << " typeId: " << inf.typeID() << " #params: "
-			<< inf.params_.size() << endl;
+  os << "kvStationInfoExt: stationid: " << inf.stationID() << " obstime: "
+     << inf.obstime() << " typeId: " << inf.typeID() << " #params: "
+     << inf.params_.size() << endl;
 
-	return os;
+  return os;
 }

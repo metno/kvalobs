@@ -35,82 +35,66 @@
 using namespace std;
 namespace pt = boost::posix_time;
 
-std::string kvalobs::kvTextData::toSend() const
-{
-	ostringstream ost;
+std::string kvalobs::kvTextData::toSend() const {
+  ostringstream ost;
 
-	ost << "(" << stationid_ << "," << quoted( pt::to_kvalobs_string(obstime_)) << ","
-			<< quoted(original_) << "," << paramid_ << "," << quoted( pt::to_kvalobs_string(tbtime_))
-			<< "," << typeid_ << ")";
-	return ost.str();
+  ost << "(" << stationid_ << "," << quoted(pt::to_kvalobs_string(obstime_))
+      << "," << quoted(original_) << "," << paramid_ << ","
+      << quoted(pt::to_kvalobs_string(tbtime_)) << "," << typeid_ << ")";
+  return ost.str();
 }
 
 bool kvalobs::kvTextData::set(int sta, const boost::posix_time::ptime& obt,
-		const std::string& org, int pid, const boost::posix_time::ptime& tbt, int typ)
-{
-	stationid_ = sta;
-	obstime_ = obt;
-	original_ = org;
-	paramid_ = pid;
-	tbtime_ = tbt;
-	typeid_ = typ;
-	sortBy_ = boost::lexical_cast<std::string>(sta) + pt::to_kvalobs_string(obt);
-	return true;
+                              const std::string& org, int pid,
+                              const boost::posix_time::ptime& tbt, int typ) {
+  stationid_ = sta;
+  obstime_ = obt;
+  original_ = org;
+  paramid_ = pid;
+  tbtime_ = tbt;
+  typeid_ = typ;
+  sortBy_ = boost::lexical_cast<std::string>(sta) + pt::to_kvalobs_string(obt);
+  return true;
 }
 
-bool kvalobs::kvTextData::set(const dnmi::db::DRow& r_)
-{
-	dnmi::db::DRow & r = const_cast<dnmi::db::DRow&>(r_);
-	list<string> names = r.getFieldNames();
-	list<string>::iterator it = names.begin();
-	std::string buf;
+bool kvalobs::kvTextData::set(const dnmi::db::DRow& r_) {
+  dnmi::db::DRow & r = const_cast<dnmi::db::DRow&>(r_);
+  list<string> names = r.getFieldNames();
+  list<string>::iterator it = names.begin();
+  std::string buf;
 
-	for (; it != names.end(); it++)
-	{
-		try
-		{
-			buf = r[*it];
-			if (*it == "stationid")
-			{
-				stationid_ = atoi(buf.c_str());
-			}
-			else if (*it == "obstime")
-			{
-				obstime_ = pt::time_from_string_nothrow(buf);
-			}
-			else if (*it == "original")
-			{
-				original_ = buf;
-			}
-			else if (*it == "paramid")
-			{
-				paramid_ = atoi(buf.c_str());
-			}
-			else if (*it == "tbtime")
-			{
-				tbtime_ = pt::time_from_string_nothrow(buf);
-			}
-			else if (*it == "typeid")
-			{
-				typeid_ = atoi(buf.c_str());
-			}
-		} catch (...)
-		{
-			CERR("kvTextData: exception ..... \n");
-		}
-	}
-	sortBy_ = boost::lexical_cast<std::string>(stationid_) + pt::to_kvalobs_string(obstime_);
-	return true;
+  for (; it != names.end(); it++) {
+    try {
+      buf = r[*it];
+      if (*it == "stationid") {
+        stationid_ = atoi(buf.c_str());
+      } else if (*it == "obstime") {
+        obstime_ = pt::time_from_string_nothrow(buf);
+      } else if (*it == "original") {
+        original_ = buf;
+      } else if (*it == "paramid") {
+        paramid_ = atoi(buf.c_str());
+      } else if (*it == "tbtime") {
+        tbtime_ = pt::time_from_string_nothrow(buf);
+      } else if (*it == "typeid") {
+        typeid_ = atoi(buf.c_str());
+      }
+    } catch (...) {
+      CERR("kvTextData: exception ..... \n");
+    }
+  }
+  sortBy_ = boost::lexical_cast<std::string>(stationid_)
+      + pt::to_kvalobs_string(obstime_);
+  return true;
 }
 
-std::string kvalobs::kvTextData::uniqueKey() const
-{
-	ostringstream ost;
+std::string kvalobs::kvTextData::uniqueKey() const {
+  ostringstream ost;
 
-	ost << " WHERE stationid=" << stationid_ << " AND " << "       obstime="
-			<< quoted(pt::to_kvalobs_string(obstime_)) << " AND " << "       paramid="
-			<< paramid_ << " AND " << "       typeid=" << typeid_;
+  ost << " WHERE stationid=" << stationid_ << " AND " << "       obstime="
+      << quoted(pt::to_kvalobs_string(obstime_)) << " AND " << "       paramid="
+      << paramid_ << " AND " << "       typeid=" << typeid_;
 
-	return ost.str();
+  return ost.str();
 }
 

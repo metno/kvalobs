@@ -36,8 +36,7 @@
 #include <kvalobs/kvStationInfoExt.h>
 #include <dnmithread/CommandQue.h>
 
-namespace kvalobs
-{
+namespace kvalobs {
 
 /**
  * \addtogroup kvinternalhelpers
@@ -50,65 +49,60 @@ namespace kvalobs
  *
  * The command can carry more than one kvStationInfo elements.
  */
-class StationInfoCommand: public dnmi::thread::CommandBase
-{
-	kvalobs::kvStationInfoExtList stationInfoList;
-	kvalobs::kvStationInfoList stationInfoListLegacy;
-public:
-	StationInfoCommand();
+class StationInfoCommand : public dnmi::thread::CommandBase {
+  kvalobs::kvStationInfoExtList stationInfoList;
+  kvalobs::kvStationInfoList stationInfoListLegacy;
+ public:
+  StationInfoCommand();
 
-	/**
-	 * \brief initialize from the CORBA object CKvalObs::StationInfoList.
-	 * \param stInfo a CORBA StationInfoList object.
-	 */
-	StationInfoCommand(const CKvalObs::StationInfoList &stInfo);
-	StationInfoCommand(const CKvalObs::StationInfoExtList &stInfo);
+  /**
+   * \brief initialize from the CORBA object CKvalObs::StationInfoList.
+   * \param stInfo a CORBA StationInfoList object.
+   */
+  StationInfoCommand(const CKvalObs::StationInfoList &stInfo);
+  StationInfoCommand(const CKvalObs::StationInfoExtList &stInfo);
 
-	/**
-	 * \brief initialize from the CORBA object CKvalObs::StationInfo.
-	 * \param a CORBA StationInfo object.
-	 */
-	StationInfoCommand(const CKvalObs::StationInfo &stInfo);
-	StationInfoCommand(const CKvalObs::StationInfoExt &stInfo);
+  /**
+   * \brief initialize from the CORBA object CKvalObs::StationInfo.
+   * \param a CORBA StationInfo object.
+   */
+  StationInfoCommand(const CKvalObs::StationInfo &stInfo);
+  StationInfoCommand(const CKvalObs::StationInfoExt &stInfo);
 
-	virtual ~StationInfoCommand()
-	{
-	}
-	;
+  virtual ~StationInfoCommand() {
+  }
+  ;
 
-	/**
-	 * \brief get a list of all kvStationInfo object this command carries.
-	 * \return a list of kvStationInfo objects.
-	 */
-	kvalobs::kvStationInfoList& getStationInfo();
-	const kvalobs::kvStationInfoList & getStationInfo() const;
+  /**
+   * \brief get a list of all kvStationInfo object this command carries.
+   * \return a list of kvStationInfo objects.
+   */
+  kvalobs::kvStationInfoList& getStationInfo();
+  const kvalobs::kvStationInfoList & getStationInfo() const;
 
-	kvalobs::kvStationInfoExtList& getStationInfoExt()
-	{
-		return stationInfoList;
-	}
-	const kvalobs::kvStationInfoExtList & getStationInfoExt() const
-	{
-		return stationInfoList;
-	}
+  kvalobs::kvStationInfoExtList& getStationInfoExt() {
+    return stationInfoList;
+  }
+  const kvalobs::kvStationInfoExtList & getStationInfoExt() const {
+    return stationInfoList;
+  }
 
-	/**
-	 *  \brief add a kvStationInfo object to this command.
-	 *
-	 * \param stationInfo The kvStationInfo object to add.
-	 * \return true on success and false otherwise.
-	 */
-	bool addStationInfo(const kvStationInfo &stationInfo);
+  /**
+   *  \brief add a kvStationInfo object to this command.
+   *
+   * \param stationInfo The kvStationInfo object to add.
+   * \return true on success and false otherwise.
+   */
+  bool addStationInfo(const kvStationInfo &stationInfo);
 
-	bool addStationInfo(const kvStationInfoExt &stationInfo);
+  bool addStationInfo(const kvStationInfoExt &stationInfo);
 
-	bool executeImpl()
-	{
-		return true;
-	}
-	; //Do nothing
+  bool executeImpl() {
+    return true;
+  }
+  ;  //Do nothing
 
-	void debugInfo(std::ostream &info) const;
+  void debugInfo(std::ostream &info) const;
 
 };
 

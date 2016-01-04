@@ -39,16 +39,16 @@ std::string QaBaseApp::kafkaBrokers_;
 std::string QaBaseApp::kafkaDomain_;
 
 namespace {
-std::string val(const std::string & name, miutil::conf::ConfSection * conf, const std::string & defaultValue) {
+std::string val(const std::string & name, miutil::conf::ConfSection * conf,
+                const std::string & defaultValue) {
   if (conf) {
     miutil::conf::ValElementList ret = conf->getValue(name);
     if (ret.empty())
       return defaultValue;
-    if (ret.size() > 1 )
+    if (ret.size() > 1)
       throw std::runtime_error("Several " + name + " elements in config!");
     return ret.valAsString(defaultValue);
-  }
-  else
+  } else
     return defaultValue;
 }
 }
@@ -80,11 +80,11 @@ std::shared_ptr<kvalobs::subscribe::KafkaProducer> QaBaseApp::kafkaProducer() {
   LOGINFO(
       "Creating kafka connection on " << kafkaBrokers_ << ", using topic " << queue);
 
-  return std::make_shared<KafkaProducer>(queue, kafkaBrokers_, processDataErrors);
+  return std::make_shared < KafkaProducer
+      > (queue, kafkaBrokers_, processDataErrors);
 }
 
-const std::string & QaBaseApp::baseLogDir()
-{
+const std::string & QaBaseApp::baseLogDir() {
   return kvalobs::kvPath(kvalobs::logdir) + "/checks/";
 }
 

@@ -5,28 +5,30 @@
 #include "newfilePoa.hh"
 #include "corbaApp.h"
 
-class SignalNewFileApp : public CorbaHelper::CorbaApp
-{
+class SignalNewFileApp : public CorbaHelper::CorbaApp {
   micutil::newfilesignal_var refNewfile;
-  std::string                aopath_;
-  std::string                newfileApp;
-  std::string                datadir;
-  omni_mutex   mutex;
+  std::string aopath_;
+  std::string newfileApp;
+  std::string datadir;
+  omni_mutex mutex;
 
  public:
 
-  class ConfigEx : public std::exception{
+  class ConfigEx : public std::exception {
     std::string reason;
-  public:
+   public:
     explicit ConfigEx(const std::string &reason_)
-      : reason(reason_){}
-    
-    virtual ~ConfigEx()throw(){};
-    
-    const char *what()const throw()
-      { return reason.c_str();}
-  };
+        : reason(reason_) {
+    }
 
+    virtual ~ConfigEx() throw () {
+    }
+    ;
+
+    const char *what() const throw () {
+      return reason.c_str();
+    }
+  };
 
   SignalNewFileApp(int argn, char **argv);
 
@@ -45,7 +47,7 @@ class SignalNewFileApp : public CorbaHelper::CorbaApp
    * \exception ConfigEx.
    */
   CORBA::Object_ptr getRefInNS(const std::string &name,
-			       const std::string &path="");
+                               const std::string &path = "");
 
   /**
    * This function return either a cached referance to a 'Data'
@@ -57,16 +59,12 @@ class SignalNewFileApp : public CorbaHelper::CorbaApp
    *               the KvDataSource.
    * \return A Data_ptr if successful, CORBA::_nil() on error.
    */
-  micutil::newfilesignal_ptr 
-    lookUpNewfilesignal(bool forceNS, 
-			bool &usedNS);
-  
-  bool createFile(const std::string &station,
-		  const std::string &data, 
-		  const std::string &key);
-  
-  
-};
+  micutil::newfilesignal_ptr
+  lookUpNewfilesignal(bool forceNS, bool &usedNS);
 
+  bool createFile(const std::string &station, const std::string &data,
+                  const std::string &key);
+
+};
 
 #endif

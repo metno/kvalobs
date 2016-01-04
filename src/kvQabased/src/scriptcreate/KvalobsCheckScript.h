@@ -33,14 +33,11 @@
 #include <db/DatabaseAccess.h>
 #include <boost/scoped_ptr.hpp>
 
-
-namespace scriptrunner
-{
+namespace scriptrunner {
 class Script;
 }
 
-namespace qabase
-{
+namespace qabase {
 class DataStore;
 
 /**
@@ -56,48 +53,46 @@ class DataStore;
  *
  * \ingroup group_scriptcreate
  */
-class KvalobsCheckScript : boost::noncopyable
-{
-public:
+class KvalobsCheckScript : boost::noncopyable {
+ public:
 
-	/**
-	 * Construct kvalobs script
-	 *
-	 * @param database The database connection to use for getting source data
-	 * @param obs observation to check
-	 * @param check The check to run
-	 * @param scriptLog stream to send script log, or NULL if no logging is to
-	 *                  be done.
-	 */
-	KvalobsCheckScript(
-			const db::DatabaseAccess & database,
-			const kvalobs::kvStationInfo & obs,
-			const kvalobs::kvChecks & check,
-			std::ostream * scriptLog = 0);
+  /**
+   * Construct kvalobs script
+   *
+   * @param database The database connection to use for getting source data
+   * @param obs observation to check
+   * @param check The check to run
+   * @param scriptLog stream to send script log, or NULL if no logging is to
+   *                  be done.
+   */
+  KvalobsCheckScript(const db::DatabaseAccess & database,
+                     const kvalobs::kvStationInfo & obs,
+                     const kvalobs::kvChecks & check, std::ostream * scriptLog =
+                         0);
 
-	~KvalobsCheckScript();
+  ~KvalobsCheckScript();
 
-	/**
-	 * Get a runnable version of the given script.
-	 *
-	 * @return The script that this object represents, as a string.
-	 */
-	std::string str() const;
+  /**
+   * Get a runnable version of the given script.
+   *
+   * @return The script that this object represents, as a string.
+   */
+  std::string str() const;
 
-	/**
-	 * Run the script
-	 *
-	 * @param modificationsOut Any modified data goes into this list.
-	 */
-	void run(db::DatabaseAccess::DataList * modificationsOut);
+  /**
+   * Run the script
+   *
+   * @param modificationsOut Any modified data goes into this list.
+   */
+  void run(db::DatabaseAccess::DataList * modificationsOut);
 
-private:
-	boost::scoped_ptr<DataStore> store_;
-	boost::scoped_ptr<scriptrunner::Script> script_;
+ private:
+  boost::scoped_ptr<DataStore> store_;
+  boost::scoped_ptr<scriptrunner::Script> script_;
 
-	void terminateLogEntry_() const;
+  void terminateLogEntry_() const;
 
-	std::ostream * scriptLog_;
+  std::ostream * scriptLog_;
 };
 
 }

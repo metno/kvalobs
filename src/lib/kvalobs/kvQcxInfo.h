@@ -35,8 +35,7 @@
 
 /* Edited by T.Reite 30. januar 2003 */
 
-namespace kvalobs
-{
+namespace kvalobs {
 /**
  * \addtogroup  dbinterface
  *
@@ -47,58 +46,49 @@ namespace kvalobs
  * \brief Interface to the table qcx_info in the kvalobs database.
  */
 
-class kvQcxInfo: public kvDbBase
-{
-private:
-	std::string medium_qcx_;
-	std::string main_qcx_;
-	int controlpart_;
-	std::string comment_;
+class kvQcxInfo : public kvDbBase {
+ private:
+  std::string medium_qcx_;
+  std::string main_qcx_;
+  int controlpart_;
+  std::string comment_;
 
-public:
+ public:
 
-	kvQcxInfo()
-	{
-	}
-	;
-	kvQcxInfo(const dnmi::db::DRow& r)
-	{
-		set(r);
-	}
-	kvQcxInfo(const std::string& medium_qcx, const std::string& main_qcx,
-			int controlpart, const std::string& comment)
-	{
-		set(medium_qcx, main_qcx, controlpart, comment);
-	}
-	~kvQcxInfo();
+  kvQcxInfo() {
+  }
+  ;
+  kvQcxInfo(const dnmi::db::DRow& r) {
+    set(r);
+  }
+  kvQcxInfo(const std::string& medium_qcx, const std::string& main_qcx,
+            int controlpart, const std::string& comment) {
+    set(medium_qcx, main_qcx, controlpart, comment);
+  }
+  ~kvQcxInfo();
 
-	bool set(const std::string& medium_qcx, const std::string& main_qcx,
-			int controlpart, const std::string& comment);
+  bool set(const std::string& medium_qcx, const std::string& main_qcx,
+           int controlpart, const std::string& comment);
 
-	bool set(const dnmi::db::DRow&);
-	const char* tableName() const
-	{
-		return "qcx_info";
-	}
-	std::string toSend() const;
-	std::string uniqueKey() const;
+  bool set(const dnmi::db::DRow&);
+  const char* tableName() const {
+    return "qcx_info";
+  }
+  std::string toSend() const;
+  std::string uniqueKey() const;
 
-	const std::string & medium_qcx() const
-	{
-		return medium_qcx_;
-	}
-	const std::string & main_qcx() const
-	{
-		return main_qcx_;
-	}
-	int controlpart() const
-	{
-		return controlpart_;
-	}
-	const std::string & comment() const
-	{
-		return comment_;
-	}
+  const std::string & medium_qcx() const {
+    return medium_qcx_;
+  }
+  const std::string & main_qcx() const {
+    return main_qcx_;
+  }
+  int controlpart() const {
+    return controlpart_;
+  }
+  const std::string & comment() const {
+    return comment_;
+  }
 };
 
 /** @} */

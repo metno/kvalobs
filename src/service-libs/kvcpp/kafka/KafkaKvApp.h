@@ -11,25 +11,25 @@
 #include "../corba/CorbaKvApp.h"
 #include "KafkaSubscribe.h"
 
-namespace kvservice
-{
-namespace kafka
-{
+namespace kvservice {
+namespace kafka {
 
-class KafkaKvApp: public corba::CorbaKvApp
-{
-public:
-	KafkaKvApp(int &argc, char **argv,  miutil::conf::ConfSection *conf, const char *options[][2] = nullptr);
-	virtual ~KafkaKvApp();
+class KafkaKvApp : public corba::CorbaKvApp {
+ public:
+  KafkaKvApp(int &argc, char **argv, miutil::conf::ConfSection *conf,
+             const char *options[][2] = nullptr);
+  virtual ~KafkaKvApp();
 
-    virtual SubscriberID subscribeDataNotify( const KvDataSubscribeInfoHelper &info, dnmi::thread::CommandQue &queue );
-    virtual SubscriberID subscribeData( const KvDataSubscribeInfoHelper &info, dnmi::thread::CommandQue &queue );
+  virtual SubscriberID subscribeDataNotify(
+      const KvDataSubscribeInfoHelper &info, dnmi::thread::CommandQue &queue);
+  virtual SubscriberID subscribeData(const KvDataSubscribeInfoHelper &info,
+                                     dnmi::thread::CommandQue &queue);
 //    virtual SubscriberID subscribeKvHint( dnmi::thread::CommandQue &queue );
-    virtual void unsubscribe( const SubscriberID &subscriberid );
-    virtual void unsubscribeAll();
+  virtual void unsubscribe(const SubscriberID &subscriberid);
+  virtual void unsubscribeAll();
 
-private:
-    KafkaSubscribe subscriptionHandler_;
+ private:
+  KafkaSubscribe subscriptionHandler_;
 };
 
 } /* namespace kafka */

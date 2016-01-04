@@ -30,28 +30,25 @@
  */
 #include "kvalobs/bitmanip.h"
 
-namespace
-{
+namespace {
 const unsigned long long lowmask = 0x00000000FFFFFFFF;
 }
 ;
 
-void u32ToU64(unsigned long high, unsigned long low, unsigned long long &val)
-{
-	unsigned long long tmp;
+void u32ToU64(unsigned long high, unsigned long low, unsigned long long &val) {
+  unsigned long long tmp;
 
-	val = high;
-	val <<= 32;
-	tmp = low;
-	val |= tmp;
+  val = high;
+  val <<= 32;
+  tmp = low;
+  val |= tmp;
 }
 
-void u64ToU32(unsigned long long val, unsigned long &high, unsigned long &low)
-{
-	unsigned long long tmp;
+void u64ToU32(unsigned long long val, unsigned long &high, unsigned long &low) {
+  unsigned long long tmp;
 
-	low = val & lowmask;
-	tmp = val;
-	tmp >>= 32;
-	high = tmp;
+  low = val & lowmask;
+  tmp = val;
+  tmp >>= 32;
+  high = tmp;
 }

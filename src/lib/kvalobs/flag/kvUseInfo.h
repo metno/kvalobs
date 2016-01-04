@@ -32,69 +32,66 @@
 
 #include "kvDataFlag.h"
 
-namespace kvalobs
-{
+namespace kvalobs {
 
 class kvControlInfo;
 
 /**
  * \brief  UseInfo DataFlag
  */
-class kvUseInfo: public kvDataFlag
-{
-public:
-	kvUseInfo();
-	kvUseInfo(const std::string& s);
-	kvUseInfo(const unsigned char f[kvDataFlag::size]);
-	kvUseInfo(const kvUseInfo& df);
-	explicit kvUseInfo(const kvDataFlag& df);
+class kvUseInfo : public kvDataFlag {
+ public:
+  kvUseInfo();
+  kvUseInfo(const std::string& s);
+  kvUseInfo(const unsigned char f[kvDataFlag::size]);
+  kvUseInfo(const kvUseInfo& df);
+  explicit kvUseInfo(const kvDataFlag& df);
 
-	/// clear flag
-	void clear();
+  /// clear flag
+  void clear();
 
-	/**
-	 * \brief set Useinfo-flags, based on values in a controlflag.
-	 */
-	bool setUseFlags(const kvControlInfo& cinfo);
+  /**
+   * \brief set Useinfo-flags, based on values in a controlflag.
+   */
+  bool setUseFlags(const kvControlInfo& cinfo);
 
-	/**
-	 * \brief add 1 to error-count
-	 */
-	void addToErrorCount();
+  /**
+   * \brief add 1 to error-count
+   */
+  void addToErrorCount();
 
-	/**
-	 * \brief error count
-	 */
-	int ErrorCount() const;
+  /**
+   * \brief error count
+   */
+  int ErrorCount() const;
 
-	/**
-	 * \brief set confidence (0-100)
-	 */
-	void Confidence(const int& c);
-	/**
-	 * \brief get confidence (0-100)
-	 */
-	int Confidence() const;
+  /**
+   * \brief set confidence (0-100)
+   */
+  void Confidence(const int& c);
+  /**
+   * \brief get confidence (0-100)
+   */
+  int Confidence() const;
 
-	/**
-	 * \brief set HQC observer-id (0 - 255)
-	 */
-	void HQCid(const int& c);
+  /**
+   * \brief set HQC observer-id (0 - 255)
+   */
+  void HQCid(const int& c);
 
-	/**
-	 * \brief get HQC observer-id
-	 */
-	int HQCid() const;
+  /**
+   * \brief get HQC observer-id
+   */
+  int HQCid() const;
 
-	kvUseInfo& operator=(const kvUseInfo &rhs);
-	kvUseInfo& operator=(const kvDataFlag &rhs);
-	bool operator==(const kvUseInfo& rhs) const;
-	bool operator!=(const kvUseInfo& rhs) const
-	{
-		return !(*this == rhs);
-	}
-	friend std::ostream& operator<<(std::ostream& output,
-			const kvalobs::kvUseInfo& kd);
+  kvUseInfo& operator=(const kvUseInfo &rhs);
+  kvUseInfo& operator=(const kvDataFlag &rhs);
+  bool operator==(const kvUseInfo& rhs) const;
+  bool operator!=(const kvUseInfo& rhs) const {
+    return !(*this == rhs);
+  }
+  friend std::ostream& operator<<(std::ostream& output,
+                                  const kvalobs::kvUseInfo& kd);
 };
 
 /** @} */

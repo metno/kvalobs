@@ -36,8 +36,7 @@
 
 /* Dette er ingen databaseconnection- men et bibliotek */
 
-namespace kvalobs
-{
+namespace kvalobs {
 
 /**
  * \addtogroup kvinternalhelpers
@@ -49,46 +48,45 @@ namespace kvalobs
  *
  * \todo Noen som f�ler seg kallet til � dokumentere dette.
  */
-class kvParamset
-{
+class kvParamset {
 
-private:
-	std::map<int, std::vector<int> > m_int_paramset;
-	std::map<int, std::vector<std::string> > m_str_paramset;
-	std::map<int, std::vector<int> > m_int_param;
+ private:
+  std::map<int, std::vector<int> > m_int_paramset;
+  std::map<int, std::vector<std::string> > m_str_paramset;
+  std::map<int, std::vector<int> > m_int_param;
 
-	void add_inverse(int paramsetid, std::vector<int> vi);
+  void add_inverse(int paramsetid, std::vector<int> vi);
 
-public:
-	kvParamset();
+ public:
+  kvParamset();
 
-	/**
-	 * \brief returnerer en vector av parametere som dette
-	 * paramstetet inneholder
-	 * 
-	 * \note get_param og  get_param_str er egentlig samme funksjone, 
-	 * de returnerer bare verdien som forskjellig datatype - henholdsvis 
-	 * som en vector<int> og en vector<string>
-	 * get_param og get_paramset er omvendte funksjoner
-	 */
-	std::vector<int> get_param(int paramsetid);
+  /**
+   * \brief returnerer en vector av parametere som dette
+   * paramstetet inneholder
+   * 
+   * \note get_param og  get_param_str er egentlig samme funksjone, 
+   * de returnerer bare verdien som forskjellig datatype - henholdsvis 
+   * som en vector<int> og en vector<string>
+   * get_param og get_paramset er omvendte funksjoner
+   */
+  std::vector<int> get_param(int paramsetid);
 
-	/**
-	 * \brief  returnerer en vector av parametere som dette
-	 *  paramsetet inneholder.
-	 * 
-	 * \note get_param og  get_param_str er egentlig samme funksjone, 
-	 * de returnerer bare verdien som forskjellig datatype - henholdsvis 
-	 * som en vector<int> og en vector<string>
-	 *  get_param og get_paramset er omvendte funksjoner
-	 */
-	std::vector<std::string> get_param_str(int paramsetid);
+  /**
+   * \brief  returnerer en vector av parametere som dette
+   *  paramsetet inneholder.
+   * 
+   * \note get_param og  get_param_str er egentlig samme funksjone, 
+   * de returnerer bare verdien som forskjellig datatype - henholdsvis 
+   * som en vector<int> og en vector<string>
+   *  get_param og get_paramset er omvendte funksjoner
+   */
+  std::vector<std::string> get_param_str(int paramsetid);
 
-	/**
-	 * \brief returnerer en vector av paramset som inneholder mengden
-	 *  av de paramsetene som parameteren paramid er medlem av.
-	 */
-	std::vector<int> get_paramset(int paramid);
+  /**
+   * \brief returnerer en vector av paramset som inneholder mengden
+   *  av de paramsetene som parameteren paramid er medlem av.
+   */
+  std::vector<int> get_paramset(int paramid);
 
 };
 /** @} */

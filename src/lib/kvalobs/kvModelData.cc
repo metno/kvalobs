@@ -44,97 +44,81 @@
 using namespace std;
 using namespace dnmi;
 
-bool kvalobs::kvModelData::set(int stationid, const boost::posix_time::ptime &obstime,
-		int paramid, int level, int modelid, float original)
-{
-	stationid_ = stationid;
-	obstime_ = obstime;
-	paramid_ = paramid;
-	level_ = level;
-	modelid_ = modelid;
-	original_ = original;
+bool kvalobs::kvModelData::set(int stationid,
+                               const boost::posix_time::ptime &obstime,
+                               int paramid, int level, int modelid,
+                               float original) {
+  stationid_ = stationid;
+  obstime_ = obstime;
+  paramid_ = paramid;
+  level_ = level;
+  modelid_ = modelid;
+  original_ = original;
 
-	std::ostringstream s;
-	s << stationid_;
-	s << paramid_;
-	s << level_;
-	s << obstime_;
-	sortBy_ = s.str();
+  std::ostringstream s;
+  s << stationid_;
+  s << paramid_;
+  s << level_;
+  s << obstime_;
+  sortBy_ = s.str();
 
-	return true;
+  return true;
 }
 
-bool kvalobs::kvModelData::set(const dnmi::db::DRow &r_)
-{
-	db::DRow &r = const_cast<db::DRow&>(r_);
-	string buf;
-	list<string> names = r.getFieldNames();
-	list<string>::iterator it = names.begin();
+bool kvalobs::kvModelData::set(const dnmi::db::DRow &r_) {
+  db::DRow &r = const_cast<db::DRow&>(r_);
+  string buf;
+  list<string> names = r.getFieldNames();
+  list<string>::iterator it = names.begin();
 
-	for (; it != names.end(); it++)
-	{
-		try
-		{
-			buf = r[*it];
+  for (; it != names.end(); it++) {
+    try {
+      buf = r[*it];
 
-			if (*it == "stationid")
-			{
-				stationid_ = atoi(buf.c_str());
-			}
-			else if (*it == "obstime")
-			{
-				obstime_ = boost::posix_time::time_from_string_nothrow(buf);
-			}
-			else if (*it == "paramid")
-			{
-				paramid_ = atoi(buf.c_str());
-			}
-			else if (*it == "level")
-			{
-				level_ = atoi(buf.c_str());
-			}
-			else if (*it == "modelid")
-			{
-				modelid_ = atoi(buf.c_str());
-			}
-			else if (*it == "original")
-			{
-				sscanf(buf.c_str(), "%f", &original_);
-			}
-		} catch (...)
-		{
-			CERR("kvModelData: unexpected exception ..... \n");
-		}
-	}
+      if (*it == "stationid") {
+        stationid_ = atoi(buf.c_str());
+      } else if (*it == "obstime") {
+        obstime_ = boost::posix_time::time_from_string_nothrow(buf);
+      } else if (*it == "paramid") {
+        paramid_ = atoi(buf.c_str());
+      } else if (*it == "level") {
+        level_ = atoi(buf.c_str());
+      } else if (*it == "modelid") {
+        modelid_ = atoi(buf.c_str());
+      } else if (*it == "original") {
+        sscanf(buf.c_str(), "%f", &original_);
+      }
+    } catch (...) {
+      CERR("kvModelData: unexpected exception ..... \n");
+    }
+  }
 
-	std::ostringstream s;
-	s << stationid_;
-	s << paramid_;
-	s << level_;
-	s << obstime_;
-	sortBy_ = s.str();
+  std::ostringstream s;
+  s << stationid_;
+  s << paramid_;
+  s << level_;
+  s << obstime_;
+  sortBy_ = s.str();
 
-	return true;
+  return true;
 }
 
-std::string kvalobs::kvModelData::toSend() const
-{
-	ostringstream ost;
+std::string kvalobs::kvModelData::toSend() const {
+  ostringstream ost;
 
-	ost << "(" << stationid_ << "," << quoted(obstime_) << "," << paramid_
-			<< "," << level_ << "," << modelid_ << "," << original_ << ")";
+  ost << "(" << stationid_ << "," << quoted(obstime_) << "," << paramid_ << ","
+      << level_ << "," << modelid_ << "," << original_ << ")";
 
-	return ost.str();
+  return ost.str();
 }
 
-std::string kvalobs::kvModelData::uniqueKey() const
-{
-	ostringstream ost;
+std::string kvalobs::kvModelData::uniqueKey() const {
+  ostringstream ost;
 
-	ost << " WHERE stationid=" << stationid_ << " AND " << "       obstime="
-			<< quoted(to_kvalobs_string(obstime_)) << " AND " << "       paramid="
-			<< paramid_ << " AND " << "       level=" << level_ << " AND "
-			<< "       modelid=" << modelid_;
+  ost << " WHERE stationid=" << stationid_ << " AND " << "       obstime="
+      << quoted(to_kvalobs_string(obstime_)) << " AND " << "       paramid="
+      << paramid_ << " AND " << "       level=" << level_ << " AND "
+      << "       modelid=" << modelid_;
 
-	return ost.str();
+  return ost.str();
 }

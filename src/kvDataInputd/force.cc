@@ -1,33 +1,33 @@
 /*
-  Kvalobs - Free Quality Control Software for Meteorological Observations 
+ Kvalobs - Free Quality Control Software for Meteorological Observations 
 
-  $Id: force.cc,v 1.9.2.7 2007/09/27 09:02:18 paule Exp $                                                       
+ $Id: force.cc,v 1.9.2.7 2007/09/27 09:02:18 paule Exp $                                                       
 
-  Copyright (C) 2007 met.no
+ Copyright (C) 2007 met.no
 
-  Contact information:
-  Norwegian Meteorological Institute
-  Box 43 Blindern
-  0313 OSLO
-  NORWAY
-  email: kvalobs-dev@met.no
+ Contact information:
+ Norwegian Meteorological Institute
+ Box 43 Blindern
+ 0313 OSLO
+ NORWAY
+ email: kvalobs-dev@met.no
 
-  This file is part of KVALOBS
+ This file is part of KVALOBS
 
-  KVALOBS is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License as 
-  published by the Free Software Foundation; either version 2 
-  of the License, or (at your option) any later version.
-  
-  KVALOBS is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License along 
-  with KVALOBS; if not, write to the Free Software Foundation Inc., 
-  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ KVALOBS is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as 
+ published by the Free Software Foundation; either version 2 
+ of the License, or (at your option) any later version.
+ 
+ KVALOBS is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License along 
+ with KVALOBS; if not, write to the Free Software Foundation Inc., 
+ 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
 /**
  * \file
  * This file is an artifical used to force symbols in the executible 
@@ -56,58 +56,57 @@
 #include <fileutil/mkdir.h>
 #include <kvalobs/kvDataOperations.h>
 
-
-
 namespace {
-  kvalobs::kvData         dummyKvData;
-  kvalobs::kvRejectdecode dummyKvRejectdecode;
-  kvalobs::kvTypes        dummyKvTypes;
-  kvalobs::kvTextData     dummyKvTextData;
-  kvalobs::kvStation      dummykvStation;
+kvalobs::kvData dummyKvData;
+kvalobs::kvRejectdecode dummyKvRejectdecode;
+kvalobs::kvTypes dummyKvTypes;
+kvalobs::kvTextData dummyKvTextData;
+kvalobs::kvStation dummykvStation;
 
-  //decodeutility::KvDataSerializer dummyKvDataSerializer;
-  //decodeutility::KvDataSerializer dummyKvDataSerializer1(std::string());
+//decodeutility::KvDataSerializer dummyKvDataSerializer;
+//decodeutility::KvDataSerializer dummyKvDataSerializer1(std::string());
 
-  void dummyFunc1(){
-    ParamList pl;
-    findParamIdInList(pl, 0);
-  }
+void dummyFunc1() {
+  ParamList pl;
+  findParamIdInList(pl, 0);
+}
 
-  void dummyFunc2(){
-    using namespace kvalobs::decoder;
+void dummyFunc2() {
+  using namespace kvalobs::decoder;
 
-    std::string dummy1;
-    int         dummy2;
+  std::string dummy1;
+  int dummy2;
 
-    //DecoderBase::isTextParam(dummy2);
-  }
+  //DecoderBase::isTextParam(dummy2);
+}
 
-  void dummyFunc3(){
-    decodeutility::kvdataformatter::kvDataList dummy;
-    std::string    dummy1;
+void dummyFunc3() {
+  decodeutility::kvdataformatter::kvDataList dummy;
+  std::string dummy1;
 
-    dummy=decodeutility::kvdataformatter::getKvData(dummy1);
-  }
+  dummy = decodeutility::kvdataformatter::getKvData(dummy1);
+}
 
-  void dummyFunc4(){
-    std::string dummy;
-    std::string ret;
+void dummyFunc4() {
+  std::string dummy;
+  std::string ret;
 
-    ret=decodeutility::VV(dummy);
-  }
-  
-  void dummyFunc5(){
-  	dnmi::file::mkdir("","");
-  }
+  ret = decodeutility::VV(dummy);
+}
 
-  void dummyfunc6( kvalobs::serialize::KvalobsDataParser * parser ){
-    kvalobs::serialize::KvalobsData d;
-    parser->parse( "foo", d );
-  }
+void dummyFunc5() {
+  dnmi::file::mkdir("", "");
+}
 
-  void dummyfunc7(){
-    kvalobs::compare::eq_sensor( 3, 65 );
-  }
-   
-};
+void dummyfunc6(kvalobs::serialize::KvalobsDataParser * parser) {
+  kvalobs::serialize::KvalobsData d;
+  parser->parse("foo", d);
+}
+
+void dummyfunc7() {
+  kvalobs::compare::eq_sensor(3, 65);
+}
+
+}
+;
 

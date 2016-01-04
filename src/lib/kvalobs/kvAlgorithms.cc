@@ -34,77 +34,64 @@
 using namespace std;
 using namespace dnmi;
 
-std::string kvalobs::kvAlgorithms::toSend() const
-{
-	ostringstream ost;
-	ost << "(" << language_ << "," << quoted(checkname_) << ","
-			<< quoted(signature_) << "," << quoted(script_) << ")";
+std::string kvalobs::kvAlgorithms::toSend() const {
+  ostringstream ost;
+  ost << "(" << language_ << "," << quoted(checkname_) << ","
+      << quoted(signature_) << "," << quoted(script_) << ")";
 
-	return ost.str();
+  return ost.str();
 }
 
-bool kvalobs::kvAlgorithms::set(const dnmi::db::DRow& r_)
-{
-	db::DRow &r = const_cast<db::DRow&>(r_);
-	string buf;
-	list<string> names = r.getFieldNames();
-	list<string>::iterator it = names.begin();
+bool kvalobs::kvAlgorithms::set(const dnmi::db::DRow& r_) {
+  db::DRow &r = const_cast<db::DRow&>(r_);
+  string buf;
+  list<string> names = r.getFieldNames();
+  list<string>::iterator it = names.begin();
 
-	for (; it != names.end(); it++)
-	{
-		try
-		{
-			buf = r[*it];
+  for (; it != names.end(); it++) {
+    try {
+      buf = r[*it];
 
-			if (*it == "language")
-			{
-				language_ = atoi(buf.c_str());
-			}
-			else if (*it == "checkname")
-			{
-				checkname_ = buf;
-			}
-			else if (*it == "signature")
-			{
-				signature_ = buf;
-			}
-			else if (*it == "script")
-			{
-				script_ = buf;
-			}
-		} catch (...)
-		{
-			CERR("kvAlgorithms: unexpected exception ..... \n");
-		}
-	}
+      if (*it == "language") {
+        language_ = atoi(buf.c_str());
+      } else if (*it == "checkname") {
+        checkname_ = buf;
+      } else if (*it == "signature") {
+        signature_ = buf;
+      } else if (*it == "script") {
+        script_ = buf;
+      }
+    } catch (...) {
+      CERR("kvAlgorithms: unexpected exception ..... \n");
+    }
+  }
 
-	sortBy_ = checkname_;
+  sortBy_ = checkname_;
 
-	return true;
+  return true;
 
 }
 
 bool kvalobs::kvAlgorithms::set(int language, const std::string &checkname,
-		const std::string &signature, const std::string &script)
-{
+                                const std::string &signature,
+                                const std::string &script) {
 
-	language_ = language;
-	checkname_ = checkname;
-	signature_ = signature;
-	script_ = script;
+  language_ = language;
+  checkname_ = checkname;
+  signature_ = signature;
+  script_ = script;
 
-	sortBy_ = checkname_;
+  sortBy_ = checkname_;
 
-	return true;
+  return true;
 }
 
-std::string kvalobs::kvAlgorithms::uniqueKey() const
-{
-	ostringstream ost;
+std::string kvalobs::kvAlgorithms::uniqueKey() const {
+  ostringstream ost;
 
-	ost << " WHERE checkname=" << quoted(checkname_) << " AND "
-			<< "       language=" << language_;
+  ost << " WHERE checkname=" << quoted(checkname_) << " AND "
+      << "       language=" << language_;
 
-	return ost.str();
+  return ost.str();
 
 }

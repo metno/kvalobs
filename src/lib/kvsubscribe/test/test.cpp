@@ -31,12 +31,11 @@
 #include <gmock/gmock.h>
 #include <iostream>
 
-int main(int argc, char ** argv)
-{
-    ::testing::InitGoogleTest(&argc, argv);
+int main(int argc, char ** argv) {
+  ::testing::InitGoogleTest(&argc, argv);
 
-    ::testing::FLAGS_gmock_verbose = "error";
-    // rather, on command-line: --gmock_verbose=error
+  ::testing::FLAGS_gmock_verbose = "error";
+  // rather, on command-line: --gmock_verbose=error
 
-    return RUN_ALL_TESTS();
+  return RUN_ALL_TESTS();
 }

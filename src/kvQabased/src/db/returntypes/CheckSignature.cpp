@@ -32,66 +32,56 @@
 #include <vector>
 #include <iostream>
 
-namespace qabase
-{
+namespace qabase {
 
-CheckSignature::CheckSignature(const std::string & signature, int stationid)
-{
-	parse_(signature, stationid);
+CheckSignature::CheckSignature(const std::string & signature, int stationid) {
+  parse_(signature, stationid);
 }
 
-CheckSignature::CheckSignature(const char * signature, int stationid)
-{
-	parse_(signature, stationid);
+CheckSignature::CheckSignature(const char * signature, int stationid) {
+  parse_(signature, stationid);
 }
 
-CheckSignature::~CheckSignature()
-{
+CheckSignature::~CheckSignature() {
 }
 
-const DataRequirement * CheckSignature::obs() const
-{
-	return get_("obs");
+const DataRequirement * CheckSignature::obs() const {
+  return get_("obs");
 }
 
-const DataRequirement * CheckSignature::refobs() const
-{
-	return get_("refobs");
+const DataRequirement * CheckSignature::refobs() const {
+  return get_("refobs");
 }
 
-const DataRequirement * CheckSignature::model() const
-{
-	return get_("model");
+const DataRequirement * CheckSignature::model() const {
+  return get_("model");
 }
 
-const DataRequirement * CheckSignature::meta() const
-{
-	return get_("meta");
+const DataRequirement * CheckSignature::meta() const {
+  return get_("meta");
 }
 
-const DataRequirement * CheckSignature::get_(const std::string & name) const
-{
-	std::map<std::string, DataRequirement>::const_iterator find = requirements_.find(name);
-	if ( find == requirements_.end() )
-		return 0;
-	return & find->second;
+const DataRequirement * CheckSignature::get_(const std::string & name) const {
+  std::map<std::string, DataRequirement>::const_iterator find = requirements_
+      .find(name);
+  if (find == requirements_.end())
+    return 0;
+  return &find->second;
 }
 
-void CheckSignature::parse_(const std::string & signature, int stationid)
-{
-	std::vector<std::string> requirements;
-	boost::algorithm::split(requirements, signature, boost::algorithm::is_any_of("|"));
+void CheckSignature::parse_(const std::string & signature, int stationid) {
+  std::vector<std::string> requirements;
+  boost::algorithm::split(requirements, signature,
+                          boost::algorithm::is_any_of("|"));
 
-	for ( std::vector<std::string>::const_iterator it = requirements.begin(); it != requirements.end(); ++ it )
-	{
-		DataRequirement justParsed(it->c_str(), stationid);
-		DataRequirement & inMemory = requirements_[justParsed.requirementType()];
-		if ( not inMemory.empty() )
-			throw Error("Requirement defined twice: " + signature);
-		inMemory = justParsed;
-	}
+  for (std::vector<std::string>::const_iterator it = requirements.begin();
+      it != requirements.end(); ++it) {
+    DataRequirement justParsed(it->c_str(), stationid);
+    DataRequirement & inMemory = requirements_[justParsed.requirementType()];
+    if (not inMemory.empty())
+      throw Error("Requirement defined twice: " + signature);
+    inMemory = justParsed;
+  }
 }
-
-
 
 }

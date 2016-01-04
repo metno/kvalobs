@@ -41,86 +41,69 @@
 using namespace std;
 using namespace dnmi;
 
-bool kvalobs::kvParam::set(const dnmi::db::DRow &r_)
-{
-	db::DRow &r = const_cast<db::DRow&>(r_);
-	string buf;
-	list<string> names = r.getFieldNames();
-	list<string>::iterator it = names.begin();
+bool kvalobs::kvParam::set(const dnmi::db::DRow &r_) {
+  db::DRow &r = const_cast<db::DRow&>(r_);
+  string buf;
+  list<string> names = r.getFieldNames();
+  list<string>::iterator it = names.begin();
 
-	for (; it != names.end(); it++)
-	{
-		try
-		{
-			buf = r[*it];
+  for (; it != names.end(); it++) {
+    try {
+      buf = r[*it];
 
-			if (*it == "paramid")
-			{
-				paramid_ = atoi(buf.c_str());
-			}
-			else if (*it == "name")
-			{
-				name_ = buf;
-			}
-			else if (*it == "description")
-			{
-				description_ = buf;
-			}
-			else if (*it == "unit")
-			{
-				unit_ = buf;
-			}
-			else if (*it == "level_scale")
-			{
-				level_scale_ = atoi(buf.c_str());
-			}
-			else if (*it == "comment")
-			{
-				comment_ = buf;
-			}
-		} catch (...)
-		{
-			CERR("kvParam: unexpected exception ..... \n");
-		}
-	}
+      if (*it == "paramid") {
+        paramid_ = atoi(buf.c_str());
+      } else if (*it == "name") {
+        name_ = buf;
+      } else if (*it == "description") {
+        description_ = buf;
+      } else if (*it == "unit") {
+        unit_ = buf;
+      } else if (*it == "level_scale") {
+        level_scale_ = atoi(buf.c_str());
+      } else if (*it == "comment") {
+        comment_ = buf;
+      }
+    } catch (...) {
+      CERR("kvParam: unexpected exception ..... \n");
+    }
+  }
 
-	sortBy_ = boost::lexical_cast<std::string>(paramid_);
-	return true;
+  sortBy_ = boost::lexical_cast<std::string>(paramid_);
+  return true;
 }
 
 bool kvalobs::kvParam::set(int paramid, const std::string &name,
-		const std::string &description, const std::string &unit,
-		int level_scale, const std::string &comment)
-{
-	paramid_ = paramid;
-	name_ = name;
-	description_ = description;
-	unit_ = unit;
-	level_scale_ = level_scale;
-	comment_ = comment;
+                           const std::string &description,
+                           const std::string &unit, int level_scale,
+                           const std::string &comment) {
+  paramid_ = paramid;
+  name_ = name;
+  description_ = description;
+  unit_ = unit;
+  level_scale_ = level_scale;
+  comment_ = comment;
 
-	sortBy_ = boost::lexical_cast<std::string>(paramid_);
+  sortBy_ = boost::lexical_cast<std::string>(paramid_);
 
-	return true;
+  return true;
 }
 
-std::string kvalobs::kvParam::toSend() const
-{
-	ostringstream ost;
+std::string kvalobs::kvParam::toSend() const {
+  ostringstream ost;
 
-	ost << "(" << paramid_ << "," << quoted(name_) << ","
-			<< quoted(description_) << "," << quoted(unit_) << ","
-			<< level_scale_ << "," << quoted(comment_) << ")";
+  ost << "(" << paramid_ << "," << quoted(name_) << "," << quoted(description_)
+      << "," << quoted(unit_) << "," << level_scale_ << "," << quoted(comment_)
+      << ")";
 
-	return ost.str();
+  return ost.str();
 }
 
-std::string kvalobs::kvParam::uniqueKey() const
-{
-	ostringstream ost;
+std::string kvalobs::kvParam::uniqueKey() const {
+  ostringstream ost;
 
-	ost << " WHERE  paramid=" << paramid_;
+  ost << " WHERE  paramid=" << paramid_;
 
-	return ost.str();
+  return ost.str();
 }
 

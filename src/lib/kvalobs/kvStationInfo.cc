@@ -32,32 +32,30 @@
 
 using namespace std;
 
-kvalobs::kvStationInfo::kvStationInfo(const kvalobs::kvStationInfo &info) :
-		stationid_(info.stationid_), obstime_(info.obstime_), typeid_(
-				info.typeid_)
-{
+kvalobs::kvStationInfo::kvStationInfo(const kvalobs::kvStationInfo &info)
+    : stationid_(info.stationid_),
+      obstime_(info.obstime_),
+      typeid_(info.typeid_) {
 }
 
 kvalobs::kvStationInfo&
-kvalobs::kvStationInfo::operator=(const kvStationInfo &info)
-{
-	if (this == &info)
-		return *this;
+kvalobs::kvStationInfo::operator=(const kvStationInfo &info) {
+  if (this == &info)
+    return *this;
 
-	stationid_ = info.stationid_;
-	obstime_ = info.obstime_;
-	typeid_ = info.typeid_;
+  stationid_ = info.stationid_;
+  obstime_ = info.obstime_;
+  typeid_ = info.typeid_;
 
-	return *this;
+  return *this;
 }
 
 std::ostream&
-kvalobs::operator<<(std::ostream& os, const kvalobs::kvStationInfo &inf_)
-{
-	kvalobs::kvStationInfo &inf = const_cast<kvalobs::kvStationInfo&>(inf_);
+kvalobs::operator<<(std::ostream& os, const kvalobs::kvStationInfo &inf_) {
+  kvalobs::kvStationInfo &inf = const_cast<kvalobs::kvStationInfo&>(inf_);
 
-	os << "kvStationInfo: stationid: " << inf.stationID() << " obstime: "
-			<< inf.obstime() << " typeId: " << inf.typeID() << endl;
+  os << "kvStationInfo: stationid: " << inf.stationID() << " obstime: "
+     << inf.obstime() << " typeId: " << inf.typeID() << endl;
 
-	return os;
+  return os;
 }

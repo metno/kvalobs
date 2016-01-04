@@ -32,83 +32,63 @@
 
 using namespace std;
 
-std::string kvalobs::kvTypes::toSend() const
-{
-	ostringstream ost;
-	ost << "(" << typeid_ << "," << quoted(format_) << "," << earlyobs_ << ","
-			<< lateobs_ << "," << quoted(read_) << "," << quoted(obspgm_) << ","
-			<< quoted(comment_) << ")";
-	return ost.str();
+std::string kvalobs::kvTypes::toSend() const {
+  ostringstream ost;
+  ost << "(" << typeid_ << "," << quoted(format_) << "," << earlyobs_ << ","
+      << lateobs_ << "," << quoted(read_) << "," << quoted(obspgm_) << ","
+      << quoted(comment_) << ")";
+  return ost.str();
 }
 
 bool kvalobs::kvTypes::set(int typeid__, std::string format__, int earlyobs__,
-		int lateobs__, std::string read__, std::string obspgm__,
-		std::string comment__)
-{
-	typeid_ = typeid__;
-	format_ = format__;
-	earlyobs_ = earlyobs__, lateobs_ = lateobs__, read_ = read__, obspgm_ =
-			obspgm__, comment_ = comment__;
-	sortBy_ = std::string(format_);
-	return true;
+                           int lateobs__, std::string read__,
+                           std::string obspgm__, std::string comment__) {
+  typeid_ = typeid__;
+  format_ = format__;
+  earlyobs_ = earlyobs__, lateobs_ = lateobs__, read_ = read__, obspgm_ =
+      obspgm__, comment_ = comment__;
+  sortBy_ = std::string(format_);
+  return true;
 }
 
-bool kvalobs::kvTypes::set(const dnmi::db::DRow& r_)
-{
-	dnmi::db::DRow &r = const_cast<dnmi::db::DRow&>(r_);
-	string buf;
-	list<string> names = r.getFieldNames();
-	list<string>::iterator it = names.begin();
+bool kvalobs::kvTypes::set(const dnmi::db::DRow& r_) {
+  dnmi::db::DRow &r = const_cast<dnmi::db::DRow&>(r_);
+  string buf;
+  list<string> names = r.getFieldNames();
+  list<string>::iterator it = names.begin();
 
-	for (; it != names.end(); it++)
-	{
-		try
-		{
-			buf = r[*it];
-			if (*it == "typeid")
-			{
-				typeid_ = atoi(buf.c_str());
-			}
-			else if (*it == "format")
-			{
-				format_ = buf;
-			}
-			else if (*it == "earlyobs")
-			{
-				earlyobs_ = atoi(buf.c_str());
-			}
-			else if (*it == "lateobs")
-			{
-				lateobs_ = atoi(buf.c_str());
-			}
-			else if (*it == "read")
-			{
-				read_ = buf;
-			}
-			else if (*it == "obspgm")
-			{
-				read_ = buf;
-			}
-			else if (*it == "comment")
-			{
-				comment_ = buf;
-			}
-		} catch (...)
-		{
-			CERR("kvTypes: exception ..... \n");
-		}
-	}
+  for (; it != names.end(); it++) {
+    try {
+      buf = r[*it];
+      if (*it == "typeid") {
+        typeid_ = atoi(buf.c_str());
+      } else if (*it == "format") {
+        format_ = buf;
+      } else if (*it == "earlyobs") {
+        earlyobs_ = atoi(buf.c_str());
+      } else if (*it == "lateobs") {
+        lateobs_ = atoi(buf.c_str());
+      } else if (*it == "read") {
+        read_ = buf;
+      } else if (*it == "obspgm") {
+        read_ = buf;
+      } else if (*it == "comment") {
+        comment_ = buf;
+      }
+    } catch (...) {
+      CERR("kvTypes: exception ..... \n");
+    }
+  }
 
-	sortBy_ = std::string(format_);
-	return true;
+  sortBy_ = std::string(format_);
+  return true;
 }
 
-std::string kvalobs::kvTypes::uniqueKey() const
-{
-	ostringstream ost;
+std::string kvalobs::kvTypes::uniqueKey() const {
+  ostringstream ost;
 
-	ost << " WHERE typeid=" << typeid_;
+  ost << " WHERE typeid=" << typeid_;
 
-	return ost.str();
+  return ost.str();
 }
 

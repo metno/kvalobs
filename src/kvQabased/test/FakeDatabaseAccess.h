@@ -33,39 +33,51 @@
 #include <db/DatabaseAccess.h>
 #include <kvalobs/kvDataOperations.h>
 
-class FakeDatabaseAccess: public db::DatabaseAccess
-{
-public:
-	FakeDatabaseAccess();
-	virtual ~FakeDatabaseAccess();
+class FakeDatabaseAccess : public db::DatabaseAccess {
+ public:
+  FakeDatabaseAccess();
+  virtual ~FakeDatabaseAccess();
 
+  virtual void getChecks(CheckList * out,
+                         const kvalobs::kvStationInfo & si) const;
 
-	virtual void getChecks(CheckList * out, const kvalobs::kvStationInfo & si) const;
+  virtual int getQcxFlagPosition(const std::string & qcx) const;
 
-	virtual int getQcxFlagPosition(const std::string & qcx) const;
+  virtual void getParametersToCheck(ParameterList * out,
+                                    const kvalobs::kvStationInfo & si) const;
 
-	virtual void getParametersToCheck(ParameterList * out, const kvalobs::kvStationInfo & si) const;
+  virtual kvalobs::kvAlgorithms getAlgorithm(
+      const std::string & algorithmName) const;
 
-	virtual kvalobs::kvAlgorithms getAlgorithm(const std::string & algorithmName) const;
+  virtual void getModelData(
+      ModelDataList * out, const kvalobs::kvStationInfo & si,
+      const qabase::DataRequirement::Parameter & parameter,
+      int minutesBackInTime) const;
 
-	virtual void getModelData(ModelDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minutesBackInTime ) const;
+  virtual void getData(DataList * out, const kvalobs::kvStationInfo & si,
+                       const qabase::DataRequirement::Parameter & parameter,
+                       int minuteOffset) const;
 
-	virtual void getData(DataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const;
+  virtual std::string getStationParam(const kvalobs::kvStationInfo & si,
+                                      const std::string & parameter,
+                                      const std::string & qcx) const;
 
-	virtual std::string getStationParam(const kvalobs::kvStationInfo & si, const std::string & parameter, const std::string & qcx) const;
+  virtual kvalobs::kvStation getStation(int stationid) const;
 
-	virtual kvalobs::kvStation getStation(int stationid) const;
+  virtual void getTextData(TextDataList * out,
+                           const kvalobs::kvStationInfo & si,
+                           const qabase::DataRequirement::Parameter & parameter,
+                           int minuteOffset) const;
 
-	virtual void getTextData(TextDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const;
-
-	virtual void write(const DataList & data);
+  virtual void write(const DataList & data);
 
   virtual kvalobs::kvStationInfo * selectDataForControl();
 
-  virtual void markProcessDone(const kvalobs::kvStationInfo & si) {}
+  virtual void markProcessDone(const kvalobs::kvStationInfo & si) {
+  }
 
-	typedef std::set<kvalobs::kvData, kvalobs::compare::lt_kvData> SavedData;
-	SavedData savedData;
+  typedef std::set<kvalobs::kvData, kvalobs::compare::lt_kvData> SavedData;
+  SavedData savedData;
 };
 
 #endif /* FAKEDATABASEACCESS_H_ */

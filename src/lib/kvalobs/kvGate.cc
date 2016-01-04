@@ -34,34 +34,29 @@
 
 using namespace std;
 
-bool kvGate::select(list<kvAlgorithms>& list_, std::string q)
-{
-	std::string query = kvAlgorithms::selectAllQuery() + q;
+bool kvGate::select(list<kvAlgorithms>& list_, std::string q) {
+  std::string query = kvAlgorithms::selectAllQuery() + q;
 
-	Result *res = 0;
+  Result *res = 0;
 
-	try
-	{
-		res = con.execQuery(query);
+  try {
+    res = con.execQuery(query);
 
-		while (res->hasNext())
-		{
-			DRow & row = res->next();
-			list_.push_back();
-			list[list.size() - 1].set(row);
-		}
-		delete res;
-		return true;
-	} catch (SQLException & ex)
-	{
-		delete res;
-		CERR("EXCEPTION: KvDataProxy::getData: " << ex.what() << endl);
-	} catch (...)
-	{
-		delete res;
-		CERR("EXCEPTION: KvDataProxy::getData: Unknown exception!\n");
-	}
+    while (res->hasNext()) {
+      DRow & row = res->next();
+      list_.push_back();
+      list[list.size() - 1].set(row);
+    }
+    delete res;
+    return true;
+  } catch (SQLException & ex) {
+    delete res;
+    CERR("EXCEPTION: KvDataProxy::getData: " << ex.what() << endl);
+  } catch (...) {
+    delete res;
+    CERR("EXCEPTION: KvDataProxy::getData: Unknown exception!\n");
+  }
 
-	return false;
+  return false;
 }
 ;

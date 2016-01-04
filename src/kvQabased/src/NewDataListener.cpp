@@ -1,31 +1,31 @@
 /*
-  Kvalobs - Free Quality Control Software for Meteorological Observations
+ Kvalobs - Free Quality Control Software for Meteorological Observations
 
-  Copyright (C) 2010 met.no
+ Copyright (C) 2010 met.no
 
-  Contact information:
-  Norwegian Meteorological Institute
-  Box 43 Blindern
-  0313 OSLO
-  NORWAY
-  email: kvalobs-dev@met.no
+ Contact information:
+ Norwegian Meteorological Institute
+ Box 43 Blindern
+ 0313 OSLO
+ NORWAY
+ email: kvalobs-dev@met.no
 
-  This file is part of KVALOBS
+ This file is part of KVALOBS
 
-  KVALOBS is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License as
-  published by the Free Software Foundation; either version 2
-  of the License, or (at your option) any later version.
+ KVALOBS is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as
+ published by the Free Software Foundation; either version 2
+ of the License, or (at your option) any later version.
 
-  KVALOBS is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  General Public License for more details.
+ KVALOBS is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ General Public License for more details.
 
-  You should have received a copy of the GNU General Public License along
-  with KVALOBS; if not, write to the Free Software Foundation Inc.,
-  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ You should have received a copy of the GNU General Public License along
+ with KVALOBS; if not, write to the Free Software Foundation Inc.,
+ 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
 
 #include "NewDataListener.h"
 #include "CheckRunner.h"
@@ -39,11 +39,9 @@
 
 namespace qabase {
 
-namespace
-{
+namespace {
 bool globalStop = false;
 }
-
 
 NewDataListener::NewDataListener(std::shared_ptr<db::DatabaseAccess> db)
     : stopping_(true),
@@ -61,7 +59,8 @@ void NewDataListener::run() {
   while (not stopping()) {
     db_->beginTransaction();
     try {
-      std::unique_ptr<kvalobs::kvStationInfo> toProcess(db_->selectDataForControl());
+      std::unique_ptr<kvalobs::kvStationInfo> toProcess(
+          db_->selectDataForControl());
       db_->commit();
 
       if (toProcess) {
@@ -69,11 +68,9 @@ void NewDataListener::run() {
         processor_.process(*toProcess);
         db_->markProcessDone(*toProcess);
         db_->commit();
-      }
-      else
+      } else
         std::this_thread::sleep_for(std::chrono::seconds(1));
-    }
-    catch (std::exception & e) {
+    } catch (std::exception & e) {
       LOGERROR(e.what());
       db_->rollback();
     }
@@ -88,8 +85,7 @@ bool NewDataListener::stopping() const {
   return stopping_ or globalStop;
 }
 
-void NewDataListener::stopAll()
-{
+void NewDataListener::stopAll() {
   globalStop = true;
 }
 

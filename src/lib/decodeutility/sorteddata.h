@@ -178,7 +178,7 @@ struct DataContent {
         corrected(corr),
         controlinfo(ci),
         useinfo(ui),
-        cfailed(fail){
+        cfailed(fail) {
   }
   DataContent(const kvData & d)
       : original(d.original()),
@@ -206,7 +206,7 @@ struct TextDataContent {
       : original(orig) {
   }
   TextDataContent(const kvTextData & d)
-      : original(d.original()){
+      : original(d.original()) {
   }
   TextDataContent() {
   }
@@ -219,14 +219,13 @@ typedef LeafItem<TextDataContent> TextDataItem;
 typedef SortedData<int, DataItem> Level;
 typedef SortedData<int, Level> Sensor;
 
-
 /**
  * \see Observations
  */
 class TbTime : public SortedData<boost::posix_time::ptime, Sensor> {
  public:
   TbTime(boost::posix_time::ptime t)
-      : SortedData<boost::posix_time::ptime, Sensor>(t){
+      : SortedData<boost::posix_time::ptime, Sensor>(t) {
   }
 
   Container<TextDataItem> textData;
@@ -236,7 +235,6 @@ class TbTime : public SortedData<boost::posix_time::ptime, Sensor> {
         + textData.count();
   }
 };
-
 
 /**
  * \see Observations
@@ -257,7 +255,6 @@ class ObsTime : public SortedData<boost::posix_time::ptime, TbTime> {
     return invalidate_;
   }
 };
-
 
 typedef SortedData<int, ObsTime> TypeID;
 typedef SortedData<int, TypeID> StationID;

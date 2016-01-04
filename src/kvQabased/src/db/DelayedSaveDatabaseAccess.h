@@ -35,8 +35,7 @@
 #include <boost/noncopyable.hpp>
 #include <set>
 
-namespace db
-{
+namespace db {
 
 /**
  * Delays the effect of write() until commit() is called. The get
@@ -44,34 +43,37 @@ namespace db
  *
  * \ingroup group_db
  */
-class DelayedSaveDatabaseAccess : public FilteredDatabaseAccess, boost::noncopyable
-{
-public:
-	explicit DelayedSaveDatabaseAccess(DatabaseAccess * baseImplementation);
+class DelayedSaveDatabaseAccess : public FilteredDatabaseAccess,
+    boost::noncopyable {
+ public:
+  explicit DelayedSaveDatabaseAccess(DatabaseAccess * baseImplementation);
 
-	virtual ~DelayedSaveDatabaseAccess();
+  virtual ~DelayedSaveDatabaseAccess();
 
-	/**
-	 * Perform all previous writes
-	 */
-	virtual void commit();
+  /**
+   * Perform all previous writes
+   */
+  virtual void commit();
 
-	virtual void rollback();
+  virtual void rollback();
 
-	virtual void getData(DataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const;
+  virtual void getData(DataList * out, const kvalobs::kvStationInfo & si,
+                       const qabase::DataRequirement::Parameter & parameter,
+                       int minuteOffset) const;
 
-	virtual void write(const DataList & data);
+  virtual void write(const DataList & data);
 
-	virtual bool commitIsNeccessary() const { return true; }
+  virtual bool commitIsNeccessary() const {
+    return true;
+  }
 
-	typedef std::set<kvalobs::kvData, kvalobs::compare::lt_kvData> SavedData;
-	const SavedData & uncommitted() const
-	{
-		return savedData_;
-	}
+  typedef std::set<kvalobs::kvData, kvalobs::compare::lt_kvData> SavedData;
+  const SavedData & uncommitted() const {
+    return savedData_;
+  }
 
-private:
-	SavedData savedData_;
+ private:
+  SavedData savedData_;
 
 };
 

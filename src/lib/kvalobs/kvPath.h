@@ -33,19 +33,17 @@
 
 #include <string>
 
-namespace kvalobs
-{
-enum PathQuery
-{
-	prefix,
-	pkglibdir,
-	sysconfdir,
-	libdir,
-	bindir,
-	datadir,
-	localstatedir,
-	logdir,
-	rundir
+namespace kvalobs {
+enum PathQuery {
+  prefix,
+  pkglibdir,
+  sysconfdir,
+  libdir,
+  bindir,
+  datadir,
+  localstatedir,
+  logdir,
+  rundir
 };
 
 std::string kvPath(PathQuery name, const std::string & system = "kvalobs");
@@ -70,6 +68,6 @@ std::string kvPath(PathQuery name, const std::string & system = "kvalobs");
  * 
  */
 std::string kvPath(const std::string &name, const std::string &system =
-		"kvalobs");
+                       "kvalobs");
 
 #endif

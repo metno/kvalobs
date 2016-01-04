@@ -30,53 +30,53 @@
  */
 #include <kvalobs/kvTextDataOperations.h>
 
-namespace kvalobs
-{
+namespace kvalobs {
 
 kvTextDataFactory::kvTextDataFactory(int stationID,
-		const boost::posix_time::ptime & obsTime, int typeID) :
-		stationID_(stationID), typeID_(typeID), obstime_(obsTime)
-{
+                                     const boost::posix_time::ptime & obsTime,
+                                     int typeID)
+    : stationID_(stationID),
+      typeID_(typeID),
+      obstime_(obsTime) {
 }
 
-kvTextDataFactory::kvTextDataFactory(const kvTextData & d) :
-		stationID_(d.stationID()), typeID_(d.typeID()), obstime_(d.obstime())
-{
+kvTextDataFactory::kvTextDataFactory(const kvTextData & d)
+    : stationID_(d.stationID()),
+      typeID_(d.typeID()),
+      obstime_(d.obstime()) {
 }
 
-kvTextData kvTextDataFactory::getData(std::string val, int paramID,
-		const boost::posix_time::ptime & obsTime) const
-{
-	kvTextData ret(stationID_, obsTime.is_not_a_date_time() ? obstime_ : obsTime, val,
-			paramID, boost::posix_time::microsec_clock::universal_time(), typeID_);
-	return ret;
+kvTextData kvTextDataFactory::getData(
+    std::string val, int paramID,
+    const boost::posix_time::ptime & obsTime) const {
+  kvTextData ret(stationID_, obsTime.is_not_a_date_time() ? obstime_ : obsTime,
+                 val, paramID,
+                 boost::posix_time::microsec_clock::universal_time(), typeID_);
+  return ret;
 }
 
-namespace compare
-{
-bool lt_kvTextData::operator()(const kvTextData & a, const kvTextData & b) const
-{
-	if (a.stationID() != b.stationID())
-		return a.stationID() < b.stationID();
-	if (a.typeID() != b.typeID())
-		return a.typeID() < b.typeID();
-	if (a.obstime() != b.obstime())
-		return a.obstime() < b.obstime();
-	return a.paramID() < b.paramID();
+namespace compare {
+bool lt_kvTextData::operator()(const kvTextData & a,
+                               const kvTextData & b) const {
+  if (a.stationID() != b.stationID())
+    return a.stationID() < b.stationID();
+  if (a.typeID() != b.typeID())
+    return a.typeID() < b.typeID();
+  if (a.obstime() != b.obstime())
+    return a.obstime() < b.obstime();
+  return a.paramID() < b.paramID();
 }
 
 bool kvTextData_same_obs_and_parameter::operator()(const kvTextData & a,
-		const kvTextData & b) const
-{
-	return a.stationID() == b.stationID() and a.paramID() == b.paramID()
-			and a.obstime() == b.obstime() and a.typeID() == b.typeID();
+                                                   const kvTextData & b) const {
+  return a.stationID() == b.stationID() and a.paramID() == b.paramID()
+      and a.obstime() == b.obstime() and a.typeID() == b.typeID();
 }
 
-bool kvTextData_exactly_equal_ex_tbtime::operator()(const kvTextData & a,
-		const kvTextData & b) const
-{
-	return kvTextData_same_obs_and_parameter()(a, b)
-			and a.original() == b.original();
+bool kvTextData_exactly_equal_ex_tbtime::operator()(
+    const kvTextData & a, const kvTextData & b) const {
+  return kvTextData_same_obs_and_parameter()(a, b)
+      and a.original() == b.original();
 }
 }
 }

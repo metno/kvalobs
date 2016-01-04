@@ -30,30 +30,25 @@
 #include "Script.h"
 #include <stdexcept>
 
-namespace scriptrunner
-{
+namespace scriptrunner {
 
 Script::Script(const std::string & baseScript,
-		const language::Interpreter::Ptr & interpreter) :
-	baseScript_(baseScript),
-	interpreter_(interpreter)
-{
-	if (!interpreter_)
-		throw std::logic_error("No interpreter for script");
+               const language::Interpreter::Ptr & interpreter)
+    : baseScript_(baseScript),
+      interpreter_(interpreter) {
+  if (!interpreter_)
+    throw std::logic_error("No interpreter for script");
 }
 
-Script::~Script()
-{
+Script::~Script() {
 }
 
-RunResult Script::run() const
-{
-	return interpreter_->run(* this);
+RunResult Script::run() const {
+  return interpreter_->run(*this);
 }
 
-std::string Script::str() const
-{
-	return interpreter_->fullScript(* this);
+std::string Script::str() const {
+  return interpreter_->fullScript(*this);
 }
 
 }

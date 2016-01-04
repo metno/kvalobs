@@ -38,8 +38,7 @@
 #include <kvdb/kvdb.h>
 #include <kvalobs/kvDbBase.h>
 
-namespace kvalobs
-{
+namespace kvalobs {
 
 /**
  * DataInsertTransaction is an helper class to insert data elements into
@@ -66,94 +65,95 @@ namespace kvalobs
  * On failure is an exception thrown. Possible exception is all from kvdb.h, ModeException and
  * std::logic_error.
  */
-class DataInsertTransaction: public dnmi::db::Transaction
-{
-public:
-	typedef enum
-	{
-		INSERTONLY, INSERT_OR_UPDATE, INSERT_OR_REPLACE
-	} Action;
+class DataInsertTransaction : public dnmi::db::Transaction {
+ public:
+  typedef enum {
+    INSERTONLY,
+    INSERT_OR_UPDATE,
+    INSERT_OR_REPLACE
+  } Action;
 
-	class ModeException: public std::logic_error
-	{
-	public:
-		int index;
-		ModeException(int index, const std::string &msg) :
-				std::logic_error(msg), index(index)
-		{
-		}
-	};
+  class ModeException : public std::logic_error {
+   public:
+    int index;
+    ModeException(int index, const std::string &msg)
+        : std::logic_error(msg),
+          index(index) {
+    }
+  };
 
-private:
-	DataInsertTransaction& operator=(const DataInsertTransaction &);
-	DataInsertTransaction(const DataInsertTransaction &);
-	DataInsertTransaction();
+ private:
+  DataInsertTransaction& operator=(const DataInsertTransaction &);
+  DataInsertTransaction(const DataInsertTransaction &);
+  DataInsertTransaction();
 
-protected:
-	bool deleteElems;
-	int savedExcetion;
-	std::string errorCode;
-	int index;
-	const std::list<kvalobs::kvDbBase*> *elems;
-	std::string tblName;
-	Action action;
-	bool fastExit;
-	std::string lastError;
-	dnmi::db::Connection *conection;
+ protected:
+  bool deleteElems;
+  int savedExcetion;
+  std::string errorCode;
+  int index;
+  const std::list<kvalobs::kvDbBase*> *elems;
+  std::string tblName;
+  Action action;
+  bool fastExit;
+  std::string lastError;
+  dnmi::db::Connection *conection;
 
-	/**
-	 * Try to insert the data elemnt into the table given with \em tblName or
-	 * data->tableName(). The function return true if the data element is successfuly
-	 * inserted into the database and false if the 'key' for the datalement all ready is
-	 * in the databse.
-	 *
-	 * On all other errors an exception is thrown.
-	 *
-	 * @param data The data to insert.
-	 * @return false if the data element (key) all ready is in the database. True if the
-	 * data element is inserted.
-	 * @throw an exception on all other errors.
-	 */
-	bool insert(kvalobs::kvDbBase *data);
-	void update(kvalobs::kvDbBase *data);
-	void replace(kvalobs::kvDbBase *data);
+  /**
+   * Try to insert the data elemnt into the table given with \em tblName or
+   * data->tableName(). The function return true if the data element is successfuly
+   * inserted into the database and false if the 'key' for the datalement all ready is
+   * in the databse.
+   *
+   * On all other errors an exception is thrown.
+   *
+   * @param data The data to insert.
+   * @return false if the data element (key) all ready is in the database. True if the
+   * data element is inserted.
+   * @throw an exception on all other errors.
+   */
+  bool insert(kvalobs::kvDbBase *data);
+  void update(kvalobs::kvDbBase *data);
+  void replace(kvalobs::kvDbBase *data);
 
-	void reThrow();
+  void reThrow();
 
-public:
+ public:
 
-	template<class T>
-	DataInsertTransaction(const std::list<T>& li, Action action_ = INSERTONLY,
-			const std::string &tblName_ = "") :
-			elems(0), tblName(tblName_), action(action_)
-	{
-		typename std::list<T>::const_iterator it = li.begin();
+  template<class T>
+  DataInsertTransaction(const std::list<T>& li, Action action_ = INSERTONLY,
+                        const std::string &tblName_ = "")
+      : elems(0),
+        tblName(tblName_),
+        action(action_) {
+    typename std::list<T>::const_iterator it = li.begin();
 
-		if (it == li.end())
-			return;
+    if (it == li.end())
+      return;
 
-		elems = new std::list<kvalobs::kvDbBase*>();
-		deleteElems = true;
+    elems = new std::list<kvalobs::kvDbBase*>();
+    deleteElems = true;
 
-		for (; it != li.end(); it++)
-		{
-			kvalobs::kvDbBase *dat = const_cast<T*>(&(*it));
+    for (; it != li.end(); it++) {
+      kvalobs::kvDbBase *dat = const_cast<T*>(&(*it));
 
-			const_cast<std::list<kvalobs::kvDbBase*>*>(elems)->push_back(dat);
-		}
-	}
+      const_cast<std::list<kvalobs::kvDbBase*>*>(elems)->push_back(dat);
+    }
+  }
 
-	DataInsertTransaction(const std::list<kvalobs::kvDbBase*> &elem,
-			Action action = INSERTONLY, const std::string &tblName_ = "");
-	~DataInsertTransaction();
+  DataInsertTransaction(const std::list<kvalobs::kvDbBase*> &elem,
+                        Action action = INSERTONLY,
+                        const std::string &tblName_ = "");
+  ~DataInsertTransaction();
 
-	virtual bool run();
-	virtual bool operator()(dnmi::db::Connection *conection);
-	virtual void onAbort(const std::string &driverid,
-			const std::string &errorMessage, const std::string &errorCode);
-	virtual void onSuccess();
-	virtual void onRetry();
-	virtual void onMaxRetry(const std::string &lastError);
+  virtual bool run();
+  virtual bool operator()(dnmi::db::Connection *conection);
+  virtual void onAbort(const std::string &driverid,
+                       const std::string &errorMessage,
+                       const std::string &errorCode);
+  virtual void onSuccess();
+  virtual void onRetry();
+  virtual void onMaxRetry(const std::string &lastError);
 
 };
 

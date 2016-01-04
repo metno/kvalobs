@@ -30,15 +30,13 @@
 #ifndef DATAREQUIREMENT_H_
 #define DATAREQUIREMENT_H_
 
-
 #include <Exception.h>
 #include <string>
 #include <vector>
 #include <map>
 #include <ostream>
 
-namespace qabase
-{
+namespace qabase {
 
 /**
  * Specification for what data of a specific type is needed for a particular
@@ -91,102 +89,111 @@ namespace qabase
  *
  * \ingroup group_db
  */
-class DataRequirement
-{
-public:
+class DataRequirement {
+ public:
 
-	/**
-	 * Create an uninitialized object, similar to what you would get by
-	 * providing an empty initializer string.
-	 */
-	DataRequirement();
+  /**
+   * Create an uninitialized object, similar to what you would get by
+   * providing an empty initializer string.
+   */
+  DataRequirement();
 
-	/**
-	 * Initialize with the given string. See the class documentation for
-	 * string format.
-	 *
-	 * @throw DataRequirement::Invalid if the specification was not valid.
-	 * @param signature Specification of requirements
-	 * @param stationid Station id for the station we are interested in. Data
-	 *                  mentioned in the specification is implicitly from this
-	 *                  station, regardless of whether the specification
-	 *                  contains any explicit stations.
-	 */
-	DataRequirement(const char * signature, int stationid);
-	~DataRequirement();
+  /**
+   * Initialize with the given string. See the class documentation for
+   * string format.
+   *
+   * @throw DataRequirement::Invalid if the specification was not valid.
+   * @param signature Specification of requirements
+   * @param stationid Station id for the station we are interested in. Data
+   *                  mentioned in the specification is implicitly from this
+   *                  station, regardless of whether the specification
+   *                  contains any explicit stations.
+   */
+  DataRequirement(const char * signature, int stationid);
+  ~DataRequirement();
 
-	/**
-	 * Does the object contain any objects at all?
-	 *
-	 * @return True if there is no requirements.
-	 */
-	bool empty() const;
+  /**
+   * Does the object contain any objects at all?
+   *
+   * @return True if there is no requirements.
+   */
+  bool empty() const;
 
-	/**
-	 * Get the requirement type. (obs, refobs, model or meta).
-	 *
-	 * @return requirement type, as a string
-	 */
-	const std::string & requirementType() const { return requirementType_; }
+  /**
+   * Get the requirement type. (obs, refobs, model or meta).
+   *
+   * @return requirement type, as a string
+   */
+  const std::string & requirementType() const {
+    return requirementType_;
+  }
 
-	class Parameter;
-	typedef std::vector<Parameter> ParameterList;
+  class Parameter;
+  typedef std::vector<Parameter> ParameterList;
 
-	/**
-	 * Get a list of required parameters.
-	 * @return Reference to a list of parameters
-	 */
-	const ParameterList & parameter() const { return parameter_; }
+  /**
+   * Get a list of required parameters.
+   * @return Reference to a list of parameters
+   */
+  const ParameterList & parameter() const {
+    return parameter_;
+  }
 
-	/**
-	 * Does the given parameter exist in the requirement?
-	 *
-	 * @param baseParameter base parameter name, excluding any
-	 *                      level/sensor/typeid specifications
-	 * @return True if the given parameter is wanted
-	 */
-	bool haveParameter(const std::string & baseParameter) const;
+  /**
+   * Does the given parameter exist in the requirement?
+   *
+   * @param baseParameter base parameter name, excluding any
+   *                      level/sensor/typeid specifications
+   * @return True if the given parameter is wanted
+   */
+  bool haveParameter(const std::string & baseParameter) const;
 
-	typedef std::vector<int> Station;
-	/**
-	 * Get a list of all required stations.
-	 * @return A list of station identifiers.
-	 */
-	const Station & station() const { return station_; }
+  typedef std::vector<int> Station;
+  /**
+   * Get a list of all required stations.
+   * @return A list of station identifiers.
+   */
+  const Station & station() const {
+    return station_;
+  }
 
-	/**
-	 * Do we want the given station?
-	 *
-	 * @param what The station identifier we want to query
-	 * @return True if we want the given station for the checks
-	 */
-	bool haveStation(int what) const;
+  /**
+   * Do we want the given station?
+   *
+   * @param what The station identifier we want to query
+   * @return True if we want the given station for the checks
+   */
+  bool haveStation(int what) const;
 
-	/**
-	 * Get earliest time offset we are interested in
-	 *
-	 * @return time offset, in minutes
-	 */
-	int firstTime() const { return firstTime_; }
+  /**
+   * Get earliest time offset we are interested in
+   *
+   * @return time offset, in minutes
+   */
+  int firstTime() const {
+    return firstTime_;
+  }
 
-	/**
-	 * Get latest time offset we are interested in.
-	 *
-	 * @return time offset, in minutes
-	 */
-	int lastTime() const { return lastTime_; }
+  /**
+   * Get latest time offset we are interested in.
+   *
+   * @return time offset, in minutes
+   */
+  int lastTime() const {
+    return lastTime_;
+  }
 
-	/**
-	 * Thrown if the DataRequirement string is syntactically wrong.
-	 */
-	QABASE_EXCEPTION(Invalid);
+  /**
+   * Thrown if the DataRequirement string is syntactically wrong.
+   */
+  QABASE_EXCEPTION(Invalid);
 
-private:
-	std::string requirementType_;
-	ParameterList parameter_;
-	Station station_;
-	int firstTime_;
-	int lastTime_;
+ private:
+  std::string requirementType_;
+  ParameterList parameter_;
+  Station station_;
+  int firstTime_;
+  int lastTime_;
 };
 
 /**
@@ -209,7 +216,8 @@ typedef std::map<DataRequirement::Parameter, DataRequirement::Parameter> Paramet
  *
  * \ingroup group_db
  */
-ParameterTranslation getTranslation(const DataRequirement & from, const DataRequirement & to);
+ParameterTranslation getTranslation(const DataRequirement & from,
+                                    const DataRequirement & to);
 
 /**
  * %Parameter specification. May include required level, sensor or typeid for
@@ -217,116 +225,129 @@ ParameterTranslation getTranslation(const DataRequirement & from, const DataRequ
  *
  * \ingroup group_db
  */
-class DataRequirement::Parameter
-{
-public:
-	/**
-	 * Create uninitalized parameter object
-	 */
-	Parameter();
+class DataRequirement::Parameter {
+ public:
+  /**
+   * Create uninitalized parameter object
+   */
+  Parameter();
 
-	/**
-	 * Initialize object with the given string
-	 * @param signature string to use as parameter specification
-	 */
-	Parameter(const char * signature);
+  /**
+   * Initialize object with the given string
+   * @param signature string to use as parameter specification
+   */
+  Parameter(const char * signature);
 
-	/**
-	 * Initialize object with the given string range
-	 * @param start start of string to interpret
-	 * @param stop end of string to interpret
-	 */
-	Parameter(const char * start, const char * stop);
+  /**
+   * Initialize object with the given string range
+   * @param start start of string to interpret
+   * @param stop end of string to interpret
+   */
+  Parameter(const char * start, const char * stop);
 
-	/**
-	 * Initialize object with the given string
-	 * @param signature string to use as parameter specification
-	 */
-	Parameter(const std::string & signature);
+  /**
+   * Initialize object with the given string
+   * @param signature string to use as parameter specification
+   */
+  Parameter(const std::string & signature);
 
-	/**
-	 * Get the identifier for the parameter itself. (eg. TA or RR_24)
-	 *
-	 * @return Parameter identifier string
-	 */
-	const std::string & baseName() const { return name_; }
+  /**
+   * Get the identifier for the parameter itself. (eg. TA or RR_24)
+   *
+   * @return Parameter identifier string
+   */
+  const std::string & baseName() const {
+    return name_;
+  }
 
-	/**
-	 * Get a string representation of the required parameter.
-	 * @return Required parameter, possibly with level, sensor and typeid spec.
-	 */
-	std::string str() const;
+  /**
+   * Get a string representation of the required parameter.
+   * @return Required parameter, possibly with level, sensor and typeid spec.
+   */
+  std::string str() const;
 
-	/**
-	 * Get required level. If specification does not contain a specific level,
-	 * the return value may be anything.
-	 *
-	 * \see haveLevel()
-	 *
-	 * @return required level
-	 */
-	int level() const { return level_; }
+  /**
+   * Get required level. If specification does not contain a specific level,
+   * the return value may be anything.
+   *
+   * \see haveLevel()
+   *
+   * @return required level
+   */
+  int level() const {
+    return level_;
+  }
 
-	/**
-	 * Get required sensor. If specification does not contain a specific
-	 * sensor, the return value may be anything.
-	 *
-	 * \see haveSensor()
-	 *
-	 * @return required sensor
-	 */
-	int sensor() const { return sensor_; }
+  /**
+   * Get required sensor. If specification does not contain a specific
+   * sensor, the return value may be anything.
+   *
+   * \see haveSensor()
+   *
+   * @return required sensor
+   */
+  int sensor() const {
+    return sensor_;
+  }
 
-	/**
-	 * Get required typeid. If specification does not contain a specific
-	 * typeid, the return value may be anything.
-	 *
-	 * \see haveType()
-	 *
-	 * @return required typeid
-	 */
-	int type() const { return typeid_; }
+  /**
+   * Get required typeid. If specification does not contain a specific
+   * typeid, the return value may be anything.
+   *
+   * \see haveType()
+   *
+   * @return required typeid
+   */
+  int type() const {
+    return typeid_;
+  }
 
-	/**
-	 * Does the specification contain a specific level?
-	 * @return True if parameter have an explicit level.
-	 */
-	bool haveLevel() const { return level_ != NULL_PARAMETER_; }
+  /**
+   * Does the specification contain a specific level?
+   * @return True if parameter have an explicit level.
+   */
+  bool haveLevel() const {
+    return level_ != NULL_PARAMETER_;
+  }
 
-	/**
-	 * Does the specification contain a specific sensor?
-	 * @return True if parameter have an explicit sensor.
-	 */
-	bool haveSensor() const { return sensor_ != NULL_PARAMETER_; }
+  /**
+   * Does the specification contain a specific sensor?
+   * @return True if parameter have an explicit sensor.
+   */
+  bool haveSensor() const {
+    return sensor_ != NULL_PARAMETER_;
+  }
 
-	/**
-	 * Does the specification contain a specific typeid?
-	 * @return True if parameter have an explicit typeid.
-	 */
-	bool haveType() const { return typeid_ != NULL_PARAMETER_; }
+  /**
+   * Does the specification contain a specific typeid?
+   * @return True if parameter have an explicit typeid.
+   */
+  bool haveType() const {
+    return typeid_ != NULL_PARAMETER_;
+  }
 
-private:
-	void parse_(const std::string & parameterString);
-	static const int NULL_PARAMETER_;
-	std::string name_;
-	int level_;
-	int sensor_;
-	int typeid_;
+ private:
+  void parse_(const std::string & parameterString);
+  static const int NULL_PARAMETER_;
+  std::string name_;
+  int level_;
+  int sensor_;
+  int typeid_;
 };
 
-inline bool operator == (const DataRequirement::Parameter & a, const DataRequirement::Parameter & b)
-{
-	return a.str() == b.str();
+inline bool operator ==(const DataRequirement::Parameter & a,
+                        const DataRequirement::Parameter & b) {
+  return a.str() == b.str();
 }
 
-inline bool operator < (const DataRequirement::Parameter & a, const DataRequirement::Parameter & b)
-{
-	return a.str() < b.str();
+inline bool operator <(const DataRequirement::Parameter & a,
+                       const DataRequirement::Parameter & b) {
+  return a.str() < b.str();
 }
 
-inline std::ostream & operator << (std::ostream & s, const DataRequirement::Parameter & p)
-{
-	return s << p.str();
+inline std::ostream & operator <<(std::ostream & s,
+                                  const DataRequirement::Parameter & p) {
+  return s << p.str();
 }
 
 }

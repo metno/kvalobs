@@ -1,9 +1,7 @@
-
 #ifndef __MILOG_UTILITY_H__
 #define __MILOG_UTILITY_H__
 
 namespace milog {
-
 
 /**
  * Creates an globale logger.
@@ -18,14 +16,9 @@ namespace milog {
  * @return true on success and false otherwise.
  */
 bool
-createGlobalLogger( const std::string &path,
-                    const std::string &prefix,
-                    const std::string &id,
-                    milog::LogLevel ll,
-                    int size=200,
-                    int nFiles=2,
-                    StdLayout1 *layout = 0);
+createGlobalLogger(const std::string &path, const std::string &prefix,
+                   const std::string &id, milog::LogLevel ll, int size = 200,
+                   int nFiles = 2, StdLayout1 *layout = 0);
 }
-
 
 #endif /* UTILITY_H_ */

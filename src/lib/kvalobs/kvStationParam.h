@@ -37,8 +37,7 @@
  at Mon Aug 26 2002 */
 /* Edited by T.Reite 21. mai 2003*/
 
-namespace kvalobs
-{
+namespace kvalobs {
 
 /**
  * \addtogroup  dbinterface
@@ -50,101 +49,85 @@ namespace kvalobs
  * \brief Interface to the table station_param in the kvalobs database.
  */
 
-class kvStationParam: public kvDbBase
-{
-private:
-	int stationid_;
-	int paramid_;
-	int level_;
-	int sensor_;
-	int fromday_;
-	int today_;
-	int hour_;
-	std::string qcx_;
-	std::string metadata_;
-	std::string descMetadata_;
-	boost::posix_time::ptime fromtime_;
+class kvStationParam : public kvDbBase {
+ private:
+  int stationid_;
+  int paramid_;
+  int level_;
+  int sensor_;
+  int fromday_;
+  int today_;
+  int hour_;
+  std::string qcx_;
+  std::string metadata_;
+  std::string descMetadata_;
+  boost::posix_time::ptime fromtime_;
 
-public:
-	kvStationParam()
-	{
-	}
-	kvStationParam(const dnmi::db::DRow& r)
-	{
-		set(r);
-	}
-	kvStationParam(int st, int pa, int lev, int sen, int fr, int to, int hour,
-			const std::string& qc, const std::string& md, const std::string& dm,
-			const boost::posix_time::ptime& fromtime)
-	{
-		set(st, pa, lev, sen, fr, to, hour, qc, md, dm, fromtime);
-	}
+ public:
+  kvStationParam() {
+  }
+  kvStationParam(const dnmi::db::DRow& r) {
+    set(r);
+  }
+  kvStationParam(int st, int pa, int lev, int sen, int fr, int to, int hour,
+                 const std::string& qc, const std::string& md,
+                 const std::string& dm,
+                 const boost::posix_time::ptime& fromtime) {
+    set(st, pa, lev, sen, fr, to, hour, qc, md, dm, fromtime);
+  }
 
-	bool set(const dnmi::db::DRow&);
-	bool set(int, int, int, int, int, int, int, const std::string&,
-			const std::string&, const std::string&, const boost::posix_time::ptime&);
+  bool set(const dnmi::db::DRow&);
+  bool set(int, int, int, int, int, int, int, const std::string&,
+           const std::string&, const std::string&,
+           const boost::posix_time::ptime&);
 
-	const char* tableName() const
-	{
-		return "station_param";
-	}
-	std::string toSend() const;
-	std::string uniqueKey() const;
+  const char* tableName() const {
+    return "station_param";
+  }
+  std::string toSend() const;
+  std::string uniqueKey() const;
 
-	int stationID() const
-	{
-		return stationid_;
-	}
-	int paramID() const
-	{
-		return paramid_;
-	}
-	int level() const
-	{
-		return level_;
-	}
-	int sensor() const
-	{
-		return sensor_;
-	}
-	int fromday() const
-	{
-		return fromday_;
-	}
-	int today() const
-	{
-		return today_;
-	}
-	int hour() const
-	{
-		return hour_;
-	}
-	const std::string & qcx() const
-	{
-		return qcx_;
-	}
-	const std::string & metadata() const
-	{
-		return metadata_;
-	}
-	const std::string & descMetadata() const
-	{
-		return descMetadata_;
-	}
-	const boost::posix_time::ptime & fromtime() const
-	{
-		return fromtime_;
-	}
+  int stationID() const {
+    return stationid_;
+  }
+  int paramID() const {
+    return paramid_;
+  }
+  int level() const {
+    return level_;
+  }
+  int sensor() const {
+    return sensor_;
+  }
+  int fromday() const {
+    return fromday_;
+  }
+  int today() const {
+    return today_;
+  }
+  int hour() const {
+    return hour_;
+  }
+  const std::string & qcx() const {
+    return qcx_;
+  }
+  const std::string & metadata() const {
+    return metadata_;
+  }
+  const std::string & descMetadata() const {
+    return descMetadata_;
+  }
+  const boost::posix_time::ptime & fromtime() const {
+    return fromtime_;
+  }
 
-	boost::gregorian::date fromDAY(int y = -1) const
-	{
-		return julianDayThatYear(fromday_, y);
-	}
+  boost::gregorian::date fromDAY(int y = -1) const {
+    return julianDayThatYear(fromday_, y);
+  }
 
-	boost::gregorian::date toDAY(int y = -1) const
-	{
-		return julianDayThatYear(today_, y);
-	}
+  boost::gregorian::date toDAY(int y = -1) const {
+    return julianDayThatYear(today_, y);
+  }
 };
 
 /** @} */

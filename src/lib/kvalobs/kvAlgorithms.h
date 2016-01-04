@@ -35,8 +35,7 @@
 
 /* Created by DNMI/IT: borge.moe@met.no
  at Mon Aug 227 15:29:59 2002 */
-namespace kvalobs
-{
+namespace kvalobs {
 
 /**
  * \addtogroup  dbinterface
@@ -48,56 +47,47 @@ namespace kvalobs
  * \brief Interface to the table algorithms in the kvalobs database.
  */
 
-class kvAlgorithms: public kvDbBase
-{
-private:
-	int language_;
-	std::string checkname_;
-	std::string signature_;
-	std::string script_;
+class kvAlgorithms : public kvDbBase {
+ private:
+  int language_;
+  std::string checkname_;
+  std::string signature_;
+  std::string script_;
 
-public:
-	kvAlgorithms()
-	{
-	}
-	kvAlgorithms(const dnmi::db::DRow &r)
-	{
-		set(r);
-	}
-	kvAlgorithms(int language, const std::string &checkname,
-			const std::string &signature, const std::string &script)
-	{
-		set(language, checkname, signature, script);
-	}
+ public:
+  kvAlgorithms() {
+  }
+  kvAlgorithms(const dnmi::db::DRow &r) {
+    set(r);
+  }
+  kvAlgorithms(int language, const std::string &checkname,
+               const std::string &signature, const std::string &script) {
+    set(language, checkname, signature, script);
+  }
 
-	bool set(int language, const std::string &checkname,
-			const std::string &signature, const std::string &script);
+  bool set(int language, const std::string &checkname,
+           const std::string &signature, const std::string &script);
 
-	bool set(const dnmi::db::DRow&);
-	const char* tableName() const
-	{
-		return "algorithms";
-	}
-	std::string toSend() const;
+  bool set(const dnmi::db::DRow&);
+  const char* tableName() const {
+    return "algorithms";
+  }
+  std::string toSend() const;
 
-	std::string uniqueKey() const;
+  std::string uniqueKey() const;
 
-	int language() const
-	{
-		return language_;
-	}
-	const std::string & checkname() const
-	{
-		return checkname_;
-	}
-	const std::string & signature() const
-	{
-		return signature_;
-	}
-	const std::string & script() const
-	{
-		return script_;
-	}
+  int language() const {
+    return language_;
+  }
+  const std::string & checkname() const {
+    return checkname_;
+  }
+  const std::string & signature() const {
+    return signature_;
+  }
+  const std::string & script() const {
+    return script_;
+  }
 
 };
 

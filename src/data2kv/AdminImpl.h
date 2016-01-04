@@ -6,8 +6,7 @@
 class App;
 
 class AdminImpl : public virtual POA_micutil::Admin,
-		  public PortableServer::RefCountServantBase
-{
+    public PortableServer::RefCountServantBase {
   App &app;
 
  public:
@@ -17,8 +16,7 @@ class AdminImpl : public virtual POA_micutil::Admin,
 
   CORBA::Boolean ping();
 
-  void statusmessage(CORBA::Short details, 
-		     CORBA::String_out message);
+  void statusmessage(CORBA::Short details, CORBA::String_out message);
 
   CORBA::Boolean shutdown();
 };

@@ -32,51 +32,50 @@
 #include <corba/CorbaKvApp.h>
 #include <memory>
 
-
-namespace dnmi
-{
-namespace db
-{
+namespace dnmi {
+namespace db {
 class Connection;
 }
 }
 
+namespace kvservice {
+namespace sql {
 
-namespace kvservice
-{
-namespace sql
-{
+class SqlKvApp : public corba::CorbaKvApp {
+ public:
+  SqlKvApp(int &argc, char **argv, miutil::conf::ConfSection *conf);
+  virtual ~SqlKvApp();
 
+  virtual bool getKvData(KvGetDataReceiver &dataReceiver,
+                         const WhichDataHelper &wd);
+  virtual bool getKvRejectDecode(
+      const CKvalObs::CService::RejectDecodeInfo &decodeInfo,
+      kvservice::RejectDecodeIterator &it);
+  virtual bool getKvParams(std::list<kvalobs::kvParam> &paramList);
+  virtual bool getKvStations(std::list<kvalobs::kvStation> &stationList);
+  virtual bool getKvModelData(std::list<kvalobs::kvModelData> &dataList,
+                              const WhichDataHelper &wd);
+  virtual bool getKvTypes(std::list<kvalobs::kvTypes> &typeList);
+  virtual bool getKvOperator(std::list<kvalobs::kvOperator> &operatorList);
+  virtual bool getKvStationParam(std::list<kvalobs::kvStationParam> &stParam,
+                                 int stationid, int paramid = -1, int day = -1);
+  virtual bool getKvStationMetaData(
+      std::list<kvalobs::kvStationMetadata> &stMeta, int stationid,
+      const boost::posix_time::ptime &obstime,
+      const std::string & metadataName = "");
+  virtual bool getKvObsPgm(std::list<kvalobs::kvObsPgm> &obsPgm,
+                           const std::list<long> &stationList, bool aUnion);
+  virtual bool getKvData(KvObsDataList &dataList, const WhichDataHelper &wd);
+  virtual bool getKvWorkstatistik(
+      CKvalObs::CService::WorkstatistikTimeType timeType,
+      const boost::posix_time::ptime &from, const boost::posix_time::ptime &to,
+      kvservice::WorkstatistikIterator &it);
 
-class SqlKvApp: public corba::CorbaKvApp
-{
-public:
-	SqlKvApp(int &argc, char **argv, miutil::conf::ConfSection *conf);
-	virtual ~SqlKvApp();
+ private:
+  dnmi::db::Connection * connection(int id = 0);
 
-    virtual bool getKvData( KvGetDataReceiver &dataReceiver, const WhichDataHelper &wd );
-    virtual bool getKvRejectDecode( const CKvalObs::CService::RejectDecodeInfo &decodeInfo, kvservice::RejectDecodeIterator &it );
-    virtual bool getKvParams( std::list<kvalobs::kvParam> &paramList );
-    virtual bool getKvStations( std::list<kvalobs::kvStation> &stationList );
-    virtual bool getKvModelData( std::list<kvalobs::kvModelData> &dataList, const WhichDataHelper &wd );
-    virtual bool getKvTypes( std::list<kvalobs::kvTypes> &typeList );
-    virtual bool getKvOperator( std::list<kvalobs::kvOperator> &operatorList );
-    virtual bool getKvStationParam( std::list<kvalobs::kvStationParam> &stParam, int stationid, int paramid = -1, int day = -1 );
-    virtual bool getKvStationMetaData( std::list<kvalobs::kvStationMetadata> &stMeta,
-  		                             int stationid, const boost::posix_time::ptime &obstime,
-  		                             const std::string & metadataName = "");
-    virtual bool getKvObsPgm( std::list<kvalobs::kvObsPgm> &obsPgm, const std::list<long> &stationList, bool aUnion );
-    virtual bool getKvData( KvObsDataList &dataList, const WhichDataHelper &wd );
-    virtual bool getKvWorkstatistik(CKvalObs::CService::WorkstatistikTimeType timeType,
-                                    const boost::posix_time::ptime &from, const boost::posix_time::ptime &to,
-                                    kvservice::WorkstatistikIterator &it
-                                    );
-
-private:
-    dnmi::db::Connection * connection(int id = 0);
-
-    std::map<int, std::shared_ptr<dnmi::db::Connection>> connections_;
-    miutil::conf::ConfSection * conf_;
+  std::map<int, std::shared_ptr<dnmi::db::Connection>> connections_;
+  miutil::conf::ConfSection * conf_;
 };
 
 } /* namespace sql */

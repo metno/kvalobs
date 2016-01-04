@@ -32,73 +32,58 @@
 
 using namespace std;
 
-kvalobs::kvQcxInfo::~kvQcxInfo()
-{
+kvalobs::kvQcxInfo::~kvQcxInfo() {
 }
 
-std::string kvalobs::kvQcxInfo::toSend() const
-{
-	ostringstream ost;
-	ost << "(" << quoted(medium_qcx_) << "," << quoted(main_qcx_) << ","
-			<< controlpart_ << "," << quoted(comment_) << ")";
-	return ost.str();
+std::string kvalobs::kvQcxInfo::toSend() const {
+  ostringstream ost;
+  ost << "(" << quoted(medium_qcx_) << "," << quoted(main_qcx_) << ","
+      << controlpart_ << "," << quoted(comment_) << ")";
+  return ost.str();
 }
 
 bool kvalobs::kvQcxInfo::set(const std::string& medium_qcx__,
-		const std::string& main_qcx__, int controlpart__,
-		const std::string& comment__)
-{
-	medium_qcx_ = medium_qcx__;
-	main_qcx_ = main_qcx__;
-	controlpart_ = controlpart__;
-	comment_ = comment__;
+                             const std::string& main_qcx__, int controlpart__,
+                             const std::string& comment__) {
+  medium_qcx_ = medium_qcx__;
+  main_qcx_ = main_qcx__;
+  controlpart_ = controlpart__;
+  comment_ = comment__;
 
-	sortBy_ = std::string(medium_qcx_);
-	return true;
+  sortBy_ = std::string(medium_qcx_);
+  return true;
 }
 
-bool kvalobs::kvQcxInfo::set(const dnmi::db::DRow& r_)
-{
-	dnmi::db::DRow &r = const_cast<dnmi::db::DRow&>(r_);
-	string buf;
-	list<string> names = r.getFieldNames();
-	list<string>::iterator it = names.begin();
+bool kvalobs::kvQcxInfo::set(const dnmi::db::DRow& r_) {
+  dnmi::db::DRow &r = const_cast<dnmi::db::DRow&>(r_);
+  string buf;
+  list<string> names = r.getFieldNames();
+  list<string>::iterator it = names.begin();
 
-	for (; it != names.end(); it++)
-	{
-		try
-		{
-			buf = r[*it];
-			if (*it == "medium_qcx")
-			{
-				medium_qcx_ = buf;
-			}
-			else if (*it == "main_qcx")
-			{
-				main_qcx_ = buf;
-			}
-			else if (*it == "controlpart")
-			{
-				controlpart_ = atoi(buf.c_str());
-			}
-			else if (*it == "comment")
-			{
-				comment_ = buf;
-			}
-		} catch (...)
-		{
-			CERR("kvQcxInfo: exception ..... \n");
-		}
-	}
-	sortBy_ = std::string(medium_qcx_);
-	return true;
+  for (; it != names.end(); it++) {
+    try {
+      buf = r[*it];
+      if (*it == "medium_qcx") {
+        medium_qcx_ = buf;
+      } else if (*it == "main_qcx") {
+        main_qcx_ = buf;
+      } else if (*it == "controlpart") {
+        controlpart_ = atoi(buf.c_str());
+      } else if (*it == "comment") {
+        comment_ = buf;
+      }
+    } catch (...) {
+      CERR("kvQcxInfo: exception ..... \n");
+    }
+  }
+  sortBy_ = std::string(medium_qcx_);
+  return true;
 }
 
-std::string kvalobs::kvQcxInfo::uniqueKey() const
-{
-	ostringstream ost;
+std::string kvalobs::kvQcxInfo::uniqueKey() const {
+  ostringstream ost;
 
-	ost << " WHERE  medium_qcx=" << quoted(medium_qcx_);
+  ost << " WHERE  medium_qcx=" << quoted(medium_qcx_);
 
-	return ost.str();
+  return ost.str();
 }

@@ -30,31 +30,29 @@
 #include "RunResult.h"
 #include <sstream>
 
-namespace scriptrunner
-{
+namespace scriptrunner {
 
-RunResult::RunResult(int exitCode, const RunReturn & returnValues) :
-	exitCode_(exitCode), returnValues_(returnValues)
-{
+RunResult::RunResult(int exitCode, const RunReturn & returnValues)
+    : exitCode_(exitCode),
+      returnValues_(returnValues) {
 }
 
-RunResult::~RunResult()
-{
+RunResult::~RunResult() {
 }
 
-std::string RunResult::str() const
-{
-	if ( exitCode() != 0 )
-		return "<failed>";
+std::string RunResult::str() const {
+  if (exitCode() != 0)
+    return "<failed>";
 
-	if ( returnValues_.empty() )
-		return "<nothing>";
+  if (returnValues_.empty())
+    return "<nothing>";
 
-	std::ostringstream ret;
-	for ( RunReturn::const_iterator it = returnValues_.begin(); it != returnValues_.end(); ++ it )
-		ret << it->first << " =\t" << it->second << '\n';
+  std::ostringstream ret;
+  for (RunReturn::const_iterator it = returnValues_.begin();
+      it != returnValues_.end(); ++it)
+    ret << it->first << " =\t" << it->second << '\n';
 
-	return ret.str();
+  return ret.str();
 }
 
 }

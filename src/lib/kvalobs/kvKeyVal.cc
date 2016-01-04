@@ -37,107 +37,89 @@
 using namespace std;
 using namespace dnmi;
 
-void kvalobs::kvKeyVal::createSortIndex()
-{
-	sortBy_ = std::string(package_) + std::string(key_);
+void kvalobs::kvKeyVal::createSortIndex() {
+  sortBy_ = std::string(package_) + std::string(key_);
 }
 
-void kvalobs::kvKeyVal::clean()
-{
-	package_.erase();
-	key_.erase();
-	val_.erase();
+void kvalobs::kvKeyVal::clean() {
+  package_.erase();
+  key_.erase();
+  val_.erase();
 
-	createSortIndex();
+  createSortIndex();
 }
 
-bool kvalobs::kvKeyVal::set(const dnmi::db::DRow &r_)
-{
-	db::DRow &r = const_cast<db::DRow&>(r_);
-	string buf;
-	list<string> names = r.getFieldNames();
-	list<string>::iterator it = names.begin();
+bool kvalobs::kvKeyVal::set(const dnmi::db::DRow &r_) {
+  db::DRow &r = const_cast<db::DRow&>(r_);
+  string buf;
+  list<string> names = r.getFieldNames();
+  list<string>::iterator it = names.begin();
 
-	for (; it != names.end(); it++)
-	{
-		try
-		{
-			buf = r[*it];
+  for (; it != names.end(); it++) {
+    try {
+      buf = r[*it];
 
-			if (*it == "package")
-			{
-				package_ = buf;
-			}
-			else if (*it == "key")
-			{
-				key_ = buf;
-			}
-			else if (*it == "val")
-			{
-				val_ = buf;
-			}
-			else
-			{
-				LOGWARN("kvKeyVal::set .. unknown entry:" << *it << std::endl);
-			}
-		} catch (...)
-		{
-			LOGWARN("kvKeyVal: unexpected exception ..... \n");
-		}
-	}
+      if (*it == "package") {
+        package_ = buf;
+      } else if (*it == "key") {
+        key_ = buf;
+      } else if (*it == "val") {
+        val_ = buf;
+      } else {
+        LOGWARN("kvKeyVal::set .. unknown entry:" << *it << std::endl);
+      }
+    } catch (...) {
+      LOGWARN("kvKeyVal: unexpected exception ..... \n");
+    }
+  }
 
-	createSortIndex();
-	return true;
+  createSortIndex();
+  return true;
 }
 
-bool kvalobs::kvKeyVal::set(const kvKeyVal &s)
-{
-	package_ = s.package_;
-	key_ = s.key_;
-	val_ = s.val_;
+bool kvalobs::kvKeyVal::set(const kvKeyVal &s) {
+  package_ = s.package_;
+  key_ = s.key_;
+  val_ = s.val_;
 
-	createSortIndex();
+  createSortIndex();
 
-	return true;
+  return true;
 }
 
 bool kvalobs::kvKeyVal::set(const std::string &package, const std::string &key,
-		const std::string &val)
-{
-	package_ = package;
-	key_ = key;
-	val_ = val;
+                            const std::string &val) {
+  package_ = package;
+  key_ = key;
+  val_ = val;
 
-	createSortIndex();
+  createSortIndex();
 
-	return true;
+  return true;
 }
 
-std::string kvalobs::kvKeyVal::toSend() const
-{
-	ostringstream ost;
+std::string kvalobs::kvKeyVal::toSend() const {
+  ostringstream ost;
 
-	ost << "(" << quoted(package_) << "," << quoted(key_) << "," << quoted(val_)
-			<< ")";
+  ost << "(" << quoted(package_) << "," << quoted(key_) << "," << quoted(val_)
+      << ")";
 
-	return ost.str();
+  return ost.str();
 }
 
-std::string kvalobs::kvKeyVal::uniqueKey() const
-{
-	ostringstream ost;
+std::string kvalobs::kvKeyVal::uniqueKey() const {
+  ostringstream ost;
 
-	ost << " WHERE package=" << quoted(package_) << " AND key=" << quoted(key_);
+  ost << " WHERE package=" << quoted(package_) << " AND key=" << quoted(key_);
 
-	return ost.str();
+  return ost.str();
 }
 
-std::string kvalobs::kvKeyVal::toUpdate() const
-{
-	ostringstream ost;
+std::string kvalobs::kvKeyVal::toUpdate() const {
+  ostringstream ost;
 
-	ost << "SET val=" << quoted(val_) << " WHERE package=" << quoted(package_)
-			<< " AND key=" << quoted(key_);
+  ost << "SET val=" << quoted(val_) << " WHERE package=" << quoted(package_)
+      << " AND key=" << quoted(key_);
 
-	return ost.str();
+  return ost.str();
 }

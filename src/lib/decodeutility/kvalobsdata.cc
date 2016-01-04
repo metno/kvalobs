@@ -39,7 +39,6 @@ using namespace std;
 using boost::posix_time::ptime;
 using boost::posix_time::special_values;
 
-
 namespace kvalobs {
 namespace serialize {
 
@@ -52,7 +51,6 @@ using internal::Sensor;
 using internal::Level;
 using internal::TextDataItem;
 using internal::Container;
-
 
 KvalobsData::KvalobsData()
     : overwrite_(false) {
@@ -104,8 +102,7 @@ void KvalobsData::data(list<kvData> & out, bool setTbtime,
   for (Observations::const_iterator s = obs_.begin(); s != obs_.end(); ++s) {
     for (StationID::const_iterator t = s->begin(); t != s->end(); ++t) {
       for (TypeID::const_iterator o = t->begin(); o != t->end(); ++o) {
-        for (ObsTime::const_iterator tbt = o->begin(); tbt != o->end();
-            ++tbt) {
+        for (ObsTime::const_iterator tbt = o->begin(); tbt != o->end(); ++tbt) {
           for (TbTime::const_iterator sensor = tbt->begin();
               sensor != tbt->end(); ++sensor) {
             for (Sensor::const_iterator level = sensor->begin();
@@ -115,9 +112,9 @@ void KvalobsData::data(list<kvData> & out, bool setTbtime,
 
                 const internal::DataContent & c = param->content();
                 kvData d(s->get(), o->get(), c.original, param->paramID(),
-                         setTbtime ? tbtime : tbt->get(), t->get(), sensor->get(),
-                         level->get(), c.corrected, c.controlinfo, c.useinfo,
-                         c.cfailed);
+                         setTbtime ? tbtime : tbt->get(), t->get(),
+                         sensor->get(), level->get(), c.corrected,
+                         c.controlinfo, c.useinfo, c.cfailed);
                 out.push_back(d);
               }
             }
@@ -136,14 +133,12 @@ void KvalobsData::data(list<kvTextData> & out, bool setTbtime,
   for (Observations::const_iterator s = obs_.begin(); s != obs_.end(); ++s) {
     for (StationID::const_iterator t = s->begin(); t != s->end(); ++t) {
       for (TypeID::const_iterator o = t->begin(); o != t->end(); ++o) {
-        for (ObsTime::const_iterator tbt = o->begin(); tbt != o->end();
-            ++tbt) {
+        for (ObsTime::const_iterator tbt = o->begin(); tbt != o->end(); ++tbt) {
           for (Container<TextDataItem>::const_iterator param = tbt->textData
               .begin(); param != tbt->textData.end(); ++param) {
 
             kvTextData d(s->get(), o->get(), param->content().original,
-                         param->paramID(),
-                         setTbtime ? tbtime : tbt->get(),
+                         param->paramID(), setTbtime ? tbtime : tbt->get(),
                          t->get());
             out.push_back(d);
           }
@@ -156,14 +151,13 @@ void KvalobsData::data(list<kvTextData> & out, bool setTbtime,
   out.sort(kvalobs::compare::lt_kvTextData());
 }
 
-
 void KvalobsData::invalidate(bool doit, int station, int typeID,
-    const boost::posix_time::ptime & obstime) {
+                             const boost::posix_time::ptime & obstime) {
   obs_[station][typeID][obstime].invalidate(doit);
 }
 
 bool KvalobsData::isInvalidate(int station, int typeID,
-    const boost::posix_time::ptime & obstime) const {
+                               const boost::posix_time::ptime & obstime) const {
   return obs_[station][typeID][obstime].invalidate();
 }
 
@@ -173,23 +167,22 @@ void KvalobsData::getInvalidate(std::list<InvalidateSpec> & invSpec) {
     for (StationID::const_iterator t = s->begin(); t != s->end(); ++t) {
       for (TypeID::const_iterator o = t->begin(); o != t->end(); ++o) {
         if (o->invalidate())
-        invSpec.push_back(InvalidateSpec(s->get(), t->get(), o->get()));
+          invSpec.push_back(InvalidateSpec(s->get(), t->get(), o->get()));
       }
     }
   }
 }
 
-std::set<kvalobs::kvStationInfo> KvalobsData::summary() const
-{
-	std::set<kvalobs::kvStationInfo> ret;
+std::set<kvalobs::kvStationInfo> KvalobsData::summary() const {
+  std::set<kvalobs::kvStationInfo> ret;
 
-	using namespace internal;
-	for (Observations::const_iterator s = obs_.begin(); s != obs_.end(); ++s)
-		for (StationID::const_iterator t = s->begin(); t != s->end(); ++t)
-			for (TypeID::const_iterator o = t->begin(); o != t->end(); ++o)
-				ret.insert(kvalobs::kvStationInfo(s->get(), o->get(), t->get()));
+  using namespace internal;
+  for (Observations::const_iterator s = obs_.begin(); s != obs_.end(); ++s)
+    for (StationID::const_iterator t = s->begin(); t != s->end(); ++t)
+      for (TypeID::const_iterator o = t->begin(); o != t->end(); ++o)
+        ret.insert(kvalobs::kvStationInfo(s->get(), o->get(), t->get()));
 
-	return ret;
+  return ret;
 }
 
 }

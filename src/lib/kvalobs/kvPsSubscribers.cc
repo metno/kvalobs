@@ -39,161 +39,138 @@ using namespace miutil;
 using namespace dnmi;
 
 bool kvalobs::kvPsSubscribers::set(const std::string &name, int subscribertype,
-		const std::string &comment, int &delete_after_hours,
-		const std::string &sior, const boost::posix_time::ptime &created)
-{
+                                   const std::string &comment,
+                                   int &delete_after_hours,
+                                   const std::string &sior,
+                                   const boost::posix_time::ptime &created) {
 
-	name_ = name;
-	subscribertype = subscribertype;
-	comment_ = comment;
-	delete_after_hours_ = delete_after_hours;
-	sior_ = sior;
-	created_ = created;
+  name_ = name;
+  subscribertype = subscribertype;
+  comment_ = comment;
+  delete_after_hours_ = delete_after_hours;
+  sior_ = sior;
+  created_ = created;
 
-	sortBy_ = name_;
+  sortBy_ = name_;
 
-	return true;
+  return true;
 
 }
 
-bool kvalobs::kvPsSubscribers::set(const dnmi::db::DRow& r_)
-{
-	db::DRow &r = const_cast<db::DRow&>(r_);
-	string buf;
-	list<string> names = r.getFieldNames();
-	list<string>::iterator it = names.begin();
+bool kvalobs::kvPsSubscribers::set(const dnmi::db::DRow& r_) {
+  db::DRow &r = const_cast<db::DRow&>(r_);
+  string buf;
+  list<string> names = r.getFieldNames();
+  list<string>::iterator it = names.begin();
 
-	for (; it != names.end(); it++)
-	{
-		try
-		{
-			buf = r[*it];
+  for (; it != names.end(); it++) {
+    try {
+      buf = r[*it];
 
-			if (*it == "name")
-			{
-				name_ = buf;
-			}
-			else if (*it == "subscribertype")
-			{
-				subscribertype_ = atoi(buf.c_str());
-			}
-			else if (*it == "comment")
-			{
-				comment_ = buf;
-			}
-			else if (*it == "delete_after_hours")
-			{
-				delete_after_hours_ = atoi(buf.c_str());
-			}
-			else if (*it == "sior")
-			{
-				sior_ = buf;
-			}
-			else if (*it == "created")
-			{
-				created_ = boost::posix_time::time_from_string_nothrow(buf);
-			}
-			else
-			{
-				CERR("kvPsSubscribers: unknown coloumn name '" << *it << "'.");
-			}
-		} catch (...)
-		{
-			CERR("kvPsSubscribers: unexpected exception ..... \n");
-		}
-	}
+      if (*it == "name") {
+        name_ = buf;
+      } else if (*it == "subscribertype") {
+        subscribertype_ = atoi(buf.c_str());
+      } else if (*it == "comment") {
+        comment_ = buf;
+      } else if (*it == "delete_after_hours") {
+        delete_after_hours_ = atoi(buf.c_str());
+      } else if (*it == "sior") {
+        sior_ = buf;
+      } else if (*it == "created") {
+        created_ = boost::posix_time::time_from_string_nothrow(buf);
+      } else {
+        CERR("kvPsSubscribers: unknown coloumn name '" << *it << "'.");
+      }
+    } catch (...) {
+      CERR("kvPsSubscribers: unexpected exception ..... \n");
+    }
+  }
 
-	sortBy_ = name_;
+  sortBy_ = name_;
 
-	return true;
+  return true;
 }
 
-std::string kvalobs::kvPsSubscribers::toSend() const
-{
-	ostringstream ost;
+std::string kvalobs::kvPsSubscribers::toSend() const {
+  ostringstream ost;
 
-	ost << "(" << quoted(name_) << "," << subscribertype_ << ","
-			<< quoted(comment_) << "," << delete_after_hours_ << ","
-			<< quoted(sior_) << "," << quoted(created_) << ")";
+  ost << "(" << quoted(name_) << "," << subscribertype_ << ","
+      << quoted(comment_) << "," << delete_after_hours_ << "," << quoted(sior_)
+      << "," << quoted(created_) << ")";
 
-	return ost.str();
+  return ost.str();
 }
 
-std::string kvalobs::kvPsSubscribers::uniqueKey() const
-{
-	ostringstream ost;
+std::string kvalobs::kvPsSubscribers::uniqueKey() const {
+  ostringstream ost;
 
-	ost << " WHERE name=" << quoted(name_);
+  ost << " WHERE name=" << quoted(name_);
 
-	return ost.str();
+  return ost.str();
 }
 
-std::string kvalobs::kvPsSubscribers::toUpdate() const
-{
-	ostringstream ost;
+std::string kvalobs::kvPsSubscribers::toUpdate() const {
+  ostringstream ost;
 
-	ost << "SET      subscribertype=" << subscribertype_
-			<< "             ,comment=" << quoted(comment_)
-			<< "  ,delete_after_hours=" << delete_after_hours_
-			<< "                ,sior=" << quoted(sior_)
-			<< "             ,created=" << quoted(created_) << " "
-			<< "WHERE name=" << quoted(name_);
+  ost << "SET      subscribertype=" << subscribertype_
+      << "             ,comment=" << quoted(comment_)
+      << "  ,delete_after_hours=" << delete_after_hours_
+      << "                ,sior=" << quoted(sior_) << "             ,created="
+      << quoted(created_) << " " << "WHERE name=" << quoted(name_);
 
-	return ost.str();
+  return ost.str();
 }
 
-std::string kvalobs::kvPsSubscribers::subscriberid() const
-{
-	string type_;
-	ostringstream ost;
+std::string kvalobs::kvPsSubscribers::subscriberid() const {
+  string type_;
+  ostringstream ost;
 
-	if (name_.empty())
-		return std::string();
+  if (name_.empty())
+    return std::string();
 
-	if (subscribertype_ == 0)
-		type_ = "data";
-	else if (subscribertype_ == 1)
-		type_ = "notify";
-	else
-		return std::string();
+  if (subscribertype_ == 0)
+    type_ = "data";
+  else if (subscribertype_ == 1)
+    type_ = "notify";
+  else
+    return std::string();
 
-	ost << "ps_" << type_ << "_" << name_;
+  ost << "ps_" << type_ << "_" << name_;
 
-	return ost.str();
+  return ost.str();
 }
 
 std::string kvalobs::kvPsSubscribers::nameFromSubscriberid(
-		const std::string &subscriberid)
-{
-	ostringstream ost;
-	CommaString cs(subscriberid, "_");
-	std::string name;
+    const std::string &subscriberid) {
+  ostringstream ost;
+  CommaString cs(subscriberid, "_");
+  std::string name;
 
-	if (cs.size() < 3)
-		return "";
+  if (cs.size() < 3)
+    return "";
 
-	ost << cs[2];
+  ost << cs[2];
 
-	for (int i = 3; i < cs.size(); i++)
-		ost << "_" << cs[i];
+  for (int i = 3; i < cs.size(); i++)
+    ost << "_" << cs[i];
 
-	return ost.str();
+  return ost.str();
 }
 
 int kvalobs::kvPsSubscribers::typeFromSubscriberid(
-		const std::string &subscriberid)
-{
-	ostringstream ost;
-	CommaString cs(subscriberid, "_");
+    const std::string &subscriberid) {
+  ostringstream ost;
+  CommaString cs(subscriberid, "_");
 
-	if (cs.size() < 3)
-		return -1;
+  if (cs.size() < 3)
+    return -1;
 
-	if (cs[1] == "data")
-		return 0;
+  if (cs[1] == "data")
+    return 0;
 
-	if (cs[1] == "notify")
-		return 1;
+  if (cs[1] == "notify")
+    return 1;
 
-	return -1;
+  return -1;
 }

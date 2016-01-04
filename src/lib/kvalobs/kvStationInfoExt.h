@@ -37,8 +37,7 @@
 #include <kvalobs/kvData.h>
 #include <kvskel/commonStationInfo.hh>
 
-namespace kvalobs
-{
+namespace kvalobs {
 /**
  * \addtogroup kvinternalhelpers
  * @{
@@ -51,84 +50,82 @@ namespace kvalobs
  * The class plays an importen role for the data flow in the
  * kvalobs system.
  */
-class kvStationInfoExt
-{
-public:
-	struct Param
-	{
-		int paramid;
-		int sensor;
-		int level;
+class kvStationInfoExt {
+ public:
+  struct Param {
+    int paramid;
+    int sensor;
+    int level;
 
-		Param(int pid, int sensor = 0, int level = 0) :
-				paramid(pid), sensor(sensor), level(level)
-		{
-		}
-	};
+    Param(int pid, int sensor = 0, int level = 0)
+        : paramid(pid),
+          sensor(sensor),
+          level(level) {
+    }
+  };
 
-private:
-	long stationid_;
-	boost::posix_time::ptime obstime_;
-	int typeid_;
-	std::list<Param> params_;
+ private:
+  long stationid_;
+  boost::posix_time::ptime obstime_;
+  int typeid_;
+  std::list<Param> params_;
 
-public:
-	/**
-	 * \brief Initialize the object.
-	 *
-	 * \param stationid The kvalobs stationid.
-	 * \param obstime The observation time for this observation.
-	 * \param typeId The typeid to the observation.
-	 */
-	kvStationInfoExt(long stationid, const boost::posix_time::ptime &obstime, int typeId) :
-			stationid_(stationid), obstime_(obstime), typeid_(typeId)
-	{
-	}
+ public:
+  /**
+   * \brief Initialize the object.
+   *
+   * \param stationid The kvalobs stationid.
+   * \param obstime The observation time for this observation.
+   * \param typeId The typeid to the observation.
+   */
+  kvStationInfoExt(long stationid, const boost::posix_time::ptime &obstime,
+                   int typeId)
+      : stationid_(stationid),
+        obstime_(obstime),
+        typeid_(typeId) {
+  }
 
-	kvStationInfoExt(long stationid, const boost::posix_time::ptime &obstime, int typeId,
-			int paramid) :
-			stationid_(stationid), obstime_(obstime), typeid_(typeId)
-	{
-		params_.push_back(Param(paramid));
-	}
+  kvStationInfoExt(long stationid, const boost::posix_time::ptime &obstime,
+                   int typeId, int paramid)
+      : stationid_(stationid),
+        obstime_(obstime),
+        typeid_(typeId) {
+    params_.push_back(Param(paramid));
+  }
 
-	kvStationInfoExt(long stationid, const boost::posix_time::ptime &obstime, int typeId,
-			std::list<kvStationInfoExt::Param> &params) :
-			stationid_(stationid), obstime_(obstime), typeid_(typeId), params_(
-					params)
-	{
-	}
+  kvStationInfoExt(long stationid, const boost::posix_time::ptime &obstime,
+                   int typeId, std::list<kvStationInfoExt::Param> &params)
+      : stationid_(stationid),
+        obstime_(obstime),
+        typeid_(typeId),
+        params_(params) {
+  }
 
-	kvStationInfoExt(const kvStationInfoExt &info);
-	kvStationInfoExt &operator=(const kvStationInfoExt &info);
+  kvStationInfoExt(const kvStationInfoExt &info);
+  kvStationInfoExt &operator=(const kvStationInfoExt &info);
 
-	///The stationid for this observation
-	long stationID() const
-	{
-		return stationid_;
-	}
+  ///The stationid for this observation
+  long stationID() const {
+    return stationid_;
+  }
 
-	///The observation time for this observation
-	const boost::posix_time::ptime & obstime() const
-	{
-		return obstime_;
-	}
+  ///The observation time for this observation
+  const boost::posix_time::ptime & obstime() const {
+    return obstime_;
+  }
 
-	///The typeid for this observation
-	int typeID() const
-	{
-		return typeid_;
-	}
+  ///The typeid for this observation
+  int typeID() const {
+    return typeid_;
+  }
 
-	const std::list<kvStationInfoExt::Param> & params() const
-	{
-		return params_;
-	}
+  const std::list<kvStationInfoExt::Param> & params() const {
+    return params_;
+  }
 
-	void addParam(const kvStationInfoExt::Param &param);
+  void addParam(const kvStationInfoExt::Param &param);
 
-	friend std::ostream& operator<<(std::ostream& os,
-			const kvStationInfoExt &c);
+  friend std::ostream& operator<<(std::ostream& os, const kvStationInfoExt &c);
 
 };
 
@@ -137,17 +134,17 @@ typedef std::list<kvStationInfoExt>::iterator IkvStationInfoExtList;
 typedef std::list<kvStationInfoExt>::const_iterator CIkvStationInfoExtList;
 
 void populateCorbaKvStationInfoExtList(
-		const kvalobs::kvStationInfoExtList &stList,
-		CKvalObs::StationInfoExtList &cstList);
+    const kvalobs::kvStationInfoExtList &stList,
+    CKvalObs::StationInfoExtList &cstList);
 
-inline bool operator ==(const kvStationInfoExt & a, const kvStationInfoExt & b)
-{
-	return a.stationID() == b.stationID() and a.obstime() == b.obstime()
-			and a.typeID() == b.typeID();
+inline bool operator ==(const kvStationInfoExt & a,
+                        const kvStationInfoExt & b) {
+  return a.stationID() == b.stationID() and a.obstime() == b.obstime()
+      and a.typeID() == b.typeID();
 }
-inline bool operator !=(const kvStationInfoExt & a, const kvStationInfoExt & b)
-{
-	return not operator ==(a, b);
+inline bool operator !=(const kvStationInfoExt & a,
+                        const kvStationInfoExt & b) {
+  return not operator ==(a, b);
 }
 
 /** @} */

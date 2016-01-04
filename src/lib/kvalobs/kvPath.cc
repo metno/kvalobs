@@ -35,69 +35,61 @@
 #include <boost/assign/list_of.hpp>
 #include <map>
 
-namespace kvalobs
-{
-namespace
-{
+namespace kvalobs {
+namespace {
 const std::map<std::string, PathQuery> pathNameTranslations =
-		boost::assign::map_list_of("pkglibdir", pkglibdir)("sysconfdir",
-				sysconfdir)("libdir", libdir)("bindir", bindir)("datadir",
-				datadir)("localstatedir", localstatedir)("logdir", logdir)(
-				"rundir", rundir)("prefix", prefix);
+    boost::assign::map_list_of("pkglibdir", pkglibdir)("sysconfdir", sysconfdir)(
+        "libdir", libdir)("bindir", bindir)("datadir", datadir)("localstatedir",
+                                                                localstatedir)(
+        "logdir", logdir)("rundir", rundir)("prefix", prefix);
 }
 
-std::string kvPath(PathQuery name, const std::string & system)
-{
-	std::string ret;
+std::string kvPath(PathQuery name, const std::string & system) {
+  std::string ret;
 
-	switch (name)
-	{
-	case pkglibdir:
-		ret = PKGLIBDIR;
-		break;
-	case sysconfdir:
-		ret = SYSCONFDIR + std::string("/" + system);
-		break;
-	case libdir:
-		ret = LIBDIR;
-		break;
-	case bindir:
-		ret = BINDIR;
-		break;
-	case datadir:
-		ret = DATADIR + std::string("/" + system);
-		break;
-	case localstatedir:
-		ret = LOCALSTATEDIR + std::string("/lib/" + system);
-		break;
-	case logdir:
-		ret = LOCALSTATEDIR + std::string("/log/" + system);
-		break;
-	case rundir:
-		ret = LOCALSTATEDIR + std::string("/run/" + system);
-		break;
-	case prefix:
-		ret = PREFIX;
-		break;
-	}
+  switch (name) {
+    case pkglibdir:
+      ret = PKGLIBDIR;
+      break;
+    case sysconfdir:
+      ret = SYSCONFDIR + std::string("/" + system);
+      break;
+    case libdir:
+      ret = LIBDIR;
+      break;
+    case bindir:
+      ret = BINDIR;
+      break;
+    case datadir:
+      ret = DATADIR + std::string("/" + system);
+      break;
+    case localstatedir:
+      ret = LOCALSTATEDIR + std::string("/lib/" + system);
+      break;
+    case logdir:
+      ret = LOCALSTATEDIR + std::string("/log/" + system);
+      break;
+    case rundir:
+      ret = LOCALSTATEDIR + std::string("/run/" + system);
+      break;
+    case prefix:
+      ret = PREFIX;
+      break;
+  }
 
-	boost::algorithm::replace_all(ret, "//", "/");
+  boost::algorithm::replace_all(ret, "//", "/");
 
-	return ret;
+  return ret;
 }
 }
 
-std::string kvPath(const std::string &name, const std::string &system)
-{
-	std::map<std::string, kvalobs::PathQuery>::const_iterator find =
-			kvalobs::pathNameTranslations.find(name);
-	if (find == kvalobs::pathNameTranslations.end())
-	{
-		std::cerr << "FATAL: The 'name' (" << name << ") is NOT recognised!\n";
-		return "";
-	}
-	else
-	{
-		return kvPath(find->second, system);
-	}
+std::string kvPath(const std::string &name, const std::string &system) {
+  std::map<std::string, kvalobs::PathQuery>::const_iterator find =
+      kvalobs::pathNameTranslations.find(name);
+  if (find == kvalobs::pathNameTranslations.end()) {
+    std::cerr << "FATAL: The 'name' (" << name << ") is NOT recognised!\n";
+    return "";
+  } else {
+    return kvPath(find->second, system);
+  }
 }

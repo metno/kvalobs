@@ -1,33 +1,33 @@
 /*
-  Kvalobs - Free Quality Control Software for Meteorological Observations 
+ Kvalobs - Free Quality Control Software for Meteorological Observations 
 
-  $Id: kvmgrclt.cc,v 1.1.2.4 2007/09/27 09:02:35 paule Exp $                                                       
+ $Id: kvmgrclt.cc,v 1.1.2.4 2007/09/27 09:02:35 paule Exp $                                                       
 
-  Copyright (C) 2007 met.no
+ Copyright (C) 2007 met.no
 
-  Contact information:
-  Norwegian Meteorological Institute
-  Box 43 Blindern
-  0313 OSLO
-  NORWAY
-  email: kvalobs-dev@met.no
+ Contact information:
+ Norwegian Meteorological Institute
+ Box 43 Blindern
+ 0313 OSLO
+ NORWAY
+ email: kvalobs-dev@met.no
 
-  This file is part of KVALOBS
+ This file is part of KVALOBS
 
-  KVALOBS is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License as 
-  published by the Free Software Foundation; either version 2 
-  of the License, or (at your option) any later version.
-  
-  KVALOBS is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License along 
-  with KVALOBS; if not, write to the Free Software Foundation Inc., 
-  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ KVALOBS is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as 
+ published by the Free Software Foundation; either version 2 
+ of the License, or (at your option) any later version.
+ 
+ KVALOBS is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License along 
+ with KVALOBS; if not, write to the Free Software Foundation Inc., 
+ 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
 #include <fstream>
 #include <iostream>
 #include <list>
@@ -42,29 +42,25 @@
 #include <kvalobs/kvWorkelement.h>
 #include "kvmgrcltApp.h"
 
-using namespace std; 
+using namespace std;
 using namespace miutil;
 using namespace kvalobs;
 using namespace dnmi::db;
 
+int main(int argc, char** argv) {
+  boost::posix_time::ptime undefTime;
+  Connection *con;
 
-int main(int argc, char** argv)
-{
-	boost::posix_time::ptime undefTime;
-  	Connection    *con;
+  KvMgrCltApp app(argc, argv);
 
-	KvMgrCltApp app(argc, argv);
+  con = app.getNewDbConnection();
 
-	con=app.getNewDbConnection();
+  if (!con) {
+    cerr << "Cant connect to the database!" << endl;
+    exit(1);
+  }
 
- 	if(!con){
- 		cerr << "Cant connect to the database!" << endl;
- 		exit(1);
- 	}
- 
-    kvDbGate gate(con);
-
-
+  kvDbGate gate(con);
 
 //	if(!gate.insert(kvWorkelement(180,
 //								  boost::posix_time::ptime("2005-12-16 06:00:00"),
@@ -86,90 +82,80 @@ int main(int argc, char** argv)
 //	
 //	return 0;
 
+// Creating station list ...
 
+  list<kvStation> stations;
+  gate.select(stations, " where wmonr>=1000 AND wmonr<1500 order by stationid");
 
+  list<kvData> data;
+  list<kvData>::iterator dit;
+  ostringstream ost;
 
-    // Creating station list ...
+  boost::posix_time::ptime startObst =
+      boost::posix_time::time_from_string_nothrow("2010-06-08 10:00:00");
+  boost::posix_time::ptime endObst =
+      boost::posix_time::time_from_string_nothrow("2010-06-09 08:00:00");
+  boost::posix_time::ptime obst(startObst);
+  //endObst.addDay(1);
 
-    list<kvStation> stations;
-    gate.select(stations," where wmonr>=1000 AND wmonr<1500 order by stationid");
+  cerr << "Obstime: " << obst << endl;
 
+  for (list<kvStation>::const_iterator sit = stations.begin();
+      sit != stations.end(); ++sit) {
 
-	list<kvData>           data;
-	list<kvData>::iterator dit;	
-	ostringstream          ost;
-	
-	boost::posix_time::ptime startObst = boost::posix_time::time_from_string_nothrow("2010-06-08 10:00:00");
-	boost::posix_time::ptime endObst = boost::posix_time::time_from_string_nothrow("2010-06-09 08:00:00");
-	boost::posix_time::ptime obst(startObst);
-	//endObst.addDay(1);
-	
-	cerr << "Obstime: " << obst << endl;
-	
-	for(list<kvStation>::const_iterator sit=stations.begin();
-		sit!=stations.end(); 
-		++sit){
-					
-		ost.str("");
-		ost << " where stationid=" << sit->stationID() << " AND "
-			<< "       obstime='" << to_kvalobs_string(obst) << "'"
-			<< "       order by typeid";
-	
-		if(!gate.select(data, ost.str())){
-			cerr << "Cant query the data table! " << endl 
-				 << " Reason: " << gate.getErrorStr() << endl;
-			goto error;
-		}
-		
-		dit=data.begin();
-		
-		if(dit==data.end()){
-			cerr << sit->stationID() << ", " << obst << " NO data!" << endl;
-			continue;
-		}
-		
-		while(dit!=data.end()){
-			int      tid=dit->typeID();
-			int      sid=dit->stationID();
-			const boost::posix_time::ptime & dObst=dit->obstime();
-			const boost::posix_time::ptime & tbt=dit->tbtime();
-			bool     qc1=false;  
+    ost.str("");
+    ost << " where stationid=" << sit->stationID() << " AND "
+        << "       obstime='" << to_kvalobs_string(obst) << "'"
+        << "       order by typeid";
 
-			for(; dit!=data.end() && dit->typeID()==tid; ++dit);
-			
-			cerr << dObst << ", " << sid << ", " << tid << "  check observation!";				
+    if (!gate.select(data, ost.str())) {
+      cerr << "Cant query the data table! " << endl << " Reason: "
+           << gate.getErrorStr() << endl;
+      goto error;
+    }
 
-  			if(!gate.insert(kvWorkelement(sid, 
-										  dObst, 
-										  tid, 
-										  tbt, 
-										  10,
-										  undefTime,
-			                              undefTime, 
-			                              undefTime, 
-			                              undefTime, 
-			                              undefTime), 
-		                                     true)){
-    			cerr << "Can't save kvWorkelement into the" << endl <<
-	     				"the table 'workque' in  the database!" << endl <<
-	    				"[" << gate.getErrorStr() << "]" << endl;
-		    }else{
-		    	if(app.sendSignalToManager(sid, tid, dObst))
-		    		cerr << " (Manager Signaled!)";
-		    	else
-		    		cerr << " (FAILED Signaling Manager!)";
-		    		
-		    	cerr << endl;
-		    }
-		}
-	}
+    dit = data.begin();
 
+    if (dit == data.end()) {
+      cerr << sit->stationID() << ", " << obst << " NO data!" << endl;
+      continue;
+    }
 
-	//for(;sit!=stations.end(); ++sit) 
-	//	cout << sit->stationID() << "  " << sit->name() << endl;
+    while (dit != data.end()) {
+      int tid = dit->typeID();
+      int sid = dit->stationID();
+      const boost::posix_time::ptime & dObst = dit->obstime();
+      const boost::posix_time::ptime & tbt = dit->tbtime();
+      bool qc1 = false;
 
-error:
-	app.releaseDbConnection(con);
+      for (; dit != data.end() && dit->typeID() == tid; ++dit)
+        ;
 
-    return 0;
-};
+      cerr << dObst << ", " << sid << ", " << tid << "  check observation!";
+
+      if (!gate.insert(
+          kvWorkelement(sid, dObst, tid, tbt, 10, undefTime, undefTime,
+                        undefTime, undefTime, undefTime),
+          true)) {
+        cerr << "Can't save kvWorkelement into the" << endl
+             << "the table 'workque' in  the database!" << endl << "["
+             << gate.getErrorStr() << "]" << endl;
+      } else {
+        if (app.sendSignalToManager(sid, tid, dObst))
+          cerr << " (Manager Signaled!)";
+        else
+          cerr << " (FAILED Signaling Manager!)";
+
+        cerr << endl;
+      }
+    }
+  }
+
+  //for(;sit!=stations.end(); ++sit) 
+  //	cout << sit->stationID() << "  " << sit->name() << endl;
+
+  error: app.releaseDbConnection(con);
+
+  return 0;
+}
+;

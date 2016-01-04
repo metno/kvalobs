@@ -43,194 +43,161 @@ using namespace kvalobs;
 using namespace CKvalObs::CService;
 using namespace milog;
 
-namespace kvservice
-{
-class WorkstatistikIterator::Implementation
-{
-public:
-	virtual ~Implementation()
-	{
-	}
-	virtual bool next(kvalobs::kvWorkelement &workstatistik) =0;
-	virtual CKvalObs::CService::WorkstatistikIterator_var &getCorbaObjPtr() =0;
-	virtual void cleanup() =0;
+namespace kvservice {
+class WorkstatistikIterator::Implementation {
+ public:
+  virtual ~Implementation() {
+  }
+  virtual bool next(kvalobs::kvWorkelement &workstatistik) =0;
+  virtual CKvalObs::CService::WorkstatistikIterator_var &getCorbaObjPtr() =0;
+  virtual void cleanup() =0;
 };
 
-namespace
-{
-class SimpleWorkstatistikIterator: public WorkstatistikIterator::Implementation
-{
-public:
-	SimpleWorkstatistikIterator(
-			const std::vector<kvalobs::kvWorkelement> & elements) :
-			elements_(elements), it_(elements_.begin())
-	{
-	}
+namespace {
+class SimpleWorkstatistikIterator : public WorkstatistikIterator::Implementation {
+ public:
+  SimpleWorkstatistikIterator(
+      const std::vector<kvalobs::kvWorkelement> & elements)
+      : elements_(elements),
+        it_(elements_.begin()) {
+  }
 
-	virtual bool next(kvalobs::kvWorkelement &workstatistik)
-	{
-		if (it_ == elements_.end())
-			return false;
-		workstatistik = *it_;
-		++it_;
-		return true;
-	}
+  virtual bool next(kvalobs::kvWorkelement &workstatistik) {
+    if (it_ == elements_.end())
+      return false;
+    workstatistik = *it_;
+    ++it_;
+    return true;
+  }
 
-	virtual CKvalObs::CService::WorkstatistikIterator_var &getCorbaObjPtr()
-	{
-		throw std::runtime_error("Internal error");
-	}
+  virtual CKvalObs::CService::WorkstatistikIterator_var &getCorbaObjPtr() {
+    throw std::runtime_error("Internal error");
+  }
 
-	virtual void cleanup()
-	{
-		elements_.clear();
-		it_ = elements_.end();
-	}
+  virtual void cleanup() {
+    elements_.clear();
+    it_ = elements_.end();
+  }
 
-private:
-	std::vector<kvalobs::kvWorkelement> elements_;
-	std::vector<kvalobs::kvWorkelement>::const_iterator it_;
+ private:
+  std::vector<kvalobs::kvWorkelement> elements_;
+  std::vector<kvalobs::kvWorkelement>::const_iterator it_;
 };
 
-class CorbaWorkstatistikIterator: public WorkstatistikIterator::Implementation
-{
-public:
-	CorbaWorkstatistikIterator() :
-			iter(CKvalObs::CService::WorkstatistikIterator::_nil()),
-			dataList(new CKvalObs::CService::WorkstatistikElemList()),
-			index(0)
-	{}
+class CorbaWorkstatistikIterator : public WorkstatistikIterator::Implementation {
+ public:
+  CorbaWorkstatistikIterator()
+      : iter(CKvalObs::CService::WorkstatistikIterator::_nil()),
+        dataList(new CKvalObs::CService::WorkstatistikElemList()),
+        index(0) {
+  }
 
-	virtual ~CorbaWorkstatistikIterator()
-	{
-		cleanup();
-	}
+  virtual ~CorbaWorkstatistikIterator() {
+    cleanup();
+  }
 
-	virtual bool next(kvalobs::kvWorkelement &ws)
-	{
-		LogContext context("WorkstatistikIterator::next");
+  virtual bool next(kvalobs::kvWorkelement &ws) {
+    LogContext context("WorkstatistikIterator::next");
 
-		if (index == dataList->length())
-		{
-			LOGDEBUG("Fetching data from kvalobs");
-			for (int i = 0;; i++)
-			{
-				try
-				{
-					bool ok = iter->next(dataList);
-					index = 0;
-					if (dataList->length() == 0 or not ok)
-					{
-						LOGDEBUG("No more data available");
-						return false;
-					}
-					break;
-				} catch (CORBA::TRANSIENT &e)
-				{
-					if (i < 2)
-					{
-						LOGWARN("CORBA TRANSIENT exception - retrying...");
-						timespec ts;
-						ts.tv_sec = 0;
-						ts.tv_nsec = 500000000;
-						nanosleep(&ts, NULL);
-						continue;
-					}
-					else
-					{
-						LOGERROR("CORBA TRANSIENT exception - giving up");
-						return false;
-					}
-				} catch (CORBA::Exception &e)
-				{
-					LOGERROR(
-							"Unhandled CORBA exception: " << typeid( e ).name());
-					return false;
-				}
-			}
-		}
-		assert(index < dataList->length());
+    if (index == dataList->length()) {
+      LOGDEBUG("Fetching data from kvalobs");
+      for (int i = 0;; i++) {
+        try {
+          bool ok = iter->next(dataList);
+          index = 0;
+          if (dataList->length() == 0 or not ok) {
+            LOGDEBUG("No more data available");
+            return false;
+          }
+          break;
+        } catch (CORBA::TRANSIENT &e) {
+          if (i < 2) {
+            LOGWARN("CORBA TRANSIENT exception - retrying...");
+            timespec ts;
+            ts.tv_sec = 0;
+            ts.tv_nsec = 500000000;
+            nanosleep(&ts, NULL);
+            continue;
+          } else {
+            LOGERROR("CORBA TRANSIENT exception - giving up");
+            return false;
+          }
+        } catch (CORBA::Exception &e) {
+          LOGERROR("Unhandled CORBA exception: " << typeid( e ).name());
+          return false;
+        }
+      }
+    }
+    assert(index < dataList->length());
 
-		const WorkstatistikElem &rd = dataList[index++];
-		ws.set(rd.stationID,
-				boost::posix_time::time_from_string_nothrow(
-						std::string(rd.obstime)), rd.typeID_,
-				boost::posix_time::time_from_string_nothrow(
-						std::string(rd.tbtime)), rd.priority,
-				boost::posix_time::time_from_string_nothrow(
-						std::string(rd.processStart)),
-				boost::posix_time::time_from_string_nothrow(
-						std::string(rd.qaStart)),
-				boost::posix_time::time_from_string_nothrow(
-						std::string(rd.qaStop)),
-				boost::posix_time::time_from_string_nothrow(
-						std::string(rd.serviceStart)),
-				boost::posix_time::time_from_string_nothrow(
-						std::string(rd.serviceStop)));
-		return true;
-	}
-	virtual CKvalObs::CService::WorkstatistikIterator_var &getCorbaObjPtr()
-	{
-		return iter;
-	}
-	virtual void cleanup()
-	{
-		LogContext context("WorkstatistikIterator::cleanup");
+    const WorkstatistikElem &rd = dataList[index++];
+    ws.set(
+        rd.stationID,
+        boost::posix_time::time_from_string_nothrow(std::string(rd.obstime)),
+        rd.typeID_,
+        boost::posix_time::time_from_string_nothrow(std::string(rd.tbtime)),
+        rd.priority,
+        boost::posix_time::time_from_string_nothrow(
+            std::string(rd.processStart)),
+        boost::posix_time::time_from_string_nothrow(std::string(rd.qaStart)),
+        boost::posix_time::time_from_string_nothrow(std::string(rd.qaStop)),
+        boost::posix_time::time_from_string_nothrow(
+            std::string(rd.serviceStart)),
+        boost::posix_time::time_from_string_nothrow(
+            std::string(rd.serviceStop)));
+    return true;
+  }
+  virtual CKvalObs::CService::WorkstatistikIterator_var &getCorbaObjPtr() {
+    return iter;
+  }
+  virtual void cleanup() {
+    LogContext context("WorkstatistikIterator::cleanup");
 
-		dataList->length(0);
-		index = 0;
+    dataList->length(0);
+    index = 0;
 
-		if (not CORBA::is_nil(iter))
-		{
-			LOGDEBUG("Destroying CORBA iterator object");
-			try
-			{
-				iter->destroy();
-				iter = CKvalObs::CService::WorkstatistikIterator::_nil();
-			} catch (...)
-			{
-				LOGERROR("Unable to destroy iterator object on server.");
-			}
-		}
-	}
+    if (not CORBA::is_nil(iter)) {
+      LOGDEBUG("Destroying CORBA iterator object");
+      try {
+        iter->destroy();
+        iter = CKvalObs::CService::WorkstatistikIterator::_nil();
+      } catch (...) {
+        LOGERROR("Unable to destroy iterator object on server.");
+      }
+    }
+  }
 
-private:
-	CKvalObs::CService::WorkstatistikIterator_var iter;
-	CKvalObs::CService::WorkstatistikElemList_var dataList;
-	CORBA::ULong index;
+ private:
+  CKvalObs::CService::WorkstatistikIterator_var iter;
+  CKvalObs::CService::WorkstatistikElemList_var dataList;
+  CORBA::ULong index;
 };
 
 }
 
-WorkstatistikIterator::WorkstatistikIterator() :
-		impl_(new CorbaWorkstatistikIterator)
-{
+WorkstatistikIterator::WorkstatistikIterator()
+    : impl_(new CorbaWorkstatistikIterator) {
 }
 
 WorkstatistikIterator::WorkstatistikIterator(
-		const std::vector<kvalobs::kvWorkelement> & elements) :
-		impl_(new SimpleWorkstatistikIterator(elements))
-{
+    const std::vector<kvalobs::kvWorkelement> & elements)
+    : impl_(new SimpleWorkstatistikIterator(elements)) {
 }
 
-WorkstatistikIterator::~WorkstatistikIterator()
-{
+WorkstatistikIterator::~WorkstatistikIterator() {
 }
 
-bool WorkstatistikIterator::next(kvalobs::kvWorkelement &ws)
-{
-	return impl_->next(ws);
+bool WorkstatistikIterator::next(kvalobs::kvWorkelement &ws) {
+  return impl_->next(ws);
 }
 
 WorkstatistikIterator_var&
-WorkstatistikIterator::getCorbaObjPtr()
-{
-	return impl_->getCorbaObjPtr();
+WorkstatistikIterator::getCorbaObjPtr() {
+  return impl_->getCorbaObjPtr();
 }
 
-void WorkstatistikIterator::cleanup()
-{
-	impl_->cleanup();
+void WorkstatistikIterator::cleanup() {
+  impl_->cleanup();
 }
 }
 

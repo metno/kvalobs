@@ -32,72 +32,63 @@
 #include <miutil/timeconvert.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-
 using namespace std;
 
-std::string kvalobs::kvRejectdecode::toSend() const
-{
-	ostringstream ost;
-	ost << "(" << quoted(message_) << "," << quoted(tbtime_) << ","
-			<< quoted(decoder_) << "," << quoted(comment_) << ")";
-	return ost.str();
+std::string kvalobs::kvRejectdecode::toSend() const {
+  ostringstream ost;
+  ost << "(" << quoted(message_) << "," << quoted(tbtime_) << ","
+      << quoted(decoder_) << "," << quoted(comment_) << ")";
+  return ost.str();
 }
 
 bool kvalobs::kvRejectdecode::set(const std::string &message__,
-		const boost::posix_time::ptime &tbtime__, const std::string &decoder__,
-		const std::string &comment__, bool fixed)
-{
-	message_ = message__;
-	tbtime_ = tbtime__;
-	decoder_ = decoder__;
-	comment_ = comment__;
-	fixed_ = fixed;
-	sortBy_ = to_kvalobs_string(tbtime_);
+                                  const boost::posix_time::ptime &tbtime__,
+                                  const std::string &decoder__,
+                                  const std::string &comment__, bool fixed) {
+  message_ = message__;
+  tbtime_ = tbtime__;
+  decoder_ = decoder__;
+  comment_ = comment__;
+  fixed_ = fixed;
+  sortBy_ = to_kvalobs_string(tbtime_);
 }
 
-bool kvalobs::kvRejectdecode::set(const dnmi::db::DRow& r_)
-{
-	dnmi::db::DRow &r = const_cast<dnmi::db::DRow&>(r_);
-	string buf;
-	list<string> names = r.getFieldNames();
-	list<string>::iterator it = names.begin();
+bool kvalobs::kvRejectdecode::set(const dnmi::db::DRow& r_) {
+  dnmi::db::DRow &r = const_cast<dnmi::db::DRow&>(r_);
+  string buf;
+  list<string> names = r.getFieldNames();
+  list<string>::iterator it = names.begin();
 
-	fixed_ = false;
-	for (; it != names.end(); it++)
-	{
-		try
-		{
-			buf = r[*it];
-			if (*it == "message")
-				message_ = buf;
-			else if (*it == "tbtime")
-				tbtime_ = boost::posix_time::time_from_string_nothrow(buf);
-			else if (*it == "decoder")
-				decoder_ = buf;
-			else if (*it == "comment")
-				comment_ = buf;
-			else if (*it == "fixed")
-			{
-				//std::cout << buf << std::endl;
-				if ((not buf.empty()) and (buf[0] == 't' or buf[0] == 'T'))
-					fixed_ = true;
-			}
-		} catch (...)
-		{
-			CERR("kvRejectdecode: exception ..... \n");
-		}
-	}
-	sortBy_ = to_kvalobs_string(tbtime_);
-	return true;
+  fixed_ = false;
+  for (; it != names.end(); it++) {
+    try {
+      buf = r[*it];
+      if (*it == "message")
+        message_ = buf;
+      else if (*it == "tbtime")
+        tbtime_ = boost::posix_time::time_from_string_nothrow(buf);
+      else if (*it == "decoder")
+        decoder_ = buf;
+      else if (*it == "comment")
+        comment_ = buf;
+      else if (*it == "fixed") {
+        //std::cout << buf << std::endl;
+        if ((not buf.empty()) and (buf[0] == 't' or buf[0] == 'T'))
+          fixed_ = true;
+      }
+    } catch (...) {
+      CERR("kvRejectdecode: exception ..... \n");
+    }
+  }
+  sortBy_ = to_kvalobs_string(tbtime_);
+  return true;
 }
 
-std::string kvalobs::kvRejectdecode::uniqueKey() const
-{
-	ostringstream ost;
+std::string kvalobs::kvRejectdecode::uniqueKey() const {
+  ostringstream ost;
 
-	ost << " WHERE  tbtime=" << quoted(tbtime_) << " AND "
-			<< "        message=" << quoted(message_) << " AND "
-			<< "        decoder=" << quoted(decoder_);
+  ost << " WHERE  tbtime=" << quoted(tbtime_) << " AND " << "        message="
+      << quoted(message_) << " AND " << "        decoder=" << quoted(decoder_);
 
-	return ost.str();
+  return ost.str();
 }

@@ -38,8 +38,7 @@
 #include <vector>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-namespace kvalobs
-{
+namespace kvalobs {
 
 /**
  * Cron-like time string.
@@ -66,69 +65,65 @@ namespace kvalobs
  *
  * \ingroup group_db
  */
-class CronString
-{
-private:
-	std::string str_;
-	bool isempty;
+class CronString {
+ private:
+  std::string str_;
+  bool isempty;
 
-	/// to skip using years - set NT to 4 - etc.
-	enum
-	{
-		NT = 5
-	};
+  /// to skip using years - set NT to 4 - etc.
+  enum {
+    NT = 5
+  };
 
-	/**
-	 numbers from string:
-	 0: minutes
-	 1: hours
-	 2: days
-	 3: months
-	 4: years
-	 */
-	std::vector<int> numbers[NT];
+  /**
+   numbers from string:
+   0: minutes
+   1: hours
+   2: days
+   3: months
+   4: years
+   */
+  std::vector<int> numbers[NT];
 
-	void unpackString();
+  void unpackString();
 
-public:
+ public:
 
-	CronString() :
-		isempty(true)
-	{
-	}
+  CronString()
+      : isempty(true) {
+  }
 
-	/**
-	 * Initialize object with given value
-	 *
-	 * @param str cron string
-	 */
-	CronString(const std::string& str);
+  /**
+   * Initialize object with given value
+   *
+   * @param str cron string
+   */
+  CronString(const std::string& str);
 
-	/**
-	 * Reset object to new value
-	 *
-	 * @param str new cron string
-	 */
-	void str(const std::string& str);
+  /**
+   * Reset object to new value
+   *
+   * @param str new cron string
+   */
+  void str(const std::string& str);
 
-	/**
-	 * Get string representation of object
-	 *
-	 * @return
-	 */
-	std::string str() const
-	{
-		return str_;
-	}
+  /**
+   * Get string representation of object
+   *
+   * @return
+   */
+  std::string str() const {
+    return str_;
+  }
 
-	/**
-	 * Does the given time match this cront string?
-	 *
-	 * @param t time to match against *this.
-	 *
-	 * @return True if time matches the cron time specification.
-	 */
-	bool active(const boost::posix_time::ptime& t);
+  /**
+   * Does the given time match this cront string?
+   *
+   * @param t time to match against *this.
+   *
+   * @return True if time matches the cron time specification.
+   */
+  bool active(const boost::posix_time::ptime& t);
 
 };
 

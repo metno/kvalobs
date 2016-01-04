@@ -33,56 +33,46 @@
 
 using namespace std;
 
-std::string kvalobs::kvGeneratedTypes::toSend() const
-{
-	ostringstream ost;
-	ost << "(" << stationid_ << "," << typeid_ << ")";
-	return ost.str();
+std::string kvalobs::kvGeneratedTypes::toSend() const {
+  ostringstream ost;
+  ost << "(" << stationid_ << "," << typeid_ << ")";
+  return ost.str();
 }
 
-bool kvalobs::kvGeneratedTypes::set(int stationid__, int typeid__)
-{
-	stationid_ = stationid__;
-	typeid_ = typeid__;
-	sortBy_ = boost::lexical_cast<std::string>(stationid_);
-	return true;
+bool kvalobs::kvGeneratedTypes::set(int stationid__, int typeid__) {
+  stationid_ = stationid__;
+  typeid_ = typeid__;
+  sortBy_ = boost::lexical_cast<std::string>(stationid_);
+  return true;
 }
 
-bool kvalobs::kvGeneratedTypes::set(const dnmi::db::DRow& r_)
-{
-	dnmi::db::DRow &r = const_cast<dnmi::db::DRow&>(r_);
-	string buf;
-	list<string> names = r.getFieldNames();
-	list<string>::iterator it = names.begin();
+bool kvalobs::kvGeneratedTypes::set(const dnmi::db::DRow& r_) {
+  dnmi::db::DRow &r = const_cast<dnmi::db::DRow&>(r_);
+  string buf;
+  list<string> names = r.getFieldNames();
+  list<string>::iterator it = names.begin();
 
-	for (; it != names.end(); it++)
-	{
-		try
-		{
-			buf = r[*it];
-			if (*it == "stationid")
-			{
-				stationid_ = atoi(buf.c_str());
-			}
-			else if (*it == "typeid")
-			{
-				typeid_ = atoi(buf.c_str());
-			}
-		} catch (...)
-		{
-			CERR("kvGeneratedTypes: exception ..... \n");
-		}
-	}
-	sortBy_ = boost::lexical_cast<std::string>(stationid_);
-	return true;
+  for (; it != names.end(); it++) {
+    try {
+      buf = r[*it];
+      if (*it == "stationid") {
+        stationid_ = atoi(buf.c_str());
+      } else if (*it == "typeid") {
+        typeid_ = atoi(buf.c_str());
+      }
+    } catch (...) {
+      CERR("kvGeneratedTypes: exception ..... \n");
+    }
+  }
+  sortBy_ = boost::lexical_cast<std::string>(stationid_);
+  return true;
 }
 
-std::string kvalobs::kvGeneratedTypes::uniqueKey() const
-{
-	ostringstream ost;
+std::string kvalobs::kvGeneratedTypes::uniqueKey() const {
+  ostringstream ost;
 
-	ost << " WHERE stationid=" << stationid_ << " AND " << "       typeid="
-			<< typeid_;
+  ost << " WHERE stationid=" << stationid_ << " AND " << "       typeid="
+      << typeid_;
 
-	return ost.str();
+  return ost.str();
 }

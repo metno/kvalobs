@@ -86,8 +86,7 @@ class KvalobsDataSerializerTest : public testing::Test {
   }
 };
 
-TEST_F(KvalobsDataSerializerTest, testPreserveKvDataWithTbtime)
-{
+TEST_F(KvalobsDataSerializerTest, testPreserveKvDataWithTbtime) {
   list<kvData> indata;
   list<kvData> outdata;
   in.getData(indata, pt::time_from_string("2006-04-25 18:00:00"));  //Add tbtime to the testdata set.
@@ -96,46 +95,58 @@ TEST_F(KvalobsDataSerializerTest, testPreserveKvDataWithTbtime)
   DSet outdata_set(outdata.begin(), outdata.end());
 
   ASSERT_EQ(indata.size(), out->size());
-  EXPECT_TRUE( equal( indata.begin(), indata.end(), outdata_set.begin(), compare::exactly_equal() ) );
+  EXPECT_TRUE(
+      equal(indata.begin(), indata.end(), outdata_set.begin(),
+            compare::exactly_equal()));
 }
 
-TEST_F(KvalobsDataSerializerTest, testPreserveKvData)
-{
+TEST_F(KvalobsDataSerializerTest, testPreserveKvData) {
   KvalobsDataPtr out = loop();
   list<kvData> outdata;
   out->getData(outdata);
   DSet outdata_set(outdata.begin(), outdata.end());
 
   ASSERT_EQ(in.size(), out->size());
-  EXPECT_TRUE( equal( indata.begin(), indata.end(), outdata_set.begin(), compare::exactly_equal_ex_tbtime() ) );
+  EXPECT_TRUE(
+      equal(indata.begin(), indata.end(), outdata_set.begin(),
+            compare::exactly_equal_ex_tbtime()));
 }
 
-TEST_F(KvalobsDataSerializerTest, testPreserveOverwrite)
-{
+TEST_F(KvalobsDataSerializerTest, testPreserveOverwrite) {
   KvalobsDataPtr out = loop();
-  EXPECT_TRUE( not out->overwrite() );
-  in.overwrite( true );
+  EXPECT_TRUE(not out->overwrite());
+  in.overwrite(true);
   out = loop();
-  EXPECT_TRUE( out->overwrite() );
+  EXPECT_TRUE(out->overwrite());
 }
 
-TEST_F(KvalobsDataSerializerTest, testPreserveInvalidate)
-{
-  in.invalidate(true, 42, 302, boost::posix_time::time_from_string("2006-04-26 06:00:00"));
-  in.invalidate(true, 42, 302, boost::posix_time::time_from_string("2006-04-25 18:00:00"));
-  in.invalidate(true, 42, 302, boost::posix_time::time_from_string("2006-04-25 12:00:00"));
+TEST_F(KvalobsDataSerializerTest, testPreserveInvalidate) {
+  in.invalidate(true, 42, 302,
+                boost::posix_time::time_from_string("2006-04-26 06:00:00"));
+  in.invalidate(true, 42, 302,
+                boost::posix_time::time_from_string("2006-04-25 18:00:00"));
+  in.invalidate(true, 42, 302,
+                boost::posix_time::time_from_string("2006-04-25 12:00:00"));
 
   KvalobsDataPtr out = loop();
 
-  EXPECT_TRUE( out->isInvalidate( 42, 302, boost::posix_time::time_from_string("2006-04-26 06:00:00") ) );
-  EXPECT_TRUE( out->isInvalidate( 42, 302, boost::posix_time::time_from_string("2006-04-25 18:00:00") ) );
-  EXPECT_TRUE( out->isInvalidate( 42, 302, boost::posix_time::time_from_string("2006-04-25 12:00:00") ) );
-  EXPECT_TRUE( not out->isInvalidate( 42, 302, boost::posix_time::time_from_string("2006-04-26 12:00:00") ) );
+  EXPECT_TRUE(
+      out->isInvalidate(
+          42, 302, boost::posix_time::time_from_string("2006-04-26 06:00:00")));
+  EXPECT_TRUE(
+      out->isInvalidate(
+          42, 302, boost::posix_time::time_from_string("2006-04-25 18:00:00")));
+  EXPECT_TRUE(
+      out->isInvalidate(
+          42, 302, boost::posix_time::time_from_string("2006-04-25 12:00:00")));
+  EXPECT_TRUE(
+      not out->isInvalidate(
+          42, 302, boost::posix_time::time_from_string("2006-04-26 12:00:00")));
 }
 
-TEST_F(KvalobsDataSerializerTest, testPreserveFixedRejectedList)
-{
-  kvalobs::kvRejectdecode rejected("hallo?", boost::posix_time::time_from_string("2010-08-11 12:00:00"),
+TEST_F(KvalobsDataSerializerTest, testPreserveFixedRejectedList) {
+  kvalobs::kvRejectdecode rejected(
+      "hallo?", boost::posix_time::time_from_string("2010-08-11 12:00:00"),
       "somedecoder", "unknown message");
   in.setMessageCorrectsThisRejection(rejected);
 
@@ -147,11 +158,16 @@ TEST_F(KvalobsDataSerializerTest, testPreserveFixedRejectedList)
   EXPECT_EQ(rejected, fixedReject[0]);
 }
 
-TEST_F(KvalobsDataSerializerTest, testPreserveMultipleFixedRejectedList)
-{
-  kvalobs::kvRejectdecode r1("hallo?", boost::posix_time::time_from_string("2010-08-11 12:00:00"), "somedecoder", "unknown message");
-  kvalobs::kvRejectdecode r2("wrong msg", boost::posix_time::time_from_string("2010-08-12 12:12:41"), "some_other_decoder", "");
-  kvalobs::kvRejectdecode r3("wrong msg", boost::posix_time::time_from_string("2010-08-12 12:12:45"), "somedecoder", "");
+TEST_F(KvalobsDataSerializerTest, testPreserveMultipleFixedRejectedList) {
+  kvalobs::kvRejectdecode r1(
+      "hallo?", boost::posix_time::time_from_string("2010-08-11 12:00:00"),
+      "somedecoder", "unknown message");
+  kvalobs::kvRejectdecode r2(
+      "wrong msg", boost::posix_time::time_from_string("2010-08-12 12:12:41"),
+      "some_other_decoder", "");
+  kvalobs::kvRejectdecode r3(
+      "wrong msg", boost::posix_time::time_from_string("2010-08-12 12:12:45"),
+      "somedecoder", "");
 
   in.setMessageCorrectsThisRejection(r1);
   in.setMessageCorrectsThisRejection(r2);
@@ -163,7 +179,13 @@ TEST_F(KvalobsDataSerializerTest, testPreserveMultipleFixedRejectedList)
   out->getRejectedCorrections(fixedReject);
   EXPECT_EQ(3u, fixedReject.size());
 
-  EXPECT_TRUE(std::find(fixedReject.begin(), fixedReject.end(), r1) != fixedReject.end());
-  EXPECT_TRUE(std::find(fixedReject.begin(), fixedReject.end(), r2) != fixedReject.end());
-  EXPECT_TRUE(std::find(fixedReject.begin(), fixedReject.end(), r3) != fixedReject.end());
+  EXPECT_TRUE(
+      std::find(fixedReject.begin(), fixedReject.end(), r1)
+          != fixedReject.end());
+  EXPECT_TRUE(
+      std::find(fixedReject.begin(), fixedReject.end(), r2)
+          != fixedReject.end());
+  EXPECT_TRUE(
+      std::find(fixedReject.begin(), fixedReject.end(), r3)
+          != fixedReject.end());
 }

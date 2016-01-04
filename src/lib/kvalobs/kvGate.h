@@ -55,51 +55,43 @@
 /* Created by met.no/FoU/PU: j.schulze@met.no
  at Wed Aug 28 13:49:02 2002 */
 
-namespace kvalobs
-{
+namespace kvalobs {
 
-class kvGate
-{
-private:
+class kvGate {
+ private:
 
-	dnmi::db::Connection &con;
+  dnmi::db::Connection &con;
 
-public:
-	kvGate()
-	{
-	}
+ public:
+  kvGate() {
+  }
 
-	template<class T>
-	bool select(std::list<T>& li, std::string q = "")
-	{
-		li.clear();
-		std::string query = T::selectAllQuery() + q;
+  template<class T>
+  bool select(std::list<T>& li, std::string q = "") {
+    li.clear();
+    std::string query = T::selectAllQuery() + q;
 
-		Result *res = 0;
+    Result *res = 0;
 
-		try
-		{
-			res = con.execQuery(query);
+    try {
+      res = con.execQuery(query);
 
-			while (res->hasNext())
-			{
-				DRow & row = res->next();
-				li.push_back(T(row));
-			}
-			delete res;
-			return true;
-		} catch (SQLException & ex)
-		{
-			delete res;
-			CERR("EXCEPTION: select: " << ex.what() << endl);
-		} catch (...)
-		{
-			delete res;
-			CERR("EXCEPTION: select: Unknown exception!\n");
-		}
+      while (res->hasNext()) {
+        DRow & row = res->next();
+        li.push_back(T(row));
+      }
+      delete res;
+      return true;
+    } catch (SQLException & ex) {
+      delete res;
+      CERR("EXCEPTION: select: " << ex.what() << endl);
+    } catch (...) {
+      delete res;
+      CERR("EXCEPTION: select: Unknown exception!\n");
+    }
 
-		return false;
-	}
+    return false;
+  }
 
 };
 

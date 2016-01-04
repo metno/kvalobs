@@ -37,92 +37,88 @@
 #include <set>
 #include <list>
 
-namespace kvalobs
-{
+namespace kvalobs {
 
 /**
  * \brief  ControlInfo DataFlag
  */
-class kvControlInfo: public kvDataFlag
-{
-public:
-	/// flag is all zero's
-	kvControlInfo();
-	kvControlInfo(const std::string& s);
-	kvControlInfo(const unsigned char f[kvDataFlag::size]);
-	kvControlInfo(const kvControlInfo& df);
-	explicit kvControlInfo(const kvDataFlag& df);
+class kvControlInfo : public kvDataFlag {
+ public:
+  /// flag is all zero's
+  kvControlInfo();
+  kvControlInfo(const std::string& s);
+  kvControlInfo(const unsigned char f[kvDataFlag::size]);
+  kvControlInfo(const kvControlInfo& df);
+  explicit kvControlInfo(const kvDataFlag& df);
 
-	/**
-	 * \brief Fill static structures from list of kvQcxInfo
-	 *
-	 * Should be called once in initialisation phase
-	 */
-	void setQcxInfo(const std::list<kvalobs::kvQcxInfo>& qcxi);
+  /**
+   * \brief Fill static structures from list of kvQcxInfo
+   *
+   * Should be called once in initialisation phase
+   */
+  void setQcxInfo(const std::list<kvalobs::kvQcxInfo>& qcxi);
 
-	/**
-	 * \brief get controlflag - based on checktype.
-	 * \return  false if unknown checktype
-	 */
-	bool getControlFlag(const std::string& medium_qcx, int& control);
+  /**
+   * \brief get controlflag - based on checktype.
+   * \return  false if unknown checktype
+   */
+  bool getControlFlag(const std::string& medium_qcx, int& control);
 
-	/**
-	 * \brief set controlflag - based on checktype,
-	 *
-	 * optionally calls setFqclevel
-	 * \return false if unknown checktype
-	 */
-	bool setControlFlag(const std::string& medium_qcx, const int& control);
+  /**
+   * \brief set controlflag - based on checktype,
+   *
+   * optionally calls setFqclevel
+   * \return false if unknown checktype
+   */
+  bool setControlFlag(const std::string& medium_qcx, const int& control);
 
-	/**
-	 * \brief force controlflag in specified part of controlinfo
-	 */
-	bool setControlFlag(const kvQCFlagTypes::c_flags cf, const int& control);
+  /**
+   * \brief force controlflag in specified part of controlinfo
+   */
+  bool setControlFlag(const kvQCFlagTypes::c_flags cf, const int& control);
 
-	bool qc1Done() const;
-	bool qc2dDone() const;
-	bool qc2mDone() const;
-	bool qc2Done() const;
-	bool hqcDone() const;
+  bool qc1Done() const;
+  bool qc2dDone() const;
+  bool qc2mDone() const;
+  bool qc2Done() const;
+  bool hqcDone() const;
 
-	/**
-	 * \brief convenience-functions to set the missing-flag (QC1-0)
-	 */
-	void MissingFlag(const int& v);
+  /**
+   * \brief convenience-functions to set the missing-flag (QC1-0)
+   */
+  void MissingFlag(const int& v);
 
-	/**
-	 * \brief convenience-functions to get the missing-flag (QC1-0)
-	 */
-	int MissingFlag() const;
+  /**
+   * \brief convenience-functions to get the missing-flag (QC1-0)
+   */
+  int MissingFlag() const;
 
-	kvControlInfo& operator=(const kvControlInfo &rhs);
-	kvControlInfo& operator=(const kvDataFlag &rhs);
-	bool operator==(const kvControlInfo& rhs) const;
-	bool operator!=(const kvControlInfo& rhs) const
-	{
-		return !(*this == rhs);
-	}
+  kvControlInfo& operator=(const kvControlInfo &rhs);
+  kvControlInfo& operator=(const kvDataFlag &rhs);
+  bool operator==(const kvControlInfo& rhs) const;
+  bool operator!=(const kvControlInfo& rhs) const {
+    return !(*this == rhs);
+  }
 
-private:
-	/// controlpart --> c_flags map
-	static std::map<int, kvQCFlagTypes::c_flags> lockedControlFlags_;
-	/// main_qcx string --> main_qc enum map
-	static std::map<std::string, kvQCFlagTypes::main_qc> mainQCXint_;
+ private:
+  /// controlpart --> c_flags map
+  static std::map<int, kvQCFlagTypes::c_flags> lockedControlFlags_;
+  /// main_qcx string --> main_qc enum map
+  static std::map<std::string, kvQCFlagTypes::main_qc> mainQCXint_;
 
-	/// list of QcxInfo (from db)
-	static std::list<kvalobs::kvQcxInfo> qcxinfolist_;
+  /// list of QcxInfo (from db)
+  static std::list<kvalobs::kvQcxInfo> qcxinfolist_;
 
-	/// medium_qcx --> main_qc enum map
-	static std::map<std::string, kvQCFlagTypes::main_qc> mainQCX_;
-	/// medium_qcx --> controlpart map
-	static std::map<std::string, int> controlPart_;
+  /// medium_qcx --> main_qc enum map
+  static std::map<std::string, kvQCFlagTypes::main_qc> mainQCX_;
+  /// medium_qcx --> controlpart map
+  static std::map<std::string, int> controlPart_;
 
-	/// init static structures etc.
-	void init_();
+  /// init static structures etc.
+  void init_();
 
-
-	friend std::ostream& operator<<(std::ostream& output,
-			const kvalobs::kvControlInfo& kd);
+  friend std::ostream& operator<<(std::ostream& output,
+                                  const kvalobs::kvControlInfo& kd);
 };
 
 }

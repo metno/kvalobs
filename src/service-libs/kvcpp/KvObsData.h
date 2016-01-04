@@ -1,33 +1,33 @@
 /*
-  Kvalobs - Free Quality Control Software for Meteorological Observations 
+ Kvalobs - Free Quality Control Software for Meteorological Observations 
 
-  $Id: KvObsData.h,v 1.3.2.3 2007/09/27 09:02:45 paule Exp $                                                       
+ $Id: KvObsData.h,v 1.3.2.3 2007/09/27 09:02:45 paule Exp $                                                       
 
-  Copyright (C) 2007 met.no
+ Copyright (C) 2007 met.no
 
-  Contact information:
-  Norwegian Meteorological Institute
-  Box 43 Blindern
-  0313 OSLO
-  NORWAY
-  email: kvalobs-dev@met.no
+ Contact information:
+ Norwegian Meteorological Institute
+ Box 43 Blindern
+ 0313 OSLO
+ NORWAY
+ email: kvalobs-dev@met.no
 
-  This file is part of KVALOBS
+ This file is part of KVALOBS
 
-  KVALOBS is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License as 
-  published by the Free Software Foundation; either version 2 
-  of the License, or (at your option) any later version.
-  
-  KVALOBS is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License along 
-  with KVALOBS; if not, write to the Free Software Foundation Inc., 
-  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ KVALOBS is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as 
+ published by the Free Software Foundation; either version 2 
+ of the License, or (at your option) any later version.
+ 
+ KVALOBS is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License along 
+ with KVALOBS; if not, write to the Free Software Foundation Inc., 
+ 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
 #ifndef __kvservice__KvObsData_h__
 #define __kvservice__KvObsData_h__
 
@@ -36,86 +36,98 @@
 #include <kvalobs/kvData.h>
 #include <kvalobs/kvTextData.h>
 
-namespace kvservice
-{
-  /**
-   * \addtogroup kvcpp
-   * @{
-   */
+namespace kvservice {
+/**
+ * \addtogroup kvcpp
+ * @{
+ */
+
+/**
+ * \brief A collection of observations, as kvData and kvTextData
+ * objects, for a single station.
+ */
+class KvObsData {
+ public:
+
+  typedef std::list<kvalobs::kvData> kvDataList;
+  typedef std::list<kvalobs::kvTextData> kvTextDataList;
 
   /**
-   * \brief A collection of observations, as kvData and kvTextData
-   * objects, for a single station.
+   * \brief Object will contain no data.
    */
-  class KvObsData
-  {
-  public:
+  KvObsData();
 
-    typedef std::list<kvalobs::kvData>     kvDataList;
-    typedef std::list<kvalobs::kvTextData> kvTextDataList;
+  /**
+   * \brief The resulting object will contain the data data
+   * represented by the given object.
+   *
+   * \param obsData The CORBA data object, normally returned by
+   * kvalobs, containing the observations this object is to
+   * represent.
+   */
+  KvObsData(const CKvalObs::CService::ObsData &obsData);
 
-    /**
-     * \brief Object will contain no data.
-     */
-    KvObsData();
+  /**
+   * Create an empty data list, for the given station.
+   *
+   * Data may later be added with the dataList() and textDataList()
+   * methods. But note that they do not guard against wrong data (wrong
+   * stationid).
+   */
+  KvObsData(int stationid)
+      : stationid_(stationid) {
+  }
 
-    /**
-     * \brief The resulting object will contain the data data
-     * represented by the given object.
-     *
-     * \param obsData The CORBA data object, normally returned by
-     * kvalobs, containing the observations this object is to
-     * represent.
-     */
-    KvObsData( const CKvalObs::CService::ObsData &obsData );
+  virtual ~KvObsData();
 
-	/**
-	 * Create an empty data list, for the given station.
-	 *
-	 * Data may later be added with the dataList() and textDataList()
-	 * methods. But note that they do not guard against wrong data (wrong
-	 * stationid).
-	 */
-	KvObsData(int stationid) :
-		stationid_(stationid)
-	{}
+  virtual void operator=(const CKvalObs::CService::ObsData &obsData);
 
-    virtual ~KvObsData( );
+  virtual operator kvDataList&() {
+    return dataList_;
+  }
 
-    virtual void operator=( const CKvalObs::CService::ObsData &obsData );
+  virtual operator kvTextDataList&() {
+    return textDataList_;
+  }
 
-    virtual operator kvDataList&() { return dataList_; }
+  /**
+   * \brief Get this collection of data's stationID.
+   */
+  inline int stationid() const {
+    return stationid_;
+  }
 
-    virtual operator kvTextDataList&() { return textDataList_; }
+  /**
+   * \brief Get the list of KvData elements.
+   **/
+  kvDataList &dataList() {
+    return dataList_;
+  }
+  const kvDataList &dataList() const {
+    return dataList_;
+  }
 
-    /**
-     * \brief Get this collection of data's stationID.
-     */
-    inline int stationid() const { return stationid_; }
+  /**
+   * \brief Get the list of KvTextData elements.
+   */
+  kvTextDataList &textDataList() {
+    return textDataList_;
+  }
+  const kvTextDataList &textDataList() const {
+    return textDataList_;
+  }
 
-    /**
-     * \brief Get the list of KvData elements.
-     **/ 
-    kvDataList &dataList() { return dataList_; }
-    const kvDataList &dataList() const { return dataList_; }
+  /**
+   * \brief clear all internal lists, that is: make this object
+   * represent no station, and contain no data.
+   */
+  virtual void clear();
 
-    /**
-     * \brief Get the list of KvTextData elements.
-     */
-    kvTextDataList &textDataList() { return textDataList_; }
-    const kvTextDataList &textDataList() const { return textDataList_; }
-
-    /**
-     * \brief clear all internal lists, that is: make this object
-     * represent no station, and contain no data.
-     */
-    virtual void clear();
-              
-  private:
-    int stationid_;
-    kvDataList     dataList_;
-    kvTextDataList textDataList_;
-  };
+ private:
+  int stationid_;
+  kvDataList dataList_;
+  kvTextDataList textDataList_;
+};
 }
 
 #endif // __kvservice__KvObsData_h__

@@ -1,33 +1,33 @@
 /*
-  Kvalobs - Free Quality Control Software for Meteorological Observations 
+ Kvalobs - Free Quality Control Software for Meteorological Observations 
 
-  $Id: DataCommandExt.h,v 1.1.2.2 2007/09/27 09:02:21 paule Exp $                                                       
+ $Id: DataCommandExt.h,v 1.1.2.2 2007/09/27 09:02:21 paule Exp $                                                       
 
-  Copyright (C) 2007 met.no
+ Copyright (C) 2007 met.no
 
-  Contact information:
-  Norwegian Meteorological Institute
-  Box 43 Blindern
-  0313 OSLO
-  NORWAY
-  email: kvalobs-dev@met.no
+ Contact information:
+ Norwegian Meteorological Institute
+ Box 43 Blindern
+ 0313 OSLO
+ NORWAY
+ email: kvalobs-dev@met.no
 
-  This file is part of KVALOBS
+ This file is part of KVALOBS
 
-  KVALOBS is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License as 
-  published by the Free Software Foundation; either version 2 
-  of the License, or (at your option) any later version.
-  
-  KVALOBS is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License along 
-  with KVALOBS; if not, write to the Free Software Foundation Inc., 
-  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ KVALOBS is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as 
+ published by the Free Software Foundation; either version 2 
+ of the License, or (at your option) any later version.
+ 
+ KVALOBS is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License along 
+ with KVALOBS; if not, write to the Free Software Foundation Inc., 
+ 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
 #ifndef __DataCommandExt_h__
 #define __DataCommandExt_h__
 
@@ -36,28 +36,29 @@
 #include "SubscriberCommandBase.h"
 #include "DataToSubscribers.h"
 
-namespace kvskel=CKvalObs::CService;
+namespace kvskel = CKvalObs::CService;
 
-class DataCommandExt : 
-  public SubscriberCommandBase<kvskel::kvDataSubscriberExt>
-{
+class DataCommandExt : public SubscriberCommandBase<kvskel::kvDataSubscriberExt> {
  protected:
   DataCommandExt();
   DataCommandExt(const DataCommandExt &);
   DataCommandExt& operator=(const DataCommandExt &);
 
-  class DataHelper{
+  class DataHelper {
     DataHelper();
     DataHelper(const DataHelper &);
     DataHelper& operator=(const DataHelper &);
-    
-  public:
-    DataHelper(long sid, int tid, miutil::miTime obst):
-      stationid(sid), typeid_(tid), obstime(obst){}
-    
+
+   public:
+    DataHelper(long sid, int tid, miutil::miTime obst)
+        : stationid(sid),
+          typeid_(tid),
+          obstime(obst) {
+    }
+
     kvskel::ObsDataList data;
     long stationid;          //stationid to the data.
-    int  typeid_;            //typeid to the data.
+    int typeid_;            //typeid to the data.
     miutil::miTime obstime;  //obstime to the data.
   };
 
@@ -67,10 +68,12 @@ class DataCommandExt :
 
  public:
   DataCommandExt(DataToSubscribersPtr data2sub)
-    :SubscriberCommandBase<kvskel::kvDataSubscriberExt>(data2sub){}
+      : SubscriberCommandBase<kvskel::kvDataSubscriberExt>(data2sub) {
+  }
 
-  ~DataCommandExt(){};
-
+  ~DataCommandExt() {
+  }
+  ;
 
   //  int operator()(KvDataSubscriberInfo &sinf,
   //		 CKvalObs::CService::kvDataSubscriber_ptr sub){
@@ -80,6 +83,5 @@ class DataCommandExt :
 
   int execute(KvDataSubscriberInfo &sinf);
 };
-
 
 #endif

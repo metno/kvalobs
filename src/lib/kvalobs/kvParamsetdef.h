@@ -35,8 +35,7 @@
 
 /* Dette er data til kvParamset.h */
 
-namespace kvalobs
-{
+namespace kvalobs {
 
 /**
  * \addtogroup kvinternalhelpers
@@ -49,10 +48,9 @@ int nparamset;
  * \brief a paramset
  * \todo Noen som f�ler seg kallet til � dokumentere dette.
  */
-struct paramset
-{
-	int paramsetid;
-	char * set;
+struct paramset {
+  int paramsetid;
+  char * set;
 };
 
 extern paramset paramset_[];

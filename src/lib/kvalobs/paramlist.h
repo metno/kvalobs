@@ -45,99 +45,95 @@
  * \brief Param is used as a cache element for an param cache.
  *
  */
-class Param
-{
-    ///The name the param is identified with in the param table in kvalobs
-	std::string kode_;
+class Param {
+  ///The name the param is identified with in the param table in kvalobs
+  std::string kode_;
 
-	///The paramid the param is identified with in the param table in kvalobs
-	int id_;
+  ///The paramid the param is identified with in the param table in kvalobs
+  int id_;
 
-	/**
-	 * Tells if the data for this parameter is to be loaded into
-	 * the data table (isScalar=true) or the text_data table (isScalar=false).
-	 */
-	bool isScalar_;
+  /**
+   * Tells if the data for this parameter is to be loaded into
+   * the data table (isScalar=true) or the text_data table (isScalar=false).
+   */
+  bool isScalar_;
 
-public:
-	Param() :
-	    kode_(""), id_(-1), isScalar_(false)
-	{
-	}
+ public:
+  Param()
+      : kode_(""),
+        id_(-1),
+        isScalar_(false) {
+  }
 
-	Param(const Param &p) :
-			kode_(p.kode_), id_(p.id_), isScalar_( p.isScalar_ )
-	{
-	}
+  Param(const Param &p)
+      : kode_(p.kode_),
+        id_(p.id_),
+        isScalar_(p.isScalar_) {
+  }
 
-	Param(const std::string &kode, int id, bool isScalar) :
-			kode_(kode), id_(id), isScalar_( isScalar )
-	{
-	}
+  Param(const std::string &kode, int id, bool isScalar)
+      : kode_(kode),
+        id_(id),
+        isScalar_(isScalar) {
+  }
 
-	Param& operator=(const Param &p)
-	{
-		if (&p == this)
-			return *this;
+  Param& operator=(const Param &p) {
+    if (&p == this)
+      return *this;
 
-		kode_ = p.kode_;
-		id_ = p.id_;
-		isScalar_ = p.isScalar_;
-		return *this;
-	}
+    kode_ = p.kode_;
+    id_ = p.id_;
+    isScalar_ = p.isScalar_;
+    return *this;
+  }
 
-	/**
-	 * The parametere is a valid parameter definition if
-	 * the paramid >= 0.
-	 *
-	 * \return true if this is a valid parameter definition and false otherwise.
-	 */
-	bool valid() const
-	{
-		return (id_ >= 0);
-	}
+  /**
+   * The parametere is a valid parameter definition if
+   * the paramid >= 0.
+   *
+   * \return true if this is a valid parameter definition and false otherwise.
+   */
+  bool valid() const {
+    return (id_ >= 0);
+  }
 
-	/**
-	 * Return the paramid the parameter is has in kvalobs.
-	 * \return The paramid to the parameter.
-	 */
-	int id() const
-	{
-		return id_;
-	}
+  /**
+   * Return the paramid the parameter is has in kvalobs.
+   * \return The paramid to the parameter.
+   */
+  int id() const {
+    return id_;
+  }
 
-	/**
-	 * Return the param name the parameter is known by in kvalobs.
-	 * \return The name of the parameter.
-	 */
-	std::string kode() const
-	{
-		return kode_;
-	}
+  /**
+   * Return the param name the parameter is known by in kvalobs.
+   * \return The name of the parameter.
+   */
+  std::string kode() const {
+    return kode_;
+  }
 
-	/**
-	 * Tells if the data for this parameter is to be loaded into
-	 * the data table or the text_data table.
-	 *
-	 * @return true if the data is for the data table and false if the data
-	 * is for the text_data table.
-	 */
-	bool isScalar()const {
-	    return isScalar_;
-	}
+  /**
+   * Tells if the data for this parameter is to be loaded into
+   * the data table or the text_data table.
+   *
+   * @return true if the data is for the data table and false if the data
+   * is for the text_data table.
+   */
+  bool isScalar() const {
+    return isScalar_;
+  }
 };
 
-class ParamPredicate: public std::binary_function<Param, Param, bool>
-{
-public:
-	result_type operator()(const first_argument_type &a1,
-			const second_argument_type &a2) const
-	{
-		if (a1.kode() < a2.kode())
-			return true;
+class ParamPredicate : public std::binary_function<Param, Param, bool> {
+ public:
+  result_type operator()(const first_argument_type &a1,
+                         const second_argument_type &a2) const {
+    if (a1.kode() < a2.kode())
+      return true;
 
-		return false;
-	}
+    return false;
+  }
 };
 
 ///a type that can be used as a param cache.
@@ -168,8 +164,8 @@ findParamIdInList(const ParamList &pl, int id);
  * \return true if paramName is defined and false of not.
  */
 bool
-findParamInList(const ParamList &pl, const std::string &paramName, Param &param );
-
+findParamInList(const ParamList &pl, const std::string &paramName,
+                Param &param);
 
 /**
  * Reads the param definitions from a CSV file with the following format:
@@ -188,7 +184,7 @@ bool
 readParamsFromFile(const std::string &filename, ParamList &paramList);
 
 bool
-isParamListsEqual( const ParamList &oldList, const ParamList &newList );
+isParamListsEqual(const ParamList &oldList, const ParamList &newList);
 
 std::ostream&
 operator<<(std::ostream &os, const ParamList &p);

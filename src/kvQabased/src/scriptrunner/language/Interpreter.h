@@ -35,12 +35,10 @@
 #include <string>
 #include <exception>
 
-namespace scriptrunner
-{
+namespace scriptrunner {
 class Script;
 
-namespace language
-{
+namespace language {
 
 /**
  * Implements what is language-dependent of a script. Subclasses know how to
@@ -48,49 +46,53 @@ namespace language
  *
  * \ingroup group_scriptrunner
  */
-class Interpreter
-{
-public:
-	typedef boost::shared_ptr<Interpreter> Ptr;
+class Interpreter {
+ public:
+  typedef boost::shared_ptr<Interpreter> Ptr;
 
-	/**
-	 * Get a registered interpreter
-	 *
-	 * @see internal::registerInterpreter()
-	 *
-	 * @param interpreterName The name that the interpreter was registered with
-	 * @return Pointer to ai interpreter, or a NULL pointer if no such interpreter is available.
-	 */
-	static Ptr get(const std::string & interpreterName);
+  /**
+   * Get a registered interpreter
+   *
+   * @see internal::registerInterpreter()
+   *
+   * @param interpreterName The name that the interpreter was registered with
+   * @return Pointer to ai interpreter, or a NULL pointer if no such interpreter is available.
+   */
+  static Ptr get(const std::string & interpreterName);
 
-	virtual ~Interpreter() {}
+  virtual ~Interpreter() {
+  }
 
-	/**
-	 * Base class for interpreter related exceptions
-	 */
-	class Error;
+  /**
+   * Base class for interpreter related exceptions
+   */
+  class Error;
 
-	/**
-	 * Execute the given script.
-	 *
-	 * @throws Error, or a subclass of Error if unable to run script for any reason.
-	 */
-	virtual RunResult run(const Script & s) const =0;
+  /**
+   * Execute the given script.
+   *
+   * @throws Error, or a subclass of Error if unable to run script for any reason.
+   */
+  virtual RunResult run(const Script & s) const =0;
 
-	/**
-	 * Get the string representation of the Script.
-	 */
-	virtual std::string fullScript(const Script & s) const =0;
+  /**
+   * Get the string representation of the Script.
+   */
+  virtual std::string fullScript(const Script & s) const =0;
 
 };
 
-class Interpreter::Error : public std::exception
-{
-	std::string msg_;
-public:
-	Error(const std::string & msg) : msg_(msg) {}
-	~Error() throw () {}
-	const char * what() const throw() { return msg_.c_str(); }
+class Interpreter::Error : public std::exception {
+  std::string msg_;
+ public:
+  Error(const std::string & msg)
+      : msg_(msg) {
+  }
+  ~Error() throw () {
+  }
+  const char * what() const throw () {
+    return msg_.c_str();
+  }
 };
 
 }

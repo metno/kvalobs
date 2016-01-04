@@ -50,7 +50,7 @@
 #define HAVE_UNISTD_H 1
 
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
-   */
+ */
 #define LT_OBJDIR ".libs/"
 
 /* Define to 1 if your C compiler doesn't accept -c and -o together. */
@@ -84,5 +84,5 @@
 #define VERSION "2.5.4"
 
 /* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
-   `char[]'. */
+ `char[]'. */
 #define YYTEXT_POINTER 1

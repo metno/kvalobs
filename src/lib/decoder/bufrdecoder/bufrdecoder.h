@@ -1,32 +1,32 @@
 /*
-  Kvalobs - Free Quality Control Software for Meteorological Observations 
+ Kvalobs - Free Quality Control Software for Meteorological Observations 
 
-  $Id: synopdecoder.h,v 1.7.6.3 2007/09/27 09:02:18 paule Exp $                                                       
+ $Id: synopdecoder.h,v 1.7.6.3 2007/09/27 09:02:18 paule Exp $                                                       
 
-  Copyright (C) 2007 met.no
+ Copyright (C) 2007 met.no
 
-  Contact information:
-  Norwegian Meteorological Institute
-  Box 43 Blindern
-  0313 OSLO
-  NORWAY
-  email: kvalobs-dev@met.no
+ Contact information:
+ Norwegian Meteorological Institute
+ Box 43 Blindern
+ 0313 OSLO
+ NORWAY
+ email: kvalobs-dev@met.no
 
-  This file is part of KVALOBS
+ This file is part of KVALOBS
 
-  KVALOBS is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License as 
-  published by the Free Software Foundation; either version 2 
-  of the License, or (at your option) any later version.
+ KVALOBS is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as 
+ published by the Free Software Foundation; either version 2 
+ of the License, or (at your option) any later version.
 
-  KVALOBS is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  General Public License for more details.
+ KVALOBS is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ General Public License for more details.
 
-  You should have received a copy of the GNU General Public License along 
-  with KVALOBS; if not, write to the Free Software Foundation Inc., 
-  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ You should have received a copy of the GNU General Public License along 
+ with KVALOBS; if not, write to the Free Software Foundation Inc., 
+ 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #ifndef __kvalobs_decoder_bufrdecoder_h__
 #define __kvalobs_decoder_bufrdecoder_h__
@@ -38,59 +38,51 @@
 #include <decoderbase/decoder.h>
 #include "BufrDecodeKvResult.h"
 
-namespace kvalobs{
-namespace decoder{
-namespace bufr{
+namespace kvalobs {
+namespace decoder {
+namespace bufr {
 
-typedef boost::mutex::scoped_lock    Lock;
+typedef boost::mutex::scoped_lock Lock;
 
-
-class DecodeKvResult : public BufrDecodeKvResult
-{
-public:
-   bool saveData( BufrDecoder *decoder );
+class DecodeKvResult : public BufrDecodeKvResult {
+ public:
+  bool saveData(BufrDecoder *decoder);
 };
 
+class BufrDecoder : public DecoderBase {
+  BufrDecoder();
+  BufrDecoder(const BufrDecoder &);
+  BufrDecoder& operator=(const BufrDecoder &);
 
-class BufrDecoder : public DecoderBase{
-   BufrDecoder();
-   BufrDecoder(const BufrDecoder &);
-   BufrDecoder& operator=(const BufrDecoder &);
+  static miutil::miTime lastStationCheck;
+  static boost::mutex mutex;
+  boost::shared_ptr<std::list<kvalobs::kvStation> > stationList;
+  int earlyobs;
+  int lateobs;
 
-   static miutil::miTime lastStationCheck;
-   static boost::mutex   mutex;
-   boost::shared_ptr< std::list<kvalobs::kvStation> > stationList;
-   int earlyobs;
-   int lateobs;
+  long getStationId(std::string &msg);
+  bool initialize();
 
-   long getStationId( std::string &msg);
-   bool initialize();
+ public:
+  BufrDecoder(dnmi::db::Connection &con, const ParamList &params,
+              const std::list<kvalobs::kvTypes> &typeList,
+              const std::string &obsType, const std::string &obs,
+              int decoderId = -1);
+  virtual ~BufrDecoder();
 
+  bool saveData(std::list<kvalobs::kvData> &data, bool &rejected,
+                std::string &rejectedMessage);
 
-public:
-   BufrDecoder( dnmi::db::Connection     &con,
-                const ParamList        &params,
-                const std::list<kvalobs::kvTypes> &typeList,
-                const std::string &obsType,
-                const std::string &obs,
-                int                    decoderId=-1);
-   virtual ~BufrDecoder();
+  void splitBufr(const std::string &bufr, std::list<std::string> &bufrs);
 
-   bool saveData(std::list<kvalobs::kvData> &data,
-                   bool &rejected,
-                   std::string &rejectedMessage);
+  long getStationid(int wmono) const;
+  std::string getFormat() const;
 
-   void splitBufr( const std::string &bufr, std::list<std::string> &bufrs );
+  bool getEarlyLateObs(int &early, int &late) const;
 
-   long getStationid( int wmono )const;
-   std::string getFormat()const;
+  virtual std::string name() const;
 
-   bool getEarlyLateObs( int &early, int &late )const;
-
-
-   virtual std::string name()const;
-
-   virtual DecodeResult execute( std::string &msg);
+  virtual DecodeResult execute(std::string &msg);
 };
 }
 }

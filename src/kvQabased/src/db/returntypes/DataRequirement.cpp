@@ -31,162 +31,156 @@
 #include <boost/spirit/include/classic.hpp>
 #include <sstream>
 
-namespace qabase
-{
+namespace qabase {
 
-DataRequirement::DataRequirement() :
-		firstTime_(0),
-		lastTime_(0)
-{
+DataRequirement::DataRequirement()
+    : firstTime_(0),
+      lastTime_(0) {
 }
 
+DataRequirement::DataRequirement(const char * signature, int stationid)
+    : firstTime_(0),
+      lastTime_(0) {
+  if (signature[0] == '\0')
+    return;
 
-DataRequirement::DataRequirement(const char * signature, int stationid) :
-		firstTime_(0),
-		lastTime_(0)
-{
-	if ( signature[0] == '\0' )
-		return;
+  using namespace boost::spirit::classic;
 
-	using namespace boost::spirit::classic;
+  bool ok =
+      parse(
+          signature,
 
-	bool ok =
-	parse(signature,
+          // Requirement type
+          (alpha_p >> *alpha_p)[assign_a(requirementType_)] >> ';'
 
-			// Requirement type
-			(alpha_p >> * alpha_p)[assign_a(requirementType_)] >> ';'
+          // Parameters
+              >> !((+(alnum_p | '_')
+                  >> !('&' >> !int_p >> '&' >> !int_p >> '&' >> !int_p))[push_back_a(
+                  parameter_)]
+                  >> *(','
+                      >> ((+(alnum_p | '_')
+                          >> !('&' >> !int_p >> '&' >> !int_p >> '&' >> !int_p))[push_back_a(
+                          parameter_)]))) >> ';'
 
-			// Parameters
-			>> ! ((+ (alnum_p | '_') >> ! ('&' >> ! int_p >> '&' >> ! int_p >> '&' >> ! int_p))[push_back_a(parameter_)]
-			>> * (',' >> ((+ (alnum_p | '_') >> ! ('&' >> ! int_p >> '&' >> ! int_p >> '&' >> ! int_p))[push_back_a(parameter_)]))) >> ';'
+              // Stations
+              >> !((int_p)[push_back_a(station_)]
+                  >> *(',' >> (int_p)[push_back_a(station_)])) >> ';'
 
-			// Stations
-			>> ! ((int_p)[push_back_a(station_)] >> * (',' >> (int_p)[push_back_a(station_)])) >> ';'
-
-			// Times
-			//>> ! (int_p[assign_a(lastTime_)][assign_a(firstTime_)] >> ! (',' >> int_p[assign_a(firstTime_)]))
-			>> ! (int_p[assign_a(lastTime_)] >> ! (',' >> int_p[assign_a(firstTime_)]))
+              // Times
+              //>> ! (int_p[assign_a(lastTime_)][assign_a(firstTime_)] >> ! (',' >> int_p[assign_a(firstTime_)]))
+              >> !(int_p[assign_a(lastTime_)]
+                  >> !(',' >> int_p[assign_a(firstTime_)]))
 //			>> ! ((int_p[assign_a(lastTime_)] >> ',' >> int_p[assign_a(firstTime_)]) |
 //					int_p[assign_a(lastTime_)])
-	).full;
+              ).full;
 
-	if ( std::find(station_.begin(), station_.end(), stationid) == station_.end() )
-		station_.push_back(stationid);
+  if (std::find(station_.begin(), station_.end(), stationid) == station_.end())
+    station_.push_back(stationid);
 
-	if ( not ok )
-		throw Invalid("Invalid syntax for signature: " + std::string(signature));
+  if (not ok)
+    throw Invalid("Invalid syntax for signature: " + std::string(signature));
 
-	if ( lastTime_ < firstTime_ )
-		std::swap(lastTime_, firstTime_);
+  if (lastTime_ < firstTime_)
+    std::swap(lastTime_, firstTime_);
 }
 
-DataRequirement::~DataRequirement()
-{
+DataRequirement::~DataRequirement() {
 }
 
-bool DataRequirement::empty() const
-{
-	return parameter_.empty() and station_.empty();
+bool DataRequirement::empty() const {
+  return parameter_.empty() and station_.empty();
 }
 
-
-bool DataRequirement::haveParameter(const std::string & baseParameter) const
-{
-	for ( ParameterList::const_iterator find = parameter_.begin(); find != parameter_.end(); ++ find )
-		if ( find->baseName() == baseParameter )
-			return true;
-	return false;
+bool DataRequirement::haveParameter(const std::string & baseParameter) const {
+  for (ParameterList::const_iterator find = parameter_.begin();
+      find != parameter_.end(); ++find)
+    if (find->baseName() == baseParameter)
+      return true;
+  return false;
 }
 
-bool DataRequirement::haveStation(int what) const
-{
-	return std::find(station_.begin(), station_.end(), what) != station_.end();
+bool DataRequirement::haveStation(int what) const {
+  return std::find(station_.begin(), station_.end(), what) != station_.end();
 }
 
-ParameterTranslation getTranslation(const DataRequirement & from, const DataRequirement & to)
-{
-	const DataRequirement::ParameterList & pfrom = from.parameter();
-	const DataRequirement::ParameterList & pto = to.parameter();
+ParameterTranslation getTranslation(const DataRequirement & from,
+                                    const DataRequirement & to) {
+  const DataRequirement::ParameterList & pfrom = from.parameter();
+  const DataRequirement::ParameterList & pto = to.parameter();
 
-	unsigned size = pfrom.size();
-	if ( size != pto.size() )
-		throw NonmatchingDataRequirements("nonmatching requirements");
+  unsigned size = pfrom.size();
+  if (size != pto.size())
+    throw NonmatchingDataRequirements("nonmatching requirements");
 
-	ParameterTranslation ret;
-	for ( unsigned i = 0; i < size; ++ i )
-		ret[pfrom[i]] = pto[i];
+  ParameterTranslation ret;
+  for (unsigned i = 0; i < size; ++i)
+    ret[pfrom[i]] = pto[i];
 
-	return ret;
+  return ret;
 }
 
-const int DataRequirement::Parameter::NULL_PARAMETER_ = std::numeric_limits<int>::min();
+const int DataRequirement::Parameter::NULL_PARAMETER_ =
+    std::numeric_limits<int>::min();
 
-DataRequirement::Parameter::Parameter() :
-		level_(NULL_PARAMETER_),
-		sensor_(NULL_PARAMETER_),
-		typeid_(NULL_PARAMETER_)
-{}
-
-DataRequirement::Parameter::Parameter(const char * signature) :
-		level_(NULL_PARAMETER_),
-		sensor_(NULL_PARAMETER_),
-		typeid_(NULL_PARAMETER_)
-{
-	parse_(signature);
+DataRequirement::Parameter::Parameter()
+    : level_(NULL_PARAMETER_),
+      sensor_(NULL_PARAMETER_),
+      typeid_(NULL_PARAMETER_) {
 }
 
-DataRequirement::Parameter::Parameter(const char * start, const char * stop) :
-		level_(NULL_PARAMETER_),
-		sensor_(NULL_PARAMETER_),
-		typeid_(NULL_PARAMETER_)
-{
-	parse_(std::string(start, stop));
+DataRequirement::Parameter::Parameter(const char * signature)
+    : level_(NULL_PARAMETER_),
+      sensor_(NULL_PARAMETER_),
+      typeid_(NULL_PARAMETER_) {
+  parse_(signature);
 }
 
-DataRequirement::Parameter::Parameter(const std::string & signature) :
-		name_(signature),
-		level_(NULL_PARAMETER_),
-		sensor_(NULL_PARAMETER_),
-		typeid_(NULL_PARAMETER_)
-{
-	parse_(signature);
+DataRequirement::Parameter::Parameter(const char * start, const char * stop)
+    : level_(NULL_PARAMETER_),
+      sensor_(NULL_PARAMETER_),
+      typeid_(NULL_PARAMETER_) {
+  parse_(std::string(start, stop));
 }
 
-std::string DataRequirement::Parameter::str() const
-{
-	if ( haveLevel() or haveSensor() or haveType() )
-	{
-		std::ostringstream ret;
-		ret << name_;
-		ret << '&';
-		if ( haveLevel() )
-			ret << level();
-		ret << '&';
-		if ( haveSensor() )
-			ret << sensor();
-		ret << '&';
-		if ( haveType() )
-			ret << type();
-		return ret.str();
-	}
-	else
-		return name_;
+DataRequirement::Parameter::Parameter(const std::string & signature)
+    : name_(signature),
+      level_(NULL_PARAMETER_),
+      sensor_(NULL_PARAMETER_),
+      typeid_(NULL_PARAMETER_) {
+  parse_(signature);
 }
 
-void DataRequirement::Parameter::parse_(const std::string & parameterString)
-{
-	using namespace boost::spirit::classic;
-
-	bool ok =
-		parse(parameterString.c_str(),
-			(+ (alnum_p | '_'))[assign_a(name_)] >>
-			! ('&' >> ! int_p[assign_a(level_)] >> '&' >> ! int_p[assign_a(sensor_)] >> '&' >> ! int_p[assign_a(typeid_)])
-	).full;
-
-	if ( not ok )
-		throw DataRequirement::Invalid("Invalid parameter: " + parameterString);
-
+std::string DataRequirement::Parameter::str() const {
+  if (haveLevel() or haveSensor() or haveType()) {
+    std::ostringstream ret;
+    ret << name_;
+    ret << '&';
+    if (haveLevel())
+      ret << level();
+    ret << '&';
+    if (haveSensor())
+      ret << sensor();
+    ret << '&';
+    if (haveType())
+      ret << type();
+    return ret.str();
+  } else
+    return name_;
 }
 
+void DataRequirement::Parameter::parse_(const std::string & parameterString) {
+  using namespace boost::spirit::classic;
+
+  bool ok = parse(
+      parameterString.c_str(),
+      (+(alnum_p | '_'))[assign_a(name_)]
+          >> !('&' >> !int_p[assign_a(level_)] >> '&'
+              >> !int_p[assign_a(sensor_)] >> '&' >> !int_p[assign_a(typeid_)]))
+      .full;
+
+  if (not ok)
+    throw DataRequirement::Invalid("Invalid parameter: " + parameterString);
+
+}
 
 }

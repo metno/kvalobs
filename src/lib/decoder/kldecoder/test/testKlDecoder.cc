@@ -1,32 +1,32 @@
 /*
-  Kvalobs - Free Quality Control Software for Meteorological Observations 
+ Kvalobs - Free Quality Control Software for Meteorological Observations 
 
-  $Id: testsms2.cc,v 1.2.2.3 2007/09/27 09:02:24 paule Exp $                                                       
+ $Id: testsms2.cc,v 1.2.2.3 2007/09/27 09:02:24 paule Exp $                                                       
 
-  Copyright (C) 2007 met.no
+ Copyright (C) 2007 met.no
 
-  Contact information:
-  Norwegian Meteorological Institute
-  Box 43 Blindern
-  0313 OSLO
-  NORWAY
-  email: kvalobs-dev@met.no
+ Contact information:
+ Norwegian Meteorological Institute
+ Box 43 Blindern
+ 0313 OSLO
+ NORWAY
+ email: kvalobs-dev@met.no
 
-  This file is part of KVALOBS
+ This file is part of KVALOBS
 
-  KVALOBS is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License as 
-  published by the Free Software Foundation; either version 2 
-  of the License, or (at your option) any later version.
+ KVALOBS is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as 
+ published by the Free Software Foundation; either version 2 
+ of the License, or (at your option) any later version.
 
-  KVALOBS is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  General Public License for more details.
+ KVALOBS is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ General Public License for more details.
 
-  You should have received a copy of the GNU General Public License along 
-  with KVALOBS; if not, write to the Free Software Foundation Inc., 
-  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ You should have received a copy of the GNU General Public License along 
+ with KVALOBS; if not, write to the Free Software Foundation Inc., 
+ 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include <float.h>
 #include <sys/stat.h>
@@ -79,428 +79,427 @@ boost::thread_specific_ptr<kvalobs::decoder::RedirectInfo> ptrRedirect;
 
 namespace {
 const char *schemaKvStation = "CREATE TABLE station (	"
-		"stationid INTEGER NOT NULL,	"
-		"lat FLOAT DEFAULT NULL,	"
-		"lon FLOAT DEFAULT NULL,	"
-		"height FLOAT DEFAULT NULL,	"
-		"maxspeed FLOAT DEFAULT NULL,	"
-		"name       TEXT DEFAULT NULL,	"
-		"wmonr      INTEGER DEFAULT NULL,	"
-		"nationalnr INTEGER DEFAULT NULL,	"
-		"ICAOid     CHAR(4) DEFAULT NULL,	"
-		"call_sign  CHAR(7) DEFAULT NULL,	"
-		"stationstr TEXT DEFAULT NULL,       "
-		"environmentid  INTEGER DEFAULT NULL,	"
-		"static    BOOLEAN DEFAULT FALSE,  "
-		"fromtime TIMESTAMP NOT NULL,	"
-		"UNIQUE ( stationid, fromtime ));";
+    "stationid INTEGER NOT NULL,	"
+    "lat FLOAT DEFAULT NULL,	"
+    "lon FLOAT DEFAULT NULL,	"
+    "height FLOAT DEFAULT NULL,	"
+    "maxspeed FLOAT DEFAULT NULL,	"
+    "name       TEXT DEFAULT NULL,	"
+    "wmonr      INTEGER DEFAULT NULL,	"
+    "nationalnr INTEGER DEFAULT NULL,	"
+    "ICAOid     CHAR(4) DEFAULT NULL,	"
+    "call_sign  CHAR(7) DEFAULT NULL,	"
+    "stationstr TEXT DEFAULT NULL,       "
+    "environmentid  INTEGER DEFAULT NULL,	"
+    "static    BOOLEAN DEFAULT FALSE,  "
+    "fromtime TIMESTAMP NOT NULL,	"
+    "UNIQUE ( stationid, fromtime ));";
 
 //stationid |  lat   |  lon   | height | maxspeed |         name         | wmonr | nationalnr | icaoid | call_sign | stationstr | environmentid | static |      fromtime
 //-----------+--------+--------+--------+----------+----------------------+-------+------------+--------+-----------+------------+---------------+--------+---------------------
 //     59680 | 62.181 | 6.0807 |     74 |        0 | ØRSTA-VOLDA LUFTHAVN |  1209 |      59680 | ENOV   |           |            |             8 | t      | 1971-06-01 00:00:00
 const char *stations =
-		"INSERT INTO station VALUES(59680, 62.181, 6.0807, 74, 0, 'ØRSTA-VOLDA LUFTHAVN', 1209, 59680, 'ENOV', NULL, NULL, 8, 't', '1971-06-01 00:00:00');";
-
+    "INSERT INTO station VALUES(59680, 62.181, 6.0807, 74, 0, 'ØRSTA-VOLDA LUFTHAVN', 1209, 59680, 'ENOV', NULL, NULL, 8, 't', '1971-06-01 00:00:00');";
 
 }
 
+class KlDecoderTest : public testing::Test {
 
+ protected:
+  string dbId;
+  string testdb;
+  DriverManager dbMgr;
+  dc::DecoderMgr decoderMgr;
+  string decoderBaseTestDir;
+  string testdir;
+  string dbdir;
+  string decoderdir;
 
-class KlDecoderTest : public testing::Test
-{
+  ParamList paramList;
+  KvTypeList typesList;
 
-protected:
-   string dbId;
-   string testdb;
-   DriverManager dbMgr;
-   dc::DecoderMgr decoderMgr;
-   string decoderBaseTestDir;
-   string testdir;
-   string dbdir;
-   string decoderdir;
+  ///Called before each test case.
+  virtual void SetUp() {
+    testdb = TESTDB;
+    testdir = TESTDIR;
+    dbdir = DBDIR;
+    decoderdir = DECODERDIR;
+    decoderBaseTestDir = DECODERBASE_TESTDIR;
+    decoderMgr.setDecoderPath(decoderdir);
+    decoderMgr.updateDecoders();
 
+    if (dbId.empty()) {
+      ASSERT_TRUE( dbMgr.loadDriver( dbdir+"/sqlite3driver.so", dbId ) )<<
+      "Failed to load Db driver. Reason: " << dbMgr.getErr();
+    }
 
-   ParamList        paramList;
-   KvTypeList typesList;
+    if (paramList.empty()) {
+      ASSERT_TRUE( readParamsFromFile( decoderBaseTestDir+"/kvparams.csv", paramList ) )<<
+      "Cant read params from the file <kvparams.csv>";
+    }
 
-   ///Called before each test case.
-   virtual void SetUp() {
-	   testdb= TESTDB;
-      testdir = TESTDIR;
-      dbdir = DBDIR;
-      decoderdir = DECODERDIR;
-      decoderBaseTestDir = DECODERBASE_TESTDIR;
-      decoderMgr.setDecoderPath( decoderdir );
-      decoderMgr.updateDecoders();
+    if (typesList.empty()) {
+      ASSERT_TRUE( ReadTypesFromFile(decoderBaseTestDir+"/kvtypes.csv", typesList) )<<
+      "Cant read types from the file <kvtypes.csv>";
+    }
 
-      if( dbId.empty() ) {
-         ASSERT_TRUE( dbMgr.loadDriver( dbdir+"/sqlite3driver.so", dbId ) )<<
-         "Failed to load Db driver. Reason: " << dbMgr.getErr();
+    setUpDb();
+  }
+
+  void createConfSection(const string &programName, const string &decoderName,
+                         miutil::conf::ConfSection *&conf) {
+
+    conf = new miutil::conf::ConfSection();
+    miutil::conf::ConfSection *programConf = new miutil::conf::ConfSection();
+    miutil::conf::ConfSection *tmp = new miutil::conf::ConfSection();
+
+    ASSERT_TRUE(programConf->addSection(decoderName, tmp));
+    ASSERT_TRUE(conf->addSection(programName, programConf));
+
+    string sectionName = programName + "." + decoderName;
+    miutil::conf::ConfSection *hasSection = conf->getSection(sectionName);
+
+    ASSERT_TRUE( hasSection )<< "Can't create conf section '" << sectionName << "'.";
+  }
+
+  void setUpDb() {
+    unlink( TESTDB );
+    dnmi::db::Connection *con = dbMgr.connect( dbId, testdb );
+    ASSERT_TRUE( con != 0 )<< "Cant open database connection: " << testdb << ".";
+    ASSERT_NO_THROW( con->exec( schemaKvStation ) ) << "DB: cant create table 'stations'.";
+    cerr << stations << endl;
+    ASSERT_NO_THROW( con->exec( stations ) ) << "DB: cant insert into table 'stations'.";
+
+  }
+
+  bool getData( const KvDataContainer::DataList &dataList, kvalobs::kvData &data,
+      int stationid, int typeId, int paramid, int sensor=0, int level=0) const
+  {
+    KvDataContainer::DataList::const_iterator it = dataList.begin();
+
+    for(; it != dataList.end(); ++it ) {
+      if( it->stationID() == stationid &&
+          it->typeID() == typeId &&
+          it->paramID() == paramid &&
+          it->sensor() == sensor &&
+          it->level() == level ) {
+        data = *it;
+        return true;
       }
+    }
 
-      if( paramList.empty() ) {
-         ASSERT_TRUE( readParamsFromFile( decoderBaseTestDir+"/kvparams.csv", paramList ) ) <<
-         "Cant read params from the file <kvparams.csv>";
+    return false;
+  }
+
+  bool getTextData( const KvDataContainer::TextDataList &dataList, kvalobs::kvTextData &data,
+      int stationid, int typeId, int paramid ) const
+  {
+    KvDataContainer::TextDataList::const_iterator it = dataList.begin();
+
+    for(; it != dataList.end(); ++it ) {
+      if( it->stationID() == stationid &&
+          it->typeID() == typeId &&
+          it->paramID() == paramid ) {
+        data = *it;
+        return true;
       }
+    }
 
-      if( typesList.empty() ) {
-    	  ASSERT_TRUE( ReadTypesFromFile(decoderBaseTestDir+"/kvtypes.csv", typesList) ) <<
-    	           "Cant read types from the file <kvtypes.csv>";
-      }
+    return false;
+  }
 
-     setUpDb();
-   }
+  ///Called after each test case.
+  virtual void TearDown() {
+    //cerr << "TearDown:\n";
 
-
-   void createConfSection( const string &programName,
-		                                         const string &decoderName,
-		                                         miutil::conf::ConfSection *&conf)
-   {
-
-	   conf = new miutil::conf::ConfSection();
-	   miutil::conf::ConfSection *programConf = new miutil::conf::ConfSection();
-	   miutil::conf::ConfSection *tmp = new miutil::conf::ConfSection();
-
-	   ASSERT_TRUE( programConf->addSection( decoderName, tmp ) );
-	   ASSERT_TRUE( conf->addSection( programName, programConf ) );
-
-	   string sectionName = programName+"."+decoderName;
-	   miutil::conf::ConfSection *hasSection = conf->getSection( sectionName );
-
-	   ASSERT_TRUE( hasSection ) << "Can't create conf section '" << sectionName  << "'.";
-   }
-
-
-   void setUpDb() {
-	   unlink( TESTDB );
-	   dnmi::db::Connection *con = dbMgr.connect( dbId, testdb );
-	   ASSERT_TRUE( con != 0 )<< "Cant open database connection: " << testdb << ".";
-	   ASSERT_NO_THROW( con->exec( schemaKvStation ) ) << "DB: cant create table 'stations'.";
-	   cerr << stations << endl;
-	   ASSERT_NO_THROW( con->exec( stations ) ) << "DB: cant insert into table 'stations'.";
-
-
-   }
-
-   bool getData( const KvDataContainer::DataList &dataList, kvalobs::kvData &data,
-		   int stationid, int typeId, int paramid, int sensor=0, int level=0) const
-   {
-	   KvDataContainer::DataList::const_iterator it = dataList.begin();
-
-	   for( ; it != dataList.end(); ++it ) {
-		   if( it->stationID() == stationid &&
-			   it->typeID() == typeId &&
-			   it->paramID() == paramid &&
-			   it->sensor() == sensor  &&
-			   it->level() == level ) {
-			   data = *it;
-			   return true;
-		   }
-	   }
-
-	   return false;
-   }
-
-   bool getTextData( const KvDataContainer::TextDataList &dataList, kvalobs::kvTextData &data,
-   		   int stationid, int typeId, int paramid ) const
-      {
-   	   KvDataContainer::TextDataList::const_iterator it = dataList.begin();
-
-   	   for( ; it != dataList.end(); ++it ) {
-   		   if( it->stationID() == stationid &&
-   			   it->typeID() == typeId &&
-   			   it->paramID() == paramid ) {
-   			   data = *it;
-   			   return true;
-   		   }
-   	   }
-
-   	   return false;
-      }
-
-   ///Called after each test case.
-   virtual void TearDown() {
-	   //cerr << "TearDown:\n";
-
-   }
+  }
 };
 
-TEST_F( KlDecoderTest, DuplicatedParamsTest )
-{
-    KvTypeList types;
-    vector<ParamDef> definedParams;
-    list<string> strParams;
-    string message;
-    list<string> expectedStrParams;
-    string header="TAN,TAX,TA,TJM(0,10),TJM(0,20),TA";
+TEST_F( KlDecoderTest, DuplicatedParamsTest ) {
+  KvTypeList types;
+  vector<ParamDef> definedParams;
+  list<string> strParams;
+  string message;
+  list<string> expectedStrParams;
+  string header = "TAN,TAX,TA,TJM(0,10),TJM(0,20),TA";
 
-    types.push_back(kvTypes(502,"",60, 60,"I","h","For test"));
-    bits::DataDecoder decoder( paramList, typesList );
+  types.push_back(kvTypes(502, "", 60, 60, "I", "h", "For test"));
+  bits::DataDecoder decoder(paramList, typesList);
 
-    ASSERT_TRUE( decoder.splitParams( header, strParams, message) ) << "Cant split params '" << header << "'.";
+  ASSERT_TRUE( decoder.splitParams( header, strParams, message) )<< "Cant split params '" << header << "'.";
 
-    ba::push_back( expectedStrParams )("TAN")("TAX")("TA")("TJM(0,10)")("TJM(0,20)")
-            ("TA");
+  ba::push_back(expectedStrParams)("TAN")("TAX")("TA")("TJM(0,10)")("TJM(0,20)")(
+      "TA");
 
-    ASSERT_TRUE( equal( strParams.begin(), strParams.end(), expectedStrParams.begin()  ) );
+  ASSERT_TRUE(
+      equal(strParams.begin(), strParams.end(), expectedStrParams.begin()));
 
-    ASSERT_FALSE( decoder.decodeHeader( header, definedParams, message ) ) << message;
+  ASSERT_FALSE( decoder.decodeHeader( header, definedParams, message ) )<< message;
 }
 
-TEST_F( KlDecoderTest, DataDecodeTest )
-{
-	string error;
-	string filename;
-	string obsType;
-	string obsData;
-	string header;
-	KvTypeList types;
-	KlDataArray klData;
-	int useinfo7; //tolate/toearly flag
-	conf::ConfSection *conf=0;
-	list<string> strParams;
-	list<string> expectedStrParams;
-	string message;
-	pt::ptime obstime;
-	pt::ptime receivedTime;
-	kvalobs::serialize::KvalobsData *data;
+TEST_F( KlDecoderTest, DataDecodeTest ) {
+  string error;
+  string filename;
+  string obsType;
+  string obsData;
+  string header;
+  KvTypeList types;
+  KlDataArray klData;
+  int useinfo7;  //tolate/toearly flag
+  conf::ConfSection *conf = 0;
+  list<string> strParams;
+  list<string> expectedStrParams;
+  string message;
+  pt::ptime obstime;
+  pt::ptime receivedTime;
+  kvalobs::serialize::KvalobsData *data;
 
-	types.push_back(kvTypes(311,"",60, 60,"I","h","For test"));
+  types.push_back(kvTypes(311, "", 60, 60, "I", "h", "For test"));
 
-	filename = testdir+"/n59680-t311.dat";
-	ASSERT_TRUE( ReadDataFromFile( filename, obsType, obsData ) )<< "Cant read testdata: " << filename << ".";
-	ASSERT_TRUE( ! obsType.empty() && ! obsData.empty() ) << "Invalid datafile format: " << filename << ".";
+  filename = testdir + "/n59680-t311.dat";
+  ASSERT_TRUE( ReadDataFromFile( filename, obsType, obsData ) )<< "Cant read testdata: " << filename << ".";
+  ASSERT_TRUE( ! obsType.empty() && ! obsData.empty() )<< "Invalid datafile format: " << filename << ".";
 
-	header="AA,DD,DX_1";
-	vector<ParamDef> definedParams;
+  header = "AA,DD,DX_1";
+  vector<ParamDef> definedParams;
 
-	bits::DataDecoder decoder( paramList, typesList );
+  bits::DataDecoder decoder(paramList, typesList);
 
+  ASSERT_TRUE( decoder.splitParams( header, strParams, message) )<< "Cant split params '" << header << "'.";
+  ba::push_back(expectedStrParams)("AA")("DD")("DX_1");
+  ASSERT_TRUE(
+      equal(strParams.begin(), strParams.end(), expectedStrParams.begin()));
 
-	ASSERT_TRUE( decoder.splitParams( header, strParams, message) ) << "Cant split params '" << header << "'.";
-	ba::push_back( expectedStrParams )("AA")("DD")("DX_1");
-	ASSERT_TRUE( equal( strParams.begin(), strParams.end(), expectedStrParams.begin()  ) );
+  header = "AA(1),DD(1,0),DX_1(1,2)";
+  ASSERT_TRUE( decoder.splitParams( header, strParams, message) )<< "Cant split params '" << header << "'.";
+  expectedStrParams.clear();
+  ba::push_back(expectedStrParams)("AA(1)")("DD(1,0)")("DX_1(1,2)");
+  ASSERT_TRUE(
+      equal(strParams.begin(), strParams.end(), expectedStrParams.begin()));
 
+  header = "AA,DD,DX_1";
+  ASSERT_TRUE(decoder.decodeHeader(header, definedParams, message));
+  ASSERT_TRUE(definedParams.size() == 3);
+  ASSERT_TRUE(definedParams[0] == ParamDef("AA", 1));
+  ASSERT_TRUE(definedParams[1] == ParamDef("DD", 61));
+  ASSERT_TRUE(definedParams[2] == ParamDef("DX_1", 73));
 
-	header="AA(1),DD(1,0),DX_1(1,2)";
-	ASSERT_TRUE( decoder.splitParams( header, strParams, message) ) << "Cant split params '" << header << "'.";
-	expectedStrParams.clear();
-	ba::push_back( expectedStrParams )("AA(1)")("DD(1,0)")("DX_1(1,2)");
-	ASSERT_TRUE( equal( strParams.begin(), strParams.end(), expectedStrParams.begin()  ) );
+  header = "AA(1),DD,DX_1(1,2)";
+  ASSERT_TRUE( decoder.decodeHeader( header, definedParams, message ) )<< "Cant decode header: " << message;
 
-	header="AA,DD,DX_1";
-	ASSERT_TRUE( decoder.decodeHeader( header, definedParams, message ) );
-	ASSERT_TRUE( definedParams.size() == 3 );
-	ASSERT_TRUE( definedParams[0]== ParamDef( "AA", 1 ) );
-	ASSERT_TRUE( definedParams[1]== ParamDef( "DD", 61 ) );
-	ASSERT_TRUE( definedParams[2]== ParamDef( "DX_1",73) );
+  ASSERT_TRUE( definedParams[0] == ParamDef("AA", 1, 1, 0));
+  ASSERT_TRUE(definedParams[1] == ParamDef("DD", 61, 0, 0));
+  ASSERT_TRUE(definedParams[2] == ParamDef("DX_1", 73, 1, 2));
 
-	header="AA(1),DD,DX_1(1,2)";
-	ASSERT_TRUE( decoder.decodeHeader( header, definedParams, message ) )
-		<< "Cant decode header: " << message;
+  header = "AA,DD,IvalidParam";
+  ASSERT_TRUE(decoder.decodeHeader(header, definedParams, message));
+  ASSERT_TRUE(definedParams[2].id() == -1);
 
-	ASSERT_TRUE( definedParams[0]== ParamDef( "AA", 1, 1, 0 ) );
-	ASSERT_TRUE( definedParams[1]== ParamDef( "DD", 61, 0, 0 ) );
-	ASSERT_TRUE( definedParams[2]== ParamDef( "DX_1" ,73, 1, 2) );
+  header = "AA,DD,DX_1";
+  ASSERT_TRUE(decoder.decodeHeader(header, definedParams, message));
+  obsData = "201310051000,3,276,254";
 
+  ASSERT_TRUE(
+      decoder.decodeData(klData, definedParams.size(), obstime, receivedTime,
+                         311, obsData, 2, message));
+  ASSERT_TRUE(obstime == pt::time_from_string_nothrow("201310051000"));
+  ASSERT_TRUE(klData[0] == KlData("3"));
+  ASSERT_TRUE(klData[1] == KlData("276"));
+  ASSERT_TRUE(klData[2] == KlData("254"));
 
+  //Set useinfo and controlinfo flag from data.
+  obsData = "201310051000,3(,xxxxxxxxxxxxx6xx),276,254";
+  ASSERT_TRUE(
+      decoder.decodeData(klData, definedParams.size(), obstime, receivedTime,
+                         311, obsData, 2, message));
+  ASSERT_TRUE(obstime == pt::time_from_string_nothrow("201310051000"));
+  ASSERT_TRUE(klData[0] == KlData("3", "0000000000000000", "9999900000000600"));
+  ASSERT_TRUE(klData[1] == KlData("276"));
+  ASSERT_TRUE(klData[2] == KlData("254"));
 
-    header="AA,DD,IvalidParam";
-    ASSERT_TRUE( decoder.decodeHeader( header, definedParams, message ) );
-    ASSERT_TRUE( definedParams[2].id() == -1 );
+  //Set useinfo(7)=0 on time.
+  receivedTime = pt::time_from_string_nothrow("2013-10-05 10:04:56");
+  ASSERT_TRUE(!receivedTime.is_special());
+  obsData = "201310051000,3,276,254";
+  ASSERT_TRUE(
+      decoder.decodeData(klData, definedParams.size(), obstime, receivedTime,
+                         311, obsData, 2, message));
+  ASSERT_TRUE(klData[0] == KlData("3"));
+  ASSERT_TRUE(klData[1] == KlData("276"));
+  ASSERT_TRUE(klData[2] == KlData("254"));
 
-    header="AA,DD,DX_1";
-    ASSERT_TRUE( decoder.decodeHeader( header, definedParams, message ) );
-    obsData = "201310051000,3,276,254";
+  //Set useinfo(7)=4 to late
+  receivedTime = pt::time_from_string_nothrow("2013-10-05 11:01:56");
+  ASSERT_TRUE(!receivedTime.is_special());
+  obsData = "201310051000,3,276,254";
+  ASSERT_TRUE(
+      decoder.decodeData(klData, definedParams.size(), obstime, receivedTime,
+                         311, obsData, 2, message));
+  ASSERT_TRUE(klData[0] == KlData("3", "0000000000000000", "9999900400000000"));
+  ASSERT_TRUE(
+      klData[1] == KlData("276", "0000000000000000", "9999900400000000"));
+  ASSERT_TRUE(
+      klData[2] == KlData("254", "0000000000000000", "9999900400000000"));
 
-	ASSERT_TRUE( decoder.decodeData( klData, definedParams.size(), obstime, receivedTime, 311, obsData, 2, message) );
-    ASSERT_TRUE( obstime == pt::time_from_string_nothrow("201310051000") );
-    ASSERT_TRUE( klData[0] == KlData("3") );
-    ASSERT_TRUE( klData[1] == KlData("276")  );
-    ASSERT_TRUE( klData[2] == KlData("254") );
+  //Set useinfo(7)=3 to early.
+  receivedTime = pt::time_from_string_nothrow("2013-10-05 08:59:59");
+  ASSERT_TRUE(!receivedTime.is_special());
+  obsData = "201310051000,3,276,254";
+  ASSERT_TRUE(
+      decoder.decodeData(klData, definedParams.size(), obstime, receivedTime,
+                         311, obsData, 2, message));
+  ASSERT_TRUE(klData[0] == KlData("3", "0000000000000000", "9999900300000000"));
+  ASSERT_TRUE(
+      klData[1] == KlData("276", "0000000000000000", "9999900300000000"));
+  ASSERT_TRUE(
+      klData[2] == KlData("254", "0000000000000000", "9999900300000000"));
 
-    //Set useinfo and controlinfo flag from data.
-    obsData = "201310051000,3(,xxxxxxxxxxxxx6xx),276,254";
-    ASSERT_TRUE( decoder.decodeData( klData, definedParams.size(), obstime, receivedTime, 311, obsData, 2, message) );
-    ASSERT_TRUE( obstime == pt::time_from_string_nothrow("201310051000") );
-    ASSERT_TRUE( klData[0] == KlData("3", "0000000000000000","9999900000000600") );
-    ASSERT_TRUE( klData[1] == KlData("276")  );
-    ASSERT_TRUE( klData[2] == KlData("254") );
+  //decode data
+  //receivedTime = pt::time_from_string_nothrow("2013-10-05 10:04:56");
+  receivedTime = pt::time_from_string_nothrow("2013-10-05 08:59:59");  //To early
+  ASSERT_TRUE(!receivedTime.is_special());
+  obstime = pt::time_from_string_nothrow("2013-10-05 10:00:00");
+  obsData = "AA,DD,DX_1,signature\n"
+      "201310051000,3,276,254,bm";
 
-    //Set useinfo(7)=0 on time.
-    receivedTime = pt::time_from_string_nothrow("2013-10-05 10:04:56");
-    ASSERT_TRUE( ! receivedTime.is_special() );
-    obsData = "201310051000,3,276,254";
-    ASSERT_TRUE( decoder.decodeData( klData, definedParams.size(), obstime, receivedTime, 311, obsData, 2, message) );
-    ASSERT_TRUE( klData[0] == KlData("3") );
-    ASSERT_TRUE( klData[1] == KlData("276")  );
-    ASSERT_TRUE( klData[2] == KlData("254") );
+  data = decoder.decodeData(obsData, 59680, 311, receivedTime, "", "");
+  ASSERT_TRUE(data);
+  KvDataContainer dataContainer(data);
+  KvDataContainer::Data obsData1;
 
-    //Set useinfo(7)=4 to late
-    receivedTime = pt::time_from_string_nothrow("2013-10-05 11:01:56");
-    ASSERT_TRUE( ! receivedTime.is_special() );
-    obsData = "201310051000,3,276,254";
-    ASSERT_TRUE( decoder.decodeData( klData, definedParams.size(), obstime, receivedTime, 311, obsData, 2, message) );
-    ASSERT_TRUE( klData[0] == KlData("3",  "0000000000000000","9999900400000000" ) );
-    ASSERT_TRUE( klData[1] == KlData("276","0000000000000000","9999900400000000" )  );
-    ASSERT_TRUE( klData[2] == KlData("254","0000000000000000","9999900400000000" ) );
+  ASSERT_TRUE(dataContainer.getData(obsData1, receivedTime) == 3);
 
-    //Set useinfo(7)=3 to early.
-    receivedTime = pt::time_from_string_nothrow("2013-10-05 08:59:59");
-    ASSERT_TRUE( ! receivedTime.is_special() );
-    obsData = "201310051000,3,276,254";
-    ASSERT_TRUE( decoder.decodeData( klData, definedParams.size(), obstime, receivedTime, 311, obsData, 2, message) );
-    ASSERT_TRUE( klData[0] == KlData("3",  "0000000000000000","9999900300000000" ) );
-    ASSERT_TRUE( klData[1] == KlData("276","0000000000000000","9999900300000000" )  );
-    ASSERT_TRUE( klData[2] == KlData("254","0000000000000000","9999900300000000" ) );
+  KvDataContainer::DataByObstime obsData2;
+  kvalobs::kvData kvData;
+  ASSERT_TRUE(dataContainer.getData(obsData2, 59680, 311, receivedTime) == 3);
 
+  ASSERT_TRUE(getData(obsData2[obstime], kvData, 59680, 311, 1));
+  ASSERT_FLOAT_EQ(kvData.original(), 3 /* AA */);
+  ASSERT_TRUE(kvData.useinfo() == kvUseInfo("9999900300000000"));
+  ASSERT_TRUE(kvData.controlinfo() == kvControlInfo());
 
-    //decode data
-    //receivedTime = pt::time_from_string_nothrow("2013-10-05 10:04:56");
-    receivedTime = pt::time_from_string_nothrow("2013-10-05 08:59:59"); //To early
-    ASSERT_TRUE( ! receivedTime.is_special() );
-    obstime = pt::time_from_string_nothrow("2013-10-05 10:00:00");
-    obsData = "AA,DD,DX_1,signature\n"
-    		  "201310051000,3,276,254,bm";
+  ASSERT_TRUE(getData(obsData2[obstime], kvData, 59680, 311, 61));
+  ASSERT_FLOAT_EQ(kvData.original(), 276 /* DD */);
+  ASSERT_TRUE(kvData.useinfo() == kvUseInfo("9999900300000000"));
+  ASSERT_TRUE(kvData.controlinfo() == kvControlInfo());
 
-    data =  decoder.decodeData( obsData, 59680, 311, receivedTime, "", "" );
-    ASSERT_TRUE( data );
-    KvDataContainer dataContainer( data );
-    KvDataContainer::Data obsData1;
+  ASSERT_TRUE(getData(obsData2[obstime], kvData, 59680, 311, 73));
+  ASSERT_FLOAT_EQ(kvData.original(), 254 /* DX_1 */);
+  ASSERT_TRUE(kvData.useinfo() == kvUseInfo("9999900300000000"));
+  ASSERT_TRUE(kvData.controlinfo() == kvControlInfo());
 
-    ASSERT_TRUE(  dataContainer.getData( obsData1, receivedTime ) == 3 );
-
-    KvDataContainer::DataByObstime obsData2;
-    kvalobs::kvData kvData;
-    ASSERT_TRUE( dataContainer.getData( obsData2, 59680, 311, receivedTime ) == 3 );
-
-    ASSERT_TRUE( getData( obsData2[obstime], kvData, 59680, 311, 1) );
-    ASSERT_FLOAT_EQ( kvData.original(), 3 /* AA */);
-    ASSERT_TRUE( kvData.useinfo() == kvUseInfo("9999900300000000") );
-    ASSERT_TRUE( kvData.controlinfo() == kvControlInfo() );
-
-    ASSERT_TRUE( getData( obsData2[obstime], kvData, 59680, 311, 61) );
-    ASSERT_FLOAT_EQ( kvData.original(), 276 /* DD */);
-    ASSERT_TRUE( kvData.useinfo() == kvUseInfo("9999900300000000") );
-    ASSERT_TRUE( kvData.controlinfo() == kvControlInfo() );
-
-    ASSERT_TRUE( getData( obsData2[obstime], kvData, 59680, 311, 73) );
-    ASSERT_FLOAT_EQ( kvData.original(), 254 /* DX_1 */ );
-    ASSERT_TRUE( kvData.useinfo() == kvUseInfo("9999900300000000") );
-    ASSERT_TRUE( kvData.controlinfo() == kvControlInfo() );
-
-    KvDataContainer::TextDataByObstime textObsData;
-    kvalobs::kvTextData textData;
-    ASSERT_TRUE( dataContainer.getTextData( textObsData, 59680, 311, receivedTime ) == 1 );
-    ASSERT_TRUE( getTextData( textObsData[obstime], textData, 59680, 311, 1000 /*signature*/) );
-    ASSERT_TRUE( textData.original() == "bm" /* signature */);
+  KvDataContainer::TextDataByObstime textObsData;
+  kvalobs::kvTextData textData;
+  ASSERT_TRUE(
+      dataContainer.getTextData(textObsData, 59680, 311, receivedTime) == 1);
+  ASSERT_TRUE(
+      getTextData(textObsData[obstime], textData, 59680, 311,
+                  1000 /*signature*/));
+  ASSERT_TRUE(textData.original() == "bm" /* signature */);
 }
 
-TEST_F( KlDecoderTest, InvalidParamDecodeTest )
-{
-    string obsData;
-    string header;
-    KvTypeList types;
-    list<string> strParams;
-    list<string> expectedStrParams;
-    string message;
-    pt::ptime obstime;
-    pt::ptime receivedTime;
-    kvalobs::serialize::KvalobsData *data;
+TEST_F( KlDecoderTest, InvalidParamDecodeTest ) {
+  string obsData;
+  string header;
+  KvTypeList types;
+  list<string> strParams;
+  list<string> expectedStrParams;
+  string message;
+  pt::ptime obstime;
+  pt::ptime receivedTime;
+  kvalobs::serialize::KvalobsData *data;
 
-    types.push_back(kvTypes(311,"",60, 60,"I","h","For test"));
-    receivedTime = pt::time_from_string_nothrow("2013-10-05 10:04:56");
+  types.push_back(kvTypes(311, "", 60, 60, "I", "h", "For test"));
+  receivedTime = pt::time_from_string_nothrow("2013-10-05 10:04:56");
 
-    header="AA,DD,InvalidParam";
-    vector<ParamDef> definedParams;
+  header = "AA,DD,InvalidParam";
+  vector<ParamDef> definedParams;
 
-    bits::DataDecoder decoder( paramList, typesList );
+  bits::DataDecoder decoder(paramList, typesList);
 
-    ASSERT_TRUE( decoder.splitParams( header, strParams, message) ) << "Cant split params '" << header << "'.";
-    ba::push_back( expectedStrParams )("AA")("DD")("InvalidParam");
-    ASSERT_TRUE( equal( strParams.begin(), strParams.end(), expectedStrParams.begin()  ) );
+  ASSERT_TRUE( decoder.splitParams( header, strParams, message) )<< "Cant split params '" << header << "'.";
+  ba::push_back(expectedStrParams)("AA")("DD")("InvalidParam");
+  ASSERT_TRUE(
+      equal(strParams.begin(), strParams.end(), expectedStrParams.begin()));
 
-    ASSERT_TRUE( decoder.decodeHeader( header, definedParams, message ) );
-    ASSERT_TRUE( definedParams.size() == 3 );
-    ASSERT_TRUE( definedParams[0]== ParamDef( "AA", 1 ) );
-    ASSERT_TRUE( definedParams[1]== ParamDef( "DD", 61 ) );
-    ASSERT_TRUE( definedParams[2]== ParamDef( "InvalidParam",-1) );
+  ASSERT_TRUE(decoder.decodeHeader(header, definedParams, message));
+  ASSERT_TRUE(definedParams.size() == 3);
+  ASSERT_TRUE(definedParams[0] == ParamDef("AA", 1));
+  ASSERT_TRUE(definedParams[1] == ParamDef("DD", 61));
+  ASSERT_TRUE(definedParams[2] == ParamDef("InvalidParam", -1));
 
-    obsData = "AA,DD,InvalidParam\n"
-              "201310051000,3,276,254";
+  obsData = "AA,DD,InvalidParam\n"
+      "201310051000,3,276,254";
 
-    data = decoder.decodeData( obsData, 59680, 311, receivedTime, "", "" );
+  data = decoder.decodeData(obsData, 59680, 311, receivedTime, "", "");
 
-    ASSERT_TRUE( data ) << decoder.messages;
+  ASSERT_TRUE( data )<< decoder.messages;
 
+  KvDataContainer dataContainer(data);
+  KvDataContainer::DataByObstime obsData1;
+  kvalobs::kvData kvData;
 
+  obstime = pt::time_from_string_nothrow("2013-10-05 10:00:00");
 
-    KvDataContainer dataContainer( data );
-    KvDataContainer::DataByObstime obsData1;
-    kvalobs::kvData kvData;
-
-    obstime = pt::time_from_string_nothrow("2013-10-05 10:00:00");
-
-    ASSERT_TRUE(  dataContainer.getData(  obsData1, 59680, 311 ) == 2 );
-    ASSERT_FALSE( getData( obsData1[obstime], kvData, 59680, 311, -1 ) );
-    ASSERT_TRUE( getData( obsData1[obstime], kvData, 59680, 311, 1 ) );
-    ASSERT_TRUE( getData( obsData1[obstime], kvData, 59680, 311, 61 ) );
+  ASSERT_TRUE(dataContainer.getData(obsData1, 59680, 311) == 2);
+  ASSERT_FALSE(getData(obsData1[obstime], kvData, 59680, 311, -1));
+  ASSERT_TRUE(getData(obsData1[obstime], kvData, 59680, 311, 1));
+  ASSERT_TRUE(getData(obsData1[obstime], kvData, 59680, 311, 61));
 }
 
+TEST_F( KlDecoderTest, decodeData ) {
+  string error;
+  string filename;
+  string obsType;
+  string obsData;
+  string header;
+  KvTypeList types;
+  int useinfo7;  //tolate/toearly flag
+  conf::ConfSection *conf = 0;
+  string decoderName;
 
+  filename = testdir + "/n59680-t311.dat";
+  ASSERT_TRUE( ReadDataFromFile( filename, obsType, obsData ) )<< "Cant read testdata: " << filename << ".";
+  ASSERT_TRUE( ! obsType.empty() && ! obsData.empty() )<< "Invalid datafile format: " << filename << ".";
 
-TEST_F( KlDecoderTest, decodeData )
-{
-	string error;
-	string filename;
-	string obsType;
-	string obsData;
-	string header;
-	KvTypeList types;
-	int useinfo7; //tolate/toearly flag
-	conf::ConfSection *conf=0;
-	string decoderName;
+  cerr << "testdb: '" << testdb << "'\n";
+  dnmi::db::Connection *con = dbMgr.connect(dbId, testdb);
+  ASSERT_TRUE( con )<< "Cant open database connection: " << string(testdb) << ".";
 
-	filename = testdir+"/n59680-t311.dat";
-	ASSERT_TRUE( ReadDataFromFile( filename, obsType, obsData ) )<< "Cant read testdata: " << filename << ".";
-	ASSERT_TRUE( ! obsType.empty() && ! obsData.empty() ) << "Invalid datafile format: " << filename << ".";
+  dc::DecoderBase *dec = decoderMgr.findDecoder(*con, paramList, typesList,
+                                                obsType, obsData, error);
+  ASSERT_TRUE( dec )<< "Cant create test decoder. obsType: '" << obsType << "'.";
 
-	cerr << "testdb: '" << testdb << "'\n";
-	dnmi::db::Connection *con = dbMgr.connect( dbId, testdb );
-	ASSERT_TRUE( con  )<< "Cant open database connection: " << string(testdb) << ".";
+  decoderName = dec->name();
 
-	dc::DecoderBase *dec=decoderMgr.findDecoder( *con, paramList, typesList, obsType, obsData, error);
-	ASSERT_TRUE( dec  ) << "Cant create test decoder. obsType: '" << obsType << "'.";
+  kvalobs::decoder::kldecoder::KlDecoder *klDecoder =
+      static_cast<kvalobs::decoder::kldecoder::KlDecoder*>(dec);
+  ASSERT_TRUE(!klDecoder->getSetUsinfo7());
 
-	decoderName = dec->name();
+  decoderMgr.releaseDecoder(dec);
 
-	kvalobs::decoder::kldecoder::KlDecoder *klDecoder = static_cast<kvalobs::decoder::kldecoder::KlDecoder*>(dec);
-	ASSERT_TRUE( ! klDecoder->getSetUsinfo7() );
+  createConfSection("kvDataInputd", decoderName, conf);
 
-	decoderMgr.releaseDecoder( dec );
+  ASSERT_TRUE(conf);
 
-	createConfSection( "kvDataInputd", decoderName, conf );
+  conf::ConfSection *decoderConf = conf->getSection(
+      "kvDataInputd." + decoderName);
+  ASSERT_TRUE(decoderConf);
+  conf::ValElement val("true");
+  ASSERT_TRUE(decoderConf->addValue("set_useinfo7", val));
 
-	ASSERT_TRUE( conf );
-
-	conf::ConfSection *decoderConf = conf->getSection("kvDataInputd." + decoderName );
-	ASSERT_TRUE( decoderConf );
-	conf::ValElement val("true");
-	ASSERT_TRUE( decoderConf->addValue( "set_useinfo7", val ) );
-
-	decoderMgr.setTheKvConf( conf );
-	dec=decoderMgr.findDecoder( *con, paramList, typesList, obsType, obsData, error);
-	ASSERT_TRUE( dec  ) << "Cant create test decoder. obsType: '" << obsType << "'.";
-	klDecoder = static_cast<kvalobs::decoder::kldecoder::KlDecoder*>(dec);
-	ASSERT_TRUE(  klDecoder->getSetUsinfo7() );
-	decoderMgr.releaseDecoder( dec );
-	decoderMgr.setTheKvConf( 0 );
+  decoderMgr.setTheKvConf(conf);
+  dec = decoderMgr.findDecoder(*con, paramList, typesList, obsType, obsData,
+                               error);
+  ASSERT_TRUE( dec )<< "Cant create test decoder. obsType: '" << obsType << "'.";
+  klDecoder = static_cast<kvalobs::decoder::kldecoder::KlDecoder*>(dec);
+  ASSERT_TRUE(klDecoder->getSetUsinfo7());
+  decoderMgr.releaseDecoder(dec);
+  decoderMgr.setTheKvConf(0);
 }
 
-
-int
-main(int argc, char **argv) {
-   ::testing::InitGoogleTest(&argc, argv);
-   return RUN_ALL_TESTS();
+int main(int argc, char **argv) {
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }
 

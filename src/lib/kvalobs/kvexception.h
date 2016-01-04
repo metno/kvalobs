@@ -33,8 +33,7 @@
 
 #include <exception>
 
-namespace kvalobs
-{
+namespace kvalobs {
 
 /**
  * \addtogroup kvinternalhelpers
@@ -45,55 +44,45 @@ namespace kvalobs
  * \brief An excetion class used to throw an exception that
  *        in some way is a bad format.
  */
-class FormatException: public std::exception
-{
-	std::string reason;
-public:
-	FormatException(const std::string &reason_) :
-			reason(reason_)
-	{
-	}
-	~FormatException() throw ()
-	{
-	}
+class FormatException : public std::exception {
+  std::string reason;
+ public:
+  FormatException(const std::string &reason_)
+      : reason(reason_) {
+  }
+  ~FormatException() throw () {
+  }
 
-	const char *what() const throw ()
-	{
-		return reason.c_str();
-	}
+  const char *what() const throw () {
+    return reason.c_str();
+  }
 };
 
 /**
  * \brief An excetion class used to throw an exception that
  *       in some way is a unknown parameter.
  */
-class UnknownParam: public std::exception
-{
-	std::string reason;
-public:
-	UnknownParam(const std::string &reason_) :
-			reason(reason_)
-	{
-	}
-	~UnknownParam() throw ()
-	{
-	}
+class UnknownParam : public std::exception {
+  std::string reason;
+ public:
+  UnknownParam(const std::string &reason_)
+      : reason(reason_) {
+  }
+  ~UnknownParam() throw () {
+  }
 
-	const char *what() const throw ()
-	{
-		return reason.c_str();
-	}
+  const char *what() const throw () {
+    return reason.c_str();
+  }
 };
 
 /**
  * @brief A method received some kind of invalid input.
  */
-class InvalidInput: public std::exception
-{
-	virtual const char* what() const throw ()
-	{
-		return "Invalid input";
-	}
+class InvalidInput : public std::exception {
+  virtual const char* what() const throw () {
+    return "Invalid input";
+  }
 };
 
 /** @} */

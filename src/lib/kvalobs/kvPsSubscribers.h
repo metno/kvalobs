@@ -37,8 +37,7 @@
 /* Created by DNMI/IT: borge.moe@met.no Oct 13 2006
  */
 
-namespace kvalobs
-{
+namespace kvalobs {
 
 /**
  * \addtogroup  dbinterface
@@ -49,132 +48,117 @@ namespace kvalobs
 /**
  * \brief Interface to the table ps_subscribers in the kvalobs database.
  */
-class kvPsSubscribers: public kvDbBase
-{
-private:
+class kvPsSubscribers : public kvDbBase {
+ private:
 
-	std::string name_;
-	int subscribertype_;
-	std::string comment_;
-	int delete_after_hours_;
-	std::string sior_;
-	boost::posix_time::ptime created_;
+  std::string name_;
+  int subscribertype_;
+  std::string comment_;
+  int delete_after_hours_;
+  std::string sior_;
+  boost::posix_time::ptime created_;
 
-public:
-	kvPsSubscribers()
-	{
-	}
-	kvPsSubscribers(const dnmi::db::DRow &r)
-	{
-		set(r);
-	}
-	kvPsSubscribers(const std::string &name, int subscribertype,
-			const std::string &comment, int &delete_after_hours,
-			const std::string &sior, const boost::posix_time::ptime &created)
-	{
-		set(name, subscribertype, comment, delete_after_hours, sior, created);
+ public:
+  kvPsSubscribers() {
+  }
+  kvPsSubscribers(const dnmi::db::DRow &r) {
+    set(r);
+  }
+  kvPsSubscribers(const std::string &name, int subscribertype,
+                  const std::string &comment, int &delete_after_hours,
+                  const std::string &sior,
+                  const boost::posix_time::ptime &created) {
+    set(name, subscribertype, comment, delete_after_hours, sior, created);
 
-	}
+  }
 
-	bool set(const std::string &name, int subscribertype,
-			const std::string &comment, int &delete_after_hours,
-			const std::string &sior, const boost::posix_time::ptime &created);
+  bool set(const std::string &name, int subscribertype,
+           const std::string &comment, int &delete_after_hours,
+           const std::string &sior, const boost::posix_time::ptime &created);
 
-	bool set(const dnmi::db::DRow&);
+  bool set(const dnmi::db::DRow&);
 
-	const char* tableName() const
-	{
-		return "ps_subscribers";
-	}
-	std::string toSend() const;
-	std::string toUpdate() const;
-	std::string uniqueKey() const;
+  const char* tableName() const {
+    return "ps_subscribers";
+  }
+  std::string toSend() const;
+  std::string toUpdate() const;
+  std::string uniqueKey() const;
 
-	/**
-	 * Return a subscriberid agregated from name and subscribertype.
-	 *
-	 * At the momment two subscribertypes is defined:
-	 *  - data subscribers       (subscribertype=0)
-	 *  - notify subscribers     (subscribertype=1)
-	 *
-	 * The returned subscriberid is on the form:
-	 *   ps_subscribertype_name. Where subscribertype is data or notify.
-	 *
-	 * Ex.
-	 *   If we have defined a data subscriber with name dvh the subscriberid
-	 *   is: ps_data_dvh.
-	 */
-	std::string subscriberid() const;
+  /**
+   * Return a subscriberid agregated from name and subscribertype.
+   *
+   * At the momment two subscribertypes is defined:
+   *  - data subscribers       (subscribertype=0)
+   *  - notify subscribers     (subscribertype=1)
+   *
+   * The returned subscriberid is on the form:
+   *   ps_subscribertype_name. Where subscribertype is data or notify.
+   *
+   * Ex.
+   *   If we have defined a data subscriber with name dvh the subscriberid
+   *   is: ps_data_dvh.
+   */
+  std::string subscriberid() const;
 
-	/**
-	 * Find the subscribername from an subscriberid.
-	 *
-	 * The name is the last part of the subscriberid.
-	 *
-	 * Ex
-	 * 	- The name for the subscriberid ps_data_dvh is dvh.
-	 *    - The name for the subscriberid ps_data_dvh_test is
-	 *      dvh_test.
-	 */
-	static std::string nameFromSubscriberid(const std::string &subscriberid);
+  /**
+   * Find the subscribername from an subscriberid.
+   *
+   * The name is the last part of the subscriberid.
+   *
+   * Ex
+   * 	- The name for the subscriberid ps_data_dvh is dvh.
+   *    - The name for the subscriberid ps_data_dvh_test is
+   *      dvh_test.
+   */
+  static std::string nameFromSubscriberid(const std::string &subscriberid);
 
-	/**
-	 * Find the subscriber type from an subscriberid.
-	 *
-	 * The subscriber type is the second part of the subscriberid.
-	 *
-	 * Ex
-	 * 	- The subscriber type for the subscriberid ps_data_dvh is 0.
-	 *    - The subscriber type for the subscriberid ps_notify_dvh_test is
-	 *      1.
-	 */
-	static int typeFromSubscriberid(const std::string &subscriberid);
+  /**
+   * Find the subscriber type from an subscriberid.
+   *
+   * The subscriber type is the second part of the subscriberid.
+   *
+   * Ex
+   * 	- The subscriber type for the subscriberid ps_data_dvh is 0.
+   *    - The subscriber type for the subscriberid ps_notify_dvh_test is
+   *      1.
+   */
+  static int typeFromSubscriberid(const std::string &subscriberid);
 
-	const std::string & name() const
-	{
-		return name_;
-	}
-	int subscribertype() const
-	{
-		return subscribertype_;
-	}
-	const std::string & comment() const
-	{
-		return comment_;
-	}
-	int deleteAfterHours() const
-	{
-		return delete_after_hours_;
-	}
-	const std::string & sior() const
-	{
-		return sior_;
-	}
-	const boost::posix_time::ptime & created() const
-	{
-		return created_;
-	}
+  const std::string & name() const {
+    return name_;
+  }
+  int subscribertype() const {
+    return subscribertype_;
+  }
+  const std::string & comment() const {
+    return comment_;
+  }
+  int deleteAfterHours() const {
+    return delete_after_hours_;
+  }
+  const std::string & sior() const {
+    return sior_;
+  }
+  const boost::posix_time::ptime & created() const {
+    return created_;
+  }
 
-	void subscribertype(int subtype)
-	{
-		subscribertype_ = subtype;
-	}
-	void comment(const std::string &comment)
-	{
-		comment_ = comment;
-	}
-	void deleteAfterHours(int hours)
-	{
-		delete_after_hours_ = hours;
-	}
-	void sior(const std::string& sior__)
-	{
-		sior_ = sior__;
-	}
-	void created(const boost::posix_time::ptime& created__)
-	{
-		created_ = created__;
-	}
+  void subscribertype(int subtype) {
+    subscribertype_ = subtype;
+  }
+  void comment(const std::string &comment) {
+    comment_ = comment;
+  }
+  void deleteAfterHours(int hours) {
+    delete_after_hours_ = hours;
+  }
+  void sior(const std::string& sior__) {
+    sior_ = sior__;
+  }
+  void created(const boost::posix_time::ptime& created__) {
+    created_ = created__;
+  }
 };
 
 /** @} */

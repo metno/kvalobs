@@ -37,25 +37,29 @@
 #include <miconfparser/miconfparser.h>
 
 milog::LogLevel
-loglevelFromString( const std::string &level);
+loglevelFromString(const std::string &level);
 
 milog::LogLevel
-getLoglevel( const miutil::conf::ConfSection *conf, const std::string &section, const milog::LogLevel defLoglevel=milog::NOTSET );
+getLoglevel(const miutil::conf::ConfSection *conf, const std::string &section,
+            const milog::LogLevel defLoglevel = milog::NOTSET);
 
 milog::LogLevel
-getLoglevelRecursivt( const miutil::conf::ConfSection *conf, const std::string &startAtSection,
-                      const milog::LogLevel defLoglevel=milog::NOTSET );
-
-
-milog::LogLevel
-getTracelevel( const miutil::conf::ConfSection *conf, const std::string &section, const milog::LogLevel defLoglevel=milog::NOTSET );
+getLoglevelRecursivt(const miutil::conf::ConfSection *conf,
+                     const std::string &startAtSection,
+                     const milog::LogLevel defLoglevel = milog::NOTSET);
 
 milog::LogLevel
-getTracelevelRecursivt( const miutil::conf::ConfSection *conf, const std::string &startAtSection,
-                      const milog::LogLevel defLoglevel=milog::NOTSET );
+getTracelevel(const miutil::conf::ConfSection *conf, const std::string &section,
+              const milog::LogLevel defLoglevel = milog::NOTSET);
+
+milog::LogLevel
+getTracelevelRecursivt(const miutil::conf::ConfSection *conf,
+                       const std::string &startAtSection,
+                       const milog::LogLevel defLoglevel = milog::NOTSET);
 
 void
-getLogfileInfo( const miutil::conf::ConfSection *conf, const std::string &startAtSection,
-                int &nRotation, int &fileSize );
+getLogfileInfo(const miutil::conf::ConfSection *conf,
+               const std::string &startAtSection, int &nRotation,
+               int &fileSize);
 
 #endif /* GETLOGLEVEL_H_ */

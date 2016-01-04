@@ -47,22 +47,19 @@
 #include "../KvGetDataReceiver.h"
 #include "../WorkstatistikIterator.h"
 
-namespace kvservice
-{
+namespace kvservice {
 /**
  * \addtogroup kvcpp
  * @{
  */
-namespace corba
-{
+namespace corba {
 /**
  * \addtogroup corba
  * @{
  */
 class CorbaKvApp;
 
-namespace priv
-{
+namespace priv {
 /**
  * \brief An abstract functor, used by CorbaKvApp, for fetching data from kvalobs.
  *
@@ -76,176 +73,159 @@ namespace priv
  * <code> process </code> function, to get data from kvalobs. No change
  * to <code> operator() </code> should be neccessary.
  */
-class CorbaGetFunction
-{
-protected:
-	virtual bool process(CKvalObs::CService::kvServiceExt_ptr service) =0;
-public:
-	static CorbaKvApp *corbaApp;
+class CorbaGetFunction {
+ protected:
+  virtual bool process(CKvalObs::CService::kvServiceExt_ptr service) =0;
+ public:
+  static CorbaKvApp *corbaApp;
 
-	virtual ~CorbaGetFunction()
-	{
-	}
+  virtual ~CorbaGetFunction() {
+  }
 
-	/**
-	 * \brief Call <code> process </code> and handle all CORBA-specific errors related to the call.
-	 *
-	 * \param name The name of the called method, to be displayed in error
-	 * messages.
-	 * \return True on success, false otherwise
-	 */
-	virtual bool operator()(const char *name);
+  /**
+   * \brief Call <code> process </code> and handle all CORBA-specific errors related to the call.
+   *
+   * \param name The name of the called method, to be displayed in error
+   * messages.
+   * \return True on success, false otherwise
+   */
+  virtual bool operator()(const char *name);
 };
 
-class getKvRejectDecodeFunc: public CorbaGetFunction
-{
-	const CKvalObs::CService::RejectDecodeInfo &decodeInfo;
-	kvservice::RejectDecodeIterator &it;
-public:
-	getKvRejectDecodeFunc(
-			const CKvalObs::CService::RejectDecodeInfo &decodeInfo,
-			kvservice::RejectDecodeIterator &it);
-protected:
-	virtual bool process(CKvalObs::CService::kvServiceExt_ptr service);
+class getKvRejectDecodeFunc : public CorbaGetFunction {
+  const CKvalObs::CService::RejectDecodeInfo &decodeInfo;
+  kvservice::RejectDecodeIterator &it;
+ public:
+  getKvRejectDecodeFunc(const CKvalObs::CService::RejectDecodeInfo &decodeInfo,
+                        kvservice::RejectDecodeIterator &it);
+ protected:
+  virtual bool process(CKvalObs::CService::kvServiceExt_ptr service);
 };
 
+class getKvWorkstatisticFunc : public CorbaGetFunction {
+  CKvalObs::CService::WorkstatistikTimeType timeType;
+  boost::posix_time::ptime from;
+  boost::posix_time::ptime to;
+  kvservice::WorkstatistikIterator &it;
 
-class getKvWorkstatisticFunc: public CorbaGetFunction
-{
-   CKvalObs::CService::WorkstatistikTimeType timeType;
-   boost::posix_time::ptime from;
-   boost::posix_time::ptime to;
-   kvservice::WorkstatistikIterator &it;
-
-public:
-   getKvWorkstatisticFunc(
-         const CKvalObs::CService::WorkstatistikTimeType,
-         const boost::posix_time::ptime &from,
-         const boost::posix_time::ptime &to,
-         kvservice::WorkstatistikIterator &it );
-protected:
-   virtual bool process(CKvalObs::CService::kvServiceExt_ptr service);
+ public:
+  getKvWorkstatisticFunc(const CKvalObs::CService::WorkstatistikTimeType,
+                         const boost::posix_time::ptime &from,
+                         const boost::posix_time::ptime &to,
+                         kvservice::WorkstatistikIterator &it);
+ protected:
+  virtual bool process(CKvalObs::CService::kvServiceExt_ptr service);
 };
 
-
-class getKvParamsFunc: public CorbaGetFunction
-{
-	std::list<kvalobs::kvParam> &paramList;
-public:
-	getKvParamsFunc(std::list<kvalobs::kvParam> &paramList);
-protected:
-	virtual bool process(CKvalObs::CService::kvServiceExt_ptr service);
+class getKvParamsFunc : public CorbaGetFunction {
+  std::list<kvalobs::kvParam> &paramList;
+ public:
+  getKvParamsFunc(std::list<kvalobs::kvParam> &paramList);
+ protected:
+  virtual bool process(CKvalObs::CService::kvServiceExt_ptr service);
 };
 
-class getKvStationsFunc: public CorbaGetFunction
-{
-	std::list<kvalobs::kvStation> &stationList;
-public:
-	getKvStationsFunc(std::list<kvalobs::kvStation> &stationList);
-protected:
-	virtual bool process(CKvalObs::CService::kvServiceExt_ptr service);
+class getKvStationsFunc : public CorbaGetFunction {
+  std::list<kvalobs::kvStation> &stationList;
+ public:
+  getKvStationsFunc(std::list<kvalobs::kvStation> &stationList);
+ protected:
+  virtual bool process(CKvalObs::CService::kvServiceExt_ptr service);
 };
 
-class getKvModelDataFunc: public CorbaGetFunction
-{
-	std::list<kvalobs::kvModelData> &dataList;
-	const kvservice::WhichDataHelper &wd;
-public:
-	getKvModelDataFunc(std::list<kvalobs::kvModelData> &dataList,
-			const kvservice::WhichDataHelper &wd);
-protected:
-	virtual bool process(CKvalObs::CService::kvServiceExt_ptr service);
+class getKvModelDataFunc : public CorbaGetFunction {
+  std::list<kvalobs::kvModelData> &dataList;
+  const kvservice::WhichDataHelper &wd;
+ public:
+  getKvModelDataFunc(std::list<kvalobs::kvModelData> &dataList,
+                     const kvservice::WhichDataHelper &wd);
+ protected:
+  virtual bool process(CKvalObs::CService::kvServiceExt_ptr service);
 };
 
-class getKvTypesFunc: public CorbaGetFunction
-{
-	std::list<kvalobs::kvTypes> &typeList;
-public:
-	getKvTypesFunc(std::list<kvalobs::kvTypes> &typeList);
-protected:
-	virtual bool process(CKvalObs::CService::kvServiceExt_ptr service);
+class getKvTypesFunc : public CorbaGetFunction {
+  std::list<kvalobs::kvTypes> &typeList;
+ public:
+  getKvTypesFunc(std::list<kvalobs::kvTypes> &typeList);
+ protected:
+  virtual bool process(CKvalObs::CService::kvServiceExt_ptr service);
 };
 
-class getKvOperatorFunc: public CorbaGetFunction
-{
-	std::list<kvalobs::kvOperator> &operatorList;
-public:
-	getKvOperatorFunc(std::list<kvalobs::kvOperator> &operatorList);
-protected:
-	virtual bool process(CKvalObs::CService::kvServiceExt_ptr service);
+class getKvOperatorFunc : public CorbaGetFunction {
+  std::list<kvalobs::kvOperator> &operatorList;
+ public:
+  getKvOperatorFunc(std::list<kvalobs::kvOperator> &operatorList);
+ protected:
+  virtual bool process(CKvalObs::CService::kvServiceExt_ptr service);
 };
 
-class getKvStationParamFunc: public CorbaGetFunction
-{
-	std::list<kvalobs::kvStationParam> &stParam;
-	int stationid;
-	int paramid;
-	int day;
-public:
-	getKvStationParamFunc(std::list<kvalobs::kvStationParam> &stParam,
-			int stationid, int paramid, int day);
-protected:
-	virtual bool process(CKvalObs::CService::kvServiceExt_ptr service);
+class getKvStationParamFunc : public CorbaGetFunction {
+  std::list<kvalobs::kvStationParam> &stParam;
+  int stationid;
+  int paramid;
+  int day;
+ public:
+  getKvStationParamFunc(std::list<kvalobs::kvStationParam> &stParam,
+                        int stationid, int paramid, int day);
+ protected:
+  virtual bool process(CKvalObs::CService::kvServiceExt_ptr service);
 };
 
-class getKvStationMetaDataFunc: public CorbaGetFunction
-{
-	std::list<kvalobs::kvStationMetadata> &stParam;
-	int stationid;
-	boost::posix_time::ptime obstime;
-	std::string metadataName_;
-public:
-	getKvStationMetaDataFunc(std::list<kvalobs::kvStationMetadata> &stParam,
-			int stationid, const boost::posix_time::ptime &obstime, const std::string & metadataName);
-protected:
-	virtual bool process(CKvalObs::CService::kvServiceExt_ptr service);
+class getKvStationMetaDataFunc : public CorbaGetFunction {
+  std::list<kvalobs::kvStationMetadata> &stParam;
+  int stationid;
+  boost::posix_time::ptime obstime;
+  std::string metadataName_;
+ public:
+  getKvStationMetaDataFunc(std::list<kvalobs::kvStationMetadata> &stParam,
+                           int stationid,
+                           const boost::posix_time::ptime &obstime,
+                           const std::string & metadataName);
+ protected:
+  virtual bool process(CKvalObs::CService::kvServiceExt_ptr service);
 };
 
-class getKvObsPgmFunc: public CorbaGetFunction
-{
-	std::list<kvalobs::kvObsPgm> &obsPgmList;
-	const std::list<long> &stationList;
-	bool aUnion;
-public:
-	getKvObsPgmFunc(std::list<kvalobs::kvObsPgm> &obsPgm,
-			const std::list<long> &stationList, bool aUnion);
-protected:
-	virtual bool process(CKvalObs::CService::kvServiceExt_ptr service);
+class getKvObsPgmFunc : public CorbaGetFunction {
+  std::list<kvalobs::kvObsPgm> &obsPgmList;
+  const std::list<long> &stationList;
+  bool aUnion;
+ public:
+  getKvObsPgmFunc(std::list<kvalobs::kvObsPgm> &obsPgm,
+                  const std::list<long> &stationList, bool aUnion);
+ protected:
+  virtual bool process(CKvalObs::CService::kvServiceExt_ptr service);
 };
 
-class getKvDataFunc_abstract: public CorbaGetFunction
-{
-public:
-	typedef bool (*termfunc)();
+class getKvDataFunc_abstract : public CorbaGetFunction {
+ public:
+  typedef bool (*termfunc)();
 
-	getKvDataFunc_abstract(termfunc terminate);
-protected:
-	virtual CKvalObs::CService::DataIterator_ptr getDataIter(
-			const WhichDataHelper &wd);
-	termfunc terminate;
+  getKvDataFunc_abstract(termfunc terminate);
+ protected:
+  virtual CKvalObs::CService::DataIterator_ptr getDataIter(
+      const WhichDataHelper &wd);
+  termfunc terminate;
 };
 
-class getKvDataFunc: public getKvDataFunc_abstract
-{
-	kvservice::KvGetDataReceiver &dataReceiver;
-	const WhichDataHelper &wd;
-public:
+class getKvDataFunc : public getKvDataFunc_abstract {
+  kvservice::KvGetDataReceiver &dataReceiver;
+  const WhichDataHelper &wd;
+ public:
 
-	getKvDataFunc(KvGetDataReceiver &dataReceiver, const WhichDataHelper &wd,
-			termfunc terminate);
-protected:
-	virtual bool process(CKvalObs::CService::kvServiceExt_ptr service);
+  getKvDataFunc(KvGetDataReceiver &dataReceiver, const WhichDataHelper &wd,
+                termfunc terminate);
+ protected:
+  virtual bool process(CKvalObs::CService::kvServiceExt_ptr service);
 };
 
-class getKvDataFunc_deprecated: public getKvDataFunc_abstract
-{
-	kvservice::KvObsDataList &dataList;
-	const WhichDataHelper &wd;
-public:
-	getKvDataFunc_deprecated(kvservice::KvObsDataList &dataList,
-			const WhichDataHelper &wd, termfunc terminate);
-protected:
-	virtual bool process(CKvalObs::CService::kvServiceExt_ptr service);
+class getKvDataFunc_deprecated : public getKvDataFunc_abstract {
+  kvservice::KvObsDataList &dataList;
+  const WhichDataHelper &wd;
+ public:
+  getKvDataFunc_deprecated(kvservice::KvObsDataList &dataList,
+                           const WhichDataHelper &wd, termfunc terminate);
+ protected:
+  virtual bool process(CKvalObs::CService::kvServiceExt_ptr service);
 };
 }
 }

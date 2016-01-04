@@ -34,8 +34,7 @@
 #include <kvalobs/kvStationInfo.h>
 #include <boost/noncopyable.hpp>
 
-namespace db
-{
+namespace db {
 
 /**
  * Generic implementation of kvalobs data cache.
@@ -45,64 +44,71 @@ namespace db
  * \ingroup group_db
  */
 template<class DataList>
-class DataCache : boost::noncopyable
-{
-public:
-	explicit DataCache(const kvalobs::kvStationInfo & si) : si_(si) {}
+class DataCache : boost::noncopyable {
+ public:
+  explicit DataCache(const kvalobs::kvStationInfo & si)
+      : si_(si) {
+  }
 
-	bool getData(DataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const
-	{
-		if ( si != si_ )
-			return false;
+  bool getData(DataList * out, const kvalobs::kvStationInfo & si,
+               const qabase::DataRequirement::Parameter & parameter,
+               int minuteOffset) const {
+    if (si != si_)
+      return false;
 
-		typename CachedData::const_iterator find = cache_.find(parameter);
-		if ( find == cache_.end() )
-			return false;
+    typename CachedData::const_iterator find = cache_.find(parameter);
+    if (find == cache_.end())
+      return false;
 
-		const Data & cache = find->second;
+    const Data & cache = find->second;
 
-		if ( cache.timeOffset > minuteOffset)
-			return false;
+    if (cache.timeOffset > minuteOffset)
+      return false;
 
-		boost::posix_time::ptime earliestWantedObsTime = si_.obstime();
-		earliestWantedObsTime += boost::posix_time::minutes(minuteOffset);
+    boost::posix_time::ptime earliestWantedObsTime = si_.obstime();
+    earliestWantedObsTime += boost::posix_time::minutes(minuteOffset);
 
-		for ( typename DataList::const_iterator it = cache.data.begin(); it != cache.data.end(); ++ it )
-			if ( it->obstime() >= earliestWantedObsTime)
-				out->push_back(* it);
+    for (typename DataList::const_iterator it = cache.data.begin();
+        it != cache.data.end(); ++it)
+      if (it->obstime() >= earliestWantedObsTime)
+        out->push_back(*it);
 
-		return true;
-	}
+    return true;
+  }
 
-	void setData(const DataList & toSet, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset)
-	{
-		if ( si != si_ )
-			return;
+  void setData(const DataList & toSet, const kvalobs::kvStationInfo & si,
+               const qabase::DataRequirement::Parameter & parameter,
+               int minuteOffset) {
+    if (si != si_)
+      return;
 
-		Data & d = cache_[parameter];
-		d.timeOffset = minuteOffset;
-		d.data = toSet;
-	}
+    Data & d = cache_[parameter];
+    d.timeOffset = minuteOffset;
+    d.data = toSet;
+  }
 
+  const kvalobs::kvStationInfo & stationInfo() const {
+    return si_;
+  }
 
+ private:
 
-	const kvalobs::kvStationInfo & stationInfo() const { return si_; }
+  struct Data {
+    Data()
+        : timeOffset(0) {
+    }
+    Data(int timeOffset)
+        : timeOffset(timeOffset) {
+    }
 
-private:
+    int timeOffset;
+    DataList data;
+  };
 
-	struct Data
-	{
-		Data() : timeOffset(0) {}
-		Data(int timeOffset) : timeOffset(timeOffset) {}
+  typedef std::map<qabase::DataRequirement::Parameter, Data> CachedData;
+  CachedData cache_;
 
-		int timeOffset;
-		DataList data;
-	};
-
-	typedef std::map<qabase::DataRequirement::Parameter, Data> CachedData;
-	CachedData cache_;
-
-	const kvalobs::kvStationInfo si_;
+  const kvalobs::kvStationInfo si_;
 };
 
 }

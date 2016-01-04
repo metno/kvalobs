@@ -34,8 +34,7 @@
 #include "kvalobs/kvData.h"
 #include <functional>
 
-namespace kvalobs
-{
+namespace kvalobs {
 /**
  * \brief Have we got a legal corrected value?
  */
@@ -82,7 +81,7 @@ void correct(kvData & d, float new_val);
  * \brief Generate a missing data object for the given parameters.
  */
 kvData getMissingKvData(int stationID, const boost::posix_time::ptime & obsTime,
-		int paramID, int typeID, int sensor, int level);
+                        int paramID, int typeID, int sensor, int level);
 
 /**
  * Creates kvData objects, beloning to a specific "observation", consisting
@@ -92,64 +91,58 @@ kvData getMissingKvData(int stationID, const boost::posix_time::ptime & obsTime,
  * creation of type 302-type observation, which has three different obstimes
  * in the same observation.
  */
-class kvDataFactory
-{
-public:
-	kvDataFactory(int stationID, const boost::posix_time::ptime & obsTime, int typeID,
-			int sensor = 0, int level = 0);
+class kvDataFactory {
+ public:
+  kvDataFactory(int stationID, const boost::posix_time::ptime & obsTime,
+                int typeID, int sensor = 0, int level = 0);
 
-	/**
-	 * Create a factory for creating observation data logically beloning to
-	 * the given input.
-	 */
-	explicit kvDataFactory(const kvData & data);
+  /**
+   * Create a factory for creating observation data logically beloning to
+   * the given input.
+   */
+  explicit kvDataFactory(const kvData & data);
 
-	/**
-	 * Get a missing parameter for the given observation.
-	 */
-	kvData getMissing(int paramID, const boost::posix_time::ptime & obsTime =
-			boost::posix_time::ptime()) const;
+  /**
+   * Get a missing parameter for the given observation.
+   */
+  kvData getMissing(int paramID, const boost::posix_time::ptime & obsTime =
+                        boost::posix_time::ptime()) const;
 
-	/**
-	 * Get one piece of data for the observation.
-	 */
-	kvData getData(float val, int paramID, const boost::posix_time::ptime & obsTime =
-			boost::posix_time::ptime()) const;
+  /**
+   * Get one piece of data for the observation.
+   */
+  kvData getData(float val, int paramID,
+                 const boost::posix_time::ptime & obsTime =
+                     boost::posix_time::ptime()) const;
 
-	int stationID() const
-	{
-		return stationID_;
-	}
-	int typeID() const
-	{
-		return typeID_;
-	}
-	const boost::posix_time::ptime & obstime() const
-	{
-		return obstime_;
-	}
-	int sensor() const
-	{
-		return sensor_;
-	}
-	int level() const
-	{
-		return level_;
-	}
+  int stationID() const {
+    return stationID_;
+  }
+  int typeID() const {
+    return typeID_;
+  }
+  const boost::posix_time::ptime & obstime() const {
+    return obstime_;
+  }
+  int sensor() const {
+    return sensor_;
+  }
+  int level() const {
+    return level_;
+  }
 
-private:
-	const int stationID_;
-	const int typeID_;
-	const boost::posix_time::ptime obstime_;
-	const int sensor_;
-	const int level_;
+ private:
+  const int stationID_;
+  const int typeID_;
+  const boost::posix_time::ptime obstime_;
+  const int sensor_;
+  const int level_;
 };
 
 /**
  * HQC-specific operations
  */
-namespace hqc
-{
+namespace hqc {
 void hqc_accept(kvData & d);
 void hqc_reject(kvData & d);
 
@@ -175,72 +168,60 @@ bool hqc_rejected(const kvData & d);
 /**
  * Various functors for inspecting kvData objects
  */
-namespace inspect
-{
-class has_paramid
-{
-	int paramid_;
-public:
-	has_paramid(int paramid) :
-			paramid_(paramid)
-	{
-	}
-	template<typename T>
-	bool operator()(const T & t) const
-	{
-		return t.paramID() == paramid_;
-	}
+namespace inspect {
+class has_paramid {
+  int paramid_;
+ public:
+  has_paramid(int paramid)
+      : paramid_(paramid) {
+  }
+  template<typename T>
+  bool operator()(const T & t) const {
+    return t.paramID() == paramid_;
+  }
 };
 }
 
-namespace compare
-{
+namespace compare {
 typedef std::binary_function<kvData, kvData, bool> kvDataCompare;
 
 bool eq_sensor(int sA, int sB);
 bool lt_sensor(int sA, int sB);
 
-struct lt_kvData: public kvDataCompare
-{
-	bool operator()(const kvData & a, const kvData & b) const;
-	bool operator()(const kvData * a, const kvData * b) const;
+struct lt_kvData : public kvDataCompare {
+  bool operator()(const kvData & a, const kvData & b) const;
+  bool operator()(const kvData * a, const kvData * b) const;
 };
 
-struct same_kvData: public kvDataCompare
-{
-	bool operator()(const kvData & a, const kvData & b) const;
+struct same_kvData : public kvDataCompare {
+  bool operator()(const kvData & a, const kvData & b) const;
 };
 
 template<typename Kv1 = kvData, typename Kv2 = kvData>
-struct lt_kvData_without_paramID: public std::binary_function<Kv1, Kv2, bool>
-{
-	bool operator()(const Kv1 & a, const Kv2 & b) const
-	{
-		if (a.stationID() != b.stationID())
-			return a.stationID() < b.stationID();
-		if (a.obstime() != b.obstime())
-			return a.obstime() < b.obstime();
-		if (a.typeID() != b.typeID())
-			return a.typeID() < b.typeID();
-		if (a.level() != b.level())
-			return a.level() < b.level();
-		return lt_sensor(a.sensor(), b.sensor());
-	}
+struct lt_kvData_without_paramID : public std::binary_function<Kv1, Kv2, bool> {
+  bool operator()(const Kv1 & a, const Kv2 & b) const {
+    if (a.stationID() != b.stationID())
+      return a.stationID() < b.stationID();
+    if (a.obstime() != b.obstime())
+      return a.obstime() < b.obstime();
+    if (a.typeID() != b.typeID())
+      return a.typeID() < b.typeID();
+    if (a.level() != b.level())
+      return a.level() < b.level();
+    return lt_sensor(a.sensor(), b.sensor());
+  }
 };
 
-struct same_obs_and_parameter: public kvDataCompare
-{
-	bool operator()(const kvData & a, const kvData & b) const;
+struct same_obs_and_parameter : public kvDataCompare {
+  bool operator()(const kvData & a, const kvData & b) const;
 };
 
-struct exactly_equal_ex_tbtime: public kvDataCompare
-{
-	bool operator()(const kvData & a, const kvData & b) const;
+struct exactly_equal_ex_tbtime : public kvDataCompare {
+  bool operator()(const kvData & a, const kvData & b) const;
 };
 
-struct exactly_equal: public kvDataCompare
-{
-	bool operator()(const kvData & a, const kvData & b) const;
+struct exactly_equal : public kvDataCompare {
+  bool operator()(const kvData & a, const kvData & b) const;
 };
 
 }
@@ -248,46 +229,43 @@ struct exactly_equal: public kvDataCompare
 /**
  * Flag enums for use with kvData objects
  */
-namespace flag
-{
-enum ControlFlag
-{
-	fqclevel, // Kontrollniv�
-	fr, // Grenseverdikontroll
-	fcc, // Formell konsistenskontroll
-	fs, // Sprangkontroll
-	fnum, // Prognostisk romkontroll
-	fpos, // Meldingskontroll
-	fmis, // Manglende observasjon
-	ftime, // Tidsserietilpasning
-	fw, // V�ranalyse
-	fstat, // Statistikkontroll
-	fcp, // Klimatologisk konsistenskontroll
-	fclim, // Klimatologikontroll
-	fd, // Fordeling av samleverdier
-	fpre, // Forh�ndskvalifisering
-	fcombi, // Kombinert vurdering
-	fhqc // Manuell kvalitetskontroll
+namespace flag {
+enum ControlFlag {
+  fqclevel,  // Kontrollniv�
+  fr,  // Grenseverdikontroll
+  fcc,  // Formell konsistenskontroll
+  fs,  // Sprangkontroll
+  fnum,  // Prognostisk romkontroll
+  fpos,  // Meldingskontroll
+  fmis,  // Manglende observasjon
+  ftime,  // Tidsserietilpasning
+  fw,  // V�ranalyse
+  fstat,  // Statistikkontroll
+  fcp,  // Klimatologisk konsistenskontroll
+  fclim,  // Klimatologikontroll
+  fd,  // Fordeling av samleverdier
+  fpre,  // Forh�ndskvalifisering
+  fcombi,  // Kombinert vurdering
+  fhqc  // Manuell kvalitetskontroll
 };
 
-enum UseInfoFlag
-{
-	ui0, // Kontrollniv� passert
-	ui1, // Originalverdiens avvik fra normert observasjonsprosedyre
-	ui2, // Kvalitetsniv� for originalverdi
-	ui3, // Originalverdi korrigert
-	ui4, // Viktigste kontrollmetode
-	ui5, // < reservert >
-	ui6, // < reservert >
-	ui7, // Forsinkelse
-	ui8, // Prosent konfidens, f�rste siffer av to
-	ui9, // Prosent konfidens, andre siffer av to
-	ui10, // < reservert >
-	ui11, // < reservert >
-	ui12, // < reservert >
-	ui13, // HQC-operat�rens l�penummer, f�rste siffer av to
-	ui14, // HQC-operat�rens l�penummer, andre siffer av to
-	ui15 // Antall tester som har gitt utslag
+enum UseInfoFlag {
+  ui0,  // Kontrollniv� passert
+  ui1,  // Originalverdiens avvik fra normert observasjonsprosedyre
+  ui2,  // Kvalitetsniv� for originalverdi
+  ui3,  // Originalverdi korrigert
+  ui4,  // Viktigste kontrollmetode
+  ui5,  // < reservert >
+  ui6,  // < reservert >
+  ui7,  // Forsinkelse
+  ui8,  // Prosent konfidens, f�rste siffer av to
+  ui9,  // Prosent konfidens, andre siffer av to
+  ui10,  // < reservert >
+  ui11,  // < reservert >
+  ui12,  // < reservert >
+  ui13,  // HQC-operat�rens l�penummer, f�rste siffer av to
+  ui14,  // HQC-operat�rens l�penummer, andre siffer av to
+  ui15  // Antall tester som har gitt utslag
 };
 }
 }

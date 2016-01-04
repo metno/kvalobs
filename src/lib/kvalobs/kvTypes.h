@@ -35,8 +35,7 @@
 
 /* Created by DNMI/FoU/PU: j.schulze@dnmi.no
  at Tue Aug 27 09:17:38 2002 */
-namespace kvalobs
-{
+namespace kvalobs {
 
 /**
  * \addtogroup  dbinterface
@@ -48,70 +47,58 @@ namespace kvalobs
  * \brief Interface to the table types in the kvalobs database.
  */
 
-class kvTypes: public kvDbBase
-{
-private:
-	int typeid_;
-	std::string format_;
-	int earlyobs_;
-	int lateobs_;
-	std::string read_;
-	std::string obspgm_;
-	std::string comment_;
+class kvTypes : public kvDbBase {
+ private:
+  int typeid_;
+  std::string format_;
+  int earlyobs_;
+  int lateobs_;
+  std::string read_;
+  std::string obspgm_;
+  std::string comment_;
 
-public:
-	kvTypes()
-	{
-	}
-	kvTypes(const dnmi::db::DRow& r)
-	{
-		set(r);
-	}
-	kvTypes(int ty, std::string na, int earlyobs, int lateobs, std::string read,
-			std::string obs, std::string co)
-	{
-		set(ty, na, earlyobs, lateobs, read, obs, co);
-	}
+ public:
+  kvTypes() {
+  }
+  kvTypes(const dnmi::db::DRow& r) {
+    set(r);
+  }
+  kvTypes(int ty, std::string na, int earlyobs, int lateobs, std::string read,
+          std::string obs, std::string co) {
+    set(ty, na, earlyobs, lateobs, read, obs, co);
+  }
 
-	bool set(const dnmi::db::DRow&);
-	bool set(int, std::string, int, int, std::string, std::string, std::string);
+  bool set(const dnmi::db::DRow&);
+  bool set(int, std::string, int, int, std::string, std::string, std::string);
 
-	std::string uniqueKey() const;
+  std::string uniqueKey() const;
 
-	int typeID() const
-	{
-		return typeid_;
-	}
-	const std::string & format() const
-	{
-		return format_;
-	}
-	int earlyobs() const
-	{
-		return earlyobs_;
-	}
-	int lateobs() const
-	{
-		return lateobs_;
-	}
-	const std::string & read() const
-	{
-		return read_;
-	}
-	const std::string & obspgm() const
-	{
-		return obspgm_;
-	}
-	const std::string & comment() const
-	{
-		return comment_;
-	}
+  int typeID() const {
+    return typeid_;
+  }
+  const std::string & format() const {
+    return format_;
+  }
+  int earlyobs() const {
+    return earlyobs_;
+  }
+  int lateobs() const {
+    return lateobs_;
+  }
+  const std::string & read() const {
+    return read_;
+  }
+  const std::string & obspgm() const {
+    return obspgm_;
+  }
+  const std::string & comment() const {
+    return comment_;
+  }
 
-	const char* tableName() const
-	{
-		return "types";
-	}
-	std::string toSend() const;
+  const char* tableName() const {
+    return "types";
+  }
+  std::string toSend() const;
 
 };
 

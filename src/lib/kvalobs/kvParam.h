@@ -38,8 +38,7 @@
  * at Tue Aug 28 07:53:16 2002
  */
 
-namespace kvalobs
-{
+namespace kvalobs {
 
 /**
  * \addtogroup  dbinterface
@@ -51,67 +50,56 @@ namespace kvalobs
  * \brief Interface to the table param in the kvalobs database.
  */
 
-class kvParam: public kvDbBase
-{
-private:
-	int paramid_;
-	std::string name_;
-	std::string description_;
-	std::string unit_;
-	int level_scale_;
-	std::string comment_;
+class kvParam : public kvDbBase {
+ private:
+  int paramid_;
+  std::string name_;
+  std::string description_;
+  std::string unit_;
+  int level_scale_;
+  std::string comment_;
 
-public:
-	kvParam()
-	{
-	}
-	kvParam(const dnmi::db::DRow &r)
-	{
-		set(r);
-	}
-	kvParam(int paramid, const std::string &name,
-			const std::string &description, const std::string &unit,
-			int level_scale, const std::string &comment)
-	{
-		set(paramid, name, description, unit, level_scale, comment);
-	}
+ public:
+  kvParam() {
+  }
+  kvParam(const dnmi::db::DRow &r) {
+    set(r);
+  }
+  kvParam(int paramid, const std::string &name, const std::string &description,
+          const std::string &unit, int level_scale,
+          const std::string &comment) {
+    set(paramid, name, description, unit, level_scale, comment);
+  }
 
-	bool set(int paramid, const std::string &name,
-			const std::string &description, const std::string &unit,
-			int level_scale, const std::string &comment);
+  bool set(int paramid, const std::string &name, const std::string &description,
+           const std::string &unit, int level_scale,
+           const std::string &comment);
 
-	bool set(const dnmi::db::DRow&);
-	const char* tableName() const
-	{
-		return "param";
-	}
-	std::string toSend() const;
-	std::string uniqueKey() const;
+  bool set(const dnmi::db::DRow&);
+  const char* tableName() const {
+    return "param";
+  }
+  std::string toSend() const;
+  std::string uniqueKey() const;
 
-	int paramID() const
-	{
-		return paramid_;
-	}
-	const std::string & name() const
-	{
-		return name_;
-	}
-	const std::string & description() const
-	{
-		return description_;
-	}
-	const std::string & unit() const
-	{
-		return unit_;
-	}
-	int level_scale() const
-	{
-		return level_scale_;
-	}
-	const std::string & comment() const
-	{
-		return comment_;
-	}
+  int paramID() const {
+    return paramid_;
+  }
+  const std::string & name() const {
+    return name_;
+  }
+  const std::string & description() const {
+    return description_;
+  }
+  const std::string & unit() const {
+    return unit_;
+  }
+  int level_scale() const {
+    return level_scale_;
+  }
+  const std::string & comment() const {
+    return comment_;
+  }
 };
 
 /** @} */

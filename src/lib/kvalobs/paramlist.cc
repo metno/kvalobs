@@ -39,73 +39,67 @@
 using namespace std;
 using namespace miutil;
 
+std::string findParamIdInList(const ParamList &pl, int id) {
+  CIParamList it = pl.begin();
 
-std::string findParamIdInList(const ParamList &pl, int id)
-{
-	CIParamList it = pl.begin();
+  for (; it != pl.end(); it++) {
+    if (it->id() == id)
+      return it->kode();
+  }
 
-	for (; it != pl.end(); it++)
-	{
-		if (it->id() == id)
-			return it->kode();
-	}
-
-	return std::string();
+  return std::string();
 }
 
-bool
-findParamInList(const ParamList &pl, const std::string &name, Param &param )
-{
-    //In the find method only the name parametere of Param is
-    //used so it does'nt matter what value id and isScalar has.
-    CIParamList it = pl.find( Param( name, -1, false) );
+bool findParamInList(const ParamList &pl, const std::string &name,
+                     Param &param) {
+  //In the find method only the name parametere of Param is
+  //used so it does'nt matter what value id and isScalar has.
+  CIParamList it = pl.find(Param(name, -1, false));
 
-    if( it == pl.end() )
-        return false;
+  if (it == pl.end())
+    return false;
 
-    param = *it;
-    return true;
+  param = *it;
+  return true;
 }
 
-bool
-readParamsFromFile(const std::string &filename, ParamList &paramList)
-{
+bool readParamsFromFile(const std::string &filename, ParamList &paramList) {
   ifstream fs;
-  string   buf;
-  string   sparamid;
-  string   name;
+  string buf;
+  string sparamid;
+  string name;
   bool isScalar;
-  int lineno=0;
+  int lineno = 0;
 
   paramList.clear();
   fs.open(filename.c_str());
 
-  if(!fs){
-    LOGERROR("Cant open param file <" << filename << ">!" );
+  if (!fs) {
+    LOGERROR("Cant open param file <" << filename << ">!");
     return false;
   }
 
-  while(getline(fs, buf)){
-      ++lineno;
-      trimstr( buf );
+  while (getline(fs, buf)) {
+    ++lineno;
+    trimstr(buf);
 
-      if( buf.empty() || buf[0]=='#' )
-          continue;
+    if (buf.empty() || buf[0] == '#')
+      continue;
 
     CommaString cStr(buf, ',');
 
-    if(cStr.size()<3){
-      LOGERROR("To few elements in param file <" << filename<< "> at line: " << lineno
-              << ". Expecting 3, but found only " << cStr.size() << "." );
+    if (cStr.size() < 3) {
+      LOGERROR(
+          "To few elements in param file <" << filename<< "> at line: " << lineno << ". Expecting 3, but found only " << cStr.size() << ".");
       return false;;
     }
 
     isScalar = true;
 
-    if( cStr[2]=="f" || cStr[2]=="F" )
-        isScalar = false;
+    if (cStr[2] == "f" || cStr[2] == "F")
+      isScalar = false;
 
-    paramList.insert( Param(cStr[1], cStr[0].as<int>(), isScalar) );
+    paramList.insert(Param(cStr[1], cStr[0].as<int>(), isScalar));
   }
 
   fs.close();
@@ -113,42 +107,36 @@ readParamsFromFile(const std::string &filename, ParamList &paramList)
   return true;
 }
 
-bool
-isParamListsEqual( const ParamList &oldList, const ParamList &newList )
-{
-    if( oldList.size() != newList.size() )
-        return false;
+bool isParamListsEqual(const ParamList &oldList, const ParamList &newList) {
+  if (oldList.size() != newList.size())
+    return false;
 
-    //The sets are sorted so if the sets are equal
-    //the iterators should iterate through the same
-    //elements.
+  //The sets are sorted so if the sets are equal
+  //the iterators should iterate through the same
+  //elements.
 
-    ParamList::const_iterator itOld = oldList.begin();
-    ParamList::const_iterator itNew = newList.begin();
+  ParamList::const_iterator itOld = oldList.begin();
+  ParamList::const_iterator itNew = newList.begin();
 
-    for( ; itNew != newList.end(); ++itNew, ++itOld ) {
-         if( itNew->kode() != itOld->kode() ||
-             itNew->id() != itOld->id() ||
-             itNew->isScalar() != itOld->isScalar() ) {
-             return false;
-         }
+  for (; itNew != newList.end(); ++itNew, ++itOld) {
+    if (itNew->kode() != itOld->kode() || itNew->id() != itOld->id()
+        || itNew->isScalar() != itOld->isScalar()) {
+      return false;
     }
-    return true;
+  }
+  return true;
 }
 
-
-
-
 std::ostream&
-operator<<(std::ostream &os, const ParamList &p)
-{
-	CIParamList it = p.begin();
+operator<<(std::ostream &os, const ParamList &p) {
+  CIParamList it = p.begin();
 
-	os << "ParamList:\n";
+  os << "ParamList:\n";
 
-	for (; it != p.end(); it++)
-		os << "  " << it->kode() << "  " << it->id() << " " << (it->isScalar()?"true":"false") << std::endl;
+  for (; it != p.end(); it++)
+    os << "  " << it->kode() << "  " << it->id() << " "
+       << (it->isScalar() ? "true" : "false") << std::endl;
 
-	return os;
+  return os;
 }
 

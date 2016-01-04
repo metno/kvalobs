@@ -42,8 +42,7 @@
  * \brief This namespace contains common queries
  *        that is used at many places in kvalobs.
  */
-namespace kvQueries
-{
+namespace kvQueries {
 
 /**
  * \addtogroup kvqueries
@@ -56,7 +55,7 @@ namespace kvQueries
  *  stationid in slist, language=lan and valid fromtime
  */
 std::string selectChecks(const std::list<int> slist, const int lan,
-		const boost::posix_time::ptime& otime);
+                         const boost::posix_time::ptime& otime);
 
 /**
  * \brief select all rows from table \em station_param matching
@@ -64,7 +63,8 @@ std::string selectChecks(const std::list<int> slist, const int lan,
  *  qcx = qcx and valid fromtime
  */
 std::string selectStationParam(const std::list<int> slist,
-		const boost::posix_time::ptime& otime, const std::string& qcx);
+                               const boost::posix_time::ptime& otime,
+                               const std::string& qcx);
 
 /**
  * \brief select all rows from table \em data matching
@@ -77,7 +77,7 @@ std::string selectData(const boost::posix_time::ptime& otime);
  *  stationid=sid, paramid=pid and obstime=otime
  */
 std::string selectData(const int sid, const int pid,
-		const boost::posix_time::ptime& otime);
+                       const boost::posix_time::ptime& otime);
 
 /**
  * \brief Select the \em data record that match this \em kvData,
@@ -91,7 +91,7 @@ std::string selectData(const kvalobs::kvData &d);
  *  stationid=sid, typeid=tid and obstime=otime
  */
 std::string selectDataFromType(const int sid, const int tid,
-		const boost::posix_time::ptime& otime);
+                               const boost::posix_time::ptime& otime);
 
 /**
  * \brief select all rows from table \em text_data matching
@@ -100,49 +100,52 @@ std::string selectDataFromType(const int sid, const int tid,
  * The result is sorted by paramid.
  */
 std::string selectTextDataFromType(const int sid, const int tid,
-		const boost::posix_time::ptime& otime);
+                                   const boost::posix_time::ptime& otime);
 
 /**
  * \brief select all rows from table \em data matching
  *  stationid=sid, abs(typeid)=abs(tid) and obstime=otime
  */
 std::string selectDataFromAbsType(const int sid, const int tid,
-		const boost::posix_time::ptime& otime);
+                                  const boost::posix_time::ptime& otime);
 
 /**
  * \brief select all rows from table \em data matching
  *  obstime in [stime - etime], order by ob
  */
-std::string selectData(const boost::posix_time::ptime& stime, const boost::posix_time::ptime& etime,
-		const std::string& ob);
+std::string selectData(const boost::posix_time::ptime& stime,
+                       const boost::posix_time::ptime& etime,
+                       const std::string& ob);
 
 /**
  * \brief select all rows from table \em data matching
  *  tbtime in [stime - etime], order by ob.
  */
 std::string selectDataByTabletime(const boost::posix_time::ptime& stime,
-		const boost::posix_time::ptime& etime, const std::string& ob);
+                                  const boost::posix_time::ptime& etime,
+                                  const std::string& ob);
 
 /**
  * \brief select all rows from table \em data matching
  *  stationid=sid, and obstime in [stime - etime]
  */
 std::string selectData(const int sid, const boost::posix_time::ptime& stime,
-		const boost::posix_time::ptime& etime);
+                       const boost::posix_time::ptime& etime);
 
 /**
  * \brief select all rows from table \em text_data matching
  *  stationid=sid, and obstime in [stime - etime]
  */
 std::string selectTextData(const int sid, const boost::posix_time::ptime& stime,
-		const boost::posix_time::ptime& etime);
+                           const boost::posix_time::ptime& etime);
 
 /**
  * \brief select all rows from table \em data matching
  *  stationid=sid, and tbtime in [stime - etime]
  */
-std::string selectDataByTbtime(const int sid, const boost::posix_time::ptime& stime,
-		const boost::posix_time::ptime& etime);
+std::string selectDataByTbtime(const int sid,
+                               const boost::posix_time::ptime& stime,
+                               const boost::posix_time::ptime& etime);
 
 /**
  * \brief select all rows from table \em data order by ob
@@ -154,7 +157,7 @@ std::string selectData(const std::string& ob);
  *  obstime in [stime - etime]
  */
 std::string selectData(const boost::posix_time::ptime& stime,
-		const boost::posix_time::ptime& etime);
+                       const boost::posix_time::ptime& etime);
 
 std::string selectReferenceStation(long stationid, long paramsetid);
 
@@ -163,7 +166,8 @@ std::string selectReferenceStation(long stationid, long paramsetid);
  *  obstime in [stime - etime]
  */
 std::string selectDataStat(const boost::posix_time::ptime& stime,
-		const boost::posix_time::ptime& etime, const std::string& statList);
+                           const boost::posix_time::ptime& etime,
+                           const std::string& statList);
 
 /**
  * \brief select all rows from table \em param order by ob
@@ -174,8 +178,9 @@ std::string selectParam(const std::string& ob);
  * \brief select all rows from table \em model_data matching
  *  stationid=sid, and obstime in [stime - etime]
  */
-std::string selectModelData(const int sid, const boost::posix_time::ptime& stime,
-		const boost::posix_time::ptime& etime);
+std::string selectModelData(const int sid,
+                            const boost::posix_time::ptime& stime,
+                            const boost::posix_time::ptime& etime);
 
 /**
  * \brief Select a station from the \em station table based on stationid.
@@ -227,7 +232,8 @@ std::string selectObsPgm(long stationid, const boost::posix_time::ptime& otime);
  * \brief Select all entries from \em obs_pgm matching stationid, typeid
  * and time
  */
-std::string selectObsPgm(long stationid, long tid, const boost::posix_time::ptime& otime);
+std::string selectObsPgm(long stationid, long tid,
+                         const boost::posix_time::ptime& otime);
 
 /**
  * \brief Select all entries from \em obs_pgm matching time
@@ -257,13 +263,15 @@ std::string selectIsGenerated(long stationid, int typeid_);
  *  stationid in list, paramid=pid and obstime in [stime - etime]
  */
 std::string selectData(const std::list<int> slist, const int pid,
-		const boost::posix_time::ptime& stime, const boost::posix_time::ptime& etime);
+                       const boost::posix_time::ptime& stime,
+                       const boost::posix_time::ptime& etime);
 /** EGLITIS (for Qc2)
  * \brief select all rows from table \em data matching
  *  stationid in list, paramid=pid and obstime in [stime - etime]
  */
 std::string selectData(const std::list<int> slist, const int pid, const int tid,
-		const boost::posix_time::ptime& stime, const boost::posix_time::ptime& etime);
+                       const boost::posix_time::ptime& stime,
+                       const boost::posix_time::ptime& etime);
 
 /** EGLITIS (for Qc2)
  * \brief select all rows from table \em data matching
@@ -272,35 +280,38 @@ std::string selectData(const std::list<int> slist, const int pid, const int tid,
  */
 
 std::string selectData(const int pid, const int tid,
-		const boost::posix_time::ptime& stime, const boost::posix_time::ptime& etime,
-		const std::string& controlString);
+                       const boost::posix_time::ptime& stime,
+                       const boost::posix_time::ptime& etime,
+                       const std::string& controlString);
 
 /** EGLITIS (for Qc2)
  * \brief select all rows from table \em data matching
  *  a single stationid, paramid=pid and obstime in [stime - etime]
  */
 std::string selectData(const int stid, const int pid, const int tid,
-		const boost::posix_time::ptime& stime, const boost::posix_time::ptime& etime);
+                       const boost::posix_time::ptime& stime,
+                       const boost::posix_time::ptime& etime);
 /** EGLITIS (for Qc2)
  * \brief select all rows from table \em data matching
  *  a single stationid, paramid=pid and obstime in [stime - etime]
  */
 std::string selectData(const int stid, const int pid,
-		const boost::posix_time::ptime& stime, const boost::posix_time::ptime& etime);
+                       const boost::posix_time::ptime& stime,
+                       const boost::posix_time::ptime& etime);
 
 /** EGLITIS (for Qc2)
  * \brief A query to pick out missing float values especially
  *  for Qc2 tests, for all stations at one particular time
  */
 std::string selectMissingData(const float value, const int pid,
-		const boost::posix_time::ptime& Ptime);
+                              const boost::posix_time::ptime& Ptime);
 
 /** EGLITIS (for Qc2)
  * \brief A query to pick out missing float values especially
  *  for Qc2 tests, for all stations at one particular time
  */
 std::string selectMissingData(const float value, const int pid, const int tid,
-		const boost::posix_time::ptime& Ptime);
+                              const boost::posix_time::ptime& Ptime);
 
 /** @} */
 }

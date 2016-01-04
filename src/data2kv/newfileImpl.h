@@ -5,17 +5,17 @@
 #include "App.h"
 
 class NewFileImpl : public POA_micutil::newfilesignal,
-		    public PortableServer::RefCountServantBase 
-{
+    public PortableServer::RefCountServantBase {
   App &app;
 
-public:
+ public:
   // standard constructor
-  NewFileImpl(App &app_):app(app_)
-    {
-    }
+  NewFileImpl(App &app_)
+      : app(app_) {
+  }
 
-  virtual ~NewFileImpl(){}
+  virtual ~NewFileImpl() {
+  }
 
   // methods corresponding to defined IDL attributes and operations
   void newfile(const char* newfileindir);

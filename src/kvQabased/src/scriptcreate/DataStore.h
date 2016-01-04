@@ -42,13 +42,11 @@
 #include <deque>
 #include <map>
 
-namespace db
-{
+namespace db {
 class DatabaseAccess;
 }
 
-namespace qabase
-{
+namespace qabase {
 class ScriptResultIdentifier;
 
 /**
@@ -57,98 +55,100 @@ class ScriptResultIdentifier;
  *
  * \ingroup group_scriptcreate
  */
-class DataStore
-{
-public:
-	typedef kvalobs::kvData Data;
-	typedef std::deque<Data> DataList;
-	typedef std::map<DataRequirement::Parameter, DataList> ParameterSortedDataList;
+class DataStore {
+ public:
+  typedef kvalobs::kvData Data;
+  typedef std::deque<Data> DataList;
+  typedef std::map<DataRequirement::Parameter, DataList> ParameterSortedDataList;
 
-	typedef kvalobs::kvTextData RefData;
-	typedef std::vector<RefData> RefDataList;
-	typedef std::map<DataRequirement::Parameter, RefDataList> ParameterSortedRefDataList;
+  typedef kvalobs::kvTextData RefData;
+  typedef std::vector<RefData> RefDataList;
+  typedef std::map<DataRequirement::Parameter, RefDataList> ParameterSortedRefDataList;
 
-	typedef kvalobs::kvModelData ModelData;
-	typedef std::vector<ModelData> ModelDataList;
-	typedef std::map<DataRequirement::Parameter, ModelDataList> ParameterSortedModelDataList;
+  typedef kvalobs::kvModelData ModelData;
+  typedef std::vector<ModelData> ModelDataList;
+  typedef std::map<DataRequirement::Parameter, ModelDataList> ParameterSortedModelDataList;
 
-	//typedef kvalobs::kvStationParam MetaData;
-	typedef float MetaData;
-	typedef std::vector<MetaData> MetaDataList;
-	typedef std::map<DataRequirement::Parameter, MetaDataList> ParameterSortedMetaDataList;
+  //typedef kvalobs::kvStationParam MetaData;
+  typedef float MetaData;
+  typedef std::vector<MetaData> MetaDataList;
+  typedef std::map<DataRequirement::Parameter, MetaDataList> ParameterSortedMetaDataList;
 
-	DataStore(
-			const db::DatabaseAccess & db,
-			const kvalobs::kvStationInfo & observation,
-			const std::string & qcx,
-			const qabase::CheckSignature & abstractSignature,
-			const qabase::CheckSignature & concreteSignature);
+  DataStore(const db::DatabaseAccess & db,
+            const kvalobs::kvStationInfo & observation, const std::string & qcx,
+            const qabase::CheckSignature & abstractSignature,
+            const qabase::CheckSignature & concreteSignature);
 
-	// For creating tests
-	DataStore(const ParameterSortedDataList & data, int flagPosition);
+  // For creating tests
+  DataStore(const ParameterSortedDataList & data, int flagPosition);
 
-	~DataStore();
+  ~DataStore();
 
-	const ParameterSortedDataList & getObsData() const { return data_; }
-	const ParameterSortedRefDataList & getRefData() const { return refData_; }
-	const ParameterSortedModelDataList & getModelData() const { return modelData_; }
-	const ParameterSortedMetaDataList & getMetaData() const { return metaData_; }
+  const ParameterSortedDataList & getObsData() const {
+    return data_;
+  }
+  const ParameterSortedRefDataList & getRefData() const {
+    return refData_;
+  }
+  const ParameterSortedModelDataList & getModelData() const {
+    return modelData_;
+  }
+  const ParameterSortedMetaDataList & getMetaData() const {
+    return metaData_;
+  }
 
-	const kvalobs::kvStationInfo & observation() const { return observation_; }
+  const kvalobs::kvStationInfo & observation() const {
+    return observation_;
+  }
 
-	const kvalobs::kvStation & station() const { return station_; }
+  const kvalobs::kvStation & station() const {
+    return station_;
+  }
 
-	void apply(const ScriptResultIdentifier & resultType, double value);
+  void apply(const ScriptResultIdentifier & resultType, double value);
 
-	template<class Iterator>
-	void getModified(Iterator out) const;
+  template<class Iterator>
+  void getModified(Iterator out) const;
 
-	QABASE_EXCEPTION(UnableToGetData);
-	QABASE_EXCEPTION(InvalidParameter);
-	QABASE_EXCEPTION(NoSuchData);
-	QABASE_DERIVED_EXCEPTION(MissingModelData, NoErrorLogException);
+  QABASE_EXCEPTION(UnableToGetData);QABASE_EXCEPTION(InvalidParameter);QABASE_EXCEPTION(NoSuchData);QABASE_DERIVED_EXCEPTION(MissingModelData, NoErrorLogException);
 
-private:
-	void populateObs_(
-			const db::DatabaseAccess & db,
-			const kvalobs::kvStationInfo & observation,
-			const qabase::DataRequirement & abstractObsRequirement,
-			const qabase::DataRequirement & concreteObsRequirement);
-	void populateRefObs_(
-				const db::DatabaseAccess & db,
-				const kvalobs::kvStationInfo & observation,
-				const qabase::DataRequirement & abstractRefObsRequirement,
-				const qabase::DataRequirement & concreteRefObsRequirement);
-	void populateModel_(
-			const db::DatabaseAccess & db,
-			const kvalobs::kvStationInfo & observation,
-			const qabase::DataRequirement & abstractModelRequirement,
-			const qabase::DataRequirement & concreteModelRequirement);
-	void populateMeta_(
-			const db::DatabaseAccess & db,
-			const kvalobs::kvStationInfo & observation,
-			const std::string & qcx,
-			const qabase::DataRequirement & abstractMetaRequirement,
-			const qabase::DataRequirement & concreteMetaRequirement);
-	void populateStation_(const db::DatabaseAccess & db);
+ private:
+  void populateObs_(const db::DatabaseAccess & db,
+                    const kvalobs::kvStationInfo & observation,
+                    const qabase::DataRequirement & abstractObsRequirement,
+                    const qabase::DataRequirement & concreteObsRequirement);
+  void populateRefObs_(
+      const db::DatabaseAccess & db, const kvalobs::kvStationInfo & observation,
+      const qabase::DataRequirement & abstractRefObsRequirement,
+      const qabase::DataRequirement & concreteRefObsRequirement);
+  void populateModel_(const db::DatabaseAccess & db,
+                      const kvalobs::kvStationInfo & observation,
+                      const qabase::DataRequirement & abstractModelRequirement,
+                      const qabase::DataRequirement & concreteModelRequirement);
+  void populateMeta_(const db::DatabaseAccess & db,
+                     const kvalobs::kvStationInfo & observation,
+                     const std::string & qcx,
+                     const qabase::DataRequirement & abstractMetaRequirement,
+                     const qabase::DataRequirement & concreteMetaRequirement);
+  void populateStation_(const db::DatabaseAccess & db);
 
-	ParameterSortedDataList data_;
-	ParameterSortedRefDataList refData_;
-	ParameterSortedModelDataList modelData_;
-	ParameterSortedMetaDataList metaData_;
-	kvalobs::kvStationInfo observation_;
-	kvalobs::kvStation station_;
-	std::string qcx_;
-	int flagPosition_;
-	typedef std::set<kvalobs::kvData *, kvalobs::compare::lt_kvData> ModificationList;
-	ModificationList modified_;
+  ParameterSortedDataList data_;
+  ParameterSortedRefDataList refData_;
+  ParameterSortedModelDataList modelData_;
+  ParameterSortedMetaDataList metaData_;
+  kvalobs::kvStationInfo observation_;
+  kvalobs::kvStation station_;
+  std::string qcx_;
+  int flagPosition_;
+  typedef std::set<kvalobs::kvData *, kvalobs::compare::lt_kvData> ModificationList;
+  ModificationList modified_;
 };
 
 template<class Iterator>
-void DataStore::getModified(Iterator out) const
-{
-	for ( ModificationList::const_iterator it = modified_.begin(); it != modified_.end(); ++ it )
-		* out ++ = ** it;
+void DataStore::getModified(Iterator out) const {
+  for (ModificationList::const_iterator it = modified_.begin();
+      it != modified_.end(); ++it)
+    *out++ = **it;
 }
 
 /**
@@ -160,7 +160,6 @@ void fillMissing(DataStore::ParameterSortedDataList & dataList);
  * \ingroup group_scriptcreate
  */
 void fillMissing(DataStore::ParameterSortedRefDataList & dataList);
-
 
 }
 

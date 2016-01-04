@@ -1,33 +1,33 @@
 /*
-  Kvalobs - Free Quality Control Software for Meteorological Observations
+ Kvalobs - Free Quality Control Software for Meteorological Observations
 
-  $Id: LogManager.cc,v 1.6.6.3 2007/09/27 09:02:32 paule Exp $
+ $Id: LogManager.cc,v 1.6.6.3 2007/09/27 09:02:32 paule Exp $
 
-  Copyright (C) 2007 met.no
+ Copyright (C) 2007 met.no
 
-  Contact information:
-  Norwegian Meteorological Institute
-  Box 43 Blindern
-  0313 OSLO
-  NORWAY
-  email: kvalobs-dev@met.no
+ Contact information:
+ Norwegian Meteorological Institute
+ Box 43 Blindern
+ 0313 OSLO
+ NORWAY
+ email: kvalobs-dev@met.no
 
-  This file is part of KVALOBS
+ This file is part of KVALOBS
 
-  KVALOBS is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License as
-  published by the Free Software Foundation; either version 2
-  of the License, or (at your option) any later version.
+ KVALOBS is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as
+ published by the Free Software Foundation; either version 2
+ of the License, or (at your option) any later version.
 
-  KVALOBS is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  General Public License for more details.
+ KVALOBS is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ General Public License for more details.
 
-  You should have received a copy of the GNU General Public License along
-  with KVALOBS; if not, write to the Free Software Foundation Inc.,
-  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ You should have received a copy of the GNU General Public License along
+ with KVALOBS; if not, write to the Free Software Foundation Inc.,
+ 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
 
 #ifndef __SIGNALHELPERS_H__
 #define __SIGNALHELPERS_H__
@@ -38,44 +38,42 @@
 namespace miutil {
 
 bool
-setSignalHandler( int signum, void (*sigfunc)(int signum), int sa_flags=0, struct sigaction *oldact=0 );
-
+setSignalHandler(int signum, void (*sigfunc)(int signum), int sa_flags = 0,
+                 struct sigaction *oldact = 0);
 
 /**
  * @throw std::runtime_error on failure.
  */
 void
-setSignalHandlerThrow( int signum, void (*sigfunc)(int signum), int sa_flags=0, struct sigaction *oldact=0 );
+setSignalHandlerThrow(int signum, void (*sigfunc)(int signum), int sa_flags = 0,
+                      struct sigaction *oldact = 0);
 
 /**
  * @note Do not use in multithreaded programs. See the manual page sigprocmask(2)
  */
 bool
-blocksignal( int signum );
+blocksignal(int signum);
 
 /**
  * @throw std::runtime_error on failure.
  * @note Do not use in multithreaded programs. See the manual page sigprocmask(2)
  */
 void
-blocksignalThrow( int signum ) ;
+blocksignalThrow(int signum);
 
 /**
  * @note Do not use in multithreaded programs. See the manual page sigprocmask(2)
  */
 bool
-unblocksignal( int signum );
+unblocksignal(int signum);
 
 /**
  * @throw std::runtime_error on failure.
  * @note Do not use in multithreaded programs. See the manual page sigprocmask(2)
  */
 void
-unblocksignalThrow( int signum ) ;
-
+unblocksignalThrow(int signum);
 
 }
-
-
 
 #endif

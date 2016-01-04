@@ -1,33 +1,33 @@
 /*
-  Kvalobs - Free Quality Control Software for Meteorological Observations 
+ Kvalobs - Free Quality Control Software for Meteorological Observations 
 
-  $Id: DataSrcApp.h,v 1.19.2.5 2007/09/27 09:02:16 paule Exp $                                                       
+ $Id: DataSrcApp.h,v 1.19.2.5 2007/09/27 09:02:16 paule Exp $                                                       
 
-  Copyright (C) 2007 met.no
+ Copyright (C) 2007 met.no
 
-  Contact information:
-  Norwegian Meteorological Institute
-  Box 43 Blindern
-  0313 OSLO
-  NORWAY
-  email: kvalobs-dev@met.no
+ Contact information:
+ Norwegian Meteorological Institute
+ Box 43 Blindern
+ 0313 OSLO
+ NORWAY
+ email: kvalobs-dev@met.no
 
-  This file is part of KVALOBS
+ This file is part of KVALOBS
 
-  KVALOBS is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License as 
-  published by the Free Software Foundation; either version 2 
-  of the License, or (at your option) any later version.
-  
-  KVALOBS is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License along 
-  with KVALOBS; if not, write to the Free Software Foundation Inc., 
-  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ KVALOBS is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as 
+ published by the Free Software Foundation; either version 2 
+ of the License, or (at your option) any later version.
+ 
+ KVALOBS is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License along 
+ with KVALOBS; if not, write to the Free Software Foundation Inc., 
+ 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
 #ifndef __DataSrcApp_h__
 #define __DataSrcApp_h__
 
@@ -62,25 +62,24 @@
  * the command from. It manages the connection to the database and it
  * manages the deoders.
  */
-class DataSrcApp : public KvApp
-{
-  typedef boost::mutex::scoped_lock    Lock;
+class DataSrcApp : public KvApp {
+  typedef boost::mutex::scoped_lock Lock;
 
   CKvalObs::CManager::ManagerInput_var refMgr;
-  dnmi::thread::CommandQue             que;
-  kvalobs::decoder::DecoderMgr         decoderMgr;
-  dnmi::db::DriverManager              dbMgr;
-  bool                                 ok;
-  std::string                          connectStr;
-  std::string                          dbDriver;
-  ConnectionCache                      conCache;
-  int                                  nConnections;
-  ParamList                            paramList;
-  std::list<kvalobs::kvTypes>          typeList;
-  bool                                 shutdown_;
-  boost::posix_time::ptime             nextParamCheckTime;
-  std::string                          amqpUrl;
-  std::string                          amqpPasswd;
+  dnmi::thread::CommandQue que;
+  kvalobs::decoder::DecoderMgr decoderMgr;
+  dnmi::db::DriverManager dbMgr;
+  bool ok;
+  std::string connectStr;
+  std::string dbDriver;
+  ConnectionCache conCache;
+  int nConnections;
+  ParamList paramList;
+  std::list<kvalobs::kvTypes> typeList;
+  bool shutdown_;
+  boost::posix_time::ptime nextParamCheckTime;
+  std::string amqpUrl;
+  std::string amqpPasswd;
 
   /**
    * \brief registerParams reads parameter information from the table
@@ -96,7 +95,6 @@ class DataSrcApp : public KvApp
    */
   bool registerTypes();
 
-
   /**
    * \brief registerDb looks for the dbDriver.so in the directory $KVALOBS/lib.
    *
@@ -109,7 +107,7 @@ class DataSrcApp : public KvApp
    *        want to open.
    * \return the number of connections that is created to the database.
    */
-  int  registerDb(int nConn);
+  int registerDb(int nConn);
 
   /**
    * \brief registerAllDecoders, scans the directory $KVALOBS/lib for decoders.
@@ -119,7 +117,7 @@ class DataSrcApp : public KvApp
    * \returns true if we find at least one decoder. false if no decoders is 
    * found.
    */
-  bool registerAllDecoders( miutil::conf::ConfSection *theConf );
+  bool registerAllDecoders(miutil::conf::ConfSection *theConf);
 
   /**
    *\brief lookUpManager, use the CORBA nameserver if necessary, to
@@ -133,12 +131,16 @@ class DataSrcApp : public KvApp
    * \exception throws LookUpException if it fails to
    */
   CKvalObs::CManager::ManagerInput_ptr lookUpManager(bool forceNS,
-						     bool & usedNS);
+                                                     bool & usedNS);
   boost::mutex mutex;
 
  public:
-  typedef enum  {TimeOut, NoDecoder, NoDbConnection, NoMem} ErrCode;
-  
+  typedef enum {
+    TimeOut,
+    NoDecoder,
+    NoDbConnection,
+    NoMem
+  } ErrCode;
 
   /**
    * \brief Constructor that initialize a DataSrcApp instance. 
@@ -157,16 +159,14 @@ class DataSrcApp : public KvApp
    *        shall we try to create.
    * \param opt Optional options to omniorb.
    */
-  DataSrcApp(int argn, char **argv,
-	          int              numberOfConnections,
-	          miutil::conf::ConfSection *theKvConf,
-	          const char      *opt[][2]=0);
+  DataSrcApp(int argn, char **argv, int numberOfConnections,
+             miutil::conf::ConfSection *theKvConf, const char *opt[][2] = 0);
 
   /**
    * \brief Detructor, deletes all connection to the database.
    */
   ~DataSrcApp();
-  
+
   /**
    * \brief creates a DecodeCommand if it find a decoder for
    * the observation type. 
@@ -181,26 +181,25 @@ class DataSrcApp : public KvApp
    * error message is given in errMsg.
    */
 
-  DecodeCommand *create(const char  *obsType, 
-			const char  *obs,
-			long        timoutIn_msec,
-			ErrCode     &errCode,
-			std::string &errMsg);
-  
-  DecodeCommand *create(CORBA::Long report_id, 
-			const char* report_type, 
-			const char* obstime, 
-			const char* data,
-			long        timoutIn_msec,
-			ErrCode     &errCode,
-			std::string &errMsg);
+  DecodeCommand *create(const char *obsType, const char *obs,
+                        long timoutIn_msec, ErrCode &errCode,
+                        std::string &errMsg);
+
+  DecodeCommand *create(CORBA::Long report_id, const char* report_type,
+                        const char* obstime, const char* data,
+                        long timoutIn_msec, ErrCode &errCode,
+                        std::string &errMsg);
 
   void releaseDecodeCommand(DecodeCommand *command);
 
   bool sendInfoToManager(const kvalobs::kvStationInfoList &info);
-  
-  std::string getAmqpUrl()const { return amqpUrl; }
-  std::string getAmqpPasswd()const { return amqpPasswd;  }
+
+  std::string getAmqpUrl() const {
+    return amqpUrl;
+  }
+  std::string getAmqpPasswd() const {
+    return amqpPasswd;
+  }
 
   /**
    * \brief put is used to send the command to the consument threads.
@@ -222,19 +221,20 @@ class DataSrcApp : public KvApp
    */
   dnmi::thread::CommandBase* remove(dnmi::thread::CommandBase *command);
 
-
   /**
    * \brief getDbConnections returns the number of connections we have to the 
    * database.
    */
-  int getDbConnections()const{ return nConnections;}
-  
+  int getDbConnections() const {
+    return nConnections;
+  }
+
   /**
    * \brief returns true if this instance of DataSrcApp is valid constructed!
    *
    * \return True if valid. False otherwise.
    */
-  virtual bool isOk()const;
+  virtual bool isOk() const;
 
   /**
    * \brief returns a pointer to the message Que. Never delete
@@ -242,12 +242,16 @@ class DataSrcApp : public KvApp
    *
    * \return a pointer to the message que.
    */
-  dnmi::thread::CommandQue  *getQue(){ return &que;} 
+  dnmi::thread::CommandQue *getQue() {
+    return &que;
+  }
 
   /**
    * \brief Request shutdown. Ie. we want to terminate.
    */
-  void shutdown(){shutdown_=true;}
+  void shutdown() {
+    shutdown_ = true;
+  }
 
   /**
    * \brief Are we in shutdown. 
@@ -255,11 +259,9 @@ class DataSrcApp : public KvApp
    * \return true if we are in shutdown. When we are in shutdown all threads
    * shall end the jobs they ar doing and terminate.
    */
-  bool inShutdown()const;
+  bool inShutdown() const;
 };
 
-
 /** @} */
-
 
 #endif

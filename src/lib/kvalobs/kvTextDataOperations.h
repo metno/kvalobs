@@ -34,42 +34,37 @@
 #include "kvalobs/kvTextData.h"
 #include <functional>
 
-namespace kvalobs
-{
-class kvTextDataFactory
-{
-public:
-	kvTextDataFactory(int stationID, const boost::posix_time::ptime & obsTime,
-			int typeID);
+namespace kvalobs {
+class kvTextDataFactory {
+ public:
+  kvTextDataFactory(int stationID, const boost::posix_time::ptime & obsTime,
+                    int typeID);
 
-	explicit kvTextDataFactory(const kvTextData & data);
+  explicit kvTextDataFactory(const kvTextData & data);
 
-	kvTextData getData(std::string val, int paramID,
-			const boost::posix_time::ptime & obsTime = boost::posix_time::ptime()) const;
+  kvTextData getData(std::string val, int paramID,
+                     const boost::posix_time::ptime & obsTime =
+                         boost::posix_time::ptime()) const;
 
-private:
-	const int stationID_;
-	const int typeID_;
-	const boost::posix_time::ptime obstime_;
+ private:
+  const int stationID_;
+  const int typeID_;
+  const boost::posix_time::ptime obstime_;
 };
 
-namespace compare
-{
+namespace compare {
 typedef std::binary_function<kvTextData, kvTextData, bool> kvTextDataCompare;
 
-struct lt_kvTextData: kvTextDataCompare
-{
-	bool operator()(const kvTextData & a, const kvTextData & b) const;
+struct lt_kvTextData : kvTextDataCompare {
+  bool operator()(const kvTextData & a, const kvTextData & b) const;
 };
 
-struct kvTextData_same_obs_and_parameter: kvTextDataCompare
-{
-	bool operator()(const kvTextData & a, const kvTextData & b) const;
+struct kvTextData_same_obs_and_parameter : kvTextDataCompare {
+  bool operator()(const kvTextData & a, const kvTextData & b) const;
 };
 
-struct kvTextData_exactly_equal_ex_tbtime: kvTextDataCompare
-{
-	bool operator()(const kvTextData & a, const kvTextData & b) const;
+struct kvTextData_exactly_equal_ex_tbtime : kvTextDataCompare {
+  bool operator()(const kvTextData & a, const kvTextData & b) const;
 };
 
 }

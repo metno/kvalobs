@@ -34,11 +34,9 @@
 #include "kvalobsdata.h"
 #include <string>
 
-namespace kvalobs
-{
+namespace kvalobs {
 
-namespace serialize
-{
+namespace serialize {
 
 /**
  * Serializes a \c KvalobsData object into an XML string, or an XML string
@@ -46,25 +44,24 @@ namespace serialize
  *
  * @author Vegard Bnes
  */
-class KvalobsDataSerializer
-{
-public:
-	KvalobsDataSerializer();
-	KvalobsDataSerializer(const KvalobsData & d);
-	KvalobsDataSerializer(const std::string & s);
+class KvalobsDataSerializer {
+ public:
+  KvalobsDataSerializer();
+  KvalobsDataSerializer(const KvalobsData & d);
+  KvalobsDataSerializer(const std::string & s);
 
-	~KvalobsDataSerializer();
+  ~KvalobsDataSerializer();
 
-	static std::string serialize(const KvalobsData & d);
+  static std::string serialize(const KvalobsData & d);
 
-	const KvalobsData & toData() const;
+  const KvalobsData & toData() const;
 
-	KvalobsData & toData();
+  KvalobsData & toData();
 
-	std::string toString() const;
+  std::string toString() const;
 
-private:
-	KvalobsData data_;
+ private:
+  KvalobsData data_;
 };
 
 }

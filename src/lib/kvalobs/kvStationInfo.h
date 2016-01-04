@@ -36,8 +36,7 @@
 #include <kvalobs/kvDataFlag.h>
 #include <kvalobs/kvData.h>
 
-namespace kvalobs
-{
+namespace kvalobs {
 /**
  * \addtogroup kvinternalhelpers
  * @{
@@ -50,48 +49,46 @@ namespace kvalobs
  * The class plays an importen role for the data flow in the
  * kvalobs system.
  */
-class kvStationInfo
-{
-private:
-	long stationid_;
-	boost::posix_time::ptime obstime_;
-	int typeid_;
+class kvStationInfo {
+ private:
+  long stationid_;
+  boost::posix_time::ptime obstime_;
+  int typeid_;
 
-public:
-	/**
-	 * \brief Initialize the object.
-	 *
-	 * \param stationid The kvalobs stationid.
-	 * \param obstime The observation time for this observation.
-	 * \param typeId The typeid to the observation.
-	 */
-	kvStationInfo(long stationid, const boost::posix_time::ptime &obstime, int typeId) :
-			stationid_(stationid), obstime_(obstime), typeid_(typeId)
-	{
-	}
+ public:
+  /**
+   * \brief Initialize the object.
+   *
+   * \param stationid The kvalobs stationid.
+   * \param obstime The observation time for this observation.
+   * \param typeId The typeid to the observation.
+   */
+  kvStationInfo(long stationid, const boost::posix_time::ptime &obstime,
+                int typeId)
+      : stationid_(stationid),
+        obstime_(obstime),
+        typeid_(typeId) {
+  }
 
-	kvStationInfo(const kvStationInfo &info);
-	kvStationInfo &operator=(const kvStationInfo &info);
+  kvStationInfo(const kvStationInfo &info);
+  kvStationInfo &operator=(const kvStationInfo &info);
 
-	///The stationid for this observation
-	long stationID() const
-	{
-		return stationid_;
-	}
+  ///The stationid for this observation
+  long stationID() const {
+    return stationid_;
+  }
 
-	///The observation time for this observation
-	const boost::posix_time::ptime & obstime() const
-	{
-		return obstime_;
-	}
+  ///The observation time for this observation
+  const boost::posix_time::ptime & obstime() const {
+    return obstime_;
+  }
 
-	///The typeid for this observation
-	int typeID() const
-	{
-		return typeid_;
-	}
+  ///The typeid for this observation
+  int typeID() const {
+    return typeid_;
+  }
 
-	friend std::ostream& operator<<(std::ostream& os, const kvStationInfo &c);
+  friend std::ostream& operator<<(std::ostream& os, const kvStationInfo &c);
 
 };
 
@@ -99,23 +96,20 @@ typedef std::list<kvStationInfo> kvStationInfoList;
 typedef std::list<kvStationInfo>::iterator IkvStationInfoList;
 typedef std::list<kvStationInfo>::const_iterator CIkvStationInfoList;
 
-inline bool operator ==(const kvStationInfo & a, const kvStationInfo & b)
-{
-	return a.stationID() == b.stationID() and a.obstime() == b.obstime()
-			and a.typeID() == b.typeID();
+inline bool operator ==(const kvStationInfo & a, const kvStationInfo & b) {
+  return a.stationID() == b.stationID() and a.obstime() == b.obstime()
+      and a.typeID() == b.typeID();
 }
-inline bool operator !=(const kvStationInfo & a, const kvStationInfo & b)
-{
-	return not operator ==(a, b);
+inline bool operator !=(const kvStationInfo & a, const kvStationInfo & b) {
+  return not operator ==(a, b);
 }
 
-inline bool operator <(const kvStationInfo & a, const kvStationInfo & b)
-{
-	if ( a.stationID() != b.stationID() )
-		return a.stationID() < b.stationID();
-	if ( a.obstime() != b.obstime() )
-		return a.obstime() < b.obstime();
-	return a.typeID() < b.typeID();
+inline bool operator <(const kvStationInfo & a, const kvStationInfo & b) {
+  if (a.stationID() != b.stationID())
+    return a.stationID() < b.stationID();
+  if (a.obstime() != b.obstime())
+    return a.obstime() < b.obstime();
+  return a.typeID() < b.typeID();
 }
 
 /** @} */

@@ -33,39 +33,43 @@
 #include <map>
 #include <string>
 
-namespace scriptrunner
-{
+namespace scriptrunner {
 
 /**
  * The return values after having run a script.
  *
  * \ingroup group_scriptrunner
  */
-class RunResult
-{
-public:
-	typedef std::map<std::string, double> RunReturn;
+class RunResult {
+ public:
+  typedef std::map<std::string, double> RunReturn;
 
-	RunResult(int exitCode, const RunReturn & returnValues);
-	~RunResult();
+  RunResult(int exitCode, const RunReturn & returnValues);
+  ~RunResult();
 
-	/**
-	 * script's exit status
-	 */
-	int exitCode() const { return exitCode_; }
+  /**
+   * script's exit status
+   */
+  int exitCode() const {
+    return exitCode_;
+  }
 
-	operator bool () const { return exitCode() == 0; }
+  operator bool() const {
+    return exitCode() == 0;
+  }
 
-	/**
-	 * Any return values, given as a set of name-value pairs
-	 */
-	const RunReturn & returnValues() const { return returnValues_; }
+  /**
+   * Any return values, given as a set of name-value pairs
+   */
+  const RunReturn & returnValues() const {
+    return returnValues_;
+  }
 
-	std::string str() const;
+  std::string str() const;
 
-private:
-	int exitCode_;
-	RunReturn returnValues_;
+ private:
+  int exitCode_;
+  RunReturn returnValues_;
 };
 
 }

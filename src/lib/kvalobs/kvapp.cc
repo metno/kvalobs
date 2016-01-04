@@ -46,422 +46,352 @@
 using namespace std;
 using namespace miutil::conf;
 
-namespace
-{
+namespace {
 ConfSection* confLoader();
 std::string getAppName(const std::string &progname);
 
 }
 
-
-
 ConfSection* KvApp::conf = 0;
 std::string KvApp::confFile;
 std::string KvApp::pidfile;
-milog::LogLevel KvApp::globalLogLevel=milog::WARN;
+milog::LogLevel KvApp::globalLogLevel = milog::WARN;
 
-KvApp::KvApp(int argn, char **argv, const char *opt[0][2]) :
-		CorbaHelper::CorbaApp(argn, argv, opt), setAppNameForDb(false)
-{
-	string corbaNS;
-	string kvconfig;
-	ValElementList val;
+KvApp::KvApp(int argn, char **argv, const char *opt[0][2])
+    : CorbaHelper::CorbaApp(argn, argv, opt),
+      setAppNameForDb(false) {
+  string corbaNS;
+  string kvconfig;
+  ValElementList val;
 
-	appName = getAppName(argv[0]);
+  appName = getAppName(argv[0]);
 
-	kvPathInCorbaNS.erase();
+  kvPathInCorbaNS.erase();
 
-	for (int i = 0; i < argn; i++)
-	{
-		if (strcmp(argv[i], "--kv-cnspath") == 0)
-		{
-			if ((i + 1) < argn)
-			{
-				i++;
-				kvPathInCorbaNS = argv[i];
-			}
-		}
-		else if (strcmp(argv[i], "--kv-cnserver") == 0)
-		{
-			if ((i + 1) < argn)
-			{
-				i++;
-				corbaNS = argv[i];
-			}
-		}
-		else if (strcmp(argv[i], "--help") == 0)
-		{
-			printUseMsgAndExit(0);
-		}
-		else if (strcmp(argv[i], "--kv-config") == 0)
-		{
-			cout << "--kv-config\n";
-			if ((i + 1) < argn)
-			{
-				i++;
-				cout << "--kv-config [" << argv[i] << "]\n";
-				setConfFile(argv[i]);
-			}
-		}
+  for (int i = 0; i < argn; i++) {
+    if (strcmp(argv[i], "--kv-cnspath") == 0) {
+      if ((i + 1) < argn) {
+        i++;
+        kvPathInCorbaNS = argv[i];
+      }
+    } else if (strcmp(argv[i], "--kv-cnserver") == 0) {
+      if ((i + 1) < argn) {
+        i++;
+        corbaNS = argv[i];
+      }
+    } else if (strcmp(argv[i], "--help") == 0) {
+      printUseMsgAndExit(0);
+    } else if (strcmp(argv[i], "--kv-config") == 0) {
+      cout << "--kv-config\n";
+      if ((i + 1) < argn) {
+        i++;
+        cout << "--kv-config [" << argv[i] << "]\n";
+        setConfFile(argv[i]);
+      }
+    }
 
-	}
+  }
 
-	//Sets the variable conf
-	getConfiguration();
+  //Sets the variable conf
+  getConfiguration();
 
-	if (conf)
-	{
-		val = conf->getValue("database.set_app_name");
+  if (conf) {
+    val = conf->getValue("database.set_app_name");
 
-		if (val.size() > 0)
-		{
-			string sval = val[0].valAsString();
-			if (!sval.empty() && (sval[0] == 't' || sval[0] == 'T'))
-				setAppNameForDb = true;
-		}
-	}
+    if (val.size() > 0) {
+      string sval = val[0].valAsString();
+      if (!sval.empty() && (sval[0] == 't' || sval[0] == 'T'))
+        setAppNameForDb = true;
+    }
+  }
 
-	if (kvPathInCorbaNS.empty())
-	{
-		if (conf)
-		{
-			val = conf->getValue("corba.path");
+  if (kvPathInCorbaNS.empty()) {
+    if (conf) {
+      val = conf->getValue("corba.path");
 
-			if (val.size() > 0)
-			{
-				kvPathInCorbaNS = val[0].valAsString();
-			}
-		}
-	}
+      if (val.size() > 0) {
+        kvPathInCorbaNS = val[0].valAsString();
+      }
+    }
+  }
 
-	if (kvPathInCorbaNS.empty())
-	{
-		LOGFATAL(
-				"Path in CORBA nameserver missing. " << endl << "Set the corba.path value in " << kvPath("sysconfdir") +"/kvalobs.conf." << endl);
-		printUseMsgAndExit(1);
-	}
+  if (kvPathInCorbaNS.empty()) {
+    LOGFATAL(
+        "Path in CORBA nameserver missing. " << endl << "Set the corba.path value in " << kvPath("sysconfdir") +"/kvalobs.conf." << endl);
+    printUseMsgAndExit(1);
+  }
 
-	if (!kvPathInCorbaNS.empty()
-			&& kvPathInCorbaNS[kvPathInCorbaNS.length() - 1] != '/')
-		kvPathInCorbaNS += "/";
+  if (!kvPathInCorbaNS.empty()
+      && kvPathInCorbaNS[kvPathInCorbaNS.length() - 1] != '/')
+    kvPathInCorbaNS += "/";
 
-	LOGINFO("Using <" <<kvPathInCorbaNS << "> as path in CORBA nameserver");
+  LOGINFO("Using <" <<kvPathInCorbaNS << "> as path in CORBA nameserver");
 
-	if (corbaNS.empty())
-	{
-		if (conf)
-		{
-			val = conf->getValue("corba.nameserver");
+  if (corbaNS.empty()) {
+    if (conf) {
+      val = conf->getValue("corba.nameserver");
 
-			if (val.size() == 1)
-			{
-				corbaNS = val[0].valAsString();
-			}
-		}
-	}
+      if (val.size() == 1) {
+        corbaNS = val[0].valAsString();
+      }
+    }
+  }
 
-	if (corbaNS.empty())
-	{
-		LOGFATAL(
-				"No CORBA nameserver given!" << endl << "Set the corba.nameserver value in" << kvPath("sysconfdir")+"/kvalobs.conf " << endl);
-		printUseMsgAndExit(1);
-	}
+  if (corbaNS.empty()) {
+    LOGFATAL(
+        "No CORBA nameserver given!" << endl << "Set the corba.nameserver value in" << kvPath("sysconfdir")+"/kvalobs.conf " << endl);
+    printUseMsgAndExit(1);
+  }
 
-	LOGINFO("Using CORBA nameserver at: " << corbaNS);
+  LOGINFO("Using CORBA nameserver at: " << corbaNS);
 
-	setNameservice(corbaNS);
+  setNameservice(corbaNS);
 }
 
-KvApp::~KvApp()
-{
-	if (conf)
-	{
-		delete conf;
-		//cerr << "~KvApp:: after delete\n";
-	}
-	//cerr << "~KvApp:: after delete!!!\n";
+KvApp::~KvApp() {
+  if (conf) {
+    delete conf;
+    //cerr << "~KvApp:: after delete\n";
+  }
+  //cerr << "~KvApp:: after delete!!!\n";
 }
 
 //Inherited from CorbaApp.
-bool KvApp::isOk() const
-{
-	if (!CorbaHelper::CorbaApp::isOk())
-		return false;
+bool KvApp::isOk() const {
+  if (!CorbaHelper::CorbaApp::isOk())
+    return false;
 
-	return true;
+  return true;
 }
 
-bool KvApp::putRefInNS(CORBA::Object_ptr objref, const std::string &name_)
-{
-	std::string name(kvPathInCorbaNS);
-	name += name_;
+bool KvApp::putRefInNS(CORBA::Object_ptr objref, const std::string &name_) {
+  std::string name(kvPathInCorbaNS);
+  name += name_;
 
-	return putObjInNS(objref, name);
+  return putObjInNS(objref, name);
 }
 
-CORBA::Object_ptr KvApp::getRefInNS(const std::string &name_)
-{
-	std::string name(kvPathInCorbaNS);
-	name += name_;
+CORBA::Object_ptr KvApp::getRefInNS(const std::string &name_) {
+  std::string name(kvPathInCorbaNS);
+  name += name_;
 
-	return getObjFromNS(name);
+  return getObjFromNS(name);
 }
 
 CORBA::Object_ptr KvApp::getRefInNS(const std::string &name_,
-		const std::string &path_)
-{
+                                    const std::string &path_) {
 
-	std::string name(path_);
+  std::string name(path_);
 
-	if (name.empty())
-		return CORBA::Object::_nil();
+  if (name.empty())
+    return CORBA::Object::_nil();
 
-	if (*name.rbegin() != '/')
-		name.append("/");
+  if (*name.rbegin() != '/')
+    name.append("/");
 
-	name.append(name_);
+  name.append(name_);
 
-	return getObjFromNS(name);
+  return getObjFromNS(name);
 }
 
-void KvApp::useMessage(std::ostream &os)
-{
-	os << "Use: \n\n";
+void KvApp::useMessage(std::ostream &os) {
+  os << "Use: \n\n";
 }
 
-void KvApp::printUseMsgAndExit(int exitStatus)
-{
-	cout << "Standard kvalobs configuration options:\n";
-	cout << "\t\t--kv-cnspath <path>    The path in CORBA nameserver.\n";
-	cout << "\t\t--kv-cnserver <host>   Use the CORBA nameserver at <host>.\n";
-	cout
-			<< "\t\t--kv-config <filename> Read the configuration file <filename>\n"
-			<< "\t\t                       instead of the kvalobs.conf\n";
-	cout << "\t\t--help Print this help message and exit!\n\n";
+void KvApp::printUseMsgAndExit(int exitStatus) {
+  cout << "Standard kvalobs configuration options:\n";
+  cout << "\t\t--kv-cnspath <path>    The path in CORBA nameserver.\n";
+  cout << "\t\t--kv-cnserver <host>   Use the CORBA nameserver at <host>.\n";
+  cout << "\t\t--kv-config <filename> Read the configuration file <filename>\n"
+       << "\t\t                       instead of the kvalobs.conf\n";
+  cout << "\t\t--help Print this help message and exit!\n\n";
 
-	exit(exitStatus);
+  exit(exitStatus);
 }
 
-std::string KvApp::createPidFileName(const std::string &progname)
-{
-	std::string path(kvPath("rundir"));
-	return dnmi::file::createPidFileName(path, progname);
+std::string KvApp::createPidFileName(const std::string &progname) {
+  std::string path(kvPath("rundir"));
+  return dnmi::file::createPidFileName(path, progname);
 }
 
-void KvApp::createPidFile(const std::string &progname)
-{
-	FILE *fd;
+void KvApp::createPidFile(const std::string &progname) {
+  FILE *fd;
 
-	pidfile = createPidFileName(progname);
+  pidfile = createPidFileName(progname);
 
-	LOGINFO("Writing pid to file <" << pidfile << ">!");
+  LOGINFO("Writing pid to file <" << pidfile << ">!");
 
-	fd = fopen(pidfile.c_str(), "w");
+  fd = fopen(pidfile.c_str(), "w");
 
-	if (!fd)
-	{
-		LOGWARN("Can't create pidfile <" << pidfile << ">!\n");
-		pidfile.erase();
-		return;
-	}
+  if (!fd) {
+    LOGWARN("Can't create pidfile <" << pidfile << ">!\n");
+    pidfile.erase();
+    return;
+  }
 
-	fprintf(fd, "%ld\n", (long) getpid());
-	fclose(fd);
+  fprintf(fd, "%ld\n", (long) getpid());
+  fclose(fd);
 }
 
-void KvApp::deletePidFile()
-{
-	if (pidfile.empty())
-		return;
+void KvApp::deletePidFile() {
+  if (pidfile.empty())
+    return;
 
-	LOGINFO("Deleting pidfile <" << pidfile << ">!");
+  LOGINFO("Deleting pidfile <" << pidfile << ">!");
 
-	unlink(pidfile.c_str());
+  unlink(pidfile.c_str());
 }
 
 std::string KvApp::createConnectString(const std::string &dbname,
-		const std::string &kvdbuser, const std::string &host,
-		const std::string &port)
-{
+                                       const std::string &kvdbuser,
+                                       const std::string &host,
+                                       const std::string &port) {
 
-	char *buf;
-	stringstream ost;
-	ConfSection *myConf = KvApp::getConfiguration();
+  char *buf;
+  stringstream ost;
+  ConfSection *myConf = KvApp::getConfiguration();
 
-	if (myConf)
-	{
-		ValElementList val = myConf->getValue("database.dbconnect");
+  if (myConf) {
+    ValElementList val = myConf->getValue("database.dbconnect");
 
-		if (val.size() == 1)
-		{
-			LOGINFO("Using 'database.dbconnect' from configuration file");
-			return val[0].valAsString();
-		}
-	}
+    if (val.size() == 1) {
+      LOGINFO("Using 'database.dbconnect' from configuration file");
+      return val[0].valAsString();
+    }
+  }
 
-	ost << "dbname=";
+  ost << "dbname=";
 
-	if (dbname.empty())
-	{
-		buf = getenv("KVDB");
+  if (dbname.empty()) {
+    buf = getenv("KVDB");
 
-		if (buf)
-		{
-			ost << buf;
-		}
-		else
-		{
-			ost << "kvalobs ";
-		}
-	}
-	else
-		ost << dbname;
+    if (buf) {
+      ost << buf;
+    } else {
+      ost << "kvalobs ";
+    }
+  } else
+    ost << dbname;
 
-	ost << " ";
+  ost << " ";
 
-	if (host.empty())
-	{
-		buf = getenv("PGHOST");
+  if (host.empty()) {
+    buf = getenv("PGHOST");
 
-		if (buf)
-		{
-			ost << "host=" << buf << " ";
-		}
-	}
-	else
-		ost << "host=" << host << " ";
+    if (buf) {
+      ost << "host=" << buf << " ";
+    }
+  } else
+    ost << "host=" << host << " ";
 
-	if (port.empty())
-	{
-		buf = getenv("PGPORT");
+  if (port.empty()) {
+    buf = getenv("PGPORT");
 
-		if (buf)
-		{
-			ost << "port=" << buf << " ";
-		}
-	}
-	else
-		ost << "port=" << port << " ";
+    if (buf) {
+      ost << "port=" << buf << " ";
+    }
+  } else
+    ost << "port=" << port << " ";
 
-	if (kvdbuser.empty())
-	{
-		buf = getenv("KVDBUSER");
+  if (kvdbuser.empty()) {
+    buf = getenv("KVDBUSER");
 
-		if (buf)
-		{
-			ost << "user=" << buf << " ";
-		}
-		else
-			ost << "user=kvalobs ";
-	}
-	else
-		ost << "user=" << kvdbuser << " ";
+    if (buf) {
+      ost << "user=" << buf << " ";
+    } else
+      ost << "user=kvalobs ";
+  } else
+    ost << "user=" << kvdbuser << " ";
 
-	return ost.str();
+  return ost.str();
 }
 
 miutil::conf::ConfSection*
-KvApp::getConfiguration()
-{
-	if (!KvApp::conf) {
-		KvApp::conf = confLoader();
+KvApp::getConfiguration() {
+  if (!KvApp::conf) {
+    KvApp::conf = confLoader();
 
-		if( conf )
-		    globalLogLevel = getLogLevel( "", conf);
-	}
+    if (conf)
+      globalLogLevel = getLogLevel("", conf);
+  }
 
-	return conf;
+  return conf;
 }
 
-milog::LogLevel
-KvApp::
-getLogLevel( const std::string &section, miutil::conf::ConfSection *conf )
-{
-    string key;
+milog::LogLevel KvApp::getLogLevel(const std::string &section,
+                                   miutil::conf::ConfSection *conf) {
+  string key;
 
-    if( ! conf )
-        conf = getConfiguration();
+  if (!conf)
+    conf = getConfiguration();
 
-    milog::LogLevel ll = ::getLoglevel( conf, section );
+  milog::LogLevel ll = ::getLoglevel(conf, section);
 
-    if( ll == milog::NOTSET )
-        ll = milog::WARN;
+  if (ll == milog::NOTSET)
+    ll = milog::WARN;
 
-    return ll;
+  return ll;
 }
 
-std::string KvApp::getConfFile(const std::string &ifNotSetReturn)
-{
-	if (confFile.empty())
-		return ifNotSetReturn;
+std::string KvApp::getConfFile(const std::string &ifNotSetReturn) {
+  if (confFile.empty())
+    return ifNotSetReturn;
 
-	return confFile;
+  return confFile;
 }
 
-void KvApp::setConfFile(const std::string &filename)
-{
-	confFile = filename;
+void KvApp::setConfFile(const std::string &filename) {
+  confFile = filename;
 }
 
-namespace
-{
+namespace {
 ConfSection*
-confLoader()
-{
-	ConfParser parser;
-	string conffile;
-	ConfSection *conf;
-	ifstream fis;
+confLoader() {
+  ConfParser parser;
+  string conffile;
+  ConfSection *conf;
+  ifstream fis;
 
-	conffile = KvApp::getConfFile();
+  conffile = KvApp::getConfFile();
 
-	if (!conffile.empty() && conffile[0] != '/')
-		conffile = kvPath("sysconfdir") + "/" + KvApp::getConfFile();
+  if (!conffile.empty() && conffile[0] != '/')
+    conffile = kvPath("sysconfdir") + "/" + KvApp::getConfFile();
 
-	fis.open(conffile.c_str());
+  fis.open(conffile.c_str());
 
-	if (!fis)
-	{
-		LOGERROR(
-				"Cant open the configuration file <" << conffile << ">!" << endl);
-	}
-	else
-	{
-		LOGINFO(
-				"Reading configuration from file <" << conffile << ">!" << endl);
-		conf = parser.parse(fis);
+  if (!fis) {
+    LOGERROR("Cant open the configuration file <" << conffile << ">!" << endl);
+  } else {
+    LOGINFO("Reading configuration from file <" << conffile << ">!" << endl);
+    conf = parser.parse(fis);
 
-		if (!conf)
-		{
-			LOGERROR(
-					"Error while reading configuration file: <" << conffile << ">!" << endl << parser.getError() << endl);
-		}
-		else
-		{
-			LOGINFO("Configuration file loaded!\n");
-			return conf;
-		}
-	}
+    if (!conf) {
+      LOGERROR(
+          "Error while reading configuration file: <" << conffile << ">!" << endl << parser.getError() << endl);
+    } else {
+      LOGINFO("Configuration file loaded!\n");
+      return conf;
+    }
+  }
 
-	return 0;
+  return 0;
 }
 
-std::string getAppName(const std::string &progname)
-{
-	std::string name(progname);
-	std::string::size_type i;
+std::string getAppName(const std::string &progname) {
+  std::string name(progname);
+  std::string::size_type i;
 
-	i = name.find_last_of("/");
+  i = name.find_last_of("/");
 
-	if (i != string::npos)
-		name.erase(0, i + 1);
+  if (i != string::npos)
+    name.erase(0, i + 1);
 
-	i = name.find_first_of('.');
+  i = name.find_first_of('.');
 
-	if (i != string::npos)
-		name.erase(i);
+  if (i != string::npos)
+    name.erase(i);
 
-	return name;
+  return name;
 }
 
 }

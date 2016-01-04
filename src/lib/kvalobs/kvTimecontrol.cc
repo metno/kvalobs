@@ -33,86 +33,70 @@
 
 using namespace std;
 
-std::string kvalobs::kvTimecontrol::toSend() const
-{
-	ostringstream ost;
-	ost << "(" << fromday_ << "," << today_ << "," << time_ << "," << priority_
-			<< "," << quoted(qcx_) << ")";
+std::string kvalobs::kvTimecontrol::toSend() const {
+  ostringstream ost;
+  ost << "(" << fromday_ << "," << today_ << "," << time_ << "," << priority_
+      << "," << quoted(qcx_) << ")";
 
-	return ost.str();
+  return ost.str();
 }
 
 bool kvalobs::kvTimecontrol::set(int fromday__, int today__, int time__,
-		int priority__, const std::string& qcx__)
-{
-	fromday_ = fromday__;
-	today_ = today__;
-	time_ = time__;
-	priority_ = priority__;
-	qcx_ = qcx__;
+                                 int priority__, const std::string& qcx__) {
+  fromday_ = fromday__;
+  today_ = today__;
+  time_ = time__;
+  priority_ = priority__;
+  qcx_ = qcx__;
 
-	std::ostringstream s;
-	s << fromday_;
-	s << today_;
-	s << time_;
-	sortBy_ = s.str();
-	return true;
+  std::ostringstream s;
+  s << fromday_;
+  s << today_;
+  s << time_;
+  sortBy_ = s.str();
+  return true;
 }
 
-bool kvalobs::kvTimecontrol::set(const dnmi::db::DRow& r_)
-{
-	dnmi::db::DRow &r = const_cast<dnmi::db::DRow&>(r_);
-	string buf;
-	list<string> names = r.getFieldNames();
-	list<string>::iterator it = names.begin();
+bool kvalobs::kvTimecontrol::set(const dnmi::db::DRow& r_) {
+  dnmi::db::DRow &r = const_cast<dnmi::db::DRow&>(r_);
+  string buf;
+  list<string> names = r.getFieldNames();
+  list<string>::iterator it = names.begin();
 
-	for (; it != names.end(); it++)
-	{
-		try
-		{
-			buf = r[*it];
-			if (*it == "fromday")
-			{
-				fromday_ = atoi(buf.c_str());
-			}
-			else if (*it == "today")
-			{
-				today_ = atoi(buf.c_str());
-			}
-			else if (*it == "time")
-			{
-				time_ = atoi(buf.c_str());
-			}
-			else if (*it == "priority")
-			{
-				priority_ = atoi(buf.c_str());
-			}
-			else if (*it == "qcx")
-			{
-				qcx_ = buf;
-			}
-		} catch (...)
-		{
-			CERR("kvTimeControl: exception ..... \n");
-		}
-	}
+  for (; it != names.end(); it++) {
+    try {
+      buf = r[*it];
+      if (*it == "fromday") {
+        fromday_ = atoi(buf.c_str());
+      } else if (*it == "today") {
+        today_ = atoi(buf.c_str());
+      } else if (*it == "time") {
+        time_ = atoi(buf.c_str());
+      } else if (*it == "priority") {
+        priority_ = atoi(buf.c_str());
+      } else if (*it == "qcx") {
+        qcx_ = buf;
+      }
+    } catch (...) {
+      CERR("kvTimeControl: exception ..... \n");
+    }
+  }
 
-	std::ostringstream s;
-	s << fromday_;
-	s << today_;
-	s << time_;
-	sortBy_ = s.str();
+  std::ostringstream s;
+  s << fromday_;
+  s << today_;
+  s << time_;
+  sortBy_ = s.str();
 
-	return true;
+  return true;
 }
 
-std::string kvalobs::kvTimecontrol::uniqueKey() const
-{
-	ostringstream ost;
+std::string kvalobs::kvTimecontrol::uniqueKey() const {
+  ostringstream ost;
 
-	ost << " WHERE fromday=" << fromday_ << " AND " << "       today=" << today_
-			<< " AND " << "       time=" << time_ << " AND "
-			<< "       priority=" << priority_;
+  ost << " WHERE fromday=" << fromday_ << " AND " << "       today=" << today_
+      << " AND " << "       time=" << time_ << " AND " << "       priority="
+      << priority_;
 
-	return ost.str();
+  return ost.str();
 }

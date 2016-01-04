@@ -38,8 +38,7 @@
  * at Mon Sep 20 13:25:16 2004
  */
 
-namespace kvalobs
-{
+namespace kvalobs {
 
 /**
  * \addtogroup  dbinterface
@@ -51,111 +50,99 @@ namespace kvalobs
  * \brief Interface to the table workque and workstatistik in the kvalobs database.
  */
 
-class kvWorkelement: public kvDbBase
-{
-private:
-	int stationid_;
-	boost::posix_time::ptime obstime_;
-	int typeid_;
-	boost::posix_time::ptime tbtime_;
-	int priority_;
-	boost::posix_time::ptime process_start_;
-	boost::posix_time::ptime qa_start_;
-	boost::posix_time::ptime qa_stop_;
-	boost::posix_time::ptime service_start_;
-	boost::posix_time::ptime service_stop_;
+class kvWorkelement : public kvDbBase {
+ private:
+  int stationid_;
+  boost::posix_time::ptime obstime_;
+  int typeid_;
+  boost::posix_time::ptime tbtime_;
+  int priority_;
+  boost::posix_time::ptime process_start_;
+  boost::posix_time::ptime qa_start_;
+  boost::posix_time::ptime qa_stop_;
+  boost::posix_time::ptime service_start_;
+  boost::posix_time::ptime service_stop_;
 
-	void createSortIndex();
+  void createSortIndex();
 
-public:
-	kvWorkelement()
-	{
-	}
-	kvWorkelement(const dnmi::db::DRow &r)
-	{
-		set(r);
-	}
-	kvWorkelement(int sid, const boost::posix_time::ptime &obt, int tid,
-			const boost::posix_time::ptime &tbt, int pri,
-			const boost::posix_time::ptime &process_start, const boost::posix_time::ptime &qa_start,
-			const boost::posix_time::ptime &qa_stop, const boost::posix_time::ptime &service_start,
-			const boost::posix_time::ptime &service_stop)
-	{
-		set(sid, obt, tid, tbt, pri, process_start, qa_start, qa_stop,
-				service_start, service_stop);
-	}
+ public:
+  kvWorkelement() {
+  }
+  kvWorkelement(const dnmi::db::DRow &r) {
+    set(r);
+  }
+  kvWorkelement(int sid, const boost::posix_time::ptime &obt, int tid,
+                const boost::posix_time::ptime &tbt, int pri,
+                const boost::posix_time::ptime &process_start,
+                const boost::posix_time::ptime &qa_start,
+                const boost::posix_time::ptime &qa_stop,
+                const boost::posix_time::ptime &service_start,
+                const boost::posix_time::ptime &service_stop) {
+    set(sid, obt, tid, tbt, pri, process_start, qa_start, qa_stop,
+        service_start, service_stop);
+  }
 
-	bool valid() const
-	{
-		return !sortBy_.empty();
-	}
+  bool valid() const {
+    return !sortBy_.empty();
+  }
 
-	kvWorkelement(const kvWorkelement &we);
+  kvWorkelement(const kvWorkelement &we);
 
-	kvWorkelement& operator=(const kvWorkelement &rhs);
+  kvWorkelement& operator=(const kvWorkelement &rhs);
 
-	bool set(int sid, const boost::posix_time::ptime &obt, int tid,
-			const boost::posix_time::ptime &tbt, int pri,
-			const boost::posix_time::ptime &process_start, const boost::posix_time::ptime &qa_start,
-			const boost::posix_time::ptime &qa_stop, const boost::posix_time::ptime &service_start,
-			const boost::posix_time::ptime &service_stop);
+  bool set(int sid, const boost::posix_time::ptime &obt, int tid,
+           const boost::posix_time::ptime &tbt, int pri,
+           const boost::posix_time::ptime &process_start,
+           const boost::posix_time::ptime &qa_start,
+           const boost::posix_time::ptime &qa_stop,
+           const boost::posix_time::ptime &service_start,
+           const boost::posix_time::ptime &service_stop);
 
-	bool set(const dnmi::db::DRow&);
+  bool set(const dnmi::db::DRow&);
 
-	const char* tableName() const
-	{
-		return "workque";
-	}
-	std::string toSend() const;
-	std::string toUpdate() const;
-	std::string uniqueKey() const;
+  const char* tableName() const {
+    return "workque";
+  }
+  std::string toSend() const;
+  std::string toUpdate() const;
+  std::string uniqueKey() const;
 
-	int stationID() const
-	{
-		return stationid_;
-	}
-	const boost::posix_time::ptime & obstime() const
-	{
-		return obstime_;
-	}
-	int typeID() const
-	{
-		return typeid_;
-	}
-	const boost::posix_time::ptime & tbtime() const
-	{
-		return tbtime_;
-	}
-	int priority() const
-	{
-		return priority_;
-	}
-	const boost::posix_time::ptime & process_start() const
-	{
-		return process_start_;
-	}
-	const boost::posix_time::ptime & qa_start() const
-	{
-		return qa_start_;
-	}
-	const boost::posix_time::ptime & qa_stop() const
-	{
-		return qa_stop_;
-	}
-	const boost::posix_time::ptime & service_start() const
-	{
-		return service_start_;
-	}
-	const boost::posix_time::ptime & service_stop() const
-	{
-		return service_stop_;
-	}
+  int stationID() const {
+    return stationid_;
+  }
+  const boost::posix_time::ptime & obstime() const {
+    return obstime_;
+  }
+  int typeID() const {
+    return typeid_;
+  }
+  const boost::posix_time::ptime & tbtime() const {
+    return tbtime_;
+  }
+  int priority() const {
+    return priority_;
+  }
+  const boost::posix_time::ptime & process_start() const {
+    return process_start_;
+  }
+  const boost::posix_time::ptime & qa_start() const {
+    return qa_start_;
+  }
+  const boost::posix_time::ptime & qa_stop() const {
+    return qa_stop_;
+  }
+  const boost::posix_time::ptime & service_start() const {
+    return service_start_;
+  }
+  const boost::posix_time::ptime & service_stop() const {
+    return service_stop_;
+  }
 
-	void process_start(const boost::posix_time::ptime &start);
-	void qa_start(const boost::posix_time::ptime &start);
-	void qa_stop(const boost::posix_time::ptime &stop);
-	void service_start(const boost::posix_time::ptime &start);
-	void service_stop(const boost::posix_time::ptime &stop);
+  void process_start(const boost::posix_time::ptime &start);
+  void qa_start(const boost::posix_time::ptime &start);
+  void qa_stop(const boost::posix_time::ptime &stop);
+  void service_start(const boost::posix_time::ptime &start);
+  void service_stop(const boost::posix_time::ptime &stop);
 };
 
 /** @} */

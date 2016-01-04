@@ -33,16 +33,13 @@
 #include <db/DatabaseAccess.h>
 #include <memory>
 
-
-namespace qabase
-{
+namespace qabase {
 
 /**
  * \defgroup group_control Controlling classes
  *
  * Classes for controlling check running.
  */
-
 
 /**
  * Controls the running of checks.
@@ -54,83 +51,83 @@ namespace qabase
  *
  * \ingroup group_control
  */
-class CheckRunner
-{
-public:
+class CheckRunner {
+ public:
 
-	/**
-	 * Create CheckRunner instance.
-	 *
-	 * @param database The database connection, where data will both be read
-	 * and written, as required by the checks. Note that the CheckRunner class
-	 * will itself take care of database caching, so from here there is no
-	 * point in thinking of that.
-	 */
-	explicit CheckRunner(std::shared_ptr<db::DatabaseAccess> database);
+  /**
+   * Create CheckRunner instance.
+   *
+   * @param database The database connection, where data will both be read
+   * and written, as required by the checks. Note that the CheckRunner class
+   * will itself take care of database caching, so from here there is no
+   * point in thinking of that.
+   */
+  explicit CheckRunner(std::shared_ptr<db::DatabaseAccess> database);
 
-	static std::shared_ptr<CheckRunner> create(const std::string & dbConnect);
+  static std::shared_ptr<CheckRunner> create(const std::string & dbConnect);
 
-	~CheckRunner();
+  ~CheckRunner();
 
-	typedef std::list<kvalobs::kvData> DataList;
-	typedef std::shared_ptr<DataList> DataListPtr;
+  typedef std::list<kvalobs::kvData> DataList;
+  typedef std::shared_ptr<DataList> DataListPtr;
 
-	/**
-	 * Signal that a new observation is ready for being checked. Checks will
-	 * immediately start running.
-	 *
-	 * @param obs The observation that we want to check.
-	 * @param scriptLog Where to log scripts and script results. Nothing will
-	 *                  be logged if scripLog is NULL.
-	 */
-	DataListPtr newObservation(const kvalobs::kvStationInfo & obs, std::ostream * scriptLog = 0);
+  /**
+   * Signal that a new observation is ready for being checked. Checks will
+   * immediately start running.
+   *
+   * @param obs The observation that we want to check.
+   * @param scriptLog Where to log scripts and script results. Nothing will
+   *                  be logged if scripLog is NULL.
+   */
+  DataListPtr newObservation(const kvalobs::kvStationInfo & obs,
+                             std::ostream * scriptLog = 0);
 
-	/**
-	 * Set a filter for checks to run. The given input should be an iterator
-	 * pair to a list of strings. Only checks with qcx (e.g QC1-1-42) in this
-	 * list will be run.
-	 *
-	 * @param qcxFrom start iterator to a list of strings with qcx sepcification
-	 * @param qcxTo end iterator to a list of strings with qcx sepcification
-	 */
-	template<class Iterator>
-	void setQcxFilter(Iterator qcxFrom, Iterator qcxTo)
-	{
-		qcxFilter_.clear();
-		qcxFilter_.insert(qcxFrom, qcxTo);
-	}
+  /**
+   * Set a filter for checks to run. The given input should be an iterator
+   * pair to a list of strings. Only checks with qcx (e.g QC1-1-42) in this
+   * list will be run.
+   *
+   * @param qcxFrom start iterator to a list of strings with qcx sepcification
+   * @param qcxTo end iterator to a list of strings with qcx sepcification
+   */
+  template<class Iterator>
+  void setQcxFilter(Iterator qcxFrom, Iterator qcxTo) {
+    qcxFilter_.clear();
+    qcxFilter_.insert(qcxFrom, qcxTo);
+  }
 
-	/**
-	 * Determine if attempts to run a particular check should be performed.
-	 *
-	 * @param obs The observation which is to be checked.
-	 * @param check The check we want to consider for checking
-	 * @param expectedParameters The observation's expected parameter list
-	 * @return true if the given check should run. False otherwise
-	 */
-	bool shouldRunCheck(const kvalobs::kvStationInfo & obs,
-			const kvalobs::kvChecks & check,
-			const db::DatabaseAccess::ParameterList & expectedParameters) const;
+  /**
+   * Determine if attempts to run a particular check should be performed.
+   *
+   * @param obs The observation which is to be checked.
+   * @param check The check we want to consider for checking
+   * @param expectedParameters The observation's expected parameter list
+   * @return true if the given check should run. False otherwise
+   */
+  bool shouldRunCheck(
+      const kvalobs::kvStationInfo & obs, const kvalobs::kvChecks & check,
+      const db::DatabaseAccess::ParameterList & expectedParameters) const;
 
-private:
-	bool shouldMarkStartAndStop_();
+ private:
+  bool shouldMarkStartAndStop_();
 
-	DataListPtr checkObservation(const kvalobs::kvStationInfo & obs, std::ostream * scriptLog);
+  DataListPtr checkObservation(const kvalobs::kvStationInfo & obs,
+                               std::ostream * scriptLog);
 
-	bool shouldRunAnyChecks(const kvalobs::kvStationInfo & obs) const;
+  bool shouldRunAnyChecks(const kvalobs::kvStationInfo & obs) const;
 
-	void resetObservationDataFlags(
-			db::DatabaseAccess::DataList & observationData);
+  void resetObservationDataFlags(
+      db::DatabaseAccess::DataList & observationData);
 
-	void resetCFailed(db::DatabaseAccess::DataList & observationData);
+  void resetCFailed(db::DatabaseAccess::DataList & observationData);
 
+  bool haveAnyHqcCorrectedElements(
+      const db::DatabaseAccess::DataList & observationData) const;
 
-	bool haveAnyHqcCorrectedElements(const db::DatabaseAccess::DataList & observationData) const;
+  std::shared_ptr<db::DatabaseAccess> db_;
 
-	std::shared_ptr<db::DatabaseAccess> db_;
-
-	// If this is nonempty, only qcx checks listed here will run
-	std::set<std::string> qcxFilter_;
+  // If this is nonempty, only qcx checks listed here will run
+  std::set<std::string> qcxFilter_;
 };
 
 }

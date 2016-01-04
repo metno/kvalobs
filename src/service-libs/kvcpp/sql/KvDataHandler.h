@@ -12,28 +12,25 @@
 #include <WhichDataHelper.h>
 #include <kvdb/kvdb.h>
 
-namespace kvservice
-{
-namespace sql
-{
-namespace internal
-{
+namespace kvservice {
+namespace sql {
+namespace internal {
 
-class KvDataHandler
-{
-public:
-	explicit KvDataHandler(dnmi::db::Connection & connection1, dnmi::db::Connection & connection2, KvGetDataReceiver & dataReceiver);
-	~KvDataHandler();
+class KvDataHandler {
+ public:
+  explicit KvDataHandler(dnmi::db::Connection & connection1,
+                         dnmi::db::Connection & connection2,
+                         KvGetDataReceiver & dataReceiver);
+  ~KvDataHandler();
 
+  void operator()(const WhichDataHelper & wd);
 
-	void operator()(const WhichDataHelper & wd);
+ private:
+  std::string query_(const WhichDataHelper & wd, const std::string & table);
 
-private:
-	std::string query_(const WhichDataHelper & wd, const std::string & table);
-
-	KvGetDataReceiver & dataReceiver_;
-	dnmi::db::Connection & connection1_;
-	dnmi::db::Connection & connection2_;
+  KvGetDataReceiver & dataReceiver_;
+  dnmi::db::Connection & connection1_;
+  dnmi::db::Connection & connection2_;
 };
 
 }

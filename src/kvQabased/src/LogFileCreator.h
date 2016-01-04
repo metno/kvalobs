@@ -34,47 +34,44 @@
 #include <memory>
 #include <iosfwd>
 
-namespace kvalobs
-{
+namespace kvalobs {
 class kvStationInfo;
 }
 
-
-namespace qabase
-{
+namespace qabase {
 
 /**
  * Creates script log files.
  *
  * \ingroup group_control
  */
-class LogFileCreator
-{
-public:
+class LogFileCreator {
+ public:
 
-	/**
-	 * Initialize LogFileCreator with a base directory to use for logs.
-	 *
-	 * @param baseDirectory
-	 * @return
-	 */
-	explicit LogFileCreator(const std::string & baseDirectory);
-	~LogFileCreator();
+  /**
+   * Initialize LogFileCreator with a base directory to use for logs.
+   *
+   * @param baseDirectory
+   * @return
+   */
+  explicit LogFileCreator(const std::string & baseDirectory);
+  ~LogFileCreator();
 
-	typedef std::shared_ptr<std::ostream> LogStreamPtr;
+  typedef std::shared_ptr<std::ostream> LogStreamPtr;
 
-	/**
-	 * Create and return a file for logging
-	 *
-	 * @param observationToCheck Specification of the observation. A file path
-	 * is generated from this.
-	 * @return A pointer to a file stream where script logs may be written, or
-	 * NULL if an error occurs when opening that file.
-	 */
-	LogStreamPtr getLogStream(const kvalobs::kvStationInfo & observationToCheck) const;
+  /**
+   * Create and return a file for logging
+   *
+   * @param observationToCheck Specification of the observation. A file path
+   * is generated from this.
+   * @return A pointer to a file stream where script logs may be written, or
+   * NULL if an error occurs when opening that file.
+   */
+  LogStreamPtr getLogStream(
+      const kvalobs::kvStationInfo & observationToCheck) const;
 
-private:
-	std::string baseDirectory_;
+ private:
+  std::string baseDirectory_;
 };
 
 }

@@ -35,51 +35,43 @@
 using namespace std;
 using namespace miutil;
 
-kvalobs::kvParamset::kvParamset()
-{
+kvalobs::kvParamset::kvParamset() {
 
-	for (int i = 0; i < nparamset; i++)
-	{
-		paramset t = paramset_[i];
-		int paramsetid = t.paramsetid;
-		char * set = t.set;
-		std::string str = std::string(set);
-		vector<std::string> vstr = str.split(str);
-		m_str_paramset[paramsetid] = vstr;
-		vector<int> vi;
-		for (int k = 0; k < vstr.size(); k++)
-		{
-			int ll = atoi(vstr[k].c_str());
-			vi.push_back(ll);
-		}
+  for (int i = 0; i < nparamset; i++) {
+    paramset t = paramset_[i];
+    int paramsetid = t.paramsetid;
+    char * set = t.set;
+    std::string str = std::string(set);
+    vector<std::string> vstr = str.split(str);
+    m_str_paramset[paramsetid] = vstr;
+    vector<int> vi;
+    for (int k = 0; k < vstr.size(); k++) {
+      int ll = atoi(vstr[k].c_str());
+      vi.push_back(ll);
+    }
 
-		m_int_paramset[paramsetid] = vi;
-		add_inverse(paramsetid, vi);
-	}
+    m_int_paramset[paramsetid] = vi;
+    add_inverse(paramsetid, vi);
+  }
 
 }
 
-void kvalobs::kvParamset::add_inverse(int paramsetid, vector<int> vi)
-{
-	for (int i = 0; i < vi.size(); i++)
-	{
-		m_int_param[vi[i]].push_back(paramsetid);
-	}
+void kvalobs::kvParamset::add_inverse(int paramsetid, vector<int> vi) {
+  for (int i = 0; i < vi.size(); i++) {
+    m_int_param[vi[i]].push_back(paramsetid);
+  }
 }
 
-vector<int> kvalobs::kvParamset::get_param(int paramsetid)
-{
-	return m_int_paramset[paramsetid];
+vector<int> kvalobs::kvParamset::get_param(int paramsetid) {
+  return m_int_paramset[paramsetid];
 }
 
-vector<std::string> kvalobs::kvParamset::get_param_str(int paramsetid)
-{
-	return m_str_paramset[paramsetid];
+vector<std::string> kvalobs::kvParamset::get_param_str(int paramsetid) {
+  return m_str_paramset[paramsetid];
 }
 
-vector<int> kvalobs::kvParamset::get_paramset(int paramid)
-{
-	//NOT IMPLEMENTED YET
-	return m_int_param[paramid];
+vector<int> kvalobs::kvParamset::get_paramset(int paramid) {
+  //NOT IMPLEMENTED YET
+  return m_int_param[paramid];
 }
 

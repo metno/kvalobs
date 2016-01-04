@@ -69,105 +69,87 @@ namespace miutil {
 //    }
 //}
 
-ArgvClass::~ArgvClass()
-{
-    if(n>0)
-    {
-        for(unsigned int i=0; i<n; i++)
-            delete[] argv[i];
+ArgvClass::~ArgvClass() {
+  if (n > 0) {
+    for (unsigned int i = 0; i < n; i++)
+      delete[] argv[i];
 
-        delete[] argv;
-    }
+    delete[] argv;
+  }
 }
 
-ArgvClass::ArgvClass(const std::string &str)
-{
-    list<string> strList;
-    list<string>::iterator it;
-    unsigned int  i;
+ArgvClass::ArgvClass(const std::string &str) {
+  list<string> strList;
+  list<string>::iterator it;
+  unsigned int i;
 
-    argv=0;
-    n=0;
+  argv = 0;
+  n = 0;
 
-    split(strList, str);
+  split(strList, str);
 
-    if(strList.size()==0)
-        return;
+  if (strList.size() == 0)
+    return;
 
-    try
-    {
-        argv=new char*[strList.size()+1];
+  try {
+    argv = new char*[strList.size() + 1];
 
-        for(i=0; i<=strList.size(); i++)
-            argv[i]=0;
+    for (i = 0; i <= strList.size(); i++)
+      argv[i] = 0;
+  } catch (...) {
+    n = 0;
+    argv = 0;
+  }
+
+  try {
+    n = 0;
+    it = strList.begin();
+
+    for (; it != strList.end(); it++) {
+      argv[n] = new char[(*it).length() + 1];
+      strcpy(&(argv[n][0]), (*it).c_str());
+      n++;
     }
-    catch(...)
-    {
-        n=0;
-        argv=0;
-    }
+  } catch (...) {
+    for (i = 0; i < n; i++)
+      delete[] argv[i];
 
-    try
-    {
-        n=0;
-        it=strList.begin();
+    delete[] argv;
 
-        for(;it!=strList.end(); it++)
-        {
-            argv[n]=new char[(*it).length()+1];
-            strcpy(&(argv[n][0]),(*it).c_str());
-            n++;
-        }
-    }
-    catch(...)
-    {
-        for(i=0; i<n; i++)
-            delete[] argv[i];
-
-        delete[] argv;
-
-        n=0;
-        argv=0;
-        return;
-    }
+    n = 0;
+    argv = 0;
+    return;
+  }
 }
 
 char* const *
-ArgvClass::getArgv()
-{
-    return argv;
+ArgvClass::getArgv() {
+  return argv;
 }
 
-unsigned int    
-ArgvClass::getArgn()
-{
-    return n;
+unsigned int ArgvClass::getArgn() {
+  return n;
 }
 
-void 
-ArgvClass::split( list<string> &strList, const std::string &buf)
-{
-    std::string::const_iterator it=buf.begin();
-    std::string   tmp;
+void ArgvClass::split(list<string> &strList, const std::string &buf) {
+  std::string::const_iterator it = buf.begin();
+  std::string tmp;
 
-    strList.erase(strList.begin(), strList.end());
+  strList.erase(strList.begin(), strList.end());
 
-    while(it!=buf.end())
-    {
-        while(it!=buf.end() && *it==' ')
-            it++;
+  while (it != buf.end()) {
+    while (it != buf.end() && *it == ' ')
+      it++;
 
-        tmp="";
+    tmp = "";
 
-        while(it!=buf.end() && *it!=' ')
-        {
-            tmp+=*it;
-            it++;
-        }
-
-        strList.push_back(tmp);
+    while (it != buf.end() && *it != ' ') {
+      tmp += *it;
+      it++;
     }
-}
 
+    strList.push_back(tmp);
+  }
+}
 
 }

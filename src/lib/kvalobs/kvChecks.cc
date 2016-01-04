@@ -38,97 +38,77 @@
 using namespace std;
 using namespace dnmi;
 
-std::string kvalobs::kvChecks::toSend() const
-{
-	ostringstream ost;
-	ost << "(" << stationid_ << "," << quoted(qcx_) << ","
-			<< quoted(medium_qcx_) << "," << language_ << ","
-			<< quoted(checkname_) << "," << quoted(checksignature_) << ","
-			<< quoted(active_) << "," << quoted(fromtime_) << ")";
-	return ost.str();
+std::string kvalobs::kvChecks::toSend() const {
+  ostringstream ost;
+  ost << "(" << stationid_ << "," << quoted(qcx_) << "," << quoted(medium_qcx_)
+      << "," << language_ << "," << quoted(checkname_) << ","
+      << quoted(checksignature_) << "," << quoted(active_) << ","
+      << quoted(fromtime_) << ")";
+  return ost.str();
 }
 
-bool kvalobs::kvChecks::set(const dnmi::db::DRow &r_)
-{
-	db::DRow &r = const_cast<db::DRow&>(r_);
-	string buf;
-	list<string> names = r.getFieldNames();
-	list<string>::iterator it = names.begin();
+bool kvalobs::kvChecks::set(const dnmi::db::DRow &r_) {
+  db::DRow &r = const_cast<db::DRow&>(r_);
+  string buf;
+  list<string> names = r.getFieldNames();
+  list<string>::iterator it = names.begin();
 
-	for (; it != names.end(); it++)
-	{
-		try
-		{
-			buf = r[*it];
+  for (; it != names.end(); it++) {
+    try {
+      buf = r[*it];
 
-			if (*it == "stationid")
-			{
-				stationid_ = atoi(buf.c_str());
-			}
-			else if (*it == "qcx")
-			{
-				qcx_ = buf;
-			}
-			else if (*it == "medium_qcx")
-			{
-				medium_qcx_ = buf;
-			}
-			else if (*it == "language")
-			{
-				language_ = atoi(buf.c_str());
-			}
-			else if (*it == "checkname")
-			{
-				checkname_ = buf;
-			}
-			else if (*it == "checksignature")
-			{
-				checksignature_ = buf;
-			}
-			else if (*it == "active")
-			{
-				active_ = buf;
-			}
-			else if (*it == "fromtime")
-			{
-				fromtime_ = boost::posix_time::time_from_string_nothrow(buf);
-			}
-		} catch (...)
-		{
-			CERR("kvChecks: unexpected exception ..... \n");
-		}
-	}
-	sortBy_ = boost::lexical_cast<std::string>(stationid_);
+      if (*it == "stationid") {
+        stationid_ = atoi(buf.c_str());
+      } else if (*it == "qcx") {
+        qcx_ = buf;
+      } else if (*it == "medium_qcx") {
+        medium_qcx_ = buf;
+      } else if (*it == "language") {
+        language_ = atoi(buf.c_str());
+      } else if (*it == "checkname") {
+        checkname_ = buf;
+      } else if (*it == "checksignature") {
+        checksignature_ = buf;
+      } else if (*it == "active") {
+        active_ = buf;
+      } else if (*it == "fromtime") {
+        fromtime_ = boost::posix_time::time_from_string_nothrow(buf);
+      }
+    } catch (...) {
+      CERR("kvChecks: unexpected exception ..... \n");
+    }
+  }
+  sortBy_ = boost::lexical_cast<std::string>(stationid_);
 
-	return true;
+  return true;
 }
 
 bool kvalobs::kvChecks::set(int stationid, const std::string &qcx,
-		const std::string &medium_qcx, int language,
-		const std::string &checkname, const std::string &checksignature,
-		const std::string &active, const boost::posix_time::ptime & fromtime)
-{
-	stationid_ = stationid;
-	qcx_ = qcx;
-	medium_qcx_ = medium_qcx;
-	language_ = language;
-	checkname_ = checkname;
-	checksignature_ = checksignature;
-	active_ = active;
-	fromtime_ = fromtime;
+                            const std::string &medium_qcx, int language,
+                            const std::string &checkname,
+                            const std::string &checksignature,
+                            const std::string &active,
+                            const boost::posix_time::ptime & fromtime) {
+  stationid_ = stationid;
+  qcx_ = qcx;
+  medium_qcx_ = medium_qcx;
+  language_ = language;
+  checkname_ = checkname;
+  checksignature_ = checksignature;
+  active_ = active;
+  fromtime_ = fromtime;
 
-	sortBy_ = boost::lexical_cast<std::string>(stationid_);
+  sortBy_ = boost::lexical_cast<std::string>(stationid_);
 
-	return true;
+  return true;
 }
 
-std::string kvalobs::kvChecks::uniqueKey() const
-{
-	ostringstream ost;
+std::string kvalobs::kvChecks::uniqueKey() const {
+  ostringstream ost;
 
-	ost << " WHERE stationid=" << stationid_ << " AND " << "       qcx="
-			<< quoted(qcx_) << " AND " << "       language=" << language_
-			<< " AND " << "       fromtime=" << quoted(to_kvalobs_string(fromtime_));
+  ost << " WHERE stationid=" << stationid_ << " AND " << "       qcx="
+      << quoted(qcx_) << " AND " << "       language=" << language_ << " AND "
+      << "       fromtime=" << quoted(to_kvalobs_string(fromtime_));
 
-	return ost.str();
+  return ost.str();
 }

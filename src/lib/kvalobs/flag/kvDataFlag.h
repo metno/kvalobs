@@ -33,8 +33,7 @@
 #include <string>
 #include <iosfwd>
 
-namespace kvalobs
-{
+namespace kvalobs {
 
 /**
  * \addtogroup dbutility
@@ -51,52 +50,49 @@ namespace kvalobs
  * and UseInfo flags.
  *
  */
-class kvDataFlag
-{
-public:
-	enum
-	{
-		size = 16
-	}; /// number of 4-bit nibbles
-protected:
-	/// the actual dataflag
-	unsigned char flag_[kvDataFlag::size];
+class kvDataFlag {
+ public:
+  enum {
+    size = 16
+  };  /// number of 4-bit nibbles
+ protected:
+  /// the actual dataflag
+  unsigned char flag_[kvDataFlag::size];
 
-	/// check if legal int
-	bool legal_(const int i);
-	/// convert a HEX-character (0-9,A-F) to int
-	int chartoint_(const char c) const;
-	/// convert an int to a HEX-character
-	char inttochar_(const int i) const;
+  /// check if legal int
+  bool legal_(const int i);
+  /// convert a HEX-character (0-9,A-F) to int
+  int chartoint_(const char c) const;
+  /// convert an int to a HEX-character
+  char inttochar_(const int i) const;
 
-public:
-	/// flag is all zero's
-	kvDataFlag();
-	kvDataFlag(const std::string& s);
-	kvDataFlag(const unsigned char f[kvDataFlag::size]);
-	kvDataFlag(const kvDataFlag& df);
+ public:
+  /// flag is all zero's
+  kvDataFlag();
+  kvDataFlag(const std::string& s);
+  kvDataFlag(const unsigned char f[kvDataFlag::size]);
+  kvDataFlag(const kvDataFlag& df);
 
-	virtual ~kvDataFlag();
+  virtual ~kvDataFlag();
 
-	/// flag as string
-	std::string flagstring() const;
-	/// get one nibble as char
-	unsigned char cflag(const char index) const;
-	/// get one nibble
-	int flag(const char index) const;
-	/// set one nibble
-	void set(const char index, const int c);
-	/// clear flag
-	virtual void clear();
+  /// flag as string
+  std::string flagstring() const;
+  /// get one nibble as char
+  unsigned char cflag(const char index) const;
+  /// get one nibble
+  int flag(const char index) const;
+  /// set one nibble
+  void set(const char index, const int c);
+  /// clear flag
+  virtual void clear();
 
-	kvDataFlag& operator=(const kvDataFlag &rhs);
-	bool operator==(const kvDataFlag& rhs) const;
-	bool operator!=(const kvDataFlag& rhs) const
-	{
-		return !(*this == rhs);
-	}
-	friend std::ostream& operator<<(std::ostream& output,
-			const kvalobs::kvDataFlag& kd);
+  kvDataFlag& operator=(const kvDataFlag &rhs);
+  bool operator==(const kvDataFlag& rhs) const;
+  bool operator!=(const kvDataFlag& rhs) const {
+    return !(*this == rhs);
+  }
+  friend std::ostream& operator<<(std::ostream& output,
+                                  const kvalobs::kvDataFlag& kd);
 };
 
 }

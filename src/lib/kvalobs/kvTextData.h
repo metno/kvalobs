@@ -34,8 +34,7 @@
 #include <kvalobs/kvDbBase.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-namespace kvalobs
-{
+namespace kvalobs {
 
 /**
  * \addtogroup  dbinterface
@@ -47,76 +46,64 @@ namespace kvalobs
  * \brief Interface to the table text_data in the kvalobs database.
  */
 
-class kvTextData: public kvDbBase
-{
-private:
-	int stationid_;
-	boost::posix_time::ptime obstime_;
-	std::string original_;
-	int paramid_;
-	boost::posix_time::ptime tbtime_;
-	int typeid_;
+class kvTextData : public kvDbBase {
+ private:
+  int stationid_;
+  boost::posix_time::ptime obstime_;
+  std::string original_;
+  int paramid_;
+  boost::posix_time::ptime tbtime_;
+  int typeid_;
 
-public:
+ public:
 
-	kvTextData()
-	{
-	}
-	;
-	kvTextData(const dnmi::db::DRow& r)
-	{
-		set(r);
-	}
-	kvTextData(int sta, const boost::posix_time::ptime& obt, const std::string& org,
-			int pid, const boost::posix_time::ptime& tbt, int typ)
-	{
-		set(sta, obt, org, pid, tbt, typ);
-	}
+  kvTextData() {
+  }
+  ;
+  kvTextData(const dnmi::db::DRow& r) {
+    set(r);
+  }
+  kvTextData(int sta, const boost::posix_time::ptime& obt,
+             const std::string& org, int pid,
+             const boost::posix_time::ptime& tbt, int typ) {
+    set(sta, obt, org, pid, tbt, typ);
+  }
 
-	bool set(const dnmi::db::DRow&);
-	bool set(int sta, const boost::posix_time::ptime& obt, const std::string& org,
-			int pid, const boost::posix_time::ptime& tbt, int typ);
+  bool set(const dnmi::db::DRow&);
+  bool set(int sta, const boost::posix_time::ptime& obt, const std::string& org,
+           int pid, const boost::posix_time::ptime& tbt, int typ);
 
-	const char* tableName() const
-	{
-		return "text_data";
-	}
-	std::string toSend() const;
-	std::string uniqueKey() const;
+  const char* tableName() const {
+    return "text_data";
+  }
+  std::string toSend() const;
+  std::string uniqueKey() const;
 
-	int stationID() const
-	{
-		return stationid_;
-	}
-	const boost::posix_time::ptime & obstime() const
-	{
-		return obstime_;
-	}
-	const std::string & original() const
-	{
-		return original_;
-	}
-	int paramID() const
-	{
-		return paramid_;
-	}
-	const boost::posix_time::ptime & tbtime() const
-	{
-		return tbtime_;
-	}
-	int typeID() const
-	{
-		return typeid_;
-	}
+  int stationID() const {
+    return stationid_;
+  }
+  const boost::posix_time::ptime & obstime() const {
+    return obstime_;
+  }
+  const std::string & original() const {
+    return original_;
+  }
+  int paramID() const {
+    return paramid_;
+  }
+  const boost::posix_time::ptime & tbtime() const {
+    return tbtime_;
+  }
+  int typeID() const {
+    return typeid_;
+  }
 
-	void tbtime(const boost::posix_time::ptime &tbtime)
-	{
-		tbtime_ = tbtime;
-	}
-	void typeID(int t)
-	{
-		typeid_ = t;
-	}
+  void tbtime(const boost::posix_time::ptime &tbtime) {
+    tbtime_ = tbtime;
+  }
+  void typeID(int t) {
+    typeid_ = t;
+  }
 };
 
 /** @} */

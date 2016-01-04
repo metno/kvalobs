@@ -29,31 +29,24 @@
 
 #include "ScriptInput.h"
 
-namespace scriptrunner
-{
+namespace scriptrunner {
 
-ScriptInput::ScriptInput()
-{
+ScriptInput::ScriptInput() {
 }
 
-ScriptInput::ScriptInput(const std::string & name) :
-		name_(name)
-{
+ScriptInput::ScriptInput(const std::string & name)
+    : name_(name) {
 }
 
-ScriptInput::~ScriptInput()
-{
+ScriptInput::~ScriptInput() {
 }
 
-void ScriptInput::add(const std::string & name, double value)
-{
-	numeric_[name] = value;
+void ScriptInput::add(const std::string & name, double value) {
+  numeric_[name] = value;
 }
 
-void ScriptInput::add(const std::string & name, const std::string & value)
-{
-	strings_[name] = value;
+void ScriptInput::add(const std::string & name, const std::string & value) {
+  strings_[name] = value;
 }
-
 
 }

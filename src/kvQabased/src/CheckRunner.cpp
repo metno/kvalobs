@@ -40,433 +40,381 @@
 #include <iterator>
 #include <new>
 
-namespace qabase
-{
+namespace qabase {
 
-CheckRunner::CheckRunner(std::shared_ptr<db::DatabaseAccess> database) :
-		      db_(database)
-{
+CheckRunner::CheckRunner(std::shared_ptr<db::DatabaseAccess> database)
+    : db_(database) {
 }
 
-std::shared_ptr<CheckRunner> CheckRunner::create(const std::string & dbConnect)
-{
-	LOGDEBUG("Connecting to database: " << dbConnect);
-	auto db = std::make_shared<db::KvalobsDatabaseAccess>(dbConnect);
-	return std::make_shared<qabase::CheckRunner>(db);
+std::shared_ptr<CheckRunner> CheckRunner::create(
+    const std::string & dbConnect) {
+  LOGDEBUG("Connecting to database: " << dbConnect);
+  auto db = std::make_shared < db::KvalobsDatabaseAccess > (dbConnect);
+  return std::make_shared < qabase::CheckRunner > (db);
 }
 
-CheckRunner::~CheckRunner()
-{
+CheckRunner::~CheckRunner() {
 }
 
-namespace
-{
-struct have_typeid : std::unary_function<kvalobs::kvData, bool>
-{
-   int type_;
-   have_typeid(int typeID) : type_(typeID) {}
-   bool operator () (const kvalobs::kvData & d) const
-   {
-      return d.typeID() == type_;
-   }
+namespace {
+struct have_typeid : std::unary_function<kvalobs::kvData, bool> {
+  int type_;
+  have_typeid(int typeID)
+      : type_(typeID) {
+  }
+  bool operator ()(const kvalobs::kvData & d) const {
+    return d.typeID() == type_;
+  }
 };
 
 /**
-* Start a transaction that will be rolled back upon object destruction,
-* unless it has been explicitly committed first.
-*/
-class AutoRollbackTransaction
-{
-public:
-   explicit AutoRollbackTransaction(db::DatabaseAccess & db) :
-   db_(db), committed_(false)
-   {
-      db_.beginTransaction();
-   }
-   ~AutoRollbackTransaction()
-   {
-      if ( not committed_ )
-      {
-         try
-         {
-            db_.rollback();
-         }
-         catch ( std::exception & )
-         {
-            milog::LogContext context("transaction");
-            LOGWARN("Error when attempting to rollback.");
-         }
+ * Start a transaction that will be rolled back upon object destruction,
+ * unless it has been explicitly committed first.
+ */
+class AutoRollbackTransaction {
+ public:
+  explicit AutoRollbackTransaction(db::DatabaseAccess & db)
+      : db_(db),
+        committed_(false) {
+    db_.beginTransaction();
+  }
+  ~AutoRollbackTransaction() {
+    if (not committed_) {
+      try {
+        db_.rollback();
+      } catch (std::exception &) {
+        milog::LogContext context("transaction");
+        LOGWARN("Error when attempting to rollback.");
       }
-   }
-   void commit()
-   {
-      db_.commit();
-      committed_ = true;
-   }
-private:
-   db::DatabaseAccess & db_;
-   bool committed_;
+    }
+  }
+  void commit() {
+    db_.commit();
+    committed_ = true;
+  }
+ private:
+  db::DatabaseAccess & db_;
+  bool committed_;
 };
 
-void
-logTransaction( bool ok,
-                double start,
-                int shortRetries,
-                int longRetries,
-                int aborted,
-                std::exception *ex=0)
-{
-   using namespace std;
+void logTransaction(bool ok, double start, int shortRetries, int longRetries,
+                    int aborted, std::exception *ex = 0) {
+  using namespace std;
 
-   double duration( miutil::gettimeofday() - start );
-   string extra(".");
-   string sAborted;
-   std::ostringstream sCommon;
+  double duration(miutil::gettimeofday() - start);
+  string extra(".");
+  string sAborted;
+  std::ostringstream sCommon;
 
-   if( ex ) {
-      dnmi::db::SQLException *sqlex=dynamic_cast<dnmi::db::SQLException*>(ex);
+  if (ex) {
+    dnmi::db::SQLException *sqlex = dynamic_cast<dnmi::db::SQLException*>(ex);
 
-      if( sqlex ) {
-         extra = string(" Excetion (") + typeid(*sqlex).name()+"): [" + sqlex->errorCode() + "]: " + sqlex->what() + ".";
-      } else {
-         extra = string(" Excetion (")+ typeid(*ex).name()+"): " + ex->what() + ".";
-      }
-   }
+    if (sqlex) {
+      extra = string(" Excetion (") + typeid(*sqlex).name() + "): ["
+          + sqlex->errorCode() + "]: " + sqlex->what() + ".";
+    } else {
+      extra = string(" Excetion (") + typeid(*ex).name() + "): " + ex->what()
+          + ".";
+    }
+  }
 
-   if( aborted > 0 ) {
-      std::ostringstream s;
-      s << " #aborted: " << aborted;
-      sAborted = s.str();
-   }
+  if (aborted > 0) {
+    std::ostringstream s;
+    s << " #aborted: " << aborted;
+    sAborted = s.str();
+  }
 
-   sCommon << fixed << setprecision(3) << duration <<
-         " s #swait: " << shortRetries <<
-         " #lwait: " << longRetries << sAborted <<  extra;
+  sCommon << fixed << setprecision(3) << duration << " s #swait: "
+          << shortRetries << " #lwait: " << longRetries << sAborted << extra;
 
-   if( ok ) {
-      if( shortRetries == 0 && longRetries == 0 ) {
-         IDLOGINFO( "transaction", "SUCCESS duration: " << sCommon.str() );
-      } else {
-         IDLOGWARN( "transaction", "SUCCESS duration: " << sCommon.str() )
-      }
-   } else {
-      IDLOGERROR("transaction", "FAILED  duration: " << sCommon.str() );
-      IDLOGERROR("failed", "FAILED duration: " << sCommon.str() );
-   }
+  if (ok) {
+    if (shortRetries == 0 && longRetries == 0) {
+      IDLOGINFO("transaction", "SUCCESS duration: " << sCommon.str());
+    } else {
+      IDLOGWARN("transaction", "SUCCESS duration: " << sCommon.str())
+    }
+  } else {
+    IDLOGERROR("transaction", "FAILED  duration: " << sCommon.str());
+    IDLOGERROR("failed", "FAILED duration: " << sCommon.str());
+  }
 }
 }
 
-CheckRunner::DataListPtr CheckRunner::newObservation(const kvalobs::kvStationInfo & obs, std::ostream * scriptLog)
-{
-   const int shortSleep=100;
-   const int longSleep=300;
-   const int nRetry=3;
-   double start;
-   int nLongRetries=0;
-   int nShortRetries=0;
-   int aborted=0;
+CheckRunner::DataListPtr CheckRunner::newObservation(
+    const kvalobs::kvStationInfo & obs, std::ostream * scriptLog) {
+  const int shortSleep = 100;
+  const int longSleep = 300;
+  const int nRetry = 3;
+  double start;
+  int nLongRetries = 0;
+  int nShortRetries = 0;
+  int aborted = 0;
 
-   std::ostringstream logContext;
-   logContext << obs.obstime() << '/' << obs.typeID() << '/' << obs.stationID();
-   milog::LogContext context(logContext.str());
+  std::ostringstream logContext;
+  logContext << obs.obstime() << '/' << obs.typeID() << '/' << obs.stationID();
+  milog::LogContext context(logContext.str());
 
-   if ( not shouldRunAnyChecks(obs) )
-   {
-      LOGDEBUG("Will not run any checks on observation: " << obs);
-      return DataListPtr(new DataList);
-   }
+  if (not shouldRunAnyChecks(obs)) {
+    LOGDEBUG("Will not run any checks on observation: " << obs);
+    return DataListPtr(new DataList);
+  }
 
-   LOGINFO("Checking " << obs);
-   start = miutil::gettimeofday();
+  LOGINFO("Checking " << obs);
+  start = miutil::gettimeofday();
 
-   // Will try up to nRetry*nRetry times in case of error
-   try
-   {
-      for ( int k = 0; k < nRetry; ++ k )
-      {
-         if( k != 0 )
-         {
-            nLongRetries++;
-            miutil::msleep( longSleep );
-         }
+  // Will try up to nRetry*nRetry times in case of error
+  try {
+    for (int k = 0; k < nRetry; ++k) {
+      if (k != 0) {
+        nLongRetries++;
+        miutil::msleep(longSleep);
+      }
 
-         for ( int i = 0; i < nRetry ; ++ i )
-         {
-            if( i != 0 )
-            {
-               nShortRetries++;
-               miutil::msleep( shortSleep );
+      for (int i = 0; i < nRetry; ++i) {
+        if (i != 0) {
+          nShortRetries++;
+          miutil::msleep(shortSleep);
+        }
+
+        try {
+          for (int i = 0; i < 256; ++i) {
+            try {
+              DataListPtr ret = checkObservation(obs, scriptLog);
+              logTransaction(true, start, nShortRetries, nLongRetries, aborted);
+              return ret;
+            } catch (dnmi::db::SQLSerializeError &) {
+              LOGWARN("Serialization error! Retrying");
             }
-
-            try
-            {
-				for ( int i = 0; i < 256; ++ i )
-				{
-					try
-					{
-					   DataListPtr ret = checkObservation(obs, scriptLog);
-					   logTransaction( true, start, nShortRetries, nLongRetries, aborted );
-					   return ret;
-					}
-					catch (dnmi::db::SQLSerializeError & )
-					{
-					   LOGWARN("Serialization error! Retrying");
-					}
-				}
-				// Happens if we get more than 256 serialization errors in a row
-				throw std::runtime_error("Serialization error!");
-            }
-            catch( const dnmi::db::SQLAborted &ex ) {
-               LOGWARN("Aborted error! Retrying Reason: " << ex.what() );
-               aborted++;
-            }
-         }
+          }
+          // Happens if we get more than 256 serialization errors in a row
+          throw std::runtime_error("Serialization error!");
+        } catch (const dnmi::db::SQLAborted &ex) {
+          LOGWARN("Aborted error! Retrying Reason: " << ex.what());
+          aborted++;
+        }
       }
+    }
 
-      // final attempt:
-      DataListPtr ret = checkObservation(obs, scriptLog);
-      logTransaction( true, start, nShortRetries, nLongRetries, aborted );
-      return ret;
-   }
-   catch ( std::exception & e )
-   {
-      logTransaction( false, start, nShortRetries, nLongRetries, aborted, &e );
-      //LOGERROR(e.what());
-      throw;
-   }
-   return DataListPtr(new DataList); // never reached
+    // final attempt:
+    DataListPtr ret = checkObservation(obs, scriptLog);
+    logTransaction(true, start, nShortRetries, nLongRetries, aborted);
+    return ret;
+  } catch (std::exception & e) {
+    logTransaction(false, start, nShortRetries, nLongRetries, aborted, &e);
+    //LOGERROR(e.what());
+    throw;
+  }
+  return DataListPtr(new DataList);  // never reached
 }
 
-bool CheckRunner::shouldMarkStartAndStop_()
-{
-	// Will not update working tables if only parts of checks are run
-	return qcxFilter_.empty();
+bool CheckRunner::shouldMarkStartAndStop_() {
+  // Will not update working tables if only parts of checks are run
+  return qcxFilter_.empty();
 }
 
-CheckRunner::DataListPtr CheckRunner::checkObservation(const kvalobs::kvStationInfo & obs, std::ostream * scriptLog)
-{
-   db::CachedDatabaseAccess cdb(db_.get(), obs);
-   db::DelayedSaveDatabaseAccess db(& cdb);
-   AutoRollbackTransaction transaction(db);
+CheckRunner::DataListPtr CheckRunner::checkObservation(
+    const kvalobs::kvStationInfo & obs, std::ostream * scriptLog) {
+  db::CachedDatabaseAccess cdb(db_.get(), obs);
+  db::DelayedSaveDatabaseAccess db(&cdb);
+  AutoRollbackTransaction transaction(db);
 
-   LOGDEBUG("Getting checks for observation");
-   db::DatabaseAccess::CheckList checkList;
-   db.getChecks(& checkList, obs);
-   LOGDEBUG1("Received " << checkList.size() << " checks to run");
+  LOGDEBUG("Getting checks for observation");
+  db::DatabaseAccess::CheckList checkList;
+  db.getChecks(&checkList, obs);
+  LOGDEBUG1("Received " << checkList.size() << " checks to run");
 
+  LOGDEBUG("Getting list of expected parameters from station");
+  db::DatabaseAccess::ParameterList expectedParameters;
+  db.getParametersToCheck(&expectedParameters, obs);
 
-   LOGDEBUG("Getting list of expected parameters from station");
-   db::DatabaseAccess::ParameterList expectedParameters;
-   db.getParametersToCheck(& expectedParameters, obs);
+  LOGDEBUG("Fetching observation data from database");
+  std::set<std::string> parametersInData;  // list of all parameters in observation data set
+  db::DatabaseAccess::DataList observationData;
+  for (db::DatabaseAccess::ParameterList::const_iterator it = expectedParameters
+      .begin(); it != expectedParameters.end(); ++it) {
+    db::DatabaseAccess::DataList d;
+    db.getData(&d, obs, *it, 0);
+    d.remove_if(std::not1(have_typeid(obs.typeID())));
+    if (not d.empty()) {
+      parametersInData.insert(*it);
+      observationData.insert(observationData.end(), d.begin(), d.end());
+    }
+  }
+  //observationData.remove_if(std::not1(have_typeid(obs.typeID())));
 
+  if (haveAnyHqcCorrectedElements(observationData)) {
+    LOGINFO("Observation is HQC-modified. Will not run tests on this");
+    return DataListPtr(new DataList);
+  }
 
-   LOGDEBUG("Fetching observation data from database");
-   std::set<std::string> parametersInData; // list of all parameters in observation data set
-   db::DatabaseAccess::DataList observationData;
-   for ( db::DatabaseAccess::ParameterList::const_iterator it = expectedParameters.begin(); it != expectedParameters.end(); ++ it )
-   {
-      db::DatabaseAccess::DataList d;
-      db.getData(& d, obs, * it, 0);
-      d.remove_if(std::not1(have_typeid(obs.typeID())));
-      if ( not d.empty() )
-      {
-         parametersInData.insert(* it);
-         observationData.insert(observationData.end(), d.begin(), d.end());
-      }
-   }
-   //observationData.remove_if(std::not1(have_typeid(obs.typeID())));
+  if (qcxFilter_.empty()) {
+    resetObservationDataFlags(observationData);
+    resetCFailed(observationData);
+    db.write(observationData);
+  }
 
-   if ( haveAnyHqcCorrectedElements(observationData) )
-   {
-      LOGINFO("Observation is HQC-modified. Will not run tests on this");
-      return DataListPtr(new DataList);
-   }
+  for (db::DatabaseAccess::CheckList::const_iterator check = checkList.begin();
+      check != checkList.end(); ++check) {
+    std::string checkName = check->checkname();
+    milog::LogContext context(checkName);
+    try {
+      bool hasAnyParametersRequiredByCheck = false;
 
-   if ( qcxFilter_.empty() )
-   {
-      resetObservationDataFlags(observationData);
-      resetCFailed(observationData);
-      db.write(observationData);
-   }
-
-   for ( db::DatabaseAccess::CheckList::const_iterator check = checkList.begin(); check != checkList.end(); ++ check )
-   {
-      std::string checkName = check->checkname();
-      milog::LogContext context(checkName);
-      try
-      {
-         bool hasAnyParametersRequiredByCheck = false;
-
-         std::string signatureString = check->checksignature();
-         CheckSignature signature(signatureString.c_str(), obs.stationID());
-         const DataRequirement * obsRequirement = signature.obs();
-         if ( obsRequirement )
-         {
-            for ( std::set<std::string>::const_iterator it = parametersInData.begin(); it != parametersInData.end(); ++ it )
-               if ( obsRequirement->haveParameter(* it) )
-               {
-                  hasAnyParametersRequiredByCheck = true;
-                  break;
-               }
-         }
-         else
+      std::string signatureString = check->checksignature();
+      CheckSignature signature(signatureString.c_str(), obs.stationID());
+      const DataRequirement * obsRequirement = signature.obs();
+      if (obsRequirement) {
+        for (std::set<std::string>::const_iterator it =
+            parametersInData.begin(); it != parametersInData.end(); ++it)
+          if (obsRequirement->haveParameter(*it)) {
             hasAnyParametersRequiredByCheck = true;
+            break;
+          }
+      } else
+        hasAnyParametersRequiredByCheck = true;
 
-         if ( hasAnyParametersRequiredByCheck and shouldRunCheck(obs, * check, expectedParameters) )
-         {
-            db::DatabaseAccess::DataList modifications;
+      if (hasAnyParametersRequiredByCheck
+          and shouldRunCheck(obs, *check, expectedParameters)) {
+        db::DatabaseAccess::DataList modifications;
 
-            KvalobsCheckScript script(db, obs, * check, scriptLog);
+        KvalobsCheckScript script(db, obs, *check, scriptLog);
 
-            LOGDEBUG("Running check " << * check);
-            script.run(& modifications);
+        LOGDEBUG("Running check " << * check);
+        script.run(&modifications);
 
-            // Set new useinfo flags
-            for ( db::DatabaseAccess::DataList::iterator it = modifications.begin(); it != modifications.end(); ++ it )
-            {
-               kvalobs::kvUseInfo ui = it->useinfo();
-               ui.setUseFlags(it->controlinfo());
-               it->useinfo(ui);
-            }
+        // Set new useinfo flags
+        for (db::DatabaseAccess::DataList::iterator it = modifications.begin();
+            it != modifications.end(); ++it) {
+          kvalobs::kvUseInfo ui = it->useinfo();
+          ui.setUseFlags(it->controlinfo());
+          it->useinfo(ui);
+        }
 
-            LOGDEBUG("Check done. modification size " << modifications.size());
+        LOGDEBUG("Check done. modification size " << modifications.size());
 
-            db.write(modifications);
-         }
-         else
-            LOGDEBUG1("Skipping check " << check->qcx());
-      }
-      catch ( std::bad_alloc & e )
-      {
-         LOGFATAL(e.what());
-         throw;
-      }
-      catch ( NoErrorLogException & e )
-      {
-         LOGINFO(e.what());
-      }
-      catch( const dnmi::db::SQLException &ex )
-      {
-         //Must catch SQLException before std::exception, since
-         //SQLException is derived from std::exception.
-         //The exception is just rethrown.
-         throw;
-      }
-      catch ( std::exception & e )
-      {
-         // errors that are not related to database are merely logged, and
-         // we merely continue running next test
-         LOGERROR(e.what());
-      }
-   }
+        db.write(modifications);
+      } else
+        LOGDEBUG1("Skipping check " << check->qcx());
+    } catch (std::bad_alloc & e) {
+      LOGFATAL(e.what());
+      throw;
+    } catch (NoErrorLogException & e) {
+      LOGINFO(e.what());
+    } catch (const dnmi::db::SQLException &ex) {
+      //Must catch SQLException before std::exception, since
+      //SQLException is derived from std::exception.
+      //The exception is just rethrown.
+      throw;
+    } catch (std::exception & e) {
+      // errors that are not related to database are merely logged, and
+      // we merely continue running next test
+      LOGERROR(e.what());
+    }
+  }
 
-   DataListPtr ret(new DataList(db.uncommitted().begin(), db.uncommitted().end()));
+  DataListPtr ret(
+      new DataList(db.uncommitted().begin(), db.uncommitted().end()));
 
-   if ( scriptLog and not db.uncommitted().empty() )
-   {
-      (*scriptLog) << "Saving " << db.uncommitted().size() << " elements to database:";
-      for ( db::DelayedSaveDatabaseAccess::SavedData::const_iterator it = db.uncommitted().begin(); it != db.uncommitted().end(); ++ it )
-         (*scriptLog) << '\n' << * it;
-      (*scriptLog) << std::endl;
-   }
+  if (scriptLog and not db.uncommitted().empty()) {
+    (*scriptLog) << "Saving " << db.uncommitted().size()
+                 << " elements to database:";
+    for (db::DelayedSaveDatabaseAccess::SavedData::const_iterator it = db
+        .uncommitted().begin(); it != db.uncommitted().end(); ++it)
+      (*scriptLog) << '\n' << *it;
+    (*scriptLog) << std::endl;
+  }
 
-   transaction.commit();
-   return ret;
+  transaction.commit();
+  return ret;
 }
 
-namespace
-{
-bool isShip(const kvalobs::kvStationInfo & obs)
-{
-   // Ships get assigned a stationid higher than this
-   return obs.stationID() > 10000000;
+namespace {
+bool isShip(const kvalobs::kvStationInfo & obs) {
+  // Ships get assigned a stationid higher than this
+  return obs.stationID() > 10000000;
 }
 
-bool signatureMatchesExpectedParameters(const CheckSignature & concreteSignature,
-                                        const db::DatabaseAccess::ParameterList & expectedParameters)
-{
-   const DataRequirement * obsReq = concreteSignature.obs();
-   if (obsReq)
-   {
-      for (DataRequirement::ParameterList::const_iterator param =
-            obsReq->parameter().begin(); param != obsReq->parameter().end(); ++param)
-         if (expectedParameters.count(param->baseName()))
-            return true;
-      return false;
-   }
-   return true;
+bool signatureMatchesExpectedParameters(
+    const CheckSignature & concreteSignature,
+    const db::DatabaseAccess::ParameterList & expectedParameters) {
+  const DataRequirement * obsReq = concreteSignature.obs();
+  if (obsReq) {
+    for (DataRequirement::ParameterList::const_iterator param = obsReq
+        ->parameter().begin(); param != obsReq->parameter().end(); ++param)
+      if (expectedParameters.count(param->baseName()))
+        return true;
+    return false;
+  }
+  return true;
 }
 
 bool checkShouldRunAtThisHour(const std::string & checkActive,
-                              const kvalobs::kvStationInfo & obs)
-{
-   kvalobs::CronString cs(checkActive);
-   return cs.active(obs.obstime());
+                              const kvalobs::kvStationInfo & obs) {
+  kvalobs::CronString cs(checkActive);
+  return cs.active(obs.obstime());
 }
 }
 
-bool CheckRunner::shouldRunCheck(const kvalobs::kvStationInfo & obs,
-                                 const kvalobs::kvChecks & check,
-                                 const db::DatabaseAccess::ParameterList & expectedParameters) const
-{
-   if ( not qcxFilter_.empty() )
-      if ( qcxFilter_.find(check.qcx()) == qcxFilter_.end() )
-         return false;
-
-   if (not checkShouldRunAtThisHour(check.active(), obs))
+bool CheckRunner::shouldRunCheck(
+    const kvalobs::kvStationInfo & obs, const kvalobs::kvChecks & check,
+    const db::DatabaseAccess::ParameterList & expectedParameters) const {
+  if (not qcxFilter_.empty())
+    if (qcxFilter_.find(check.qcx()) == qcxFilter_.end())
       return false;
 
-   if ( (not isShip(obs))
-		   //or expectedParameters.empty() )
-         and not signatureMatchesExpectedParameters(CheckSignature(check.checksignature(), obs.stationID()), expectedParameters))
-      return false;
+  if (not checkShouldRunAtThisHour(check.active(), obs))
+    return false;
 
-   return true;
+  if ((not isShip(obs))
+  //or expectedParameters.empty() )
+      and not signatureMatchesExpectedParameters(
+          CheckSignature(check.checksignature(), obs.stationID()),
+          expectedParameters))
+    return false;
+
+  return true;
 }
 
-bool CheckRunner::shouldRunAnyChecks(const kvalobs::kvStationInfo & obs) const
-{
-   return obs.typeID() > 0; // not aggregated value
+bool CheckRunner::shouldRunAnyChecks(const kvalobs::kvStationInfo & obs) const {
+  return obs.typeID() > 0;  // not aggregated value
 }
 
+void CheckRunner::resetObservationDataFlags(
+    db::DatabaseAccess::DataList & observationData) {
+  for (db::DatabaseAccess::DataList::iterator it = observationData.begin();
+      it != observationData.end(); ++it) {
+    kvalobs::kvControlInfo oldCi = it->controlinfo();
 
-void CheckRunner::resetObservationDataFlags(db::DatabaseAccess::DataList & observationData)
-{
-   for ( db::DatabaseAccess::DataList::iterator it = observationData.begin(); it != observationData.end(); ++ it )
-   {
-      kvalobs::kvControlInfo oldCi = it->controlinfo();
+    kvalobs::kvControlInfo newCi;
 
-      kvalobs::kvControlInfo newCi;
+    // All flags should be 0, with a few exceptions:
+    newCi.set(kvQCFlagTypes::f_fagg, oldCi.flag(kvQCFlagTypes::f_fagg));
+    newCi.set(kvQCFlagTypes::f_fmis, oldCi.flag(kvQCFlagTypes::f_fmis));
+    newCi.set(kvQCFlagTypes::f_fd, oldCi.flag(kvQCFlagTypes::f_fd));
+    if (oldCi.flag(kvQCFlagTypes::f_fpre) == 7)
+      newCi.set(kvQCFlagTypes::f_fpre, 7);
 
-      // All flags should be 0, with a few exceptions:
-      newCi.set(kvQCFlagTypes::f_fagg, oldCi.flag(kvQCFlagTypes::f_fagg));
-      newCi.set(kvQCFlagTypes::f_fmis, oldCi.flag(kvQCFlagTypes::f_fmis));
-      newCi.set(kvQCFlagTypes::f_fd, oldCi.flag(kvQCFlagTypes::f_fd));
-      if ( oldCi.flag(kvQCFlagTypes::f_fpre) == 7 )
-         newCi.set(kvQCFlagTypes::f_fpre, 7);
+    it->controlinfo(newCi);
 
-      it->controlinfo(newCi);
-
-      kvalobs::kvUseInfo ui = it->useinfo();
-      ui.setUseFlags(newCi);
-      it->useinfo(ui);
-   }
+    kvalobs::kvUseInfo ui = it->useinfo();
+    ui.setUseFlags(newCi);
+    it->useinfo(ui);
+  }
 }
 
-void CheckRunner::resetCFailed(db::DatabaseAccess::DataList & observationData)
-{
-   for ( db::DatabaseAccess::DataList::iterator it = observationData.begin(); it != observationData.end(); ++ it )
-      it->cfailed("");
+void CheckRunner::resetCFailed(db::DatabaseAccess::DataList & observationData) {
+  for (db::DatabaseAccess::DataList::iterator it = observationData.begin();
+      it != observationData.end(); ++it)
+    it->cfailed("");
 }
 
-
-bool CheckRunner::haveAnyHqcCorrectedElements(const db::DatabaseAccess::DataList & observationData) const
-{
-   for ( db::DatabaseAccess::DataList::const_iterator it = observationData.begin(); it != observationData.end(); ++ it )
-      if ( kvalobs::hqc::hqc_touched(* it) )
-         return true;
-   return false;
+bool CheckRunner::haveAnyHqcCorrectedElements(
+    const db::DatabaseAccess::DataList & observationData) const {
+  for (db::DatabaseAccess::DataList::const_iterator it =
+      observationData.begin(); it != observationData.end(); ++it)
+    if (kvalobs::hqc::hqc_touched(*it))
+      return true;
+  return false;
 }
-
 
 }

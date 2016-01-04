@@ -1,33 +1,33 @@
 /*
-  Kvalobs - Free Quality Control Software for Meteorological Observations 
+ Kvalobs - Free Quality Control Software for Meteorological Observations 
 
-  $Id: kvDataSubscribeInfoHelper.h,v 1.2.2.3 2007/09/27 09:02:45 paule Exp $                                                       
+ $Id: kvDataSubscribeInfoHelper.h,v 1.2.2.3 2007/09/27 09:02:45 paule Exp $                                                       
 
-  Copyright (C) 2007 met.no
+ Copyright (C) 2007 met.no
 
-  Contact information:
-  Norwegian Meteorological Institute
-  Box 43 Blindern
-  0313 OSLO
-  NORWAY
-  email: kvalobs-dev@met.no
+ Contact information:
+ Norwegian Meteorological Institute
+ Box 43 Blindern
+ 0313 OSLO
+ NORWAY
+ email: kvalobs-dev@met.no
 
-  This file is part of KVALOBS
+ This file is part of KVALOBS
 
-  KVALOBS is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License as 
-  published by the Free Software Foundation; either version 2 
-  of the License, or (at your option) any later version.
-  
-  KVALOBS is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License along 
-  with KVALOBS; if not, write to the Free Software Foundation Inc., 
-  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ KVALOBS is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as 
+ published by the Free Software Foundation; either version 2 
+ of the License, or (at your option) any later version.
+ 
+ KVALOBS is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License along 
+ with KVALOBS; if not, write to the Free Software Foundation Inc., 
+ 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
 #ifndef __kvDataSubscribeInfoHelper_h__
 #define __kvDataSubscribeInfoHelper_h__
 
@@ -37,7 +37,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 
-namespace kvservice{
+namespace kvservice {
 
 /**
  * This is a helper class that can be uses to setup the sunscriber 
@@ -48,9 +48,9 @@ namespace kvservice{
  * in with help of the function  'addStationId(long stationID)'
  */
 
-class KvDataSubscribeInfoHelper{
+class KvDataSubscribeInfoHelper {
   CKvalObs::CService::DataSubscribeInfo info_;
-  
+
  public:
   /**
    * Constructor:
@@ -62,32 +62,35 @@ class KvDataSubscribeInfoHelper{
    * \param id status.
    *
    */
-  KvDataSubscribeInfoHelper(CKvalObs::CService::StatusId 
-			            id=CKvalObs::CService::All);
-  
+  KvDataSubscribeInfoHelper(CKvalObs::CService::StatusId id =
+      CKvalObs::CService::All);
+
   KvDataSubscribeInfoHelper(const KvDataSubscribeInfoHelper &info)
-    :info_(info.info_)
-    {
-    }
-  
+      : info_(info.info_) {
+  }
+
   ~KvDataSubscribeInfoHelper();
-  
-  
-  KvDataSubscribeInfoHelper& operator=(const KvDataSubscribeInfoHelper &rhs){
-    if(this!=&rhs){
-      info_=rhs.info_;
+
+  KvDataSubscribeInfoHelper& operator=(const KvDataSubscribeInfoHelper &rhs) {
+    if (this != &rhs) {
+      info_ = rhs.info_;
     }
     return *this;
   }
-  
-  CKvalObs::CService::StatusId status()const { return info_.status;}
 
-  void                         status(CKvalObs::CService::StatusId id)
-                                      { info_.status=id;}
+  CKvalObs::CService::StatusId status() const {
+    return info_.status;
+  }
 
-  CKvalObs::CService::QcIdList     qc()const { return info_.qc;}
-  
-  bool addStationId(long stationid) ;
+  void status(CKvalObs::CService::StatusId id) {
+    info_.status = id;
+  }
+
+  CKvalObs::CService::QcIdList qc() const {
+    return info_.qc;
+  }
+
+  bool addStationId(long stationid);
 
   /**
    * After which QC level do you want data from. Valid values
@@ -97,12 +100,13 @@ class KvDataSubscribeInfoHelper{
    * The default value is to callback for everey QClevel.
    */
   bool addQc(CKvalObs::CService::QcId qcId);
-  
- const CKvalObs::CService::DataSubscribeInfo* getDataSubscribeInfo()const 
-                  { return &info_;}
-  
-  friend std::ostream& operator<<(std::ostream& os, 
-				  const KvDataSubscribeInfoHelper &c);
+
+  const CKvalObs::CService::DataSubscribeInfo* getDataSubscribeInfo() const {
+    return &info_;
+  }
+
+  friend std::ostream& operator<<(std::ostream& os,
+                                  const KvDataSubscribeInfoHelper &c);
 };
 }
 #endif

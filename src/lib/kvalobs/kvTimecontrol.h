@@ -37,8 +37,7 @@
  at Mon Aug 26 14:27:59 2002 */
 /* Edited by T.Reite 9. October 2002 */
 
-namespace kvalobs
-{
+namespace kvalobs {
 
 /**
  * \addtogroup  dbinterface
@@ -50,68 +49,56 @@ namespace kvalobs
  * \brief Interface to the table timecontrol in the kvalobs database.
  */
 
-class kvTimecontrol: public kvDbBase
-{
-private:
-	int fromday_;
-	int today_;
-	int time_;
-	int priority_;
-	std::string qcx_;
+class kvTimecontrol : public kvDbBase {
+ private:
+  int fromday_;
+  int today_;
+  int time_;
+  int priority_;
+  std::string qcx_;
 
-public:
-	kvTimecontrol()
-	{
-	}
-	kvTimecontrol(const dnmi::db::DRow& r)
-	{
-		set(r);
-	}
-	kvTimecontrol(int fr, int to, int ti, int pr, const std::string& qc)
-	{
-		set(fr, to, ti, pr, qc);
-	}
+ public:
+  kvTimecontrol() {
+  }
+  kvTimecontrol(const dnmi::db::DRow& r) {
+    set(r);
+  }
+  kvTimecontrol(int fr, int to, int ti, int pr, const std::string& qc) {
+    set(fr, to, ti, pr, qc);
+  }
 
-	bool set(const dnmi::db::DRow&);
-	bool set(int, int, int, int, const std::string&);
+  bool set(const dnmi::db::DRow&);
+  bool set(int, int, int, int, const std::string&);
 
-	const char* tableName() const
-	{
-		return "timecontrol";
-	}
-	std::string toSend() const;
-	std::string uniqueKey() const;
+  const char* tableName() const {
+    return "timecontrol";
+  }
+  std::string toSend() const;
+  std::string uniqueKey() const;
 
-	int fromday() const
-	{
-		return fromday_;
-	}
-	int today() const
-	{
-		return today_;
-	}
-	int time() const
-	{
-		return time_;
-	}
-	int priority() const
-	{
-		return priority_;
-	}
-	const std::string & qcx() const
-	{
-		return qcx_;
-	}
+  int fromday() const {
+    return fromday_;
+  }
+  int today() const {
+    return today_;
+  }
+  int time() const {
+    return time_;
+  }
+  int priority() const {
+    return priority_;
+  }
+  const std::string & qcx() const {
+    return qcx_;
+  }
 
-	boost::gregorian::date fromDAY(int y = -1) const
-	{
-		return julianDayThatYear(fromday_, y);
-	}
+  boost::gregorian::date fromDAY(int y = -1) const {
+    return julianDayThatYear(fromday_, y);
+  }
 
-	boost::gregorian::date toDAY(int y = -1) const
-	{
-		return julianDayThatYear(today_, y);
-	}
+  boost::gregorian::date toDAY(int y = -1) const {
+    return julianDayThatYear(today_, y);
+  }
 
 };
 

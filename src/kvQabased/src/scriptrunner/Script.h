@@ -35,14 +35,12 @@
 #include <string>
 #include <vector>
 
-
 /**
  * Namespace for generic script creation and -running functionalty.
  *
  * \ingroup group_scriptrunner
  */
-namespace scriptrunner
-{
+namespace scriptrunner {
 /**
  * \defgroup group_scriptrunner Script running
  *
@@ -52,69 +50,67 @@ namespace scriptrunner
  * The most important classes here are Script and language::Interpreter.
  */
 
-
 /**
  * Abstraction of a script, independent of language
  *
  * \ingroup group_scriptrunner
  */
-class Script
-{
-public:
-	/**
-	 * Instatiate script with the given base script (in a specific language),
-	 * and the interpreter to use with it.
-	 *
-	 * \param baseScript Basic language-speccific definition of the script to run.
-	 * \param interpreter The language interpreter to use with this script.
-	 */
-	Script( const std::string & baseScript,
-			const language::Interpreter::Ptr & interpreter);
+class Script {
+ public:
+  /**
+   * Instatiate script with the given base script (in a specific language),
+   * and the interpreter to use with it.
+   *
+   * \param baseScript Basic language-speccific definition of the script to run.
+   * \param interpreter The language interpreter to use with this script.
+   */
+  Script(const std::string & baseScript,
+         const language::Interpreter::Ptr & interpreter);
 
-	~Script();
+  ~Script();
 
-	typedef ScriptInput Input;
+  typedef ScriptInput Input;
 
-	/**
-	 * Add a set of input variables to this script. These variables may
-	 * neither be modified nor removed after they have been added to *this.
-	 *
-	 * \note a Script may have several Input objects attached.
-	 */
-	void addInput(const Input & input)
-	{
-		input_.push_back(input);
-	}
+  /**
+   * Add a set of input variables to this script. These variables may
+   * neither be modified nor removed after they have been added to *this.
+   *
+   * \note a Script may have several Input objects attached.
+   */
+  void addInput(const Input & input) {
+    input_.push_back(input);
+  }
 
-	/**
-	 * Get the complete list of input sets.
-	 */
-	const std::vector<Input> & getInput() const
-	{
-		return input_;
-	}
+  /**
+   * Get the complete list of input sets.
+   */
+  const std::vector<Input> & getInput() const {
+    return input_;
+  }
 
-	/**
-	 * Execute *this.
-	 *
-	 * \returns the result of having run *this with the given data.
-	 */
-	RunResult run() const;
+  /**
+   * Execute *this.
+   *
+   * \returns the result of having run *this with the given data.
+   */
+  RunResult run() const;
 
-	/**
-	 * Get a this script in it's native form, as a string.
-	 */
-	std::string str() const;
+  /**
+   * Get a this script in it's native form, as a string.
+   */
+  std::string str() const;
 
-	/**
-	 * Get the base of the script, without any input variables.
-	 */
-	std::string baseScript() const { return baseScript_; }
+  /**
+   * Get the base of the script, without any input variables.
+   */
+  std::string baseScript() const {
+    return baseScript_;
+  }
 
-private:
-	const std::string baseScript_;
-	std::vector<Input> input_;
-	language::Interpreter::Ptr interpreter_;
+ private:
+  const std::string baseScript_;
+  std::vector<Input> input_;
+  language::Interpreter::Ptr interpreter_;
 };
 
 }

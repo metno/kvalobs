@@ -33,63 +33,51 @@
 
 using namespace std;
 
-std::string kvalobs::kvReferenceStation::toSend() const
-{
-	ostringstream ost;
-	ost << "(" << stationid_ << "," << paramsetid_ << "," << quoted(reference_)
-			<< ")";
-	return ost.str();
+std::string kvalobs::kvReferenceStation::toSend() const {
+  ostringstream ost;
+  ost << "(" << stationid_ << "," << paramsetid_ << "," << quoted(reference_)
+      << ")";
+  return ost.str();
 }
 
 bool kvalobs::kvReferenceStation::set(int stationid, int paramsetid,
-		const std::string& reference)
-{
-	stationid_ = stationid;
-	paramsetid_ = paramsetid;
-	reference_ = reference;
-	sortBy_ = boost::lexical_cast<std::string>(stationid_);
-	return true;
+                                      const std::string& reference) {
+  stationid_ = stationid;
+  paramsetid_ = paramsetid;
+  reference_ = reference;
+  sortBy_ = boost::lexical_cast<std::string>(stationid_);
+  return true;
 }
 
-bool kvalobs::kvReferenceStation::set(const dnmi::db::DRow& r_)
-{
-	dnmi::db::DRow &r = const_cast<dnmi::db::DRow&>(r_);
-	string buf;
-	list<string> names = r.getFieldNames();
-	list<string>::iterator it = names.begin();
+bool kvalobs::kvReferenceStation::set(const dnmi::db::DRow& r_) {
+  dnmi::db::DRow &r = const_cast<dnmi::db::DRow&>(r_);
+  string buf;
+  list<string> names = r.getFieldNames();
+  list<string>::iterator it = names.begin();
 
-	for (; it != names.end(); it++)
-	{
-		try
-		{
-			buf = r[*it];
-			if (*it == "stationid")
-			{
-				stationid_ = atoi(buf.c_str());
-			}
-			else if (*it == "paramsetid")
-			{
-				paramsetid_ = atoi(buf.c_str());
-			}
-			else if (*it == "reference")
-			{
-				reference_ = buf;
-			}
-		} catch (...)
-		{
-			CERR("kvReferenceStation: exception ..... \n");
-		}
-	}
-	sortBy_ = boost::lexical_cast<std::string>(stationid_);
-	return true;
+  for (; it != names.end(); it++) {
+    try {
+      buf = r[*it];
+      if (*it == "stationid") {
+        stationid_ = atoi(buf.c_str());
+      } else if (*it == "paramsetid") {
+        paramsetid_ = atoi(buf.c_str());
+      } else if (*it == "reference") {
+        reference_ = buf;
+      }
+    } catch (...) {
+      CERR("kvReferenceStation: exception ..... \n");
+    }
+  }
+  sortBy_ = boost::lexical_cast<std::string>(stationid_);
+  return true;
 }
 
-std::string kvalobs::kvReferenceStation::uniqueKey() const
-{
-	ostringstream ost;
+std::string kvalobs::kvReferenceStation::uniqueKey() const {
+  ostringstream ost;
 
-	ost << " WHERE stationid=" << stationid_ << " AND " << "       paramsetid="
-			<< paramsetid_;
+  ost << " WHERE stationid=" << stationid_ << " AND " << "       paramsetid="
+      << paramsetid_;
 
-	return ost.str();
+  return ost.str();
 }

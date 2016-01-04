@@ -36,8 +36,7 @@
 /* Created by DNMI/FoU/PU: j.schulze@dnmi.no
  at Tue Aug 27 08:46:16 2002 */
 
-namespace kvalobs
-{
+namespace kvalobs {
 /**
  * \addtogroup  dbinterface
  *
@@ -48,68 +47,57 @@ namespace kvalobs
  * \brief Interface to the table rejectdecode in the kvalobs database.
  */
 
-class kvRejectdecode: public kvDbBase
-{
-private:
-	std::string message_;
-	boost::posix_time::ptime tbtime_;
-	std::string decoder_;
-	std::string comment_;
-	bool fixed_;
+class kvRejectdecode : public kvDbBase {
+ private:
+  std::string message_;
+  boost::posix_time::ptime tbtime_;
+  std::string decoder_;
+  std::string comment_;
+  bool fixed_;
 
-public:
-	kvRejectdecode()
-	{
-	}
-	kvRejectdecode(const dnmi::db::DRow& r)
-	{
-		set(r);
-	}
-	kvRejectdecode(const std::string &me, const boost::posix_time::ptime &tb,
-			const std::string &decode, const std::string &comment, bool fixed =
-					false)
-	{
-		set(me, tb, decode, comment, fixed);
-	}
+ public:
+  kvRejectdecode() {
+  }
+  kvRejectdecode(const dnmi::db::DRow& r) {
+    set(r);
+  }
+  kvRejectdecode(const std::string &me, const boost::posix_time::ptime &tb,
+                 const std::string &decode, const std::string &comment,
+                 bool fixed = false) {
+    set(me, tb, decode, comment, fixed);
+  }
 
-	bool set(const dnmi::db::DRow&);
-	bool set(const std::string &message, const boost::posix_time::ptime &tbtime,
-			const std::string &decoder, const std::string &comment, bool fixed =
-					false);
+  bool set(const dnmi::db::DRow&);
+  bool set(const std::string &message, const boost::posix_time::ptime &tbtime,
+           const std::string &decoder, const std::string &comment, bool fixed =
+               false);
 
-	const char* tableName() const
-	{
-		return "rejectdecode";
-	}
-	std::string toSend() const;
-	std::string uniqueKey() const;
+  const char* tableName() const {
+    return "rejectdecode";
+  }
+  std::string toSend() const;
+  std::string uniqueKey() const;
 
-	const std::string & message() const
-	{
-		return message_;
-	}
-	const boost::posix_time::ptime & tbtime() const
-	{
-		return tbtime_;
-	}
-	const std::string & decoder() const
-	{
-		return decoder_;
-	}
-	const std::string & comment() const
-	{
-		return comment_;
-	}
+  const std::string & message() const {
+    return message_;
+  }
+  const boost::posix_time::ptime & tbtime() const {
+    return tbtime_;
+  }
+  const std::string & decoder() const {
+    return decoder_;
+  }
+  const std::string & comment() const {
+    return comment_;
+  }
 
-	void fixed(bool done)
-	{
-		fixed_ = done;
-	}
+  void fixed(bool done) {
+    fixed_ = done;
+  }
 
-	bool fixed() const
-	{
-		return fixed_;
-	}
+  bool fixed() const {
+    return fixed_;
+  }
 
 };
 

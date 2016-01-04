@@ -34,119 +34,116 @@
 using namespace kvalobs;
 using namespace std;
 
-kvalobs::StationInfoCommand::StationInfoCommand()
-{
+kvalobs::StationInfoCommand::StationInfoCommand() {
 }
 
 kvalobs::StationInfoCommand::StationInfoCommand(
-		const CKvalObs::StationInfoList &st)
+    const CKvalObs::StationInfoList &st)
 
-{
-	for (CORBA::Long i = 0; i < st.length(); i++)
-	{
-		kvStationInfoExt stationInfo(st[i].stationId, boost::posix_time::time_from_string_nothrow(std::string(st[i].obstime)),
-				st[i].typeId_);
-		stationInfoList.push_back(stationInfo);
-	}
+    {
+  for (CORBA::Long i = 0; i < st.length(); i++) {
+    kvStationInfoExt stationInfo(
+        st[i].stationId,
+        boost::posix_time::time_from_string_nothrow(std::string(st[i].obstime)),
+        st[i].typeId_);
+    stationInfoList.push_back(stationInfo);
+  }
 }
 
 kvalobs::StationInfoCommand::StationInfoCommand(
-		const CKvalObs::StationInfoExtList &st)
-{
-	for (CORBA::Long i = 0; i < st.length(); i++)
-	{
-		kvStationInfoExt stationInfo(st[i].stationId, boost::posix_time::time_from_string_nothrow(std::string(st[i].obstime)),
-				st[i].typeId_);
-		for (CORBA::Long j = 0; j < st[i].params.length(); ++j)
-			stationInfo.addParam(
-					kvStationInfoExt::Param(st[i].params[j].paramid,
-							st[i].params[j].sensor, st[i].params[j].level));
+    const CKvalObs::StationInfoExtList &st) {
+  for (CORBA::Long i = 0; i < st.length(); i++) {
+    kvStationInfoExt stationInfo(
+        st[i].stationId,
+        boost::posix_time::time_from_string_nothrow(std::string(st[i].obstime)),
+        st[i].typeId_);
+    for (CORBA::Long j = 0; j < st[i].params.length(); ++j)
+      stationInfo.addParam(
+          kvStationInfoExt::Param(st[i].params[j].paramid,
+                                  st[i].params[j].sensor,
+                                  st[i].params[j].level));
 
-		stationInfoList.push_back(stationInfo);
-	}
+    stationInfoList.push_back(stationInfo);
+  }
 
 }
 
 kvalobs::StationInfoCommand::StationInfoCommand(
-		const CKvalObs::StationInfoExt &st)
-{
-	kvStationInfoExt sti(st.stationId, boost::posix_time::time_from_string_nothrow(std::string(st.obstime)), st.typeId_);
+    const CKvalObs::StationInfoExt &st) {
+  kvStationInfoExt sti(
+      st.stationId,
+      boost::posix_time::time_from_string_nothrow(std::string(st.obstime)),
+      st.typeId_);
 
-	for (CORBA::Long i = 0; i < st.params.length(); ++i)
-		sti.addParam(
-				kvStationInfoExt::Param(st.params[i].paramid,
-						st.params[i].sensor, st.params[i].level));
+  for (CORBA::Long i = 0; i < st.params.length(); ++i)
+    sti.addParam(
+        kvStationInfoExt::Param(st.params[i].paramid, st.params[i].sensor,
+                                st.params[i].level));
 
 }
 
-kvalobs::StationInfoCommand::StationInfoCommand(const CKvalObs::StationInfo &st)
-{
-	stationInfoList.push_back(
-			kvStationInfoExt(st.stationId, boost::posix_time::time_from_string_nothrow(std::string(st.obstime)), st.typeId_));
+kvalobs::StationInfoCommand::StationInfoCommand(
+    const CKvalObs::StationInfo &st) {
+  stationInfoList.push_back(
+      kvStationInfoExt(
+          st.stationId,
+          boost::posix_time::time_from_string_nothrow(std::string(st.obstime)),
+          st.typeId_));
 }
 
-bool kvalobs::StationInfoCommand::addStationInfo(const kvStationInfo &si)
-{
-	kvStationInfoExt sti(si.stationID(), si.obstime(), si.typeID());
+bool kvalobs::StationInfoCommand::addStationInfo(const kvStationInfo &si) {
+  kvStationInfoExt sti(si.stationID(), si.obstime(), si.typeID());
 
-	try
-	{
-		stationInfoList.push_back(sti);
-		return true;
-	} catch (...)
-	{
-		return false;
-	}
+  try {
+    stationInfoList.push_back(sti);
+    return true;
+  } catch (...) {
+    return false;
+  }
 }
 
 bool kvalobs::StationInfoCommand::addStationInfo(
-		const kvStationInfoExt &stationInfo)
-{
-	try
-	{
-		stationInfoList.push_back(stationInfo);
-		return true;
-	} catch (...)
-	{
-		return false;
-	}
+    const kvStationInfoExt &stationInfo) {
+  try {
+    stationInfoList.push_back(stationInfo);
+    return true;
+  } catch (...) {
+    return false;
+  }
 }
 
-void kvalobs::StationInfoCommand::debugInfo(std::ostream &os) const
-{
-	CIkvStationInfoExtList it = stationInfoList.begin();
+void kvalobs::StationInfoCommand::debugInfo(std::ostream &os) const {
+  CIkvStationInfoExtList it = stationInfoList.begin();
 
-	os << "[StationInfoCommand: " << endl;
+  os << "[StationInfoCommand: " << endl;
 
-	for (; it != stationInfoList.end(); it++)
-		os << *it;
+  for (; it != stationInfoList.end(); it++)
+    os << *it;
 
-	os << ":StationInfoCommand]" << endl;
+  os << ":StationInfoCommand]" << endl;
 }
 
 kvalobs::kvStationInfoList&
-kvalobs::StationInfoCommand::getStationInfo()
-{
-	stationInfoListLegacy.clear();
+kvalobs::StationInfoCommand::getStationInfo() {
+  stationInfoListLegacy.clear();
 
-	for (kvStationInfoExtList::const_iterator it = stationInfoList.begin();
-			it != stationInfoList.end(); ++it)
-		stationInfoListLegacy.push_back(
-				kvStationInfo(it->stationID(), it->obstime(), it->typeID()));
+  for (kvStationInfoExtList::const_iterator it = stationInfoList.begin();
+      it != stationInfoList.end(); ++it)
+    stationInfoListLegacy.push_back(
+        kvStationInfo(it->stationID(), it->obstime(), it->typeID()));
 
-	return stationInfoListLegacy;
+  return stationInfoListLegacy;
 }
 
 const kvalobs::kvStationInfoList&
-kvalobs::StationInfoCommand::getStationInfo() const
-{
+kvalobs::StationInfoCommand::getStationInfo() const {
 
-	const_cast<kvalobs::StationInfoCommand*>(this)->stationInfoListLegacy.clear();
+  const_cast<kvalobs::StationInfoCommand*>(this)->stationInfoListLegacy.clear();
 
-	for (kvStationInfoExtList::const_iterator it = stationInfoList.begin();
-			it != stationInfoList.end(); ++it)
-		const_cast<kvalobs::StationInfoCommand*>(this)->stationInfoListLegacy.push_back(
-				kvStationInfo(it->stationID(), it->obstime(), it->typeID()));
+  for (kvStationInfoExtList::const_iterator it = stationInfoList.begin();
+      it != stationInfoList.end(); ++it)
+    const_cast<kvalobs::StationInfoCommand*>(this)->stationInfoListLegacy
+        .push_back(kvStationInfo(it->stationID(), it->obstime(), it->typeID()));
 
-	return stationInfoListLegacy;
+  return stationInfoListLegacy;
 }

@@ -132,16 +132,16 @@ class CorrectedRejectionHandler : public HandlerFunction {
 
 typedef boost::shared_ptr<HandlerFunction> hfp;
 typedef map<string, hfp> HandlerMap;
-const HandlerMap handlers_ = assign::map_list_of
-  ("KvalobsData", hfp(new KvalobsDataHandler))
-  ("station", hfp(new ValHandler("station")))
-  ("typeid",  hfp(new ValHandler("typeid")))
-  ("obstime", hfp(new ObstimeHandler()))
-  ("tbtime",  hfp(new ValHandler("tbtime")))
-  ("sensor", hfp(new ValHandler("sensor")))
-  ("level", hfp(new ValHandler("level")))
-  ("decoder", hfp(new ValHandler("decoder")))
-  ("message", hfp(new CorrectedRejectionHandler));
+const HandlerMap handlers_ = assign::map_list_of("KvalobsData",
+                                                 hfp(new KvalobsDataHandler))(
+    "station", hfp(new ValHandler("station")))("typeid",
+                                               hfp(new ValHandler("typeid")))(
+    "obstime", hfp(new ObstimeHandler()))("tbtime",
+                                          hfp(new ValHandler("tbtime")))(
+    "sensor", hfp(new ValHandler("sensor")))("level",
+                                             hfp(new ValHandler("level")))(
+    "decoder", hfp(new ValHandler("decoder")))(
+    "message", hfp(new CorrectedRejectionHandler));
 }
 
 void KvalobsDataParser::parse(const string & xml, KvalobsData & d) {
@@ -202,7 +202,7 @@ void KvalobsDataParser::on_end_element(const Glib::ustring & name) {
     data_.setMessageCorrectsThisRejection(reject);
     context_.erase("message");
     context_.erase("message/tbtime");
-  }else if (name == "tbtime")
+  } else if (name == "tbtime")
     context_.erase("tbtime");
   else if (name == "level")
     context_.erase("level");
@@ -221,10 +221,9 @@ void KvalobsDataParser::on_characters(const Glib::ustring & characters) {
     context_[currentContext_.top()] = s;
 }
 
-std::ostream& operator<<(std::ostream &o, const Stack &s )
-{
-  for( auto &&p : s)
-    o << "/"<< p;
+std::ostream& operator<<(std::ostream &o, const Stack &s) {
+  for (auto &&p : s)
+    o << "/" << p;
   o << endl;
   return o;
 }

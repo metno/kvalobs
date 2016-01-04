@@ -35,8 +35,7 @@
 #include <string>
 #include <map>
 
-namespace qabase
-{
+namespace qabase {
 class DataRequirement;
 
 /**
@@ -58,80 +57,79 @@ class DataRequirement;
  *
  * \ingroup group_db
  */
-class CheckSignature
-{
-public:
+class CheckSignature {
+ public:
 
-	/**
-	 * Initialize object with the given string.
-	 *
-	 * @throw CheckSignature::Error or DataRequirement::Invalid if error
-	 *        occurs during parsing.
-	 * @param signature the signature string to parse
-	 * @param stationid Station identifier for the signature. All all
-	 *                  requirements are implicitly for this station, in
-	 *                  addition to any other stations explicitly mentioned in
-	 *                  the signature.
-	 */
-	CheckSignature(const std::string & signature, int stationid);
+  /**
+   * Initialize object with the given string.
+   *
+   * @throw CheckSignature::Error or DataRequirement::Invalid if error
+   *        occurs during parsing.
+   * @param signature the signature string to parse
+   * @param stationid Station identifier for the signature. All all
+   *                  requirements are implicitly for this station, in
+   *                  addition to any other stations explicitly mentioned in
+   *                  the signature.
+   */
+  CheckSignature(const std::string & signature, int stationid);
 
-	/**
-	 * Initialize object with the given string.
-	 *
-	 * @throw CheckSignature::Error or DataRequirement::Invalid if error
-	 *        occurs during parsing.
-	 * @param signature the signature string to parse
-	 * @param stationid Station identifier for the signature. All all
-	 *                  requirements are implicitly for this station, in
-	 *                  addition to any other stations explicitly mentioned in
-	 *                  the signature.
-	 */
-	CheckSignature(const char * signature, int stationid);
-	~CheckSignature();
+  /**
+   * Initialize object with the given string.
+   *
+   * @throw CheckSignature::Error or DataRequirement::Invalid if error
+   *        occurs during parsing.
+   * @param signature the signature string to parse
+   * @param stationid Station identifier for the signature. All all
+   *                  requirements are implicitly for this station, in
+   *                  addition to any other stations explicitly mentioned in
+   *                  the signature.
+   */
+  CheckSignature(const char * signature, int stationid);
+  ~CheckSignature();
 
-	/**
-	 * Get obs requirements, or NULL if there are none.
-	 * @return obs part of signature
-	 */
-	const DataRequirement * obs() const;
+  /**
+   * Get obs requirements, or NULL if there are none.
+   * @return obs part of signature
+   */
+  const DataRequirement * obs() const;
 
-	/**
-	 * Get refobs requirements, or NULL if there are none.
-	 * @return refobs part of signature
-	 */
-	const DataRequirement * refobs() const;
+  /**
+   * Get refobs requirements, or NULL if there are none.
+   * @return refobs part of signature
+   */
+  const DataRequirement * refobs() const;
 
-	/**
-	 * Get model requirements, or NULL if there are none.
-	 * @return model part of signature
-	 */
-	const DataRequirement * model() const;
+  /**
+   * Get model requirements, or NULL if there are none.
+   * @return model part of signature
+   */
+  const DataRequirement * model() const;
 
-	/**
-	 * Get meta requirements, or NULL if there are none.
-	 * @return meta part of signature
-	 */
-	const DataRequirement * meta() const;
+  /**
+   * Get meta requirements, or NULL if there are none.
+   * @return meta part of signature
+   */
+  const DataRequirement * meta() const;
 
-	/**
-	 * Throw on error during parse, which are not directly related to errors
-	 * in DataRequirment.
-	 */
-	QABASE_EXCEPTION(Error);
+  /**
+   * Throw on error during parse, which are not directly related to errors
+   * in DataRequirment.
+   */
+  QABASE_EXCEPTION(Error);
 
-private:
-	void parse_(const std::string & signature, int stationid);
-	const DataRequirement * get_(const std::string & name) const;
+ private:
+  void parse_(const std::string & signature, int stationid);
+  const DataRequirement * get_(const std::string & name) const;
 
+  enum DataRequirementIdx {
+    Obs,
+    RefObs,
+    Model,
+    Meta
+  };
 
-	enum DataRequirementIdx
-	{
-		Obs, RefObs, Model, Meta
-	};
-
-	std::map<std::string, DataRequirement> requirements_;
+  std::map<std::string, DataRequirement> requirements_;
 };
-
 
 }
 

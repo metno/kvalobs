@@ -12,11 +12,8 @@
 
 namespace exechelper {
 void
-exec( miutil::SimpleSocket *pSocket,
-      const std::string &cmdstring,
-      int timeout );
+exec(miutil::SimpleSocket *pSocket, const std::string &cmdstring, int timeout);
 
 }
-
 
 #endif

@@ -35,22 +35,20 @@
 #include <memory>
 #include <string>
 
-namespace qabase
-{
+namespace qabase {
 
 // TODO Refactor into consumer and processor (last one is essentially checkrunner + post to kafka)
-class CheckRequestConsumer: public kvalobs::subscribe::KafkaConsumer
-{
-public:
+class CheckRequestConsumer : public kvalobs::subscribe::KafkaConsumer {
+ public:
   CheckRequestConsumer();
   virtual ~CheckRequestConsumer();
 
-protected:
+ protected:
   virtual void data(const char * msg, unsigned length);
   virtual void error(int code, const std::string & msg);
 
-private:
-    DataProcessor processor_;
+ private:
+  DataProcessor processor_;
 };
 
 } /* namespace qabase */

@@ -5,11 +5,10 @@
 
 namespace miutil {
 
-
 namespace socket_status_codes {
-typedef enum  {
-  NO_ERR = 0, 
-  SOCKET_CREATE_ERR, 
+typedef enum {
+  NO_ERR = 0,
+  SOCKET_CREATE_ERR,
   SOCKET_BIND_ERR,
   SOCKET_ACCEPT_ERR,
   SOCKET_LISTEN_ERR,
@@ -20,8 +19,6 @@ typedef enum  {
   NO_MEM
 } ErrorTypes;
 }
-
-
 
 /**
  * readString
@@ -40,9 +37,8 @@ typedef enum  {
  * Based on code from UNIX Network Programming
  */
 
-int 
+int
 readString(int fd, std::string &str, int timeoutInSec);
-
 
 int
 readStringExt(int fd, std::string &str, int timeoutInMillimSec);
@@ -52,7 +48,6 @@ socketGetCh(int fd, char &ch, bool &timedout, int timeoutInSec);
 
 int
 socketGetChExt(int fd, char &ch, bool &timedout, int timeoutInMillimSec);
-
 
 /**
  * writeString 
@@ -71,7 +66,7 @@ socketGetChExt(int fd, char &ch, bool &timedout, int timeoutInMillimSec);
  *
  * Based on code from UNIX Network Programming
  */
-int 
+int
 writeString(int fd, const std::string &str);
 
 int socketWriteBuf(int fd, const std::string &str);
@@ -92,7 +87,7 @@ int socketWriteBuf(int fd, const std::string &str);
  *        before we close anyway.
  *
  * \return true on success, false otherwise.
- */ 
+ */
 
 bool
 socketSetLinger(int sd, bool enable, int timeoutInSec);

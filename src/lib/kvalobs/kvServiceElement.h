@@ -38,8 +38,7 @@
  * at Tue Sep 20  20:15:16 2004
  */
 
-namespace kvalobs
-{
+namespace kvalobs {
 /**
  * \addtogroup  dbinterface
  *
@@ -50,50 +49,43 @@ namespace kvalobs
  * \brief Interface to the table service_element in the kvalobs database.
  */
 
-class kvServiceElement: public kvDbBase
-{
-private:
-	int stationid_;
-	boost::posix_time::ptime obstime_;
-	int typeid_;
+class kvServiceElement : public kvDbBase {
+ private:
+  int stationid_;
+  boost::posix_time::ptime obstime_;
+  int typeid_;
 
-	void createSortIndex();
+  void createSortIndex();
 
-public:
-	kvServiceElement();
-	kvServiceElement(const dnmi::db::DRow &r)
-	{
-		set(r);
-	}
-	kvServiceElement(int sid, const boost::posix_time::ptime &obt, int tid)
-	{
-		set(sid, obt, tid);
-	}
+ public:
+  kvServiceElement();
+  kvServiceElement(const dnmi::db::DRow &r) {
+    set(r);
+  }
+  kvServiceElement(int sid, const boost::posix_time::ptime &obt, int tid) {
+    set(sid, obt, tid);
+  }
 
-	bool set(int sid, const boost::posix_time::ptime &obt, int tid);
+  bool set(int sid, const boost::posix_time::ptime &obt, int tid);
 
-	bool set(const dnmi::db::DRow&);
+  bool set(const dnmi::db::DRow&);
 
-	const char* tableName() const
-	{
-		return "service_element";
-	}
-	std::string toSend() const;
-	std::string toUpdate() const;
-	std::string uniqueKey() const;
+  const char* tableName() const {
+    return "service_element";
+  }
+  std::string toSend() const;
+  std::string toUpdate() const;
+  std::string uniqueKey() const;
 
-	int stationID() const
-	{
-		return stationid_;
-	}
-	const boost::posix_time::ptime & obstime() const
-	{
-		return obstime_;
-	}
-	int typeID() const
-	{
-		return typeid_;
-	}
+  int stationID() const {
+    return stationid_;
+  }
+  const boost::posix_time::ptime & obstime() const {
+    return obstime_;
+  }
+  int typeID() const {
+    return typeid_;
+  }
 };
 
 /** @} */

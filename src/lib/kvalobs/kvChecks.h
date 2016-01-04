@@ -37,8 +37,7 @@
  Aug 27 2002 */
 /* Edited by T.Reite 5 jun 2003 */
 
-namespace kvalobs
-{
+namespace kvalobs {
 
 /**
  * \addtogroup  dbinterface
@@ -49,80 +48,67 @@ namespace kvalobs
 /**
  * \brief Interface to the table checks in the kvalobs database.
  */
-class kvChecks: public kvDbBase
-{
-private:
-	int stationid_;
-	std::string qcx_;
-	std::string medium_qcx_;
-	int language_;
-	std::string checkname_;
-	std::string checksignature_;
-	std::string active_;
-	boost::posix_time::ptime fromtime_;
+class kvChecks : public kvDbBase {
+ private:
+  int stationid_;
+  std::string qcx_;
+  std::string medium_qcx_;
+  int language_;
+  std::string checkname_;
+  std::string checksignature_;
+  std::string active_;
+  boost::posix_time::ptime fromtime_;
 
-public:
-	kvChecks()
-	{
-	}
-	kvChecks(const dnmi::db::DRow &r)
-	{
-		set(r);
-	}
-	kvChecks(int stationid, const std::string &qcx,
-			const std::string &medium_qcx, int language,
-			const std::string &checkname, const std::string &checksignature,
-			const std::string &active, const boost::posix_time::ptime &fromtime)
-	{
-		set(stationid, qcx, medium_qcx, language, checkname, checksignature,
-				active, fromtime);
-	}
+ public:
+  kvChecks() {
+  }
+  kvChecks(const dnmi::db::DRow &r) {
+    set(r);
+  }
+  kvChecks(int stationid, const std::string &qcx, const std::string &medium_qcx,
+           int language, const std::string &checkname,
+           const std::string &checksignature, const std::string &active,
+           const boost::posix_time::ptime &fromtime) {
+    set(stationid, qcx, medium_qcx, language, checkname, checksignature, active,
+        fromtime);
+  }
 
-	bool set(int stationid, const std::string &qcx,
-			const std::string &medium_qcx, int language,
-			const std::string &checkname, const std::string &checksignature,
-			const std::string &active, const boost::posix_time::ptime &fromtime);
+  bool set(int stationid, const std::string &qcx, const std::string &medium_qcx,
+           int language, const std::string &checkname,
+           const std::string &checksignature, const std::string &active,
+           const boost::posix_time::ptime &fromtime);
 
-	bool set(const dnmi::db::DRow&);
-	const char* tableName() const
-	{
-		return "checks";
-	}
-	std::string toSend() const;
-	std::string uniqueKey() const;
+  bool set(const dnmi::db::DRow&);
+  const char* tableName() const {
+    return "checks";
+  }
+  std::string toSend() const;
+  std::string uniqueKey() const;
 
-	int stationID() const
-	{
-		return stationid_;
-	}
-	const std::string & qcx() const
-	{
-		return qcx_;
-	}
-	const std::string & medium_qcx() const
-	{
-		return medium_qcx_;
-	}
-	int language() const
-	{
-		return language_;
-	}
-	const std::string & checkname() const
-	{
-		return checkname_;
-	}
-	const std::string & checksignature() const
-	{
-		return checksignature_;
-	}
-	const std::string & active() const
-	{
-		return active_;
-	}
-	const boost::posix_time::ptime & fromtime() const
-	{
-		return fromtime_;
-	}
+  int stationID() const {
+    return stationid_;
+  }
+  const std::string & qcx() const {
+    return qcx_;
+  }
+  const std::string & medium_qcx() const {
+    return medium_qcx_;
+  }
+  int language() const {
+    return language_;
+  }
+  const std::string & checkname() const {
+    return checkname_;
+  }
+  const std::string & checksignature() const {
+    return checksignature_;
+  }
+  const std::string & active() const {
+    return active_;
+  }
+  const boost::posix_time::ptime & fromtime() const {
+    return fromtime_;
+  }
 };
 
 /** @} */

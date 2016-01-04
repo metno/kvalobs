@@ -36,51 +36,50 @@
 
 #include <string>
 
-namespace kvQCFlagTypes
-{
+namespace kvQCFlagTypes {
 
 /*
  The main QC levels
  */
 const int num_mainqcx = 4;
 
-enum main_qc
-{
-	main_qc1 = 0, main_qc2d = 1, main_qc2m = 2, main_hqc = 3
+enum main_qc {
+  main_qc1 = 0,
+  main_qc2d = 1,
+  main_qc2m = 2,
+  main_hqc = 3
 };
 
 /*
  control-flag for each QC checks, corresponds to
  'controlpart' in kvQcxInfo
  */
-enum c_flags
-{
-	f_fagg = 0,
-	f_fr = 1,
-	f_fcc = 2,
-	f_fs = 3,
-	f_fnum = 4,
-	f_fpos = 5,
-	f_fmis = 6,
-	f_ftime = 7,
-	f_fw = 8,
-	f_fstat = 9,
-	f_fcp = 10,
-	f_fclim = 11,
-	f_fd = 12,
-	f_fpre = 13,
-	f_fcombi = 14,
-	f_fhqc = 15
+enum c_flags {
+  f_fagg = 0,
+  f_fr = 1,
+  f_fcc = 2,
+  f_fs = 3,
+  f_fnum = 4,
+  f_fpos = 5,
+  f_fmis = 6,
+  f_ftime = 7,
+  f_fw = 8,
+  f_fstat = 9,
+  f_fcp = 10,
+  f_fclim = 11,
+  f_fd = 12,
+  f_fpre = 13,
+  f_fcombi = 14,
+  f_fhqc = 15
 };
 /*
  legal 'missing' values (QC1-0, f_fmis)
  */
-enum missing_status
-{
-	status_ok = 0,
-	status_original_missing = 1,
-	status_corrected_missing = 2,
-	status_orig_and_corr_missing = 3
+enum missing_status {
+  status_ok = 0,
+  status_original_missing = 1,
+  status_corrected_missing = 2,
+  status_orig_and_corr_missing = 3
 };
 
 }

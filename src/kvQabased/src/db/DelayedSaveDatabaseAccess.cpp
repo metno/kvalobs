@@ -29,59 +29,52 @@
 
 #include "DelayedSaveDatabaseAccess.h"
 
-namespace db
-{
+namespace db {
 
-DelayedSaveDatabaseAccess::DelayedSaveDatabaseAccess(DatabaseAccess * baseImplementation) :
-		FilteredDatabaseAccess(baseImplementation)
-{
+DelayedSaveDatabaseAccess::DelayedSaveDatabaseAccess(
+    DatabaseAccess * baseImplementation)
+    : FilteredDatabaseAccess(baseImplementation) {
 }
 
-DelayedSaveDatabaseAccess::~DelayedSaveDatabaseAccess()
-{
+DelayedSaveDatabaseAccess::~DelayedSaveDatabaseAccess() {
 }
 
-void DelayedSaveDatabaseAccess::getData(DataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const
-{
-	DataList fromDb;
-	FilteredDatabaseAccess::getData(& fromDb, si, parameter, minuteOffset);
+void DelayedSaveDatabaseAccess::getData(
+    DataList * out, const kvalobs::kvStationInfo & si,
+    const qabase::DataRequirement::Parameter & parameter,
+    int minuteOffset) const {
+  DataList fromDb;
+  FilteredDatabaseAccess::getData(&fromDb, si, parameter, minuteOffset);
 
-	for ( DataList::iterator it = fromDb.begin(); it != fromDb.end(); ++ it )
-	{
-		SavedData::const_iterator alreadySaved = savedData_.find(* it);
-		if ( alreadySaved == savedData_.end() )
-			out->push_back(* it);
-		else
-			out->push_back(* alreadySaved);
-	}
+  for (DataList::iterator it = fromDb.begin(); it != fromDb.end(); ++it) {
+    SavedData::const_iterator alreadySaved = savedData_.find(*it);
+    if (alreadySaved == savedData_.end())
+      out->push_back(*it);
+    else
+      out->push_back(*alreadySaved);
+  }
 }
 
-void DelayedSaveDatabaseAccess::write(const DataList & data)
-{
-	for ( DataList::const_iterator it = data.begin(); it != data.end(); ++ it )
-	{
-		savedData_.erase(* it);
-		savedData_.insert(* it);
-	}
+void DelayedSaveDatabaseAccess::write(const DataList & data) {
+  for (DataList::const_iterator it = data.begin(); it != data.end(); ++it) {
+    savedData_.erase(*it);
+    savedData_.insert(*it);
+  }
 }
 
-void DelayedSaveDatabaseAccess::commit()
-{
-	if ( not savedData_.empty() )
-	{
-		DataList saveData(savedData_.begin(), savedData_.end());
-		FilteredDatabaseAccess::write(saveData);
-		FilteredDatabaseAccess::commit();
-		savedData_.clear();
-	}
-	else
-		FilteredDatabaseAccess::commit();
+void DelayedSaveDatabaseAccess::commit() {
+  if (not savedData_.empty()) {
+    DataList saveData(savedData_.begin(), savedData_.end());
+    FilteredDatabaseAccess::write(saveData);
+    FilteredDatabaseAccess::commit();
+    savedData_.clear();
+  } else
+    FilteredDatabaseAccess::commit();
 }
 
-void DelayedSaveDatabaseAccess::rollback()
-{
-	savedData_.clear();
-	FilteredDatabaseAccess::rollback();
+void DelayedSaveDatabaseAccess::rollback() {
+  savedData_.clear();
+  FilteredDatabaseAccess::rollback();
 }
 
 }

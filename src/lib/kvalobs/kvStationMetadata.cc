@@ -34,167 +34,160 @@
 #include <sstream>
 #include <memory>
 
-namespace kvalobs
-{
-namespace
-{
+namespace kvalobs {
+namespace {
 template<typename T>
-class Interpreted
-{
-public:
-	typedef T value_type;
+class Interpreted {
+ public:
+  typedef T value_type;
 
-	Interpreted(const std::string & s)
-	{
-		if ( not s.empty() )
-			data_.reset(new value_type(boost::lexical_cast<value_type>(s)));
-	}
+  Interpreted(const std::string & s) {
+    if (not s.empty())
+      data_.reset(new value_type(boost::lexical_cast<value_type>(s)));
+  }
 
-	operator value_type () const
-	{
-		if ( data_ )
-			return * data_;
-		else
-			throw std::logic_error("NULL value");
-	}
+  operator value_type() const {
+    if (data_)
+      return *data_;
+    else
+      throw std::logic_error("NULL value");
+  }
 
-	operator const value_type * () const
-	{
-		return data_.get();
-	}
+  operator const value_type *() const {
+    return data_.get();
+  }
 
-private:
-	std::unique_ptr<value_type> data_;
+ private:
+  std::unique_ptr<value_type> data_;
 };
 }
 
-kvStationMetadata::kvStationMetadata() :
-		station_(0), param_(INT_NULL), type_(INT_NULL), level_(INT_NULL), sensor_(
-				INT_NULL), name_(""), metadata_(
-				std::numeric_limits<float>::quiet_NaN()), description_(
-				"invalid")
-{
+kvStationMetadata::kvStationMetadata()
+    : station_(0),
+      param_(INT_NULL),
+      type_(INT_NULL),
+      level_(INT_NULL),
+      sensor_(INT_NULL),
+      name_(""),
+      metadata_(std::numeric_limits<float>::quiet_NaN()),
+      description_("invalid") {
 }
 
 kvStationMetadata::kvStationMetadata(int station, const int * param,
-		const int * type, const int * level, const int * sensor,
-		const std::string & name, float metadata,
-		const std::string & description, const boost::posix_time::ptime & fromtime,
-		const boost::posix_time::ptime & totime) :
-		station_(station), param_(param ? *param : INT_NULL), type_(
-				type ? *type : INT_NULL), level_(level ? *level : INT_NULL), sensor_(
-				sensor ? *sensor : INT_NULL), name_(name), metadata_(metadata), description_(
-				description), fromtime_(fromtime), totime_(totime)
-{
+                                     const int * type, const int * level,
+                                     const int * sensor,
+                                     const std::string & name, float metadata,
+                                     const std::string & description,
+                                     const boost::posix_time::ptime & fromtime,
+                                     const boost::posix_time::ptime & totime)
+    : station_(station),
+      param_(param ? *param : INT_NULL),
+      type_(type ? *type : INT_NULL),
+      level_(level ? *level : INT_NULL),
+      sensor_(sensor ? *sensor : INT_NULL),
+      name_(name),
+      metadata_(metadata),
+      description_(description),
+      fromtime_(fromtime),
+      totime_(totime) {
 }
 
-kvStationMetadata::kvStationMetadata(dnmi::db::DRow & r) :
-		kvStationMetadata(
-			Interpreted<int>(r["stationid"]),
-			Interpreted<int>(r["paramid"]),
-			Interpreted<int>(r["typeid"]),
-			Interpreted<int>(r["level"]),
-			Interpreted<int>(r["sensor"]),
-			r["metadatatypename"],
-			Interpreted<float>(r["metadata"]),
-			std::string(),
-			boost::posix_time::time_from_string(r["fromtime"]),
-			boost::posix_time::time_from_string_nothrow(r["totime"])
-		)
-{
+kvStationMetadata::kvStationMetadata(dnmi::db::DRow & r)
+    : kvStationMetadata(
+        Interpreted<int>(r["stationid"]), Interpreted<int>(r["paramid"]),
+        Interpreted<int>(r["typeid"]), Interpreted<int>(r["level"]),
+        Interpreted<int>(r["sensor"]), r["metadatatypename"],
+        Interpreted<float>(r["metadata"]), std::string(),
+        boost::posix_time::time_from_string(r["fromtime"]),
+        boost::posix_time::time_from_string_nothrow(r["totime"])) {
 }
 
-kvStationMetadata::kvStationMetadata(const kvStationMetadata & d) :
-		station_(d.station_), param_(d.param_), type_(d.type_), level_(
-				d.level_), sensor_(d.sensor_), name_(d.name_), metadata_(
-				d.metadata_), description_(d.description_), fromtime_(
-				d.fromtime_), totime_(d.totime_)
-{
+kvStationMetadata::kvStationMetadata(const kvStationMetadata & d)
+    : station_(d.station_),
+      param_(d.param_),
+      type_(d.type_),
+      level_(d.level_),
+      sensor_(d.sensor_),
+      name_(d.name_),
+      metadata_(d.metadata_),
+      description_(d.description_),
+      fromtime_(d.fromtime_),
+      totime_(d.totime_) {
 }
 
-kvStationMetadata::~kvStationMetadata()
-{
+kvStationMetadata::~kvStationMetadata() {
 
 }
 
 kvStationMetadata&
-kvStationMetadata::operator =(const kvStationMetadata & rhs)
-{
-	if (&rhs != this)
-	{
-		station_ = rhs.station_;
-		param_ = rhs.param_;
-		type_ = rhs.type_;
-		level_ = rhs.level_;
-		sensor_ = rhs.sensor_;
-		name_ = rhs.name_;
-		metadata_ = rhs.metadata_;
-		description_ = rhs.description_;
-		fromtime_ = rhs.fromtime_;
-		totime_ = rhs.totime_;
-	}
-	return *this;
+kvStationMetadata::operator =(const kvStationMetadata & rhs) {
+  if (&rhs != this) {
+    station_ = rhs.station_;
+    param_ = rhs.param_;
+    type_ = rhs.type_;
+    level_ = rhs.level_;
+    sensor_ = rhs.sensor_;
+    name_ = rhs.name_;
+    metadata_ = rhs.metadata_;
+    description_ = rhs.description_;
+    fromtime_ = rhs.fromtime_;
+    totime_ = rhs.totime_;
+  }
+  return *this;
 }
 
-namespace
-{
-std::ostream & possiblyNull(std::ostream & s, int i)
-{
-	if (i == kvStationMetadata::INT_NULL)
-		return s << "NULL";
-	return s << i;
+namespace {
+std::ostream & possiblyNull(std::ostream & s, int i) {
+  if (i == kvStationMetadata::INT_NULL)
+    return s << "NULL";
+  return s << i;
 }
 }
 
-std::string kvStationMetadata::toSend() const
-{
-	std::ostringstream q;
-	q << "(" << station_ << ", ";
-	possiblyNull(q, paramID()) << ", ";
-	possiblyNull(q, typeID()) << ", ";
-	possiblyNull(q, level()) << ", ";
-	possiblyNull(q, sensor()) << ", ";
-	q << quoted(name()) << ", ";
-	q << metadata() << ", ";
-	q << quoted(fromtime()) << ", ";
-	if (totime().is_not_a_date_time())
-		q << "NULL";
-	else
-		q << quoted(totime());
-	q << ")";
+std::string kvStationMetadata::toSend() const {
+  std::ostringstream q;
+  q << "(" << station_ << ", ";
+  possiblyNull(q, paramID()) << ", ";
+  possiblyNull(q, typeID()) << ", ";
+  possiblyNull(q, level()) << ", ";
+  possiblyNull(q, sensor()) << ", ";
+  q << quoted(name()) << ", ";
+  q << metadata() << ", ";
+  q << quoted(fromtime()) << ", ";
+  if (totime().is_not_a_date_time())
+    q << "NULL";
+  else
+    q << quoted(totime());
+  q << ")";
 
-	return q.str();
+  return q.str();
 }
 
-namespace
-{
-std::ostream & maybeNullKey(std::ostream & s, const char * key, int value)
-{
-	if (value == kvStationMetadata::INT_NULL)
-		return s << key << " IS NULL";
-	return s << key << " = " << value;
+namespace {
+std::ostream & maybeNullKey(std::ostream & s, const char * key, int value) {
+  if (value == kvStationMetadata::INT_NULL)
+    return s << key << " IS NULL";
+  return s << key << " = " << value;
 }
 }
 
-std::string kvStationMetadata::uniqueKey() const
-{
-	std::ostringstream q;
+std::string kvStationMetadata::uniqueKey() const {
+  std::ostringstream q;
 
-	q << " WHERE ";
-	q << "stationid = " << station_ << " AND ";
-	maybeNullKey(q, "paramid", param_) << " AND ";
-	maybeNullKey(q, "typeid", type_) << " AND ";
-	maybeNullKey(q, "level", level_) << " AND ";
-	maybeNullKey(q, "sensor", sensor_) << " AND ";
-	q << "metadatatypename = " << quoted(name()) << " AND ";
-	q << "fromtime = " << quoted(fromtime());
+  q << " WHERE ";
+  q << "stationid = " << station_ << " AND ";
+  maybeNullKey(q, "paramid", param_) << " AND ";
+  maybeNullKey(q, "typeid", type_) << " AND ";
+  maybeNullKey(q, "level", level_) << " AND ";
+  maybeNullKey(q, "sensor", sensor_) << " AND ";
+  q << "metadatatypename = " << quoted(name()) << " AND ";
+  q << "fromtime = " << quoted(fromtime());
 
-	return q.str();
+  return q.str();
 }
 
-const char* kvStationMetadata::tableName() const
-{
-	return "station_metadata";
+const char* kvStationMetadata::tableName() const {
+  return "station_metadata";
 }
 
 }

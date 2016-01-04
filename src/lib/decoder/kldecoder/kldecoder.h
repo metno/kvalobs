@@ -1,32 +1,32 @@
 /*
-  Kvalobs - Free Quality Control Software for Meteorological Observations 
+ Kvalobs - Free Quality Control Software for Meteorological Observations 
 
-  $Id: kldecoder.h,v 1.4.2.5 2007/09/27 09:02:29 paule Exp $                                                       
+ $Id: kldecoder.h,v 1.4.2.5 2007/09/27 09:02:29 paule Exp $                                                       
 
-  Copyright (C) 2007 met.no
+ Copyright (C) 2007 met.no
 
-  Contact information:
-  Norwegian Meteorological Institute
-  Box 43 Blindern
-  0313 OSLO
-  NORWAY
-  email: kvalobs-dev@met.no
+ Contact information:
+ Norwegian Meteorological Institute
+ Box 43 Blindern
+ 0313 OSLO
+ NORWAY
+ email: kvalobs-dev@met.no
 
-  This file is part of KVALOBS
+ This file is part of KVALOBS
 
-  KVALOBS is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License as 
-  published by the Free Software Foundation; either version 2 
-  of the License, or (at your option) any later version.
+ KVALOBS is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as 
+ published by the Free Software Foundation; either version 2 
+ of the License, or (at your option) any later version.
 
-  KVALOBS is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  General Public License for more details.
+ KVALOBS is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ General Public License for more details.
 
-  You should have received a copy of the GNU General Public License along 
-  with KVALOBS; if not, write to the Free Software Foundation Inc., 
-  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ You should have received a copy of the GNU General Public License along 
+ with KVALOBS; if not, write to the Free Software Foundation Inc., 
+ 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #ifndef __kvalobs_decoder_kldecoder_h__
 #define __kvalobs_decoder_kldecoder_h__
@@ -39,10 +39,9 @@
 #include <vector>
 #include "DataDecode.h"
 
-namespace kvalobs{
-namespace decoder{
-namespace kldecoder{
-
+namespace kvalobs {
+namespace decoder {
+namespace kldecoder {
 
 /**
  * \addtogroup kldecode
@@ -50,7 +49,7 @@ namespace kldecoder{
  * @{
  */
 
-typedef boost::mutex::scoped_lock    Lock;
+typedef boost::mutex::scoped_lock Lock;
 
 /**
  * \brief implements the interface  DecoderBase.
@@ -86,51 +85,49 @@ typedef boost::mutex::scoped_lock    Lock;
  *  </pre>
  *
  */
-class KlDecoder : public DecoderBase{
-   KlDecoder();
-   KlDecoder(const KlDecoder &);
-   KlDecoder& operator=(const KlDecoder &);
+class KlDecoder : public DecoderBase {
+  KlDecoder();
+  KlDecoder(const KlDecoder &);
+  KlDecoder& operator=(const KlDecoder &);
 
-protected:
+ protected:
 
-   void decodeObsType( const std::string &obstype);
+  void decodeObsType(const std::string &obstype);
 
-   kvalobs::decoder::DecoderBase::DecodeResult
-   rejected( const std::string &msg, const std::string &logid, std::string &msgToSender, bool includeObs=true );
+  kvalobs::decoder::DecoderBase::DecodeResult
+  rejected(const std::string &msg, const std::string &logid,
+           std::string &msgToSender, bool includeObs = true);
 
-   bits::DataDecoder datadecoder;
-   std::string logid;
-   int typeID;
-   int stationID;
-   std::string stationidIn;
-   std::string redirectedFrom;
-   bool onlyInsertOrUpdate;
-   boost::posix_time::ptime receivedTime;
+  bits::DataDecoder datadecoder;
+  std::string logid;
+  int typeID;
+  int stationID;
+  std::string stationidIn;
+  std::string redirectedFrom;
+  bool onlyInsertOrUpdate;
+  boost::posix_time::ptime receivedTime;
 
+ public:
+  KlDecoder(dnmi::db::Connection &con, const ParamList &params,
+            const std::list<kvalobs::kvTypes> &typeList,
+            const std::string &obsType, const std::string &obs, int decoderId =
+                -1);
 
-public:
-   KlDecoder(dnmi::db::Connection     &con,
-             const ParamList        &params,
-             const std::list<kvalobs::kvTypes> &typeList,
-             const std::string &obsType,
-             const std::string &obs,
-             int                    decoderId=-1);
+  virtual ~KlDecoder();
 
-   virtual ~KlDecoder();
+  bool getSetUsinfo7();
+  bool getOnlyInsertOrUpdate() const;
+  long getStationId(std::string &msg) const;
+  long getTypeId(std::string &msg) const;
+  DecodeResult insertDataInDb(kvalobs::serialize::KvalobsData *theData,
+                              int stationid, int typeId,
+                              const std::string &logid,
+                              std::string &msgToSender);
 
-   bool getSetUsinfo7();
-   bool getOnlyInsertOrUpdate()const;
-   long getStationId(std::string &msg) const;
-   long getTypeId(std::string &msg)const;
-   DecodeResult insertDataInDb( kvalobs::serialize::KvalobsData *theData,
-		                     int stationid, int typeId,
-		                     const std::string &logid,
-		                     std::string &msgToSender );
+  virtual std::string name() const;
 
-   virtual std::string name()const;
-
-   DecodeResult doExecute(std::string &msg );
-   virtual DecodeResult execute(std::string &msg);
+  DecodeResult doExecute(std::string &msg);
+  virtual DecodeResult execute(std::string &msg);
 };
 
 /** @} */

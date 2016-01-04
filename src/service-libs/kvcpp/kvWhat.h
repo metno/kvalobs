@@ -1,33 +1,33 @@
 /*
-  Kvalobs - Free Quality Control Software for Meteorological Observations 
+ Kvalobs - Free Quality Control Software for Meteorological Observations 
 
-  $Id: kvWhat.h,v 1.2.2.3 2007/09/27 09:02:45 paule Exp $                                                       
+ $Id: kvWhat.h,v 1.2.2.3 2007/09/27 09:02:45 paule Exp $                                                       
 
-  Copyright (C) 2007 met.no
+ Copyright (C) 2007 met.no
 
-  Contact information:
-  Norwegian Meteorological Institute
-  Box 43 Blindern
-  0313 OSLO
-  NORWAY
-  email: kvalobs-dev@met.no
+ Contact information:
+ Norwegian Meteorological Institute
+ Box 43 Blindern
+ 0313 OSLO
+ NORWAY
+ email: kvalobs-dev@met.no
 
-  This file is part of KVALOBS
+ This file is part of KVALOBS
 
-  KVALOBS is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License as 
-  published by the Free Software Foundation; either version 2 
-  of the License, or (at your option) any later version.
-  
-  KVALOBS is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License along 
-  with KVALOBS; if not, write to the Free Software Foundation Inc., 
-  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ KVALOBS is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as 
+ published by the Free Software Foundation; either version 2 
+ of the License, or (at your option) any later version.
+ 
+ KVALOBS is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License along 
+ with KVALOBS; if not, write to the Free Software Foundation Inc., 
+ 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
 #ifndef __kvWhat_h__
 #define __kvWhat_h__
 
@@ -38,44 +38,50 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <kvskel/kvDataNotifySubscriber.hh>
 
-namespace kvservice{
-    class KvWhat{
-	KvWhat();
-	
-	typedef std::map<CKvalObs::CService::QcId, bool> QcId;      
-		
-	long                       stationID_;
-	long                       typeID_;
-	QcId                       qcID_;
-	boost::posix_time::ptime             obsTime_;
-	
-    public:
-	KvWhat(const KvWhat &w);
-    KvWhat(long stationID, long typeID, const boost::posix_time::ptime & obsTime) :
-        stationID_(stationID),
+namespace kvservice {
+class KvWhat {
+  KvWhat();
+
+  typedef std::map<CKvalObs::CService::QcId, bool> QcId;
+
+  long stationID_;
+  long typeID_;
+  QcId qcID_;
+  boost::posix_time::ptime obsTime_;
+
+ public:
+  KvWhat(const KvWhat &w);
+  KvWhat(long stationID, long typeID, const boost::posix_time::ptime & obsTime)
+      : stationID_(stationID),
         typeID_(typeID),
-        obsTime_(obsTime)
-    {}
-	KvWhat(const CKvalObs::CService::kvDataNotifySubscriber::What &what);
-	~KvWhat(){}
-	
-	KvWhat& operator=(const KvWhat &w); 
+        obsTime_(obsTime) {
+  }
+  KvWhat(const CKvalObs::CService::kvDataNotifySubscriber::What &what);
+  ~KvWhat() {
+  }
 
-	bool  qcID(CKvalObs::CService::QcId id)const 
-	    { return qcID_.find(id)!=qcID_.end();}
-	long  stationID()const { return stationID_;}
-	long  typeID()const {return typeID_;}
-	boost::posix_time::ptime obsTime()const { return obsTime_;}
-    };
+  KvWhat& operator=(const KvWhat &w);
 
-    typedef std::list<KvWhat>                   KvWhatList;
-    typedef std::list<KvWhat>::iterator        IKvWhatList;
-    typedef std::list<KvWhat>::const_iterator CIKvWhatList;
-    
-    typedef boost::shared_ptr<KvWhatList> KvWhatListPtr; 
+  bool qcID(CKvalObs::CService::QcId id) const {
+    return qcID_.find(id) != qcID_.end();
+  }
+  long stationID() const {
+    return stationID_;
+  }
+  long typeID() const {
+    return typeID_;
+  }
+  boost::posix_time::ptime obsTime() const {
+    return obsTime_;
+  }
+};
+
+typedef std::list<KvWhat> KvWhatList;
+typedef std::list<KvWhat>::iterator IKvWhatList;
+typedef std::list<KvWhat>::const_iterator CIKvWhatList;
+
+typedef boost::shared_ptr<KvWhatList> KvWhatListPtr;
 
 }
-
-
 
 #endif

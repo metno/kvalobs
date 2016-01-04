@@ -1,32 +1,32 @@
 /*
-  Kvalobs - Free Quality Control Software for Meteorological Observations 
+ Kvalobs - Free Quality Control Software for Meteorological Observations 
 
-  $Id: testsms2.cc,v 1.2.2.3 2007/09/27 09:02:24 paule Exp $                                                       
+ $Id: testsms2.cc,v 1.2.2.3 2007/09/27 09:02:24 paule Exp $                                                       
 
-  Copyright (C) 2007 met.no
+ Copyright (C) 2007 met.no
 
-  Contact information:
-  Norwegian Meteorological Institute
-  Box 43 Blindern
-  0313 OSLO
-  NORWAY
-  email: kvalobs-dev@met.no
+ Contact information:
+ Norwegian Meteorological Institute
+ Box 43 Blindern
+ 0313 OSLO
+ NORWAY
+ email: kvalobs-dev@met.no
 
-  This file is part of KVALOBS
+ This file is part of KVALOBS
 
-  KVALOBS is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License as 
-  published by the Free Software Foundation; either version 2 
-  of the License, or (at your option) any later version.
+ KVALOBS is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as 
+ published by the Free Software Foundation; either version 2 
+ of the License, or (at your option) any later version.
 
-  KVALOBS is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  General Public License for more details.
+ KVALOBS is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ General Public License for more details.
 
-  You should have received a copy of the GNU General Public License along 
-  with KVALOBS; if not, write to the Free Software Foundation Inc., 
-  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ You should have received a copy of the GNU General Public License along 
+ with KVALOBS; if not, write to the Free Software Foundation Inc., 
+ 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include <float.h>
 #include <sys/stat.h>
@@ -65,53 +65,50 @@ boost::thread_specific_ptr<kvalobs::decoder::RedirectInfo> ptrRedirect;
 }
 }
 
-class DecoderBaseTest : public testing::Test
-{
+class DecoderBaseTest : public testing::Test {
 
-protected:
-   string dbId;
-   string testdb;
-   DriverManager dbMgr;
-   dc::DecoderMgr decoderMgr;
-   string testdir;
-   string dbdir;
-   string decoderdir;
+ protected:
+  string dbId;
+  string testdb;
+  DriverManager dbMgr;
+  dc::DecoderMgr decoderMgr;
+  string testdir;
+  string dbdir;
+  string decoderdir;
 
-   ParamList        paramList;
-   KvTypeList typesList;
+  ParamList paramList;
+  KvTypeList typesList;
 
-   ///Called before each test case.
-   virtual void SetUp() {
-	   testdb= TESTDB;
-      testdir = TESTDIR;
-      dbdir = DBDIR;
-      decoderdir = DECODERDIR;
-      decoderMgr.setDecoderPath( decoderdir );
-      decoderMgr.updateDecoders();
+  ///Called before each test case.
+  virtual void SetUp() {
+    testdb = TESTDB;
+    testdir = TESTDIR;
+    dbdir = DBDIR;
+    decoderdir = DECODERDIR;
+    decoderMgr.setDecoderPath(decoderdir);
+    decoderMgr.updateDecoders();
 
-      if( dbId.empty() ) {
-         ASSERT_TRUE( dbMgr.loadDriver( dbdir+"/sqlite3driver.so", dbId ) )<<
-         "Failed to load Db driver. Reason: " << dbMgr.getErr();
-      }
+    if (dbId.empty()) {
+      ASSERT_TRUE( dbMgr.loadDriver( dbdir+"/sqlite3driver.so", dbId ) )<<
+      "Failed to load Db driver. Reason: " << dbMgr.getErr();
+    }
 
-      if( paramList.empty() ) {
-         ASSERT_TRUE( readParamsFromFile(testdir+"/kvparams.csv", paramList ) ) <<
-         "Cant read params from the file <kvparams.csv>";
-      }
+    if (paramList.empty()) {
+      ASSERT_TRUE( readParamsFromFile(testdir+"/kvparams.csv", paramList ) )<<
+      "Cant read params from the file <kvparams.csv>";
+    }
 
-      if( typesList.empty() ) {
-    	  ASSERT_TRUE( ReadTypesFromFile(testdir+"/kvtypes.csv", typesList) ) <<
-    	           "Cant read types from the file <kvtypes.csv>";
-      }
-   }
+    if (typesList.empty()) {
+      ASSERT_TRUE( ReadTypesFromFile(testdir+"/kvtypes.csv", typesList) )<<
+      "Cant read types from the file <kvtypes.csv>";
+    }
+  }
 
-   ///Called after each test case.
-   virtual void TearDown() {
-	   //cerr << "TearDown:\n";
+  ///Called after each test case.
+  virtual void TearDown() {
+    //cerr << "TearDown:\n";
 
-   }
-
-
+  }
 
 //   kvalobs::decodeutil::DecodedData*
 //   runtestOnFile( const ParamList &paramList,
@@ -120,37 +117,36 @@ protected:
 
 };
 
-TEST_F( DecoderBaseTest, useinfo7 )
-{
-	string error;
-	string obsType("test");
-	string obsData("");
-	KvTypeList types;
-	int useinfo7; //tolate/toearly flag
+TEST_F( DecoderBaseTest, useinfo7 ) {
+  string error;
+  string obsType("test");
+  string obsData("");
+  KvTypeList types;
+  int useinfo7;  //tolate/toearly flag
 
-	types.push_back(kvTypes(1,"",60, 60,"I","h","For test"));
+  types.push_back(kvTypes(1, "", 60, 60, "I", "h", "For test"));
 
-	dnmi::db::Connection *con = dbMgr.connect( dbId, testdb );
+  dnmi::db::Connection *con = dbMgr.connect(dbId, testdb);
 
-	ASSERT_TRUE( con != 0 )<< "Cant open database connection: " << testdb << ".";
+  ASSERT_TRUE( con != 0 )<< "Cant open database connection: " << testdb << ".";
 
-	dc::DecoderBase *dec=decoderMgr.findDecoder( *con, paramList, types, obsType, obsData, error);
-	ASSERT_TRUE( dec != 0 ) << "Cant create test decoder.";
+  dc::DecoderBase *dec = decoderMgr.findDecoder(*con, paramList, types, obsType,
+                                                obsData, error);
+  ASSERT_TRUE( dec != 0 )<< "Cant create test decoder.";
 
-	pt::ptime obstime( pt::time_from_string("2010-09-13 06:00:00") );
-	pt::ptime oktime( pt::time_from_string("2010-09-13 06:10:53") );
-	pt::ptime oktime1( pt::time_from_string("2010-09-13 05:51:53") );
-	pt::ptime toearly( pt::time_from_string("2010-09-13 04:59:00") );
-	pt::ptime tolate( pt::time_from_string("2010-09-13 07:01:00") );
+  pt::ptime obstime(pt::time_from_string("2010-09-13 06:00:00"));
+  pt::ptime oktime(pt::time_from_string("2010-09-13 06:10:53"));
+  pt::ptime oktime1(pt::time_from_string("2010-09-13 05:51:53"));
+  pt::ptime toearly(pt::time_from_string("2010-09-13 04:59:00"));
+  pt::ptime tolate(pt::time_from_string("2010-09-13 07:01:00"));
 
-	ASSERT_TRUE( dec->getUseinfo7Code( 1, oktime, obstime, "") == 0 );
-	ASSERT_TRUE(dec->getUseinfo7Code( 1, oktime1, obstime, "") == 0 );
-	ASSERT_TRUE( dec->getUseinfo7Code( 1, toearly, obstime, "") == 3);
-	ASSERT_TRUE(dec->getUseinfo7Code( 1, tolate, obstime, "") == 4 );
+  ASSERT_TRUE(dec->getUseinfo7Code(1, oktime, obstime, "") == 0);
+  ASSERT_TRUE(dec->getUseinfo7Code(1, oktime1, obstime, "") == 0);
+  ASSERT_TRUE(dec->getUseinfo7Code(1, toearly, obstime, "") == 3);
+  ASSERT_TRUE(dec->getUseinfo7Code(1, tolate, obstime, "") == 4);
 
-	decoderMgr.releaseDecoder( dec );
+  decoderMgr.releaseDecoder(dec);
 }
-
 
 //TEST_F( Sms2DecodeTest, MultiObsTime )
 //{
@@ -187,10 +183,9 @@ TEST_F( DecoderBaseTest, useinfo7 )
 //   EXPECT_FLOAT_EQ( getData( elem, miTime("2010-12-27 18:00:00"), 35), 0 )    << "Val: " << getData( elem, miTime("2010-12-28 06:00:00"), 35);
 //}
 
-int
-main(int argc, char **argv) {
-   ::testing::InitGoogleTest(&argc, argv);
-   return RUN_ALL_TESTS();
+int main(int argc, char **argv) {
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }
 
 //kvalobs::decodeutil::DecodedData*
@@ -309,5 +304,4 @@ main(int argc, char **argv) {
 //
 //   return data;
 //}
-
 
