@@ -28,106 +28,100 @@
  with KVALOBS; if not, write to the Free Software Foundation Inc., 
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+#include <string>
 #include <boost/thread/thread.hpp>
-#include <dnmithread/CommandQue.h>
-#include <milog/milog.h>
-#include <miconfparser/miconfparser.h>
-#include <fileutil/pidfileutil.h>
-#include "AdminImpl.h"
-#include "mgrApp.h"
-#include "managerInputImpl.h"
-#include "checkedInputImpl.h"
-#include "NewDataCommand.h"
-#include "PreProcessWorker.h"
-#include "InitLogger.h"
-#include "PreProcessMissingData.h"
-#include "kvCheckedDataThread.h"
-#include "CheckForMissingObsMessages.h"
-#include "NewDataJob.h"
-#include "SelectDataToProcess.h"
-#include "SendDataToQa.h"
-#include "ServiceCheckedInputImpl.h"
-#include <kvalobs/kvPath.h>
+#include "lib/dnmithread/CommandQue.h"
+#include "lib/miconfparser/miconfparser.h"
+#include "lib/milog/milog.h"
+#include "lib/fileutil/pidfileutil.h"
+#include "kvalobs/kvPath.h"
+#include "kvManagerd/AdminImpl.h"
+#include "kvManagerd/checkedInputImpl.h"
+#include "kvManagerd/CheckForMissingObsMessages.h"
+#include "kvManagerd/kvCheckedDataThread.h"
+#include "kvManagerd/InitLogger.h"
+#include "kvManagerd/managerInputImpl.h"
+#include "kvManagerd/mgrApp.h"
+#include "kvManagerd/NewDataCommand.h"
+#include "kvManagerd/NewDataJob.h"
+#include "kvManagerd/PreProcessMissingData.h"
+#include "kvManagerd/PreProcessWorker.h"
+#include "kvManagerd/SelectDataToProcess.h"
+#include "kvManagerd/SendDataToQa.h"
+#include "kvManagerd/ServiceCheckedInputImpl.h"
+
 using namespace std;
 using namespace boost;
+
+string getDbDriver(miutil::conf::ConfSection *conf) {
+  string dbDriver;
+  if (conf) {
+    miutil::conf::ValElementList dbVal = conf->getValue("database.dbdriver");
+    if (dbVal.size() == 1)
+      dbDriver = dbVal[0].valAsString();
+  }
+  // Use postgreSql as a last guess.
+  if (dbDriver.empty())
+    dbDriver = "pgdriver.so";
+  return dbDriver;
+}
+
+bool checkForMissingObs(miutil::conf::ConfSection *conf) {
+  bool ret = true;
+  if (conf) {
+    miutil::conf::ValElementList checkVal = conf->getValue("kvManagerd.check_for_missing_obs");
+    if (checkVal.size() == 1) {
+      string v = checkVal[0].valAsString();
+      if (!v.empty() && (v[0] == 'f' || v[0] == 'F'))
+        ret = false;
+    }
+  }
+  return ret;
+}
 
 int main(int argc, char** argv) {
   CORBA::ORB_ptr orb;
   PortableServer::POA_ptr poa;
-  dnmi::thread::CommandQue selectDataQue;  //From kvDatainputd and
-  //checkForMissingObsMessages
-  dnmi::thread::CommandQue preProcessQue;  //SelectDataToProcess
-  dnmi::thread::CommandQue newDataQue;    //From preprosess
-  dnmi::thread::CommandQue qaDataQue;  //From kvQabased
-  string dbdriver;
-  bool docheckForMissingObs = true;
-  miutil::conf::ConfSection *conf = KvApp::getConfiguration();
+  dnmi::thread::CommandQue selectDataQue;  // From kvDatainputd and checkForMissingObsMessages
+  dnmi::thread::CommandQue preProcessQue;  // SelectDataToProcess
+  dnmi::thread::CommandQue newDataQue;  // From Preprocess
+  dnmi::thread::CommandQue qaDataQue;  // From kvQabased
   bool error;
   string pidfile;
 
-  //Read all connection information from the $KVALOBS/etc/kvalobs.conf
-  //if it exist. Otherwise use the environment varibales:
-  //KVDB, KVDBUSER, PGHOST, PGPORT
-  string constr(KvApp::createConnectString());
-
-  if (conf) {
-    miutil::conf::ValElementList val = conf->getValue("database.dbdriver");
-
-    if (val.size() == 1)
-      dbdriver = val[0].valAsString();
-  }
-
-  if (conf) {
-    miutil::conf::ValElementList val = conf->getValue(
-        "kvManagerd.check_for_missing_obs");
-
-    if (val.size() == 1) {
-      string v = val[0].valAsString();
-
-      if (!v.empty() && (v[0] == 'f' || v[0] == 'F'))
-        docheckForMissingObs = false;
-    }
-  }
-
-  //Use postgresql as a last guess.
-  if (dbdriver.empty())
-    dbdriver = "pgdriver.so";
-
+  string connectionInfo(KvApp::createConnectString());
+  miutil::conf::ConfSection * conf = KvApp::getConfiguration();
+  string dbDriver(getDbDriver(conf));
   InitLogger(argc, argv, "kvManagerd", conf);
-
+  bool docheckForMissingObs = checkForMissingObs(conf);
   LOGINFO("check_for_missing_obs=" << (docheckForMissingObs?"true":"false"));
-
   pidfile = KvApp::createPidFileName("kvManagerd");
-
   LOGDEBUG("pidfile: " << pidfile);
-
   if (dnmi::file::isRunningPidFile(pidfile, error)) {
     if (error) {
-      LOGFATAL(
-          "An error occured while reading the pidfile:" << endl << pidfile << " remove the file if it exist and" << endl << "kvManagerd is not running. " << "If it is running and there is problems. Kill kvManagerd and" << endl << "restart it." << endl << endl);
+      LOGFATAL("An error occurred while reading the pidfile:" << endl
+               << pidfile << " remove the file if it exist and" << endl
+               << "kvManagerd is not running. " << "If it is running and there is problems. Kill kvManagerd and" << endl
+               << "restart it." << endl
+               << endl);
       return 1;
     } else {
-      LOGFATAL(
-          "Is kvManagerd allready running?" << endl << "If not remove the pidfile: " << pidfile);
+      LOGFATAL("Is kvManagerd already running?" << endl
+               << "If not remove the pidfile: " << pidfile);
       return 1;
     }
   }
 
   LOGINFO("KvManagerd: starting ....");
-
-  ManagerApp app(argc, argv, dbdriver, constr);
-
+  ManagerApp app(argc, argv, dbDriver, connectionInfo);
   if (!app.isOk()) {
     return 1;
   }
-
   app.checkForMissingObs(docheckForMissingObs);
-
   orb = app.getOrb();
   poa = app.getPoa();
 
-  SelectDataToProcess selectDataToProcess(app, selectDataQue, preProcessQue,
-                                          newDataQue);
+  SelectDataToProcess selectDataToProcess(app, selectDataQue, preProcessQue, newDataQue);
 
   PreProcessWorker preProcessWorker(app, preProcessQue, newDataQue);
 
@@ -151,8 +145,7 @@ int main(int argc, char** argv) {
     ManagerInputImpl *mgrImpl = new ManagerInputImpl(app, selectDataQue);
     CheckedInputImpl *chkImpl = new CheckedInputImpl(app, qaDataQue);
     AdminImpl *admImpl = new AdminImpl(app);
-    ServiceCheckedInputImpl *srvImpl = new ServiceCheckedInputImpl(app,
-                                                                   qaDataQue);
+    ServiceCheckedInputImpl *srvImpl = new ServiceCheckedInputImpl(app, qaDataQue);
 
     PortableServer::ObjectId_var mgrImplIid = poa->activate_object(mgrImpl);
     PortableServer::ObjectId_var chkImplIid = poa->activate_object(chkImpl);
@@ -169,8 +162,7 @@ int main(int argc, char** argv) {
       }
 
       CORBA::String_var sior(orb->object_to_string(ref));
-      cout << "IDL object kvManagerInput IOR = '" << (char*) sior << "'"
-           << endl;
+      cout << "IDL object kvManagerInput IOR = '" << static_cast<char*>(sior) << "'" << endl;
       // IDL interface: micutil::Admin
       ref = admImpl->_this();
 
@@ -180,8 +172,7 @@ int main(int argc, char** argv) {
       }
 
       sior = orb->object_to_string(ref);
-      cout << "IDL object micutil::Admin IOR = '" << (char*) sior << "'"
-           << endl;
+      cout << "IDL object micutil::Admin IOR = '" << static_cast<char*>(sior) << "'" << endl;
 
       // IDL interface: CKvalObs::manager::ManagerInput
       app.setCheckedInput(chkImpl->_this());
@@ -206,8 +197,7 @@ int main(int argc, char** argv) {
     app.deletePidFile();
     exit(1);
   } catch (omniORB::fatalException& fe) {
-    LOGFATAL(
-        "Caught omniORB::fatalException:" << endl << "  file: " << fe.file() << endl << "  line: " << fe.line() << endl << "  mesg: " << fe.errmsg());
+    LOGFATAL("Caught omniORB::fatalException:" << endl << "  file: " << fe.file() << endl << "  line: " << fe.line() << endl << "  mesg: " << fe.errmsg());
     app.deletePidFile();
     exit(1);
   } catch (...) {

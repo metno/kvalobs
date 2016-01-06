@@ -1,4 +1,9 @@
-AM_CPPFLAGS = -I$(top_srcdir)/src/lib  -I$(top_builddir)/src/lib -I$(top_builddir)/src/lib/kvskel  $(omniORB4_CFLAGS)  $(putools_CFLAGS)  -D_REENTRANT
+AM_CPPFLAGS = -D_REENTRANT \
+			  -I$(top_srcdir)/src \
+			  -I$(top_srcdir)/src/lib \
+			  -I$(top_builddir)/src/lib \
+			  -I$(top_builddir)/src/lib/kvskel \
+			  $(omniORB4_CFLAGS) $(putools_CFLAGS)
 
 bin_PROGRAMS = kvManagerd kvmgrclt
 kvManagerd_SOURCES =  mgrApp.cc  mgrApp.h \
