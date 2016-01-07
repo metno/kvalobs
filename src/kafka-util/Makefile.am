@@ -18,4 +18,5 @@ kvalobs_queue_transfer_LDADD = \
 	$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
 	$(top_builddir)/src/lib/dnmithread/libkvalobs_dnmithread.la \
 	$(top_builddir)/src/lib/milog/libkvalobs_milog.la \
-	-lboost_system -lomniDynamic4 -lomniORB4 -lomnithread
+	-lboost_filesystem -lboost_system \
+	-lomniDynamic4 -lomniORB4 -lomnithread

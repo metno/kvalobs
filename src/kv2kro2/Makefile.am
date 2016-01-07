@@ -25,7 +25,7 @@ kv2kro_LDADD = \
 		$(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la \
 		$(top_builddir)/src/lib/miutil/libkvalobs_miutil.la\
 		$(putools_LIBS) \
-               $(omniORB4_LIBS) $(BOOST_THREAD_LIB) $(BOOST_DATE_TIME_LIB) $(BOOST_SYSTEM_LIB) \
-              -lm 
+		$(omniORB4_LIBS) $(BOOST_THREAD_LIB) $(BOOST_DATE_TIME_LIB) $(BOOST_FILESYSTEM_LIB) $(BOOST_SYSTEM_LIB) \
+		-lm 
 
 EXTRA_DIST = README delete_oldfiles.pl obsInsert obsInsertTest.pl               

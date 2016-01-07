@@ -10,7 +10,7 @@ CORBA_LIB=$(OMNILIB) -lomniORB4 -lomnithread
 
 #BOOST stuff
 BOOST_INCLUDE=$(BOOSTINCLUDE)
-BOOST_LIB=$(BOOSTLIB) -lboost_thread
+BOOST_LIB=$(BOOSTLIB) -lboost_thread -lboost_filesystem
 
 
 #KVALOBS stuff
@@ -32,7 +32,7 @@ INCLUDE:=-I. -I$(TOP)/include $(BOOST_INCLUDE) $(KVINCLUDE) $(CORBA_INCLUDE)
 
 CXXFLAGS += -g 
 
-LIBS:= $(KVLIB)  $(BOOST_LIB)  $(CORBA_LIB) -L$(TOP)/lib -lkvcpp 
+LIBS:= $(KVLIB) -L$(TOP)/lib  -lkvcpp $(BOOST_LIB)  $(CORBA_LIB) 
 
 
 %.o: %.cc

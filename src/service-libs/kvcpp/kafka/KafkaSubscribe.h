@@ -36,6 +36,7 @@
 #include <map>
 #include <memory>
 #include <thread>
+#include <condition_variable>
 
 namespace kvalobs {
 namespace subscribe {
@@ -46,7 +47,8 @@ class KafkaConsumer;
 namespace kvservice {
 namespace kafka {
 
-class KafkaSubscribe : public details::KvalobsSubscribe, boost::noncopyable {
+class KafkaSubscribe : public virtual details::KvalobsSubscribe,
+    virtual details::KvAppControl, boost::noncopyable {
  public:
   KafkaSubscribe(const std::string & domain, const std::string & brokers);
   ~KafkaSubscribe();
@@ -75,6 +77,10 @@ class KafkaSubscribe : public details::KvalobsSubscribe, boost::noncopyable {
    */
   void joinAll();
 
+  virtual bool shutdown() const;
+  virtual void doShutdown();
+  virtual void run();
+
  private:
   typedef std::shared_ptr<kvalobs::subscribe::KafkaConsumer> ConsumerPtr;
   typedef std::pair<ConsumerPtr, std::thread> RunnableConsumer;
@@ -85,6 +91,10 @@ class KafkaSubscribe : public details::KvalobsSubscribe, boost::noncopyable {
   ConsumerCollection consumers_;
 
   RunnableConsumer & getConsumer_(const SubscriberID &subscriberid);
+
+  std::mutex mutex_;
+  std::condition_variable blocker_;
+  bool shutdown_;
 };
 
 } /* namespace kafka */

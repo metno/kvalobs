@@ -30,6 +30,7 @@
 #define SRC_SERVICE_LIBS_KVCPP_SQL_SQLKVAPP_H_
 
 #include <corba/CorbaKvApp.h>
+#include "SqlGet.h"
 #include <memory>
 
 namespace dnmi {
@@ -38,44 +39,48 @@ class Connection;
 }
 }
 
-namespace kvservice {
-namespace sql {
 
-class SqlKvApp : public corba::CorbaKvApp {
- public:
-  SqlKvApp(int &argc, char **argv, miutil::conf::ConfSection *conf);
-  virtual ~SqlKvApp();
+namespace kvservice
+{
+namespace sql
+{
 
-  virtual bool getKvData(KvGetDataReceiver &dataReceiver,
-                         const WhichDataHelper &wd);
-  virtual bool getKvRejectDecode(
-      const CKvalObs::CService::RejectDecodeInfo &decodeInfo,
-      kvservice::RejectDecodeIterator &it);
-  virtual bool getKvParams(std::list<kvalobs::kvParam> &paramList);
-  virtual bool getKvStations(std::list<kvalobs::kvStation> &stationList);
-  virtual bool getKvModelData(std::list<kvalobs::kvModelData> &dataList,
-                              const WhichDataHelper &wd);
-  virtual bool getKvTypes(std::list<kvalobs::kvTypes> &typeList);
-  virtual bool getKvOperator(std::list<kvalobs::kvOperator> &operatorList);
-  virtual bool getKvStationParam(std::list<kvalobs::kvStationParam> &stParam,
-                                 int stationid, int paramid = -1, int day = -1);
-  virtual bool getKvStationMetaData(
-      std::list<kvalobs::kvStationMetadata> &stMeta, int stationid,
-      const boost::posix_time::ptime &obstime,
-      const std::string & metadataName = "");
-  virtual bool getKvObsPgm(std::list<kvalobs::kvObsPgm> &obsPgm,
-                           const std::list<long> &stationList, bool aUnion);
-  virtual bool getKvData(KvObsDataList &dataList, const WhichDataHelper &wd);
-  virtual bool getKvWorkstatistik(
-      CKvalObs::CService::WorkstatistikTimeType timeType,
-      const boost::posix_time::ptime &from, const boost::posix_time::ptime &to,
-      kvservice::WorkstatistikIterator &it);
 
- private:
-  dnmi::db::Connection * connection(int id = 0);
+class SqlKvApp: public corba::CorbaKvApp
+{
+public:
+	SqlKvApp(int &argc, char **argv, miutil::conf::ConfSection *conf);
+	virtual ~SqlKvApp();
 
-  std::map<int, std::shared_ptr<dnmi::db::Connection>> connections_;
-  miutil::conf::ConfSection * conf_;
+    virtual bool getKvData( KvGetDataReceiver &dataReceiver, const WhichDataHelper &wd );
+    virtual bool getKvRejectDecode( const CKvalObs::CService::RejectDecodeInfo &decodeInfo, kvservice::RejectDecodeIterator &it );
+    virtual bool getKvParams( std::list<kvalobs::kvParam> &paramList );
+    virtual bool getKvStations( std::list<kvalobs::kvStation> &stationList );
+    virtual bool getKvModelData( std::list<kvalobs::kvModelData> &dataList, const WhichDataHelper &wd );
+    virtual bool getKvTypes( std::list<kvalobs::kvTypes> &typeList );
+    virtual bool getKvOperator( std::list<kvalobs::kvOperator> &operatorList );
+    virtual bool getKvStationParam( std::list<kvalobs::kvStationParam> &stParam, int stationid, int paramid = -1, int day = -1 );
+    virtual bool getKvStationMetaData( std::list<kvalobs::kvStationMetadata> &stMeta,
+  		                             int stationid, const boost::posix_time::ptime &obstime,
+  		                             const std::string & metadataName = "");
+    virtual bool getKvObsPgm( std::list<kvalobs::kvObsPgm> &obsPgm, const std::list<long> &stationList, bool aUnion );
+    virtual bool getKvData( KvObsDataList &dataList, const WhichDataHelper &wd );
+    virtual bool getKvWorkstatistik(CKvalObs::CService::WorkstatistikTimeType timeType,
+                                    const boost::posix_time::ptime &from, const boost::posix_time::ptime &to,
+                                    kvservice::WorkstatistikIterator &it
+                                    );
+
+private:
+    SqlGet * get_;
+
+    class ConnectionCreator {
+     public:
+      ConnectionCreator(miutil::conf::ConfSection * conf) : conf_(conf) {}
+      dnmi::db::Connection * operator () () const;
+
+     private:
+      miutil::conf::ConfSection * conf_;
+    } connectionCreator_;
 };
 
 } /* namespace sql */

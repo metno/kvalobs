@@ -1,9 +1,7 @@
 /*
  Kvalobs - Free Quality Control Software for Meteorological Observations
 
- $Id: KvApp.h,v 1.3.2.4 2007/09/27 09:02:45 paule Exp $
-
- Copyright (C) 2007 met.no
+ Copyright (C) 2015 met.no
 
  Contact information:
  Norwegian Meteorological Institute
@@ -333,8 +331,6 @@ class KvAppControl {
    *
    *    while( not in shutdown ) {
    *        work();
-   *
-   *        ....
    *    }
    *
    *     .....
@@ -363,14 +359,19 @@ class KvAppControl {
  * There is nothing that prevent you from creating more instances
  * but the behavior is undefined. Don't do it.
  */
-class KvApp : private boost::noncopyable, public details::KvalobsGet,
-    public details::KvalobsSend, public details::KvalobsSubscribe,
-    public details::KvAppControl {
+class KvApp : private boost::noncopyable, public virtual details::KvalobsGet,
+    public virtual details::KvalobsSend, public virtual details::KvalobsSubscribe,
+    public virtual details::KvAppControl {
  public:
   /**
    * \brief A pointer to the KvApp singleton, if one has been instatiated.
    */
   static KvApp *kvApp;
+
+  /**
+   * Create a KvApp object
+   */
+  static KvApp * create(const std::string & applicationName, int argc, char ** argv);
 
   KvApp();
 

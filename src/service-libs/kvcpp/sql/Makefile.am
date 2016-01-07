@@ -6,6 +6,8 @@ libsqlkvappinclude_HEADERS = \
 
 libsqlkvapp_la_SOURCES = \
 	SqlKvApp.cpp \
+	SqlGet.h \
+	SqlGet.cpp \
 	KvDataHandler.h \
 	KvDataHandler.cpp
 

@@ -4,6 +4,11 @@ lib_LTLIBRARIES = libkvalobs_kvcpp.la
 
 libkvalobs_kvcpp_la_SOURCES = \
 	KvApp.cc  \
+	sql/SqlGet.cpp \
+	sql/SqlGet.h \
+	sql/KvDataHandler.cpp \
+	sql/KvDataHandler.h \
+	CurrentKvApp.cpp \
 	kvDataSubscribeInfoHelper.cc \
 	kveventinterface.cc \
 	kvevents.cc \
@@ -12,11 +17,13 @@ libkvalobs_kvcpp_la_SOURCES = \
 	RejectdecodeIterator.cc \
 	WhichDataHelper.cc\
 	WorkstatistikIterator.cc
+	
 
 kvcppincludedir = $(pkgincludedir)/kvcpp
 	
 kvcppinclude_HEADERS = \
 	KvApp.h \
+	CurrentKvApp.h \
 	kvDataSubscribeInfoHelper.h \
 	kveventinterface.h \
 	kvevents.h \
@@ -42,9 +49,8 @@ libkvalobs_kvcpp_la_LIBADD = \
 	$(top_builddir)/src/lib/dnmithread/libkvalobs_dnmithread.la \
 	$(top_builddir)/src/lib/kvskel/libkvalobs_kvadmininterface.la \
 	$(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la \
-	$(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la   
-
-
+	$(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
+	@BOOST_FILESYSTEM_LIB@
 
 AM_CPPFLAGS = \
 	-D_REENTRANT \

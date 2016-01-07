@@ -37,6 +37,7 @@
 #include <stdexcept>
 #include <list>
 #include <set>
+#include <mutex>
 
 using namespace kvalobs::subscribe;
 using namespace kvalobs;
@@ -155,7 +156,8 @@ void broadcastNotification(
 KafkaSubscribe::KafkaSubscribe(const std::string & domain,
                                const std::string & brokers)
     : domain_(domain),
-      brokers_(brokers) {
+      brokers_(brokers),
+      shutdown_(false) {
 }
 
 KafkaSubscribe::~KafkaSubscribe() {
@@ -230,6 +232,22 @@ KafkaSubscribe::RunnableConsumer & KafkaSubscribe::getConsumer_(
     throw std::runtime_error("Attempting to access invalid subscriber");
   return find->second;
 
+}
+
+bool KafkaSubscribe::shutdown() const {
+  return shutdown_;
+}
+
+void KafkaSubscribe::doShutdown() {
+  shutdown_ = true;
+  std::unique_lock<std::mutex> l(mutex_);
+  blocker_.notify_all();
+}
+
+void KafkaSubscribe::run() {
+  std::unique_lock<std::mutex> l(mutex_);
+  blocker_.wait(l);
+  joinAll();
 }
 
 } /* namespace kafka */

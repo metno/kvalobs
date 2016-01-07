@@ -1,9 +1,7 @@
 /*
  Kvalobs - Free Quality Control Software for Meteorological Observations
 
- $Id: KvApp.cc,v 1.2.2.3 2007/09/27 09:02:46 paule Exp $
-
- Copyright (C) 2007 met.no
+ Copyright (C) 2015 met.no
 
  Contact information:
  Norwegian Meteorological Institute
@@ -29,9 +27,63 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include "service-libs/kvcpp/KvApp.h"
+#include "CurrentKvApp.h"
+#include <kvalobs/kvPath.h>
+#include <milog/milog.h>
+#include <miconfparser/confparser.h>
+#include <fstream>
 
 namespace kvservice {
+
 KvApp *KvApp::kvApp = 0;
+
+namespace {
+
+miutil::conf::ConfSection * readConf(const std::string &fname) {
+  miutil::conf::ConfParser parser;
+  miutil::conf::ConfSection *conf;
+  std::ifstream fis;
+
+  fis.open(fname.c_str());
+
+  if (!fis) {
+    LOGERROR("Cant open the configuration file <" << fname << ">!");
+  } else {
+    LOGINFO("Reading configuration from file <" << fname << ">!");
+    conf = parser.parse(fis);
+    if (!conf) {
+      LOGERROR(
+          "Error while reading configuration file: <" << fname << ">!\n"
+              << parser.getError());
+    } else {
+      LOGINFO("Configuration file loaded!");
+      return conf;
+    }
+  }
+  return 0;
+}
+
+miutil::conf::ConfSection * getConfSection(
+    const std::string & applicationName) {
+
+  std::string myconf = applicationName + ".conf";
+  miutil::conf::ConfSection * confSec = readConf(myconf);
+  if (!confSec) {
+    myconf = kvPath("sysconfdir") + "/kvalobs.conf";
+    confSec = readConf(myconf);
+  }
+  if (!confSec)
+    throw std::runtime_error("Cant open conf file: " + myconf);
+  return confSec;
+}
+
+}
+
+KvApp * KvApp::create(const std::string & applicationName,
+                      int argc, char ** argv) {
+
+  return new CurrentKvApp(argc, argv);
+}
 
 KvApp::KvApp() {
   kvApp = this;
