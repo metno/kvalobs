@@ -31,8 +31,10 @@
 #define CACHEDDATABASEACCESS_H_
 
 #include "FilteredDatabaseAccess.h"
-#include "cache/DataCache.h"
+#include <memory>
+#include <map>
 #include <boost/shared_ptr.hpp>
+#include "cache/DataCache.h"
 
 namespace db {
 
@@ -93,7 +95,7 @@ class CachedDatabaseAccess : public FilteredDatabaseAccess {
   };
   mutable StationParamSpec lastStationParamQuery_;
 
-  mutable std::map<int, kvalobs::kvStation *> stations_;
+  mutable std::map<int, std::shared_ptr<kvalobs::kvStation>> stations_;
 
   mutable DataCache<ModelDataList> modelDataCache_;
   mutable DataCache<DataList> dataCache_;

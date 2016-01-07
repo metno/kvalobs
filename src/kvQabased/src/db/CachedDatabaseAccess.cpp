@@ -28,6 +28,9 @@
  */
 
 #include "CachedDatabaseAccess.h"
+#include <milog/milog.h>
+#include <map>
+
 
 namespace db {
 std::map<std::string, int> CachedDatabaseAccess::qcxFlagPositions_;
@@ -90,19 +93,21 @@ std::string CachedDatabaseAccess::getStationParam(
 }
 
 kvalobs::kvStation CachedDatabaseAccess::getStation(int stationid) const {
-  kvalobs::kvStation * station = 0;
-  std::map<int, kvalobs::kvStation *>::const_iterator find = stations_.find(
-      stationid);
+  std::shared_ptr<kvalobs::kvStation> station;
+
+  auto find = stations_.find(stationid);
   if (find == stations_.end()) {
     try {
-      station = new kvalobs::kvStation(
-          FilteredDatabaseAccess::getStation(stationid));
+      const kvalobs::kvStation s = FilteredDatabaseAccess::getStation(stationid);
+      station = std::make_shared<kvalobs::kvStation>(s);
     } catch (std::exception & e) {
-      station = 0;
+      LOGDEBUG(e.what());
     }
     stations_[stationid] = station;
-  } else
+  } else {
     station = find->second;
+  }
+
   if (!station) {
     std::ostringstream s;
     s << "Unable to find station information for station id " << stationid;
