@@ -93,37 +93,27 @@ class KvalobsData {
   }
 
   void setMessageCorrectsThisRejection(
-      const kvalobs::kvRejectdecode & previouslyRejectedMessage) {
-    correctedMessages_.push_back(previouslyRejectedMessage);
-  }
+      const kvalobs::kvRejectdecode & previouslyRejectedMessage);
 
   /**
    * Get all data from object, with the given tbtime
    */
   void getData(std::list<kvalobs::kvData> & out,
                const boost::posix_time::ptime & tbtime =
-                   boost::posix_time::ptime()) const {
-    data(out, true, tbtime);
-  }
-
+                   boost::posix_time::ptime()) const;
   /**
    * Get all text data from object, with the given tbtime
    */
   void getData(std::list<kvalobs::kvTextData> & out,
                const boost::posix_time::ptime & tbtime =
-                   boost::posix_time::ptime()) const {
-    data(out, true, tbtime);
-  }
-
+                   boost::posix_time::ptime()) const;
   /**
    * Get all data and text datafrom object, with the given tbtime
    */
   void getData(std::list<kvalobs::kvData> & out1,
                std::list<kvalobs::kvTextData> & out2,
                const boost::posix_time::ptime & tbtime =
-                   boost::posix_time::ptime()) const {
-    data(out1, out2, true, tbtime);
-  }
+                   boost::posix_time::ptime()) const;
 
   /**
    * Get all data from object.
@@ -157,10 +147,7 @@ class KvalobsData {
   void data(std::list<kvalobs::kvData> & out1,
             std::list<kvalobs::kvTextData> & out2, bool setTbtime = false,
             const boost::posix_time::ptime & tbtime =
-                boost::posix_time::ptime()) const {
-    data(out1, setTbtime, tbtime);
-    data(out2, setTbtime, tbtime);
-  }
+                boost::posix_time::ptime()) const;
 
   typedef std::vector<kvalobs::kvRejectdecode> RejectList;
   void getRejectedCorrections(RejectList & out) const {

@@ -96,6 +96,30 @@ void KvalobsData::insert(const kvTextData & d) {
       .content() = d;
 }
 
+void KvalobsData::setMessageCorrectsThisRejection(
+    const kvalobs::kvRejectdecode & previouslyRejectedMessage) {
+  correctedMessages_.push_back(previouslyRejectedMessage);
+}
+
+void KvalobsData::getData(std::list<kvalobs::kvData> & out,
+                          const boost::posix_time::ptime & tbtime) const {
+  data(out, true, tbtime);
+}
+
+/**
+ * Get all text data from object, with the given tbtime
+ */
+void KvalobsData::getData(std::list<kvalobs::kvTextData> & out,
+                          const boost::posix_time::ptime & tbtime) const {
+  data(out, true, tbtime);
+}
+
+void KvalobsData::getData(std::list<kvalobs::kvData> & out1,
+                          std::list<kvalobs::kvTextData> & out2,
+                          const boost::posix_time::ptime & tbtime) const {
+  data(out1, out2, true, tbtime);
+}
+
 void KvalobsData::data(list<kvData> & out, bool setTbtime,
                        const boost::posix_time::ptime & tbtime) const {
 
@@ -149,6 +173,13 @@ void KvalobsData::data(list<kvTextData> & out, bool setTbtime,
 
   //Sort the return data, ignoring tbtime, so it is compatible with previous versions.
   out.sort(kvalobs::compare::lt_kvTextData());
+}
+
+void KvalobsData::data(std::list<kvalobs::kvData> & out1,
+                       std::list<kvalobs::kvTextData> & out2, bool setTbtime,
+                       const boost::posix_time::ptime & tbtime) const {
+  data(out1, setTbtime, tbtime);
+  data(out2, setTbtime, tbtime);
 }
 
 void KvalobsData::invalidate(bool doit, int station, int typeID,
