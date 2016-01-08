@@ -211,7 +211,6 @@ struct TextDataContent {
   TextDataContent() {
   }
   std::string original;
-  boost::posix_time::ptime tbtime;
 };
 
 typedef LeafItem<DataContent> DataItem;
