@@ -88,6 +88,8 @@ bool dnmi::file::deletePidFile(const std::string &pidfile) {
 
 bool dnmi::file::readPidFromPidFile(const std::string &pidfile, pid_t &pid,
                                     bool &fileExist) {
+  int n = sizeof(pid_t);
+  string buf;
   FILE *fd = fopen(pidfile.c_str(), "r");
 
   fileExist = true;
@@ -97,7 +99,22 @@ bool dnmi::file::readPidFromPidFile(const std::string &pidfile, pid_t &pid,
     return false;
   }
 
-  if (fscanf(fd, "%ld", &pid) == 1) {
+  if (n == sizeof(int)) {
+    buf = "%d";
+  } else if (n == sizeof(long int)) {
+    buf = "%ld";
+  } else if (n == sizeof(long long int)) {
+    buf = "%Ld";
+  } else {
+    cerr
+        << "Size of pid_t = "
+        << n
+        << ", that does not match the size of an int, long int or long long int.\n\n.";
+    fclose(fd);
+    return false;
+  }
+
+  if (fscanf(fd, buf.c_str(), &pid) == 1) {
     fclose(fd);
     return true;
   }
