@@ -44,11 +44,14 @@ class DeliveryReport : public RdKafka::DeliveryReportCb {
   }
 
   virtual void dr_cb(RdKafka::Message & message) {
+    std::unique_ptr<KafkaProducer::MessageId> id(
+        static_cast<KafkaProducer::MessageId *>(message.msg_opaque()));
+
     std::string data((char*) message.payload(), message.len());
     if (message.err() == RdKafka::ERR_NO_ERROR)
-      onSuccessfulDelivery_(data);
+      onSuccessfulDelivery_(*id, data);
     else
-      onFailedDelivery_(data, message.errstr());
+      onFailedDelivery_(*id, data, message.errstr());
   }
 
  private:
@@ -62,7 +65,8 @@ KafkaProducer::KafkaProducer(const std::string & topic,
                              KafkaProducer::ErrorHandler onFailedDelivery,
                              KafkaProducer::SuccessHandler onSuccessfulDelivery)
     : deliveryReportHandler_(
-        new DeliveryReport(onFailedDelivery, onSuccessfulDelivery)) {
+          new DeliveryReport(onFailedDelivery, onSuccessfulDelivery)),
+      messageId_(0) {
   if (brokers.empty())
     throw std::logic_error("Empty kafka broker list");
 
@@ -91,18 +95,25 @@ KafkaProducer::~KafkaProducer() {
   catchup();
 }
 
-void KafkaProducer::send(const std::string & data) {
-  send(data.c_str(), data.size());
+KafkaProducer::MessageId KafkaProducer::send(const std::string & data) {
+  return send(data.c_str(), data.size());
 }
 
-void KafkaProducer::send(const char * data, unsigned length) {
+KafkaProducer::MessageId KafkaProducer::send(const char * data,
+                                             unsigned length) {
+  MessageId * id = new MessageId(messageId_++);
+
   RdKafka::ErrorCode resp = producer_->produce(
       topic_.get(), RdKafka::Topic::PARTITION_UA,
-      RdKafka::Producer::RK_MSG_COPY /* Copy payload */, (void*) data, length,
-      nullptr, nullptr);
+      RdKafka::Producer::RK_MSG_COPY /* Copy payload */,
+      const_cast<char*>(data), length, nullptr, static_cast<void*>(id));
 
-  if (resp != RdKafka::ERR_NO_ERROR)
+  if (resp != RdKafka::ERR_NO_ERROR) {
+    delete id;
     throw std::runtime_error(RdKafka::err2str(resp));
+  }
+
+  return *id;
 }
 
 void KafkaProducer::catchup(unsigned timeout) {

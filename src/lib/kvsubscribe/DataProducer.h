@@ -31,6 +31,7 @@
 #define SRC_LIB_KVSUBSCRIBE_DATAPRODUCER_H_
 
 #include "KafkaProducer.h"
+#include <string>
 
 namespace kvalobs {
 namespace serialize {
@@ -41,15 +42,17 @@ namespace subscribe {
 
 class DataProducer {
  public:
+  typedef KafkaProducer::MessageId MessageId;
+
   DataProducer(const std::string & domain, const std::string & brokers =
                    "localhost",
                KafkaProducer::ErrorHandler onFailedDelivery =
-                   [](const std::string &, const std::string &) {},
+                   [](MessageId, const std::string &, const std::string &) {},
                KafkaProducer::SuccessHandler onSuccessfulDelivery =
-                   [](const std::string &) {});
+                   [](MessageId, const std::string &) {});
   ~DataProducer();
 
-  void send(const serialize::KvalobsData & data);
+  MessageId send(const serialize::KvalobsData & data);
 
   /**
    * Process all awaiting delivery reports.

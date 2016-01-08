@@ -48,7 +48,7 @@ void stopApplication(int signal) {
   kvservice::KvApp::kvApp->doShutdown();
 }
 
-void onError(const std::string & data, const std::string & errorMessage) {
+void onError(KafkaProducer::MessageId id, const std::string & data, const std::string & errorMessage) {
   std::clog << "ERROR:\t" << errorMessage << std::endl;
 }
 
@@ -96,7 +96,12 @@ void produceData(const std::string & domain, const std::string brokers =
     auto dataList = event->data();
     for (const kvservice::KvObsData & data : *dataList) {
       kvalobs::serialize::KvalobsData d(data.dataList(), data.textDataList());
-      output.send(d);
+      try {
+        output.send(d);
+      }
+      catch (std::exception & e) {
+        std::clog << "ERROR: " << e.what() << std::endl;
+      }
     }
   }
   std::clog << "done" << std::endl;

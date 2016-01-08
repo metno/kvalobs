@@ -28,6 +28,7 @@
  */
 
 #include "QaBaseApp.h"
+#include <string>
 #include <kvsubscribe/KafkaProducer.h>
 #include <kvsubscribe/queue.h>
 #include <kvalobs/kvPath.h>
@@ -65,7 +66,8 @@ QaBaseApp::~QaBaseApp() {
 }
 
 namespace {
-void processDataErrors(const std::string & data,
+void processDataErrors(kvalobs::subscribe::KafkaProducer::MessageId id,
+                       const std::string & data,
                        const std::string & errorMessage) {
   LOGERROR("Unable to send data: " + errorMessage + "  Data: <" + data + ">");
 }
@@ -84,7 +86,7 @@ std::shared_ptr<kvalobs::subscribe::KafkaProducer> QaBaseApp::kafkaProducer() {
       > (queue, kafkaBrokers_, processDataErrors);
 }
 
-const std::string & QaBaseApp::baseLogDir() {
+std::string QaBaseApp::baseLogDir() {
   return kvalobs::kvPath(kvalobs::logdir) + "/checks/";
 }
 

@@ -30,6 +30,7 @@
 #ifndef KAFKAPRODUCER_H_
 #define KAFKAPRODUCER_H_
 
+#include <cstdint>
 #include <string>
 #include <memory>
 
@@ -45,16 +46,17 @@ namespace subscribe {
 
 class KafkaProducer {
  public:
-  typedef std::function<void(const std::string & data)> SuccessHandler;
+  typedef uint64_t MessageId;
+  typedef std::function<void(MessageId id, const std::string & data)> SuccessHandler;
   typedef std::function<
-      void(const std::string & data, const std::string & errorMessage)> ErrorHandler;
+      void(MessageId id, const std::string & data, const std::string & errorMessage)> ErrorHandler;
 
   explicit KafkaProducer(const std::string & topic,
                          const std::string & brokers = "localhost",
                          ErrorHandler onFailedDelivery =
-                             [](const std::string &, const std::string &) {},
+                             [](MessageId, const std::string &, const std::string &) {},
                          SuccessHandler onSuccessfulDelivery =
-                             [](const std::string &) {});
+                             [](MessageId, const std::string &) {});
 
   ~KafkaProducer();
 
@@ -65,10 +67,15 @@ class KafkaProducer {
    * On error, may either throw an exception right away, or deliver an
    * error report on KafkaProducer's deliveryReportHandler after having
    * called catchup, or destroying this object.
+   *
+   * @throws exception if it fails right away
+   *
+   * @return a message id, that will be available in this object's constructor's
+   *         onFailedDelivery and onSuccessfulDelivery functions
    */
-  void send(const std::string & data);
+  MessageId send(const std::string & data);
 
-  void send(const char * data, unsigned length);
+  MessageId send(const char * data, unsigned length);
 
   /**
    * Process all awaiting delivery reports.
@@ -80,6 +87,8 @@ class KafkaProducer {
   std::string topic() const;
 
  private:
+  MessageId messageId_;
+
   std::unique_ptr<RdKafka::Producer> producer_;
   std::unique_ptr<RdKafka::Topic> topic_;
 

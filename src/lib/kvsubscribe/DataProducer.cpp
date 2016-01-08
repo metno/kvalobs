@@ -46,8 +46,8 @@ DataProducer::DataProducer(const std::string & domain,
 DataProducer::~DataProducer() {
 }
 
-void DataProducer::send(const serialize::KvalobsData & data) {
-  producer_.send(serialize::KvalobsDataSerializer::serialize(data));
+DataProducer::MessageId DataProducer::send(const serialize::KvalobsData & data) {
+  return producer_.send(serialize::KvalobsDataSerializer::serialize(data));
 }
 
 } /* namespace kafka */
