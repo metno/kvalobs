@@ -30,6 +30,7 @@ AC_CONFIG_FILES([Makefile
                  src/Makefile
                  src/lib/Makefile
                  src/lib/gtest/Makefile
+		 src/lib/json/Makefile
                  src/lib/kvskel/Makefile
                  src/lib/miutil/Makefile
                  src/lib/decodeutility/Makefile

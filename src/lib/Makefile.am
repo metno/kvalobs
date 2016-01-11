@@ -1,16 +1,16 @@
 SUBDIRS = \
-	gtest \
-	kvskel \
-	dnmithread \
-	miutil \
-	miconfparser \
-	milog \
-	fileutil \
-	kvdb \
-	corbahelper \
-	kvalobs \
-	decodeutility \
-	dbdrivers \
-	decoder \
-	kvsubscribe
-
+  gtest \
+  json \
+  kvskel \
+  dnmithread \
+  miutil \
+  miconfparser \
+  milog \
+  fileutil \
+  kvdb \
+  corbahelper \
+  kvalobs \
+  decodeutility \
+  dbdrivers \
+  decoder \
+  kvsubscribe
