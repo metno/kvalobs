@@ -34,9 +34,9 @@
 #define SRC_LIB_MIUTIL_THREADPOOL_H_
 
 
-#include <chrono>  // NOLINT(build/c++11)
+#include <chrono>
 #include <string>
-#include <thread>  // NOLINT(build/c++11)
+#include <thread>
 #include <vector>
 #include "miutil/blockingqueue.h"
 #include "miutil/runable.h"

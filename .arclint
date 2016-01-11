@@ -66,6 +66,7 @@
     "googleccplint": {
       "type": "googlecpplint",
       "severity": {
+        "build/c++11": "disabled",
         "runtime/int": "advice",
         "runtime/references": "disabled",
         "whitespace/line_length": "disabled"

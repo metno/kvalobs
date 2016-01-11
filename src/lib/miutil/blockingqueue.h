@@ -32,12 +32,12 @@
 #ifndef SRC_LIB_MIUTIL_BLOCKINGQUEUE_H_
 #define SRC_LIB_MIUTIL_BLOCKINGQUEUE_H_
 
-#include <chrono>  // NOLINT(build/c++11)
-#include <condition_variable>  // NOLINT(build/c++11)
+#include <chrono>
+#include <condition_variable>
 #include <deque>
 #include <exception>
 #include <limits>
-#include <mutex>  // NOLINT(build/c++11)
+#include <mutex>
 #include "miutil/exceptionSpec.h"
 
 namespace miutil {
