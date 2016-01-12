@@ -1,7 +1,7 @@
 /*
- Kvalobs - Free Quality Control Software for Meteorological Observations 
+ Kvalobs - Free Quality Control Software for Meteorological Observations
 
- $Id: decoder.h,v 1.1.2.2 2007/09/27 09:02:27 paule Exp $                                                       
+ $Id: decoder.h,v 1.1.2.2 2007/09/27 09:02:27 paule Exp $
 
  Copyright (C) 2007 met.no
 
@@ -15,41 +15,43 @@
  This file is part of KVALOBS
 
  KVALOBS is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License as 
- published by the Free Software Foundation; either version 2 
+ modify it under the terms of the GNU General Public License as
+ published by the Free Software Foundation; either version 2
  of the License, or (at your option) any later version.
- 
+
  KVALOBS is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  General Public License for more details.
- 
- You should have received a copy of the GNU General Public License along 
- with KVALOBS; if not, write to the Free Software Foundation Inc., 
+
+ You should have received a copy of the GNU General Public License along
+ with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#ifndef __dnmi_decoder_Decoder_h__
-#define __dnmi_decoder_Decoder_h__
+#ifndef SRC_LIB_DECODER_DECODERBASE_DECODER_H_
+#define SRC_LIB_DECODER_DECODERBASE_DECODER_H_
 
 #include <list>
 #include <set>
 #include <sstream>
 #include <string>
-#include <miconfparser/miconfparser.h>
-#include <puTools/miTime.h>
-#include <kvdb/kvdb.h>
-#include <fileutil/dso.h>
-#include <kvalobs/kvObsPgm.h>
-#include <kvalobs/paramlist.h>
-#include <kvalobs/kvData.h>
-#include <kvalobs/kvStationInfo.h>
-#include <kvalobs/kvRejectdecode.h>
-#include <kvalobs/kvStation.h>
-#include <kvalobs/kvTextData.h>
-#include <kvalobs/kvTypes.h>
-#include <milog/milog.h>
-#include <decoderbase/GenCacheElem.h>
-#include <decoderbase/metadata.h>
+#include "boost/lexical_cast.hpp"
+#include "miconfparser/miconfparser.h"
+#include "puTools/miTime.h"
+#include "kvdb/kvdb.h"
+#include "fileutil/dso.h"
+#include "kvalobs/kvObsPgm.h"
+#include "kvalobs/paramlist.h"
+#include "kvalobs/kvData.h"
+#include "kvalobs/kvStationInfo.h"
+#include "kvalobs/kvRejectdecode.h"
+#include "kvalobs/kvStation.h"
+#include "kvalobs/kvTextData.h"
+#include "kvalobs/kvTypes.h"
+#include "decodeutility/kvalobsdata.h"
+#include "milog/milog.h"
+#include "decoderbase/GenCacheElem.h"
+#include "decoderbase/metadata.h"
 
 namespace kvalobs {
 
@@ -60,7 +62,7 @@ namespace kvalobs {
 namespace decoder {
 /**
  * \defgroup kvdecoder Data decoders
- * 
+ *
  * The data decoders is implemented as plugins to the kvDatainputd.
 
  * @{
@@ -103,6 +105,7 @@ class DecoderBase {
 
   int decoderId;
   kvalobs::kvStationInfoList stationInfoList;
+  std::list<kvalobs::serialize::KvalobsData> decodedData;
   std::list<std::string> createdLoggers;
   std::list<GenCachElem> genCachElem;
   miutil::conf::ConfSection *theKvConf;
@@ -143,14 +146,14 @@ class DecoderBase {
   void updateStationInfo(const kvalobs::kvStationInfoList& stationInfo);
 
   /**
-   * \brief  isGenerated looks up in the table 'generated_data' 
-   * 
+   * \brief  isGenerated looks up in the table 'generated_data'
+   *
    * to see if there exist an entry for the stationid/typeid
-   * combination. If there is an entry the function returns 
+   * combination. If there is an entry the function returns
    * true and false otherwise.
    *
-   * The generated_data table has an enty for each message 
-   * given by stationid and typeid that is not 'original' data, 
+   * The generated_data table has an enty for each message
+   * given by stationid and typeid that is not 'original' data,
    * but a message generated from data from the kvalobs. This my be
    * SYNOP, METAR etc.
    *
@@ -167,33 +170,33 @@ class DecoderBase {
   const std::list<kvalobs::kvTypes> &typeList;
 
   /**
-   * mataconf contains metadata that is given from the 
+   * mataconf contains metadata that is given from the
    * data providers. This is extra information about the data
    * that is not avaible in kvalobs, but is needed to decode the data.
    */
   miutil::parsers::meta::Meta metaconf;
 
   /**
-   * \brief This is the type (format) of the observation message that 
-   * is to be decoded. 
-   * 
-   * It is an input parameter to the constructor. 
+   * \brief This is the type (format) of the observation message that
+   * is to be decoded.
+   *
+   * It is an input parameter to the constructor.
    */
   std::string obsType;
 
   /**
-   * \brief This is the message that is to be decoded 
+   * \brief This is the message that is to be decoded
    *
-   * and inserted into the tables \em data and \em text_data. 
-   * It is an input parameter to the constructor. 
+   * and inserted into the tables \em data and \em text_data.
+   * It is an input parameter to the constructor.
    */
   std::string obs;
 
-  std::string logdir_;  //Set the path to use for the logdir. Mainly for running tests.
+  std::string logdir_;  // Set the path to use for the logdir. Mainly for running tests.
 
   /**
-   * \brief findTypes, look up the typeid in the typelist 
-   * 
+   * \brief findTypes, look up the typeid in the typelist
+   *
    * and returns a pointer to a kvTypes. This pointer must NOT
    * be deleted.
    *
@@ -204,7 +207,7 @@ class DecoderBase {
 
   /**
    * \brief getStationId, looks up in the database to find the kvalobs
-   * stationId from ex. climano, synopno, etc 
+   * stationId from ex. climano, synopno, etc
    *
    * \param key must be a valid column name in the table kv_stasjon.
    * \param value the value of key that we want.
@@ -286,7 +289,7 @@ class DecoderBase {
    * If it does, the method just returns true without actually inserting
    * the data.
    *
-   * How the data is inserted depends on the value of paramter onlyAddOrUpdateData.
+   * How the data is inserted depends on the value of parameter onlyAddOrUpdateData.
    *
    * onlyAddOrUpdateDate is false:
    * If there exist data for the dataset but the data is not equal all
@@ -312,7 +315,7 @@ class DecoderBase {
                    const std::string &logid, bool onlyAddOrUpdateData);
 
   /**
-   * \brief insert the \em obs message into the table \em rejectdecode. 
+   * \brief insert the \em obs message into the table \em rejectdecode.
    *
    */
 
@@ -321,7 +324,7 @@ class DecoderBase {
   /**
    *  \brief putkvStationInDb, if a SHIP is not defined in
    *
-   *  the database, then we load it here (temporary) 
+   *  the database, then we load it here (temporary)
    */
 
   bool putkvStationInDb(const kvalobs::kvStation &st);
@@ -342,24 +345,23 @@ class DecoderBase {
                          int priority);
 
  public:
-
   typedef enum {
-    ///The \em obs was decoded and inserted into the database. 
+    /// The \em obs was decoded and inserted into the database.
     Ok,
-    ///The \em obs was decoded, but not inserted into the database due to a database error.. 
+    /// The \em obs was decoded, but not inserted into the database due to a database error..
     NotSaved,
-    ///There was an error while decoding the \em obs. The obs is inserted into the table \em rejectdecode.
+    /// There was an error while decoding the \em obs. The obs is inserted into the table \em rejectdecode.
     Rejected,
-    ///There was an unrecoverable error in the decoder. Not releated
-    ///to the \em obs.
+    /// There was an unrecoverable error in the decoder. Not releated
+    /// to the \em obs.
     Error,
-    ///Redirect the message to the decoder in msg, from execute.
+    /// Redirect the message to the decoder in msg, from execute.
     Redirect
   } DecodeResult;
 
   /**
-   * \brief This is the only avalable constructor, all classes that 
-   * inherit from this baseclass must call this constructor. 
+   * \brief This is the only avalable constructor, all classes that
+   * inherit from this baseclass must call this constructor.
    *
    * The observation message to be decoded is \em obs_ and the type
    * (format) of the message is \em obsType_. You can also give
@@ -384,16 +386,16 @@ class DecoderBase {
    *
    * </pre>
    *
-   * Note that it is posible to give an array of values with repeated
+   * Note that it is possible to give an array of values with repeated
    * value tags in an param section.
    *
    * The decoder will save the decoded data in the tables \em data and
-   * \em text_data in the kvalobs database. 
+   * \em text_data in the kvalobs database.
    *
    * If the message cant be decoded the hole message \em obs_ is inserted
    * into the table \em rejectdecode.
    *
-   * \note Failing to call this constructor will result in a real mess, 
+   * \note Failing to call this constructor will result in a real mess,
    * and proably a core dump when the driver is unloaded. You are warned!
    *
    * \param con_ A database connection to use.
@@ -437,16 +439,16 @@ class DecoderBase {
 
   /**
    * \brief Return the value of a key in obstype.
-   * 
+   *
    * The obstype string that identifies a message can contain
    * key=value pairs.
-   * 
+   *
    * The generell format on the obstype string is:
-   * 
+   *
    *   messagetype/key0=val0/key1=val1/.../keyN=valN
-   * 
+   *
    * Where the keys may be specific for the messagetype.
-   * 
+   *
    * \param key The key we want the value to.
    * \return the value to the key if the key exist or an
    *         empty string otherwise.
@@ -455,21 +457,21 @@ class DecoderBase {
 
   /**
    * \brief Returns the meta_SaSd key from ObsType.
-   * 
-   * The values indicates if the station report SA/SD/EM. 
+   *
+   * The values indicates if the station report SA/SD/EM.
    * The returned string is two character wide. Where each
    * value represent a boolean, 0 is false and 1 true.
-   * 
-   * The first character indicate is the value for SA and 
+   *
+   * The first character indicate is the value for SA and
    * the second caharacter is the value of SD.
-   *  
+   *
    *  -SA=1 The station report snowdepth.
-   *  -SD/EM = 1 The station report the state of the ground. 
-   * 
-   * The values comes typically from the E'sss codings. See 
+   *  -SD/EM = 1 The station report the state of the ground.
+   *
+   * The values comes typically from the E'sss codings. See
    * the WMO specificatipn for SYNOP.
-   * 
-   * \return The value of the meta_SaSd key from the ObsType 
+   *
+   * \return The value of the meta_SaSd key from the ObsType
    *         if present otherwise an empty string is returned.
    */
   std::string getMetaSaSd() const;
@@ -495,14 +497,21 @@ class DecoderBase {
   }
 
   /**
-   * \brief return a referance to the station list. 
-   * Ths is a list of the stations that is defined in the table
-   * \em stations in the kvalobs database, 
+   * \brief return a reference to the station list.
+   * This is a list of the stations that is inserted
+   * into the kvalobs database,
    *
-   * \return The station list. 
+   * \return The station list.
    */
   kvalobs::kvStationInfoList &getStationList() {
     return stationInfoList;
+  }
+
+  /**
+   * The decoded data inserted into the database.
+   */
+  std::list<kvalobs::serialize::KvalobsData> &getDecodedData() {
+    return decodedData;
   }
 
   /**
@@ -523,7 +532,6 @@ class DecoderBase {
    * \param paramid The parameter to test.
    * \return true if \em paramid is a text param and false if not.
    */
-  //static bool isTextParam(int paramid);
   bool isTextParam(int paramid);
 
   /**
@@ -532,34 +540,34 @@ class DecoderBase {
    * This is an virtual function that must be implemented by the
    * decoder.
    *
-   * \note The name of the decoder must be unique. ie. It cant be two 
+   * \note The name of the decoder must be unique. ie. It cant be two
    * decoders in the system with the same name.
    *
    * \return The name of the decoder.
    */
-  virtual std::string name() const =0;
+  virtual std::string name() const = 0;
 
   /**
    * \brief call this funtction to decode a message.
-   * This is a virtual function that must be implemented by 
+   * This is a virtual function that must be implemented by
    * the decoder.
    *
    * The caller call this function to decode a message.
    *
-   * The message to be decoded was given as the \em obs_ parameter  
-   * and the the type of the message was given as the obsType_ parameter 
-   * to the constructor:  
+   * The message to be decoded was given as the \em obs_ parameter
+   * and the the type of the message was given as the obsType_ parameter
+   * to the constructor:
    *
    *  DecoderBase(dnmi::db::Connection   &con_,const ParamList        &params,const std::list<kvalobs::kvTypes> &typeList,const std::string &obsType_,const std::string &obs_,int                    decoderId_)
    *
-   * The observation message and the observation type (format) is 
-   * avalable to the decoder as the protected variables \em obs and 
+   * The observation message and the observation type (format) is
+   * avalable to the decoder as the protected variables \em obs and
    * \em  obsType.
    *
    * \param[out] msg a status message on return.
    * \return The decoding status after decoding the message.
    */
-  virtual DecodeResult execute(std::string &msg)=0;
+  virtual DecodeResult execute(std::string &msg) = 0;
 
   /**
    * \brief Create a logger that logs to a file.
@@ -595,7 +603,7 @@ class DecoderBase {
 
   /**
    * \brief Load a decoder specific configurationfile.
-   * 
+   *
    * The file loaded is $KVALOBS/etc/decode/name()/'sid'-'tid'.conf
    *
    * \param sid stationid
@@ -656,11 +664,8 @@ class IdlogHelper {
  public:
   IdlogHelper(int stationid, int typeid_,
               kvalobs::decoder::DecoderBase *decoder_)
-      : decoder(decoder_) {
-    std::ostringstream ost;
-    ost << "n" << stationid << "-t" << typeid_;
-    logid_ = ost.str();
-
+    : decoder(decoder_),
+      logid_(std::string("n")+boost::lexical_cast<std::string>(stationid)+"-t"+boost::lexical_cast<std::string>(typeid_)) {
     if (decoder)
       decoder->createLogger(logid_);
   }
@@ -676,8 +681,7 @@ class IdlogHelper {
 };
 
 /** @} */
-}
-}
+}  // namespace decoder
+}  // namespace kvalobs
 
-#endif
-
+#endif  // SRC_LIB_DECODER_DECODERBASE_DECODER_H_

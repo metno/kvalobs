@@ -31,31 +31,37 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <errno.h>
-#include <sstream>
-#include <fstream>
 #include <cstring>
-#include <boost/thread.hpp>
-#include <kvalobs/kvDbGate.h>
-#include <kvalobs/kvQueries.h>
-#include <kvalobs/kvGeneratedTypes.h>
-#include <kvalobs/kvWorkelement.h>
-#include <kvalobs/kvPath.h>
-#include <puTools/miTime.h>
-#include <miutil/commastring.h>
-#include <miutil/trimstr.h>
-#include <miutil/timeconvert.h>
-#include <miutil/SemiUniqueName.h>
-#include <decodeutility/getUseInfo7.h>
-#include <decodeutility/isTextParam.h>
-#include <kvalobs/getLogInfo.h>
-#include "RedirectInfo.h"
-#include "decoder.h"
-#include "ConfParser.h"
-#include "metadata.h"
-#include "DataUpdateTransaction.h"
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include "boost/thread.hpp"
+#include "puTools/miTime.h"
+#include "lib/decoder/decoderbase/ConfParser.h"
+#include "lib/decoder/decoderbase/DataUpdateTransaction.h"
+#include "lib/decoder/decoderbase/RedirectInfo.h"
+#include "lib/decoder/decoderbase/decoder.h"
+#include "lib/decoder/decoderbase/metadata.h"
+#include "lib/decodeutility/getUseInfo7.h"
+#include "lib/decodeutility/isTextParam.h"
+#include "lib/kvalobs/getLogInfo.h"
+#include "lib/kvalobs/kvDbGate.h"
+#include "lib/kvalobs/kvGeneratedTypes.h"
+#include "lib/kvalobs/kvPath.h"
+#include "lib/kvalobs/kvQueries.h"
+#include "lib/kvalobs/kvWorkelement.h"
+#include "lib/miutil/SemiUniqueName.h"
+#include "lib/miutil/commastring.h"
+#include "lib/miutil/timeconvert.h"
+#include "lib/miutil/trimstr.h"
 
-using namespace std;
-using namespace kvalobs;
+
+using std::string;
+using std::endl;
+using std::list;
+using std::ostringstream;
+using std::vector;
+using std::ifstream;
 
 namespace kvdatainput {
 namespace decodecommand {
@@ -81,18 +87,12 @@ kvalobs::decoder::ObsPgmParamInfo::operator=(const ObsPgmParamInfo &rhs) {
   return *this;
 }
 
-bool kvalobs::decoder::ObsPgmParamInfo::isActive(int stationid, int typeid_,
-                                                 int paramid, int sensor,
-                                                 int level,
-                                                 const miutil::miTime &obstime,
+bool kvalobs::decoder::ObsPgmParamInfo::isActive(int stationid, int typeid_, int paramid, int sensor, int level, const miutil::miTime &obstime,
                                                  Active &state) const {
   state = NO;
 
   for (CIObsPgmList it = obsPgm.begin(); it != obsPgm.end(); ++it) {
-    if (it->stationID() == stationid && it->typeID() == typeid_
-        && it->paramID() == paramid && it->level() == level
-        && it->nr_sensor() > sensor) {
-
+    if (it->stationID() == stationid && it->typeID() == typeid_ && it->paramID() == paramid && it->level() == level && it->nr_sensor() > sensor) {
       if (it->isOn(to_ptime(obstime))) {
         if (it->collector())
           state = MAYBE;
@@ -107,10 +107,8 @@ bool kvalobs::decoder::ObsPgmParamInfo::isActive(int stationid, int typeid_,
   return false;
 }
 
-kvalobs::decoder::DecoderBase::DecoderBase(
-    dnmi::db::Connection &con_, const ParamList &params,
-    const std::list<kvalobs::kvTypes> &typeList_, const std::string &obsType_,
-    const std::string &obs_, int decoderId_)
+kvalobs::decoder::DecoderBase::DecoderBase(dnmi::db::Connection &con_, const ParamList &params, const std::list<kvalobs::kvTypes> &typeList_,
+                                           const std::string &obsType_, const std::string &obs_, int decoderId_)
     : decoderId(decoderId_),
       con(con_),
       paramList(params),
@@ -123,13 +121,12 @@ kvalobs::decoder::DecoderBase::DecoderBase(
 kvalobs::decoder::DecoderBase::~DecoderBase() {
   list<string>::iterator it = createdLoggers.begin();
 
-  for (; it != createdLoggers.end(); it++) {
+  for (; it != createdLoggers.end(); ++it) {
     milog::Logger::removeLogger(*it);
   }
 }
 
-std::string kvalobs::decoder::DecoderBase::semiuniqueName(
-    const std::string &prefix, const char *endsWith) {
+std::string kvalobs::decoder::DecoderBase::semiuniqueName(const std::string &prefix, const char *endsWith) {
   return miutil::SemiUniqueName::uniqueName(prefix, endsWith);
 }
 
@@ -139,8 +136,7 @@ std::string kvalobs::decoder::DecoderBase::semiuniqueName(
  * a decoder command. The DecoderBase class is binary compatible
  * with old code that use it.
  */
-bool kvalobs::decoder::DecoderBase::setRedirectInfo(const std::string &obsType,
-                                                    const std::string &data) {
+bool kvalobs::decoder::DecoderBase::setRedirectInfo(const std::string &obsType, const std::string &data) {
   RedirectInfo *redirectInfo = kvdatainput::decodecommand::ptrRedirect.get();
 
   if (!redirectInfo)
@@ -153,14 +149,12 @@ bool kvalobs::decoder::DecoderBase::setRedirectInfo(const std::string &obsType,
   return true;
 }
 
-void kvalobs::decoder::DecoderBase::setKvConf(
-    miutil::conf::ConfSection *theKvConf_) {
+void kvalobs::decoder::DecoderBase::setKvConf(miutil::conf::ConfSection *theKvConf_) {
   theKvConf = theKvConf_;
 }
 
-char kvalobs::decoder::DecoderBase::getUseinfo7Code(
-    int typeId, const boost::posix_time::ptime &now,
-    const boost::posix_time::ptime &obt, const std::string &logid) {
+char kvalobs::decoder::DecoderBase::getUseinfo7Code(int typeId, const boost::posix_time::ptime &now, const boost::posix_time::ptime &obt,
+                                                    const std::string &logid) {
   int flag = decodeutility::getUseinfo7Code(typeId, now, obt, typeList);
 
   if (flag < 0) {
@@ -177,31 +171,26 @@ char kvalobs::decoder::DecoderBase::getUseinfo7Code(
 }
 
 void kvalobs::decoder::DecoderBase::setMetaconf(const std::string &metaconf_) {
-  using namespace miutil::parsers::meta;
+  namespace m = miutil::parsers::meta;
 
-  MetaParser parser;
-
-  Meta *meta = parser.parse(metaconf_);
+  m::MetaParser parser;
+  m::Meta *meta = parser.parse(metaconf_);
 
   LOGDEBUG6("Metaconf: " << endl << metaconf_);
 
   if (meta) {
     if (!parser.getWarnings().empty()) {
-      LOGWARN(
-          "Warnings from parsing metaconf!" << endl << metaconf_ << endl << "Reason: " << parser.getWarnings());
+      LOGWARN("Warnings from parsing metaconf!" << endl << metaconf_ << endl << "Reason: " << parser.getWarnings());
     }
 
     metaconf = *meta;
     delete meta;
   } else {
-    LOGERROR(
-        "Error parsing metaconf!" << endl << metaconf_ << endl << "Reason: " << parser.getErrMsg());
+    LOGERROR("Error parsing metaconf!" << endl << metaconf_ << endl << "Reason: " << parser.getErrMsg());
   }
-
 }
 
-std::string kvalobs::decoder::DecoderBase::getObsTypeKey(
-    const std::string &keyToFind_) const {
+std::string kvalobs::decoder::DecoderBase::getObsTypeKey(const std::string &keyToFind_) const {
   string keyval;
   string key;
   string val;
@@ -215,7 +204,6 @@ std::string kvalobs::decoder::DecoderBase::getObsTypeKey(
   miutil::CommaString cstr(obsType, '/');
 
   for (int i = 0; i < cstr.size(); ++i) {
-
     if (!cstr.get(i, keyval))
       continue;
 
@@ -230,14 +218,12 @@ std::string kvalobs::decoder::DecoderBase::getObsTypeKey(
     miutil::trimstr(key);
 
     if (key == keyToFind) {
-
       if (key.size() >= 2)
         return val;
     }
   }
 
   return "";
-
 }
 
 std::string kvalobs::decoder::DecoderBase::getMetaSaSd() const {
@@ -253,7 +239,7 @@ const kvalobs::kvTypes*
 kvalobs::decoder::DecoderBase::findType(int typeid_) const {
   std::list<kvalobs::kvTypes>::const_iterator it = typeList.begin();
 
-  for (; it != typeList.end(); it++) {
+  for (; it != typeList.end(); ++it) {
     if (it->typeID() == typeid_)
       return &(*it);
   }
@@ -261,15 +247,11 @@ kvalobs::decoder::DecoderBase::findType(int typeid_) const {
   return 0;
 }
 
-void kvalobs::decoder::DecoderBase::addStationInfo(
-    long stationid, const miutil::miTime &obstime, long typeid_,
-    const miutil::miTime &tbtime, int priority) {
+void kvalobs::decoder::DecoderBase::addStationInfo(long stationid, const miutil::miTime &obstime, long typeid_, const miutil::miTime &tbtime, int priority) {
   IkvStationInfoList it = stationInfoList.begin();
 
-  for (; it != stationInfoList.end(); it++) {
-    if (it->stationID() == stationid && it->obstime() == to_ptime(obstime)
-        && it->typeID() == typeid_) {
-
+  for (; it != stationInfoList.end(); ++it) {
+    if (it->stationID() == stationid && it->obstime() == to_ptime(obstime) && it->typeID() == typeid_) {
       return;
     }
   }
@@ -277,32 +259,24 @@ void kvalobs::decoder::DecoderBase::addStationInfo(
   kvDbGate gate(&con);
   boost::posix_time::ptime undefTime;
 
-  if (!gate.insert(
-      kvWorkelement(stationid, to_ptime(obstime), typeid_, to_ptime(tbtime),
-                    priority, undefTime, undefTime, undefTime, undefTime,
-                    undefTime),
-      true)) {
-    LOGERROR(
-        "addStationInfo: can't save kvWorkelement into the" << endl << "the table 'workque' in  the database!\n" << "[" << gate.getErrorStr() << "]");
+  if (!gate.insert(kvWorkelement(stationid, to_ptime(obstime), typeid_, to_ptime(tbtime), priority, undefTime, undefTime, undefTime, undefTime, undefTime),
+                   true)) {
+    LOGERROR("addStationInfo: can't save kvWorkelement into the" << endl << "the table 'workque' in  the database!\n" << "[" << gate.getErrorStr() << "]");
     return;
   }
 
   LOGDEBUG(
       "addStation: station added to the table 'workque'." << endl << "-- Stationid: " << stationid << endl << "-- obstime:   " << obstime << endl << "-- typeid:    " << typeid_ << endl << "-- priority:  " << priority);
 
-  stationInfoList.push_back(
-      kvStationInfo(stationid, to_ptime(obstime), typeid_));
+  stationInfoList.push_back(kvStationInfo(stationid, to_ptime(obstime), typeid_));
 }
 
-void kvalobs::decoder::DecoderBase::updateStationInfo(
-    const kvalobs::kvStationInfoList& stationInfo) {
+void kvalobs::decoder::DecoderBase::updateStationInfo(const kvalobs::kvStationInfoList& stationInfo) {
   IkvStationInfoList it = stationInfoList.begin();
 
-  for (kvalobs::kvStationInfoList::const_iterator nit = stationInfo.begin();
-      nit != stationInfo.end(); ++nit) {
-    for (; it != stationInfoList.end(); it++) {
-      if (it->stationID() == nit->stationID() && it->obstime() == nit->obstime()
-          && it->typeID() == nit->typeID()) {
+  for (kvalobs::kvStationInfoList::const_iterator nit = stationInfo.begin(); nit != stationInfo.end(); ++nit) {
+    for (; it != stationInfoList.end(); ++it) {
+      if (it->stationID() == nit->stationID() && it->obstime() == nit->obstime() && it->typeID() == nit->typeID()) {
         break;
       }
     }
@@ -314,8 +288,7 @@ void kvalobs::decoder::DecoderBase::updateStationInfo(
 bool kvalobs::decoder::DecoderBase::isGenerated(long stationid, long typeid_) {
   kvDbGate gate(&con);
 
-  for (list<GenCachElem>::iterator it = genCachElem.begin();
-      it != genCachElem.end(); it++) {
+  for (list<GenCachElem>::iterator it = genCachElem.begin(); it != genCachElem.end(); ++it) {
     if (it->stationID() == stationid && it->typeID() == typeid_) {
       return it->generated();
     }
@@ -337,47 +310,37 @@ int kvalobs::decoder::DecoderBase::getDecoderId() const {
   return decoderId;
 }
 
-long kvalobs::decoder::DecoderBase::getStationId(const std::string &key,
-                                                 const std::string &value) {
-  using namespace dnmi::db;
-  using namespace std;
+long kvalobs::decoder::DecoderBase::getStationId(const std::string &key, const std::string &value) {
+  namespace db = dnmi::db;
 
-  std::string query("SELECT stationid FROM station WHERE ");
+  string query("SELECT stationid FROM station WHERE ");
   query += key + "=" + value;
 
   LOGDEBUG("DecoderBase::getStationId: query(" << query << ")\n");
 
-  Result *res;
-  long stationId = -1;
+  db::Result *res;
 
   try {
+    long stationId = -1;
     res = con.execQuery(query);
 
     if (res) {
-      /* LOGDEBUG("Size: " << res->size() << endl <<
-       res->fieldName(0) <<  << endl <<
-       "=======================\n");*/
-
       if (res->hasNext()) {
-        DRow row = res->next();
-        //LOGDEBUG(row[0] << endl);
+        db::DRow row = res->next();
         stationId = atol(row[0].c_str());
       }
       delete res;
     }
 
     return stationId;
-  } catch (SQLException &ex) {
+  } catch (const db::SQLException &ex) {
     LOGERROR("Exception: " << ex.what() << endl);
     return -2;
   }
-
 }
 
-bool kvalobs::decoder::DecoderBase::deleteKvDataFromDb(
-    const kvalobs::kvData &sd) {
+bool kvalobs::decoder::DecoderBase::deleteKvDataFromDb(const kvalobs::kvData &sd) {
   kvDbGate gate(&con);
-  std::list<kvalobs::kvData> dataList;
   std::string query(kvQueries::selectData(sd));
   std::ostringstream ost;
 
@@ -393,40 +356,33 @@ bool kvalobs::decoder::DecoderBase::deleteKvDataFromDb(
   return true;
 }
 
-bool kvalobs::decoder::DecoderBase::putKvDataInDb(const kvalobs::kvData &sd_,
-                                                  int priority) {
+bool kvalobs::decoder::DecoderBase::putKvDataInDb(const kvalobs::kvData &sd_, int priority) {
   kvalobs::kvData sd(sd_);
   kvDbGate gate(&con);
-  ostringstream ost;
 
   try {
     if (isGenerated(sd.stationID(), sd.typeID())) {
-      LOGDEBUG(
-          "GENERATEDDATA: stationid: " << sd.stationID() << " typeid: " << sd.typeID() << " obstime: " << sd.obstime());
+      LOGDEBUG("GENERATEDDATA: stationid: " << sd.stationID() << " typeid: " << sd.typeID() << " obstime: " << sd.obstime());
 
       sd.typeID(-1 * sd.typeID());
     }
   } catch (...) {
-    //COMMENT:
-    //do nothing. The log message from isGenerated is enough for
-    //the momment.
+    // Do nothing. The log message from isGenerated is enough for
+    // the momment.
   }
 
   if (!gate.insert(sd, true)) {
-    LOGDEBUG(
-        "putKvDataInDb: can't save kvData to the database!\n" << "[" << gate.getErrorStr() << "]");
+    LOGDEBUG("putKvDataInDb: can't save kvData to the database!\n" << "[" << gate.getErrorStr() << "]");
 
     return false;
   }
 
-  addStationInfo(sd.stationID(), to_miTime(sd.obstime()), sd.typeID(),
-                 to_miTime(sd.tbtime()), priority);
+  addStationInfo(sd.stationID(), to_miTime(sd.obstime()), sd.typeID(), to_miTime(sd.tbtime()), priority);
 
   return true;
 }
 
-bool kvalobs::decoder::DecoderBase::putKvDataInDb(
-    const std::list<kvalobs::kvData> &sd_, int priority) {
+bool kvalobs::decoder::DecoderBase::putKvDataInDb(const std::list<kvalobs::kvData> &sd_, int priority) {
   std::list<kvalobs::kvData> sd(sd_);
   std::list<kvalobs::kvData>::iterator it = sd.begin();
   long sid = -1;
@@ -435,7 +391,6 @@ bool kvalobs::decoder::DecoderBase::putKvDataInDb(
   miutil::miTime obsTime;
   miutil::miTime tbTime;
   kvDbGate gate(&con);
-  ostringstream ost;
 
   if (it == sd.end())
     return true;
@@ -444,12 +399,10 @@ bool kvalobs::decoder::DecoderBase::putKvDataInDb(
   tid = it->typeID();
   obsTime = to_miTime(it->obstime());
   tbTime = to_miTime(it->tbtime());
-  myTid = tid;
 
   try {
     if (myTid > 0 && isGenerated(sid, tid)) {
-      LOGDEBUG(
-          "GENERATEDDATA: stationid: " << it->stationID() << " typeid: " << it->typeID() << " obstime: " << it->obstime());
+      LOGDEBUG("GENERATEDDATA: stationid: " << it->stationID() << " typeid: " << it->typeID() << " obstime: " << it->obstime());
 
       myTid = -1 * tid;
     }
@@ -458,9 +411,7 @@ bool kvalobs::decoder::DecoderBase::putKvDataInDb(
   }
 
   while (it != sd.end()) {
-    if (sid != it->stationID() || tid != it->typeID()
-        || obsTime != to_miTime(it->obstime())) {
-
+    if (sid != it->stationID() || tid != it->typeID() || obsTime != to_miTime(it->obstime())) {
       addStationInfo(sid, obsTime, myTid, tbTime, priority);
 
       sid = it->stationID();
@@ -471,8 +422,7 @@ bool kvalobs::decoder::DecoderBase::putKvDataInDb(
 
       try {
         if (myTid > 0 && isGenerated(sid, tid)) {
-          LOGDEBUG(
-              "GENERATEDDATA: stationid: " << it->stationID() << " typeid: " << it->typeID() << " obstime: " << it->obstime());
+          LOGDEBUG("GENERATEDDATA: stationid: " << it->stationID() << " typeid: " << it->typeID() << " obstime: " << it->obstime());
 
           myTid = -1 * tid;
         }
@@ -484,13 +434,12 @@ bool kvalobs::decoder::DecoderBase::putKvDataInDb(
     it->typeID(myTid);
 
     if (!gate.insert(*it, true)) {
-      LOGDEBUG6(
-          "putKvDataInDb: can't save kvData to the database!\n" << "[" << gate.getErrorStr() << "]");
+      LOGDEBUG6("putKvDataInDb: can't save kvData to the database!\n" << "[" << gate.getErrorStr() << "]");
 
       return false;
     }
 
-    it++;
+    ++it;
   }
 
   addStationInfo(sid, obsTime, myTid, tbTime, priority);
@@ -498,70 +447,58 @@ bool kvalobs::decoder::DecoderBase::putKvDataInDb(
   return true;
 }
 
-bool kvalobs::decoder::DecoderBase::addDataToDb(
-    const miutil::miTime &obstime, int stationid, int typeid_,
-    std::list<kvalobs::kvData> &sd, std::list<kvalobs::kvTextData> &textData,
-    int priority, const std::string &logid) {
-  return addDataToDb(obstime, stationid, typeid_, sd, textData, priority, logid,
-                     false);
+bool kvalobs::decoder::DecoderBase::addDataToDb(const miutil::miTime &obstime, int stationid, int typeid_, std::list<kvalobs::kvData> &sd,
+                                                std::list<kvalobs::kvTextData> &textData, int priority, const std::string &logid) {
+  return addDataToDb(obstime, stationid, typeid_, sd, textData, priority, logid, false);
 }
 
-bool kvalobs::decoder::DecoderBase::addDataToDb(
-    const miutil::miTime &obstime, int stationid, int typeid_,
-    std::list<kvalobs::kvData> &sd, std::list<kvalobs::kvTextData> &textData,
-    int priority, const std::string &logid, bool onlyAddOrUpdateData) {
-  using namespace boost::posix_time;
+bool kvalobs::decoder::DecoderBase::addDataToDb(const miutil::miTime &obstime, int stationid, int typeid_, std::list<kvalobs::kvData> &sd,
+                                                std::list<kvalobs::kvTextData> &textData, int priority, const std::string &logid, bool onlyAddOrUpdateData) {
+  namespace pt = boost::posix_time;
   boost::gregorian::date date(obstime.year(), obstime.month(), obstime.day());
-  boost::posix_time::time_duration clock(
-      hours(obstime.hour()) + minutes(obstime.min()) + seconds(obstime.sec()));
+  boost::posix_time::time_duration clock(pt::hours(obstime.hour()) + pt::minutes(obstime.min()) + pt::seconds(obstime.sec()));
   boost::posix_time::ptime pt_obstime(date, clock);
 
-  kvalobs::decoder::DataUpdateTransaction work(pt_obstime, stationid, typeid_,
-                                               priority, &sd, &textData, logid,
-                                               onlyAddOrUpdateData);
+  kvalobs::decoder::DataUpdateTransaction work(pt_obstime, stationid, typeid_, priority, &sd, &textData, logid, onlyAddOrUpdateData);
 
   try {
     con.perform(work);
     updateStationInfo(work.stationInfoList());
+    decodedData.push_back(work.insertedOrUpdatedData());
   } catch (...) {
   }
 
   return work.ok();
 }
 
-bool kvalobs::decoder::DecoderBase::putkvTextDataInDb(
-    const kvalobs::kvTextData &td_, int priority) {
+bool kvalobs::decoder::DecoderBase::putkvTextDataInDb(const kvalobs::kvTextData &td_, int priority) {
   kvalobs::kvTextData td(td_);
   kvDbGate gate(&con);
 
   try {
     if (isGenerated(td.stationID(), td.typeID())) {
-      LOGDEBUG(
-          "GENERATEDDATA: stationid: " << td.stationID() << " typeid: " << td.typeID() << " obstime: " << td.obstime());
+      LOGDEBUG("GENERATEDDATA: stationid: " << td.stationID() << " typeid: " << td.typeID() << " obstime: " << td.obstime());
 
       td.typeID(-1 * td.typeID());
     }
   } catch (...) {
-    //COMMENT:
-    //do nothing. The log message from isGenerated is enough for
-    //the momment.
+    // COMMENT:
+    // do nothing. The log message from isGenerated is enough for
+    // the momment.
   }
 
   if (!gate.insert(td, true)) {
-    LOGDEBUG(
-        "putkvTextDataInDb: can't save kvTextData to the database!\n" << "[" << gate.getErrorStr() << "]");
+    LOGDEBUG("putkvTextDataInDb: can't save kvTextData to the database!\n" << "[" << gate.getErrorStr() << "]");
 
     return false;
   }
 
-  addStationInfo(td.stationID(), to_miTime(td.obstime()), td.typeID(),
-                 to_miTime(td.tbtime()), priority);
+  addStationInfo(td.stationID(), to_miTime(td.obstime()), td.typeID(), to_miTime(td.tbtime()), priority);
 
   return true;
 }
 
-bool kvalobs::decoder::DecoderBase::putkvTextDataInDb(
-    const std::list<kvalobs::kvTextData> &td_, int priority) {
+bool kvalobs::decoder::DecoderBase::putkvTextDataInDb(const std::list<kvalobs::kvTextData> &td_, int priority) {
   std::list<kvalobs::kvTextData> td(td_);
   std::list<kvalobs::kvTextData>::iterator it = td.begin();
   long sid = -1;
@@ -575,10 +512,8 @@ bool kvalobs::decoder::DecoderBase::putkvTextDataInDb(
 
   kvDbGate gate(&con);
 
-  for (; it != td.end(); it++) {
-    if (sid == -1 || sid != it->stationID() || tid != it->typeID()
-        || obsTime != to_miTime(it->obstime())) {
-
+  for (; it != td.end(); ++it) {
+    if (sid == -1 || sid != it->stationID() || tid != it->typeID() || obsTime != to_miTime(it->obstime())) {
       if (sid != -1) {
         addStationInfo(sid, obsTime, tid, tbTime, priority);
       }
@@ -591,23 +526,20 @@ bool kvalobs::decoder::DecoderBase::putkvTextDataInDb(
 
       try {
         if (myTid > 0 && isGenerated(sid, tid)) {
-          LOGDEBUG(
-              "GENERATEDDATA: stationid: " << it->stationID() << " typeid: " << it->typeID() << " obstime: " << it->obstime());
+          LOGDEBUG("GENERATEDDATA: stationid: " << it->stationID() << " typeid: " << it->typeID() << " obstime: " << it->obstime());
 
           myTid = -1 * tid;
         }
       } catch (...) {
-        //COMMENT:
-        //do nothing. The log message from isGenerated is enough for
-        //the momment.
+        // Do nothing. The log message from isGenerated is enough for
+        // the momment.
       }
     }
 
     it->typeID(myTid);
 
     if (!gate.insert(*it, true)) {
-      LOGDEBUG(
-          "putkvTextDataInDb: can't save kvTextData to the database!\n" << "[" << gate.getErrorStr() << "]");
+      LOGDEBUG("putkvTextDataInDb: can't save kvTextData to the database!\n" << "[" << gate.getErrorStr() << "]");
 
       return false;
     }
@@ -618,17 +550,12 @@ bool kvalobs::decoder::DecoderBase::putkvTextDataInDb(
   return true;
 }
 
-bool kvalobs::decoder::DecoderBase::putRejectdecodeInDb(
-    const kvalobs::kvRejectdecode &sd) {
-
+bool kvalobs::decoder::DecoderBase::putRejectdecodeInDb(const kvalobs::kvRejectdecode &sd) {
   kvDbGate gate(&con);
-  kvRejectdecode reject(gate.esc(sd.message()), sd.tbtime(),
-                        gate.esc(sd.decoder()), gate.esc(sd.comment()),
-                        sd.fixed());
+  kvRejectdecode reject(gate.esc(sd.message()), sd.tbtime(), gate.esc(sd.decoder()), gate.esc(sd.comment()), sd.fixed());
 
   if (!gate.insert(reject, true)) {
-    LOGERROR(
-        "putRejectdecodeInDb: can't save kvRejectdecode to the database!\n" << "[" << gate.getErrorStr() << "]");
+    LOGERROR("putRejectdecodeInDb: can't save kvRejectdecode to the database!\n" << "[" << gate.getErrorStr() << "]");
 
     return false;
   }
@@ -636,13 +563,11 @@ bool kvalobs::decoder::DecoderBase::putRejectdecodeInDb(
   return true;
 }
 
-bool kvalobs::decoder::DecoderBase::putkvStationInDb(
-    const kvalobs::kvStation &st) {
+bool kvalobs::decoder::DecoderBase::putkvStationInDb(const kvalobs::kvStation &st) {
   kvDbGate gate(&con);
 
   if (!gate.insert(st, true)) {
-    LOGERROR(
-        "kvStationInDb: can't save kvStation to the database!\n" << "[" << gate.getErrorStr() << "]");
+    LOGERROR("kvStationInDb: can't save kvStation to the database!\n" << "[" << gate.getErrorStr() << "]");
 
     return false;
   }
@@ -658,10 +583,9 @@ bool kvalobs::decoder::DecoderBase::isTextParam(int paramid) {
   return decodeutility::isTextParam(paramid, paramList);
 }
 
-bool kvalobs::decoder::DecoderBase::loadConf(
-    int sid, int tid, kvalobs::decoder::ConfParser &parser) {
-  miutil::conf::ConfParser myparser;
-  miutil::conf::ConfSection *conf;
+bool kvalobs::decoder::DecoderBase::loadConf(int sid, int tid, kvalobs::decoder::ConfParser &parser) {
+  namespace c = miutil::conf;
+  c::ConfParser myparser;
   ostringstream fname;
   ifstream fis;
 
@@ -675,11 +599,10 @@ bool kvalobs::decoder::DecoderBase::loadConf(
     LOGERROR("Cant open the configuration file <" << fname << ">!" << endl);
   } else {
     LOGINFO("Reading configuration from file <" << fname << ">!" << endl);
-    conf = myparser.parse(fis);
+    c::ConfSection *conf = myparser.parse(fis);
 
     if (!conf) {
-      LOGERROR(
-          "Error while reading configuration file: <" << fname << ">!" << endl << myparser.getError() << endl);
+      LOGERROR("Error while reading configuration file: <" << fname << ">!" << endl << myparser.getError() << endl);
     } else {
       LOGINFO("Configuration file loaded!\n");
       parser.parse(*conf);
@@ -697,8 +620,7 @@ kvalobs::decoder::DecoderBase::myConfSection() {
   ostringstream sectionName;
 
   if (!theKvConf) {
-    LOGDEBUG(
-        "myConfSection: driver <" << name() << "> has NOT implemented use of data from <kvalobs.conf>.");
+    LOGDEBUG("myConfSection: driver <" << name() << "> has NOT implemented use of data from <kvalobs.conf>.");
     return 0;
   }
 
@@ -706,25 +628,21 @@ kvalobs::decoder::DecoderBase::myConfSection() {
   conf = theKvConf->getSection(sectionName.str());
 
   if (!conf) {
-    LOGDEBUG(
-        "No configuration section defined in <kvalobs.conf> for the section '" << sectionName.str()<<"'.");
+    LOGDEBUG("No configuration section defined in <kvalobs.conf> for the section '" << sectionName.str() << "'.");
   }
 
   return conf;
 }
 
-miutil::conf::ValElementList kvalobs::decoder::DecoderBase::getKeyFromConf(
-    const std::string &key, const miutil::conf::ValElementList &defaultValue) {
-  using namespace miutil::conf;
-  ostringstream sectionName;
+miutil::conf::ValElementList kvalobs::decoder::DecoderBase::getKeyFromConf(const std::string &key, const miutil::conf::ValElementList &defaultValue) {
+  namespace c = miutil::conf;
 
   if (!theKvConf) {
-    LOGDEBUG(
-        "getKeyFromConf: driver <" << name() << "> has NOT implemented use of data from <kvalobs.conf>.");
+    LOGDEBUG("getKeyFromConf: driver <" << name() << "> has NOT implemented use of data from <kvalobs.conf>.");
     return defaultValue;
   }
 
-  ValElementList val = theKvConf->getValue(key);
+  c::ValElementList val = theKvConf->getValue(key);
 
   if (val.empty())
     return defaultValue;
@@ -732,15 +650,14 @@ miutil::conf::ValElementList kvalobs::decoder::DecoderBase::getKeyFromConf(
     return val;
 }
 
-miutil::conf::ValElementList kvalobs::decoder::DecoderBase::getKeyInMyConfSection(
-    const std::string &key, const miutil::conf::ValElementList &defaultValue) {
-  using namespace miutil::conf;
-  ConfSection *conf = myConfSection();
+miutil::conf::ValElementList kvalobs::decoder::DecoderBase::getKeyInMyConfSection(const std::string &key, const miutil::conf::ValElementList &defaultValue) {
+  namespace c = miutil::conf;
+  c::ConfSection *conf = myConfSection();
 
   if (!conf)
     return defaultValue;
 
-  ValElementList val = conf->getValue(key);
+  c::ValElementList val = conf->getValue(key);
 
   if (val.empty())
     return defaultValue;
@@ -748,8 +665,7 @@ miutil::conf::ValElementList kvalobs::decoder::DecoderBase::getKeyInMyConfSectio
     return val;
 }
 
-std::string kvalobs::decoder::DecoderBase::createOrCheckDir(
-    const std::string &where, const std::string &dir) {
+std::string kvalobs::decoder::DecoderBase::createOrCheckDir(const std::string &where, const std::string &dir) {
   list<string> pathlist;
   string path = where;
   ostringstream ost;
@@ -780,8 +696,7 @@ std::string kvalobs::decoder::DecoderBase::createOrCheckDir(
 
   ost.str("");
 
-  for (list<string>::iterator it = pathlist.begin();
-      it != pathlist.end() && !error; it++) {
+  for (list<string>::iterator it = pathlist.begin(); it != pathlist.end() && !error; ++it) {
     ost << *it;
 
     if (mkdir(ost.str().c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) < -1) {
@@ -796,31 +711,26 @@ std::string kvalobs::decoder::DecoderBase::createOrCheckDir(
 
   if (error) {
     ost.str("");
-    for (list<string>::iterator it = pathlist.begin();
-        it != pathlist.end() && !error; it++)
+    for (list<string>::iterator it = pathlist.begin(); it != pathlist.end() && !error; ++it)
       ost << *it << "/";
 
-    LOGERROR(
-        "Can NOT create the dierctory. A directory in the path maybe missing or a dangling link!\n" << "Path: '" << ost.str() << "'.");
+    LOGERROR("Can NOT create the dierctory. A directory in the path maybe missing or a dangling link!\n" << "Path: '" << ost.str() << "'.");
 
     return "";
   }
   return ost.str();
 }
 
-std::string kvalobs::decoder::DecoderBase::logdirForLogger(
-    const std::string &dir) {
+std::string kvalobs::decoder::DecoderBase::logdirForLogger(const std::string &dir) {
   return createOrCheckDir(logdir(), dir);
 }
 
-std::string kvalobs::decoder::DecoderBase::datdirForLogger(
-    const std::string &dir) {
+std::string kvalobs::decoder::DecoderBase::datdirForLogger(const std::string &dir) {
   return createOrCheckDir(kvPath(localstatedir), dir);
 }
 
 milog::FLogStream*
 kvalobs::decoder::DecoderBase::openFLogStream(const std::string &filename) {
-  using namespace std;
   const int defSize = 1024 * 100;
   milog::FLogStream *fs;
   ostringstream ost;
@@ -854,8 +764,7 @@ kvalobs::decoder::DecoderBase::openFLogStream(const std::string &filename) {
     pathlist.push_back(path);
 
   if (error) {
-    LOGERROR(
-        "Cant open logfile! " << "MISSING/EMPTY 'logdir'" << endl << "Logging all activity to: /dev/null");
+    LOGERROR("Cant open logfile! " << "MISSING/EMPTY 'logdir'" << endl << "Logging all activity to: /dev/null");
     fs->open("/dev/null");
 
     return fs;
@@ -868,8 +777,7 @@ kvalobs::decoder::DecoderBase::openFLogStream(const std::string &filename) {
 
   ost.str("");
 
-  for (list<string>::iterator it = pathlist.begin();
-      it != pathlist.end() && !error; it++) {
+  for (list<string>::iterator it = pathlist.begin(); it != pathlist.end() && !error; ++it) {
     ost << "/" << *it;
 
     if (mkdir(ost.str().c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) < -1) {
@@ -882,8 +790,7 @@ kvalobs::decoder::DecoderBase::openFLogStream(const std::string &filename) {
   }
 
   if (error) {
-    LOGERROR(
-        "A directory in the logpath maybe missing or a dangling link!" << "Path: " <<ost.str() << endl << "Logging all activity to: /dev/null");
+    LOGERROR("A directory in the logpath maybe missing or a dangling link!" << "Path: " <<ost.str() << endl << "Logging all activity to: /dev/null");
     fs->open("/dev/null");
     return fs;
   }
@@ -891,8 +798,7 @@ kvalobs::decoder::DecoderBase::openFLogStream(const std::string &filename) {
   ost << "/" << filename;
 
   if (!fs->open(ost.str())) {
-    LOGERROR(
-        "Failed to create logfile: " << ost.str() << endl << "Using /dev/null!");
+    LOGERROR("Failed to create logfile: " << ost.str() << endl << "Using /dev/null!");
     fs->open("/dev/null");
   } else {
     LOGINFO("Logfile (open): " << ost.str());
@@ -916,7 +822,7 @@ void kvalobs::decoder::DecoderBase::createLogger(const std::string &logname) {
 void kvalobs::decoder::DecoderBase::removeLogger(const std::string &logname) {
   list<string>::iterator it = createdLoggers.begin();
 
-  for (; it != createdLoggers.end(); it++) {
+  for (; it != createdLoggers.end(); ++it) {
     if (*it == logname) {
       milog::Logger::removeLogger(logname);
       createdLoggers.erase(it);
@@ -925,16 +831,15 @@ void kvalobs::decoder::DecoderBase::removeLogger(const std::string &logname) {
   }
 }
 
-void kvalobs::decoder::DecoderBase::loglevel(const std::string &logname,
-                                             milog::LogLevel loglevel) {
-  //We only changes the loglevel if we have created the logger.
+void kvalobs::decoder::DecoderBase::loglevel(const std::string &logname, milog::LogLevel loglevel) {
+  // We only changes the loglevel if we have created the logger.
 
   if (logname.empty())
     return;
 
   list<string>::iterator it = createdLoggers.begin();
 
-  for (; it != createdLoggers.end(); it++) {
+  for (; it != createdLoggers.end(); ++it) {
     if (*it == logname) {
       milog::Logger::logger(logname).logLevel(loglevel);
       return;
@@ -954,19 +859,14 @@ milog::LogLevel kvalobs::decoder::DecoderBase::getConfLoglevel() const {
   return getLoglevelRecursivt(theKvConf, sectionName, milog::DEBUG);
 }
 
-bool kvalobs::decoder::DecoderBase::loadObsPgmParamInfo(
-    int stationid, int typeid_, const miutil::miTime &obstime,
-    ObsPgmParamInfo &paramInfo) const {
+bool kvalobs::decoder::DecoderBase::loadObsPgmParamInfo(int stationid, int typeid_, const miutil::miTime &obstime, ObsPgmParamInfo &paramInfo) const {
   paramInfo.obsPgm.clear();
   paramInfo.obstime = obstime;
 
   kvDbGate gate(&con);
 
-  if (!gate.select(
-      paramInfo.obsPgm,
-      kvQueries::selectObsPgm(stationid, typeid_, to_ptime(obstime)))) {
-    LOGWARN(
-        "DBError: Cant access obs_pgm: " << endl << "Reason: " << gate.getErrorStr());
+  if (!gate.select(paramInfo.obsPgm, kvQueries::selectObsPgm(stationid, typeid_, to_ptime(obstime)))) {
+    LOGWARN("DBError: Cant access obs_pgm: " << endl << "Reason: " << gate.getErrorStr());
     return false;
   }
 

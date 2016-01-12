@@ -29,16 +29,18 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef __DATAUPDATETRANSACTION_H__
-#define __DATAUPDATETRANSACTION_H__
+#ifndef SRC_LIB_DECODER_DECODERBASE_DATAUPDATETRANSACTION_H_
+#define SRC_LIB_DECODER_DECODERBASE_DATAUPDATETRANSACTION_H_
 
 #include <list>
-#include <boost/shared_ptr.hpp>
-#include <kvalobs/kvStationInfo.h>
-#include <kvalobs/kvData.h>
-#include <kvalobs/kvTextData.h>
-#include <kvdb/transaction.h>
+#include <string>
 #include <sstream>
+#include "boost/shared_ptr.hpp"
+#include "decodeutility/kvalobsdata.h"
+#include "kvdb/transaction.h"
+#include "kvalobs/kvData.h"
+#include "kvalobs/kvStationInfo.h"
+#include "kvalobs/kvTextData.h"
 
 namespace kvalobs {
 namespace decoder {
@@ -64,6 +66,7 @@ class DataUpdateTransaction : public dnmi::db::Transaction {
   int typeid_;
   int priority;
   boost::shared_ptr<kvalobs::kvStationInfoList> stationInfoList_;
+  boost::shared_ptr<kvalobs::serialize::KvalobsData> data_;  // Data that is inserted or updated
   boost::shared_ptr<bool> ok_;
   std::ostringstream log;
   std::string logid;
@@ -121,6 +124,7 @@ class DataUpdateTransaction : public dnmi::db::Transaction {
 
   void insert(dnmi::db::Connection *conection, const kvalobs::kvDbBase &elem,
               const std::string &tblName);
+
   void update(dnmi::db::Connection *connection,
               const std::list<kvalobs::kvData> &data,
               const std::list<kvalobs::kvTextData> &textData);
@@ -158,11 +162,16 @@ class DataUpdateTransaction : public dnmi::db::Transaction {
   kvalobs::kvStationInfoList stationInfoList() const {
     return *stationInfoList_;
   }
+
+  kvalobs::serialize::KvalobsData insertedOrUpdatedData() const {
+    return *data_;
+  }
+
   bool ok() const {
     return *ok_;
   }
 };
 
-}
-}
-#endif
+}  // namespace decoder
+}  // namespace kvalobs
+#endif  // SRC_LIB_DECODER_DECODERBASE_DATAUPDATETRANSACTION_H_
