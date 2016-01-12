@@ -10,6 +10,7 @@ lib_LTLIBRARIES = libkvalobs_miutil.la
 libkvalobs_miutil_la_SOURCES = \
    blockingqueue.h runable.h \
    threadpool.h threadpool.cc \
+   httpclient.h httpclient.cc \
    commastring.h commastring.cc \
    trimstr.h trimstr.cc \
    cmprspace.h cmprspace.cc \

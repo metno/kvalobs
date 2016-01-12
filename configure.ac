@@ -101,13 +101,16 @@ AC_CONFIG_FILES([Makefile
                  src/lib/kvsubscribe/libkvsubscribe.pc
 ])
 
+#libcurl, sets CURL_LIBS and CURL_CFLAGS.
+AX_LIB_CURL([7.15.5])
+
 PKG_CHECK_MODULES(putools, puTools)
 KV_FIND_OMNIORB4
 KV_POSTGRESQL
 PKG_CHECK_MODULES(sqlite3, sqlite3)
 PKG_CHECK_MODULES(libxml2, libxml-2.0)
 PKG_CHECK_MODULES(libxmlpp, libxml++-2.6)
-PKG_CHECK_MODULES(jsoncpp, jsoncpp)
+#PKG_CHECK_MODULES(jsoncpp, jsoncpp)
 
 RDKAFKA_CHECK
 
