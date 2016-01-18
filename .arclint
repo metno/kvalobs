@@ -63,11 +63,11 @@
         "(\\.h$)"
       ]
     },
-    "googleccplint": {
-      "type": "googlecpplint",
+    "cpplint": {
+      "type": "cpplint",
       "severity": {
         "build/c++11": "disabled",
-        "runtime/int": "advice",
+        "runtime/int": "disabled",
         "runtime/references": "disabled",
         "whitespace/line_length": "disabled"
       },
