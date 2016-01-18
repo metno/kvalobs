@@ -1,7 +1,7 @@
 /*
  Kvalobs - Free Quality Control Software for Meteorological Observations
 
- Copyright (C) 2007 met.no
+ Copyright (C) 2015 met.no
 
  Contact information:
  Norwegian Meteorological Institute
@@ -26,14 +26,35 @@
  with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#ifndef SRC_KVDATAINPUTD_INITLOGGER_H_
-#define SRC_KVDATAINPUTD_INITLOGGER_H_
+
+#ifndef SRC_LIB_KVSUBSCRIBE_HTTPSENDDATA_H_
+#define SRC_LIB_KVSUBSCRIBE_HTTPSENDDATA_H_
 
 #include <string>
-#include "lib/miconfparser/miconfparser.h"
+#include "miutil/httpclient.h"
+#include "kvsubscribe/SendData.h"
 
-void
-InitLogger(int argn, char **argv, const std::string &logname,
-           miutil::conf::ConfSection *conf = 0);
+namespace kvalobs {
+namespace datasource {
 
-#endif  // SRC_KVDATAINPUTD_INITLOGGER_H_
+class HttpSendData : SendData {
+  std::string host;
+  miutil::HTTPClient http;
+
+ public:
+  /**
+   * @param hostAndPort must be on the form host:port.
+   * @param useHttps Use https if true.
+   */
+  explicit HttpSendData(const std::string &hostAndPort, bool useHttps = false);
+  virtual ~HttpSendData();
+
+  /**
+   * @throw Fatal on transport problems.
+   */
+  virtual Result newData(const std::string &data, const std::string &obsType);
+};
+
+}  // namespace datasource
+}  // namespace kvalobs
+#endif  // SRC_LIB_KVSUBSCRIBE_HTTPSENDDATA_H_

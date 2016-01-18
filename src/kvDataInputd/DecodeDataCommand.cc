@@ -26,14 +26,20 @@
  with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#ifndef SRC_KVDATAINPUTD_INITLOGGER_H_
-#define SRC_KVDATAINPUTD_INITLOGGER_H_
-
 #include <string>
-#include "lib/miconfparser/miconfparser.h"
+#include "lib/decodeutility/kvalobsdataserializer.h"
+#include "kvDataInputd/DecodeDataCommand.h"
 
-void
-InitLogger(int argn, char **argv, const std::string &logname,
-           miutil::conf::ConfSection *conf = 0);
+DecodedDataCommand::DecodedDataCommand(
+    std::shared_ptr<std::list<kvalobs::serialize::KvalobsData>> data)
+    : data(data) {
+}
 
-#endif  // SRC_KVDATAINPUTD_INITLOGGER_H_
+kvalobs::subscribe::KafkaProducer::MessageId DecodedDataCommand::send(kvalobs::subscribe::KafkaProducer &producer) {
+  std::string xml;
+  for (auto &&kvdata : *data) {
+    xml = kvalobs::serialize::KvalobsDataSerializer::serialize(kvdata);
+    // TODO(borgem): Send data to the decoded data kafka queue.
+  }
+  return 0;
+}

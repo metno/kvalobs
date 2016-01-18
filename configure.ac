@@ -1,10 +1,6 @@
 AC_PREREQ([2.59])
 AC_INIT([kvalobs], [2.7.8~rckafka7], [kvoss@met.no])
 AM_INIT_AUTOMAKE([subdir-objects])
-#METNO_SET_VERSION_INFO
-
-#AC_CONFIG_SRCDIR([src/diNetCDF.cc])
-#AC_CONFIG_HEADER([include/config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
 AC_PROG_LIBTOOL
@@ -30,7 +26,7 @@ AC_CONFIG_FILES([Makefile
                  src/Makefile
                  src/lib/Makefile
                  src/lib/gtest/Makefile
-		 src/lib/json/Makefile
+		           src/lib/json/Makefile
                  src/lib/kvskel/Makefile
                  src/lib/miutil/Makefile
                  src/lib/decodeutility/Makefile
@@ -78,6 +74,7 @@ AC_CONFIG_FILES([Makefile
                  src/kv2kro2/Makefile
                  src/tools/kvpush/Makefile
                  src/tools/kv2kvDataInputd/Makefile
+                 src/kvDataInputd/kvdataclt/Makefile
                  src/tools/aexecd/Makefile
                  src/kvalobs_database/Makefile
                  src/kvalobs_database/upgrade/Makefile
@@ -110,15 +107,13 @@ KV_POSTGRESQL
 PKG_CHECK_MODULES(sqlite3, sqlite3)
 PKG_CHECK_MODULES(libxml2, libxml-2.0)
 PKG_CHECK_MODULES(libxmlpp, libxml++-2.6)
-#PKG_CHECK_MODULES(jsoncpp, jsoncpp)
 
 RDKAFKA_CHECK
 
 PKG_CHECK_MODULES(cppunit, cppunit)
 AC_PATH_PROG(CMAKE, cmake, false)
 GMOCK_DIST_CHECK([src/lib/gtest])
-#GTEST_CHECK([src/lib/gtest])
-#GMOCK_CHECK
+PKG_CHECK_MODULES( [libhttpserver], [libhttpserver >= 0.11.0] )
 AC_CHECK_LIB(perl, [main], [], [AC_MSG_ERROR([no libperl found])])
 
 KV_PERL
@@ -134,6 +129,7 @@ if test -z $BOOST_PROGRAM_OPTIONS_LIB; then AC_MSG_ERROR([Unable to find boost p
 AX_BOOST_DATE_TIME
 if test -z $BOOST_DATE_TIME_LIB; then AC_MSG_ERROR([Unable to find boost date_time library]); fi
 AX_BOOST_SYSTEM
+if test -z $BOOST_SYSTEM_LIB; then AC_MSG_ERROR([Unable to find boost system library]); fi
 
 KV_MODEL2KV
 

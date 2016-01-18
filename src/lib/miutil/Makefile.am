@@ -37,6 +37,7 @@ libkvalobs_miutil_la_LIBADD = \
 
 miutilincludedir = $(pkgincludedir)/miutil
 miutilinclude_HEADERS = \
+  exceptionSpec.h \
   blockingqueue.h threadpool.h runable.h \
   msleep.h replace.h cmprspace.h commastring.h \
   miTimeParse.h trimstr.h base64.h gettimeofday.h \

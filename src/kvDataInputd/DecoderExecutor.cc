@@ -26,14 +26,17 @@
  with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#ifndef SRC_KVDATAINPUTD_INITLOGGER_H_
-#define SRC_KVDATAINPUTD_INITLOGGER_H_
 
-#include <string>
-#include "lib/miconfparser/miconfparser.h"
 
-void
-InitLogger(int argn, char **argv, const std::string &logname,
-           miutil::conf::ConfSection *conf = 0);
+#include "kvDataInputd/DecodeCommand.h"
+#include "kvDataInputd/DecoderExecutor.h"
 
-#endif  // SRC_KVDATAINPUTD_INITLOGGER_H_
+void DecoderExecutor::afterExecute(miutil::Runable *run) {
+  DecodeCommand *cmd = dynamic_cast<DecodeCommand*>(run);
+
+  if (!cmd) {
+    delete run;
+  } else {
+    cmd->signal();
+  }
+}

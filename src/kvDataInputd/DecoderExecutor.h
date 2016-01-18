@@ -1,8 +1,6 @@
 /*
  Kvalobs - Free Quality Control Software for Meteorological Observations
 
- $Id: DataSrcImpl.h,v 1.4.2.2 2007/09/27 09:02:16 paule Exp $
-
  Copyright (C) 2007 met.no
 
  Contact information:
@@ -29,23 +27,20 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef __DATASRCAMQP_H__
-#define __DATASRCAMQP_H__
+#ifndef SRC_KVDATAINPUTD_DECODEREXECUTOR_H_
+#define SRC_KVDATAINPUTD_DECODEREXECUTOR_H_
 
-#include <string>
+#include <miutil/threadpool.h>
 
-class DataSrcApp;
-
-class DataSrcAmqp {
- protected:
-  DataSrcApp &app;
-  void runChannels(amqp::Connection *con);
-  void receiveData(amqp::Channel *channel);
-
+class DecoderExecutor : public miutil::concurrent::ThreadPool {
  public:
-  DataSrcAmqp(const DataSrcApp &app);
-
-  void operator()();
+  explicit DecoderExecutor(int size)
+      : ThreadPool(size, "decoder") {
+  }
+  DecoderExecutor()
+      : ThreadPool("decoder") {
+  }
+  void afterExecute(miutil::Runable *run);
 };
 
-#endif /* DATASRCAMQP_H_ */
+#endif /* SRC_KVDATAINPUTD_DECODEREXECUTOR_H_ */

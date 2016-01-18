@@ -43,7 +43,6 @@ src/kv2kro2/kv2kro
 src/kv2metdat/kv2metdat
 src/kvDataInputd/createTestData
 src/kvDataInputd/kvDataInputd
-src/kvDataInputd/kvdataclt
 src/kvManagerd/kvManagerd
 src/kvManagerd/kvmgrclt
 src/kvQabased/kvQabased

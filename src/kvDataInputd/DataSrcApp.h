@@ -1,7 +1,5 @@
 /*
- Kvalobs - Free Quality Control Software for Meteorological Observations 
-
- $Id: DataSrcApp.h,v 1.19.2.5 2007/09/27 09:02:16 paule Exp $                                                       
+ Kvalobs - Free Quality Control Software for Meteorological Observations
 
  Copyright (C) 2007 met.no
 
@@ -15,58 +13,90 @@
  This file is part of KVALOBS
 
  KVALOBS is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License as 
- published by the Free Software Foundation; either version 2 
+ modify it under the terms of the GNU General Public License as
+ published by the Free Software Foundation; either version 2
  of the License, or (at your option) any later version.
- 
+
  KVALOBS is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  General Public License for more details.
- 
- You should have received a copy of the GNU General Public License along 
- with KVALOBS; if not, write to the Free Software Foundation Inc., 
+
+ You should have received a copy of the GNU General Public License along
+ with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#ifndef __DataSrcApp_h__
-#define __DataSrcApp_h__
+#ifndef SRC_KVDATAINPUTD_DATASRCAPP_H_
+#define SRC_KVDATAINPUTD_DATASRCAPP_H_
 
 #include <exception>
-#include <omniORB4/CORBA.h>
-#include <boost/thread/thread.hpp>
-#include <boost/date_time/posix_time/ptime.hpp>
+#include <limits>
 #include <string>
-#include <kvskel/managerInput.hh>
-#include <kvalobs/kvapp.h>
-#include <dnmithread/CommandQue.h>
-#include "DecodeCommand.h"
-#include <decoderbase/decodermgr.h>
-#include <kvdb/dbdrivermgr.h>
-#include "ConnectionCache.h"
-#include <kvalobs/paramlist.h>
-#include <kvalobs/kvTypes.h>
-#include "miconfparser/miconfparser.h"
 #include <list>
-
+#include "boost/regex.hpp"
+#include "boost/thread/thread.hpp"
+#include "boost/date_time/posix_time/ptime.hpp"
+#include "lib/kvalobs/kvbaseapp.h"
+#include "lib/kvalobs/paramlist.h"
+#include "lib/kvalobs/kvTypes.h"
+#include "lib/decoder/decoderbase/decodermgr.h"
+#include "lib/kvdb/dbdrivermgr.h"
+#include "lib/json/json/json.h"
+#include "lib/miconfparser/miconfparser.h"
+#include "lib/kvsubscribe/SendData.h"
+#include "lib/kvsubscribe/queue.h"
+#include "kvDataInputd/ConnectionCache.h"
+#include "kvDataInputd/ProducerCommand.h"
+#include "kvDataInputd/DecodeCommand.h"
+#include "kvDataInputd/DecoderExecutor.h"
+#include "kvDataInputd/KafkaProducerThread.h"
 /**
  * \defgroup kvDatainputd kvDatainputd
  *
  * @{
  */
 
+struct HttpConfig {
+  int port;
+  int threads;
+  milog::LogLevel loglevel;
+  int logRotate;
+  int logSize;
+
+  HttpConfig()
+      : port(8090),
+        threads(5),
+        loglevel(milog::ERROR),
+        logRotate(0),
+        logSize(0) {
+  }
+};
+
+struct KafkaConfig {
+  std::string brokers;
+  std::string domain;
+
+  KafkaConfig()
+      : brokers("localhost") {
+  }
+
+  std::string getRawTopic() {
+    return kvalobs::subscribe::queue::raw(domain);
+  }
+};
+
 /**
- * \brief DataSrcApp is a class that encapsulate the main datastructure in the 
- * \em kvDatainputd application. 
+ * \brief DataSrcApp is a class that encapsulate the main datastructure in the
+ * \em kvDatainputd application.
  *
  * It contains the message que that consument threads reads
  * the command from. It manages the connection to the database and it
  * manages the deoders.
  */
-class DataSrcApp : public KvApp {
+class DataSrcApp : public KvBaseApp {
   typedef boost::mutex::scoped_lock Lock;
 
-  CKvalObs::CManager::ManagerInput_var refMgr;
-  dnmi::thread::CommandQue que;
+  static boost::regex reMessageid;
   kvalobs::decoder::DecoderMgr decoderMgr;
   dnmi::db::DriverManager dbMgr;
   bool ok;
@@ -78,8 +108,10 @@ class DataSrcApp : public KvApp {
   std::list<kvalobs::kvTypes> typeList;
   bool shutdown_;
   boost::posix_time::ptime nextParamCheckTime;
-  std::string amqpUrl;
-  std::string amqpPasswd;
+  HttpConfig httpConfig;
+  KafkaConfig kafkaConfig;
+  DecoderExecutor decoderExecutor;
+  KafkaProducerThread kafkaRawStream;
 
   /**
    * \brief registerParams reads parameter information from the table
@@ -103,7 +135,7 @@ class DataSrcApp : public KvApp {
    * The function also creates connections to the database. The connections
    * is registred in conCache (connection cache).
    *
-   * \param nConn is a hint about how many connection to the databse we 
+   * \param nConn is a hint about how many connection to the databse we
    *        want to open.
    * \return the number of connections that is created to the database.
    */
@@ -114,24 +146,14 @@ class DataSrcApp : public KvApp {
    *
    * All decoders is managed by decoderMgr.
    *
-   * \returns true if we find at least one decoder. false if no decoders is 
+   * \returns true if we find at least one decoder. false if no decoders is
    * found.
    */
   bool registerAllDecoders(miutil::conf::ConfSection *theConf);
 
-  /**
-   *\brief lookUpManager, use the CORBA nameserver if necessary, to
-   *find the ManagerInput interface.
-   *
-   * \param forceNS if true use only the nameserver to find
-   *                the reference.
-   * \param usedNS is set on output to true if the CORBA nameserver
-   *               was uesd to find the reference.
-   * \return a reference to a ManagerInput object.
-   * \exception throws LookUpException if it fails to
-   */
-  CKvalObs::CManager::ManagerInput_ptr lookUpManager(bool forceNS,
-                                                     bool & usedNS);
+  DecodeCommand* decodeExecute(DecodeCommand *decCmd, kvalobs::datasource::Result *res, const std::string &logid);
+  DecodeCommand* decode(const char *obsType, const char *data, const std::string &logid, kvalobs::datasource::Result *res);
+
   boost::mutex mutex;
 
  public:
@@ -143,9 +165,9 @@ class DataSrcApp : public KvApp {
   } ErrCode;
 
   /**
-   * \brief Constructor that initialize a DataSrcApp instance. 
+   * \brief Constructor that initialize a DataSrcApp instance.
    *
-   * It is supposed* to be only one of this object in the application. 
+   * It is supposed* to be only one of this object in the application.
    * It should have been implemented as a singleton.
    *
    * Use the function isOk() to check if the construction was successfull.
@@ -159,8 +181,7 @@ class DataSrcApp : public KvApp {
    *        shall we try to create.
    * \param opt Optional options to omniorb.
    */
-  DataSrcApp(int argn, char **argv, int numberOfConnections,
-             miutil::conf::ConfSection *theKvConf, const char *opt[][2] = 0);
+  DataSrcApp(int argn, char **argv, int numberOfConnections, miutil::conf::ConfSection *theKvConf, const char *opt[][2] = 0);
 
   /**
    * \brief Detructor, deletes all connection to the database.
@@ -169,60 +190,34 @@ class DataSrcApp : public KvApp {
 
   /**
    * \brief creates a DecodeCommand if it find a decoder for
-   * the observation type. 
-   * 
-   * The function will block if no conection
+   * the observation type.
+   *
+   * The function will block if no connection
    * to the database is available. The number of working threads
    * mandate the number of connection to the database that will
    * be created. The connections is cached to reduce the time used
-   * to establish connetction to the database. If no conection is 
+   * to establish connection to the database. If no connection is
    * made available in the time limit given by timeoutIn_msec, null
    * will be returned and the errCode is set to TimeOut, and a appropriate
    * error message is given in errMsg.
    */
 
-  DecodeCommand *create(const char *obsType, const char *obs,
-                        long timoutIn_msec, ErrCode &errCode,
-                        std::string &errMsg);
+  DecodeCommand *create(const char *obsType, const char *obs, long timoutIn_msec, ErrCode &errCode, std::string &errMsg);
 
-  DecodeCommand *create(CORBA::Long report_id, const char* report_type,
-                        const char* obstime, const char* data,
-                        long timoutIn_msec, ErrCode &errCode,
-                        std::string &errMsg);
 
   void releaseDecodeCommand(DecodeCommand *command);
 
-  bool sendInfoToManager(const kvalobs::kvStationInfoList &info);
+  bool sendInfoToManager(const kvalobs::kvStationInfoList &info, const std::list<kvalobs::serialize::KvalobsData> &decodedData);
 
-  std::string getAmqpUrl() const {
-    return amqpUrl;
-  }
-  std::string getAmqpPasswd() const {
-    return amqpPasswd;
+  HttpConfig getHttpConfig() const {
+    return httpConfig;
   }
 
-  /**
-   * \brief put is used to send the command to the consument threads.
-   *
-   * The consuments call execute on the comman and the message 
-   * is decoded. If the command can't be posted on the que the function
-   * returns false. The que is suspened, this means that the threads
-   * is shuting down.
-   */
-  bool put(dnmi::thread::CommandBase *command);
+  static std::string getMessageId(std::string &obstype);
+  kvalobs::datasource::Result newObservation(const char *obsType, const char *data, const std::string &logid);
 
   /**
-   * \brief  remove the command in the que to be proccessed by the consument
-   * thread. 
-   *
-   * If the method return is != 0. The Command is removed from
-   * the que. If the method return 0. The command is received by the consument
-   * thread and is proccessed.
-   */
-  dnmi::thread::CommandBase* remove(dnmi::thread::CommandBase *command);
-
-  /**
-   * \brief getDbConnections returns the number of connections we have to the 
+   * \brief getDbConnections returns the number of connections we have to the
    * database.
    */
   int getDbConnections() const {
@@ -237,24 +232,20 @@ class DataSrcApp : public KvApp {
   virtual bool isOk() const;
 
   /**
-   * \brief returns a pointer to the message Que. Never delete
-   * this pointer.
+   * \brief returns a pointer to the raw message queue.
    *
    * \return a pointer to the message que.
    */
-  dnmi::thread::CommandQue *getQue() {
-    return &que;
+  ProducerQuePtr getRawQueue() {
+    return kafkaRawStream.que;
   }
 
   /**
    * \brief Request shutdown. Ie. we want to terminate.
    */
-  void shutdown() {
-    shutdown_ = true;
-  }
-
+  void shutdown();
   /**
-   * \brief Are we in shutdown. 
+   * \brief Are we in shutdown.
    *
    * \return true if we are in shutdown. When we are in shutdown all threads
    * shall end the jobs they ar doing and terminate.
@@ -264,4 +255,4 @@ class DataSrcApp : public KvApp {
 
 /** @} */
 
-#endif
+#endif  // SRC_KVDATAINPUTD_DATASRCAPP_H_

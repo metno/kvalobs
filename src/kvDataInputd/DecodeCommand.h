@@ -1,7 +1,5 @@
 /*
- Kvalobs - Free Quality Control Software for Meteorological Observations 
-
- $Id: DecodeCommand.h,v 1.11.2.2 2007/09/27 09:02:16 paule Exp $                                                       
+ Kvalobs - Free Quality Control Software for Meteorological Observations
 
  Copyright (C) 2007 met.no
 
@@ -15,25 +13,28 @@
  This file is part of KVALOBS
 
  KVALOBS is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License as 
- published by the Free Software Foundation; either version 2 
+ modify it under the terms of the GNU General Public License as
+ published by the Free Software Foundation; either version 2
  of the License, or (at your option) any later version.
- 
+
  KVALOBS is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  General Public License for more details.
- 
- You should have received a copy of the GNU General Public License along 
- with KVALOBS; if not, write to the Free Software Foundation Inc., 
+
+ You should have received a copy of the GNU General Public License along
+ with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#ifndef ___DecodeCommand_h__
-#define ___DecodeCommand_h__
+#ifndef SRC_KVDATAINPUTD_DECODECOMMAND_H_
+#define SRC_KVDATAINPUTD_DECODECOMMAND_H_
 
-#include <dnmithread/CommandQue.h>
-#include <decoderbase/decoder.h>
-#include <decoderbase/RedirectInfo.h>
+#include <list>
+#include <string>
+#include "lib/miutil/runable.h"
+#include "lib/miutil/blockingqueue.h"
+#include "lib/decoder/decoderbase/decoder.h"
+#include "lib/decoder/decoderbase/RedirectInfo.h"
 
 /**
  * \addtogroup kvDatainputd
@@ -45,7 +46,7 @@
  * work threads.
  */
 
-class DecodeCommand : public dnmi::thread::CommandBase {
+class DecodeCommand : public miutil::Runable {
   DecodeCommand();
   DecodeCommand(const DecodeCommand &);
   DecodeCommand& operator=(const DecodeCommand &);
@@ -53,7 +54,7 @@ class DecodeCommand : public dnmi::thread::CommandBase {
   kvalobs::decoder::DecoderBase *decoder;
   kvalobs::decoder::DecoderBase::DecodeResult result;
   std::string msg;
-  dnmi::thread::CommandQue resQue;
+  miutil::concurrent::BlockingQueuePtr<DecodeCommand> resQue;
   kvalobs::decoder::RedirectInfo *redirect_;
 
   friend class DataSrcApp;
@@ -63,7 +64,7 @@ class DecodeCommand : public dnmi::thread::CommandBase {
   }
 
   ~DecodeCommand();
-  DecodeCommand(kvalobs::decoder::DecoderBase *decoder_);
+  explicit DecodeCommand(kvalobs::decoder::DecoderBase *decoder_);
 
  public:
   kvalobs::decoder::DecoderBase::DecodeResult getResult() const {
@@ -78,7 +79,11 @@ class DecodeCommand : public dnmi::thread::CommandBase {
   }
 
   kvalobs::kvStationInfoList& getInfoList();
+  std::list<kvalobs::serialize::KvalobsData>& getDecodedData();
 
+  bool isOk() const {
+    return result == kvalobs::decoder::DecoderBase::Ok;
+  }
   /**
    * The caller must delete the pointer.
    */
@@ -90,10 +95,9 @@ class DecodeCommand : public dnmi::thread::CommandBase {
 
   DecodeCommand *wait(int timeoutInSecond = 0);
   void signal();
-  bool executeImpl();
-  void debugInfo(std::iostream &info);
+  void run();
 };
 
 /** @} */
 
-#endif
+#endif  // SRC_KVDATAINPUTD_DECODECOMMAND_H_

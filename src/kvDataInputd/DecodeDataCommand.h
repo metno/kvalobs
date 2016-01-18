@@ -26,14 +26,39 @@
  with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#ifndef SRC_KVDATAINPUTD_INITLOGGER_H_
-#define SRC_KVDATAINPUTD_INITLOGGER_H_
+#ifndef SRC_KVDATAINPUTD_DECODEDATACOMMAND_H_
+#define SRC_KVDATAINPUTD_DECODEDATACOMMAND_H_
 
-#include <string>
-#include "lib/miconfparser/miconfparser.h"
+#include <memory>
+#include <list>
+#include "decodeutility/kvalobsdata.h"
 
-void
-InitLogger(int argn, char **argv, const std::string &logname,
-           miutil::conf::ConfSection *conf = 0);
+#include "kvDataInputd/ProducerCommand.h"
 
-#endif  // SRC_KVDATAINPUTD_INITLOGGER_H_
+/**
+ * \addtogroup kvDatainputd
+ * @{
+ */
+
+/**
+ * \brief This is the message that is passed to the
+ *kafka producers.
+ */
+
+class DecodedDataCommand : public ProducerCommand {
+  DecodedDataCommand();
+  DecodedDataCommand(const DecodedDataCommand &);
+  DecodedDataCommand& operator=(const DecodedDataCommand &);
+
+  std::shared_ptr<std::list<kvalobs::serialize::KvalobsData>> data;
+
+ public:
+  DecodedDataCommand(
+      std::shared_ptr<std::list<kvalobs::serialize::KvalobsData>> rawData);
+
+  virtual kvalobs::subscribe::KafkaProducer::MessageId send(kvalobs::subscribe::KafkaProducer &producer);
+};
+
+/** @} */
+
+#endif  // SRC_KVDATAINPUTD_DECODEDATACOMMAND_H_

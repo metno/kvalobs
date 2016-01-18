@@ -4,6 +4,7 @@ SUBDIRS = \
 	kafka-util \
 	data2kv \
 	kvDataInputd \
+	kvDataInputd/kvdataclt \
 	kvServiced \
 	kvServiced/test \
 	kvQabased \

@@ -1,7 +1,5 @@
 /*
- Kvalobs - Free Quality Control Software for Meteorological Observations 
-
- $Id: kvDataInputd.cc,v 1.28.2.3 2007/09/27 09:02:18 paule Exp $                                                       
+ Kvalobs - Free Quality Control Software for Meteorological Observations
 
  Copyright (C) 2007 met.no
 
@@ -15,8 +13,8 @@
  This file is part of KVALOBS
 
  KVALOBS is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License as 
- published by the Free Software Foundation; either version 2 
+ modify it under the terms of the GNU General Public License as
+ published by the Free Software Foundation; either version 2
  of the License, or (at your option) any later version.
 
  KVALOBS is distributed in the hope that it will be useful,
@@ -24,37 +22,33 @@
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  General Public License for more details.
 
- You should have received a copy of the GNU General Public License along 
- with KVALOBS; if not, write to the Free Software Foundation Inc., 
+ You should have received a copy of the GNU General Public License along
+ with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#include <signal.h> 
-#include <boost/thread/thread.hpp>
-#include <boost/thread/mutex.hpp>
-#include <milog/milog.h>
-#include "InitLogger.h"
-#include "DataSrcImpl.h"
-#include "DataSrcApp.h"
-#include <dnmithread/ThrPoolQue.h>
-#include "DecodeCommand.h"
-#include <miconfparser/miconfparser.h>
-#include <fileutil/pidfileutil.h>
-#include <kvalobs/kvPath.h>
-using namespace std;
-using namespace dnmi::thread;
-using namespace boost;
+#include <signal.h>
+#include <setjmp.h>
+#include <mutex>
+#include "boost/thread.hpp"
+#include "lib/milog/milog.h"
+#include "lib/miconfparser/miconfparser.h"
+#include "lib/fileutil/pidfileutil.h"
+#include "lib/kvalobs/kvPath.h"
+#include "kvDataInputd/DataSrcApp.h"
+#include "kvDataInputd/DecodeCommand.h"
+#include "kvDataInputd/InitLogger.h"
+#include "kvDataInputd/ObservationHandler.h"
+
+using std::string;
+using std::endl;
 
 extern volatile sig_atomic_t sigTerm;
-static void sig_term(int);
+static void sig_term(int signal);
+static void sig_abort(int signal);
 static void setSigHandlers();
-static bool killThreadOnSignal();
-static bool threadAfter(CommandBase *cmd);
-
-//Følgende globale variabler brukes av funksjonen
-//killThreadOnSignal for å stoppe CORBA.
-static mutex m;
-static CORBA::ORB_ptr orb;
-static bool hintKilled = false;
+static void ignoreSigAbort();
+static sigjmp_buf jmpbuf;
+static volatile sig_atomic_t canjump;
 
 namespace kvdatainput {
 namespace decodecommand {
@@ -62,16 +56,24 @@ boost::thread_specific_ptr<kvalobs::decoder::RedirectInfo> ptrRedirect;
 }
 }
 
-using namespace kvalobs;
+void loghHttpError(const std::string &msg) {
+  IDLOGERROR("http_error", msg);
+}
+
+void loghHttpAccess(const std::string &msg) {
+  IDLOGINFO("http_access", msg);
+}
 
 int main(int argn, char** argv) {
   bool error;
   string pidfile;
-  miutil::conf::ConfSection *theKvConf = KvApp::getConfiguration();
+  miutil::conf::ConfSection *theKvConf = KvBaseApp::getConfiguration();
+  int nWorkerThreads = 3;
 
+  canjump = 0;
   InitLogger(argn, argv, "kvDataInputd", theKvConf);
 
-  pidfile = KvApp::createPidFileName("kvDataInputd");
+  pidfile = KvBaseApp::createPidFileName("kvDataInputd");
 
   if (dnmi::file::isRunningPidFile(pidfile, error)) {
     if (error) {
@@ -79,101 +81,76 @@ int main(int argn, char** argv) {
           "An error occured while reading the pidfile:" << endl << pidfile << " remove the file if it exists and" << endl << "kvDataInputd is not running. " << "If it is running and there are problems. Kill kvDataInputd and" << endl << "restart it." << endl << endl);
       return 1;
     } else {
-      LOGFATAL(
-          "Is kvDataInputd allready running?" << endl << "If not remove the pidfile: " << pidfile);
+      LOGFATAL("Is kvDataInputd allready running?" << endl << "If not remove the pidfile: " << pidfile);
       return 1;
     }
   }
 
-  //Read all connection information from the config file
-  //$KVALOBS/etc/kvalobs.conf or environment.
-  //ie: KVDB, KVDBUSER, PGHOST, PGPORT
-
-  int nWorkerThreads = 3;
-  CKvalObs::CDataSource::Data_ptr dataSource;
-
-  //Look up the dbdriver from conf file.
-
   setSigHandlers();
-
-  KvApp::createPidFile("kvDataInputd");
-
+  KvBaseApp::createPidFile("kvDataInputd");
   DataSrcApp app(argn, argv, nWorkerThreads, theKvConf);
+  ObservationHandler observationHandler(app, app.getRawQueue());
 
   if (!app.isOk()) {
     LOGFATAL("Problems with initializing of kvDataInputd!\n");
   }
 
-  //We create as many worker threads as we have database connections.
-  nWorkerThreads = app.getDbConnections();
+  HttpConfig httpConfig = app.getHttpConfig();
 
-  if (nWorkerThreads < 1) {
-    LOGFATAL("No db connections. We cant do anything, so we quit!\n");
+  httpserver::webserver ws = httpserver::webserver(
+      httpserver::create_webserver(httpConfig.port).max_threads(httpConfig.threads).log_error(loghHttpError).log_access(loghHttpAccess));
+  ws.register_resource("/v1/observation", &observationHandler, false);
+
+  ws.start(false);
+  if (!ws.is_running()) {
+    LOGFATAL("Cant start the http interface on port " << httpConfig.port << ", threads " << httpConfig.threads << ".");
     app.deletePidFile();
     return 1;
   }
 
-  LOGINFO("Db connections: " << nWorkerThreads << endl);
-  LOGINFO("Creates " << nWorkerThreads << " worker threads!\n");
+  while (sigTerm == 0) {
+    sleep(1);
+  }
 
-  ThreadPoolQue thrPool((unsigned int) nWorkerThreads, *app.getQue(), 2);
-  thrPool.setKillFunc(killThreadOnSignal);
-  thrPool.setAfterFunc(threadAfter);
-  thrPool.run();
+  // Hack to avoid that the webserver abort the application
+  // on exit if a close on a socket fails.
+  // We setup for a longjump back from the signalhandler
+  // for SIGABRT.
 
-  orb = app.getOrb();
-  PortableServer::POA_ptr poa = app.getPoa();
-
-  try {
-
-    // We allocate the objects on the heap.  Since these are reference
-    // counted objects, they will be deleted by the POA when they are no
-    // longer needed.
-    DataSrcImpl *dataSrcImpl = new DataSrcImpl(app);
-
-    // Activate the objects.  This tells the POA that the objects are
-    // ready to accept requests.
-    PortableServer::ObjectId_var dataSrcIid = poa->activate_object(dataSrcImpl);
-
-    // Obtain a reference to each object and output the stringified
-    // IOR to std::cerr
-    {
-      dataSource = dataSrcImpl->_this();
-
-      if (!app.putRefInNS(dataSource, "kvinput")) {
-        LOGFATAL(
-            "Can't register with CORBA nameservice!\n" << "Is the CORBA nameservice running!\n");
-        app.deletePidFile();
-        return 1;
-      }
+  if (ws.is_running()) {
+    ignoreSigAbort();
+    if (sigsetjmp(jmpbuf, 1) == 0) {
+      canjump = 1;
+      ws.stop();
     }
-
-    // Obtain a POAManager, and tell the POA to start accepting
-    // requests on its objects.
-    PortableServer::POAManager_ptr pman = app.getPoaMgr();
-    pman->activate();
-
-    app.createPidFile("kvDataInputd");
-
-    orb->run();
-    orb->destroy();
-  } catch (CORBA::SystemException&) {
-    LOGERROR("main: Caught CORBA::SystemException." << endl);
-  } catch (CORBA::Exception&) {
-    LOGERROR("main: Caught CORBA::Exception." << endl);
-  } catch (omniORB::fatalException& fe) {
-    LOGERROR(
-        "main: Caught omniORB::fatalException:" << endl << "  file: " << fe.file() << endl << "  line: " << fe.line() << endl << "  mesg: " << fe.errmsg() << endl);
-  } catch (...) {
-    LOGERROR("main: Caught unknown exception." << endl);
   }
 
   app.shutdown();
-
-  thrPool.join();
-
   app.deletePidFile();
   return 0;
+}
+
+void sig_abort(int sig) {
+  // Hack to avoid that the webserver abort the application
+  // on exit if a close on a socket fails.
+  if (canjump) {
+    canjump = 0;
+    siglongjmp(jmpbuf, 1);
+  }
+}
+
+void ignoreSigAbort() {
+  sigset_t oldmask;
+  struct sigaction act, oldact;
+
+  act.sa_handler = sig_abort;
+  sigemptyset(&act.sa_mask);
+  act.sa_flags = 0;
+
+  if (sigaction(SIGABRT, &act, &oldact) < 0) {
+    LOGFATAL("ERROR: Can't install signal handler for SIGABRT\n");
+    exit(1);
+  }
 }
 
 void setSigHandlers() {
@@ -199,44 +176,6 @@ void setSigHandlers() {
   }
 }
 
-bool killThreadOnSignal() {
-  if (sigTerm) {
-    LOGINFO("killThreadOnSignal: dying ....\n");
-
-    mutex::scoped_lock scoped_lock(m);
-
-    if (!hintKilled) {
-      orb->shutdown(0);
-      hintKilled = true;
-    }
-  }
-
-  return sigTerm;
-}
-
-bool threadAfter(CommandBase *cmd) {
-  DecodeCommand *dec = dynamic_cast<DecodeCommand *>(cmd);
-  ;
-
-  if (!dec) {
-    LOGFATAL("kvDataInputd: threadAfter: failed dynamic_cast!\n");
-    return false;
-  }
-
-  try {
-    LOGDEBUG("kvDataInputd: threadAfter: BEFORE call too: dec->signal()!\n");
-    dec->signal();
-    LOGDEBUG("kvDataInputd: threadAfter: AFTER call too: dec->signal()!\n");
-    return true;
-  } catch (std::exception& ex) {
-    LOGFATAL("kvDataInputd: exception in dec->signal: " << ex.what());
-  } catch (...) {
-    LOGFATAL("kvDataInputd: unknown exception in dec->signal");
-  }
-
-  return false;
-}
-
-void sig_term(int) {
+void sig_term(int signal) {
   sigTerm = 1;
 }

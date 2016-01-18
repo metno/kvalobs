@@ -1,7 +1,7 @@
 /*
  Kvalobs - Free Quality Control Software for Meteorological Observations
 
- Copyright (C) 2007 met.no
+ Copyright (C) 2015 met.no
 
  Contact information:
  Norwegian Meteorological Institute
@@ -26,14 +26,39 @@
  with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#ifndef SRC_KVDATAINPUTD_INITLOGGER_H_
-#define SRC_KVDATAINPUTD_INITLOGGER_H_
+
+#ifndef SRC_LIB_KVSUBSCRIBE_SENDDATAJSONRESULT_H_
+#define SRC_LIB_KVSUBSCRIBE_SENDDATAJSONRESULT_H_
 
 #include <string>
-#include "lib/miconfparser/miconfparser.h"
+#include <stdexcept>
+#include "json/json/json.h"
+#include "kvsubscribe/SendData.h"
 
-void
-InitLogger(int argn, char **argv, const std::string &logname,
-           miutil::conf::ConfSection *conf = 0);
+namespace kvalobs {
+namespace datasource {
 
-#endif  // SRC_KVDATAINPUTD_INITLOGGER_H_
+/**
+ * @throws std::logic_error on failure.
+ */
+Json::Value
+decodeResultToJson(const Result &result);
+
+/**
+ * @throws std::logic_error on failure.
+ */
+Result
+decodeResultFromJson(const Json::Value &result);
+
+/**
+ * @throws std::logic_error on failure.
+ */
+Result
+decodeResultFromJsonString(const std::string &result);
+
+}  // namespace datasource
+}  // namespace kvalobs
+
+
+
+#endif  // SRC_LIB_KVSUBSCRIBE_SENDDATAJSONRESULT_H_

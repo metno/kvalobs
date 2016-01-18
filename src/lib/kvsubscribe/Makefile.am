@@ -2,6 +2,7 @@ lib_LTLIBRARIES = libkvalobs_kvsubscribe.la
 
 libkvalobs_kvsubscribe_la_CPPFLAGS = \
 	-D_REENTRANT \
+	-I$(top_srcdir)/src \
 	-I$(top_srcdir)/src/lib \
 	$(libxmlpp_CFLAGS) 
 
@@ -10,9 +11,14 @@ libkvalobs_kvsubscribe_la_SOURCES = \
 	KafkaConsumer.cpp \
 	DataSubscriber.cpp \
 	KafkaProducer.cpp \
-	DataProducer.cpp
-	
-libkvalobs_kvsubscribe_la_LIBADD = ../decodeutility/libkvalobs_decodeutility.la $(jsoncpp_LIBS) $(rdkafka_LIBS)
+	DataProducer.cpp \
+	HttpSendData.cc \
+	SendDataJsonResult.h SendDataJsonResult.cc
+
+libkvalobs_kvsubscribe_la_LIBADD = \
+	../decodeutility/libkvalobs_decodeutility.la \
+	$(top_builddir)/src/lib/json/libjson.la \
+	$(rdkafka_LIBS)
 
 kvsubscribeincludedir = $(pkgincludedir)/kvsubscribe
 	
@@ -21,7 +27,9 @@ kvsubscribeinclude_HEADERS = \
 	KafkaConsumer.h \
 	DataSubscriber.h \
 	KafkaProducer.h \
-	DataProducer.h
+	DataProducer.h \
+	HttpSendData.h \
+	SendData.h
 
 
 pkgconfigdir = $(libdir)/pkgconfig

@@ -26,14 +26,30 @@
  with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#ifndef SRC_KVDATAINPUTD_INITLOGGER_H_
-#define SRC_KVDATAINPUTD_INITLOGGER_H_
+
+#ifndef SRC_KVDATAINPUTD_KAFKAPRODUCERTHREAD_H_
+#define SRC_KVDATAINPUTD_KAFKAPRODUCERTHREAD_H_
 
 #include <string>
-#include "lib/miconfparser/miconfparser.h"
+#include <thread>
+#include "kvDataInputd/ProducerCommand.h"
 
-void
-InitLogger(int argn, char **argv, const std::string &logname,
-           miutil::conf::ConfSection *conf = 0);
+class KafkaProducerThread {
+  typedef std::shared_ptr<miutil::concurrent::BlockingQueuePtr<std::string>> StatusQue;
+  StatusQue statusQue;
+  std::thread kafkaThread;
 
-#endif  // SRC_KVDATAINPUTD_INITLOGGER_H_
+ public:
+  ProducerQuePtr que;
+  KafkaProducerThread();
+  ~KafkaProducerThread();
+
+  /**
+   * @throws std::runtime_error if the kafka thread can't start.
+   */
+  void start(const std::string &brokers, const std::string &topic);
+  void shutdown();
+  void join(const std::chrono::high_resolution_clock::duration &timeout);
+};
+
+#endif  // SRC_KVDATAINPUTD_KAFKAPRODUCERTHREAD_H_
