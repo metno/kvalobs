@@ -2,7 +2,8 @@ noinst_LTLIBRARIES = libsqlkvapp.la
 
 libsqlkvappincludedir =  $(pkgincludedir)/kvcpp/sql
 libsqlkvappinclude_HEADERS = \
-	SqlKvApp.h
+	SqlKvApp.h \
+	SqlGet.h
 
 libsqlkvapp_la_SOURCES = \
 	SqlKvApp.cpp \
