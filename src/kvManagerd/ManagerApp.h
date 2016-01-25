@@ -1,9 +1,7 @@
 /*
  Kvalobs - Free Quality Control Software for Meteorological Observations
 
- $Id: NewDataJob.h,v 1.2.2.2 2007/09/27 09:02:35 paule Exp $
-
- Copyright (C) 2007 met.no
+ Copyright (C) 2016 met.no
 
  Contact information:
  Norwegian Meteorological Institute
@@ -28,23 +26,16 @@
  with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#ifndef __NewDataJob_h__
-#define __NewDataJob_h__
 
-#include <milog/milog.h>
-#include "OneTimeJob.h"
+#ifndef SRC_KVMANAGERD_MANAGERAPP_H_
+#define SRC_KVMANAGERD_MANAGERAPP_H_
 
-class NewDataJob : public OneTimeJob {
+#include <kvalobs/kvbaseapp.h>
+
+class ManagerApp : public KvBaseApp {
  public:
-  NewDataJob();
-  ~NewDataJob();
-
-  virtual const char* jobName() const {
-    return "NewDataJob";
-  }
-  ;
-
-  virtual void doJob(dnmi::db::Connection &con);
+  ManagerApp(int argc, char ** argv);
+  ~ManagerApp();
 };
 
-#endif
+#endif /* SRC_KVMANAGERD_MANAGERAPP_H_ */

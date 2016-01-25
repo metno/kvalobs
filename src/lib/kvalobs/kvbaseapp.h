@@ -59,7 +59,7 @@ class KvBaseApp {
   bool setAppNameForDb;
   static std::string appName;  //Set the application name from ARGV[0].
 
-  KvBaseApp(int argn, char **argv, const char *options[0][2] = 0);
+  KvBaseApp(int argn, char **argv);
   virtual ~KvBaseApp();
 
   virtual void useMessage(std::ostream &os);
@@ -117,9 +117,18 @@ class KvBaseApp {
    * @return The name to use as the pidfile.
    */
   static std::string createPidFileName(const std::string &progname);
-
   static void createPidFile(const std::string &progname);
   static void deletePidFile();
+
+  class PidFile {
+   public:
+    explicit PidFile(const std::string & progname);
+    ~PidFile();
+    PidFile(const PidFile & p) = delete;
+    PidFile & operator=(const PidFile & p) = delete;
+   private:
+    std::string pidFile_;
+  };
 
   /**
    * \brief creates a string that can be used to connect to the database.

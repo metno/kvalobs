@@ -58,8 +58,8 @@ volatile sig_atomic_t sigTerm = 0;
 
 boost::regex DataSrcApp::reMessageid(".+(/ *messageid *=([^/]*)).*", boost::regex::perl | boost::regex::icase);
 
-DataSrcApp::DataSrcApp(int argn, char **argv, int nConnections_, miutil::conf::ConfSection *theKvConf, const char *opt[][2])
-    : KvBaseApp(argn, argv, opt),
+DataSrcApp::DataSrcApp(int argn, char **argv, int nConnections_, miutil::conf::ConfSection *theKvConf)
+    : KvBaseApp(argn, argv),
       ok(false),
       shutdown_(false) {
   miutil::conf::ConfSection *conf;

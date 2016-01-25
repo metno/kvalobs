@@ -58,7 +58,7 @@ std::string KvBaseApp::pidfile;
 std::string KvBaseApp::appName;
 milog::LogLevel KvBaseApp::globalLogLevel = milog::WARN;
 
-KvBaseApp::KvBaseApp(int argn, char **argv, const char *opt[0][2])
+KvBaseApp::KvBaseApp(int argn, char **argv)
     : setAppNameForDb(false) {
   string corbaNS;
   string kvconfig;
@@ -146,6 +146,27 @@ void KvBaseApp::deletePidFile() {
 
   unlink(pidfile.c_str());
 }
+
+KvBaseApp::PidFile::PidFile(const std::string & progname)
+    : pidFile_(dnmi::file::createPidFileName(kvPath("rundir"), progname)) {
+
+  LOGDEBUG("Creating PID file " + pidFile_);
+  bool error;
+  if (dnmi::file::isRunningPidFile(pidFile_, error)) {
+    if (error)
+      throw std::runtime_error("Error when attempting to check PID file");
+    else
+      throw std::runtime_error("PID file <" + pidFile_ + "> already exists! Is " + progname + " running?");
+  }
+  std::ofstream s(pidFile_);
+  s << getpid() << std::endl;
+  if (!s)
+    throw std::runtime_error("Error when attempting to create PID file: " + pidFile_);
+}
+KvBaseApp::PidFile::~PidFile() {
+  unlink(pidFile_.c_str());
+}
+
 
 std::string KvBaseApp::createConnectString(const std::string &dbname,
                                            const std::string &kvdbuser,

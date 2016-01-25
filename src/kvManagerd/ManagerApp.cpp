@@ -1,9 +1,7 @@
 /*
  Kvalobs - Free Quality Control Software for Meteorological Observations
 
- $Id: PreProcessJob.h,v 1.2.2.2 2007/09/27 09:02:35 paule Exp $
-
- Copyright (C) 2007 met.no
+ Copyright (C) 2016 met.no
 
  Contact information:
  Norwegian Meteorological Institute
@@ -28,23 +26,15 @@
  with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#ifndef __preprocessjob_h__
-#define __preprocessjob_h__
 
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <kvdb/kvdb.h>
+#include "ManagerApp.h"
+#include <string>
+#include <initializer_list>
 
-class PreProcessJob {
+ManagerApp::ManagerApp(int argc, char ** argv)
+    : KvBaseApp(argc, argv) {
 
- public:
-  PreProcessJob();
-  virtual ~PreProcessJob();
+}
 
-  virtual const char* jobName() const =0;
-
-  virtual void doJob(long stationId, long typeId,
-                     const boost::posix_time::ptime &obstime,
-                     dnmi::db::Connection &con)=0;
-};
-
-#endif
+ManagerApp::~ManagerApp() {
+}

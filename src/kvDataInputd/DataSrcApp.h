@@ -181,7 +181,7 @@ class DataSrcApp : public KvBaseApp {
    *        shall we try to create.
    * \param opt Optional options to omniorb.
    */
-  DataSrcApp(int argn, char **argv, int numberOfConnections, miutil::conf::ConfSection *theKvConf, const char *opt[][2] = 0);
+  DataSrcApp(int argn, char **argv, int numberOfConnections, miutil::conf::ConfSection *theKvConf);
 
   /**
    * \brief Detructor, deletes all connection to the database.

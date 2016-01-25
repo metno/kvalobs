@@ -1,9 +1,7 @@
 /*
  Kvalobs - Free Quality Control Software for Meteorological Observations
 
- $Id: OneTimeJob.h,v 1.2.2.2 2007/09/27 09:02:35 paule Exp $
-
- Copyright (C) 2007 met.no
+ Copyright (C) 2016 met.no
 
  Contact information:
  Norwegian Meteorological Institute
@@ -28,40 +26,39 @@
  with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#ifndef __OneTimeJob_h__
-#define __OneTimeJob_h__
 
-#include <kvdb/kvdb.h>
-#include <kvalobs/kvStationInfo.h>
-#include <dnmithread/CommandQue.h>
+#ifndef SRC_KVMANAGERD_MISSINGRUNNER_H_
+#define SRC_KVMANAGERD_MISSINGRUNNER_H_
 
-class ManagerApp;
+#include <boost/date_time/posix_time/ptime.hpp>
+#include <condition_variable>
+#include <chrono>
+#include <string>
 
-class OneTimeJob {
-  friend class PreProcessWorker;
+class KvalobsDatabaseAccess;
 
-  ManagerApp *app_;
-  dnmi::thread::CommandQue *outputQue_;
-  dnmi::db::Connection *con_;
-
-  void runJob(ManagerApp *app, dnmi::thread::CommandQue *outputQue,
-              dnmi::db::Connection *con);
-
+class MissingRunner {
  public:
-  OneTimeJob()
-      : app_(0),
-        outputQue_(0),
-        con_(0) {
+  explicit MissingRunner(const std::string & connectString);
+  ~MissingRunner();
+
+  void operator()();
+
+  static bool stopped() {
+    return stopped_;
   }
-  ;
-  virtual ~OneTimeJob() {
-  }
 
-  virtual const char* jobName() const =0;
+  static void stop();
 
-  void postToQue(const kvalobs::kvStationInfo &info);
+ private:
+  typedef std::chrono::system_clock::time_point Time;
+  void run();
+  void addAllMissingData(KvalobsDatabaseAccess & dbAccess,
+                         const boost::posix_time::ptime & obstime);
 
-  virtual void doJob(dnmi::db::Connection &con)=0;
+  std::string connectString_;
+  static bool stopped_;
+  static std::condition_variable condition_;
 };
 
-#endif
+#endif  // SRC_KVMANAGERD_MISSINGRUNNER_H_

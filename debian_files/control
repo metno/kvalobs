@@ -14,6 +14,7 @@ Build-Depends: debhelper (>= 7.0.50), autotools-dev, g++ (>= 4.4.0), debconf,
  libperl-dev (>= 5.8), libdbd-pg-perl (>= 1.49),
  liblog4cpp5-dev, libcppunit-dev (>= 1.12),
  librdkafka-dev,
+ libhttpserver-dev (>= 0.11.0),
  metlibs-putools-dev
 Standards-Version: 3.7.3
 
