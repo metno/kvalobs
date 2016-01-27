@@ -167,8 +167,13 @@ std::string ObsData::createHeader(ParamDefsPtr paramdefs) {
 
     ost << hit->second;
 
+    // Sometimes sensor will be 48 (ascii '0'), we correct this here
+    int sensor = it->sensor;
+    if (sensor >= '0')
+      sensor -= '0';
+
     if (!it->isTextData() && (it->sensor != 0 || it->level != 0)) {
-      ost << "(" << it->sensor << "," << it->level << ")";
+      ost << "(" << sensor << "," << it->level << ")";
     }
   }
 

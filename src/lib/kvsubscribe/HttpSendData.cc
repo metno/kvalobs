@@ -49,7 +49,7 @@ HttpSendData::HttpSendData(const std::string &hostAndPort, bool secure) {
 
   ost << hostAndPort << "/v1/observation";
 
-  host = ost.str();
+  host_ = ost.str();
 }
 
 HttpSendData::~HttpSendData() {
@@ -60,9 +60,9 @@ Result HttpSendData::newData(const std::string &data, const std::string &obsType
   ost << obsType << "\n" << data;
 
   try {
-    http.post(host, ost.str(), "text/plain");
+    http_.post(host_, ost.str(), "text/plain");
 
-    int retCode = http.returnCode();
+    int retCode = http_.returnCode();
 
     if (retCode != 200) {
       ostringstream err;
@@ -70,16 +70,17 @@ Result HttpSendData::newData(const std::string &data, const std::string &obsType
       throw Fatal(err.str());
     }
 
-    string sRes = http.content();
+    string sRes = http_.content();
     cerr << "HttpSendData::newData:Response: " << sRes << "\n\n";
     return decodeResultFromJsonString(sRes);
   } catch (const HttpException &ex) {
     throw Fatal(ex.what());
   } catch (const logic_error &err) {
     throw Fatal(err.what());
-  } catch (...) {
-    throw Fatal("HttpSendData::newData: Unexpected unknown error. This is a bug.");
   }
+//  catch (std::exception & e) {
+//    throw Fatal("HttpSendData::newData: Unexpected unknown error. This is a bug. Message: " + std::string(e.what()));
+//  }
 }
 
 }  // namespace datasource

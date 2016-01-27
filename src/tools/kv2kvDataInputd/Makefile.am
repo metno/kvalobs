@@ -18,6 +18,7 @@ kv2kvDataInputd_CPPFLAGS = -D_REENTRANT \
 kv2kvDataInputd_LDFLAGS = -pthread 
 kv2kvDataInputd_LDADD = \
 		$(top_builddir)/src/service-libs/kvcpp/libkvalobs_kvcpp.la \
+		$(top_builddir)/src/lib/kvsubscribe/libkvalobs_kvsubscribe.la \
 		$(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
 		$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
 		$(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \

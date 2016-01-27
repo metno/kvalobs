@@ -30,6 +30,7 @@
 #ifndef SRC_LIB_KVSUBSCRIBE_HTTPSENDDATA_H_
 #define SRC_LIB_KVSUBSCRIBE_HTTPSENDDATA_H_
 
+#include <boost/noncopyable.hpp>
 #include <string>
 #include "miutil/httpclient.h"
 #include "kvsubscribe/SendData.h"
@@ -38,8 +39,8 @@ namespace kvalobs {
 namespace datasource {
 
 class HttpSendData : SendData {
-  std::string host;
-  miutil::HTTPClient http;
+  std::string host_;
+  miutil::HTTPClient http_;
 
  public:
   /**
@@ -52,7 +53,11 @@ class HttpSendData : SendData {
   /**
    * @throw Fatal on transport problems.
    */
-  virtual Result newData(const std::string &data, const std::string &obsType);
+  Result newData(const std::string &data, const std::string &obsType) override;
+
+  const std::string host() const {
+    return host_;
+  }
 };
 
 }  // namespace datasource

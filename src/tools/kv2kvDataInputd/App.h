@@ -34,9 +34,10 @@
 
 #include <string>
 #include <utility>
-#include <dnmithread/Thread.h>
-#include <kvcpp/corba/CorbaKvApp.h>
-#include <kvskel/datasource.hh>
+#include "dnmithread/Thread.h"
+#include "kvsubscribe/HttpSendData.h"
+#include "kvcpp/corba/CorbaKvApp.h"
+#include "kvskel/datasource.hh"
 #include "DataReceiver.h"
 #include "CorbaServerConf.h"
 
@@ -47,7 +48,7 @@ class App : public kvservice::corba::CorbaKvApp {
   std::string notifyid;
   std::string hintid;
   CorbaServerConf receiveFromKvServer;
-  CorbaServerConf sendToKvServer;
+  kvalobs::datasource::HttpSendData sendToKvServer;
   dnmi::thread::CommandQue eventQue;
   DataReceiverThread dataReceiverThread;
   CKvalObs::CDataSource::Data_var refDataReceiver;

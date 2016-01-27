@@ -53,8 +53,8 @@ EXCEPTION_SPEC_CUSTOM_MESSAGE(HttpException, HttpUrlError);
  */
 
 class HTTPClient {
-  HTTPClient(const HTTPClient &);
-  HTTPClient& operator=(const HTTPClient &);
+  HTTPClient(const HTTPClient &) = delete;
+  HTTPClient& operator=(const HTTPClient &) = delete;
 
   CURL *curl;
   std::ostream *out;
