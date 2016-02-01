@@ -28,5 +28,6 @@ AM_LDFLAGS = \
 	$(BOOST_DATE_TIME_LIB)
 
 AM_CPPFLAGS = \
-	-I$(top/srcdir)/src/ \
-	-I$(top_srcdir)/src/lib
+	-I$(top_srcdir)/src/ \
+	-I$(top_srcdir)/src/lib \
+	-D_REENTRANT
