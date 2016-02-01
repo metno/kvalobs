@@ -37,8 +37,7 @@
 
 namespace miutil {
 EXCEPTION_SPEC_BASE(HttpException);
-EXCEPTION_SPEC(HttpException, HttpInitError,
-               "The HTTP client is not initialized!");
+EXCEPTION_SPEC(HttpException, HttpInitError, "The HTTP client is not initialized!");
 EXCEPTION_SPEC_CUSTOM_MESSAGE(HttpException, HttpConnectError);
 EXCEPTION_SPEC_CUSTOM_MESSAGE(HttpException, HttpSSLError);
 EXCEPTION_SPEC_CUSTOM_MESSAGE(HttpException, HttpAccessDenied);
@@ -57,13 +56,17 @@ class HTTPClient {
   HTTPClient& operator=(const HTTPClient &) = delete;
 
   CURL *curl;
+  struct curl_slist *header;
   std::ostream *out;
   std::ostringstream content_;
   char *errbuf;
 
+ protected:
+  void open();
+
  public:
   HTTPClient();
-  ~HTTPClient();
+  virtual ~HTTPClient();
 
   /**
    * Implementation detail. Dont use.
@@ -72,15 +75,12 @@ class HTTPClient {
     return out;
   }
 
-  void open();
   void close();
 
   void get(const std::string &url, std::ostream &content);
-  void post(const std::string &url, const std::string &content,
-            const std::string &contentType);
+  void post(const std::string &url, const std::string &content, const std::string &contentType);
 
-  void postFile(const std::string &url, const std::string &file,
-                const std::string &contentType);
+  void postFile(const std::string &url, const std::string &file, const std::string &contentType);
 
   std::string content() const {
     return content_.str();
@@ -89,6 +89,7 @@ class HTTPClient {
   std::string contentType() const;
   long returnCode() const;
   double totalTime() const;
+  virtual void log(const std::string &msg);
 };
 
 }  // namespace miutil

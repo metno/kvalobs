@@ -27,6 +27,7 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include <sstream>
+#include "lib/milog/milog.h"
 #include "lib/kvsubscribe/HttpSendData.h"
 #include "lib/kvsubscribe/SendDataJsonResult.h"
 
@@ -60,9 +61,9 @@ Result HttpSendData::newData(const std::string &data, const std::string &obsType
   ost << obsType << "\n" << data;
 
   try {
-    http_.post(host_, ost.str(), "text/plain");
+    post(host_, ost.str(), "text/plain");
 
-    int retCode = http_.returnCode();
+    int retCode = returnCode();
 
     if (retCode != 200) {
       ostringstream err;
@@ -70,17 +71,22 @@ Result HttpSendData::newData(const std::string &data, const std::string &obsType
       throw Fatal(err.str());
     }
 
-    string sRes = http_.content();
-    cerr << "HttpSendData::newData:Response: " << sRes << "\n\n";
+    string sRes = content();
+    LOGDEBUG("HttpSendData::newData:Response: " << sRes);
     return decodeResultFromJsonString(sRes);
   } catch (const HttpException &ex) {
     throw Fatal(ex.what());
   } catch (const logic_error &err) {
     throw Fatal(err.what());
+  } catch (const std::exception &err) {
+    throw Fatal(err.what());
+  } catch (...) {
+    throw Fatal("HttpSendData::newData: Unexpected unknown error. This is a bug.");
   }
-//  catch (std::exception & e) {
-//    throw Fatal("HttpSendData::newData: Unexpected unknown error. This is a bug. Message: " + std::string(e.what()));
-//  }
+}
+
+void HttpSendData::log(const std::string &msg) {
+  LOGERROR("HttpSendData: " << msg);
 }
 
 }  // namespace datasource
