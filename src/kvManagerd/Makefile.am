@@ -28,11 +28,6 @@ AM_LDFLAGS = \
 	$(BOOST_DATE_TIME_LIB)
 
 AM_CPPFLAGS = \
-<<<<<<< HEAD
 	-I$(top_srcdir)/src/ \
 	-I$(top_srcdir)/src/lib \
 	-D_REENTRANT
-=======
-	-I$(top/srcdir)/src/ \
-	-I$(top_srcdir)/src/lib -D_REENTRANT
->>>>>>> Define _REENTRANT. Thread safety.
