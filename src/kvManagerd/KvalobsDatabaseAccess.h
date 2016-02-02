@@ -87,6 +87,8 @@ class KvalobsDatabaseAccess : boost::noncopyable {
    */
   std::shared_ptr<DataIdentifier> nextDataToProcess();
 
+  void cleanWorkQueue();
+
 
   /**
    * A transaction handler. Starts transaction upon construction. Unless

@@ -27,29 +27,25 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef SRC_KVMANAGERD_MISSINGRUNNER_H_
-#define SRC_KVMANAGERD_MISSINGRUNNER_H_
-
-#include "TimedDatabaseTask.h"
-#include <boost/date_time/posix_time/ptime.hpp>
-#include <condition_variable>
-#include <chrono>
+#include "WorkQueueMover.h"
 #include <string>
+#include "KvalobsDatabaseAccess.h"
 
-class KvalobsDatabaseAccess;
 
-class MissingRunner: public TimedDatabaseTask {
- public:
-  explicit MissingRunner(const std::string & connectString);
-  ~MissingRunner();
+WorkQueueMover::WorkQueueMover(const std::string & connectString) :
+  TimedDatabaseTask(connectString, "WorkQueueMover") {
+}
 
- protected:
-  Time nextRunTime() const override;
-  void run() override;
+WorkQueueMover::~WorkQueueMover() {
+}
 
- private:
-  void addAllMissingData(KvalobsDatabaseAccess & dbAccess,
-                         const boost::posix_time::ptime & obstime);
-};
+WorkQueueMover::Time WorkQueueMover::nextRunTime() const {
+  auto t = std::chrono::system_clock::now();
+  t += std::chrono::minutes(15);
+  return t;
+}
 
-#endif  // SRC_KVMANAGERD_MISSINGRUNNER_H_
+void WorkQueueMover::run() {
+  KvalobsDatabaseAccess dbAccess(connectString());
+  dbAccess.cleanWorkQueue();
+}

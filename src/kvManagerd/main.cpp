@@ -36,11 +36,12 @@
 #include "kvalobs/kvPath.h"
 #include "ManagerApp.h"
 #include "MissingRunner.h"
+#include "WorkQueueMover.h"
 #include "ObservationComplete.h"
 
 namespace {
 void stop(int signum) {
-  MissingRunner::stop();
+  TimedDatabaseTask::stop();
   ObservationComplete::stop();
 }
 
@@ -80,11 +81,15 @@ int main(int argc, char ** argv) {
     std::string connectString = app.createConnectString();
     ObservationComplete observationComplete(connectString);
     MissingRunner missingRunner(connectString);
+    WorkQueueMover workQueueMover(connectString);
+
 
     LOGDEBUG("Starting manager");
     std::thread missingThread(missingRunner);
+    std::thread moverThread(workQueueMover);
     observationComplete();
     missingThread.join();
+    moverThread.join();
   } catch (std::exception & e) {
     LOGFATAL(e.what());
     return 1;

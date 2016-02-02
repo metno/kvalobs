@@ -27,29 +27,38 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef SRC_KVMANAGERD_MISSINGRUNNER_H_
-#define SRC_KVMANAGERD_MISSINGRUNNER_H_
+#ifndef SRC_KVMANAGERD_TIMEDDATABASETASK_H_
+#define SRC_KVMANAGERD_TIMEDDATABASETASK_H_
 
-#include "TimedDatabaseTask.h"
-#include <boost/date_time/posix_time/ptime.hpp>
-#include <condition_variable>
 #include <chrono>
 #include <string>
 
-class KvalobsDatabaseAccess;
-
-class MissingRunner: public TimedDatabaseTask {
+class TimedDatabaseTask {
  public:
-  explicit MissingRunner(const std::string & connectString);
-  ~MissingRunner();
+  TimedDatabaseTask(const std::string & connectString, const std::string & logContext);
+  virtual ~TimedDatabaseTask();
+
+  void operator()();
+
+  static bool stopped() {
+    return stopped_;
+  }
+
+  static void stop();
 
  protected:
-  Time nextRunTime() const override;
-  void run() override;
+  typedef std::chrono::system_clock::time_point Time;
+  virtual Time nextRunTime() const = 0;
+  virtual void run() = 0;
+
+  const std::string connectString() const {
+    return connectString_;
+  }
 
  private:
-  void addAllMissingData(KvalobsDatabaseAccess & dbAccess,
-                         const boost::posix_time::ptime & obstime);
+  std::string connectString_;
+  std::string logContext_;
+  static bool stopped_;
 };
 
-#endif  // SRC_KVMANAGERD_MISSINGRUNNER_H_
+#endif /* SRC_KVMANAGERD_TIMEDDATABASETASK_H_ */

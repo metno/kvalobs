@@ -161,6 +161,22 @@ std::shared_ptr<DataIdentifier> KvalobsDatabaseAccess::nextDataToProcess() {
   return std::shared_ptr<DataIdentifier>();
 }
 
+void KvalobsDatabaseAccess::cleanWorkQueue() {
+  auto t = transaction();
+  const std::string criteria = "qa_stop<now()-'15 minutes'::interval";
+
+  exec_("delete from workstatistik s using workque "
+    "where s.stationid=workque.stationid "
+    "and s.obstime=workque.obstime "
+    "and s.typeid=workque.typeid "
+    "and workque." + criteria);
+  exec_("INSERT INTO workstatistik (SELECT * FROM workque WHERE " + criteria + ")");
+  exec_("DELETE FROM workque WHERE " + criteria);
+
+  t->commit();
+}
+
+
 KvalobsDatabaseAccess::Transaction::Transaction(
     dnmi::db::Connection & connection,
     bool serializable)

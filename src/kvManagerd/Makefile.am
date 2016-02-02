@@ -4,8 +4,12 @@ kvManagerd_SOURCES = \
 	main.cpp \
 	ManagerApp.cpp \
 	ManagerApp.h \
+	TimedDatabaseTask.cpp \
+	TimedDatabaseTask.h \
 	MissingRunner.cpp \
 	MissingRunner.h \
+	WorkQueueMover.cpp \
+	WorkQueueMover.h \
 	ObservationComplete.cpp \
 	ObservationComplete.h \
 	KvalobsDatabaseAccess.cpp \
