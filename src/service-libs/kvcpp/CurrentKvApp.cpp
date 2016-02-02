@@ -29,14 +29,17 @@
 
 #include "CurrentKvApp.h"
 #include <libgen.h>
-#include <fstream>
 #include <boost/filesystem.hpp>
-#include <miconfparser/confsection.h>
-#include <miconfparser/confparser.h>
-#include <milog/milog.h>
-#include <kvalobs/kvPath.h>
-#include <kvdb/kvdb.h>
-#include <kvdb/dbdrivermgr.h>
+#include <boost/static_assert.hpp>
+#include <vector>
+#include <fstream>
+#include "miconfparser/confsection.h"
+#include "miconfparser/confparser.h"
+#include "milog/milog.h"
+#include "kvalobs/kvPath.h"
+#include "kvdb/kvdb.h"
+#include "kvdb/dbdrivermgr.h"
+#include "kvsubscribe/HttpSendData.h"
 
 namespace kvservice {
 
@@ -92,26 +95,29 @@ dnmi::db::Connection * createConnection(const miutil::conf::ConfSection *conf) {
   return connection;
 }
 
-std::function<Connection*()> connector(int argc, char ** argv, const boost::filesystem::path & preferredConfigFile) {
-
-  path baseConfigPath = kvPath("sysconfdir");
-
-  std::vector<path> configAlternatives = {
-      preferredConfigFile,
-      baseConfigPath/boost::filesystem::basename(argv[0]),
-      baseConfigPath/"kvalobs.conf"
-  };
-
-  miutil::conf::ConfSection * config = nullptr;
-  for (const path & p : configAlternatives)  {
-    try {
-      config = readConf(p);
-    }
-    catch (std::exception & e) {
-      LOGDEBUG(e.what());
+miutil::conf::ConfSection * getConfiguration(const boost::filesystem::path& preferredConfigFile,
+                      const std::string & application) {
+  static miutil::conf::ConfSection * conf = nullptr;
+  if (!conf) {
+    path baseConfigPath = kvPath("sysconfdir");
+    std::vector<path> configAlternatives = {
+        preferredConfigFile,
+        baseConfigPath / application,
+        baseConfigPath / "kvalobs.conf" };
+    for (const path & p : configAlternatives) {
+      try {
+        conf = readConf(p);
+        break;
+      } catch (std::exception & e) {
+        LOGDEBUG(e.what());
+      }
     }
   }
+  return conf;
+}
 
+std::function<Connection*()> connector(int argc, char ** argv, const boost::filesystem::path & preferredConfigFile) {
+  miutil::conf::ConfSection * config = getConfiguration(preferredConfigFile, boost::filesystem::basename(argv[0]));
   return [config]() {
     return createConnection(config);
   };
@@ -126,9 +132,41 @@ void releaseConnection(dnmi::db::Connection * connection) {
 CurrentKvApp::CurrentKvApp(int argc, char ** argv, const std::string & preferredConfigFile)
     : sql::SqlGet(connector(argc, argv, preferredConfigFile), releaseConnection),
       kafka::KafkaSubscribe("test", "localhost") {
+  const miutil::conf::ConfSection * conf = getConfiguration(
+      preferredConfigFile, boost::filesystem::basename(argv[0]));
+  sendData_ = std::unique_ptr<kvalobs::datasource::SendData>(new kvalobs::datasource::HttpSendData(*conf));
+
+  // needed for correct handling of CORBA::string_dup, below
+  int ac = 1;
+  char * av = "fake";
+  CORBA::ORB_init(ac, & av);
 }
 
 CurrentKvApp::~CurrentKvApp() {
+}
+
+// If any of these fail, you must reimplement sendDataToKv
+BOOST_STATIC_ASSERT(kvalobs::datasource::OK == (kvalobs::datasource::EResult) CKvalObs::CDataSource::OK);
+BOOST_STATIC_ASSERT(kvalobs::datasource::NODECODER == (kvalobs::datasource::EResult) CKvalObs::CDataSource::NODECODER);
+BOOST_STATIC_ASSERT(kvalobs::datasource::DECODEERROR == (kvalobs::datasource::EResult) CKvalObs::CDataSource::DECODEERROR);
+BOOST_STATIC_ASSERT(kvalobs::datasource::NOTSAVED == (kvalobs::datasource::EResult) CKvalObs::CDataSource::NOTSAVED);
+BOOST_STATIC_ASSERT(kvalobs::datasource::ERROR == (kvalobs::datasource::EResult) CKvalObs::CDataSource::ERROR);
+
+const CKvalObs::CDataSource::Result_var CurrentKvApp::sendDataToKv(const char *data, const char *obsType) {
+  try {
+      kvalobs::datasource::Result result = sendData_->newData(data, obsType);
+
+      CKvalObs::CDataSource::Result_var r( new CKvalObs::CDataSource::Result );
+      r->res = (CKvalObs::CDataSource::EResult) result.res;
+      r->message = CORBA::string_dup(result.message.c_str());
+      return r;
+  }
+  catch (std::exception & e) {
+    CKvalObs::CDataSource::Result_var r( new CKvalObs::CDataSource::Result );
+    r->res = CKvalObs::CDataSource::ERROR;
+    r->message = CORBA::string_dup(e.what());
+    return r;
+  }
 }
 
 } /* namespace kvservice */

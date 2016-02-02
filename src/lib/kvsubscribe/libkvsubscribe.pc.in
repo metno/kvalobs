@@ -8,6 +8,6 @@ idldir=@datarootdir@/@PACKAGE@/idl
 Name: libkvsubscribe
 Description: Data subscription library for Kvalobs
 Version: @VERSION@
-Requires: jsoncpp libkvalobs_decodeutility
+Requires: libkvalobs_decodeutility libkvalobs_miutil
 Libs: -L${libdir} -lkvalobs_kvsubscribe -lrdkafka++ -lrdkafka
 Cflags: -I@includedir@/kvalobs

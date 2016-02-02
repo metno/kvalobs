@@ -127,7 +127,7 @@ milog::LogLevel getLogLevel(miutil::conf::ConfSection *conf) {
 App::App(int argn, char **argv, miutil::conf::ConfSection *conf)
     : kvservice::corba::CorbaKvApp(argn, argv, conf),
 #warning This must be set in config!
-      sendToKvServer("10.99.2.229:8090"),
+      sendToKvServer(conf),
       dataReceiverThread(0),
       corbaApp(kvservice::corba::CorbaKvApp::getCorbaApp()),
       dataReceiverAlive(false) {

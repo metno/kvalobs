@@ -34,6 +34,13 @@
 #include "miutil/httpclient.h"
 #include "kvsubscribe/SendData.h"
 
+namespace miutil {
+namespace conf {
+class ConfSection;
+}  // namespace conf
+}  // namespace miutil
+
+
 namespace kvalobs {
 namespace datasource {
 
@@ -46,6 +53,9 @@ class HttpSendData : public SendData, miutil::HTTPClient {
    * @param useHttps Use https if true.
    */
   explicit HttpSendData(const std::string &hostAndPort, bool useHttps = false);
+
+  explicit HttpSendData(const miutil::conf::ConfSection &conf);
+
   virtual ~HttpSendData();
 
   /**

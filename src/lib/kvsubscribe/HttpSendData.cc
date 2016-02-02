@@ -27,6 +27,7 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include <sstream>
+#include "miconfparser/confsection.h"
 #include "lib/milog/milog.h"
 #include "lib/kvsubscribe/HttpSendData.h"
 #include "lib/kvsubscribe/SendDataJsonResult.h"
@@ -40,23 +41,39 @@ using miutil::HttpException;
 namespace kvalobs {
 namespace datasource {
 
+namespace {
+bool secure(const miutil::conf::ConfSection &conf) {
+  return conf.getValue("kvDataInputd.http.useHTTPS").valAsBool(false);
+}
+
+std::string getHost(const miutil::conf::ConfSection &conf) {
+  std::ostringstream ost;
+  ost << conf.getValue("kvDataInputd.http.host").valAsString("localhost");
+  ost << ':';
+  ost << conf.getValue("kvDataInputd.http.port").valAsInt(8090);
+  return ost.str();
+}
+}  // namespace
+
 HttpSendData::HttpSendData(const std::string &hostAndPort, bool secure) {
   ostringstream ost;
-
   if (secure)
     ost << "https://";
   else
     ost << "http://";
-
   ost << hostAndPort << "/v1/observation";
-
   host_ = ost.str();
+}
+
+HttpSendData::HttpSendData(const miutil::conf::ConfSection &conf)
+    : HttpSendData(getHost(conf), secure(conf)) {
 }
 
 HttpSendData::~HttpSendData() {
 }
 
-Result HttpSendData::newData(const std::string &data, const std::string &obsType) {
+Result HttpSendData::newData(const std::string &data,
+                             const std::string &obsType) {
   ostringstream ost;
   ost << obsType << "\n" << data;
 
