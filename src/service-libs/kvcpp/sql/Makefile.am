@@ -3,6 +3,7 @@ noinst_LTLIBRARIES = libsqlkvapp.la
 libsqlkvappincludedir =  $(pkgincludedir)/kvcpp/sql
 libsqlkvappinclude_HEADERS = \
 	SqlKvApp.h \
+	ConnectionPool.h \
 	SqlGet.h
 
 libsqlkvapp_la_SOURCES = \
@@ -10,7 +11,9 @@ libsqlkvapp_la_SOURCES = \
 	SqlGet.h \
 	SqlGet.cpp \
 	KvDataHandler.h \
-	KvDataHandler.cpp
+	KvDataHandler.cpp \
+	ConnectionPool.h \
+	ConnectionPool.cpp
 
 AM_CPPFLAGS = \
 	-D_REENTRANT \

@@ -8,6 +8,8 @@ libkvalobs_kvcpp_la_SOURCES = \
 	sql/SqlGet.h \
 	sql/KvDataHandler.cpp \
 	sql/KvDataHandler.h \
+	sql/ConnectionPool.h \
+	sql/ConnectionPool.cpp \
 	CurrentKvApp.cpp \
 	kvDataSubscribeInfoHelper.cc \
 	kveventinterface.cc \

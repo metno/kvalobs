@@ -33,6 +33,7 @@
 #include "../KvApp.h"
 #include <memory>
 #include <functional>
+#include "ConnectionPool.h"
 
 namespace dnmi {
 namespace db {
@@ -45,7 +46,8 @@ namespace sql {
 
 class SqlGet : virtual public details::KvalobsGet {
  public:
-  explicit SqlGet(std::function<dnmi::db::Connection *()> createConnection);
+  explicit SqlGet(std::function<dnmi::db::Connection *()> createConnection,
+                  std::function<void(dnmi::db::Connection *)> releaseConnection);
   virtual ~SqlGet();
 
   virtual bool getKvData( KvGetDataReceiver &dataReceiver, const WhichDataHelper &wd );
@@ -67,11 +69,7 @@ class SqlGet : virtual public details::KvalobsGet {
                                   );
 
 private:
-  dnmi::db::Connection * connection(int id = 0);
-
-  std::function<dnmi::db::Connection *()> createConnection_;
-
-  std::map<int, std::shared_ptr<dnmi::db::Connection>> connections_;
+  ConnectionPool connections_;
 };
 
 } /* namespace sql */

@@ -75,13 +75,14 @@ std::string getValue(const std::string & key,
   return val.front().valAsString();
 }
 
+static dnmi::db::DriverManager dbMgr;
+
 dnmi::db::Connection * createConnection(const miutil::conf::ConfSection *conf) {
   std::string connectString = getValue("database.dbconnect", conf);
   std::string driver = kvalobs::kvPath(kvalobs::libdir) + "/kvalobs/db/"
       + getValue("database.dbdriver", conf);
 
   std::string driverId;
-  static dnmi::db::DriverManager dbMgr;
   if (!dbMgr.loadDriver(driver, driverId))
     throw std::runtime_error("Unable to load driver " + driver);
 
@@ -115,10 +116,15 @@ std::function<Connection*()> connector(int argc, char ** argv, const boost::file
     return createConnection(config);
   };
 }
+
+void releaseConnection(dnmi::db::Connection * connection) {
+  dbMgr.releaseConnection(connection);
+}
+
 }
 
 CurrentKvApp::CurrentKvApp(int argc, char ** argv, const std::string & preferredConfigFile)
-    : sql::SqlGet(connector(argc, argv, preferredConfigFile)),
+    : sql::SqlGet(connector(argc, argv, preferredConfigFile), releaseConnection),
       kafka::KafkaSubscribe("test", "localhost") {
 }
 

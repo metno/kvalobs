@@ -40,7 +40,7 @@
 namespace kvservice {
 namespace sql {
 namespace {
-bool query(dnmi::db::Connection * connection, std::string q,
+bool query(std::shared_ptr<dnmi::db::Connection> connection, std::string q,
            std::function<void(const dnmi::db::DRow &)> handler) {
   if (q.empty())
     return false;
@@ -66,15 +66,9 @@ bool query(dnmi::db::Connection * connection, std::string q,
 }
 }
 
-dnmi::db::Connection * SqlGet::connection(int id) {
-  std::shared_ptr<dnmi::db::Connection> & connection = connections_[id];
-  if (!connection)
-    connection.reset(createConnection_());
-  return connection.get();
-}
-
-SqlGet::SqlGet(std::function<dnmi::db::Connection *()> createConnection)
-    : createConnection_(createConnection) {
+SqlGet::SqlGet(std::function<dnmi::db::Connection *()> createConnection,
+               std::function<void(dnmi::db::Connection *)> releaseConnection)
+    : connections_(createConnection, releaseConnection) {
 }
 
 SqlGet::~SqlGet() {
@@ -83,7 +77,9 @@ SqlGet::~SqlGet() {
 bool SqlGet::getKvData(KvGetDataReceiver &dataReceiver,
                        const WhichDataHelper &wd) {
   try {
-    internal::KvDataHandler handler(*connection(0), *connection(1),
+    auto c1 = connections_.get();
+    auto c2 = connections_.get();
+    internal::KvDataHandler handler(*c1, *c2,
                                     dataReceiver);
     handler(wd);
     return true;
@@ -110,7 +106,7 @@ bool SqlGet::getKvRejectDecode(
 
   try {
     std::vector<kvalobs::kvRejectdecode> rejected;
-    bool ok = query(connection(), q.str(),
+    bool ok = query(connections_.get(), q.str(),
                     [& rejected](const dnmi::db::DRow & row) {
                       kvalobs::kvRejectdecode r(row);
                       rejected.push_back(r);
@@ -125,7 +121,7 @@ bool SqlGet::getKvRejectDecode(
 
 bool SqlGet::getKvParams(std::list<kvalobs::kvParam> &paramList) {
   try {
-    return query(connection(), "select * from param",
+    return query(connections_.get(), "select * from param",
                  [&paramList](const dnmi::db::DRow & row) {
                    paramList.push_back(kvalobs::kvParam(row));
                  });
@@ -137,7 +133,7 @@ bool SqlGet::getKvParams(std::list<kvalobs::kvParam> &paramList) {
 
 bool SqlGet::getKvStations(std::list<kvalobs::kvStation> &stationList) {
   try {
-    return query(connection(), "select * "
+    return query(connections_.get(), "select * "
                  "from station",
                  [&stationList](const dnmi::db::DRow & row) {
                    stationList.push_back(kvalobs::kvStation(row));
@@ -169,7 +165,7 @@ bool SqlGet::getKvModelData(std::list<kvalobs::kvModelData> &dataList,
   }
 
   try {
-    return query(connection(), q.str(),
+    return query(connections_.get(), q.str(),
                  [&dataList](const dnmi::db::DRow & row) {
                    dataList.push_back(kvalobs::kvModelData(row));
                  });
@@ -181,7 +177,7 @@ bool SqlGet::getKvModelData(std::list<kvalobs::kvModelData> &dataList,
 
 bool SqlGet::getKvTypes(std::list<kvalobs::kvTypes> &typeList) {
   try {
-    return query(connection(), "select * "
+    return query(connections_.get(), "select * "
                  "from types "
                  "order by typeid",
                  [&typeList](const dnmi::db::DRow & row) {
@@ -195,7 +191,7 @@ bool SqlGet::getKvTypes(std::list<kvalobs::kvTypes> &typeList) {
 
 bool SqlGet::getKvOperator(std::list<kvalobs::kvOperator> &operatorList) {
   try {
-    return query(connection(), "select * from operator",
+    return query(connections_.get(), "select * from operator",
                  [&operatorList](const dnmi::db::DRow & row) {
                    operatorList.push_back(row);
                  });
@@ -216,7 +212,7 @@ bool SqlGet::getKvStationParam(std::list<kvalobs::kvStationParam> &stParam,
     if (day >= 0)
       q << " and fromday<=" << day << " and today>=" << day;
     q << " order by paramid, fromday";
-    return query(connection(), q.str(), [&stParam](const dnmi::db::DRow & row) {
+    return query(connections_.get(), q.str(), [&stParam](const dnmi::db::DRow & row) {
       stParam.push_back(kvalobs::kvStationParam(row));
     });
   } catch (std::exception & e) {
@@ -239,7 +235,7 @@ bool SqlGet::getKvStationMetaData(std::list<kvalobs::kvStationMetadata> &stMeta,
     if (not metadataName.empty())
       q << " and metadatatypename='" << metadataName << "'";
 
-    query(connection(), q.str(), [&stMeta](const dnmi::db::DRow & row) {
+    query(connections_.get(), q.str(), [&stMeta](const dnmi::db::DRow & row) {
 
       dnmi::db::DRow & r = const_cast<dnmi::db::DRow &>(row);
       kvalobs::kvStationMetadata d(r);
@@ -281,7 +277,7 @@ bool SqlGet::getKvObsPgm(std::list<kvalobs::kvObsPgm> &obsPgm,
     q << " group by stationid";
   q << " order by stationid";
 
-  return query(connection(), q.str(), [&obsPgm](const dnmi::db::DRow & row) {
+  return query(connections_.get(), q.str(), [&obsPgm](const dnmi::db::DRow & row) {
     obsPgm.push_back(kvalobs::kvObsPgm(row));
   });
 }
@@ -342,7 +338,7 @@ bool SqlGet::getKvWorkstatistik(
 
   try {
     std::vector<kvalobs::kvWorkelement> ret;
-    bool ok = query(connection(), q.str(), [&ret](const dnmi::db::DRow & row) {
+    bool ok = query(connections_.get(), q.str(), [&ret](const dnmi::db::DRow & row) {
       ret.push_back(kvalobs::kvWorkelement(row));
     });
     if (ok)

@@ -51,13 +51,14 @@ std::string getValue(const std::string & key,
   return val.front().valAsString();
 }
 
+static dnmi::db::DriverManager dbMgr;
+
 dnmi::db::Connection * createConnection(const miutil::conf::ConfSection *conf) {
   std::string connectString = getValue("database.dbconnect", conf);
   std::string driver = kvalobs::kvPath(kvalobs::libdir) + "/kvalobs/db/"
       + getValue("database.dbdriver", conf);
 
   std::string driverId;
-  static dnmi::db::DriverManager dbMgr;
   if (!dbMgr.loadDriver(driver, driverId))
     throw std::runtime_error("Unable to load driver " + driver);
 
@@ -65,6 +66,10 @@ dnmi::db::Connection * createConnection(const miutil::conf::ConfSection *conf) {
   if (!connection or not connection->isConnected())
     throw std::runtime_error("Unable to connect to database");
   return connection;
+}
+
+void releaseConnection(dnmi::db::Connection * connection) {
+  dbMgr.releaseConnection(connection);
 }
 }
 
@@ -75,7 +80,7 @@ dnmi::db::Connection * SqlKvApp::ConnectionCreator::operator ()() const {
 SqlKvApp::SqlKvApp(int &argc, char **argv, miutil::conf::ConfSection *conf)
     : corba::CorbaKvApp(argc, argv, conf),
       connectionCreator_(conf) {
-  get_ = new SqlGet(connectionCreator_);
+  get_ = new SqlGet(connectionCreator_, releaseConnection);
 }
 
 SqlKvApp::~SqlKvApp() {
