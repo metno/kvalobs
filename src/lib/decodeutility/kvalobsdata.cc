@@ -216,6 +216,45 @@ std::set<kvalobs::kvStationInfo> KvalobsData::summary() const {
   return ret;
 }
 
+std::ostream& operator<<(std::ostream &ost, const KvalobsData &data) {
+  for (Observations::const_iterator s = data.obs_.begin(); s != data.obs_.end(); ++s) {
+    for (StationID::const_iterator t = s->begin(); t != s->end(); ++t) {
+      for (TypeID::const_iterator o = t->begin(); o != t->end(); ++o) {
+        for (ObsTime::const_iterator tbt = o->begin(); tbt != o->end(); ++tbt) {
+          for (TbTime::const_iterator sensor = tbt->begin(); sensor != tbt->end(); ++sensor) {
+            for (Sensor::const_iterator level = sensor->begin(); level != sensor->end(); ++level) {
+              for (Level::const_iterator param = level->begin(); param != level->end(); ++param) {
+                const internal::DataContent & c = param->content();
+                kvData d(s->get(), o->get(), c.original, param->paramID(), tbt->get(), t->get(), sensor->get(), level->get(), c.corrected, c.controlinfo,
+                         c.useinfo, c.cfailed);
+                ost << d << endl;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  for (Observations::const_iterator s = data.obs_.begin(); s != data.obs_.end(); ++s) {
+    for (StationID::const_iterator t = s->begin(); t != s->end(); ++t) {
+      for (TypeID::const_iterator o = t->begin(); o != t->end(); ++o) {
+        for (ObsTime::const_iterator tbt = o->begin(); tbt != o->end(); ++tbt) {
+          for (Container<TextDataItem>::const_iterator param = tbt->textData
+              .begin(); param != tbt->textData.end(); ++param) {
+            kvTextData d(s->get(), o->get(), param->content().original,
+                         param->paramID(), tbt->get(),
+                         t->get());
+            ost << d << endl;
+          }
+        }
+      }
+    }
+  }
+
+  return ost;
+}
+
 }
 
 }

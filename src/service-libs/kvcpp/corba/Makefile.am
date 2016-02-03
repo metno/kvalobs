@@ -27,10 +27,12 @@ libcorbakvapp_la_CPPFLAGS = \
 	$(omniORB4_CFLAGS) \
 	$(putools_CFLAGS) 
 	
-libcorbakvapp_la_LIBADD = $(top_builddir)/src/lib/milog/libkvalobs_milog.la \
-                          $(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
-                          $(top_builddir)/src/lib/corbahelper/libkvalobs_corbahelper.la \
-                          $(top_builddir)/src/lib/dnmithread/libkvalobs_dnmithread.la \
-                          $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la
+libcorbakvapp_la_LIBADD = \
+   $(top_builddir)/src/lib/milog/libkvalobs_milog.la \
+   $(top_builddir)/src/lib/kvsubscribe/libkvalobs_kvsubscribe.la \
+   $(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
+   $(top_builddir)/src/lib/corbahelper/libkvalobs_corbahelper.la \
+   $(top_builddir)/src/lib/dnmithread/libkvalobs_dnmithread.la \
+   $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la
  
 	

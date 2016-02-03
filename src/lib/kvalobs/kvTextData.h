@@ -104,8 +104,12 @@ class kvTextData : public kvDbBase {
   void typeID(int t) {
     typeid_ = t;
   }
+
+  friend std::ostream& operator<<(std::ostream& output,
+                                  const kvalobs::kvTextData &d);
 };
 
+std::ostream& operator<<(std::ostream& output, const kvalobs::kvTextData &d);
 /** @} */
 }
 ;

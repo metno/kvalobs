@@ -237,6 +237,7 @@ class KvalobsData {
    */
   std::set<kvalobs::kvStationInfo> summary() const;
 
+  friend std::ostream& operator<<(std::ostream &o, const KvalobsData &d);
  private:
   bool overwrite_;
   internal::Observations obs_;
@@ -244,6 +245,7 @@ class KvalobsData {
   RejectList correctedMessages_;
 };
 
+std::ostream& operator<<(std::ostream &o, const KvalobsData &d);
 }
 
 }

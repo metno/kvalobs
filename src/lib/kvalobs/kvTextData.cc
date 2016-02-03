@@ -28,6 +28,7 @@
  with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+#include <string>
 #include <kvalobs/kvTextData.h>
 #include <miutil/timeconvert.h>
 #include <boost/lexical_cast.hpp>
@@ -38,15 +39,12 @@ namespace pt = boost::posix_time;
 std::string kvalobs::kvTextData::toSend() const {
   ostringstream ost;
 
-  ost << "(" << stationid_ << "," << quoted(pt::to_kvalobs_string(obstime_))
-      << "," << quoted(original_) << "," << paramid_ << ","
+  ost << "(" << stationid_ << "," << quoted(pt::to_kvalobs_string(obstime_)) << "," << quoted(original_) << "," << paramid_ << ","
       << quoted(pt::to_kvalobs_string(tbtime_)) << "," << typeid_ << ")";
   return ost.str();
 }
 
-bool kvalobs::kvTextData::set(int sta, const boost::posix_time::ptime& obt,
-                              const std::string& org, int pid,
-                              const boost::posix_time::ptime& tbt, int typ) {
+bool kvalobs::kvTextData::set(int sta, const boost::posix_time::ptime& obt, const std::string& org, int pid, const boost::posix_time::ptime& tbt, int typ) {
   stationid_ = sta;
   obstime_ = obt;
   original_ = org;
@@ -83,18 +81,26 @@ bool kvalobs::kvTextData::set(const dnmi::db::DRow& r_) {
       CERR("kvTextData: exception ..... \n");
     }
   }
-  sortBy_ = boost::lexical_cast<std::string>(stationid_)
-      + pt::to_kvalobs_string(obstime_);
+  sortBy_ = boost::lexical_cast<std::string>(stationid_) + pt::to_kvalobs_string(obstime_);
   return true;
 }
 
 std::string kvalobs::kvTextData::uniqueKey() const {
   ostringstream ost;
 
-  ost << " WHERE stationid=" << stationid_ << " AND " << "       obstime="
-      << quoted(pt::to_kvalobs_string(obstime_)) << " AND " << "       paramid="
+  ost << " WHERE stationid=" << stationid_ << " AND " << "       obstime=" << quoted(pt::to_kvalobs_string(obstime_)) << " AND " << "       paramid="
       << paramid_ << " AND " << "       typeid=" << typeid_;
 
   return ost.str();
 }
 
+std::ostream& kvalobs::operator<<(std::ostream& output, const kvalobs::kvTextData &d) {
+  string v = d.original();
+
+  if (v.length() > 12)
+    v = v.substr(0, 12) + "...";
+
+  output << "[" << "sid: " << d.stationID() << " otime: " << d.obstime() << " tid: " << d.typeID() << " pid: " << d.paramID() << " tbt: " << d.tbtime()
+         << " orig: " << v << "]";
+  return output;
+}

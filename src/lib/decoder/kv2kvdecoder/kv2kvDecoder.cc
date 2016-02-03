@@ -229,6 +229,7 @@ struct lt_kvTextData : public binary_function<kvTextData, kvTextData, bool> {
     return a.paramID() < b.paramID();
   }
 };
+
 struct lt_kvTextData_without_paramID : public binary_function<kvTextData,
     kvTextData, bool> {
   bool operator()(const kvTextData & a, const kvTextData & b) const {

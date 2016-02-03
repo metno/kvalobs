@@ -35,6 +35,8 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <limits>
+#include <map>
 #include "boost/thread.hpp"
 #include "puTools/miTime.h"
 #include "lib/decoder/decoderbase/ConfParser.h"
@@ -55,13 +57,41 @@
 #include "lib/miutil/timeconvert.h"
 #include "lib/miutil/trimstr.h"
 
-
 using std::string;
 using std::endl;
 using std::list;
 using std::ostringstream;
 using std::vector;
 using std::ifstream;
+
+namespace {
+
+/**
+ * Sort in lists where each elements in the lists have the same stationid, typeid and obstime.
+ */
+std::list<std::list<kvalobs::kvData>> collate(const std::list<kvalobs::kvData> &data) {
+  namespace pt = boost::posix_time;
+  using std::map;
+  using std::list;
+  using kvalobs::kvData;
+
+  map<long, map<long, map<pt::ptime, list<kvData>>> > collated;
+  list<list<kvData>> ret;
+
+  for (auto &d : data) {
+    collated[d.stationID()][d.typeID()][d.obstime()].push_back(d);
+  }
+
+  for (auto &sid : collated) {
+    for (auto &tid : sid.second) {
+      for (auto &obst : tid.second) {
+        ret.push_back(std::move(obst.second));
+      }
+    }
+  }
+  return ret;
+}
+}  // namespace
 
 namespace kvdatainput {
 namespace decodecommand {
@@ -382,67 +412,25 @@ bool kvalobs::decoder::DecoderBase::putKvDataInDb(const kvalobs::kvData &sd_, in
   return true;
 }
 
-bool kvalobs::decoder::DecoderBase::putKvDataInDb(const std::list<kvalobs::kvData> &sd_, int priority) {
-  std::list<kvalobs::kvData> sd(sd_);
-  std::list<kvalobs::kvData>::iterator it = sd.begin();
-  long sid = -1;
-  long tid;
-  long myTid;
-  miutil::miTime obsTime;
-  miutil::miTime tbTime;
+bool kvalobs::decoder::DecoderBase::putKvDataInDb(const std::list<kvalobs::kvData> &sd, int priority) {
+  using std::list;
+  using kvalobs::kvData;
   kvDbGate gate(&con);
 
-  if (it == sd.end())
+  if (sd.empty())
     return true;
 
-  sid = it->stationID();
-  tid = it->typeID();
-  obsTime = to_miTime(it->obstime());
-  tbTime = to_miTime(it->tbtime());
-
-  try {
-    if (myTid > 0 && isGenerated(sid, tid)) {
-      LOGDEBUG("GENERATEDDATA: stationid: " << it->stationID() << " typeid: " << it->typeID() << " obstime: " << it->obstime());
-
-      myTid = -1 * tid;
-    }
-  } catch (...) {
-    return false;
-  }
-
-  while (it != sd.end()) {
-    if (sid != it->stationID() || tid != it->typeID() || obsTime != to_miTime(it->obstime())) {
-      addStationInfo(sid, obsTime, myTid, tbTime, priority);
-
-      sid = it->stationID();
-      tid = it->typeID();
-      obsTime = to_miTime(it->obstime());
-      tbTime = to_miTime(it->tbtime());
-      myTid = tid;
-
-      try {
-        if (myTid > 0 && isGenerated(sid, tid)) {
-          LOGDEBUG("GENERATEDDATA: stationid: " << it->stationID() << " typeid: " << it->typeID() << " obstime: " << it->obstime());
-
-          myTid = -1 * tid;
-        }
-      } catch (...) {
+  list<list<kvData>> allData = collate(sd);
+  for (auto &dl : allData) {
+    auto &d = dl.front();
+    addStationInfo(d.stationID(), to_miTime(d.obstime()), d.typeID(), to_miTime(d.tbtime()), priority);
+    for (auto &de : dl) {
+      if (!gate.insert(de, true)) {
+        LOGERROR("putKvDataInDb: can't save kvData to the database!\n" << "[" << gate.getErrorStr() << "]");
         return false;
       }
     }
-
-    it->typeID(myTid);
-
-    if (!gate.insert(*it, true)) {
-      LOGDEBUG6("putKvDataInDb: can't save kvData to the database!\n" << "[" << gate.getErrorStr() << "]");
-
-      return false;
-    }
-
-    ++it;
   }
-
-  addStationInfo(sid, obsTime, myTid, tbTime, priority);
 
   return true;
 }
