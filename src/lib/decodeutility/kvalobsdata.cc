@@ -76,8 +76,31 @@ bool KvalobsData::empty() const {
 size_t KvalobsData::size() const {
   return obs_.count();
 }
+namespace {
+void removeExisting(internal::Observations & obs, const kvData & d) {
+  int sensor = d.sensor();
+  if (sensor >= '0')
+    sensor -= '0';
+
+  ObsTime & intermediateKey = obs[d.stationID()][d.typeID()][d.obstime()];
+  for (auto & tb : intermediateKey) {
+    Level & leaf = const_cast<Level&>(tb[sensor][d.level()]);
+    leaf.erase(d.paramID());
+  }
+}
+
+void removeExisting(internal::Observations & obs, const kvTextData & d) {
+  ObsTime & intermediateKey = obs[d.stationID()][d.typeID()][d.obstime()];
+  for (auto & tb : intermediateKey) {
+    TbTime & leaf = const_cast<TbTime&>(tb);
+    leaf.erase(d.paramID());
+  }
+}
+}  // namespace
 
 void KvalobsData::insert(const kvData & d) {
+  removeExisting(obs_, d);
+
   int sensor = d.sensor();
   if (sensor >= '0')
     sensor -= '0';
@@ -90,6 +113,8 @@ void KvalobsData::insert(const kvData & d) {
 }
 
 void KvalobsData::insert(const kvTextData & d) {
+  removeExisting(obs_, d);
+
   ptime tbtime =
       d.tbtime().is_special() ? ptime(special_values::neg_infin) : d.tbtime();
   obs_[d.stationID()][d.typeID()][d.obstime()][tbtime].textData[d.paramID()]

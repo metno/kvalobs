@@ -43,7 +43,7 @@ class KvalobsDataTest : public testing::Test {
   KvalobsData data;
 };
 
-TEST_F(KvalobsDataTest, testContructor) {
+TEST_F(KvalobsDataTest, testConstructor) {
   EXPECT_TRUE(not data.overwrite());
   EXPECT_TRUE(data.empty());
   EXPECT_EQ(size_t(0), data.size());
@@ -175,4 +175,23 @@ TEST_F(KvalobsDataTest, testSummary) {
   EXPECT_EQ(boost::posix_time::time_from_string("2006-04-26 06:00:00"),
             s.obstime());
   EXPECT_EQ(302, s.typeID());
+}
+
+TEST_F(KvalobsDataTest, testMultipleTbTime) {
+  kvalobs::kvDataFactory f(
+      42, boost::posix_time::time_from_string("2006-04-26 06:00:00"), 302);
+  kvData d = f.getData(0.1, 110);
+  data.insert(f.getData(0.1, 110));
+  data.insert(f.getData(0.1, 110));
+  EXPECT_EQ(1u, data.size());
+}
+
+TEST_F(KvalobsDataTest, testMultipleTbTimeAndData) {
+  kvalobs::kvDataFactory f(
+      42, boost::posix_time::time_from_string("2006-04-26 06:00:00"), 302);
+  kvData d = f.getData(0.1, 110);
+  data.insert(f.getData(0.1, 110));
+  data.insert(f.getData(0.1, 110));
+  data.insert(f.getData(0.1, 109));
+  EXPECT_EQ(2u, data.size());
 }
