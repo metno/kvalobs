@@ -28,6 +28,7 @@
  */
 
 #include "ConnectionPool.h"
+#include <milog/milog.h>
 
 namespace kvservice {
 namespace sql {
@@ -40,13 +41,13 @@ ConnectionPool::ConnectionPool(
 }
 
 ConnectionPool::~ConnectionPool() {
-  std::lock_guard < std::mutex > lock(mutex_);
+  std::lock_guard<std::mutex> lock(mutex_);
   for (dnmi::db::Connection * c : freeConnections_)
     releaseConnection_(c);
 }
 
-std::shared_ptr<dnmi::db::Connection> ConnectionPool::get() {
-  std::lock_guard < std::mutex > lock(mutex_);
+ConnectionPool::ConnectionPtr ConnectionPool::get() {
+  std::lock_guard<std::mutex> lock(mutex_);
   dnmi::db::Connection * ret = nullptr;
   if (!freeConnections_.empty()) {
     ret = freeConnections_.front();
@@ -54,13 +55,15 @@ std::shared_ptr<dnmi::db::Connection> ConnectionPool::get() {
   } else {
     ret = createConnection_();
   }
-  return std::shared_ptr < dnmi::db::Connection
-      > (ret, [&](dnmi::db::Connection * connection) {
+  return std::shared_ptr<dnmi::db::Connection> (ret, [&](dnmi::db::Connection * connection) {
         std::lock_guard<std::mutex> lock(mutex_);
-        if (freeConnections_.size() < 3)
-        freeConnections_.push_back(connection);
-        else
-        releaseConnection_(connection);
+        if (freeConnections_.size() < 4) {
+          LOGDEBUG("Putting connection back in pool. New pool size: " << freeConnections_.size() +1);
+          freeConnections_.push_back(connection);
+        } else {
+          LOGDEBUG("Releasing connection. Pool size: " << freeConnections_.size());
+          releaseConnection_(connection);
+        }
       });
 }
 

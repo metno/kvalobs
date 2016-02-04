@@ -53,7 +53,9 @@ class ConnectionPool {
                  std::function<void(dnmi::db::Connection*)> releaseConnection);
   ~ConnectionPool();
 
-  std::shared_ptr<dnmi::db::Connection> get();
+  typedef std::shared_ptr<dnmi::db::Connection> ConnectionPtr;
+
+  ConnectionPtr get();
 
  private:
   std::function<dnmi::db::Connection*()> createConnection_;
