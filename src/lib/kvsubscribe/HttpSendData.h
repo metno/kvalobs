@@ -31,7 +31,6 @@
 #define SRC_LIB_KVSUBSCRIBE_HTTPSENDDATA_H_
 
 #include <string>
-#include "miutil/httpclient.h"
 #include "kvsubscribe/SendData.h"
 
 namespace miutil {
@@ -44,7 +43,7 @@ class ConfSection;
 namespace kvalobs {
 namespace datasource {
 
-class HttpSendData : public SendData, miutil::HTTPClient {
+class HttpSendData : public SendData {
   std::string host_;
 
  public:
@@ -67,7 +66,7 @@ class HttpSendData : public SendData, miutil::HTTPClient {
     return host_;
   }
 
-  void log(const std::string &msg) override;
+  virtual void log(const std::string &msg);
 };
 
 }  // namespace datasource

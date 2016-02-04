@@ -31,7 +31,7 @@
 #include "lib/milog/milog.h"
 #include "lib/kvsubscribe/HttpSendData.h"
 #include "lib/kvsubscribe/SendDataJsonResult.h"
-
+#include "lib/miutil/httpclient.h"
 using std::string;
 using std::ostringstream;
 using std::cerr;
@@ -53,6 +53,18 @@ std::string getHost(const miutil::conf::ConfSection &conf) {
   ost << conf.getValue("kvDataInputd.http.port").valAsInt(8090);
   return ost.str();
 }
+
+class MyHttp : public miutil::HTTPClient {
+  kvalobs::datasource::HttpSendData *parent_;
+ public:
+  explicit MyHttp(kvalobs::datasource::HttpSendData *parent)
+      : parent_(parent) {
+  }
+  void log(const std::string &msg) override {
+    parent_->log(msg);
+  }
+};
+
 }  // namespace
 
 HttpSendData::HttpSendData(const std::string &hostAndPort, bool secure) {
@@ -72,15 +84,15 @@ HttpSendData::HttpSendData(const miutil::conf::ConfSection &conf)
 HttpSendData::~HttpSendData() {
 }
 
-Result HttpSendData::newData(const std::string &data,
-                             const std::string &obsType) {
+Result HttpSendData::newData(const std::string &data, const std::string &obsType) {
+  MyHttp http(this);
   ostringstream ost;
   ost << obsType << "\n" << data;
 
   try {
-    post(host_, ost.str(), "text/plain");
+    http.post(host_, ost.str(), "text/plain");
 
-    int retCode = returnCode();
+    int retCode = http.returnCode();
 
     if (retCode != 200) {
       ostringstream err;
@@ -88,7 +100,7 @@ Result HttpSendData::newData(const std::string &data,
       throw Fatal(err.str());
     }
 
-    string sRes = content();
+    string sRes = http.content();
     LOGDEBUG("HttpSendData::newData:Response: " << sRes);
     return decodeResultFromJsonString(sRes);
   } catch (const HttpException &ex) {
