@@ -145,7 +145,7 @@ void KvalobsDatabaseAccess::addMissingData(const DataIdentifier & di) {
   if (!r->hasNext() )
     exec_(insertWorkQueueQuery_(di, 10));
   else
-    exec_(updateWorkQueueQuery_(di, 10));
+    exec_(updateWorkQueueQuery_(di));
 }
 
 std::shared_ptr<DataIdentifier> KvalobsDatabaseAccess::nextDataToProcess() {
@@ -305,7 +305,7 @@ std::string KvalobsDatabaseAccess::insertMissingDataQuery_(const DataIdentifier 
 
 std::string KvalobsDatabaseAccess::selectWorkQueueQuery_(const DataIdentifier & di) const {
   std::ostringstream q;
-  q << "SELECT process_start FROM workque WHERE " << di.sqlWhere();
+  q << "SELECT priority FROM workque WHERE " << di.sqlWhere();
   return q.str();
 }
 
@@ -320,11 +320,10 @@ std::string KvalobsDatabaseAccess::insertWorkQueueQuery_(const DataIdentifier & 
   return q.str();
 }
 
-std::string KvalobsDatabaseAccess::updateWorkQueueQuery_(const DataIdentifier & di, int priority) const {
+std::string KvalobsDatabaseAccess::updateWorkQueueQuery_(const DataIdentifier & di) const {
   std::ostringstream q;
   q << "UPDATE workque SET ";
   q << "process_start=now(), ";
-  q << "priority=" << priority << ", ";
   q << "qa_start=NULL, ";
   q << "qa_stop=NULL, ";
   q << "service_start=NULL, ";

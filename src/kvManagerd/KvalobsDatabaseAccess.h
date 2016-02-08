@@ -135,7 +135,7 @@ class KvalobsDatabaseAccess : boost::noncopyable {
   std::string insertMissingDataQuery_(const DataIdentifier & di) const;
   std::string selectWorkQueueQuery_(const DataIdentifier & di) const;
   std::string insertWorkQueueQuery_(const DataIdentifier & di, int priority) const;
-  std::string updateWorkQueueQuery_(const DataIdentifier & di, int priority) const;
+  std::string updateWorkQueueQuery_(const DataIdentifier & di) const;
 
   dnmi::db::Connection * connection_;
 };
