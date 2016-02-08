@@ -1,1 +1,2 @@
 usr/share/kvalobs/db/*.sql
+usr/share/kvalobs/db/upgrade/*.sql

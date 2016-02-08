@@ -15,7 +15,8 @@ GRANT SELECT, UPDATE, INSERT ON default_missing TO kv_write;
 CREATE VIEW default_missing_values AS
 select
 	p.paramid,
-	m.value
+	m.value,
+	m.controlinfo
 from
 	param p,
 	default_missing m
@@ -29,6 +30,6 @@ where
 REVOKE ALL ON default_missing_values FROM public;
 GRANT ALL ON default_missing_values TO kv_admin;
 GRANT SELECT ON default_missing_values TO kv_read;
-GRANT SELECT ON obs_pgm TO kv_write;
+GRANT SELECT ON default_missing_values TO kv_write;
 
 COMMIT;
