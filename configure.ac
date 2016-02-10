@@ -1,5 +1,5 @@
 AC_PREREQ([2.59])
-AC_INIT([kvalobs], [2.7.8~rckafka7], [kvoss@met.no])
+AC_INIT([kvalobs], [2.7.8~rckafka9], [kvoss@met.no])
 AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -74,6 +74,7 @@ AC_CONFIG_FILES([Makefile
                  src/kv2kro2/Makefile
                  src/tools/kvpush/Makefile
                  src/tools/kv2kvDataInputd/Makefile
+                 src/tools/nagios/Makefile
                  src/kvDataInputd/kvdataclt/Makefile
                  src/tools/aexecd/Makefile
                  src/kvalobs_database/Makefile

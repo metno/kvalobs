@@ -19,6 +19,7 @@ usr/bin/qabase_log_cleanup
 usr/lib/kvalobs/bin/*
 usr/lib/kvalobs/decode/*.so.*
 usr/lib/kvalobs/tool_funcs.sh
+usr/lib/nagios/plugins/*
 etc/kvalobs/kv_ctl.conf
 etc/kvalobs/kv-ipalias.conf
 etc/kvalobs/kvcron
