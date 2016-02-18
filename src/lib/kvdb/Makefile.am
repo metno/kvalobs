@@ -1,14 +1,16 @@
-AM_CPPFLAGS = -I $(top_srcdir)/src/lib -D_REENTRANT 
+AM_CPPFLAGS = -I $(top_srcdir)/src -I $(top_srcdir)/src/lib -D_REENTRANT 
 
 lib_LTLIBRARIES = libkvalobs_kvdb.la
 
 kvdbincludedir =  $(pkgincludedir)/kvdb
-kvdbinclude_HEADERS = kvdb.h dbdrivermgr.h transactionhelper.h transaction.h
-libkvalobs_kvdb_la_SOURCES = kvdb.h kvdb.cc \
-                             dbdrivermgr.h dbdrivermgr.cc \
-                             Pimpel.h Pimpel.cc \
-                             transaction.cc transactionhelper.h \
-                             transactionhelper.cc
+kvdbinclude_HEADERS = kvdb.h ConnectionPool.h dbdrivermgr.h transactionhelper.h transaction.h
+libkvalobs_kvdb_la_SOURCES = \
+	kvdb.h kvdb.cc \
+	ConnectionPool.h ConnectionPool.cc \
+   dbdrivermgr.h dbdrivermgr.cc \
+   Pimpel.h Pimpel.cc \
+   transaction.cc transactionhelper.h \
+   transactionhelper.cc
 libkvalobs_kvdb_la_CPPFLAGS = \
    $(AM_CPPFLAGS) \
    -DKVALOBSLIBS_SO_VERSION="\""@KVALOBSLIBS_SO_VERSION@"\"" \

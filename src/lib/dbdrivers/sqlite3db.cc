@@ -28,22 +28,39 @@
  with KVALOBS; if not, write to the Free Software Foundation Inc., 
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+#include <cctype>
 #include <stdlib.h>
 #include <unistd.h>
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 #include "sqlite3db.h"
 
 #define DB_NOTOPEN -1
 #define DB_NOMEM -2
 #define DB_DRIVERMISMATCH -2
 
+using std::tolower;
+using std::string;
+using std::transform;
+using std::istringstream;
+using std::ostringstream;
+using std::cerr;
+
+
+using dnmi::db::drivers::SQLiteConnection;
+namespace SQLite = dnmi::db::drivers::SQLite;
+
 namespace {
 int dataCallback(void *pArg, int argc, char **argv, char **columnNames);
+
+string toLower(const string &s) {
+  string ret = s;
+  transform(s.begin(), s.end(), ret.begin(), [](const string::value_type &c) {return std::tolower(c);});
+  return ret;
+}
 }
 
-using namespace std;
-using namespace dnmi::db::drivers;
 
 dnmi::db::drivers::SQLiteDriver::SQLiteDriver() {
 }
@@ -73,10 +90,8 @@ dnmi::db::drivers::SQLiteDriver::createConnection(const std::string &connect) {
 
 bool dnmi::db::drivers::SQLiteDriver::releaseConnection(Connection *connect) {
   if (connect->getDriverId() != name()) {
-    stringstream ost;
-    ost << "ERROR: trying to release a connection with driverId <"
-        << connect->getDriverId() << ">, but this driver har driverId <"
-        << name() << ">!\n";
+    ostringstream ost;
+    ost << "ERROR: trying to release a connection with driverId <" << connect->getDriverId() << ">, but this driver har driverId <" << name() << ">!\n";
     setErrMsg(ost.str());
     return false;
   }
@@ -85,8 +100,7 @@ bool dnmi::db::drivers::SQLiteDriver::releaseConnection(Connection *connect) {
   return true;
 }
 
-dnmi::db::drivers::SQLiteConnection::SQLiteConnection(
-    const std::string &connect, const std::string &driverId)
+dnmi::db::drivers::SQLiteConnection::SQLiteConnection(const std::string &connect, const std::string &driverId)
     : Connection(driverId),
       con(0) {
   SQLitePimpel *myPimpel = new SQLitePimpel(this);
@@ -100,8 +114,7 @@ dnmi::db::drivers::SQLiteConnection::SQLiteConnection(
       myPimpel->setErrInfo(res, sqlite3_errmsg(con));
       sqlite3_close(con);
     } else {
-      errMsg = "SQLLite: NOMEM, when trying to connect to the data base '"
-          + connect + "'.";
+      errMsg = "SQLLite: NOMEM, when trying to connect to the data base '" + connect + "'.";
       myPimpel->setErrInfo(res, errMsg);
     }
     errMsg = myPimpel->getErrMsg();
@@ -165,14 +178,10 @@ bool dnmi::db::drivers::SQLiteConnection::tryReconnect() {
 
   if (res != SQLITE_OK) {
     if (con) {
-      errMsg = myPimpel->setErrInfo(
-          res, string("SQLite: tryReconnect: ") + sqlite3_errmsg(con));
+      errMsg = myPimpel->setErrInfo(res, string("SQLite: tryReconnect: ") + sqlite3_errmsg(con));
       sqlite3_close(con);
     } else {
-      errMsg = myPimpel->setErrInfo(
-          DB_NOMEM,
-          string("SQLite: NOMEM, when trying to reconnect to the data base '")
-              + connect + "'.");
+      errMsg = myPimpel->setErrInfo(DB_NOMEM, string("SQLite: NOMEM, when trying to reconnect to the data base '") + connect + "'.");
     }
     con = 0;
     return false;
@@ -255,11 +264,10 @@ void dnmi::db::drivers::SQLiteConnection::exec(const std::string &query) {
       errMsg = myPimpel->setErrInfo(sqliteRes, errMsg);
 
       if (sqliteRes == SQLITE_CONSTRAINT) {
-        string::size_type i = errMsg.find("unique");
+        string::size_type i = toLower(errMsg).find("unique");
 
         if (i != string::npos) {
-          errMsg = myPimpel->setErrInfo(sqliteRes,
-                                        "SQLite: Duplicate (" + errMsg + ")");
+          errMsg = myPimpel->setErrInfo(sqliteRes, "SQLite: Duplicate (" + errMsg + ")");
           throw SQLDuplicate(errMsg, myPimpel->getErrorCode());
         } else {
           throw SQLException(errMsg, myPimpel->getErrorCode());
@@ -311,12 +319,10 @@ dnmi::db::drivers::SQLiteConnection::execQuery(const std::string &query) {
       myPimpel->setErrMsg("SQLite: Unknown error!");
 
     if (sqliteRes != SQLITE_OK) {
-      //cerr << "ERROR: " << sqliteRes << endl;
 
       if (sqliteRes == SQLITE_BUSY) {
         busy = true;
         data->clear();
-        //throw SQLBusy("SQLiteBusy: " + sMsg, errorCode.str());
       } else {
         delete data;
         errMsg = myPimpel->setErrInfo(sqliteRes);
@@ -339,8 +345,7 @@ std::string dnmi::db::drivers::SQLiteConnection::lastError() const {
   return errMsg;
 }
 
-std::string dnmi::db::drivers::SQLiteConnection::esc(
-    const std::string &stringToEscape) const {
+std::string dnmi::db::drivers::SQLiteConnection::esc(const std::string &stringToEscape) const {
   char *buf = sqlite3_mprintf("%q", stringToEscape.c_str());
 
   if (!buf)
@@ -383,8 +388,7 @@ std::string dnmi::db::drivers::SQLiteResult::fieldName(int index) const {
 
 }
 
-int dnmi::db::drivers::SQLiteResult::fieldIndex(
-    const std::string &fieldName) const {
+int dnmi::db::drivers::SQLiteResult::fieldIndex(const std::string &fieldName) const {
 
   for (int i = 0; i < sqlData->fieldNames.size(); i++) {
     if (sqlData->fieldNames[i] == fieldName)
@@ -394,16 +398,14 @@ int dnmi::db::drivers::SQLiteResult::fieldIndex(
   throw SQLException("No fields with name: " + fieldName);
 }
 
-dnmi::db::FieldType dnmi::db::drivers::SQLiteResult::fieldType(
-    int index) const {
+dnmi::db::FieldType dnmi::db::drivers::SQLiteResult::fieldType(int index) const {
   if (index >= sqlData->fieldNames.size())
     throw SQLException("index out of range!");
 
   throw SQLException("SQLite: fieldType is not implemented!");
 }
 
-dnmi::db::FieldType dnmi::db::drivers::SQLiteResult::fieldType(
-    const std::string &fieldName) const {
+dnmi::db::FieldType dnmi::db::drivers::SQLiteResult::fieldType(const std::string &fieldName) const {
   throw SQLException("SQLite: fieldType is not implemented!");
 }
 
@@ -414,8 +416,7 @@ int dnmi::db::drivers::SQLiteResult::fieldSize(int index) const {
   throw SQLException("SQLite: fieldSize is not implemented!");
 }
 
-int dnmi::db::drivers::SQLiteResult::fieldSize(
-    const std::string &fieldName) const {
+int dnmi::db::drivers::SQLiteResult::fieldSize(const std::string &fieldName) const {
   return fieldSize(fieldIndex(fieldName));
 }
 
@@ -444,8 +445,7 @@ void dnmi::db::drivers::SQLiteResult::nextImpl() {
   nextData++;
 }
 
-void dnmi::db::drivers::SQLitePimpel::beginTransaction(
-    dnmi::db::Connection::IsolationLevel isolation) {
+void dnmi::db::drivers::SQLitePimpel::beginTransaction(dnmi::db::Connection::IsolationLevel isolation) {
   using namespace dnmi::db::priv;
   switch (isolation) {
     case Connection::SERIALIZABLE:
@@ -473,8 +473,7 @@ std::string dnmi::db::drivers::SQLitePimpel::getConnect() const {
   return connect;
 }
 
-void dnmi::db::drivers::SQLitePimpel::setConnect(
-    const std::string &connectString) {
+void dnmi::db::drivers::SQLitePimpel::setConnect(const std::string &connectString) {
   connect = connectString;
 }
 
@@ -505,8 +504,7 @@ void dnmi::db::drivers::SQLitePimpel::setErrorCode(int errCode) {
 
 }
 
-std::string dnmi::db::drivers::SQLitePimpel::setErrInfo(const int errCode,
-                                                        const char *errMsg) {
+std::string dnmi::db::drivers::SQLitePimpel::setErrInfo(const int errCode, const char *errMsg) {
   setErrorCode(errCode);
 
   if (errMsg)
@@ -515,8 +513,7 @@ std::string dnmi::db::drivers::SQLitePimpel::setErrInfo(const int errCode,
   return this->errMsg;
 }
 
-std::string dnmi::db::drivers::SQLitePimpel::setErrInfo(
-    const int errCode, const std::string &errMsg) {
+std::string dnmi::db::drivers::SQLitePimpel::setErrInfo(const int errCode, const std::string &errMsg) {
   setErrorCode(errCode);
 
   if (!errMsg.empty())
@@ -540,19 +537,16 @@ void dnmi::db::drivers::SQLitePimpel::createSavepoint(const std::string &name) {
   con->exec("SAVEPOINT " + name);
 }
 
-void dnmi::db::drivers::SQLitePimpel::rollbackToSavepoint(
-    const std::string &name) {
+void dnmi::db::drivers::SQLitePimpel::rollbackToSavepoint(const std::string &name) {
   con->exec("ROLLBACK TO SAVEPOINT " + name);
 }
 
-void dnmi::db::drivers::SQLitePimpel::releaseSavepoint(
-    const std::string &name) {
+void dnmi::db::drivers::SQLitePimpel::releaseSavepoint(const std::string &name) {
   con->exec("RELEASE SAVEPOINT " + name);
 }
 
-void dnmi::db::drivers::SQLitePimpel::perform(
-    dnmi::db::Connection *con_, dnmi::db::Transaction &transaction, int retry,
-    dnmi::db::Connection::IsolationLevel isolation) {
+void dnmi::db::drivers::SQLitePimpel::perform(dnmi::db::Connection *con_, dnmi::db::Transaction &transaction, int retry,
+                                              dnmi::db::Connection::IsolationLevel isolation) {
   dnmi::db::Transaction &t(transaction);
   std::string lastError;
   con = static_cast<SQLiteConnection*>(con_);

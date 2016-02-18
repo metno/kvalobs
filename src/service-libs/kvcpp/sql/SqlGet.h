@@ -33,7 +33,7 @@
 #include "../KvApp.h"
 #include <memory>
 #include <functional>
-#include "ConnectionPool.h"
+#include "kvdb/ConnectionPool.h"
 
 namespace dnmi {
 namespace db {
@@ -69,7 +69,7 @@ class SqlGet : virtual public details::KvalobsGet {
                                   );
 
 private:
-  ConnectionPool connections_;
+  dnmi::db::ConnectionPool connections_;
 };
 
 } /* namespace sql */

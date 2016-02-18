@@ -34,7 +34,8 @@
 #include <time.h>
 #include "pgsqldb.h"
 
-using namespace std;
+using std::string;
+using std::ostringstream;
 
 dnmi::db::drivers::PGDriver::PGDriver() {
 }
@@ -64,10 +65,8 @@ dnmi::db::drivers::PGDriver::createConnection(const std::string &connect) {
 
 bool dnmi::db::drivers::PGDriver::releaseConnection(Connection *connect) {
   if (connect->getDriverId() != name()) {
-    stringstream ost;
-    ost << "ERROR: trying to release a connection with driverId <"
-        << connect->getDriverId() << ">, but this driver har driverId <"
-        << name() << ">!\n";
+    ostringstream ost;
+    ost << "ERROR: trying to release a connection with driverId <" << connect->getDriverId() << ">, but this driver har driverId <" << name() << ">!\n";
     setErrMsg(ost.str());
     return false;
   }
@@ -77,8 +76,7 @@ bool dnmi::db::drivers::PGDriver::releaseConnection(Connection *connect) {
   return true;
 }
 
-dnmi::db::drivers::PGConnection::PGConnection(const std::string &connect,
-                                              const std::string &driverId)
+dnmi::db::drivers::PGConnection::PGConnection(const std::string &connect, const std::string &driverId)
     : Connection(driverId),
       con(0) {
   char *msg;
@@ -110,7 +108,6 @@ dnmi::db::drivers::PGConnection::~PGConnection() {
   }
 
   if (con) {
-    std::cerr << "Disconnect from a PostgreSQL database!\n";
     PQfinish(con);
   }
 }
@@ -218,8 +215,7 @@ void dnmi::db::drivers::PGConnection::exec(const std::string &query) {
   PQclear(p);
 
   if (errorCode == "40001" || errorCode == "40P01")
-    throw SQLSerializeError("Seriallize error", errorCode,
-                            errorCode == "40P01");
+    throw SQLSerializeError("Seriallize error", errorCode, errorCode == "40P01");
 
   std::string::size_type i = msg2.find("duplicate");
 
@@ -310,8 +306,7 @@ dnmi::db::drivers::PGConnection::execQuery(const std::string &query) {
   PQclear(p);
 
   if (errorCode == "40001" || errorCode == "40P01")
-    throw SQLSerializeError("Seriallize error", errorCode,
-                            errorCode == "40P01");
+    throw SQLSerializeError("Seriallize error", errorCode, errorCode == "40P01");
 
   std::string::size_type i = msg.find("duplicate");
 
@@ -351,8 +346,7 @@ std::string dnmi::db::drivers::PGConnection::lastError() const {
     return std::string("UNKNOWN ERROR, cant get error message!");
 }
 
-std::string dnmi::db::drivers::PGConnection::esc(
-    const std::string &stringToEscape) const {
+std::string dnmi::db::drivers::PGConnection::esc(const std::string &stringToEscape) const {
   if (!con)
     throw SQLException("NO CONNECTION: not connected to a database!");
 
@@ -361,8 +355,7 @@ std::string dnmi::db::drivers::PGConnection::esc(
   try {
     buf = new char[stringToEscape.length() * 2 + 1];
 
-    PQescapeStringConn(con, buf, stringToEscape.c_str(),
-                       stringToEscape.length(), 0);
+    PQescapeStringConn(con, buf, stringToEscape.c_str(), stringToEscape.length(), 0);
 
     string ret(buf);
     delete[] buf;
@@ -382,8 +375,6 @@ dnmi::db::drivers::PGResult::PGResult(PGresult *r)
   nFields = PQnfields(res);
   nTuples = PQntuples(res);
   tupleIndex = 0;
-
-  // cerr << "PGResult:ctor:: nFields=" << nFields << " nTuples=" << nTuples <<endl;
 }
 
 dnmi::db::drivers::PGResult::~PGResult() {
@@ -407,8 +398,7 @@ std::string dnmi::db::drivers::PGResult::fieldName(int index) const {
 
 }
 
-int dnmi::db::drivers::PGResult::fieldIndex(
-    const std::string &fieldName) const {
+int dnmi::db::drivers::PGResult::fieldIndex(const std::string &fieldName) const {
   return PQfnumber(res, fieldName.c_str());
 }
 
@@ -417,8 +407,7 @@ dnmi::db::FieldType dnmi::db::drivers::PGResult::fieldType(int index) const {
     throw SQLException("index out of range!");
 }
 
-dnmi::db::FieldType dnmi::db::drivers::PGResult::fieldType(
-    const std::string &fieldName) const {
+dnmi::db::FieldType dnmi::db::drivers::PGResult::fieldType(const std::string &fieldName) const {
 }
 
 int dnmi::db::drivers::PGResult::fieldSize(int index) const {
@@ -467,8 +456,7 @@ void dnmi::db::drivers::PGPimpel::releaseSavepoint(const std::string &name) {
   con->exec("RELEASE SAVEPOINT " + name);
 }
 
-void dnmi::db::drivers::PGPimpel::beginTransaction(
-    dnmi::db::Connection::IsolationLevel isolation) {
+void dnmi::db::drivers::PGPimpel::beginTransaction(dnmi::db::Connection::IsolationLevel isolation) {
   using namespace dnmi::db::priv;
   switch (isolation) {
     case Connection::SERIALIZABLE:
@@ -492,9 +480,8 @@ dnmi::db::drivers::PGPimpel::PGPimpel(PGConnection *con_)
       con(con_) {
 }
 
-void dnmi::db::drivers::PGPimpel::perform(
-    dnmi::db::Connection *con_, dnmi::db::Transaction &transaction, int retry,
-    dnmi::db::Connection::IsolationLevel isolation) {
+void dnmi::db::drivers::PGPimpel::perform(dnmi::db::Connection *con_, dnmi::db::Transaction &transaction, int retry,
+                                          dnmi::db::Connection::IsolationLevel isolation) {
   dnmi::db::Transaction &t(transaction);
   std::string lastError;
   con = static_cast<PGConnection*>(con_);
