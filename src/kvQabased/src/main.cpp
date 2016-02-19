@@ -95,12 +95,34 @@ void terminate(int /*signal*/) {
   qabase::NewDataListener::stopAll();
 }
 
-void spawnSubProcesses(unsigned totalWorkerCount) {
+/**
+ * Information about the current process instance (which part of the fork() are we)
+ */
+class ProcessStatus {
+ public:
+  ProcessStatus() :id_(0) {}
+  explicit ProcessStatus(int id) :id_(id) {}
+
+  /**
+   * Is this the "original" instance?
+   */
+  bool isLeader() const {
+    return id_ == 0;
+  }
+  int id() const {
+    return id_;
+  }
+ private:
+  int id_;
+};
+
+ProcessStatus spawnSubProcesses(unsigned totalWorkerCount) {
   for (int i = 1; i < totalWorkerCount; ++i)
     if (fork() == 0) {
       prctl(PR_SET_PDEATHSIG, SIGHUP);  // die on parent death
-      break;
+      return ProcessStatus(i);
     }
+  return ProcessStatus(0);
 }
 
 void createPidFile() {
@@ -121,15 +143,18 @@ void createPidFile() {
     throw std::runtime_error("Unable to create pidfile!");
 }
 
-
-
-void setupLogging(const qabase::Configuration& config) {
+void setupLogging(const qabase::Configuration& config, const ProcessStatus & ps) {
   if (!config.runLogFile().empty()) {
+    std::ostringstream logFile;
+    logFile << config.runLogFile();
+    if (!ps.isLeader())
+      logFile << '.' << ps.id();
+    std::string logFileName = logFile.str();
     milog::FLogStream* fs = new milog::FLogStream(9, 1024 * 1024);
-    fs->open(config.runLogFile());
+    fs->open(logFileName);
     fs->loglevel(config.logLevel());
     if (!milog::LogManager::createLogger("filelog", fs)) {
-      LOGERROR("Unable to create logger for file " << config.runLogFile());
+      LOGERROR("Unable to create logger for file " << logFileName);
       delete fs;
       return;
     }
@@ -143,10 +168,14 @@ int main(int argc, char ** argv) {
 
   try {
     qabase::Configuration config(argc, argv);
-    setupLogging(config);
-    qabase::QaBaseApp app(argc, argv);
     if (not config.runNormally())
       return 0;
+
+    ProcessStatus processStatus;
+    if (!config.haveObservationToCheck())
+      processStatus = spawnSubProcesses(config.processCount());
+    setupLogging(config, processStatus);
+    qabase::QaBaseApp app(argc, argv);
 
     LOGDEBUG("Using model data name " << config.modelDataName());
 
@@ -163,8 +192,8 @@ int main(int argc, char ** argv) {
       qabase::DataProcessor processor(checkRunner);
       processor.process(*config.observationToCheck());
     } else {
-      createPidFile();
-      spawnSubProcesses(4);
+      if (processStatus.isLeader())
+        createPidFile();
 
       signal(SIGINT, terminate);
       signal(SIGHUP, terminate);

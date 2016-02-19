@@ -151,9 +151,11 @@ database.add_options()(
     "Database user");
 
 options_description generic("Generic");
-generic.add_options()("config", value<std::string>(),
-                      "Read configuration from the given file")(
-    "version", "Produce version information")("help", "Produce help message");
+generic.add_options()
+    ("process-count", value<unsigned>(& processCount_)->default_value(4), "Run the given number of processes")
+    ("config", value<std::string>(), "Read configuration from the given file")
+    ("version", "Produce version information")
+    ("help", "Produce help message");
 
 commandLine.add(observation).add(logging).add(database).add(generic);
 

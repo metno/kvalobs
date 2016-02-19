@@ -142,6 +142,10 @@ class Configuration {
     return baseLogDir_;
   }
 
+  unsigned processCount() const {
+    return processCount_;
+  }
+
   /**
    * Print version information to the given stream.
    *
@@ -178,6 +182,8 @@ class Configuration {
   std::string host_;
   int port_;
   std::string user_;
+
+  unsigned processCount_;
 };
 
 }
