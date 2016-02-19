@@ -102,7 +102,7 @@ miutil::conf::ConfSection * getConfiguration(const boost::filesystem::path& pref
     path baseConfigPath = kvPath("sysconfdir");
     std::vector<path> configAlternatives = {
         preferredConfigFile,
-        baseConfigPath / application,
+        baseConfigPath / (application + ".conf"),
         baseConfigPath / "kvalobs.conf" };
     for (const path & p : configAlternatives) {
       try {
@@ -127,11 +127,21 @@ void releaseConnection(dnmi::db::Connection * connection) {
   dbMgr.releaseConnection(connection);
 }
 
+std::string kafkaDomain(int argc, char ** argv, const std::string & preferredConfigFile) {
+  miutil::conf::ConfSection * config = getConfiguration(preferredConfigFile, boost::filesystem::basename(argv[0]));
+  return getValue("kafka.domain", config);
+}
+
+std::string kafkaBrokers(int argc, char ** argv, const std::string & preferredConfigFile) {
+  miutil::conf::ConfSection * config = getConfiguration(preferredConfigFile, boost::filesystem::basename(argv[0]));
+  return getValue("kafka.brokers", config);
+}
+
 }
 
 CurrentKvApp::CurrentKvApp(int argc, char ** argv, const std::string & preferredConfigFile)
     : sql::SqlGet(connector(argc, argv, preferredConfigFile), releaseConnection),
-      kafka::KafkaSubscribe("test", "localhost") {
+      kafka::KafkaSubscribe(kafkaDomain(argc, argv, preferredConfigFile), kafkaBrokers(argc, argv, preferredConfigFile)) {
   const miutil::conf::ConfSection * conf = getConfiguration(
       preferredConfigFile, boost::filesystem::basename(argv[0]));
   sendData_ = std::unique_ptr<kvalobs::datasource::SendData>(new kvalobs::datasource::HttpSendData(*conf));
