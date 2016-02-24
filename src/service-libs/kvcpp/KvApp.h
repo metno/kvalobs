@@ -43,6 +43,7 @@
 #include "kvalobs/kvStationMetadata.h"
 #include "kvalobs/kvStationParam.h"
 #include "kvalobs/kvTypes.h"
+#include "miconfparser/confsection.h"
 #include "kvskel/datasource.hh"
 #include "kvskel/kvServiceCommon.hh"
 #include "kvcpp/kvDataSubscribeInfoHelper.h"
@@ -371,7 +372,7 @@ class KvApp : private boost::noncopyable, public virtual details::KvalobsGet,
   /**
    * Create a KvApp object
    */
-  static KvApp * create(const std::string & applicationName, int argc, char ** argv);
+  static KvApp *create(const std::string & applicationName, int argc, char **argv, std::shared_ptr<miutil::conf::ConfSection> conf = std::shared_ptr<miutil::conf::ConfSection>());
 
   KvApp();
 

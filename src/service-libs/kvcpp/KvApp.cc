@@ -80,9 +80,9 @@ miutil::conf::ConfSection * getConfSection(
 }
 
 KvApp * KvApp::create(const std::string & applicationName,
-                      int argc, char ** argv) {
+                      int argc, char ** argv, std::shared_ptr<miutil::conf::ConfSection> conf) {
 
-  return new CurrentKvApp(argc, argv);
+  return new CurrentKvApp(argc, argv, conf);
 }
 
 KvApp::KvApp() {

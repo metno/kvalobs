@@ -27,35 +27,21 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef SRC_SERVICE_LIBS_KVCPP_CURRENT_CURRENTKVAPP_H_
-#define SRC_SERVICE_LIBS_KVCPP_CURRENT_CURRENTKVAPP_H_
+#ifndef SRC_SERVICE_LIBS_KVCPP_TEST_CONFIGURATION_H_
+#define SRC_SERVICE_LIBS_KVCPP_TEST_CONFIGURATION_H_
 
+#include <string>
 #include <memory>
-#include "KvApp.h"
-#include "sql/SqlGet.h"
-#include "kafka/KafkaSubscribe.h"
-
-
-namespace kvalobs {
-namespace datasource {
-class SendData;
-}  // namespace datasource
-}  // namespace kvalobs
+#include "boost/filesystem.hpp"
+#include "lib/miconfparser/confsection.h"
 
 namespace kvservice {
+namespace test {
+std::shared_ptr<miutil::conf::ConfSection> getConfiguration(std::shared_ptr<miutil::conf::ConfSection> preferredConf, const std::string & application,
+                                                            bool reset = false);
 
-class CurrentKvApp : public KvApp, virtual sql::SqlGet, virtual kafka::KafkaSubscribe {
- public:
-  CurrentKvApp(int argc, char **argv, std::shared_ptr<miutil::conf::ConfSection> conf);
-  virtual ~CurrentKvApp();
-
-  const CKvalObs::CDataSource::Result_var sendDataToKv(const char *data, const char *obsType) override;
-
- private:
-  std::unique_ptr<kvalobs::datasource::SendData> sendData_;
-};
-
-
+miutil::conf::ConfSection * readConf(const boost::filesystem::path & configFile);
+}  // namespace test
 }  // namespace kvservice
 
-#endif /* SRC_SERVICE_LIBS_KVCPP_CURRENT_CURRENTKVAPP_H_ */
+#endif  // SRC_SERVICE_LIBS_KVCPP_TEST_CONFIGURATION_H_

@@ -91,20 +91,35 @@ AC_LANG_PUSH(C++)
 
 CPPFLAGS_SAVED="$CPPFLAGS"
 AS_IF([test "x$gmock_base" = "x/usr"],
-    [gtest_src="${gmock_base}/src/gtest"],
-    [gtest_includes="-I${gmock_base}/gtest/include"
-     gtest_src="${gmock_base}/gtest"])
+    [gtest_src="${gmock_base}/src/gmock/gtest";gtest_includes="-I${gmock_base}/src/gmock/gtest/include"],
+    [gtest_src=""])
+
+#AS_IF([test "x$gmock_base" = "x/usr"],
+#    [AC_MSG_WARN([1 gmock_base $gmock_base"])],
+#    [AC_MSG_WARN([2 gmock_base $gmock_base"])])
+
+
+#Test if it is a raw google distribution. https://github.com/google/googletest
+AS_IF([test "x$gtest_src" = "x" -a -d "${gmock_base}/googletest"],
+    [gtest_src="${gmock_base}/googletest";gtest_includes="-I${gmock_base}/googletest/include"],
+    [])
 
 CPPFLAGS="${gtest_includes} $CPPFLAGS"
 AC_CHECK_HEADER([gtest/gtest.h],
     [gtest_CFLAGS=${gtest_includes}
     have_gtest=true],
-    [AC_MSG_WARN([Unable to find header gtest/gtest.h])])
+    [AC_MSG_WARN([Unable to find header gtest/gtest.h ${gtest_includes}])])
 
 
 AS_IF([test "x$gmock_base" = "x/usr"],
     [gmock_src="${gmock_base}/src/gmock"],
-    [gmock_includes="-I${gmock_base}/include";gmock_src="${gmock_base}"])
+    [gmock_src=""])
+
+#Test if it is a raw google distribution. https://github.com/google/googletest
+AS_IF([test "x$gmock_src" = "x" -a -d "${gmock_base}/googlemock"],
+    [gmock_src="${gmock_base}/googlemock";gmock_includes="-I${gmock_base}/googlemock/include"],
+    [])
+
 
 CPPFLAGS="${gmock_includes} $CPPFLAGS"
 AC_CHECK_HEADER([gmock/gmock.h],

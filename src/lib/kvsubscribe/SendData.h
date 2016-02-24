@@ -32,7 +32,7 @@
 
 #include <string>
 #include "boost/lexical_cast.hpp"
-#include "lib/miutil/exceptionSpec.h"
+#include "miutil/exceptionSpec.h"
 
 namespace kvalobs {
 namespace datasource {

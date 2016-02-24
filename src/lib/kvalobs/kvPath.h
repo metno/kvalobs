@@ -54,20 +54,41 @@ std::string kvPath(PathQuery name, const std::string & system = "kvalobs");
  * 
  * name may be one of:
  * 
- *  - prefix
- *  - pkglibdir     , eg $prefix/kvalobs              
- *  - sysconfdir    , eg $perfix/etc
- *  - libdir        , eg $prefix/lib
- *  - bindir        , eg $prefix/bin
- *  - datadir       , eg $prefix/share 
- *  - localstatedir , eg $prefix/var
- *  - logdir        , eg $localstatedir/log/kvalobs
- *  - rundir        , eg $localstatedir/run/kvalobs
+ *  - prefix        , eg PREFIX
+ *  - pkglibdir     , eg PKGLIBDIR/kvalobs
+ *  - sysconfdir    , eg SYSCONFDIR/etc/'system'
+ *  - libdir        , eg LIBDIR/lib
+ *  - bindir        , eg BINDIR/bin
+ *  - datadir       , eg DATADIR/share/'system'
+ *  - localstatedir , eg LOCALSTATEDIR/lib/'system'
+ *  - logdir        , eg LOCALSTATEDIR/log/'system'
+ *  - rundir        , eg LOCALSTATEDIR/run/'system'
+ *
+ *  PREFIX, PKGLIBDIR, SYSCONFDIR, LIBDIR, BINDIR, DATADIR and LOCALSTATEDIR
+ *  is as they are set by configure.
  * 
  * @return The path to the 'name'. An empty string if name is not recogniced.
  * 
  */
 std::string kvPath(const std::string &name, const std::string &system =
                        "kvalobs");
+
+/**
+ * setKvPathPrefix - kvPath will return according to:
+ *
+ *  - prefix        , prefix
+ *  - pkglibdir     , eg $prefix/lib/kvalobs
+ *  - sysconfdir    , eg $prefix/etc/'system'
+ *  - libdir        , eg $prefix/lib
+ *  - bindir        , eg $prefix/bin
+ *  - datadir       , eg $prefix/share/'system'
+ *  - localstatedir , eg $prefix/var/lib/'system'
+ *  - logdir        , eg $prefix/var/log/'system'
+ *  - rundir        , eg $prefix/var/run/'system'
+ *
+ *  setPrefix is mostly useful for unit testing and should probably not be used
+ *  by programs.
+ */
+void setKvPathPrefix(const std::string &prefix);
 
 #endif

@@ -27,12 +27,12 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "CurrentKvApp.h"
+#include <string>
+#include <vector>
+#include <fstream>
 #include <libgen.h>
 #include <boost/filesystem.hpp>
 #include <boost/static_assert.hpp>
-#include <vector>
-#include <fstream>
 #include "miconfparser/confsection.h"
 #include "miconfparser/confparser.h"
 #include "milog/milog.h"
@@ -40,6 +40,8 @@
 #include "kvdb/kvdb.h"
 #include "kvdb/dbdrivermgr.h"
 #include "kvsubscribe/HttpSendData.h"
+#include "test/configuration.h"
+#include "CurrentKvApp.h"
 
 namespace kvservice {
 
@@ -50,7 +52,7 @@ namespace {
 using boost::filesystem::path;
 
 miutil::conf::ConfSection * readConf(const path & configFile) {
-  if ( ! exists(configFile) || ! is_regular_file(configFile) )
+  if (!exists(configFile) || !is_regular_file(configFile))
     throw std::runtime_error("Not a regular file");
 
   std::ifstream fis(configFile.c_str());
@@ -67,23 +69,51 @@ miutil::conf::ConfSection * readConf(const path & configFile) {
   return conf;
 }
 
-std::string getValue(const std::string & key,
-                     const miutil::conf::ConfSection *conf) {
+std::shared_ptr<miutil::conf::ConfSection> getConfiguration(std::shared_ptr<miutil::conf::ConfSection> preferredConf, const std::string & application,
+                                                            bool reset = false) {
+  static std::shared_ptr<miutil::conf::ConfSection> conf;
+
+  if (reset)  // Mostly for test.
+    conf = std::shared_ptr<miutil::conf::ConfSection>();
+
+  if (!conf && preferredConf) {
+    conf = preferredConf;
+  }
+
+  if (!conf) {
+    path baseConfigPath = kvPath("sysconfdir");
+    std::ostringstream msg;
+    std::vector<path> configAlternatives = { baseConfigPath / (application + ".conf"), baseConfigPath / "kvalobs.conf" };
+    for (const path & p : configAlternatives) {
+      try {
+        msg << " " << p;
+        conf.reset(readConf(p));
+        break;
+      } catch (std::exception & e) {
+        LOGDEBUG(e.what());
+      }
+    }
+
+    if (!conf)
+      throw std::runtime_error("No config file found. Searched for: " + msg.str() + ".");
+  }
+  return conf;
+}
+
+std::string getValue(const std::string & key, std::shared_ptr<miutil::conf::ConfSection> conf) {
   auto val = conf->getValue(key);
   if (val.empty())
     throw std::runtime_error("missing <" + key + "> in config file");
   if (val.size() > 1)
-    throw std::runtime_error(
-        "Too many entries for <" + key + "> in config file");
+    throw std::runtime_error("Too many entries for <" + key + "> in config file");
   return val.front().valAsString();
 }
 
 static dnmi::db::DriverManager dbMgr;
 
-dnmi::db::Connection * createConnection(const miutil::conf::ConfSection *conf) {
+dnmi::db::Connection * createConnection(std::shared_ptr<miutil::conf::ConfSection> conf) {
   std::string connectString = getValue("database.dbconnect", conf);
-  std::string driver = kvalobs::kvPath(kvalobs::libdir) + "/kvalobs/db/"
-      + getValue("database.dbdriver", conf);
+  std::string driver = kvalobs::kvPath(kvalobs::libdir) + "/kvalobs/db/" + getValue("database.dbdriver", conf);
 
   std::string driverId;
   if (!dbMgr.loadDriver(driver, driverId))
@@ -95,29 +125,8 @@ dnmi::db::Connection * createConnection(const miutil::conf::ConfSection *conf) {
   return connection;
 }
 
-miutil::conf::ConfSection * getConfiguration(const boost::filesystem::path& preferredConfigFile,
-                      const std::string & application) {
-  static miutil::conf::ConfSection * conf = nullptr;
-  if (!conf) {
-    path baseConfigPath = kvPath("sysconfdir");
-    std::vector<path> configAlternatives = {
-        preferredConfigFile,
-        baseConfigPath / (application + ".conf"),
-        baseConfigPath / "kvalobs.conf" };
-    for (const path & p : configAlternatives) {
-      try {
-        conf = readConf(p);
-        break;
-      } catch (std::exception & e) {
-        LOGDEBUG(e.what());
-      }
-    }
-  }
-  return conf;
-}
-
-std::function<Connection*()> connector(int argc, char ** argv, const boost::filesystem::path & preferredConfigFile) {
-  miutil::conf::ConfSection * config = getConfiguration(preferredConfigFile, boost::filesystem::basename(argv[0]));
+std::function<Connection*()> connector(int argc, char ** argv, std::shared_ptr<miutil::conf::ConfSection> preferredConfig) {
+  std::shared_ptr<miutil::conf::ConfSection> config = getConfiguration(preferredConfig, boost::filesystem::basename(argv[0]));
   return [config]() {
     return createConnection(config);
   };
@@ -127,29 +136,28 @@ void releaseConnection(dnmi::db::Connection * connection) {
   dbMgr.releaseConnection(connection);
 }
 
-std::string kafkaDomain(int argc, char ** argv, const std::string & preferredConfigFile) {
-  miutil::conf::ConfSection * config = getConfiguration(preferredConfigFile, boost::filesystem::basename(argv[0]));
+std::string kafkaDomain(int argc, char **argv, std::shared_ptr<miutil::conf::ConfSection> preferredConfig) {
+  std::shared_ptr<miutil::conf::ConfSection> config = getConfiguration(preferredConfig, boost::filesystem::basename(argv[0]));
   return getValue("kafka.domain", config);
 }
 
-std::string kafkaBrokers(int argc, char ** argv, const std::string & preferredConfigFile) {
-  miutil::conf::ConfSection * config = getConfiguration(preferredConfigFile, boost::filesystem::basename(argv[0]));
+std::string kafkaBrokers(int argc, char ** argv, std::shared_ptr<miutil::conf::ConfSection> preferredConfig) {
+  std::shared_ptr<miutil::conf::ConfSection> config = getConfiguration(preferredConfig, boost::filesystem::basename(argv[0]));
   return getValue("kafka.brokers", config);
 }
 
 }
 
-CurrentKvApp::CurrentKvApp(int argc, char ** argv, const std::string & preferredConfigFile)
-    : sql::SqlGet(connector(argc, argv, preferredConfigFile), releaseConnection),
-      kafka::KafkaSubscribe(kafkaDomain(argc, argv, preferredConfigFile), kafkaBrokers(argc, argv, preferredConfigFile)) {
-  const miutil::conf::ConfSection * conf = getConfiguration(
-      preferredConfigFile, boost::filesystem::basename(argv[0]));
+CurrentKvApp::CurrentKvApp(int argc, char ** argv, std::shared_ptr<miutil::conf::ConfSection> preferredConfig)
+    : sql::SqlGet(connector(argc, argv, preferredConfig), releaseConnection),
+      kafka::KafkaSubscribe(kafkaDomain(argc, argv, preferredConfig), kafkaBrokers(argc, argv, preferredConfig)) {
+  std::shared_ptr<miutil::conf::ConfSection> conf = getConfiguration(preferredConfig, boost::filesystem::basename(argv[0]));
   sendData_ = std::unique_ptr<kvalobs::datasource::SendData>(new kvalobs::datasource::HttpSendData(*conf));
 
   // needed for correct handling of CORBA::string_dup, below
   int ac = 1;
-  char * av = "fake";
-  CORBA::ORB_init(ac, & av);
+  char * av = const_cast<char*>("fake");
+  CORBA::ORB_init(ac, &av);
 }
 
 CurrentKvApp::~CurrentKvApp() {
@@ -164,19 +172,31 @@ BOOST_STATIC_ASSERT(kvalobs::datasource::ERROR == (kvalobs::datasource::EResult)
 
 const CKvalObs::CDataSource::Result_var CurrentKvApp::sendDataToKv(const char *data, const char *obsType) {
   try {
-      kvalobs::datasource::Result result = sendData_->newData(data, obsType);
+    kvalobs::datasource::Result result = sendData_->newData(data, obsType);
 
-      CKvalObs::CDataSource::Result_var r( new CKvalObs::CDataSource::Result );
-      r->res = (CKvalObs::CDataSource::EResult) result.res;
-      r->message = CORBA::string_dup(result.message.c_str());
-      return r;
-  }
-  catch (std::exception & e) {
-    CKvalObs::CDataSource::Result_var r( new CKvalObs::CDataSource::Result );
+    CKvalObs::CDataSource::Result_var r(new CKvalObs::CDataSource::Result);
+    r->res = (CKvalObs::CDataSource::EResult) result.res;
+    r->message = CORBA::string_dup(result.message.c_str());
+    return r;
+  } catch (std::exception & e) {
+    CKvalObs::CDataSource::Result_var r(new CKvalObs::CDataSource::Result);
     r->res = CKvalObs::CDataSource::ERROR;
     r->message = CORBA::string_dup(e.what());
     return r;
   }
 }
+
+namespace test {
+
+std::shared_ptr<miutil::conf::ConfSection> getConfiguration(std::shared_ptr<miutil::conf::ConfSection> preferredConf, const std::string & application,
+                                                            bool reset) {
+  return kvservice::getConfiguration(preferredConf, application, reset);
+}
+
+miutil::conf::ConfSection * readConf(const path & configFile) {
+  return kvservice::readConf(configFile);
+}
+
+}  // namespace test
 
 } /* namespace kvservice */

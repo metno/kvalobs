@@ -3,6 +3,7 @@ SUBDIRS = corba sql kafka mock
 lib_LTLIBRARIES = libkvalobs_kvcpp.la
 
 libkvalobs_kvcpp_la_SOURCES = \
+   test/configuration.h \
 	KvApp.cc  \
 	sql/SqlGet.cpp \
 	sql/SqlGet.h \
@@ -81,3 +82,24 @@ runit_LDFLAGS = \
 	$(top_builddir)/src/lib/dnmithread/libkvalobs_dnmithread.la \
 	$(top_builddir)/src/lib/milog/libkvalobs_milog.la \
 	-lboost_system -lboost_timer -lomniDynamic4 -lomniORB4 -lomnithread
+
+if HAVE_GTEST
+
+TESTS = gtest
+
+check_PROGRAMS = gtest
+
+gtest_SOURCES = \
+	test/gtest.cc
+
+gtest_CPPFLAGS = \
+	-DTESTDIR="\""$(top_srcdir)/src/service-libs/kvcpp/test"\"" \
+	$(AM_CPPFLAGS) \
+	$(libkvalobs_kvcpp_la_CPPFLAGS) \
+	$(gtest_CFLAGS)
+
+gtest_LDADD = \
+	libkvalobs_kvcpp.la \
+	$(libkvalobs_kvcpp_la_LIBADD) \
+	$(gtest_LIBS)
+endif
