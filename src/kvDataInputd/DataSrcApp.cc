@@ -133,6 +133,8 @@ DataSrcApp::DataSrcApp(int argn, char **argv, int nConnections_, miutil::conf::C
 
   try {
     LOGERROR("Starting kafka producer for topic <" << kafkaConfig.getRawTopic() << ">. Brokers <" << kafkaConfig.brokers << ">.");
+    std::string name = kafkaRawStream.getName() + "-" + kafkaConfig.getRawTopic();
+    kafkaRawStream.setName(name);
     kafkaRawStream.start(kafkaConfig.brokers, kafkaConfig.getRawTopic());
   } catch (const std::exception &ex) {
     LOGERROR(
@@ -369,7 +371,6 @@ DataSrcApp::create(const char *obsType_, const char *obs, long timoutIn_msec, Er
 
   return decCmd;
 }
-
 
 void DataSrcApp::releaseDecodeCommand(DecodeCommand *command) {
   DecoderBase *dec;

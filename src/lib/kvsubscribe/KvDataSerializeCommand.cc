@@ -26,20 +26,30 @@
  with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+#include <string>
+#include "lib/decodeutility/kvalobsdataserializer.h"
+#include "lib/kvsubscribe/KvDataSerializeCommand.h"
 
+namespace kvalobs {
+namespace service {
 
-#include "lib/milog/milog.h"
-#include "boost/thread.hpp"
-#include "kvDataInputd/ProducerCommand.h"
-
-ProducerCommand::ProducerCommand() {
+KvDataSerializeCommand::KvDataSerializeCommand(const std::list<kvalobs::kvData> &dataList)
+    : data(dataList) {
 }
 
-ProducerCommand::~ProducerCommand() {
+KvDataSerializeCommand::KvDataSerializeCommand(const std::list<kvalobs::kvData> &&dataList)
+    : data(dataList) {
 }
 
-void ProducerCommand::onSuccess(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &data) {
+KvDataSerializeCommand::KvDataSerializeCommand(const kvalobs::kvData &dataElem) {
+  data.push_back(dataElem);
 }
 
-void ProducerCommand::onError(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string & data, const std::string & errorMessage) {
+const char *KvDataSerializeCommand::getData(unsigned int *size) const {
+  std::string xml = kvalobs::serialize::KvalobsDataSerializer::serialize(data);
+  *size = xml.size();
+  return xml.data();
 }
+
+}  // namespace service
+}  // namespace kvalobs

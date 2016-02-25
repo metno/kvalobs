@@ -45,11 +45,12 @@
 #include "lib/miconfparser/miconfparser.h"
 #include "lib/kvsubscribe/SendData.h"
 #include "lib/kvsubscribe/queue.h"
+#include "lib/kvsubscribe/ProducerCommand.h"
+#include "lib/kvsubscribe/KafkaProducerThread.h"
 #include "kvDataInputd/ConnectionCache.h"
-#include "kvDataInputd/ProducerCommand.h"
 #include "kvDataInputd/DecodeCommand.h"
 #include "kvDataInputd/DecoderExecutor.h"
-#include "kvDataInputd/KafkaProducerThread.h"
+
 /**
  * \defgroup kvDatainputd kvDatainputd
  *
@@ -111,7 +112,7 @@ class DataSrcApp : public KvBaseApp {
   HttpConfig httpConfig;
   KafkaConfig kafkaConfig;
   DecoderExecutor decoderExecutor;
-  KafkaProducerThread kafkaRawStream;
+  kvalobs::service::KafkaProducerThread kafkaRawStream;
 
   /**
    * \brief registerParams reads parameter information from the table
@@ -204,7 +205,6 @@ class DataSrcApp : public KvBaseApp {
 
   DecodeCommand *create(const char *obsType, const char *obs, long timoutIn_msec, ErrCode &errCode, std::string &errMsg);
 
-
   void releaseDecodeCommand(DecodeCommand *command);
 
   bool sendInfoToManager(const kvalobs::kvStationInfoList &info, const std::list<kvalobs::serialize::KvalobsData> &decodedData);
@@ -236,8 +236,8 @@ class DataSrcApp : public KvBaseApp {
    *
    * \return a pointer to the message que.
    */
-  ProducerQuePtr getRawQueue() {
-    return kafkaRawStream.que;
+  kvalobs::service::ProducerQuePtr getRawQueue() {
+    return kafkaRawStream.queue;
   }
 
   /**

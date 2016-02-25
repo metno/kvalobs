@@ -34,7 +34,7 @@
 #include <string>
 #include "httpserver.hpp"
 #include "lib/kvsubscribe/SendData.h"
-#include "kvDataInputd/ProducerCommand.h"
+#include "lib/kvsubscribe/ProducerCommand.h"
 #include "kvDataInputd/DataSrcApp.h"
 
 class ObservationHandler : public httpserver::http_resource {
@@ -60,7 +60,7 @@ class ObservationHandler : public httpserver::http_resource {
     }
   };
 
-  ObservationHandler(DataSrcApp &app, ProducerQuePtr raw);
+  ObservationHandler(DataSrcApp &app, kvalobs::service::ProducerQuePtr raw);
   void render_POST(const httpserver::http_request& req, httpserver::http_response** res);
 
  protected:
@@ -71,7 +71,7 @@ class ObservationHandler : public httpserver::http_resource {
  private:
   DataSrcApp &app;
   std::atomic_ullong serialNumber;
-  ProducerQuePtr rawQue;
+  kvalobs::service::ProducerQuePtr rawQue;
 };
 
 #endif  // SRC_KVDATAINPUTD_OBSERVATIONHANDLER_H_

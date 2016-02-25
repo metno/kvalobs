@@ -28,10 +28,7 @@ kvDataInputd_SOURCES=\
    DataSrcApp.cc DataSrcApp.h \
    ConnectionCache.cc ConnectionCache.h \
    ObservationHandler.cc ObservationHandler.h \
-   ProducerCommand.cc ProducerCommand.h \
    RawDataCommand.cc RawDataCommand.h \
-   DecodeDataCommand.cc DecodeDataCommand.h \
-   KafkaProducerThread.cc KafkaProducerThread.h \
    kvDataInputd.cc 
    
 

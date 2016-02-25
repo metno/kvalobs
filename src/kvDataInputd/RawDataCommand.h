@@ -32,7 +32,7 @@
 #include <string>
 #include <memory>
 #include "lib/decodeutility/kvalobsdata.h"
-#include "kvDataInputd/ProducerCommand.h"
+#include "lib/kvsubscribe/ProducerCommand.h"
 
 /**
  * \addtogroup kvDatainputd
@@ -44,7 +44,7 @@
  *kafka producers.
  */
 
-class RawDataCommand : public ProducerCommand {
+class RawDataCommand : public kvalobs::service::ProducerCommand {
   RawDataCommand();
   RawDataCommand(const RawDataCommand &);
   RawDataCommand& operator=(const RawDataCommand &);
@@ -54,9 +54,11 @@ class RawDataCommand : public ProducerCommand {
  public:
   explicit RawDataCommand(const std::string &rawData);
 
-  virtual kvalobs::subscribe::KafkaProducer::MessageId send(kvalobs::subscribe::KafkaProducer &producer);
-  virtual void onSuccess(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &data);
-  virtual void onError(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string & data, const std::string & errorMessage);
+  const char *getData(unsigned int *size) const;
+  virtual void onSend(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &threadName);
+  virtual void onSuccess(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &threadName, const std::string &data);
+  virtual void onError(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &threadName, const std::string & data,
+                       const std::string & errorMessage);
 };
 
 /** @} */

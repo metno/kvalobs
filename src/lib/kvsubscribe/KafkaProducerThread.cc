@@ -30,9 +30,11 @@
 #include <memory>
 #include <iostream>
 #include <map>
-#include "lib/kvsubscribe/KafkaProducer.h"
+#include <mutex>
+#include <sstream>
 #include "lib/milog/milog.h"
-#include "kvDataInputd/KafkaProducerThread.h"
+#include "lib/kvsubscribe/KafkaProducer.h"
+#include "lib/kvsubscribe/KafkaProducerThread.h"
 
 using std::map;
 using std::string;
@@ -42,13 +44,30 @@ using std::unique_ptr;
 using miutil::concurrent::BlockingQueuePtr;
 using miutil::concurrent::QueueIllegalState;
 
+namespace kvalobs {
+namespace service {
+
 namespace {
+
+std::mutex mutex;
+std::string getThreadId(const std::string &name) {
+  if (!name.empty())
+    return name;
+
+  std::ostringstream sid;
+  std::lock_guard<std::mutex> lock(mutex);
+  static unsigned int id = 0;
+  sid << "KafkaProducerThread-" << id;
+  ++id;
+  return sid.str();
+}
 
 class KafkaThread : kvalobs::subscribe::KafkaProducer {
   typedef map<kvalobs::subscribe::KafkaProducer::MessageId, std::shared_ptr<ProducerCommand>> WaitingAck;
   shared_ptr<ProducerQue> que;
   shared_ptr<BlockingQueuePtr<string>> statusQue;
   WaitingAck waitingAck;
+  std::string name;
 
   shared_ptr<ProducerCommand> getWaitingMessage(KafkaProducer::MessageId id) {
     WaitingAck::iterator it = waitingAck.find(id);
@@ -61,32 +80,44 @@ class KafkaThread : kvalobs::subscribe::KafkaProducer {
     return ret;
   }
 
+  using kvalobs::subscribe::KafkaProducer::send;
+
   void send(ProducerCommand *cmd) {
     if (cmd) {
-      KafkaProducer::MessageId msgId = cmd->send(*this);
-      waitingAck[msgId] = shared_ptr<ProducerCommand>(cmd);
+      unsigned int size;
+      const char *data = cmd->getData(&size);
+      if (data && size > 0) {
+        kvalobs::subscribe::KafkaProducer::MessageId msgId = send(data, size);
+        cmd->onSend(msgId, name);
+        waitingAck[msgId] = shared_ptr<ProducerCommand>(cmd);
+      } else {
+        cmd->onSend(0, name);
+        cmd->onSuccess(0, name, std::string());
+      }
     }
   }
 
  public:
-  KafkaThread(const string &brokers, const std::string &topic, shared_ptr<ProducerQue> que, shared_ptr<BlockingQueuePtr<std::string>> statusQue)
+  KafkaThread(const std::string &name, const string &brokers, const std::string &topic, shared_ptr<ProducerQue> que,
+              shared_ptr<BlockingQueuePtr<std::string>> statusQue)
       : KafkaProducer(topic, brokers,
                       [this](KafkaProducer::MessageId msgId, const std::string & data, const std::string & errorMessage) {onError(msgId, data, errorMessage);},
                       [this](KafkaProducer::MessageId msgId, const std::string &data) {onSuccess(msgId, data);}),
         que(que),
-        statusQue(statusQue) {
+        statusQue(statusQue),
+        name(name) {
   }
 
   void onSuccess(KafkaProducer::MessageId msgId, const std::string & data) {
     shared_ptr<ProducerCommand> cmd = getWaitingMessage(msgId);
     if (cmd)
-      cmd->onSuccess(msgId, data);
+      cmd->onSuccess(msgId, name, data);
   }
 
   void onError(KafkaProducer::MessageId msgId, const std::string & data, const std::string & errorMessage) {
     shared_ptr<ProducerCommand> cmd = getWaitingMessage(msgId);
     if (cmd)
-      cmd->onError(msgId, data, errorMessage);
+      cmd->onError(msgId, name, data, errorMessage);
   }
 
   void drainQue() {
@@ -104,7 +135,6 @@ class KafkaThread : kvalobs::subscribe::KafkaProducer {
 
   void run() {
     bool running = true;
-    IDLOGDEBUG("kafka", "START: kafka thread.");
     while (running) {
       try {
         catchup(0);
@@ -115,12 +145,12 @@ class KafkaThread : kvalobs::subscribe::KafkaProducer {
       }
     }
     drainQue();
-    IDLOGDEBUG("kafka", "STOPPED: kafka thread.");
   }
 
-  static void start(const std::string &brokers, const std::string &topic, ProducerQuePtr que, shared_ptr<BlockingQueuePtr<std::string>> statusQue) {
+  static void start(const std::string &name, const std::string &brokers, const std::string &topic, ProducerQuePtr que,
+                    shared_ptr<BlockingQueuePtr<std::string>> statusQue) {
     try {
-      KafkaThread kafka(brokers, topic, que, statusQue);
+      KafkaThread kafka(name, brokers, topic, que, statusQue);
       statusQue->add(new std::string("<STARTED>"));
       kafka.run();
       statusQue->add(new std::string("<EXIT>"));
@@ -132,30 +162,41 @@ class KafkaThread : kvalobs::subscribe::KafkaProducer {
 };
 }  // namespace
 
-KafkaProducerThread::KafkaProducerThread()
-    : que(new ProducerQue(50)),
-      statusQue(new miutil::concurrent::BlockingQueuePtr<std::string>()) {
+KafkaProducerThread::KafkaProducerThread(const std::string &name, unsigned int queueSize)
+    : statusQue(new miutil::concurrent::BlockingQueuePtr<std::string>()),
+      name(getThreadId(name)),
+      queue(new ProducerQue(queueSize)) {
 }
 
 KafkaProducerThread::~KafkaProducerThread() {
   if (kafkaThread.joinable())
     kafkaThread.detach();
 }
+void KafkaProducerThread::setName(const std::string &name_) {
+  name = name_;
+}
+
+void KafkaProducerThread::send(ProducerCommand *cmd) {
+  try {
+    queue->add(cmd);
+  } catch (const std::exception &ex) {
+  }
+}
 
 void KafkaProducerThread::start(const std::string &brokers, const std::string &topic) {
-  kafkaThread = thread(KafkaThread::start, brokers, topic, que, statusQue);
+  kafkaThread = thread(KafkaThread::start, name, brokers, topic, queue, statusQue);
   string *res = statusQue->get();
-  if (*res == "<STARTED>")
+  if (*res == "<STARTED>") {
+    LOGINFO("KafkaProducerThread: " << name << ": started.");
     return;
-  else if (*res == "<EXIT>")
-    throw std::runtime_error("Unexpected problems with start of kafka thread, topic <" + topic + ">, brokers <" + brokers + ">.");
-  else
-    throw std::runtime_error(*res);
+  } else {
+    throw std::runtime_error(name + ": " + *res);
+  }
 }
 
 void KafkaProducerThread::shutdown() {
   try {
-    que->suspend();
+    queue->suspend();
   } catch (...) {
   }
 }
@@ -163,12 +204,17 @@ void KafkaProducerThread::shutdown() {
 void KafkaProducerThread::join(const std::chrono::high_resolution_clock::duration &timeout) {
   try {
     string *res = statusQue->timedGet(timeout, true);
-    if (*res == "<EXIT>")
+    if (*res == "<EXIT>") {
       kafkaThread.join();
-    else
-      std::cerr << "ERROR: KafkaProducerThread::join: Unexpected return from thread <" + *res + ">.\n";
+      LOGINFO("KafkaProducerThread: " << name << ": stopped.");
+    } else {
+      LOGERROR(name <<": join: Unexpected return from thread <" + *res + ">.");
+    }
   } catch (const miutil::concurrent::QueueTimeout &ex) {
     if (kafkaThread.joinable())
       kafkaThread.detach();
   }
 }
+
+}  //  namespace service
+}  //  namespace kvalobs

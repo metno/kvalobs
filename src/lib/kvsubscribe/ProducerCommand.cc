@@ -26,39 +26,29 @@
  with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#ifndef SRC_KVDATAINPUTD_DECODEDATACOMMAND_H_
-#define SRC_KVDATAINPUTD_DECODEDATACOMMAND_H_
 
-#include <memory>
-#include <list>
-#include "decodeutility/kvalobsdata.h"
+#include "boost/thread.hpp"
+#include "lib/milog/milog.h"
+#include "lib/kvsubscribe/ProducerCommand.h"
 
-#include "kvDataInputd/ProducerCommand.h"
+namespace kvalobs {
+namespace service {
 
-/**
- * \addtogroup kvDatainputd
- * @{
- */
+ProducerCommand::ProducerCommand() {
+}
 
-/**
- * \brief This is the message that is passed to the
- *kafka producers.
- */
+ProducerCommand::~ProducerCommand() {
+}
 
-class DecodedDataCommand : public ProducerCommand {
-  DecodedDataCommand();
-  DecodedDataCommand(const DecodedDataCommand &);
-  DecodedDataCommand& operator=(const DecodedDataCommand &);
+void ProducerCommand::onSend(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &threadName) {
+}
 
-  std::shared_ptr<std::list<kvalobs::serialize::KvalobsData>> data;
+void ProducerCommand::onSuccess(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &threadName, const std::string &data) {
+}
 
- public:
-  DecodedDataCommand(
-      std::shared_ptr<std::list<kvalobs::serialize::KvalobsData>> rawData);
+void ProducerCommand::onError(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &threadName, const std::string & data,
+                              const std::string & errorMessage) {
+}
 
-  virtual kvalobs::subscribe::KafkaProducer::MessageId send(kvalobs::subscribe::KafkaProducer &producer);
-};
-
-/** @} */
-
-#endif  // SRC_KVDATAINPUTD_DECODEDATACOMMAND_H_
+}  //  namespace service
+}  //  namespace kvalobs

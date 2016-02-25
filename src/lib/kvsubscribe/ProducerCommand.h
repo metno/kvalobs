@@ -26,21 +26,20 @@
  with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#ifndef SRC_KVDATAINPUTD_PRODUCERCOMMAND_H_
-#define SRC_KVDATAINPUTD_PRODUCERCOMMAND_H_
+#ifndef SRC_LIB_KVSUBSCRIBE_PRODUCERCOMMAND_H_
+#define SRC_LIB_KVSUBSCRIBE_PRODUCERCOMMAND_H_
 
 #include <string>
 #include "lib/kvsubscribe/KafkaProducer.h"
 #include "lib/miutil/blockingqueue.h"
 
-/**
- * \addtogroup kvDatainputd
- * @{
- */
+namespace kvalobs {
+namespace service {
+
 
 /**
  * \brief This is the message that is passed to the
- *kafka producers.
+ * kafka producers.
  */
 
 class ProducerCommand {
@@ -51,14 +50,24 @@ class ProducerCommand {
   ProducerCommand();
   virtual ~ProducerCommand();
 
-  virtual kvalobs::subscribe::KafkaProducer::MessageId send(kvalobs::subscribe::KafkaProducer &producer) = 0;
-  virtual void onSuccess(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &data);
-  virtual void onError(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string & data, const std::string & errorMessage);
+  virtual const char *getData(unsigned int *size) const = 0;
+
+  /**
+   * If the MessageId is 0, then there was no data to send.
+   */
+  virtual void onSend(kvalobs::subscribe::KafkaProducer::MessageId msgId,  const std::string &threadName);
+
+  /**
+   * If the MessageId is 0, then there was no data to send. We treat this as a success.
+   */
+  virtual void onSuccess(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &threadName, const std::string &data);
+  virtual void onError(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &threadName, const std::string & data, const std::string & errorMessage);
 };
 
 typedef miutil::concurrent::BlockingQueuePtr<ProducerCommand> ProducerQue;
 typedef std::shared_ptr<ProducerQue> ProducerQuePtr;
 
-/** @} */
+}  //  namespace service
+}  //  namespace kvalobs
 
-#endif  // SRC_KVDATAINPUTD_PRODUCERCOMMAND_H_
+#endif  // SRC_LIB_KVSUBSCRIBE_PRODUCERCOMMAND_H_

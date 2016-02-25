@@ -37,9 +37,12 @@ RawDataCommand::RawDataCommand(const std::string &rawData)
     : data(rawData) {
 }
 
-KafkaProducer::MessageId RawDataCommand::send(KafkaProducer &producer) {
-  KafkaProducer::MessageId msgId = producer.send(data);
+const char *RawDataCommand::getData(unsigned int *size) const {
+  *size = data.size();
+  return data.data();
+}
 
+void RawDataCommand::onSend(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &threadName) {
   string::size_type i = data.find_first_of('\n');
   if (i != string::npos) {
     IDLOGDEBUG("kafka", "RawData(" << msgId << "): SENDT: " << data.substr(i));
@@ -48,29 +51,28 @@ KafkaProducer::MessageId RawDataCommand::send(KafkaProducer &producer) {
   } else {
     IDLOGDEBUG("kafka", "RawData(" << msgId << "): SENDT: empty message.");
   }
-
-  return msgId;
 }
 
-void RawDataCommand::onSuccess(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &data) {
+void RawDataCommand::onSuccess(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &threadName, const std::string &data) {
   string::size_type i = data.find_first_of('\n');
   if (i != string::npos) {
-    IDLOGDEBUG("kafka", "RawData(" << msgId << "): ACK: " << data.substr(i));
+    IDLOGDEBUG("kafka", threadName << ": RawData(" << msgId << "): ACK: " << data.substr(i));
   } else if (!data.empty()) {
-    IDLOGDEBUG("kafka", "RawData(" << msgId << "): ACK: " << data);
+    IDLOGDEBUG("kafka", threadName << ": RawData(" << msgId << "): ACK: " << data);
   } else {
-    IDLOGDEBUG("kafka", "RawData(" << msgId << "): ACK: empty message.");
+    IDLOGDEBUG("kafka", threadName << ": RawData(" << msgId << "): ACK: empty message.");
   }
 }
 
-void RawDataCommand::onError(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string & data, const std::string & errorMessage) {
+void RawDataCommand::onError(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &threadName, const std::string & data,
+                             const std::string & errorMessage) {
   string::size_type i = data.find_first_of('\n');
 
   if (i != string::npos) {
-    IDLOGERROR("kafka", "RawData(" << msgId << "): FAIL: " << data.substr(i) << "\n" << errorMessage);
+    IDLOGERROR("kafka", threadName << ": RawData(" << msgId << "): FAIL: " << data.substr(i) << "\n" << errorMessage);
   } else if (!data.empty()) {
-    IDLOGERROR("kafka", "RawData(" << msgId << "): FAIL: " << data << "\n" << errorMessage);
+    IDLOGERROR("kafka", threadName << ": RawData(" << msgId << "): FAIL: " << data << "\n" << errorMessage);
   } else {
-    IDLOGDEBUG("kafka", "RawData(" << msgId << "): FAIL: empty message.");
+    IDLOGDEBUG("kafka", threadName << ": RawData(" << msgId << "): FAIL: empty message.");
   }
 }

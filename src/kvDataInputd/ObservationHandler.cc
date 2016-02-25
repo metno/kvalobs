@@ -51,20 +51,17 @@ int HttpOk = http_utils::http_ok;
 int HttpBadRequest = http_utils::http_bad_request;
 }  // namespace
 
-ObservationHandler::ObservationHandler(DataSrcApp &app, ProducerQuePtr raw)
+ObservationHandler::ObservationHandler(DataSrcApp &app, kvalobs::service::ProducerQuePtr raw)
     : app(app),
       serialNumber(0),
       rawQue(raw) {
 }
 
-void ObservationHandler::render_POST(const httpserver::http_request& req,
-                                     httpserver::http_response** res) {
+void ObservationHandler::render_POST(const httpserver::http_request& req, httpserver::http_response** res) {
   Json::Value jval;
 
   if (app.inShutdown()) {
-    *res = new http_response(
-        http_response_builder("The service is unavailable.",
-                              HttpServiceUnavailable).string_response());
+    *res = new http_response(http_response_builder("The service is unavailable.", HttpServiceUnavailable).string_response());
     return;
   }
   unsigned long long serial = getSerialNumber();
@@ -78,38 +75,27 @@ void ObservationHandler::render_POST(const httpserver::http_request& req,
   try {
     Observation obs = getObservation(req);
 
-    LOGDEBUG(
-        "obsType: '" << obs.obsType << "'\n" << "obsData:[\n" << obs.obs << "\n]\n");
+    LOGDEBUG("obsType: '" << obs.obsType << "'\n" << "obsData:[\n" << obs.obs << "\n]\n");
 
     kd::Result r;
 
     r = app.newObservation(obs.obsType.c_str(), obs.obs.c_str(), "http");
     jval = kd::decodeResultToJson(r);
     if (r.res == kd::EResult::OK) {
-      *res = new http_response(
-          http_response_builder(jval.toStyledString(), HttpOk,
-                                "application/json").string_response());
-    } else if (r.res == kd::EResult::ERROR
-        && b::starts_with(r.message, "SHUTDOWN")) {
-      *res = new http_response(
-          http_response_builder("The service is unavailable.",
-                                HttpServiceUnavailable).string_response());
+      *res = new http_response(http_response_builder(jval.toStyledString(), HttpOk, "application/json").string_response());
+    } else if (r.res == kd::EResult::ERROR && b::starts_with(r.message, "SHUTDOWN")) {
+      *res = new http_response(http_response_builder("The service is unavailable.", HttpServiceUnavailable).string_response());
     } else {
-      *res = new http_response(
-          http_response_builder(jval.toStyledString(), HttpBadRequest,
-                                "application/json").string_response());
+      *res = new http_response(http_response_builder(jval.toStyledString(), HttpBadRequest, "application/json").string_response());
     }
   } catch (const DecodeResultException &ex) {
     jval = decodeResultToJson(ex);
-    *res = new http_response(
-        http_response_builder(jval.toStyledString(), HttpBadRequest,
-                              "application/json").string_response());
+    *res = new http_response(http_response_builder(jval.toStyledString(), HttpBadRequest, "application/json").string_response());
     return;
   }
 }
 
-ObservationHandler::Observation ObservationHandler::getObservation(
-    const httpserver::http_request& req) {
+ObservationHandler::Observation ObservationHandler::getObservation(const httpserver::http_request& req) {
   string::size_type i, iStart;
   string content = req.get_content();
 
@@ -125,8 +111,7 @@ ObservationHandler::Observation ObservationHandler::getObservation(
   i = content.find("\n", iStart);
 
   if (i == string::npos)
-    throw DecodeResultException(kd::EResult::DECODEERROR,
-                                "Only obstype is given.");
+    throw DecodeResultException(kd::EResult::DECODEERROR, "Only obstype is given.");
 
   return Observation(content.substr(iStart, i - iStart), content.substr(i + 1));
 }
@@ -141,8 +126,7 @@ void ObservationHandler::postOnRawQue(const std::string &rawData) {
     rawQue->timedAdd(data.get(), std::chrono::seconds(4), true);
     data.release();
   } catch (std::exception &ex) {
-    LOGWARN(
-        "Unable to post data to the raw kafka queue.\nReason: " << ex.what() <<"\n"<< rawData);
+    LOGWARN("Unable to post data to the raw kafka queue.\nReason: " << ex.what() <<"\n"<< rawData);
   }
 }
 
