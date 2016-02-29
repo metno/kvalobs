@@ -2,7 +2,7 @@ decoderdir=$(pkglibdir)/decode
 
 decoder_LTLIBRARIES = kltextdecoder.la
 
-kltextdecoder_la_SOURCES = kltext.cc kltextdecoder.cc  kltextdecoder.h  kltextentry.cc  kltextentry.h
+kltextdecoder_la_SOURCES = kltext.h kltext.cc kltextdecoder.cc  kltextdecoder.h  kltextentry.cc  kltextentry.h
 kltextdecoder_la_CPPFLAGS = -D_REENTRANT -I$(top_srcdir)/src -I$(top_srcdir)/src/lib  -I$(top_srcdir)/src -I$(top_srcdir)/src/lib/decoder $(putools_CFLAGS)
 kltextdecoder_la_LIBADD = \
                  $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs_decoderbase.la \
