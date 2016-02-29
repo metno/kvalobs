@@ -62,6 +62,12 @@ class HttpSendData : public SendData {
    */
   Result newData(const std::string &data, const std::string &obsType) override;
 
+  /**
+   * @throw Fatal on transport problems.
+   */
+  static Result newData(const std::string &hostAndPort, const std::string &data, const std::string &obsType);
+
+
   const std::string host() const {
     return host_;
   }

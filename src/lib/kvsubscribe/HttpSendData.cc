@@ -65,16 +65,20 @@ class MyHttp : public miutil::HTTPClient {
   }
 };
 
-}  // namespace
-
-HttpSendData::HttpSendData(const std::string &hostAndPort, bool secure) {
+std::string createUrl(const std::string &hostAndPort, bool secure = false) {
   ostringstream ost;
   if (secure)
     ost << "https://";
   else
     ost << "http://";
   ost << hostAndPort << "/v1/observation";
-  host_ = ost.str();
+  return ost.str();
+}
+
+}  // namespace
+
+HttpSendData::HttpSendData(const std::string &hostAndPort, bool secure)
+  : host_(createUrl(hostAndPort, secure)) {
 }
 
 HttpSendData::HttpSendData(const miutil::conf::ConfSection &conf)
@@ -83,6 +87,7 @@ HttpSendData::HttpSendData(const miutil::conf::ConfSection &conf)
 
 HttpSendData::~HttpSendData() {
 }
+
 
 Result HttpSendData::newData(const std::string &data, const std::string &obsType) {
   MyHttp http(this);
@@ -95,23 +100,32 @@ Result HttpSendData::newData(const std::string &data, const std::string &obsType
     int retCode = http.returnCode();
 
     if (retCode != 200) {
-      ostringstream err;
-      err << "Http return code: " << retCode << ".";
-      throw Fatal(err.str());
+      try {
+        return decodeResultFromJsonString(http.content());
+      } catch (const std::exception &ex) {
+        ostringstream err;
+        err << "Http return code: " << retCode << ".";
+        throw Fatal(err.str());
+      }
+    } else {
+      string sRes = http.content();
+      LOGDEBUG("HttpSendData::newData:Response (" << host_ << "): " << sRes);
+      return decodeResultFromJsonString(sRes);
     }
-
-    string sRes = http.content();
-    LOGDEBUG("HttpSendData::newData:Response: " << sRes);
-    return decodeResultFromJsonString(sRes);
   } catch (const HttpException &ex) {
-    throw Fatal(ex.what());
+    throw Fatal(ex.what() + string(" Url: ") + host_);
   } catch (const logic_error &err) {
-    throw Fatal(err.what());
+    throw Fatal(err.what() + string(" Url: ") + host_);
   } catch (const std::exception &err) {
-    throw Fatal(err.what());
+    throw Fatal(err.what() + string(" Url: ") + host_);
   } catch (...) {
-    throw Fatal("HttpSendData::newData: Unexpected unknown error. This is a bug.");
+    throw Fatal("HttpSendData::newData (" + host_ + "): Unexpected unknown error. This is a bug.");
   }
+}
+
+Result HttpSendData::newData(const std::string &hostAndPort, const std::string &data, const std::string &obsType) {
+  HttpSendData http(hostAndPort);
+  return http.newData(data, obsType);
 }
 
 void HttpSendData::log(const std::string &msg) {
