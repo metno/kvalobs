@@ -10,14 +10,12 @@ kvkafkalistener_LDADD = \
 
 nagiosbindir = $(libdir)/nagios/plugins
 
-nagiosbin_SCRIPTS = check_kvprocs check_kvkafkastatus
+PYTHON_FILES = check_kvprocs.py check_kvkafkastatus.py
 
-check_kvprocs: check_kvprocs.py
+nagiosbin_SCRIPTS = $(PYTHON_FILES:.py=)
+
+%: %.py
 	cp $< $@
 
-check_kvkafkastatus: check_kvkafkastatus.py
-	cp $< $@
-
-	
-EXTRA_DIST = $(nagiosbin_SCRIPTS)
-CLEANFILES = $(nagiosbin_SCRIPTS:.py=)
+EXTRA_DIST = $(PYTHON_FILES)
+CLEANFILES = $(nagiosbin_SCRIPTS)
