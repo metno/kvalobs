@@ -141,7 +141,7 @@ void logTransaction(bool ok, double start, int shortRetries, int longRetries,
 }
 
 CheckRunner::DataListPtr CheckRunner::newObservation(
-    const kvalobs::kvStationInfo & obs, std::ostream * scriptLog) {
+  const kvalobs::kvStationInfo & obs, std::ostream * scriptLog) {
   const int shortSleep = 100;
   const int longSleep = 300;
   const int nRetry = 3;
@@ -183,7 +183,7 @@ CheckRunner::DataListPtr CheckRunner::newObservation(
               logTransaction(true, start, nShortRetries, nLongRetries, aborted);
               return ret;
             } catch (dnmi::db::SQLSerializeError &) {
-              LOGWARN("Serialization error! Retrying");
+              LOGDEBUG("newObservation Serialization error! Retrying");
             }
           }
           // Happens if we get more than 256 serialization errors in a row
@@ -199,9 +199,14 @@ CheckRunner::DataListPtr CheckRunner::newObservation(
     DataListPtr ret = checkObservation(obs, scriptLog);
     logTransaction(true, start, nShortRetries, nLongRetries, aborted);
     return ret;
-  } catch (std::exception & e) {
+  } catch (dnmi::db::SQLSerializeError & e) {
     logTransaction(false, start, nShortRetries, nLongRetries, aborted, &e);
-    //LOGERROR(e.what());
+    LOGERROR("Persistent serialization error on newObservation: " << e.what());
+    throw;
+  }
+  catch (std::exception & e) {
+    logTransaction(false, start, nShortRetries, nLongRetries, aborted, &e);
+    LOGERROR("Unexpected error in newObservation: " << e.what());
     throw;
   }
   return DataListPtr(new DataList);  // never reached

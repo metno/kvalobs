@@ -33,6 +33,9 @@
 #include "DataProcessor.h"
 #include <boost/noncopyable.hpp>
 #include <memory>
+#include <string>
+#include "kvalobs/kvStationInfo.h"
+#include "kvsubscribe/KafkaProducer.h"
 
 namespace kvalobs {
 class kvStationInfo;
@@ -56,10 +59,22 @@ class NewDataListener : boost::noncopyable {
 
   static void stopAll();
 
+  static void onKafkaSendSuccess(kvalobs::subscribe::KafkaProducer::MessageId id, const std::string & data);
+  static void onKafkaSendError(kvalobs::subscribe::KafkaProducer::MessageId id, const std::string & data, const std::string & errorMessage);
+
  private:
+  typedef kvalobs::kvStationInfo StationInfo;
+  typedef std::shared_ptr<kvalobs::kvStationInfo> StationInfoPtr;
   bool stopping_;
   std::shared_ptr<db::DatabaseAccess> db_;
   DataProcessor processor_;
+
+  void startProcessing();
+  bool isProcessingCompleted() const;
+
+  StationInfoPtr fetchDataToProcess() const;
+  qabase::CheckRunner::DataListPtr runChecks(const StationInfo & toProcess) const;
+  void markProcessDone(const StationInfo & toProcess);
 };
 
 } /* namespace qabase */

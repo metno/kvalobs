@@ -109,7 +109,8 @@ void KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::commit() {
   transactionInProgress_ = false;
 }
 void KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::rollback() {
-  connection_->rollBack();
+  if (transactionInProgress_)
+    connection_->rollBack();
   transactionInProgress_ = false;
 }
 
@@ -440,46 +441,44 @@ void KvalobsDatabaseAccess::write(const DataList & data) {
 }
 
 kvalobs::kvStationInfo * KvalobsDatabaseAccess::selectDataForControl() {
-  static const std::string findNext =
-      "select stationid, typeid, obstime from workque where process_start is not null and ((qa_start<now()-'10 minutes'::interval and qa_stop is null) or (qa_start is null and stationid not in (select stationid from workque where qa_start is not null and qa_stop is null))) order by priority, tbtime limit 1;";
+    static const std::string findNext =
+        "select stationid, typeid, obstime from workque where process_start is not null and ((qa_start<now()-'10 minutes'::interval and qa_stop is null) or (qa_start is null and stationid not in (select stationid from workque where qa_start is not null and qa_stop is null))) order by priority, tbtime limit 1;";
 
-  std::unique_ptr<dnmi::db::Result> result(connection_->execQuery(findNext));
-  if (!result or not result->hasNext())
-    return nullptr;
+    std::unique_ptr<dnmi::db::Result> result(connection_->execQuery(findNext));
+    if (!result || !result->hasNext())
+      return nullptr;
 
-  auto row = result->next();
+    auto row = result->next();
 
-  int station = boost::lexical_cast<int>(row[0]);
-  int type = boost::lexical_cast<int>(row[1]);
-  boost::posix_time::ptime obstime = boost::posix_time::time_from_string(
-      row[2]);
+    int station = boost::lexical_cast<int>(row[0]);
+    int type = boost::lexical_cast<int>(row[1]);
+    boost::posix_time::ptime obstime = boost::posix_time::time_from_string(
+        row[2]);
 
-  std::ostringstream query;
-  query << "UPDATE workque SET qa_start=statement_timestamp() WHERE ";
-  query << "stationid=" << station;
-  query << " AND typeid=" << type;
-  query << " AND obstime='" << row[2] << "'";
+    std::ostringstream query;
+    query << "UPDATE workque SET qa_start=statement_timestamp() WHERE ";
+    query << "stationid=" << station;
+    query << " AND typeid=" << type;
+    query << " AND obstime='" << row[2] << "'";
 
-  milog::LogContext context("query");
-  LOGDEBUG1(query.str());
+    milog::LogContext context("query");
+    LOGDEBUG1(query.str());
 
-  connection_->exec(query.str());
-
-  return new kvalobs::kvStationInfo(station, obstime, type);
-
+    connection_->exec(query.str());
+    return new kvalobs::kvStationInfo(station, obstime, type);
 }
 
 void KvalobsDatabaseAccess::markProcessDone(const kvalobs::kvStationInfo & si) {
-  std::ostringstream query;
-  query << "UPDATE workque SET qa_stop=statement_timestamp() WHERE ";
-  query << "stationid=" << si.stationID();
-  query << " AND typeid=" << si.typeID();
-  query << " AND obstime='" << to_kvalobs_string(si.obstime()) << "'";
+    std::ostringstream query;
+    query << "UPDATE workque SET qa_stop=statement_timestamp() WHERE ";
+    query << "stationid=" << si.stationID();
+    query << " AND typeid=" << si.typeID();
+    query << " AND obstime='" << to_kvalobs_string(si.obstime()) << "'";
 
-  milog::LogContext context("query");
-  LOGDEBUG1(query.str());
+    milog::LogContext context("query");
+    LOGDEBUG1(query.str());
 
-  connection_->exec(query.str());
+    connection_->exec(query.str());
 }
 
 dnmi::db::Connection * KvalobsDatabaseAccess::createConnection(
