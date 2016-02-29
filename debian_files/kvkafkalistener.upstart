@@ -1,0 +1,8 @@
+author "Vegard Bones <vegard.bones@met.no>"
+
+setuid kvalobs
+
+respawn
+respawn limit 10 60
+
+exec /usr/bin/kvkafkalistener -o /var/log/kvalobs/kafkastatus.txt
