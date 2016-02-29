@@ -98,6 +98,7 @@ stamp-h1
 /src/lib/*/libkvalobs_*.pc
 /src/service-libs/kvcpp/libkvcpp.pc
 /src/lib/decoder/decoderbase/libkvalobs_decoderbase.pc
+/src/lib/kvsubscribe/libkvsubscribe.pc
 /configure-stamp
 /src/kvQabased/qabasetest
 /src/lib/decoder/comobsdecoder/test/gtestsms2

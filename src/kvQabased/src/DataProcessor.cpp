@@ -46,6 +46,18 @@ DataProcessor::DataProcessor(std::shared_ptr<qabase::CheckRunner> checkRunner)
 DataProcessor::~DataProcessor() {
 }
 
+qabase::CheckRunner::DataListPtr DataProcessor::runChecks(const kvalobs::kvStationInfo & si) const {
+  qabase::LogFileCreator::LogStreamPtr logStream = logCreator_.getLogStream(si);
+  qabase::CheckRunner::DataListPtr modified(checkRunner_->newObservation(si, logStream.get()));
+  return modified;
+}
+
+void DataProcessor::sendToKafka(const qabase::CheckRunner::DataListPtr dataList) {
+  kvalobs::serialize::KvalobsData d(*dataList);
+  output_->send(kvalobs::serialize::KvalobsDataSerializer::serialize(d));
+  finalizeMessage_();
+}
+
 void DataProcessor::process(const kvalobs::kvStationInfo & si) {
   simpleProcess_(si);
   finalizeMessage_();
@@ -61,9 +73,8 @@ void DataProcessor::process(const std::string & message) {
 
 void DataProcessor::simpleProcess_(const kvalobs::kvStationInfo & si) {
   qabase::LogFileCreator::LogStreamPtr logStream = logCreator_.getLogStream(si);
-  qabase::CheckRunner::DataListPtr modified = checkRunner_->newObservation(
-      si, logStream.get());
-  if (not modified->empty()) {
+  qabase::CheckRunner::DataListPtr modified = checkRunner_->newObservation(si, logStream.get());
+  if (!modified->empty()) {
     kvalobs::serialize::KvalobsData d(*modified);
     output_->send(kvalobs::serialize::KvalobsDataSerializer::serialize(d));
   }

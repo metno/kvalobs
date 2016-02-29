@@ -37,15 +37,13 @@ namespace subscribe {
 namespace {
 class DeliveryReport : public RdKafka::DeliveryReportCb {
  public:
-  DeliveryReport(KafkaProducer::ErrorHandler onFailedDelivery,
-                 KafkaProducer::SuccessHandler onSuccessfulDelivery)
+  DeliveryReport(KafkaProducer::ErrorHandler onFailedDelivery, KafkaProducer::SuccessHandler onSuccessfulDelivery)
       : onFailedDelivery_(onFailedDelivery),
         onSuccessfulDelivery_(onSuccessfulDelivery) {
   }
 
   virtual void dr_cb(RdKafka::Message & message) {
-    std::unique_ptr<KafkaProducer::MessageId> id(
-        static_cast<KafkaProducer::MessageId *>(message.msg_opaque()));
+    std::unique_ptr<KafkaProducer::MessageId> id(static_cast<KafkaProducer::MessageId *>(message.msg_opaque()));
 
     std::string data((char*) message.payload(), message.len());
     if (message.err() == RdKafka::ERR_NO_ERROR)
@@ -60,20 +58,16 @@ class DeliveryReport : public RdKafka::DeliveryReportCb {
 };
 }
 
-KafkaProducer::KafkaProducer(const std::string & topic,
-                             const std::string & brokers,
-                             KafkaProducer::ErrorHandler onFailedDelivery,
+KafkaProducer::KafkaProducer(const std::string & topic, const std::string & brokers, KafkaProducer::ErrorHandler onFailedDelivery,
                              KafkaProducer::SuccessHandler onSuccessfulDelivery)
-    : deliveryReportHandler_(
-          new DeliveryReport(onFailedDelivery, onSuccessfulDelivery)),
+    : deliveryReportHandler_(new DeliveryReport(onFailedDelivery, onSuccessfulDelivery)),
       messageId_(0) {
   if (brokers.empty())
     throw std::logic_error("Empty kafka broker list");
 
   std::string errstr;
 
-  std::unique_ptr<RdKafka::Conf> conf(
-      RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL));
+  std::unique_ptr<RdKafka::Conf> conf(RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL));
 
   conf->set("metadata.broker.list", brokers, errstr);
   conf->set("dr_cb", deliveryReportHandler_.get(), errstr);
@@ -82,11 +76,9 @@ KafkaProducer::KafkaProducer(const std::string & topic,
   if (!producer_)
     throw std::runtime_error("Failed to create producer: " + errstr);
 
-  std::unique_ptr<RdKafka::Conf> tconf(
-      RdKafka::Conf::create(RdKafka::Conf::CONF_TOPIC));
+  std::unique_ptr<RdKafka::Conf> tconf(RdKafka::Conf::create(RdKafka::Conf::CONF_TOPIC));
 
-  topic_.reset(
-      RdKafka::Topic::create(producer_.get(), topic, tconf.get(), errstr));
+  topic_.reset(RdKafka::Topic::create(producer_.get(), topic, tconf.get(), errstr));
   if (!topic_)
     throw std::runtime_error("Failed to create topic: " + errstr);
 }
@@ -99,14 +91,11 @@ KafkaProducer::MessageId KafkaProducer::send(const std::string & data) {
   return send(data.c_str(), data.size());
 }
 
-KafkaProducer::MessageId KafkaProducer::send(const char * data,
-                                             unsigned length) {
+KafkaProducer::MessageId KafkaProducer::send(const char * data, unsigned length) {
   MessageId * id = new MessageId(messageId_++);
 
-  RdKafka::ErrorCode resp = producer_->produce(
-      topic_.get(), RdKafka::Topic::PARTITION_UA,
-      RdKafka::Producer::RK_MSG_COPY /* Copy payload */,
-      const_cast<char*>(data), length, nullptr, static_cast<void*>(id));
+  RdKafka::ErrorCode resp = producer_->produce(topic_.get(), RdKafka::Topic::PARTITION_UA, RdKafka::Producer::RK_MSG_COPY /* Copy payload */,
+                                               const_cast<char*>(data), length, nullptr, static_cast<void*>(id));
 
   if (resp != RdKafka::ERR_NO_ERROR) {
     delete id;

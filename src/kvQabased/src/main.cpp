@@ -27,25 +27,26 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "QaBaseApp.h"
-#include "NewDataListener.h"
-#include "Configuration.h"
-#include "CheckRunner.h"
-#include "DataProcessor.h"
-#include "scriptcreate/KvalobsCheckScript.h"
-#include "Exception.h"
-#include "LogFileCreator.h"
-#include "db/KvalobsDatabaseAccess.h"
-#include <decodeutility/kvalobsdata.h>
-#include <decodeutility/kvalobsdataserializer.h>
-#include <kvsubscribe/KafkaProducer.h>
-#include <kvsubscribe/DataSubscriber.h>
-#include <milog/milog.h>
-#include <milog/FLogStream.h>
-#include <fileutil/pidfileutil.h>
+#include <sys/prctl.h>
 #include <boost/lexical_cast.hpp>
 #include <csignal>
-#include <sys/prctl.h>
+#include <string>
+#include "decodeutility/kvalobsdata.h"
+#include "decodeutility/kvalobsdataserializer.h"
+#include "fileutil/pidfileutil.h"
+#include "kvsubscribe/KafkaProducer.h"
+#include "kvsubscribe/DataSubscriber.h"
+#include "milog/FLogStream.h"
+#include "milog/milog.h"
+#include "CheckRunner.h"
+#include "Configuration.h"
+#include "DataProcessor.h"
+#include "Exception.h"
+#include "LogFileCreator.h"
+#include "NewDataListener.h"
+#include "QaBaseApp.h"
+#include "scriptcreate/KvalobsCheckScript.h"
+#include "db/KvalobsDatabaseAccess.h"
 
 /**
  * \mainpage qabase - Kvalobs quality script manager
@@ -85,7 +86,7 @@
  * There are two ways to run qabase. One is to provide command-line arguments,
  * specifying a single observation to check, while the other way is to run
  * qabase as a daemon. Details about daemon mode can be found
- * \ref group_corba "here".
+ * \ref group_kafka "here".
  */
 
 using namespace boost::program_options;
@@ -135,9 +136,7 @@ void createPidFile() {
           "An error occured while reading the pidfile:" + pidfile
               + " remove the file if it exist and kvQabased is not running.  If it is running and there is problems. Kill kvQabased and restart it.");
     else
-      throw std::runtime_error(
-          "Is kvQabased already running? If not remove the pidfile: "
-              + pidfile);
+      throw std::runtime_error("Is kvQabased already running? If not remove the pidfile: " + pidfile);
   }
   if (!dnmi::file::createPidFile(pidfile))
     throw std::runtime_error("Unable to create pidfile!");
@@ -162,6 +161,7 @@ void setupLogging(const qabase::Configuration& config, const ProcessStatus & ps)
       LOGERROR("Unable to register file logger as default logger");
   }
 }
+
 }
 
 int main(int argc, char ** argv) {
@@ -182,12 +182,10 @@ int main(int argc, char ** argv) {
     db::KvalobsDatabaseAccess::setModelDataName(config.modelDataName());
 
     if (config.haveObservationToCheck()) {
-      auto checkRunner = qabase::CheckRunner::create(
-          config.databaseConnectString());
+      auto checkRunner = qabase::CheckRunner::create(config.databaseConnectString());
 
       if (config.onlySpecificQcx())
-        checkRunner->setQcxFilter(config.qcxFilter().begin(),
-                                  config.qcxFilter().end());
+        checkRunner->setQcxFilter(config.qcxFilter().begin(), config.qcxFilter().end());
 
       qabase::DataProcessor processor(checkRunner);
       processor.process(*config.observationToCheck());
@@ -200,9 +198,8 @@ int main(int argc, char ** argv) {
 
       std::string dbConnect = qabase::QaBaseApp::createConnectString();
       LOGDEBUG("Connecting to database: " << dbConnect);
-      auto db = std::make_shared < db::KvalobsDatabaseAccess > (dbConnect);
-      auto checkRunner = std::make_shared < qabase::CheckRunner > (db);
-
+      auto db = std::make_shared<db::KvalobsDatabaseAccess>(dbConnect);
+      auto checkRunner = std::make_shared<qabase::CheckRunner>(db);
       qabase::NewDataListener listener(db);
       listener.run();
     }

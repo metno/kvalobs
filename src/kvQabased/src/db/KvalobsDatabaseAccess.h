@@ -65,8 +65,7 @@ class KvalobsDatabaseAccess : public db::DatabaseAccess {
    *                                  be deleted when this object's
    *                                  destructor is called.
    */
-  KvalobsDatabaseAccess(dnmi::db::Connection * connection,
-                        bool takeOwnershipOfConnection);
+  KvalobsDatabaseAccess(dnmi::db::Connection * connection, bool takeOwnershipOfConnection);
 
   static void setModelDataName(const std::string & modelDataName);
 
@@ -82,36 +81,24 @@ class KvalobsDatabaseAccess : public db::DatabaseAccess {
 
   virtual void rollback();
 
-  virtual void getChecks(CheckList * out,
-                         const kvalobs::kvStationInfo & si) const;
+  virtual void getChecks(CheckList * out, const kvalobs::kvStationInfo & si) const;
 
   virtual int getQcxFlagPosition(const std::string & qcx) const;
 
-  virtual void getParametersToCheck(ParameterList * out,
-                                    const kvalobs::kvStationInfo & si) const;
+  virtual void getParametersToCheck(ParameterList * out, const kvalobs::kvStationInfo & si) const;
 
-  virtual kvalobs::kvAlgorithms getAlgorithm(
-      const std::string & algorithmName) const;
+  virtual kvalobs::kvAlgorithms getAlgorithm(const std::string & algorithmName) const;
 
-  virtual std::string getStationParam(const kvalobs::kvStationInfo & si,
-                                      const std::string & parameter,
-                                      const std::string & qcx) const;
+  virtual std::string getStationParam(const kvalobs::kvStationInfo & si, const std::string & parameter, const std::string & qcx) const;
 
   virtual kvalobs::kvStation getStation(int stationid) const;
 
-  virtual void getModelData(
-      ModelDataList * out, const kvalobs::kvStationInfo & si,
-      const qabase::DataRequirement::Parameter & parameter,
-      int minutesBackInTime) const;
+  virtual void getModelData(ModelDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter,
+                            int minutesBackInTime) const;
 
-  virtual void getData(DataList * out, const kvalobs::kvStationInfo & si,
-                       const qabase::DataRequirement::Parameter & parameter,
-                       int minuteOffset) const;
+  virtual void getData(DataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const;
 
-  virtual void getTextData(TextDataList * out,
-                           const kvalobs::kvStationInfo & si,
-                           const qabase::DataRequirement::Parameter & parameter,
-                           int minuteOffset) const;
+  virtual void getTextData(TextDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const;
 
   virtual void write(const DataList & data);
 
@@ -120,8 +107,7 @@ class KvalobsDatabaseAccess : public db::DatabaseAccess {
   virtual void markProcessDone(const kvalobs::kvStationInfo & si);
 
  private:
-  static dnmi::db::Connection * createConnection(
-      const std::string & databaseConnect);
+  static dnmi::db::Connection * createConnection(const std::string & databaseConnect);
   class TransactionEnforcingDatabaseConnection;
   TransactionEnforcingDatabaseConnection * connection_;
 

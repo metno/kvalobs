@@ -48,15 +48,12 @@ class KafkaProducer {
  public:
   typedef uint64_t MessageId;
   typedef std::function<void(MessageId id, const std::string & data)> SuccessHandler;
-  typedef std::function<
-      void(MessageId id, const std::string & data, const std::string & errorMessage)> ErrorHandler;
+  typedef std::function<void(MessageId id, const std::string & data, const std::string & errorMessage)> ErrorHandler;
 
   explicit KafkaProducer(const std::string & topic,
                          const std::string & brokers = "localhost",
-                         ErrorHandler onFailedDelivery =
-                             [](MessageId, const std::string &, const std::string &) {},
-                         SuccessHandler onSuccessfulDelivery =
-                             [](MessageId, const std::string &) {});
+                         ErrorHandler onFailedDelivery = [](MessageId, const std::string &, const std::string &) {},
+                         SuccessHandler onSuccessfulDelivery = [](MessageId, const std::string &) {});
 
   ~KafkaProducer();
 

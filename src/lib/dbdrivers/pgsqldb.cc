@@ -215,7 +215,7 @@ void dnmi::db::drivers::PGConnection::exec(const std::string &query) {
   PQclear(p);
 
   if (errorCode == "40001" || errorCode == "40P01")
-    throw SQLSerializeError("Seriallize error", errorCode, errorCode == "40P01");
+    throw SQLSerializeError("Serialize error", errorCode, errorCode == "40P01");
 
   std::string::size_type i = msg2.find("duplicate");
 
@@ -306,7 +306,7 @@ dnmi::db::drivers::PGConnection::execQuery(const std::string &query) {
   PQclear(p);
 
   if (errorCode == "40001" || errorCode == "40P01")
-    throw SQLSerializeError("Seriallize error", errorCode, errorCode == "40P01");
+    throw SQLSerializeError("Serialize error", errorCode, errorCode == "40P01");
 
   std::string::size_type i = msg.find("duplicate");
 

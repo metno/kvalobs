@@ -33,6 +33,7 @@
 #include "LogFileCreator.h"
 #include <memory>
 #include <string>
+#include "CheckRunner.h"
 
 namespace kvalobs {
 class kvStationInfo;
@@ -53,11 +54,17 @@ class DataProcessor {
 
   explicit DataProcessor(std::shared_ptr<qabase::CheckRunner> checkRunner);
 
-//  DataProcessor(
-//      std::shared_ptr<qabase::CheckRunner> checkRunner,
-//      const std::string & baseLogDir,
-//      std::shared_ptr<kvalobs::subscribe::KafkaProducer> output);
   ~DataProcessor();
+
+  /**
+   * Run checks on a single message
+   */
+  qabase::CheckRunner::DataListPtr runChecks(const kvalobs::kvStationInfo & si) const;
+  /**
+   * Send a single dataList to Kafka
+   */
+  void sendToKafka(qabase::CheckRunner::DataListPtr dataList);
+
 
   /**
    * Process a single message.
@@ -87,8 +94,7 @@ class DataProcessor {
 };
 
 template<typename StationInfoIterator>
-void DataProcessor::process(StationInfoIterator begin,
-                            StationInfoIterator end) {
+void DataProcessor::process(StationInfoIterator begin, StationInfoIterator end) {
   while (begin != end) {
     simpleProcess_(*begin);
     ++begin;

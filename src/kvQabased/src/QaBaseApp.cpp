@@ -29,10 +29,11 @@
 
 #include "QaBaseApp.h"
 #include <string>
-#include <kvsubscribe/KafkaProducer.h>
-#include <kvsubscribe/queue.h>
-#include <kvalobs/kvPath.h>
-#include <miconfparser/miconfparser.h>
+#include "kvalobs/kvPath.h"
+#include "kvsubscribe/KafkaProducer.h"
+#include "kvsubscribe/queue.h"
+#include "miconfparser/miconfparser.h"
+#include "NewDataListener.h"
 
 namespace qabase {
 
@@ -40,8 +41,7 @@ std::string QaBaseApp::kafkaBrokers_;
 std::string QaBaseApp::kafkaDomain_;
 
 namespace {
-std::string val(const std::string & name, miutil::conf::ConfSection * conf,
-                const std::string & defaultValue) {
+std::string val(const std::string & name, miutil::conf::ConfSection * conf, const std::string & defaultValue) {
   if (conf) {
     miutil::conf::ValElementList ret = conf->getValue(name);
     if (ret.empty())
@@ -65,25 +65,15 @@ QaBaseApp::QaBaseApp(int argc, char ** argv)
 QaBaseApp::~QaBaseApp() {
 }
 
-namespace {
-void processDataErrors(kvalobs::subscribe::KafkaProducer::MessageId id,
-                       const std::string & data,
-                       const std::string & errorMessage) {
-  LOGERROR("Unable to send data: " + errorMessage + "  Data: <" + data + ">");
-}
-}
-
 std::shared_ptr<kvalobs::subscribe::KafkaProducer> QaBaseApp::kafkaProducer() {
 
   using kvalobs::subscribe::KafkaProducer;
 
   std::string queue = kvalobs::subscribe::queue::checked(kafkaDomain_);
 
-  LOGINFO(
-      "Creating kafka connection on " << kafkaBrokers_ << ", using topic " << queue);
+  LOGINFO("Creating kafka connection on " << kafkaBrokers_ << ", using topic " << queue);
 
-  return std::make_shared < KafkaProducer
-      > (queue, kafkaBrokers_, processDataErrors);
+  return std::make_shared < KafkaProducer > (queue, kafkaBrokers_, NewDataListener::onKafkaSendError, NewDataListener::onKafkaSendSuccess);
 }
 
 std::string QaBaseApp::baseLogDir() {
