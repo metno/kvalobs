@@ -62,11 +62,9 @@ namespace kvalobs {
  * For an example look at \ref kvDbBaseExample.doc "kvDbBaseExample".
  */
 class kvDbBase {
-
  protected:
   std::string sortBy_;
   boost::gregorian::date julianDayThatYear(int addOn, int year = -1) const;
-
  public:
 
   /**Used to specifie an NULL value for a FLOAT field*/
@@ -110,7 +108,7 @@ class kvDbBase {
    * \param toQuote the string to be quoted.
    * \return a quoted version of the toQuote string.
    */
-  std::string quoted(const std::string &toQuote) const;
+  static std::string quoted(const std::string &toQuote);
 
   /**
    * /brief make a quoted ISO time.
@@ -118,7 +116,7 @@ class kvDbBase {
    * \param timeToQuote the time we want a quoted ISO time.
    * \return a quoted ISO time formatted version of timetoQuote.
    */
-  std::string quoted(const boost::posix_time::ptime & timeToQuote) const;
+  static std::string quoted(const boost::posix_time::ptime & timeToQuote);
 
   /**
    * \brief create a quoted string versjon of a integer.
@@ -126,7 +124,7 @@ class kvDbBase {
    * \param intToQuote the integer to create a quoted string version of.
    * \return a quoted string version of intToQuote.
    */
-  std::string quoted(const int &intToQuote) const;
+  static std::string quoted(const int &intToQuote);
 
   /**
    * /brief is this instance initialized with walues.

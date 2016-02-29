@@ -27,12 +27,16 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include <string.h>
 #include <string>
-#include <boost/date_time/posix_time/ptime.hpp>
-#include <gtest/gtest.h>
-#include <miutil/timeconvert.h>
-#include <kvalobs/paramlist.h>
-#include <milog/milog.h>
+#include <memory>
+#include "boost/date_time/posix_time/ptime.hpp"
+#include "gtest/gtest.h"
+#include "lib/miutil/timeconvert.h"
+#include "lib/kvalobs/paramlist.h"
+#include "lib/kvalobs/kvDbBase.h"
+#include "lib/milog/milog.h"
+#include "lib/kvalobs/test/sqlesctest.h"
 
 using namespace std;
 //using namespace decodeutility;
@@ -78,6 +82,22 @@ TEST_F(Tests, paramlist) {
   ASSERT_TRUE(findParamInList(params, "KLFG", param));
   ASSERT_EQ(param.id(), 1025);
   ASSERT_FALSE(param.isScalar());
+}
+
+TEST_F(Tests, SqlEsc) {
+  using kvalobs::test::escapeSql_;
+  using std::string;
+  string val = escapeSql_("Hei");
+
+  ASSERT_EQ(val, "\'Hei\'");
+  val = escapeSql_("\'frank\';  DROP TABLE people;");
+  ASSERT_EQ(val, "\'\'\'frank\'\';  DROP TABLE people;\'");
+
+  pt::ptime dt = pt::time_from_string_nothrow("2016-02-26 15:00:00");
+  ASSERT_TRUE(!dt.is_special());
+  val = kvalobs::kvDbBase::quoted(dt);
+  ASSERT_EQ(val, "\'2016-02-26 15:00:00\'");
+  ASSERT_EQ(kvalobs::kvDbBase::quoted(10), "\'10\'");
 }
 
 int main(int argc, char* argv[]) {

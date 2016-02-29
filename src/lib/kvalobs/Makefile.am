@@ -1,5 +1,6 @@
 AM_CPPFLAGS = -I$(top_srcdir)/src/lib \
 	-I$(top_builddir)/src/lib \
+	-I$(top_srcdir)/src \
 	-D_REENTRANT
 
 lib_LTLIBRARIES = libkvalobs_kvalobs.la
@@ -125,7 +126,8 @@ TESTS = gtest
 check_PROGRAMS = gtest
 
 gtest_SOURCES = \
-	test/gtest.cc
+	test/sqlesctest.h \
+	test/gtest.cc 
 
 gtest_CPPFLAGS = \
 	-DTESTDIR="\""$(top_srcdir)/src/lib/kvalobs/test"\"" \
@@ -135,6 +137,8 @@ gtest_CPPFLAGS = \
 gtest_LDADD = \
 	$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
 	$(libkvalobs_kvalobs_la_LIBADD) \
+	$(BOOST_DATE_TIME_LIB) \
+	$(BOOST_SYSTEM_LIB) \
 	$(gtest_LIBS)
 endif
 

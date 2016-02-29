@@ -51,6 +51,7 @@ AC_CONFIG_FILES([Makefile
                  src/lib/decoder/execdecoder/Makefile
                  src/lib/decoder/kldecoder/Makefile
                  src/lib/decoder/kldecoder/test/Makefile
+                 src/lib/decoder/kltext/Makefile
                  src/lib/decoder/autoobsdecoder/Makefile
                  src/lib/decoder/comobsdecoder/Makefile
                  src/lib/decoder/comobsdecoder/test/Makefile

@@ -8,4 +8,5 @@ SUBDIRS = \
 	comobsdecoder \
 	synopdecoder  \
 	execdecoder  \
-	bufrdecoder
+	bufrdecoder \
+	kltext
