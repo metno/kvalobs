@@ -30,8 +30,8 @@
 #define SRC_LIB_KVSUBSCRIBE_PRODUCERCOMMAND_H_
 
 #include <string>
-#include "lib/kvsubscribe/KafkaProducer.h"
-#include "lib/miutil/blockingqueue.h"
+#include "kvsubscribe/KafkaProducer.h"
+#include "miutil/blockingqueue.h"
 
 namespace kvalobs {
 namespace service {

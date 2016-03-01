@@ -32,7 +32,7 @@
 
 #include <string>
 #include <thread>
-#include "lib/kvsubscribe/ProducerCommand.h"
+#include "kvsubscribe/ProducerCommand.h"
 
 namespace kvalobs {
 namespace service {
@@ -54,9 +54,9 @@ namespace service {
  *  We can use the helper functions in kvsubscribe/queue.h to get the topics.
  *  there is three methods that is of interest.
  *
- *    - kvalobss::subscribe::queue::raw(const std::string &domain)
- *    - kvalobss::subscribe::queue::decoded(const std::string &domain)
- *    - kvalobss::subscribe::queue::checked(const std::string &domain)
+ *    - kvalobs::subscribe::queue::raw(const std::string &domain)
+ *    - kvalobs::subscribe::queue::decoded(const std::string &domain)
+ *    - kvalobs::subscribe::queue::checked(const std::string &domain)
  *
  *  For the QC applications the function checked(const std::string &domain) is used
  *  to get the topic to checked data.
@@ -70,17 +70,17 @@ namespace service {
  Ex. To start a thread to send data to the checked queue (topic) for the test domain. We have
  a kafka cluster with 4 nodes.
 
- using kvalobss::subscribe::queue::checked;
+ using kvalobs::subscribe::queue::checked;
  KafkaProducerThread checkedProducer;
  string kafkaBrokers("kafka1.met.no,kafka2.met.no,kafka3.met.no,kafka4.met.no");
- checkedProducer.start(kafkaBrokers, checked("test));
+ checkedProducer.start(kafkaBrokers, checked("test"));
 
  // We can now send data with.
  std::list<kvalobs::kvData> dataList=produceData();
  KvDataSerializeCommand *dataCmd = new  KvDataSerializeCommand(dataList);
  checkedProducer.queue.add( dataCmd );
 
- // or use the convenient method  checkedProducer.send( dataCmd )
+ // or use the convenience method  checkedProducer.send( dataCmd )
 
  ~~~~
  */
