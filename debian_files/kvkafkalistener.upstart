@@ -1,5 +1,8 @@
 author "Vegard Bones <vegard.bones@met.no>"
 
+start on stopped rc
+stop on runlevel [016]
+
 setuid kvalobs
 
 respawn
