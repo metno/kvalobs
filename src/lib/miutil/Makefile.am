@@ -33,7 +33,7 @@ libkvalobs_miutil_la_CPPFLAGS = $(AM_CPPFLAGS) $(putools_CFLAGS)  -fPIC
 libkvalobs_miutil_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@ -fPIC
 libkvalobs_miutil_la_LIBADD = \
   $(CURL_LIBS) \
-  $(BOOST_DATE_TIME_LIB)
+  $(BOOST_DATE_TIME_LIB) $(BOOST_SYSTEM_LIB)
 
 miutilincludedir = $(pkgincludedir)/miutil
 miutilinclude_HEADERS = \

@@ -7,5 +7,5 @@ includedir=@includedir@
 Name: libkvalobs_miutil
 Description: kvalobs miutil library
 Version: @VERSION@
-Libs: -L${libdir} -lkvalobs_miutil @BOOST_DATE_TIME_LIB@ -lperl
+Libs: -L${libdir} -lkvalobs_miutil @BOOST_DATE_TIME_LIB@ @BOOST_SYSTEM_LIB@ -lperl
 Cflags: -D_REENTRANT -I${includedir}/@PACKAGE@

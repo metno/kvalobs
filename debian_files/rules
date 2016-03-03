@@ -16,7 +16,7 @@ override_dh_auto_configure: pre-build configure-stamp
 	@true
 
 configure-stamp:
-	autoreconf -i
+#	autoreconf -i
 	./configure --prefix=/usr  \
 	    --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info  \
 	    --localstatedir=/var --sysconfdir=/etc \

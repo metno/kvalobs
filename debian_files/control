@@ -2,7 +2,7 @@ Source: kvalobs
 Section: science
 Priority: extra
 Maintainer: Borge Moe <borge.moe@met.no>
-Build-Depends: debhelper (>= 7.0.50), autotools-dev, g++ (>= 4.4.0), debconf,
+Build-Depends: debhelper (>= 7.0.50), autotools-dev, g++ (>= 4.6.0), debconf,
  devscripts, fakeroot,
  automake, libtool, gfortran (>= 4.4.0), bison (>= 2.3) | bison-1.35, flex (>= 2.5.33),
  sqlite3 (>= 3.6.22), libsqlite3-dev (>= 3.6.22), libpq-dev (>= 8.3),
@@ -21,9 +21,9 @@ Standards-Version: 3.7.3
 Package: kvalobs
 Architecture: any
 Depends: kvalobsuser, adduser, debconf, sqlite3,
- postgresql | postgresql-8.3 | postgresql-8.4 | postgresql-9.0 | postgresql-9.1,
+ postgresql-9.0 | postgresql-9.1 | postgresql-9.2 |postgresql-9.3 |postgresql-9.4|postgresql-9.5,
  python,
- libkvalobs4 (>= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+ libkvalobs5 (>= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Suggests: postgresql-client
 Description: quality control system for meteorological observations
  Kvalobs is a quality control system for meteorological observations.
@@ -43,7 +43,7 @@ Suggests: kvalobs
 Description: Install sql files for creating kvalobs database
  This will install the sql files for installing a kvalobs database.
 
-Package: libkvalobs4
+Package: libkvalobs5
 Section: libs
 Architecture: any
 Depends:  ${shlibs:Depends}, ${misc:Depends}
@@ -51,10 +51,10 @@ Conflicts: libkvalobs (<< 2.7.0~rc3)
 Description: Runtime library for kvalobs clients
  Kvalobs is a quality control system for meteorological observations.
 
-Package: libkvcpp4
+Package: libkvcpp5
 Section: libs
 Architecture: any
-Depends:  libkvalobs4 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Depends:  libkvalobs5 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Conflicts: libkvcpp (<< 2.7.0~rc3)
 Description: Runtime library for kvalobs clients
  Kvalobs is a quality control system for meteorological observations.
@@ -62,7 +62,7 @@ Description: Runtime library for kvalobs clients
 Package: libkvcpp-dev
 Section: libdevel
 Architecture: any
-Depends: libkvcpp4 (= ${binary:Version}), 
+Depends: libkvcpp5 (= ${binary:Version}), 
  libkvsubscribe-dev  (= ${binary:Version}),
  libxml++2.6-dev (>= 2.14.0),
  libboost-dev (>= 1.40.0), libboost-thread-dev (>= 1.40.0),
@@ -85,7 +85,7 @@ Description: Very simple monitoring daemon for kvalobs
 Package: libkvsubscribe0
 Section: libs
 Architecture: any
-Depends: libjsoncpp0, librdkafka, ${shlibs:Depends}, ${misc:Depends} 
+Depends: librdkafka, ${shlibs:Depends}, ${misc:Depends} 
 Description: Subscription library for kvalobs clients
  This allows other programs to pick up changes to data in kvalobs.
  Kvalobs is a quality control system for meteorological observations.
@@ -115,7 +115,7 @@ Description: Client program to send data to a kvalobs server
 Package: kv2kvdatainputd
 Architecture: any
 Depends:  ${shlibs:Depends}, ${misc:Depends},
- libkvalobs4 (>= ${binary:Version})
+ libkvalobs5 (>= ${binary:Version})
 Description: receive data from another kvalobs server
  kv2kvDataInputd listens for data updates from one kvalobs
  instance, strips them so that only the original data are transferred,
