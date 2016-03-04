@@ -1,3 +1,10 @@
+kvalobs (2.8.2-1) UNRELEASED; urgency=medium
+
+  * Changed the "so" version. 
+  
+ -- Borge Moe <borge.moe@met.no>  Fri, 4 Mar 2016 10:00:01 +0100
+
+
 kvalobs (2.8.1-1) UNRELEASED; urgency=medium
 
   * new version, with KafkaKvApp
