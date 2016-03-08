@@ -651,7 +651,9 @@ CREATE TABLE qc2_interpolation_best_neighbors (
        interpolation_id INTEGER NOT NULL,
        fit_offset       FLOAT NOT NULL,
        fit_slope        FLOAT NOT NULL,
-       fit_sigma        FLOAT NOT NULL);
+       fit_sigma        FLOAT NOT NULL,
+       UNIQUE(stationid,neighborid,paramid,interpolation_id)
+);
 
 REVOKE ALL ON qc2_interpolation_best_neighbors FROM public;
 GRANT ALL ON qc2_interpolation_best_neighbors TO kv_admin;
