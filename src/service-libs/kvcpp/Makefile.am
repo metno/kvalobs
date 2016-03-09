@@ -90,6 +90,7 @@ TESTS = gtest
 check_PROGRAMS = gtest
 
 gtest_SOURCES = \
+	test/testKafkaSubcriber.h \
 	test/gtest.cc
 
 gtest_CPPFLAGS = \

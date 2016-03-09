@@ -27,17 +27,18 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "KafkaSubscribe.h"
-#include "../kvevents.h"
-#include <kvsubscribe/DataSubscriber.h>
-#include <decodeutility/kvalobsdata.h>
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_generators.hpp>
-#include <boost/uuid/uuid_io.hpp>
 #include <stdexcept>
 #include <list>
 #include <set>
 #include <mutex>
+#include "boost/uuid/uuid.hpp"
+#include "boost/uuid/uuid_generators.hpp"
+#include "boost/uuid/uuid_io.hpp"
+#include "lib/kvsubscribe/DataSubscriber.h"
+#include "lib/decodeutility/kvalobsdata.h"
+#include "service-libs/kvcpp/kvevents.h"
+#include "service-libs/kvcpp/kafka/KafkaSubscribe.h"
+#include "service-libs/kvcpp/test/testKafkaSubcriber.h"  // header file for the test interface
 
 using namespace kvalobs::subscribe;
 using namespace kvalobs;
@@ -119,6 +120,9 @@ void broadcast(const ::kvalobs::serialize::KvalobsData & d,
                    return st.find(d.stationID()) != st.end();
                  });
   }
+
+  if ( data.empty() && textData.empty() )  // Do not publish empty messages.
+    return;
 
   broadcast(serialize::KvalobsData(data, textData), queue);
 }
@@ -250,5 +254,17 @@ void KafkaSubscribe::run() {
   joinAll();
 }
 
-} /* namespace kafka */
-} /* namespace kvservice */
+namespace test {
+/*
+ * The namespace test is used to export function in the anonymous namespace
+ * so they are available for unit testing. The test interface is defined in
+ * kvcpp/test/testKafkaSubcriber.h.
+ */
+void broadcast(const ::kvalobs::serialize::KvalobsData & d,
+               const KvDataSubscribeInfoHelper &info,
+               dnmi::thread::CommandQue & queue) {
+  kvservice::kafka::broadcast(d, info, queue);
+}
+}  // namespace test
+}  // namespace kafka
+}  // namespace kvservice
