@@ -66,15 +66,15 @@ ServiceApp::ServiceApp(int argn, char **argv, const std::string &driver_,
 
   LOGINFO("Loading driver for database engine <" << driver << ">!\n");
 
-  if (!dbMgr.loadDriver(driver, dbDriverId)) {
+  if (!dnmi::db::DriverManager::loadDriver(driver, dbDriverId)) {
     LOGFATAL(
-        "Can't load driver <" << driver << endl << dbMgr.getErr() << endl << "Check if the driver is in the directory $KVALOBS/lib/db???");
+        "Can't load driver <" << driver << endl << dnmi::db::DriverManager::getErr() << endl << "Check if the driver is in the directory $KVALOBS/lib/db???");
 
     exit(1);
   }
 
   if (setAppNameForDb && !appName.empty())
-    dbMgr.setAppName(appName);
+    dnmi::db::DriverManager::setAppName(appName);
 
   LOGINFO("Driver <" << dbDriverId<< "> loaded!\n");
 
@@ -138,11 +138,11 @@ ServiceApp::getNewDbConnection() {
   boost::mutex::scoped_lock l(mutex);
   Connection *con;
 
-  con = dbMgr.connect(dbDriverId, dbConnect);
+  con = dnmi::db::DriverManager::connect(dbDriverId, dbConnect);
 
   if (!con) {
     LOGERROR(
-        "Can't create a database connection  (" << dbDriverId << ")" << endl << "Connect string: <" << dbConnect << ">" << endl << "Reason: " << dbMgr.getErr() << ".");
+        "Can't create a database connection  (" << dbDriverId << ")" << endl << "Connect string: <" << dbConnect << ">" << endl << "Reason: " << dnmi::db::DriverManager::getErr() << ".");
     return 0;
   }
 
@@ -154,7 +154,7 @@ void ServiceApp::releaseDbConnection(dnmi::db::Connection *con) {
   //ERROR: 13.11.2013 discovered a bug in dnmi::db::DriverManager
   //that implies that it is NOT thread safe.
   boost::mutex::scoped_lock l(mutex);
-  dbMgr.releaseConnection(con);
+  dnmi::db::DriverManager::releaseConnection(con);
 }
 
 bool ServiceApp::shutdown() {

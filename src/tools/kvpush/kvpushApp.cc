@@ -77,8 +77,8 @@ KvPushApp::KvPushApp(int argn, char **argv, const char *options[][2])
 
   dbdriver = pkglibdir + "/db/" + dbdriver;
 
-  if (!dbMgr.loadDriver(dbdriver, dbDriverId)) {
-    cerr << "Can't load driver <" << dbdriver << endl << dbMgr.getErr() << endl
+  if (!dnmi::db::DriverManager::loadDriver(dbdriver, dbDriverId)) {
+    cerr << "Can't load driver <" << dbdriver << endl << dnmi::db::DriverManager::getErr() << endl
          << "Check if '" << dbdriver << "' exist." << endl << endl;
 
     exit(1);
@@ -145,7 +145,7 @@ dnmi::db::Connection*
 KvPushApp::getNewDbConnection() {
   Connection *con;
 
-  con = dbMgr.connect(dbDriverId, dbConnect);
+  con = dnmi::db::DriverManager::connect(dbDriverId, dbConnect);
 
   if (!con) {
     cerr << "Can't create a database connection  (" << dbDriverId << ")" << endl
@@ -158,7 +158,7 @@ KvPushApp::getNewDbConnection() {
 }
 
 void KvPushApp::releaseDbConnection(dnmi::db::Connection *con) {
-  dbMgr.releaseConnection(con);
+  dnmi::db::DriverManager::releaseConnection(con);
 }
 
 void KvPushApp::getOpt(int argn, char **argv, Options &opt) {

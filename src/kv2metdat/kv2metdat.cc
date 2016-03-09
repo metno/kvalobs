@@ -97,15 +97,14 @@ int main(int argc, char** argv) {
   string driveID;
 
   Connection *con;
-  DriverManager manager;
 
-  if (!manager.loadDriver(driver, driveID)) {
-    cerr << "Can't load driver <" << driver << ">\n" << manager.getErr()
+  if (!dnmi::db::DriverManager::loadDriver(driver, driveID)) {
+    cerr << "Can't load driver <" << driver << ">\n" << dnmi::db::DriverManager::getErr()
          << endl;
     return 1;
   }
 
-  con = manager.connect(driveID, constr);
+  con = dnmi::db::DriverManager::connect(driveID, constr);
 
   if (!con) {
     cerr << "Can't create connection to <" << driveID << ">" << endl;

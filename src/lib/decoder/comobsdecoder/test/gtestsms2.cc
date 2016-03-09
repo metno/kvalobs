@@ -69,7 +69,6 @@ class Sms2DecodeTest : public testing::Test {
 
  protected:
   string dbId;
-  DriverManager dbMgr;
   string testdir;
   string dbdir;
   string decoderBaseTestDir;
@@ -83,11 +82,11 @@ class Sms2DecodeTest : public testing::Test {
     decoderBaseTestDir = DECODERBASE_TESTDIR;
 
     if (dbId.empty())
-      ASSERT_TRUE( dbMgr.loadDriver( dbdir+"/dummydriver.so", dbId ) )<<
+      ASSERT_TRUE(DriverManager::loadDriver(dbdir+"/dummydriver.so", dbId))<<
       "Failed to load Db driver.";
 
     if (paramList.empty())
-      ASSERT_TRUE( ReadParamsFromFile( decoderBaseTestDir+"/kvparams.csv", paramList ) )<<
+      ASSERT_TRUE(ReadParamsFromFile(decoderBaseTestDir+"/kvparams.csv", paramList))<<
       "Cant read params from the file <" << decoderBaseTestDir+"/kvparams.csv" << ">.";
     }
 
@@ -227,7 +226,7 @@ kvalobs::decodeutil::DecodedData*
 Sms2DecodeTest::runtest(const ParamList &paramList,
                         const std::list<kvalobs::kvTypes> typesList,
                         const SmsMelding &melding, const miTime &nowTime) {
-  dnmi::db::Connection *dummyCon = dbMgr.connect(dbId, "");
+  dnmi::db::Connection *dummyCon = dnmi::db::DriverManager::connect(dbId, "");
   FakeComobsDecoder *fakeComobsDecoder;
   string fcontent;
   miTime obst;
@@ -309,7 +308,7 @@ kvalobs::decodeutil::DecodedData*
 Sms2DecodeTest::runtestOnFile(const ParamList &paramList,
                               const std::list<kvalobs::kvTypes> typesList,
                               const dnmi::file::File &file) {
-  dnmi::db::Connection *dummyCon = dbMgr.connect(dbId, "");
+  dnmi::db::Connection *dummyCon = dnmi::db::DriverManager::connect(dbId, "");
   FakeComobsDecoder *fakeComobsDecoder;
 
   SmsMelding *smsmsg;

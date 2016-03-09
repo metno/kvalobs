@@ -99,7 +99,6 @@ class DataSrcApp : public KvBaseApp {
 
   static boost::regex reMessageid;
   kvalobs::decoder::DecoderMgr decoderMgr;
-  dnmi::db::DriverManager dbMgr;
   bool ok;
   std::string connectStr;
   std::string dbDriver;

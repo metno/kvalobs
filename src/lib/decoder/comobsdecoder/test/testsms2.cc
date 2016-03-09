@@ -63,7 +63,6 @@ boost::thread_specific_ptr<kvalobs::decoder::RedirectInfo> ptrRedirect;
 }
 
 string dbId;
-DriverManager dbMgr;
 string testdir(TESTDIR);
 
 int main(int argn, char **argv) {
@@ -74,11 +73,11 @@ int main(int argn, char **argv) {
   string inFile;
 
   cerr << "TESTDIR: " << testdir << endl;
-  if (dbMgr.loadDriver("./src/lib/dbdrivers/.libs/dummydriver.so", dbId)) {
+  if (DriverManager::loadDriver("./src/lib/dbdrivers/.libs/dummydriver.so", dbId)) {
     cerr << "Db driver loaded: " << dbId << endl;
   } else {
     cerr << "Failed to laod db driver for: dummydriver. Reason: "
-         << dbMgr.getErr() << endl;
+         << DriverManager::getErr() << endl;
     return 1;
   }
 
@@ -120,7 +119,7 @@ int main(int argn, char **argv) {
 void runtestOnFile(const ParamList &paramList,
                    const std::list<kvalobs::kvTypes> typesList,
                    const dnmi::file::File &file) {
-  dnmi::db::Connection *dummyCon = dbMgr.connect(dbId, "");
+  dnmi::db::Connection *dummyCon = DriverManager::connect(dbId, "");
   FakeComobsDecoder *fakeComobsDecoder;
 
   SmsMelding *smsmsg;

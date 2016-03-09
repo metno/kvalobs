@@ -28,11 +28,14 @@
  with KVALOBS; if not, write to the Free Software Foundation Inc., 
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#ifndef __dnmi__db_dbdrivermgr_h__
-#define __dnmi__db_dbdrivermgr_h__
+#ifndef SRC_LIB_KVDB_DBDRIVERMGR_H_
+#define SRC_LIB_KVDB_DBDRIVERMGR_H_
 
-#include <fileutil/dso.h>
-#include <kvdb/kvdb.h>
+#include <mutex>
+#include <string>
+#include <list>
+#include "fileutil/dso.h"
+#include "kvdb/kvdb.h"
 
 namespace dnmi {
 namespace db {
@@ -131,43 +134,14 @@ class DriverBase {
  * The DriverManager is NOT thread safe. Bugzilla: #1368
  *
  */
-class DriverManager {
-  struct Driver {
-    DriverBase *driver;
-    void (*releaseDriverFunc)(dnmi::db::DriverBase*);
-    dnmi::file::DSO *dso;
 
-    Driver(DriverBase *driver_, void (*pf)(dnmi::db::DriverBase*),
-           dnmi::file::DSO *dso_)
-        : driver(driver_),
-          releaseDriverFunc(pf),
-          dso(dso_) {
-    }
-    ~Driver() {
-      releaseDriverFunc(driver);
-      delete dso;
-    }
-  };
+namespace DriverManager {
 
-  typedef std::list<Driver*> DriverList;
-  typedef std::list<Driver*>::iterator IDriverList;
-  typedef std::list<Driver*>::const_iterator CIDriverList;
+std::string fixDriverName(const std::string &driver);
 
-  DriverList drivers;
-  std::string err;
-  std::string appName;
-  std::string soVersion;
-
- public:
-  DriverManager();
-  DriverManager(const std::string &appName);
-  ~DriverManager();
-
-  std::string fixDriverName(const std::string &driver);
-
-  void setAppName(const std::string &appName);
-  std::string getAppName() const;
-  bool loadDriver(const std::string &driver, std::string &driverId);
+void setAppName(const std::string &appName);
+std::string getAppName();
+bool loadDriver(const std::string &driver, std::string &driverId);
 
   /**
    * Create a connection to a database through the driver given with 
@@ -179,29 +153,27 @@ class DriverManager {
    * \return 0 if a connection could'nt be created, otherwise
    *         the connection.
    */
-  Connection *connect(const std::string &driverId, const std::string &connect);
+Connection *connect(const std::string &driverId, const std::string &connect);
 
   /**
    * release a connection previously created with connect.
    * 
    * \return true if the connection is released, false otherwise.
    */
-  bool releaseConnection(Connection *con);
+bool releaseConnection(Connection *con);
 
   /**
    * get a list of all drivers that is known by the driverManager.
    */
-  std::list<std::string> listDrivers() const;
+std::list<std::string> listDrivers();
 
   /**
    * getErr can  be used to get a error message if a method fails.
    */
-  std::string getErr() const {
-    return err;
-  }
-};
+std::string getErr();
+}  // namespace DriverManager
 
 /** @} */
-}
-}
-#endif
+}  // namespace db
+}  // namespace dnmi
+#endif  // SRC_LIB_KVDB_DBDRIVERMGR_H_

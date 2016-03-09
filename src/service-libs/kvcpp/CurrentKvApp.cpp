@@ -109,17 +109,15 @@ std::string getValue(const std::string & key, std::shared_ptr<miutil::conf::Conf
   return val.front().valAsString();
 }
 
-static dnmi::db::DriverManager dbMgr;
-
 dnmi::db::Connection * createConnection(std::shared_ptr<miutil::conf::ConfSection> conf) {
   std::string connectString = getValue("database.dbconnect", conf);
   std::string driver = kvalobs::kvPath(kvalobs::libdir) + "/kvalobs/db/" + getValue("database.dbdriver", conf);
 
   std::string driverId;
-  if (!dbMgr.loadDriver(driver, driverId))
+  if (!dnmi::db::DriverManager::loadDriver(driver, driverId))
     throw std::runtime_error("Unable to load driver " + driver);
 
-  dnmi::db::Connection * connection = dbMgr.connect(driverId, connectString);
+  dnmi::db::Connection * connection = dnmi::db::DriverManager::connect(driverId, connectString);
   if (!connection or not connection->isConnected())
     throw std::runtime_error("Unable to connect to database");
   return connection;
@@ -133,7 +131,7 @@ std::function<Connection*()> connector(int argc, char ** argv, std::shared_ptr<m
 }
 
 void releaseConnection(dnmi::db::Connection * connection) {
-  dbMgr.releaseConnection(connection);
+  dnmi::db::DriverManager::releaseConnection(connection);
 }
 
 std::string kafkaDomain(int argc, char **argv, std::shared_ptr<miutil::conf::ConfSection> preferredConfig) {

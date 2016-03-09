@@ -70,7 +70,6 @@ class DecoderBaseTest : public testing::Test {
  protected:
   string dbId;
   string testdb;
-  DriverManager dbMgr;
   dc::DecoderMgr decoderMgr;
   string testdir;
   string dbdir;
@@ -89,8 +88,8 @@ class DecoderBaseTest : public testing::Test {
     decoderMgr.updateDecoders();
 
     if (dbId.empty()) {
-      ASSERT_TRUE( dbMgr.loadDriver( dbdir+"/sqlite3driver.so", dbId ) )<<
-      "Failed to load Db driver. Reason: " << dbMgr.getErr();
+      ASSERT_TRUE(dnmi::db::DriverManager::loadDriver(dbdir+"/sqlite3driver.so", dbId))<<
+      "Failed to load Db driver. Reason: " << dnmi::db::DriverManager::getErr();
     }
 
     if (paramList.empty()) {
@@ -126,7 +125,7 @@ TEST_F( DecoderBaseTest, useinfo7 ) {
 
   types.push_back(kvTypes(1, "", 60, 60, "I", "h", "For test"));
 
-  dnmi::db::Connection *con = dbMgr.connect(dbId, testdb);
+  dnmi::db::Connection *con = dnmi::db::DriverManager::connect(dbId, testdb);
 
   ASSERT_TRUE( con != 0 )<< "Cant open database connection: " << testdb << ".";
 

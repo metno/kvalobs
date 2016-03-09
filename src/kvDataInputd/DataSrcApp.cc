@@ -156,15 +156,15 @@ int DataSrcApp::registerDb(int nConn) {
   string drvId;
   int n = 0;
 
-  LOGINFO("registerDb: loading driver <" << dbMgr.fixDriverName(driver) << ">!\n");
+  LOGINFO("registerDb: loading driver <" << dnmi::db::DriverManager::fixDriverName(driver) << ">!\n");
 
-  if (!dbMgr.loadDriver(driver, drvId)) {
-    LOGFATAL(dbMgr.getErr());
+  if (!dnmi::db::DriverManager::loadDriver(driver, drvId)) {
+    LOGFATAL(dnmi::db::DriverManager::getErr());
     return 0;
   }
 
   if (setAppNameForDb && !appName.empty())
-    dbMgr.setAppName(appName);
+    dnmi::db::DriverManager::setAppName(appName);
 
   LOGINFO("registerDb: Driver <" << drvId<< "> loaded!\n");
 
@@ -172,10 +172,10 @@ int DataSrcApp::registerDb(int nConn) {
     Connection *con = 0;
 
     while (!con && !inShutdown()) {
-      con = dbMgr.connect(drvId, connectStr);
+      con = dnmi::db::DriverManager::connect(drvId, connectStr);
 
       if (!con) {
-        LOGFATAL("registerDb: Can't create connection to <" << drvId << ">\n ERROR message: " << dbMgr.getErr());
+        LOGFATAL("registerDb: Can't create connection to <" << drvId << ">\n ERROR message: " << dnmi::db::DriverManager::getErr());
         sleep(1);
       } else {
         conCache.addConnection(con);

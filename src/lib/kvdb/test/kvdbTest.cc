@@ -49,10 +49,9 @@ TEST_F( kvdbTest, fixeDriverName ) {
   if (i != string::npos)
     soVersion.erase(i);
 
-  DriverManager mgr;
 
   string driver("pgdriver.so");
-  string res = mgr.fixDriverName(driver);
+  string res = dnmi::db::DriverManager::fixDriverName(driver);
 
   s << dir << "/pgdriver.so." << soVersion;
 
@@ -62,43 +61,43 @@ TEST_F( kvdbTest, fixeDriverName ) {
   EXPECT_TRUE( s.str() == res ) << "test1";
 
   driver = "pgdriver";
-  res = mgr.fixDriverName(driver);
+  res = dnmi::db::DriverManager::fixDriverName(driver);
 
   EXPECT_TRUE( s.str() == res ) << "test2";
 
   driver = "pgdriver.";
-  res = mgr.fixDriverName(driver);
+  res = dnmi::db::DriverManager::fixDriverName(driver);
 
   EXPECT_FALSE( s.str() == res ) << "test3";
 
   s.str("");
   driver = "/a/dir/pgdriver.so";
-  res = mgr.fixDriverName(driver);
+  res = dnmi::db::DriverManager::fixDriverName(driver);
   s << "/a/dir/pgdriver.so." << soVersion;
   EXPECT_TRUE( s.str() == res ) << "test4";
 
   s.str("");
   s << "a/dir/pgdriver.so." << soVersion;
   driver = "a/dir/pgdriver.so";
-  res = mgr.fixDriverName(driver);
+  res = dnmi::db::DriverManager::fixDriverName(driver);
   EXPECT_TRUE( s.str() == res ) << "test5";
 
   s.str("");
   s << "a/dir/pgdriver.so." << soVersion;
   driver = "a/dir/pgdriver.so.1";
-  res = mgr.fixDriverName(driver);
+  res = dnmi::db::DriverManager::fixDriverName(driver);
   EXPECT_TRUE( s.str() == res ) << "test6";
 
   s.str("");
   s << "a/dir/pgdriver.so." << soVersion;
   driver = "a/dir/pgdriver.so.1.2";
-  res = mgr.fixDriverName(driver);
+  res = dnmi::db::DriverManager::fixDriverName(driver);
   EXPECT_TRUE( s.str() == res ) << "test7";
 
   s.str("");
   s << dir << "/pgdriver.so." << soVersion;
   driver = "pgdriver.so.1.2";
-  res = mgr.fixDriverName(driver);
+  res = dnmi::db::DriverManager::fixDriverName(driver);
   EXPECT_TRUE( s.str() == res ) << "test7";
 }
 

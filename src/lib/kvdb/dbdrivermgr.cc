@@ -35,30 +35,51 @@
 
 using namespace std;
 
-dnmi::db::DriverManager::DriverManager() {
-}
 
-dnmi::db::DriverManager::DriverManager(const std::string &appName_)
-    : appName(appName_) {
-}
+namespace dnmi {
+namespace db {
 
-dnmi::db::DriverManager::~DriverManager() {
-  IDriverList it = drivers.begin();
 
-  for (; it != drivers.end(); it++)
-    delete *it;
+namespace {
 
-}
+struct Driver {
+  DriverBase *driver;
+  void (*releaseDriverFunc)(dnmi::db::DriverBase*);
+  dnmi::file::DSO *dso;
 
-void dnmi::db::DriverManager::setAppName(const std::string &appName_) {
+  Driver(DriverBase *driver_, void (*pf)(DriverBase*), dnmi::file::DSO *dso_)
+  : driver(driver_),
+    releaseDriverFunc(pf),
+    dso(dso_) {
+  }
+  ~Driver() {
+    releaseDriverFunc(driver);
+    delete dso;
+  }
+};
+
+typedef std::list<Driver*> DriverList;
+typedef std::list<Driver*>::iterator IDriverList;
+typedef std::list<Driver*>::const_iterator CIDriverList;
+
+DriverList drivers;
+thread_local std::string err;
+std::string appName;
+std::string soVersion;
+std::mutex mutex;
+}  // namespace
+
+namespace DriverManager {
+
+void setAppName(const std::string &appName_) {
   appName = appName_;
 }
 
-std::string dnmi::db::DriverManager::getAppName() const {
+std::string getAppName() {
   return appName;
 }
 
-std::string dnmi::db::DriverManager::fixDriverName(const std::string &driver_) {
+std::string fixDriverName(const std::string &driver_) {
   string driver(driver_);
   std::string dir(PKGLIB_DBDIR);
 
@@ -99,8 +120,8 @@ std::string dnmi::db::DriverManager::fixDriverName(const std::string &driver_) {
   return driver;
 }
 
-bool dnmi::db::DriverManager::loadDriver(const std::string &driver_,
-                                         std::string &driverId) {
+bool loadDriver(const std::string &driver_,
+                std::string &driverId) {
   using namespace dnmi::file;
   string driver(fixDriverName(driver_));
   DriverBase *d;
@@ -108,6 +129,8 @@ bool dnmi::db::DriverManager::loadDriver(const std::string &driver_,
   DSO *dso = 0;
 
   driverId.clear();
+
+  std::lock_guard<std::mutex> lock(mutex);
 
   try {
     dso = new DSO(fixDriverName(driver));
@@ -139,8 +162,8 @@ bool dnmi::db::DriverManager::loadDriver(const std::string &driver_,
     releaseSQLDriver = (void (*)(
         dnmi::db::DriverBase*))(*dso)["releaseSQLDriver"];
 
-createSQLDriver    = (dnmi::db::DriverBase* (*)())(*dso)["createSQLDriver"];d
-    = createSQLDriver();
+    createSQLDriver  = (dnmi::db::DriverBase* (*)())(*dso)["createSQLDriver"];
+    d = createSQLDriver();
 
     if (!d)
       throw std::bad_alloc();
@@ -190,10 +213,12 @@ createSQLDriver    = (dnmi::db::DriverBase* (*)())(*dso)["createSQLDriver"];d
 }
 
 dnmi::db::Connection*
-dnmi::db::DriverManager::connect(const std::string &driverId,
+connect(const std::string &driverId,
                                  const std::string &connect_) {
   std::string connect(connect_);
   dnmi::db::Connection *con;
+
+  std::lock_guard<std::mutex> lock(mutex);
 
   IDriverList it = drivers.begin();
 
@@ -223,7 +248,9 @@ dnmi::db::DriverManager::connect(const std::string &driverId,
   return con;
 }
 
-bool dnmi::db::DriverManager::releaseConnection(Connection *con) {
+bool releaseConnection(Connection *con) {
+  std::lock_guard<std::mutex> lock(mutex);
+
   IDriverList it = drivers.begin();
 
   for (; it != drivers.end(); it++) {
@@ -246,7 +273,8 @@ bool dnmi::db::DriverManager::releaseConnection(Connection *con) {
   return (*it)->driver->releaseConnection(con);
 }
 
-std::list<std::string> dnmi::db::DriverManager::listDrivers() const {
+std::list<std::string> listDrivers() {
+  std::lock_guard<std::mutex> lock(mutex);
   std::list<std::string> list;
   CIDriverList it = drivers.begin();
 
@@ -256,3 +284,9 @@ std::list<std::string> dnmi::db::DriverManager::listDrivers() const {
   return list;
 }
 
+std::string getErr() {
+    return err;
+}
+}  // namespace DriverManager
+}  // namespace db
+}  // namespace dnmi

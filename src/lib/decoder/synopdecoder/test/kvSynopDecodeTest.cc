@@ -80,7 +80,6 @@ class SynopDecodeTest : public testing::Test {
  protected:
   string dbId;
   string testdb;
-  DriverManager dbMgr;
   dc::DecoderMgr decoderMgr;
   string decoderBaseTestDir;
   string testdir;
@@ -101,8 +100,8 @@ class SynopDecodeTest : public testing::Test {
     decoderMgr.updateDecoders();
 
     if (dbId.empty()) {
-      ASSERT_TRUE( dbMgr.loadDriver( dbdir+"/sqlite3driver.so", dbId ) )<<
-      "Failed to load Db driver. Reason: " << dbMgr.getErr();
+      ASSERT_TRUE( dnmi::db::DriverManager::loadDriver( dbdir+"/sqlite3driver.so", dbId ) )<<
+      "Failed to load Db driver. Reason: " << dnmi::db::DriverManager::getErr();
     }
 
     if (paramList.empty()) {
@@ -149,7 +148,7 @@ class SynopDecodeTest : public testing::Test {
   }
   void setUpDb() {
     unlink( TESTDB );
-    dnmi::db::Connection *con = dbMgr.connect( dbId, testdb );
+    dnmi::db::Connection *con = dnmi::db::DriverManager::connect( dbId, testdb );
     ASSERT_TRUE( con != 0 )<< "Cant open database connection: " << testdb << ".";
     //ASSERT_NO_THROW( con->exec( schemaKvStation ) ) << "DB: cant create table 'stations'.";
     //cerr << stations << endl;
@@ -433,7 +432,7 @@ TEST_F( SynopDecodeTest, getHsInMeter ) {
   dc::DecoderBase *dec;
   kvalobs::decoder::synop::SynopDecoder *synopDecoder;
 
-  dnmi::db::Connection *con = dbMgr.connect(dbId, testdb);
+  dnmi::db::Connection *con = dnmi::db::DriverManager::connect(dbId, testdb);
   ASSERT_TRUE( con )<< "Cant open database connection: " << string(testdb) << ".";
   createConfSection("kvDataInputd", decoderName, conf);
 

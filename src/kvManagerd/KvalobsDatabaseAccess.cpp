@@ -46,20 +46,19 @@ using boost::posix_time::hours;
 using boost::posix_time::minutes;
 
 namespace {
-dnmi::db::DriverManager dbMgr;
 
 dnmi::db::Connection * createConnection(const std::string & databaseConnect) {
   static std::string driverId;
   if (driverId.empty()) {
     std::string driver = kvalobs::kvPath(kvalobs::libdir)
         + "/kvalobs/db/pgdriver.so";
-    if (!dbMgr.loadDriver(driver, driverId))
+    if (!dnmi::db::DriverManager::loadDriver(driver, driverId))
       throw std::runtime_error("Unable to load driver " + driver);
   }
 
-  dnmi::db::Connection * conn = dbMgr.connect(driverId, databaseConnect);
+  dnmi::db::Connection * conn = dnmi::db::DriverManager::connect(driverId, databaseConnect);
   if (!conn)
-    throw std::runtime_error(dbMgr.getErr());
+    throw std::runtime_error(dnmi::db::DriverManager::getErr());
   return conn;
 }
 }  // namespace
@@ -69,7 +68,7 @@ KvalobsDatabaseAccess::KvalobsDatabaseAccess(const std::string & connectString)
 }
 
 KvalobsDatabaseAccess::~KvalobsDatabaseAccess() {
-  dbMgr.releaseConnection(connection_);
+  dnmi::db::DriverManager::releaseConnection(connection_);
 }
 
 KvalobsDatabaseAccess::MissingList KvalobsDatabaseAccess::findAllMissing(

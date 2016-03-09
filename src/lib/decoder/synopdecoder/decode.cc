@@ -184,15 +184,14 @@ bool readStationsFromKvalobs(list<kvalobs::kvStation> &stat) {
       "host=seca dbname=kvalobs user=kvalobs password=kvalobs12 port=5434");
 
   Connection *con;
-  DriverManager manager;
 
-  if (!manager.loadDriver(driver, driveID)) {
-    cerr << "Can't load driver <" << driver << ">" << endl << manager.getErr()
+  if (!DriverManager::loadDriver(driver, driveID)) {
+    cerr << "Can't load driver <" << driver << ">" << endl << DriverManager::getErr()
          << endl;
     return false;
   }
 
-  con = manager.connect(driveID, constr);
+  con = DriverManager::connect(driveID, constr);
 
   if (!con) {
     cerr << "Can't create connection to <" << driveID << endl;
@@ -207,7 +206,7 @@ bool readStationsFromKvalobs(list<kvalobs::kvStation> &stat) {
 
   gate.select(stat);
 
-  manager.releaseConnection(con);
+  DriverManager::releaseConnection(con);
   return true;
 
 }

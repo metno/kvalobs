@@ -45,7 +45,6 @@ class ServiceApp : public KvApp {
   enum {
     MAX_CLIENTS = 10000
   };
-  dnmi::db::DriverManager dbMgr;
   std::string dbDriver;
   std::string dbConnect;
   std::string dbDriverId;

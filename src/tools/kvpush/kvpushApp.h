@@ -83,7 +83,6 @@ struct Options {
 std::ostream& operator<<(std::ostream &ost, const Options &opt);
 
 class KvPushApp : public KvApp {
-  dnmi::db::DriverManager dbMgr;
   std::string dbConnect;
   std::string dbDriverId;
 
