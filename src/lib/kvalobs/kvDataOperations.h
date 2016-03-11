@@ -35,6 +35,9 @@
 #include <functional>
 
 namespace kvalobs {
+
+class kvStationInfo;
+
 /**
  * \brief Have we got a legal corrected value?
  */
@@ -101,6 +104,8 @@ class kvDataFactory {
    * the given input.
    */
   explicit kvDataFactory(const kvData & data);
+
+  explicit kvDataFactory(kvalobs::kvStationInfo & stInfo);
 
   /**
    * Get a missing parameter for the given observation.

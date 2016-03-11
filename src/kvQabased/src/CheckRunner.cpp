@@ -140,7 +140,7 @@ void logTransaction(bool ok, double start, int shortRetries, int longRetries,
 }
 }
 
-CheckRunner::DataListPtr CheckRunner::newObservation(
+CheckRunner::KvalobsDataPtr CheckRunner::newObservation(
   const kvalobs::kvStationInfo & obs, std::ostream * scriptLog) {
   const int shortSleep = 100;
   const int longSleep = 300;
@@ -156,7 +156,10 @@ CheckRunner::DataListPtr CheckRunner::newObservation(
 
   if (not shouldRunAnyChecks(obs)) {
     LOGDEBUG("Will not run any checks on observation: " << obs);
-    return DataListPtr(new DataList);
+    // KvalobsDatabaseAccess requires a transaction to be running, but since
+    // we are merely reading data we don't bother to commit
+    AutoRollbackTransaction transaction(*db_);
+    return db_->complete(obs);
   }
 
   LOGINFO("Checking " << obs);
@@ -179,7 +182,7 @@ CheckRunner::DataListPtr CheckRunner::newObservation(
         try {
           for (int i = 0; i < 256; ++i) {
             try {
-              DataListPtr ret = checkObservation(obs, scriptLog);
+              KvalobsDataPtr ret = checkObservation(obs, scriptLog);
               logTransaction(true, start, nShortRetries, nLongRetries, aborted);
               return ret;
             } catch (dnmi::db::SQLSerializeError &) {
@@ -196,7 +199,7 @@ CheckRunner::DataListPtr CheckRunner::newObservation(
     }
 
     // final attempt:
-    DataListPtr ret = checkObservation(obs, scriptLog);
+    KvalobsDataPtr ret = checkObservation(obs, scriptLog);
     logTransaction(true, start, nShortRetries, nLongRetries, aborted);
     return ret;
   } catch (dnmi::db::SQLSerializeError & e) {
@@ -209,7 +212,9 @@ CheckRunner::DataListPtr CheckRunner::newObservation(
     LOGERROR("Unexpected error in newObservation: " << e.what());
     throw;
   }
-  return DataListPtr(new DataList);  // never reached
+  // never reached:
+  AutoRollbackTransaction transaction(*db_);
+  return db_->complete(obs);
 }
 
 bool CheckRunner::shouldMarkStartAndStop_() {
@@ -217,7 +222,7 @@ bool CheckRunner::shouldMarkStartAndStop_() {
   return qcxFilter_.empty();
 }
 
-CheckRunner::DataListPtr CheckRunner::checkObservation(
+CheckRunner::KvalobsDataPtr CheckRunner::checkObservation(
     const kvalobs::kvStationInfo & obs, std::ostream * scriptLog) {
   db::CachedDatabaseAccess cdb(db_.get(), obs);
   db::DelayedSaveDatabaseAccess db(&cdb);
@@ -249,7 +254,7 @@ CheckRunner::DataListPtr CheckRunner::checkObservation(
 
   if (haveAnyHqcCorrectedElements(observationData)) {
     LOGINFO("Observation is HQC-modified. Will not run tests on this");
-    return DataListPtr(new DataList);
+    return db.complete(obs, observationData);
   }
 
   if (qcxFilter_.empty()) {
@@ -317,8 +322,7 @@ CheckRunner::DataListPtr CheckRunner::checkObservation(
     }
   }
 
-  DataListPtr ret(
-      new DataList(db.uncommitted().begin(), db.uncommitted().end()));
+  DataList dl(db.uncommitted().begin(), db.uncommitted().end());
 
   if (scriptLog and not db.uncommitted().empty()) {
     (*scriptLog) << "Saving " << db.uncommitted().size()
@@ -329,6 +333,7 @@ CheckRunner::DataListPtr CheckRunner::checkObservation(
     (*scriptLog) << std::endl;
   }
 
+  auto ret = db.complete(obs, dl);
   transaction.commit();
   return ret;
 }

@@ -33,10 +33,12 @@
 #include <CheckRunner.h>
 #include <scriptcreate/DataStore.h>
 #include <scriptrunner/Script.h>
+#include <decodeutility/kvalobsdata.h>
 #include <kvalobs/kvDataOperations.h>
 #include <boost/scoped_ptr.hpp>
 #include <boost/assign/list_of.hpp>
 #include <algorithm>
+#include <list>
 
 using qabase::CheckRunner;
 
@@ -68,6 +70,20 @@ class CheckRunnerTest : public testing::Test {
   kvalobs::kvStationInfo observation;
   kvalobs::kvDataFactory factory;
 };
+
+namespace {
+  bool isSimilar(const CheckRunner::DataList & a, const CheckRunner::DataList & b) {
+    if (a.size() != b.size())
+      return false;
+    for (const kvalobs::kvData & d : a) {
+      auto func = std::bind1st(kvalobs::compare::exactly_equal_ex_tbtime(), d);
+      auto other = std::find_if(b.begin(), b.end(), func);
+      if (other == b.end())
+        return false;
+    }
+    return true;
+  }
+}  // namespace
 
 TEST_F(CheckRunnerTest, test) {
   runner->newObservation(observation);
@@ -170,6 +186,34 @@ TEST_F(CheckRunnerTest, uncheckedObservationDataUpdatesUseinfo) {
   EXPECT_EQ(expectedData.useinfo(), returnFromScript.useinfo());
 }
 
+TEST_F(CheckRunnerTest, forwardsAggregatedData) {
+  using namespace testing;
+  kvalobs::kvStationInfo stInfo(10, factory.obstime(), -308);
+  kvalobs::kvDataFactory factory2(stInfo);
+
+
+  db::DatabaseAccess::DataList dataFromDatabase = {
+      factory2.getData(6.0, 110)
+  };
+  auto databaseData = std::make_shared<kvalobs::serialize::KvalobsData>(dataFromDatabase);
+
+  db::DatabaseAccess::DataList emptyDataList;
+  EXPECT_CALL(*database, getData(_, observation, qabase::DataRequirement::Parameter("RR_24"), 0))
+      .Times(0);
+  EXPECT_CALL(*database, getData(_, observation, qabase::DataRequirement::Parameter("TAM_24"), 0))
+      .Times(0);
+  EXPECT_CALL(*database, write(_)).Times(0);
+  EXPECT_CALL(*database, complete(stInfo, _, _))
+      .Times(AtLeast(1)).WillRepeatedly(Return(databaseData));
+
+  CheckRunner::KvalobsDataPtr modifiedList = runner->newObservation(stInfo);
+
+  std::list<kvalobs::kvData> data;
+  modifiedList->getData(data);
+  ASSERT_EQ(1u, data.size());
+  EXPECT_EQ(data.front(), dataFromDatabase.front());
+}
+
 TEST_F(CheckRunnerTest, skipsHqcCorrectedData) {
   using namespace testing;
 
@@ -184,7 +228,10 @@ TEST_F(CheckRunnerTest, skipsHqcCorrectedData) {
       .Times(AtLeast(1));
   EXPECT_CALL(*database, write(_)).Times(0);
 
-  runner->newObservation(observation);
+  CheckRunner::KvalobsDataPtr modifiedList = runner->newObservation(observation);
+  std::list<kvalobs::kvData> data;
+  modifiedList->getData(data);
+  EXPECT_TRUE(isSimilar(dataFromDatabase, data));
 }
 
 TEST_F(CheckRunnerTest, reusesResultsFromOtherChecks) {

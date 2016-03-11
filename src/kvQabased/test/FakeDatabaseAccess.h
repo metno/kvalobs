@@ -69,6 +69,8 @@ class FakeDatabaseAccess : public db::DatabaseAccess {
                            const qabase::DataRequirement::Parameter & parameter,
                            int minuteOffset) const;
 
+  virtual KvalobsDataPtr complete(const kvalobs::kvStationInfo & si, const DataList & d = DataList(), const TextDataList & td = TextDataList()) const;
+
   virtual void write(const DataList & data);
 
   virtual kvalobs::kvStationInfo * selectDataForControl();

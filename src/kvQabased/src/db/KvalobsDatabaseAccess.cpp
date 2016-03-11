@@ -31,8 +31,11 @@
 #include "databaseResultFilter.h"
 #include <kvdb/dbdrivermgr.h>
 #include <kvalobs/kvPath.h>
+#include <kvalobs/kvDataOperations.h>
+#include <kvalobs/kvTextDataOperations.h>
 #include <milog/milog.h>
 #include <miutil/timeconvert.h>
+#include <decodeutility/kvalobsdata.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <iomanip>
@@ -40,7 +43,7 @@
 namespace db {
 namespace {
 typedef boost::scoped_ptr<dnmi::db::Result> ResultPtr;
-}
+}  // namespace
 
 class KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection {
  public:
@@ -413,6 +416,48 @@ void KvalobsDatabaseAccess::getTextData(
   out->swap(data);
 }
 
+namespace {
+std::string query(const kvalobs::kvStationInfo & si, const std::string & table) {
+  std::ostringstream query;
+  query << "SELECT * FROM " << table << " WHERE stationid=" << si.stationID() <<
+      " AND typeid=" << si.typeID() <<
+      " AND obstime='" << to_kvalobs_string(si.obstime()) << "';";
+  milog::LogContext context("query");
+  LOGDEBUG1(query.str());
+  return query.str();
+}
+}  // namespace
+
+void KvalobsDatabaseAccess::complete_(const kvalobs::kvStationInfo & si, DataList * out) const {
+  ResultPtr result(connection_->execQuery(query(si, "data")));
+  while (result->hasNext()) {
+    kvalobs::kvData d(result->next());
+    auto func = std::bind1st(kvalobs::compare::same_obs_and_parameter(), d);
+    auto previous = std::find_if(out->begin(), out->end(), func);
+    if (previous == out->end())
+      out->push_back(d);
+  }
+}
+
+void KvalobsDatabaseAccess::complete_(const kvalobs::kvStationInfo & si, TextDataList * out) const {
+  ResultPtr result(connection_->execQuery(query(si, "text_data")));
+  while (result->hasNext()) {
+    kvalobs::kvTextData d(result->next());
+    auto func = std::bind1st(kvalobs::compare::kvTextData_same_obs_and_parameter(), d);
+    auto previous = std::find_if(out->begin(), out->end(), func);
+    if (previous == out->end())
+      out->push_back(d);
+  }
+}
+
+KvalobsDatabaseAccess::KvalobsDataPtr KvalobsDatabaseAccess::complete(const kvalobs::kvStationInfo & si, const DataList & d, const TextDataList & td) const {
+  DataList dl = d;
+  complete_(si, & dl);
+  TextDataList tdl = td;
+  complete_(si, & tdl);
+  return std::make_shared<kvalobs::serialize::KvalobsData>(dl, tdl);
+}
+
 void KvalobsDatabaseAccess::write(const DataList & data) {
 #ifdef QABASE_NO_SAVE
   LOGINFO("Pretending to save " << data.size() << " elements to database");
@@ -496,4 +541,4 @@ dnmi::db::Connection * KvalobsDatabaseAccess::createConnection(
   return conn;
 }
 
-}
+}  // namespace db

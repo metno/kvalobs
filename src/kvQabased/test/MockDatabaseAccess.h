@@ -54,6 +54,8 @@ class MockDatabaseAccess : public db::DatabaseAccess {
 
   MOCK_CONST_METHOD4(getTextData, void (TextDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset));
 
+  MOCK_CONST_METHOD3(complete, KvalobsDataPtr (const kvalobs::kvStationInfo & si, const DataList & d, const TextDataList & td));
+
   MOCK_METHOD1(write, void (const DataList & data));
 
   MOCK_METHOD0(selectDataForControl, kvalobs::kvStationInfo*());
@@ -85,6 +87,8 @@ class MockDatabaseAccess : public db::DatabaseAccess {
     .WillByDefault(Invoke(&fake_, &FakeDatabaseAccess::getData));
     ON_CALL(*this, getTextData(_, _, _, _))
     .WillByDefault(Invoke(&fake_, &FakeDatabaseAccess::getTextData));
+    ON_CALL(*this, complete(_, _, _))
+    .WillByDefault(Invoke(&fake_, &FakeDatabaseAccess::complete));
     ON_CALL(*this, write(_))
     .WillByDefault(Invoke(&fake_, &FakeDatabaseAccess::write));
   }

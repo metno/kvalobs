@@ -59,11 +59,11 @@ class DataProcessor {
   /**
    * Run checks on a single message
    */
-  qabase::CheckRunner::DataListPtr runChecks(const kvalobs::kvStationInfo & si) const;
+  qabase::CheckRunner::KvalobsDataPtr runChecks(const kvalobs::kvStationInfo & si) const;
   /**
    * Send a single dataList to Kafka
    */
-  void sendToKafka(qabase::CheckRunner::DataListPtr dataList);
+  void sendToKafka(const qabase::CheckRunner::KvalobsDataPtr & dataList);
 
 
   /**

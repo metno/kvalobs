@@ -29,6 +29,7 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include <kvalobs/kvDataOperations.h>
+#include <kvalobs/kvStationInfo.h>
 #include <boost/static_assert.hpp>
 #include <cmath>
 
@@ -112,6 +113,14 @@ kvDataFactory::kvDataFactory(const kvData & d)
       typeID_(d.typeID()),
       sensor_(d.sensor()),
       level_(d.level()) {
+}
+
+kvDataFactory::kvDataFactory(kvalobs::kvStationInfo & stInfo)
+  : stationID_(stInfo.stationID()),
+    obstime_(stInfo.obstime()),
+    typeID_(stInfo.typeID()),
+    sensor_(0),
+    level_(0) {
 }
 
 kvData kvDataFactory::getMissing(

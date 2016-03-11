@@ -29,6 +29,7 @@
 
 #include "FakeDatabaseAccess.h"
 #include <kvalobs/kvDataOperations.h>
+#include <decodeutility/kvalobsdata.h>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <iostream>
 #include <cstdio>
@@ -172,6 +173,13 @@ void FakeDatabaseAccess::getTextData(
     const qabase::DataRequirement::Parameter & parameter,
     int minuteOffset) const {
 }
+
+FakeDatabaseAccess::KvalobsDataPtr FakeDatabaseAccess::complete(
+    const kvalobs::kvStationInfo & si, const DataList & d,
+    const TextDataList & td) const {
+  return std::make_shared < kvalobs::serialize::KvalobsData > (d, td);
+}
+
 
 void FakeDatabaseAccess::write(const DataList & data) {
   for (DataList::const_iterator it = data.begin(); it != data.end(); ++it) {

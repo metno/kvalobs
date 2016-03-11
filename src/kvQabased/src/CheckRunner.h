@@ -71,6 +71,9 @@ class CheckRunner {
   typedef std::list<kvalobs::kvData> DataList;
   typedef std::shared_ptr<DataList> DataListPtr;
 
+
+  typedef db::DatabaseAccess::KvalobsDataPtr KvalobsDataPtr;
+
   /**
    * Signal that a new observation is ready for being checked. Checks will
    * immediately start running.
@@ -78,8 +81,10 @@ class CheckRunner {
    * @param obs The observation that we want to check.
    * @param scriptLog Where to log scripts and script results. Nothing will
    *                  be logged if scripLog is NULL.
+   * @return A list of all modified data. Also, all data belonging to the
+   *         given obs will be returned, even if it is unmodified.
    */
-  DataListPtr newObservation(const kvalobs::kvStationInfo & obs,
+  KvalobsDataPtr newObservation(const kvalobs::kvStationInfo & obs,
                              std::ostream * scriptLog = 0);
 
   /**
@@ -111,7 +116,7 @@ class CheckRunner {
  private:
   bool shouldMarkStartAndStop_();
 
-  DataListPtr checkObservation(const kvalobs::kvStationInfo & obs,
+  KvalobsDataPtr checkObservation(const kvalobs::kvStationInfo & obs,
                                std::ostream * scriptLog);
 
   bool shouldRunAnyChecks(const kvalobs::kvStationInfo & obs) const;

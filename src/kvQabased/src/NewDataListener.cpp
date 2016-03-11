@@ -36,6 +36,7 @@
 #include <thread>
 #include "db/KvalobsDatabaseAccess.h"
 #include "kvalobs/kvStationInfo.h"
+#include "decodeutility/kvalobsdata.h"
 #include "CheckRunner.h"
 #include "QaBaseApp.h"
 
@@ -65,7 +66,7 @@ void NewDataListener::run() {
       // Fetch next data to process
       if (toProcess) {
         startProcessing();
-        qabase::CheckRunner::DataListPtr dataList = runChecks(*toProcess);
+        qabase::CheckRunner::KvalobsDataPtr dataList = runChecks(*toProcess);
         if (!dataList->empty()) {
           bool dataSent = false;
           int sendAttempts = 0;
@@ -112,9 +113,9 @@ qabase::NewDataListener::StationInfoPtr NewDataListener::fetchDataToProcess() co
   }
 }
 
-qabase::CheckRunner::DataListPtr NewDataListener::runChecks(const qabase::NewDataListener::StationInfo & toProcess) const {
+qabase::CheckRunner::KvalobsDataPtr NewDataListener::runChecks(const qabase::NewDataListener::StationInfo & toProcess) const {
   db_->beginTransaction();
-  qabase::CheckRunner::DataListPtr dataList = processor_.runChecks(toProcess);
+  qabase::CheckRunner::KvalobsDataPtr dataList = processor_.runChecks(toProcess);
   db_->commit();
   return dataList;
 }

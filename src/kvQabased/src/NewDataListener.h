@@ -73,7 +73,7 @@ class NewDataListener : boost::noncopyable {
   bool isProcessingCompleted() const;
 
   StationInfoPtr fetchDataToProcess() const;
-  qabase::CheckRunner::DataListPtr runChecks(const StationInfo & toProcess) const;
+  qabase::CheckRunner::KvalobsDataPtr runChecks(const StationInfo & toProcess) const;
   void markProcessDone(const StationInfo & toProcess);
 };
 

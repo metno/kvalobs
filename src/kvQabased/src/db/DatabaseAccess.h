@@ -43,6 +43,12 @@
 #include <list>
 #include <set>
 
+namespace kvalobs {
+namespace serialize {
+class KvalobsData;
+}
+}
+
 namespace db {
 
 /**
@@ -100,7 +106,7 @@ class DatabaseAccess {
    * @param si The observation we wants checks for
    */
   virtual void getChecks(CheckList * out,
-                         const kvalobs::kvStationInfo & si) const =0;
+                         const kvalobs::kvStationInfo & si) const = 0;
 
   /**
    * Find index of controlinfo flag for the given qcx.
@@ -108,7 +114,7 @@ class DatabaseAccess {
    * @param qcx The medium qcx we want to find flag position for. Example: "QC1-4"
    * @return index in controlinfo string.
    */
-  virtual int getQcxFlagPosition(const std::string & qcx) const =0;
+  virtual int getQcxFlagPosition(const std::string & qcx) const = 0;
 
   typedef std::set<std::string> ParameterList;
   /**
@@ -118,7 +124,7 @@ class DatabaseAccess {
    * @param si Observation we want the parameter list from
    */
   virtual void getParametersToCheck(ParameterList * out,
-                                    const kvalobs::kvStationInfo & si) const =0;
+                                    const kvalobs::kvStationInfo & si) const = 0;
 
   /**
    * Get an algorithm with the specified name
@@ -128,7 +134,7 @@ class DatabaseAccess {
    *         to be runnable
    */
   virtual kvalobs::kvAlgorithms getAlgorithm(
-      const std::string & algorithmName) const =0;
+      const std::string & algorithmName) const = 0;
 
   /**
    * Get station's parameter's metadata.
@@ -145,7 +151,7 @@ class DatabaseAccess {
    */
   virtual std::string getStationParam(const kvalobs::kvStationInfo & si,
                                       const std::string & parameter,
-                                      const std::string & qcx) const =0;
+                                      const std::string & qcx) const = 0;
 
   /**
    * Get information on the given station
@@ -154,7 +160,7 @@ class DatabaseAccess {
    *
    * @return information about the station with the given id
    */
-  virtual kvalobs::kvStation getStation(int stationid) const =0;
+  virtual kvalobs::kvStation getStation(int stationid) const = 0;
 
   typedef std::vector<kvalobs::kvModelData> ModelDataList;
   /**
@@ -169,7 +175,7 @@ class DatabaseAccess {
   virtual void getModelData(
       ModelDataList * out, const kvalobs::kvStationInfo & si,
       const qabase::DataRequirement::Parameter & parameter,
-      int minutesBackInTime) const =0;
+      int minutesBackInTime) const = 0;
 
   typedef std::list<kvalobs::kvData> DataList;
   /**
@@ -183,7 +189,7 @@ class DatabaseAccess {
    */
   virtual void getData(DataList * out, const kvalobs::kvStationInfo & si,
                        const qabase::DataRequirement::Parameter & parameter,
-                       int minuteOffset) const =0;
+                       int minuteOffset) const = 0;
 
   typedef std::list<kvalobs::kvTextData> TextDataList;
   /**
@@ -198,7 +204,18 @@ class DatabaseAccess {
   virtual void getTextData(TextDataList * out,
                            const kvalobs::kvStationInfo & si,
                            const qabase::DataRequirement::Parameter & parameter,
-                           int minuteOffset) const =0;
+                           int minuteOffset) const = 0;
+
+  typedef std::shared_ptr<kvalobs::serialize::KvalobsData> KvalobsDataPtr;
+
+  /**
+   * Construct a KvalobsData object containing all the given data in d and td,
+   * but also all database data specified by si.
+   */
+  virtual KvalobsDataPtr complete(const kvalobs::kvStationInfo & si,
+                                  const DataList & d = DataList(),
+                                  const TextDataList & td =
+                                      TextDataList()) const = 0;
 
 //	/**
 //	 * Error may be thrown by write method if a transaction serialization error occurred.
@@ -215,9 +232,9 @@ class DatabaseAccess {
    */
   virtual void write(const DataList & data) = 0;
 
-  virtual kvalobs::kvStationInfo * selectDataForControl() =0;
+  virtual kvalobs::kvStationInfo * selectDataForControl() = 0;
 
-  virtual void markProcessDone(const kvalobs::kvStationInfo & si) =0;
+  virtual void markProcessDone(const kvalobs::kvStationInfo & si) = 0;
 };
 
 }
