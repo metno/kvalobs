@@ -10,4 +10,5 @@ usr/lib/libkvalobs_kvskel.so.*
 usr/lib/libkvalobs_miconfparser.so.*
 usr/lib/libkvalobs_milog.so.*
 usr/lib/libkvalobs_miutil.so.*
+usr/lib/libkvalobs_kvsubscribe.so.*
 usr/lib/kvalobs/db/*.so.*

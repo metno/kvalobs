@@ -103,4 +103,7 @@ gtest_LDADD = \
 	libkvalobs_kvcpp.la \
 	$(libkvalobs_kvcpp_la_LIBADD) \
 	$(gtest_LIBS)
+	
 endif
+
+EXTRA_DIST = test/etc/kvalobs/gtest.conf
