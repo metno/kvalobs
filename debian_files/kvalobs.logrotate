@@ -1,0 +1,8 @@
+compress
+
+/var/log/kvalobs/kvQabased_transaction.log {
+  rotate 7
+  daily
+  delaycompress
+}
+  

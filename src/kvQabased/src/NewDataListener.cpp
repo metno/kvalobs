@@ -39,12 +39,12 @@
 #include "decodeutility/kvalobsdata.h"
 #include "CheckRunner.h"
 #include "QaBaseApp.h"
+#include "TransactionLogger.h"
 
 namespace qabase {
 
 namespace {
 bool globalStop = false;
-bool processingCompleted = false;
 }
 
 NewDataListener::NewDataListener(std::shared_ptr<db::DatabaseAccess> db)
@@ -63,31 +63,11 @@ void NewDataListener::run() {
   while (!stopping()) {
     try {
       qabase::NewDataListener::StationInfoPtr toProcess = fetchDataToProcess();
-      // Fetch next data to process
       if (toProcess) {
-        startProcessing();
+        qabase::TransactionLogger logger(*toProcess);
         qabase::CheckRunner::KvalobsDataPtr dataList = runChecks(*toProcess);
-        if (!dataList->empty()) {
-          bool dataSent = false;
-          int sendAttempts = 0;
-          while (!dataSent) {
-            processor_.sendToKafka(dataList);
-            if (isProcessingCompleted()) {
-              dataSent = true;
-              markProcessDone(*toProcess);
-              if (sendAttempts > 0)
-                LOGWARN("Successfully sent data after " << sendAttempts << " retries");
-            } else {
-              if (sendAttempts == 0)
-                LOGWARN("Could not send data to Kafka. Retrying...");
-              sendAttempts++;
-              std::this_thread::sleep_for(std::chrono::seconds(1));
-            }
-          }
-        } else {
-          LOGINFO("DataList from runChecks() is empty; nothing to send to Kafka. Marking done and continuing...");
-          markProcessDone(*toProcess);
-        }
+        markProcessDone(*toProcess);
+        logger.markSuccess();
       } else {
         // Did not find any data to process. Pausing for 1 second. This is normal.
         std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -113,11 +93,18 @@ qabase::NewDataListener::StationInfoPtr NewDataListener::fetchDataToProcess() co
   }
 }
 
-qabase::CheckRunner::KvalobsDataPtr NewDataListener::runChecks(const qabase::NewDataListener::StationInfo & toProcess) const {
-  db_->beginTransaction();
-  qabase::CheckRunner::KvalobsDataPtr dataList = processor_.runChecks(toProcess);
-  db_->commit();
-  return dataList;
+qabase::CheckRunner::KvalobsDataPtr NewDataListener::runChecks(const qabase::NewDataListener::StationInfo & toProcess) {
+  try {
+    db_->beginTransaction();
+    qabase::CheckRunner::KvalobsDataPtr dataList = processor_.runChecks(toProcess);
+    db_->commit();
+    processor_.sendToKafka(dataList);
+    return dataList;
+  }
+  catch (...) {
+    db_->rollback();
+    throw;
+  }
 }
 
 void NewDataListener::markProcessDone(const qabase::NewDataListener::StationInfo &toProcess) {
@@ -147,21 +134,5 @@ void NewDataListener::stopAll() {
   globalStop = true;
 }
 
-void NewDataListener::startProcessing() {
-  processingCompleted = false;
-}
-
-bool NewDataListener::isProcessingCompleted() const {
-  return processingCompleted;
-}
-
-void NewDataListener::onKafkaSendSuccess(kvalobs::subscribe::KafkaProducer::MessageId id, const std::string & data) {
-  LOGDEBUG("Successfully sent data: <" + data + ">");
-  processingCompleted = true;
-}
-
-void NewDataListener::onKafkaSendError(kvalobs::subscribe::KafkaProducer::MessageId id, const std::string & data, const std::string & errorMessage) {
-  LOGDEBUG("Unable to send data: " + errorMessage + "  Data: <" + data + ">");
-}
 
 } /* namespace qabase */

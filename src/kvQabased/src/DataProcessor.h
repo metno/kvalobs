@@ -31,6 +31,7 @@
 #define SRC_KVQABASED_SRC_DATAPROCESSOR_H_
 
 #include "LogFileCreator.h"
+#include "kvsubscribe/KafkaProducer.h"
 #include <memory>
 #include <string>
 #include "CheckRunner.h"
@@ -57,9 +58,10 @@ class DataProcessor {
   ~DataProcessor();
 
   /**
-   * Run checks on a single message
+   * Run checks on a single message, but do not post to kafka
    */
   qabase::CheckRunner::KvalobsDataPtr runChecks(const kvalobs::kvStationInfo & si) const;
+
   /**
    * Send a single dataList to Kafka
    */
@@ -67,25 +69,27 @@ class DataProcessor {
 
 
   /**
-   * Process a single message.
+   * Process a single message. Also post to kafka.
    */
   void process(const kvalobs::kvStationInfo & si);
 
   /**
-   * Parse and process message.
+   * Parse and process message. Also post to kafka.
    */
   void process(const std::string & message);
 
   /**
-   * Process the given set of messages. Errors when sending modification
-   * notifications may be given either after each message, or after all
-   * messages have been processed.
+   * Process the given set of messages. Also post to kafka. Errors when
+   * sending modification notifications may be given either after each
+   * message, or after all messages have been processed.
    */
   template<typename StationInfoIterator>
   void process(StationInfoIterator begin, StationInfoIterator end);
 
+  static void onKafkaSendSuccess(kvalobs::subscribe::KafkaProducer::MessageId id, const std::string & data);
+  static void onKafkaSendError(kvalobs::subscribe::KafkaProducer::MessageId id, const std::string & data, const std::string & errorMessage);
+
  private:
-  void simpleProcess_(const kvalobs::kvStationInfo & si);
   void finalizeMessage_();
 
   std::shared_ptr<qabase::CheckRunner> checkRunner_;
@@ -96,7 +100,7 @@ class DataProcessor {
 template<typename StationInfoIterator>
 void DataProcessor::process(StationInfoIterator begin, StationInfoIterator end) {
   while (begin != end) {
-    simpleProcess_(*begin);
+    sendToKafka(runChecks(*begin));
     ++begin;
   }
   finalizeMessage_();

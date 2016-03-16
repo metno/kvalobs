@@ -33,7 +33,7 @@
 #include "kvsubscribe/KafkaProducer.h"
 #include "kvsubscribe/queue.h"
 #include "miconfparser/miconfparser.h"
-#include "NewDataListener.h"
+#include "DataProcessor.h"
 
 namespace qabase {
 
@@ -73,7 +73,7 @@ std::shared_ptr<kvalobs::subscribe::KafkaProducer> QaBaseApp::kafkaProducer() {
 
   LOGINFO("Creating kafka connection on " << kafkaBrokers_ << ", using topic " << queue);
 
-  return std::make_shared < KafkaProducer > (queue, kafkaBrokers_, NewDataListener::onKafkaSendError, NewDataListener::onKafkaSendSuccess);
+  return std::make_shared < KafkaProducer > (queue, kafkaBrokers_, DataProcessor::onKafkaSendError, DataProcessor::onKafkaSendSuccess);
 }
 
 std::string QaBaseApp::baseLogDir() {
