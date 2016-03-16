@@ -1,10 +1,11 @@
-kvalobs (2.8.4-1) UNRELEASED; urgency=medium
+kvalobs (2.8.5-1) UNRELEASED; urgency=medium
 
   * New "DriverManager".
   * Fix empty events form kvcpp subscribe. 
     * new version
+  * new version
 
- -- Borge Moe <borge.moe@met.no>  Mon, 14 Mar 2016 11:58:41 +0100
+ -- Borge Moe <borge.moe@met.no>  Wed, 16 Mar 2016 12:39:49 +0100
 
 kvalobs (2.8.2-1) UNRELEASED; urgency=medium
 
