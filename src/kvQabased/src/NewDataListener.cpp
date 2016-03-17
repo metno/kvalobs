@@ -32,6 +32,7 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <chrono>
 #include <memory>
+#include <set>
 #include <string>
 #include <thread>
 #include "db/KvalobsDatabaseAccess.h"
@@ -44,18 +45,18 @@
 namespace qabase {
 
 namespace {
-bool globalStop = false;
+std::set<NewDataListener*> listeners;
 }
 
 NewDataListener::NewDataListener(std::shared_ptr<db::DatabaseAccess> db)
     : stopping_(true),
       db_(db),
       processor_(CheckRunner::create(QaBaseApp::createConnectString())) {
-  // NOOP
+  listeners.insert(this);
 }
 
 NewDataListener::~NewDataListener() {
-  // NOOP
+  listeners.erase(this);
 }
 
 void NewDataListener::run() {
@@ -79,7 +80,7 @@ void NewDataListener::run() {
 }
 
 qabase::NewDataListener::StationInfoPtr NewDataListener::fetchDataToProcess() const {
-  while (true) {
+  while (!stopping()) {
     try {
       db_->beginTransaction();
       qabase::NewDataListener::StationInfoPtr ret(db_->selectDataForControl());
@@ -91,6 +92,7 @@ qabase::NewDataListener::StationInfoPtr NewDataListener::fetchDataToProcess() co
       std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
   }
+  return qabase::NewDataListener::StationInfoPtr();
 }
 
 qabase::CheckRunner::KvalobsDataPtr NewDataListener::runChecks(const qabase::NewDataListener::StationInfo & toProcess) {
@@ -98,7 +100,7 @@ qabase::CheckRunner::KvalobsDataPtr NewDataListener::runChecks(const qabase::New
     db_->beginTransaction();
     qabase::CheckRunner::KvalobsDataPtr dataList = processor_.runChecks(toProcess);
     db_->commit();
-    processor_.sendToKafka(dataList);
+    processor_.sendToKafka(dataList, & stopping_);
     return dataList;
   }
   catch (...) {
@@ -127,11 +129,13 @@ void NewDataListener::stop() {
 }
 
 bool NewDataListener::stopping() const {
-  return stopping_ or globalStop;
+  return stopping_;
 }
 
 void NewDataListener::stopAll() {
-  globalStop = true;
+  std::cout << "stopAll!" << std::endl;
+  for (NewDataListener * listener : listeners)
+    listener->stop();
 }
 
 

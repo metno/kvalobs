@@ -59,9 +59,9 @@ qabase::CheckRunner::KvalobsDataPtr DataProcessor::runChecks(const kvalobs::kvSt
   return modified;
 }
 
-void DataProcessor::sendToKafka(const qabase::CheckRunner::KvalobsDataPtr & dataList) {
+void DataProcessor::sendToKafka(const qabase::CheckRunner::KvalobsDataPtr & dataList, bool * stop) {
   int sendAttempts = 0;
-  while (true) {
+  do {
     auto messageid = output_->send(kvalobs::serialize::KvalobsDataSerializer::serialize(*dataList));
     messages.insert(messageid);
     finalizeMessage_();
@@ -76,7 +76,7 @@ void DataProcessor::sendToKafka(const qabase::CheckRunner::KvalobsDataPtr & data
       sendAttempts++;
       std::this_thread::sleep_for(std::chrono::seconds(1));
     }
-  }
+  } while (stop == nullptr || *stop == false);
 }
 
 void DataProcessor::process(const kvalobs::kvStationInfo & si) {
