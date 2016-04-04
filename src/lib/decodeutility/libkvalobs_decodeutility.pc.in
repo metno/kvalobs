@@ -7,6 +7,6 @@ includedir=@includedir@
 Name: libkvalobs_decodeutility
 Description: kvalobs decodeutility library
 Version: @VERSION@
-Requires: libkvalobs_kvalobs libkvalobs_kvdb libkvalobs_fileutil libcurl libkvalobs_corbahelper libkvalobs_dnmithread libkvalobs_miconfparser libkvalobs_miutil libkvalobs_kvskel libkvalobs_milog libxml++-2.6 omniDynamic4
+Requires: libkvalobs_kvalobs libkvalobs_kvdb libkvalobs_fileutil libkvalobs_corbahelper libkvalobs_dnmithread libkvalobs_miconfparser libkvalobs_miutil libkvalobs_kvskel libkvalobs_milog libxml++-2.6 omniDynamic4
 Libs: -L${libdir} -lkvalobs_decodeutility  @BOOST_DATE_TIME_LIB@ @BOOST_THREAD_LIB@ -lperl
 Cflags: -D_REENTRANT -I${includedir}/@PACKAGE@

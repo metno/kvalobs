@@ -32,8 +32,10 @@
 #include <ostream>
 #include <sstream>
 #include <string>
-#include "curl/curl.h"
 #include "miutil/exceptionSpec.h"
+
+typedef void CURL;
+struct curl_slist;
 
 namespace miutil {
 EXCEPTION_SPEC_BASE(HttpException);

@@ -1,7 +1,7 @@
 /*
- wdb - weather and water data storage
+ kvalobs
 
- Copyright (C) 2007 met.no
+ Copyright (C) 2016 met.no
 
  Contact information:
  Norwegian Meteorological Institute
@@ -26,12 +26,13 @@
  MA  02110-1301, USA
  */
 
+#include "lib/miutil/httpclient.h"
+#include <curl/curl.h>
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
 #include <sstream>
-#include <mutex>  // NOLINT(build/c++11)
-#include "lib/miutil/httpclient.h"
+#include <mutex>
 
 using std::fstream;
 using std::string;

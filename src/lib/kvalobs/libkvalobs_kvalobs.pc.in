@@ -7,6 +7,6 @@ includedir=@includedir@
 Name: libkvalobs_kvalobs
 Description: kvalobs kvalobs library
 Version: @VERSION@
-Requires: omniDynamic4 libkvalobs_kvdb libkvalobs_fileutil libcurl libkvalobs_corbahelper libkvalobs_dnmithread libkvalobs_milog libkvalobs_miconfparser libkvalobs_kvskel libkvalobs_miutil
+Requires: omniDynamic4 libkvalobs_kvdb libkvalobs_fileutil libkvalobs_corbahelper libkvalobs_dnmithread libkvalobs_milog libkvalobs_miconfparser libkvalobs_kvskel libkvalobs_miutil
 Libs: -L${libdir} -lkvalobs_kvalobs @BOOST_DATE_TIME_LIB@ @BOOST_THREAD_LIB@ -lperl
 Cflags: -D_REENTRANT -I${includedir}/@PACKAGE@ -DKVALOBS_USE_BOOST_DATE_TIME
