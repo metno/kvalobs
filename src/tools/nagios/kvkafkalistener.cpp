@@ -105,22 +105,38 @@ int main(int argc, char ** argv) {
 
   using namespace boost::program_options;
 
-  options_description opt("Command-line options");
+
+  options_description opt;
   opt.add_options()
       ("output-file,o", value<std::string>(& reportFile)->default_value("kvalobs.kafka.status"), "Write reports to the given file")
       ("domain,d", value<std::string>(& domain)->default_value("test"), "Use the given kvalobs domain in kafka")
-      ("server,s", value<std::string>(& server)->default_value("localhost"), "Test against the given server")
+      ("server,s", value<std::string>(& server)->default_value("localhost"), "Test against the given server");
+
+  options_description general;
+  general.add_options()
+      ("configuration", value<std::string>()->default_value("/etc/default/kvkafkalistener"), "Read additional config from the given file, if it exists")
       ("help", "Get this help message");
 
-  parsed_options parsed = command_line_parser(argc, argv).options(opt).run();
+  options_description allOptions("Program options");
+  allOptions.add(opt).add(general);
+
+  parsed_options parsed = command_line_parser(argc, argv).options(allOptions).run();
   variables_map vm;
   store(parsed, vm);
   notify(vm);
 
   if (vm.count("help")) {
     std::cout << "Continuously send a report about kafka's kvalobs activity to the given file\n\n";
-    std::cout << opt << std::endl;
+    std::cout << allOptions << std::endl;
     return 0;
+  }
+
+  if (vm.count("configuration")) {
+    std::string configFile = vm["configuration"].as<std::string>();
+    std::ifstream s(configFile);
+    parsed_options parsedFromFile = parse_config_file(s, opt);
+    store(parsedFromFile, vm);
+    notify(vm);
   }
 
   kvalobs::subscribe::DataSubscriber subscriber(newData, domain, kvalobs::subscribe::KafkaConsumer::Latest, server);
