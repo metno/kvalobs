@@ -27,71 +27,83 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-//#include "../HintSubscriber.h"
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <kvsubscribe/DataSubscriber.h>
+#include <decodeutility/kvalobsdata.h>
 #include <decodeutility/kvalobsdataserializer.h>
+#include <boost/program_options.hpp>
 #include <iostream>
-#include <memory>
-#include <csignal>
+#include <string>
 
-using namespace kvalobs::subscribe;
+using kvalobs::subscribe::DataSubscriber;
+using boost::program_options::value;
 
-namespace hint {
-void up() {
-  std::cout << "kvalobs coming up" << std::endl;
-}
-void down() {
-  std::cout << "kvalobs going down" << std::endl;
-}
-}
-namespace data {
-void message(const kvalobs::serialize::KvalobsData & data) {
-  std::cout << kvalobs::serialize::KvalobsDataSerializer::serialize(data)
-            << std::endl;
-}
+void handle_full(const kvalobs::serialize::KvalobsData & d) {
+  std::cout << kvalobs::serialize::KvalobsDataSerializer::serialize(d) << std::endl;
 }
 
-void stopListening(int singal) {
-  KafkaConsumer::stopAll();
+void handle_summary(const kvalobs::serialize::KvalobsData & d) {
+  for (const kvalobs::kvStationInfo & st : d.summary())
+    std::cout << st.stationID() << '\t' << st.typeID() << '\t' << st.obstime() << '\n';
+  std::cout << std::flush;
 }
 
-void help(std::ostream & s, const std::string & applicationName) {
-  s << "Usage: " << applicationName << " hint|data" << std::endl;
+void version(std::ostream & s) {
+  s << "kvsubscribe (" << PACKAGE_VERSION << ")\n";
 }
-KafkaConsumer * getConsumer(const std::string & type,
-                            const std::string & domain,
-                            const std::string & brokers) {
-  if (type == "hint") {  //return new HintSubscriber(hint::up, hint::down, brokers);
-    throw std::logic_error("Not implemented consumer type: " + type);
-  } else if (type == "data") {
-    return new DataSubscriber(data::message, domain, DataSubscriber::Latest,
-                              brokers);
-  }
 
-  throw std::logic_error("Invalid consumer type: " + type);
+void help(const boost::program_options::options_description & opt, std::ostream & s) {
+  version(s);
+  s << "\nList data from kvalobs in real time\n\n";
+  s << opt << std::endl;
 }
 
 int main(int argc, char ** argv) {
+  std::string domain;
+  std::string host;
+  auto handlerFunction = handle_summary;
+
+  boost::program_options::options_description opt("Command-line options");
+  opt.add_options()
+      ("host,h", value<std::string>(& host)->default_value("localhost"), "Host(s) to connect to")
+      ("domain,d", value<std::string>(& domain)->default_value("test"), "Domain name to use")
+      ("full", "List all data, instead of summaries")
+      ("version", "Show version information, and exit")
+      ("help", "Show this help message, and exit");
+
   try {
-    if (argc != 2) {
-      help(std::clog, argv[0]);
-      return 1;
-    }
-    std::string arg(argv[1]);
+    boost::program_options::variables_map vm;
+    boost::program_options::store(boost::program_options::parse_command_line(argc, argv, opt), vm);
+    boost::program_options::notify(vm);
 
-    std::unique_ptr<KafkaConsumer> consumer;
-
-    if (arg == "--help") {
-      help(std::cout, argv[0]);
+    if (vm.count("help")) {
+      help(opt, std::cout);
       return 0;
-    } else
-      consumer.reset(getConsumer(arg, "test", "localhost"));
+    }
 
-    signal(SIGINT, stopListening);
-    signal(SIGTERM, stopListening);
+    if (vm.count("version")) {
+      version(std::cout);
+      return 0;
+    }
 
-    consumer->run();
-  } catch (std::exception & e) {
+    if (vm.count("full"))
+      handlerFunction = handle_full;
+  }
+  catch (boost::program_options::unknown_option &) {
+    std::clog << "Invalid option.\n\n";
+    help(opt, std::clog);
+    return 1;
+  }
+
+  try {
+    DataSubscriber subscriber(handlerFunction, domain, DataSubscriber::Latest, host);
+    subscriber.run();
+  }
+  catch (std::exception & e) {
     std::clog << e.what() << std::endl;
+    return 1;
   }
 }

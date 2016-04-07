@@ -13,7 +13,6 @@ usr/bin/kvServiced
 usr/bin/kvstart
 usr/bin/kvstatus
 usr/bin/kvstop
-usr/bin/kvsubscribe
 usr/bin/kv_get_stinfosys_params
 usr/bin/qabase_log_cleanup
 usr/lib/kvalobs/bin/*

@@ -2,12 +2,13 @@ AM_DEFAULT_SOURCE_EXT = .cpp
 
 LDADD = $(top_builddir)/src/lib/kvsubscribe/libkvalobs_kvsubscribe.la
 AM_CPPFLAGS = 	-I$(top_srcdir)/src \
-				-I$(top_srcdir)/src/lib
+				-I$(top_srcdir)/src/lib \
+				-DVERSION=\"PACKAGE_STRING\"
 
 bin_PROGRAMS = kvsubscribe kvalobs-queue-transfer
 
 
-kvsubscribe_LDADD = $(LDADD) $(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la -lboost_system
+kvsubscribe_LDADD = $(LDADD) $(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la -lboost_program_options -lboost_system
 
 
 kvalobs_queue_transfer_CPPFLAGS = $(AM_CPPFLAGS) -I$(top_srcdir)/src/service-libs/ -I$(top_builddir)/src/lib/ -I$(top_builddir)/src/lib/kvskel

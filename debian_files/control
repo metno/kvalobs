@@ -77,6 +77,11 @@ Suggests: kvalobs
 Description: Install sql files for creating kvalobs database
  This will install the sql files for installing a kvalobs database.
 
+Package: kvsubscribe
+Architecture: any
+Depends: libkvalobs5 (= ${binary:Version})
+Description: List data from kvalobs in real time 
+
 Package: kvkafkalistener
 Architecture: any
 Depends: libkvalobs5 (= ${binary:Version})
