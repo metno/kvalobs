@@ -1,11 +1,11 @@
 bin_SCRIPTS = kvstart kvstop kvrestart kvstatus kv2norcom \
-              kv_get_stinfosys_params
+              kv_get_stinfosys_params kvsync_files
 scriptdir = $(libdir)/kvalobs
 script_DATA = tool_funcs.sh
 
 EXTRA_DIST = kvrestart.sh kvstart.sh kvstop.sh kvstatus.sh\
              kvcron.template tool_funcs.sh.in kv2norcom \
-             kv_get_stinfosys_params.sh
+             kv_get_stinfosys_params.sh kvsync_files
 
 CLEANFILES = kvstart kvstop kvrestart kvstatus \
              tool_funcs.sh kv_get_stinfosys_params

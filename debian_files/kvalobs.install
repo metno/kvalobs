@@ -15,6 +15,8 @@ usr/bin/kvstatus
 usr/bin/kvstop
 usr/bin/kv_get_stinfosys_params
 usr/bin/qabase_log_cleanup
+usr/bin/kvsync_files
+usr/bin/sync_norcom_files
 usr/lib/kvalobs/bin/*
 usr/lib/kvalobs/decode/*.so.*
 usr/lib/kvalobs/tool_funcs.sh
@@ -24,6 +26,7 @@ etc/kvalobs/kv-ipalias.conf
 etc/kvalobs/kvcron
 etc/kvalobs/kvincron
 etc/kvalobs/kv2norcom.conf.template
+etc/kvalobs/sync_from_norcom.conf.template
 etc/kvalobs/aexecd.conf.template
 etc/kvalobs/save_last_month.conf
 etc/kvalobs/pgclean-local.sql.template

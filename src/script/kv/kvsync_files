@@ -1,0 +1,136 @@
+#! /bin/dash
+
+# This script to configure sync of files with rsync.
+# It reads the configuration from /etc/kvalobs/sync_files.conf,
+# but this can changed with creating symbolic links. See below.
+#
+# The format to the configuration file is
+#
+# KEYS - a list of keys to identify source and destination directories.
+# SOURCE_AND_DEST_key - One entry for each key in KEYS.
+#   It is a list of two components, the source  directory and the
+#   destination directory. The source and destination directory
+#   must have a format accepted by rsync.
+#
+# Ex.
+#
+# KEYS="1 2"
+#
+#SOURCE_AND_DEST_1="kvalobs@norcom2.met.no:/metno/norcom/data/kvalobs/data* \
+#                  /disk1/kvalobs/var/lib/kvalobs/synopreports"
+#SOURCE_AND_DEST_2="kvalobs@kvalobs.oslo.dnmi.no:/var/lib/kvalobs/synopreports/data* \
+#                   /disk1/kvalobs/var/lib/kvalobs/synopreports"
+#
+# The script use rsync to copy the files. Ensure that kvalobs user account can log in with ssh on the destination accounts
+# without use off passwords.
+#
+# The program can be made an symbolic link to.
+# eg.
+#    sync_from_norcom -> kvsync_files
+#
+#    It will then look for the configuratin file: $CONFDIR/sync_from_norcom.conf
+#    and log to    $LOGDIR/sync_from_norcom.log
+#
+
+CONFDIR=`kvconfig --sysconfdir`/kvalobs
+DESTDIR=""
+SRCDIR=""
+LOGDIR=$(kvconfig --logdir)
+LOG="$LOGDIR/sync_from_norcom.log"
+DISABLED=$CONFDIR/sync_from_norcom.disable
+KEY=""
+
+pname=`basename $0`
+
+CONF=$CONFDIR/$pname.conf
+LOG="$LOGDIR/$pname.log"
+DISABLED=$CONFDIR/$pname.disable
+
+log()
+{
+    local logtime=""
+    logtime=`date +'%Y-%m-%d %H:%M:%S:'`
+
+    [ -d $LOGDIR ] &&  echo "$logtime $@" >> $LOG
+}
+
+#getconf sets the variables DESTDIR, SRCDIR and LOG.
+#It use the variables KEYS and SOURCE_AND_DEST_key
+#from the configuration file.
+getconf()
+{
+   local myvar=""
+   local myval=""
+   local next="source"
+   local key=$1
+   DESTDIR=""
+   SRCDIR=""
+
+   myvar="SOURCE_AND_DEST_$key"
+   myval=$(eval echo "\$$myvar")
+
+   if [ -z "$myval" ]; then
+     log "Missing definition for '$myvar' in the configuration file $CONF"
+     return 1
+   fi
+
+   next=source
+
+   for val in $myval; do
+      case $next in
+         source)
+            SRCDIR=$val
+            next="dest"
+         ;;
+         dest)
+            if [ ! -d "$val" ]; then
+               log "Config key: '$myvar'. Destination directory '$val' do not exist!"
+            else
+               DESTDIR="$val"
+            fi
+            break 1
+         ;;
+         *) log "BUG in script!!!!!!"
+         ;;
+      esac
+   done
+  return 0
+}
+
+truncatelog()
+{
+    local tmplog="$1-tmp"
+    if [ -f $1 ]; then
+        tail -n 100 $1 > $tmplog
+        mv $tmplog $1
+    fi
+}
+
+
+truncatelog $LOG
+
+if [ -f "$DISABLED" ]; then
+   log "Is disabled."
+   exit 0
+fi
+
+if [ ! -f "$CONF" ]; then
+   log "Cant read the configuration file: '$CONF'"
+   exit 1
+fi
+
+. $CONF
+
+for key in "$KEYS"; do
+   getconf $key
+   if [ -z "$DESTDIR" ]; then
+      continue
+   fi
+   log "START sync: $SRCDIR -> $DESTDIR"
+   rsync -e "ssh -o NumberOfPasswordPrompts=0" $SRCDIR $DESTDIR >> $LOG 2>&1
+   if [ $? -ne 0 ]; then
+      log "FAILED sync: $SRCDIR -> $DESTDIR"
+   else
+      log "COMPLETED sync: $SRCDIR -> $DESTDIR"
+   fi
+done

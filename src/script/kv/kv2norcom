@@ -29,11 +29,13 @@
 # The script use rsync to copy the files. Ensure that kvalobs user account can log in with ssh on the destination accounts
 # without use off passwords.
 
-CONF=`kvconfig --sysconfdir`/kvalobs/kv2norcom.conf
+CONFDIR=`kvconfig --sysconfdir`/kvalobs
+CONF=$CONFDIR/kv2norcom.conf
 DESTDIR=""
 SRCDIR=""
 LOGDIR=$(kvconfig --logdir)
 LOG="$LOGDIR/kv2norcom.log"
+DISABLED=$CONFDIR/kv2norcom.disable
 
 
 #getconf sets the variables DESTDIR, SRCDIR and LOG.
@@ -97,6 +99,12 @@ log()
 
 truncatelog $LOG
 
+if [ -f "$DISABLED" ]; then
+   log "Is disabled."
+   exit 0
+fi
+
+
 if [ ! -f "$CONF" ]; then
    log "Cant read the configuration file: '$CONF'"
    exit 1
@@ -126,7 +134,7 @@ truncatelog $LOG
 
 log "Transfer started: $SRCDIR -> $DESTDIR"
 
-rsync --exclude tmp --remove-source-files $SRCDIR $DESTDIR >> $LOG 2>&1
+rsync -e "ssh -o NumberOfPasswordPrompts=0" --exclude tmp --remove-source-files $SRCDIR $DESTDIR >> $LOG 2>&1
 
 log "Transfer ended."
 
