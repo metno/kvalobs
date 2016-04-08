@@ -35,12 +35,14 @@ namespace subscribe {
 
 std::list<KafkaConsumer *> KafkaConsumer::allConsumers_;
 
-KafkaConsumer::KafkaConsumer(ConsumptionStart startAt,
-                             const std::string & topic,
+KafkaConsumer::KafkaConsumer(const std::string & topic,
                              const std::string & brokers)
-    : stopping_(false) {
+    : initialized_(false),
+      stopping_(false),
+      topicConf_(RdKafka::Conf::create(RdKafka::Conf::CONF_TOPIC)),
+      topicName_(topic),
+      topicOffset_(RdKafka::Topic::OFFSET_END) {
   createConnection_(brokers);
-  createTopic_(topic, startAt);
   allConsumers_.push_back(this);
 }
 
@@ -48,6 +50,27 @@ KafkaConsumer::~KafkaConsumer() {
   stop();
   allConsumers_.remove(this);
 }
+
+void KafkaConsumer::startAtEarliestData() {
+  topicOffset_ = RdKafka::Topic::OFFSET_BEGINNING;
+}
+
+namespace {
+void set(RdKafka::Conf & c, const std::string & key, const std::string & value) {
+  std::string errstr;
+  if ( c.set(key, value, errstr) != RdKafka::Conf::CONF_OK)
+    throw std::runtime_error(errstr);
+}
+}
+
+void KafkaConsumer::startAtStored(const std::string & fileName) {
+  topicOffset_ = RdKafka::Topic::OFFSET_STORED;
+  set(* topicConf_, "offset.store.method", "file");
+  set(* topicConf_, "offset.store.path", fileName);
+  set(* topicConf_, "offset.store.sync.interval.ms", "0");
+  set(* topicConf_, "auto.commit.interval.ms", "1000");
+}
+
 
 namespace {
 class FunctionConsumer : public RdKafka::ConsumeCb {
@@ -71,6 +94,11 @@ void KafkaConsumer::run() {
 }
 
 void KafkaConsumer::runOnce(unsigned timeoutInMilliSeconds) {
+  if (!initialized_) {
+    createTopic_();
+    initialized_ = true;
+  }
+
   FunctionConsumer consumer([this](RdKafka::Message & message) {
     handle_(message);
   });
@@ -107,42 +135,24 @@ void KafkaConsumer::handle_(RdKafka::Message & message) {
   }
 }
 
-void KafkaConsumer::createConnection_(const std::string& brokers) {
+void KafkaConsumer::createConnection_(const std::string & brokers) {
   std::string errstr;
   std::unique_ptr<RdKafka::Conf> conf(
       RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL));
-  conf->set("metadata.broker.list", brokers, errstr);
+  set(* conf, "metadata.broker.list", brokers);
   consumer_.reset(RdKafka::Consumer::create(conf.get(), errstr));
   if (!consumer_)
     throw std::runtime_error("Failed to create consumer: " + errstr);
 }
 
-void KafkaConsumer::createTopic_(const std::string& topic,
-                                 ConsumptionStart startAt) {
+void KafkaConsumer::createTopic_() {
   std::string errstr;
-
-  std::unique_ptr<RdKafka::Conf> tconf(
-      RdKafka::Conf::create(RdKafka::Conf::CONF_TOPIC));
   topic_.reset(
-      RdKafka::Topic::create(consumer_.get(), topic, tconf.get(), errstr));
+      RdKafka::Topic::create(consumer_.get(), topicName_, topicConf_.get(), errstr));
   if (!topic_)
     throw std::runtime_error("Failed to create topic: " + errstr);
 
-  int64_t offset = RdKafka::Topic::OFFSET_BEGINNING;
-  switch (startAt) {
-    case Earliest:
-      offset = RdKafka::Topic::OFFSET_BEGINNING;
-      break;
-    case Stored:
-      offset = RdKafka::Topic::OFFSET_STORED;
-      break;
-    case Latest:
-      offset = RdKafka::Topic::OFFSET_END;
-      break;
-    default:
-      throw std::logic_error("Invalid offset spec");
-  }
-  RdKafka::ErrorCode resp = consumer_->start(topic_.get(), 0, offset);
+  RdKafka::ErrorCode resp = consumer_->start(topic_.get(), 0, topicOffset_);
   if (resp != RdKafka::ERR_NO_ERROR)
     throw std::runtime_error(
         "Failed to start consumer: " + RdKafka::err2str(resp));

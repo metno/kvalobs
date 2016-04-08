@@ -37,10 +37,10 @@
 namespace kvalobs {
 namespace subscribe {
 
-DataSubscriber::DataSubscriber(Handler handler, const std::string & domain,
-                               ConsumptionStart startAt,
+DataSubscriber::DataSubscriber(Handler handler,
+                               const std::string & domain,
                                const std::string & brokers)
-    : KafkaConsumer(startAt, topic(domain), brokers),
+    : KafkaConsumer(topic(domain), brokers),
       handler_(handler) {
 }
 

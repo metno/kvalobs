@@ -6,8 +6,6 @@ qabase_src_SOURCES += \
 	src/Configuration.cpp \
 	src/Configuration.h \
 	src/LogFileCreator.h \
-	src/CheckRequestConsumer.cpp \
-	src/CheckRequestConsumer.h \
 	src/DataProcessor.cpp \
 	src/DataProcessor.h \
 	src/QaBaseApp.cpp \

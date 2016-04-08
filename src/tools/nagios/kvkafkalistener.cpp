@@ -139,7 +139,7 @@ int main(int argc, char ** argv) {
     notify(vm);
   }
 
-  kvalobs::subscribe::DataSubscriber subscriber(newData, domain, kvalobs::subscribe::KafkaConsumer::Latest, server);
+  kvalobs::subscribe::DataSubscriber subscriber(newData, domain, server);
 
   signal(SIGINT, terminate);
   signal(SIGHUP, terminate);

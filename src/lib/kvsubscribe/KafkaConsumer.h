@@ -53,19 +53,25 @@ namespace subscribe {
 class KafkaConsumer {
  public:
 
-  /**
-   * List of where to start reading data.
-   */
-  enum ConsumptionStart {
-    Earliest,  //< Start at the earliest available data in queue - this may give you very old data
-    Stored,  //< Pick up where you left. First time this is called, it will behave like Latest. Note that there may be some overlap in data - the first data you receive may be equal to the last data from last time
-    Latest  //< Only get data that arrives after having started this consumer
-  };
-
-  KafkaConsumer(ConsumptionStart startAt, const std::string & topic,
+  KafkaConsumer(const std::string & topic,
                 const std::string & brokers);
 
   virtual ~KafkaConsumer();
+
+  /**
+   * When getting data, start at the earliest possible time instead of getting
+   * only data produced after start() has been called.
+   */
+  void startAtEarliestData();
+
+  /**
+   * Store place in queue to the given file, also read it at startup if it
+   * exists, to pick up where you left. Note that the file is not written for
+   * every message, so expect duplicates if you restart your service
+   *
+   * @param fileName Name of the progress file to use.
+   */
+  void startAtStored(const std::string & fileName);
 
   /**
    * Run until stop() has been called, processing events, calling data(...)
@@ -112,12 +118,16 @@ class KafkaConsumer {
  private:
   typedef std::function<void(RdKafka::Message & message)> BasicHandler;
   void handle_(RdKafka::Message & message);
-  void createConnection_(const std::string& brokers);
-  void createTopic_(const std::string& topic, ConsumptionStart startAt);
+  void createConnection_(const std::string & brokers);
+  void createTopic_();
 
+  bool initialized_;
   bool stopping_;
   std::unique_ptr<RdKafka::Consumer> consumer_;
   std::unique_ptr<RdKafka::Topic> topic_;
+  std::unique_ptr<RdKafka::Conf> topicConf_;
+  std::string topicName_;
+  int64_t topicOffset_;
 
   static std::list<KafkaConsumer *> allConsumers_;
 

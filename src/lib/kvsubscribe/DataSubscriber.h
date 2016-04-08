@@ -58,7 +58,6 @@ class DataSubscriber : public KafkaConsumer {
   typedef std::function<void(const ::kvalobs::serialize::KvalobsData &)> Handler;
 
   DataSubscriber(Handler handler, const std::string & domain,
-                 ConsumptionStart startAt = Stored,
                  const std::string & brokers = "localhost");
 
   /**

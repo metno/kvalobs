@@ -175,7 +175,7 @@ KafkaSubscribe::SubscriberID KafkaSubscribe::subscribeData(
           [info, & queue](const ::kvalobs::serialize::KvalobsData & d) {
             broadcast(d, info, queue);
           },
-          domain_, DataSubscriber::Latest, brokers_));
+          domain_, brokers_));
 
   std::string ret = uniqueString();
   consumers_[ret] = std::make_pair(runner,
@@ -190,7 +190,7 @@ KafkaSubscribe::SubscriberID KafkaSubscribe::subscribeDataNotify(
           [info, & queue](const ::kvalobs::serialize::KvalobsData & d) {
             broadcastNotification(d, queue);
           },
-          domain_, DataSubscriber::Latest, brokers_));
+          domain_, brokers_));
 
   std::string ret = uniqueString();
   consumers_[ret] = std::make_pair(runner,
