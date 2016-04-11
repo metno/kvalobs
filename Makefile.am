@@ -20,7 +20,7 @@ install-data-hook:
 pkgsysconfdir = $(sysconfdir)/@PACKAGE_NAME@
 pkgsysconf_DATA = \
 	etc/kv2norcom.conf.template \
-	etc/sync_from_norcom.conf.template \
+	etc/sync_norcom_files.conf.template \
 	etc/kv2kvDataInputd.conf.template \
 	etc/kvdataclt.conf.template \
 	etc/norcom2kv.conf.template \
@@ -32,7 +32,7 @@ pkgsysconf_DATA = \
 #$(pkgconfig_DATA): config.status
 
 EXTRA_DIST = etc/kv2norcom.conf.template \
-			    etc/sync_from_norcom.conf.template \
+			    etc/sync_norcom_files.conf.template \
              etc/kv2kvDataInputd.conf.template \
              etc/kvdataclt.conf.template \
              etc/norcom2kv.conf.template \
