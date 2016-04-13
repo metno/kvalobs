@@ -13,6 +13,7 @@
 #
 # The format to the configuratin file is 
 # 
+# KVUSER - If the script is run as root, change the user to the KVUSER.
 # MESSAGES_KEYS - a list of keys to identify source and destination directories.
 # SOURCE_AND_DEST_key - One entry for each key in MESSAGES_KEYS.
 #   It is a list of two components, the source  directory and the 
@@ -29,14 +30,17 @@
 # The script use rsync to copy the files. Ensure that kvalobs user account can log in with ssh on the destination accounts
 # without use off passwords.
 
-CONFDIR=`kvconfig --sysconfdir`/kvalobs
+set -e
+
+CONFDIR=$(kvconfig --sysconfdir)/kvalobs
 CONF=$CONFDIR/kv2norcom.conf
+KV2NORCOM=$(kvconfig --bindir)/kv2norcom
 DESTDIR=""
 SRCDIR=""
 LOGDIR=$(kvconfig --logdir)
 LOG="$LOGDIR/kv2norcom.log"
 DISABLED=$CONFDIR/kv2norcom.disable
-
+MYUID=$(id -u)
 
 #getconf sets the variables DESTDIR, SRCDIR and LOG.
 #It use the variables MESSAGE_KEYS and SOURCE_AND_DEST_key
@@ -111,6 +115,16 @@ if [ ! -f "$CONF" ]; then
 fi
 
 . $CONF
+
+
+if [ $MYUID -eq 0 ]; then
+   if [ -n "$KVUSER" ]; then
+      exec /usr/bin/sudo -u $KVUSER -H sh $KV2NORCOM "$@"
+   else
+      log "Running as root and KVUSER is NOT defined, exiting!"
+      exit 1
+   fi
+fi
 
 if [ $# -lt 1 ]; then 
     log "Missing argument that specify the directory to scan."
