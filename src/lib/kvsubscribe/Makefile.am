@@ -23,6 +23,8 @@ libkvalobs_kvsubscribe_la_LIBADD = \
 	$(top_builddir)/src/lib/json/libjson.la \
 	$(rdkafka_LIBS)
 
+libkvalobs_kvsubscribe_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@
+
 kvsubscribeincludedir = $(pkgincludedir)/kvsubscribe
 	
 kvsubscribeinclude_HEADERS = \
