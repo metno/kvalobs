@@ -1,9 +1,7 @@
-kvalobs (2.8.8-1) UNRELEASED; urgency=medium
-  * kvsubscribe.
-  * kvsync_files: rsync helper. 
-  
- -- Borge Moe <borge.moe@met.no>  Fri, 08 Apr 2016 12:00:00 +0200
+kvalobs (3.0.0-1) UNRELEASED; urgency=medium
+  * new version
 
+ -- Borge Moe <borge.moe@met.no>  Fri, 15 Apr 2016 10:01:07 +0200
 
 kvalobs (2.8.1-1) UNRELEASED; urgency=medium
   * New "DriverManager".
