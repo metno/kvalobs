@@ -1,7 +1,8 @@
-kvalobs (3.0.0-1) UNRELEASED; urgency=medium
+kvalobs (3.0.1-1) UNRELEASED; urgency=medium
   * new version
+  * new version, with correct version numbers
 
- -- Borge Moe <borge.moe@met.no>  Fri, 15 Apr 2016 10:01:07 +0200
+ -- Borge Moe <borge.moe@met.no>  Fri, 15 Apr 2016 12:22:02 +0200
 
 kvalobs (2.8.1-1) UNRELEASED; urgency=medium
   * New "DriverManager".
