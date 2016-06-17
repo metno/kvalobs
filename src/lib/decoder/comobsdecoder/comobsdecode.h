@@ -31,8 +31,12 @@
 #ifndef __kvalobs_decoder_comobsdecoder_ComObsDecoder_h__
 #define __kvalobs_decoder_comobsdecoder_ComObsDecoder_h__
 
+#include <sstream>
 #include <decoderbase/decoder.h>
 #include <kvalobs/kvRejectdecode.h>
+
+
+class SmsMelding;
 
 namespace kvalobs {
 namespace decoder {
@@ -48,6 +52,8 @@ typedef boost::mutex::scoped_lock Lock;
 
 class SmsBase;
 
+
+
 /**
  * \brief implements the interface  DecoderBase.
  *
@@ -59,12 +65,31 @@ class ComObsDecoder : public DecoderBase {
   ComObsDecoder& operator=(const ComObsDecoder &);
 
  protected:
+  struct Header {
+    int code;
+    miutil::miTime receivedTime;
+    long stationid;
+    std::string redirectedFrom;
+    std::ostringstream error;
+    explicit Header():code(-1),stationid(-1){}
+    void clear() {
+        code=-1;
+        stationid = -1;
+        error.str("");
+        receivedTime = miutil::miTime();
+        redirectedFrom="";
+    }
+  };
+
   SmsBase *smsfactory(int smscode);
   long getStationid(long obsid, bool isWmono);
-
+  bool decodeObsType();
+  SmsMelding *getSmsMelding(std::string &error);
   kvalobs::decoder::ObsPgmParamInfo obsPgm;
 
+
  public:
+  Header header;
   ComObsDecoder(dnmi::db::Connection &con, const ParamList &params,
                 const std::list<kvalobs::kvTypes> &typeList,
                 const std::string &obsType, const std::string &obs,

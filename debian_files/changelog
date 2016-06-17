@@ -1,3 +1,12 @@
+kvalobs (3.0.2-1) UNRELEASED; urgency=medium
+  * new version
+  * Update the comobsdecoder to accept smscode 2 without the xml-wraping.
+  * Update the comobsdecoder to accept comobs as obstype.
+  * comobsdecoder better error messages.
+  * Add decoder for smscode 13 (Service messages).
+
+ -- Borge Moe <borge.moe@met.no>  Fri, 17 Apr 2016 12:25:00 +0200
+
 kvalobs (3.0.1-1) UNRELEASED; urgency=medium
   * new version
   * new version, with correct version numbers
