@@ -47,7 +47,7 @@ libkvalobs_milog_la_SOURCES = Logger.h Logger.cc \
 # don't install: LoggerImpl.h ThreadLogManager.h types.h
 
 SUBDIRS = private thread
-
+libkvalobs_milog_la_CPPFLAGS=$(AM_CPPFLAGS)
 libkvalobs_milog_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@ -pthread
 libkvalobs_milog_la_LIBADD = -lpthread
 
