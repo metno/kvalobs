@@ -1,3 +1,8 @@
+kvalobs (3.0.3-1) UNRELEASED; urgency=medium
+  * Fix timeconvert bug.
+
+ -- Borge Moe <borge.moe@met.no>  Mon, 20 Jun 2016 12:45:00 +0200
+
 kvalobs (3.0.2-1) UNRELEASED; urgency=medium
   * new version
   * Update the comobsdecoder to accept smscode 2 without the xml-wraping.
@@ -5,7 +10,7 @@ kvalobs (3.0.2-1) UNRELEASED; urgency=medium
   * comobsdecoder better error messages.
   * Add decoder for smscode 13 (Service messages).
 
- -- Borge Moe <borge.moe@met.no>  Fri, 17 Apr 2016 12:25:00 +0200
+ -- Borge Moe <borge.moe@met.no>  Fri, 17 Jun 2016 12:25:00 +0200
 
 kvalobs (3.0.1-1) UNRELEASED; urgency=medium
   * new version
