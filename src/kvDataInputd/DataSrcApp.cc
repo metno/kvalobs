@@ -459,7 +459,7 @@ DecodeCommand* DataSrcApp::decodeExecute(DecodeCommand *decCmd, kvalobs::datasou
   } catch (const miutil::concurrent::QueueSuspended &ex) {
     this->releaseDecodeCommand(decCmd);
     res->res = kd::EResult::ERROR;
-    res->message = "SHUTDOWN: In the proccess of shuting down!";
+    res->message = "SHUTDOWN: In the proccess of shutdown!";
     IDLOGINFO(logid, "Shutdown in proccess!");
     return nullptr;
   }
