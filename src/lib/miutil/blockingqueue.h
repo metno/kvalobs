@@ -311,7 +311,7 @@ class BlockingQueuePtr {
   }
 
   /**
-   * @throws QueueAuspended, QueueTimeout
+   * @throws QueueSuspended, QueueTimeout
    */
   bool timedAdd(T *value,
                 const std::chrono::high_resolution_clock::duration &timeout,
