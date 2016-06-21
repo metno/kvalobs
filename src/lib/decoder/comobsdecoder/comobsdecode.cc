@@ -290,7 +290,7 @@ kvalobs::decoder::DecoderBase::DecodeResult ComObsDecoder::execute(
     bool isWmono;
     long stationid;
     int typeId;
-    bool hasRejected;
+    bool hasRejected = false;
     DecodedData *data;
     string logid;
     int code;
