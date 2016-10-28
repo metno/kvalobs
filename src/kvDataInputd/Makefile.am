@@ -53,6 +53,7 @@ kvDataInputd_LDADD = \
    $(BOOST_THREAD_LIB) $(BOOST_DATE_TIME_LIB) $(BOOST_REGEX_LIB) \
    $(BOOST_SYSTEM_LIB) \
    $(omniORB4_LIBS) \
+   -lhttpserver \
    $(libhttpserver_LIBS) \
    -ldl
 

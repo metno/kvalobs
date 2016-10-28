@@ -31,6 +31,7 @@
 #include <iostream>
 #include <memory>
 #include <thread>
+#include <boost/scoped_ptr.hpp>
 #include <kvsubscribe/DataProducer.h>
 #include <kvsubscribe/queue.h>
 #include <kvcpp/corba/CorbaKvApp.h>
