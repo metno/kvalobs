@@ -91,7 +91,7 @@ AC_LANG_PUSH(C++)
 
 CPPFLAGS_SAVED="$CPPFLAGS"
 AS_IF([test "x$gmock_base" = "x/usr"],
-    [gtest_src="${gmock_base}/src/gmock/gtest";gtest_includes="-I${gmock_base}/src/gmock/gtest/include"],
+    [gtest_src="${gmock_base}/src/gtest";gtest_includes="-I${gmock_base}/src/gtest/include"],
     [gtest_src=""])
 
 #AS_IF([test "x$gmock_base" = "x/usr"],

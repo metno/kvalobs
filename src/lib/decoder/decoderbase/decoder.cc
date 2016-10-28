@@ -574,14 +574,16 @@ bool kvalobs::decoder::DecoderBase::isTextParam(int paramid) {
 bool kvalobs::decoder::DecoderBase::loadConf(int sid, int tid, kvalobs::decoder::ConfParser &parser) {
   namespace c = miutil::conf;
   c::ConfParser myparser;
-  ostringstream fname;
+  ostringstream fnames;
   ifstream fis;
 
-  fname << kvPath(sysconfdir);
+  fnames << kvPath(sysconfdir);
 
-  fname << "/decode/" << name() << ".conf";
+  fnames << "/decode/" << name() << ".conf";
 
-  fis.open(fname.str().c_str());
+  std::string fname = fnames.str();
+
+  fis.open(fname.c_str());
 
   if (!fis) {
     LOGERROR("Cant open the configuration file <" << fname << ">!" << endl);
