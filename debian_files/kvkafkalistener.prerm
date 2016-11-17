@@ -19,7 +19,8 @@ set -e
 
 case "$1" in
     remove|upgrade|deconfigure)
-    	stop kvkafkalistener || true
+    	systemctl disable kvkafkalistener || true
+    	systemctl stop kvkafkalistener || true
 	;;
 
     failed-upgrade)

@@ -14,8 +14,15 @@ PYTHON_FILES = check_kvprocs.py check_kvkafkastatus.py
 
 nagiosbin_SCRIPTS = $(PYTHON_FILES:.py=)
 
+systemddir=$(sysconfdir)/systemd/system/
+systemd_DATA = kvkafkalistener.service
+
+kvkafkalistener.service: kvkafkalistener.in.service
+	sed s:__BINPATH__:$(bindir): $< > $@
+
+
 %: %.py
 	cp $< $@
 
-EXTRA_DIST = $(PYTHON_FILES)
-CLEANFILES = $(nagiosbin_SCRIPTS)
+EXTRA_DIST = $(PYTHON_FILES) kvkafkalistener.in.service
+CLEANFILES = $(nagiosbin_SCRIPTS) kvkafkalistener.service
