@@ -1,0 +1,6 @@
+[Unit]
+Description=Runs the kvkafaklistener
+
+[Service]
+Type=simple
+ExecStart=__BINPATH__/kvkafkalistener -o /var/log/kvalobs/kafkastatus.txt
