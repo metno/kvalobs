@@ -69,7 +69,7 @@ std::string kvPath(PathQuery name, const std::string & system) {
       ret = LOCALSTATEDIR + std::string("/log/" + system);
       break;
     case rundir:
-      ret = LOCALSTATEDIR + std::string("/run/" + system);
+      ret = LOCALSTATEDIR + std::string("/lib/" + system + "/run/");
       break;
     case prefix:
       ret = PREFIX;
