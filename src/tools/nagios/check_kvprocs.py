@@ -96,7 +96,7 @@ if __name__ == '__main__':
 
 	if run_count == 0:
 		server = os.uname()[1]
-		stopped_file = '/var/run/kvalobs/%s-%s.stopped' % (args.command, server)
+		stopped_file = '/var/lib/kvalobs/run/%s-%s.stopped' % (args.command, server)
 		if os.path.exists(stopped_file):
 			time_since_change = (time.time() - os.path.getctime(stopped_file)) / 60
 			if time_since_change > args.stopped_time_critical:
