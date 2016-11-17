@@ -46,11 +46,12 @@
 #include <puTools/miTime.h>
 #include <miutil/timeconvert.h>
 #include <dbdrivers/dummysqldb.h>
+#include "miconfparser/miconfparser.h"
 //#include "ReadParamsFromFile.h"
 #include "ReadTypesFromFile.h"
 #include <gtest/gtest.h>
 #include "../RedirectInfo.h"
-
+#include "../StationFilter.h"
 using namespace std;
 using namespace kvalobs;
 using namespace miutil;
@@ -109,6 +110,12 @@ class DecoderBaseTest : public testing::Test {
 
   }
 
+  conf::ConfSection *loadConf(const std::string &filename) {
+    std::string fpath=string(TESTDIR)+"/"+filename;
+
+    return conf::ConfParser::parse(fpath);
+  }
+
 //   kvalobs::decodeutil::DecodedData*
 //   runtestOnFile( const ParamList &paramList,
 //                  std::list<kvalobs::kvTypes> typesList,
@@ -129,8 +136,7 @@ TEST_F( DecoderBaseTest, useinfo7 ) {
 
   ASSERT_TRUE( con != 0 )<< "Cant open database connection: " << testdb << ".";
 
-  dc::DecoderBase *dec = decoderMgr.findDecoder(*con, paramList, types, obsType,
-                                                obsData, error);
+  dc::DecoderBase *dec = decoderMgr.findDecoder(*con, paramList, types, obsType, obsData, error);
   ASSERT_TRUE( dec != 0 )<< "Cant create test decoder.";
 
   pt::ptime obstime(pt::time_from_string("2010-09-13 06:00:00"));
@@ -145,6 +151,55 @@ TEST_F( DecoderBaseTest, useinfo7 ) {
   ASSERT_TRUE(dec->getUseinfo7Code(1, tolate, obstime, "") == 4);
 
   decoderMgr.releaseDecoder(dec);
+}
+
+TEST_F( DecoderBaseTest, filter ) {
+  conf::ConfSection *conf = loadConf("filter_test.conf");
+
+  ASSERT_TRUE(conf);
+
+  conf->print(std::cerr, true);
+
+  dc::StationFiltersPtr filters = dc::StationFilters::readConfig(*conf);
+
+  dc::StationFilterElement filter = filters->filter(5, 302);
+
+  ASSERT_EQ("filter1", filter.name());
+  ASSERT_TRUE(filter.saveToDb());
+  ASSERT_FALSE(filter.publish());
+
+  dc::StationFilterElement filter = filters->filter(1, 302);
+  ASSERT_EQ("filter1", filter.name());
+
+  dc::StationFilterElement filter = filters->filter(10, 302);
+  ASSERT_EQ("filter1", filter.name());
+
+
+  filter = filters->filter(5, 1);
+  ASSERT_EQ("__default__", filter.name());
+  ASSERT_TRUE(filter.saveToDb());
+  ASSERT_FALSE(filter.publish());
+
+
+  filter = filters->filter(15, 302);
+  ASSERT_EQ("__default__", filter.name());
+  ASSERT_TRUE(filter.saveToDb());
+  ASSERT_FALSE(filter.publish());
+
+  filter = filters->filter(100001, 302);
+  ASSERT_EQ("filter2", filter.name());
+  ASSERT_FALSE(filter.saveToDb());
+  ASSERT_TRUE(filter.publish());
+
+  filter = filters->filter(40, 302);
+  ASSERT_EQ("__default__", filter.name());
+  ASSERT_TRUE(filter.saveToDb());
+  ASSERT_FALSE(filter.publish());
+
+  filter = filters->filter(100, 302);
+  ASSERT_EQ("filter3", filter.name());
+  ASSERT_FALSE(filter.saveToDb());
+  ASSERT_TRUE(filter.publish());
 }
 
 //TEST_F( Sms2DecodeTest, MultiObsTime )

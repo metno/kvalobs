@@ -412,6 +412,14 @@ kvalobs::decoder::DecoderBase::DecodeResult ComObsDecoder::execute(
         list<kvTextData> td = it->textData();
         int priority;
 
+        // Publish the data if the filter is set up to do that.
+        dataToPublish(d, td);
+
+        // Filter the data to see if it is to be saved to the database.
+        std::tuple<std::list<kvalobs::kvData>, std::list<kvalobs::kvTextData>> fd=filterSaveDataToDb(d,td);
+        d=std::get<0>(fd);
+        td=std::get<1>(fd);
+
         if( smsMelding->getCode() == 2 || smsMelding->getCode() == 13
                 || smsMelding->getCode() == 3 )
             priority = 8;
@@ -420,7 +428,7 @@ kvalobs::decoder::DecoderBase::DecodeResult ComObsDecoder::execute(
 
         IDLOGDEBUG3( logid, *it );
 
-        if( it->dataSize() > 0 || it->textDataSize() > 0 ) {
+        if( d.size() > 0 || td.size() > 0 ) {
             try {
                 kvalobs::decoder::DataUpdateTransaction work(
                         to_ptime( it->getDate() ), it->stationID(),

@@ -1,3 +1,10 @@
+kvalobs (3.0.5-1) UNRELEASED; urgency=medium
+  * comobsdecode/sms2: Use received_time if available.
+  * comobsdecode/sms2: Return erroro message o the client in case of error.
+
+ -- Borge Moe <borge.moe@met.no>  Wed, 22 Jun 2016 13:45:00 +0200
+
+
 kvalobs (3.0.4-1) UNRELEASED; urgency=medium
   * Fix initialization bug in comobsdecode.
 

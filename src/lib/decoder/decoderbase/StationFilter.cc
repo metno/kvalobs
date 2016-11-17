@@ -28,6 +28,11 @@
  */
 
 #include <limits>
+#include <string>
+#include <list>
+#include <iostream>
+#include <stdexcept>
+#include "milog/milog.h"
 #include "StationFilter.h"
 
 namespace c = miutil::conf;
@@ -94,21 +99,22 @@ std::string StationFilterElement::name() const {
   return name_;
 }
 
+bool StationFilterElement::stationDefined(long stationId) const {
+  if (stationIdRangeFrom_ > -1 && stationIdRangeTo_ > -1 && stationId >= stationIdRangeFrom_ && stationId <= stationIdRangeTo_)
+    return true;
+
+  return stationIdList_.find(stationId) != stationIdList_.end();
+}
+
+bool StationFilterElement::typeDefined(long typeId) const {
+  typeids_.find(typeId) != typeids_.end();
+}
+
 bool StationFilterElement::filter(long stationId, long typeId) const {
-  bool hasStationid = false;
-  if (stationIdRangeFrom_ != -1 && stationIdRangeTo_ != -1 && stationId >= stationIdRangeFrom_ && stationId < stationIdRangeTo_)
-    hasStationid = true;
-
-  if (!hasStationid)
-    hasStationid = stationIdList_.find(stationId) != stationIdList_.end();
-
-  if (!hasStationid)
+  if (!stationDefined(stationId))
     return false;
 
-  if (typeids_.empty())
-    return true;
-  else
-    return typeids_.find(typeId) != typeids_.end();
+  return typeids_.empty() || typeDefined(typeId);
 }
 
 namespace {
@@ -140,16 +146,20 @@ StationFilterElement StationFilterElement::readConfig(const miutil::conf::ConfSe
     // If only one element. This is interpreted as
     // all stationids greater or equal to the value. ie 'stationIdFrom'.
     if (val.size() < 1)
-      throw std::logic_error("Filter element '" + name + "', key 'station_range' to few elements. Must be at least one, (stationIdFom, stationIdTo) if stationIdTo is missing, then the range is all stationids greater or equal to 'stationIdFrom'.");
+      throw std::logic_error(
+          "Filter element '" + name
+              + "', key 'station_range' to few elements. Must be at least one, (stationIdFom, stationIdTo) if stationIdTo is missing, then the range is all stationids greater or equal to 'stationIdFrom'.");
 
     long v1 = val.valAsInt(-1, 0);
     long v2 = val.valAsInt(-1, 1);
 
-    if(v2<0 && val.size()==1)
+    if (v2 < 0 && val.size() == 1)
       v2 = std::numeric_limits<long>::max();
 
     if (v1 < 0 || v2 < 0)
-        throw std::logic_error("Filter element '" + name + "', key 'station_range' invalid element(s). Must be at least one, (stationIdFom, stationIdTo) if stationIdTo is missing, then the range is all stationids greater or equal to 'stationIdFrom'.");
+      throw std::logic_error(
+          "Filter element '" + name
+              + "', key 'station_range' invalid element(s). Must be at least one, (stationIdFom, stationIdTo) if stationIdTo is missing, then the range is all stationids greater or equal to 'stationIdFrom'.");
 
     e.setStationRange(v1, v2);
   }
@@ -166,21 +176,167 @@ StationFilters::StationFilters() {
 StationFilters::~StationFilters() {
 }
 
-StationFilters StationFilters::readConfig(const miutil::conf::ConfSection &conf_) {
-  StationFilters filters;
-  c::ConfSection &conf = const_cast<c::ConfSection>(conf_);
+std::list<std::string> StationFilters::filterNames() const {
+  std::list<std::string> names;
+  for (auto &f : filters_)
+    names.push_back(f.name());
+  return names;
+}
+
+StationFilterElement StationFilters::getFilterByName(const std::string &name) const {
+  for (auto &f : filters_)
+    if (f.name() == name)
+      return f;
+  throw std::logic_error("Filter: '" + name + "' do not exist!");
+}
+
+StationFilterElement StationFilters::filter(long stationId, long typeId) const {
+  if (filters_.empty())
+    return StationFilterElement();  // Default filter.
+  for (auto &f : filters_) {
+    if (f.filter(stationId, typeId))
+      return f;
+  }
+  return defaultFilter_;  // Default filter.
+}
+
+std::list<kvalobs::kvData> StationFilters::publishOrSaveData(const std::list<kvalobs::kvData> &sd, bool saveData)const
+{
+  std::list<kvalobs::kvData> data;
+  long sid=std::numeric_limits<long>::max();
+  long tid=std::numeric_limits<long>::max();
+  StationFilterElement f;
+
+  for( auto &d : sd) {
+    if(sid!=d.stationID() || tid!=d.typeID()) {
+      sid=d.stationID();
+      tid=d.typeID();
+      f=filter(sid, tid);
+    }
+
+    // Use the saveToDb or publish filter.
+    if( saveData ){
+      if( f.saveToDb() )
+        data.push_back(d);
+    } else if( f.publish() ) {
+      data.push_back(d);
+    }
+  }
+
+  return std::move(data);
+
+}
+std::list<kvalobs::kvTextData> StationFilters::publishOrSaveTextData(const std::list<kvalobs::kvTextData> &textData, bool saveData)const {
+  std::list<kvalobs::kvTextData> txtData;
+  long sid=std::numeric_limits<long>::max();
+  long tid=std::numeric_limits<long>::max();
+  StationFilterElement f;
+
+  for( auto &d : textData) {
+    if(sid!=d.stationID() || tid!=d.typeID()) {
+      sid=d.stationID();
+      tid=d.typeID();
+      f=filter(sid, tid);
+    }
+
+    // Use the saveToDb or publish filter.
+    if( saveData ) {
+      if( f.saveToDb() )
+        txtData.push_back(d);
+    } else if( f.publish() ) {
+      txtData.push_back(d);
+    }
+  }
+  return std::move(txtData);
+
+}
+
+
+std::list<kvalobs::kvData>
+StationFilters::saveDataToDb(const std::list<kvalobs::kvData> &sd)const{
+  return publishOrSaveData(sd, true);
+}
+
+std::list<kvalobs::kvTextData> StationFilters::saveTextDataToDb(const std::list<kvalobs::kvTextData> &textData)const
+{
+  return publishOrSaveTextData( textData, true);
+}
+
+std::tuple<std::list<kvalobs::kvData>, std::list<kvalobs::kvTextData> >
+StationFilters::saveDataToDb(const std::list<kvalobs::kvData> &sd,
+                             const std::list<kvalobs::kvTextData> &textData)const
+{
+  return std::make_tuple(saveDataToDb(sd), saveTextDataToDb(textData));
+}
+
+
+std::list<kvalobs::kvData> StationFilters::publishData(const std::list<kvalobs::kvData> &sd)const{
+  return publishOrSaveData(sd, false);
+}
+
+std::list<kvalobs::kvTextData> StationFilters::publishData(const std::list<kvalobs::kvTextData> &textData)const{
+  return publishOrSaveTextData( textData, false);
+}
+
+kvalobs::serialize::KvalobsData StationFilters::publishData(const std::list<kvalobs::kvData> &sd, const std::list<kvalobs::kvTextData> &textData)const{
+  return kvalobs::serialize::KvalobsData( publishData(sd), publishData(textData));
+}
+
+
+void StationFilters::configDefaultFilter(const miutil::conf::ConfSection &conf) {
+  std::list<std::string> keys = conf.getKeys();
+  bool publish = false;
+  bool saveToDb = true;
+
+  for (auto &key : keys) {
+    if (key == "save_to_db") {
+      saveToDb=conf.getValue(key).valAsBool(true);
+    } else if (key == "publish") {
+      publish=conf.getValue(key).valAsBool(false);
+    } else {
+      throw std::logic_error("Invalid key '" + key + "' in the filters 'default' section, valid keys 'save_to_db' and 'publish'.");
+    }
+  }
+  defaultFilter_.saveToDb(saveToDb);
+  defaultFilter_.publish(publish);
+}
+
+StationFiltersPtr StationFilters::readConfig(const miutil::conf::ConfSection &conf_) {
+  StationFiltersPtr filters(new StationFilters());
+  c::ConfSection &conf = const_cast<c::ConfSection&>(conf_);
   c::ConfSection *fconf = conf.getSection("kvDataInputd.filters");
+  std::ostringstream errs;
+  bool hasError = false;
 
   // No filters are defined. This is ok.
   if (!fconf)
     return filters;
 
-  std::list<std::string> fDefs=fconf->getSubSections();
-  std::cerr << "Filter sections: \n    ";
+  std::list<std::string> fDefs = fconf->getSubSections();
+  std::cerr << "Filter sections: \n";
 
-  for( auto &filter : fDefs  )
-    std::cerr << " " << filter << "\n";
+  for (auto &filterName : fDefs) {
+    try {
+      c::ConfSection *filter = fconf->getSection(filterName);
+      if (!filter)  // Should never happen
+        continue;
 
+      if (filterName == "default") {
+        filters->configDefaultFilter(*filter);
+        continue;
+      }
+
+      StationFilterElement elem = StationFilterElement::readConfig(*filter, filterName);
+      filters->filters_.push_back(elem);
+    } catch (const std::exception &ex) {
+      errs << "Error: Filter def '" << filterName << "': " << ex.what() << "\n";
+      hasError = true;
+    }
+  }
+
+  if (hasError) {
+    LOGERROR(errs.str());
+  }
 
   return filters;
 }

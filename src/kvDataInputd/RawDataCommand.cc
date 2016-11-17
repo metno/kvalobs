@@ -45,22 +45,22 @@ const char *RawDataCommand::getData(unsigned int *size) const {
 void RawDataCommand::onSend(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &threadName) {
   string::size_type i = data.find_first_of('\n');
   if (i != string::npos) {
-    IDLOGDEBUG("kafka", "RawData(" << msgId << "): SENDT: " << data.substr(i));
+    IDLOGDEBUG("kafka_raw", "RawData(" << msgId << "): SENDT: " << data.substr(i));
   } else if (!data.empty()) {
-    IDLOGDEBUG("kafka", "RawData(" << msgId << "): SENDT: " << data);
+    IDLOGDEBUG("kafka_raw", "RawData(" << msgId << "): SENDT: " << data);
   } else {
-    IDLOGDEBUG("kafka", "RawData(" << msgId << "): SENDT: empty message.");
+    IDLOGDEBUG("kafka_raw", "RawData(" << msgId << "): SENDT: empty message.");
   }
 }
 
 void RawDataCommand::onSuccess(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &threadName, const std::string &data) {
   string::size_type i = data.find_first_of('\n');
   if (i != string::npos) {
-    IDLOGDEBUG("kafka", threadName << ": RawData(" << msgId << "): ACK: " << data.substr(i));
+    IDLOGDEBUG("kafka_raw", threadName << ": RawData(" << msgId << "): ACK: " << data.substr(i));
   } else if (!data.empty()) {
-    IDLOGDEBUG("kafka", threadName << ": RawData(" << msgId << "): ACK: " << data);
+    IDLOGDEBUG("kafka_raw", threadName << ": RawData(" << msgId << "): ACK: " << data);
   } else {
-    IDLOGDEBUG("kafka", threadName << ": RawData(" << msgId << "): ACK: empty message.");
+    IDLOGDEBUG("kafka_raw", threadName << ": RawData(" << msgId << "): ACK: empty message.");
   }
 }
 
@@ -69,10 +69,10 @@ void RawDataCommand::onError(kvalobs::subscribe::KafkaProducer::MessageId msgId,
   string::size_type i = data.find_first_of('\n');
 
   if (i != string::npos) {
-    IDLOGERROR("kafka", threadName << ": RawData(" << msgId << "): FAIL: " << data.substr(i) << "\n" << errorMessage);
+    IDLOGERROR("kafka_raw", threadName << ": RawData(" << msgId << "): FAIL: " << data.substr(i) << "\n" << errorMessage);
   } else if (!data.empty()) {
-    IDLOGERROR("kafka", threadName << ": RawData(" << msgId << "): FAIL: " << data << "\n" << errorMessage);
+    IDLOGERROR("kafka_raw", threadName << ": RawData(" << msgId << "): FAIL: " << data << "\n" << errorMessage);
   } else {
-    IDLOGDEBUG("kafka", threadName << ": RawData(" << msgId << "): FAIL: empty message.");
+    IDLOGDEBUG("kafka_raw", threadName << ": RawData(" << msgId << "): FAIL: empty message.");
   }
 }

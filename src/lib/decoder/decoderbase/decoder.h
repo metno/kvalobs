@@ -52,6 +52,7 @@
 #include "milog/milog.h"
 #include "decoderbase/GenCacheElem.h"
 #include "decoderbase/metadata.h"
+#include "StationFilter.h"
 
 namespace kvalobs {
 
@@ -106,9 +107,11 @@ class DecoderBase {
   int decoderId;
   kvalobs::kvStationInfoList stationInfoList;
   std::list<kvalobs::serialize::KvalobsData> decodedData;
+  std::list<kvalobs::serialize::KvalobsData> publishData;
   std::list<std::string> createdLoggers;
   std::list<GenCachElem> genCachElem;
   miutil::conf::ConfSection *theKvConf;
+  StationFiltersPtr filters;
 
  protected:
   milog::FLogStream *openFLogStream(const std::string &filename);
@@ -413,6 +416,23 @@ class DecoderBase {
 
   virtual ~DecoderBase();
 
+  void setFilters( const kvalobs::decoder::StationFiltersPtr filters);
+  StationFilterElement filter(long stationId, long typeId)const;
+
+  /**
+   * Use the filters an returns the data to be saved into the database. It does not save the
+   * the data, just filter it.
+   */
+  std::tuple<std::list<kvalobs::kvData>, std::list<kvalobs::kvTextData>> filterSaveDataToDb( const std::list<kvalobs::kvData> &d, const std::list<kvalobs::kvTextData> &td)const;
+
+  /**
+   * Use the filters to decide if the data is to be published and add it to the publishData
+   * container.
+   *
+   * Returns true if some data is to be published and false if no data is published.
+   */
+  bool dataToPublish( const std::list<kvalobs::kvData> &d, const std::list<kvalobs::kvTextData> &td);
+
   std::string semiuniqueName(const std::string &prefix, const char *endsWith);
 
   bool setRedirectInfo(const std::string &obsType, const std::string &data);
@@ -513,6 +533,13 @@ class DecoderBase {
   std::list<kvalobs::serialize::KvalobsData> &getDecodedData() {
     return decodedData;
   }
+
+  /**
+   * The decoded data to publish if filter.publish is true.
+   */
+    std::list<kvalobs::serialize::KvalobsData> &getPublishData() {
+      return publishData;
+    }
 
   /**
    * \brief is the \em paramname a textparam.

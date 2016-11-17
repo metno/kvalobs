@@ -410,6 +410,7 @@ Sms2::decode(long stationid,
 
       if(buf.length()<3){
          IDLOGERROR( logid, "Invalid format!");
+         returnMessage += "Invalid format! To few elements. Must have at least 2 elements.\n";
          continue;
       }
 
@@ -417,6 +418,7 @@ Sms2::decode(long stationid,
 
       if(sep<0){
          IDLOGERROR(logid, "Invalid dataformat. Unknown element separator.");
+         returnMessage += "Invalid dataformat. Unknown element separator.\n";
          continue;
       }
 
@@ -428,6 +430,7 @@ Sms2::decode(long stationid,
 
       if(cStr.size()<3){
          IDLOGERROR( logid, "Invalid dataformat. Too few elements.");
+         returnMessage += "Invalid dataformat. Too few elements.\n";
          continue;
       }
 
@@ -439,6 +442,7 @@ Sms2::decode(long stationid,
          rejected.push_back(kvRejectdecode(mybuf, boost::posix_time::microsec_clock::universal_time(), "comobs/typeid=302",
                                            errs.str()));
          hasRejected=true;
+         returnMessage += errs.str() + "\n";
          continue;
       }
 
@@ -522,19 +526,19 @@ doKvPrecipitation(kvalobs::decodeutil::DecodedDataElem &data,
       sprintf(sRR, "%0.1f", RR);
    }
 
-   IDLOGDEBUG2( logid, "KLSTART: <" << klStart << ">" << endl
+   IDLOGDEBUG( logid, "KLSTART: <" << klStart << ">" << endl
              << "KLOBS:   <" << klObs   << ">" << endl);
 
-   //if one of klStart or klObs is empty and the other
-   //is not empty we have an invalid observation!
+   //klStart and klObs must both be given if one of the is given.
    if( (!klObs.empty() &&  klStart.empty()) ||
          ( klObs.empty() && !klStart.empty())){
-      ost << "Missing a timestamp, <tildato> eller <fradato>!";
+      ost << "Missing a timestamp, <fromtime> (" << klStart << ") or <totime> (" << klObs << "), both must be given if one is given! (It my also be a format error!)";
+      IDLOGERROR(logid,"Missing a timestamp, <fromtime> (" << klStart << ") or <totime> (" << klObs << "), both must be given if one is given! (It my also be a format error!)")
       return false;
    }
 
    if( !ComObsDec.header.receivedTime.undef()){
-       createTime("", dtComObs);
+       dtComObs=ComObsDec.header.receivedTime;
    } else  if(!klComObs.empty()){
       string ret;
       ret=createTime(klComObs, dtComObs);
@@ -547,6 +551,7 @@ doKvPrecipitation(kvalobs::decodeutil::DecodedDataElem &data,
       }
    }
 
+   IDLOGERROR( logid, "KLCOMOBS time: " << dtComObs << endl);
    if(dtComObs.undef()){
       dtComObs=nowTime();
       IDLOGDEBUG2( logid, "CURRENT time: " << dtComObs << endl);

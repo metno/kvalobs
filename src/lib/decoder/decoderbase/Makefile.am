@@ -9,7 +9,7 @@ lib_LTLIBRARIES = libkvalobs_decoderbase.la
 
 decoderbaseincludedir = $(pkgincludedir)/decoder/decoderbase
 decoderbaseinclude_HEADERS = \
-	decoder.h GenCacheElem.h metadata.h
+	decoder.h GenCacheElem.h metadata.h StationFilter.h
 
 libkvalobs_decoderbase_la_SOURCES = \
   decodermgr.cc decodermgr.h \
@@ -17,6 +17,7 @@ libkvalobs_decoderbase_la_SOURCES = \
   metadata.cc metadata.h \
   DataUpdateTransaction.h DataUpdateTransaction.cc \
   GenCacheElem.h ConfParser.h \
+  StationFilter.cc StationFilter.h \
   RedirectInfo.cc RedirectInfo.h
 
 libkvalobs_decoderbase_la_CPPFLAGS = \

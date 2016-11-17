@@ -29,6 +29,7 @@ kvDataInputd_SOURCES=\
    ConnectionCache.cc ConnectionCache.h \
    ObservationHandler.cc ObservationHandler.h \
    RawDataCommand.cc RawDataCommand.h \
+   PublishDataCommand.cc PublishDataCommand.h \
    kvDataInputd.cc 
    
 

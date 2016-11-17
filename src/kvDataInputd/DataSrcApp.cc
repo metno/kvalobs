@@ -40,6 +40,7 @@
 #include "lib/kvalobs/getLogInfo.h"
 #include "lib/kvsubscribe/queue.h"
 #include "kvDataInputd/DataSrcApp.h"
+#include "kvDataInputd/PublishDataCommand.h"
 
 using std::list;
 using std::string;
@@ -74,7 +75,7 @@ DataSrcApp::DataSrcApp(int argn, char **argv, int nConnections_, miutil::conf::C
     cerr << "Cant read configuration file: " << getConfFile() << endl;
     exit(1);
   }
-
+  filters = kvalobs::decoder::StationFilters::readConfig(*conf);
   httpConfig.port = conf->getValue("kvDataInputd.http.port").valAsInt(httpConfig.port);
   httpConfig.threads = conf->getValue("kvDataInputd.http.threads").valAsInt(httpConfig.threads);
   httpConfig.loglevel = getLoglevelRecursivt(conf, "kvDataInputd.http", httpConfig.loglevel);
@@ -124,7 +125,8 @@ DataSrcApp::DataSrcApp(int argn, char **argv, int nConnections_, miutil::conf::C
   milog::createGlobalLogger(logdir, "kvDataInputd", "http", httpConfig.loglevel, httpConfig.logSize, httpConfig.logRotate);
   milog::createGlobalLogger(logdir, "kvDataInputd", "http_error", milog::ERROR, httpConfig.logSize, httpConfig.logRotate);
   milog::createGlobalLogger(logdir, "kvDataInputd", "http_access", milog::INFO, httpConfig.logSize, httpConfig.logRotate, new milog::StdLayout1());
-  milog::createGlobalLogger(logdir, "kvDataInputd", "kafka", milog::DEBUG, httpConfig.logSize, httpConfig.logRotate, new milog::StdLayout1());
+  milog::createGlobalLogger(logdir, "kvDataInputd", "kafka_raw", milog::DEBUG, httpConfig.logSize, httpConfig.logRotate, new milog::StdLayout1());
+  milog::createGlobalLogger(logdir, "kvDataInputd", "kafka_pub", milog::DEBUG, httpConfig.logSize, httpConfig.logRotate, new milog::StdLayout1());
   milog::createGlobalLogger(logdir, "kvDataInputd_transaction", "failed", milog::DEBUG);
   milog::createGlobalLogger(logdir, "kvDataInputd_transaction", "duplicates", milog::DEBUG);
   milog::createGlobalLogger(logdir, "kvDataInputd_transaction", "updated", milog::DEBUG);
@@ -141,11 +143,49 @@ DataSrcApp::DataSrcApp(int argn, char **argv, int nConnections_, miutil::conf::C
         "Failed to start the kafka stream for topic <" << kafkaConfig.getRawTopic() << ">.\n" "Brokers: <" << kafkaConfig.brokers << ">\n" "REason: " << ex.what());
     return;
   }
+
+  try {
+      LOGERROR("Starting kafka producer for topic <" << kafkaConfig.getPublishTopic() << ">. Brokers <" << kafkaConfig.brokers << ">.");
+      std::string name = kafkaRawStream.getName() + "-" + kafkaConfig.getPublishTopic();
+      kafkaPubStream.setName(name);
+      kafkaPubStream.start(kafkaConfig.brokers, kafkaConfig.getPublishTopic());
+    } catch (const std::exception &ex) {
+      LOGERROR(
+          "Failed to start the kafka stream for topic <" << kafkaConfig.getPublishTopic() << ">.\n" "Brokers: <" << kafkaConfig.brokers << ">\n" "REason: " << ex.what());
+      return;
+    }
   ok = true;
 }
 
-bool DataSrcApp::sendInfoToManager(const kvalobs::kvStationInfoList &info_, const std::list<kvalobs::serialize::KvalobsData> &decodedData) {
-  return true;
+namespace {
+  string headStation(const kvalobs::serialize::KvalobsData &kd) {
+    std::set<kvalobs::kvStationInfo> summary=kd.summary();
+    if( summary.empty() || kd.empty())
+      return "<empty message>";
+
+    kvalobs::kvStationInfo info=*summary.begin();
+    std::ostringstream o;
+    o << "nObs: " << summary.size();
+
+    o << ", first: " << info.stationID() << ":" << info.typeID() << ":" << boost::posix_time::to_kvalobs_string(info.obstime());
+    return o.str();
+  }
+}
+
+bool DataSrcApp::publishData(const std::list<kvalobs::serialize::KvalobsData> &publishData) {
+  if( publishData.size() == 0 )
+    return true;
+
+  for( auto &d : publishData ) {
+    std::unique_ptr<PublishDataCommand> data(new PublishDataCommand(d));
+
+    try {
+      kafkaPubStream.queue->timedAdd(data.get(), std::chrono::seconds(4), true);
+      data.release();
+    } catch (std::exception &ex) {
+      LOGWARN("Unable to post data to the 'checked' kafka queue.\nReason: " << ex.what() <<"\n"<< headStation(d));
+    }
+  }
 }
 
 DataSrcApp::~DataSrcApp() {
@@ -356,6 +396,7 @@ DataSrcApp::create(const char *obsType_, const char *obs, long timoutIn_msec, Er
   }
 
   try {
+    dec->setFilters(filters);
     decCmd = new DecodeCommand(dec);
   } catch (...) {
     errCode = NoMem;
@@ -534,8 +575,8 @@ kvalobs::datasource::Result DataSrcApp::newObservation(const char *obsType_, con
     } else if (decodeResult == kvalobs::decoder::DecoderBase::Ok) {
       IDLOGDEBUG(logid, "Decode: OK.");
       kvalobs::kvStationInfoList infoList = decCmdRet->getInfoList();
-      list<kvalobs::serialize::KvalobsData> decodedData = decCmdRet->getDecodedData();
-      this->sendInfoToManager(infoList, decodedData);
+      list<kvalobs::serialize::KvalobsData> publishData = decCmdRet->getPublishData();
+      this->publishData(publishData);
       res.res = kd::EResult::OK;
     } else if (decodeResult == kvalobs::decoder::DecoderBase::NotSaved) {
       IDLOGDEBUG(logid, "Decode: NotSaved.");
@@ -577,4 +618,6 @@ void DataSrcApp::shutdown() {
   decoderExecutor.waitForTermination(std::chrono::seconds(60));
   kafkaRawStream.shutdown();
   kafkaRawStream.join(std::chrono::seconds(60));
+  kafkaPubStream.shutdown();
+  kafkaPubStream.join(std::chrono::seconds(60));
 }

@@ -59,7 +59,22 @@ std::string dnmi::file::createPidFileName(const std::string &path,
 }
 
 bool dnmi::file::createPidFile(const std::string &pidfile) {
+  int n = sizeof(pid_t);
+  string buf;
   FILE *fd;
+
+  if( n == sizeof(int) ) {
+      buf = "%d\n";
+  } else if( n == sizeof(long int) ) {
+      buf = "%ld\n";
+  } else if( n == sizeof(long long int) ) {
+      buf = "%Ld\n";
+  } else {
+      cerr << "Size of pid_t = " << n
+           << ", that does not match the size of an int, long int or long long int.\n\n.";
+      fclose( fd );
+      return false;
+  }
 
   fd = fopen(pidfile.c_str(), "w");
 
@@ -70,7 +85,7 @@ bool dnmi::file::createPidFile(const std::string &pidfile) {
     return false;
   }
 
-  fprintf(fd, "%ld\n", (long) getpid());
+  fprintf(fd, buf.c_str(), getpid());
   fclose(fd);
 
   return true;

@@ -31,8 +31,10 @@
 
 #include <string>
 #include <memory>
+#include <set>
 #include "lib/decodeutility/kvalobsdata.h"
 #include "lib/kvsubscribe/ProducerCommand.h"
+#include "lib/kvalobs/kvStationInfo.h"
 
 /**
  * \addtogroup kvDatainputd
@@ -46,13 +48,15 @@
 
 class PublishDataCommand : public kvalobs::service::ProducerCommand {
   PublishDataCommand();
-  PublishDataCommand(const RawDataCommand &);
-  PublishDataCommand& operator=(const RawDataCommand &);
+  PublishDataCommand(const PublishDataCommand &);
+  PublishDataCommand& operator=(const PublishDataCommand &);
 
   std::string data;
+  std::set<kvalobs::kvStationInfo> summary;
+  std::string toLog;
 
  public:
-  explicit PublishDataCommand(const std::string &rawData);
+  explicit PublishDataCommand(const kvalobs::serialize::KvalobsData &pubData);
 
   const char *getData(unsigned int *size) const;
   virtual void onSend(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &threadName);

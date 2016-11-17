@@ -36,6 +36,7 @@
 #include <sstream>
 #include <vector>
 #include <limits>
+#include <tuple>
 #include <map>
 #include "boost/thread.hpp"
 #include "puTools/miTime.h"
@@ -63,6 +64,10 @@ using std::list;
 using std::ostringstream;
 using std::vector;
 using std::ifstream;
+using std::list;
+using std::tuple;
+using kvalobs::kvData;
+using kvalobs::kvTextData;
 
 namespace {
 
@@ -145,7 +150,8 @@ kvalobs::decoder::DecoderBase::DecoderBase(dnmi::db::Connection &con_, const Par
       typeList(typeList_),
       obsType(obsType_),
       obs(obs_),
-      theKvConf(0) {
+      theKvConf(0),
+      filters( new StationFilters() ){
 }
 
 kvalobs::decoder::DecoderBase::~DecoderBase() {
@@ -155,6 +161,36 @@ kvalobs::decoder::DecoderBase::~DecoderBase() {
     milog::Logger::removeLogger(*it);
   }
 }
+
+
+void kvalobs::decoder::DecoderBase::setFilters( const kvalobs::decoder::StationFiltersPtr filters_){
+  filters=filters_;
+}
+
+kvalobs::decoder::StationFilterElement
+kvalobs::decoder::DecoderBase::filter(long stationId, long typeId)const
+{
+  return filters->filter(stationId, typeId);
+}
+
+std::tuple<std::list<kvalobs::kvData>, std::list<kvalobs::kvTextData>>
+kvalobs::decoder::DecoderBase::filterSaveDataToDb( const std::list<kvalobs::kvData> &d, const std::list<kvalobs::kvTextData> &td)const
+{
+  return filters->saveDataToDb( d, td);
+}
+
+bool kvalobs::decoder::DecoderBase::dataToPublish( const std::list<kvalobs::kvData> &d, const std::list<kvalobs::kvTextData> &td)
+{
+  kvalobs::serialize::KvalobsData pubData = filters->publishData(d,td);
+
+  if( !pubData.empty() ) {
+    publishData.push_back(std::move(pubData));
+    return true;
+  }
+  return false;
+
+}
+
 
 std::string kvalobs::decoder::DecoderBase::semiuniqueName(const std::string &prefix, const char *endsWith) {
   return miutil::SemiUniqueName::uniqueName(prefix, endsWith);
@@ -443,11 +479,19 @@ bool kvalobs::decoder::DecoderBase::addDataToDb(const miutil::miTime &obstime, i
 bool kvalobs::decoder::DecoderBase::addDataToDb(const miutil::miTime &obstime, int stationid, int typeid_, std::list<kvalobs::kvData> &sd,
                                                 std::list<kvalobs::kvTextData> &textData, int priority, const std::string &logid, bool onlyAddOrUpdateData) {
   namespace pt = boost::posix_time;
+
   boost::gregorian::date date(obstime.year(), obstime.month(), obstime.day());
   boost::posix_time::time_duration clock(pt::hours(obstime.hour()) + pt::minutes(obstime.min()) + pt::seconds(obstime.sec()));
   boost::posix_time::ptime pt_obstime(date, clock);
+  tuple<list<kvData>, list<kvTextData>> data=filterSaveDataToDb( sd, textData);
+  dataToPublish(sd, textData);
 
-  kvalobs::decoder::DataUpdateTransaction work(pt_obstime, stationid, typeid_, priority, &sd, &textData, logid, onlyAddOrUpdateData);
+  if( std::get<0>(data).empty() && std::get<1>(data).empty()) {
+    // No data to save to the database.
+    return true;
+  }
+
+  kvalobs::decoder::DataUpdateTransaction work(pt_obstime, stationid, typeid_, priority, &std::get<0>(data), &std::get<1>(data), logid, onlyAddOrUpdateData);
 
   try {
     con.perform(work);

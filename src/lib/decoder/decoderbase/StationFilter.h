@@ -34,7 +34,11 @@
 #include <set>
 #include <memory>
 #include <stdexcept>
+#include <tuple>
+#include "decodeutility/kvalobsdataserializer.h"
 #include "miconfparser/miconfparser.h"
+#include "kvalobs/kvData.h"
+#include "kvalobs/kvTextData.h"
 
 namespace kvalobs {
 namespace decoder {
@@ -42,8 +46,9 @@ namespace decoder {
 class StationFilterElement {
   StationFilterElement();
   explicit StationFilterElement(const std::string &filterName);
- public:
 
+  friend class StationFilters;
+ public:
   ~StationFilterElement();
 
   void publish(bool pub);
@@ -51,6 +56,8 @@ class StationFilterElement {
   bool publish() const;
   bool saveToDb() const;
 
+  bool stationDefined(long stationId) const;
+  bool typeDefined(long typeId) const;
   void setStationRange(long stationIdFrom, long stationIdTo);
   void addStation(long stationId);
   void addTypeId(long typeId);
@@ -60,8 +67,11 @@ class StationFilterElement {
   /**
    * @throw std::logig_error on error;
    */
-  static StationFilterElement readConfig(const miutil::conf::ConfSection &conf, const std::string &name );
-  bool filter(long stationId, long typeId)const;
+  static StationFilterElement readConfig(const miutil::conf::ConfSection &conf, const std::string &name);
+  bool filter(long stationId, long typeId) const;
+
+  friend std::ostream& operator<<(std::ostream &strm, const StationFilterElement &filter);
+
  private:
   long stationIdRangeFrom_;
   long stationIdRangeTo_;
@@ -72,21 +82,46 @@ class StationFilterElement {
   bool saveToDb_;
 };
 
+class StationFilters;
+typedef std::shared_ptr<StationFilters> StationFiltersPtr;
+
 class StationFilters {
-  StationFilters();
-  std::list<StationFilterElement> filters;
+  StationFilterElement defaultFilter_;
+  std::list<StationFilterElement> filters_;
+
+  void configDefaultFilter(const miutil::conf::ConfSection &conf);
+
+  std::list<kvalobs::kvData> publishOrSaveData(const std::list<kvalobs::kvData> &sd, bool saveData) const;
+  std::list<kvalobs::kvTextData> publishOrSaveTextData(const std::list<kvalobs::kvTextData> &textData, bool saveData) const;
+
  public:
 
+  StationFilters();
   ~StationFilters();
 
-  static StationFilters readConfig(const miutil::conf::ConfSection &conf );
+  StationFilterElement filter(long stationId, long typeId) const;
+
+  std::list<kvalobs::kvData> saveDataToDb(const std::list<kvalobs::kvData> &sd) const;
+  std::list<kvalobs::kvTextData> saveTextDataToDb(const std::list<kvalobs::kvTextData> &textData) const;
+
+  std::tuple<std::list<kvalobs::kvData>, std::list<kvalobs::kvTextData> >
+  saveDataToDb(const std::list<kvalobs::kvData> &sd, const std::list<kvalobs::kvTextData> &textData) const;
+
+  std::list<kvalobs::kvData> publishData(const std::list<kvalobs::kvData> &sd) const;
+  std::list<kvalobs::kvTextData> publishData(const std::list<kvalobs::kvTextData> &textData) const;
+
+  kvalobs::serialize::KvalobsData publishData(const std::list<kvalobs::kvData> &sd, const std::list<kvalobs::kvTextData> &textData) const;
+
+  std::list<std::string> filterNames() const;
+  /**
+   * @throw std::logical_error if the filter do not exist.
+   */
+  StationFilterElement getFilterByName(const std::string &name) const;
+  static StationFiltersPtr readConfig(const miutil::conf::ConfSection &conf);
 
 };
 
 }
 }
-
-
-
 
 #endif /* SRC_LIB_DECODER_DECODERBASE_STATIONFILTER_H_ */

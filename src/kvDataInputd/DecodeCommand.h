@@ -79,7 +79,11 @@ class DecodeCommand : public miutil::Runable {
   }
 
   kvalobs::kvStationInfoList& getInfoList();
+
   std::list<kvalobs::serialize::KvalobsData>& getDecodedData();
+
+  std::list<kvalobs::serialize::KvalobsData>& getPublishData();
+
 
   bool isOk() const {
     return result == kvalobs::decoder::DecoderBase::Ok;

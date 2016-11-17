@@ -50,9 +50,11 @@ class RawDataCommand : public kvalobs::service::ProducerCommand {
   RawDataCommand& operator=(const RawDataCommand &);
 
   std::string data;
+  std::string logId;
 
  public:
   explicit RawDataCommand(const std::string &rawData);
+  explicit RawDataCommand(const kvalobs::serialize::KvalobsData &kvalobsData);
 
   const char *getData(unsigned int *size) const;
   virtual void onSend(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &threadName);

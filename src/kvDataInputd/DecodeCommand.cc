@@ -56,6 +56,12 @@ DecodeCommand::getDecodedData() {
   return decoder->getDecodedData();
 }
 
+std::list<kvalobs::serialize::KvalobsData>&
+DecodeCommand::getPublishData() {
+  return decoder->getPublishData();
+}
+
+
 void DecodeCommand::run() {
   LOGDEBUG("DecodeCommand::execute: called!\n");
 

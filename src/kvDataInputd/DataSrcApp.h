@@ -84,6 +84,10 @@ struct KafkaConfig {
   std::string getRawTopic() {
     return kvalobs::subscribe::queue::raw(domain);
   }
+
+  std::string getPublishTopic() {
+      return kvalobs::subscribe::queue::checked(domain);
+  }
 };
 
 /**
@@ -112,6 +116,8 @@ class DataSrcApp : public KvBaseApp {
   KafkaConfig kafkaConfig;
   DecoderExecutor decoderExecutor;
   kvalobs::service::KafkaProducerThread kafkaRawStream;
+  kvalobs::service::KafkaProducerThread kafkaPubStream;
+  kvalobs::decoder::StationFiltersPtr filters;
 
   /**
    * \brief registerParams reads parameter information from the table
@@ -206,7 +212,7 @@ class DataSrcApp : public KvBaseApp {
 
   void releaseDecodeCommand(DecodeCommand *command);
 
-  bool sendInfoToManager(const kvalobs::kvStationInfoList &info, const std::list<kvalobs::serialize::KvalobsData> &decodedData);
+  bool publishData(const std::list<kvalobs::serialize::KvalobsData> &publishData);
 
   HttpConfig getHttpConfig() const {
     return httpConfig;
@@ -238,6 +244,11 @@ class DataSrcApp : public KvBaseApp {
   kvalobs::service::ProducerQuePtr getRawQueue() {
     return kafkaRawStream.queue;
   }
+
+  kvalobs::service::ProducerQuePtr getPublishQueue() {
+      return kafkaPubStream.queue;
+  }
+
 
   /**
    * \brief Request shutdown. Ie. we want to terminate.
