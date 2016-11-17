@@ -24,7 +24,8 @@ case "$1" in
     		mkdir -p /var/log/kvalobs/
     		chown kvalobs:kvalobs /var/log/kvalobs/
     	fi
-		start kvkafkalistener 
+    	systemctl enable kvkafkalistener
+    	systemctl start kvkafkalistener
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
