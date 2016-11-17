@@ -1,3 +1,4 @@
+
 kvalobs (3.0.11-1) UNRELEASED; urgency=medium
   * Adapt to change api change in libhttpserver.
   * Use version 0.9.0 of libhttpserver. (The only one that work at the moment.)
@@ -7,7 +8,6 @@ kvalobs (3.0.11-1) UNRELEASED; urgency=medium
   * new version
 
  -- Borge Moe <borge.moe@met.no>  Mon, 05 Dec 2016 10:29:23 +0100
-
 
 kvalobs (3.0.6-1) UNRELEASED; urgency=medium
   * Fix initialization bug in comobsdecode.
@@ -22,7 +22,6 @@ kvalobs (3.0.6-1) UNRELEASED; urgency=medium
 
  -- Borge Moe <borge.moe@met.no>  Wed, 22 Jun 2016 13:45:00 +0200
  
-
 kvalobs (3.0.3-1) UNRELEASED; urgency=medium
   * Fix timeconvert bug.
 
