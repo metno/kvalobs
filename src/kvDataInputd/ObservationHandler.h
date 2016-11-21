@@ -37,7 +37,7 @@
 #include "lib/kvsubscribe/ProducerCommand.h"
 #include "kvDataInputd/DataSrcApp.h"
 
-class ObservationHandler : public httpserver::http_resource {
+class ObservationHandler : public httpserver::http_resource<ObservationHandler> {
  public:
   struct Observation {
     std::string obsType;
