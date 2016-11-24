@@ -30,7 +30,7 @@
 KVCONFIG=/usr/bin/kvconfig
 
 KVBIN=`$KVCONFIG --bindir`
-KVPID=`$KVCONFIG --localstatedir`/run/kvalobs
+KVPID=`$KVCONFIG --rundir`
 KVCONF=`$KVCONFIG --sysconfdir`/kvalobs
 LIBDIR=`$KVCONFIG --pkglibdir`
 
