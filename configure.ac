@@ -1,5 +1,5 @@
 AC_PREREQ([2.59])
-AC_INIT([kvalobs], [3.0.5], [kvoss@met.no])
+AC_INIT([kvalobs], [3.0.7], [kvoss@met.no])
 AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -115,7 +115,7 @@ RDKAFKA_CHECK
 PKG_CHECK_MODULES(cppunit, cppunit)
 AC_PATH_PROG(CMAKE, cmake, false)
 GMOCK_DIST_CHECK([src/lib/gtest])
-PKG_CHECK_MODULES( [libhttpserver], [libhttpserver >= 0.11.0] )
+PKG_CHECK_MODULES( [libhttpserver], [libhttpserver >= 0.9.0] )
 AC_CHECK_LIB(perl, [main], [], [AC_MSG_ERROR([no libperl found])])
 
 KV_PERL

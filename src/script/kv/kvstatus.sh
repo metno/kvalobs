@@ -69,7 +69,7 @@ use( )
   echo " "
 	echo " status er gitt med: OK, not running, stopped."
 	echo "  - OK, programmet kjører."
-	echo "  - not rinning, programmet kjører ikke, mest sansynlig"
+	echo "  - not running, programmet kjører ikke, mest sansynlig"
 	echo "    så har det krasjet."
 	echo "  - stopped, programmet er stoppet av operatør med kvstop."
 	echo " "
