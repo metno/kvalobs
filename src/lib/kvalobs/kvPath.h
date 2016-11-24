@@ -32,6 +32,7 @@
 #define __kvPath_h__
 
 #include <string>
+#include <vector>
 
 namespace kvalobs {
 enum PathQuery {
@@ -90,5 +91,11 @@ std::string kvPath(const std::string &name, const std::string &system =
  *  by programs.
  */
 void setKvPathPrefix(const std::string &prefix);
+
+/**
+ * Get a list of all available string arguments to kvPath
+ */
+std::vector<std::string> availableKvPathIdentifiers();
+
 
 #endif

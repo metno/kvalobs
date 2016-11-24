@@ -147,3 +147,11 @@ std::string kvPath(const std::string &name, const std::string &system) {
 void setKvPathPrefix(const std::string &prefix) {
   kvalobs::prefix_ = prefix;
 }
+
+std::vector<std::string> availableKvPathIdentifiers()
+{
+	std::vector<std::string> ret;
+	for (const auto & element : kvalobs::pathNameTranslations)
+		ret.push_back(element.first);
+	return ret;
+}

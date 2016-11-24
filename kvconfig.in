@@ -57,7 +57,7 @@ case $1 in
 	--sysconfdir) echo @sysconfdir@ ;;
 	--localstatedir) echo @localstatedir@ ;;
 	--kvstatedir) echo @localstatedir@/@PACKAGE@ ;;
-	--rundir) echo @localstatedir@/run/@PACKAGE@ ;;
+	--rundir) echo @localstatedir@/lib/@PACKAGE@/run ;;
 	--logdir) echo @localstatedir@/log/@PACKAGE@ ;;
 	--pkglibdir) echo @libdir@/@PACKAGE@ ;;
 	--version) echo $VERSION ;;
