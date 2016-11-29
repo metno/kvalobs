@@ -152,7 +152,7 @@ isProgRunning()
     local pidfile; local pid
     
     running="" 
-    piddir=`$KVCONFIG --localstatedir`/run/kvalobs
+    piddir=`$KVCONFIG --rundir`
     nodename=`uname -n`
     pidfile=$piddir/$1-$nodename.pid
     prog=$1
