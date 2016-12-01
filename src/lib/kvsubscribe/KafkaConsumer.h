@@ -30,6 +30,7 @@
 #ifndef KAFKACONSUMER_H_
 #define KAFKACONSUMER_H_
 
+#include <functional>
 #include <string>
 #include <memory>
 #include <librdkafka/rdkafkacpp.h>
