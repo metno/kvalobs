@@ -33,7 +33,9 @@
 #include <exception>
 #include <mutex>
 #include <string>
+#include <thread>
 #include "milog/milog.h"
+#include "kvdb/kvdb.h"
 #include "DataIdentifier.h"
 #include "KvalobsDatabaseAccess.h"
 
@@ -64,9 +66,14 @@ void MissingRunner::run() {
   while (obstime < boost::posix_time::microsec_clock::universal_time()
       && !stopped()) {
     LOGINFO("Locating missing observations at " << obstime);
-    addAllMissingData(dbAccess, obstime);
-    dbAccess.setLastFindAllMissingRuntime(obstime);
-    obstime += hours(1);
+    try {
+	  addAllMissingData(dbAccess, obstime);
+	  dbAccess.setLastFindAllMissingRuntime(obstime);
+	  obstime += hours(1);
+    } catch (dnmi::db::SQLSerializeError & e) {
+    	LOGWARN(e.what() << "  - retrying");
+    	std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
   }
 }
 
