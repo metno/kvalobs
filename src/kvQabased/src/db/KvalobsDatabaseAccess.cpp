@@ -104,7 +104,7 @@ void KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::exec(
     throw std::runtime_error("No transaction in progress");
 }
 void KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::beginTransaction() {
-  connection_->beginTransaction(dnmi::db::Connection::SERIALIZABLE);
+  connection_->beginTransaction(dnmi::db::Connection::REPEATABLE_READ);
   transactionInProgress_ = true;
 }
 void KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::commit() {
@@ -366,7 +366,8 @@ void KvalobsDatabaseAccess::getData(
   else
     query << "obstime BETWEEN '" << to_kvalobs_string(t) << "' AND '"
           << to_kvalobs_string(si.obstime()) << "'";
-  query << " ORDER BY obstime DESC;";
+  query << " ORDER BY obstime DESC";
+  query << " FOR UPDATE;";
 
   milog::LogContext context("query");
   LOGDEBUG1(query.str());
