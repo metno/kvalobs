@@ -1,25 +1,13 @@
 #This file defines the host(s) this kvalobs instance 
-#run on and the programs to set/remove and check ipalias
-#status.
+#run on and the programs to check which host
+#is the current production host.
 #
-#It is expected that the program takes the commands: 
-#start, stop and status, ie
+#The KVHOSTS must be set to the hostname or ip-adress
+#to the hosts that is part of the production kvalobs system.
 #
-#  alias_name start|stop|status
-#
-#where 'name' is the alias name without the domain.
-#
-#This file is sourced by shell script so please remember
-#no space between the equal sign and the value.
-#
-#The IPALIAS_CHOICES is the aliases searched for in 
-#the order they are specified. The first alias found is
-#used.
-#
-#The PRIMARY_HOSTS must be set with host names as returned
-#by the command 'uname -n' on the host machines.
+#KVMASTER_HOST is an ip that is assigned to the host that is the
+#current master host.
 
-
-PRIMARY_HOSTS="kvalobs1 kvalobs2"
-IPALIAS_CHOICES="/usr/local/bin/alias_kvalobs"
+KVHOSTS="kvalobs1 kvalobs2"
+KVMASTER_HOST="kvalobs"
  

@@ -1,11 +1,20 @@
+kvalobs (4.0.0-1) UNRELEASED; urgency=medium
+  * Change main version in a attemt to resolve the conflict with the old (corba) kvalobs.
+  
+ -- Borge Moe <borge.moe@met.no>  Fri, 23 Dec 2016 10:23:02 +0100
+
+
+kvalobs (3.0.12-1) UNRELEASED; urgency=medium
+  * More logging in kvcpp when connect to a database is failing.
+  * Fix script to no longer use ip-alias.
+
+ -- Borge Moe <borge.moe@met.no>  Mon, 19 Dec 2016 10:23:02 +0100
+  
 kvalobs (3.0.11-1) UNRELEASED; urgency=medium
   * Adapt to change api change in libhttpserver.
   * Use version 0.9.0 of libhttpserver. (The only one that work at the moment.)
   * new version
-  * new version
-  * new version
-  * new version
-
+  
  -- Borge Moe <borge.moe@met.no>  Mon, 05 Dec 2016 10:29:23 +0100
 
 kvalobs (3.0.10-1) UNRELEASED; urgency=medium

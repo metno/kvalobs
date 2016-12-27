@@ -22,7 +22,7 @@ usr/lib/kvalobs/decode/*.so.*
 usr/lib/kvalobs/tool_funcs.sh
 usr/lib/nagios/plugins/*
 etc/kvalobs/kv_ctl.conf
-etc/kvalobs/kv-ipalias.conf
+etc/kvalobs/kv-ips.conf.template
 etc/kvalobs/kvcron
 etc/kvalobs/kvincron
 etc/kvalobs/kv2norcom.conf.template

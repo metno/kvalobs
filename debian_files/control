@@ -15,10 +15,10 @@ Build-Depends: debhelper (>= 9), autotools-dev, debconf,
  liblog4cpp5-dev, libcppunit-dev (>= 1.12),
  librdkafka-dev,
  libhttpserver-dev (= 0.9.0),
- metlibs-putools-dev
+ metlibs-putools-dev, cmake, google-mock
 Standards-Version: 3.9.2
 
-Package: libkvalobs6
+Package: libkvalobs7
 Section: libs
 Architecture: any
 Depends:  ${shlibs:Depends}, ${misc:Depends}
@@ -28,21 +28,21 @@ Description: Client library for kvalobs
 Package: libkvalobs-dev
 Section: libdevel
 Architecture: any
-Depends: libkvalobs6 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends} 
+Depends: libkvalobs7 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends} 
 Description: Client library for kvalobs
  May be used to write applications connecting to kvalobs
 
-Package: libkvcpp6
+Package: libkvcpp7
 Section: libs
 Architecture: any
-Depends:  libkvalobs6 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Depends:  libkvalobs7 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: Runtime library for kvalobs clients
  Kvalobs is a quality control system for meteorological observations.
 
 Package: libkvcpp-dev
 Section: libdevel
 Architecture: any
-Depends: libkvcpp6 (= ${binary:Version}), 
+Depends: libkvcpp7 (= ${binary:Version}), 
  libkvalobs-dev (= ${binary:Version}),
  libxml++2.6-dev (>= 2.14.0),
  libboost-dev (>= 1.40.0), libboost-thread-dev (>= 1.40.0),
@@ -57,7 +57,7 @@ Package: kvalobs
 Architecture: any
 Depends: kvalobsuser, adduser, debconf, sqlite3,
  python,
- libkvalobs6 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+ libkvalobs7 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Suggests: postgresql-client
 Description: quality control system for meteorological observations
  Kvalobs is a quality control system for meteorological observations.
@@ -79,12 +79,12 @@ Description: Install sql files for creating kvalobs database
 
 Package: kvsubscribe
 Architecture: any
-Depends: libkvalobs6 (= ${binary:Version})
+Depends: libkvalobs7 (= ${binary:Version})
 Description: List data from kvalobs in real time 
 
 Package: kvkafkalistener
 Architecture: any
-Depends: libkvalobs6 (= ${binary:Version})
+Depends: libkvalobs7 (= ${binary:Version})
 Description: Very simple monitoring daemon for kvalobs
  Will periodically write and update kvalobs status information to 
  /var/log/kvalobs/kvkafkalistener.log 
@@ -105,7 +105,7 @@ Description: Client program to send data to a kvalobs server
 Package: kv2kvdatainputd
 Architecture: any
 Depends:  ${shlibs:Depends}, ${misc:Depends},
- libkvalobs6 (>= ${binary:Version})
+ libkvalobs7 (>= ${binary:Version})
 Description: receive data from another kvalobs server
  kv2kvDataInputd listens for data updates from one kvalobs
  instance, strips them so that only the original data are transferred,
