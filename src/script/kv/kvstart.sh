@@ -1,4 +1,4 @@
-#!/bin/dash
+#!/bin/bash
 #  Kvalobs - Free Quality Control Software for Meteorological Observations 
 #
 #  Copyright (C) 2007 met.no
@@ -27,6 +27,7 @@
 #  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 KVCONFIG=__KVCONFIG__
+#KVCONFIG=/usr/bin/kvconfig
 
 KVBIN=`$KVCONFIG --bindir`
 KVPID=`$KVCONFIG --rundir`
@@ -44,18 +45,32 @@ fi
 NODENAME=$(uname -n)
 
 is_master=false
-res=0
-has_ip_alias=`ipalias_status` || res=$? 
+is_standby=false
+has_ip_alias=`ipalias_status` 
+
+echo "has_ip_alias: $has_ip_alias"
 
 case "$has_ip_alias" in
-   true) echo "This node '$NODENAME' is the current kvalobs master!"
-         is_master=true
-		  ;;
-   test) echo "This node '$NODENAME' is an kvalobs test machine!"
-        ;;
+   true)
+      echo  
+      echo "  This node '$NODENAME' is the current kvalobs master!"
+      echo 
+      is_master=true
+		;;
+   false) 
+      echo 
+      echo "  This node '$NODENAME' is a standby host!"
+      echo 
+      is_standby=true 
+      exit 0
+      ;;
+   test) 
+      echo 
+      echo "  This node '$NODENAME' is an kvalobs test machine!"
+      echo 
+      ;;
    *) echo
-      echo "  This node '$NODENAME' is NOT the kvalobs master "
-      echo "  or an test machine." 
+      echo "  Configuration error, check $KVCONF/kv-ips.conf."
 	   echo 
 	   exit 1
 esac

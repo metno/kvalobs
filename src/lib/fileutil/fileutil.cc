@@ -179,6 +179,43 @@ long fileSize(const std::string &filepath) {
   return sbuf.st_size;
 }
 
+
+bool logrotate(const std::string &fname_, int nRotate, int maxSize ) {
+  ostringstream ostNew;
+  ostringstream ostOld;
+  std::string fname(fname_);
+
+  try {
+    if(!isfile(fname))
+      return false;
+
+    if( fileSize(fname) < maxSize )
+      return true;
+
+    ostNew << fname << "." << nRotate;
+
+    unlink(ostNew.str().c_str()); //Remove the oldest
+
+    for (int i = nRotate; i > 1; i--) {
+      ostNew.str("");
+      ostOld.str("");
+      ostNew << fname << "." << i;
+      ostOld << fname << "." << i - 1;
+
+      rename(ostOld.str().c_str(), ostNew.str().c_str());
+    }
+
+
+    rename(fname.c_str(), string(fname + string(".1")).c_str());
+
+    return true;
+  }
+  catch( ... ) {
+    return false;
+  }
+}
+
+
 }
 }
 

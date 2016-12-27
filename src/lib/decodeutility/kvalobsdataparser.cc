@@ -86,6 +86,7 @@ struct KvalobsDataHandler : public HandlerFunction {
   virtual void operator()(const AttributeList & attr, KvalobsData & data_,
                           map<string, string> & context_) const {
     data_.overwrite(has_attr(attr, "overwrite"));
+    data_.created(get_attr(attr, "created"));
   }
 };
 class ValHandler : public HandlerFunction {

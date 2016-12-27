@@ -45,7 +45,22 @@ typedef std::list<kvalobs::kvData>::iterator IKvDataList;
 typedef std::list<kvalobs::kvData>::const_iterator CIKvDataList;
 
 //  typedef std::list<KvDataList>                      KvObsDataList;
-typedef std::list<KvObsData> KvObsDataList;
+//typedef std::list<KvObsData> KvObsDataList;
+
+struct KvObsDataList: public std::list<KvObsData> {
+ public:
+  boost::posix_time::ptime created; ///Set from the kv-xml by the data receiver.
+
+  KvObsDataList(std::initializer_list<std::list<KvObsData>::value_type> il,
+                const allocator_type& alloc = allocator_type())
+  :std::list<KvObsData>(il, alloc)
+   {}
+  KvObsDataList(){}
+  explicit KvObsDataList(const boost::posix_time::ptime &created):created(created){}
+
+  friend std::ostream& operator<< (std::ostream &o, const KvObsDataList &d);
+};
+
 typedef KvObsDataList::iterator IKvObsDataList;
 typedef KvObsDataList::const_iterator CIKvObsDataList;
 
@@ -60,6 +75,8 @@ typedef boost::shared_ptr<KvWhatList> KvWhatListPtr;
 
 typedef std::list<kvalobs::kvWorkelement> KvWorkelementList;
 typedef boost::shared_ptr<KvWorkelementList> KvWorkelementListPtr;
+
+std::ostream& operator<< (std::ostream &o, const KvObsDataList &d);
 
 }
 #endif

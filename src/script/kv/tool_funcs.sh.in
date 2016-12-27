@@ -1,10 +1,11 @@
-primary_host=""
-ipalias=""
+test_host=false
+conffile="/etc/kvalobs/kv-ips.conf"
 
 #INPUT variable that can be defined 
 #logfile - A file to log to. /dev/null if not defined.
 #SILENT - (true|false) Write to the terminal if false.
 #DOLOG - (true|false) Write to the logfile if true. 
+
 
 if [ -z "$DOLOG" ]; then
    DOLOG=true
@@ -19,28 +20,54 @@ if [ x"$KVCONF" = "x" ]; then
 fi
 
 
-if [ -f "/etc/kvalobs/kv-ipalias.conf" ]; then
-    . /etc/kvalobs/kv-ipalias.conf
+if [ -f $conffile ]; then
+    . $conffile
     mylog=/dev/null
     [ x"$logfile" = "x" ] || mylog=$logfile
-    echo "Reading '/etc/kvalobs/kv-ipalias.conf'!" | tee -a $mylog
+    echo "Reading '$conffile'!" | tee -a $mylog
+else
+   test_host=true
 fi
 
-#echo "PRIMARY_HOSTS: $PRIMARY_HOSTS"
-#echo "IPALIAS_CHOICES: $IPALIAS_CHOICES"
+#echo "KVHOSTS: $KVHOSTS"
+#echo "KVMASTER_HOST: $KVMASTER_HOST"
 
 
-[ x"$PRIMARY_HOSTS" = "x" ] || primary_host="$PRIMARY_HOSTS" 
+is_ip_popinting_to_me() 
+{
+   local myip=""
+   local mylog=""
+   local testfile=$(mktemp /tmp/kv_ip_check.XXXXXXX)
+   local sshlog=$(mktemp /tmp/kv_ip_check_ssh_log.XXXXXXX)
+      
+   echo "Running ssh comand: 'ssh kvalobs@$1 ls $testfile'" >> $sshlog
+   ssh kvalobs@$1 ls $testfile  >> $sshlog 2>&1
+   
+   if [ $? -eq 0 ]; then
+      myip=$1
+   elif [ $? -eq 255 ]; then
+     logerror "$(cat $sshlog)"
+   fi
+   #loginfo "$(cat $sshlog)"
+   rm -f $testfile
+   rm -f $sshlog
+   echo "$myip"
+}
 
-if [ x"$IPALIAS_CHOICES" != "x" ]; then
-    for myalias in $IPALIAS_CHOICES; do
-#	echo "myalias: $myalias"
-        if [ -x "$myalias" ]; then
-            ipalias=$myalias
-            break
-        fi
-    done
-fi
+my_extern_ip() 
+{
+   local myip=""
+   for ip in "$1"; do
+      testip=$(is_ip_popinting_to_me $ip)
+      if [ -n "$testip" ]; then
+         myip=ip
+         break 
+      fi
+   done
+   rm -f $testfile
+   echo "$myip"
+}
+
 
 log()
 {
@@ -104,19 +131,13 @@ loginfo()
 }
 
 
-if [ -z "$ipalias" ]; then
-    log "ipalias: NOT defined, this is ok if this instance of kvalobs do not use ip-alias." 
-else
-    log "ipalias: $ipalias"
-fi
-
-
 ipalias_status()
 {
     local me=`uname -n`
     local res=0
+    local prodhost=""
 
-    if [ -z "$ipalias" ]; then
+    if [ "$test_host" = true ]; then
         if [ "$SILENT" != true ]; then
            log "$me, is a test machine (?)."
         fi
@@ -124,25 +145,23 @@ ipalias_status()
         return 0
     fi
 
-    $ipalias status > /dev/null 2>&1 || res=$?
-
-    if [ "$res" = "2" ]; then
-		log "This machine has the kvalobs ip alias."
-		echo "true" 
-		return 0
-    elif [ "$res" = "1" ]; then
-		log "Another machine has the kvalobs ip alias."
+    if [ -z "$KVMASTER_HOST" ]; then
+        log "Configuration error, no KVMASTER_HOST defined in the configuartaion file '$conffile'."
+        echo "undefined"
+        return 2
+    fi 
+      
+    prodhost=$(is_ip_popinting_to_me $KVMASTER_HOST)
+    
+    if [ -n "$prodhost" ]; then
+       log "This machine is the kvalobs master."
+       echo "true" 
+		 return 0
+    else 
+		log "Another machine has the kvalobs production ip '$KVMASTER_HOST'."
 		echo "false"
 		return 1
-    elif [ "$res" = "0" ]; then
-        log "No machine has the kvalobs ip alias."
-        echo "false"
-        return 1
-    else
-		logerror "FAILED - kvalobs ipalias status." 
-		echo "undefined"
-		return 2
-    fi
+	 fi
 }
 
 isProgRunning()

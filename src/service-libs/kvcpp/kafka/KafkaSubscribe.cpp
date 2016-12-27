@@ -77,7 +77,8 @@ void broadcast(const ::kvalobs::serialize::KvalobsData & d,
     obsData.textDataList().push_back(d);
   }
 
-  kvservice::KvObsDataListPtr toSend(new kvservice::KvObsDataList);
+  kvservice::KvObsDataListPtr toSend(new kvservice::KvObsDataList(d.created()));
+
   for (auto element : elements)
     toSend->push_back(element.second);
 
@@ -124,7 +125,10 @@ void broadcast(const ::kvalobs::serialize::KvalobsData & d,
   if ( data.empty() && textData.empty() )  // Do not publish empty messages.
     return;
 
-  broadcast(serialize::KvalobsData(data, textData), queue);
+  serialize::KvalobsData theData(data, textData);
+  theData.created(d.created());
+
+  broadcast(theData, queue);
 }
 
 struct cmpWhat {

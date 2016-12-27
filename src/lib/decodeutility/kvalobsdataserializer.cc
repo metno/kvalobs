@@ -60,7 +60,10 @@ KvalobsDataSerializer::~KvalobsDataSerializer() {
 
 string KvalobsDataSerializer::serialize(const KvalobsData & d) {
   KvalobsDataSerializer s(d);
-  return s.toString();
+  if( d.created().is_special())
+    return s.toString();
+  else
+    return s.toString(d.created());
 }
 
 const KvalobsData & KvalobsDataSerializer::toData() const {
@@ -81,11 +84,19 @@ Element * set_(Element * parent, const std::string & name, Val val) {
 }
 
 std::string KvalobsDataSerializer::toString() const {
+  ptime created=boost::posix_time::second_clock::universal_time();
+  return toString(created);
+}
+
+std::string KvalobsDataSerializer::toString(const boost::posix_time::ptime &created) const {
   DomParser parser;
   Document * document = parser.get_document();
   Element * root = document->create_root_node("KvalobsData");
   if (data_.overwrite())
     root->set_attribute("overwrite", "1");
+
+  if( ! created.is_special() )
+    root->set_attribute("created", to_kvalobs_string(created));
 
   using namespace internal;
 

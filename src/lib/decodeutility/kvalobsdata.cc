@@ -32,12 +32,14 @@
 #include <kvalobs/kvDataOperations.h>
 #include <kvalobs/kvTextDataOperations.h>
 #include <kvalobs/kvTextData.h>
+#include <miutil/timeconvert.h>
 #include <boost/any.hpp>
 #include <stack>
 
 using namespace std;
 using boost::posix_time::ptime;
 using boost::posix_time::special_values;
+using boost::posix_time::time_from_string_nothrow;
 
 namespace kvalobs {
 namespace serialize {
@@ -229,6 +231,25 @@ void KvalobsData::getInvalidate(std::list<InvalidateSpec> & invSpec) {
   }
 }
 
+boost::posix_time::ptime KvalobsData::created()const{
+  return created_;
+}
+
+  ///Mostly for test and internal use. It is set by the constructor or when it is created
+  ///by the deserializer.
+void KvalobsData::created(const boost::posix_time::ptime &time) {
+  created_=time;
+}
+
+void KvalobsData::created(const std::string &isotimestamp ){ /// Can be an empty string -> is_spesial
+  if( isotimestamp.empty())
+    created_=ptime();
+  else
+    created_=time_from_string_nothrow(isotimestamp);
+}
+
+
+
 std::set<kvalobs::kvStationInfo> KvalobsData::summary() const {
   std::set<kvalobs::kvStationInfo> ret;
 
@@ -279,6 +300,9 @@ std::ostream& operator<<(std::ostream &ost, const KvalobsData &data) {
 
   return ost;
 }
+
+
+
 
 }
 

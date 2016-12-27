@@ -174,6 +174,7 @@ class KvalobsData {
 
   /**
    * Remove all data and reset the overwrite flag to false.
+   *
    */
   void clear() {
     overwrite_ = false;
@@ -237,12 +238,21 @@ class KvalobsData {
    */
   std::set<kvalobs::kvStationInfo> summary() const;
 
+  ///Can return is_spesial if the xml-document it is created from does not have the attribute 'created'.
+  boost::posix_time::ptime created()const;
+
+  ///Mostly for test and internal use. It is set when the data is deserialized.
+  ///It will set the attribute
+  void created(const boost::posix_time::ptime &time);
+  void created(const std::string &isotimestamp ); /// Can be an empty string -> is_spesial
+
   friend std::ostream& operator<<(std::ostream &o, const KvalobsData &d);
  private:
   bool overwrite_;
   internal::Observations obs_;
 
   RejectList correctedMessages_;
+  boost::posix_time::ptime created_;
 };
 
 std::ostream& operator<<(std::ostream &o, const KvalobsData &d);

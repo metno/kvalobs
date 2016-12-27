@@ -64,13 +64,15 @@ class DataSubscriber : public KafkaConsumer {
    * The identifying string for this message stream
    */
   static std::string topic(const std::string & domain);
-
+  static void setDebugWriter(std::function<void(const std::string &message, const serialize::KvalobsData &d)> func);
+  static void resetDebugWrite();
  protected:
 
   virtual void data(const char * msg, unsigned length);
   virtual void error(int code, const std::string & msg);
 
  private:
+  static std::function<void(const std::string &message, const serialize::KvalobsData &d)> debugWriter;
   Handler handler_;
 };
 

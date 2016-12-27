@@ -59,6 +59,7 @@ class KvalobsDataSerializer {
   KvalobsData & toData();
 
   std::string toString() const;
+  std::string toString(const boost::posix_time::ptime &created) const;
 
  private:
   KvalobsData data_;

@@ -17,7 +17,8 @@ libkvalobs_kvcpp_la_SOURCES = \
 	kvWhat.cc \
 	RejectdecodeIterator.cc \
 	WhichDataHelper.cc\
-	WorkstatistikIterator.cc
+	WorkstatistikIterator.cc \
+	kvservicetypes.h kvservicetypes.cc 
 	
 
 kvcppincludedir = $(pkgincludedir)/kvcpp

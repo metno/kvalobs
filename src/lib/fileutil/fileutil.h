@@ -104,6 +104,8 @@ bool pathExist(const std::string &path, bool onlyDirAndRegularFiles = true);
  */
 long fileSize(const std::string &filepath);
 
+bool logrotate(const std::string &fname_, int nRotate, int maxSize );
+
 }
 
 }

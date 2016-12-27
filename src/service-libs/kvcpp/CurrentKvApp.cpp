@@ -109,6 +109,27 @@ std::string getValue(const std::string & key, std::shared_ptr<miutil::conf::Conf
   return val.front().valAsString();
 }
 
+std::string removePassword(const std::string &connect) {
+  using namespace std;
+  string con(connect);
+  int i = con.find("password");
+  int k;
+
+  if( i == string::npos )
+    return con;
+
+  k=con.find_first_of("=", i);
+  if( k == string::npos) {
+    k=con.length();
+  } else {
+    k=con.find_first_of(" \n\t\r", k);
+    if( k==string::npos)
+      k=con.length();
+  }
+
+  return con.replace(i, k-i, "password=*******");
+}
+
 dnmi::db::Connection * createConnection(std::shared_ptr<miutil::conf::ConfSection> conf) {
   std::string connectString = getValue("database.dbconnect", conf);
   std::string driver = kvalobs::kvPath(kvalobs::libdir) + "/kvalobs/db/" + getValue("database.dbdriver", conf);
@@ -118,8 +139,10 @@ dnmi::db::Connection * createConnection(std::shared_ptr<miutil::conf::ConfSectio
     throw std::runtime_error("Unable to load driver " + driver);
 
   dnmi::db::Connection * connection = dnmi::db::DriverManager::connect(driverId, connectString);
-  if (!connection or not connection->isConnected())
-    throw std::runtime_error("Unable to connect to database");
+  if (!connection or not connection->isConnected()) {
+
+    throw std::runtime_error("Unable to connect to database ("+driverId+") connect: '"+removePassword(connectString)+"'. Reason: "+dnmi::db::DriverManager::getErr());
+  }
   return connection;
 }
 
