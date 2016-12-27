@@ -39,7 +39,7 @@ KVCONFIG=__KVCONFIG__
 >>>>>>> Add debug hook to DataSubcriber. Add a created attribute to the kv-xml format.
 
 KVBIN=`$KVCONFIG --bindir`
-KVPID=`$KVCONFIG --localstatedir`/run/kvalobs
+KVPID=`$KVCONFIG --rundir`
 KVCONF=`$KVCONFIG --sysconfdir`/kvalobs
 LIBDIR=`$KVCONFIG --pkglibdir`
 

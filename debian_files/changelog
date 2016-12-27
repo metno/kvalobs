@@ -27,7 +27,6 @@ kvalobs (3.0.10-1) UNRELEASED; urgency=medium
 
  -- Borge Moe <borge.moe@met.no>  Mon, 05 Dec 2016 10:29:23 +0100
 
-
 kvalobs (3.0.6-1) UNRELEASED; urgency=medium
   * Fix initialization bug in comobsdecode.
   * new version

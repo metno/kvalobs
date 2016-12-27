@@ -622,11 +622,9 @@ bool kvalobs::decoder::DecoderBase::loadConf(int sid, int tid, kvalobs::decoder:
   ifstream fis;
 
   fnames << kvPath(sysconfdir);
-
   fnames << "/decode/" << name() << ".conf";
 
   std::string fname = fnames.str();
-
   fis.open(fname.c_str());
 
   if (!fis) {
