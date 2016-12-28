@@ -168,10 +168,10 @@ TEST_F( DecoderBaseTest, filter ) {
   ASSERT_TRUE(filter.saveToDb());
   ASSERT_FALSE(filter.publish());
 
-  dc::StationFilterElement filter = filters->filter(1, 302);
+  filter = filters->filter(1, 302);
   ASSERT_EQ("filter1", filter.name());
 
-  dc::StationFilterElement filter = filters->filter(10, 302);
+  filter = filters->filter(10, 302);
   ASSERT_EQ("filter1", filter.name());
 
 

@@ -1,3 +1,9 @@
+kvalobs (4.0.1-1) UNRELEASED; urgency=medium
+  * Fix test.
+  * rebuild from master.
+  
+ -- Borge Moe <borge.moe@met.no>  Wed, 28 Dec 2016 05:54:32 +0100
+
 kvalobs (4.0.0-1) UNRELEASED; urgency=medium
   * Change main version in a attemt to resolve the conflict with the old (corba) kvalobs.
   
