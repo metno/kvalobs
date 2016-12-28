@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-#!/bin/dash
-=======
 #!/bin/bash
->>>>>>> Add debug hook to DataSubcriber. Add a created attribute to the kv-xml format.
 #  Kvalobs - Free Quality Control Software for Meteorological Observations
 #
 #  Copyright (C) 2007 met.no
@@ -30,13 +26,8 @@
 #  with KVALOBS; if not, write to the Free Software Foundation Inc.,
 #  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-<<<<<<< HEAD
-#KVCONFIG=__KVCONFIG__
-KVCONFIG=/usr/bin/kvconfig
-=======
 KVCONFIG=__KVCONFIG__
 #KVCONFIG=/usr/bin/kvconfig
->>>>>>> Add debug hook to DataSubcriber. Add a created attribute to the kv-xml format.
 
 KVBIN=`$KVCONFIG --bindir`
 KVPID=`$KVCONFIG --rundir`
@@ -44,13 +35,8 @@ KVCONF=`$KVCONFIG --sysconfdir`/kvalobs
 LIBDIR=`$KVCONFIG --pkglibdir`
 
 if [ ! -f "$LIBDIR/tool_funcs.sh" ]; then
-<<<<<<< HEAD
 	echo "Cant load: $LIBDIR/tool_funcs.sh" >&2
 	exit 1
-=======
-        echo "Cant load: $LIBDIR/tool_funcs.sh" >&2
-        exit 1
->>>>>>> Add debug hook to DataSubcriber. Add a created attribute to the kv-xml format.
 fi
 
 . $LIBDIR/tool_funcs.sh
@@ -65,47 +51,14 @@ SCRIPT=false
 
 use( )
 {
-<<<<<<< HEAD
 	local ret=1
 	if [ $# -ge 1 ]; then
 		ret = $1
 	fi
-=======
-  local ret=1
-  if [ $# -ge 1 ]; then
-    ret = $1
-  fi
->>>>>>> Add debug hook to DataSubcriber. Add a created attribute to the kv-xml format.
 
   echo " kvstatus [-h] [-s] [progname]"
   echo " "
   echo " Tester om alle prosessene i kvalobs kjører. Kan også teste om"
-<<<<<<< HEAD
-	echo " et enkelt program 'progname' kjører."
-	echo " Resultatet er en liste på formen: "
-	echo " "
-	echo " progname .... status"
-	echo " "
-	echo " Hvor progname er en av programmene definert i START_PROGS i"
-	echo " filen ${KVCONF}/kv_ctl.conf. "
-  echo " "
-	echo " status er gitt med: OK, not running, stopped."
-	echo "  - OK, programmet kjører."
-	echo "  - not running, programmet kjører ikke, mest sansynlig"
-	echo "    så har det krasjet."
-	echo "  - stopped, programmet er stoppet av operatør med kvstop."
-	echo " "
-	echo " Options: "
-	echo "  -h Skriv denne hjelpe skjermen."
-	echo "  -s En mer skript venlig status liste på formen: "
-	echo "     progname status"
-	echo "     Og status er: OK, FAILED, STOPPED"
-	echo "     "
-	echo " Exit koden er 0 hvis alt er ok, dvs alle programmene kjøre."
-	echo " Exit kode 2 hvis noen av programmene ikke kjører (kræsjet)."
-	echo " Exit kode 1 hvis andre feil har oppstått"
-	echo " "
-=======
   echo " et enkelt program 'progname' kjører."
   echo " Resultatet er en liste på formen: "
   echo " "
@@ -130,24 +83,12 @@ use( )
   echo " Exit kode 2 hvis noen av programmene ikke kjører (kræsjet)."
   echo " Exit kode 1 hvis andre feil har oppstått"
   echo " "
->>>>>>> Add debug hook to DataSubcriber. Add a created attribute to the kv-xml format.
   exit $ret
 }
 
 res=0
 has_ip_alias=`ipalias_status` || res=$?
 case "$has_ip_alias" in
-<<<<<<< HEAD
-	true) echo "This node '$NODENAME' is the current kvalobs master!" >&2
-		  ;;
-    test) echo "This node '$NODENAME' is an kvalobs test machine!" >&2
-          ;;
-    *) echo >&2
-       echo "  This node '$NODENAME' is NOT the kvalobs master " >&2
-       echo "  or an test machine."  >&2
-	   echo  >&2
-	   exit 1
-=======
     true) echo "This node '$NODENAME' is the current kvalobs master!" >&2
           ;;
     test) echo "This node '$NODENAME' is an kvalobs test machine!" >&2
@@ -157,7 +98,6 @@ case "$has_ip_alias" in
        echo "  or an test machine."  >&2
        echo  >&2
        exit 1
->>>>>>> Add debug hook to DataSubcriber. Add a created attribute to the kv-xml format.
 esac
 
 if [ -e ${KVCONF}/kv_ctl.conf ]; then
@@ -172,17 +112,10 @@ do
   case $f in
     s) STATUS_OK=" OK"
        STATUS_FAILED=" FAILED"
-<<<<<<< HEAD
-		   STATUS_STOPPED=" STOPPED"
-			 ;;
-    h) use 0;;
-    \?) use 1;;
-=======
        STATUS_STOPPED=" STOPPED"
        ;;
     h) use 0;;
    \?) use 1;;
->>>>>>> Add debug hook to DataSubcriber. Add a created attribute to the kv-xml format.
   esac
 done
 shift `expr $OPTIND - 1`
@@ -196,27 +129,6 @@ fi
 ret=0
 
 for PROG in $START_PROGS ; do
-<<<<<<< HEAD
-	if [ "z$progname" != "z" ]; then
-		if ! echo $PROG | grep "^$progname" > /dev/null 2>&1 ; then
-			continue
-		fi
-	fi
-
-	echo -n " -- $PROG"
-
-	isProgRunning $PROG
-
-  if [ $? -eq 0 ]; then
-		echo "$STATUS_OK"
-  elif [ -f "$KVPID/$PROG-$NODENAME.stopped" ]; then
-		echo "$STATUS_STOPPED"
-		rm -f $KVPID/$PROG-$NODENAME.pid
-	else
-  	echo "$STATUS_FAILED"
-		rm -f $KVPID/$PROG-$NODENAME.pid
-		ret=2
-=======
   if [ "z$progname" != "z" ]; then
     if ! echo $PROG | grep "^$progname" > /dev/null 2>&1 ; then
       continue
@@ -236,7 +148,6 @@ for PROG in $START_PROGS ; do
     echo "$STATUS_FAILED"
     rm -f $KVPID/$PROG-$NODENAME.pid
     ret=2
->>>>>>> Add debug hook to DataSubcriber. Add a created attribute to the kv-xml format.
   fi
 done
 

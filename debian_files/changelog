@@ -1,3 +1,8 @@
+kvalobs (4.0.2-1) UNRELEASED; urgency=medium
+  * kvstatus: Fix merge error.
+  
+ -- Borge Moe <borge.moe@met.no>  Wed, 28 Dec 2016 11:00:00 +0100
+
 kvalobs (4.0.1-1) UNRELEASED; urgency=medium
   * Fix test.
   * rebuild from master.
