@@ -97,7 +97,7 @@ class DecodeCommand : public miutil::Runable {
     return ret;
   }
 
-  DecodeCommand *wait(int timeoutInSecond = 0);
+  DecodeCommand *wait(int timeoutInMilliseconds = 0);
   void signal();
   void run();
 };

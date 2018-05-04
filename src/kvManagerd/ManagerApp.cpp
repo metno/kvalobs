@@ -29,7 +29,10 @@
 
 #include "ManagerApp.h"
 #include <string>
+#include "miconfparser/miconfparser.h"
 #include <initializer_list>
+
+using std::string;
 
 ManagerApp::ManagerApp(int argc, char ** argv)
     : KvBaseApp(argc, argv) {
@@ -37,4 +40,13 @@ ManagerApp::ManagerApp(int argc, char ** argv)
 }
 
 ManagerApp::~ManagerApp() {
+}
+
+bool ManagerApp::checkForMissisngObs(bool defaultValue) const {
+  miutil::conf::ConfSection *conf=KvBaseApp::getConfiguration();
+
+  if( ! conf )
+    return defaultValue;
+
+  return conf->getValue("kvManagerd.check_for_missing_obs").valAsBool(defaultValue);
 }

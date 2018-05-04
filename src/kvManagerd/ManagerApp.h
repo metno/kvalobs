@@ -36,6 +36,8 @@ class ManagerApp : public KvBaseApp {
  public:
   ManagerApp(int argc, char ** argv);
   ~ManagerApp();
+
+  bool checkForMissisngObs(bool defaultValue)const;
 };
 
 #endif /* SRC_KVMANAGERD_MANAGERAPP_H_ */

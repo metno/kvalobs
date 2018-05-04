@@ -77,14 +77,14 @@ int main(int argc, char ** argv) {
 
     ManagerApp app(argc, argv);
     ManagerApp::PidFile pidFile("kvManagerd");
-
+    bool checkForMissingObs=app.checkForMissisngObs(false);
     std::string connectString = app.createConnectString();
     ObservationComplete observationComplete(connectString);
-    MissingRunner missingRunner(connectString);
+    MissingRunner missingRunner(connectString, checkForMissingObs);
     WorkQueueMover workQueueMover(connectString);
 
-
     LOGDEBUG("Starting manager");
+    LOGINFO("Check for missing observations '" << (checkForMissingObs?"enabled":"disabled") << "'.");
     std::thread missingThread(missingRunner);
     std::thread moverThread(workQueueMover);
     observationComplete();

@@ -28,8 +28,10 @@
  */
 
 
+#include "lib/milog/milog.h"
 #include "kvDataInputd/DecodeCommand.h"
 #include "kvDataInputd/DecoderExecutor.h"
+
 
 void DecoderExecutor::afterExecute(miutil::Runable *run) {
   DecodeCommand *cmd = dynamic_cast<DecodeCommand*>(run);
@@ -39,4 +41,9 @@ void DecoderExecutor::afterExecute(miutil::Runable *run) {
   } else {
     cmd->signal();
   }
+}
+
+void
+DecoderExecutor::log(const std::string &logMsg){
+  IDLOGDEBUG(logid, logMsg);
 }

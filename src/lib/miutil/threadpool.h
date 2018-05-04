@@ -58,7 +58,13 @@ class ThreadPool {
   int size;
   RunQueue runQueue;
   Pool pool;
+  int runningCount_;
 
+  static void runner(ThreadPool *pool, Runable *run);
+  static void runnerProc(ThreadPool *pool, ThreadPool::RunQueue *queue);
+
+  void incRunningCount();
+  void decRunningCount();
   void init_(int poolSize);
   void setName_(const std::string &name = std::string());
 
@@ -69,6 +75,14 @@ class ThreadPool {
   explicit ThreadPool(int size, const std::string &poolName = "");
   explicit ThreadPool(const std::string &poolName = "");
   virtual ~ThreadPool();
+
+  //Return the number of threads that is busy doing some jobs.
+  int runningCount()const;
+
+  // All threads is busy.
+  bool isBusy()const;
+
+  int waitingInRunQue()const;
 
   void init(int poolSize);
   void setName(const std::string &name = std::string());
@@ -87,7 +101,8 @@ class ThreadPool {
   unsigned int waitForTermination(
       const std::chrono::high_resolution_clock::duration &timeout =
           std::chrono::high_resolution_clock::duration::max());
-  void log(const std::string &logMsg);
+
+  virtual void log(const std::string &logMsg);
 };
 
 }  // namespace concurrent

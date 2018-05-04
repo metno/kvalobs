@@ -101,7 +101,7 @@ class BlockingQueue {
       throw QueueSuspended();
 
     dataQueue.push_back(value);
-    cond.notify_one();
+    cond.notify_all();
   }
 
   /**
@@ -125,7 +125,7 @@ class BlockingQueue {
       throw QueueSuspended();
 
     dataQueue.push_back(value);
-    cond.notify_one();
+    cond.notify_all();
 
     return true;
   }
@@ -146,7 +146,7 @@ class BlockingQueue {
     dataQueue.pop_front();
 
     if (maxSize > 0)
-      cond.notify_one();
+      cond.notify_all();
   }
 
   /**
@@ -169,7 +169,7 @@ class BlockingQueue {
 
     *value = dataQueue.front();
     dataQueue.pop_front();
-    cond.notify_one();
+    cond.notify_all();
 
     return true;
   }
@@ -208,7 +208,7 @@ class BlockingQueue {
     *value = dataQueue.front();
     dataQueue.pop_front();
 
-    cond.notify_one();
+    cond.notify_all();
 
     return true;
   }
@@ -217,6 +217,12 @@ class BlockingQueue {
     Lock lock(mutex);
     return dataQueue.empty();
   }
+
+  size_t size() const {
+    Lock lock(mutex);
+    return dataQueue.size();
+  }
+
 
   void suspend(bool clearQue = false) {
     Lock lock(mutex);
@@ -307,7 +313,7 @@ class BlockingQueuePtr {
       throw QueueSuspended();
 
     dataQueue.push_back(value);
-    cond.notify_one();
+    cond.notify_all();
   }
 
   /**
@@ -335,7 +341,7 @@ class BlockingQueuePtr {
       throw QueueSuspended();
 
     dataQueue.push_back(value);
-    cond.notify_one();
+    cond.notify_all();
 
     return true;
   }
@@ -348,14 +354,17 @@ class BlockingQueuePtr {
   get() {
     Lock lock(mutex);
 
-    cond.wait(lock, [this] {return !dataQueue.empty() || suspended;});
-
     if (suspended)
       throw QueueSuspended();
 
+    cond.wait(lock, [this] {return !dataQueue.empty() || suspended;});
+
+    if (suspended)
+         throw QueueSuspended();
+
     T* res = dataQueue.front();
     dataQueue.pop_front();
-    cond.notify_one();
+    cond.notify_all();
 
     return res;
   }
@@ -368,20 +377,23 @@ class BlockingQueuePtr {
            bool throwTimeout = false) {
     Lock lock(mutex);
 
+    if (suspended)
+      throw QueueSuspended();
+
     if (!cond.wait_for(lock, timeout,
                        [this] {return !dataQueue.empty() || suspended;})) {
+      if (suspended)
+        throw QueueSuspended();
+
       if (throwTimeout)
         throw QueueTimeout();
       else
         return nullptr;
     }
 
-    if (suspended)
-      throw QueueSuspended();
-
     T *res = dataQueue.front();
     dataQueue.pop_front();
-    cond.notify_one();
+    cond.notify_all();
 
     return res;
   }
@@ -399,7 +411,7 @@ class BlockingQueuePtr {
 
     T* res = dataQueue.front();
     dataQueue.pop_front();
-    cond.notify_one();
+    cond.notify_all();
 
     return res;
   }
@@ -426,6 +438,11 @@ class BlockingQueuePtr {
   bool empty() const {
     Lock lock(mutex);
     return dataQueue.empty();
+  }
+
+  size_t size() const {
+      Lock lock(mutex);
+      return dataQueue.size();
   }
 
   void suspend(bool clearQue = false, bool deleteElements = false) {

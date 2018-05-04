@@ -43,7 +43,9 @@ namespace {
 
 volatile std::atomic_uint poolCounter(0);
 
-void runner(ThreadPool *pool, Runable *run) {
+}  // namespace
+
+void ThreadPool::runner(ThreadPool *pool, Runable *run) {
   try {
     if (!run)
       return;
@@ -57,16 +59,20 @@ void runner(ThreadPool *pool, Runable *run) {
   }
 }
 
-void runnerProc(ThreadPool *pool, ThreadPool::RunQueue *queue) {
+void ThreadPool::runnerProc(ThreadPool *pool, ThreadPool::RunQueue *queue) {
   bool stop = false;
 
   while (!stop) {
+    pool->incRunningCount();
     try {
       Runable *toRun = queue->get();
       runner(pool, toRun);
     } catch (const miutil::concurrent::QueueSuspended &suspended) {
       stop = true;
     }
+
+    if( !stop )
+      pool->decRunningCount();
   }
 
   //  Drain the queue
@@ -77,8 +83,9 @@ void runnerProc(ThreadPool *pool, ThreadPool::RunQueue *queue) {
   } catch (const QueueIllegalState &ex) {
     pool->log("Unexpected QueueIllegalState");
   }
+  pool->decRunningCount();
 }
-}  // namespace
+
 
 ThreadPool::ThreadPool(int poolSize, const std::string &poolName)
     : size(poolSize),
@@ -93,6 +100,40 @@ ThreadPool::ThreadPool(const std::string &poolName)
 }
 
 ThreadPool::~ThreadPool() {
+}
+
+
+void ThreadPool::incRunningCount() {
+  std::lock_guard<std::mutex> lock(mutex);
+  ++runningCount_;
+}
+
+void ThreadPool::decRunningCount(){
+  std::lock_guard<std::mutex> lock(mutex);
+  if(runningCount_>0)
+    --runningCount_;
+  else {
+    std::ostringstream o;
+    o << "ERROR: runningCount <= 0 (" << runningCount_ << ")";
+    log(o.str());
+  }
+}
+
+int ThreadPool::runningCount()const
+{
+  std::lock_guard<std::mutex> lock(mutex);
+  return runningCount_;
+}
+
+  // All threads is busy.
+bool ThreadPool::isBusy()const{
+  std::lock_guard<std::mutex> lock(mutex);
+
+  return runningCount_>=size;
+}
+
+int ThreadPool::waitingInRunQue()const{
+  return runQueue.size();
 }
 
 void ThreadPool::setName_(const std::string &name_) {
@@ -112,7 +153,7 @@ void ThreadPool::init_(int size_) {
     runQueue.resize(2 * size);
 
     for (int i = 0; i < n; ++i)
-      pool.push_back(std::thread(runnerProc, this, &runQueue));
+      pool.push_back(std::thread(ThreadPool::runnerProc, this, &runQueue));
   }
 }
 
@@ -145,10 +186,17 @@ void ThreadPool::execute(miutil::Runable *r) {
 bool ThreadPool::execute(
     miutil::Runable *r,
     const std::chrono::high_resolution_clock::duration &timeout) {
-  return runQueue.timedAdd(r, timeout);
+  bool res=runQueue.timedAdd(r, timeout);
+
+  if( !res ) {
+    log("Execute timed out!");
+  }
+
+  return res;
 }
 
 void ThreadPool::shutdown() {
+  log("shutdown");
   runQueue.suspend();
 }
 

@@ -29,6 +29,7 @@ AM_LDFLAGS = \
 	$(top_builddir)/src/lib/milog/libkvalobs_milog.la \
 	$(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la \
 	$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
+	$(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la \
 	$(BOOST_DATE_TIME_LIB)
 
 AM_CPPFLAGS = \

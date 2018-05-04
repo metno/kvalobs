@@ -218,11 +218,16 @@ struct Options {
 };
 
 void use(bool exit_) {
-  cout << "\n\n  kvdataclt [-d decoder] [-h] filename\n\n" << "\t-d decoder, ex. synop, autoobs, ....\n"
-       << "\t-c conffile use this confile instead of kvdataclt.conf\n" << "\t-h print this help screen and exit!\n" << "\t-v be verbose.\n"
-       << "\t-s kvalobs server to send the data to.\n\n" << "  If -d option is missing: Assume the decoder is given with the first line in the file.\n\n"
+  cout << "\n\n  kvdataclt [-d decoder] [-h] filename\n\n"
+       << "\t-d decoder, ex. synop, autoobs, ....\n"
+       << "\t-c conffile use this confile instead of kvdataclt.conf\n"
+       << "\t-h print this help screen and exit!\n"
+       << "\t-v be verbose.\n"
+       << "\t-s kvalobs server to send the data to.\n\n"
+       << "  If -d option is missing: Assume the decoder is given with the first line in the file.\n\n"
        << "  If -s option is missing: Search for a configuration files named .kvdataclt in the current\n"
-       << "  directory, and the in the home directory. It then search the kvalobs sysconf directory for\n" << "  kvdataclt.conf. \n\n"
+       << "  directory, and the in the home directory. It then search the kvalobs sysconf directory for\n"
+       << "  kvdataclt.conf. \n\n"
        << "  The the configuration file format is: kvserver=host:port\n\n";
 
   if (exit_)

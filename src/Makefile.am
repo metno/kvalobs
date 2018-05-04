@@ -5,8 +5,6 @@ SUBDIRS = \
 	data2kv \
 	kvDataInputd \
 	kvDataInputd/kvdataclt \
-	kvServiced \
-	kvServiced/test \
 	kvQabased \
 	kvManagerd \
 	model2kv \
@@ -15,6 +13,7 @@ SUBDIRS = \
 	script \
 	kv2kro2 \
 	tools/kvpush \
+	tools/kvpull \
 	tools/kv2kvDataInputd \
 	tools/aexecd \
 	tools/nagios

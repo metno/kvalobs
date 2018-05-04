@@ -40,7 +40,7 @@ class KvalobsDatabaseAccess;
 
 class MissingRunner: public TimedDatabaseTask {
  public:
-  explicit MissingRunner(const std::string & connectString);
+  explicit MissingRunner(const std::string & connectString, bool checkForMissingObs);
   ~MissingRunner();
 
  protected:
@@ -48,6 +48,7 @@ class MissingRunner: public TimedDatabaseTask {
   void run() override;
 
  private:
+  bool checkForMissingObs;
   void addAllMissingData(KvalobsDatabaseAccess & dbAccess,
                          const boost::posix_time::ptime & obstime);
 };

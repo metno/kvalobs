@@ -32,7 +32,6 @@ BIN="/usr/bin/kv2metdat \
 	/usr/bin/kvpush \
 	/usr/bin/kvQabased \
 	/usr/bin/kvrestart \
-	/usr/bin/kvServiced \
 	/usr/bin/kvstart \
 	/usr/bin/kvstatus \
 	/usr/bin/kvstop \

@@ -132,6 +132,7 @@ DataSrcApp::DataSrcApp(int argn, char **argv, int nConnections_, miutil::conf::C
   milog::createGlobalLogger(logdir, "kvDataInputd_transaction", "updated", milog::DEBUG);
   milog::createGlobalLogger(logdir, "kvDataInputd_transaction", "retry", milog::DEBUG);
   milog::createGlobalLogger(logdir, "kvDataInputd", "transaction", milog::DEBUG, 200, 1, new milog::StdLayout1());
+  milog::createGlobalLogger(logdir, "kvDataInputd", "thread_pool", milog::DEBUG, 200, 1, new milog::StdLayout1());
 
   try {
     LOGERROR("Starting kafka producer for topic <" << kafkaConfig.getRawTopic() << ">. Brokers <" << kafkaConfig.brokers << ">.");
@@ -506,7 +507,7 @@ DecodeCommand* DataSrcApp::decodeExecute(DecodeCommand *decCmd, kvalobs::datasou
   }
 
   while (!decCmdRet) {
-    decCmdRet = decCmd->wait(250);
+    decCmdRet = decCmd->wait(250 /*milliseconds*/);
 
     if (decCmdRet)
       break;
@@ -541,6 +542,7 @@ kvalobs::datasource::Result DataSrcApp::newObservation(const char *obsType_, con
   string redirectedData;
   string redirectedObsType;
   bool redirect = false;
+  int redirectCount=0;
   boost::shared_ptr<kvalobs::decoder::RedirectInfo> redirected;
   res.messageId = getMessageId(obsType);
 
@@ -555,6 +557,12 @@ kvalobs::datasource::Result DataSrcApp::newObservation(const char *obsType_, con
     redirect = false;
 
     if (decodeResult == kvalobs::decoder::DecoderBase::Redirect) {
+      if( redirectCount > 5 ) {
+        IDLOGDEBUG(logid, "To many redirect (" << redirectCount <<"): " << obsType);
+        throw std::runtime_error("To many redirect: "+obsType);
+      }
+
+      redirectCount++;
       redirected.reset(decCmdRet->getRedirctInfo());
       if (redirected) {
         string redirectedFromDecoder = redirected->decoder();

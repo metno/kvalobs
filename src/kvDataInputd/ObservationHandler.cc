@@ -49,6 +49,7 @@ namespace {
 int HttpServiceUnavailable = http_utils::http_service_unavailable;
 int HttpOk = http_utils::http_ok;
 int HttpBadRequest = http_utils::http_bad_request;
+int HttpInternalServerError=http_utils::http_internal_server_error;
 }  // namespace
 
 ObservationHandler::ObservationHandler(DataSrcApp &app, kvalobs::service::ProducerQuePtr raw)
@@ -72,8 +73,10 @@ void ObservationHandler::render_POST(const httpserver::http_request& req, httpse
 
   LOGINFO("Path: '" << req.get_path() << " serialNumber: " << serial << ".");
 
+  Observation obs;
+
   try {
-    Observation obs = getObservation(req);
+    obs = getObservation(req);
 
     LOGDEBUG("obsType: '" << obs.obsType << "'\n" << "obsData:[\n" << obs.obs << "\n]\n");
 
@@ -89,9 +92,15 @@ void ObservationHandler::render_POST(const httpserver::http_request& req, httpse
       *res = new http_response(http_response_builder(jval.toStyledString(), HttpBadRequest, "application/json").string_response());
     }
   } catch (const DecodeResultException &ex) {
+    LOGERROR("DecodeResultException: " << ex.what() << "\nobsType: '" << obs.obsType << "'\n" << "obsData:[\n" << obs.obs << "\n]\n")
     jval = decodeResultToJson(ex);
     *res = new http_response(http_response_builder(jval.toStyledString(), HttpBadRequest, "application/json").string_response());
     return;
+  } catch ( const std::exception &ex) {
+    LOGERROR("Unexpected exception: " << ex.what() << "\nobsType: '" << obs.obsType << "'\n" << "obsData:[\n" << obs.obs << "\n]\n")
+    string err("Problems: " );
+    err += ex.what();
+    *res = new http_response(http_response_builder(err, HttpInternalServerError, "application/text" ).string_response());
   }
 }
 

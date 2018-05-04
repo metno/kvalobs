@@ -9,7 +9,6 @@ usr/bin/kvManagerd
 usr/bin/kvpush
 usr/bin/kvQabased
 usr/bin/kvrestart
-usr/bin/kvServiced
 usr/bin/kvstart
 usr/bin/kvstatus
 usr/bin/kvstop

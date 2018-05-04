@@ -1,5 +1,5 @@
 AC_PREREQ([2.59])
-AC_INIT([kvalobs], [4.0.2], [kvoss@met.no])
+AC_INIT([kvalobs], [4.0.4~rc1-1], [kvoss@met.no])
 AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -66,13 +66,12 @@ AC_CONFIG_FILES([Makefile
                  src/service-libs/kvcpp/mock/Makefile
                  src/data2kv/Makefile
                  src/kvDataInputd/Makefile
-                 src/kvServiced/test/Makefile
-                 src/kvServiced/Makefile
                  src/kvQabased/Makefile
                  src/kvManagerd/Makefile
                  src/model2kv/Makefile
                  src/kv2metdat/Makefile
                  src/kv2kro2/Makefile
+                 src/tools/kvpull/Makefile
                  src/tools/kvpush/Makefile
                  src/tools/kv2kvDataInputd/Makefile
                  src/tools/nagios/Makefile

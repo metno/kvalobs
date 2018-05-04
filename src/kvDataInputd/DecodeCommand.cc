@@ -86,9 +86,9 @@ void DecodeCommand::run() {
 }
 
 DecodeCommand*
-DecodeCommand::wait(int timeoutInSecond) {
+DecodeCommand::wait(int timeoutInMilliseconds) {
   try {
-    return resQue.timedGet(std::chrono::milliseconds(timeoutInSecond));
+    return resQue.timedGet(std::chrono::milliseconds(timeoutInMilliseconds));
   } catch (const miutil::concurrent::QueueSuspended &ex) {
     LOGERROR("DecodeCommand::wait: Result que suspended.\n");
   } catch (...) {

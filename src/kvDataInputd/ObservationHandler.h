@@ -46,6 +46,7 @@ class ObservationHandler : public httpserver::http_resource<ObservationHandler> 
         : obsType(obsType_),
           obs(obs_) {
     }
+    Observation(){}
   };
 
   class DecodeResultException : public std::exception, public kvalobs::datasource::Result {

@@ -39,8 +39,9 @@
 #include "DataIdentifier.h"
 #include "KvalobsDatabaseAccess.h"
 
-MissingRunner::MissingRunner(const std::string & connectString)
-    : TimedDatabaseTask(connectString, "MissingRunner") {
+MissingRunner::MissingRunner(const std::string & connectString, bool checkForMissingObs_)
+    : TimedDatabaseTask(connectString, "MissingRunner"),
+      checkForMissingObs(checkForMissingObs_) {
 }
 
 MissingRunner::~MissingRunner() {
@@ -60,26 +61,28 @@ using boost::posix_time::minutes;
 using boost::posix_time::second_clock;
 
 void MissingRunner::run() {
+  if (!checkForMissingObs) {
+    LOGINFO("Locating missing observations 'disabled'. (" << second_clock::universal_time() << ")");
+    return;
+  }
+
   KvalobsDatabaseAccess dbAccess(connectString());
 
   ptime obstime = dbAccess.lastFindAllMissingRuntime() + hours(1);
-  while (obstime < boost::posix_time::microsec_clock::universal_time()
-      && !stopped()) {
+  while (obstime < boost::posix_time::microsec_clock::universal_time() && !stopped()) {
     LOGINFO("Locating missing observations at " << obstime);
     try {
-	  addAllMissingData(dbAccess, obstime);
-	  dbAccess.setLastFindAllMissingRuntime(obstime);
-	  obstime += hours(1);
+      addAllMissingData(dbAccess, obstime);
+      dbAccess.setLastFindAllMissingRuntime(obstime);
+      obstime += hours(1);
     } catch (dnmi::db::SQLSerializeError & e) {
-    	LOGWARN(e.what() << "  - retrying");
-    	std::this_thread::sleep_for(std::chrono::seconds(1));
+      LOGWARN(e.what() << "  - retrying");
+      std::this_thread::sleep_for(std::chrono::seconds(1));
     }
   }
 }
 
-void MissingRunner::addAllMissingData(
-    KvalobsDatabaseAccess & dbAccess,
-    const boost::posix_time::ptime & obstime) {
+void MissingRunner::addAllMissingData(KvalobsDatabaseAccess & dbAccess, const boost::posix_time::ptime & obstime) {
   auto missing = dbAccess.findAllMissing(obstime);
 
   for (const DataIdentifier & di : missing) {

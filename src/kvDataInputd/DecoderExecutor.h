@@ -33,14 +33,18 @@
 #include <miutil/threadpool.h>
 
 class DecoderExecutor : public miutil::concurrent::ThreadPool {
+  std::string logid;
  public:
-  explicit DecoderExecutor(int size)
-      : ThreadPool(size, "decoder") {
+  explicit DecoderExecutor(int size, const std::string &logid_="thread_pool")
+      : ThreadPool(size, "decoder"), logid(logid_) {
   }
+
   DecoderExecutor()
-      : ThreadPool("decoder") {
+      : ThreadPool("decoder"), logid("thread_pool") {
   }
+
   void afterExecute(miutil::Runable *run);
+  void log(const std::string &logMsg);
 };
 
 #endif /* SRC_KVDATAINPUTD_DECODEREXECUTOR_H_ */

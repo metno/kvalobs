@@ -6,6 +6,7 @@ conffile="/etc/kvalobs/kv-ips.conf"
 #SILENT - (true|false) Write to the terminal if false.
 #DOLOG - (true|false) Write to the logfile if true. 
 
+: ${SILENT:-true}
 
 if [ -z "$DOLOG" ]; then
    DOLOG=true
@@ -24,7 +25,7 @@ if [ -f $conffile ]; then
     . $conffile
     mylog=/dev/null
     [ x"$logfile" = "x" ] || mylog=$logfile
-    echo "Reading '$conffile'!" | tee -a $mylog
+    echo "Reading '$conffile'!" >> $mylog
 else
    test_host=true
 fi
