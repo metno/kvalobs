@@ -143,4 +143,15 @@ CREATE VIEW text_data AS (
         o.observationid = d.observationid
 );
 
+
+ALTER TABLE workque ADD COLUMN observationid bigint REFERENCES observations(observationid);
+UPDATE workque q SET observationid=(SELECT observationid FROM observations o WHERE o.stationid=q.stationid AND o.typeid=q.typeid AND o.obstime=q.obstime);
+DELETE FROM workque WHERE observationid IS NULL;
+ALTER TABLE workque ALTER COLUMN observationid SET NOT NULL;
+ALTER TABLE workque DROP COLUMN stationid;
+ALTER TABLE workque DROP COLUMN obstime;
+ALTER TABLE workque DROP COLUMN typeid;
+ALTER TABLE workque DROP COLUMN tbtime;
+CREATE INDEX workque_priority_obsid ON workque (priority, observationid);
+
 END;
