@@ -240,8 +240,7 @@ CheckRunner::KvalobsDataPtr CheckRunner::checkObservation(
   LOGDEBUG("Fetching observation data from database");
   std::set<std::string> parametersInData;  // list of all parameters in observation data set
   db::DatabaseAccess::DataList observationData;
-  for (db::DatabaseAccess::ParameterList::const_iterator it = expectedParameters
-      .begin(); it != expectedParameters.end(); ++it) {
+  for (db::DatabaseAccess::ParameterList::const_iterator it = expectedParameters.begin(); it != expectedParameters.end(); ++it) {
     db::DatabaseAccess::DataList d;
     db.getData(&d, obs, *it, 0);
     d.remove_if(std::not1(have_typeid(obs.typeID())));
@@ -263,8 +262,7 @@ CheckRunner::KvalobsDataPtr CheckRunner::checkObservation(
     db.write(observationData);
   }
 
-  for (db::DatabaseAccess::CheckList::const_iterator check = checkList.begin();
-      check != checkList.end(); ++check) {
+  for (db::DatabaseAccess::CheckList::const_iterator check = checkList.begin(); check != checkList.end(); ++check) {
     std::string checkName = check->checkname();
     milog::LogContext context(checkName);
     try {

@@ -488,7 +488,7 @@ void KvalobsDatabaseAccess::write(const DataList & data) {
 
 kvalobs::kvStationInfo * KvalobsDatabaseAccess::selectDataForControl() {
     static const std::string findNext =
-        "select stationid, typeid, obstime from workque where process_start is not null and ((qa_start<now()-'10 minutes'::interval and qa_stop is null) or (qa_start is null and stationid not in (select stationid from workque where qa_start is not null and qa_stop is null))) order by priority, tbtime limit 1;";
+        "select stationid, typeid, obstime, q.observationid from workque q, observations o where q.observationid=o.observationid and process_start is not null and ((qa_start<now()-'10 minutes'::interval and qa_stop is null) or (qa_start is null and stationid not in (select stationid from workque where qa_start is not null and qa_stop is null))) order by priority, tbtime limit 1;";
 
     std::unique_ptr<dnmi::db::Result> result(connection_->execQuery(findNext));
     if (!result || !result->hasNext())
@@ -501,11 +501,11 @@ kvalobs::kvStationInfo * KvalobsDatabaseAccess::selectDataForControl() {
     boost::posix_time::ptime obstime = boost::posix_time::time_from_string(
         row[2]);
 
+    long long observationid = boost::lexical_cast<long long>(row[3]);
+
     std::ostringstream query;
     query << "UPDATE workque SET qa_start=statement_timestamp() WHERE ";
-    query << "stationid=" << station;
-    query << " AND typeid=" << type;
-    query << " AND obstime='" << row[2] << "'";
+    query << "observationid=" << observationid;
 
     milog::LogContext context("query");
     LOGDEBUG1(query.str());
@@ -516,10 +516,11 @@ kvalobs::kvStationInfo * KvalobsDatabaseAccess::selectDataForControl() {
 
 void KvalobsDatabaseAccess::markProcessDone(const kvalobs::kvStationInfo & si) {
     std::ostringstream query;
-    query << "UPDATE workque SET qa_stop=statement_timestamp() WHERE ";
+
+    query << "UPDATE workque SET qa_stop=statement_timestamp() WHERE observationid=(select observationid from observations where ";
     query << "stationid=" << si.stationID();
     query << " AND typeid=" << si.typeID();
-    query << " AND obstime='" << to_kvalobs_string(si.obstime()) << "'";
+    query << " AND obstime='" << to_kvalobs_string(si.obstime()) << "')";
 
     milog::LogContext context("query");
     LOGDEBUG1(query.str());
