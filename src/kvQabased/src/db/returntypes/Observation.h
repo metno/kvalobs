@@ -4,6 +4,7 @@
 // #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <kvalobs/kvStationInfo.h>
+#include <ostream>
 
 namespace qabase {
 
@@ -33,6 +34,11 @@ private:
     boost::posix_time::ptime tbtime_;
 };
 
+inline std::ostream & operator<<(std::ostream & s, const Observation & o) {
+    return s << o.id() << '(' << o.stationID() << '/' << o.typeID() << '/' << o.obstime() << ')';
 }
+
+}
+
 
 #endif
