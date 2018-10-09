@@ -32,7 +32,7 @@
 #ifndef SRC_KVQABASED_SRC_TRANSACTIONLOGGER_H_
 #define SRC_KVQABASED_SRC_TRANSACTIONLOGGER_H_
 
-#include <kvalobs/kvStationInfo.h>
+#include "db/returntypes/Observation.h"
 #include <string>
 #include <chrono>
 
@@ -47,7 +47,7 @@ namespace qabase {
  */
 class TransactionLogger {
  public:
-  explicit TransactionLogger(const kvalobs::kvStationInfo & si);
+  explicit TransactionLogger(const qabase::Observation & obs);
   ~TransactionLogger();
 
   /**
@@ -70,7 +70,7 @@ class TransactionLogger {
 
  private:
   bool success_;
-  kvalobs::kvStationInfo si_;
+  qabase::Observation obs_;
   std::chrono::system_clock::time_point startTime_;
 };
 

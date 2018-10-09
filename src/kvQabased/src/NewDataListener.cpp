@@ -66,7 +66,7 @@ void NewDataListener::run() {
     try {
       qabase::NewDataListener::ObservationPtr toProcess = fetchDataToProcess();
       if (toProcess) {
-        qabase::TransactionLogger logger(toProcess->stationInfo());
+        qabase::TransactionLogger logger(*toProcess);
         qabase::CheckRunner::KvalobsDataPtr dataList = runChecks(toProcess->stationInfo());
         markProcessDone(*toProcess);
         logger.markSuccess();

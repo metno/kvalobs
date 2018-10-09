@@ -44,9 +44,9 @@
 
 namespace qabase {
 
-TransactionLogger::TransactionLogger(const kvalobs::kvStationInfo & si)
+TransactionLogger::TransactionLogger(const qabase::Observation & obs)
     : success_(false),
-      si_(si),
+      obs_(obs),
       startTime_(std::chrono::system_clock::now()) {
 }
 
@@ -85,8 +85,8 @@ std::string TransactionLogger::message() const {
     summaryLog << "\tSUCCESS\t";
   else
     summaryLog << "\tFAILURE\t";
-  summaryLog << '(' << si_.stationID() << '/' << si_.typeID() << '/'
-      << to_kvalobs_string(si_.obstime()) << ')';
+  summaryLog << '(' << obs_.id() << ": " << obs_.stationID() << '/' << obs_.typeID() << '/'
+      << to_kvalobs_string(obs_.obstime()) << ')';
   summaryLog << "\tduration=" << duration.count() << "ms\n";
 
   return summaryLog.str();
