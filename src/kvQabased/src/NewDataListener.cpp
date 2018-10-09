@@ -28,6 +28,7 @@
  */
 
 #include "NewDataListener.h"
+#include "db/returntypes/Observation.h"
 #include <boost/lexical_cast.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <chrono>
@@ -63,10 +64,10 @@ void NewDataListener::run() {
   stopping_ = false;
   while (!stopping()) {
     try {
-      qabase::NewDataListener::StationInfoPtr toProcess = fetchDataToProcess();
+      qabase::NewDataListener::ObservationPtr toProcess = fetchDataToProcess();
       if (toProcess) {
-        qabase::TransactionLogger logger(*toProcess);
-        qabase::CheckRunner::KvalobsDataPtr dataList = runChecks(*toProcess);
+        qabase::TransactionLogger logger(toProcess->stationInfo());
+        qabase::CheckRunner::KvalobsDataPtr dataList = runChecks(toProcess->stationInfo());
         markProcessDone(*toProcess);
         logger.markSuccess();
       } else {
@@ -79,11 +80,11 @@ void NewDataListener::run() {
   }
 }
 
-qabase::NewDataListener::StationInfoPtr NewDataListener::fetchDataToProcess() const {
+qabase::NewDataListener::ObservationPtr NewDataListener::fetchDataToProcess() const {
   while (!stopping()) {
     try {
       db_->beginTransaction();
-      qabase::NewDataListener::StationInfoPtr ret(db_->selectDataForControl());
+      qabase::NewDataListener::ObservationPtr ret(db_->selectDataForControl());
       db_->commit();
       return ret;
     } catch (dnmi::db::SQLSerializeError & e) {
@@ -92,7 +93,7 @@ qabase::NewDataListener::StationInfoPtr NewDataListener::fetchDataToProcess() co
       std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
   }
-  return qabase::NewDataListener::StationInfoPtr();
+  return qabase::NewDataListener::ObservationPtr();
 }
 
 qabase::CheckRunner::KvalobsDataPtr NewDataListener::runChecks(const qabase::NewDataListener::StationInfo & toProcess) {
@@ -109,11 +110,11 @@ qabase::CheckRunner::KvalobsDataPtr NewDataListener::runChecks(const qabase::New
   }
 }
 
-void NewDataListener::markProcessDone(const qabase::NewDataListener::StationInfo &toProcess) {
+void NewDataListener::markProcessDone(const qabase::Observation & obs) {
   while (true) {
     try {
       db_->beginTransaction();
-      db_->markProcessDone(toProcess);
+      db_->markProcessDone(obs);
       db_->commit();
       return;
     } catch (dnmi::db::SQLSerializeError & e) {

@@ -49,6 +49,10 @@ class KvalobsData;
 }
 }
 
+namespace qabase {
+class Observation;
+}
+
 namespace db {
 
 /**
@@ -191,6 +195,9 @@ class DatabaseAccess {
                        const qabase::DataRequirement::Parameter & parameter,
                        int minuteOffset) const = 0;
 
+  //virtual void getData(DataList * out, long long observationid) =0;
+
+
   typedef std::list<kvalobs::kvTextData> TextDataList;
   /**
    * Get observation data from database - data which is not representable as a float
@@ -232,9 +239,9 @@ class DatabaseAccess {
    */
   virtual void write(const DataList & data) = 0;
 
-  virtual kvalobs::kvStationInfo * selectDataForControl() = 0;
+  virtual qabase::Observation * selectDataForControl() = 0;
 
-  virtual void markProcessDone(const kvalobs::kvStationInfo & si) = 0;
+  virtual void markProcessDone(const qabase::Observation & obs) = 0;
 };
 
 }

@@ -124,12 +124,12 @@ class FilteredDatabaseAccess : public DatabaseAccess {
     baseImplementation_->write(data);
   }
 
-  virtual kvalobs::kvStationInfo * selectDataForControl() {
+  virtual qabase::Observation * selectDataForControl() {
     return baseImplementation_->selectDataForControl();
   }
 
-  virtual void markProcessDone(const kvalobs::kvStationInfo & si) {
-    baseImplementation_->markProcessDone(si);
+  virtual void markProcessDone(const qabase::Observation & obs) {
+    baseImplementation_->markProcessDone(obs);
   }
 
  private:

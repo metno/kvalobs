@@ -61,13 +61,14 @@ class NewDataListener : boost::noncopyable {
  private:
   typedef kvalobs::kvStationInfo StationInfo;
   typedef std::shared_ptr<kvalobs::kvStationInfo> StationInfoPtr;
+  typedef std::shared_ptr<qabase::Observation> ObservationPtr;
   bool stopping_;
   std::shared_ptr<db::DatabaseAccess> db_;
   DataProcessor processor_;
 
-  StationInfoPtr fetchDataToProcess() const;
+  ObservationPtr fetchDataToProcess() const;
   qabase::CheckRunner::KvalobsDataPtr runChecks(const StationInfo & toProcess);
-  void markProcessDone(const StationInfo & toProcess);
+  void markProcessDone(const qabase::Observation & obs);
 };
 
 } /* namespace qabase */

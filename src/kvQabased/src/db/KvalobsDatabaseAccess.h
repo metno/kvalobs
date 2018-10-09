@@ -104,9 +104,9 @@ class KvalobsDatabaseAccess : public db::DatabaseAccess {
 
   virtual void write(const DataList & data);
 
-  virtual kvalobs::kvStationInfo * selectDataForControl();
+  virtual qabase::Observation * selectDataForControl();
 
-  virtual void markProcessDone(const kvalobs::kvStationInfo & si);
+  virtual void markProcessDone(const qabase::Observation & obs);
 
  private:
   static dnmi::db::Connection * createConnection(const std::string & databaseConnect);

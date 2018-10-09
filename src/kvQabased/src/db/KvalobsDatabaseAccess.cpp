@@ -28,6 +28,7 @@
  */
 
 #include "KvalobsDatabaseAccess.h"
+#include "returntypes/Observation.h"
 #include "databaseResultFilter.h"
 #include <kvdb/dbdrivermgr.h>
 #include <kvalobs/kvPath.h>
@@ -486,9 +487,9 @@ void KvalobsDatabaseAccess::write(const DataList & data) {
 #endif
 }
 
-kvalobs::kvStationInfo * KvalobsDatabaseAccess::selectDataForControl() {
+qabase::Observation * KvalobsDatabaseAccess::selectDataForControl() {
     static const std::string findNext =
-        "select stationid, typeid, obstime, q.observationid from workque q, observations o where q.observationid=o.observationid and process_start is not null and ((qa_start<now()-'10 minutes'::interval and qa_stop is null) or (qa_start is null and stationid not in (select stationid from workque where qa_start is not null and qa_stop is null))) order by priority, tbtime limit 1;";
+        "select o.observationid, stationid, typeid, obstime, o.tbtime from workque q, observations o where q.observationid=o.observationid and process_start is not null and ((qa_start<now()-'10 minutes'::interval and qa_stop is null) or (qa_start is null and stationid not in (select stationid from workque where qa_start is not null and qa_stop is null))) order by priority, tbtime limit 1;";
 
     std::unique_ptr<dnmi::db::Result> result(connection_->execQuery(findNext));
     if (!result || !result->hasNext())
@@ -496,12 +497,11 @@ kvalobs::kvStationInfo * KvalobsDatabaseAccess::selectDataForControl() {
 
     auto row = result->next();
 
-    int station = boost::lexical_cast<int>(row[0]);
-    int type = boost::lexical_cast<int>(row[1]);
-    boost::posix_time::ptime obstime = boost::posix_time::time_from_string(
-        row[2]);
-
-    long long observationid = boost::lexical_cast<long long>(row[3]);
+    long long observationid = boost::lexical_cast<long long>(row[0]);
+    int station = boost::lexical_cast<int>(row[1]);
+    int type = boost::lexical_cast<int>(row[2]);
+    boost::posix_time::ptime obstime = boost::posix_time::time_from_string(row[3]);
+    boost::posix_time::ptime tbtime = boost::posix_time::time_from_string(row[4]);
 
     std::ostringstream query;
     query << "UPDATE workque SET qa_start=statement_timestamp() WHERE ";
@@ -511,16 +511,13 @@ kvalobs::kvStationInfo * KvalobsDatabaseAccess::selectDataForControl() {
     LOGDEBUG1(query.str());
 
     connection_->exec(query.str());
-    return new kvalobs::kvStationInfo(station, obstime, type);
+    return new qabase::Observation(observationid, station, type, obstime, tbtime);
 }
 
-void KvalobsDatabaseAccess::markProcessDone(const kvalobs::kvStationInfo & si) {
+void KvalobsDatabaseAccess::markProcessDone(const qabase::Observation & obs) {
     std::ostringstream query;
 
-    query << "UPDATE workque SET qa_stop=statement_timestamp() WHERE observationid=(select observationid from observations where ";
-    query << "stationid=" << si.stationID();
-    query << " AND typeid=" << si.typeID();
-    query << " AND obstime='" << to_kvalobs_string(si.obstime()) << "')";
+    query << "UPDATE workque SET qa_stop=statement_timestamp() WHERE observationid=" << obs.id();
 
     milog::LogContext context("query");
     LOGDEBUG1(query.str());
