@@ -29,6 +29,7 @@
 
 #include "CheckRunner.h"
 #include "db/KvalobsDatabaseAccess.h"
+#include "db/returntypes/Observation.h"
 #include <scriptcreate/KvalobsCheckScript.h>
 #include <db/DelayedSaveDatabaseAccess.h>
 #include <db/CachedDatabaseAccess.h>
@@ -141,7 +142,7 @@ void logTransaction(bool ok, double start, int shortRetries, int longRetries,
 }
 
 CheckRunner::KvalobsDataPtr CheckRunner::newObservation(
-  const kvalobs::kvStationInfo & obs, std::ostream * scriptLog) {
+  const qabase::Observation & obs, std::ostream * scriptLog) {
   const int shortSleep = 100;
   const int longSleep = 300;
   const int nRetry = 3;
@@ -154,12 +155,12 @@ CheckRunner::KvalobsDataPtr CheckRunner::newObservation(
   logContext << obs.obstime() << '/' << obs.typeID() << '/' << obs.stationID();
   milog::LogContext context(logContext.str());
 
-  if (not shouldRunAnyChecks(obs)) {
+  if (not shouldRunAnyChecks(obs.stationInfo())) {
     LOGDEBUG("Will not run any checks on observation: " << obs);
     // KvalobsDatabaseAccess requires a transaction to be running, but since
     // we are merely reading data we don't bother to commit
     AutoRollbackTransaction transaction(*db_);
-    return db_->complete(obs);
+    return db_->complete(obs.stationInfo());
   }
 
   LOGINFO("Checking " << obs);
@@ -182,7 +183,7 @@ CheckRunner::KvalobsDataPtr CheckRunner::newObservation(
         try {
           for (int i = 0; i < 256; ++i) {
             try {
-              KvalobsDataPtr ret = checkObservation(obs, scriptLog);
+              KvalobsDataPtr ret = checkObservation(obs.stationInfo(), scriptLog);
               logTransaction(true, start, nShortRetries, nLongRetries, aborted);
               return ret;
             } catch (dnmi::db::SQLSerializeError &) {
@@ -199,7 +200,7 @@ CheckRunner::KvalobsDataPtr CheckRunner::newObservation(
     }
 
     // final attempt:
-    KvalobsDataPtr ret = checkObservation(obs, scriptLog);
+    KvalobsDataPtr ret = checkObservation(obs.stationInfo(), scriptLog);
     logTransaction(true, start, nShortRetries, nLongRetries, aborted);
     return ret;
   } catch (dnmi::db::SQLSerializeError & e) {
@@ -214,7 +215,7 @@ CheckRunner::KvalobsDataPtr CheckRunner::newObservation(
   }
   // never reached:
   AutoRollbackTransaction transaction(*db_);
-  return db_->complete(obs);
+  return db_->complete(obs.stationInfo());
 }
 
 bool CheckRunner::shouldMarkStartAndStop_() {

@@ -84,7 +84,7 @@ class CheckRunner {
    * @return A list of all modified data. Also, all data belonging to the
    *         given obs will be returned, even if it is unmodified.
    */
-  KvalobsDataPtr newObservation(const kvalobs::kvStationInfo & obs,
+  KvalobsDataPtr newObservation(const qabase::Observation & obs,
                              std::ostream * scriptLog = 0);
 
   /**

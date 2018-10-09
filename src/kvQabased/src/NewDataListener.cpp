@@ -67,7 +67,7 @@ void NewDataListener::run() {
       qabase::NewDataListener::ObservationPtr toProcess = fetchDataToProcess();
       if (toProcess) {
         qabase::TransactionLogger logger(*toProcess);
-        qabase::CheckRunner::KvalobsDataPtr dataList = runChecks(toProcess->stationInfo());
+        qabase::CheckRunner::KvalobsDataPtr dataList = runChecks(*toProcess);
         markProcessDone(*toProcess);
         logger.markSuccess();
       } else {
@@ -96,10 +96,10 @@ qabase::NewDataListener::ObservationPtr NewDataListener::fetchDataToProcess() co
   return qabase::NewDataListener::ObservationPtr();
 }
 
-qabase::CheckRunner::KvalobsDataPtr NewDataListener::runChecks(const qabase::NewDataListener::StationInfo & toProcess) {
+qabase::CheckRunner::KvalobsDataPtr NewDataListener::runChecks(const qabase::Observation & obs) {
   try {
     db_->beginTransaction();
-    qabase::CheckRunner::KvalobsDataPtr dataList = processor_.runChecks(toProcess);
+    qabase::CheckRunner::KvalobsDataPtr dataList = processor_.runChecks(obs);
     db_->commit();
     processor_.sendToKafka(dataList, & stopping_);
     return dataList;

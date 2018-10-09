@@ -44,6 +44,7 @@ class KafkaProducer;
 }
 
 namespace qabase {
+class Observation;
 class CheckRunner;
 class Configuration;
 
@@ -60,7 +61,7 @@ class DataProcessor {
   /**
    * Run checks on a single message, but do not post to kafka
    */
-  qabase::CheckRunner::KvalobsDataPtr runChecks(const kvalobs::kvStationInfo & si) const;
+  qabase::CheckRunner::KvalobsDataPtr runChecks(const qabase::Observation & obs) const;
 
   /**
    * Send a single dataList to Kafka
@@ -97,14 +98,14 @@ class DataProcessor {
   std::shared_ptr<kvalobs::subscribe::KafkaProducer> output_;
 };
 
-template<typename StationInfoIterator>
-void DataProcessor::process(StationInfoIterator begin, StationInfoIterator end) {
-  while (begin != end) {
-    sendToKafka(runChecks(*begin));
-    ++begin;
-  }
-  finalizeMessage_();
-}
+// template<typename StationInfoIterator>
+// void DataProcessor::process(StationInfoIterator begin, StationInfoIterator end) {
+//   while (begin != end) {
+//     sendToKafka(runChecks(*begin));
+//     ++begin;
+//   }
+//   finalizeMessage_();
+// }
 
 } /* namespace qabase */
 
