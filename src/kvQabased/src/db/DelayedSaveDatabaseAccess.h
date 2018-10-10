@@ -57,7 +57,7 @@ class DelayedSaveDatabaseAccess : public FilteredDatabaseAccess,
 
   virtual void rollback();
 
-  virtual void getData(DataList * out, const kvalobs::kvStationInfo & si,
+  virtual void getData(DataList * out, const qabase::Observation & obs,
                        const qabase::DataRequirement::Parameter & parameter,
                        int minuteOffset) const;
 

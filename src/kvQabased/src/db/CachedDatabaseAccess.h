@@ -53,7 +53,7 @@ class CachedDatabaseAccess : public FilteredDatabaseAccess {
    * @param obs The observation we are checking now.
    */
   CachedDatabaseAccess(DatabaseAccess * baseImplementation,
-                       const kvalobs::kvStationInfo & obs);
+                       const qabase::Observation & obs);
   virtual ~CachedDatabaseAccess();
 
   virtual int getQcxFlagPosition(const std::string & qcx) const;
@@ -71,7 +71,7 @@ class CachedDatabaseAccess : public FilteredDatabaseAccess {
       ModelDataList * out, const kvalobs::kvStationInfo & si,
       const qabase::DataRequirement::Parameter & parameter,
       int minuteOffset) const;
-  virtual void getData(DataList * out, const kvalobs::kvStationInfo & si,
+  virtual void getData(DataList * out, const qabase::Observation & obs,
                        const qabase::DataRequirement::Parameter & parameter,
                        int minuteOffset) const;
   virtual void getTextData(TextDataList * out,

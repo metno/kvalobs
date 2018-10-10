@@ -81,11 +81,11 @@ class KvalobsDatabaseAccess : public db::DatabaseAccess {
 
   virtual void rollback();
 
-  virtual void getChecks(CheckList * out, const kvalobs::kvStationInfo & si) const;
+  virtual void getChecks(CheckList * out, const qabase::Observation & obs) const;
 
   virtual int getQcxFlagPosition(const std::string & qcx) const;
 
-  virtual void getParametersToCheck(ParameterList * out, const kvalobs::kvStationInfo & si) const;
+  virtual void getParametersToCheck(ParameterList * out, const qabase::Observation & obs) const;
 
   virtual kvalobs::kvAlgorithms getAlgorithm(const std::string & algorithmName) const;
 
@@ -96,7 +96,7 @@ class KvalobsDatabaseAccess : public db::DatabaseAccess {
   virtual void getModelData(ModelDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter,
                             int minutesBackInTime) const;
 
-  virtual void getData(DataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const;
+  virtual void getData(DataList * out, const qabase::Observation & obs, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const;
 
   virtual void getTextData(TextDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const;
 

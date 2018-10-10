@@ -40,11 +40,11 @@ DelayedSaveDatabaseAccess::~DelayedSaveDatabaseAccess() {
 }
 
 void DelayedSaveDatabaseAccess::getData(
-    DataList * out, const kvalobs::kvStationInfo & si,
+    DataList * out, const qabase::Observation & obs,
     const qabase::DataRequirement::Parameter & parameter,
     int minuteOffset) const {
   DataList fromDb;
-  FilteredDatabaseAccess::getData(&fromDb, si, parameter, minuteOffset);
+  FilteredDatabaseAccess::getData(&fromDb, obs, parameter, minuteOffset);
 
   for (DataList::iterator it = fromDb.begin(); it != fromDb.end(); ++it) {
     SavedData::const_iterator alreadySaved = savedData_.find(*it);

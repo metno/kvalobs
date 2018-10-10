@@ -67,8 +67,8 @@ class FilteredDatabaseAccess : public DatabaseAccess {
   }
 
   virtual void getChecks(CheckList * out,
-                         const kvalobs::kvStationInfo & si) const {
-    baseImplementation_->getChecks(out, si);
+                         const qabase::Observation & obs) const {
+    baseImplementation_->getChecks(out, obs);
   }
 
   virtual int getQcxFlagPosition(const std::string & qcx) const {
@@ -76,8 +76,8 @@ class FilteredDatabaseAccess : public DatabaseAccess {
   }
 
   virtual void getParametersToCheck(ParameterList * out,
-                                    const kvalobs::kvStationInfo & si) const {
-    baseImplementation_->getParametersToCheck(out, si);
+                                     const qabase::Observation & obs) const {
+    baseImplementation_->getParametersToCheck(out, obs);
   }
 
   virtual kvalobs::kvAlgorithms getAlgorithm(
@@ -103,10 +103,10 @@ class FilteredDatabaseAccess : public DatabaseAccess {
                                              minutesBackInTime);
   }
 
-  virtual void getData(DataList * out, const kvalobs::kvStationInfo & si,
+  virtual void getData(DataList * out, const qabase::Observation & obs,
                        const qabase::DataRequirement::Parameter & parameter,
                        int minuteOffset) const {
-    baseImplementation_->getData(out, si, parameter, minuteOffset);
+    baseImplementation_->getData(out, obs, parameter, minuteOffset);
   }
 
   virtual void getTextData(TextDataList * out,

@@ -66,7 +66,7 @@ class KvalobsCheckScript : boost::noncopyable {
    *                  be done.
    */
   KvalobsCheckScript(const db::DatabaseAccess & database,
-                     const kvalobs::kvStationInfo & obs,
+                     const qabase::Observation & obs,
                      const kvalobs::kvChecks & check, std::ostream * scriptLog =
                          0);
 

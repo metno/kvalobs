@@ -110,7 +110,7 @@ class DatabaseAccess {
    * @param si The observation we wants checks for
    */
   virtual void getChecks(CheckList * out,
-                         const kvalobs::kvStationInfo & si) const = 0;
+                         const qabase::Observation & obs) const = 0;
 
   /**
    * Find index of controlinfo flag for the given qcx.
@@ -128,7 +128,7 @@ class DatabaseAccess {
    * @param si Observation we want the parameter list from
    */
   virtual void getParametersToCheck(ParameterList * out,
-                                    const kvalobs::kvStationInfo & si) const = 0;
+                                    const qabase::Observation & obs) const = 0;
 
   /**
    * Get an algorithm with the specified name
@@ -191,7 +191,7 @@ class DatabaseAccess {
    * @param minuteOffset How far back in time from obstime do we want data
    *                     for?
    */
-  virtual void getData(DataList * out, const kvalobs::kvStationInfo & si,
+  virtual void getData(DataList * out, const qabase::Observation & obs,
                        const qabase::DataRequirement::Parameter & parameter,
                        int minuteOffset) const = 0;
 

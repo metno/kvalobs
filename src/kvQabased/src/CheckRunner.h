@@ -116,10 +116,10 @@ class CheckRunner {
  private:
   bool shouldMarkStartAndStop_();
 
-  KvalobsDataPtr checkObservation(const kvalobs::kvStationInfo & obs,
+  KvalobsDataPtr checkObservation(const qabase::Observation & obs,
                                std::ostream * scriptLog);
 
-  bool shouldRunAnyChecks(const kvalobs::kvStationInfo & obs) const;
+  bool shouldRunAnyChecks(const qabase::Observation & obs) const;
 
   void resetObservationDataFlags(
       db::DatabaseAccess::DataList & observationData);

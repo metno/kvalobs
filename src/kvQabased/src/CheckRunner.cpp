@@ -152,10 +152,10 @@ CheckRunner::KvalobsDataPtr CheckRunner::newObservation(
   int aborted = 0;
 
   std::ostringstream logContext;
-  logContext << obs.obstime() << '/' << obs.typeID() << '/' << obs.stationID();
+  logContext << obs.obstime() << '/' << obs.typeID() << '/' << obs.stationID() << '/' << obs.id();
   milog::LogContext context(logContext.str());
 
-  if (not shouldRunAnyChecks(obs.stationInfo())) {
+  if (not shouldRunAnyChecks(obs)) {
     LOGDEBUG("Will not run any checks on observation: " << obs);
     // KvalobsDatabaseAccess requires a transaction to be running, but since
     // we are merely reading data we don't bother to commit
@@ -183,7 +183,7 @@ CheckRunner::KvalobsDataPtr CheckRunner::newObservation(
         try {
           for (int i = 0; i < 256; ++i) {
             try {
-              KvalobsDataPtr ret = checkObservation(obs.stationInfo(), scriptLog);
+              KvalobsDataPtr ret = checkObservation(obs, scriptLog);
               logTransaction(true, start, nShortRetries, nLongRetries, aborted);
               return ret;
             } catch (dnmi::db::SQLSerializeError &) {
@@ -200,7 +200,7 @@ CheckRunner::KvalobsDataPtr CheckRunner::newObservation(
     }
 
     // final attempt:
-    KvalobsDataPtr ret = checkObservation(obs.stationInfo(), scriptLog);
+    KvalobsDataPtr ret = checkObservation(obs, scriptLog);
     logTransaction(true, start, nShortRetries, nLongRetries, aborted);
     return ret;
   } catch (dnmi::db::SQLSerializeError & e) {
@@ -224,7 +224,7 @@ bool CheckRunner::shouldMarkStartAndStop_() {
 }
 
 CheckRunner::KvalobsDataPtr CheckRunner::checkObservation(
-    const kvalobs::kvStationInfo & obs, std::ostream * scriptLog) {
+    const qabase::Observation & obs, std::ostream * scriptLog) {
   db::CachedDatabaseAccess cdb(db_.get(), obs);
   db::DelayedSaveDatabaseAccess db(&cdb);
   AutoRollbackTransaction transaction(db);
@@ -254,7 +254,7 @@ CheckRunner::KvalobsDataPtr CheckRunner::checkObservation(
 
   if (haveAnyHqcCorrectedElements(observationData)) {
     LOGINFO("Observation is HQC-modified. Will not run tests on this");
-    return db.complete(obs, observationData);
+    return db.complete(obs.stationInfo(), observationData);
   }
 
   if (qcxFilter_.empty()) {
@@ -283,7 +283,7 @@ CheckRunner::KvalobsDataPtr CheckRunner::checkObservation(
         hasAnyParametersRequiredByCheck = true;
 
       if (hasAnyParametersRequiredByCheck
-          and shouldRunCheck(obs, *check, expectedParameters)) {
+          and shouldRunCheck(obs.stationInfo(), *check, expectedParameters)) {
         db::DatabaseAccess::DataList modifications;
 
         KvalobsCheckScript script(db, obs, *check, scriptLog);
@@ -332,7 +332,7 @@ CheckRunner::KvalobsDataPtr CheckRunner::checkObservation(
     (*scriptLog) << std::endl;
   }
 
-  auto ret = db.complete(obs, dl);
+  auto ret = db.complete(obs.stationInfo(), dl);
   transaction.commit();
   return ret;
 }
@@ -384,7 +384,7 @@ bool CheckRunner::shouldRunCheck(
   return true;
 }
 
-bool CheckRunner::shouldRunAnyChecks(const kvalobs::kvStationInfo & obs) const {
+bool CheckRunner::shouldRunAnyChecks(const qabase::Observation & obs) const {
   return obs.typeID() > 0;  // not aggregated value
 }
 
