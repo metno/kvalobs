@@ -38,6 +38,10 @@ inline std::ostream & operator<<(std::ostream & s, const Observation & o) {
     return s << o.id() << '(' << o.stationID() << '/' << o.typeID() << '/' << o.obstime() << ')';
 }
 
+inline bool operator==(const Observation & a, const Observation & b) {
+    return a.id() == b.id();
+}
+
 }
 
 

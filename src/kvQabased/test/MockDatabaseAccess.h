@@ -36,11 +36,11 @@
 class MockDatabaseAccess : public db::DatabaseAccess {
  public:
 
-  MOCK_CONST_METHOD2(getChecks, void (CheckList * out, const kvalobs::kvStationInfo & si));
+  MOCK_CONST_METHOD2(getChecks, void (CheckList * out, const qabase::Observation & obs));
 
   MOCK_CONST_METHOD1(getQcxFlagPosition, int (const std::string & qcx));
 
-  MOCK_CONST_METHOD2(getParametersToCheck, void (ParameterList * out, const kvalobs::kvStationInfo & si));
+  MOCK_CONST_METHOD2(getParametersToCheck, void (ParameterList * out, const qabase::Observation & obs));
 
   MOCK_CONST_METHOD1(getAlgorithm, kvalobs::kvAlgorithms (const std::string & algorithmName));
 
@@ -50,7 +50,7 @@ class MockDatabaseAccess : public db::DatabaseAccess {
 
   MOCK_CONST_METHOD4(getModelData, void (ModelDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minutesBackInTime ) );
 
-  MOCK_CONST_METHOD4(getData, void (DataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset));
+  MOCK_CONST_METHOD4(getData, void (DataList * out, const qabase::Observation & obs, const qabase::DataRequirement::Parameter & parameter, int minuteOffset));
 
   MOCK_CONST_METHOD4(getTextData, void (TextDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset));
 
@@ -58,9 +58,9 @@ class MockDatabaseAccess : public db::DatabaseAccess {
 
   MOCK_METHOD1(write, void (const DataList & data));
 
-  MOCK_METHOD0(selectDataForControl, kvalobs::kvStationInfo*());
+  MOCK_METHOD0(selectDataForControl, qabase::Observation*());
 
-  MOCK_METHOD1(markProcessDone, void (const kvalobs::kvStationInfo & si));
+  MOCK_METHOD1(markProcessDone, void (const qabase::Observation & obs));
 
   // Will only work if setDefaultActions() have been called
   const FakeDatabaseAccess::SavedData & savedData() const {return fake_.savedData;}

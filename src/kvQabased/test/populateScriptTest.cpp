@@ -40,15 +40,15 @@
 class populateScriptTest : public testing::Test {
  public:
   populateScriptTest()
-      : observation(10,
+      : observation(1, 10, 302,
                     boost::posix_time::time_from_string("2010-05-12 06:00:00"),
-                    302),
+                    boost::posix_time::time_from_string("2010-05-12 06:00:00")),
         script("sub check() { print \"ok\\n\"; }",
                scriptrunner::language::Interpreter::get("perl")) {
   }
  protected:
   FakeDatabaseAccess database;
-  kvalobs::kvStationInfo observation;
+  qabase::Observation observation;
   scriptrunner::Script script;
 };
 
@@ -345,7 +345,7 @@ TEST_F(populateScriptTest, existingRefObs) {
       kvalobs::kvTextData(observation.stationID(), observation.obstime(),
                           "2010010106", 1021, boost::posix_time::ptime(),
                           observation.typeID()));
-  EXPECT_CALL(mockDatabase, getTextData(_, observation, qabase::DataRequirement::Parameter("KLSTART"), 0))
+  EXPECT_CALL(mockDatabase, getTextData(_, observation.stationInfo(), qabase::DataRequirement::Parameter("KLSTART"), 0))
       .Times(AtLeast(1)).WillRepeatedly(SetArgumentPointee<0>(klstart));
 
   db::DatabaseAccess::TextDataList klobs;
@@ -353,7 +353,7 @@ TEST_F(populateScriptTest, existingRefObs) {
       kvalobs::kvTextData(observation.stationID(), observation.obstime(),
                           "2010050106", 1022, boost::posix_time::ptime(),
                           observation.typeID()));
-  EXPECT_CALL(mockDatabase, getTextData(_, observation, qabase::DataRequirement::Parameter("KLOBS"), 0))
+  EXPECT_CALL(mockDatabase, getTextData(_, observation.stationInfo(), qabase::DataRequirement::Parameter("KLOBS"), 0))
       .Times(AtLeast(1)).WillRepeatedly(SetArgumentPointee<0>(klobs));
 
   qabase::CheckSignature abstractRequirement("obs;R;;|refobs;Rstart,Robs;;",
@@ -410,7 +410,7 @@ TEST_F(populateScriptTest, oneRefObsNonexisting) {
   klstart.push_back(
       kvalobs::kvTextData(observation.stationID(), t, "2010010106", 1021,
                           boost::posix_time::ptime(), observation.typeID()));
-  EXPECT_CALL(mockDatabase, getTextData(_, observation, qabase::DataRequirement::Parameter("KLSTART"), -60))
+  EXPECT_CALL(mockDatabase, getTextData(_, observation.stationInfo(), qabase::DataRequirement::Parameter("KLSTART"), -60))
       .Times(AtLeast(1)).WillRepeatedly(SetArgumentPointee<0>(klstart));
 
   db::DatabaseAccess::TextDataList klobs;
@@ -418,7 +418,7 @@ TEST_F(populateScriptTest, oneRefObsNonexisting) {
       kvalobs::kvTextData(observation.stationID(), observation.obstime(),
                           "2010050106", 1022, boost::posix_time::ptime(),
                           observation.typeID()));
-  EXPECT_CALL(mockDatabase, getTextData(_, observation, qabase::DataRequirement::Parameter("KLOBS"), -60))
+  EXPECT_CALL(mockDatabase, getTextData(_, observation.stationInfo(), qabase::DataRequirement::Parameter("KLOBS"), -60))
       .Times(AtLeast(1)).WillRepeatedly(SetArgumentPointee<0>(klobs));
 
   qabase::CheckSignature abstractRequirement("obs;R;;|refobs;Rstart,Robs;;",

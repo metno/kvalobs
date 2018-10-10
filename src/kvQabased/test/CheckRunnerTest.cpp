@@ -45,9 +45,9 @@ using qabase::CheckRunner;
 class CheckRunnerTest : public testing::Test {
  public:
   CheckRunnerTest()
-      : observation(10,
+      : observation(1, 10, 302,
                     boost::posix_time::time_from_string("2010-05-12 06:00:00"),
-                    302),
+                    boost::posix_time::time_from_string("2010-05-12 06:00:00")),
         factory(10, boost::posix_time::time_from_string("2010-05-12 06:00:00"),
                 302),
         runner(nullptr) {
@@ -67,7 +67,7 @@ class CheckRunnerTest : public testing::Test {
 
   std::shared_ptr<MockDatabaseAccess> database;
   CheckRunner * runner;
-  kvalobs::kvStationInfo observation;
+  qabase::Observation observation;
   kvalobs::kvDataFactory factory;
 };
 
@@ -188,8 +188,8 @@ TEST_F(CheckRunnerTest, uncheckedObservationDataUpdatesUseinfo) {
 
 TEST_F(CheckRunnerTest, forwardsAggregatedData) {
   using namespace testing;
-  kvalobs::kvStationInfo stInfo(10, factory.obstime(), -308);
-  kvalobs::kvDataFactory factory2(stInfo);
+  qabase::Observation obs(1, 10, -308, factory.obstime(), factory.obstime());
+  kvalobs::kvDataFactory factory2(obs.stationInfo());
 
 
   db::DatabaseAccess::DataList dataFromDatabase = {
@@ -203,10 +203,10 @@ TEST_F(CheckRunnerTest, forwardsAggregatedData) {
   EXPECT_CALL(*database, getData(_, observation, qabase::DataRequirement::Parameter("TAM_24"), 0))
       .Times(0);
   EXPECT_CALL(*database, write(_)).Times(0);
-  EXPECT_CALL(*database, complete(stInfo, _, _))
+  EXPECT_CALL(*database, complete(obs.stationInfo(), _, _))
       .Times(AtLeast(1)).WillRepeatedly(Return(databaseData));
 
-  CheckRunner::KvalobsDataPtr modifiedList = runner->newObservation(stInfo);
+  CheckRunner::KvalobsDataPtr modifiedList = runner->newObservation(obs);
 
   std::list<kvalobs::kvData> data;
   modifiedList->getData(data);
@@ -276,8 +276,8 @@ TEST_F(CheckRunnerTest, reusesResultsFromOtherChecks) {
 TEST_F(CheckRunnerTest, runCheckWithOneParameterAtOddLevel) {
   using namespace testing;
 
-  kvalobs::kvStationInfo observation(
-      20, boost::posix_time::time_from_string("2010-05-12 06:00:00"), 302);
+  qabase::Observation observation(
+      1, 20, 302, boost::posix_time::time_from_string("2010-05-12 06:00:00"), boost::posix_time::time_from_string("2010-05-12 06:00:00"));
   kvalobs::kvDataFactory factory(
       20, boost::posix_time::time_from_string("2010-05-12 06:00:00"), 302);
 
@@ -316,7 +316,7 @@ TEST_F(CheckRunnerTest, runDecision) {
 
   EXPECT_TRUE(
       runner->shouldRunCheck(
-          observation,
+          observation.stationInfo(),
           kvalobs::kvChecks(
               10, "QC1-2-101", "QC1-2", 1, "foo", "obs;RR_24;;", "* * * * *",
               boost::posix_time::time_from_string("2010-01-01 00:00:00")),
@@ -331,7 +331,7 @@ TEST_F(CheckRunnerTest, willNotRunChecksWithoutAnyExpectedParametersForTypeid) {
 
   EXPECT_FALSE(
       runner->shouldRunCheck(
-          observation,
+          observation.stationInfo(),
           kvalobs::kvChecks(
               10, "QC1-2-101", "QC1-2", 1, "foo", "obs;TAM;;", "* * * * *",
               boost::posix_time::time_from_string("2010-01-01 00:00:00")),
@@ -347,7 +347,7 @@ TEST_F(CheckRunnerTest, runCheckWithOneButNotAllParametersExpectedForTypeid) {
 
   EXPECT_TRUE(
       runner->shouldRunCheck(
-          observation,
+          observation.stationInfo(),
           kvalobs::kvChecks(
               10, "QC1-2-101", "QC1-2", 1, "foo", "obs;RR_24,TAM;;",
               "* * * * *",
@@ -363,7 +363,7 @@ TEST_F(CheckRunnerTest, respectsChecksActiveColumn) {
 
   EXPECT_FALSE(
       runner->shouldRunCheck(
-          observation,
+          observation.stationInfo(),
           kvalobs::kvChecks(
               10, "QC1-2-101", "QC1-2", 1, "foo", "obs;RR_24;;", "* 13 * * *",
               boost::posix_time::time_from_string("2010-01-01 00:00:00")),
@@ -378,7 +378,7 @@ TEST_F(CheckRunnerTest, skipChecksForMissingParameters) {
 
   EXPECT_FALSE(
       runner->shouldRunCheck(
-          observation,
+          observation.stationInfo(),
           kvalobs::kvChecks(
               10, "QC1-2-101", "QC1-2", 1, "foo", "obs;TA_24;;", "* * * * *",
               boost::posix_time::time_from_string("2010-01-01 00:00:00")),

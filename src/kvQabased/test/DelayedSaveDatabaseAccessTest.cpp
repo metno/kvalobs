@@ -30,18 +30,19 @@
 #include <gtest/gtest.h>
 #include "FakeDatabaseAccess.h"
 #include <db/DelayedSaveDatabaseAccess.h>
+#include <db/returntypes/Observation.h>
 
 class DelayedSaveDatabaseAccessTest : public testing::Test {
  public:
   DelayedSaveDatabaseAccessTest()
-      : observation(10,
+      : observation(1, 10, 302, 
                     boost::posix_time::time_from_string("2010-05-26 06:00:00"),
-                    302) {
+                    boost::posix_time::time_from_string("2010-05-26 06:04:21")) {
   }
  protected:
   FakeDatabaseAccess fakeDb;
   db::DelayedSaveDatabaseAccess * database;
-  kvalobs::kvStationInfo observation;
+  qabase::Observation observation;
 
   virtual void SetUp() {
     database = new db::DelayedSaveDatabaseAccess(&fakeDb);

@@ -39,12 +39,12 @@ class FakeDatabaseAccess : public db::DatabaseAccess {
   virtual ~FakeDatabaseAccess();
 
   virtual void getChecks(CheckList * out,
-                         const kvalobs::kvStationInfo & si) const;
+                         const qabase::Observation & obs) const;
 
   virtual int getQcxFlagPosition(const std::string & qcx) const;
 
   virtual void getParametersToCheck(ParameterList * out,
-                                    const kvalobs::kvStationInfo & si) const;
+                                    const qabase::Observation & obs) const;
 
   virtual kvalobs::kvAlgorithms getAlgorithm(
       const std::string & algorithmName) const;
@@ -54,7 +54,7 @@ class FakeDatabaseAccess : public db::DatabaseAccess {
       const qabase::DataRequirement::Parameter & parameter,
       int minutesBackInTime) const;
 
-  virtual void getData(DataList * out, const kvalobs::kvStationInfo & si,
+  virtual void getData(DataList * out, const qabase::Observation & obs,
                        const qabase::DataRequirement::Parameter & parameter,
                        int minuteOffset) const;
 
@@ -73,9 +73,9 @@ class FakeDatabaseAccess : public db::DatabaseAccess {
 
   virtual void write(const DataList & data);
 
-  virtual kvalobs::kvStationInfo * selectDataForControl();
+  virtual qabase::Observation * selectDataForControl();
 
-  virtual void markProcessDone(const kvalobs::kvStationInfo & si) {
+  virtual void markProcessDone(const qabase::Observation & obs) {
   }
 
   typedef std::set<kvalobs::kvData, kvalobs::compare::lt_kvData> SavedData;
