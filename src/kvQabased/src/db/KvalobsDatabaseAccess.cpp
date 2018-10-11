@@ -146,6 +146,7 @@ KvalobsDatabaseAccess::~KvalobsDatabaseAccess() {
 
 void KvalobsDatabaseAccess::beginTransaction() {
   connection_->beginTransaction();
+  fetchedData_.clear();
 }
 
 void KvalobsDatabaseAccess::commit() {
@@ -342,38 +343,48 @@ void KvalobsDatabaseAccess::getData(
     const qabase::DataRequirement::Parameter & parameter,
     int minuteOffset) const {
   std::ostringstream query;
-  query << "SELECT * FROM data WHERE ";
-  query << "stationid=" << obs.stationID() << " AND ";
-  query << "paramid IN (SELECT paramid FROM param WHERE name='"
-        << parameter.baseName() << "') AND ";
-  if (parameter.haveLevel())
-    query << "level=" << parameter.level() << " AND ";
-  if (parameter.haveSensor())
-    query << "sensor='" << parameter.sensor() << "' AND ";
-  if (parameter.haveType())
-    query << "typeid=" << parameter.type() << " AND ";
-  boost::posix_time::ptime t = obs.obstime()
-      + boost::posix_time::minutes(minuteOffset);
-  if (t == obs.obstime())
-    query << "obstime='" << to_kvalobs_string(t) << "'";
-  else
-    query << "obstime BETWEEN '" << to_kvalobs_string(t) << "' AND '"
-          << to_kvalobs_string(obs.obstime()) << "'";
-  query << " ORDER BY obstime DESC";
-  query << " FOR UPDATE;";
+  query << "SELECT "
+    "o.stationid, o.obstime + d.obs_offset AS obstime, d.original, d.paramid, o.tbtime, o.typeid, d.sensor, d.level, d.corrected, d.controlinfo, d.useinfo, d.cfailed, o.observationid "
+    "FROM "
+    "observations o, obsdata d "
+    "WHERE "
+    "o.observationid = d.observationid AND ";
+    query << "o.stationid=" << obs.stationID() << " AND ";
+    query << "d.paramid IN (SELECT paramid FROM param WHERE name='"
+          << parameter.baseName() << "') AND ";
+    if (parameter.haveLevel())
+      query << "d.level=" << parameter.level() << " AND ";
+    if (parameter.haveSensor())
+      query << "d.sensor='" << parameter.sensor() << "' AND ";
+    if (parameter.haveType())
+      query << "o.typeid=" << parameter.type() << " AND ";
+    boost::posix_time::ptime t = obs.obstime()
+        + boost::posix_time::minutes(minuteOffset);
+    if (t == obs.obstime())
+      query << "obstime='" << to_kvalobs_string(t) << "'";
+    else
+      query << "obstime BETWEEN '" << to_kvalobs_string(t) << "' AND '"
+            << to_kvalobs_string(obs.obstime()) << "'";
+    query << " ORDER BY obstime DESC";
+    query << " FOR UPDATE;";
 
-  milog::LogContext context("query");
-  LOGDEBUG1(query.str());
+    milog::LogContext context("query");
+    LOGDEBUG1(query.str());
 
-  ResultPtr result(connection_->execQuery(query.str()));
+    ResultPtr result(connection_->execQuery(query.str()));
 
-  db::DatabaseAccess::DataList data;
-  while (result->hasNext())
-    data.push_back(kvalobs::kvData(result->next()));
+    db::DatabaseAccess::DataList data;
+    while (result->hasNext()) {
+      auto r = result->next();
+      kvalobs::kvData d(r);
+      long long obsid = boost::lexical_cast<long long>(r[12]);
+      storeFetched(obsid, d);
+      data.push_back(d);
+    }
 
-  db::resultfilter::filter(data, obs.typeID());
+    db::resultfilter::filter(data, obs.typeID());
 
-  out->swap(data);
+    out->swap(data);
 }
 
 void KvalobsDatabaseAccess::getTextData(
@@ -458,23 +469,31 @@ void KvalobsDatabaseAccess::write(const DataList & data) {
 #else
   milog::LogContext context("query");
   LOGINFO("Saving " << data.size() << " elements to database");
-//	for ( DataList::const_iterator it = data.begin(); it != data.end(); ++ it )
-//		LOGINFO("Write to database: " << * it);
-
   for (DataList::const_iterator it = data.begin(); it != data.end(); ++it) {
-    std::ostringstream query;
-    query << "UPDATE data SET "
-          "controlinfo='"
-          << it->controlinfo().flagstring() << "', "
-          "useinfo='"
-          << it->useinfo().flagstring() << "', "
-          "corrected="
-          << it->corrected() << ", "
-          "cfailed='"
-          << it->cfailed() << "'" << it->uniqueKey() << ';';
+    auto fetched = fetchedData_.find(*it);
+    if (fetched == fetchedData_.end()) {
+      LOGWARN("Attempt to update non-existing row: " << *it);
+      continue;
+    }
+    long long obsid = fetched->second;
 
+    std::ostringstream query;
+    query << "UPDATE obsdata SET ";
+    query << "controlinfo='" << it->controlinfo().flagstring() << "', ";
+    query << "useinfo='" << it->useinfo().flagstring() << "', ";
+    query << "corrected=" << it->corrected() << ", ";
+    query << "cfailed='" << it->cfailed() << "' ";
+    query << " WHERE ";
+    query << "observationid=" << obsid << " AND ";
+    query << "paramid=" << it->paramID() << " AND ";
+    query << "sensor='" << it->sensor() << "' AND ";
+    query << "level=" << it->level();
+    query << " RETURNING observationid";
+    
     LOGDEBUG1(query.str());
-    connection_->exec(query.str());
+    ResultPtr result(connection_->execQuery(query.str()));
+    if (result->size() != 1)
+      throw std::runtime_error("Update statement did not affect exactly one row");
   }
 #endif
 }
@@ -531,5 +550,19 @@ dnmi::db::Connection * KvalobsDatabaseAccess::createConnection(
   dnmi::db::Connection * conn = dnmi::db::DriverManager::connect(driverId, databaseConnect);
   return conn;
 }
+
+void KvalobsDatabaseAccess::storeFetched(long long obsid, const kvalobs::kvData & d) const {
+  DataID::value_type toInsert(d, obsid);
+  auto insertResult = fetchedData_.insert(toInsert);
+  if (!insertResult.second) {
+    long long oldId = insertResult.first->second;
+    if (obsid != oldId) {
+      std::ostringstream s;
+      s << "obsid mismatch: got " << obsid << " previous was " << oldId << " data: " << d;
+      throw std::runtime_error(s.str());
+    }
+  }
+}
+
 
 }  // namespace db

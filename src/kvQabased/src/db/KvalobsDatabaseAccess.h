@@ -31,7 +31,9 @@
 #define KVALOBSDATABASEACCESS_H_
 
 #include "DatabaseAccess.h"
+#include <kvalobs/kvDataOperations.h>
 #include <string>
+#include <map>
 
 namespace dnmi {
 namespace db {
@@ -118,6 +120,11 @@ class KvalobsDatabaseAccess : public db::DatabaseAccess {
   TransactionEnforcingDatabaseConnection * connection_;
 
   static std::string modelDataName_;
+
+  // kvData -> observationid
+  typedef std::map<kvalobs::kvData, long long, kvalobs::compare::lt_kvData> DataID;
+  mutable DataID fetchedData_;
+  void storeFetched(long long obsid, const kvalobs::kvData & d) const;
 };
 
 }
