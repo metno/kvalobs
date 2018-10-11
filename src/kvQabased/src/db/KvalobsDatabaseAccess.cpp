@@ -420,6 +420,36 @@ void KvalobsDatabaseAccess::getData(
     out->swap(data);
 }
 
+bool KvalobsDatabaseAccess::pin(const qabase::Observation & obs) const {
+  std::ostringstream query;
+  query << "SELECT "
+    "o.stationid, o.obstime + d.obs_offset AS obstime, d.original, d.paramid, o.tbtime, o.typeid, d.sensor, d.level, d.corrected, d.controlinfo, d.useinfo, d.cfailed, o.observationid "
+    "FROM "
+    "observations o, obsdata d "
+    "WHERE "
+    "o.observationid = d.observationid AND "
+    "o.observationid = " << obs.id();
+  query << " ORDER BY obstime DESC";
+  query << " FOR UPDATE;";
+
+  milog::LogContext context("query");
+  LOGDEBUG1(query.str());
+
+  ResultPtr result(connection_->execQuery(query.str()));
+
+  if (result->size() == 0)
+    return false;
+
+  while (result->hasNext()) {
+    auto r = result->next();
+    kvalobs::kvData d = kvDataFromRow(r);
+    long long obsid = boost::lexical_cast<long long>(r[12]);
+    storeFetched(obsid, d);
+  }
+  return true;
+}
+
+
 void KvalobsDatabaseAccess::getTextData(
     TextDataList * out, const kvalobs::kvStationInfo & si,
     const qabase::DataRequirement::Parameter & parameter,

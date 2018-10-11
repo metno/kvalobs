@@ -229,7 +229,10 @@ CheckRunner::KvalobsDataPtr CheckRunner::checkObservation(
   db::DelayedSaveDatabaseAccess db(&cdb);
   AutoRollbackTransaction transaction(db);
 
-  std::cout << "TOOOYYOOY" << std::endl;
+  if (!db.pin(obs)) {
+    LOGINFO("No data for observationid " << obs.id() << " - skipping all checks");
+    return CheckRunner::KvalobsDataPtr();
+  }
 
   LOGDEBUG("Getting checks for observation");
   db::DatabaseAccess::CheckList checkList;

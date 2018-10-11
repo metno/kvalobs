@@ -195,8 +195,17 @@ class DatabaseAccess {
                        const qabase::DataRequirement::Parameter & parameter,
                        int minuteOffset) const = 0;
 
-  //virtual void getData(DataList * out, long long observationid) =0;
-
+  /**
+   * Pin the given observation. This means that any attempt to read data will
+   * either fail with an exception or return the pinned data if there is a 
+   * conflict between the pinned observationid and the newly returned 
+   * observationid.
+   * Will throw an exception at you if you have already read the data you are 
+   * attempting to pi, and there is a conflict.
+   * Pins are cleared when you start a new transaction.
+   * Returns false if absolutely no data was pinned. True otherwise.
+   */
+  virtual bool pin(const qabase::Observation & obs) const = 0;
 
   typedef std::list<kvalobs::kvTextData> TextDataList;
   /**

@@ -176,7 +176,7 @@ void FakeDatabaseAccess::getTextData(
 }
 
 FakeDatabaseAccess::KvalobsDataPtr FakeDatabaseAccess::complete(
-    const kvalobs::kvStationInfo & si, const DataList & d,
+    const qabase::Observation & obs, const DataList & d,
     const TextDataList & td) const {
   return std::make_shared < kvalobs::serialize::KvalobsData > (d, td);
 }

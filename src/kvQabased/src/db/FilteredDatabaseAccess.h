@@ -109,6 +109,11 @@ class FilteredDatabaseAccess : public DatabaseAccess {
     baseImplementation_->getData(out, obs, parameter, minuteOffset);
   }
 
+  virtual bool pin(const qabase::Observation & obs) const {
+    return baseImplementation_->pin(obs);
+  }
+
+
   virtual void getTextData(TextDataList * out,
                            const kvalobs::kvStationInfo & si,
                            const qabase::DataRequirement::Parameter & parameter,

@@ -110,6 +110,10 @@ TEST_F(CheckRunnerTest, resetsFlagsBeforeCheck) {
   EXPECT_CALL(*database, getData(_, observation, qabase::DataRequirement::Parameter("TAM_24"), 0))
       .Times(AtLeast(1)).WillRepeatedly(SetArgumentPointee<0>(taData));
 
+  EXPECT_CALL(*database, pin(_))
+      .Times(AtLeast(1)).WillRepeatedly(
+      Return(true));
+
   db::DatabaseAccess::DataList expectedScriptReturn = boost::assign::list_of(
       factory.getData(6.0, 110));
   expectedScriptReturn.front().controlinfo(
@@ -142,6 +146,10 @@ TEST_F(CheckRunnerTest, resetsFlagsBeforeCheck) {
 
 TEST_F(CheckRunnerTest, uncheckedObservationDataUpdatesUseinfo) {
   using namespace testing;
+
+  EXPECT_CALL(*database, pin(_))
+      .Times(AtLeast(1)).WillRepeatedly(
+      Return(true));
 
   db::DatabaseAccess::CheckList checks;  // empty check list
   EXPECT_CALL(*database, getChecks(_, observation)).Times(AtLeast(1))
@@ -203,7 +211,7 @@ TEST_F(CheckRunnerTest, forwardsAggregatedData) {
   EXPECT_CALL(*database, getData(_, observation, qabase::DataRequirement::Parameter("TAM_24"), 0))
       .Times(0);
   EXPECT_CALL(*database, write(_)).Times(0);
-  EXPECT_CALL(*database, complete(obs.stationInfo(), _, _))
+  EXPECT_CALL(*database, complete(obs, _, _))
       .Times(AtLeast(1)).WillRepeatedly(Return(databaseData));
 
   CheckRunner::KvalobsDataPtr modifiedList = runner->newObservation(obs);
@@ -227,6 +235,9 @@ TEST_F(CheckRunnerTest, skipsHqcCorrectedData) {
   EXPECT_CALL(*database, getData(_, observation, qabase::DataRequirement::Parameter("TAM_24"), 0))
       .Times(AtLeast(1));
   EXPECT_CALL(*database, write(_)).Times(0);
+  EXPECT_CALL(*database, pin(_))
+      .Times(AtLeast(1)).WillRepeatedly(
+      Return(true));
 
   CheckRunner::KvalobsDataPtr modifiedList = runner->newObservation(observation);
   std::list<kvalobs::kvData> data;
@@ -236,6 +247,10 @@ TEST_F(CheckRunnerTest, skipsHqcCorrectedData) {
 
 TEST_F(CheckRunnerTest, reusesResultsFromOtherChecks) {
   using namespace testing;
+
+  EXPECT_CALL(*database, pin(_))
+      .Times(AtLeast(1)).WillRepeatedly(
+      Return(true));
 
   db::DatabaseAccess::CheckList checks;
   checks.push_back(
@@ -275,6 +290,10 @@ TEST_F(CheckRunnerTest, reusesResultsFromOtherChecks) {
 
 TEST_F(CheckRunnerTest, runCheckWithOneParameterAtOddLevel) {
   using namespace testing;
+
+  EXPECT_CALL(*database, pin(_))
+      .Times(AtLeast(1)).WillRepeatedly(
+      Return(true));
 
   qabase::Observation observation(
       1, 20, 302, boost::posix_time::time_from_string("2010-05-12 06:00:00"), boost::posix_time::time_from_string("2010-05-12 06:00:00"));
@@ -407,6 +426,10 @@ TEST_F(CheckRunnerTest, checkShipsEvenIfParameterMissingInObsPgm) {
 TEST_F(CheckRunnerTest, skipsChecksWhereAllParametersAreFromOtherTypeId) {
   using namespace testing;
 
+  EXPECT_CALL(*database, pin(_))
+      .Times(AtLeast(1)).WillRepeatedly(
+      Return(true));
+
   kvalobs::kvDataFactory factory(
       10, boost::posix_time::time_from_string("2010-05-12 06:00:00"), 304);
   db::DatabaseAccess::DataList dataFromDatabase = boost::assign::list_of(
@@ -430,3 +453,16 @@ TEST_F(CheckRunnerTest, skipsChecksWhereAllParametersAreFromOtherTypeId) {
 
   runner->newObservation(observation);
 }
+
+TEST_F(CheckRunnerTest, bailOutIfPinFails) {
+  using namespace testing;
+
+  EXPECT_CALL(*database, pin(_))
+      .Times(1).WillRepeatedly(
+      Return(false));
+  EXPECT_CALL(*database, getData(_, _, _, _)).Times(0);
+  EXPECT_CALL(*database, write(_)).Times(0);
+
+  runner->newObservation(observation);
+}
+

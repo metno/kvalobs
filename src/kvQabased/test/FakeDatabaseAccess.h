@@ -58,6 +58,8 @@ class FakeDatabaseAccess : public db::DatabaseAccess {
                        const qabase::DataRequirement::Parameter & parameter,
                        int minuteOffset) const;
 
+  virtual bool pin(const qabase::Observation & obs) const { return true; }
+
   virtual std::string getStationParam(const kvalobs::kvStationInfo & si,
                                       const std::string & parameter,
                                       const std::string & qcx) const;
@@ -69,7 +71,7 @@ class FakeDatabaseAccess : public db::DatabaseAccess {
                            const qabase::DataRequirement::Parameter & parameter,
                            int minuteOffset) const;
 
-  virtual KvalobsDataPtr complete(const kvalobs::kvStationInfo & si, const DataList & d = DataList(), const TextDataList & td = TextDataList()) const;
+  virtual KvalobsDataPtr complete(const qabase::Observation & obs, const DataList & d = DataList(), const TextDataList & td = TextDataList()) const;
 
   virtual void write(const DataList & data);
 

@@ -100,6 +100,8 @@ class KvalobsDatabaseAccess : public db::DatabaseAccess {
 
   virtual void getData(DataList * out, const qabase::Observation & obs, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const;
 
+  virtual bool pin(const qabase::Observation & obs) const;
+
   virtual void getTextData(TextDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const;
 
   virtual KvalobsDataPtr complete(const qabase::Observation & obs, const DataList & d, const TextDataList & td) const;
