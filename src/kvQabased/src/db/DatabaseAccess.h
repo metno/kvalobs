@@ -219,7 +219,7 @@ class DatabaseAccess {
    * Construct a KvalobsData object containing all the given data in d and td,
    * but also all database data specified by si.
    */
-  virtual KvalobsDataPtr complete(const kvalobs::kvStationInfo & si,
+  virtual KvalobsDataPtr complete(const qabase::Observation & obs,
                                   const DataList & d = DataList(),
                                   const TextDataList & td =
                                       TextDataList()) const = 0;

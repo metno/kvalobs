@@ -160,7 +160,7 @@ CheckRunner::KvalobsDataPtr CheckRunner::newObservation(
     // KvalobsDatabaseAccess requires a transaction to be running, but since
     // we are merely reading data we don't bother to commit
     AutoRollbackTransaction transaction(*db_);
-    return db_->complete(obs.stationInfo());
+    return db_->complete(obs);
   }
 
   LOGINFO("Checking " << obs);
@@ -215,7 +215,7 @@ CheckRunner::KvalobsDataPtr CheckRunner::newObservation(
   }
   // never reached:
   AutoRollbackTransaction transaction(*db_);
-  return db_->complete(obs.stationInfo());
+  return db_->complete(obs);
 }
 
 bool CheckRunner::shouldMarkStartAndStop_() {
@@ -228,6 +228,8 @@ CheckRunner::KvalobsDataPtr CheckRunner::checkObservation(
   db::CachedDatabaseAccess cdb(db_.get(), obs);
   db::DelayedSaveDatabaseAccess db(&cdb);
   AutoRollbackTransaction transaction(db);
+
+  std::cout << "TOOOYYOOY" << std::endl;
 
   LOGDEBUG("Getting checks for observation");
   db::DatabaseAccess::CheckList checkList;
@@ -254,7 +256,7 @@ CheckRunner::KvalobsDataPtr CheckRunner::checkObservation(
 
   if (haveAnyHqcCorrectedElements(observationData)) {
     LOGINFO("Observation is HQC-modified. Will not run tests on this");
-    return db.complete(obs.stationInfo(), observationData);
+    return db.complete(obs, observationData);
   }
 
   if (qcxFilter_.empty()) {
@@ -332,7 +334,7 @@ CheckRunner::KvalobsDataPtr CheckRunner::checkObservation(
     (*scriptLog) << std::endl;
   }
 
-  auto ret = db.complete(obs.stationInfo(), dl);
+  auto ret = db.complete(obs, dl);
   transaction.commit();
   return ret;
 }

@@ -105,7 +105,7 @@ void KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::exec(
     throw std::runtime_error("No transaction in progress");
 }
 void KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::beginTransaction() {
-  connection_->beginTransaction(dnmi::db::Connection::REPEATABLE_READ);
+  connection_->beginTransaction(dnmi::db::Connection::READ_COMMITTED);
   transactionInProgress_ = true;
 }
 void KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::commit() {
@@ -338,6 +338,39 @@ void KvalobsDatabaseAccess::getModelData(
     out->push_back(kvalobs::kvModelData(result->next()));
 }
 
+namespace {
+  /**
+   * Read database rows with any data entries after the kvdata-specific ones
+   */
+  kvalobs::kvData kvDataFromRow(dnmi::db::DRow & row) {
+    return kvalobs::kvData(
+      boost::lexical_cast<int>(row[0]),
+      boost::posix_time::time_from_string(row[1]),
+      boost::lexical_cast<float>(row[2]),
+      boost::lexical_cast<int>(row[3]),
+      boost::posix_time::time_from_string(row[4]),
+      boost::lexical_cast<int>(row[5]),
+      boost::lexical_cast<int>(row[6]),
+      boost::lexical_cast<int>(row[7]),
+      boost::lexical_cast<float>(row[8]),
+      kvalobs::kvControlInfo(row[9]),
+      kvalobs::kvUseInfo(row[10]),
+      row[11]
+    );
+  }
+
+  kvalobs::kvTextData kvTextDataFromRow(dnmi::db::DRow & row) {
+    return kvalobs::kvTextData(
+      boost::lexical_cast<int>(row[0]),
+      boost::posix_time::time_from_string(row[1]),
+      row[2],
+      boost::lexical_cast<int>(row[3]),
+      boost::posix_time::time_from_string(row[4]),
+      boost::lexical_cast<int>(row[5])
+    );
+  }
+}
+
 void KvalobsDatabaseAccess::getData(
     DataList * out, const qabase::Observation & obs,
     const qabase::DataRequirement::Parameter & parameter,
@@ -376,7 +409,7 @@ void KvalobsDatabaseAccess::getData(
     db::DatabaseAccess::DataList data;
     while (result->hasNext()) {
       auto r = result->next();
-      kvalobs::kvData d(r);
+      kvalobs::kvData d = kvDataFromRow(r);
       long long obsid = boost::lexical_cast<long long>(r[12]);
       storeFetched(obsid, d);
       data.push_back(d);
@@ -422,21 +455,40 @@ void KvalobsDatabaseAccess::getTextData(
 }
 
 namespace {
-std::string query(const kvalobs::kvStationInfo & si, const std::string & table) {
+std::string obsdataQuery(const qabase::Observation & obs) {
   std::ostringstream query;
-  query << "SELECT * FROM " << table << " WHERE stationid=" << si.stationID() <<
-      " AND typeid=" << si.typeID() <<
-      " AND obstime='" << to_kvalobs_string(si.obstime()) << "';";
+  query << "SELECT "
+  "o.stationid, o.obstime + d.obs_offset AS obstime, d.original, d.paramid, o.tbtime, o.typeid, d.sensor, d.level, d.corrected, d.controlinfo, d.useinfo, d.cfailed "
+  "FROM "
+  "observations o, obsdata d "
+  "WHERE "
+  "o.observationid = d.observationid AND "
+  "o.observationid=" << obs.id();
   milog::LogContext context("query");
   LOGDEBUG1(query.str());
   return query.str();
 }
+
+std::string obstextdataQuery(const qabase::Observation & obs) {
+  std::ostringstream query;
+  query << "SELECT "
+  "o.stationid, o.obstime + d.obs_offset AS obstime, d.original, d.paramid, o.tbtime, o.typeid "
+  "FROM "
+  "observations o, obstextdata d "
+  "WHERE "
+  "o.observationid = d.observationid AND "
+  "o.observationid=" << obs.id();
+  milog::LogContext context("query");
+  LOGDEBUG1(query.str());
+  return query.str();
+}
+
 }  // namespace
 
-void KvalobsDatabaseAccess::complete_(const kvalobs::kvStationInfo & si, DataList * out) const {
-  ResultPtr result(connection_->execQuery(query(si, "data")));
+void KvalobsDatabaseAccess::complete_(const qabase::Observation & obs, DataList * out) const {
+  ResultPtr result(connection_->execQuery(obsdataQuery(obs)));
   while (result->hasNext()) {
-    kvalobs::kvData d(result->next());
+    kvalobs::kvData d = kvDataFromRow(result->next());
     auto func = std::bind1st(kvalobs::compare::same_obs_and_parameter(), d);
     auto previous = std::find_if(out->begin(), out->end(), func);
     if (previous == out->end())
@@ -444,10 +496,10 @@ void KvalobsDatabaseAccess::complete_(const kvalobs::kvStationInfo & si, DataLis
   }
 }
 
-void KvalobsDatabaseAccess::complete_(const kvalobs::kvStationInfo & si, TextDataList * out) const {
-  ResultPtr result(connection_->execQuery(query(si, "text_data")));
+void KvalobsDatabaseAccess::complete_(const qabase::Observation & obs, TextDataList * out) const {
+  ResultPtr result(connection_->execQuery(obstextdataQuery(obs)));
   while (result->hasNext()) {
-    kvalobs::kvTextData d(result->next());
+    kvalobs::kvTextData d = kvTextDataFromRow(result->next());
     auto func = std::bind1st(kvalobs::compare::kvTextData_same_obs_and_parameter(), d);
     auto previous = std::find_if(out->begin(), out->end(), func);
     if (previous == out->end())
@@ -455,11 +507,11 @@ void KvalobsDatabaseAccess::complete_(const kvalobs::kvStationInfo & si, TextDat
   }
 }
 
-KvalobsDatabaseAccess::KvalobsDataPtr KvalobsDatabaseAccess::complete(const kvalobs::kvStationInfo & si, const DataList & d, const TextDataList & td) const {
+KvalobsDatabaseAccess::KvalobsDataPtr KvalobsDatabaseAccess::complete(const qabase::Observation & obs, const DataList & d, const TextDataList & td) const {
   DataList dl = d;
-  complete_(si, & dl);
+  complete_(obs, & dl);
   TextDataList tdl = td;
-  complete_(si, & tdl);
+  complete_(obs, & tdl);
   return std::make_shared<kvalobs::serialize::KvalobsData>(dl, tdl);
 }
 

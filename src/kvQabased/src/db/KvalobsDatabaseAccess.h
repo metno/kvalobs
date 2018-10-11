@@ -102,7 +102,7 @@ class KvalobsDatabaseAccess : public db::DatabaseAccess {
 
   virtual void getTextData(TextDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const;
 
-  virtual KvalobsDataPtr complete(const kvalobs::kvStationInfo & si, const DataList & d, const TextDataList & td) const;
+  virtual KvalobsDataPtr complete(const qabase::Observation & obs, const DataList & d, const TextDataList & td) const;
 
   virtual void write(const DataList & data);
 
@@ -113,8 +113,8 @@ class KvalobsDatabaseAccess : public db::DatabaseAccess {
  private:
   static dnmi::db::Connection * createConnection(const std::string & databaseConnect);
 
-  void complete_(const kvalobs::kvStationInfo & si, DataList * out) const;
-  void complete_(const kvalobs::kvStationInfo & si, TextDataList * out) const;
+  void complete_(const qabase::Observation & obs, DataList * out) const;
+  void complete_(const qabase::Observation & obs, TextDataList * out) const;
 
   class TransactionEnforcingDatabaseConnection;
   TransactionEnforcingDatabaseConnection * connection_;
