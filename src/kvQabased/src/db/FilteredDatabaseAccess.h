@@ -115,10 +115,10 @@ class FilteredDatabaseAccess : public DatabaseAccess {
 
 
   virtual void getTextData(TextDataList * out,
-                           const kvalobs::kvStationInfo & si,
+                           const qabase::Observation & obs,
                            const qabase::DataRequirement::Parameter & parameter,
                            int minuteOffset) const {
-    baseImplementation_->getTextData(out, si, parameter, minuteOffset);
+    baseImplementation_->getTextData(out, obs, parameter, minuteOffset);
   }
 
   virtual KvalobsDataPtr complete(const qabase::Observation & obs, const DataList & d = DataList(), const TextDataList & td = TextDataList()) const {

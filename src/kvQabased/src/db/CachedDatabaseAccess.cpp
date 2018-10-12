@@ -138,12 +138,12 @@ void CachedDatabaseAccess::getData(
 }
 
 void CachedDatabaseAccess::getTextData(
-    TextDataList * out, const kvalobs::kvStationInfo & si,
+    TextDataList * out, const qabase::Observation & obs,
     const qabase::DataRequirement::Parameter & parameter,
     int minuteOffset) const {
-  if (!textDataCache_.getData(out, si, parameter, minuteOffset)) {
-    FilteredDatabaseAccess::getTextData(out, si, parameter, minuteOffset);
-    textDataCache_.setData(*out, si, parameter, minuteOffset);
+  if (!textDataCache_.getData(out, obs.stationInfo(), parameter, minuteOffset)) {
+    FilteredDatabaseAccess::getTextData(out, obs, parameter, minuteOffset);
+    textDataCache_.setData(*out, obs.stationInfo(), parameter, minuteOffset);
   }
 }
 

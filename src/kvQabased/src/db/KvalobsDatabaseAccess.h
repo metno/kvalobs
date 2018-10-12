@@ -32,6 +32,7 @@
 
 #include "DatabaseAccess.h"
 #include <kvalobs/kvDataOperations.h>
+#include <kvalobs/kvTextDataOperations.h>
 #include <string>
 #include <map>
 
@@ -102,7 +103,7 @@ class KvalobsDatabaseAccess : public db::DatabaseAccess {
 
   virtual bool pin(const qabase::Observation & obs) const;
 
-  virtual void getTextData(TextDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const;
+  virtual void getTextData(TextDataList * out, const qabase::Observation & obs, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const;
 
   virtual KvalobsDataPtr complete(const qabase::Observation & obs, const DataList & d, const TextDataList & td) const;
 
@@ -127,6 +128,11 @@ class KvalobsDatabaseAccess : public db::DatabaseAccess {
   typedef std::map<kvalobs::kvData, long long, kvalobs::compare::lt_kvData> DataID;
   mutable DataID fetchedData_;
   void storeFetched(long long obsid, const kvalobs::kvData & d) const;
+
+  typedef std::map<kvalobs::kvTextData, long long, kvalobs::compare::lt_kvTextData> TextDataID;
+  mutable TextDataID fetchedTextData_;
+  void storeFetched(long long obsid, const kvalobs::kvTextData & d) const;
+
 };
 
 }

@@ -218,7 +218,7 @@ class DatabaseAccess {
    *                     for?
    */
   virtual void getTextData(TextDataList * out,
-                           const kvalobs::kvStationInfo & si,
+                           const qabase::Observation & obs,
                            const qabase::DataRequirement::Parameter & parameter,
                            int minuteOffset) const = 0;
 

@@ -154,7 +154,7 @@ void DataStore::populateRefObs_(
           "Unable to find translation for parameter: " + parameter->baseName());
 
     db::DatabaseAccess::TextDataList textData;
-    db.getTextData(&textData, obs.stationInfo(), *parameter,
+    db.getTextData(&textData, obs, *parameter,
                    concreteRefObsRequirement.firstTime());
     if (textData.empty()) {
       kvalobs::kvTextData td(obs.stationID(), obs.obstime(), "",

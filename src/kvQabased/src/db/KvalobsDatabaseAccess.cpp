@@ -451,35 +451,45 @@ bool KvalobsDatabaseAccess::pin(const qabase::Observation & obs) const {
 
 
 void KvalobsDatabaseAccess::getTextData(
-    TextDataList * out, const kvalobs::kvStationInfo & si,
+    TextDataList * out, const qabase::Observation & obs,
     const qabase::DataRequirement::Parameter & parameter,
     int minuteOffset) const {
   std::ostringstream query;
-  query << "SELECT * FROM text_data WHERE ";
-  query << "stationid=" << si.stationID() << " AND ";
-  query << "paramid IN (SELECT paramid FROM param WHERE name='"
-        << parameter.baseName() << "') AND ";
-  if (parameter.haveType())
-    query << "typeid=" << parameter.type() << " AND ";
-  boost::posix_time::ptime t = si.obstime()
-      + boost::posix_time::minutes(minuteOffset);
-  if (t == si.obstime())
-    query << "obstime='" << to_kvalobs_string(t) << "'";
-  else
-    query << "obstime BETWEEN '" << to_kvalobs_string(t) << "' AND '"
-          << to_kvalobs_string(si.obstime()) << "'";
-  query << " ORDER BY obstime DESC;";
+  query << "SELECT "
+    "o.stationid, o.obstime + d.obs_offset AS obstime, d.original, d.paramid, o.tbtime, o.typeid, o.observationid "
+    "FROM "
+    "observations o, obstextdata d "
+    "WHERE "
+    "o.observationid = d.observationid AND ";
+    query << "o.stationid=" << obs.stationID() << " AND ";
+    query << "d.paramid IN (SELECT paramid FROM param WHERE name='"
+          << parameter.baseName() << "') AND ";
+    if (parameter.haveType())
+      query << "o.typeid=" << parameter.type() << " AND ";
+    boost::posix_time::ptime t = obs.obstime()
+        + boost::posix_time::minutes(minuteOffset);
+    if (t == obs.obstime())
+      query << "obstime='" << to_kvalobs_string(t) << "'";
+    else
+      query << "obstime BETWEEN '" << to_kvalobs_string(t) << "' AND '"
+            << to_kvalobs_string(obs.obstime()) << "'";
+    query << " ORDER BY obstime DESC";
 
-  milog::LogContext context("query");
-  LOGDEBUG1(query.str());
+    milog::LogContext context("query");
+    LOGDEBUG1(query.str());
 
   ResultPtr result(connection_->execQuery(query.str()));
 
   db::DatabaseAccess::TextDataList data;
-  while (result->hasNext())
-    data.push_back(kvalobs::kvTextData(result->next()));
+  while (result->hasNext()) {
+    auto r = result->next();
+    kvalobs::kvTextData d = kvTextDataFromRow(r);
+    long long obsid = boost::lexical_cast<long long>(r[6]);
+    storeFetched(obsid, d);
+    data.push_back(d);
+  }
 
-  db::resultfilter::filter(data, si.typeID());
+  db::resultfilter::filter(data, obs.typeID());
 
   out->swap(data);
 }
@@ -646,5 +656,17 @@ void KvalobsDatabaseAccess::storeFetched(long long obsid, const kvalobs::kvData 
   }
 }
 
+void KvalobsDatabaseAccess::storeFetched(long long obsid, const kvalobs::kvTextData & d) const {
+  TextDataID::value_type toInsert(d, obsid);
+  auto insertResult = fetchedTextData_.insert(toInsert);
+  if (!insertResult.second) {
+    long long oldId = insertResult.first->second;
+    if (obsid != oldId) {
+      std::ostringstream s;
+      s << "textdata obsid mismatch: got " << obsid << " previous was " << oldId << " data: " << d;
+      throw std::runtime_error(s.str());
+    }
+  }
+}
 
 }  // namespace db
