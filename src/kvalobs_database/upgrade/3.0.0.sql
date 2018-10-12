@@ -144,7 +144,7 @@ CREATE VIEW text_data AS (
 );
 
 
-ALTER TABLE workque ADD COLUMN observationid bigint REFERENCES observations(observationid);
+ALTER TABLE workque ADD COLUMN observationid bigint REFERENCES observations(observationid) ON DELETE CASCADE;
 UPDATE workque q SET observationid=(SELECT observationid FROM observations o WHERE o.stationid=q.stationid AND o.typeid=q.typeid AND o.obstime=q.obstime);
 DELETE FROM workque WHERE observationid IS NULL;
 ALTER TABLE workque ALTER COLUMN observationid SET NOT NULL;
