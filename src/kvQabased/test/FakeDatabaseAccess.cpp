@@ -170,7 +170,7 @@ void FakeDatabaseAccess::getData(
 }
 
 void FakeDatabaseAccess::getTextData(
-    TextDataList * out, const kvalobs::kvStationInfo & si,
+    TextDataList * out, const qabase::Observation & obs,
     const qabase::DataRequirement::Parameter & parameter,
     int minuteOffset) const {
 }

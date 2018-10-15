@@ -54,7 +54,7 @@ class MockDatabaseAccess : public db::DatabaseAccess {
 
   MOCK_CONST_METHOD1(pin, bool (const qabase::Observation & obs));
 
-  MOCK_CONST_METHOD4(getTextData, void (TextDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset));
+  MOCK_CONST_METHOD4(getTextData, void (TextDataList * out, const qabase::Observation & obs, const qabase::DataRequirement::Parameter & parameter, int minuteOffset));
 
   MOCK_CONST_METHOD3(complete, KvalobsDataPtr (const qabase::Observation & obs, const DataList & d, const TextDataList & td));
 

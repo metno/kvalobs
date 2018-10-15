@@ -67,7 +67,7 @@ class FakeDatabaseAccess : public db::DatabaseAccess {
   virtual kvalobs::kvStation getStation(int stationid) const;
 
   virtual void getTextData(TextDataList * out,
-                           const kvalobs::kvStationInfo & si,
+                           const qabase::Observation & obs,
                            const qabase::DataRequirement::Parameter & parameter,
                            int minuteOffset) const;
 
