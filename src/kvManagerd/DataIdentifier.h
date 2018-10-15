@@ -52,7 +52,11 @@ class DataIdentifier {
    */
   explicit DataIdentifier(dnmi::db::DRow & row);
 
-  DataIdentifier(int station, int type, const Time &obstime);
+  DataIdentifier(long long obsid, int station, int type, const Time &obstime);
+
+  long long obsid() const { 
+    return obsid_; 
+  }
 
   int station() const {
     return station_;
@@ -66,9 +70,15 @@ class DataIdentifier {
     return obstime_;
   }
 
+  static DataIdentifier invalid();
+
+  bool isValid() const;
+
+
   std::string sqlWhere(const std::string & identifier = std::string()) const;
 
  private:
+  long long obsid_;
   int station_;
   int type_;
   Time obstime_;

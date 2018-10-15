@@ -50,10 +50,10 @@ void ObservationComplete::operator()() {
   while (!stopped()) {
     try {
       auto transaction = dbAccess_.transaction(true);
-      std::shared_ptr<DataIdentifier> di = dbAccess_.nextDataToProcess();
-      if (di) {
+      DataIdentifier di = dbAccess_.nextDataToProcess();
+      if (di.isValid()) {
         LOGDEBUG1(di);
-        dbAccess_.addMissingData(*di);
+        dbAccess_.addMissingData(di);
         transaction->commit();
       } else if (!stopped()) {
         transaction->rollback();
