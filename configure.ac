@@ -1,5 +1,5 @@
 AC_PREREQ([2.59])
-AC_INIT([kvalobs], [4.0.4~rc1-1], [kvoss@met.no])
+AC_INIT([kvalobs], [5.0.0~rc1], [kvoss@met.no])
 AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -15,8 +15,8 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AX_CXX_COMPILE_STDCXX_11(noext)
 
-AC_SUBST([OLD_KVALOBSLIBS_SO_VERSION], [6:0:0])
-AC_SUBST([KVALOBSLIBS_SO_VERSION], [7:0:0])
+AC_SUBST([OLD_KVALOBSLIBS_SO_VERSION], [7:0:0])
+AC_SUBST([KVALOBSLIBS_SO_VERSION], [8:0:0])
 
 AC_CONFIG_FILES([Makefile
                  kvconfig
