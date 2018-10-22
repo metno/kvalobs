@@ -19,4 +19,4 @@
 -- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 --Create a kvalobs database.
-CREATE DATABASE kvalobs OWNER kvalobs;
+CREATE DATABASE kvalobs OWNER kvadmin;

@@ -36,10 +36,6 @@
 #include <kvalobs/kvDbBase.h>
 #include <kvalobs/kvDataFlag.h>
 
-/*
- * Created by DNMI/IT: borge.moe@met.no
- * at Tue Aug 28 07:53:16 2002
- */
 
 namespace kvalobs {
 /**

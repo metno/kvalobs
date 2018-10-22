@@ -5,6 +5,7 @@ kvkafkalistener_SOURCES= kvkafkalistener.cpp
 kvkafkalistener_CPPFLAGS = -I$(top_srcdir)/src/lib
 kvkafkalistener_LDADD = \
 	$(top_builddir)/src/lib/kvsubscribe/libkvalobs_kvsubscribe.la \
+	$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
 	$(BOOST_PROGRAM_OPTIONS_LIB)
 
 

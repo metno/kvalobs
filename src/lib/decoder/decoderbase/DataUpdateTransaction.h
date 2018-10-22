@@ -41,6 +41,7 @@
 #include "kvalobs/kvData.h"
 #include "kvalobs/kvStationInfo.h"
 #include "kvalobs/kvTextData.h"
+#include "kvalobs/observation.h"
 
 namespace kvalobs {
 namespace decoder {
@@ -75,6 +76,10 @@ class DataUpdateTransaction : public dnmi::db::Transaction {
   bool onlyAddOrUpdateData;
 
  public:
+  int getPriority(dnmi::db::Connection *conection, int stationid, int typeid_, const boost::posix_time::ptime &obstime);
+  void updateWorkQue(dnmi::db::Connection *conection, long observationid, int priority);
+  bool updateObservation(dnmi::db::Connection *conection, kvalobs::Observation *obs);
+  bool replaceObservation(dnmi::db::Connection *conection, long observationid);
   void setTbtime(dnmi::db::Connection *conection);
   bool addDataToList(const kvalobs::kvData &data,
                      std::list<kvalobs::kvData> &dataList, bool replaceOnly =

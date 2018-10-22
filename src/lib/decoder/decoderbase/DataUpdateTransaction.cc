@@ -36,6 +36,7 @@
 #include "lib/kvalobs/kvWorkelement.h"
 #include "lib/miutil/timeconvert.h"
 #include "lib/decoder/decoderbase/DataUpdateTransaction.h"
+#include "lib/kvalobs/observation.h"
 
 namespace pt = boost::posix_time;
 
@@ -45,6 +46,7 @@ using std::ostringstream;
 using std::list;
 using std::auto_ptr;
 using std::logic_error;
+using kvalobs::Observation;
 
 namespace {
 
@@ -127,6 +129,21 @@ DataUpdateTransaction::DataUpdateTransaction(const DataUpdateTransaction &dut)
 }
 
 DataUpdateTransaction::~DataUpdateTransaction() {
+}
+
+
+int DataUpdateTransaction::getPriority(dnmi::db::Connection *conection, int stationid, int typeid_, const boost::posix_time::ptime &obstime)
+{
+  return priority;
+}
+
+void DataUpdateTransaction::updateWorkQue(dnmi::db::Connection *con, long observationid, int pri) {
+  ostringstream q;
+
+  q << "INSERT INTO workque (observationid,priority,process_start,qa_start,qa_stop,service_start,service_stop) "
+    << "VALUES(" << observationid << "," << pri << ",NULL,NULL,NULL,NULL,NULL)";
+
+  con->exec(q.str());
 }
 
 void DataUpdateTransaction::addQuery(std::list<std::string> &qList, const std::string &query) {
@@ -784,6 +801,55 @@ void DataUpdateTransaction::update(dnmi::db::Connection *connection, const std::
   }
 }
 
+bool DataUpdateTransaction::updateObservation(dnmi::db::Connection *conection, Observation *obs) {
+  list<kvalobs::kvData> toUpdateData(*newData);
+  list<kvalobs::kvTextData> toUpdateTextData(*newTextData);
+
+  for( auto &e : obs->data()){
+    auto it = findElem(e, toUpdateData);
+    if (it == toUpdateData.end()) {
+      toUpdateData.push_back(e);
+    }
+  }
+  
+  for( auto &e : obs->textData()){
+    auto it = findElem(e, toUpdateTextData);
+    if (it == toUpdateTextData.end()) {
+      toUpdateTextData.push_back(e);
+    }
+  }
+  
+  if( toUpdateData.empty() && toUpdateTextData.empty())
+    return true;
+
+  ostringstream q;
+
+  q << "DELETE FROM observations WHERE observationid=" << obs->observationid();
+
+  conection->exec(q.str());
+
+  Observation newObs(obs->stationID(), obs->typeID(), obs->obstime(), pt::second_clock::universal_time(), toUpdateData, toUpdateTextData);
+  newObs.insertIntoDb(conection, false);
+  int pri = getPriority(conection, stationid, typeid_, obstime);
+  updateWorkQue(conection, newObs.observationid(), pri);
+  return true;
+} 
+
+bool DataUpdateTransaction::replaceObservation(dnmi::db::Connection *conection, long observationid)
+{
+  ostringstream q;
+  q << "DELETE FROM observations WHERE observationid=" << observationid;
+
+  conection->exec(q.str());
+
+  Observation newObs(stationid, typeid_, obstime, pt::second_clock::universal_time(), *newData, *newTextData);
+  newObs.insertIntoDb(conection, false);
+  int pri = getPriority(conection, stationid, typeid_, obstime);
+  updateWorkQue(conection, newObs.observationid(), pri);
+  return true;
+}
+
+
 bool DataUpdateTransaction::doInsertOrUpdate(dnmi::db::Connection *conection, list<kvalobs::kvData> &oldData, list<kvalobs::kvTextData> &oldTextData) {
   list<kvalobs::kvData> toUpdateData;
   list<kvalobs::kvTextData> toUpdateTextData;
@@ -826,14 +892,20 @@ bool DataUpdateTransaction::doInsertOrUpdate(dnmi::db::Connection *conection, li
 
 bool DataUpdateTransaction::operator()(dnmi::db::Connection *conection) {
   ostringstream mylog;
-  list<kvalobs::kvData> dataList;
-  list<kvalobs::kvTextData> textDataList;
+  //list<kvalobs::kvData> dataList;
+  //list<kvalobs::kvTextData> textDataList;
   boost::posix_time::ptime tbtime;
 
   if (obstime.is_not_a_date_time()) {
     LOGERROR("NewData: stationid: " << stationid << " typeid: " << typeid_ << ". Invalid obstime.");
     return false;
   }
+
+  if (newData->empty() && newTextData->empty() ) {
+    insertType="NO DATA";
+    return true;
+  }
+
 
   if (!logid.empty()) {
     bool err = false;
@@ -859,18 +931,19 @@ bool DataUpdateTransaction::operator()(dnmi::db::Connection *conection) {
 
   stationInfoList_->clear();
 
-  if (!getData(conection, stationid, typeid_, obstime, dataList, textDataList))
-    return false;
+  std::unique_ptr<Observation> oldObs(Observation::getFromDb(conection, stationid, typeid_, obstime));
 
-  if (dataList.empty() && textDataList.empty()) {
-    log << "New data. stationid: " << stationid << " typeid: " << typeid_ << " obstime: " << pt::to_kvalobs_string(obstime) << endl;
-    setTbtime(conection);
-    insertData(conection, *newData, *newTextData);
-    insertType = "INSERT";
+  if (!oldObs) { //No observation exist
+    insertType="INSERT";
+    Observation newObs(stationid, typeid_, obstime, pt::second_clock::universal_time(), *newData, *newTextData);
+    newObs.insertIntoDb(conection, false);
+    int pri = getPriority(conection, stationid, typeid_, obstime);
+    updateWorkQue(conection, newObs.observationid(), pri);
     return true;
   }
+   
 
-  if (isEqual(dataList, textDataList)) {
+  if (isEqual(oldObs->data(), oldObs->textData())) {
     log << "Data allready exist. stationid: " << stationid << " typeid: " << typeid_ << " obstime: " << pt::to_kvalobs_string(obstime) << endl;
     IDLOGINFO("duplicates", "DUPLICATE: stationid: " << stationid << " typeid: " << typeid_ << " obstime: " << pt::to_kvalobs_string(obstime));
     insertType = "DUPLICATE";
@@ -879,8 +952,13 @@ bool DataUpdateTransaction::operator()(dnmi::db::Connection *conection) {
 
   if (onlyAddOrUpdateData) {
     insertType = "REPLENISH";
-    return doInsertOrUpdate(conection, dataList, textDataList);
+    return updateObservation(conection, oldObs.get());
   }
+
+  insertType = "REPLACE";
+  return replaceObservation(conection, oldObs->observationid());
+/*
+  insertType = "REPLACE";
 
   log << "Replace data.stationid: " << stationid << " typeid: " << typeid_ << " obstime: " << pt::to_kvalobs_string(obstime) << endl;
 
@@ -902,6 +980,7 @@ bool DataUpdateTransaction::operator()(dnmi::db::Connection *conection) {
   IDLOGINFO("updated", mylog.str());
   insertType = "UPDATE";
   return true;
+  */
 }
 
 void DataUpdateTransaction::onSuccess() {
