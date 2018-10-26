@@ -797,8 +797,10 @@ CREATE TABLE workstatistik  (
        qa_stop       TIMESTAMP ,
        service_start TIMESTAMP ,
        service_stop  TIMESTAMP ,
-       UNIQUE(stationid, obstime, typeid)
+       observationid BIGINT
 );
+CREATE INDEX ON workstatistik (stationid, obstime, typeid);
+CREATE INDEX ON workstatistik (observationid);
 
 REVOKE ALL ON workstatistik FROM public;
 GRANT ALL ON workstatistik TO kv_admin;

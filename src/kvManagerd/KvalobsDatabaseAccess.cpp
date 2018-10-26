@@ -163,14 +163,11 @@ void KvalobsDatabaseAccess::cleanWorkQueue() {
   auto t = transaction();
   const std::string criteria = "qa_stop<now()-'15 minutes'::interval";
 
-  exec_("delete from workstatistik s using workque q, observations o "
-    "where s.stationid=o.stationid "
-    "and s.obstime=o.obstime "
-    "and s.typeid=o.typeid "
-    "and o.observationid=q.observationid "
+  exec_("delete from workstatistik s using workque q "
+    "where s.observationid=q.observationid "
     "and workque." + criteria);
   exec_("INSERT INTO workstatistik (SELECT "
-    "o.stationid, o.obstime, o.typeid, o.tbtime, q.priority, q.process_start, q.qa_start, q.qa_stop, q.service_start, q.service_stop"
+    "o.stationid, o.obstime, o.typeid, o.tbtime, q.priority, q.process_start, q.qa_start, q.qa_stop, q.service_start, q.service_stop, o.observationid"
     " FROM workque q, observations o WHERE"
     " q.observationid=o.observationid "
     " and q." + criteria + ")");

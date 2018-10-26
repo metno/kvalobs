@@ -160,6 +160,13 @@ ALTER TABLE workque DROP COLUMN typeid;
 ALTER TABLE workque DROP COLUMN tbtime;
 CREATE INDEX workque_priority_obsid ON workque (priority, observationid);
 
+
+ALTER TABLE workstatistik DROP CONSTRAINT workstatistik_stationid_obstime_typeid_key;
+ALTER TABLE workstatistik ADD COLUMN observationid bigint;
+UPDATE workstatistik s SET observationid=(SELECT observationid FROM observations o WHERE o.stationid=s.stationid AND o.typeid=s.typeid AND o.obstime=s.obstime);
+CREATE INDEX ON workstatistik (stationid, obstime, typeid);
+CREATE INDEX ON workstatistik (observationid);
+
 --
 --
 -- TODO: Handle deletion from observations table
