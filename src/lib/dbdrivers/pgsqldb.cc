@@ -529,10 +529,11 @@ void dnmi::db::drivers::PGPimpel::perform(dnmi::db::Connection *con_, dnmi::db::
 
       //We allow a 10 seconds periode of retry
       //before we reduce the retry counter.
-      if ((now - start) > 10) {
-        time(&start);  //Reset the timeout counter.
-        retry--;
-      }
+      //if ((now - start) > 10) {
+       // time(&start);  //Reset the timeout counter.
+      //  retry--;
+      //}
+      retry--;
       t.onAbort(con->getDriverId(), e.what(), e.errorCode());
     } catch (const std::exception &ex) {
       retry--;

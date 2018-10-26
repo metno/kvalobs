@@ -44,7 +44,6 @@ libkvalobs_kvcpp_la_LIBADD = \
 	$(top_builddir)/src/service-libs/kvcpp/kafka/libkafkakvapp.la \
 	$(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
 	$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
-	$(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la \
 	$(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la \
 	$(top_builddir)/src/lib/milog/libkvalobs_milog.la \
 	$(top_builddir)/src/lib/corbahelper/libkvalobs_corbahelper.la \
@@ -52,6 +51,7 @@ libkvalobs_kvcpp_la_LIBADD = \
 	$(top_builddir)/src/lib/kvskel/libkvalobs_kvadmininterface.la \
 	$(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la \
 	$(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
+	$(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la \
 	@BOOST_FILESYSTEM_LIB@
 
 AM_CPPFLAGS = \

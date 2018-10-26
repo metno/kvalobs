@@ -36,7 +36,7 @@ REVOKE ALL ON observations FROM public;
 GRANT ALL ON observations TO kv_admin;
 GRANT SELECT ON observations TO kv_read;
 GRANT SELECT, UPDATE, INSERT, DELETE ON observations TO kv_write;
-
+GRANT USAGE, SELECT ON SEQUENCE observations_observationid_seq TO kv_write,kv_admin;
 
 CREATE TABLE obsdata (
     observationid BIGINT REFERENCES observations(observationid) ON DELETE CASCADE,
@@ -92,6 +92,12 @@ CREATE VIEW data AS (
         o.observationid = d.observationid
 );
 
+REVOKE ALL ON data FROM public;
+GRANT ALL ON data TO kv_admin;
+GRANT SELECT ON data TO kv_read;
+GRANT SELECT ON data TO kv_write;
+
+
 CREATE VIEW text_data AS (
     SELECT 
         o.stationid,
@@ -106,6 +112,12 @@ CREATE VIEW text_data AS (
     WHERE
         o.observationid = d.observationid
 );
+
+REVOKE ALL ON text_data FROM public;
+GRANT ALL ON text_data TO kv_admin;
+GRANT SELECT ON text_data TO kv_read;
+GRANT SELECT ON text_data TO kv_write;
+
 
 --
 -- This table maintains a complete history of everything that has happened to 
@@ -745,19 +757,17 @@ GRANT ALL ON qcx_info TO kv_admin;
 GRANT SELECT ON qcx_info TO kv_read;
 GRANT SELECT, UPDATE, INSERT ON qcx_info TO kv_write;
 
-
 CREATE TABLE key_val (
 	package TEXT NOT NULL,
 	key 	TEXT NOT NULL,
 	val   	TEXT,
 	UNIQUE (package, key)
 ); 
+
 REVOKE ALL ON key_val FROM public;
 GRANT ALL ON key_val TO kv_admin;
 GRANT SELECT ON key_val TO kv_read;
 GRANT SELECT, UPDATE, INSERT, DELETE ON key_val TO kv_write;
-
-
 
 CREATE TABLE workque (
        priority      INTEGER   NOT NULL,
@@ -769,13 +779,12 @@ CREATE TABLE workque (
 	   observationid bigint NOT NULL REFERENCES observations(observationid) ON DELETE CASCADE ,
        UNIQUE(observationid)
 );
+
 CREATE INDEX workque_priority_obsid ON workque (priority, observationid);
 REVOKE ALL ON workque FROM public;
 GRANT ALL ON workque TO kv_admin;
 GRANT SELECT ON workque TO kv_read;
 GRANT SELECT, UPDATE, INSERT, DELETE ON workque TO kv_write;
-
-
 
 CREATE TABLE workstatistik  (
        stationid     INTEGER   NOT NULL,
@@ -790,11 +799,11 @@ CREATE TABLE workstatistik  (
        service_stop  TIMESTAMP ,
        UNIQUE(stationid, obstime, typeid)
 );
+
 REVOKE ALL ON workstatistik FROM public;
 GRANT ALL ON workstatistik TO kv_admin;
 GRANT SELECT ON workstatistik TO kv_read;
 GRANT SELECT, UPDATE, INSERT, DELETE ON workstatistik TO kv_write;
-
 
 CREATE TABLE ps_subscribers  (
        name     TEXT NOT NULL,

@@ -16,7 +16,7 @@ REVOKE ALL ON observations FROM public;
 GRANT ALL ON observations TO kv_admin;
 GRANT SELECT ON observations TO kv_read;
 GRANT SELECT, UPDATE, INSERT, DELETE ON observations TO kv_write;
-
+GRANT USAGE, SELECT ON SEQUENCE observations_observationid_seq TO kv_write,kv_admin;
 
 CREATE TABLE obsdata (
     observationid BIGINT REFERENCES observations(observationid) ON DELETE CASCADE,
@@ -50,8 +50,6 @@ REVOKE ALL ON obstextdata FROM public;
 GRANT ALL ON obstextdata TO kv_admin;
 GRANT SELECT ON obstextdata TO kv_read;
 GRANT SELECT, UPDATE, INSERT, DELETE ON obstextdata TO kv_write;
-
-
 
 INSERT INTO observations (stationid, typeid, obstime, tbtime) (
     SELECT sub.stationid, sub.typeid, sub.obstime, max(sub.tbtime) FROM (
@@ -125,6 +123,10 @@ CREATE VIEW data AS (
         o.observationid = d.observationid
 );
 
+REVOKE ALL ON data FROM public;
+GRANT ALL ON data TO kv_admin;
+GRANT SELECT ON data TO kv_read;
+GRANT SELECT ON data TO kv_write;
 
 DROP TABLE text_data;
 
@@ -143,6 +145,10 @@ CREATE VIEW text_data AS (
         o.observationid = d.observationid
 );
 
+REVOKE ALL ON text_data FROM public;
+GRANT ALL ON text_data TO kv_admin;
+GRANT SELECT ON text_data TO kv_read;
+GRANT SELECT ON text_data TO kv_write;
 
 ALTER TABLE workque ADD COLUMN observationid bigint REFERENCES observations(observationid) ON DELETE CASCADE;
 UPDATE workque q SET observationid=(SELECT observationid FROM observations o WHERE o.stationid=q.stationid AND o.typeid=q.typeid AND o.obstime=q.obstime);

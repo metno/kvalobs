@@ -31,8 +31,11 @@
 #include "transactionhelper.h"
 #include "kvdb.h"
 
-dnmi::db::TransactionBlock::TransactionBlock(dnmi::db::Connection &con_)
-    : abort(true),
+namespace dnmi {
+namespace db {
+
+TransactionBlock::TransactionBlock(dnmi::db::Connection &con_)
+    : abort_(true),
       inTransaction(false),
       con(&con_) {
   try {
@@ -42,15 +45,36 @@ dnmi::db::TransactionBlock::TransactionBlock(dnmi::db::Connection &con_)
   }
 }
 
-dnmi::db::TransactionBlock::~TransactionBlock() {
+TransactionBlock::TransactionBlock(dnmi::db::Connection *con_, dnmi::db::Connection::IsolationLevel il, bool defaultDoAbort, bool doIgnoreTransactions)
+  : abort_(defaultDoAbort),
+      inTransaction(false),
+      con(con_),
+      ignore_(doIgnoreTransactions) 
+{
+  if ( ignore_)
+    return;
+
+  try {
+    con->beginTransaction(il);
+    inTransaction = true;
+  } catch (...) {
+  }
+}
+
+
+TransactionBlock::~TransactionBlock() {
+  if (ignore_)
+    return;
+
   try {
     if (inTransaction) {
-      if (abort)
+      if (abort_)
         con->rollBack();
       else
         con->endTransaction();
     }
   } catch (...) {
   }
-
+}
+}
 }
