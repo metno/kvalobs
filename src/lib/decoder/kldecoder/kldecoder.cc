@@ -212,6 +212,8 @@ void kvalobs::decoder::kldecoder::KlDecoder::decodeObsType(
   typeID = INT_MAX;
   stationID = INT_MAX;
   onlyInsertOrUpdate = false;
+  receivedTime = boost::posix_time::ptime();
+  
 
   if (cstr.size() < 2) {
     LOGERROR("decodeObsType: To few keys!");

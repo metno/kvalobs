@@ -31,6 +31,7 @@
 #define DATASTORE_H_
 
 #include <db/returntypes/CheckSignature.h>
+#include <db/returntypes/Observation.h>
 #include <Exception.h>
 #include <kvalobs/kvStationInfo.h>
 #include <kvalobs/kvDataOperations.h>
@@ -75,12 +76,12 @@ class DataStore {
   typedef std::map<DataRequirement::Parameter, MetaDataList> ParameterSortedMetaDataList;
 
   DataStore(const db::DatabaseAccess & db,
-            const kvalobs::kvStationInfo & observation, const std::string & qcx,
+            const qabase::Observation & obs, const std::string & qcx,
             const qabase::CheckSignature & abstractSignature,
             const qabase::CheckSignature & concreteSignature);
 
-  // For creating tests
-  DataStore(const ParameterSortedDataList & data, int flagPosition);
+  // // For creating tests
+  // DataStore(const ParameterSortedDataList & data, int flagPosition);
 
   ~DataStore();
 
@@ -97,7 +98,7 @@ class DataStore {
     return metaData_;
   }
 
-  const kvalobs::kvStationInfo & observation() const {
+  const qabase::Observation & observation() const {
     return observation_;
   }
 
@@ -114,19 +115,19 @@ class DataStore {
 
  private:
   void populateObs_(const db::DatabaseAccess & db,
-                    const kvalobs::kvStationInfo & observation,
+                    const qabase::Observation & obs,
                     const qabase::DataRequirement & abstractObsRequirement,
                     const qabase::DataRequirement & concreteObsRequirement);
   void populateRefObs_(
-      const db::DatabaseAccess & db, const kvalobs::kvStationInfo & observation,
+      const db::DatabaseAccess & db, const qabase::Observation & obs,
       const qabase::DataRequirement & abstractRefObsRequirement,
       const qabase::DataRequirement & concreteRefObsRequirement);
   void populateModel_(const db::DatabaseAccess & db,
-                      const kvalobs::kvStationInfo & observation,
+                      const qabase::Observation & obs,
                       const qabase::DataRequirement & abstractModelRequirement,
                       const qabase::DataRequirement & concreteModelRequirement);
   void populateMeta_(const db::DatabaseAccess & db,
-                     const kvalobs::kvStationInfo & observation,
+                     const qabase::Observation & obs,
                      const std::string & qcx,
                      const qabase::DataRequirement & abstractMetaRequirement,
                      const qabase::DataRequirement & concreteMetaRequirement);
@@ -136,7 +137,7 @@ class DataStore {
   ParameterSortedRefDataList refData_;
   ParameterSortedModelDataList modelData_;
   ParameterSortedMetaDataList metaData_;
-  kvalobs::kvStationInfo observation_;
+  qabase::Observation observation_;
   kvalobs::kvStation station_;
   std::string qcx_;
   int flagPosition_;

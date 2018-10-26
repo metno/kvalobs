@@ -105,7 +105,7 @@ class kvDataFactory {
    */
   explicit kvDataFactory(const kvData & data);
 
-  explicit kvDataFactory(kvalobs::kvStationInfo & stInfo);
+  explicit kvDataFactory(const kvalobs::kvStationInfo & stInfo);
 
   /**
    * Get a missing parameter for the given observation.

@@ -39,12 +39,12 @@ class FakeDatabaseAccess : public db::DatabaseAccess {
   virtual ~FakeDatabaseAccess();
 
   virtual void getChecks(CheckList * out,
-                         const kvalobs::kvStationInfo & si) const;
+                         const qabase::Observation & obs) const;
 
   virtual int getQcxFlagPosition(const std::string & qcx) const;
 
   virtual void getParametersToCheck(ParameterList * out,
-                                    const kvalobs::kvStationInfo & si) const;
+                                    const qabase::Observation & obs) const;
 
   virtual kvalobs::kvAlgorithms getAlgorithm(
       const std::string & algorithmName) const;
@@ -54,9 +54,11 @@ class FakeDatabaseAccess : public db::DatabaseAccess {
       const qabase::DataRequirement::Parameter & parameter,
       int minutesBackInTime) const;
 
-  virtual void getData(DataList * out, const kvalobs::kvStationInfo & si,
+  virtual void getData(DataList * out, const qabase::Observation & obs,
                        const qabase::DataRequirement::Parameter & parameter,
                        int minuteOffset) const;
+
+  virtual bool pin(const qabase::Observation & obs) const { return true; }
 
   virtual std::string getStationParam(const kvalobs::kvStationInfo & si,
                                       const std::string & parameter,
@@ -65,17 +67,17 @@ class FakeDatabaseAccess : public db::DatabaseAccess {
   virtual kvalobs::kvStation getStation(int stationid) const;
 
   virtual void getTextData(TextDataList * out,
-                           const kvalobs::kvStationInfo & si,
+                           const qabase::Observation & obs,
                            const qabase::DataRequirement::Parameter & parameter,
                            int minuteOffset) const;
 
-  virtual KvalobsDataPtr complete(const kvalobs::kvStationInfo & si, const DataList & d = DataList(), const TextDataList & td = TextDataList()) const;
+  virtual KvalobsDataPtr complete(const qabase::Observation & obs, const DataList & d = DataList(), const TextDataList & td = TextDataList()) const;
 
   virtual void write(const DataList & data);
 
-  virtual kvalobs::kvStationInfo * selectDataForControl();
+  virtual qabase::Observation * selectDataForControl();
 
-  virtual void markProcessDone(const kvalobs::kvStationInfo & si) {
+  virtual void markProcessDone(const qabase::Observation & obs) {
   }
 
   typedef std::set<kvalobs::kvData, kvalobs::compare::lt_kvData> SavedData;

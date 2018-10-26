@@ -40,15 +40,15 @@
 class populateScriptTest : public testing::Test {
  public:
   populateScriptTest()
-      : observation(10,
+      : observation(1, 10, 302,
                     boost::posix_time::time_from_string("2010-05-12 06:00:00"),
-                    302),
+                    boost::posix_time::time_from_string("2010-05-12 06:00:00")),
         script("sub check() { print \"ok\\n\"; }",
                scriptrunner::language::Interpreter::get("perl")) {
   }
  protected:
   FakeDatabaseAccess database;
-  kvalobs::kvStationInfo observation;
+  qabase::Observation observation;
   scriptrunner::Script script;
 };
 

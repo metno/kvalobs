@@ -84,7 +84,7 @@ class CheckRunner {
    * @return A list of all modified data. Also, all data belonging to the
    *         given obs will be returned, even if it is unmodified.
    */
-  KvalobsDataPtr newObservation(const kvalobs::kvStationInfo & obs,
+  KvalobsDataPtr newObservation(const qabase::Observation & obs,
                              std::ostream * scriptLog = 0);
 
   /**
@@ -116,10 +116,10 @@ class CheckRunner {
  private:
   bool shouldMarkStartAndStop_();
 
-  KvalobsDataPtr checkObservation(const kvalobs::kvStationInfo & obs,
+  KvalobsDataPtr checkObservation(const qabase::Observation & obs,
                                std::ostream * scriptLog);
 
-  bool shouldRunAnyChecks(const kvalobs::kvStationInfo & obs) const;
+  bool shouldRunAnyChecks(const qabase::Observation & obs) const;
 
   void resetObservationDataFlags(
       db::DatabaseAccess::DataList & observationData);

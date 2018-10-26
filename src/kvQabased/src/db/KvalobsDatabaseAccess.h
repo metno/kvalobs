@@ -31,7 +31,10 @@
 #define KVALOBSDATABASEACCESS_H_
 
 #include "DatabaseAccess.h"
+#include <kvalobs/kvDataOperations.h>
+#include <kvalobs/kvTextDataOperations.h>
 #include <string>
+#include <map>
 
 namespace dnmi {
 namespace db {
@@ -81,11 +84,11 @@ class KvalobsDatabaseAccess : public db::DatabaseAccess {
 
   virtual void rollback();
 
-  virtual void getChecks(CheckList * out, const kvalobs::kvStationInfo & si) const;
+  virtual void getChecks(CheckList * out, const qabase::Observation & obs) const;
 
   virtual int getQcxFlagPosition(const std::string & qcx) const;
 
-  virtual void getParametersToCheck(ParameterList * out, const kvalobs::kvStationInfo & si) const;
+  virtual void getParametersToCheck(ParameterList * out, const qabase::Observation & obs) const;
 
   virtual kvalobs::kvAlgorithms getAlgorithm(const std::string & algorithmName) const;
 
@@ -96,28 +99,40 @@ class KvalobsDatabaseAccess : public db::DatabaseAccess {
   virtual void getModelData(ModelDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter,
                             int minutesBackInTime) const;
 
-  virtual void getData(DataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const;
+  virtual void getData(DataList * out, const qabase::Observation & obs, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const;
 
-  virtual void getTextData(TextDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const;
+  virtual bool pin(const qabase::Observation & obs) const;
 
-  virtual KvalobsDataPtr complete(const kvalobs::kvStationInfo & si, const DataList & d, const TextDataList & td) const;
+  virtual void getTextData(TextDataList * out, const qabase::Observation & obs, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const;
+
+  virtual KvalobsDataPtr complete(const qabase::Observation & obs, const DataList & d, const TextDataList & td) const;
 
   virtual void write(const DataList & data);
 
-  virtual kvalobs::kvStationInfo * selectDataForControl();
+  virtual qabase::Observation * selectDataForControl();
 
-  virtual void markProcessDone(const kvalobs::kvStationInfo & si);
+  virtual void markProcessDone(const qabase::Observation & obs);
 
  private:
   static dnmi::db::Connection * createConnection(const std::string & databaseConnect);
 
-  void complete_(const kvalobs::kvStationInfo & si, DataList * out) const;
-  void complete_(const kvalobs::kvStationInfo & si, TextDataList * out) const;
+  void complete_(const qabase::Observation & obs, DataList * out) const;
+  void complete_(const qabase::Observation & obs, TextDataList * out) const;
 
   class TransactionEnforcingDatabaseConnection;
   TransactionEnforcingDatabaseConnection * connection_;
 
   static std::string modelDataName_;
+
+  // kvData -> observationid
+  typedef std::map<kvalobs::kvData, long long, kvalobs::compare::lt_kvData> DataID;
+  mutable DataID fetchedData_;
+  void storeFetched(long long obsid, const kvalobs::kvData & d) const;
+
+  typedef std::map<kvalobs::kvTextData, long long, kvalobs::compare::lt_kvTextData> TextDataID;
+  mutable TextDataID fetchedTextData_;
+  void storeFetched(long long obsid, const kvalobs::kvTextData & d) const;
+
 };
 
 }

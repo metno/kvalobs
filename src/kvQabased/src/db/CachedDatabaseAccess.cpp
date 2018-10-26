@@ -28,6 +28,7 @@
  */
 
 #include "CachedDatabaseAccess.h"
+#include "returntypes/Observation.h"
 #include <milog/milog.h>
 #include <map>
 
@@ -37,11 +38,11 @@ std::map<std::string, int> CachedDatabaseAccess::qcxFlagPositions_;
 std::map<std::string, boost::shared_ptr<kvalobs::kvAlgorithms> > CachedDatabaseAccess::algorithms_;
 
 CachedDatabaseAccess::CachedDatabaseAccess(DatabaseAccess * baseImplementation,
-                                           const kvalobs::kvStationInfo & obs)
+                                           const qabase::Observation & obs)
     : FilteredDatabaseAccess(baseImplementation),
-      modelDataCache_(obs),
-      dataCache_(obs),
-      textDataCache_(obs) {
+      modelDataCache_(obs.stationInfo()),
+      dataCache_(obs.stationInfo()),
+      textDataCache_(obs.stationInfo()) {
 }
 
 CachedDatabaseAccess::~CachedDatabaseAccess() {
@@ -127,22 +128,22 @@ void CachedDatabaseAccess::getModelData(
 }
 
 void CachedDatabaseAccess::getData(
-    DataList * out, const kvalobs::kvStationInfo & si,
+    DataList * out, const qabase::Observation & obs,
     const qabase::DataRequirement::Parameter & parameter,
     int minuteOffset) const {
-  if (!dataCache_.getData(out, si, parameter, minuteOffset)) {
-    FilteredDatabaseAccess::getData(out, si, parameter, minuteOffset);
-    dataCache_.setData(*out, si, parameter, minuteOffset);
+  if (!dataCache_.getData(out, obs.stationInfo(), parameter, minuteOffset)) {
+    FilteredDatabaseAccess::getData(out, obs, parameter, minuteOffset);
+    dataCache_.setData(*out, obs.stationInfo(), parameter, minuteOffset);
   }
 }
 
 void CachedDatabaseAccess::getTextData(
-    TextDataList * out, const kvalobs::kvStationInfo & si,
+    TextDataList * out, const qabase::Observation & obs,
     const qabase::DataRequirement::Parameter & parameter,
     int minuteOffset) const {
-  if (!textDataCache_.getData(out, si, parameter, minuteOffset)) {
-    FilteredDatabaseAccess::getTextData(out, si, parameter, minuteOffset);
-    textDataCache_.setData(*out, si, parameter, minuteOffset);
+  if (!textDataCache_.getData(out, obs.stationInfo(), parameter, minuteOffset)) {
+    FilteredDatabaseAccess::getTextData(out, obs, parameter, minuteOffset);
+    textDataCache_.setData(*out, obs.stationInfo(), parameter, minuteOffset);
   }
 }
 

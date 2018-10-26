@@ -930,9 +930,8 @@ bool DataUpdateTransaction::operator()(dnmi::db::Connection *conection) {
   }
 
   stationInfoList_->clear();
-
-  std::unique_ptr<Observation> oldObs(Observation::getFromDb(conection, stationid, typeid_, obstime));
-
+  std::unique_ptr<Observation> oldObs(Observation::getFromDb(conection, stationid, typeid_, obstime, false));
+  
   if (!oldObs) { //No observation exist
     insertType="INSERT";
     Observation newObs(stationid, typeid_, obstime, pt::second_clock::universal_time(), *newData, *newTextData);
@@ -941,7 +940,6 @@ bool DataUpdateTransaction::operator()(dnmi::db::Connection *conection) {
     updateWorkQue(conection, newObs.observationid(), pri);
     return true;
   }
-   
 
   if (isEqual(oldObs->data(), oldObs->textData())) {
     log << "Data allready exist. stationid: " << stationid << " typeid: " << typeid_ << " obstime: " << pt::to_kvalobs_string(obstime) << endl;

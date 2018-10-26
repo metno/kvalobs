@@ -67,8 +67,8 @@ class FilteredDatabaseAccess : public DatabaseAccess {
   }
 
   virtual void getChecks(CheckList * out,
-                         const kvalobs::kvStationInfo & si) const {
-    baseImplementation_->getChecks(out, si);
+                         const qabase::Observation & obs) const {
+    baseImplementation_->getChecks(out, obs);
   }
 
   virtual int getQcxFlagPosition(const std::string & qcx) const {
@@ -76,8 +76,8 @@ class FilteredDatabaseAccess : public DatabaseAccess {
   }
 
   virtual void getParametersToCheck(ParameterList * out,
-                                    const kvalobs::kvStationInfo & si) const {
-    baseImplementation_->getParametersToCheck(out, si);
+                                     const qabase::Observation & obs) const {
+    baseImplementation_->getParametersToCheck(out, obs);
   }
 
   virtual kvalobs::kvAlgorithms getAlgorithm(
@@ -103,33 +103,38 @@ class FilteredDatabaseAccess : public DatabaseAccess {
                                              minutesBackInTime);
   }
 
-  virtual void getData(DataList * out, const kvalobs::kvStationInfo & si,
+  virtual void getData(DataList * out, const qabase::Observation & obs,
                        const qabase::DataRequirement::Parameter & parameter,
                        int minuteOffset) const {
-    baseImplementation_->getData(out, si, parameter, minuteOffset);
+    baseImplementation_->getData(out, obs, parameter, minuteOffset);
   }
+
+  virtual bool pin(const qabase::Observation & obs) const {
+    return baseImplementation_->pin(obs);
+  }
+
 
   virtual void getTextData(TextDataList * out,
-                           const kvalobs::kvStationInfo & si,
+                           const qabase::Observation & obs,
                            const qabase::DataRequirement::Parameter & parameter,
                            int minuteOffset) const {
-    baseImplementation_->getTextData(out, si, parameter, minuteOffset);
+    baseImplementation_->getTextData(out, obs, parameter, minuteOffset);
   }
 
-  virtual KvalobsDataPtr complete(const kvalobs::kvStationInfo & si, const DataList & d = DataList(), const TextDataList & td = TextDataList()) const {
-    return baseImplementation_->complete(si, d, td);
+  virtual KvalobsDataPtr complete(const qabase::Observation & obs, const DataList & d = DataList(), const TextDataList & td = TextDataList()) const {
+    return baseImplementation_->complete(obs, d, td);
   }
 
   virtual void write(const DataList & data) {
     baseImplementation_->write(data);
   }
 
-  virtual kvalobs::kvStationInfo * selectDataForControl() {
+  virtual qabase::Observation * selectDataForControl() {
     return baseImplementation_->selectDataForControl();
   }
 
-  virtual void markProcessDone(const kvalobs::kvStationInfo & si) {
-    baseImplementation_->markProcessDone(si);
+  virtual void markProcessDone(const qabase::Observation & obs) {
+    baseImplementation_->markProcessDone(obs);
   }
 
  private:

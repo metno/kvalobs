@@ -153,7 +153,6 @@ GRANT ALL ON text_data TO kv_admin;
 GRANT SELECT ON text_data TO kv_read;
 GRANT SELECT ON text_data TO kv_write;
 
-
 ALTER TABLE workque ADD COLUMN observationid bigint REFERENCES observations(observationid);
 UPDATE workque q SET observationid=(SELECT observationid FROM observations o WHERE o.stationid=q.stationid AND o.typeid=q.typeid AND o.obstime=q.obstime);
 DELETE FROM workque WHERE observationid IS NULL;

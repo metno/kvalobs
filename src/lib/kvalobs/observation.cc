@@ -164,6 +164,10 @@ kvData Observation::getKvData(const dnmi::db::DRow &r_, long *obsid_) {
         cfailed = buf;
       } else if (*it == "obstime") {
         obstime_ = pt::time_from_string_nothrow(buf);
+      } else if (*it == "obs_offset") {
+        //obstime from the tabell observations with obs_offset is used to create obstime.
+        //We just ignore it here.
+        continue;
       } else {
         CERR("Observation::getKvData .. unknown entry:" << *it << std::endl);
       }
@@ -210,6 +214,10 @@ kvTextData Observation::getKvTextData(const dnmi::db::DRow &r_, long *obsid_){
         original = buf;
       } else if (*it == "paramid") {
         paramid = atoi(buf.c_str());
+      } else if (*it == "obs_offset") {
+        //obstime from the tabell observations with obs_offset is used to create obstime.
+        //We just ignore it here.
+        continue;
       } else {
         CERR("Observation::getKvTextData .. unknown entry:" << *it << std::endl);
       }
@@ -301,7 +309,7 @@ Observation *Observation::getFromDb(
 
     std::unique_ptr<dnmi::db::Result> res;
     res.reset(con->execQuery(q.str()));
- 
+
     if (res->size() == 0 ) {
       return nullptr;
     }
@@ -314,8 +322,7 @@ Observation *Observation::getFromDb(
         << obs->typeID() << " obst: " << pt::to_kvalobs_string(obs->obstime()) << " tbt: " << pt::to_kvalobs_string(obs->tbtime());
       throw std::logic_error(q.str());
     }
-
-    obs->getDataForObservationid(con, obs->observationid());
+    obs->getDataForObservationid(con, obs->observationid(), obs->obstime());
   
     return obs;
   } 
@@ -323,7 +330,6 @@ Observation *Observation::getFromDb(
     tran.abort();
     throw;
   }
-
 }
 
 Observation *Observation::getFromDb(dnmi::db::Connection *con, long observationid, bool useTransaction)
@@ -331,6 +337,7 @@ Observation *Observation::getFromDb(dnmi::db::Connection *con, long observationi
   db::TransactionBlock tran(con, db::Connection::REPEATABLE_READ, false, !useTransaction);
   try {
     ostringstream q;
+    
     q << "SELECT * FROM observations WHERE observationid=" << observationid; 
 
     std::unique_ptr<dnmi::db::Result> res;
@@ -349,7 +356,7 @@ Observation *Observation::getFromDb(dnmi::db::Connection *con, long observationi
       throw std::logic_error(q.str());
     }
 
-    obs->getDataForObservationid(con, obs->observationid());
+    obs->getDataForObservationid(con, obs->observationid(), obs->obstime() );
   
     return obs;
   } 
@@ -361,17 +368,17 @@ Observation *Observation::getFromDb(dnmi::db::Connection *con, long observationi
 
 
 
-void Observation::getDataForObservationid(dnmi::db::Connection *con, long obsid) {
+void Observation::getDataForObservationid(dnmi::db::Connection *con, long obsid, const boost::posix_time::ptime &obsTime ) {
   std::unique_ptr<dnmi::db::Result> res;
   ostringstream q;
-  q << "SELECT * FROM obsdata WHERE observationid=" << obsid; 
+  q << "SELECT *," << dbTime(obsTime, true) << "+obs_offset AS obstime FROM obsdata WHERE observationid=" << obsid; 
 
   res.reset(con->execQuery(q.str()));
   setData(*res.get());
 
-  q.clear();
+  q.str("");
 
-  q << "SELECT * FROM obstextdata WHERE observationid=" << obsid; 
+  q << "SELECT *," << dbTime(obsTime, true) << "+obs_offset AS obstime FROM obstextdata WHERE observationid=" << obsid; 
 
   res.reset(con->execQuery(q.str()));
   setTextData(*res.get());
@@ -398,7 +405,7 @@ void Observation::insertIntoDb(dnmi::db::Connection *con, bool useTransaction)
   
     observationid_ = currentObservationid(con);
 
-    q.clear();
+    q.str("");
     for(auto &d : data_) {
       q << "INSERT INTO obsdata (observationid,obs_offset,original,paramid,sensor,level,corrected,controlinfo,useinfo,cfailed) VALUES("
         << observationid_ << ","<< dbTime(d.obstime(),true) << "-" << dbTime(obstime_,true) <<"," << d.original() << ","

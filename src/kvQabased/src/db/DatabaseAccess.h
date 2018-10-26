@@ -49,6 +49,10 @@ class KvalobsData;
 }
 }
 
+namespace qabase {
+class Observation;
+}
+
 namespace db {
 
 /**
@@ -106,7 +110,7 @@ class DatabaseAccess {
    * @param si The observation we wants checks for
    */
   virtual void getChecks(CheckList * out,
-                         const kvalobs::kvStationInfo & si) const = 0;
+                         const qabase::Observation & obs) const = 0;
 
   /**
    * Find index of controlinfo flag for the given qcx.
@@ -124,7 +128,7 @@ class DatabaseAccess {
    * @param si Observation we want the parameter list from
    */
   virtual void getParametersToCheck(ParameterList * out,
-                                    const kvalobs::kvStationInfo & si) const = 0;
+                                    const qabase::Observation & obs) const = 0;
 
   /**
    * Get an algorithm with the specified name
@@ -187,9 +191,21 @@ class DatabaseAccess {
    * @param minuteOffset How far back in time from obstime do we want data
    *                     for?
    */
-  virtual void getData(DataList * out, const kvalobs::kvStationInfo & si,
+  virtual void getData(DataList * out, const qabase::Observation & obs,
                        const qabase::DataRequirement::Parameter & parameter,
                        int minuteOffset) const = 0;
+
+  /**
+   * Pin the given observation. This means that any attempt to read data will
+   * either fail with an exception or return the pinned data if there is a 
+   * conflict between the pinned observationid and the newly returned 
+   * observationid.
+   * Will throw an exception at you if you have already read the data you are 
+   * attempting to pi, and there is a conflict.
+   * Pins are cleared when you start a new transaction.
+   * Returns false if absolutely no data was pinned. True otherwise.
+   */
+  virtual bool pin(const qabase::Observation & obs) const = 0;
 
   typedef std::list<kvalobs::kvTextData> TextDataList;
   /**
@@ -202,7 +218,7 @@ class DatabaseAccess {
    *                     for?
    */
   virtual void getTextData(TextDataList * out,
-                           const kvalobs::kvStationInfo & si,
+                           const qabase::Observation & obs,
                            const qabase::DataRequirement::Parameter & parameter,
                            int minuteOffset) const = 0;
 
@@ -212,7 +228,7 @@ class DatabaseAccess {
    * Construct a KvalobsData object containing all the given data in d and td,
    * but also all database data specified by si.
    */
-  virtual KvalobsDataPtr complete(const kvalobs::kvStationInfo & si,
+  virtual KvalobsDataPtr complete(const qabase::Observation & obs,
                                   const DataList & d = DataList(),
                                   const TextDataList & td =
                                       TextDataList()) const = 0;
@@ -232,9 +248,9 @@ class DatabaseAccess {
    */
   virtual void write(const DataList & data) = 0;
 
-  virtual kvalobs::kvStationInfo * selectDataForControl() = 0;
+  virtual qabase::Observation * selectDataForControl() = 0;
 
-  virtual void markProcessDone(const kvalobs::kvStationInfo & si) = 0;
+  virtual void markProcessDone(const qabase::Observation & obs) = 0;
 };
 
 }
