@@ -278,7 +278,7 @@ class DecoderBase {
    */
   bool addDataToDb(const miutil::miTime &obstime, int stationid, int typeid_,
                    std::list<kvalobs::kvData> &sd,
-                   std::list<kvalobs::kvTextData> &textData, int priority,
+                   std::list<kvalobs::kvTextData> &textData, 
                    const std::string &logid);
 
   /**
@@ -314,7 +314,7 @@ class DecoderBase {
    */
   bool addDataToDb(const miutil::miTime &obstime, int stationid, int typeid_,
                    std::list<kvalobs::kvData> &sd,
-                   std::list<kvalobs::kvTextData> &textData, int priority,
+                   std::list<kvalobs::kvTextData> &textData, 
                    const std::string &logid, bool onlyAddOrUpdateData);
 
   /**

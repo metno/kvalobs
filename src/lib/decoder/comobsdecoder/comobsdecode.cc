@@ -410,7 +410,7 @@ kvalobs::decoder::DecoderBase::DecodeResult ComObsDecoder::execute(
             it++ ) {
         list<kvData> d = it->data();
         list<kvTextData> td = it->textData();
-        int priority;
+        //int priority;
 
         // Publish the data if the filter is set up to do that.
         dataToPublish(d, td);
@@ -420,22 +420,23 @@ kvalobs::decoder::DecoderBase::DecodeResult ComObsDecoder::execute(
         d=std::get<0>(fd);
         td=std::get<1>(fd);
 
+/*
         if( smsMelding->getCode() == 2 || smsMelding->getCode() == 13
                 || smsMelding->getCode() == 3 )
             priority = 8;
         else
             priority = 4;
-
+*/
         IDLOGDEBUG3( logid, *it );
 
         if( d.size() > 0 || td.size() > 0 ) {
             try {
                 kvalobs::decoder::DataUpdateTransaction work(
                         to_ptime( it->getDate() ), it->stationID(),
-                        it->typeID(), priority, &d, &td, logid );
+                        it->typeID(), &d, &td, logid );
 
                 con.perform( work );
-                updateStationInfo( work.stationInfoList() );
+                //updateStationInfo( work.stationInfoList() );
                 nData += it->dataSize() + it->textDataSize();
             }
             catch( const dnmi::db::SQLException &ex ) {

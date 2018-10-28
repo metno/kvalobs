@@ -286,7 +286,6 @@ kvalobs::decoder::DecoderBase::DecodeResult AutoObsDecoder::execute(
   float fval;
   int count = 0;
   int nExpectedParams = 0;
-  int priority = 4;
   int line = 0;
   std::list<kvData> dataList;
   std::list<kvData>::iterator itDataList;
@@ -562,7 +561,7 @@ kvalobs::decoder::DecoderBase::DecodeResult AutoObsDecoder::execute(
     }
 
     if (addDataToDb(to_miTime(obstime), stationid, typeidWithSave, dataList,
-                    textDataList, priority, logid)) {
+                    textDataList, logid)) {
       count += dataList.size() + textDataList.size();
     }
   }

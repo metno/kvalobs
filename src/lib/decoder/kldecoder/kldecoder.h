@@ -36,6 +36,7 @@
 #include <list>
 #include <kvalobs/kvStation.h>
 #include <decoderbase/decoder.h>
+#include "KvDataContainer.h"
 #include <vector>
 #include "DataDecode.h"
 
@@ -119,6 +120,12 @@ class KlDecoder : public DecoderBase {
   bool getOnlyInsertOrUpdate() const;
   long getStationId(std::string &msg) const;
   long getTypeId(std::string &msg) const;
+  bool do302(int stationid, int typeId, 
+             KvDataContainer::DataByObstime &dataIn, 
+             KvDataContainer::TextDataByObstime &textDataIn, 
+             std::map<boost::posix_time::ptime, int> &observations,
+             const std::string &logid, std::string &msgToSender);
+
   DecodeResult insertDataInDb(kvalobs::serialize::KvalobsData *theData,
                               int stationid, int typeId,
                               const std::string &logid,
