@@ -456,7 +456,7 @@ CREATE TABLE model_data (
 	obstime	  TIMESTAMP NOT NULL,
 	paramid   INTEGER NOT NULL,
 	level     INTEGER NOT NULL,
-        modelid   INTEGER NOT NULL,
+    modelid   INTEGER NOT NULL,
 	original  FLOAT DEFAULT NULL,  
 	UNIQUE ( stationid, obstime, paramid, level, modelid )
 );
@@ -479,6 +479,19 @@ GRANT ALL ON model TO kv_admin;
 GRANT SELECT ON model TO kv_read;
 GRANT SELECT, UPDATE, INSERT ON model TO kv_write;
 
+CREATE TABLE priority (
+	stationid INTEGER NOT NULL,
+	typeid    INTEGER NOT NULL,
+    priority  INTEGER NOT NULL,
+    hour      INTEGER DEFAULT 6,
+    pri_after_hour INTEGER DEFAULT 10,
+	UNIQUE ( stationid, typeid )
+);
+
+REVOKE ALL ON priority FROM public;
+GRANT ALL ON priority TO kv_admin;
+GRANT SELECT ON priority TO kv_read;
+GRANT SELECT, UPDATE, INSERT ON priority TO kv_write;
 
 
 
@@ -486,11 +499,11 @@ CREATE TABLE types (
 	typeid  INTEGER NOT NULL,
 	format   TEXT DEFAULT NULL,
 	earlyobs INTEGER DEFAULT NULL,
-        lateobs  INTEGER DEFAULT NULL,
+    lateobs  INTEGER DEFAULT NULL,
 	read     TEXT DEFAULT NULL,
-        obspgm   TEXT DEFAULT NULL,
+    obspgm   TEXT DEFAULT NULL,
 	comment  TEXT DEFAULT NULL,
-	UNIQUE ( typeid )
+ 	UNIQUE ( typeid )
 );
 
 REVOKE ALL ON types FROM public;
@@ -550,9 +563,9 @@ CREATE TABLE station (
 	ICAOid     CHAR(4) DEFAULT NULL,
 	call_sign  CHAR(7) DEFAULT NULL, 
 	stationstr TEXT DEFAULT NULL,
-        environmentid  INTEGER DEFAULT NULL,
+    environmentid  INTEGER DEFAULT NULL,
 	static    BOOLEAN DEFAULT FALSE,
-        fromtime TIMESTAMP NOT NULL, 
+    fromtime TIMESTAMP NOT NULL,
 	UNIQUE ( stationid, fromtime )
 );
 
@@ -571,7 +584,7 @@ CREATE TABLE checks (
 	language  INTEGER NOT NULL,
 	checkname TEXT DEFAULT NULL,
 	checksignature TEXT DEFAULT NULL,
-        active   TEXT DEFAULT '* * * * *',   
+    active   TEXT DEFAULT '* * * * *',   
 	fromtime TIMESTAMP NOT NULL,
 	UNIQUE ( stationid, qcx, language, fromtime )
 );
@@ -590,10 +603,10 @@ CREATE TABLE station_param (
 	fromday	  INTEGER NOT NULL,
 	today	  INTEGER NOT NULL,
 	hour      INTEGER DEFAULT -1,
-        qcx       TEXT NOT NULL,
+    qcx       TEXT NOT NULL,
 	metadata  TEXT DEFAULT NULL,
-        desc_metadata TEXT DEFAULT NULL,
-        fromtime TIMESTAMP NOT NULL,
+    desc_metadata TEXT DEFAULT NULL,
+    fromtime TIMESTAMP NOT NULL,
 	UNIQUE ( stationid, paramid, level, sensor, fromday, today, hour, qcx, fromtime )
 );
 
@@ -653,7 +666,7 @@ CREATE TABLE obs_pgm (
 	stationid INTEGER NOT NULL,
 	paramid	  INTEGER NOT NULL,
 	level	  INTEGER NOT NULL,
-        nr_sensor INTEGER DEFAULT 1,
+    nr_sensor INTEGER DEFAULT 1,
 	typeid    INTEGER NOT NULL,
 	priority_message  BOOLEAN DEFAULT TRUE,
 	collector BOOLEAN DEFAULT FALSE,
@@ -688,8 +701,8 @@ CREATE TABLE obs_pgm (
 	fri  BOOLEAN DEFAULT FALSE,
 	sat  BOOLEAN DEFAULT FALSE,
 	sun  BOOLEAN DEFAULT FALSE,
-        fromtime TIMESTAMP NOT NULL,
-        totime   TIMESTAMP DEFAULT NULL,
+    fromtime TIMESTAMP NOT NULL,
+    totime   TIMESTAMP DEFAULT NULL,
 	UNIQUE ( stationid, typeid, paramid, level, fromtime )	
 );
 
@@ -749,7 +762,7 @@ CREATE TABLE qcx_info (
 	medium_qcx  TEXT NOT NULL,
 	main_qcx    TEXT NOT NULL,  
  	controlpart INTEGER DEFAULT NULL,
-        comment	    TEXT DEFAULT NULL,
+    comment	    TEXT DEFAULT NULL,
 	UNIQUE (medium_qcx)
 );
 REVOKE ALL ON qcx_info FROM public;

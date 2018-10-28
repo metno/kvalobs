@@ -132,9 +132,66 @@ DataUpdateTransaction::~DataUpdateTransaction() {
 }
 
 
-int DataUpdateTransaction::getPriority(dnmi::db::Connection *conection, int stationid, int typeid_, const boost::posix_time::ptime &obstime)
+int DataUpdateTransaction::getPriority(dnmi::db::Connection *con, int stationid, int typeid_, const boost::posix_time::ptime &obstime)
 {
-  return priority;
+  string buf;
+  ostringstream q;
+
+  q << "(SELECT *  FROM priority WHERE stationid=" << stationid << " AND typeid=" << typeid_ 
+    << " UNION SELECT *  FROM priority WHERE stationid=0 AND typeid=" << typeid_ << ") ORDER BY stationid DESC LIMIT 1";
+  
+  std::unique_ptr<dnmi::db::Result> res;
+  res.reset(con->execQuery(q.str()));
+
+  if (res->size() == 0 ) {
+    return 4;
+  }
+ 
+  while (res->hasNext()) {
+    dnmi::db::DRow & row = res->next();
+    int priority = INT_MAX;
+    int priAfter = 10;
+    int hour=6;
+    list<string> names = row.getFieldNames();
+    list<string>::iterator it = names.begin();
+  
+    for (; it != names.end(); it++) {
+      try {
+        buf = row[*it];
+
+        if (*it == "priority" ) {
+          priority = atoi(buf.c_str());
+        } else  if (*it == "hour") {
+          hour = atoi(buf.c_str());
+        } else if (*it == "pri_after_hour") {
+          priAfter = atoi(buf.c_str());
+        } else if (*it == "stationid ") {
+          continue;
+        } else if (*it == "typeid") {
+          continue;
+        } else {
+          CERR("DataUpdateTransaction::getPriority .. unknown entry:" << *it << std::endl);
+        }
+      } catch (...) {
+        CERR("DataUpdateTransaction::getPriority: unexpected exception ..... \n");
+      }
+    }
+
+    if( priority == INT_MAX ) {
+      CERR("DataUpdateTransaction::getPriority: no priority def, returning default 4 \n");
+      return 4;
+    }
+
+    auto now = pt::second_clock::universal_time();
+    auto testTime = now-pt::hours(hour);
+
+    if( obstime<testTime)
+      return priAfter;
+    else
+      return priority;
+  }
+
+  return 4;
 }
 
 void DataUpdateTransaction::updateWorkQue(dnmi::db::Connection *con, long observationid, int pri) {
@@ -892,8 +949,6 @@ bool DataUpdateTransaction::doInsertOrUpdate(dnmi::db::Connection *conection, li
 
 bool DataUpdateTransaction::operator()(dnmi::db::Connection *conection) {
   ostringstream mylog;
-  //list<kvalobs::kvData> dataList;
-  //list<kvalobs::kvTextData> textDataList;
   boost::posix_time::ptime tbtime;
 
   if (obstime.is_not_a_date_time()) {

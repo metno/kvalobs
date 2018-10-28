@@ -51,6 +51,20 @@ GRANT ALL ON obstextdata TO kv_admin;
 GRANT SELECT ON obstextdata TO kv_read;
 GRANT SELECT, UPDATE, INSERT, DELETE ON obstextdata TO kv_write;
 
+CREATE TABLE priority (
+	stationid INTEGER NOT NULL,
+	typeid    INTEGER NOT NULL,
+    priority  INTEGER NOT NULL,
+    hour      INTEGER DEFAULT 6,
+    pri_after_hour INTEGER DEFAULT 10,
+	UNIQUE ( stationid, typeid )
+);
+
+REVOKE ALL ON priority FROM public;
+GRANT ALL ON priority TO kv_admin;
+GRANT SELECT ON priority TO kv_read;
+GRANT SELECT, UPDATE, INSERT ON priority TO kv_write;
+
 INSERT INTO observations (stationid, typeid, obstime, tbtime) (
     SELECT sub.stationid, sub.typeid, sub.obstime, max(sub.tbtime) FROM (
         SELECT stationid, typeid, obstime, max(tbtime) as tbtime FROM data group by 1,2,3 
