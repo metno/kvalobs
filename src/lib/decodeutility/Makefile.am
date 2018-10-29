@@ -12,7 +12,8 @@ nobase_decodeutilityinclude_HEADERS = 	decodeutility.h \
 	kvalobsdataserializer.h \
 	kvDataFormatter.h \
 	DataReinserter.h bits/DataReinserter.tcc \
-	sorteddata.h
+	sorteddata.h \
+	KvDataContainer.h
 
 
 libkvalobs_decodeutility_la_SOURCES = \
@@ -24,7 +25,8 @@ libkvalobs_decodeutility_la_SOURCES = \
 	kvalobsdataserializer.h kvalobsdataserializer.cc \
 	kvDataFormatter.h kvDataFormatter.cc \
 	DataReinserter.h bits/DataReinserter.tcc \
-	sorteddata.h
+	sorteddata.h \
+	KvDataContainer.h KvDataContainer.cc
 
 libkvalobs_decodeutility_la_CPPFLAGS = $(AM_CPPFLAGS) $(putools_CFLAGS) $(libxmlpp_CFLAGS) $(omniORB4_CFLAGS) $(BOOST_CPPFLAGS)
 libkvalobs_decodeutility_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@

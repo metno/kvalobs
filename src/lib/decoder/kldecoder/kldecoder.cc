@@ -53,6 +53,7 @@ using namespace dnmi::db;
 using namespace miutil;
 using namespace boost;
 using namespace kvalobs;
+using decodeutility::KvDataContainer;
 
 namespace {
 bool decodeKeyVal(const string &keyval, string &key, string &val) {

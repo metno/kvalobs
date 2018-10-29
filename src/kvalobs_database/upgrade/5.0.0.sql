@@ -403,4 +403,14 @@ CREATE OR REPLACE RULE text_data_delete AS ON DELETE TO text_data DO INSTEAD (
         paramid=OLD.paramid
 );
 
+CREATE OR REPLACE FUNCTION 
+kvalobs_database_version()
+RETURNS text AS
+$BODY$
+BEGIN
+	RETURN '5.0.0';
+END;
+$BODY$
+LANGUAGE plpgsql IMMUTABLE;
+
 END;

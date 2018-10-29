@@ -31,6 +31,7 @@
 #include "kv2kvDecoder.h"
 #include <decodeutility/kvDataFormatter.h>
 #include <decodeutility/kvalobsdataparser.h>
+#include <decodeutility/KvDataContainer.h>
 #include <kvalobs/kvexception.h>
 #include <kvalobs/kvDataOperations.h>
 #include <kvalobs/kvQueries.h>
@@ -52,6 +53,9 @@ using namespace std;
 using namespace kvalobs::decoder;
 using namespace kvalobs::serialize;
 using namespace decodeutility::kvdataformatter;
+using decodeutility::KvDataContainer;
+
+namespace pt=boost::posix_time;
 
 namespace kvalobs {
 
@@ -164,6 +168,66 @@ void kv2kvDecoder::verifyAndAdapt(KvalobsData & data, list<kvData> & out) {
     adapt(*it, dbData, data.overwrite());
   }
 }
+
+void kv2kvDecoder::save2(const list<kvData> & dl_, const list<kvTextData> & tdl_) 
+{
+  KvDataContainer container(dl_, tdl_);
+  KvDataContainer::DataByObstime data;
+  KvDataContainer::TextDataByObstime textData;
+  KvDataContainer::TextDataByObstime::iterator tid;
+  KvDataContainer::TextDataList td;
+
+  KvDataContainer::StationInfoList infl=container.stationInfos();
+
+  for( auto &sinf : container.stationInfos()) {
+    if (container.get(
+          data, textData, sinf.stationId, sinf.typeId,
+          pt::second_clock::universal_time()) < 0) {
+       continue;               
+    }
+
+    for (KvDataContainer::DataByObstime::iterator it = data.begin();
+      it != data.end(); ++it) {
+      td.clear();
+      tid = textData.find(it->first);
+
+      if (tid != textData.end()) {
+        td = tid->second;
+        textData.erase(tid);
+      }
+
+      if (!addDataToDb(to_miTime(it->first), sinf.stationId, sinf.typeId, it->second, td,
+             logid, true /*getOnlyInsertOrUpdate()*/)) {
+        ostringstream ost;
+
+        ost << "DBERROR: stationid: " << sinf.stationId << " typeid: " << sinf.typeId
+            << " obstime: " << it->first;
+        //LOGERROR(ost.str());
+        throw(DecoderError(decoder::DecoderBase::Error, ost.str()));
+      }
+    }
+
+    //Is there any left over text data.
+    if (!textData.empty()) {
+      KvDataContainer::DataList dl;
+      for (KvDataContainer::TextDataByObstime::iterator it = textData.begin();
+          it != textData.end(); ++it) {
+        if (!addDataToDb(to_miTime(it->first), sinf.stationId, sinf.typeId, dl, it->second,
+                       logid, true/*getOnlyInsertOrUpdate()*/)) {
+          ostringstream ost;
+          ost << "DBERROR: TextData: stationid: " << sinf.stationId << " typeid: "
+              << sinf.typeId << " obstime: " << it->first;
+          //LOGERROR(ost.str());
+          
+          throw(DecoderError(decoder::DecoderBase::Error, ost.str()));
+        }
+      }
+    }
+  }
+}
+
+
+
 
 void kv2kvDecoder::save(const list<kvData> & dl, const list<kvTextData> & tdl) {
   // kvTextData:
