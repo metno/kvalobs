@@ -201,24 +201,19 @@ int DataUpdateTransaction::getPriority(dnmi::db::Connection *con, int stationid,
   return 4;
 }
 
-bool DataUpdateTransaction::isEqual(const std::list<kvalobs::kvData> &oldData_, const std::list<kvalobs::kvTextData> &oldTextData) {
-  list<kvalobs::kvData> oldData(oldData_);
 
-  for (list<kvalobs::kvData>::iterator it = oldData.begin(); it != oldData.end(); ++it) {
-    if (it->original() == -32767)
-      it = oldData.erase(it);
-  }
 
-  if (!onlyAddOrUpdateData) {
-    if (oldData.size() != newData->size() || oldTextData.size() != newTextData->size()) {
+bool DataUpdateTransaction::doIsEqual(const std::list<kvalobs::kvData> &oldData, const std::list<kvalobs::kvTextData> &oldTextData, bool replace) {
+  bool found=false;
+
+  if( replace ) {
+    if ( newData->size() != oldData.size() || newTextData->size() != oldTextData.size()) {
       log << "isEqual: size differ: " << oldData.size() << " (" << newData->size() << ") " << "- " << oldTextData.size() << " (" << newTextData->size()
           << ")\n";
 
       return false;
     }
   }
-
-  bool found;
 
   for (list<kvalobs::kvData>::const_iterator nit = newData->begin(); nit != newData->end(); ++nit) {
     found = false;
@@ -254,7 +249,26 @@ bool DataUpdateTransaction::isEqual(const std::list<kvalobs::kvData> &oldData_, 
       return false;
   }
 
-  return true;
+  return found;
+}
+
+
+bool DataUpdateTransaction::isEqual(const std::list<kvalobs::kvData> &oldData_, const std::list<kvalobs::kvTextData> &oldTextData) {
+  //if onlyAddOrUpdateData is false, the oldadata is to be replaced by the new data.
+  //If true the new data is to be addded to the data that is alleady in the databse.
+  if( doIsEqual(oldData_, oldTextData, !onlyAddOrUpdateData) ) {
+    return true;
+  }
+
+  //Remove missing values from the old data and test again for equality  
+  list<kvalobs::kvData> oldData(oldData_);
+
+  for (list<kvalobs::kvData>::iterator it = oldData.begin(); it != oldData.end(); ++it) {
+    if (it->original() == -32767)
+      it = oldData.erase(it);
+  }
+
+  return doIsEqual(oldData, oldTextData, !onlyAddOrUpdateData);
 }
 
 
@@ -398,7 +412,7 @@ bool DataUpdateTransaction::operator()(dnmi::db::Connection *conection) {
 void DataUpdateTransaction::onSuccess() {
   ostringstream mylog;
   string prefix(insertType.length(), ' ');
-  
+  mylog << insertType << ": stationid: " << stationid << " typeid: " << typeid_ << " obstime: " << pt::to_kvalobs_string(obstime);
   IDLOGINFO(logid, log.str());
   IDLOGINFO("transaction", mylog.str());
   *ok_ = true;

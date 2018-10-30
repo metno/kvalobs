@@ -69,6 +69,8 @@ class DataUpdateTransaction : public dnmi::db::Transaction {
   int nRetry;
   bool onlyAddOrUpdateData;
 
+  bool doIsEqual(const std::list<kvalobs::kvData> &oldData_, const std::list<kvalobs::kvTextData> &oldTextData, bool replace);
+
  public:
   int getPriority(dnmi::db::Connection *conection, int stationid, int typeid_, const boost::posix_time::ptime &obstime);
   void updateWorkQue(dnmi::db::Connection *conection, long observationid, int priority);
@@ -78,6 +80,7 @@ class DataUpdateTransaction : public dnmi::db::Transaction {
   bool addDataToList(const kvalobs::kvData &data,
                      std::list<kvalobs::kvData> &dataList, bool replaceOnly =
                          false);
+  
   bool isEqual(const std::list<kvalobs::kvData> &oldData,
                const std::list<kvalobs::kvTextData> &oldTextData);
 

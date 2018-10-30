@@ -107,7 +107,7 @@ DecoderBase::DecodeResult kv2kvDecoder::execute(std::string & msg) {
     verifyAndAdapt(data, dl);
     list<kvTextData> tdl;
     data.getData(tdl, tbtime);
-    save(dl, tdl);
+    save2(dl, tdl);
 
     KvalobsData::RejectList rejectedFixes;
     data.getRejectedCorrections(rejectedFixes);
@@ -180,6 +180,9 @@ void kv2kvDecoder::save2(const list<kvData> & dl_, const list<kvTextData> & tdl_
   KvDataContainer::StationInfoList infl=container.stationInfos();
 
   for( auto &sinf : container.stationInfos()) {
+    IdlogHelper idLog(sinf.stationId, sinf.typeId, this);
+    string logid( idLog.logid() );
+
     if (container.get(
           data, textData, sinf.stationId, sinf.typeId,
           pt::second_clock::universal_time()) < 0) {
@@ -197,12 +200,13 @@ void kv2kvDecoder::save2(const list<kvData> & dl_, const list<kvTextData> & tdl_
       }
 
       if (!addDataToDb(to_miTime(it->first), sinf.stationId, sinf.typeId, it->second, td,
-             logid, true /*getOnlyInsertOrUpdate()*/)) {
+             logid, false)) {
         ostringstream ost;
 
         ost << "DBERROR: stationid: " << sinf.stationId << " typeid: " << sinf.typeId
             << " obstime: " << it->first;
-        //LOGERROR(ost.str());
+        LOGERROR(ost.str());
+        IDLOGERROR(logid, ost.str());
         throw(DecoderError(decoder::DecoderBase::Error, ost.str()));
       }
     }
@@ -213,12 +217,12 @@ void kv2kvDecoder::save2(const list<kvData> & dl_, const list<kvTextData> & tdl_
       for (KvDataContainer::TextDataByObstime::iterator it = textData.begin();
           it != textData.end(); ++it) {
         if (!addDataToDb(to_miTime(it->first), sinf.stationId, sinf.typeId, dl, it->second,
-                       logid, true/*getOnlyInsertOrUpdate()*/)) {
+                       logid, false)) {
           ostringstream ost;
           ost << "DBERROR: TextData: stationid: " << sinf.stationId << " typeid: "
               << sinf.typeId << " obstime: " << it->first;
-          //LOGERROR(ost.str());
-          
+          LOGERROR(ost.str());
+          IDLOGERROR(logid, ost.str());
           throw(DecoderError(decoder::DecoderBase::Error, ost.str()));
         }
       }
@@ -420,8 +424,8 @@ void kv2kvDecoder::verify(const kvData & d, kvDataPtr dbData) const {
 void kv2kvDecoder::adapt(kvData & d, kvDataPtr dbData, bool overwrite) const {
   milog::LogContext lcontext("adapt");
 
-  LOGDEBUG("dbData.get():\t" << dbData.get());
-  LOGDEBUG("overwrite:\t" << overwrite);
+  LOGDEBUG("dbData.get():\t" << *dbData.get());
+  LOGDEBUG("overwrite:\t" << (overwrite?"true":"false"));
 
   if (dbData.get() and not overwrite)
     d.set(d.stationID(), d.obstime(), dbData->original(), d.paramID(),
