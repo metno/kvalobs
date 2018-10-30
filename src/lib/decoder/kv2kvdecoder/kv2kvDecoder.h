@@ -95,10 +95,8 @@ class kv2kvDecoder : public DecoderBase, public boost::noncopyable {
   };
 
   serialize::KvalobsData data;
-  //std::string logid;
   DecodeResult parseResult_;
   std::string parseMessage_;
-  int priority_;
   const boost::posix_time::ptime tbtime;
 };
 

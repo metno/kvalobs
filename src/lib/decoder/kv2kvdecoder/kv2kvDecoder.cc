@@ -72,7 +72,6 @@ kv2kvDecoder::kv2kvDecoder(dnmi::db::Connection & con, const ParamList & params,
                            int decoderId)
     : DecoderBase(con, params, typeList, obsType, obs, decoderId),
       dbGate(&con),
-      priority_(5),
       tbtime(boost::posix_time::microsec_clock::universal_time()) {
   milog::LogContext lcontext(name());
   LOGDEBUG("kv2kvDecoder object created");
@@ -101,8 +100,6 @@ DecoderBase::DecodeResult kv2kvDecoder::execute(std::string & msg) {
   }
 
   try {
-    // Transactions may not be used here - the underlying system uses them.
-    //     getConnection()->beginTransaction();
     list<kvData> dl;
     verifyAndAdapt(data, dl);
     list<kvTextData> tdl;
@@ -112,10 +109,7 @@ DecoderBase::DecodeResult kv2kvDecoder::execute(std::string & msg) {
     KvalobsData::RejectList rejectedFixes;
     data.getRejectedCorrections(rejectedFixes);
     markAsFixed(rejectedFixes);
-
-    //     getConnection()->endTransaction();
   } catch (DecoderError & e) {
-    //     getConnection()->rollBack();
     parseMessage_ = e.what();
     parseResult_ = e.res;
     saveInRejectDecode();
@@ -183,6 +177,7 @@ void kv2kvDecoder::save2(const list<kvData> & dl_, const list<kvTextData> & tdl_
     IdlogHelper idLog(sinf.stationId, sinf.typeId, this);
     string logid( idLog.logid() );
 
+    IDLOGINFO(logid, obs);
     if (container.get(
           data, textData, sinf.stationId, sinf.typeId,
           pt::second_clock::universal_time()) < 0) {
@@ -235,6 +230,7 @@ void kv2kvDecoder::save2(const list<kvData> & dl_, const list<kvTextData> & tdl_
 
 void kv2kvDecoder::save(const list<kvData> & dl, const list<kvTextData> & tdl) {
   // kvTextData:
+  int priority_ = 5;
   if (not tdl.empty()) {
     if (!putkvTextDataInDb(tdl, priority_)) {
       for (TDList::const_iterator it = tdl.begin(); it != tdl.end(); ++it) {

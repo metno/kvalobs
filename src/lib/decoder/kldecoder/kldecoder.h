@@ -105,7 +105,14 @@ class KlDecoder : public DecoderBase {
   int stationID;
   std::string stationidIn;
   std::string redirectedFrom;
-  bool onlyInsertOrUpdate;
+
+  /**
+   * if onlyInsertOrUpdate is true the new data is inserted, 
+   * ie in addition to the data that is allready in the database for
+   * this stationd,typeid and obstime. If false the data is replaced
+   * with this new data.
+   */
+  bool onlyInsertOrUpdate; 
   boost::posix_time::ptime receivedTime;
 
  public:
