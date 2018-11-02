@@ -150,12 +150,14 @@ comment: kommentar.
 priority
 KILDE: METADATA, manuelt inntastet.
 HVEM bruker tabellen:
-BESKRIVELSE av tabellen: Brukes av kvalobs serveren for å prioritere rekkefølgen av meldinger
+BESKRIVELSE av tabellen: Brukes av kvalobs serveren for å prioritere rekkefølgen av meldinger som skal behandles
 stationid: stasjonsnummer, 0 betyr at denne raden gjelder for alle stasjoner, se tabellen station. 
 typeid: meldingsformat identifikator, se tabellen types.
-priority: prioritet.
-hour: heltall, tidspunkt denne prioriteten gjelder for ( INTEGER DEFAULT 6 )
-pri_after_hour: Etter hvilket antall timer denne prioriteten gjelder for (INTEGER DEFAULT 10) 
+priority: prioritet. Lavere tall gir høyere prioritet, 1 er høyest. 0 er reservert for systemet.
+          Det er egentlig ikke satt noen minimums prioritet. Ofte er 10 brukt.
+hour: angir hvor forsinket en melding kan komme inn før den ikke lenger har prioritet. Dvs kommer
+meldingen in hour timer etter "Nå" tiden så får den pri_after_hour prioriteten.
+pri_after_hour: Dette er prioriteten en melding får når den kommer mer enn hour timer etter "Nå" tiden.
 
 
 types.
