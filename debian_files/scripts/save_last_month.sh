@@ -36,7 +36,7 @@ backupdir=$VARDIR/klima_backup
 
 
 if [ "${nmonth}z" = "z" ]; then
-	NMONTH=3
+	NMONTH=2
 else
     NMONTH=$nmonth
 fi
