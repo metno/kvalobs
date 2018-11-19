@@ -32,14 +32,19 @@
 #include "KvDataContainer.h"
 
 using namespace kvalobs::serialize::internal;
-
-namespace kvalobs {
-namespace decoder {
-namespace kldecoder {
+using kvalobs::serialize::KvalobsData;
+using boost::posix_time::ptime;
+using std::map;
+namespace decodeutility {
 
 ///Deletes kvData after it is consumed.
 KvDataContainer::KvDataContainer(kvalobs::serialize::KvalobsData *kvData)
     : data_(kvData) {
+}
+
+KvDataContainer::KvDataContainer(const std::list<kvalobs::kvData> &d, const std::list<kvalobs::kvTextData> &td) {
+  KvalobsData *t = new KvalobsData(d, td);
+  data_=t;
 }
 
 KvDataContainer::~KvDataContainer() {
@@ -197,7 +202,23 @@ void KvDataContainer::set(kvalobs::serialize::KvalobsData *kvData_) {
   data_ = kvData_;
 }
 
+KvDataContainer::StationInfoList KvDataContainer::stationInfos()const{
+  map<int, map<int, int> > stInfo;
+  StationInfoList ret;
+  std::list<kvalobs::kvData> d;
+  data_->data(d, false);
+
+  for (auto &elem : d) {
+    stInfo[elem.stationID()][elem.typeID()]++;
+  }
+
+  for( auto sid : stInfo) {
+    for( auto tid : sid.second) {
+      ret.push_front(StationInfo(sid.first, tid.first));
+    }
+  } 
+  return ret;
 }
-}
+
 }
 

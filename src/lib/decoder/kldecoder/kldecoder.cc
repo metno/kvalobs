@@ -41,7 +41,6 @@
 #include <kvalobs/kvQueries.h>
 #include <kvalobs/kvTypes.h>
 #include <miutil/trimstr.h>
-#include "KvDataContainer.h"
 #include <miutil/timeconvert.h>
 #include "kldecoder.h"
 #include <decodeutility/decodeutility.h>
@@ -54,6 +53,7 @@ using namespace dnmi::db;
 using namespace miutil;
 using namespace boost;
 using namespace kvalobs;
+using decodeutility::KvDataContainer;
 
 namespace {
 bool decodeKeyVal(const string &keyval, string &key, string &val) {
@@ -323,6 +323,66 @@ kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecod
   return Rejected;
 }
 
+
+bool
+kvalobs::decoder::kldecoder::
+KlDecoder::
+do302(int stationid, int typeId, 
+      KvDataContainer::DataByObstime &dataIn, 
+      KvDataContainer::TextDataByObstime &textDataIn, 
+      map<pt::ptime, int> &observations,
+      const std::string &logid, std::string &msgToSender )
+{
+  pt::ptime obstime;
+  KvDataContainer::DataList data;
+  KvDataContainer::TextDataList textData;
+
+  for(KvDataContainer::DataByObstime::iterator it = dataIn.begin();
+      it != dataIn.end(); ++it) {
+
+    if( obstime.is_special() ) {
+      obstime=it->first;
+    } else if( obstime < it->first) {
+      obstime=it->first;
+    }
+    for( auto &d : it->second) 
+      data.push_back(d);
+      
+    observations[it->first] += it->second.size();
+  }
+
+  for(KvDataContainer::TextDataByObstime::iterator it = textDataIn.begin();
+      it != textDataIn.end(); ++it) {
+
+    if( obstime.is_special() ) {
+      obstime=it->first;
+    } else if( obstime < it->first) {
+      obstime=it->first;
+    }
+    for( auto &d : it->second) 
+      textData.push_back(d);
+      
+    observations[it->first] += it->second.size();
+  }
+
+  if( data.empty() && textData.empty())
+    return true;
+
+  if (!addDataToDb(to_miTime(obstime), stationid, typeId, data, textData,
+                  logid, getOnlyInsertOrUpdate())) {
+    ostringstream ost;
+    ost << "DBERROR: stationid: " << stationid << " typeid: " << typeId
+        << " obstime: " << obstime;
+    LOGERROR(ost.str());
+    IDLOGERROR(logid, ost.str());
+    msgToSender += "\n" + ost.str();
+    return false;
+  }
+
+  return true;
+
+}
+
 kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecoder::insertDataInDb(
     kvalobs::serialize::KvalobsData *theData, int stationid, int typeId,
     const std::string &logid, std::string &msgToSender) {
@@ -334,60 +394,61 @@ kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecod
   map<ptime, int> observations;
 
   KvDataContainer container(theData);
-  int priority = 4;
-
-  if (receivedTime.is_special())
-    priority = 10;
-
-
+  
   if (container.get(data, textData, stationid, typeId,
                     pt::second_clock::universal_time()) < 0) {
     IDLOGINFO(logid, "No Data.");
     return Ok;
   }
 
-  for (KvDataContainer::DataByObstime::iterator it = data.begin();
-      it != data.end(); ++it) {
-
-    td.clear();
-    tid = textData.find(it->first);
-
-    if (tid != textData.end()) {
-      td = tid->second;
-      textData.erase(tid);
-    }
-
-    if (!addDataToDb(to_miTime(it->first), stationid, typeId, it->second, td,
-                     priority, logid, getOnlyInsertOrUpdate())) {
-      ostringstream ost;
-
-      ost << "DBERROR: stationid: " << stationid << " typeid: " << typeId
-          << " obstime: " << it->first;
-      LOGERROR(ost.str());
-      IDLOGERROR(logid, ost.str());
-      msgToSender += "\n" + ost.str();
+  if( typeId == 302 ) {
+    if(! do302(stationid, typeId, data, textData, observations, logid, msgToSender) ) {
       return NotSaved;
     }
+  } else {
+    for (KvDataContainer::DataByObstime::iterator it = data.begin();
+        it != data.end(); ++it) {
 
-    observations[it->first] += it->second.size();
-  }
+      td.clear();
+      tid = textData.find(it->first);
 
-  //Is there any left over text data.
-  if (!textData.empty()) {
-    KvDataContainer::DataList dl;
-    for (KvDataContainer::TextDataByObstime::iterator it = textData.begin();
-        it != textData.end(); ++it) {
-      if (!addDataToDb(to_miTime(it->first), stationid, typeId, dl, it->second,
-                       priority, logid, getOnlyInsertOrUpdate())) {
+      if (tid != textData.end()) {
+        td = tid->second;
+        textData.erase(tid);
+      }
+
+      if (!addDataToDb(to_miTime(it->first), stationid, typeId, it->second, td,
+             logid, getOnlyInsertOrUpdate())) {
         ostringstream ost;
-        ost << "DBERROR: TextData: stationid: " << stationid << " typeid: "
-            << typeId << " obstime: " << it->first;
+
+        ost << "DBERROR: stationid: " << stationid << " typeid: " << typeId
+            << " obstime: " << it->first;
         LOGERROR(ost.str());
         IDLOGERROR(logid, ost.str());
         msgToSender += "\n" + ost.str();
         return NotSaved;
       }
+
       observations[it->first] += it->second.size();
+    }
+
+    //Is there any left over text data.
+    if (!textData.empty()) {
+      KvDataContainer::DataList dl;
+      for (KvDataContainer::TextDataByObstime::iterator it = textData.begin();
+          it != textData.end(); ++it) {
+       if (!addDataToDb(to_miTime(it->first), stationid, typeId, dl, it->second,
+                       logid, getOnlyInsertOrUpdate())) {
+          ostringstream ost;
+          ost << "DBERROR: TextData: stationid: " << stationid << " typeid: "
+              << typeId << " obstime: " << it->first;
+          LOGERROR(ost.str());
+          IDLOGERROR(logid, ost.str());
+          msgToSender += "\n" + ost.str();
+          return NotSaved;
+        }
+        observations[it->first] += it->second.size();
+      }
     }
   }
 

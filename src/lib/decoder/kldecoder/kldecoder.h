@@ -36,6 +36,7 @@
 #include <list>
 #include <kvalobs/kvStation.h>
 #include <decoderbase/decoder.h>
+#include "decodeutility/KvDataContainer.h"
 #include <vector>
 #include "DataDecode.h"
 
@@ -104,7 +105,14 @@ class KlDecoder : public DecoderBase {
   int stationID;
   std::string stationidIn;
   std::string redirectedFrom;
-  bool onlyInsertOrUpdate;
+
+  /**
+   * if onlyInsertOrUpdate is true the new data is inserted, 
+   * ie in addition to the data that is allready in the database for
+   * this stationd,typeid and obstime. If false the data is replaced
+   * with this new data.
+   */
+  bool onlyInsertOrUpdate; 
   boost::posix_time::ptime receivedTime;
 
  public:
@@ -119,6 +127,12 @@ class KlDecoder : public DecoderBase {
   bool getOnlyInsertOrUpdate() const;
   long getStationId(std::string &msg) const;
   long getTypeId(std::string &msg) const;
+  bool do302(int stationid, int typeId, 
+             decodeutility::KvDataContainer::DataByObstime &dataIn, 
+             decodeutility::KvDataContainer::TextDataByObstime &textDataIn, 
+             std::map<boost::posix_time::ptime, int> &observations,
+             const std::string &logid, std::string &msgToSender);
+
   DecodeResult insertDataInDb(kvalobs::serialize::KvalobsData *theData,
                               int stationid, int typeId,
                               const std::string &logid,

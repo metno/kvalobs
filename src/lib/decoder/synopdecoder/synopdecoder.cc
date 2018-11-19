@@ -92,8 +92,7 @@ bool SynopDecoder::saveData(list<kvalobs::kvData> &data, bool &rejected,
   list<kvalobs::kvTextData> textData;
   list<kvalobs::kvData>::iterator it = data.begin();
   int i = 0;
-  int priority = 10;
-
+  
   rejected = false;
 
   if (it == data.end())
@@ -101,6 +100,7 @@ bool SynopDecoder::saveData(list<kvalobs::kvData> &data, bool &rejected,
 
   logid << "n" << it->stationID() << "-t" << it->typeID();
 
+/*
   if (it->stationID() < 100000) {
     //National stations that is registred in table 'station'.
     priority = 6;
@@ -115,7 +115,7 @@ bool SynopDecoder::saveData(list<kvalobs::kvData> &data, bool &rejected,
 
     priority = 8;
   }
-
+*/
   for (; it != data.end(); it++) {
     if (it->obstime().is_not_a_date_time()
         || it->tbtime().is_not_a_date_time()) {
@@ -131,7 +131,7 @@ bool SynopDecoder::saveData(list<kvalobs::kvData> &data, bool &rejected,
   it = data.begin();
 
   if (!addDataToDb(to_miTime(it->obstime()), it->stationID(), it->typeID(),
-                   data, textData, priority, logid.str())) {
+                   data, textData, logid.str())) {
     ret = false;
   }
 

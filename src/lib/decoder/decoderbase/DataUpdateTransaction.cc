@@ -96,7 +96,7 @@ namespace kvalobs {
 
 namespace decoder {
 
-DataUpdateTransaction::DataUpdateTransaction(const boost::posix_time::ptime &obstime, int stationid, int typeID, int priority,
+DataUpdateTransaction::DataUpdateTransaction(const boost::posix_time::ptime &obstime, int stationid, int typeID,
                                              std::list<kvalobs::kvData> *newData, std::list<kvalobs::kvTextData> *newTextData, const std::string &logid,
                                              bool onlyAddOrUpdateData_)
     : newData(newData),
@@ -104,8 +104,6 @@ DataUpdateTransaction::DataUpdateTransaction(const boost::posix_time::ptime &obs
       obstime(obstime),
       stationid(stationid),
       typeid_(typeID),
-      priority(priority),
-      stationInfoList_(new kvalobs::kvStationInfoList()),
       data_(new kvalobs::serialize::KvalobsData()),
       ok_(new bool(false)),
       logid(logid),
@@ -119,8 +117,6 @@ DataUpdateTransaction::DataUpdateTransaction(const DataUpdateTransaction &dut)
       obstime(dut.obstime),
       stationid(dut.stationid),
       typeid_(dut.typeid_),
-      priority(dut.priority),
-      stationInfoList_(dut.stationInfoList_),
       data_(dut.data_),
       ok_(dut.ok_),
       logid(dut.logid),
@@ -132,11 +128,6 @@ DataUpdateTransaction::~DataUpdateTransaction() {
 }
 
 
-int DataUpdateTransaction::getPriority(dnmi::db::Connection *conection, int stationid, int typeid_, const boost::posix_time::ptime &obstime)
-{
-  return priority;
-}
-
 void DataUpdateTransaction::updateWorkQue(dnmi::db::Connection *con, long observationid, int pri) {
   ostringstream q;
 
@@ -146,178 +137,83 @@ void DataUpdateTransaction::updateWorkQue(dnmi::db::Connection *con, long observ
   con->exec(q.str());
 }
 
-void DataUpdateTransaction::addQuery(std::list<std::string> &qList, const std::string &query) {
-  for (std::list<std::string>::iterator it = qList.begin(); it != qList.end(); ++it) {
-    if (query == *it)
-      return;
-  }
 
-  qList.push_back(query);
-}
-
-void DataUpdateTransaction::addStationInfo(dnmi::db::Connection *con, long stationID, const boost::posix_time::ptime &obsTime, long typeID,
-                                           const boost::posix_time::ptime &tbTime) {
-  IkvStationInfoList it = stationInfoList_->begin();
-
-  for (; it != stationInfoList_->end(); it++) {
-    if (it->stationID() == stationID && it->obstime() == obsTime && it->typeID() == typeID) {
-      return;
-    }
-  }
-
+int DataUpdateTransaction::getPriority(dnmi::db::Connection *con, int stationid, int typeid_, const boost::posix_time::ptime &obstime)
+{
+  string buf;
   ostringstream q;
-  boost::posix_time::ptime undefTime;
 
-  q << "DELETE FROM workque WHERE stationid=" << stationID << " AND " << "typeid=" << typeID << " AND obstime='" << to_kvalobs_string(obsTime) << "'";
+  q << "(SELECT *  FROM priority WHERE stationid=" << stationid << " AND typeid=abs(" << typeid_ << ") "
+    << "UNION " 
+    << "SELECT *  FROM priority WHERE stationid=0 AND typeid=abs(" << typeid_ << ")) ORDER BY stationid DESC LIMIT 1";
+  
+  std::unique_ptr<dnmi::db::Result> res;
+  res.reset(con->execQuery(q.str()));
 
-  try {
-    con->exec(q.str());
-  } catch (const dnmi::db::SQLException &ex) {
-    log << "addStationInfo (delete from workque): '" << q.str() << "' \nSQLState: " << ex.errorCode() << "\nReason: " << ex.what() << endl;
-    throw;
-  } catch (const std::exception &ex) {
-    log << "addStationInfo: '" << q.str() << "' \nReason: " << ex.what() << endl;
-    throw;
-  } catch (...) {
-    log << "addStationInfo: '" << q.str() << "' \nReason: Unknown." << endl;
-    throw;
+  if (res->size() == 0 ) {
+    return 4;
   }
-
-  kvalobs::kvWorkelement workque(stationID, obsTime, typeID, tbTime, priority, undefTime, undefTime, undefTime, undefTime, undefTime);
-
-  q.str("");
-
-  q << "INSERT INTO " << workque.tableName() << " VALUES" << workque.toSend() << ";";
-
-  try {
-    con->exec(q.str());
-  } catch (const dnmi::db::SQLException &ex) {
-    log << "addStationInfo (add to workque): '" << q.str() << "' \nSQLState: " << ex.errorCode() << "\nReason: " << ex.what() << endl;
-    throw;
-  } catch (const std::exception &ex) {
-    log << "addStationInfo: '" << q.str() << "' \nReason: " << ex.what() << endl;
-    throw;
-  } catch (...) {
-    log << "addStationInfo: '" << q.str() << "' \nReason: Unknown." << endl;
-    throw;
-  }
-
-  stationInfoList_->push_back(kvalobs::kvStationInfo(stationID, obsTime, typeID));
-}
-
-bool DataUpdateTransaction::hasDataWithTbtime(dnmi::db::Connection *con, const boost::posix_time::ptime &tbtime) {
-  ostringstream q;
-  dnmi::db::Result *dbRes;
-
-//   q << "SELECT * FROM data WHERE stationid=" << stationid << " AND "
-//     << "typeid=" << typeid_ << " AND "
-//     << "tbtime='" << tbtime << "." << msec <<"'";
-
-  q << "SELECT * FROM data WHERE stationid=" << stationid << " AND " << "tbtime='" << to_kvalobs_string(tbtime) << "'";
-
-  auto_ptr<dnmi::db::Result> res;
-
-  try {
-    dbRes = con->execQuery(q.str());
-  } catch (const dnmi::db::SQLException &ex) {
-    log << "hasDataWithTbtime: '" << q.str() << "' \nSQLState: " << ex.errorCode() << "\nReason: " << ex.what() << endl;
-    throw;
-  } catch (const std::exception &ex) {
-    log << "hasDataWithTbtime: '" << q.str() << "' \nReason: " << ex.what() << "\n";
-    throw;
-  } catch (...) {
-    log << "hasDataWithTbtime: '" << q.str() << "' \nReason: Unknown \n";
-    throw;
-  }
-
-  if (!dbRes)
-    throw logic_error("EXCEPTION: hasDataWithTimestamp: dbRes, NULL pointer.");
-
-  res.reset(dbRes);
-
-  return res->size() != 0;
-}
-
-boost::posix_time::ptime DataUpdateTransaction::getTimestamp(dnmi::db::Connection *con) {
-  std::auto_ptr<dnmi::db::Result> res;
-  string q("SELECT now()");
-
-  try {
-    res.reset(con->execQuery(q));
-  } catch (const dnmi::db::SQLException &ex) {
-    log << "getTimestamp: '" << q << "' \nSQLState: " << ex.errorCode() << "\nReason: " << ex.what() << endl;
-    throw;
-  } catch (const std::exception &ex) {
-    log << "getTimestamp: '" << q << "' \nReason: " << ex.what() << "\n";
-    throw;
-  } catch (...) {
-    log << "getTimestamp: '" << q << "' \nReason: Unknown \n";
-    throw;
-  }
-
-  if (res.get() != 0 && res->hasNext()) {
+ 
+  while (res->hasNext()) {
     dnmi::db::DRow & row = res->next();
-    return boost::posix_time::time_from_string_nothrow(row[0]);
-  }
+    int priority = INT_MAX;
+    int priAfter = 10;
+    int hour=6;
+    list<string> names = row.getFieldNames();
+    list<string>::iterator it = names.begin();
+  
+    for (; it != names.end(); it++) {
+      try {
+        buf = row[*it];
 
-  return boost::posix_time::ptime();
-}
-
-boost::posix_time::ptime DataUpdateTransaction::getUniqTbtime(dnmi::db::Connection *con) {
-  boost::posix_time::ptime t;
-
-  for (int i = 0; i < 10000; ++i) {
-    if (t.is_not_a_date_time())
-      t = getTimestamp(con);
-
-    if (t.is_not_a_date_time()) {
-      continue;
+        if (*it == "priority" ) {
+          priority = atoi(buf.c_str());
+        } else  if (*it == "hour") {
+          hour = atoi(buf.c_str());
+        } else if (*it == "pri_after_hour") {
+          priAfter = atoi(buf.c_str());
+        } else if (*it == "stationid") {
+          continue;
+        } else if (*it == "typeid") {
+          continue;
+        } else {
+          CERR("DataUpdateTransaction::getPriority .. unknown entry:" << *it << std::endl);
+        }
+      } catch (...) {
+        CERR("DataUpdateTransaction::getPriority: unexpected exception ..... \n");
+      }
     }
 
-    if (hasDataWithTbtime(con, t)) {
-      t += boost::posix_time::microseconds(1);
-      continue;
+    if( priority == INT_MAX ) {
+      CERR("DataUpdateTransaction::getPriority: no priority def, returning default 4 \n");
+      return 4;
     }
 
-    return t;
+    auto now = pt::second_clock::universal_time();
+    auto testTime = now-pt::hours(hour);
+
+    if( obstime<testTime)
+      return priAfter;
+    else
+      return priority;
   }
 
-  return boost::posix_time::microsec_clock::universal_time();
-}
-
-void DataUpdateTransaction::setTbtime(dnmi::db::Connection *conection) {
-  boost::posix_time::ptime tbtime;
-
-  tbtime = getUniqTbtime(conection);
-
-  for (list<kvalobs::kvData>::iterator nit = newData->begin(); nit != newData->end(); ++nit) {
-    nit->tbtime(tbtime);
-  }
-
-  for (list<kvalobs::kvTextData>::iterator nit = newTextData->begin(); nit != newTextData->end(); ++nit) {
-    nit->tbtime(tbtime);
-  }
+  return 4;
 }
 
 
-bool DataUpdateTransaction::isEqual(const std::list<kvalobs::kvData> &oldData_, const std::list<kvalobs::kvTextData> &oldTextData) {
-  list<kvalobs::kvData> oldData(oldData_);
 
-  for (list<kvalobs::kvData>::iterator it = oldData.begin(); it != oldData.end(); ++it) {
-    if (it->original() == -32767)
-      it = oldData.erase(it);
-  }
+bool DataUpdateTransaction::doIsEqual(const std::list<kvalobs::kvData> &oldData, const std::list<kvalobs::kvTextData> &oldTextData, bool replace) {
+  bool found=false;
 
-  if (!onlyAddOrUpdateData) {
-    if (oldData.size() != newData->size() || oldTextData.size() != newTextData->size()) {
+  if( replace ) {
+    if ( newData->size() != oldData.size() || newTextData->size() != oldTextData.size()) {
       log << "isEqual: size differ: " << oldData.size() << " (" << newData->size() << ") " << "- " << oldTextData.size() << " (" << newTextData->size()
           << ")\n";
 
       return false;
     }
   }
-
-  bool found;
 
   for (list<kvalobs::kvData>::const_iterator nit = newData->begin(); nit != newData->end(); ++nit) {
     found = false;
@@ -353,453 +249,28 @@ bool DataUpdateTransaction::isEqual(const std::list<kvalobs::kvData> &oldData_, 
       return false;
   }
 
-  return true;
+  return found;
 }
 
-bool DataUpdateTransaction::getDataWithTbtime(dnmi::db::Connection *con, int stationid, int typeid_, const std::string &tbtime, list<kvalobs::kvData> &data,
-                                              list<kvalobs::kvTextData> &textData) {
-  ostringstream q;
-  dnmi::db::Result *dbRes;
 
-  data.clear();
-  textData.clear();
-
-//   q << "SELECT * FROM data WHERE stationid=" << stationid << " AND "
-//     << "typeid=" << typeid_ << " AND "
-//     << "tbtime='" << tbtime << "' AND original<>-32767";
-
-//   q << "SELECT * FROM data WHERE stationid=" << stationid << " AND "
-//     << "tbtime='" << tbtime << "' AND original<>-32767";
-  q << "SELECT * FROM data WHERE stationid=" << stationid << " AND " << "tbtime='" << tbtime << "'";
-
-  auto_ptr<dnmi::db::Result> res;
-
-  try {
-    dbRes = con->execQuery(q.str());
-  } catch (const dnmi::db::SQLException &ex) {
-    log << "getDataWithTbtime: '" << q.str() << "' \nSQLState: " << ex.errorCode() << "\nReason: " << ex.what() << endl;
-    throw;
-  } catch (const std::exception &ex) {
-    log << "getDataWithTbtime: '" << q.str() << "' \nReason: " << ex.what() << "\n";
-    throw;
-  } catch (...) {
-    log << "getDataWithTbtime: '" << q.str() << "' \nReason: Unknown \n";
-    throw;
+bool DataUpdateTransaction::isEqual(const std::list<kvalobs::kvData> &oldData_, const std::list<kvalobs::kvTextData> &oldTextData) {
+  //if onlyAddOrUpdateData is false, the oldadata is to be replaced by the new data.
+  //If true the new data is to be addded to the data that is alleady in the databse.
+  if( doIsEqual(oldData_, oldTextData, !onlyAddOrUpdateData) ) {
+    return true;
   }
 
-  if (!dbRes)
-    return false;
-
-  res.reset(dbRes);
-
-  while (res->hasNext()) {
-    dnmi::db::DRow & row = res->next();
-    data.push_back(kvalobs::kvData(row));
-  }
-
-  q.str("");
-//   q << "SELECT * FROM text_data WHERE stationid=" << stationid << " AND "
-//     << "typeid=" << typeid_ << " AND "
-//     << "tbtime='" << tbtime << "'";
-
-  q << "SELECT * FROM text_data WHERE stationid=" << stationid << " AND " << "tbtime='" << tbtime << "'";
-
-  try {
-    dbRes = con->execQuery(q.str());
-  } catch (const dnmi::db::SQLException &ex) {
-    log << "getDataWithTbtime: '" << q.str() << "' \nSQLState: " << ex.errorCode() << "\nReason: " << ex.what() << endl;
-    throw;
-  } catch (const std::exception &ex) {
-    log << "getDataWithTbtime: '" << q.str() << "' \nReason: " << ex.what() << "\n";
-    throw;
-  } catch (...) {
-    log << "getDataWithTbtime: '" << q.str() << "' \nReason: Unknown \n";
-    throw;
-  }
-
-  if (!dbRes)
-    return false;
-
-  res.reset(dbRes);
-
-  while (res->hasNext()) {
-    dnmi::db::DRow & row = res->next();
-    textData.push_back(kvalobs::kvTextData(row));
-  }
-
-  return true;
-}
-
-bool DataUpdateTransaction::getData(dnmi::db::Connection *con, int stationid, int typeid_, const boost::posix_time::ptime &obstime, list<kvalobs::kvData> &data,
-                                    list<kvalobs::kvTextData> &textData) {
-  ostringstream q;
-  dnmi::db::Result *dbRes;
-
-  data.clear();
-  textData.clear();
-
-  /*
-   q << "SELECT * FROM data WHERE stationid=" << stationid << " AND "
-   << "typeid=" << typeid_ << " AND "
-   << "obstime='" << obstime << "' AND original<>-32767";
-   */
-
-  q << "SELECT * FROM data WHERE stationid=" << stationid << " AND " << "typeid=" << typeid_ << " AND " << "obstime='" << to_kvalobs_string(obstime) << "'";
-
-  auto_ptr<dnmi::db::Result> res;
-
-  try {
-    dbRes = con->execQuery(q.str());
-  } catch (const dnmi::db::SQLException &ex) {
-    log << "getData: '" << q.str() << "' \nSQLState: " << ex.errorCode() << "\nReason: " << ex.what() << endl;
-    throw;
-  } catch (const std::exception &ex) {
-    log << "getData: '" << q.str() << "' \nReason: " << ex.what() << "\n";
-    throw;
-  } catch (...) {
-    log << "getData: '" << q.str() << "' \nReason: Unknown \n";
-    throw;
-  }
-
-  if (!dbRes)
-    return false;
-
-  res.reset(dbRes);
-
-  std::string myTbtime;
-  bool eqTbtime = true;
-
-  while (res->hasNext()) {
-    dnmi::db::DRow & row = res->next();
-    data.push_back(kvalobs::kvData(row));
-
-    if (myTbtime.empty())
-      myTbtime = row["tbtime"];
-    else if (myTbtime != row["tbtime"])
-      eqTbtime = false;
-  }
-
-  if (eqTbtime && !myTbtime.empty()) {
-    log << "getData: all data has the same tbtime '" << myTbtime << "' as expected.\n";
-    return getDataWithTbtime(con, stationid, typeid_, myTbtime, data, textData);
-  }
-
-  q.str("");
-  q << "SELECT * FROM text_data WHERE stationid=" << stationid << " AND " << "typeid=" << typeid_ << " AND " << "obstime='" << to_kvalobs_string(obstime)
-    << "'";
-
-  try {
-    dbRes = con->execQuery(q.str());
-  } catch (const dnmi::db::SQLException &ex) {
-    log << "getData: '" << q.str() << "' \nSQLState: " << ex.errorCode() << "\nReason: " << ex.what() << endl;
-    throw;
-  } catch (const std::exception &ex) {
-    log << "getData: '" << q.str() << "' \nReason: " << ex.what() << "\n";
-    throw;
-  } catch (...) {
-    log << "getData: '" << q.str() << "' \nReason: Unknown \n";
-    throw;
-  }
-
-  if (!dbRes)
-    return false;
-
-  res.reset(dbRes);
-
-  while (res->hasNext()) {
-    dnmi::db::DRow & row = res->next();
-    textData.push_back(kvalobs::kvTextData(row));
-  }
-
-  return true;
-}
-
-void DataUpdateTransaction::insert(dnmi::db::Connection *conection, const kvalobs::kvDbBase &elem, const std::string &tblName) {
-  ostringstream ost;
-
-  ost << "INSERT INTO " << tblName << " VALUES" << elem.toSend() << ";";
-
-  try {
-    conection->exec(ost.str());
-  } catch (const dnmi::db::SQLException &ex) {
-    log << "insert: '" << ost.str() << "' \nSQLState: " << ex.errorCode() << "\nReason: " << ex.what() << endl;
-    throw;
-  } catch (const std::exception &ex) {
-    log << "insert: '" << ost.str() << "' \nReason: " << ex.what() << "\n";
-    throw;
-  } catch (...) {
-    log << "insert: '" << ost.str() << "' \nReason: Unknown \n";
-    throw;
-  }
-}
-
-void DataUpdateTransaction::insertData(dnmi::db::Connection *conection, const std::list<kvalobs::kvData> &data,
-                                       const std::list<kvalobs::kvTextData> &textData) {
-  boost::posix_time::ptime tbtime(boost::posix_time::microsec_clock::universal_time());
-
-  for (list<kvalobs::kvData>::const_iterator nit = data.begin(); nit != data.end(); ++nit) {
-    insert(conection, *nit, "data");
-    addStationInfo(conection, nit->stationID(), nit->obstime(), nit->typeID(), tbtime);
-    data_->insert(*nit);
-  }
-
-  for (list<kvalobs::kvTextData>::const_iterator nit = textData.begin(); nit != textData.end(); ++nit) {
-    insert(conection, *nit, "text_data");
-    addStationInfo(conection, nit->stationID(), nit->obstime(), nit->typeID(), tbtime);
-    data_->insert(*nit);
-  }
-}
-
-bool DataUpdateTransaction::addDataToList(const kvalobs::kvData &data, std::list<kvalobs::kvData> &dataList, bool replaceOnly) {
-  for (std::list<kvalobs::kvData>::iterator it = dataList.begin(); it != dataList.end(); ++it) {
-    if (data.obstime() == it->obstime() && data.stationID() == it->stationID() && data.typeID() == it->typeID() && data.paramID() == it->paramID()
-        && data.sensor() == it->sensor() && data.level() == it->level()) {
-      if (replaceOnly) {
-        *it = data;
-        return true;
-      } else {
-        return false;
-      }
-    }
-  }
-
-  if (replaceOnly)
-    return false;
-
-  dataList.push_back(data);
-  return true;
-}
-
-bool DataUpdateTransaction::addTextDataToList(const kvalobs::kvTextData &data, std::list<kvalobs::kvTextData> &dataList, bool replaceOnly) {
-  for (std::list<kvalobs::kvTextData>::iterator it = dataList.begin(); it != dataList.end(); ++it) {
-    if (data.obstime() == it->obstime() && data.stationID() == it->stationID() && data.typeID() == it->typeID() && data.paramID() == it->paramID()) {
-      if (replaceOnly) {
-        *it = data;
-        return true;
-      } else {
-        return false;
-      }
-    }
-  }
-  if (replaceOnly)
-    return false;
-
-  dataList.push_back(data);
-  return true;
-}
-
-void DataUpdateTransaction::getData(dnmi::db::Connection *conection, const std::list<std::string> &query, std::list<kvalobs::kvData> &data) {
-  namespace db = dnmi::db;
-  string q;
-  data.clear();
-  auto_ptr<db::Result> res;
-
-  log << "getData: # of queries: " << query.size() << endl;
-  for (list<string>::const_iterator it = query.begin(); it != query.end(); ++it)
-    log << "\n  '" << *it << "'";
-  log << endl;
-
-  try {
-    for (std::list<std::string>::const_iterator it = query.begin(); it != query.end(); ++it) {
-      q = *it;
-      db::Result *dbRes = conection->execQuery(*it);
-
-      if (!dbRes)
-        continue;
-
-      res.reset(dbRes);
-
-      while (res->hasNext()) {
-        dnmi::db::DRow & row = res->next();
-        addDataToList(kvalobs::kvData(row), data);
-      }
-    }
-  } catch (const dnmi::db::SQLException &ex) {
-    log << "getData: '" << q << "' \nSQLState: " << ex.errorCode() << "\nReason: " << ex.what() << endl;
-    throw;
-  } catch (const std::exception &ex) {
-    log << "getData: '" << q << "' \nReason: " << ex.what() << "\n";
-    throw;
-  } catch (...) {
-    log << "getData: '" << q << "' \nReason: Unknown \n";
-    throw;
-  }
-}
-
-void DataUpdateTransaction::getTextData(dnmi::db::Connection *conection, const std::list<std::string> &query, std::list<kvalobs::kvTextData> &data) {
-  namespace db = dnmi::db;
-  string q;
-  data.clear();
-  auto_ptr<db::Result> res;
-
-  log << "getTextData: # of queries: " << query.size() << endl;
-  for (list<string>::const_iterator it = query.begin(); it != query.end(); ++it)
-    log << "\n  '" << *it << "'";
-  log << endl;
-
-  try {
-    for (std::list<std::string>::const_iterator it = query.begin(); it != query.end(); ++it) {
-      q = *it;
-      db::Result *dbRes = conection->execQuery(*it);
-
-      if (!dbRes)
-        continue;
-
-      res.reset(dbRes);
-
-      while (res->hasNext()) {
-        dnmi::db::DRow & row = res->next();
-        addTextDataToList(kvalobs::kvTextData(row), data);
-      }
-    }
-  } catch (const dnmi::db::SQLException &ex) {
-    log << "getTextData: '" << q << "' \nSQLState: " << ex.errorCode() << "\nReason: " << ex.what() << endl;
-    throw;
-  } catch (const std::exception &ex) {
-    log << "getTextData: '" << q << "' \nReason: " << ex.what() << "\n";
-    throw;
-  } catch (...) {
-    log << "getTextData: '" << q << "' \nReason: Unknown \n";
-    throw;
-  }
-}
-
-void DataUpdateTransaction::replaceData(dnmi::db::Connection *conection, const std::list<kvalobs::kvData> &dataList,
-                                        const std::list<kvalobs::kvTextData> &textDataList) {
-  list<string> qDataList;
-  list<string> qTextDataList;
-  list<kvalobs::kvData> oldData;
-  list<kvalobs::kvTextData> oldTextData;
-  list<kvalobs::kvData> myNewData;
-  list<kvalobs::kvTextData> myNewTextData;
-  ostringstream q;
-  boost::posix_time::ptime tbtime;
-  bool onlyMissing = true;
-
-  for (list<kvalobs::kvData>::const_iterator it = dataList.begin(); it != dataList.end(); ++it) {
-    if (it->original() != -32767) {
-      onlyMissing = false;
-      break;
-    }
-  }
-
-  if (onlyMissing && !dataList.empty()) {
-    tbtime = dataList.begin()->tbtime();
-  } else if (!dataList.empty()) {
-    for (list<kvalobs::kvData>::const_iterator it = dataList.begin(); it != dataList.end(); ++it) {
-      if (it->original() != -32767) {
-        tbtime = it->tbtime();
-        break;
-      }
-    }
-  }
-
-  if (tbtime.is_not_a_date_time() && !textDataList.empty())
-    tbtime = textDataList.begin()->tbtime();
-
-  if (tbtime.is_not_a_date_time()) {
-    insertData(conection, *newData, *newTextData);
-    return;
-  }
-
-  for (std::list<kvalobs::kvData>::const_iterator it = dataList.begin(); it != dataList.end(); ++it) {
-    q.str("");
-    tbtime = it->tbtime();
-    q << "SELECT * FROM data WHERE stationid=" << it->stationID() << " AND abs(typeid)=" << it->typeID() << " AND (obstime='" << to_kvalobs_string(obstime)
-      << "' OR tbtime='" << to_kvalobs_string(tbtime) << "')";
-
-    addQuery(qDataList, q.str());
-  }
-
-  for (std::list<kvalobs::kvTextData>::const_iterator it = textDataList.begin(); it != textDataList.end(); ++it) {
-    q.str("");
-    tbtime = it->tbtime();
-    q << "SELECT * FROM text_data WHERE stationid=" << it->stationID() << " AND abs(typeid)=" << it->typeID() << " AND (obstime='" << to_kvalobs_string(obstime)
-      << "' OR tbtime='" << to_kvalobs_string(tbtime) << "')";
-
-    addQuery(qTextDataList, q.str());
-  }
-
-  getData(conection, qDataList, oldData);
-  getTextData(conection, qTextDataList, oldTextData);
-
-  // Mark the oldData as deleted
-  kvControlInfo cinfo;
+  //Remove missing values from the old data and test again for equality  
+  list<kvalobs::kvData> oldData(oldData_);
 
   for (list<kvalobs::kvData>::iterator it = oldData.begin(); it != oldData.end(); ++it) {
-    cinfo = it->controlinfo();
-    int fmis = cinfo.MissingFlag();
-
-    // Do not mark missing and negative typeids as deleted in the
-    // new message.
-    if ((fmis != 0 && fmis != 2 && fmis != 4) || (it->typeID() < 0)) {
-      continue;
-    }
-
-    it->corrected(-32766);
-
-    cinfo.setControlFlag(kvQCFlagTypes::f_fpre, 7);
-    cinfo.setControlFlag(kvQCFlagTypes::f_fmis, 2);
-
-    it->controlinfo(cinfo);
+    if (it->original() == -32767)
+      it = oldData.erase(it);
   }
 
-  // Mark the oldtextData as deleted
-  for (list<kvalobs::kvTextData>::iterator it = oldTextData.begin(); it != oldTextData.end(); ++it) {
-    it->tbtime(it->tbtime());
-    it->set(it->stationID(), it->obstime(), "", it->paramID(), it->tbtime(), it->typeID());
-  }
-
-  // We prepare the data in oldData for update and myNewData for insert.
-  for (list<kvalobs::kvData>::iterator it = newData->begin(); it != newData->end(); ++it) {
-    if (!addDataToList(*it, oldData, true))
-      myNewData.push_back(*it);
-  }
-
-  for (list<kvalobs::kvTextData>::iterator it = newTextData->begin(); it != newTextData->end(); ++it) {
-    if (!addTextDataToList(*it, oldTextData, true))
-      myNewTextData.push_back(*it);
-  }
-
-  insertData(conection, myNewData, myNewTextData);
-  update(conection, oldData, oldTextData);
+  return doIsEqual(oldData, oldTextData, !onlyAddOrUpdateData);
 }
 
-void DataUpdateTransaction::update(dnmi::db::Connection *connection, const std::list<kvalobs::kvData> &data, const std::list<kvalobs::kvTextData> &textData) {
-  ostringstream ost;
-  boost::posix_time::ptime tbtime;
-
-  if (!data.empty())
-    tbtime = data.begin()->tbtime();
-  else if (!textData.empty())
-    tbtime = textData.begin()->tbtime();
-
-  for (std::list<kvalobs::kvData>::const_iterator it = data.begin(); it != data.end(); ++it) {
-    ost.str("");
-
-    ost << "UPDATE data SET " << "  corrected=" << it->corrected() << ", original=" << it->original() << ", controlinfo='" << it->controlinfo().flagstring()
-        << "'" << ", useinfo='" << it->useinfo().flagstring() << "'" << ", cfailed='" << it->cfailed() << "'" << ", tbtime='" << to_kvalobs_string(it->tbtime())
-        << "'" << " WHERE stationid=" << it->stationID() << " AND " << "       obstime='" << to_kvalobs_string(it->obstime()) << "' AND " << "       paramid="
-        << it->paramID() << " AND " << "       typeid=" << it->typeID() << " AND " << "       sensor='" << it->sensor() << "' AND " << "       level="
-        << it->level();
-
-    connection->exec(ost.str());
-    addStationInfo(connection, it->stationID(), it->obstime(), it->typeID(), tbtime);
-    data_->insert(*it);
-  }
-
-  for (std::list<kvalobs::kvTextData>::const_iterator it = textData.begin(); it != textData.end(); ++it) {
-    ost.str("");
-
-    ost << "UPDATE text_data SET " << "  original='" << it->original() << "'" << ", tbtime='" << to_kvalobs_string(it->tbtime()) << "'" << " WHERE stationid="
-        << it->stationID() << " AND " << "       obstime='" << to_kvalobs_string(it->obstime()) << "' AND " << "       paramid=" << it->paramID() << " AND "
-        << "       typeid=" << it->typeID();
-
-    connection->exec(ost.str());
-    addStationInfo(connection, it->stationID(), it->obstime(), it->typeID(), tbtime);
-    data_->insert(*it);
-  }
-}
 
 bool DataUpdateTransaction::updateObservation(dnmi::db::Connection *conection, Observation *obs) {
   list<kvalobs::kvData> toUpdateData(*newData);
@@ -850,50 +321,8 @@ bool DataUpdateTransaction::replaceObservation(dnmi::db::Connection *conection, 
 }
 
 
-bool DataUpdateTransaction::doInsertOrUpdate(dnmi::db::Connection *conection, list<kvalobs::kvData> &oldData, list<kvalobs::kvTextData> &oldTextData) {
-  list<kvalobs::kvData> toUpdateData;
-  list<kvalobs::kvTextData> toUpdateTextData;
-  list<kvalobs::kvData> toInsertData;
-  list<kvalobs::kvTextData> toInsertTextData;
-  list<kvalobs::kvData>::const_iterator itData;
-  list<kvalobs::kvTextData>::const_iterator itTextData;
-
-  boost::posix_time::ptime tbtime(boost::posix_time::microsec_clock::universal_time());
-
-  for (list<kvalobs::kvData>::iterator it = newData->begin(); it != newData->end(); ++it) {
-    it->tbtime(tbtime);
-
-    itData = findElem(*it, oldData);
-    if (itData != oldData.end()) {
-      if (!isKvDataEqual(*itData, *it))
-        toUpdateData.push_back(*it);
-    } else {
-      toInsertData.push_back(*it);
-    }
-  }
-
-  for (list<kvalobs::kvTextData>::iterator it = oldTextData.begin(); it != oldTextData.end(); ++it) {
-    it->tbtime(tbtime);
-
-    itTextData = findElem(*it, oldTextData);
-    if (itTextData != oldTextData.end()) {
-      if (!isKvTextDataEqual(*itTextData, *it))
-        toUpdateTextData.push_back(*it);
-    } else {
-      toInsertTextData.push_back(*it);
-    }
-  }
-
-  update(conection, toUpdateData, toUpdateTextData);
-  insertData(conection, toInsertData, toInsertTextData);
-
-  return true;
-}
-
 bool DataUpdateTransaction::operator()(dnmi::db::Connection *conection) {
   ostringstream mylog;
-  //list<kvalobs::kvData> dataList;
-  //list<kvalobs::kvTextData> textDataList;
   boost::posix_time::ptime tbtime;
 
   if (obstime.is_not_a_date_time()) {
@@ -929,7 +358,6 @@ bool DataUpdateTransaction::operator()(dnmi::db::Connection *conection) {
         << pt::to_kvalobs_string(obstime) << endl << mylog.str() << endl;
   }
 
-  stationInfoList_->clear();
   std::unique_ptr<Observation> oldObs(Observation::getFromDb(conection, stationid, typeid_, obstime, false));
   
   if (!oldObs) { //No observation exist
@@ -984,19 +412,7 @@ bool DataUpdateTransaction::operator()(dnmi::db::Connection *conection) {
 void DataUpdateTransaction::onSuccess() {
   ostringstream mylog;
   string prefix(insertType.length(), ' ');
-  IkvStationInfoList it = stationInfoList_->begin();
-
-  if (it != stationInfoList_->end()) {
-    mylog << insertType << ": stationid: " << it->stationID() << " typeid: " << it->typeID() << " obstime: " << pt::to_kvalobs_string(it->obstime());
-    ++it;
-  } else {
-    mylog << insertType << ": stationid: " << stationid << " typeid: " << typeid_ << " obstime: " << pt::to_kvalobs_string(obstime);
-  }
-
-  for (; it != stationInfoList_->end(); it++) {
-    mylog << "\n" << prefix << "  stationid: " << it->stationID() << " typeid: " << it->typeID() << " obstime: " << pt::to_kvalobs_string(it->obstime());
-  }
-
+  mylog << insertType << ": stationid: " << stationid << " typeid: " << typeid_ << " obstime: " << pt::to_kvalobs_string(obstime);
   IDLOGINFO(logid, log.str());
   IDLOGINFO("transaction", mylog.str());
   *ok_ = true;
@@ -1012,7 +428,6 @@ void DataUpdateTransaction::onRetry() {
       "retry",
       "RETRY: " << nRetry << " stationid: " << stationid << " Typeid: " << typeid_ << " obstime: " << pt::to_kvalobs_string(obstime) << "\nMessage: " << log.str());
   log.str("");
-  stationInfoList_->clear();
   data_->clear();
 }
 

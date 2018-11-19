@@ -31,6 +31,7 @@
 #include "kv2kvDecoder.h"
 #include <decodeutility/kvDataFormatter.h>
 #include <decodeutility/kvalobsdataparser.h>
+#include <decodeutility/KvDataContainer.h>
 #include <kvalobs/kvexception.h>
 #include <kvalobs/kvDataOperations.h>
 #include <kvalobs/kvQueries.h>
@@ -52,6 +53,9 @@ using namespace std;
 using namespace kvalobs::decoder;
 using namespace kvalobs::serialize;
 using namespace decodeutility::kvdataformatter;
+using decodeutility::KvDataContainer;
+
+namespace pt=boost::posix_time;
 
 namespace kvalobs {
 
@@ -68,7 +72,6 @@ kv2kvDecoder::kv2kvDecoder(dnmi::db::Connection & con, const ParamList & params,
                            int decoderId)
     : DecoderBase(con, params, typeList, obsType, obs, decoderId),
       dbGate(&con),
-      priority_(5),
       tbtime(boost::posix_time::microsec_clock::universal_time()) {
   milog::LogContext lcontext(name());
   LOGDEBUG("kv2kvDecoder object created");
@@ -97,21 +100,16 @@ DecoderBase::DecodeResult kv2kvDecoder::execute(std::string & msg) {
   }
 
   try {
-    // Transactions may not be used here - the underlying system uses them.
-    //     getConnection()->beginTransaction();
     list<kvData> dl;
     verifyAndAdapt(data, dl);
     list<kvTextData> tdl;
     data.getData(tdl, tbtime);
-    save(dl, tdl);
+    save2(dl, tdl);
 
     KvalobsData::RejectList rejectedFixes;
     data.getRejectedCorrections(rejectedFixes);
     markAsFixed(rejectedFixes);
-
-    //     getConnection()->endTransaction();
   } catch (DecoderError & e) {
-    //     getConnection()->rollBack();
     parseMessage_ = e.what();
     parseResult_ = e.res;
     saveInRejectDecode();
@@ -165,8 +163,74 @@ void kv2kvDecoder::verifyAndAdapt(KvalobsData & data, list<kvData> & out) {
   }
 }
 
+void kv2kvDecoder::save2(const list<kvData> & dl_, const list<kvTextData> & tdl_) 
+{
+  KvDataContainer container(dl_, tdl_);
+  KvDataContainer::DataByObstime data;
+  KvDataContainer::TextDataByObstime textData;
+  KvDataContainer::TextDataByObstime::iterator tid;
+  KvDataContainer::TextDataList td;
+
+  KvDataContainer::StationInfoList infl=container.stationInfos();
+
+  for( auto &sinf : container.stationInfos()) {
+    IdlogHelper idLog(sinf.stationId, sinf.typeId, this);
+    string logid( idLog.logid() );
+
+    IDLOGINFO(logid, obs);
+    if (container.get(
+          data, textData, sinf.stationId, sinf.typeId,
+          pt::second_clock::universal_time()) < 0) {
+       continue;               
+    }
+
+    for (KvDataContainer::DataByObstime::iterator it = data.begin();
+      it != data.end(); ++it) {
+      td.clear();
+      tid = textData.find(it->first);
+
+      if (tid != textData.end()) {
+        td = tid->second;
+        textData.erase(tid);
+      }
+
+      if (!addDataToDb(to_miTime(it->first), sinf.stationId, sinf.typeId, it->second, td,
+             logid, false)) {
+        ostringstream ost;
+
+        ost << "DBERROR: stationid: " << sinf.stationId << " typeid: " << sinf.typeId
+            << " obstime: " << it->first;
+        LOGERROR(ost.str());
+        IDLOGERROR(logid, ost.str());
+        throw(DecoderError(decoder::DecoderBase::Error, ost.str()));
+      }
+    }
+
+    //Is there any left over text data.
+    if (!textData.empty()) {
+      KvDataContainer::DataList dl;
+      for (KvDataContainer::TextDataByObstime::iterator it = textData.begin();
+          it != textData.end(); ++it) {
+        if (!addDataToDb(to_miTime(it->first), sinf.stationId, sinf.typeId, dl, it->second,
+                       logid, false)) {
+          ostringstream ost;
+          ost << "DBERROR: TextData: stationid: " << sinf.stationId << " typeid: "
+              << sinf.typeId << " obstime: " << it->first;
+          LOGERROR(ost.str());
+          IDLOGERROR(logid, ost.str());
+          throw(DecoderError(decoder::DecoderBase::Error, ost.str()));
+        }
+      }
+    }
+  }
+}
+
+
+
+
 void kv2kvDecoder::save(const list<kvData> & dl, const list<kvTextData> & tdl) {
   // kvTextData:
+  int priority_ = 5;
   if (not tdl.empty()) {
     if (!putkvTextDataInDb(tdl, priority_)) {
       for (TDList::const_iterator it = tdl.begin(); it != tdl.end(); ++it) {
@@ -356,8 +420,8 @@ void kv2kvDecoder::verify(const kvData & d, kvDataPtr dbData) const {
 void kv2kvDecoder::adapt(kvData & d, kvDataPtr dbData, bool overwrite) const {
   milog::LogContext lcontext("adapt");
 
-  LOGDEBUG("dbData.get():\t" << dbData.get());
-  LOGDEBUG("overwrite:\t" << overwrite);
+  LOGDEBUG("dbData.get():\t" << *dbData.get());
+  LOGDEBUG("overwrite:\t" << (overwrite?"true":"false"));
 
   if (dbData.get() and not overwrite)
     d.set(d.stationID(), d.obstime(), dbData->original(), d.paramID(),

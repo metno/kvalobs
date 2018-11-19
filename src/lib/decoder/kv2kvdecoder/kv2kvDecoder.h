@@ -67,6 +67,7 @@ class kv2kvDecoder : public DecoderBase, public boost::noncopyable {
   void parse(serialize::KvalobsData & data, const std::string & obs) const;
   void verifyAndAdapt(serialize::KvalobsData & data,
                       std::list<kvalobs::kvData> & out);
+  void save2(const std::list<kvalobs::kvData> & dl, const std::list<kvalobs::kvTextData> & tdl);
   //     void save( const serialize::KvalobsData & data );
   void save(const std::list<kvalobs::kvData> & dl,
             const std::list<kvalobs::kvTextData> & tdl);
@@ -96,7 +97,6 @@ class kv2kvDecoder : public DecoderBase, public boost::noncopyable {
   serialize::KvalobsData data;
   DecodeResult parseResult_;
   std::string parseMessage_;
-  int priority_;
   const boost::posix_time::ptime tbtime;
 };
 
