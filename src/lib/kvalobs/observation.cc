@@ -49,6 +49,15 @@ namespace {
       return "'"+pt::to_kvalobs_string(t)+"'::timestamp";
   }
 
+  string Q(const std::string &s) {
+    if ( s.length() >= 2) {
+      if ( s[0]=='\'' && s[s.length()-1]=='\'')
+        return s;
+    }
+
+    return '\''+s+'\'';
+  }
+
 }
 
 
@@ -410,7 +419,7 @@ void Observation::insertIntoDb(dnmi::db::Connection *con, bool useTransaction)
       q << "INSERT INTO obsdata (observationid,obs_offset,original,paramid,sensor,level,corrected,controlinfo,useinfo,cfailed) VALUES("
         << observationid_ << ","<< dbTime(d.obstime(),true) << "-" << dbTime(obstime_,true) <<"," << d.original() << ","
         << d.paramID() << "," << d.sensor() << "," <<d.level() << "," << d.corrected() <<"," 
-        << d.controlinfo().flagstring() <<","<< d.useinfo().flagstring() << "," << "'" << d.cfailed() << "');\n";
+        << Q(d.controlinfo().flagstring()) <<","<< Q(d.useinfo().flagstring()) << "," << Q(d.cfailed()) << ");\n";
     }
 
     for(auto &d : textData_) {

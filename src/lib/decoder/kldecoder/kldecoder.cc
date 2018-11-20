@@ -417,16 +417,30 @@ kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecod
         textData.erase(tid);
       }
 
-      if (!addDataToDb(to_miTime(it->first), stationid, typeId, it->second, td,
+      try {
+        if (!addDataToDbThrow(to_miTime(it->first), stationid, typeId, it->second, td,
              logid, getOnlyInsertOrUpdate())) {
+          ostringstream ost;
+          ost << "ERROR: stationid: " << stationid << " typeid: " << typeId
+              << " obstime: " << it->first << ". Inconsistens in the data!";
+          LOGERROR(ost.str());
+          IDLOGERROR(logid, ost.str());
+          msgToSender += "\n" + ost.str();
+          return Rejected;
+        }
+      }
+      catch( const SQLException &e) {
         ostringstream ost;
-
-        ost << "DBERROR: stationid: " << stationid << " typeid: " << typeId
-            << " obstime: " << it->first;
+        ost << "ERROR: stationid: " << stationid << " typeid: " << typeId
+            << " obstime: " << it->first << ". DB" << e.what();
         LOGERROR(ost.str());
-        IDLOGERROR(logid, ost.str());
+        IDLOGERROR(logid, ost.str() << ". SQLSTATE: '" << e.errorCode() << "' mayRecover: " << (e.mayRecover()?"true":"false") <<"." );
         msgToSender += "\n" + ost.str();
-        return NotSaved;
+        if ( !e.mayRecover() ) {
+          return Rejected;
+        } else {
+          return NotSaved;
+        }
       }
 
       observations[it->first] += it->second.size();

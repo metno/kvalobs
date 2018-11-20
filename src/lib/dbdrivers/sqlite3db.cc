@@ -550,11 +550,17 @@ void dnmi::db::drivers::SQLitePimpel::perform(dnmi::db::Connection *con_, dnmi::
   dnmi::db::Transaction &t(transaction);
   std::string lastError;
   con = static_cast<SQLiteConnection*>(con_);
+  std::string errorCode;
+  bool mayRecover;
+
 
   if (retry <= 0)
     retry = 1;
 
+
   while (retry > 0) {
+    errorCode.erase();
+    mayRecover=true;
     try {
       beginTransaction(isolation);
     } catch (...) {
@@ -570,7 +576,8 @@ void dnmi::db::drivers::SQLitePimpel::perform(dnmi::db::Connection *con_, dnmi::
         return;
       } else {
         t.onFailure();
-        retry--;
+        con->rollBack();
+        return;
       }
     } catch (const SQLAborted &e) {
       retry--;
@@ -578,7 +585,14 @@ void dnmi::db::drivers::SQLitePimpel::perform(dnmi::db::Connection *con_, dnmi::
       t.onAbort(con->getDriverId(), lastError, e.errorCode());
     } catch (const SQLBusy &e) {
       continue;
-    } catch (const SQLException &e) {
+    } 
+    catch (const SQLUnrecoverable &e) {
+      //Not implemented for Sqlite at the moment
+      lastError = e.what();
+      mayRecover=false;
+      errorCode=e.errorCode();
+      retry=0;
+    }catch (const SQLException &e) {
       retry--;
       istringstream is(e.errorCode());
       int i;
@@ -593,6 +607,8 @@ void dnmi::db::drivers::SQLitePimpel::perform(dnmi::db::Connection *con_, dnmi::
         }
         t.onAbort(con->getDriverId(), e.what(), e.errorCode());
         break;
+      } else if ( !e.mayRecover() ) {
+        retry=0;
       }
     } catch (const std::exception &e) {
       lastError = e.what();
@@ -610,7 +626,7 @@ void dnmi::db::drivers::SQLitePimpel::perform(dnmi::db::Connection *con_, dnmi::
     t.onRetry();
   }
 
-  transaction.onMaxRetry(lastError);
+  transaction.onMaxRetry(lastError, errorCode, mayRecover);
 }
 
 namespace {

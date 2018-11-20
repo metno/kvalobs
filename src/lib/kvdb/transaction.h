@@ -37,7 +37,8 @@ namespace db {
 class Connection;
 
 class Transaction {
- public:
+public:
+  
   virtual ~Transaction();
 
   virtual bool operator()(dnmi::db::Connection *conection);
@@ -74,9 +75,13 @@ class Transaction {
   /**
    * Called when max retry to perform the transaction is reached.
    * Default action is to throw SQLException
+   * 
+   * @param lastError the last error that was detected.
+   * @param errorCode The last errorcode from the database.
+   * @param mayRecover The last error maybe a transient error. The transaction may succeed if we retry.
    * @throw SQLException
    */
-  virtual void onMaxRetry(const std::string &lastError);
+  virtual void onMaxRetry(const std::string &lastError, const std::string &errorCode, bool mayRecover);
 };
 
 }

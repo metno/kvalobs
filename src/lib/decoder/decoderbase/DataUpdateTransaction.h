@@ -98,8 +98,9 @@ class DataUpdateTransaction : public dnmi::db::Transaction {
                        const std::string &errorMessage,
                        const std::string &errorCode);
   virtual void onSuccess();
+  virtual void onFailure();
   virtual void onRetry();
-  virtual void onMaxRetry(const std::string &lastError);
+  virtual void onMaxRetry(const std::string &lastError, const std::string &errorCode, bool mayRecover);
 
   
   kvalobs::serialize::KvalobsData insertedOrUpdatedData() const {

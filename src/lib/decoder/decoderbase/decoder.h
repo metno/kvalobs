@@ -317,6 +317,12 @@ class DecoderBase {
                    std::list<kvalobs::kvTextData> &textData, 
                    const std::string &logid, bool onlyAddOrUpdateData);
 
+
+  bool addDataToDbThrow(const miutil::miTime &obstime, int stationid, int typeid_,
+                   std::list<kvalobs::kvData> &sd,
+                   std::list<kvalobs::kvTextData> &textData, 
+                   const std::string &logid, bool onlyAddOrUpdateData);
+
   /**
    * \brief insert the \em obs message into the table \em rejectdecode.
    *

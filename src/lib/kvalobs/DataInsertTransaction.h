@@ -97,6 +97,7 @@ class DataInsertTransaction : public dnmi::db::Transaction {
   Action action;
   bool fastExit;
   std::string lastError;
+  bool mayRecover;
   dnmi::db::Connection *conection;
 
   /**
@@ -153,7 +154,7 @@ class DataInsertTransaction : public dnmi::db::Transaction {
                        const std::string &errorCode);
   virtual void onSuccess();
   virtual void onRetry();
-  virtual void onMaxRetry(const std::string &lastError);
+  virtual void onMaxRetry(const std::string &lastError, const std::string &errorCode, bool mayRecover);
 
 };
 

@@ -40,6 +40,7 @@
 
 namespace pt = boost::posix_time;
 
+using dnmi::db::SQLException;
 using std::string;
 using std::endl;
 using std::ostringstream;
@@ -383,30 +384,6 @@ bool DataUpdateTransaction::operator()(dnmi::db::Connection *conection) {
 
   insertType = "REPLACE";
   return replaceObservation(conection, oldObs->observationid());
-/*
-  insertType = "REPLACE";
-
-  log << "Replace data.stationid: " << stationid << " typeid: " << typeid_ << " obstime: " << pt::to_kvalobs_string(obstime) << endl;
-
-  setTbtime(conection);
-  replaceData(conection, dataList, textDataList);
-
-  mylog.str("");
-  IkvStationInfoList it = stationInfoList_->begin();
-
-  if (it != stationInfoList_->end()) {
-    mylog << "UPDATED: stationid: " << it->stationID() << " typeid: " << it->typeID() << " obstime: " << pt::to_kvalobs_string(it->obstime());
-    ++it;
-  }
-
-  for (; it != stationInfoList_->end(); it++) {
-    mylog << "\n         stationid: " << it->stationID() << " typeid: " << it->typeID() << " obstime: " << pt::to_kvalobs_string(it->obstime());
-  }
-
-  IDLOGINFO("updated", mylog.str());
-  insertType = "UPDATE";
-  return true;
-  */
 }
 
 void DataUpdateTransaction::onSuccess() {
@@ -416,6 +393,14 @@ void DataUpdateTransaction::onSuccess() {
   IDLOGINFO(logid, log.str());
   IDLOGINFO("transaction", mylog.str());
   *ok_ = true;
+}
+
+void DataUpdateTransaction::onFailure() {
+  ostringstream mylog;
+  string prefix(insertType.length(), ' ');
+  mylog << insertType << ": Failed: stationid: " << stationid << " typeid: " << typeid_ << " obstime: " << pt::to_kvalobs_string(obstime);
+  IDLOGERROR(logid, log.str());
+  IDLOGERROR("transaction", mylog.str());
 }
 
 void DataUpdateTransaction::onRetry() {
@@ -437,18 +422,19 @@ void DataUpdateTransaction::onAbort(const std::string &driverid, const std::stri
   }
 }
 
-void DataUpdateTransaction::onMaxRetry(const std::string &lastError) {
+void DataUpdateTransaction::onMaxRetry(const std::string &lastError, const std::string &errorCode, bool mayRecover) {
   ostringstream mylog;
 
   if (!log.str().empty()) {
     mylog << endl << "Log: " << log.str();
   }
 
-  IDLOGERROR(logid, "Transaction Failed.\n" << lastError << "\n" << log.str());
+  IDLOGERROR(logid, "Transaction Failed (mayRecover=" << (mayRecover?"true":"false") << " errorCode=" << errorCode <<").\n" << lastError << "\n" << log.str());
   IDLOGERROR(
       "failed",
-      "Transaction Failed. Stationid: " << stationid << " Typeid: " << typeid_ << " obstime: " << pt::to_kvalobs_string(obstime) << "\nLast error: " << lastError << mylog.str());
+      "Transaction Failed (mayRecover=" << (mayRecover?"true":"false") << " errorCode=" << errorCode <<").\n" << " Stationid: " << stationid << " Typeid: " << typeid_ << " obstime: " << pt::to_kvalobs_string(obstime) << "\nLast error: " << lastError << mylog.str());
   IDLOGERROR("transaction", "   FAILED: Stationid: " << stationid << " Typeid: " << typeid_ << " obstime: " << pt::to_kvalobs_string(obstime));
+  throw SQLException(lastError, errorCode, mayRecover);
 }
 
 }  // namespace decoder

@@ -478,6 +478,20 @@ bool kvalobs::decoder::DecoderBase::addDataToDb(const miutil::miTime &obstime, i
 
 bool kvalobs::decoder::DecoderBase::addDataToDb(const miutil::miTime &obstime, int stationid, int typeid_, std::list<kvalobs::kvData> &sd,
                                                 std::list<kvalobs::kvTextData> &textData, const std::string &logid, bool onlyAddOrUpdateData) {
+  try {
+    return addDataToDbThrow(obstime, stationid, typeid_, sd, textData, logid, onlyAddOrUpdateData);
+  } catch (...) {
+    return false;
+  }
+}
+
+bool 
+kvalobs::decoder::DecoderBase::
+addDataToDbThrow(const miutil::miTime &obstime, int stationid, int typeid_,
+                   std::list<kvalobs::kvData> &sd,
+                   std::list<kvalobs::kvTextData> &textData, 
+                   const std::string &logid, bool onlyAddOrUpdateData)
+{
   namespace pt = boost::posix_time;
 
   boost::gregorian::date date(obstime.year(), obstime.month(), obstime.day());
@@ -493,14 +507,12 @@ bool kvalobs::decoder::DecoderBase::addDataToDb(const miutil::miTime &obstime, i
 
   kvalobs::decoder::DataUpdateTransaction work(pt_obstime, stationid, typeid_, &std::get<0>(data), &std::get<1>(data), logid, onlyAddOrUpdateData);
 
-  try {
-    con.perform(work);
-    decodedData.push_back(work.insertedOrUpdatedData());
-  } catch (...) {
-  }
-
+  con.perform(work);
+  decodedData.push_back(work.insertedOrUpdatedData());
+  
   return work.ok();
 }
+
 
 bool kvalobs::decoder::DecoderBase::putkvTextDataInDb(const kvalobs::kvTextData &td_, int priority) {
   kvalobs::kvTextData td(td_);

@@ -100,22 +100,6 @@ bool SynopDecoder::saveData(list<kvalobs::kvData> &data, bool &rejected,
 
   logid << "n" << it->stationID() << "-t" << it->typeID();
 
-/*
-  if (it->stationID() < 100000) {
-    //National stations that is registred in table 'station'.
-    priority = 6;
-  } else if (it->stationID() <= 10000000) {
-    //Foregn stations is in the range [100000, 10000000]
-    priority = 7;
-  } else if (it->stationID() > 10000000 && it->stationID() < 130000000) {
-    //COMMENT:
-    //As a quick fix to set priority. We reduce the priority
-    //for ships. We now that ships get a automatic generated stationid
-    //in the range [10100009, 123123599]. For
-
-    priority = 8;
-  }
-*/
   for (; it != data.end(); it++) {
     if (it->obstime().is_not_a_date_time()
         || it->tbtime().is_not_a_date_time()) {
@@ -130,9 +114,22 @@ bool SynopDecoder::saveData(list<kvalobs::kvData> &data, bool &rejected,
   int ret = true;
   it = data.begin();
 
-  if (!addDataToDb(to_miTime(it->obstime()), it->stationID(), it->typeID(),
-                   data, textData, logid.str())) {
-    ret = false;
+  try {
+    if (!addDataToDbThrow(to_miTime(it->obstime()), it->stationID(), it->typeID(),
+          data, textData, logid.str(), false)) {
+      rejected=true;
+      rejectedMessage="Unknown error, but not DB error.";
+      ret = false;
+    }
+  }
+  catch (const SQLException &e) {
+    if( !e.mayRecover() ) {
+      rejected=true;
+      ostringstream o;
+      o << "DB " << e.what() << ". SQLSTATE: '" << e.errorCode() << "'.";
+      rejectedMessage = o.str();
+      ret = false;
+    }
   }
 
   removeLogger(logid.str());

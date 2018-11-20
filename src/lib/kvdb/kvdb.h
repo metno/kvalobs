@@ -63,19 +63,23 @@ namespace db {
 class SQLException : public std::exception {
   std::string reason;
   std::string errorCode_;
+  bool mayRecoverFrom_;
  public:
-  explicit SQLException(const std::string &reason_)
-      : reason(reason_) {
+  explicit SQLException(const std::string &reason_, bool mayRecover=true)
+      : reason(reason_), mayRecoverFrom_(mayRecover) {
   }
   explicit SQLException(const std::string &reason_,
-                        const std::string &errorCode)
+                        const std::string &errorCode,
+                        bool mayRecover=true)
       : reason(reason_),
-        errorCode_(errorCode) {
+        errorCode_(errorCode), mayRecoverFrom_(mayRecover) {
   }
 
   virtual ~SQLException() throw () {
   }
-  ;
+  
+
+  bool mayRecover()const { return mayRecoverFrom_;}
 
   std::string errorCode() const {
     return errorCode_;
@@ -102,12 +106,38 @@ class SQLNotSupported : public SQLException {
       : SQLException(reason_, errorCode) {
   }
   explicit SQLNotSupported()
-      : SQLException("Not supported!") {
+      : SQLException("Not supported") {
   }
 
   ~SQLNotSupported() throw () {
   }
 };
+
+
+/**
+ * \brief Unrecoverable error
+ *
+ * Unrecoverable error. There is error in the data 
+ * or syntax that it is not posible to recover from. 
+ */
+class SQLUnrecoverable: public SQLException {
+ public:
+  explicit SQLUnrecoverable(const std::string &reason_)
+      : SQLException(reason_) {
+  }
+  explicit SQLUnrecoverable(const std::string &reason_,
+                           const std::string &errorCode)
+      : SQLException(reason_, errorCode) {
+  }
+  explicit SQLUnrecoverable()
+      : SQLException("SQLUnrecoverable") {
+  }
+
+  ~SQLUnrecoverable() throw () {
+  }
+};
+
+
 
 /**
  * \brief Trying to insert a duplicate row.

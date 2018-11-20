@@ -419,8 +419,13 @@ void kv2kvDecoder::verify(const kvData & d, kvDataPtr dbData) const {
 
 void kv2kvDecoder::adapt(kvData & d, kvDataPtr dbData, bool overwrite) const {
   milog::LogContext lcontext("adapt");
+  
+  if( dbData ) {
+    LOGDEBUG("dbData.get():\t" << *dbData.get());  
+  } else {
+    LOGDEBUG("dbData.get():\tNo data");  
+  }
 
-  LOGDEBUG("dbData.get():\t" << *dbData.get());
   LOGDEBUG("overwrite:\t" << (overwrite?"true":"false"));
 
   if (dbData.get() and not overwrite)

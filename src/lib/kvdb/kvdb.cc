@@ -125,12 +125,16 @@ void dnmi::db::Connection::perform(dnmi::db::Transaction &transaction,
   //cerr << "Driverid: " << getDriverId() << ": Using: General transaction.\n";
 
   Transaction &t(transaction);
+  std::string errorCode;
+  bool mayRecover;
 
   try {
     if (retry <= 0)
       retry = 1;
 
     while (retry > 0) {
+      mayRecover=true;
+      errorCode.erase();
       beginTransaction();
 
       try {
@@ -140,13 +144,28 @@ void dnmi::db::Connection::perform(dnmi::db::Transaction &transaction,
           return;
         } else {
           t.onFailure();
-          retry--;
+          rollBack();
+          return;
         }
       } catch (const SQLAborted &e) {
         retry--;
         lastError = e.what();
         t.onAbort(this->getDriverId(), lastError, e.errorCode());
-      } catch (const std::exception &e) {
+      } catch (const SQLUnrecoverable &e) {
+        lastError = e.what();
+        mayRecover=false;
+        errorCode=e.errorCode();
+        retry=0;
+      } catch (const SQLException&e) {
+        retry--;
+        lastError = e.what();
+        if (!e.mayRecover() ) {
+          retry=0;
+        } else {
+          t.onAbort(this->getDriverId(), lastError, e.errorCode());
+        }
+      }
+      catch (const std::exception &e) {
         retry--;
         lastError = e.what();
       } catch (...) {
@@ -162,7 +181,7 @@ void dnmi::db::Connection::perform(dnmi::db::Transaction &transaction,
     lastError = "Fatal: unknown exception.";
   }
 
-  transaction.onMaxRetry(lastError);
+  transaction.onMaxRetry(lastError, errorCode, mayRecover);
 }
 
 void dnmi::db::Connection::createSavepoint(const std::string &name) {

@@ -1,5 +1,5 @@
 AC_PREREQ([2.59])
-AC_INIT([kvalobs], [5.0.0~rc2], [kvoss@met.no])
+AC_INIT([kvalobs], [5.0.0~rc3], [kvoss@met.no])
 AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -26,7 +26,7 @@ AC_CONFIG_FILES([Makefile
                  src/Makefile
                  src/lib/Makefile
                  src/lib/gtest/Makefile
-		           src/lib/json/Makefile
+		             src/lib/json/Makefile
                  src/lib/kvskel/Makefile
                  src/lib/miutil/Makefile
                  src/lib/decodeutility/Makefile

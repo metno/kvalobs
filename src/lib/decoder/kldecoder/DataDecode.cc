@@ -29,6 +29,7 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include <string.h>
 #include <string>
 #include <cctype>
 #include <boost/algorithm/string/case_conv.hpp>
@@ -58,6 +59,16 @@ int DataDecoder::findParamId(const std::string &paramname) const {
 
   return param.id();
 }
+
+namespace {
+  std::string checkNaN(const std::string &val) {
+    if( strcasecmp(val.c_str(), "nan") == 0 ) {
+      return "";
+    }
+    return val;
+  }
+}
+
 
 bool DataDecoder::decodeData(KlDataArray &da, KlDataArray::size_type daSize,
                              boost::posix_time::ptime &obstime,
@@ -121,10 +132,11 @@ bool DataDecoder::decodeData(KlDataArray &da, KlDataArray::size_type daSize,
     i = buf.find_first_of("(", 0);
 
     if (i == string::npos) {
-      val = buf;
+      val = checkNaN(buf);
     } else {
       val = buf.substr(0, i);
       miutil::trimstr(val);
+      val=checkNaN(val);
       iEnd = buf.find_first_of(")", i);
 
       if (iEnd == string::npos) {
@@ -344,6 +356,14 @@ bool DataDecoder::decodeHeader(const std::string &header,
 
         cs.get(0, buf);
         sensor = atoi(buf.c_str());
+
+        if( sensor > 9 ) {
+          message +=
+              "\nInvalid format: sensor number must be in the range [0,9] ("+std::to_string(sensor)+") "
+                  + string(" param  [") + name + "]";
+          return false;
+        }
+
         cs.get(1, buf);
         level = atoi(buf.c_str());
       }
