@@ -1,3 +1,9 @@
+kvalobs (5.0.0~rc4-1) xenial; urgency=medium
+  * kvQaBase db fix.
+
+ -- Borge Moe <borge.moe@met.no>  Tue, 20 Nov 2018 10:30:00 +0100
+
+
 kvalobs (5.0.0~rc3-1) xenial; urgency=medium
   * Fix decodings bugs.
 
