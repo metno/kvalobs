@@ -794,6 +794,7 @@ CREATE TABLE workque (
 );
 
 CREATE INDEX workque_priority_obsid ON workque (priority, observationid);
+CREATE INDEX workque_qa_start_qa_stop_idx ON workque (qa_start, qa_stop);
 REVOKE ALL ON workque FROM public;
 GRANT ALL ON workque TO kv_admin;
 GRANT SELECT ON workque TO kv_read;
