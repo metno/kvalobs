@@ -66,7 +66,7 @@ class DataProcessor {
   /**
    * Send a single dataList to Kafka
    */
-  void sendToKafka(const qabase::CheckRunner::KvalobsDataPtr & dataList, bool * stop = nullptr);
+  void sendToKafka(const qabase::CheckRunner::KvalobsDataPtr dataList, bool * stop = nullptr);
 
 
   /**

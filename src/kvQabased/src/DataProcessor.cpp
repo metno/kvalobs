@@ -60,8 +60,13 @@ qabase::CheckRunner::KvalobsDataPtr DataProcessor::runChecks(const qabase::Obser
   return modified;
 }
 
-void DataProcessor::sendToKafka(const qabase::CheckRunner::KvalobsDataPtr & dataList, bool * stop) {
+void DataProcessor::sendToKafka(const qabase::CheckRunner::KvalobsDataPtr dataList, bool * stop) {
   int sendAttempts = 0;
+
+  if( !dataList ) {
+     return;
+  }
+
   do {
     auto messageid = output_->send(kvalobs::serialize::KvalobsDataSerializer::serialize(*dataList));
     messages.insert(messageid);
