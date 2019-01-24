@@ -31,6 +31,7 @@
 #define DATABASEACCESS_H_
 
 #include "returntypes/DataRequirement.h"
+#include "returntypes/Observation.h"
 #include <kvalobs/kvChecks.h>
 #include <kvalobs/kvObsPgm.h>
 #include <kvalobs/kvAlgorithms.h>
@@ -165,6 +166,11 @@ class DatabaseAccess {
    * @return information about the station with the given id
    */
   virtual kvalobs::kvStation getStation(int stationid) const = 0;
+
+  /**
+   * Query database, to get the correct observation for the given stationinfo. Will throw an exception if unable to find that entry.
+   */
+  virtual qabase::Observation getObservation(const kvalobs::kvStationInfo & si) const =0;
 
   typedef std::vector<kvalobs::kvModelData> ModelDataList;
   /**

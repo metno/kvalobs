@@ -87,6 +87,9 @@ class CheckRunner {
   KvalobsDataPtr newObservation(const qabase::Observation & obs,
                              std::ostream * scriptLog = 0);
 
+  KvalobsDataPtr newObservation(const kvalobs::kvStationInfo & st,
+                             std::ostream * scriptLog = 0);
+
   /**
    * Set a filter for checks to run. The given input should be an iterator
    * pair to a list of strings. Only checks with qcx (e.g QC1-1-42) in this
