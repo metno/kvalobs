@@ -40,7 +40,6 @@ GRANT USAGE, SELECT ON SEQUENCE observations_observationid_seq TO kv_write,kv_ad
 
 CREATE TABLE obsdata (
     observationid BIGINT REFERENCES observations(observationid) ON DELETE CASCADE,
-    obs_offset  INTERVAL NOT NULL DEFAULT '0h',
     original    FLOAT NOT NULL,
     paramid     INTEGER NOT NULL,
     sensor      CHAR(1) DEFAULT '0',
@@ -49,7 +48,7 @@ CREATE TABLE obsdata (
     controlinfo CHAR(16) DEFAULT '0000000000000000',
     useinfo     CHAR(16) DEFAULT '0000000000000000',
     cfailed     TEXT DEFAULT NULL,          
-    UNIQUE ( observationid, paramid, level, sensor, obs_offset ) 
+    UNIQUE ( observationid, paramid, level, sensor ) 
 );
 
 REVOKE ALL ON obsdata FROM public;
@@ -60,10 +59,9 @@ GRANT SELECT, UPDATE, INSERT, DELETE ON obsdata TO kv_write;
 
 CREATE TABLE obstextdata (
     observationid BIGINT REFERENCES observations(observationid) ON DELETE CASCADE,
-    obs_offset  INTERVAL NOT NULL DEFAULT '0h',
     original    TEXT NOT NULL,
     paramid     INTEGER NOT NULL,
-    UNIQUE ( observationid, paramid, obs_offset ) 
+    UNIQUE ( observationid, paramid ) 
 );
 
 REVOKE ALL ON obstextdata FROM public;
@@ -74,7 +72,7 @@ GRANT SELECT, UPDATE, INSERT, DELETE ON obstextdata TO kv_write;
 CREATE VIEW data AS (
     SELECT 
         o.stationid,
-        o.obstime + d.obs_offset as obstime,
+        o.obstime,
         d.original,
         d.paramid,
         o.tbtime,
@@ -101,7 +99,7 @@ GRANT SELECT ON data TO kv_write;
 CREATE VIEW text_data AS (
     SELECT 
         o.stationid,
-        o.obstime + d.obs_offset as obstime,
+        o.obstime,
         d.original,
         d.paramid,
         o.tbtime,
@@ -177,7 +175,7 @@ BEGIN
 	INSERT INTO data_history 
 		(stationid,obstime,original,paramid,tbtime,typeid,sensor,level,corrected,controlinfo,useinfo,cfailed)
 	VALUES
-		(obs.stationid,obs.obstime+NEW.obs_offset,NEW.original,NEW.paramid,obs.tbtime,obs.typeid,NEW.sensor,NEW.level,NEW.corrected,NEW.controlinfo,NEW.useinfo,NEW.cfailed);
+		(obs.stationid,obs.obstime,NEW.original,NEW.paramid,obs.tbtime,obs.typeid,NEW.sensor,NEW.level,NEW.corrected,NEW.controlinfo,NEW.useinfo,NEW.cfailed);
 	RETURN NULL;
 END;
 $BODY$
@@ -203,7 +201,7 @@ BEGIN
 	INSERT INTO data_history 
 		(stationid,obstime,original,paramid,tbtime,typeid,sensor,level,corrected,controlinfo,useinfo,cfailed)
 	VALUES
-		(obs.stationid,obs.obstime+OLD.obs_offset,NULL,OLD.paramid,obs.tbtime,obs.typeid,OLD.sensor,OLD.level,NULL,NULL,NULL,NULL);
+		(obs.stationid,obs.obstime,NULL,OLD.paramid,obs.tbtime,obs.typeid,OLD.sensor,OLD.level,NULL,NULL,NULL,NULL);
 	RETURN NULL;
 END;
 $BODY$
@@ -252,7 +250,7 @@ BEGIN
 	INSERT INTO text_data_history
 		(stationid,obstime,original,paramid,tbtime,typeid)
 	VALUES
-		(obs.stationid,obs.obstime+NEW.obs_offset,NEW.original,NEW.paramid,obs.tbtime,obs.typeid);
+		(obs.stationid,obs.obstime,NEW.original,NEW.paramid,obs.tbtime,obs.typeid);
 	RETURN NULL;
 END;
 $BODY$
@@ -277,7 +275,7 @@ BEGIN
 	INSERT INTO text_data_history 
 		(stationid,obstime,original,paramid,tbtime,typeid)
 	VALUES
-		(obs.stationid,obs.obstime+OLD.obs_offset,NULL,OLD.paramid,obs.tbtime,obs.typeid);
+		(obs.stationid,obs.obstime,NULL,OLD.paramid,obs.tbtime,obs.typeid);
 	RETURN NULL;
 END;
 $BODY$

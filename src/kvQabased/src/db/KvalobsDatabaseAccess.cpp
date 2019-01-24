@@ -377,7 +377,7 @@ void KvalobsDatabaseAccess::getData(
     int minuteOffset) const {
   std::ostringstream query;
   query << "SELECT "
-    "o.stationid, o.obstime + d.obs_offset AS obstime, d.original, d.paramid, o.tbtime, o.typeid, d.sensor, d.level, d.corrected, d.controlinfo, d.useinfo, d.cfailed, o.observationid "
+    "o.stationid, o.obstime, d.original, d.paramid, o.tbtime, o.typeid, d.sensor, d.level, d.corrected, d.controlinfo, d.useinfo, d.cfailed, o.observationid "
     "FROM "
     "observations o, obsdata d "
     "WHERE "
@@ -423,7 +423,7 @@ void KvalobsDatabaseAccess::getData(
 bool KvalobsDatabaseAccess::pin(const qabase::Observation & obs) const {
   std::ostringstream query;
   query << "SELECT "
-    "o.stationid, o.obstime + d.obs_offset AS obstime, d.original, d.paramid, o.tbtime, o.typeid, d.sensor, d.level, d.corrected, d.controlinfo, d.useinfo, d.cfailed, o.observationid "
+    "o.stationid, o.obstime, d.original, d.paramid, o.tbtime, o.typeid, d.sensor, d.level, d.corrected, d.controlinfo, d.useinfo, d.cfailed, o.observationid "
     "FROM "
     "observations o, obsdata d "
     "WHERE "
@@ -456,7 +456,7 @@ void KvalobsDatabaseAccess::getTextData(
     int minuteOffset) const {
   std::ostringstream query;
   query << "SELECT "
-    "o.stationid, o.obstime + d.obs_offset AS obstime, d.original, d.paramid, o.tbtime, o.typeid, o.observationid "
+    "o.stationid, o.obstime, d.original, d.paramid, o.tbtime, o.typeid, o.observationid "
     "FROM "
     "observations o, obstextdata d "
     "WHERE "
@@ -498,7 +498,7 @@ namespace {
 std::string obsdataQuery(const qabase::Observation & obs) {
   std::ostringstream query;
   query << "SELECT "
-  "o.stationid, o.obstime + d.obs_offset AS obstime, d.original, d.paramid, o.tbtime, o.typeid, d.sensor, d.level, d.corrected, d.controlinfo, d.useinfo, d.cfailed "
+  "o.stationid, o.obstime, d.original, d.paramid, o.tbtime, o.typeid, d.sensor, d.level, d.corrected, d.controlinfo, d.useinfo, d.cfailed "
   "FROM "
   "observations o, obsdata d "
   "WHERE "
@@ -512,7 +512,7 @@ std::string obsdataQuery(const qabase::Observation & obs) {
 std::string obstextdataQuery(const qabase::Observation & obs) {
   std::ostringstream query;
   query << "SELECT "
-  "o.stationid, o.obstime + d.obs_offset AS obstime, d.original, d.paramid, o.tbtime, o.typeid "
+  "o.stationid, o.obstime, d.original, d.paramid, o.tbtime, o.typeid "
   "FROM "
   "observations o, obstextdata d "
   "WHERE "
