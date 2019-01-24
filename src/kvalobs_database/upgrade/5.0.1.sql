@@ -139,6 +139,8 @@ LANGUAGE plpgsql IMMUTABLE;
 
 ALTER TABLE obstextdata DROP COLUMN obs_offset;
 
+CREATE index ON obstextdata (observationid);
+
 CREATE VIEW pdata AS
     SELECT data.stationid, data.obstime, data.tbtime, data.typeid, (SELECT param.name FROM param WHERE (param.paramid = data.paramid))
     AS paramid, data.original, data.corrected, data.sensor, data.level, data.controlinfo, data.useinfo, data.cfailed FROM data;
@@ -148,4 +150,4 @@ GRANT SELECT ON pdata TO kv_read;
 GRANT SELECT ON pdata TO kv_write;
 
 
-ROLLBACK;
+COMMIT;
