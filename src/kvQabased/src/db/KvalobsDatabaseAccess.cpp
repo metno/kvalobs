@@ -280,6 +280,34 @@ std::string KvalobsDatabaseAccess::getStationParam(
         "Unable to find station_param for " + parameter + " for qcx=" + qcx);
 }
 
+qabase::Observation KvalobsDatabaseAccess::getObservation(const kvalobs::kvStationInfo & si) const {
+  std::ostringstream query;
+  query << "SELECT * FROM observation WHERE ";
+  query << "stationid=" << si.stationID();
+  query << " and typeid=" << si.typeID();
+  query << "obstime='" << to_kvalobs_string(si.obstime());
+  ResultPtr result(connection_->execQuery(query.str()));
+
+  milog::LogContext context("query");
+  LOGDEBUG1(query.str());
+
+  if (!result->hasNext()) {
+    std::ostringstream s;
+    s << "unable to find observation for " << si;
+    throw std::runtime_error(s.str());
+  }
+
+    //Observation(long long id, int stationid, int type, const boost::posix_time::ptime & obstime, const boost::posix_time::ptime & tbtime)
+  auto row = result->next();
+  auto id = boost::lexical_cast<long long>(row[0]);
+  auto stationid = boost::lexical_cast<int>(row[1]);
+  auto type = boost::lexical_cast<int>(row[2]);
+  auto obstime = boost::posix_time::time_from_string(row[3]);
+  auto tbtime = boost::posix_time::time_from_string(row[4]);
+  return qabase::Observation(id, stationid, type, obstime, tbtime);
+}
+
+
 kvalobs::kvStation KvalobsDatabaseAccess::getStation(int stationid) const {
   std::ostringstream query;
   query << "SELECT * FROM station WHERE stationid=" << stationid

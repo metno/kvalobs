@@ -141,6 +141,10 @@ void logTransaction(bool ok, double start, int shortRetries, int longRetries,
 }
 }
 
+CheckRunner::KvalobsDataPtr CheckRunner::newObservation(const kvalobs::kvStationInfo & st, std::ostream * scriptLog) {
+  return newObservation(db_->getObservation(st), scriptLog);
+}
+
 CheckRunner::KvalobsDataPtr CheckRunner::newObservation(
   const qabase::Observation & obs, std::ostream * scriptLog) {
   const int shortSleep = 100;

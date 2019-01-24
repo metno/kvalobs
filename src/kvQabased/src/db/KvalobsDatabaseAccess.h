@@ -94,6 +94,8 @@ class KvalobsDatabaseAccess : public db::DatabaseAccess {
 
   virtual std::string getStationParam(const kvalobs::kvStationInfo & si, const std::string & parameter, const std::string & qcx) const;
 
+  virtual qabase::Observation getObservation(const kvalobs::kvStationInfo & si) const;
+
   virtual kvalobs::kvStation getStation(int stationid) const;
 
   virtual void getModelData(ModelDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter,

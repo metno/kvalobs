@@ -91,6 +91,10 @@ class FilteredDatabaseAccess : public DatabaseAccess {
     return baseImplementation_->getStationParam(si, parameter, qcx);
   }
 
+  virtual qabase::Observation getObservation(const kvalobs::kvStationInfo & si) const {
+    return baseImplementation_->getObservation(si);
+  }
+
   virtual kvalobs::kvStation getStation(int stationid) const {
     return baseImplementation_->getStation(stationid);
   }

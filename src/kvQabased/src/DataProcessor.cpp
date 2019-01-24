@@ -81,11 +81,9 @@ void DataProcessor::sendToKafka(const qabase::CheckRunner::KvalobsDataPtr & data
 }
 
 void DataProcessor::process(const kvalobs::kvStationInfo & si) {
-  throw std::runtime_error("not implemented yet");
-
-  // qabase::CheckRunner::KvalobsDataPtr d = runChecks(si);
-  // sendToKafka(d);
-  // finalizeMessage_();
+  qabase::CheckRunner::KvalobsDataPtr modified(checkRunner_->newObservation(si));
+  sendToKafka(modified);
+  finalizeMessage_();
 }
 
 // void DataProcessor::process(const std::string & message) {
