@@ -250,7 +250,6 @@ std::string KvalobsDatabaseAccess::insertMissingDataQuery_(const DataIdentifier 
   q << "  SELECT\n";
   //        What to insert
   q << "    " << di.obsid() << ", \n";
-  q << "    '0h',\n";
   q << "    mv.value,\n";
   q << "    q.paramid,\n";
   q << "    q.sensor::char,\n";
