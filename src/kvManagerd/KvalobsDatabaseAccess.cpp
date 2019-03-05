@@ -165,7 +165,7 @@ void KvalobsDatabaseAccess::cleanWorkQueue() {
 
   exec_("delete from workstatistik s using workque q "
     "where s.observationid=q.observationid "
-    "and workque." + criteria);
+    "and q." + criteria);
   exec_("INSERT INTO workstatistik (SELECT "
     "o.stationid, o.obstime, o.typeid, o.tbtime, q.priority, q.process_start, q.qa_start, q.qa_stop, q.service_start, q.service_stop, o.observationid"
     " FROM workque q, observations o WHERE"

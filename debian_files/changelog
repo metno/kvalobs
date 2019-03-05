@@ -1,3 +1,29 @@
+kvalobs (5.0.0~rc13-1) xenial; urgency=medium
+  * kvDataInputd.
+
+ -- Borge Moe <borge.moe@met.no>  Mon, 4 Mar 2018 09:30:00 +0100
+
+kvalobs (5.0.0~rc12-1) xenial; urgency=medium
+  * kvDataInputd.
+
+ -- Borge Moe <borge.moe@met.no>  Thu, 29 Jan 2018 12:30:00 +0100
+
+kvalobs (5.0.0~rc11-1) xenial; urgency=medium
+  * kvManagerd: Fix workstatistikk.
+
+ -- Borge Moe <borge.moe@met.no>  Tue, 29 Jan 2018 10:45:00 +0100
+
+kvalobs (5.0.0~rc10-1) xenial; urgency=medium
+  * Fix kvmanagerd.
+
+ -- Borge Moe <borge.moe@met.no>  Mon, 28 Jan 2018 09:45:00 +0100
+
+kvalobs (5.0.0~rc9-1) xenial; urgency=medium
+  * Schema fix, removed obs_offset.
+
+ -- Borge Moe <borge.moe@met.no>  Fri, 25 Nov 2018 09:15:00 +0100
+
+
 kvalobs (5.0.0~rc4-1) xenial; urgency=medium
   * kvQaBase db fix.
 

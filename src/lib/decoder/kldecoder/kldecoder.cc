@@ -401,71 +401,65 @@ kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecod
     return Ok;
   }
 
-  if( typeId == 302 ) {
-    if(! do302(stationid, typeId, data, textData, observations, logid, msgToSender) ) {
-      return NotSaved;
+  for (KvDataContainer::DataByObstime::iterator it = data.begin();
+      it != data.end(); ++it) {
+
+    td.clear();
+    tid = textData.find(it->first);
+
+    if (tid != textData.end()) {
+      td = tid->second;
+      textData.erase(tid);
     }
-  } else {
-    for (KvDataContainer::DataByObstime::iterator it = data.begin();
-        it != data.end(); ++it) {
 
-      td.clear();
-      tid = textData.find(it->first);
-
-      if (tid != textData.end()) {
-        td = tid->second;
-        textData.erase(tid);
-      }
-
-      try {
-        if (!addDataToDbThrow(to_miTime(it->first), stationid, typeId, it->second, td,
-             logid, getOnlyInsertOrUpdate())) {
-          ostringstream ost;
-          ost << "ERROR: stationid: " << stationid << " typeid: " << typeId
-              << " obstime: " << it->first << ". Inconsistens in the data!";
-          LOGERROR(ost.str());
-          IDLOGERROR(logid, ost.str());
-          msgToSender += "\n" + ost.str();
-          return Rejected;
-        }
-      }
-      catch( const SQLException &e) {
+    try {
+      if (!addDataToDbThrow(to_miTime(it->first), stationid, typeId, it->second, td,
+           logid, getOnlyInsertOrUpdate())) {
         ostringstream ost;
         ost << "ERROR: stationid: " << stationid << " typeid: " << typeId
-            << " obstime: " << it->first << ". DB" << e.what();
+            << " obstime: " << it->first << ". Inconsistens in the data!";
         LOGERROR(ost.str());
-        IDLOGERROR(logid, ost.str() << ". SQLSTATE: '" << e.errorCode() << "' mayRecover: " << (e.mayRecover()?"true":"false") <<"." );
+        IDLOGERROR(logid, ost.str());
         msgToSender += "\n" + ost.str();
-        if ( !e.mayRecover() ) {
-          return Rejected;
-        } else {
-          return NotSaved;
-        }
-      }
-
-      observations[it->first] += it->second.size();
-    }
-
-    //Is there any left over text data.
-    if (!textData.empty()) {
-      KvDataContainer::DataList dl;
-      for (KvDataContainer::TextDataByObstime::iterator it = textData.begin();
-          it != textData.end(); ++it) {
-       if (!addDataToDb(to_miTime(it->first), stationid, typeId, dl, it->second,
-                       logid, getOnlyInsertOrUpdate())) {
-          ostringstream ost;
-          ost << "DBERROR: TextData: stationid: " << stationid << " typeid: "
-              << typeId << " obstime: " << it->first;
-          LOGERROR(ost.str());
-          IDLOGERROR(logid, ost.str());
-          msgToSender += "\n" + ost.str();
-          return NotSaved;
-        }
-        observations[it->first] += it->second.size();
+        return Rejected;
       }
     }
+    catch( const SQLException &e) {
+      ostringstream ost;
+      ost << "ERROR: stationid: " << stationid << " typeid: " << typeId
+          << " obstime: " << it->first << ". DB" << e.what();
+      LOGERROR(ost.str());
+      IDLOGERROR(logid, ost.str() << ". SQLSTATE: '" << e.errorCode() << "' mayRecover: " << (e.mayRecover()?"true":"false") <<"." );
+      msgToSender += "\n" + ost.str();
+      if ( !e.mayRecover() ) {
+        return Rejected;
+      } else {
+        return NotSaved;
+      }
+    }
+
+    observations[it->first] += it->second.size();
   }
 
+  //Is there any left over text data.
+  if (!textData.empty()) {
+    KvDataContainer::DataList dl;
+    for (KvDataContainer::TextDataByObstime::iterator it = textData.begin();
+        it != textData.end(); ++it) {
+     if (!addDataToDb(to_miTime(it->first), stationid, typeId, dl, it->second,
+                     logid, getOnlyInsertOrUpdate())) {
+        ostringstream ost;
+        ost << "DBERROR: TextData: stationid: " << stationid << " typeid: "
+            << typeId << " obstime: " << it->first;
+        LOGERROR(ost.str());
+        IDLOGERROR(logid, ost.str());
+        msgToSender += "\n" + ost.str();
+        return NotSaved;
+      }
+      observations[it->first] += it->second.size();
+    }
+  }
+  
   ostringstream ost;
   int totalObservations = 0;
   if (observations.size() > 0) {

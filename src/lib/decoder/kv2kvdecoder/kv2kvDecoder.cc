@@ -169,8 +169,7 @@ void kv2kvDecoder::save2(const list<kvData> & dl_, const list<kvTextData> & tdl_
   KvDataContainer::DataByObstime data;
   KvDataContainer::TextDataByObstime textData;
   KvDataContainer::TextDataByObstime::iterator tid;
-  KvDataContainer::TextDataList td;
-
+  
   KvDataContainer::StationInfoList infl=container.stationInfos();
 
   for( auto &sinf : container.stationInfos()) {
@@ -186,7 +185,7 @@ void kv2kvDecoder::save2(const list<kvData> & dl_, const list<kvTextData> & tdl_
 
     for (KvDataContainer::DataByObstime::iterator it = data.begin();
       it != data.end(); ++it) {
-      td.clear();
+      KvDataContainer::TextDataList td;
       tid = textData.find(it->first);
 
       if (tid != textData.end()) {
@@ -194,15 +193,44 @@ void kv2kvDecoder::save2(const list<kvData> & dl_, const list<kvTextData> & tdl_
         textData.erase(tid);
       }
 
-      if (!addDataToDb(to_miTime(it->first), sinf.stationId, sinf.typeId, it->second, td,
+      try {
+        if (!addDataToDbThrow(to_miTime(it->first), sinf.stationId, sinf.typeId, it->second, td,
              logid, false)) {
-        ostringstream ost;
+          ostringstream ost;
 
+          ost << "DBERROR: stationid: " << sinf.stationId << " typeid: " << sinf.typeId
+              << " obstime: " << it->first;
+          LOGERROR(ost.str());
+          IDLOGERROR(logid, ost.str());
+          throw DecoderError(decoder::DecoderBase::Error, ost.str());
+        }
+      }
+      catch ( const dnmi::db::SQLException &e) {
+        ostringstream ost;
         ost << "DBERROR: stationid: " << sinf.stationId << " typeid: " << sinf.typeId
-            << " obstime: " << it->first;
-        LOGERROR(ost.str());
-        IDLOGERROR(logid, ost.str());
-        throw(DecoderError(decoder::DecoderBase::Error, ost.str()));
+            << " obstime: " << it->first << "\n" 
+            << "DB " << e.what() << ". SQLSTATE: '" << e.errorCode() 
+            << "' mayRecover: " << (e.mayRecover()?"true":"false") << ".";
+          LOGERROR(ost.str());
+          IDLOGERROR(logid, ost.str());
+          throw DecoderError(decoder::DecoderBase::Error, ost.str());
+      }
+      catch( const std::exception &e ) {
+        ostringstream ost;
+        ost << "DBERROR: stationid: " << sinf.stationId << " typeid: " << sinf.typeId
+            << " obstime: " << it->first << "\n" 
+            << "DB " << e.what() << ".";
+          LOGERROR(ost.str());
+          IDLOGERROR(logid, ost.str());
+          throw DecoderError(decoder::DecoderBase::Error, ost.str());
+      }
+      catch( ... ) {
+        ostringstream ost;
+        ost << "DBERROR: stationid: " << sinf.stationId << " typeid: " << sinf.typeId
+            << " obstime: " << it->first << "\n" << "DB Unknown error.";;
+          LOGERROR(ost.str());
+          IDLOGERROR(logid, ost.str());
+          throw DecoderError(decoder::DecoderBase::Error, ost.str());
       }
     }
 
@@ -218,7 +246,7 @@ void kv2kvDecoder::save2(const list<kvData> & dl_, const list<kvTextData> & tdl_
               << sinf.typeId << " obstime: " << it->first;
           LOGERROR(ost.str());
           IDLOGERROR(logid, ost.str());
-          throw(DecoderError(decoder::DecoderBase::Error, ost.str()));
+          throw DecoderError(decoder::DecoderBase::Error, ost.str());
         }
       }
     }

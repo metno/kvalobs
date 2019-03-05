@@ -132,12 +132,18 @@ bool Observation::set(const dnmi::db::Result &res ){
   return hasObservationid_ && stationid_ != 0 && typeid_ != 0 && !obstime_.is_special() && !tbtime_.is_special();  
 }
 
+
 kvData Observation::getKvData(const dnmi::db::DRow &r_, long *obsid_) {
   db::DRow &r = const_cast<db::DRow&>(r_);
   string buf;
   list<string> names = r.getFieldNames();
   list<string>::iterator it = names.begin();
 
+  long obsid;
+  int stationid;
+  int myTypeid;
+  pt::ptime obstime;
+  pt::ptime tbtime;
   float original;
   int paramid;
   int sensor;
@@ -146,15 +152,37 @@ kvData Observation::getKvData(const dnmi::db::DRow &r_, long *obsid_) {
   kvControlInfo controlinfo;
   kvUseInfo useinfo;
   std::string cfailed;
-  boost::posix_time::ptime obstime;
-  long obsid=0;
-
+  
   for (; it != names.end(); it++) {
     try {
       buf = r[*it];
 
       if (*it == "observationid" ) {
         obsid = atol(buf.c_str());
+        if( ! hasObservationid_ ){
+          observationid_=obsid;
+          hasObservationid_=true;
+        }
+      } else if ( *it == "stationid" ) {
+        stationid = atoi(buf.c_str());
+        if( stationid_ == 0){
+          stationid_=stationid;
+        } 
+      } else if (*it == "typeid") {
+        myTypeid = atoi(buf.c_str());
+        if( typeid_ == 0 ) {
+          typeid_ = myTypeid;
+        }
+      }else if (*it == "obstime") {
+        obstime = pt::time_from_string_nothrow(buf);
+        if( obstime_.is_special() ) {
+          obstime_ = obstime;
+        }
+      }else if (*it == "tbtime") {
+        tbtime = pt::time_from_string_nothrow(buf);
+        if( tbtime_.is_special() ) {
+          tbtime_ = tbtime;
+        }
       } else  if (*it == "original") {
         sscanf(buf.c_str(), "%f", &original);
       } else if (*it == "paramid") {
@@ -171,12 +199,6 @@ kvData Observation::getKvData(const dnmi::db::DRow &r_, long *obsid_) {
         useinfo = kvUseInfo(buf);
       } else if (*it == "cfailed") {
         cfailed = buf;
-      } else if (*it == "obstime") {
-        obstime_ = pt::time_from_string_nothrow(buf);
-      } else if (*it == "obs_offset") {
-        //obstime from the tabell observations with obs_offset is used to create obstime.
-        //We just ignore it here.
-        continue;
       } else {
         CERR("Observation::getKvData .. unknown entry:" << *it << std::endl);
       }
@@ -185,20 +207,13 @@ kvData Observation::getKvData(const dnmi::db::DRow &r_, long *obsid_) {
     }
   }
 
-  if ( obsid != observationid_) {
-    CERR("Observation::getKvData:  observationid differ this obsdata '" << obsid << "' observations '" << observationid_ << "'..... \n");
-  }
-  
   if(  obsid_ ) {
     *obsid_ = obsid;
   }
 
-  if (obstime.is_special() ) {
-      obstime = obstime_;
-  }
-
-  return kvData(stationid_, obstime, original, paramid,
-         tbtime_, typeid_, sensor, level, corrected, controlinfo,  useinfo,cfailed);
+  
+  return kvData(stationid, obstime, original, paramid,
+         tbtime, myTypeid, sensor, level, corrected, controlinfo,  useinfo,cfailed);
   
 }
 
@@ -207,26 +222,46 @@ kvTextData Observation::getKvTextData(const dnmi::db::DRow &r_, long *obsid_){
   list<string> names = r.getFieldNames();
   list<string>::iterator it = names.begin();
   std::string buf;
+  long obsid;
+  int stationid;
+  int myTypeid;
+  pt::ptime obstime;
+  pt::ptime tbtime;
   std::string original;
   int paramid;
-  boost::posix_time::ptime obstime;
-  long obsid;
-
+  
   for (; it != names.end(); it++) {
     try {
-      buf = r[*it];
        if (*it == "observationid" ) {
         obsid = atol(buf.c_str());
-      } else if (*it == "obstime") {
+        if( ! hasObservationid_ ){
+          observationid_=obsid;
+          hasObservationid_=true;
+        }
+      } else if ( *it == "stationid" ) {
+        stationid = atoi(buf.c_str());
+        if( stationid_ == 0){
+          stationid_=stationid;
+        } 
+      } else if (*it == "typeid") {
+        myTypeid = atoi(buf.c_str());
+        if( typeid_ == 0 ) {
+          typeid_ = myTypeid;
+        }
+      }else if (*it == "obstime") {
         obstime = pt::time_from_string_nothrow(buf);
+        if( obstime_.is_special() ) {
+          obstime_ = obstime;
+        }
+      }else if (*it == "tbtime") {
+        tbtime = pt::time_from_string_nothrow(buf);
+        if( tbtime_.is_special() ) {
+          tbtime_ = tbtime;
+        }
       } else if (*it == "original") {
         original = buf;
       } else if (*it == "paramid") {
         paramid = atoi(buf.c_str());
-      } else if (*it == "obs_offset") {
-        //obstime from the tabell observations with obs_offset is used to create obstime.
-        //We just ignore it here.
-        continue;
       } else {
         CERR("Observation::getKvTextData .. unknown entry:" << *it << std::endl);
       }
@@ -243,7 +278,7 @@ kvTextData Observation::getKvTextData(const dnmi::db::DRow &r_, long *obsid_){
       obstime = obstime_;
   }
 
-  return kvTextData(stationid_, obstime, original, paramid, tbtime_, typeid_);
+  return kvTextData(stationid, obstime, original, paramid, tbtime, myTypeid);
 
 }
 
@@ -310,30 +345,47 @@ Observation *Observation::getFromDb(
   bool useTransaction
   )
 {
-  db::TransactionBlock tran(con, db::Connection::REPEATABLE_READ, false, !useTransaction);
+  //db::TransactionBlock tran(con, db::Connection::REPEATABLE_READ, false, !useTransaction);
+  db::TransactionBlock tran(con, db::Connection::READ_COMMITTED, false, !useTransaction);
   try {
     ostringstream q;
-    q << "SELECT * FROM observations WHERE stationid=" << stationID << " AND typeid=" << typeID 
-      << " AND obstime=" << dbTime(obsTime) ; 
+    q << "SELECT o.observationid, o.stationid, o.typeid, o.obstime, o.tbtime, d.original,d.paramid,d.sensor,d.level,d.corrected, d.controlinfo, d.useinfo,d.cfailed "
+      << "FROM observations o LEFT JOIN  obsdata d "
+      << "ON o.observationid = d.observationid "
+      << "WHERE o.stationid=" << stationID << " AND o.typeid=" << typeID 
+      << " AND o.obstime=" << dbTime(obsTime) << ";";
+
+    //q << "SELECT * FROM observations WHERE observationid=" << observationid; 
 
     std::unique_ptr<dnmi::db::Result> res;
     res.reset(con->execQuery(q.str()));
-
+ 
     if (res->size() == 0 ) {
       return nullptr;
     }
 
-    Observation *obs=new Observation();
+    std::unique_ptr<Observation> obs=std::unique_ptr<Observation>(new Observation());
 
-    if (!obs->set(*res.get())) {
-      q.str("");
-      q << "UNEXPECTED EXCEPTION: Observation::getFromDb: observationid: " << obs->observationid() << " sid: " << obs->stationID() << " tid: "
-        << obs->typeID() << " obst: " << pt::to_kvalobs_string(obs->obstime()) << " tbt: " << pt::to_kvalobs_string(obs->tbtime());
-      throw std::logic_error(q.str());
+    obs->setData(*res.get());
+
+    q.str("");
+    q << "SELECT o.observationid, o.stationid, o.typeid, o.obstime, o.tbtime, d.original,d.paramid "
+      << "FROM observations o LEFT JOIN  obstextdata d "
+      << "ON o.observationid = d.observationid "
+      << "WHERE o.stationid=" << stationID << " AND o.typeid=" << typeID 
+      << " AND o.obstime=" << dbTime(obsTime) << ";";
+
+
+    res.reset(con->execQuery(q.str()));
+
+    if (res->size() == 0 ) {
+      return obs.release();
     }
-    obs->getDataForObservationid(con, obs->observationid(), obs->obstime());
-  
-    return obs;
+
+    obs->setTextData(*res.get());
+
+    return obs.release();
+
   } 
   catch( ... ) {
     tran.abort();
@@ -343,11 +395,16 @@ Observation *Observation::getFromDb(
 
 Observation *Observation::getFromDb(dnmi::db::Connection *con, long observationid, bool useTransaction)
 {
-  db::TransactionBlock tran(con, db::Connection::REPEATABLE_READ, false, !useTransaction);
+  //db::TransactionBlock tran(con, db::Connection::REPEATABLE_READ, false, !useTransaction);
+  db::TransactionBlock tran(con, db::Connection::READ_COMMITTED, false, !useTransaction);
   try {
     ostringstream q;
-    
-    q << "SELECT * FROM observations WHERE observationid=" << observationid; 
+    q << "SELECT o.observationid, o.stationid, o.typeid, o.obstime, o.tbtime, d.original,d.paramid,d.sensor,d.level,d.corrected, d.controlinfo, d.useinfo,d.cfailed "
+      << "FROM observations o LEFT JOIN  obsdata d "
+      << "ON o.observationid = d.observationid "
+      << "WHERE o.observationid=" << observationid << ";";
+
+    //q << "SELECT * FROM observations WHERE observationid=" << observationid; 
 
     std::unique_ptr<dnmi::db::Result> res;
     res.reset(con->execQuery(q.str()));
@@ -356,18 +413,26 @@ Observation *Observation::getFromDb(dnmi::db::Connection *con, long observationi
       return nullptr;
     }
 
-    Observation *obs=new Observation();
+    std::unique_ptr<Observation> obs=std::unique_ptr<Observation>(new Observation());
 
-    if (!obs->set(*res.get())) {
-      q.str("");
-      q << "UNEXPECTED EXCEPTION: Observation::getFromDb: observationid: " << obs->observationid() << " sid: " << obs->stationID() << " tid: "
-        << obs->typeID() << " obst: " << pt::to_kvalobs_string(obs->obstime()) << " tbt: " << pt::to_kvalobs_string(obs->tbtime());
-      throw std::logic_error(q.str());
+    obs->setData(*res.get());
+
+    q.str("");
+    q << "SELECT o.observationid, o.stationid, o.typeid, o.obstime, o.tbtime, d.original,d.paramid "
+      << "FROM observations o LEFT JOIN  obstextdata d "
+      << "ON o.observationid = d.observationid "
+      << "WHERE o.observationid=" << observationid << ";";
+
+
+    res.reset(con->execQuery(q.str()));
+
+    if (res->size() == 0 ) {
+      return obs.release();
     }
 
-    obs->getDataForObservationid(con, obs->observationid(), obs->obstime() );
-  
-    return obs;
+    obs->setTextData(*res.get());
+
+    return obs.release();
   } 
   catch( ... ) {
     tran.abort();
@@ -377,25 +442,9 @@ Observation *Observation::getFromDb(dnmi::db::Connection *con, long observationi
 
 
 
-void Observation::getDataForObservationid(dnmi::db::Connection *con, long obsid, const boost::posix_time::ptime &obsTime ) {
-  std::unique_ptr<dnmi::db::Result> res;
-  ostringstream q;
-  q << "SELECT *," << dbTime(obsTime, true) << "+obs_offset AS obstime FROM obsdata WHERE observationid=" << obsid; 
-
-  res.reset(con->execQuery(q.str()));
-  setData(*res.get());
-
-  q.str("");
-
-  q << "SELECT *," << dbTime(obsTime, true) << "+obs_offset AS obstime FROM obstextdata WHERE observationid=" << obsid; 
-
-  res.reset(con->execQuery(q.str()));
-  setTextData(*res.get());
-}
-
-
 void Observation::insertIntoDb(dnmi::db::Connection *con, bool useTransaction) 
 {
+  //db::TransactionBlock tran(con, db::Connection::REPEATABLE_READ, false, !useTransaction);
   db::TransactionBlock tran(con, db::Connection::READ_COMMITTED, false, !useTransaction);
   try {
     ostringstream q;
@@ -416,15 +465,15 @@ void Observation::insertIntoDb(dnmi::db::Connection *con, bool useTransaction)
 
     q.str("");
     for(auto &d : data_) {
-      q << "INSERT INTO obsdata (observationid,obs_offset,original,paramid,sensor,level,corrected,controlinfo,useinfo,cfailed) VALUES("
-        << observationid_ << ","<< dbTime(d.obstime(),true) << "-" << dbTime(obstime_,true) <<"," << d.original() << ","
+      q << "INSERT INTO obsdata (observationid,original,paramid,sensor,level,corrected,controlinfo,useinfo,cfailed) VALUES("
+        << observationid_ <<"," << d.original() << ","
         << d.paramID() << "," << d.sensor() << "," <<d.level() << "," << d.corrected() <<"," 
         << Q(d.controlinfo().flagstring()) <<","<< Q(d.useinfo().flagstring()) << "," << Q(d.cfailed()) << ");\n";
     }
 
     for(auto &d : textData_) {
-      q << "INSERT INTO obstextdata (observationid,obs_offset,original,paramid) VALUES("
-        << observationid_ << ","<< dbTime(d.obstime(),true) << "-" << dbTime(obstime_,true) <<",'" << con->esc(d.original()) << "',"
+      q << "INSERT INTO obstextdata (observationid,original,paramid) VALUES("
+        << observationid_ <<",'" << con->esc(d.original()) << "',"
         << d.paramID() <<");\n";
     }
     con->exec(q.str());

@@ -480,9 +480,35 @@ bool kvalobs::decoder::DecoderBase::addDataToDb(const miutil::miTime &obstime, i
                                                 std::list<kvalobs::kvTextData> &textData, const std::string &logid, bool onlyAddOrUpdateData) {
   try {
     return addDataToDbThrow(obstime, stationid, typeid_, sd, textData, logid, onlyAddOrUpdateData);
-  } catch (...) {
+  }
+  catch ( const dnmi::db::SQLException &e) {
+    ostringstream ost;
+    ost << "addDataToDb: DBERROR: stationid: " << stationid << " typeid: " << typeid_
+        << " obstime: " << obstime << "\n" 
+        << "DB " << e.what() << ". SQLSTATE: '" << e.errorCode() 
+        << "' mayRecover: " << (e.mayRecover()?"true":"false") << ".";
+    LOGERROR(ost.str());
+    IDLOGERROR(logid, ost.str());
     return false;
   }
+  catch( const std::exception &e) {
+    ostringstream ost;
+    ost << "addDataToDb: DBERROR: stationid: " << stationid << " typeid: " << typeid_
+        << " obstime: " << obstime << "\n" 
+        << "DB " << e.what() << ".";
+    LOGERROR(ost.str());
+    IDLOGERROR(logid, ost.str());
+    return false;
+  }
+  catch( ... ) {
+    ostringstream ost;
+    ost << "addDataToDb: DBERROR: stationid: " << stationid << " typeid: " << typeid_
+        << " obstime: " << obstime << "\n" << "DB Unknown error.";
+    LOGERROR(ost.str());
+    IDLOGERROR(logid, ost.str());
+    return false;
+  }
+  return false; 
 }
 
 bool 

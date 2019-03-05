@@ -75,8 +75,8 @@ public:
 
   void cleanData();
 
-  std::list<kvData> &data() { return data_;}
-  std::list<kvTextData> &textData(){ return textData_;}
+  std::list<kvData> data() { return data_;}
+  std::list<kvTextData> textData(){ return textData_;}
 
   long observationid()const{ return observationid_;}
   
@@ -133,7 +133,7 @@ public:
 
 protected:
   long currentObservationid(dnmi::db::Connection *con);
-  void getDataForObservationid(dnmi::db::Connection *con, long observationid, const boost::posix_time::ptime &obsTime ); 
+  //void getDataForObservationid(dnmi::db::Connection *con, long observationid, const boost::posix_time::ptime &obsTime ); 
   bool set(const dnmi::db::Result &res);
   void setData(const dnmi::db::Result &res);
   void setTextData(const dnmi::db::Result &res);
