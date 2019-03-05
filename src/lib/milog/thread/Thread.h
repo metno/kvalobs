@@ -39,9 +39,12 @@
 #  else
 #    include <milog/thread/PThread.h>
 #  endif
-#else 
-#include <milog/thread/DummyThread.h>
-#warning "NOT THREAD SAFE (define _REENTRANT)"
+#else  //TODO why is _REENTRANT not defined
+# define _REENTRANT
+# include <milog/thread/PThread.h>
+# undef _REENTRANT
+//#include <milog/thread/DummyThread.h>
+//#warning "NOT THREAD SAFE (define _REENTRANT)"
 #endif
 
 #endif

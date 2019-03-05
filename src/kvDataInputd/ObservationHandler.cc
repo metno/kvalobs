@@ -39,11 +39,16 @@ namespace kd = kvalobs::datasource;
 namespace b = boost;
 
 using std::string;
+using std::shared_ptr;
+using std::make_shared;
 using std::endl;
 using std::ostringstream;
 using httpserver::http_response;
-using httpserver::http_response_builder;
+using httpserver::string_response;
+//using httpserver::http_response_builder;
 using httpserver::http::http_utils;
+
+
 
 namespace {
 int HttpServiceUnavailable = http_utils::http_service_unavailable;
@@ -58,12 +63,19 @@ ObservationHandler::ObservationHandler(DataSrcApp &app, kvalobs::service::Produc
       rawQue(raw) {
 }
 
-void ObservationHandler::render_POST(const httpserver::http_request& req, httpserver::http_response** res) {
+namespace {
+  shared_ptr<http_response> response(const std::string &content, 
+    int response_code = http_utils::http_ok,
+    const std::string& content_type = http_utils::text_plain) {
+      return shared_ptr<http_response>(new string_response( content, response_code, content_type));
+  }
+}
+
+const shared_ptr<http_response> ObservationHandler::render_POST(const httpserver::http_request& req) {
   Json::Value jval;
 
   if (app.inShutdown()) {
-    *res = new http_response(http_response_builder("The service is unavailable.", HttpServiceUnavailable).string_response());
-    return;
+    return response("The service is unavailable.", HttpServiceUnavailable);
   }
   unsigned long long serial = getSerialNumber();
   ostringstream ost;
@@ -85,23 +97,24 @@ void ObservationHandler::render_POST(const httpserver::http_request& req, httpse
     r = app.newObservation(obs.obsType.c_str(), obs.obs.c_str(), "http");
     jval = kd::decodeResultToJson(r);
     if (r.res == kd::EResult::OK) {
-      *res = new http_response(http_response_builder(jval.toStyledString(), HttpOk, "application/json").string_response());
+      return response(jval.toStyledString(), HttpOk, "application/json");
     } else if (r.res == kd::EResult::ERROR && b::starts_with(r.message, "SHUTDOWN")) {
-      *res = new http_response(http_response_builder("The service is unavailable.", HttpServiceUnavailable).string_response());
+      return response("The service is unavailable.", HttpServiceUnavailable);
     } else {
-      *res = new http_response(http_response_builder(jval.toStyledString(), HttpBadRequest, "application/json").string_response());
+      return response(jval.toStyledString(), HttpBadRequest, "application/json");
     }
   } catch (const DecodeResultException &ex) {
     LOGERROR("DecodeResultException: " << ex.what() << "\nobsType: '" << obs.obsType << "'\n" << "obsData:[\n" << obs.obs << "\n]\n")
     jval = decodeResultToJson(ex);
-    *res = new http_response(http_response_builder(jval.toStyledString(), HttpBadRequest, "application/json").string_response());
-    return;
+    return response(jval.toStyledString(), HttpBadRequest, "application/json");
   } catch ( const std::exception &ex) {
     LOGERROR("Unexpected exception: " << ex.what() << "\nobsType: '" << obs.obsType << "'\n" << "obsData:[\n" << obs.obs << "\n]\n")
     string err("Problems: " );
     err += ex.what();
-    *res = new http_response(http_response_builder(err, HttpInternalServerError, "application/text" ).string_response());
+    return response(err, HttpInternalServerError, "application/text");
   }
+  //This should never happend
+  return response("Unexpected error.", HttpInternalServerError, "application/text");
 }
 
 ObservationHandler::Observation ObservationHandler::getObservation(const httpserver::http_request& req) {

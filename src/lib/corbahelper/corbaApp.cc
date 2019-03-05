@@ -282,7 +282,7 @@ CORBA::Object_ptr CorbaApp::getObjFromNS(const std::string &name_) {
   if (!ns.decode(nameservice_, 2809)) {
     CERR(
         "WARNING CorbaApp::putObjInNS: Cant decode default nameservice '" << nameservice_ << "'." << endl);
-    return false;
+    return CORBA::Object::_nil();
   }
 
   return getObjFromNS(name_, ns);

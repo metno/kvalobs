@@ -32,12 +32,17 @@
 
 #include <atomic>
 #include <string>
+#include <memory>
 #include "httpserver.hpp"
 #include "lib/kvsubscribe/SendData.h"
 #include "lib/kvsubscribe/ProducerCommand.h"
 #include "kvDataInputd/DataSrcApp.h"
 
-class ObservationHandler : public httpserver::http_resource<ObservationHandler> {
+
+using httpserver::http_resource;
+using httpserver::http_response;
+
+class ObservationHandler : public http_resource {
  public:
   struct Observation {
     std::string obsType;
@@ -62,7 +67,7 @@ class ObservationHandler : public httpserver::http_resource<ObservationHandler> 
   };
 
   ObservationHandler(DataSrcApp &app, kvalobs::service::ProducerQuePtr raw);
-  void render_POST(const httpserver::http_request& req, httpserver::http_response** res);
+  const std::shared_ptr<http_response> render_POST(const httpserver::http_request& req);
 
  protected:
   unsigned long long getSerialNumber();
