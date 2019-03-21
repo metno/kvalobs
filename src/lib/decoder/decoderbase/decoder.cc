@@ -533,7 +533,8 @@ addDataToDbThrow(const miutil::miTime &obstime, int stationid, int typeid_,
 
   kvalobs::decoder::DataUpdateTransaction work(pt_obstime, stationid, typeid_, &std::get<0>(data), &std::get<1>(data), logid, onlyAddOrUpdateData);
 
-  con.perform(work);
+  //con.perform(work, 20, dnmi::db::Connection::READ_COMMITTED);
+  con.perform(work, 20, dnmi::db::Connection::REPEATABLE_READ);
   decodedData.push_back(work.insertedOrUpdatedData());
   
   return work.ok();

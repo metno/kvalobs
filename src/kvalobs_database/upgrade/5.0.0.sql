@@ -20,7 +20,6 @@ GRANT USAGE, SELECT ON SEQUENCE observations_observationid_seq TO kv_write,kv_ad
 
 CREATE TABLE obsdata (
     observationid BIGINT REFERENCES observations(observationid) ON DELETE CASCADE,
-    obs_offset  INTERVAL NOT NULL DEFAULT '0h',
     original    FLOAT NOT NULL,
     paramid     INTEGER NOT NULL,
     sensor      CHAR(1) DEFAULT '0',
@@ -29,8 +28,9 @@ CREATE TABLE obsdata (
     controlinfo CHAR(16) DEFAULT '0000000000000000',
     useinfo     CHAR(16) DEFAULT '0000000000000000',
     cfailed     TEXT DEFAULT NULL,          
-    UNIQUE ( observationid, paramid, level, sensor, obs_offset ) 
+    UNIQUE ( observationid, paramid, level, sensor ) 
 );
+
 
 REVOKE ALL ON obsdata FROM public;
 GRANT ALL ON obsdata TO kv_admin;
@@ -40,10 +40,9 @@ GRANT SELECT, UPDATE, INSERT, DELETE ON obsdata TO kv_write;
 
 CREATE TABLE obstextdata (
     observationid BIGINT REFERENCES observations(observationid) ON DELETE CASCADE,
-    obs_offset  INTERVAL NOT NULL DEFAULT '0h',
     original    TEXT NOT NULL,
     paramid     INTEGER NOT NULL,
-    UNIQUE ( observationid, paramid, obs_offset ) 
+    UNIQUE ( observationid, paramid ) 
 );
 
 REVOKE ALL ON obstextdata FROM public;
@@ -119,7 +118,7 @@ DROP TABLE data;
 CREATE VIEW data AS (
     SELECT 
         o.stationid,
-        o.obstime + d.obs_offset as obstime,
+        o.obstime,
         d.original,
         d.paramid,
         o.tbtime,
@@ -147,7 +146,7 @@ DROP TABLE text_data;
 CREATE VIEW text_data AS (
     SELECT 
         o.stationid,
-        o.obstime + d.obs_offset as obstime,
+        o.obstime,
         d.original,
         d.paramid,
         o.tbtime,
@@ -175,7 +174,6 @@ ALTER TABLE workque DROP COLUMN tbtime;
 CREATE INDEX workque_priority_obsid ON workque (priority, observationid);
 CREATE INDEX workque_qa_start_qa_stop_idx ON workque (qa_start, qa_stop);
 
-
 ALTER TABLE workstatistik DROP CONSTRAINT workstatistik_stationid_obstime_typeid_key;
 ALTER TABLE workstatistik ADD COLUMN observationid bigint;
 UPDATE workstatistik s SET observationid=(SELECT observationid FROM observations o WHERE o.stationid=s.stationid AND o.typeid=s.typeid AND o.obstime=s.obstime);
@@ -202,7 +200,7 @@ BEGIN
 	INSERT INTO data_history 
 		(stationid,obstime,original,paramid,tbtime,typeid,sensor,level,corrected,controlinfo,useinfo,cfailed)
 	VALUES
-		(obs.stationid,obs.obstime+NEW.obs_offset,NEW.original,NEW.paramid,obs.tbtime,obs.typeid,NEW.sensor,NEW.level,NEW.corrected,NEW.controlinfo,NEW.useinfo,NEW.cfailed);
+		(obs.stationid,obs.obstime,NEW.original,NEW.paramid,obs.tbtime,obs.typeid,NEW.sensor,NEW.level,NEW.corrected,NEW.controlinfo,NEW.useinfo,NEW.cfailed);
 	RETURN NULL;
 END;
 $BODY$
@@ -228,7 +226,7 @@ BEGIN
 	INSERT INTO data_history 
 		(stationid,obstime,original,paramid,tbtime,typeid,sensor,level,corrected,controlinfo,useinfo,cfailed)
 	VALUES
-		(obs.stationid,obs.obstime+OLD.obs_offset,NULL,OLD.paramid,obs.tbtime,obs.typeid,OLD.sensor,OLD.level,NULL,NULL,NULL,NULL);
+		(obs.stationid,obs.obstime,NULL,OLD.paramid,obs.tbtime,obs.typeid,OLD.sensor,OLD.level,NULL,NULL,NULL,NULL);
 	RETURN NULL;
 END;
 $BODY$
@@ -248,7 +246,7 @@ BEGIN
 	INSERT INTO text_data_history
 		(stationid,obstime,original,paramid,tbtime,typeid)
 	VALUES
-		(obs.stationid,obs.obstime+NEW.obs_offset,NEW.original,NEW.paramid,obs.tbtime,obs.typeid);
+		(obs.stationid,obs.obstime,NEW.original,NEW.paramid,obs.tbtime,obs.typeid);
 	RETURN NULL;
 END;
 $BODY$
@@ -273,7 +271,7 @@ BEGIN
 	INSERT INTO text_data_history 
 		(stationid,obstime,original,paramid,tbtime,typeid)
 	VALUES
-		(obs.stationid,obs.obstime+OLD.obs_offset,NULL,OLD.paramid,obs.tbtime,obs.typeid);
+		(obs.stationid,obs.obstime,NULL,OLD.paramid,obs.tbtime,obs.typeid);
 	RETURN NULL;
 END;
 $BODY$
@@ -304,7 +302,6 @@ BEGIN
     END IF;
     INSERT INTO obsdata VALUES (
         obs,
-        '0h',
         original,
         paramid,
         sensor,
@@ -372,7 +369,6 @@ BEGIN
     END IF;
     INSERT INTO obstextdata VALUES (
         obs,
-        '0h',
         original,
         paramid
     );
@@ -403,6 +399,15 @@ CREATE OR REPLACE RULE text_data_delete AS ON DELETE TO text_data DO INSTEAD (
             stationid=OLD.stationid AND typeid=OLD.typeid AND obstime=OLD.obstime) AND
         paramid=OLD.paramid
 );
+
+
+CREATE VIEW pdata AS
+    SELECT data.stationid, data.obstime, data.tbtime, data.typeid, (SELECT param.name FROM param WHERE (param.paramid = data.paramid))
+    AS paramid, data.original, data.corrected, data.sensor, data.level, data.controlinfo, data.useinfo, data.cfailed FROM data;
+REVOKE ALL ON pdata FROM public;
+GRANT ALL ON pdata TO kv_admin;
+GRANT SELECT ON pdata TO kv_read;
+GRANT SELECT ON pdata TO kv_write;
 
 CREATE OR REPLACE FUNCTION 
 kvalobs_database_version()

@@ -385,7 +385,6 @@ Observation *Observation::getFromDb(
     obs->setTextData(*res.get());
 
     return obs.release();
-
   } 
   catch( ... ) {
     tran.abort();
