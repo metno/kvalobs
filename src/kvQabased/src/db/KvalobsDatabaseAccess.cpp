@@ -619,11 +619,32 @@ void KvalobsDatabaseAccess::write(const DataList & data) {
 }
 
 qabase::Observation * KvalobsDatabaseAccess::selectDataForControl() {
-    static const std::string findNext =
-        "select o.observationid, stationid, typeid, obstime, o.tbtime from workque q, observations o where q.observationid=o.observationid and process_start is not null and ((qa_start<now()-'10 minutes'::interval and qa_stop is null) or (qa_start is null and stationid not in (select o.stationid from workque q, observations o where o.observationid=q.observationid and qa_start is not null and qa_stop is null))) order by priority, tbtime limit 1;";
-        //"select o.observationid, stationid, typeid, obstime, o.tbtime from workque q, observations o where q.observationid=o.observationid and process_start is not null and ((qa_start<now()-'10 minutes'::interval and qa_stop is null) or (qa_start is null and stationid not in (select stationid from workque where qa_start is not null and qa_stop is null))) order by priority, tbtime limit 1;";
 
-    std::unique_ptr<dnmi::db::Result> result(connection_->execQuery(findNext));
+    std::vector<int> runningChecks;
+    std::unique_ptr<dnmi::db::Result> result(connection_->execQuery("select o.stationid from workque q, observations o where o.observationid=q.observationid and qa_start is not null and qa_stop is null;"));
+    while (result->hasNext()) {
+      auto row = result->next();
+      int station = boost::lexical_cast<int>(row[0]);
+      runningChecks.push_back(station);
+    }
+
+    std::ostringstream query;
+    query << "select o.observationid, stationid, typeid, obstime, o.tbtime from workque q, observations o "
+      "where q.observationid=o.observationid and process_start is not null and "
+      "((qa_start<now()-'10 minutes'::interval and qa_stop is null) or "
+      "(qa_start is null";
+    if (not runningChecks.empty()) {
+      query << " and stationid not in (";
+      auto it = runningChecks.begin();
+      query << *it;
+      while (++it != runningChecks.end()) {
+        query << ", " << *it;
+      }
+      query << ")";
+    }
+    query << ")) order by priority, tbtime limit 1;";
+
+    std::unique_ptr<dnmi::db::Result> result(connection_->execQuery(query.str()));
     if (!result || !result->hasNext())
       return nullptr;
 
