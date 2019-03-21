@@ -644,7 +644,7 @@ qabase::Observation * KvalobsDatabaseAccess::selectDataForControl() {
     }
     query << ")) order by priority, tbtime limit 1;";
 
-    std::unique_ptr<dnmi::db::Result> result(connection_->execQuery(query.str()));
+    result.reset(connection_->execQuery(query.str()));
     if (!result || !result->hasNext())
       return nullptr;
 
@@ -656,7 +656,7 @@ qabase::Observation * KvalobsDatabaseAccess::selectDataForControl() {
     boost::posix_time::ptime obstime = boost::posix_time::time_from_string(row[3]);
     boost::posix_time::ptime tbtime = boost::posix_time::time_from_string(row[4]);
 
-    std::ostringstream query;
+    query.str("");
     query << "UPDATE workque SET qa_start=statement_timestamp() WHERE ";
     query << "observationid=" << observationid;
 
