@@ -99,7 +99,7 @@ namespace decoder {
 
 DataUpdateTransaction::DataUpdateTransaction(const boost::posix_time::ptime &obstime, int stationid, int typeID,
                                              std::list<kvalobs::kvData> *newData, std::list<kvalobs::kvTextData> *newTextData, const std::string &logid,
-                                             bool onlyAddOrUpdateData_)
+                                             bool onlyAddOrUpdateData_, bool addToWorkQueue_)
     : newData(newData),
       newTextData(newTextData),
       obstime(obstime),
@@ -109,7 +109,8 @@ DataUpdateTransaction::DataUpdateTransaction(const boost::posix_time::ptime &obs
       ok_(new bool(false)),
       logid(logid),
       nRetry(0),
-      onlyAddOrUpdateData(onlyAddOrUpdateData_) {
+      onlyAddOrUpdateData(onlyAddOrUpdateData_),
+      addToWorkQueue(addToWorkQueue_) {
 }
 
 DataUpdateTransaction::DataUpdateTransaction(const DataUpdateTransaction &dut)
@@ -122,7 +123,8 @@ DataUpdateTransaction::DataUpdateTransaction(const DataUpdateTransaction &dut)
       ok_(dut.ok_),
       logid(dut.logid),
       nRetry(dut.nRetry),
-      onlyAddOrUpdateData(dut.onlyAddOrUpdateData) {
+      onlyAddOrUpdateData(dut.onlyAddOrUpdateData),
+      addToWorkQueue(dut.addToWorkQueue) {
 }
 
 DataUpdateTransaction::~DataUpdateTransaction() {
@@ -130,6 +132,10 @@ DataUpdateTransaction::~DataUpdateTransaction() {
 
 
 void DataUpdateTransaction::updateWorkQue(dnmi::db::Connection *con, long observationid, int pri) {
+  if ( ! addToWorkQueue ) {
+    return;
+  }
+  
   ostringstream q;
 
   q << "INSERT INTO workque (observationid,priority,process_start,qa_start,qa_stop,service_start,service_stop) "

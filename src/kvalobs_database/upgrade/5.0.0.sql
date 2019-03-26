@@ -139,7 +139,8 @@ CREATE VIEW data AS (
 REVOKE ALL ON data FROM public;
 GRANT ALL ON data TO kv_admin;
 GRANT SELECT ON data TO kv_read;
-GRANT SELECT ON data TO kv_write;
+GRANT SELECT, INSERT, UPDATE, DELETE ON data TO kv_write;
+
 
 DROP TABLE text_data;
 
@@ -161,7 +162,7 @@ CREATE VIEW text_data AS (
 REVOKE ALL ON text_data FROM public;
 GRANT ALL ON text_data TO kv_admin;
 GRANT SELECT ON text_data TO kv_read;
-GRANT SELECT ON text_data TO kv_write;
+GRANT SELECT, INSERT, UPDATE, DELETE ON data TO kv_write;
 
 ALTER TABLE workque ADD COLUMN observationid bigint REFERENCES observations(observationid) ON DELETE CASCADE;
 UPDATE workque q SET observationid=(SELECT observationid FROM observations o WHERE o.stationid=q.stationid AND o.typeid=q.typeid AND o.obstime=q.obstime);
@@ -173,6 +174,7 @@ ALTER TABLE workque DROP COLUMN typeid;
 ALTER TABLE workque DROP COLUMN tbtime;
 CREATE INDEX workque_priority_obsid ON workque (priority, observationid);
 CREATE INDEX workque_qa_start_qa_stop_idx ON workque (qa_start, qa_stop);
+CREATE INDEX workque_process_start_index on workque (process_start);
 
 ALTER TABLE workstatistik DROP CONSTRAINT workstatistik_stationid_obstime_typeid_key;
 ALTER TABLE workstatistik ADD COLUMN observationid bigint;
@@ -316,6 +318,48 @@ END;
 $BODY$
 LANGUAGE 'plpgsql';
 
+
+CREATE OR REPLACE FUNCTION rmdata(
+    stationid_ integer,
+    typeid_ integer,
+    obstime_ timestamp,
+    paramid_ integer,
+    sensor_ char(1),
+    level_ integer
+) RETURNS void AS
+$BODY$
+DECLARE 
+    obs bigint;
+    cnt integer;
+BEGIN
+    RAISE LOG 'Checkpoint #0, % % % % % %', stationid_, typeid_, obstime_, paramid_, sensor_, level_;
+
+    SELECT observationid INTO obs FROM observations o WHERE o.stationid=stationid_ AND o.typeid=typeid_ AND o.obstime=obstime_;
+    IF NOT FOUND THEN
+        RAISE LOG 'No observation foud %  %  %', stationid_, typeid_, obstime_;
+        RETURN;
+    END IF;
+
+    RAISE LOG 'Checkpoint #1, obsid  %', obs;
+    DELETE FROM obsdata o WHERE 
+        o.observationid=obs AND
+        o.paramid=paramid_ AND
+        o.sensor=sensor_ AND
+        o.level=level_;
+
+    RAISE LOG 'Checkpoint #2';
+    SELECT count(*) INTO cnt FROM obsdata o WHERE o.observationid=obs;
+    RAISE LOG 'Checkpoint #3, cnt %', cnt;
+    IF NOT FOUND OR cnt = 0 THEN
+        RAISE LOG 'Checkpoint #4, obs= % deleteing observation', obs;
+        DELETE FROM observations o WHERE o.observationid=obs;     
+    END IF;
+    RETURN;
+END;
+$BODY$
+LANGUAGE 'plpgsql';
+
+
 CREATE OR REPLACE RULE data_insert AS ON INSERT TO data DO INSTEAD (
     SELECT mkdata(NEW.stationid, NEW.obstime, NEW.original, NEW.paramid, NEW.tbtime, NEW.typeid, NEW.sensor, NEW.level, NEW.corrected, NEW.controlinfo, NEW.useinfo, NEW.cfailed);
 );
@@ -340,14 +384,20 @@ CREATE OR REPLACE RULE data_update AS ON UPDATE TO data DO INSTEAD (
 );
 
 CREATE OR REPLACE RULE data_delete AS ON DELETE TO data DO INSTEAD (
-    DELETE FROM obsdata WHERE 
-        observationid=(
-            select observationid from observations where
-            stationid=OLD.stationid AND typeid=OLD.typeid AND obstime=OLD.obstime) AND
-        paramid=OLD.paramid AND
-        sensor=OLD.sensor AND
-        level=OLD.level
+    SELECT rmdata(OLD.stationid, OLD.typeid, OLD.obstime, OLD.paramid, OLD.sensor, OLD.level);
 );
+
+
+--CREATE OR REPLACE RULE data_delete AS ON DELETE TO data DO INSTEAD (
+--    DELETE FROM obsdata WHERE 
+--        observationid=(
+--            select observationid from observations where
+--            stationid=OLD.stationid AND typeid=OLD.typeid AND obstime=OLD.obstime) AND
+--        paramid=OLD.paramid AND
+--        sensor=OLD.sensor AND
+--        level=OLD.level
+--  
+--);
 
 
 

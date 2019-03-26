@@ -1,3 +1,8 @@
+kvalobs (5.0.0~rc15-1) xenial; urgency=medium
+  * kv2kvDecoder, allow it to be used as a "replicator".
+
+ -- Borge Moe <borge.moe@met.no>  Wed, 26 Mar 2019 07:45:00 +0100
+
 kvalobs (5.0.0~rc14-1) xenial; urgency=medium
   * kvDataInputd,  set db isolaltion level to REPEATABLE_READ.
 

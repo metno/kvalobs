@@ -793,6 +793,7 @@ CREATE TABLE workque (
 
 CREATE INDEX workque_priority_obsid ON workque (priority, observationid);
 CREATE INDEX workque_qa_start_qa_stop_idx ON workque (qa_start, qa_stop);
+CREATE INDEX workque_process_start_index on workque (process_start);
 REVOKE ALL ON workque FROM public;
 GRANT ALL ON workque TO kv_admin;
 GRANT SELECT ON workque TO kv_read;
@@ -863,9 +864,6 @@ GRANT ALL ON qc2_interpolation_best_neighbors TO kv_admin;
 GRANT SELECT ON qc2_interpolation_best_neighbors TO kv_read;
 GRANT SELECT, UPDATE, INSERT, DELETE ON qc2_interpolation_best_neighbors TO kv_write;
 
--- "select o.observationid, stationid, typeid, obstime, o.tbtime from workque q, observations o where q.observationid=o.observationid and process_start is not null and ((qa_start<now()-'10 minutes'::interval and qa_stop is null) or (qa_start is null and stationid not in (select o.stationid from workque q, observations o where o.observationid=q.observationid and qa_start is not null and qa_stop is null))) order by priority, tbtime ;"
-
-
 CREATE VIEW workque_waiting  AS
 select
 	o.stationid,
@@ -882,12 +880,6 @@ where q.observationid=o.observationid and process_start is not null and ((qa_sta
       (qa_start is null and stationid not in 
        (select o.stationid from workque q, observations o where o.observationid=q.observationid and qa_start is not null and qa_stop is null))) 
 order by priority, tbtime ;    
-
---from
---	 observations obs,
---	 workque w 
--- where
---    w.qa_start is null and w.observationid = obs.observationid and w.process_start is not null and ((w.qa_start<now()-'10 minutes'::interval and w.qa_stop is null) or (w.qa_start is null and obs.stationid not in (select o.stationid from workque q, observations o where o.observationid=q.observationid and q.qa_start is not null and q.qa_stop is null))) order by w.priority, obs.tbtime ;	
 
 REVOKE ALL ON workque_waiting FROM public;
 GRANT ALL ON workque_waiting TO kv_admin;

@@ -68,6 +68,7 @@ class DataUpdateTransaction : public dnmi::db::Transaction {
   std::string insertType;
   int nRetry;
   bool onlyAddOrUpdateData;
+  bool addToWorkQueue;
 
   bool doIsEqual(const std::list<kvalobs::kvData> &oldData_, const std::list<kvalobs::kvTextData> &oldTextData, bool replace);
 
@@ -88,8 +89,9 @@ class DataUpdateTransaction : public dnmi::db::Transaction {
                         int typeid_,
                         std::list<kvalobs::kvData> *newData,
                         std::list<kvalobs::kvTextData> *newTextData,
-                        const std::string &logid, bool onlyAddOrUpdateData =
-                            false);
+                        const std::string &logid, 
+                        bool onlyAddOrUpdateData = false, 
+                        bool addToWorkQueue=true);
   DataUpdateTransaction(const DataUpdateTransaction &dut);
 
   virtual ~DataUpdateTransaction();

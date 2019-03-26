@@ -72,15 +72,16 @@ kv2kvDecoder::kv2kvDecoder(dnmi::db::Connection & con, const ParamList & params,
                            int decoderId)
     : DecoderBase(con, params, typeList, obsType, obs, decoderId),
       dbGate(&con),
-      tbtime(boost::posix_time::microsec_clock::universal_time()) {
+      tbtime(boost::posix_time::microsec_clock::universal_time()),
+      checked_(false) {
   milog::LogContext lcontext(name());
   LOGDEBUG("kv2kvDecoder object created");
 
   try {
+    setChecked(obsType);
     parse(data, obs);
     parseResult_ = Ok;
     parseMessage_ = "Ok";
-
   } catch (DecoderError & e) {
     parseResult_ = Error;
     parseMessage_ = "Could not parse data";
@@ -89,6 +90,20 @@ kv2kvDecoder::kv2kvDecoder(dnmi::db::Connection & con, const ParamList & params,
 
 kv2kvDecoder::~kv2kvDecoder() {
 }
+
+void kv2kvDecoder::setChecked( const std::string &obsType ){
+  auto val = getObsTypeKey("checked");
+
+  if (val.empty() )
+    return;
+  
+  if (val[0]=='T' || val[0]=='t') {
+    checked_=true;
+  } else {
+    checked_ = false;
+  }
+}
+
 
 DecoderBase::DecodeResult kv2kvDecoder::execute(std::string & msg) {
   milog::LogContext lcontext(name());
@@ -194,8 +209,16 @@ void kv2kvDecoder::save2(const list<kvData> & dl_, const list<kvTextData> & tdl_
       }
 
       try {
+
+        // If checked is true, the data in the database is updated if it exist or added if it do not exist. 
+        // It do not replace data that already is in the database.
+        // If checked is true we do not add it to the workque. This will skip the run in kvQaBased. In this
+        // way we can almost 'replicate' the data from one kvalobs instance to another from the checked queue 
+        // in kafka. 
+        bool onlyUpdateData = checked_;
+        bool addDataToWorkQueue = ! checked_;
         if (!addDataToDbThrow(to_miTime(it->first), sinf.stationId, sinf.typeId, it->second, td,
-             logid, false)) {
+             logid, onlyUpdateData, addDataToWorkQueue)) {
           ostringstream ost;
 
           ost << "DBERROR: stationid: " << sinf.stationId << " typeid: " << sinf.typeId

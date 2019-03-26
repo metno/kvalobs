@@ -476,10 +476,12 @@ bool kvalobs::decoder::DecoderBase::addDataToDb(const miutil::miTime &obstime, i
   return addDataToDb(obstime, stationid, typeid_, sd, textData, logid, false);
 }
 
-bool kvalobs::decoder::DecoderBase::addDataToDb(const miutil::miTime &obstime, int stationid, int typeid_, std::list<kvalobs::kvData> &sd,
-                                                std::list<kvalobs::kvTextData> &textData, const std::string &logid, bool onlyAddOrUpdateData) {
+bool kvalobs::decoder::DecoderBase::addDataToDb(
+    const miutil::miTime &obstime, int stationid, int typeid_, 
+    std::list<kvalobs::kvData> &sd, std::list<kvalobs::kvTextData> &textData, 
+    const std::string &logid, bool onlyAddOrUpdateData, bool addToWorkQueue) {
   try {
-    return addDataToDbThrow(obstime, stationid, typeid_, sd, textData, logid, onlyAddOrUpdateData);
+    return addDataToDbThrow(obstime, stationid, typeid_, sd, textData, logid, onlyAddOrUpdateData, addToWorkQueue);
   }
   catch ( const dnmi::db::SQLException &e) {
     ostringstream ost;
@@ -516,7 +518,7 @@ kvalobs::decoder::DecoderBase::
 addDataToDbThrow(const miutil::miTime &obstime, int stationid, int typeid_,
                    std::list<kvalobs::kvData> &sd,
                    std::list<kvalobs::kvTextData> &textData, 
-                   const std::string &logid, bool onlyAddOrUpdateData)
+                   const std::string &logid, bool onlyAddOrUpdateData, bool addToWorkQueue)
 {
   namespace pt = boost::posix_time;
 

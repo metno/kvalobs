@@ -94,10 +94,13 @@ class kv2kvDecoder : public DecoderBase, public boost::noncopyable {
     }
   };
 
+  void setChecked( const std::string &obsType );
+  
   serialize::KvalobsData data;
   DecodeResult parseResult_;
   std::string parseMessage_;
   const boost::posix_time::ptime tbtime;
+  bool checked_;
 };
 
 }
