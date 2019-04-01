@@ -113,12 +113,9 @@ fmodeldata="$tmpdir/model_data-$endname"
 
 
 #Opprett sqlfilen for aa ta data ut av databasen
-echo "CREATE TEMP TABLE data_temp AS SELECT * FROM data WHERE obstime BETWEEN '$start_date' AND '$end_date';" > $sql 
-echo "CREATE TEMP TABLE text_data_temp AS SELECT * FROM text_data WHERE obstime BETWEEN '$start_date' AND '$end_date';" >> $sql
-echo "CREATE TEMP TABLE model_data_temp AS SELECT * FROM model_data WHERE obstime BETWEEN '$start_date' AND '$end_date';" >> $sql
-echo "\\copy data_temp TO $fdata WITH DELIMITER AS '|'"  >> $sql
-echo "\\copy text_data_temp TO $ftextdata WITH DELIMITER AS '|'" >> $sql
-echo "\\copy model_data_temp TO $fmodeldata WITH DELIMITER AS '|'" >> $sql
+echo "\\copy (SELECT * FROM data WHERE obstime BETWEEN '$start_date' AND '$end_date') TO $fdata WITH DELIMITER AS '|'"  > $sql
+echo "\\copy (SELECT * FROM text_data WHERE obstime BETWEEN '$start_date' AND '$end_date') TO $ftextdata WITH DELIMITER AS '|'" >> $sql
+echo "\\copy (SELECT * FROM model_data WHERE obstime BETWEEN '$start_date' AND '$end_date') TO $fmodeldata WITH DELIMITER AS '|'" >> $sql
 
 #Opprett en sqlfil for aa laste data inn i databasen.
 echo "\set ON_ERROR_STOP" > $lsql
