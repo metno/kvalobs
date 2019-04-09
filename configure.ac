@@ -71,6 +71,7 @@ AC_CONFIG_FILES([Makefile
                  src/model2kv/Makefile
                  src/kv2metdat/Makefile
                  src/kv2kro2/Makefile
+                 src/tools/kv2kvparser/Makefile
                  src/tools/kvpull/Makefile
                  src/tools/kvpush/Makefile
                  src/tools/kv2kvDataInputd/Makefile

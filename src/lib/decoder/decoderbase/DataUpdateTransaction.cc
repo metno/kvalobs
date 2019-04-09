@@ -99,7 +99,7 @@ namespace decoder {
 
 DataUpdateTransaction::DataUpdateTransaction(const boost::posix_time::ptime &obstime, int stationid, int typeID,
                                              std::list<kvalobs::kvData> *newData, std::list<kvalobs::kvTextData> *newTextData, const std::string &logid,
-                                             bool onlyAddOrUpdateData_, bool addToWorkQueue_)
+                                             bool onlyAddOrUpdateData_, bool addToWorkQueue_, bool tryToUseDataTbTime_)
     : newData(newData),
       newTextData(newTextData),
       obstime(obstime),
@@ -110,7 +110,8 @@ DataUpdateTransaction::DataUpdateTransaction(const boost::posix_time::ptime &obs
       logid(logid),
       nRetry(0),
       onlyAddOrUpdateData(onlyAddOrUpdateData_),
-      addToWorkQueue(addToWorkQueue_) {
+      addToWorkQueue(addToWorkQueue_),
+      tryToUseDataTbTime(tryToUseDataTbTime_) {
 }
 
 DataUpdateTransaction::DataUpdateTransaction(const DataUpdateTransaction &dut)
@@ -124,7 +125,8 @@ DataUpdateTransaction::DataUpdateTransaction(const DataUpdateTransaction &dut)
       logid(dut.logid),
       nRetry(dut.nRetry),
       onlyAddOrUpdateData(dut.onlyAddOrUpdateData),
-      addToWorkQueue(dut.addToWorkQueue) {
+      addToWorkQueue(dut.addToWorkQueue),
+      tryToUseDataTbTime(dut.tryToUseDataTbTime) {
 }
 
 DataUpdateTransaction::~DataUpdateTransaction() {
@@ -144,6 +146,42 @@ void DataUpdateTransaction::updateWorkQue(dnmi::db::Connection *con, long observ
   con->exec(q.str());
 }
 
+
+
+boost::posix_time::ptime DataUpdateTransaction::useTbTime(const std::list<kvalobs::kvData> &data, const std::list<kvalobs::kvTextData> &textData)const 
+{
+  if ( ! tryToUseDataTbTime ) {
+    return pt::second_clock::universal_time();
+  }
+
+  boost::posix_time::ptime tbTime;
+  
+  for( auto &it : data ) {
+    if( tbTime.is_special() ) {
+      tbTime = it.tbtime();
+      continue;
+    }
+    if( ! it.tbtime().is_special() && it.tbtime() < tbTime ) {
+      tbTime = it.tbtime();
+    }
+  }
+
+  for( auto &it : textData ) {
+    if( tbTime.is_special() ) {
+     tbTime = it.tbtime();
+      continue;
+    }
+    if( ! it.tbtime().is_special() && it.tbtime() < tbTime ) {
+      tbTime = it.tbtime();
+    }
+  }
+
+  if ( ! tbTime.is_special() ) {
+    return tbTime;
+  }
+
+  return pt::second_clock::universal_time();
+}
 
 int DataUpdateTransaction::getPriority(dnmi::db::Connection *con, int stationid, int typeid_, const boost::posix_time::ptime &obstime)
 {
@@ -305,8 +343,9 @@ bool DataUpdateTransaction::updateObservation(dnmi::db::Connection *conection, O
   q << "DELETE FROM observations WHERE observationid=" << obs->observationid();
 
   conection->exec(q.str());
+  pt::ptime tbTime = useTbTime(toUpdateData, toUpdateTextData);
 
-  Observation newObs(obs->stationID(), obs->typeID(), obs->obstime(), pt::second_clock::universal_time(), toUpdateData, toUpdateTextData);
+  Observation newObs(obs->stationID(), obs->typeID(), obs->obstime(), tbTime, toUpdateData, toUpdateTextData);
   newObs.insertIntoDb(conection, false);
   int pri = getPriority(conection, stationid, typeid_, obstime);
   updateWorkQue(conection, newObs.observationid(), pri);
@@ -319,8 +358,10 @@ bool DataUpdateTransaction::replaceObservation(dnmi::db::Connection *conection, 
   q << "DELETE FROM observations WHERE observationid=" << observationid;
 
   conection->exec(q.str());
+  
+  pt::ptime tbTime = useTbTime( *newData, *newTextData);
 
-  Observation newObs(stationid, typeid_, obstime, pt::second_clock::universal_time(), *newData, *newTextData);
+  Observation newObs(stationid, typeid_, obstime, tbTime, *newData, *newTextData);
   newObs.insertIntoDb(conection, false);
   int pri = getPriority(conection, stationid, typeid_, obstime);
   updateWorkQue(conection, newObs.observationid(), pri);
@@ -352,7 +393,7 @@ bool DataUpdateTransaction::operator()(dnmi::db::Connection *conection) {
               << it->original() << endl;
       } else {
         mylog << pt::to_kvalobs_string(it->obstime()) << "," << it->stationID() << "," << it->typeID() << "," << it->paramID() << "," << it->sensor() << ","
-              << it->level() << "," << it->original() << endl;
+              << it->level() << "," << it->original() << ", " << pt::to_kvalobs_string(it->tbtime()) << endl;
       }
     }
 
@@ -369,7 +410,8 @@ bool DataUpdateTransaction::operator()(dnmi::db::Connection *conection) {
   
   if (!oldObs) { //No observation exist
     insertType="INSERT";
-    Observation newObs(stationid, typeid_, obstime, pt::second_clock::universal_time(), *newData, *newTextData);
+    pt::ptime tbTime = useTbTime( *newData, *newTextData);
+    Observation newObs(stationid, typeid_, obstime, tbTime, *newData, *newTextData);
     newObs.insertIntoDb(conection, false);
     int pri = getPriority(conection, stationid, typeid_, obstime);
     updateWorkQue(conection, newObs.observationid(), pri);

@@ -87,11 +87,11 @@ int KvDataContainer::get(TextData &textData, Data &data,
 
 int KvDataContainer::getTextData(TextDataByObstime &textData, int stationid,
                                  int typeId,
-                                 const boost::posix_time::ptime &tbtime) const {
+                                 const boost::posix_time::ptime &tbtime, bool setTbTime) const {
   int n = 0;
   textData.clear();
   std::list<kvalobs::kvTextData> td;
-  data_->data(td, true, tbtime);
+  data_->data(td, setTbTime, tbtime);
 
   for (auto &&elem : td) {
     if (elem.stationID() != stationid || elem.typeID() != typeId)
@@ -105,11 +105,11 @@ int KvDataContainer::getTextData(TextDataByObstime &textData, int stationid,
 }
 
 int KvDataContainer::getData(DataByObstime &data, int stationid, int typeId,
-                             const boost::posix_time::ptime &tbtime) const {
+                             const boost::posix_time::ptime &tbtime, bool setTbTime) const {
   int n = 0;
   data.clear();
   std::list<kvalobs::kvData> d;
-  data_->data(d, true, tbtime);
+  data_->data(d, setTbTime, tbtime);
 
   for (auto &&elem : d) {
     if (elem.stationID() != stationid || elem.typeID() != typeId)
@@ -124,9 +124,9 @@ int KvDataContainer::getData(DataByObstime &data, int stationid, int typeId,
 
 int KvDataContainer::get(DataByObstime &data, TextDataByObstime &textData,
                          int stationid, int typeId,
-                         const boost::posix_time::ptime &tbtime) const {
-  return getTextData(textData, stationid, typeId, tbtime)
-      + getData(data, stationid, typeId, tbtime);
+                         const boost::posix_time::ptime &tbtime, bool setTbTime) const {
+  return getTextData(textData, stationid, typeId, tbtime, setTbTime)
+      + getData(data, stationid, typeId, tbtime, setTbTime);
 }
 
 bool KvDataContainer::getData(kvalobs::kvData &data, int stationid, int typeId,

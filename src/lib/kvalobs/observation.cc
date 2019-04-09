@@ -289,7 +289,8 @@ void Observation::setData(const dnmi::db::Result &res){
     dnmi::db::DRow & row = const_cast<db::Result&>(res).next();
     data_.push_back(getKvData(row,&obsid));
     if (observationid_ != obsid) { 
-      // Remove it again if it was not for this observationid (Should never happend)
+      
+      // Remove it again if it was not for this observationid
       data_.pop_back(); 
     }
   }
@@ -302,7 +303,7 @@ void Observation::setTextData(const dnmi::db::Result &res){
     textData_.push_back(getKvTextData(row,&obsid));
     if (observationid_ != obsid) { 
       // Remove it again if it was not for this observationid (Should never happend)
-      data_.pop_back(); 
+      textData_.pop_back(); 
     }
   }
 

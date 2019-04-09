@@ -69,6 +69,7 @@ class DataUpdateTransaction : public dnmi::db::Transaction {
   int nRetry;
   bool onlyAddOrUpdateData;
   bool addToWorkQueue;
+  bool tryToUseDataTbTime;
 
   bool doIsEqual(const std::list<kvalobs::kvData> &oldData_, const std::list<kvalobs::kvTextData> &oldTextData, bool replace);
 
@@ -81,6 +82,7 @@ class DataUpdateTransaction : public dnmi::db::Transaction {
   bool addDataToList(const kvalobs::kvData &data,
                      std::list<kvalobs::kvData> &dataList, bool replaceOnly =
                          false);
+  boost::posix_time::ptime useTbTime(const std::list<kvalobs::kvData> &data, const std::list<kvalobs::kvTextData> &textData)const;
   
   bool isEqual(const std::list<kvalobs::kvData> &oldData,
                const std::list<kvalobs::kvTextData> &oldTextData);
@@ -91,8 +93,11 @@ class DataUpdateTransaction : public dnmi::db::Transaction {
                         std::list<kvalobs::kvTextData> *newTextData,
                         const std::string &logid, 
                         bool onlyAddOrUpdateData = false, 
-                        bool addToWorkQueue=true);
+                        bool addToWorkQueue=true,
+                        bool tryToUseDataTbTime = false);
   DataUpdateTransaction(const DataUpdateTransaction &dut);
+
+
 
   virtual ~DataUpdateTransaction();
   virtual bool operator()(dnmi::db::Connection *conection);

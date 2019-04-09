@@ -80,14 +80,14 @@ class KvDataContainer {
 
   int getTextData(TextDataByObstime &textData, int stationid, int typeId,
                   const boost::posix_time::ptime &tbtime =
-                      boost::posix_time::ptime()) const;
+                      boost::posix_time::ptime(), bool setTbTime=true) const;
   int getData(DataByObstime &data, int stationid, int typeId,
               const boost::posix_time::ptime &tbtime =
-                  boost::posix_time::ptime()) const;
+                  boost::posix_time::ptime(), bool setTbTime=true) const;
 
   int get(DataByObstime &data, TextDataByObstime &textData, int stationid,
           int typeId, const boost::posix_time::ptime &tbtime =
-              boost::posix_time::ptime()) const;
+              boost::posix_time::ptime(), bool setTbTime=true) const;
 
   bool getData(kvalobs::kvData &data, int stationid, int typeId, int paramid,
                const boost::posix_time::ptime &obstime, char sensor = '0',
