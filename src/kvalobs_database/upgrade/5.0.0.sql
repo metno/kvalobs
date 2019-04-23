@@ -332,26 +332,26 @@ DECLARE
     obs bigint;
     cnt integer;
 BEGIN
-    RAISE LOG 'Checkpoint #0, % % % % % %', stationid_, typeid_, obstime_, paramid_, sensor_, level_;
+--    RAISE LOG 'Checkpoint #0, % % % % % %', stationid_, typeid_, obstime_, paramid_, sensor_, level_;
 
     SELECT observationid INTO obs FROM observations o WHERE o.stationid=stationid_ AND o.typeid=typeid_ AND o.obstime=obstime_;
     IF NOT FOUND THEN
-        RAISE LOG 'No observation foud %  %  %', stationid_, typeid_, obstime_;
+ --       RAISE LOG 'No observation foud %  %  %', stationid_, typeid_, obstime_;
         RETURN;
     END IF;
 
-    RAISE LOG 'Checkpoint #1, obsid  %', obs;
+ --   RAISE LOG 'Checkpoint #1, obsid  %', obs;
     DELETE FROM obsdata o WHERE 
         o.observationid=obs AND
         o.paramid=paramid_ AND
         o.sensor=sensor_ AND
         o.level=level_;
 
-    RAISE LOG 'Checkpoint #2';
+ --   RAISE LOG 'Checkpoint #2';
     SELECT count(*) INTO cnt FROM obsdata o WHERE o.observationid=obs;
-    RAISE LOG 'Checkpoint #3, cnt %', cnt;
+ --   RAISE LOG 'Checkpoint #3, cnt %', cnt;
     IF NOT FOUND OR cnt = 0 THEN
-        RAISE LOG 'Checkpoint #4, obs= % deleteing observation', obs;
+ --     RAISE LOG 'Checkpoint #4, obs= % deleteing observation', obs;
         DELETE FROM observations o WHERE o.observationid=obs;     
     END IF;
     RETURN;
