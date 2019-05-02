@@ -162,7 +162,7 @@ CREATE VIEW text_data AS (
 REVOKE ALL ON text_data FROM public;
 GRANT ALL ON text_data TO kv_admin;
 GRANT SELECT ON text_data TO kv_read;
-GRANT SELECT, INSERT, UPDATE, DELETE ON data TO kv_write;
+GRANT SELECT, INSERT, UPDATE, DELETE ON text_data TO kv_write;
 
 ALTER TABLE workque ADD COLUMN observationid bigint REFERENCES observations(observationid) ON DELETE CASCADE;
 UPDATE workque q SET observationid=(SELECT observationid FROM observations o WHERE o.stationid=q.stationid AND o.typeid=q.typeid AND o.obstime=q.obstime);
