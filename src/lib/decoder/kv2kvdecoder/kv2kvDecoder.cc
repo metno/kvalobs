@@ -187,6 +187,7 @@ void kv2kvDecoder::verifyAndAdapt(KvalobsData & data, list<kvData> & out) {
   }
 }
 
+
 void kv2kvDecoder::save2(const list<kvData> & dl_, const list<kvTextData> & tdl_) 
 {
   // If checked is true
@@ -197,7 +198,8 @@ void kv2kvDecoder::save2(const list<kvData> & dl_, const list<kvTextData> & tdl_
   // This way we can almost 'replicate' the data from one kvalobs instance to another from the checked queue 
   // in kafka.
   
-  bool onlyUpdateData = checked_;
+  // bool onlyUpdateData = checked_;
+  bool onlyUpdateData = true;
   bool addDataToWorkQueue = ! checked_;
   bool tryToUseDataTbTime = checked_;
 
@@ -231,7 +233,7 @@ void kv2kvDecoder::save2(const list<kvData> & dl_, const list<kvTextData> & tdl_
 
       try {
         if (!addDataToDbThrow(to_miTime(it->first), sinf.stationId, sinf.typeId, it->second, td,
-             logid, onlyUpdateData, addDataToWorkQueue, tryToUseDataTbTime)) {
+             logid, onlyUpdateData, addDataToWorkQueue, tryToUseDataTbTime, false)) {
           ostringstream ost;
 
           ost << "DBERROR: stationid: " << sinf.stationId << " typeid: " << sinf.typeId
@@ -276,7 +278,7 @@ void kv2kvDecoder::save2(const list<kvData> & dl_, const list<kvTextData> & tdl_
       for (KvDataContainer::TextDataByObstime::iterator it = textData.begin();
           it != textData.end(); ++it) {
         if (!addDataToDb(to_miTime(it->first), sinf.stationId, sinf.typeId, dl, it->second,
-                       logid, onlyUpdateData, addDataToWorkQueue, tryToUseDataTbTime)) {
+                       logid, onlyUpdateData, addDataToWorkQueue, tryToUseDataTbTime, false)) {
           ostringstream ost;
           ost << "DBERROR: TextData: stationid: " << sinf.stationId << " typeid: "
               << sinf.typeId << " obstime: " << it->first;
@@ -288,9 +290,6 @@ void kv2kvDecoder::save2(const list<kvData> & dl_, const list<kvTextData> & tdl_
     }
   }
 }
-
-
-
 
 void kv2kvDecoder::save(const list<kvData> & dl, const list<kvTextData> & tdl) {
   // kvTextData:

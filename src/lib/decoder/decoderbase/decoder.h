@@ -315,13 +315,13 @@ class DecoderBase {
   bool addDataToDb(const miutil::miTime &obstime, int stationid, int typeid_,
                    std::list<kvalobs::kvData> &sd,
                    std::list<kvalobs::kvTextData> &textData, 
-                   const std::string &logid, bool onlyAddOrUpdateData, bool addToWorkQueue=true, bool tryToUseDataTbTime=false);
+                   const std::string &logid, bool onlyAddOrUpdateData, bool addToWorkQueue=true, bool tryToUseDataTbTime=false, bool enableDuplicateTest=true);
 
 
   bool addDataToDbThrow(const miutil::miTime &obstime, int stationid, int typeid_,
                    std::list<kvalobs::kvData> &sd,
                    std::list<kvalobs::kvTextData> &textData, 
-                   const std::string &logid, bool onlyAddOrUpdateData, bool addToWorkQueue=true, bool tryToUseDataTbTime=false);
+                   const std::string &logid, bool onlyAddOrUpdateData, bool addToWorkQueue=true, bool tryToUseDataTbTime=false, bool enableDuplicateTest=true);
 
   /**
    * \brief insert the \em obs message into the table \em rejectdecode.

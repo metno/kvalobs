@@ -99,7 +99,8 @@ namespace decoder {
 
 DataUpdateTransaction::DataUpdateTransaction(const boost::posix_time::ptime &obstime, int stationid, int typeID,
                                              std::list<kvalobs::kvData> *newData, std::list<kvalobs::kvTextData> *newTextData, const std::string &logid,
-                                             bool onlyAddOrUpdateData_, bool addToWorkQueue_, bool tryToUseDataTbTime_)
+                                             bool onlyAddOrUpdateData_, bool addToWorkQueue_, bool tryToUseDataTbTime_,
+                                             bool enableDuplicateTest_)
     : newData(newData),
       newTextData(newTextData),
       obstime(obstime),
@@ -111,7 +112,8 @@ DataUpdateTransaction::DataUpdateTransaction(const boost::posix_time::ptime &obs
       nRetry(0),
       onlyAddOrUpdateData(onlyAddOrUpdateData_),
       addToWorkQueue(addToWorkQueue_),
-      tryToUseDataTbTime(tryToUseDataTbTime_) {
+      tryToUseDataTbTime(tryToUseDataTbTime_),
+      enableDuplicateTest(enableDuplicateTest_) {
 }
 
 DataUpdateTransaction::DataUpdateTransaction(const DataUpdateTransaction &dut)
@@ -126,7 +128,8 @@ DataUpdateTransaction::DataUpdateTransaction(const DataUpdateTransaction &dut)
       nRetry(dut.nRetry),
       onlyAddOrUpdateData(dut.onlyAddOrUpdateData),
       addToWorkQueue(dut.addToWorkQueue),
-      tryToUseDataTbTime(dut.tryToUseDataTbTime) {
+      tryToUseDataTbTime(dut.tryToUseDataTbTime),
+      enableDuplicateTest(dut.enableDuplicateTest) {
 }
 
 DataUpdateTransaction::~DataUpdateTransaction() {
@@ -253,7 +256,7 @@ bool DataUpdateTransaction::doIsEqual(const std::list<kvalobs::kvData> &oldData,
 
   if( replace ) {
     if ( newData->size() != oldData.size() || newTextData->size() != oldTextData.size()) {
-      log << "isEqual: size differ: " << oldData.size() << " (" << newData->size() << ") " << "- " << oldTextData.size() << " (" << newTextData->size()
+      log << "isEqual: size differ: data " << oldData.size() << " (" << newData->size() << ") " << "- textData " << oldTextData.size() << " (" << newTextData->size()
           << ")\n";
 
       return false;
@@ -299,6 +302,9 @@ bool DataUpdateTransaction::doIsEqual(const std::list<kvalobs::kvData> &oldData,
 
 
 bool DataUpdateTransaction::isEqual(const std::list<kvalobs::kvData> &oldData_, const std::list<kvalobs::kvTextData> &oldTextData) {
+  if( !enableDuplicateTest )
+    return false;
+
   //if onlyAddOrUpdateData is false, the oldadata is to be replaced by the new data.
   //If true the new data is to be addded to the data that is alleady in the databse.
   if( doIsEqual(oldData_, oldTextData, !onlyAddOrUpdateData) ) {
@@ -402,7 +408,7 @@ bool DataUpdateTransaction::operator()(dnmi::db::Connection *conection) {
       return false;
     }
 
-    log << "NewData " << (onlyAddOrUpdateData ? "(replenish):" : ":") << "stationid: " << stationid << " typeid: " << typeid_ << " obstime: "
+    log << "NewData " << (onlyAddOrUpdateData ? "(update):" : ":") << "stationid: " << stationid << " typeid: " << typeid_ << " obstime: "
         << pt::to_kvalobs_string(obstime) << endl << mylog.str() << endl;
   }
 
@@ -426,7 +432,7 @@ bool DataUpdateTransaction::operator()(dnmi::db::Connection *conection) {
   }
 
   if (onlyAddOrUpdateData) {
-    insertType = "REPLENISH";
+    insertType = "UPDATE";
     return updateObservation(conection, oldObs.get());
   }
 

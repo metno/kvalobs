@@ -479,9 +479,9 @@ bool kvalobs::decoder::DecoderBase::addDataToDb(const miutil::miTime &obstime, i
 bool kvalobs::decoder::DecoderBase::addDataToDb(
     const miutil::miTime &obstime, int stationid, int typeid_, 
     std::list<kvalobs::kvData> &sd, std::list<kvalobs::kvTextData> &textData, 
-    const std::string &logid, bool onlyAddOrUpdateData, bool addToWorkQueue, bool tryToUseDataTbTime) {
+    const std::string &logid, bool onlyAddOrUpdateData, bool addToWorkQueue, bool tryToUseDataTbTime, bool enableDuplicateTest) {
   try {
-    return addDataToDbThrow(obstime, stationid, typeid_, sd, textData, logid, onlyAddOrUpdateData, addToWorkQueue, tryToUseDataTbTime);
+    return addDataToDbThrow(obstime, stationid, typeid_, sd, textData, logid, onlyAddOrUpdateData, addToWorkQueue, tryToUseDataTbTime, enableDuplicateTest);
   }
   catch ( const dnmi::db::SQLException &e) {
     ostringstream ost;
@@ -518,7 +518,7 @@ kvalobs::decoder::DecoderBase::
 addDataToDbThrow(const miutil::miTime &obstime, int stationid, int typeid_,
                    std::list<kvalobs::kvData> &sd,
                    std::list<kvalobs::kvTextData> &textData, 
-                   const std::string &logid, bool onlyAddOrUpdateData, bool addToWorkQueue, bool tryToUseDataTbTime)
+                   const std::string &logid, bool onlyAddOrUpdateData, bool addToWorkQueue, bool tryToUseDataTbTime, bool enableDuplicateTest)
 {
   namespace pt = boost::posix_time;
 
@@ -533,7 +533,7 @@ addDataToDbThrow(const miutil::miTime &obstime, int stationid, int typeid_,
     return true;
   }
 
-  kvalobs::decoder::DataUpdateTransaction work(pt_obstime, stationid, typeid_, &std::get<0>(data), &std::get<1>(data), logid, onlyAddOrUpdateData, addToWorkQueue, tryToUseDataTbTime);
+  kvalobs::decoder::DataUpdateTransaction work(pt_obstime, stationid, typeid_, &std::get<0>(data), &std::get<1>(data), logid, onlyAddOrUpdateData, addToWorkQueue, tryToUseDataTbTime, enableDuplicateTest);
 
   //con.perform(work, 20, dnmi::db::Connection::READ_COMMITTED);
   con.perform(work, 20, dnmi::db::Connection::REPEATABLE_READ);

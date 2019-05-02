@@ -1,3 +1,15 @@
+
+
+kvalobs (5.0.0~rc17-1) xenial; urgency=medium
+  * kv2kvDecoder, disable the duplicate test for this decoder.
+
+ -- Borge Moe <borge.moe@met.no>  Fri, 26 Apr 2019 09:45:00 +0100
+
+kvalobs (5.0.0~rc16-1) xenial; urgency=medium
+  * kv2kvDecoder, allways use onlyUpdateData.
+
+ -- Borge Moe <borge.moe@met.no>  Fri, 26 Apr 2019 07:45:00 +0100
+
 kvalobs (5.0.0~rc15-1) xenial; urgency=medium
   * kv2kvDecoder, allow it to be used as a "replicator".
 

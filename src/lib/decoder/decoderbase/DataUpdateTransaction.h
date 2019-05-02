@@ -70,6 +70,7 @@ class DataUpdateTransaction : public dnmi::db::Transaction {
   bool onlyAddOrUpdateData;
   bool addToWorkQueue;
   bool tryToUseDataTbTime;
+  bool enableDuplicateTest;
 
   bool doIsEqual(const std::list<kvalobs::kvData> &oldData_, const std::list<kvalobs::kvTextData> &oldTextData, bool replace);
 
@@ -94,7 +95,8 @@ class DataUpdateTransaction : public dnmi::db::Transaction {
                         const std::string &logid, 
                         bool onlyAddOrUpdateData = false, 
                         bool addToWorkQueue=true,
-                        bool tryToUseDataTbTime = false);
+                        bool tryToUseDataTbTime = false,
+                        bool enableDuplicateTest=true);
   DataUpdateTransaction(const DataUpdateTransaction &dut);
 
 
