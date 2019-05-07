@@ -55,35 +55,57 @@ namespace decoder {
  *
  */
 class DataUpdateTransaction : public dnmi::db::Transaction {
+public:
+  typedef enum { 
+    Partial,  //! Use only the original value for the test
+    Complete  //! Use all values original, corrected, controlinfo, useinfo and cfailed.
+    } DuplicateTestType;
+  
+private:
   DataUpdateTransaction operator=(const DataUpdateTransaction &rhs);
   std::list<kvalobs::kvData> *newData;
   std::list<kvalobs::kvTextData> *newTextData;
   boost::posix_time::ptime obstime;
   int stationid;
   int typeid_;
-  boost::shared_ptr<kvalobs::serialize::KvalobsData> data_;  // Data that is inserted or updated
+
+  // Data that is inserted or updated. This is not used in the kv2018 update
+  //but maybe we will reuse it later.
+  boost::shared_ptr<kvalobs::serialize::KvalobsData> data_;  
+
+  /**
+   * dataToPublish - 
+   *  Data that is inserted or updated and added to the database, but not to the workqueue
+   *  this data will not be processed by kvQabase and not published by kvQabase.
+   *  At the momment it is only HQC only data that bypass kvQabase
+   */
+  boost::shared_ptr<kvalobs::serialize::KvalobsData> dataToPublish_;  
   boost::shared_ptr<bool> ok_;
-  std::ostringstream log;
+  mutable std::ostringstream log;
   std::string logid;
   std::string insertType;
   int nRetry;
   bool onlyAddOrUpdateData;
   bool addToWorkQueue;
   bool tryToUseDataTbTime;
-  bool enableDuplicateTest;
-
-  bool doIsEqual(const std::list<kvalobs::kvData> &oldData_, const std::list<kvalobs::kvTextData> &oldTextData, bool replace);
+  DuplicateTestType  duplicateTestType;
+  bool onlyHqcData;
+  
+  bool partialIsEqual(const std::list<kvalobs::kvData> &oldData_, const std::list<kvalobs::kvTextData> &oldTextData, bool replace)const;
+  bool completeIsEqual(const std::list<kvalobs::kvData> &oldData, const std::list<kvalobs::kvTextData> &oldTextData, bool replace)const;
+  void onlyHqcDataCheck();
 
  public:
   int getPriority(dnmi::db::Connection *conection, int stationid, int typeid_, const boost::posix_time::ptime &obstime);
   void updateWorkQue(dnmi::db::Connection *conection, long observationid, int priority);
+  void checkWorkQue(dnmi::db::Connection *conection, long observationid);
   bool updateObservation(dnmi::db::Connection *conection, kvalobs::Observation *obs);
   bool replaceObservation(dnmi::db::Connection *conection, long observationid);
   void setTbtime(dnmi::db::Connection *conection);
   bool addDataToList(const kvalobs::kvData &data,
                      std::list<kvalobs::kvData> &dataList, bool replaceOnly =
                          false);
-  boost::posix_time::ptime useTbTime(const std::list<kvalobs::kvData> &data, const std::list<kvalobs::kvTextData> &textData)const;
+  boost::posix_time::ptime useTbTime(const std::list<kvalobs::kvData> &data, const std::list<kvalobs::kvTextData> &textData, const boost::posix_time::ptime &defaultTbTime)const;
   
   bool isEqual(const std::list<kvalobs::kvData> &oldData,
                const std::list<kvalobs::kvTextData> &oldTextData);
@@ -96,7 +118,7 @@ class DataUpdateTransaction : public dnmi::db::Transaction {
                         bool onlyAddOrUpdateData = false, 
                         bool addToWorkQueue=true,
                         bool tryToUseDataTbTime = false,
-                        bool enableDuplicateTest=true);
+                        DataUpdateTransaction::DuplicateTestType  duplicateTestType=Partial);
   DataUpdateTransaction(const DataUpdateTransaction &dut);
 
 
@@ -114,6 +136,10 @@ class DataUpdateTransaction : public dnmi::db::Transaction {
   
   kvalobs::serialize::KvalobsData insertedOrUpdatedData() const {
     return *data_;
+  }
+
+  kvalobs::serialize::KvalobsData dataToPublish() const {
+    return *dataToPublish_;
   }
 
   bool ok() const {

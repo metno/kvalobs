@@ -451,7 +451,7 @@ void Observation::insertIntoDb(dnmi::db::Connection *con, bool useTransaction)
     string tbtime;
 
     if ( tbtime_.is_special() ) {
-      tbtime=dbTime(pt::second_clock::universal_time());
+      tbtime=dbTime(pt::microsec_clock::universal_time());
     } else {
       tbtime=dbTime(tbtime_);
     }

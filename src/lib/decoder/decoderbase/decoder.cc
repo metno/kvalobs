@@ -518,10 +518,11 @@ kvalobs::decoder::DecoderBase::
 addDataToDbThrow(const miutil::miTime &obstime, int stationid, int typeid_,
                    std::list<kvalobs::kvData> &sd,
                    std::list<kvalobs::kvTextData> &textData, 
-                   const std::string &logid, bool onlyAddOrUpdateData, bool addToWorkQueue, bool tryToUseDataTbTime, bool enableDuplicateTest)
+                   const std::string &logid, bool onlyAddOrUpdateData, bool addToWorkQueue, bool tryToUseDataTbTime, 
+                   bool partialDuplicateTest)
 {
   namespace pt = boost::posix_time;
-
+  DataUpdateTransaction::DuplicateTestType duplicateTest;
   boost::gregorian::date date(obstime.year(), obstime.month(), obstime.day());
   boost::posix_time::time_duration clock(pt::hours(obstime.hour()) + pt::minutes(obstime.min()) + pt::seconds(obstime.sec()));
   boost::posix_time::ptime pt_obstime(date, clock);
@@ -533,11 +534,21 @@ addDataToDbThrow(const miutil::miTime &obstime, int stationid, int typeid_,
     return true;
   }
 
-  kvalobs::decoder::DataUpdateTransaction work(pt_obstime, stationid, typeid_, &std::get<0>(data), &std::get<1>(data), logid, onlyAddOrUpdateData, addToWorkQueue, tryToUseDataTbTime, enableDuplicateTest);
+  if( partialDuplicateTest )
+    duplicateTest=DataUpdateTransaction::Partial;
+  else
+    duplicateTest=DataUpdateTransaction::Complete;
+
+  kvalobs::decoder::DataUpdateTransaction work(pt_obstime, stationid, typeid_, &std::get<0>(data), &std::get<1>(data), logid, onlyAddOrUpdateData, addToWorkQueue, tryToUseDataTbTime, duplicateTest);
 
   //con.perform(work, 20, dnmi::db::Connection::READ_COMMITTED);
   con.perform(work, 20, dnmi::db::Connection::REPEATABLE_READ);
   decodedData.push_back(work.insertedOrUpdatedData());
+
+  auto publish = work.dataToPublish();
+  if ( work.ok() && ! publish.empty() ) {
+    publishData.push_back(publish);
+  }
   
   return work.ok();
 }

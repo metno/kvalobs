@@ -50,28 +50,6 @@ using std::logic_error;
 using kvalobs::Observation;
 
 namespace {
-
-bool isKvDataEqual(const kvalobs::kvData &rhs, const kvalobs::kvData &lhs) {
-  if (rhs.obstime() == lhs.obstime() && rhs.stationID() == lhs.stationID() && rhs.typeID() == lhs.typeID() && rhs.paramID() == lhs.paramID()
-      && rhs.sensor() == lhs.sensor() && rhs.level() == lhs.level()) {
-    float nv = lhs.original();
-    float ov = rhs.original();
-
-    if (static_cast<int>((nv + 0.005) * 100) == static_cast<int>((ov + 0.005) * 100))
-      return true;
-  }
-
-  return false;
-}
-
-bool isKvTextDataEqual(const kvalobs::kvTextData &rhs, const kvalobs::kvTextData &lhs) {
-  if (rhs.obstime() == lhs.obstime() && rhs.stationID() == lhs.stationID() && rhs.typeID() == lhs.typeID() && rhs.paramID() == lhs.paramID()
-      && rhs.original() == lhs.original())
-    return true;
-  else
-    return false;
-}
-
 std::list<kvalobs::kvData>::const_iterator findElem(const kvalobs::kvData &elem, const std::list<kvalobs::kvData> &list) {
   for (std::list<kvalobs::kvData>::const_iterator it = list.begin(); it != list.end(); ++it) {
     if (elem.obstime() == it->obstime() && elem.stationID() == it->stationID() && elem.typeID() == it->typeID() && elem.paramID() == it->paramID()
@@ -100,20 +78,22 @@ namespace decoder {
 DataUpdateTransaction::DataUpdateTransaction(const boost::posix_time::ptime &obstime, int stationid, int typeID,
                                              std::list<kvalobs::kvData> *newData, std::list<kvalobs::kvTextData> *newTextData, const std::string &logid,
                                              bool onlyAddOrUpdateData_, bool addToWorkQueue_, bool tryToUseDataTbTime_,
-                                             bool enableDuplicateTest_)
+                                             DataUpdateTransaction::DuplicateTestType duplicateTestType_)
     : newData(newData),
       newTextData(newTextData),
       obstime(obstime),
       stationid(stationid),
       typeid_(typeID),
       data_(new kvalobs::serialize::KvalobsData()),
+      dataToPublish_(new kvalobs::serialize::KvalobsData()),
       ok_(new bool(false)),
       logid(logid),
       nRetry(0),
       onlyAddOrUpdateData(onlyAddOrUpdateData_),
       addToWorkQueue(addToWorkQueue_),
       tryToUseDataTbTime(tryToUseDataTbTime_),
-      enableDuplicateTest(enableDuplicateTest_) {
+      duplicateTestType(duplicateTestType_),
+      onlyHqcData(false) {
 }
 
 DataUpdateTransaction::DataUpdateTransaction(const DataUpdateTransaction &dut)
@@ -123,21 +103,65 @@ DataUpdateTransaction::DataUpdateTransaction(const DataUpdateTransaction &dut)
       stationid(dut.stationid),
       typeid_(dut.typeid_),
       data_(dut.data_),
+      dataToPublish_(dut.dataToPublish_),
       ok_(dut.ok_),
       logid(dut.logid),
       nRetry(dut.nRetry),
       onlyAddOrUpdateData(dut.onlyAddOrUpdateData),
       addToWorkQueue(dut.addToWorkQueue),
       tryToUseDataTbTime(dut.tryToUseDataTbTime),
-      enableDuplicateTest(dut.enableDuplicateTest) {
+      duplicateTestType(dut.duplicateTestType),
+      onlyHqcData(dut.onlyHqcData) {
 }
 
 DataUpdateTransaction::~DataUpdateTransaction() {
 }
 
 
+void DataUpdateTransaction::onlyHqcDataCheck() 
+{
+  dataToPublish_->clear();
+  onlyHqcData=false;
+
+  for (auto it : *newData) {
+    if( ! it.controlinfo().hqcDone() ) {
+      return;
+    }
+  }
+  onlyHqcData=true;
+
+  //We can now bypass kvQabase with NOT adding this data to the workqueue.
+  //But the data must be published on the 'checked' kafka queue. 
+
+  dataToPublish_->insert(newData->begin(), newData->end());
+  dataToPublish_->insert(newTextData->begin(), newTextData->end());
+}
+
+
+
+void DataUpdateTransaction::checkWorkQue(dnmi::db::Connection *con, long observationid)
+{
+  //Check if we have an unprocessed worque element for this observationid. 
+  //It is unprocessed if qa_stop is null. In this case we must ensure that 
+  //a new workque element is generated if the data is deleted because of cascading deletes
+  //the workque element to.
+
+  ostringstream q;
+
+  q << "SELECT observationid FROM workque WHERE observationid="<< observationid << " AND "
+    << "qa_stop IS NULL";
+ 
+  std::unique_ptr<dnmi::db::Result> res;
+  res.reset(con->execQuery(q.str()));
+
+  if (res->size() > 0 ) {
+    dataToPublish_->clear();
+    onlyHqcData = false;  //This ensures that we create a new workque element.
+  }
+}
+
 void DataUpdateTransaction::updateWorkQue(dnmi::db::Connection *con, long observationid, int pri) {
-  if ( ! addToWorkQueue ) {
+  if ( ! addToWorkQueue || onlyHqcData) {
     return;
   }
   
@@ -151,10 +175,13 @@ void DataUpdateTransaction::updateWorkQue(dnmi::db::Connection *con, long observ
 
 
 
-boost::posix_time::ptime DataUpdateTransaction::useTbTime(const std::list<kvalobs::kvData> &data, const std::list<kvalobs::kvTextData> &textData)const 
+boost::posix_time::ptime 
+DataUpdateTransaction
+::useTbTime(const std::list<kvalobs::kvData> &data, const std::list<kvalobs::kvTextData> &textData,
+            const boost::posix_time::ptime &defaultTbTime)const 
 {
   if ( ! tryToUseDataTbTime ) {
-    return pt::second_clock::universal_time();
+    return defaultTbTime;
   }
 
   boost::posix_time::ptime tbTime;
@@ -183,7 +210,7 @@ boost::posix_time::ptime DataUpdateTransaction::useTbTime(const std::list<kvalob
     return tbTime;
   }
 
-  return pt::second_clock::universal_time();
+  return pt::microsec_clock::universal_time();
 }
 
 int DataUpdateTransaction::getPriority(dnmi::db::Connection *con, int stationid, int typeid_, const boost::posix_time::ptime &obstime)
@@ -251,7 +278,10 @@ int DataUpdateTransaction::getPriority(dnmi::db::Connection *con, int stationid,
 
 
 
-bool DataUpdateTransaction::doIsEqual(const std::list<kvalobs::kvData> &oldData, const std::list<kvalobs::kvTextData> &oldTextData, bool replace) {
+bool 
+DataUpdateTransaction::
+partialIsEqual(const std::list<kvalobs::kvData> &oldData, const std::list<kvalobs::kvTextData> &oldTextData, bool replace)const 
+{
   bool found=false;
 
   if( replace ) {
@@ -301,13 +331,76 @@ bool DataUpdateTransaction::doIsEqual(const std::list<kvalobs::kvData> &oldData,
 }
 
 
+bool 
+DataUpdateTransaction::
+completeIsEqual(const std::list<kvalobs::kvData> &oldData, const std::list<kvalobs::kvTextData> &oldTextData, bool replace) const
+{
+  bool found=false;
+
+  if( replace ) {
+    if ( newData->size() != oldData.size() || newTextData->size() != oldTextData.size()) {
+      log << "doCompleteIsEqual: size differ: data " << oldData.size() << " (" << newData->size() << ") " << "- textData " << oldTextData.size() << " (" << newTextData->size()
+          << ")\n";
+
+      return false;
+    }
+  }
+
+  for (list<kvalobs::kvData>::const_iterator nit = newData->begin(); nit != newData->end(); ++nit) {
+    found = false;
+
+    for (list<kvalobs::kvData>::const_iterator oit = oldData.begin(); oit != oldData.end(); ++oit) {
+      if (oit->obstime() == nit->obstime() && oit->stationID() == nit->stationID() && oit->typeID() == nit->typeID() && oit->paramID() == nit->paramID()
+          && oit->sensor() == nit->sensor() && oit->level() == nit->level()) {
+        float norig = nit->original();
+        float oorig = oit->original();
+        float ncor = nit->corrected();
+        float ocor = oit->corrected();
+
+
+        if ((static_cast<int>((norig + 0.005) * 100) == static_cast<int>((oorig + 0.005) * 100)) &&
+            (static_cast<int>((ncor + 0.005) * 100) == static_cast<int>((ocor + 0.005) * 100)) &&
+            (nit->controlinfo() == oit->controlinfo()) &&
+            (nit->useinfo() == oit->useinfo()) &&
+            (nit->cfailed() == oit->cfailed())
+         ) {
+          found = true;
+          break;
+        }
+      }
+    }
+
+    if (!found)
+      return false;
+  }
+
+  for (list<kvalobs::kvTextData>::const_iterator nit = newTextData->begin(); nit != newTextData->end(); ++nit) {
+    found = false;
+    for (list<kvalobs::kvTextData>::const_iterator oit = oldTextData.begin(); oit != oldTextData.end(); ++oit) {
+      if (oit->obstime() == nit->obstime() && oit->stationID() == nit->stationID() && oit->typeID() == nit->typeID() && oit->paramID() == nit->paramID()
+          && oit->original() == nit->original()) {
+        found = true;
+        break;
+      }
+    }
+
+    if (!found)
+      return false;
+  }
+
+  return found;
+}
+
+
+
 bool DataUpdateTransaction::isEqual(const std::list<kvalobs::kvData> &oldData_, const std::list<kvalobs::kvTextData> &oldTextData) {
-  if( !enableDuplicateTest )
-    return false;
+  if( duplicateTestType == Complete ){
+    return completeIsEqual(oldData_, oldTextData, !onlyAddOrUpdateData);
+  }
 
   //if onlyAddOrUpdateData is false, the oldadata is to be replaced by the new data.
   //If true the new data is to be addded to the data that is alleady in the databse.
-  if( doIsEqual(oldData_, oldTextData, !onlyAddOrUpdateData) ) {
+  if( partialIsEqual(oldData_, oldTextData, !onlyAddOrUpdateData) ) {
     return true;
   }
 
@@ -319,7 +412,7 @@ bool DataUpdateTransaction::isEqual(const std::list<kvalobs::kvData> &oldData_, 
       it = oldData.erase(it);
   }
 
-  return doIsEqual(oldData, oldTextData, !onlyAddOrUpdateData);
+  return partialIsEqual(oldData, oldTextData, !onlyAddOrUpdateData);
 }
 
 
@@ -344,12 +437,13 @@ bool DataUpdateTransaction::updateObservation(dnmi::db::Connection *conection, O
   if( toUpdateData.empty() && toUpdateTextData.empty())
     return true;
 
+  checkWorkQue(conection, obs->observationid());
   ostringstream q;
 
   q << "DELETE FROM observations WHERE observationid=" << obs->observationid();
 
   conection->exec(q.str());
-  pt::ptime tbTime = useTbTime(toUpdateData, toUpdateTextData);
+  pt::ptime tbTime = useTbTime(toUpdateData, toUpdateTextData, obs->tbtime());
 
   Observation newObs(obs->stationID(), obs->typeID(), obs->obstime(), tbTime, toUpdateData, toUpdateTextData);
   newObs.insertIntoDb(conection, false);
@@ -360,12 +454,14 @@ bool DataUpdateTransaction::updateObservation(dnmi::db::Connection *conection, O
 
 bool DataUpdateTransaction::replaceObservation(dnmi::db::Connection *conection, long observationid)
 {
+  checkWorkQue(conection, observationid);
+
   ostringstream q;
   q << "DELETE FROM observations WHERE observationid=" << observationid;
 
   conection->exec(q.str());
   
-  pt::ptime tbTime = useTbTime( *newData, *newTextData);
+  pt::ptime tbTime = useTbTime( *newData, *newTextData, pt::microsec_clock::universal_time());
 
   Observation newObs(stationid, typeid_, obstime, tbTime, *newData, *newTextData);
   newObs.insertIntoDb(conection, false);
@@ -389,6 +485,7 @@ bool DataUpdateTransaction::operator()(dnmi::db::Connection *conection) {
     return true;
   }
 
+  onlyHqcDataCheck();
 
   if (!logid.empty()) {
     bool err = false;
@@ -409,14 +506,14 @@ bool DataUpdateTransaction::operator()(dnmi::db::Connection *conection) {
     }
 
     log << "NewData " << (onlyAddOrUpdateData ? "(update):" : ":") << "stationid: " << stationid << " typeid: " << typeid_ << " obstime: "
-        << pt::to_kvalobs_string(obstime) << endl << mylog.str() << endl;
+        << pt::to_kvalobs_string(obstime) << " onlyHqcData: "<<(onlyHqcData?"true":"false") << endl << mylog.str() << endl;
   }
 
   std::unique_ptr<Observation> oldObs(Observation::getFromDb(conection, stationid, typeid_, obstime, false));
   
   if (!oldObs) { //No observation exist
     insertType="INSERT";
-    pt::ptime tbTime = useTbTime( *newData, *newTextData);
+    pt::ptime tbTime = useTbTime( *newData, *newTextData, pt::microsec_clock::universal_time());
     Observation newObs(stationid, typeid_, obstime, tbTime, *newData, *newTextData);
     newObs.insertIntoDb(conection, false);
     int pri = getPriority(conection, stationid, typeid_, obstime);
@@ -427,6 +524,7 @@ bool DataUpdateTransaction::operator()(dnmi::db::Connection *conection) {
   if (isEqual(oldObs->data(), oldObs->textData())) {
     log << "Data allready exist. stationid: " << stationid << " typeid: " << typeid_ << " obstime: " << pt::to_kvalobs_string(obstime) << endl;
     IDLOGINFO("duplicates", "DUPLICATE: stationid: " << stationid << " typeid: " << typeid_ << " obstime: " << pt::to_kvalobs_string(obstime));
+    dataToPublish_->clear();    
     insertType = "DUPLICATE";
     return true;
   }
