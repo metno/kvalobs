@@ -153,6 +153,7 @@ kvData Observation::getKvData(const dnmi::db::DRow &r_, long *obsid_) {
   kvUseInfo useinfo;
   std::string cfailed;
   
+  *obsid_ = 0;
   for (; it != names.end(); it++) {
     try {
       buf = r[*it];
@@ -162,6 +163,12 @@ kvData Observation::getKvData(const dnmi::db::DRow &r_, long *obsid_) {
         if( ! hasObservationid_ ){
           observationid_=obsid;
           hasObservationid_=true;
+        }
+
+        if( *obsid_ == 0 ) {
+          *obsid_ = obsid;
+        } else if( obsid != *obsid_ ) {
+          CERR("Observation::getKvData .. EXPECTING all observations has the same observationid\n");
         }
       } else if ( *it == "stationid" ) {
         stationid = atoi(buf.c_str());
@@ -206,11 +213,11 @@ kvData Observation::getKvData(const dnmi::db::DRow &r_, long *obsid_) {
       CERR("Observation::getKvData: unexpected exception ..... \n");
     }
   }
-
+/*
   if(  obsid_ ) {
     *obsid_ = obsid;
   }
-
+*/
   
   return kvData(stationid, obstime, original, paramid,
          tbtime, myTypeid, sensor, level, corrected, controlinfo,  useinfo,cfailed);
@@ -230,13 +237,21 @@ kvTextData Observation::getKvTextData(const dnmi::db::DRow &r_, long *obsid_){
   std::string original;
   int paramid;
   
+  *obsid_ = 0;
   for (; it != names.end(); it++) {
     try {
+       buf = r[*it];
        if (*it == "observationid" ) {
         obsid = atol(buf.c_str());
         if( ! hasObservationid_ ){
           observationid_=obsid;
           hasObservationid_=true;
+        }
+
+        if (*obsid_ == 0) {
+          *obsid_ = obsid;
+        } else if ( *obsid_ != obsid ) {
+            CERR("Observation::getKvTextData .. EXPECTING all observations has the same observationid\n");
         }
       } else if ( *it == "stationid" ) {
         stationid = atoi(buf.c_str());
@@ -269,11 +284,11 @@ kvTextData Observation::getKvTextData(const dnmi::db::DRow &r_, long *obsid_){
       CERR("getKvTextData: exception ..... \n");
     }
   }
-
+/*
   if(  obsid_ ) {
     *obsid_ = obsid;
   }
-
+*/
   if (obstime.is_special() ) {
       obstime = obstime_;
   }

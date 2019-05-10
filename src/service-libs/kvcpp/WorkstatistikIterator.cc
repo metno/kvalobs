@@ -144,7 +144,7 @@ class CorbaWorkstatistikIterator : public WorkstatistikIterator::Implementation 
         boost::posix_time::time_from_string_nothrow(
             std::string(rd.serviceStart)),
         boost::posix_time::time_from_string_nothrow(
-            std::string(rd.serviceStop)));
+            std::string(rd.serviceStop)), 0);
     return true;
   }
   virtual CKvalObs::CService::WorkstatistikIterator_var &getCorbaObjPtr() {

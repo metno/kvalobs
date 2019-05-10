@@ -13,8 +13,9 @@ SUBDIRS = \
 	script \
 	kv2kro2 \
 	tools/kv2kvparser \
-	tools/kvpush \
 	tools/kvpull \
 	tools/kv2kvDataInputd \
 	tools/aexecd \
 	tools/nagios
+
+#tools/kvpush 

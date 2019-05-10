@@ -73,7 +73,6 @@ AC_CONFIG_FILES([Makefile
                  src/kv2kro2/Makefile
                  src/tools/kv2kvparser/Makefile
                  src/tools/kvpull/Makefile
-                 src/tools/kvpush/Makefile
                  src/tools/kv2kvDataInputd/Makefile
                  src/tools/nagios/Makefile
                  src/kvDataInputd/kvdataclt/Makefile
@@ -99,6 +98,8 @@ AC_CONFIG_FILES([Makefile
                  src/lib/kvskel/libkvalobs_kvadmininterface.pc
                  src/lib/kvsubscribe/libkvsubscribe.pc
 ])
+
+#src/tools/kvpush/Makefile
 
 #libcurl, sets CURL_LIBS and CURL_CFLAGS.
 AX_LIB_CURL([7.15.5])

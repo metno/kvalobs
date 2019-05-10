@@ -312,7 +312,7 @@ kvalobs::decoder::DecoderBase::findType(int typeid_) const {
 
   return 0;
 }
-
+/*
 void kvalobs::decoder::DecoderBase::addStationInfo(long stationid, const miutil::miTime &obstime, long typeid_, const miutil::miTime &tbtime, int priority) {
   IkvStationInfoList it = stationInfoList.begin();
 
@@ -350,7 +350,7 @@ void kvalobs::decoder::DecoderBase::updateStationInfo(const kvalobs::kvStationIn
       stationInfoList.push_back(*nit);
   }
 }
-
+*/
 bool kvalobs::decoder::DecoderBase::isGenerated(long stationid, long typeid_) {
   kvDbGate gate(&con);
 
@@ -422,6 +422,7 @@ bool kvalobs::decoder::DecoderBase::deleteKvDataFromDb(const kvalobs::kvData &sd
   return true;
 }
 
+#if 0
 bool kvalobs::decoder::DecoderBase::putKvDataInDb(const kvalobs::kvData &sd_, int priority) {
   kvalobs::kvData sd(sd_);
   kvDbGate gate(&con);
@@ -470,6 +471,7 @@ bool kvalobs::decoder::DecoderBase::putKvDataInDb(const std::list<kvalobs::kvDat
 
   return true;
 }
+#endif
 
 bool kvalobs::decoder::DecoderBase::addDataToDb(const miutil::miTime &obstime, int stationid, int typeid_, std::list<kvalobs::kvData> &sd,
                                                 std::list<kvalobs::kvTextData> &textData, const std::string &logid) {
@@ -553,7 +555,7 @@ addDataToDbThrow(const miutil::miTime &obstime, int stationid, int typeid_,
   return work.ok();
 }
 
-
+#if 0
 bool kvalobs::decoder::DecoderBase::putkvTextDataInDb(const kvalobs::kvTextData &td_, int priority) {
   kvalobs::kvTextData td(td_);
   kvDbGate gate(&con);
@@ -632,7 +634,7 @@ bool kvalobs::decoder::DecoderBase::putkvTextDataInDb(const std::list<kvalobs::k
 
   return true;
 }
-
+#endif
 bool kvalobs::decoder::DecoderBase::putRejectdecodeInDb(const kvalobs::kvRejectdecode &sd) {
   kvDbGate gate(&con);
   kvRejectdecode reject(gate.esc(sd.message()), sd.tbtime(), gate.esc(sd.decoder()), gate.esc(sd.comment()), sd.fixed());

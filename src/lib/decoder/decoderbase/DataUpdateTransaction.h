@@ -99,6 +99,7 @@ private:
   int getPriority(dnmi::db::Connection *conection, int stationid, int typeid_, const boost::posix_time::ptime &obstime);
   void updateWorkQue(dnmi::db::Connection *conection, long observationid, int priority);
   void checkWorkQue(dnmi::db::Connection *conection, long observationid);
+  void worqueToWorkStatistik(dnmi::db::Connection *conection, long observationid);
   bool updateObservation(dnmi::db::Connection *conection, kvalobs::Observation *obs);
   bool replaceObservation(dnmi::db::Connection *conection, long observationid);
   void setTbtime(dnmi::db::Connection *conection);

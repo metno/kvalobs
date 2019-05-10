@@ -157,7 +157,12 @@ void DataUpdateTransaction::checkWorkQue(dnmi::db::Connection *con, long observa
   if (res->size() > 0 ) {
     dataToPublish_->clear();
     onlyHqcData = false;  //This ensures that we create a new workque element.
+    return;
   }
+
+  //We must ensure that an element in the workque that is processed in kvQabase is added
+  //to workstatistik.
+  worqueToWorkStatistik(con, observationid);
 }
 
 void DataUpdateTransaction::updateWorkQue(dnmi::db::Connection *con, long observationid, int pri) {
@@ -173,6 +178,37 @@ void DataUpdateTransaction::updateWorkQue(dnmi::db::Connection *con, long observ
   con->exec(q.str());
 }
 
+
+void DataUpdateTransaction::worqueToWorkStatistik(dnmi::db::Connection *con, long observationid) 
+{
+  //We must ensure that an element in the workque that is processed in kvQabase is added
+  //to workstatistik.
+
+  ostringstream q;
+
+  q.str("");
+  q << "INSERT INTO workstatistik SELECT "
+    << "o.stationid,"
+    << "o.obstime," 
+    << "o.typeid,"
+    << "o.tbtime,"
+    << "q.priority,"
+    << "q.process_start,"
+    << "q.qa_start,"
+    << "q.qa_stop,"
+    << "q.service_start,"
+    << "q.service_stop,"
+    << "q.observationid "
+    << "FROM workque q, observations o"
+    << "WHERE q.observationid=o.observationid AND q.observationid=" << observationid 
+    << " AND q.qa_stop IS NOT NULL AND (SELECT count(*) FROM workstatistik s WHERE q.observationid=s.observationid)=0";
+
+  con->exec(q.str());
+
+  q.str("");
+  q << "DELETE FROM workque WHERE observationid=" << observationid << " AND qa_stop IS NOT NULL";
+  con->exec(q.str());
+}
 
 
 boost::posix_time::ptime 

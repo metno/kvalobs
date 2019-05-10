@@ -1,7 +1,7 @@
 /*
  Kvalobs - Free Quality Control Software for Meteorological Observations
 
- $Id: kvWorkelement.cc,v 1.2.2.3 2007/09/27 09:02:31 paule Exp $
+ $Id: kvWorkque.cc,v 1.2.2.3 2007/09/27 09:02:31 paule Exp $
 
  Copyright (C) 2007 met.no
 
@@ -28,84 +28,70 @@
  with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#include <kvalobs/kvWorkelement.h>
+#include <kvalobs/kvWorkque.h>
 #include <miutil/timeconvert.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <sstream>
+#include <iomanip>
 
 using namespace std;
 using namespace dnmi;
 
-void kvalobs::kvWorkelement::createSortIndex() {
+void kvalobs::kvWorkque::createSortIndex() {
   std::ostringstream s;
-  s << stationid_;
-  s << obstime_;
-  s << typeid_;
+  s << std::setfill('0') << std::setw(3) << priority_ << std::setw(20) << observationid_;
+  
   sortBy_ = s.str();
 }
 
-kvalobs::kvWorkelement::kvWorkelement(const kvWorkelement &we)
-    : stationid_(we.stationid_),
-      obstime_(we.obstime_),
-      typeid_(we.typeid_),
-      tbtime_(we.tbtime_),
+kvalobs::kvWorkque::kvWorkque(const kvWorkque &we)
+    : observationid_(we.observationid_),
       priority_(we.priority_),
       process_start_(we.process_start_),
       qa_start_(we.qa_start_),
       qa_stop_(we.qa_stop_),
       service_start_(we.service_start_),
-      service_stop_(we.service_stop_),
-      observationid_(we.observationid_)
+      service_stop_(we.service_stop_)
 
 {
   createSortIndex();
 }
 
-kvalobs::kvWorkelement&
-kvalobs::kvWorkelement::operator=(const kvWorkelement &rhs) {
+kvalobs::kvWorkque&
+kvalobs::kvWorkque::operator=(const kvWorkque &rhs) {
   if (&rhs != this) {
-    stationid_ = rhs.stationid_;
-    obstime_ = rhs.obstime_;
-    typeid_ = rhs.typeid_;
-    tbtime_ = rhs.tbtime_;
+    observationid_ = rhs.observationid_;
     priority_ = rhs.priority_;
     process_start_ = rhs.process_start_;
     qa_start_ = rhs.qa_start_;
     qa_stop_ = rhs.qa_stop_;
     service_start_ = rhs.service_start_;
     service_stop_ = rhs.service_stop_;
-    observationid_ = rhs.observationid_;
+
     createSortIndex();
   }
 
   return *this;
 }
 
-bool kvalobs::kvWorkelement::set(int sid, const boost::posix_time::ptime &obt,
-                                 int tid, const boost::posix_time::ptime &tbt,
-                                 int pri,
+bool kvalobs::kvWorkque::set(long observationid, int pri,
                                  const boost::posix_time::ptime &process_start,
                                  const boost::posix_time::ptime &qa_start,
                                  const boost::posix_time::ptime &qa_stop,
                                  const boost::posix_time::ptime &service_start,
-                                 const boost::posix_time::ptime &service_stop,
-                                 long observationid) {
-  stationid_ = sid;
-  obstime_ = obt;
-  typeid_ = tid;
-  tbtime_ = tbt;
+                                 const boost::posix_time::ptime &service_stop) {
+  observationid_ = observationid;
   priority_ = pri;
   process_start_ = process_start;
   qa_start_ = qa_start;
   qa_stop_ = qa_stop;
   service_start_ = service_start;
   service_stop_ = service_stop;
-  observationid_ = observationid;
 
   createSortIndex();
 }
 
-bool kvalobs::kvWorkelement::set(const dnmi::db::DRow &r_) {
+bool kvalobs::kvWorkque::set(const dnmi::db::DRow &r_) {
   db::DRow &r = const_cast<db::DRow&>(r_);
   string buf;
   list<string> names = r.getFieldNames();
@@ -115,14 +101,8 @@ bool kvalobs::kvWorkelement::set(const dnmi::db::DRow &r_) {
     try {
       buf = r[*it];
 
-      if (*it == "stationid") {
-        stationid_ = atoi(buf.c_str());
-      } else if (*it == "obstime") {
-        obstime_ = boost::posix_time::time_from_string_nothrow(buf);
-      } else if (*it == "typeid") {
-        typeid_ = atoi(buf.c_str());
-      } else if (*it == "tbtime") {
-        tbtime_ = boost::posix_time::time_from_string_nothrow(buf);
+      if (*it == "observationid") {
+        observationid_ = atol(buf.c_str());
       } else if (*it == "priority") {
         priority_ = atoi(buf.c_str());
       } else if (*it == "process_start") {
@@ -140,13 +120,11 @@ bool kvalobs::kvWorkelement::set(const dnmi::db::DRow &r_) {
       } else if (*it == "service_stop") {
         if (!buf.empty())
           service_stop_ = boost::posix_time::time_from_string_nothrow(buf);
-      } else if (*it == "observationid") {
-        observationid_ = atol(buf.c_str());
       } else {
-        CERR("kvWorkelement::set .. unknown entry:" << *it << std::endl);
+        CERR("kvWorkque::set .. unknown entry:" << *it << std::endl);
       }
     } catch (...) {
-      CERR("kvWorkelement: unexpected exception ..... \n");
+      CERR("kvWorkque: unexpected exception ..... \n");
     }
   }
 
@@ -155,23 +133,22 @@ bool kvalobs::kvWorkelement::set(const dnmi::db::DRow &r_) {
 
 }
 
-std::string kvalobs::kvWorkelement::toSend() const {
+std::string kvalobs::kvWorkque::toSend() const {
   ostringstream ost;
 
-  ost << "(" << stationid_ << "," << quoted(obstime_) << "," << typeid_ << ","
-      << quoted(tbtime_) << "," << priority_ << ","
+  ost << "(" <<  priority_ << ","
       << (process_start_.is_not_a_date_time() ? "NULL" : quoted(process_start_))
       << "," << (qa_start_.is_not_a_date_time() ? "NULL" : quoted(qa_start_))
       << "," << (qa_stop_.is_not_a_date_time() ? "NULL" : quoted(qa_stop_))
       << "," << (service_start_.is_not_a_date_time() ? "NULL" : quoted(service_start_))
-      << "," << (service_stop_.is_not_a_date_time() ? "NULL" : quoted(service_stop_))
-      << ", " << observationid_
+      << "," << (service_stop_.is_not_a_date_time() ? "NULL" : quoted(service_stop_)) 
+      << "," << observationid_
       << ")";
 
   return ost.str();
 }
 
-std::string kvalobs::kvWorkelement::toUpdate() const {
+std::string kvalobs::kvWorkque::toUpdate() const {
   ostringstream ost;
   bool comma = false;
 
@@ -214,22 +191,13 @@ std::string kvalobs::kvWorkelement::toUpdate() const {
     ost << "service_stop=" << quoted(service_stop_);
   }
 
-  if (!service_stop_.is_not_a_date_time()) {
-    if (comma)
-      ost << ", ";
-
-    comma = true;
-    ost << "service_stop=" << quoted(service_stop_);
-  }
-
- 
   ost << " WHERE observationid=" << observationid_;
 
   return ost.str();
 
 }
 
-std::string kvalobs::kvWorkelement::uniqueKey() const {
+std::string kvalobs::kvWorkque::uniqueKey() const {
   ostringstream ost;
 
   ost << " WHERE observationid=" << observationid_;
@@ -237,29 +205,76 @@ std::string kvalobs::kvWorkelement::uniqueKey() const {
   return ost.str();
 }
 
-void kvalobs::kvWorkelement::process_start(
+void kvalobs::kvWorkque::process_start(
     const boost::posix_time::ptime &start) {
   process_start_ = start;
 }
 
-void kvalobs::kvWorkelement::qa_start(const boost::posix_time::ptime &start) {
+void kvalobs::kvWorkque::qa_start(const boost::posix_time::ptime &start) {
   qa_start_ = start;
 }
 
-void kvalobs::kvWorkelement::qa_stop(const boost::posix_time::ptime &stop) {
+void kvalobs::kvWorkque::qa_stop(const boost::posix_time::ptime &stop) {
   qa_stop_ = stop;
 }
 
-void kvalobs::kvWorkelement::service_start(
+void kvalobs::kvWorkque::service_start(
     const boost::posix_time::ptime &start) {
   service_start_ = start;
 }
 
-void kvalobs::kvWorkelement::service_stop(
+void kvalobs::kvWorkque::service_stop(
     const boost::posix_time::ptime &stop) {
   service_stop_ = stop;
 }
 
-void kvalobs::kvWorkelement::observationID(long id) {
-  observationid_ = id;
-}
+/*
+INSERT INTO workstatistik SELECT
+o.stationid,
+  o.obstime,
+o.typeid,
+  o.tbtime,
+  q.priority,
+  q.process_start,
+  q.qa_start,
+  q.qa_stop,
+  q.service_start,
+  q.service_stop,
+  q.observationid
+from workque q, observations o
+WHERE q.observationid=o.observationid AND q.qa_stop IS NOT NULL AND (SELECT count(*) FROM workstatistik s WHERE q.observationid=s.observationid)=0;
+
+
+
+
+ stationid     | integer                     | not null
+ obstime       | timestamp without time zone | not null
+ typeid        | integer                     | not null
+ tbtime        | timestamp without time zone | not null
+ priority      | integer                     | not null
+ process_start | timestamp without time zone | 
+ qa_start      | timestamp without time zone | 
+ qa_stop       | timestamp without time zone | 
+ service_start | timestamp without time zone | 
+ service_stop  | timestamp without time zone | 
+ observationid | bigint                      | 
+
+SELECT
+	o.stationid,
+  o.obstime,
+	o.typeid,
+  o.tbtime,
+  q.priority,
+  q.process_start,
+  q.qa_start,
+  q.qa_stop,
+  q.service_start,
+  q.service_stop,
+  q.observationid
+from workque q, observations o
+WHERE q.observationid=o.observationid AND (SELECT count(*) FROM workstatistik s WHERE q.observationid=s.observationid)==0;
+order by priority, tbtime ;    
+
+
+
+*/
