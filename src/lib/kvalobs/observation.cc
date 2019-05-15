@@ -232,6 +232,7 @@ kvTextData Observation::getKvTextData(const dnmi::db::DRow &r_, long *obsid_){
   
   for (; it != names.end(); it++) {
     try {
+       buf = r[*it];
        if (*it == "observationid" ) {
         obsid = atol(buf.c_str());
         if( ! hasObservationid_ ){
