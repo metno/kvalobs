@@ -1,3 +1,13 @@
+kvalobs (5.0.0~rc17c-1) xenial; urgency=medium
+  * fix paramid=0
+
+ -- Borge Moe <borge.moe@met.no>  Tue, 21 May 2019 10:15:00 +0100
+
+kvalobs (5.0.0~rc17b-1) xenial; urgency=medium
+  * make sure we compile with the code from (5.0.0~rc17-1)
+
+ -- Borge Moe <borge.moe@met.no>  Fri, 10 May 2019 10:45:00 +0100
+
 kvalobs (5.0.0~rc17a-1) xenial; urgency=medium
   * textdata: Fix textdata when data is added to.
 
