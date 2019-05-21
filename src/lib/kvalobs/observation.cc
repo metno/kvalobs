@@ -361,36 +361,53 @@ Observation *Observation::getFromDb(
   bool useTransaction
   )
 {
+  std::unique_ptr<Observation> obs=std::unique_ptr<Observation>(new Observation());
   //db::TransactionBlock tran(con, db::Connection::REPEATABLE_READ, false, !useTransaction);
   db::TransactionBlock tran(con, db::Connection::READ_COMMITTED, false, !useTransaction);
   try {
     ostringstream q;
     q << "SELECT o.observationid, o.stationid, o.typeid, o.obstime, o.tbtime, d.original,d.paramid,d.sensor,d.level,d.corrected, d.controlinfo, d.useinfo,d.cfailed "
-      << "FROM observations o LEFT JOIN  obsdata d "
+      << "FROM observations o RIGHT JOIN  obsdata d "
       << "ON o.observationid = d.observationid "
       << "WHERE o.stationid=" << stationID << " AND o.typeid=" << typeID 
       << " AND o.obstime=" << dbTime(obsTime) << ";";
-
-    //q << "SELECT * FROM observations WHERE observationid=" << observationid; 
 
     std::unique_ptr<dnmi::db::Result> res;
     res.reset(con->execQuery(q.str()));
  
     if (res->size() == 0 ) {
-      return nullptr;
-    }
+      q.str("");
+      q << "SELECT o.observationid, o.stationid, o.typeid, o.obstime, o.tbtime, d.original,d.paramid "
+        << "FROM observations o RIGHT JOIN  obstextdata d "
+        << "ON o.observationid = d.observationid "
+        << "WHERE o.stationid=" << stationID << " AND o.typeid=" << typeID 
+        << " AND o.obstime=" << dbTime(obsTime) << ";";  
 
-    std::unique_ptr<Observation> obs=std::unique_ptr<Observation>(new Observation());
+      res.reset(con->execQuery(q.str()));
+
+      if (res->size() == 0 ) {
+        return nullptr;
+      } 
+   
+      obs->setTextData(*res.get());
+      return obs.release();    
+    }
 
     obs->setData(*res.get());
 
+    if ( obs->observationid() == 0 ){
+      string tmp=q.str();
+      q.str("");
+
+      q << "EXCEPTION: Missing observationid. query: " << tmp; 
+      throw logic_error(q.str());
+    }
+
     q.str("");
     q << "SELECT o.observationid, o.stationid, o.typeid, o.obstime, o.tbtime, d.original,d.paramid "
-      << "FROM observations o LEFT JOIN  obstextdata d "
+      << "FROM observations o RIGHT JOIN  obstextdata d "
       << "ON o.observationid = d.observationid "
-      << "WHERE o.stationid=" << stationID << " AND o.typeid=" << typeID 
-      << " AND o.obstime=" << dbTime(obsTime) << ";";
-
+      << "WHERE d.observationid=" << obs->observationid() << ";";
 
     res.reset(con->execQuery(q.str()));
 
@@ -417,9 +434,7 @@ Observation *Observation::getFromDb(dnmi::db::Connection *con, long observationi
     q << "SELECT o.observationid, o.stationid, o.typeid, o.obstime, o.tbtime, d.original,d.paramid,d.sensor,d.level,d.corrected, d.controlinfo, d.useinfo,d.cfailed "
       << "FROM observations o LEFT JOIN  obsdata d "
       << "ON o.observationid = d.observationid "
-      << "WHERE o.observationid=" << observationid << ";";
-
-    //q << "SELECT * FROM observations WHERE observationid=" << observationid; 
+      << "WHERE d.observationid=" << observationid << ";";
 
     std::unique_ptr<dnmi::db::Result> res;
     res.reset(con->execQuery(q.str()));
@@ -436,8 +451,7 @@ Observation *Observation::getFromDb(dnmi::db::Connection *con, long observationi
     q << "SELECT o.observationid, o.stationid, o.typeid, o.obstime, o.tbtime, d.original,d.paramid "
       << "FROM observations o LEFT JOIN  obstextdata d "
       << "ON o.observationid = d.observationid "
-      << "WHERE o.observationid=" << observationid << ";";
-
+      << "WHERE d.observationid=" << observationid << ";";
 
     res.reset(con->execQuery(q.str()));
 

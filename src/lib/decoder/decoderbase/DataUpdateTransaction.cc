@@ -456,6 +456,25 @@ bool DataUpdateTransaction::updateObservation(dnmi::db::Connection *conection, O
   list<kvalobs::kvData> toUpdateData(*newData);
   list<kvalobs::kvTextData> toUpdateTextData(*newTextData);
 
+#if 0
+  std::cerr << "updateObservation: incomming \n";
+  for ( auto &d : toUpdateData )
+    std::cerr << "updateObservation (d): new: " << d.obstime() << ", " << d.stationID() << ", " << d.typeID() << ", " << d.paramID() <<  d.original() << "\n";
+
+
+  for ( auto &d : toUpdateTextData )
+    std::cerr << "updateObservation (td): new: " << d.obstime() << ", " << d.stationID() << ", " << d.typeID() << ", " << d.paramID() <<  d.original() << "\n";
+
+  for ( auto &d : obs->data() )
+    std::cerr << "updateObservation (d): old: " << d.obstime() << ", " << d.stationID() << ", " << d.typeID() << ", " << d.paramID() <<  d.original() << "\n";
+
+
+  for ( auto &d : obs->textData() )
+    std::cerr << "updateObservation (td): old: " << d.obstime() << ", " << d.stationID() << ", " << d.typeID() << ", " << d.paramID() <<  d.original() << "\n";
+  
+  std::cerr << "end incomming\n";
+#endif
+
   for( auto &e : obs->data()){
     auto it = findElem(e, toUpdateData);
     if (it == toUpdateData.end()) {
@@ -535,6 +554,17 @@ bool DataUpdateTransaction::operator()(dnmi::db::Connection *conection) {
               << it->level() << "," << it->original() << ", " << pt::to_kvalobs_string(it->tbtime()) << endl;
       }
     }
+
+    for (std::list<kvalobs::kvTextData>::const_iterator it = newTextData->begin(); it != newTextData->end(); ++it) {
+      if (it->obstime().is_not_a_date_time()) {
+        err = true;
+        mylog << "Invalid obstime: " << it->stationID() << "," << it->typeID() << "," << it->paramID() << "," << it->original() << endl;
+      } else {
+        mylog << pt::to_kvalobs_string(it->obstime()) << "," << it->stationID() << "," << it->typeID() << "," << it->paramID() << "," << it->original() 
+              << ", '" << pt::to_kvalobs_string(it->tbtime()) << "'" << endl;
+      }
+    }
+
 
     if (err) {
       LOGERROR("NewData: INVALID OBSTIME stationid: " << stationid << " typeid: " << typeid_ << endl << mylog.str());
