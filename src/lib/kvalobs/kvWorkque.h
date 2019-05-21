@@ -28,8 +28,8 @@
  with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#ifndef __kvWorkelement_h__
-#define __kvWorkelement_h__
+#ifndef __kvWorkqueue_h__
+#define __kvWorkqueue_h__
 
 #include <kvalobs/kvDbBase.h>
 
@@ -50,56 +50,48 @@ namespace kvalobs {
  * \brief Interface to the table workque and workstatistik in the kvalobs database.
  */
 
-class kvWorkelement : public kvDbBase {
+class kvWorkque : public kvDbBase {
  private:
-  int stationid_;
-  boost::posix_time::ptime obstime_;
-  int typeid_;
-  boost::posix_time::ptime tbtime_;
+  long observationid_;
   int priority_;
   boost::posix_time::ptime process_start_;
   boost::posix_time::ptime qa_start_;
   boost::posix_time::ptime qa_stop_;
   boost::posix_time::ptime service_start_;
   boost::posix_time::ptime service_stop_;
-  long observationid_;
 
   void createSortIndex();
 
  public:
-  kvWorkelement() {
+  kvWorkque() {
   }
-  kvWorkelement(const dnmi::db::DRow &r) {
+  kvWorkque(const dnmi::db::DRow &r) {
     set(r);
   }
-  kvWorkelement(int sid, const boost::posix_time::ptime &obt, int tid,
-                const boost::posix_time::ptime &tbt, int pri,
+  kvWorkque(long observationid, int pri,
                 const boost::posix_time::ptime &process_start,
                 const boost::posix_time::ptime &qa_start,
                 const boost::posix_time::ptime &qa_stop,
                 const boost::posix_time::ptime &service_start,
-                const boost::posix_time::ptime &service_stop,
-                long observationid) {
-    set(sid, obt, tid, tbt, pri, process_start, qa_start, qa_stop,
-        service_start, service_stop, observationid);
+                const boost::posix_time::ptime &service_stop) {
+    set(observationid, pri, process_start, qa_start, qa_stop,
+        service_start, service_stop);
   }
 
   bool valid() const {
     return !sortBy_.empty();
   }
 
-  kvWorkelement(const kvWorkelement &we);
+  kvWorkque(const kvWorkque &we);
 
-  kvWorkelement& operator=(const kvWorkelement &rhs);
+  kvWorkque& operator=(const kvWorkque &rhs);
 
-  bool set(int sid, const boost::posix_time::ptime &obt, int tid,
-           const boost::posix_time::ptime &tbt, int pri,
+  bool set(long  observationid, int pri,
            const boost::posix_time::ptime &process_start,
            const boost::posix_time::ptime &qa_start,
            const boost::posix_time::ptime &qa_stop,
            const boost::posix_time::ptime &service_start,
-           const boost::posix_time::ptime &service_stop,
-           long observationid);
+           const boost::posix_time::ptime &service_stop);
 
   bool set(const dnmi::db::DRow&);
 
@@ -110,39 +102,31 @@ class kvWorkelement : public kvDbBase {
   std::string toUpdate() const;
   std::string uniqueKey() const;
 
-  int stationID() const {
-    return stationid_;
+  int observationID() const {
+    return observationid_;
   }
-  const boost::posix_time::ptime & obstime() const {
-    return obstime_;
-  }
-  int typeID() const {
-    return typeid_;
-  }
-  const boost::posix_time::ptime & tbtime() const {
-    return tbtime_;
-  }
+
   int priority() const {
     return priority_;
   }
   const boost::posix_time::ptime & process_start() const {
     return process_start_;
   }
+
   const boost::posix_time::ptime & qa_start() const {
     return qa_start_;
   }
+
   const boost::posix_time::ptime & qa_stop() const {
     return qa_stop_;
   }
+
   const boost::posix_time::ptime & service_start() const {
     return service_start_;
   }
+
   const boost::posix_time::ptime & service_stop() const {
     return service_stop_;
-  }
-
-  long observationID()const {
-    return observationid_;
   }
 
   void process_start(const boost::posix_time::ptime &start);
@@ -150,7 +134,6 @@ class kvWorkelement : public kvDbBase {
   void qa_stop(const boost::posix_time::ptime &stop);
   void service_start(const boost::posix_time::ptime &start);
   void service_stop(const boost::posix_time::ptime &stop);
-  void observationID(long id);
 };
 
 /** @} */

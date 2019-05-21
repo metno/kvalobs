@@ -291,6 +291,7 @@ void kv2kvDecoder::save2(const list<kvData> & dl_, const list<kvTextData> & tdl_
   }
 }
 
+#if 0
 void kv2kvDecoder::save(const list<kvData> & dl, const list<kvTextData> & tdl) {
   // kvTextData:
   int priority_ = 5;
@@ -321,6 +322,7 @@ void kv2kvDecoder::save(const list<kvData> & dl, const list<kvTextData> & tdl) {
     //     }
   }
 }
+#endif
 
 void kv2kvDecoder::markAsFixed(
     const serialize::KvalobsData::RejectList & rejectedMesage) {

@@ -1,3 +1,4 @@
+
 kvalobs (5.0.0~rc17c-1) xenial; urgency=medium
   * fix paramid=0
 
@@ -12,6 +13,13 @@ kvalobs (5.0.0~rc17a-1) xenial; urgency=medium
   * textdata: Fix textdata when data is added to.
 
  -- Borge Moe <borge.moe@met.no>  Fri, 10 May 2019 10:45:00 +0100
+
+kvalobs (5.0.0~rc18-1) xenial; urgency=medium
+  * DataUpdateTransaction, keep old tbtime when an observation is only updated.
+  * kv2kvDecoder: add dupliacate check for kv2kvDecoder, this check is a complete check.
+  * kvDataiputd: bypass kvQabase for only hqcData.
+
+ -- Borge Moe <borge.moe@met.no>  Fri, 7 May 2019 13:34:00:00 +0200
 
 kvalobs (5.0.0~rc17-1) xenial; urgency=medium
   * kv2kvDecoder, disable the duplicate test for this decoder.

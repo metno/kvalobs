@@ -222,10 +222,9 @@ std::list<kvalobs::kvData> StationFilters::publishOrSaveData(const std::list<kva
       data.push_back(d);
     }
   }
-
   return std::move(data);
-
 }
+
 std::list<kvalobs::kvTextData> StationFilters::publishOrSaveTextData(const std::list<kvalobs::kvTextData> &textData, bool saveData)const {
   std::list<kvalobs::kvTextData> txtData;
   long sid=std::numeric_limits<long>::max();
@@ -248,7 +247,6 @@ std::list<kvalobs::kvTextData> StationFilters::publishOrSaveTextData(const std::
     }
   }
   return std::move(txtData);
-
 }
 
 

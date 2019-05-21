@@ -29,6 +29,7 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include <limits.h>
+#include <list>
 #include "puTools/miTime.h"
 #include "lib/milog/milog.h"
 #include "lib/miutil/commastring.h"
@@ -40,6 +41,7 @@
 
 using kvalobs::kvTextData;
 using std::string;
+using std::list;
 using miutil::CommaString;
 using miutil::trimstr;
 namespace pt = boost::posix_time;
@@ -76,7 +78,11 @@ kvalobs::decoder::DecoderBase::DecodeResult KlTextDecoder::execute(std::string &
   if (res != Ok)
     return res;
 
-  if (!putkvTextDataInDb(textData, 10)) {
+  list<kvData>     dataList;
+  list<kvTextData> textDataList = {textData};
+  miutil::miTime obstime=pt::to_miTime(textData.obstime());
+
+  if (!addDataToDbThrow(obstime, textData.stationID(), textData.typeID(),dataList,textDataList,string(""), false)) {
     msg += "Failed to add the textdata to the database.";
     LOGERROR("Failed to put the data to the database: \nPartial INSERT SQL:\n INSERT ... " << textData.toSend());
     return NotSaved;

@@ -174,8 +174,11 @@ namespace {
 }
 
 bool DataSrcApp::publishData(const std::list<kvalobs::serialize::KvalobsData> &publishData) {
-  if( publishData.size() == 0 )
+  //std::cerr << "publishData: size " << publishData.size() << "\n\n";
+  if( publishData.size() == 0 ) {
+    
     return true;
+  }
 
   for( auto &d : publishData ) {
     std::unique_ptr<PublishDataCommand> data(new PublishDataCommand(d));
