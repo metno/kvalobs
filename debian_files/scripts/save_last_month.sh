@@ -20,6 +20,7 @@ has_ip_alias=`ipalias_status` || res=$?
 #Only run if this machine has the ip alias for kvalobs.
 [ "$has_ip_alias" = "true" ] || exit 0 
 
+
 if [ -f "$ETCDIR/kv-env.conf" ]; then
     . $ETCDIR/kv-env.conf
 fi
@@ -28,18 +29,99 @@ if [ -f "$ETCDIR/save_last_month.conf" ]; then
     . $ETCDIR/save_last_month.conf
 fi
 
+MAILTO="terjeer@met.no"
+OKDB="false"
+
+PSQL=psql
+PGDATABASE=kvalobs
+PGUSER=kvalobs
+: ${PGUSER:=$USER}
+: ${PGPORT:=5432}
+: ${PGHOST:=localhost}
+
+# echo "mypghost $PGHOST:$PGPORT:$PGDATABASE:$PGUSER:$PGPASSWORD"
+
+# Create a .pgpass file to use so we do not need to give the
+# password for each call to psql
+# It works by creating a temporary file. Get a filehandle (3) to the file
+# and delete it. Set the PGPASSFILE environment variable to /proc/PID/fd/3
+# write the credentials to the file. The file is automaticly removed on exit.
+
+rm -f "$HOME/.pgpass.kvget.*"
+PGPASSFILE=$(mktemp $HOME/.pgpass.kvget.XXXXXXX)
+chmod 0600 $PGPASSFILE
+exec 3>$PGPASSFILE
+rm $PGPASSFILE
+PGPASSFILE="/proc/$$/fd/3"
+# echo "PGPASSFILE: $PGPASSFILE"
+
+if [ -f $HOME/.pgpass ]; then
+    echo "The file $HOME/.pgpass does exist"
+else
+    echo "The file $HOME/.pgpass does not exist"
+    echo "The file $HOME/.pgpass does not exist" | mail -s "kvget_utesperring: The file $HOME/.pgpass does not exist" $MAILTO
+    exit 1
+fi
+
+
+for ll in `cat $HOME/.pgpass | grep 'kvalobs:kvalobs'| cut -f1 -d:`
+do
+       echo $ll	
+       PGHOST=$ll
+       # echo "HEI000"
+       if cat $HOME/.pgpass | grep $ll | grep 'kvalobs:kvalobs' 1>&3
+       then
+          # echo "HEI01"
+	  # PGHOST="brumle"
+	  PGHOST=$ll 
+	  if pg_isready
+	  then
+              VARn=`$PSQL --quiet --tuples-only -c 'select pg_is_in_recovery()'`
+              VAR=`echo $VARn | tr -d '\n'`
+              # echo -e "length(VAR)==$(echo -ne "${VAR}" | wc -m)"
+              #if [ "z$VAR" != "z" ] && [ $VAR == "f" ]; then
+              if [ "z$VAR" = "zf" ]; then
+	          # echo "selected database is $ll"
+		  OKDB="true"
+	          break 
+              fi
+	  else
+	      echo "Database connection problem : $?"
+	      # echo "Database connection problem : $?" | mail -s "save_last_month: Database connection problem " $MAILTO
+	      # exit 1
+	  fi
+       else
+	   echo "Noe galt med passordtilordning" | mail -s "save_last_month: Noe galt med passordtilordning" $MAILTO
+	   exit 1
+       fi
+	  
+done
+
+
+if [ "z$OKDB" != "ztrue" ]; then
+	echo "No database that is not in recovery is found" | mail -s "save_last_month: No database that is not in recovery is found" $MAILTO
+        exit 1
+fi
+
+echo "Database OK"
+
+# $PSQL -c "select * from param limit 10"
+# exit 0
+
 
 #VARDIR=$(kvconfig --localstatedir)/lib/kvalobs
 VARDIR=$(kvconfig --localstatedir)/log/kvalobs
 logdir=$(kvconfig --localstatedir)/log/kvalobs/klima_backup
 backupdir=$VARDIR/klima_backup
 
-
+#echo $nmonth
 if [ "${nmonth}z" = "z" ]; then
 	NMONTH=2
 else
     NMONTH=$nmonth
 fi
+
+echo $NMONTH
 
 if [ "${histkvalobs}z" = "z" ]; then
 	histkvalobs="kvalobs@histkvalobs:var/klima_backup"
@@ -55,6 +137,7 @@ if [ "$enable" = "false" ]; then
 	echo "Save last month disabled!"
 	exit 0
 fi 
+
 
 #PGPORT=5434
 #PGUSER=kvalobs
@@ -128,7 +211,7 @@ echo "\\copy text_data FROM $ftextdata WITH DELIMITER AS '|'" >> $lsql
 echo "\\copy model_data FROM $fmodeldata WITH DELIMITER AS '|'" >> $lsql
 echo "END" >> $lsql
 
-psql -U kvalobs kvalobs -f $sql
+$PSQL -f $sql
 
 if [ "$?" -ne 0  ]; then
 	echo "Failed to retrieve data from the database!" >> $logfile
