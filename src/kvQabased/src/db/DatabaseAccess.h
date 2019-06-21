@@ -254,6 +254,13 @@ class DatabaseAccess {
    */
   virtual void write(const DataList & data) = 0;
 
+  /**
+   * Select an observation from workqueue for control.
+   *
+   * Note that this function does _not_ need a transaction to be running - and
+   * it should not have one. If it runs outside of of any transactions, it will
+   * provide strong guarantees of atomicity.
+   */
   virtual qabase::Observation * selectDataForControl() = 0;
 
   virtual void markProcessDone(const qabase::Observation & obs) = 0;

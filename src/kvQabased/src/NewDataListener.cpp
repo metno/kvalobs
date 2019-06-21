@@ -36,6 +36,7 @@
 #include <set>
 #include <string>
 #include <thread>
+#include <cstdlib>
 #include "db/KvalobsDatabaseAccess.h"
 #include "kvalobs/kvStationInfo.h"
 #include "decodeutility/kvalobsdata.h"
@@ -83,14 +84,12 @@ void NewDataListener::run() {
 qabase::NewDataListener::ObservationPtr NewDataListener::fetchDataToProcess() const {
   while (!stopping()) {
     try {
-      db_->beginTransaction();
       qabase::NewDataListener::ObservationPtr ret(db_->selectDataForControl());
-      db_->commit();
       return ret;
     } catch (dnmi::db::SQLSerializeError & e) {
       db_->rollback();
       LOGDEBUG("Serialization error on fetchDataToProcess: " << e.what());
-      std::this_thread::sleep_for(std::chrono::milliseconds(50));
+      std::this_thread::sleep_for(std::chrono::milliseconds(25 + (std::rand() % 50)));
     }
   }
   return qabase::NewDataListener::ObservationPtr();

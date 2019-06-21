@@ -56,9 +56,10 @@ class KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection {
   std::string esc(const std::string & stringToEscape) const;
 
   void exec(const std::string & SQLstmt);
-  void beginTransaction();
+  void beginTransaction(dnmi::db::Connection::IsolationLevel isolation = dnmi::db::Connection::READ_COMMITTED);
   void commit();
   void rollback();
+  bool transactionInProgress() const;
  private:
   dnmi::db::Connection * connection_;
   bool transactionInProgress_;
@@ -104,8 +105,8 @@ void KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::exec(
   else
     throw std::runtime_error("No transaction in progress");
 }
-void KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::beginTransaction() {
-  connection_->beginTransaction(dnmi::db::Connection::READ_COMMITTED);
+void KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::beginTransaction(dnmi::db::Connection::IsolationLevel isolation) {
+  connection_->beginTransaction(isolation);
   transactionInProgress_ = true;
 }
 void KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::commit() {
@@ -117,6 +118,10 @@ void KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::rollback() {
     connection_->rollBack();
   transactionInProgress_ = false;
 }
+bool KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::transactionInProgress() const {
+  return transactionInProgress_;
+}
+
 
 KvalobsDatabaseAccess::KvalobsDatabaseAccess(
     const std::string & databaseConnect) {
@@ -620,6 +625,12 @@ void KvalobsDatabaseAccess::write(const DataList & data) {
 
 qabase::Observation * KvalobsDatabaseAccess::selectDataForControl() {
 
+    bool needOwnTransaction = !connection_->transactionInProgress();
+    if (needOwnTransaction)
+      connection_->beginTransaction(dnmi::db::Connection::SERIALIZABLE);
+    else
+      LOGWARN("trying to select data for control with previous transaction - isolation level not guaranteed");
+
     std::vector<int> runningChecks;
     std::unique_ptr<dnmi::db::Result> result(connection_->execQuery("select o.stationid from workque q, observations o where o.observationid=q.observationid and qa_start is not null and qa_stop is null;"));
     while (result->hasNext()) {
@@ -664,6 +675,8 @@ qabase::Observation * KvalobsDatabaseAccess::selectDataForControl() {
     LOGDEBUG1(query.str());
 
     connection_->exec(query.str());
+    if (needOwnTransaction)
+      connection_->commit();
     return new qabase::Observation(observationid, station, type, obstime, tbtime);
 }
 
