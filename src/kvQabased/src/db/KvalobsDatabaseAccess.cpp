@@ -462,8 +462,7 @@ bool KvalobsDatabaseAccess::pin(const qabase::Observation & obs) const {
     "WHERE "
     "o.observationid = d.observationid AND "
     "o.observationid = " << obs.id();
-  query << " ORDER BY obstime DESC";
-  query << " FOR UPDATE;";
+  query << " ORDER BY obstime DESC;";
 
   milog::LogContext context("query");
   LOGDEBUG1(query.str());
