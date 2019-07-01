@@ -258,8 +258,7 @@ class DatabaseAccess {
    * Select an observation from workqueue for control.
    *
    * Note that this function does _not_ need a transaction to be running - and
-   * it should not have one. If it runs outside of of any transactions, it will
-   * provide strong guarantees of atomicity.
+   * it should not have one.
    */
   virtual qabase::Observation * selectDataForControl() = 0;
 
