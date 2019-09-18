@@ -1,3 +1,8 @@
+kvalobs (5.0.0~rc17d-1) xenial; urgency=medium
+  * kvDataInputd: Fix insert when observations has an entry but no data exist.  
+
+ -- Borge Moe <borge.moe@met.no>  Wed, 18 Sep 2019 10:56:00 +0100
+
 kvalobs (5.0.0~rc17c-1) xenial; urgency=medium
   * fix paramid=0
 
