@@ -38,6 +38,7 @@
 
 using namespace std;
 using namespace dnmi;
+using std::get;
 namespace pt = boost::posix_time;
 
 
@@ -80,7 +81,12 @@ Observation::Observation(const Observation &d)
   :observationid_(d.observationid_), stationid_(d.stationid_), typeid_(d.typeid_),
    obstime_(d.obstime_), tbtime_(d.tbtime_), data_(d.data_), textData_(d.textData_) {
 }
-  
+
+ void Observation::setObservationid(long observationid){
+   observationid_=observationid;
+   hasObservationid_=true;
+ }
+
 bool Observation::set(int stationId, int typeId, 
   const boost::posix_time::ptime & obt,
   const boost::posix_time::ptime & tbt, 
@@ -213,10 +219,12 @@ kvData Observation::getKvData(const dnmi::db::DRow &r_, long *obsid_) {
       CERR("Observation::getKvData: unexpected exception ..... \n");
     }
   }
+
 /*
   if(  obsid_ ) {
     *obsid_ = obsid;
   }
+
 */
   
   return kvData(stationid, obstime, original, paramid,
@@ -322,8 +330,8 @@ void Observation::setTextData(const dnmi::db::Result &res){
     }
   }
 
-}
   
+}
 void Observation::cleanData() {
   textData_.clear();
   data_.clear();
@@ -352,6 +360,27 @@ Observation&  Observation::operator=(const std::list<kvalobs::kvTextData> &rhs){
   textData_ = rhs;
   return *this;
 }
+
+std::tuple<long, bool>
+Observation::getObservationid(dnmi::db::Connection *con, long stationID, long typeID, const boost::posix_time::ptime &obsTime) 
+{
+  ostringstream q;
+  q << "SELECT observationid "
+    << "FROM observations "
+    << "WHERE stationid=" << stationID << " AND typeid=" << typeID
+    << " AND obstime=" << dbTime(obsTime) << ";";
+  
+  std::unique_ptr<dnmi::db::Result> res;
+  res.reset(con->execQuery(q.str()));
+
+  if( res.get()==nullptr || !res->hasNext() ) {
+    return std::make_tuple(0, false);
+  }
+
+  dnmi::db::DRow & row = res->next();
+  return std::make_tuple(atol(row[0].c_str()), true);
+}
+
 
 Observation *Observation::getFromDb(
   dnmi::db::Connection *con, 
@@ -386,6 +415,12 @@ Observation *Observation::getFromDb(
       res.reset(con->execQuery(q.str()));
 
       if (res->size() == 0 ) {
+        auto id = getObservationid(con, stationID, typeID, obsTime);
+  
+        if (get<1>(id)){
+          obs->setObservationid(get<0>(id));
+          return obs.release();
+        }
         return nullptr;
       } 
    
@@ -430,6 +465,7 @@ Observation *Observation::getFromDb(dnmi::db::Connection *con, long observationi
   //db::TransactionBlock tran(con, db::Connection::REPEATABLE_READ, false, !useTransaction);
   db::TransactionBlock tran(con, db::Connection::READ_COMMITTED, false, !useTransaction);
   try {
+    std::unique_ptr<Observation> obs=std::unique_ptr<Observation>(new Observation());
     ostringstream q;
     q << "SELECT o.observationid, o.stationid, o.typeid, o.obstime, o.tbtime, d.original,d.paramid,d.sensor,d.level,d.corrected, d.controlinfo, d.useinfo,d.cfailed "
       << "FROM observations o LEFT JOIN  obsdata d "
@@ -438,14 +474,19 @@ Observation *Observation::getFromDb(dnmi::db::Connection *con, long observationi
 
     std::unique_ptr<dnmi::db::Result> res;
     res.reset(con->execQuery(q.str()));
- 
-    if (res->size() == 0 ) {
-      return nullptr;
-    }
 
-    std::unique_ptr<Observation> obs=std::unique_ptr<Observation>(new Observation());
-
-    obs->setData(*res.get());
+    if (res->size() > 0 ) {
+      obs->setData(*res.get());
+    } else {     
+      q.str("");
+      q << "SELECT observationid, stationid, typeid, obstime, tbtime "
+        << "FROM observations "
+        << "WHERE observationid=" << observationid << ";";
+      res.reset(con->execQuery(q.str()));
+      if (! obs->set(*res.get()) ) {
+        return nullptr; 
+      } 
+    } 
 
     q.str("");
     q << "SELECT o.observationid, o.stationid, o.typeid, o.obstime, o.tbtime, d.original,d.paramid "

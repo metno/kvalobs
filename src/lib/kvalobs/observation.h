@@ -33,6 +33,7 @@
 
 #include <list>
 #include <iosfwd>
+#include <tuple>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <kvalobs/kvData.h>
 #include <kvalobs/kvTextData.h>
@@ -137,8 +138,11 @@ protected:
   bool set(const dnmi::db::Result &res);
   void setData(const dnmi::db::Result &res);
   void setTextData(const dnmi::db::Result &res);
+  void setObservationid(long observationid);
   kvData getKvData(const dnmi::db::DRow &row, long *obsid);
   kvTextData getKvTextData(const dnmi::db::DRow &row, long *obsid);
+  static std::tuple<long, bool> getObservationid(dnmi::db::Connection *con, long stationID, long typeID, const boost::posix_time::ptime &obsTime);
+
 
 private:
   bool hasObservationid_;
