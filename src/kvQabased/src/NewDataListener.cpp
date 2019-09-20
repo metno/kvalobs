@@ -28,6 +28,7 @@
  */
 
 #include "NewDataListener.h"
+#include "db/returntypes/Observation.h"
 #include <boost/lexical_cast.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <chrono>
@@ -35,6 +36,7 @@
 #include <set>
 #include <string>
 #include <thread>
+#include <cstdlib>
 #include "db/KvalobsDatabaseAccess.h"
 #include "kvalobs/kvStationInfo.h"
 #include "decodeutility/kvalobsdata.h"
@@ -63,7 +65,7 @@ void NewDataListener::run() {
   stopping_ = false;
   while (!stopping()) {
     try {
-      qabase::NewDataListener::StationInfoPtr toProcess = fetchDataToProcess();
+      qabase::NewDataListener::ObservationPtr toProcess = fetchDataToProcess();
       if (toProcess) {
         qabase::TransactionLogger logger(*toProcess);
         qabase::CheckRunner::KvalobsDataPtr dataList = runChecks(*toProcess);
@@ -79,26 +81,24 @@ void NewDataListener::run() {
   }
 }
 
-qabase::NewDataListener::StationInfoPtr NewDataListener::fetchDataToProcess() const {
+qabase::NewDataListener::ObservationPtr NewDataListener::fetchDataToProcess() const {
   while (!stopping()) {
     try {
-      db_->beginTransaction();
-      qabase::NewDataListener::StationInfoPtr ret(db_->selectDataForControl());
-      db_->commit();
+      qabase::NewDataListener::ObservationPtr ret(db_->selectDataForControl());
       return ret;
     } catch (dnmi::db::SQLSerializeError & e) {
       db_->rollback();
       LOGDEBUG("Serialization error on fetchDataToProcess: " << e.what());
-      std::this_thread::sleep_for(std::chrono::milliseconds(50));
+      std::this_thread::sleep_for(std::chrono::milliseconds(25 + (std::rand() % 50)));
     }
   }
-  return qabase::NewDataListener::StationInfoPtr();
+  return qabase::NewDataListener::ObservationPtr();
 }
 
-qabase::CheckRunner::KvalobsDataPtr NewDataListener::runChecks(const qabase::NewDataListener::StationInfo & toProcess) {
+qabase::CheckRunner::KvalobsDataPtr NewDataListener::runChecks(const qabase::Observation & obs) {
   try {
     db_->beginTransaction();
-    qabase::CheckRunner::KvalobsDataPtr dataList = processor_.runChecks(toProcess);
+    qabase::CheckRunner::KvalobsDataPtr dataList = processor_.runChecks(obs);
     db_->commit();
     processor_.sendToKafka(dataList, & stopping_);
     return dataList;
@@ -109,11 +109,11 @@ qabase::CheckRunner::KvalobsDataPtr NewDataListener::runChecks(const qabase::New
   }
 }
 
-void NewDataListener::markProcessDone(const qabase::NewDataListener::StationInfo &toProcess) {
+void NewDataListener::markProcessDone(const qabase::Observation & obs) {
   while (true) {
     try {
       db_->beginTransaction();
-      db_->markProcessDone(toProcess);
+      db_->markProcessDone(obs);
       db_->commit();
       return;
     } catch (dnmi::db::SQLSerializeError & e) {

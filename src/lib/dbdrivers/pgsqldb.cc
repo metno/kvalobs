@@ -200,8 +200,12 @@ void dnmi::db::drivers::PGConnection::exec(const std::string &query) {
     }
   };
 
-  if (!p)
-    throw SQLException(lastError());
+  if (!p) {
+    std::ostringstream msg;
+
+    msg << "(PG 'exec' nil result): " << lastError();
+    throw SQLException(msg.str());
+  }
 
   if (status == PGRES_COMMAND_OK || status == PGRES_TUPLES_OK) {
     PQclear(p);
@@ -213,9 +217,9 @@ void dnmi::db::drivers::PGConnection::exec(const std::string &query) {
   std::string errorCode(PQresultErrorField(p, PG_DIAG_SQLSTATE));
 
   PQclear(p);
-
-  if (errorCode == "40001" || errorCode == "40P01")
+  if (errorCode == "40001" || errorCode == "40P01") {
     throw SQLSerializeError("Serialize error", errorCode, errorCode == "40P01");
+  }
 
   std::string::size_type i = msg2.find("duplicate");
 
@@ -223,11 +227,11 @@ void dnmi::db::drivers::PGConnection::exec(const std::string &query) {
     i = msg2.find("key");
 
     if (i != std::string::npos) {
-
       throw SQLDuplicate(msg2, errorCode);
     }
   }
 
+  
   if (msg2.empty()) {
     if (msg.empty())
       msg = getDriverId() + ": Unknow error!";
@@ -235,11 +239,12 @@ void dnmi::db::drivers::PGConnection::exec(const std::string &query) {
     msg = msg2;
   }
 
+
   if (errorCode.length() >= 2) {
     std::string errClass = errorCode.substr(0, 2);
 
-    if (errClass == "22") {
-      throw SQLException(msg, errorCode);
+    if (errClass == "22" || errClass=="42" ) {
+      throw SQLUnrecoverable(msg, errorCode);
     }
 
     throw SQLAborted(msg, errorCode);
@@ -323,8 +328,8 @@ dnmi::db::drivers::PGConnection::execQuery(const std::string &query) {
   if (errorCode.length() >= 2) {
     std::string errClass = errorCode.substr(0, 2);
 
-    if (errClass == "22")
-      throw SQLException(msg, errorCode);
+    if (errClass == "22" || errClass=="42")
+      throw SQLUnrecoverable(msg, errorCode);
 
     throw SQLAborted(msg, errorCode);
   }
@@ -488,12 +493,17 @@ void dnmi::db::drivers::PGPimpel::perform(dnmi::db::Connection *con_, dnmi::db::
   time_t start;
   time_t now;
 
+  bool mayRecover;
+  std::string errorCode;
+
   time(&start);
 
   if (retry <= 0)
     retry = 1;
 
   while (retry > 0) {
+    mayRecover=true;
+    errorCode.erase();
     try {
       beginTransaction(isolation);
     } catch (...) {
@@ -512,7 +522,8 @@ void dnmi::db::drivers::PGPimpel::perform(dnmi::db::Connection *con_, dnmi::db::
         return;
       } else {
         t.onFailure();
-        retry--;
+        con->rollBack();
+        return;
       }
     } catch (const SQLSerializeError &ex) {
       if (ex.deadLockDetected()) {
@@ -529,12 +540,24 @@ void dnmi::db::drivers::PGPimpel::perform(dnmi::db::Connection *con_, dnmi::db::
 
       //We allow a 10 seconds periode of retry
       //before we reduce the retry counter.
-      if ((now - start) > 10) {
-        time(&start);  //Reset the timeout counter.
-        retry--;
-      }
+      //if ((now - start) > 10) {
+       // time(&start);  //Reset the timeout counter.
+      //  retry--;
+      //}
+      retry--;
       t.onAbort(con->getDriverId(), e.what(), e.errorCode());
-    } catch (const std::exception &ex) {
+    } catch (const SQLUnrecoverable &e) {
+      lastError = e.what();
+      mayRecover=false;
+      errorCode=e.errorCode();
+      retry=0;
+    } catch (const SQLException &e) {
+      lastError = e.what();
+      mayRecover=false;
+      errorCode=e.errorCode();
+      if (!mayRecover)
+        retry=0;
+    }catch (const std::exception &ex) {
       retry--;
       lastError = ex.what();
     } catch (...) {
@@ -551,7 +574,7 @@ void dnmi::db::drivers::PGPimpel::perform(dnmi::db::Connection *con_, dnmi::db::
     t.onRetry();
   }
 
-  transaction.onMaxRetry(lastError);
+  transaction.onMaxRetry(lastError, errorCode, mayRecover);
 
 }
 

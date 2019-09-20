@@ -65,6 +65,7 @@ void MissingRunner::run() {
     LOGINFO("Locating missing observations 'disabled'. (" << second_clock::universal_time() << ")");
     return;
   }
+  LOGINFO("Locating missing observations");
 
   KvalobsDatabaseAccess dbAccess(connectString());
 

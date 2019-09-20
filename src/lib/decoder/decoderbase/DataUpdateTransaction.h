@@ -41,6 +41,7 @@
 #include "kvalobs/kvData.h"
 #include "kvalobs/kvStationInfo.h"
 #include "kvalobs/kvTextData.h"
+#include "kvalobs/observation.h"
 
 namespace kvalobs {
 namespace decoder {
@@ -52,103 +53,76 @@ namespace decoder {
  * allready exist and is not equal to the new data. ie a duplicate
  * message.
  *
- * A message is identified by stationid, typeid and tbtime. It is
- * importent that new data is inserted with a unique stationid,
- * typeid, tbtime for a message that comes with a nominal obstime.
  */
-
 class DataUpdateTransaction : public dnmi::db::Transaction {
+public:
+  typedef enum { 
+    Partial,  //! Use only the original value for the test
+    Complete  //! Use all values original, corrected, controlinfo, useinfo and cfailed.
+    } DuplicateTestType;
+  
+private:
   DataUpdateTransaction operator=(const DataUpdateTransaction &rhs);
   std::list<kvalobs::kvData> *newData;
   std::list<kvalobs::kvTextData> *newTextData;
   boost::posix_time::ptime obstime;
   int stationid;
   int typeid_;
-  int priority;
-  boost::shared_ptr<kvalobs::kvStationInfoList> stationInfoList_;
-  boost::shared_ptr<kvalobs::serialize::KvalobsData> data_;  // Data that is inserted or updated
+
+  // Data that is inserted or updated. This is not used in the kv2018 update
+  //but maybe we will reuse it later.
+  boost::shared_ptr<kvalobs::serialize::KvalobsData> data_;  
+
+  /**
+   * dataToPublish - 
+   *  Data that is inserted or updated and added to the database, but not to the workqueue
+   *  this data will not be processed by kvQabase and not published by kvQabase.
+   *  At the momment it is only HQC only data that bypass kvQabase
+   */
+  boost::shared_ptr<kvalobs::serialize::KvalobsData> dataToPublish_;  
   boost::shared_ptr<bool> ok_;
-  std::ostringstream log;
+  mutable std::ostringstream log;
   std::string logid;
   std::string insertType;
   int nRetry;
   bool onlyAddOrUpdateData;
+  bool addToWorkQueue;
+  bool tryToUseDataTbTime;
+  DuplicateTestType  duplicateTestType;
+  bool onlyHqcData;
+  
+  bool partialIsEqual(const std::list<kvalobs::kvData> &oldData_, const std::list<kvalobs::kvTextData> &oldTextData, bool replace)const;
+  bool completeIsEqual(const std::list<kvalobs::kvData> &oldData, const std::list<kvalobs::kvTextData> &oldTextData, bool replace)const;
+  void onlyHqcDataCheck();
 
  public:
+  int getPriority(dnmi::db::Connection *conection, int stationid, int typeid_, const boost::posix_time::ptime &obstime);
+  void updateWorkQue(dnmi::db::Connection *conection, long observationid, int priority);
+  void checkWorkQue(dnmi::db::Connection *conection, long observationid);
+  void worqueToWorkStatistik(dnmi::db::Connection *conection, long observationid);
+  bool updateObservation(dnmi::db::Connection *conection, kvalobs::Observation *obs);
+  bool replaceObservation(dnmi::db::Connection *conection, long observationid);
   void setTbtime(dnmi::db::Connection *conection);
   bool addDataToList(const kvalobs::kvData &data,
                      std::list<kvalobs::kvData> &dataList, bool replaceOnly =
                          false);
-
-  bool addTextDataToList(const kvalobs::kvTextData &data,
-                         std::list<kvalobs::kvTextData> &dataList,
-                         bool replaceOnly = false);
-
-  /**
-   * Add a query to the list qList if it not all ready exist in the list.
-   *
-   * @param qList The list to add the query.
-   * @param query The query to add.
-   */
-  void addQuery(std::list<std::string> &qList, const std::string &query);
-  boost::posix_time::ptime getTimestamp(dnmi::db::Connection *conection);
-  void addStationInfo(dnmi::db::Connection *con, long stationid,
-                      const boost::posix_time::ptime &obstime, long typeid_,
-                      const boost::posix_time::ptime &tbtime);
-
-  bool getData(dnmi::db::Connection *conection, int stationid, int typeid_,
-               const boost::posix_time::ptime &obstime,
-               std::list<kvalobs::kvData> &data,
-               std::list<kvalobs::kvTextData> &textData);
-
-  void getData(dnmi::db::Connection *conection,
-               const std::list<std::string> &query,
-               std::list<kvalobs::kvData> &data);
-  void getTextData(dnmi::db::Connection *conection,
-                   const std::list<std::string> &query,
-                   std::list<kvalobs::kvTextData> &data);
-
-  bool getDataWithTbtime(dnmi::db::Connection *con, int stationid, int typeid_,
-                         const std::string &tbtime,
-                         std::list<kvalobs::kvData> &data,
-                         std::list<kvalobs::kvTextData> &textData);
-
-  bool hasDataWithTbtime(dnmi::db::Connection *con,
-                         const boost::posix_time::ptime &tbtime);
-  boost::posix_time::ptime getUniqTbtime(dnmi::db::Connection *con);
+  boost::posix_time::ptime useTbTime(const std::list<kvalobs::kvData> &data, const std::list<kvalobs::kvTextData> &textData, const boost::posix_time::ptime &defaultTbTime)const;
+  
   bool isEqual(const std::list<kvalobs::kvData> &oldData,
                const std::list<kvalobs::kvTextData> &oldTextData);
-  void insertData(dnmi::db::Connection *conection,
-                  const std::list<kvalobs::kvData> &data,
-                  const std::list<kvalobs::kvTextData> &textData);
-
-  void insert(dnmi::db::Connection *conection, const kvalobs::kvDbBase &elem,
-              const std::string &tblName);
-
-  void update(dnmi::db::Connection *connection,
-              const std::list<kvalobs::kvData> &data,
-              const std::list<kvalobs::kvTextData> &textData);
-
-  /**
-   * Insert or update data. This method do not mark data in the
-   * database for the same "message" as deleted. We just insert
-   * or update data.
-   */
-  bool doInsertOrUpdate(dnmi::db::Connection *conection,
-                        std::list<kvalobs::kvData> &dataList,
-                        std::list<kvalobs::kvTextData> &textDataList);
-
-  void replaceData(dnmi::db::Connection *conection,
-                   const std::list<kvalobs::kvData> &dataList,
-                   const std::list<kvalobs::kvTextData> &textDataList);
 
   DataUpdateTransaction(const boost::posix_time::ptime &obstime, int stationid,
-                        int typeid_, int priority,
+                        int typeid_,
                         std::list<kvalobs::kvData> *newData,
                         std::list<kvalobs::kvTextData> *newTextData,
-                        const std::string &logid, bool onlyAddOrUpdateData =
-                            false);
+                        const std::string &logid, 
+                        bool onlyAddOrUpdateData = false, 
+                        bool addToWorkQueue=true,
+                        bool tryToUseDataTbTime = false,
+                        DataUpdateTransaction::DuplicateTestType  duplicateTestType=Partial);
   DataUpdateTransaction(const DataUpdateTransaction &dut);
+
+
 
   virtual ~DataUpdateTransaction();
   virtual bool operator()(dnmi::db::Connection *conection);
@@ -156,15 +130,17 @@ class DataUpdateTransaction : public dnmi::db::Transaction {
                        const std::string &errorMessage,
                        const std::string &errorCode);
   virtual void onSuccess();
+  virtual void onFailure();
   virtual void onRetry();
-  virtual void onMaxRetry(const std::string &lastError);
+  virtual void onMaxRetry(const std::string &lastError, const std::string &errorCode, bool mayRecover);
 
-  kvalobs::kvStationInfoList stationInfoList() const {
-    return *stationInfoList_;
-  }
-
+  
   kvalobs::serialize::KvalobsData insertedOrUpdatedData() const {
     return *data_;
+  }
+
+  kvalobs::serialize::KvalobsData dataToPublish() const {
+    return *dataToPublish_;
   }
 
   bool ok() const {

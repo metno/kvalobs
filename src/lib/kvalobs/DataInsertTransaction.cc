@@ -43,13 +43,14 @@ using namespace std;
 #define EX_SQLAborted       5
 #define EX_ModeAction       6
 #define EX_Exception        7
+#define EX_SQLUnrecoverable 8
 
 namespace kvalobs {
 
 void DataInsertTransaction::reThrow() {
   switch (savedExcetion) {
     case EX_SQLException:
-      throw SQLException(lastError, errorCode);
+      throw SQLException(lastError, errorCode, mayRecover);
     case EX_SQLNotSupported:
       throw SQLNotSupported(lastError, errorCode);
     case EX_SQLDuplicate:
@@ -62,6 +63,8 @@ void DataInsertTransaction::reThrow() {
       throw SQLAborted(lastError, errorCode);
     case EX_ModeAction:
       throw ModeException(index, lastError);
+    case EX_SQLUnrecoverable:
+      throw SQLUnrecoverable(lastError,errorCode);
     case EX_Exception:
       //fall through to the default action.
     default:
@@ -178,7 +181,7 @@ void DataInsertTransaction::onRetry() {
   }
 }
 
-void DataInsertTransaction::onMaxRetry(const std::string &lastError) {
+void DataInsertTransaction::onMaxRetry(const std::string &lastError, const std::string &errorCode, bool mayRecover) {
   reThrow();
 }
 
@@ -188,6 +191,7 @@ bool DataInsertTransaction::operator()(dnmi::db::Connection *con) {
   lastError.erase();
   savedExcetion = -1;
   errorCode.erase();
+  mayRecover=true;
   conection = con;
 
   if (elems->empty())
@@ -224,10 +228,17 @@ bool DataInsertTransaction::operator()(dnmi::db::Connection *con) {
     savedExcetion = EX_ModeAction;
     lastError = ex.what();
     throw;
+  } catch (const SQLUnrecoverable &ex) {
+    savedExcetion = EX_SQLUnrecoverable;
+    errorCode = ex.errorCode();
+    mayRecover=false;
+    lastError = ex.what();
+    throw;
   } catch (const SQLException &ex) {
     savedExcetion = EX_SQLException;
     lastError = ex.what();
     errorCode = ex.errorCode();
+    mayRecover=ex.mayRecover();
     throw;
   } catch (const exception &ex) {
     savedExcetion = EX_Exception;

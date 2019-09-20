@@ -44,7 +44,7 @@ scriptrunner::language::Interpreter::Ptr getInterpreter(int kvalobsCode) {
 }
 
 KvalobsCheckScript::KvalobsCheckScript(const db::DatabaseAccess & database,
-                                       const kvalobs::kvStationInfo & obs,
+                                       const qabase::Observation & obs,
                                        const kvalobs::kvChecks & check,
                                        std::ostream * scriptLog)
     : scriptLog_(scriptLog) {

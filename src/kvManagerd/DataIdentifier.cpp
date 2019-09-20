@@ -35,13 +35,15 @@
 #include "kvdb/kvdb.h"
 
 DataIdentifier::DataIdentifier(dnmi::db::DRow & row) {
+  obsid_ = boost::lexical_cast<long long>(row["observationid"]);
   station_ = boost::lexical_cast<int>(row["stationid"]);
   type_ = boost::lexical_cast<int>(row["typeid"]);
   obstime_ = boost::posix_time::time_from_string(row["obstime"]);
 }
 
-DataIdentifier::DataIdentifier(int station, int type, const Time &obstime)
-    : station_(station),
+DataIdentifier::DataIdentifier(long long obsid, int station, int type, const Time &obstime)
+    : obsid_(obsid),
+      station_(station),
       type_(type),
       obstime_(obstime) {
 }
@@ -51,12 +53,19 @@ std::string DataIdentifier::sqlWhere(const std::string & identifier) const {
   if (!identifier.empty())
     prefix = identifier + ".";
   std::ostringstream s;
-  s << prefix << "stationid=" << station_ << " and ";
-  s << prefix << "obstime='" << obstime_ << "' and ";
-  s << prefix << "typeid=" << type_;
+  s << prefix << "observationid=" << obsid_;
   return s.str();
 }
 
+DataIdentifier DataIdentifier::invalid() {
+  return DataIdentifier(std::numeric_limits<long long>::min(), 0, 0, boost::posix_time::ptime());
+}
+
+bool DataIdentifier::isValid() const {
+  return std::numeric_limits<long long>::min() != obsid_;
+}
+
+
 std::ostream & operator <<(std::ostream & s, const DataIdentifier & di) {
-  return s << di.station() << '/' << di.type() << '/' << di.obstime();
+  return s << di.obsid() << '(' << di.station() << '/' << di.type() << '/' << di.obstime() << ')';
 }

@@ -32,14 +32,19 @@
 #include "KvDataContainer.h"
 
 using namespace kvalobs::serialize::internal;
-
-namespace kvalobs {
-namespace decoder {
-namespace kldecoder {
+using kvalobs::serialize::KvalobsData;
+using boost::posix_time::ptime;
+using std::map;
+namespace decodeutility {
 
 ///Deletes kvData after it is consumed.
 KvDataContainer::KvDataContainer(kvalobs::serialize::KvalobsData *kvData)
     : data_(kvData) {
+}
+
+KvDataContainer::KvDataContainer(const std::list<kvalobs::kvData> &d, const std::list<kvalobs::kvTextData> &td) {
+  KvalobsData *t = new KvalobsData(d, td);
+  data_=t;
 }
 
 KvDataContainer::~KvDataContainer() {
@@ -82,11 +87,11 @@ int KvDataContainer::get(TextData &textData, Data &data,
 
 int KvDataContainer::getTextData(TextDataByObstime &textData, int stationid,
                                  int typeId,
-                                 const boost::posix_time::ptime &tbtime) const {
+                                 const boost::posix_time::ptime &tbtime, bool setTbTime) const {
   int n = 0;
   textData.clear();
   std::list<kvalobs::kvTextData> td;
-  data_->data(td, true, tbtime);
+  data_->data(td, setTbTime, tbtime);
 
   for (auto &&elem : td) {
     if (elem.stationID() != stationid || elem.typeID() != typeId)
@@ -100,11 +105,11 @@ int KvDataContainer::getTextData(TextDataByObstime &textData, int stationid,
 }
 
 int KvDataContainer::getData(DataByObstime &data, int stationid, int typeId,
-                             const boost::posix_time::ptime &tbtime) const {
+                             const boost::posix_time::ptime &tbtime, bool setTbTime) const {
   int n = 0;
   data.clear();
   std::list<kvalobs::kvData> d;
-  data_->data(d, true, tbtime);
+  data_->data(d, setTbTime, tbtime);
 
   for (auto &&elem : d) {
     if (elem.stationID() != stationid || elem.typeID() != typeId)
@@ -119,9 +124,9 @@ int KvDataContainer::getData(DataByObstime &data, int stationid, int typeId,
 
 int KvDataContainer::get(DataByObstime &data, TextDataByObstime &textData,
                          int stationid, int typeId,
-                         const boost::posix_time::ptime &tbtime) const {
-  return getTextData(textData, stationid, typeId, tbtime)
-      + getData(data, stationid, typeId, tbtime);
+                         const boost::posix_time::ptime &tbtime, bool setTbTime) const {
+  return getTextData(textData, stationid, typeId, tbtime, setTbTime)
+      + getData(data, stationid, typeId, tbtime, setTbTime);
 }
 
 bool KvDataContainer::getData(kvalobs::kvData &data, int stationid, int typeId,
@@ -197,7 +202,23 @@ void KvDataContainer::set(kvalobs::serialize::KvalobsData *kvData_) {
   data_ = kvData_;
 }
 
+KvDataContainer::StationInfoList KvDataContainer::stationInfos()const{
+  map<int, map<int, int> > stInfo;
+  StationInfoList ret;
+  std::list<kvalobs::kvData> d;
+  data_->data(d, false);
+
+  for (auto &elem : d) {
+    stInfo[elem.stationID()][elem.typeID()]++;
+  }
+
+  for( auto sid : stInfo) {
+    for( auto tid : sid.second) {
+      ret.push_front(StationInfo(sid.first, tid.first));
+    }
+  } 
+  return ret;
 }
-}
+
 }
 

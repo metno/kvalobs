@@ -31,25 +31,38 @@
 #ifndef __TRANSACTIONHELPER_H__
 #define __TRANSACTIONHELPER_H__
 
+#include "kvdb/kvdb.h"
+
 namespace dnmi {
 namespace db {
 
-class Connection;
+//class Connection;
 
 class TransactionBlock {
-  mutable bool abort;
+  mutable bool abort_;
   bool inTransaction;
   Connection *con;
+  bool ignore_;
  public:
   TransactionBlock(Connection &con);
+  TransactionBlock(Connection *con, Connection::IsolationLevel il, bool defaultAbort,bool doIgnoreTransactions=false);
   ~TransactionBlock();
 
+  void ignore() {
+    ignore_=true;
+  }
+
   operator bool() const {
-    return abort && inTransaction;
+    return abort_ && inTransaction;
   }
   void completed() {
-    abort = false;
+    abort_ = false;
   }
+
+  void abort(){
+    abort_=true;
+  }
+
 };
 }
 }

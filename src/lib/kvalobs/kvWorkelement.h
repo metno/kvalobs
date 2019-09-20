@@ -62,6 +62,7 @@ class kvWorkelement : public kvDbBase {
   boost::posix_time::ptime qa_stop_;
   boost::posix_time::ptime service_start_;
   boost::posix_time::ptime service_stop_;
+  long observationid_;
 
   void createSortIndex();
 
@@ -77,9 +78,10 @@ class kvWorkelement : public kvDbBase {
                 const boost::posix_time::ptime &qa_start,
                 const boost::posix_time::ptime &qa_stop,
                 const boost::posix_time::ptime &service_start,
-                const boost::posix_time::ptime &service_stop) {
+                const boost::posix_time::ptime &service_stop,
+                long observationid) {
     set(sid, obt, tid, tbt, pri, process_start, qa_start, qa_stop,
-        service_start, service_stop);
+        service_start, service_stop, observationid);
   }
 
   bool valid() const {
@@ -96,7 +98,8 @@ class kvWorkelement : public kvDbBase {
            const boost::posix_time::ptime &qa_start,
            const boost::posix_time::ptime &qa_stop,
            const boost::posix_time::ptime &service_start,
-           const boost::posix_time::ptime &service_stop);
+           const boost::posix_time::ptime &service_stop,
+           long observationid);
 
   bool set(const dnmi::db::DRow&);
 
@@ -138,11 +141,16 @@ class kvWorkelement : public kvDbBase {
     return service_stop_;
   }
 
+  long observationID()const {
+    return observationid_;
+  }
+
   void process_start(const boost::posix_time::ptime &start);
   void qa_start(const boost::posix_time::ptime &start);
   void qa_stop(const boost::posix_time::ptime &stop);
   void service_start(const boost::posix_time::ptime &start);
   void service_stop(const boost::posix_time::ptime &stop);
+  void observationID(long id);
 };
 
 /** @} */

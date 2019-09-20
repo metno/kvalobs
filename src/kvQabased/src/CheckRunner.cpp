@@ -27,8 +27,10 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include <iostream>
 #include "CheckRunner.h"
 #include "db/KvalobsDatabaseAccess.h"
+#include "db/returntypes/Observation.h"
 #include <scriptcreate/KvalobsCheckScript.h>
 #include <db/DelayedSaveDatabaseAccess.h>
 #include <db/CachedDatabaseAccess.h>
@@ -140,8 +142,12 @@ void logTransaction(bool ok, double start, int shortRetries, int longRetries,
 }
 }
 
+CheckRunner::KvalobsDataPtr CheckRunner::newObservation(const kvalobs::kvStationInfo & st, std::ostream * scriptLog) {
+  return newObservation(db_->getObservation(st), scriptLog);
+}
+
 CheckRunner::KvalobsDataPtr CheckRunner::newObservation(
-  const kvalobs::kvStationInfo & obs, std::ostream * scriptLog) {
+  const qabase::Observation & obs, std::ostream * scriptLog) {
   const int shortSleep = 100;
   const int longSleep = 300;
   const int nRetry = 3;
@@ -151,7 +157,7 @@ CheckRunner::KvalobsDataPtr CheckRunner::newObservation(
   int aborted = 0;
 
   std::ostringstream logContext;
-  logContext << obs.obstime() << '/' << obs.typeID() << '/' << obs.stationID();
+  logContext << obs.obstime() << '/' << obs.typeID() << '/' << obs.stationID() << '/' << obs.id();
   milog::LogContext context(logContext.str());
 
   if (not shouldRunAnyChecks(obs)) {
@@ -223,10 +229,15 @@ bool CheckRunner::shouldMarkStartAndStop_() {
 }
 
 CheckRunner::KvalobsDataPtr CheckRunner::checkObservation(
-    const kvalobs::kvStationInfo & obs, std::ostream * scriptLog) {
+    const qabase::Observation & obs, std::ostream * scriptLog) {
   db::CachedDatabaseAccess cdb(db_.get(), obs);
   db::DelayedSaveDatabaseAccess db(&cdb);
   AutoRollbackTransaction transaction(db);
+
+  if (!db.pin(obs)) {
+    LOGINFO("No data for observationid " << obs.id() << " - skipping all checks");
+    return CheckRunner::KvalobsDataPtr();
+  }
 
   LOGDEBUG("Getting checks for observation");
   db::DatabaseAccess::CheckList checkList;
@@ -240,8 +251,7 @@ CheckRunner::KvalobsDataPtr CheckRunner::checkObservation(
   LOGDEBUG("Fetching observation data from database");
   std::set<std::string> parametersInData;  // list of all parameters in observation data set
   db::DatabaseAccess::DataList observationData;
-  for (db::DatabaseAccess::ParameterList::const_iterator it = expectedParameters
-      .begin(); it != expectedParameters.end(); ++it) {
+  for (db::DatabaseAccess::ParameterList::const_iterator it = expectedParameters.begin(); it != expectedParameters.end(); ++it) {
     db::DatabaseAccess::DataList d;
     db.getData(&d, obs, *it, 0);
     d.remove_if(std::not1(have_typeid(obs.typeID())));
@@ -263,8 +273,7 @@ CheckRunner::KvalobsDataPtr CheckRunner::checkObservation(
     db.write(observationData);
   }
 
-  for (db::DatabaseAccess::CheckList::const_iterator check = checkList.begin();
-      check != checkList.end(); ++check) {
+  for (db::DatabaseAccess::CheckList::const_iterator check = checkList.begin(); check != checkList.end(); ++check) {
     std::string checkName = check->checkname();
     milog::LogContext context(checkName);
     try {
@@ -284,7 +293,7 @@ CheckRunner::KvalobsDataPtr CheckRunner::checkObservation(
         hasAnyParametersRequiredByCheck = true;
 
       if (hasAnyParametersRequiredByCheck
-          and shouldRunCheck(obs, *check, expectedParameters)) {
+          and shouldRunCheck(obs.stationInfo(), *check, expectedParameters)) {
         db::DatabaseAccess::DataList modifications;
 
         KvalobsCheckScript script(db, obs, *check, scriptLog);
@@ -385,7 +394,7 @@ bool CheckRunner::shouldRunCheck(
   return true;
 }
 
-bool CheckRunner::shouldRunAnyChecks(const kvalobs::kvStationInfo & obs) const {
+bool CheckRunner::shouldRunAnyChecks(const qabase::Observation & obs) const {
   return obs.typeID() > 0;  // not aggregated value
 }
 

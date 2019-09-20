@@ -92,6 +92,10 @@ inline std::string to_kvalobs_string_without_decimal_secound(const ptime & t,
 
 inline boost::posix_time::ptime time_from_string_nothrow(
     const std::string & s_) {
+
+  if( boost::trim_copy(s_).empty() )
+    return boost::posix_time::ptime();
+
   std::string s(boost::replace_first_copy(s_,"T"," "));
   try {
     std::string::size_type pos = s.find_last_of("+-Z");
@@ -162,5 +166,7 @@ inline boost::posix_time::ptime time_from_string_nothrow(
 }
 }
 }
+
+
 
 #endif /* TIMECONVERT_H_ */

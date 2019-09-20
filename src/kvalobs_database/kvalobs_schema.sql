@@ -20,29 +20,101 @@
 
 BEGIN;
 
-CREATE TABLE data (
-	stationid   INTEGER NOT NULL,
-	obstime     TIMESTAMP NOT NULL,
-	original    FLOAT NOT NULL,
-	paramid	    INTEGER NOT NULL,
-	tbtime	    TIMESTAMP NOT NULL,
-	typeid	    INTEGER NOT NULL,
-	sensor	    CHAR(1) DEFAULT '0',
-	level	    INTEGER DEFAULT 0,
-	corrected   FLOAT NOT NULL,
-	controlinfo CHAR(16) DEFAULT '0000000000000000',
-	useinfo     CHAR(16) DEFAULT '0000000000000000',
-	cfailed     TEXT DEFAULT NULL,    	
-	UNIQUE ( stationid, obstime, paramid, level, sensor, typeid ) 
+CREATE TABLE observations (
+    observationid BIGSERIAL UNIQUE,
+    stationid   INTEGER NOT NULL,
+    typeid      INTEGER NOT NULL,
+    obstime     TIMESTAMP NOT NULL,
+    tbtime      TIMESTAMP NOT NULL,
+    UNIQUE (stationid, typeid, obstime)
 );
 
-CREATE INDEX data_obstime_index ON data (obstime);
-CREATE INDEX data_tbtime_index ON data (tbtime);
+CREATE INDEX observations_obstime_index ON observations(obstime);
+CREATE INDEX observations_tbtime_index ON observations(tbtime);
+
+REVOKE ALL ON observations FROM public;
+GRANT ALL ON observations TO kv_admin;
+GRANT SELECT ON observations TO kv_read;
+GRANT SELECT, UPDATE, INSERT, DELETE ON observations TO kv_write;
+GRANT USAGE, SELECT ON SEQUENCE observations_observationid_seq TO kv_write,kv_admin;
+
+CREATE TABLE obsdata (
+    observationid BIGINT REFERENCES observations(observationid) ON DELETE CASCADE,
+    original    FLOAT NOT NULL,
+    paramid     INTEGER NOT NULL,
+    sensor      CHAR(1) DEFAULT '0',
+    level       INTEGER DEFAULT 0,
+    corrected   FLOAT NOT NULL,
+    controlinfo CHAR(16) DEFAULT '0000000000000000',
+    useinfo     CHAR(16) DEFAULT '0000000000000000',
+    cfailed     TEXT DEFAULT NULL,          
+    UNIQUE ( observationid, paramid, level, sensor ) 
+);
+
+REVOKE ALL ON obsdata FROM public;
+GRANT ALL ON obsdata TO kv_admin;
+GRANT SELECT ON obsdata TO kv_read;
+GRANT SELECT, UPDATE, INSERT, DELETE ON obsdata TO kv_write;
+
+
+CREATE TABLE obstextdata (
+    observationid BIGINT REFERENCES observations(observationid) ON DELETE CASCADE,
+    original    TEXT NOT NULL,
+    paramid     INTEGER NOT NULL,
+    UNIQUE ( observationid, paramid ) 
+);
+
+REVOKE ALL ON obstextdata FROM public;
+GRANT ALL ON obstextdata TO kv_admin;
+GRANT SELECT ON obstextdata TO kv_read;
+GRANT SELECT, UPDATE, INSERT, DELETE ON obstextdata TO kv_write;
+
+CREATE VIEW data AS (
+    SELECT 
+        o.stationid,
+        o.obstime,
+        d.original,
+        d.paramid,
+        o.tbtime,
+        o.typeid,
+        d.sensor,
+        d.level,
+        d.corrected,
+        d.controlinfo,
+        d.useinfo,
+        d.cfailed
+    FROM 
+        observations o,
+        obsdata d
+    WHERE
+        o.observationid = d.observationid
+);
 
 REVOKE ALL ON data FROM public;
 GRANT ALL ON data TO kv_admin;
 GRANT SELECT ON data TO kv_read;
-GRANT SELECT, UPDATE, INSERT, DELETE ON data TO kv_write;
+GRANT SELECT ON data TO kv_write;
+
+
+CREATE VIEW text_data AS (
+    SELECT 
+        o.stationid,
+        o.obstime,
+        d.original,
+        d.paramid,
+        o.tbtime,
+        o.typeid
+    FROM 
+        observations o,
+        obstextdata d
+    WHERE
+        o.observationid = d.observationid
+);
+
+REVOKE ALL ON text_data FROM public;
+GRANT ALL ON text_data TO kv_admin;
+GRANT SELECT ON text_data TO kv_read;
+GRANT SELECT ON text_data TO kv_write;
 
 
 --
@@ -87,64 +159,54 @@ kvalobs_database_version()
 RETURNS text AS
 $BODY$
 BEGIN
-	RETURN '2.1.4';
+	RETURN '5.0.0';
 END;
 $BODY$
 LANGUAGE plpgsql IMMUTABLE;
 
---
--- Trigger function for propagating changes to the data table into data_history
---
 CREATE OR REPLACE FUNCTION 
 	backup_old_data() 
 RETURNS trigger AS
 $BODY$
+DECLARE
+    obs observations%ROWTYPE;
 BEGIN
+    SELECT * into obs FROM observations WHERE observationid=NEW.observationid;
 	INSERT INTO data_history 
 		(stationid,obstime,original,paramid,tbtime,typeid,sensor,level,corrected,controlinfo,useinfo,cfailed)
 	VALUES
-		(NEW.stationid,NEW.obstime,NEW.original,NEW.paramid,NEW.tbtime,NEW.typeid,NEW.sensor,NEW.level,NEW.corrected,NEW.controlinfo,NEW.useinfo,NEW.cfailed);
+		(obs.stationid,obs.obstime,NEW.original,NEW.paramid,obs.tbtime,obs.typeid,NEW.sensor,NEW.level,NEW.corrected,NEW.controlinfo,NEW.useinfo,NEW.cfailed);
 	RETURN NULL;
 END;
 $BODY$
 LANGUAGE 'plpgsql';
-CREATE TRIGGER backup_data AFTER INSERT OR UPDATE ON data FOR EACH ROW EXECUTE PROCEDURE backup_old_data();
+CREATE TRIGGER backup_data AFTER INSERT OR UPDATE ON obsdata FOR EACH ROW EXECUTE PROCEDURE backup_old_data();
 
 --
 -- Trigger function for propagating deletes in the data table into data_history
 -- Deleted rows are marked in data_history with NULL values for original, 
 -- corrected, controlinfo, useinfo and cfailed.
---
+
 CREATE OR REPLACE FUNCTION 
 	backup_old_data_delete() 
 RETURNS trigger AS
 $BODY$
+DECLARE
+    obs observations%ROWTYPE;
 BEGIN
+    SELECT * into obs FROM observations WHERE observationid=OLD.observationid;
+    IF NOT FOUND THEN
+        RETURN NULL;
+    END IF;
 	INSERT INTO data_history 
 		(stationid,obstime,original,paramid,tbtime,typeid,sensor,level,corrected,controlinfo,useinfo,cfailed)
 	VALUES
-		(OLD.stationid,OLD.obstime,NULL,OLD.paramid,OLD.tbtime,OLD.typeid,OLD.sensor,OLD.level,NULL,NULL,NULL,NULL);
+		(obs.stationid,obs.obstime,NULL,OLD.paramid,obs.tbtime,obs.typeid,OLD.sensor,OLD.level,NULL,NULL,NULL,NULL);
 	RETURN NULL;
 END;
 $BODY$
 LANGUAGE 'plpgsql';
-CREATE TRIGGER backup_data_delete AFTER DELETE ON data FOR EACH ROW EXECUTE PROCEDURE backup_old_data_delete();
-
-
-CREATE TABLE text_data (
-	stationid   INTEGER NOT NULL,
-	obstime     TIMESTAMP NOT NULL,
-	original    TEXT NOT NULL,
-	paramid	    INTEGER NOT NULL,
-	tbtime	    TIMESTAMP NOT NULL,
-	typeid	    INTEGER NOT NULL,
-	UNIQUE ( stationid, obstime, paramid, typeid ) 
-);
-
-REVOKE ALL ON text_data FROM public;
-GRANT ALL ON text_data TO kv_admin;
-GRANT SELECT ON text_data TO kv_read;
-GRANT SELECT, UPDATE, INSERT, DELETE ON text_data TO kv_write;
+CREATE TRIGGER backup_data_delete AFTER DELETE ON obsdata FOR EACH ROW EXECUTE PROCEDURE backup_old_data_delete();
 
 
 --
@@ -155,15 +217,15 @@ GRANT SELECT, UPDATE, INSERT, DELETE ON text_data TO kv_write;
 -- data history in this table.  
 -- 
 CREATE TABLE text_data_history (
-	version bigserial,
-	stationid   INTEGER NOT NULL,
-	obstime     TIMESTAMP NOT NULL,
-	original    TEXT,
-	paramid	    INTEGER NOT NULL,
-	tbtime	    TIMESTAMP NOT NULL,
-	typeid	    INTEGER NOT NULL,
-	modificationtime timestamp NOT NULL DEFAULT timezone('UTC', now()),
-	UNIQUE ( version, stationid, obstime, paramid, typeid ) 
+       version bigserial,
+       stationid   INTEGER NOT NULL,
+       obstime     TIMESTAMP NOT NULL,
+       original    TEXT,
+       paramid     INTEGER NOT NULL,
+       tbtime      TIMESTAMP NOT NULL,
+       typeid      INTEGER NOT NULL,
+       modificationtime timestamp NOT NULL DEFAULT timezone('UTC', now()),
+       UNIQUE ( version, stationid, obstime, paramid, typeid ) 
 );
 REVOKE ALL ON text_data_history FROM public;
 GRANT ALL ON text_data_history TO kv_admin;
@@ -174,44 +236,176 @@ GRANT USAGE ON SEQUENCE text_data_history_version_seq TO kv_write;
 
 CREATE INDEX text_data_history_main_index ON text_data_history (stationid, obstime, paramid, typeid);
 CREATE INDEX text_data_history_modificationtime_index ON text_data_history (modificationtime);
-
---
--- Trigger function for propagating changes to the text_data table into text_data_history
---
+---
+--- Trigger function for propagating changes to the text_data table into text_data_history
+---
 CREATE OR REPLACE FUNCTION 
 	backup_old_text_data() 
 RETURNS trigger AS
 $BODY$
+DECLARE
+    obs observations%ROWTYPE;
 BEGIN
+    SELECT * into obs FROM observations WHERE observationid=NEW.observationid;
 	INSERT INTO text_data_history
 		(stationid,obstime,original,paramid,tbtime,typeid)
 	VALUES
-		(NEW.stationid,NEW.obstime,NEW.original,NEW.paramid,NEW.tbtime,NEW.typeid);
+		(obs.stationid,obs.obstime,NEW.original,NEW.paramid,obs.tbtime,obs.typeid);
 	RETURN NULL;
 END;
 $BODY$
 LANGUAGE 'plpgsql';
-CREATE TRIGGER backup_text_data AFTER INSERT OR UPDATE ON text_data FOR EACH ROW EXECUTE PROCEDURE backup_old_text_data();
+CREATE TRIGGER backup_text_data AFTER INSERT OR UPDATE ON obstextdata FOR EACH ROW EXECUTE PROCEDURE backup_old_text_data();
 
 --
 -- Trigger function for propagating deletes in the text_data table into text_data_history
--- Deleted rows are marked in text_data_history with NULL values for original, 
--- corrected, controlinfo, useinfo and cfailed.
+-- Deleted rows are marked in text_data_history with NULL values for original.
 --
 CREATE OR REPLACE FUNCTION 
 	backup_old_text_data_delete() 
 RETURNS trigger AS
 $BODY$
+DECLARE
+    obs observations%ROWTYPE;
 BEGIN
+    SELECT * into obs FROM observations WHERE observationid=OLD.observationid;
+    IF NOT FOUND THEN
+        RETURN NULL;
+    END IF;
 	INSERT INTO text_data_history 
 		(stationid,obstime,original,paramid,tbtime,typeid)
 	VALUES
-		(OLD.stationid,OLD.obstime,NULL,OLD.paramid,OLD.tbtime,OLD.typeid);
+		(obs.stationid,obs.obstime,NULL,OLD.paramid,obs.tbtime,obs.typeid);
 	RETURN NULL;
 END;
 $BODY$
 LANGUAGE 'plpgsql';
-CREATE TRIGGER backup_text_data_delete AFTER DELETE ON text_data FOR EACH ROW EXECUTE PROCEDURE backup_old_text_data_delete();
+CREATE TRIGGER backup_text_data_delete AFTER DELETE ON obstextdata FOR EACH ROW EXECUTE PROCEDURE backup_old_text_data_delete();
+
+CREATE OR REPLACE FUNCTION mkdata(
+    stationid_ integer,
+    obstime_ timestamp,
+    original float,
+    paramid integer,
+    tbtime timestamp,
+    typeid_ integer,
+    sensor char(1),
+    level integer,
+    corrected float,
+    controlinfo char(16),
+    useinfo char(16),
+    cfailed text
+) RETURNS bigint AS
+$BODY$
+DECLARE 
+    obs bigint;
+BEGIN
+    SELECT observationid into obs FROM observations o WHERE o.stationid=stationid_ AND o.typeid=typeid_ AND o.obstime=obstime_;
+    IF NOT FOUND THEN
+        INSERT INTO observations (stationid, typeid, obstime, tbtime) VALUES (stationid_, typeid_, obstime_, tbtime) RETURNING observationid INTO obs;
+    END IF;
+    INSERT INTO obsdata VALUES (
+        obs,
+        '0h',
+        original,
+        paramid,
+        sensor,
+        level,
+        corrected,
+        controlinfo,
+        useinfo,
+        cfailed
+    );
+    RETURN obs;
+END;
+$BODY$
+LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE RULE data_insert AS ON INSERT TO data DO INSTEAD (
+    SELECT mkdata(NEW.stationid, NEW.obstime, NEW.original, NEW.paramid, NEW.tbtime, NEW.typeid, NEW.sensor, NEW.level, NEW.corrected, NEW.controlinfo, NEW.useinfo, NEW.cfailed);
+);
+
+CREATE OR REPLACE RULE data_update AS ON UPDATE TO data DO INSTEAD (
+    UPDATE obsdata SET 
+        original=NEW.original,
+        paramid=NEW.paramid,
+        sensor=NEW.sensor,
+        level=NEW.level,
+        corrected=NEW.corrected,
+        controlinfo=NEW.controlinfo,
+        useinfo=NEW.useinfo,
+        cfailed=NEW.cfailed
+    where 
+        observationid=(
+            select observationid from observations where
+            stationid=NEW.stationid AND typeid=NEW.typeid AND obstime=NEW.obstime) AND
+        paramid=OLD.paramid AND
+        sensor=OLD.sensor AND
+        level=OLD.level
+);
+
+CREATE OR REPLACE RULE data_delete AS ON DELETE TO data DO INSTEAD (
+    DELETE FROM obsdata WHERE 
+        observationid=(
+            select observationid from observations where
+            stationid=OLD.stationid AND typeid=OLD.typeid AND obstime=OLD.obstime) AND
+        paramid=OLD.paramid AND
+        sensor=OLD.sensor AND
+        level=OLD.level
+);
+
+
+
+CREATE OR REPLACE FUNCTION mktextdata(
+    stationid_ integer,
+    obstime_ timestamp,
+    original text,
+    paramid integer,
+    tbtime timestamp,
+    typeid_ integer
+) RETURNS bigint AS
+$BODY$
+DECLARE 
+    obs bigint;
+BEGIN
+    SELECT observationid into obs FROM observations o WHERE o.stationid=stationid_ AND o.typeid=typeid_ AND o.obstime=obstime_;
+    IF NOT FOUND THEN
+        INSERT INTO observations (stationid, typeid, obstime, tbtime) VALUES (stationid_, typeid_, obstime_, tbtime) RETURNING observationid INTO obs;
+    END IF;
+    INSERT INTO obstextdata VALUES (
+        obs,
+        '0h',
+        original,
+        paramid
+    );
+    RETURN obs;
+END;
+$BODY$
+LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE RULE text_data_insert AS ON INSERT TO text_data DO INSTEAD (
+    SELECT mktextdata(NEW.stationid, NEW.obstime, NEW.original, NEW.paramid, NEW.tbtime, NEW.typeid);
+);
+
+CREATE OR REPLACE RULE text_data_update AS ON UPDATE TO text_data DO INSTEAD (
+    UPDATE obstextdata SET 
+        original=NEW.original,
+        paramid=NEW.paramid
+    where 
+        observationid=(
+            select observationid from observations where
+            stationid=NEW.stationid AND typeid=NEW.typeid AND obstime=NEW.obstime) AND
+        paramid=OLD.paramid
+);
+
+CREATE OR REPLACE RULE text_data_delete AS ON DELETE TO text_data DO INSTEAD (
+    DELETE FROM obstextdata WHERE 
+        observationid=(
+            select observationid from observations where
+            stationid=OLD.stationid AND typeid=OLD.typeid AND obstime=OLD.obstime) AND
+        paramid=OLD.paramid
+);
+
 
 
 
@@ -260,7 +454,7 @@ CREATE TABLE model_data (
 	obstime	  TIMESTAMP NOT NULL,
 	paramid   INTEGER NOT NULL,
 	level     INTEGER NOT NULL,
-        modelid   INTEGER NOT NULL,
+    modelid   INTEGER NOT NULL,
 	original  FLOAT DEFAULT NULL,  
 	UNIQUE ( stationid, obstime, paramid, level, modelid )
 );
@@ -283,6 +477,19 @@ GRANT ALL ON model TO kv_admin;
 GRANT SELECT ON model TO kv_read;
 GRANT SELECT, UPDATE, INSERT ON model TO kv_write;
 
+CREATE TABLE priority (
+	stationid INTEGER NOT NULL,
+	typeid    INTEGER NOT NULL,
+    priority  INTEGER NOT NULL,
+    hour      INTEGER DEFAULT 6,
+    pri_after_hour INTEGER DEFAULT 10,
+	UNIQUE ( stationid, typeid )
+);
+
+REVOKE ALL ON priority FROM public;
+GRANT ALL ON priority TO kv_admin;
+GRANT SELECT ON priority TO kv_read;
+GRANT SELECT, UPDATE, INSERT ON priority TO kv_write;
 
 
 
@@ -290,11 +497,11 @@ CREATE TABLE types (
 	typeid  INTEGER NOT NULL,
 	format   TEXT DEFAULT NULL,
 	earlyobs INTEGER DEFAULT NULL,
-        lateobs  INTEGER DEFAULT NULL,
+    lateobs  INTEGER DEFAULT NULL,
 	read     TEXT DEFAULT NULL,
-        obspgm   TEXT DEFAULT NULL,
+    obspgm   TEXT DEFAULT NULL,
 	comment  TEXT DEFAULT NULL,
-	UNIQUE ( typeid )
+ 	UNIQUE ( typeid )
 );
 
 REVOKE ALL ON types FROM public;
@@ -354,9 +561,9 @@ CREATE TABLE station (
 	ICAOid     CHAR(4) DEFAULT NULL,
 	call_sign  CHAR(7) DEFAULT NULL, 
 	stationstr TEXT DEFAULT NULL,
-        environmentid  INTEGER DEFAULT NULL,
+    environmentid  INTEGER DEFAULT NULL,
 	static    BOOLEAN DEFAULT FALSE,
-        fromtime TIMESTAMP NOT NULL, 
+    fromtime TIMESTAMP NOT NULL,
 	UNIQUE ( stationid, fromtime )
 );
 
@@ -375,7 +582,7 @@ CREATE TABLE checks (
 	language  INTEGER NOT NULL,
 	checkname TEXT DEFAULT NULL,
 	checksignature TEXT DEFAULT NULL,
-        active   TEXT DEFAULT '* * * * *',   
+    active   TEXT DEFAULT '* * * * *',   
 	fromtime TIMESTAMP NOT NULL,
 	UNIQUE ( stationid, qcx, language, fromtime )
 );
@@ -394,10 +601,10 @@ CREATE TABLE station_param (
 	fromday	  INTEGER NOT NULL,
 	today	  INTEGER NOT NULL,
 	hour      INTEGER DEFAULT -1,
-        qcx       TEXT NOT NULL,
+    qcx       TEXT NOT NULL,
 	metadata  TEXT DEFAULT NULL,
-        desc_metadata TEXT DEFAULT NULL,
-        fromtime TIMESTAMP NOT NULL,
+    desc_metadata TEXT DEFAULT NULL,
+    fromtime TIMESTAMP NOT NULL,
 	UNIQUE ( stationid, paramid, level, sensor, fromday, today, hour, qcx, fromtime )
 );
 
@@ -457,7 +664,7 @@ CREATE TABLE obs_pgm (
 	stationid INTEGER NOT NULL,
 	paramid	  INTEGER NOT NULL,
 	level	  INTEGER NOT NULL,
-        nr_sensor INTEGER DEFAULT 1,
+    nr_sensor INTEGER DEFAULT 1,
 	typeid    INTEGER NOT NULL,
 	priority_message  BOOLEAN DEFAULT TRUE,
 	collector BOOLEAN DEFAULT FALSE,
@@ -492,8 +699,8 @@ CREATE TABLE obs_pgm (
 	fri  BOOLEAN DEFAULT FALSE,
 	sat  BOOLEAN DEFAULT FALSE,
 	sun  BOOLEAN DEFAULT FALSE,
-        fromtime TIMESTAMP NOT NULL,
-        totime   TIMESTAMP DEFAULT NULL,
+    fromtime TIMESTAMP NOT NULL,
+    totime   TIMESTAMP DEFAULT NULL,
 	UNIQUE ( stationid, typeid, paramid, level, fromtime )	
 );
 
@@ -553,7 +760,7 @@ CREATE TABLE qcx_info (
 	medium_qcx  TEXT NOT NULL,
 	main_qcx    TEXT NOT NULL,  
  	controlpart INTEGER DEFAULT NULL,
-        comment	    TEXT DEFAULT NULL,
+    comment	    TEXT DEFAULT NULL,
 	UNIQUE (medium_qcx)
 );
 REVOKE ALL ON qcx_info FROM public;
@@ -561,42 +768,36 @@ GRANT ALL ON qcx_info TO kv_admin;
 GRANT SELECT ON qcx_info TO kv_read;
 GRANT SELECT, UPDATE, INSERT ON qcx_info TO kv_write;
 
-
 CREATE TABLE key_val (
 	package TEXT NOT NULL,
 	key 	TEXT NOT NULL,
 	val   	TEXT,
 	UNIQUE (package, key)
 ); 
+
 REVOKE ALL ON key_val FROM public;
 GRANT ALL ON key_val TO kv_admin;
 GRANT SELECT ON key_val TO kv_read;
 GRANT SELECT, UPDATE, INSERT, DELETE ON key_val TO kv_write;
 
-
-
 CREATE TABLE workque (
-       stationid     INTEGER   NOT NULL,
-       obstime       TIMESTAMP NOT NULL,
-       typeid        INTEGER   NOT NULL,
-       tbtime        TIMESTAMP NOT NULL,
        priority      INTEGER   NOT NULL,
        process_start TIMESTAMP ,
        qa_start      TIMESTAMP ,
        qa_stop       TIMESTAMP ,
        service_start TIMESTAMP ,
        service_stop  TIMESTAMP ,
-       UNIQUE(stationid, obstime, typeid)
+	   observationid bigint NOT NULL REFERENCES observations(observationid) ON DELETE CASCADE ,
+       UNIQUE(observationid)
 );
 
-CREATE INDEX workque_index_priority_stationid_typeid_obstime ON
-workque (priority, stationid, typeid, obstime);
+CREATE INDEX workque_priority_obsid ON workque (priority, observationid);
+CREATE INDEX workque_qa_start_qa_stop_idx ON workque (qa_start, qa_stop);
+CREATE INDEX workque_process_start_index on workque (process_start);
 REVOKE ALL ON workque FROM public;
 GRANT ALL ON workque TO kv_admin;
 GRANT SELECT ON workque TO kv_read;
 GRANT SELECT, UPDATE, INSERT, DELETE ON workque TO kv_write;
-
-
 
 CREATE TABLE workstatistik  (
        stationid     INTEGER   NOT NULL,
@@ -609,13 +810,15 @@ CREATE TABLE workstatistik  (
        qa_stop       TIMESTAMP ,
        service_start TIMESTAMP ,
        service_stop  TIMESTAMP ,
-       UNIQUE(stationid, obstime, typeid)
+       observationid BIGINT
 );
+CREATE INDEX ON workstatistik (stationid, obstime, typeid);
+CREATE INDEX ON workstatistik (observationid);
+
 REVOKE ALL ON workstatistik FROM public;
 GRANT ALL ON workstatistik TO kv_admin;
 GRANT SELECT ON workstatistik TO kv_read;
 GRANT SELECT, UPDATE, INSERT, DELETE ON workstatistik TO kv_write;
-
 
 CREATE TABLE ps_subscribers  (
        name     TEXT NOT NULL,
@@ -660,5 +863,27 @@ REVOKE ALL ON qc2_interpolation_best_neighbors FROM public;
 GRANT ALL ON qc2_interpolation_best_neighbors TO kv_admin;
 GRANT SELECT ON qc2_interpolation_best_neighbors TO kv_read;
 GRANT SELECT, UPDATE, INSERT, DELETE ON qc2_interpolation_best_neighbors TO kv_write;
+
+CREATE VIEW workque_waiting  AS
+select
+	o.stationid,
+	o.typeid,
+    o.obstime,
+    o.tbtime,
+    q.priority,
+    q.process_start,
+    q.qa_start,
+    q.qa_stop,
+    q.observationid
+from workque q, observations o 
+where q.observationid=o.observationid and process_start is not null and ((qa_start<now()-'10 minutes'::interval and qa_stop is null) or 
+      (qa_start is null and stationid not in 
+       (select o.stationid from workque q, observations o where o.observationid=q.observationid and qa_start is not null and qa_stop is null))) 
+order by priority, tbtime ;    
+
+REVOKE ALL ON workque_waiting FROM public;
+GRANT ALL ON workque_waiting TO kv_admin;
+GRANT SELECT ON workque_waiting TO kv_read;
+GRANT SELECT ON workque_waiting TO kv_write;
 
 END;

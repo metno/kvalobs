@@ -4,7 +4,6 @@ decoderdir=$(pkglibdir)/decode
 decoder_LTLIBRARIES = kldecoder.la
 kldecoder_la_SOURCES = \
 	DataDecode.h DataDecode.cc \
-	KvDataContainer.h KvDataContainer.cc \
 	kldata.h \
 	kldecoder.h kldecoder.cc\
 	klentry.h klentry.cc\

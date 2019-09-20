@@ -32,6 +32,7 @@
 #include <scriptcreate/KvalobsCheckScript.h>
 #include <scriptcreate/DataStore.h>
 #include <scriptrunner/Script.h>
+#include <db/returntypes/Observation.h>
 #include <boost/scoped_ptr.hpp>
 #include <boost/assign/list_of.hpp>
 #include <algorithm>
@@ -41,16 +42,16 @@ using qabase::KvalobsCheckScript;
 class KvalobsCheckScriptTest : public testing::Test {
  public:
   KvalobsCheckScriptTest()
-      : observation(10,
+      : observation(1, 10, 302, 
                     boost::posix_time::time_from_string("2010-05-12 06:00:00"),
-                    302),
+                    boost::posix_time::time_from_string("2010-05-12 06:04:21")),
         factory(10, boost::posix_time::time_from_string("2010-05-12 06:00:00"),
                 302) {
     database.setDefaultActions();
   }
  protected:
   MockDatabaseAccess database;
-  kvalobs::kvStationInfo observation;
+  qabase::Observation observation;
   kvalobs::kvDataFactory factory;
 };
 

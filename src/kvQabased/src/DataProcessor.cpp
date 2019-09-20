@@ -28,6 +28,7 @@
  */
 
 #include "DataProcessor.h"
+#include "db/returntypes/Observation.h"
 #include "CheckRunner.h"
 #include "QaBaseApp.h"
 #include <kvsubscribe/KafkaProducer.h>
@@ -53,14 +54,19 @@ DataProcessor::DataProcessor(std::shared_ptr<qabase::CheckRunner> checkRunner)
 DataProcessor::~DataProcessor() {
 }
 
-qabase::CheckRunner::KvalobsDataPtr DataProcessor::runChecks(const kvalobs::kvStationInfo & si) const {
-  qabase::LogFileCreator::LogStreamPtr logStream = logCreator_.getLogStream(si);
-  qabase::CheckRunner::KvalobsDataPtr modified(checkRunner_->newObservation(si, logStream.get()));
+qabase::CheckRunner::KvalobsDataPtr DataProcessor::runChecks(const qabase::Observation & obs) const {
+  qabase::LogFileCreator::LogStreamPtr logStream = logCreator_.getLogStream(obs.stationInfo());
+  qabase::CheckRunner::KvalobsDataPtr modified(checkRunner_->newObservation(obs, logStream.get()));
   return modified;
 }
 
-void DataProcessor::sendToKafka(const qabase::CheckRunner::KvalobsDataPtr & dataList, bool * stop) {
+void DataProcessor::sendToKafka(const qabase::CheckRunner::KvalobsDataPtr dataList, bool * stop) {
   int sendAttempts = 0;
+
+  if( !dataList ) {
+     return;
+  }
+
   do {
     auto messageid = output_->send(kvalobs::serialize::KvalobsDataSerializer::serialize(*dataList));
     messages.insert(messageid);
@@ -80,18 +86,18 @@ void DataProcessor::sendToKafka(const qabase::CheckRunner::KvalobsDataPtr & data
 }
 
 void DataProcessor::process(const kvalobs::kvStationInfo & si) {
-  qabase::CheckRunner::KvalobsDataPtr d = runChecks(si);
-  sendToKafka(d);
+  qabase::CheckRunner::KvalobsDataPtr modified(checkRunner_->newObservation(si));
+  sendToKafka(modified);
   finalizeMessage_();
 }
 
-void DataProcessor::process(const std::string & message) {
-  kvalobs::serialize::KvalobsDataSerializer s(message);
-  const kvalobs::serialize::KvalobsData & data = s.toData();
-  auto modified = data.summary();
+// void DataProcessor::process(const std::string & message) {
+//   kvalobs::serialize::KvalobsDataSerializer s(message);
+//   const kvalobs::serialize::KvalobsData & data = s.toData();
+//   auto modified = data.summary();
 
-  process(modified.begin(), modified.end());
-}
+//   process(modified.begin(), modified.end());
+// }
 
 void DataProcessor::onKafkaSendSuccess(kvalobs::subscribe::KafkaProducer::MessageId id, const std::string & data) {
   if (messages.erase(id) == 0) {  // should never happen

@@ -41,7 +41,6 @@
 #include <kvalobs/kvQueries.h>
 #include <kvalobs/kvTypes.h>
 #include <miutil/trimstr.h>
-#include "KvDataContainer.h"
 #include <miutil/timeconvert.h>
 #include "kldecoder.h"
 #include <decodeutility/decodeutility.h>
@@ -54,6 +53,7 @@ using namespace dnmi::db;
 using namespace miutil;
 using namespace boost;
 using namespace kvalobs;
+using decodeutility::KvDataContainer;
 
 namespace {
 bool decodeKeyVal(const string &keyval, string &key, string &val) {
@@ -212,6 +212,8 @@ void kvalobs::decoder::kldecoder::KlDecoder::decodeObsType(
   typeID = INT_MAX;
   stationID = INT_MAX;
   onlyInsertOrUpdate = false;
+  receivedTime = boost::posix_time::ptime();
+  
 
   if (cstr.size() < 2) {
     LOGERROR("decodeObsType: To few keys!");
@@ -321,6 +323,66 @@ kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecod
   return Rejected;
 }
 
+
+bool
+kvalobs::decoder::kldecoder::
+KlDecoder::
+do302(int stationid, int typeId, 
+      KvDataContainer::DataByObstime &dataIn, 
+      KvDataContainer::TextDataByObstime &textDataIn, 
+      map<pt::ptime, int> &observations,
+      const std::string &logid, std::string &msgToSender )
+{
+  pt::ptime obstime;
+  KvDataContainer::DataList data;
+  KvDataContainer::TextDataList textData;
+
+  for(KvDataContainer::DataByObstime::iterator it = dataIn.begin();
+      it != dataIn.end(); ++it) {
+
+    if( obstime.is_special() ) {
+      obstime=it->first;
+    } else if( obstime < it->first) {
+      obstime=it->first;
+    }
+    for( auto &d : it->second) 
+      data.push_back(d);
+      
+    observations[it->first] += it->second.size();
+  }
+
+  for(KvDataContainer::TextDataByObstime::iterator it = textDataIn.begin();
+      it != textDataIn.end(); ++it) {
+
+    if( obstime.is_special() ) {
+      obstime=it->first;
+    } else if( obstime < it->first) {
+      obstime=it->first;
+    }
+    for( auto &d : it->second) 
+      textData.push_back(d);
+      
+    observations[it->first] += it->second.size();
+  }
+
+  if( data.empty() && textData.empty())
+    return true;
+
+  if (!addDataToDb(to_miTime(obstime), stationid, typeId, data, textData,
+                  logid, getOnlyInsertOrUpdate())) {
+    ostringstream ost;
+    ost << "DBERROR: stationid: " << stationid << " typeid: " << typeId
+        << " obstime: " << obstime;
+    LOGERROR(ost.str());
+    IDLOGERROR(logid, ost.str());
+    msgToSender += "\n" + ost.str();
+    return false;
+  }
+
+  return true;
+
+}
+
 kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecoder::insertDataInDb(
     kvalobs::serialize::KvalobsData *theData, int stationid, int typeId,
     const std::string &logid, std::string &msgToSender) {
@@ -332,11 +394,7 @@ kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecod
   map<ptime, int> observations;
 
   KvDataContainer container(theData);
-  int priority = 4;
-
-  if (receivedTime.is_special())
-    priority = 10;
-
+  
   if (container.get(data, textData, stationid, typeId,
                     pt::second_clock::universal_time()) < 0) {
     IDLOGINFO(logid, "No Data.");
@@ -354,16 +412,30 @@ kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecod
       textData.erase(tid);
     }
 
-    if (!addDataToDb(to_miTime(it->first), stationid, typeId, it->second, td,
-                     priority, logid, getOnlyInsertOrUpdate())) {
+    try {
+      if (!addDataToDbThrow(to_miTime(it->first), stationid, typeId, it->second, td,
+           logid, getOnlyInsertOrUpdate())) {
+        ostringstream ost;
+        ost << "ERROR: stationid: " << stationid << " typeid: " << typeId
+            << " obstime: " << it->first << ". Inconsistens in the data!";
+        LOGERROR(ost.str());
+        IDLOGERROR(logid, ost.str());
+        msgToSender += "\n" + ost.str();
+        return Rejected;
+      }
+    }
+    catch( const SQLException &e) {
       ostringstream ost;
-
-      ost << "DBERROR: stationid: " << stationid << " typeid: " << typeId
-          << " obstime: " << it->first;
+      ost << "ERROR: stationid: " << stationid << " typeid: " << typeId
+          << " obstime: " << it->first << ". DB" << e.what();
       LOGERROR(ost.str());
-      IDLOGERROR(logid, ost.str());
+      IDLOGERROR(logid, ost.str() << ". SQLSTATE: '" << e.errorCode() << "' mayRecover: " << (e.mayRecover()?"true":"false") <<"." );
       msgToSender += "\n" + ost.str();
-      return NotSaved;
+      if ( !e.mayRecover() ) {
+        return Rejected;
+      } else {
+        return NotSaved;
+      }
     }
 
     observations[it->first] += it->second.size();
@@ -374,8 +446,8 @@ kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecod
     KvDataContainer::DataList dl;
     for (KvDataContainer::TextDataByObstime::iterator it = textData.begin();
         it != textData.end(); ++it) {
-      if (!addDataToDb(to_miTime(it->first), stationid, typeId, dl, it->second,
-                       priority, logid, getOnlyInsertOrUpdate())) {
+     if (!addDataToDb(to_miTime(it->first), stationid, typeId, dl, it->second,
+                     logid, getOnlyInsertOrUpdate())) {
         ostringstream ost;
         ost << "DBERROR: TextData: stationid: " << stationid << " typeid: "
             << typeId << " obstime: " << it->first;
@@ -387,7 +459,7 @@ kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecod
       observations[it->first] += it->second.size();
     }
   }
-
+  
   ostringstream ost;
   int totalObservations = 0;
   if (observations.size() > 0) {
@@ -579,243 +651,3 @@ long kvalobs::decoder::kldecoder::KlDecoder::getTypeId(std::string &msg) const {
   return typeID;
 }
 
-#if 0
-kvalobs::decoder::DecoderBase::DecodeResult
-kvalobs::decoder::kldecoder::
-KlDecoder::
-execute(std::string &msg)
-{
-  list<kvalobs::kvData> dataList;
-  list<kvalobs::kvTextData> textDataList;
-  pt::ptime nowTime( pt::second_clock::universal_time() );
-  string tmp;
-  pt::ptime obstime;
-  pt::ptime tbtime( pt::second_clock::universal_time() );
-  int typeId=getTypeId(msg);
-  string level;
-  int stationid=getStationId(msg);
-  float fval;
-  string val;
-  int count=0;  //Saved data records
-  int nErrors=0;//Failed to save data records.
-  int nExpectedData=0;
-  vector<ParamDef> params;
-  int lines=1;//Total lines.
-  int nLineWithData=0;//Number of line with data.
-  int nElemsInLine;
-  int priority=10;
-  milog::LogContext lcontext(name());
-
-  warnings=false;
-  logid.clear();
-
-  if( receivedTime.is_special() && setUsinfo7 )
-  receivedTime = pt::second_clock::universal_time();
-
-  LOGINFO( "Decoder: " << name() << ". New observation. stationid: " <<
-      stationid << " typeid: " << typeId);
-
-  if( stationid == INT_MAX ) {
-    ostringstream o;
-
-    o << "Missing stationid! typeid: ";
-
-    if( typeId > 0 )
-    o << typeId;
-    else
-    o << "<NA>";
-
-    return rejected( o.str(), "" );
-  }
-
-  if( typeId<=0 || typeId == INT_MAX) {
-    ostringstream o;
-    o << "Format error in type!"
-    << "stationid: " << stationid << ".";
-
-    return rejected( o.str(), "");
-  }
-
-  IdlogHelper idLog( stationid, typeId, this );
-  logid = idLog.logid();
-
-  trimstr( obs );
-  obs += "\n";
-
-  istringstream istr(obs);
-
-  IDLOGINFO( logid,
-      name() << endl <<
-      "------------------------------" << endl <<
-      "ObstType : " << obsType << endl <<
-      "Obs      : " << obs << endl );
-
-  msg = "OK!";
-
-  if( !getline( istr, tmp ) ) {
-    ostringstream o;
-    o << "Invalid format. No data. stationid: " << stationid << " typeid: " << typeId;
-
-    return rejected( o.str(), logid );
-  } else {
-    if( !decodeHeader( tmp, params, msg ) ) {
-      ostringstream o;
-      o << "INVALID header. stationid: " << stationid << " typeid: " << typeId;
-      return rejected( o.str(), logid );
-    }
-  }
-
-  if( params.size() < 1 ) {
-    msg = "No parameters in header!";
-    LOGINFO( "Decoder: " << name() << ". No parameters in header! Stationid: "
-        << stationid << " typeid: " << typeId );
-    IDLOGINFO( logid, "No parameters in header!" << endl << "Header: " << tmp );
-    return Ok;
-  }
-
-  string::size_type i;
-
-  while( getline( istr, tmp ) ) {
-    lines++;
-    i = tmp.find_first_of( "," );
-    obstime = pt::time_from_string_nothrow( tmp.substr( 0, i ) );
-
-    if( obstime.is_special() ) {
-      ostringstream err;
-      err << "Invalid obstime. Line: " << tmp << endl
-      << "stationid: " << stationid << " typeid: " << typeId;
-
-      return rejected( err.str(), logid );
-    }
-
-    tmp.erase(0, ( i == string::npos?i:i+1 ) );
-
-    KlDataArray da;
-
-    if( !decodeData( da, params.size(), obstime, tmp, lines, msg ) ) {
-      ostringstream o;
-      o << "Cant decode data. Line: " << tmp << endl
-      << "Reason: " << msg << endl
-      << "Stationid: " << stationid << " typeid: " << typeId;
-      return rejected( o.str(), logid );
-    }
-
-    ostringstream ost;
-    ost << "[" << tmp << "]" << endl;
-
-    for(KlDataArray::size_type index=0; index<da.size(); index++)
-    ost << params[index].name() << "("<< params[index].id() << ")["
-    << params[index].sensor() << "," << params[index].level() << "]=("
-    << da[index].val()<<"," << da[index].cinfo()<<"," << da[index].uinfo()
-    << endl;
-
-    IDLOGDEBUG3( logid, ost.str() );
-    dataList.clear();
-    textDataList.clear();
-    nElemsInLine=0;
-
-    for( KlDataArray::size_type index=0; index < da.size(); index++ ) {
-      KlData data = da[index];
-
-      if( data.empty() )
-      continue;
-
-      nExpectedData++;
-      nElemsInLine++;
-
-      string val=data.val();
-
-      if( isTextParam( params[index].id() ) ) {
-        kvTextData d( stationid,
-            obstime,
-            val,
-            params[index].id(),
-            tbtime,
-            typeId );
-
-        textDataList.push_back( d );
-      } else {
-        if( params[index].code() ) {
-          if( params[index].name() == "VV" ) {
-            val = decodeutility::VV(val);
-          } else if( params[index].name() == "HL" ) {
-            val = decodeutility::HL( val );
-          } else {
-            warnings=true;
-            IDLOGWARN( logid, "Unsupported as code value: " << params[index].name() );
-            continue;
-          }
-        }
-
-        try {
-          fval = lexical_cast<float>( val );
-        }
-        catch(...) {
-          warnings = true;
-          IDLOGERROR( logid, "Invalid value: (" << val << ") not a float!" );
-          continue;
-        }
-
-        kvData d( stationid,
-            obstime,
-            fval,
-            params[index].id(),
-            tbtime,
-            typeId,
-            params[index].sensor(),
-            params[index].level(),
-            fval,
-            data.cinfo(),
-            data.uinfo(),
-            "" );
-
-        dataList.push_back( d );
-      }
-    }
-
-    if( addDataToDb( pt::to_miTime( obstime ), stationid, typeId, dataList, textDataList, priority, idLog.logid(), onlyInsertOrUpdate) ) {
-      count += dataList.size() + textDataList.size();
-    }
-
-    if(nElemsInLine>0)
-    nLineWithData++;
-  }
-
-  ostringstream ost;
-  ost << "# Lines:             " << lines-1 << endl
-  << "# Lines with data:   " << nLineWithData << endl
-  << "# dataelements:      " << nExpectedData << endl
-  << "# Saved datarecords: " << count << endl
-  << "# Error in save:     " << nErrors;
-
-  msg = ost.str();
-
-  IDLOGINFO( logid, msg );
-
-  if( lines==1 || ( count == 0 && nExpectedData == 0 ) ) {
-    msg += "No data!";
-    return Ok;
-  }
-
-  if( count > 0 ) {
-    if( nExpectedData != count ) {
-      ostringstream ost;
-      ost << "WARNING: Expected to save " << nExpectedData
-      << " dataelements, but only " << count
-      << " dataelements was saved!";
-      warnings = true;
-      IDLOGWARN( logid, ost.str() );
-      msg += ost.str();
-    }
-    if( warnings ) {
-      LOGWARN("Data saved with warnings. stationid: " << stationid << " typeid: " << typeId );
-    } else {
-      LOGINFO("Data saved. stationid: " << stationid << " typeid: " << typeId );
-    }
-
-    return Ok;
-  }
-
-  return Rejected;
-}
-#endif

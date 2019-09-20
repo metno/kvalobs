@@ -49,11 +49,12 @@ void ObservationComplete::operator()() {
 
   while (!stopped()) {
     try {
-      auto transaction = dbAccess_.transaction(true);
-      std::shared_ptr<DataIdentifier> di = dbAccess_.nextDataToProcess();
-      if (di) {
+      //auto transaction = dbAccess_.transaction(true);
+      auto transaction = dbAccess_.transaction(false);
+      DataIdentifier di = dbAccess_.nextDataToProcess();
+      if (di.isValid()) {
         LOGDEBUG1(di);
-        dbAccess_.addMissingData(*di);
+        dbAccess_.addMissingData(di);
         transaction->commit();
       } else if (!stopped()) {
         transaction->rollback();
@@ -61,6 +62,8 @@ void ObservationComplete::operator()() {
       }
     } catch (dnmi::db::SQLSerializeError & e) {
       LOGDEBUG(e.what());
+    } catch ( dnmi::db::SQLException &e) {
+      LOGERROR(e.message());
     } catch (std::exception & e) {
       LOGERROR(e.what());
       // ...and continue as if nothing happened

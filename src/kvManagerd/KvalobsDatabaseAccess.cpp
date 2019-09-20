@@ -29,6 +29,7 @@
 
 #include "KvalobsDatabaseAccess.h"
 #include <boost/date_time.hpp>
+#include <milog/milog.h>
 #include <sstream>
 #include <memory>
 #include <string>
@@ -90,8 +91,9 @@ KvalobsDatabaseAccess::MissingList KvalobsDatabaseAccess::findAllMissing(
     ResultPtr missing = exec_(qFindMissingStations_(type, obstime));
     while (missing->hasNext()) {
       DRow & m = missing->next();
-      int station = boost::lexical_cast<int>(m[0]);
-      ret.push_back(DataIdentifier(station, type, obstime));
+      int stationid = boost::lexical_cast<int>(m[0]);
+      DataIdentifier di = createObservation_(stationid, type, obstime);
+      ret.push_back(di);
     }
   }
   return ret;
@@ -147,29 +149,28 @@ void KvalobsDatabaseAccess::addMissingData(const DataIdentifier & di) {
     exec_(updateWorkQueueQuery_(di));
 }
 
-std::shared_ptr<DataIdentifier> KvalobsDatabaseAccess::nextDataToProcess() {
-  std::string selectQuery = "SELECT stationid, typeid, obstime "
-      "FROM workque "
-      "WHERE process_start is NULL "
-      "ORDER BY tbtime LIMIT 1";
+DataIdentifier KvalobsDatabaseAccess::nextDataToProcess() {
+  std::string selectQuery = "SELECT o.observationid, o.stationid, o.typeid, o.obstime FROM observations o, workque q WHERE o.observationid=q.observationid AND q.process_start is NULL limit 1";
 
   ResultPtr r = exec_(selectQuery);
   if (r->hasNext()) {
-    return std::make_shared<DataIdentifier>(r->next());
+    return DataIdentifier(r->next());
   }
-  return std::shared_ptr<DataIdentifier>();
+  return DataIdentifier::invalid();
 }
 
 void KvalobsDatabaseAccess::cleanWorkQueue() {
   auto t = transaction();
   const std::string criteria = "qa_stop<now()-'15 minutes'::interval";
 
-  exec_("delete from workstatistik s using workque "
-    "where s.stationid=workque.stationid "
-    "and s.obstime=workque.obstime "
-    "and s.typeid=workque.typeid "
-    "and workque." + criteria);
-  exec_("INSERT INTO workstatistik (SELECT * FROM workque WHERE " + criteria + ")");
+  exec_("delete from workstatistik s using workque q "
+    "where s.observationid=q.observationid "
+    "and q." + criteria);
+  exec_("INSERT INTO workstatistik (SELECT "
+    "o.stationid, o.obstime, o.typeid, o.tbtime, q.priority, q.process_start, q.qa_start, q.qa_stop, q.service_start, q.service_stop, o.observationid"
+    " FROM workque q, observations o WHERE"
+    " q.observationid=o.observationid "
+    " and q." + criteria + ")");
   exec_("DELETE FROM workque WHERE " + criteria);
 
   t->commit();
@@ -207,6 +208,7 @@ KvalobsDatabaseAccess::TransactionPtr KvalobsDatabaseAccess::transaction(bool se
 
 KvalobsDatabaseAccess::ResultPtr KvalobsDatabaseAccess::exec_(
     const std::string & query) {
+  LOGDEBUG(query);
   return ResultPtr(connection_->execQuery(query + ';'));
 }
 
@@ -230,7 +232,7 @@ std::string KvalobsDatabaseAccess::qFindMissingStations_(
   q << "SELECT\n";
   q << "  stationid\n";
   q << "FROM\n";
-  q << "  data\n";
+  q << "  observations\n";
   q << "WHERE\n";
   q << "  typeid=" << type << " and\n";
   q << "  obstime='" << timeToFind << "'";
@@ -244,15 +246,12 @@ std::string KvalobsDatabaseAccess::insertMissingDataQuery_(const DataIdentifier 
   // exist in the data table.
 
   std::ostringstream q;
-  q << "INSERT INTO data (\n";
+  q << "INSERT INTO obsdata (\n";
   q << "  SELECT\n";
   //        What to insert
-  q << "    " << di.station() << ", \n";
-  q << "    '" << di.obstime() << "',\n";
+  q << "    " << di.obsid() << ", \n";
   q << "    mv.value,\n";
   q << "    q.paramid,\n";
-  q << "    now(),\n";
-  q << "    " << di.type() << ",\n";
   q << "    q.sensor::char,\n";
   q << "    q.level,\n";
   q << "    mv.value,\n";
@@ -275,25 +274,29 @@ std::string KvalobsDatabaseAccess::insertMissingDataQuery_(const DataIdentifier 
   q << "      o.level\n";
   q << "    FROM \n";
   q << "      obs_pgm o,\n";
-  q << "      number_series n\n";
+  q << "      number_series n,\n";
+  q << "      observations obs\n";
   q << "    WHERE \n";
-  q << "      o.stationid=" << di.station() << " and\n";
-  q << "      o.typeid=" << di.type() << " and\n";
+  q << "      obs.observationid=" << di.obsid() << " and\n";
+  q << "      o.stationid=obs.stationid and\n";
+  q << "      o.typeid=obs.typeid and\n";
   q << "      n.number < o.nr_sensor and\n";
-  q << "      fromtime<'" << di.obstime() << "' and \n";
+  q << "      fromtime<obs.obstime and \n";
   q << "      ( totime is null or \n";
-  q << "        totime>'" << di.obstime() << "') and \n";
+  q << "        totime>obs.obstime) and \n";
   q << "      kl" << std::setw(2) << std::setfill('0') << di.obstime().time_of_day().hours() << "\n";
-  q << "    EXCEPT \n";
+  q << "    EXCEPT \n"; 
   //        ...but remove any combinations that already exist in data table
   q << "    SELECT \n";
-  q << "      paramid, \n";
-  q << "      sensor::int,\n";
-  q << "      level\n";
+  q << "      d.paramid, \n";
+  q << "      d.sensor::int,\n";
+  q << "      d.level\n";
   q << "    FROM \n";
-  q << "      data \n";
+  q << "      obsdata d,\n";
+  q << "      observations o\n";
   q << "    WHERE \n";
-  q << "     " << di.sqlWhere();
+  q << "     d.observationid=o.observationid and\n";
+  q << "     " << di.sqlWhere("o");
   q << "    ) q,\n";
   q << "    default_missing_values mv\n";
   q << "  WHERE\n";
@@ -310,12 +313,7 @@ std::string KvalobsDatabaseAccess::selectWorkQueueQuery_(const DataIdentifier & 
 
 std::string KvalobsDatabaseAccess::insertWorkQueueQuery_(const DataIdentifier & di, int priority) const {
   std::ostringstream q;
-  q << "INSERT INTO workque VALUES ("
-    << di.station() << ", "
-    << "'" << di.obstime() << "', "
-    << di.type() << ", "
-    << "now(), " << priority << ", "
-    << "now(),NULL,NULL,NULL,NULL)";
+  q << "INSERT INTO workque VALUES (" << priority << ",now(),NULL,NULL,NULL,NULL," << di.obsid() << ")";
   return q.str();
 }
 
@@ -330,4 +328,13 @@ std::string KvalobsDatabaseAccess::updateWorkQueueQuery_(const DataIdentifier & 
   q << "WHERE ";
   q << di.sqlWhere();
   return q.str();
+}
+
+DataIdentifier KvalobsDatabaseAccess::createObservation_(int stationid, int type, const boost::posix_time::ptime & obstime) {
+  std::ostringstream query;
+  query << "INSERT INTO observations (stationid, typeid, obstime, tbtime) VALUES (" << stationid << ", " << type << ", '" << obstime << "', now()) RETURNING observationid, stationid, typeid, obstime";
+  auto result = exec_(query.str());
+  if (!result->hasNext())
+    throw std::runtime_error("Unable to create observation");
+  return DataIdentifier(result->next());
 }

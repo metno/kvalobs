@@ -54,7 +54,8 @@ kvalobs::kvWorkelement::kvWorkelement(const kvWorkelement &we)
       qa_start_(we.qa_start_),
       qa_stop_(we.qa_stop_),
       service_start_(we.service_start_),
-      service_stop_(we.service_stop_)
+      service_stop_(we.service_stop_),
+      observationid_(we.observationid_)
 
 {
   createSortIndex();
@@ -73,7 +74,7 @@ kvalobs::kvWorkelement::operator=(const kvWorkelement &rhs) {
     qa_stop_ = rhs.qa_stop_;
     service_start_ = rhs.service_start_;
     service_stop_ = rhs.service_stop_;
-
+    observationid_ = rhs.observationid_;
     createSortIndex();
   }
 
@@ -87,7 +88,8 @@ bool kvalobs::kvWorkelement::set(int sid, const boost::posix_time::ptime &obt,
                                  const boost::posix_time::ptime &qa_start,
                                  const boost::posix_time::ptime &qa_stop,
                                  const boost::posix_time::ptime &service_start,
-                                 const boost::posix_time::ptime &service_stop) {
+                                 const boost::posix_time::ptime &service_stop,
+                                 long observationid) {
   stationid_ = sid;
   obstime_ = obt;
   typeid_ = tid;
@@ -98,6 +100,7 @@ bool kvalobs::kvWorkelement::set(int sid, const boost::posix_time::ptime &obt,
   qa_stop_ = qa_stop;
   service_start_ = service_start;
   service_stop_ = service_stop;
+  observationid_ = observationid;
 
   createSortIndex();
 }
@@ -137,6 +140,8 @@ bool kvalobs::kvWorkelement::set(const dnmi::db::DRow &r_) {
       } else if (*it == "service_stop") {
         if (!buf.empty())
           service_stop_ = boost::posix_time::time_from_string_nothrow(buf);
+      } else if (*it == "observationid") {
+        observationid_ = atol(buf.c_str());
       } else {
         CERR("kvWorkelement::set .. unknown entry:" << *it << std::endl);
       }
@@ -158,10 +163,9 @@ std::string kvalobs::kvWorkelement::toSend() const {
       << (process_start_.is_not_a_date_time() ? "NULL" : quoted(process_start_))
       << "," << (qa_start_.is_not_a_date_time() ? "NULL" : quoted(qa_start_))
       << "," << (qa_stop_.is_not_a_date_time() ? "NULL" : quoted(qa_stop_))
-      << ","
-      << (service_start_.is_not_a_date_time() ? "NULL" : quoted(service_start_))
-      << ","
-      << (service_stop_.is_not_a_date_time() ? "NULL" : quoted(service_stop_))
+      << "," << (service_start_.is_not_a_date_time() ? "NULL" : quoted(service_start_))
+      << "," << (service_stop_.is_not_a_date_time() ? "NULL" : quoted(service_stop_))
+      << ", " << observationid_
       << ")";
 
   return ost.str();
@@ -210,8 +214,16 @@ std::string kvalobs::kvWorkelement::toUpdate() const {
     ost << "service_stop=" << quoted(service_stop_);
   }
 
-  ost << " WHERE stationid=" << stationid_ << " AND " << "         obstime="
-      << quoted(obstime_) << " AND " << "          typeid=" << typeid_;
+  if (!service_stop_.is_not_a_date_time()) {
+    if (comma)
+      ost << ", ";
+
+    comma = true;
+    ost << "service_stop=" << quoted(service_stop_);
+  }
+
+ 
+  ost << " WHERE observationid=" << observationid_;
 
   return ost.str();
 
@@ -220,8 +232,7 @@ std::string kvalobs::kvWorkelement::toUpdate() const {
 std::string kvalobs::kvWorkelement::uniqueKey() const {
   ostringstream ost;
 
-  ost << " WHERE stationid=" << stationid_ << " AND " << "       obstime="
-      << quoted(obstime_) << " AND " << "       typeid=" << typeid_;
+  ost << " WHERE observationid=" << observationid_;
 
   return ost.str();
 }
@@ -249,3 +260,6 @@ void kvalobs::kvWorkelement::service_stop(
   service_stop_ = stop;
 }
 
+void kvalobs::kvWorkelement::observationID(long id) {
+  observationid_ = id;
+}

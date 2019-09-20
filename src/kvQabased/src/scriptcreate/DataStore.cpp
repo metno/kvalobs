@@ -101,11 +101,11 @@ void fillMissing(DataStore::ParameterSortedRefDataList & dataList) {
 }
 
 void DataStore::populateObs_(const db::DatabaseAccess & db,
-                             const kvalobs::kvStationInfo & observation,
+                             const qabase::Observation & obs,
                              const DataRequirement & abstractObsRequirement,
                              const DataRequirement & concreteObsRequirement) {
-//	boost::posix_time::ptime from = observation.obstime();
-//	boost::posix_time::ptime to = observation.obstime();
+//	boost::posix_time::ptime from = obs.obstime();
+//	boost::posix_time::ptime to = obs.obstime();
 //	from.addMin(concreteObsRequirement.firstTime());
 //	to.addMin(concreteObsRequirement.lastTime());
 
@@ -121,13 +121,13 @@ void DataStore::populateObs_(const db::DatabaseAccess & db,
           "Unable to find translation for parameter: " + parameter->baseName());
 
     db::DatabaseAccess::DataList dbdata;
-    db.getData(&dbdata, observation, *parameter,
+    db.getData(&dbdata, obs, *parameter,
                concreteObsRequirement.firstTime());
 
     if (dbdata.empty()) {
       kvalobs::kvDataFactory factory(
-          observation.stationID(), observation.obstime(),
-          parameter->haveType() ? parameter->type() : observation.typeID(),
+          obs.stationID(), obs.obstime(),
+          parameter->haveType() ? parameter->type() : obs.typeID(),
           parameter->haveSensor() ? parameter->sensor() : 0,
           parameter->haveLevel() ? parameter->level() : 0);
       dbdata.push_back(factory.getMissing(0));
@@ -139,7 +139,7 @@ void DataStore::populateObs_(const db::DatabaseAccess & db,
 }
 
 void DataStore::populateRefObs_(
-    const db::DatabaseAccess & db, const kvalobs::kvStationInfo & observation,
+    const db::DatabaseAccess & db, const qabase::Observation & obs,
     const qabase::DataRequirement & abstractRefObsRequirement,
     const qabase::DataRequirement & concreteRefObsRequirement) {
   ParameterTranslation translation = getTranslation(concreteRefObsRequirement,
@@ -154,12 +154,12 @@ void DataStore::populateRefObs_(
           "Unable to find translation for parameter: " + parameter->baseName());
 
     db::DatabaseAccess::TextDataList textData;
-    db.getTextData(&textData, observation, *parameter,
+    db.getTextData(&textData, obs, *parameter,
                    concreteRefObsRequirement.firstTime());
     if (textData.empty()) {
-      kvalobs::kvTextData td(observation.stationID(), observation.obstime(), "",
+      kvalobs::kvTextData td(obs.stationID(), obs.obstime(), "",
                              0, boost::posix_time::ptime(),
-                             observation.typeID());
+                             obs.typeID());
       textData.push_back(td);
     }
 
@@ -172,11 +172,11 @@ void DataStore::populateRefObs_(
 }
 
 void DataStore::populateModel_(
-    const db::DatabaseAccess & db, const kvalobs::kvStationInfo & observation,
+    const db::DatabaseAccess & db, const qabase::Observation & obs,
     const qabase::DataRequirement & abstractModelRequirement,
     const qabase::DataRequirement & concreteModelRequirement) {
-//	boost::posix_time::ptime from = observation.obstime();
-//	boost::posix_time::ptime to = observation.obstime();
+//	boost::posix_time::ptime from = obs.obstime();
+//	boost::posix_time::ptime to = obs.obstime();
 //	from.addMin(concreteModelRequirement.firstTime());
 //	to.addMin(concreteModelRequirement.lastTime());
 
@@ -192,21 +192,21 @@ void DataStore::populateModel_(
           "Unable to find translation for parameter: " + parameter->baseName());
 
     db::DatabaseAccess::ModelDataList modelData;
-    db.getModelData(&modelData, observation, *parameter,
+    db.getModelData(&modelData, obs.stationInfo(), *parameter,
                     concreteModelRequirement.firstTime());
     if (not modelData.empty())
       modelData_[find->second].assign(modelData.begin(), modelData.end());
     else {
       throw MissingModelData("missing model data");
-      kvalobs::kvModelData missingModel(observation.stationID(),
-                                        observation.obstime(), 0, 0, 0, -32767);
-      modelData_[find->second].push_back(missingModel);  // missing observation
+      kvalobs::kvModelData missingModel(obs.stationID(),
+                                        obs.obstime(), 0, 0, 0, -32767);
+      modelData_[find->second].push_back(missingModel);  // missing obs
     }
   }
 }
 
 void DataStore::populateMeta_(
-    const db::DatabaseAccess & db, const kvalobs::kvStationInfo & observation,
+    const db::DatabaseAccess & db, const qabase::Observation & obs,
     const std::string & qcx,
     const qabase::DataRequirement & abstractMetaRequirement,
     const qabase::DataRequirement & concreteMetaRequirement) {
@@ -228,7 +228,7 @@ void DataStore::populateMeta_(
     std::string param = find->first.str().substr(0, splitPoint);
     std::string metadataType = find->first.str().substr(splitPoint + 1);
 
-    std::string stationParam = db.getStationParam(observation, param, qcx);
+    std::string stationParam = db.getStationParam(obs.stationInfo(), param, qcx);
 
     float val = db::resultfilter::parseStationParam(stationParam, metadataType);
     metaData_[find->second].push_back(val);
@@ -259,11 +259,11 @@ void DataStore::populateStation_(const db::DatabaseAccess & db) {
 }
 
 DataStore::DataStore(const db::DatabaseAccess & db,
-                     const kvalobs::kvStationInfo & observation,
+                     const qabase::Observation & obs,
                      const std::string & qcx,
                      const qabase::CheckSignature & abstractSignature,
                      const qabase::CheckSignature & concreteSignature)
-    : observation_(observation),
+    : observation_(obs),
       qcx_(qcx) {
   const DataRequirement * abstractObsRequirement = abstractSignature.obs();
   const DataRequirement * concreteObsRequirement = concreteSignature.obs();
@@ -271,7 +271,7 @@ DataStore::DataStore(const db::DatabaseAccess & db,
     if (!abstractObsRequirement or !concreteObsRequirement)
       throw UnableToGetData("check- and algorithm signature does not match");
 
-    populateObs_(db, observation, *abstractObsRequirement,
+    populateObs_(db, obs, *abstractObsRequirement,
                  *concreteObsRequirement);
   }
 
@@ -282,7 +282,7 @@ DataStore::DataStore(const db::DatabaseAccess & db,
   if (abstractRefObsRequirement or concreteRefObsRequirement) {
     if (!abstractRefObsRequirement or !concreteRefObsRequirement)
       throw UnableToGetData("check- and algorithm signature does not match");
-    populateRefObs_(db, observation, *abstractRefObsRequirement,
+    populateRefObs_(db, obs, *abstractRefObsRequirement,
                     *concreteRefObsRequirement);
   }
 
@@ -292,7 +292,7 @@ DataStore::DataStore(const db::DatabaseAccess & db,
     if (!abstractModelRequirement or !concreteModelRequirement)
       throw UnableToGetData("check- and algorithm signature does not match");
 
-    populateModel_(db, observation, *abstractModelRequirement,
+    populateModel_(db, obs, *abstractModelRequirement,
                    *concreteModelRequirement);
   }
 
@@ -302,7 +302,7 @@ DataStore::DataStore(const db::DatabaseAccess & db,
     if (!abstractMetaRequirement or !concreteMetaRequirement)
       throw UnableToGetData("check- and algorithm signature does not match");
 
-    populateMeta_(db, observation, qcx, *abstractMetaRequirement,
+    populateMeta_(db, obs, qcx, *abstractMetaRequirement,
                   *concreteMetaRequirement);
   }
 
@@ -311,17 +311,17 @@ DataStore::DataStore(const db::DatabaseAccess & db,
   flagPosition_ = db.getQcxFlagPosition(qcx);
 }
 
-DataStore::DataStore(const DataStore::ParameterSortedDataList & data,
-                     int flagPosition)
-    : data_(data),
-      observation_(
-          0,
-          boost::posix_time::ptime(boost::gregorian::day_clock::universal_day(),
-                                   boost::posix_time::hours(6)),
-          1),
-      qcx_("undefined"),
-      flagPosition_(flagPosition) {
-}
+// DataStore::DataStore(const DataStore::ParameterSortedDataList & data,
+//                      int flagPosition)
+//     : data_(data),
+//       observation_(
+//           0,
+//           boost::posix_time::ptime(boost::gregorian::day_clock::universal_day(),
+//                                    boost::posix_time::hours(6)),
+//           1),
+//       qcx_("undefined"),
+//       flagPosition_(flagPosition) {
+// }
 
 DataStore::~DataStore() {
 }

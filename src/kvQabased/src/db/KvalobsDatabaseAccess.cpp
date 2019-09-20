@@ -28,6 +28,7 @@
  */
 
 #include "KvalobsDatabaseAccess.h"
+#include "returntypes/Observation.h"
 #include "databaseResultFilter.h"
 #include <kvdb/dbdrivermgr.h>
 #include <kvalobs/kvPath.h>
@@ -55,9 +56,10 @@ class KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection {
   std::string esc(const std::string & stringToEscape) const;
 
   void exec(const std::string & SQLstmt);
-  void beginTransaction();
+  void beginTransaction(dnmi::db::Connection::IsolationLevel isolation = dnmi::db::Connection::READ_COMMITTED);
   void commit();
   void rollback();
+  bool transactionInProgress() const;
  private:
   dnmi::db::Connection * connection_;
   bool transactionInProgress_;
@@ -103,8 +105,8 @@ void KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::exec(
   else
     throw std::runtime_error("No transaction in progress");
 }
-void KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::beginTransaction() {
-  connection_->beginTransaction(dnmi::db::Connection::REPEATABLE_READ);
+void KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::beginTransaction(dnmi::db::Connection::IsolationLevel isolation) {
+  connection_->beginTransaction(isolation);
   transactionInProgress_ = true;
 }
 void KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::commit() {
@@ -116,6 +118,10 @@ void KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::rollback() {
     connection_->rollBack();
   transactionInProgress_ = false;
 }
+bool KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::transactionInProgress() const {
+  return transactionInProgress_;
+}
+
 
 KvalobsDatabaseAccess::KvalobsDatabaseAccess(
     const std::string & databaseConnect) {
@@ -145,6 +151,7 @@ KvalobsDatabaseAccess::~KvalobsDatabaseAccess() {
 
 void KvalobsDatabaseAccess::beginTransaction() {
   connection_->beginTransaction();
+  fetchedData_.clear();
 }
 
 void KvalobsDatabaseAccess::commit() {
@@ -156,11 +163,11 @@ void KvalobsDatabaseAccess::rollback() {
 }
 
 void KvalobsDatabaseAccess::getChecks(CheckList * out,
-                                      const kvalobs::kvStationInfo & si) const {
+                                      const qabase::Observation & obs) const {
   std::ostringstream query;
   query << "SELECT * FROM checks WHERE ";
-  query << "(stationid=0 OR stationid=" << si.stationID() << ")";
-  query << " AND fromtime<='" << to_kvalobs_string(si.obstime()) << "'";
+  query << "(stationid=0 OR stationid=" << obs.stationID() << ")";
+  query << " AND fromtime<='" << to_kvalobs_string(obs.obstime()) << "'";
   query << " ORDER BY stationid, fromtime;";
 
   milog::LogContext context("query");
@@ -200,14 +207,11 @@ int KvalobsDatabaseAccess::getQcxFlagPosition(const std::string & qcx) const {
 }
 
 void KvalobsDatabaseAccess::getParametersToCheck(
-    ParameterList * out, const kvalobs::kvStationInfo & si) const {
+    ParameterList * out, const qabase::Observation & obs) const {
   milog::LogContext context("query");
   {
     std::ostringstream query;
-    query << "SELECT * FROM obs_pgm WHERE stationid=" << si.stationID()
-//				<< " AND typeid=" << si.typeID() << " AND "
-//				"fromtime<='" << to_kvalobs_string(si.obstime()) << "' AND "
-//				"(totime IS NULL OR totime>'" << to_kvalobs_string(si.obstime()) << "')"
+    query << "SELECT * FROM obs_pgm WHERE stationid=" << obs.stationID()
         << " LIMIT 1;";
     LOGDEBUG1(query.str());
     ResultPtr result(connection_->execQuery(query.str()));
@@ -216,14 +220,9 @@ void KvalobsDatabaseAccess::getParametersToCheck(
   }
 
   std::ostringstream query;
-  query
-      << "SELECT distinct name FROM param WHERE paramid IN (SELECT paramid FROM data WHERE "
-      "stationid="
-      << si.stationID() << " AND "
-      "typeid="
-      << si.typeID() << " AND "
-      "obstime='"
-      << to_kvalobs_string(si.obstime()) << "')";
+  query << "SELECT distinct name FROM param WHERE "
+      "paramid IN (SELECT paramid FROM obsdata WHERE "
+      "observationid=" << obs.id() << ')';
   LOGDEBUG1(query.str());
   ResultPtr result(connection_->execQuery(query.str()));
   while (result->hasNext()) {
@@ -286,6 +285,34 @@ std::string KvalobsDatabaseAccess::getStationParam(
         "Unable to find station_param for " + parameter + " for qcx=" + qcx);
 }
 
+qabase::Observation KvalobsDatabaseAccess::getObservation(const kvalobs::kvStationInfo & si) const {
+  std::ostringstream query;
+  query << "SELECT * FROM observation WHERE ";
+  query << "stationid=" << si.stationID();
+  query << " and typeid=" << si.typeID();
+  query << "obstime='" << to_kvalobs_string(si.obstime());
+  ResultPtr result(connection_->execQuery(query.str()));
+
+  milog::LogContext context("query");
+  LOGDEBUG1(query.str());
+
+  if (!result->hasNext()) {
+    std::ostringstream s;
+    s << "unable to find observation for " << si;
+    throw std::runtime_error(s.str());
+  }
+
+    //Observation(long long id, int stationid, int type, const boost::posix_time::ptime & obstime, const boost::posix_time::ptime & tbtime)
+  auto row = result->next();
+  auto id = boost::lexical_cast<long long>(row[0]);
+  auto stationid = boost::lexical_cast<int>(row[1]);
+  auto type = boost::lexical_cast<int>(row[2]);
+  auto obstime = boost::posix_time::time_from_string(row[3]);
+  auto tbtime = boost::posix_time::time_from_string(row[4]);
+  return qabase::Observation(id, stationid, type, obstime, tbtime);
+}
+
+
 kvalobs::kvStation KvalobsDatabaseAccess::getStation(int stationid) const {
   std::ostringstream query;
   query << "SELECT * FROM station WHERE stationid=" << stationid
@@ -344,63 +371,97 @@ void KvalobsDatabaseAccess::getModelData(
     out->push_back(kvalobs::kvModelData(result->next()));
 }
 
-void KvalobsDatabaseAccess::getData(
-    DataList * out, const kvalobs::kvStationInfo & si,
-    const qabase::DataRequirement::Parameter & parameter,
-    int minuteOffset) const {
-  std::ostringstream query;
-  query << "SELECT * FROM data WHERE ";
-  query << "stationid=" << si.stationID() << " AND ";
-  query << "paramid IN (SELECT paramid FROM param WHERE name='"
-        << parameter.baseName() << "') AND ";
-  if (parameter.haveLevel())
-    query << "level=" << parameter.level() << " AND ";
-  if (parameter.haveSensor())
-    query << "sensor='" << parameter.sensor() << "' AND ";
-  if (parameter.haveType())
-    query << "typeid=" << parameter.type() << " AND ";
-  boost::posix_time::ptime t = si.obstime()
-      + boost::posix_time::minutes(minuteOffset);
-  if (t == si.obstime())
-    query << "obstime='" << to_kvalobs_string(t) << "'";
-  else
-    query << "obstime BETWEEN '" << to_kvalobs_string(t) << "' AND '"
-          << to_kvalobs_string(si.obstime()) << "'";
-  query << " ORDER BY obstime DESC";
-  query << " FOR UPDATE;";
+namespace {
+  /**
+   * Read database rows with any data entries after the kvdata-specific ones
+   */
+  kvalobs::kvData kvDataFromRow(dnmi::db::DRow & row) {
+    return kvalobs::kvData(
+      boost::lexical_cast<int>(row[0]),
+      boost::posix_time::time_from_string(row[1]),
+      boost::lexical_cast<float>(row[2]),
+      boost::lexical_cast<int>(row[3]),
+      boost::posix_time::time_from_string(row[4]),
+      boost::lexical_cast<int>(row[5]),
+      boost::lexical_cast<int>(row[6]),
+      boost::lexical_cast<int>(row[7]),
+      boost::lexical_cast<float>(row[8]),
+      kvalobs::kvControlInfo(row[9]),
+      kvalobs::kvUseInfo(row[10]),
+      row[11]
+    );
+  }
 
-  milog::LogContext context("query");
-  LOGDEBUG1(query.str());
-
-  ResultPtr result(connection_->execQuery(query.str()));
-
-  db::DatabaseAccess::DataList data;
-  while (result->hasNext())
-    data.push_back(kvalobs::kvData(result->next()));
-
-  db::resultfilter::filter(data, si.typeID());
-
-  out->swap(data);
+  kvalobs::kvTextData kvTextDataFromRow(dnmi::db::DRow & row) {
+    return kvalobs::kvTextData(
+      boost::lexical_cast<int>(row[0]),
+      boost::posix_time::time_from_string(row[1]),
+      row[2],
+      boost::lexical_cast<int>(row[3]),
+      boost::posix_time::time_from_string(row[4]),
+      boost::lexical_cast<int>(row[5])
+    );
+  }
 }
 
-void KvalobsDatabaseAccess::getTextData(
-    TextDataList * out, const kvalobs::kvStationInfo & si,
+void KvalobsDatabaseAccess::getData(
+    DataList * out, const qabase::Observation & obs,
     const qabase::DataRequirement::Parameter & parameter,
     int minuteOffset) const {
   std::ostringstream query;
-  query << "SELECT * FROM text_data WHERE ";
-  query << "stationid=" << si.stationID() << " AND ";
-  query << "paramid IN (SELECT paramid FROM param WHERE name='"
-        << parameter.baseName() << "') AND ";
-  if (parameter.haveType())
-    query << "typeid=" << parameter.type() << " AND ";
-  boost::posix_time::ptime t = si.obstime()
-      + boost::posix_time::minutes(minuteOffset);
-  if (t == si.obstime())
-    query << "obstime='" << to_kvalobs_string(t) << "'";
-  else
-    query << "obstime BETWEEN '" << to_kvalobs_string(t) << "' AND '"
-          << to_kvalobs_string(si.obstime()) << "'";
+  query << "SELECT "
+    "o.stationid, o.obstime, d.original, d.paramid, o.tbtime, o.typeid, d.sensor, d.level, d.corrected, d.controlinfo, d.useinfo, d.cfailed, o.observationid "
+    "FROM "
+    "observations o, obsdata d "
+    "WHERE "
+    "o.observationid = d.observationid AND ";
+    query << "o.stationid=" << obs.stationID() << " AND ";
+    query << "d.paramid IN (SELECT paramid FROM param WHERE name='"
+          << parameter.baseName() << "') AND ";
+    if (parameter.haveLevel())
+      query << "d.level=" << parameter.level() << " AND ";
+    if (parameter.haveSensor())
+      query << "d.sensor='" << parameter.sensor() << "' AND ";
+    if (parameter.haveType())
+      query << "o.typeid=" << parameter.type() << " AND ";
+    boost::posix_time::ptime t = obs.obstime()
+        + boost::posix_time::minutes(minuteOffset);
+    if (t == obs.obstime())
+      query << "obstime='" << to_kvalobs_string(t) << "'";
+    else
+      query << "obstime BETWEEN '" << to_kvalobs_string(t) << "' AND '"
+            << to_kvalobs_string(obs.obstime()) << "'";
+    query << " ORDER BY obstime DESC";
+    query << " FOR UPDATE;";
+
+    milog::LogContext context("query");
+    LOGDEBUG1(query.str());
+
+    ResultPtr result(connection_->execQuery(query.str()));
+
+    db::DatabaseAccess::DataList data;
+    while (result->hasNext()) {
+      auto r = result->next();
+      kvalobs::kvData d = kvDataFromRow(r);
+      long long obsid = boost::lexical_cast<long long>(r[12]);
+      storeFetched(obsid, d);
+      data.push_back(d);
+    }
+
+    db::resultfilter::filter(data, obs.typeID());
+
+    out->swap(data);
+}
+
+bool KvalobsDatabaseAccess::pin(const qabase::Observation & obs) const {
+  std::ostringstream query;
+  query << "SELECT "
+    "o.stationid, o.obstime, d.original, d.paramid, o.tbtime, o.typeid, d.sensor, d.level, d.corrected, d.controlinfo, d.useinfo, d.cfailed, o.observationid "
+    "FROM "
+    "observations o, obsdata d "
+    "WHERE "
+    "o.observationid = d.observationid AND "
+    "o.observationid = " << obs.id();
   query << " ORDER BY obstime DESC;";
 
   milog::LogContext context("query");
@@ -408,31 +469,98 @@ void KvalobsDatabaseAccess::getTextData(
 
   ResultPtr result(connection_->execQuery(query.str()));
 
-  db::DatabaseAccess::TextDataList data;
-  while (result->hasNext())
-    data.push_back(kvalobs::kvTextData(result->next()));
+  if (result->size() == 0)
+    return false;
 
-  db::resultfilter::filter(data, si.typeID());
+  while (result->hasNext()) {
+    auto r = result->next();
+    kvalobs::kvData d = kvDataFromRow(r);
+    long long obsid = boost::lexical_cast<long long>(r[12]);
+    storeFetched(obsid, d);
+  }
+  return true;
+}
+
+
+void KvalobsDatabaseAccess::getTextData(
+    TextDataList * out, const qabase::Observation & obs,
+    const qabase::DataRequirement::Parameter & parameter,
+    int minuteOffset) const {
+  std::ostringstream query;
+  query << "SELECT "
+    "o.stationid, o.obstime, d.original, d.paramid, o.tbtime, o.typeid, o.observationid "
+    "FROM "
+    "observations o, obstextdata d "
+    "WHERE "
+    "o.observationid = d.observationid AND ";
+    query << "o.stationid=" << obs.stationID() << " AND ";
+    query << "d.paramid IN (SELECT paramid FROM param WHERE name='"
+          << parameter.baseName() << "') AND ";
+    if (parameter.haveType())
+      query << "o.typeid=" << parameter.type() << " AND ";
+    boost::posix_time::ptime t = obs.obstime()
+        + boost::posix_time::minutes(minuteOffset);
+    if (t == obs.obstime())
+      query << "obstime='" << to_kvalobs_string(t) << "'";
+    else
+      query << "obstime BETWEEN '" << to_kvalobs_string(t) << "' AND '"
+            << to_kvalobs_string(obs.obstime()) << "'";
+    query << " ORDER BY obstime DESC";
+
+    milog::LogContext context("query");
+    LOGDEBUG1(query.str());
+
+  ResultPtr result(connection_->execQuery(query.str()));
+
+  db::DatabaseAccess::TextDataList data;
+  while (result->hasNext()) {
+    auto r = result->next();
+    kvalobs::kvTextData d = kvTextDataFromRow(r);
+    long long obsid = boost::lexical_cast<long long>(r[6]);
+    storeFetched(obsid, d);
+    data.push_back(d);
+  }
+
+  db::resultfilter::filter(data, obs.typeID());
 
   out->swap(data);
 }
 
 namespace {
-std::string query(const kvalobs::kvStationInfo & si, const std::string & table) {
+std::string obsdataQuery(const qabase::Observation & obs) {
   std::ostringstream query;
-  query << "SELECT * FROM " << table << " WHERE stationid=" << si.stationID() <<
-      " AND typeid=" << si.typeID() <<
-      " AND obstime='" << to_kvalobs_string(si.obstime()) << "';";
+  query << "SELECT "
+  "o.stationid, o.obstime, d.original, d.paramid, o.tbtime, o.typeid, d.sensor, d.level, d.corrected, d.controlinfo, d.useinfo, d.cfailed "
+  "FROM "
+  "observations o, obsdata d "
+  "WHERE "
+  "o.observationid = d.observationid AND "
+  "o.observationid=" << obs.id();
   milog::LogContext context("query");
   LOGDEBUG1(query.str());
   return query.str();
 }
+
+std::string obstextdataQuery(const qabase::Observation & obs) {
+  std::ostringstream query;
+  query << "SELECT "
+  "o.stationid, o.obstime, d.original, d.paramid, o.tbtime, o.typeid "
+  "FROM "
+  "observations o, obstextdata d "
+  "WHERE "
+  "o.observationid = d.observationid AND "
+  "o.observationid=" << obs.id();
+  milog::LogContext context("query");
+  LOGDEBUG1(query.str());
+  return query.str();
+}
+
 }  // namespace
 
-void KvalobsDatabaseAccess::complete_(const kvalobs::kvStationInfo & si, DataList * out) const {
-  ResultPtr result(connection_->execQuery(query(si, "data")));
+void KvalobsDatabaseAccess::complete_(const qabase::Observation & obs, DataList * out) const {
+  ResultPtr result(connection_->execQuery(obsdataQuery(obs)));
   while (result->hasNext()) {
-    kvalobs::kvData d(result->next());
+    kvalobs::kvData d = kvDataFromRow(result->next());
     auto func = std::bind1st(kvalobs::compare::same_obs_and_parameter(), d);
     auto previous = std::find_if(out->begin(), out->end(), func);
     if (previous == out->end())
@@ -440,10 +568,10 @@ void KvalobsDatabaseAccess::complete_(const kvalobs::kvStationInfo & si, DataLis
   }
 }
 
-void KvalobsDatabaseAccess::complete_(const kvalobs::kvStationInfo & si, TextDataList * out) const {
-  ResultPtr result(connection_->execQuery(query(si, "text_data")));
+void KvalobsDatabaseAccess::complete_(const qabase::Observation & obs, TextDataList * out) const {
+  ResultPtr result(connection_->execQuery(obstextdataQuery(obs)));
   while (result->hasNext()) {
-    kvalobs::kvTextData d(result->next());
+    kvalobs::kvTextData d = kvTextDataFromRow(result->next());
     auto func = std::bind1st(kvalobs::compare::kvTextData_same_obs_and_parameter(), d);
     auto previous = std::find_if(out->begin(), out->end(), func);
     if (previous == out->end())
@@ -451,11 +579,11 @@ void KvalobsDatabaseAccess::complete_(const kvalobs::kvStationInfo & si, TextDat
   }
 }
 
-KvalobsDatabaseAccess::KvalobsDataPtr KvalobsDatabaseAccess::complete(const kvalobs::kvStationInfo & si, const DataList & d, const TextDataList & td) const {
+KvalobsDatabaseAccess::KvalobsDataPtr KvalobsDatabaseAccess::complete(const qabase::Observation & obs, const DataList & d, const TextDataList & td) const {
   DataList dl = d;
-  complete_(si, & dl);
+  complete_(obs, & dl);
   TextDataList tdl = td;
-  complete_(si, & tdl);
+  complete_(obs, & tdl);
   return std::make_shared<kvalobs::serialize::KvalobsData>(dl, tdl);
 }
 
@@ -465,61 +593,96 @@ void KvalobsDatabaseAccess::write(const DataList & data) {
 #else
   milog::LogContext context("query");
   LOGINFO("Saving " << data.size() << " elements to database");
-//	for ( DataList::const_iterator it = data.begin(); it != data.end(); ++ it )
-//		LOGINFO("Write to database: " << * it);
-
   for (DataList::const_iterator it = data.begin(); it != data.end(); ++it) {
-    std::ostringstream query;
-    query << "UPDATE data SET "
-          "controlinfo='"
-          << it->controlinfo().flagstring() << "', "
-          "useinfo='"
-          << it->useinfo().flagstring() << "', "
-          "corrected="
-          << it->corrected() << ", "
-          "cfailed='"
-          << it->cfailed() << "'" << it->uniqueKey() << ';';
+    auto fetched = fetchedData_.find(*it);
+    if (fetched == fetchedData_.end()) {
+      LOGWARN("Attempt to update non-existing row: " << *it);
+      continue;
+    }
+    long long obsid = fetched->second;
 
+    std::ostringstream query;
+    query << "UPDATE obsdata SET ";
+    query << "controlinfo='" << it->controlinfo().flagstring() << "', ";
+    query << "useinfo='" << it->useinfo().flagstring() << "', ";
+    query << "corrected=" << it->corrected() << ", ";
+    query << "cfailed='" << it->cfailed() << "' ";
+    query << " WHERE ";
+    query << "observationid=" << obsid << " AND ";
+    query << "paramid=" << it->paramID() << " AND ";
+    query << "sensor='" << it->sensor() << "' AND ";
+    query << "level=" << it->level();
+    query << " RETURNING observationid";
+    
     LOGDEBUG1(query.str());
-    connection_->exec(query.str());
+    ResultPtr result(connection_->execQuery(query.str()));
+    if (result->size() != 1)
+      throw std::runtime_error("Update statement did not affect exactly one row");
   }
 #endif
 }
 
-kvalobs::kvStationInfo * KvalobsDatabaseAccess::selectDataForControl() {
-    static const std::string findNext =
-        "select stationid, typeid, obstime from workque where process_start is not null and ((qa_start<now()-'10 minutes'::interval and qa_stop is null) or (qa_start is null and stationid not in (select stationid from workque where qa_start is not null and qa_stop is null))) order by priority, tbtime limit 1;";
+qabase::Observation * KvalobsDatabaseAccess::selectDataForControl() {
 
-    std::unique_ptr<dnmi::db::Result> result(connection_->execQuery(findNext));
+    bool needOwnTransaction = !connection_->transactionInProgress();
+    if (needOwnTransaction)
+      connection_->beginTransaction(dnmi::db::Connection::SERIALIZABLE);
+    else
+      LOGWARN("trying to select data for control with previous transaction - isolation level not guaranteed");
+
+    std::vector<int> runningChecks;
+    std::unique_ptr<dnmi::db::Result> result(connection_->execQuery("select o.stationid from workque q, observations o where o.observationid=q.observationid and qa_start is not null and qa_stop is null;"));
+    while (result->hasNext()) {
+      auto row = result->next();
+      int station = boost::lexical_cast<int>(row[0]);
+      runningChecks.push_back(station);
+    }
+
+    std::ostringstream query;
+    query << "select o.observationid, stationid, typeid, obstime, o.tbtime from workque q, observations o "
+      "where q.observationid=o.observationid and process_start is not null and "
+      "((qa_start<now()-'10 minutes'::interval and qa_stop is null) or "
+      "(qa_start is null";
+    if (not runningChecks.empty()) {
+      query << " and stationid not in (";
+      auto it = runningChecks.begin();
+      query << *it;
+      while (++it != runningChecks.end()) {
+        query << ", " << *it;
+      }
+      query << ")";
+    }
+    query << ")) order by priority, tbtime limit 1;";
+
+    result.reset(connection_->execQuery(query.str()));
     if (!result || !result->hasNext())
       return nullptr;
 
     auto row = result->next();
 
-    int station = boost::lexical_cast<int>(row[0]);
-    int type = boost::lexical_cast<int>(row[1]);
-    boost::posix_time::ptime obstime = boost::posix_time::time_from_string(
-        row[2]);
+    long long observationid = boost::lexical_cast<long long>(row[0]);
+    int station = boost::lexical_cast<int>(row[1]);
+    int type = boost::lexical_cast<int>(row[2]);
+    boost::posix_time::ptime obstime = boost::posix_time::time_from_string(row[3]);
+    boost::posix_time::ptime tbtime = boost::posix_time::time_from_string(row[4]);
 
-    std::ostringstream query;
+    query.str("");
     query << "UPDATE workque SET qa_start=statement_timestamp() WHERE ";
-    query << "stationid=" << station;
-    query << " AND typeid=" << type;
-    query << " AND obstime='" << row[2] << "'";
+    query << "observationid=" << observationid;
 
     milog::LogContext context("query");
     LOGDEBUG1(query.str());
 
     connection_->exec(query.str());
-    return new kvalobs::kvStationInfo(station, obstime, type);
+    if (needOwnTransaction)
+      connection_->commit();
+    return new qabase::Observation(observationid, station, type, obstime, tbtime);
 }
 
-void KvalobsDatabaseAccess::markProcessDone(const kvalobs::kvStationInfo & si) {
+void KvalobsDatabaseAccess::markProcessDone(const qabase::Observation & obs) {
     std::ostringstream query;
-    query << "UPDATE workque SET qa_stop=statement_timestamp() WHERE ";
-    query << "stationid=" << si.stationID();
-    query << " AND typeid=" << si.typeID();
-    query << " AND obstime='" << to_kvalobs_string(si.obstime()) << "'";
+
+    query << "UPDATE workque SET qa_stop=statement_timestamp() WHERE observationid=" << obs.id();
 
     milog::LogContext context("query");
     LOGDEBUG1(query.str());
@@ -540,6 +703,32 @@ dnmi::db::Connection * KvalobsDatabaseAccess::createConnection(
 
   dnmi::db::Connection * conn = dnmi::db::DriverManager::connect(driverId, databaseConnect);
   return conn;
+}
+
+void KvalobsDatabaseAccess::storeFetched(long long obsid, const kvalobs::kvData & d) const {
+  DataID::value_type toInsert(d, obsid);
+  auto insertResult = fetchedData_.insert(toInsert);
+  if (!insertResult.second) {
+    long long oldId = insertResult.first->second;
+    if (obsid != oldId) {
+      std::ostringstream s;
+      s << "obsid mismatch: got " << obsid << " previous was " << oldId << " data: " << d;
+      throw std::runtime_error(s.str());
+    }
+  }
+}
+
+void KvalobsDatabaseAccess::storeFetched(long long obsid, const kvalobs::kvTextData & d) const {
+  TextDataID::value_type toInsert(d, obsid);
+  auto insertResult = fetchedTextData_.insert(toInsert);
+  if (!insertResult.second) {
+    long long oldId = insertResult.first->second;
+    if (obsid != oldId) {
+      std::ostringstream s;
+      s << "textdata obsid mismatch: got " << obsid << " previous was " << oldId << " data: " << d;
+      throw std::runtime_error(s.str());
+    }
+  }
 }
 
 }  // namespace db

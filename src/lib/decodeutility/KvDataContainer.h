@@ -28,8 +28,8 @@
  with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#ifndef __KVDATACONTAINER_H__
-#define __KVDATACONTAINER_H__
+#ifndef __decodeutility_KVDATACONTAINER_H__
+#define __decodeutility_KVDATACONTAINER_H__
 
 #include <string>
 #include <map>
@@ -37,9 +37,7 @@
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <decodeutility/kvalobsdata.h>
 
-namespace kvalobs {
-namespace decoder {
-namespace kldecoder {
+namespace decodeutility {
 
 class KvDataContainer {
 
@@ -54,9 +52,20 @@ class KvDataContainer {
   typedef std::map<boost::posix_time::ptime, TextDataList> TextDataByObstime;
   typedef std::map<boost::posix_time::ptime, DataList> DataByObstime;
 
+  struct StationInfo{
+      int stationId;
+      int typeId;
+      StationInfo(int sid, int tid):
+      stationId(sid), typeId(tid){}
+  };
+
+  typedef std::list<StationInfo> StationInfoList;
+
   KvDataContainer()
       : data_(0) {
   }
+
+  KvDataContainer(const std::list<kvalobs::kvData> &d, const std::list<kvalobs::kvTextData> &td); 
   ///Deletes kvData after it is consumed.
   KvDataContainer(kvalobs::serialize::KvalobsData *kvData);
   ~KvDataContainer();
@@ -71,14 +80,14 @@ class KvDataContainer {
 
   int getTextData(TextDataByObstime &textData, int stationid, int typeId,
                   const boost::posix_time::ptime &tbtime =
-                      boost::posix_time::ptime()) const;
+                      boost::posix_time::ptime(), bool setTbTime=true) const;
   int getData(DataByObstime &data, int stationid, int typeId,
               const boost::posix_time::ptime &tbtime =
-                  boost::posix_time::ptime()) const;
+                  boost::posix_time::ptime(), bool setTbTime=true) const;
 
   int get(DataByObstime &data, TextDataByObstime &textData, int stationid,
           int typeId, const boost::posix_time::ptime &tbtime =
-              boost::posix_time::ptime()) const;
+              boost::posix_time::ptime(), bool setTbTime=true) const;
 
   bool getData(kvalobs::kvData &data, int stationid, int typeId, int paramid,
                const boost::posix_time::ptime &obstime, char sensor = '0',
@@ -96,12 +105,11 @@ class KvDataContainer {
   ///Deletes kvData after it is consumed.
   void set(kvalobs::serialize::KvalobsData *kvData);
 
+  StationInfoList stationInfos()const;
+
  private:
   kvalobs::serialize::KvalobsData *data_;
 };
-
-}
-}
 }
 
 #endif

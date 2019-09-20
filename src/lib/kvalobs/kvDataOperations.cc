@@ -115,7 +115,7 @@ kvDataFactory::kvDataFactory(const kvData & d)
       level_(d.level()) {
 }
 
-kvDataFactory::kvDataFactory(kvalobs::kvStationInfo & stInfo)
+kvDataFactory::kvDataFactory(const kvalobs::kvStationInfo & stInfo)
   : stationID_(stInfo.stationID()),
     obstime_(stInfo.obstime()),
     typeID_(stInfo.typeID()),

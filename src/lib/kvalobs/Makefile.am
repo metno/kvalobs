@@ -44,7 +44,9 @@ libkvalobs_kvalobs_la_SOURCES = \
 	flag/kvControlInfo.cc \
 	flag/kvUseInfo.cc \
 	DataInsertTransaction.cc \
-	getLogInfo.cc
+	getLogInfo.cc \
+	observation.cc \
+	kvWorkque.cc
 
 
 libkvalobs_kvalobs_la_CPPFLAGS = $(AM_CPPFLAGS) $(putools_CFLAGS) \
@@ -110,7 +112,9 @@ kvalobsinclude_HEADERS = \
 	kvexception.h \
 	kvStationMetadata.h \
 	DataInsertTransaction.h \
-	getLogInfo.h
+	getLogInfo.h \
+	observation.h \
+	kvWorkque.h
 
 kvalobsflagincludedir = $(kvalobsincludedir)/flag
 kvalobsflaginclude_HEADERS = \

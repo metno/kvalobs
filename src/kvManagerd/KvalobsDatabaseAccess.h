@@ -85,7 +85,7 @@ class KvalobsDatabaseAccess : boost::noncopyable {
    * Get next data element to process. Will return empty ptr if no data
    * available.
    */
-  std::shared_ptr<DataIdentifier> nextDataToProcess();
+  DataIdentifier nextDataToProcess();
 
   void cleanWorkQueue();
 
@@ -136,6 +136,8 @@ class KvalobsDatabaseAccess : boost::noncopyable {
   std::string selectWorkQueueQuery_(const DataIdentifier & di) const;
   std::string insertWorkQueueQuery_(const DataIdentifier & di, int priority) const;
   std::string updateWorkQueueQuery_(const DataIdentifier & di) const;
+
+  DataIdentifier createObservation_(int stationid, int type, const boost::posix_time::ptime & obstime);
 
   dnmi::db::Connection * connection_;
 };
