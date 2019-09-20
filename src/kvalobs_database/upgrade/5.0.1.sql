@@ -1,6 +1,6 @@
 BEGIN;
 
-drop view pdata;
+-- drop view pdata;
 
 DROP VIEW data;
 CREATE VIEW data AS (

@@ -56,9 +56,10 @@ class KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection {
   std::string esc(const std::string & stringToEscape) const;
 
   void exec(const std::string & SQLstmt);
-  void beginTransaction();
+  void beginTransaction(dnmi::db::Connection::IsolationLevel isolation = dnmi::db::Connection::READ_COMMITTED);
   void commit();
   void rollback();
+  bool transactionInProgress() const;
  private:
   dnmi::db::Connection * connection_;
   bool transactionInProgress_;
@@ -104,8 +105,8 @@ void KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::exec(
   else
     throw std::runtime_error("No transaction in progress");
 }
-void KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::beginTransaction() {
-  connection_->beginTransaction(dnmi::db::Connection::READ_COMMITTED);
+void KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::beginTransaction(dnmi::db::Connection::IsolationLevel isolation) {
+  connection_->beginTransaction(isolation);
   transactionInProgress_ = true;
 }
 void KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::commit() {
@@ -117,6 +118,10 @@ void KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::rollback() {
     connection_->rollBack();
   transactionInProgress_ = false;
 }
+bool KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::transactionInProgress() const {
+  return transactionInProgress_;
+}
+
 
 KvalobsDatabaseAccess::KvalobsDatabaseAccess(
     const std::string & databaseConnect) {
@@ -457,8 +462,7 @@ bool KvalobsDatabaseAccess::pin(const qabase::Observation & obs) const {
     "WHERE "
     "o.observationid = d.observationid AND "
     "o.observationid = " << obs.id();
-  query << " ORDER BY obstime DESC";
-  query << " FOR UPDATE;";
+  query << " ORDER BY obstime DESC;";
 
   milog::LogContext context("query");
   LOGDEBUG1(query.str());
@@ -619,11 +623,38 @@ void KvalobsDatabaseAccess::write(const DataList & data) {
 }
 
 qabase::Observation * KvalobsDatabaseAccess::selectDataForControl() {
-    static const std::string findNext =
-        "select o.observationid, stationid, typeid, obstime, o.tbtime from workque q, observations o where q.observationid=o.observationid and process_start is not null and ((qa_start<now()-'10 minutes'::interval and qa_stop is null) or (qa_start is null and stationid not in (select o.stationid from workque q, observations o where o.observationid=q.observationid and qa_start is not null and qa_stop is null))) order by priority, tbtime limit 1;";
-        //"select o.observationid, stationid, typeid, obstime, o.tbtime from workque q, observations o where q.observationid=o.observationid and process_start is not null and ((qa_start<now()-'10 minutes'::interval and qa_stop is null) or (qa_start is null and stationid not in (select stationid from workque where qa_start is not null and qa_stop is null))) order by priority, tbtime limit 1;";
 
-    std::unique_ptr<dnmi::db::Result> result(connection_->execQuery(findNext));
+    bool needOwnTransaction = !connection_->transactionInProgress();
+    if (needOwnTransaction)
+      connection_->beginTransaction(dnmi::db::Connection::SERIALIZABLE);
+    else
+      LOGWARN("trying to select data for control with previous transaction - isolation level not guaranteed");
+
+    std::vector<int> runningChecks;
+    std::unique_ptr<dnmi::db::Result> result(connection_->execQuery("select o.stationid from workque q, observations o where o.observationid=q.observationid and qa_start is not null and qa_stop is null;"));
+    while (result->hasNext()) {
+      auto row = result->next();
+      int station = boost::lexical_cast<int>(row[0]);
+      runningChecks.push_back(station);
+    }
+
+    std::ostringstream query;
+    query << "select o.observationid, stationid, typeid, obstime, o.tbtime from workque q, observations o "
+      "where q.observationid=o.observationid and process_start is not null and "
+      "((qa_start<now()-'10 minutes'::interval and qa_stop is null) or "
+      "(qa_start is null";
+    if (not runningChecks.empty()) {
+      query << " and stationid not in (";
+      auto it = runningChecks.begin();
+      query << *it;
+      while (++it != runningChecks.end()) {
+        query << ", " << *it;
+      }
+      query << ")";
+    }
+    query << ")) order by priority, tbtime limit 1;";
+
+    result.reset(connection_->execQuery(query.str()));
     if (!result || !result->hasNext())
       return nullptr;
 
@@ -635,7 +666,7 @@ qabase::Observation * KvalobsDatabaseAccess::selectDataForControl() {
     boost::posix_time::ptime obstime = boost::posix_time::time_from_string(row[3]);
     boost::posix_time::ptime tbtime = boost::posix_time::time_from_string(row[4]);
 
-    std::ostringstream query;
+    query.str("");
     query << "UPDATE workque SET qa_start=statement_timestamp() WHERE ";
     query << "observationid=" << observationid;
 
@@ -643,6 +674,8 @@ qabase::Observation * KvalobsDatabaseAccess::selectDataForControl() {
     LOGDEBUG1(query.str());
 
     connection_->exec(query.str());
+    if (needOwnTransaction)
+      connection_->commit();
     return new qabase::Observation(observationid, station, type, obstime, tbtime);
 }
 

@@ -36,6 +36,7 @@
 #include <vector>
 #include <list>
 #include <kvdb/transaction.h>
+#include <sstream>
 
 /**
  * \namespace dnmi::db
@@ -83,6 +84,13 @@ class SQLException : public std::exception {
 
   std::string errorCode() const {
     return errorCode_;
+  }
+
+  //An extended error message
+  std::string message()const {
+    std::ostringstream o;
+    o << reason << "\nerrorCode: " << errorCode_ << " mayRecover: " << (mayRecoverFrom_?"true":"false");
+    return o.str();
   }
 
   const char *what() const throw () {

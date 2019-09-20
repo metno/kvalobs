@@ -1,5 +1,5 @@
 AC_PREREQ([2.59])
-AC_INIT([kvalobs], [5.0.0~rc13], [kvoss@met.no])
+AC_INIT([kvalobs], [5.0.0~rc19], [kvoss@met.no])
 AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -64,17 +64,11 @@ AC_CONFIG_FILES([Makefile
                  src/service-libs/kvcpp/sql/Makefile
                  src/service-libs/kvcpp/kafka/Makefile
                  src/service-libs/kvcpp/mock/Makefile
-                 src/data2kv/Makefile
                  src/kvDataInputd/Makefile
                  src/kvQabased/Makefile
                  src/kvManagerd/Makefile
-                 src/model2kv/Makefile
-                 src/kv2metdat/Makefile
-                 src/kv2kro2/Makefile
-                 src/tools/kvpull/Makefile
-                 src/tools/kvpush/Makefile
+                 src/tools/kv2kvparser/Makefile
                  src/tools/kv2kvDataInputd/Makefile
-                 src/tools/nagios/Makefile
                  src/kvDataInputd/kvdataclt/Makefile
                  src/tools/aexecd/Makefile
                  src/kvalobs_database/Makefile
@@ -98,6 +92,8 @@ AC_CONFIG_FILES([Makefile
                  src/lib/kvskel/libkvalobs_kvadmininterface.pc
                  src/lib/kvsubscribe/libkvsubscribe.pc
 ])
+
+#src/tools/kvpush/Makefile
 
 #libcurl, sets CURL_LIBS and CURL_CFLAGS.
 AX_LIB_CURL([7.15.5])

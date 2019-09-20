@@ -69,8 +69,11 @@ class kv2kvDecoder : public DecoderBase, public boost::noncopyable {
                       std::list<kvalobs::kvData> & out);
   void save2(const std::list<kvalobs::kvData> & dl, const std::list<kvalobs::kvTextData> & tdl);
   //     void save( const serialize::KvalobsData & data );
+  #if 0
   void save(const std::list<kvalobs::kvData> & dl,
             const std::list<kvalobs::kvTextData> & tdl);
+  #endif
+  
   void markAsFixed(const serialize::KvalobsData::RejectList & rejectedMesage);
 
   typedef boost::shared_ptr<const kvalobs::kvData> kvDataPtr;
@@ -94,10 +97,13 @@ class kv2kvDecoder : public DecoderBase, public boost::noncopyable {
     }
   };
 
+  void setChecked( const std::string &obsType );
+  
   serialize::KvalobsData data;
   DecodeResult parseResult_;
   std::string parseMessage_;
   const boost::posix_time::ptime tbtime;
+  bool checked_;
 };
 
 }

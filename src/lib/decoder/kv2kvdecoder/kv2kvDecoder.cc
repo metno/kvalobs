@@ -72,15 +72,16 @@ kv2kvDecoder::kv2kvDecoder(dnmi::db::Connection & con, const ParamList & params,
                            int decoderId)
     : DecoderBase(con, params, typeList, obsType, obs, decoderId),
       dbGate(&con),
-      tbtime(boost::posix_time::microsec_clock::universal_time()) {
+      tbtime(boost::posix_time::microsec_clock::universal_time()),
+      checked_(false) {
   milog::LogContext lcontext(name());
   LOGDEBUG("kv2kvDecoder object created");
 
   try {
+    setChecked(obsType);
     parse(data, obs);
     parseResult_ = Ok;
     parseMessage_ = "Ok";
-
   } catch (DecoderError & e) {
     parseResult_ = Error;
     parseMessage_ = "Could not parse data";
@@ -89,6 +90,21 @@ kv2kvDecoder::kv2kvDecoder(dnmi::db::Connection & con, const ParamList & params,
 
 kv2kvDecoder::~kv2kvDecoder() {
 }
+
+void kv2kvDecoder::setChecked( const std::string &obsType ){
+  auto val = getObsTypeKey("checked");
+
+  if (val.empty() ) {
+    return;
+  }
+  
+  if (val[0]=='T' || val[0]=='t') {
+    checked_=true;
+  } else {
+    checked_ = false;
+  }
+}
+
 
 DecoderBase::DecodeResult kv2kvDecoder::execute(std::string & msg) {
   milog::LogContext lcontext(name());
@@ -101,9 +117,17 @@ DecoderBase::DecodeResult kv2kvDecoder::execute(std::string & msg) {
 
   try {
     list<kvData> dl;
-    verifyAndAdapt(data, dl);
     list<kvTextData> tdl;
-    data.getData(tdl, tbtime);
+
+    if ( ! checked_ ) {
+      verifyAndAdapt(data, dl);
+      data.getData(tdl, tbtime);
+    } else {
+      //The data is checked, just save tha data to the database
+      //We also keep the tbtime as it is from the message.
+      data.data(dl, tdl, false);
+    }
+
     save2(dl, tdl);
 
     KvalobsData::RejectList rejectedFixes;
@@ -163,8 +187,22 @@ void kv2kvDecoder::verifyAndAdapt(KvalobsData & data, list<kvData> & out) {
   }
 }
 
+
 void kv2kvDecoder::save2(const list<kvData> & dl_, const list<kvTextData> & tdl_) 
 {
+  // If checked is true
+  //  - the data in the database is updated if it exist or added if it do not exist. 
+  //    ie, do not replace data that already is in the database.
+  //  - Do not add it to the workque. This will skip the run in kvQaBased.
+  //  - Try to set tbTime from tbtime in the data. The oldest tbTime is used if the tbTimes is not equal.
+  // This way we can almost 'replicate' the data from one kvalobs instance to another from the checked queue 
+  // in kafka.
+  
+  // bool onlyUpdateData = checked_;
+  bool onlyUpdateData = true;
+  bool addDataToWorkQueue = ! checked_;
+  bool tryToUseDataTbTime = checked_;
+
   KvDataContainer container(dl_, tdl_);
   KvDataContainer::DataByObstime data;
   KvDataContainer::TextDataByObstime textData;
@@ -179,7 +217,7 @@ void kv2kvDecoder::save2(const list<kvData> & dl_, const list<kvTextData> & tdl_
     IDLOGINFO(logid, obs);
     if (container.get(
           data, textData, sinf.stationId, sinf.typeId,
-          pt::second_clock::universal_time()) < 0) {
+          pt::second_clock::universal_time(), !tryToUseDataTbTime) < 0) {
        continue;               
     }
 
@@ -195,7 +233,7 @@ void kv2kvDecoder::save2(const list<kvData> & dl_, const list<kvTextData> & tdl_
 
       try {
         if (!addDataToDbThrow(to_miTime(it->first), sinf.stationId, sinf.typeId, it->second, td,
-             logid, false)) {
+             logid, onlyUpdateData, addDataToWorkQueue, tryToUseDataTbTime, false)) {
           ostringstream ost;
 
           ost << "DBERROR: stationid: " << sinf.stationId << " typeid: " << sinf.typeId
@@ -240,7 +278,7 @@ void kv2kvDecoder::save2(const list<kvData> & dl_, const list<kvTextData> & tdl_
       for (KvDataContainer::TextDataByObstime::iterator it = textData.begin();
           it != textData.end(); ++it) {
         if (!addDataToDb(to_miTime(it->first), sinf.stationId, sinf.typeId, dl, it->second,
-                       logid, false)) {
+                       logid, onlyUpdateData, addDataToWorkQueue, tryToUseDataTbTime, false)) {
           ostringstream ost;
           ost << "DBERROR: TextData: stationid: " << sinf.stationId << " typeid: "
               << sinf.typeId << " obstime: " << it->first;
@@ -253,9 +291,7 @@ void kv2kvDecoder::save2(const list<kvData> & dl_, const list<kvTextData> & tdl_
   }
 }
 
-
-
-
+#if 0
 void kv2kvDecoder::save(const list<kvData> & dl, const list<kvTextData> & tdl) {
   // kvTextData:
   int priority_ = 5;
@@ -286,6 +322,7 @@ void kv2kvDecoder::save(const list<kvData> & dl, const list<kvTextData> & tdl) {
     //     }
   }
 }
+#endif
 
 void kv2kvDecoder::markAsFixed(
     const serialize::KvalobsData::RejectList & rejectedMesage) {

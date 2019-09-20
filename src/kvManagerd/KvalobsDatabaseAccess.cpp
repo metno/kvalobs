@@ -150,7 +150,7 @@ void KvalobsDatabaseAccess::addMissingData(const DataIdentifier & di) {
 }
 
 DataIdentifier KvalobsDatabaseAccess::nextDataToProcess() {
-  std::string selectQuery = "SELECT o.observationid, o.stationid, o.typeid, o.obstime FROM observations o, workque q WHERE o.observationid=q.observationid AND q.process_start is NULL";
+  std::string selectQuery = "SELECT o.observationid, o.stationid, o.typeid, o.obstime FROM observations o, workque q WHERE o.observationid=q.observationid AND q.process_start is NULL limit 1";
 
   ResultPtr r = exec_(selectQuery);
   if (r->hasNext()) {

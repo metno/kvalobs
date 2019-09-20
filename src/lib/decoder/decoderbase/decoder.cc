@@ -312,7 +312,7 @@ kvalobs::decoder::DecoderBase::findType(int typeid_) const {
 
   return 0;
 }
-
+/*
 void kvalobs::decoder::DecoderBase::addStationInfo(long stationid, const miutil::miTime &obstime, long typeid_, const miutil::miTime &tbtime, int priority) {
   IkvStationInfoList it = stationInfoList.begin();
 
@@ -350,7 +350,7 @@ void kvalobs::decoder::DecoderBase::updateStationInfo(const kvalobs::kvStationIn
       stationInfoList.push_back(*nit);
   }
 }
-
+*/
 bool kvalobs::decoder::DecoderBase::isGenerated(long stationid, long typeid_) {
   kvDbGate gate(&con);
 
@@ -422,6 +422,7 @@ bool kvalobs::decoder::DecoderBase::deleteKvDataFromDb(const kvalobs::kvData &sd
   return true;
 }
 
+#if 0
 bool kvalobs::decoder::DecoderBase::putKvDataInDb(const kvalobs::kvData &sd_, int priority) {
   kvalobs::kvData sd(sd_);
   kvDbGate gate(&con);
@@ -470,16 +471,19 @@ bool kvalobs::decoder::DecoderBase::putKvDataInDb(const std::list<kvalobs::kvDat
 
   return true;
 }
+#endif
 
 bool kvalobs::decoder::DecoderBase::addDataToDb(const miutil::miTime &obstime, int stationid, int typeid_, std::list<kvalobs::kvData> &sd,
                                                 std::list<kvalobs::kvTextData> &textData, const std::string &logid) {
   return addDataToDb(obstime, stationid, typeid_, sd, textData, logid, false);
 }
 
-bool kvalobs::decoder::DecoderBase::addDataToDb(const miutil::miTime &obstime, int stationid, int typeid_, std::list<kvalobs::kvData> &sd,
-                                                std::list<kvalobs::kvTextData> &textData, const std::string &logid, bool onlyAddOrUpdateData) {
+bool kvalobs::decoder::DecoderBase::addDataToDb(
+    const miutil::miTime &obstime, int stationid, int typeid_, 
+    std::list<kvalobs::kvData> &sd, std::list<kvalobs::kvTextData> &textData, 
+    const std::string &logid, bool onlyAddOrUpdateData, bool addToWorkQueue, bool tryToUseDataTbTime, bool enableDuplicateTest) {
   try {
-    return addDataToDbThrow(obstime, stationid, typeid_, sd, textData, logid, onlyAddOrUpdateData);
+    return addDataToDbThrow(obstime, stationid, typeid_, sd, textData, logid, onlyAddOrUpdateData, addToWorkQueue, tryToUseDataTbTime, enableDuplicateTest);
   }
   catch ( const dnmi::db::SQLException &e) {
     ostringstream ost;
@@ -516,10 +520,11 @@ kvalobs::decoder::DecoderBase::
 addDataToDbThrow(const miutil::miTime &obstime, int stationid, int typeid_,
                    std::list<kvalobs::kvData> &sd,
                    std::list<kvalobs::kvTextData> &textData, 
-                   const std::string &logid, bool onlyAddOrUpdateData)
+                   const std::string &logid, bool onlyAddOrUpdateData, bool addToWorkQueue, bool tryToUseDataTbTime, 
+                   bool partialDuplicateTest)
 {
   namespace pt = boost::posix_time;
-
+  DataUpdateTransaction::DuplicateTestType duplicateTest;
   boost::gregorian::date date(obstime.year(), obstime.month(), obstime.day());
   boost::posix_time::time_duration clock(pt::hours(obstime.hour()) + pt::minutes(obstime.min()) + pt::seconds(obstime.sec()));
   boost::posix_time::ptime pt_obstime(date, clock);
@@ -531,15 +536,26 @@ addDataToDbThrow(const miutil::miTime &obstime, int stationid, int typeid_,
     return true;
   }
 
-  kvalobs::decoder::DataUpdateTransaction work(pt_obstime, stationid, typeid_, &std::get<0>(data), &std::get<1>(data), logid, onlyAddOrUpdateData);
+  if( partialDuplicateTest )
+    duplicateTest=DataUpdateTransaction::Partial;
+  else
+    duplicateTest=DataUpdateTransaction::Complete;
 
-  con.perform(work);
+  kvalobs::decoder::DataUpdateTransaction work(pt_obstime, stationid, typeid_, &std::get<0>(data), &std::get<1>(data), logid, onlyAddOrUpdateData, addToWorkQueue, tryToUseDataTbTime, duplicateTest);
+
+  //con.perform(work, 20, dnmi::db::Connection::READ_COMMITTED);
+  con.perform(work, 20, dnmi::db::Connection::REPEATABLE_READ);
   decodedData.push_back(work.insertedOrUpdatedData());
+
+  auto publish = work.dataToPublish();
+  if ( work.ok() && ! publish.empty() ) {
+    publishData.push_back(publish);
+  }
   
   return work.ok();
 }
 
-
+#if 0
 bool kvalobs::decoder::DecoderBase::putkvTextDataInDb(const kvalobs::kvTextData &td_, int priority) {
   kvalobs::kvTextData td(td_);
   kvDbGate gate(&con);
@@ -618,7 +634,7 @@ bool kvalobs::decoder::DecoderBase::putkvTextDataInDb(const std::list<kvalobs::k
 
   return true;
 }
-
+#endif
 bool kvalobs::decoder::DecoderBase::putRejectdecodeInDb(const kvalobs::kvRejectdecode &sd) {
   kvDbGate gate(&con);
   kvRejectdecode reject(gate.esc(sd.message()), sd.tbtime(), gate.esc(sd.decoder()), gate.esc(sd.comment()), sd.fixed());

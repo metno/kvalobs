@@ -143,11 +143,12 @@ class DecoderBase {
    */
   std::string datdirForLogger(const std::string &dir = "");
 
+/*
   void addStationInfo(long stationid, const miutil::miTime &obstime,
                       long typeid_, const miutil::miTime &tbtime, int priority);
 
   void updateStationInfo(const kvalobs::kvStationInfoList& stationInfo);
-
+*/
   /**
    * \brief  isGenerated looks up in the table 'generated_data'
    *
@@ -226,7 +227,7 @@ class DecoderBase {
    * \return true if there was now error, false otherwise.
    */
   bool deleteKvDataFromDb(const kvalobs::kvData &sd);
-
+#if 0
   /**
    * \brief insert/update data into the table \em data.
    *
@@ -250,6 +251,8 @@ class DecoderBase {
    * \return true if successful false otherwise.
    */
   bool putKvDataInDb(const std::list<kvalobs::kvData> &sd, int priority = 5);
+#endif
+
 
   /**
    * \brief Inserts data and textdata into the database.
@@ -315,13 +318,13 @@ class DecoderBase {
   bool addDataToDb(const miutil::miTime &obstime, int stationid, int typeid_,
                    std::list<kvalobs::kvData> &sd,
                    std::list<kvalobs::kvTextData> &textData, 
-                   const std::string &logid, bool onlyAddOrUpdateData);
+                   const std::string &logid, bool onlyAddOrUpdateData, bool addToWorkQueue=true, bool tryToUseDataTbTime=false, bool partialDuplicateTest=true);
 
 
   bool addDataToDbThrow(const miutil::miTime &obstime, int stationid, int typeid_,
                    std::list<kvalobs::kvData> &sd,
                    std::list<kvalobs::kvTextData> &textData, 
-                   const std::string &logid, bool onlyAddOrUpdateData);
+                   const std::string &logid, bool onlyAddOrUpdateData, bool addToWorkQueue=true, bool tryToUseDataTbTime=false, bool partialDuplicateTest=true);
 
   /**
    * \brief insert the \em obs message into the table \em rejectdecode.
@@ -337,7 +340,7 @@ class DecoderBase {
    */
 
   bool putkvStationInDb(const kvalobs::kvStation &st);
-
+#if 0
   /**
    * \brief Insert/update the data into the table \em text_data..
    *
@@ -352,7 +355,7 @@ class DecoderBase {
 
   bool putkvTextDataInDb(const std::list<kvalobs::kvTextData> &td_,
                          int priority);
-
+#endif
  public:
   typedef enum {
     /// The \em obs was decoded and inserted into the database.
