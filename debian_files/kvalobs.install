@@ -1,4 +1,3 @@
-usr/bin/kv2metdat
 usr/bin/kv2norcom
 usr/bin/kvconfig
 usr/bin/kvDataInputd
@@ -6,7 +5,6 @@ usr/bin/aexecd
 usr/bin/kvdbadmin
 usr/bin/kvlogread
 usr/bin/kvManagerd
-usr/bin/kvpush
 usr/bin/kvQabased
 usr/bin/kvrestart
 usr/bin/kvstart
@@ -19,7 +17,6 @@ usr/bin/sync_norcom_files
 usr/lib/kvalobs/bin/*
 usr/lib/kvalobs/decode/*.so.*
 usr/lib/kvalobs/tool_funcs.sh
-usr/lib/nagios/plugins/*
 etc/kvalobs/kv_ctl.conf
 etc/kvalobs/kv-ips.conf.template
 etc/kvalobs/kvcron
@@ -29,6 +26,5 @@ etc/kvalobs/sync_norcom_files.conf.template
 etc/kvalobs/aexecd.conf.template
 etc/kvalobs/save_last_month.conf
 etc/kvalobs/pgclean-local.sql.template
-etc/kvalobs/lam2kv/*
 etc/kvalobs/stinfosys.conf
 etc/kvalobs/stinfosys_params.csv.default

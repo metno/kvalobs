@@ -82,12 +82,12 @@ Architecture: any
 Depends: libkvalobs8 (= ${binary:Version})
 Description: List data from kvalobs in real time 
 
-Package: kvkafkalistener
-Architecture: any
-Depends: libkvalobs8 (= ${binary:Version})
-Description: Very simple monitoring daemon for kvalobs
- Will periodically write and update kvalobs status information to 
- /var/log/kvalobs/kvkafkalistener.log 
+#Package: kvkafkalistener
+#Architecture: any
+#Depends: libkvalobs8 (= ${binary:Version})
+#Description: Very simple monitoring daemon for kvalobs
+# Will periodically write and update kvalobs status information to 
+# /var/log/kvalobs/kvkafkalistener.log 
 
 Package: kvalobs-init
 Architecture: any
@@ -95,12 +95,12 @@ Depends: kvalobsuser, metno-pgrepctl, kvalobs, incron, ${misc:Depends}
 Description: Install kvalobs init scripts.
  Install the init script to start/stop kvalobs on boot and shutdown.
 
-Package: kvdataclt
-Architecture: any
-Depends:  ${shlibs:Depends}, ${misc:Depends}
-Description: Client program to send data to a kvalobs server
- A client program to send data to a kvalobs server. The data to
- send is in files with the "kvalobs format kldata".
+#Package: kvdataclt
+#Architecture: any
+#Depends:  ${shlibs:Depends}, ${misc:Depends}
+#Description: Client program to send data to a kvalobs server
+# A client program to send data to a kvalobs server. The data to
+# send is in files with the "kvalobs format kldata".
 
 Package: kv2kvdatainputd
 Architecture: any
