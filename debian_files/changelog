@@ -1,3 +1,8 @@
+kvalobs (5.0.0~rc20-1) xenial; urgency=medium
+  * Merge with master and recompile.
+ 
+ -- Borge Moe <borge.moe@met.no>  Wed, 26 Sep 2019 06:49:00:00 +0200
+
 kvalobs (5.0.0~rc19-1) xenial; urgency=medium
   * kvQaBased: Serialize selection from workque. Fix multiple processing of checks for one station.
   * kvQaBased: Fix a query that sometimes is 'insanly' slow. 
