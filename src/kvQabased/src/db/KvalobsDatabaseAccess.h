@@ -135,6 +135,12 @@ class KvalobsDatabaseAccess : public db::DatabaseAccess {
   mutable TextDataID fetchedTextData_;
   void storeFetched(long long obsid, const kvalobs::kvTextData & d) const;
 
+  //Helper methods for selectDataForControl
+  qabase::Observation *selectFailedDataForControl();  
+  qabase::Observation *selectLatestDataBasedOnObstimeForControl();  
+  qabase::Observation *selectOlderDataControl();
+  qabase::Observation *newObservation(std::unique_ptr<dnmi::db::Result> &r);
+
 };
 
 }

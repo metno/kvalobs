@@ -1,14 +1,35 @@
+kvalobs (5.0.0~rc23-1) xenial; urgency=medium
+  * kvQabased: Changed selectForControl.
+  * kvsubscribe: Kafka added more config options.
+ 
+ -- Borge Moe <borge.moe@met.no>  Thu, 21 Nov 2019 09:55:00 +0100
+
+kvalobs (5.0.0~rc22-1) xenial; urgency=medium
+  * Changed the build system.
+ 
+ -- Borge Moe <borge.moe@met.no>  Thu, 7 Nov 2019 08:45:00 +0100
+
+kvalobs (5.0.0~rc21-1) xenial; urgency=medium
+  * rdkafka: Upgrade to version version 1.2.1
+  * At runtime link to private shared objects in /usr/lib/kvalobs/lib
+ 
+ -- Borge Moe <borge.moe@met.no>  Mon, 4 Nov 2019 13:00:00 +0100
+
+kvalobs (5.0.0~rc20-1) xenial; urgency=medium
+  * rdkafka: Upgrade to version version 1.2.1
+ 
+ -- Borge Moe <borge.moe@met.no>  Sun, 3 Nov 2019 08:30:00 +0100
+
 kvalobs (5.0.0~rc19-1) xenial; urgency=medium
   * kvQaBased: Serialize selection from workque. Fix multiple processing of checks for one station.
-  * kvQaBased: Fix a query that sometimes is 'insanly' slow. 
- 
- -- Borge Moe <borge.moe@met.no>  Thu, 19 Sep 2019 10:39:00:00 +0200
+  * kvQaBased: Fix a query that sometimes is 'insanly' slow.
 
+ -- Borge Moe <borge.moe@met.no>  Thu, 19 Sep 2019 10:39:00 +0200
 
 kvalobs (5.0.0~rc17d-1) xenial; urgency=medium
   * kvDataInputd: Fix insert when observations has an entry but no data exist.  
 
- -- Borge Moe <borge.moe@met.no>  Wed, 18 Sep 2019 10:56:00 +0100
+ -- Borge Moe <borge.moe@met.no> Wed, 18 Sep 2019 10:56:00 +0100
 
 kvalobs (5.0.0~rc17c-1) xenial; urgency=medium
   * fix paramid=0

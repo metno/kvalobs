@@ -1,3 +1,4 @@
+usr/lib/kvalobs/lib/*.so.*
 usr/lib/libkvalobs_corbahelper.so.*
 usr/lib/libkvalobs_decoderbase.so.*
 usr/lib/libkvalobs_decodeutility.so.*

@@ -199,7 +199,7 @@ void DataUpdateTransaction::worqueToWorkStatistik(dnmi::db::Connection *con, lon
     << "q.service_start,"
     << "q.service_stop,"
     << "q.observationid "
-    << "FROM workque q, observations o"
+    << "FROM workque q, observations o "
     << "WHERE q.observationid=o.observationid AND q.observationid=" << observationid 
     << " AND q.qa_stop IS NOT NULL AND (SELECT count(*) FROM workstatistik s WHERE q.observationid=s.observationid)=0";
 

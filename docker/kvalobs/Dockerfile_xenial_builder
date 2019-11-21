@@ -1,0 +1,41 @@
+FROM ubuntu:xenial
+
+RUN apt-get update && apt-get install -y gnupg2 software-properties-common apt-utils && \
+  apt-key adv --keyserver keyserver.ubuntu.com --recv 4e8a0c1418494cf45d1b8533799e9fe74bb0156c && \
+  add-apt-repository 'deb http://internrepo.met.no/xenial xenial main contrib'
+
+RUN apt-get update && apt-get -y install \
+  debhelper autotools-dev debconf devscripts fakeroot \
+  automake libtool gfortran bison flex sqlite3 libsqlite3-dev libpq-dev \
+  libxml2-dev libxml++2.6-dev libboost-dev libboost-thread-dev \
+  libboost-regex-dev libboost-filesystem-dev libboost-program-options-dev libboost-system-dev \
+  libboost-timer-dev less \
+  libomniorb4-dev  omniidl libperl-dev libdbd-pg-perl libcurl3-gnutls-dev liblog4cpp5-dev libcppunit-dev \
+  cmake google-mock metlibs-putools-dev zlib1g-dev libssl-dev libsasl2-dev libzstd-dev \
+  libhttpserver-dev=0.9.0
+
+# librdkafka-dev  
+# libhttpserver-dev=0.9.0
+
+#To build libhttpserver
+RUN apt-get update && apt-get -y install mg libgnutls28-dev cdbs autoconf-archive debhelper
+
+
+RUN addgroup --gid 41494 borgem && adduser --uid 41494  --gid 41494 --disabled-password --disabled-login --gecos '' borgem
+# COPY librdkafka-1.2.1.tar.gz /usr/local/src/
+# RUN cd /usr/local/src ; \
+#   tar zxpf librdkafka-1.2.1.tar.gz ; \
+#   mkdir -p librdkafka-1.2.1/build ; \
+#   cd librdkafka-1.2.1/ ; \
+#   pwd; ls -l; ls -l mklove/modules ; \
+#   ./configure --prefix=/usr/local  --disable-c11threads ; \
+#   make ; \
+#   make install
+
+USER borgem:borgem
+
+VOLUME /src
+VOLUME /build
+WORKDIR /build
+
+ENTRYPOINT [ "/bin/bash", "-c", "while true; do sleep 10000; done" ]

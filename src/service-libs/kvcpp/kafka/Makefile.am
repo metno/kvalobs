@@ -17,12 +17,15 @@ libkafkakvapp_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/service-libs/kvcpp \
 	-I$(top_builddir)/src/lib \
 	-I$(top_builddir)/src/lib/kvskel \
+	$(rdkafka_CFLAGS) \
 	$(omniORB4_CFLAGS) \
 	$(putools_CFLAGS) 
 	
 
 libkafkakvapp_la_LIBADD = \
 	$(top_builddir)/src/lib/kvsubscribe/libkvalobs_kvsubscribe.la \
-	$(top_builddir)/src/service-libs/kvcpp/corba/libcorbakvapp.la
+	$(top_builddir)/src/service-libs/kvcpp/corba/libcorbakvapp.la \
+	$(rdkafka_LIBS)
+
  
 	

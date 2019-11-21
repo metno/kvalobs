@@ -33,6 +33,7 @@
 #include <cstdint>
 #include <string>
 #include <memory>
+#include <ostream>
 
 namespace RdKafka {
 class Producer;
@@ -44,6 +45,8 @@ class DeliveryReportCb;
 namespace kvalobs {
 namespace subscribe {
 
+class KafkaConfig;
+
 class KafkaProducer {
  public:
   typedef uint64_t MessageId;
@@ -54,6 +57,13 @@ class KafkaProducer {
                          const std::string & brokers = "localhost",
                          ErrorHandler onFailedDelivery = [](MessageId, const std::string &, const std::string &) {},
                          SuccessHandler onSuccessfulDelivery = [](MessageId, const std::string &) {});
+
+  explicit KafkaProducer(const KafkaConfig &config,
+                         ErrorHandler onFailedDelivery = [](MessageId, const std::string &, const std::string &) {},
+                         SuccessHandler onSuccessfulDelivery = [](MessageId, const std::string &) {});
+                       
+  void init( const KafkaConfig &config,
+             ErrorHandler onFailedDelivery, SuccessHandler onSuccessfulDelivery);
 
   ~KafkaProducer();
 
@@ -85,7 +95,7 @@ class KafkaProducer {
 
  private:
   MessageId messageId_;
-
+  
   std::unique_ptr<RdKafka::Producer> producer_;
   std::unique_ptr<RdKafka::Topic> topic_;
 

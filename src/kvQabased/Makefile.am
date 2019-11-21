@@ -5,10 +5,13 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/src/lib \
 	-I$(top_builddir)/src/lib \
 	-I$(top_builddir)/src/lib/kvskel \
+	$(rdkafka_CFLAGS) \
 	$(BOOST_CPPFLAGS) \
 	$(perl_CFLAGS)
 
 AM_LDFLAGS = \
+	-R "$(libdir)/@PACKAGE_NAME@/lib" \
+	-R "$(rdkafka_LIBDIR)" \
 	$(top_builddir)/src/lib/milog/libkvalobs_milog.la \
 	$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
 	$(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la \
@@ -27,6 +30,7 @@ AM_LDFLAGS = \
 	$(BOOST_REGEX_LIB) \
 	$(BOOST_THREAD_LIB) $(BOOST_DATE_TIME_LIB) -lboost_system \
 	$(omniORB4_LIBS) \
+	$(rdkafka_LIBS) \
 	$(perl_LIBS)
 
 qabase_src_SOURCES =

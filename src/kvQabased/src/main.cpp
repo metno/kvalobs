@@ -145,11 +145,24 @@ void createPidFile() {
 void setupLogging(const qabase::Configuration& config, const ProcessStatus & ps) {
   if (!config.runLogFile().empty()) {
     std::ostringstream logFile;
+    std::ostringstream kafkaLogFile;
     logFile << config.runLogFile();
-    if (!ps.isLeader())
+    std::string tmp =config.runLogFile();
+    std::string::size_type i=tmp.find_last_of(".");
+
+    if( i != std::string::npos ) {
+      tmp.erase(i);
+    }
+    
+    kafkaLogFile << tmp << "_kafka.log";
+
+    if (!config.haveObservationToCheck()) {
       logFile << '.' << ps.id();
+      kafkaLogFile << "." << ps.id();
+    }
+          
     std::string logFileName = logFile.str();
-    milog::FLogStream* fs = new milog::FLogStream(9, 1024 * 1024);
+    milog::FLogStream* fs = new milog::FLogStream(config.numberOfLogs(), config.logSize());
     fs->open(logFileName);
     fs->loglevel(config.logLevel());
     if (!milog::LogManager::createLogger("filelog", fs)) {
@@ -159,6 +172,17 @@ void setupLogging(const qabase::Configuration& config, const ProcessStatus & ps)
     }
     if (!milog::LogManager::setDefaultLogger("filelog"))
       LOGERROR("Unable to register file logger as default logger");
+
+    //Kafka logger
+    logFileName = kafkaLogFile.str();
+    milog::FLogStream* kafkaFs = new milog::FLogStream(1, 128*1024*1024); //128Mb
+    kafkaFs->open(logFileName);
+    kafkaFs->loglevel(milog::INFO);
+    if (!milog::LogManager::createLogger("kafka", kafkaFs)) {
+      LOGERROR("Unable to create logger for file " << logFileName);
+      delete fs;
+      return;
+    }
   }
 }
 

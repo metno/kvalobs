@@ -62,16 +62,14 @@ inline std::string to_native_dir(const boost::filesystem::path& path) {
 namespace qabase {
 namespace {
 boost::filesystem::path defaultConfigFile() {
-using namespace boost::filesystem;
-
-#ifdef SYSCONFDIR
-const path homeDir(SYSCONFDIR);
-const path potentialConfigFile(homeDir / "kvQabased.conf" );
-if ( exists(potentialConfigFile) )
-return potentialConfigFile;
-#endif
-return path();
+  using namespace boost::filesystem;
+  const path homeDir(kvalobs::kvPath(kvalobs::sysconfdir));
+  const path potentialConfigFile(homeDir / "kvQabased.conf" );
+  if ( exists(potentialConfigFile) )
+    return potentialConfigFile;
+  return path();
 }
+
 
 kvalobs::kvStationInfo * getStationInfo(const variables_map & vm) {
 int optionCount = 0;
@@ -139,7 +137,13 @@ logging.add_options()(
     "logdir",
     value<std::string>(&baseLogDir_)->default_value(
         kvalobs::kvPath(kvalobs::logdir) + "/checks/"),
-    "Use the given directory as base directory for script logs");
+    "Use the given directory as base directory for script logs")(
+      "logsize",value<int>(&logSize_)->default_value(128),
+      "The size of logfile in mega bytes before it is rolled."
+    )(
+      "nlogs",value<int>(&numberOfLogs_)->default_value(3),
+      "Number of backup logs."
+    );
 
 options_description database("Database");
 database.add_options()(
@@ -149,6 +153,8 @@ database.add_options()(
     "port,p", value<int>(&port_), "Port of database")(
     "user,U", value<std::string>(&user_)->default_value(databaseUser),
     "Database user");
+
+
 
 options_description generic("Generic");
 generic.add_options()

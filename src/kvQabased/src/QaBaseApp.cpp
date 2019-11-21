@@ -37,8 +37,7 @@
 
 namespace qabase {
 
-std::string QaBaseApp::kafkaBrokers_;
-std::string QaBaseApp::kafkaDomain_;
+kvalobs::subscribe::KafkaConfig QaBaseApp::kafkaConf_;
 
 namespace {
 std::string val(const std::string & name, miutil::conf::ConfSection * conf, const std::string & defaultValue) {
@@ -52,14 +51,31 @@ std::string val(const std::string & name, miutil::conf::ConfSection * conf, cons
   } else
     return defaultValue;
 }
+
+int valAsInt(const std::string & name, miutil::conf::ConfSection * conf, int  defaultValue) {
+  if (conf) {
+    miutil::conf::ValElementList ret = conf->getValue(name);
+    if (ret.empty())
+      return defaultValue;
+    if (ret.size() > 1)
+      throw std::runtime_error("Several " + name + " elements in config!");
+    return ret.valAsInt(defaultValue);
+  } else
+    return defaultValue;
+}
+
 }
 
 QaBaseApp::QaBaseApp(int argc, char ** argv)
     : KvBaseApp(argc, argv) {
 
   miutil::conf::ConfSection * kafka = getConfiguration()->getSection("kafka");
-  kafkaBrokers_ = val("brokers", kafka, "localhost");
-  kafkaDomain_ = val("domain", kafka, "test");
+  kafkaConf_.brokers = val("brokers", kafka, "localhost");
+  kafkaConf_.topic = kvalobs::subscribe::queue::checked(val("domain", kafka, "test"));
+  kafkaConf_.requestRequiredAcks = valAsInt("request_required_acks", kafka, -1);
+  kafkaConf_.requestTimeoutMs = valAsInt("request_timeout_ms", kafka, 5000);
+  std::cerr << "Kafka Configuration:\n" <<kafkaConf_ << "\n\n";
+  LOGINFO("Kafka Configuration:\n" <<kafkaConf_ << "\n");
 }
 
 QaBaseApp::~QaBaseApp() {
@@ -69,11 +85,11 @@ std::shared_ptr<kvalobs::subscribe::KafkaProducer> QaBaseApp::kafkaProducer() {
 
   using kvalobs::subscribe::KafkaProducer;
 
-  std::string queue = kvalobs::subscribe::queue::checked(kafkaDomain_);
+  std::string queue = kafkaConf_.topic;
 
-  LOGINFO("Creating kafka connection on " << kafkaBrokers_ << ", using topic " << queue);
+  LOGINFO("Creating kafka connection on " << kafkaConf_.brokers << ", using topic " << queue);
 
-  return std::make_shared < KafkaProducer > (queue, kafkaBrokers_, DataProcessor::onKafkaSendError, DataProcessor::onKafkaSendSuccess);
+  return std::make_shared < KafkaProducer > (queue, kafkaConf_.brokers, DataProcessor::onKafkaSendError, DataProcessor::onKafkaSendSuccess);
 }
 
 std::string QaBaseApp::baseLogDir() {

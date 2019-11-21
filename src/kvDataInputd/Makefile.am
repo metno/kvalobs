@@ -31,11 +31,13 @@ kvDataInputd_SOURCES=\
    RawDataCommand.cc RawDataCommand.h \
    PublishDataCommand.cc PublishDataCommand.h \
    kvDataInputd.cc 
-   
-
 
 kvDataInputd_CPPFLAGS = $(AM_CPPFLAGS) $(libxmlpp_CFLAGS)
-kvDataInputd_LDFLAGS = -pthread -export-dynamic
+kvDataInputd_LDFLAGS = \
+   -pthread -export-dynamic \
+   -R "$(libdir)/@PACKAGE_NAME@/lib" \
+   -R "$(rdkafka_LIBDIR)"
+
 kvDataInputd_LDADD = \
    $(top_builddir)/src/lib/json/libjson.la \
    $(top_builddir)/src/lib/decoder/decoderbase/libkvalobs_decoderbase.la \
@@ -55,9 +57,8 @@ kvDataInputd_LDADD = \
    $(omniORB4_LIBS) \
    -lhttpserver \
    $(libhttpserver_LIBS) \
+   $(rdkafka_LIBS) \
    -ldl
-
-
 
 #if HAVE_GMOCK
 #TESTS = kvDatatInputdTest

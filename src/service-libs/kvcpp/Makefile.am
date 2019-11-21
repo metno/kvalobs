@@ -38,7 +38,9 @@ kvcppinclude_HEADERS = \
 	WorkstatistikIterator.h
 	
 	
-libkvalobs_kvcpp_la_LDFLAGS= -version-info @KVALOBSLIBS_SO_VERSION@
+libkvalobs_kvcpp_la_LDFLAGS= \
+	-version-info @KVALOBSLIBS_SO_VERSION@ \
+	-R "$(libdir)/@PACKAGE_NAME@/lib"
 
 libkvalobs_kvcpp_la_LIBADD = \
 	$(top_builddir)/src/service-libs/kvcpp/kafka/libkafkakvapp.la \
@@ -61,6 +63,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/src/service-libs \
 	-I$(top_builddir)/src/lib \
 	-I$(top_builddir)/src/lib/kvskel \
+	$(rdkafka_CFLAGS) \
 	$(omniORB4_CFLAGS) \
 	$(putools_CFLAGS)
 
@@ -82,7 +85,9 @@ runit_LDFLAGS = \
 	$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
 	$(top_builddir)/src/lib/dnmithread/libkvalobs_dnmithread.la \
 	$(top_builddir)/src/lib/milog/libkvalobs_milog.la \
-	-lboost_system -lboost_timer -lomniDynamic4 -lomniORB4 -lomnithread
+	-lboost_system -lboost_timer -lomniDynamic4 -lomniORB4 -lomnithread \
+	-R "$(rdkafka_LIBDIR)"
+
 
 if HAVE_GTEST
 

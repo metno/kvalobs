@@ -1,3 +1,4 @@
+
 %.h:	%.ui
 	mkdir -p `dirname $@` && $(QT_UIC) $< -o $@
 

@@ -5,6 +5,7 @@
 
 DEBTMP=$(CURDIR)/debian/tmp
 DEBETC=$(DEBTMP)/etc
+DEBLIBKV=$(DEBTMP)/usr/lib/kvalobs
 
 %.sh: %.sql
 	sed s:__UPGRADE_FILE__:$<: db/upgrade_skeleton.sh > $@ 
@@ -15,7 +16,7 @@ DEBETC=$(DEBTMP)/etc
 override_dh_auto_configure: pre-build configure-stamp
 	@true
 
-configure-stamp:
+configure-stamp:  pre-build 
 #	autoreconf -i
 	CXXFLAGS=-g ./configure --prefix=/usr  \
 	    --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info  \
@@ -23,8 +24,9 @@ configure-stamp:
 	    --with-boost-libdir=/usr/lib/x86_64-linux-gnu
 	touch $@
 
-pre-build :: version-deb-autotools
-	@true
+pre-build :: version-deb-autotools 
+
+	
 
 # check that the version specified in configure.ac is the same as the
 # most recent version in debian/changelog
@@ -36,6 +38,10 @@ version-deb-autotools:
 	    echo "Error: debian version '$$DEBIAN_VERSION' != version '$$AC_VERSION' from configure.ac"; \
 	    if [ "x$$KVALOBS_BUILD_VERSION_CHECK" != "xNO" ]; then exit 1; fi \
 	fi;
+
+override_dh_shlibdeps:
+	echo "CURDIR: '$(CURDIR)'"
+	dh_shlibdeps -l/usr/lib/kvalobs/lib:$(DEBLIBKV)/lib:$(DEBLIBKV)/db:$(DEBLIBKV)/decode
 
 override_dh_auto_clean:
 	dh_auto_clean
