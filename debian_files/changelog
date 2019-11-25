@@ -1,3 +1,9 @@
+kvalobs (5.0.0~rc24-1) xenial; urgency=medium
+  * kvQabased: "hang" bugfix, missing db.commit when on observation is selected. 
+   
+ -- Borge Moe <borge.moe@met.no>  Mon, 25 Nov 2019 09:10:00 +0100
+
+
 kvalobs (5.0.0~rc23-1) xenial; urgency=medium
   * kvQabased: Changed selectForControl.
   * kvsubscribe: Kafka added more config options.
