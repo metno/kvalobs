@@ -65,7 +65,7 @@ class NewDataListener : boost::noncopyable {
   bool stopping_;
   std::shared_ptr<db::DatabaseAccess> db_;
   DataProcessor processor_;
-
+  
   ObservationPtr fetchDataToProcess() const;
   qabase::CheckRunner::KvalobsDataPtr runChecks(const qabase::Observation & obs);
   void markProcessDone(const qabase::Observation & obs);

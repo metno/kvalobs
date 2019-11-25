@@ -260,6 +260,7 @@ class DatabaseAccess {
    * Note that this function does _not_ need a transaction to be running - and
    * it should not have one.
    */
+  //virtual std::list<qabase::Observation *> selectDataForControl(int limit=1) = 0;
   virtual qabase::Observation * selectDataForControl() = 0;
 
   virtual void markProcessDone(const qabase::Observation & obs) = 0;
