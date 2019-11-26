@@ -160,6 +160,9 @@ class Configuration {
     return numberOfLogs_;
   }
 
+  int selectForControlCount()const {
+    return selectForControlCount_;
+  }
 
   /**
    * Print version information to the given stream.
@@ -200,6 +203,7 @@ class Configuration {
   std::string user_;
   int logSize_;
   int numberOfLogs_;
+  int selectForControlCount_;
 
   unsigned processCount_;
  

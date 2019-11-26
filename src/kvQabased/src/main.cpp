@@ -224,7 +224,7 @@ int main(int argc, char ** argv) {
       LOGDEBUG("Connecting to database: " << dbConnect);
       auto db = std::make_shared<db::KvalobsDatabaseAccess>(dbConnect);
       auto checkRunner = std::make_shared<qabase::CheckRunner>(db);
-      qabase::NewDataListener listener(db);
+      qabase::NewDataListener listener(db, config.selectForControlCount());
       listener.run();
     }
   } catch (std::exception & e) {

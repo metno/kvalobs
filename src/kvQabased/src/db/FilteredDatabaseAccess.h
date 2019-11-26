@@ -133,9 +133,15 @@ class FilteredDatabaseAccess : public DatabaseAccess {
     baseImplementation_->write(data);
   }
 
-  virtual qabase::Observation * selectDataForControl() {
+  virtual std::list<qabase::Observation *> selectDataForControl(int limit=1) {
+    return baseImplementation_->selectDataForControl(limit);
+  }
+
+/*
+virtual qabase::Observation * selectDataForControl() {
     return baseImplementation_->selectDataForControl();
   }
+*/
 
   virtual void markProcessDone(const qabase::Observation & obs) {
     baseImplementation_->markProcessDone(obs);

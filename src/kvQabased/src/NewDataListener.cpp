@@ -50,10 +50,11 @@ namespace {
 std::set<NewDataListener*> listeners;
 }
 
-NewDataListener::NewDataListener(std::shared_ptr<db::DatabaseAccess> db)
+NewDataListener::NewDataListener(std::shared_ptr<db::DatabaseAccess> db, int selectForControlCount)
     : stopping_(true),
       db_(db),
-      processor_(CheckRunner::create(QaBaseApp::createConnectString())) {
+      processor_(CheckRunner::create(QaBaseApp::createConnectString())),
+      selectForControlCount_(selectForControlCount) {
   listeners.insert(this);
 }
 
@@ -81,10 +82,35 @@ void NewDataListener::run() {
   }
 }
 
-qabase::NewDataListener::ObservationPtr NewDataListener::fetchDataToProcess() const {
+
+//Select selectForControllCount_ observations from workque. Return the
+//first observation and save the rest in the list selectedForControl.
+Observation* NewDataListener::fetchDataToProcess_() const {
   while (!stopping()) {
     try {
-      qabase::NewDataListener::ObservationPtr ret(db_->selectDataForControl());
+      auto obs=db_->selectDataForControl(selectForControlCount_);
+      auto it=obs.begin();
+
+      if ( it == obs.end() )
+        return nullptr;
+
+      auto ret = *it;
+
+      for( ++it; it != obs.end(); ++it ) {
+        selectedForControl.push_back(*it);
+      }
+
+      { //DEBUG
+        std::ostringstream ost;
+        ost << "FetchDataForControl_: # " << selectedForControl.size()+1 << "\n"
+            << ret->id() << " (" << ret->stationID() << "/" << ret->typeID() << "/" << ret->obstime() << ")\n"; 
+
+        for( auto p : selectedForControl) {
+          ost <<p->id() << " (" << p->stationID() << "/" << p->typeID() << "/" << p->obstime() << ")\n"; 
+        }
+        LOGINFO(ost.str());
+      } //END DEBUG
+
       return ret;
     } catch (dnmi::db::SQLSerializeError & e) {
       db_->rollback();
@@ -92,8 +118,21 @@ qabase::NewDataListener::ObservationPtr NewDataListener::fetchDataToProcess() co
       std::this_thread::sleep_for(std::chrono::milliseconds(25 + (std::rand() % 50)));
     }
   }
-  return qabase::NewDataListener::ObservationPtr();
+  return nullptr;
 }
+
+qabase::NewDataListener::ObservationPtr NewDataListener::fetchDataToProcess() const 
+{
+  Observation  *ret;
+  if ( selectedForControl.begin() != selectedForControl.end() ) {
+    ret=selectedForControl.front();
+    selectedForControl.pop_front();
+  } else {
+    ret=fetchDataToProcess_();
+  }
+  return ObservationPtr(ret);
+}
+
 
 qabase::CheckRunner::KvalobsDataPtr NewDataListener::runChecks(const qabase::Observation & obs) {
   try {

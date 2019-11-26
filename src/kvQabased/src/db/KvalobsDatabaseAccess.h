@@ -111,7 +111,8 @@ class KvalobsDatabaseAccess : public db::DatabaseAccess {
 
   virtual void write(const DataList & data);
 
-  virtual qabase::Observation * selectDataForControl();
+  std::list<qabase::Observation *> selectDataForControl(int limit=1);
+  //virtual qabase::Observation * selectDataForControl();
 
   virtual void markProcessDone(const qabase::Observation & obs);
 
@@ -136,10 +137,10 @@ class KvalobsDatabaseAccess : public db::DatabaseAccess {
   void storeFetched(long long obsid, const kvalobs::kvTextData & d) const;
 
   //Helper methods for selectDataForControl
-  qabase::Observation *selectFailedDataForControl();  
-  qabase::Observation *selectLatestDataBasedOnObstimeForControl();  
-  qabase::Observation *selectOlderDataControl();
-  qabase::Observation *newObservation(std::unique_ptr<dnmi::db::Result> &r);
+  std::list<qabase::Observation *> selectFailedDataForControl(int limit);  
+  std::list<qabase::Observation *> selectLatestDataBasedOnObstimeForControl(int limit);  
+  std::list<qabase::Observation *> selectOlderDataControl(int limit);
+  std::list<qabase::Observation *> newObservation(std::unique_ptr<dnmi::db::Result> &r);
 
 };
 

@@ -627,59 +627,60 @@ void KvalobsDatabaseAccess::write(const DataList & data) {
 
 
 
-qabase::Observation *KvalobsDatabaseAccess::selectFailedDataForControl() {
+std::list<qabase::Observation *> KvalobsDatabaseAccess::selectFailedDataForControl(int limit ) {
     //Check for any data that has not completed the check in the last 10 minutes. Possibly crached or stopped 
     //qaBase process. We run the checks again.
    
     //SELECT o.observationid, stationid, typeid, obstime, o.tbtime FROM workque q, observations o WHERE q.observationid=o.observationid AND qa_start<now()-'10 minutes'::interval AND qa_stop is null ORDER BY priority, tbtime LIMIT 1;";
 
-    std::string query = 
-      "SELECT o.observationid, stationid, typeid, obstime, o.tbtime FROM workque q, observations o "
+    std::ostringstream query; 
+    query << "SELECT o.observationid, stationid, typeid, obstime, o.tbtime FROM workque q, observations o "
       "WHERE q.observationid=o.observationid AND qa_start<now()-'10 minutes'::interval AND qa_stop is null "
-      " ORDER BY priority, tbtime LIMIT 1;";
+      " ORDER BY priority, tbtime LIMIT " << limit << ";";
 
-    std::unique_ptr<dnmi::db::Result> result(connection_->execQuery(query));
+    std::unique_ptr<dnmi::db::Result> result(connection_->execQuery(query.str()));
 
     return newObservation(result);
     
 }
 
 
-qabase::Observation *KvalobsDatabaseAccess::selectLatestDataBasedOnObstimeForControl() {
+std::list<qabase::Observation *> KvalobsDatabaseAccess::selectLatestDataBasedOnObstimeForControl( int limit) {
   //Ensure that we process the latest data the last 3 hours first.
   //Truncate the search criteria to hour, with minutes, seconds, microsecond set to zero.
   
   //SELECT o.observationid, stationid, typeid, obstime, o.tbtime FROM workque q, observations o WHERE q.observationid=o.observationid AND qa_start IS NULL AND process_start is not null AND obstime >= date_trunc('hour', now()-'3 hours'::interval) ORDER BY priority, obstime LIMIT 1;
 
 
-  std::string query = 
-      "SELECT o.observationid, stationid, typeid, obstime, o.tbtime FROM workque q, observations o "
+  std::ostringstream query; 
+  query << "SELECT o.observationid, stationid, typeid, obstime, o.tbtime FROM workque q, observations o "
       "WHERE q.observationid=o.observationid AND qa_start IS NULL AND process_start is not null" 
       " AND obstime >= date_trunc('hour', now()-'3 hours'::interval) "
-      "ORDER BY priority, obstime LIMIT 1;";
+      "ORDER BY priority, obstime LIMIT "<< limit << ";";
 
-  std::unique_ptr<dnmi::db::Result> result(connection_->execQuery(query));
+  std::unique_ptr<dnmi::db::Result> result(connection_->execQuery(query.str()));
 
   return newObservation(result);
 }  
 
-qabase::Observation *KvalobsDatabaseAccess::selectOlderDataControl() {
+std::list<qabase::Observation *> KvalobsDatabaseAccess::selectOlderDataControl(int limit) {
   //Process older data sorted by tbtime. Process the latest observations first. 
   //SELECT o.observationid, stationid, typeid, obstime, o.tbtime FROM workque q, observations o WHERE q.observationid=o.observationid AND process_start is not null AND qa_start IS NULL ORDER BY priority, tbtime LIMIT 1;
-  std::string query = 
-      "SELECT o.observationid, stationid, typeid, obstime, o.tbtime FROM workque q, observations o "
+  std::ostringstream query;
+      query << "SELECT o.observationid, stationid, typeid, obstime, o.tbtime FROM workque q, observations o "
       "WHERE q.observationid=o.observationid AND process_start is not null AND qa_start IS NULL "
-      "ORDER BY priority, tbtime LIMIT 1;";
+      "ORDER BY priority, tbtime LIMIT " << limit <<";";
 
-  std::unique_ptr<dnmi::db::Result> result(connection_->execQuery(query));
+  std::unique_ptr<dnmi::db::Result> result(connection_->execQuery(query.str()));
   return newObservation(result);
 }
 
-qabase::Observation*
+std::list<qabase::Observation *>
 KvalobsDatabaseAccess::newObservation(std::unique_ptr<dnmi::db::Result> &r)
 {
+  std::list<qabase::Observation *> ret;
   if (!r || !r->hasNext()) {
-    return nullptr;
+    return ret;
   }
 
   auto row = r->next();
@@ -690,9 +691,91 @@ KvalobsDatabaseAccess::newObservation(std::unique_ptr<dnmi::db::Result> &r)
   boost::posix_time::ptime obstime =
     boost::posix_time::time_from_string(row[3]);
   boost::posix_time::ptime tbtime = boost::posix_time::time_from_string(row[4]);
-  return new qabase::Observation(observationid, station, type, obstime, tbtime);
+  ret.push_back(new qabase::Observation(observationid, station, type, obstime, tbtime));
+  return ret;
 }
 
+std::list<qabase::Observation *> KvalobsDatabaseAccess::selectDataForControl(int limit) 
+{
+std::string whichSelect="(Crached checks)";
+  std::string selectProgres="(Crached checks)";
+  bool needOwnTransaction = !connection_->transactionInProgress();
+  if (needOwnTransaction) {
+    LOGINFO("trying to select data for control - SERIALIZABLE" );
+    connection_->beginTransaction(dnmi::db::Connection::SERIALIZABLE);
+  } else {
+    LOGWARN("trying to select data for control with previous transaction - isolation level not guaranteed");
+  }
+
+  try {
+    std::list<qabase::Observation *> obs=selectFailedDataForControl(10);
+
+    if( ! obs.empty() ) {
+      whichSelect="(Latest obs)";
+      obs = selectLatestDataBasedOnObstimeForControl( limit );
+    }
+
+    int n=limit/2;
+    if ( n<=0 )
+      n=1;
+
+    if( ! obs.empty() ) {
+      whichSelect="(Older obs)";
+      obs = selectOlderDataControl(n);
+    }
+
+    if(!obs.empty()) {
+      LOGINFO("No observation selected for controll.");
+      if (needOwnTransaction)
+        connection_->commit();
+    
+      return obs;
+    }
+
+    std::ostringstream query;
+    for ( auto o : obs ) {
+      query << "UPDATE workque SET qa_start=statement_timestamp() WHERE ";
+      query << "observationid=" << o->id() << ";";
+    }
+
+    milog::LogContext context("query");
+    LOGDEBUG1(query.str());
+
+    connection_->exec(query.str());
+    if (needOwnTransaction)
+      connection_->commit();
+    
+    auto p =(*obs.begin())->id();
+
+
+    if ( obs.size() == 1 ) {
+      LOGINFO("Selected for control "<< whichSelect <<": " << (*obs.begin())->stationID() <<"/" 
+        << (*obs.begin())->typeID()  << "/" << pt::to_kvalobs_string((*obs.begin())->obstime()) <<"/" 
+        << pt::to_kvalobs_string((*obs.begin())->tbtime()) << " (" << (*obs.begin())->id() << ")");
+    } else {
+      std::ostringstream log;
+      log << "Selected for control "<< whichSelect <<": #observations " << obs.size() << "\n";
+      for ( auto a : obs ) {
+        log << (*obs.begin())->stationID() <<"/" << (*obs.begin())->typeID()  << "/" 
+            << pt::to_kvalobs_string((*obs.begin())->obstime()) <<"/" 
+            << pt::to_kvalobs_string((*obs.begin())->tbtime()) << " (" << (*obs.begin())->id() << ")";
+      }
+      LOGINFO(log.str()); 
+    }
+    return obs;
+  }
+  catch (const std::exception &e ) {
+    LOGWARN("EXCEPTION: selectDataForControl: " << e.what());
+    throw;
+  }
+  catch (const std::exception &e ) {
+    LOGWARN("EXCEPTION: selectDataForControl: Unknown exception");
+    throw;
+  }
+}
+
+
+#if 0
 qabase::Observation * KvalobsDatabaseAccess::selectDataForControl() {
   std::string whichSelect="(Crached checks)";
   std::string selectProgres="(Crached checks)";
@@ -749,7 +832,7 @@ qabase::Observation * KvalobsDatabaseAccess::selectDataForControl() {
     throw;
   }
 }
-
+#endif
 
 
 /*

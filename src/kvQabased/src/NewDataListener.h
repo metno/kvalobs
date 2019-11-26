@@ -34,6 +34,7 @@
 #include <boost/noncopyable.hpp>
 #include <memory>
 #include <string>
+#include <list>
 #include "kvalobs/kvStationInfo.h"
 
 namespace kvalobs {
@@ -47,7 +48,7 @@ namespace qabase {
 
 class NewDataListener : boost::noncopyable {
  public:
-  explicit NewDataListener(std::shared_ptr<db::DatabaseAccess> db);
+  explicit NewDataListener(std::shared_ptr<db::DatabaseAccess> db, int selectForControlCount=5);
   ~NewDataListener();
 
   void run();
@@ -65,7 +66,10 @@ class NewDataListener : boost::noncopyable {
   bool stopping_;
   std::shared_ptr<db::DatabaseAccess> db_;
   DataProcessor processor_;
+  int selectForControlCount_;
+  mutable std::list<Observation*> selectedForControl;
   
+  Observation* fetchDataToProcess_() const;
   ObservationPtr fetchDataToProcess() const;
   qabase::CheckRunner::KvalobsDataPtr runChecks(const qabase::Observation & obs);
   void markProcessDone(const qabase::Observation & obs);

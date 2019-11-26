@@ -152,7 +152,10 @@ database.add_options()(
                                       "Hostname of database")(
     "port,p", value<int>(&port_), "Port of database")(
     "user,U", value<std::string>(&user_)->default_value(databaseUser),
-    "Database user");
+    "Database user")(
+    "select-for-control-count,s",value<int>(&selectForControlCount_)->default_value(5),
+      "Number of stations to select for controll from worque in one transaction."
+    );
 
 
 
