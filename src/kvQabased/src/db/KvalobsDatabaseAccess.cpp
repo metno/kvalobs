@@ -683,22 +683,22 @@ KvalobsDatabaseAccess::newObservation(std::unique_ptr<dnmi::db::Result> &r)
     return ret;
   }
 
-  auto row = r->next();
-
-  long long observationid = boost::lexical_cast<long long>(row[0]);
-  int station = boost::lexical_cast<int>(row[1]);
-  int type = boost::lexical_cast<int>(row[2]);
-  boost::posix_time::ptime obstime =
-    boost::posix_time::time_from_string(row[3]);
-  boost::posix_time::ptime tbtime = boost::posix_time::time_from_string(row[4]);
-  ret.push_back(new qabase::Observation(observationid, station, type, obstime, tbtime));
+  while( r->hasNext() ) {
+    auto row = r->next();
+    long long observationid = boost::lexical_cast<long long>(row[0]);
+    int station = boost::lexical_cast<int>(row[1]);
+    int type = boost::lexical_cast<int>(row[2]);
+    boost::posix_time::ptime obstime =
+      boost::posix_time::time_from_string(row[3]);
+    boost::posix_time::ptime tbtime = boost::posix_time::time_from_string(row[4]);
+    ret.push_back(new qabase::Observation(observationid, station, type, obstime, tbtime));
+  }
   return ret;
 }
 
 std::list<qabase::Observation *> KvalobsDatabaseAccess::selectDataForControl(int limit) 
 {
-std::string whichSelect="(Crached checks)";
-  std::string selectProgres="(Crached checks)";
+  std::string whichSelect="(Crached checks)";
   bool needOwnTransaction = !connection_->transactionInProgress();
   if (needOwnTransaction) {
     LOGINFO("trying to select data for control - SERIALIZABLE" );
@@ -710,7 +710,7 @@ std::string whichSelect="(Crached checks)";
   try {
     std::list<qabase::Observation *> obs=selectFailedDataForControl(10);
 
-    if( ! obs.empty() ) {
+    if( obs.empty() ) {
       whichSelect="(Latest obs)";
       obs = selectLatestDataBasedOnObstimeForControl( limit );
     }
@@ -719,12 +719,12 @@ std::string whichSelect="(Crached checks)";
     if ( n<=0 )
       n=1;
 
-    if( ! obs.empty() ) {
+    if( obs.empty() ) {
       whichSelect="(Older obs)";
       obs = selectOlderDataControl(n);
     }
 
-    if(!obs.empty()) {
+    if(obs.empty()) {
       LOGINFO("No observation selected for controll.");
       if (needOwnTransaction)
         connection_->commit();
@@ -734,8 +734,8 @@ std::string whichSelect="(Crached checks)";
 
     std::ostringstream query;
     for ( auto o : obs ) {
-      query << "UPDATE workque SET qa_start=statement_timestamp() WHERE ";
-      query << "observationid=" << o->id() << ";";
+      query << "UPDATE workque SET qa_start=statement_timestamp() WHERE "
+            << "observationid=" << o->id() << ";";
     }
 
     milog::LogContext context("query");
@@ -765,10 +765,10 @@ std::string whichSelect="(Crached checks)";
     return obs;
   }
   catch (const std::exception &e ) {
-    LOGWARN("EXCEPTION: selectDataForControl: " << e.what());
+    LOGWARN("EXCEPTION: selectDataForControl (1): " << e.what());
     throw;
   }
-  catch (const std::exception &e ) {
+  catch ( ... ) {
     LOGWARN("EXCEPTION: selectDataForControl: Unknown exception");
     throw;
   }
