@@ -44,6 +44,13 @@ KvDataSubscribeInfoHelper::~KvDataSubscribeInfoHelper() {
 }
 
 bool KvDataSubscribeInfoHelper::addStationId(long stationid) {
+  //statioid == 0, means all station. Here all stations 
+  //means that the ids list is empty. So we do not add it.
+  //Maybe we also should clean the list.
+
+  if ( stationid == 0)
+    return true;
+  
   CORBA::Long index = info_.ids.length();
 
   try {

@@ -1,3 +1,19 @@
+kvalobs (5.0.0-1) xenial; urgency=medium
+  * kvQabased: performance. Select multiple workque elements per selectForControl.
+  * kvQabased: Changes how selectForControl work. 
+      - Allways check if there is any "crached/stopped" jobs. 
+        (qa_start is not null and qa_start is null and qa_start < 10 minutes.) 
+      - Use obstime and priority for the latest 3 hours.
+      - tbtime and priority for older.
+  * kvQabased: bugfix. Multiple checks of the same observation. (in different processes).
+  * kvDataInputd: tbtime is always set to the first message received for the 
+    stationid/typeid/obstime.
+  * kvDataInputd: shortcut HQC only data, ie send it directly to the kafka queue *.checked
+     omitting workque and hence kvQabased.
+  * libkvcpp: bugfix, stationid==0, means all.
+
+ -- Borge Moe <borge.moe@met.no>  Thu, 28 Nov 2019 10:55:00 +0100
+
 kvalobs (5.0.0~rc24-1) xenial; urgency=medium
   * kvQabased: "hang" bugfix, missing db.commit when on observation is selected. 
    

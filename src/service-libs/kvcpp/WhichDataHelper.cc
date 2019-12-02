@@ -66,8 +66,45 @@ bool kvservice::WhichDataHelper::addStation(
   if (from.is_not_a_date_time())
     return false;
 
-  whichData_.length(i + 1);
+  if( i != 0 && (stationid == 0 || whichData_[0].stationid==0)) {
+    boost::posix_time::ptime f=from;
+    boost::posix_time::ptime t=to;
 
+    for( i=0; i<whichData_.length(); ++i) {
+      //Try to merge all obstime such that it span the full range.
+      //If toObsTime is undefined it means all data from fromObsTime.
+      const char *sFrom=whichData_[i].fromObsTime;
+      auto tmpFrom = boost::posix_time::time_from_string_nothrow(sFrom);
+      auto tmpTo = boost::posix_time::ptime();
+
+      if (whichData_[i].toObsTime[0] != '\0') {
+        const char *sTo=whichData_[i].toObsTime;
+        tmpTo = boost::posix_time::time_from_string_nothrow(sTo);
+      }
+
+      if( ! tmpFrom.is_not_a_date_time() && tmpFrom < f )
+        f=tmpFrom;
+
+      if( ! (tmpTo.is_not_a_date_time() || t.is_not_a_date_time()) && tmpTo > t )
+        t=tmpTo;
+      else
+        t = boost::posix_time::ptime();
+    }
+
+    whichData_[0].stationid = 0;
+    whichData_[0].status = statusId_;
+    whichData_[0].fromObsTime = to_kvalobs_string(f).c_str();
+
+    if (t.is_not_a_date_time())
+      whichData_[0].toObsTime = (const char*) "";
+    else
+       whichData_[0].toObsTime = to_kvalobs_string(to).c_str();
+
+    whichData_.length(1);
+    return true;
+  }
+
+  whichData_.length(i + 1);
   whichData_[i].stationid = stationid;
   whichData_[i].status = statusId_;
   whichData_[i].fromObsTime = to_kvalobs_string(from).c_str();

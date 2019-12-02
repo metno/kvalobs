@@ -147,19 +147,24 @@ bool SqlGet::getKvStations(std::list<kvalobs::kvStation> &stationList) {
 bool SqlGet::getKvModelData(std::list<kvalobs::kvModelData> &dataList,
                             const WhichDataHelper &wd) {
   std::ostringstream q;
-  q << "select * from model_data";
+  q << "SELECT * FROM model_data";
   auto * whichData = wd.whichData();
   if (whichData and whichData->length() > 0) {
-    q << " where ";
+    q << " WHERE ";
     for (int i = 0; i < whichData->length(); ++i) {
       if (i != 0)
-        q << " or ";
+        q << " OR ";
       auto dataElement = (*whichData)[i];
-      q << "(stationid=" << dataElement.stationid << " and ";
-      if (strcmp(dataElement.fromObsTime, dataElement.toObsTime) == 0)
+      q<< "(";
+      if( dataElement.stationid != 0 )
+        q << "stationid=" << dataElement.stationid << " AND ";
+      
+      if (strcmp(dataElement.fromObsTime, dataElement.toObsTime) == 0) 
         q << "obstime='" << dataElement.fromObsTime << "')";
+      else if ( dataElement.toObsTime[0]=='\0' )
+        q << "obstime >= '" <<  dataElement.fromObsTime << "')";
       else
-        q << "obstime between '" << dataElement.fromObsTime << "' and '"
+        q << "obstime BETWEEN '" << dataElement.fromObsTime << "' AND '"
           << dataElement.toObsTime << "')";
     }
   }

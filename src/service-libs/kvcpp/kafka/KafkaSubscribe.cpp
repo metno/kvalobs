@@ -204,7 +204,7 @@ KafkaSubscribe::SubscriberID KafkaSubscribe::subscribeDataNotify(
 
 KafkaSubscribe::SubscriberID KafkaSubscribe::subscribeKvHint(
     dnmi::thread::CommandQue &queue) {
-  throw std::runtime_error("Not implemented!");
+  throw std::runtime_error("subscribeKvHint: Not implemented!");
 }
 
 void KafkaSubscribe::unsubscribe(const SubscriberID &subscriberid) {

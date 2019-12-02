@@ -118,21 +118,26 @@ void KvDataHandler::operator()(const WhichDataHelper & wd) {
 std::string KvDataHandler::query_(const WhichDataHelper & wd,
                                   const std::string & table) {
   const CKvalObs::CService::WhichDataList * whichDataList = wd.whichData();
-
   std::ostringstream query;
-  query << "select * from " << table;
+ 
+  query << "SELECT * FROM " << table;
 
   if (whichDataList->length() > 0) {
-    query << " where ";
+    query << " WHERE ";
     for (int i = 0; i < whichDataList->length(); ++i) {
       if (i != 0)
-        query << "or ";
+        query << "OR ";
       auto whichData = (*whichDataList)[i];
-      query << "(stationid=" << whichData.stationid << " ";
-      query << "and obstime>='" << whichData.fromObsTime << "' ";
-      if (whichData.toObsTime[0] != '\0')
-        query << "and obstime<='" << whichData.toObsTime << "' ";
-      query << ")";
+      query << "(";
+      if( whichData.stationid != 0 )
+        query << "stationid=" << whichData.stationid << " AND ";
+
+      if( strcmp(whichData.fromObsTime, whichData.toObsTime) == 0 ) 
+        query << "obstime='" << whichData.fromObsTime << "' )";
+      else if (whichData.toObsTime[0] == '\0')
+        query << "obstime>='" << whichData.fromObsTime << "' )";
+      else
+        query << "obstime>='" << whichData.fromObsTime<< "' AND obstime<='" << whichData.toObsTime << "' )";
     }
   }
   query << " order by stationid, obstime, typeid";

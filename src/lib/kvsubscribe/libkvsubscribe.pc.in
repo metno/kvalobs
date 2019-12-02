@@ -9,5 +9,5 @@ Name: libkvsubscribe
 Description: Data subscription library for Kvalobs
 Version: @VERSION@
 Requires: libkvalobs_decodeutility libkvalobs_miutil
-Libs: -L${libdir} -lkvalobs_kvsubscribe -lrdkafka++ -lrdkafka
+Libs: -Wl,-rpath-link=${pkglibdir}/lib -L${libdir} -lkvalobs_kvsubscribe 
 Cflags: -I@includedir@/kvalobs

@@ -54,6 +54,7 @@ libkvalobs_kvcpp_la_LIBADD = \
 	$(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la \
 	$(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
 	$(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la \
+	$(rdkafka_LIBS) \
 	@BOOST_FILESYSTEM_LIB@
 
 AM_CPPFLAGS = \

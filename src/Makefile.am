@@ -10,7 +10,7 @@ SUBDIRS = \
 	script \
 	tools/kv2kvparser \
 	tools/kv2kvDataInputd \
-	tools/aexecd 
+	tools/aexecd \
+	tools/kvpull
 	
-
 #tools/kvpush 
