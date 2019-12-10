@@ -84,6 +84,8 @@ DataUpdateTransaction::DataUpdateTransaction(const boost::posix_time::ptime &obs
       obstime(obstime),
       stationid(stationid),
       typeid_(typeID),
+      observationid(0),
+      startTime(pt::microsec_clock::universal_time()),
       data_(new kvalobs::serialize::KvalobsData()),
       dataToPublish_(new kvalobs::serialize::KvalobsData()),
       ok_(new bool(false)),
@@ -102,6 +104,8 @@ DataUpdateTransaction::DataUpdateTransaction(const DataUpdateTransaction &dut)
       obstime(dut.obstime),
       stationid(dut.stationid),
       typeid_(dut.typeid_),
+      observationid(dut.observationid),
+      startTime(dut.startTime),
       data_(dut.data_),
       dataToPublish_(dut.dataToPublish_),
       ok_(dut.ok_),
@@ -165,17 +169,20 @@ void DataUpdateTransaction::checkWorkQue(dnmi::db::Connection *con, long observa
   worqueToWorkStatistik(con, observationid);
 }
 
-void DataUpdateTransaction::updateWorkQue(dnmi::db::Connection *con, long observationid, int pri) {
+void DataUpdateTransaction::updateWorkQue(dnmi::db::Connection *con, long observationid_, int pri) {
   if ( ! addToWorkQueue || onlyHqcData) {
+    observationid=-observationid_;
+    duration = pt::microsec_clock::universal_time() - startTime;
     return;
   }
-  
+  observationid=observationid_;
   ostringstream q;
 
   q << "INSERT INTO workque (observationid,priority,process_start,qa_start,qa_stop,service_start,service_stop) "
     << "VALUES(" << observationid << "," << pri << ",NULL,NULL,NULL,NULL,NULL)";
 
   con->exec(q.str());
+  duration = pt::microsec_clock::universal_time() - startTime;
 }
 
 
@@ -592,6 +599,8 @@ bool DataUpdateTransaction::operator()(dnmi::db::Connection *conection) {
     IDLOGINFO("duplicates", "DUPLICATE: stationid: " << stationid << " typeid: " << typeid_ << " obstime: " << pt::to_kvalobs_string(obstime));
     dataToPublish_->clear();    
     insertType = "DUPLICATE";
+    duration = pt::microsec_clock::universal_time() - startTime;
+    observationid=oldObs->observationid();
     return true;
   }
 
@@ -604,10 +613,17 @@ bool DataUpdateTransaction::operator()(dnmi::db::Connection *conection) {
   return replaceObservation(conection, oldObs->observationid());
 }
 
+std::string DataUpdateTransaction::transactionLogString() {
+  ostringstream s;
+
+  s << "(" << observationid << ": " << stationid << "/" << typeid_<< "/" <<pt::to_kvalobs_string(obstime) << ") duration=" << duration.total_milliseconds() << "ms";
+  return s.str();
+}
+
 void DataUpdateTransaction::onSuccess() {
   ostringstream mylog;
   string prefix(insertType.length(), ' ');
-  mylog << insertType << ": stationid: " << stationid << " typeid: " << typeid_ << " obstime: " << pt::to_kvalobs_string(obstime);
+  mylog << insertType << ": " << transactionLogString();
   IDLOGINFO(logid, log.str());
   IDLOGINFO("transaction", mylog.str());
   *ok_ = true;
@@ -616,7 +632,7 @@ void DataUpdateTransaction::onSuccess() {
 void DataUpdateTransaction::onFailure() {
   ostringstream mylog;
   string prefix(insertType.length(), ' ');
-  mylog << insertType << ": Failed: stationid: " << stationid << " typeid: " << typeid_ << " obstime: " << pt::to_kvalobs_string(obstime);
+  mylog << insertType << ": Failed: stationid: " << transactionLogString();
   IDLOGERROR(logid, log.str());
   IDLOGERROR("transaction", mylog.str());
 }
@@ -651,7 +667,7 @@ void DataUpdateTransaction::onMaxRetry(const std::string &lastError, const std::
   IDLOGERROR(
       "failed",
       "Transaction Failed (mayRecover=" << (mayRecover?"true":"false") << " errorCode=" << errorCode <<").\n" << " Stationid: " << stationid << " Typeid: " << typeid_ << " obstime: " << pt::to_kvalobs_string(obstime) << "\nLast error: " << lastError << mylog.str());
-  IDLOGERROR("transaction", "   FAILED: Stationid: " << stationid << " Typeid: " << typeid_ << " obstime: " << pt::to_kvalobs_string(obstime));
+  IDLOGERROR("transaction", "   FAILED: " << transactionLogString() );
   throw SQLException(lastError, errorCode, mayRecover);
 }
 
