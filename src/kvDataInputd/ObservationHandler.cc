@@ -60,6 +60,8 @@ ObservationHandler::ObservationHandler(DataSrcApp &app, kvalobs::service::Produc
 
 void ObservationHandler::render_POST(const httpserver::http_request& req, httpserver::http_response** res) {
   Json::Value jval;
+  bool ok=false;
+  std::ostringstream oerr;
 
   if (app.inShutdown()) {
     *res = new http_response(http_response_builder("The service is unavailable.", HttpServiceUnavailable).string_response());
@@ -85,23 +87,31 @@ void ObservationHandler::render_POST(const httpserver::http_request& req, httpse
     r = app.newObservation(obs.obsType.c_str(), obs.obs.c_str(), "http");
     jval = kd::decodeResultToJson(r);
     if (r.res == kd::EResult::OK) {
+      ok=true;
       *res = new http_response(http_response_builder(jval.toStyledString(), HttpOk, "application/json").string_response());
     } else if (r.res == kd::EResult::ERROR && b::starts_with(r.message, "SHUTDOWN")) {
       *res = new http_response(http_response_builder("The service is unavailable.", HttpServiceUnavailable).string_response());
+      oerr << "The service is unavailable.\n";
     } else {
       *res = new http_response(http_response_builder(jval.toStyledString(), HttpBadRequest, "application/json").string_response());
+      oerr << jval.toStyledString() << "\n";
     }
   } catch (const DecodeResultException &ex) {
+    oerr << "DecodeResultException: " << ex.what() << "\n"; 
     LOGERROR("DecodeResultException: " << ex.what() << "\nobsType: '" << obs.obsType << "'\n" << "obsData:[\n" << obs.obs << "\n]\n")
     jval = decodeResultToJson(ex);
     *res = new http_response(http_response_builder(jval.toStyledString(), HttpBadRequest, "application/json").string_response());
-    return;
   } catch ( const std::exception &ex) {
+    oerr << "Unexpected exception: " << ex.what() << "\n";
     LOGERROR("Unexpected exception: " << ex.what() << "\nobsType: '" << obs.obsType << "'\n" << "obsData:[\n" << obs.obs << "\n]\n")
     string err("Problems: " );
     err += ex.what();
     *res = new http_response(http_response_builder(err, HttpInternalServerError, "application/text" ).string_response());
   }
+
+  if( !ok && obs.obsType.find("kv2kv") != string::npos) {
+    IDLOGDEBUG("kv2kvdecoder", "Serialnumber: " << serialNumber << "\n" << oerr.str() << obs.obsType<<"\n"<<req.get_content()<<"\n" << obs.obs );
+  } 
 }
 
 ObservationHandler::Observation ObservationHandler::getObservation(const httpserver::http_request& req) {

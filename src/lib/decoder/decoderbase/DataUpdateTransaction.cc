@@ -43,6 +43,7 @@ namespace pt = boost::posix_time;
 using dnmi::db::SQLException;
 using std::string;
 using std::endl;
+using std::cerr;
 using std::ostringstream;
 using std::list;
 using std::auto_ptr;
@@ -463,7 +464,12 @@ bool DataUpdateTransaction::updateObservation(dnmi::db::Connection *conection, O
   list<kvalobs::kvData> toUpdateData(*newData);
   list<kvalobs::kvTextData> toUpdateTextData(*newTextData);
 
+  //TODO: Check for only missing data
+  bool noOldData=obs->totSize()==0;
+  
 #if 0
+  cerr <<  "OldObs: stationid: #data: " << obs->dataSize() << " #textdata: " << obs->textDataSize() << " noOldData: "<< (noOldData?"true":"false") 
+       << " observationid: " << obs->observationid() << "  "<<obs->stationID() <<"/" << obs->typeID() << "/" << obs->obstime() << endl;
   std::cerr << "updateObservation: incomming \n";
   for ( auto &d : toUpdateData )
     std::cerr << "updateObservation (d): new: " << d.obstime() << ", " << d.stationID() << ", " << d.typeID() << ", " << d.paramID() <<  d.original() << "\n";
@@ -506,6 +512,33 @@ bool DataUpdateTransaction::updateObservation(dnmi::db::Connection *conection, O
 
   conection->exec(q.str());
   pt::ptime tbTime = useTbTime(toUpdateData, toUpdateTextData, obs->tbtime());
+
+#if 0
+  //BEGIN: debug
+  if( tbTime.is_not_a_date_time() ) {
+      IDLOGERROR(logid, "updateObservation: tbTime is invalid.");
+      if( obs->tbtime().is_not_a_date_time() ) {
+        IDLOGERROR(logid, "updateObservation: obs->tbTime is invalid.");
+      }
+      tbTime=pt::microsec_clock::universal_time();
+      if ( tbTime.is_not_a_date_time() ) {
+          IDLOGERROR(logid, "updateObservation: tbTime still is invalid.");
+      }
+  }
+
+  if( obstime.is_not_a_date_time() ) {
+      IDLOGERROR(logid, "updateObservation: obstime is invalid.");
+  }
+
+  if( obs->obstime().is_not_a_date_time() ) {
+      IDLOGERROR(logid, "updateObservation: obs->obstime is invalid.");
+  }
+  //END: debug
+
+  if ( noOldData ) {
+    tbTime=pt::microsec_clock::universal_time();
+  }
+#endif
 
   Observation newObs(obs->stationID(), obs->typeID(), obs->obstime(), tbTime, toUpdateData, toUpdateTextData);
   newObs.insertIntoDb(conection, false);

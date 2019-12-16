@@ -146,7 +146,7 @@ DecoderBase::DecodeResult kv2kvDecoder::execute(std::string & msg) {
 void kv2kvDecoder::saveInRejectDecode() {
   std::string originalMessage = parseMessage_;
   try {
-    kvRejectdecode reject(obs, tbtime, name(), parseMessage_);
+    kvRejectdecode reject(obsType + "\n" + obs, tbtime, name(), parseMessage_);
     if (!this->putRejectdecodeInDb(reject))
       throw std::runtime_error("Unable to save data in rejectdecode table!");
   } catch (std::exception & e) {

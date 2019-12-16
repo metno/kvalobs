@@ -1,3 +1,9 @@
+kvalobs (5.0.1-1) xenial; urgency=medium
+  * kvManagerd: fix missing bug.
+  * kvDataInputd: bugfix nodata, but a observation record for the stationid,typeid and obstime exist.
+
+ -- Borge Moe <borge.moe@met.no>  Fri, 13 Dec 2019 11:00:00 +0100
+
 kvalobs (5.0.0-1) xenial; urgency=medium
   * kvQabased: performance. Select multiple workque elements per selectForControl.
   * kvQabased: Changes how selectForControl work. 

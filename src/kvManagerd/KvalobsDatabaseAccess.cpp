@@ -45,6 +45,7 @@ using dnmi::db::DRow;
 using boost::posix_time::ptime;
 using boost::posix_time::hours;
 using boost::posix_time::minutes;
+using boost::posix_time::to_kvalobs_string;
 
 namespace {
 
@@ -108,8 +109,17 @@ KvalobsDatabaseAccess::Time KvalobsDatabaseAccess::lastFindAllMissingRuntime() {
     try {
       Time last = boost::posix_time::time_from_string(row[0]);
       return ptime(last.date(), hours(last.time_of_day().hours()) + minutes(30));
-    } catch (...) {
+    } catch ( const std::exception &e ) {
       // ignore errors, and continue to fallback method
+      try {
+        LOGWARN("key_val (kvManagerd, LastMissingRun): Failed to create a ptime from '" << row[0] << "'. " << e.what());
+      } 
+      catch( ... ) {
+        LOGWARN("key_val (kvManagerd, LastMissingRun): Failed to create a ptime.");
+      }
+    }
+    catch ( ... ) {
+      LOGWARN("key_val (kvManagerd, LastMissingRun): Failed to create a ptime. Unknown exception.");
     }
   }
   // No information available, pretend last run was 7 days ago
@@ -138,8 +148,11 @@ bool isWholeHour(const boost::posix_time::ptime & time) {
 
 void KvalobsDatabaseAccess::addMissingData(const DataIdentifier & di) {
   if (isWholeHour(di.obstime())) {
-    // Only process missing value for data a whole hours (minutes and seconds is 0)
+    LOGDEBUG("Add missing station: observationid: " << di.obsid() << " " << di.station() << "/" << di.type() << "/" << to_kvalobs_string(di.obstime()));
+    // Only process missing value for data at whole hours (minutes and seconds is 0)
     exec_(insertMissingDataQuery_(di));
+  } else {
+    LOGDEBUG("addMissingData: Not WholeHour: " << di.obstime());
   }
 
   ResultPtr r = exec_(selectWorkQueueQuery_(di));
@@ -337,4 +350,4 @@ DataIdentifier KvalobsDatabaseAccess::createObservation_(int stationid, int type
   if (!result->hasNext())
     throw std::runtime_error("Unable to create observation");
   return DataIdentifier(result->next());
-}
+} 

@@ -133,6 +133,7 @@ DataSrcApp::DataSrcApp(int argn, char **argv, int nConnections_, miutil::conf::C
   milog::createGlobalLogger(logdir, "kvDataInputd_transaction", "retry", milog::DEBUG);
   milog::createGlobalLogger(logdir, "kvDataInputd", "transaction", milog::DEBUG, 200, 1, new milog::StdLayout1());
   milog::createGlobalLogger(logdir, "kvDataInputd", "thread_pool", milog::DEBUG, 200, 1, new milog::StdLayout1());
+  milog::createGlobalLogger(logdir, "kvDataInputd", "kv2kvdecoder", milog::DEBUG, 1073741824, 1);
 
   try {
     LOGERROR("Starting kafka producer for topic <" << kafkaConfig.getRawTopic() << ">. Brokers <" << kafkaConfig.brokers << ">.");
