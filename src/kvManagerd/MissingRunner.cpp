@@ -34,10 +34,12 @@
 #include <mutex>
 #include <string>
 #include <thread>
+#include "miutil/timeconvert.h"
 #include "milog/milog.h"
 #include "kvdb/kvdb.h"
 #include "DataIdentifier.h"
 #include "KvalobsDatabaseAccess.h"
+
 
 MissingRunner::MissingRunner(const std::string & connectString, bool checkForMissingObs_)
     : TimedDatabaseTask(connectString, "MissingRunner"),
@@ -59,6 +61,7 @@ using boost::posix_time::ptime;
 using boost::posix_time::hours;
 using boost::posix_time::minutes;
 using boost::posix_time::second_clock;
+using boost::posix_time::to_kvalobs_string;
 
 void MissingRunner::run() {
   if (!checkForMissingObs) {
@@ -85,10 +88,24 @@ void MissingRunner::run() {
 
 void MissingRunner::addAllMissingData(KvalobsDatabaseAccess & dbAccess, const boost::posix_time::ptime & obstime) {
   auto missing = dbAccess.findAllMissing(obstime);
-
+  LOGINFO("Number of missing stations: " << missing.size() << " obstime: " << to_kvalobs_string(obstime));
   for (const DataIdentifier & di : missing) {
-    auto transaction = dbAccess.transaction(true);
-    dbAccess.addMissingData(di);
-    transaction->commit();
+    bool retry=false;
+    do{
+      try {
+        auto transaction = dbAccess.transaction(true);
+        dbAccess.addMissingData(di);
+        transaction->commit();
+        retry=false;
+      }
+      catch(const dnmi::db::SQLSerializeError & e) {
+        LOGWARN(e.what() << "  - retrying");
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        retry=true;
+      }
+      catch(const std::exception &e) {
+        LOGERROR("DB error: " << e.what());
+      }
+    } while (retry);
   }
 }

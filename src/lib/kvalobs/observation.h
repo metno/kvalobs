@@ -105,19 +105,24 @@ public:
     typeid_ = t;
   }
   
-  /**
-   * @return a pointer observation if found and nullptr if not. The caller must delete the pointer.
-   * @throws SQLException on db error.
-   * @throws std::logic_error if some unexpected data was found.
-   */
-  static Observation *getFromDb(dnmi::db::Connection *con, long stationID, long typeID, const boost::posix_time::ptime &obsTime, bool useTransaction=true);
+  size_t totSize() const;
+  size_t dataSize() const;
+  size_t textDataSize() const;
+
 
   /**
    * @return a pointer observation if found and nullptr if not. The caller must delete the pointer.
    * @throws SQLException on db error.
    * @throws std::logic_error if some unexpected data was found.
    */
-  static Observation *getFromDb(dnmi::db::Connection *con, long observationid, bool useTransaction=true);
+  static Observation *getFromDb(dnmi::db::Connection *con, long stationID, long typeID, const boost::posix_time::ptime &obsTime, bool useTransaction=true, const std::string &logid="");
+
+  /**
+   * @return a pointer observation if found and nullptr if not. The caller must delete the pointer.
+   * @throws SQLException on db error.
+   * @throws std::logic_error if some unexpected data was found.
+   */
+  static Observation *getFromDb(dnmi::db::Connection *con, long observationid, bool useTransaction=true, const std::string &logid="");
 
   
   
@@ -126,7 +131,7 @@ public:
    * @throws SQLException on db error.
    * @throws std::logic_error if some unexpected data was found.
    */
-  void insertIntoDb(dnmi::db::Connection *con, bool useTransaction=true);
+  void insertIntoDb(dnmi::db::Connection *con, bool useTransaction=true, const std::string &logid="");
 
 
   friend std::ostream& operator<<(std::ostream& output,
@@ -141,7 +146,7 @@ protected:
   void setObservationid(long observationid);
   kvData getKvData(const dnmi::db::DRow &row, long *obsid);
   kvTextData getKvTextData(const dnmi::db::DRow &row, long *obsid);
-  static std::tuple<long, bool> getObservationid(dnmi::db::Connection *con, long stationID, long typeID, const boost::posix_time::ptime &obsTime);
+  static std::tuple<long, boost::posix_time::ptime, bool> getObservationid(dnmi::db::Connection *con, long stationID, long typeID, const boost::posix_time::ptime &obsTime, const std::string &logid);
 
 
 private:

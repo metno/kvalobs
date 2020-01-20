@@ -15,7 +15,11 @@ kv2kvDataInputd_CPPFLAGS = -D_REENTRANT \
                   -I$(top_srcdir)/src/service-libs \
                   $(omniORB4_CFLAGS)  \
                   $(putools_CFLAGS)  
-kv2kvDataInputd_LDFLAGS = -pthread 
+kv2kvDataInputd_LDFLAGS = \
+	-pthread \
+	-R "$(libdir)/@PACKAGE_NAME@/lib" \
+	-R "$(rdkafka_LIBDIR)" 
+	
 kv2kvDataInputd_LDADD = \
 		$(top_builddir)/src/service-libs/kvcpp/libkvalobs_kvcpp.la \
 		$(top_builddir)/src/lib/kvsubscribe/libkvalobs_kvsubscribe.la \
@@ -29,7 +33,12 @@ kv2kvDataInputd_LDADD = \
 		$(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la \
 		$(top_builddir)/src/lib/miutil/libkvalobs_miutil.la\
 		$(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la\
-		$(putools_LIBS) $(omniORB4_LIBS) $(BOOST_THREAD_LIB) $(BOOST_FILESYSTEM_LIB) $(BOOST_SYSTEM_LIB) \
+		$(putools_LIBS) \
+		$(omniORB4_LIBS) \
+		$(BOOST_THREAD_LIB) \
+		$(BOOST_FILESYSTEM_LIB) \
+		$(BOOST_SYSTEM_LIB) \
+		$(rdkafka_LIBS) \
 		-lm 
 
 #EXTRA_DIST =                

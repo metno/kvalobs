@@ -28,6 +28,7 @@
  */
 
 #include "KafkaProducer.h"
+#include "KafkaConfig.h"
 #include <iostream>
 #include <librdkafka/rdkafkacpp.h>
 
@@ -46,10 +47,12 @@ class DeliveryReport : public RdKafka::DeliveryReportCb {
     std::unique_ptr<KafkaProducer::MessageId> id(static_cast<KafkaProducer::MessageId *>(message.msg_opaque()));
 
     std::string data((char*) message.payload(), message.len());
-    if (message.err() == RdKafka::ERR_NO_ERROR)
+    if (message.err() == RdKafka::ERR_NO_ERROR) {
       onSuccessfulDelivery_(*id, data);
-    else
+    } else { 
+      std::cerr << "FAILED Kafka delivery " << *id << ": " << message.errstr() << ".\n";
       onFailedDelivery_(*id, data, message.errstr());
+    }
   }
 
  private:
@@ -58,6 +61,8 @@ class DeliveryReport : public RdKafka::DeliveryReportCb {
 };
 }
 
+
+/* 
 KafkaProducer::KafkaProducer(const std::string & topic, const std::string & brokers, KafkaProducer::ErrorHandler onFailedDelivery,
                              KafkaProducer::SuccessHandler onSuccessfulDelivery)
     : deliveryReportHandler_(new DeliveryReport(onFailedDelivery, onSuccessfulDelivery)),
@@ -70,6 +75,7 @@ KafkaProducer::KafkaProducer(const std::string & topic, const std::string & brok
   std::unique_ptr<RdKafka::Conf> conf(RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL));
 
   conf->set("metadata.broker.list", brokers, errstr);
+  //conf->set("bootstrap.servers", brokers, errstr);
   conf->set("dr_cb", deliveryReportHandler_.get(), errstr);
 
   producer_.reset(RdKafka::Producer::create(conf.get(), errstr));
@@ -78,10 +84,68 @@ KafkaProducer::KafkaProducer(const std::string & topic, const std::string & brok
 
   std::unique_ptr<RdKafka::Conf> tconf(RdKafka::Conf::create(RdKafka::Conf::CONF_TOPIC));
 
+
   topic_.reset(RdKafka::Topic::create(producer_.get(), topic, tconf.get(), errstr));
   if (!topic_)
     throw std::runtime_error("Failed to create topic: " + errstr);
 }
+ */
+
+KafkaProducer::KafkaProducer(const std::string & topic,
+                         const std::string & brokers,
+                         ErrorHandler onFailedDelivery,
+                         SuccessHandler onSuccessfulDelivery) 
+{
+  KafkaConfig conf;
+  conf.brokers=brokers;
+  conf.topic=topic;
+  init(conf, onFailedDelivery, onSuccessfulDelivery);
+} 
+
+KafkaProducer::KafkaProducer(const KafkaConfig &config,
+                         ErrorHandler onFailedDelivery,
+                         SuccessHandler onSuccessfulDelivery)
+{
+  init(config, onFailedDelivery, onSuccessfulDelivery);
+}
+                       
+  
+
+void KafkaProducer::init( const KafkaConfig &config, 
+  ErrorHandler onFailedDelivery, SuccessHandler onSuccessfulDelivery) 
+{
+  deliveryReportHandler_.reset(new DeliveryReport(onFailedDelivery, onSuccessfulDelivery));
+  messageId_=0;
+  if (config.brokers.empty())
+    throw std::logic_error("Empty kafka broker list");
+
+  std::string errstr;
+
+  std::unique_ptr<RdKafka::Conf> conf(RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL));
+
+  conf->set("metadata.broker.list", config.brokers, errstr);
+  //conf->set("bootstrap.servers", config.brokers, errstr);
+  conf->set("dr_cb", deliveryReportHandler_.get(), errstr);
+
+  producer_.reset(RdKafka::Producer::create(conf.get(), errstr));
+  if (!producer_)
+    throw std::runtime_error("Failed to create producer: " + errstr);
+
+  std::unique_ptr<RdKafka::Conf> tconf(RdKafka::Conf::create(RdKafka::Conf::CONF_TOPIC));
+
+  if ( conf->set("request.required.acks", std::to_string(config.requestRequiredAcks), errstr)!=RdKafka::Conf::CONF_OK ) {
+    throw std::runtime_error("Failed to configure topic (request.required.acks): " + errstr);
+  }
+
+  if ( conf->set("request.timeout.ms", std::to_string(config.requestTimeoutMs), errstr)!=RdKafka::Conf::CONF_OK ) {
+    throw std::runtime_error("Failed to configure topic (request.timeout.ms): " + errstr);
+  }
+
+  topic_.reset(RdKafka::Topic::create(producer_.get(), config.topic, tconf.get(), errstr));
+  if (!topic_)
+    throw std::runtime_error("Failed to create topic: " + errstr);
+}
+
 
 KafkaProducer::~KafkaProducer() {
   catchup();

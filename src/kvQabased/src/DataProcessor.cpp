@@ -77,8 +77,9 @@ void DataProcessor::sendToKafka(const qabase::CheckRunner::KvalobsDataPtr dataLi
         LOGWARN("Successfully sent data after " << sendAttempts << " retries");
       break;
     } else {
-      if (sendAttempts == 0)
-        LOGWARN("Could not send data to Kafka. Send queue size=" << messages.size() << ". Retrying...");
+      if ((sendAttempts % 10) == 0) {
+        LOGWARN("Could not send data to Kafka. Send queue size=" << messages.size() << ". Retrying (attempts #" << sendAttempts <<") ... ");
+      }
       sendAttempts++;
       std::this_thread::sleep_for(std::chrono::seconds(1));
     }
@@ -102,13 +103,16 @@ void DataProcessor::process(const kvalobs::kvStationInfo & si) {
 void DataProcessor::onKafkaSendSuccess(kvalobs::subscribe::KafkaProducer::MessageId id, const std::string & data) {
   if (messages.erase(id) == 0) {  // should never happen
     LOGWARN("Got confirmation for invalid message id! Data: <" + data + ">");
+    IDLOGINFO("kafka", "Got confirmation for invalid message id! Data: <" + data + ">");
   } else {
     LOGDEBUG("Successfully sent data: <" + data + ">");
+    IDLOGINFO("kafka", "Successfully sent data id:" << id );
   }
 }
 
 void DataProcessor::onKafkaSendError(kvalobs::subscribe::KafkaProducer::MessageId id, const std::string & data, const std::string & errorMessage) {
-  LOGDEBUG("Unable to send data: " + errorMessage + "  Data: <" + data + ">");
+  IDLOGINFO("kafka","Unable to send data ("  <<id <<"): " << errorMessage );
+  LOGDEBUG("Unable to send data ("  <<id <<"): " << errorMessage << "\nData: <" + data + ">");
 }
 
 void DataProcessor::finalizeMessage_() {

@@ -147,12 +147,31 @@ class Configuration {
   }
 
   /**
+   * The size of the logfile in bytes before it is created a backup file. 
+   */
+  int logSize() const {
+    return logSize_*1024*1024;
+  }
+
+  /**
+   * Number of backup logfiles to keep.
+   */
+  int numberOfLogs() const {
+    return numberOfLogs_;
+  }
+
+  int selectForControlCount()const {
+    return selectForControlCount_;
+  }
+
+  /**
    * Print version information to the given stream.
    *
    * @param s The stream to write to
    * @return same stream as given in argument.
    */
   std::ostream & version(std::ostream & s) const;
+
 
   /**
    * Print help information to the given stream.
@@ -182,8 +201,12 @@ class Configuration {
   std::string host_;
   int port_;
   std::string user_;
+  int logSize_;
+  int numberOfLogs_;
+  int selectForControlCount_;
 
   unsigned processCount_;
+ 
 };
 
 }

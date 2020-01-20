@@ -1,5 +1,5 @@
 AC_PREREQ([2.59])
-AC_INIT([kvalobs], [5.0.0~rc20], [kvoss@met.no])
+AC_INIT([kvalobs], [5.0.1], [kvoss@met.no])
 AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -8,6 +8,7 @@ AC_PROG_LEX
 if test "x$LEX" == "x:"; then
 	AC_MSG_ERROR([lex/flex not found])
 fi
+
 AM_PROG_CC_C_O
 AC_PROG_YACC
 AC_PROG_CXX
@@ -15,10 +16,22 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AX_CXX_COMPILE_STDCXX_11(noext)
 
+
+#echo "LIBDIR: ${libdir}"
+
+#AX_SUBDIRS_CONFIGURE( [subdirs], [mandatory arguments], [possibly merged arguments], [replacement arguments], [forbidden arguments])
+#AX_SUBDIRS_CONFIGURE( [kvsupport/librdkafka-1.2.1], [--prefix=${libdir}/kvalobs], [], [--prefix=${libdir}/kvalobs], [])
+
+export PKG_CONFIG_PATH="./kvsupport/build/lib/pkgconfig:${PKG_CONFIG_PATH}"
+
+echo "PKG_CONFIG_PATH: '${PKG_CONFIG_PATH}'"
+#AC_CONFIG_SUBDIRS([src/lib/libhttpserver/libhttpserver-0.17.5])
+
 AC_SUBST([OLD_KVALOBSLIBS_SO_VERSION], [7:0:0])
 AC_SUBST([KVALOBSLIBS_SO_VERSION], [8:0:0])
 
 AC_CONFIG_FILES([Makefile
+                 kvsupport/Makefile
                  kvconfig
                  share/Makefile
                  share/kvalobs/Makefile
@@ -69,6 +82,7 @@ AC_CONFIG_FILES([Makefile
                  src/kvManagerd/Makefile
                  src/tools/kv2kvparser/Makefile
                  src/tools/kv2kvDataInputd/Makefile
+                 src/tools/kvpull/Makefile
                  src/kvDataInputd/kvdataclt/Makefile
                  src/tools/aexecd/Makefile
                  src/kvalobs_database/Makefile
@@ -105,12 +119,13 @@ PKG_CHECK_MODULES(sqlite3, sqlite3)
 PKG_CHECK_MODULES(libxml2, libxml-2.0)
 PKG_CHECK_MODULES(libxmlpp, libxml++-2.6)
 
-RDKAFKA_CHECK
-
+#RDKAFKA_CHECK
+PKG_CHECK_MODULES( [rdkafka], [rdkafka++], [], [true])
+PKG_CHECK_VAR(rdkafka_LIBDIR, rdkafka++, libdir)
 PKG_CHECK_MODULES(cppunit, cppunit)
 AC_PATH_PROG(CMAKE, cmake, false)
 GMOCK_DIST_CHECK([src/lib/gtest])
-PKG_CHECK_MODULES( [libhttpserver], [libhttpserver >= 0.9.0] )
+#PKG_CHECK_MODULES( [libhttpserver], [libhttpserver >= 0.9.0] )
 AC_CHECK_LIB(perl, [main], [], [AC_MSG_ERROR([no libperl found])])
 
 KV_PERL

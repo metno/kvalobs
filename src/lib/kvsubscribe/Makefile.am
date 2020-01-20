@@ -4,10 +4,12 @@ libkvalobs_kvsubscribe_la_CPPFLAGS = \
 	-D_REENTRANT \
 	-I$(top_srcdir)/src \
 	-I$(top_srcdir)/src/lib \
+	$(rdkafka_CFLAGS) \
 	$(libxmlpp_CFLAGS) 
 
 libkvalobs_kvsubscribe_la_SOURCES = \
 	queue.cpp \
+	KafkaConfig.cpp \
 	KafkaConsumer.cpp \
 	DataSubscriber.cpp \
 	KafkaProducer.cpp \
@@ -19,11 +21,13 @@ libkvalobs_kvsubscribe_la_SOURCES = \
 	KvDataSerializeCommand.h KvDataSerializeCommand.cc
 
 libkvalobs_kvsubscribe_la_LIBADD = \
-	../decodeutility/libkvalobs_decodeutility.la \
+	$(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
 	$(top_builddir)/src/lib/json/libjson.la \
 	$(rdkafka_LIBS)
 
-libkvalobs_kvsubscribe_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@
+libkvalobs_kvsubscribe_la_LDFLAGS = \
+	-version-info @KVALOBSLIBS_SO_VERSION@ \
+	-R "$(libdir)/@PACKAGE_NAME@/lib"
 
 kvsubscribeincludedir = $(pkgincludedir)/kvsubscribe
 	
@@ -37,7 +41,8 @@ kvsubscribeinclude_HEADERS = \
 	SendData.h \
 	ProducerCommand.h \
 	KafkaProducerThread.h \
-	KvDataSerializeCommand.h
+	KvDataSerializeCommand.h \
+	KafkaConfig.h 
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libkvsubscribe.pc

@@ -1,19 +1,63 @@
-kvalobs (5.0.0~rc20-1) xenial; urgency=medium
-  * Merge with master and recompile.
+kvalobs (5.0.1-1) xenial; urgency=medium
+  * kvManagerd: fix missing bug.
+  * kvDataInputd: bugfix nodata, but a observation record for the stationid,typeid and obstime exist.
+
+ -- Borge Moe <borge.moe@met.no>  Fri, 13 Dec 2019 11:00:00 +0100
+
+kvalobs (5.0.0-1) xenial; urgency=medium
+  * kvQabased: performance. Select multiple workque elements per selectForControl.
+  * kvQabased: Changes how selectForControl work. 
+      - Allways check if there is any "crached/stopped" jobs. 
+        (qa_start is not null and qa_start is null and qa_start < 10 minutes.) 
+      - Use obstime and priority for the latest 3 hours.
+      - tbtime and priority for older.
+  * kvQabased: bugfix. Multiple checks of the same observation. (in different processes).
+  * kvDataInputd: tbtime is always set to the first message received for the 
+    stationid/typeid/obstime.
+  * kvDataInputd: shortcut HQC only data, ie send it directly to the kafka queue *.checked
+     omitting workque and hence kvQabased.
+  * libkvcpp: bugfix, stationid==0, means all.
+
+ -- Borge Moe <borge.moe@met.no>  Thu, 28 Nov 2019 10:55:00 +0100
+
+kvalobs (5.0.0~rc24-1) xenial; urgency=medium
+  * kvQabased: "hang" bugfix, missing db.commit when on observation is selected. 
+   
+ -- Borge Moe <borge.moe@met.no>  Mon, 25 Nov 2019 09:10:00 +0100
+
+
+kvalobs (5.0.0~rc23-1) xenial; urgency=medium
+  * kvQabased: Changed selectForControl.
+  * kvsubscribe: Kafka added more config options.
  
- -- Borge Moe <borge.moe@met.no>  Wed, 26 Sep 2019 06:49:00:00 +0200
+ -- Borge Moe <borge.moe@met.no>  Thu, 21 Nov 2019 09:55:00 +0100
+
+kvalobs (5.0.0~rc22-1) xenial; urgency=medium
+  * Changed the build system.
+ 
+ -- Borge Moe <borge.moe@met.no>  Thu, 7 Nov 2019 08:45:00 +0100
+
+kvalobs (5.0.0~rc21-1) xenial; urgency=medium
+  * rdkafka: Upgrade to version version 1.2.1
+  * At runtime link to private shared objects in /usr/lib/kvalobs/lib
+ 
+ -- Borge Moe <borge.moe@met.no>  Mon, 4 Nov 2019 13:00:00 +0100
+
+kvalobs (5.0.0~rc20-1) xenial; urgency=medium
+  * rdkafka: Upgrade to version version 1.2.1
+ 
+ -- Borge Moe <borge.moe@met.no>  Sun, 3 Nov 2019 08:30:00 +0100
 
 kvalobs (5.0.0~rc19-1) xenial; urgency=medium
   * kvQaBased: Serialize selection from workque. Fix multiple processing of checks for one station.
-  * kvQaBased: Fix a query that sometimes is 'insanly' slow. 
- 
- -- Borge Moe <borge.moe@met.no>  Thu, 19 Sep 2019 10:39:00:00 +0200
+  * kvQaBased: Fix a query that sometimes is 'insanly' slow.
 
+ -- Borge Moe <borge.moe@met.no>  Thu, 19 Sep 2019 10:39:00 +0200
 
 kvalobs (5.0.0~rc17d-1) xenial; urgency=medium
   * kvDataInputd: Fix insert when observations has an entry but no data exist.  
 
- -- Borge Moe <borge.moe@met.no>  Wed, 18 Sep 2019 10:56:00 +0100
+ -- Borge Moe <borge.moe@met.no> Wed, 18 Sep 2019 10:56:00 +0100
 
 kvalobs (5.0.0~rc17c-1) xenial; urgency=medium
   * fix paramid=0

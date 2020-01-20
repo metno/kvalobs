@@ -43,6 +43,7 @@ namespace pt = boost::posix_time;
 using dnmi::db::SQLException;
 using std::string;
 using std::endl;
+using std::cerr;
 using std::ostringstream;
 using std::list;
 using std::auto_ptr;
@@ -84,6 +85,8 @@ DataUpdateTransaction::DataUpdateTransaction(const boost::posix_time::ptime &obs
       obstime(obstime),
       stationid(stationid),
       typeid_(typeID),
+      observationid(0),
+      startTime(pt::microsec_clock::universal_time()),
       data_(new kvalobs::serialize::KvalobsData()),
       dataToPublish_(new kvalobs::serialize::KvalobsData()),
       ok_(new bool(false)),
@@ -102,6 +105,8 @@ DataUpdateTransaction::DataUpdateTransaction(const DataUpdateTransaction &dut)
       obstime(dut.obstime),
       stationid(dut.stationid),
       typeid_(dut.typeid_),
+      observationid(dut.observationid),
+      startTime(dut.startTime),
       data_(dut.data_),
       dataToPublish_(dut.dataToPublish_),
       ok_(dut.ok_),
@@ -165,17 +170,20 @@ void DataUpdateTransaction::checkWorkQue(dnmi::db::Connection *con, long observa
   worqueToWorkStatistik(con, observationid);
 }
 
-void DataUpdateTransaction::updateWorkQue(dnmi::db::Connection *con, long observationid, int pri) {
+void DataUpdateTransaction::updateWorkQue(dnmi::db::Connection *con, long observationid_, int pri) {
   if ( ! addToWorkQueue || onlyHqcData) {
+    observationid=-observationid_;
+    duration = pt::microsec_clock::universal_time() - startTime;
     return;
   }
-  
+  observationid=observationid_;
   ostringstream q;
 
   q << "INSERT INTO workque (observationid,priority,process_start,qa_start,qa_stop,service_start,service_stop) "
     << "VALUES(" << observationid << "," << pri << ",NULL,NULL,NULL,NULL,NULL)";
 
   con->exec(q.str());
+  duration = pt::microsec_clock::universal_time() - startTime;
 }
 
 
@@ -199,7 +207,7 @@ void DataUpdateTransaction::worqueToWorkStatistik(dnmi::db::Connection *con, lon
     << "q.service_start,"
     << "q.service_stop,"
     << "q.observationid "
-    << "FROM workque q, observations o"
+    << "FROM workque q, observations o "
     << "WHERE q.observationid=o.observationid AND q.observationid=" << observationid 
     << " AND q.qa_stop IS NOT NULL AND (SELECT count(*) FROM workstatistik s WHERE q.observationid=s.observationid)=0";
 
@@ -456,7 +464,12 @@ bool DataUpdateTransaction::updateObservation(dnmi::db::Connection *conection, O
   list<kvalobs::kvData> toUpdateData(*newData);
   list<kvalobs::kvTextData> toUpdateTextData(*newTextData);
 
+  //TODO: Check for only missing data
+  bool noOldData=obs->totSize()==0;
+  
 #if 0
+  cerr <<  "OldObs: stationid: #data: " << obs->dataSize() << " #textdata: " << obs->textDataSize() << " noOldData: "<< (noOldData?"true":"false") 
+       << " observationid: " << obs->observationid() << "  "<<obs->stationID() <<"/" << obs->typeID() << "/" << obs->obstime() << endl;
   std::cerr << "updateObservation: incomming \n";
   for ( auto &d : toUpdateData )
     std::cerr << "updateObservation (d): new: " << d.obstime() << ", " << d.stationID() << ", " << d.typeID() << ", " << d.paramID() <<  d.original() << "\n";
@@ -499,6 +512,33 @@ bool DataUpdateTransaction::updateObservation(dnmi::db::Connection *conection, O
 
   conection->exec(q.str());
   pt::ptime tbTime = useTbTime(toUpdateData, toUpdateTextData, obs->tbtime());
+
+#if 0
+  //BEGIN: debug
+  if( tbTime.is_not_a_date_time() ) {
+      IDLOGERROR(logid, "updateObservation: tbTime is invalid.");
+      if( obs->tbtime().is_not_a_date_time() ) {
+        IDLOGERROR(logid, "updateObservation: obs->tbTime is invalid.");
+      }
+      tbTime=pt::microsec_clock::universal_time();
+      if ( tbTime.is_not_a_date_time() ) {
+          IDLOGERROR(logid, "updateObservation: tbTime still is invalid.");
+      }
+  }
+
+  if( obstime.is_not_a_date_time() ) {
+      IDLOGERROR(logid, "updateObservation: obstime is invalid.");
+  }
+
+  if( obs->obstime().is_not_a_date_time() ) {
+      IDLOGERROR(logid, "updateObservation: obs->obstime is invalid.");
+  }
+  //END: debug
+
+  if ( noOldData ) {
+    tbTime=pt::microsec_clock::universal_time();
+  }
+#endif
 
   Observation newObs(obs->stationID(), obs->typeID(), obs->obstime(), tbTime, toUpdateData, toUpdateTextData);
   newObs.insertIntoDb(conection, false);
@@ -592,6 +632,8 @@ bool DataUpdateTransaction::operator()(dnmi::db::Connection *conection) {
     IDLOGINFO("duplicates", "DUPLICATE: stationid: " << stationid << " typeid: " << typeid_ << " obstime: " << pt::to_kvalobs_string(obstime));
     dataToPublish_->clear();    
     insertType = "DUPLICATE";
+    duration = pt::microsec_clock::universal_time() - startTime;
+    observationid=oldObs->observationid();
     return true;
   }
 
@@ -604,10 +646,17 @@ bool DataUpdateTransaction::operator()(dnmi::db::Connection *conection) {
   return replaceObservation(conection, oldObs->observationid());
 }
 
+std::string DataUpdateTransaction::transactionLogString() {
+  ostringstream s;
+
+  s << "(" << observationid << ": " << stationid << "/" << typeid_<< "/" <<pt::to_kvalobs_string(obstime) << ") duration=" << duration.total_milliseconds() << "ms";
+  return s.str();
+}
+
 void DataUpdateTransaction::onSuccess() {
   ostringstream mylog;
   string prefix(insertType.length(), ' ');
-  mylog << insertType << ": stationid: " << stationid << " typeid: " << typeid_ << " obstime: " << pt::to_kvalobs_string(obstime);
+  mylog << insertType << ": " << transactionLogString();
   IDLOGINFO(logid, log.str());
   IDLOGINFO("transaction", mylog.str());
   *ok_ = true;
@@ -616,7 +665,7 @@ void DataUpdateTransaction::onSuccess() {
 void DataUpdateTransaction::onFailure() {
   ostringstream mylog;
   string prefix(insertType.length(), ' ');
-  mylog << insertType << ": Failed: stationid: " << stationid << " typeid: " << typeid_ << " obstime: " << pt::to_kvalobs_string(obstime);
+  mylog << insertType << ": Failed: stationid: " << transactionLogString();
   IDLOGERROR(logid, log.str());
   IDLOGERROR("transaction", mylog.str());
 }
@@ -651,7 +700,7 @@ void DataUpdateTransaction::onMaxRetry(const std::string &lastError, const std::
   IDLOGERROR(
       "failed",
       "Transaction Failed (mayRecover=" << (mayRecover?"true":"false") << " errorCode=" << errorCode <<").\n" << " Stationid: " << stationid << " Typeid: " << typeid_ << " obstime: " << pt::to_kvalobs_string(obstime) << "\nLast error: " << lastError << mylog.str());
-  IDLOGERROR("transaction", "   FAILED: Stationid: " << stationid << " Typeid: " << typeid_ << " obstime: " << pt::to_kvalobs_string(obstime));
+  IDLOGERROR("transaction", "   FAILED: " << transactionLogString() );
   throw SQLException(lastError, errorCode, mayRecover);
 }
 

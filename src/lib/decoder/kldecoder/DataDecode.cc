@@ -62,13 +62,13 @@ int DataDecoder::findParamId(const std::string &paramname) const {
 
 namespace {
   std::string checkNaN(const std::string &val) {
-    if( strcasecmp(val.c_str(), "nan") == 0 ) {
+    if( strcasecmp(val.c_str(), "nan") == 0 ||
+      strcasecmp(val.c_str(), "inf") == 0 ) {
       return "";
-    }
+    } 
     return val;
   }
 }
-
 
 bool DataDecoder::decodeData(KlDataArray &da, KlDataArray::size_type daSize,
                              boost::posix_time::ptime &obstime,

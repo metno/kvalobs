@@ -1,7 +1,7 @@
 /*
  Kvalobs - Free Quality Control Software for Meteorological Observations
 
- Copyright (C) 2010 met.no
+ Copyright (C) 2015 met.no
 
  Contact information:
  Norwegian Meteorological Institute
@@ -27,46 +27,44 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef SRC_KVQABASED_SRC_QABASEAPP_H_
-#define SRC_KVQABASED_SRC_QABASEAPP_H_
+#ifndef __KAFKACONFIG_H__
+#define __KAFKACONFIG_H__
 
-#include <kvsubscribe/KafkaConfig.h>
-#include <kvalobs/kvbaseapp.h>
-#include <memory>
+
+#include <iostream>
 #include <string>
+
+
 
 namespace kvalobs {
 namespace subscribe {
-class KafkaProducer;
-}
-}
 
-namespace qabase {
+class KafkaConfig {
+  public:
+    KafkaConfig():brokers("localhost"), requestRequiredAcks(-1), requestTimeoutMs(5000){}
 
-class QaBaseApp : public KvBaseApp {
- public:
-  QaBaseApp(int argc, char ** argv);
-  virtual ~QaBaseApp();
+    std::string brokers;
+    std::string topic;
 
-  /* static const std::string & kafkaDomain() {
-    return kafkaConf_.topic;
-   }*/
-  
-  /*static const std::string & kafkaBrokers() {
-    return kafkaConf_.brokers;
-  }*/
+   /** Number of isr (in sync replika) akcs required before 
+    * we accept the message ad delivered.
+    * -1 - all
+    *  0 - None
+    *  >0 the number of isr that has acked.
+    * Default: -1
+    */
+    int requestRequiredAcks;
+ 
+  /**
+   * Timeout before we give up waiting on Acks. Reqiure kafkaAcks_ != 0 
+   * Default: 5000 ms
+   */
+   int requestTimeoutMs;
 
-  static std::shared_ptr<kvalobs::subscribe::KafkaProducer> kafkaProducer();
-
-  static std::string baseLogDir();
-
- private:
-  static kvalobs::subscribe::KafkaConfig kafkaConf_;
-  //static std::string kafkaBrokers_;
-  //static std::string kafkaDomain_;
-
+  friend std::ostream& operator<<(std::ostream &o, const KafkaConfig &c); 
 };
+}
 
-} /* namespace qabase */
+}
 
-#endif /* SRC_KVQABASED_SRC_QABASEAPP_H_ */
+#endif

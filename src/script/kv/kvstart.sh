@@ -27,7 +27,6 @@
 #  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 KVCONFIG=__KVCONFIG__
-#KVCONFIG=/usr/bin/kvconfig
 
 KVBIN=`$KVCONFIG --bindir`
 KVPID=`$KVCONFIG --rundir`
@@ -159,40 +158,31 @@ for PROG in $START_PROGS ; do
 	echo -n "Starter $PROG ...."
 	
 	rm -f $KVPID/$PROG-$NODENAME.stopped
-   isProgRunning $PROG
+  isProgRunning $PROG
  
-    if [ $? -eq 0 ]; then
-	echo "running"
+  if [ $? -eq 0 ]; then
+	  echo "running"
+  else
+	  rm -f $KVPID/$PROG-$NODENAME.pid
+    PROG_ARGS="ARGS_$PROG"
+    #echo "$KVBIN/$PROG ${!PROG_ARGS} > /dev/null  2>&1 &"
+    $KVBIN/$PROG ${!PROG_ARGS} > /dev/null  2>&1 &
+    n=0
+    while [ $n -lt $TIMEOUT  -a ! -f "$KVPID/$PROG-$NODENAME.pid" ]; do
+       n=$((n+1))
+       sleep 1
+    done
+ 
+    if [ -f "$KVPID/$PROG-$NODENAME.pid" ]; then
+       echo "Ok!"
     else
-	rm -f $KVPID/$PROG-$NODENAME.pid
-
-	$KVBIN/$PROG > /dev/null  2>&1 &
-	
-	n=0
-
-        while [ $n -lt $TIMEOUT  -a ! -f "$KVPID/$PROG-$NODENAME.pid" ]; do
-	      n=$((n+1))
-	      sleep 1
-	done
- 
-	if [ -f "$KVPID/$PROG-$NODENAME.pid" ]; then
-	    echo "Ok!"
-	else
-	    echo "Failed!"
-	fi
+       echo "Failed!"
     fi
+  fi
 done
 
 if [ -e ${KVCONF}/kvname ]; then
-    rm  ${KVCONF}/kvname
+  rm  ${KVCONF}/kvname
 fi
 
 exit 0
-
-
-
-
-
-
-
-

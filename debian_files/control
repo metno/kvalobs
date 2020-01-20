@@ -13,9 +13,9 @@ Build-Depends: debhelper (>= 9), autotools-dev, debconf,
  libomniorb4-dev (>= 4.0.6), omniidl4 (>= 4.0.6) | omniidl (>= 4.1.6),
  libperl-dev (>= 5.8), libdbd-pg-perl (>= 1.49), libcurl4-gnutls-dev | libcurl-dev,
  liblog4cpp5-dev, libcppunit-dev (>= 1.12),
- librdkafka-dev,
  libhttpserver-dev (>= 0.17.5),
- metlibs-putools-dev, cmake, google-mock
+ metlibs-putools-dev, cmake, google-mock,
+ zlib1g-dev, libssl-dev, libsasl2-dev, libzstd-dev
 Standards-Version: 3.9.2
 
 Package: libkvalobs8

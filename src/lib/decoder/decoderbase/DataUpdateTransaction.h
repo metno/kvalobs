@@ -68,6 +68,9 @@ private:
   boost::posix_time::ptime obstime;
   int stationid;
   int typeid_;
+  long long observationid;
+  boost::posix_time::time_duration duration;
+  boost::posix_time::ptime startTime;
 
   // Data that is inserted or updated. This is not used in the kv2018 update
   //but maybe we will reuse it later.
@@ -94,6 +97,8 @@ private:
   bool partialIsEqual(const std::list<kvalobs::kvData> &oldData_, const std::list<kvalobs::kvTextData> &oldTextData, bool replace)const;
   bool completeIsEqual(const std::list<kvalobs::kvData> &oldData, const std::list<kvalobs::kvTextData> &oldTextData, bool replace)const;
   void onlyHqcDataCheck();
+  std::string transactionLogString();
+  
 
  public:
   int getPriority(dnmi::db::Connection *conection, int stationid, int typeid_, const boost::posix_time::ptime &obstime);

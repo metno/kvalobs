@@ -1,7 +1,7 @@
 /*
  Kvalobs - Free Quality Control Software for Meteorological Observations
 
- Copyright (C) 2010 met.no
+ Copyright (C) 2015 met.no
 
  Contact information:
  Norwegian Meteorological Institute
@@ -27,46 +27,17 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef SRC_KVQABASED_SRC_QABASEAPP_H_
-#define SRC_KVQABASED_SRC_QABASEAPP_H_
-
-#include <kvsubscribe/KafkaConfig.h>
-#include <kvalobs/kvbaseapp.h>
-#include <memory>
-#include <string>
+#include "KafkaConfig.h"
 
 namespace kvalobs {
 namespace subscribe {
-class KafkaProducer;
+std::ostream& operator<<(std::ostream &o, const KafkaConfig &c) {
+  o << "brokers: " << c.brokers << "\n"
+    << "topic: " << c.topic << "\n"
+    << "request.required.acks: " << c.requestRequiredAcks << "\n"
+    << "request.timeout.ms: " << c.requestTimeoutMs << " ms\n";
+    return o;
+}
+
 }
 }
-
-namespace qabase {
-
-class QaBaseApp : public KvBaseApp {
- public:
-  QaBaseApp(int argc, char ** argv);
-  virtual ~QaBaseApp();
-
-  /* static const std::string & kafkaDomain() {
-    return kafkaConf_.topic;
-   }*/
-  
-  /*static const std::string & kafkaBrokers() {
-    return kafkaConf_.brokers;
-  }*/
-
-  static std::shared_ptr<kvalobs::subscribe::KafkaProducer> kafkaProducer();
-
-  static std::string baseLogDir();
-
- private:
-  static kvalobs::subscribe::KafkaConfig kafkaConf_;
-  //static std::string kafkaBrokers_;
-  //static std::string kafkaDomain_;
-
-};
-
-} /* namespace qabase */
-
-#endif /* SRC_KVQABASED_SRC_QABASEAPP_H_ */

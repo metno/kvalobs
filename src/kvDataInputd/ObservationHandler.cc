@@ -73,6 +73,8 @@ namespace {
 
 const shared_ptr<http_response> ObservationHandler::render_POST(const httpserver::http_request& req) {
   Json::Value jval;
+  bool ok=false;
+  std::ostringstream oerr;
 
   if (app.inShutdown()) {
     return response("The service is unavailable.", HttpServiceUnavailable);
@@ -86,35 +88,43 @@ const shared_ptr<http_response> ObservationHandler::render_POST(const httpserver
   LOGINFO("Path: '" << req.get_path() << " serialNumber: " << serial << ".");
 
   Observation obs;
+  shared_ptr<http_response> res;
 
   try {
     obs = getObservation(req);
 
     LOGDEBUG("obsType: '" << obs.obsType << "'\n" << "obsData:[\n" << obs.obs << "\n]\n");
 
-    kd::Result r;
-
-    r = app.newObservation(obs.obsType.c_str(), obs.obs.c_str(), "http");
+    kd::Result r = app.newObservation(obs.obsType.c_str(), obs.obs.c_str(), "http");
     jval = kd::decodeResultToJson(r);
     if (r.res == kd::EResult::OK) {
-      return response(jval.toStyledString(), HttpOk, "application/json");
+      ok=true;
+      res=response(jval.toStyledString(), HttpOk, "application/json");
     } else if (r.res == kd::EResult::ERROR && b::starts_with(r.message, "SHUTDOWN")) {
-      return response("The service is unavailable.", HttpServiceUnavailable);
+      res=response("The service is unavailable.", HttpServiceUnavailable);
+      oerr << "The service is unavailable.\n";
     } else {
-      return response(jval.toStyledString(), HttpBadRequest, "application/json");
+      res=response(jval.toStyledString(), HttpBadRequest, "application/json");
+      oerr << jval.toStyledString() << "\n";
     }
   } catch (const DecodeResultException &ex) {
+    oerr << "DecodeResultException: " << ex.what() << "\n"; 
     LOGERROR("DecodeResultException: " << ex.what() << "\nobsType: '" << obs.obsType << "'\n" << "obsData:[\n" << obs.obs << "\n]\n")
     jval = decodeResultToJson(ex);
-    return response(jval.toStyledString(), HttpBadRequest, "application/json");
+    res=response(jval.toStyledString(), HttpBadRequest, "application/json");
   } catch ( const std::exception &ex) {
+    oerr << "Unexpected exception: " << ex.what() << "\n";
     LOGERROR("Unexpected exception: " << ex.what() << "\nobsType: '" << obs.obsType << "'\n" << "obsData:[\n" << obs.obs << "\n]\n")
     string err("Problems: " );
     err += ex.what();
-    return response(err, HttpInternalServerError, "application/text");
+    res=response(err, HttpInternalServerError, "application/text");
   }
-  //This should never happend
-  return response("Unexpected error.", HttpInternalServerError, "application/text");
+
+  if( !ok && obs.obsType.find("kv2kv") != string::npos) {
+    IDLOGDEBUG("kv2kvdecoder", "Serialnumber: " << serialNumber << "\n" << oerr.str() << obs.obsType<<"\n"<<req.get_content()<<"\n" << obs.obs );
+  } 
+
+  return res;
 }
 
 ObservationHandler::Observation ObservationHandler::getObservation(const httpserver::http_request& req) {

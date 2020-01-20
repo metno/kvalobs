@@ -32,6 +32,7 @@
 #include <memory>
 #include <sstream>
 #include <stdexcept>
+#include "lib/milog/milog.h"
 #include "lib/miutil/timeconvert.h"
 #include "lib/kvalobs/observation.h"
 #include "lib/kvdb/transactionhelper.h"
@@ -351,6 +352,18 @@ Observation&  Observation::operator=(const Observation &rhs) {
   return *this;
 }
 
+size_t Observation::totSize() const { 
+  return data_.size()+textData_.size();
+ }
+size_t Observation::dataSize() const {
+   return data_.size();
+}
+
+size_t Observation::textDataSize() const { 
+  return textData_.size();
+}
+
+
 Observation&  Observation::operator=(const std::list<kvalobs::kvData> &rhs){
   data_= rhs;
   return *this;
@@ -361,24 +374,46 @@ Observation&  Observation::operator=(const std::list<kvalobs::kvTextData> &rhs){
   return *this;
 }
 
-std::tuple<long, bool>
-Observation::getObservationid(dnmi::db::Connection *con, long stationID, long typeID, const boost::posix_time::ptime &obsTime) 
+//observationid, tbtime, exist
+std::tuple<long, pt::ptime, bool>
+Observation::getObservationid(dnmi::db::Connection *con, long stationID, long typeID, const boost::posix_time::ptime &obsTime, const std::string &logid) 
 {
   ostringstream q;
-  q << "SELECT observationid "
-    << "FROM observations "
-    << "WHERE stationid=" << stationID << " AND typeid=" << typeID
-    << " AND obstime=" << dbTime(obsTime) << ";";
+  try{
+    q << "SELECT observationid, tbtime "
+      << "FROM observations "
+      << "WHERE stationid=" << stationID << " AND typeid=" << typeID
+      << " AND obstime=" << dbTime(obsTime) << ";";
   
-  std::unique_ptr<dnmi::db::Result> res;
-  res.reset(con->execQuery(q.str()));
+    std::unique_ptr<dnmi::db::Result> res;
+    res.reset(con->execQuery(q.str()));
 
-  if( res.get()==nullptr || !res->hasNext() ) {
-    return std::make_tuple(0, false);
+    if( res.get()==nullptr || !res->hasNext() ) {
+      return std::make_tuple(0, pt::microsec_clock::universal_time(), false);
+    }
+
+    dnmi::db::DRow & row = res->next();
+    auto tbt=pt::time_from_string_nothrow(row[1].c_str());
+    if( tbt.is_not_a_date_time() ) {
+      IDLOGWARN(logid,"Observation::getObservationid: '" << row[1] << "' not_a_date_time, using now.");
+      tbt=pt::microsec_clock::universal_time();
+    }
+    return std::make_tuple(atol(row[0].c_str()), tbt, true);
   }
-
-  dnmi::db::DRow & row = res->next();
-  return std::make_tuple(atol(row[0].c_str()), true);
+  catch(const dnmi::db::SQLSerializeError &e) {
+    throw;
+  }
+  catch(const dnmi::db::SQLException &e) {
+    if ( !logid.empty() ) {
+      IDLOGERROR(logid, "DBException: Observation::getObservationid: " << string(e.what()) <<"\n" << q.str());
+    } else {
+      LOGERROR("DBException: Observation::getObservationid: " << string(e.what()) <<"\n" << q.str());
+    }
+    throw;
+  }
+  catch(...){
+    throw;
+  }
 }
 
 
@@ -387,14 +422,15 @@ Observation *Observation::getFromDb(
   long stationID, 
   long typeID, 
   const boost::posix_time::ptime &obsTime,
-  bool useTransaction
+  bool useTransaction,
+  const std::string &logid
   )
 {
   std::unique_ptr<Observation> obs=std::unique_ptr<Observation>(new Observation());
   //db::TransactionBlock tran(con, db::Connection::REPEATABLE_READ, false, !useTransaction);
   db::TransactionBlock tran(con, db::Connection::READ_COMMITTED, false, !useTransaction);
+  ostringstream q;
   try {
-    ostringstream q;
     q << "SELECT o.observationid, o.stationid, o.typeid, o.obstime, o.tbtime, d.original,d.paramid,d.sensor,d.level,d.corrected, d.controlinfo, d.useinfo,d.cfailed "
       << "FROM observations o RIGHT JOIN  obsdata d "
       << "ON o.observationid = d.observationid "
@@ -415,10 +451,15 @@ Observation *Observation::getFromDb(
       res.reset(con->execQuery(q.str()));
 
       if (res->size() == 0 ) {
-        auto id = getObservationid(con, stationID, typeID, obsTime);
+        auto id = getObservationid(con, stationID, typeID, obsTime, logid);
   
-        if (get<1>(id)){
+        if (get<2>(id)){
           obs->setObservationid(get<0>(id));
+          obs->stationid_=stationID;
+          obs->typeid_=typeID;
+          obs->obstime_=obsTime;
+          obs->tbtime_=get<1>(id);
+
           return obs.release();
         }
         return nullptr;
@@ -454,19 +495,33 @@ Observation *Observation::getFromDb(
 
     return obs.release();
   } 
-  catch( ... ) {
+  catch(const dnmi::db::SQLSerializeError &e) {
     tran.abort();
     throw;
   }
+  catch(const dnmi::db::SQLException &e) {
+    if ( !logid.empty() ) {
+      IDLOGERROR(logid, "DBException: Observation::getFromDb: " << string(e.what()) <<"\n" << q.str());
+    } else {
+      LOGERROR("DBException: Observation::getFromDb: " << string(e.what()) <<"\n" << q.str());
+    }
+    tran.abort();
+    throw;
+  }
+  catch(...){
+    tran.abort();
+    throw;
+  }
+  
 }
 
-Observation *Observation::getFromDb(dnmi::db::Connection *con, long observationid, bool useTransaction)
+Observation *Observation::getFromDb(dnmi::db::Connection *con, long observationid, bool useTransaction, const std::string &logid)
 {
   //db::TransactionBlock tran(con, db::Connection::REPEATABLE_READ, false, !useTransaction);
   db::TransactionBlock tran(con, db::Connection::READ_COMMITTED, false, !useTransaction);
+  ostringstream q;
   try {
     std::unique_ptr<Observation> obs=std::unique_ptr<Observation>(new Observation());
-    ostringstream q;
     q << "SELECT o.observationid, o.stationid, o.typeid, o.obstime, o.tbtime, d.original,d.paramid,d.sensor,d.level,d.corrected, d.controlinfo, d.useinfo,d.cfailed "
       << "FROM observations o LEFT JOIN  obsdata d "
       << "ON o.observationid = d.observationid "
@@ -504,20 +559,36 @@ Observation *Observation::getFromDb(dnmi::db::Connection *con, long observationi
 
     return obs.release();
   } 
-  catch( ... ) {
+  catch(const dnmi::db::SQLSerializeError &e) {
     tran.abort();
     throw;
   }
+  catch(const dnmi::db::SQLException &e) {
+    if ( !logid.empty() ) {
+      IDLOGERROR(logid, "DBException: Observation::getFromDb: " << string(e.what()) <<"\n" << q.str());
+    } else {
+      LOGERROR("DBException: Observation::getFromDb: " << string(e.what()) <<"\n" << q.str());
+    }
+
+    tran.abort();
+    throw;
+  }
+  catch(...){
+    tran.abort();
+    throw;
+  }
+  
 }
 
 
 
-void Observation::insertIntoDb(dnmi::db::Connection *con, bool useTransaction) 
+void Observation::insertIntoDb(dnmi::db::Connection *con, bool useTransaction, const std::string &logid) 
 {
   //db::TransactionBlock tran(con, db::Connection::REPEATABLE_READ, false, !useTransaction);
   db::TransactionBlock tran(con, db::Connection::READ_COMMITTED, false, !useTransaction);
+  ostringstream q;
+
   try {
-    ostringstream q;
     string tbtime;
 
     if ( tbtime_.is_special() ) {
@@ -548,10 +619,25 @@ void Observation::insertIntoDb(dnmi::db::Connection *con, bool useTransaction)
     }
     con->exec(q.str());
   } 
-  catch( ... ) {
+  catch(const dnmi::db::SQLSerializeError &e) {
     tran.abort();
     throw;
   }
+  catch(const dnmi::db::SQLException &e) {
+    if ( !logid.empty() ) {
+      IDLOGERROR(logid, "DBException: Observation::insertIntoDb: " << string(e.what()) <<"\n" << q.str());
+    } else {
+      LOGERROR("DBException: Observation::insertIntoDb: " << string(e.what()) <<"\n" << q.str());
+    }
+
+    tran.abort();
+    throw;
+  }
+  catch(...){
+    tran.abort();
+    throw;
+  }
+  
 }
 
 
