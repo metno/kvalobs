@@ -1,7 +1,11 @@
 librdkafka_version = librdkafka-1.2.2
 librdkafka_src = $(librdkafka_version).tar.gz
 
-all-local: librdkafka
+libhttpserver_version = libhttpserver-0.17.5
+libhttpserver_src = $(libhttpserver_version).tar.gz
+
+
+all-local: librdkafka libhttpserver
 	if [ -f do-recheck ]; then \
 		( cd ..; ./config.status --recheck ) ; \
 		rm -f do-recheck ; \
@@ -18,6 +22,24 @@ librdkafka:
 			make install ) ; \
 		touch do-recheck ; \
 		touch $(librdkafka_version)-stamp ; \
+	fi 
+
+libhttpserver:
+	if [ ! -f $(libhttpserver_version)-stamp ]; then \
+		mkdir -p $(abs_top_builddir)/kvsupport/build ; \
+		cp $(top_srcdir)/kvsupport/$(libhttpserver_src) $(abs_top_builddir)/kvsupport ; \
+		tar zxpf $(libhttpserver_src) ; \
+		(	cd $(libhttpserver_version) ; \
+		  ./bootstrap --build --prefix=$(abs_top_builddir)/kvsupport/build ; \
+			mkdir -p build ; \
+			cd build ; \
+			../configure	--prefix=$(abs_top_builddir)/kvsupport/build ; \
+			make ; \
+			make check ; \
+			make install ; \
+		) ; \
+		touch do-recheck ; \
+		touch $(libhttpserver_version)-stamp ; \
 	fi 
 
 # if MUST_COMPILE_GTEST
@@ -62,4 +84,5 @@ librdkafka:
 
 clean-local:
 	rm -rf librdkafka*
+	rm -rf libhttpserver*
 	

@@ -36,7 +36,8 @@ kvDataInputd_CPPFLAGS = $(AM_CPPFLAGS) $(libxmlpp_CFLAGS)
 kvDataInputd_LDFLAGS = \
    -pthread -export-dynamic \
    -R "$(libdir)/@PACKAGE_NAME@/lib" \
-   -R "$(rdkafka_LIBDIR)"
+   -R "$(rdkafka_LIBDIR)" \
+   -R "$(libhttpserver_LIBDIR)"
 
 kvDataInputd_LDADD = \
    $(top_builddir)/src/lib/json/libjson.la \

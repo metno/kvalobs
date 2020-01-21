@@ -1,3 +1,8 @@
+kvalobs (5.0.1~bionic1-1) bionic; urgency=medium
+  * bionic build
+
+ -- Borge Moe <borge.moe@met.no>  Tue, 21 Jan 2020 09:00:00 +0100
+
 kvalobs (5.0.1-1) xenial; urgency=medium
   * kvManagerd: fix missing bug.
   * kvDataInputd: bugfix nodata, but a observation record for the stationid,typeid and obstime exist.

@@ -34,9 +34,14 @@ version-deb-autotools:
 	@AC_VERSION=$$(grep ^AC_INIT configure.ac | sed -e 's/^AC_INIT(\[[a-zA-Z0-9_.~]\+\], *\[//' -e 's/\], *\[[a-z@.-]\+\])//'); \
 	DEBIAN_PACKAGE=$$(head -n 1 debian/changelog | sed -e 's/^\([a-z_0-9-]\+\) (/\1/'); \
 	DEBIAN_VERSION=$$(head -n 1 debian/changelog | sed -e 's/^[a-z_0-9-]\+ (\([0-9]\+\.[a-zA-Z0-9_.~]\+\)-[^-)]\+).*$$/\1/'); \
+#	DEBIAN_VERSION=$$(head -n 1 debian/changelog | sed -e 's/^[a-z_0-9-]\+ (\([0-9]\+\.[a-zA-Z0-9_.~]\+-[^-)]\+\)).*$$/\1/'); \
+	echo "AC_VERSION     '$$AC_VERSION'" ;\
+	echo "DEBIAN_VERSION '$$DEBIAN_VERSION'" ;\
 	if [ "x$$DEBIAN_VERSION" != "x$$AC_VERSION" ]; then \
 	    echo "Error: debian version '$$DEBIAN_VERSION' != version '$$AC_VERSION' from configure.ac"; \
-	    if [ "x$$KVALOBS_BUILD_VERSION_CHECK" != "xNO" ]; then exit 1; fi \
+	    if [ "x$$KVALOBS_BUILD_VERSION_CHECK" != "xNO" ]; then \
+				exit 1; \
+			fi; \
 	fi;
 
 override_dh_shlibdeps:

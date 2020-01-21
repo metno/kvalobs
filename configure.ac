@@ -1,5 +1,5 @@
 AC_PREREQ([2.59])
-AC_INIT([kvalobs], [5.0.1], [kvoss@met.no])
+AC_INIT([kvalobs], [5.0.1~bionic1], [kvoss@met.no])
 AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -22,7 +22,7 @@ AX_CXX_COMPILE_STDCXX_11(noext)
 #AX_SUBDIRS_CONFIGURE( [subdirs], [mandatory arguments], [possibly merged arguments], [replacement arguments], [forbidden arguments])
 #AX_SUBDIRS_CONFIGURE( [kvsupport/librdkafka-1.2.1], [--prefix=${libdir}/kvalobs], [], [--prefix=${libdir}/kvalobs], [])
 
-export PKG_CONFIG_PATH="./kvsupport/build/lib/pkgconfig:${PKG_CONFIG_PATH}"
+export PKG_CONFIG_PATH=`pwd`"/kvsupport/build/lib/pkgconfig:${PKG_CONFIG_PATH}"
 
 echo "PKG_CONFIG_PATH: '${PKG_CONFIG_PATH}'"
 #AC_CONFIG_SUBDIRS([src/lib/libhttpserver/libhttpserver-0.17.5])
@@ -122,10 +122,20 @@ PKG_CHECK_MODULES(libxmlpp, libxml++-2.6)
 #RDKAFKA_CHECK
 PKG_CHECK_MODULES( [rdkafka], [rdkafka++], [], [true])
 PKG_CHECK_VAR(rdkafka_LIBDIR, rdkafka++, libdir)
+
+#libhttpserver
+PKG_CHECK_MODULES( [libhttpserver], [libhttpserver >= 0.17.0], [], [true] )
+PKG_CHECK_VAR(libhttpserver_LIBDIR, libhttpserver, libdir)
+#echo "libhttpserver_LIBDIR '$libhttpserver_LIBDIR'"
+
+
+#Test, cppunit and gtest
 PKG_CHECK_MODULES(cppunit, cppunit)
 AC_PATH_PROG(CMAKE, cmake, false)
 GMOCK_DIST_CHECK([src/lib/gtest])
-#PKG_CHECK_MODULES( [libhttpserver], [libhttpserver >= 0.9.0] )
+
+
+#Perl
 AC_CHECK_LIB(perl, [main], [], [AC_MSG_ERROR([no libperl found])])
 
 KV_PERL

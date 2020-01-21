@@ -16,6 +16,7 @@ dist-debian: dist clean-debian
 	cp $(PKG_DIR).tar.gz $(DEBIAN_PACKAGE).orig.tar.gz
 
 prepare-debian:
+	echo "DEBIAN_PACKAGE: '$(DEBIAN_PACKAGE)'"
 	rm -rf $(DEBIAN_DIR)
 	mkdir -p $(DEBIAN_DIR)
 	(cd $(top_srcdir)/debian_files/; tar cpf - --exclude='.svn' *) | (cd $(DEBIAN_DIR); tar xpf -) 

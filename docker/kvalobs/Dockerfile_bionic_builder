@@ -11,12 +11,12 @@ RUN apt-get update && apt-get -y install \
   libboost-regex-dev libboost-filesystem-dev libboost-program-options-dev libboost-system-dev \
   libboost-timer-dev \
   libomniorb4-dev  omniidl libperl-dev libdbd-pg-perl libcurl4-gnutls-dev liblog4cpp5-dev libcppunit-dev \
-  librdkafka-dev cmake google-mock metlibs-putools-dev
+  cmake google-mock metlibs-putools-dev zlib1g-dev libssl-dev libsasl2-dev libzstd-dev
+
 # libhttpserver-dev (= 0.9.0)
 
 #To build libhttpserver
 RUN apt-get update && apt-get -y install mg libgnutls28-dev libmicrohttpd-dev cdbs autoconf-archive debhelper
-
 
 RUN addgroup --gid 41494 borgem && adduser --uid 41494  --gid 41494 --disabled-password --disabled-login --gecos '' borgem
 
