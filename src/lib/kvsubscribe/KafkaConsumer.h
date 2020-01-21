@@ -33,7 +33,15 @@
 #include <functional>
 #include <string>
 #include <memory>
-#include <librdkafka/rdkafkacpp.h>
+#include <list>
+
+namespace RdKafka {
+class Consumer;
+class Topic;
+class Conf;
+class Message;
+}
+
 
 namespace kvalobs {
 namespace subscribe {
