@@ -31,7 +31,6 @@
 #include <librdkafka/rdkafkacpp.h>
 #include "KafkaConsumer.h"
 
-
 namespace kvalobs {
 namespace subscribe {
 
