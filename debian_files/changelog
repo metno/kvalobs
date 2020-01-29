@@ -1,5 +1,5 @@
 kvalobs (5.0.2~rc4-1) xenial; urgency=medium
-  * Add LOGLEVEL and IDLOGLEVEL to get loglevel defined.
+  * Add LOGLEVEL and IDLOGLEVEL to get the loglevel defined.
 
  -- Borge Moe <borge.moe@met.no>  Fri, 24 Jan 2020 13:45:00 +0100
 
