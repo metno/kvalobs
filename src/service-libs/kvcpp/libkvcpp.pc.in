@@ -9,5 +9,5 @@ Name: libkvcpp
 Description: Client library for Kvalobs
 Version: @VERSION@
 Requires: omniDynamic4 libkvalobs_decodeutility libxml++-2.6 libkvsubscribe libkvalobs_kvalobs libkvalobs_miutil libkvalobs_kvdb libkvalobs_fileutil libkvalobs_corbahelper libkvalobs_milog libkvalobs_dnmithread libkvalobs_kvadmininterface libkvalobs_miconfparser libkvalobs_kvskel metlibs-putools
-Libs: -Wl,-rpath=${libdir} -pthread -L${libdir} -lkvalobs_kvcpp  @BOOST_DATE_TIME_LIB@ @BOOST_THREAD_LIB@ @BOOST_FILESYSTEM_LIB@ 
+Libs: -Wl,-rpath-link=${pkglibdir}/lib -Wl,-rpath-link=${libdir} -pthread -L${pkglibdir}/lib -L${libdir} -lkvalobs_kvcpp  @BOOST_DATE_TIME_LIB@ @BOOST_THREAD_LIB@ @BOOST_FILESYSTEM_LIB@ 
 Cflags: -pthread -std=c++11 -D_REENTRANT -I${includedir}/@PACKAGE@ -I${includedir}/@PACKAGE@/kvskel -I${includedir}/@PACKAGE@/decoder

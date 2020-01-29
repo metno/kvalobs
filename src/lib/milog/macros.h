@@ -148,6 +148,10 @@
                        __milog_debug6_xxx2334__ << msg;   \
                      }
 
+#define LOGLEVEL()  milog::Logger::logger().logLevel()
+
+#define IDLOGLEVEL(id) milog::Logger::logger(id) 
+
 #define PUSH_LOG_CONTEXT(ctxt) {\
                       milog::Logger::logger().push(ctxt); \
                       }

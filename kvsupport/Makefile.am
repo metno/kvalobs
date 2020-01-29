@@ -4,6 +4,7 @@ librdkafka_src = $(librdkafka_version).tar.gz
 libhttpserver_version = libhttpserver-0.17.5
 libhttpserver_src = $(libhttpserver_version).tar.gz
 
+microhttpd_version=$(shell pkg-config --modversion libmicrohttpd)
 
 all-local: librdkafka libhttpserver
 	if [ -f do-recheck ]; then \
@@ -25,6 +26,7 @@ librdkafka:
 	fi 
 
 libhttpserver:
+	echo "microhttpd_version: $(microhttpd_version)"
 	if [ ! -f $(libhttpserver_version)-stamp ]; then \
 		mkdir -p $(abs_top_builddir)/kvsupport/build ; \
 		cp $(top_srcdir)/kvsupport/$(libhttpserver_src) $(abs_top_builddir)/kvsupport ; \
@@ -33,7 +35,12 @@ libhttpserver:
 		  ./bootstrap --build --prefix=$(abs_top_builddir)/kvsupport/build ; \
 			mkdir -p build ; \
 			cd build ; \
-			../configure	--prefix=$(abs_top_builddir)/kvsupport/build ; \
+			#Hack to build on xenial \
+			if [ $(microhttpd_version) = "0.9.44" ]; then \
+				../configure	--prefix=$(abs_top_builddir)/kvsupport/build --enable-epoll=no ; \
+			else \
+				../configure	--prefix=$(abs_top_builddir)/kvsupport/build ; \
+			fi ;\
 			make ; \
 			make check ; \
 			make install ; \
@@ -85,4 +92,6 @@ libhttpserver:
 clean-local:
 	rm -rf librdkafka*
 	rm -rf libhttpserver*
+	rm -rf build*
+	
 	

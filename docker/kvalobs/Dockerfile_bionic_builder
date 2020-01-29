@@ -5,18 +5,16 @@ RUN apt-get update && apt-get install -y gnupg2 software-properties-common apt-u
   add-apt-repository 'deb http://internrepo.met.no/bionic bionic main contrib'
 
 RUN apt-get update && apt-get -y install \
-  debhelper autotools-dev debconf devscripts fakeroot \
+  debhelper autotools-dev autoconf-archive debconf devscripts fakeroot \
+  less mg \
   automake libtool gfortran bison flex sqlite3 libsqlite3-dev libpq-dev \
   libxml2-dev libxml++2.6-dev libboost-dev libboost-thread-dev \
   libboost-regex-dev libboost-filesystem-dev libboost-program-options-dev libboost-system-dev \
   libboost-timer-dev \
   libomniorb4-dev  omniidl libperl-dev libdbd-pg-perl libcurl4-gnutls-dev liblog4cpp5-dev libcppunit-dev \
-  cmake google-mock metlibs-putools-dev zlib1g-dev libssl-dev libsasl2-dev libzstd-dev
+  cmake google-mock metlibs-putools-dev zlib1g-dev libssl-dev libsasl2-dev libzstd-dev \
+  libgnutls-dev libmicrohttpd-dev
 
-# libhttpserver-dev (= 0.9.0)
-
-#To build libhttpserver
-RUN apt-get update && apt-get -y install mg libgnutls28-dev libmicrohttpd-dev cdbs autoconf-archive debhelper
 
 RUN addgroup --gid 41494 borgem && adduser --uid 41494  --gid 41494 --disabled-password --disabled-login --gecos '' borgem
 

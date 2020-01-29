@@ -1,3 +1,19 @@
+kvalobs (5.0.2~rc4-1) xenial; urgency=medium
+  * Add LOGLEVEL and IDLOGLEVEL to get loglevel defined.
+
+ -- Borge Moe <borge.moe@met.no>  Fri, 24 Jan 2020 13:45:00 +0100
+
+kvalobs (5.0.2~rc3-1) xenial; urgency=medium
+  * kvcpp: fix pkgconfig.
+
+ -- Borge Moe <borge.moe@met.no>  Wed, 22 Jan 2020 14:00:00 +0100
+
+kvalobs (5.0.2~rc2-1) xenial; urgency=medium
+  * merge bionic branch.
+  * kvDataInputd: Compile libhttpserver internally.
+
+ -- Borge Moe <borge.moe@met.no>  Wed, 22 Jan 2020 11:30:00 +0100
+
 kvalobs (5.0.2~rc1-1) xenial; urgency=medium
   * lib/kvsubscribe: Do not expose rdkafka externally. 
   
