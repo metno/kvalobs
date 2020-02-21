@@ -1,5 +1,5 @@
 AC_PREREQ([2.59])
-AC_INIT([kvalobs], [5.0.2~rc4], [kvoss@met.no])
+AC_INIT([kvalobs], [5.0.3], [kvoss@met.no])
 AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -22,8 +22,8 @@ AX_CXX_COMPILE_STDCXX_11(noext)
 #AX_SUBDIRS_CONFIGURE( [subdirs], [mandatory arguments], [possibly merged arguments], [replacement arguments], [forbidden arguments])
 #AX_SUBDIRS_CONFIGURE( [kvsupport/librdkafka-1.2.1], [--prefix=${libdir}/kvalobs], [], [--prefix=${libdir}/kvalobs], [])
 
-export PKG_CONFIG_PATH=`pwd`"/kvsupport/build/lib/pkgconfig:${PKG_CONFIG_PATH}"
-
+#export PKG_CONFIG_PATH=`pwd`"/kvsupport/build/lib/pkgconfig:${PKG_CONFIG_PATH}"
+export PKG_CONFIG_PATH=`pwd`"/kvsupport/build$prefix/lib/kvalobs/lib/pkgconfig:${PKG_CONFIG_PATH}"
 echo "PKG_CONFIG_PATH: '${PKG_CONFIG_PATH}'"
 #AC_CONFIG_SUBDIRS([src/lib/libhttpserver/libhttpserver-0.17.5])
 
@@ -120,14 +120,22 @@ PKG_CHECK_MODULES(libxml2, libxml-2.0)
 PKG_CHECK_MODULES(libxmlpp, libxml++-2.6)
 
 #RDKAFKA_CHECK
+old_PKG_CONFIG=${PKG_CONFIG}
+echo "old_PKG_CONFIG: '${PKG_CONFIG}'"
+PKG_CONFIG="${PKG_CONFIG} --define-prefix "
 PKG_CHECK_MODULES( [rdkafka], [rdkafka++], [], [true])
+PKG_CHECK_MODULES( [rdkafkac], [rdkafka], [], [true])
 PKG_CHECK_VAR(rdkafka_LIBDIR, rdkafka++, libdir)
+
+
+echo "rdkafka_LIBS '$rdkafka_LIBS'"
+echo "rdkafka_CFLAGS '$rdkafka_CFLAGS'"
 
 #libhttpserver
 PKG_CHECK_MODULES( [libhttpserver], [libhttpserver >= 0.17.0], [], [true] )
 PKG_CHECK_VAR(libhttpserver_LIBDIR, libhttpserver, libdir)
-#echo "libhttpserver_LIBDIR '$libhttpserver_LIBDIR'"
-
+echo "libhttpserver_LIBDIR '$libhttpserver_LIBDIR'"
+PKG_CONFIG=${old_PKG_CONFIG}
 
 #Test, cppunit and gtest
 PKG_CHECK_MODULES(cppunit, cppunit)

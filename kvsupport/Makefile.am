@@ -18,9 +18,10 @@ librdkafka:
 		cp $(top_srcdir)/kvsupport/$(librdkafka_src) $(abs_top_builddir)/kvsupport ; \
 		tar zxpf $(librdkafka_src) ; \
 		(	cd $(librdkafka_version) ; \
-		  ./configure --prefix=$(abs_top_builddir)/kvsupport/build ; \
+			export LD_RUN_PATH="$(prefix)/lib/kvalobs/lib" ; \
+			./configure --prefix=$(prefix)/lib/kvalobs ; \
 			make ; \
-			make install ) ; \
+			make DESTDIR=$(abs_top_builddir)/kvsupport/build install ) ; \
 		touch do-recheck ; \
 		touch $(librdkafka_version)-stamp ; \
 	fi 
@@ -32,18 +33,19 @@ libhttpserver:
 		cp $(top_srcdir)/kvsupport/$(libhttpserver_src) $(abs_top_builddir)/kvsupport ; \
 		tar zxpf $(libhttpserver_src) ; \
 		(	cd $(libhttpserver_version) ; \
-		  ./bootstrap --build --prefix=$(abs_top_builddir)/kvsupport/build ; \
+			export LD_RUN_PATH="$(prefix)/lib/kvalobs/lib" ; \
+			./bootstrap --build --prefix=$(prefix)/lib/kvalobs ; \
 			mkdir -p build ; \
 			cd build ; \
 			#Hack to build on xenial \
 			if [ $(microhttpd_version) = "0.9.44" ]; then \
-				../configure	--prefix=$(abs_top_builddir)/kvsupport/build --enable-epoll=no ; \
+				../configure	--prefix=$(prefix)/lib/kvalobs --enable-epoll=no ; \
 			else \
-				../configure	--prefix=$(abs_top_builddir)/kvsupport/build ; \
+				../configure	--prefix=$(prefix)/lib/kvalobs ; \
 			fi ;\
 			make ; \
 			make check ; \
-			make install ; \
+			make DESTDIR=$(abs_top_builddir)/kvsupport/build install ; \
 		) ; \
 		touch do-recheck ; \
 		touch $(libhttpserver_version)-stamp ; \

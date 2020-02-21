@@ -1,3 +1,27 @@
+kvalobs (5.0.3-1) xenial; urgency=medium
+  * Link changes to make it compatible with bionic.
+  * removed dependenciey on metno-pgrepctl.
+
+ -- Borge Moe <borge.moe@met.no>  Fri, 21 Feb 2020 09:30:00 +0100
+
+
+kvalobs (5.0.3~rc2-1) xenial; urgency=medium
+  * Build changes.
+
+ -- Borge Moe <borge.moe@met.no>  Wed, 19 Feb 2020 12:00:00 +0100
+
+kvalobs (5.0.3~rc1-1) xenial; urgency=medium
+  * Build changes.
+
+ -- Borge Moe <borge.moe@met.no>  Wed, 19 Feb 2020 08:00:00 +0100
+
+
+kvalobs (5.0.2-1) xenial; urgency=medium
+  * New release.
+
+ -- Borge Moe <borge.moe@met.no>  Tue, 4 Feb 2020 08:45:00 +0100
+
+
 kvalobs (5.0.2~rc4-1) xenial; urgency=medium
   * Add LOGLEVEL and IDLOGLEVEL to get the loglevel defined.
 
