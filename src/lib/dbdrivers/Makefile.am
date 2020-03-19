@@ -1,5 +1,6 @@
 AM_CPPFLAGS = -I $(top_srcdir)/src/lib
 
+
 dbdriverdir = $(pkglibdir)/db
 
 #dbdriver_LTLIBRARIES = pgdriver.la dummydriver.la sqlite3driver.la sqlitedriver.la
