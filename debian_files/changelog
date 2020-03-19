@@ -1,3 +1,8 @@
+kvalobs (5.0.4~rc1-1) xenial; urgency=medium
+  * Hunting for kvalobs-xml bugs.
+
+ -- Borge Moe <borge.moe@met.no>  Wed, 4 Mar 2020 09:30:00 +0100
+
 kvalobs (5.0.3-1) xenial; urgency=medium
   * Link changes to make it compatible with bionic.
   * removed dependenciey on metno-pgrepctl.

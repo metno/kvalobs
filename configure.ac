@@ -1,5 +1,5 @@
 AC_PREREQ([2.59])
-AC_INIT([kvalobs], [5.0.3], [kvoss@met.no])
+AC_INIT([kvalobs], [5.0.4~rc1], [kvoss@met.no])
 AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -115,7 +115,9 @@ AX_LIB_CURL([7.15.5])
 PKG_CHECK_MODULES(putools, puTools)
 KV_FIND_OMNIORB4
 KV_POSTGRESQL
-PKG_CHECK_MODULES(sqlite3, sqlite3)
+#PKG_CHECK_MODULES(sqlite3, sqlite3)
+#sqlite3_CFLAGS=
+
 PKG_CHECK_MODULES(libxml2, libxml-2.0)
 PKG_CHECK_MODULES(libxmlpp, libxml++-2.6)
 
@@ -126,6 +128,9 @@ PKG_CONFIG="${PKG_CONFIG} --define-prefix "
 PKG_CHECK_MODULES( [rdkafka], [rdkafka++], [], [true])
 PKG_CHECK_MODULES( [rdkafkac], [rdkafka], [], [true])
 PKG_CHECK_VAR(rdkafka_LIBDIR, rdkafka++, libdir)
+
+#Use local build of sqlite3
+PKG_CHECK_MODULES(sqlite3, sqlite3)
 
 
 echo "rdkafka_LIBS '$rdkafka_LIBS'"
