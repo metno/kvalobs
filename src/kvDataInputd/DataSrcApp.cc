@@ -181,7 +181,9 @@ bool DataSrcApp::publishData(const std::list<kvalobs::serialize::KvalobsData> &p
     return true;
   }
 
+  
   for( auto &d : publishData ) {
+    const_cast<kvalobs::serialize::KvalobsData&>(d).producer("kvinput");
     std::unique_ptr<PublishDataCommand> data(new PublishDataCommand(d));
 
     try {
