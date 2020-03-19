@@ -4,9 +4,13 @@ librdkafka_src = $(librdkafka_version).tar.gz
 libhttpserver_version = libhttpserver-0.17.5
 libhttpserver_src = $(libhttpserver_version).tar.gz
 
+sqlite3_version = sqlite-autoconf-3310100
+sqlite3_src=$(sqlite3_version).tar.gz
+
+
 microhttpd_version=$(shell pkg-config --modversion libmicrohttpd)
 
-all-local: librdkafka libhttpserver
+all-local: librdkafka libhttpserver libsqlite
 	if [ -f do-recheck ]; then \
 		( cd ..; ./config.status --recheck ) ; \
 		rm -f do-recheck ; \
@@ -50,6 +54,23 @@ libhttpserver:
 		touch do-recheck ; \
 		touch $(libhttpserver_version)-stamp ; \
 	fi 
+
+libsqlite:
+	echo "sqlite3: $(sqlite3_version)"
+	if [ ! -f $(sqlite3_version)-stamp ]; then \
+		mkdir -p $(abs_top_builddir)/kvsupport/build ; \
+		cp $(top_srcdir)/kvsupport/$(sqlite3_src) $(abs_top_builddir)/kvsupport ; \
+		tar zxpf $(sqlite3_src) ; \
+		(	cd $(sqlite3_version) ; \
+			export LD_RUN_PATH="$(prefix)/lib/kvalobs/lib" ; \
+			./configure --prefix=$(prefix)/lib/kvalobs --enable-shared=no --with-pic; \
+			make ; \
+			make DESTDIR=$(abs_top_builddir)/kvsupport/build install ) ; \
+		touch do-recheck ; \
+		touch $(sqlite3_version)-stamp ; \
+	fi 
+	
+
 
 # if MUST_COMPILE_GTEST
 # gtestdir=${checkdir}
@@ -95,5 +116,6 @@ clean-local:
 	rm -rf librdkafka*
 	rm -rf libhttpserver*
 	rm -rf build*
+	rm -rf sqlite*
 	
 	
