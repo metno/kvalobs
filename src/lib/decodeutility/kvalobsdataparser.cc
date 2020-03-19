@@ -87,8 +87,10 @@ struct KvalobsDataHandler : public HandlerFunction {
                           map<string, string> & context_) const {
     data_.overwrite(has_attr(attr, "overwrite"));
     data_.created(get_attr(attr, "created"));
+    data_.producer(get_attr(attr, "producer"));
   }
 };
+
 class ValHandler : public HandlerFunction {
   string tag_;
  public:

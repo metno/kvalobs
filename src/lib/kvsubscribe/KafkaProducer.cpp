@@ -62,35 +62,6 @@ class DeliveryReport : public RdKafka::DeliveryReportCb {
 }
 
 
-/* 
-KafkaProducer::KafkaProducer(const std::string & topic, const std::string & brokers, KafkaProducer::ErrorHandler onFailedDelivery,
-                             KafkaProducer::SuccessHandler onSuccessfulDelivery)
-    : deliveryReportHandler_(new DeliveryReport(onFailedDelivery, onSuccessfulDelivery)),
-      messageId_(0) {
-  if (brokers.empty())
-    throw std::logic_error("Empty kafka broker list");
-
-  std::string errstr;
-
-  std::unique_ptr<RdKafka::Conf> conf(RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL));
-
-  conf->set("metadata.broker.list", brokers, errstr);
-  //conf->set("bootstrap.servers", brokers, errstr);
-  conf->set("dr_cb", deliveryReportHandler_.get(), errstr);
-
-  producer_.reset(RdKafka::Producer::create(conf.get(), errstr));
-  if (!producer_)
-    throw std::runtime_error("Failed to create producer: " + errstr);
-
-  std::unique_ptr<RdKafka::Conf> tconf(RdKafka::Conf::create(RdKafka::Conf::CONF_TOPIC));
-
-
-  topic_.reset(RdKafka::Topic::create(producer_.get(), topic, tconf.get(), errstr));
-  if (!topic_)
-    throw std::runtime_error("Failed to create topic: " + errstr);
-}
- */
-
 KafkaProducer::KafkaProducer(const std::string & topic,
                          const std::string & brokers,
                          ErrorHandler onFailedDelivery,

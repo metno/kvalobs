@@ -63,6 +63,11 @@ class KvalobsData {
 
   ~KvalobsData();
 
+  std::string producer()const;
+
+  void producer(const std::string &prod );
+
+
   /**
    * True if no data is contained in this object.
    */

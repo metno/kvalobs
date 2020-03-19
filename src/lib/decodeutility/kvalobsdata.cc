@@ -35,6 +35,10 @@
 #include <miutil/timeconvert.h>
 #include <boost/any.hpp>
 #include <stack>
+#include <map>
+#include <mutex>
+
+
 
 using namespace std;
 using boost::posix_time::ptime;
@@ -54,6 +58,50 @@ using internal::Level;
 using internal::TextDataItem;
 using internal::Container;
 
+
+//This is an HACK to keep Binary compability
+namespace {
+  struct BCI {
+    string producer_;
+  };
+  
+static  mutex bciMu;
+static map<KvalobsData*, BCI *> bciMap;
+
+BCI *getBci(KvalobsData *t) {
+  lock_guard<mutex> lck(bciMu);
+  auto it=bciMap.find(t);
+  if( it != bciMap.end()){
+    return it->second;
+  }
+  return nullptr;
+}
+
+
+//create the BCI if it do not exist.
+//return a pointer to the BCI.
+BCI *setBci(KvalobsData *t) {
+  lock_guard<mutex> lck(bciMu);
+  auto it=bciMap.find(t);
+  if( it != bciMap.end()){
+    return it->second;
+  } 
+  auto p=new BCI;
+  bciMap[t]=p;
+  return p;
+}
+
+void delBci(KvalobsData *t) {
+  lock_guard<mutex> lck(bciMu);
+  auto it=bciMap.find(t);
+  if( it != bciMap.end()){
+     delete it->second;
+     bciMap.erase(it);
+  } 
+}
+}
+
+
 KvalobsData::KvalobsData()
     : overwrite_(false) {
 }
@@ -69,8 +117,25 @@ KvalobsData::KvalobsData(const std::list<kvData> & data,
 }
 
 KvalobsData::~KvalobsData() {
+  delBci(this);
 }
 
+std::string KvalobsData::producer()const{
+  auto bci=getBci(const_cast<KvalobsData*>(this));
+  if( !bci ) {
+    return "";
+  }
+  return bci->producer_;
+}
+
+void KvalobsData::producer(const std::string &prod ){
+  auto bci=setBci(this);
+  bci->producer_=prod;
+}
+
+
+
+   
 bool KvalobsData::empty() const {
   return obs_.count() == 0;
 }

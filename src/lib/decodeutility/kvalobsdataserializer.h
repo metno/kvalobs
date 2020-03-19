@@ -42,16 +42,19 @@ namespace serialize {
  * Serializes a \c KvalobsData object into an XML string, or an XML string
  * into a \c KvalobsData object.
  *
- * @author Vegard Bnes
+ * @author Vegard Bønes
  */
 class KvalobsDataSerializer {
  public:
   KvalobsDataSerializer();
+  KvalobsDataSerializer(const KvalobsData & d, const std::string &producer);
   KvalobsDataSerializer(const KvalobsData & d);
   KvalobsDataSerializer(const std::string & s);
 
   ~KvalobsDataSerializer();
+  std::string producer()const;
 
+  static std::string serialize(const KvalobsData & d,const std::string &producer);
   static std::string serialize(const KvalobsData & d);
 
   const KvalobsData & toData() const;
@@ -61,9 +64,13 @@ class KvalobsDataSerializer {
   std::string toString() const;
   std::string toString(const boost::posix_time::ptime &created) const;
 
+  
  private:
   KvalobsData data_;
 };
+
+
+
 
 }
 ;

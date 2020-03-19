@@ -34,17 +34,67 @@
 #include <libxml++/parsers/domparser.h>
 #include <boost/lexical_cast.hpp>
 #include <cmath>
+#include <mutex>
 
 using namespace std;
 using namespace xmlpp;
 using namespace boost;
 using boost::posix_time::ptime;
 
+
 namespace kvalobs {
 
 namespace serialize {
 
+
+namespace {
+  struct BCI {
+    string producer_;
+  };
+  
+static  std::mutex bciMu;
+static map<KvalobsDataSerializer*, BCI *> bciMap;
+
+BCI *getBci(KvalobsDataSerializer *t) {
+  lock_guard<std::mutex> lck(bciMu);
+  auto it=bciMap.find(t);
+  if( it != bciMap.end()){
+    return it->second;
+  }
+  return nullptr;
+}
+
+
+//create the BCI if it do not exist.
+//return a pointer to the BCI.
+BCI *setBci(KvalobsDataSerializer *t) {
+  lock_guard<std::mutex> lck(bciMu);
+  auto it=bciMap.find(t);
+  if( it != bciMap.end()){
+    return it->second;
+  } 
+  auto p=new BCI;
+  bciMap[t]=p;
+  return p;
+}
+
+void delBci(KvalobsDataSerializer *t) {
+  lock_guard<std::mutex> lck(bciMu);
+  auto it=bciMap.find(t);
+  if( it != bciMap.end()){
+     delete it->second;
+     bciMap.erase(it);
+  } 
+}
+}
+
+
 KvalobsDataSerializer::KvalobsDataSerializer() {
+}
+
+KvalobsDataSerializer::KvalobsDataSerializer(const KvalobsData & d, const std::string &producer)
+    : data_(d) {
+      setBci(this)->producer_=producer;
 }
 
 KvalobsDataSerializer::KvalobsDataSerializer(const KvalobsData & d)
@@ -56,6 +106,23 @@ KvalobsDataSerializer::KvalobsDataSerializer(const std::string & s) {
 }
 
 KvalobsDataSerializer::~KvalobsDataSerializer() {
+  delBci(this);
+}
+
+std::string KvalobsDataSerializer::producer()const{
+  auto p=getBci(const_cast<KvalobsDataSerializer*>(this));
+  if( !p) {
+    return "";
+  }
+  return p->producer_;
+}
+
+string KvalobsDataSerializer::serialize(const KvalobsData & d, const std::string &producer) {
+  KvalobsDataSerializer s(d, producer);
+  if( d.created().is_special())
+    return s.toString();
+  else
+    return s.toString(d.created());
 }
 
 string KvalobsDataSerializer::serialize(const KvalobsData & d) {
@@ -65,6 +132,7 @@ string KvalobsDataSerializer::serialize(const KvalobsData & d) {
   else
     return s.toString(d.created());
 }
+
 
 const KvalobsData & KvalobsDataSerializer::toData() const {
   return data_;
@@ -89,11 +157,23 @@ std::string KvalobsDataSerializer::toString() const {
 }
 
 std::string KvalobsDataSerializer::toString(const boost::posix_time::ptime &created) const {
+  string myProducer;
   DomParser parser;
   Document * document = parser.get_document();
   Element * root = document->create_root_node("KvalobsData");
   if (data_.overwrite())
     root->set_attribute("overwrite", "1");
+
+  
+  if(!producer().empty()) {
+    myProducer=producer();
+  } else if( !data_.producer().empty() ){
+    myProducer=data_.producer();
+  }
+
+  if( ! myProducer.empty() ) {
+    root->set_attribute("producer", myProducer);
+  }
 
   if( ! created.is_special() )
     root->set_attribute("created", to_kvalobs_string(created));
@@ -121,12 +201,10 @@ std::string KvalobsDataSerializer::toString(const boost::posix_time::ptime &crea
           // kvData:
           for (TbTime::const_iterator sensor = tbt->begin();
               sensor != tbt->end(); ++sensor) {
-            Element * snsr =
-                sensor->get() ? set_(tt, "sensor", sensor->get()) : tt;
+            Element * snsr = set_(tt, "sensor", sensor->get());
             for (Sensor::const_iterator level = sensor->begin();
                 level != sensor->end(); ++level) {
-              Element * lvl =
-                  level->get() ? set_(snsr, "level", level->get()) : snsr;
+              Element * lvl =set_(snsr, "level", level->get());
               for (Level::const_iterator rest = level->begin();
                   rest != level->end(); ++rest) {
                 Element * kvdata = lvl->add_child("kvdata");
@@ -136,19 +214,15 @@ std::string KvalobsDataSerializer::toString(const boost::posix_time::ptime &crea
                 Element * original = kvdata->add_child("original");
                 original->add_child_text(
                     lexical_cast<string>(content.original));
-                if (std::abs(content.original - content.corrected) > 0.01) {
-                  Element * corrected = kvdata->add_child("corrected");
-                  corrected->add_child_text(
+                Element * corrected = kvdata->add_child("corrected");
+                corrected->add_child_text(
                       lexical_cast<string>(content.corrected));
-                }
                 Element * ci = kvdata->add_child("controlinfo");
                 ci->add_child_text(content.controlinfo.flagstring());
                 Element * ui = kvdata->add_child("useinfo");
                 ui->add_child_text(content.useinfo.flagstring());
-                if (not content.cfailed.empty()) {
-                  Element * cfailed = kvdata->add_child("cfailed");
-                  cfailed->add_child_text(content.cfailed);
-                }
+                Element * cfailed = kvdata->add_child("cfailed");
+                cfailed->add_child_text(content.cfailed);
               }
             }
 
