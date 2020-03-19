@@ -16,6 +16,7 @@ kvsubscribe_LDADD = \
 	$(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
 	$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
 	$(rdkafka_LIBS) \
+	$(BOOST_FILESYSTEM_LIB) \
 	-lboost_program_options -lboost_system
 
 
