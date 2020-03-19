@@ -30,6 +30,7 @@
 #ifndef CHECKCONTROL_H_
 #define CHECKCONTROL_H_
 
+#include <ostream>
 #include <db/DatabaseAccess.h>
 #include <memory>
 
@@ -137,6 +138,15 @@ class CheckRunner {
   // If this is nonempty, only qcx checks listed here will run
   std::set<std::string> qcxFilter_;
 };
+
+/*
+std::ostream &operator << (std::ostream &o, const CheckRunner::DataList &dl) {
+  for( auto &e : dl) {
+    o << e << std::endl;
+  }
+  return o;
+}
+*/
 
 }
 

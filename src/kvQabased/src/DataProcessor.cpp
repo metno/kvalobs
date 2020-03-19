@@ -31,13 +31,19 @@
 #include "db/returntypes/Observation.h"
 #include "CheckRunner.h"
 #include "QaBaseApp.h"
-#include <kvsubscribe/KafkaProducer.h>
-#include <decodeutility/kvalobsdataserializer.h>
-#include <decodeutility/kvalobsdata.h>
-#include <milog/milog.h>
+#include "kvsubscribe/KafkaProducer.h"
+#include "decodeutility/kvalobsdataserializer.h"
+#include "decodeutility/kvalobsdataparser.h"
+#include "decodeutility/kvalobsdata.h"
+#include "milog/milog.h"
+#include "kvalobs/kvPath.h"
+#include "miutil/LogAppender.h"
+#include "miutil/makeUniqueFile.h"
+#include "miutil/timeconvert.h"
 #include <set>
 #include <string>
 #include <thread>
+#include <fstream>
 
 namespace qabase {
 namespace {
@@ -60,15 +66,138 @@ qabase::CheckRunner::KvalobsDataPtr DataProcessor::runChecks(const qabase::Obser
   return modified;
 }
 
-void DataProcessor::sendToKafka(const qabase::CheckRunner::KvalobsDataPtr dataList, bool * stop) {
+namespace {
+  // There is a problem where garbage is received from kafka. This is an attempt to verify
+  // that we don't send garbage on the kafka queue. To verify we serialize to xlm and try to 
+  // deserialize it again. If we cant deserialize. We log it and try the cycle again. We retry
+  // 5 times befor we give up, but we send the garabage anyway :-).
+  //
+  // This does not solve the real problem. What is the cause. Some sort of wild pointer (?), but we 
+  // will at least isolate where the problem may be someway.
+
+  void writeToFile(std::string *file, bool ok, const qabase::Observation & obs, const qabase::CheckRunner::KvalobsDataPtr dataList, const std::string &xml, const std::string &ex=""){
+    using namespace std;
+    using namespace miutil;
+    namespace pt=boost::posix_time;
+    bool writeData=false;
+    string sOk="ok";
+
+    if( ! ok ) {
+      sOk="failed";
+    }
+    
+    if( file->empty() ) {
+      ostringstream o;
+      o << "qabase/" << obs.stationID() << "-" << obs.typeID() << "-" << pt::to_kvalobs_string(obs.obstime(), 'T');
+      string prefix=o.str();
+      string endsWith=".error";
+      writeData=true;
+      
+      if( ok ) {
+       endsWith=".ok";
+      } 
+
+      try {
+        *file = makeUniqueFile(prefix, endsWith, kvalobs::kvPath(kvalobs::logdir));
+      }
+      catch( const exception &e) {
+        LOGWARN("serialize2xml: Error when creating logfile: " << e.what());
+        return;
+      }
+    }
+
+    ofstream f(file->c_str(), ofstream::out|ofstream::binary|ofstream::app);
+    if( !f.is_open() ) {
+      LOGWARN("serialize2xml: Failed to open file: '" << *file << "'.");
+      return;
+    }
+
+    if( writeData) {
+      f << "Data to serialize:\n" << *dataList << "\n\n";
+    }
+    
+    if( !ex.empty() ) {
+      f << "Exception: " << ex << "\n";
+    }
+
+    f << "----- BEGIN XML (" << sOk << ") -----\n" << xml  << "\n----- END XML ------\n";
+    f.close();
+  }
+  
+  std::string serializeToXml(const qabase::Observation & obs, const qabase::CheckRunner::KvalobsDataPtr dataList) {
+    bool        debug=true;
+    std::string xml;
+    std::string fname;
+    std::ofstream ofs;
+    bool errorFileLogged = false;
+    miutil::LogAppender log("kvQabased_serialize.log", kvalobs::kvPath(kvalobs::logdir));
+
+    if( !log.isOk() ) {
+      LOGWARN("serializeToXml: Failed to create logfile. " << log.lastError());
+    }
+
+    if( dataList->empty() ) {
+      log.log("Empty datalist.");
+      return "";
+    }
+    int i;
+    for(  i=0; i<5; ++i) {
+      xml=kvalobs::serialize::KvalobsDataSerializer::serialize(*dataList, "kvqabase");
+      try {
+        kvalobs::serialize::KvalobsData d;
+        kvalobs::serialize::KvalobsDataParser::parse(xml, d);
+        if( d.size() == 0 ) {
+          writeToFile(&fname, false, obs, dataList, xml);
+          if( !errorFileLogged) {
+            std::ostringstream o;
+            o <<   "FAILED Serialize (" << i << "): " << obs << ": " << fname; 
+            log.log(o.str());
+            errorFileLogged=true;
+          }
+        } else {
+          std::ostringstream o;
+          o << "OK Serialize (" << i <<"): "  << obs ;
+          if( i>0 || debug ) {
+            writeToFile(&fname, true, obs, dataList, xml);
+            o << ": " <<  fname;
+          }
+                      
+          log.log(o.str());
+          return xml;
+        }
+      }
+      catch( const std::exception &e) {
+        writeToFile(&fname, false, obs, dataList, xml);
+        if( !errorFileLogged) {
+          std::ostringstream o;
+            o << "FAILED Serialize (exception) (" << i << "): " << obs << ": " << fname; 
+           log.log(o.str());
+           errorFileLogged=true;
+        }
+      }
+    }
+    std::ostringstream o;
+    o << "FAILED Serialize (" << i <<") to many retry: " << obs << ": " <<  fname;
+    log.log(o.str());
+    return xml;
+  }
+}
+
+
+
+void DataProcessor::sendToKafka(const qabase::Observation & obs, const qabase::CheckRunner::KvalobsDataPtr dataList, bool * stop) {
   int sendAttempts = 0;
 
-  if( !dataList ) {
+  if( !dataList || dataList->empty()) {
      return;
   }
 
   do {
-    auto messageid = output_->send(kvalobs::serialize::KvalobsDataSerializer::serialize(*dataList));
+    auto xml=serializeToXml(obs, dataList);
+    if( xml.empty()) {
+      return;
+    }
+    auto messageid = output_->send(xml);
     messages.insert(messageid);
     finalizeMessage_();
 
@@ -88,7 +217,8 @@ void DataProcessor::sendToKafka(const qabase::CheckRunner::KvalobsDataPtr dataLi
 
 void DataProcessor::process(const kvalobs::kvStationInfo & si) {
   qabase::CheckRunner::KvalobsDataPtr modified(checkRunner_->newObservation(si));
-  sendToKafka(modified);
+  Observation dummyObs(0, si.stationID(), si.typeID(), si.obstime(), boost::posix_time::second_clock::universal_time());
+  sendToKafka(dummyObs, modified);
   finalizeMessage_();
 }
 

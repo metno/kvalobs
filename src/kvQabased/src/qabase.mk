@@ -13,7 +13,7 @@ qabase_src_SOURCES += \
 	src/NewDataListener.cpp \
 	src/NewDataListener.h \
 	src/TransactionLogger.cpp \
-	src/TransactionLogger.h
+	src/TransactionLogger.h 
 	
 	
 kvQabased_SOURCES += src/main.cpp

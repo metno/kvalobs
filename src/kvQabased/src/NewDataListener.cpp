@@ -139,7 +139,7 @@ qabase::CheckRunner::KvalobsDataPtr NewDataListener::runChecks(const qabase::Obs
     db_->beginTransaction();
     qabase::CheckRunner::KvalobsDataPtr dataList = processor_.runChecks(obs);
     db_->commit();
-    processor_.sendToKafka(dataList, & stopping_);
+    processor_.sendToKafka(obs, dataList, & stopping_);
     return dataList;
   }
   catch (...) {

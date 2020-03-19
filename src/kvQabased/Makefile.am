@@ -5,6 +5,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/src/lib \
 	-I$(top_builddir)/src/lib \
 	-I$(top_builddir)/src/lib/kvskel \
+	$(libxmlpp_CFLAGS) \
 	$(rdkafka_CFLAGS) \
 	$(BOOST_CPPFLAGS) \
 	$(perl_CFLAGS)
@@ -25,6 +26,7 @@ AM_LDFLAGS = \
 	$(top_builddir)/src/lib/kvsubscribe/libkvalobs_kvsubscribe.la \
 	$(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
 	$(putools_LIBS) \
+	$(libxmlpp_LIBS) \
 	$(BOOST_PROGRAM_OPTIONS_LIB) \
 	$(BOOST_FILESYSTEM_LIB) \
 	$(BOOST_REGEX_LIB) \
