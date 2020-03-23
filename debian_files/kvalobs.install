@@ -12,6 +12,7 @@ usr/bin/kvstatus
 usr/bin/kvstop
 usr/bin/kv_get_stinfosys_params
 usr/bin/qabase_log_cleanup
+usr/bin/qabase_save_serialize.sh
 usr/bin/kvsync_files
 usr/bin/sync_norcom_files
 usr/lib/kvalobs/bin/*
