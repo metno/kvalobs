@@ -1,3 +1,14 @@
+kvalobs (5.0.4-1) xenial; urgency=medium
+  * New release.
+
+ -- Borge Moe <borge.moe@met.no>  Mon, 23 Mar 2020 20:30:00 +0100
+
+kvalobs (5.0.4~rc3-1) xenial; urgency=medium
+  * Add missing file qabase_save_serialize.sh. kvxml to kvinput.
+
+ -- Borge Moe <borge.moe@met.no>  Mon, 23 Mar 2020 18:45:00 +0100
+
+
 kvalobs (5.0.4~rc2-1) xenial; urgency=medium
   * Add a producer tag to the kvxml format.
   * Compile our own version of sqlite and use static link. 
@@ -5,7 +16,7 @@ kvalobs (5.0.4~rc2-1) xenial; urgency=medium
     Set the producer attribut in kvxml to kvqabse.
   * kvDatainputd: Set the producer attribut in kvxml to kvinput.
 
- -- Borge Moe <borge.moe@met.no>  , 23 Mar 2020 10:00:00 +0100
+ -- Borge Moe <borge.moe@met.no>  Mon , 23 Mar 2020 10:00:00 +0100
 
 
 kvalobs (5.0.4~rc1-1) xenial; urgency=medium
