@@ -5,4 +5,9 @@ compress
   daily
   delaycompress
 }
-  
+
+/var/log/kvalobs/kvQabased_serialize.log {
+  rotate 7
+  daily
+  delaycompress
+}

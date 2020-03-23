@@ -1,3 +1,13 @@
+kvalobs (5.0.4~rc2-1) xenial; urgency=medium
+  * Add a producer tag to the kvxml format.
+  * Compile our own version of sqlite and use static link. 
+  * kvQabased: Log all kvxml sendt to kafka. 
+    Set the producer attribut in kvxml to kvqabse.
+  * kvDatainputd: Set the producer attribut in kvxml to kvinput.
+
+ -- Borge Moe <borge.moe@met.no>  , 23 Mar 2020 10:00:00 +0100
+
+
 kvalobs (5.0.4~rc1-1) xenial; urgency=medium
   * Hunting for kvalobs-xml bugs.
 

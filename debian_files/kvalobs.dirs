@@ -12,6 +12,7 @@ var/lib/kvalobs/lam2kv/upload
 var/lib/kvalobs/lam2kv/data
 var/run/kvalobs
 var/log/kvalobs/
+var/log/kvalobs/qabase
 var/log/kvalobs/lam2kv
 var/log/kvalobs/html
 var/log/kvalobs/decoders
@@ -20,3 +21,4 @@ var/log/kvalobs/kvdbadmin
 var/log/kvalobs/kvService
 var/lib/kvalobs/decoders
 var/lib/kvalobs/service/subscribers
+
