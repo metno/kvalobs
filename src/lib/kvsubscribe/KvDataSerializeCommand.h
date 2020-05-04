@@ -40,24 +40,35 @@ namespace service {
 
 /**
  * \brief This is the message that can be passed to the
- * kvalobs.domain.checked queue.
+ * kvalobs.domain.checked queue. The class is bugg never use it.
+ * Use KvDataSerializeCommandExt.
  */
+class KvDataSerializeCommandPrivat;
 
 class KvDataSerializeCommand : public ProducerCommand {
   KvDataSerializeCommand();
   KvDataSerializeCommand(const KvDataSerializeCommand &);
+  KvDataSerializeCommand(const KvDataSerializeCommand &&);
   KvDataSerializeCommand& operator=(const KvDataSerializeCommand &);
 
-  std::list<kvalobs::kvData> data;
-
+  KvDataSerializeCommandPrivat *pPrivate_;
+  
  public:
-  explicit KvDataSerializeCommand(const std::list<kvalobs::kvData> &dataList);
-  explicit KvDataSerializeCommand(const std::list<kvalobs::kvData> &&dataList);
-  explicit KvDataSerializeCommand(const kvalobs::kvData &dataElem);
+  
+  /**
+   * The producer parameter sets the producer tag in the kvxml. Set it to 
+   * something that identify the program/system, ex 'kvinput' for kvDataInputd.
+   */
+  explicit KvDataSerializeCommand(const std::list<kvalobs::kvData> &dataList, const std::string &producer);
+  explicit KvDataSerializeCommand(const std::list<kvalobs::kvData> &&dataList, const std::string &producer);
+  explicit KvDataSerializeCommand(const kvalobs::kvData &dataElem, const std::string &producer);
+  virtual ~KvDataSerializeCommand();
 
-  virtual const char *getData(unsigned int *size) const;
-
+  virtual const char *getData(unsigned int *size) const override;
 };
+
+
+
 
 }  // namespace service
 }  // namespace kvalobs

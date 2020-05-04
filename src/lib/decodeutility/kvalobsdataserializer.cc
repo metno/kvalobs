@@ -48,9 +48,9 @@ namespace serialize {
 
 
 namespace {
-  struct BCI {
-    string producer_;
-  };
+struct BCI {
+  string producer_;
+};
   
 static  std::mutex bciMu;
 static map<KvalobsDataSerializer*, BCI *> bciMap;
@@ -109,11 +109,14 @@ KvalobsDataSerializer::~KvalobsDataSerializer() {
   delBci(this);
 }
 
+std::string KvalobsDataSerializer::defaultProducer="";
+
 std::string KvalobsDataSerializer::producer()const{
   auto p=getBci(const_cast<KvalobsDataSerializer*>(this));
   if( !p) {
-    return "";
+    return defaultProducer;
   }
+
   return p->producer_;
 }
 

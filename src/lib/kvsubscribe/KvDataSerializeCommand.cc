@@ -27,29 +27,67 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include <string>
+#include <mutex>
 #include "lib/decodeutility/kvalobsdataserializer.h"
 #include "lib/kvsubscribe/KvDataSerializeCommand.h"
 
 namespace kvalobs {
 namespace service {
 
-KvDataSerializeCommand::KvDataSerializeCommand(const std::list<kvalobs::kvData> &dataList)
-    : data(dataList) {
+class KvDataSerializeCommandPrivat {
+public:
+  KvDataSerializeCommandPrivat(const std::list<kvalobs::kvData> &data_,const std::string &prod)
+    :data(data_),producer(prod){
+  }
+
+  KvDataSerializeCommandPrivat(const std::list<kvalobs::kvData> &&data_,const std::string &prod)
+    :data(data_),producer(prod){
+  }
+
+  KvDataSerializeCommandPrivat(const std::string &prod)
+    :producer(prod){
+  }
+  std::list<kvalobs::kvData> data;
+  std::string producer;
+  std::string xml;
+
+};
+
+  
+  
+KvDataSerializeCommand::
+KvDataSerializeCommand(const std::list<kvalobs::kvData> &dataList, const std::string &producer)
+  :pPrivate_(new KvDataSerializeCommandPrivat(dataList, producer))
+{
 }
 
-KvDataSerializeCommand::KvDataSerializeCommand(const std::list<kvalobs::kvData> &&dataList)
-    : data(dataList) {
+KvDataSerializeCommand::
+KvDataSerializeCommand(const std::list<kvalobs::kvData> &&dataList, const std::string &producer)
+  : pPrivate_(new KvDataSerializeCommandPrivat(dataList,producer))
+{
+
+}
+KvDataSerializeCommand::
+KvDataSerializeCommand(const kvalobs::kvData &dataElem, const std::string &producer)
+  : pPrivate_(new KvDataSerializeCommandPrivat(producer)){
+    pPrivate_->data.push_back(dataElem);
 }
 
-KvDataSerializeCommand::KvDataSerializeCommand(const kvalobs::kvData &dataElem) {
-  data.push_back(dataElem);
+KvDataSerializeCommand::
+~KvDataSerializeCommand(){
+  delete pPrivate_;
 }
 
-const char *KvDataSerializeCommand::getData(unsigned int *size) const {
-  std::string xml = kvalobs::serialize::KvalobsDataSerializer::serialize(data);
-  *size = xml.size();
-  return xml.data();
+const char *KvDataSerializeCommand::getData(unsigned int *size) const
+{ 
+  pPrivate_->xml = kvalobs::serialize::KvalobsDataSerializer::serialize(pPrivate_->data, pPrivate_->producer);
+  *size = pPrivate_->xml.size();
+  return pPrivate_->xml.data();
 }
+
+
+
+
 
 }  // namespace service
 }  // namespace kvalobs

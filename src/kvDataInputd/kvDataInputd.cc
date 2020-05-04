@@ -34,6 +34,7 @@
 #include "lib/miconfparser/miconfparser.h"
 #include "lib/fileutil/pidfileutil.h"
 #include "lib/kvalobs/kvPath.h"
+#include "lib/decodeutility/kvalobsdataserializer.h"
 #include "kvDataInputd/DataSrcApp.h"
 #include "kvDataInputd/DecodeCommand.h"
 #include "kvDataInputd/InitLogger.h"
@@ -65,6 +66,7 @@ void loghHttpAccess(const std::string &msg) {
 }
 
 int main(int argn, char** argv) {
+  kvalobs::serialize::KvalobsDataSerializer::defaultProducer = "kvinput";
   bool error;
   string pidfile;
   miutil::conf::ConfSection *theKvConf = KvBaseApp::getConfiguration();

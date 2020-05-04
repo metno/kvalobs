@@ -51,6 +51,8 @@ class KvalobsDataSerializer {
   KvalobsDataSerializer(const KvalobsData & d);
   KvalobsDataSerializer(const std::string & s);
 
+  static std::string defaultProducer;
+
   ~KvalobsDataSerializer();
   std::string producer()const;
 
