@@ -1,3 +1,30 @@
+kvalobs (5.0.5-1) xenial; urgency=medium
+  * No change since last rc3.
+  
+ -- Borge Moe <borge.moe@met.no>  Mon, 4 Apr 2020 09:00:00 +0200
+
+kvalobs (5.0.5~rc3-1) xenial; urgency=medium
+  * kvQabased: Add option --logxml for logging of xml sent to 
+    the kafka queue.
+  
+ -- Borge Moe <borge.moe@met.no>  Tue, 31 Mar 2020 14:00:00 +0100
+
+kvalobs (5.0.5~rc2-1) xenial; urgency=medium
+  * Fix data coruption bug in KvDataSerializeCommand. 
+    The fix is binary compatible. All programs that use it must
+    be compiled against this new version of libkvalobs.
+  * kvQabased: Add option --logxml for logging of xml sent to 
+    the kafka queue.
+  
+ -- Borge Moe <borge.moe@met.no>  Tue, 31 Mar 2020 14:00:00 +0100
+
+kvalobs (5.0.5~rc1-1) xenial; urgency=medium
+  * Add a new class KvDataSerializeCommandExt to the kvsubscribe lib.
+  * Depricate buggy KvDataSerializeCommand in kvsubscribe lib.
+
+ -- Borge Moe <borge.moe@met.no>  Tue, 24 Mar 2020 15:00:00 +0100
+
+
 kvalobs (5.0.4-1) xenial; urgency=medium
   * New release.
 
