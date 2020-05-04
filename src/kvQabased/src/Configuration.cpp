@@ -124,6 +124,7 @@ Configuration::Configuration(int& argc, char** argv)
   : runNormally_(true)
   , observationToCheck_(0)
   , logLevel_(milog::DEBUG)
+  , logXml_(false)
   , port_(0)
 {
   const char* USER = std::getenv("USER");
@@ -162,7 +163,10 @@ Configuration::Configuration(int& argc, char** argv)
     "The size of logfile in mega bytes before it is rolled.")(
     "nlogs",
     value<int>(&numberOfLogs_)->default_value(3),
-    "Number of backup logs.");
+    "Number of backup logs.")(
+    "logxml",
+    value<bool>(&logXml_)->default_value(false),
+    "Log the xml-files sendt to kafka.");
 
   options_description database("Database");
   database.add_options()(

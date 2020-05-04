@@ -164,6 +164,10 @@ class Configuration {
     return selectForControlCount_;
   }
 
+  bool logXml()const {
+    return logXml_;
+  }
+
   /**
    * Print version information to the given stream.
    *
@@ -196,6 +200,7 @@ class Configuration {
   std::string runLogFile_;
   milog::LogLevel logLevel_;
   std::string baseLogDir_;
+  bool        logXml_;
 
   std::string databaseName_;
   std::string host_;

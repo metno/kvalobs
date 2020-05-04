@@ -54,6 +54,7 @@ class Configuration;
 class DataProcessor {
  public:
 
+  static bool logXml;
   explicit DataProcessor(std::shared_ptr<qabase::CheckRunner> checkRunner);
 
   ~DataProcessor();

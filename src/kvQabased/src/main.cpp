@@ -189,7 +189,7 @@ void setupLogging(const qabase::Configuration& config, const ProcessStatus & ps)
 }
 
 int main(int argc, char ** argv) {
-
+  kvalobs::serialize::KvalobsDataSerializer::defaultProducer = "kvqabase";
   try {
     qabase::Configuration config(argc, argv);
     if (not config.runNormally())
@@ -201,8 +201,10 @@ int main(int argc, char ** argv) {
     setupLogging(config, processStatus);
     qabase::QaBaseApp app(argc, argv);
 
+    LOGINFO("Log xml sendt to kafka: " << (config.logXml()?"true":"false"));
     LOGDEBUG("Using model data name " << config.modelDataName());
 
+    qabase::DataProcessor::logXml = config.logXml();
     db::KvalobsDatabaseAccess::setModelDataName(config.modelDataName());
 
     if (config.haveObservationToCheck()) {

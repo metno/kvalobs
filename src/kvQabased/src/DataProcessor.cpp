@@ -51,6 +51,8 @@ namespace {
 std::set<kvalobs::subscribe::KafkaProducer::MessageId> messages;
 }
 
+bool DataProcessor::logXml = false;
+
 DataProcessor::DataProcessor(std::shared_ptr<qabase::CheckRunner> checkRunner)
     : checkRunner_(checkRunner),
       logCreator_(QaBaseApp::baseLogDir()),
@@ -70,7 +72,7 @@ namespace {
   // There is a problem where garbage is received from kafka. This is an attempt to verify
   // that we don't send garbage on the kafka queue. To verify we serialize to xlm and try to 
   // deserialize it again. If we cant deserialize. We log it and try the cycle again. We retry
-  // 5 times befor we give up, but we send the garabage anyway :-).
+  // 5 times before we give up, but we send the garabage anyway :-).
   //
   // This does not solve the real problem. What is the cause. Some sort of wild pointer (?), but we 
   // will at least isolate where the problem may be someway.
@@ -124,8 +126,7 @@ namespace {
     f.close();
   }
   
-  std::string serializeToXml(const qabase::Observation & obs, const qabase::CheckRunner::KvalobsDataPtr dataList) {
-    bool        debug=true;
+  std::string serializeToXml(const qabase::Observation & obs, const qabase::CheckRunner::KvalobsDataPtr dataList, bool logXml) {
     std::string xml;
     std::string fname;
     std::ofstream ofs;
@@ -140,6 +141,11 @@ namespace {
       log.log("Empty datalist.");
       return "";
     }
+
+    if( ! logXml ) {
+      return kvalobs::serialize::KvalobsDataSerializer::serialize(*dataList, "kvqabase");
+    }
+
     int i;
     for(  i=0; i<5; ++i) {
       xml=kvalobs::serialize::KvalobsDataSerializer::serialize(*dataList, "kvqabase");
@@ -157,11 +163,8 @@ namespace {
         } else {
           std::ostringstream o;
           o << "OK Serialize (" << i <<"): "  << obs ;
-          if( i>0 || debug ) {
-            writeToFile(&fname, true, obs, dataList, xml);
-            o << ": " <<  fname;
-          }
-                      
+          writeToFile(&fname, true, obs, dataList, xml);
+          o << ": " <<  fname;
           log.log(o.str());
           return xml;
         }
@@ -193,7 +196,7 @@ void DataProcessor::sendToKafka(const qabase::Observation & obs, const qabase::C
   }
 
   do {
-    auto xml=serializeToXml(obs, dataList);
+    auto xml=serializeToXml(obs, dataList, logXml);
     if( xml.empty()) {
       return;
     }
