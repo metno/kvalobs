@@ -1,0 +1,39 @@
+FROM ubuntu:xenial
+
+MAINTAINER Met Norway kvalobs@met.no
+
+ENV user=root
+ENV userid=0
+ENV groupid=0
+
+
+RUN sed -i -e 's,http://archive.ubuntu.com/,http://ftp.uninett.no/ubuntu/,g' /etc/apt/sources.list \
+    && apt-get -y update \
+    && apt-get -y install \
+        build-essential devscripts git devscripts equivs sudo \
+    && apt-get -y clean
+
+RUN groupadd -r build \
+    && useradd --no-log-init -u userid -g build build -G sudo \
+    && mkdir /build \
+    && chown -R build:build /build \
+    && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+RUN echo "deb http://xenialrepo.met.no/ xenial main contrib" > /etc/apt/sources.list.d/metno_xenialrepo.list \
+    && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7423E2EB78589757
+
+WORKDIR /build
+#USER build
+
+RUN echo "do it again, docker -- take 1" \
+    && apt-get -y update \
+    && git clone -b KvDataSerialize https://github.com/metno/kvqc2d.git \
+    && cd kvqc2d \
+    && mk-build-deps -i --tool='apt-get --no-install-recommends --yes' \
+    && debuild -b -us -uc
+
+#    && cd kvqc2d 
+#    && sudo mk-build-deps -i --tool='apt-get --no-install-recommends --yes' \
+#    && debuild -b -us -uc
+
+CMD bash

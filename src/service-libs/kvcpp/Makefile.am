@@ -2,8 +2,7 @@ SUBDIRS = corba sql kafka mock
 
 lib_LTLIBRARIES = libkvalobs_kvcpp.la
 
-libkvalobs_kvcpp_la_SOURCES = \
-   test/configuration.h \
+libkvalobs_kvcpp_la_SOURCES= test/configuration.h \
 	KvApp.cc  \
 	sql/SqlGet.cpp \
 	sql/SqlGet.h \
@@ -75,8 +74,9 @@ pkgconfig_DATA = libkvcpp.pc
 $(pkgconfig_DATA): $(top_builddir)/config.status
 
 
-noinst_PROGRAMS = runit
+#noinst_PROGRAMS = runit
 
+noinst_PROGRAMS =
 runit_SOURCES = runit.cpp
 
 runit_LDFLAGS = \

@@ -33,7 +33,12 @@
 #include <boost/thread/mutex.hpp>
 #include <miconfparser/confparser.h>
 
-using namespace std;
+//using namespace std;
+
+using std::ifstream;
+using std::cerr;
+using std::endl;
+using std::ostringstream;
 
 namespace miutil {
 namespace conf {
