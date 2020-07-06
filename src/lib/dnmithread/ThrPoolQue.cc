@@ -124,6 +124,7 @@ void dnmi::thread::ThreadPoolQue::join() {
 namespace {
 bool defaultAfterFunc(dnmi::thread::CommandBase *cmd) {
   delete cmd;
+  return true;
 }
 }
 ;

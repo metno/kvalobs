@@ -31,11 +31,12 @@
 #ifndef __CommandQue_bm314_h__
 #define __CommandQue_bm314_h__
 
-#include <iosfwd>
-#include <boost/thread.hpp>
-#include <boost/thread/condition.hpp>
+#include <mutex>
+#include <condition_variable>
 #include <string>
 #include <deque>
+#include <list>
+#include <iostream>
 
 namespace dnmi {
 namespace thread {
@@ -61,12 +62,12 @@ class CommandBase {
   std::string comment;
 
  public:
-
   CommandBase() {
   }
   CommandBase(const std::string &comment_)
       : comment(comment_) {
   }
+  
   virtual ~CommandBase() {
   }
 
@@ -101,21 +102,26 @@ class CommandBase {
 /**
  * \brief A que to comunicate between threads.
  */
-class CommandQue : private boost::noncopyable {
+class CommandQue  {
 
  protected:
-  typedef boost::mutex::scoped_lock Lock;
+  typedef std::unique_lock<std::mutex> Lock;
   typedef std::deque<CommandBase*> Que;
   typedef std::deque<CommandBase*>::iterator QueIterator;
   typedef std::deque<CommandBase*>::const_iterator QueCIterator;
 
-  boost::mutex m;
-  boost::condition cond;
+  std::mutex m;
+  std::condition_variable cond;
   Que que;
   bool suspended;
 
  public:
-  explicit CommandQue(bool suspended = false);
+  CommandQue(const CommandBase &) = delete;
+  CommandQue(const CommandBase &&) = delete;
+  CommandQue& operator=(const CommandBase &rhs) = delete;
+
+  explicit CommandQue();
+  explicit CommandQue(bool suspended);
   ~CommandQue();
 
   void post(CommandBase *command);

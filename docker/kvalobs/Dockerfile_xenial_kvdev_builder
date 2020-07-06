@@ -1,0 +1,25 @@
+FROM ubuntu:xenial
+
+RUN apt-get update && apt-get install -y gnupg2 software-properties-common apt-utils && \
+  apt-key adv --keyserver keyserver.ubuntu.com --recv 4e8a0c1418494cf45d1b8533799e9fe74bb0156c && \
+  add-apt-repository 'deb http://internrepo.met.no/xenial xenial main contrib'
+
+RUN apt-get update && apt-get -y install \
+  debhelper autotools-dev autoconf-archive debconf devscripts fakeroot \
+  gdb sudo gfortran \
+  sqlite3 libsqlite3-dev libpq-dev \
+  automake libtool  cmake less mg  \
+  libkvcpp-dev xmlto libgsl-dev libcurl4-gnutls-dev
+
+# metlibs-putools-dev
+
+RUN addgroup --gid 41494 borgem && adduser --uid 41494  --gid 41494 --disabled-password --disabled-login --gecos '' borgem
+RUN usermod -aG sudo borgem
+
+USER borgem:borgem
+
+VOLUME /src
+VOLUME /build
+WORKDIR /build
+
+ENTRYPOINT [ "/bin/bash", "-c", "while true; do sleep 10000; done" ]

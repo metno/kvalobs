@@ -31,6 +31,7 @@
 #ifndef __ThrPoolQue_H__
 #define __ThrPoolQue_H__
 
+#include <boost/core/noncopyable.hpp>
 #include <boost/thread/thread.hpp>
 #include <dnmithread/CommandQue.h>
 #include <dnmithread/mtcout.h>
