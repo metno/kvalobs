@@ -150,7 +150,7 @@
 
 #define LOGLEVEL()  milog::Logger::logger().logLevel()
 
-#define IDLOGLEVEL(id) milog::Logger::logger(id) 
+#define IDLOGLEVEL(id) milog::Logger::logger(id).logLevel() 
 
 #define PUSH_LOG_CONTEXT(ctxt) {\
                       milog::Logger::logger().push(ctxt); \

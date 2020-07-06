@@ -60,7 +60,8 @@ std::string milog::StdLayout1::formatMessage(const std::string &msg,
           tm_.tm_mon + 1, tm_.tm_mday, tm_.tm_hour, tm_.tm_min, tm_.tm_sec);
 
   os << tb;
-
+  dash = "-------------------- ";
+  
   switch (ll) {
     case NOTSET:
       os << "NOTSET ";
@@ -111,7 +112,7 @@ std::string milog::StdLayout1::formatMessage(const std::string &msg,
     return os.str();
   }
 
-  dash = string(os.str().length() - 1, '-') + " ";
+  //dash = string(os.str().length() - 1, '-') + " ";
 
   prev = msg.find_first_not_of("\n", 0);
 
