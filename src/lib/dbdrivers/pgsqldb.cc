@@ -32,6 +32,7 @@
 #include <iostream>
 #include <sstream>
 #include <time.h>
+#include <stdexcept>
 #include "pgsqldb.h"
 
 using std::string;
@@ -408,11 +409,18 @@ int dnmi::db::drivers::PGResult::fieldIndex(const std::string &fieldName) const 
 }
 
 dnmi::db::FieldType dnmi::db::drivers::PGResult::fieldType(int index) const {
-  if (index >= nFields)
-    throw SQLException("index out of range!");
+  throw SQLNotSupported("-- Not implemented. postgreSQL: fieldType");
+  //Not implemented
+  // if (index >= nFields)
+  //   throw SQLException("index out of range!");
+  // return dnmi::db::Integer;
 }
 
 dnmi::db::FieldType dnmi::db::drivers::PGResult::fieldType(const std::string &fieldName) const {
+  //Not implemented
+  //Fix warning
+  throw SQLNotSupported("-- Not implemented. postgreSQL: fieldType");
+  //return dnmi::db::Integer;
 }
 
 int dnmi::db::drivers::PGResult::fieldSize(int index) const {

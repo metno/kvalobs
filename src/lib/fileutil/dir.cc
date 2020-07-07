@@ -143,6 +143,7 @@ bool dnmi::file::Dir::rewind() {
     throw DirException("No directory is open!");
 
   rewinddir(dir);
+  return true;
 }
 
 bool dnmi::file::isDir(const std::string &name) {

@@ -51,7 +51,7 @@ int openFile(const std::string &file, std::string *err) {
   if (fd < 0) {
     const int BUF_SIZE = 512;
     char msg[BUF_SIZE];
-    strerror_r(errno, msg, BUF_SIZE);
+    auto ignored_return_value_=strerror_r(errno, msg, BUF_SIZE);
     msg[BUF_SIZE-1]='\0';
     std::ostringstream o;
     o << "Faile to creat or open log file '" << file << "'. " << msg;
@@ -127,7 +127,7 @@ bool LogAppender::log(const std::string &message)  {
 
   auto m = o.str(); 
 
-  write(fd, m.c_str(), m.size());
+  auto ignored_return_value_=write(fd, m.c_str(), m.size());
   close(fd);
   return true;
 }

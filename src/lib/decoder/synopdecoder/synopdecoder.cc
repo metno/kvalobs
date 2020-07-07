@@ -83,8 +83,8 @@ bool SynopDecoder::getHsInMeter() {
   return inMeter;
 }
 
-long SynopDecoder::getStationId(std::string & msg) {
-}
+//long SynopDecoder::getStationId(std::string & msg) {
+//}
 
 bool SynopDecoder::saveData(list<kvalobs::kvData> &data, bool &rejected,
                             std::string &rejectedMessage) {

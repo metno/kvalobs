@@ -651,9 +651,9 @@ void DataConvert::decodeVal(std::vector<DataElem> &data,
     ts = convertToMiTimeFromHHMM(obsTime, val);
 
     if (!ts.is_not_a_date_time()) {
-      char myBuf[8];
-      sprintf(myBuf, "%02d%02d", ts.time_of_day().hours(),
-              ts.time_of_day().minutes());
+      char myBuf[32];
+      sprintf(myBuf, "%02d%02d", static_cast<int>(ts.time_of_day().hours()),
+              static_cast<int>(ts.time_of_day().minutes()));
       val = myBuf;
     }
   } else if (name == "PP") {

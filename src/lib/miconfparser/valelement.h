@@ -1,7 +1,7 @@
 /*
- Kvalobs - Free Quality Control Software for Meteorological Observations 
+ Kvalobs - Free Quality Control Software for Meteorological Observations
 
- $Id: valelement.h,v 1.1.2.2 2007/09/27 09:02:25 paule Exp $                                                       
+ $Id: valelement.h,v 1.1.2.2 2007/09/27 09:02:25 paule Exp $
 
  Copyright (C) 2007 met.no
 
@@ -15,8 +15,8 @@
  This file is part of KVALOBS
 
  KVALOBS is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License as 
- published by the Free Software Foundation; either version 2 
+ modify it under the terms of the GNU General Public License as
+ published by the Free Software Foundation; either version 2
  of the License, or (at your option) any later version.
 
  KVALOBS is distributed in the hope that it will be useful,
@@ -24,18 +24,18 @@
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  General Public License for more details.
 
- You should have received a copy of the GNU General Public License along 
- with KVALOBS; if not, write to the Free Software Foundation Inc., 
+ You should have received a copy of the GNU General Public License along
+ with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #ifndef __miutil_conf_valelement_h__
 #define __miutil_conf_valelement_h__
 
 #include <iosfwd>
-#include <string>
 #include <list>
-#include <stdexcept>
 #include <miconfparser/confexception.h>
+#include <stdexcept>
+#include <string>
 
 namespace miutil {
 namespace conf {
@@ -48,7 +48,8 @@ namespace conf {
 
 class ValElementList;
 
-enum ValType {
+enum ValType
+{
   UNDEF = 0,
   INT,
   FLOAT,
@@ -58,31 +59,32 @@ enum ValType {
 /**
  * \brief ValElement represent the value in a key=value.
  */
-class ValElement {
+class ValElement
+{
   ValType valType_;
   std::string val_;
 
- public:
+public:
   ValElement()
-      : valType_(UNDEF) {
-  }
+    : valType_(UNDEF)
+  {}
 
-  ValElement(const ValElement &v)
-      : valType_(v.valType_),
-        val_(v.val_) {
-  }
+  ValElement(const ValElement& v)
+    : valType_(v.valType_)
+    , val_(v.val_)
+  {}
 
-  ValElement(const std::string &val);
-  ValElement(const std::string &val, ValType vt);
+  ValElement(const std::string& val);
+  ValElement(const std::string& val, ValType vt);
 
   ValElement(long l);
 
   ValElement(double d);
 
-  ~ValElement() {
-  }
+  ~ValElement() {}
 
-  ValElement &operator=(const ValElement &v) {
+  ValElement& operator=(const ValElement& v)
+  {
     if (this != &v) {
       valType_ = v.valType_;
       val_ = v.val_;
@@ -91,22 +93,19 @@ class ValElement {
     return *this;
   }
 
-  bool undef() const {
-    return valType_ == UNDEF;
-  }
+  bool undef() const { return valType_ == UNDEF; }
 
-  bool isEqual(const ValElement &v) const {
+  bool isEqual(const ValElement& v) const
+  {
     if ((valType_ == v.valType_) && (val_ == v.val_))
       return true;
 
     return false;
   }
 
-  ValType type() const {
-    return valType_;
-  }
+  ValType type() const { return valType_; }
 
-  void val(const std::string &val);
+  void val(const std::string& val);
 
   void val(long val);
 
@@ -116,9 +115,7 @@ class ValElement {
    *
    *
    */
-  std::string valAsString() const {
-    return val_;
-  }
+  std::string valAsString() const { return val_; }
 
   /**
    * return the value as an long. Throws InvalidTypeEx
@@ -165,51 +162,45 @@ class ValElement {
    */
   std::string toString(bool quoted = false) const;
 
-  bool operator==(const ValElement &a) const {
-    return isEqual(a);
-  }
+  bool operator==(const ValElement& a) const { return isEqual(a); }
 
-  friend std::ostream&
-  operator<<(std::ostream &ost, const ValElement &elem);
+  friend std::ostream& operator<<(std::ostream& ost, const ValElement& elem);
 
-  friend std::ostream&
-  operator<<(std::ostream &ost, const ValElementList &elemList);
-
+  // friend std::ostream&
+  // operator<<(std::ostream &ost, const ValElementList &elemList);
 };
+
+std::ostream&
+operator<<(std::ostream& ost, const ValElement& elem);
 
 /**
  * \brief ValElementList is a list of ValElement.
  */
-class ValElementList : public std::list<ValElement> {
+class ValElementList : public std::list<ValElement>
+{
 
- public:
-  ValElementList() {
-  }
+public:
+  ValElementList() {}
 
-  ValElementList(double val) {
-    push_back(ValElement(val));
-  }
+  ValElementList(double val) { push_back(ValElement(val)); }
 
-  ValElementList(long val) {
-    push_back(ValElement(val));
-  }
+  ValElementList(long val) { push_back(ValElement(val)); }
 
-  ValElementList(const std::string &val) {
-    push_back(ValElement(val));
-  }
+  ValElementList(const std::string& val) { push_back(ValElement(val)); }
 
-  ValElementList(const ValElementList &ve)
-      : std::list<ValElement>(ve) {
-  }
+  ValElementList(const ValElementList& ve)
+    : std::list<ValElement>(ve)
+  {}
 
-  ValElementList& operator=(const ValElementList &ve) {
+  ValElementList& operator=(const ValElementList& ve)
+  {
     if (this != &ve) {
       std::list<ValElement>::operator=(ve);
     }
     return *this;
   }
 
-  std::string valAsString(const std::string &defaultVal = "",
+  std::string valAsString(const std::string& defaultVal = "",
                           int index = 0) const;
   long valAsInt(long defaultValue, int index = 0) const;
   bool valAsBool(bool defaultValue, int index = 0) const;
@@ -220,16 +211,19 @@ class ValElementList : public std::list<ValElement> {
    *           [0, size()>.
    */
   ValElement& operator[](const int index);
+
+  friend std::ostream& operator<<(std::ostream& ost,
+                                  const ValElementList& elemList);
 };
 
 typedef ValElementList::iterator IValElementList;
 typedef ValElementList::const_iterator CIValElementList;
 
-std::ostream& operator<<(std::ostream &ost, const ValElementList &elemList);
+std::ostream&
+operator<<(std::ostream& ost, const ValElementList& elemList);
 
 /** @} */
 }
-
 }
 
 #endif

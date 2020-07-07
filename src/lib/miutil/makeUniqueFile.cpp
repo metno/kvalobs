@@ -92,7 +92,7 @@ std::string makeUniqueFile(const std::string &prefix, const std::string &endsWit
       if( errno != EEXIST ) {
         const int BUF_SIZE = 512;
         char msg[BUF_SIZE];
-        strerror_r(errno, msg, BUF_SIZE);
+        auto ignored_return_value_=strerror_r(errno, msg, BUF_SIZE);
         msg[BUF_SIZE-1]='\0';
         std::ostringstream o;
         o << "Failed to creat unique file '" << file << "'. " << msg;

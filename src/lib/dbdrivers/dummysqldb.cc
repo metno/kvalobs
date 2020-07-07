@@ -46,6 +46,7 @@ dnmi::db::drivers::DummyDriver::createConnection(const std::string &connect) {
 
 bool dnmi::db::drivers::DummyDriver::releaseConnection(Connection *connect) {
   delete connect;
+  return true;
   //throw SQLNotSupported("releaseConnection: Not supported!");
 }
 

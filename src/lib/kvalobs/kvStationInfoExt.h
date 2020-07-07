@@ -129,6 +129,8 @@ class kvStationInfoExt {
 
 };
 
+std::ostream& operator<<(std::ostream& os, const kvStationInfoExt &c);
+
 typedef std::list<kvStationInfoExt> kvStationInfoExtList;
 typedef std::list<kvStationInfoExt>::iterator IkvStationInfoExtList;
 typedef std::list<kvStationInfoExt>::const_iterator CIkvStationInfoExtList;

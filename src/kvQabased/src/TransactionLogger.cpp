@@ -55,11 +55,11 @@ TransactionLogger::~TransactionLogger() {
   if (fd < 0) {
     const int BUF_SIZE = 512;
     char msg[BUF_SIZE];
-    strerror_r(errno, msg, BUF_SIZE);
+    auto ignored_retval=strerror_r(errno, msg, BUF_SIZE);
     LOGWARN("Error when creating log file: " << msg);
   } else {
     std::string msg = message();
-    write(fd, msg.c_str(), msg.size());
+    auto ignored_retval=write(fd, msg.c_str(), msg.size());
     close(fd);
   }
 }

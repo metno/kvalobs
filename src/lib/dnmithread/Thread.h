@@ -215,6 +215,7 @@ class Thread {
     CERR("Thread::start count=" << *count_<<std::endl);
 #endif
     thread_.reset(th);
+    return true;
   }
 
   T* get() {
