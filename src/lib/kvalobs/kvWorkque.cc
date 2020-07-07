@@ -89,6 +89,7 @@ bool kvalobs::kvWorkque::set(long observationid, int pri,
   service_stop_ = service_stop;
 
   createSortIndex();
+  return true;
 }
 
 bool kvalobs::kvWorkque::set(const dnmi::db::DRow &r_) {

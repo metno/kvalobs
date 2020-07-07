@@ -100,6 +100,6 @@ int main(int argn, char **argv) {
     cerr << "aexecd: cmd exitstatus: " << ret << ".\n";
   }
 
-  system(string("cat " + logfile).c_str());
+  auto ignored_retval = system(string("cat " + logfile).c_str());
 }
 

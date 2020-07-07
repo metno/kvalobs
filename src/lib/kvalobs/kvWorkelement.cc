@@ -103,6 +103,7 @@ bool kvalobs::kvWorkelement::set(int sid, const boost::posix_time::ptime &obt,
   observationid_ = observationid;
 
   createSortIndex();
+  return true;
 }
 
 bool kvalobs::kvWorkelement::set(const dnmi::db::DRow &r_) {

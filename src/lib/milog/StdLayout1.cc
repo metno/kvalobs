@@ -47,7 +47,7 @@ std::string milog::StdLayout1::formatMessage(const std::string &msg,
   std::stringstream os;
   struct tm tm_;
   time_t t;
-  char tb[32];
+  char tb[74];
   string ss;
   string dash;
   string::size_type i;
@@ -56,9 +56,9 @@ std::string milog::StdLayout1::formatMessage(const std::string &msg,
   time(&t);
   localtime_r(&t, &tm_);
 
-  sprintf(tb, "%04d-%02d-%02d %02d:%02d:%02d ", tm_.tm_year + 1900,
+  snprintf(tb, 74, "%04d-%02d-%02d %02d:%02d:%02d ", tm_.tm_year + 1900,
           tm_.tm_mon + 1, tm_.tm_mday, tm_.tm_hour, tm_.tm_min, tm_.tm_sec);
-
+  tb[73]='\0';
   os << tb;
   dash = "-------------------- ";
   

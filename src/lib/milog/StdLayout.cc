@@ -46,7 +46,7 @@ std::string milog::StdLayout::formatMessage(const std::string &msg, LogLevel ll,
   std::stringstream os;
   struct tm tm_;
   time_t t;
-  char tb[32];
+  char tb[74];
   string ss;
   string::size_type i;
   string::size_type prev;
@@ -54,8 +54,9 @@ std::string milog::StdLayout::formatMessage(const std::string &msg, LogLevel ll,
   time(&t);
   localtime_r(&t, &tm_);
 
-  sprintf(tb, "%04d-%02d-%02d %02d:%02d:%02d ", tm_.tm_year + 1900,
+  auto ignored_retval=snprintf(tb, 74, "%04d-%02d-%02d %02d:%02d:%02d ", tm_.tm_year + 1900,
           tm_.tm_mon + 1, tm_.tm_mday, tm_.tm_hour, tm_.tm_min, tm_.tm_sec);
+  tb[73]='\0';
 
   os << tb;
 

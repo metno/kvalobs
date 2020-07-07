@@ -107,7 +107,7 @@ bool StationFilterElement::stationDefined(long stationId) const {
 }
 
 bool StationFilterElement::typeDefined(long typeId) const {
-  typeids_.find(typeId) != typeids_.end();
+  return typeids_.find(typeId) != typeids_.end();
 }
 
 bool StationFilterElement::filter(long stationId, long typeId) const {

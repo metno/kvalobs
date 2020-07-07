@@ -101,6 +101,7 @@ bool Observation::set(int stationId, int typeId,
     tbtime_=tbt;
     data_=data;
     textData_=textData;
+    return true;
 }
  
 bool Observation::set(const dnmi::db::Result &res ){

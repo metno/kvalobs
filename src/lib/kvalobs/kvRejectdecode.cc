@@ -51,6 +51,7 @@ bool kvalobs::kvRejectdecode::set(const std::string &message__,
   comment_ = comment__;
   fixed_ = fixed;
   sortBy_ = to_kvalobs_string(tbtime_);
+  return true;
 }
 
 bool kvalobs::kvRejectdecode::set(const dnmi::db::DRow& r_) {

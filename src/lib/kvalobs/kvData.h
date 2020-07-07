@@ -31,11 +31,10 @@
 #ifndef __kvData_h__
 #define __kvData_h__
 
-#include <iosfwd>
 #include <boost/date_time/posix_time/posix_time.hpp>
-#include <kvalobs/kvDbBase.h>
+#include <iosfwd>
 #include <kvalobs/kvDataFlag.h>
-
+#include <kvalobs/kvDbBase.h>
 
 namespace kvalobs {
 /**
@@ -48,112 +47,94 @@ namespace kvalobs {
  * \brief Interface to the table data in the kvalobs database.
  */
 
-class kvData : public kvDbBase {
- public:
-  kvData() {
-    clean();
-  }
-  kvData(const kvData &d);
+class kvData : public kvDbBase
+{
+public:
+  kvData() { clean(); }
+  kvData(const kvData& d);
 
-  kvData(const dnmi::db::DRow &r) {
-    set(r);
-  }
-  kvData(int pos, const boost::posix_time::ptime & obt, float org, int par,
-         const boost::posix_time::ptime & tbt, int typ, int sen, int lvl,
-         float cor, const kvControlInfo & cin, const kvUseInfo & uin,
-         const std::string & fai) {
+  kvData(const dnmi::db::DRow& r) { set(r); }
+  kvData(int pos,
+         const boost::posix_time::ptime& obt,
+         float org,
+         int par,
+         const boost::posix_time::ptime& tbt,
+         int typ,
+         int sen,
+         int lvl,
+         float cor,
+         const kvControlInfo& cin,
+         const kvUseInfo& uin,
+         const std::string& fai)
+  {
     set(pos, obt, org, par, tbt, typ, sen, lvl, cor, cin, uin, fai);
   }
 
-  bool set(int pos, const boost::posix_time::ptime & obt, float org, int par,
-           const boost::posix_time::ptime & tbt, int typ, int sen, int lvl,
-           float cor, const kvControlInfo & cin, const kvUseInfo & uin,
-           const std::string & fai);
+  bool set(int pos,
+           const boost::posix_time::ptime& obt,
+           float org,
+           int par,
+           const boost::posix_time::ptime& tbt,
+           int typ,
+           int sen,
+           int lvl,
+           float cor,
+           const kvControlInfo& cin,
+           const kvUseInfo& uin,
+           const std::string& fai);
 
-  bool set(int pos, const boost::posix_time::ptime& obt, float org, int par,
-           const boost::posix_time::ptime &tbt, int typ, int lvl);
+  bool set(int pos,
+           const boost::posix_time::ptime& obt,
+           float org,
+           int par,
+           const boost::posix_time::ptime& tbt,
+           int typ,
+           int lvl);
 
   bool set(const dnmi::db::DRow&);
 
   void clean();
 
   // typeid for observations artificially created by kvalobs
-  enum {
+  enum
+  {
     kv_typeid = 5
   };
 
-  const char* tableName() const {
-    return "data";
-  }
+  const char* tableName() const { return "data"; }
 
-  kvData& operator=(const kvData &rhs);
+  kvData& operator=(const kvData& rhs);
 
   std::string toSend() const;
   std::string toUpdate() const;
   std::string toUpload() const;
   std::string uniqueKey() const;
 
-  int stationID() const {
-    return stationid_;
-  }
-  const boost::posix_time::ptime & obstime() const {
-    return obstime_;
-  }
-  float original() const {
-    return original_;
-  }
-  int paramID() const {
-    return paramid_;
-  }
-  const boost::posix_time::ptime & tbtime() const {
-    return tbtime_;
-  }
-  int typeID() const {
-    return typeid_;
-  }
-  int sensor() const {
-    return sensor_;
-  }
-  int level() const {
-    return level_;
-  }
-  float corrected() const {
-    return corrected_;
-  }
-  const kvControlInfo & controlinfo() const {
-    return controlinfo_;
-  }
-  const kvUseInfo & useinfo() const {
-    return useinfo_;
-  }
-  const std::string & cfailed() const {
-    return cfailed_;
-  }
+  int stationID() const { return stationid_; }
+  const boost::posix_time::ptime& obstime() const { return obstime_; }
+  float original() const { return original_; }
+  int paramID() const { return paramid_; }
+  const boost::posix_time::ptime& tbtime() const { return tbtime_; }
+  int typeID() const { return typeid_; }
+  int sensor() const { return sensor_; }
+  int level() const { return level_; }
+  float corrected() const { return corrected_; }
+  const kvControlInfo& controlinfo() const { return controlinfo_; }
+  const kvUseInfo& useinfo() const { return useinfo_; }
+  const std::string& cfailed() const { return cfailed_; }
 
-  void tbtime(const boost::posix_time::ptime &tbtime) {
-    tbtime_ = tbtime;
-  }
-  void typeID(int t) {
-    typeid_ = t;
-  }
-  void corrected(float c) {
-    corrected_ = c;
-  }
-  void controlinfo(const kvControlInfo &f) {
-    controlinfo_ = f;
-  }
-  void useinfo(const kvUseInfo &f) {
-    useinfo_ = f;
-  }
+  void tbtime(const boost::posix_time::ptime& tbtime) { tbtime_ = tbtime; }
+  void typeID(int t) { typeid_ = t; }
+  void corrected(float c) { corrected_ = c; }
+  void controlinfo(const kvControlInfo& f) { controlinfo_ = f; }
+  void useinfo(const kvUseInfo& f) { useinfo_ = f; }
   void useinfo(int flag, char newVal);
-  void cfailed(const std::string& cf) {
-    cfailed_ = cf;
-  }
+  void cfailed(const std::string& cf) { cfailed_ = cf; }
 
   friend std::ostream& operator<<(std::ostream& output,
-                                  const kvalobs::kvData &d);
+                                  const kvalobs::kvData& d);
 
- private:
+private:
   int stationid_;
   boost::posix_time::ptime obstime_;
   float original_;
@@ -170,7 +151,9 @@ class kvData : public kvDbBase {
   void createSortIndex();
 };
 
+std::ostream&
+operator<<(std::ostream& output, const kvalobs::kvData& d);
+
 /** @} */
-}
-;
+};
 #endif

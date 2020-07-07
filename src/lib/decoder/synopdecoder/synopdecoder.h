@@ -52,7 +52,7 @@ class SynopDecoder : public DecoderBase {
   static boost::mutex mutex;
   static kvSynopDecoder synopDec;
 
-  long getStationId(std::string &msg);
+  //long getStationId(std::string &msg);
   bool initializeKvSynopDecoder();
   bool saveData(std::list<kvalobs::kvData> &data, bool &rejected,
                 std::string &rejectedMessage);

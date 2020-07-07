@@ -181,6 +181,7 @@ bool DataSrcApp::publishData(const std::list<kvalobs::serialize::KvalobsData> &p
     return true;
   }
 
+  bool ret = true;
   
   for( auto &d : publishData ) {
     const_cast<kvalobs::serialize::KvalobsData&>(d).producer("kvinput");
@@ -190,9 +191,11 @@ bool DataSrcApp::publishData(const std::list<kvalobs::serialize::KvalobsData> &p
       kafkaPubStream.queue->timedAdd(data.get(), std::chrono::seconds(4), true);
       data.release();
     } catch (std::exception &ex) {
+      ret = false;
       LOGWARN("Unable to post data to the 'checked' kafka queue.\nReason: " << ex.what() <<"\n"<< headStation(d));
     }
   }
+  return ret;
 }
 
 DataSrcApp::~DataSrcApp() {

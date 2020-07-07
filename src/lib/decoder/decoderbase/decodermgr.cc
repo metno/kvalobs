@@ -44,6 +44,7 @@ using namespace miutil;
  */
 
 bool DecoderMgr::readyForUpdate() {
+  return true;
 }
 
 void DecoderMgr::updateDecoders() {
