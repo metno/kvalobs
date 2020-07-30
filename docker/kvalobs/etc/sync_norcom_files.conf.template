@@ -1,0 +1,5 @@
+#The format is documented in kvsync_files
+
+KEYS="1"
+SOURCE_AND_DEST_1="kvalobs@norcom2.met.no:/metno/norcom/data/kvalobs/data* \
+                  /disk1/kvalobs/var/lib/kvalobs/synopreports"

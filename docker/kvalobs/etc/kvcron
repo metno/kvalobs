@@ -1,0 +1,18 @@
+# Template cron script  debian_files/kvcron
+
+SHELL=/bin/bash
+MYBIN=/usr/lib/kvalobs/bin
+LOG=/var/log/kvalobs
+TZ=UTC
+MAILTO="borgem@met.no,pals@met.no,terjeer@met.no,oysteinl@met.no"
+
+*/2  * * * *   $MYBIN/kvdatainputd_check.sh > /dev/null 2>&1 %
+*/15 * * * *   $MYBIN/kvcheck.sh  %
+15   * * * *   /usr/bin/qabase_log_cleanup > /dev/null 2>&1  %
+*/2 *   * * *  /usr/bin/qabase_save_serialize.sh %
+25 0 * * *     /usr/bin/kvdbadmin > /dev/null 2>&1 %
+#25 3,21 * * * /usr/bin/kvrestart kvQabased > /dev/null 2>&1 %
+*/5 * * * *    /usr/bin/kvrestart -r -s -n aexecd > /dev/null 2>&1 %
+#25 1 * * *    /usr/bin/kvDataInputd_ExecDecoder_log_cleanup 2>&1 %
+#25 1 * * *    $HOME/bin/kvDataInputd_ExecDecoder_log_cleanup 2>&1 %
+15,45 * * * *  $HOME/bin/kvget_utesperring > $LOG/kvget_utesperring.log 2>&1 %

@@ -152,10 +152,10 @@ if [ -n "$META_LOCAL_SRC" ]; then
 else
    if [[ ( $CLIENT_ENCODING = LATIN1  &&  $SERVER_ENCODING = LATIN1  ) ]] ; then
        echo "METASRC: $METASRC"
-       wget -O - $METASRC | tar xvvj
+       wget -O - $METASRC | tar xvvjf -
    else
        echo "METASRC: $METASRC_UTF8"
-       wget -O - $METASRC_UTF8 | tar xvvj
+       wget -O - $METASRC_UTF8 | tar xvvjf -
    fi
 fi
 

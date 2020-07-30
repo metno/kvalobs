@@ -1,0 +1,18 @@
+# Algorithm configuration for redistribution of accumulated precipitation
+
+Algorithm=Redistribute
+#InterpCode=2
+RunAtHour   = 06
+RunAtMinute = 50
+#RunAtHour   = 12
+#RunAtMinute = 16
+Last_NDays  = 120
+
+Start_hh=6
+End_hh=6
+
+#[Specific Data Type and Parameters ids etc.]
+ParamId=110
+TypeIds=302
+TypeIds=305
+TypeIds=402
