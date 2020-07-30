@@ -13,10 +13,15 @@ Build-Depends: debhelper (>= 9), autotools-dev, debconf,
  libomniorb4-dev (>= 4.0.6), omniidl4 (>= 4.0.6) | omniidl (>= 4.1.6),
  libperl-dev (>= 5.8), libdbd-pg-perl (>= 1.49), libcurl4-gnutls-dev | libcurl-dev,
  liblog4cpp5-dev, libcppunit-dev (>= 1.12),
- metlibs-putools-dev, cmake, google-mock,
+ cmake, google-mock,
  libmicrohttpd-dev, libgnutls-dev | libgnutls28-dev, 
  zlib1g-dev, libssl-dev, libsasl2-dev, libzstd-dev
 Standards-Version: 3.9.2
+
+
+#metlibs-putools-dev
+
+
 
 Package: libkvalobs8
 Section: libs
@@ -48,8 +53,7 @@ Depends: libkvcpp8 (= ${binary:Version}),
  libboost-dev (>= 1.40.0), libboost-thread-dev (>= 1.40.0),
  libboost-regex-dev (>= 1.40.0), libboost-filesystem-dev (>= 1.40.0),
  libboost-program-options-dev (>= 1.40.0), libboost-system-dev (>= 1.40.0),
- libomniorb4-dev (>= 4.0.6), libperl-dev (>= 5.8),
- metlibs-putools-dev,
+ libomniorb4-dev (>= 4.0.6), libperl-dev (>= 5.8)
  ${misc:Depends}
 Description: Client development file for kvalobs
  Kvalobs is a quality control system for meteorological observations.
@@ -103,13 +107,13 @@ Description: Install kvalobs init scripts.
 # A client program to send data to a kvalobs server. The data to
 # send is in files with the "kvalobs format kldata".
 
-Package: kv2kvdatainputd
-Architecture: any
-Depends:  ${shlibs:Depends}, ${misc:Depends},
- libkvalobs8 (>= ${binary:Version})
-Description: receive data from another kvalobs server
- kv2kvDataInputd listens for data updates from one kvalobs
- instance, strips them so that only the original data are transferred,
- and sends them to another kvalobs instance using the 'kldata'
- decoder format.
+#Package: kv2kvdatainputd
+#Architecture: any
+#Depends:  ${shlibs:Depends}, ${misc:Depends},
+# libkvalobs8 (>= ${binary:Version})
+#Description: receive data from another kvalobs server
+# kv2kvDataInputd listens for data updates from one kvalobs
+# instance, strips them so that only the original data are transferred,
+# and sends them to another kvalobs instance using the 'kldata'
+# decoder format.
  

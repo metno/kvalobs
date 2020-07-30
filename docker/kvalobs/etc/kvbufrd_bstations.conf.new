@@ -1,0 +1,4685 @@
+id_210 {
+   code=(1)
+   name="TRYSIL - NORDRE KANKEN"
+   height=1020
+   height_wind=10
+   height_temperature=2
+   stationid=210
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=61.3188
+   longitude=12.1887
+}
+
+id_1070 {
+   code=(1)
+   name="HVALER - BREKKE"
+   height=20
+   height_temperature=2
+   stationid=1070
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.0418
+   longitude=11.0322
+}
+
+id_3290 {
+   code=(1)
+   name="RAKKESTAD"
+   height=100
+   height_temperature=2
+   stationid=3290
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.3882
+   longitude=11.3905
+}
+
+id_3370 {
+   code=(1)
+   name="ØSAKER"
+   height=45
+   height_temperature=2
+   stationid=3370
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.3193
+   longitude=11.0422
+}
+
+id_3720 {
+   code=(1)
+   name="ASKIM - KYKKELSRUD"
+   height=87
+   height_temperature=2
+   stationid=3720
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.5873
+   longitude=11.0962
+}
+
+id_3810 {
+   code=(1)
+   name="ASKIM II"
+   height=141
+   height_temperature=2
+   stationid=3810
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.5872
+   longitude=11.166
+}
+
+id_4260 {
+   code=(1)
+   name="SKEDSMO - HELLERUD"
+   height=143
+   height_temperature=2
+   stationid=4260
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.9775
+   longitude=10.9777
+}
+
+id_4785 {
+   code=(1)
+   name="GARDERMOEN PLU"
+   height=203
+   height_temperature=2
+   stationid=4785
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=60.2105
+   longitude=11.0782
+}
+
+id_4920 {
+   code=(1)
+   name="ÅRNES"
+   height=160
+   height_wind=2
+   height_precip=2
+   height_temperature=2
+   stationid=4920
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=60.1268
+   longitude=11.3933
+}
+
+id_5350 {
+   code=(1)
+   name="NORD-ODAL"
+   height=147
+   height_precip=2
+   height_temperature=2
+   stationid=5350
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=60.3883
+   longitude=11.558
+}
+
+id_5660 {
+   code=(1)
+   name="ROVERUD"
+   height=170
+   height_temperature=2
+   stationid=5660
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=60.2537
+   longitude=12.0913
+}
+
+id_8780 {
+   code=(1)
+   name="LI BRU"
+   height=780
+   height_temperature=4
+   stationid=8780
+   typepriority=(503)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=62.0103
+   longitude=10.0003
+}
+
+id_8880 {
+   code=(1)
+   name="ALVDAL"
+   height=478
+   height_temperature=2
+   stationid=8880
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=62.1093
+   longitude=10.6268
+}
+
+id_9050 {
+   code=(1)
+   name="GRIMSE"
+   height=800
+   height_temperature=2
+   stationid=9050
+   typepriority=(503)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=62.063
+   longitude=9.9907
+}
+
+id_9380 {
+   code=(1)
+   name="SNØHEIM"
+   height=1475
+   height_wind=10
+   height_temperature=2
+   stationid=9380
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=62.2958
+   longitude=9.352
+}
+
+id_11450 {
+   code=(1)
+   name="MINNESUND JERNBANESTASJON"
+   height=143
+   height_temperature=2
+   stationid=11450
+   typepriority=(342)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=60.3943
+   longitude=11.2302
+}
+
+id_12180 {
+   code=(1)
+   name="ILSENG"
+   height=182
+   height_temperature=2
+   stationid=12180
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=60.8028
+   longitude=11.2028
+}
+
+id_12648 {
+   code=(1)
+   name="LILLEHAMMER - RÅDHUSET"
+   height=210
+   height_temperature=1
+   stationid=12648
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=61.1145
+   longitude=10.4675
+}
+
+id_12700 {
+   code=(1)
+   name="LILLEHAMMER - VÅRSÆTERGRENDA"
+   height=507
+   height_temperature=1
+   stationid=12700
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=61.104
+   longitude=10.5112
+}
+
+id_12710 {
+   code=(1)
+   name="LILLEHAMMER - NORDSETERVEGEN HØYDEBASSENG"
+   height=562
+   height_temperature=1
+   stationid=12710
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=61.1431
+   longitude=10.5143
+}
+
+id_12960 {
+   code=(1)
+   name="SJUSJØEN - STORÅSEN"
+   height=930
+   height_wind=4
+   height_precip=2
+   stationid=12960
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=61.1638
+   longitude=10.7088
+}
+
+id_12980 {
+   code=(1)
+   name="LILLEHAMMER - BJØRNERUD"
+   height=388
+   height_temperature=1
+   stationid=12980
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=61.1478
+   longitude=10.4548
+}
+
+id_13030 {
+   code=(1)
+   name="GAUSDAL - FOLLEBU"
+   height=375
+   height_temperature=2
+   stationid=13030
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=61.2247
+   longitude=10.2588
+}
+
+id_13750 {
+   code=(1)
+   name="ØVRE HEIMDALSVATN"
+   height=1088
+   height_temperature=3
+   stationid=13750
+   typepriority=(503)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=61.4183
+   longitude=8.8945
+}
+
+id_14200 {
+   code=(1)
+   name="LEIRFLATEN"
+   height=599
+   height_temperature=2
+   stationid=14200
+   typepriority=(342)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=61.7247
+   longitude=9.1542
+}
+
+id_15262 {
+   code=(1)
+   name="JUVFLYE - MIMISBRUNNR KLIMAPARK"
+   height=1844
+   height_temperature=2
+   stationid=15262
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=61.674
+   longitude=8.3685
+}
+
+id_15430 {
+   code=(1)
+   name="BØVERDAL"
+   height=700
+   height_precip=2
+   height_temperature=2
+   stationid=15430
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=61.7195
+   longitude=8.2423
+}
+
+id_16040 {
+   code=(1)
+   name="OTTA - SKANSEN"
+   height=309
+   height_wind=13
+   height_temperature=2
+   height_pressure=287.0
+   stationid=16040
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=61.7782
+   longitude=9.5413
+}
+
+id_16271 {
+   code=(1)
+   name="HØVRINGEN II"
+   height=940
+   height_precip=2
+   height_temperature=2
+   stationid=16271
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=61.8883
+   longitude=9.4798
+}
+
+id_16400 {
+   code=(1)
+   name="DOVRE-LANNEM"
+   height=560
+   height_wind=10
+   height_precip=2
+   height_temperature=2
+   height_pressure=558.3
+   stationid=16400
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=62.0172
+   longitude=9.2143
+}
+
+id_17050 {
+   code=(1)
+   name="RÅDE - TOMB"
+   height=12
+   height_wind=2
+   height_precip=2
+   height_temperature=2
+   stationid=17050
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.3188
+   longitude=10.8145
+}
+
+id_17380 {
+   code=(1)
+   name="RYGGE - HUGGENES"
+   height=35
+   height_wind=2
+   height_temperature=2
+   stationid=17380
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.398
+   longitude=10.7543
+}
+
+id_17870 {
+   code=(1)
+   name="ÅS - RUSTADSKOGEN"
+   height=120
+   stationid=17870
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.6703
+   longitude=10.8107
+}
+
+id_17980 {
+   code=(1)
+   name="OSLO - LJABRUVEIEN"
+   height=92
+   height_temperature=2
+   stationid=17980
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.8427
+   longitude=10.8236
+}
+
+id_18020 {
+   code=(1)
+   name="OSLO - LAMBERTSETER"
+   height=135
+   height_temperature=2
+   stationid=18020
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.8775
+   longitude=10.8185
+}
+
+id_18210 {
+   code=(1)
+   name="OSLO - HOVIN"
+   height=100
+   height_wind=25
+   height_temperature=2
+   stationid=18210
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.923
+   longitude=10.804
+}
+
+id_18269 {
+   code=(1)
+   name="OSLO - HAUGENSTUA"
+   height=123
+   height_temperature=2
+   stationid=18269
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.9535
+   longitude=10.9035
+}
+
+id_18270 {
+   code=(1)
+   name="OSLO - VESTLI"
+   height=200
+   height_temperature=2
+   stationid=18270
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.9683
+   longitude=10.9185
+}
+
+id_18315 {
+   code=(1)
+   name="OSLO - SOFIENBERG"
+   height=37
+   height_temperature=2
+   stationid=18315
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.919
+   longitude=10.7623
+}
+
+id_18420 {
+   code=(1)
+   name="OSLO - DISEN"
+   height=130
+   height_temperature=2
+   stationid=18420
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.9463
+   longitude=10.7903
+}
+
+id_18701 {
+   code=(1)
+   name="OSLO - BLINDERN PLU"
+   height=94
+   height_temperature=2
+   stationid=18701
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.9423
+   longitude=10.7201
+}
+
+id_18815 {
+   code=(1)
+   name="OSLO - BYGDØY"
+   height=15
+   height_temperature=2
+   stationid=18815
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.9048
+   longitude=10.6825
+}
+
+id_18920 {
+   code=(1)
+   name="OSLO - BESSERUD"
+   height=177
+   height_temperature=2
+   stationid=18920
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.9573
+   longitude=10.671
+}
+
+id_18980 {
+   code=(1)
+   name="OSLO - LILLEAKER"
+   height=39
+   height_temperature=2
+   stationid=18980
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.9203
+   longitude=10.6343
+}
+
+id_19461 {
+   code=(1)
+   name="BRUNKOLLEN"
+   height=370
+   height_temperature=2
+   stationid=19461
+   typepriority=(503)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.9682
+   longitude=10.5472
+}
+
+id_19470 {
+   code=(1)
+   name="MUREN"
+   height=262
+   height_precip=2
+   height_temperature=2
+   stationid=19470
+   typepriority=(503)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.9603
+   longitude=10.5357
+}
+
+id_19527 {
+   code=(1)
+   name="SKRIVERBERGET"
+   height=281
+   height_temperature=2
+   stationid=19527
+   typepriority=(503)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.96
+   longitude=10.5315
+}
+
+id_19810 {
+   code=(1)
+   name="RØYKEN - SKOGSBORG"
+   height=3
+   height_temperature=3
+   stationid=19810
+   typepriority=(508)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.6919
+   longitude=10.5198
+}
+
+id_19825 {
+   code=(1)
+   name="TOFTE - RULLETO"
+   height=9
+   height_temperature=3
+   stationid=19825
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.5513
+   longitude=10.5813
+}
+
+id_19932 {
+   code=(1)
+   name="GLITREVANN"
+   height=360
+   height_temperature=2
+   stationid=19932
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.8562
+   longitude=10.065
+}
+
+id_19940 {
+   code=(1)
+   name="LIER"
+   height=39
+   height_wind=2
+   height_temperature=2
+   stationid=19940
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.7908
+   longitude=10.2598
+}
+
+id_20000 {
+   code=(1)
+   name="TYRISTRAND"
+   height=63
+   height_precip=2
+   height_temperature=2
+   stationid=20000
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=60.082
+   longitude=10.1133
+}
+
+id_20280 {
+   code=(1)
+   name="HØNEFOSS - HVERVEN"
+   height=126
+   height_wind=2
+   height_temperature=2
+   stationid=20280
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=60.1403
+   longitude=10.2662
+}
+
+id_20540 {
+   code=(1)
+   name="GRAN"
+   height=245
+   height_temperature=2
+   stationid=20540
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=60.3558
+   longitude=10.5592
+}
+
+id_20720 {
+   code=(1)
+   name="SORTUNGEN"
+   height=364
+   height_precip=2
+   height_temperature=2
+   stationid=20720
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=60.4278
+   longitude=10.3577
+}
+
+id_22220 {
+   code=(1)
+   name="ÅDAL - STRØMMEN"
+   height=150
+   height_temperature=2
+   stationid=22220
+   typepriority=(502)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=60.3142
+   longitude=10.1396
+}
+
+id_22700 {
+   code=(1)
+   name="URULA"
+   height=224
+   height_temperature=2
+   stationid=22700
+   typepriority=(502)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=60.5583
+   longitude=9.8742
+}
+
+id_22800 {
+   code=(1)
+   name="BERGSUND"
+   height=219
+   height_temperature=2
+   stationid=22800
+   typepriority=(502)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=60.8082
+   longitude=9.5674
+}
+
+id_23200 {
+   code=(1)
+   name="BLØYTJERNET"
+   height=750
+   height_temperature=2
+   stationid=23200
+   typepriority=(502)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=60.8949
+   longitude=9.28445
+}
+
+id_23350 {
+   code=(1)
+   name="FLYVATNET"
+   height=860
+   height_precip=2
+   height_temperature=2
+   stationid=23350
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=60.91
+   longitude=8.8697
+}
+
+id_23405 {
+   code=(1)
+   name="FJØSHØLEN VED STRONDAFJORDEN"
+   height=325
+   height_temperature=2
+   stationid=23405
+   typepriority=(502)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=60.9623
+   longitude=9.3019
+}
+
+id_23460 {
+   code=(1)
+   name="RØSSBRUA"
+   height=428
+   height_temperature=2
+   stationid=23460
+   typepriority=(502)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=61.0728
+   longitude=9.113
+}
+
+id_23520 {
+   code=(1)
+   name="BEITO - ØYANGEN"
+   height=677
+   height_temperature=2
+   stationid=23520
+   typepriority=(502)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=61.2
+   longitude=8.9232
+}
+
+id_23580 {
+   code=(1)
+   name="KALVEDALEN KRAFTVERK"
+   height=763
+   height_precip=2
+   height_temperature=2
+   stationid=23580
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=61.2565
+   longitude=8.7588
+}
+
+id_23600 {
+   code=(1)
+   name="RØN"
+   height=367
+   height_precip=2
+   height_temperature=2
+   stationid=23600
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=61.0387
+   longitude=9.0452
+}
+
+id_23700 {
+   code=(1)
+   name="HEMSINGBRUNE"
+   height=466
+   height_temperature=2
+   stationid=23700
+   typepriority=(502)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=61.1588
+   longitude=8.6678
+}
+
+id_23750 {
+   code=(1)
+   name="VANG - SANDDALEN"
+   height=1230
+   height_precip=2
+   height_temperature=2
+   stationid=23750
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=61.2229
+   longitude=8.4541
+}
+
+id_23800 {
+   code=(1)
+   name="YLJA KRAFTVERK"
+   height=517
+   height_precip=2
+   height_temperature=2
+   stationid=23800
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=61.1973
+   longitude=8.3807
+}
+
+id_24580 {
+   code=(1)
+   name="KRØDEREN"
+   height=136
+   height_precip=2
+   height_temperature=2
+   stationid=24580
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=60.1239
+   longitude=9.7822
+}
+
+id_25115 {
+   code=(1)
+   name="HEMSEDAL SKISENTER"
+   height=1344
+   height_wind=5
+   height_temperature=2
+   stationid=25115
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=60.8397
+   longitude=8.4968
+}
+
+id_25541 {
+   code=(1)
+   name="BAKKO I HOL II"
+   height=992
+   height_temperature=2
+   stationid=25541
+   typepriority=(503)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=60.6811
+   longitude=8.00375
+}
+
+id_26060 {
+   code=(1)
+   name="SKOTSELV"
+   height=18
+   height_precip=4
+   height_temperature=4
+   stationid=26060
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.8387
+   longitude=9.8948
+}
+
+id_26350 {
+   code=(1)
+   name="SIGDAL - NEDRE EGGEDAL"
+   height=143
+   height_temperature=2
+   stationid=26350
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=60.1358
+   longitude=9.4391
+}
+
+id_26500 {
+   code=(1)
+   name="GEITHUS"
+   height=64
+   height_temperature=2
+   stationid=26500
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.9202
+   longitude=9.9728
+}
+
+id_26580 {
+   code=(1)
+   name="DRAMMEN - BANGELØKKA"
+   height=14
+   height_temperature=2
+   stationid=26580
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.731
+   longitude=10.2142
+}
+
+id_26590 {
+   code=(1)
+   name="DRAMMEN - SLETTA"
+   height=4
+   height_temperature=2
+   stationid=26590
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.7445
+   longitude=10.2312
+}
+
+id_26630 {
+   code=(1)
+   name="VESTFOSSEN"
+   height=13
+   height_temperature=4
+   stationid=26630
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.7323
+   longitude=9.8728
+}
+
+id_26780 {
+   code=(1)
+   name="SOLBERGELVA - OLLEVEIEN"
+   height=54
+   height_temperature=2
+   stationid=26780
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.7655
+   longitude=10.0582
+}
+
+id_26790 {
+   code=(1)
+   name="MJØNDALEN - ORKIDEHØGDA"
+   height=4
+   height_temperature=2
+   stationid=26790
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.7498
+   longitude=10.0275
+}
+
+id_26802 {
+   code=(1)
+   name="MJØNDALEN - ÅSEN"
+   height=166
+   height_temperature=2
+   stationid=26802
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.7328
+   longitude=10.0258
+}
+
+id_26810 {
+   code=(1)
+   name="HOKKSUND - LOE"
+   height=7
+   height_temperature=2
+   stationid=26810
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.7688
+   longitude=9.9155
+}
+
+id_26820 {
+   code=(1)
+   name="HOKKSUND"
+   height=15
+   height_temperature=2
+   stationid=26820
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.7613
+   longitude=9.8922
+}
+
+id_26840 {
+   code=(1)
+   name="KROKSTADELVA - LANGELØKKA"
+   height=139
+   height_temperature=2
+   stationid=26840
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.7658
+   longitude=10.0123
+}
+
+id_26950 {
+   code=(1)
+   name="SVELVIK - KNEM"
+   height=4
+   height_temperature=2
+   stationid=26950
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.6027
+   longitude=10.4047
+}
+
+id_26975 {
+   code=(1)
+   name="SVELVIK - BOKERØYA"
+   height=3
+   height_temperature=2
+   stationid=26975
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.591
+   longitude=10.4053
+}
+
+id_26996 {
+   code=(1)
+   name="SANDE - LAUVKOLLMYR"
+   height=437
+   height_temperature=2
+   stationid=26996
+   typepriority=(342)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.6473
+   longitude=10.1052
+}
+
+id_27120 {
+   code=(1)
+   name="HORTEN - NYKIRKE"
+   height=70
+   height_temperature=2
+   stationid=27120
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.4283
+   longitude=10.3847
+}
+
+id_27160 {
+   code=(1)
+   name="HORTEN II"
+   height=95
+   height_temperature=2
+   stationid=27160
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.4198
+   longitude=10.4647
+}
+
+id_27161 {
+   code=(1)
+   name="HORTEN - SKOPPUM"
+   height=40
+   height_wind=8
+   height_temperature=2
+   stationid=27161
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.3845
+   longitude=10.3985
+}
+
+id_27162 {
+   code=(1)
+   name="ÅSGÅRDSTRAND"
+   height=61
+   stationid=27162
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.3563
+   longitude=10.46
+}
+
+id_27261 {
+   code=(1)
+   name="TØNSBERG - VALLØ"
+   height=9
+   stationid=27261
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.2608
+   longitude=10.4978
+}
+
+id_27262 {
+   code=(1)
+   name="TØNSBERG - KARLSVIK"
+   height=3
+   stationid=27262
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.2942
+   longitude=10.5137
+}
+
+id_27270 {
+   code=(1)
+   name="TØNSBERG - KILEN"
+   height=3
+   height_temperature=2
+   stationid=27270
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.2782
+   longitude=10.4312
+}
+
+id_27272 {
+   code=(1)
+   name="TØNSBERG - EIK"
+   height=55
+   stationid=27272
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.2937
+   longitude=10.4275
+}
+
+id_27281 {
+   code=(1)
+   name="TØNSBERG - BERKÅKER"
+   height=60
+   stationid=27281
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.3173
+   longitude=10.3957
+}
+
+id_27282 {
+   code=(1)
+   name="TØNSBERG - VEAR"
+   height=30
+   stationid=27282
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.2632
+   longitude=10.3603
+}
+
+id_27315 {
+   code=(1)
+   name="RAMNES - KILE VESTRE"
+   height=39
+   height_temperature=2
+   stationid=27315
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.3808
+   longitude=10.2397
+}
+
+id_27330 {
+   code=(1)
+   name="TØNSBERG - TARANRØD"
+   height=33
+   height_temperature=2
+   stationid=27330
+   typepriority=(342)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.2938
+   longitude=10.2983
+}
+
+id_27400 {
+   code=(1)
+   name="NØTTERØY - FØYNLAND"
+   height=2
+   height_temperature=2
+   stationid=27400
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.2366
+   longitude=10.456
+}
+
+id_27403 {
+   code=(1)
+   name="NØTTERØY - KNARRBERG"
+   height=1
+   height_temperature=2
+   stationid=27403
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.2084
+   longitude=10.4544
+}
+
+id_27406 {
+   code=(1)
+   name="NØTTERØY - TORØD"
+   height=2
+   height_temperature=2
+   stationid=27406
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.169
+   longitude=10.4238
+}
+
+id_27420 {
+   code=(1)
+   name="TJØME"
+   height=32
+   height_wind=10
+   height_temperature=2
+   stationid=27420
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.1208
+   longitude=10.398
+}
+
+id_27433 {
+   code=(1)
+   name="NØTTERØY - TENVIK"
+   height=1
+   height_temperature=2
+   stationid=27433
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.1745
+   longitude=10.3655
+}
+
+id_27435 {
+   code=(1)
+   name="NØTTERØY - VESTSKOGEN"
+   height=25
+   height_temperature=2
+   stationid=27435
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.2417
+   longitude=10.4023
+}
+
+id_27460 {
+   code=(1)
+   name="NØTTERØY - BORGHEIM"
+   height=5
+   height_temperature=2
+   stationid=27460
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.2173
+   longitude=10.4103
+}
+
+id_27780 {
+   code=(1)
+   name="TJØLLING"
+   height=19
+   height_wind=2
+   height_temperature=2
+   stationid=27780
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.0467
+   longitude=10.125
+}
+
+id_28770 {
+   code=(1)
+   name="HØLSETER"
+   height=588
+   height_precip=2
+   height_temperature=2
+   stationid=28770
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.8468
+   longitude=9.2929
+}
+
+id_29350 {
+   code=(1)
+   name="UVDAL KRAFTVERK"
+   height=648
+   height_precip=4
+   height_temperature=2
+   stationid=29350
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=60.255
+   longitude=8.7057
+}
+
+id_29900 {
+   code=(1)
+   name="SKURDEVIKÅI"
+   height=1250
+   height_temperature=4
+   stationid=29900
+   typepriority=(503)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=60.3778
+   longitude=7.5693
+}
+
+id_30330 {
+   code=(1)
+   name="GJERPEN - ÅRHUS"
+   height=41
+   height_temperature=2
+   stationid=30330
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.2268
+   longitude=9.5772
+}
+
+id_30810 {
+   code=(1)
+   name="TINNOSDAMMEN"
+   height=191
+   height_precip=2
+   height_temperature=2
+   stationid=30810
+   typepriority=(505)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.7238
+   longitude=9.0245
+}
+
+id_30860 {
+   code=(1)
+   name="BERGELIGREND"
+   height=514
+   height_wind=4
+   height_precip=2
+   height_temperature=1
+   stationid=30860
+   typepriority=(505)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.8861
+   longitude=9.058
+}
+
+id_30875 {
+   code=(1)
+   name="BUSNES"
+   height=325
+   height_precip=2
+   height_temperature=1
+   stationid=30875
+   typepriority=(505)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.8103
+   longitude=8.9863
+}
+
+id_31400 {
+   code=(1)
+   name="FYRIEGG"
+   height=1008
+   height_precip=3
+   height_temperature=2
+   stationid=31400
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.8655
+   longitude=8.6978
+}
+
+id_31500 {
+   code=(1)
+   name="FRØYSTUL"
+   height=875
+   height_wind=3
+   height_precip=2
+   height_temperature=2
+   stationid=31500
+   typepriority=(505)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.8247
+   longitude=8.3477
+}
+
+id_31520 {
+   code=(1)
+   name="GROSET"
+   height=949
+   height_precip=2
+   height_temperature=2
+   stationid=31520
+   typepriority=(505)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.8358
+   longitude=8.315
+}
+
+id_31660 {
+   code=(1)
+   name="MOGEN"
+   height=954
+   height_precip=2
+   height_temperature=2
+   stationid=31660
+   typepriority=(505)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=60.018
+   longitude=7.913
+}
+
+id_31680 {
+   code=(1)
+   name="HANSBU"
+   height=1160
+   height_precip=2
+   height_temperature=2
+   stationid=31680
+   typepriority=(505)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=60.0825
+   longitude=7.4247
+}
+
+id_32061 {
+   code=(1)
+   name="GVARV - NES BIOFORSK"
+   height=94
+   height_temperature=2
+   stationid=32061
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.3822
+   longitude=9.2118
+}
+
+id_32220 {
+   code=(1)
+   name="LIFJELL - ØYSTEINNATTEN"
+   height=1102
+   height_wind=10
+   height_precip=3
+   height_temperature=2
+   stationid=32220
+   typepriority=(330)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.5022
+   longitude=8.9837
+}
+
+id_32240 {
+   code=(1)
+   name="BØ"
+   height=105
+   height_temperature=2
+   stationid=32240
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.4175
+   longitude=9.0287
+}
+
+id_33300 {
+   code=(1)
+   name="HONNEGRASNUTEN"
+   height=1340
+   height_wind=5
+   height_temperature=2
+   stationid=33300
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.7675
+   longitude=7.8173
+}
+
+id_36330 {
+   code=(1)
+   name="ARENDAL LUFTHAVN"
+   height=134
+   stationid=36330
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=58.5158
+   longitude=8.7028
+}
+
+id_37150 {
+   code=(1)
+   name="STORGAMA"
+   height=570
+   height_temperature=4
+   stationid=37150
+   typepriority=(503)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.0523
+   longitude=8.6537
+}
+
+id_37310 {
+   code=(1)
+   name="GRYTÅI"
+   height=645
+   height_temperature=2
+   stationid=37310
+   typepriority=(503)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.1723
+   longitude=8.3442
+}
+
+id_39150 {
+   code=(1)
+   name="KRISTIANSAND - SØMSKLEIVA"
+   height=12
+   stationid=39150
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=58.1502
+   longitude=8.052
+}
+
+id_41480 {
+   code=(1)
+   name="ÅSERAL"
+   height=268
+   height_precip=2
+   height_temperature=2
+   stationid=41480
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=58.6172
+   longitude=7.4128
+}
+
+id_41825 {
+   code=(1)
+   name="LYNGDAL"
+   height=6
+   height_wind=2
+   height_temperature=2
+   stationid=41825
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=58.134
+   longitude=7.0452
+}
+
+id_44190 {
+   code=(1)
+   name="TIME - LYE"
+   height=92
+   height_temperature=2
+   stationid=44190
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=58.7345
+   longitude=5.7262
+}
+
+id_44730 {
+   code=(1)
+   name="SANDNES - ROVIK"
+   height=19
+   stationid=44730
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=58.8662
+   longitude=5.7592
+}
+
+id_45350 {
+   code=(1)
+   name="LYSEBOTN"
+   height=5
+   height_precip=2
+   height_temperature=2
+   stationid=45350
+   typepriority=(330)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.0552
+   longitude=6.6467
+}
+
+id_45770 {
+   code=(1)
+   name="HJELMELAND"
+   height=43
+   height_temperature=2
+   stationid=45770
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.23
+   longitude=6.1498
+}
+
+id_46220 {
+   code=(1)
+   name="GULLINGEN SKISENTER"
+   height=639
+   height_wind=5
+   height_precip=4
+   height_temperature=2
+   stationid=46220
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.4128
+   longitude=6.4697
+}
+
+id_46432 {
+   code=(1)
+   name="RØLDALSFJELLET - ELVERSHEI"
+   height=1370
+   stationid=46432
+   typepriority=(330)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.8357
+   longitude=6.7108
+}
+
+id_47498 {
+   code=(1)
+   name="ETNE II"
+   height=8
+   height_wind=2
+   height_precip=2
+   height_temperature=2
+   stationid=47498
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.6625
+   longitude=5.9538
+}
+
+id_49085 {
+   code=(1)
+   name="FOLGEFONNA SKISENTER"
+   height=1212
+   height_wind=5
+   height_precip=3
+   height_temperature=3
+   stationid=49085
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=60.2263
+   longitude=6.4347
+}
+
+id_49087 {
+   code=(1)
+   name="FOLGEFONNA SKISENTER TOPP"
+   height=1390
+   height_wind=5
+   height_temperature=2
+   stationid=49087
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=60.2178
+   longitude=6.4298
+}
+
+id_49220 {
+   code=(1)
+   name="ODDA - JORDAL"
+   height=89
+   height_temperature=2
+   stationid=49220
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=60.0447
+   longitude=6.5395
+}
+
+id_49245 {
+   code=(1)
+   name="SKARE"
+   height=255
+   height_temperature=2
+   stationid=49245
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=59.9333
+   longitude=6.5887
+}
+
+id_49360 {
+   code=(1)
+   name="TYSSEDAL V"
+   height=147
+   height_temperature=2
+   stationid=49360
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=60.1173
+   longitude=6.5742
+}
+
+id_49420 {
+   code=(1)
+   name="SKJEGGEDAL"
+   height=470
+   height_precip=3
+   height_temperature=2
+   stationid=49420
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=60.128
+   longitude=6.6293
+}
+
+id_50480 {
+   code=(1)
+   name="BERGEN - SANDSLI"
+   height=37
+   height_temperature=2
+   stationid=50480
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=60.2913
+   longitude=5.2777
+}
+
+id_50503 {
+   code=(1)
+   name="SÆDALEN"
+   height=215
+   height_temperature=2
+   stationid=50503
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=60.35
+   longitude=5.3967
+}
+
+id_50539 {
+   code=(1)
+   name="BERGEN - FLORIDA UIB"
+   height=46
+   height_temperature=2
+   stationid=50539
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=60.3837
+   longitude=5.332
+}
+
+id_50570 {
+   code=(1)
+   name="SKREDDERDALEN"
+   height=175
+   height_wind=10
+   height_temperature=2
+   stationid=50570
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=60.404
+   longitude=5.3358
+}
+
+id_50810 {
+   code=(1)
+   name="ÅSANE"
+   height=90
+   height_temperature=2
+   stationid=50810
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=60.4742
+   longitude=5.3418
+}
+
+id_50865 {
+   code=(1)
+   name="GULLFJELLET"
+   height=345
+   height_wind=10
+   height_temperature=2
+   stationid=50865
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=60.3828
+   longitude=5.542
+}
+
+id_51980 {
+   code=(1)
+   name="MYRKDALEN-ONDRAHAUGEN"
+   height=853
+   height_wind=10
+   stationid=51980
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=60.8603
+   longitude=6.4675
+}
+
+id_51990 {
+   code=(1)
+   name="MYRKDALEN-VETLEBOTN"
+   height=700
+   height_precip=4
+   height_temperature=3
+   stationid=51990
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=60.8655
+   longitude=6.4733
+}
+
+id_53680 {
+   code=(1)
+   name="FLÅM - JOASETBERGI"
+   height=860
+   height_wind=10
+   height_precip=2
+   height_temperature=2
+   height_pressure=859.9
+   stationid=53680
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=60.8625
+   longitude=7.1603
+}
+
+id_55420 {
+   code=(1)
+   name="JOSTEDALEN - BREHEIMSENTERET"
+   height=243
+   height_precip=3
+   height_temperature=2
+   stationid=55420
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=61.6517
+   longitude=7.2765
+}
+
+id_55425 {
+   code=(1)
+   name="SPØRTEGGBU"
+   height=1566
+   height_wind=10
+   height_temperature=2
+   stationid=55425
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=61.5972
+   longitude=7.3892
+}
+
+id_55720 {
+   code=(1)
+   name="SKARDSBØFJELLET"
+   height=713
+   height_wind=10
+   height_temperature=2
+   stationid=55720
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=61.2168
+   longitude=7.0183
+}
+
+id_55740 {
+   code=(1)
+   name="ANESTØLEN"
+   height=443
+   height_temperature=3
+   stationid=55740
+   typepriority=(503)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=61.3648
+   longitude=6.9077
+}
+
+id_55770 {
+   code=(1)
+   name="NJØS"
+   height=45
+   height_wind=2
+   height_temperature=2
+   stationid=55770
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=61.1792
+   longitude=6.8608
+}
+
+id_55928 {
+   code=(1)
+   name="BALESTRAND - BALE"
+   height=15
+   height_temperature=2
+   stationid=55928
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=61.2028
+   longitude=6.5285
+}
+
+id_56960 {
+   code=(1)
+   name="HAUKEDAL"
+   height=311
+   height_precip=3
+   height_temperature=2
+   stationid=56960
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=61.4202
+   longitude=6.3758
+}
+
+id_57340 {
+   code=(1)
+   name="JØLSTER - KVAMSFJELLET"
+   height=980
+   height_wind=5
+   height_temperature=2
+   stationid=57340
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=61.4573
+   longitude=6.096
+}
+
+id_57790 {
+   code=(1)
+   name="MYKLEBUSTFJELLET"
+   height=715
+   height_wind=5
+   height_temperature=2
+   stationid=57790
+   typepriority=(330)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=61.6788
+   longitude=5.2007
+}
+
+id_57810 {
+   code=(1)
+   name="SVELGEN II"
+   height=16
+   height_precip=2
+   height_temperature=2
+   stationid=57810
+   typepriority=(330)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=61.7707
+   longitude=5.2983
+}
+
+id_58860 {
+   code=(1)
+   name="TROLLEDALSEGGA"
+   height=1020
+   height_wind=6
+   height_temperature=2
+   stationid=58860
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=61.8902
+   longitude=6.1065
+}
+
+id_59450 {
+   code=(1)
+   name="STADLANDET"
+   height=75
+   height_precip=2
+   height_temperature=2
+   stationid=59450
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=62.1467
+   longitude=5.2115
+}
+
+id_59695 {
+   code=(1)
+   name="ØRSTA - EITREFJELL"
+   height=690
+   height_wind=10
+   height_precip=3
+   height_temperature=3
+   stationid=59695
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=62.16
+   longitude=6.2877
+}
+
+id_60190 {
+   code=(1)
+   name="ROALDSHORNET"
+   height=1050
+   height_wind=10
+   height_temperature=10
+   stationid=60190
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=62.3065
+   longitude=6.849
+}
+
+id_60240 {
+   code=(1)
+   name="ÅKERNESET"
+   height=900
+   height_wind=3
+   height_precip=2
+   height_temperature=2
+   stationid=60240
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=62.191
+   longitude=6.9933
+}
+
+id_60640 {
+   code=(1)
+   name="VALLDAL - MURI"
+   height=2
+   height_temperature=2
+   stationid=60640
+   typepriority=(342)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=62.297
+   longitude=7.2525
+}
+
+id_60650 {
+   code=(1)
+   name="LINGE"
+   height=34
+   height_temperature=2
+   stationid=60650
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=62.288
+   longitude=7.2173
+}
+
+id_60800 {
+   code=(1)
+   name="ØRSKOG"
+   height=5
+   height_precip=1
+   height_temperature=2
+   stationid=60800
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=62.4775
+   longitude=6.8167
+}
+
+id_60830 {
+   code=(1)
+   name="SKODJE"
+   height=26
+   height_precip=2
+   stationid=60830
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=62.5
+   longitude=6.7
+}
+
+id_60850 {
+   code=(1)
+   name="EMBLEM"
+   height=1
+   height_temperature=2
+   stationid=60850
+   typepriority=(503)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=62.4317
+   longitude=6.4325
+}
+
+id_60870 {
+   code=(1)
+   name="SULA - LANGEVÅG"
+   height=20
+   height_temperature=1
+   stationid=60870
+   typepriority=(4)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=62.4402
+   longitude=6.1922
+}
+
+id_60890 {
+   code=(1)
+   name="BRUSDALSVATN II"
+   height=33
+   height_precip=2
+   height_temperature=1
+   stationid=60890
+   typepriority=(503)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=62.4654
+   longitude=6.4013
+}
+
+id_61340 {
+   code=(1)
+   name="ÅNDALSNES - KAMSHAUGEN"
+   height=4
+   height_temperature=2
+   stationid=61340
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=62.5643
+   longitude=7.672
+}
+
+id_62290 {
+   code=(1)
+   name="MOLDE - NØISOMHED"
+   height=5
+   height_temperature=2
+   stationid=62290
+   typepriority=(502)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=62.7413
+   longitude=7.2275
+}
+
+id_62295 {
+   code=(1)
+   name="MOLDE - HINDALSRØRA"
+   height=258
+   height_wind=4
+   height_precip=4
+   height_temperature=2
+   stationid=62295
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=62.756
+   longitude=7.2088
+}
+
+id_62700 {
+   code=(1)
+   name="HUSTADVATN"
+   height=80
+   height_precip=2
+   height_temperature=2
+   stationid=62700
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=62.9087
+   longitude=7.2436
+}
+
+id_62980 {
+   code=(1)
+   name="GJEMNES - REINSFJELLET"
+   height=990
+   height_wind=10
+   height_temperature=2
+   stationid=62980
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=62.93
+   longitude=7.925
+}
+
+id_63583 {
+   code=(1)
+   name="STORLIGRENDA"
+   height=647
+   height_precip=2
+   height_temperature=2
+   stationid=63583
+   typepriority=(503)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=62.69
+   longitude=9.1
+}
+
+id_63630 {
+   code=(1)
+   name="TROLLHEIMEN - STORHORNET"
+   height=1550
+   height_temperature=2
+   stationid=63630
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=62.6352
+   longitude=9.392
+}
+
+id_63820 {
+   code=(1)
+   name="DRIVDALEN"
+   height=680
+   height_wind=10
+   height_precip=2
+   height_temperature=2
+   stationid=63820
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=62.4473
+   longitude=9.5827
+}
+
+id_63850 {
+   code=(1)
+   name="DØRRESLØKKJA"
+   height=690
+   height_precip=2
+   height_temperature=2
+   stationid=63850
+   typepriority=(503)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=62.6393
+   longitude=9.5505
+}
+
+id_64300 {
+   code=(1)
+   name="KRISTIANSUND - KARIHOLA"
+   height=5
+   stationid=64300
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=63.1257
+   longitude=7.7027
+}
+
+id_64510 {
+   code=(1)
+   name="TINGVOLL"
+   height=23
+   height_wind=2
+   height_temperature=2
+   stationid=64510
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=62.9133
+   longitude=8.1862
+}
+
+id_64760 {
+   code=(1)
+   name="SURNADAL - SYLTE"
+   height=5
+   height_temperature=2
+   stationid=64760
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=62.9853
+   longitude=8.6895
+}
+
+id_65270 {
+   code=(1)
+   name="SØVATNET"
+   height=306
+   height_precip=2
+   height_temperature=2
+   stationid=65270
+   typepriority=(503)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=63.2302
+   longitude=9.3488
+}
+
+id_66230 {
+   code=(1)
+   name="ÅMOT I MELDAL"
+   height=240
+   height_precip=2
+   height_temperature=2
+   stationid=66230
+   typepriority=(503)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=63.1423
+   longitude=9.8197
+}
+
+id_66560 {
+   code=(1)
+   name="NERSKOGEN - GRANASJØEN"
+   height=660
+   height_precip=2
+   height_temperature=2
+   stationid=66560
+   typepriority=(503)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=62.8272
+   longitude=9.6988
+}
+
+id_66720 {
+   code=(1)
+   name="BERKÅK - TERMINALVEIEN"
+   height=440
+   height_precip=2
+   height_temperature=2
+   stationid=66720
+   typepriority=(503)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=62.8332
+   longitude=10.0188
+}
+
+id_66760 {
+   code=(1)
+   name="OPPDAL - MAURHAUGEN"
+   height=660
+   height_temperature=2
+   stationid=66760
+   typepriority=(503)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=62.6597
+   longitude=9.8203
+}
+
+id_66860 {
+   code=(1)
+   name="MOEN I KVIKNE"
+   height=545
+   height_precip=2
+   height_temperature=2
+   stationid=66860
+   typepriority=(503)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=62.5843
+   longitude=10.2738
+}
+
+id_66890 {
+   code=(1)
+   name="YA - HELGESTJØNNA"
+   height=900
+   height_precip=2
+   height_temperature=2
+   stationid=66890
+   typepriority=(503)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=62.5775
+   longitude=10.5583
+}
+
+id_66990 {
+   code=(1)
+   name="ØVRE DØLVAD"
+   height=860
+   height_wind=2
+   height_precip=2
+   height_temperature=2
+   stationid=66990
+   typepriority=(503)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=62.5
+   longitude=10.1677
+}
+
+id_67140 {
+   code=(1)
+   name="SKJETLEIN"
+   height=44
+   height_temperature=2
+   stationid=67140
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=63.3403
+   longitude=10.2973
+}
+
+id_68010 {
+   code=(1)
+   name="TRONDHEIM - HØVRINGEN"
+   height=44
+   height_temperature=2
+   stationid=68010
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=63.4465
+   longitude=10.3364
+}
+
+id_68050 {
+   code=(1)
+   name="LADE"
+   height=13
+   height_temperature=2
+   stationid=68050
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=63.4429
+   longitude=10.4428
+}
+
+id_68110 {
+   code=(1)
+   name="SKISTUA"
+   height=433
+   height_temperature=2
+   stationid=68110
+   typepriority=(502)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=63.4182
+   longitude=10.2641
+}
+
+id_68120 {
+   code=(1)
+   name="SAUPSTAD"
+   height=135
+   height_temperature=2
+   stationid=68120
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=63.3628
+   longitude=10.3597
+}
+
+id_68125 {
+   code=(1)
+   name="SVERRESBORG"
+   height=156
+   height_temperature=2
+   stationid=68125
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=63.4223
+   longitude=10.3498
+}
+
+id_68230 {
+   code=(1)
+   name="TRONDHEIM - RISVOLLAN"
+   height=84
+   stationid=68230
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=63.3987
+   longitude=10.4228
+}
+
+id_68262 {
+   code=(1)
+   name="KLÆBU II"
+   height=143
+   height_temperature=2
+   stationid=68262
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=63.3064
+   longitude=10.4657
+}
+
+id_68863 {
+   code=(1)
+   name="TRONDHEIM - VOLL PLU"
+   height=127
+   height_temperature=2
+   stationid=68863
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=63.4107
+   longitude=10.4535
+}
+
+id_69010 {
+   code=(1)
+   name="SVARTTJØRNBEKKEN"
+   height=285
+   height_temperature=2
+   stationid=69010
+   typepriority=(503)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=63.3188
+   longitude=10.648
+}
+
+id_69020 {
+   code=(1)
+   name="RANHEIM"
+   height=23
+   height_temperature=1
+   stationid=69020
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=63.4248
+   longitude=10.5337
+}
+
+id_70680 {
+   code=(1)
+   name="MÆRE III"
+   height=59
+   height_wind=2
+   height_precip=2
+   height_temperature=2
+   stationid=70680
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=63.9425
+   longitude=11.4255
+}
+
+id_71320 {
+   code=(1)
+   name="RISSA III"
+   height=23
+   height_wind=2
+   height_temperature=2
+   stationid=71320
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=63.5858
+   longitude=9.9705
+}
+
+id_71370 {
+   code=(1)
+   name="SLIPER"
+   height=158
+   height_precip=2
+   height_temperature=2
+   stationid=71370
+   typepriority=(503)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=63.6427
+   longitude=10.1838
+}
+
+id_71740 {
+   code=(1)
+   name="KARLAUNET"
+   height=89
+   height_precip=2
+   height_temperature=2
+   stationid=71740
+   typepriority=(503)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=63.93
+   longitude=10.3615
+}
+
+id_72710 {
+   code=(1)
+   name="OVERHALLA - SKOGMO"
+   height=32
+   height_temperature=2
+   stationid=72710
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=64.5103
+   longitude=12.0197
+}
+
+id_73466 {
+   code=(1)
+   name="NORDLI - SANDVIKA"
+   height=420
+   stationid=73466
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=64.4595
+   longitude=13.5978
+}
+
+id_74780 {
+   code=(1)
+   name="NAMSVATN II"
+   height=460
+   height_temperature=3
+   stationid=74780
+   typepriority=(503)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=64.9608
+   longitude=13.5403
+}
+
+id_76914 {
+   code=(1)
+   name="ITASMOBAWS1"
+   height=121
+   stationid=76914
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=59.9492
+   longitude=10.715
+}
+
+id_77034 {
+   code=(1)
+   name="FAUSKANE"
+   height=0
+   stationid=77034
+   typepriority=(22)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=62.5798
+   longitude=5.7235
+}
+
+id_77490 {
+   code=(1)
+   name="KAPPFJELLET"
+   height=940
+   height_wind=6
+   height_temperature=2
+   stationid=77490
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=65.3143
+   longitude=13.4483
+}
+
+id_79720 {
+   code=(1)
+   name="LAPPSÆTRA"
+   height=550
+   height_temperature=3
+   stationid=79720
+   typepriority=(503)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=66.2785
+   longitude=14.8892
+}
+
+id_80200 {
+   code=(1)
+   name="LURØY"
+   height=115
+   height_precip=2
+   height_temperature=2
+   stationid=80200
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=66.3892
+   longitude=13.1848
+}
+
+id_80615 {
+   code=(1)
+   name="ENGABREEN - SKJÆRET"
+   height=1362
+   height_temperature=3
+   stationid=80615
+   typepriority=(503)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=66.6432
+   longitude=13.9298
+}
+
+id_80700 {
+   code=(1)
+   name="GLOMFJORD"
+   height=39
+   height_temperature=2
+   stationid=80700
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=66.8102
+   longitude=13.9793
+}
+
+id_80705 {
+   code=(1)
+   name="GLOMFJORD - SKIHYTTA"
+   height=520
+   height_wind=10
+   height_precip=3
+   height_temperature=4
+   stationid=80705
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=66.8275
+   longitude=13.948
+}
+
+id_80707 {
+   code=(1)
+   name="GLOMFJORD - TVERRFJELLET"
+   height=930
+   height_wind=5
+   height_temperature=2
+   stationid=80707
+   typepriority=(330)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=66.8303
+   longitude=13.9067
+}
+
+id_80880 {
+   code=(1)
+   name="SANDHORNØYA - VÅTVIKFJELLET"
+   height=600
+   height_wind=5
+   height_temperature=2
+   stationid=80880
+   typepriority=(330)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=67.093
+   longitude=14.1663
+}
+
+id_81775 {
+   code=(1)
+   name="LØNSDAL STASJON"
+   height=520
+   height_wind=10
+   height_precip=3
+   height_temperature=2
+   stationid=81775
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=66.7435
+   longitude=15.4628
+}
+
+id_81930 {
+   code=(1)
+   name="STORSTILLA"
+   height=565
+   height_precip=2
+   height_temperature=3
+   stationid=81930
+   typepriority=(503)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=67.0129
+   longitude=15.973
+}
+
+id_82110 {
+   code=(1)
+   name="VALNESFJORD"
+   height=20
+   height_precip=2
+   height_temperature=2
+   stationid=82110
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=67.2763
+   longitude=15.1018
+}
+
+id_82310 {
+   code=(1)
+   name="BODØ - SKIVIKA"
+   height=5
+   height_temperature=2
+   stationid=82310
+   typepriority=(504)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=67.3084
+   longitude=14.4309
+}
+
+id_82720 {
+   code=(1)
+   name="SISOVATNET"
+   height=665
+   height_precip=2
+   height_temperature=2
+   stationid=82720
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=67.3335
+   longitude=15.8282
+}
+
+id_84630 {
+   code=(1)
+   name="NARVIK - FAGERNESFJELLET"
+   height=1000
+   height_wind=10
+   height_temperature=2
+   stationid=84630
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=68.421
+   longitude=17.4802
+}
+
+id_84701 {
+   code=(1)
+   name="NARVIK SENTRUM"
+   height=31
+   height_wind=10
+   height_temperature=2
+   height_pressure=30.9
+   stationid=84701
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=68.4372
+   longitude=17.4212
+}
+
+id_84880 {
+   code=(1)
+   name="KATTERAT"
+   height=365
+   stationid=84880
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=68.3995
+   longitude=17.966
+}
+
+id_84900 {
+   code=(1)
+   name="BJØRNFJELL"
+   height=512
+   height_precip=2
+   stationid=84900
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=68.4323
+   longitude=18.0767
+}
+
+id_85080 {
+   code=(1)
+   name="KANSTADBOTN"
+   height=6
+   height_precip=3
+   height_temperature=3
+   stationid=85080
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=68.5172
+   longitude=15.8768
+}
+
+id_86070 {
+   code=(1)
+   name="VESTVÅGØY - HIMMELTINDAN"
+   height=940
+   height_temperature=2
+   height_pressure=955.0
+   stationid=86070
+   typepriority=(502)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=68.2212
+   longitude=13.5725
+}
+
+id_86520 {
+   code=(1)
+   name="SORTLAND - KLEIVA"
+   height=14
+   height_wind=2
+   height_precip=2
+   height_temperature=2
+   stationid=86520
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=68.648
+   longitude=15.2832
+}
+
+id_87000 {
+   code=(1)
+   name="ÅNSTADBLÅHEIA"
+   height=500
+   height_wind=10
+   height_temperature=2
+   stationid=87000
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=68.7183
+   longitude=15.3112
+}
+
+id_87772 {
+   code=(1)
+   name="SÆTERTINDEN VED TJELDSUNDET"
+   height=1095
+   height_wind=10
+   height_temperature=2
+   stationid=87772
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=68.5863
+   longitude=16.3608
+}
+
+id_88100 {
+   code=(1)
+   name="BONES I BARDU"
+   height=230
+   height_precip=2
+   height_temperature=2
+   stationid=88100
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=68.6457
+   longitude=18.2442
+}
+
+id_88730 {
+   code=(1)
+   name="SENJA - INNHESTEN"
+   height=913
+   height_temperature=2
+   stationid=88730
+   typepriority=(502)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=69.4195
+   longitude=17.5775
+}
+
+id_89820 {
+   code=(1)
+   name="ØVERBYGD II"
+   height=85
+   height_temperature=2
+   stationid=89820
+   typepriority=(503)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=69.0222
+   longitude=19.3537
+}
+
+id_89920 {
+   code=(1)
+   name="NJUNIS"
+   height=1655
+   height_temperature=2
+   stationid=89920
+   typepriority=(502)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=68.751
+   longitude=19.4695
+}
+
+id_89980 {
+   code=(1)
+   name="TAMOKDALEN"
+   height=230
+   height_precip=3
+   height_temperature=2
+   stationid=89980
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=69.0935
+   longitude=19.6278
+}
+
+id_89985 {
+   code=(1)
+   name="SJUFJELLET"
+   height=1074
+   height_wind=5
+   height_temperature=2
+   stationid=89985
+   typepriority=(330)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=69.1025
+   longitude=19.5442
+}
+
+id_90100 {
+   code=(1)
+   name="MALANGEN - PÅLFINNMOEN"
+   height=124
+   height_precip=2
+   height_temperature=3
+   stationid=90100
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=69.414
+   longitude=18.6773
+}
+
+id_90110 {
+   code=(1)
+   name="MORTENHALSSKOLTEN"
+   height=740
+   height_wind=5
+   height_temperature=3
+   stationid=90110
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=69.4229
+   longitude=18.6208
+}
+
+id_90491 {
+   code=(1)
+   name="TROMSØ LH - STORKJØLEN"
+   height=790
+   height_wind=10
+   stationid=90491
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=69.7333
+   longitude=18.7875
+}
+
+id_90495 {
+   code=(1)
+   name="STAKKEVOLLAN"
+   height=80
+   height_temperature=1
+   stationid=90495
+   typepriority=(342)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=69.6942
+   longitude=18.982
+}
+
+id_90510 {
+   code=(1)
+   name="TROMSDALEN"
+   height=3
+   height_temperature=2
+   stationid=90510
+   typepriority=(342)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=69.6508
+   longitude=19.0065
+}
+
+id_90560 {
+   code=(1)
+   name="KVALØYSLETTA"
+   height=63
+   height_temperature=2
+   stationid=90560
+   typepriority=(342)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=69.6988
+   longitude=18.8772
+}
+
+id_90720 {
+   code=(1)
+   name="MÅSVIK"
+   height=26
+   stationid=90720
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=69.9903
+   longitude=18.6938
+}
+
+id_90760 {
+   code=(1)
+   name="FAKKEN"
+   height=57
+   height_wind=10
+   height_temperature=2
+   stationid=90760
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=70.1043
+   longitude=20.1145
+}
+
+id_91120 {
+   code=(1)
+   name="LYNGEN - GJERDELVDALEN"
+   height=670
+   height_wind=10
+   height_temperature=2
+   stationid=91120
+   typepriority=(330)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=69.5599
+   longitude=20.1518
+}
+
+id_91180 {
+   code=(1)
+   name="LENANGSSTRAUMEN"
+   height=45
+   height_precip=3
+   height_temperature=3
+   stationid=91180
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=69.8915
+   longitude=20.1387
+}
+
+id_91251 {
+   code=(1)
+   name="MANNDALEN - VADDJA"
+   height=72
+   stationid=91251
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=69.4722
+   longitude=20.5268
+}
+
+id_91430 {
+   code=(1)
+   name="RIHPOJAVRI"
+   height=502
+   height_wind=10
+   height_temperature=2
+   stationid=91430
+   typepriority=(342)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=69.2235
+   longitude=20.5795
+}
+
+id_91522 {
+   code=(1)
+   name="LØKVOLLEN"
+   height=14
+   stationid=91522
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=69.5417
+   longitude=20.5507
+}
+
+id_91530 {
+   code=(1)
+   name="GAMANJUNNI"
+   height=1237
+   height_precip=2
+   height_pressure=1236.4
+   stationid=91530
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=69.4818
+   longitude=20.5787
+}
+
+id_91551 {
+   code=(1)
+   name="BIRTAVARRE - HOLMEN"
+   height=20
+   stationid=91551
+   typepriority=(502)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=69.4802
+   longitude=20.8693
+}
+
+id_91729 {
+   code=(1)
+   name="ARNØYA - TROLLTINDEN"
+   height=850
+   height_temperature=2
+   stationid=91729
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=70.075
+   longitude=20.431
+}
+
+id_92500 {
+   code=(1)
+   name="LANGFJORDJØKELEN"
+   height=915
+   height_temperature=4
+   stationid=92500
+   typepriority=(503)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=70.1227
+   longitude=21.7223
+}
+
+id_92650 {
+   code=(1)
+   name="NUVSVÅG"
+   height=27
+   height_precip=3
+   height_temperature=2
+   stationid=92650
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=70.2368
+   longitude=22.0705
+}
+
+id_92860 {
+   code=(1)
+   name="ØKSFJORD - DEALLJA"
+   height=560
+   height_wind=5
+   height_temperature=3
+   stationid=92860
+   typepriority=(330)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=70.1728
+   longitude=22.3413
+}
+
+id_94050 {
+   code=(1)
+   name="ØVRE LEIRBOTN"
+   height=190
+   height_temperature=2
+   stationid=94050
+   typepriority=(503)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=70.1282
+   longitude=23.6168
+}
+
+id_94670 {
+   code=(1)
+   name="HONNINGSVÅGFJELLET"
+   height=379
+   height_temperature=2
+   height_pressure=379.0
+   stationid=94670
+   typepriority=(503)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=70.984
+   longitude=25.8907
+}
+
+id_97700 {
+   code=(1)
+   name="ISKURAS"
+   height=643
+   height_temperature=2
+   stationid=97700
+   typepriority=(330)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=69.298
+   longitude=25.3695
+}
+
+id_98560 {
+   code=(1)
+   name="VARDØ - VÅRBERGET"
+   height=39
+   height_temperature=2
+   stationid=98560
+   typepriority=(502)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=70.3667
+   longitude=31.1258
+}
+
+id_98974 {
+   code=(1)
+   name="BERGEBYDALEN"
+   height=150
+   height_wind=10
+   height_temperature=2
+   stationid=98974
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=70.227
+   longitude=28.9563
+}
+
+id_98976 {
+   code=(1)
+   name="TORVHAUGDALEN"
+   height=268
+   height_wind=10
+   height_temperature=2
+   stationid=98976
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=70.306
+   longitude=29.1003
+}
+
+id_98978 {
+   code=(1)
+   name="REINHAUGEN"
+   height=470
+   height_wind=10
+   height_temperature=2
+   stationid=98978
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=70.3357
+   longitude=28.9648
+}
+
+id_99763 {
+   code=(1)
+   name="REINDALSPASSET"
+   height=181
+   height_wind=10
+   height_temperature=2
+   stationid=99763
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=78.0648
+   longitude=17.0442
+}
+
+id_99843 {
+   code=(1)
+   name="PLATÅBERGET III"
+   height=450
+   height_wind=10
+   height_temperature=3
+   stationid=99843
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=78.2278
+   longitude=15.378
+}
+
+id_99870 {
+   code=(1)
+   name="ADVENTDALEN"
+   height=15
+   height_wind=10
+   height_precip=2
+   height_temperature=2
+   stationid=99870
+   typepriority=(501)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=78.2022
+   longitude=15.831
+}
+
+id_99874 {
+   code=(1)
+   name="JANSSONHAUGEN VEST"
+   height=250
+   height_wind=10
+   height_temperature=2
+   stationid=99874
+   typepriority=(501)
+   delay=("+HH:00")
+   owner="BSTA"
+   list="99"
+   latitude=78.18
+   longitude=16.41
+}
+
+id_202430 {
+   code=(1)
+   name="BJÖRKUDDEN"
+   height=376
+   stationid=202430
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=67.3956
+   longitude=18.7156
+}
+
+id_205410 {
+   code=(1)
+   name="ESRANGE"
+   height=328
+   stationid=205410
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=67.8911
+   longitude=21.0846
+}
+
+id_207280 {
+   code=(1)
+   name="VITTANGI"
+   height=250
+   stationid=207280
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=67.6943
+   longitude=21.6335
+}
+
+id_212310 {
+   code=(1)
+   name="JÄCKVIK"
+   height=430
+   stationid=212310
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=66.3881
+   longitude=16.9763
+}
+
+id_213590 {
+   code=(1)
+   name="SORSELE"
+   height=150
+   stationid=213590
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=65.5354
+   longitude=17.5225
+}
+
+id_214710 {
+   code=(1)
+   name="MALÅ"
+   height=320
+   stationid=214710
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=65.1808
+   longitude=18.7431
+}
+
+id_214910 {
+   code=(1)
+   name="GLOMMERSTRÄSK"
+   height=395
+   stationid=214910
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=65.278
+   longitude=19.6673
+}
+
+id_217310 {
+   code=(1)
+   name="PITEÅ"
+   height=5
+   stationid=217310
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=65.2636
+   longitude=21.4776
+}
+
+id_218410 {
+   code=(1)
+   name="MARKUSVINSA"
+   height=164
+   stationid=218410
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=66.7265
+   longitude=22.9001
+}
+
+id_219790 {
+   code=(1)
+   name="ÖVERTORNEÅ"
+   height=75
+   stationid=219790
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=66.3862
+   longitude=23.622
+}
+
+id_224720 {
+   code=(1)
+   name="FORSE"
+   height=120
+   stationid=224720
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=63.1466
+   longitude=17.0262
+}
+
+id_226010 {
+   code=(1)
+   name="LÄNNÄS"
+   height=30
+   stationid=226010
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=63.1663
+   longitude=17.6543
+}
+
+id_230310 {
+   code=(1)
+   name="LJUSNEDAL"
+   height=585
+   stationid=230310
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=62.5493
+   longitude=12.6043
+}
+
+id_232150 {
+   code=(1)
+   name="ULVSJÖ"
+   height=585
+   stationid=232150
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=61.6022
+   longitude=14.1847
+}
+
+id_232520 {
+   code=(1)
+   name="HEDEVIKEN"
+   height=410
+   stationid=232520
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=62.4112
+   longitude=13.6748
+}
+
+id_232590 {
+   code=(1)
+   name="YTTERHOGDAL"
+   height=260
+   stationid=232590
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=62.1825
+   longitude=14.9508
+}
+
+id_232980 {
+   code=(1)
+   name="LOBONÄS D"
+   height=220
+   stationid=232980
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=61.5338
+   longitude=15.3444
+}
+
+id_234720 {
+   code=(1)
+   name="HUDIKSVALL"
+   height=5
+   stationid=234720
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=61.7167
+   longitude=17.086
+}
+
+id_234730 {
+   code=(1)
+   name="JÄRVSÖ"
+   height=140
+   stationid=234730
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=61.7111
+   longitude=16.1667
+}
+
+id_241820 {
+   code=(1)
+   name="KRISTINEHAMN"
+   height=82
+   stationid=241820
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=59.3107
+   longitude=14.1019
+}
+
+id_242370 {
+   code=(1)
+   name="ÖSTMARK-ÅSARNA"
+   height=135
+   stationid=242370
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=60.2788
+   longitude=12.8538
+}
+
+id_242610 {
+   code=(1)
+   name="FREDRIKSBERG"
+   height=305
+   stationid=242610
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=60.1418
+   longitude=14.2145
+}
+
+id_243170 {
+   code=(1)
+   name="STÄLLDALEN"
+   height=205
+   stationid=243170
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=59.9391
+   longitude=14.891
+}
+
+id_243530 {
+   code=(1)
+   name="FALUN-LUGNET"
+   height=140
+   stationid=243530
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=60.619
+   longitude=15.6603
+}
+
+id_244120 {
+   code=(1)
+   name="LEKSAND"
+   height=175
+   stationid=244120
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=60.7256
+   longitude=15.0167
+}
+
+id_245615 {
+   code=(1)
+   name="FILMS KYRKBY"
+   height=39
+   stationid=245615
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_1")
+   owner="BSTA"
+   list="99"
+   latitude=60.2363
+   longitude=17.9078
+}
+
+id_248110 {
+   code=(1)
+   name="BROVALLEN"
+   height=100
+   stationid=248110
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=60.0991
+   longitude=16.3062
+}
+
+id_248190 {
+   code=(1)
+   name="VÄSTERÅS"
+   height=10
+   stationid=248190
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=59.5977
+   longitude=16.6034
+}
+
+id_248210 {
+   code=(1)
+   name="AVESTA"
+   height=100
+   stationid=248210
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=60.1419
+   longitude=16.1747
+}
+
+id_248690 {
+   code=(1)
+   name="SÖDERTÄLJE"
+   height=23
+   stationid=248690
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=59.2142
+   longitude=17.6289
+}
+
+id_250580 {
+   code=(1)
+   name="RÖRASTRAND D"
+   height=5
+   stationid=250580
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=58.0582
+   longitude=11.6528
+}
+
+id_251310 {
+   code=(1)
+   name="KÄRNA"
+   height=21
+   stationid=251310
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=57.8403
+   longitude=11.8086
+}
+
+id_253610 {
+   code=(1)
+   name="BORÅS"
+   height=135
+   stationid=253610
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=57.7611
+   longitude=12.9493
+}
+
+id_253680 {
+   code=(1)
+   name="ULRICEHAMN"
+   height=175
+   stationid=253680
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=57.8052
+   longitude=13.4083
+}
+
+id_253920 {
+   code=(1)
+   name="KÄLLSJÖ"
+   height=154
+   stationid=253920
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=57.2323
+   longitude=12.7042
+}
+
+id_254290 {
+   code=(1)
+   name="SKARA"
+   height=115
+   stationid=254290
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=58.4072
+   longitude=13.4407
+}
+
+id_254480 {
+   code=(1)
+   name="SKÖVDE"
+   height=150
+   stationid=254480
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=58.3949
+   longitude=13.8436
+}
+
+id_255210 {
+   code=(1)
+   name="HÄRSNÄS"
+   height=119
+   stationid=255210
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=58.2886
+   longitude=15.237
+}
+
+id_256540 {
+   code=(1)
+   name="OSKARSHAMN"
+   height=20
+   stationid=256540
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=57.2674
+   longitude=16.4149
+}
+
+id_261845 {
+   code=(1)
+   name="HALMSTAD"
+   height=24
+   stationid=261845
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=56.6737
+   longitude=12.9242
+}
+
+id_262810 {
+   code=(1)
+   name="KARLSHAMN"
+   height=50
+   stationid=262810
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=56.1813
+   longitude=14.8517
+}
+
+id_262910 {
+   code=(1)
+   name="MARKARYD"
+   height=110
+   stationid=262910
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=56.4595
+   longitude=13.6191
+}
+
+id_262920 {
+   code=(1)
+   name="OSBY"
+   height=90
+   stationid=262920
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=56.3742
+   longitude=13.9376
+}
+
+id_264870 {
+   code=(1)
+   name="TINGSRYD-DEGERHAGA"
+   height=176
+   stationid=264870
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=56.5376
+   longitude=14.9019
+}
+
+id_265220 {
+   code=(1)
+   name="KRISTIANSTAD"
+   height=10
+   stationid=265220
+   typepriority=(505)
+   delay=("+HH:00")
+   precipitation=("RR_24")
+   owner="BSTA"
+   list="99"
+   latitude=56.0133
+   longitude=14.2896
+}
+

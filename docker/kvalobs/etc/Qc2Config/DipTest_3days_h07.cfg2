@@ -1,0 +1,11 @@
+Algorithm=DipTest
+
+RunAtHour = 7
+RunAtMinute = 05
+#RunAtHour   = 05
+#RunAtMinute = 05
+Last_NDays  = 1
+
+#[Specific Data Type and Parameters ids etc.]
+#ParValFilename=/etc/kvalobs/Qc2Config/DipTestParameters.txt
+ParValFilename= list: 172 12.0, 174 12.0, 175 12.0, 176 12.0, 211 7.5, 212 7.5, 213 7.5, 215 7.5, 221 15.0, 222 15.0, 178 12.0

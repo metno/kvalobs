@@ -14,7 +14,7 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
       KAFKA_BROKER_ID: '1'
-      KAFKA_CREATE_TOPICS: 'kvalobs.histkvalobs.raw:1:1,kvalobs.histkvalobs.checked:1:1,kvalobs.histkvalobs.decoded:1:1,kvalobs.histkvalobs.hint:1:1'
+      KAFKA_CREATE_TOPICS: 'kvalobs.docker.raw:1:1,kvalobs.docker.checked:1:1,kvalobs.docker.decoded:1:1,kvalobs.docker.hint:1:1'
     volumes:
       - 'kvkafka:/kafka'
 
@@ -26,6 +26,14 @@ services:
       POSTGRES_PASSWORD: postgres
     volumes:
       - kvpostgres:/var/lib/postgresql/data
+
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.57.0/24
 
 volumes:
   kvkafka:

@@ -67,14 +67,15 @@ override_dh_auto_install:
 
 	cd $(DEBTMP) && mkdir -p etc/pgrepctl etc/kvalobs/lam2kv usr/lib/kvalobs/bin etc/init etc/init.d
 	cd $(CURDIR)/debian && \
-	    mv lam2kv/etc $(DEBETC)/kvalobs/lam2kv && \
-	    mv pgclean-local.sql.template save_last_month.conf kv_ctl.conf kv-env.conf kv-ips.conf.template kvcron kvincron  $(DEBETC)/kvalobs && \
-	    mv lam2kv/bin/hirlam2kvalobs.sh lam2kv/bin/lam2kv.cron scripts/*.sh init/*.sh $(DEBTMP)/usr/lib/kvalobs/bin && \
-	    chmod a+x $(DEBTMP)/usr/lib/kvalobs/bin/* && \
-	    mv init/kvalobs $(DEBETC)/init.d && \
-	    mv init/kvalobs-st*.conf $(DEBETC)/init && \
-	    mv init/kvalobs-init.conf $(DEBETC)/kvalobs && \
-	    mv pgrepctl/kvalobs.conf.template $(DEBETC)/pgrepctl
+  mv lam2kv/etc $(DEBETC)/kvalobs/lam2kv && \
+  mv pgclean-local.sql.template save_last_month.conf kv_ctl.conf kv-env.conf kv-ips.conf.template kvcron kvincron  $(DEBETC)/kvalobs && \
+  mv lam2kv/bin/hirlam2kvalobs.sh lam2kv/bin/lam2kv.cron scripts/*.sh init/*.sh $(DEBTMP)/usr/lib/kvalobs/bin && \
+  chmod a+x $(DEBTMP)/usr/lib/kvalobs/bin/* && \
+  mv init/kvalobs $(DEBETC)/init.d && \
+  mv init/kvalobs-st*.conf $(DEBETC)/init && \
+  mv init/kvalobs-init.conf $(DEBETC)/kvalobs && \
+  mv pgrepctl/kvalobs.conf.template $(DEBETC)/pgrepctl
 	cp $(CURDIR)/etc/kv2norcom.conf.template $(DEBETC)/kvalobs
 	cp $(CURDIR)/etc/stinfosys.conf $(DEBETC)/kvalobs
 	cp $(CURDIR)/etc/stinfosys_params.csv.default $(DEBETC)/kvalobs
+	cp /usr/local/lib/libmetlibs-*.so* $(DEBLIBKV)/lib

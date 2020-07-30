@@ -1,0 +1,2 @@
+/var/lib/kvbufrd/bufr2norcom IN_MOVED_TO,IN_NO_LOOP /usr/bin/kv2norcom $@
+/var/lib/kvsynopd/synop2norcom IN_MOVED_TO,IN_NO_LOOP /usr/bin/kv2norcom $@

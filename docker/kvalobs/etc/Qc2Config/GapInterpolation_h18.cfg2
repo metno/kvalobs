@@ -1,0 +1,17 @@
+Algorithm=GapInterpolation
+RunAtHour=18
+RunAtMinute=45
+End_hh = 01
+Last_NDays  = 3
+
+missing_flagchange_common = fmis=3->fmis=1;fmis=[02]->fmis=4
+
+TypeId = -32767
+
+Parameter = par=104,minVal=0,offsetCorrectionLimit=5
+Parameter = par=112,minVal=0,offsetCorrectionLimit=5
+
+Parameter = par=178,minVal=800,maxVal=1200,offsetCorrectionLimit=5,fluctuationLevel=0
+Parameter = par=211,minPar=213,maxPar=215,minVal=-80,maxVal=100,offsetCorrectionLimit=15,fluctuationLevel=0
+Parameter = par=217,minPar=219,maxPar=220,minVal=-80,maxVal=100,offsetCorrectionLimit=15,fluctuationLevel=0
+Parameter = par=262,minPar=264,maxPar=265,minVal=0,maxVal=100,offsetCorrectionLimit=5,fluctuationLevel=0,roundingFactor=1

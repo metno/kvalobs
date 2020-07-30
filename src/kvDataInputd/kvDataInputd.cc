@@ -28,6 +28,7 @@
  */
 #include <signal.h>
 #include <setjmp.h>
+#include <stdlib.h>
 #include <mutex>
 #include "boost/thread.hpp"
 #include "lib/milog/milog.h"
@@ -70,8 +71,13 @@ int main(int argn, char** argv) {
   bool error;
   string pidfile;
   miutil::conf::ConfSection *theKvConf = KvBaseApp::getConfiguration();
+  
+  if( ! theKvConf ) {
+    LOGFATAL("No configuration file!");
+    exit(1);
+  }
+  
   int nWorkerThreads = 3;
-
   canjump = 0;
   InitLogger(argn, argv, "kvDataInputd", theKvConf);
 

@@ -1,0 +1,13 @@
+#This file defines the host(s) this kvalobs instance 
+#run on and the programs to check which host
+#is the current production host.
+#
+#The KVHOSTS must be set to the hostname or ip-adress
+#to the hosts that is part of the production kvalobs system.
+#
+#KVMASTER_HOST is an ip that is assigned to the host that is the
+#current master host.
+
+KVHOSTS="kvalobs1 kvalobs2"
+KVMASTER_HOST="kvalobs"
+ 

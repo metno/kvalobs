@@ -37,7 +37,8 @@ kvDataInputd_LDFLAGS = \
    -pthread -export-dynamic \
    -R "$(libdir)/@PACKAGE_NAME@/lib" \
    -R "$(rdkafka_LIBDIR)" \
-   -R "$(libhttpserver_LIBDIR)"
+   -R "$(libhttpserver_LIBDIR)" \
+   -R "/usr/local/lib"
 
 kvDataInputd_LDADD = \
    $(top_builddir)/src/lib/json/libjson.la \

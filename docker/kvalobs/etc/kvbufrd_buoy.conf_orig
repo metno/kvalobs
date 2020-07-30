@@ -1,0 +1,87 @@
+callsign_6301000 {
+   code=(5)
+   name="MIKE"
+   height=2
+   height_wind=4
+   height_temperature=4
+   height_pressure=0.0
+   stationid=76900
+   typepriority=("*522",502)
+   delay=("+HH:00")
+   owner="BUOY"
+   list="99"
+   latitude=66
+   longitude=2
+}
+
+callsign_6301001 {
+   code=(5)
+   name="ORMEN LANGE"
+   height_wind=4
+   height_pressure=0.0
+   stationid=76933
+   typepriority=(22)
+   delay=("+HH:00")
+   owner="BUOY"
+   list="99"
+   latitude=63.5
+   longitude=5
+}
+
+callsign_6301002 {
+   code=(5)
+   name="STOREGGA"
+   height=0
+   stationid=76907
+   typepriority=(22)
+   delay=("+HH:00")
+   owner="PLAT"
+   list="99"
+   latitude=62.8667
+   longitude=4.3667
+}
+
+callsign_6301003 {
+   code=(5)
+   name="WISTING"
+   height=0
+   height_pressure=0.0
+   stationid=20925
+   typepriority=("*22",538)
+   delay=("+HH:00")
+   owner="BUOY"
+   list="99"
+   latitude=73.5
+   longitude=24.13
+}
+
+callsign_6301004 {
+   code=(5)
+   name="HJELMSOYBANKEN"
+   height=0
+   height_wind=4
+   height_pressure=0.0
+   stationid=20926
+   typepriority=("*22",538)
+   delay=("+HH:00")
+   owner="BUOY"
+   list="99"
+   latitude=72.49
+   longitude=20.15
+}
+
+callsign_6301005 {
+   code=(5)
+   name="NORDKAPPBASSENGET"
+   height=0
+   height_pressure=0.0
+   stationid=20927
+   typepriority=("*22",538)
+   delay=("+HH:00")
+   owner="BUOY"
+   list="99"
+   latitude=72.66
+   longitude=34.7
+}
+
+
