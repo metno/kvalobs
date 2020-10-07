@@ -1,3 +1,8 @@
+kvalobs (5.0.6~rc1-1) xenial; urgency=medium
+  * kvDataInputd: logger change for publishing raw data to kafka.
+  
+ -- Borge Moe <borge.moe@met.no>  Wed, 7 Oct 2020 10:45:00 +0200
+
 kvalobs (5.0.5-1) xenial; urgency=medium
   * No change since last rc3.
   

@@ -45,11 +45,11 @@ const char *RawDataCommand::getData(unsigned int *size) const {
 void RawDataCommand::onSend(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &threadName) {
   string::size_type i = data.find_first_of('\n');
   if (i != string::npos) {
-    IDLOGDEBUG("kafka_raw", "RawData(" << msgId << "): SENDT: " << data.substr(i));
+    IDLOGDEBUG("kafka_raw", "SENDT: RawData(" << msgId << "): HEADER: '" << data.substr(0, i) << "' DATA: " << data.substr(i));
   } else if (!data.empty()) {
-    IDLOGDEBUG("kafka_raw", "RawData(" << msgId << "): SENDT: " << data);
+    IDLOGDEBUG("kafka_raw", "SENDT: RawData(" << msgId << "): HEADER: (none) DATA:\n" << data);
   } else {
-    IDLOGDEBUG("kafka_raw", "RawData(" << msgId << "): SENDT: empty message.");
+    IDLOGDEBUG("kafka_raw", "SENDT: RawData(" << msgId << "): DATA: empty message.");
   }
 }
 
