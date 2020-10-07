@@ -101,16 +101,13 @@ public:
     return *this;
   }
 
-  bool isNil() const { valType_ == NIL;}
+  bool isNil() const { return valType_ == NIL;}
   void setAsNil();
   bool undef() const { return valType_ == UNDEF; }
 
   bool isEqual(const ValElement& v) const
   {
-    if ((valType_ == v.valType_) && (val_ == v.val_))
-      return true;
-
-    return false;
+    return (valType_ == v.valType_) && (val_ == v.val_);
   }
 
   ValType type() const { return valType_; }
