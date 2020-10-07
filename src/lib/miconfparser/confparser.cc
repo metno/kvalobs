@@ -30,8 +30,9 @@
  */
 #include <iostream>
 #include <fstream>
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 #include <miconfparser/confparser.h>
+#include <miconfparser/valelement.h>
 
 //using namespace std;
 
@@ -44,12 +45,14 @@ namespace miutil {
 namespace conf {
 typedef std::map<const ConfParser*, void*> PimpelType;
 PimpelType ConfParser::pimpel;
+
+
 }
 }
 
 namespace {
 
-boost::mutex mutex;
+std::mutex mutex;
 
 struct MyPimpel {
   bool allowMultipleSections;
@@ -60,27 +63,41 @@ struct MyPimpel {
         deleteIgnoredSections(true) {
   }
 };
+
+std::string sOP;
+std::string sCP;
+void setListChars_() {
+  auto listChars=miutil::conf::getListChars();
+  sOP=listChars[0];
+  sCP=listChars[1];
 }
+}
+
+
 
 miutil::conf::ConfParser::ConfParser()
     : curIst(0),
       debugLevel_(0) {
-  boost::mutex::scoped_lock lock(mutex);
+  std::lock_guard<std::mutex> lock(mutex);
   pimpel[this] = new MyPimpel(false);
+  setListChars_();
 }
 
 miutil::conf::ConfParser::ConfParser(bool allowMultipleSections_)
     : curIst(0),
       debugLevel_(0) {
-  boost::mutex::scoped_lock lock(mutex);
+  std::lock_guard<std::mutex> lock(mutex);
   pimpel[this] = new MyPimpel(allowMultipleSections_);
+  setListChars_();
 }
 
 miutil::conf::ConfParser::ConfParser(std::istream &ist)
     : debugLevel_(0) {
-  boost::mutex::scoped_lock lock(mutex);
-  pimpel[this] = new MyPimpel(false);
 
+  std::lock_guard<std::mutex> lock(mutex);
+  setListChars_();
+  pimpel[this] = new MyPimpel(false);
+  
   try {
     curIst = new TIstStack;
   } catch (...) {
@@ -97,7 +114,8 @@ miutil::conf::ConfParser::ConfParser(std::istream &ist)
 miutil::conf::ConfParser::ConfParser(std::istream &ist,
                                      bool allowMultipleSections_)
     : debugLevel_(0) {
-  boost::mutex::scoped_lock lock(mutex);
+  std::lock_guard<std::mutex> lock(mutex);
+  setListChars_();
   pimpel[this] = new MyPimpel(allowMultipleSections_);
 
   try {
@@ -114,7 +132,7 @@ miutil::conf::ConfParser::ConfParser(std::istream &ist,
 }
 
 miutil::conf::ConfParser::~ConfParser() {
-  boost::mutex::scoped_lock lock(mutex);
+  std::lock_guard<std::mutex> lock(mutex);
   PimpelType::iterator it = pimpel.find(this);
 
   if (it != pimpel.end()) {
@@ -127,7 +145,7 @@ miutil::conf::ConfParser::~ConfParser() {
 }
 
 bool miutil::conf::ConfParser::allowMultipleSections() const {
-  boost::mutex::scoped_lock lock(mutex);
+  std::lock_guard<std::mutex> lock(mutex);
   PimpelType::const_iterator it = pimpel.find(this);
 
   if (it != pimpel.end())
@@ -159,7 +177,7 @@ miutil::conf::ConfParser::printTokenStack(std::ostream &ost) const {
 }
 
 void miutil::conf::ConfParser::keepIgnoredSection() {
-  boost::mutex::scoped_lock lock(mutex);
+  std::lock_guard<std::mutex> lock(mutex);
   PimpelType::const_iterator it = pimpel.find(this);
 
   if (it != pimpel.end())
@@ -326,6 +344,8 @@ void miutil::conf::ConfParser::aliasToken(const char *id) {
 }
 
 void miutil::conf::ConfParser::charToken(char ch) {
+  const char cOP=sOP[0];
+  const char cCP=sCP[0];
   if (debugLevel_ > 0) {
     char buf[2];
     buf[0] = ch;
@@ -337,12 +357,14 @@ void miutil::conf::ConfParser::charToken(char ch) {
     case '=':
       checkToken(Token(MiTT_EQUAL, "=", curIst->lineno));
       break;
+#if 0
     case ')':
-      checkToken(Token(MiTT_CP, ")", curIst->lineno));
+      checkToken(Token(MiTT_CP, sCP/*")"*/, curIst->lineno));
       break;
     case '(':
-      checkToken(Token(MiTT_OP, "(", curIst->lineno));
-      break;
+      checkToken(Token(MiTT_OP, sOP /*"("*/, curIst->lineno));
+      break; 
+#endif
     case '}':
       checkToken(Token(MiTT_CB, "}", curIst->lineno));
       break;
@@ -356,9 +378,15 @@ void miutil::conf::ConfParser::charToken(char ch) {
       checkToken(Token(MiTT_NL, "\\n", curIst->lineno));
       break;
     default:
-      errs_ << "File: " << curIst->file << " Line: " << curIst->lineno
-            << ": Invalid token, (" << ch << ")";
-      error_ = true;
+      if(ch == sOP[0] ){
+        checkToken(Token(MiTT_OP, sOP /*"("*/, curIst->lineno));
+      } else if(ch == sCP[0] ){
+        checkToken(Token(MiTT_CP, sCP/*")"*/, curIst->lineno));
+      } else { 
+        errs_ << "File: " << curIst->file << " Line: " << curIst->lineno
+              << ": Invalid token, ('" << ch << "')   listChars '" << sOP[0] << sCP[0] << "'\n";
+        error_ = true;
+      }
       break;
   }
 }
@@ -497,6 +525,7 @@ bool miutil::conf::ConfParser::colapseList() {
   ValElementList vl;
   TokenType prevToken = MiTT_CP;
 
+  vl.isList(true);
   if (debugLevel_ > 1) {
     if (debugLevel_ > 2) {
       cerr << "Tokenstack before colapseList ....\n";
@@ -548,8 +577,12 @@ bool miutil::conf::ConfParser::colapseList() {
             error_ = true;
             return false;
           }
+        } else if( t.val == "nil") {
+          ValElement v;
+          v.setAsNil();
+          vl.push_front(v);
         } else {
-          vl.push_front(ValElement(t.val, miutil::conf::STRING));
+          vl.push_front(ValElement(t.val, miutil::conf::ID));
         }
         break;
       case MiTT_INT:
@@ -571,7 +604,7 @@ bool miutil::conf::ConfParser::colapseList() {
           vl.push_front(ValElement("", miutil::conf::STRING));
         break;
       case MiTT_OP:
-        if (prevToken == MiTT_COMMA || prevToken == MiTT_CP)
+        if (prevToken == MiTT_COMMA )
           vl.push_front(ValElement("", miutil::conf::STRING));
         break;
       default:
@@ -630,7 +663,11 @@ bool miutil::conf::ConfParser::colapseKeyVal(const Token &t) {
       v = ValElement(t.val, miutil::conf::STRING);
       break;
     case MiTT_ID:
-      v = ValElement(t.val, miutil::conf::STRING);
+      if( t.val == "nil" ) {
+        v.setAsNil();
+      } else {
+        v = ValElement(t.val, miutil::conf::ID);
+      }
       break;
     case MiTT_FLOAT:
       v = ValElement(t.val, miutil::conf::FLOAT);
@@ -689,7 +726,7 @@ bool miutil::conf::ConfParser::colapseSection() {
   bool deleteIgnoredSections = true;
 
   {
-    boost::mutex::scoped_lock lock(mutex);
+    std::lock_guard<std::mutex> lock(mutex);
     PimpelType::const_iterator it = pimpel.find(this);
 
     if (it != pimpel.end())
@@ -797,7 +834,11 @@ std::string miutil::conf::ConfParser::Token::print() const {
 
   switch (tt) {
     case MiTT_ID:
-      ost << "ID";
+      if( val == "nil") {
+        ost << "ID (nil)";
+      } else {
+         ost << "ID";
+      }
       break;
     case MiTT_IGNORE_ID:
       ost << "IGNORE ID";

@@ -1,0 +1,34 @@
+FROM bionic-kvbuild:latest AS kvbins
+
+ENTRYPOINT [ "/bin/bash" ]
+
+
+
+FROM registry.met.no/obs/kvalobs/kvbuild/staging/bionic-kvcpp-runtime:latest 
+ARG DEBIAN_FRONTEND='noninteractive'
+ARG kvuser=kvalobs
+ARG kvuserid=5010
+
+RUN apt-get update && apt-get --yes install \
+   libperl5.26 libkvutil-perl
+
+#Create a runtime user for kvalobs
+RUN addgroup --gid $kvuserid $kvuser && \
+  adduser --uid $kvuserid  --gid $kvuserid --disabled-password --disabled-login --gecos '' $kvuser
+
+RUN mkdir -p /etc/kvalobs && chown ${kvuser}:${kvuser}  /etc/kvalobs
+RUN mkdir -p /var/log/kvalobs && chown ${kvuser}:${kvuser}  /var/log/kvalobs
+RUN mkdir -p /var/lib/kvalobs/run && chown ${kvuser}:${kvuser} /var/lib/kvalobs/run
+
+COPY --from=kvbins /usr/bin/kvQabased /usr/bin/
+COPY docker/kvalobs/kvqabased/entrypoint.sh  /usr/bin/
+
+RUN chmod +x /usr/bin/entrypoint.sh
+VOLUME /etc/kvalobs
+VOLUME /var/log/kvalobs
+
+USER ${kvuser}:${kvuser}
+
+#ENTRYPOINT [ "/bin/bash" ]
+#ENTRYPOINT ["/bin/bash", "-c", "while true; do sleep 10000; done" ]
+ENTRYPOINT  ["tini", "--", "/usr/bin/entrypoint.sh" ]

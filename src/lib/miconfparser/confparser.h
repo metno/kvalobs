@@ -69,7 +69,7 @@ class ConfParser {
   bool newStream(const std::string &file);
   bool deleteStream();
   void cleanIstStack();
-
+  
  private:
   static std::map<const ConfParser*, void*> pimpel;
   ConfParser(const ConfParser&);
@@ -205,6 +205,8 @@ class ConfParser {
    *
    * that i used to log the the  progres of the
    * parsing of the input.
+   * Valid values 0, 1, 2, 3. Higher values more debug 
+   * information.
    */
   void debugLevel(int dl) {
     debugLevel_ = dl;

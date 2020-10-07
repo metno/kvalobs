@@ -48,10 +48,12 @@ int main(int argn, char **argv) {
   int debug = 0;
   bool verbose = false;
   bool regression = false;
-
+  bool listOutputBrace=false; 
+  bool listUseBrace=false;
+  bool allowMultipleSections=false;
   opterr = 0;  //dont print to standard error.
 
-  while ((ch = getopt(argn, argv, "d:vhr")) != -1) {
+  while ((ch = getopt(argn, argv, "d:vhrbpm")) != -1) {
     switch (ch) {
       case 'd':
         if (!isdigit(optarg[0])) {
@@ -73,6 +75,15 @@ int main(int argn, char **argv) {
       case 'r':
         regression = true;
         break;
+      case 'b':
+        listOutputBrace=true;
+        break;
+      case 'p':
+        listUseBrace=true;
+        break;
+      case 'm':
+        allowMultipleSections=true;
+        break;
       case ':':
         cout << "Option -: " << optopt << " missing argument!" << endl;
         use();
@@ -82,11 +93,10 @@ int main(int argn, char **argv) {
 
   if (regression) {
     debug = 0;
-
-    if (verbose)
-      verbose = false;
+    verbose = false;
   }
 
+  
   if (optind < argn)
     filename = argv[optind];
   else {
@@ -102,16 +112,28 @@ int main(int argn, char **argv) {
     return 1;
   }
 
-  ConfParser parser(f);
+  if(listUseBrace) {
+    miutil::conf::setListChars("[]");
+  }
+
+  ConfParser parser(f, allowMultipleSections);
 
   parser.debugLevel(debug);
-
+  
   result = parser.parse();
 
   if (result) {
+    if( listOutputBrace ) {
+      debug = false;
+      miutil::conf::setListChars("[]");
+      std::cout << *result << endl;
+      delete result;
+      exit(0);
+    }
+    
     if (debug > 0 && verbose)
       std::cout << "\n-------------------------\n\n";
-
+    
     if (verbose || regression)
       std::cout << *result << endl;
 
@@ -130,12 +152,15 @@ int main(int argn, char **argv) {
 void use() {
   cout << "\n\tmiconfparse -dn -v -h -r filename\n"
        << "\t\t-dn debugmode, for debugging the parser.\n"
-       << "\t\t    n=1,2 or 3, higher n -> more debug information.\n"
+       << "\t\t    n=0,1,2 or 3, higher n -> more debug information.\n"
        << "\t\t-h  print this help screen and exit.\n"
        << "\t\t-v  print the the content of the file, but from\n"
        << "\t\t    the parse tree.\n"
        << "\t\t-r  same as -v, but print the parse tree in a form that\n"
-       << "\t\t    can be parsed again. The -d option is ignored!\n\n";
+       << "\t\t    can be parsed again. The -d option is ignored!\n"
+       << "\t\t-b  output list as [], this make the result HCON readable.\n"
+       << "\t\t-p  The parser assumes list use [] in the configuration.\n"
+       << "\t\t-m  allow multiple sections in in the configuration.\n\n";
 
   exit(1);
 }

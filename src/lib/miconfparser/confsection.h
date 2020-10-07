@@ -120,6 +120,8 @@ public:
 
   void deleteAllIgnoredSections();
 
+  bool sectionExist(const std::string &name)const;
+
   friend std::ostream& operator<<(std::ostream& str,
                                   const miutil::conf::ConfSection& cs);
 };
