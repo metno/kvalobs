@@ -36,7 +36,6 @@ pkgsysconf_DATA = \
 
 EXTRA_DIST = \
 	$(top_srcdir)/kvsupport/*.tar* \
-	$(top_srcdir)/kvsupport/*.zip \
 	etc/kv2norcom.conf.template \
 	etc/sync_norcom_files.conf.template \
   etc/kv2kvDataInputd.conf.template \
