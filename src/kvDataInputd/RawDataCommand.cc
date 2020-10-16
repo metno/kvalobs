@@ -45,22 +45,22 @@ const char *RawDataCommand::getData(unsigned int *size) const {
 void RawDataCommand::onSend(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &threadName) {
   string::size_type i = data.find_first_of('\n');
   if (i != string::npos) {
-    IDLOGDEBUG("kafka_raw", "RawData(" << msgId << "): HEADER: '" << data.substr(0, i) << "' SENDT: " << data.substr(i));
+    IDLOGDEBUG("kafka_raw", "SENDT: msgid: " << msgId << " HEADER: '" << data.substr(0, i) << "' DATA: " << data.substr(i));
   } else if (!data.empty()) {
-    IDLOGDEBUG("kafka_raw", "RawData(" << msgId << "): HEADER: (none) SENDT: " << data);
+    IDLOGDEBUG("kafka_raw", "SENDT: msgid: " << msgId << " HEADER: (none) DATA:\n" << data);
   } else {
-    IDLOGDEBUG("kafka_raw", "RawData(" << msgId << "): SENDT: empty message.");
+    IDLOGDEBUG("kafka_raw", "SENDT: msgid: " << msgId << " DATA: empty message.");
   }
 }
 
 void RawDataCommand::onSuccess(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &threadName, const std::string &data) {
   string::size_type i = data.find_first_of('\n');
   if (i != string::npos) {
-    IDLOGDEBUG("kafka_raw", threadName << ": RawData(" << msgId << "): ACK: " << data.substr(i));
+    IDLOGDEBUG("kafka_raw", threadName << " ACK: msgid: " << msgId << " Header: '" << data.substr(0, i) <<"'.");
   } else if (!data.empty()) {
-    IDLOGDEBUG("kafka_raw", threadName << ": RawData(" << msgId << "): ACK: " << data);
+    IDLOGDEBUG("kafka_raw",  threadName << " ACK: msgid: " << msgId << " no header.");
   } else {
-    IDLOGDEBUG("kafka_raw", threadName << ": RawData(" << msgId << "): ACK: empty message.");
+    IDLOGDEBUG("kafka_raw", threadName << " ACK: msgid: " << msgId << " no data.");
   }
 }
 
@@ -69,10 +69,10 @@ void RawDataCommand::onError(kvalobs::subscribe::KafkaProducer::MessageId msgId,
   string::size_type i = data.find_first_of('\n');
 
   if (i != string::npos) {
-    IDLOGERROR("kafka_raw", threadName << ": RawData(" << msgId << "): FAIL: " << data.substr(i) << "\n" << errorMessage);
+    IDLOGERROR("kafka_raw", threadName << " FAIL: msgid: " << msgId << " HEADER:  " << data.substr(i) << "\n" << errorMessage);
   } else if (!data.empty()) {
-    IDLOGERROR("kafka_raw", threadName << ": RawData(" << msgId << "): FAIL: " << data << "\n" << errorMessage);
+    IDLOGERROR("kafka_raw", threadName << " FAIL: msgid: " << msgId << " No header.\n" << errorMessage);
   } else {
-    IDLOGDEBUG("kafka_raw", threadName << ": RawData(" << msgId << "): FAIL: empty message.");
+    IDLOGDEBUG("kafka_raw", threadName << " FAIL: msgid: " << msgId << " empty message.\n" << errorMessage);
   }
 }
