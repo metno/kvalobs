@@ -74,21 +74,18 @@ pkgconfig_DATA = libkvcpp.pc
 $(pkgconfig_DATA): $(top_builddir)/config.status
 
 
-#noinst_PROGRAMS = runit
-
-noinst_PROGRAMS =
-runit_SOURCES = runit.cpp
-
-runit_LDFLAGS = \
-	sql/libsqlkvapp.la \
-	corba/libcorbakvapp.la \
-	libkvalobs_kvcpp.la \
-	$(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
-	$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
-	$(top_builddir)/src/lib/dnmithread/libkvalobs_dnmithread.la \
-	$(top_builddir)/src/lib/milog/libkvalobs_milog.la \
-	-lboost_system -lboost_timer -lomniDynamic4 -lomniORB4 -lomnithread \
-	-R "$(rdkafka_LIBDIR)"
+# noinst_PROGRAMS = runit
+# runit_SOURCES = runit.cpp
+# runit_LDFLAGS = \
+# 	sql/libsqlkvapp.la \
+# 	corba/libcorbakvapp.la \
+# 	libkvalobs_kvcpp.la \
+# 	$(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
+# 	$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
+# 	$(top_builddir)/src/lib/dnmithread/libkvalobs_dnmithread.la \
+# 	$(top_builddir)/src/lib/milog/libkvalobs_milog.la \
+# 	-lboost_system -lboost_timer -lomniDynamic4 -lomniORB4 -lomnithread \
+# 	-R "$(rdkafka_LIBDIR)"
 
 
 if HAVE_GTEST
