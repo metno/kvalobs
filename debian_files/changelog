@@ -1,3 +1,18 @@
+kvalobs (5.0.7~rc1-1) xenial; urgency=medium
+  * UseInfo(3): Take fpre = 4 in consideration when setting usinfo(3)=1
+  
+ -- Borge Moe <borge.moe@met.no>  Thu, 28 Jan 2021 13:00:00 +0200
+
+kvalobs (5.0.6-1) xenial; urgency=medium
+  * kvDataInputd: logger change for publishing raw data to kafka.
+  
+ -- Borge Moe <borge.moe@met.no>  Wed, 7 Oct 2020 14:15:00 +0200
+
+kvalobs (5.0.6~rc3-1) xenial; urgency=medium
+  * kvDataInputd: logger change for publishing raw data to kafka.
+  
+ -- Borge Moe <borge.moe@met.no>  Wed, 7 Oct 2020 10:45:00 +0200
+
 kvalobs (5.0.5-1) xenial; urgency=medium
   * No change since last rc3.
   
