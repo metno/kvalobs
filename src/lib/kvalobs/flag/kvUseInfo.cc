@@ -224,7 +224,7 @@ bool kvUseInfo::setUseFlags(const kvControlInfo& cinfo) {
     else if (fhqc == 5 || fagg == 5 || (ftime == 1 && fmis == 1))
       ui[3] = 2;
 
-    else if (fhqc == 7 || fagg == 4 || fr == 0xA || fs == 9
+    else if (fhqc == 7 || fagg == 4 || fr == 0xA || fs == 9 || fpre == 4
         || (ftime == 1 && fmis == 4))
       ui[3] = 1;
 
