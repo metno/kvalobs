@@ -401,6 +401,8 @@ kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecod
     return Ok;
   }
 
+  auto  filter_ = filter(stationid, typeId);
+
   for (KvDataContainer::DataByObstime::iterator it = data.begin();
       it != data.end(); ++it) {
 
@@ -411,10 +413,10 @@ kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecod
       td = tid->second;
       textData.erase(tid);
     }
-
+  
     try {
       if (!addDataToDbThrow(to_miTime(it->first), stationid, typeId, it->second, td,
-           logid, getOnlyInsertOrUpdate())) {
+           logid, getOnlyInsertOrUpdate(), filter_.addToWorkQueue())) {
         ostringstream ost;
         ost << "ERROR: stationid: " << stationid << " typeid: " << typeId
             << " obstime: " << it->first << ". Inconsistens in the data!";
@@ -447,7 +449,7 @@ kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecod
     for (KvDataContainer::TextDataByObstime::iterator it = textData.begin();
         it != textData.end(); ++it) {
      if (!addDataToDb(to_miTime(it->first), stationid, typeId, dl, it->second,
-                     logid, getOnlyInsertOrUpdate())) {
+                     logid, getOnlyInsertOrUpdate(), filter_.addToWorkQueue())) {
         ostringstream ost;
         ost << "DBERROR: TextData: stationid: " << stationid << " typeid: "
             << typeId << " obstime: " << it->first;

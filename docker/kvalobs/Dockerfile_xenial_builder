@@ -12,7 +12,7 @@ RUN apt-get update && apt-get -y install \
   libboost-regex-dev libboost-filesystem-dev libboost-program-options-dev libboost-system-dev libboost-timer-dev  \
   libomniorb4-dev omniidl libperl-dev libdbd-pg-perl libcurl3-gnutls-dev liblog4cpp5-dev libcppunit-dev \
   cmake google-mock metlibs-putools-dev zlib1g-dev libssl-dev libsasl2-dev libzstd-dev \
-  libmicrohttpd-dev libgnutls-dev
+  libmicrohttpd-dev libgnutls-dev git
   
 
 RUN addgroup --gid 41494 borgem && adduser --uid 41494  --gid 41494 --disabled-password --disabled-login --gecos '' borgem

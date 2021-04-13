@@ -44,6 +44,7 @@ StationFilterElement::StationFilterElement()
     : stationIdRangeFrom_(-1),
       stationIdRangeTo_(-1),
       name_("__default__"),
+      addToWokque_(true),
       publish_(false),
       saveToDb_(true) {
 }
@@ -52,8 +53,9 @@ StationFilterElement::StationFilterElement(const std::string &filterName)
     : stationIdRangeFrom_(-1),
       stationIdRangeTo_(-1),
       name_(filterName),
+      addToWokque_(true),
       publish_(false),
-      saveToDb_(false) {
+      saveToDb_(true) {
 }
 StationFilterElement::~StationFilterElement() {
 }
@@ -88,7 +90,17 @@ void StationFilterElement::setStationRange(long stationIdFrom, long stationIdTo)
   }
 }
 void StationFilterElement::addStation(long stationId) {
-  stationIdList_.insert(stationId);
+   //id 0 means all stations. We only need one element in the set. 
+    if (stationId == 0 ) {
+      stationIdList_.clear();
+      stationIdList_.insert(0);
+      return;
+    }
+
+    if( stationIdList_.size() > 0 && *stationIdList_.begin()==0)
+      return;
+
+    stationIdList_.insert(stationId);
 }
 
 void StationFilterElement::addTypeId(long typeId) {
@@ -103,7 +115,12 @@ bool StationFilterElement::stationDefined(long stationId) const {
   if (stationIdRangeFrom_ > -1 && stationIdRangeTo_ > -1 && stationId >= stationIdRangeFrom_ && stationId <= stationIdRangeTo_)
     return true;
 
-  return stationIdList_.find(stationId) != stationIdList_.end();
+  for( auto &sid : stationIdList_) {
+    if( sid == 0 || sid==stationId ) {
+      return true;
+    }
+  } 
+  return false;
 }
 
 bool StationFilterElement::typeDefined(long typeId) const {
@@ -116,6 +133,15 @@ bool StationFilterElement::filter(long stationId, long typeId) const {
 
   return typeids_.empty() || typeDefined(typeId);
 }
+
+void StationFilterElement::setAddToWorkQueue(bool f){
+  addToWokque_=f;
+}
+
+bool StationFilterElement::addToWorkQueue()const{
+  return addToWokque_;
+}
+
 
 namespace {
 void setVals(const std::string &key, const std::string &name, const c::ConfSection &conf, std::set<long> &dst) {
@@ -132,12 +158,24 @@ void setVals(const std::string &key, const std::string &name, const c::ConfSecti
 }
 }
 
-StationFilterElement StationFilterElement::readConfig(const miutil::conf::ConfSection &conf, const std::string &name) {
+StationFilterElement StationFilterElement::readConfig(const miutil::conf::ConfSection &conf, const std::string &name, bool isDefault) {
   StationFilterElement e(name);
+  
+  if ( isDefault  ){
+    e=StationFilterElement();
+  }
 
-  e.saveToDb(conf.getValue("save_to_db").valAsBool(false));
-  e.publish(conf.getValue("publish").valAsBool(false));
+  e.saveToDb(conf.getValue("save_to_db").valAsBool(e.saveToDb_));
+  e.publish(conf.getValue("publish").valAsBool(e.publish_));
+  e.setAddToWorkQueue(conf.getValue("add_to_work_queue").valAsBool(e.addToWokque_));
 
+  if( ! e.saveToDb_ ) {
+    e.addToWokque_=false;
+  }
+
+  if (isDefault) {
+    return e;
+  }
   // Optional element
   c::ValElementList val = conf.getValue("station_range");
 
@@ -191,8 +229,6 @@ StationFilterElement StationFilters::getFilterByName(const std::string &name) co
 }
 
 StationFilterElement StationFilters::filter(long stationId, long typeId) const {
-  if (filters_.empty())
-    return StationFilterElement();  // Default filter.
   for (auto &f : filters_) {
     if (f.filter(stationId, typeId))
       return f;
@@ -281,23 +317,26 @@ kvalobs::serialize::KvalobsData StationFilters::publishData(const std::list<kval
 }
 
 
-void StationFilters::configDefaultFilter(const miutil::conf::ConfSection &conf) {
-  std::list<std::string> keys = conf.getKeys();
-  bool publish = false;
-  bool saveToDb = true;
+// void StationFilters::configDefaultFilter(const miutil::conf::ConfSection &conf) {
+//   std::list<std::string> keys = conf.getKeys();
+//   bool publish = false;
+//   bool saveToDb = true;
+//   bool addToWorkue=true;
 
-  for (auto &key : keys) {
-    if (key == "save_to_db") {
-      saveToDb=conf.getValue(key).valAsBool(true);
-    } else if (key == "publish") {
-      publish=conf.getValue(key).valAsBool(false);
-    } else {
-      throw std::logic_error("Invalid key '" + key + "' in the filters 'default' section, valid keys 'save_to_db' and 'publish'.");
-    }
-  }
-  defaultFilter_.saveToDb(saveToDb);
-  defaultFilter_.publish(publish);
-}
+//   for (auto &key : keys) {
+//     if (key == "save_to_db") {
+//       saveToDb=conf.getValue(key).valAsBool(true);
+//     } else if (key == "publish") {
+//       publish=conf.getValue(key).valAsBool(false);
+//     } else if (key == "add_to_work") {
+//       publish=conf.getValue(key).valAsBool(false);
+//     } else {
+//       throw std::logic_error("Invalid key '" + key + "' in the filters 'default' section, valid keys 'save_to_db' and 'publish'.");
+//     }
+//   }
+//   defaultFilter_.saveToDb(saveToDb);
+//   defaultFilter_.publish(publish);
+// }
 
 StationFiltersPtr StationFilters::readConfig(const miutil::conf::ConfSection &conf_) {
   StationFiltersPtr filters(new StationFilters());
@@ -320,11 +359,12 @@ StationFiltersPtr StationFilters::readConfig(const miutil::conf::ConfSection &co
         continue;
 
       if (filterName == "default") {
-        filters->configDefaultFilter(*filter);
+        filters->defaultFilter_= StationFilterElement::readConfig(*filter, filterName, true);
+        //filters->configDefaultFilter(*filter);
         continue;
       }
 
-      StationFilterElement elem = StationFilterElement::readConfig(*filter, filterName);
+      StationFilterElement elem = StationFilterElement::readConfig(*filter, filterName, false);
       filters->filters_.push_back(elem);
     } catch (const std::exception &ex) {
       errs << "Error: Filter def '" << filterName << "': " << ex.what() << "\n";
