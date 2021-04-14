@@ -31,6 +31,8 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <map>
+#include <sstream>
 #include <miconfparser/trimstr.h>
 #include <miconfparser/confsection.h>
 
@@ -132,6 +134,10 @@ bool miutil::conf::ConfSection::allowMultipleSections() const {
 
   pit = pimpel.find(this);
   return pit != pimpel.end() ? pit->second->allowMultipleSections : false;
+}
+
+bool miutil::conf::ConfSection::sectionExist(const std::string &name )const {
+  return sectionList.find(name) != sectionList.end(); 
 }
 
 bool miutil::conf::ConfSection::addSection(const std::string &name,
@@ -429,6 +435,19 @@ void miutil::conf::ConfSection::deleteAllIgnoredSections() {
   }
 }
 
+namespace {
+  int sectionCount(std::map<std::string, int> &sections, const std::string &name) {
+    auto it = sections.find(name);
+    if( it == sections.end() ) {
+      sections[name]=0;
+      return 0;
+    }
+    it->second++;
+    return it->second;
+  }
+}
+
+
 void miutil::conf::ConfSection::printImple(std::ostream &ost, int nSpace,
                                            bool pritty) const {
   CISectionList itSec;
@@ -447,11 +466,27 @@ void miutil::conf::ConfSection::printImple(std::ostream &ost, int nSpace,
   if (pritty && itSec != sectionList.end())
     ost << endl;
 
+  std::map<std::string, int> allreadyDefinedSections;
   while (itSec != sectionList.end()) {
+    auto sectionName = itSec->first;
     for (ConfSectionList::const_iterator cit = itSec->second.begin();
         cit != itSec->second.end(); ++cit) {
 
-      ost << space << itSec->first << "{" << endl;
+      
+      if( allowMultipleSections() && getListChars() == "[]") {
+        //HOCON compatibility.
+        //HOCON merges multiple sections by default. So we must give them a new name.
+        //The new name has number appende, ex _1, _2 etc.
+        int n = sectionCount(allreadyDefinedSections, sectionName);
+        if( n > 0 ) {
+          std::ostringstream t;
+          t << sectionName << "_" << n;
+          sectionName=t.str();
+        }
+      }
+      
+
+      ost << space << sectionName << " {" << endl;
       (*cit)->printImple(ost, nSpace + 3, true);
       ost << space << "}" << endl;
     }

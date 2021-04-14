@@ -1,0 +1,57 @@
+FROM focal-kvbuild:latest AS kvbins
+
+ENTRYPOINT [ "/bin/bash" ]
+
+FROM ubuntu:focal AS kv_bin_deps
+
+RUN apt-get update && apt-get -y install \
+  libboost-date-time1.71.0 libboost-filesystem1.71.0 libboost-thread1.71.0 \
+  libboost-regex1.71.0  libc6 libcurl3-gnutls libgcc-s1 libglibmm-2.4-1v5 \
+  libmicrohttpd12 libomniorb4-2 libomnithread4 libpq5 libsasl2-2 \
+  libssl1.1 libstdc++6 libxml++2.6-2v5 libxml2 libzstd1 zlib1g \
+  postgresql-client-12 iproute2 gosu
+
+COPY --from=kvbins /usr/local/lib/libmetlibs*.so.* /usr/local/lib/
+COPY --from=kvbins /usr/lib/libkvalobs_*.so.* /usr/lib/
+COPY --from=kvbins /usr/lib/kvalobs/db/*.so*  /usr/lib/kvalobs/db/
+COPY --from=kvbins /usr/lib/kvalobs/lib/*.so*  /usr/lib/kvalobs/lib/
+
+RUN mkdir -p /var/lib/kvalobs/run
+
+ENTRYPOINT [ "/bin/bash" ]
+
+
+
+FROM kv_bin_deps AS kvDataInputd
+
+ARG kvuser=kvalobs
+ARG kvuserid=5010
+
+#Create a runtime user for kvalobs
+RUN addgroup --gid $kvuserid $kvuserid && \
+  adduser --uid $kvuserid  --gid $kvuserid --disabled-password --disabled-login --gecos '' $kvuser
+
+COPY docker/tini_0.19.0-amd64.deb /tmp
+RUN dpkg -i /tmp/tini_0.19.0-amd64.deb && rm -f tini_0.19.0-amd64.deb
+
+RUN mkdir -p /etc/kvalobs && chown ${kvuser}:${kvuser}  /etc/kvalobs
+RUN mkdir -p /var/log/kvalobs && chown ${kvuser}:${kvuser}  /var/log/kvalobs
+
+COPY --from=kvbins /usr/lib/kvalobs/decode/*.so*  /usr/lib/kvalobs/decode/
+COPY --from=kvbins /usr/bin/kvDataInputd /usr/bin/
+COPY --from=kvbins /usr/bin/aexecd* /usr/bin/
+COPY docker/kvalobs/kvdatainputd/aexecd.conf /etc/kvalobs/
+COPY docker/kvalobs/kvdatainputd/entrypoint.sh  /usr/bin/
+
+RUN chmod +x /usr/bin/entrypoint.sh
+VOLUME /etc/kvalobs
+VOLUME /var/log/kvalobs
+
+
+EXPOSE 8090
+
+USER ${kvuser}:${kvuser}
+
+#ENTRYPOINT [ "/bin/bash" ]
+#ENTRYPOINT ["/bin/bash", "-c", "while true; do sleep 10000; done" ]
+ENTRYPOINT  ["tini", "--", "/usr/bin/entrypoint.sh" ]

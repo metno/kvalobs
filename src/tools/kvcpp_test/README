@@ -1,0 +1,5 @@
+This directory contains a few small programs to live test the kvcpp library,
+ie we test it against a kvalobs server that is running, no mock.
+
+It also test that the pkg-config files is working.
+

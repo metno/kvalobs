@@ -32,6 +32,7 @@
 #include <math.h>
 #include <sstream>
 #include <stdio.h>
+#include <iostream>
 #include <sstream>
 #include <boost/lexical_cast.hpp>
 #include <miconfparser/trimstr.h>
@@ -41,7 +42,25 @@ using namespace std;
 
 namespace {
 void compress(std::string &str);
+std::string listCharLeft="(";
+std::string listCharRight=")";
 }
+
+bool miutil::conf::setListChars(const std::string &listCharLeftRight) {
+  if( listCharLeftRight.length()!=2) {
+    return false;
+  }
+
+  listCharLeft=listCharLeftRight[0];
+  listCharRight=listCharLeftRight[1];
+  return true;
+}
+
+std::string miutil::conf::getListChars() {
+  return listCharLeft+listCharRight;
+}
+
+
 
 miutil::conf::ValElement::ValElement(long l)
     : valType_(INT),
@@ -72,6 +91,11 @@ miutil::conf::ValElement::ValElement(const std::string &val, ValType type)
       val_(val) {
   trimstr(val_);
   compress(val_);
+}
+
+void miutil::conf::ValElement::setAsNil() {
+  valType_=NIL;
+  val_.erase();
 }
 
 long miutil::conf::ValElement::valAsInt() const {
@@ -156,6 +180,9 @@ std::string miutil::conf::ValElement::toString(bool quoted) const {
   if (valType_ == UNDEF)
     throw UndefEx();
 
+  if (valType_ == NIL) {
+    return "nil";
+  }
   if (valType_ != STRING && !quoted) {
     return val_;
   }
@@ -172,27 +199,9 @@ std::string miutil::conf::ValElement::toString(bool quoted) const {
       i += 2;
       i = val.find("\"", i);
     }
+    quoted=true;
   }
 
-  if (valType_ == STRING && !quoted) {
-    string::size_type i;
-
-    if (!val.empty()) {
-      for (i = 0; i < val.length(); i++) {
-        if (ispunct(val[i]) || val[i] == ' ') {
-          quoted = true;
-          break;
-        }
-      }
-
-      if (!quoted) {
-        if (isalpha(val[0]) || val[0] == '_')
-          return val;
-      }
-
-      quoted = true;
-    }
-  }
 
   if (quoted) {
     val.insert(0, "\"");
@@ -200,7 +209,6 @@ std::string miutil::conf::ValElement::toString(bool quoted) const {
   }
 
   return val;
-
 }
 
 void miutil::conf::ValElement::val(long val) {
@@ -291,20 +299,28 @@ miutil::conf::operator<<(std::ostream &ost, const ValElementList &elemList) {
   CIValElementList it = elemList.begin();
 
   if (elemList.empty()) {
-    ost << "<<<EMPTY>>>";
+    if (elemList.isList()) {
+      ost << miutil::conf::getListChars();
+    } else if( elemList.isNil() ){
+      ost << "nil";
+    } 
     return ost;
   }
 
   if (elemList.size() > 1) {
-    ost << "(" << *it;
+    ost << listCharLeft << *it;
     it++;
 
     for (; it != elemList.end(); it++)
       ost << "," << *it;
 
-    ost << ")";
-  } else
-    ost << *it;
+    ost << listCharRight;
+  } else {
+    if( elemList.isList() )
+      ost << listCharLeft << *it << listCharRight;
+    else
+      ost << *it ;
+  }
 
   return ost;
 }
@@ -315,7 +331,6 @@ miutil::conf::operator<<(std::ostream &ost,
   try {
     ost << elem.toString();
   } catch (...) {
-    ost << "<<<UNDEF>>>";
   }
 
   return ost;

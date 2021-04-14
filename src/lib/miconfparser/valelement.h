@@ -40,6 +40,12 @@
 namespace miutil {
 namespace conf {
 
+bool setListChars(const std::string &listCharLeftRight="()");
+
+//2 elements string, where element[0] is opening character and element[1] is closing
+//chracters. The result may also be used as the emtty list.
+std::string getListChars();
+
 /**
  * \addtogroup miconfparser
  *
@@ -51,9 +57,11 @@ class ValElementList;
 enum ValType
 {
   UNDEF = 0,
+  ID,
   INT,
   FLOAT,
-  STRING
+  STRING,
+  NIL
 };
 
 /**
@@ -93,6 +101,8 @@ public:
     return *this;
   }
 
+  bool isNil() const { valType_ == NIL;}
+  void setAsNil();
   bool undef() const { return valType_ == UNDEF; }
 
   bool isEqual(const ValElement& v) const
@@ -176,30 +186,119 @@ operator<<(std::ostream& ost, const ValElement& elem);
 /**
  * \brief ValElementList is a list of ValElement.
  */
-class ValElementList : public std::list<ValElement>
+class ValElementList : protected std::list<ValElement>
 {
-
+  bool isList_;
+  bool isNil_;
+  
 public:
-  ValElementList() {}
+  typedef std::list<ValElement>::iterator iterator;
+  typedef std::list<ValElement>::const_iterator const_iterator;
 
-  ValElementList(double val) { push_back(ValElement(val)); }
+  ValElementList():isList_(false), isNil_(true) {}
 
-  ValElementList(long val) { push_back(ValElement(val)); }
 
-  ValElementList(const std::string& val) { push_back(ValElement(val)); }
+  ValElementList(double val):isList_(false), isNil_(false) { push_back(ValElement(val)); }
+
+  ValElementList(long val):isList_(false), isNil_(false) { push_back(ValElement(val)); }
+
+  ValElementList(const std::string& val):isList_(false), isNil_(false) { push_back(ValElement(val)); }
 
   ValElementList(const ValElementList& ve)
-    : std::list<ValElement>(ve)
-  {}
+    : std::list<ValElement>(ve), isList_(ve.isList_), isNil_(ve.isNil_)
+  {
+  }
+
+  bool empty() const {
+    return std::list<ValElement>::empty();
+  }
+  
+  size_type size() const noexcept{
+    return std::list<ValElement>::size();
+  }
+
+  void clear() {
+    std::list<ValElement>::clear();
+  }
+
+  void push_back (const std::list<ValElement>::value_type& val){
+    isNil_=false;
+
+    if( isList_ || empty()) {
+      std::list<ValElement>::push_back(val);
+    } else {
+      //Replace the element.
+     *begin() = val; 
+    }
+  }
+
+  void push_front (const std::list<ValElement>::value_type& val){
+    isNil_=false;
+
+    if( isList_ || empty()) {
+      std::list<ValElement>::push_front(val);
+    } else {
+      //Replace the element.
+     *begin() = val; 
+    }
+    
+  }
+  iterator begin() noexcept {
+    return std::list<ValElement>::begin();
+  }
+
+  const_iterator begin() const noexcept{
+    return std::list<ValElement>::begin();
+  }
+
+  iterator end() noexcept {
+    return std::list<ValElement>::end();
+  }
+
+  const_iterator end() const noexcept {
+    return std::list<ValElement>::end();
+  }
+
+  reference front() {
+    return std::list<ValElement>::front();
+  }
+  const_reference front() const{
+    return std::list<ValElement>::front();
+  }
 
   ValElementList& operator=(const ValElementList& ve)
   {
     if (this != &ve) {
+      isList_=ve.isList_;
+      isNil_ = ve.isNil_; 
       std::list<ValElement>::operator=(ve);
     }
     return *this;
   }
 
+  void isList(bool v) {
+    if (size() > 1 ) {
+      //Ignoring v (this is a list).
+      isList_=true;
+      return;
+    }
+    isList_=v;
+  } 
+
+  bool isList()const{ 
+      if(size() > 1 )
+        return true;
+      return isList_;
+  }
+
+  bool isNil()const{ return isNil_;}
+  void setAsNil() {
+    isList_=false;
+    isNil_=true;
+    clear();
+  }
+
+  
   std::string valAsString(const std::string& defaultVal = "",
                           int index = 0) const;
   long valAsInt(long defaultValue, int index = 0) const;
@@ -211,6 +310,8 @@ public:
    *           [0, size()>.
    */
   ValElement& operator[](const int index);
+
+  
 
   friend std::ostream& operator<<(std::ostream& ost,
                                   const ValElementList& elemList);
