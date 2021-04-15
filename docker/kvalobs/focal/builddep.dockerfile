@@ -24,9 +24,19 @@ RUN apt-get update && apt-get -y install \
   libboost-regex-dev libboost-filesystem-dev libboost-program-options-dev libboost-system-dev libboost-timer-dev \
   libomniorb4-dev  omniidl libperl-dev libdbd-pg-perl libcurl4-gnutls-dev liblog4cpp5-dev libcppunit-dev \
   cmake google-mock  zlib1g-dev libssl-dev libsasl2-dev libzstd-dev \
+  librdkafka-dev \
   libmicrohttpd-dev libgnutls28-dev
 
 # metlibs-putools-dev
+
+#Build libhttpserver
+RUN mkdir -p /usr/src/ && cd /usr/src && \
+  git clone https://github.com/etr/libhttpserver.git && \
+  cd libhttpserver && git checkout 0.18.2 && ./bootstrap && \
+  mkdir -p build && cd build && \
+ 	../configure --prefix=/usr/local && \
+  make && make check && make install 
+
 
 # Build metlibs-puctools. Installs in /usr/local.
 RUN mkdir -p /usr/src && cd /usr/src && \
@@ -42,4 +52,3 @@ RUN mkdir -p /usr/src && cd /usr/src && \
   cmake .. && make && make install && \
   rm -rf /usr/src/metlibs-putools 
   
-

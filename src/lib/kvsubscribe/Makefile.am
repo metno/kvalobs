@@ -23,8 +23,6 @@ libkvalobs_kvsubscribe_la_SOURCES = \
 libkvalobs_kvsubscribe_la_LIBADD = \
 	$(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
 	$(top_builddir)/src/lib/json/libjson.la \
-	$(rdkafka_LIBDIR)/librdkafka++.so \
-	$(rdkafka_LIBDIR)/librdkafka.so \
 	$(rdkafka_LIBS)
 
 libkvalobs_kvsubscribe_la_LDFLAGS = \

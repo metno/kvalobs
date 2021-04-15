@@ -10,7 +10,8 @@ sqlite3_src=$(sqlite3_version).tar.gz
 
 microhttpd_version=$(shell pkg-config --modversion libmicrohttpd)
 
-all-local: librdkafka libhttpserver libsqlite
+#all-local: librdkafka libhttpserver libsqlite
+all-local: libsqlite
 	if [ -f do-recheck ]; then \
 		( cd ..; ./config.status --recheck ) ; \
 		rm -f do-recheck ; \
