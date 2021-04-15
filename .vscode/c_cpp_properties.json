@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/src/lib/**",
+                "${workspaceFolder}/src/lib/kvalobs",
+                "${workspaceFolder}/src/*",
+                "${default}"
+            ],
+            "defines": ["_REENTRANT", "${default}"],
+            "compileCommands": "${default}",
+            "compilerPath": "${default}",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "${default}"
+        }
+    ],
+    "version": 4
+}
