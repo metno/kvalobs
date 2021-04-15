@@ -194,7 +194,6 @@ public:
 
   ValElementList():isList_(false), isNil_(true) {}
 
-<<<<<<< HEAD
 
   ValElementList(double val):isList_(false), isNil_(false) { push_back(ValElement(val)); }
 
@@ -253,66 +252,6 @@ public:
     return std::list<ValElement>::end();
   }
 
-=======
-
-  ValElementList(double val):isList_(false), isNil_(false) { push_back(ValElement(val)); }
-
-  ValElementList(long val):isList_(false), isNil_(false) { push_back(ValElement(val)); }
-
-  ValElementList(const std::string& val):isList_(false), isNil_(false) { push_back(ValElement(val)); }
-
-  ValElementList(const ValElementList& ve)
-    : std::list<ValElement>(ve), isList_(ve.isList_), isNil_(ve.isNil_)
-  {
-  }
-
-  bool empty() const {
-    return std::list<ValElement>::empty();
-  }
-  
-  size_type size() const noexcept{
-    return std::list<ValElement>::size();
-  }
-
-  void clear() {
-    std::list<ValElement>::clear();
-  }
-
-  void push_back (const std::list<ValElement>::value_type& val){
-    isNil_=false;
-
-    if( isList_ || empty()) {
-      std::list<ValElement>::push_back(val);
-    } else {
-      //Replace the element.
-     *begin() = val; 
-    }
-  }
-
-  void push_front (const std::list<ValElement>::value_type& val){
-    isNil_=false;
-
-    if( isList_ || empty()) {
-      std::list<ValElement>::push_front(val);
-    } else {
-      //Replace the element.
-     *begin() = val; 
-    }
-    
-  }
-  iterator begin() noexcept {
-    return std::list<ValElement>::begin();
-  }
-
-  const_iterator begin() const noexcept{
-    return std::list<ValElement>::begin();
-  }
-
-  iterator end() noexcept {
-    return std::list<ValElement>::end();
-  }
-
->>>>>>> focal-rebase
   const_iterator end() const noexcept {
     return std::list<ValElement>::end();
   }
