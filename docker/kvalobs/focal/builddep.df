@@ -34,14 +34,4 @@ RUN mkdir -p /usr/src && cd /usr/src && \
   cd metlibs-putools && mkdir -p build && cd build && \
   cmake .. && make && make install
 
-
-#RUN addgroup --gid 41494 borgem && adduser --uid 41494  --gid 41494 --disabled-password --disabled-login --gecos '' borgem
-
-#USER borgem:borgem
-
-#VOLUME /src
-#VOLUME /build
-#WORKDIR /build
-
-
-#ENTRYPOINT [ "/bin/bash", "-c", "while true; do sleep 10000; done" ]
+RUN useradd -ms /bin/bash vscode

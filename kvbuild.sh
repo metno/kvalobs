@@ -4,8 +4,8 @@ kvuser=kvalobs
 kvuserid=5010
 mode=test
 
-#os=focal
-os=bionic
+os=focal
+#os=bionic
 registry="registry.met.no/obs/kvalobs/kvbuild"
 build=test
 targets=
