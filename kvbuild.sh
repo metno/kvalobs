@@ -153,9 +153,9 @@ fi
 
 #Should we build the kvdev and kvruntime 
 if [ -n "$kvcpp" ]; then 
-  echo "Using dockerfile: docker/kvalobs/${os}/kvcpp.df"
-  docker build $nocache -f docker/kvalobs/${os}/kvcpp.df --target dev --tag "${registry}${os}-kvcpp-dev:$tag" .
-  docker build $nocache -f docker/kvalobs/${os}/kvcpp.df --target runtime --tag "${registry}${os}-kvcpp-runtime:$tag" .
+  echo "Using dockerfile: docker/kvalobs/${os}/kvcpp.dockerfile"
+  docker build $nocache -f docker/kvalobs/${os}/kvcpp.dockerfile --target dev --tag "${registry}${os}-kvcpp-dev:$tag" .
+  docker build $nocache -f docker/kvalobs/${os}/kvcpp.dockerfile --target runtime --tag "${registry}${os}-kvcpp-runtime:$tag" .
 
   if [ $mode != test ]; then 
     docker push ${registry}${os}-kvcpp-dev:$tag
@@ -172,7 +172,7 @@ for target in $targets; do
     fi
   done
 
-  dockerfile="docker/kvalobs/${os}/${target}.df"
+  dockerfile="docker/kvalobs/${os}/${target}.dockerfile"
 
   echo "Using dockerfile: $dockerfile"
   if [ $addArgs == true ]; then

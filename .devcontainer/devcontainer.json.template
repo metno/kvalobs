@@ -5,7 +5,7 @@
 	"context": "..",
 
 	// Update the 'dockerFile' property if you aren't using the standard 'Dockerfile' filename.
-	"dockerFile": "../docker/develop.dockerfile",
+	"dockerFile": "../docker/devcontainer.dockerfile",
 
 	// Set *default* container specific settings.json values on container create.
 	"settings": { 
@@ -40,7 +40,7 @@
 	// "forwardPorts": [],
 
 	// Uncomment the next line to run commands after the container is created - for example installing curl.
-	"postCreateCommand": "python setup.py develop --user",
+	//"postCreateCommand": "python setup.py develop --user",
 
 	// Uncomment when using a ptrace-based debugger like C++, Go, and Rust
 	// "runArgs": [ "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined" ],
