@@ -25,6 +25,7 @@ RUN apt-get update && apt-get -y install \
   libomniorb4-dev  omniidl libperl-dev libdbd-pg-perl libcurl4-gnutls-dev liblog4cpp5-dev libcppunit-dev \
   cmake google-mock  zlib1g-dev libssl-dev libsasl2-dev libzstd-dev \
   librdkafka-dev \
+  libgmock-dev \
   libmicrohttpd-dev libgnutls28-dev
 
 # metlibs-putools-dev
