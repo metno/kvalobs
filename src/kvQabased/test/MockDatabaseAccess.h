@@ -48,6 +48,8 @@ class MockDatabaseAccess : public db::DatabaseAccess {
 
   MOCK_CONST_METHOD1(getStation, kvalobs::kvStation (int stationid));
 
+  MOCK_CONST_METHOD1(getObservation, qabase::Observation (const kvalobs::kvStationInfo & si));
+
   MOCK_CONST_METHOD4(getModelData, void (ModelDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter, int minutesBackInTime ) );
 
   MOCK_CONST_METHOD4(getData, void (DataList * out, const qabase::Observation & obs, const qabase::DataRequirement::Parameter & parameter, int minuteOffset));
@@ -60,7 +62,7 @@ class MockDatabaseAccess : public db::DatabaseAccess {
 
   MOCK_METHOD1(write, void (const DataList & data));
 
-  MOCK_METHOD0(selectDataForControl, qabase::Observation*());
+  MOCK_METHOD1(selectDataForControl, std::list<qabase::Observation *>(int limit));
 
   MOCK_METHOD1(markProcessDone, void (const qabase::Observation & obs));
 

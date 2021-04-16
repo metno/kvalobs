@@ -11,34 +11,34 @@ kltextdecoder_la_LIBADD = \
 kltextdecoder_la_LDFLAGS = -module -version-info @KVALOBSLIBS_SO_VERSION@
 
 
-if HAVE_GTEST
-check_PROGRAMS = kltest
-TESTS = $(check_PROGRAMS)
+# if HAVE_GTEST
+# check_PROGRAMS = kltest
+# TESTS = $(check_PROGRAMS)
   
 
-kltest_SOURCES=\
-	kltext.cc \
-	test/testheader.h \
-	test/kltest.cc
+# kltest_SOURCES=\
+# 	kltext.cc \
+# 	test/testheader.h \
+# 	test/kltest.cc
 
-kltest_CPPFLAGS =\
-	-I$(top_srcdir)/src -I$(top_srcdir)/src/lib $(gtest_CFLAGS) \
-	-I$(top_srcdir)/src/lib/decoder $(putools_CFLAGS) \
-	-DTESTDIR="\""$(top_srcdir)/src/lib/decoder/kltext/test"\"" \
-	-DDBDIR="\""$(top_builddir)/src/lib/dbdrivers/.libs"\"" 
-kltest_LDFLAGS = -pthread -export-dynamic
-kltest_LDADD = \
-	$(top_builddir)/src/lib/decoder/decoderbase/libkvalobs_decoderbase.la \
-   $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
-   $(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la \
-   $(top_builddir)/src/lib/dnmithread/libkvalobs_dnmithread.la\
-   $(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la \
-   $(top_builddir)/src/lib/milog/libkvalobs_milog.la \
-   $(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
-   $(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
-   $(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la \
-   $(putools_LIBS) $(libxml2_LIBS) \
-	$(BOOST_THREAD_LIB) $(BOOST_DATE_TIME_LIB) $(BOOST_SYSTEM_LIB) \
-	$(gtest_LIBS) \
-	-lm -ldl
-endif
+# kltest_CPPFLAGS =\
+# 	-I$(top_srcdir)/src -I$(top_srcdir)/src/lib $(gtest_CFLAGS) \
+# 	-I$(top_srcdir)/src/lib/decoder $(putools_CFLAGS) \
+# 	-DTESTDIR="\""$(top_srcdir)/src/lib/decoder/kltext/test"\"" \
+# 	-DDBDIR="\""$(top_builddir)/src/lib/dbdrivers/.libs"\"" 
+# kltest_LDFLAGS = -pthread -export-dynamic
+# kltest_LDADD = \
+# 	$(top_builddir)/src/lib/decoder/decoderbase/libkvalobs_decoderbase.la \
+#    $(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
+#    $(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la \
+#    $(top_builddir)/src/lib/dnmithread/libkvalobs_dnmithread.la\
+#    $(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la \
+#    $(top_builddir)/src/lib/milog/libkvalobs_milog.la \
+#    $(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
+#    $(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
+#    $(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la \
+#    $(putools_LIBS) $(libxml2_LIBS) \
+# 	$(BOOST_THREAD_LIB) $(BOOST_DATE_TIME_LIB) $(BOOST_SYSTEM_LIB) \
+# 	$(gtest_LIBS) \
+# 	-lm -ldl
+# endif

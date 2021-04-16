@@ -172,17 +172,10 @@ LIBS=${OLD_LIBS}
 LDFLAGS=${ldflags_old}
 
 
-#Temporary disable testing with googletest
-AM_CONDITIONAL(HAVE_GTEST, [false])
-AM_CONDITIONAL(HAVE_GMOCK, [false])
-AM_CONDITIONAL(MUST_COMPILE_GTEST, [false])
-AM_CONDITIONAL(MUST_COMPILE_GMOCK, [false])
-
-
-#AM_CONDITIONAL(HAVE_GTEST, [test x${have_gtest} = xtrue])
-#AM_CONDITIONAL(HAVE_GMOCK, [test x${have_gmock} = xtrue])
-#AM_CONDITIONAL(MUST_COMPILE_GTEST, [test x${must_compile_gtest} = xtrue -a x${have_gtest} = xtrue])
-#M_CONDITIONAL(MUST_COMPILE_GMOCK, [test x${must_compile_gmock} = xtrue -a x${have_gmock} = xtrue])
+AM_CONDITIONAL(HAVE_GTEST, [test x${have_gtest} = xtrue])
+AM_CONDITIONAL(HAVE_GMOCK, [test x${have_gmock} = xtrue])
+AM_CONDITIONAL(MUST_COMPILE_GTEST, [test x${must_compile_gtest} = xtrue -a x${have_gtest} = xtrue])
+AM_CONDITIONAL(MUST_COMPILE_GMOCK, [test x${must_compile_gmock} = xtrue -a x${have_gmock} = xtrue])
 
 AC_SUBST(gtest_src)
 AC_SUBST(gmock_src)

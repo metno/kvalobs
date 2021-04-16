@@ -126,6 +126,12 @@ kvalobs::kvStation FakeDatabaseAccess::getStation(int stationid) const {
                                boost::posix_time::time_duration(0, 0, 0)));
 }
 
+qabase::Observation FakeDatabaseAccess::getObservation(const kvalobs::kvStationInfo & si) const {
+  boost::posix_time::ptime tbtime;
+  qabase::Observation obs(0, si.stationID(), si.typeID(), si.obstime(), tbtime);
+  return obs;
+}
+
 void FakeDatabaseAccess::getModelData(
     ModelDataList * out, const kvalobs::kvStationInfo & si,
     const qabase::DataRequirement::Parameter & parameter,
@@ -189,6 +195,6 @@ void FakeDatabaseAccess::write(const DataList & data) {
   }
 }
 
-qabase::Observation * FakeDatabaseAccess::selectDataForControl() {
-  return nullptr;
+std::list<qabase::Observation *> FakeDatabaseAccess::selectDataForControl(int limit) {
+  return std::list<qabase::Observation *>();
 }
