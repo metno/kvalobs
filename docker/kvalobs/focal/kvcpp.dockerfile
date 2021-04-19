@@ -1,6 +1,9 @@
-FROM focal-kvbuild:latest AS kvbins
+ARG REGISTRY
+ARG BASE_IMAGE_TAG=latest
 
-FROM registry.met.no/obs/kvalobs/kvbuild/staging/focal-builddep:latest AS dev
+FROM ${REGISTRY}focal-kvbuild:${BASE_IMAGE_TAG} AS kvbins
+
+FROM ${REGISTRY}focal-builddep:${BASE_IMAGE_TAG} AS dev
 ARG DEBIAN_FRONTEND='noninteractive'
 
 COPY docker/pg-ACCC4CF8.asc /tmp
