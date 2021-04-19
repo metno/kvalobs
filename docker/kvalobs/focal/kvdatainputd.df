@@ -9,9 +9,10 @@ RUN apt-get update && apt-get -y install \
   libboost-regex1.71.0  libc6 libcurl3-gnutls libgcc-s1 libglibmm-2.4-1v5 \
   libmicrohttpd12 libomniorb4-2 libomnithread4 libpq5 libsasl2-2 \
   libssl1.1 libstdc++6 libxml++2.6-2v5 libxml2 libzstd1 zlib1g \
-  postgresql-client-12 iproute2 gosu
+  postgresql-client-12 iproute2 gosu 
 
 COPY --from=kvbins /usr/local/lib/libmetlibs*.so.* /usr/local/lib/
+COPY --from=kvbins /usr/local/lib/libhttpserver.so.* /usr/local/lib/
 COPY --from=kvbins /usr/lib/libkvalobs_*.so.* /usr/lib/
 COPY --from=kvbins /usr/lib/kvalobs/db/*.so*  /usr/lib/kvalobs/db/
 COPY --from=kvbins /usr/lib/kvalobs/lib/*.so*  /usr/lib/kvalobs/lib/
