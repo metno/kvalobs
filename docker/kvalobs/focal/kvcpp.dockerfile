@@ -23,7 +23,7 @@ COPY --from=kvbins /usr/lib/libkvalobs_*.a /usr/lib/
 COPY --from=kvbins /usr/lib/libkvalobs_*.la /usr/lib/
 COPY --from=kvbins /usr/lib/kvalobs/db/*.so*  /usr/lib/kvalobs/db/
 COPY --from=kvbins /usr/lib/kvalobs/decode/*.so*  /usr/lib/kvalobs/decode/
-COPY --from=kvbins /usr/lib/kvalobs/lib/*.so*  /usr/lib/kvalobs/lib/
+#COPY --from=kvbins /usr/lib/kvalobs/lib/*.so*  /usr/lib/kvalobs/lib/
 COPY --from=kvbins /usr/include/kvalobs /usr/include/kvalobs
 COPY --from=kvbins /usr/lib/pkgconfig/libkv*.pc  /usr/lib/pkgconfig/
 
