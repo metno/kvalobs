@@ -60,7 +60,7 @@ COPY --from=kvbins /usr/local/lib/libmetlibs*.so.* /usr/local/lib/
 COPY --from=kvbins /usr/lib/libkvalobs_*.so.* /usr/lib/
 COPY --from=kvbins /usr/lib/kvalobs/db/*.so*  /usr/lib/kvalobs/db/
 COPY --from=kvbins /usr/lib/kvalobs/decode/*.so*  /usr/lib/kvalobs/decode/
-COPY --from=kvbins /usr/lib/kvalobs/lib/*.so*  /usr/lib/kvalobs/lib/
+# COPY --from=kvbins /usr/lib/kvalobs/lib/*.so*  /usr/lib/kvalobs/lib/
 
 RUN mkdir -p /var/lib/kvalobs/run
 
