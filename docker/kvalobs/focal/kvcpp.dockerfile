@@ -1,6 +1,9 @@
-FROM focal-kvbuild:latest AS kvbins
+ARG REGISTRY
+ARG BASE_IMAGE_TAG=latest
 
-FROM registry.met.no/obs/kvalobs/kvbuild/staging/focal-builddep:latest AS dev
+FROM ${REGISTRY}focal-kvbuild:${BASE_IMAGE_TAG} AS kvbins
+
+FROM ${REGISTRY}focal-builddep:${BASE_IMAGE_TAG} AS dev
 ARG DEBIAN_FRONTEND='noninteractive'
 
 COPY docker/pg-ACCC4CF8.asc /tmp
@@ -20,14 +23,14 @@ COPY --from=kvbins /usr/lib/libkvalobs_*.a /usr/lib/
 COPY --from=kvbins /usr/lib/libkvalobs_*.la /usr/lib/
 COPY --from=kvbins /usr/lib/kvalobs/db/*.so*  /usr/lib/kvalobs/db/
 COPY --from=kvbins /usr/lib/kvalobs/decode/*.so*  /usr/lib/kvalobs/decode/
-COPY --from=kvbins /usr/lib/kvalobs/lib/*.so*  /usr/lib/kvalobs/lib/
+#COPY --from=kvbins /usr/lib/kvalobs/lib/*.so*  /usr/lib/kvalobs/lib/
 COPY --from=kvbins /usr/include/kvalobs /usr/include/kvalobs
 COPY --from=kvbins /usr/lib/pkgconfig/libkv*.pc  /usr/lib/pkgconfig/
 
 ENTRYPOINT [ "/bin/bash" ]
 
 
-FROM ubuntu:bionic AS runtime
+FROM ubuntu:focal AS runtime
 ARG DEBIAN_FRONTEND='noninteractive'
 
 COPY docker/pg-ACCC4CF8.asc /tmp
@@ -43,12 +46,13 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv 4e8a0c1418494cf45d1b8533
 # The dependencies must be in sync with the *-dev dependencies in 
 # registry.met.no/obs/kvalobs/kvbuild/staging/bionic-builddep:latest
 RUN apt-get update && apt-get -y install \
-  libboost-date-time1.65.1 libboost-filesystem1.65.1 libboost-thread1.65.1 \
-  libboost-regex1.65.1  libboost-program-options1.65.1 \
+  libboost-date-time1.71.0 libboost-filesystem1.71.0 libboost-thread1.71.0 \
+  libboost-regex1.71.0  libboost-program-options1.71.0 \
   libc6 libcurl3-gnutls libglibmm-2.4-1v5 \
   libmicrohttpd12 libomniorb4-2 libomnithread4 libpq5 libsasl2-2 \
   libssl1.1 libstdc++6 libxml++2.6-2v5 libxml2 libzstd1 zlib1g \
-  postgresql-client-12 iproute2 gosu
+  postgresql-client-12 iproute2 gosu \
+  librdkafka++1
 
 COPY docker/tini_0.19.0-amd64.deb /tmp
 RUN dpkg -i /tmp/tini_0.19.0-amd64.deb && rm -f tini_0.19.0-amd64.deb
@@ -57,7 +61,7 @@ COPY --from=kvbins /usr/local/lib/libmetlibs*.so.* /usr/local/lib/
 COPY --from=kvbins /usr/lib/libkvalobs_*.so.* /usr/lib/
 COPY --from=kvbins /usr/lib/kvalobs/db/*.so*  /usr/lib/kvalobs/db/
 COPY --from=kvbins /usr/lib/kvalobs/decode/*.so*  /usr/lib/kvalobs/decode/
-COPY --from=kvbins /usr/lib/kvalobs/lib/*.so*  /usr/lib/kvalobs/lib/
+# COPY --from=kvbins /usr/lib/kvalobs/lib/*.so*  /usr/lib/kvalobs/lib/
 
 RUN mkdir -p /var/lib/kvalobs/run
 

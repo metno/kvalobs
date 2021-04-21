@@ -36,7 +36,6 @@
 #include "lib/miutil/timeconvert.h"
 #include "lib/kvalobs/kvTextData.h"
 #include "lib/decoder/kltext/kltext.h"
-#include "lib/decoder/kltext/test/testheader.h"
 
 using kvalobs::kvTextData;
 using std::string;

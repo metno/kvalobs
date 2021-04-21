@@ -1,3 +1,6 @@
+# ignored, but kept for easier use with kvbuild.sh
+ARG REGISTRY
+
 FROM ubuntu:focal
 
 #Create a base image with all dependecies to build kvalobs.
