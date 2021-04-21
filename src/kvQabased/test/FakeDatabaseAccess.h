@@ -66,6 +66,8 @@ class FakeDatabaseAccess : public db::DatabaseAccess {
 
   virtual kvalobs::kvStation getStation(int stationid) const;
 
+  virtual qabase::Observation getObservation(const kvalobs::kvStationInfo & si) const;
+
   virtual void getTextData(TextDataList * out,
                            const qabase::Observation & obs,
                            const qabase::DataRequirement::Parameter & parameter,
@@ -75,7 +77,7 @@ class FakeDatabaseAccess : public db::DatabaseAccess {
 
   virtual void write(const DataList & data);
 
-  virtual qabase::Observation * selectDataForControl();
+  virtual std::list<qabase::Observation *> selectDataForControl(int limit=1);
 
   virtual void markProcessDone(const qabase::Observation & obs) {
   }
