@@ -1,5 +1,7 @@
 #! /bin/bash
 
+set -euo pipefail
+
 kvuser=kvalobs
 kvuserid=5010
 mode=test
@@ -83,7 +85,7 @@ done
 echo "tag: $tag"
 echo "mode: $mode"
 echo "os: $os"
-echo "registry: $regisrtry"
+echo "registry: $registry"
 echo "kvbuild: $kvbuild"
 echo "kvcpp: $kvcpp"
 echo "builddep: $builddep"
@@ -154,8 +156,8 @@ fi
 #Should we build the kvdev and kvruntime 
 if [ -n "$kvcpp" ]; then 
   echo "Using dockerfile: docker/kvalobs/${os}/kvcpp.dockerfile"
-  docker build $nocache -f docker/kvalobs/${os}/kvcpp.dockerfile --target dev --tag "${registry}${os}-kvcpp-dev:$tag" .
-  docker build $nocache -f docker/kvalobs/${os}/kvcpp.dockerfile --target runtime --tag "${registry}${os}-kvcpp-runtime:$tag" .
+  docker build $nocache --build-arg "REGISTRY=${registry}" -f docker/kvalobs/${os}/kvcpp.dockerfile --target dev --tag "${registry}${os}-kvcpp-dev:$tag" .
+  docker build $nocache --build-arg "REGISTRY=${registry}" -f docker/kvalobs/${os}/kvcpp.dockerfile --target runtime --tag "${registry}${os}-kvcpp-runtime:$tag" .
 
   if [ $mode != test ]; then 
     docker push ${registry}${os}-kvcpp-dev:$tag
@@ -176,9 +178,9 @@ for target in $targets; do
 
   echo "Using dockerfile: $dockerfile"
   if [ $addArgs == true ]; then
-    docker build $nocache --build-arg "kvuser=$kvuser" --build-arg "kvuserid=$kvuserid" -f $dockerfile --tag ${registry}${os}-${target}:$tag .
+    docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "kvuser=$kvuser" --build-arg "kvuserid=$kvuserid" -f $dockerfile --tag ${registry}${os}-${target}:$tag .
   else
-    docker build $nocache -f $dockerfile --tag "${registry}${os}-${target}:$tag" .
+    docker build $nocache --build-arg "REGISTRY=${registry}" -f $dockerfile --tag "${registry}${os}-${target}:$tag" .
   fi
   
   if [ $mode != test ]; then 
