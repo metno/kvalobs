@@ -38,13 +38,13 @@ RUN apt-get update && apt-get install -y gnupg2 software-properties-common apt-u
 
 #Add intertn repos and postgres repo 
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv 4e8a0c1418494cf45d1b8533799e9fe74bb0156c && \
-  add-apt-repository 'deb http://internrepo.met.no/bionic bionic main contrib' && \
+  add-apt-repository 'deb http://internrepo.met.no/focal focal main contrib' && \
   apt-key add /tmp/pg-ACCC4CF8.asc && rm /tmp/pg-ACCC4CF8.asc && \
-  add-apt-repository 'deb http://apt.postgresql.org/pub/repos/apt bionic-pgdg main'
+  add-apt-repository 'deb http://apt.postgresql.org/pub/repos/apt focal-pgdg main'
 
 # NB NB NB
 # The dependencies must be in sync with the *-dev dependencies in 
-# registry.met.no/obs/kvalobs/kvbuild/staging/bionic-builddep:latest
+# registry.met.no/obs/kvalobs/kvbuild/staging/focal-builddep:latest
 RUN apt-get update && apt-get -y install \
   libboost-date-time1.71.0 libboost-filesystem1.71.0 libboost-thread1.71.0 \
   libboost-regex1.71.0  libboost-program-options1.71.0 \
