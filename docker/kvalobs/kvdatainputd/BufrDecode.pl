@@ -4,7 +4,7 @@ use strict;
 use Getopt::Long;
 use Geo::BUFR;
 
-# --dbhost,dbuser,db not used here. But perhaps used by aexecd?
+# --dbhost,dbuser,db,database not used here. But perhaps used by aexecd?
 my $Usage = "Usage: $0 --dbhost host:port --dbuser read_only_dbuser --db database"
     . " --bufr bufrfile --kvdata kvdatafile --loglevel level --bufrtables path";
 
@@ -218,35 +218,34 @@ sub extract {
         # descriptor, while the later occurrence(s) might for example
         # be due to data required by regional or national reporting
         # practices, added after a standard WMO template
+        my $value = $data->[$idx];
         if ($id eq '004024') { # Time period or displacement [hour]
-            $hour_p = $data->[$idx];
+            $hour_p = $value;
         } elsif  ($id eq '004025') { # Time period or displacement [minute]
-            $minute_p = $data->[$idx];
+            $minute_p = $value;
         } elsif ($id eq '001001') { # WMO block number
-            return if !defined $data->[$idx]; # Skip stations without WMO number
-            $II = $data->[$idx];
+            $II = $value;
         } elsif ($id eq '001002') { # WMO station number
-            return if !defined $data->[$idx]; # Skip stations without WMO number
-            $iii = $data->[$idx];
+            $iii = $value;
         } elsif ($id eq '004004') { # Hour
             if (!defined $hour ) {
-                $hour = $data->[$idx];
+                $hour = $value;
             }
         } elsif ($id eq '010004') { # Pressure
             if (!defined $par{PO}) {
-                $par{PO} = $data->[$idx]/100; # hPa
+                $par{PO} = $value/100; # hPa
             }
         } elsif ($id eq '010051') { # Pressure reduced to mean sea level
             if (!defined $par{PR}) {
-                $par{PR} = $data->[$idx]/100; # hPa
+                $par{PR} = $value/100; # hPa
             }
         } elsif ($id eq '010061') { # 3-hour pressure change
             if (!defined $par{PP}) {
-                $par{PP} = abs($data->[$idx]/100); # hPa, absolute value
+                $par{PP} = abs($value/100); # hPa, absolute value
             }
         } elsif ($id eq '010063') { # Characteristic of pressure tendency
             if (!defined $par{AA}) {
-                $par{AA} = $data->[$idx];
+                $par{AA} = $value;
             }
         # For 011001 WIND DIRECTION and 011002 WIND SPEED we ought to check
         # that these are preceded by 007032 HEIGHT OF SENSOR ABOVE LOCAL
@@ -260,29 +259,29 @@ sub extract {
         # 011001 and 011002 with non missing value only.
         } elsif ($id eq '011012') { # Wind speed at 10 m
             if (!defined $par{FF}) {
-                $par{FF} = $data->[$idx];
+                $par{FF} = $value;
             }
         } elsif ($id eq '011002') { # Wind speed
             if (!defined $par{FF}) {
-                $par{FF} = $data->[$idx];
+                $par{FF} = $value;
             }
         } elsif ($id eq '011011') { # Wind direction at 10 m
             if (!defined $par{DD}) {
-                $par{DD} = $data->[$idx];
+                $par{DD} = $value;
             }
         } elsif ($id eq '011001') { #  Wind direction
             if (!defined $par{DD}) {
-                $par{DD} = $data->[$idx];
+                $par{DD} = $value;
             }
         } elsif ($id eq '011041') { # Maximum gust speed
             if (defined $minute_p && defined $hour) {
                 if ($minute_p == -10) {
                     if (!defined $par{FG_010}) {
-                        $par{FG_010} = $data->[$idx];
+                        $par{FG_010} = $value;
                     }
                 } elsif ($minute_p >= -70 && $minute_p <= -50) {
                     if (!defined $par{FG_1}) {
-                        $par{FG_1} = $data->[$idx];
+                        $par{FG_1} = $value;
                     }
                 # For time periods > 1 hour, we choose to decode this as FG for
                 # termins 0,6,12,18 if time period is 6 hours, and for termins
@@ -291,10 +290,10 @@ sub extract {
                 # be reported for other termins than 0,3,6,9...
                 } elsif ($minute_p == -360 && $hour%6 == 0) {
                     if (!defined $par{FG}) {
-                        $par{FG} = $data->[$idx];
+                        $par{FG} = $value;
                     } elsif ($minute_p == -180 && $hour%3 == 0) {
                         if (!defined $par{FG}) {
-                            $par{FG} = $data->[$idx];
+                            $par{FG} = $value;
                         }
                     }
                 # Skip other periods (don't decode FG_X)
@@ -305,18 +304,18 @@ sub extract {
             if (defined $minute_p && defined $hour) {
                 if ($minute_p == -10) {
                     if (!defined $par{DG_010}) {
-                        $par{DG_010} = $data->[$idx];
+                        $par{DG_010} = $value;
                     }
                 } elsif ($minute_p >= -70 && $minute_p <= -50) {
                     if (!defined $par{DG_1}) {
-                        $par{DG_1} = $data->[$idx];
+                        $par{DG_1} = $value;
                     }
                 } elsif ($minute_p == -360 && $hour%6 == 0) {
                     if (!defined $par{DG}) {
-                        $par{DG} = $data->[$idx];
+                        $par{DG} = $value;
                     } elsif ($minute_p == -180 && $hour%3 == 0) {
                         if (!defined $par{DG}) {
-                            $par{DG} = $data->[$idx];
+                            $par{DG} = $value;
                         }
                     }
                 # Skip other periods (don't decode DG_X)
@@ -331,97 +330,97 @@ sub extract {
                     if (($minute_p == -360 && $hour%6 == 0)
                             || ($minute_p == -180 && $hour%3 == 0 && $hour%6 != 0)) {
                         if (!defined $par{FX_1}) {
-                            $par{FX_1} = $data->[$idx];
+                            $par{FX_1} = $value;
                         }
                     }
                 } elsif ($minute_p >= -70 && $minute_p <= -50) {
                     if (!defined $par{FG_1}) {
-                        $par{FG_1} = $data->[$idx];
+                        $par{FG_1} = $value;
                     }
                 }
                 # Skip other periods (don't decode FG_X)
             }
          } elsif ($id eq '012104') { #  Dry bulb temperature at 2m (data width 16 bits)
             if (!defined $par{TA}) {
-                $par{TA} = sprintf("%.1f",$data->[$idx] - 273.15); # Celcius
+                $par{TA} = sprintf("%.1f",$value - 273.15); # Celcius
             }
         } elsif ($id eq '012004') { # Dry bulb temperature at 2m (12 bits)
             if (!defined $par{TA}) {
-                $par{TA} = sprintf("%.1f",$data->[$idx] - 273.15); # Celcius
+                $par{TA} = sprintf("%.1f",$value - 273.15); # Celcius
             }
         } elsif ($id eq '012101') { # Temperature/dry bulb temperature (16 bits)
             if (!defined $par{TA}) {
-                $par{TA} = sprintf("%.1f",$data->[$idx] - 273.15); # Celcius
+                $par{TA} = sprintf("%.1f",$value - 273.15); # Celcius
             }
         } elsif ($id eq '012001') { # Temperature/dry bulb temperature (12 bits)
             if (!defined $par{TA}) {
-                $par{TA} = sprintf("%.1f",$data->[$idx] - 273.15); # Celcius
+                $par{TA} = sprintf("%.1f",$value - 273.15); # Celcius
             }
         } elsif ($id eq '012006') { # Dew-point temperature at 2m (16 bits)
             if (!defined $par{TD}) {
-                $par{TD} = sprintf("%.1f",$data->[$idx] - 273.15); # Celcius
+                $par{TD} = sprintf("%.1f",$value - 273.15); # Celcius
             }
         } elsif ($id eq '012103') { # Dew-point temperature (16 bits)
             if (!defined $par{TD}) {
-                $par{TD} = sprintf("%.1f",$data->[$idx] - 273.15); # Celcius
+                $par{TD} = sprintf("%.1f",$value - 273.15); # Celcius
             }
          } elsif ($id eq '012113') { # Ground minimum temperature at 2m (data width 16 bits)
             if (!defined $par{TGN_12}) {
-                $par{TGN_12} = sprintf("%.1f",$data->[$idx] - 273.15); # Celcius
+                $par{TGN_12} = sprintf("%.1f",$value - 273.15); # Celcius
             }
          } elsif ($id eq '012013') { # Ground minimum temperature at 2m (12 bits)
             if (!defined $par{TGN_12}) {
-                $par{TGN_12} = sprintf("%.1f",$data->[$idx] - 273.15); # Celcius
+                $par{TGN_12} = sprintf("%.1f",$value - 273.15); # Celcius
             }
          } elsif ($id eq '012114') { # Maximum temperature at 2m, past 12 hours (16 bits)
             if (!defined $par{TAX_12}) {
-                $par{TAX_12} = sprintf("%.1f",$data->[$idx] - 273.15); # Celcius
+                $par{TAX_12} = sprintf("%.1f",$value - 273.15); # Celcius
             }
          } elsif ($id eq '012014') { # Maximum temperature at 2m, past 12 hours (12 bits)
             if (!defined $par{TAX_12}) {
-                $par{TAX_12} = sprintf("%.1f",$data->[$idx] - 273.15); # Celcius
+                $par{TAX_12} = sprintf("%.1f",$value - 273.15); # Celcius
             }
          } elsif ($id eq '012111') { # Maximum temperature at height and over period specified
              if ($idx >= 2 && $desc->[$idx-1] eq '004024'
                      && defined $data->[$idx-1] && $data->[$idx-1] == 0
                      && $desc->[$idx-2] eq '004024'&& defined $data->[$idx-2] ) {
                  if ($data->[$idx-2] == -12 && !defined $par{TAX_12}) {
-                     $par{TAX_12} = sprintf("%.1f",$data->[$idx] - 273.15); # Celcius
+                     $par{TAX_12} = sprintf("%.1f",$value - 273.15); # Celcius
                  } elsif ($data->[$idx-2] == -1 && !defined $par{TAX}) {
-                     $par{TAX} = sprintf("%.1f",$data->[$idx] - 273.15); # Celcius
+                     $par{TAX} = sprintf("%.1f",$value - 273.15); # Celcius
                  }
              }
             # Do we also need to consider 12021 'Maximum temperature at 2m'?
          } elsif ($id eq '012115') { # Minimum temperature at 2m, past 12 hours (16 bits)
             if (!defined $par{TAN_12}) {
-                $par{TAN_12} = sprintf("%.1f",$data->[$idx] - 273.15); # Celcius
+                $par{TAN_12} = sprintf("%.1f",$value - 273.15); # Celcius
             }
          } elsif ($id eq '012015') { # Minimum temperature at 2m, past 12 hours (12 bits)
             if (!defined $par{TAN_12}) {
-                $par{TAN_12} = sprintf("%.1f",$data->[$idx] - 273.15); # Celcius
+                $par{TAN_12} = sprintf("%.1f",$value - 273.15); # Celcius
             }
          } elsif ($id eq '012112') { # Minimum temperature at height and over period specified
              if ($idx >= 2 && $desc->[$idx-1] eq '004024'
                      && defined $data->[$idx-1] && $data->[$idx-1] == 0
                      && $desc->[$idx-2] eq '004024'&& defined $data->[$idx-2] ) {
                  if ($data->[$idx-2] == -12 && !defined $par{TAN_12}) {
-                     $par{TAN_12} = sprintf("%.1f",$data->[$idx] - 273.15); # Celcius
+                     $par{TAN_12} = sprintf("%.1f",$value - 273.15); # Celcius
                  } elsif ($data->[$idx-2] == -1 && !defined $par{TAN}) {
-                     $par{TAN} = sprintf("%.1f",$data->[$idx] - 273.15); # Celcius
+                     $par{TAN} = sprintf("%.1f",$value - 273.15); # Celcius
                  }
              }
              # Do we also need to consider 12022 'Minimum temperature at 2m'?
          } elsif ($id eq '013003') { # Relative humidity
             if (!defined $par{UU}) {
-                $par{UU} = $data->[$idx];
+                $par{UU} = $value;
             }
         } elsif ($id eq '020001') { # Horizontal visibility
             if (!defined $par{VV}) {
-                $par{VV} = $data->[$idx];
+                $par{VV} = $value;
             }
         } elsif ($id eq '020003') { # Present weather
             if (!defined $par{WW}) {
-                my $WW = $data->[$idx];
+                my $WW = $value;
                 if ($WW < 100) {
                     $par{WW} = $WW;
                 } elsif ($WW < 200) { # 508-511 and w1w1 (in 333 9 group) ignored here
@@ -430,7 +429,7 @@ sub extract {
             }
         } elsif ($id eq '020004') { # Past weather (1)
             if (!defined $par{W1}) {
-                my $W1 = $data->[$idx];
+                my $W1 = $value;
                 if ($W1 < 10) {
                     $par{W1} = $W1;
                 } else {
@@ -439,7 +438,7 @@ sub extract {
             }
         } elsif ($id eq '020005') { # Past weather (2)
             if (!defined $par{W2}) {
-                my $W2 = $data->[$idx];
+                my $W2 = $value;
                 if ($W2 < 10) {
                     $par{W2} = $W2;
                 } else {
@@ -448,15 +447,15 @@ sub extract {
             }
         } elsif ($id eq '020010') { # Cloud cover (total)
             if (!defined $par{NN}) {
-                $par{NN} = NNtoWMO_N($data->[$idx]);
+                $par{NN} = NNtoWMO_N($value);
             }
         } elsif ($id eq '031001') {
             # Delayed descriptor replication factor; this should be
             # number of cloud layers if previous descriptor is cloud
             # type, according to all WMO recommended templates
             if ($desc->[$idx-1] eq '020012') {
-                if ($data->[$idx] <= 4) {
-                    $num_cloud_layers = $data->[$idx];
+                if ($value <= 4) {
+                    $num_cloud_layers = $value;
                 } else {
                     $bad_cloud_data = 1;
                 }
@@ -467,7 +466,7 @@ sub extract {
         } elsif ($id eq '020011' && !$bad_cloud_data) { # Cloud amount
             if ($cloud_type_count == 0) { #  First occurrence
                 if (!defined $par{NH}) {
-                    $par{NH} = $data->[$idx];
+                    $par{NH} = $value;
                 }
             } elsif ($cloud_type_count < 3) {
                 $bad_cloud_data = 1; # There should always be three
@@ -476,13 +475,13 @@ sub extract {
                 $cloud_layer = $cloud_type_count - 2;
                 if ($cloud_layer <= $num_cloud_layers) {
                     if ($cloud_layer == 1) {
-                        $par{NS1} = $data->[$idx];
+                        $par{NS1} = $value;
                      } elsif ($cloud_layer == 2) {
-                        $par{NS2} = $data->[$idx];
+                        $par{NS2} = $value;
                      } elsif ($cloud_layer == 3) {
-                        $par{NS3} = $data->[$idx];
+                        $par{NS3} = $value;
                     } elsif ($cloud_layer == 4) {
-                        $par{NS4} = $data->[$idx];
+                        $par{NS4} = $value;
                     }
                 }
             } else { # rdb-files always have 0 or 4 cloud layers
@@ -490,13 +489,13 @@ sub extract {
                 $cloud_layer = $cloud_type_count - 2;
                 if ($cloud_layer < 5) {
                     if ($cloud_layer == 1) {
-                        $par{NS1} = $data->[$idx];
+                        $par{NS1} = $value;
                      } elsif ($cloud_layer == 2) {
-                        $par{NS2} = $data->[$idx];
+                        $par{NS2} = $value;
                      } elsif ($cloud_layer == 3) {
-                        $par{NS3} = $data->[$idx];
+                        $par{NS3} = $value;
                     } elsif ($cloud_layer == 4) {
-                        $par{NS4} = $data->[$idx];
+                        $par{NS4} = $value;
                     }
                 }
             }
@@ -505,35 +504,35 @@ sub extract {
             if ($cloud_type_count > 3) {
                 $cloud_layer = $cloud_type_count - 3;
                 if ($num_cloud_layers > -1) {
-                    if ($data->[$idx] < 10 # Accept one digit values only
+                    if ($value < 10 # Accept one digit values only
                             && $cloud_layer <= $num_cloud_layers) {
                         if ($cloud_layer == 1) {
-                            $par{CC1} = $data->[$idx];
+                            $par{CC1} = $value;
                         } elsif ($cloud_layer == 2) {
-                            $par{CC2} = $data->[$idx];
+                            $par{CC2} = $value;
                         } elsif ($cloud_layer == 3) {
-                            $par{CC3} = $data->[$idx];
+                            $par{CC3} = $value;
                         } elsif ($cloud_layer == 4) {
-                            $par{CC4} = $data->[$idx];
+                            $par{CC4} = $value;
                         }
                     }
                 } elsif ($cloud_layer < 5) { # rdb-files always have 0 or 4 cloud layers
                     if ($cloud_layer == 1) { # here 2 digit values should never occur,
                                              # so don't bother checking for this
-                        $par{CC1} = $data->[$idx];
+                        $par{CC1} = $value;
                     } elsif ($cloud_layer == 2) {
-                        $par{CC2} = $data->[$idx];
+                        $par{CC2} = $value;
                     } elsif ($cloud_layer == 3) {
-                        $par{CC3} = $data->[$idx];
+                        $par{CC3} = $value;
                     } elsif ($cloud_layer == 4) {
-                        $par{CC4} = $data->[$idx];
+                        $par{CC4} = $value;
                     }
                 }
             } else {
                 # Convert 020012 Cloud type in BUFR into one digit CL (0513), CM
                 # (0515) and CH (0509) in TAC
                 if ($cloud_type_count == 1 && !defined $par{CL}) {
-                    my $CL = $data->[$idx];
+                    my $CL = $value;
                     if ($CL >= 30 && $CL < 40 ) {
                         $par{CL} = $CL - 30;
                     } elsif ($CL != 62) {
@@ -541,7 +540,7 @@ sub extract {
                             if $loglevel >= 2;
                     }
                 } elsif ($cloud_type_count == 2 && !defined $par{CM}) {
-                    my $CM = $data->[$idx];
+                    my $CM = $value;
                     if ($CM >= 20 && $CM < 30 ) {
                         $par{CM} = $CM - 20;
                     } elsif ($CM != 61) {
@@ -549,7 +548,7 @@ sub extract {
                             if $loglevel >= 2;
                     }
                 } elsif ($cloud_type_count == 3 && !defined $par{CH}) {
-                    my $CH = $data->[$idx];
+                    my $CH = $value;
                     if ($CH >= 10 && $CH < 20 ) {
                         $par{CH} = $CH - 10;
                     } elsif ($CH != 60) {
@@ -561,7 +560,7 @@ sub extract {
         } elsif ($id eq '020013' && !$bad_cloud_data) { # Height of base of cloud
             if ($cloud_type_count == 0) { # First occurrence
                 if (!defined $par{HL}) {
-                    $par{HL} = $data->[$idx];
+                    $par{HL} = $value;
                 }
 #     Note that 020013 in individual cloud layers comes
 #     AFTER 020012 and therefore must be treated
@@ -573,67 +572,67 @@ sub extract {
                $cloud_layer = $cloud_type_count - 3;
                if ($cloud_layer <= $num_cloud_layers) {
                     if ($cloud_layer == 1) {
-                        $par{HS1} = $data->[$idx];
+                        $par{HS1} = $value;
                     } elsif ($cloud_layer == 2) {
-                        $par{HS2} = $data->[$idx];
+                        $par{HS2} = $value;
                     } elsif ($cloud_layer == 3) {
-                        $par{HS3} = $data->[$idx];
+                        $par{HS3} = $value;
                     } elsif ($cloud_layer == 4) {
-                        $par{HS4} = $data->[$idx];
+                        $par{HS4} = $value;
                     }
                 }
           } else { # rdb-files always have 0 or 4 cloud layers
                $cloud_layer = $cloud_type_count - 3;
                if ($cloud_layer == 1) {
-                   $par{HS1} = $data->[$idx];
+                   $par{HS1} = $value;
                } elsif ($cloud_layer == 2) {
-                   $par{HS2} = $data->[$idx];
+                   $par{HS2} = $value;
                } elsif ($cloud_layer == 3) {
-                   $par{HS3} = $data->[$idx];
+                   $par{HS3} = $value;
                } elsif ($cloud_layer == 4) {
-                   $par{HS4} = $data->[$idx];
+                   $par{HS4} = $value;
                }
            }
         # For all RR_x: treat trace and 0 at end of loop
         } elsif ($id eq '013023') { # Total precipitation past 24 hours
             if (!defined $par{RR_24}) {
-                $par{RR_24} = $data->[$idx];
+                $par{RR_24} = $value;
             }
         } elsif ($id eq '013022') { # Total precipitation past 12 hours
             if (!defined $par{RR_12}) {
-                $par{RR_12} = $data->[$idx];
+                $par{RR_12} = $value;
             }
         } elsif ($id eq '013021') { # Total precipitation past 6 hours
             if (!defined $par{RR_6}) {
-                $par{RR_6} = $data->[$idx];
+                $par{RR_6} = $value;
             }
         } elsif ($id eq '013020') { # Total precipitation past 3 hours
             if (!defined $par{RR_3}) {
-                $par{RR_3} = $data->[$idx];
+                $par{RR_3} = $value;
             }
         } elsif ($id eq '013019') { # Total precipitation past 1 hours
             if (!defined $par{RR_1}) {
-                $par{RR_1} = $data->[$idx];
+                $par{RR_1} = $value;
             }
         } elsif ($id eq '013011') { # Total precipitation/total water equivalent
             if (defined $hour_p) {
                 if ($hour_p == -24 && !defined $par{RR_24}) {
-                    $par{RR_24} = $data->[$idx];
+                    $par{RR_24} = $value;
                 } elsif ($hour_p == -12 && !defined $par{RR_12}) {
-                    $par{RR_12} = $data->[$idx];
+                    $par{RR_12} = $value;
                 } elsif ($hour_p == -6 && !defined $par{RR_6}) {
-                    $par{RR_6} = $data->[$idx];
+                    $par{RR_6} = $value;
                 } elsif ($hour_p == -3 && !defined $par{RR_3}) {
-                    $par{RR_3} = $data->[$idx];
+                    $par{RR_3} = $value;
                 } elsif ($hour_p == -1 && !defined $par{RR_1}) {
-                    $par{RR_1} = $data->[$idx];
+                    $par{RR_1} = $value;
                 }
             }
         } elsif ($id eq '013013') { # Total snow depth
             # Don't check for SA missing, because SA might earlier
             # have been set to 0 if EE < 10, which probably means that
             # 20062 has been wrongly encoded, not 13013
-            my $SA = $data->[$idx] * 100; # cm
+            my $SA = $value * 100; # cm
             # SA has some special values in BUFR as well as in Kvalobs
             if ($SA == -1) { # Trace: less than 0.5 cm snow
                 $par{SA} = 0;
@@ -646,9 +645,9 @@ sub extract {
             }
         } elsif ($id eq '020062') { #  State of the ground (with or without snow)
             if (!defined $par{EE}) {
-                $par{EE} = $data->[$idx];
+                $par{EE} = $value;
             }
-            if ($data->[$idx] <= 10 && !defined $par{SA}) {
+            if ($value <= 10 && !defined $par{SA}) {
                 $par{SA} = -1; # Special value in kvalobs
             }
         # Equating 013012 with SS_24 is dubious generally, but this is
@@ -657,70 +656,74 @@ sub extract {
         # of fresh snow anyway)
         } elsif ($id eq '013012') { # Depth of fresh snow
             if (!defined $par{SS_24}) {
-                $par{SS_24} = $data->[$idx] * 100; # cm
+                $par{SS_24} = $value * 100; # cm
             }
         } elsif ($id eq '014031') { # Total sunshine
             if (defined $hour_p) {
                 if ($hour_p == -1 && !defined $par{OT_1}) {
-                    $par{OT_1} = $data->[$idx];
+                    $par{OT_1} = $value;
                 } elsif ($hour_p == -24 && !defined $par{OT_24}) {
-                    $par{OT_24} = $data->[$idx];
+                    $par{OT_24} = $value;
                 }
             }
         } elsif ($id eq '013033') { # Evaporation/evapotranspiration
             if (defined $hour_p) {
                 if ($hour_p == -1 && !defined $par{EV_1}) {
-                    $par{EV_1} = $data->[$idx];
+                    $par{EV_1} = $value;
                 } elsif ($hour_p == -24 && !defined $par{EV_24}) {
-                    $par{EV_24} = $data->[$idx];
+                    $par{EV_24} = $value;
                 }
             }
         } elsif ($id eq '014002') { # Long-wave radiation
             if (defined $hour_p) {
-                if ($hour_p == -1 && !defined $par{QL_1}) {
-                    $par{QL_1} = sprintf("%.2f",$data->[$idx]/3600); # W/m2
+                if ($hour_p == -1 && !defined $par{QL}) {
+                    if ($value >= 0) { # downward
+                        $par{QLI} = sprintf("%.2f",$value/3600); # W/m2
+                    } else {           # upward
+                        $par{QLO} = sprintf("%.2f",$value/3600);
+                    }
                 } elsif ($hour_p == -24 && !defined $par{QL_24}) {
-                    $par{QL_24} = sprintf("%.2f",$data->[$idx]/3600);
+                    $par{QL_24} = sprintf("%.2f",$value/(24*3600));
                 }
             }
         } elsif ($id eq '014004') { # Short-wave radiation
             if (defined $hour_p) {
-                if ($hour_p == -1 && !defined $par{QK_1}) {
-                    $par{QK_1} = sprintf("%.2f",$data->[$idx]/3600);
+                if ($hour_p == -1 && !defined $par{QK}) {
+                    $par{QK} = sprintf("%.2f",$value/3600);
                 } elsif ($hour_p == -24 && !defined $par{QK_24}) {
-                    $par{QK_24} = sprintf("%.2f",$data->[$idx]/3600);
+                    $par{QK_24} = sprintf("%.2f",$value/(24*3600));
                 }
             }
         } elsif ($id eq '014016') { # Net radiation
             if (defined $hour_p) {
-                if ($hour_p == -1 && !defined $par{QE_1}) {
-                    $par{QE_1} = sprintf("%.2f",$data->[$idx]/3600);
-                } elsif ($hour_p == -24 && !defined $par{QE_24}) {
-                    $par{QE_24} = sprintf("%.2f",$data->[$idx]/3600);
+                if ($hour_p == -1 && !defined $par{QNET}) {
+                    $par{QNET} = sprintf("%.2f",$value/3600);
+                } elsif ($hour_p == -24 && !defined $par{QNET_24}) {
+                    $par{QNET_24} = sprintf("%.2f",$value/(24*3600));
                 }
             }
         } elsif ($id eq '014028') { # Global solar radiation
             if (defined $hour_p) {
-                if ($hour_p == -1 && !defined $par{QO_1}) {
-                    $par{QO_1} = sprintf("%.2f",$data->[$idx]/3600);
-                } elsif ($hour_p == -24 && !defined $par{QO_24}) {
-                    $par{QO_24} = sprintf("%.2f",$data->[$idx]/3600);
+                if ($hour_p == -1 && !defined $par{QSI}) {
+                    $par{QSI} = sprintf("%.2f",$value/3600);
+                } elsif ($hour_p == -24 && !defined $par{QSI_24}) {
+                    $par{QSI_24} = sprintf("%.2f",$value/(24*3600));
                 }
             }
         } elsif ($id eq '014029') { # Diffuse solar radiation
             if (defined $hour_p) {
-                if ($hour_p == -1 && !defined $par{QD_1}) {
-                    $par{QD_1} = sprintf("%.2f",$data->[$idx]/3600);
+                if ($hour_p == -1 && !defined $par{QD}) {
+                    $par{QD} = sprintf("%.2f",$value/3600);
                 } elsif ($hour_p == -24 && !defined $par{QD_24}) {
-                    $par{QD_24} = sprintf("%.2f",$data->[$idx]/3600);
+                    $par{QD_24} = sprintf("%.2f",$value/(24*3600));
                 }
             }
         } elsif ($id eq '014030') { # Direct solar radiation
             if (defined $hour_p) {
-                if ($hour_p == -1 && !defined $par{QS_1}) {
-                    $par{QS_1} = sprintf("%.2f",$data->[$idx]/3600);
+                if ($hour_p == -1 && !defined $par{QS}) {
+                    $par{QS} = sprintf("%.2f",$value/3600);
                 } elsif ($hour_p == -24 && !defined $par{QS_24}) {
-                    $par{QS_24} = sprintf("%.2f",$data->[$idx]/3600);
+                    $par{QS_24} = sprintf("%.2f",$value/(24*3600));
                 }
             }
         # The following parameters might be possible for platforms,
@@ -728,23 +731,23 @@ sub extract {
         # with wmonr
         } elsif ($id eq '022061') { # State of the sea
             if (!defined $par{SG}) {
-                $par{SG} = $data->[$idx];
+                $par{SG} = $value;
             }
         } elsif ($id eq '022011') { # Period of waves (instrumentally measured)
             if (!defined $par{PWA}) {
-                $par{PWA} = $data->[$idx];
+                $par{PWA} = $value;
             }
         } elsif ($id eq '022012') { # Period of waves (visually measured)
             if (!defined $par{PW}) {
-                $par{PW} = $data->[$idx];
+                $par{PW} = $value;
             }
         } elsif ($id eq '022021') { # Heigth of waves
             if (!defined $par{HWA}) {
-                $par{HWA} = $data->[$idx];
+                $par{HWA} = $value;
             }
         } elsif ($id eq '022022') { # Heigth of wind waves
             if (!defined $par{HW}) {
-                $par{HW} = $data->[$idx];
+                $par{HW} = $value;
             }
         }
     }
@@ -761,13 +764,17 @@ sub extract {
 
     return unless $II && $iii; # Skip stations without WMO number
 
-    # To be changed - decode British, Dutch, Finish, German, Spanish
-    # and Swedish stations only
+    # To be changed - decode Austrian, British, Dutch, Finish, German,
+    # Hungarian, Irish, Spanish and Swedish stations only. For new countries
+    # to be added: check
+    # https://www.wmo.int/pages/prog/www/ois/volume-a/StationIDs_Global_1509.pdf
     return unless $II == 2
         || $II == 3
-	|| ($II == 6 && $iii >=200 && $iii < 400)
-	|| ($II == 8 && $iii <= 494)
-        || $II == 10;
+        || ($II == 6 && $iii >=200 && $iii < 400)
+        || ($II == 8 && $iii <= 494)
+        || $II == 10
+	|| ($II == 11 && $iii < 400)
+	|| ($II == 12 && $iii >=700 && $iii <= 998);
 
     my $wmonr = sprintf("%02d%03d", $II, $iii);
     my $header = "kldata/wmonr=$wmonr/type=7";
