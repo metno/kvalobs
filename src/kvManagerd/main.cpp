@@ -70,10 +70,22 @@ void setupLogging() {
 }
 }  // namespace
 
+bool log_to_stdout(int argc, char ** argv) {
+  const std::string option = "--log-to-stdout";
+  for (int i = 1; i < argc; ++i)
+    if (option == argv[i])
+      return true;
+  return false;
+}
+
 int main(int argc, char ** argv) {
   try {
-    setupLogging();
+    if (! log_to_stdout(argc, argv))
+      setupLogging();
     setStopSignals();
+
+    LOGINFO("yo!!");
+    return 0;
 
     ManagerApp app(argc, argv);
     ManagerApp::PidFile pidFile("kvManagerd");
