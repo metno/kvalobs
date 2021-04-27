@@ -64,8 +64,8 @@ while test $# -ne 0; do
       use
       exit 0;;
     --staging) mode=staging;;
-    --prod) prod=prod;;
-    --test) test=test;;
+    --prod) mode=prod;;
+    --test) mode=test;;
     --kvbuild) kvbuild="kvbuild";;
     --builddep) builddep="builddep";;
     --kvcpp) kvcpp="kvcpp";;
@@ -149,6 +149,7 @@ echo "Build targets: $targets $kvcpp"
 
 if [ $mode = test ]; then 
   registry=""
+  kvuserid=$(id -u)
 else 
   registry="$registry/$mode/"
 fi
