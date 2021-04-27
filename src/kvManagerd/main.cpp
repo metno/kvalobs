@@ -84,9 +84,6 @@ int main(int argc, char ** argv) {
       setupLogging();
     setStopSignals();
 
-    LOGINFO("yo!!");
-    return 0;
-
     ManagerApp app(argc, argv);
     ManagerApp::PidFile pidFile("kvManagerd");
     bool checkForMissingObs=app.checkForMissisngObs(false);
