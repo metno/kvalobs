@@ -26,3 +26,4 @@ VOLUME /var/log/kvalobs
 USER ${kvuser}:${kvuser}
 
 ENTRYPOINT  ["/usr/bin/kvManagerd" ]
+CMD [ "--log-to-stdout" ]
