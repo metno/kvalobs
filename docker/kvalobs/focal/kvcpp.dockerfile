@@ -8,7 +8,7 @@ ARG DEBIAN_FRONTEND='noninteractive'
 
 COPY docker/pg-ACCC4CF8.asc /tmp
 
-RUN apt-get update && apt-get install -y gnupg2 software-properties-common apt-utils
+RUN apt-get install -y gnupg2 software-properties-common apt-utils
 
 #Add intertn repos and postgres repo
 RUN apt-key add /tmp/pg-ACCC4CF8.asc && rm /tmp/pg-ACCC4CF8.asc && \
@@ -37,8 +37,8 @@ COPY docker/pg-ACCC4CF8.asc /tmp
 RUN apt-get update && apt-get install -y gnupg2 software-properties-common apt-utils
 
 #Add intertn repos and postgres repo 
-RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 4e8a0c1418494cf45d1b8533799e9fe74bb0156c && \
-  add-apt-repository 'deb http://internrepo.met.no/focal focal main contrib' && \
+ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 4e8a0c1418494cf45d1b8533799e9fe74bb0156c && \
+  add-apt-repository'deb http://internrepo.met.no/focal focal main contrib' && \
   apt-key add /tmp/pg-ACCC4CF8.asc && rm /tmp/pg-ACCC4CF8.asc && \
   add-apt-repository 'deb http://apt.postgresql.org/pub/repos/apt focal-pgdg main'
 
