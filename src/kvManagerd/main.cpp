@@ -80,8 +80,11 @@ bool log_to_stdout(int argc, char ** argv) {
 
 int main(int argc, char ** argv) {
   try {
-    if (! log_to_stdout(argc, argv))
+    if (log_to_stdout(argc, argv))
+      milog::LogManager::loglevel(milog::INFO);
+    else
       setupLogging();
+
     setStopSignals();
 
     ManagerApp app(argc, argv);
