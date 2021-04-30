@@ -81,7 +81,8 @@ DataSrcApp::DataSrcApp(int argn, char **argv, int nConnections_, miutil::conf::C
   httpConfig.loglevel = getLoglevelRecursivt(conf, "kvDataInputd.http", httpConfig.loglevel);
   kafkaConfig.brokers = conf->getValue("kafka.brokers").valAsString("localhost");
   kafkaConfig.domain = conf->getValue("kafka.domain").valAsString("");
-
+  std::string defautlParamFile=kvalobs::kvPath(kvalobs::sysconfdir)+"/stinfosys_params.csv";
+  paramFile = conf->getValue("kvDataInputd.paramfile").valAsString(defautlParamFile);
   if (kafkaConfig.domain.empty()) {
     LOGFATAL("This kvalobs instance must have a name. kafka.domain must be set in the configuration file.");
     exit(1);
@@ -253,7 +254,6 @@ bool DataSrcApp::registerParams() {
   ParamList tmpParams;
   ParamList newParams;
   Param param;
-  string paramFile;
   ostringstream textParams;
   boost::posix_time::ptime now;
 
@@ -261,11 +261,7 @@ bool DataSrcApp::registerParams() {
 
   if (!nextParamCheckTime.is_special() && now < nextParamCheckTime)
     return true;
-
-  paramFile = kvalobs::kvPath(kvalobs::sysconfdir);
-
-  paramFile += "/stinfosys_params.csv";
-
+ 
   con = conCache.findFreeConnection();
 
   if (!con) {
@@ -274,17 +270,16 @@ bool DataSrcApp::registerParams() {
   }
 
   if (!readParamsFromFile(paramFile, tmpParams)) {
-    string pfile = paramFile;
-    paramFile = kvalobs::kvPath(kvalobs::sysconfdir) + "/stinfosys_params.csv.default";
+    string pfile = kvalobs::kvPath(kvalobs::sysconfdir) + "/stinfosys_params.csv.default";
 
     IDLOGERROR(
         "param_update",
-        "Cant read parameter information from file <" << pfile << ">." << endl << "Trying to load parameter information from default file <" << paramFile << endl << ">. This file may be incomplete. Use 'kv_get_stinfosys_params' to generate the file" << endl << "'" << pfile << "'.");
+        "Cant read parameter information from file <" << paramFile << ">." << endl << "Trying to load parameter information from default file <" << paramFile << endl << ">. This file may be incomplete. Use 'kv_get_stinfosys_params' to generate the file" << endl << "'" << paramFile << "'.");
 
     LOGERROR(
-        "Cant read parameter information from file <" << pfile << ">." << endl << "Trying to load parameter information from default file <" << paramFile << endl << ">. This file may be incomplete. Use 'kv_get_stinfosys_params' to generate the file" << endl << "'" << pfile << "'.");
+        "Cant read parameter information from file <" << paramFile << ">." << endl << "Trying to load parameter information from default file <" << paramFile << endl << ">. This file may be incomplete. Use 'kv_get_stinfosys_params' to generate the file" << endl << "'" << paramFile << "'.");
 
-    if (!readParamsFromFile(paramFile, tmpParams)) {
+    if (!readParamsFromFile(pfile, tmpParams)) {
       IDLOGERROR("param_update", "Cant read parameter information from file <" << paramFile << ">.");
       LOGERROR("Cant read parameter information from file <" << paramFile << ">.");
     }
@@ -293,6 +288,7 @@ bool DataSrcApp::registerParams() {
   if (!tmpParams.empty()) {
     IDLOGINFO("param_update", "Loaded #" << tmpParams.size() << " 'stinfosys' param definitions from file <" << paramFile << ">.");
   }
+
 
   try {
     res = con->execQuery("SELECT paramid,name FROM param");
