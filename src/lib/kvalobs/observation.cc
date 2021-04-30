@@ -75,11 +75,11 @@ namespace kvalobs {
  * \brief Interface to the table data in the kvalobs database.
  */
 
-Observation::Observation():observationid_(0), stationid_(0), typeid_(0) {
+Observation::Observation():hasObservationid_(false),observationid_(0), stationid_(0), typeid_(0) {
 }
 
 Observation::Observation(const Observation &d)
-  :observationid_(d.observationid_), stationid_(d.stationid_), typeid_(d.typeid_),
+  :hasObservationid_(d.observationid_), observationid_(d.observationid_), stationid_(d.stationid_), typeid_(d.typeid_),
    obstime_(d.obstime_), tbtime_(d.tbtime_), data_(d.data_), textData_(d.textData_) {
 }
 
@@ -230,7 +230,7 @@ kvData Observation::getKvData(const dnmi::db::DRow &r_, long *obsid_) {
 */
   
   return kvData(stationid, obstime, original, paramid,
-         tbtime, myTypeid, sensor, level, corrected, controlinfo,  useinfo,cfailed);
+         tbtime, myTypeid, sensor, level, corrected, controlinfo, useinfo, cfailed);
   
 }
 
@@ -428,6 +428,8 @@ Observation *Observation::getFromDb(
   )
 {
   std::unique_ptr<Observation> obs=std::unique_ptr<Observation>(new Observation());
+  obs->setLogid(logid);
+
   //db::TransactionBlock tran(con, db::Connection::REPEATABLE_READ, false, !useTransaction);
   db::TransactionBlock tran(con, db::Connection::READ_COMMITTED, false, !useTransaction);
   ostringstream q;
@@ -477,6 +479,10 @@ Observation *Observation::getFromDb(
       q.str("");
 
       q << "EXCEPTION: Missing observationid. query: " << tmp; 
+      IDLOGERROR(logid,"Missing observationid. query: " << tmp << "\n" << "#obsdata: " 
+        << obs->dataSize() << " #textdata: " << obs->textDataSize() << " #tot: " << obs->totSize() 
+        << " hasObsID: " << (obs->hasObservationid_?"true":"false"));
+      
       throw logic_error(q.str());
     }
 
@@ -523,6 +529,7 @@ Observation *Observation::getFromDb(dnmi::db::Connection *con, long observationi
   ostringstream q;
   try {
     std::unique_ptr<Observation> obs=std::unique_ptr<Observation>(new Observation());
+    obs->setLogid(logid);
     q << "SELECT o.observationid, o.stationid, o.typeid, o.obstime, o.tbtime, d.original,d.paramid,d.sensor,d.level,d.corrected, d.controlinfo, d.useinfo,d.cfailed "
       << "FROM observations o LEFT JOIN  obsdata d "
       << "ON o.observationid = d.observationid "
