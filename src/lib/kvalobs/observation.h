@@ -58,11 +58,16 @@ public:
   Observation(int stationId, int typeId, const boost::posix_time::ptime & obt,
     const boost::posix_time::ptime & tbt, 
     const std::list<kvalobs::kvData> &data=std::list<kvalobs::kvData>(),
-    const std::list<kvalobs::kvTextData> &textData=std::list<kvalobs::kvTextData>())
-    : hasObservationid_(false),observationid_(0) {
-    set(stationId,typeId, obt, tbt, data, textData);
+    const std::list<kvalobs::kvTextData> &textData=std::list<kvalobs::kvTextData>(),
+    const std::string &logid="")
+    : hasObservationid_(false),observationid_(0), logid_(logid) {
+    set(stationId, typeId, obt, tbt, data, textData);
   }
 
+  void setLogid(const std::string &logid) {
+    logid_=logid;
+  }
+  
   bool set(int stationId, int typeId, 
     const boost::posix_time::ptime & obt,
     const boost::posix_time::ptime & tbt, 
@@ -158,6 +163,7 @@ private:
   boost::posix_time::ptime tbtime_;
   std::list<kvData> data_;
   std::list<kvTextData> textData_;
+  std::string logid_;
 };
 }
 #endif
