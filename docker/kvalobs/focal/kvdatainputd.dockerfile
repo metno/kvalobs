@@ -11,17 +11,13 @@ ARG kvuser=kvalobs
 ARG kvuserid=5010
 
 ENV PGPASSFILE=/etc/kvalobs/.pgpass
+
 #Add bufrdecoder
-#RUN apt-get update && apt-get -y install libgeo-bufr-perl 
+RUN apt-get update && apt-get -y install libgeo-bufr-perl 
 COPY docker/kvalobs/kvdatainputd/BufrDecode.pl /usr/local/bin
 
-#Create a runtime user for kvalobs
-#RUN addgroup --gid $kvuserid $kvuser && \
-#  adduser --uid $kvuserid  --gid $kvuserid --disabled-password --disabled-login --gecos '' $kvuser
 
 RUN useradd -ms /bin/bash --uid ${kvuserid} --user-group  ${kvuser}
-#RUN useradd -m -s /bin/bash --uid 5010 --user-group 5010 kvalobs
-  
 
 RUN mkdir -p /etc/kvalobs && chown ${kvuser}:${kvuser}  /etc/kvalobs
 RUN mkdir -p /var/log/kvalobs && chown ${kvuser}:${kvuser}  /var/log/kvalobs
