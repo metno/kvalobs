@@ -29,5 +29,9 @@ VOLUME /var/log/kvalobs
 
 USER ${kvuser}:${kvuser}
 
+COPY src/kvQabased/scripts/check_file_age.sh /usr/bin/check_file_age
+
+HEALTHCHECK CMD [ "check_file_age", "/var/log/kvalobs/kvQabased_transaction.log", "900" ]
+
 ENTRYPOINT  ["/usr/bin/kvQabased" ]
 
