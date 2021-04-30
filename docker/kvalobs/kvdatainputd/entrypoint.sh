@@ -57,6 +57,9 @@ echo "getent: $(getent passwd kvalobs)"
 echo "id: $(id -u)"
 
 
+#Remove pidfile
+rm -f /var/lib/kvalobs/run/kvDataInputd-*.pid
+
 #Create some directories
 mkdir -p /var/log/kvalobs/decoders
 mkdir -p /var/log/kvalobs/decoders/SynopDecoder
