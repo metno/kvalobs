@@ -10,6 +10,7 @@ ARG DEBIAN_FRONTEND='noninteractive'
 ARG kvuser=kvalobs
 ARG kvuserid=5010
 
+ENV PGPASSFILE=/etc/kvalobs/.pgpass
 #Add bufrdecoder
 #RUN apt-get update && apt-get -y install libgeo-bufr-perl 
 COPY docker/kvalobs/kvdatainputd/BufrDecode.pl /usr/local/bin
@@ -30,8 +31,10 @@ COPY --from=kvbins /usr/bin/aexecd* /usr/bin/
 COPY --from=kvbins /usr/local/lib/libhttpserver.so* /usr/local/lib/
 COPY docker/kvalobs/kvdatainputd/aexecd.conf /etc/kvalobs/
 COPY docker/kvalobs/kvdatainputd/entrypoint.sh \
-  docker/kvalobs/kvdatainputd/healthcheck.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/entrypoint.sh /usr/local/bin/healthcheck.sh
+  docker/kvalobs/kvdatainputd/healthcheck.sh \
+  docker/kvalobs/kvdatainputd/kv_get_stinfosys_params.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/entrypoint.sh /usr/local/bin/healthcheck.sh \
+  /usr/local/bin/kv_get_stinfosys_params.sh
 VOLUME /etc/kvalobs
 VOLUME /var/log/kvalobs
 VOLUME /var/lib/kvalobs
