@@ -138,7 +138,7 @@ bool miutil::conf::ValElement::valAsBool(bool defaultValue) const {
 }
 
 bool miutil::conf::ValElement::valAsBool() const {
-  if (valType_ == STRING && !val_.empty()) {
+  if ((valType_ == ID || valType_ == STRING) && !val_.empty()) {
     if (val_[0] == 't' || val_[0] == 'T')
       return true;
     else if (val_[0] == 'f' || val_[0] == 'F')
