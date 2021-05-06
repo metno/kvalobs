@@ -51,6 +51,7 @@
 #include "kvDataInputd/DecodeCommand.h"
 #include "kvDataInputd/DecoderExecutor.h"
 
+
 /**
  * \defgroup kvDatainputd kvDatainputd
  *
@@ -118,7 +119,7 @@ class DataSrcApp : public KvBaseApp {
   kvalobs::service::KafkaProducerThread kafkaRawStream;
   kvalobs::service::KafkaProducerThread kafkaPubStream;
   kvalobs::decoder::StationFiltersPtr filters;
-
+  std::string paramFile;
   /**
    * \brief registerParams reads parameter information from the table
    * kv_params into paramList.

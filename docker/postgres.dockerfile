@@ -1,6 +1,8 @@
-FROM postgres:12
+FROM postgres:13
 
-RUN apt-get update && apt-get -y install bzip2 less mg wget && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+  apt-get -y install bzip2 less mg wget && \
+  rm -rf /var/lib/apt/lists/*
 RUN mkdir -p /var/lib/kvalobs && chown postgres.postgres /var/lib/kvalobs
 RUN mkdir -p /usr/share/kvalobs && chown postgres.postgres /usr/share/kvalobs
 COPY src/kvalobs_database/kvalobs_roles.sql    /docker-entrypoint-initdb.d/00-kvalobs_roles.sql

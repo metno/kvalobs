@@ -26,7 +26,14 @@ services:
       POSTGRES_PASSWORD: postgres
     volumes:
       - kvpostgres:/var/lib/postgresql/data
-
+  
+  kvdataiputd:
+    image: focal-kvdatainputd:latest
+    ports: 
+      - '8090:8090'
+    volumes:
+      - '/media/borgem/backup_pc4816/kvalobs/etc/kvalobs:/etc/kvalobs:ro'
+      - '/media/borgem/backup_pc4816/kvalobs/var/log/kvalobs/:/var/log/kvalobs:rw'
 
 networks:
   default:

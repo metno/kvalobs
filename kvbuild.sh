@@ -1,5 +1,7 @@
 #! /bin/bash
 
+export DOCKER_BUILDKIT=1
+
 set -euo pipefail
 
 kvuser=kvalobs
@@ -59,23 +61,25 @@ echo -e "$usage\n\n"
 
 while test $# -ne 0; do
   case $1 in
-    --tag) tag=$2;;
+    --tag) 
+        tag="$2"
+        shift;;
     --help) 
-      use
-      exit 0;;
+        use
+        exit 0;;
     --staging) mode=staging;;
-    --prod) prod=prod;;
-    --test) test=test;;
+    --prod) mode=prod;;
+    --test) mode=test;;
     --kvbuild) kvbuild="kvbuild";;
     --builddep) builddep="builddep";;
     --kvcpp) kvcpp="kvcpp";;
     --list) 
-      echo -e "\nTargets: all builddep kvbuild $avalable_targets\n\n"
-      exit 0 ;;
+        echo -e "\nTargets: all builddep kvbuild $avalable_targets\n\n"
+        exit 0 ;;
     --no-cache) nocache="--no-cache";;
     -*) use
-      echo "Invalid option $1"
-      exit 1;;  
+        echo "Invalid option $1"
+        exit 1;;  
     *) targets="$targets $1";;
   esac
   shift
@@ -149,6 +153,7 @@ echo "Build targets: $targets $kvcpp"
 
 if [ $mode = test ]; then 
   registry=""
+  kvuserid=$(id -u)
 else 
   registry="$registry/$mode/"
 fi
@@ -156,8 +161,8 @@ fi
 #Should we build the kvdev and kvruntime 
 if [ -n "$kvcpp" ]; then 
   echo "Using dockerfile: docker/kvalobs/${os}/kvcpp.dockerfile"
-  docker build $nocache --build-arg "REGISTRY=${registry}" -f docker/kvalobs/${os}/kvcpp.dockerfile --target dev --tag "${registry}${os}-kvcpp-dev:$tag" .
-  docker build $nocache --build-arg "REGISTRY=${registry}" -f docker/kvalobs/${os}/kvcpp.dockerfile --target runtime --tag "${registry}${os}-kvcpp-runtime:$tag" .
+  docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" -f docker/kvalobs/${os}/kvcpp.dockerfile --target dev --tag "${registry}${os}-kvcpp-dev:$tag" .
+  docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" -f docker/kvalobs/${os}/kvcpp.dockerfile --target runtime --tag "${registry}${os}-kvcpp-runtime:$tag" .
 
   if [ $mode != test ]; then 
     docker push ${registry}${os}-kvcpp-dev:$tag
@@ -178,9 +183,9 @@ for target in $targets; do
 
   echo "Using dockerfile: $dockerfile"
   if [ $addArgs == true ]; then
-    docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "kvuser=$kvuser" --build-arg "kvuserid=$kvuserid" -f $dockerfile --tag ${registry}${os}-${target}:$tag .
+    docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" --build-arg "kvuser=$kvuser" --build-arg "kvuserid=$kvuserid" -f $dockerfile --tag ${registry}${os}-${target}:$tag .
   else
-    docker build $nocache --build-arg "REGISTRY=${registry}" -f $dockerfile --tag "${registry}${os}-${target}:$tag" .
+    docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" -f $dockerfile --tag "${registry}${os}-${target}:$tag" .
   fi
   
   if [ $mode != test ]; then 
