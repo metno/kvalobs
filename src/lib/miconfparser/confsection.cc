@@ -175,10 +175,8 @@ bool miutil::conf::ConfSection::addValue(const std::string &key,
                                          bool replaceIfExist) {
   IValueList it = valueList.find(key);
 
-  if (it != valueList.end()) {
-    if (!replaceIfExist) {
+  if (it != valueList.end() && !replaceIfExist) {
       return false;
-    }
   }
 
   valueList[key] = value;
@@ -190,21 +188,14 @@ bool miutil::conf::ConfSection::addValue(const std::string &key,
                                          bool replaceIfExist) {
   IValueList it = valueList.find(key);
 
-  if (it != valueList.end()) {
-    if (!replaceIfExist) {
+  if (it != valueList.end() && !replaceIfExist ) {
       return false;
-    } else {
-      it->second.clear();
-      it->second.push_back(value);
-    }
   }
-
+  
   ValElementList elem;
   elem.push_back(value);
   valueList[key] = elem;
-
   return true;
-
 }
 
 void miutil::conf::ConfSection::appendValue(const std::string &key,
@@ -212,6 +203,7 @@ void miutil::conf::ConfSection::appendValue(const std::string &key,
   IValueList it = valueList.find(key);
 
   if (it != valueList.end()) {
+    it->second.isList(true);
     it->second.push_back(value);
   } else {
     ValElementList elem;
