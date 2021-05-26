@@ -96,7 +96,8 @@ echo "builddep: $builddep"
 echo "Targets: $targets"
 echo "nocache: $nocache"
 
-gitref.sh 
+chmod +x gitref.sh
+./gitref.sh 
 
 for target in $targets ; do
   found=false
