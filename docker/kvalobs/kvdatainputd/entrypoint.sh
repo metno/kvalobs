@@ -66,8 +66,12 @@ mkdir -p /var/log/kvalobs/decoders/SynopDecoder
 mkdir -p /var/log/kvalobs/decoders/KlDataDecoder
 mkdir -p /var/log/kvalobs/decoders/ExecDecoder
 
-cp /usr/share/kvalobs/VERSION /var/log/kvalobs/kvDataInputd_VERSION
-cat /usr/share/kvalobs/VERSION
+if [ -f /usr/share/kvalobs/VERSION ]; then|
+  cp -f /usr/share/kvalobs/VERSION /var/log/kvalobs/kvDataInputd_VERSION
+  cat /usr/share/kvalobs/VERSION
+else
+  echo "Not known" > /var/log/kvalobs/kvDataInputd_VERSION
+fi
 
 if [ "$#" -eq 0 ]; then
   echo "ENTRYPOINT starting kvDataInputd"

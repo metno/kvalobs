@@ -55,4 +55,4 @@ USER ${kvuser}:${kvuser}
 
 #ENTRYPOINT [ "/bin/bash" ]
 #ENTRYPOINT ["/bin/bash", "-c", "while true; do sleep 10000; done" ]
-ENTRYPOINT  ["tini", "--", "/usr/bin/entrypoint.sh" ]
+ENTRYPOINT  ["/usr/bin/entrypoint.sh" ]
