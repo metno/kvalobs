@@ -3,7 +3,7 @@
 ARG REGISTRY
 ARG BASE_IMAGE_TAG=latest
 
-FROM ${REGISTRY}focal-builddep:${BASE_IMAGE_TAG}
+FROM ${REGISTRY}builddep:${BASE_IMAGE_TAG}
 
 VOLUME /src
 VOLUME /build

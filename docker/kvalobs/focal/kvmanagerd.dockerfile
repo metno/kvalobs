@@ -1,9 +1,9 @@
 ARG REGISTRY
 ARG BASE_IMAGE_TAG=latest
 
-FROM ${REGISTRY}focal-kvbuild:${BASE_IMAGE_TAG} AS kvbins
+FROM ${REGISTRY}kvbuild:${BASE_IMAGE_TAG} AS kvbins
 
-FROM ${REGISTRY}focal-kvcpp-runtime:${BASE_IMAGE_TAG}
+FROM ${REGISTRY}kvcpp-runtime:${BASE_IMAGE_TAG}
 
 ARG kvuser=kvalobs
 ARG kvuserid=5010
