@@ -56,7 +56,6 @@ echo "ENTRYPOINT: NARGS: $# ARGS: '$@'"
 echo "getent: $(getent passwd kvalobs)"
 echo "id: $(id -u)"
 
-
 #Remove pidfile
 rm -f /var/lib/kvalobs/run/kvDataInputd-*.pid
 
