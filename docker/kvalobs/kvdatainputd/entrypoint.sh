@@ -66,7 +66,7 @@ mkdir -p /var/log/kvalobs/decoders/SynopDecoder
 mkdir -p /var/log/kvalobs/decoders/KlDataDecoder
 mkdir -p /var/log/kvalobs/decoders/ExecDecoder
 
-if [ -f /usr/share/kvalobs/VERSION ]; then|
+if [ -f /usr/share/kvalobs/VERSION ]; then
   cp -f /usr/share/kvalobs/VERSION /var/log/kvalobs/kvDataInputd_VERSION
   cat /usr/share/kvalobs/VERSION
 else
