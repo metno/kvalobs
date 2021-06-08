@@ -96,6 +96,9 @@ echo "builddep: $builddep"
 echo "Targets: $targets"
 echo "nocache: $nocache"
 
+chmod +x gitref.sh
+./gitref.sh 
+
 for target in $targets ; do
   found=false
 
@@ -161,12 +164,12 @@ fi
 #Should we build the kvdev and kvruntime 
 if [ -n "$kvcpp" ]; then 
   echo "Using dockerfile: docker/kvalobs/${os}/kvcpp.dockerfile"
-  docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" -f docker/kvalobs/${os}/kvcpp.dockerfile --target dev --tag "${registry}${os}-kvcpp-dev:$tag" .
-  docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" -f docker/kvalobs/${os}/kvcpp.dockerfile --target runtime --tag "${registry}${os}-kvcpp-runtime:$tag" .
+  docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" -f docker/kvalobs/${os}/kvcpp.dockerfile --target dev --tag "${registry}kvcpp-dev:$tag" .
+  docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" -f docker/kvalobs/${os}/kvcpp.dockerfile --target runtime --tag "${registry}kvcpp-runtime:$tag" .
 
   if [ $mode != test ]; then 
-    docker push ${registry}${os}-kvcpp-dev:$tag
-    docker push ${registry}${os}-kvcpp-runtime:$tag
+    docker push ${registry}kvcpp-dev:$tag
+    docker push ${registry}kvcpp-runtime:$tag
   fi
 fi
 
@@ -183,13 +186,13 @@ for target in $targets; do
 
   echo "Using dockerfile: $dockerfile"
   if [ $addArgs == true ]; then
-    docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" --build-arg "kvuser=$kvuser" --build-arg "kvuserid=$kvuserid" -f $dockerfile --tag ${registry}${os}-${target}:$tag .
+    docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" --build-arg "kvuser=$kvuser" --build-arg "kvuserid=$kvuserid" -f $dockerfile --tag ${registry}${target}:$tag .
   else
-    docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" -f $dockerfile --tag "${registry}${os}-${target}:$tag" .
+    docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" -f $dockerfile --tag "${registry}${target}:$tag" .
   fi
   
   if [ $mode != test ]; then 
-    docker push ${registry}${os}-${target}:$tag
+    docker push ${registry}${target}:$tag
   fi
 
 done

@@ -3,13 +3,14 @@
 ARG REGISTRY
 ARG BASE_IMAGE_TAG=latest
 
-FROM ${REGISTRY}focal-builddep:${BASE_IMAGE_TAG}
+FROM ${REGISTRY}builddep:${BASE_IMAGE_TAG}
 
 VOLUME /src
 VOLUME /build
 WORKDIR /build
 
 COPY . /src
+COPY GITREF /usr/share/kvalobs/VERSION
 
 RUN --mount=type=cache,target=/build cd /src/ && autoreconf -if && cd /build && \
       /src/configure --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info  \

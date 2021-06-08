@@ -1,4 +1,4 @@
-FROM registry.met.no/obs/kvalobs/kvbuild/staging/focal-builddep:latest
+FROM registry.met.no/obs/kvalobs/kvbuild/staging/builddep:latest
 
 RUN apt-get update && apt-get install -y libgmock-dev language-pack-nb-base
 

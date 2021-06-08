@@ -225,7 +225,7 @@ public:
       std::list<ValElement>::push_back(val);
     } else {
       //Replace the element.
-     *begin() = val; 
+      *begin() = val; 
     }
   }
 
@@ -236,7 +236,7 @@ public:
       std::list<ValElement>::push_front(val);
     } else {
       //Replace the element.
-     *begin() = val; 
+      *begin() = val; 
     }
     
   }
