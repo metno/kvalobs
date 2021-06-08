@@ -53,6 +53,8 @@ std::set<kvalobs::subscribe::KafkaProducer::MessageId> messages;
 
 bool DataProcessor::logXml = false;
 
+bool DataProcessor::logTransactions = true;
+
 DataProcessor::DataProcessor(std::shared_ptr<qabase::CheckRunner> checkRunner)
     : checkRunner_(checkRunner),
       logCreator_(QaBaseApp::baseLogDir()),
@@ -127,6 +129,9 @@ namespace {
   }
   
   std::string serializeToXml(const qabase::Observation & obs, const qabase::CheckRunner::KvalobsDataPtr dataList, bool logXml) {
+    if (!DataProcessor::logTransactions)
+      return kvalobs::serialize::KvalobsDataSerializer::serialize(*dataList, "kvqabase");
+
     std::string xml;
     std::string fname;
     std::ofstream ofs;
@@ -220,6 +225,7 @@ void DataProcessor::sendToKafka(const qabase::Observation & obs, const qabase::C
 
 void DataProcessor::process(const kvalobs::kvStationInfo & si) {
   qabase::CheckRunner::KvalobsDataPtr modified(checkRunner_->newObservation(si));
+
   Observation dummyObs(0, si.stationID(), si.typeID(), si.obstime(), boost::posix_time::second_clock::universal_time());
   sendToKafka(dummyObs, modified);
   finalizeMessage_();

@@ -152,7 +152,7 @@ Configuration::Configuration(int& argc, char** argv)
     "Set loglevel (debug_all, debug, info, warn, error or fatal")(
     "runlogfile",
     value<std::string>(&runLogFile_)
-      ->default_value(kvalobs::kvPath(kvalobs::logdir) + "/kvQabased.log"),
+      ->default_value("-"),
     "Set file name for run log")(
     "logdir",
     value<std::string>(&baseLogDir_)
@@ -177,7 +177,7 @@ Configuration::Configuration(int& argc, char** argv)
     "port,p", value<int>(&port_), "Port of database")(
     "user,U",
     value<std::string>(&user_)->default_value(databaseUser),
-    "Database user")("select-for-control-count,s",
+    "Database user")("select-for-control-count",
                      value<int>(&selectForControlCount_)->default_value(6),
                      "Number of stations to select for controll from worque in "
                      "one transaction.");

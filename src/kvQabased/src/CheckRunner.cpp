@@ -143,7 +143,10 @@ void logTransaction(bool ok, double start, int shortRetries, int longRetries,
 }
 
 CheckRunner::KvalobsDataPtr CheckRunner::newObservation(const kvalobs::kvStationInfo & st, std::ostream * scriptLog) {
-  return newObservation(db_->getObservation(st), scriptLog);
+  db_->beginTransaction();
+  auto obs = db_->getObservation(st);
+  db_->rollback();
+  return newObservation(obs, scriptLog);
 }
 
 CheckRunner::KvalobsDataPtr CheckRunner::newObservation(

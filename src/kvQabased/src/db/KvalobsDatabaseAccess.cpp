@@ -289,10 +289,10 @@ std::string KvalobsDatabaseAccess::getStationParam(
 
 qabase::Observation KvalobsDatabaseAccess::getObservation(const kvalobs::kvStationInfo & si) const {
   std::ostringstream query;
-  query << "SELECT * FROM observation WHERE ";
+  query << "SELECT * FROM observations WHERE ";
   query << "stationid=" << si.stationID();
   query << " and typeid=" << si.typeID();
-  query << "obstime='" << to_kvalobs_string(si.obstime());
+  query << " and obstime='" << to_kvalobs_string(si.obstime()) << "'";
   ResultPtr result(connection_->execQuery(query.str()));
 
   milog::LogContext context("query");
