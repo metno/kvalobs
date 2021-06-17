@@ -12,12 +12,17 @@ aexecd_PID=
 kvDataInputd_PID=
 got_exit_signal=false
 running=true
+running_pids=
 trap _term SIGTERM SIGINT
 
 _term() {
     echo "TERMINATING"
     running=false
     got_exit_signal=true    
+
+    for [ pid in "$running_pids" ]; do
+      kill -sTERM $pid &>/dev/null
+    done
 }
 
 #kill_pid pid [signal=SIGTERM [timeout=60]
@@ -77,10 +82,12 @@ if [ "$#" -eq 0 ]; then
   echo "Starting aexecd as a sidecar."
   /usr/bin/aexecd &>/dev/null & 
   aexecd_PID=$!
+  running_pids="$running_pids $!"
   echo "aexec pid: $aexecd_PID"
   echo "Starting kvDataInputd."
   /usr/bin/kvDataInputd 2>&1 &
   kvDataInputd_PID=$!
+  running_pids="$running_pids $!"
   echo "kvDataInputd pid: $kvDataInputd_PID"
   wait -n
   ec=$?

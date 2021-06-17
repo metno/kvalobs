@@ -5,12 +5,27 @@ FROM ${REGISTRY}kvbuild:${BASE_IMAGE_TAG} AS kvbins
 
 ENTRYPOINT [ "/bin/bash" ]
 
+
+FROM ubuntu:focal AS bufrtables
+RUN apt-get update && apt-get install -y git
+#Get the metno-bufrtables
+
+RUN mkdir -p /usr/share/metno-bufrtables/tmp && cd /usr/share/metno-bufrtables/tmp && \
+  git clone https://gitlab.met.no/it-geo/metno-bufrtables.git && \
+  cp metno-bufrtables/bufrtables/* .. && cd .. && rm -rf tmp/
+
+
+
 FROM ${REGISTRY}kvcpp-runtime:${BASE_IMAGE_TAG}
 ARG DEBIAN_FRONTEND='noninteractive'
 ARG kvuser=kvalobs
 ARG kvuserid=5010
 
 ENV PGPASSFILE=/etc/kvalobs/.pgpass
+
+#Get the metno-bufrtables
+RUN mkdir -p /usr/share/metno-bufrtables
+COPY --from=bufrtables /usr/share/metno-bufrtables/* /usr/share/metno-bufrtables/
 
 #Add bufrdecoder
 RUN apt-get update && apt-get -y install libgeo-bufr-perl 
@@ -31,6 +46,7 @@ COPY docker/kvalobs/kvdatainputd/entrypoint.sh \
   docker/kvalobs/kvdatainputd/kv_get_stinfosys_params.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/entrypoint.sh /usr/local/bin/healthcheck.sh \
   /usr/local/bin/kv_get_stinfosys_params.sh
+
 VOLUME /etc/kvalobs
 VOLUME /var/log/kvalobs
 VOLUME /var/lib/kvalobs
