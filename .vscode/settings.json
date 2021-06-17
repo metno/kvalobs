@@ -75,6 +75,13 @@
     "stack": "cpp",
     "string": "cpp",
     "future": "cpp",
-    "__functional_base_03": "cpp"
+    "__functional_base_03": "cpp",
+    "bit": "cpp",
+    "memory_resource": "cpp",
+    "optional": "cpp",
+    "string_view": "cpp",
+    "slist": "cpp",
+    "shared_mutex": "cpp",
+    "variant": "cpp"
   }
 }

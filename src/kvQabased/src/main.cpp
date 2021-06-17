@@ -211,7 +211,12 @@ int main(int argc, char ** argv) {
     db::KvalobsDatabaseAccess::setModelDataName(config.modelDataName());
 
     if (config.haveObservationToCheck()) {
-      auto checkRunner = qabase::CheckRunner::create(config.databaseConnectString());
+      qabase::DataProcessor::logTransactions = false;
+      std::string dbConnect = qabase::QaBaseApp::createConnectString();
+      // std::string dbConnect = config.databaseConnectString();
+
+      auto db = std::make_shared<db::KvalobsDatabaseAccess>(dbConnect);
+      auto checkRunner = std::make_shared<qabase::CheckRunner>(db);
 
       if (config.onlySpecificQcx())
         checkRunner->setQcxFilter(config.qcxFilter().begin(), config.qcxFilter().end());
