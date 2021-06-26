@@ -20,7 +20,7 @@ _term() {
     running=false
     got_exit_signal=true    
 
-    for [ pid in "$running_pids" ]; do
+    for pid in "$running_pids"; do
       kill -sTERM $pid &>/dev/null
     done
 }
