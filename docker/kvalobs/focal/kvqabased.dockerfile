@@ -31,9 +31,5 @@ USER ${kvuser}:${kvuser}
 
 COPY src/kvQabased/scripts/check_file_age.sh /usr/bin/check_file_age
 
-#HEALTHCHECK CMD [ "check_file_age", "/var/log/kvalobs/kvQabased_transaction.log" ]
-
-ENTRYPOINT  ["/usr/bin/sleep" ]
-#ENTRYPOINT  ["/usr/bin/kvQabased" ]
-
-
+HEALTHCHECK CMD [ "check_file_age", "/var/log/kvalobs/kvQabased_transaction.log" ]
+ENTRYPOINT  ["/usr/bin/kvQabased" ]
