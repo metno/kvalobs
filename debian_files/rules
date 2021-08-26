@@ -78,4 +78,4 @@ override_dh_auto_install:
 	cp $(CURDIR)/etc/kv2norcom.conf.template $(DEBETC)/kvalobs
 	cp $(CURDIR)/etc/stinfosys.conf $(DEBETC)/kvalobs
 	cp $(CURDIR)/etc/stinfosys_params.csv.default $(DEBETC)/kvalobs
-	cp /usr/local/lib/libmetlibs-*.so* $(DEBLIBKV)/lib
+#	cp /usr/local/lib/libmetlibs-*.so* $(DEBLIBKV)/lib

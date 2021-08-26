@@ -2,28 +2,39 @@ Source: kvalobs
 Section: science
 Priority: extra
 Maintainer: Borge Moe <borge.moe@met.no>
-Build-Depends: debhelper (>= 9), autotools-dev, debconf,
- devscripts, fakeroot,
- automake, libtool, gfortran (>= 4.4.0), bison (>= 2.3) | bison-1.35, flex (>= 2.5.33),
- sqlite3 (>= 3.6.22), libsqlite3-dev (>= 3.6.22), libpq-dev (>= 8.3),
- libxml2-dev (>= 2.6.27), libxml++2.6-dev (>= 2.14.0),
- libboost-dev (>= 1.40.0), libboost-thread-dev (>= 1.40.0),
- libboost-regex-dev (>= 1.40.0), libboost-filesystem-dev (>= 1.40.0),
- libboost-program-options-dev (>= 1.40.0), libboost-system-dev (>= 1.40.0),
- libomniorb4-dev (>= 4.0.6), omniidl4 (>= 4.0.6) | omniidl (>= 4.1.6),
- libperl-dev (>= 5.8), libdbd-pg-perl (>= 1.49), libcurl4-gnutls-dev | libcurl-dev,
- liblog4cpp5-dev, libcppunit-dev (>= 1.12),
- cmake, google-mock,
- libmicrohttpd-dev, libgnutls-dev | libgnutls28-dev, 
- zlib1g-dev, libssl-dev, libsasl2-dev, libzstd-dev
+Build-Depends: debhelper, autotools-dev, autoconf-archive, debconf, devscripts, fakeroot ,
+  automake, libtool, gfortran, bison, flex, sqlite3, libsqlite3-dev, libpq-dev, python3,
+  libxml2-dev, libxml++2.6-dev, libboost-dev, libboost-thread-dev,
+  libboost-regex-dev, libboost-filesystem-dev, libboost-program-options-dev, libboost-system-dev, libboost-timer-dev,
+  libomniorb4-dev,  omniidl, libperl-dev, libdbd-pg-perl, libcurl4-gnutls-dev, liblog4cpp5-dev, libcppunit-dev,
+  cmake, google-mock,  zlib1g-dev, libssl-dev, libsasl2-dev, libzstd-dev,
+  librdkafka-dev, 
+  libgmock-dev,
+  libmicrohttpd-dev, libgnutls28-dev,
+  metlibs-putools-dev
 Standards-Version: 3.9.2
+
+# devscripts, fakeroot,
+# automake, libtool, gfortran (>= 4.4.0), bison (>= 2.3) | bison-1.35, flex (>= 2.5.33),
+# sqlite3 (>= 3.6.22), libsqlite3-dev (>= 3.6.22), libpq-dev (>= 8.3),
+# libxml2-dev (>= 2.6.27), libxml++2.6-dev (>= 2.14.0),
+# libboost-dev (>= 1.40.0), libboost-thread-dev (>= 1.40.0),
+# libboost-regex-dev (>= 1.40.0), libboost-filesystem-dev (>= 1.40.0),
+# libboost-program-options-dev (>= 1.40.0), libboost-system-dev (>= 1.40.0),
+# libomniorb4-dev (>= 4.0.6), omniidl4 (>= 4.0.6) | omniidl (>= 4.1.6),
+# libperl-dev (>= 5.8), libdbd-pg-perl (>= 1.49), libcurl4-gnutls-dev | libcurl-dev,
+# liblog4cpp5-dev, libcppunit-dev (>= 1.12),
+# cmake, google-mock,
+# libmicrohttpd-dev, libgnutls-dev | libgnutls28-dev, 
+# zlib1g-dev, libssl-dev, libsasl2-dev, libzstd-dev
+#Standards-Version: 3.9.2
 
 
 #metlibs-putools-dev
 
 
 
-Package: libkvalobs8
+Package: libkvalobs9
 Section: libs
 Architecture: any
 Depends:  ${shlibs:Depends}, ${misc:Depends}
@@ -33,21 +44,21 @@ Description: Client library for kvalobs
 Package: libkvalobs-dev
 Section: libdevel
 Architecture: any
-Depends: libkvalobs8 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends} 
+Depends: libkvalobs9 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends} 
 Description: Client library for kvalobs
  May be used to write applications connecting to kvalobs
 
-Package: libkvcpp8
+Package: libkvcpp9
 Section: libs
 Architecture: any
-Depends:  libkvalobs8 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Depends:  libkvalobs9 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: Runtime library for kvalobs clients
  Kvalobs is a quality control system for meteorological observations.
 
 Package: libkvcpp-dev
 Section: libdevel
 Architecture: any
-Depends: libkvcpp8 (= ${binary:Version}), 
+Depends: libkvcpp9 (= ${binary:Version}), 
  libkvalobs-dev (= ${binary:Version}),
  libxml++2.6-dev (>= 2.14.0),
  libboost-dev (>= 1.40.0), libboost-thread-dev (>= 1.40.0),
@@ -58,33 +69,33 @@ Depends: libkvcpp8 (= ${binary:Version}),
 Description: Client development file for kvalobs
  Kvalobs is a quality control system for meteorological observations.
 
-Package: kvalobs
-Architecture: any
-Depends: kvalobsuser, adduser, debconf, sqlite3,
- python,
- libkvalobs8 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
-Suggests: postgresql-client
-Description: quality control system for meteorological observations
- Kvalobs is a quality control system for meteorological observations.
+#Package: kvalobs
+#Architecture: any
+#Depends: kvalobsuser, adduser, debconf, sqlite3,
+# python,
+# libkvalobs9 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+#Suggests: postgresql-client
+#Description: quality control system for meteorological observations
+# Kvalobs is a quality control system for meteorological observations.
 
-Package: kvalobsuser
-Architecture: all
-Depends: adduser, debconf, ${misc:Depends}
-Suggests: kvalobs
-Description: Install kvalobs user
- Create a user for the kvalobs package. All kvalobs programs are supposed to be
- run by this user.
+#Package: kvalobsuser
+#Architecture: all
+#Depends: adduser, debconf, ${misc:Depends}
+#Suggests: kvalobs
+#Description: Install kvalobs user
+# Create a user for the kvalobs package. All kvalobs programs are supposed to be
+# run by this user.
 
 Package: kvalobs-database-files
 Architecture: all
 Depends: ${misc:Depends}
-Suggests: kvalobs
+#Suggests: kvalobs
 Description: Install sql files for creating kvalobs database
  This will install the sql files for installing a kvalobs database.
 
 Package: kvsubscribe
 Architecture: any
-Depends: libkvalobs8 (= ${binary:Version})
+Depends: libkvalobs9 (= ${binary:Version})
 Description: List data from kvalobs in real time 
 
 #Package: kvkafkalistener
@@ -94,11 +105,11 @@ Description: List data from kvalobs in real time
 # Will periodically write and update kvalobs status information to 
 # /var/log/kvalobs/kvkafkalistener.log 
 
-Package: kvalobs-init
-Architecture: any
-Depends: kvalobsuser, kvalobs, incron, ${misc:Depends}
-Description: Install kvalobs init scripts.
- Install the init script to start/stop kvalobs on boot and shutdown.
+#Package: kvalobs-init
+#Architecture: any
+#Depends: kvalobsuser, kvalobs, incron, ${misc:Depends}
+#Description: Install kvalobs init scripts.
+# Install the init script to start/stop kvalobs on boot and shutdown.
 
 #Package: kvdataclt
 #Architecture: any

@@ -1,3 +1,21 @@
+kvalobs (6.0.0~rc2-1) xenial; urgency=medium
+  * Build changes
+  
+ -- Borge Moe <borge.moe@met.no>  Thu, 26 Aug 2021 12:00:00 +0100
+
+
+kvalobs (6.0.0~rc1-1) xenial; urgency=medium
+  * Change version number. Binary incompatible with 5.x.x
+  
+ -- Borge Moe <borge.moe@met.no>  Wed, 25 Aug 2021 11:00:00 +0100
+
+
+kvalobs (5.0.7~rc3-1) xenial; urgency=medium
+  * build changes for libhttpserver.
+  * Only generate debian package for the lib*.
+  
+ -- Borge Moe <borge.moe@met.no>  Tue, 24 Aug 2021 11:00:00 +0100
+
 kvalobs (5.0.7~rc2-1) xenial; urgency=medium
   * kvDatainputd: Changes to the filter for what to bypass workque and
       kvQabased.

@@ -1,7 +1,7 @@
 librdkafka_version = librdkafka-1.2.2
 librdkafka_src = $(librdkafka_version).tar.gz
 
-libhttpserver_version = libhttpserver-0.17.5
+libhttpserver_version = libhttpserver-0.18.2
 libhttpserver_src = $(libhttpserver_version).tar.gz
 
 sqlite3_version = sqlite-autoconf-3310100
@@ -11,7 +11,7 @@ sqlite3_src=$(sqlite3_version).tar.gz
 microhttpd_version=$(shell pkg-config --modversion libmicrohttpd)
 
 #all-local: librdkafka libhttpserver libsqlite
-all-local: libsqlite
+all-local: libsqlite libhttpserver
 	if [ -f do-recheck ]; then \
 		( cd ..; ./config.status --recheck ) ; \
 		rm -f do-recheck ; \

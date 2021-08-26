@@ -17,6 +17,8 @@ install-data-hook:
 	$(install_sh) -m 755 -d $(DESTDIR)/$(libdir)/@PACKAGE_NAME@/lib
 	$(install_sh) -m 755 -d $(DESTDIR)/$(datadir)/@PACKAGE_NAME@/metadata
 	cd $(DESTDIR)/$(bindir); rm -f sync_norcom_files; $(LN_S) $(bindir)/kvsync_files sync_norcom_files
+	cp -d $(libhttpserver_LIBDIR)/lib*.so* $(DESTDIR)/$(libdir)/@PACKAGE_NAME@/lib
+
 
 pkgsysconfdir = $(sysconfdir)/@PACKAGE_NAME@
 pkgsysconf_DATA = \

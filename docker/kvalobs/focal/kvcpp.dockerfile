@@ -23,7 +23,7 @@ COPY --from=kvbins /usr/lib/libkvalobs_*.a /usr/lib/
 COPY --from=kvbins /usr/lib/libkvalobs_*.la /usr/lib/
 COPY --from=kvbins /usr/lib/kvalobs/db/*.so*  /usr/lib/kvalobs/db/
 COPY --from=kvbins /usr/lib/kvalobs/decode/*.so*  /usr/lib/kvalobs/decode/
-#COPY --from=kvbins /usr/lib/kvalobs/lib/*.so*  /usr/lib/kvalobs/lib/
+COPY --from=kvbins /usr/lib/kvalobs/lib/*.so*  /usr/lib/kvalobs/lib/
 COPY --from=kvbins /usr/include/kvalobs /usr/include/kvalobs
 COPY --from=kvbins /usr/lib/pkgconfig/libkv*.pc  /usr/lib/pkgconfig/
 
@@ -53,14 +53,14 @@ RUN apt-get update && apt-get -y install \
   libmicrohttpd12 libomniorb4-2 libomnithread4 libpq5 libsasl2-2 \
   libssl1.1 libstdc++6 libxml++2.6-2v5 libxml2 libzstd1 zlib1g \
   postgresql-client-13 iproute2 gosu \
-  librdkafka++1
+  librdkafka++1 libmetlibs-putools8
 
-COPY --from=kvbins /usr/local/lib/libmetlibs*.so.* /usr/local/lib/
+#COPY --from=kvbins /usr/local/lib/libmetlibs*.so.* /usr/local/lib/
 COPY --from=kvbins /usr/lib/libkvalobs_*.so.* /usr/lib/
 COPY --from=kvbins /usr/lib/kvalobs/db/*.so*  /usr/lib/kvalobs/db/
 COPY --from=kvbins /usr/lib/kvalobs/decode/*.so*  /usr/lib/kvalobs/decode/
 COPY --from=kvbins /usr/share/kvalobs/VERSION /usr/share/kvalobs/VERSION
-# COPY --from=kvbins /usr/lib/kvalobs/lib/*.so*  /usr/lib/kvalobs/lib/
+COPY --from=kvbins /usr/lib/kvalobs/lib/*.so*  /usr/lib/kvalobs/lib/
 
 RUN mkdir -p /var/lib/kvalobs/run
 
