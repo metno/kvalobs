@@ -39,7 +39,7 @@ RUN mkdir -p /var/log/kvalobs && chown ${kvuser}:${kvuser}  /var/log/kvalobs
 
 COPY --from=kvbins /usr/bin/kvDataInputd /usr/bin/
 COPY --from=kvbins /usr/bin/aexecd* /usr/bin/
-COPY --from=kvbins /usr/local/lib/libhttpserver.so* /usr/local/lib/
+#COPY --from=kvbins /usr/local/lib/libhttpserver.so* /usr/local/lib/
 COPY docker/kvalobs/kvdatainputd/aexecd.conf /etc/kvalobs/
 COPY docker/kvalobs/kvdatainputd/entrypoint.sh \
   docker/kvalobs/kvdatainputd/healthcheck.sh \
