@@ -12,23 +12,6 @@ Build-Depends: debhelper, autotools-dev, autoconf-archive, debconf, devscripts, 
   libgmock-dev,
   libmicrohttpd-dev, libgnutls28-dev,
   metlibs-putools-dev
-Standards-Version: 3.9.2
-
-# devscripts, fakeroot,
-# automake, libtool, gfortran (>= 4.4.0), bison (>= 2.3) | bison-1.35, flex (>= 2.5.33),
-# sqlite3 (>= 3.6.22), libsqlite3-dev (>= 3.6.22), libpq-dev (>= 8.3),
-# libxml2-dev (>= 2.6.27), libxml++2.6-dev (>= 2.14.0),
-# libboost-dev (>= 1.40.0), libboost-thread-dev (>= 1.40.0),
-# libboost-regex-dev (>= 1.40.0), libboost-filesystem-dev (>= 1.40.0),
-# libboost-program-options-dev (>= 1.40.0), libboost-system-dev (>= 1.40.0),
-# libomniorb4-dev (>= 4.0.6), omniidl4 (>= 4.0.6) | omniidl (>= 4.1.6),
-# libperl-dev (>= 5.8), libdbd-pg-perl (>= 1.49), libcurl4-gnutls-dev | libcurl-dev,
-# liblog4cpp5-dev, libcppunit-dev (>= 1.12),
-# cmake, google-mock,
-# libmicrohttpd-dev, libgnutls-dev | libgnutls28-dev, 
-# zlib1g-dev, libssl-dev, libsasl2-dev, libzstd-dev
-#Standards-Version: 3.9.2
-
 
 #metlibs-putools-dev
 
@@ -60,6 +43,7 @@ Section: libdevel
 Architecture: any
 Depends: libkvcpp9 (= ${binary:Version}), 
  libkvalobs-dev (= ${binary:Version}),
+ metlibs-putools-dev,
  libxml++2.6-dev (>= 2.14.0),
  libboost-dev (>= 1.40.0), libboost-thread-dev (>= 1.40.0),
  libboost-regex-dev (>= 1.40.0), libboost-filesystem-dev (>= 1.40.0),
