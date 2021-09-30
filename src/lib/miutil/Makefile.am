@@ -29,7 +29,10 @@ libkvalobs_miutil_la_SOURCES = \
    strerror.h strerror.cc \
    SemiUniqueName.h SemiUniqueName.cc \
    LogAppender.h LogAppender.cpp \
-   makeUniqueFile.h makeUniqueFile.cpp
+   makeUniqueFile.h makeUniqueFile.cpp \
+   getprogname.h getprogname.cc \
+   gethostname.h gethostname.cc \
+   getusername.h getusername.cc 
 
 libkvalobs_miutil_la_CPPFLAGS = $(AM_CPPFLAGS) $(putools_CFLAGS)  -fPIC
 libkvalobs_miutil_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@ -fPIC

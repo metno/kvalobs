@@ -184,6 +184,9 @@ class CorbaKvApp : public KvApp, protected CorbaHelper::CorbaApp {
       const KvDataSubscribeInfoHelper &info, dnmi::thread::CommandQue &que);
   virtual SubscriberID subscribeData(const KvDataSubscribeInfoHelper &info,
                                      dnmi::thread::CommandQue &que);
+  SubscriberID subscribeDataWithGroupId(const KvDataSubscribeInfoHelper &info,
+                                     dnmi::thread::CommandQue &queue, const std::string &groupId);
+
   virtual SubscriberID subscribeKvHint(dnmi::thread::CommandQue &que);
   virtual void unsubscribe(const SubscriberID &subscriberid);
   virtual void unsubscribeAll();

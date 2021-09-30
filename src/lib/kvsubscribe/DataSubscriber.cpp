@@ -49,8 +49,9 @@ std::function<void(const std::string &message, const serialize::KvalobsData &d)>
 
 DataSubscriber::DataSubscriber(Handler handler,
                                const std::string & domain,
-                               const std::string & brokers)
-    : KafkaConsumer(topic(domain), brokers),
+                               const std::string & brokers,
+                               const std::string &groupId)
+    : KafkaConsumer(topic(domain), brokers, groupId),
       handler_(handler) {
 }
 

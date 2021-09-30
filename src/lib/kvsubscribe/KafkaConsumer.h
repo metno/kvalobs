@@ -34,9 +34,10 @@
 #include <string>
 #include <memory>
 #include <list>
+#include <vector>
 
 namespace RdKafka {
-class Consumer;
+class KafkaConsumer;
 class Topic;
 class Conf;
 class Message;
@@ -63,7 +64,8 @@ class KafkaConsumer {
  public:
 
   KafkaConsumer(const std::string & topic,
-                const std::string & brokers);
+                const std::string & brokers,
+                const std::string & groupId="");
 
   virtual ~KafkaConsumer();
 
@@ -127,16 +129,15 @@ class KafkaConsumer {
  private:
   typedef std::function<void(RdKafka::Message & message)> BasicHandler;
   void handle_(RdKafka::Message & message);
-  void createConnection_(const std::string & brokers);
-  void createTopic_();
-
+  void createConnection_(const std::string & brokers, const std::string & groupId);
+  void subscribe_();
+  
   bool initialized_;
   bool stopping_;
-  std::unique_ptr<RdKafka::Consumer> consumer_;
-  std::unique_ptr<RdKafka::Topic> topic_;
-  std::unique_ptr<RdKafka::Conf> topicConf_;
-  std::string topicName_;
-  int64_t topicOffset_;
+  std::unique_ptr<RdKafka::KafkaConsumer> consumer_;
+  std::vector<std::string> topics_;
+  std::string groupId_;
+  
 
   static std::list<KafkaConsumer *> allConsumers_;
 
