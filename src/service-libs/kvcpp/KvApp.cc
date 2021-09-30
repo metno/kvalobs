@@ -30,6 +30,7 @@
 #include "service-libs/kvcpp/KvApp.h"
 #include "CurrentKvApp.h"
 #include <kvalobs/kvPath.h>
+#include "kafka/creategroupid.h"
 #include <milog/milog.h>
 #include <miconfparser/confparser.h>
 #include <fstream>
@@ -134,7 +135,14 @@ std::string KvApp::getConsumerGroupId(const std::string &consumerGroupIdKey) {
   
   auto val=getConfigValue(groupIdName, "");
 
-  LOGINFO("Consumer group id key: '" << groupIdName << "' value: '" << val << "'");
+  if ( val.empty() ) {
+    LOGINFO("No Consumer group id key defined: '" << groupIdName << "' ");
+    val=kvservice::kafka::createKafkaConsumerGroupId(KvApp::appName);
+    LOGINFO("Created a consumer group id: '" << val << "'");  
+  } else {
+    LOGINFO("Consumer group id key: '" << groupIdName << "' value: '" << val << "'");
+  }
+  
   return val;
 }
 

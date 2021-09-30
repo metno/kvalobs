@@ -40,6 +40,7 @@
 #include "service-libs/kvcpp/kvevents.h"
 #include "service-libs/kvcpp/kafka/KafkaSubscribe.h"
 #include "service-libs/kvcpp/test/testKafkaSubcriber.h"  // header file for the test interface
+#include "creategroupid.h"
 
 using namespace kvalobs::subscribe;
 using namespace kvalobs;

@@ -49,9 +49,8 @@ miutilinclude_HEADERS = \
   miTimeParse.h trimstr.h base64.h gettimeofday.h \
   splitstr.h timeconvert.h strerror.h signalhelpers.h \
   sockethelper.h simplesocket.h aexecclient.h SemiUniqueName.h \
-  LogAppender.h makeUniqueFile.h
-
-
+  LogAppender.h makeUniqueFile.h getprogname.h gethostname.h getusername.h
+ 
 if HAVE_GMOCK 
 
 TESTS = libmiutiltest
