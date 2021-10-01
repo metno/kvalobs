@@ -48,6 +48,7 @@ namespace miutil {
 std::string
 getProgramNameFromArgv(const char **argv);
 
+std::string getProgramName();
 
 /** @} */
 
