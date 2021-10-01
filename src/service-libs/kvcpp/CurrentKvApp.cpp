@@ -128,7 +128,6 @@ CurrentKvApp::CurrentKvApp(int argc, char ** argv, std::shared_ptr<miutil::conf:
       kafka::KafkaSubscribe(kafkaDomain(argc, argv, preferredConfig), kafkaBrokers(argc, argv, preferredConfig)) {
   std::shared_ptr<miutil::conf::ConfSection> conf = KvApp::getConfiguration(preferredConfig, boost::filesystem::basename(argv[0]));
   sendData_ = std::unique_ptr<kvalobs::datasource::SendData>(new kvalobs::datasource::HttpSendData(*conf));
-  std::cerr << "CurrentApp ctor: debug: 3  (remove me)\n";
   // needed for correct handling of CORBA::string_dup, below
   int ac = 1;
   char * av = const_cast<char*>("fake");

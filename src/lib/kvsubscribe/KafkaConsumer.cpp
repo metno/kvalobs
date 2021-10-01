@@ -44,6 +44,9 @@ KafkaConsumer::KafkaConsumer(const std::string & topic,
       groupId_(groupId)
 {
   topics_.push_back(topic);
+  if( groupId.empty() ) {
+    
+  }
   createConnection_(brokers, groupId);
   allConsumers_.push_back(this);
 }
@@ -51,6 +54,10 @@ KafkaConsumer::KafkaConsumer(const std::string & topic,
 KafkaConsumer::~KafkaConsumer() {
   stop();
   allConsumers_.remove(this);
+}
+
+std::string KafkaConsumer::getTopic()const{
+  return topics_.empty()?"":*topics_.begin();
 }
 
 void KafkaConsumer::startAtEarliestData() {
@@ -68,6 +75,7 @@ void set(RdKafka::Conf & c, const std::string & key, const std::string & value) 
 
 void KafkaConsumer::startAtStored(const std::string & fileName) {
   //no_op, keept for source compabitilty.
+
 }
 
 
@@ -101,7 +109,6 @@ void KafkaConsumer::runOnce(unsigned timeoutInMilliSeconds) {
 
   RdKafka::Message *msg = consumer_->consume(timeoutInMilliSeconds);
   if (!msg ) {
-    std::cerr << "KafkaConsumer::runOnce: msg == nullptr (this is ok)\n";
     return;
   }
 
@@ -122,27 +129,21 @@ void KafkaConsumer::stopAll() {
 void KafkaConsumer::handle_(RdKafka::Message & message) {
   switch (message.err()) {
     case RdKafka::ERR__TIMED_OUT:
-      std::cerr << "KafkaConsumer::handle_: Timeout\n";
       break;
 
     case RdKafka::ERR_NO_ERROR:
       try {
-        std::cerr << "KafkaConsumer::handle_: data ++\n";
         data((char*) message.payload(), message.len());
-        std::cerr << "KafkaConsumer::handle_: data --\n";
       } catch (std::exception & e) {
-        std::cerr << "KafkaConsumer::handle_: data error: " << e.what() << "\n";
         error(0, e.what());
       }
       break;
 
     case RdKafka::ERR__PARTITION_EOF:
       // ignored
-      std::cerr << "KafkaConsumer::handle_: partition\n";
       break;
 
     default:
-      std::cerr << "KafkaConsumer::handle_: '" << message.errstr() << "'.\n";
       error(message.err(), message.errstr());
       break;
   }
@@ -152,10 +153,8 @@ void KafkaConsumer::createConnection_(const std::string & brokers, const std::st
   std::string errstr;
   std::unique_ptr<RdKafka::Conf> conf(
       RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL));
-  std::cerr << "KafkaConsumer::createConnection_: brokers '" << brokers << "'\n";
   set(* conf, "metadata.broker.list", brokers);
-  std::cerr << "KafkaConsumer::createConnection_: groupid '" << groupId << "'\n";
-  
+    
   if ( groupId.empty() ) {
     throw std::runtime_error("A Kafka Consumer group id must be given."); 
   }
@@ -170,7 +169,7 @@ void KafkaConsumer::createConnection_(const std::string & brokers, const std::st
 
 void KafkaConsumer::subscribe_() {
   std::string errstr;
-  std::cerr << "KafkaConsumer::subscribe_: topic: '" << *topics_.begin() << "'\n";
+  
   RdKafka::ErrorCode resp = consumer_->subscribe(topics_);
   if (resp != RdKafka::ERR_NO_ERROR) {
     throw std::runtime_error(

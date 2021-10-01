@@ -42,6 +42,10 @@ namespace subscribe {
  *   
  */
 std::string createKafkaConsumerGroupId(const std::string &prefix="");
+
+
+
+
 }
 }
 #endif

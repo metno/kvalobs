@@ -69,13 +69,16 @@ class KafkaConsumer {
 
   virtual ~KafkaConsumer();
 
+  std::string getTopic()const;
   /**
+   * DEPRECRATED, no-op, keept for backward source compatibility.
    * When getting data, start at the earliest possible time instead of getting
    * only data produced after start() has been called.
    */
   void startAtEarliestData();
 
   /**
+   * DEPRECRATED, no-op, keept for backward source compatibility.
    * Store place in queue to the given file, also read it at startup if it
    * exists, to pick up where you left. Note that the file is not written for
    * every message, so expect duplicates if you restart your service

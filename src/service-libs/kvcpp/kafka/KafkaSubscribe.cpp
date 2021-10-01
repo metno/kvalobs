@@ -177,7 +177,6 @@ KafkaSubscribe::~KafkaSubscribe() {
 KafkaSubscribe::SubscriberID KafkaSubscribe::subscribeData(
     const KvDataSubscribeInfoHelper &info, dnmi::thread::CommandQue &queue) {
   auto groupId=KvApp::getConsumerGroupId();
-  LOGDEBUG("KafkaSubscribe::subscribeData: kafka consumer group id: '" << groupId << "'.");
   return subscribeDataWithGroupId(info, queue, groupId);
 }
 
@@ -190,11 +189,11 @@ KafkaSubscribe::SubscriberID KafkaSubscribe::subscribeDataWithGroupId(const KvDa
           },
           domain_, brokers_, groupId));
 
+  LOGINFO("SubscribeData: Consumer group id: '" << groupId << "'. topic: '" << runner->getTopic() <<"'.");
   std::string ret = uniqueString();
   consumers_[ret] = std::make_pair(runner,
                                    std::thread([runner]() {runner->run();}));
   return ret;
-
 }
 
 

@@ -56,6 +56,7 @@ class MockKvApp : public kvservice::KvApp {
 
   MOCK_METHOD2(subscribeDataNotify, SubscriberID( const kvservice::KvDataSubscribeInfoHelper &info, dnmi::thread::CommandQue &que ));
   MOCK_METHOD2(subscribeData, SubscriberID( const kvservice::KvDataSubscribeInfoHelper &info, dnmi::thread::CommandQue &que ));
+  MOCK_METHOD3(subscribeDataWithGroupId, SubscriberID( const kvservice::KvDataSubscribeInfoHelper &info, dnmi::thread::CommandQue &que, const std::string &groupId ));
   MOCK_METHOD1(subscribeKvHint, SubscriberID( dnmi::thread::CommandQue &que ));
   MOCK_METHOD1(unsubscribe, void( const SubscriberID &subscriberid ));
   MOCK_METHOD0(unsubscribeAll, void());

@@ -55,7 +55,8 @@ int openFile(const std::string &file, std::string *err) {
     msg[BUF_SIZE-1]='\0';
     std::ostringstream o;
     o << "Faile to creat or open log file '" << file << "'. " << msg;
-    *err = o.str();
+    if( err )
+      *err = o.str();
     LOGWARN("Error when creating/open log file '" << file << "'. " << msg);
     return -1;
   } 
