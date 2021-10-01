@@ -34,9 +34,10 @@
 #include <string>
 #include <memory>
 #include <list>
+#include <vector>
 
 namespace RdKafka {
-class Consumer;
+class KafkaConsumer;
 class Topic;
 class Conf;
 class Message;
@@ -63,17 +64,21 @@ class KafkaConsumer {
  public:
 
   KafkaConsumer(const std::string & topic,
-                const std::string & brokers);
+                const std::string & brokers,
+                const std::string & groupId="");
 
   virtual ~KafkaConsumer();
 
+  std::string getTopic()const;
   /**
+   * DEPRECRATED, no-op, keept for backward source compatibility.
    * When getting data, start at the earliest possible time instead of getting
    * only data produced after start() has been called.
    */
   void startAtEarliestData();
 
   /**
+   * DEPRECRATED, no-op, keept for backward source compatibility.
    * Store place in queue to the given file, also read it at startup if it
    * exists, to pick up where you left. Note that the file is not written for
    * every message, so expect duplicates if you restart your service
@@ -127,16 +132,15 @@ class KafkaConsumer {
  private:
   typedef std::function<void(RdKafka::Message & message)> BasicHandler;
   void handle_(RdKafka::Message & message);
-  void createConnection_(const std::string & brokers);
-  void createTopic_();
-
+  void createConnection_(const std::string & brokers, const std::string & groupId);
+  void subscribe_();
+  
   bool initialized_;
   bool stopping_;
-  std::unique_ptr<RdKafka::Consumer> consumer_;
-  std::unique_ptr<RdKafka::Topic> topic_;
-  std::unique_ptr<RdKafka::Conf> topicConf_;
-  std::string topicName_;
-  int64_t topicOffset_;
+  std::unique_ptr<RdKafka::KafkaConsumer> consumer_;
+  std::vector<std::string> topics_;
+  std::string groupId_;
+  
 
   static std::list<KafkaConsumer *> allConsumers_;
 

@@ -3,11 +3,13 @@ noinst_LTLIBRARIES = libkafkakvapp.la
 libkafkakvappincludedir =  $(pkgincludedir)/kvcpp/kafka
 libkafkakvappinclude_HEADERS = \
 	KafkaKvApp.h \
-	KafkaSubscribe.h
+	KafkaSubscribe.h \
+	creategroupid.h
 
 libkafkakvapp_la_SOURCES = \
 	KafkaKvApp.cpp \
-	KafkaSubscribe.cpp
+	KafkaSubscribe.cpp \
+	creategroupid.cpp
 
 libkafkakvapp_la_CPPFLAGS = \
 	-D_REENTRANT \

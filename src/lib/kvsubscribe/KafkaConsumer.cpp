@@ -26,7 +26,7 @@
  with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
+#include <iostream>
 #include <stdexcept>
 #include <librdkafka/rdkafkacpp.h>
 #include "KafkaConsumer.h"
@@ -37,13 +37,17 @@ namespace subscribe {
 std::list<KafkaConsumer *> KafkaConsumer::allConsumers_;
 
 KafkaConsumer::KafkaConsumer(const std::string & topic,
-                             const std::string & brokers)
+                             const std::string & brokers,
+                             const std::string & groupId)
     : initialized_(false),
       stopping_(false),
-      topicConf_(RdKafka::Conf::create(RdKafka::Conf::CONF_TOPIC)),
-      topicName_(topic),
-      topicOffset_(RdKafka::Topic::OFFSET_END) {
-  createConnection_(brokers);
+      groupId_(groupId)
+{
+  topics_.push_back(topic);
+  if( groupId.empty() ) {
+    
+  }
+  createConnection_(brokers, groupId);
   allConsumers_.push_back(this);
 }
 
@@ -52,8 +56,13 @@ KafkaConsumer::~KafkaConsumer() {
   allConsumers_.remove(this);
 }
 
+std::string KafkaConsumer::getTopic()const{
+  return topics_.empty()?"":*topics_.begin();
+}
+
 void KafkaConsumer::startAtEarliestData() {
-  topicOffset_ = RdKafka::Topic::OFFSET_BEGINNING;
+  //no_op, keept for source compabitilty.
+
 }
 
 namespace {
@@ -65,11 +74,8 @@ void set(RdKafka::Conf & c, const std::string & key, const std::string & value) 
 }
 
 void KafkaConsumer::startAtStored(const std::string & fileName) {
-  topicOffset_ = RdKafka::Topic::OFFSET_STORED;
-  set(* topicConf_, "offset.store.method", "file");
-  set(* topicConf_, "offset.store.path", fileName);
-  set(* topicConf_, "offset.store.sync.interval.ms", "0");
-  set(* topicConf_, "auto.commit.interval.ms", "1000");
+  //no_op, keept for source compabitilty.
+
 }
 
 
@@ -90,23 +96,25 @@ class FunctionConsumer : public RdKafka::ConsumeCb {
 void KafkaConsumer::run() {
   stopping_ = false;
 
-  while (not stopping_)
+  while (not stopping_) {
     runOnce(1000);
+  }
 }
 
 void KafkaConsumer::runOnce(unsigned timeoutInMilliSeconds) {
   if (!initialized_) {
-    createTopic_();
+    subscribe_();
     initialized_ = true;
   }
 
-  FunctionConsumer consumer([this](RdKafka::Message & message) {
-    handle_(message);
-  });
+  RdKafka::Message *msg = consumer_->consume(timeoutInMilliSeconds);
+  if (!msg ) {
+    return;
+  }
 
-  consumer_->consume_callback(topic_.get(), 0, timeoutInMilliSeconds, &consumer,
-                              nullptr);
-  consumer_->poll(0);
+  handle_(*msg);
+
+  delete msg;
 }
 
 void KafkaConsumer::stop() {
@@ -120,6 +128,9 @@ void KafkaConsumer::stopAll() {
 
 void KafkaConsumer::handle_(RdKafka::Message & message) {
   switch (message.err()) {
+    case RdKafka::ERR__TIMED_OUT:
+      break;
+
     case RdKafka::ERR_NO_ERROR:
       try {
         data((char*) message.payload(), message.len());
@@ -127,36 +138,43 @@ void KafkaConsumer::handle_(RdKafka::Message & message) {
         error(0, e.what());
       }
       break;
+
     case RdKafka::ERR__PARTITION_EOF:
       // ignored
       break;
+
     default:
       error(message.err(), message.errstr());
       break;
   }
 }
 
-void KafkaConsumer::createConnection_(const std::string & brokers) {
+void KafkaConsumer::createConnection_(const std::string & brokers, const std::string & groupId) {
   std::string errstr;
   std::unique_ptr<RdKafka::Conf> conf(
       RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL));
   set(* conf, "metadata.broker.list", brokers);
-  consumer_.reset(RdKafka::Consumer::create(conf.get(), errstr));
+    
+  if ( groupId.empty() ) {
+    throw std::runtime_error("A Kafka Consumer group id must be given."); 
+  }
+  
+  set(* conf, "group.id", groupId);
+  set(*conf, "partition.assignment.strategy", "range");
+
+  consumer_.reset(RdKafka::KafkaConsumer::create(conf.get(), errstr));
   if (!consumer_)
     throw std::runtime_error("Failed to create consumer: " + errstr);
 }
 
-void KafkaConsumer::createTopic_() {
+void KafkaConsumer::subscribe_() {
   std::string errstr;
-  topic_.reset(
-      RdKafka::Topic::create(consumer_.get(), topicName_, topicConf_.get(), errstr));
-  if (!topic_)
-    throw std::runtime_error("Failed to create topic: " + errstr);
-
-  RdKafka::ErrorCode resp = consumer_->start(topic_.get(), 0, topicOffset_);
-  if (resp != RdKafka::ERR_NO_ERROR)
+  
+  RdKafka::ErrorCode resp = consumer_->subscribe(topics_);
+  if (resp != RdKafka::ERR_NO_ERROR) {
     throw std::runtime_error(
-        "Failed to start consumer: " + RdKafka::err2str(resp));
+        "Failed to susbscribe to topic (" + *topics_.begin() + "): " + RdKafka::err2str(resp));
+  }
 }
 
 }

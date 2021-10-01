@@ -1,5 +1,5 @@
 AC_PREREQ([2.59])
-AC_INIT([kvalobs], [6.0.0~rc3], [kvoss@met.no])
+AC_INIT([kvalobs], [7.0.0~rc1], [kvoss@met.no])
 AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -27,8 +27,8 @@ export PKG_CONFIG_PATH=`pwd`"/kvsupport/build$prefix/lib/kvalobs/lib/pkgconfig:$
 echo "PKG_CONFIG_PATH: '${PKG_CONFIG_PATH}'"
 #AC_CONFIG_SUBDIRS([src/lib/libhttpserver/libhttpserver-0.17.5])
 
-AC_SUBST([OLD_KVALOBSLIBS_SO_VERSION], [8:0:0])
-AC_SUBST([KVALOBSLIBS_SO_VERSION], [9:0:0])
+AC_SUBST([OLD_KVALOBSLIBS_SO_VERSION], [9:0:0])
+AC_SUBST([KVALOBSLIBS_SO_VERSION], [10:0:0])
 
 AC_CONFIG_FILES([Makefile
                  kvsupport/Makefile

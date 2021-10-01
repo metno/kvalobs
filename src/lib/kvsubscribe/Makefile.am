@@ -18,7 +18,8 @@ libkvalobs_kvsubscribe_la_SOURCES = \
 	SendDataJsonResult.h SendDataJsonResult.cc \
 	ProducerCommand.h ProducerCommand.cc \
 	KafkaProducerThread.h KafkaProducerThread.cc \
-	KvDataSerializeCommand.h KvDataSerializeCommand.cc
+	KvDataSerializeCommand.h KvDataSerializeCommand.cc \
+	creategroupid.h creategroupid.cpp
 
 libkvalobs_kvsubscribe_la_LIBADD = \
 	$(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
@@ -42,7 +43,8 @@ kvsubscribeinclude_HEADERS = \
 	ProducerCommand.h \
 	KafkaProducerThread.h \
 	KvDataSerializeCommand.h \
-	KafkaConfig.h 
+	KafkaConfig.h \
+	creategroupid.h
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libkvsubscribe.pc

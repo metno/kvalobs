@@ -58,7 +58,7 @@ class DataSubscriber : public KafkaConsumer {
   typedef std::function<void(const ::kvalobs::serialize::KvalobsData &)> Handler;
 
   DataSubscriber(Handler handler, const std::string & domain,
-                 const std::string & brokers = "localhost");
+                 const std::string & brokers = "localhost", const std::string &groupId="");
 
   /**
    * The identifying string for this message stream

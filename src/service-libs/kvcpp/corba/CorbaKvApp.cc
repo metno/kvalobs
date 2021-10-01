@@ -575,6 +575,12 @@ string CorbaKvApp::subscribeData(const KvDataSubscribeInfoHelper &info,
   return string();
 }
 
+
+string CorbaKvApp::subscribeDataWithGroupId(const KvDataSubscribeInfoHelper &info,
+                                     dnmi::thread::CommandQue &queue, const std::string &groupId /*ignored*/){
+  return subscribeData(info, queue);
+}
+
 string CorbaKvApp::subscribeKvHint(dnmi::thread::CommandQue &que) {
   HintSubscriber *sub;
   kvHintSubscriber_var refSub;

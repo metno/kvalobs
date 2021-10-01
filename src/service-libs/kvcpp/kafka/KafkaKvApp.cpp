@@ -7,6 +7,7 @@
 
 #include "KafkaKvApp.h"
 #include <kvsubscribe/DataSubscriber.h>
+#include <milog/milog.h>
 
 namespace kvservice {
 namespace kafka {
@@ -30,6 +31,7 @@ std::string getDomain(miutil::conf::ConfSection * conf) {
 std::string getBrokers(miutil::conf::ConfSection * conf) {
   return value(conf, "kafka.brokers", "localhost");
 }
+
 }
 
 KafkaKvApp::KafkaKvApp(int &argc, char **argv, miutil::conf::ConfSection *conf,
@@ -41,6 +43,7 @@ KafkaKvApp::KafkaKvApp(int &argc, char **argv, miutil::conf::ConfSection *conf,
 KafkaKvApp::~KafkaKvApp() {
 }
 
+
 KafkaKvApp::SubscriberID KafkaKvApp::subscribeDataNotify(
     const KvDataSubscribeInfoHelper &info, dnmi::thread::CommandQue &queue) {
   return subscriptionHandler_.subscribeDataNotify(info, queue);
@@ -48,8 +51,16 @@ KafkaKvApp::SubscriberID KafkaKvApp::subscribeDataNotify(
 
 KafkaKvApp::SubscriberID KafkaKvApp::subscribeData(
     const KvDataSubscribeInfoHelper &info, dnmi::thread::CommandQue & queue) {
-  return subscriptionHandler_.subscribeData(info, queue);
+  auto groupId=getConsumerGroupId();
+  LOGDEBUG("KafkaKvApp::subscribeData: groupId: '" << groupId << "'.");
+  return subscriptionHandler_.subscribeDataWithGroupId(info, queue, groupId);
 }
+
+KafkaKvApp::SubscriberID KafkaKvApp::subscribeDataWithGroupId(
+    const KvDataSubscribeInfoHelper &info, dnmi::thread::CommandQue & queue, const std::string &groupId) {
+  return subscriptionHandler_.subscribeDataWithGroupId(info, queue, groupId);
+}
+
 
 //KafkaKvApp::SubscriberID KafkaKvApp::subscribeKvHint( dnmi::thread::CommandQue &queue )
 //{

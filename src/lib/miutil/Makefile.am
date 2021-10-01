@@ -29,7 +29,10 @@ libkvalobs_miutil_la_SOURCES = \
    strerror.h strerror.cc \
    SemiUniqueName.h SemiUniqueName.cc \
    LogAppender.h LogAppender.cpp \
-   makeUniqueFile.h makeUniqueFile.cpp
+   makeUniqueFile.h makeUniqueFile.cpp \
+   getprogname.h getprogname.cc \
+   gethostname.h gethostname.cc \
+   getusername.h getusername.cc 
 
 libkvalobs_miutil_la_CPPFLAGS = $(AM_CPPFLAGS) $(putools_CFLAGS)  -fPIC
 libkvalobs_miutil_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@ -fPIC
@@ -46,9 +49,8 @@ miutilinclude_HEADERS = \
   miTimeParse.h trimstr.h base64.h gettimeofday.h \
   splitstr.h timeconvert.h strerror.h signalhelpers.h \
   sockethelper.h simplesocket.h aexecclient.h SemiUniqueName.h \
-  LogAppender.h makeUniqueFile.h
-
-
+  LogAppender.h makeUniqueFile.h getprogname.h gethostname.h getusername.h
+ 
 if HAVE_GMOCK 
 
 TESTS = libmiutiltest

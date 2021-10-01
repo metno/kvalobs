@@ -118,6 +118,13 @@ class FakeKvApp : public kvservice::KvApp {
     return "#id";
   }
 
+  virtual SubscriberID subscribeDataWithGroupId(
+      const kvservice::KvDataSubscribeInfoHelper &info,
+      dnmi::thread::CommandQue &que, const std::string &consumerGroupID) {
+    return "#id";
+  }
+
+
   virtual SubscriberID subscribeKvHint(dnmi::thread::CommandQue &que) {
     return "#id";
   }

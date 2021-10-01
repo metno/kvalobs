@@ -56,6 +56,12 @@ class KafkaSubscribe : public virtual details::KvalobsSubscribe,
   virtual SubscriberID subscribeData(const KvDataSubscribeInfoHelper &info,
                                      dnmi::thread::CommandQue &queue);
 
+  /**
+   * Subscribe on data with a kafka consumer group, group.id
+   */
+  virtual SubscriberID subscribeDataWithGroupId(const KvDataSubscribeInfoHelper &info,
+                                     dnmi::thread::CommandQue &queue, const std::string &groupId);
+
   virtual SubscriberID subscribeDataNotify(
       const KvDataSubscribeInfoHelper &info, dnmi::thread::CommandQue &que);
 

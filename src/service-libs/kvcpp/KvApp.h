@@ -29,9 +29,11 @@
 #ifndef SRC_SERVICE_LIBS_KVCPP_KVAPP_H_
 #define SRC_SERVICE_LIBS_KVCPP_KVAPP_H_
 
+#include <boost/filesystem.hpp>
 #include <boost/utility.hpp>
 #include <list>
 #include <string>
+#include <memory>
 #include "dnmithread/CommandQue.h"
 #include "kvalobs/kvData.h"
 #include "kvalobs/kvModelData.h"
@@ -59,6 +61,8 @@ namespace kvservice {
  */
 
 namespace details {
+
+
 /**
  * \brief Various functions to get data from kvalobs.
  */
@@ -253,6 +257,20 @@ class KvalobsSubscribe {
   }
 
   /**
+   * getGroupIdFromConf, returns the group id from the groupIdKey in the configuration file.
+   * If the groupIdKey is an empty string it search the for the following keys in order.
+   * 
+   *   - kafka.groupid.appname
+   *   - kafka.gropuid
+   * 
+   *  appname is what was given when the AppClass was created. Can also set it with.
+   * KvApp::appName="ny app name"
+   * 
+   * Returns the groupId or an empty string if no groupId is given for the key.
+   */
+  //virtual std::string getConsumerGroupIdFromConf(const std::string &groupIdKey="")=0;
+
+  /**
    * \brief Subscribe to DataNotify events.
    *
    * The events is posted on the que as DataNotifyEvent. The
@@ -275,6 +293,20 @@ class KvalobsSubscribe {
    */
   virtual SubscriberID subscribeData(const KvDataSubscribeInfoHelper &info,
                                      dnmi::thread::CommandQue &que) = 0;
+  /**
+   * \brief Subscribe to Data events, given an kafka consumer group id.
+   *
+   * The events is posted on the que as DataEvent. The DataEvent
+   * is declared in the file \em kvevents.h.
+   *
+   * \param que The que to receive DataEvent.
+   * \param groupId Kafka consumer group id.
+   * \return subscriberid on success and a empty string on failure.
+   */
+  
+  virtual SubscriberID subscribeDataWithGroupId(const KvDataSubscribeInfoHelper &info,
+                                     dnmi::thread::CommandQue &queue, const std::string &groupId)=0;
+
 
   /**
    * \brief Subscribe to Hint events.
@@ -352,6 +384,10 @@ class KvAppControl {
 };
 }  // namespace details
 
+
+miutil::conf::ConfSection * readConf(const boost::filesystem::path & configFile);
+
+
 /**
  * \brief A application singleton class for kvservice applications.
  *
@@ -364,10 +400,25 @@ class KvApp : private boost::noncopyable, public virtual details::KvalobsGet,
     public virtual details::KvalobsSend, public virtual details::KvalobsSubscribe,
     public virtual details::KvAppControl {
  public:
+
+  /**
+   * Set the name of the app.
+   */  
+  static std::string appName;
   /**
    * \brief A pointer to the KvApp singleton, if one has been instatiated.
    */
   static KvApp *kvApp;
+
+  static std::shared_ptr<miutil::conf::ConfSection> getConfiguration(std::shared_ptr<miutil::conf::ConfSection> preferredConf, const std::string & application,
+                                                            bool reset = false);
+  static std::shared_ptr<miutil::conf::ConfSection> getDefaultConfiguration(const std::string & application="");
+
+  static std::string getConsumerGroupId(const std::string &consumerGroupKIdKey="");
+
+  static std::string getConfigValue(const std::string & key,
+                  const std::string & fallback);
+
 
   /**
    * Create a KvApp object
