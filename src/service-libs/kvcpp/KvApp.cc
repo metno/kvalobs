@@ -122,10 +122,6 @@ std::string KvApp::getConfigValue(const std::string & key,
 
   return value.front().valAsString();
 }
-
-
-
-
 std::string KvApp::getConsumerGroupId(const std::string &consumerGroupIdKey) {
   auto progname=appName;
   std::string idkey("kafka.groupid."+progname);
