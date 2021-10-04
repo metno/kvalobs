@@ -27,7 +27,7 @@ Description: Client library for kvalobs
 Package: libkvalobs-dev
 Section: libdevel
 Architecture: any
-Depends: libkvalobs9 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends} 
+Depends: libkvalobs10 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends} 
 Description: Client library for kvalobs
  May be used to write applications connecting to kvalobs
 
