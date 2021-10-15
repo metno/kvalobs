@@ -1,3 +1,4 @@
+pkglibdir = $(libdir)/@PACKAGE_NAME@@KVALOBSLIBS_BIN_VERSION@
 noinst_LTLIBRARIES = libsqlkvapp.la
 
 libsqlkvappincludedir =  $(pkgincludedir)/kvcpp/sql

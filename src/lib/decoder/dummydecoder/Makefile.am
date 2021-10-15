@@ -1,3 +1,4 @@
+pkglibdir = $(libdir)/@PACKAGE_NAME@@KVALOBSLIBS_BIN_VERSION@
 decoderdir=$(pkglibdir)/decode
 
 decoder_LTLIBRARIES = dummydecoder.la

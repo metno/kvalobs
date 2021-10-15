@@ -1,3 +1,4 @@
+pkglibdir = $(libdir)/@PACKAGE_NAME@@KVALOBSLIBS_BIN_VERSION@
 AM_CPPFLAGS = -I $(top_srcdir)/src/lib
 
 lib_LTLIBRARIES = libkvalobs_dnmithread.la

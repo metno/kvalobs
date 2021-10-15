@@ -1,4 +1,5 @@
 
+pkglibdir = $(libdir)/@PACKAGE_NAME@@KVALOBSLIBS_BIN_VERSION@
 if HAVE_GMOCK
 libmockkvappincludedir =  $(pkgincludedir)/kvcpp/mock
 libmockkvappinclude_HEADERS = \

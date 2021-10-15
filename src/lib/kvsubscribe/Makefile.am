@@ -1,3 +1,4 @@
+pkglibdir = $(libdir)/@PACKAGE_NAME@@KVALOBSLIBS_BIN_VERSION@
 lib_LTLIBRARIES = libkvalobs_kvsubscribe.la
 
 libkvalobs_kvsubscribe_la_CPPFLAGS = \
@@ -28,7 +29,7 @@ libkvalobs_kvsubscribe_la_LIBADD = \
 
 libkvalobs_kvsubscribe_la_LDFLAGS = \
 	-version-info @KVALOBSLIBS_SO_VERSION@ \
-	-R "$(libdir)/@PACKAGE_NAME@/lib"
+	-R "$(pkglibdir)/lib"
 
 kvsubscribeincludedir = $(pkgincludedir)/kvsubscribe
 	

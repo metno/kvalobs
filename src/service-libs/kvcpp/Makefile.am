@@ -1,3 +1,4 @@
+pkglibdir = $(libdir)/@PACKAGE_NAME@@KVALOBSLIBS_BIN_VERSION@
 SUBDIRS = corba sql kafka mock
 
 lib_LTLIBRARIES = libkvalobs_kvcpp.la
@@ -39,7 +40,7 @@ kvcppinclude_HEADERS = \
 	
 libkvalobs_kvcpp_la_LDFLAGS= \
 	-version-info @KVALOBSLIBS_SO_VERSION@ \
-	-R "$(libdir)/@PACKAGE_NAME@/lib"
+	-R "$(pkglibdir)/lib"
 
 libkvalobs_kvcpp_la_LIBADD = \
 	$(top_builddir)/src/service-libs/kvcpp/kafka/libkafkakvapp.la \

@@ -1,6 +1,7 @@
+pkglibdir = $(libdir)/@PACKAGE_NAME@@KVALOBSLIBS_BIN_VERSION@
 bin_SCRIPTS = kvstart kvstop kvrestart kvstatus kv2norcom \
               kv_get_stinfosys_params kvsync_files
-scriptdir = $(libdir)/kvalobs
+scriptdir = $(pkglibdir)
 script_DATA = tool_funcs.sh
 
 EXTRA_DIST = kvrestart.sh kvstart.sh kvstop.sh kvstatus.sh\

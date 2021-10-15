@@ -1,3 +1,4 @@
+pkglibdir = $(libdir)/@PACKAGE_NAME@@KVALOBSLIBS_BIN_VERSION@
 if BUILD_MODEL2KV
 bin_PROGRAMS = model2kv
 else

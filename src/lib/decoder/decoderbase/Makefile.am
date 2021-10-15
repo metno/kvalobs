@@ -1,3 +1,4 @@
+pkglibdir = $(libdir)/@PACKAGE_NAME@@KVALOBSLIBS_BIN_VERSION@
 SUBDIRS=test
 AM_CPPFLAGS = \
   -I$(top_srcdir)/src \

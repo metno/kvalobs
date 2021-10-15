@@ -1,3 +1,4 @@
+
 if MUST_COMPILE_GTEST
 gtestdir=${checkdir}
 gtest_LIBRARIES = libgtest.a libgtest_main.a

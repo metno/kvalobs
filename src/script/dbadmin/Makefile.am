@@ -1,3 +1,4 @@
+pkglibdir = $(libdir)/@PACKAGE_NAME@@KVALOBSLIBS_BIN_VERSION@
 sqldir = $(datadir)/kvalobs/db
 
 sql_DATA = pgclean.sql pgclean_mini.sql

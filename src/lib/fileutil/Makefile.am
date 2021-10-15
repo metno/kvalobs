@@ -1,4 +1,5 @@
 AM_CPPFLAGS = -I $(top_srcdir)/src/lib
+pkglibdir = $(libdir)/@PACKAGE_NAME@@KVALOBSLIBS_BIN_VERSION@
 
 lib_LTLIBRARIES = libkvalobs_fileutil.la
 
