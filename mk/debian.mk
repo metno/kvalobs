@@ -20,6 +20,7 @@ prepare-debian:
 	rm -rf $(DEBIAN_DIR)
 	mkdir -p $(DEBIAN_DIR)
 	(cd $(top_srcdir)/debian_files/; tar cpf - --exclude='.svn' *) | (cd $(DEBIAN_DIR); tar xpf -) 
+	(cp $(top_builddir)/debian_files/* $(DEBIAN_DIR))
 	chmod 774 $(DEBIAN_DIR)/rules
 	if [ -e $(DEBIAN_DIR)/templates -a -d $(DEBIAN_DIR)/po ]; then  debconf-updatepo --podir=$(DEBIAN_DIR)/po; fi
 

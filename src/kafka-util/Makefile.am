@@ -1,3 +1,4 @@
+pkglibdir = $(libdir)/@PACKAGE_NAME@@KVALOBSLIBS_BIN_VERSION@
 AM_DEFAULT_SOURCE_EXT = .cpp
 
 LDADD = $(top_builddir)/src/lib/kvsubscribe/libkvalobs_kvsubscribe.la
@@ -9,7 +10,7 @@ AM_CPPFLAGS = 	-I$(top_srcdir)/src \
 bin_PROGRAMS = kvsubscribe kvalobs-queue-transfer
 
 kvsubscribe_LDFLAGS = \
-	-R "$(libdir)/@PACKAGE_NAME@/lib" -R "$(rdkafka_LIBDIR)" 
+	-R "$(pkglibdir)/lib" -R "$(rdkafka_LIBDIR)" 
 
 kvsubscribe_LDADD = \
 	$(LDADD) \
@@ -28,7 +29,7 @@ kvalobs_queue_transfer_CPPFLAGS = \
 	$(rdkafka_CFLAGS)
 
 kvalobs_queue_transfer_LDFLAGS = \
-	-R "$(libdir)/@PACKAGE_NAME@/lib" -R "$(rdkafka_LIBDIR)"
+	-R "$(pkglibdir)/lib" -R "$(rdkafka_LIBDIR)"
 	
 kvalobs_queue_transfer_LDADD = \
 	$(LDADD) \

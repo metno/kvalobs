@@ -59,7 +59,7 @@ case $1 in
 	--kvstatedir) echo @localstatedir@/@PACKAGE@ ;;
 	--rundir) echo @localstatedir@/lib/@PACKAGE@/run ;;
 	--logdir) echo @localstatedir@/log/@PACKAGE@ ;;
-	--pkglibdir) echo @libdir@/@PACKAGE@ ;;
+	--pkglibdir) echo @libdir@/@PACKAGE@@KVALOBSLIBS_BIN_VERSION@ ;;
 	--version) echo $VERSION ;;
 	--help) 
 		echo $VERSION

@@ -4,7 +4,7 @@ librdkafka_src = $(librdkafka_version).tar.gz
 libhttpserver_version = libhttpserver-0.18.2
 libhttpserver_src = $(libhttpserver_version).tar.gz
 
-sqlite3_version = sqlite-autoconf-3310100
+sqlite3_version = sqlite-autoconf-3360000
 sqlite3_src=$(sqlite3_version).tar.gz
 
 
@@ -23,8 +23,8 @@ librdkafka:
 		cp $(top_srcdir)/kvsupport/$(librdkafka_src) $(abs_top_builddir)/kvsupport ; \
 		tar zxpf $(librdkafka_src) ; \
 		(	cd $(librdkafka_version) ; \
-			export LD_RUN_PATH="$(prefix)/lib/kvalobs/lib" ; \
-			./configure --prefix=$(prefix)/lib/kvalobs ; \
+			export LD_RUN_PATH="$(prefix)/lib/kvalobs@KVALOBSLIBS_BIN_VERSION@/lib" ; \
+			./configure --prefix=$(prefix)/lib/kvalobs@KVALOBSLIBS_BIN_VERSION@ ; \
 			make ; \
 			make DESTDIR=$(abs_top_builddir)/kvsupport/build install ) ; \
 		touch do-recheck ; \
@@ -38,15 +38,15 @@ libhttpserver:
 		cp $(top_srcdir)/kvsupport/$(libhttpserver_src) $(abs_top_builddir)/kvsupport ; \
 		tar zxpf $(libhttpserver_src) ; \
 		(	cd $(libhttpserver_version) ; \
-			export LD_RUN_PATH="$(prefix)/lib/kvalobs/lib" ; \
-			./bootstrap --build --prefix=$(prefix)/lib/kvalobs ; \
+			export LD_RUN_PATH="$(prefix)/lib/kvalobs@KVALOBSLIBS_BIN_VERSION@/lib" ; \
+			./bootstrap --build --prefix=$(prefix)/lib/kvalobs@KVALOBSLIBS_BIN_VERSION@ ; \
 			mkdir -p build ; \
 			cd build ; \
 			#Hack to build on xenial \
 			if [ $(microhttpd_version) = "0.9.44" ]; then \
-				../configure	--prefix=$(prefix)/lib/kvalobs --enable-epoll=no ; \
+				../configure	--prefix=$(prefix)/lib/kvalobs@KVALOBSLIBS_BIN_VERSION@ --enable-epoll=no ; \
 			else \
-				../configure	--prefix=$(prefix)/lib/kvalobs ; \
+				../configure	--prefix=$(prefix)/lib/kvalobs@KVALOBSLIBS_BIN_VERSION@ ; \
 			fi ;\
 			make ; \
 			make check ; \
@@ -63,8 +63,8 @@ libsqlite:
 		cp $(top_srcdir)/kvsupport/$(sqlite3_src) $(abs_top_builddir)/kvsupport ; \
 		tar zxpf $(sqlite3_src) ; \
 		(	cd $(sqlite3_version) ; \
-			export LD_RUN_PATH="$(prefix)/lib/kvalobs/lib" ; \
-			./configure --prefix=$(prefix)/lib/kvalobs --enable-shared=no --with-pic; \
+			export LD_RUN_PATH="$(prefix)/lib/kvalobs@KVALOBSLIBS_BIN_VERSION@/lib" ; \
+			./configure --prefix=$(prefix)/lib/kvalobs@KVALOBSLIBS_BIN_VERSION@ --enable-shared=no --with-pic; \
 			make ; \
 			make DESTDIR=$(abs_top_builddir)/kvsupport/build install ) ; \
 		touch do-recheck ; \

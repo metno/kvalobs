@@ -1,3 +1,4 @@
+pkglibdir = $(libdir)/@PACKAGE_NAME@@KVALOBSLIBS_BIN_VERSION@
 bin_PROGRAMS = kv2kro
 
 kv2kro_SOURCES = GetData.cc GetData.h \

@@ -1,3 +1,4 @@
+pkglibdir = $(libdir)/@PACKAGE_NAME@@KVALOBSLIBS_BIN_VERSION@
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/src \
 	-I$(top_srcdir)/src/lib \
@@ -35,7 +36,7 @@ kvDataInputd_SOURCES=\
 kvDataInputd_CPPFLAGS = $(AM_CPPFLAGS) $(libxmlpp_CFLAGS)
 kvDataInputd_LDFLAGS = \
    -pthread -export-dynamic \
-   -R "$(libdir)/@PACKAGE_NAME@/lib" \
+   -R "$(pkglibdir)/lib" \
    -R "$(rdkafka_LIBDIR)" \
    -R "$(libhttpserver_LIBDIR)" \
    -R "/usr/local/lib"

@@ -1,3 +1,4 @@
+pkglibdir = $(libdir)/@PACKAGE_NAME@@KVALOBSLIBS_BIN_VERSION@
 AM_CPPFLAGS = -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib/ -I$(top_builddir)/src/lib/kvskel
 
 lib_LTLIBRARIES = libkvalobs_decodeutility.la

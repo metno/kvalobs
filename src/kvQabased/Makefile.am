@@ -1,5 +1,5 @@
 #ACLOCAL_AMFLAGS = -I m4
-
+pkglibdir = $(libdir)/@PACKAGE_NAME@@KVALOBSLIBS_BIN_VERSION@
 AM_CPPFLAGS = \
 	-I$(srcdir)/src/ \
 	-I$(top_srcdir)/src/lib \
