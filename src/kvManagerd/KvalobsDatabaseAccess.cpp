@@ -52,8 +52,8 @@ namespace {
 dnmi::db::Connection * createConnection(const std::string & databaseConnect) {
   static std::string driverId;
   if (driverId.empty()) {
-    std::string driver = kvalobs::kvPath(kvalobs::libdir)
-        + "/kvalobs/db/pgdriver.so";
+    std::string driver = kvalobs::kvPath(kvalobs::pkglibdir)
+        + "/db/pgdriver.so";
     if (!dnmi::db::DriverManager::loadDriver(driver, driverId))
       throw std::runtime_error("Unable to load driver " + driver);
   }

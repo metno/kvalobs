@@ -83,7 +83,7 @@ std::string removePassword(const std::string &connect) {
 
 dnmi::db::Connection * createConnection(std::shared_ptr<miutil::conf::ConfSection> conf) {
   std::string connectString = getValue("database.dbconnect", conf);
-  std::string driver = kvalobs::kvPath(kvalobs::libdir) + "/kvalobs/db/" + getValue("database.dbdriver", conf);
+  std::string driver = kvalobs::kvPath(kvalobs::pkglibdir) + "/db/" + getValue("database.dbdriver", conf);
 
   std::string driverId;
   if (!dnmi::db::DriverManager::loadDriver(driver, driverId))
