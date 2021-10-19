@@ -1,5 +1,5 @@
 AC_PREREQ([2.59])
-AC_INIT([kvalobs], [7.0.0~rc2], [kvoss@met.no])
+AC_INIT([kvalobs], [7.0.0~rc6], [kvoss@met.no])
 AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -16,18 +16,20 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AX_CXX_COMPILE_STDCXX_11(noext)
 
-
 #echo "LIBDIR: ${libdir}"
 
 #AX_SUBDIRS_CONFIGURE( [subdirs], [mandatory arguments], [possibly merged arguments], [replacement arguments], [forbidden arguments])
 #AX_SUBDIRS_CONFIGURE( [kvsupport/librdkafka-1.2.1], [--prefix=${libdir}/kvalobs], [], [--prefix=${libdir}/kvalobs], [])
 
 #export PKG_CONFIG_PATH=`pwd`"/kvsupport/build/lib/pkgconfig:${PKG_CONFIG_PATH}"
-export PKG_CONFIG_PATH=`pwd`"/kvsupport/build$prefix/lib/kvalobs/lib/pkgconfig:${PKG_CONFIG_PATH}"
+export PKG_CONFIG_PATH=`pwd`"/kvsupport/build$prefix/lib/kvalobs10/lib/pkgconfig:${PKG_CONFIG_PATH}"
 echo "PKG_CONFIG_PATH: '${PKG_CONFIG_PATH}'"
 #AC_CONFIG_SUBDIRS([src/lib/libhttpserver/libhttpserver-0.17.5])
 
 AC_SUBST([OLD_KVALOBSLIBS_SO_VERSION], [9:0:0])
+
+#KVALOBSLIBS_BIN_VERSION must match the major version of KVALOBSLIBS_SO_VERSION
+AC_SUBST([KVALOBSLIBS_BIN_VERSION], [10])
 AC_SUBST([KVALOBSLIBS_SO_VERSION], [10:0:0])
 
 AC_CONFIG_FILES([Makefile
@@ -105,6 +107,13 @@ AC_CONFIG_FILES([Makefile
                  src/lib/kvskel/libkvalobs_kvskel.pc
                  src/lib/kvskel/libkvalobs_kvadmininterface.pc
                  src/lib/kvsubscribe/libkvsubscribe.pc
+                 debian_files/kvalobs-init.postinst
+                 debian_files/kvalobs-init.postrm
+                 debian_files/kvalobs.install
+                 debian_files/kvalobs.postinst
+                 debian_files/kvalobs.postrm 
+                 debian_files/libkvalobs10.install
+                 debian_files/rules
 ])
 
 #src/tools/kvpush/Makefile

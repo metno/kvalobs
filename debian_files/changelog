@@ -1,3 +1,23 @@
+kvalobs (7.0.0~rc6-1) bionic; urgency=medium
+  * Fix more dbdriver path in kvcpp.
+  
+ -- Borge Moe <borge.moe@met.no>  Tue, 19 Oct 2021 09:15:00 +0200
+
+kvalobs (7.0.0~rc5-1) bionic; urgency=medium
+  * Fix dbdriver path in kvcpp.
+  
+ -- Borge Moe <borge.moe@met.no>  Mon, 18 Oct 2021 10:45:00 +0200
+
+kvalobs (7.0.0~rc4-1) bionic; urgency=medium
+  * Package rebuild bionic.
+  
+ -- Borge Moe <borge.moe@met.no>  Fri, 15 Oct 2021 11:00:00 +0200
+
+kvalobs (7.0.0~rc3-1) bionic; urgency=medium
+  * Package rebuild bionic.
+  
+ -- Borge Moe <borge.moe@met.no>  Thu, 14 Oct 2021 15:00:00 +0200
+
 kvalobs (7.0.0~rc2-1) xenial; urgency=medium
   * Package fix.
   
