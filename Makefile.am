@@ -1,3 +1,5 @@
+pkglibdir = $(libdir)/@PACKAGE_NAME@@KVALOBSLIBS_BIN_VERSION@
+
 SUBDIRS =  kvsupport share src doc
 
 ACLOCAL_AMFLAGS = -I m4
@@ -14,10 +16,10 @@ install-data-hook:
 	$(install_sh) -m 755 -d $(DESTDIR)/$(localstatedir)/lib/@PACKAGE_NAME@/service/subscribers
 	$(install_sh) -m 755 -d $(DESTDIR)/$(localstatedir)/log/@PACKAGE_NAME@
 	$(install_sh) -m 755 -d $(DESTDIR)/$(localstatedir)/log/@PACKAGE_NAME@/html
-	$(install_sh) -m 755 -d $(DESTDIR)/$(libdir)/@PACKAGE_NAME@/lib
+	$(install_sh) -m 755 -d $(DESTDIR)/$(pkglibdir)/lib
 	$(install_sh) -m 755 -d $(DESTDIR)/$(datadir)/@PACKAGE_NAME@/metadata
 	cd $(DESTDIR)/$(bindir); rm -f sync_norcom_files; $(LN_S) $(bindir)/kvsync_files sync_norcom_files
-	cp -d $(libhttpserver_LIBDIR)/lib*.so* $(DESTDIR)/$(libdir)/@PACKAGE_NAME@/lib
+	cp -d $(libhttpserver_LIBDIR)/lib*.so* $(DESTDIR)/$(pkglibdir)/lib
 
 
 pkgsysconfdir = $(sysconfdir)/@PACKAGE_NAME@

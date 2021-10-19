@@ -87,6 +87,14 @@ AC_ARG_WITH([gmock-dist],
     [gmock_base=${with_gmock_dist}],
     [gmock_base=/usr])
 
+AC_ARG_WITH([gmock],
+    [AS_HELP_STRING([--without-gmock], [Disable gmock build and tests based on gmock/gtest])])
+
+
+AC_MSG_WARN([WITH_GMOCK $with_gmock"])
+
+
+
 AC_LANG_PUSH(C++)
 
 CPPFLAGS_SAVED="$CPPFLAGS"
@@ -172,10 +180,16 @@ LIBS=${OLD_LIBS}
 LDFLAGS=${ldflags_old}
 
 
-AM_CONDITIONAL(HAVE_GTEST, [test x${have_gtest} = xtrue])
-AM_CONDITIONAL(HAVE_GMOCK, [test x${have_gmock} = xtrue])
-AM_CONDITIONAL(MUST_COMPILE_GTEST, [test x${must_compile_gtest} = xtrue -a x${have_gtest} = xtrue])
-AM_CONDITIONAL(MUST_COMPILE_GMOCK, [test x${must_compile_gmock} = xtrue -a x${have_gmock} = xtrue])
+AM_CONDITIONAL(HAVE_GTEST, [test "x$with_gmock"  != "xno" -a x${have_gtest} = xtrue])
+AM_CONDITIONAL(HAVE_GMOCK, [test "x$with_gmock" != "xno" -a x${have_gmock} = xtrue])
+AM_CONDITIONAL(MUST_COMPILE_GTEST, [test "x$with_gmock" != "xno" -a x${must_compile_gtest} = xtrue])
+AM_CONDITIONAL(MUST_COMPILE_GMOCK, [test "x$with_gmock" != "xno" -a x${must_compile_gmock} = xtrue])
+
+#Disable gtest
+# AM_CONDITIONAL(HAVE_GTEST, [false])
+# AM_CONDITIONAL(HAVE_GMOCK, [false])
+# AM_CONDITIONAL(MUST_COMPILE_GTEST, [false])
+# AM_CONDITIONAL(MUST_COMPILE_GMOCK, [false])
 
 AC_SUBST(gtest_src)
 AC_SUBST(gmock_src)
