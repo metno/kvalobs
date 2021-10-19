@@ -21,9 +21,9 @@ COPY --from=kvbins /usr/lib/libkvalobs_*.so.* /usr/lib/
 COPY --from=kvbins /usr/lib/libkvalobs_*.so /usr/lib/
 COPY --from=kvbins /usr/lib/libkvalobs_*.a /usr/lib/
 COPY --from=kvbins /usr/lib/libkvalobs_*.la /usr/lib/
-COPY --from=kvbins /usr/lib/kvalobs/db/*.so*  /usr/lib/kvalobs/db/
-COPY --from=kvbins /usr/lib/kvalobs/decode/*.so*  /usr/lib/kvalobs/decode/
-COPY --from=kvbins /usr/lib/kvalobs/lib/*.so*  /usr/lib/kvalobs/lib/
+COPY --from=kvbins /usr/lib/kvalobs10/db/*.so*  /usr/lib/kvalobs10/db/
+COPY --from=kvbins /usr/lib/kvalobs10/decode/*.so*  /usr/lib/kvalobs10/decode/
+COPY --from=kvbins /usr/lib/kvalobs10/lib/*.so*  /usr/lib/kvalobs10/lib/
 COPY --from=kvbins /usr/include/kvalobs /usr/include/kvalobs
 COPY --from=kvbins /usr/lib/pkgconfig/libkv*.pc  /usr/lib/pkgconfig/
 
@@ -57,10 +57,10 @@ RUN apt-get update && apt-get -y install \
 
 #COPY --from=kvbins /usr/local/lib/libmetlibs*.so.* /usr/local/lib/
 COPY --from=kvbins /usr/lib/libkvalobs_*.so.* /usr/lib/
-COPY --from=kvbins /usr/lib/kvalobs/db/*.so*  /usr/lib/kvalobs/db/
-COPY --from=kvbins /usr/lib/kvalobs/decode/*.so*  /usr/lib/kvalobs/decode/
+COPY --from=kvbins /usr/lib/kvalobs10/db/*.so*  /usr/lib/kvalobs10/db/
+COPY --from=kvbins /usr/lib/kvalobs10/decode/*.so*  /usr/lib/kvalobs10/decode/
 COPY --from=kvbins /usr/share/kvalobs/VERSION /usr/share/kvalobs/VERSION
-COPY --from=kvbins /usr/lib/kvalobs/lib/*.so*  /usr/lib/kvalobs/lib/
+COPY --from=kvbins /usr/lib/kvalobs10/lib/*.so*  /usr/lib/kvalobs10/lib/
 
 RUN mkdir -p /var/lib/kvalobs/run
 
