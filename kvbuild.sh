@@ -9,7 +9,6 @@ kvuserid=5010
 mode=test
 
 os=focal
-#os=bionic
 registry="registry.met.no/obs/kvalobs/kvbuild"
 build=test
 targets=
@@ -24,7 +23,7 @@ nocache=
 use() {
 
   usage="\
-Usage: $0 [--help] [--staging|--prod|--test] [--kvbuild] [--buildep] [--tag tag] [--list]
+Usage: $0 [--help] [--os os] [--staging|--prod|--test] [--kvbuild] [--buildep] [--tag tag] [--list]
           [--no-cache] targets
 
 This script build kvalobs containers. 
@@ -47,6 +46,8 @@ Options:
                 and kvruntime has all runtime files needed for kvcpp
   --builddep    Build the buildep container. The dafault is not to buils
                 the container. 
+  --os os       The os to build for. There must exist deinition files in docker/kvalobs/os
+                Default: $os
   --no-cache    Do not use the docker build cache.
 
 
@@ -67,6 +68,9 @@ while test $# -ne 0; do
     --help) 
         use
         exit 0;;
+    --os)
+        os="$2"
+        shift;;
     --staging) mode=staging;;
     --prod) mode=prod;;
     --test) mode=test;;
