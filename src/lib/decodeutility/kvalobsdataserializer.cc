@@ -48,6 +48,7 @@ namespace serialize {
 
 
 namespace {
+//BCI = binary compatible interface. A strategi to make changes without breaking binary compatibility.
 struct BCI {
   string producer_;
 };
