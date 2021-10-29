@@ -39,16 +39,20 @@
 
 using namespace std;
 
-std::string dnmi::file::createPidFileName(const std::string &path,
+std::string dnmi::file::createPidFileName(const std::string &path_,  
                                           const std::string &progname) {
   struct utsname buf;
+  std::string path(path_);
   string nodename;
   string pidfilename;
 
   if (uname(&buf) == 0)
     nodename = buf.nodename;
 
-  pidfilename = path + "/" + progname;
+  if( path.rbegin() != path.rend() && *path.rbegin() != '/')
+     path += "/";
+   
+  pidfilename = path + progname;
 
   if (!nodename.empty())
     pidfilename += "-" + nodename;
