@@ -1,3 +1,9 @@
+kvalobs (7.0.0~rc7-1) bionic; urgency=medium
+  * Minor bugfix in createPidFileName.
+  
+ -- Borge Moe <borge.moe@met.no>  Fri, 29 Oct 2021 11:00:00 +0200
+
+
 kvalobs (7.0.0~rc6-1) bionic; urgency=medium
   * Fix more dbdriver path in kvcpp.
   
