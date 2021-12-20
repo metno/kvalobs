@@ -306,7 +306,6 @@ BEGIN
     END IF;
     INSERT INTO obsdata VALUES (
         obs,
-        '0h',
         original,
         paramid,
         sensor,
@@ -374,7 +373,6 @@ BEGIN
     END IF;
     INSERT INTO obstextdata VALUES (
         obs,
-        '0h',
         original,
         paramid
     );
