@@ -93,7 +93,7 @@ CREATE VIEW data AS (
 REVOKE ALL ON data FROM public;
 GRANT ALL ON data TO kv_admin;
 GRANT SELECT ON data TO kv_read;
-GRANT SELECT ON data TO kv_write;
+GRANT SELECT, INSERT, UPDATE, DELETE ON data TO kv_write;
 
 
 CREATE VIEW text_data AS (
@@ -114,7 +114,7 @@ CREATE VIEW text_data AS (
 REVOKE ALL ON text_data FROM public;
 GRANT ALL ON text_data TO kv_admin;
 GRANT SELECT ON text_data TO kv_read;
-GRANT SELECT ON text_data TO kv_write;
+GRANT SELECT, INSERT, UPDATE, DELETE ON text_data TO kv_write;
 
 
 --
