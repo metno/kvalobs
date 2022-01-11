@@ -79,7 +79,7 @@ Observation::Observation():hasObservationid_(false),observationid_(0), stationid
 }
 
 Observation::Observation(const Observation &d)
-  :hasObservationid_(d.observationid_), observationid_(d.observationid_), stationid_(d.stationid_), typeid_(d.typeid_),
+  :hasObservationid_(d.hasObservationid_), observationid_(d.observationid_), stationid_(d.stationid_), typeid_(d.typeid_),
    obstime_(d.obstime_), tbtime_(d.tbtime_), data_(d.data_), textData_(d.textData_) {
 }
 
