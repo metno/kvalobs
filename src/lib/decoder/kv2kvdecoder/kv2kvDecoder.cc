@@ -181,7 +181,7 @@ void kv2kvDecoder::verifyAndAdapt(KvalobsData & data, list<kvData> & out) {
 
   for (DList::iterator it = out.begin(); it != out.end(); ++it) {
     kv2kvDecoder::kvDataPtr dbData = getDbData(*it);
-    if (not data.overwrite())
+    if ( ! data.overwrite())
       verify(*it, dbData);
     adapt(*it, dbData, data.overwrite());
   }
@@ -474,10 +474,12 @@ kv2kvDecoder::kvDataPtr kv2kvDecoder::getDbData(const kvData d) {
 
 void kv2kvDecoder::verify(const kvData & d, kvDataPtr dbData) const {
   const float delta = 0.0999;
-  if (dbData.get() and abs(dbData->original() - d.original()) > delta) {
+  if (dbData.get() && abs(dbData->original() - d.original()) > delta) {
     ostringstream ss;
-    ss << "New data is not compatible with old in database: Values: DB = "
-       << dbData->original() << ". New = " << d.original();
+    ss << "New data is not compatible with old in database: original values: DB = "
+       << dbData->original() << ". New = " << d.original() 
+       << " (staionid: " << d.stationID() << " typeid: " << d.typeID() 
+       << " paramid: " << d.paramID() << " obstime: " << pt::to_kvalobs_string(d.obstime()) << ")";
     throw DecoderError(decoder::DecoderBase::Rejected, ss.str());
   }
 }
