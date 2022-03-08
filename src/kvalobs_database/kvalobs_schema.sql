@@ -459,7 +459,7 @@ CREATE TABLE model_data (
 REVOKE ALL ON model_data FROM public;
 GRANT ALL ON model_data TO kv_admin;
 GRANT SELECT ON model_data TO kv_read;
-GRANT SELECT, UPDATE, INSERT ON model_data TO kv_write;
+GRANT SELECT, UPDATE, INSERT, DELETE ON model_data TO kv_write;
 
 
 
