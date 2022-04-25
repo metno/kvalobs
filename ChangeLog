@@ -1,4 +1,9 @@
-2009-09-22 Vegard Bønes
+2022-0426 BÃ¸rge Moe
+  * Relase 7.0.1
+  * kvQaBased
+    - DataProcessor: Logg kafka error also to the stadard log so it is logged to stderr.
+
+2009-09-22 Vegard Bï¿½nes
            * kvQaBased
              - Updated setting of useinfo flags (Bug 1229)
 
@@ -11,23 +16,23 @@
 			  * kvSynopd
              - Fixed rounding error in max wind code in section 555.
 
-2009-03-23 Børge Moe
+2009-03-23 Bï¿½rge Moe
            * kv2metdat
              - Only transfer model data for norwegians stations to kvalobs db, 
                ie stationid<100000.
 
-2009-03-23 Børge Moe
+2009-03-23 Bï¿½rge Moe
            * kvSynopd
              - #1241. Fixed tr(=5) for hourly precipitation from RR_1.
 
-2009-02-26 Børge Moe
+2009-02-26 Bï¿½rge Moe
            * kvSynopd
              - #1241. Fixed generation of hourly precipitation from RR_1.
 
 2009-01-08 Paul Eglitis
            * Copied prototype Qc2 source tree into the kvalobs/trunk/src/kvQc2
 
-2008-12-08 Børge Moe
+2008-12-08 Bï¿½rge Moe
            * Fixed an offset by one bug. Reported by Yngve.Einarsson@smhi.se.
              Changed files.
              - src/kvDataInputd/InitLogger.cc
@@ -41,10 +46,10 @@
 -------------
 
 
-2008-01-18 Børge Moe
+2008-01-18 Bï¿½rge Moe
            kvsynopd
            * Endret koding av Esss.
-           * VV, støtte for automatisk målt sikt Vmor.
+           * VV, stï¿½tte for automatisk mï¿½lt sikt Vmor.
            * Vindhastighet i m/s i stedet for knop.
 
            autoobsdecoder
@@ -53,10 +58,10 @@
            comobsdekoder
            * Endret dekoding av SA og SD.
 
-2007-10-30 Vegard Bønes
+2007-10-30 Vegard Bï¿½nes
            kvcpp removed, kvcpp2->kvcpp
 
-2007-10-29 Børge Moe
+2007-10-29 Bï¿½rge Moe
            kvsynopd
            - Use kvcpp2.
            kv2kro2
@@ -65,23 +70,23 @@
 2007-08-27 Ny versjon kvalobs-drift-20070827T0758
            **************************************
            
-2007-08-27 Børge Moe
+2007-08-27 Bï¿½rge Moe
            autoobsdecoder
            * Rettet 2 skrivefeil i feilmeldinger.
 
-2007-08-20 Børge Moe
+2007-08-20 Bï¿½rge Moe
            kvsynopd
            * Rettet en liten feil i dagens maks temperatur.
 
-2007-08-02 Vegard Bønes
+2007-08-02 Vegard Bï¿½nes
            * Bug 1177 fixed: ra agregation can no longer produce precipitation -1 (0 produced instead).
 
-2007-06-12 Vegard Bønes
+2007-06-12 Vegard Bï¿½nes
            agregator
-           * fix bug 1159 falsk nedbør fra RA
+           * fix bug 1159 falsk nedbï¿½r fra RA
            * la til unit tests
 
-2007-06-12 Vegard Bønes
+2007-06-12 Vegard Bï¿½nes
            src/lib/kvalobs
            * Implementert flaggdokumentet, versjon 8.7.0
 
@@ -89,9 +94,9 @@
            kvSynopDecoder
            * Tillat at Nddff gruppen i seksjon 111 er slashet, /////. 
 
-2007-06-04 Vegard Bønes
+2007-06-04 Vegard Bï¿½nes
            kvQtApp
-           Det er nå mulig å hente ut corba-path fra kvQtApp
+           Det er nï¿½ mulig ï¿½ hente ut corba-path fra kvQtApp
 
 2007-05-23 Bxrge Moe
 			  autoobsdecoder
@@ -106,18 +111,18 @@
            * Setter ikke oppsamlingsflagget lenger i controllinfo
              for typeid 302.
 
-2006-12-01 Vegard Bønes
+2006-12-01 Vegard Bï¿½nes
            src/kvQABase2/src/checkrunner.cc
            * HTML-logger rulleres for hver stasjon og hvert tidspunkt. Det kan
-             nå eksistere flere logger for samme observasjon.
+             nï¿½ eksistere flere logger for samme observasjon.
 
-2006-11-28 Vegard Bønes
+2006-11-28 Vegard Bï¿½nes
            src/agregator/ra2rr12.cc
-           * Beregnet 0mm nedbør gir nå -1 istedenfor 0
+           * Beregnet 0mm nedbï¿½r gir nï¿½ -1 istedenfor 0
            src/service-libs/kvcpp2/include/KvApp.h
            * diverse virtuelle destruktorer
 
-2006-11-08 Vegard Bønes
+2006-11-08 Vegard Bï¿½nes
            kv2kvDecoder
            - Bug 963 Fiksa - tbtime endres ikke lenger av HQC
 
