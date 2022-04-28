@@ -19,11 +19,15 @@ kvcpp=
 avalable_targets="kvdatainputd kvqabased kvmanagerd"
 all=false
 nocache=
+src=
+dst=
+copy_dryrun=
+
 
 use() {
 
   usage="\
-Usage: $0 [--help] [--os os] [--staging|--prod|--test] [--kvbuild] [--buildep] [--tag tag] [--list]
+Usage: $0 [--help] [--os os] [--staging|--prod|--test|--copy src dst|--copy-dry-run] [--kvbuild] [--buildep] [--tag tag] [--list]
           [--no-cache] targets
 
 This script build kvalobs containers. 
@@ -44,16 +48,51 @@ Options:
   --kvbuild     Build kvalobs, ie the kvbuild container. 
   --kvcpp       Build kvcpp and kvruntime. kvdev has all kvcpp development files 
                 and kvruntime has all runtime files needed for kvcpp
-  --builddep    Build the buildep container. The dafault is not to buils
+  --builddep    Build the buildep container. The dafault is not to build
                 the container. 
   --os os       The os to build for. There must exist deinition files in docker/kvalobs/os
                 Default: $os
   --no-cache    Do not use the docker build cache.
+  --copy src dst Copy from src repositoy to dst repository.
+  --copy-dry-run Same as --copy, but only list the actions that will be taken.
 
 
   targets this is a list of targets to build. Available targets is:
 
   all builddep kvbuild kvdev $avalable_targets
+
+  copy:
+    src: registry:container_name:tag
+    dst: registry:container_name:tag
+
+    Regestry must be a host (dns or ip) or one of prod, staging or test. If registry
+    is empty 'test' is asumed. 
+
+    src: container_name can be empty or a container_name. If empty the folowwing containers are
+    assumed, kvcpp-runtime, $avalable_targets.
+
+    dst: container_name is not empty a \"reaname\" is implied. In this case ony one container_name is 
+    valid for the src container_name.
+
+    ex 1.
+      kvbuild --copy staging:: prod:: 
+
+      This copies the latest (tag) from staging to the latest(tag) in prod for:  kvcpp-runtime, $avalable_targets.
+
+    ex 2.
+      kvbuild --copy staging:: prod::7.0.0 
+
+      This copies the latest (tag) from staging to the tag 7.0.0 in prod for:  kvcpp-runtime, $avalable_targets.
+
+    ex 3.
+      kvbuild --copy staging:kvqabased: prod:: 
+
+      This copies the kvqabased latest (tag) from staging to prod latest (tag).
+    
+    ex 4.
+      kvbuild --copy prod:: test:: 
+
+      This copies the latest (tag) from prod to local docker latest (tag).
 
 "
 echo -e "$usage\n\n"
@@ -77,6 +116,19 @@ while test $# -ne 0; do
     --kvbuild) kvbuild="kvbuild";;
     --builddep) builddep="builddep";;
     --kvcpp) kvcpp="kvcpp";;
+    --copy)
+      mode=copy
+      src="$2"
+      shift
+      dst="$2"
+      shift;; 
+    --copy-dry-run)
+      mode=copy
+      src="$2"
+      shift
+      dst="$2"
+      copy_dryrun=true
+      shift;; 
     --list) 
         echo -e "\nTargets: all builddep kvbuild $avalable_targets\n\n"
         exit 0 ;;
@@ -90,6 +142,154 @@ while test $# -ne 0; do
 done
 
 
+_decode_dst_paths() {
+  _dp_registry=
+  _dp_target=$(echo $1 | cut -d: -f2)
+  _dp_tag=
+
+  local cp1=$(echo $1 | cut -d: -f1)
+  local cp3=$(echo $1 | cut -d: -f3)
+  local tag=
+  
+  if [ "$cp1" = "prod" ]; then 
+    _dp_registry="$registry/prod/"
+  elif [ "$cp1" = "staging" ]; then
+    _dp_registry="$registry/staging/"
+  elif [ "$cp1" = "test" -o -z "$cp1" ]; then
+    _dp_registry=""
+  else 
+    _dp_registry="$cp1/"
+  fi
+
+  
+  if [ "$cp3" = "latest" -o -z "$cp3" ]; then
+    _dp_tag="latest"
+  else
+    _dp_tag="$cp3"
+  fi
+
+  return 0
+}
+
+  
+
+_decode_src_paths() {
+  _dp_registry=
+  _dp_targets=
+  _dp_tag=
+
+  local cp1=$(echo $1 | cut -d: -f1)
+  local cp2=$(echo $1 | cut -d: -f2)
+  local cp3=$(echo $1 | cut -d: -f3)
+  local tag=
+  local res=
+
+  if [ "$cp1" = "prod" ]; then 
+    _dp_registry="$registry/prod/"
+  elif [ "$cp1" = "staging" ]; then
+    _dp_registry="$registry/staging/"
+  elif [ "$cp1" = "test" -o -z "$cp1" ]; then
+    _dp_registry=""
+  else 
+    _dp_registry="$cp1/"
+  fi
+
+  if [ "$cp2" = "all" -o -z "$cp2" ]; then
+    targets="kvcpp-runtime $avalable_targets"
+  else
+    targets="$cp2"
+  fi
+
+  if [ "$cp3" = "latest" -o -z "$cp3" ]; then
+    _dp_tag="latest"
+  else
+    _dp_tag="$cp3"
+  fi
+
+  for target in $targets ; do
+    _dp_targets="$_dp_targets $target"
+  done
+  return 0
+}
+
+copy() {
+  local src_reg=
+  local src_targets=
+  local src_tag
+  local dst_reg=
+  local dst_targets=
+  local dst_tag
+  mkdir -p /tmp/kvbuild
+  _decode_src_paths $1
+  src_reg=$_dp_registry
+  src_targets=$_dp_targets
+  src_tag=$_dp_tag
+  _decode_dst_paths $2
+  dst_reg=$_dp_registry
+  dst_target=$_dp_target
+  dst_tag=$_dp_tag
+
+  
+  if [ -n "$dst_target" ]; then
+    n=$(echo $src_targets | wc -w)
+    if [ "$n" -ne 1 ]; then 
+      echo
+      echo "When dst target '$dst_target' is given. Then src target must be exactly one element" 
+      echo
+      exit 1
+    fi
+  fi
+
+  for target in $src_targets ; do 
+    src="${src_reg}${target}:${src_tag}" 
+    if [ -n "${dst_target}" ]; then
+      dst="${dst_reg}${dst_target}:${dst_tag}"
+    else 
+      dst="${dst_reg}${target}:${dst_tag}"
+    fi
+
+
+    if [ -n "$copy_dryrun" ]; then
+      echo "dryrun: $src -> $dst"
+      continue
+    fi
+
+    if [ -n "$dst_reg" ]; then 
+      docker pull $src &>/tmp/kvbuild/docker_err
+
+      if [ "$?" -ne 0 ]; then
+        echo "FAILED to pull: '$src'"
+        cat /tmp/kvbuild/docker_err
+        continue
+      fi
+    fi
+
+    docker tag $src $dst &>/tmp/kvbuild/docker_err
+
+    if [ "$?" -ne 0 ]; then
+      echo "FAILED to tag: $src -> $dst"
+      cat /tmp/kvbuild/docker_err
+      continue
+    else
+      echo "Ok - $src -> $dst"
+    fi
+
+    if [ -z "$dst_reg" ]; then
+      continue;
+    fi 
+    docker push $dst &>/tmp/kvbuild/docker_err
+
+    if [ "$?" -ne 0 ]; then
+      echo "FAILED to push: '$dst'"
+      cat /tmp/kvbuild/docker_err
+      continue
+    fi
+
+  done
+}
+
+
+
 echo "tag: $tag"
 echo "mode: $mode"
 echo "os: $os"
@@ -99,6 +299,18 @@ echo "kvcpp: $kvcpp"
 echo "builddep: $builddep"
 echo "Targets: $targets"
 echo "nocache: $nocache"
+
+if [ "$mode" = "copy" ]; then
+  if [ -z "$src" -o -z "$dst" ]; then
+    echo
+    echo "Copy need a 'src' and 'dst' argument."
+    echo
+    exit 1
+  fi
+  copy $src $dst
+  exit 0
+fi
+
 
 chmod +x gitref.sh
 ./gitref.sh 
@@ -122,7 +334,7 @@ for target in $targets ; do
   fi
 
   if [ $target = kvcpp ]; then 
-    kvcpp="kcpp";
+    kvcpp="kvcpp";
     continue
   fi
 
