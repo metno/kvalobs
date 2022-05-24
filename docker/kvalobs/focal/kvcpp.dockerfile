@@ -6,13 +6,13 @@ FROM ${REGISTRY}kvbuild:${BASE_IMAGE_TAG} AS kvbins
 FROM ${REGISTRY}builddep:${BASE_IMAGE_TAG} AS dev
 ARG DEBIAN_FRONTEND='noninteractive'
 
-COPY docker/pg-ACCC4CF8.asc /tmp
+#COPY docker/pg-ACCC4CF8.asc /tmp
 
 RUN apt-get install -y gpg software-properties-common apt-utils
 
 #Add intertn repos and postgres repo
-RUN apt-key add /tmp/pg-ACCC4CF8.asc && rm /tmp/pg-ACCC4CF8.asc && \
-  add-apt-repository 'deb http://apt.postgresql.org/pub/repos/apt focal-pgdg main'
+# RUN apt-key add /tmp/pg-ACCC4CF8.asc && rm /tmp/pg-ACCC4CF8.asc && \
+#   add-apt-repository 'deb http://apt.postgresql.org/pub/repos/apt focal-pgdg main'
 
 #Add bufrdecoder
 
@@ -33,15 +33,22 @@ ENTRYPOINT [ "/bin/bash" ]
 FROM ubuntu:focal AS runtime
 ARG DEBIAN_FRONTEND='noninteractive'
 
-COPY docker/pg-ACCC4CF8.asc /tmp
+
 RUN apt-get update && apt-get install -y gpg software-properties-common apt-utils
 
-#Add intertn repos and postgres repo 
-RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 4e8a0c1418494cf45d1b8533799e9fe74bb0156c &&\
+#Keys for internrepo.met.no, postgresql and confluent (librdkafka) repos
+COPY docker/pg-ACCC4CF8.asc docker/internrepo-4E8A0C14.asc docker/confluent_repo_key.asc /tmp/
+RUN apt-get update && apt-get install -y gnupg2 software-properties-common apt-utils
+
+RUN apt-key add /tmp/internrepo-4E8A0C14.asc && rm /tmp/internrepo-4E8A0C14.asc && \
   add-apt-repository 'deb [arch=amd64] http://internrepo.met.no/focal focal main contrib'
 
 RUN apt-key add /tmp/pg-ACCC4CF8.asc && rm /tmp/pg-ACCC4CF8.asc && \
-  add-apt-repository 'deb [arch=amd64] http://apt.postgresql.org/pub/repos/apt focal-pgdg main'
+  add-apt-repository 'deb http://apt.postgresql.org/pub/repos/apt focal-pgdg main'
+
+
+RUN apt-key add /tmp/pg-ACCC4CF8.asc && rm /tmp/confluent_repo_key.asc && \
+  add-apt-repository 'deb [arch=amd64] https://packages.confluent.io/clients/deb focal  main'
 
 # NB NB NB
 # The dependencies must be in sync with the *-dev dependencies in 
