@@ -151,8 +151,7 @@ Configuration::Configuration(int& argc, char** argv)
     value<std::string>()->default_value("info"),
     "Set loglevel (debug_all, debug, info, warn, error or fatal")(
     "runlogfile",
-    value<std::string>(&runLogFile_)
-      ->default_value("-"),
+    value<std::string>(&runLogFile_)->default_value("-"),
     "Set file name for run log")(
     "logdir",
     value<std::string>(&baseLogDir_)
@@ -163,10 +162,9 @@ Configuration::Configuration(int& argc, char** argv)
     "The size of logfile in mega bytes before it is rolled.")(
     "nlogs",
     value<int>(&numberOfLogs_)->default_value(3),
-    "Number of backup logs.")(
-    "logxml",
-    value<bool>(&logXml_)->default_value(false),
-    "Log the xml-files sendt to kafka.");
+    "Number of backup logs.")("logxml",
+                              value<bool>(&logXml_)->default_value(false),
+                              "Log the xml-files sendt to kafka.");
 
   options_description database("Database");
   database.add_options()(
@@ -183,11 +181,15 @@ Configuration::Configuration(int& argc, char** argv)
                      "one transaction.");
 
   options_description generic("Generic");
-  generic.add_options()("process-count",
-                        value<unsigned>(&processCount_)->default_value(4),
-                        "Run the given number of processes")(
-    "config", value<std::string>(), "Read configuration from the given file")(
-    "version", "Produce version information")("help", "Produce help message");
+  generic.add_options()
+    ("process-count",
+      value<unsigned>(&processCount_)->default_value(4),
+      "Run the given number of processes")
+    ("kafka-error-loop-count",value<unsigned>(&maxKafkaSendErrors_)->default_value(0),
+      "Kill the process after trying to send to kafka count times. If the value is 0 there is no limmit."
+      " Only has effect if process count is 1")
+    ("config", value<std::string>(), "Read configuration from the given file")
+    ("version", "Produce version information")("help", "Produce help message");
 
   commandLine.add(observation).add(logging).add(database).add(generic);
 

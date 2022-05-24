@@ -56,6 +56,7 @@ class DataProcessor {
 
   static bool logXml;
   static bool logTransactions;
+  static unsigned maxKafkaSendErrors;
 
   explicit DataProcessor(std::shared_ptr<qabase::CheckRunner> checkRunner);
 

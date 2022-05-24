@@ -34,6 +34,7 @@
 #include <kvalobs/kvStationInfo.h>
 #include <string>
 #include <iosfwd>
+#include <limits>
 
 namespace boost {
 namespace program_options {
@@ -90,7 +91,7 @@ class Configuration {
 
   /**
    * Get the single observation to check
-   * @return Observation tha user wants to check, or NULL if
+   * @return Observation the user wants to check, or NULL if
    * haveObservationToCheck() returns false.
    */
   const kvalobs::kvStationInfo * observationToCheck() const {
@@ -146,6 +147,23 @@ class Configuration {
     return processCount_;
   }
 
+
+  /**
+   * @brief Max errors we accept when trying to send to kafka.
+   * The process kill it self if the number of error exceed 
+   * this value. 
+   * 
+   * This value has only effect if the process count is 1.
+   * 
+   * @return unsigned 
+   */
+  unsigned maxKafkaSendErrors() const {
+    if( maxKafkaSendErrors_==0 || processCount_>1) {
+      return std::numeric_limits<unsigned>::max();
+    } 
+    return maxKafkaSendErrors_;
+  }
+
   /**
    * The size of the logfile in bytes before it is created a backup file. 
    */
@@ -167,6 +185,8 @@ class Configuration {
   bool logXml()const {
     return logXml_;
   }
+
+
 
   /**
    * Print version information to the given stream.
@@ -209,6 +229,7 @@ class Configuration {
   int logSize_;
   int numberOfLogs_;
   int selectForControlCount_;
+  unsigned maxKafkaSendErrors_;
 
   unsigned processCount_;
  

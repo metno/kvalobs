@@ -195,8 +195,10 @@ int main(int argc, char ** argv) {
   kvalobs::serialize::KvalobsDataSerializer::defaultProducer = "kvqabase";
   try {
     qabase::Configuration config(argc, argv);
-    if (not config.runNormally())
+    if ( !config.runNormally()) {
       return 0;
+    }
+    qabase::DataProcessor::maxKafkaSendErrors=config.maxKafkaSendErrors();
 
     ProcessStatus processStatus;
     if (!config.haveObservationToCheck())
@@ -205,7 +207,9 @@ int main(int argc, char ** argv) {
     qabase::QaBaseApp app(argc, argv);
 
     LOGINFO("Log xml sendt to kafka: " << (config.logXml()?"true":"false"));
+    LOGINFO("Kafka send errors before terminating: " << config.maxKafkaSendErrors());
     LOGDEBUG("Using model data name " << config.modelDataName());
+
 
     qabase::DataProcessor::logXml = config.logXml();
     db::KvalobsDatabaseAccess::setModelDataName(config.modelDataName());

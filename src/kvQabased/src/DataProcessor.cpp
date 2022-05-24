@@ -54,6 +54,7 @@ std::set<kvalobs::subscribe::KafkaProducer::MessageId> messages;
 bool DataProcessor::logXml = false;
 
 bool DataProcessor::logTransactions = true;
+unsigned DataProcessor::maxKafkaSendErrors=std::numeric_limits<unsigned>::max();
 
 DataProcessor::DataProcessor(std::shared_ptr<qabase::CheckRunner> checkRunner)
     : checkRunner_(checkRunner),
@@ -217,8 +218,13 @@ void DataProcessor::sendToKafka(const qabase::Observation & obs, const qabase::C
       if ((sendAttempts % 10) == 0) {
         LOGWARN("Could not send data to Kafka. Send queue size=" << messages.size() << ". Retrying (attempts #" << sendAttempts <<") ... ");
       }
+
+      if( sendAttempts > maxKafkaSendErrors ) {
+        LOGWARN("Terminating: Could not send data to Kafka. Send queue size=" << messages.size() << ". Tried " << sendAttempts << " times before giving up!");
+        exit(16);
+      }
       sendAttempts++;
-      std::this_thread::sleep_for(std::chrono::seconds(1));
+      std::this_thread::sleep_for(std::chrono::seconds(2));
     }
   } while (stop == nullptr || *stop == false);
 }
