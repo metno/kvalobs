@@ -47,7 +47,7 @@ RUN apt-key add /tmp/pg-ACCC4CF8.asc && rm /tmp/pg-ACCC4CF8.asc && \
   add-apt-repository 'deb http://apt.postgresql.org/pub/repos/apt focal-pgdg main'
 
 
-RUN apt-key add /tmp/pg-ACCC4CF8.asc && rm /tmp/confluent_repo_key.asc && \
+RUN apt-key add /tmp/confluent_repo_key.asc && rm /tmp/confluent_repo_key.asc && \
   add-apt-repository 'deb [arch=amd64] https://packages.confluent.io/clients/deb focal  main'
 
 # NB NB NB
