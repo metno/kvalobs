@@ -1,7 +1,10 @@
-2022-0426 Børge Moe
+2022-04-26 Børge Moe
   * Relase 7.0.1
   * kvQaBased
     - DataProcessor: Logg kafka error also to the stadard log so it is logged to stderr.
+    - Uppgrade rdkafka to version 18.2
+    - exit the process when we have retried to send to kafka kafka-error-loop-count times. 
+      The process must be restarted by some means.
 
 2009-09-22 Vegard B�nes
            * kvQaBased
