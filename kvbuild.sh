@@ -13,6 +13,7 @@ registry="registry.met.no/obs/kvalobs/kvbuild"
 build=test
 targets=
 tag=latest
+tag_and_latest="false"
 kvbuild=
 builddep=
 kvcpp=
@@ -27,7 +28,7 @@ copy_dryrun=
 use() {
 
   usage="\
-Usage: $0 [--help] [--os os] [--staging|--prod|--test|--copy src dst|--copy-dry-run] [--kvbuild] [--buildep] [--tag tag] [--list]
+Usage: $0 [--help] [--os os] [--staging|--prod|--test|--copy src dst|--copy-dry-run] [--kvbuild] [--buildep] [--tag tag] [--tag-and-latest tag] [--list]
           [--no-cache] targets
 
 This script build kvalobs containers. 
@@ -42,6 +43,7 @@ Options:
   --help        display this help and exit.
   --list        list targets.
   --tag tagname tag the image with the name tagname, default latest.
+  --tag-and-latest tagname tag the image with the name tagname  and also create latest tag.
   --staging     build and push to staging.
   --prod        build and push to prod.
   --test        only build, default
@@ -103,6 +105,10 @@ while test $# -ne 0; do
   case $1 in
     --tag) 
         tag="$2"
+        shift;;
+    --tag_and_latest) 
+        tag="$2"
+        tag_and_latest=true
         shift;;
     --help) 
         use
@@ -383,9 +389,19 @@ if [ -n "$kvcpp" ]; then
   docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" -f docker/kvalobs/${os}/kvcpp.dockerfile --target dev --tag "${registry}kvcpp-dev:$tag" .
   docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" -f docker/kvalobs/${os}/kvcpp.dockerfile --target runtime --tag "${registry}kvcpp-runtime:$tag" .
 
+  if [ "$tag_and_latest" = "true" ]; then
+      docker tag "${registry}kvcpp-dev:$tag" "${registry}kvcpp-dev:latest"
+      docker tag "${registry}kvcpp-runtime:$tag" "${registry}kvcpp-runtime:latest"
+  fi
+
   if [ $mode != test ]; then 
     docker push ${registry}kvcpp-dev:$tag
     docker push ${registry}kvcpp-runtime:$tag
+
+    if [ "$tag_and_latest" = "true" ]; then
+      docker push "${registry}kvcpp-dev:latest"
+      docker push "${registry}kvcpp-runtime:latest" 
+    fi
   fi
 fi
 
@@ -407,9 +423,16 @@ for target in $targets; do
     docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" -f $dockerfile --tag "${registry}${target}:$tag" .
   fi
   
-  if [ $mode != test ]; then 
-    docker push ${registry}${target}:$tag
+  if [ "$tag_and_latest" = "true" ]; then
+      docker tag "${registry}${target}:$tag" "${registry}${target}:latest"
   fi
 
+
+  if [ $mode != test ]; then 
+    docker push ${registry}${target}:$tag
+    if [ "$tag_and_latest" = "true" ]; then
+      docker push "${registry}${target}:latest"
+    fi
+  fi
 done
 
