@@ -106,7 +106,7 @@ while test $# -ne 0; do
     --tag) 
         tag="$2"
         shift;;
-    --tag_and_latest) 
+    --tag-and-latest) 
         tag="$2"
         tag_and_latest=true
         shift;;

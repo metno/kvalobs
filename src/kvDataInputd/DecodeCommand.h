@@ -78,6 +78,11 @@ class DecodeCommand : public miutil::Runable {
     msg = m;
   }
 
+  void setMessageId( const std::string &msgid );
+  void setSerialNumber( unsigned long long serialNumber );
+  void setProducer( const std::string &producer );
+  std::string getProducer( )const;
+
   kvalobs::kvStationInfoList& getInfoList();
 
   std::list<kvalobs::serialize::KvalobsData>& getDecodedData();

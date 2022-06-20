@@ -190,6 +190,10 @@ kvalobs::decoder::kldecoder::KlDecoder::KlDecoder(
       onlyInsertOrUpdate(false)
 
 {
+  ostringstream s;
+  s << name() << " (" << serialNumber << " - '" << producer << "')";
+  milog::LogContext lcontext(s.str());
+
   decodeObsType(obsType);
 }
 
@@ -496,6 +500,10 @@ kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecod
   string retMsg;
   string line;
 
+  ostringstream s;
+  s << name() << " (" << serialNumber << " - '" << producer <<"')";
+  milog::LogContext lcontext(s.str());
+
   while (helper.getObs(obsType, obs) && !error) {
     if (helper.multiMessage())
       ostMsg << "<<<<<<<<<<<<<<<<<<<< DECODER RESULT >>>>>>>>>>>>>>>>>>>>\n";
@@ -551,8 +559,11 @@ kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecod
 
   if (!redirectedFrom.empty())
     decoder += "." + redirectedFrom;
+ 
+  ostringstream s;
+  s << decoder << " (" << serialNumber << " - '" << producer <<"')";
+  milog::LogContext lcontext(s.str());
 
-  milog::LogContext lcontext(decoder);
   LOGDEBUG(obsType << "\n" << obs);
   logid.clear();
 

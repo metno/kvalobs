@@ -74,6 +74,8 @@ kv2kvDecoder::kv2kvDecoder(dnmi::db::Connection & con, const ParamList & params,
       dbGate(&con),
       tbtime(boost::posix_time::microsec_clock::universal_time()),
       checked_(false) {
+  ostringstream s;
+  s << name() << " (" << serialNumber << ")";
   milog::LogContext lcontext(name());
   LOGDEBUG("kv2kvDecoder object created");
 
@@ -107,13 +109,18 @@ void kv2kvDecoder::setChecked( const std::string &obsType ){
 
 
 DecoderBase::DecodeResult kv2kvDecoder::execute(std::string & msg) {
-  milog::LogContext lcontext(name());
+  ostringstream s;
+  s << name() << " (" << serialNumber << " - '" << producer_ << "')";
+  
+  milog::LogContext lcontext(s.str());
 
   if (parseResult_ != Ok) {
     msg = parseMessage_;
     saveInRejectDecode();
     return parseResult_;
   }
+  
+  
 
   try {
     list<kvData> dl;
@@ -156,17 +163,25 @@ void kv2kvDecoder::saveInRejectDecode() {
 }
 
 void kv2kvDecoder::parse(KvalobsData & data, const std::string & obs) const {
+
   try {
     serialize::internal::KvalobsDataParser::parse(obs, data);
+    producer_=data.producer();
+    if( producer_.empty() ) {
+      producer_ = producer; //From the DecoderBase
+    }
   } catch (exception & e) {
     LOGERROR(e.what());
     milog::LogContext lcontext("Fallback");
     LOGDEBUG("Trying old parsing method");
     try {
       // Fallback on old way of decoding data.
+      
       data = KvalobsData();  // remove any sideeffects from old parse attempt
       DList dlist = decodeutility::kvdataformatter::getKvData(obs);
       data.insert(dlist.begin(), dlist.end());
+      LOGINFO("Data not in 'kvxml' format, but in the old CSV format");
+      producer_ = producer;  //From the DecoderBase
     } catch (exception & e) {
       LOGERROR(e.what());
       throw DecoderError(decoder::DecoderBase::Rejected, "Cannot parse input.");
@@ -175,15 +190,40 @@ void kv2kvDecoder::parse(KvalobsData & data, const std::string & obs) const {
 }
 
 void kv2kvDecoder::verifyAndAdapt(KvalobsData & data, list<kvData> & out) {
+  std::stringstream errStrm;
+  int nErrors=0;
   invalidatePrevious(data);
 
   data.getData(out, tbtime);
-
+  
   for (DList::iterator it = out.begin(); it != out.end(); ++it) {
     kv2kvDecoder::kvDataPtr dbData = getDbData(*it);
-    if ( ! data.overwrite())
-      verify(*it, dbData);
-    adapt(*it, dbData, data.overwrite());
+    if ( ! data.overwrite()) {
+      try {
+        verify(*it, dbData);
+        adapt(*it, dbData, data.overwrite());
+      } catch( const DecoderError &e) {
+        string err(e.what());
+        auto i = err.find_first_of(":");
+  
+        if ( i != string::npos ) {
+          err = err.substr(i+2);
+        }
+
+        if ( nErrors == 0 ) {
+          errStrm << "New data is not compatible with old in database:\n";
+          errStrm << " - " <<  err;
+        } else {
+          errStrm << "\n - " << err;
+        }
+        
+        nErrors++; 
+      }
+    }
+  }
+
+  if( nErrors > 0) {
+    throw DecoderError(decoder::DecoderBase::Rejected, errStrm.str());
   }
 }
 
@@ -291,38 +331,6 @@ void kv2kvDecoder::save2(const list<kvData> & dl_, const list<kvTextData> & tdl_
   }
 }
 
-#if 0
-void kv2kvDecoder::save(const list<kvData> & dl, const list<kvTextData> & tdl) {
-  // kvTextData:
-  int priority_ = 5;
-  if (not tdl.empty()) {
-    if (!putkvTextDataInDb(tdl, priority_)) {
-      for (TDList::const_iterator it = tdl.begin(); it != tdl.end(); ++it) {
-        ostringstream ss;
-        ss << "update text_data set original=\'" << it->original() << '\''
-           << " where stationid=" << it->stationID() << " and obstime=\'"
-           << to_kvalobs_string(it->obstime()) << '\'' << " and paramid="
-           << it->paramID() << " and typeid=" << it->typeID();
-        try {
-          getConnection()->exec(ss.str());
-        } catch (dnmi::db::SQLException & e) {
-          throw(DecoderError(decoder::DecoderBase::Error, e.what()));
-        }
-      }
-    }
-  }
-  // kvData:
-  if (not dl.empty()) {
-    //     if ( ! putKvDataInDb( dl, priority_ ) ) {
-    for (DList::const_iterator it = dl.begin(); it != dl.end(); ++it) {
-      deleteKvDataFromDb(*it);
-    }
-    if (!putKvDataInDb(dl, priority_))
-      throw DecoderError(decoder::DecoderBase::Error, "Could not save data");
-    //     }
-  }
-}
-#endif
 
 void kv2kvDecoder::markAsFixed(
     const serialize::KvalobsData::RejectList & rejectedMesage) {
@@ -476,9 +484,9 @@ void kv2kvDecoder::verify(const kvData & d, kvDataPtr dbData) const {
   const float delta = 0.0999;
   if (dbData.get() && abs(dbData->original() - d.original()) > delta) {
     ostringstream ss;
-    ss << "New data is not compatible with old in database: original values: DB = "
+    ss << "New data is not compatible with old in database: Original value: DB = "
        << dbData->original() << ". New = " << d.original() 
-       << " (staionid: " << d.stationID() << " typeid: " << d.typeID() 
+       << " (stationid: " << d.stationID() << " typeid: " << d.typeID() 
        << " paramid: " << d.paramID() << " obstime: " << pt::to_kvalobs_string(d.obstime()) << ")";
     throw DecoderError(decoder::DecoderBase::Rejected, ss.str());
   }
@@ -495,7 +503,7 @@ void kv2kvDecoder::adapt(kvData & d, kvDataPtr dbData, bool overwrite) const {
 
   LOGDEBUG("overwrite:\t" << (overwrite?"true":"false"));
 
-  if (dbData.get() and not overwrite)
+  if (dbData.get() && !overwrite)
     d.set(d.stationID(), d.obstime(), dbData->original(), d.paramID(),
           dbData->tbtime(), d.typeID(), d.sensor(), d.level(), d.corrected(),
           d.controlinfo(), d.useinfo(), d.cfailed());

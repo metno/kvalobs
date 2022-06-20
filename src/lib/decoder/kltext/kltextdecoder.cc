@@ -30,6 +30,7 @@
  */
 #include <limits.h>
 #include <list>
+#include <sstream>
 #include "puTools/miTime.h"
 #include "lib/milog/milog.h"
 #include "lib/miutil/commastring.h"
@@ -65,7 +66,9 @@ std::string KlTextDecoder::name() const {
 }
 
 kvalobs::decoder::DecoderBase::DecodeResult KlTextDecoder::execute(std::string &msg) {
-  milog::LogContext lcontext(name());
+  std::ostringstream s;
+  s << name() << " (" << serialNumber << ")";
+  milog::LogContext lcontext(s.str());
   kvTextData textData;
   DecodeResult res;
 

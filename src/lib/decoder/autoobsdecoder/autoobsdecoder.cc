@@ -295,7 +295,9 @@ kvalobs::decoder::DecoderBase::DecodeResult AutoObsDecoder::execute(
   warnings = false;
   logid.clear();
 
-  milog::LogContext lcontext("AutoObsDecoder");
+  ostringstream s;
+  s << name() << " (" << serialNumber << ")";
+  milog::LogContext lcontext(s.str());
 
   if (stationid == 0) {
     ostringstream o;

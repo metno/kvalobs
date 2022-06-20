@@ -48,6 +48,8 @@ class KvalobsDataSerializerTest : public testing::Test {
   typedef std::set<kvalobs::kvData, kvalobs::compare::lt_kvData> DSet;
   DSet indata;
   kvalobs::serialize::KvalobsData in;
+  string producer;
+  string msgid;
 
   typedef boost::shared_ptr<kvalobs::serialize::KvalobsData> KvalobsDataPtr;
 
@@ -64,7 +66,15 @@ class KvalobsDataSerializerTest : public testing::Test {
   }
 
   KvalobsDataPtr loop(const kvalobs::serialize::KvalobsData &data) {
-    string xml = KvalobsDataSerializer::serialize(data);
+    string xml;
+    if( producer.empty() && msgid.empty() ) {
+      xml = KvalobsDataSerializer::serialize(data);
+    } else if( ! producer.empty() && msgid.empty() ) {
+      xml = KvalobsDataSerializer::serialize(data, producer);
+    } else {
+      xml = KvalobsDataSerializer::serialize(data, producer, msgid);
+    }
+    
     KvalobsDataPtr out(new KvalobsData);
     KvalobsDataParser::parse(xml, *out.get());
     cerr << xml << endl;
@@ -189,3 +199,29 @@ TEST_F(KvalobsDataSerializerTest, testPreserveMultipleFixedRejectedList) {
       std::find(fixedReject.begin(), fixedReject.end(), r3)
           != fixedReject.end());
 }
+
+TEST_F(KvalobsDataSerializerTest, testProducerAndMsgid) {
+  KvalobsDataPtr out = loop();
+  EXPECT_TRUE( out->producer().empty());
+  EXPECT_TRUE( out->msgid().empty());
+
+  producer="hqc";
+
+  out = loop();
+  EXPECT_TRUE( out->producer() == "hqc");
+  EXPECT_TRUE( out->msgid().empty());
+
+  producer.clear();
+  msgid="123";
+  out = loop();
+  EXPECT_TRUE( out->producer().empty());
+  EXPECT_TRUE( out->msgid()=="123");
+
+
+  msgid="123";
+  producer="kvQabased";
+  out = loop();
+  EXPECT_TRUE( out->producer()== "kvQabased" );
+  EXPECT_TRUE( out->msgid()=="123");
+}
+

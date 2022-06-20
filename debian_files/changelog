@@ -1,11 +1,14 @@
-kvalobs (7.0.1~rc1-1) bionic; urgency=medium
+kvalobs (7.0.1-1) bionic; urgency=medium
   * Uppgrade rdkafka to version 18.2
+  * kvDataInputd
+    - Better tracing of log messages between logs.
+    - Add optional messageid to all decoders.
   * kvQaBased
-    * DataProcessor: Logg kafka error also to the stadard log so it is logged to stderr.
-    * exit the processe when we have retried to send to kafka 10 times. The process must
-      be restarted by some means.
+    - DataProcessor: Logg kafka error also to the stadard log so it is logged to stderr.
+    - exit the processe when we have retried to send to kafka 10 times. The process must
+      be restarted by some means. 
   
- -- Borge Moe <borge.moe@met.no>  Tue, 24 May 2022 08:30:00 +0200
+ -- Borge Moe <borge.moe@met.no>  Mon, 20 Jun 2022 07:30:00 +0200
 
 kvalobs (7.0.0-1) bionic; urgency=medium
   * Fix initialization bug in CTOR.

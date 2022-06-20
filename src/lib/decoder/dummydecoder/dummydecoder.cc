@@ -48,8 +48,10 @@ std::string kvalobs::decoder::dummydecoder::DummyDecoder::name() const {
 
 kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::dummydecoder::DummyDecoder::execute(
     std::string &msg) {
-  milog::LogContext lcontext(name());
-
+  
+  std::ostringstream s;
+  s << name() << " (" << serialNumber << ")";
+  milog::LogContext lcontext(s.str());
   LOGINFO("New observation!  " << miutil::miTime::nowTime());
 
   return Ok;

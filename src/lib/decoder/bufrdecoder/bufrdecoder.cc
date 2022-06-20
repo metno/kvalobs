@@ -242,7 +242,10 @@ kvalobs::decoder::DecoderBase::DecodeResult BufrDecoder::execute(
 
   Lock lock(mutex);
 
-  milog::LogContext lcontext("BufrDecoder");
+  ostringstream s;
+  s << name()  << " (" << serialNumber << ")";
+  milog::LogContext lcontext(s.str());
+  
   LOGINFO("New observation(s)");
 
   if (obs.length() == 0) {

@@ -569,9 +569,13 @@ class LogLevel {
 }
 
 DecoderBase::DecodeResult ExecDecoder::execute(std::string &msg) {
-  milog::LogContext lcontext(name());
   ostringstream ost;
   ostringstream cmd;
+
+  ost << name() << " (" << serialNumber << ")";
+  milog::LogContext lcontext(ost.str());
+  ost.str("");
+  
   LOGINFO(
       "New observation!  " << boost::posix_time::to_kvalobs_string( boost::posix_time::second_clock::universal_time() ));
 

@@ -1,12 +1,15 @@
-2022-04-26 Børge Moe
-  * Relase 7.0.1
+2022-06-20 Børge Moe
+  * Relase 7.0.1~rc2
+  * Uppgrade rdkafka to version 18.2
+  * kvDataInputd
+    - Better tracing of log messages between logs.
+    - Add optional messageid to all decoders.
   * kvQaBased
     - DataProcessor: Logg kafka error also to the stadard log so it is logged to stderr.
-    - Uppgrade rdkafka to version 18.2
     - exit the process when we have retried to send to kafka kafka-error-loop-count times. 
       The process must be restarted by some means.
 
-2009-09-22 Vegard B�nes
+2009-09-22 Vegard Bønes
            * kvQaBased
              - Updated setting of useinfo flags (Bug 1229)
 
@@ -19,23 +22,23 @@
 			  * kvSynopd
              - Fixed rounding error in max wind code in section 555.
 
-2009-03-23 B�rge Moe
+2009-03-23 Børge Moe
            * kv2metdat
              - Only transfer model data for norwegians stations to kvalobs db, 
                ie stationid<100000.
 
-2009-03-23 B�rge Moe
+2009-03-23 Børge Moe
            * kvSynopd
              - #1241. Fixed tr(=5) for hourly precipitation from RR_1.
 
-2009-02-26 B�rge Moe
+2009-02-26 Børge Moe
            * kvSynopd
              - #1241. Fixed generation of hourly precipitation from RR_1.
 
 2009-01-08 Paul Eglitis
            * Copied prototype Qc2 source tree into the kvalobs/trunk/src/kvQc2
 
-2008-12-08 B�rge Moe
+2008-12-08 Børge Moe
            * Fixed an offset by one bug. Reported by Yngve.Einarsson@smhi.se.
              Changed files.
              - src/kvDataInputd/InitLogger.cc

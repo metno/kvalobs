@@ -104,6 +104,7 @@ class kv2kvDecoder : public DecoderBase, public boost::noncopyable {
   std::string parseMessage_;
   const boost::posix_time::ptime tbtime;
   bool checked_;
+  mutable std::string producer_;
 };
 
 }

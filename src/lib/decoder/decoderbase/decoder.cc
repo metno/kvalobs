@@ -163,6 +163,36 @@ kvalobs::decoder::DecoderBase::~DecoderBase() {
 }
 
 
+void kvalobs::decoder::DecoderBase::setSerialNumber(unsigned long long serialnumber)
+{
+  this->serialNumber=serialnumber;
+
+}
+
+unsigned long long kvalobs::decoder::DecoderBase::getSerialNumber()const
+{
+  return serialNumber;
+}
+
+void kvalobs::decoder::DecoderBase::setMessageId(const std::string &msgid)
+{
+  this->messageId = msgid;
+}
+
+std::string kvalobs::decoder::DecoderBase::getMessageId()const
+{
+  return messageId;
+}
+
+void kvalobs::decoder::DecoderBase::setProducer(const std::string &producer) {  
+  this->producer = producer;
+}
+
+std::string kvalobs::decoder::DecoderBase::getProducer()const{
+  return producer;
+}
+
+
 void kvalobs::decoder::DecoderBase::setFilters( const kvalobs::decoder::StationFiltersPtr filters_){
   filters=filters_;
 }
@@ -312,45 +342,6 @@ kvalobs::decoder::DecoderBase::findType(int typeid_) const {
 
   return 0;
 }
-/*
-void kvalobs::decoder::DecoderBase::addStationInfo(long stationid, const miutil::miTime &obstime, long typeid_, const miutil::miTime &tbtime, int priority) {
-  IkvStationInfoList it = stationInfoList.begin();
-
-  for (; it != stationInfoList.end(); ++it) {
-    if (it->stationID() == stationid && it->obstime() == to_ptime(obstime) && it->typeID() == typeid_) {
-      return;
-    }
-  }
-
-  kvDbGate gate(&con);
-  boost::posix_time::ptime undefTime;
-
-  if (!gate.insert(kvWorkelement(stationid, to_ptime(obstime), typeid_, to_ptime(tbtime), priority, undefTime, undefTime, undefTime, undefTime, undefTime),
-                   true)) {
-    LOGERROR("addStationInfo: can't save kvWorkelement into the" << endl << "the table 'workque' in  the database!\n" << "[" << gate.getErrorStr() << "]");
-    return;
-  }
-
-  LOGDEBUG(
-      "addStation: station added to the table 'workque'." << endl << "-- Stationid: " << stationid << endl << "-- obstime:   " << obstime << endl << "-- typeid:    " << typeid_ << endl << "-- priority:  " << priority);
-
-  stationInfoList.push_back(kvStationInfo(stationid, to_ptime(obstime), typeid_));
-}
-
-void kvalobs::decoder::DecoderBase::updateStationInfo(const kvalobs::kvStationInfoList& stationInfo) {
-  IkvStationInfoList it = stationInfoList.begin();
-
-  for (kvalobs::kvStationInfoList::const_iterator nit = stationInfo.begin(); nit != stationInfo.end(); ++nit) {
-    for (; it != stationInfoList.end(); ++it) {
-      if (it->stationID() == nit->stationID() && it->obstime() == nit->obstime() && it->typeID() == nit->typeID()) {
-        break;
-      }
-    }
-    if (it == stationInfoList.end())
-      stationInfoList.push_back(*nit);
-  }
-}
-*/
 bool kvalobs::decoder::DecoderBase::isGenerated(long stationid, long typeid_) {
   kvDbGate gate(&con);
 
@@ -422,56 +413,6 @@ bool kvalobs::decoder::DecoderBase::deleteKvDataFromDb(const kvalobs::kvData &sd
   return true;
 }
 
-#if 0
-bool kvalobs::decoder::DecoderBase::putKvDataInDb(const kvalobs::kvData &sd_, int priority) {
-  kvalobs::kvData sd(sd_);
-  kvDbGate gate(&con);
-
-  try {
-    if (isGenerated(sd.stationID(), sd.typeID())) {
-      LOGDEBUG("GENERATEDDATA: stationid: " << sd.stationID() << " typeid: " << sd.typeID() << " obstime: " << sd.obstime());
-
-      sd.typeID(-1 * sd.typeID());
-    }
-  } catch (...) {
-    // Do nothing. The log message from isGenerated is enough for
-    // the momment.
-  }
-
-  if (!gate.insert(sd, true)) {
-    LOGDEBUG("putKvDataInDb: can't save kvData to the database!\n" << "[" << gate.getErrorStr() << "]");
-
-    return false;
-  }
-
-  addStationInfo(sd.stationID(), to_miTime(sd.obstime()), sd.typeID(), to_miTime(sd.tbtime()), priority);
-
-  return true;
-}
-
-bool kvalobs::decoder::DecoderBase::putKvDataInDb(const std::list<kvalobs::kvData> &sd, int priority) {
-  using std::list;
-  using kvalobs::kvData;
-  kvDbGate gate(&con);
-
-  if (sd.empty())
-    return true;
-
-  list<list<kvData>> allData = collate(sd);
-  for (auto &dl : allData) {
-    auto &d = dl.front();
-    addStationInfo(d.stationID(), to_miTime(d.obstime()), d.typeID(), to_miTime(d.tbtime()), priority);
-    for (auto &de : dl) {
-      if (!gate.insert(de, true)) {
-        LOGERROR("putKvDataInDb: can't save kvData to the database!\n" << "[" << gate.getErrorStr() << "]");
-        return false;
-      }
-    }
-  }
-
-  return true;
-}
-#endif
 
 bool kvalobs::decoder::DecoderBase::addDataToDb(const miutil::miTime &obstime, int stationid, int typeid_, std::list<kvalobs::kvData> &sd,
                                                 std::list<kvalobs::kvTextData> &textData, const std::string &logid) {
@@ -555,86 +496,6 @@ addDataToDbThrow(const miutil::miTime &obstime, int stationid, int typeid_,
   return work.ok();
 }
 
-#if 0
-bool kvalobs::decoder::DecoderBase::putkvTextDataInDb(const kvalobs::kvTextData &td_, int priority) {
-  kvalobs::kvTextData td(td_);
-  kvDbGate gate(&con);
-
-  try {
-    if (isGenerated(td.stationID(), td.typeID())) {
-      LOGDEBUG("GENERATEDDATA: stationid: " << td.stationID() << " typeid: " << td.typeID() << " obstime: " << td.obstime());
-
-      td.typeID(-1 * td.typeID());
-    }
-  } catch (...) {
-    // COMMENT:
-    // do nothing. The log message from isGenerated is enough for
-    // the momment.
-  }
-
-  if (!gate.insert(td, true)) {
-    LOGDEBUG("putkvTextDataInDb: can't save kvTextData to the database!\n" << "[" << gate.getErrorStr() << "]");
-
-    return false;
-  }
-
-  addStationInfo(td.stationID(), to_miTime(td.obstime()), td.typeID(), to_miTime(td.tbtime()), priority);
-
-  return true;
-}
-
-bool kvalobs::decoder::DecoderBase::putkvTextDataInDb(const std::list<kvalobs::kvTextData> &td_, int priority) {
-  std::list<kvalobs::kvTextData> td(td_);
-  std::list<kvalobs::kvTextData>::iterator it = td.begin();
-  long sid = -1;
-  long tid;
-  long myTid;
-  miutil::miTime obsTime;
-  miutil::miTime tbTime;
-
-  if (it == td.end())
-    return true;
-
-  kvDbGate gate(&con);
-
-  for (; it != td.end(); ++it) {
-    if (sid == -1 || sid != it->stationID() || tid != it->typeID() || obsTime != to_miTime(it->obstime())) {
-      if (sid != -1) {
-        addStationInfo(sid, obsTime, tid, tbTime, priority);
-      }
-
-      sid = it->stationID();
-      tid = it->typeID();
-      obsTime = to_miTime(it->obstime());
-      tbTime = to_miTime(it->tbtime());
-      myTid = tid;
-
-      try {
-        if (myTid > 0 && isGenerated(sid, tid)) {
-          LOGDEBUG("GENERATEDDATA: stationid: " << it->stationID() << " typeid: " << it->typeID() << " obstime: " << it->obstime());
-
-          myTid = -1 * tid;
-        }
-      } catch (...) {
-        // Do nothing. The log message from isGenerated is enough for
-        // the momment.
-      }
-    }
-
-    it->typeID(myTid);
-
-    if (!gate.insert(*it, true)) {
-      LOGDEBUG("putkvTextDataInDb: can't save kvTextData to the database!\n" << "[" << gate.getErrorStr() << "]");
-
-      return false;
-    }
-  }
-
-  addStationInfo(sid, obsTime, tid, tbTime, priority);
-
-  return true;
-}
-#endif
 bool kvalobs::decoder::DecoderBase::putRejectdecodeInDb(const kvalobs::kvRejectdecode &sd) {
   kvDbGate gate(&con);
   kvRejectdecode reject(gate.esc(sd.message()), sd.tbtime(), gate.esc(sd.decoder()), gate.esc(sd.comment()), sd.fixed());

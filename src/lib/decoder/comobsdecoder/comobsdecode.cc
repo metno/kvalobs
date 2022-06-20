@@ -297,7 +297,9 @@ kvalobs::decoder::DecoderBase::DecodeResult ComObsDecoder::execute(
     string sError;
 
     list<kvRejectdecode> rejected;
-    milog::LogContext lcontext( name() );
+    ostringstream s;
+    s << name() << " (" << serialNumber << ")";
+    milog::LogContext lcontext( s.str());
 
     LOGINFO( "ComObsDecoder:  " << miutil::miTime::nowTime() );
 

@@ -57,6 +57,7 @@ namespace serialize {
 class KvalobsData {
  public:
   KvalobsData();
+  KvalobsData(const KvalobsData &d);
 
   KvalobsData(const std::list<kvData> & data,
               const std::list<kvTextData> & tdata = std::list<kvTextData>());
@@ -66,6 +67,9 @@ class KvalobsData {
   std::string producer()const;
 
   void producer(const std::string &prod );
+
+  std::string msgid()const;
+  void msgid(const std::string &id);
 
 
   /**

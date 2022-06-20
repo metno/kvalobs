@@ -112,7 +112,7 @@ class DecoderBase {
   std::list<GenCachElem> genCachElem;
   miutil::conf::ConfSection *theKvConf;
   StationFiltersPtr filters;
-
+  
  protected:
   milog::FLogStream *openFLogStream(const std::string &filename);
 
@@ -143,12 +143,6 @@ class DecoderBase {
    */
   std::string datdirForLogger(const std::string &dir = "");
 
-/*
-  void addStationInfo(long stationid, const miutil::miTime &obstime,
-                      long typeid_, const miutil::miTime &tbtime, int priority);
-
-  void updateStationInfo(const kvalobs::kvStationInfoList& stationInfo);
-*/
   /**
    * \brief  isGenerated looks up in the table 'generated_data'
    *
@@ -189,6 +183,26 @@ class DecoderBase {
   std::string obsType;
 
   /**
+   * @brief A serial number that can be used to indentify an observation
+   * 
+   */
+  unsigned long long serialNumber;
+
+  /**
+   * @brief A messageid that can be used to indentify an observation
+   * 
+   */
+  std::string messageId;
+
+
+  /**
+   * @brief Who produced this message. Not all producers set this.
+   * 
+   */
+  std::string producer;
+
+
+  /**
    * \brief This is the message that is to be decoded
    *
    * and inserted into the tables \em data and \em text_data.
@@ -227,31 +241,6 @@ class DecoderBase {
    * \return true if there was now error, false otherwise.
    */
   bool deleteKvDataFromDb(const kvalobs::kvData &sd);
-#if 0
-  /**
-   * \brief insert/update data into the table \em data.
-   *
-   * It calls addStationInfo, so the caller must NOT do this.
-   * The field tbtime will be updated if it is not set.
-   *
-   * \param sd The data.
-   * \param priority The priority of the \em obs. Defaul value is 5.
-   * \return true if successful false otherwise.
-   */
-  bool putKvDataInDb(const kvalobs::kvData &sd, int priority = 5);
-
-  /**
-   * \brief insert/update data into the table \em data.
-   *
-   * It calls addStationInfo, so the caller must NOT do this.
-   * The field tbtime will be updated if it is not set.
-   *
-   * \param sd A list of data.
-   * \param priority The priority of the \em obs. Defaul value is 5.
-   * \return true if successful false otherwise.
-   */
-  bool putKvDataInDb(const std::list<kvalobs::kvData> &sd, int priority = 5);
-#endif
 
 
   /**
@@ -340,22 +329,6 @@ class DecoderBase {
    */
 
   bool putkvStationInDb(const kvalobs::kvStation &st);
-#if 0
-  /**
-   * \brief Insert/update the data into the table \em text_data..
-   *
-   * It calls addStationInfo, so the caller must NOT do this.
-   * The field tbtime will be updated if it is not set.
-   *
-   * \param sd The data.
-   * \param priority The priority of the \em obs. Defaul value is 5.
-   * \return true if successful false otherwise.
-   */
-  bool putkvTextDataInDb(const kvalobs::kvTextData &td, int priority = 5);
-
-  bool putkvTextDataInDb(const std::list<kvalobs::kvTextData> &td_,
-                         int priority);
-#endif
  public:
   typedef enum {
     /// The \em obs was decoded and inserted into the database.
@@ -424,6 +397,16 @@ class DecoderBase {
               int decoderId_ = -1);
 
   virtual ~DecoderBase();
+
+  void setSerialNumber(unsigned long long serialnumber);
+  unsigned long long  getSerialNumber()const;
+
+  void setMessageId(const std::string &msgid);
+  std::string getMessageId()const;
+
+  void setProducer(const std::string &producer);
+  std::string getProducer()const;
+
 
   void setFilters( const kvalobs::decoder::StationFiltersPtr filters);
   StationFilterElement filter(long stationId, long typeId)const;

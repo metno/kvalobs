@@ -85,7 +85,10 @@ bool kvalobs::decoder::rejectdecoder::RejectDecoder::doDecode(
 kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::rejectdecoder::RejectDecoder::execute(
     std::string &msg) {
   kvRejectdecode rejected;
-  milog::LogContext lcontext(name());
+  ostringstream s;
+
+  s << name() << " (" << serialNumber << ")";
+  milog::LogContext lcontext(s.str());
 
   LOGINFO("Rejected:  " << miutil::miTime::nowTime());
 

@@ -47,7 +47,9 @@ namespace serialize {
 class KvalobsDataSerializer {
  public:
   KvalobsDataSerializer();
+  KvalobsDataSerializer(const KvalobsDataSerializer &d);
   KvalobsDataSerializer(const KvalobsData & d, const std::string &producer);
+  KvalobsDataSerializer(const KvalobsData & d, const std::string &producer, const std::string &msgid);
   KvalobsDataSerializer(const KvalobsData & d);
   KvalobsDataSerializer(const std::string & s);
 
@@ -55,8 +57,10 @@ class KvalobsDataSerializer {
 
   ~KvalobsDataSerializer();
   std::string producer()const;
+  std::string msgid()const;
 
   static std::string serialize(const KvalobsData & d,const std::string &producer);
+  static std::string serialize(const KvalobsData & d,const std::string &producer, const std::string &msgid);
   static std::string serialize(const KvalobsData & d);
 
   const KvalobsData & toData() const;

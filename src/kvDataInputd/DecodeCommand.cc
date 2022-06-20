@@ -61,6 +61,21 @@ DecodeCommand::getPublishData() {
   return decoder->getPublishData();
 }
 
+void DecodeCommand::setMessageId( const std::string &msgid ) {
+  decoder->setMessageId(msgid);
+}
+
+void DecodeCommand::setSerialNumber( unsigned long long serialNumber ) {
+  decoder->setSerialNumber(serialNumber);
+}
+
+void DecodeCommand::setProducer( const std::string &producer ) {
+  decoder->setProducer(producer);
+}
+
+std::string DecodeCommand::getProducer( ) const {
+  return decoder->getProducer();
+}
 
 void DecodeCommand::run() {
   LOGDEBUG("DecodeCommand::execute: called!\n");

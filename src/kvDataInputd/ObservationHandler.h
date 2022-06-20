@@ -30,54 +30,59 @@
 #ifndef SRC_KVDATAINPUTD_OBSERVATIONHANDLER_H_
 #define SRC_KVDATAINPUTD_OBSERVATIONHANDLER_H_
 
-#include <atomic>
-#include <string>
-#include <memory>
 #include "httpserver.hpp"
-#include "lib/kvsubscribe/SendData.h"
-#include "lib/kvsubscribe/ProducerCommand.h"
 #include "kvDataInputd/DataSrcApp.h"
-
+#include "lib/kvsubscribe/ProducerCommand.h"
+#include "lib/kvsubscribe/SendData.h"
+#include <atomic>
+#include <memory>
+#include <string>
 
 using httpserver::http_resource;
 using httpserver::http_response;
 
-class ObservationHandler : public http_resource {
- public:
-  struct Observation {
+class ObservationHandler : public http_resource
+{
+public:
+  struct Observation
+  {
     std::string obsType;
     std::string obs;
-    Observation(const std::string &obsType_, const std::string &obs_)
-        : obsType(obsType_),
-          obs(obs_) {
-    }
-    Observation(){}
+    Observation(const std::string& obsType_, const std::string& obs_)
+      : obsType(obsType_)
+      , obs(obs_)
+    {}
+    Observation() {}
   };
 
-  class DecodeResultException : public std::exception, public kvalobs::datasource::Result {
-   public:
-    DecodeResultException(kvalobs::datasource::EResult res, const std::string &errormsg) {
+  class DecodeResultException
+    : public std::exception
+    , public kvalobs::datasource::Result
+  {
+  public:
+    DecodeResultException(kvalobs::datasource::EResult res,
+                          const std::string& errormsg)
+    {
       this->res = res;
       message = errormsg;
     }
 
-    const char* what() const noexcept {
-      return message.c_str();
-    }
+    const char* what() const noexcept { return message.c_str(); }
   };
 
-  ObservationHandler(DataSrcApp &app, kvalobs::service::ProducerQuePtr raw);
-  const std::shared_ptr<http_response> render_POST(const httpserver::http_request& req);
+  ObservationHandler(DataSrcApp& app, kvalobs::service::ProducerQuePtr raw);
+  const std::shared_ptr<http_response> render_POST(
+    const httpserver::http_request& req);
 
- protected:
+protected:
   unsigned long long getSerialNumber();
   Observation getObservation(const httpserver::http_request& req);
-  void postOnRawQue(const std::string &rawData);
+  void postOnRawQue(const std::string& rawData);
 
- private:
-  DataSrcApp &app;
+private:
+  DataSrcApp& app;
   std::atomic_ullong serialNumber;
   kvalobs::service::ProducerQuePtr rawQue;
 };
 
-#endif  // SRC_KVDATAINPUTD_OBSERVATIONHANDLER_H_
+#endif // SRC_KVDATAINPUTD_OBSERVATIONHANDLER_H_

@@ -63,9 +63,10 @@ using internal::Container;
 namespace {
   struct BCI {
     string producer_;
+    string msgid_;
   };
   
-static  mutex bciMu;
+static mutex bciMu;
 static map<KvalobsData*, BCI *> bciMap;
 
 BCI *getBci(KvalobsData *t) {
@@ -106,6 +107,18 @@ KvalobsData::KvalobsData()
     : overwrite_(false) {
 }
 
+KvalobsData::KvalobsData(const KvalobsData &d)
+  : overwrite_(d.overwrite_),
+   obs_(d.obs_),
+   correctedMessages_(d.correctedMessages_),
+   created_(d.created_)
+
+{
+  auto bci=setBci(this);
+  bci->msgid_=d.msgid();
+  bci->producer_=d.producer();
+}
+
 KvalobsData::KvalobsData(const std::list<kvData> & data,
                          const std::list<kvTextData> & tdata)
     : overwrite_(false) {
@@ -133,6 +146,18 @@ void KvalobsData::producer(const std::string &prod ){
   bci->producer_=prod;
 }
 
+std::string KvalobsData::msgid()const{
+  auto bci=getBci(const_cast<KvalobsData*>(this));
+  if( !bci ) {
+    return "";
+  }
+  return bci->msgid_;
+}
+
+void KvalobsData::msgid(const std::string &id){
+  auto bci=setBci(this);
+  bci->msgid_=id;
+}
 
 
    

@@ -213,7 +213,9 @@ kvalobs::decoder::DecoderBase::DecodeResult SynopDecoder::execute(
 
   Lock lock(mutex);
 
-  milog::LogContext lcontext("SynopDecoder");
+  ostringstream s;
+  s << name() << " (" << serialNumber << ")";
+  milog::LogContext lcontext(s.str());
   LOGINFO("New observation(s)");
 
   if (obs.length() == 0) {

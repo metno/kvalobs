@@ -103,6 +103,7 @@ class DataSrcApp : public KvBaseApp {
   typedef boost::mutex::scoped_lock Lock;
 
   static boost::regex reMessageid;
+  static boost::regex reProducer;
   kvalobs::decoder::DecoderMgr decoderMgr;
   bool ok;
   std::string connectStr;
@@ -159,7 +160,8 @@ class DataSrcApp : public KvBaseApp {
   bool registerAllDecoders(miutil::conf::ConfSection *theConf);
 
   DecodeCommand* decodeExecute(DecodeCommand *decCmd, kvalobs::datasource::Result *res, const std::string &logid);
-  DecodeCommand* decode(const char *obsType, const char *data, const std::string &logid, kvalobs::datasource::Result *res);
+  //DecodeCommand* decode(const char *obsType, const char *data, const std::string &logid, kvalobs::datasource::Result *res);
+  DecodeCommand* getDecoder(const char *obsType, const char *data, const std::string &logid, kvalobs::datasource::Result *res);
 
   boost::mutex mutex;
 
@@ -220,7 +222,9 @@ class DataSrcApp : public KvBaseApp {
   }
 
   static std::string getMessageId(std::string &obstype);
-  kvalobs::datasource::Result newObservation(const char *obsType, const char *data, const std::string &logid);
+  static std::string getProducer(std::string &obstype);
+
+  kvalobs::datasource::Result newObservation(const char *obsType, const char *data, unsigned long long serialNumber, std::string *producer, const std::string &logid);
 
   /**
    * \brief getDbConnections returns the number of connections we have to the

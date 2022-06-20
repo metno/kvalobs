@@ -51,6 +51,7 @@ namespace {
 //BCI = binary compatible interface. A strategi to make changes without breaking binary compatibility.
 struct BCI {
   string producer_;
+  string msgid_;
 };
   
 static  std::mutex bciMu;
@@ -93,17 +94,36 @@ void delBci(KvalobsDataSerializer *t) {
 KvalobsDataSerializer::KvalobsDataSerializer() {
 }
 
+// KvalobsDataSerializer::KvalobsDataSerializer(const KvalobsDataSerializer &d) {
+// }
+
+
 KvalobsDataSerializer::KvalobsDataSerializer(const KvalobsData & d, const std::string &producer)
     : data_(d) {
-      setBci(this)->producer_=producer;
+      data_.producer(producer);
+      auto bci=setBci(this);
+      bci->producer_=producer;
+      bci->msgid_=d.msgid();
 }
 
 KvalobsDataSerializer::KvalobsDataSerializer(const KvalobsData & d)
     : data_(d) {
+    auto bci=setBci(this);
+    bci->producer_=d.producer();
+    bci->msgid_=d.msgid();
 }
 
 KvalobsDataSerializer::KvalobsDataSerializer(const std::string & s) {
   internal::KvalobsDataParser::parse(s, data_);
+}
+
+KvalobsDataSerializer::KvalobsDataSerializer(const KvalobsData & d, const std::string &producer, const std::string &msgid)
+   : data_(d) {
+  data_.producer(producer);
+  data_.msgid(msgid);
+  auto bci=setBci(this);
+  bci->producer_=producer;
+  bci->msgid_=msgid;
 }
 
 KvalobsDataSerializer::~KvalobsDataSerializer() {
@@ -121,8 +141,26 @@ std::string KvalobsDataSerializer::producer()const{
   return p->producer_;
 }
 
+
+std::string KvalobsDataSerializer::msgid()const{
+  auto p=getBci(const_cast<KvalobsDataSerializer*>(this));
+  if( !p) {
+    return "";
+  }
+
+  return p->msgid_;
+}
+
 string KvalobsDataSerializer::serialize(const KvalobsData & d, const std::string &producer) {
   KvalobsDataSerializer s(d, producer);
+  if( d.created().is_special())
+    return s.toString();
+  else
+    return s.toString(d.created());
+}
+
+std::string KvalobsDataSerializer::serialize(const KvalobsData & d,const std::string &producer, const std::string &msgid){
+  KvalobsDataSerializer s(d, producer, msgid);
   if( d.created().is_special())
     return s.toString();
   else
@@ -181,6 +219,15 @@ std::string KvalobsDataSerializer::toString(const boost::posix_time::ptime &crea
 
   if( ! created.is_special() )
     root->set_attribute("created", to_kvalobs_string(created));
+
+  string msgId=msgid();
+  if (msgId.empty() ) {
+    msgId=data_.msgid();
+  }
+
+  if( ! msgId.empty() ) {
+    root->set_attribute("msgid", msgId);
+  }
 
   using namespace internal;
 

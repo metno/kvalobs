@@ -68,6 +68,7 @@ struct Result {
   std::string message;
   std::string messageId;
   bool retry;
+  
   Result()
       : res(EResult::OK),
         retry(false) {

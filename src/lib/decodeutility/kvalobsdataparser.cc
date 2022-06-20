@@ -88,6 +88,7 @@ struct KvalobsDataHandler : public HandlerFunction {
     data_.overwrite(has_attr(attr, "overwrite"));
     data_.created(get_attr(attr, "created"));
     data_.producer(get_attr(attr, "producer"));
+    data_.msgid(get_attr(attr, "msgid"));
   }
 };
 

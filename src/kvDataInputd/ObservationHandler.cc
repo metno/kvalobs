@@ -75,6 +75,7 @@ const shared_ptr<http_response> ObservationHandler::render_POST(const httpserver
   Json::Value jval;
   bool ok=false;
   std::ostringstream oerr;
+  std::string producer;
 
   if (app.inShutdown()) {
     return response("The service is unavailable.", HttpServiceUnavailable);
@@ -86,6 +87,7 @@ const shared_ptr<http_response> ObservationHandler::render_POST(const httpserver
   milog::LogContext logContext(ost.str());
 
   LOGINFO("Path: '" << req.get_path() << " serialNumber: " << serial << ".");
+  IDLOGINFO("http","Path: '" << req.get_path() << " serialNumber: " << serial << ".");
 
   Observation obs;
   shared_ptr<http_response> res;
@@ -94,8 +96,9 @@ const shared_ptr<http_response> ObservationHandler::render_POST(const httpserver
     obs = getObservation(req);
 
     LOGDEBUG("obsType: '" << obs.obsType << "'\n" << "obsData:[\n" << obs.obs << "\n]\n");
+    IDLOGDEBUG("http","obsType: '" << obs.obsType << "'\n" << "obsData:[\n" << obs.obs << "\n]\n");
 
-    kd::Result r = app.newObservation(obs.obsType.c_str(), obs.obs.c_str(), "http");
+    kd::Result r = app.newObservation(obs.obsType.c_str(), obs.obs.c_str(), serial, &producer, "http");
     jval = kd::decodeResultToJson(r);
     if (r.res == kd::EResult::OK) {
       ok=true;
@@ -110,18 +113,20 @@ const shared_ptr<http_response> ObservationHandler::render_POST(const httpserver
   } catch (const DecodeResultException &ex) {
     oerr << "DecodeResultException: " << ex.what() << "\n"; 
     LOGERROR("DecodeResultException: " << ex.what() << "\nobsType: '" << obs.obsType << "'\n" << "obsData:[\n" << obs.obs << "\n]\n")
+    IDLOGERROR("http","DecodeResultException: " << ex.what() << "\nobsType: '" << obs.obsType << "'\n" << "obsData:[\n" << obs.obs << "\n]\n")
     jval = decodeResultToJson(ex);
     res=response(jval.toStyledString(), HttpBadRequest, "application/json");
   } catch ( const std::exception &ex) {
     oerr << "Unexpected exception: " << ex.what() << "\n";
     LOGERROR("Unexpected exception: " << ex.what() << "\nobsType: '" << obs.obsType << "'\n" << "obsData:[\n" << obs.obs << "\n]\n")
+    IDLOGERROR("http","Unexpected exception: " << ex.what() << "\nobsType: '" << obs.obsType << "'\n" << "obsData:[\n" << obs.obs << "\n]\n")
     string err("Problems: " );
     err += ex.what();
     res=response(err, HttpInternalServerError, "application/text");
   }
 
   if( !ok && obs.obsType.find("kv2kv") != string::npos) {
-    IDLOGDEBUG("kv2kvdecoder", "Serialnumber: " << serialNumber << "\n" << oerr.str() << obs.obsType<<"\n"<<req.get_content()<<"\n" << obs.obs );
+    IDLOGDEBUG("kv2kvdecoder", "Serialnumber: " << serial << "\n" << oerr.str() << obs.obsType << "\n--- raw begin ----\n" << obs.obs <<"\n--- raw end ---");
   } 
 
   return res;

@@ -58,6 +58,7 @@ using boost::bad_lexical_cast;
 volatile sig_atomic_t sigTerm = 0;
 
 boost::regex DataSrcApp::reMessageid(".+(/ *messageid *=([^/]*)).*", boost::regex::perl | boost::regex::icase);
+boost::regex DataSrcApp::reProducer(".+(/ *producer *=([^/]*)).*", boost::regex::perl | boost::regex::icase);
 
 DataSrcApp::DataSrcApp(int argn, char **argv, int nConnections_, miutil::conf::ConfSection *theKvConf)
     : KvBaseApp(argn, argv),
@@ -178,7 +179,6 @@ namespace {
 bool DataSrcApp::publishData(const std::list<kvalobs::serialize::KvalobsData> &publishData) {
   //std::cerr << "publishData: size " << publishData.size() << "\n\n";
   if( publishData.size() == 0 ) {
-    
     return true;
   }
 
@@ -457,6 +457,20 @@ std::string DataSrcApp::getMessageId(std::string &obstype) {
   return boost::trim_copy(id);
 }
 
+std::string DataSrcApp::getProducer(std::string &obstype) {
+  boost::smatch match;
+
+  if (!boost::regex_match(obstype, match, reProducer))
+    return "";
+
+  string producer = match[2];
+  obstype.replace(obstype.find(match[1]), match[1].length(), "");
+
+  return boost::trim_copy(producer);
+}
+
+
+#if 0
 DecodeCommand*
 DataSrcApp::decode(const char *obsType, const char *data, const std::string &logid, kvalobs::datasource::Result *res) {
   namespace kd = kvalobs::datasource;
@@ -492,6 +506,42 @@ DataSrcApp::decode(const char *obsType, const char *data, const std::string &log
   }
 
   return decodeExecute(decCmd, res, logid);
+}
+#endif
+
+DecodeCommand* DataSrcApp::getDecoder(const char *obsType, const char *data, const std::string &logid, kvalobs::datasource::Result *res) {
+  namespace kd = kvalobs::datasource;
+  DecodeCommand *decCmd;
+  DataSrcApp::ErrCode errCode;
+  string errMsg;
+
+  try {
+    decCmd = this->create(obsType, data, 60000, errCode, errMsg);
+  } catch (const std::exception &ex) {
+    IDLOGERROR(logid, "Exception: " << ex.what() << " <" << obsType << ">.\nData <"<< data << ">.");
+    decCmd = 0;
+  } catch (...) {
+    IDLOGERROR(logid, "Exception:  <" << obsType << ">.\nData <"<< data << ">.");
+    decCmd = 0;
+  }
+
+  if (!decCmd) {
+    if (errCode == DataSrcApp::NoDbConnection) {
+      res->res = kd::EResult::NOTSAVED;
+      res->message = errMsg;
+    } else if (errCode == DataSrcApp::NoMem) {
+      res->res = kd::EResult::ERROR;
+      res->message = "Internal server error.";
+    } else if (errCode == DataSrcApp::NoDecoder) {
+      res->res = kd::EResult::NODECODER;
+      res->message = errMsg;
+    } else {
+      res->res = kd::EResult::ERROR;
+      res->message = errMsg;
+    }
+    return nullptr;
+  }
+  return decCmd;
 }
 
 DecodeCommand* DataSrcApp::decodeExecute(DecodeCommand *decCmd, kvalobs::datasource::Result *res, const std::string &logid) {
@@ -538,10 +588,11 @@ DecodeCommand* DataSrcApp::decodeExecute(DecodeCommand *decCmd, kvalobs::datasou
   return decCmdRet;
 }
 
-kvalobs::datasource::Result DataSrcApp::newObservation(const char *obsType_, const char *data_, const std::string &logid) {
+kvalobs::datasource::Result DataSrcApp::newObservation(const char *obsType_, const char *data_, unsigned long long serialNumber, std::string *producer, const std::string &logid) {
   namespace kd = kvalobs::datasource;
   kd::Result res;
   DecodeCommand *decCmdRet;
+  DecodeCommand *decCmd;
   const char *data = data_;
   std::string obsType = obsType_;
   string redirectedData;
@@ -549,14 +600,35 @@ kvalobs::datasource::Result DataSrcApp::newObservation(const char *obsType_, con
   bool redirect = false;
   int redirectCount=0;
   boost::shared_ptr<kvalobs::decoder::RedirectInfo> redirected;
+  std::string myProducer(getProducer(obsType)); 
   res.messageId = getMessageId(obsType);
+
 
   do {
     redirect = false;
-    decCmdRet = decode(obsType.c_str(), data, logid, &res);
+    decCmd = getDecoder(obsType.c_str(), data, logid, &res);
+
+    if( ! decCmd ) {
+      return res;
+    }
+
+    decCmd->setMessageId(res.messageId);
+    decCmd->setSerialNumber(serialNumber);
+    decCmd->setProducer(myProducer);
+    
+    if( ! producer ) {
+      *producer=myProducer;
+    }
+
+    decCmdRet = decodeExecute(decCmd, &res, logid);
 
     if (!decCmdRet)
       return res;
+    
+    if( producer ) {
+      *producer = decCmd->getProducer();
+    }
+
 
     kvalobs::decoder::DecoderBase::DecodeResult decodeResult = decCmdRet->getResult();
     redirect = false;
@@ -612,7 +684,7 @@ kvalobs::datasource::Result DataSrcApp::newObservation(const char *obsType_, con
   } while (redirect);
 
   res.message = decCmdRet->getMsg();
-
+  
   this->releaseDecodeCommand(decCmdRet);
   return res;
 }
