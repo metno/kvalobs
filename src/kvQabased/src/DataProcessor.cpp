@@ -256,9 +256,9 @@ void DataProcessor::onKafkaSendSuccess(kvalobs::subscribe::KafkaProducer::Messag
 }
 
 void DataProcessor::onKafkaSendError(kvalobs::subscribe::KafkaProducer::MessageId id, const std::string & data, const std::string & errorMessage) {
-  LOGERROR("kafka: Unable to send data ("  <<id <<"): " << errorMessage );
-  IDLOGINFO("kafka","Unable to send data ("  <<id <<"): " << errorMessage );
-  LOGDEBUG("Unable to send data ("  <<id <<"): " << errorMessage << "\nData: <" + data + ">");
+  LOGERROR("kafka: Could not send data to Kafka. ("  <<id <<"): " << errorMessage );
+  IDLOGINFO("kafka","Could not send data to Kafka. ("  <<id <<"): " << errorMessage );
+  LOGDEBUG("kafka: Could not send data to Kafka. ("  <<id <<"): " << errorMessage << "\nData: <" + data + ">");
 }
 
 void DataProcessor::finalizeMessage_() {
