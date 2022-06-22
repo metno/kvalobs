@@ -8,7 +8,7 @@ kvalobs (7.0.1-1) bionic; urgency=medium
     - exit the processe when we have retried to send to kafka 10 times. The process must
       be restarted by some means. 
   
- -- Borge Moe <borge.moe@met.no>  Mon, 20 Jun 2022 07:30:00 +0200
+ -- Borge Moe <borge.moe@met.no>  Mon, 22 Jun 2022 07:00:00 +0200
 
 kvalobs (7.0.0-1) bionic; urgency=medium
   * Fix initialization bug in CTOR.

@@ -1,5 +1,5 @@
-2022-06-20 Børge Moe
-  * Relase 7.0.1~rc2
+2022-06-22 Børge Moe
+  * Relase 7.0.1
   * Uppgrade rdkafka to version 18.2
   * kvDataInputd
     - Better tracing of log messages between logs.
