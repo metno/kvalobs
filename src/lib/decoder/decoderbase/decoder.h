@@ -33,8 +33,11 @@
 
 #include <list>
 #include <set>
+#include <iostream>
 #include <sstream>
 #include <string>
+#include <stdlib.h>
+#include <mutex>
 #include "boost/lexical_cast.hpp"
 #include "miconfparser/miconfparser.h"
 #include "puTools/miTime.h"
@@ -99,6 +102,60 @@ class ObsPgmParamInfo {
                 const miutil::miTime &obstime, Active &state) const;
 };
 
+
+class QaIdInfo {
+  public:
+    QaIdInfo():qaMaxId_(-1){}
+    QaIdInfo(int qaMaxId, std::list<int> qaIdTypes):
+      random_(true), nextQaId_(0),qaIdTypes_(qaIdTypes), qaMaxId_(qaMaxId){
+        if( qaIdTypes_.size()==1 && *qaIdTypes_.begin()==0) {
+          random_=false;
+        }
+    }
+
+    bool isQaIdConfiguredForType(int typeID){ 
+      if( qaMaxId_<0 ||  qaIdTypes_.empty() )
+        return false;
+
+      if(*qaIdTypes_.begin()==0 )
+        return true;
+      for( auto t : qaIdTypes_) {
+        if( t == typeID )
+          return true;
+      }
+      return false;
+    }
+
+    //Return the qaId to use, or -1 if qaId is not configured.
+    int getQaIdToUse() {
+      if( qaMaxId_< 0 || qaIdTypes_.empty()) {
+        return -1;
+      }
+
+      if( random_ ) {
+        return rand()%(qaMaxId_+1);
+      } else {
+        //Use round robin
+        std::lock_guard<std::mutex> lck(m_);
+        int ret=nextQaId_;
+        nextQaId_ = (nextQaId_+1)%(qaMaxId_+1);
+        return ret;
+      }
+    }
+    
+    friend std::ostream& operator<<(std::ostream& os, const QaIdInfo& info);
+  private:
+    std::mutex m_;
+    bool random_;
+    int nextQaId_;
+    std::list<int> qaIdTypes_;
+    int qaMaxId_;
+    //friend std::ostream& operator<<(std::ostream& os, const QaIdInfo& info);
+};
+
+std::ostream& operator<<(std::ostream& os, const QaIdInfo& info);
+
+
 class DecoderBase {
   DecoderBase();
   DecoderBase(const DecoderBase &);
@@ -112,7 +169,8 @@ class DecoderBase {
   std::list<GenCachElem> genCachElem;
   miutil::conf::ConfSection *theKvConf;
   StationFiltersPtr filters;
-  
+  std::shared_ptr<QaIdInfo> qaIdInfo_; 
+  int useQaId_;
  protected:
   milog::FLogStream *openFLogStream(const std::string &filename);
 
@@ -407,10 +465,16 @@ class DecoderBase {
   void setProducer(const std::string &producer);
   std::string getProducer()const;
 
+  void setQaIdInfo(std::shared_ptr<QaIdInfo> qaIdInfo);
+  //Returns the qa_id to use. If < 0, do not set qa_id. Not used for this typeid. 
+  int useQaId(int typeID);
+
+
 
   void setFilters( const kvalobs::decoder::StationFiltersPtr filters);
   StationFilterElement filter(long stationId, long typeId)const;
 
+  
   /**
    * Use the filters an returns the data to be saved into the database. It does not save the
    * the data, just filter it.

@@ -40,6 +40,7 @@
 #include "lib/kvalobs/paramlist.h"
 #include "lib/kvalobs/kvTypes.h"
 #include "lib/decoder/decoderbase/decodermgr.h"
+#include "lib/decoder/decoderbase/decoder.h"
 #include "lib/kvdb/dbdrivermgr.h"
 #include "lib/json/json/json.h"
 #include "lib/miconfparser/miconfparser.h"
@@ -121,6 +122,7 @@ class DataSrcApp : public KvBaseApp {
   kvalobs::service::KafkaProducerThread kafkaPubStream;
   kvalobs::decoder::StationFiltersPtr filters;
   std::string paramFile;
+  std::shared_ptr<kvalobs::decoder::QaIdInfo> qaIdInfo;
   /**
    * \brief registerParams reads parameter information from the table
    * kv_params into paramList.

@@ -634,9 +634,16 @@ std::list<qabase::Observation *> KvalobsDatabaseAccess::selectFailedDataForContr
     //SELECT o.observationid, stationid, typeid, obstime, o.tbtime FROM workque q, observations o WHERE q.observationid=o.observationid AND qa_start<now()-'10 minutes'::interval AND qa_stop is null ORDER BY priority, tbtime LIMIT 1;";
 
     std::ostringstream query; 
-    query << "SELECT o.observationid, stationid, typeid, obstime, o.tbtime FROM workque q, observations o "
-      "WHERE q.observationid=o.observationid AND qa_start<now()-'10 minutes'::interval AND qa_stop is null "
-      " ORDER BY priority, tbtime LIMIT " << limit << ";";
+ 
+    if( qaId>-1) {
+       query << "SELECT o.observationid, stationid, typeid, obstime, o.tbtime FROM workque q, observations o "
+        "WHERE q.observationid=o.observationid AND qa_start<now()-'10 minutes'::interval AND qa_stop is null"
+        " AND (qa_id=" << qaId << " OR qa_id is null) "
+        "ORDER BY qa_id, priority, tbtime LIMIT " << limit << ";";
+    } else
+      query << "SELECT o.observationid, stationid, typeid, obstime, o.tbtime FROM workque q, observations o "
+        "WHERE q.observationid=o.observationid AND qa_start<now()-'10 minutes'::interval AND qa_stop is null "
+        "ORDER BY priority, tbtime LIMIT " << limit << ";";
 
     std::unique_ptr<dnmi::db::Result> result(connection_->execQuery(query.str()));
 
@@ -653,10 +660,18 @@ std::list<qabase::Observation *> KvalobsDatabaseAccess::selectLatestDataBasedOnO
 
 
   std::ostringstream query; 
-  query << "SELECT o.observationid, stationid, typeid, obstime, o.tbtime FROM workque q, observations o "
+  
+  if( qaId>-1) {
+    query << "SELECT o.observationid, stationid, typeid, obstime, o.tbtime FROM workque q, observations o "
+      "WHERE q.observationid=o.observationid AND qa_start IS NULL AND process_start is not null" 
+      " AND obstime >= date_trunc('hour', now()-'3 hours'::interval) AND (qa_id=" << qaId << " OR qa_id is null) "
+      "ORDER BY qa_id, priority, obstime LIMIT "<< limit << ";";
+  } else {
+    query << "SELECT o.observationid, stationid, typeid, obstime, o.tbtime FROM workque q, observations o "
       "WHERE q.observationid=o.observationid AND qa_start IS NULL AND process_start is not null" 
       " AND obstime >= date_trunc('hour', now()-'3 hours'::interval) "
       "ORDER BY priority, obstime LIMIT "<< limit << ";";
+  }
 
   std::unique_ptr<dnmi::db::Result> result(connection_->execQuery(query.str()));
 
@@ -667,9 +682,16 @@ std::list<qabase::Observation *> KvalobsDatabaseAccess::selectOlderDataControl(i
   //Process older data sorted by tbtime. Process the latest observations first. 
   //SELECT o.observationid, stationid, typeid, obstime, o.tbtime FROM workque q, observations o WHERE q.observationid=o.observationid AND process_start is not null AND qa_start IS NULL ORDER BY priority, tbtime LIMIT 1;
   std::ostringstream query;
-      query << "SELECT o.observationid, stationid, typeid, obstime, o.tbtime FROM workque q, observations o "
+  
+  if( qaId>-1) {
+    query << "SELECT o.observationid, stationid, typeid, obstime, o.tbtime FROM workque q, observations o "
+      "WHERE q.observationid=o.observationid AND process_start is not null AND qa_start IS NULL AND (qa_id=" << qaId << " OR qa_id is null ) "
+      "ORDER BY qa_id, priority, tbtime LIMIT " << limit <<";";
+  } else {
+    query << "SELECT o.observationid, stationid, typeid, obstime, o.tbtime FROM workque q, observations o "
       "WHERE q.observationid=o.observationid AND process_start is not null AND qa_start IS NULL "
       "ORDER BY priority, tbtime LIMIT " << limit <<";";
+  }
 
   std::unique_ptr<dnmi::db::Result> result(connection_->execQuery(query.str()));
   return newObservation(result);

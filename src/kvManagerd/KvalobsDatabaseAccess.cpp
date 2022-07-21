@@ -180,7 +180,7 @@ void KvalobsDatabaseAccess::cleanWorkQueue() {
     "where s.observationid=q.observationid "
     "and q." + criteria);
   exec_("INSERT INTO workstatistik (SELECT "
-    "o.stationid, o.obstime, o.typeid, o.tbtime, q.priority, q.process_start, q.qa_start, q.qa_stop, q.service_start, q.service_stop, o.observationid"
+    "o.stationid, o.obstime, o.typeid, o.tbtime, q.priority, q.process_start, q.qa_start, q.qa_stop, q.service_start, q.service_stop, q.qa_id, o.observationid"
     " FROM workque q, observations o WHERE"
     " q.observationid=o.observationid "
     " and q." + criteria + ")");
@@ -324,9 +324,10 @@ std::string KvalobsDatabaseAccess::selectWorkQueueQuery_(const DataIdentifier & 
   return q.str();
 }
 
+
 std::string KvalobsDatabaseAccess::insertWorkQueueQuery_(const DataIdentifier & di, int priority) const {
   std::ostringstream q;
-  q << "INSERT INTO workque VALUES (" << priority << ",now(),NULL,NULL,NULL,NULL," << di.obsid() << ")";
+  q << "INSERT INTO workque (priority, process_start, qa_start, qa_stop, service_start, service_stop, observationid) VALUES (" << priority << ",now(),NULL,NULL,NULL,NULL," << di.obsid() << ")";
   return q.str();
 }
 

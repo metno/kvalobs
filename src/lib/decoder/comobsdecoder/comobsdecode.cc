@@ -435,7 +435,7 @@ kvalobs::decoder::DecoderBase::DecodeResult ComObsDecoder::execute(
             try {
                 kvalobs::decoder::DataUpdateTransaction work(
                         to_ptime( it->getDate() ), it->stationID(),
-                        it->typeID(), &d, &td, logid );
+                        it->typeID(), &d, &td, logid, false, true, false, kvalobs::decoder::DataUpdateTransaction::Partial, useQaId(it->typeID()));
 
                 con.perform( work );
                 //updateStationInfo( work.stationInfoList() );

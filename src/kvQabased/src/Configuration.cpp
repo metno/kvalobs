@@ -188,6 +188,7 @@ Configuration::Configuration(int& argc, char** argv)
     ("kafka-error-loop-count",value<unsigned>(&maxKafkaSendErrors_)->default_value(0),
       "Kill the process after trying to send to kafka count times. If the value is 0 there is no limmit."
       " Only has effect if process count is 1")
+    ("id", value<int>(&id_)->default_value(-1), "The id for this kvQabased process. If less than 0, no id is assigned. ")
     ("config", value<std::string>(), "Read configuration from the given file")
     ("version", "Produce version information")("help", "Produce help message");
 

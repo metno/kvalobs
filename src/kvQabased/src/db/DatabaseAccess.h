@@ -74,6 +74,11 @@ namespace db {
  */
 class DatabaseAccess {
  public:
+  /**
+   * @brief qaId is an unique id assigned to each kvQabased.
+   * It is used to assign workque elements to a spesific kvQabased.
+   */
+  static int qaId;  
   virtual ~DatabaseAccess() {
   }
   ;

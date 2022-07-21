@@ -186,7 +186,9 @@ class Configuration {
     return logXml_;
   }
 
-
+  int id() const {
+    return id_;
+  }
 
   /**
    * Print version information to the given stream.
@@ -232,6 +234,7 @@ class Configuration {
   unsigned maxKafkaSendErrors_;
 
   unsigned processCount_;
+  int id_;
  
 };
 

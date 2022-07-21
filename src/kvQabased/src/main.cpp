@@ -117,12 +117,17 @@ class ProcessStatus {
   int id_;
 };
 
-ProcessStatus spawnSubProcesses(unsigned totalWorkerCount) {
-  for (int i = 1; i < totalWorkerCount; ++i)
-    if (fork() == 0) {
+ProcessStatus spawnSubProcesses(unsigned totalWorkerCount, int qaId) {
+  for (int i = 1; i < totalWorkerCount; ++i){
+    if (fork() == 0) { //in child
       prctl(PR_SET_PDEATHSIG, SIGHUP);  // die on parent death
+      if( qaId>-1) {
+        db::DatabaseAccess::qaId=qaId+i;
+      }
       return ProcessStatus(i);
     }
+  }
+  db::DatabaseAccess::qaId=qaId;
   return ProcessStatus(0);
 }
 
@@ -191,8 +196,25 @@ void setupLogging(const qabase::Configuration& config, const ProcessStatus & ps)
 
 }
 
+/*
+* NOTE on id. 
+*
+* Workque elements can be assigned to a specific id. Only the kvQabased process
+* with the id should process those workque elements.
+* 
+* If the process count is one. The id is assigned to the main process.
+* If the process count is greater than 1. The id configured defines the baseline
+* for ids used. Each forked prosess get an id based on id + the number of the forked process.
+* Ie, the process get id numbers in the range [id,id+processcount].
+*
+* ex. If the configured id is 1 and the processcount is 3. The id nubers for
+* the the forked processes and the main process is. [1, 2, 3]
+*
+*/
+
 int main(int argc, char ** argv) {
   kvalobs::serialize::KvalobsDataSerializer::defaultProducer = "kvqabase";
+  
   try {
     qabase::Configuration config(argc, argv);
     if ( !config.runNormally()) {
@@ -202,12 +224,13 @@ int main(int argc, char ** argv) {
 
     ProcessStatus processStatus;
     if (!config.haveObservationToCheck())
-      processStatus = spawnSubProcesses(config.processCount());
+      processStatus = spawnSubProcesses(config.processCount(), config.id());
     setupLogging(config, processStatus);
     qabase::QaBaseApp app(argc, argv);
 
     LOGINFO("Log xml sendt to kafka: " << (config.logXml()?"true":"false"));
     LOGINFO("Kafka send errors before terminating: " << config.maxKafkaSendErrors());
+    LOGINFO("ID: " << db::DatabaseAccess::qaId);
     LOGDEBUG("Using model data name " << config.modelDataName());
 
 

@@ -4,6 +4,7 @@ qabase_src_SOURCES += \
 	src/db/DelayedSaveDatabaseAccess.cpp \
 	src/db/databaseResultFilter.h \
 	src/db/DatabaseAccess.h \
+	src/db/DatabaseAccess.cpp \
 	src/db/CachedDatabaseAccess.cpp \
 	src/db/CachedDatabaseAccess.h \
 	src/db/KvalobsDatabaseAccess.h \

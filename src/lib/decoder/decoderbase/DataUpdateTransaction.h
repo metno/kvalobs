@@ -71,7 +71,7 @@ private:
   long long observationid;
   boost::posix_time::time_duration duration;
   boost::posix_time::ptime startTime;
-
+  
   // Data that is inserted or updated. This is not used in the kv2018 update
   //but maybe we will reuse it later.
   boost::shared_ptr<kvalobs::serialize::KvalobsData> data_;  
@@ -93,6 +93,7 @@ private:
   bool tryToUseDataTbTime;
   DuplicateTestType  duplicateTestType;
   bool onlyHqcData;
+  int qaId;  //if > -1, assign to the kvQabased with qa_id == qaId.
   
   bool partialIsEqual(const std::list<kvalobs::kvData> &oldData_, const std::list<kvalobs::kvTextData> &oldTextData, bool replace)const;
   bool completeIsEqual(const std::list<kvalobs::kvData> &oldData, const std::list<kvalobs::kvTextData> &oldTextData, bool replace)const;
@@ -116,15 +117,27 @@ private:
   bool isEqual(const std::list<kvalobs::kvData> &oldData,
                const std::list<kvalobs::kvTextData> &oldTextData);
 
+  // DataUpdateTransaction(const boost::posix_time::ptime &obstime, int stationid,
+  //                       int typeid_,
+  //                       std::list<kvalobs::kvData> *newData,
+  //                       std::list<kvalobs::kvTextData> *newTextData,
+  //                       const std::string &logid, 
+  //                       bool onlyAddOrUpdateData = false, 
+  //                       bool addToWorkQueue=true,
+  //                       bool tryToUseDataTbTime = false,
+  //                       DataUpdateTransaction::DuplicateTestType  duplicateTestType=Partial);
+
+  //false, true, false, kvalobs::decoder::DataUpdateTransaction::Partial
+
   DataUpdateTransaction(const boost::posix_time::ptime &obstime, int stationid,
                         int typeid_,
                         std::list<kvalobs::kvData> *newData,
                         std::list<kvalobs::kvTextData> *newTextData,
                         const std::string &logid, 
-                        bool onlyAddOrUpdateData = false, 
-                        bool addToWorkQueue=true,
-                        bool tryToUseDataTbTime = false,
-                        DataUpdateTransaction::DuplicateTestType  duplicateTestType=Partial);
+                        bool onlyAddOrUpdateData, 
+                        bool addToWorkQueue,
+                        bool tryToUseDataTbTime,
+                        DataUpdateTransaction::DuplicateTestType  duplicateTestType, int useQaId);          
   DataUpdateTransaction(const DataUpdateTransaction &dut);
 
 

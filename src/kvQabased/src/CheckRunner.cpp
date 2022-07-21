@@ -28,6 +28,9 @@
  */
 
 #include <iostream>
+#include <random>
+#include <chrono>
+#include <thread>
 #include "CheckRunner.h"
 #include "db/KvalobsDatabaseAccess.h"
 #include "db/returntypes/Observation.h"
@@ -43,6 +46,14 @@
 #include <new>
 
 namespace qabase {
+
+namespace {
+  std::chrono::milliseconds getTimeToSleepInMillis(unsigned int minMillis=200, unsigned int maxMillis=5000){
+    static thread_local std::default_random_engine* generator = new std::default_random_engine(std::random_device{}());
+    std::uniform_int_distribution<unsigned> distribution(minMillis, maxMillis);
+    return std::chrono::milliseconds(distribution(*generator));
+  }
+}
 
 CheckRunner::CheckRunner(std::shared_ptr<db::DatabaseAccess> database)
     : db_(database) {
@@ -163,7 +174,7 @@ CheckRunner::KvalobsDataPtr CheckRunner::newObservation(
   logContext << obs.obstime() << '/' << obs.typeID() << '/' << obs.stationID() << '/' << obs.id();
   milog::LogContext context(logContext.str());
 
-  if (not shouldRunAnyChecks(obs)) {
+  if ( ! shouldRunAnyChecks(obs)) {
     LOGDEBUG("Will not run any checks on observation: " << obs);
     // KvalobsDatabaseAccess requires a transaction to be running, but since
     // we are merely reading data we don't bother to commit
@@ -194,8 +205,16 @@ CheckRunner::KvalobsDataPtr CheckRunner::newObservation(
               KvalobsDataPtr ret = checkObservation(obs, scriptLog);
               logTransaction(true, start, nShortRetries, nLongRetries, aborted);
               return ret;
-            } catch (dnmi::db::SQLSerializeError &) {
-              LOGDEBUG("newObservation Serialization error! Retrying");
+            } catch (const dnmi::db::SQLSerializeError &e) {
+              if ( e.deadLockDetected() ) {
+                auto sleepFor = getTimeToSleepInMillis();
+                LOGWARN("newObservation Serialization error (deadlock)! Retrying in " << sleepFor.count() << " ms");
+                std::this_thread::sleep_for(sleepFor);
+              } else {
+                auto sleepFor = getTimeToSleepInMillis(50, 500);
+                LOGDEBUG("newObservation Serialization error! Retrying in " << sleepFor.count() << " ms");
+                std::this_thread::sleep_for(sleepFor);
+              }
             }
           }
           // Happens if we get more than 256 serialization errors in a row

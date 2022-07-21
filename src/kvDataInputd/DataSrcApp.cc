@@ -60,6 +60,37 @@ volatile sig_atomic_t sigTerm = 0;
 boost::regex DataSrcApp::reMessageid(".+(/ *messageid *=([^/]*)).*", boost::regex::perl | boost::regex::icase);
 boost::regex DataSrcApp::reProducer(".+(/ *producer *=([^/]*)).*", boost::regex::perl | boost::regex::icase);
 
+
+// assign_qaid {   
+//     types=(503,510)
+//     max_qaid=10
+//   }
+
+
+std::shared_ptr<kvalobs::decoder::QaIdInfo> getQaIdInfo(miutil::conf::ConfSection *conf) {
+  auto definedTypes = conf->getValue("kvDataInputd.assign_qaid.types");
+  auto maxQaId=conf->getValue("kvDataInputd.assign_qaid.max_qaid").valAsInt(-1);
+  std::list<int> types; 
+  miutil::conf::ValElementList::const_iterator it;
+  for( it=definedTypes.begin(); it != definedTypes.end(); it++ ) {
+    if( it->type()== miutil::conf::INT ){
+      int t=static_cast<int>(it->valAsInt());
+      if( t == 0 ) {
+        types.clear();
+        types.push_back(0);
+        break;
+      }
+      types.push_back(t);
+    }
+  }
+
+  if( types.empty() || maxQaId<0){
+    return std::make_shared<kvalobs::decoder::QaIdInfo>();
+  }
+
+  return std::make_shared<kvalobs::decoder::QaIdInfo>(maxQaId, types);
+}
+
 DataSrcApp::DataSrcApp(int argn, char **argv, int nConnections_, miutil::conf::ConfSection *theKvConf)
     : KvBaseApp(argn, argv),
       ok(false),
@@ -77,6 +108,8 @@ DataSrcApp::DataSrcApp(int argn, char **argv, int nConnections_, miutil::conf::C
     exit(1);
   }
   filters = kvalobs::decoder::StationFilters::readConfig(*conf);
+  qaIdInfo=getQaIdInfo(theKvConf);
+  LOGINFO("QaIdInfo: "  << *qaIdInfo);
   httpConfig.port = conf->getValue("kvDataInputd.http.port").valAsInt(httpConfig.port);
   httpConfig.threads = conf->getValue("kvDataInputd.http.threads").valAsInt(httpConfig.threads);
   httpConfig.loglevel = getLoglevelRecursivt(conf, "kvDataInputd.http", httpConfig.loglevel);
@@ -403,6 +436,7 @@ DataSrcApp::create(const char *obsType_, const char *obs, long timoutIn_msec, Er
 
   try {
     dec->setFilters(filters);
+    dec->setQaIdInfo(qaIdInfo);
     decCmd = new DecodeCommand(dec);
   } catch (...) {
     errCode = NoMem;

@@ -142,6 +142,23 @@ bool kvalobs::decoder::ObsPgmParamInfo::isActive(int stationid, int typeid_, int
   return false;
 }
 
+
+
+std::ostream& kvalobs::decoder::operator<<(std::ostream& os, const kvalobs::decoder::QaIdInfo& info)
+{
+    if( info.qaMaxId_ < 0 || info.qaIdTypes_.empty() ) {
+      os << "Not defined";
+      return os;
+    }
+
+    os << "Strategi: " << (info.random_?"random":"round robin") << " Types:";
+    for( auto t: info.qaIdTypes_) {
+      os << " " << t;
+    } 
+    return os;
+}
+
+
 kvalobs::decoder::DecoderBase::DecoderBase(dnmi::db::Connection &con_, const ParamList &params, const std::list<kvalobs::kvTypes> &typeList_,
                                            const std::string &obsType_, const std::string &obs_, int decoderId_)
     : decoderId(decoderId_),
@@ -151,7 +168,8 @@ kvalobs::decoder::DecoderBase::DecoderBase(dnmi::db::Connection &con_, const Par
       obsType(obsType_),
       obs(obs_),
       theKvConf(0),
-      filters( new StationFilters() ){
+      filters( new StationFilters() ),
+      useQaId_(-1){
 }
 
 kvalobs::decoder::DecoderBase::~DecoderBase() {
@@ -196,6 +214,25 @@ std::string kvalobs::decoder::DecoderBase::getProducer()const{
 void kvalobs::decoder::DecoderBase::setFilters( const kvalobs::decoder::StationFiltersPtr filters_){
   filters=filters_;
 }
+
+
+void kvalobs::decoder::DecoderBase::setQaIdInfo(std::shared_ptr<QaIdInfo> qaIdInfo) {
+  this->qaIdInfo_=qaIdInfo;
+  if( qaIdInfo ) {
+    useQaId_=qaIdInfo->getQaIdToUse();
+  }
+}
+  
+//Returns the qa_id to use. If < 0, do not set qa_id. Not used for this typeid. 
+int kvalobs::decoder::DecoderBase::useQaId(int typeID) {
+  if( qaIdInfo_ ) {
+    if ( qaIdInfo_->isQaIdConfiguredForType(typeID) ) {
+      return useQaId_;
+    }
+  }
+  return -1;
+}
+
 
 kvalobs::decoder::StationFilterElement
 kvalobs::decoder::DecoderBase::filter(long stationId, long typeId)const
@@ -482,7 +519,8 @@ addDataToDbThrow(const miutil::miTime &obstime, int stationid, int typeid_,
   else
     duplicateTest=DataUpdateTransaction::Complete;
 
-  kvalobs::decoder::DataUpdateTransaction work(pt_obstime, stationid, typeid_, &std::get<0>(data), &std::get<1>(data), logid, onlyAddOrUpdateData, addToWorkQueue, tryToUseDataTbTime, duplicateTest);
+  kvalobs::decoder::DataUpdateTransaction work(pt_obstime, stationid, typeid_, &std::get<0>(data), &std::get<1>(data), logid, 
+    onlyAddOrUpdateData, addToWorkQueue, tryToUseDataTbTime, duplicateTest, useQaId(typeid_));
 
   //con.perform(work, 20, dnmi::db::Connection::READ_COMMITTED);
   con.perform(work, 20, dnmi::db::Connection::REPEATABLE_READ);

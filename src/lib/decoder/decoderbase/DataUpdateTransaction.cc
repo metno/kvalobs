@@ -35,6 +35,7 @@
 #include "lib/milog/milog.h"
 #include "lib/kvalobs/kvWorkelement.h"
 #include "lib/miutil/timeconvert.h"
+#include "lib/miutil/splitstr.h"
 #include "lib/decoder/decoderbase/DataUpdateTransaction.h"
 #include "lib/kvalobs/observation.h"
 
@@ -49,6 +50,7 @@ using std::list;
 using std::auto_ptr;
 using std::logic_error;
 using kvalobs::Observation;
+using miutil::splitstr;
 
 namespace {
 std::list<kvalobs::kvData>::const_iterator findElem(const kvalobs::kvData &elem, const std::list<kvalobs::kvData> &list) {
@@ -70,6 +72,10 @@ std::list<kvalobs::kvTextData>::const_iterator findElem(const kvalobs::kvTextDat
   return list.end();
 }
 
+
+
+
+
 }  // namespace
 
 namespace kvalobs {
@@ -79,7 +85,7 @@ namespace decoder {
 DataUpdateTransaction::DataUpdateTransaction(const boost::posix_time::ptime &obstime, int stationid, int typeID,
                                              std::list<kvalobs::kvData> *newData, std::list<kvalobs::kvTextData> *newTextData, const std::string &logid,
                                              bool onlyAddOrUpdateData_, bool addToWorkQueue_, bool tryToUseDataTbTime_,
-                                             DataUpdateTransaction::DuplicateTestType duplicateTestType_)
+                                             DataUpdateTransaction::DuplicateTestType duplicateTestType_, int qaId_)
     : newData(newData),
       newTextData(newTextData),
       obstime(obstime),
@@ -96,7 +102,8 @@ DataUpdateTransaction::DataUpdateTransaction(const boost::posix_time::ptime &obs
       addToWorkQueue(addToWorkQueue_),
       tryToUseDataTbTime(tryToUseDataTbTime_),
       duplicateTestType(duplicateTestType_),
-      onlyHqcData(false) {
+      onlyHqcData(false),
+      qaId(qaId_) {
 }
 
 DataUpdateTransaction::DataUpdateTransaction(const DataUpdateTransaction &dut)
@@ -116,7 +123,8 @@ DataUpdateTransaction::DataUpdateTransaction(const DataUpdateTransaction &dut)
       addToWorkQueue(dut.addToWorkQueue),
       tryToUseDataTbTime(dut.tryToUseDataTbTime),
       duplicateTestType(dut.duplicateTestType),
-      onlyHqcData(dut.onlyHqcData) {
+      onlyHqcData(dut.onlyHqcData),
+      qaId(dut.qaId) {
 }
 
 DataUpdateTransaction::~DataUpdateTransaction() {
@@ -178,9 +186,16 @@ void DataUpdateTransaction::updateWorkQue(dnmi::db::Connection *con, long observ
   }
   observationid=observationid_;
   ostringstream q;
+  ostringstream sQaId;
 
-  q << "INSERT INTO workque (observationid,priority,process_start,qa_start,qa_stop,service_start,service_stop) "
-    << "VALUES(" << observationid << "," << pri << ",NULL,NULL,NULL,NULL,NULL)";
+  if( qaId < 0 ) {
+    sQaId << "NULL";
+  } else {
+    sQaId << qaId;
+  }
+
+  q << "INSERT INTO workque (observationid,priority,process_start,qa_start,qa_stop,service_start,service_stop, qa_id) "
+    << "VALUES(" << observationid << "," << pri << ",NULL,NULL,NULL,NULL,NULL," << sQaId.str() << ")";
 
   con->exec(q.str());
   duration = pt::microsec_clock::universal_time() - startTime;
@@ -206,7 +221,8 @@ void DataUpdateTransaction::worqueToWorkStatistik(dnmi::db::Connection *con, lon
     << "q.qa_stop,"
     << "q.service_start,"
     << "q.service_stop,"
-    << "q.observationid "
+    << "q.observationid,"
+    << "q.qa_id"
     << "FROM workque q, observations o "
     << "WHERE q.observationid=o.observationid AND q.observationid=" << observationid 
     << " AND q.qa_stop IS NOT NULL AND (SELECT count(*) FROM workstatistik s WHERE q.observationid=s.observationid)=0";
@@ -612,7 +628,7 @@ bool DataUpdateTransaction::operator()(dnmi::db::Connection *conection) {
     }
 
     log << "NewData " << (onlyAddOrUpdateData ? "(update):" : ":") << "stationid: " << stationid << " typeid: " << typeid_ << " obstime: "
-        << pt::to_kvalobs_string(obstime) << " onlyHqcData: "<<(onlyHqcData?"true":"false") << endl << mylog.str() << endl;
+        << pt::to_kvalobs_string(obstime) << " onlyHqcData: "<<(onlyHqcData?"true":"false") << " qa_id: " << qaId  << endl << mylog.str() << endl;
   }
 
   std::unique_ptr<Observation> oldObs(Observation::getFromDb(conection, stationid, typeid_, obstime, false));
@@ -648,8 +664,13 @@ bool DataUpdateTransaction::operator()(dnmi::db::Connection *conection) {
 
 std::string DataUpdateTransaction::transactionLogString() {
   ostringstream s;
+  ostringstream sQaId;
 
-  s << "(" << observationid << ": " << stationid << "/" << typeid_<< "/" <<pt::to_kvalobs_string(obstime) << ") duration=" << duration.total_milliseconds() << "ms";
+  if( qaId>-1 ) {
+    sQaId << " qa_id=" << qaId;
+  }
+
+  s << "(" << observationid << ": " << stationid << "/" << typeid_<< "/" <<pt::to_kvalobs_string(obstime) << ") duration=" << duration.total_milliseconds() << "ms" << sQaId.str();
   return s.str();
 }
 

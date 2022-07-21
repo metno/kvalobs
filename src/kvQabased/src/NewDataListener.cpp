@@ -37,6 +37,7 @@
 #include <string>
 #include <thread>
 #include <cstdlib>
+#include <random>
 #include "db/KvalobsDatabaseAccess.h"
 #include "kvalobs/kvStationInfo.h"
 #include "decodeutility/kvalobsdata.h"
@@ -48,6 +49,12 @@ namespace qabase {
 
 namespace {
 std::set<NewDataListener*> listeners;
+
+std::chrono::milliseconds getTimeToSleepInMillis(unsigned int minMillis=200, unsigned int maxMillis=5000){
+  static thread_local std::default_random_engine* generator = new std::default_random_engine(std::random_device{}());
+  std::uniform_int_distribution<unsigned> distribution(minMillis, maxMillis);
+  return std::chrono::milliseconds(distribution(*generator));
+}
 }
 
 NewDataListener::NewDataListener(std::shared_ptr<db::DatabaseAccess> db, int selectForControlCount)
@@ -114,8 +121,15 @@ Observation* NewDataListener::fetchDataToProcess_() const {
       return ret;
     } catch (dnmi::db::SQLSerializeError & e) {
       db_->rollback();
-      LOGDEBUG("Serialization error on fetchDataToProcess: " << e.what());
-      std::this_thread::sleep_for(std::chrono::milliseconds(25 + (std::rand() % 50)));
+      if( e.deadLockDetected() ) {
+        auto sleepFor = getTimeToSleepInMillis(200, 5000);
+        LOGWARN("Serialization error on fetchDataToProcess (deadlock), retry in " << sleepFor.count() << " ms: " << e.what());
+        std::this_thread::sleep_for(sleepFor);
+      } else {
+        auto sleepFor = getTimeToSleepInMillis(25, 500);
+        LOGDEBUG("Serialization error on fetchDataToProcess, retry in " << sleepFor.count() << " ms: " << e.what());
+        std::this_thread::sleep_for(sleepFor);
+      }
     }
   }
   return nullptr;
@@ -157,8 +171,15 @@ void NewDataListener::markProcessDone(const qabase::Observation & obs) {
       return;
     } catch (dnmi::db::SQLSerializeError & e) {
       db_->rollback();
-      LOGDEBUG("Serialization error on markProcessDone: " << e.what());
-      std::this_thread::sleep_for(std::chrono::milliseconds(50));
+      if( e.deadLockDetected() ){
+        auto sleepFor = getTimeToSleepInMillis(200, 5000);
+        LOGWARN("Serialization error on markProcessDone (deadlock), retry in " << sleepFor.count() << " ms: " << e.what());
+        std::this_thread::sleep_for(sleepFor);
+      } else {
+        auto sleepFor = getTimeToSleepInMillis(25, 500);
+        LOGDEBUG("Serialization error on markProcessDone, retry in " << sleepFor.count() << " ms: " << e.what());
+        std::this_thread::sleep_for(sleepFor);
+      }
     }
   }
 }
