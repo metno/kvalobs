@@ -151,7 +151,7 @@ std::ostream& kvalobs::decoder::operator<<(std::ostream& os, const kvalobs::deco
       return os;
     }
 
-    os << "Strategi: " << (info.random_?"random":"round robin") << " Types:";
+    os << "MaxQaId: " << info.qaMaxId_ << " Strategi: " << (info.random_?"random":"round robin") << " Types:";
     for( auto t: info.qaIdTypes_) {
       os << " " << t;
     } 
