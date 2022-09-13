@@ -1,6 +1,7 @@
 ARG REGISTRY
 ARG BASE_IMAGE_TAG=latest
 
+
 FROM ${REGISTRY}kvbuild:${BASE_IMAGE_TAG} AS kvbins
 
 FROM ${REGISTRY}builddep:${BASE_IMAGE_TAG} AS dev
@@ -32,7 +33,7 @@ ENTRYPOINT [ "/bin/bash" ]
 
 FROM ubuntu:focal AS runtime
 ARG DEBIAN_FRONTEND='noninteractive'
-
+ARG kafka_VERSION=1.9.0-1.cflt~ubu20
 
 RUN apt-get update && apt-get install -y gpg software-properties-common apt-utils
 
@@ -60,7 +61,7 @@ RUN apt-get update && apt-get -y install \
   libmicrohttpd12 libomniorb4-2 libomnithread4 libpq5 libsasl2-2 \
   libssl1.1 libstdc++6 libxml++2.6-2v5 libxml2 libzstd1 zlib1g \
   postgresql-client-13 iproute2 gosu \
-  librdkafka++1 libmetlibs-putools8
+  librdkafka++1=${kafka_VERSION} libmetlibs-putools8
 
 #COPY --from=kvbins /usr/local/lib/libmetlibs*.so.* /usr/local/lib/
 COPY --from=kvbins /usr/lib/libkvalobs_*.so.* /usr/lib/

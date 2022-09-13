@@ -2,6 +2,7 @@
 ARG REGISTRY
 
 FROM ubuntu:focal
+ARG kafka_VERSION=1.9.0-1.cflt~ubu20
 
 #Create a base image with all dependecies to build kvalobs.
 #This includes metlibs-putools
@@ -29,7 +30,7 @@ RUN apt-get update && apt-get -y install \
   libboost-regex-dev libboost-filesystem-dev libboost-program-options-dev libboost-system-dev libboost-timer-dev \
   libomniorb4-dev  omniidl libperl-dev libdbd-pg-perl libcurl4-gnutls-dev liblog4cpp5-dev libcppunit-dev \
   cmake google-mock  zlib1g-dev libssl-dev libsasl2-dev libzstd-dev \
-  librdkafka-dev \
+  librdkafka-dev=${kafka_VERSION} \
   libgmock-dev \
   libmicrohttpd-dev libgnutls28-dev \
   metlibs-putools-dev

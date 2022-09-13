@@ -7,6 +7,7 @@ set -euo pipefail
 kvuser=kvalobs
 kvuserid=5010
 mode=test
+kafka_version=1.9.0-1.cflt~ubu20
 
 os=focal
 registry="registry.met.no/obs/kvalobs/kvbuild"
@@ -305,6 +306,7 @@ echo "kvcpp: $kvcpp"
 echo "builddep: $builddep"
 echo "Targets: $targets"
 echo "nocache: $nocache"
+echo "kafka_version: ${kafka_version}"
 
 if [ "$mode" = "copy" ]; then
   if [ -z "$src" -o -z "$dst" ]; then
@@ -386,8 +388,10 @@ fi
 #Should we build the kvdev and kvruntime 
 if [ -n "$kvcpp" ]; then 
   echo "Using dockerfile: docker/kvalobs/${os}/kvcpp.dockerfile"
-  docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" -f docker/kvalobs/${os}/kvcpp.dockerfile --target dev --tag "${registry}kvcpp-dev:$tag" .
-  docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" -f docker/kvalobs/${os}/kvcpp.dockerfile --target runtime --tag "${registry}kvcpp-runtime:$tag" .
+  docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" --build-arg "kafka_VERSION=${kafka_version}" \
+    -f docker/kvalobs/${os}/kvcpp.dockerfile --target dev --tag "${registry}kvcpp-dev:$tag" .
+  docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" --build-arg "kafka_VERSION=${kafka_version}" \
+    -f docker/kvalobs/${os}/kvcpp.dockerfile --target runtime --tag "${registry}kvcpp-runtime:$tag" .
 
   if [ "$tag_and_latest" = "true" ]; then
       docker tag "${registry}kvcpp-dev:$tag" "${registry}kvcpp-dev:latest"
@@ -418,9 +422,11 @@ for target in $targets; do
 
   echo "Using dockerfile: $dockerfile"
   if [ $addArgs == true ]; then
-    docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" --build-arg "kvuser=$kvuser" --build-arg "kvuserid=$kvuserid" -f $dockerfile --tag ${registry}${target}:$tag .
+    docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" --build-arg "kvuser=$kvuser" --build-arg "kvuserid=$kvuserid" --build-arg "kafka_VERSION=${kafka_version}" \
+      -f $dockerfile --tag ${registry}${target}:$tag .
   else
-    docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" -f $dockerfile --tag "${registry}${target}:$tag" .
+    docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" --build-arg "kafka_VERSION=${kafka_version}" \
+      -f $dockerfile --tag "${registry}${target}:$tag" .
   fi
   
   if [ "$tag_and_latest" = "true" ]; then
