@@ -130,6 +130,12 @@ Observation* NewDataListener::fetchDataToProcess_() const {
         LOGDEBUG("Serialization error on fetchDataToProcess, retry in " << sleepFor.count() << " ms: " << e.what());
         std::this_thread::sleep_for(sleepFor);
       }
+    } catch( const std::exception &ex ) {
+      LOGERROR("Exception:  fetchDataToProcess: " << ex.what());
+      db_->rollback();
+    } catch( ... ) {
+      LOGERROR("Terminating: Unknown Exception in fetchDataToProcess .... " );
+      exit(16);
     }
   }
   return nullptr;
