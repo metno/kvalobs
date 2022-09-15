@@ -220,7 +220,7 @@ void DataProcessor::sendToKafka(const qabase::Observation & obs, const qabase::C
       }
 
       if( sendAttempts > maxKafkaSendErrors ) {
-        LOGWARN("Terminating: Could not send data to Kafka. Send queue size=" << messages.size() << ". Tried " << sendAttempts << " times before giving up!");
+        LOGERROR("Terminating: Could not send data to Kafka. Send queue size=" << messages.size() << ". Tried " << sendAttempts << " times before giving up!");
         exit(16);
       }
       sendAttempts++;

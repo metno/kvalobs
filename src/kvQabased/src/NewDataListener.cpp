@@ -131,10 +131,10 @@ Observation* NewDataListener::fetchDataToProcess_() const {
         std::this_thread::sleep_for(sleepFor);
       }
     } catch( const std::exception &ex ) {
-      LOGERROR("Exception:  fetchDataToProcess: " << ex.what());
+      LOGERROR("Exception: fetchDataToProcess_: " << ex.what());
       db_->rollback();
     } catch( ... ) {
-      LOGERROR("Terminating: Unknown Exception in fetchDataToProcess .... " );
+      LOGERROR("Terminating: Unknown Exception in NewDataListener::fetchDataToProcess_ .... " );
       exit(16);
     }
   }
