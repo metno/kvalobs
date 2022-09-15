@@ -367,8 +367,6 @@ if [ $all = true ]; then
   kvcpp="kvcpp"
 fi
 
-targets="$builddep $kvbuild $targets"
-
 
 if [ -z "$targets" -a -z "$kvcpp" ]; then
   echo "No targets given."
@@ -376,7 +374,7 @@ if [ -z "$targets" -a -z "$kvcpp" ]; then
 fi
 
 
-echo "Build targets: $targets $kvcpp"
+echo "Build targets: $targets"
 
 if [ $mode = test ]; then 
   registry=""
@@ -385,13 +383,36 @@ else
   registry="$registry/$mode/"
 fi
 
+
+# Must build the targets buildep and kvbuild first, if given.
+pretargets="$builddep $kvbuild"
+for target in $pretargets; do
+  dockerfile="docker/kvalobs/${os}/${target}.dockerfile"
+  echo "Building dockerfile: $dockerfile"
+  docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" --build-arg "kafka_VERSION=${kafka_version}" \
+      -f $dockerfile --tag "${registry}${target}:$tag" .
+  
+  if [ "$tag_and_latest" = "true" ]; then
+      docker tag "${registry}${target}:$tag" "${registry}${target}:latest"
+  fi
+
+  if [ $mode != test ]; then 
+    docker push ${registry}${target}:$tag
+    if [ "$tag_and_latest" = "true" ]; then
+      docker push "${registry}${target}:latest"
+    fi
+  fi
+done
+
+
 #Should we build the kvdev and kvruntime 
-if [ -n "$kvcpp" ]; then 
-  echo "Using dockerfile: docker/kvalobs/${os}/kvcpp.dockerfile"
+if [ -n "$kvcpp" ]; then
+  dockerfile="docker/kvalobs/${os}/kvcpp.dockerfile"
+  echo "Building dockerfile: docker/kvalobs/${os}/kvcpp.dockerfile"
   docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" --build-arg "kafka_VERSION=${kafka_version}" \
-    -f docker/kvalobs/${os}/kvcpp.dockerfile --target dev --tag "${registry}kvcpp-dev:$tag" .
+    -f $dockerfile --target dev --tag "${registry}kvcpp-dev:$tag" .
   docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" --build-arg "kafka_VERSION=${kafka_version}" \
-    -f docker/kvalobs/${os}/kvcpp.dockerfile --target runtime --tag "${registry}kvcpp-runtime:$tag" .
+    -f $dockerfile --target runtime --tag "${registry}kvcpp-runtime:$tag" .
 
   if [ "$tag_and_latest" = "true" ]; then
       docker tag "${registry}kvcpp-dev:$tag" "${registry}kvcpp-dev:latest"
@@ -410,29 +431,15 @@ if [ -n "$kvcpp" ]; then
 fi
 
 for target in $targets; do
-  addArgs=false
-  for tmp in $avalable_targets ; do
-    if [ $target = $tmp ]; then
-      addArgs=true
-      break
-    fi
-  done
-
   dockerfile="docker/kvalobs/${os}/${target}.dockerfile"
 
-  echo "Using dockerfile: $dockerfile"
-  if [ $addArgs == true ]; then
-    docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" --build-arg "kvuser=$kvuser" --build-arg "kvuserid=$kvuserid" --build-arg "kafka_VERSION=${kafka_version}" \
-      -f $dockerfile --tag ${registry}${target}:$tag .
-  else
-    docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" --build-arg "kafka_VERSION=${kafka_version}" \
-      -f $dockerfile --tag "${registry}${target}:$tag" .
-  fi
+  echo "Building dockerfile: $dockerfile"
+  docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" --build-arg "kvuser=$kvuser" --build-arg "kvuserid=$kvuserid" --build-arg "kafka_VERSION=${kafka_version}" \
+    -f $dockerfile --tag ${registry}${target}:$tag .
   
   if [ "$tag_and_latest" = "true" ]; then
       docker tag "${registry}${target}:$tag" "${registry}${target}:latest"
   fi
-
 
   if [ $mode != test ]; then 
     docker push ${registry}${target}:$tag
