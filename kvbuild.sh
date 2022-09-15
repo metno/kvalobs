@@ -368,13 +368,13 @@ if [ $all = true ]; then
 fi
 
 
-if [ -z "$targets" -a -z "$kvcpp" ]; then
+if [ -z "$targets" -a -z "$kvcpp" -a -z "$builddep" -a -z "$kvbuild" ]; then
   echo "No targets given."
   exit 1
 fi
 
 
-echo "Build targets: $targets"
+echo "Build targets: $builddep $kvbuild $kvcpp $targets"
 
 if [ $mode = test ]; then 
   registry=""
