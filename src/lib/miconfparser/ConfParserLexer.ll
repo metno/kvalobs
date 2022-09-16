@@ -30,7 +30,7 @@ using namespace std;
 %x FILENAME
 
 DIGIT  [0-9]
-ID     [_a-zA-Z]+[a-zA-Z0-9_]*
+ID     [_a-zA-Z]+[a-zA-Z0-9_\-]*
 STRING [^"]*
 FILENAME [^"]*
 FLOAT  [-+]?{DIGIT}+\.{DIGIT}*
