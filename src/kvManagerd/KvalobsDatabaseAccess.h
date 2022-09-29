@@ -34,6 +34,7 @@
 #include <boost/noncopyable.hpp>
 #include <string>
 #include <vector>
+#include <memory>
 #include "DataIdentifier.h"
 
 namespace dnmi {

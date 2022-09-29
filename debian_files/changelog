@@ -1,3 +1,9 @@
+kvalobs (7.0.1-1) jammy; urgency=medium
+  * Rebuild for jammy
+
+ -- Borge Moe <borge.moe@met.no>  Thu, 29 Sep 2022 13:00:00 +0200
+
+
 kvalobs (7.0.1-1) bionic; urgency=medium
   * miconfig: Allow the char '-' in ids.
   * Uppgrade rdkafka to version 1.9.0.

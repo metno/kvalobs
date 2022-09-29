@@ -8,6 +8,7 @@ kvuser=kvalobs
 kvuserid=5010
 mode=test
 kafka_version=1.9.0-1.cflt~ubu20
+kafka_version_jammy=1.8.0-1build1
 
 os=focal
 registry="registry.met.no/obs/kvalobs/kvbuild"
@@ -116,6 +117,7 @@ while test $# -ne 0; do
         exit 0;;
     --os)
         os="$2"
+        kafka_version="$kafka_version_jammy"
         shift;;
     --staging) mode=staging;;
     --prod) mode=prod;;
