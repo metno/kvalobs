@@ -124,6 +124,14 @@ bool StationFilterElement::stationDefined(long stationId) const {
 }
 
 bool StationFilterElement::typeDefined(long typeId) const {
+  if( ! typeids_.empty() ) {
+    if( typeId < 0 && *typeids_.cbegin()==LONG_MIN) {
+      return true;
+    }
+    if (typeId>0  && *typeids_.cbegin()==LONG_MAX) {
+      return true;
+    }
+  }
   return typeids_.find(typeId) != typeids_.end();
 }
 
@@ -147,8 +155,20 @@ namespace {
 void setVals(const std::string &key, const std::string &name, const c::ConfSection &conf, std::set<long> &dst) {
   c::ValElementList vals = conf.getValue(key);
   long v;
-
+  
   for (c::ValElement &e : vals) {
+    if ( e.valAsString() == "neg" ) {
+      dst.clear();
+      dst.insert(LONG_MIN);
+      return;
+    }
+    
+    if ( e.valAsString() == "pos" ) {
+      dst.clear();
+      dst.insert(LONG_MAX);
+      return;
+    }
+    
     v = e.valAsInt(-1);
     if (v < 0)
       throw std::logic_error("Filter element '" + name + "', key '" + key + "' invalid value(s), must be integers greater or equal to 0.");

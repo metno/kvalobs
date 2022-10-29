@@ -259,6 +259,8 @@ bool kvalobs::decoder::DecoderBase::dataToPublish( const std::list<kvalobs::kvDa
 }
 
 
+
+
 std::string kvalobs::decoder::DecoderBase::semiuniqueName(const std::string &prefix, const char *endsWith) {
   return miutil::SemiUniqueName::uniqueName(prefix, endsWith);
 }
@@ -518,6 +520,13 @@ addDataToDbThrow(const miutil::miTime &obstime, int stationid, int typeid_,
     duplicateTest=DataUpdateTransaction::Partial;
   else
     duplicateTest=DataUpdateTransaction::Complete;
+
+
+  if ( addToWorkQueue ) { 
+    //Only use it as a hint if true, but use the filters to do 
+    //the final decision.
+    addToWorkQueue = filter(stationid, typeid_).addToWorkQueue();
+  }
 
   kvalobs::decoder::DataUpdateTransaction work(pt_obstime, stationid, typeid_, &std::get<0>(data), &std::get<1>(data), logid, 
     onlyAddOrUpdateData, addToWorkQueue, tryToUseDataTbTime, duplicateTest, useQaId(typeid_));

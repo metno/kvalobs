@@ -9,6 +9,7 @@ kvuserid=5010
 mode=test
 kafka_version=1.9.0-1.cflt~ubu20
 kafka_version_jammy=1.8.0-1build1
+VERSION="$(version.sh)"
 
 os=focal
 registry="registry.met.no/obs/kvalobs/kvbuild"
@@ -117,7 +118,6 @@ while test $# -ne 0; do
         exit 0;;
     --os)
         os="$2"
-        kafka_version="$kafka_version_jammy"
         shift;;
     --staging) mode=staging;;
     --prod) mode=prod;;
@@ -298,6 +298,10 @@ copy() {
 }
 
 
+if [ "$os" = "jammy" ]; then
+  kafka_version="$kafka_version_jammy"
+fi
+
 
 echo "tag: $tag"
 echo "mode: $mode"
@@ -309,6 +313,7 @@ echo "builddep: $builddep"
 echo "Targets: $targets"
 echo "nocache: $nocache"
 echo "kafka_version: ${kafka_version}"
+echo "VERSION: $VERSION"
 
 if [ "$mode" = "copy" ]; then
   if [ -z "$src" -o -z "$dst" ]; then

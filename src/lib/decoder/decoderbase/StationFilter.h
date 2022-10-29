@@ -68,7 +68,9 @@ namespace decoder {
  *  add_to_work_queue (*true/false) - Shall we add the observation to workque. Only observation 
  *                                    in the workque is checked by kvQabased.
  *  typeid_list              - A list of typeids this filter element is valid for. An empty list (default) 
- *                             means all typides.
+ *                             means all typides. There is two spesial values 'pos' and 'neg'. Where
+ *                             'pos' is all positive values and 'neg' as all negative values, ie all
+ *                             aggregated values.
  *  station_list             - A list of stationids this filter element is valid for. If the list 
  *                             has an element with value 0 it means all stations.
  *  station_range  [from, to] - Speciefies a range of stationids that is valid. 
@@ -91,6 +93,14 @@ namespace decoder {
         save_to_db=false
         publish = true
         typeid_list=(508)
+        station_list=(0)
+      }
+      #For all stations with negativ typeid do not add to rhe wokque, 
+      #but publish to the 'checked' queue.
+      aggregated {
+        add_to_work_queue=false
+        publish = true
+        typeid_list=('neg')
         station_list=(0)
       }
       default {

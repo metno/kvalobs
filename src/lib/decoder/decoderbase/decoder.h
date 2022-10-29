@@ -489,6 +489,7 @@ class DecoderBase {
    */
   bool dataToPublish( const std::list<kvalobs::kvData> &d, const std::list<kvalobs::kvTextData> &td);
 
+  
   std::string semiuniqueName(const std::string &prefix, const char *endsWith);
 
   bool setRedirectInfo(const std::string &obsType, const std::string &data);
