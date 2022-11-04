@@ -9,7 +9,7 @@ kvuserid=5010
 mode=test
 kafka_version=1.9.0-1.cflt~ubu20
 kafka_version_jammy=1.8.0-1build1
-VERSION="$(version.sh)"
+VERSION="$(./version.sh)"
 
 os=focal
 registry="registry.met.no/obs/kvalobs/kvbuild"
