@@ -1,9 +1,9 @@
 #syntax=docker/dockerfile:1.2
 
 ARG REGISTRY
-ARG BASE_IMAGE_TAG=latest
+ARG BUILDDEP_TAG=latest
 
-FROM ${REGISTRY}builddep:${BASE_IMAGE_TAG}
+FROM ${REGISTRY}builddep:${BUILDDEP_TAG}
 
 VOLUME /src
 VOLUME /build

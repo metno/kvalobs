@@ -1,10 +1,10 @@
 ARG REGISTRY
 ARG BASE_IMAGE_TAG=latest
-
+ARG BUILDDEP_TAG=latest
 
 FROM ${REGISTRY}kvbuild:${BASE_IMAGE_TAG} AS kvbins
 
-FROM ${REGISTRY}builddep:${BASE_IMAGE_TAG} AS dev
+FROM ${REGISTRY}builddep:${BUILDDEP_TAG} AS dev
 ARG DEBIAN_FRONTEND='noninteractive'
 
 #COPY docker/pg-ACCC4CF8.asc /tmp
