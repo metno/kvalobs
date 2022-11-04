@@ -313,6 +313,7 @@ fi
 
 if [ -z "$builddep_tag" ]; then
   builddep_tag="$tag"
+fi
 
 echo "tag: $tag"
 echo "mode: $mode"
