@@ -53,7 +53,7 @@ RUN apt-key add /tmp/confluent_repo_key.asc && rm /tmp/confluent_repo_key.asc &&
 
 # NB NB NB
 # The dependencies must be in sync with the *-dev dependencies in 
-# registry.met.no/obs/kvalobs/kvbuild/staging/focal-builddep:latest
+# registry.met.no/obs/kvalobs/kvbuild/staging/builddep:latest
 RUN apt-get update && apt-get -y install \
   libboost-date-time1.71.0 libboost-filesystem1.71.0 libboost-thread1.71.0 \
   libboost-regex1.71.0  libboost-program-options1.71.0 \
