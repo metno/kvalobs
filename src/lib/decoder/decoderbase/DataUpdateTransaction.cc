@@ -178,12 +178,39 @@ void DataUpdateTransaction::checkWorkQue(dnmi::db::Connection *con, long observa
   worqueToWorkStatistik(con, observationid);
 }
 
-void DataUpdateTransaction::updateWorkQue(dnmi::db::Connection *con, long observationid_, int pri) {
+// void DataUpdateTransaction::updateWorkQue(dnmi::db::Connection *con, long observationid_, int pri) {
+//   if ( ! addToWorkQueue || onlyHqcData) {
+//     observationid=-observationid_;
+//     duration = pt::microsec_clock::universal_time() - startTime;
+//     return;
+//   }
+//   observationid=observationid_;
+//   ostringstream q;
+//   ostringstream sQaId;
+
+//   if( qaId < 0 ) {
+//     sQaId << "NULL";
+//   } else {
+//     sQaId << qaId;
+//   }
+
+//   q << "INSERT INTO workque (observationid,priority,process_start,qa_start,qa_stop,service_start,service_stop, qa_id) "
+//     << "VALUES(" << observationid << "," << pri << ",NULL,NULL,NULL,NULL,NULL," << sQaId.str() << ")";
+
+//   con->exec(q.str());
+//   duration = pt::microsec_clock::universal_time() - startTime;
+// }
+
+
+void DataUpdateTransaction::updateWorkQue(dnmi::db::Connection *con, long observationid_, int pri,
+  int theStationid, int theTypeid, boost::posix_time::ptime theObstime) {
+  const int hoursBack=12;
   if ( ! addToWorkQueue || onlyHqcData) {
     observationid=-observationid_;
     duration = pt::microsec_clock::universal_time() - startTime;
     return;
   }
+
   observationid=observationid_;
   ostringstream q;
   ostringstream sQaId;
@@ -194,12 +221,12 @@ void DataUpdateTransaction::updateWorkQue(dnmi::db::Connection *con, long observ
     sQaId << qaId;
   }
 
-  q << "INSERT INTO workque (observationid,priority,process_start,qa_start,qa_stop,service_start,service_stop, qa_id) "
-    << "VALUES(" << observationid << "," << pri << ",NULL,NULL,NULL,NULL,NULL," << sQaId.str() << ")";
-
+  q << "select insert_into_workque(" << observationid<< ", " << pri << ", " << theStationid << ", " << theTypeid << ", " << theObstime << ", " << hoursBack << ", " << sQaId.str() <<")";
+  
   con->exec(q.str());
   duration = pt::microsec_clock::universal_time() - startTime;
 }
+
 
 
 void DataUpdateTransaction::worqueToWorkStatistik(dnmi::db::Connection *con, long observationid) 
@@ -559,7 +586,7 @@ bool DataUpdateTransaction::updateObservation(dnmi::db::Connection *conection, O
   Observation newObs(obs->stationID(), obs->typeID(), obs->obstime(), tbTime, toUpdateData, toUpdateTextData);
   newObs.insertIntoDb(conection, false);
   int pri = getPriority(conection, stationid, typeid_, obstime);
-  updateWorkQue(conection, newObs.observationid(), pri);
+  updateWorkQue(conection, newObs.observationid(), pri, obs->stationID(), obs->typeID(), obs->obstime());
   return true;
 } 
 
@@ -577,7 +604,7 @@ bool DataUpdateTransaction::replaceObservation(dnmi::db::Connection *conection, 
   Observation newObs(stationid, typeid_, obstime, tbTime, *newData, *newTextData);
   newObs.insertIntoDb(conection, false);
   int pri = getPriority(conection, stationid, typeid_, obstime);
-  updateWorkQue(conection, newObs.observationid(), pri);
+  updateWorkQue(conection, newObs.observationid(), pri, stationid, typeid_, obstime);
   return true;
 }
 
@@ -639,7 +666,7 @@ bool DataUpdateTransaction::operator()(dnmi::db::Connection *conection) {
     Observation newObs(stationid, typeid_, obstime, tbTime, *newData, *newTextData);
     newObs.insertIntoDb(conection, false);
     int pri = getPriority(conection, stationid, typeid_, obstime);
-    updateWorkQue(conection, newObs.observationid(), pri);
+    updateWorkQue(conection, newObs.observationid(), pri, stationid, typeid_, obstime);
     return true;
   }
 
