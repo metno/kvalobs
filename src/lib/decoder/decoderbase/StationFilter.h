@@ -95,12 +95,12 @@ namespace decoder {
         typeid_list=(508)
         station_list=(0)
       }
-      #For all stations with negativ typeid do not add to rhe wokque, 
+      #For all stations with negativ typeid, do not add to the wokque, 
       #but publish to the 'checked' queue.
       aggregated {
         add_to_work_queue=false
         publish = true
-        typeid_list=('neg')
+        typeid_list=("neg")
         station_list=(0)
       }
       default {
