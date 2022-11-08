@@ -20,6 +20,18 @@
 
 BEGIN;
 
+CREATE OR REPLACE FUNCTION 
+kvalobs_database_version()
+RETURNS text AS
+$BODY$
+BEGIN
+	RETURN '5.0.3';
+END;
+$BODY$
+LANGUAGE plpgsql IMMUTABLE;
+
+
+
 CREATE TABLE observations (
     observationid BIGSERIAL UNIQUE,
     stationid   INTEGER NOT NULL,
@@ -154,15 +166,6 @@ GRANT SELECT, UPDATE, INSERT, DELETE ON data_history TO kv_write;
 GRANT USAGE ON SEQUENCE data_history_version_seq TO kv_write;
 
 
-CREATE OR REPLACE FUNCTION 
-kvalobs_database_version()
-RETURNS text AS
-$BODY$
-BEGIN
-	RETURN '5.0.0';
-END;
-$BODY$
-LANGUAGE plpgsql IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION 
 	backup_old_data() 
@@ -786,16 +789,51 @@ CREATE TABLE workque (
        service_start TIMESTAMP ,
        service_stop  TIMESTAMP ,
 	   observationid bigint NOT NULL REFERENCES observations(observationid) ON DELETE CASCADE ,
+       tbtime        timestamp DEFAULT current_timestamp(0),
+       qa_id         smallint DEFAULT NULL;
        UNIQUE(observationid)
 );
 
 CREATE INDEX workque_priority_obsid ON workque (priority, observationid);
 CREATE INDEX workque_qa_start_qa_stop_idx ON workque (qa_start, qa_stop);
 CREATE INDEX workque_process_start_index on workque (process_start);
+CREATE INDEX workque_tbtime_index ON workque (tbtime);
 REVOKE ALL ON workque FROM public;
 GRANT ALL ON workque TO kv_admin;
 GRANT SELECT ON workque TO kv_read;
 GRANT SELECT, UPDATE, INSERT, DELETE ON workque TO kv_write;
+
+CREATE VIEW workque_v  AS
+SELECT
+  o.stationid,
+  o.typeid,
+  o.obstime,
+  o.tbtime,
+  q.tbtime AS que_tbtime,
+  q.priority,
+  q.process_start,
+  q.qa_start,
+  q.qa_stop,
+  q.qa_id,
+  q.observationid
+FROM workque q, observations o 
+WHERE q.observationid=o.observationid;
+
+REVOKE ALL ON workque_v FROM public;
+GRANT ALL ON workque_v TO kv_admin;
+GRANT SELECT ON workque_v TO kv_read;
+GRANT SELECT ON workque_v TO kv_write;
+
+
+CREATE VIEW workque_count  AS
+select to_char(tbtime,'yyyy-mm-dd HH24:MI') as tbtime, stationid, typeid, count(*) 
+from workque_v group by to_char(tbtime,'yyyy-mm-dd HH24:MI'),stationid, typeid;
+
+REVOKE ALL ON workque_count FROM public;
+GRANT ALL ON workque_count TO kv_admin;
+GRANT SELECT ON workque_count TO kv_read;
+GRANT SELECT ON workque_count TO kv_write;
+
 
 CREATE TABLE workstatistik  (
        stationid     INTEGER   NOT NULL,
@@ -808,31 +846,26 @@ CREATE TABLE workstatistik  (
        qa_stop       TIMESTAMP ,
        service_start TIMESTAMP ,
        service_stop  TIMESTAMP ,
-       observationid BIGINT
+       observationid BIGINT,
+       qa_id         smallint DEFAULT NULL
 );
 CREATE INDEX ON workstatistik (stationid, obstime, typeid);
 CREATE INDEX ON workstatistik (observationid);
+CREATE INDEX ON workstatistik (tbtime);
 
 REVOKE ALL ON workstatistik FROM public;
 GRANT ALL ON workstatistik TO kv_admin;
 GRANT SELECT ON workstatistik TO kv_read;
 GRANT SELECT, UPDATE, INSERT, DELETE ON workstatistik TO kv_write;
 
-CREATE TABLE ps_subscribers  (
-       name     TEXT NOT NULL,
-       subscriberid TEXT NOT NULL,
-       comment  TEXT NOT NULL,
-       delete_after_hours INTEGER NOT NULL,
-       sior     TEXT NOT NULL,
-       created  TIMESTAMP NOT NULL,
-       UNIQUE(name)
-);
+CREATE VIEW workstatistik_count  AS
+select to_char(tbtime,'yyyy-mm-dd HH24:MI') as tbtime, stationid, typeid, count(*) 
+from workstatistik group by to_char(tbtime,'yyyy-mm-dd HH24:MI'),stationid, typeid;
 
-REVOKE ALL ON ps_subscribers FROM public;
-GRANT ALL ON ps_subscribers TO kv_admin;
-GRANT SELECT ON ps_subscribers TO kv_read;
-GRANT SELECT, UPDATE, INSERT, DELETE ON ps_subscribers TO kv_write;
-
+REVOKE ALL ON workstatistik_count FROM public;
+GRANT ALL ON workstatistik_count TO kv_admin;
+GRANT SELECT ON workstatistik_count TO kv_read;
+GRANT SELECT ON workstatistik_count TO kv_write;
 
 CREATE TABLE qc2_statistical_reference_values (
        stationid   INTEGER NOT NULL,
