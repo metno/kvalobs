@@ -32,6 +32,7 @@
 #include <stdexcept>
 #include <sstream>
 #include "lib/kvdb/kvdb.h"
+#include "lib/kvalobs/kvDbBase.h"
 #include "lib/milog/milog.h"
 #include "lib/kvalobs/kvWorkelement.h"
 #include "lib/miutil/timeconvert.h"
@@ -51,6 +52,9 @@ using std::auto_ptr;
 using std::logic_error;
 using kvalobs::Observation;
 using miutil::splitstr;
+using kvalobs::kvDbBase;
+
+#define Q(t) kvDbBase::quoted(t)
 
 namespace {
 std::list<kvalobs::kvData>::const_iterator findElem(const kvalobs::kvData &elem, const std::list<kvalobs::kvData> &list) {
@@ -220,8 +224,8 @@ void DataUpdateTransaction::updateWorkQue(dnmi::db::Connection *con, long observ
   } else {
     sQaId << qaId;
   }
-
-  q << "select insert_into_workque(" << observationid<< ", " << pri << ", " << theStationid << ", " << theTypeid << ", " << theObstime << ", " << hoursBack << ", " << sQaId.str() <<")";
+ //insert_into_workque( observationid bigint, priority integer, stationid integer, typeid integer, obstime_ timestamp, hours_back integer, qa_id_default integer)
+  q << "select insert_into_workque(" << observationid<< ", " << pri << ", " << theStationid << ", " << theTypeid << ", " << Q(theObstime) << ", " << hoursBack << ", " << sQaId.str() <<")";
   
   con->exec(q.str());
   duration = pt::microsec_clock::universal_time() - startTime;
