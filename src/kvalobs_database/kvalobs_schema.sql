@@ -790,7 +790,7 @@ CREATE TABLE workque (
        service_stop  TIMESTAMP ,
 	   observationid bigint NOT NULL REFERENCES observations(observationid) ON DELETE CASCADE ,
        tbtime        timestamp DEFAULT current_timestamp(0),
-       qa_id         smallint DEFAULT NULL;
+       qa_id         smallint DEFAULT NULL,
        UNIQUE(observationid)
 );
 
