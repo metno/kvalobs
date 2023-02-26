@@ -61,7 +61,7 @@ RUN apt-get update && apt-get -y install \
   libmicrohttpd12 libomniorb4-2 libomnithread4 libpq5 libsasl2-2 \
   libssl1.1 libstdc++6 libxml++2.6-2v5 libxml2 libzstd1 zlib1g \
   postgresql-client-13 iproute2 gosu \
-  librdkafka++1=${kafka_VERSION} libmetlibs-putools8
+  librdkafka1=${kafka_VERSION} librdkafka++1=${kafka_VERSION} libmetlibs-putools8
 
 #COPY --from=kvbins /usr/local/lib/libmetlibs*.so.* /usr/local/lib/
 COPY --from=kvbins /usr/lib/libkvalobs_*.so.* /usr/lib/
