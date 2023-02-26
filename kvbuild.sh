@@ -11,7 +11,8 @@ kafka_version=1.9.0-1.cflt~ubu20
 kafka_version_jammy=1.8.0-1build1
 
 os=focal
-registry="registry.met.no/obs/kvalobs/kvbuild"
+#registry="registry.met.no/obs/kvalobs/kvbuild"
+registry="registry.met.no/met/obsklim/kvalobs/kvbuild"
 build=test
 targets=
 tag=latest

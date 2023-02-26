@@ -1,4 +1,4 @@
-#FROM registry.met.no/obs/kvalobs/kvbuild/staging/builddep:latest
+#FROM registry.met.no/met/obsklim/kvalobs/kvbuild/staging/builddep:latest
 FROM builddep:bionic
 ARG DEBIAN_FRONTEND='noninteractive'
 
