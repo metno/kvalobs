@@ -9,9 +9,9 @@ kvuserid=5010
 mode=test
 kafka_version=1.9.0-1.cflt~ubu20
 kafka_version_jammy=1.8.0-1build1
+VERSION="$(./version.sh)"
 
 os=focal
-#registry="registry.met.no/obs/kvalobs/kvbuild"
 registry="registry.met.no/met/obsklim/kvalobs/kvbuild"
 build=test
 targets=
@@ -26,12 +26,13 @@ nocache=
 src=
 dst=
 copy_dryrun=
+builddep_tag=
 
 
 use() {
 
   usage="\
-Usage: $0 [--help] [--os os] [--staging|--prod|--test|--copy src dst|--copy-dry-run] [--kvbuild] [--buildep] [--tag tag] [--tag-and-latest tag] [--list]
+Usage: $0 [--help] [--os os] [--staging|--prod|--test|--copy src dst|--copy-dry-run] [--kvbuild] [--buildep] [--tag-version] [--tag tag] [--tag-and-latest tag] [--list]
           [--no-cache] targets
 
 This script build kvalobs containers. 
@@ -47,6 +48,8 @@ Options:
   --list        list targets.
   --tag tagname tag the image with the name tagname, default latest.
   --tag-and-latest tagname tag the image with the name tagname  and also create latest tag.
+  --builddep-tag tag Use this builddep container
+  --tag-version Use version from configure.ac as tag. Also tag latest.
   --staging     build and push to staging.
   --prod        build and push to prod.
   --test        only build, default
@@ -113,12 +116,17 @@ while test $# -ne 0; do
         tag="$2"
         tag_and_latest=true
         shift;;
+    --tag-version) 
+        tag="$VERSION"
+        tag_and_latest=true;;
+    --buildep-tag) 
+        builddep_tag="$2"
+        shift;;
     --help) 
         use
         exit 0;;
     --os)
         os="$2"
-        kafka_version="$kafka_version_jammy"
         shift;;
     --staging) mode=staging;;
     --prod) mode=prod;;
@@ -299,6 +307,13 @@ copy() {
 }
 
 
+if [ "$os" = "jammy" ]; then
+  kafka_version="$kafka_version_jammy"
+fi
+
+if [ -z "$builddep_tag" ]; then
+  builddep_tag="$tag"
+fi
 
 echo "tag: $tag"
 echo "mode: $mode"
@@ -310,6 +325,8 @@ echo "builddep: $builddep"
 echo "Targets: $targets"
 echo "nocache: $nocache"
 echo "kafka_version: ${kafka_version}"
+echo "VERSION: $VERSION"
+echo "builddep_tag: $builddep_tag"
 
 if [ "$mode" = "copy" ]; then
   if [ -z "$src" -o -z "$dst" ]; then
@@ -393,7 +410,7 @@ for target in $pretargets; do
   dockerfile="docker/kvalobs/${os}/${target}.dockerfile"
   echo "Building dockerfile: $dockerfile"
   docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" --build-arg "kafka_VERSION=${kafka_version}" \
-      -f $dockerfile --tag "${registry}${target}:$tag" .
+      --build-arg "BUILDDEP_TAG=${builddep_tag}" -f $dockerfile --tag "${registry}${target}:$tag" .
   
   if [ "$tag_and_latest" = "true" ]; then
       docker tag "${registry}${target}:$tag" "${registry}${target}:latest"
@@ -413,9 +430,9 @@ if [ -n "$kvcpp" ]; then
   dockerfile="docker/kvalobs/${os}/kvcpp.dockerfile"
   echo "Building dockerfile: docker/kvalobs/${os}/kvcpp.dockerfile"
   docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" --build-arg "kafka_VERSION=${kafka_version}" \
-    -f $dockerfile --target dev --tag "${registry}kvcpp-dev:$tag" .
+    --build-arg "BUILDDEP_TAG=${builddep_tag}" -f $dockerfile --target dev --tag "${registry}kvcpp-dev:$tag" .
   docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" --build-arg "kafka_VERSION=${kafka_version}" \
-    -f $dockerfile --target runtime --tag "${registry}kvcpp-runtime:$tag" .
+    --build-arg "BUILDDEP_TAG=${builddep_tag}" -f $dockerfile --target runtime --tag "${registry}kvcpp-runtime:$tag" .
 
   if [ "$tag_and_latest" = "true" ]; then
       docker tag "${registry}kvcpp-dev:$tag" "${registry}kvcpp-dev:latest"
@@ -438,7 +455,7 @@ for target in $targets; do
 
   echo "Building dockerfile: $dockerfile"
   docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" --build-arg "kvuser=$kvuser" --build-arg "kvuserid=$kvuserid" --build-arg "kafka_VERSION=${kafka_version}" \
-    -f $dockerfile --tag ${registry}${target}:$tag .
+    --build-arg "BUILDDEP_TAG=${builddep_tag}" -f $dockerfile --tag ${registry}${target}:$tag .
   
   if [ "$tag_and_latest" = "true" ]; then
       docker tag "${registry}${target}:$tag" "${registry}${target}:latest"
