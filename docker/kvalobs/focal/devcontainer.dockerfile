@@ -1,5 +1,5 @@
-#FROM  registry.met.no/met/obsklim/kvalobs/kvbuild/staging/builddep:latest
-FROM builddep:latest
+FROM  registry.met.no/met/obsklim/kvalobs/kvbuild/staging/builddep:latest
+#FROM builddep:latest
 ARG DEBIAN_FRONTEND='noninteractive'
 
 RUN apt-get update && apt-get install -y libgmock-dev language-pack-nb-base

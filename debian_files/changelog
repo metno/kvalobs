@@ -1,3 +1,24 @@
+kvalobs (7.0.1-1) focal; urgency=medium
+  * miconfig: Allow the char '-' in ids.
+  * Uppgrade rdkafka to version 1.9.0.
+  * kvDataInputd
+    - Better tracing of log messages between logs.
+    - Add optional messageid to all decoders.
+  * kvQaBased
+    - DataProcessor: Logg kafka error also to the stadard log so it is logged to stderr.
+    - exit the processe when we have retried to send to kafka 10 times. The process must
+      be restarted by some means. 
+
+-- Borge Moe <borge.moe@met.no>  Thu, 9 Mar 2023 07:00:00 +0100
+
+
+
+kvalobs (7.0.1a-1) jammy; urgency=medium
+  * Rebuild for focal
+
+ -- Borge Moe <borge.moe@met.no>  Thu, 2 Mar 2023 15:00:00 +0200
+
+
 kvalobs (7.0.1-1) jammy; urgency=medium
   * Rebuild for jammy
 

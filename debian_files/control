@@ -2,7 +2,7 @@ Source: kvalobs
 Section: science
 Priority: extra
 Maintainer: Borge Moe <borge.moe@met.no>
-Build-Depends: debhelper, autotools-dev, autoconf-archive, debconf, devscripts, fakeroot ,
+Build-Depends: debhelper, autotools-dev, autoconf-archive, debconf, devscripts, fakeroot,
   automake, libtool, gfortran, bison, flex, sqlite3, libsqlite3-dev, libpq-dev, python3,
   libxml2-dev, libxml++2.6-dev, libboost-dev, libboost-thread-dev,
   libboost-regex-dev, libboost-filesystem-dev, libboost-program-options-dev, libboost-system-dev, libboost-timer-dev,
