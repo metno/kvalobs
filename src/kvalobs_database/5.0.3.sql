@@ -38,15 +38,15 @@ CREATE VIEW workque_v  AS
 select
 	o.stationid,
 	o.typeid,
-    o.obstime,
-    o.tbtime,
-    q.tbtime AS que_tbtime,
-    q.priority,
-    q.process_start,
-    q.qa_start,
-    q.qa_stop,
-    q.qa_id,
-    q.observationid
+  o.obstime,
+  o.tbtime,
+  q.tbtime AS que_tbtime,
+  q.priority,
+  q.process_start,
+  q.qa_start,
+  q.qa_stop,
+  q.qa_id,
+  q.observationid
 from workque q, observations o 
 where q.observationid=o.observationid;
 
