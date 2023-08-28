@@ -813,7 +813,7 @@ CREATE TABLE workstatistik  (
        service_start TIMESTAMP ,
        service_stop  TIMESTAMP ,
        observationid BIGINT,
-       qa_id         smallint DEFAULT NULL,
+       qa_id         smallint DEFAULT NULL
 );
 CREATE INDEX ON workstatistik (stationid, obstime, typeid);
 CREATE INDEX ON workstatistik (observationid);
