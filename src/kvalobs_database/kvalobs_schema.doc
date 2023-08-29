@@ -547,6 +547,9 @@ qa_start:
 qa_stop:
 service_start:
 service_stop:
+qa_id: Only kvQabased with the given id should process this workqueue elements. 
+       This reduce db deadlocks when timeseries of observatinons is loaded by 
+       kvDataInputd for stationid/typeid combination.
 
 
 workstatistik.
@@ -565,6 +568,7 @@ qa_start:
 qa_stop:
 service_start:
 service_stop:
+qa_id:
 
 
 ps_subscribers ??
