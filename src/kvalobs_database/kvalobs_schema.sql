@@ -710,6 +710,27 @@ GRANT SELECT ON obs_pgm TO kv_read;
 GRANT SELECT, UPDATE, INSERT ON obs_pgm TO kv_write;
 
 
+CREATE TABLE obs_pgm2  (
+    stationid           INTEGER NOT NULL,
+    paramid             INTEGER NOT NULL,
+    level               INTEGER NOT NULL,
+    typeid              INTEGER NOT NULL,
+    sensor              INTEGER DEFAULT 0,
+    priority_message    BOOLEAN DEFAULT TRUE,
+    anytime             BOOLEAN DEFAULT FALSE,
+    hour                BOOLEAN[24] DEFAULT '{FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE}',
+    fromtime            TIMESTAMP NOT NULL,
+    totime              TIMESTAMP DEFAULT NULL,
+    UNIQUE ( stationid, paramid, level, typeid, sensor, fromtime )
+);
+
+CREATE INDEX obs_pgm2_index_fromtime_totime_typeid_stationid ON obs_pgm2 (fromtime, totime, typeid, stationid);
+REVOKE ALL ON obs_pgm2 FROM public;
+GRANT ALL ON obs_pgm2 TO kv_admin;
+GRANT SELECT ON obs_pgm2 TO kv_read;
+GRANT SELECT, UPDATE, INSERT ON obs_pgm2 TO kv_write;
+
+
 CREATE TABLE default_missing (
 	paramid INT UNIQUE,
 	value FLOAT NOT NULL,
