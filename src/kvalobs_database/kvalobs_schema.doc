@@ -496,6 +496,41 @@ fromtime: Tiden fra dataene i denne raden gjelder
 totime: Dataene for denne raden gjelder til og med dette tidspunktet.
 
 
+obs_pgm2:
+KILDE: METADATA, fra Stinfosys. 
+HVEM bruker tabellen:
+ QABases modul for manglende observasjoner
+ BESKRIVELSE av tabellen: |
+   Denne tabellen er observasjonsprogrammet (eg. Kvalobs' kontrollprogram) for en
+   stasjon, basert på timevise meldinger eller sjeldnere.
+   Observasjonsprogrammet beskriver når en parameter observert på en
+   stasjon er forventet å komme inn. Ikke alle parameterene blir observert for alle
+   terminer. En stasjon (observatør) trenger heller ikke å observere for alle
+   terminer.
+   Denne tabellen angir når en parameter blir observert og brukes for å finne ut om
+   en observasjon ikke er mottatt.
+ BESKRIVELSE av attributtene i tabellen:
+   stationid:   stasjonsnummer, se tabellen stationid_list.
+   paramid:     parameternummer, se tabellen param.
+   level:       relativ høyde for sensoren, se tabellen sensor_info.
+   typeid:      Id for meldingsformat, se tabellen message_format.
+   sensor: >
+                sensornummeret for en gitt kombinasjon av stationid, message_formatid,
+		paramid, level og fromtime. Hva sensor betyr defineres i
+		tabellen sensor_info.
+   priority_message: >
+                angir om meldingsformatet er det prioriterte for gitt kombinasjon
+                av stationid, paramid og level. Prioritering true innebærer at
+                observasjonen med gitt message_formatid skal benyttes ved distribusjon.
+   anytime: >
+                Verdien true angir at observasjonen kan komme inn når som helst.
+                Verdien false angir at kolonnen hour er relevant og beskriver
+                termintiden når observasjonen er forventet.
+   hour:        BOOLEAN[24] Observasjonstermin, hele time.
+   fromtime:    Tiden da dataene for denne raden begynner/begynte å gjelde.
+   totime:      Nedlagt rad: stationid,paramid og level er nedlagt.
+
+
 operator
 KILDE: METADATA, våre egne - username skal stemme med ldap-brulernavnet
 HVEM bruker tabellen: hqc
