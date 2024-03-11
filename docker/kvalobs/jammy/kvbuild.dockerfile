@@ -1,5 +1,3 @@
-#syntax=docker/dockerfile:1.2
-
 ARG REGISTRY
 ARG BASE_IMAGE_TAG=latest
 
