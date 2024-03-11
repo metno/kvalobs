@@ -1,3 +1,9 @@
+kvalobs (7.0.2-1) focal; urgency=medium
+  * Only container build changes.
+
+ -- Borge Moe <borge.moe@met.no>  Mon, 11 Mar 2023 07:00:00 +0100
+
+
 kvalobs (7.0.1-1) focal; urgency=medium
   * miconfig: Allow the char '-' in ids.
   * Uppgrade rdkafka to version 1.9.0.
