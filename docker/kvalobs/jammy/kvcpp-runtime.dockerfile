@@ -1,37 +1,10 @@
 ARG REGISTRY
 ARG BASE_IMAGE_TAG=latest
 
-
 FROM ${REGISTRY}kvbuild:${BASE_IMAGE_TAG} AS kvbins
-
-FROM ${REGISTRY}kvbuilddep:${BASE_IMAGE_TAG} AS dev
-ARG DEBIAN_FRONTEND='noninteractive'
-
-#COPY docker/pg-ACCC4CF8.asc /tmp
-
-RUN apt-get install -y gpg software-properties-common apt-utils
-
-#Add intertn repos and postgres repo
-# RUN apt-key add /tmp/pg-ACCC4CF8.asc && rm /tmp/pg-ACCC4CF8.asc && \
-#   add-apt-repository 'deb http://apt.postgresql.org/pub/repos/apt focal-pgdg main'
-
-#Add bufrdecoder
-
-
-COPY --from=kvbins /usr/lib/libkvalobs_*.so.* /usr/lib/
-COPY --from=kvbins /usr/lib/libkvalobs_*.so /usr/lib/
-COPY --from=kvbins /usr/lib/libkvalobs_*.a /usr/lib/
-COPY --from=kvbins /usr/lib/libkvalobs_*.la /usr/lib/
-COPY --from=kvbins /usr/lib/kvalobs10/db/*.so*  /usr/lib/kvalobs10/db/
-COPY --from=kvbins /usr/lib/kvalobs10/decode/*.so*  /usr/lib/kvalobs10/decode/
-COPY --from=kvbins /usr/lib/kvalobs10/lib/*.so*  /usr/lib/kvalobs10/lib/
-COPY --from=kvbins /usr/include/kvalobs /usr/include/kvalobs
-COPY --from=kvbins /usr/lib/pkgconfig/libkv*.pc  /usr/lib/pkgconfig/
-
 ENTRYPOINT [ "/bin/bash" ]
 
-
-FROM ubuntu:focal AS runtime
+FROM ubuntu:focal
 ARG DEBIAN_FRONTEND='noninteractive'
 ARG kafka_VERSION=1.9.0-1.cflt~ubu20
 
@@ -63,7 +36,6 @@ RUN apt-get update && apt-get -y install \
   postgresql-client-13 iproute2 gosu \
   librdkafka++1=${kafka_VERSION} libmetlibs-putools8
 
-#COPY --from=kvbins /usr/local/lib/libmetlibs*.so.* /usr/local/lib/
 COPY --from=kvbins /usr/lib/libkvalobs_*.so.* /usr/lib/
 COPY --from=kvbins /usr/lib/kvalobs10/db/*.so*  /usr/lib/kvalobs10/db/
 COPY --from=kvbins /usr/lib/kvalobs10/decode/*.so*  /usr/lib/kvalobs10/decode/

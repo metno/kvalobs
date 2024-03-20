@@ -6,7 +6,7 @@ set -euo pipefail
 
 kvuser=kvalobs
 kvuserid=5010
-mode=test
+mode="test"
 kafka_version=1.9.0-1.cflt~ubu20
 kafka_version_jammy=1.8.0-1build1
 VERSION="$(./version.sh)"
@@ -14,22 +14,18 @@ BUILDDATE=$(date +'%Y%m%d')
 os=focal
 registry="registry.met.no/met/obsklim/bakkeobservasjoner/data-og-kvalitet/kvalobs/kvbuild"
 targets=
+targets_in=
 tag=latest
 tag_and_latest="false"
-kvbuild=
-builddep=
-kvcpp=
-avalable_targets="kvdatainputd kvqabased kvmanagerd"
-all=false
+avalable_targets="kvbuilddep kvbuild kvcpp kvdatainputd kvqabased kvmanagerd"
 nocache=
-builddep_tag=
-
-
+build_only="false"
+push_only="false"
 use() {
 
   usage="\
-Usage: $0 [--help] [--os os] [--staging|--prod|--test] [--kvbuild] [--buildep] [--tag-version] [--tag tag] [--tag-and-latest tag] [--tag-with-build-date] [--list]
-          [--no-cache] targets
+Usage: $0 [--help] [--no-cache] [--os os] [--staging|--prod|--test] [--kvbuild] [--buildep] [--tag-version] [--tag tag] [--tag-and-latest tag] [--tag-with-build-date] [--list]
+           [--all-targets] [--push-only] [--build-only] targets
 
 This script build kvalobs containers. 
 
@@ -48,7 +44,6 @@ Options:
   --tag-with-build-date 
                 tag with version and build date on the form version-YYYYMMDD 
                 and set latest.
-  --builddep-tag tag Use this builddep container
   --tag-version Use version from configure.ac as tag. Also tag latest.
   --staging     build and push to staging.
   --prod        build and push to prod.
@@ -60,142 +55,134 @@ Options:
                 the container. 
   --os os       The os to build for. There must exist deinition files in docker/kvalobs/os
                 Default: $os
+  --build-only  Only build the container(s). No push. Default: $build_only
+  --push-only   Push only the container(s). No build. Default: $push_only
+                The containers must prevosly been buildt whith the same flags.
   --no-cache    Do not use the docker build cache.
+  --all-targets Build all targets.
   
   targets this is a list of targets to build. Available targets is:
 
-  all builddep kvbuild kvcpp $avalable_targets
+    '$avalable_targets'
 
-  The 'all' target builds: builddep kvbuild kvcpp $avalable_targets
-  
 "
 echo -e "$usage\n\n"
 
+}
+
+validate_targets() {
+  local target_to_validate=$1
+
+  for target_in in $target_to_validate ; do
+    found=false
+    for target in $avalable_targets ; do
+      if [ "$target_in" = "$target" ]; then
+        found=true
+        break
+      fi
+    done 
+    if [ "$found" == "false" ]; then
+      echo "Invalid target '$targets_in'"
+      exit 1
+    fi
+  done
 }
 
 while test $# -ne 0; do
   case $1 in
     --tag) 
         tag="$2"
-        shift;;
+        shift
+        ;;
     --tag-and-latest) 
         tag="$2"
         tag_and_latest=true
-        shift;;
+        shift
+        ;;
     --tag-version) 
         tag="$VERSION"
-        tag_and_latest=true;;
+        tag_and_latest=true
+        ;;
     --tag-with-build-date) 
         tag="$VERSION-$BUILDDATE"
-        tag_and_latest=true;;
-    --buildep-tag) 
-        builddep_tag="$2"
-        shift;;
+        tag_and_latest=true
+        ;;
+    --all-targets)
+      targets_in="$avalable_targets"
+      ;;
     --help) 
         use
         exit 0;;
     --os)
         os="$2"
-        shift;;
-    --staging) mode=staging;;
-    --prod) mode=prod;;
-    --test) mode=test;;
-    --kvbuild) kvbuild="kvbuild";;
-    --builddep) builddep="builddep";;
-    --kvcpp) kvcpp="kvcpp";;
+        shift
+        ;;
+    --staging) mode="staging";;
+    --prod) mode="prod";;
+    --test) mode="test";;
+    --kvbuild) 
+        targets_in="$targets_in kvbuild";;
+    --builddep) 
+        targets_in="$targets_in kvbuilddep";;
+    --kvcpp) 
+        targets_in="$targets_in kvcpp";;
     --list) 
-        echo -e "\nTargets: all builddep kvbuild $avalable_targets\n\n"
-        exit 0 ;;
-    --no-cache) nocache="--no-cache";;
+        echo -e "\nTargets: all $avalable_targets\n\n"
+        exit 0 
+        ;;
+    --no-cache) 
+      nocache="--no-cache";;
+    --build-only)
+      build_only="true";;
+    --push-only)
+      push_only="true";;
     -*) use
         echo "Invalid option $1"
-        exit 1;;  
-    *) targets="$targets $1";;
+        exit 1
+        ;;  
+    *) targets_in="$targets_in $1";;
   esac
   shift
 done
-
-
-
 
 if [ "$os" = "jammy" ]; then
   kafka_version="$kafka_version_jammy"
 fi
 
-if [ -z "$builddep_tag" ]; then
-  builddep_tag="$tag"
-fi
+
+validate_targets "$targets_in"
+
+# Make the target build in correct sequence, ie kvbuilddep, kvbuild, kvcpp, etc ...
+# The correct sequence is given by avalable_targets.
+for target in $avalable_targets ; do
+  for target_in in $targets_in ; do
+    if [ "$target" = "$target_in" ]; then
+      if [ "$target" = "kvcpp" ]; then
+        targets="$targets kvcpp-dev kvcpp-runtime"
+      else
+        targets="$targets $target"
+      fi
+      break
+    fi
+  done
+done
 
 echo "tag: $tag"
+echo "targets_in: $targets_in"
+echo "Targets: $targets"
 echo "mode: $mode"
 echo "os: $os"
 echo "registry: $registry"
-echo "kvbuild: $kvbuild"
-echo "kvcpp: $kvcpp"
-echo "builddep: $builddep"
-echo "Targets: $targets"
 echo "nocache: $nocache"
 echo "kafka_version: ${kafka_version}"
+echo "build_only: $build_only"
+echo "push_only: $push_only"
 echo "VERSION: $VERSION"
-echo "builddep_tag: $builddep_tag"
-
-
 
 chmod +x gitref.sh
 ./gitref.sh 
 
-for target in $targets ; do
-  found=false
-
-  if [ $target = all ]; then 
-    all=true;
-    continue
-  fi
-
-  if [ $target = builddep ]; then 
-    builddep="builddep";
-    continue
-  fi
-
-  if [ $target = kvbuild ]; then 
-    kvbuild="kvbuild";
-    continue
-  fi
-
-  if [ $target = kvcpp ]; then 
-    kvcpp="kvcpp";
-    continue
-  fi
-
-
-  for tmp in $avalable_targets ; do
-    if [ $target = $tmp ]; then  
-      found=true
-    fi
-  done
-  
-  if [ $found = false ]; then
-   echo "Invalid target: $target"
-   echo "Avalable targets: $avalable_targets"
-   exit 1
-  fi
-done
-
-if [ $all = true ]; then
-  targets="$avalable_targets"
-  builddep="builddep"
-  kvbuild="kvbuild"
-  kvcpp="kvcpp"
-fi
-
-
-if [ -z "$targets" -a -z "$kvcpp" -a -z "$builddep" -a -z "$kvbuild" ]; then
-  echo "No targets given."
-  exit 1
-fi
-
-
-echo "Build targets: $builddep $kvbuild $kvcpp $targets"
+echo "Build targets: $targets"
 
 if [ $mode = test ]; then 
   registry=""
@@ -205,68 +192,30 @@ else
 fi
 
 
-# Must build the targets buildep and kvbuild first, if given.
-pretargets="$builddep $kvbuild"
-for target in $pretargets; do
-  dockerfile="docker/kvalobs/${os}/${target}.dockerfile"
-  echo "Building dockerfile: $dockerfile"
-  docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" --build-arg "kafka_VERSION=${kafka_version}" \
-      --build-arg "BUILDDEP_TAG=${builddep_tag}" -f $dockerfile --tag "${registry}${target}:$tag" .
+
+if [ "$push_only" = "false" ]; then
+  for target in $targets; do
+    dockerfile="docker/kvalobs/${os}/${target}.dockerfile"
+    echo "Building dockerfile: $dockerfile"
+    docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" \
+      --build-arg "kvuser=$kvuser" --build-arg "kvuserid=$kvuserid" \
+      --build-arg "kafka_VERSION=${kafka_version}" \
+      -f "$dockerfile" --tag "${registry}${target}:$tag" .
   
-  if [ "$tag_and_latest" = "true" ]; then
+    if [ "$tag_and_latest" = "true" ] && [ "$tag" != "latest" ]; then
       docker tag "${registry}${target}:$tag" "${registry}${target}:latest"
-  fi
-
-  if [ $mode != test ]; then 
-    docker push ${registry}${target}:$tag
-    if [ "$tag_and_latest" = "true" ]; then
-      docker push "${registry}${target}:latest"
     fi
-  fi
-done
-
-
-#Should we build the kvdev and kvruntime 
-if [ -n "$kvcpp" ]; then
-  dockerfile="docker/kvalobs/${os}/kvcpp.dockerfile"
-  echo "Building dockerfile: docker/kvalobs/${os}/kvcpp.dockerfile"
-  docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" --build-arg "kafka_VERSION=${kafka_version}" \
-    --build-arg "BUILDDEP_TAG=${builddep_tag}" -f $dockerfile --target dev --tag "${registry}kvcpp-dev:$tag" .
-  docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" --build-arg "kafka_VERSION=${kafka_version}" \
-    --build-arg "BUILDDEP_TAG=${builddep_tag}" -f $dockerfile --target runtime --tag "${registry}kvcpp-runtime:$tag" .
-
-  if [ "$tag_and_latest" = "true" ]; then
-      docker tag "${registry}kvcpp-dev:$tag" "${registry}kvcpp-dev:latest"
-      docker tag "${registry}kvcpp-runtime:$tag" "${registry}kvcpp-runtime:latest"
-  fi
-
-  if [ $mode != test ]; then 
-    docker push ${registry}kvcpp-dev:$tag
-    docker push ${registry}kvcpp-runtime:$tag
-
-    if [ "$tag_and_latest" = "true" ]; then
-      docker push "${registry}kvcpp-dev:latest"
-      docker push "${registry}kvcpp-runtime:latest" 
-    fi
-  fi
+  done
 fi
 
-for target in $targets; do
-  dockerfile="docker/kvalobs/${os}/${target}.dockerfile"
 
-  echo "Building dockerfile: $dockerfile"
-  docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" --build-arg "kvuser=$kvuser" --build-arg "kvuserid=$kvuserid" --build-arg "kafka_VERSION=${kafka_version}" \
-    --build-arg "BUILDDEP_TAG=${builddep_tag}" -f $dockerfile --tag ${registry}${target}:$tag .
-  
-  if [ "$tag_and_latest" = "true" ]; then
-      docker tag "${registry}${target}:$tag" "${registry}${target}:latest"
-  fi
-
-  if [ $mode != test ]; then 
-    docker push ${registry}${target}:$tag
-    if [ "$tag_and_latest" = "true" ]; then
+if [ "$build_only" = "false" ] && [ "$mode" != "test" ]; then
+  for target in $targets; do
+    echo "Pushing: ${registry}${target}:$tag"
+    docker push "${registry}${target}:$tag"
+    if [ "$tag_and_latest" = "true" ] && [ "$tag" != "latest" ]; then
+      echo "Pushing: ${registry}${target}:latest"
       docker push "${registry}${target}:latest"
     fi
-  fi
-done
-
+  done
+fi

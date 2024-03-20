@@ -1,4 +1,4 @@
-FROM registry.met.no/met/obsklim/bakkeobservasjoner/data-og-kvalitet/kvalobs/kvbuild/staging/builddep:latest
+FROM registry.met.no/met/obsklim/bakkeobservasjoner/data-og-kvalitet/kvalobs/kvbuild/staging/kvbuilddep:latest
 #FROM builddep:latest
 ARG DEBIAN_FRONTEND='noninteractive'
 

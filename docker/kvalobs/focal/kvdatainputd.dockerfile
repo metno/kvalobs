@@ -2,7 +2,6 @@ ARG REGISTRY
 ARG BASE_IMAGE_TAG=latest
 
 FROM ${REGISTRY}kvbuild:${BASE_IMAGE_TAG} AS kvbins
-
 ENTRYPOINT [ "/bin/bash" ]
 
 
