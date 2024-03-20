@@ -19,8 +19,8 @@ tag=latest
 tag_and_latest="false"
 avalable_targets="kvbuilddep kvbuild kvcpp kvdatainputd kvqabased kvmanagerd"
 nocache=
-build_only="false"
-push_only="false"
+build="true"
+push="true"
 use() {
 
   usage="\
@@ -55,8 +55,8 @@ Options:
                 the container. 
   --os os       The os to build for. There must exist deinition files in docker/kvalobs/os
                 Default: $os
-  --build-only  Only build the container(s). No push. Default: $build_only
-  --push-only   Push only the container(s). No build. Default: $push_only
+  --build-only  Only build the container(s). No push. Default: $build
+  --push-only   Push only the container(s). No build. Default: $push
                 The containers must prevosly been buildt whith the same flags.
   --no-cache    Do not use the docker build cache.
   --all-targets Build all targets.
@@ -133,9 +133,9 @@ while test $# -ne 0; do
     --no-cache) 
       nocache="--no-cache";;
     --build-only)
-      build_only="true";;
+      push="false";;
     --push-only)
-      push_only="true";;
+      build="false";;
     -*) use
         echo "Invalid option $1"
         exit 1
@@ -175,8 +175,8 @@ echo "os: $os"
 echo "registry: $registry"
 echo "nocache: $nocache"
 echo "kafka_version: ${kafka_version}"
-echo "build_only: $build_only"
-echo "push_only: $push_only"
+echo "build: $build"
+echo "push: $push"
 echo "VERSION: $VERSION"
 
 chmod +x gitref.sh
@@ -193,7 +193,7 @@ fi
 
 
 
-if [ "$push_only" = "false" ]; then
+if [ "$build" = "true" ]; then
   for target in $targets; do
     dockerfile="docker/kvalobs/${os}/${target}.dockerfile"
     echo "Building dockerfile: $dockerfile"
@@ -209,7 +209,7 @@ if [ "$push_only" = "false" ]; then
 fi
 
 
-if [ "$build_only" = "false" ] && [ "$mode" != "test" ]; then
+if [ "$push" = "true" ] && [ "$mode" != "test" ]; then
   for target in $targets; do
     echo "Pushing: ${registry}${target}:$tag"
     docker push "${registry}${target}:$tag"
