@@ -764,17 +764,20 @@ sub extract {
 
     return unless $II && $iii; # Skip stations without WMO number
 
-    # To be changed - decode Austrian, British, Dutch, Finish, German,
-    # Hungarian, Irish, Spanish and Swedish stations only. For new countries
-    # to be added: check
+    # To be changed - decode only stations from Austria, Denmark, Finland,
+    # Germany, Hungary, Ireland, Netherlands, Slovenia, Spane, Sweden,
+    # Switzerland and UK. For new countries to be added: check
     # https://www.wmo.int/pages/prog/www/ois/volume-a/StationIDs_Global_1509.pdf
-    return unless $II == 2
-        || $II == 3
-        || ($II == 6 && $iii >=200 && $iii < 400)
-        || ($II == 8 && $iii <= 494)
-        || $II == 10
-	|| ($II == 11 && $iii < 400)
-	|| ($II == 12 && $iii >=700 && $iii <= 998);
+    # [2024-03 this link not working anymore - use an old Vol A instead]
+    return unless $II == 2 # Sweden, Finland
+        || $II == 3 # UK, Ireland
+        || ($II == 6 && $iii < 400) # Denmark and Netherlands
+        || ($II == 6 && $iii > 600 && $iii < 700) # Switzerland
+        || ($II == 8 && $iii <= 494) # Spain
+        || $II == 10 # Germany
+        || ($II == 11 && $iii < 400) # Austria
+        || ($II == 12 && $iii >=700 && $iii <= 998) # Hungary
+        || ($II == 14 && $iii <= 122); # Slovenia
 
     my $wmonr = sprintf("%02d%03d", $II, $iii);
     my $header = "kldata/wmonr=$wmonr/type=7";
