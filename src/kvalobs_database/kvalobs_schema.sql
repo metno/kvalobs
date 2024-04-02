@@ -25,7 +25,7 @@ kvalobs_database_version()
 RETURNS text AS
 $BODY$
 BEGIN
-	RETURN '5.0.3';
+	RETURN '5.0.4';
 END;
 $BODY$
 LANGUAGE plpgsql IMMUTABLE;
@@ -455,6 +455,7 @@ CREATE TABLE model_data (
 	level     INTEGER NOT NULL,
     modelid   INTEGER NOT NULL,
 	original  FLOAT DEFAULT NULL,  
+    tbtime    TIMESTAMP DEFAULT current_timestamp(0),
 	UNIQUE ( stationid, obstime, paramid, level, modelid )
 );
 REVOKE ALL ON model_data FROM public;
@@ -462,6 +463,13 @@ GRANT ALL ON model_data TO kv_admin;
 GRANT SELECT ON model_data TO kv_read;
 GRANT SELECT, UPDATE, INSERT, DELETE ON model_data TO kv_write;
 
+CREATE VIEW pmodel_data AS 
+    SELECT stationid,obstime, (SELECT name FROM param WHERE paramid=model_data.paramid) AS paramid, 
+    level, modelid, original, tbtime FROM model_data;
+REVOKE ALL ON pmodel_data FROM public;
+GRANT ALL ON pmodel_data TO kv_admin;
+GRANT SELECT ON pmodel_data TO kv_read;
+GRANT SELECT ON pmodel_data TO kv_write;
 
 
 CREATE TABLE model (
