@@ -1,3 +1,7 @@
+2024-04-02 Børge Moe
+  * Release 7.0.3
+  * Add tbtime to the table model_data.
+
 2024-03-11 Børge Moe
   * Release 7.0.2
     - Only container build changes.
@@ -14,8 +18,8 @@
       The process must be restarted by some means.
 
 2009-09-22 Vegard Bønes
-           * kvQaBased
-             - Updated setting of useinfo flags (Bug 1229)
+   * kvQaBased
+     - Updated setting of useinfo flags (Bug 1229)
 
 ----------------
 

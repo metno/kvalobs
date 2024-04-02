@@ -1,3 +1,8 @@
+kvalobs (7.0.3-1) focal; urgency=medium
+  * Add tbtime to the table model_data.
+
+ -- Borge Moe <borge.moe@met.no>  Tue, 2 Apr 2024 07:00:00 +0200
+
 kvalobs (7.0.2-1) focal; urgency=medium
   * Only container build changes.
 
