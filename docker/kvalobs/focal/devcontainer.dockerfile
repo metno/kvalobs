@@ -1,5 +1,6 @@
-FROM registry.met.no/met/obsklim/bakkeobservasjoner/data-og-kvalitet/kvalobs/kvbuild/staging/kvbuilddep:latest
-#FROM builddep:latest
+ARG REGISTRY="registry.met.no/met/obsklim/bakkeobservasjoner/data-og-kvalitet/kvalobs/kvbuild/staging"
+
+FROM ${REGISTRY}/kvbuilddep:latest
 ARG DEBIAN_FRONTEND='noninteractive'
 
 RUN apt-get update && apt-get install -y libgmock-dev language-pack-nb-base
@@ -14,5 +15,5 @@ RUN apt-get update && apt-get --yes install \
    libperl5.30 libkvutil-perl 
 
 #Add vscode user
-RUN locale-gen en_US.UTF-8
+RUN locale-gen en_US.UTF-8 nb_NO.UTF-8
 RUN useradd -ms /bin/bash vscode

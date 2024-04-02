@@ -11,6 +11,7 @@ kafka_version=1.9.0-1.cflt~ubu20
 kafka_version_jammy=1.8.0-1build1
 VERSION="$(./version.sh)"
 BUILDDATE=$(date +'%Y%m%d')
+default_os="focal"
 os=focal
 registry="registry.met.no/met/obsklim/bakkeobservasjoner/data-og-kvalitet/kvalobs/kvbuild"
 targets=
@@ -167,6 +168,16 @@ for target in $avalable_targets ; do
   done
 done
 
+if [ $mode = test ]; then 
+  registry="$os/"
+  kvuserid=$(id -u)
+elif [ "$os" = "$default_os" ]; then
+  registry="$registry/$mode/"
+else 
+  registry="$registry/$mode/$os/"
+fi
+
+
 echo "tag: $tag"
 echo "targets_in: $targets_in"
 echo "Targets: $targets"
@@ -183,15 +194,6 @@ chmod +x gitref.sh
 ./gitref.sh 
 
 echo "Build targets: $targets"
-
-if [ $mode = test ]; then 
-  registry=""
-  kvuserid=$(id -u)
-else 
-  registry="$registry/$mode/"
-fi
-
-
 
 if [ "$build" = "true" ]; then
   for target in $targets; do

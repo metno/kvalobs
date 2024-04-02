@@ -31,7 +31,7 @@ COPY --from=kvbins /usr/lib/pkgconfig/libkv*.pc  /usr/lib/pkgconfig/
 ENTRYPOINT [ "/bin/bash" ]
 
 
-FROM ubuntu:focal AS runtime
+FROM ubuntu:jammy AS runtime
 ARG DEBIAN_FRONTEND='noninteractive'
 ARG kafka_VERSION=1.9.0-1.cflt~ubu20
 
