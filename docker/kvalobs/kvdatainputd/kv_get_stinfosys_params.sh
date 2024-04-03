@@ -30,18 +30,18 @@ KVCONFIG=__KVCONFIG__
 
 
 #KVCONF=`$KVCONFIG --sysconfdir`/kvalobs
-KVCONF=/etc/kvalobs
+KVCONF="/etc/kvalobs"
 
 #KVLOG=`$KVCONFIG --logdir`
-KVLOG=/var/log/kvalobs
+KVLOG="/var/log/kvalobs"
 
 
-LOG_FILE=${KVLOG}/kv_get_stinfosys_params.log
-STINFOSYS=${KVCONF}/stinfosys.conf
-OUTFILE=$KVCONF/stinfosys_params.csv
+LOG_FILE="${KVLOG}/kv_get_stinfosys_params.log"
+STINFOSYS="${KVCONF}/stinfosys.conf"
+OUTFILE="$KVCONF/stinfosys_params.csv"
 #OUTFILE=$KVLOG/stinfosys_params.csv
-TMP_OUTFILE=${OUTFILE}_tmp
-ERROR_OUTFILE=${OUTFILE}_error
+TMP_OUTFILE="${OUTFILE}_tmp"
+ERROR_OUTFILE="${OUTFILE}_error"
 
 function use()
 {
@@ -87,7 +87,7 @@ function use()
 }
 
 
-debug=false
+debug="false"
 no_password=""
 pgport=""
 pghost=""
@@ -113,49 +113,49 @@ while [ $optret -eq 0 ]; do
 done
 
 
-if [ $debug="false" ]; then
-    rm -f $TMP_OUTFILE
-    rm -f $ERROR_OUTFILE
-    rm -f ${LOG_FILE}_trunc
+if [ "$debug" = "false" ]; then
+    rm -f "$TMP_OUTFILE"
+    rm -f "$ERROR_OUTFILE"
+    rm -f "${LOG_FILE}_trunc"
 fi
 
-touch $LOG_FILE
+touch "$LOG_FILE"
 
-if [ -f $LOG_FILE ]; then
+if [ -f "$LOG_FILE" ]; then
     #Truncate the logfile
-    tail -n 50 $LOG_FILE > ${LOG_FILE}_trunc
-    mv ${LOG_FILE}_trunc ${LOG_FILE}
+    tail -n 50 "$LOG_FILE" > "${LOG_FILE}_trunc"
+    mv "${LOG_FILE}_trunc" "${LOG_FILE}"
 fi
 
 log()
 {
     local t=""
     t=`date +'%Y-%m-%d %H:%M:%S'`
-    echo "$t - $@" >> $LOG_FILE
+    echo "$t - $@" >> "$LOG_FILE"
 }
 
-if [ ! -f ${STINFOSYS} ]; then
+if [ ! -f "${STINFOSYS}" ]; then
     log "No '$STINFOSYS' file!"
     exit 1
 fi
 
 #Set PGHOST, PGPORT and PGUSER from the conf file.
-. ${STINFOSYS}
+. "${STINFOSYS}"
 
 
 if [ -n "$pgport" ]; then
-    PGPORT=$pgport
+    PGPORT="$pgport"
 fi
 
 if [ -n "$pghost" ]; then
-    PGHOST=$pghost
+    PGHOST="$pghost"
 fi
 
 if [ -n "$pguser" ]; then
-    PGUSER=$pguser
+    PGUSER="$pguser"
 fi
 
-if [ $debug = true ]; then
+if [ "$debug" = "true" ]; then
     echo "PGHOST: $PGHOST"
     echo "PGPORT: $PGPORT"
     echo "PGUSER: $PGUSER"
@@ -169,34 +169,34 @@ export PGUSER
 
 (psql $no_password stinfosys <<EOF
 \set ON_ERROR_STOP
-\copy (select paramid,name,scalar from param order by paramid) to '${TMP_OUTFILE}' delimiter as ',';
+\copy (select paramid,name,scalar from param where name is not null order by paramid) to '${TMP_OUTFILE}' delimiter as ',';
 EOF
-)> ${ERROR_OUTFILE} 2>&1 
+)> "${ERROR_OUTFILE}" 2>&1 
 
-if [ $? -ne 0 -o ! -f ${TMP_OUTFILE} ]; then 
+if [ $? -ne 0 -o ! -f "${TMP_OUTFILE}" ]; then 
     if [ -z "$no_password" ]; then
-        cat ${ERROR_OUTFILE}
+        cat "${ERROR_OUTFILE}"
     fi
     log "Failed to get the parameter definition from stinfosys."
     log "The error message was."
     log "---------------------------"
-    cat ${ERROR_OUTFILE} >> $LOG_FILE
+    cat "${ERROR_OUTFILE}" >> "$LOG_FILE"
     log "---------------------------"
     log "The file '$OUTFILE' was NOT changed."
     exit 1
 fi
 
-if [ ! -f $OUTFILE ]; then
-    mv $TMP_OUTFILE $OUTFILE
+if [ ! -f "$OUTFILE" ]; then
+    mv "$TMP_OUTFILE" "$OUTFILE"
     log "The $OUTFILE was created!"
     
     exit 0
 fi
 
-crcOldFile=`md5sum $OUTFILE | cut -f1 -d' '`
-crcNewFile=`md5sum $TMP_OUTFILE | cut -f1 -d' '`
+crcOldFile=`md5sum "$OUTFILE" | cut -f1 -d' '`
+crcNewFile=`md5sum "$TMP_OUTFILE" | cut -f1 -d' '`
 
-if [ $debug = true ]; then
+if [ "$debug" = "true" ]; then
     echo "crcOldFile: $crcOldFile"
     echo "crcNewFile: $crcNewFile"
 fi
@@ -205,17 +205,17 @@ if [ "$crcOldFile" = "$crcNewFile" ]; then
     #Use touch to update the modification time så 
     #we can use this time to check when we last 
     #checked stinfosys for parameter information.
-    touch $OUTFILE
+    touch "$OUTFILE"
     log "No change!"
 else 
-    mv $TMP_OUTFILE $OUTFILE
+    mv "$TMP_OUTFILE" "$OUTFILE"
     log "New parameters defined. $OUTFILE was changed."
 fi
 
-if [ $debug = false ]; then
-    rm -f $TMP_OUTFILE
-    rm -f $ERROR_OUTFILE
-    rm -f ${LOG_FILE}_trunc
+if [ "$debug" = "false" ]; then
+    rm -f "$TMP_OUTFILE"
+    rm -f "$ERROR_OUTFILE"
+    rm -f "${LOG_FILE}_trunc"
 fi
 
 exit 0
