@@ -22,6 +22,11 @@ avalable_targets="kvbuilddep kvbuild kvcpp kvdatainputd kvqabased kvmanagerd"
 nocache=
 build="true"
 push="true"
+
+if [ -n "$KV_BUILD_DATE" ]; then
+  BUILDDATE=$KV_BUILD_DATE
+fi
+
 use() {
 
   usage="\
@@ -44,7 +49,8 @@ Options:
                 tag the image with the name tagname  and also create latest tag.
   --tag-with-build-date 
                 tag with version and build date on the form version-YYYYMMDD 
-                and set latest.
+                and set latest. If the enviroment variable KV_BUILD_DATE is set use
+                this as the build date. Format KV_BUILD_DATE YYYYMMDD.
   --tag-version Use version from configure.ac as tag. Also tag latest.
   --staging     build and push to staging.
   --prod        build and push to prod.
