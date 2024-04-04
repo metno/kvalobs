@@ -22,8 +22,10 @@ avalable_targets="kvbuilddep kvbuild kvcpp kvdatainputd kvqabased kvmanagerd"
 nocache=
 build="true"
 push="true"
+KV_BUILD_DATE=${KV_BUILD_DATE:-}
 
-if [ -n "$KV_BUILD_DATE" ]; then
+
+if [ -n "${KV_BUILD_DATE}" ]; then
   BUILDDATE=$KV_BUILD_DATE
 fi
 
