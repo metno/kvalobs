@@ -81,7 +81,11 @@ std::shared_ptr<kvalobs::decoder::QaIdInfo> getQaIdInfo(miutil::conf::ConfSectio
         break;
       }
       types.push_back(t);
-    }
+    } else if( it->type()== miutil::conf::STRING && it->valAsString() == "*" ){
+      types.clear();
+      types.push_back(0);
+      break;
+    } 
   }
 
   if( types.empty() || maxQaId<0){
