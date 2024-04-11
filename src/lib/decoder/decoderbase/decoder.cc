@@ -506,6 +506,11 @@ addDataToDbThrow(const miutil::miTime &obstime, int stationid, int typeid_,
   boost::gregorian::date date(obstime.year(), obstime.month(), obstime.day());
   boost::posix_time::time_duration clock(pt::hours(obstime.hour()) + pt::minutes(obstime.min()) + pt::seconds(obstime.sec()));
   boost::posix_time::ptime pt_obstime(date, clock);
+
+  auto filter=this->filter(stationid, typeid_);
+
+  IDLOGINFO(logid, "Using filter: '" << filter.name() << "' for stationid: " << stationid << " typeid: " << typeid_);
+
   tuple<list<kvData>, list<kvTextData>> data=filterSaveDataToDb( sd, textData);
   dataToPublish(sd, textData);
 
