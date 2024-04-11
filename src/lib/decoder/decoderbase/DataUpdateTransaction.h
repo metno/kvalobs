@@ -42,6 +42,7 @@
 #include "kvalobs/kvStationInfo.h"
 #include "kvalobs/kvTextData.h"
 #include "kvalobs/observation.h"
+#include "decoderbase/commontypes.h"
 
 namespace kvalobs {
 namespace decoder {
@@ -88,7 +89,7 @@ private:
   std::string logid;
   std::string insertType;
   int nRetry;
-  bool onlyAddOrUpdateData;
+  DBAddType insertOrUpdate;
   bool addToWorkQueue;
   bool tryToUseDataTbTime;
   DuplicateTestType  duplicateTestType;
@@ -129,12 +130,22 @@ private:
 
   //false, true, false, kvalobs::decoder::DataUpdateTransaction::Partial
 
+  // DataUpdateTransaction(const boost::posix_time::ptime &obstime, int stationid,
+  //                       int typeid_,
+  //                       std::list<kvalobs::kvData> *newData,
+  //                       std::list<kvalobs::kvTextData> *newTextData,
+  //                       const std::string &logid, 
+  //                       bool onlyAddOrUpdateData, 
+  //                       bool addToWorkQueue,
+  //                       bool tryToUseDataTbTime,
+  //                       DataUpdateTransaction::DuplicateTestType  duplicateTestType, int useQaId);
+
   DataUpdateTransaction(const boost::posix_time::ptime &obstime, int stationid,
                         int typeid_,
                         std::list<kvalobs::kvData> *newData,
                         std::list<kvalobs::kvTextData> *newTextData,
                         const std::string &logid, 
-                        bool onlyAddOrUpdateData, 
+                        DBAddType unsertOrUpdate, 
                         bool addToWorkQueue,
                         bool tryToUseDataTbTime,
                         DataUpdateTransaction::DuplicateTestType  duplicateTestType, int useQaId);          

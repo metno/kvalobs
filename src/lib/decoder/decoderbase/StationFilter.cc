@@ -263,7 +263,7 @@ std::list<kvalobs::kvData> StationFilters::publishOrSaveData(const std::list<kva
   long sid=std::numeric_limits<long>::max();
   long tid=std::numeric_limits<long>::max();
   StationFilterElement f;
-
+  
   for( auto &d : sd) {
     if(sid!=d.stationID() || tid!=d.typeID()) {
       sid=d.stationID();

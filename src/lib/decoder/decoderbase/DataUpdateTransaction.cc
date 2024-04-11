@@ -88,7 +88,7 @@ namespace decoder {
 
 DataUpdateTransaction::DataUpdateTransaction(const boost::posix_time::ptime &obstime, int stationid, int typeID,
                                              std::list<kvalobs::kvData> *newData, std::list<kvalobs::kvTextData> *newTextData, const std::string &logid,
-                                             bool onlyAddOrUpdateData_, bool addToWorkQueue_, bool tryToUseDataTbTime_,
+                                             DBAddType insertOrUpdate_, bool addToWorkQueue_, bool tryToUseDataTbTime_,
                                              DataUpdateTransaction::DuplicateTestType duplicateTestType_, int qaId_)
     : newData(newData),
       newTextData(newTextData),
@@ -102,7 +102,7 @@ DataUpdateTransaction::DataUpdateTransaction(const boost::posix_time::ptime &obs
       ok_(new bool(false)),
       logid(logid),
       nRetry(0),
-      onlyAddOrUpdateData(onlyAddOrUpdateData_),
+      insertOrUpdate(insertOrUpdate_),
       addToWorkQueue(addToWorkQueue_),
       tryToUseDataTbTime(tryToUseDataTbTime_),
       duplicateTestType(duplicateTestType_),
@@ -123,7 +123,7 @@ DataUpdateTransaction::DataUpdateTransaction(const DataUpdateTransaction &dut)
       ok_(dut.ok_),
       logid(dut.logid),
       nRetry(dut.nRetry),
-      onlyAddOrUpdateData(dut.onlyAddOrUpdateData),
+      insertOrUpdate(dut.insertOrUpdate),
       addToWorkQueue(dut.addToWorkQueue),
       tryToUseDataTbTime(dut.tryToUseDataTbTime),
       duplicateTestType(dut.duplicateTestType),
@@ -461,12 +461,12 @@ completeIsEqual(const std::list<kvalobs::kvData> &oldData, const std::list<kvalo
 
 bool DataUpdateTransaction::isEqual(const std::list<kvalobs::kvData> &oldData_, const std::list<kvalobs::kvTextData> &oldTextData) {
   if( duplicateTestType == Complete ){
-    return completeIsEqual(oldData_, oldTextData, !onlyAddOrUpdateData);
+    return completeIsEqual(oldData_, oldTextData, insertOrUpdate==DbInsert);
   }
 
   //if onlyAddOrUpdateData is false, the oldadata is to be replaced by the new data.
   //If true the new data is to be addded to the data that is alleady in the databse.
-  if( partialIsEqual(oldData_, oldTextData, !onlyAddOrUpdateData) ) {
+  if( partialIsEqual(oldData_, oldTextData, insertOrUpdate==DbInsert) ) {
     return true;
   }
 
@@ -478,7 +478,7 @@ bool DataUpdateTransaction::isEqual(const std::list<kvalobs::kvData> &oldData_, 
       it = oldData.erase(it);
   }
 
-  return partialIsEqual(oldData, oldTextData, !onlyAddOrUpdateData);
+  return partialIsEqual(oldData, oldTextData, insertOrUpdate==DbInsert);
 }
 
 
@@ -633,7 +633,7 @@ bool DataUpdateTransaction::operator()(dnmi::db::Connection *conection) {
       return false;
     }
 
-    log << "NewData " << (onlyAddOrUpdateData ? "(update):" : ":") << "stationid: " << stationid << " typeid: " << typeid_ << " obstime: "
+    log << "NewData " << (insertOrUpdate==DbUpdate ? "(update):" : ":") << "stationid: " << stationid << " typeid: " << typeid_ << " obstime: "
         << pt::to_kvalobs_string(obstime) << " onlyHqcData: "<<(onlyHqcData?"true":"false") << " qa_id: " << qaId  << endl << mylog.str() << endl;
   }
 
@@ -659,7 +659,7 @@ bool DataUpdateTransaction::operator()(dnmi::db::Connection *conection) {
     return true;
   }
 
-  if (onlyAddOrUpdateData) {
+  if (insertOrUpdate==DbUpdate) {
     insertType = "UPDATE";
     return updateObservation(conection, oldObs.get());
   }

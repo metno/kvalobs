@@ -116,7 +116,7 @@ bool SynopDecoder::saveData(list<kvalobs::kvData> &data, bool &rejected,
 
   try {
     if (!addDataToDbThrow(to_miTime(it->obstime()), it->stationID(), it->typeID(),
-          data, textData, logid.str(), false)) {
+          data, textData, logid.str(), DbInsert)) {
       rejected=true;
       rejectedMessage="Unknown error, but not DB error.";
       ret = false;

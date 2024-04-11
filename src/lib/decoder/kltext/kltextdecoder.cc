@@ -85,7 +85,7 @@ kvalobs::decoder::DecoderBase::DecodeResult KlTextDecoder::execute(std::string &
   list<kvTextData> textDataList = {textData};
   miutil::miTime obstime=pt::to_miTime(textData.obstime());
 
-  if (!addDataToDbThrow(obstime, textData.stationID(), textData.typeID(),dataList,textDataList,string(""), false)) {
+  if (!addDataToDbThrow(obstime, textData.stationID(), textData.typeID(),dataList,textDataList,string(""), DbInsert)) {
     msg += "Failed to add the textdata to the database.";
     LOGERROR("Failed to put the data to the database: \nPartial INSERT SQL:\n INSERT ... " << textData.toSend());
     return NotSaved;

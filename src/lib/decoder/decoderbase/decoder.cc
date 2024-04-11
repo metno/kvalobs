@@ -453,15 +453,15 @@ bool kvalobs::decoder::DecoderBase::deleteKvDataFromDb(const kvalobs::kvData &sd
 
 bool kvalobs::decoder::DecoderBase::addDataToDb(const miutil::miTime &obstime, int stationid, int typeid_, std::list<kvalobs::kvData> &sd,
                                                 std::list<kvalobs::kvTextData> &textData, const std::string &logid) {
-  return addDataToDb(obstime, stationid, typeid_, sd, textData, logid, false);
+  return addDataToDb(obstime, stationid, typeid_, sd, textData, logid, DbInsert);
 }
 
 bool kvalobs::decoder::DecoderBase::addDataToDb(
     const miutil::miTime &obstime, int stationid, int typeid_, 
     std::list<kvalobs::kvData> &sd, std::list<kvalobs::kvTextData> &textData, 
-    const std::string &logid, bool onlyAddOrUpdateData, bool addToWorkQueue, bool tryToUseDataTbTime, bool enableDuplicateTest) {
+    const std::string &logid, DBAddType insertOrUpdate, bool addToWorkQueue, bool tryToUseDataTbTime, bool enableDuplicateTest) {
   try {
-    return addDataToDbThrow(obstime, stationid, typeid_, sd, textData, logid, onlyAddOrUpdateData, addToWorkQueue, tryToUseDataTbTime, enableDuplicateTest);
+    return addDataToDbThrow(obstime, stationid, typeid_, sd, textData, logid, insertOrUpdate, addToWorkQueue, tryToUseDataTbTime, enableDuplicateTest);
   }
   catch ( const dnmi::db::SQLException &e) {
     ostringstream ost;
@@ -498,7 +498,7 @@ kvalobs::decoder::DecoderBase::
 addDataToDbThrow(const miutil::miTime &obstime, int stationid, int typeid_,
                    std::list<kvalobs::kvData> &sd,
                    std::list<kvalobs::kvTextData> &textData, 
-                   const std::string &logid, bool onlyAddOrUpdateData, bool addToWorkQueue, bool tryToUseDataTbTime, 
+                   const std::string &logid, DBAddType insertOrUpdate, bool addToWorkQueue, bool tryToUseDataTbTime, 
                    bool partialDuplicateTest)
 {
   namespace pt = boost::posix_time;
@@ -509,11 +509,25 @@ addDataToDbThrow(const miutil::miTime &obstime, int stationid, int typeid_,
 
   auto filter=this->filter(stationid, typeid_);
 
-  IDLOGINFO(logid, "Using filter: '" << filter.name() << "' for stationid: " << stationid << " typeid: " << typeid_);
+  IDLOGINFO(logid, "Using filter: '" << filter.name() << "' for stationid: " << stationid << " typeid: " << typeid_ << "\n"
+    << "addToWorkQue: " << (filter.addToWorkQueue()?"true":"false") 
+    << " publish: " << (filter.publish()?"true":"false")
+    << " saveToDb: " << (filter.saveToDb()?"true":"false"));
 
+  //If both saveToDb and publish is false
+  //there is nothing to do with the data so we just return.
+  if( !(filter.saveToDb() || filter.publish()) ) {
+    IDLOGINFO(logid, "filtered out: We are not intrested in data for stationid: " << stationid << " typeid: " << typeid_ );
+    return true;
+  }
+ 
+  if( filter.publish() && ! filter.saveToDb() ) {
+    dataToPublish(sd, textData);
+    return true;
+  }
+
+  //When we comes here we now that filter.saveToDb() is true.
   tuple<list<kvData>, list<kvTextData>> data=filterSaveDataToDb( sd, textData);
-  dataToPublish(sd, textData);
-
   if( std::get<0>(data).empty() && std::get<1>(data).empty()) {
     // No data to save to the database.
     return true;
@@ -525,14 +539,14 @@ addDataToDbThrow(const miutil::miTime &obstime, int stationid, int typeid_,
     duplicateTest=DataUpdateTransaction::Complete;
 
   kvalobs::decoder::DataUpdateTransaction work(pt_obstime, stationid, typeid_, &std::get<0>(data), &std::get<1>(data), logid, 
-    onlyAddOrUpdateData, addToWorkQueue, tryToUseDataTbTime, duplicateTest, useQaId(typeid_));
+    insertOrUpdate, addToWorkQueue, tryToUseDataTbTime, duplicateTest, useQaId(typeid_));
 
   //con.perform(work, 20, dnmi::db::Connection::READ_COMMITTED);
   con.perform(work, 20, dnmi::db::Connection::REPEATABLE_READ);
   decodedData.push_back(work.insertedOrUpdatedData());
 
   auto publish = work.dataToPublish();
-  if ( work.ok() && ! publish.empty() ) {
+  if ( work.ok() && ! publish.empty() && filter.publish() ) {
     publishData.push_back(publish);
   }
   

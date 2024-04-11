@@ -239,7 +239,8 @@ void kv2kvDecoder::save2(const list<kvData> & dl_, const list<kvTextData> & tdl_
   // in kafka.
   
   // bool onlyUpdateData = checked_;
-  bool onlyUpdateData = true;
+  //bool onlyUpdateData = true;
+  DBAddType insertOrUpdate=DbUpdate;
   bool addDataToWorkQueue = ! checked_;
   bool tryToUseDataTbTime = checked_;
 
@@ -253,6 +254,7 @@ void kv2kvDecoder::save2(const list<kvData> & dl_, const list<kvTextData> & tdl_
   for( auto &sinf : container.stationInfos()) {
     IdlogHelper idLog(sinf.stationId, sinf.typeId, this);
     string logid( idLog.logid() );
+    
 
     IDLOGINFO(logid, obs);
     if (container.get(
@@ -273,7 +275,7 @@ void kv2kvDecoder::save2(const list<kvData> & dl_, const list<kvTextData> & tdl_
 
       try {
         if (!addDataToDbThrow(to_miTime(it->first), sinf.stationId, sinf.typeId, it->second, td,
-             logid, onlyUpdateData, addDataToWorkQueue, tryToUseDataTbTime, false)) {
+             logid, insertOrUpdate, addDataToWorkQueue, tryToUseDataTbTime, false)) {
           ostringstream ost;
 
           ost << "DBERROR: stationid: " << sinf.stationId << " typeid: " << sinf.typeId
@@ -318,7 +320,7 @@ void kv2kvDecoder::save2(const list<kvData> & dl_, const list<kvTextData> & tdl_
       for (KvDataContainer::TextDataByObstime::iterator it = textData.begin();
           it != textData.end(); ++it) {
         if (!addDataToDb(to_miTime(it->first), sinf.stationId, sinf.typeId, dl, it->second,
-                       logid, onlyUpdateData, addDataToWorkQueue, tryToUseDataTbTime, false)) {
+                       logid, insertOrUpdate, addDataToWorkQueue, tryToUseDataTbTime, false)) {
           ostringstream ost;
           ost << "DBERROR: TextData: stationid: " << sinf.stationId << " typeid: "
               << sinf.typeId << " obstime: " << it->first;

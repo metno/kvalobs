@@ -187,7 +187,7 @@ kvalobs::decoder::kldecoder::KlDecoder::KlDecoder(
       datadecoder(paramList, typeList),
       typeID( INT_MAX),
       stationID(INT_MAX),
-      onlyInsertOrUpdate(false)
+      insertOrUpdate(DbInsert)
 
 {
   ostringstream s;
@@ -215,7 +215,7 @@ void kvalobs::decoder::kldecoder::KlDecoder::decodeObsType(
   LOGDEBUG("decodeObsType: '" << obstype << "'");
   typeID = INT_MAX;
   stationID = INT_MAX;
-  onlyInsertOrUpdate = false;
+  insertOrUpdate = DbInsert;
   receivedTime = boost::posix_time::ptime();
   
 
@@ -249,7 +249,7 @@ void kvalobs::decoder::kldecoder::KlDecoder::decodeObsType(
 
     if (key == "add") {  //Value is optional
       if (val.empty() || val[0] == 't' || val[0] == 'T')
-        onlyInsertOrUpdate = true;
+        insertOrUpdate = DbUpdate;
     } else if (key == "received_time") {
       receivedTime = pt::time_from_string_nothrow(val);
     } else if (key == "redirected") {
@@ -274,7 +274,7 @@ void kvalobs::decoder::kldecoder::KlDecoder::decodeObsType(
   }
 
   LOGDEBUG(
-      "decodeObsType: stationID: " << stationID << " typeid: " << typeID << " update: " << (onlyInsertOrUpdate?"true":"false"));
+      "decodeObsType: stationID: " << stationID << " typeid: " << typeID << " update: " << (insertOrUpdate==DbUpdate?"true":"false"));
 }
 
 std::string kvalobs::decoder::kldecoder::KlDecoder::name() const {
@@ -373,7 +373,7 @@ do302(int stationid, int typeId,
     return true;
 
   if (!addDataToDb(to_miTime(obstime), stationid, typeId, data, textData,
-                  logid, getOnlyInsertOrUpdate())) {
+                  logid, insertOrUpdate)) {
     ostringstream ost;
     ost << "DBERROR: stationid: " << stationid << " typeid: " << typeId
         << " obstime: " << obstime;
@@ -420,7 +420,7 @@ kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecod
   
     try {
       if (!addDataToDbThrow(to_miTime(it->first), stationid, typeId, it->second, td,
-           logid, getOnlyInsertOrUpdate(), filter_.addToWorkQueue())) {
+           logid, insertOrUpdate, filter_.addToWorkQueue())) {
         ostringstream ost;
         ost << "ERROR: stationid: " << stationid << " typeid: " << typeId
             << " obstime: " << it->first << ". Inconsistens in the data!";
@@ -453,7 +453,7 @@ kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecod
     for (KvDataContainer::TextDataByObstime::iterator it = textData.begin();
         it != textData.end(); ++it) {
      if (!addDataToDb(to_miTime(it->first), stationid, typeId, dl, it->second,
-                     logid, getOnlyInsertOrUpdate(), filter_.addToWorkQueue())) {
+                     logid, insertOrUpdate, filter_.addToWorkQueue())) {
         ostringstream ost;
         ost << "DBERROR: TextData: stationid: " << stationid << " typeid: "
             << typeId << " obstime: " << it->first;
@@ -613,7 +613,7 @@ kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecod
     o << receivedTime;
 
   o << endl << "Insert type : "
-    << (getOnlyInsertOrUpdate() ? "update (replenish)" : "insert");
+    << (insertOrUpdate==DbUpdate ? "update (replenish)" : "insert");
 
   o << endl << "ObstType    : " << obsType << endl << "Obs         : " << obs
     << endl;
@@ -642,9 +642,6 @@ long kvalobs::decoder::kldecoder::KlDecoder::getStationId(
   return stationID;
 }
 
-bool kvalobs::decoder::kldecoder::KlDecoder::getOnlyInsertOrUpdate() const {
-  return onlyInsertOrUpdate;
-}
 
 bool kvalobs::decoder::kldecoder::KlDecoder::getSetUsinfo7() {
   bool setUsinfo7 = false;

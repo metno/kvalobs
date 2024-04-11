@@ -112,7 +112,8 @@ class KlDecoder : public DecoderBase {
    * this stationd,typeid and obstime. If false the data is replaced
    * with this new data.
    */
-  bool onlyInsertOrUpdate; 
+  DBAddType insertOrUpdate;
+
   boost::posix_time::ptime receivedTime;
 
  public:
@@ -124,8 +125,7 @@ class KlDecoder : public DecoderBase {
   virtual ~KlDecoder();
 
   bool getSetUsinfo7();
-  bool getOnlyInsertOrUpdate() const;
-  long getStationId(std::string &msg) const;
+    long getStationId(std::string &msg) const;
   long getTypeId(std::string &msg) const;
   bool do302(int stationid, int typeId, 
              decodeutility::KvDataContainer::DataByObstime &dataIn, 

@@ -115,15 +115,15 @@ class StationFilterElement {
   void saveToDb(bool save);
   bool publish() const;
   bool saveToDb() const;
+  void setAddToWorkQueue(bool f);
+  bool addToWorkQueue()const;
 
   bool stationDefined(long stationId) const;
   bool typeDefined(long typeId) const;
   void setStationRange(long stationIdFrom, long stationIdTo);
   void addStation(long stationId);
   void addTypeId(long typeId);
-  void setAddToWorkQueue(bool f);
-  bool addToWorkQueue()const;
-
+  
   std::string name() const;
 
   /**

@@ -19,7 +19,8 @@ libkvalobs_decoderbase_la_SOURCES = \
   DataUpdateTransaction.h DataUpdateTransaction.cc \
   GenCacheElem.h ConfParser.h \
   StationFilter.cc StationFilter.h \
-  RedirectInfo.cc RedirectInfo.h
+  RedirectInfo.cc RedirectInfo.h \
+  commontypes.h
 
 libkvalobs_decoderbase_la_CPPFLAGS = \
 	$(AM_CPPFLAGS) \

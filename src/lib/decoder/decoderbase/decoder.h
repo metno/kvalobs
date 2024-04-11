@@ -55,6 +55,7 @@
 #include "milog/milog.h"
 #include "decoderbase/GenCacheElem.h"
 #include "decoderbase/metadata.h"
+#include "decoderbase/commontypes.h"
 #include "StationFilter.h"
 
 namespace kvalobs {
@@ -365,13 +366,13 @@ class DecoderBase {
   bool addDataToDb(const miutil::miTime &obstime, int stationid, int typeid_,
                    std::list<kvalobs::kvData> &sd,
                    std::list<kvalobs::kvTextData> &textData, 
-                   const std::string &logid, bool onlyAddOrUpdateData, bool addToWorkQueue=true, bool tryToUseDataTbTime=false, bool partialDuplicateTest=true);
+                   const std::string &logid, DBAddType insertOrUpdate, bool addToWorkQueue=true, bool tryToUseDataTbTime=false, bool partialDuplicateTest=true);
 
 
   bool addDataToDbThrow(const miutil::miTime &obstime, int stationid, int typeid_,
                    std::list<kvalobs::kvData> &sd,
                    std::list<kvalobs::kvTextData> &textData, 
-                   const std::string &logid, bool onlyAddOrUpdateData, bool addToWorkQueue=true, bool tryToUseDataTbTime=false, bool partialDuplicateTest=true);
+                   const std::string &logid, DBAddType insertOrUpdate, bool addToWorkQueue=true, bool tryToUseDataTbTime=false, bool partialDuplicateTest=true);
 
   /**
    * \brief insert the \em obs message into the table \em rejectdecode.
