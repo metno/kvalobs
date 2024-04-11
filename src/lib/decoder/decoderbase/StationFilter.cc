@@ -45,7 +45,7 @@ StationFilterElement::StationFilterElement()
       stationIdRangeTo_(-1),
       name_("__default__"),
       addToWokque_(true),
-      publish_(false),
+      publish_(true),
       saveToDb_(true) {
 }
 
