@@ -170,9 +170,9 @@ void setVals(const std::string &key, const std::string &name, const c::ConfSecti
       return;
     }
 
-    v = e.valAsInt(-1);
-    if (v < 0)
-      throw std::logic_error("Filter element '" + name + "', key '" + key + "' invalid value(s), must be integers greater or equal to 0.");
+    v = e.valAsInt(LONG_MIN);
+    if (v == LONG_MIN)
+      throw std::logic_error("Filter element '" + name + "', key '" + key + "' invalid value(s), val '"+e.valAsString()+"'.");
 
     dst.insert(v);
   }
