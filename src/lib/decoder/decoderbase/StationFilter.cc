@@ -229,6 +229,27 @@ StationFilterElement StationFilterElement::readConfig(const miutil::conf::ConfSe
   return e;
 }
 
+
+std::ostream& operator<<(std::ostream &strm, const StationFilterElement &filter){
+  strm << "'" << filter.name_ << "' addToWorkQue: " << (filter.addToWorkQueue()?"true":"false") 
+      << " publish: " << (filter.publish()?"true":"false")
+      << " saveToDb: " << (filter.saveToDb()?"true":"false") << " stationIdList: [" ;
+  for ( auto &sid : filter.stationIdList_) {
+    strm << sid << " ";
+  }
+  strm << "] typeids: [" ;
+  for ( auto &tid : filter.typeids_) {
+      if (tid==LONG_MAX)
+        strm << "pos" << " ";
+      else if( tid == LONG_MIN)
+        strm << "neg" << " ";
+      else 
+       strm << tid << " ";
+  }
+  strm << "]";
+  return strm;
+ }
+
 StationFilters::StationFilters() {
 }
 
@@ -399,6 +420,15 @@ StationFiltersPtr StationFilters::readConfig(const miutil::conf::ConfSection &co
 
   return filters;
 }
+
+std::ostream& operator<<(std::ostream &strm, const StationFilters &filters){
+  strm << "Filters: \n";
+  for ( auto &filter : filters.filters_ ){
+    strm << "  " << filter << std::endl;
+  }
+  return strm;
+}
+
 
 }
 }

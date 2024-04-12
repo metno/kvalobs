@@ -474,6 +474,7 @@ class DecoderBase {
 
   void setFilters( const kvalobs::decoder::StationFiltersPtr filters);
   StationFilterElement filter(long stationId, long typeId)const;
+  void logFilters(const std::string &logid);
 
   
   /**

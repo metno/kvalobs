@@ -145,6 +145,9 @@ class StationFilterElement {
   bool saveToDb_;
 };
 
+std::ostream& operator<<(std::ostream &strm, const StationFilterElement &filter);
+
+
 class StationFilters;
 typedef std::shared_ptr<StationFilters> StationFiltersPtr;
 
@@ -181,9 +184,11 @@ class StationFilters {
    */
   StationFilterElement getFilterByName(const std::string &name) const;
   static StationFiltersPtr readConfig(const miutil::conf::ConfSection &conf);
-
+  
+  friend std::ostream& operator<<(std::ostream &strm, const StationFilters &filter);
 };
 
+std::ostream& operator<<(std::ostream &strm, const StationFilters &filters);
 }
 }
 

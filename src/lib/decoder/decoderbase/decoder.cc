@@ -215,6 +215,9 @@ void kvalobs::decoder::DecoderBase::setFilters( const kvalobs::decoder::StationF
   filters=filters_;
 }
 
+void kvalobs::decoder::DecoderBase::logFilters(const std::string &logid) {
+  IDLOGINFO(logid, *filters)
+}
 
 void kvalobs::decoder::DecoderBase::setQaIdInfo(std::shared_ptr<QaIdInfo> qaIdInfo) {
   this->qaIdInfo_=qaIdInfo;
@@ -506,6 +509,9 @@ addDataToDbThrow(const miutil::miTime &obstime, int stationid, int typeid_,
   boost::gregorian::date date(obstime.year(), obstime.month(), obstime.day());
   boost::posix_time::time_duration clock(pt::hours(obstime.hour()) + pt::minutes(obstime.min()) + pt::seconds(obstime.sec()));
   boost::posix_time::ptime pt_obstime(date, clock);
+
+
+  logFilters(logid);
 
   auto filter=this->filter(stationid, typeid_);
 
