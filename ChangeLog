@@ -1,3 +1,8 @@
+2024-04-15 Børge Moe
+  * Release 7.0.4
+  * kvDataInputd
+    - Fix station filter. 
+
 2024-04-02 Børge Moe
   * Release 7.0.3
   * Add tbtime to the table model_data.

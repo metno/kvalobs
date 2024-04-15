@@ -1,3 +1,8 @@
+kvalobs (7.0.4-1) focal; urgency=medium
+  * Fix station filter. 
+
+ -- Borge Moe <borge.moe@met.no>  Mon, 15 Apr 2024 08:00:00 +0200
+
 kvalobs (7.0.3-1) focal; urgency=medium
   * Add tbtime to the table model_data.
 
