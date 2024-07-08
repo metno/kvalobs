@@ -7,7 +7,8 @@ set -euo pipefail
 kvuser=kvalobs
 kvuserid=5010
 mode="test"
-kafka_version=1.9.0-1.cflt~ubu20
+#kafka_version=1.9.0-1.cflt~ubu20
+kafka_version=2.4.0-1.cflt~ub20
 kafka_version_jammy=1.8.0-1build1
 VERSION="$(./version.sh)"
 BUILDDATE=$(date +'%Y%m%d')
