@@ -41,6 +41,26 @@ scriptrunner::language::Interpreter::Ptr getInterpreter(int kvalobsCode) {
     return scriptrunner::language::Interpreter::get("perl");
   return scriptrunner::language::Interpreter::Ptr();
 }
+
+
+void logObsData(const qabase::DataStore &datastore, std::ostream &scriptLog) {
+  const qabase::Observation & observation = datastore.observation();
+  auto obsdata=datastore.getObsData();
+
+  scriptLog << "DEBUG begin, obsdata types\n";
+  scriptLog << "observation_stationid: " << observation.stationID() << "\n"
+    << "observation_typeid: " << observation.typeID() << "\n"
+    << "types defined:\n";
+
+  for( auto param : obsdata) {
+    if(!param.second.empty()) {
+      scriptLog << "  " << param.first.baseName() << ": haveType=" << (param.second.begin()->typeID() != observation.typeID())
+        << " typeid=" << param.second.begin()->typeID() << "\n"; 
+    }
+  }
+  scriptLog << "DEBUG end\n";
+}
+
 }
 
 KvalobsCheckScript::KvalobsCheckScript(const db::DatabaseAccess & database,
@@ -66,6 +86,10 @@ KvalobsCheckScript::KvalobsCheckScript(const db::DatabaseAccess & database,
     script_.reset(
         new scriptrunner::Script(algorithm.script(),
                                  getInterpreter(algorithm.language())));
+
+    //DEBUG begin
+    //logObsData(*store_,*scriptLog_);
+    //DEBUG end
 
     addDataToScript(*script_, *store_);
   } catch (NoErrorLogException & e) {

@@ -1,3 +1,10 @@
+kvalobs (7.0.5-1) focal; urgency=medium
+  * kvQabased
+    - Add parameters observation_stationid and observation_typeid to the perl scripts.
+    - Add variables to give typeid for the parameter to the perl scripts. Ex. my $X_typeid=312.
+
+ -- Borge Moe <borge.moe@met.no>  Mon, 17 Jul 2024 08:00:00 +0200
+
 kvalobs (7.0.4-1) focal; urgency=medium
   * Fix station filter. 
 

@@ -111,7 +111,10 @@ class DataStore {
   template<class Iterator>
   void getModified(Iterator out) const;
 
-  QABASE_EXCEPTION(UnableToGetData);QABASE_EXCEPTION(InvalidParameter);QABASE_EXCEPTION(NoSuchData);QABASE_DERIVED_EXCEPTION(MissingModelData, NoErrorLogException);
+  QABASE_EXCEPTION(UnableToGetData);
+  QABASE_EXCEPTION(InvalidParameter);
+  QABASE_EXCEPTION(NoSuchData);
+  QABASE_DERIVED_EXCEPTION(MissingModelData, NoErrorLogException);
 
  private:
   void populateObs_(const db::DatabaseAccess & db,

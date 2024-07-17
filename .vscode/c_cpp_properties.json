@@ -3,10 +3,7 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**",
-                "${workspaceFolder}/src/lib/**",
-                "${workspaceFolder}/src/lib/kvalobs",
-                "${workspaceFolder}/src/*",
+                "${workspaceFolder}/src/**",
                 "${default}"
             ],
             "defines": ["_REENTRANT", "${default}"],

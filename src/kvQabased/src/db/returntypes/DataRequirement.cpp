@@ -113,8 +113,9 @@ ParameterTranslation getTranslation(const DataRequirement & from,
     throw NonmatchingDataRequirements("nonmatching requirements");
 
   ParameterTranslation ret;
-  for (unsigned i = 0; i < size; ++i)
+  for (unsigned i = 0; i < size; ++i){
     ret[pfrom[i]] = pto[i];
+  }
 
   return ret;
 }

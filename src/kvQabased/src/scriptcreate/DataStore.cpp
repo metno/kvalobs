@@ -116,9 +116,10 @@ void DataStore::populateObs_(const db::DatabaseAccess & db,
       concreteObsRequirement.parameter().begin();
       parameter != concreteObsRequirement.parameter().end(); ++parameter) {
     ParameterTranslation::const_iterator find = translation.find(*parameter);
-    if (find == translation.end())
+    if (find == translation.end()){
       throw UnableToGetData(
           "Unable to find translation for parameter: " + parameter->baseName());
+    }
 
     db::DatabaseAccess::DataList dbdata;
     db.getData(&dbdata, obs, *parameter,
@@ -149,9 +150,10 @@ void DataStore::populateRefObs_(
       concreteRefObsRequirement.parameter().begin();
       parameter != concreteRefObsRequirement.parameter().end(); ++parameter) {
     ParameterTranslation::const_iterator find = translation.find(*parameter);
-    if (find == translation.end())
+    if (find == translation.end()) {
       throw UnableToGetData(
           "Unable to find translation for parameter: " + parameter->baseName());
+    }
 
     db::DatabaseAccess::TextDataList textData;
     db.getTextData(&textData, obs, *parameter,
@@ -164,8 +166,9 @@ void DataStore::populateRefObs_(
     }
 
     for (db::DatabaseAccess::TextDataList::const_iterator it = textData.begin();
-        it != textData.end(); ++it)
+        it != textData.end(); ++it) {
       refData_[find->second].push_back(*it);
+    }
   }
 
   fillMissing(refData_);
@@ -187,20 +190,18 @@ void DataStore::populateModel_(
       concreteModelRequirement.parameter().begin();
       parameter != concreteModelRequirement.parameter().end(); ++parameter) {
     ParameterTranslation::const_iterator find = translation.find(*parameter);
-    if (find == translation.end())
+    if (find == translation.end()) {
       throw UnableToGetData(
           "Unable to find translation for parameter: " + parameter->baseName());
+    }
 
     db::DatabaseAccess::ModelDataList modelData;
     db.getModelData(&modelData, obs.stationInfo(), *parameter,
                     concreteModelRequirement.firstTime());
-    if (not modelData.empty())
+    if (!modelData.empty()) {
       modelData_[find->second].assign(modelData.begin(), modelData.end());
-    else {
+    } else {
       throw MissingModelData("missing model data");
-      kvalobs::kvModelData missingModel(obs.stationID(),
-                                        obs.obstime(), 0, 0, 0, -32767);
-      modelData_[find->second].push_back(missingModel);  // missing obs
     }
   }
 }
@@ -217,14 +218,16 @@ void DataStore::populateMeta_(
       concreteMetaRequirement.parameter().begin();
       parameter != concreteMetaRequirement.parameter().end(); ++parameter) {
     ParameterTranslation::const_iterator find = translation.find(*parameter);
-    if (find == translation.end())
+    if (find == translation.end()) {
       throw UnableToGetData(
           "Unable to find translation for metadata parameter: "
               + parameter->str());
+    }
 
     std::string::size_type splitPoint = find->first.str().find_last_of('_');
-    if (std::string::npos == splitPoint)
+    if (std::string::npos == splitPoint) {
       throw UnableToGetData("Cannot understand metadata: " + find->first.str());
+    }
     std::string param = find->first.str().substr(0, splitPoint);
     std::string metadataType = find->first.str().substr(splitPoint + 1);
 
@@ -267,9 +270,10 @@ DataStore::DataStore(const db::DatabaseAccess & db,
       qcx_(qcx) {
   const DataRequirement * abstractObsRequirement = abstractSignature.obs();
   const DataRequirement * concreteObsRequirement = concreteSignature.obs();
-  if (abstractObsRequirement or concreteObsRequirement) {
-    if (!abstractObsRequirement or !concreteObsRequirement)
+  if (abstractObsRequirement || concreteObsRequirement) {
+    if (!abstractObsRequirement || !concreteObsRequirement){
       throw UnableToGetData("check- and algorithm signature does not match");
+    }
 
     populateObs_(db, obs, *abstractObsRequirement,
                  *concreteObsRequirement);
@@ -279,18 +283,20 @@ DataStore::DataStore(const db::DatabaseAccess & db,
       abstractSignature.refobs();
   const DataRequirement * concreteRefObsRequirement =
       concreteSignature.refobs();
-  if (abstractRefObsRequirement or concreteRefObsRequirement) {
-    if (!abstractRefObsRequirement or !concreteRefObsRequirement)
+  if (abstractRefObsRequirement || concreteRefObsRequirement) {
+    if (!abstractRefObsRequirement || !concreteRefObsRequirement){
       throw UnableToGetData("check- and algorithm signature does not match");
+    }
     populateRefObs_(db, obs, *abstractRefObsRequirement,
                     *concreteRefObsRequirement);
   }
 
   const DataRequirement * abstractModelRequirement = abstractSignature.model();
   const DataRequirement * concreteModelRequirement = concreteSignature.model();
-  if (abstractModelRequirement or concreteModelRequirement) {
-    if (!abstractModelRequirement or !concreteModelRequirement)
+  if (abstractModelRequirement || concreteModelRequirement) {
+    if (!abstractModelRequirement || !concreteModelRequirement){
       throw UnableToGetData("check- and algorithm signature does not match");
+    }
 
     populateModel_(db, obs, *abstractModelRequirement,
                    *concreteModelRequirement);
@@ -298,9 +304,10 @@ DataStore::DataStore(const db::DatabaseAccess & db,
 
   const DataRequirement * abstractMetaRequirement = abstractSignature.meta();
   const DataRequirement * concreteMetaRequirement = concreteSignature.meta();
-  if (abstractMetaRequirement or concreteMetaRequirement) {
-    if (!abstractMetaRequirement or !concreteMetaRequirement)
+  if (abstractMetaRequirement || concreteMetaRequirement) {
+    if (!abstractMetaRequirement || !concreteMetaRequirement){
       throw UnableToGetData("check- and algorithm signature does not match");
+    }
 
     populateMeta_(db, obs, qcx, *abstractMetaRequirement,
                   *concreteMetaRequirement);
@@ -331,13 +338,14 @@ bool setFlag(kvalobs::kvData & data, int flagIndex, int newValue,
              bool regardlessOfOldValue = false) {
   kvalobs::kvControlInfo ci = data.controlinfo();
   int oldValue = ci.flag(flagIndex);
-  if (oldValue < newValue or regardlessOfOldValue) {
+  if (oldValue < newValue || regardlessOfOldValue) {
     ci.set(flagIndex, newValue);
     data.controlinfo(ci);
     return true;
   }
   return false;
 }
+
 bool updateCfailed(kvalobs::kvData & data, const std::string & qcx,
                    int newValue) {
   if (newValue > 1) {
@@ -356,8 +364,9 @@ bool updateCfailed(kvalobs::kvData & data, const std::string & qcx,
 
 void DataStore::apply(const ScriptResultIdentifier & resultType, double value) {
   ParameterSortedDataList::iterator pit = data_.find(resultType.parameter());
-  if (pit == data_.end())
+  if (pit == data_.end()){
     throw InvalidParameter("Unknown parameter: " + resultType.parameter());
+  }
 
   size_t idx = resultType.timeIndex();
 
@@ -373,8 +382,9 @@ void DataStore::apply(const ScriptResultIdentifier & resultType, double value) {
       bool mod = false;
       mod |= setFlag(data, flagPosition_, value);
       mod |= updateCfailed(data, qcx_, value);
-      if (mod)
+      if (mod){
         modified_.insert(&data);
+      }
     }
       break;
     case ScriptResultIdentifier::Corrected:
@@ -383,10 +393,11 @@ void DataStore::apply(const ScriptResultIdentifier & resultType, double value) {
       break;
     case ScriptResultIdentifier::Missing:
       setFlag(data, 6, value, true);
-      if (value == 2)
+      if (value == 2){
         data.corrected(-32766);
-      else if (value == 3)
+      } else if (value == 3) {
         data.corrected(-32767);
+      }
       modified_.insert(&data);
       break;
     case ScriptResultIdentifier::Undefined:

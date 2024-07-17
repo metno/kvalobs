@@ -40,6 +40,7 @@ bool have_missing_value(int missingFlag) {
 }
 
 void addObsDataToScript(scriptrunner::Script & script,
+                        const qabase::Observation &obs,
                         const DataStore::ParameterSortedDataList & obsdata) {
   scriptrunner::ScriptInput input("obs");
 
@@ -64,8 +65,9 @@ void addObsDataToScript(scriptrunner::Script & script,
       value.push_back(it->original());
       kvalobs::kvControlInfo ci = it->controlinfo();
       missing.push_back(ci.flag(6));  // fmis
-      for (int i = 0; i < 16; ++i)
+      for (int i = 0; i < 16; ++i) {
         controlinfo.push_back(ci.flag(i));
+      }
     }
     //numtimes = std::max(numtimes, value.size());
 
@@ -77,6 +79,10 @@ void addObsDataToScript(scriptrunner::Script & script,
               missing.end());
     input.add(param->first.baseName() + "_controlinfo", controlinfo.begin(),
               controlinfo.end());
+
+    if (!param->second.empty()) {
+      input.add(param->first.baseName()+"_typeid", param->second.begin()->typeID());
+    }
   }
 
   input.add("obs_numtimes", numtimes);
@@ -206,9 +212,12 @@ void addDataToScript(scriptrunner::Script & script,
   scriptrunner::ScriptInput input("general");
 
   const kvalobs::kvStation & station = dataStore.station();
+  const qabase::Observation & observation = dataStore.observation();
 //	std::ostringstream stationIdentifier;
 //	stationIdentifier << station.stationID() << " - " << station.name();
 //	input.add("station", stationIdentifier.str());
+  input.add("observation_stationid", observation.stationID());
+  input.add("observation_typeid", observation.typeID());
   input.add("station_latitude", station.lat());
   input.add("station_longitude", station.lon());
 
@@ -224,7 +233,7 @@ void addDataToScript(scriptrunner::Script & script,
 
   script.addInput(input);
 
-  addObsDataToScript(script, dataStore.getObsData());
+  addObsDataToScript(script, dataStore.observation(), dataStore.getObsData());
   addRefObsDataToScript(script, dataStore.getRefData());
   addModelDataToScript(script, dataStore.getModelData());
   addMetaDataToScript(script, dataStore.getMetaData());
