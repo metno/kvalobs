@@ -87,8 +87,9 @@ class FilteredDatabaseAccess : public DatabaseAccess {
 
   virtual std::string getStationParam(const kvalobs::kvStationInfo & si,
                                       const std::string & parameter,
+                                      int sensor, int level,
                                       const std::string & qcx) const {
-    return baseImplementation_->getStationParam(si, parameter, qcx);
+    return baseImplementation_->getStationParam(si, parameter, sensor, level, qcx);
   }
 
   virtual qabase::Observation getObservation(const kvalobs::kvStationInfo & si) const {

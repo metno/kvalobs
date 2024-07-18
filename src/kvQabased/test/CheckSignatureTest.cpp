@@ -68,3 +68,24 @@ TEST(CheckSignatureTest, missingModelSpec) {
   EXPECT_EQ("meta", meta->requirementType());
   EXPECT_FALSE(meta->empty());
 }
+
+
+TEST(CheckSignatureTest,paramAndSensorSpec){
+  CheckSignature s("obs;X&1&2&3;;", 100);
+  const DataRequirement * obs = s.obs();
+  ASSERT_TRUE(obs!=nullptr);
+  EXPECT_EQ("obs", obs->requirementType());
+  EXPECT_FALSE(obs->empty());
+
+  auto params = obs->parameter();
+  auto itPar=params.begin();
+
+  EXPECT_TRUE(itPar != params.end());
+
+  EXPECT_TRUE(itPar->haveLevel());
+  EXPECT_TRUE(itPar->level()==1);
+  EXPECT_TRUE(itPar->haveSensor());
+  EXPECT_TRUE(itPar->sensor()==2);
+  EXPECT_TRUE(itPar->haveType());
+  EXPECT_TRUE(itPar->type()==3);
+}

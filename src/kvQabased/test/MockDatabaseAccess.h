@@ -44,7 +44,7 @@ class MockDatabaseAccess : public db::DatabaseAccess {
 
   MOCK_CONST_METHOD1(getAlgorithm, kvalobs::kvAlgorithms (const std::string & algorithmName));
 
-  MOCK_CONST_METHOD3(getStationParam, std::string (const kvalobs::kvStationInfo & si, const std::string & parameter, const std::string & qcx));
+  MOCK_CONST_METHOD5(getStationParam, std::string (const kvalobs::kvStationInfo & si, const std::string & parameter, int sensor, int level, const std::string & qcx));
 
   MOCK_CONST_METHOD1(getStation, kvalobs::kvStation (int stationid));
 
@@ -81,7 +81,7 @@ class MockDatabaseAccess : public db::DatabaseAccess {
     .WillByDefault(Invoke(&fake_, &FakeDatabaseAccess::getParametersToCheck));
     ON_CALL(*this, getAlgorithm(_))
     .WillByDefault(Invoke(&fake_, &FakeDatabaseAccess::getAlgorithm));
-    ON_CALL(*this, getStationParam(_,_,_))
+    ON_CALL(*this, getStationParam(_,_,_,_,_))
     .WillByDefault(Invoke(&fake_, &FakeDatabaseAccess::getStationParam));
     ON_CALL(*this, getStation(_))
     .WillByDefault(Invoke(&fake_, &FakeDatabaseAccess::getStation));

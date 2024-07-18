@@ -99,6 +99,24 @@ bool DataRequirement::haveParameter(const std::string & baseParameter) const {
   return false;
 }
 
+const DataRequirement::ParameterList::const_iterator DataRequirement::findParameter(const std::string &baseName, bool *found ) const {
+  if ( found != nullptr) {
+    *found = false;
+  }
+  
+  for( ParameterList::const_iterator it=parameter_.cbegin(); it != parameter_.cend(); ++it ){
+    if( it->baseName() == baseName ) {
+      if ( found != nullptr) {
+        *found = true;
+      }
+        
+      return it;
+    }
+  }
+  return parameter_.cend();
+}
+
+
 bool DataRequirement::haveStation(int what) const {
   return std::find(station_.begin(), station_.end(), what) != station_.end();
 }

@@ -139,6 +139,7 @@ class DataRequirement {
     return parameter_;
   }
 
+  const ParameterList::const_iterator findParameter(const std::string &baseName, bool *found ) const;
   /**
    * Does the given parameter exist in the requirement?
    *

@@ -251,7 +251,8 @@ kvalobs::kvAlgorithms KvalobsDatabaseAccess::getAlgorithm(
 }
 
 std::string KvalobsDatabaseAccess::getStationParam(
-    const kvalobs::kvStationInfo & si, const std::string & parameter,
+    const kvalobs::kvStationInfo & si, 
+    const std::string & parameter, int sensor, int level, 
     const std::string & qcx) const {
   const boost::gregorian::date & date = si.obstime().date();
   const boost::gregorian::date firstDayOfYear(date.year(), 1, 1);
@@ -268,7 +269,7 @@ std::string KvalobsDatabaseAccess::getStationParam(
         << dayNumber << " AND " << dayNumber << "<=today AND "
         "qcx='"
         << qcx << "' AND "
-        "level=0 AND sensor='0' AND "
+        "level=" << level << " AND sensor='" << sensor <<"' AND "
         "fromtime<='"
         << to_kvalobs_string(si.obstime()) << "' "
         "ORDER BY stationid DESC, fromtime DESC "

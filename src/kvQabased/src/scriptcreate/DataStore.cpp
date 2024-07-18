@@ -209,8 +209,10 @@ void DataStore::populateModel_(
 void DataStore::populateMeta_(
     const db::DatabaseAccess & db, const qabase::Observation & obs,
     const std::string & qcx,
+    const qabase::DataRequirement & concreteObsRequirement,
     const qabase::DataRequirement & abstractMetaRequirement,
-    const qabase::DataRequirement & concreteMetaRequirement) {
+    const qabase::DataRequirement & concreteMetaRequirement
+    ) {
   ParameterTranslation translation = getTranslation(concreteMetaRequirement,
                                                     abstractMetaRequirement);
 
@@ -228,10 +230,20 @@ void DataStore::populateMeta_(
     if (std::string::npos == splitPoint) {
       throw UnableToGetData("Cannot understand metadata: " + find->first.str());
     }
+    bool obsParamFound;
+    int sensor=0;
+    int level=0;
     std::string param = find->first.str().substr(0, splitPoint);
     std::string metadataType = find->first.str().substr(splitPoint + 1);
-
-    std::string stationParam = db.getStationParam(obs.stationInfo(), param, qcx);
+    auto obsParam = concreteObsRequirement.findParameter(param, &obsParamFound);
+    if ( obsParamFound ) {
+      (*scriptLog_) << "META: concreteObsParam: " << param << " abstractMetaParam: " << find->second.baseName() << " concreteMetaParam: " << find->first.baseName() << "\n";
+      sensor = (obsParam->haveSensor()?obsParam->sensor():0);
+      level = (obsParam->haveLevel()?obsParam->level():0);
+    } else {
+      (*scriptLog_) << "META no mapping to concreteObsParam: " << param << " abstractMetaParam: " << find->second.baseName() << " concreteMetaParam: " << find->first.baseName() << "\n";
+    }
+    std::string stationParam = db.getStationParam(obs.stationInfo(), param, sensor, level, qcx);
 
     float val = db::resultfilter::parseStationParam(stationParam, metadataType);
     metaData_[find->second].push_back(val);
@@ -265,9 +277,15 @@ DataStore::DataStore(const db::DatabaseAccess & db,
                      const qabase::Observation & obs,
                      const std::string & qcx,
                      const qabase::CheckSignature & abstractSignature,
-                     const qabase::CheckSignature & concreteSignature)
+                     const qabase::CheckSignature & concreteSignature,
+                     std::ostream *scriptLog)
     : observation_(obs),
       qcx_(qcx) {
+  if( scriptLog == nullptr) {
+    scriptLog_=&std::cerr;
+  } else {
+    scriptLog_=scriptLog;
+  }
   const DataRequirement * abstractObsRequirement = abstractSignature.obs();
   const DataRequirement * concreteObsRequirement = concreteSignature.obs();
   if (abstractObsRequirement || concreteObsRequirement) {
@@ -309,7 +327,7 @@ DataStore::DataStore(const db::DatabaseAccess & db,
       throw UnableToGetData("check- and algorithm signature does not match");
     }
 
-    populateMeta_(db, obs, qcx, *abstractMetaRequirement,
+    populateMeta_(db, obs, qcx, *concreteObsRequirement, *abstractMetaRequirement,
                   *concreteMetaRequirement);
   }
 

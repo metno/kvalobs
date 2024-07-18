@@ -42,6 +42,7 @@
 #include <vector>
 #include <deque>
 #include <map>
+#include <iostream>
 
 namespace db {
 class DatabaseAccess;
@@ -78,7 +79,8 @@ class DataStore {
   DataStore(const db::DatabaseAccess & db,
             const qabase::Observation & obs, const std::string & qcx,
             const qabase::CheckSignature & abstractSignature,
-            const qabase::CheckSignature & concreteSignature);
+            const qabase::CheckSignature & concreteSignature,
+            std::ostream *scriptLog=0);
 
   // // For creating tests
   // DataStore(const ParameterSortedDataList & data, int flagPosition);
@@ -132,6 +134,7 @@ class DataStore {
   void populateMeta_(const db::DatabaseAccess & db,
                      const qabase::Observation & obs,
                      const std::string & qcx,
+                     const qabase::DataRequirement & concreteObsRequirement,
                      const qabase::DataRequirement & abstractMetaRequirement,
                      const qabase::DataRequirement & concreteMetaRequirement);
   void populateStation_(const db::DatabaseAccess & db);
@@ -146,6 +149,7 @@ class DataStore {
   int flagPosition_;
   typedef std::set<kvalobs::kvData *, kvalobs::compare::lt_kvData> ModificationList;
   ModificationList modified_;
+  std::ostream *scriptLog_;
 };
 
 template<class Iterator>

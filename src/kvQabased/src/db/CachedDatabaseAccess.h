@@ -62,7 +62,7 @@ class CachedDatabaseAccess : public FilteredDatabaseAccess {
       const std::string & algorithmName) const;
 
   virtual std::string getStationParam(const kvalobs::kvStationInfo & si,
-                                      const std::string & parameter,
+                                      const std::string & parameter, int sensor, int level, 
                                       const std::string & qcx) const;
 
   virtual kvalobs::kvStation getStation(int stationid) const;
@@ -89,6 +89,8 @@ class CachedDatabaseAccess : public FilteredDatabaseAccess {
     }
     kvalobs::kvStationInfo si;
     std::string parameter;
+    int sensor;
+    int level;
     std::string qcx;
 
     std::string result;

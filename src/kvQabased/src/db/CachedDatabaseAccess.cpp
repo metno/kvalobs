@@ -79,15 +79,19 @@ kvalobs::kvAlgorithms CachedDatabaseAccess::getAlgorithm(
 }
 
 std::string CachedDatabaseAccess::getStationParam(
-    const kvalobs::kvStationInfo & si, const std::string & parameter,
+    const kvalobs::kvStationInfo & si, const std::string & parameter, int sensor, int level, 
     const std::string & qcx) const {
   if (si != lastStationParamQuery_.si
-      or parameter != lastStationParamQuery_.parameter
-      or qcx != lastStationParamQuery_.qcx) {
+      || parameter != lastStationParamQuery_.parameter
+      || sensor != lastStationParamQuery_.sensor
+      || level != lastStationParamQuery_.level
+      || qcx != lastStationParamQuery_.qcx) {
     lastStationParamQuery_.result = FilteredDatabaseAccess::getStationParam(
-        si, parameter, qcx);
+        si, parameter, sensor, level, qcx);
     lastStationParamQuery_.si = si;
     lastStationParamQuery_.parameter = parameter;
+    lastStationParamQuery_.sensor = sensor;
+    lastStationParamQuery_.level = level;
     lastStationParamQuery_.qcx = qcx;
   }
   return lastStationParamQuery_.result;

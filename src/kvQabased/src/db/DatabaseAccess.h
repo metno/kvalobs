@@ -160,7 +160,7 @@ class DatabaseAccess {
    *         resultfilter::parseStationParam()
    */
   virtual std::string getStationParam(const kvalobs::kvStationInfo & si,
-                                      const std::string & parameter,
+                                      const std::string & parameter, int sensor, int level, 
                                       const std::string & qcx) const = 0;
 
   /**

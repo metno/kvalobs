@@ -82,6 +82,8 @@ void addObsDataToScript(scriptrunner::Script & script,
 
     if (!param->second.empty()) {
       input.add(param->first.baseName()+"_typeid", param->second.begin()->typeID());
+      input.add(param->first.baseName()+"_sensor", param->second.begin()->sensor());
+      input.add(param->first.baseName()+"_level", param->second.begin()->level());
     }
   }
 

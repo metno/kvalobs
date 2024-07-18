@@ -103,6 +103,7 @@ kvalobs::kvAlgorithms FakeDatabaseAccess::getAlgorithm(
 
 std::string FakeDatabaseAccess::getStationParam(
     const kvalobs::kvStationInfo & si, const std::string & parameter,
+    int sensor, int level,
     const std::string & qcx) const {
   return "max;min\n2.2;1.1";
 }

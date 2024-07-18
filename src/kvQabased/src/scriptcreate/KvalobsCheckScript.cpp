@@ -71,18 +71,21 @@ KvalobsCheckScript::KvalobsCheckScript(const db::DatabaseAccess & database,
   try {
     kvalobs::kvAlgorithms algorithm = database.getAlgorithm(check.checkname());
 
-    if (scriptLog_)
+    if (scriptLog_) {
       (*scriptLog_) << "CHECK:\t" << check.qcx() << " - " << check.checkname()
                     << "\n\n" << "Abstract signature: " << algorithm.signature()
                     << "\n" << "Concrete signature: " << check.checksignature()
-                    << "\n\n\n";
+                    << "\n\n\n" 
+                    << "Observation: stationid=" << obs.stationID() 
+                    << ", typeid=" << obs.typeID() << ", obstime=" << obs.obstime() << "\n\n";
+     }
 
     CheckSignature abstractSignature(algorithm.signature(), obs.stationID());
     CheckSignature concreteSignature(check.checksignature(), obs.stationID());
 
     store_.reset(
         new DataStore(database, obs, check.qcx(), abstractSignature,
-                      concreteSignature));
+                      concreteSignature, scriptLog_));
     script_.reset(
         new scriptrunner::Script(algorithm.script(),
                                  getInterpreter(algorithm.language())));

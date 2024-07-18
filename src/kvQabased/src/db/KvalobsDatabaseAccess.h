@@ -92,7 +92,7 @@ class KvalobsDatabaseAccess : public db::DatabaseAccess {
 
   virtual kvalobs::kvAlgorithms getAlgorithm(const std::string & algorithmName) const;
 
-  virtual std::string getStationParam(const kvalobs::kvStationInfo & si, const std::string & parameter, const std::string & qcx) const;
+  virtual std::string getStationParam(const kvalobs::kvStationInfo & si, const std::string & parameter, int sensor, int level, const std::string & qcx) const;
 
   virtual qabase::Observation getObservation(const kvalobs::kvStationInfo & si) const;
 
