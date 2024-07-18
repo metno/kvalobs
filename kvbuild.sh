@@ -10,6 +10,7 @@ mode="test"
 #kafka_version=1.9.0-1.cflt~ubu20
 kafka_version=2.4.0-1.cflt~ub20
 kafka_version_jammy=1.8.0-1build1
+kafka_version_noble=2.3.0-1build2
 VERSION="$(./version.sh)"
 BUILDDATE=$(date +'%Y%m%d')
 default_os="focal"
@@ -24,7 +25,7 @@ nocache=
 build="true"
 push="true"
 KV_BUILD_DATE=${KV_BUILD_DATE:-}
-
+latest_tag=latest
 
 if [ -n "${KV_BUILD_DATE}" ]; then
   BUILDDATE=$KV_BUILD_DATE
@@ -160,6 +161,15 @@ if [ "$os" = "jammy" ]; then
 fi
 
 
+# Remove this when noble 
+if [ "$os" = "noble" ]; then
+  # tag="noble-$tag"
+  # latest_tag="noble-latest"
+  kafka_version="$kafka_version_noble"
+fi
+
+
+
 validate_targets "$targets_in"
 
 # Make the target build in correct sequence, ie kvbuilddep, kvbuild, kvcpp, etc ...
@@ -213,8 +223,8 @@ if [ "$build" = "true" ]; then
       --build-arg "kafka_VERSION=${kafka_version}" \
       -f "$dockerfile" --tag "${registry}${target}:$tag" .
   
-    if [ "$tag_and_latest" = "true" ] && [ "$tag" != "latest" ]; then
-      docker tag "${registry}${target}:$tag" "${registry}${target}:latest"
+    if [ "$tag_and_latest" = "true" ] && [ "$tag" != "$latest_tag" ]; then
+      docker tag "${registry}${target}:$tag" "${registry}${target}:$latest_tag"
     fi
   done
 fi
@@ -224,9 +234,9 @@ if [ "$push" = "true" ] && [ "$mode" != "test" ]; then
   for target in $targets; do
     echo "Pushing: ${registry}${target}:$tag"
     docker push "${registry}${target}:$tag"
-    if [ "$tag_and_latest" = "true" ] && [ "$tag" != "latest" ]; then
-      echo "Pushing: ${registry}${target}:latest"
-      docker push "${registry}${target}:latest"
+    if [ "$tag_and_latest" = "true" ] && [ "$tag" != "$latest_tag" ]; then
+      echo "Pushing: ${registry}${target}:$latest_tag"
+      docker push "${registry}${target}:$latest_tag"
     fi
   done
 fi
