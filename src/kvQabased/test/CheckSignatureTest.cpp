@@ -34,7 +34,7 @@ using qabase::CheckSignature;
 using qabase::DataRequirement;
 
 TEST(CheckSignatureTest, test) {
-  CheckSignature s("obs;X;;|refobs;rX;;|model;mX;;|meta;X_MID,X_STD;;", 100);
+  CheckSignature s("obs;X;;|refobs;rX;;|model;mX;;|meta;X_MID,X_STD;;", 100, true);
 
   const DataRequirement * obs = s.obs();
   ASSERT_TRUE(obs != 0);
@@ -58,7 +58,7 @@ TEST(CheckSignatureTest, test) {
 }
 
 TEST(CheckSignatureTest, missingModelSpec) {
-  CheckSignature s("obs;X;;|refobs;rX;;||meta;X_MID,X_STD;;", 100);
+  CheckSignature s("obs;X;;|refobs;rX;;||meta;X_MID,X_STD;;", 100, true);
 
   const DataRequirement * model = s.model();
   ASSERT_TRUE(model == 0);
@@ -71,7 +71,7 @@ TEST(CheckSignatureTest, missingModelSpec) {
 
 
 TEST(CheckSignatureTest,paramAndSensorSpec){
-  CheckSignature s("obs;X&1&2&3;;", 100);
+  CheckSignature s("obs;X&1&2&3;;", 100, true);
   const DataRequirement * obs = s.obs();
   ASSERT_TRUE(obs!=nullptr);
   EXPECT_EQ("obs", obs->requirementType());

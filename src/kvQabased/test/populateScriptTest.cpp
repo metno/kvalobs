@@ -54,10 +54,10 @@ class populateScriptTest : public testing::Test {
 
 TEST_F(populateScriptTest, scriptGenerate) {
   qabase::CheckSignature abstractRequirement("obs;X,Y;;|meta;M;;",
-                                             observation.stationID());
+                                             observation.stationID(), false);
   qabase::CheckSignature concreteRequirement(
       "obs;RR_24,RR_12;10;0,-1440|meta;RR_24_MAX;10;0",
-      observation.stationID());
+      observation.stationID(), true);
   qabase::DataStore store(database, observation, "QC1-1-1", abstractRequirement,
                           concreteRequirement);
   qabase::addDataToScript(script, store);
@@ -116,9 +116,9 @@ TEST_F(populateScriptTest, scriptGenerate) {
 
 TEST_F(populateScriptTest, minimalScript) {
   qabase::CheckSignature abstractRequirement("obs;X;;",
-                                             observation.stationID());
+                                             observation.stationID(), false);
   qabase::CheckSignature concreteRequirement("obs;RR_12;;",
-                                             observation.stationID());
+                                             observation.stationID(), true);
   qabase::DataStore store(database, observation, "QC1-1-1", abstractRequirement,
                           concreteRequirement);
   qabase::addDataToScript(script, store);
@@ -161,9 +161,9 @@ TEST_F(populateScriptTest, usesOriginalValueForObs) {
       .Times(AtLeast(1)).WillRepeatedly(SetArgumentPointee<0>(data));
 
   qabase::CheckSignature abstractRequirement("obs;R;;",
-                                             observation.stationID());
+                                             observation.stationID(), false);
   qabase::CheckSignature concreteRequirement("obs;RR_24;;",
-                                             observation.stationID());
+                                             observation.stationID(), true);
   qabase::DataStore store(mockDatabase, observation, "QC1-1-1",
                           abstractRequirement, concreteRequirement);
   qabase::addDataToScript(script, store);
@@ -206,9 +206,9 @@ TEST_F(populateScriptTest, flagsMissingValuesAsMissing) {
       .Times(AtLeast(1)).WillRepeatedly(SetArgumentPointee<0>(data));
 
   qabase::CheckSignature abstractRequirement("obs;R;;",
-                                             observation.stationID());
+                                             observation.stationID(), false);
   qabase::CheckSignature concreteRequirement("obs;RR_24;;",
-                                             observation.stationID());
+                                             observation.stationID(), true);
   qabase::DataStore store(mockDatabase, observation, "QC1-1-1",
                           abstractRequirement, concreteRequirement);
   qabase::addDataToScript(script, store);
@@ -258,9 +258,9 @@ TEST_F(populateScriptTest, flagsRejectedValuesAsNotMissing) {
       .Times(AtLeast(1)).WillRepeatedly(SetArgumentPointee<0>(data));
 
   qabase::CheckSignature abstractRequirement("obs;R;;",
-                                             observation.stationID());
+                                             observation.stationID(), false);
   qabase::CheckSignature concreteRequirement("obs;RR_24;;",
-                                             observation.stationID());
+                                             observation.stationID(), true);
   qabase::DataStore store(mockDatabase, observation, "QC1-1-1",
                           abstractRequirement, concreteRequirement);
   qabase::addDataToScript(script, store);
@@ -296,9 +296,9 @@ TEST_F(populateScriptTest, flagsRejectedValuesAsNotMissing) {
 
 TEST_F(populateScriptTest, missingRefobs) {
   qabase::CheckSignature abstractRequirement("obs;R;;|refobs;Rstart,Robs;;",
-                                             observation.stationID());
+                                             observation.stationID(), false);
   qabase::CheckSignature concreteRequirement(
-      "obs;RR_X;;|refobs;KLSTART,KLOBS;;", observation.stationID());
+      "obs;RR_X;;|refobs;KLSTART,KLOBS;;", observation.stationID(), true);
   qabase::DataStore store(database, observation, "QC1-1-1", abstractRequirement,
                           concreteRequirement);
   qabase::addDataToScript(script, store);
@@ -357,9 +357,9 @@ TEST_F(populateScriptTest, existingRefObs) {
       .Times(AtLeast(1)).WillRepeatedly(SetArgumentPointee<0>(klobs));
 
   qabase::CheckSignature abstractRequirement("obs;R;;|refobs;Rstart,Robs;;",
-                                             observation.stationID());
+                                             observation.stationID(), false);
   qabase::CheckSignature concreteRequirement(
-      "obs;RR_X;;|refobs;KLSTART,KLOBS;;", observation.stationID());
+      "obs;RR_X;;|refobs;KLSTART,KLOBS;;", observation.stationID(), true);
   qabase::DataStore store(mockDatabase, observation, "QC1-1-1",
                           abstractRequirement, concreteRequirement);
   qabase::addDataToScript(script, store);
@@ -422,9 +422,9 @@ TEST_F(populateScriptTest, oneRefObsNonexisting) {
       .Times(AtLeast(1)).WillRepeatedly(SetArgumentPointee<0>(klobs));
 
   qabase::CheckSignature abstractRequirement("obs;R;;|refobs;Rstart,Robs;;",
-                                             observation.stationID());
+                                             observation.stationID(), false);
   qabase::CheckSignature concreteRequirement(
-      "obs;RR_X;;|refobs;KLSTART,KLOBS;;0,-60", observation.stationID());
+      "obs;RR_X;;|refobs;KLSTART,KLOBS;;0,-60", observation.stationID(), true);
   qabase::DataStore store(mockDatabase, observation, "QC1-1-1",
                           abstractRequirement, concreteRequirement);
   qabase::addDataToScript(script, store);
@@ -467,9 +467,9 @@ TEST_F(populateScriptTest, oneRefObsNonexisting) {
 
 TEST_F(populateScriptTest, metaData) {
   qabase::CheckSignature abstractRequirement("obs;X;;|meta;M,N;;",
-                                             observation.stationID());
+                                             observation.stationID(), false);
   qabase::CheckSignature concreteRequirement(
-      "obs;RR_24;;|meta;RR_24_MIN,RR_24_MAX;;", observation.stationID());
+      "obs;RR_24;;|meta;RR_24_MIN,RR_24_MAX;;", observation.stationID(), true);
   qabase::DataStore store(database, observation, "QC1-1-1", abstractRequirement,
                           concreteRequirement);
   qabase::addDataToScript(script, store);
@@ -511,9 +511,9 @@ TEST_F(populateScriptTest, metaData) {
 
 TEST_F(populateScriptTest, getsValuesFromDb) {
   qabase::CheckSignature abstractRequirement("obs;X;;",
-                                             observation.stationID());
+                                             observation.stationID(), false);
   qabase::CheckSignature concreteRequirement("obs;RR_12;10;0,-1440",
-                                             observation.stationID());
+                                             observation.stationID(), true);
   qabase::DataStore store(database, observation, "QC1-1-1", abstractRequirement,
                           concreteRequirement);
   qabase::addDataToScript(script, store);
@@ -535,9 +535,9 @@ TEST_F(populateScriptTest, getsValuesFromDb) {
 
 TEST_F(populateScriptTest, modelData) {
   qabase::CheckSignature abstractRequirement("obs;X;;|model;mX;;",
-                                             observation.stationID());
+                                             observation.stationID(), false);
   qabase::CheckSignature concreteRequirement(
-      "obs;RR_12&0&&;;|model;RR_12&0&&;;", observation.stationID());
+      "obs;RR_12&0&&;;|model;RR_12&0&&;;", observation.stationID(), true);
   qabase::DataStore store(database, observation, "QC1-1-1", abstractRequirement,
                           concreteRequirement);
   qabase::addDataToScript(script, store);
@@ -568,9 +568,9 @@ TEST_F(populateScriptTest, modelData) {
 
 TEST_F(populateScriptTest, nonmatchingSignatures) {
   qabase::CheckSignature abstractRequirement("obs;X,Y;;|meta;M;;",
-                                             observation.stationID());
+                                             observation.stationID(), false);
   qabase::CheckSignature concreteRequirement(
-      "obs;RR_24;10;0,-1440|meta;RR_24_MAX;10;0", observation.stationID());
+      "obs;RR_24;10;0,-1440|meta;RR_24_MAX;10;0", observation.stationID(), true);
 
   EXPECT_THROW(
       qabase::DataStore store(database, observation, "QC1-1-1", abstractRequirement, concreteRequirement),
@@ -579,9 +579,9 @@ TEST_F(populateScriptTest, nonmatchingSignatures) {
 
 TEST_F(populateScriptTest, missingSignatureInChecks) {
   qabase::CheckSignature abstractRequirement("obs;X,Y;;|meta;M;;",
-                                             observation.stationID());
+                                             observation.stationID(), false);
   qabase::CheckSignature concreteRequirement("meta;RR_24_MAX;10;0",
-                                             observation.stationID());
+                                             observation.stationID(), true);
 
   EXPECT_THROW(
       qabase::DataStore store(database, observation, "QC1-1-1",abstractRequirement, concreteRequirement),
@@ -590,9 +590,9 @@ TEST_F(populateScriptTest, missingSignatureInChecks) {
 
 TEST_F(populateScriptTest, missingSignatureInAlgorithm) {
   qabase::CheckSignature abstractRequirement("meta;M;;",
-                                             observation.stationID());
+                                             observation.stationID(), false);
   qabase::CheckSignature concreteRequirement(
-      "obs;RR_24;10;0,-1440|meta;RR_24_MAX;10;0", observation.stationID());
+      "obs;RR_24;10;0,-1440|meta;RR_24_MAX;10;0", observation.stationID(), true);
 
   EXPECT_THROW(
       qabase::DataStore store(database, observation, "QC1-1-1",abstractRequirement, concreteRequirement),

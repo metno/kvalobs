@@ -31,6 +31,8 @@
 #include "ScriptResultIdentifier.h"
 #include <db/DatabaseAccess.h>
 #include <db/databaseResultFilter.h>
+#include <miutil/replace.h>
+#include <set>
 
 namespace qabase {
 namespace {
@@ -206,6 +208,102 @@ void DataStore::populateModel_(
   }
 }
 
+
+
+namespace {
+  /**
+   * findMetaParameter takes as parameter a translation of a mapping from concreteMetadata to abstractMetadata, 
+   * a concrete parameter to serach for.
+   * 
+   * Returns a tuple with the first element is the parameter name of the concrete parameter,
+   * the second element is the metadata type and the third parameter is the abstract parameter the 
+   * concrete parameter is an instance of.
+   * 
+   * The metadata parameter is on the form Name_metaDataType. The name can contain _, it is the
+   * last _ that separetes name from MetaDataType.  
+   * 
+   * @throw qabase::DataStore::UnableToGetData ekception if the parameter is not found or the param format is wrong.
+   */
+  std::tuple<DataRequirement::Parameter, DataRequirement::Parameter> findMetaParameter(const ParameterTranslation &translation, 
+    const DataRequirement::Parameter &paramToSearch) {
+          ParameterTranslation::const_iterator find = translation.find(paramToSearch);
+    if (find == translation.end()) {
+      throw qabase::DataStore::UnableToGetData(
+          "Unable to find translation for metadata parameter: "
+              + paramToSearch.str());
+    }
+
+    if ( ! find->first.hasMetaData() ) {
+      throw qabase::DataStore::UnableToGetData("Expect concrete metadata: " + find->first.str());
+    }
+    
+    return std::make_tuple(find->first, find->second);  
+  }
+
+  std::string findMetadata(const std::string &metaParam, 
+    const qabase::DataRequirement & concreteObsRequirement, 
+    qabase::StationParamList &paramMetadataList, std::ostream &log ) {
+    int sensor;
+    int level;
+    int nMatch=0;
+    std::tuple<int,int,std::string> exactMatch(std::make_tuple(-1, -1, ""));
+    std::tuple<int,int,std::string> levelMatch(std::make_tuple(-1, -1, ""));
+    std::string err;
+
+    for( auto const &obsParam : concreteObsRequirement.parameter()) {
+      if( obsParam.baseName() != metaParam ) {
+        continue;
+      }
+      sensor=obsParam.haveSensor()?obsParam.sensor():0;
+      level=obsParam.haveLevel()?obsParam.level():0;
+      
+      try{
+        auto metadata=paramMetadataList.find(level, sensor);
+        nMatch++;
+        if ( std::get<1>(metadata)!=sensor ) {
+          levelMatch=metadata;
+        } else {
+          exactMatch=metadata;
+        }
+      }
+      catch( const qabase::StationParamList::MultipleMatch &ex) {
+        nMatch+=2;  //To be more than one
+      }
+      catch( const qabase::StationParamList::NoMatch &ex) {
+      }
+    }
+
+    if( nMatch==0) {
+      throw qabase::DataStore::NoMetadata("META: No metadata for param '" + metaParam +"'.");
+    }
+
+    if ( nMatch > 1 ) {
+      throw qabase::DataStore::NoMetadata("META: Multiple metadata for param '" + metaParam +"'.");
+    }
+    
+    if( ! std::get<2>(exactMatch).empty() ) {
+      log << "META: parameter '" << metaParam << "' exact match for level=" << std::get<0>(exactMatch) 
+        << " and sensor=" << std::get<1>(exactMatch) << " meta: '" << miutil::replace_copy(std::get<2>(exactMatch), "\n", "|") <<"'.\n";
+      return std::get<2>(exactMatch);
+    } 
+    
+    log << "META: parameter '" << metaParam << "' partly match for level=" << std::get<0>(levelMatch) 
+        << " (sensor=" << std::get<1>(levelMatch) <<" ) meta: '" << miutil::replace_copy(std::get<2>(levelMatch), "\n", "|") << "'.\n";
+    
+    return std::get<2>(levelMatch); 
+  }
+}
+
+/**
+ * Algoritme:
+ *
+ * 1. Finner metadata parameter fra checks metadata på formen PARAM_what, eks meta; TJ_max. PARAM=TJ og what=max.
+ * 2. Søker opp og finner sensor og level for TJ i checks fra obs spesifikasjonen. eks obs;TJ&10&0&. Level=10 og sensor 0.
+ * 3. Bruker sensor og level fra 2. til å finne metadata for TJ i station_param.
+ *     a. Hvis sensor og param finnes brukes metadata for denne (Exact match).
+ *     b. Hvis 3a. feiler, søk bare etter level uavhengig av sensor (Partiel match).
+ * 4. Hvis ingen match finnes i punkt 3. eller 3b. gir flere muligheter så feiler søket etter metadata.
+ */
 void DataStore::populateMeta_(
     const db::DatabaseAccess & db, const qabase::Observation & obs,
     const std::string & qcx,
@@ -213,42 +311,72 @@ void DataStore::populateMeta_(
     const qabase::DataRequirement & abstractMetaRequirement,
     const qabase::DataRequirement & concreteMetaRequirement
     ) {
+  std::set<std::string> notLogged;
   ParameterTranslation translation = getTranslation(concreteMetaRequirement,
                                                     abstractMetaRequirement);
-
-  for (qabase::DataRequirement::ParameterList::const_iterator parameter =
-      concreteMetaRequirement.parameter().begin();
-      parameter != concreteMetaRequirement.parameter().end(); ++parameter) {
-    ParameterTranslation::const_iterator find = translation.find(*parameter);
-    if (find == translation.end()) {
-      throw UnableToGetData(
-          "Unable to find translation for metadata parameter: "
-              + parameter->str());
-    }
-
-    std::string::size_type splitPoint = find->first.str().find_last_of('_');
-    if (std::string::npos == splitPoint) {
-      throw UnableToGetData("Cannot understand metadata: " + find->first.str());
-    }
-    bool obsParamFound;
+  for (const qabase::DataRequirement::Parameter &parameter : concreteMetaRequirement.parameter()) {
     int sensor=0;
     int level=0;
-    std::string param = find->first.str().substr(0, splitPoint);
-    std::string metadataType = find->first.str().substr(splitPoint + 1);
-    auto obsParam = concreteObsRequirement.findParameter(param, &obsParamFound);
-    if ( obsParamFound ) {
-      (*scriptLog_) << "META: concreteObsParam: " << param << " abstractMetaParam: " << find->second.baseName() << " concreteMetaParam: " << find->first.baseName() << "\n";
-      sensor = (obsParam->haveSensor()?obsParam->sensor():0);
-      level = (obsParam->haveLevel()?obsParam->level():0);
-    } else {
-      (*scriptLog_) << "META no mapping to concreteObsParam: " << param << " abstractMetaParam: " << find->second.baseName() << " concreteMetaParam: " << find->first.baseName() << "\n";
-    }
-    std::string stationParam = db.getStationParam(obs.stationInfo(), param, sensor, level, qcx);
+    auto concreteToAbstractParam = findMetaParameter(translation, parameter);
+    DataRequirement::Parameter concreteMetaParam = std::get<0>(concreteToAbstractParam);
+    std::string metadataType = concreteMetaParam.metaDataType();
+    DataRequirement::Parameter abstractMetaParam=std::get<1>(concreteToAbstractParam);
+    
+    qabase::StationParamList stationParamsMetadata;
+    db.getStationParamAll(stationParamsMetadata, obs.stationInfo(), concreteMetaParam.metaDataParam(), qcx);
+    std::ostringstream tmpLog;
+    std::string metadata=findMetadata(concreteMetaParam.metaDataParam(), concreteObsRequirement, stationParamsMetadata, tmpLog);
 
-    float val = db::resultfilter::parseStationParam(stationParam, metadataType);
-    metaData_[find->second].push_back(val);
+    if( notLogged.insert(tmpLog.str()).second ) {
+      *scriptLog_ << tmpLog.str();
+    }
+    
+    float val = db::resultfilter::parseStationParam(metadata, metadataType);
+    metaData_[abstractMetaParam].push_back(val);
   }
 }
+
+
+
+// void DataStore::populateMeta_(
+//     const db::DatabaseAccess & db, const qabase::Observation & obs,
+//     const std::string & qcx,
+//     const qabase::DataRequirement & abstractObsRequirement,
+//     const qabase::DataRequirement & concreteObsRequirement,
+//     const qabase::DataRequirement & abstractMetaRequirement,
+//     const qabase::DataRequirement & concreteMetaRequirement
+//     ) {
+//   ParameterTranslation translation = getTranslation(concreteMetaRequirement,
+//                                                     abstractMetaRequirement);
+//   ParameterTranslation obsTranslation = getTranslation(abstractObsRequirement, concreteObsRequirement);
+
+
+//   for (qabase::DataRequirement::ParameterList::const_iterator parameter =
+//       concreteMetaRequirement.parameter().begin();
+//       parameter != concreteMetaRequirement.parameter().end(); ++parameter) {
+//     int sensor=0;
+//     int level=0;
+//     auto concreteToAbstractParam = findMetaParameter(translation, *parameter);
+//     DataRequirement::Parameter concreteMetaParam = std::get<0>(concreteToAbstractParam);
+//     std::string metadataType = std::get<0>(concreteToAbstractParam).metaDataType();
+//     DataRequirement::Parameter abstractMetaParam=std::get<1>(concreteToAbstractParam);
+//     auto obsParamResult = concreteObsRequirement.findParameter(concreteMetaParam.metaDataParam());
+//     DataRequirement::Parameter obsParam=std::get<0>(obsParamResult);
+//     bool obsParamFound=std::get<1>(obsParamResult);
+//     if ( obsParamFound ) {
+//       (*scriptLog_) << "META: concreteObsParam: " << obsParam << " abstractMetaParam: " << abstractMetaParam.baseName() << " concreteMetaParam: " << concreteMetaParam.metaDataParam() << "\n";
+//       sensor = (obsParam.haveSensor()?obsParam.sensor():0);
+//       level = (obsParam.haveLevel()?obsParam.level():0);
+//     } else {
+//       (*scriptLog_) << "META no mapping to concreteObsParam: " << obsParam << " abstractMetaParam: " << abstractMetaParam.baseName() << 
+//         " concreteMetaParam: " << concreteMetaParam << "\n";
+//     }
+//     std::string stationParam = db.getStationParam(obs.stationInfo(), concreteMetaParam.metaDataParam(), sensor, level, qcx);
+
+//     float val = db::resultfilter::parseStationParam(stationParam, metadataType);
+//     metaData_[abstractMetaParam].push_back(val);
+//   }
+// }
 
 void DataStore::populateStation_(const db::DatabaseAccess & db) {
   try {

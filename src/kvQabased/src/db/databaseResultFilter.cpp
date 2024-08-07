@@ -44,7 +44,7 @@ struct caseInsensitiveEq {
   }
 
   bool operator ()(const std::string & s) const {
-    return s == wantedLower or boost::algorithm::to_lower_copy(s) == wantedLower;
+    return s == wantedLower || boost::algorithm::to_lower_copy(s) == wantedLower;
   }
 };
 
@@ -53,11 +53,17 @@ float parseStationParam(const std::string & metadataToParse,
   std::vector<std::string> params;
   boost::split(params, metadataToParse, boost::algorithm::is_any_of(";\n"));
 
+  if ( (params.size() % 2) != 0 ) {
+    throw std::runtime_error("metadata, the number of parameters and values must be equal");
+  }
+
   std::vector<std::string>::const_iterator find = std::find_if(
       params.begin(), params.end(), caseInsensitiveEq(wanted));
 
-  if (find == params.end())
+  if (find == params.end()) {
     throw std::runtime_error(wanted + ": No such station_param");
+  }
+
   std::advance(find, params.size() / 2);
 
   float val = boost::lexical_cast<float>(*find);

@@ -283,9 +283,70 @@ std::string KvalobsDatabaseAccess::getStationParam(
   if (result->hasNext()) {
     std::string metadata = result->next()[0];
     return metadata;
-  } else
+  } else {
     throw std::runtime_error(
         "Unable to find station_param for " + parameter + " for qcx=" + qcx);
+  }
+}
+
+
+void KvalobsDatabaseAccess::getStationParamAll( qabase::StationParamList &outResult,
+                                   const kvalobs::kvStationInfo & si,
+                                   const std::string & parameter, 
+                                   const std::string & qcx) const{
+  const boost::gregorian::date & date = si.obstime().date();
+  const boost::gregorian::date firstDayOfYear(date.year(), 1, 1);
+  int dayNumber = (date - firstDayOfYear).days() + 1;
+  outResult.clear();
+  qabase::StationParamSet myRes;
+
+  std::ostringstream query;
+  query << "SELECT sensor, level, metadata FROM station_param WHERE "
+        "stationid in (0, "
+        << si.stationID() << ") AND "
+        "paramid=(SELECT paramid FROM param WHERE name='"
+        << parameter << "') AND "
+        "fromday<="
+        << dayNumber << " AND " << dayNumber << "<=today AND "
+        "qcx='"
+        << qcx << "' AND fromtime <= '" << to_kvalobs_string(si.obstime()) << "' "
+        "ORDER BY stationid ASC, fromtime ASC;";
+
+  ResultPtr result(connection_->execQuery(query.str()));
+
+  milog::LogContext context("query");
+  LOGDEBUG1(query.str());
+
+  qabase::StationParam stp;
+  stp.stationid=si.stationID();
+  stp.qcx = qcx;
+  stp.paramid = parameter;
+  while (result->hasNext()) {
+    auto &row = result->next();
+    try {
+      stp.sensor=std::stoi(row[0]);
+      stp.level=std::stoi(row[1]);
+    }
+    catch( const std::out_of_range &ex) {
+      std::ostringstream ost;
+      ost << "Failed to convert 'sensor=" << row[0] << "' or 'level="<<row[1]<<"' to integer (out_of_range)";
+      throw std::runtime_error(ost.str());
+    }
+    catch( const std::invalid_argument &ex){
+      std::ostringstream ost;
+      ost << "Failed to convert 'sensor=" << row[0] << "' or 'level="<<row[1]<<"' to integer (invalid_argument)";
+      throw std::runtime_error(ost.str());
+    } 
+    stp.metadata=row[2];
+    myRes.insertOrReplace(stp);
+  }
+
+  if( myRes.empty() ) {
+    throw std::runtime_error(
+        "Unable to find station_param for " + parameter + " for qcx=" + qcx);                                  
+  }
+  
+  myRes.toVector(outResult);
 }
 
 qabase::Observation KvalobsDatabaseAccess::getObservation(const kvalobs::kvStationInfo & si) const {
@@ -305,7 +366,7 @@ qabase::Observation KvalobsDatabaseAccess::getObservation(const kvalobs::kvStati
     throw std::runtime_error(s.str());
   }
 
-    //Observation(long long id, int stationid, int type, const boost::posix_time::ptime & obstime, const boost::posix_time::ptime & tbtime)
+  //Observation(long long id, int stationid, int type, const boost::posix_time::ptime & obstime, const boost::posix_time::ptime & tbtime)
   auto row = result->next();
   auto id = boost::lexical_cast<long long>(row[0]);
   auto stationid = boost::lexical_cast<int>(row[1]);

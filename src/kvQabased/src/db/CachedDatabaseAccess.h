@@ -65,6 +65,12 @@ class CachedDatabaseAccess : public FilteredDatabaseAccess {
                                       const std::string & parameter, int sensor, int level, 
                                       const std::string & qcx) const;
 
+  virtual void getStationParamAll( qabase::StationParamList &result,
+                                   const kvalobs::kvStationInfo & si,
+                                   const std::string & parameter, 
+                                   const std::string & qcx) const;
+
+
   virtual kvalobs::kvStation getStation(int stationid) const;
 
   virtual void getModelData(
@@ -102,6 +108,7 @@ class CachedDatabaseAccess : public FilteredDatabaseAccess {
   mutable DataCache<ModelDataList> modelDataCache_;
   mutable DataCache<DataList> dataCache_;
   mutable DataCache<TextDataList> textDataCache_;
+  mutable qabase::StationParamSet stationParams_;
 
 };
 

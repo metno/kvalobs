@@ -34,7 +34,7 @@
 using qabase::DataRequirement;
 
 TEST(DataRequirementTest, manyParameters) {
-  DataRequirement req("obs;FX_1,FG_1,FG_010;;", 10);
+  DataRequirement req("obs;FX_1,FG_1,FG_010;;", 10, true);
 
   EXPECT_FALSE(req.empty());
   EXPECT_EQ("obs", req.requirementType());
@@ -52,7 +52,7 @@ TEST(DataRequirementTest, manyParameters) {
 }
 
 TEST(DataRequirementTest, implicitZeroTime) {
-  DataRequirement req("obs;A;;-60", 42);
+  DataRequirement req("obs;A;;-60", 42, true);
 
   EXPECT_FALSE(req.empty());
   EXPECT_EQ("obs", req.requirementType());
@@ -68,7 +68,7 @@ TEST(DataRequirementTest, implicitZeroTime) {
 }
 
 TEST(DataRequirementTest, explicitZeroTime) {
-  DataRequirement req("obs;B;;0,-120", 42);
+  DataRequirement req("obs;B;;0,-120", 42, true);
 
   EXPECT_FALSE(req.empty());
   EXPECT_EQ("obs", req.requirementType());
@@ -84,7 +84,7 @@ TEST(DataRequirementTest, explicitZeroTime) {
 }
 
 TEST(DataRequirementTest, swapUnorderedTime) {
-  DataRequirement req("obs;C;;-180,0", 42);
+  DataRequirement req("obs;C;;-180,0", 42, false);
 
   EXPECT_FALSE(req.empty());
   EXPECT_EQ("obs", req.requirementType());
@@ -100,7 +100,7 @@ TEST(DataRequirementTest, swapUnorderedTime) {
 }
 
 TEST(DataRequirementTest, ampersandInParameter) {
-  DataRequirement req("obs;P&&&;;", 42);
+  DataRequirement req("obs;P&&&;;", 42, true);
 
   EXPECT_EQ(1u, req.parameter().size());
   ASSERT_TRUE(req.haveParameter("P"));
@@ -115,7 +115,7 @@ TEST(DataRequirementTest, ampersandInParameter) {
 }
 
 TEST(DataRequirementTest, levelInParameter) {
-  DataRequirement req("obs;P&10&&;;", 42);
+  DataRequirement req("obs;P&10&&;;", 42, true);
 
   EXPECT_EQ(1u, req.parameter().size());
   EXPECT_TRUE(req.haveParameter("P"));  // Hva brukes denne til?
@@ -131,7 +131,7 @@ TEST(DataRequirementTest, levelInParameter) {
 }
 
 TEST(DataRequirementTest, sensorInParameter) {
-  DataRequirement req("obs;P&&1&;;", 42);
+  DataRequirement req("obs;P&&1&;;", 42, true);
 
   EXPECT_EQ(1u, req.parameter().size());
   EXPECT_TRUE(req.haveParameter("P"));
@@ -147,7 +147,7 @@ TEST(DataRequirementTest, sensorInParameter) {
 }
 
 TEST(DataRequirementTest, typeidInParameter) {
-  DataRequirement req("obs;P&&&302;;", 42);
+  DataRequirement req("obs;P&&&302;;", 42, true);
 
   EXPECT_EQ(1u, req.parameter().size());
   EXPECT_TRUE(req.haveParameter("P"));

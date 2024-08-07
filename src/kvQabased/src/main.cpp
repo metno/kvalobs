@@ -223,8 +223,9 @@ int main(int argc, char ** argv) {
     qabase::DataProcessor::maxKafkaSendErrors=config.maxKafkaSendErrors();
 
     ProcessStatus processStatus;
-    if (!config.haveObservationToCheck())
+    if (!config.haveObservationToCheck()) {
       processStatus = spawnSubProcesses(config.processCount(), config.id());
+    }
     setupLogging(config, processStatus);
     qabase::QaBaseApp app(argc, argv);
 
@@ -245,14 +246,16 @@ int main(int argc, char ** argv) {
       auto db = std::make_shared<db::KvalobsDatabaseAccess>(dbConnect);
       auto checkRunner = std::make_shared<qabase::CheckRunner>(db);
 
-      if (config.onlySpecificQcx())
+      if (config.onlySpecificQcx()) {
         checkRunner->setQcxFilter(config.qcxFilter().begin(), config.qcxFilter().end());
+      }
 
       qabase::DataProcessor processor(checkRunner);
       processor.process(*config.observationToCheck());
     } else {
-      if (processStatus.isLeader())
+      if (processStatus.isLeader()){
         createPidFile();
+      }
 
       signal(SIGINT, terminate);
       signal(SIGHUP, terminate);

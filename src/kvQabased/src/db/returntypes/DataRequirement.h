@@ -108,8 +108,9 @@ class DataRequirement {
    *                  mentioned in the specification is implicitly from this
    *                  station, regardless of whether the specification
    *                  contains any explicit stations.
+   * @param isConcreteSpecifification Set this to true for the concrete instance of metata.
    */
-  DataRequirement(const char * signature, int stationid);
+  DataRequirement(const char * signature, int stationid, bool isConcreteSpecifification);
   ~DataRequirement();
 
   /**
@@ -139,7 +140,7 @@ class DataRequirement {
     return parameter_;
   }
 
-  const ParameterList::const_iterator findParameter(const std::string &baseName, bool *found ) const;
+
   /**
    * Does the given parameter exist in the requirement?
    *
@@ -184,6 +185,13 @@ class DataRequirement {
     return lastTime_;
   }
 
+  bool isConcrete()const { 
+    return isConcrete_;
+  }
+
+  bool isAbstract()const { 
+    return ! isConcrete_;
+  }
   /**
    * Thrown if the DataRequirement string is syntactically wrong.
    */
@@ -195,6 +203,7 @@ class DataRequirement {
   Station station_;
   int firstTime_;
   int lastTime_;
+  bool isConcrete_;
 };
 
 /**
@@ -327,13 +336,37 @@ class DataRequirement::Parameter {
     return typeid_ != NULL_PARAMETER_;
   }
 
+
+  //hasMetaData is only set for concrete metadata.
+  bool hasMetaData() const {
+    return ! metaDataParamName_.empty();
+  }
+  
+  //metaDataType is only set for concrete metadata.
+  std::string metaDataType()const {
+    return metaDataType_;
+  }
+
+  std::string metaDataParam()const {
+    return metaDataParamName_;
+  }
+
+  friend class DataRequirement;
  private:
+  bool parseAsConcreteMetaParameter();
   void parse_(const std::string & parameterString);
   static const int NULL_PARAMETER_;
   std::string name_;
   int level_;
   int sensor_;
   int typeid_;
+  /**
+   * The following two parameters is valid only if this parameter is given for metadata.
+   * The parameter name for metadata has the format paramName_metaDataType. paramName may contain
+   * _ so the metaDataType follows after the last underscore.
+   */
+  std::string metaDataParamName_; //The baseName to the parameter if this is a metedata parameter.
+  std::string metaDataType_; //The metadata type of the parameter
 };
 
 inline bool operator ==(const DataRequirement::Parameter & a,

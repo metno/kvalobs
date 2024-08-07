@@ -32,6 +32,7 @@
 
 #include "returntypes/DataRequirement.h"
 #include "returntypes/Observation.h"
+#include "returntypes/StationParam.h"
 #include <kvalobs/kvChecks.h>
 #include <kvalobs/kvObsPgm.h>
 #include <kvalobs/kvAlgorithms.h>
@@ -163,6 +164,28 @@ class DatabaseAccess {
                                       const std::string & parameter, int sensor, int level, 
                                       const std::string & qcx) const = 0;
 
+
+  /**
+   * Get station's parameter's metadata for all sensors and levels.
+   *
+   * @param si Observation we are interested in. Note that obstime must be
+   *           correct in order to get a correct answer.
+   * @param parameter Meteorological phenomenon we are interested in
+   * @param qcx Identifier for the check we are going to run.
+   *
+   * @return An entry from the station_param table. As the format of some of
+   *         this table's contents is a bit weird, you must probably parse
+   *         the result later, using the function
+   *         resultfilter::parseStationParam()
+   */
+  virtual void getStationParamAll( qabase::StationParamList &result,
+                                   const kvalobs::kvStationInfo & si,
+                                   const std::string & parameter, 
+                                   const std::string & qcx) const = 0;
+
+
+
+
   /**
    * Get information on the given station
    *
@@ -212,7 +235,7 @@ class DatabaseAccess {
    * conflict between the pinned observationid and the newly returned 
    * observationid.
    * Will throw an exception at you if you have already read the data you are 
-   * attempting to pi, and there is a conflict.
+   * attempting to pin, and there is a conflict.
    * Pins are cleared when you start a new transaction.
    * Returns false if absolutely no data was pinned. True otherwise.
    */

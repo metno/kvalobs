@@ -302,7 +302,7 @@ CheckRunner::KvalobsDataPtr CheckRunner::checkObservation(
       bool hasAnyParametersRequiredByCheck = false;
 
       std::string signatureString = check->checksignature();
-      CheckSignature signature(signatureString.c_str(), obs.stationID());
+      CheckSignature signature(signatureString.c_str(), obs.stationID(), true);
       const DataRequirement * obsRequirement = signature.obs();
       if (obsRequirement) {
         for (std::set<std::string>::const_iterator it =
@@ -311,11 +311,12 @@ CheckRunner::KvalobsDataPtr CheckRunner::checkObservation(
             hasAnyParametersRequiredByCheck = true;
             break;
           }
-      } else
+      } else {
         hasAnyParametersRequiredByCheck = true;
+      }
 
       if (hasAnyParametersRequiredByCheck
-          and shouldRunCheck(obs.stationInfo(), *check, expectedParameters)) {
+          && shouldRunCheck(obs.stationInfo(), *check, expectedParameters)) {
         db::DatabaseAccess::DataList modifications;
 
         KvalobsCheckScript script(db, obs, *check, scriptLog);
@@ -409,7 +410,7 @@ bool CheckRunner::shouldRunCheck(
   if ((not isShip(obs))
   //or expectedParameters.empty() )
       and not signatureMatchesExpectedParameters(
-          CheckSignature(check.checksignature(), obs.stationID()),
+          CheckSignature(check.checksignature(), obs.stationID(), true),
           expectedParameters))
     return false;
 

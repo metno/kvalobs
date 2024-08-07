@@ -43,6 +43,7 @@
 #include <deque>
 #include <map>
 #include <iostream>
+#include <tuple>
 
 namespace db {
 class DatabaseAccess;
@@ -116,6 +117,7 @@ class DataStore {
   QABASE_EXCEPTION(UnableToGetData);
   QABASE_EXCEPTION(InvalidParameter);
   QABASE_EXCEPTION(NoSuchData);
+  QABASE_EXCEPTION(NoMetadata);
   QABASE_DERIVED_EXCEPTION(MissingModelData, NoErrorLogException);
 
  private:

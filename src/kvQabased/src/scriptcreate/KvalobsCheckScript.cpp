@@ -80,8 +80,8 @@ KvalobsCheckScript::KvalobsCheckScript(const db::DatabaseAccess & database,
                     << ", typeid=" << obs.typeID() << ", obstime=" << obs.obstime() << "\n\n";
      }
 
-    CheckSignature abstractSignature(algorithm.signature(), obs.stationID());
-    CheckSignature concreteSignature(check.checksignature(), obs.stationID());
+    CheckSignature abstractSignature(algorithm.signature(), obs.stationID(), false);
+    CheckSignature concreteSignature(check.checksignature(), obs.stationID(), true);
 
     store_.reset(
         new DataStore(database, obs, check.qcx(), abstractSignature,

@@ -35,12 +35,14 @@ namespace qabase {
 
 DataRequirement::DataRequirement()
     : firstTime_(0),
-      lastTime_(0) {
+      lastTime_(0),
+      isConcrete_(false) {
 }
 
-DataRequirement::DataRequirement(const char * signature, int stationid)
+DataRequirement::DataRequirement(const char * signature, int stationid,  bool isConcreteSpecifification)
     : firstTime_(0),
-      lastTime_(0) {
+      lastTime_(0),
+      isConcrete_(isConcreteSpecifification) {
   if (signature[0] == '\0')
     return;
 
@@ -74,14 +76,27 @@ DataRequirement::DataRequirement(const char * signature, int stationid)
 //					int_p[assign_a(lastTime_)])
               ).full;
 
-  if (std::find(station_.begin(), station_.end(), stationid) == station_.end())
+  if (std::find(station_.begin(), station_.end(), stationid) == station_.end()) {
     station_.push_back(stationid);
+  }
 
-  if (not ok)
+  if ( !ok ) {
     throw Invalid("Invalid syntax for signature: " + std::string(signature));
+  }
 
-  if (lastTime_ < firstTime_)
+  if (lastTime_ < firstTime_){
     std::swap(lastTime_, firstTime_);
+  }
+
+  if (isConcreteSpecifification && requirementType_ == "meta" ) {
+    for( auto &param : parameter_ ){
+      if ( ! param.parseAsConcreteMetaParameter() ) {
+        throw Invalid("Invalid metadata syntax for concrete meta parameter '" + param.baseName()+"' in signature: " + std::string(signature));
+      }
+    }
+  }
+
+
 }
 
 DataRequirement::~DataRequirement() {
@@ -97,23 +112,6 @@ bool DataRequirement::haveParameter(const std::string & baseParameter) const {
     if (find->baseName() == baseParameter)
       return true;
   return false;
-}
-
-const DataRequirement::ParameterList::const_iterator DataRequirement::findParameter(const std::string &baseName, bool *found ) const {
-  if ( found != nullptr) {
-    *found = false;
-  }
-  
-  for( ParameterList::const_iterator it=parameter_.cbegin(); it != parameter_.cend(); ++it ){
-    if( it->baseName() == baseName ) {
-      if ( found != nullptr) {
-        *found = true;
-      }
-        
-      return it;
-    }
-  }
-  return parameter_.cend();
 }
 
 
@@ -200,6 +198,18 @@ void DataRequirement::Parameter::parse_(const std::string & parameterString) {
   if (not ok)
     throw DataRequirement::Invalid("Invalid parameter: " + parameterString);
 
+}
+
+bool DataRequirement::Parameter::parseAsConcreteMetaParameter() {
+  std::string::size_type splitPoint = name_.find_last_of('_');
+  if (std::string::npos == splitPoint) {
+    return false;
+  }
+    
+  metaDataParamName_= name_.substr(0, splitPoint);
+  metaDataType_ = name_.substr(splitPoint + 1);
+
+  return true;
 }
 
 }

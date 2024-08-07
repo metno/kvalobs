@@ -34,12 +34,12 @@
 
 namespace qabase {
 
-CheckSignature::CheckSignature(const std::string & signature, int stationid) {
-  parse_(signature, stationid);
+CheckSignature::CheckSignature(const std::string & signature, int stationid,bool isConcreteSpecification) {
+  parse_(signature, stationid, isConcreteSpecification);
 }
 
-CheckSignature::CheckSignature(const char * signature, int stationid) {
-  parse_(signature, stationid);
+CheckSignature::CheckSignature(const char * signature, int stationid, bool isConcreteSpecification) {
+  parse_(signature, stationid, isConcreteSpecification);
 }
 
 CheckSignature::~CheckSignature() {
@@ -69,14 +69,14 @@ const DataRequirement * CheckSignature::get_(const std::string & name) const {
   return &find->second;
 }
 
-void CheckSignature::parse_(const std::string & signature, int stationid) {
+void CheckSignature::parse_(const std::string & signature, int stationid, bool isConcreteSpecification) {
   std::vector<std::string> requirements;
   boost::algorithm::split(requirements, signature,
                           boost::algorithm::is_any_of("|"));
 
   for (std::vector<std::string>::const_iterator it = requirements.begin();
       it != requirements.end(); ++it) {
-    DataRequirement justParsed(it->c_str(), stationid);
+    DataRequirement justParsed(it->c_str(), stationid, isConcreteSpecification);
     DataRequirement & inMemory = requirements_[justParsed.requirementType()];
     if (not inMemory.empty())
       throw Error("Requirement defined twice: " + signature);

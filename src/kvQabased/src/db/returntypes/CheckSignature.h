@@ -71,7 +71,7 @@ class CheckSignature {
    *                  addition to any other stations explicitly mentioned in
    *                  the signature.
    */
-  CheckSignature(const std::string & signature, int stationid);
+  CheckSignature(const std::string & signature, int stationid,bool isConcreteSpecification);
 
   /**
    * Initialize object with the given string.
@@ -84,7 +84,7 @@ class CheckSignature {
    *                  addition to any other stations explicitly mentioned in
    *                  the signature.
    */
-  CheckSignature(const char * signature, int stationid);
+  CheckSignature(const char * signature, int stationid, bool isConcreteSpecification);
   ~CheckSignature();
 
   /**
@@ -118,7 +118,7 @@ class CheckSignature {
   QABASE_EXCEPTION(Error);
 
  private:
-  void parse_(const std::string & signature, int stationid);
+  void parse_(const std::string & signature, int stationid, bool isConcreteSpecification);
   const DataRequirement * get_(const std::string & name) const;
 
   enum DataRequirementIdx {

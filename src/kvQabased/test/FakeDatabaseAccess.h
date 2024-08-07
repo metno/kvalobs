@@ -65,6 +65,12 @@ class FakeDatabaseAccess : public db::DatabaseAccess {
                                       int sensor, int level,
                                       const std::string & qcx) const;
 
+  virtual void getStationParamAll( qabase::StationParamList &result,
+                                   const kvalobs::kvStationInfo & si,
+                                   const std::string & parameter, 
+                                   const std::string & qcx) const;
+  
+
   virtual kvalobs::kvStation getStation(int stationid) const;
 
   virtual qabase::Observation getObservation(const kvalobs::kvStationInfo & si) const;

@@ -108,6 +108,15 @@ std::string FakeDatabaseAccess::getStationParam(
   return "max;min\n2.2;1.1";
 }
 
+
+void FakeDatabaseAccess::getStationParamAll( qabase::StationParamList &result,
+                                   const kvalobs::kvStationInfo & si,
+                                   const std::string & parameter, 
+                                   const std::string & qcx) const {
+
+}
+  
+
 kvalobs::kvStation FakeDatabaseAccess::getStation(int stationid) const {
   return kvalobs::kvStation(
       stationid,

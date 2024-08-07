@@ -50,6 +50,16 @@ namespace miutil {
  */
 std::string&
 replace(std::string &source, const std::string &what, const std::string &with);
+
+/* @brif replace a substrings in a string with new content.
+ * 
+ * @param source the string to replace content in.
+ * @param what The content to be replaced.
+ * @param with The new content.
+ * @return a reference to source.
+ */
+std::string
+replace_copy(std::string &source, const std::string &what, const std::string &with);
 }
 
 #endif /*REPLACE_H_*/

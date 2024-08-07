@@ -97,6 +97,22 @@ std::string CachedDatabaseAccess::getStationParam(
   return lastStationParamQuery_.result;
 }
 
+void CachedDatabaseAccess::getStationParamAll( qabase::StationParamList &result,
+                                   const kvalobs::kvStationInfo & si,
+                                   const std::string & parameter, 
+                                   const std::string & qcx) const{
+  result.clear();                                    
+  stationParams_.filterStationParam(result, qcx, si.stationID(), parameter);
+
+  if( ! result.empty() ) {
+    return;
+  }
+
+  FilteredDatabaseAccess::getStationParamAll(result, si, parameter, qcx);
+  stationParams_.insertFrom(result);
+}
+
+
 kvalobs::kvStation CachedDatabaseAccess::getStation(int stationid) const {
   std::shared_ptr<kvalobs::kvStation> station;
 
