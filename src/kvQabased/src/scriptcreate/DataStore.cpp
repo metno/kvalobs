@@ -338,46 +338,6 @@ void DataStore::populateMeta_(
 
 
 
-// void DataStore::populateMeta_(
-//     const db::DatabaseAccess & db, const qabase::Observation & obs,
-//     const std::string & qcx,
-//     const qabase::DataRequirement & abstractObsRequirement,
-//     const qabase::DataRequirement & concreteObsRequirement,
-//     const qabase::DataRequirement & abstractMetaRequirement,
-//     const qabase::DataRequirement & concreteMetaRequirement
-//     ) {
-//   ParameterTranslation translation = getTranslation(concreteMetaRequirement,
-//                                                     abstractMetaRequirement);
-//   ParameterTranslation obsTranslation = getTranslation(abstractObsRequirement, concreteObsRequirement);
-
-
-//   for (qabase::DataRequirement::ParameterList::const_iterator parameter =
-//       concreteMetaRequirement.parameter().begin();
-//       parameter != concreteMetaRequirement.parameter().end(); ++parameter) {
-//     int sensor=0;
-//     int level=0;
-//     auto concreteToAbstractParam = findMetaParameter(translation, *parameter);
-//     DataRequirement::Parameter concreteMetaParam = std::get<0>(concreteToAbstractParam);
-//     std::string metadataType = std::get<0>(concreteToAbstractParam).metaDataType();
-//     DataRequirement::Parameter abstractMetaParam=std::get<1>(concreteToAbstractParam);
-//     auto obsParamResult = concreteObsRequirement.findParameter(concreteMetaParam.metaDataParam());
-//     DataRequirement::Parameter obsParam=std::get<0>(obsParamResult);
-//     bool obsParamFound=std::get<1>(obsParamResult);
-//     if ( obsParamFound ) {
-//       (*scriptLog_) << "META: concreteObsParam: " << obsParam << " abstractMetaParam: " << abstractMetaParam.baseName() << " concreteMetaParam: " << concreteMetaParam.metaDataParam() << "\n";
-//       sensor = (obsParam.haveSensor()?obsParam.sensor():0);
-//       level = (obsParam.haveLevel()?obsParam.level():0);
-//     } else {
-//       (*scriptLog_) << "META no mapping to concreteObsParam: " << obsParam << " abstractMetaParam: " << abstractMetaParam.baseName() << 
-//         " concreteMetaParam: " << concreteMetaParam << "\n";
-//     }
-//     std::string stationParam = db.getStationParam(obs.stationInfo(), concreteMetaParam.metaDataParam(), sensor, level, qcx);
-
-//     float val = db::resultfilter::parseStationParam(stationParam, metadataType);
-//     metaData_[abstractMetaParam].push_back(val);
-//   }
-// }
-
 void DataStore::populateStation_(const db::DatabaseAccess & db) {
   try {
     station_ = db.getStation(observation_.stationID());

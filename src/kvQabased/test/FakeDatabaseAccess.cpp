@@ -113,7 +113,7 @@ void FakeDatabaseAccess::getStationParamAll( qabase::StationParamList &result,
                                    const kvalobs::kvStationInfo & si,
                                    const std::string & parameter, 
                                    const std::string & qcx) const {
-
+  result.push_back(qabase::StationParam(si.stationID(), parameter, 0, 0, qcx, "max;min\n2.2;1.1"));
 }
   
 

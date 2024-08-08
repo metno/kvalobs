@@ -47,6 +47,10 @@ struct StationParam {
   std::string qcx;
   std::string metadata;
 
+  StationParam(){}
+  StationParam(int sid, const std::string &pid, int sensor_, int level_, const std::string &qcx_, const std::string &metadata_):
+    stationid(sid), paramid(pid), sensor(sensor_), level(level_), qcx(qcx_), metadata(metadata_){}
+
   bool operator < (const qabase::StationParam &rhs) const {
     if (qcx < rhs.qcx || stationid < rhs.stationid || 
       paramid < rhs.paramid ||  
