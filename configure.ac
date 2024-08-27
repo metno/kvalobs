@@ -154,7 +154,7 @@ PKG_CONFIG=${old_PKG_CONFIG}
 #Test, cppunit and gtest
 PKG_CHECK_MODULES(cppunit, cppunit)
 AC_PATH_PROG(CMAKE, cmake, false)
-GMOCK_DIST_CHECK([src/lib/gtest])
+#GMOCK_DIST_CHECK([src/lib/gtest])
 
 
 #Perl

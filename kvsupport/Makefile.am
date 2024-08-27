@@ -4,7 +4,8 @@ librdkafka_src = $(librdkafka_version).tar.gz
 libhttpserver_version = libhttpserver-0.18.2
 libhttpserver_src = $(libhttpserver_version).tar.gz
 
-sqlite3_version = sqlite-autoconf-3360000
+#sqlite3_version = sqlite-autoconf-3360000
+sqlite3_version = sqlite-autoconf-3460000
 sqlite3_src=$(sqlite3_version).tar.gz
 
 
