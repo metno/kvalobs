@@ -1,5 +1,7 @@
+
+#gtest \
+
 SUBDIRS = \
-  gtest \
   json \
   kvskel \
   dnmithread \

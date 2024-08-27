@@ -193,7 +193,7 @@ if [ $mode = test ]; then
 elif [ "$os" = "$default_os" ]; then
   registry="$registry/$mode/"
 else 
-  registry="$registry/$mode/$os/"
+  registry="$registry/$mode-$os/"
 fi
 
 
