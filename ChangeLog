@@ -1,8 +1,9 @@
-2024-07-17 Børge Moe
+2024-08-27 Børge Moe
   * Release 7.0.5
   * kvQabased
     - Add parameters observation_stationid and observation_typeid to the perl scripts.
     - Add variables to give typeid for the parameter to the perl scripts. Ex. my $X_typeid=312
+    - Use sensor and typeid when setting up metadata for the checks. 
 
 2024-04-15 Børge Moe
   * Release 7.0.4
