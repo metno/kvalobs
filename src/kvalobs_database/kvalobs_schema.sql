@@ -447,6 +447,24 @@ GRANT ALL ON rejectdecode TO kv_admin;
 GRANT SELECT ON rejectdecode TO kv_read;
 GRANT SELECT, UPDATE, INSERT, DELETE ON rejectdecode TO kv_write;
 
+CREATE TABLE param (
+	paramid INTEGER NOT NULL,
+	name    TEXT NOT NULL,
+	description TEXT DEFAULT NULL,
+	unit    TEXT DEFAULT NULL,
+	level_scale INTEGER DEFAULT 0,
+	comment TEXT DEFAULT NULL,
+	scalar BOOLEAN DEFAULT TRUE,
+	UNIQUE ( paramid )
+);
+
+REVOKE ALL ON param FROM public;
+GRANT ALL ON param TO kv_admin;
+GRANT SELECT ON param TO kv_read;
+GRANT SELECT, UPDATE, INSERT ON param TO kv_write;
+
+
+
 
 CREATE TABLE model_data (
 	stationid INTEGER NOT NULL,
@@ -526,23 +544,6 @@ REVOKE ALL ON generated_types FROM public;
 GRANT ALL ON generated_types TO kv_admin;
 GRANT SELECT ON generated_types TO kv_read;
 GRANT SELECT, UPDATE, INSERT, DELETE ON generated_types TO kv_write;
-
-
-CREATE TABLE param (
-	paramid INTEGER NOT NULL,
-	name    TEXT NOT NULL,
-	description TEXT DEFAULT NULL,
-	unit    TEXT DEFAULT NULL,
-	level_scale INTEGER DEFAULT 0,
-	comment TEXT DEFAULT NULL,
-	scalar BOOLEAN DEFAULT TRUE,
-	UNIQUE ( paramid )
-);
-
-REVOKE ALL ON param FROM public;
-GRANT ALL ON param TO kv_admin;
-GRANT SELECT ON param TO kv_read;
-GRANT SELECT, UPDATE, INSERT ON param TO kv_write;
 
 --
 -- PDATA is a view to the data table that shows parameter names instead of parameter ids.
