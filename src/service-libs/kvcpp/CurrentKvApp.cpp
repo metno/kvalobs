@@ -51,6 +51,11 @@ namespace {
 
 using boost::filesystem::path;
 
+std::string stem(const std::string & filename) {
+  return path(filename).stem().string();
+}
+
+
 std::string getValue(const std::string & key, std::shared_ptr<miutil::conf::ConfSection> conf) {
   auto val = conf->getValue(key);
   if (val.empty())
@@ -98,7 +103,7 @@ dnmi::db::Connection * createConnection(std::shared_ptr<miutil::conf::ConfSectio
 }
 
 std::function<Connection*()> connector(int argc, char ** argv, std::shared_ptr<miutil::conf::ConfSection> preferredConfig) {
-  std::shared_ptr<miutil::conf::ConfSection> config = KvApp::getConfiguration(preferredConfig, boost::filesystem::basename(argv[0]));
+  std::shared_ptr<miutil::conf::ConfSection> config = KvApp::getConfiguration(preferredConfig, stem(argv[0]));
   return [config]() {
     return createConnection(config);
   };
@@ -109,14 +114,14 @@ void releaseConnection(dnmi::db::Connection * connection) {
 }
 
 std::string kafkaDomain(int argc, char **argv, std::shared_ptr<miutil::conf::ConfSection> preferredConfig) {
-  std::shared_ptr<miutil::conf::ConfSection> config = KvApp::getConfiguration(preferredConfig, boost::filesystem::basename(argv[0]));
+  std::shared_ptr<miutil::conf::ConfSection> config = KvApp::getConfiguration(preferredConfig, stem(argv[0]));
   auto ret = getValue("kafka.domain", config);
   LOGINFO("kafka.domain: '"<< ret << "'");
   return ret;
 }
 
 std::string kafkaBrokers(int argc, char ** argv, std::shared_ptr<miutil::conf::ConfSection> preferredConfig) {
-  std::shared_ptr<miutil::conf::ConfSection> config = KvApp::getConfiguration(preferredConfig, boost::filesystem::basename(argv[0]));
+  std::shared_ptr<miutil::conf::ConfSection> config = KvApp::getConfiguration(preferredConfig, stem(argv[0]));
 
   return getValue("kafka.brokers", config);
 }
@@ -126,7 +131,7 @@ std::string kafkaBrokers(int argc, char ** argv, std::shared_ptr<miutil::conf::C
 CurrentKvApp::CurrentKvApp(int argc, char ** argv, std::shared_ptr<miutil::conf::ConfSection> preferredConfig)
     : sql::SqlGet(connector(argc, argv, preferredConfig), releaseConnection),
       kafka::KafkaSubscribe(kafkaDomain(argc, argv, preferredConfig), kafkaBrokers(argc, argv, preferredConfig)) {
-  std::shared_ptr<miutil::conf::ConfSection> conf = KvApp::getConfiguration(preferredConfig, boost::filesystem::basename(argv[0]));
+  std::shared_ptr<miutil::conf::ConfSection> conf = KvApp::getConfiguration(preferredConfig, stem(argv[0]));
   sendData_ = std::unique_ptr<kvalobs::datasource::SendData>(new kvalobs::datasource::HttpSendData(*conf));
   // needed for correct handling of CORBA::string_dup, below
   int ac = 1;

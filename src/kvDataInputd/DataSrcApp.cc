@@ -654,7 +654,7 @@ kvalobs::datasource::Result DataSrcApp::newObservation(const char *obsType_, con
     decCmd->setSerialNumber(serialNumber);
     decCmd->setProducer(myProducer);
     
-    if( ! producer ) {
+    if( producer != nullptr ) {
       *producer=myProducer;
     }
 

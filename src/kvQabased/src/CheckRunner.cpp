@@ -70,7 +70,7 @@ CheckRunner::~CheckRunner() {
 }
 
 namespace {
-struct have_typeid : std::unary_function<kvalobs::kvData, bool> {
+struct have_typeid  {
   int type_;
   have_typeid(int typeID)
       : type_(typeID) {
@@ -276,7 +276,7 @@ CheckRunner::KvalobsDataPtr CheckRunner::checkObservation(
   for (db::DatabaseAccess::ParameterList::const_iterator it = expectedParameters.begin(); it != expectedParameters.end(); ++it) {
     db::DatabaseAccess::DataList d;
     db.getData(&d, obs, *it, 0);
-    d.remove_if(std::not1(have_typeid(obs.typeID())));
+    d.remove_if(std::not_fn(have_typeid(obs.typeID())));
     if (not d.empty()) {
       parametersInData.insert(*it);
       observationData.insert(observationData.end(), d.begin(), d.end());

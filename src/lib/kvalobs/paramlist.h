@@ -125,10 +125,10 @@ class Param {
   }
 };
 
-class ParamPredicate : public std::binary_function<Param, Param, bool> {
+class ParamPredicate  {
  public:
-  result_type operator()(const first_argument_type &a1,
-                         const second_argument_type &a2) const {
+  bool operator()(const Param &a1,
+                         const Param &a2) const {
     if (a1.kode() < a2.kode())
       return true;
 

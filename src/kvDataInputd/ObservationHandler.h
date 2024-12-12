@@ -71,8 +71,9 @@ public:
   };
 
   ObservationHandler(DataSrcApp& app, kvalobs::service::ProducerQuePtr raw);
-  const std::shared_ptr<http_response> render_POST(
-    const httpserver::http_request& req);
+
+  std::shared_ptr<http_response> render_POST(
+    const httpserver::http_request& req) override;
 
 protected:
   unsigned long long getSerialNumber();

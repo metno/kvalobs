@@ -188,7 +188,14 @@ class has_paramid {
 }
 
 namespace compare {
-typedef std::binary_function<kvData, kvData, bool> kvDataCompare;
+class kvDataCompare {
+ public:
+  virtual bool operator()(const kvData & a, const kvData & b) const = 0;
+  virtual ~kvDataCompare() = default;
+};
+
+//typedef std::binary_function<kvData, kvData, bool> kvDataCompare;
+//typedef std::function<std::binary_function<kvData, kvData, bool> kvDataCompare;
 
 bool eq_sensor(int sA, int sB);
 bool lt_sensor(int sA, int sB);
@@ -203,7 +210,7 @@ struct same_kvData : public kvDataCompare {
 };
 
 template<typename Kv1 = kvData, typename Kv2 = kvData>
-struct lt_kvData_without_paramID : public std::binary_function<Kv1, Kv2, bool> {
+struct lt_kvData_without_paramID  {
   bool operator()(const Kv1 & a, const Kv2 & b) const {
     if (a.stationID() != b.stationID())
       return a.stationID() < b.stationID();

@@ -1,9 +1,9 @@
-AC_PREREQ([2.59])
-AC_INIT([kvalobs], [7.0.5], [kvoss@met.no])
+AC_PREREQ([2.71])
+AC_INIT([kvalobs],[7.0.5],[kvoss@met.no])
 AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_MACRO_DIR([m4])
 
-AC_PROG_LIBTOOL
+LT_INIT
 AC_PROG_LEX
 if test "x$LEX" == "x:"; then
 	AC_MSG_ERROR([lex/flex not found])
@@ -14,7 +14,7 @@ AC_PROG_YACC
 AC_PROG_CXX
 AC_PROG_INSTALL
 AC_PROG_LN_S
-AX_CXX_COMPILE_STDCXX_11(noext)
+AX_CXX_COMPILE_STDCXX([20],[noext],[mandatory])
 
 #echo "LIBDIR: ${libdir}"
 
@@ -154,7 +154,7 @@ PKG_CONFIG=${old_PKG_CONFIG}
 #Test, cppunit and gtest
 PKG_CHECK_MODULES(cppunit, cppunit)
 AC_PATH_PROG(CMAKE, cmake, false)
-#GMOCK_DIST_CHECK([src/lib/gtest])
+GMOCK_DIST_CHECK([src/lib/gtest])
 
 
 #Perl

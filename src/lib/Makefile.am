@@ -1,5 +1,5 @@
 
-#gtest \
+#gtest 
 
 SUBDIRS = \
   json \

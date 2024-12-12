@@ -28,11 +28,11 @@
  with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#include <time.h>
-#include <sstream>
 #include <kvalobs/DataInsertTransaction.h>
 #include <kvalobs/kvDbGate.h>
-//#include <milog/milog.h>
+#include <sstream>
+#include <time.h>
+// #include <milog/milog.h>
 
 using namespace std;
 using namespace dnmi::db;
@@ -53,11 +53,11 @@ bool kvalobs::kvDbGate::begintransaction() {
 
     try {
       con->beginTransaction();
-    } catch (dnmi::db::SQLNotConnected & ex) {
+    } catch (dnmi::db::SQLNotConnected &ex) {
       err_ = NotConnected;
       errStr_ = ex.what();
       return false;
-    } catch (dnmi::db::SQLBusy & ex) {
+    } catch (dnmi::db::SQLBusy &ex) {
       err_ = Busy;
       errStr_ = ex.what();
       busy = true;
@@ -86,11 +86,11 @@ bool kvalobs::kvDbGate::endtransaction() {
 
     try {
       con->endTransaction();
-    } catch (dnmi::db::SQLNotConnected & ex) {
+    } catch (dnmi::db::SQLNotConnected &ex) {
       err_ = NotConnected;
       errStr_ = ex.what();
       return false;
-    } catch (dnmi::db::SQLBusy & ex) {
+    } catch (dnmi::db::SQLBusy &ex) {
       err_ = Busy;
       errStr_ = ex.what();
       busy = true;
@@ -119,11 +119,11 @@ bool kvalobs::kvDbGate::rollback() {
 
     try {
       con->rollBack();
-    } catch (dnmi::db::SQLNotConnected & ex) {
+    } catch (dnmi::db::SQLNotConnected &ex) {
       err_ = NotConnected;
       errStr_ = ex.what();
       return false;
-    } catch (dnmi::db::SQLBusy & ex) {
+    } catch (dnmi::db::SQLBusy &ex) {
       err_ = Busy;
       errStr_ = ex.what();
       busy = true;
@@ -139,7 +139,7 @@ bool kvalobs::kvDbGate::rollback() {
   return !busy;
 }
 
-bool kvalobs::kvDbGate::insertImpl(const std::list<kvalobs::kvDbBase*> &elem,
+bool kvalobs::kvDbGate::insertImpl(const std::list<kvalobs::kvDbBase *> &elem,
                                    const std::string &tblName, bool replace) {
   InsertOption action(INSERTONLY);
 
@@ -149,7 +149,7 @@ bool kvalobs::kvDbGate::insertImpl(const std::list<kvalobs::kvDbBase*> &elem,
   return insertImpl(elem, tblName, action);
 }
 
-bool kvalobs::kvDbGate::insertImpl(const std::list<kvalobs::kvDbBase*> &elem,
+bool kvalobs::kvDbGate::insertImpl(const std::list<kvalobs::kvDbBase *> &elem,
                                    const std::string &tblName,
                                    InsertOption option) {
   DataInsertTransaction::Action action(DataInsertTransaction::INSERTONLY);
@@ -164,27 +164,28 @@ bool kvalobs::kvDbGate::insertImpl(const std::list<kvalobs::kvDbBase*> &elem,
   try {
     con->perform(transaction, 3, dnmi::db::Connection::SERIALIZABLE);
     return true;
-  } catch (const dnmi::db::SQLDuplicate & ex) {
+  } catch (const dnmi::db::SQLDuplicate &ex) {
     err_ = Duplicate;
     errStr_ = string("Duplicate: [") + ex.what() + string("]");
     return false;
 
-  } catch (const dnmi::db::SQLNotConnected & ex) {
+  } catch (const dnmi::db::SQLNotConnected &ex) {
     err_ = NotConnected;
     errStr_ = string("NotConnected: [") + ex.what() + string("]");
     return false;
-  } catch (const dnmi::db::SQLBusy & ex) {
+  } catch (const dnmi::db::SQLBusy &ex) {
     err_ = Busy;
     errStr_ = string("Busy: [") + ex.what() + string("]");
+    return false;
   } catch (const dnmi::db::SQLAborted &ex) {
     err_ = Aborted;
     errStr_ = string("Aborted: [") + ex.what() + string("]");
     return false;
-  } catch (const dnmi::db::SQLException & ex) {
+  } catch (const dnmi::db::SQLException &ex) {
     err_ = Error;
     errStr_ = string("Error: [") + ex.what() + string("]");
     return false;
-  } catch (const std::exception & ex) {
+  } catch (const std::exception &ex) {
     err_ = Error;
     errStr_ = string("Error: ") + ex.what() + string("]");
     return false;
@@ -193,7 +194,6 @@ bool kvalobs::kvDbGate::insertImpl(const std::list<kvalobs::kvDbBase*> &elem,
     errStr_ = "UnknownError. Unknown exception.";
     return false;
   }
-
 }
 
 std::string kvalobs::kvDbGate::esc(const std::string &src) const {
@@ -211,14 +211,14 @@ bool kvalobs::kvDbGate::insert(const kvalobs::kvDbBase &elem,
 
   if (!elem.exists()) {
     err_ = InvalidObject;
-    errStr_ = "InvalidObject: The kvDbBase object for table <" + tblName
-        + "> is invalid!";
+    errStr_ = "InvalidObject: The kvDbBase object for table <" + tblName +
+              "> is invalid!";
     return false;
   }
 
   ost << "INSERT INTO " << tblName << " VALUES" << elem.toSend() << ";";
 
-  //LOGDEBUG("INSERT: " << endl << "[" << ost.str() << "]" << endl);
+  // LOGDEBUG("INSERT: " << endl << "[" << ost.str() << "]" << endl);
 
   for (int i = 0; i < 2; i++) {
     time(&now);
@@ -231,7 +231,7 @@ bool kvalobs::kvDbGate::insert(const kvalobs::kvDbBase &elem,
       try {
         con->exec(ost.str());
         return true;
-      } catch (dnmi::db::SQLDuplicate & ex) {
+      } catch (dnmi::db::SQLDuplicate &ex) {
         if (replace) {
           time(&now);
           timeout = now + busytimeout_;
@@ -243,28 +243,28 @@ bool kvalobs::kvDbGate::insert(const kvalobs::kvDbBase &elem,
             try {
               ostringstream o;
               o << "DELETE FROM " << tblName << " " << elem.uniqueKey();
-              //LOGDEBUG("[" << o.str() << "]");
+              // LOGDEBUG("[" << o.str() << "]");
               con->exec(o.str());
-            } catch (dnmi::db::SQLBusy & ex) {
+            } catch (dnmi::db::SQLBusy &ex) {
               err_ = Busy;
-              errStr_ = string("Busy, Duplicate (replace): [") + ex.what()
-                  + string("]");
+              errStr_ = string("Busy, Duplicate (replace): [") + ex.what() +
+                        string("]");
               time(&now);
               busy = true;
-            } catch (dnmi::db::SQLNotConnected & ex) {
+            } catch (dnmi::db::SQLNotConnected &ex) {
               err_ = NotConnected;
-              errStr_ = string("NotConnected, Duplicate (replace): [")
-                  + ex.what() + string("]");
+              errStr_ = string("NotConnected, Duplicate (replace): [") +
+                        ex.what() + string("]");
               return false;
             } catch (dnmi::db::SQLAborted &ex) {
               err_ = Aborted;
-              errStr_ = string("Aborted, Duplicate (replace): [") + ex.what()
-                  + string("]");
+              errStr_ = string("Aborted, Duplicate (replace): [") + ex.what() +
+                        string("]");
               return false;
-            } catch (dnmi::db::SQLException & ex) {
+            } catch (dnmi::db::SQLException &ex) {
               err_ = Error;
-              errStr_ = string("Error, Duplicate (replace) : [") + ex.what()
-                  + string("]");
+              errStr_ = string("Error, Duplicate (replace) : [") + ex.what() +
+                        string("]");
               return false;
             } catch (...) {
               err_ = UnknownError;
@@ -280,11 +280,11 @@ bool kvalobs::kvDbGate::insert(const kvalobs::kvDbBase &elem,
           errStr_ = "Duplicate, Duplicate (no replace): Duplicate key!";
           return false;
         }
-      } catch (dnmi::db::SQLNotConnected & ex) {
+      } catch (dnmi::db::SQLNotConnected &ex) {
         err_ = NotConnected;
         errStr_ = string("NotConnected: [") + ex.what() + string("]");
         return false;
-      } catch (dnmi::db::SQLBusy & ex) {
+      } catch (dnmi::db::SQLBusy &ex) {
         err_ = Busy;
         errStr_ = string("Busy: [") + ex.what() + string("]");
         time(&now);
@@ -293,7 +293,7 @@ bool kvalobs::kvDbGate::insert(const kvalobs::kvDbBase &elem,
         err_ = Aborted;
         errStr_ = string("Aborted: [") + ex.what() + string("]");
         return false;
-      } catch (dnmi::db::SQLException & ex) {
+      } catch (dnmi::db::SQLException &ex) {
         err_ = Error;
         errStr_ = string("Error: ") + ex.what() + string("]");
         return false;
@@ -344,25 +344,25 @@ bool kvalobs::kvDbGate::update(const kvalobs::kvDbBase &elem,
     try {
       con->exec(ost.str());
       return true;
-    } catch (dnmi::db::SQLBusy & ex) {
+    } catch (dnmi::db::SQLBusy &ex) {
       err_ = Busy;
       errStr_ = string("Busy: [") + ex.what() + string("]");
       time(&now);
       busy = true;
-    } catch (dnmi::db::SQLNotConnected & ex) {
+    } catch (dnmi::db::SQLNotConnected &ex) {
       err_ = NotConnected;
-      errStr_ = string("NotConnected, Duplicate (replace): [") + ex.what()
-          + string("]");
+      errStr_ = string("NotConnected, Duplicate (replace): [") + ex.what() +
+                string("]");
       return false;
     } catch (dnmi::db::SQLAborted &ex) {
       err_ = Aborted;
-      errStr_ = string("Aborted, Duplicate (replace): [") + ex.what()
-          + string("]");
+      errStr_ =
+          string("Aborted, Duplicate (replace): [") + ex.what() + string("]");
       return false;
-    } catch (dnmi::db::SQLException & ex) {
+    } catch (dnmi::db::SQLException &ex) {
       err_ = Error;
-      errStr_ = string("Error, Duplicate (replace) : [") + ex.what()
-          + string("]");
+      errStr_ =
+          string("Error, Duplicate (replace) : [") + ex.what() + string("]");
       return false;
     } catch (...) {
       err_ = UnknownError;
@@ -416,12 +416,12 @@ bool kvalobs::kvDbGate::replace(const kvalobs::kvDbBase &elem,
 
     try {
       con->exec(del.str());
-    } catch (dnmi::db::SQLBusy & ex) {
+    } catch (dnmi::db::SQLBusy &ex) {
       err_ = Busy;
       errStr_ = ex.what();
       busy = true;
       time(&now);
-    } catch (dnmi::db::SQLNotConnected & ex) {
+    } catch (dnmi::db::SQLNotConnected &ex) {
       err_ = NotConnected;
       errStr_ = ex.what();
       return false;
@@ -447,11 +447,11 @@ bool kvalobs::kvDbGate::replace(const kvalobs::kvDbBase &elem,
 
     try {
       con->exec(ins.str());
-    } catch (dnmi::db::SQLNotConnected & ex) {
+    } catch (dnmi::db::SQLNotConnected &ex) {
       err_ = NotConnected;
       errStr_ = ex.what();
       return false;
-    } catch (dnmi::db::SQLBusy & ex) {
+    } catch (dnmi::db::SQLBusy &ex) {
       err_ = Busy;
       errStr_ = ex.what();
       busy = true;
@@ -473,7 +473,6 @@ bool kvalobs::kvDbGate::replace(const kvalobs::kvDbBase &elem,
   }
 
   return endtransaction();
-
 }
 
 bool kvalobs::kvDbGate::remove(const kvalobs::kvDbBase &elem) {
@@ -513,11 +512,11 @@ bool kvalobs::kvDbGate::remove(const kvalobs::kvDbBase &elem,
     try {
       con->exec(o.str());
       return true;
-    } catch (dnmi::db::SQLNotConnected & ex) {
+    } catch (dnmi::db::SQLNotConnected &ex) {
       err_ = NotConnected;
       errStr_ = ex.what();
       return false;
-    } catch (dnmi::db::SQLBusy & ex) {
+    } catch (dnmi::db::SQLBusy &ex) {
       err_ = Busy;
       errStr_ = ex.what();
       busy = true;
@@ -554,11 +553,11 @@ bool kvalobs::kvDbGate::remove(const std::string &query) {
     try {
       con->exec(o.str());
       return true;
-    } catch (dnmi::db::SQLNotConnected & ex) {
+    } catch (dnmi::db::SQLNotConnected &ex) {
       err_ = NotConnected;
       errStr_ = ex.what();
       return false;
-    } catch (dnmi::db::SQLBusy & ex) {
+    } catch (dnmi::db::SQLBusy &ex) {
       err_ = Busy;
       errStr_ = ex.what();
       time(&now);
@@ -591,11 +590,11 @@ bool kvalobs::kvDbGate::exec(const std::string &query) {
     try {
       con->exec(query);
       return true;
-    } catch (dnmi::db::SQLNotConnected & ex) {
+    } catch (dnmi::db::SQLNotConnected &ex) {
       err_ = NotConnected;
       errStr_ = ex.what();
       return false;
-    } catch (dnmi::db::SQLBusy & ex) {
+    } catch (dnmi::db::SQLBusy &ex) {
       err_ = Busy;
       errStr_ = ex.what();
       busy = true;
@@ -613,5 +612,4 @@ bool kvalobs::kvDbGate::exec(const std::string &query) {
   }
 
   return false;
-
 }

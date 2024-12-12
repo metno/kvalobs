@@ -53,7 +53,12 @@ class kvTextDataFactory {
 };
 
 namespace compare {
-typedef std::binary_function<kvTextData, kvTextData, bool> kvTextDataCompare;
+
+class kvTextDataCompare {
+public:
+    virtual bool operator()(const kvTextData& lhs, const kvTextData& rhs) const = 0;
+    virtual ~kvTextDataCompare()=default;
+};
 
 struct lt_kvTextData : kvTextDataCompare {
   bool operator()(const kvTextData & a, const kvTextData & b) const;

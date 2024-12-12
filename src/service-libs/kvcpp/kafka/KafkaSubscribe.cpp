@@ -134,7 +134,7 @@ void broadcast(const ::kvalobs::serialize::KvalobsData & d,
 }
 
 struct cmpWhat {
-  bool operator ()(const KvWhat & a, const KvWhat & b) {
+  bool operator ()(const KvWhat & a, const KvWhat & b) const {
     if (a.stationID() != b.stationID())
       return a.stationID() < b.stationID();
     if (a.typeID() != b.typeID())
@@ -151,9 +151,9 @@ void broadcastNotification(
   std::list<kvalobs::kvData> data;
   std::list<kvalobs::kvTextData> textData;
   kvalobsData.getData(data, textData);
-  for (auto d : data)
+  for (const auto &d : data)
     elements.insert(KvWhat(d.stationID(), d.typeID(), d.obstime()));
-  for (auto d : textData)
+  for (auto &d : textData)
     elements.insert(KvWhat(d.stationID(), d.typeID(), d.obstime()));
 
   KvWhatListPtr newData(new KvWhatList(elements.begin(), elements.end()));

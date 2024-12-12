@@ -24,7 +24,7 @@ RUN apt-key add /tmp/pg-ACCC4CF8.asc && rm /tmp/pg-ACCC4CF8.asc && \
 
 RUN apt-get update && apt-get -y install \
   debhelper autotools-dev autoconf-archive debconf devscripts fakeroot \
-  less mg \
+  build-essential less nano \
   automake libtool gfortran bison flex sqlite3 libsqlite3-dev libpq-dev python3\
   libxml2-dev libxml++2.6-dev libboost-dev libboost-thread-dev \
   libboost-regex-dev libboost-filesystem-dev libboost-program-options-dev libboost-system-dev libboost-timer-dev \

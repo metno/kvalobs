@@ -28,16 +28,17 @@
  with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+
 #include "kvalobsdataparser.h"
 #include <algorithm>
+#include <boost/assign.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/shared_ptr.hpp>
 #include <functional>
 #include <iostream>
-#include <miutil/trimstr.h>
-#include <miutil/timeconvert.h>
-#include <boost/lexical_cast.hpp>
-#include <boost/assign.hpp>
-#include <boost/shared_ptr.hpp>
 #include <map>
+#include <miutil/timeconvert.h>
+#include <miutil/trimstr.h>
 
 using namespace std;
 using namespace xmlpp;
@@ -53,38 +54,33 @@ namespace serialize {
 namespace {
 typedef SaxParser::AttributeList AttributeList;
 
-struct has_key : public std::unary_function<SaxParser::Attribute, bool> {
+struct has_key {
   string key;
-  has_key(string k)
-      : key(k) {
-  }
-  bool operator()(const SaxParser::Attribute & a) const {
-    return a.name == key;
-  }
+  has_key(string k) : key(k) {}
+  bool operator()(const SaxParser::Attribute &a) const { return a.name == key; }
 };
 
-bool has_attr(const AttributeList & attributes, const string & key) {
-  AttributeList::const_iterator find = find_if(attributes.begin(),
-                                               attributes.end(), has_key(key));
+bool has_attr(const AttributeList &attributes, const string &key) {
+  AttributeList::const_iterator find =
+      find_if(attributes.begin(), attributes.end(), has_key(key));
   return find != attributes.end();
 }
-string get_attr(const AttributeList & attributes, const string & key) {
-  AttributeList::const_iterator find = find_if(attributes.begin(),
-                                               attributes.end(), has_key(key));
+string get_attr(const AttributeList &attributes, const string &key) {
+  AttributeList::const_iterator find =
+      find_if(attributes.begin(), attributes.end(), has_key(key));
   if (find == attributes.end())
     return "";
   return find->value;
 }
 
 struct HandlerFunction {
-  virtual ~HandlerFunction() {
-  }
-  virtual void operator()(const AttributeList & attr, KvalobsData & data_,
-                          map<string, string> & context_) const =0;
+  virtual ~HandlerFunction() {}
+  virtual void operator()(const AttributeList &attr, KvalobsData &data_,
+                          map<string, string> &context_) const = 0;
 };
 struct KvalobsDataHandler : public HandlerFunction {
-  virtual void operator()(const AttributeList & attr, KvalobsData & data_,
-                          map<string, string> & context_) const {
+  virtual void operator()(const AttributeList &attr, KvalobsData &data_,
+                          map<string, string> &context_) const {
     data_.overwrite(has_attr(attr, "overwrite"));
     data_.created(get_attr(attr, "created"));
     data_.producer(get_attr(attr, "producer"));
@@ -94,30 +90,28 @@ struct KvalobsDataHandler : public HandlerFunction {
 
 class ValHandler : public HandlerFunction {
   string tag_;
- public:
-  explicit ValHandler(string tag)
-      : tag_(tag) {
-  }
-  void operator()(const AttributeList & attr, KvalobsData & data_,
-                  map<string, string> & context_) const {
+
+public:
+  explicit ValHandler(string tag) : tag_(tag) {}
+  void operator()(const AttributeList &attr, KvalobsData &data_,
+                  map<string, string> &context_) const {
     context_[tag_] = get_attr(attr, "val");
   }
 };
 
 struct ObstimeHandler : public HandlerFunction {
-  void operator()(const AttributeList & attr, KvalobsData & data_,
-                  map<string, string> & context_) const {
+  void operator()(const AttributeList &attr, KvalobsData &data_,
+                  map<string, string> &context_) const {
     string obstime = get_attr(attr, "val");
     context_["obstime"] = obstime;
     if (has_attr(attr, "invalidate")) {
       try {
         data_.invalidate(
-            true,
-            lexical_cast<int>(context_["station"]),
+            true, lexical_cast<int>(context_["station"]),
             lexical_cast<int>(context_["typeid"]),
-            obstime.empty() ?
-                boost::posix_time::ptime() :
-                boost::posix_time::time_from_string_nothrow(obstime));
+            obstime.empty()
+                ? boost::posix_time::ptime()
+                : boost::posix_time::time_from_string_nothrow(obstime));
       } catch (bad_lexical_cast &) {
         throw parse_error("Invalid parameter values");
       }
@@ -126,9 +120,9 @@ struct ObstimeHandler : public HandlerFunction {
 };
 
 class CorrectedRejectionHandler : public HandlerFunction {
- public:
-  void operator()(const AttributeList & attr, KvalobsData & data_,
-                  map<string, string> & context_) const {
+public:
+  void operator()(const AttributeList &attr, KvalobsData &data_,
+                  map<string, string> &context_) const {
     std::string tbtime = get_attr(attr, "tbtime");
     context_["message/tbtime"] = tbtime;
   }
@@ -136,33 +130,30 @@ class CorrectedRejectionHandler : public HandlerFunction {
 
 typedef boost::shared_ptr<HandlerFunction> hfp;
 typedef map<string, hfp> HandlerMap;
-const HandlerMap handlers_ = assign::map_list_of("KvalobsData",
-                                                 hfp(new KvalobsDataHandler))(
-    "station", hfp(new ValHandler("station")))("typeid",
-                                               hfp(new ValHandler("typeid")))(
-    "obstime", hfp(new ObstimeHandler()))("tbtime",
-                                          hfp(new ValHandler("tbtime")))(
-    "sensor", hfp(new ValHandler("sensor")))("level",
-                                             hfp(new ValHandler("level")))(
-    "decoder", hfp(new ValHandler("decoder")))(
-    "message", hfp(new CorrectedRejectionHandler));
-}
+const HandlerMap handlers_ =
+    assign::map_list_of("KvalobsData", hfp(new KvalobsDataHandler))(
+        "station", hfp(new ValHandler("station")))(
+        "typeid", hfp(new ValHandler("typeid")))("obstime",
+                                                 hfp(new ObstimeHandler()))(
+        "tbtime", hfp(new ValHandler("tbtime")))("sensor",
+                                                 hfp(new ValHandler("sensor")))(
+        "level", hfp(new ValHandler("level")))("decoder",
+                                               hfp(new ValHandler("decoder")))(
+        "message", hfp(new CorrectedRejectionHandler));
+} // namespace
 
-void KvalobsDataParser::parse(const string & xml, KvalobsData & d) {
+void KvalobsDataParser::parse(const string &xml, KvalobsData &d) {
   KvalobsDataParser parser(d);
   parser.parse_memory(xml);
 }
 
-KvalobsDataParser::KvalobsDataParser(KvalobsData & d)
-    : xmlpp::SaxParser(),
-      data_(d) {
-}
+KvalobsDataParser::KvalobsDataParser(KvalobsData &d)
+    : xmlpp::SaxParser(), data_(d) {}
 
-KvalobsDataParser::~KvalobsDataParser() {
-}
+KvalobsDataParser::~KvalobsDataParser() {}
 
-void KvalobsDataParser::on_start_element(const Glib::ustring & name,
-                                         const AttributeList & attributes) {
+void KvalobsDataParser::on_start_element(const Glib::ustring &name,
+                                         const AttributeList &attributes) {
   currentContext_.push(name);
 
   HandlerMap::const_iterator handler = handlers_.find(name);
@@ -172,16 +163,15 @@ void KvalobsDataParser::on_start_element(const Glib::ustring & name,
   }
 
   if (name == "kvdata" or name == "kvtextdata") {
-    AttributeList::const_iterator find = std::find_if(attributes.begin(),
-                                                      attributes.end(),
-                                                      has_key("paramid"));
+    AttributeList::const_iterator find =
+        std::find_if(attributes.begin(), attributes.end(), has_key("paramid"));
     if (find == attributes.end())
       throw parse_error("Tag misses a required key");
     context_["paramid"] = find->value;
   }
 }
 
-void KvalobsDataParser::on_end_element(const Glib::ustring & name) {
+void KvalobsDataParser::on_end_element(const Glib::ustring &name) {
   currentContext_.pop();
 
   if (name == "kvdata" or name == "kvtextdata") {
@@ -198,9 +188,8 @@ void KvalobsDataParser::on_end_element(const Glib::ustring & name) {
     context_.erase("cfailed");
   } else if (name == "message") {
     std::string message = context_["message"];
-    boost::posix_time::ptime tbtime(
-        boost::posix_time::time_from_string_nothrow(
-            context_["message/tbtime"]));
+    boost::posix_time::ptime tbtime(boost::posix_time::time_from_string_nothrow(
+        context_["message/tbtime"]));
     std::string decoder = context_["decoder"];
     kvalobs::kvRejectdecode reject(message, tbtime, decoder, "");
     data_.setMessageCorrectsThisRejection(reject);
@@ -218,14 +207,14 @@ void KvalobsDataParser::on_end_element(const Glib::ustring & name) {
     context_.erase("fixed_rejected_message");
 }
 
-void KvalobsDataParser::on_characters(const Glib::ustring & characters) {
+void KvalobsDataParser::on_characters(const Glib::ustring &characters) {
   string s(characters);
   miutil::trimstr(s);
-  if (not (s.empty() or currentContext_.empty()))
+  if (not(s.empty() or currentContext_.empty()))
     context_[currentContext_.top()] = s;
 }
 
-std::ostream& operator<<(std::ostream &o, const Stack &s) {
+std::ostream &operator<<(std::ostream &o, const Stack &s) {
   for (auto &&p : s)
     o << "/" << p;
   o << endl;
@@ -234,62 +223,57 @@ std::ostream& operator<<(std::ostream &o, const Stack &s) {
 
 namespace {
 using namespace boost;
-int get_station(std::map<std::string, std::string> & context_) {
+int get_station(std::map<std::string, std::string> &context_) {
   return lexical_cast<int>(context_["station"]);
 }
-int get_typeid(std::map<std::string, std::string> & context_) {
+int get_typeid(std::map<std::string, std::string> &context_) {
   return lexical_cast<int>(context_["typeid"]);
 }
-boost::posix_time::ptime get_obstime(
-    std::map<std::string, std::string> & context_) {
+boost::posix_time::ptime
+get_obstime(std::map<std::string, std::string> &context_) {
   string ot = context_["obstime"];
-  return
-      ot.empty() ?
-          boost::posix_time::ptime() :
-          boost::posix_time::time_from_string_nothrow(ot);
+  return ot.empty() ? boost::posix_time::ptime()
+                    : boost::posix_time::time_from_string_nothrow(ot);
 }
 
-boost::posix_time::ptime get_tbtime(
-    std::map<std::string, std::string> & context_) {
+boost::posix_time::ptime
+get_tbtime(std::map<std::string, std::string> &context_) {
   string tt = context_["tbtime"];
-  return
-      tt.empty() ?
-          boost::posix_time::ptime() :
-          boost::posix_time::time_from_string_nothrow(tt);
+  return tt.empty() ? boost::posix_time::ptime()
+                    : boost::posix_time::time_from_string_nothrow(tt);
 }
-int get_sensor(std::map<std::string, std::string> & context_) {
+int get_sensor(std::map<std::string, std::string> &context_) {
   if (context_["sensor"].empty())
     return 0;
   return lexical_cast<int>(context_["sensor"]);
 }
-int get_level(std::map<std::string, std::string> & context_) {
+int get_level(std::map<std::string, std::string> &context_) {
   if (context_["level"].empty())
     return 0;
   return lexical_cast<int>(context_["level"]);
 }
-int get_paramid(std::map<std::string, std::string> & context_) {
+int get_paramid(std::map<std::string, std::string> &context_) {
   return lexical_cast<int>(context_["paramid"]);
 }
-template<typename T>
-T get_original(std::map<std::string, std::string> & context_) {
+template <typename T>
+T get_original(std::map<std::string, std::string> &context_) {
   return lexical_cast<T>(context_["original"]);
 }
-float get_corrected(std::map<std::string, std::string> & context_) {
+float get_corrected(std::map<std::string, std::string> &context_) {
   if (context_["corrected"].empty())
     return get_original<float>(context_);
   return lexical_cast<float>(context_["corrected"]);
 }
-kvControlInfo get_controlinfo(std::map<std::string, std::string> & context_) {
+kvControlInfo get_controlinfo(std::map<std::string, std::string> &context_) {
   return kvControlInfo(context_["controlinfo"]);
 }
-kvUseInfo get_useinfo(std::map<std::string, std::string> & context_) {
+kvUseInfo get_useinfo(std::map<std::string, std::string> &context_) {
   return kvUseInfo(context_["useinfo"]);
 }
-string get_cfailed(std::map<std::string, std::string> & context_) {
+string get_cfailed(std::map<std::string, std::string> &context_) {
   return context_["cfailed"];
 }
-}
-;
+}; // namespace
 
 void KvalobsDataParser::insertData() {
   try {
@@ -306,9 +290,9 @@ void KvalobsDataParser::insertData() {
     kvUseInfo useinfo_ = get_useinfo(context_);
     string cfailed_ = get_cfailed(context_);
 
-    data_.insert(
-        kvData(station_, obstime_, original_, paramid_, tbtime_, typeid_,
-               sensor_, level_, corrected_, controlinfo_, useinfo_, cfailed_));
+    data_.insert(kvData(station_, obstime_, original_, paramid_, tbtime_,
+                        typeid_, sensor_, level_, corrected_, controlinfo_,
+                        useinfo_, cfailed_));
   } catch (...) {
     throw parse_error("Invalid parameter values");
   }
@@ -330,9 +314,6 @@ void KvalobsDataParser::insertTextData() {
   }
 }
 
-}
-;
+}; // namespace serialize
 
-}
-;
-
+}; // namespace kvalobs

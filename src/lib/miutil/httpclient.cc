@@ -30,21 +30,21 @@
 #include <curl/curl.h>
 #include <fstream>
 #include <iostream>
-#include <stdexcept>
-#include <sstream>
 #include <mutex>
+#include <sstream>
+#include <stdexcept>
 
-using std::fstream;
-using std::string;
-using std::endl;
-using std::ostringstream;
-using miutil::HttpUrlError;
-using miutil::HttpConnectError;
 using miutil::HttpAccessDenied;
+using miutil::HttpConnectError;
+using miutil::HttpException;
 using miutil::HttpIOError;
 using miutil::HttpSSLError;
 using miutil::HttpTimeout;
-using miutil::HttpException;
+using miutil::HttpUrlError;
+using std::endl;
+using std::fstream;
+using std::ostringstream;
+using std::string;
 
 namespace {
 std::once_flag initCurl;
@@ -59,37 +59,37 @@ void throwExceptionOnError(CURLcode code, const std::string &msg = "") {
     message << curl_easy_strerror(code);
 
     switch (code) {
-      case CURLE_URL_MALFORMAT:
-        throw HttpUrlError(message.str());
-      case CURLE_COULDNT_RESOLVE_PROXY:
-      case CURLE_COULDNT_RESOLVE_HOST:
-      case CURLE_COULDNT_CONNECT:
-        throw HttpConnectError(message.str());
-      case CURLE_REMOTE_ACCESS_DENIED:
-      case CURLE_LOGIN_DENIED:
-        throw HttpAccessDenied(message.str());
-      case CURLE_WRITE_ERROR:
-      case CURLE_READ_ERROR:
-      case CURLE_SEND_ERROR:
-      case CURLE_RECV_ERROR:
-        throw HttpIOError(message.str());
-      case CURLE_SSL_CONNECT_ERROR:
-      case CURLE_SSL_ENGINE_NOTFOUND:
-      case CURLE_SSL_ENGINE_SETFAILED:
-      case CURLE_SSL_CERTPROBLEM:
-      case CURLE_SSL_CIPHER:
-      case CURLE_SSL_CACERT:
-      case CURLE_SSL_ENGINE_INITFAILED:
-      case CURLE_SSL_CACERT_BADFILE:
-      case CURLE_SSL_SHUTDOWN_FAILED:
-      case CURLE_SSL_CRL_BADFILE:
-      case CURLE_SSL_ISSUER_ERROR:
-      case CURLE_USE_SSL_FAILED:
-        throw HttpSSLError(message.str());
-      case CURLE_OPERATION_TIMEDOUT:
-        throw HttpTimeout(message.str());
-      default:
-        throw HttpException(message.str());
+    case CURLE_URL_MALFORMAT:
+      throw HttpUrlError(message.str());
+    case CURLE_COULDNT_RESOLVE_PROXY:
+    case CURLE_COULDNT_RESOLVE_HOST:
+    case CURLE_COULDNT_CONNECT:
+      throw HttpConnectError(message.str());
+    case CURLE_REMOTE_ACCESS_DENIED:
+    case CURLE_LOGIN_DENIED:
+      throw HttpAccessDenied(message.str());
+    case CURLE_WRITE_ERROR:
+    case CURLE_READ_ERROR:
+    case CURLE_SEND_ERROR:
+    case CURLE_RECV_ERROR:
+      throw HttpIOError(message.str());
+    case CURLE_SSL_CONNECT_ERROR:
+    case CURLE_SSL_ENGINE_NOTFOUND:
+    case CURLE_SSL_ENGINE_SETFAILED:
+    case CURLE_SSL_CERTPROBLEM:
+    case CURLE_SSL_CIPHER:
+    case CURLE_SSL_CACERT:
+    case CURLE_SSL_ENGINE_INITFAILED:
+    case CURLE_SSL_CACERT_BADFILE:
+    case CURLE_SSL_SHUTDOWN_FAILED:
+    case CURLE_SSL_CRL_BADFILE:
+    case CURLE_SSL_ISSUER_ERROR:
+    case CURLE_USE_SSL_FAILED:
+      throw HttpSSLError(message.str());
+    case CURLE_OPERATION_TIMEDOUT:
+      throw HttpTimeout(message.str());
+    default:
+      throw HttpException(message.str());
     }
   }
 }
@@ -116,29 +116,23 @@ string readFile(const std::string &file) {
 
 class Closer {
   miutil::HTTPClient *client;
- public:
-  explicit Closer(miutil::HTTPClient *client_)
-      : client(client_) {
-  }
+
+public:
+  explicit Closer(miutil::HTTPClient *client_) : client(client_) {}
 
   ~Closer() {
     if (client)
       client->close();
   }
 
-  void release() {
-    client = nullptr;
-  }
+  void release() { client = nullptr; }
 };
 
-}  // namespace
+} // namespace
 
 namespace miutil {
 
-HTTPClient::HTTPClient()
-    : curl(nullptr),
-      header(nullptr),
-      out(nullptr) {
+HTTPClient::HTTPClient() : curl(nullptr), header(nullptr), out(nullptr) {
   errbuf = new char[CURL_ERROR_SIZE];
   std::call_once(initCurl, curl_global_init, CURL_GLOBAL_ALL);
 }
@@ -155,9 +149,14 @@ void HTTPClient::open() {
   curl = curl_easy_init();
 
   if (curl) {
-    throwExceptionOnError(curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errbuf), "Failed to set error buffer.");
-    throwExceptionOnError(curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_function), "Failed to set the 'write_function'.");
-    throwExceptionOnError(curl_easy_setopt(curl, CURLOPT_WRITEDATA, this), "Failed to set the extra data (a pointer to HTTPClient).");
+    throwExceptionOnError(curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errbuf),
+                          "Failed to set error buffer.");
+    throwExceptionOnError(
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_function),
+        "Failed to set the 'write_function'.");
+    throwExceptionOnError(
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, this),
+        "Failed to set the extra data (a pointer to HTTPClient).");
   }
 
   if (!curl)
@@ -182,8 +181,10 @@ void HTTPClient::get(const std::string &url, std::ostream &content) {
   if (!curl)
     throw HttpInitError();
 
-  throwExceptionOnError(curl_easy_setopt(curl, CURLOPT_HTTPGET, 1), "HTTP GET.");
-  throwExceptionOnError(curl_easy_setopt(curl, CURLOPT_URL, url.c_str()), "GET: Failed to set url '" + url + "'.");
+  throwExceptionOnError(curl_easy_setopt(curl, CURLOPT_HTTPGET, 1),
+                        "HTTP GET.");
+  throwExceptionOnError(curl_easy_setopt(curl, CURLOPT_URL, url.c_str()),
+                        "GET: Failed to set url '" + url + "'.");
 
   out = &content;
   ret = curl_easy_perform(curl);
@@ -193,7 +194,8 @@ void HTTPClient::get(const std::string &url, std::ostream &content) {
   closer.release();
 }
 
-void HTTPClient::post(const std::string &url, const std::string &content, const std::string &contentType) {
+void HTTPClient::post(const std::string &url, const std::string &content,
+                      const std::string &contentType) {
   content_.str("");
   CURLcode ret;
   ostringstream item;
@@ -207,10 +209,16 @@ void HTTPClient::post(const std::string &url, const std::string &content, const 
   item << "Content-Type: " << contentType;
   header = curl_slist_append(header, item.str().c_str());
 
-  throwExceptionOnError(curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header), "POST: Failed to set headers.");
-  throwExceptionOnError(curl_easy_setopt(curl, CURLOPT_POSTFIELDS, content.c_str()), "POST: Failed to set content.");
-  throwExceptionOnError(curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, content.length()), "POST: Failed to set content size.");
-  throwExceptionOnError(curl_easy_setopt(curl, CURLOPT_URL, url.c_str()), "POST: Failed to set url '" + url + "'.");
+  throwExceptionOnError(curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header),
+                        "POST: Failed to set headers.");
+  throwExceptionOnError(
+      curl_easy_setopt(curl, CURLOPT_POSTFIELDS, content.c_str()),
+      "POST: Failed to set content.");
+  throwExceptionOnError(
+      curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, content.length()),
+      "POST: Failed to set content size.");
+  throwExceptionOnError(curl_easy_setopt(curl, CURLOPT_URL, url.c_str()),
+                        "POST: Failed to set url '" + url + "'.");
 
   out = &content_;
   ret = curl_easy_perform(curl);
@@ -219,7 +227,8 @@ void HTTPClient::post(const std::string &url, const std::string &content, const 
   closer.release();
 }
 
-void HTTPClient::postFile(const std::string &url, const std::string &file, const std::string &contentType) {
+void HTTPClient::postFile(const std::string &url, const std::string &file,
+                          const std::string &contentType) {
   string data;
 
   data = readFile(file);
@@ -231,7 +240,8 @@ long HTTPClient::contenlLength() const {
 
   if (curl) {
     errbuf[0] = '\0';
-    if ( curl_easy_getinfo(curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &d) == CURLE_OK)
+    if (curl_easy_getinfo(curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD_T, &d) ==
+        CURLE_OK)
       return static_cast<long>(d);
   }
 
@@ -243,7 +253,8 @@ std::string HTTPClient::contentType() const {
 
   if (curl) {
     errbuf[0] = '\0';
-    if ( curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &ct) == CURLE_OK && ct != NULL)
+    if (curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &ct) == CURLE_OK &&
+        ct != NULL)
       return string(ct);
   }
 
@@ -255,7 +266,7 @@ long HTTPClient::returnCode() const {
 
   if (curl) {
     errbuf[0] = '\0';
-    if ( curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &rc) == CURLE_OK)
+    if (curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &rc) == CURLE_OK)
       return rc;
   }
 
@@ -267,18 +278,16 @@ double HTTPClient::totalTime() const {
 
   if (curl) {
     errbuf[0] = '\0';
-    if ( curl_easy_getinfo(curl, CURLINFO_TOTAL_TIME, &dt) == CURLE_OK)
+    if (curl_easy_getinfo(curl, CURLINFO_TOTAL_TIME, &dt) == CURLE_OK)
       return dt;
   }
 
   return dt;
 }
 
-void HTTPClient::log(const std::string &msg) {
-  std::clog << msg << std::endl;
-}
+void HTTPClient::log(const std::string &msg) { std::clog << msg << std::endl; }
 
-}  // namespace miutil
+} // namespace miutil
 
 namespace {
 size_t write_function(char *ptr, size_t size, size_t nmemb, void *stream) {
@@ -289,7 +298,7 @@ size_t write_function(char *ptr, size_t size, size_t nmemb, void *stream) {
     return 0;
 
   if (stream != NULL) {
-    miutil::HTTPClient *client = static_cast<miutil::HTTPClient*>(stream);
+    miutil::HTTPClient *client = static_cast<miutil::HTTPClient *>(stream);
     std::ostream *out = client->outStream();
 
     if (out) {
@@ -299,10 +308,11 @@ size_t write_function(char *ptr, size_t size, size_t nmemb, void *stream) {
       client->log("HTTPClient: write_function: No pointer to a stream given.");
     }
   } else {
-    std::clog << "HTTPClient: write_function: No pointer to a HTTPClient given." << std::endl;
+    std::clog << "HTTPClient: write_function: No pointer to a HTTPClient given."
+              << std::endl;
   }
 
   return n;
 }
 
-}  // namespace
+} // namespace

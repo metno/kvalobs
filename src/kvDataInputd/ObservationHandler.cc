@@ -71,7 +71,7 @@ namespace {
   }
 }
 
-const shared_ptr<http_response> ObservationHandler::render_POST(const httpserver::http_request& req) {
+shared_ptr<http_response> ObservationHandler::render_POST(const httpserver::http_request& req) {
   Json::Value jval;
   bool ok=false;
   std::ostringstream oerr;
@@ -134,9 +134,9 @@ const shared_ptr<http_response> ObservationHandler::render_POST(const httpserver
 
 ObservationHandler::Observation ObservationHandler::getObservation(const httpserver::http_request& req) {
   string::size_type i, iStart;
-  string content = req.get_content();
+  string content = string(req.get_content());
 
-  string ct = req.get_header("Content-type");
+  string ct = string(req.get_header("Content-type"));
 
   postOnRawQue(content);
   LOGDEBUG("Content-type: " << ct << "\n" << "Content: \n" << content << endl);

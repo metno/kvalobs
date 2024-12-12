@@ -284,7 +284,7 @@ SmsMelding *ComObsDecoder::getSmsMelding( std::string &error ) {
 
 kvalobs::decoder::DecoderBase::DecodeResult ComObsDecoder::execute(
         std::string &msg ) {
-    std::auto_ptr<SmsMelding> smsMelding;
+    std::unique_ptr<SmsMelding> smsMelding;
     SmsBase *decoder;
     long obsid;
     bool isWmono;

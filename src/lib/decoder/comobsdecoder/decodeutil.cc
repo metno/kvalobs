@@ -203,7 +203,7 @@ bool kvalobs::decodeutil::dowwW1W2(kvalobs::decodeutil::DecodedDataElem &data,
 
   if (isdigit(buf[0]))
     data.addData("W2", buf);
-
+  return true;
 }
 
 void kvalobs::decodeutil::doVT(kvalobs::decodeutil::DecodedDataElem &data,

@@ -357,7 +357,7 @@ bool sensor_eq_(int sensor1, int sensor2) {
   return !res or abs(res) == '0';
 }
 
-struct lt_kvTextData : public binary_function<kvTextData, kvTextData, bool> {
+struct lt_kvTextData  {
   bool operator()(const kvTextData & a, const kvTextData & b) const {
     if (a.stationID() != b.stationID())
       return a.stationID() < b.stationID();
@@ -369,8 +369,7 @@ struct lt_kvTextData : public binary_function<kvTextData, kvTextData, bool> {
   }
 };
 
-struct lt_kvTextData_without_paramID : public binary_function<kvTextData,
-    kvTextData, bool> {
+struct lt_kvTextData_without_paramID {
   bool operator()(const kvTextData & a, const kvTextData & b) const {
     if (a.stationID() != b.stationID())
       return a.stationID() < b.stationID();
