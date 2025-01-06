@@ -189,7 +189,7 @@ done
 
 if [ $mode = test ]; then 
   registry="$os/"
-  kvuserid=$(id -u)
+    
 elif [ "$os" = "$default_os" ]; then
   registry="$registry/$mode/"
 else 

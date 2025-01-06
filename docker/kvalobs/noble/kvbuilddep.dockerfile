@@ -21,19 +21,25 @@ RUN apt-key add /tmp/pg-ACCC4CF8.asc && rm /tmp/pg-ACCC4CF8.asc && \
 # RUN apt-key add /tmp/confluent_repo_key.asc && rm /tmp/confluent_repo_key.asc && \
 #   add-apt-repository 'deb [arch=amd64] https://packages.confluent.io/clients/deb noble  main'
 
-
+#Development tools and programming languages
 RUN apt-get update && apt-get -y install \
   debhelper autotools-dev autoconf-archive debconf devscripts fakeroot \
-  build-essential less nano \
-  automake libtool gfortran bison flex sqlite3 libsqlite3-dev libpq-dev python3\
-  libxml2-dev libxml++2.6-dev libboost-dev libboost-thread-dev \
-  libboost-regex-dev libboost-filesystem-dev libboost-program-options-dev libboost-system-dev libboost-timer-dev \
-  libomniorb4-dev  omniidl libperl-dev libdbd-pg-perl libcurl4-gnutls-dev liblog4cpp5-dev libcppunit-dev \
-  cmake google-mock  zlib1g-dev libssl-dev libsasl2-dev libzstd-dev \
-  librdkafka1=${kafka_VERSION} librdkafka++1=${kafka_VERSION} librdkafka-dev=${kafka_VERSION} \
-  libgmock-dev \
-  libmicrohttpd-dev libgnutls28-dev \
-  metlibs-putools-dev
+  build-essential less nano automake libtool gfortran bison flex sqlite3 \
+  omniidl python3 cmake google-mock libgmock-dev libgtest-dev 
+
+#Dependencies for kvalobs
+RUN apt-get update && apt-get -y install \
+  libboost-date-time-dev libboost-filesystem-dev libboost-thread-dev \
+  libboost-regex-dev libboost-program-options-dev libboost-system-dev \
+  libboost-timer-dev libboost-dev \
+  libc6-dev libcurl4-gnutls-dev libglibmm-2.4-dev \
+  libmicrohttpd-dev libomniorb4-dev libomnithread4-dev libpq-dev libsasl2-dev\
+  libssl-dev libstdc++-13-dev libxml++2.6-dev libxml2-dev libzstd-dev zlib1g-dev \
+  librdkafka-dev=${kafka_VERSION}  metlibs-putools-dev\
+  libperl-dev libdbd-pg-perl  liblog4cpp5-dev libcppunit-dev \
+  libgnutls28-dev 
+
+#librdkafka1=${kafka_VERSION} librdkafka++1=${kafka_VERSION} 
 
 #Build libhttpserver
 # RUN mkdir -p /usr/src/ && cd /usr/src && \

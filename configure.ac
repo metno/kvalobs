@@ -136,10 +136,10 @@ echo "old_PKG_CONFIG: '${PKG_CONFIG}'"
 PKG_CONFIG="${PKG_CONFIG} --define-prefix "
 PKG_CHECK_MODULES( [rdkafka], [rdkafka++], [], [true])
 PKG_CHECK_MODULES( [rdkafkac], [rdkafka], [], [true])
-PKG_CHECK_VAR(rdkafka_LIBDIR, rdkafka++, libdir)
+PKG_CHECK_VAR([rdkafka_LIBDIR], [rdkafka++], [libdir])
 
 #Use local build of sqlite3
-PKG_CHECK_MODULES(sqlite3, sqlite3)
+PKG_CHECK_MODULES([sqlite3], [sqlite3],[],[true])
 
 
 echo "rdkafka_LIBS '$rdkafka_LIBS'"
@@ -147,7 +147,7 @@ echo "rdkafka_CFLAGS '$rdkafka_CFLAGS'"
 
 #libhttpserver
 PKG_CHECK_MODULES( [libhttpserver], [libhttpserver >= 0.17.0], [], [true] )
-PKG_CHECK_VAR(libhttpserver_LIBDIR, libhttpserver, libdir)
+PKG_CHECK_VAR([libhttpserver_LIBDIR], [libhttpserver], [libdir])
 echo "libhttpserver_LIBDIR '$libhttpserver_LIBDIR'"
 PKG_CONFIG=${old_PKG_CONFIG}
 
