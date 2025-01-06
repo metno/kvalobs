@@ -1,7 +1,7 @@
 /*
- Kvalobs - Free Quality Control Software for Meteorological Observations 
+ Kvalobs - Free Quality Control Software for Meteorological Observations
 
- $Id: Logger.cc,v 1.6.6.4 2007/09/27 09:02:32 paule Exp $                                                       
+ $Id: Logger.cc,v 1.6.6.4 2007/09/27 09:02:32 paule Exp $
 
  Copyright (C) 2007 met.no
 
@@ -15,24 +15,24 @@
  This file is part of KVALOBS
 
  KVALOBS is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License as 
- published by the Free Software Foundation; either version 2 
+ modify it under the terms of the GNU General Public License as
+ published by the Free Software Foundation; either version 2
  of the License, or (at your option) any later version.
- 
+
  KVALOBS is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  General Public License for more details.
- 
- You should have received a copy of the GNU General Public License along 
- with KVALOBS; if not, write to the Free Software Foundation Inc., 
+
+ You should have received a copy of the GNU General Public License along
+ with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#include <milog/Logger.h>
-#include <milog/private/LoggerImpl.h>
 #include <milog/LogStream.h>
+#include <milog/Logger.h>
 #include <milog/StdErrStream.h>
 #include <milog/TraceLayout.h>
+#include <milog/private/LoggerImpl.h>
 
 #include <iostream>
 
@@ -42,18 +42,11 @@ milog::Logger milog::Logger::dummyLogger(0);
 
 milog::Logger::Logger(milog::priv::LoggerImpl *logger, LogLevel ll,
                       bool enabled)
-    : logger_(logger),
-      thrLocaleLoggers_(0),
-      level_(ll),
-      enabled_(enabled),
-      ownerOfLogger(false) {
-
-}
+    : logger_(logger), thrLocaleLoggers_(0), level_(ll), enabled_(enabled),
+      ownerOfLogger(false) {}
 
 milog::Logger::Logger()
-    : thrLocaleLoggers_(0),
-      ownerOfLogger(true),
-      level_(NOTSET),
+    : thrLocaleLoggers_(0), ownerOfLogger(true), level_(NOTSET),
       enabled_(true) {
   StdErrStream *strm = 0;
   TraceLayout *layout = 0;
@@ -61,9 +54,9 @@ milog::Logger::Logger()
   try {
     layout = new TraceLayout();
     strm = new StdErrStream(layout);
-    layout = 0;  //StdStream is responsible for the layout now.
+    layout = 0; // StdStream is responsible for the layout now.
     logger_ = new milog::priv::LoggerImpl(strm);
-    strm = 0;  //LoggerImpl is responsible for the strm now.
+    strm = 0; // LoggerImpl is responsible for the strm now.
   } catch (...) {
     delete layout;
     delete strm;
@@ -73,10 +66,7 @@ milog::Logger::Logger()
 }
 
 milog::Logger::Logger(LogStream *logStream)
-    : logger_(0),
-      thrLocaleLoggers_(0),
-      level_(NOTSET),
-      enabled_(true),
+    : logger_(0), thrLocaleLoggers_(0), level_(NOTSET), enabled_(true),
       ownerOfLogger(true) {
   try {
     logger_ = new milog::priv::LoggerImpl(logStream);
@@ -121,7 +111,6 @@ void milog::Logger::removeLogger(const std::string &id) {
     return;
 
   tlm->removeLogger(id);
-
 }
 
 void milog::Logger::pushLogStream(LogStream *strm) {
@@ -144,7 +133,6 @@ void milog::Logger::pushLogStream(LogStream *strm) {
   } else {
     log->thrLocaleLoggers_->addLogStream(strm);
   }
-
 }
 
 void milog::Logger::popLogStream() {
@@ -168,13 +156,11 @@ void milog::Logger::popLogStream() {
   }
 }
 
-milog::Logger&
-milog::Logger::logger() {
+milog::Logger &milog::Logger::logger() {
   return logger("__milog_default_logger__");
 }
 
-milog::Logger&
-milog::Logger::logger(const std::string &id) {
+milog::Logger &milog::Logger::logger(const std::string &id) {
   priv::ThreadLogManager *tlm = priv::ThreadLogManager::instance();
   Logger *log;
 
@@ -203,7 +189,7 @@ void milog::Logger::log(LogLevel ll, const std::string &msg) {
 
   priv::ThreadLogManager *tlm = priv::ThreadLogManager::instance();
 
-  if (ll <= level_) {
+  if (ll <= level_ || ll == INFO) {
     if (tlm) {
       logger_->log(msg, ll, *tlm->getContextStr());
 
@@ -244,4 +230,3 @@ std::string milog::Logger::getContextString() {
 
   return std::string(*tlm->getContextStr());
 }
-
