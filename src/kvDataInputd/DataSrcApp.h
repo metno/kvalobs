@@ -29,29 +29,28 @@
 #ifndef SRC_KVDATAINPUTD_DATASRCAPP_H_
 #define SRC_KVDATAINPUTD_DATASRCAPP_H_
 
-#include <exception>
-#include <limits>
-#include <string>
-#include <list>
+#include "boost/date_time/posix_time/ptime.hpp"
 #include "boost/regex.hpp"
 #include "boost/thread/thread.hpp"
-#include "boost/date_time/posix_time/ptime.hpp"
-#include "lib/kvalobs/kvbaseapp.h"
-#include "lib/kvalobs/paramlist.h"
-#include "lib/kvalobs/kvTypes.h"
-#include "lib/decoder/decoderbase/decodermgr.h"
-#include "lib/decoder/decoderbase/decoder.h"
-#include "lib/kvdb/dbdrivermgr.h"
-#include "lib/json/json/json.h"
-#include "lib/miconfparser/miconfparser.h"
-#include "lib/kvsubscribe/SendData.h"
-#include "lib/kvsubscribe/queue.h"
-#include "lib/kvsubscribe/ProducerCommand.h"
-#include "lib/kvsubscribe/KafkaProducerThread.h"
 #include "kvDataInputd/ConnectionCache.h"
 #include "kvDataInputd/DecodeCommand.h"
 #include "kvDataInputd/DecoderExecutor.h"
-
+#include "lib/decoder/decoderbase/decoder.h"
+#include "lib/decoder/decoderbase/decodermgr.h"
+#include "lib/json/json/json.h"
+#include "lib/kvalobs/kvTypes.h"
+#include "lib/kvalobs/kvbaseapp.h"
+#include "lib/kvalobs/paramlist.h"
+#include "lib/kvdb/dbdrivermgr.h"
+#include "lib/kvsubscribe/KafkaProducerThread.h"
+#include "lib/kvsubscribe/ProducerCommand.h"
+#include "lib/kvsubscribe/SendData.h"
+#include "lib/kvsubscribe/queue.h"
+#include "lib/miconfparser/miconfparser.h"
+#include <exception>
+#include <limits>
+#include <list>
+#include <string>
 
 /**
  * \defgroup kvDatainputd kvDatainputd
@@ -67,28 +66,21 @@ struct HttpConfig {
   int logSize;
 
   HttpConfig()
-      : port(8090),
-        threads(5),
-        loglevel(milog::ERROR),
-        logRotate(0),
-        logSize(0) {
-  }
+      : port(8090), threads(5), loglevel(milog::ERROR), logRotate(0),
+        logSize(0) {}
 };
 
 struct KafkaConfig {
   std::string brokers;
   std::string domain;
+  bool enable;
 
-  KafkaConfig()
-      : brokers("localhost") {
-  }
+  KafkaConfig() : brokers("localhost"), enable(true) {}
 
-  std::string getRawTopic() {
-    return kvalobs::subscribe::queue::raw(domain);
-  }
+  std::string getRawTopic() { return kvalobs::subscribe::queue::raw(domain); }
 
   std::string getPublishTopic() {
-      return kvalobs::subscribe::queue::checked(domain);
+    return kvalobs::subscribe::queue::checked(domain);
   }
 };
 
@@ -161,19 +153,19 @@ class DataSrcApp : public KvBaseApp {
    */
   bool registerAllDecoders(miutil::conf::ConfSection *theConf);
 
-  DecodeCommand* decodeExecute(DecodeCommand *decCmd, kvalobs::datasource::Result *res, const std::string &logid);
-  //DecodeCommand* decode(const char *obsType, const char *data, const std::string &logid, kvalobs::datasource::Result *res);
-  DecodeCommand* getDecoder(const char *obsType, const char *data, const std::string &logid, kvalobs::datasource::Result *res);
+  DecodeCommand *decodeExecute(DecodeCommand *decCmd,
+                               kvalobs::datasource::Result *res,
+                               const std::string &logid);
+  // DecodeCommand* decode(const char *obsType, const char *data, const
+  // std::string &logid, kvalobs::datasource::Result *res);
+  DecodeCommand *getDecoder(const char *obsType, const char *data,
+                            const std::string &logid,
+                            kvalobs::datasource::Result *res);
 
   boost::mutex mutex;
 
- public:
-  typedef enum {
-    TimeOut,
-    NoDecoder,
-    NoDbConnection,
-    NoMem
-  } ErrCode;
+public:
+  typedef enum { TimeOut, NoDecoder, NoDbConnection, NoMem } ErrCode;
 
   /**
    * \brief Constructor that initialize a DataSrcApp instance.
@@ -192,7 +184,8 @@ class DataSrcApp : public KvBaseApp {
    *        shall we try to create.
    * \param opt Optional options to omniorb.
    */
-  DataSrcApp(int argn, char **argv, int numberOfConnections, miutil::conf::ConfSection *theKvConf);
+  DataSrcApp(int argn, char **argv, int numberOfConnections,
+             miutil::conf::ConfSection *theKvConf);
 
   /**
    * \brief Detructor, deletes all connection to the database.
@@ -213,28 +206,31 @@ class DataSrcApp : public KvBaseApp {
    * error message is given in errMsg.
    */
 
-  DecodeCommand *create(const char *obsType, const char *obs, long timoutIn_msec, ErrCode &errCode, std::string &errMsg);
+  DecodeCommand *create(const char *obsType, const char *obs,
+                        long timoutIn_msec, ErrCode &errCode,
+                        std::string &errMsg);
 
   void releaseDecodeCommand(DecodeCommand *command);
 
-  bool publishData(const std::list<kvalobs::serialize::KvalobsData> &publishData);
+  bool
+  publishData(const std::list<kvalobs::serialize::KvalobsData> &publishData);
 
-  HttpConfig getHttpConfig() const {
-    return httpConfig;
-  }
+  HttpConfig getHttpConfig() const { return httpConfig; }
 
   static std::string getMessageId(std::string &obstype);
   static std::string getProducer(std::string &obstype);
 
-  kvalobs::datasource::Result newObservation(const char *obsType, const char *data, unsigned long long serialNumber, std::string *producer, const std::string &logid);
+  kvalobs::datasource::Result newObservation(const char *obsType,
+                                             const char *data,
+                                             unsigned long long serialNumber,
+                                             std::string *producer,
+                                             const std::string &logid);
 
   /**
    * \brief getDbConnections returns the number of connections we have to the
    * database.
    */
-  int getDbConnections() const {
-    return nConnections;
-  }
+  int getDbConnections() const { return nConnections; }
 
   /**
    * \brief returns true if this instance of DataSrcApp is valid constructed!
@@ -253,9 +249,10 @@ class DataSrcApp : public KvBaseApp {
   }
 
   kvalobs::service::ProducerQuePtr getPublishQueue() {
-      return kafkaPubStream.queue;
+    return kafkaPubStream.queue;
   }
 
+  bool kafkaEnabled() const { return kafkaConfig.enable; }
 
   /**
    * \brief Request shutdown. Ie. we want to terminate.
@@ -272,4 +269,4 @@ class DataSrcApp : public KvBaseApp {
 
 /** @} */
 
-#endif  // SRC_KVDATAINPUTD_DATASRCAPP_H_
+#endif // SRC_KVDATAINPUTD_DATASRCAPP_H_

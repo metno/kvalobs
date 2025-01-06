@@ -38,6 +38,7 @@
 namespace qabase {
 
 kvalobs::subscribe::KafkaConfig QaBaseApp::kafkaConf_;
+bool QaBaseApp::kafkaEnabled_;
 
 namespace {
 std::string val(const std::string & name, miutil::conf::ConfSection * conf, const std::string & defaultValue) {
@@ -64,6 +65,19 @@ int valAsInt(const std::string & name, miutil::conf::ConfSection * conf, int  de
     return defaultValue;
 }
 
+bool valAsBool(const std::string & name, miutil::conf::ConfSection * conf, bool  defaultValue) {
+  if (conf) {
+    miutil::conf::ValElementList ret = conf->getValue(name);
+    if (ret.empty())
+      return defaultValue;
+    if (ret.size() > 1)
+      throw std::runtime_error("Several " + name + " elements in config!");
+    return ret.valAsBool(defaultValue);
+  } else
+    return defaultValue;
+}
+
+
 }
 
 QaBaseApp::QaBaseApp(int argc, char ** argv)
@@ -74,12 +88,17 @@ QaBaseApp::QaBaseApp(int argc, char ** argv)
   kafkaConf_.topic = kvalobs::subscribe::queue::checked(val("domain", kafka, "test"));
   kafkaConf_.requestRequiredAcks = valAsInt("request_required_acks", kafka, -1);
   kafkaConf_.requestTimeoutMs = valAsInt("request_timeout_ms", kafka, 5000);
+  kafkaEnabled_ = valAsBool("enabled", kafka, true);
   std::cerr << "Kafka Configuration:\n" <<kafkaConf_ << "\n\n";
   LOGINFO("Kafka Configuration:\n" <<kafkaConf_ << "\n");
 }
 
 QaBaseApp::~QaBaseApp() {
 }
+
+bool QaBaseApp::kafkaEnabledInConfig() {
+  return kafkaEnabled_;
+};
 
 std::shared_ptr<kvalobs::subscribe::KafkaProducer> QaBaseApp::kafkaProducer() {
 

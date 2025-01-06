@@ -232,6 +232,7 @@ int main(int argc, char ** argv) {
     LOGINFO("Log xml sendt to kafka: " << (config.logXml()?"true":"false"));
     LOGINFO("Kafka send errors before terminating: " << config.maxKafkaSendErrors());
     LOGINFO("ID: " << db::DatabaseAccess::qaId);
+    LOGINFO("Kafka enabled: " << (config.kafkaEnabled()?"true":"false"));
     LOGDEBUG("Using model data name " << config.modelDataName());
 
 
@@ -250,7 +251,7 @@ int main(int argc, char ** argv) {
         checkRunner->setQcxFilter(config.qcxFilter().begin(), config.qcxFilter().end());
       }
 
-      qabase::DataProcessor processor(checkRunner);
+      qabase::DataProcessor processor(checkRunner, config.kafkaEnabled());
       processor.process(*config.observationToCheck());
     } else {
       if (processStatus.isLeader()){
@@ -264,7 +265,7 @@ int main(int argc, char ** argv) {
       LOGDEBUG("Connecting to database: " << dbConnect);
       auto db = std::make_shared<db::KvalobsDatabaseAccess>(dbConnect);
       auto checkRunner = std::make_shared<qabase::CheckRunner>(db);
-      qabase::NewDataListener listener(db, config.selectForControlCount());
+      qabase::NewDataListener listener(db, config.selectForControlCount(), config.kafkaEnabled());
       listener.run();
     }
   } catch (std::exception & e) {

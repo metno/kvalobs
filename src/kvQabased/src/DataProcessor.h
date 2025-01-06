@@ -58,7 +58,7 @@ class DataProcessor {
   static bool logTransactions;
   static unsigned maxKafkaSendErrors;
 
-  explicit DataProcessor(std::shared_ptr<qabase::CheckRunner> checkRunner);
+  explicit DataProcessor(std::shared_ptr<qabase::CheckRunner> checkRunner, bool kafkaEnabled = true);
 
   ~DataProcessor();
 
@@ -100,6 +100,7 @@ class DataProcessor {
   std::shared_ptr<qabase::CheckRunner> checkRunner_;
   qabase::LogFileCreator logCreator_;
   std::shared_ptr<kvalobs::subscribe::KafkaProducer> output_;
+  bool kafkaEnabled_;
 };
 
 // template<typename StationInfoIterator>

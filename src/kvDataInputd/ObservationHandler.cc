@@ -154,8 +154,9 @@ ObservationHandler::Observation ObservationHandler::getObservation(const httpser
 }
 
 void ObservationHandler::postOnRawQue(const std::string &rawData) {
-  if (rawData.empty())
+  if (rawData.empty() || !app.kafkaEnabled()) {
     return;
+  }
 
   std::unique_ptr<RawDataCommand> data(new RawDataCommand(rawData));
 

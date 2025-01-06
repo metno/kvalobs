@@ -57,10 +57,10 @@ std::chrono::milliseconds getTimeToSleepInMillis(unsigned int minMillis=200, uns
 }
 }
 
-NewDataListener::NewDataListener(std::shared_ptr<db::DatabaseAccess> db, int selectForControlCount)
+NewDataListener::NewDataListener(std::shared_ptr<db::DatabaseAccess> db, int selectForControlCount, bool kafkaEnabled)
     : stopping_(true),
       db_(db),
-      processor_(CheckRunner::create(QaBaseApp::createConnectString())),
+      processor_(CheckRunner::create(QaBaseApp::createConnectString()), kafkaEnabled),
       selectForControlCount_(selectForControlCount) {
   listeners.insert(this);
 }

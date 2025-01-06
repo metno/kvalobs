@@ -48,7 +48,7 @@ namespace qabase {
 
 class NewDataListener : boost::noncopyable {
  public:
-  explicit NewDataListener(std::shared_ptr<db::DatabaseAccess> db, int selectForControlCount=5);
+  explicit NewDataListener(std::shared_ptr<db::DatabaseAccess> db, int selectForControlCount=5, bool kafkaEnabled=true);
   ~NewDataListener();
 
   void run();
@@ -68,7 +68,7 @@ class NewDataListener : boost::noncopyable {
   DataProcessor processor_;
   int selectForControlCount_;
   mutable std::list<Observation*> selectedForControl;
-  
+    
   Observation* fetchDataToProcess_() const;
   ObservationPtr fetchDataToProcess() const;
   qabase::CheckRunner::KvalobsDataPtr runChecks(const qabase::Observation & obs);

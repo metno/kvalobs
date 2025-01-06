@@ -26,79 +26,80 @@
  with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#include <signal.h>
-#include <regex>
-#include <memory>
-#include <chrono>
-#include "boost/lexical_cast.hpp"
+#include "kvDataInputd/DataSrcApp.h"
 #include "boost/algorithm/string.hpp"
-#include "lib/milog/milog.h"
-#include "lib/miutil/timeconvert.h"
+#include "boost/lexical_cast.hpp"
+#include "kvDataInputd/PublishDataCommand.h"
 #include "lib/kvalobs/bitmanip.h"
+#include "lib/kvalobs/getLogInfo.h"
 #include "lib/kvalobs/kvDbGate.h"
 #include "lib/kvalobs/kvPath.h"
-#include "lib/kvalobs/getLogInfo.h"
 #include "lib/kvsubscribe/queue.h"
-#include "kvDataInputd/DataSrcApp.h"
-#include "kvDataInputd/PublishDataCommand.h"
+#include "lib/milog/milog.h"
+#include "lib/miutil/timeconvert.h"
+#include <chrono>
+#include <memory>
+#include <regex>
+#include <signal.h>
 
-using std::list;
-using std::string;
-using std::endl;
-using std::ostringstream;
-using std::cerr;
-using dnmi::db::Result;
-using dnmi::db::DRow;
+using boost::bad_lexical_cast;
+using boost::lexical_cast;
 using dnmi::db::Connection;
+using dnmi::db::DRow;
+using dnmi::db::Result;
 using dnmi::db::SQLException;
 using kvalobs::decoder::DecoderBase;
-using boost::lexical_cast;
-using boost::bad_lexical_cast;
+using std::cerr;
+using std::endl;
+using std::list;
+using std::ostringstream;
+using std::string;
 
 volatile sig_atomic_t sigTerm = 0;
 
-boost::regex DataSrcApp::reMessageid(".+(/ *messageid *=([^/]*)).*", boost::regex::perl | boost::regex::icase);
-boost::regex DataSrcApp::reProducer(".+(/ *producer *=([^/]*)).*", boost::regex::perl | boost::regex::icase);
+boost::regex DataSrcApp::reMessageid(".+(/ *messageid *=([^/]*)).*",
+                                     boost::regex::perl | boost::regex::icase);
+boost::regex DataSrcApp::reProducer(".+(/ *producer *=([^/]*)).*",
+                                    boost::regex::perl | boost::regex::icase);
 
-
-// assign_qaid {   
+// assign_qaid {
 //     types=(503,510)
 //     max_qaid=10
 //   }
 
-
-std::shared_ptr<kvalobs::decoder::QaIdInfo> getQaIdInfo(miutil::conf::ConfSection *conf) {
+std::shared_ptr<kvalobs::decoder::QaIdInfo>
+getQaIdInfo(miutil::conf::ConfSection *conf) {
   auto definedTypes = conf->getValue("kvDataInputd.assign_qaid.types");
-  auto maxQaId=conf->getValue("kvDataInputd.assign_qaid.max_qaid").valAsInt(-1);
-  std::list<int> types; 
+  auto maxQaId =
+      conf->getValue("kvDataInputd.assign_qaid.max_qaid").valAsInt(-1);
+  std::list<int> types;
   miutil::conf::ValElementList::const_iterator it;
-  for( it=definedTypes.begin(); it != definedTypes.end(); it++ ) {
-    if( it->type()== miutil::conf::INT ){
-      int t=static_cast<int>(it->valAsInt());
-      if( t == 0 ) {
+  for (it = definedTypes.begin(); it != definedTypes.end(); it++) {
+    if (it->type() == miutil::conf::INT) {
+      int t = static_cast<int>(it->valAsInt());
+      if (t == 0) {
         types.clear();
         types.push_back(0);
         break;
       }
       types.push_back(t);
-    } else if( it->type()== miutil::conf::STRING && it->valAsString() == "*" ){
+    } else if (it->type() == miutil::conf::STRING && it->valAsString() == "*") {
       types.clear();
       types.push_back(0);
       break;
-    } 
+    }
   }
 
-  if( types.empty() || maxQaId<0){
+  if (types.empty() || maxQaId < 0) {
     return std::make_shared<kvalobs::decoder::QaIdInfo>();
   }
 
   return std::make_shared<kvalobs::decoder::QaIdInfo>(maxQaId, types);
 }
 
-DataSrcApp::DataSrcApp(int argn, char **argv, int nConnections_, miutil::conf::ConfSection *theKvConf)
-    : KvBaseApp(argn, argv),
-      ok(false),
-      shutdown_(false) {
+DataSrcApp::DataSrcApp(int argn, char **argv, int nConnections_,
+                       miutil::conf::ConfSection *theKvConf)
+    : KvBaseApp(argn, argv), ok(false), shutdown_(false) {
   miutil::conf::ConfSection *conf;
   string logdir(kvPath("logdir"));
   string myPath = kvPath("pkglibdir");
@@ -112,21 +113,30 @@ DataSrcApp::DataSrcApp(int argn, char **argv, int nConnections_, miutil::conf::C
     exit(1);
   }
   filters = kvalobs::decoder::StationFilters::readConfig(*conf);
-  qaIdInfo=getQaIdInfo(theKvConf);
-  LOGINFO("QaIdInfo: "  << *qaIdInfo);
-  httpConfig.port = conf->getValue("kvDataInputd.http.port").valAsInt(httpConfig.port);
-  httpConfig.threads = conf->getValue("kvDataInputd.http.threads").valAsInt(httpConfig.threads);
-  httpConfig.loglevel = getLoglevelRecursivt(conf, "kvDataInputd.http", httpConfig.loglevel);
-  kafkaConfig.brokers = conf->getValue("kafka.brokers").valAsString("localhost");
+  qaIdInfo = getQaIdInfo(theKvConf);
+  LOGINFO("QaIdInfo: " << *qaIdInfo);
+  httpConfig.port =
+      conf->getValue("kvDataInputd.http.port").valAsInt(httpConfig.port);
+  httpConfig.threads =
+      conf->getValue("kvDataInputd.http.threads").valAsInt(httpConfig.threads);
+  httpConfig.loglevel =
+      getLoglevelRecursivt(conf, "kvDataInputd.http", httpConfig.loglevel);
+  kafkaConfig.brokers =
+      conf->getValue("kafka.brokers").valAsString("localhost");
   kafkaConfig.domain = conf->getValue("kafka.domain").valAsString("");
-  std::string defautlParamFile=kvalobs::kvPath(kvalobs::sysconfdir)+"/stinfosys_params.csv";
-  paramFile = conf->getValue("kvDataInputd.paramfile").valAsString(defautlParamFile);
+  kafkaConfig.enable = conf->getValue("kafka.enable").valAsBool(true);
+  std::string defautlParamFile =
+      kvalobs::kvPath(kvalobs::sysconfdir) + "/stinfosys_params.csv";
+  paramFile =
+      conf->getValue("kvDataInputd.paramfile").valAsString(defautlParamFile);
   if (kafkaConfig.domain.empty()) {
-    LOGFATAL("This kvalobs instance must have a name. kafka.domain must be set in the configuration file.");
+    LOGFATAL("This kvalobs instance must have a name. kafka.domain must be set "
+             "in the configuration file.");
     exit(1);
   }
 
-  getLogfileInfo(conf, "kvDataInputd.http", httpConfig.logRotate, httpConfig.logSize);
+  getLogfileInfo(conf, "kvDataInputd.http", httpConfig.logRotate,
+                 httpConfig.logSize);
 
   miutil::conf::ValElementList val;
   val = conf->getValue("database.dbdriver");
@@ -153,7 +163,8 @@ DataSrcApp::DataSrcApp(int argn, char **argv, int nConnections_, miutil::conf::C
   if (!registerAllDecoders(theKvConf))
     return;
 
-  milog::createGlobalLogger(logdir, "kvDataInputd", "param_update", milog::DEBUG);
+  milog::createGlobalLogger(logdir, "kvDataInputd", "param_update",
+                            milog::DEBUG);
 
   if (!registerParams())
     return;
@@ -161,68 +172,111 @@ DataSrcApp::DataSrcApp(int argn, char **argv, int nConnections_, miutil::conf::C
   if (!registerTypes())
     return;
 
-  milog::createGlobalLogger(logdir, "kvDataInputd", "http", httpConfig.loglevel, httpConfig.logSize, httpConfig.logRotate);
-  milog::createGlobalLogger(logdir, "kvDataInputd", "http_error", milog::ERROR, httpConfig.logSize, httpConfig.logRotate);
-  milog::createGlobalLogger(logdir, "kvDataInputd", "http_access", milog::INFO, httpConfig.logSize, httpConfig.logRotate, new milog::StdLayout1());
-  milog::createGlobalLogger(logdir, "kvDataInputd", "kafka_raw", milog::DEBUG, httpConfig.logSize, httpConfig.logRotate, new milog::StdLayout1());
-  milog::createGlobalLogger(logdir, "kvDataInputd", "kafka_pub", milog::DEBUG, httpConfig.logSize, httpConfig.logRotate, new milog::StdLayout1());
-  milog::createGlobalLogger(logdir, "kvDataInputd_transaction", "failed", milog::DEBUG);
-  milog::createGlobalLogger(logdir, "kvDataInputd_transaction", "duplicates", milog::DEBUG);
-  milog::createGlobalLogger(logdir, "kvDataInputd_transaction", "updated", milog::DEBUG);
-  milog::createGlobalLogger(logdir, "kvDataInputd_transaction", "retry", milog::DEBUG);
-  milog::createGlobalLogger(logdir, "kvDataInputd", "transaction", milog::DEBUG, 200, 1, new milog::StdLayout1());
-  milog::createGlobalLogger(logdir, "kvDataInputd", "thread_pool", milog::DEBUG, 200, 1, new milog::StdLayout1());
-  milog::createGlobalLogger(logdir, "kvDataInputd", "kv2kvdecoder", milog::DEBUG, 1073741824, 1);
+  milog::createGlobalLogger(logdir, "kvDataInputd", "http", httpConfig.loglevel,
+                            httpConfig.logSize, httpConfig.logRotate);
+  milog::createGlobalLogger(logdir, "kvDataInputd", "http_error", milog::ERROR,
+                            httpConfig.logSize, httpConfig.logRotate);
+  milog::createGlobalLogger(logdir, "kvDataInputd", "http_access", milog::INFO,
+                            httpConfig.logSize, httpConfig.logRotate,
+                            new milog::StdLayout1());
+  milog::createGlobalLogger(logdir, "kvDataInputd", "kafka_raw", milog::DEBUG,
+                            httpConfig.logSize, httpConfig.logRotate,
+                            new milog::StdLayout1());
+  milog::createGlobalLogger(logdir, "kvDataInputd", "kafka_pub", milog::DEBUG,
+                            httpConfig.logSize, httpConfig.logRotate,
+                            new milog::StdLayout1());
+  milog::createGlobalLogger(logdir, "kvDataInputd_transaction", "failed",
+                            milog::DEBUG);
+  milog::createGlobalLogger(logdir, "kvDataInputd_transaction", "duplicates",
+                            milog::DEBUG);
+  milog::createGlobalLogger(logdir, "kvDataInputd_transaction", "updated",
+                            milog::DEBUG);
+  milog::createGlobalLogger(logdir, "kvDataInputd_transaction", "retry",
+                            milog::DEBUG);
+  milog::createGlobalLogger(logdir, "kvDataInputd", "transaction", milog::DEBUG,
+                            200, 1, new milog::StdLayout1());
+  milog::createGlobalLogger(logdir, "kvDataInputd", "thread_pool", milog::DEBUG,
+                            200, 1, new milog::StdLayout1());
+  milog::createGlobalLogger(logdir, "kvDataInputd", "kv2kvdecoder",
+                            milog::DEBUG, 1073741824, 1);
 
   try {
-    LOGERROR("Starting kafka producer for topic <" << kafkaConfig.getRawTopic() << ">. Brokers <" << kafkaConfig.brokers << ">.");
-    std::string name = kafkaRawStream.getName() + "-" + kafkaConfig.getRawTopic();
-    kafkaRawStream.setName(name);
-    kafkaRawStream.start(kafkaConfig.brokers, kafkaConfig.getRawTopic());
+    if (kafkaConfig.enable) {
+      LOGINFO("Starting kafka producer for topic <"
+              << kafkaConfig.getRawTopic() << ">. Brokers <"
+              << kafkaConfig.brokers << ">.");
+      std::string name =
+          kafkaRawStream.getName() + "-" + kafkaConfig.getRawTopic();
+      kafkaRawStream.setName(name);
+      kafkaRawStream.start(kafkaConfig.brokers, kafkaConfig.getRawTopic());
+    } else {
+      LOGINFO("kafka disabled.");
+    }
   } catch (const std::exception &ex) {
-    LOGERROR(
-        "Failed to start the kafka stream for topic <" << kafkaConfig.getRawTopic() << ">.\n" "Brokers: <" << kafkaConfig.brokers << ">\n" "REason: " << ex.what());
+    LOGERROR("Failed to start the kafka stream for topic <"
+             << kafkaConfig.getRawTopic()
+             << ">.\n"
+                "Brokers: <"
+             << kafkaConfig.brokers
+             << ">\n"
+                "REason: "
+             << ex.what());
     return;
   }
 
   try {
-      LOGERROR("Starting kafka producer for topic <" << kafkaConfig.getPublishTopic() << ">. Brokers <" << kafkaConfig.brokers << ">.");
-      std::string name = kafkaRawStream.getName() + "-" + kafkaConfig.getPublishTopic();
+    if (kafkaConfig.enable) {
+      LOGINFO("Starting kafka producer for topic <"
+              << kafkaConfig.getPublishTopic() << ">. Brokers <"
+              << kafkaConfig.brokers << ">.");
+      std::string name =
+          kafkaRawStream.getName() + "-" + kafkaConfig.getPublishTopic();
       kafkaPubStream.setName(name);
       kafkaPubStream.start(kafkaConfig.brokers, kafkaConfig.getPublishTopic());
-    } catch (const std::exception &ex) {
-      LOGERROR(
-          "Failed to start the kafka stream for topic <" << kafkaConfig.getPublishTopic() << ">.\n" "Brokers: <" << kafkaConfig.brokers << ">\n" "REason: " << ex.what());
-      return;
+    } else {
+      LOGINFO("kafka disabled.");
     }
+  } catch (const std::exception &ex) {
+    LOGERROR("Failed to start the kafka stream for topic <"
+             << kafkaConfig.getPublishTopic()
+             << ">.\n"
+                "Brokers: <"
+             << kafkaConfig.brokers
+             << ">\n"
+                "REason: "
+             << ex.what());
+    return;
+  }
   ok = true;
 }
 
 namespace {
-  string headStation(const kvalobs::serialize::KvalobsData &kd) {
-    std::set<kvalobs::kvStationInfo> summary=kd.summary();
-    if( summary.empty() || kd.empty())
-      return "<empty message>";
+string headStation(const kvalobs::serialize::KvalobsData &kd) {
+  std::set<kvalobs::kvStationInfo> summary = kd.summary();
+  if (summary.empty() || kd.empty())
+    return "<empty message>";
 
-    kvalobs::kvStationInfo info=*summary.begin();
-    std::ostringstream o;
-    o << "nObs: " << summary.size();
+  kvalobs::kvStationInfo info = *summary.begin();
+  std::ostringstream o;
+  o << "nObs: " << summary.size();
 
-    o << ", first: " << info.stationID() << ":" << info.typeID() << ":" << boost::posix_time::to_kvalobs_string(info.obstime());
-    return o.str();
-  }
+  o << ", first: " << info.stationID() << ":" << info.typeID() << ":"
+    << boost::posix_time::to_kvalobs_string(info.obstime());
+  return o.str();
 }
+} // namespace
 
-bool DataSrcApp::publishData(const std::list<kvalobs::serialize::KvalobsData> &publishData) {
-  //std::cerr << "publishData: size " << publishData.size() << "\n\n";
-  if( publishData.size() == 0 ) {
+bool DataSrcApp::publishData(
+    const std::list<kvalobs::serialize::KvalobsData> &publishData) {
+  // std::cerr << "publishData: size " << publishData.size() << "\n\n";
+  if (publishData.size() == 0 || !kafkaConfig.enable) {
     return true;
   }
 
   bool ret = true;
-  
-  for( auto &d : publishData ) {
-    const_cast<kvalobs::serialize::KvalobsData&>(d).producer("kvinput");
+
+  for (auto &d : publishData) {
+    const_cast<kvalobs::serialize::KvalobsData &>(d).producer("kvinput");
     std::unique_ptr<PublishDataCommand> data(new PublishDataCommand(d));
 
     try {
@@ -230,21 +284,23 @@ bool DataSrcApp::publishData(const std::list<kvalobs::serialize::KvalobsData> &p
       data.release();
     } catch (std::exception &ex) {
       ret = false;
-      LOGWARN("Unable to post data to the 'checked' kafka queue.\nReason: " << ex.what() <<"\n"<< headStation(d));
+      LOGWARN("Unable to post data to the 'checked' kafka queue.\nReason: "
+              << ex.what() << "\n"
+              << headStation(d));
     }
   }
   return ret;
 }
 
-DataSrcApp::~DataSrcApp() {
-}
+DataSrcApp::~DataSrcApp() {}
 
 int DataSrcApp::registerDb(int nConn) {
   string driver(kvPath("pkglibdir") + "/db/" + dbDriver);
   string drvId;
   int n = 0;
 
-  LOGINFO("registerDb: loading driver <" << dnmi::db::DriverManager::fixDriverName(driver) << ">!\n");
+  LOGINFO("registerDb: loading driver <"
+          << dnmi::db::DriverManager::fixDriverName(driver) << ">!\n");
 
   if (!dnmi::db::DriverManager::loadDriver(driver, drvId)) {
     LOGFATAL(dnmi::db::DriverManager::getErr());
@@ -254,7 +310,7 @@ int DataSrcApp::registerDb(int nConn) {
   if (setAppNameForDb && !appName.empty())
     dnmi::db::DriverManager::setAppName(appName);
 
-  LOGINFO("registerDb: Driver <" << drvId<< "> loaded!\n");
+  LOGINFO("registerDb: Driver <" << drvId << "> loaded!\n");
 
   for (int i = 0; i < nConn; i++) {
     Connection *con = 0;
@@ -263,7 +319,9 @@ int DataSrcApp::registerDb(int nConn) {
       con = dnmi::db::DriverManager::connect(drvId, connectStr);
 
       if (!con) {
-        LOGFATAL("registerDb: Can't create connection to <" << drvId << ">\n ERROR message: " << dnmi::db::DriverManager::getErr());
+        LOGFATAL("registerDb: Can't create connection to <"
+                 << drvId
+                 << ">\n ERROR message: " << dnmi::db::DriverManager::getErr());
         sleep(1);
       } else {
         conCache.addConnection(con);
@@ -298,7 +356,7 @@ bool DataSrcApp::registerParams() {
 
   if (!nextParamCheckTime.is_special() && now < nextParamCheckTime)
     return true;
- 
+
   con = conCache.findFreeConnection();
 
   if (!con) {
@@ -307,25 +365,42 @@ bool DataSrcApp::registerParams() {
   }
 
   if (!readParamsFromFile(paramFile, tmpParams)) {
-    string pfile = kvalobs::kvPath(kvalobs::sysconfdir) + "/stinfosys_params.csv.default";
+    string pfile =
+        kvalobs::kvPath(kvalobs::sysconfdir) + "/stinfosys_params.csv.default";
 
-    IDLOGERROR(
-        "param_update",
-        "Cant read parameter information from file <" << paramFile << ">." << endl << "Trying to load parameter information from default file <" << paramFile << endl << ">. This file may be incomplete. Use 'kv_get_stinfosys_params' to generate the file" << endl << "'" << paramFile << "'.");
+    IDLOGERROR("param_update",
+               "Cant read parameter information from file <"
+                   << paramFile << ">." << endl
+                   << "Trying to load parameter information from default file <"
+                   << paramFile << endl
+                   << ">. This file may be incomplete. Use "
+                      "'kv_get_stinfosys_params' to generate the file"
+                   << endl
+                   << "'" << paramFile << "'.");
 
-    LOGERROR(
-        "Cant read parameter information from file <" << paramFile << ">." << endl << "Trying to load parameter information from default file <" << paramFile << endl << ">. This file may be incomplete. Use 'kv_get_stinfosys_params' to generate the file" << endl << "'" << paramFile << "'.");
+    LOGERROR("Cant read parameter information from file <"
+             << paramFile << ">." << endl
+             << "Trying to load parameter information from default file <"
+             << paramFile << endl
+             << ">. This file may be incomplete. Use 'kv_get_stinfosys_params' "
+                "to generate the file"
+             << endl
+             << "'" << paramFile << "'.");
 
     if (!readParamsFromFile(pfile, tmpParams)) {
-      IDLOGERROR("param_update", "Cant read parameter information from file <" << paramFile << ">.");
-      LOGERROR("Cant read parameter information from file <" << paramFile << ">.");
+      IDLOGERROR("param_update", "Cant read parameter information from file <"
+                                     << paramFile << ">.");
+      LOGERROR("Cant read parameter information from file <" << paramFile
+                                                             << ">.");
     }
   }
 
   if (!tmpParams.empty()) {
-    IDLOGINFO("param_update", "Loaded #" << tmpParams.size() << " 'stinfosys' param definitions from file <" << paramFile << ">.");
+    IDLOGINFO("param_update",
+              "Loaded #" << tmpParams.size()
+                         << " 'stinfosys' param definitions from file <"
+                         << paramFile << ">.");
   }
-
 
   try {
     res = con->execQuery("SELECT paramid,name FROM param");
@@ -348,7 +423,8 @@ bool DataSrcApp::registerParams() {
           }
           newParams.insert(Param(row[1], id, scalar));
         } catch (bad_lexical_cast &) {
-          LOGERROR("registerParams: BADNUM: paramid is not a number\n" << "   paramid(" << row[0] << ")\n");
+          LOGERROR("registerParams: BADNUM: paramid is not a number\n"
+                   << "   paramid(" << row[0] << ")\n");
         }
       }
 
@@ -370,7 +446,8 @@ bool DataSrcApp::registerParams() {
 
   if (!isParamListsEqual(paramList, newParams)) {
     if (!paramList.empty()) {
-      IDLOGINFO("param_update", "New, deleted or changed parameter definition in kvalobs.");
+      IDLOGINFO("param_update",
+                "New, deleted or changed parameter definition in kvalobs.");
     } else {
       IDLOGDEBUG("param_update", "Parameter definitions is initialized.");
     }
@@ -378,7 +455,8 @@ bool DataSrcApp::registerParams() {
   }
 
   nextParamCheckTime = now + boost::posix_time::hours(1);
-  IDLOGDEBUG("param_update", "nextParamCheckTime: " << nextParamCheckTime << ".");
+  IDLOGDEBUG("param_update",
+             "nextParamCheckTime: " << nextParamCheckTime << ".");
 
   return true;
 }
@@ -404,8 +482,9 @@ bool DataSrcApp::registerTypes() {
   return true;
 }
 
-DecodeCommand*
-DataSrcApp::create(const char *obsType_, const char *obs, long timoutIn_msec, ErrCode &errCode, std::string &err) {
+DecodeCommand *DataSrcApp::create(const char *obsType_, const char *obs,
+                                  long timoutIn_msec, ErrCode &errCode,
+                                  std::string &err) {
   DecoderBase *dec;
   DecodeCommand *decCmd;
   Connection *con;
@@ -428,7 +507,8 @@ DataSrcApp::create(const char *obsType_, const char *obs, long timoutIn_msec, Er
     // Check for updated params.
     registerParams();
 
-    dec = decoderMgr.findDecoder(*con, paramList, typeList, obsType_, obs, myErr);
+    dec =
+        decoderMgr.findDecoder(*con, paramList, typeList, obsType_, obs, myErr);
   }
 
   if (!dec) {
@@ -507,10 +587,9 @@ std::string DataSrcApp::getProducer(std::string &obstype) {
   return boost::trim_copy(producer);
 }
 
-
-#if 0
-DecodeCommand*
-DataSrcApp::decode(const char *obsType, const char *data, const std::string &logid, kvalobs::datasource::Result *res) {
+DecodeCommand *DataSrcApp::getDecoder(const char *obsType, const char *data,
+                                      const std::string &logid,
+                                      kvalobs::datasource::Result *res) {
   namespace kd = kvalobs::datasource;
   DecodeCommand *decCmd;
   DataSrcApp::ErrCode errCode;
@@ -519,47 +598,12 @@ DataSrcApp::decode(const char *obsType, const char *data, const std::string &log
   try {
     decCmd = this->create(obsType, data, 60000, errCode, errMsg);
   } catch (const std::exception &ex) {
-    IDLOGERROR(logid, "Exception: " << ex.what() << " <" << obsType << ">.\nData <"<< data << ">.");
+    IDLOGERROR(logid, "Exception: " << ex.what() << " <" << obsType
+                                    << ">.\nData <" << data << ">.");
     decCmd = 0;
   } catch (...) {
-    IDLOGERROR(logid, "Exception:  <" << obsType << ">.\nData <"<< data << ">.");
-    decCmd = 0;
-  }
-
-  if (!decCmd) {
-    if (errCode == DataSrcApp::NoDbConnection) {
-      res->res = kd::EResult::NOTSAVED;
-      res->message = errMsg;
-    } else if (errCode == DataSrcApp::NoMem) {
-      res->res = kd::EResult::ERROR;
-      res->message = "Internal server error.";
-    } else if (errCode == DataSrcApp::NoDecoder) {
-      res->res = kd::EResult::NODECODER;
-      res->message = errMsg;
-    } else {
-      res->res = kd::EResult::ERROR;
-      res->message = errMsg;
-    }
-    return nullptr;
-  }
-
-  return decodeExecute(decCmd, res, logid);
-}
-#endif
-
-DecodeCommand* DataSrcApp::getDecoder(const char *obsType, const char *data, const std::string &logid, kvalobs::datasource::Result *res) {
-  namespace kd = kvalobs::datasource;
-  DecodeCommand *decCmd;
-  DataSrcApp::ErrCode errCode;
-  string errMsg;
-
-  try {
-    decCmd = this->create(obsType, data, 60000, errCode, errMsg);
-  } catch (const std::exception &ex) {
-    IDLOGERROR(logid, "Exception: " << ex.what() << " <" << obsType << ">.\nData <"<< data << ">.");
-    decCmd = 0;
-  } catch (...) {
-    IDLOGERROR(logid, "Exception:  <" << obsType << ">.\nData <"<< data << ">.");
+    IDLOGERROR(logid,
+               "Exception:  <" << obsType << ">.\nData <" << data << ">.");
     decCmd = 0;
   }
 
@@ -582,7 +626,9 @@ DecodeCommand* DataSrcApp::getDecoder(const char *obsType, const char *data, con
   return decCmd;
 }
 
-DecodeCommand* DataSrcApp::decodeExecute(DecodeCommand *decCmd, kvalobs::datasource::Result *res, const std::string &logid) {
+DecodeCommand *DataSrcApp::decodeExecute(DecodeCommand *decCmd,
+                                         kvalobs::datasource::Result *res,
+                                         const std::string &logid) {
   namespace kd = kvalobs::datasource;
   DecodeCommand *decCmdRet = nullptr;
 
@@ -626,7 +672,10 @@ DecodeCommand* DataSrcApp::decodeExecute(DecodeCommand *decCmd, kvalobs::datasou
   return decCmdRet;
 }
 
-kvalobs::datasource::Result DataSrcApp::newObservation(const char *obsType_, const char *data_, unsigned long long serialNumber, std::string *producer, const std::string &logid) {
+kvalobs::datasource::Result
+DataSrcApp::newObservation(const char *obsType_, const char *data_,
+                           unsigned long long serialNumber,
+                           std::string *producer, const std::string &logid) {
   namespace kd = kvalobs::datasource;
   kd::Result res;
   DecodeCommand *decCmdRet;
@@ -636,45 +685,45 @@ kvalobs::datasource::Result DataSrcApp::newObservation(const char *obsType_, con
   string redirectedData;
   string redirectedObsType;
   bool redirect = false;
-  int redirectCount=0;
+  int redirectCount = 0;
   boost::shared_ptr<kvalobs::decoder::RedirectInfo> redirected;
-  std::string myProducer(getProducer(obsType)); 
+  std::string myProducer(getProducer(obsType));
   res.messageId = getMessageId(obsType);
-
 
   do {
     redirect = false;
     decCmd = getDecoder(obsType.c_str(), data, logid, &res);
 
-    if( ! decCmd ) {
+    if (!decCmd) {
       return res;
     }
 
     decCmd->setMessageId(res.messageId);
     decCmd->setSerialNumber(serialNumber);
     decCmd->setProducer(myProducer);
-    
-    if( producer != nullptr ) {
-      *producer=myProducer;
+
+    if (producer != nullptr) {
+      *producer = myProducer;
     }
 
     decCmdRet = decodeExecute(decCmd, &res, logid);
 
     if (!decCmdRet)
       return res;
-    
-    if( producer ) {
+
+    if (producer) {
       *producer = decCmd->getProducer();
     }
 
-
-    kvalobs::decoder::DecoderBase::DecodeResult decodeResult = decCmdRet->getResult();
+    kvalobs::decoder::DecoderBase::DecodeResult decodeResult =
+        decCmdRet->getResult();
     redirect = false;
 
     if (decodeResult == kvalobs::decoder::DecoderBase::Redirect) {
-      if( redirectCount > 5 ) {
-        IDLOGDEBUG(logid, "To many redirect (" << redirectCount <<"): " << obsType);
-        throw std::runtime_error("To many redirect: "+obsType);
+      if (redirectCount > 5) {
+        IDLOGDEBUG(logid,
+                   "To many redirect (" << redirectCount << "): " << obsType);
+        throw std::runtime_error("To many redirect: " + obsType);
       }
 
       redirectCount++;
@@ -688,7 +737,10 @@ kvalobs::datasource::Result DataSrcApp::newObservation(const char *obsType_, con
         data = redirectedData.c_str();
 
         this->releaseDecodeCommand(decCmdRet);
-        IDLOGDEBUG(logid, "Decode: Redirect <"<< obsType << ">, redirected from: " << redirectedFromDecoder << ".\nData: " << data << ".");
+        IDLOGDEBUG(logid, "Decode: Redirect <"
+                              << obsType
+                              << ">, redirected from: " << redirectedFromDecoder
+                              << ".\nData: " << data << ".");
       } else {
         IDLOGDEBUG(logid, "Decode: Redirect, format error.");
         decCmdRet->setMsg("Redirected: Missing data.");
@@ -698,7 +750,8 @@ kvalobs::datasource::Result DataSrcApp::newObservation(const char *obsType_, con
     } else if (decodeResult == kvalobs::decoder::DecoderBase::Ok) {
       IDLOGDEBUG(logid, "Decode: OK.");
       kvalobs::kvStationInfoList infoList = decCmdRet->getInfoList();
-      list<kvalobs::serialize::KvalobsData> publishData = decCmdRet->getPublishData();
+      list<kvalobs::serialize::KvalobsData> publishData =
+          decCmdRet->getPublishData();
       this->publishData(publishData);
       res.res = kd::EResult::OK;
     } else if (decodeResult == kvalobs::decoder::DecoderBase::NotSaved) {
@@ -722,18 +775,14 @@ kvalobs::datasource::Result DataSrcApp::newObservation(const char *obsType_, con
   } while (redirect);
 
   res.message = decCmdRet->getMsg();
-  
+
   this->releaseDecodeCommand(decCmdRet);
   return res;
 }
 
-bool DataSrcApp::isOk() const {
-  return ok;
-}
+bool DataSrcApp::isOk() const { return ok; }
 
-bool DataSrcApp::inShutdown() const {
-  return sigTerm;
-}
+bool DataSrcApp::inShutdown() const { return sigTerm; }
 
 void DataSrcApp::shutdown() {
   sigTerm = 1;

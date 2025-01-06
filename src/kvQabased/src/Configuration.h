@@ -164,6 +164,7 @@ class Configuration {
     return maxKafkaSendErrors_;
   }
 
+  bool kafkaEnabled() const;
   /**
    * The size of the logfile in bytes before it is created a backup file. 
    */
@@ -235,6 +236,7 @@ class Configuration {
 
   unsigned processCount_;
   int id_;
+  bool kafkaDisabled_;
  
 };
 

@@ -56,10 +56,11 @@ bool DataProcessor::logXml = false;
 bool DataProcessor::logTransactions = true;
 unsigned DataProcessor::maxKafkaSendErrors=std::numeric_limits<unsigned>::max();
 
-DataProcessor::DataProcessor(std::shared_ptr<qabase::CheckRunner> checkRunner)
+DataProcessor::DataProcessor(std::shared_ptr<qabase::CheckRunner> checkRunner, bool kafkaEnabled)
     : checkRunner_(checkRunner),
       logCreator_(QaBaseApp::baseLogDir()),
-      output_(QaBaseApp::kafkaProducer()) {
+      output_(QaBaseApp::kafkaProducer()), 
+      kafkaEnabled_(kafkaEnabled) {
 }
 
 DataProcessor::~DataProcessor() {
@@ -197,7 +198,7 @@ namespace {
 void DataProcessor::sendToKafka(const qabase::Observation & obs, const qabase::CheckRunner::KvalobsDataPtr dataList, bool * stop) {
   int sendAttempts = 0;
 
-  if( !dataList || dataList->empty()) {
+  if( !kafkaEnabled_ || !dataList || dataList->empty() ) {
      return;
   }
 

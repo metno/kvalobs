@@ -59,9 +59,10 @@ class QaBaseApp : public KvBaseApp {
   static std::shared_ptr<kvalobs::subscribe::KafkaProducer> kafkaProducer();
 
   static std::string baseLogDir();
-
+  static bool kafkaEnabledInConfig();
  private:
   static kvalobs::subscribe::KafkaConfig kafkaConf_;
+  static bool kafkaEnabled_;
   //static std::string kafkaBrokers_;
   //static std::string kafkaDomain_;
 
