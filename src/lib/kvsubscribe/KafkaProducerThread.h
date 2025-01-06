@@ -30,9 +30,9 @@
 #ifndef SRC_LIB_KVSUBSCRIBE_KAFKAPRODUCERTHREAD_H_
 #define SRC_LIB_KVSUBSCRIBE_KAFKAPRODUCERTHREAD_H_
 
+#include "kvsubscribe/ProducerCommand.h"
 #include <string>
 #include <thread>
-#include "kvsubscribe/ProducerCommand.h"
 
 namespace kvalobs {
 namespace service {
@@ -58,7 +58,8 @@ namespace service {
  *    - kvalobs::subscribe::queue::decoded(const std::string &domain)
  *    - kvalobs::subscribe::queue::checked(const std::string &domain)
  *
- *  For the QC applications the function checked(const std::string &domain) is used
+ *  For the QC applications the function checked(const std::string &domain) is
+ used
  *  to get the topic to checked data.
  *
  *  Kafka hosts is a comma separated list of kafka hosts on the form
@@ -67,8 +68,8 @@ namespace service {
  *
  ~~~~{.cc}
 
- Ex. To start a thread to send data to the checked queue (topic) for the test domain. We have
- a kafka cluster with 4 nodes.
+ Ex. To start a thread to send data to the checked queue (topic) for the test
+ domain. We have a kafka cluster with 4 nodes.
 
  using kvalobs::subscribe::queue::checked;
  KafkaProducerThread checkedProducer;
@@ -86,23 +87,23 @@ namespace service {
  */
 
 class KafkaProducerThread {
-  typedef std::shared_ptr<miutil::concurrent::BlockingQueuePtr<std::string>> StatusQue;
+  typedef std::shared_ptr<miutil::concurrent::BlockingQueuePtr<std::string>>
+      StatusQue;
   StatusQue statusQue;
   std::thread kafkaThread;
   std::string name;
 
- public:
+public:
   ProducerQuePtr queue;
-  explicit KafkaProducerThread(const std::string &name = "", unsigned int queueSize = 50);
+  explicit KafkaProducerThread(const std::string &name = "",
+                               unsigned int queueSize = 50);
   ~KafkaProducerThread();
 
   /**
    * Must be called before start is called.
    */
   void setName(const std::string &name_);
-  std::string getName() const {
-    return name;
-  }
+  std::string getName() const { return name; }
 
   void send(ProducerCommand *cmd);
 
@@ -113,7 +114,7 @@ class KafkaProducerThread {
   void shutdown();
   void join(const std::chrono::high_resolution_clock::duration &timeout);
 };
-}  //  namespace service
-}  //  namespace kvalobs
+} //  namespace service
+} //  namespace kvalobs
 
-#endif  // SRC_LIB_KVSUBSCRIBE_KAFKAPRODUCERTHREAD_H_
+#endif // SRC_LIB_KVSUBSCRIBE_KAFKAPRODUCERTHREAD_H_

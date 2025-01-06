@@ -27,22 +27,22 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <memory>
+#include "lib/kvsubscribe/KafkaProducerThread.h"
+#include "lib/kvsubscribe/KafkaProducer.h"
+#include "lib/milog/milog.h"
 #include <iostream>
 #include <map>
+#include <memory>
 #include <mutex>
 #include <sstream>
-#include "lib/milog/milog.h"
-#include "lib/kvsubscribe/KafkaProducer.h"
-#include "lib/kvsubscribe/KafkaProducerThread.h"
 
-using std::map;
-using std::string;
-using std::shared_ptr;
-using std::thread;
-using std::unique_ptr;
 using miutil::concurrent::BlockingQueuePtr;
 using miutil::concurrent::QueueIllegalState;
+using std::map;
+using std::shared_ptr;
+using std::string;
+using std::thread;
+using std::unique_ptr;
 
 namespace kvalobs {
 namespace service {
@@ -63,7 +63,9 @@ std::string getThreadId(const std::string &name) {
 }
 
 class KafkaThread : kvalobs::subscribe::KafkaProducer {
-  typedef map<kvalobs::subscribe::KafkaProducer::MessageId, std::shared_ptr<ProducerCommand>> WaitingAck;
+  typedef map<kvalobs::subscribe::KafkaProducer::MessageId,
+              std::shared_ptr<ProducerCommand>>
+      WaitingAck;
   shared_ptr<ProducerQue> que;
   shared_ptr<BlockingQueuePtr<string>> statusQue;
   WaitingAck waitingAck;
@@ -97,24 +99,29 @@ class KafkaThread : kvalobs::subscribe::KafkaProducer {
     }
   }
 
- public:
-  KafkaThread(const std::string &name, const string &brokers, const std::string &topic, shared_ptr<ProducerQue> que,
+public:
+  KafkaThread(const std::string &name, const string &brokers,
+              const std::string &topic, shared_ptr<ProducerQue> que,
               shared_ptr<BlockingQueuePtr<std::string>> statusQue)
-      : KafkaProducer(topic, brokers,
-                      [this](KafkaProducer::MessageId msgId, const std::string & data, const std::string & errorMessage) {onError(msgId, data, errorMessage);},
-                      [this](KafkaProducer::MessageId msgId, const std::string &data) {onSuccess(msgId, data);}),
-        que(que),
-        statusQue(statusQue),
-        name(name) {
-  }
+      : KafkaProducer(
+            topic, brokers,
+            [this](KafkaProducer::MessageId msgId, const std::string &data,
+                   const std::string &errorMessage) {
+              onError(msgId, data, errorMessage);
+            },
+            [this](KafkaProducer::MessageId msgId, const std::string &data) {
+              onSuccess(msgId, data);
+            }),
+        que(que), statusQue(statusQue), name(name) {}
 
-  void onSuccess(KafkaProducer::MessageId msgId, const std::string & data) {
+  void onSuccess(KafkaProducer::MessageId msgId, const std::string &data) {
     shared_ptr<ProducerCommand> cmd = getWaitingMessage(msgId);
     if (cmd)
       cmd->onSuccess(msgId, name, data);
   }
 
-  void onError(KafkaProducer::MessageId msgId, const std::string & data, const std::string & errorMessage) {
+  void onError(KafkaProducer::MessageId msgId, const std::string &data,
+               const std::string &errorMessage) {
     shared_ptr<ProducerCommand> cmd = getWaitingMessage(msgId);
     if (cmd)
       cmd->onError(msgId, name, data, errorMessage);
@@ -147,7 +154,8 @@ class KafkaThread : kvalobs::subscribe::KafkaProducer {
     drainQue();
   }
 
-  static void start(const std::string &name, const std::string &brokers, const std::string &topic, ProducerQuePtr que,
+  static void start(const std::string &name, const std::string &brokers,
+                    const std::string &topic, ProducerQuePtr que,
                     shared_ptr<BlockingQueuePtr<std::string>> statusQue) {
     try {
       KafkaThread kafka(name, brokers, topic, que, statusQue);
@@ -160,21 +168,18 @@ class KafkaThread : kvalobs::subscribe::KafkaProducer {
     }
   }
 };
-}  // namespace
+} // namespace
 
-KafkaProducerThread::KafkaProducerThread(const std::string &name, unsigned int queueSize)
+KafkaProducerThread::KafkaProducerThread(const std::string &name,
+                                         unsigned int queueSize)
     : statusQue(new miutil::concurrent::BlockingQueuePtr<std::string>()),
-      name(getThreadId(name)),
-      queue(new ProducerQue(queueSize)) {
-}
+      name(getThreadId(name)), queue(new ProducerQue(queueSize)) {}
 
 KafkaProducerThread::~KafkaProducerThread() {
   if (kafkaThread.joinable())
     kafkaThread.detach();
 }
-void KafkaProducerThread::setName(const std::string &name_) {
-  name = name_;
-}
+void KafkaProducerThread::setName(const std::string &name_) { name = name_; }
 
 void KafkaProducerThread::send(ProducerCommand *cmd) {
   try {
@@ -183,8 +188,10 @@ void KafkaProducerThread::send(ProducerCommand *cmd) {
   }
 }
 
-void KafkaProducerThread::start(const std::string &brokers, const std::string &topic) {
-  kafkaThread = thread(KafkaThread::start, name, brokers, topic, queue, statusQue);
+void KafkaProducerThread::start(const std::string &brokers,
+                                const std::string &topic) {
+  kafkaThread =
+      thread(KafkaThread::start, name, brokers, topic, queue, statusQue);
   string *res = statusQue->get();
   if (*res == "<STARTED>") {
     LOGINFO("KafkaProducerThread: " << name << ": started.");
@@ -201,14 +208,15 @@ void KafkaProducerThread::shutdown() {
   }
 }
 
-void KafkaProducerThread::join(const std::chrono::high_resolution_clock::duration &timeout) {
+void KafkaProducerThread::join(
+    const std::chrono::high_resolution_clock::duration &timeout) {
   try {
     string *res = statusQue->timedGet(timeout, true);
     if (*res == "<EXIT>") {
       kafkaThread.join();
       LOGINFO("KafkaProducerThread: " << name << ": stopped.");
     } else {
-      LOGERROR(name <<": join: Unexpected return from thread <" + *res + ">.");
+      LOGERROR(name << ": join: Unexpected return from thread <" + *res + ">.");
     }
   } catch (const miutil::concurrent::QueueTimeout &ex) {
     if (kafkaThread.joinable())
@@ -216,5 +224,5 @@ void KafkaProducerThread::join(const std::chrono::high_resolution_clock::duratio
   }
 }
 
-}  //  namespace service
-}  //  namespace kvalobs
+} //  namespace service
+} //  namespace kvalobs
