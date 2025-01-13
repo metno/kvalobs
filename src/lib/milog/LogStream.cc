@@ -57,7 +57,7 @@ void milog::LogStream::message(const std::string &msg, LogLevel ll,
                                const std::string &context) {
   std::string fmsg;
 
-  if (ll > loglevel_ || ll == INFO)
+  if (ll > loglevel_ && ll != milog::INFO)
     return;
 
   if (layout_) {

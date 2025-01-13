@@ -189,7 +189,7 @@ void milog::Logger::log(LogLevel ll, const std::string &msg) {
 
   priv::ThreadLogManager *tlm = priv::ThreadLogManager::instance();
 
-  if (ll <= level_ || ll == INFO) {
+  if (ll <= level_ || ll == milog::INFO) {
     if (tlm) {
       logger_->log(msg, ll, *tlm->getContextStr());
 

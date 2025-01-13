@@ -1,7 +1,7 @@
 /*
- Kvalobs - Free Quality Control Software for Meteorological Observations 
+ Kvalobs - Free Quality Control Software for Meteorological Observations
 
- $Id: kldecoder.cc,v 1.7.2.7 2007/09/27 09:02:29 paule Exp $                                                       
+ $Id: kldecoder.cc,v 1.7.2.7 2007/09/27 09:02:29 paule Exp $
 
  Copyright (C) 2007 met.no
 
@@ -15,8 +15,8 @@
  This file is part of KVALOBS
 
  KVALOBS is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License as 
- published by the Free Software Foundation; either version 2 
+ modify it under the terms of the GNU General Public License as
+ published by the Free Software Foundation; either version 2
  of the License, or (at your option) any later version.
 
  KVALOBS is distributed in the hope that it will be useful,
@@ -24,27 +24,27 @@
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  General Public License for more details.
 
- You should have received a copy of the GNU General Public License along 
- with KVALOBS; if not, write to the Free Software Foundation Inc., 
+ You should have received a copy of the GNU General Public License along
+ with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#include <cctype>
-#include <sstream>
-#include <limits.h>
-#include <boost/lexical_cast.hpp>
+#include "kldecoder.h"
 #include <boost/algorithm/string.hpp>
-#include <puTools/miTime.h>
-#include <miutil/commastring.h>
-#include <milog/milog.h>
-#include <stdlib.h>
+#include <boost/lexical_cast.hpp>
+#include <cctype>
+#include <decodeutility/decodeutility.h>
 #include <kvalobs/kvDbGate.h>
+#include <kvalobs/kvPath.h>
 #include <kvalobs/kvQueries.h>
 #include <kvalobs/kvTypes.h>
-#include <miutil/trimstr.h>
+#include <limits.h>
+#include <milog/milog.h>
+#include <miutil/commastring.h>
 #include <miutil/timeconvert.h>
-#include "kldecoder.h"
-#include <decodeutility/decodeutility.h>
-#include <kvalobs/kvPath.h>
+#include <miutil/trimstr.h>
+#include <puTools/miTime.h>
+#include <sstream>
+#include <stdlib.h>
 
 namespace pt = boost::posix_time;
 using namespace kvalobs::decoder::kldecoder;
@@ -68,7 +68,7 @@ bool decodeKeyVal(const string &keyval, string &key, string &val) {
   }
 
   trimstr(key);
-  trimstr(val);
+  trimstr(val, TRIMBOTH, "\" \t\r\n");
 
   return !key.empty();
 }
@@ -111,16 +111,12 @@ class GetObsHelper {
     return !obstype.empty();
   }
 
- public:
+public:
   GetObsHelper(const std::string &data, const std::string &obsType_)
-      : in_(boost::trim_copy(data)),
-        obstype_(boost::trim_copy(obsType_)),
-        nMessages(0) {
-  }
+      : in_(boost::trim_copy(data)), obstype_(boost::trim_copy(obsType_)),
+        nMessages(0) {}
 
-  bool eof() const {
-    return in_.eof();
-  }
+  bool eof() const { return in_.eof(); }
 
   bool getObs(string &obstype, string &data) {
     ostringstream buf;
@@ -143,9 +139,7 @@ class GetObsHelper {
     return !data.empty();
   }
 
-  bool multiMessage() const {
-    return nMessages > 1;
-  }
+  bool multiMessage() const { return nMessages > 1; }
 };
 
 string getFirstLine(const std::string &buf) {
@@ -177,16 +171,14 @@ std::string removeRedirectFromObsType(const std::string &obstype) {
   return ret + buf;
 }
 
-}
+} // namespace
 
 kvalobs::decoder::kldecoder::KlDecoder::KlDecoder(
     dnmi::db::Connection &con, const ParamList &params,
     const std::list<kvalobs::kvTypes> &typeList, const std::string &obsType,
     const std::string &obs, int decoderId)
     : DecoderBase(con, params, typeList, obsType, obs, decoderId),
-      datadecoder(paramList, typeList),
-      typeID( INT_MAX),
-      stationID(INT_MAX),
+      datadecoder(paramList, typeList), typeID(INT_MAX), stationID(INT_MAX),
       insertOrUpdate(DbInsert)
 
 {
@@ -197,8 +189,7 @@ kvalobs::decoder::kldecoder::KlDecoder::KlDecoder(
   decodeObsType(obsType);
 }
 
-kvalobs::decoder::kldecoder::KlDecoder::~KlDecoder() {
-}
+kvalobs::decoder::kldecoder::KlDecoder::~KlDecoder() {}
 
 void kvalobs::decoder::kldecoder::KlDecoder::decodeObsType(
     const std::string &obstype) {
@@ -209,19 +200,19 @@ void kvalobs::decoder::kldecoder::KlDecoder::decodeObsType(
   string::size_type iKey;
   CommaString cstr(obstype, '/');
   long id;
-  const char *keys[] = { "nationalnr", "stationid", "wmonr", "icaoid",
-      "call_sign", "type", "add", "received_time", "redirected", 0 };
+  const char *keys[] = {
+      "nationalnr", "stationid", "wmonr",         "icaoid",     "call_sign",
+      "type",       "add",       "received_time", "redirected", 0};
 
   LOGDEBUG("decodeObsType: '" << obstype << "'");
   typeID = INT_MAX;
   stationID = INT_MAX;
   insertOrUpdate = DbInsert;
   receivedTime = boost::posix_time::ptime();
-  
 
   if (cstr.size() < 2) {
     LOGERROR("decodeObsType: To few keys!");
-//        msg="obsType: Invalid Format!";
+    //        msg="obsType: Invalid Format!";
     return;
   }
 
@@ -231,7 +222,7 @@ void kvalobs::decoder::kldecoder::KlDecoder::decodeObsType(
       return;
     }
 
-    if (!decodeKeyVal(keyval, key, val))  //keyval empty
+    if (!decodeKeyVal(keyval, key, val)) // keyval empty
       continue;
 
     for (iKey = 0; keys[iKey]; ++iKey) {
@@ -244,10 +235,10 @@ void kvalobs::decoder::kldecoder::KlDecoder::decodeObsType(
       continue;
     }
 
-    if (val.empty() && key != "add")  //Must have a value
+    if (val.empty() && key != "add") // Must have a value
       continue;
 
-    if (key == "add") {  //Value is optional
+    if (key == "add") { // Value is optional
       if (val.empty() || val[0] == 't' || val[0] == 'T')
         insertOrUpdate = DbUpdate;
     } else if (key == "received_time") {
@@ -256,8 +247,8 @@ void kvalobs::decoder::kldecoder::KlDecoder::decodeObsType(
       redirectedFrom = val;
     } else if (key == "type") {
       typeID = atoi(val.c_str());
-    } else if (key == "nationalnr" || key == "stationid" || key == "wmonr"
-        || key == "icaoid" || key == "call_sign") {
+    } else if (key == "nationalnr" || key == "stationid" || key == "wmonr" ||
+               key == "icaoid" || key == "call_sign") {
 
       stationidIn = key + "=" + val;
       stationID = DecoderBase::getStationId(key, val);
@@ -268,22 +259,25 @@ void kvalobs::decoder::kldecoder::KlDecoder::decodeObsType(
         continue;
       }
     } else {
-      LOGERROR(
-          "decodeObsType: INTERNAL: unhandled key '" << key << "', this is a error and must be fixed.");
+      LOGERROR("decodeObsType: INTERNAL: unhandled key '"
+               << key << "', this is a error and must be fixed.");
     }
   }
 
-  LOGDEBUG(
-      "decodeObsType: stationID: " << stationID << " typeid: " << typeID << " update: " << (insertOrUpdate==DbUpdate?"true":"false"));
+  LOGDEBUG("decodeObsType: stationID: "
+           << stationID << " typeid: " << typeID
+           << " update: " << (insertOrUpdate == DbUpdate ? "true" : "false"));
 }
 
 std::string kvalobs::decoder::kldecoder::KlDecoder::name() const {
   return string("KlDataDecoder");
 }
 
-kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecoder::rejected(
-    const std::string &msg, const std::string &logid, std::string &msgToSender,
-    bool includeObs) {
+kvalobs::decoder::DecoderBase::DecodeResult
+kvalobs::decoder::kldecoder::KlDecoder::rejected(const std::string &msg,
+                                                 const std::string &logid,
+                                                 std::string &msgToSender,
+                                                 bool includeObs) {
   ostringstream ost;
   string decoder;
   boost::posix_time::ptime tbtime;
@@ -318,62 +312,58 @@ kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecod
   }
 
   if (!logid.empty()) {
-    IDLOGERROR(
-        logid,
-        "Rejected: " << msg << endl << obs.c_str() << (saved?"":"\nFailed to save to 'rejected'."));
+    IDLOGERROR(logid, "Rejected: "
+                          << msg << endl
+                          << obs.c_str()
+                          << (saved ? "" : "\nFailed to save to 'rejected'."));
   }
 
   LOGERROR(ost.str());
   return Rejected;
 }
 
-
-bool
-kvalobs::decoder::kldecoder::
-KlDecoder::
-do302(int stationid, int typeId, 
-      KvDataContainer::DataByObstime &dataIn, 
-      KvDataContainer::TextDataByObstime &textDataIn, 
-      map<pt::ptime, int> &observations,
-      const std::string &logid, std::string &msgToSender )
-{
+bool kvalobs::decoder::kldecoder::KlDecoder::do302(
+    int stationid, int typeId, KvDataContainer::DataByObstime &dataIn,
+    KvDataContainer::TextDataByObstime &textDataIn,
+    map<pt::ptime, int> &observations, const std::string &logid,
+    std::string &msgToSender) {
   pt::ptime obstime;
   KvDataContainer::DataList data;
   KvDataContainer::TextDataList textData;
 
-  for(KvDataContainer::DataByObstime::iterator it = dataIn.begin();
-      it != dataIn.end(); ++it) {
+  for (KvDataContainer::DataByObstime::iterator it = dataIn.begin();
+       it != dataIn.end(); ++it) {
 
-    if( obstime.is_special() ) {
-      obstime=it->first;
-    } else if( obstime < it->first) {
-      obstime=it->first;
+    if (obstime.is_special()) {
+      obstime = it->first;
+    } else if (obstime < it->first) {
+      obstime = it->first;
     }
-    for( auto &d : it->second) 
+    for (auto &d : it->second)
       data.push_back(d);
-      
+
     observations[it->first] += it->second.size();
   }
 
-  for(KvDataContainer::TextDataByObstime::iterator it = textDataIn.begin();
-      it != textDataIn.end(); ++it) {
+  for (KvDataContainer::TextDataByObstime::iterator it = textDataIn.begin();
+       it != textDataIn.end(); ++it) {
 
-    if( obstime.is_special() ) {
-      obstime=it->first;
-    } else if( obstime < it->first) {
-      obstime=it->first;
+    if (obstime.is_special()) {
+      obstime = it->first;
+    } else if (obstime < it->first) {
+      obstime = it->first;
     }
-    for( auto &d : it->second) 
+    for (auto &d : it->second)
       textData.push_back(d);
-      
+
     observations[it->first] += it->second.size();
   }
 
-  if( data.empty() && textData.empty())
+  if (data.empty() && textData.empty())
     return true;
 
-  if (!addDataToDb(to_miTime(obstime), stationid, typeId, data, textData,
-                  logid, insertOrUpdate)) {
+  if (!addDataToDb(to_miTime(obstime), stationid, typeId, data, textData, logid,
+                   insertOrUpdate)) {
     ostringstream ost;
     ost << "DBERROR: stationid: " << stationid << " typeid: " << typeId
         << " obstime: " << obstime;
@@ -384,10 +374,10 @@ do302(int stationid, int typeId,
   }
 
   return true;
-
 }
 
-kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecoder::insertDataInDb(
+kvalobs::decoder::DecoderBase::DecodeResult
+kvalobs::decoder::kldecoder::KlDecoder::insertDataInDb(
     kvalobs::serialize::KvalobsData *theData, int stationid, int typeId,
     const std::string &logid, std::string &msgToSender) {
   using namespace boost::posix_time;
@@ -398,17 +388,17 @@ kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecod
   map<ptime, int> observations;
 
   KvDataContainer container(theData);
-  
+
   if (container.get(data, textData, stationid, typeId,
                     pt::second_clock::universal_time()) < 0) {
     IDLOGINFO(logid, "No Data.");
     return Ok;
   }
 
-  auto  filter_ = filter(stationid, typeId);
+  auto filter_ = filter(stationid, typeId);
 
   for (KvDataContainer::DataByObstime::iterator it = data.begin();
-      it != data.end(); ++it) {
+       it != data.end(); ++it) {
 
     td.clear();
     tid = textData.find(it->first);
@@ -417,10 +407,11 @@ kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecod
       td = tid->second;
       textData.erase(tid);
     }
-  
+
     try {
-      if (!addDataToDbThrow(to_miTime(it->first), stationid, typeId, it->second, td,
-           logid, insertOrUpdate, filter_.addToWorkQueue())) {
+      if (!addDataToDbThrow(to_miTime(it->first), stationid, typeId, it->second,
+                            td, logid, insertOrUpdate,
+                            filter_.addToWorkQueue())) {
         ostringstream ost;
         ost << "ERROR: stationid: " << stationid << " typeid: " << typeId
             << " obstime: " << it->first << ". Inconsistens in the data!";
@@ -429,15 +420,17 @@ kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecod
         msgToSender += "\n" + ost.str();
         return Rejected;
       }
-    }
-    catch( const SQLException &e) {
+    } catch (const SQLException &e) {
       ostringstream ost;
       ost << "ERROR: stationid: " << stationid << " typeid: " << typeId
           << " obstime: " << it->first << ". DB" << e.what();
       LOGERROR(ost.str());
-      IDLOGERROR(logid, ost.str() << ". SQLSTATE: '" << e.errorCode() << "' mayRecover: " << (e.mayRecover()?"true":"false") <<"." );
+      IDLOGERROR(logid, ost.str()
+                            << ". SQLSTATE: '" << e.errorCode()
+                            << "' mayRecover: "
+                            << (e.mayRecover() ? "true" : "false") << ".");
       msgToSender += "\n" + ost.str();
-      if ( !e.mayRecover() ) {
+      if (!e.mayRecover()) {
         return Rejected;
       } else {
         return NotSaved;
@@ -447,16 +440,16 @@ kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecod
     observations[it->first] += it->second.size();
   }
 
-  //Is there any left over text data.
+  // Is there any left over text data.
   if (!textData.empty()) {
     KvDataContainer::DataList dl;
     for (KvDataContainer::TextDataByObstime::iterator it = textData.begin();
-        it != textData.end(); ++it) {
-     if (!addDataToDb(to_miTime(it->first), stationid, typeId, dl, it->second,
-                     logid, insertOrUpdate, filter_.addToWorkQueue())) {
+         it != textData.end(); ++it) {
+      if (!addDataToDb(to_miTime(it->first), stationid, typeId, dl, it->second,
+                       logid, insertOrUpdate, filter_.addToWorkQueue())) {
         ostringstream ost;
-        ost << "DBERROR: TextData: stationid: " << stationid << " typeid: "
-            << typeId << " obstime: " << it->first;
+        ost << "DBERROR: TextData: stationid: " << stationid
+            << " typeid: " << typeId << " obstime: " << it->first;
         LOGERROR(ost.str());
         IDLOGERROR(logid, ost.str());
         msgToSender += "\n" + ost.str();
@@ -465,12 +458,12 @@ kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecod
       observations[it->first] += it->second.size();
     }
   }
-  
+
   ostringstream ost;
   int totalObservations = 0;
   if (observations.size() > 0) {
     for (map<ptime, int>::const_iterator it = observations.begin();
-        it != observations.end(); ++it) {
+         it != observations.end(); ++it) {
       ost << "\n# observations " << to_kvalobs_string(it->first) << ": "
           << it->second;
       totalObservations += it->second;
@@ -478,21 +471,24 @@ kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecod
   }
 
   ostringstream msgOst;
-  IDLOGINFO(
-      logid,
-      "Total number of observations saved to DB: " << totalObservations << " stationid '" << stationid << "' typeid '" << typeId << "'" << endl << ost.str());
-  LOGINFO(
-      "Total number of observations saved to DB: " << totalObservations << " stationid '" << stationid << "' typeid '" << typeId << "'");
+  IDLOGINFO(logid, "Total number of observations saved to DB: "
+                       << totalObservations << " stationid '" << stationid
+                       << "' typeid '" << typeId << "'" << endl
+                       << ost.str());
+  LOGINFO("Total number of observations saved to DB: "
+          << totalObservations << " stationid '" << stationid << "' typeid '"
+          << typeId << "'");
 
   msgOst << "Total number of observations saved to DB: " << totalObservations
          << " for stationid '" << stationid << "', typeid '" << typeId << "'"
-         << endl << ost.str();
+         << endl
+         << ost.str();
   msgToSender += "\n" + msgOst.str();
   return Ok;
 }
 
-kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecoder::execute(
-    std::string &msg) {
+kvalobs::decoder::DecoderBase::DecodeResult
+kvalobs::decoder::kldecoder::KlDecoder::execute(std::string &msg) {
   ostringstream ostMsg;
   GetObsHelper helper(obs, obsType);
   bool error = false;
@@ -501,7 +497,7 @@ kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecod
   string line;
 
   ostringstream s;
-  s << name() << " (" << serialNumber << " - '" << producer <<"')";
+  s << name() << " (" << serialNumber << " - '" << producer << "')";
   milog::LogContext lcontext(s.str());
 
   while (helper.getObs(obsType, obs) && !error) {
@@ -514,23 +510,23 @@ kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecod
     ret = doExecute(retMsg);
 
     switch (ret) {
-      case Ok:
-        ostMsg << "OK";
-        break;
-      case NotSaved:
-        ostMsg << "NOTSAVED";
-        error = true;
-        break;
-      case Rejected:
-        ostMsg << "REJECTED";
-        break;
-      case Error:
-        ostMsg << "ERROR";
-        error = true;
-        break;
-      case Redirect:
-        ostMsg << "REDIRECT";
-        break;
+    case Ok:
+      ostMsg << "OK";
+      break;
+    case NotSaved:
+      ostMsg << "NOTSAVED";
+      error = true;
+      break;
+    case Rejected:
+      ostMsg << "REJECTED";
+      break;
+    case Error:
+      ostMsg << "ERROR";
+      error = true;
+      break;
+    case Redirect:
+      ostMsg << "REDIRECT";
+      break;
     }
     ostMsg << ": " << obsType << endl << retMsg << "\n";
   }
@@ -549,8 +545,8 @@ kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecod
     return Ok;
 }
 
-kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecoder::doExecute(
-    std::string &msg) {
+kvalobs::decoder::DecoderBase::DecodeResult
+kvalobs::decoder::kldecoder::KlDecoder::doExecute(std::string &msg) {
   bool setUsinfo7 = getSetUsinfo7();
   int typeId = getTypeId(msg);
   int stationid = getStationId(msg);
@@ -559,9 +555,9 @@ kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecod
 
   if (!redirectedFrom.empty())
     decoder += "." + redirectedFrom;
- 
+
   ostringstream s;
-  s << decoder << " (" << serialNumber << " - '" << producer <<"')";
+  s << decoder << " (" << serialNumber << " - '" << producer << "')";
   milog::LogContext lcontext(s.str());
 
   LOGDEBUG(obsType << "\n" << obs);
@@ -605,18 +601,21 @@ kvalobs::decoder::DecoderBase::DecodeResult kvalobs::decoder::kldecoder::KlDecod
   obs += "\n";
 
   o.str("");
-  o << name() << endl << "------------------------------" << endl
+  o << name() << endl
+    << "------------------------------" << endl
     << "ReceivedTime: ";
   if (receivedTime.is_special())
     o << " NOT given or set_useinfo7 is not set.";
   else
     o << receivedTime;
 
-  o << endl << "Insert type : "
-    << (insertOrUpdate==DbUpdate ? "update (replenish)" : "insert");
+  o << endl
+    << "Insert type : "
+    << (insertOrUpdate == DbUpdate ? "update (replenish)" : "insert");
 
-  o << endl << "ObstType    : " << obsType << endl << "Obs         : " << obs
-    << endl;
+  o << endl
+    << "ObstType    : " << obsType << endl
+    << "Obs         : " << obs << endl;
 
   IDLOGINFO(logid, o.str());
 
@@ -642,7 +641,6 @@ long kvalobs::decoder::kldecoder::KlDecoder::getStationId(
   return stationID;
 }
 
-
 bool kvalobs::decoder::kldecoder::KlDecoder::getSetUsinfo7() {
   bool setUsinfo7 = false;
   miutil::conf::ConfSection *conf = myConfSection();
@@ -660,4 +658,3 @@ bool kvalobs::decoder::kldecoder::KlDecoder::getSetUsinfo7() {
 long kvalobs::decoder::kldecoder::KlDecoder::getTypeId(std::string &msg) const {
   return typeID;
 }
-
