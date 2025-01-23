@@ -40,8 +40,7 @@ AC_CONFIG_FILES([Makefile
                  share/kvalobs/idl/Makefile
                  src/Makefile
                  src/lib/Makefile
-                 src/lib/gtest/Makefile
-		             src/lib/json/Makefile
+                 src/lib/json/Makefile
                  src/lib/kvskel/Makefile
                  src/lib/miutil/Makefile
                  src/lib/decodeutility/Makefile
@@ -117,6 +116,7 @@ AC_CONFIG_FILES([Makefile
 ])
 
 #src/tools/kvpush/Makefile
+#src/lib/gtest/Makefile
 
 #libcurl, sets CURL_LIBS and CURL_CFLAGS.
 AX_LIB_CURL([7.15.5])
