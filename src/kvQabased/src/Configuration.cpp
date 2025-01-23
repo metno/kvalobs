@@ -127,7 +127,6 @@ Configuration::Configuration(int& argc, char** argv)
   , logLevel_(milog::DEBUG)
   , logXml_(false)
   , port_(0)
-  , kafkaDisabled_(true)
 {
   const char* USER = std::getenv("USER");
   const std::string databaseUser = USER ? USER : "kvalobs";
@@ -192,8 +191,7 @@ Configuration::Configuration(int& argc, char** argv)
       " Only has effect if process count is 1")
     ("id", value<int>(&id_)->default_value(-1), "The id for this kvQabased process. If less than 0, no id is assigned. ")
     ("config", value<std::string>(), "Read configuration from the given file")
-    ("version", "Produce version information")("help", "Produce help message"),
-    ("disable-kafka", value<bool>(&kafkaDisabled_)->default_value(false), "Only for testing.");
+    ("version", "Produce version information")("help", "Produce help message");
 
   commandLine.add(observation).add(logging).add(database).add(generic);
 
@@ -271,13 +269,6 @@ Configuration::databaseConnectString() const
   dbConnect << " user=" << user_;
   return dbConnect.str();
 }
-
-bool Configuration::kafkaEnabled() const {
-  if (kafkaDisabled_)
-    return false;
-  return qabase::QaBaseApp::kafkaEnabledInConfig();
-}
-
 
 std::ostream&
 Configuration::version(std::ostream& s) const
