@@ -32,9 +32,9 @@
 #define __paramlist_h__
 
 #include <functional>
-#include <string>
-#include <set>
 #include <ostream>
+#include <set>
+#include <string>
 
 /**
  * \addtogroup kvinternalhelpers
@@ -46,10 +46,10 @@
  *
  */
 class Param {
-  ///The name the param is identified with in the param table in kvalobs
+  /// The name the param is identified with in the param table in kvalobs
   std::string kode_;
 
-  ///The paramid the param is identified with in the param table in kvalobs
+  /// The paramid the param is identified with in the param table in kvalobs
   int id_;
 
   /**
@@ -58,26 +58,15 @@ class Param {
    */
   bool isScalar_;
 
- public:
-  Param()
-      : kode_(""),
-        id_(-1),
-        isScalar_(false) {
-  }
+public:
+  Param() : kode_(""), id_(-1), isScalar_(false) {}
 
-  Param(const Param &p)
-      : kode_(p.kode_),
-        id_(p.id_),
-        isScalar_(p.isScalar_) {
-  }
+  Param(const Param &p) : kode_(p.kode_), id_(p.id_), isScalar_(p.isScalar_) {}
 
   Param(const std::string &kode, int id, bool isScalar)
-      : kode_(kode),
-        id_(id),
-        isScalar_(isScalar) {
-  }
+      : kode_(kode), id_(id), isScalar_(isScalar) {}
 
-  Param& operator=(const Param &p) {
+  Param &operator=(const Param &p) {
     if (&p == this)
       return *this;
 
@@ -93,25 +82,19 @@ class Param {
    *
    * \return true if this is a valid parameter definition and false otherwise.
    */
-  bool valid() const {
-    return (id_ >= 0);
-  }
+  bool valid() const { return (id_ >= 0); }
 
   /**
    * Return the paramid the parameter is has in kvalobs.
    * \return The paramid to the parameter.
    */
-  int id() const {
-    return id_;
-  }
+  int id() const { return id_; }
 
   /**
    * Return the param name the parameter is known by in kvalobs.
    * \return The name of the parameter.
    */
-  std::string kode() const {
-    return kode_;
-  }
+  std::string kode() const { return kode_; }
 
   /**
    * Tells if the data for this parameter is to be loaded into
@@ -120,27 +103,21 @@ class Param {
    * @return true if the data is for the data table and false if the data
    * is for the text_data table.
    */
-  bool isScalar() const {
-    return isScalar_;
+  bool isScalar() const { return isScalar_; }
+};
+
+class ParamPredicate {
+public:
+  bool operator()(const Param &a1, const Param &a2) const {
+    return a1.kode() < a2.kode();
   }
 };
 
-class ParamPredicate  {
- public:
-  bool operator()(const Param &a1,
-                         const Param &a2) const {
-    if (a1.kode() < a2.kode())
-      return true;
-
-    return false;
-  }
-};
-
-///a type that can be used as a param cache.
+/// a type that can be used as a param cache.
 typedef std::set<Param, ParamPredicate> ParamList;
-///an iterator for ParamList
+/// an iterator for ParamList
 typedef std::set<Param, ParamPredicate>::iterator IParamList;
-///a const iterator for ParamList
+/// a const iterator for ParamList
 typedef std::set<Param, ParamPredicate>::const_iterator CIParamList;
 
 /**
@@ -148,11 +125,10 @@ typedef std::set<Param, ParamPredicate>::const_iterator CIParamList;
  * a ParamList.
  *
  * \param pl the ParamList to search.
- * \param id the id to search after in the ParamList, pl. 
+ * \param id the id to search after in the ParamList, pl.
  * \return the paramname on success and an empty string otherwise.
  */
-std::string
-findParamIdInList(const ParamList &pl, int id);
+std::string findParamIdInList(const ParamList &pl, int id);
 
 /**
  * findParamInList, finds the Param definition where name is equal to paramName
@@ -160,12 +136,11 @@ findParamIdInList(const ParamList &pl, int id);
  *
  * \param pl the ParamList to search.
  * \param paramName the name to search after in the ParamList, pl.
- * \param[out] The param definition for the paramName, if defined in the param table.
- * \return true if paramName is defined and false of not.
+ * \param[out] The param definition for the paramName, if defined in the param
+ * table. \return true if paramName is defined and false of not.
  */
-bool
-findParamInList(const ParamList &pl, const std::string &paramName,
-                Param &param);
+bool findParamInList(const ParamList &pl, const std::string &paramName,
+                     Param &param);
 
 /**
  * Reads the param definitions from a CSV file with the following format:
@@ -174,20 +149,18 @@ findParamInList(const ParamList &pl, const std::string &paramName,
  * Lines that starts with a the character '#' (comment) is ignored.
  *
  * The file can be generated from stinfosys with the command:
- * \copy (select paramid,name,scalar from param  order by paramid) to 'params.csv' delimiter as ',';
+ * \copy (select paramid,name,scalar from param  order by paramid) to
+ * 'params.csv' delimiter as ',';
  *
  * \param filename The CSV file to read the parameters from.
  * \param[out] paramList The list that the parameters is saved to.
  * \return true if the method succeed to read the file and false otherwise.
  */
-bool
-readParamsFromFile(const std::string &filename, ParamList &paramList);
+bool readParamsFromFile(const std::string &filename, ParamList &paramList);
 
-bool
-isParamListsEqual(const ParamList &oldList, const ParamList &newList);
+bool isParamListsEqual(const ParamList &oldList, const ParamList &newList);
 
-std::ostream&
-operator<<(std::ostream &os, const ParamList &p);
+std::ostream &operator<<(std::ostream &os, const ParamList &p);
 
 /** @} */
 
