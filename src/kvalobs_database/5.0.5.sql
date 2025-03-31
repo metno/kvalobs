@@ -19,4 +19,16 @@ GRANT ALL ON pstation_metadata TO kv_admin;
 GRANT SELECT ON pstation_metadata TO kv_read;
 GRANT SELECT ON pstation_metadata TO kv_write;
 
+
+CREATE OR REPLACE FUNCTION 
+kvalobs_database_version()
+RETURNS text AS
+$BODY$
+BEGIN
+	RETURN '5.0.5';
+END;
+$BODY$
+LANGUAGE plpgsql IMMUTABLE;
+
+
 END;

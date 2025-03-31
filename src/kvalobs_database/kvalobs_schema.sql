@@ -25,7 +25,7 @@ kvalobs_database_version()
 RETURNS text AS
 $BODY$
 BEGIN
-	RETURN '5.0.4';
+	RETURN '5.0.5';
 END;
 $BODY$
 LANGUAGE plpgsql IMMUTABLE;
