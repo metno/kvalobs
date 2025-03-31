@@ -28,53 +28,53 @@
  */
 
 #include "KvalobsDatabaseAccess.h"
+#include "kvalobs/kvPath.h"
+#include "kvdb/dbdrivermgr.h"
+#include "kvdb/kvdb.h"
+#include "miutil/timeconvert.h"
 #include <boost/date_time.hpp>
+#include <memory>
 #include <milog/milog.h>
 #include <sstream>
-#include <memory>
 #include <string>
-#include "kvdb/kvdb.h"
-#include "kvdb/dbdrivermgr.h"
-#include "kvalobs/kvPath.h"
-#include "miutil/timeconvert.h"
 
 using dnmi::db::Connection;
 using dnmi::db::Result;
 typedef std::unique_ptr<Result> ResultPtr;
-using dnmi::db::DRow;
-using boost::posix_time::ptime;
 using boost::posix_time::hours;
 using boost::posix_time::minutes;
+using boost::posix_time::ptime;
 using boost::posix_time::to_kvalobs_string;
+using dnmi::db::DRow;
 
 namespace {
 
-dnmi::db::Connection * createConnection(const std::string & databaseConnect) {
+dnmi::db::Connection *createConnection(const std::string &databaseConnect) {
   static std::string driverId;
   if (driverId.empty()) {
-    std::string driver = kvalobs::kvPath(kvalobs::pkglibdir)
-        + "/db/pgdriver.so";
+    std::string driver =
+        kvalobs::kvPath(kvalobs::pkglibdir) + "/db/pgdriver.so";
     if (!dnmi::db::DriverManager::loadDriver(driver, driverId))
       throw std::runtime_error("Unable to load driver " + driver);
   }
 
-  dnmi::db::Connection * conn = dnmi::db::DriverManager::connect(driverId, databaseConnect);
+  dnmi::db::Connection *conn =
+      dnmi::db::DriverManager::connect(driverId, databaseConnect);
   if (!conn)
     throw std::runtime_error(dnmi::db::DriverManager::getErr());
   return conn;
 }
-}  // namespace
+} // namespace
 
-KvalobsDatabaseAccess::KvalobsDatabaseAccess(const std::string & connectString)
-    : connection_(createConnection(connectString)) {
-}
+KvalobsDatabaseAccess::KvalobsDatabaseAccess(const std::string &connectString)
+    : connection_(createConnection(connectString)) {}
 
 KvalobsDatabaseAccess::~KvalobsDatabaseAccess() {
   dnmi::db::DriverManager::releaseConnection(connection_);
 }
 
-KvalobsDatabaseAccess::MissingList KvalobsDatabaseAccess::findAllMissing(
-    const Time & obstime) {
+KvalobsDatabaseAccess::MissingList
+KvalobsDatabaseAccess::findAllMissing(const Time &obstime) {
   MissingList ret;
 
   std::ostringstream expiry;
@@ -85,13 +85,13 @@ KvalobsDatabaseAccess::MissingList KvalobsDatabaseAccess::findAllMissing(
 
   ResultPtr result = exec_(expiry.str());
   while (result->hasNext()) {
-    DRow & row = result->next();
+    DRow &row = result->next();
     int type = boost::lexical_cast<int>(row[0]);
     auto obstime = boost::posix_time::time_from_string(row[1]);
 
     ResultPtr missing = exec_(qFindMissingStations_(type, obstime));
     while (missing->hasNext()) {
-      DRow & m = missing->next();
+      DRow &m = missing->next();
       int stationid = boost::lexical_cast<int>(m[0]);
       DataIdentifier di = createObservation_(stationid, type, obstime);
       ret.push_back(di);
@@ -101,25 +101,28 @@ KvalobsDatabaseAccess::MissingList KvalobsDatabaseAccess::findAllMissing(
 }
 
 KvalobsDatabaseAccess::Time KvalobsDatabaseAccess::lastFindAllMissingRuntime() {
-  std::string query =
-      "SELECT val FROM key_val WHERE package='kvManagerd' AND key='LastMissingRun'";
+  std::string query = "SELECT val FROM key_val WHERE package='kvManagerd' AND "
+                      "key='LastMissingRun'";
   ResultPtr r = exec_(query);
   if (r->hasNext()) {
     DRow row = r->next();
     try {
       Time last = boost::posix_time::time_from_string(row[0]);
-      return ptime(last.date(), hours(last.time_of_day().hours()) + minutes(30));
-    } catch ( const std::exception &e ) {
+      return ptime(last.date(),
+                   hours(last.time_of_day().hours()) + minutes(30));
+    } catch (const std::exception &e) {
       // ignore errors, and continue to fallback method
       try {
-        LOGWARN("key_val (kvManagerd, LastMissingRun): Failed to create a ptime from '" << row[0] << "'. " << e.what());
-      } 
-      catch( ... ) {
-        LOGWARN("key_val (kvManagerd, LastMissingRun): Failed to create a ptime.");
+        LOGWARN("key_val (kvManagerd, LastMissingRun): Failed to create a "
+                "ptime from '"
+                << row[0] << "'. " << e.what());
+      } catch (...) {
+        LOGWARN(
+            "key_val (kvManagerd, LastMissingRun): Failed to create a ptime.");
       }
-    }
-    catch ( ... ) {
-      LOGWARN("key_val (kvManagerd, LastMissingRun): Failed to create a ptime. Unknown exception.");
+    } catch (...) {
+      LOGWARN("key_val (kvManagerd, LastMissingRun): Failed to create a ptime. "
+              "Unknown exception.");
     }
   }
   // No information available, pretend last run was 7 days ago
@@ -129,41 +132,46 @@ KvalobsDatabaseAccess::Time KvalobsDatabaseAccess::lastFindAllMissingRuntime() {
 }
 
 void KvalobsDatabaseAccess::setLastFindAllMissingRuntime(
-    const KvalobsDatabaseAccess::Time & obstime) {
+    const KvalobsDatabaseAccess::Time &obstime) {
   connection_->beginTransaction();
-  exec_(
-      "DELETE FROM key_val WHERE package='kvManagerd' AND key='LastMissingRun'");
-  exec_(
-      "INSERT INTO key_val VALUES ('kvManagerd', 'LastMissingRun', '"
-          + to_kvalobs_string(obstime) + "')");
+  exec_("DELETE FROM key_val WHERE package='kvManagerd' AND "
+        "key='LastMissingRun'");
+  exec_("INSERT INTO key_val VALUES ('kvManagerd', 'LastMissingRun', '" +
+        to_kvalobs_string(obstime) + "')");
   connection_->endTransaction();
 }
 
 namespace {
-bool isWholeHour(const boost::posix_time::ptime & time) {
-  const auto & t = time.time_of_day();
+bool isWholeHour(const boost::posix_time::ptime &time) {
+  const auto &t = time.time_of_day();
   return t.minutes() == 0 && t.seconds() == 0 && t.fractional_seconds() == 0;
 }
-}
+} // namespace
 
-void KvalobsDatabaseAccess::addMissingData(const DataIdentifier & di) {
+void KvalobsDatabaseAccess::addMissingData(const DataIdentifier &di) {
   if (isWholeHour(di.obstime())) {
-    LOGDEBUG("Add missing station: observationid: " << di.obsid() << " " << di.station() << "/" << di.type() << "/" << to_kvalobs_string(di.obstime()));
-    // Only process missing value for data at whole hours (minutes and seconds is 0)
+    LOGDEBUG("Add missing station: observationid: "
+             << di.obsid() << " " << di.station() << "/" << di.type() << "/"
+             << to_kvalobs_string(di.obstime()));
+    // Only process missing value for data at whole hours (minutes and seconds
+    // is 0)
     exec_(insertMissingDataQuery_(di));
   } else {
     LOGDEBUG("addMissingData: Not WholeHour: " << di.obstime());
   }
 
   ResultPtr r = exec_(selectWorkQueueQuery_(di));
-  if (!r->hasNext() )
+  if (!r->hasNext())
     exec_(insertWorkQueueQuery_(di, 10));
   else
     exec_(updateWorkQueueQuery_(di));
 }
 
 DataIdentifier KvalobsDatabaseAccess::nextDataToProcess() {
-  std::string selectQuery = "SELECT o.observationid, o.stationid, o.typeid, o.obstime FROM observations o, workque q WHERE o.observationid=q.observationid AND q.process_start is NULL limit 1";
+  std::string selectQuery =
+      "SELECT o.observationid, o.stationid, o.typeid, o.obstime FROM "
+      "observations o, workque q WHERE o.observationid=q.observationid AND "
+      "q.process_start is NULL limit 1";
 
   ResultPtr r = exec_(selectQuery);
   if (r->hasNext()) {
@@ -177,24 +185,25 @@ void KvalobsDatabaseAccess::cleanWorkQueue() {
   const std::string criteria = "qa_stop<now()-'15 minutes'::interval";
 
   exec_("delete from workstatistik s using workque q "
-    "where s.observationid=q.observationid "
-    "and q." + criteria);
+        "where s.observationid=q.observationid "
+        "and q." +
+        criteria);
   exec_("INSERT INTO workstatistik (SELECT "
-    "o.stationid, o.obstime, o.typeid, o.tbtime, q.priority, q.process_start, q.qa_start, q.qa_stop, q.service_start, q.service_stop, q.qa_id, o.observationid"
-    " FROM workque q, observations o WHERE"
-    " q.observationid=o.observationid "
-    " and q." + criteria + ")");
+        "o.stationid, o.obstime, o.typeid, o.tbtime, q.priority, "
+        "q.process_start, q.qa_start, q.qa_stop, q.service_start, "
+        "q.service_stop, o.observationid, q.qa_id"
+        " FROM workque q, observations o WHERE"
+        " q.observationid=o.observationid "
+        " and q." +
+        criteria + ")");
   exec_("DELETE FROM workque WHERE " + criteria);
 
   t->commit();
 }
 
-
 KvalobsDatabaseAccess::Transaction::Transaction(
-    dnmi::db::Connection & connection,
-    bool serializable)
-    : connection_(connection),
-      handled_(false) {
+    dnmi::db::Connection &connection, bool serializable)
+    : connection_(connection), handled_(false) {
   Connection::IsolationLevel il =
       serializable ? Connection::SERIALIZABLE : Connection::READ_COMMITTED;
   connection_.beginTransaction(il);
@@ -215,18 +224,19 @@ void KvalobsDatabaseAccess::Transaction::rollback() {
   handled_ = true;
 }
 
-KvalobsDatabaseAccess::TransactionPtr KvalobsDatabaseAccess::transaction(bool serializable) {
+KvalobsDatabaseAccess::TransactionPtr
+KvalobsDatabaseAccess::transaction(bool serializable) {
   return TransactionPtr(new Transaction(*connection_, serializable));
 }
 
-KvalobsDatabaseAccess::ResultPtr KvalobsDatabaseAccess::exec_(
-    const std::string & query) {
+KvalobsDatabaseAccess::ResultPtr
+KvalobsDatabaseAccess::exec_(const std::string &query) {
   LOGDEBUG(query);
   return ResultPtr(connection_->execQuery(query + ';'));
 }
 
 std::string KvalobsDatabaseAccess::qFindMissingStations_(
-    int type, const boost::posix_time::ptime & timeToFind) const {
+    int type, const boost::posix_time::ptime &timeToFind) const {
   std::ostringstream q;
   // Make a selection of all obs_pgm_rows with correct typeid and klXX entry
   q << "SELECT\n";
@@ -252,7 +262,8 @@ std::string KvalobsDatabaseAccess::qFindMissingStations_(
   return q.str();
 }
 
-std::string KvalobsDatabaseAccess::insertMissingDataQuery_(const DataIdentifier & di) const {
+std::string
+KvalobsDatabaseAccess::insertMissingDataQuery_(const DataIdentifier &di) const {
   // Big query ahead!
   // The query is of the form INSERT INTO data (SELECT ....), where the select
   // is essentially all possible values from obs_pgm except those that already
@@ -280,7 +291,8 @@ std::string KvalobsDatabaseAccess::insertMissingDataQuery_(const DataIdentifier 
   q << "      FROM number_series \n";
   q << "      WHERE number<10\n";
   q << "    )\n";
-  //        Get all paramid/sensor/level combinations from obs_pgm for the given DataIdentifier
+  //        Get all paramid/sensor/level combinations from obs_pgm for the given
+  //        DataIdentifier
   q << "    SELECT\n";
   q << "      o.paramid, \n";
   q << "      n.number as sensor,\n";
@@ -297,8 +309,9 @@ std::string KvalobsDatabaseAccess::insertMissingDataQuery_(const DataIdentifier 
   q << "      fromtime<obs.obstime and \n";
   q << "      ( totime is null or \n";
   q << "        totime>obs.obstime) and \n";
-  q << "      kl" << std::setw(2) << std::setfill('0') << di.obstime().time_of_day().hours() << "\n";
-  q << "    EXCEPT \n"; 
+  q << "      kl" << std::setw(2) << std::setfill('0')
+    << di.obstime().time_of_day().hours() << "\n";
+  q << "    EXCEPT \n";
   //        ...but remove any combinations that already exist in data table
   q << "    SELECT \n";
   q << "      d.paramid, \n";
@@ -318,20 +331,25 @@ std::string KvalobsDatabaseAccess::insertMissingDataQuery_(const DataIdentifier 
   return q.str();
 }
 
-std::string KvalobsDatabaseAccess::selectWorkQueueQuery_(const DataIdentifier & di) const {
+std::string
+KvalobsDatabaseAccess::selectWorkQueueQuery_(const DataIdentifier &di) const {
   std::ostringstream q;
   q << "SELECT priority FROM workque WHERE " << di.sqlWhere();
   return q.str();
 }
 
-
-std::string KvalobsDatabaseAccess::insertWorkQueueQuery_(const DataIdentifier & di, int priority) const {
+std::string
+KvalobsDatabaseAccess::insertWorkQueueQuery_(const DataIdentifier &di,
+                                             int priority) const {
   std::ostringstream q;
-  q << "INSERT INTO workque (priority, process_start, qa_start, qa_stop, service_start, service_stop, observationid) VALUES (" << priority << ",now(),NULL,NULL,NULL,NULL," << di.obsid() << ")";
+  q << "INSERT INTO workque (priority, process_start, qa_start, qa_stop, "
+       "service_start, service_stop, observationid) VALUES ("
+    << priority << ",now(),NULL,NULL,NULL,NULL," << di.obsid() << ")";
   return q.str();
 }
 
-std::string KvalobsDatabaseAccess::updateWorkQueueQuery_(const DataIdentifier & di) const {
+std::string
+KvalobsDatabaseAccess::updateWorkQueueQuery_(const DataIdentifier &di) const {
   std::ostringstream q;
   q << "UPDATE workque SET ";
   q << "process_start=now(), ";
@@ -344,11 +362,15 @@ std::string KvalobsDatabaseAccess::updateWorkQueueQuery_(const DataIdentifier & 
   return q.str();
 }
 
-DataIdentifier KvalobsDatabaseAccess::createObservation_(int stationid, int type, const boost::posix_time::ptime & obstime) {
+DataIdentifier KvalobsDatabaseAccess::createObservation_(
+    int stationid, int type, const boost::posix_time::ptime &obstime) {
   std::ostringstream query;
-  query << "INSERT INTO observations (stationid, typeid, obstime, tbtime) VALUES (" << stationid << ", " << type << ", '" << obstime << "', now()) RETURNING observationid, stationid, typeid, obstime";
+  query << "INSERT INTO observations (stationid, typeid, obstime, tbtime) "
+           "VALUES ("
+        << stationid << ", " << type << ", '" << obstime
+        << "', now()) RETURNING observationid, stationid, typeid, obstime";
   auto result = exec_(query.str());
   if (!result->hasNext())
     throw std::runtime_error("Unable to create observation");
   return DataIdentifier(result->next());
-} 
+}
