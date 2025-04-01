@@ -1,3 +1,8 @@
+kvalobs (7.1.0-1) noble; urgency=medium
+  * Bigfix for workque.
+
+ -- Borge Moe <borge.moe@met.no>  Tue, 1 Apr 2025 15:00:00 +0100
+
 kvalobs (7.0.5-1) noble; urgency=medium
   * Build for noble.
 
