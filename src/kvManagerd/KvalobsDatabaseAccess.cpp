@@ -199,6 +199,13 @@ void KvalobsDatabaseAccess::cleanWorkQueue() {
   exec_("DELETE FROM workque WHERE " + criteria);
 
   t->commit();
+  try {
+    exec_("VACUUM FULL workque");
+  } catch (const std::exception &e) {
+    LOGWARN("VACUUM FULL workque failed: " << e.what());
+  } catch (...) {
+    LOGWARN("VACUUM FULL workque failed: Unknown exception.");
+  }
 }
 
 KvalobsDatabaseAccess::Transaction::Transaction(
