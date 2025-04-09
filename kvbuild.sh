@@ -34,8 +34,7 @@ fi
 use() {
 
   usage="\
-Usage: $0 [--help] [--no-cache] [--os os] [--staging|--prod|--test] [--kvbuild] [--buildep] [--tag-version] [--tag tag] [--tag-and-latest tag] [--tag-with-build-date] [--list]
-           [--all-targets] [--push-only] [--build-only] targets
+Usage: $0 [--help] [options] targets
 
 This script build kvalobs containers. 
 
@@ -71,6 +70,8 @@ Options:
                 The containers must prevosly been buildt whith the same flags.
   --no-cache    Do not use the docker build cache.
   --all-targets Build all targets.
+  --print-version-tag
+                Print the version tag and exit.
   
   targets this is a list of targets to build. Available targets is:
 
@@ -147,6 +148,9 @@ while test $# -ne 0; do
       push="false";;
     --push-only)
       build="false";;
+    --print-version-tag)
+      echo "$VERSION-$BUILDDATE"
+      exit 0;;
     -*) use
         echo "Invalid option $1"
         exit 1
