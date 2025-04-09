@@ -32,4 +32,8 @@ while getopts "hd" opt; do
   esac
 done
 
+if [ -n "$KV_BUILD_DATE" ]; then 
+	today="$KV_BUILD_DATE"
+fi
+
 echo "$version$today"
