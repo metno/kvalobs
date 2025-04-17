@@ -240,9 +240,9 @@ fi
 
 
 if [ "$push" = "true" ] && [ "$mode" != "test" ]; then
+  # Before pushing add the tag to the list of tags
+  tags="$tag $tags"
   for target in $targets; do
-    echo "Pushing: ${registry}${target}:$tag"
-    docker push "${registry}${target}:$tag"
     for tagname in $tags; do
       echo "Pushing: ${registry}${target}:$tagname"
       docker push "${registry}${target}:$tagname"
