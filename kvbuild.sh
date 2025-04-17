@@ -7,10 +7,8 @@ set -euo pipefail
 kvuser=kvalobs
 kvuserid=5010
 mode="test"
-#kafka_version=1.9.0-1.cflt~ubu20
-kafka_version=2.4.0-1.cflt~ub20
+kafka_version=2.3.0-1build2
 kafka_version_jammy=1.8.0-1build1
-kafka_version_noble=2.3.0-1build2
 VERSION="$(./version.sh)"
 BUILDDATE=$(date +'%Y%m%d')
 default_os="noble"
@@ -18,14 +16,14 @@ os="noble"
 registry="registry.met.no/met/obsklim/bakkeobservasjoner/data-og-kvalitet/kvalobs/kvbuild"
 targets=
 targets_in=
-tag=latest
-tag_and_latest="false"
+tag="${VERSION}"
 avalable_targets="kvbuilddep kvbuild kvcpp kvdatainputd kvqabased kvmanagerd"
 nocache=
 build="true"
 push="true"
-KV_BUILD_DATE=${KV_BUILD_DATE:-}
-latest_tag=latest
+KV_BUILD_DATE="${KV_BUILD_DATE:-}"
+tags=""
+tag_counter=0
 
 if [ -n "${KV_BUILD_DATE}" ]; then
   BUILDDATE=$KV_BUILD_DATE
@@ -47,14 +45,13 @@ to the registry.
 Options:
   --help        display this help and exit.
   --list        list targets.
-  --tag tagname tag the image with the name tagname, default latest.
+  --tag tagname tag the image with tagname, default ${VERSION}.
   --tag-and-latest tagname 
-                tag the image with the name tagname  and also create latest tag.
+                tag the image with tagname and also create latest tag.
   --tag-with-build-date 
-                tag with version and build date on the form version-YYYYMMDD 
-                and set latest. If the enviroment variable KV_BUILD_DATE is set use
+                Creates three tags: ${VERSION}, latest and a ${VERSION}-${BUILDDATE}.
+                If the enviroment variable KV_BUILD_DATE is set use
                 this as the build date. Format KV_BUILD_DATE YYYYMMDD.
-  --tag-version Use version from configure.ac as tag. Also tag latest.
   --staging     build and push to staging.
   --prod        build and push to prod.
   --test        only build, default
@@ -72,8 +69,13 @@ Options:
   --all-targets Build all targets.
   --print-version-tag
                 Print the version tag and exit.
+
+              
+  The following opptions is mutally exclusive: --tag, --tag-and-latest, --tag-with-build-date
+  The following options is mutally exclusive: --build-only, --push-only
+  The following options is mutally exclusive: --staging, --prod, --test
   
-  targets this is a list of targets to build. Available targets is:
+  This is a list of targets to build. Available targets is:
 
     '$avalable_targets'
 
@@ -104,20 +106,18 @@ while test $# -ne 0; do
   case $1 in
     --tag) 
         tag="$2"
+        tag_counter=$((tag_counter + 1))
         shift
         ;;
     --tag-and-latest) 
         tag="$2"
-        tag_and_latest=true
+        tags="latest"
+        tag_counter=$((tag_counter + 1))
         shift
         ;;
-    --tag-version) 
-        tag="$VERSION"
-        tag_and_latest=true
-        ;;
     --tag-with-build-date) 
-        tag="$VERSION-$BUILDDATE"
-        tag_and_latest=true
+        tag_counter=$((tag_counter + 1))
+        tags="latest $VERSION-$BUILDDATE"
         ;;
     --all-targets)
       targets_in="$avalable_targets"
@@ -143,11 +143,14 @@ while test $# -ne 0; do
         exit 0 
         ;;
     --no-cache) 
-      nocache="--no-cache";;
+        nocache="--no-cache"
+        ;;
     --build-only)
-      push="false";;
+        push="false"
+        ;;
     --push-only)
-      build="false";;
+        build="false"
+        ;;
     --print-version-tag)
       echo "$VERSION-$BUILDDATE"
       exit 0;;
@@ -160,19 +163,19 @@ while test $# -ne 0; do
   shift
 done
 
+if [ $tag_counter -gt 1 ]; then
+  echo "Only one of --tag, --tag-and-latest or --tag-with-build-date can be used"
+  exit 1
+fi
+
+if [ "$push" = false ] && [ "$build" = false ]; then
+  echo "Either --build-only or --push-only must be used"
+  exit 1
+fi
+
 if [ "$os" = "jammy" ]; then
   kafka_version="$kafka_version_jammy"
 fi
-
-
-# Remove this when noble 
-if [ "$os" = "noble" ]; then
-  # tag="noble-$tag"
-  # latest_tag="noble-latest"
-  kafka_version="$kafka_version_noble"
-fi
-
-
 
 validate_targets "$targets_in"
 
@@ -202,6 +205,7 @@ fi
 
 
 echo "tag: $tag"
+echo "tags: $tags"
 echo "targets_in: $targets_in"
 echo "Targets: $targets"
 echo "mode: $mode"
@@ -225,11 +229,12 @@ if [ "$build" = "true" ]; then
     docker build $nocache --build-arg "REGISTRY=${registry}" --build-arg "BASE_IMAGE_TAG=${tag}" \
       --build-arg "kvuser=$kvuser" --build-arg "kvuserid=$kvuserid" \
       --build-arg "kafka_VERSION=${kafka_version}" \
-      -f "$dockerfile" --tag "${registry}${target}:$tag" .
+      -f "$dockerfile" --tag "${registry}${target}:${tag}" .
   
-    if [ "$tag_and_latest" = "true" ] && [ "$tag" != "$latest_tag" ]; then
-      docker tag "${registry}${target}:$tag" "${registry}${target}:$latest_tag"
-    fi
+    for tagname in $tags; do
+      echo "Tagging: ${registry}${target}:$tagname"
+      docker tag "${registry}${target}:$tag" "${registry}${target}:$tagname"
+    done
   done
 fi
 
@@ -238,9 +243,9 @@ if [ "$push" = "true" ] && [ "$mode" != "test" ]; then
   for target in $targets; do
     echo "Pushing: ${registry}${target}:$tag"
     docker push "${registry}${target}:$tag"
-    if [ "$tag_and_latest" = "true" ] && [ "$tag" != "$latest_tag" ]; then
-      echo "Pushing: ${registry}${target}:$latest_tag"
-      docker push "${registry}${target}:$latest_tag"
-    fi
+    for tagname in $tags; do
+      echo "Pushing: ${registry}${target}:$tagname"
+      docker push "${registry}${target}:$tagname"
+    done
   done
 fi
