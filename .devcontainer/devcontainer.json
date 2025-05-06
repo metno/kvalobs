@@ -47,7 +47,7 @@
 	},
 	// Set *default* container specific settings.json values on container create.
 	"containerEnv": {
-		"PATH": "/home/${localEnv:USER}/.local/bin:/opt/conda/bin:/opt/conda/condabin:/opt/conda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+		"PATH": "/home/${localEnv:USER}/.local/bin:/opt/conda/bin:/opt/conda/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 	},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
