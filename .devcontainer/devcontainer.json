@@ -1,0 +1,66 @@
+{
+	"name": "kvalobsdev",
+	// Sets the run context to one level up instead of the .devcontainer folder.
+	"context": "..",
+	// Update the 'dockerFile' property if you aren't using the standard 'Dockerfile' filename.
+	//"dockerFile": "../docker/kvalobs/bionic/devcontainer.dockerfile",
+	//"dockerFile": "../docker/kvalobs/focal/devcontainer.dockerfile",
+	// "dockerFile": "../docker/kvalobs/focal/devcontainer.dockerfile",
+	"dockerFile": "../docker/kvalobs/noble/devcontainer.dockerfile",
+	"build": {
+		"args": {
+			"USER": "${localEnv:USER}"
+		}
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-python.vscode-pylance",
+				"ms-python.python",
+				"visualstudioexptteam.vscodeintellicode",
+				"redhat.vscode-yaml",
+				"mads-hartmann.bash-ide-vscode",
+				"yzhang.markdown-all-in-one",
+				"coolbear.systemd-unit-file",
+				"tamasfe.even-better-toml",
+				"ms-azuretools.vscode-docker",
+				"maelvalais.autoconf",
+				"zxh404.vscode-proto3",
+				"bierner.markdown-mermaid",
+				"redhat.vscode-xml",
+				"golang.go",
+				"ms-vscode.cpptools-extension-pack",
+				"github.copilot",
+				"ms-vscode.makefile-tools"
+			],
+			"settings": {
+				"terminal.integrated.profiles.linux": {
+					"bash": {
+						"path": "/bin/bash",
+						"args": [
+							"--login"
+						]
+					}
+				}
+			}
+		}
+	},
+	// Set *default* container specific settings.json values on container create.
+	"containerEnv": {
+		"PATH": "/home/${localEnv:USER}/.local/bin:/opt/conda/bin:/opt/conda/condabin:/opt/conda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+	},
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+	// Uncomment the next line to run commands after the container is created - for example installing curl.
+	//"postCreateCommand": "python setup.py develop --user",
+	// Uncomment when using a ptrace-based debugger like C++, Go, and Rust
+	// "runArgs": [ "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined" ],
+	// Uncomment to use the Docker CLI from inside the container. See https://aka.ms/vscode-remote/samples/docker-from-docker.
+	// "mounts": [ "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind" ],
+	// Uncomment to connect as a non-root user if you've added one. See https://aka.ms/vscode-remote/containers/non-root.
+	"mounts": [
+		"source=${localEnv:HOME}/.config,target=/home/${localEnv:USER}/.config,type=bind,consistency=cached",
+		"source=${localEnv:HOME}/.ssh,target=/home/${localEnv:USER}/.ssh,type=bind,consistency=cached"
+	],
+	"remoteUser": "${localEnv:USER}"
+}
