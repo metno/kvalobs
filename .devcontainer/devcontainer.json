@@ -8,6 +8,7 @@
 	// "dockerFile": "../docker/kvalobs/focal/devcontainer.dockerfile",
 	"dockerFile": "../docker/kvalobs/noble/devcontainer.dockerfile",
 	"build": {
+		//"dockerfile": "../docker/kvalobs/noble/devcontainer.dockerfile",
 		"args": {
 			"USER": "${localEnv:USER}"
 		}
