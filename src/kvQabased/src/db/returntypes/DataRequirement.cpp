@@ -102,6 +102,33 @@ DataRequirement::DataRequirement(const char * signature, int stationid,  bool is
 DataRequirement::~DataRequirement() {
 }
 
+std::list<int> DataRequirement::getDefinedTypeIDs() const{
+  std::list<int> ret;
+  for (ParameterList::const_iterator it = parameter_.begin();
+      it != parameter_.end(); ++it) {
+    if (it->haveType()) {
+      ret.push_back(it->type());
+    }
+  }
+  return ret;
+}
+
+bool DataRequirement::haveTypeID(int typeid_) const {
+    std::list<int> definedTypeIDs = getDefinedTypeIDs();
+    return definedTypeIDs.empty() ||
+           std::find(definedTypeIDs.begin(), definedTypeIDs.end(), typeid_) != definedTypeIDs.end();
+  }
+
+bool DataRequirement::haveSensorLevel(int sensor, int level) const {
+  for (ParameterList::const_iterator it = parameter_.begin();
+      it != parameter_.end(); ++it) {
+    if ( it->haveSensor(sensor) && it->haveLevel(level))
+        return true;
+    }
+    return false;
+  }
+
+
 bool DataRequirement::empty() const {
   return parameter_.empty() and station_.empty();
 }

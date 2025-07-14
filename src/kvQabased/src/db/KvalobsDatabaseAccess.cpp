@@ -30,6 +30,8 @@
 #include "KvalobsDatabaseAccess.h"
 #include "databaseResultFilter.h"
 #include "returntypes/Observation.h"
+#include "returntypes/DataRequirement.h"
+#include "returntypes/CheckSignature.h"
 #include <boost/lexical_cast.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <decodeutility/kvalobsdata.h>
@@ -171,7 +173,8 @@ void KvalobsDatabaseAccess::getChecks(CheckList *out,
   milog::LogContext context("query");
   LOGDEBUG1(query.str());
 
-  std::map<std::string, kvalobs::kvChecks> checks;
+  typedef std::tuple<kvalobs::kvChecks, qabase::CheckSignature> CheckWithSignature;
+  std::map<std::string, CheckWithSignature> checks;
 
   ResultPtr result(connection_->execQuery(query.str()));
   while (result->hasNext()) {
@@ -179,12 +182,36 @@ void KvalobsDatabaseAccess::getChecks(CheckList *out,
     // overwrite with specific-value stations likewise for varying
     // fromtime - latest fromtime for station is preferred
     kvalobs::kvChecks check(result->next());
-    checks[check.qcx()] = check;
+    try {
+      checks[check.qcx()] = std::make_tuple(check,
+                                          qabase::CheckSignature(
+                                              check.checksignature(),
+                                              obs.stationID(), true));
+    } catch( const qabase::CheckSignature::Error &e) {
+      LOGERROR("Error parsing check signature stationid=" 
+        << obs.stationID() 
+        << "signature='" << check.qcx() 
+        << "': " << e.what());
+      checks[check.qcx()] = std::make_tuple( check, qabase::CheckSignature());
+    } catch (const std::exception &e) {
+      LOGERROR("Error parsing check signature stationid="
+               << obs.stationID() << " signature='" << check.qcx()
+               << "': " << e.what());
+      checks[check.qcx()] = std::make_tuple(check, qabase::CheckSignature());
+    } 
   }
-  for (std::map<std::string, kvalobs::kvChecks>::const_iterator it =
-           checks.begin();
-       it != checks.end(); ++it)
-    out->push_back(it->second);
+
+  for ( auto const &it : checks){
+    const qabase::CheckSignature &signature = std::get<1>(it.second);
+    if (signature.isValid()) {
+      const qabase::DataRequirement *obsReq = signature.obs();
+      if (obsReq->haveTypeID(obs.typeID())) {
+        out->push_back(std::get<0>(it.second));
+      }
+    } else {
+      out->push_back(std::get<0>(it.second));
+    }
+  }
 }
 
 int KvalobsDatabaseAccess::getQcxFlagPosition(const std::string &qcx) const {

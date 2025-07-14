@@ -277,18 +277,17 @@ CheckRunner::KvalobsDataPtr CheckRunner::checkObservation(
     db::DatabaseAccess::DataList d;
     db.getData(&d, obs, *it, 0);
     d.remove_if(std::not_fn(have_typeid(obs.typeID())));
-    if (not d.empty()) {
+    if ( ! d.empty()) {
       parametersInData.insert(*it);
       observationData.insert(observationData.end(), d.begin(), d.end());
     }
   }
-  //observationData.remove_if(std::not1(have_typeid(obs.typeID())));
 
   if (haveAnyHqcCorrectedElements(observationData)) {
     LOGINFO("Observation is HQC-modified. Will not run tests on this");
     return db.complete(obs, observationData);
   }
-
+  
   if (qcxFilter_.empty()) {
     resetObservationDataFlags(observationData);
     resetCFailed(observationData);
@@ -306,15 +305,23 @@ CheckRunner::KvalobsDataPtr CheckRunner::checkObservation(
       const DataRequirement * obsRequirement = signature.obs();
       if (obsRequirement) {
         for (std::set<std::string>::const_iterator it =
-            parametersInData.begin(); it != parametersInData.end(); ++it)
+            parametersInData.begin(); it != parametersInData.end(); ++it) {
           if (obsRequirement->haveParameter(*it)) {
-            hasAnyParametersRequiredByCheck = true;
+            //Check if sensor and level in the observation data matches the checks
+            //parameters required sensor and level.
+            for (const kvalobs::kvData  &data : observationData) {
+              if (obsRequirement->haveSensorLevel(data.sensor(), data.level())){
+                hasAnyParametersRequiredByCheck = true;
+                break;
+              }
+            }
             break;
           }
+        }
       } else {
         hasAnyParametersRequiredByCheck = true;
       }
-
+      // If the check is not active at this hour, we skip it
       if (hasAnyParametersRequiredByCheck
           && shouldRunCheck(obs.stationInfo(), *check, expectedParameters)) {
         db::DatabaseAccess::DataList modifications;
@@ -335,8 +342,9 @@ CheckRunner::KvalobsDataPtr CheckRunner::checkObservation(
         LOGDEBUG("Check done. modification size " << modifications.size());
 
         db.write(modifications);
-      } else
+      } else {
         LOGDEBUG1("Skipping check " << check->qcx());
+      }
     } catch (std::bad_alloc & e) {
       LOGFATAL(e.what());
       throw;
@@ -431,7 +439,10 @@ void CheckRunner::resetObservationDataFlags(
 
     // All flags should be 0, with a few exceptions:
     newCi.set(kvQCFlagTypes::f_fagg, oldCi.flag(kvQCFlagTypes::f_fagg));
-    newCi.set(kvQCFlagTypes::f_fmis, oldCi.flag(kvQCFlagTypes::f_fmis));
+    auto fmis=oldCi.flag(kvQCFlagTypes::f_fmis);
+    if (fmis==0 || fmis==3){
+      newCi.set(kvQCFlagTypes::f_fmis, fmis);
+    }
     newCi.set(kvQCFlagTypes::f_fd, oldCi.flag(kvQCFlagTypes::f_fd));
     if (oldCi.flag(kvQCFlagTypes::f_fpre) == 7)
       newCi.set(kvQCFlagTypes::f_fpre, 7);

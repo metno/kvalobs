@@ -35,6 +35,7 @@
 #include <vector>
 #include <map>
 #include <ostream>
+#include <list>
 
 namespace qabase {
 
@@ -112,6 +113,27 @@ class DataRequirement {
    */
   DataRequirement(const char * signature, int stationid, bool isConcreteSpecifification);
   ~DataRequirement();
+
+  /**
+   * Get all typeids that is explicit defined..
+   *
+   * @return List of typeids that is explicitly defined in the requirement.
+   */
+  std::list<int> getDefinedTypeIDs() const;
+
+  /**
+   * Has the requirement the specified typeid defined.
+   * If non typeids are defined, this will return true.
+   * If any typeid is defined, this will return true if the
+   * specified typeid is in the list of defined typeids and false
+   * if it is not.
+   * @param typeid_ Typeid to check for
+   * @return True if the typeid is defined, false if not.
+   */
+  
+  bool haveTypeID(int typeid_) const;
+
+  bool haveSensorLevel(int sensor, int level) const;
 
   /**
    * Does the object contain any objects at all?
@@ -320,6 +342,9 @@ class DataRequirement::Parameter {
     return level_ != NULL_PARAMETER_;
   }
 
+  bool haveLevel(int level) const {
+    return (level_ == level) || (level_ == NULL_PARAMETER_);
+  }
   /**
    * Does the specification contain a specific sensor?
    * @return True if parameter have an explicit sensor.
@@ -328,12 +353,20 @@ class DataRequirement::Parameter {
     return sensor_ != NULL_PARAMETER_;
   }
 
+  bool haveSensor(int sensor) const {
+    return (sensor_ == sensor) || (sensor_ == NULL_PARAMETER_);
+  }
+
   /**
    * Does the specification contain a specific typeid?
    * @return True if parameter have an explicit typeid.
    */
   bool haveType() const {
     return typeid_ != NULL_PARAMETER_;
+  }
+
+  bool haveType(int typeid_) const {
+    return (typeid_ == typeid_) || (typeid_ == NULL_PARAMETER_);
   }
 
 

@@ -60,6 +60,9 @@ class DataRequirement;
 class CheckSignature {
  public:
 
+  CheckSignature() {
+    requirements_=std::map<std::string, DataRequirement>();
+  }
   /**
    * Initialize object with the given string.
    *
@@ -85,7 +88,12 @@ class CheckSignature {
    *                  the signature.
    */
   CheckSignature(const char * signature, int stationid, bool isConcreteSpecification);
+
   ~CheckSignature();
+
+  bool isValid()const {
+    return !requirements_.empty();
+  }
 
   /**
    * Get obs requirements, or NULL if there are none.
