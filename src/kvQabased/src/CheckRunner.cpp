@@ -255,6 +255,7 @@ CheckRunner::KvalobsDataPtr CheckRunner::checkObservation(
   db::CachedDatabaseAccess cdb(db_.get(), obs);
   db::DelayedSaveDatabaseAccess db(&cdb);
   AutoRollbackTransaction transaction(db);
+  std::ostringstream skippedChecks;
 
   if (!db.pin(obs)) {
     LOGINFO("No data for observationid " << obs.id() << " - skipping all checks");
@@ -298,53 +299,35 @@ CheckRunner::KvalobsDataPtr CheckRunner::checkObservation(
     std::string checkName = check->checkname();
     milog::LogContext context(checkName);
     try {
-      bool hasAnyParametersRequiredByCheck = false;
-
-      std::string signatureString = check->checksignature();
-      CheckSignature signature(signatureString.c_str(), obs.stationID(), true);
-      const DataRequirement * obsRequirement = signature.obs();
-      if (obsRequirement) {
-        for (std::set<std::string>::const_iterator it =
-            parametersInData.begin(); it != parametersInData.end(); ++it) {
-          if (obsRequirement->haveParameter(*it)) {
-            //Check if sensor and level in the observation data matches the checks
-            //parameters required sensor and level.
-            for (const kvalobs::kvData  &data : observationData) {
-              if (obsRequirement->haveSensorLevel(data.sensor(), data.level())){
-                hasAnyParametersRequiredByCheck = true;
-                break;
-              }
-            }
-            break;
-          }
-        }
-      } else {
-        hasAnyParametersRequiredByCheck = true;
+      if( ! haveAnyParametersRequiredByCheck(obs,*check, parametersInData, observationData) ) {
+        LOGDEBUG1("Skipping check '" << check->qcx() << "' no parameters match the check requirements");
+        skippedChecks << "Skipping check '" << check->qcx() << "' no parameters match the check requirements" << std::endl;
+        continue;
       }
+
       // If the check is not active at this hour, we skip it
-      if (hasAnyParametersRequiredByCheck
-          && shouldRunCheck(obs.stationInfo(), *check, expectedParameters)) {
-        db::DatabaseAccess::DataList modifications;
-
-        KvalobsCheckScript script(db, obs, *check, scriptLog);
-
-        LOGDEBUG("Running check " << * check);
-        script.run(&modifications);
-
-        // Set new useinfo flags
-        for (db::DatabaseAccess::DataList::iterator it = modifications.begin();
-            it != modifications.end(); ++it) {
-          kvalobs::kvUseInfo ui = it->useinfo();
-          ui.setUseFlags(it->controlinfo());
-          it->useinfo(ui);
-        }
-
-        LOGDEBUG("Check done. modification size " << modifications.size());
-
-        db.write(modifications);
-      } else {
-        LOGDEBUG1("Skipping check " << check->qcx());
+      if ( ! shouldRunCheck(obs.stationInfo(), *check, expectedParameters)) {
+        LOGDEBUG1("Skipping check " << check->qcx() << " at this hour");
+        skippedChecks << "Skipping check '" << check->qcx() << "' at this hour." << std::endl;
+        continue;
       }
+
+      db::DatabaseAccess::DataList modifications;
+      KvalobsCheckScript script(db, obs, *check, scriptLog);
+
+      LOGDEBUG("Running check " << * check);
+      script.run(&modifications);
+
+      // Set new useinfo flags
+      for (db::DatabaseAccess::DataList::iterator it = modifications.begin();
+        it != modifications.end(); ++it) {
+        kvalobs::kvUseInfo ui = it->useinfo();
+        ui.setUseFlags(it->controlinfo());
+        it->useinfo(ui);
+      }
+
+      LOGDEBUG("Check done. modification size " << modifications.size());
+      db.write(modifications);
     } catch (std::bad_alloc & e) {
       LOGFATAL(e.what());
       throw;
@@ -375,7 +358,45 @@ CheckRunner::KvalobsDataPtr CheckRunner::checkObservation(
 
   auto ret = db.complete(obs, dl);
   transaction.commit();
+
+  (*scriptLog) << std::endl << "Skipped checks:" << std::endl;
+  std::string skippedChecksStr = skippedChecks.str();
+  if ( skippedChecksStr.empty() ) {
+    (*scriptLog) << " - No checks skipped." << std::endl;
+  } else {
+    (*scriptLog) << skippedChecksStr << std::endl;
+  }
   return ret;
+}
+
+bool CheckRunner::haveAnyParametersRequiredByCheck(
+          const qabase::Observation & obs,
+          const kvalobs::kvChecks & check,
+          const std::set<std::string> &parametersInData,
+          const db::DatabaseAccess::DataList & observationData) const {
+  std::string signatureString = check.checksignature();
+  CheckSignature signature(signatureString.c_str(), obs.stationID(), true);
+  const DataRequirement * obsRequirement = signature.obs();
+  if (obsRequirement) {
+    for ( const std::string &paramName : parametersInData) {
+      if (obsRequirement->haveParameter(paramName)) {
+        //Check if sensor and level in the observation data matches the checks
+        //parameters required sensor and level.
+        for (const kvalobs::kvData  &data : observationData) {
+          if (obsRequirement->haveSensorLevel(data.sensor(), data.level())){
+              return true;
+          }
+        }
+      }
+    }
+ 
+    // No parameters in the observation data matches the obsRequirement
+    return false; 
+  }
+ 
+  // If no obsRequirement, we assume it matches
+  // all parameters in the observation data
+  return true; 
 }
 
 namespace {
@@ -440,9 +461,14 @@ void CheckRunner::resetObservationDataFlags(
     // All flags should be 0, with a few exceptions:
     newCi.set(kvQCFlagTypes::f_fagg, oldCi.flag(kvQCFlagTypes::f_fagg));
     auto fmis=oldCi.flag(kvQCFlagTypes::f_fmis);
-    if (fmis==0 || fmis==3){
+    
+    if (fmis==3){
       newCi.set(kvQCFlagTypes::f_fmis, fmis);
+    } else {
+      //Reset corrected value to original value when fmis is reset ie fmis != 3.
+      it->corrected(it->original());
     }
+    
     newCi.set(kvQCFlagTypes::f_fd, oldCi.flag(kvQCFlagTypes::f_fd));
     if (oldCi.flag(kvQCFlagTypes::f_fpre) == 7)
       newCi.set(kvQCFlagTypes::f_fpre, 7);
@@ -452,6 +478,8 @@ void CheckRunner::resetObservationDataFlags(
     kvalobs::kvUseInfo ui = it->useinfo();
     ui.setUseFlags(newCi);
     it->useinfo(ui);
+
+    
   }
 }
 

@@ -130,6 +130,29 @@ class CheckRunner {
 
   void resetCFailed(db::DatabaseAccess::DataList & observationData);
 
+  /**
+   * @brief Determines if any parameters required by a check are present in the observation data.
+   *
+   * This function checks whether any of the parameters required by the given check
+   * are present in the provided set of parameters (`parametersInData`) and whether
+   * the corresponding sensor and level in the observation data match the requirements
+   * specified by the check's signature.
+   *
+   * @param obs The observation being checked.
+   * @param check The check whose parameter requirements are being evaluated.
+   * @param parametersInData Set of parameter names present in the observation data.
+   * @param observationData List of observation data elements to check for matching sensor/level.
+   * @return true if at least one required parameter (with matching sensor/level) is present; false otherwise.
+   *
+   * If the check does not specify any parameter requirements (i.e., `obsRequirement` is null),
+   * the function returns true, assuming all parameters in the observation data are valid for the check.
+   */
+  bool haveAnyParametersRequiredByCheck(
+          const qabase::Observation & obs,
+          const kvalobs::kvChecks & check,
+          const std::set<std::string> &parametersInData,
+          const db::DatabaseAccess::DataList & observationData) const;
+
   bool haveAnyHqcCorrectedElements(
       const db::DatabaseAccess::DataList & observationData) const;
 

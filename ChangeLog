@@ -1,3 +1,9 @@
+2025-07-14 Børge Moe
+  * Release 7.20-rc1
+  * kvQaBased
+    - Reset missing flag if it != 3
+    - Use the checks concrete typeid, sensor and level to only run necesarry checks.
+    
 2025-04-01 Børge Moe
   * Release 7.1.0
   * kvManagerd
