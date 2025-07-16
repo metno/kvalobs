@@ -42,9 +42,9 @@ DelayedSaveDatabaseAccess::~DelayedSaveDatabaseAccess() {
 void DelayedSaveDatabaseAccess::getData(
     DataList * out, const qabase::Observation & obs,
     const qabase::DataRequirement::Parameter & parameter,
-    int minuteOffset) const {
+    int minuteOffset, bool filterByLevel, bool filterBySensor) const {
   DataList fromDb;
-  FilteredDatabaseAccess::getData(&fromDb, obs, parameter, minuteOffset);
+  FilteredDatabaseAccess::getData(&fromDb, obs, parameter, minuteOffset, filterByLevel, filterBySensor);
 
   for (DataList::iterator it = fromDb.begin(); it != fromDb.end(); ++it) {
     SavedData::const_iterator alreadySaved = savedData_.find(*it);
@@ -61,7 +61,6 @@ void DelayedSaveDatabaseAccess::write(const DataList & data) {
     savedData_.insert(*it);
   }
 }
-
 void DelayedSaveDatabaseAccess::commit() {
   if (not savedData_.empty()) {
     DataList saveData(savedData_.begin(), savedData_.end());

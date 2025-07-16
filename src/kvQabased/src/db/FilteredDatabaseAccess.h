@@ -119,8 +119,8 @@ class FilteredDatabaseAccess : public DatabaseAccess {
 
   virtual void getData(DataList * out, const qabase::Observation & obs,
                        const qabase::DataRequirement::Parameter & parameter,
-                       int minuteOffset) const {
-    baseImplementation_->getData(out, obs, parameter, minuteOffset);
+                       int minuteOffset, bool filterByLevel=true, bool filterBySensor=true) const {
+    baseImplementation_->getData(out, obs, parameter, minuteOffset, filterByLevel, filterBySensor);
   }
 
   virtual bool pin(const qabase::Observation & obs) const {

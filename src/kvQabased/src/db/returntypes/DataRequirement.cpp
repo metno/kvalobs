@@ -28,6 +28,7 @@
  */
 
 #include "DataRequirement.h"
+#include "db/KvalobsDatabaseAccess.h"
 #include <boost/spirit/include/classic.hpp>
 #include <sstream>
 
@@ -104,30 +105,61 @@ DataRequirement::~DataRequirement() {
 
 std::list<int> DataRequirement::getDefinedTypeIDs() const{
   std::list<int> ret;
-  for (ParameterList::const_iterator it = parameter_.begin();
-      it != parameter_.end(); ++it) {
-    if (it->haveType()) {
-      ret.push_back(it->type());
+  for (const auto &param : parameter_) {
+    if (param.haveType()) {
+      ret.push_back(param.type());
     }
   }
   return ret;
 }
 
+bool DataRequirement::dataMatchesTheRequirement(const db::DatabaseAccess::DataList &dataList) const {
+    int nMatching = 0;
+    for (const Parameter &param : parameter_) {
+      for(const kvalobs::kvData &data : dataList) {
+        // If the parameter does not match the data, we skip it.
+        if ( param.useParameter(data) ) {
+          nMatching++; // We have a matching data.
+          break;;
+        }
+      }
+    }
+    //Do we have data for all parameters?
+    return nMatching == parameter_.size();
+  }
+  
+
 bool DataRequirement::haveTypeID(int typeid_) const {
     std::list<int> definedTypeIDs = getDefinedTypeIDs();
-    return definedTypeIDs.empty() ||
-           std::find(definedTypeIDs.begin(), definedTypeIDs.end(), typeid_) != definedTypeIDs.end();
-  }
+    if ( definedTypeIDs.empty() ) {
+      return true; // If no typeids are defined, we assume all typeids are wanted.
+    }
+    for ( auto t : definedTypeIDs) {
+      if ( t == typeid_ ) {
+        return true; // If the typeid is in the list of defined typeids, we return true.
+      }
 
-bool DataRequirement::haveSensorLevel(int sensor, int level) const {
-  for (ParameterList::const_iterator it = parameter_.begin();
-      it != parameter_.end(); ++it) {
-    if ( it->haveSensor(sensor) && it->haveLevel(level))
+    } 
+    return false;
+  }  
+
+bool DataRequirement::haveParameterSensorLevel(const std::string & paramName, int sensor, int level) const {
+    for (const auto &param : parameter_) {
+      if (param.baseName() == paramName && param.haveSensor(sensor) && param.haveLevel(level)) {
         return true;
+      }
     }
     return false;
   }
-
+bool DataRequirement::haveSensorLevel(int sensor, int level) const {
+  for (ParameterList::const_iterator it = parameter_.begin();
+      it != parameter_.end(); ++it) {
+    if (it->haveSensor(sensor) && it->haveLevel(level)){
+        return true;
+    }
+  }
+  return false;
+}
 
 bool DataRequirement::empty() const {
   return parameter_.empty() and station_.empty();
@@ -135,15 +167,37 @@ bool DataRequirement::empty() const {
 
 bool DataRequirement::haveParameter(const std::string & baseParameter) const {
   for (ParameterList::const_iterator find = parameter_.begin();
-      find != parameter_.end(); ++find)
-    if (find->baseName() == baseParameter)
+      find != parameter_.end(); ++find) {
+    if (find->baseName() == baseParameter){
       return true;
+    }
+  }
   return false;
 }
 
 
 bool DataRequirement::haveStation(int what) const {
   return std::find(station_.begin(), station_.end(), what) != station_.end();
+}
+
+std::string DataRequirement::str() const {
+  std::ostringstream oss;
+  oss << requirementType_ << ';';
+
+  for (ParameterList::const_iterator it = parameter_.begin();
+      it != parameter_.end(); ++it) {
+    if (it != parameter_.begin()) {
+      oss << ',';
+    }
+    oss << it->str();
+  }
+  //
+  oss << ";;";
+
+  if (firstTime_!=0 || lastTime_ != 0) {
+    oss << firstTime_ << ',' << lastTime_ << ';';
+  }
+  return oss.str();
 }
 
 ParameterTranslation getTranslation(const DataRequirement & from,
@@ -193,6 +247,19 @@ DataRequirement::Parameter::Parameter(const std::string & signature)
       typeid_(NULL_PARAMETER_) {
   parse_(signature);
 }
+
+bool DataRequirement::Parameter::useParameter(const kvalobs::kvData &data) const {
+    std::string dataParamName = db::KvalobsDatabaseAccess::getParamName(data.paramID());
+    if (dataParamName != name_) {
+      return false; // The parameter name does not match.
+    }
+   
+
+    return haveSensor(data.sensor()) &&
+           haveLevel(data.level()) &&
+           haveType(data.typeID());
+  }
+
 
 std::string DataRequirement::Parameter::str() const {
   if (haveLevel() or haveSensor() or haveType()) {

@@ -59,7 +59,7 @@ class DelayedSaveDatabaseAccess : public FilteredDatabaseAccess,
 
   virtual void getData(DataList * out, const qabase::Observation & obs,
                        const qabase::DataRequirement::Parameter & parameter,
-                       int minuteOffset) const;
+                       int minuteOffset, bool filterByLevel=true, bool filterBySensor=true) const;
 
   virtual void write(const DataList & data);
 

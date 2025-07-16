@@ -276,7 +276,7 @@ CheckRunner::KvalobsDataPtr CheckRunner::checkObservation(
   db::DatabaseAccess::DataList observationData;
   for (db::DatabaseAccess::ParameterList::const_iterator it = expectedParameters.begin(); it != expectedParameters.end(); ++it) {
     db::DatabaseAccess::DataList d;
-    db.getData(&d, obs, *it, 0);
+    db.getData(&d, obs, *it, 0, false, false);
     d.remove_if(std::not_fn(have_typeid(obs.typeID())));
     if ( ! d.empty()) {
       parametersInData.insert(*it);
@@ -299,7 +299,7 @@ CheckRunner::KvalobsDataPtr CheckRunner::checkObservation(
     std::string checkName = check->checkname();
     milog::LogContext context(checkName);
     try {
-      if( ! haveAnyParametersRequiredByCheck(obs,*check, parametersInData, observationData) ) {
+      if( ! haveAnyParametersRequiredByCheck(obs,*check, parametersInData, observationData, scriptLog) ) {
         LOGDEBUG1("Skipping check '" << check->qcx() << "' no parameters match the check requirements");
         skippedChecks << "Skipping check '" << check->qcx() << "' no parameters match the check requirements" << std::endl;
         continue;
@@ -373,30 +373,42 @@ bool CheckRunner::haveAnyParametersRequiredByCheck(
           const qabase::Observation & obs,
           const kvalobs::kvChecks & check,
           const std::set<std::string> &parametersInData,
-          const db::DatabaseAccess::DataList & observationData) const {
+          const db::DatabaseAccess::DataList & observationData, std::ostream * scriptLog) const {
+  std::ostringstream log;
+  log <<  "Checkrequirement '" << check.qcx() <<", " << check.checkname() << "': sid= " << obs.stationID() 
+    << " tid=" << obs.typeID() << " obt=" << obs.obstime() << std::endl;
+    log << "Parameters in data: ";
+  for (const std::string &paramName : parametersInData) {
+    log << paramName << " ";
+  }
+  log << std::endl;
+
+  log << "Observation data: " << std::endl;
+  for (const kvalobs::kvData &data : observationData) {
+    log << db::KvalobsDatabaseAccess::getParamName(data.paramID()) << ",s: " << data.sensor() << ", l: " << data.level() << ", tid: " << data.typeID()
+        << ", orig: " << data.original() << std::endl;
+  }
+  bool found=false;
   std::string signatureString = check.checksignature();
-  CheckSignature signature(signatureString.c_str(), obs.stationID(), true);
+  CheckSignature signature(check.checksignature(), obs.stationID(), true);
   const DataRequirement * obsRequirement = signature.obs();
   if (obsRequirement) {
-    for ( const std::string &paramName : parametersInData) {
-      if (obsRequirement->haveParameter(paramName)) {
-        //Check if sensor and level in the observation data matches the checks
-        //parameters required sensor and level.
-        for (const kvalobs::kvData  &data : observationData) {
-          if (obsRequirement->haveSensorLevel(data.sensor(), data.level())){
-              return true;
-          }
-        }
+    log << "Checkrequirement signature: " << signatureString << std::endl;
+    log << "Checkrequirement parameters: " << obsRequirement->str() << std::endl;
+    found=obsRequirement->dataMatchesTheRequirement(observationData);
+  }
+  if( !found ) {
+    log << "No parameters in the observation data matches the obsRequirement." << std::endl;
+    if (scriptLog) {
+      //DEBUG
+      if (obs.stationID() == 7420 && obs.typeID() == 501 && check.checkname() == "push6flag") {
+        // Special case for stationid 7420, typeid 1, where we log the
+        // check signature and parameters in the observation data.
+          (*scriptLog) << log.str() << std::endl;
       }
     }
- 
-    // No parameters in the observation data matches the obsRequirement
-    return false; 
   }
- 
-  // If no obsRequirement, we assume it matches
-  // all parameters in the observation data
-  return true; 
+  return false; 
 }
 
 namespace {
@@ -429,16 +441,24 @@ bool checkShouldRunAtThisHour(const std::string & checkActive,
 bool CheckRunner::shouldRunCheck(
     const kvalobs::kvStationInfo & obs, const kvalobs::kvChecks & check,
     const db::DatabaseAccess::ParameterList & expectedParameters) const {
-  if (not qcxFilter_.empty())
+
+  // if ( check.medium_qcx() == "QC1-1" && 
+  //     (check.checkname()=="RANGE_CHECK" || check.checkname()=="logger_t") && 
+  //     !isShip(obs) && checkShouldRunAtThisHour(check.active(), obs)
+  //   ) {
+  //   // QC1-1 is a special case, it is always run
+  //   return true;
+  // }
+
+  if ( ! qcxFilter_.empty())
     if (qcxFilter_.find(check.qcx()) == qcxFilter_.end())
       return false;
 
-  if (not checkShouldRunAtThisHour(check.active(), obs))
+  if ( ! checkShouldRunAtThisHour(check.active(), obs))
     return false;
 
-  if ((not isShip(obs))
-  //or expectedParameters.empty() )
-      and not signatureMatchesExpectedParameters(
+  if ( ! isShip(obs)
+      && ! signatureMatchesExpectedParameters(
           CheckSignature(check.checksignature(), obs.stationID(), true),
           expectedParameters))
     return false;

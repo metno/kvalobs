@@ -123,9 +123,12 @@ void DataStore::populateObs_(const db::DatabaseAccess & db,
           "Unable to find translation for parameter: " + parameter->baseName());
     }
 
+    // If the parameter hasLevel given we dont need to filter on level. Same
+    // for sensor if is given we dont need to filter on sensor.
     db::DatabaseAccess::DataList dbdata;
     db.getData(&dbdata, obs, *parameter,
-               concreteObsRequirement.firstTime());
+               concreteObsRequirement.firstTime(), 
+               !parameter->haveLevel(), ! parameter->haveSensor());
 
     if (dbdata.empty()) {
       kvalobs::kvDataFactory factory(
@@ -424,17 +427,6 @@ DataStore::DataStore(const db::DatabaseAccess & db,
   flagPosition_ = db.getQcxFlagPosition(qcx);
 }
 
-// DataStore::DataStore(const DataStore::ParameterSortedDataList & data,
-//                      int flagPosition)
-//     : data_(data),
-//       observation_(
-//           0,
-//           boost::posix_time::ptime(boost::gregorian::day_clock::universal_day(),
-//                                    boost::posix_time::hours(6)),
-//           1),
-//       qcx_("undefined"),
-//       flagPosition_(flagPosition) {
-// }
 
 DataStore::~DataStore() {
 }

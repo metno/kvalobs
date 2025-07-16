@@ -151,7 +151,7 @@ class CheckRunner {
           const qabase::Observation & obs,
           const kvalobs::kvChecks & check,
           const std::set<std::string> &parametersInData,
-          const db::DatabaseAccess::DataList & observationData) const;
+          const db::DatabaseAccess::DataList & observationData, std::ostream * scriptLog=nullptr) const;
 
   bool haveAnyHqcCorrectedElements(
       const db::DatabaseAccess::DataList & observationData) const;

@@ -107,7 +107,7 @@ class KvalobsDatabaseAccess : public db::DatabaseAccess {
   virtual void getModelData(ModelDataList * out, const kvalobs::kvStationInfo & si, const qabase::DataRequirement::Parameter & parameter,
                             int minutesBackInTime) const;
 
-  virtual void getData(DataList * out, const qabase::Observation & obs, const qabase::DataRequirement::Parameter & parameter, int minuteOffset) const;
+  virtual void getData(DataList * out, const qabase::Observation & obs, const qabase::DataRequirement::Parameter & parameter, int minuteOffset, bool filterByLevel=true, bool filterBySensor=true) const;
 
   virtual bool pin(const qabase::Observation & obs) const;
 
@@ -122,8 +122,13 @@ class KvalobsDatabaseAccess : public db::DatabaseAccess {
 
   virtual void markProcessDone(const qabase::Observation & obs);
 
+  static std::string getParamName( int paramid );
+
  private:
   static dnmi::db::Connection * createConnection(const std::string & databaseConnect);
+  static std::map<int, std::string> params;
+
+  void getParams();
 
   void complete_(const qabase::Observation & obs, DataList * out) const;
   void complete_(const qabase::Observation & obs, TextDataList * out) const;

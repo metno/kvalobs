@@ -52,15 +52,35 @@ float parseStationParam(const std::string & metadataToParse,
  * everything except typeid, we prefer either the preferredTypeId, or the
  * highest typeid.
  *
- * Also, if multiple levels or sensors are present, the lowest will be preferred.
+ * Also, if multiple levels or sensors are present, the lowest will be preferred.resultfilter
  *
  * @param data The data to filter
  * @param preferredTypeId The given typeid will be preferred to any other typeids
  *
  * \ingroup group_db
  */
-void filter(db::DatabaseAccess::DataList & data, int preferredTypeId);
 
+/**
+ * @brief Filters a DataList to select the most appropriate data based on typeid, level, and sensor.
+ *
+ * Select correct data from the given list, based on typeid. If we have
+ * several candidates for representing the same piece of data, with respect to
+ * everything except typeid, we prefer either the preferredTypeId, or the
+ * highest typeid.
+ * 
+ * If multiple levels or sensors are present, the lowest value
+ * for each is preferred based on filterByLevel and filterBySensor. 
+ *
+ * @param data The data to filter.
+ * @param preferredTypeId The typeid to prefer over others.
+ * @param filterByLevel If true, filter by level (default: true).
+ * @param filterBySensor If true, filter by sensor (default: true).
+ *
+ * \ingroup group_db
+ */
+  void filter(db::DatabaseAccess::DataList & data, int preferredTypeId,
+            bool filterByLevel=true, bool filterBySensor=true);
+ 
 /**
  * Select correct data from the given list, based on typeid. If we have
  * several candidates for representing the same piece of data, with respect to

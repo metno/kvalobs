@@ -31,6 +31,7 @@
 #include <boost/algorithm/string.hpp>
 #include <vector>
 #include <iostream>
+#include <sstream>
 
 namespace qabase {
 
@@ -61,11 +62,23 @@ const DataRequirement * CheckSignature::meta() const {
   return get_("meta");
 }
 
+std::string CheckSignature::str() const {
+  std::ostringstream oss;
+  for (std::map<std::string, DataRequirement>::const_iterator it =
+      requirements_.begin(); it != requirements_.end(); ++it) {
+    if (it != requirements_.begin()) {
+      oss << "|";
+    }
+    oss <<it->second.str();
+  }
+  return oss.str();
+}
+
 const DataRequirement * CheckSignature::get_(const std::string & name) const {
   std::map<std::string, DataRequirement>::const_iterator find = requirements_
       .find(name);
   if (find == requirements_.end())
-    return 0;
+    return nullptr;
   return &find->second;
 }
 

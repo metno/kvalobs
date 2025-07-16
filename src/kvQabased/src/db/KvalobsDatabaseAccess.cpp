@@ -72,6 +72,8 @@ private:
   bool ownsConnection_;
 };
 
+std::map<int, std::string> KvalobsDatabaseAccess::params;
+
 KvalobsDatabaseAccess::TransactionEnforcingDatabaseConnection::
     TransactionEnforcingDatabaseConnection(dnmi::db::Connection *connection,
                                            bool takeOwnershipOfConnection)
@@ -138,12 +140,15 @@ KvalobsDatabaseAccess::KvalobsDatabaseAccess(
   if (!conn)
     throw std::runtime_error("Unable to connect to database");
   connection_ = new TransactionEnforcingDatabaseConnection(conn, true);
+  getParams();
 }
 
 KvalobsDatabaseAccess::KvalobsDatabaseAccess(dnmi::db::Connection *connection,
                                              bool takeOwnershipOfConnection)
     : connection_(new TransactionEnforcingDatabaseConnection(
-          connection, takeOwnershipOfConnection)) {}
+          connection, takeOwnershipOfConnection)) {
+            getParams();
+          }
 
 std::string KvalobsDatabaseAccess::modelDataName_;
 
@@ -161,6 +166,49 @@ void KvalobsDatabaseAccess::beginTransaction() {
 void KvalobsDatabaseAccess::commit() { connection_->commit(); }
 
 void KvalobsDatabaseAccess::rollback() { connection_->rollback(); }
+
+std::string KvalobsDatabaseAccess::getParamName( int paramid ){
+  
+  if( ! KvalobsDatabaseAccess::params.empty() ) {
+    auto it = KvalobsDatabaseAccess::params.find(paramid);
+    if (it != KvalobsDatabaseAccess::params.end()) {
+      return it->second;
+    }
+  }
+  std::ostringstream p;
+  p <<paramid;
+  return p.str(); 
+}
+
+
+void KvalobsDatabaseAccess::getParams() {
+
+  std::ostringstream query;
+  if ( ! params.empty()) {
+    return;
+  } 
+  LOGINFO("Fetching parameter names from database");
+  query << "SELECT paramid, name FROM param;";
+
+  milog::LogContext context("query");
+  LOGDEBUG1(query.str());
+  connection_->beginTransaction();
+  try{
+    ResultPtr result(connection_->execQuery(query.str()));
+    while (result->hasNext()) {
+      dnmi::db::DRow &row = result->next();
+      int paramid = boost::lexical_cast<int>(row[0]);
+      params[paramid] = row[1];
+    }
+    connection_->commit();
+  } catch (const std::exception &e) {
+    LOGERROR("Error fetching parameter names from database: " << e.what());
+    connection_->rollback();
+    throw;
+  }
+  LOGINFO("Fetched " << params.size() << " parameter names from database");
+}
+
 
 void KvalobsDatabaseAccess::getChecks(CheckList *out,
                                       const qabase::Observation &obs) const {
@@ -497,7 +545,7 @@ kvalobs::kvTextData kvTextDataFromRow(dnmi::db::DRow &row) {
 void KvalobsDatabaseAccess::getData(
     DataList *out, const qabase::Observation &obs,
     const qabase::DataRequirement::Parameter &parameter,
-    int minuteOffset) const {
+    int minuteOffset, bool filterByLevel, bool filterBySensor) const {
   std::ostringstream query;
   query << "SELECT "
            "o.stationid, o.obstime, d.original, d.paramid, o.tbtime, o.typeid, "
@@ -540,7 +588,7 @@ void KvalobsDatabaseAccess::getData(
     data.push_back(d);
   }
 
-  db::resultfilter::filter(data, obs.typeID());
+  db::resultfilter::filter(data, obs.typeID(), filterByLevel, filterBySensor);
 
   out->swap(data);
 }

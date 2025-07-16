@@ -227,7 +227,7 @@ class DatabaseAccess {
    */
   virtual void getData(DataList * out, const qabase::Observation & obs,
                        const qabase::DataRequirement::Parameter & parameter,
-                       int minuteOffset) const = 0;
+                       int minuteOffset, bool filterByLevel=true, bool filterBySensor=true) const = 0;
 
   /**
    * Pin the given observation. This means that any attempt to read data will

@@ -106,10 +106,17 @@ void filter_(db::DatabaseAccess::DataList &data, F function) {
 }
 } // namespace
 
-void filter(db::DatabaseAccess::DataList &data, int preferredTypeId) {
+void filter(db::DatabaseAccess::DataList &data, int preferredTypeId, 
+          bool filterByLevel, bool filterBySensor) {
   filterTypeId_(data, preferredTypeId);
-  filter_<int>(data, std::mem_fn(&kvalobs::kvData::level));
-  filter_<char>(data, std::mem_fn(&kvalobs::kvData::sensor));
+
+  if (filterBySensor) {
+    filter_<int>(data, std::mem_fn(&kvalobs::kvData::sensor));
+  }
+  
+  if (filterByLevel){
+    filter_<int>(data, std::mem_fn(&kvalobs::kvData::level));
+  }
 }
 
 void filter(db::DatabaseAccess::TextDataList &data, int preferredTypeId) {

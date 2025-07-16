@@ -36,6 +36,7 @@
 #include <map>
 #include <ostream>
 #include <list>
+#include <kvalobs/kvData.h>
 
 namespace qabase {
 
@@ -136,6 +137,16 @@ class DataRequirement {
   bool haveSensorLevel(int sensor, int level) const;
 
   /**
+   * Does the object contain a parameter with the given base name, sensor and level?
+   *
+   * @param baseParameter base parameter name, excluding any
+   *                      level/sensor/typeid specifications
+   * @param sensor Sensor number to check for
+   * @param level Level to check for
+   * @return True if the given parameter is wanted with the specified sensor and level
+   */
+  bool haveParameterSensorLevel(const std::string & paramName, int sensor, int level) const;
+  /**
    * Does the object contain any objects at all?
    *
    * @return True if there is no requirements.
@@ -214,6 +225,18 @@ class DataRequirement {
   bool isAbstract()const { 
     return ! isConcrete_;
   }
+
+  typedef std::list<kvalobs::kvData> DataList;
+  bool dataMatchesTheRequirement(const DataList &data) const;
+  /**
+   * Get the number of parameters in the requirement.
+   *
+   * @return Number of parameters
+   */
+  int numberOfParameters() const {
+    return parameter_.size();
+  }
+  std::string str() const;
   /**
    * Thrown if the DataRequirement string is syntactically wrong.
    */
@@ -251,6 +274,10 @@ typedef std::map<DataRequirement::Parameter, DataRequirement::Parameter> Paramet
 ParameterTranslation getTranslation(const DataRequirement & from,
                                     const DataRequirement & to);
 
+
+
+
+
 /**
  * %Parameter specification. May include required level, sensor or typeid for
  * concrete requirements.
@@ -282,6 +309,13 @@ class DataRequirement::Parameter {
    * @param signature string to use as parameter specification
    */
   Parameter(const std::string & signature);
+
+  Parameter(const std::string & name, int level, int sensor, int typeid_, bool isConcreteMetaParameter = false)
+      : name_(name), level_(level), sensor_(sensor), typeid_(typeid_) {
+      if( isConcreteMetaParameter ) {
+        parseAsConcreteMetaParameter();
+      }
+  }
 
   /**
    * Get the identifier for the parameter itself. (eg. TA or RR_24)
@@ -365,8 +399,8 @@ class DataRequirement::Parameter {
     return typeid_ != NULL_PARAMETER_;
   }
 
-  bool haveType(int typeid_) const {
-    return (typeid_ == typeid_) || (typeid_ == NULL_PARAMETER_);
+  bool haveType(int type) const {
+    return (typeid_ == type) || (typeid_ == NULL_PARAMETER_);
   }
 
 
@@ -380,15 +414,17 @@ class DataRequirement::Parameter {
     return metaDataType_;
   }
 
+  bool useParameter(const kvalobs::kvData &data) const;
+
+
   std::string metaDataParam()const {
     return metaDataParamName_;
   }
-
+  static const int NULL_PARAMETER_;
   friend class DataRequirement;
  private:
   bool parseAsConcreteMetaParameter();
   void parse_(const std::string & parameterString);
-  static const int NULL_PARAMETER_;
   std::string name_;
   int level_;
   int sensor_;

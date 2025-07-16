@@ -119,6 +119,9 @@ class CheckSignature {
    */
   const DataRequirement * meta() const;
 
+
+  std::string str() const;
+
   /**
    * Throw on error during parse, which are not directly related to errors
    * in DataRequirment.
