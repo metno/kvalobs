@@ -100,6 +100,9 @@ class CheckSignature {
    * @return obs part of signature
    */
   const DataRequirement * obs() const;
+  void setObs(const DataRequirement & obs) {
+    requirements_["obs"] = obs;
+  }
 
   /**
    * Get refobs requirements, or NULL if there are none.

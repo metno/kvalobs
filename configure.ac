@@ -1,5 +1,5 @@
 AC_PREREQ([2.71])
-AC_INIT([kvalobs],[7.2.0-rc2],[kvoss@met.no])
+AC_INIT([kvalobs],[7.2.0-rc3],[kvoss@met.no])
 AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_MACRO_DIR([m4])
 

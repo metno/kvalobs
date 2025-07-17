@@ -228,6 +228,22 @@ class DataRequirement {
 
   typedef std::list<kvalobs::kvData> DataList;
   bool dataMatchesTheRequirement(const DataList &data) const;
+
+  /**
+   * Remove all data that does not match the requirement.
+   * 
+   * @param data Data to filter
+   * @return Data that matches the requirement
+   */
+  std::list<DataRequirement>
+  getSignaturesForAllDataThatMatchesTheRequirement(const DataList &data) const;
+
+  DataRequirement copyAndUpdateObsRequirement(const std::map<std::string, kvalobs::kvData> &data) const;
+  /**
+   * Get the station id for the station we are interested in.
+   *
+   * @return Station id
+   */
   /**
    * Get the number of parameters in the requirement.
    *

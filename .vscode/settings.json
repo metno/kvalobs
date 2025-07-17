@@ -87,6 +87,11 @@
     "concepts": "cpp",
     "numbers": "cpp",
     "semaphore": "cpp",
-    "stop_token": "cpp"
+    "stop_token": "cpp",
+    "any": "cpp",
+    "charconv": "cpp",
+    "source_location": "cpp",
+    "format": "cpp",
+    "span": "cpp"
   }
 }

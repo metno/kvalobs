@@ -31,6 +31,9 @@
 #include "db/KvalobsDatabaseAccess.h"
 #include <boost/spirit/include/classic.hpp>
 #include <sstream>
+#include <map>
+#include <list>
+#include <iterator>
 
 namespace qabase {
 
@@ -103,6 +106,34 @@ DataRequirement::DataRequirement(const char * signature, int stationid,  bool is
 DataRequirement::~DataRequirement() {
 }
 
+DataRequirement DataRequirement::copyAndUpdateObsRequirement(const std::map<std::string, kvalobs::kvData> &data) const{
+
+  if (requirementType_ != "obs" && requirementType_ != "refobs") {
+    throw Invalid("copyAndUpdateObsRequirement can only be used for obs or refobs requirements, not " + requirementType_);
+  }
+
+  DataRequirement newRequirement;
+  newRequirement.requirementType_ = requirementType_;
+  newRequirement.firstTime_ = firstTime_;
+  newRequirement.lastTime_ = lastTime_;
+  newRequirement.isConcrete_ = isConcrete_;
+  newRequirement.station_ = station_;
+  newRequirement.parameter_= parameter_;
+
+  for (auto &param : newRequirement.parameter_) {
+    auto it = data.find(param.baseName());
+    if (it == data.end() ){
+      throw Invalid("copyAndUpdateObsRequirement: Unexpected. No data found for parameter '" + param.baseName() + "'");
+    }
+    //Update sensor and level
+    param.sensor_=it->second.sensor();
+    param.level_=it->second.level();
+  }
+  
+  return newRequirement;  
+}
+
+
 std::list<int> DataRequirement::getDefinedTypeIDs() const{
   std::list<int> ret;
   for (const auto &param : parameter_) {
@@ -127,7 +158,82 @@ bool DataRequirement::dataMatchesTheRequirement(const db::DatabaseAccess::DataLi
     //Do we have data for all parameters?
     return nMatching == parameter_.size();
   }
-  
+
+  namespace {
+/**
+ * @brief Generates all permutations by picking one element from each list in the map.
+ *
+ * Each permutation is represented as a std::map<Key, Value> where each key is mapped to one value from its list.
+ *
+ * @tparam Key The type of the map key.
+ * @tparam Value The type of the list value.
+ * @param input The input map of lists.
+ * @param result The output vector of permutations.
+ * 
+ * 
+ * a: {1, 2}
+ * b: {3, 4}
+ * c: {5}
+ * / result now contains all combinations, e.g.:
+// {{"a",1},{"b",3},{"c",5}}, {{"a",1},{"b",4},{"c",5}}, {{"a",2},{"b",3},{"c",5}}, {{"a",2},{"b",4},{"c",5}}
+ */
+template<typename Key, typename Value>
+void permuteMapLists(const std::map<Key, std::list<Value>>& input,
+                     std::list<std::map<Key, Value>>& result)
+{
+    std::map<Key, Value> current;
+    auto it = input.begin();
+
+    std::function<void(decltype(it))> recurse = [&](decltype(it) iter) {
+        if (iter == input.end()) {
+            result.push_back(current);
+            return;
+        }
+        for (const auto& val : iter->second) {
+            current[iter->first] = val;
+            recurse(std::next(iter));
+        }
+    };
+
+    recurse(it);
+}
+}
+std::list<DataRequirement>
+ DataRequirement::getSignaturesForAllDataThatMatchesTheRequirement(
+      const db::DatabaseAccess::DataList &data) const {
+    std::list<DataRequirement> requirements;
+    std::map<std::string, std::list<kvalobs::kvData>> params;
+    for (const Parameter &param : parameter_) {
+      for(const kvalobs::kvData &dataItem : data) {
+        // If the parameter does not match the data, we skip it.
+        if ( param.useParameter(dataItem) ) {
+          params[param.baseName()].push_back(dataItem); // We have a matching data.
+        }
+      }
+    }
+    if (params.size() != parameter_.size()) {
+      return requirements;
+    }
+    // Now we have a map with all parameters and their matching data.
+    // We need to permute the lists in the map to get all combinations.
+    std::list<std::map<std::string, kvalobs::kvData>> permutations;
+    permuteMapLists(params, permutations);
+    
+    for (const auto &perm : permutations) {
+      std::list<kvalobs::kvData> tmpData;
+      for (const auto &entry : perm) {
+        tmpData.push_back(entry.second);
+      }
+      
+      if(! dataMatchesTheRequirement(tmpData)) {
+        //this permutation does not match the requirement, so we skip it.
+        continue;
+      }
+      
+      requirements.push_back( copyAndUpdateObsRequirement(perm));
+    }
+    return requirements;
+  }
 
 bool DataRequirement::haveTypeID(int typeid_) const {
     std::list<int> definedTypeIDs = getDefinedTypeIDs();

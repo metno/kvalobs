@@ -103,6 +103,11 @@ class kvChecks : public kvDbBase {
   const std::string & checksignature() const {
     return checksignature_;
   }
+
+  void setChecksignature( const::std::string & checksignature) {
+    checksignature_ = checksignature;
+  }
+  
   const std::string & active() const {
     return active_;
   }

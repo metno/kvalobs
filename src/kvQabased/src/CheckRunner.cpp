@@ -250,6 +250,86 @@ bool CheckRunner::shouldMarkStartAndStop_() {
   return qcxFilter_.empty();
 }
 
+namespace {
+  void printCheckAndData(const qabase::Observation & obs,
+          const kvalobs::kvChecks & check,
+          const db::DatabaseAccess::DataList & observationData,
+          std::ostream & log) {
+  log <<  "Checkrequirement '" << check.qcx() <<", " << check.checkname() << "': sid= " << obs.stationID() 
+      << " tid=" << obs.typeID() << " obt=" << obs.obstime() << std::endl;
+  log << "Observation data: " << std::endl;
+  for (const kvalobs::kvData &data : observationData) {
+    log << db::KvalobsDatabaseAccess::getParamName(data.paramID()) << ",s: " << data.sensor() << ", l: " << data.level() << ", tid: " << data.typeID()
+        << ", orig: " << data.original() << std::endl;
+  }
+}
+
+std::list<kvalobs::kvChecks> generateChecksWithSensorAndLevelSetFromData(
+          const qabase::Observation & obs,
+          const kvalobs::kvChecks & check,
+          const db::DatabaseAccess::DataList & observationData,
+          std::ostream * scriptLog) {
+  
+  std::ostringstream log;
+  std::list<kvalobs::kvChecks> checks;
+  
+  printCheckAndData(obs, check, observationData, log);
+  
+  std::string signatureString = check.checksignature();
+  CheckSignature signature(signatureString, obs.stationID(), true);
+  const DataRequirement * obsRequirement = signature.obs();
+  
+  if ( ! obsRequirement ) {
+    if (scriptLog) {
+      (*scriptLog) << "Unexpected: No obsRequirement for check signature: " << check.checksignature() << std::endl;
+    }
+    return checks; // No obsRequirement, no checks
+  }
+
+  log << "Checkrequirement signature: " << signatureString << std::endl;
+  log << "Checkrequirement parameters: " << obsRequirement->str() << std::endl;
+  
+  if ( !obsRequirement->dataMatchesTheRequirement(observationData) ) {
+    log << "No parameters in the observation data matches the obsRequirement." << std::endl;
+    return checks; // No matching parameters, no checks
+  }
+  log << "Original obs signature: '" << obsRequirement->str() << "'" << std::endl;
+
+  try {
+    std::list<DataRequirement> requirements = obsRequirement->getSignaturesForAllDataThatMatchesTheRequirement(observationData);
+    if( ! requirements.empty() ) {
+      log << "Generated obs requirement with sensor and level set:" << std::endl;
+    }
+    
+    for (const auto &requirement : requirements) {
+      log << "   '" << requirement.str() << "'" << std::endl;
+      auto newCheckSignature = CheckSignature(signature);
+      newCheckSignature.setObs(requirement);
+      kvalobs::kvChecks newCheck(check);
+      newCheck.setChecksignature(newCheckSignature.str());
+      checks.push_back(newCheck);  
+    }
+    if( scriptLog) {
+      (*scriptLog) << log.str() << std::endl;
+    }
+    return checks; // Return the generated checks with updated signatures
+  }
+  catch (const DataRequirement::Invalid & e) {
+    log << "Invalid DataRequirement: " << e.what() << std::endl<< std::endl <<
+           "  Using original check signature: '" << signatureString << "'" << std::endl;
+
+    if (scriptLog) {
+      (*scriptLog) << log.str() << std::endl;
+      // (*scriptLog) << "Invalid DataRequirement: " << e.what() << std::endl <<
+      //   "  Using original check signature: '" << signatureString << "'" << std::endl;
+    }
+    checks.clear();
+    checks.push_back(check);
+    return checks; // Invalid requirement, no checks
+  }
+}
+}
+
 CheckRunner::KvalobsDataPtr CheckRunner::checkObservation(
     const qabase::Observation & obs, std::ostream * scriptLog) {
   db::CachedDatabaseAccess cdb(db_.get(), obs);
@@ -312,6 +392,9 @@ CheckRunner::KvalobsDataPtr CheckRunner::checkObservation(
         continue;
       }
 
+      //TODO: At the momment we only log the generated checks, not the original check.
+      auto ignored_at_the_momment =generateChecksWithSensorAndLevelSetFromData(obs, *check, observationData, scriptLog);
+
       db::DatabaseAccess::DataList modifications;
       KvalobsCheckScript script(db, obs, *check, scriptLog);
 
@@ -369,28 +452,21 @@ CheckRunner::KvalobsDataPtr CheckRunner::checkObservation(
   return ret;
 }
 
+
+
+
+
 bool CheckRunner::haveAnyParametersRequiredByCheck(
           const qabase::Observation & obs,
           const kvalobs::kvChecks & check,
           const std::set<std::string> &parametersInData,
           const db::DatabaseAccess::DataList & observationData, std::ostream * scriptLog) const {
   std::ostringstream log;
-  log <<  "Checkrequirement '" << check.qcx() <<", " << check.checkname() << "': sid= " << obs.stationID() 
-    << " tid=" << obs.typeID() << " obt=" << obs.obstime() << std::endl;
-    log << "Parameters in data: ";
-  for (const std::string &paramName : parametersInData) {
-    log << paramName << " ";
-  }
-  log << std::endl;
+  printCheckAndData(obs, check, observationData, log);
 
-  log << "Observation data: " << std::endl;
-  for (const kvalobs::kvData &data : observationData) {
-    log << db::KvalobsDatabaseAccess::getParamName(data.paramID()) << ",s: " << data.sensor() << ", l: " << data.level() << ", tid: " << data.typeID()
-        << ", orig: " << data.original() << std::endl;
-  }
-  bool found=false;
+  bool found = false;
   std::string signatureString = check.checksignature();
-  CheckSignature signature(check.checksignature(), obs.stationID(), true);
+  CheckSignature signature(signatureString, obs.stationID(), true);
   const DataRequirement * obsRequirement = signature.obs();
   if (obsRequirement) {
     log << "Checkrequirement signature: " << signatureString << std::endl;
@@ -408,7 +484,7 @@ bool CheckRunner::haveAnyParametersRequiredByCheck(
       }
     }
   }
-  return false; 
+  return found; 
 }
 
 namespace {
