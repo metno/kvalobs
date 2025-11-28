@@ -8,12 +8,11 @@ FROM ubuntu:noble
 ARG DEBIAN_FRONTEND='noninteractive'
 ARG kafka_VERSION=2.3.0-1build2
 
-RUN apt-get update && apt-get install -y gpg software-properties-common apt-utils
+RUN apt update && apt install -y gpg software-properties-common apt-utils
 
 #Keys for internrepo.met.no, postgresql and confluent (librdkafka) repos
 COPY docker/pg-ACCC4CF8.asc docker/internrepo-4E8A0C14.asc docker/confluent_repo_key.asc /tmp/
-RUN apt-get update && apt-get install -y gnupg2 software-properties-common apt-utils
-
+RUN apt update && apt install -y gnupg2 software-properties-common apt-utils
 RUN apt-key add /tmp/internrepo-4E8A0C14.asc && rm /tmp/internrepo-4E8A0C14.asc && \
   add-apt-repository 'deb [arch=amd64] http://internrepo.met.no/noble noble main contrib'
 
@@ -28,7 +27,7 @@ RUN apt-key add /tmp/pg-ACCC4CF8.asc && rm /tmp/pg-ACCC4CF8.asc && \
 # The dependencies must be in sync with the *-dev dependencies in 
 # registry.met.no/obs/kvalobs/kvbuild/staging/focal-builddep:latest
 
-RUN apt-get update && apt-get -y install \
+RUN apt  update && apt install -y \
   libboost-date-time1.83.0 libboost-filesystem1.83.0 libboost-thread1.83.0 \
   libboost-regex1.83.0  libboost-program-options1.83.0 libboost-system1.83.0 \
   libboost-timer1.83.0\

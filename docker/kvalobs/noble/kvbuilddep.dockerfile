@@ -9,7 +9,7 @@ ARG kafka_VERSION=2.3.0-1build2
 
 #Keys for internrepo.met.no, postgresql and confluent (librdkafka) repos
 COPY docker/pg-ACCC4CF8.asc docker/internrepo-4E8A0C14.asc docker/confluent_repo_key.asc /tmp/
-RUN apt-get update && apt-get install -y gnupg2 software-properties-common apt-utils
+RUN apt update && apt install -y gnupg2 software-properties-common apt-utils
 
 RUN apt-key add /tmp/internrepo-4E8A0C14.asc && rm /tmp/internrepo-4E8A0C14.asc && \
   add-apt-repository 'deb [arch=amd64] http://internrepo.met.no/noble noble main contrib'
@@ -22,13 +22,13 @@ RUN apt-key add /tmp/pg-ACCC4CF8.asc && rm /tmp/pg-ACCC4CF8.asc && \
 #   add-apt-repository 'deb [arch=amd64] https://packages.confluent.io/clients/deb noble  main'
 
 #Development tools and programming languages
-RUN apt-get update && apt-get -y install \
+RUN apt update && apt install -y \
   debhelper autotools-dev autoconf-archive debconf devscripts fakeroot \
   build-essential less nano automake libtool gfortran bison flex sqlite3 \
   omniidl python3 cmake google-mock libgmock-dev libgtest-dev 
 
 #Dependencies for kvalobs
-RUN apt-get update && apt-get -y install \
+RUN apt update && apt install -y \
   libboost-date-time-dev libboost-filesystem-dev libboost-thread-dev \
   libboost-regex-dev libboost-program-options-dev libboost-system-dev \
   libboost-timer-dev libboost-dev \

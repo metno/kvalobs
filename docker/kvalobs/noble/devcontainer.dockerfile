@@ -4,7 +4,7 @@ FROM ${REGISTRY}/kvbuilddep:latest
 ARG DEBIAN_FRONTEND='noninteractive'
 ARG USER=vscode
 
-RUN apt-get update && apt-get install --yes python-is-python3 software-properties-common python3-pip gpg \
+RUN apt update && apt install --yes python-is-python3 software-properties-common python3-pip gpg \
    less nano git python3-argcomplete git-lfs locales sshpass build-essential python3-dev python3.12-venv \
    libgmock-dev language-pack-nb-base metno-bufrtables
 
@@ -17,7 +17,7 @@ ENV USER=${USER}
 
 
 # For qabase to be able to run properly
-#Add intern repos
+# Add intern repos
 # COPY docker/internrepo-4E8A0C14.asc /tmp/
 # RUN apt-key add /tmp/internrepo-4E8A0C14.asc && rm /tmp/internrepo-4E8A0C14.asc && \
 #   add-apt-repository 'deb [arch=amd64] http://internrepo.met.no/focal focal main contrib'

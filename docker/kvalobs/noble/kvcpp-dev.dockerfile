@@ -6,7 +6,7 @@ ENTRYPOINT [ "/bin/bash" ]
 FROM ${REGISTRY}kvbuilddep:${BASE_IMAGE_TAG}
 ARG DEBIAN_FRONTEND='noninteractive'
 
-RUN apt-get install -y gpg software-properties-common apt-utils
+RUN apt install -y gpg software-properties-common apt-utils
 
 COPY --from=kvbins /usr/lib/libkvalobs_*.so.* /usr/lib/
 COPY --from=kvbins /usr/lib/libkvalobs_*.so /usr/lib/
