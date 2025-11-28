@@ -1,3 +1,8 @@
+2025-11-25 Børge Moe
+  * Release 7.1.1
+  * kvDataInputd
+    - Removed the autoobs decoder
+    
 2025-04-01 Børge Moe
   * Release 7.1.0
   * kvManagerd

@@ -1,7 +1,7 @@
 /*
- Kvalobs - Free Quality Control Software for Meteorological Observations 
+ Kvalobs - Free Quality Control Software for Meteorological Observations
 
- $Id: convert.h,v 1.14.2.4 2007/09/27 09:02:23 paule Exp $                                                       
+ $Id: convert.h,v 1.14.2.4 2007/09/27 09:02:23 paule Exp $
 
  Copyright (C) 2007 met.no
 
@@ -15,8 +15,8 @@
  This file is part of KVALOBS
 
  KVALOBS is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License as 
- published by the Free Software Foundation; either version 2 
+ modify it under the terms of the GNU General Public License as
+ published by the Free Software Foundation; either version 2
  of the License, or (at your option) any later version.
 
  KVALOBS is distributed in the hope that it will be useful,
@@ -24,19 +24,19 @@
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  General Public License for more details.
 
- You should have received a copy of the GNU General Public License along 
- with KVALOBS; if not, write to the Free Software Foundation Inc., 
+ You should have received a copy of the GNU General Public License along
+ with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #ifndef __convert_h__
 #define __convert_h__
 
+#include <exception>
+#include <kvalobs/kvData.h>
+#include <kvalobs/paramlist.h>
 #include <limits.h>
 #include <string>
-#include <exception>
 #include <vector>
-#include <kvalobs/paramlist.h>
-#include <kvalobs/kvData.h>
 namespace kvalobs {
 namespace decoder {
 namespace autoobs {
@@ -67,22 +67,22 @@ struct NameDef {
  *        kvalobs parameteres.
  */
 struct SplitDef {
-  ///Kvalobs parameter name.
+  /// Kvalobs parameter name.
   const char *id;
   /// An index into the AutoObs parameter data where a element start
-  char index;
-  ///The size of the data that starts at index
-  char size;
+  int index;
+  /// The size of the data that starts at index
+  int size;
 };
 
 /**
  *  \brief A referanse to a SplitDef, from AutoObs param name.
  */
 struct SplitData {
-  ///AutoObs param name.
+  /// AutoObs param name.
   const char *name;
 
-  ///A referanse to a corresponding kvalobs param name.
+  /// A referanse to a corresponding kvalobs param name.
   SplitDef *def;
 };
 
@@ -106,17 +106,13 @@ std::string convertName(const std::string &nameToConvert);
  */
 class BadFormat : public std::exception {
   std::string reason;
- public:
-  explicit BadFormat(const std::string &reason_)
-      : reason(reason_) {
-  }
 
-  virtual ~BadFormat() throw () {
-  }
+public:
+  explicit BadFormat(const std::string &reason_) : reason(reason_) {}
 
-  const char *what() const throw () {
-    return reason.c_str();
-  }
+  virtual ~BadFormat() throw() {}
+
+  const char *what() const throw() { return reason.c_str(); }
 };
 
 /**
@@ -124,17 +120,13 @@ class BadFormat : public std::exception {
  */
 class UnknownParam : public std::exception {
   std::string reason;
- public:
-  explicit UnknownParam(const std::string &reason_)
-      : reason(reason_) {
-  }
 
-  virtual ~UnknownParam() throw () {
-  }
+public:
+  explicit UnknownParam(const std::string &reason_) : reason(reason_) {}
 
-  const char *what() const throw () {
-    return reason.c_str();
-  }
+  virtual ~UnknownParam() throw() {}
+
+  const char *what() const throw() { return reason.c_str(); }
 };
 
 /**
@@ -148,38 +140,22 @@ class DataElem {
   int heigth_;
   int mod_;
 
- public:
+public:
   DataElem(int id, const std::string &val, int sensorno = 1, int height = 0,
            int mod = 0);
   DataElem(const DataElem &p)
-      : id_(p.id_),
-        val_(p.val_),
-        sensorno_(p.sensorno_),
-        heigth_(p.heigth_),
-        mod_(p.mod_) {
-  }
+      : id_(p.id_), val_(p.val_), sensorno_(p.sensorno_), heigth_(p.heigth_),
+        mod_(p.mod_) {}
 
-  bool valid() const {
-    return id_ > -1;
-  }
+  bool valid() const { return id_ > -1; }
 
-  DataElem& operator=(const DataElem &p);
-  int id() const {
-    return id_;
-  }
-  int sensorno() const {
-    return sensorno_;
-  }
+  DataElem &operator=(const DataElem &p);
+  int id() const { return id_; }
+  int sensorno() const { return sensorno_; }
   bool fVal(float &f) const;
-  std::string sVal() const {
-    return val_;
-  }
-  int height() const {
-    return heigth_;
-  }
-  int mod() const {
-    return mod_;
-  }
+  std::string sVal() const { return val_; }
+  int height() const { return heigth_; }
+  int mod() const { return mod_; }
 };
 
 /**
@@ -187,30 +163,19 @@ class DataElem {
  *        to kvalobs data.
  */
 class DataConvert {
- public:
+public:
   struct RRRtr {
-    int RRR;  //RRR fra _RRRtr
-    int tr;  //tr fra _RRRtr
-    int rt;  //Rt fra _4RtWdWdWd
+    int RRR; // RRR fra _RRRtr
+    int tr;  // tr fra _RRRtr
+    int rt;  // Rt fra _4RtWdWdWd
     int ir;
-    bool RR_N;  //Has at least one RR_N parameter,
-    //where N is 1,2,3,6,9,12,15,18 or 24.
+    bool RR_N; // Has at least one RR_N parameter,
+    // where N is 1,2,3,6,9,12,15,18 or 24.
 
-    RRRtr()
-        : RRR(INT_MAX),
-          tr(-1),
-          rt(0),
-          ir(-1),
-          RR_N(false) {
-    }
+    RRRtr() : RRR(INT_MAX), tr(-1), rt(0), ir(-1), RR_N(false) {}
     RRRtr(const RRRtr &r)
-        : RRR(r.RRR),
-          tr(r.tr),
-          rt(r.rt),
-          ir(r.ir),
-          RR_N(false) {
-    }
-    RRRtr& operator=(const RRRtr &r) {
+        : RRR(r.RRR), tr(r.tr), rt(r.rt), ir(r.ir), RR_N(false) {}
+    RRRtr &operator=(const RRRtr &r) {
       if (this != &r) {
         RRR = r.RRR;
         tr = r.tr;
@@ -235,25 +200,13 @@ class DataConvert {
     bool hasEm;
     bool hasEi;
 
-    SaSdEmEi()
-        : hasSa(false),
-          hasSd(false),
-          hasEm(false),
-          hasEi(false) {
-    }
+    SaSdEmEi() : hasSa(false), hasSd(false), hasEm(false), hasEi(false) {}
 
     SaSdEmEi(const SaSdEmEi &cc)
-        : sa(cc.sa),
-          sd(cc.sd),
-          em(cc.em),
-          ei(cc.ei),
-          hasSa(cc.hasSa),
-          hasSd(cc.hasSd),
-          hasEm(cc.hasEm),
-          hasEi(cc.hasEi) {
-    }
+        : sa(cc.sa), sd(cc.sd), em(cc.em), ei(cc.ei), hasSa(cc.hasSa),
+          hasSd(cc.hasSd), hasEm(cc.hasEm), hasEi(cc.hasEi) {}
 
-    SaSdEmEi& operator=(const SaSdEmEi &rhs) {
+    SaSdEmEi &operator=(const SaSdEmEi &rhs) {
       if (this != &rhs) {
         sa = rhs.sa;
         sd = rhs.sd;
@@ -275,13 +228,12 @@ class DataConvert {
                        const kvData &saSdEmTemplate);
     static bool dataEi(kvData &data, const SaSdEmEi &ei,
                        const kvData &saSdEmTemplate);
-
   };
 
- private:
+private:
   DataConvert();
-  DataConvert(const DataConvert&);
-  DataConvert& operator=(const DataConvert&);
+  DataConvert(const DataConvert &);
+  DataConvert &operator=(const DataConvert &);
 
   bool allCh(const std::string &val, char ch);
 
@@ -302,18 +254,20 @@ class DataConvert {
   bool decodeParam(const std::string &param, std::string &name, int &sensor,
                    int &height, int &mod);
 
-  boost::posix_time::ptime convertToMiTimeFromHHMM(
-      const boost::posix_time::ptime &obst, const std::string &val);
+  boost::posix_time::ptime
+  convertToMiTimeFromHHMM(const boost::posix_time::ptime &obst,
+                          const std::string &val);
 
   ParamList &paramList;
 
   bool hasRRRtr_;
   RRRtr RRRtr_;
-  bool hasSa, hasSd, hasEm, hasEi;  //Is the station setup with Sa, SD, Em and/or Ei.
+  bool hasSa, hasSd, hasEm,
+      hasEi; // Is the station setup with Sa, SD, Em and/or Ei.
   SaSdEmEi saSdEm_;
   std::string logid;
 
- public:
+public:
   DataConvert(ParamList &p, const std::string &logid);
 
   void setSaSdEmEi(const std::string &sa_sd_em);
@@ -334,15 +288,13 @@ class DataConvert {
     return hasRRRtr_ && !rr.RR_N;
   }
 
-  void resetSaSdEm() {
-    saSdEm_ = SaSdEmEi();
-  }
+  void resetSaSdEm() { saSdEm_ = SaSdEmEi(); }
   bool hasSaSdEmEi(SaSdEmEi &saSdEm);
 };
 
 /** @} */
-}
-}
-}
+} // namespace autoobs
+} // namespace decoder
+} // namespace kvalobs
 
 #endif

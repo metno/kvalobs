@@ -1,5 +1,5 @@
 AC_PREREQ([2.71])
-AC_INIT([kvalobs],[7.1.0],[kvoss@met.no])
+AC_INIT([kvalobs],[7.1.1],[kvoss@met.no])
 AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -16,12 +16,6 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AX_CXX_COMPILE_STDCXX([20],[noext],[mandatory])
 
-#echo "LIBDIR: ${libdir}"
-
-#AX_SUBDIRS_CONFIGURE( [subdirs], [mandatory arguments], [possibly merged arguments], [replacement arguments], [forbidden arguments])
-#AX_SUBDIRS_CONFIGURE( [kvsupport/librdkafka-1.2.1], [--prefix=${libdir}/kvalobs], [], [--prefix=${libdir}/kvalobs], [])
-
-#export PKG_CONFIG_PATH=`pwd`"/kvsupport/build/lib/pkgconfig:${PKG_CONFIG_PATH}"
 export PKG_CONFIG_PATH=`pwd`"/kvsupport/build$prefix/lib/kvalobs10/lib/pkgconfig:${PKG_CONFIG_PATH}"
 echo "PKG_CONFIG_PATH: '${PKG_CONFIG_PATH}'"
 #AC_CONFIG_SUBDIRS([src/lib/libhttpserver/libhttpserver-0.17.5])
@@ -66,7 +60,6 @@ AC_CONFIG_FILES([Makefile
                  src/lib/decoder/kldecoder/Makefile
                  src/lib/decoder/kldecoder/test/Makefile
                  src/lib/decoder/kltext/Makefile
-                 src/lib/decoder/autoobsdecoder/Makefile
                  src/lib/decoder/comobsdecoder/Makefile
                  src/lib/decoder/comobsdecoder/test/Makefile
                  src/lib/decoder/synopdecoder/Makefile
@@ -124,8 +117,6 @@ AX_LIB_CURL([7.15.5])
 PKG_CHECK_MODULES(putools, puTools)
 KV_FIND_OMNIORB4
 KV_POSTGRESQL
-#PKG_CHECK_MODULES(sqlite3, sqlite3)
-#sqlite3_CFLAGS=
 
 PKG_CHECK_MODULES(libxml2, libxml-2.0)
 PKG_CHECK_MODULES(libxmlpp, libxml++-2.6)

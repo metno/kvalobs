@@ -4,7 +4,6 @@ SUBDIRS = \
 	rejectdecoder \
 	dummydecoder \
 	kldecoder \
-	autoobsdecoder \
 	comobsdecoder \
 	synopdecoder  \
 	execdecoder  \
