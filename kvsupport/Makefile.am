@@ -26,6 +26,8 @@ librdkafka:
 		tar zxpf $(librdkafka_src) ; \
 		(	cd $(librdkafka_version) ; \
 			export LD_RUN_PATH="$(prefix)/lib/kvalobs@KVALOBSLIBS_BIN_VERSION@/lib" ; \
+			export CXX=g++-14 ; \
+			export CC=gcc-14 ; \
 			./configure --prefix=$(prefix)/lib/kvalobs@KVALOBSLIBS_BIN_VERSION@ ; \
 			make ; \
 			make DESTDIR=$(abs_top_builddir)/kvsupport/build install ) ; \
@@ -41,6 +43,8 @@ libhttpserver:
 		tar zxpf $(libhttpserver_src) ; \
 		(	cd $(libhttpserver_version) ; \
 			export LD_RUN_PATH="$(prefix)/lib/kvalobs@KVALOBSLIBS_BIN_VERSION@/lib" ; \
+			export CXX=g++-14 ; \
+			export CC=gcc-14 ; \
 			./bootstrap --build --prefix=$(prefix)/lib/kvalobs@KVALOBSLIBS_BIN_VERSION@ ; \
 			mkdir -p build ; \
 			cd build ; \
@@ -66,6 +70,8 @@ libsqlite:
 		tar zxpf $(sqlite3_src) ; \
 		(	cd $(sqlite3_version) ; \
 			export LD_RUN_PATH="$(prefix)/lib/kvalobs@KVALOBSLIBS_BIN_VERSION@/lib" ; \
+			export CXX=g++-14 ; \
+			export CC=gcc-14 ; \
 			./configure --prefix=$(prefix)/lib/kvalobs@KVALOBSLIBS_BIN_VERSION@ --enable-shared=no --with-pic; \
 			make ; \
 			make DESTDIR=$(abs_top_builddir)/kvsupport/build install ) ; \

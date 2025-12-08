@@ -12,7 +12,6 @@ RUN apt update && apt install -y gpg software-properties-common apt-utils
 
 #Keys for internrepo.met.no, postgresql and confluent (librdkafka) repos
 COPY docker/pg-ACCC4CF8.asc docker/internrepo-4E8A0C14.asc docker/confluent_repo_key.asc /tmp/
-RUN apt update && apt install -y gnupg2 software-properties-common apt-utils
 RUN apt-key add /tmp/internrepo-4E8A0C14.asc && rm /tmp/internrepo-4E8A0C14.asc && \
   add-apt-repository 'deb [arch=amd64] http://internrepo.met.no/noble noble main contrib'
 

@@ -25,7 +25,7 @@ RUN apt-key add /tmp/pg-ACCC4CF8.asc && rm /tmp/pg-ACCC4CF8.asc && \
 RUN apt update && apt install -y \
   debhelper autotools-dev autoconf-archive debconf devscripts fakeroot \
   build-essential less nano automake libtool gfortran bison flex sqlite3 \
-  omniidl python3 cmake google-mock libgmock-dev libgtest-dev 
+  omniidl python3 cmake google-mock libgmock-dev libgtest-dev g++-14 libstdc++-14-dev
 
 #Dependencies for kvalobs
 RUN apt update && apt install -y \
@@ -34,7 +34,7 @@ RUN apt update && apt install -y \
   libboost-timer-dev libboost-dev \
   libc6-dev libcurl4-gnutls-dev libglibmm-2.4-dev \
   libmicrohttpd-dev libomniorb4-dev libomnithread4-dev libpq-dev libsasl2-dev\
-  libssl-dev libstdc++-13-dev libxml++2.6-dev libxml2-dev libzstd-dev zlib1g-dev \
+  libssl-dev libxml++2.6-dev libxml2-dev libzstd-dev zlib1g-dev \
   librdkafka-dev=${kafka_VERSION}  metlibs-putools-dev\
   libperl-dev libdbd-pg-perl  liblog4cpp5-dev libcppunit-dev \
   libgnutls28-dev 

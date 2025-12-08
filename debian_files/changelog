@@ -1,8 +1,10 @@
 kvalobs (7.1.1-1) noble; urgency=medium
   * kvDataInputd
     - Removed the autoobs decoder
+  * debianpackage:
+    - kvcpp-dev: Use c++20 standard.
 
- -- Borge Moe <borge.moe@met.no>  Tue, 25 Nov 2025 12:00:00 +0100
+ -- Borge Moe <borge.moe@met.no>  Thu, 4 Dec 2025 07:00:00 +0100
 
 kvalobs (7.1.0-1) noble; urgency=medium
   * Bigfix for workque.

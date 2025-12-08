@@ -24,20 +24,21 @@ ENV USER=${USER}
 
 
 #Use this when libkvutil-perl is available for ubuntu noble
-# RUN apt-get update && apt-get --yes install \
-#    libperl5.38t64 libkvutil-perl 
+RUN apt-get update && apt-get --yes install \
+   libperl5.38t64 libkvutil-perl metno-bufrtables
 
 
 #Remove this when libkvutil-perlis available for ubuntu noble
-RUN apt update && apt install --yes \
-   libdbd-pg-perl libdbi-perl libperl5.38t64 postgresql bzip2 wget libclass-singleton-perl \
-   libdatetime-locale-perl libdatetime-perl libdatetime-set-perl libdatetime-timezone-perl \
-   libmodule-implementation-perl libmodule-runtime-perl libparams-classify-perl perl \
-   libparams-validate-perl libset-infinite-perl libtry-tiny-perl libdatetime-event-sunrise-perl
-COPY metno-bufrtables_1.2.8_all.deb libkvutil-perl_2.12.3-1_amd64.deb /tmp/
-#RUN dpkg -i /tmp/metno-bufrtables_1.2.8_all.deb 
-RUN dpkg -i --ignore-depends=libperl5.30 /tmp/libkvutil-perl_2.12.3-1_amd64.deb
-RUN rm -f /tmp/metno-bufrtables_1.2.8_all.deb /tmp/libkvutil-perl_2.12.3-1_amd64.deb
-#End remove when metno-bufrtables_1.2.8_all.deb libkvutil-perl_2.12.3-1_amd64.deb are avalable fof ubunto noble
+# RUN apt update && apt install --yes \
+#    libdbd-pg-perl libdbi-perl libperl5.38t64 postgresql bzip2 wget libclass-singleton-perl \
+#    libdatetime-locale-perl libdatetime-perl libdatetime-set-perl libdatetime-timezone-perl \
+#    libmodule-implementation-perl libmodule-runtime-perl libparams-classify-perl perl \
+#    libparams-validate-perl libset-infinite-perl libtry-tiny-perl libdatetime-event-sunrise-perl
+
+#COPY metno-bufrtables_1.2.8_all.deb libkvutil-perl_2.12.3-1_amd64.deb /tmp/
+##RUN dpkg -i /tmp/metno-bufrtables_1.2.8_all.deb 
+#RUN dpkg -i --ignore-depends=libperl5.30 /tmp/libkvutil-perl_2.12.3-1_amd64.deb
+#RUN rm -f /tmp/metno-bufrtables_1.2.8_all.deb /tmp/libkvutil-perl_2.12.3-1_amd64.deb
+##End remove when metno-bufrtables_1.2.8_all.deb libkvutil-perl_2.12.3-1_amd64.deb are avalable fof ubunto noble
 
 ENTRYPOINT [ "/bin/bash" ]
