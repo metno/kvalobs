@@ -196,7 +196,6 @@ done
 
 if [ $mode = test ]; then 
   registry="$os/"
-    
 elif [ "$os" = "$default_os" ]; then
   registry="$registry/$mode/"
 else 
