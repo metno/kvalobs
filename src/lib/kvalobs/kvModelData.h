@@ -57,7 +57,7 @@ class kvModelData : public kvDbBase {
   int paramid_;
   int level_;
   int modelid_;
-  float original_;
+  double original_;
 
  public:
   kvModelData() {
@@ -66,14 +66,13 @@ class kvModelData : public kvDbBase {
     set(r);
   }
   kvModelData(int stationid, const boost::posix_time::ptime &obstime,
-              int paramid, int level, int modelid, float original)
-
+              int paramid, int level, int modelid, double original)
               {
     set(stationid, obstime, paramid, level, modelid, original);
   }
 
   bool set(int stationid, const boost::posix_time::ptime &obstime, int paramid,
-           int level, int modelid, float original);
+           int level, int modelid, double original);
 
   bool set(const dnmi::db::DRow&);
   const char* tableName() const {
@@ -97,7 +96,7 @@ class kvModelData : public kvDbBase {
   int modelID() const {
     return modelid_;
   }
-  float original() const {
+  double original() const {
     return original_;
   }
 };

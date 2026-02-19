@@ -207,8 +207,8 @@ int kvSynopDecoder::temporaryRegister(std::string uknown) {
   // build a new station with an index and the callsign starting from now
   //  tstat.set(lastTempoIndex,0,0,0,0,"",0,0,"",uknown,"",6,false, miutil::miTime::nowTime());
 
-  tstat.set(lastTempoIndex, kvDbBase::FLT_NULL, kvDbBase::FLT_NULL,
-            kvDbBase::FLT_NULL, kvDbBase::FLT_NULL, "", kvDbBase::INT_NULL,
+  tstat.set(lastTempoIndex, kvDbBase::DBL_NULL, kvDbBase::DBL_NULL,
+            kvDbBase::DBL_NULL, kvDbBase::DBL_NULL, "", kvDbBase::INT_NULL,
             kvDbBase::INT_NULL, "", uknown, "", 6, false,
             boost::posix_time::microsec_clock::universal_time());
 
@@ -280,8 +280,8 @@ bool kvSynopDecoder::decode(const std::string &raw, list<kvData>& data) {
     return false;
   }
 
-  map<int, float> deco = obs.Data();
-  map<int, float>::iterator itr = deco.begin();
+  map<int, double> deco = obs.Data();
+  map<int, double>::iterator itr = deco.begin();
 
   kvData d;
 

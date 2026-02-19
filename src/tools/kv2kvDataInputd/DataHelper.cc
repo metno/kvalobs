@@ -212,7 +212,7 @@ std::string ObsData::getData(const Param &param,
     if (obstimeIt == data.end())
       return "";
 
-    std::map<Param, float>::const_iterator paramIt;
+    std::map<Param, double>::const_iterator paramIt;
     paramIt = obstimeIt->second.find(param);
 
     if (paramIt == obstimeIt->second.end())
@@ -291,7 +291,7 @@ operator<<(std::ostream &out, const ObsData &od) {
   for (ObsData::DataList::const_iterator dit = od.data.begin();
       dit != od.data.end(); ++dit) {
     out << to_kvalobs_string(dit->first);
-    for (std::map<Param, float>::const_iterator pit = dit->second.begin();
+    for (auto pit = dit->second.begin();
         pit != dit->second.end(); ++pit) {
       out << "," << pit->first << ":" << pit->second;
     }

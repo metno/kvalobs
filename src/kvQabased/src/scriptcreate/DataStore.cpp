@@ -486,8 +486,8 @@ void DataStore::apply(const ScriptResultIdentifier & resultType, double value) {
   switch (resultType.correctionType()) {
     case ScriptResultIdentifier::Flag: {
       bool mod = false;
-      mod |= setFlag(data, flagPosition_, value);
-      mod |= updateCfailed(data, qcx_, value);
+      mod |= setFlag(data, flagPosition_, static_cast<int>(value));
+      mod |= updateCfailed(data, qcx_, static_cast<int>(value));
       if (mod){
         modified_.insert(&data);
       }
@@ -498,7 +498,7 @@ void DataStore::apply(const ScriptResultIdentifier & resultType, double value) {
       modified_.insert(&data);
       break;
     case ScriptResultIdentifier::Missing:
-      setFlag(data, 6, value, true);
+      setFlag(data, 6, static_cast<int>(value), true);
       if (value == 2){
         data.corrected(-32766);
       } else if (value == 3) {

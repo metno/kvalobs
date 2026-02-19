@@ -28,16 +28,16 @@
  with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#include <list>
-#include <sstream>
-#include <stdlib.h>
-#include <stdio.h>
-#include <kvalobs/kvData.h>
-#include <miutil/timeconvert.h>
 #include <dnmithread/mtcout.h>
+#include <kvalobs/kvData.h>
+#include <list>
+#include <miutil/timeconvert.h>
+#include <sstream>
+#include <stdio.h>
+#include <stdlib.h>
 /*
  * Created by DNMI/IT: borge.moe@met.no
- * at Tue Aug 28 07:53:16 2002 
+ * at Tue Aug 28 07:53:16 2002
  */
 
 using namespace std;
@@ -45,18 +45,10 @@ using namespace dnmi;
 namespace pt = boost::posix_time;
 
 kvalobs::kvData::kvData(const kvalobs::kvData &d)
-    : stationid_(d.stationid_),
-      obstime_(d.obstime_),
-      original_(d.original_),
-      paramid_(d.paramid_),
-      tbtime_(d.tbtime_),
-      typeid_(d.typeid_),
-      sensor_(d.sensor_),
-      level_(d.level_),
-      corrected_(d.corrected_),
-      controlinfo_(d.controlinfo_),
-      useinfo_(d.useinfo_),
-      cfailed_(d.cfailed_) {
+    : stationid_(d.stationid_), obstime_(d.obstime_), original_(d.original_),
+      paramid_(d.paramid_), tbtime_(d.tbtime_), typeid_(d.typeid_),
+      sensor_(d.sensor_), level_(d.level_), corrected_(d.corrected_),
+      controlinfo_(d.controlinfo_), useinfo_(d.useinfo_), cfailed_(d.cfailed_) {
   createSortIndex();
 }
 
@@ -87,7 +79,7 @@ void kvalobs::kvData::clean() {
 }
 
 bool kvalobs::kvData::set(const dnmi::db::DRow &r_) {
-  db::DRow &r = const_cast<db::DRow&>(r_);
+  db::DRow &r = const_cast<db::DRow &>(r_);
   string buf;
   list<string> names = r.getFieldNames();
   list<string>::iterator it = names.begin();
@@ -101,7 +93,8 @@ bool kvalobs::kvData::set(const dnmi::db::DRow &r_) {
       } else if (*it == "obstime") {
         obstime_ = pt::time_from_string_nothrow(buf);
       } else if (*it == "original") {
-        sscanf(buf.c_str(), "%f", &original_);
+        // sscanf(buf.c_str(), "%f", &original_);
+        original_ = std::stod(buf);
       } else if (*it == "paramid") {
         paramid_ = atoi(buf.c_str());
       } else if (*it == "tbtime") {
@@ -113,7 +106,8 @@ bool kvalobs::kvData::set(const dnmi::db::DRow &r_) {
       } else if (*it == "level") {
         level_ = atoi(buf.c_str());
       } else if (*it == "corrected") {
-        sscanf(buf.c_str(), "%f", &corrected_);
+        // sscanf(buf.c_str(), "%f", &corrected_);
+        corrected_ = std::stod(buf);
       } else if (*it == "controlinfo") {
         controlinfo_ = kvControlInfo(buf);
       } else if (*it == "useinfo") {
@@ -132,8 +126,7 @@ bool kvalobs::kvData::set(const dnmi::db::DRow &r_) {
   return true;
 }
 
-kvalobs::kvData&
-kvalobs::kvData::operator=(const kvalobs::kvData &rhs) {
+kvalobs::kvData &kvalobs::kvData::operator=(const kvalobs::kvData &rhs) {
   if (this != &rhs) {
     stationid_ = rhs.stationid_;
     obstime_ = rhs.obstime_;
@@ -155,9 +148,9 @@ kvalobs::kvData::operator=(const kvalobs::kvData &rhs) {
 }
 
 bool kvalobs::kvData::set(int pos, const boost::posix_time::ptime &obt,
-                          float org, int par,
+                          double org, int par,
                           const boost::posix_time::ptime &tbt, int typ, int sen,
-                          int lvl, float cor, const kvControlInfo &cin,
+                          int lvl, double cor, const kvControlInfo &cin,
                           const kvUseInfo &uin, const std::string &fai) {
   stationid_ = pos;
   obstime_ = obt;
@@ -178,7 +171,7 @@ bool kvalobs::kvData::set(int pos, const boost::posix_time::ptime &obt,
 }
 
 bool kvalobs::kvData::set(int pos, const boost::posix_time::ptime &obt,
-                          float org, int par,
+                          double org, int par,
                           const boost::posix_time::ptime &tbt, int typ,
                           int lvl) {
   stationid_ = pos;
@@ -224,11 +217,11 @@ std::string kvalobs::kvData::toUpload() const {
 std::string kvalobs::kvData::uniqueKey() const {
   ostringstream ost;
 
-  ost << " WHERE stationid=" << stationid_ << " AND " << "       obstime="
-      << quoted(to_kvalobs_string(obstime_)) << " AND " << "       paramid="
-      << paramid_ << " AND " << "       typeid=" << typeid_ << " AND "
-      << "       sensor=" << quoted(sensor_) << " AND " << "       level="
-      << level_;
+  ost << " WHERE stationid=" << stationid_ << " AND "
+      << "       obstime=" << quoted(to_kvalobs_string(obstime_)) << " AND "
+      << "       paramid=" << paramid_ << " AND " << "       typeid=" << typeid_
+      << " AND " << "       sensor=" << quoted(sensor_) << " AND "
+      << "       level=" << level_;
 
   return ost.str();
 }
@@ -236,31 +229,31 @@ std::string kvalobs::kvData::uniqueKey() const {
 std::string kvalobs::kvData::toUpdate() const {
   ostringstream ost;
 
-  ost << "SET corrected=" << corrected_ << ", controlinfo="
-      << quoted(controlinfo_.flagstring()) << ", useinfo="
-      << quoted(useinfo_.flagstring()) << ", cfailed=" << quoted(cfailed_)
-      << " WHERE stationid=" << stationid_ << " AND " << "       obstime="
-      << quoted(to_kvalobs_string(obstime_)) << " AND " << "       paramid="
-      << paramid_ << " AND " << "       typeid=" << typeid_ << " AND "
-      << "       sensor=" << quoted(sensor_) << " AND " << "       level="
-      << level_;
+  ost << "SET corrected=" << corrected_
+      << ", controlinfo=" << quoted(controlinfo_.flagstring())
+      << ", useinfo=" << quoted(useinfo_.flagstring())
+      << ", cfailed=" << quoted(cfailed_) << " WHERE stationid=" << stationid_
+      << " AND " << "       obstime=" << quoted(to_kvalobs_string(obstime_))
+      << " AND " << "       paramid=" << paramid_ << " AND "
+      << "       typeid=" << typeid_ << " AND "
+      << "       sensor=" << quoted(sensor_) << " AND "
+      << "       level=" << level_;
 
   return ost.str();
-
 }
 
 void kvalobs::kvData::useinfo(int flag, char newVal) {
   useinfo_.set(flag, newVal);
 }
 
-std::ostream&
-kvalobs::operator<<(std::ostream& output, const kvalobs::kvData& d) {
+std::ostream &kvalobs::operator<<(std::ostream &output,
+                                  const kvalobs::kvData &d) {
   output << "[" << "sid: " << d.stationID() << " otime: " << d.obstime()
-         << " tid: " << d.typeID() << " pid: " << d.paramID() << " lvl: "
-         << d.level() << " sen: " << d.sensor() << " orig: " << d.original()
-         << " cor: " << d.corrected() << " tbt: " << d.tbtime() << " cinfo: "
-         << d.controlinfo() << " uinfo: " << d.useinfo() << "]";
+         << " tid: " << d.typeID() << " pid: " << d.paramID()
+         << " lvl: " << d.level() << " sen: " << d.sensor()
+         << " orig: " << d.original() << " cor: " << d.corrected()
+         << " tbt: " << d.tbtime() << " cinfo: " << d.controlinfo()
+         << " uinfo: " << d.useinfo() << "]";
 
   return output;
 }
-

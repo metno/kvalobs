@@ -57,9 +57,9 @@ void addObsDataToScript(scriptrunner::Script & script,
 
   for (DataStore::ParameterSortedDataList::const_iterator param =
       obsdata.begin(); param != obsdata.end(); ++param) {
-    std::vector<float> value;
-    std::vector<float> missing;
-    std::vector<float> controlinfo;
+    std::vector<double> value;
+    std::vector<double> missing;
+    std::vector<double> controlinfo;
     for (DataStore::DataList::const_iterator it = param->second.begin();
         it != param->second.end(); ++it) {
       value.push_back(it->original());
@@ -168,7 +168,7 @@ void addModelDataToScript(
         } else
           missing.push_back(0);
 
-      std::vector<float> modelDataValues;
+      std::vector<double> modelDataValues;
       for (DataStore::ModelDataList::const_iterator it = param->second.begin();
           it != param->second.end(); ++it)
         modelDataValues.push_back(it->original());

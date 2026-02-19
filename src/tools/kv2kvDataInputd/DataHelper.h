@@ -62,7 +62,7 @@ operator<<(std::ostream &out, const Param &param);
 
 class ObsData {
  public:
-  typedef std::map<boost::posix_time::ptime, std::map<Param, float> > DataList;
+  typedef std::map<boost::posix_time::ptime, std::map<Param, double> > DataList;
   typedef std::map<boost::posix_time::ptime, std::map<Param, std::string> > TextDataList;
   typedef std::set<Param> Params;
   typedef std::set<boost::posix_time::ptime> Times;

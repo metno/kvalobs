@@ -210,7 +210,7 @@ kvalobs::decoder::comobsdecoder::Sms12::decode(
         data.addData(param, o.str());
       } else if (param == "FF" || param == "FX" || param == "FG") {
         ostringstream o;
-        float f;
+        double f;
 
         try {
           f = boost::lexical_cast<float>(buf);

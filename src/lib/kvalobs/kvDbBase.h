@@ -68,7 +68,9 @@ class kvDbBase {
  public:
 
   /**Used to specifie an NULL value for a FLOAT field*/
-  static const float FLT_NULL;
+  //static const float FLT_NULL;
+
+  static const double DBL_NULL;
 
   /**Used to specifie an NULL value for a INT field*/
   static const int INT_NULL;

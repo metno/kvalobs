@@ -365,8 +365,8 @@ partialIsEqual(const std::list<kvalobs::kvData> &oldData, const std::list<kvalob
     for (list<kvalobs::kvData>::const_iterator oit = oldData.begin(); oit != oldData.end(); ++oit) {
       if (oit->obstime() == nit->obstime() && oit->stationID() == nit->stationID() && oit->typeID() == nit->typeID() && oit->paramID() == nit->paramID()
           && oit->sensor() == nit->sensor() && oit->level() == nit->level()) {
-        float nv = nit->original();
-        float ov = oit->original();
+        auto nv = nit->original();
+        auto ov = oit->original();
 
         if (static_cast<int>((nv + 0.005) * 100) == static_cast<int>((ov + 0.005) * 100)) {
           found = true;
@@ -418,10 +418,10 @@ completeIsEqual(const std::list<kvalobs::kvData> &oldData, const std::list<kvalo
     for (list<kvalobs::kvData>::const_iterator oit = oldData.begin(); oit != oldData.end(); ++oit) {
       if (oit->obstime() == nit->obstime() && oit->stationID() == nit->stationID() && oit->typeID() == nit->typeID() && oit->paramID() == nit->paramID()
           && oit->sensor() == nit->sensor() && oit->level() == nit->level()) {
-        float norig = nit->original();
-        float oorig = oit->original();
-        float ncor = nit->corrected();
-        float ocor = oit->corrected();
+        auto norig = nit->original();
+        auto oorig = oit->original();
+        auto ncor = nit->corrected();
+        auto ocor = oit->corrected();
 
 
         if ((static_cast<int>((norig + 0.005) * 100) == static_cast<int>((oorig + 0.005) * 100)) &&

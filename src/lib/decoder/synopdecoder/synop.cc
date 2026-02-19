@@ -107,7 +107,7 @@ int synop::readToken(const char *token, int a, int b) {
   return atoi(buf);
 
 }
-void synop::setBuffer(const int par, float val) {
+void synop::setBuffer(const int par, double val) {
   obs[par] = val;
 }
 
@@ -159,9 +159,9 @@ void synop::setExtraCloudNsToken(const int par, const char *token, int pos,
   setBuffer(par, val);
 }
 
-void synop::setScaledToken(const int par, const char* token, float scl, int a,
+void synop::setScaledToken(const int par, const char* token, double scl, int a,
                            int b) {
-  float val = readToken(token, a, b);
+  double val = readToken(token, a, b);
   scale(val, scl);
   setBuffer(par, val);
 }
@@ -185,12 +185,12 @@ void synop::setSnowToken(const int& par, const char* token, int a, int b) {
 }
 
 void synop::setScaledSubstituteToken(const int par, const char* token,
-                                     float scl, int fsub, int tosub, int a,
+                                     double scl, int fsub, int tosub, int a,
                                      int b) {
-
-  float val = readToken(token, a, b);
+                                      
+  double val = readToken(token, a, b);
   if (int(val) == fsub)
-    val = float(tosub);
+    val = double(tosub);
   else
     scale(val, scl);
   setBuffer(par, val);
@@ -200,7 +200,7 @@ bool synop::hasobs(int par) {
   return bool(obs.count(par));
 }
 
-bool synop::value(int par, float& o) {
+bool synop::value(int par, double& o) {
   if (!obs.count(par))
     return false;
   o = obs[par];
@@ -214,7 +214,7 @@ bool synop::value(int par, int& o) {
   return true;
 }
 
-void synop::scale(float &buf, float s) {
+void synop::scale(double &buf, double s) {
   if (buf > undef)
     buf *= s;
 }
@@ -291,7 +291,7 @@ void synop::checkOrder(const char* token) {
 
 void synop::setTemperature(const char* token, const int par,
                            const signtype signt) {
-  float tmp = readToken(token, 1, 3);
+  double tmp = readToken(token, 1, 3);
 
   if (tmp > undef)
     tmp *= sign(*token, signt);
@@ -307,7 +307,7 @@ void synop::setWind(const int par, const char* token, int a, int b) {
     return;
   }
 
-  float tff = readToken(token, a, b);
+  double tff = readToken(token, a, b);
 
   if (wunit == KT)
     tff *= 0.5144;  // knots 2 m/s ;
@@ -316,7 +316,7 @@ void synop::setWind(const int par, const char* token, int a, int b) {
 }
 
 void synop::setPressure(const char* token, const int par) {
-  float tmp = readToken(token, 0, 4);
+  double tmp = readToken(token, 0, 4);
 
   scale(tmp, 0.1);
 
@@ -362,7 +362,7 @@ void synop::setPrecipitation(const char* token) {
       break;
   }
 
-  float RRR = readToken(token, 1, 3);
+  double RRR = readToken(token, 1, 3);
 
   int ir_ = 0;
 
@@ -387,7 +387,7 @@ void synop::setPrecipitation(const char* token) {
 
 void synop::setPrecipitationRt(const char* token) {
 
-  float fRt = readToken(token, 1);
+  double fRt = readToken(token, 1);
   scale(fRt, 0.1);
 
   setBuffer(Rt, fRt);
@@ -402,8 +402,8 @@ void synop::setPrecipitationRt(const char* token) {
   addPrecipitation(110, fRt);  // RR_24
 }
 
-void synop::addPrecipitation(int par, float fRt) {
-  float newRRR;
+void synop::addPrecipitation(int par, double fRt) {
+  double newRRR;
 
   if (!value(par, newRRR))
     return;
@@ -1076,7 +1076,7 @@ void synop::sort555Token(const char *token) {
 // OUTPUT -------------------------------------- 
 
 string synop::index() {
-  map<int, float>::iterator itr = obs.begin();
+  map<int, double>::iterator itr = obs.begin();
 
   ostringstream ost;
 
@@ -1126,9 +1126,9 @@ void synop::computeUUU() {
   if (!hasobs(TdTdTd) || !hasobs(TTT))
     return;
 
-  float tt_ = obs[TTT];
-  float td_ = obs[TdTdTd];
-  float uu = 100.0 * svp(td_) / svp(tt_);
+  double tt_ = obs[TTT];
+  double td_ = obs[TdTdTd];
+  double uu = 100.0 * svp(td_) / svp(tt_);
 
   int iuu = static_cast<int>(rint(uu));
   uu = iuu;
@@ -1139,7 +1139,7 @@ void synop::computeUUU() {
 /// Sverdrups equation to compute vapour pressure E
 /// empirical equation with different sets over neg/pos.
 
-float synop::svp(double tt) {
+double synop::svp(double tt) {
   if (tt > 0.0)
     return 6.10780 * exp(17.08085 * tt / (243.175 + tt));
   else

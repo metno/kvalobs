@@ -51,10 +51,10 @@ namespace kvalobs {
 class kvStation : public kvDbBase {
  private:
   int stationid_;
-  float lat_;
-  float lon_;
-  float height_;
-  float maxspeed_;
+  double lat_;
+  double lon_;
+  double height_;
+  double maxspeed_;
   std::string name_;
   int wmonr_;
   int nationalnr_;
@@ -71,7 +71,7 @@ class kvStation : public kvDbBase {
   kvStation(const dnmi::db::DRow& r) {
     set(r);
   }
-  kvStation(int st, float la, float lo, float he, float max,
+  kvStation(int st, double la, double lo, double he, double max,
             const std::string& na, int wm, int nn, const std::string& ic,
             const std::string& ca, const std::string& ss, int environmentid,
             bool static_, const boost::posix_time::ptime& fromtime) {
@@ -81,7 +81,7 @@ class kvStation : public kvDbBase {
 
   bool set(const dnmi::db::DRow&);
 
-  bool set(int, float, float, float, float, const std::string&, int, int,
+  bool set(int, double, double, double, double, const std::string&, int, int,
            const std::string&, const std::string&, const std::string&, int,
            bool, const boost::posix_time::ptime&);
 
@@ -94,16 +94,16 @@ class kvStation : public kvDbBase {
   int stationID() const {
     return stationid_;
   }
-  float lat() const {
+  double lat() const {
     return lat_;
   }
-  float lon() const {
+  double lon() const {
     return lon_;
   }
-  float height() const {
+  double height() const {
     return height_;
   }
-  float maxspeed() const {
+  double maxspeed() const {
     return maxspeed_;
   }
   const std::string & name() const {

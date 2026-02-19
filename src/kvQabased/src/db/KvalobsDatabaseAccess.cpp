@@ -448,22 +448,25 @@ namespace {
  * Read database rows with any data entries after the kvdata-specific ones
  */
 kvalobs::kvData kvDataFromRow(dnmi::db::DRow &row) {
-  return kvalobs::kvData(
-      boost::lexical_cast<int>(row[0]),
-      boost::posix_time::time_from_string(row[1]),
-      boost::lexical_cast<float>(row[2]), boost::lexical_cast<int>(row[3]),
-      boost::posix_time::time_from_string(row[4]),
-      boost::lexical_cast<int>(row[5]), boost::lexical_cast<int>(row[6]),
-      boost::lexical_cast<int>(row[7]), boost::lexical_cast<float>(row[8]),
-      kvalobs::kvControlInfo(row[9]), kvalobs::kvUseInfo(row[10]), row[11]);
+  return kvalobs::kvData(row);
+//   return kvalobs::kvData(
+//       boost::lexical_cast<int>(row[0]),
+//       boost::posix_time::time_from_string(row[1]),
+//       std::stod(row[2]), boost::lexical_cast<int>(row[3]),
+//       boost::posix_time::time_from_string(row[4]),
+//       boost::lexical_cast<int>(row[5]), boost::lexical_cast<int>(row[6]),
+//       boost::lexical_cast<int>(row[7]), std::stod(row[8]),
+//       kvalobs::kvControlInfo(row[9]), kvalobs::kvUseInfo(row[10]), row[11]);
+// 
 }
 
 kvalobs::kvTextData kvTextDataFromRow(dnmi::db::DRow &row) {
-  return kvalobs::kvTextData(boost::lexical_cast<int>(row[0]),
-                             boost::posix_time::time_from_string(row[1]),
-                             row[2], boost::lexical_cast<int>(row[3]),
-                             boost::posix_time::time_from_string(row[4]),
-                             boost::lexical_cast<int>(row[5]));
+  return kvalobs::kvTextData(row);
+  // return kvalobs::kvTextData(boost::lexical_cast<int>(row[0]),
+  //                            boost::posix_time::time_from_string(row[1]),
+  //                            row[2], boost::lexical_cast<int>(row[3]),
+  //                            boost::posix_time::time_from_string(row[4]),
+  //                            boost::lexical_cast<int>(row[5]));
 }
 } // namespace
 

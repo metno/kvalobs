@@ -131,7 +131,8 @@ string escapeSql(const std::string &toEsc) {
 }
 }  // namespace
 
-const float kvalobs::kvDbBase::FLT_NULL = FLT_MAX;
+//const float kvalobs::kvDbBase::FLT_NULL = FLT_MAX;
+const double kvalobs::kvDbBase::DBL_NULL = DBL_MAX;
 const int kvalobs::kvDbBase::INT_NULL = INT_MAX;
 const std::string kvalobs::kvDbBase::TEXT_NULL("__:#@#+@##:TEXT_NULL:Qw@$:__");
 

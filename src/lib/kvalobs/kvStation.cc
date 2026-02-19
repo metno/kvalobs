@@ -40,22 +40,22 @@ std::string kvalobs::kvStation::toSend() const {
   ostringstream ost;
   ost << "(" << stationid_ << ",";
 
-  if (lat_ == kvDbBase::FLT_NULL)
+  if (lat_ == kvDbBase::DBL_NULL)
     ost << "NULL,";
   else
     ost << lat_ << ",";
 
-  if (lon_ == kvDbBase::FLT_NULL)
+  if (lon_ == kvDbBase::DBL_NULL)
     ost << "NULL,";
   else
     ost << lon_ << ",";
 
-  if (height_ == kvDbBase::FLT_NULL)
+  if (height_ == kvDbBase::DBL_NULL)
     ost << "NULL,";
   else
     ost << height_ << ",";
 
-  if (maxspeed_ == kvDbBase::FLT_NULL)
+  if (maxspeed_ == kvDbBase::DBL_NULL)
     ost << "NULL,";
   else
     ost << maxspeed_ << ",";
@@ -100,8 +100,8 @@ std::string kvalobs::kvStation::toSend() const {
   return ost.str();
 }
 
-bool kvalobs::kvStation::set(int stationid__, float lat__, float lon__,
-                             float height__, float maxspeed__,
+bool kvalobs::kvStation::set(int stationid__, double lat__, double lon__,
+                             double height__, double maxspeed__,
                              const std::string& name__, int wmonr__,
                              int nationalnr__, const std::string& ICAOid__,
                              const std::string& call_sign__,
@@ -140,13 +140,13 @@ bool kvalobs::kvStation::set(const dnmi::db::DRow& r_) {
       if (*it == "stationid")
         stationid_ = atoi(buf.c_str());
       else if (*it == "lat")
-        lat_ = atof(buf.c_str());
+        lat_ = std::stod(buf.c_str());
       else if (*it == "lon")
-        lon_ = atof(buf.c_str());
+        lon_ = std::stod(buf.c_str());
       else if (*it == "height")
-        height_ = atoi(buf.c_str());
+        height_ = std::stod(buf.c_str());
       else if (*it == "maxspeed")
-        maxspeed_ = atoi(buf.c_str());
+        maxspeed_ = std::stod(buf.c_str());
       else if (*it == "name")
         name_ = buf;
       else if (*it == "wmonr")

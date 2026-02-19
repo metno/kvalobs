@@ -71,7 +71,7 @@ class synop {
   std::string icetext;                ///< ICE   plain text
   std::string icingtext;              ///< ICING plain text
 
-  std::map<int, float> obs;            ///< all data storage 
+  std::map<int, double> obs;            ///< all data storage 
   syn::info pinfo;                  ///< extra info (lon lat etc.)
   bool hshsInMeter;
 
@@ -114,7 +114,7 @@ class synop {
   }          ///< original message
   std::string index();                              ///< all elements with index
 
-  std::map<int, float> Data() const {
+  std::map<int, double> Data() const {
     return obs;
   }  ///< map< kvalobs-nr, value >      
   const syn::info* Info() const {
@@ -158,10 +158,10 @@ class synop {
                                                          ///< integer
 
   void setToken(const int, const char*, int pos = 0, int len = 0);  ///< set direct
-  void setScaledToken(const int, const char*, float, int pos = 0, int len = 0);  ///< set scaled
+  void setScaledToken(const int, const char*, double scl, int pos = 0, int len = 0);  ///< set scaled
   void setStaticToken(int&, const char*, int pos = 0, int len = 0);  ///< pos etc.
   void setSnowToken(const int& par, const char* token, int a, int b);  ///< adapt to klimadb 
-  void setScaledSubstituteToken(const int, const char*, float, int fsub,
+  void setScaledSubstituteToken(const int, const char*, double scl, int fsub,
                                 int tosub, int pos = 0, int len = 0);  ///< adapt to klimadb 
   void setExtraCloudHsToken(const int par, const char *token, int pos = 0,
                             int len = 0);       ///< Convert to height in meter.
@@ -170,14 +170,14 @@ class synop {
   void setExtraCloudClToken(const int par, const char *token, int pos = 0,
                             int len = 0);       ///< Convert to height in meter.
 
-  bool value(int par, float& o);
+  bool value(int par, double& o);
   bool value(int par, int& o);
 
-  void setBuffer(const int par, float val);            ///< the real set
+  void setBuffer(const int par, double val);            ///< the real set
   bool hasobs(int);
 
   int sign(const char, const syn::signtype s = syn::sn);  ///< sn/sw/ss: +/- (0/1) 
-  void scale(float&, float s = 1.0);                     ///< 333=>33.3 etc. 
+  void scale(double&, double s = 1.0);                     ///< 333=>33.3 etc. 
 
   void squareDetection();                      ///< process Qc on Lon/Lat (SHIP)
   int checkCountry();                                ///< II
@@ -187,7 +187,7 @@ class synop {
 
   void setPrecipitation(const char*);                 ///< RRRtr  
   void setPrecipitationRt(const char*);               ///< add Rt to all RRR 
-  void addPrecipitation(int par, float val);           ///< add Rt to RRR_XX 
+  void addPrecipitation(int par, double val);           ///< add Rt to RRR_XX 
 
   void setPressure(const char*, const int);            ///< common press func.
                                                        ///< 0xxx = 10xx.x 
@@ -228,7 +228,7 @@ class synop {
 
   /// EXTRA
   void setSnowCoverBySoilCondition();
-  float svp(double tt);
+  double svp(double tt);
   void computeUUU();
 
 };

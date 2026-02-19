@@ -47,7 +47,7 @@ using namespace dnmi;
 bool kvalobs::kvModelData::set(int stationid,
                                const boost::posix_time::ptime &obstime,
                                int paramid, int level, int modelid,
-                               float original) {
+                               double original) {
   stationid_ = stationid;
   obstime_ = obstime;
   paramid_ = paramid;
@@ -86,7 +86,7 @@ bool kvalobs::kvModelData::set(const dnmi::db::DRow &r_) {
       } else if (*it == "modelid") {
         modelid_ = atoi(buf.c_str());
       } else if (*it == "original") {
-        sscanf(buf.c_str(), "%f", &original_);
+        original_=std::stod(buf.c_str());
       }
     } catch (...) {
       CERR("kvModelData: unexpected exception ..... \n");

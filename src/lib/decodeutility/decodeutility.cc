@@ -287,7 +287,7 @@ std::string decodeutility::hs2Code(int hs) {
     return "";
 
   if (hs <= 1500)
-    code = hs / 30.0;
+    code = hs / 30;
   else if (hs < 1800)
     code = 50;
   else if (hs <= 9000)

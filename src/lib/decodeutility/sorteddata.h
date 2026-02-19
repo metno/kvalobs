@@ -172,7 +172,7 @@ class LeafItem {
  * Data for a \c kvData object that is not part of the key for that object.
  */
 struct DataContent {
-  DataContent(float orig, float corr, const kvalobs::kvControlInfo ci,
+  DataContent(double orig, double corr, const kvalobs::kvControlInfo ci,
               const kvalobs::kvUseInfo & ui, const std::string & fail)
       : original(orig),
         corrected(corr),
@@ -188,12 +188,12 @@ struct DataContent {
         cfailed(d.cfailed()) {
   }
   DataContent()
-      : original(std::numeric_limits<float>::max()),
-        corrected(std::numeric_limits<float>::max()) {
+      : original(std::numeric_limits<double>::max()),
+        corrected(std::numeric_limits<double>::max()) {
   }
 
-  float original;
-  float corrected;
+  double original;
+  double corrected;
   kvalobs::kvControlInfo controlinfo;
   kvalobs::kvUseInfo useinfo;
   std::string cfailed;

@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
   boost::posix_time::ptime endTime;
   boost::posix_time::ptime itTime;
   char buf[64];
-  float ta;
+  double ta;
   ofstream ofs;
 
   ofs.open("18700.txt");

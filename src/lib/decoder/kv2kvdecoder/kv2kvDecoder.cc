@@ -482,7 +482,7 @@ kv2kvDecoder::kvDataPtr kv2kvDecoder::getDbData(const kvData d) {
 }
 
 void kv2kvDecoder::verify(const kvData & d, kvDataPtr dbData) const {
-  const float delta = 0.0999;
+  const double delta = 0.0999;
   if (dbData.get() && abs(dbData->original() - d.original()) > delta) {
     ostringstream ss;
     ss << "New data is not compatible with old in database: Original value: DB = "
