@@ -4,7 +4,7 @@ AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_MACRO_DIR([m4])
 
 LT_INIT
-AC_PROG_LEX
+AC_PROG_LEX([yywrap])
 if test "x$LEX" == "x:"; then
 	AC_MSG_ERROR([lex/flex not found])
 fi
@@ -16,7 +16,7 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AX_CXX_COMPILE_STDCXX([20],[noext],[mandatory])
 
-export PKG_CONFIG_PATH=`pwd`"/kvsupport/build$prefix/lib/kvalobs10/lib/pkgconfig:${PKG_CONFIG_PATH}"
+export PKG_CONFIG_PATH=`pwd`"/kvsupport/build$prefix/lib/kvalobs11/lib/pkgconfig:${PKG_CONFIG_PATH}"
 echo "PKG_CONFIG_PATH: '${PKG_CONFIG_PATH}'"
 #AC_CONFIG_SUBDIRS([src/lib/libhttpserver/libhttpserver-0.17.5])
 
@@ -106,7 +106,7 @@ AC_CONFIG_FILES([Makefile
                  debian_files/kvalobs.install
                  debian_files/kvalobs.postinst
                  debian_files/kvalobs.postrm 
-                 debian_files/libkvalobs10.install
+                 debian_files/libkvalobs11.install
                  debian_files/rules
 ])
 
