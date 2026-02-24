@@ -114,6 +114,8 @@ bool kvalobs::kvData::set(const dnmi::db::DRow &r_) {
         useinfo_ = kvUseInfo(buf);
       } else if (*it == "cfailed") {
         cfailed_ = buf;
+      } else if (*it == "observationid") {
+        // ignore observationid
       } else {
         CERR("kvData::set .. unknown entry:" << *it << std::endl);
       }
