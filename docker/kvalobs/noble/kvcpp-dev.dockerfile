@@ -12,9 +12,9 @@ COPY --from=kvbins /usr/lib/libkvalobs_*.so.* /usr/lib/
 COPY --from=kvbins /usr/lib/libkvalobs_*.so /usr/lib/
 COPY --from=kvbins /usr/lib/libkvalobs_*.a /usr/lib/
 COPY --from=kvbins /usr/lib/libkvalobs_*.la /usr/lib/
-COPY --from=kvbins /usr/lib/kvalobs10/db/*.so*  /usr/lib/kvalobs10/db/
-COPY --from=kvbins /usr/lib/kvalobs10/decode/*.so*  /usr/lib/kvalobs10/decode/
-COPY --from=kvbins /usr/lib/kvalobs10/lib/*.so*  /usr/lib/kvalobs10/lib/
+COPY --from=kvbins /usr/lib/kvalobs11/db/*.so*  /usr/lib/kvalobs11/db/
+COPY --from=kvbins /usr/lib/kvalobs11/decode/*.so*  /usr/lib/kvalobs11/decode/
+COPY --from=kvbins /usr/lib/kvalobs11/lib/*.so*  /usr/lib/kvalobs11/lib/
 COPY --from=kvbins /usr/include/kvalobs /usr/include/kvalobs
 COPY --from=kvbins /usr/lib/pkgconfig/libkv*.pc  /usr/lib/pkgconfig/
 
