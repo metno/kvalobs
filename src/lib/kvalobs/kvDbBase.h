@@ -31,9 +31,9 @@
 #ifndef _kvDbBase_h
 #define _kvDbBase_h
 
-#include <kvdb/kvdb.h>
-#include <iosfwd>
 #include <dnmithread/mtcout.h>
+#include <iosfwd>
+#include <kvdb/kvdb.h>
 
 /* Created  by JS at Mon Aug 26 13:25:00 2002 */
 
@@ -62,14 +62,15 @@ namespace kvalobs {
  * For an example look at \ref kvDbBaseExample.doc "kvDbBaseExample".
  */
 class kvDbBase {
- protected:
+protected:
   std::string sortBy_;
   boost::gregorian::date julianDayThatYear(int addOn, int year = -1) const;
- public:
 
+public:
   /**Used to specifie an NULL value for a FLOAT field*/
-  //static const float FLT_NULL;
+  static const float FLT_NULL;
 
+  /**Used to specifie an NULL value for a DOUBLE field*/
   static const double DBL_NULL;
 
   /**Used to specifie an NULL value for a INT field*/
@@ -102,7 +103,7 @@ class kvDbBase {
    * \return The value part of a SQL insert statment.
    *
    */
-  virtual std::string toSend() const=0;
+  virtual std::string toSend() const = 0;
 
   /**
    * \brief make quoted string of the input parameter.
@@ -118,7 +119,7 @@ class kvDbBase {
    * \param timeToQuote the time we want a quoted ISO time.
    * \return a quoted ISO time formatted version of timetoQuote.
    */
-  static std::string quoted(const boost::posix_time::ptime & timeToQuote);
+  static std::string quoted(const boost::posix_time::ptime &timeToQuote);
 
   /**
    * \brief create a quoted string versjon of a integer.
@@ -133,9 +134,7 @@ class kvDbBase {
    *
    * \return true if initialized and false otherwise.
    */
-  bool exists() const {
-    return not sortBy_.empty();
-  }
+  bool exists() const { return not sortBy_.empty(); }
 
   /**
    * \brief generate a string that can be used to update the table from
@@ -152,7 +151,7 @@ class kvDbBase {
    * \return a string that can be used in a query to uniqly indentify
    *         the data in this instance.
    */
-  virtual std::string uniqueKey() const =0;
+  virtual std::string uniqueKey() const = 0;
 
   std::string insertQuery(const bool replace) const;
   std::string selectAllQuery() const;
@@ -170,29 +169,28 @@ class kvDbBase {
    * @param[out] msec The microsecond part.
    * @return A UTC time.
    */
-  //miutil::miTime decodeTimeWithMsec(const std::string &timespec, int &msec);
+  // miutil::miTime decodeTimeWithMsec(const std::string &timespec, int &msec);
   /**
    * \brief the table name/view class represent.
    *
    * \return the table name.
    */
-  virtual const char* tableName() const=0;
+  virtual const char *tableName() const = 0;
 
-  friend bool operator>(const kvDbBase& lhs, const kvDbBase& rhs);
-  friend bool operator<(const kvDbBase& lhs, const kvDbBase& rhs);
-  friend bool operator==(const kvDbBase& lhs, const kvDbBase& rhs);
-  friend bool operator!=(const kvDbBase& lhs, const kvDbBase& rhs);
+  friend bool operator>(const kvDbBase &lhs, const kvDbBase &rhs);
+  friend bool operator<(const kvDbBase &lhs, const kvDbBase &rhs);
+  friend bool operator==(const kvDbBase &lhs, const kvDbBase &rhs);
+  friend bool operator!=(const kvDbBase &lhs, const kvDbBase &rhs);
 
-  friend std::ostream& operator<<(std::ostream&, const kvDbBase&);
-
+  friend std::ostream &operator<<(std::ostream &, const kvDbBase &);
 };
 
-bool operator>(const kvDbBase& lhs, const kvDbBase& rhs);
-bool operator<(const kvDbBase& lhs, const kvDbBase& rhs);
-bool operator==(const kvDbBase& lhs, const kvDbBase& rhs);
-bool operator!=(const kvDbBase& lhs, const kvDbBase& rhs);
+bool operator>(const kvDbBase &lhs, const kvDbBase &rhs);
+bool operator<(const kvDbBase &lhs, const kvDbBase &rhs);
+bool operator==(const kvDbBase &lhs, const kvDbBase &rhs);
+bool operator!=(const kvDbBase &lhs, const kvDbBase &rhs);
 
-std::ostream& operator<<(std::ostream&, const kvDbBase&);
+std::ostream &operator<<(std::ostream &, const kvDbBase &);
 
 /**
  * \example kvDbBaseExample.doc
@@ -224,7 +222,6 @@ std::ostream& operator<<(std::ostream&, const kvDbBase&);
  */
 
 /** @} */
-}
+} // namespace kvalobs
 
 #endif
-
