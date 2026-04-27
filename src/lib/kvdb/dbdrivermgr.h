@@ -137,11 +137,11 @@ class DriverBase {
 
 namespace DriverManager {
 
-std::string fixDriverName(const std::string &driver);
+std::string fixDriverName(std::string driver);
 
-void setAppName(const std::string &appName);
+void setAppName(std::string appName);
 std::string getAppName();
-bool loadDriver(const std::string &driver, std::string &driverId);
+bool loadDriver(std::string driver, std::string &driverId);
 
   /**
    * Create a connection to a database through the driver given with 

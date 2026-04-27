@@ -1,7 +1,7 @@
 # ignored, but kept for easier use with kvbuild.sh
 ARG REGISTRY
 
-FROM ubuntu:noble
+FROM ubuntu:24.04
 ARG kafka_VERSION=2.3.0-1build2
 
 #Create a base image with all dependecies to build kvalobs.

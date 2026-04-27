@@ -79,7 +79,7 @@ void reject(kvData & d) {
   }
 }
 
-void correct(kvData & d, float new_val) {
+void correct(kvData & d, double new_val) {
   kvControlInfo ci = d.controlinfo();
   int old_fmis = ci.flag(fmis);
 
@@ -132,7 +132,7 @@ kvData kvDataFactory::getMissing(
   return ret;
 }
 
-kvData kvDataFactory::getData(float val, int paramID,
+kvData kvDataFactory::getData(double val, int paramID,
                               const boost::posix_time::ptime & obstime) const {
   kvData ret(stationID_, obstime.is_not_a_date_time() ? obstime_ : obstime, val,
              paramID, boost::posix_time::microsec_clock::universal_time(),
@@ -160,17 +160,17 @@ void hqc_reject(kvData & d) {
   setFhqc_(d, 0xA);
 }
 
-void hqc_correct(kvData & d, float new_val) {
+void hqc_correct(kvData & d, double new_val) {
   ::kvalobs::correct(d, new_val);
   setFhqc_(d, 7);
 }
 
-void hqc_interpol(kvData & d, float new_val) {
+void hqc_interpol(kvData & d, double new_val) {
   ::kvalobs::correct(d, new_val);
   setFhqc_(d, 5);
 }
 
-void hqc_distribute(kvData & d, float new_val) {
+void hqc_distribute(kvData & d, double new_val) {
   ::kvalobs::correct(d, new_val);
 
   const int old_fd = d.controlinfo().flag(fd);
@@ -182,7 +182,7 @@ void hqc_distribute(kvData & d, float new_val) {
   d.controlinfo(ci);
 }
 
-void hqc_auto_correct(kvData & d, float new_val) {
+void hqc_auto_correct(kvData & d, double new_val) {
   if (d.controlinfo().flag(fd) < 2 or d.controlinfo().flag(fd) == 3) {
     if (original_missing(d))
       hqc_interpol(d, new_val);

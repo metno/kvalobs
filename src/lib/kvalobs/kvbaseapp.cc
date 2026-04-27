@@ -55,7 +55,7 @@ std::string getAppName(const std::string &progname);
 ConfSection* KvBaseApp::conf = 0;
 std::string KvBaseApp::confFile;
 std::string KvBaseApp::pidfile;
-std::string KvBaseApp::appName;
+std::string KvBaseApp:: appName;
 milog::LogLevel KvBaseApp::globalLogLevel = milog::WARN;
 
 KvBaseApp::KvBaseApp(int argn, char **argv)

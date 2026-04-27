@@ -307,11 +307,16 @@ int DataSrcApp::registerDb(int nConn) {
     return 0;
   }
 
-  if (setAppNameForDb && !appName.empty())
-    dnmi::db::DriverManager::setAppName(appName);
-
   LOGINFO("registerDb: Driver <" << drvId << "> loaded!\n");
 
+  if (setAppNameForDb && !appName.empty()) {
+    std::cerr << "Setting appname for db driver to <" << appName << ">.\n";
+    dnmi::db::DriverManager::setAppName(appName);
+  }
+
+  LOGINFO("registerDb: (Caching) Trying to create " << nConn
+          << " connections to the database using driver <" << drvId
+          << "> and connect string <" << connectStr << ">.\n");
   for (int i = 0; i < nConn; i++) {
     Connection *con = 0;
 
@@ -330,6 +335,7 @@ int DataSrcApp::registerDb(int nConn) {
     }
   }
 
+  LOGINFO("registerDb: Successfully created " << n << " connections to the database.");
   return n;
 }
 

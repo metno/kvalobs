@@ -32,8 +32,8 @@
 #include <string>
 #include "dso.h"
 
-dnmi::file::DSO::DSO(const std::string &dsoFile, bool resolveNow)
-    : handle(0) {
+dnmi::file::DSO::DSO(std::string dsoFile, bool resolveNow)
+    : handle(nullptr) {
   load(dsoFile, resolveNow);
 }
 
@@ -42,16 +42,16 @@ dnmi::file::DSO::~DSO() {
     dlclose(handle);
 }
 
-void dnmi::file::DSO::load(const std::string &dsoFile, bool resolveNow) {
+void dnmi::file::DSO::load(std::string dsoFile_, bool resolveNow) {
   if (handle)
     throw DSOException(
         std::string("Shared object allready open <") + dsofile
             + std::string(">!"));
 
   if (resolveNow)
-    handle = dlopen(dsoFile.c_str(), RTLD_GLOBAL | RTLD_NOW);
+    handle = dlopen(dsoFile_.c_str(), RTLD_GLOBAL | RTLD_NOW);
   else
-    handle = dlopen(dsoFile.c_str(), RTLD_GLOBAL | RTLD_LAZY);
+    handle = dlopen(dsoFile_.c_str(), RTLD_GLOBAL | RTLD_LAZY);
 
   if (!handle) {
     const char *err = dlerror();
@@ -62,11 +62,11 @@ void dnmi::file::DSO::load(const std::string &dsoFile, bool resolveNow) {
       throw DSOException("UNKNOWN ERROR: dlopen!\n");
   }
 
-  dsofile = dsoFile;
+  dsofile = dsoFile_;
 }
 
 std::string dnmi::file::DSO::getLastError() {
-  char *error = dlerror();
+  const char *error = dlerror();
 
   if (error)
     return std::string(error);
@@ -76,11 +76,11 @@ std::string dnmi::file::DSO::getLastError() {
 
 void*
 dnmi::file::DSO::operator[](const std::string &name) {
-  void *ret;
-  const char *error;
+  void *ret=nullptr;
+  const char *error=nullptr;
 
   if (!handle)
-    DSOException("No DSO file is open!");
+    throw DSOException("No DSO file is open!");
 
   ret = dlsym(handle, name.c_str());
   error = dlerror();
@@ -88,22 +88,32 @@ dnmi::file::DSO::operator[](const std::string &name) {
   if (error != 0)
     throw DSOException(error);
 
+  if (!ret)
+    throw DSOException("Symbol '" + name + "' not found in file <" + dsofile
+                       + ">!");
+
   return ret;
 }
 
 void*
-dnmi::file::DSO::loadSymbol(const std::string &name) {
-  void *ret;
-  const char *error;
+dnmi::file::DSO::loadSymbol(std::string name) {
+  void *ret=nullptr;
+  const char *error=nullptr;
 
   if (!handle)
-    DSOException("No DSO file is open!");
+    throw DSOException("No DSO file is open!");
 
   ret = dlsym(handle, name.c_str());
   error = dlerror();
 
-  if (error != 0)
-    return 0;
+  if (error != 0) {
+    throw DSOException("DSO: failed to load symbol: '" + std::string(error) + "'");
+  }
 
+  if (!ret) {
+    throw DSOException("Symbol '" + name + "' not found in file <" + dsofile
+                       + ">!");
+  } 
+  
   return ret;
 }

@@ -25,6 +25,8 @@ kvpull_LDADD = $(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
                 $(top_builddir)/src/lib/kvskel/libkvalobs_kvadmininterface.la \
                 $(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
                 $(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
+                $(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la\
+                $(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la\
                 $(putools_LIBS) $(omniORB4_LIBS) $(libxmlpp_LIBS) \
                 $(BOOST_THREAD_LIB) $(BOOST_SYSTEM_LIB) \
                 -ldl

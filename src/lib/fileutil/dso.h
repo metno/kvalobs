@@ -100,7 +100,7 @@ class DSO {
    * Default konstruktor. Laster ingen fil.
    */
   DSO()
-      : handle(0) {
+      : handle(nullptr) {
   }
 
   /**
@@ -119,7 +119,7 @@ class DSO {
    * \see DLOPEN(3)
    */
 
-  DSO(const std::string &dsoFile, bool resolveNow = true);
+  DSO(std::string dsoFile, bool resolveNow = true);
 
   /**
    * \brief Destruktoren lukker det dynamisk lastbare objektet.
@@ -142,7 +142,7 @@ class DSO {
    *            problemer med � laste dsoFile
    *            eller denne instansen representerer allerede en dsoFile.
    */
-  void load(const std::string &dsoFile, bool resolveNow = true);
+  void load(std::string dsoFile, bool resolveNow = true);
 
   /**
    * \brief isValid kan kalles for � sjekke om instansen representerer en
@@ -187,7 +187,7 @@ class DSO {
    * \param name The name of the symbol to load.
    * \return A pointer to the symbol if it exist and 0 if it does not exist.
    */
-  void* loadSymbol(const std::string &name);
+  void* loadSymbol(std::string name);
 };
 
 /** @} */

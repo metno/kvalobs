@@ -14,6 +14,7 @@ aexecd_LDADD = \
 	$(top_builddir)/src/lib/miutil/libkvalobs_miutil.la\
 	$(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la\
 	$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la\
+	$(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la\
    $(BOOST_THREAD_LIB) \
 	-lm 
 
@@ -28,6 +29,7 @@ aexecdclt_LDADD = \
 	$(top_builddir)/src/lib/miutil/libkvalobs_miutil.la\
 	$(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la\
 	$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la\
+	$(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la\
    $(BOOST_THREAD_LIB) \
 	-lm 
 
