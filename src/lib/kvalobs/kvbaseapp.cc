@@ -28,38 +28,37 @@
  with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#include <stdio.h>
-#include <sys/utsname.h>
-#include <unistd.h>
-#include <string>
-#include <stdlib.h>
-#include <sstream>
+#include <dnmithread/mtcout.h>
+#include <fileutil/pidfileutil.h>
 #include <fstream>
+#include <kvalobs/getLogInfo.h>
+#include <kvalobs/kvPath.h>
+#include <kvalobs/kvbaseapp.h>
 #include <miconfparser/miconfparser.h>
 #include <milog/milog.h>
-#include <dnmithread/mtcout.h>
-#include <kvalobs/kvbaseapp.h>
-#include <kvalobs/kvPath.h>
-#include <fileutil/pidfileutil.h>
-#include <kvalobs/getLogInfo.h>
+#include <sstream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+#include <sys/utsname.h>
+#include <unistd.h>
 
 using namespace std;
 using namespace miutil::conf;
 
 namespace {
-ConfSection* confLoader(const string &defaultConfName);
+ConfSection *confLoader(const string &defaultConfName);
 std::string getAppName(const std::string &progname);
 
-}
+} // namespace
 
-ConfSection* KvBaseApp::conf = 0;
+ConfSection *KvBaseApp::conf = 0;
 std::string KvBaseApp::confFile;
 std::string KvBaseApp::pidfile;
-std::string KvBaseApp:: appName;
+std::string KvBaseApp::appName;
 milog::LogLevel KvBaseApp::globalLogLevel = milog::WARN;
 
-KvBaseApp::KvBaseApp(int argn, char **argv)
-    : setAppNameForDb(false) {
+KvBaseApp::KvBaseApp(int argn, char **argv) : setAppNameForDb(false) {
   string corbaNS;
   string kvconfig;
   ValElementList val;
@@ -77,10 +76,9 @@ KvBaseApp::KvBaseApp(int argn, char **argv)
         setConfFile(argv[i]);
       }
     }
-
   }
 
-  //Sets the variable conf
+  // Sets the variable conf
   getConfiguration();
 
   if (conf) {
@@ -134,7 +132,7 @@ void KvBaseApp::createPidFile(const std::string &progname) {
     return;
   }
 
-  fprintf(fd, "%ld\n", (long) getpid());
+  fprintf(fd, "%ld\n", (long)getpid());
   fclose(fd);
 }
 
@@ -147,7 +145,7 @@ void KvBaseApp::deletePidFile() {
   unlink(pidfile.c_str());
 }
 
-KvBaseApp::PidFile::PidFile(const std::string & progname)
+KvBaseApp::PidFile::PidFile(const std::string &progname)
     : pidFile_(dnmi::file::createPidFileName(kvPath("rundir"), progname)) {
 
   LOGDEBUG("Creating PID file " + pidFile_);
@@ -156,17 +154,17 @@ KvBaseApp::PidFile::PidFile(const std::string & progname)
     if (error)
       throw std::runtime_error("Error when attempting to check PID file");
     else
-      throw std::runtime_error("PID file <" + pidFile_ + "> already exists! Is " + progname + " running?");
+      throw std::runtime_error("PID file <" + pidFile_ +
+                               "> already exists! Is " + progname +
+                               " running?");
   }
   std::ofstream s(pidFile_);
   s << getpid() << std::endl;
   if (!s)
-    throw std::runtime_error("Error when attempting to create PID file: " + pidFile_);
+    throw std::runtime_error("Error when attempting to create PID file: " +
+                             pidFile_);
 }
-KvBaseApp::PidFile::~PidFile() {
-  unlink(pidFile_.c_str());
-}
-
+KvBaseApp::PidFile::~PidFile() { unlink(pidFile_.c_str()); }
 
 std::string KvBaseApp::createConnectString(const std::string &dbname,
                                            const std::string &kvdbuser,
@@ -227,8 +225,7 @@ std::string KvBaseApp::createConnectString(const std::string &dbname,
   return ost.str();
 }
 
-miutil::conf::ConfSection*
-KvBaseApp::getConfiguration() {
+miutil::conf::ConfSection *KvBaseApp::getConfiguration() {
   if (!KvBaseApp::conf) {
     KvBaseApp::conf = confLoader(KvBaseApp::appName + ".conf");
 
@@ -266,8 +263,7 @@ void KvBaseApp::setConfFile(const std::string &filename) {
 }
 
 namespace {
-ConfSection*
-confLoader(const std::string &defaultConfFile) {
+ConfSection *confLoader(const std::string &defaultConfFile) {
   ConfParser parser;
   string conffile;
   ConfSection *conf;
@@ -287,8 +283,9 @@ confLoader(const std::string &defaultConfFile) {
     conf = parser.parse(fis);
 
     if (!conf) {
-      LOGERROR(
-          "Error while reading configuration file: <" << conffile << ">!" << endl << parser.getError() << endl);
+      LOGERROR("Error while reading configuration file: <"
+               << conffile << ">!" << endl
+               << parser.getError() << endl);
     } else {
       LOGINFO("Configuration file loaded!\n");
       return conf;
@@ -315,4 +312,4 @@ std::string getAppName(const std::string &progname) {
   return name;
 }
 
-}
+} // namespace

@@ -85,10 +85,12 @@ int main(int argn, char** argv) {
 
   if (dnmi::file::isRunningPidFile(pidfile, error)) {
     if (error) {
+      std::cerr << "An error occured while reading the pidfile:" << endl << pidfile << " remove the file if it exists and" << endl << "kvDataInputd is not running. " << "If it is running and there are problems. Kill kvDataInputd and" << endl << "restart it." << endl << endl;
       LOGFATAL(
           "An error occured while reading the pidfile:" << endl << pidfile << " remove the file if it exists and" << endl << "kvDataInputd is not running. " << "If it is running and there are problems. Kill kvDataInputd and" << endl << "restart it." << endl << endl);
       return 1;
     } else {
+      std::cerr << "Is kvDataInputd already running?" << endl << "If not remove the pidfile: " << pidfile << endl;
       LOGFATAL("Is kvDataInputd allready running?" << endl << "If not remove the pidfile: " << pidfile);
       return 1;
     }
@@ -101,6 +103,9 @@ int main(int argn, char** argv) {
 
   if (!app.isOk()) {
     LOGFATAL("Problems with initializing of kvDataInputd!\n");
+    std::cerr << "Problems with initializing of kvDataInputd!" << std::endl;
+    app.deletePidFile();
+    return 2;
   }
 
   HttpConfig httpConfig = app.getHttpConfig();
@@ -112,8 +117,9 @@ int main(int argn, char** argv) {
   ws.start(false);
   if (!ws.is_running()) {
     LOGFATAL("Cant start the http interface on port " << httpConfig.port << ", threads " << httpConfig.threads << ".");
+    std::cerr << "Cant start the http interface on port " << httpConfig.port << ", threads " << httpConfig.threads << "." << std::endl;
     app.deletePidFile();
-    return 1;
+    return 3;
   }
 
   while (sigTerm == 0) {

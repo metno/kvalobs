@@ -85,8 +85,9 @@ void DecoderMgr::updateDecoders(miutil::conf::ConfSection *theKvConf) {
       fac = (decoderFactory) (*dso)["decoderFactory"];
       obsTypes = (getObsTypes) (*dso)["getObsTypes"];
       releaseFunc = (releaseDecoderFunc) (*dso)["releaseDecoder"];
-      setConf = (setKvConf) dso->loadSymbol("setKvConf");
-      obsTypesExt = (getObsTypesExt) dso->loadSymbol("getObsTypesExt");
+      //setConf = (setKvConf) dso->loadSymbol("setKvConf");
+      setConf = (setKvConf) (*dso)["setKvConf"];
+      obsTypesExt = (getObsTypesExt) dso->loadSymbol("getObsTypesExt"); //This may not exist, so we use loadSymbol and check for 0.
       decoder = new DecoderItem(fac, releaseFunc, setConf, dso, modTime(name));
 
       if (obsTypesExt)
