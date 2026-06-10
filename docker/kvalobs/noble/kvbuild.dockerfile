@@ -13,6 +13,6 @@ COPY GITREF /usr/share/kvalobs/VERSION
 RUN --mount=type=cache,target=/build cd /src/ && autoreconf -if && cd /build && \
       CC=gcc-14 CXX=g++-14 /src/configure --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info  \
       --localstatedir=/var --sysconfdir=/etc  \
-      CFLAGS=-g && make && make install
+      CFLAGS=-g CXXFLAGS=-g && make && make install
 
 ENTRYPOINT [ "/bin/bash"]

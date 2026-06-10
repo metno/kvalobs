@@ -64,8 +64,8 @@ namespace decoder {
  * 
  *  save_to_db (*true/false) - Shall the observation be put into the database.
  *                             save_to_db=false, implies add_to_work_queue=false.
- *  publish (true/*false)    - Shall the obbservation be published on the checked que.
- *  add_to_work_queue (*true/false) - Shall we add the observation to workque. Only observation 
+ *  publish (true / *false)    - Shall the obbservation be published on the checked que.
+ *  add_to_work_queue (*true / false) - Shall we add the observation to workque. Only observation 
  *                                    in the workque is checked by kvQabased.
  *  typeid_list              - A list of typeids this filter element is valid for. An empty list (default) 
  *                             means all typides.

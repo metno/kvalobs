@@ -30,9 +30,9 @@
 #ifndef SRC_LIB_KVSUBSCRIBE_SENDDATA_H_
 #define SRC_LIB_KVSUBSCRIBE_SENDDATA_H_
 
-#include <string>
 #include "boost/lexical_cast.hpp"
 #include "miutil/exceptionSpec.h"
+#include <string>
 
 namespace kvalobs {
 namespace datasource {
@@ -68,29 +68,24 @@ struct Result {
   std::string message;
   std::string messageId;
   bool retry;
-  
-  Result()
-      : res(EResult::OK),
-        retry(false) {
-  }
+
+  Result() : res(EResult::OK), retry(false) {}
   explicit Result(int messageid)
       : res(EResult::OK),
-        retry(false),
-        messageId(boost::lexical_cast<std::string>(messageid)) {
-  }
+        messageId(boost::lexical_cast<std::string>(messageid)), retry(false) {}
 };
 
 class SendData {
- public:
-  virtual ~SendData() {
-  }
+public:
+  virtual ~SendData() {}
   /**
    * @throws Fatal on transport error.
    */
-  virtual Result newData(const std::string &data, const std::string &obsType) = 0;
+  virtual Result newData(const std::string &data,
+                         const std::string &obsType) = 0;
 };
 
-}  // namespace datasource
-}  // namespace kvalobs
+} // namespace datasource
+} // namespace kvalobs
 
-#endif  // SRC_LIB_KVSUBSCRIBE_SENDDATA_H_
+#endif // SRC_LIB_KVSUBSCRIBE_SENDDATA_H_
