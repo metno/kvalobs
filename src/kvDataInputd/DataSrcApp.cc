@@ -318,7 +318,7 @@ int DataSrcApp::registerDb(int nConn) {
           << nConn << " connections to the database using driver <" << drvId
           << "> and connect string <" << connectStr << ">.\n");
   for (int i = 0; i < nConn; i++) {
-    Connection *con = 0;
+    Connection *con = nullptr;
 
     while (!con && !inShutdown()) {
       con = dnmi::db::DriverManager::connect(drvId, connectStr);

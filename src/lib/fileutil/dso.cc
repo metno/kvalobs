@@ -73,37 +73,27 @@ std::string dnmi::file::DSO::getLastError() {
 }
 
 void *dnmi::file::DSO::operator[](const std::string &name) {
-  void *ret = nullptr;
-  const char *error = nullptr;
-
   if (!handle)
     throw DSOException("No DSO file is open!");
 
-  ret = dlsym(handle, name.c_str());
-  error = dlerror();
+  void *ret = dlsym(handle, name.c_str());
 
-  if (error != 0)
-
-    if (!ret)
-      throw DSOException("Symbol '" + name + "' not found in file <" + dsofile +
-                         ">!");
+  if (!ret) {
+    std::string err("DSO failed to lookup symbol '" + name + "' in file <" +
+                    dsofile + ">");
+    const char *error = dlerror();
+    if (error) {
+      err += ": " + std::string(error);
+    }
+    throw DSOException(err);
+  }
 
   return ret;
 }
 
 void *dnmi::file::DSO::loadSymbol(std::string name) {
-  void *ret = nullptr;
-  const char *error = nullptr;
-
   if (!handle)
     throw DSOException("No DSO file is open!");
 
-  ret = dlsym(handle, name.c_str());
-  error = dlerror();
-
-  if (error != 0) {
-    return nullptr;
-  }
-
-  return ret;
+  return dlsym(handle, name.c_str());
 }
