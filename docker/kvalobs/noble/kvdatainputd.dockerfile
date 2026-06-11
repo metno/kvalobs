@@ -12,7 +12,7 @@ ARG kvuserid=5010
 ENV PGPASSFILE=/etc/kvalobs/.pgpass
 
 # Add bufrdecoder 
-RUN apt update && apt install -y libgeo-bufr-perl  metno-bufrtables
+RUN apt update && apt install -y libgeo-bufr-perl  metno-bufrtables gdb
 COPY docker/kvalobs/kvdatainputd/BufrDecode.pl /usr/local/bin
 
 # Add kvalobs user
