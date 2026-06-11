@@ -4,7 +4,7 @@ ARG BASE_IMAGE_TAG=latest
 FROM ${REGISTRY}kvbuild:${BASE_IMAGE_TAG} AS kvbins
 ENTRYPOINT [ "/bin/bash" ]
 
-FROM ubuntu:noble
+FROM ubuntu:24.04
 ARG DEBIAN_FRONTEND='noninteractive'
 ARG kafka_VERSION=2.3.0-1build2
 

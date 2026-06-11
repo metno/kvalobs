@@ -104,7 +104,7 @@ ObsData::ObsData()
 
 ObsData::ObsData(int stationid, int typeid_)
     : stationid(stationid),
-      type(type) {
+      type(typeid_) {
 }
 
 bool ObsData::add(const kvalobs::kvData &kvData) {

@@ -78,7 +78,7 @@ void reject(kvData & d);
 /**
  * \brief Update corrected field.
  */
-void correct(kvData & d, float new_val);
+void correct(kvData & d, double new_val);
 
 /**
  * \brief Generate a missing data object for the given parameters.
@@ -116,7 +116,7 @@ class kvDataFactory {
   /**
    * Get one piece of data for the observation.
    */
-  kvData getData(float val, int paramID,
+  kvData getData(double val, int paramID,
                  const boost::posix_time::ptime & obsTime =
                      boost::posix_time::ptime()) const;
 
@@ -151,15 +151,15 @@ namespace hqc {
 void hqc_accept(kvData & d);
 void hqc_reject(kvData & d);
 
-void hqc_correct(kvData & d, float new_val);
-void hqc_interpol(kvData & d, float new_val);
-void hqc_distribute(kvData & d, float new_val);
+void hqc_correct(kvData & d, double new_val);
+void hqc_interpol(kvData & d, double new_val);
+void hqc_distribute(kvData & d, double new_val);
 
 /**
  * \brief Correction method will be chosen based on the state of d
  * and value of new_val.
  */
-void hqc_auto_correct(kvData & d, float new_val);
+void hqc_auto_correct(kvData & d, double new_val);
 
 /**
  * \brief Has HQC set any flags on this?

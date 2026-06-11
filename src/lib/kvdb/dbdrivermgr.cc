@@ -30,6 +30,7 @@
  */
 #include <fileutil/dso.h>
 #include "dbdrivermgr.h"
+#include <iostream>
 #include <sstream>
 #include "kvdb.h"
 
@@ -71,7 +72,7 @@ std::mutex mutex;
 
 namespace DriverManager {
 
-void setAppName(const std::string &appName_) {
+void setAppName(std::string appName_) {
   appName = appName_;
 }
 
@@ -79,8 +80,7 @@ std::string getAppName() {
   return appName;
 }
 
-std::string fixDriverName(const std::string &driver_) {
-  string driver(driver_);
+std::string fixDriverName(std::string driver) {
   std::string dir(PKGLIB_DBDIR);
 
   size_t i;
@@ -121,20 +121,20 @@ std::string fixDriverName(const std::string &driver_) {
   return driver;
 }
 
-bool loadDriver(const std::string &driver_,
+bool loadDriver(std::string driver_,
                 std::string &driverId) {
   using namespace dnmi::file;
   string driver(fixDriverName(driver_));
-  DriverBase *d;
-  Driver *drv = 0;
-  DSO *dso = 0;
+  DriverBase *d = nullptr;
+  Driver *drv = nullptr;
+  DSO *dso = nullptr;
 
   driverId.clear();
 
   std::lock_guard<std::mutex> lock(mutex);
 
   try {
-    dso = new DSO(fixDriverName(driver));
+    dso = new DSO(driver);
   } catch (dnmi::file::DSOException &ex) {
     err = "Can't load driver <";
     err += driver;
@@ -155,10 +155,11 @@ bool loadDriver(const std::string &driver_,
     return false;
   }
 
+  std::cerr << "DEBUG: DriverManager::loadDriver: driver <" << driver << "> loaded!\n";
+
   try {
     dnmi::db::DriverBase* (*createSQLDriver)();
     void (*releaseSQLDriver)(dnmi::db::DriverBase*);
-    dnmi::db::DriverBase *p;
 
     releaseSQLDriver = (void (*)(
         dnmi::db::DriverBase*))(*dso)["releaseSQLDriver"];
@@ -166,8 +167,11 @@ bool loadDriver(const std::string &driver_,
     createSQLDriver  = (dnmi::db::DriverBase* (*)())(*dso)["createSQLDriver"];
     d = createSQLDriver();
 
-    if (!d)
-      throw std::bad_alloc();
+    if (!d) {
+      std::cerr << "DEBUG: DriverManager::loadDriver (d==nullptr): Out of memory????\n";
+      delete dso;
+      return false;
+    }
 
     drv = new Driver(d, releaseSQLDriver, dso);
   } catch (dnmi::file::DSOException &ex) {
@@ -176,22 +180,17 @@ bool loadDriver(const std::string &driver_,
     err += ">, ";
     err += ex.what();
 
-    if (d)
-      delete d;
-
     delete dso;
-
     return false;
   } catch (...) {
     err = "Can't load driver <";
     err += driver;
     err += ">  Out of memmory!";
 
-    if (drv)
+    if (drv) {
+      std::cerr << "DEBUG: DriverManager::loadDriver: <unknown error> " << err  << "???\n";
       delete drv;
-    else if (d) {
-      delete d;
-      delete dso;
+      return false;
     }
 
     return false;
@@ -199,10 +198,10 @@ bool loadDriver(const std::string &driver_,
 
   driverId = drv->driver->name();
 
-  IDriverList it = drivers.begin();
-
-  for (; it != drivers.end(); it++) {
+  for (IDriverList it = drivers.begin(); it != drivers.end(); it++) {
     if ((*it)->driver->name() == driverId) {
+      std::cerr << "DEBUG: DriverManager::loadDriver: Driver <" << driverId
+                << "> already loaded!\n";
       delete drv;
 
       return true;

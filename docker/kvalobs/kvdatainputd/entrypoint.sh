@@ -5,7 +5,7 @@
 #When a process is killed by a signal, it has exit code 128 + signum. (LINUX)
 #Killed by SIGTERM (15) => 128 + 15 = 143.
 
-set -e
+#set -e
 export PGPASSFILE=/etc/kvalobs/.pgpass
 
 aexecd_PID=
@@ -20,7 +20,7 @@ _term() {
     running=false
     got_exit_signal=true    
 
-    for pid in "$running_pids"; do
+    for pid in $running_pids; do
       kill -sTERM $pid &>/dev/null
     done
 }
@@ -89,8 +89,13 @@ if [ "$#" -eq 0 ]; then
   kvDataInputd_PID=$!
   running_pids="$running_pids $!"
   echo "kvDataInputd pid: $kvDataInputd_PID"
-  wait -n
+  echo "Running pids: $running_pids"
+
+  PID_TO_EXIT=
+  wait -n -p PID_TO_EXIT $running_pids
   ec=$?
+
+  echo "Process with pid $PID_TO_EXIT exited with code $ec"
 
   if [ $got_exit_signal = true ]; then
     echo "Got exit signal: $got_exit_signal"

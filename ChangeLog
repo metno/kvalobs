@@ -1,3 +1,7 @@
+2026-06-10 Børge Moe
+  * Release 8.0.1
+  * kvDataInputd
+
 2026-03-12 Børge Moe
   * Release 8.0.0
   * Use same precision in database and kvalobs

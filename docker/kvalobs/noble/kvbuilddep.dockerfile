@@ -1,7 +1,7 @@
 # ignored, but kept for easier use with kvbuild.sh
 ARG REGISTRY
 
-FROM ubuntu:noble
+FROM ubuntu:24.04
 ARG kafka_VERSION=2.3.0-1build2
 
 #Create a base image with all dependecies to build kvalobs.
@@ -25,7 +25,7 @@ RUN apt-key add /tmp/pg-ACCC4CF8.asc && rm /tmp/pg-ACCC4CF8.asc && \
 RUN apt update && apt install -y \
   debhelper autotools-dev autoconf-archive debconf devscripts fakeroot \
   build-essential less nano automake libtool gfortran bison flex sqlite3 \
-  omniidl python3 cmake google-mock libgmock-dev libgtest-dev g++-14 libstdc++-14-dev
+  omniidl python3 cmake google-mock libgmock-dev libgtest-dev g++-14 libstdc++-14-dev gdb
 
 #Dependencies for kvalobs
 RUN apt update && apt install -y \

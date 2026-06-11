@@ -33,6 +33,7 @@ kvalobs_queue_transfer_LDFLAGS = \
 	
 kvalobs_queue_transfer_LDADD = \
 	$(LDADD) \
+	$(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la \
 	$(top_builddir)/src/service-libs/kvcpp/libkvalobs_kvcpp.la \
 	$(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
 	$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
