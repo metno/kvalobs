@@ -77,7 +77,9 @@ else
   echo "Not known" > /var/log/kvalobs/kvDataInputd_VERSION
 fi
 
-if [ "$#" -eq 0 ]; then
+rm -f /var/log/kvalobs/kvDataInputd_gdb
+
+if [ "$#" -eq 0 -o "$1" = "gdb" ]; then
   echo "ENTRYPOINT starting kvDataInputd"
   echo "Starting aexecd as a sidecar."
   /usr/bin/aexecd &>/dev/null & 
@@ -85,7 +87,21 @@ if [ "$#" -eq 0 ]; then
   running_pids="$running_pids $!"
   echo "aexec pid: $aexecd_PID"
   echo "Starting kvDataInputd."
-  /usr/bin/kvDataInputd 2>&1 &
+
+  kvDataInputd_PID=
+  if [ "$1" = "gdb" ]; then
+    touch /var/log/kvalobs/kvDataInputd_gdb
+    echo "Starting kvDataInputd in gdb!"
+    gdb gdb -batch \
+    -ex run \
+    -ex "thread apply all bt" \
+    --args /usr/bin/kvDataInputd 
+    exit 99
+  else
+    echo "Starting kvDataInputd normally!"
+     /usr/bin/kvDataInputd 2>&1 &
+  fi
+  
   kvDataInputd_PID=$!
   running_pids="$running_pids $!"
   echo "kvDataInputd pid: $kvDataInputd_PID"
