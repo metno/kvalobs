@@ -92,10 +92,25 @@ if [ "$#" -eq 0 -o "$1" = "gdb" ]; then
   if [ "$1" = "gdb" ]; then
     touch /var/log/kvalobs/kvDataInputd_gdb
     echo "Starting kvDataInputd in gdb!"
-    gdb gdb -batch \
+    tmux new-session -d -s gdb \
+    "gdb -batch \
     -ex run \
-    -ex "thread apply all bt" \
-    --args /usr/bin/kvDataInputd 
+    -ex \"thread apply all bt\" \
+    --args /usr/bin/kvDataInputd"
+
+    #Redirect gdb output to stdout of the container. 
+    #We use tmux for this, and we have to use pipe-pane to 
+    #redirect the output of the tmux session to the stdout 
+    #of the container. We also have to use -o to make sure that 
+    #we only redirect the output of the tmux session and not the input.
+    tmux pipe-pane -o -t gdb 'cat >> /proc/1/fd/1'
+
+    # keep the container running until we get a signal to exit.
+    while [ "$running" = "true" ]; do 
+        sleep 1; 
+    done
+
+    #Use exit code 99 to indicate that we are exiting a gdb session. 
     exit 99
   else
     echo "Starting kvDataInputd normally!"
@@ -136,7 +151,7 @@ elif [ "$1" = "bash" ]; then
     /bin/bash
 else
     echo "ENTRYPOINT sleep forever!"
-    while running="true"; do 
+    while [ "$running" = "true" ]; do 
         sleep 1; 
     done
 fi
