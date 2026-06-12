@@ -1,3 +1,7 @@
+2026-06-12 Børge Moe
+  * Release 8.0.2
+  * option to run kvDataInputd un gdb
+
 2026-06-10 Børge Moe
   * Release 8.0.1
   * kvDataInputd
