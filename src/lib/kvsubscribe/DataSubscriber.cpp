@@ -28,55 +28,63 @@
  */
 
 #include "DataSubscriber.h"
+#include "queue.h"
 #include <decodeutility/kvalobsdata.h>
 #include <decodeutility/kvalobsdataparser.h>
-#include <milog/milog.h>
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <milog/milog.h>
 #include <mutex>
-#include "queue.h"
 
 namespace kvalobs {
 namespace subscribe {
 
 namespace {
-void writeNoDebug(const std::string &message, const serialize::KvalobsData &d ) {
+void writeNoDebug(const std::string &message, const serialize::KvalobsData &d) {
   return;
 }
-}
+} // namespace
 
-std::function<void(const std::string &message, const serialize::KvalobsData &d)> DataSubscriber::debugWriter=writeNoDebug;
+std::function<void(const std::string &message, const serialize::KvalobsData &d)>
+    DataSubscriber::debugWriter = writeNoDebug;
 
-DataSubscriber::DataSubscriber(Handler handler,
-                               const std::string & domain,
-                               const std::string & brokers,
+DataSubscriber::DataSubscriber(Handler handler, const std::string &domain,
+                               const std::string &brokers,
                                const std::string &groupId)
-    : KafkaConsumer(topic(domain), brokers, groupId),
-      handler_(handler) {
-}
+    : KafkaConsumer(topic(domain), brokers, groupId), handler_(handler) {}
 
-std::string DataSubscriber::topic(const std::string & domain) {
+std::string DataSubscriber::topic(const std::string &domain) {
   return queue::checked(domain);
 }
 
-
-void DataSubscriber::setDebugWriter(std::function<void(const std::string &message, const serialize::KvalobsData &d)> func){
-  debugWriter=func;
+void DataSubscriber::setDebugWriter(
+    std::function<void(const std::string &message,
+                       const serialize::KvalobsData &d)>
+        func) {
+  debugWriter = func;
 }
 
-void DataSubscriber::resetDebugWrite(){
-  debugWriter=writeNoDebug;
-}
+void DataSubscriber::resetDebugWrite() { debugWriter = writeNoDebug; }
 
-void DataSubscriber::data(const char * msg, unsigned length) {
+// KafkaConsumer interface implementation
+void DataSubscriber::data(const char *msg, unsigned length) {
   std::string message(msg, length);
   serialize::KvalobsData d;
   serialize::KvalobsDataParser::parse(message, d);
-  debugWriter( message, d);
-  handler_(d);
+  debugWriter(message, d);
+  handleData(d);
 }
 
-void DataSubscriber::error(int code, const std::string & msg) {
+void DataSubscriber::error(int code, const std::string &msg) {
+  handleError(code, msg);
+}
+
+// DataHandler interface implementation
+void DataSubscriber::handleData(const ::kvalobs::serialize::KvalobsData &data) {
+  handler_(data);
+}
+
+void DataSubscriber::handleError(int code, const std::string &msg) {
   milog::LogContext context("DataSubscriber");
   LOGERROR(msg);
 }

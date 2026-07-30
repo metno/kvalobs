@@ -28,20 +28,37 @@
  */
 #include "KafkaConsumer.h"
 #include <iostream>
-#include <librdkafka/rdkafkacpp.h>
 #include <stdexcept>
 
 namespace kvalobs {
 namespace subscribe {
 
+std::list<KafkaConsumer *> KafkaConsumer::allConsumers_;
+
 KafkaConsumer::KafkaConsumer(const std::string &topic,
                              const std::string &brokers,
                              const std::string &groupId)
-    : Consumer(topic), initialized_(false), groupId_(groupId) {
+    : initialized_(false), stopping_(false), groupId_(groupId) {
+  topics_.push_back(topic);
+  if (groupId.empty()) {
+  }
   createConnection_(brokers, groupId);
+  allConsumers_.push_back(this);
 }
 
-KafkaConsumer::~KafkaConsumer() { stop(); }
+KafkaConsumer::~KafkaConsumer() {
+  stop();
+  allConsumers_.remove(this);
+}
+
+std::string KafkaConsumer::getTopic() const {
+  return topics_.empty() ? "" : *topics_.begin();
+}
+
+void KafkaConsumer::startAtEarliestData() {
+  // no_op, keept for source compabitilty.
+}
+
 namespace {
 void set(RdKafka::Conf &c, const std::string &key, const std::string &value) {
   std::string errstr;
@@ -49,6 +66,10 @@ void set(RdKafka::Conf &c, const std::string &key, const std::string &value) {
     throw std::runtime_error(errstr);
 }
 } // namespace
+
+void KafkaConsumer::startAtStored(const std::string &fileName) {
+  // no_op, keept for source compabitilty.
+}
 
 namespace {
 class FunctionConsumer : public RdKafka::ConsumeCb {
@@ -63,6 +84,14 @@ private:
   std::function<void(RdKafka::Message &message)> handler_;
 };
 } // namespace
+
+void KafkaConsumer::run() {
+  stopping_ = false;
+
+  while (not stopping_) {
+    runOnce(1000);
+  }
+}
 
 void KafkaConsumer::runOnce(unsigned timeoutInMilliSeconds) {
   if (!initialized_) {
@@ -94,7 +123,7 @@ void KafkaConsumer::handle_(RdKafka::Message &message) {
 
   case RdKafka::ERR_NO_ERROR:
     try {
-      handleData((char *)message.payload(), message.len());
+      data((char *)message.payload(), message.len());
     } catch (std::exception &e) {
       error(0, e.what());
     }
@@ -105,7 +134,7 @@ void KafkaConsumer::handle_(RdKafka::Message &message) {
     break;
 
   default:
-    handleError(message.err(), message.errstr());
+    error(message.err(), message.errstr());
     break;
   }
 }

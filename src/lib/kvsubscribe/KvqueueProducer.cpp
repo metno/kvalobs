@@ -1,0 +1,125 @@
+/*
+ Kvalobs - Free Quality Control Software for Meteorological Observations
+
+ Copyright (C) 2015 met.no
+
+ Contact information:
+ Norwegian Meteorological Institute
+ Box 43 Blindern
+ 0313 OSLO
+ NORWAY
+ email: kvalobs-dev@met.no
+
+ This file is part of KVALOBS
+
+ KVALOBS is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as
+ published by the Free Software Foundation; either version 2
+ of the License, or (at your option) any later version.
+
+ KVALOBS is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along
+ with KVALOBS; if not, write to the Free Software Foundation Inc.,
+ 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+#include "src/lib/kvsubscribe/KvqueueProducer.h"
+#include "src/lib/kvsubscribe/KvqueueConfig.h"
+#include <iostream>
+#include <librdkafka/rdkafkacpp.h>
+
+namespace kvalobs {
+namespace subscribe {
+
+KvqueueProducer::KvqueueProducer(const std::string &topic,
+                                 const std::list<std::string> &brokers,
+                                 ErrorHandler onFailedDelivery,
+                                 SuccessHandler onSuccessfulDelivery) {
+  KvqueueConfig conf;
+  conf.brokers = brokers;
+  conf.topic = topic;
+  init(conf, onFailedDelivery, onSuccessfulDelivery);
+}
+
+KvqueueProducer::KvqueueProducer(const KvqueueConfig &config,
+                                 ErrorHandler onFailedDelivery,
+                                 SuccessHandler onSuccessfulDelivery) {
+  init(config, onFailedDelivery, onSuccessfulDelivery);
+}
+
+void KvqueueProducer::init(const KvqueueConfig &config,
+                           ErrorHandler onFailedDelivery,
+                           SuccessHandler onSuccessfulDelivery) {
+  messageId_ = 0;
+  if (config.brokers.empty()) {
+    throw std::logic_error("Empty list of kvqueue databases");
+  }
+
+  std::string errstr;
+
+  std::unique_ptr<RdKafka::Conf> conf(
+      RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL));
+
+  conf->set("metadata.broker.list", config.brokers, errstr);
+  // conf->set("bootstrap.servers", config.brokers, errstr);
+  conf->set("dr_cb", deliveryReportHandler_.get(), errstr);
+
+  producer_.reset(RdKafka::Producer::create(conf.get(), errstr));
+  if (!producer_)
+    throw std::runtime_error("Failed to create producer: " + errstr);
+
+  std::unique_ptr<RdKafka::Conf> tconf(
+      RdKafka::Conf::create(RdKafka::Conf::CONF_TOPIC));
+
+  if (conf->set("request.required.acks",
+                std::to_string(config.requestRequiredAcks),
+                errstr) != RdKafka::Conf::CONF_OK) {
+    throw std::runtime_error(
+        "Failed to configure topic (request.required.acks): " + errstr);
+  }
+
+  if (conf->set("request.timeout.ms", std::to_string(config.requestTimeoutMs),
+                errstr) != RdKafka::Conf::CONF_OK) {
+    throw std::runtime_error(
+        "Failed to configure topic (request.timeout.ms): " + errstr);
+  }
+
+  topic_.reset(RdKafka::Topic::create(producer_.get(), config.topic,
+                                      tconf.get(), errstr));
+  if (!topic_)
+    throw std::runtime_error("Failed to create topic: " + errstr);
+}
+
+KvqueueProducer::~KvqueueProducer() { catchup(); }
+
+KvqueueProducer::MessageId KvqueueProducer::send(const std::string &data) {
+  return send(data.c_str(), data.size());
+}
+
+KvqueueProducer::MessageId KvqueueProducer::send(const char *data,
+                                                 unsigned length) {
+  MessageId *id = new MessageId(messageId_++);
+
+  RdKafka::ErrorCode resp = producer_->produce(
+      topic_.get(), RdKafka::Topic::PARTITION_UA,
+      RdKafka::Producer::RK_MSG_COPY /* Copy payload */,
+      const_cast<char *>(data), length, nullptr, static_cast<void *>(id));
+
+  if (resp != RdKafka::ERR_NO_ERROR) {
+    delete id;
+    throw std::runtime_error(RdKafka::err2str(resp));
+  }
+
+  return *id;
+}
+
+void KvqueueProducer::catchup(unsigned timeout) { producer_->poll(timeout); }
+
+std::string KvqueueProducer::topic() const { return topic_->name(); }
+
+} // namespace subscribe
+} // namespace kvalobs

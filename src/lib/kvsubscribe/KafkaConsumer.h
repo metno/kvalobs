@@ -30,10 +30,11 @@
 #ifndef KAFKACONSUMER_H_
 #define KAFKACONSUMER_H_
 
+#include "Consumer.h"
 #include <functional>
-#include <string>
-#include <memory>
 #include <list>
+#include <memory>
+#include <string>
 #include <vector>
 
 namespace RdKafka {
@@ -41,8 +42,7 @@ class KafkaConsumer;
 class Topic;
 class Conf;
 class Message;
-}
-
+} // namespace RdKafka
 
 namespace kvalobs {
 namespace subscribe {
@@ -60,93 +60,35 @@ namespace subscribe {
  *     - automatically set some config options
  *   - figure out partitions
  */
-class KafkaConsumer {
- public:
-
-  KafkaConsumer(const std::string & topic,
-                const std::string & brokers,
-                const std::string & groupId="");
+class KafkaConsumer : public Consumer {
+public:
+  KafkaConsumer(const std::string &topic, const std::string &brokers,
+                const std::string &groupId = "");
 
   virtual ~KafkaConsumer();
-
-  std::string getTopic()const;
-  /**
-   * DEPRECRATED, no-op, keept for backward source compatibility.
-   * When getting data, start at the earliest possible time instead of getting
-   * only data produced after start() has been called.
-   */
-  void startAtEarliestData();
-
-  /**
-   * DEPRECRATED, no-op, keept for backward source compatibility.
-   * Store place in queue to the given file, also read it at startup if it
-   * exists, to pick up where you left. Note that the file is not written for
-   * every message, so expect duplicates if you restart your service
-   *
-   * @param fileName Name of the progress file to use.
-   */
-  void startAtStored(const std::string & fileName);
-
-  /**
-   * Run until stop() has been called, processing events, calling data(...)
-   * and error(...) as appropriate.
-   *
-   * It may make sense to run this in a std::thread
-   */
-  void run();
-
-  /**
-   * Process one message, waiting maximum for the given time if no messages are available.
-   */
-  void runOnce(unsigned timeoutInMilliSeconds);
-
-  /**
-   * Has stop() been called?
-   */
-  bool stopping() const {
-    return stopping_;
-  }
 
   /**
    * Stop this consumer.
    */
-  void stop();
+  void stop() override;
 
-  /**
-   * call stop() an all consumers
-   */
-  static void stopAll();
+protected:
+  void runOnce(unsigned timeoutInMilliSeconds) override;
 
- protected:
-
-  /**
-   * Process incoming data
-   */
-  virtual void data(const char * msg, unsigned length) =0;
-
-  /**
-   * Handle errors on message arrival.
-   */
-  virtual void error(int code, const std::string & msg) =0;
-
- private:
-  typedef std::function<void(RdKafka::Message & message)> BasicHandler;
-  void handle_(RdKafka::Message & message);
-  void createConnection_(const std::string & brokers, const std::string & groupId);
+private:
+  typedef std::function<void(RdKafka::Message &message)> BasicHandler;
+  void handle_(RdKafka::Message &message);
+  void createConnection_(const std::string &brokers,
+                         const std::string &groupId);
   void subscribe_();
-  
+
   bool initialized_;
-  bool stopping_;
   std::unique_ptr<RdKafka::KafkaConsumer> consumer_;
   std::vector<std::string> topics_;
   std::string groupId_;
-  
-
-  static std::list<KafkaConsumer *> allConsumers_;
-
 };
 
-}
-}
+} // namespace subscribe
+} // namespace kvalobs
 
 #endif /* KAFKACONSUMER_H_ */

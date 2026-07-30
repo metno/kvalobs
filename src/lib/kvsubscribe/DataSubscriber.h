@@ -30,6 +30,7 @@
 #ifndef SRC_LIB_KVSUBSCRIBE_DATASUBSCRIBER_H_
 #define SRC_LIB_KVSUBSCRIBE_DATASUBSCRIBER_H_
 
+#include "DataHandler.h"
 #include "KafkaConsumer.h"
 #include <functional>
 
@@ -48,31 +49,48 @@ namespace subscribe {
  *
  * Valid messages are handled through the provided handling function, while
  * errors are merely logged.
+ *
+ * This class inherits from both KafkaConsumer (for Kafka transport) and
+ * DataHandler (for data processing logic), bridging the transport layer
+ * with the data handling layer.
  */
-class DataSubscriber : public KafkaConsumer {
- public:
 
+class DataSubscriber : public KafkaConsumer, public DataHandler {
+public:
   /**
    * New data handling function
    */
-  typedef std::function<void(const ::kvalobs::serialize::KvalobsData &)> Handler;
+  typedef std::function<void(const ::kvalobs::serialize::KvalobsData &)>
+      Handler;
 
-  DataSubscriber(Handler handler, const std::string & domain,
-                 const std::string & brokers = "localhost", const std::string &groupId="");
+  DataSubscriber(Handler handler, const std::string &domain,
+                 const std::string &brokers = "localhost",
+                 const std::string &groupId = "");
 
   /**
    * The identifying string for this message stream
    */
-  static std::string topic(const std::string & domain);
-  static void setDebugWriter(std::function<void(const std::string &message, const serialize::KvalobsData &d)> func);
+  static std::string topic(const std::string &domain);
+  static void
+  setDebugWriter(std::function<void(const std::string &message,
+                                    const serialize::KvalobsData &d)>
+                     func);
   static void resetDebugWrite();
- protected:
 
-  virtual void data(const char * msg, unsigned length);
-  virtual void error(int code, const std::string & msg);
+protected:
+  // KafkaConsumer interface implementation
+  virtual void data(const char *msg, unsigned length) override;
+  virtual void error(int code, const std::string &msg) override;
 
- private:
-  static std::function<void(const std::string &message, const serialize::KvalobsData &d)> debugWriter;
+  // DataHandler interface implementation
+  virtual void
+  handleData(const ::kvalobs::serialize::KvalobsData &data) override;
+  virtual void handleError(int code, const std::string &msg) override;
+
+private:
+  static std::function<void(const std::string &message,
+                            const serialize::KvalobsData &d)>
+      debugWriter;
   Handler handler_;
 };
 
