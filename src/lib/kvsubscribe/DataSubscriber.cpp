@@ -43,18 +43,70 @@ namespace {
 void writeNoDebug(const std::string &message, const serialize::KvalobsData &d) {
   return;
 }
+
+class DataHandler : public ConsumerDataHandler {
+public:
+  DataHandler(DataSubscriber::Handler handler) : handler_(handler) {}
+  virtual void data(const char *msg, unsigned length) override {
+    std::string message(msg, length);
+    serialize::KvalobsData d;
+    serialize::KvalobsDataParser::parse(message, d);
+    DataSubscriber::getDebugWriter()(message, d);
+    handler_(d);
+  };
+
+  /**
+   * Handle errors on message arrival.
+   */
+  virtual void error(int code, const std::string &msg) override {
+    // Default implementation: log the error
+    milog::LogContext context("DataHandler");
+    LOGERROR(msg);
+  }
+private:
+  DataSubscriber::Handler handler_;
+};
 } // namespace
 
 std::function<void(const std::string &message, const serialize::KvalobsData &d)>
     DataSubscriber::debugWriter = writeNoDebug;
 
-DataSubscriber::DataSubscriber(Handler handler, const std::string &domain,
-                               const std::string &brokers,
-                               const std::string &groupId)
-    : KafkaConsumer(topic(domain), brokers, groupId), handler_(handler) {}
+DataSubscriber::DataSubscriber(Handler handler, Consumer *consumer)
+    : Consumer("", nullptr), handler_(handler), consumer_(consumer) {
+      DataHandler *dataHandler = new DataHandler(handler_);
+      consumer_->setHandler(dataHandler);
+    }
 
 std::string DataSubscriber::topic(const std::string &domain) {
   return queue::checked(domain);
+}
+
+// Consumer interface implementation
+void DataSubscriber::run() {
+  if (consumer_) {
+    consumer_->run();
+  }
+}
+
+bool DataSubscriber::stopping() const {
+  if (consumer_) {
+    return consumer_->stopping();
+  }
+  return false;
+}
+
+void DataSubscriber::stop() {
+  if (consumer_) {
+    consumer_->stop();
+  }
+}
+
+void DataSubscriber::runOnce(unsigned timeoutInMilliSeconds) {
+  // Delegate to the wrapped consumer
+  // This method is called by the base Consumer::run() implementation
+  if (consumer_) {
+    consumer_->runOnce(timeoutInMilliSeconds);
+  }
 }
 
 void DataSubscriber::setDebugWriter(
@@ -65,29 +117,6 @@ void DataSubscriber::setDebugWriter(
 }
 
 void DataSubscriber::resetDebugWrite() { debugWriter = writeNoDebug; }
-
-// KafkaConsumer interface implementation
-void DataSubscriber::data(const char *msg, unsigned length) {
-  std::string message(msg, length);
-  serialize::KvalobsData d;
-  serialize::KvalobsDataParser::parse(message, d);
-  debugWriter(message, d);
-  handleData(d);
-}
-
-void DataSubscriber::error(int code, const std::string &msg) {
-  handleError(code, msg);
-}
-
-// DataHandler interface implementation
-void DataSubscriber::handleData(const ::kvalobs::serialize::KvalobsData &data) {
-  handler_(data);
-}
-
-void DataSubscriber::handleError(int code, const std::string &msg) {
-  milog::LogContext context("DataSubscriber");
-  LOGERROR(msg);
-}
 
 } /* namespace subscribe */
 } /* namespace kvalobs */

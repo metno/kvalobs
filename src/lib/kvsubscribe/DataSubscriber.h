@@ -30,8 +30,7 @@
 #ifndef SRC_LIB_KVSUBSCRIBE_DATASUBSCRIBER_H_
 #define SRC_LIB_KVSUBSCRIBE_DATASUBSCRIBER_H_
 
-#include "DataHandler.h"
-#include "KafkaConsumer.h"
+#include "Consumer.h"
 #include <functional>
 
 namespace kvalobs {
@@ -55,7 +54,7 @@ namespace subscribe {
  * with the data handling layer.
  */
 
-class DataSubscriber : public KafkaConsumer, public DataHandler {
+class DataSubscriber : public Consumer {
 public:
   /**
    * New data handling function
@@ -63,9 +62,12 @@ public:
   typedef std::function<void(const ::kvalobs::serialize::KvalobsData &)>
       Handler;
 
-  DataSubscriber(Handler handler, const std::string &domain,
-                 const std::string &brokers = "localhost",
-                 const std::string &groupId = "");
+  DataSubscriber(Handler handler, Consumer *consumer);
+  
+  // Consumer interface implementation
+  virtual void run() override;
+  virtual bool stopping() const override;
+  virtual void stop() override;
 
   /**
    * The identifying string for this message stream
@@ -75,23 +77,23 @@ public:
   setDebugWriter(std::function<void(const std::string &message,
                                     const serialize::KvalobsData &d)>
                      func);
+
   static void resetDebugWrite();
 
+  static std::function<void(const std::string &message,
+                                    const serialize::KvalobsData &d)>
+      getDebugWriter() { return debugWriter; }
+  
 protected:
-  // KafkaConsumer interface implementation
-  virtual void data(const char *msg, unsigned length) override;
-  virtual void error(int code, const std::string &msg) override;
-
-  // DataHandler interface implementation
-  virtual void
-  handleData(const ::kvalobs::serialize::KvalobsData &data) override;
-  virtual void handleError(int code, const std::string &msg) override;
+  // Consumer interface implementation (protected methods)
+  virtual void runOnce(unsigned timeoutInMilliSeconds) override;
 
 private:
   static std::function<void(const std::string &message,
                             const serialize::KvalobsData &d)>
       debugWriter;
   Handler handler_;
+  Consumer *consumer_;
 };
 
 } /* namespace subscribe */

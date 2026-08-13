@@ -1,7 +1,5 @@
 SUBDIRS = \
 	lib \
-	service-libs \
-	kafka-util \
 	kvDataInputd \
 	kvDataInputd/kvdataclt \
 	kvQabased \
@@ -12,5 +10,9 @@ SUBDIRS = \
 	tools/kv2kvDataInputd \
 	tools/aexecd \
 	tools/kvpull
-	
+
+#service-libs 
+#kafka-util 
+
+
 #tools/kvpush 

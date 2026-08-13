@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+pkglibdir=${libdir}/kvalobs@KVALOBSLIBS_BIN_VERSION@
+includedir=@includedir@
+
+Name: libkvalobs_pgqueue
+Description: Postgres queue implmetation replacement for kafka
+Version: @VERSION@
+Requires: 
+Libs: @postgresql_LIBS@
+Cflags: -D_REENTRANT @postgresql_CFLAGS@

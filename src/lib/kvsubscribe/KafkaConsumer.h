@@ -63,8 +63,12 @@ namespace subscribe {
 class KafkaConsumer : public Consumer {
 public:
   KafkaConsumer(const std::string &topic, const std::string &brokers,
-                const std::string &groupId = "");
+                const std::string &groupId );
 
+  KafkaConsumer(const std::string &topic, const std::string &brokers,
+                const std::string &groupId, ConsumerDataHandler *handler);
+
+  
   virtual ~KafkaConsumer();
 
   /**
@@ -86,6 +90,7 @@ private:
   std::unique_ptr<RdKafka::KafkaConsumer> consumer_;
   std::vector<std::string> topics_;
   std::string groupId_;
+  bool stopping_;
 };
 
 } // namespace subscribe

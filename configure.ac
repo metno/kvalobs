@@ -49,6 +49,7 @@ AC_CONFIG_FILES([Makefile
                  src/lib/dnmithread/Makefile
                  src/lib/fileutil/Makefile
                  src/lib/kvdb/Makefile
+                 src/lib/pgqueue/Makefile
                  src/lib/kvalobs/Makefile
                  src/lib/kvsubscribe/Makefile
                  src/lib/decoder/Makefile
@@ -89,6 +90,7 @@ AC_CONFIG_FILES([Makefile
                  doc/Makefile
                  src/service-libs/kvcpp/libkvcpp.pc
                  src/lib/kvdb/libkvalobs_kvdb.pc
+                 src/lib/pgqueue/libkvalobs_pgqueue.pc
                  src/lib/decoder/decoderbase/libkvalobs_decoderbase.pc
                  src/lib/decodeutility/libkvalobs_decodeutility.pc
                  src/lib/dnmithread/libkvalobs_dnmithread.pc

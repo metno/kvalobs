@@ -29,6 +29,7 @@
 #include "Consumer.h"
 #include <iostream>
 #include <stdexcept>
+#include <thread>
 
 namespace kvalobs {
 namespace subscribe {
@@ -59,7 +60,7 @@ Consumer::Consumer(const std::string &topic, ConsumerDataHandler *handler)
   allConsumers_.push_back(this);
 }
 
-Consumer::Consumer(const std::string &topic) : Consumer(topic, nullptr) {}
+Consumer::Consumer(const std::string &topic) : Consumer(topic, &nullHandler) {}
 
 Consumer::~Consumer() {
   stop();
@@ -77,20 +78,25 @@ ConsumerDataHandler *Consumer::getHandler() const { return handler_; }
 std::string Consumer::getTopic() const { return topic_; }
 
 void Consumer::run() {
-  stopping_ = false;
-
-  while (!stopping_) {
+  while (!stopping()) {
     runOnce(1000);
   }
 }
 
-bool Consumer::stopping() const { return stopping_; }
 
-void Consumer::stop() { stopping_ = true; }
 
 void Consumer::stopAll() {
-  for (auto consumer : allConsumers_)
+  for (auto consumer : allConsumers_) {
     consumer->stop();
+  }
+
+  // Wait for all consumers to stop
+  for (auto consumer : allConsumers_) {
+    while (!consumer->stopping()) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+  }
+
   allConsumers_.clear();
 }
 

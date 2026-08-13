@@ -62,7 +62,7 @@ public:
  */
 class Consumer {
 public:
-  Consumer(const std::string &topic, ConsumerDataHandler *handler = nullptr);
+  Consumer(const std::string &topic, ConsumerDataHandler *handler );
   Consumer(const std::string &topic);
 
   virtual ~Consumer();
@@ -86,10 +86,22 @@ public:
    */
   virtual void run();
 
+
+  /**
+   * Process one message, waiting maximum for the given time if no messages are
+   * available.
+   *
+   * Must call handleData(...) or handleError(...) as appropriate.
+   *
+   */
+   virtual void runOnce(unsigned timeoutInMilliSeconds)=0;
+
   /**
    * Has stop() been called?
    */
-  bool stopping() const;
+  virtual bool stopping() const=0;
+
+
 
   /**
    * Stop this consumer.
@@ -109,8 +121,7 @@ protected:
    * Must call handleData(...) or handleError(...) as appropriate.
    *
    */
-  virtual void runOnce(unsigned timeoutInMilliSeconds) = 0;
-
+  
   void handleData(const char *msg, unsigned length);
   void handleError(int code, const std::string &msg);
 

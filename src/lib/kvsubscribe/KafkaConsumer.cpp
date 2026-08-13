@@ -37,32 +37,27 @@ namespace subscribe {
 KafkaConsumer::KafkaConsumer(const std::string &topic,
                              const std::string &brokers,
                              const std::string &groupId)
-    : Consumer(topic), initialized_(false), groupId_(groupId) {
+    : KafkaConsumer(topic, brokers, groupId, nullptr) {
+}
+
+KafkaConsumer::KafkaConsumer(const std::string &topic, const std::string &brokers,
+                             const std::string &groupId, ConsumerDataHandler *handler)
+    : Consumer(topic, handler), initialized_(false), groupId_(groupId), stopping_(false) {
+  topics_.push_back(topic);
   createConnection_(brokers, groupId);
 }
 
+
+
 KafkaConsumer::~KafkaConsumer() { stop(); }
+
 namespace {
 void set(RdKafka::Conf &c, const std::string &key, const std::string &value) {
   std::string errstr;
   if (c.set(key, value, errstr) != RdKafka::Conf::CONF_OK)
     throw std::runtime_error(errstr);
 }
-} // namespace
-
-namespace {
-class FunctionConsumer : public RdKafka::ConsumeCb {
-public:
-  FunctionConsumer(std::function<void(RdKafka::Message &message)> handler)
-      : handler_(handler) {}
-  virtual void consume_cb(RdKafka::Message &message, void * /*ignored*/) {
-    handler_(message);
-  }
-
-private:
-  std::function<void(RdKafka::Message &message)> handler_;
-};
-} // namespace
+}
 
 void KafkaConsumer::runOnce(unsigned timeoutInMilliSeconds) {
   if (!initialized_) {
@@ -80,12 +75,10 @@ void KafkaConsumer::runOnce(unsigned timeoutInMilliSeconds) {
   delete msg;
 }
 
-void KafkaConsumer::stop() { stopping_ = true; }
-
-void KafkaConsumer::stopAll() {
-  for (auto consumer : allConsumers_)
-    consumer->stop();
+void KafkaConsumer::stop() { 
+   stopping_ = true; 
 }
+
 
 void KafkaConsumer::handle_(RdKafka::Message &message) {
   switch (message.err()) {
@@ -96,7 +89,7 @@ void KafkaConsumer::handle_(RdKafka::Message &message) {
     try {
       handleData((char *)message.payload(), message.len());
     } catch (std::exception &e) {
-      error(0, e.what());
+      handleError(0, e.what());
     }
     break;
 

@@ -10,6 +10,7 @@ SUBDIRS = \
   milog \
   fileutil \
   kvdb \
+  pgqueue \
   corbahelper \
   kvalobs \
   decodeutility \
