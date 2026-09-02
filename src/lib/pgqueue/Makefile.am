@@ -16,6 +16,14 @@ libkvalobs_pgqueue_la_CPPFLAGS = \
 libkvalobs_pgqueue_la_LDFLAGS = -version-info @KVALOBSLIBS_SO_VERSION@
 libkvalobs_pgqueue_la_LIBADD= $(postgresql_LIBS)
 
+bin_PROGRAMS = kvproducer kvconsumer
+
+kvproducer_SOURCES = pgqueue_producer.cpp
+kvproducer_LDADD = libkvalobs_pgqueue.la
+
+kvconsumer_SOURCES = pgqueue_consumer.cpp
+kvconsumer_LDADD = libkvalobs_pgqueue.la
+
 # if HAVE_GMOCK
 # TESTS = libkvdbtest
 

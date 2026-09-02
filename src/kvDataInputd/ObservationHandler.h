@@ -70,7 +70,7 @@ public:
     const char* what() const noexcept { return message.c_str(); }
   };
 
-  ObservationHandler(DataSrcApp& app, kvalobs::service::ProducerQuePtr raw);
+  ObservationHandler(DataSrcApp& app, kvalobs::service::ProducerQuePtr raw, kvalobs::service::ProducerQuePtr pgRaw);
 
   std::shared_ptr<http_response> render_POST(
     const httpserver::http_request& req) override;
@@ -84,6 +84,7 @@ private:
   DataSrcApp& app;
   std::atomic_ullong serialNumber;
   kvalobs::service::ProducerQuePtr rawQue;
+  kvalobs::service::ProducerQuePtr pgRawQue;
 };
 
 #endif // SRC_KVDATAINPUTD_OBSERVATIONHANDLER_H_

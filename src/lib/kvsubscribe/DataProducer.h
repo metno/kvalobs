@@ -30,9 +30,8 @@
 #ifndef SRC_LIB_KVSUBSCRIBE_DATAPRODUCER_H_
 #define SRC_LIB_KVSUBSCRIBE_DATAPRODUCER_H_
 
-#include "KafkaProducer.h"
+#include "Producer.h"
 #include <string>
-
 namespace kvalobs {
 namespace serialize {
 class KvalobsData;
@@ -42,13 +41,12 @@ namespace subscribe {
 
 class DataProducer {
  public:
-  typedef KafkaProducer::MessageId MessageId;
-
+  DataProducer(Producer *producer);
   DataProducer(const std::string & domain, const std::string & brokers =
                    "localhost",
-               KafkaProducer::ErrorHandler onFailedDelivery =
+               kvalobs::subscribe::Producer::ErrorHandler onFailedDelivery =
                    [](MessageId, const std::string &, const std::string &) {},
-               KafkaProducer::SuccessHandler onSuccessfulDelivery =
+               kvalobs::subscribe::Producer::SuccessHandler onSuccessfulDelivery =
                    [](MessageId, const std::string &) {});
   ~DataProducer();
 
@@ -60,14 +58,14 @@ class DataProducer {
    * @param timeout Maximum time to wait for delivery report to become available, in milliseconds
    */
   void catchup(unsigned timeout = 0) {
-    producer_.catchup(timeout);
+    producer_->catchup(timeout);
   }
 
  private:
-  KafkaProducer producer_;
+  std::unique_ptr<Producer> producer_;
 };
 
-} /* namespace kafka */
-} /* namespace kvservice */
+} /* namespace subscribe */
+} /* namespace kvalobs */
 
 #endif /* SRC_LIB_KVSUBSCRIBE_DATAPRODUCER_H_ */

@@ -30,7 +30,7 @@
 #define SRC_LIB_KVSUBSCRIBE_PRODUCERCOMMAND_H_
 
 #include <string>
-#include "kvsubscribe/KafkaProducer.h"
+#include "kvsubscribe/messageid.h"
 #include "miutil/blockingqueue.h"
 
 namespace kvalobs {
@@ -55,13 +55,13 @@ class ProducerCommand {
   /**
    * If the MessageId is 0, then there was no data to send.
    */
-  virtual void onSend(kvalobs::subscribe::KafkaProducer::MessageId msgId,  const std::string &threadName);
+  virtual void onSend(kvalobs::subscribe::MessageId msgId,  const std::string &threadName);
 
   /**
    * If the MessageId is 0, then there was no data to send. We treat this as a success.
    */
-  virtual void onSuccess(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &threadName, const std::string &data);
-  virtual void onError(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &threadName, const std::string & data, const std::string & errorMessage);
+  virtual void onSuccess(kvalobs::subscribe::MessageId msgId, const std::string &threadName, const std::string &data);
+  virtual void onError(kvalobs::subscribe::MessageId msgId, const std::string &threadName, const std::string & data, const std::string & errorMessage);
 };
 
 typedef miutil::concurrent::BlockingQueuePtr<ProducerCommand> ProducerQue;

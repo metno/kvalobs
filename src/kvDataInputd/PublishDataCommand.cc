@@ -34,7 +34,6 @@
 #include "kvDataInputd/PublishDataCommand.h"
 
 using std::string;
-using kvalobs::subscribe::KafkaProducer;
 
 PublishDataCommand::PublishDataCommand(const kvalobs::serialize::KvalobsData &pubData)
     : data(kvalobs::serialize::KvalobsDataSerializer::serialize(pubData)), summary(pubData.summary()) {
@@ -52,7 +51,7 @@ const char *PublishDataCommand::getData(unsigned int *size) const {
   return data.data();
 }
 
-void PublishDataCommand::onSend(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &threadName) {
+void PublishDataCommand::onSend(kvalobs::subscribe::MessageId msgId, const std::string &threadName) {
   if (!toLog.empty()) {
     IDLOGDEBUG("kafka_pub", "Data(" << msgId << "): SENDT: " << toLog);
   } else if (!data.empty()) {
@@ -62,7 +61,7 @@ void PublishDataCommand::onSend(kvalobs::subscribe::KafkaProducer::MessageId msg
   }
 }
 
-void PublishDataCommand::onSuccess(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &threadName, const std::string &data) {
+void PublishDataCommand::onSuccess(kvalobs::subscribe::MessageId msgId, const std::string &threadName, const std::string &data) {
   if (!toLog.empty()) {
     IDLOGDEBUG("kafka_pub", threadName << ": Data(" << msgId << "): ACK: " << toLog);
   } else if (!data.empty()) {
@@ -72,7 +71,7 @@ void PublishDataCommand::onSuccess(kvalobs::subscribe::KafkaProducer::MessageId 
   }
 }
 
-void PublishDataCommand::onError(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &threadName, const std::string & data,
+void PublishDataCommand::onError(kvalobs::subscribe::MessageId msgId, const std::string &threadName, const std::string & data,
                              const std::string & errorMessage) {
   if (!toLog.empty()) {
     IDLOGERROR("kafka_pub", threadName << ": Data(" << msgId << "): FAIL: " << toLog << "\n" << errorMessage);

@@ -33,7 +33,7 @@ kvDataInputd_SOURCES=\
    PublishDataCommand.cc PublishDataCommand.h \
    kvDataInputd.cc 
 
-kvDataInputd_CPPFLAGS = $(AM_CPPFLAGS) $(libxmlpp_CFLAGS)
+kvDataInputd_CPPFLAGS = $(AM_CPPFLAGS) $(libxmlpp_CFLAGS) $(postgresql_CFLAGS)
 kvDataInputd_LDFLAGS = \
    -pthread -export-dynamic \
    -R "$(pkglibdir)/lib" \
@@ -54,6 +54,7 @@ kvDataInputd_LDADD = \
    $(top_builddir)/src/lib/miutil/libkvalobs_miutil.la\
    $(top_builddir)/src/lib/kvsubscribe/libkvalobs_kvsubscribe.la\
    $(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la\
+   $(top_builddir)/src/lib/pgqueue/libkvalobs_pgqueue.la\
    $(putools_LIBS) $(libxmlpp_LIBS) \
    $(BOOST_THREAD_LIB) $(BOOST_DATE_TIME_LIB) $(BOOST_REGEX_LIB) \
    $(BOOST_SYSTEM_LIB) \

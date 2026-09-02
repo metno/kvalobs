@@ -27,83 +27,100 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef __KVALOBS_SUBSCRIBE_PRODUCER_H__
-#define __KVALOBS_SUBSCRIBE_PRODUCER_H__
+#ifndef __KVSUBSCRIBE_PGPRODUCER_H__
+#define __KVSUBSCRIBE_PGPRODUCER_H__
 
 #include "messageid.h"
+#include "Producer.h"
+#include "pgqueue/pgqueue.h"
 #include <cstdint>
 #include <functional>
 #include <memory>
 #include <ostream>
 #include <string>
+#include <vector>
+#include <queue>
+#include <mutex>
+
+class PgMessaging;
 
 namespace kvalobs {
 namespace subscribe {
 
-class Producer {
+class PgProducer : public Producer {
 public:
-  typedef std::function<void(MessageId id, const std::string &data)>
-      SuccessHandler;
-  typedef std::function<void(MessageId id, const std::string &data,
-                             const std::string &errorMessage)>
-      ErrorHandler;
-
-  explicit Producer(
+  /**
+   * Create a PgProducer that publishes to a PostgreSQL-backed queue.
+   *
+   * @param topic The topic (queue name) to publish to
+   * @param connections Vector of PostgreSQL connection strings (host, port, dbname, user, etc.)
+   * @param onFailedDelivery Callback invoked on delivery failure
+   * @param onSuccessfulDelivery Callback invoked on successful delivery
+   */
+  explicit PgProducer(
       const std::string &topic,
+      const std::vector<std::string> &connections,
+      PgCluster::Environment env,
+      const std::string &appName,
       ErrorHandler onFailedDelivery = [](MessageId, const std::string &,
                                          const std::string &) {},
       SuccessHandler onSuccessfulDelivery = [](MessageId,
                                                const std::string &) {});
 
-  virtual ~Producer() = default;
+
+   explicit PgProducer(
+      const std::string &topic,
+      PgCluster *cluster,
+      ErrorHandler onFailedDelivery = [](MessageId, const std::string &,
+                                         const std::string &) {},
+      SuccessHandler onSuccessfulDelivery = [](MessageId,
+                                               const std::string &) {});
+
+
+  ~PgProducer();
 
   /**
    * Asynchronous sending of data. Remember to call catchup() at some point
    * to check results of send.
    *
    * On error, may either throw an exception right away, or deliver an
-   * error report on KafkaProducer's deliveryReportHandler after having
-   * called catchup, or destroying this object.
+   * error report via the errorHandler callback after having called catchup,
+   * or destroying this object.
    *
    * @throws exception if it fails right away
    *
    * @return a message id, that will be available in this object's constructor's
    *         onFailedDelivery and onSuccessfulDelivery functions
    */
-  virtual MessageId send(const std::string &data) = 0;
+  MessageId send(const std::string &data) override;
 
-  virtual MessageId send(const char *data, unsigned length) = 0;
+  MessageId send(const char *data, unsigned length) override;
 
-  ErrorHandler setErrorHandler(ErrorHandler handler) {
-    ErrorHandler old = onFailedDelivery_;
-    onFailedDelivery_ = handler;
-    return old;
-  }
-
-  SuccessHandler setSuccessHandler(SuccessHandler handler) {
-    SuccessHandler old = onSuccessfulDelivery_;
-    onSuccessfulDelivery_ = handler;
-    return old;
-  }
-
-  
   /**
    * Process all awaiting delivery reports.
    *
    * @param timeout Maximum time to wait for delivery report to become
-   * available, in milliseconds
+   * available, in milliseconds (currently unused, for Kafka API compatibility)
    */
-  virtual void catchup(unsigned timeout = 0) = 0;
+  void catchup(unsigned timeout = 0) override;
 
-  std::string topic() const;
+private:
+  std::unique_ptr<PgCluster> cluster_;
+  std::unique_ptr<PgMessaging> messaging_;
+  MessageId messageId_;
+  mutable std::mutex mu_;
 
-protected:
-  std::string topic_;
-  ErrorHandler onFailedDelivery_;
-  SuccessHandler onSuccessfulDelivery_;
+  // Pending deliveries for deferred callback processing
+  struct PendingDelivery {
+    MessageId id;
+    std::string data;
+    bool success;
+    std::string error;
+  };
+  std::queue<PendingDelivery> pendingDeliveries_;
 };
 
 } // namespace subscribe
 } // namespace kvalobs
 
-#endif // __PRODUCER_H__
+#endif /* KVSUBSCRIBE_PGPRODUCER_H_ */

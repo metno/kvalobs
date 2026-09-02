@@ -63,7 +63,6 @@ Consumer::Consumer(const std::string &topic, ConsumerDataHandler *handler)
 Consumer::Consumer(const std::string &topic) : Consumer(topic, &nullHandler) {}
 
 Consumer::~Consumer() {
-  stop();
   allConsumers_.remove(this);
 }
 

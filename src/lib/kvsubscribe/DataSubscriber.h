@@ -64,6 +64,14 @@ public:
 
   DataSubscriber(Handler handler, Consumer *consumer);
   
+  // Convenience constructors that create KafkaConsumer internally
+  DataSubscriber(Handler handler, const std::string &domain, 
+                 const std::string &brokers, const std::string &groupId);
+  DataSubscriber(Handler handler, const std::string &domain, 
+                 const std::string &brokers);
+  
+  virtual ~DataSubscriber();
+  
   // Consumer interface implementation
   virtual void run() override;
   virtual bool stopping() const override;
@@ -94,6 +102,7 @@ private:
       debugWriter;
   Handler handler_;
   Consumer *consumer_;
+  bool ownsConsumer_; // True if we created the consumer and should delete it
 };
 
 } /* namespace subscribe */

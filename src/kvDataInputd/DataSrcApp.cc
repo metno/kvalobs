@@ -35,6 +35,7 @@
 #include "lib/kvalobs/kvDbGate.h"
 #include "lib/kvalobs/kvPath.h"
 #include "lib/kvsubscribe/queue.h"
+#include "lib/kvsubscribe/PgProducer.h"
 #include "lib/milog/milog.h"
 #include "lib/miutil/timeconvert.h"
 #include <chrono>
@@ -97,6 +98,65 @@ getQaIdInfo(miutil::conf::ConfSection *conf) {
   return std::make_shared<kvalobs::decoder::QaIdInfo>(maxQaId, types);
 }
 
+namespace {
+bool startKafkaProducer(kvalobs::service::ProducerThread &producer,
+                        const KafkaConfig &conf, const std::string &topic) {
+  try {
+    if (conf.enable) {
+      LOGINFO("Starting kafka producer for topic <" << topic << ">. Brokers <"
+                                                    << conf.brokers << ">.");
+      std::string name = producer.getName() + "-" + topic;
+      producer.setName(name);
+      producer.start(conf.brokers, topic);
+    } else {
+      LOGINFO("kafka disabled.");
+    }
+  } catch (const std::exception &ex) {
+    LOGERROR("Failed to start the kafka stream for topic <"
+             << topic << ">.\nBrokers: <" << conf.brokers
+             << ">\nREason: " << ex.what());
+    return false;
+  }
+  return true;
+}
+
+bool startPgProducer(kvalobs::service::ProducerThread &producer,
+                        const PgQueueConfig &conf, const std::string &topic) {
+  std::string hosts;
+  for( auto const &con : conf.dbconnect) {
+    if (hosts.empty() ) {
+      hosts = "  - " + con;
+    } else {
+      hosts += "\n  - " + con;
+    }
+  }
+
+  try {
+    if (conf.enable) {
+      LOGINFO("Starting postgres producer for topic <" << topic << ">. \n"
+        << "Hosts:\n" << hosts);
+      std::string name = producer.getName() + "-" + topic;
+      producer.setName(name);
+
+      kvalobs::subscribe::PgProducer *pgProducer=new kvalobs::subscribe::PgProducer(topic, conf.dbconnect, conf.env(), "kvdatainputd");
+      producer.start(pgProducer);
+    } else {
+      LOGINFO("kafka disabled.");
+    }
+  } catch (const std::exception &ex) {
+    LOGERROR("Failed to start the postgres producer for topic <"
+             << topic << ">.\nHosts: \n" << hosts
+             << ">\nREason: " << ex.what());
+    return false;
+  }
+  return true;
+}
+
+
+
+
+} // namespace
+
 DataSrcApp::DataSrcApp(int argn, char **argv, int nConnections_,
                        miutil::conf::ConfSection *theKvConf)
     : KvBaseApp(argn, argv), ok(false), shutdown_(false) {
@@ -125,6 +185,24 @@ DataSrcApp::DataSrcApp(int argn, char **argv, int nConnections_,
       conf->getValue("kafka.brokers").valAsString("localhost");
   kafkaConfig.domain = conf->getValue("kafka.domain").valAsString("");
   kafkaConfig.enable = conf->getValue("kafka.enable").valAsBool(true);
+  pgqueConfig.enable = conf->getValue("pgqueue.enable").valAsBool(true);
+  pgqueConfig.domain = conf->getValue("pgqueue.domain").valAsString("");
+  if (pgqueConfig.enable) {
+    std::string dbqueconnect =
+        conf->getValue("pgqueue.database_a").valAsString("");
+    if (!dbqueconnect.empty()) {
+      pgqueConfig.dbconnect.push_back(dbqueconnect);
+    }
+    dbqueconnect = conf->getValue("pgqueue.database_b").valAsString("");
+    if (!dbqueconnect.empty()) {
+      pgqueConfig.dbconnect.push_back(dbqueconnect);
+    }
+
+    if (pgqueConfig.dbconnect.empty()) {
+      LOGFATAL("pgqueue is enabled but no database connection is configured.");
+      exit(1);
+    }
+  }
   std::string defautlParamFile =
       kvalobs::kvPath(kvalobs::sysconfdir) + "/stinfosys_params.csv";
   paramFile =
@@ -200,53 +278,16 @@ DataSrcApp::DataSrcApp(int argn, char **argv, int nConnections_,
   milog::createGlobalLogger(logdir, "kvDataInputd", "kv2kvdecoder",
                             milog::DEBUG, 1073741824, 1);
 
-  try {
-    if (kafkaConfig.enable) {
-      LOGINFO("Starting kafka producer for topic <"
-              << kafkaConfig.getRawTopic() << ">. Brokers <"
-              << kafkaConfig.brokers << ">.");
-      std::string name =
-          kafkaRawStream.getName() + "-" + kafkaConfig.getRawTopic();
-      kafkaRawStream.setName(name);
-      kafkaRawStream.start(kafkaConfig.brokers, kafkaConfig.getRawTopic());
-    } else {
-      LOGINFO("kafka disabled.");
-    }
-  } catch (const std::exception &ex) {
-    LOGERROR("Failed to start the kafka stream for topic <"
-             << kafkaConfig.getRawTopic()
-             << ">.\n"
-                "Brokers: <"
-             << kafkaConfig.brokers
-             << ">\n"
-                "REason: "
-             << ex.what());
+  if (!startKafkaProducer(kafkaRawStream, kafkaConfig,
+                          kafkaConfig.getRawTopic())) {
     return;
   }
 
-  try {
-    if (kafkaConfig.enable) {
-      LOGINFO("Starting kafka producer for topic <"
-              << kafkaConfig.getPublishTopic() << ">. Brokers <"
-              << kafkaConfig.brokers << ">.");
-      std::string name =
-          kafkaPubStream.getName() + "-" + kafkaConfig.getPublishTopic();
-      kafkaPubStream.setName(name);
-      kafkaPubStream.start(kafkaConfig.brokers, kafkaConfig.getPublishTopic());
-    } else {
-      LOGINFO("kafka disabled.");
-    }
-  } catch (const std::exception &ex) {
-    LOGERROR("Failed to start the kafka stream for topic <"
-             << kafkaConfig.getPublishTopic()
-             << ">.\n"
-                "Brokers: <"
-             << kafkaConfig.brokers
-             << ">\n"
-                "REason: "
-             << ex.what());
+  if (!startKafkaProducer(kafkaPubStream, kafkaConfig,
+                          kafkaConfig.getPublishTopic())) {
     return;
   }
+
   ok = true;
 }
 

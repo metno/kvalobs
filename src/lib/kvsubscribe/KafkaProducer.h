@@ -30,41 +30,44 @@
 #ifndef KAFKAPRODUCER_H_
 #define KAFKAPRODUCER_H_
 
+#include "messageid.h"
+#include "Producer.h"
 #include <cstdint>
-#include <string>
-#include <memory>
 #include <functional>
+#include <memory>
 #include <ostream>
+#include <string>
 
 namespace RdKafka {
 class Producer;
 class Topic;
 class Message;
 class DeliveryReportCb;
-}
+} // namespace RdKafka
 
 namespace kvalobs {
 namespace subscribe {
 
 class KafkaConfig;
 
-class KafkaProducer {
- public:
-  typedef uint64_t MessageId;
-  typedef std::function<void(MessageId id, const std::string & data)> SuccessHandler;
-  typedef std::function<void(MessageId id, const std::string & data, const std::string & errorMessage)> ErrorHandler;
+class KafkaProducer : public Producer {
+public:
+  explicit KafkaProducer(
+      const std::string &topic, const std::string &brokers = "localhost",
+      ErrorHandler onFailedDelivery = [](MessageId, const std::string &,
+                                         const std::string &) {},
+      SuccessHandler onSuccessfulDelivery = [](MessageId,
+                                               const std::string &) {});
 
-  explicit KafkaProducer(const std::string & topic,
-                         const std::string & brokers = "localhost",
-                         ErrorHandler onFailedDelivery = [](MessageId, const std::string &, const std::string &) {},
-                         SuccessHandler onSuccessfulDelivery = [](MessageId, const std::string &) {});
+  explicit KafkaProducer(
+      const KafkaConfig &config,
+      ErrorHandler onFailedDelivery = [](MessageId, const std::string &,
+                                         const std::string &) {},
+      SuccessHandler onSuccessfulDelivery = [](MessageId,
+                                               const std::string &) {});
 
-  explicit KafkaProducer(const KafkaConfig &config,
-                         ErrorHandler onFailedDelivery = [](MessageId, const std::string &, const std::string &) {},
-                         SuccessHandler onSuccessfulDelivery = [](MessageId, const std::string &) {});
-                       
-  void init( const KafkaConfig &config,
-             ErrorHandler onFailedDelivery, SuccessHandler onSuccessfulDelivery);
+  void init(const KafkaConfig &config, ErrorHandler onFailedDelivery,
+            SuccessHandler onSuccessfulDelivery);
 
   ~KafkaProducer();
 
@@ -81,29 +84,27 @@ class KafkaProducer {
    * @return a message id, that will be available in this object's constructor's
    *         onFailedDelivery and onSuccessfulDelivery functions
    */
-  MessageId send(const std::string & data);
+  MessageId send(const std::string &data) override;
 
-  MessageId send(const char * data, unsigned length);
+  MessageId send(const char *data, unsigned length) override;
 
   /**
    * Process all awaiting delivery reports.
    *
-   * @param timeout Maximum time to wait for delivery report to become available, in milliseconds
+   * @param timeout Maximum time to wait for delivery report to become
+   * available, in milliseconds
    */
-  void catchup(unsigned timeout = 0);
+  void catchup(unsigned timeout = 0) override;
 
-  std::string topic() const;
-
- private:
+private:
   MessageId messageId_;
-  
   std::unique_ptr<RdKafka::Producer> producer_;
-  std::unique_ptr<RdKafka::Topic> topic_;
+  std::unique_ptr<RdKafka::Topic> topic__;
 
   std::unique_ptr<RdKafka::DeliveryReportCb> deliveryReportHandler_;
 };
 
-}
-}
+} // namespace subscribe
+} // namespace kvalobs
 
 #endif /* KAFKAPRODUCER_H_ */

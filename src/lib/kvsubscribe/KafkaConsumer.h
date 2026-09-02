@@ -75,6 +75,8 @@ public:
    * Stop this consumer.
    */
   void stop() override;
+  
+  bool stopping() const override;
 
 protected:
   void runOnce(unsigned timeoutInMilliSeconds) override;

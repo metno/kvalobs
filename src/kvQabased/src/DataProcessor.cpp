@@ -48,7 +48,7 @@
 namespace qabase {
 namespace {
 // Must be protected by mutex if we want to make this thread-safe
-std::set<kvalobs::subscribe::KafkaProducer::MessageId> messages;
+std::set<kvalobs::subscribe::MessageId> messages;
 }
 
 bool DataProcessor::logXml = false;
@@ -230,11 +230,49 @@ void DataProcessor::sendToKafka(const qabase::Observation & obs, const qabase::C
   } while (stop == nullptr || *stop == false);
 }
 
+void DataProcessor::sendToQueue(const qabase::Observation & obs, const qabase::CheckRunner::KvalobsDataPtr dataList, bool * stop){
+  int sendAttempts = 0;
+
+  if( !queueEnabled_ || !dataList || dataList->empty() ) {
+     return;
+  }
+
+  do {
+    auto xml=serializeToXml(obs, dataList, logXml);
+    if( xml.empty()) {
+      return;
+    }
+    auto messageid = pgqueue_->send(xml);
+    messages.insert(messageid);
+    finalizeMessage_();
+
+    if (messages.find(messageid) == messages.end()) {
+      if (sendAttempts > 0)
+        LOGWARN("Successfully sent data after " << sendAttempts << " retries");
+      break;
+    } else {
+      if ((sendAttempts % 10) == 0) {
+        LOGWARN("Could not send data to Queue. Send queue size=" << messages.size() << ". Retrying (attempts #" << sendAttempts <<") ... ");
+      }
+
+      if( sendAttempts > maxKafkaSendErrors ) {
+        LOGERROR("Terminating: Could not send data to Queue. Send queue size=" << messages.size() << ". Tried " << sendAttempts << " times before giving up!");
+        exit(16);
+      }
+      sendAttempts++;
+      std::this_thread::sleep_for(std::chrono::seconds(2));
+    }
+  } while (stop == nullptr || *stop == false);
+}
+
+
+
 void DataProcessor::process(const kvalobs::kvStationInfo & si) {
   qabase::CheckRunner::KvalobsDataPtr modified(checkRunner_->newObservation(si));
 
   Observation dummyObs(0, si.stationID(), si.typeID(), si.obstime(), boost::posix_time::second_clock::universal_time());
-  sendToKafka(dummyObs, modified);
+  //sendToKafka(dummyObs, modified);
+  sendToQueue(dummyObs, modified);
   finalizeMessage_();
 }
 
@@ -246,7 +284,7 @@ void DataProcessor::process(const kvalobs::kvStationInfo & si) {
 //   process(modified.begin(), modified.end());
 // }
 
-void DataProcessor::onKafkaSendSuccess(kvalobs::subscribe::KafkaProducer::MessageId id, const std::string & data) {
+void DataProcessor::onKafkaSendSuccess(kvalobs::subscribe::MessageId id, const std::string & data) {
   if (messages.erase(id) == 0) {  // should never happen
     LOGWARN("Got confirmation for invalid message id! Data: <" + data + ">");
     IDLOGINFO("kafka", "Got confirmation for invalid message id! Data: <" + data + ">");
@@ -256,7 +294,7 @@ void DataProcessor::onKafkaSendSuccess(kvalobs::subscribe::KafkaProducer::Messag
   }
 }
 
-void DataProcessor::onKafkaSendError(kvalobs::subscribe::KafkaProducer::MessageId id, const std::string & data, const std::string & errorMessage) {
+void DataProcessor::onKafkaSendError(kvalobs::subscribe::MessageId id, const std::string & data, const std::string & errorMessage) {
   LOGERROR("kafka: Could not send data to Kafka. ("  <<id <<"): " << errorMessage );
   IDLOGINFO("kafka","Could not send data to Kafka. ("  <<id <<"): " << errorMessage );
   LOGDEBUG("kafka: Could not send data to Kafka. ("  <<id <<"): " << errorMessage << "\nData: <" + data + ">");

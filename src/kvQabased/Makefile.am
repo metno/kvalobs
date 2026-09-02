@@ -25,6 +25,7 @@ AM_LDFLAGS = \
 	$(top_builddir)/src/lib/miutil/libkvalobs_miutil.la \
 	$(top_builddir)/src/lib/kvsubscribe/libkvalobs_kvsubscribe.la \
 	$(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
+	$(top_builddir)/src/lib/pgqueue/libkvalobs_pgqueue.la \
 	$(putools_LIBS) \
 	$(libxmlpp_LIBS) \
 	$(BOOST_PROGRAM_OPTIONS_LIB) \

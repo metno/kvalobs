@@ -39,22 +39,14 @@ namespace subscribe {
 Producer::Producer(const std::string & topic,
                          ErrorHandler onFailedDelivery,
                          SuccessHandler onSuccessfulDelivery):
-                         messageId_(0),
                          topic_(topic),
                          onFailedDelivery_(onFailedDelivery),
                          onSuccessfulDelivery_(onSuccessfulDelivery) {} 
 
-                       
-  
-
-
-
-KafkaProducer::~KafkaProducer() {
-  catchup();
+                         std::string Producer::topic() const {
+  return topic_;
 }
 
-KafkaProducer::MessageId KafkaProducer::send(const std::string & data) {
-  return send(data.c_str(), data.size());
-}
+
 } // namespace subscribe
 } // namespace kvalobs

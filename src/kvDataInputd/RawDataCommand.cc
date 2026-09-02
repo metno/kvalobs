@@ -31,7 +31,6 @@
 #include "kvDataInputd/RawDataCommand.h"
 
 using std::string;
-using kvalobs::subscribe::KafkaProducer;
 
 RawDataCommand::RawDataCommand(const std::string &rawData)
     : data(rawData) {
@@ -42,7 +41,7 @@ const char *RawDataCommand::getData(unsigned int *size) const {
   return data.data();
 }
 
-void RawDataCommand::onSend(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &threadName) {
+void RawDataCommand::onSend(kvalobs::subscribe::MessageId msgId, const std::string &threadName) {
   string::size_type i = data.find_first_of('\n');
   if (i != string::npos) {
     IDLOGDEBUG("kafka_raw", "SENDT: msgid: " << msgId << " HEADER: '" << data.substr(0, i) << "' DATA: " << data.substr(i));
@@ -53,7 +52,7 @@ void RawDataCommand::onSend(kvalobs::subscribe::KafkaProducer::MessageId msgId, 
   }
 }
 
-void RawDataCommand::onSuccess(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &threadName, const std::string &data) {
+void RawDataCommand::onSuccess(kvalobs::subscribe::MessageId msgId, const std::string &threadName, const std::string &data) {
   string::size_type i = data.find_first_of('\n');
   if (i != string::npos) {
     IDLOGDEBUG("kafka_raw", threadName << " ACK: msgid: " << msgId << " Header: '" << data.substr(0, i) <<"'.");
@@ -64,7 +63,7 @@ void RawDataCommand::onSuccess(kvalobs::subscribe::KafkaProducer::MessageId msgI
   }
 }
 
-void RawDataCommand::onError(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &threadName, const std::string & data,
+void RawDataCommand::onError(kvalobs::subscribe::MessageId msgId, const std::string &threadName, const std::string & data,
                              const std::string & errorMessage) {
   string::size_type i = data.find_first_of('\n');
 

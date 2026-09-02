@@ -40,7 +40,7 @@
 
 namespace kvalobs {
 namespace subscribe {
-class KafkaConsumer;
+class Consumer;
 }
 }
 
@@ -88,7 +88,7 @@ class KafkaSubscribe : public virtual details::KvalobsSubscribe,
   virtual void run();
 
  private:
-  typedef std::shared_ptr<kvalobs::subscribe::KafkaConsumer> ConsumerPtr;
+  typedef std::shared_ptr<kvalobs::subscribe::Consumer> ConsumerPtr;
   typedef std::pair<ConsumerPtr, std::thread> RunnableConsumer;
   typedef std::map<std::string, RunnableConsumer> ConsumerCollection;
 

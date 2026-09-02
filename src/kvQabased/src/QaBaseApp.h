@@ -31,9 +31,12 @@
 #define SRC_KVQABASED_SRC_QABASEAPP_H_
 
 #include <kvsubscribe/KafkaConfig.h>
+#include <kvsubscribe/PgProducer.h>
+#include <kvsubscribe/queue.h>
 #include <kvalobs/kvbaseapp.h>
 #include <memory>
 #include <string>
+#include <pgqueue/pgqueue.h>
 
 namespace kvalobs {
 namespace subscribe {
@@ -42,6 +45,20 @@ class KafkaProducer;
 }
 
 namespace qabase {
+struct PgQueueConfig {
+  std::vector<std::string> dbconnect;
+  std::string domain;
+  bool enable;
+
+  PgQueueConfig(): enable(true) {}
+
+  std::string getRawTopic() { return kvalobs::subscribe::queue::raw(domain); }
+  PgCluster::Environment env() const { return PgCluster::env(domain);}
+  std::string getPublishTopic() {
+    return kvalobs::subscribe::queue::checked(domain);
+  }
+};
+
 
 class QaBaseApp : public KvBaseApp {
  public:
@@ -57,12 +74,17 @@ class QaBaseApp : public KvBaseApp {
   }*/
 
   static std::shared_ptr<kvalobs::subscribe::KafkaProducer> kafkaProducer();
+  static std::shared_ptr<kvalobs::subscribe::PgProducer> pgqueueProducer();
 
   static std::string baseLogDir();
   static bool kafkaEnabledInConfig();
  private:
   static kvalobs::subscribe::KafkaConfig kafkaConf_;
+  static PgQueueConfig pgQueueConf_;
+  static std::shared_ptr<PgCluster> pgCluster_;
+  
   static bool kafkaEnabled_;
+  static bool pgQueueEnabled_;
   //static std::string kafkaBrokers_;
   //static std::string kafkaDomain_;
 

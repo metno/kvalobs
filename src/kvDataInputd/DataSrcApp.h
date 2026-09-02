@@ -42,11 +42,12 @@
 #include "lib/kvalobs/kvbaseapp.h"
 #include "lib/kvalobs/paramlist.h"
 #include "lib/kvdb/dbdrivermgr.h"
-#include "lib/kvsubscribe/KafkaProducerThread.h"
+#include "lib/kvsubscribe/ProducerThread.h"
 #include "lib/kvsubscribe/ProducerCommand.h"
 #include "lib/kvsubscribe/SendData.h"
 #include "lib/kvsubscribe/queue.h"
 #include "lib/miconfparser/miconfparser.h"
+#include "lib/pgqueue/pgqueue.h"
 #include <exception>
 #include <limits>
 #include <list>
@@ -84,6 +85,21 @@ struct KafkaConfig {
   }
 };
 
+struct PgQueueConfig {
+  std::vector<std::string> dbconnect;
+  std::string domain;
+  bool enable;
+
+  PgQueueConfig(): enable(true) {}
+
+  std::string getRawTopic() { return kvalobs::subscribe::queue::raw(domain); }
+  PgCluster::Environment env() const { return PgCluster::env(domain);}
+  std::string getPublishTopic() {
+    return kvalobs::subscribe::queue::checked(domain);
+  }
+};
+
+
 /**
  * \brief DataSrcApp is a class that encapsulate the main datastructure in the
  * \em kvDatainputd application.
@@ -109,9 +125,12 @@ class DataSrcApp : public KvBaseApp {
   boost::posix_time::ptime nextParamCheckTime;
   HttpConfig httpConfig;
   KafkaConfig kafkaConfig;
+  PgQueueConfig pgqueConfig;
   DecoderExecutor decoderExecutor;
-  kvalobs::service::KafkaProducerThread kafkaRawStream;
-  kvalobs::service::KafkaProducerThread kafkaPubStream;
+  kvalobs::service::ProducerThread kafkaRawStream;
+  kvalobs::service::ProducerThread kafkaPubStream;
+  kvalobs::service::ProducerThread pgRawStream;
+  kvalobs::service::ProducerThread pgPubStream;
   kvalobs::decoder::StationFiltersPtr filters;
   std::string paramFile;
   std::shared_ptr<kvalobs::decoder::QaIdInfo> qaIdInfo;
@@ -247,12 +266,18 @@ public:
   kvalobs::service::ProducerQuePtr getRawQueue() {
     return kafkaRawStream.queue;
   }
+  kvalobs::service::ProducerQuePtr getPgRawQueue() {
+    return pgRawStream.queue;
+  }
+
 
   kvalobs::service::ProducerQuePtr getPublishQueue() {
     return kafkaPubStream.queue;
   }
 
   bool kafkaEnabled() const { return kafkaConfig.enable; }
+
+  bool pgQueueEnabled() const { return pgqueConfig.enable; }
 
   /**
    * \brief Request shutdown. Ie. we want to terminate.

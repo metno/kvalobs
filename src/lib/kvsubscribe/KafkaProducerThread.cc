@@ -29,6 +29,7 @@
 
 #include "lib/kvsubscribe/KafkaProducerThread.h"
 #include "lib/kvsubscribe/KafkaProducer.h"
+#include "lib/kvsubscribe/messageid.h"
 #include "lib/milog/milog.h"
 #include <iostream>
 #include <map>
@@ -63,7 +64,7 @@ std::string getThreadId(const std::string &name) {
 }
 
 class KafkaThread : kvalobs::subscribe::KafkaProducer {
-  typedef map<kvalobs::subscribe::KafkaProducer::MessageId,
+  typedef map<kvalobs::subscribe::MessageId,
               std::shared_ptr<ProducerCommand>>
       WaitingAck;
   shared_ptr<ProducerQue> que;
@@ -71,7 +72,7 @@ class KafkaThread : kvalobs::subscribe::KafkaProducer {
   WaitingAck waitingAck;
   std::string name;
 
-  shared_ptr<ProducerCommand> getWaitingMessage(KafkaProducer::MessageId id) {
+  shared_ptr<ProducerCommand> getWaitingMessage(kvalobs::subscribe::MessageId id) {
     WaitingAck::iterator it = waitingAck.find(id);
 
     if (it == waitingAck.end())
@@ -89,7 +90,7 @@ class KafkaThread : kvalobs::subscribe::KafkaProducer {
       unsigned int size;
       const char *data = cmd->getData(&size);
       if (data && size > 0) {
-        kvalobs::subscribe::KafkaProducer::MessageId msgId = send(data, size);
+        kvalobs::subscribe::MessageId msgId = send(data, size);
         cmd->onSend(msgId, name);
         waitingAck[msgId] = shared_ptr<ProducerCommand>(cmd);
       } else {
@@ -105,22 +106,22 @@ public:
               shared_ptr<BlockingQueuePtr<std::string>> statusQue)
       : KafkaProducer(
             topic, brokers,
-            [this](KafkaProducer::MessageId msgId, const std::string &data,
+            [this](kvalobs::subscribe::MessageId msgId, const std::string &data,
                    const std::string &errorMessage) {
               onError(msgId, data, errorMessage);
             },
-            [this](KafkaProducer::MessageId msgId, const std::string &data) {
+            [this](kvalobs::subscribe::MessageId msgId, const std::string &data) {
               onSuccess(msgId, data);
             }),
         que(que), statusQue(statusQue), name(name) {}
 
-  void onSuccess(KafkaProducer::MessageId msgId, const std::string &data) {
+  void onSuccess(kvalobs::subscribe::MessageId msgId, const std::string &data) {
     shared_ptr<ProducerCommand> cmd = getWaitingMessage(msgId);
     if (cmd)
       cmd->onSuccess(msgId, name, data);
   }
 
-  void onError(KafkaProducer::MessageId msgId, const std::string &data,
+  void onError(kvalobs::subscribe::MessageId msgId, const std::string &data,
                const std::string &errorMessage) {
     shared_ptr<ProducerCommand> cmd = getWaitingMessage(msgId);
     if (cmd)

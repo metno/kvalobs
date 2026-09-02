@@ -32,6 +32,7 @@
 
 #include "LogFileCreator.h"
 #include "kvsubscribe/KafkaProducer.h"
+#include "kvsubscribe/PgProducer.h"
 #include <memory>
 #include <string>
 #include "CheckRunner.h"
@@ -72,6 +73,11 @@ class DataProcessor {
    */
   void sendToKafka(const qabase::Observation & obs, const qabase::CheckRunner::KvalobsDataPtr dataList, bool * stop = nullptr);
 
+  /**
+   * Send a single dataList to queue system
+   */
+  void sendToQueue(const qabase::Observation & obs, const qabase::CheckRunner::KvalobsDataPtr dataList, bool * stop = nullptr);
+
 
   /**
    * Process a single message. Also post to kafka.
@@ -91,8 +97,8 @@ class DataProcessor {
   template<typename StationInfoIterator>
   void process(StationInfoIterator begin, StationInfoIterator end);
 
-  static void onKafkaSendSuccess(kvalobs::subscribe::KafkaProducer::MessageId id, const std::string & data);
-  static void onKafkaSendError(kvalobs::subscribe::KafkaProducer::MessageId id, const std::string & data, const std::string & errorMessage);
+  static void onKafkaSendSuccess(kvalobs::subscribe::MessageId id, const std::string & data);
+  static void onKafkaSendError(kvalobs::subscribe::MessageId id, const std::string & data, const std::string & errorMessage);
 
  private:
   void finalizeMessage_();
@@ -100,7 +106,9 @@ class DataProcessor {
   std::shared_ptr<qabase::CheckRunner> checkRunner_;
   qabase::LogFileCreator logCreator_;
   std::shared_ptr<kvalobs::subscribe::KafkaProducer> output_;
+  std::shared_ptr<kvalobs::subscribe::PgProducer> pgqueue_;
   bool kafkaEnabled_;
+  bool queueEnabled_;
 };
 
 // template<typename StationInfoIterator>

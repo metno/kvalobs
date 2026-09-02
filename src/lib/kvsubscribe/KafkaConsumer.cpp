@@ -49,7 +49,7 @@ KafkaConsumer::KafkaConsumer(const std::string &topic, const std::string &broker
 
 
 
-KafkaConsumer::~KafkaConsumer() { stop(); }
+KafkaConsumer::~KafkaConsumer() { KafkaConsumer::stop(); }
 
 namespace {
 void set(RdKafka::Conf &c, const std::string &key, const std::string &value) {
@@ -79,6 +79,9 @@ void KafkaConsumer::stop() {
    stopping_ = true; 
 }
 
+bool KafkaConsumer::stopping() const {
+  return stopping_;
+}
 
 void KafkaConsumer::handle_(RdKafka::Message &message) {
   switch (message.err()) {

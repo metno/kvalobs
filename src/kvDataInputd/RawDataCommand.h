@@ -57,9 +57,9 @@ class RawDataCommand : public kvalobs::service::ProducerCommand {
   explicit RawDataCommand(const kvalobs::serialize::KvalobsData &kvalobsData);
 
   const char *getData(unsigned int *size) const;
-  virtual void onSend(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &threadName);
-  virtual void onSuccess(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &threadName, const std::string &data);
-  virtual void onError(kvalobs::subscribe::KafkaProducer::MessageId msgId, const std::string &threadName, const std::string & data,
+  virtual void onSend(kvalobs::subscribe::MessageId msgId, const std::string &threadName);
+  virtual void onSuccess(kvalobs::subscribe::MessageId msgId, const std::string &threadName, const std::string &data);
+  virtual void onError(kvalobs::subscribe::MessageId msgId, const std::string &threadName, const std::string & data,
                        const std::string & errorMessage);
 };
 

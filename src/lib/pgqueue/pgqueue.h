@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libpq-fe.h>
+
 #include <string>
 #include <vector>
 #include <chrono>
@@ -41,13 +41,26 @@ struct NodeInfo {
 //   std::string primary_ci = cluster.primary_conninfo();
 //   std::string replica_ci = cluster.replica_conninfo();
 // ---------------------------------------------------------------------------
+
+
+
 class PgCluster {
 public:
+    friend class PgMessaging;
     using Seconds = std::chrono::seconds;
+    typedef enum environment { production, staging, dev } Environment;
 
     explicit PgCluster(std::vector<std::string> conninfos,
+                       Environment env = dev,
+                       const std::string &appName="",
                        Seconds cache_ttl = Seconds{60});
 
+
+    explicit PgCluster(std::vector<std::string> conninfos,
+                       const std::string  env = "dev",
+                       const std::string &appName="",
+                       Seconds cache_ttl = Seconds{60});
+                   
     // Returns conninfo for the current primary.
     // Throws if no primary is found.
     std::string primary_conninfo();
@@ -61,17 +74,29 @@ public:
 
     // Returns a snapshot of what the last probe found.
     std::vector<NodeInfo> topology();
+        
+    // Returns the environment enum for a given string (production, staging, dev)
+    // Throws std::invalid_argument if the string is invalid.
+    static  
+    Environment env(const std::string& s);
 
+    const std::string& env(Environment e) const;
+    
 private:
     std::vector<std::string>                       conninfos_;
     Seconds                                        cache_ttl_;
     std::vector<NodeInfo>                          nodes_;         // cached result
     std::chrono::steady_clock::time_point          probed_at_;
     size_t                                         replica_rr_{0}; // round-robin index
+    Environment                                    env_;
+    
     mutable std::mutex                             mu_;
 
     void probe_locked();   // must be called with mu_ held
     bool cache_valid() const;
+    // Returns the messages table for the environment (kvproduction, kvstaging, kvdev)
+    std::string msgTable() const; 
+
 };
 
 // ---------------------------------------------------------------------------
@@ -123,16 +148,11 @@ public:
                                       const std::string& topic);
 
 private:
-    PGconn* primary_ = nullptr;   // write connection
-    PGconn* replica_ = nullptr;   // read connection
+    void *primaryCon_=nullptr;    // write connection
+    void *replicaCon_=nullptr;   // read connection
+    std::string msgTbl_;
+    std::string appName_;
 
-    static PGconn* connect(const std::string& conninfo);
-    static void    prepare(PGconn* conn, const char* name, const char* sql);
     void           prepare_primary_stmts();
     void           prepare_replica_stmts();
-
-    // Helpers that operate on a specific connection.
-    static void check_result (PGresult* res, ExecStatusType expected,
-                               const std::string& ctx);
-    static void check_command(PGresult* res, const std::string& ctx);
 };
