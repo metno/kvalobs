@@ -41,6 +41,7 @@
 #include <vector>
 #include <queue>
 #include <mutex>
+#include <thread>
 
 class PgMessaging;
 
@@ -60,7 +61,6 @@ public:
   explicit PgProducer(
       const std::string &topic,
       const std::vector<std::string> &connections,
-      PgCluster::Environment env,
       const std::string &appName,
       ErrorHandler onFailedDelivery = [](MessageId, const std::string &,
                                          const std::string &) {},
@@ -96,6 +96,9 @@ public:
 
   MessageId send(const char *data, unsigned length) override;
 
+  MessageId send(const std::string &data, QueueType queue) override;
+  MessageId send(const char *data, unsigned length, QueueType queue) override;
+
   /**
    * Process all awaiting delivery reports.
    *
@@ -108,8 +111,11 @@ private:
   std::unique_ptr<PgCluster> cluster_;
   std::unique_ptr<PgMessaging> messaging_;
   MessageId messageId_;
+  std::string queue_;
   mutable std::mutex mu_;
 
+  
+  MessageId send(const char *data, unsigned length, const std::string &topic);
   // Pending deliveries for deferred callback processing
   struct PendingDelivery {
     MessageId id;

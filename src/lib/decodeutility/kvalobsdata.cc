@@ -193,6 +193,10 @@ void removeExisting(internal::Observations & obs, const kvTextData & d) {
 void KvalobsData::insert(const kvData & d) {
   removeExisting(obs_, d);
 
+  if ( obstime_.is_special() || d.obstime() > obstime_) {
+    obstime_ = d.obstime();
+  }
+
   int sensor = d.sensor();
   if (sensor >= '0')
     sensor -= '0';
@@ -206,6 +210,10 @@ void KvalobsData::insert(const kvData & d) {
 
 void KvalobsData::insert(const kvTextData & d) {
   removeExisting(obs_, d);
+
+  if ( obstime_.is_special() || d.obstime() > obstime_) {
+    obstime_ = d.obstime();
+  }
 
   ptime tbtime =
       d.tbtime().is_special() ? ptime(special_values::neg_infin) : d.tbtime();
@@ -323,6 +331,10 @@ void KvalobsData::getInvalidate(std::list<InvalidateSpec> & invSpec) {
 
 boost::posix_time::ptime KvalobsData::created()const{
   return created_;
+}
+
+boost::posix_time::ptime KvalobsData::obstime()const{
+  return obstime_;
 }
 
   ///Mostly for test and internal use. It is set by the constructor or when it is created

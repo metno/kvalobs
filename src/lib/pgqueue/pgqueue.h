@@ -48,23 +48,23 @@ class PgCluster {
 public:
     friend class PgMessaging;
     using Seconds = std::chrono::seconds;
-    typedef enum environment { production, staging, dev } Environment;
+    typedef enum environment { production, staging, development } Environment;
 
     explicit PgCluster(std::vector<std::string> conninfos,
-                       Environment env = dev,
+                       Environment env = development,
                        const std::string &appName="",
                        Seconds cache_ttl = Seconds{60});
 
 
     explicit PgCluster(std::vector<std::string> conninfos,
-                       const std::string  env = "dev",
+                       const std::string  env = "development",
                        const std::string &appName="",
                        Seconds cache_ttl = Seconds{60});
                    
     // Returns conninfo for the current primary.
     // Throws if no primary is found.
     std::string primary_conninfo();
-
+    
     // Returns conninfo for a replica (round-robins if multiple).
     // Falls back to primary if no replica is found (e.g. single-node setup).
     std::string replica_conninfo();
@@ -126,6 +126,8 @@ public:
 
     // --- Topics (write → primary) -------------------------------------------
     void create_topic(const std::string& topic);
+    std::vector<std::string> list_topics() const;
+    bool topic_exists(const std::string& topic) const;
 
     // --- Producer (write → primary) -----------------------------------------
     long long publish(const std::string& topic, const std::string& data);

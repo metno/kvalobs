@@ -34,7 +34,8 @@
 namespace kvalobs {
 namespace service {
 
-ProducerCommand::ProducerCommand() {
+ProducerCommand::ProducerCommand(TopicType topicQueue) :
+    topicQueue_(topicQueue ) {
 }
 
 ProducerCommand::~ProducerCommand() {

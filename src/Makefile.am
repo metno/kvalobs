@@ -7,10 +7,10 @@ SUBDIRS = \
 	kvalobs_database \
 	script \
 	tools/kv2kvparser \
-	tools/kv2kvDataInputd \
 	tools/aexecd \
 	tools/kvpull
 
+#tools/kv2kvDataInputd 
 #service-libs 
 #kafka-util 
 

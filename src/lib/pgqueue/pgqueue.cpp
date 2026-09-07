@@ -15,6 +15,8 @@ struct ResultGuard {
     if (res)
       PQclear(res);
   }
+
+
   ResultGuard(const ResultGuard &) = delete;
   ResultGuard &operator=(const ResultGuard &) = delete;
 };
@@ -56,13 +58,13 @@ PgCluster::Environment PgCluster::env(const std::string& s) {
     return production;
   if (s == "staging")
     return staging;
-  if (s == "dev")
-    return dev;
+  if (s == "development")
+    return development;
   throw std::invalid_argument(std::format("PgCluster: invalid environment: {}", s));
 }
 
 const std::string& PgCluster::env(Environment e) const {
-  static const std::string envs[] = {"production", "staging", "dev"};
+  static const std::string envs[] = {"production", "staging", "development"};
   return envs[e];
 }
 
@@ -194,17 +196,42 @@ void prepare(void *conn_, const char *name, const char *sql) {
 }
 
 
-void check_result(PGresult *res, ExecStatusType expected,
+void check_result_raw(PGresult *res, ExecStatusType expected,
                                const std::string &ctx) {
   if (PQresultStatus(res) != expected) {
+    std::cerr << "ERROR PgMessaging: " << ctx << ": unexpected result status" << std::endl;
     std::string err = PQresultErrorMessage(res);
     PQclear(res);
     throw std::runtime_error(ctx + ": " + err);
   }
 }
 
-void check_command(PGresult *res, const std::string &ctx) {
-  check_result(res, PGRES_COMMAND_OK, ctx);
+
+void check_result(ResultGuard &g, ExecStatusType expected,
+                               const std::string &ctx) {
+  try{
+    check_result_raw(g.res, expected, ctx);
+  } catch (const std::exception &e) {
+    std::cerr << "ERROR PgMessaging: " << ctx << ": unexpected result status" << std::endl;
+    g.res=nullptr;
+    throw;
+  }
+}
+
+
+
+void check_command_raw(PGresult *res, const std::string &ctx) {
+  check_result_raw(res, PGRES_COMMAND_OK, ctx);
+}
+
+void check_command(ResultGuard &g, const std::string &ctx) {
+  try {
+    check_command_raw(g.res, ctx);
+  } catch (const std::exception &e) {
+    std::cerr << "ERROR PgMessaging: " << ctx << ": unexpected result status" << std::endl;
+    g.res = nullptr;
+    throw;
+  }
 }
 }
 // ===========================================================================
@@ -298,6 +325,17 @@ void PgMessaging::prepare_replica_stmts() {
         WHERE co.consumer_name = $1 AND co.topic = $2
         GROUP BY co.last_id
     )", msgTbl_).c_str());
+
+  prepare(replicaCon_, "topic_exists", R"(
+        SELECT EXISTS (
+            SELECT 1 FROM kvtopic
+            WHERE topic = $1
+        )
+    )");
+  
+  prepare(replicaCon_, "list_topics", R"(
+        SELECT topic FROM kvtopic
+    )");
 }
 
 // ===========================================================================
@@ -308,8 +346,27 @@ void PgMessaging::create_topic(const std::string &topic) {
   const char *p[] = {topic.c_str()};
   ResultGuard g(
       PQexecPrepared(static_cast<PGconn*>(primaryCon_), "create_topic", 1, p, nullptr, nullptr, 0));
-  check_command(g.res, "create_topic");
+  check_command(g, "create_topic");
 }
+
+std::vector<std::string> PgMessaging::list_topics() const {
+  ResultGuard g(PQexecPrepared(static_cast<PGconn*>(primaryCon_), "list_topics", 0, nullptr, nullptr, nullptr, 0));
+  check_result(g, PGRES_TUPLES_OK, "list_topics");
+  std::vector<std::string> topics;
+  for (int i = 0; i < PQntuples(g.res); ++i) {
+    topics.push_back(PQgetvalue(g.res, i, 0));
+  }
+  return topics;
+}
+
+bool PgMessaging::topic_exists(const std::string& topic) const {
+  const char *p[] = {topic.c_str()};
+  ResultGuard g(PQexecPrepared(static_cast<PGconn*>(primaryCon_), "topic_exists", 1, p, nullptr, nullptr, 0));
+  check_result(g, PGRES_TUPLES_OK, "topic_exists");
+  return PQntuples(g.res) > 0 && std::string(PQgetvalue(g.res, 0, 0)) == "t";
+}
+
+
 
 // ===========================================================================
 // PgMessaging — Producer (primary)
@@ -319,7 +376,7 @@ long long PgMessaging::publish(const std::string &topic,
                                const std::string &data) {
   const char *p[] = {topic.c_str(), data.c_str()};
   ResultGuard g(PQexecPrepared(static_cast<PGconn*>(primaryCon_), "publish", 2, p, nullptr, nullptr, 0));
-  check_result(g.res, PGRES_TUPLES_OK, "publish");
+  check_result(g, PGRES_TUPLES_OK, "publish");
   if (PQntuples(g.res) == 0)
     throw std::runtime_error("publish: no id returned");
   return std::stoll(PQgetvalue(g.res, 0, 0));
@@ -330,7 +387,7 @@ long long PgMessaging::publish_dedup(const std::string &topic,
   const char *p[] = {topic.c_str(), data.c_str()};
   ResultGuard g(
       PQexecPrepared(static_cast<PGconn*>(primaryCon_), "publish_dedup", 2, p, nullptr, nullptr, 0));
-  check_result(g.res, PGRES_TUPLES_OK, "publish_dedup");
+  check_result(g, PGRES_TUPLES_OK, "publish_dedup");
   if (PQntuples(g.res) == 0)
     throw std::runtime_error("publish_dedup: no id returned");
   return std::stoll(PQgetvalue(g.res, 0, 0));
@@ -345,7 +402,7 @@ void PgMessaging::register_consumer(const std::string &consumer_name,
   const char *p[] = {consumer_name.c_str(), topic.c_str()};
   ResultGuard g(
       PQexecPrepared(static_cast<PGconn*>(primaryCon_), "register_consumer", 2, p, nullptr, nullptr, 0));
-  check_command(g.res, "register_consumer");
+  check_command(g, "register_consumer");
 }
 
 void PgMessaging::commit_offset(const std::string &consumer_name,
@@ -354,7 +411,7 @@ void PgMessaging::commit_offset(const std::string &consumer_name,
   const char *p[] = {consumer_name.c_str(), topic.c_str(), id_str.c_str()};
   ResultGuard g(
       PQexecPrepared(static_cast<PGconn*>(primaryCon_), "commit_offset", 3, p, nullptr, nullptr, 0));
-  check_command(g.res, "commit_offset");
+  check_command(g, "commit_offset");
 }
 
 // ===========================================================================
@@ -366,7 +423,7 @@ long long PgMessaging::get_offset(const std::string &consumer_name,
   const char *p[] = {consumer_name.c_str(), topic.c_str()};
   ResultGuard g(
       PQexecPrepared(static_cast<PGconn*>(replicaCon_), "get_offset", 2, p, nullptr, nullptr, 0));
-  check_result(g.res, PGRES_TUPLES_OK, "get_offset");
+  check_result(g, PGRES_TUPLES_OK, "get_offset");
   if (PQntuples(g.res) == 0)
     return 0;
   return std::stoll(PQgetvalue(g.res, 0, 0));
@@ -380,7 +437,7 @@ std::vector<Message> PgMessaging::poll(const std::string &consumer_name,
 
   const char *p[] = {topic.c_str(), offset_str.c_str(), limit_str.c_str()};
   ResultGuard g(PQexecPrepared(static_cast<PGconn*>(replicaCon_), "poll", 3, p, nullptr, nullptr, 0));
-  check_result(g.res, PGRES_TUPLES_OK, "poll");
+  check_result(g, PGRES_TUPLES_OK, "poll");
 
   std::vector<Message> rows;
   int n = PQntuples(g.res);
@@ -401,7 +458,7 @@ long long PgMessaging::consumer_lag(const std::string &consumer_name,
   const char *p[] = {consumer_name.c_str(), topic.c_str()};
   ResultGuard g(
       PQexecPrepared(static_cast<PGconn*>(replicaCon_), "consumer_lag", 2, p, nullptr, nullptr, 0));
-  check_result(g.res, PGRES_TUPLES_OK, "consumer_lag");
+  check_result(g, PGRES_TUPLES_OK, "consumer_lag");
   if (PQntuples(g.res) == 0)
     return 0;
   return std::stoll(PQgetvalue(g.res, 0, 0));

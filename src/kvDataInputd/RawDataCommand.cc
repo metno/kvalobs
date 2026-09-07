@@ -33,7 +33,8 @@
 using std::string;
 
 RawDataCommand::RawDataCommand(const std::string &rawData)
-    : data(rawData) {
+    : ProducerCommand(ProducerCommand::raw), data(rawData) {
+  setObstime(boost::posix_time::ptime());
 }
 
 const char *RawDataCommand::getData(unsigned int *size) const {

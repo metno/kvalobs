@@ -87,6 +87,8 @@ public:
   MessageId send(const std::string &data) override;
 
   MessageId send(const char *data, unsigned length) override;
+  MessageId send(const std::string &data, QueueType queue) override;
+  MessageId send(const char *data, unsigned length, QueueType queue) override;
 
   /**
    * Process all awaiting delivery reports.

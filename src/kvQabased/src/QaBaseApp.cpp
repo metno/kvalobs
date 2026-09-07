@@ -159,7 +159,7 @@ std::shared_ptr<kvalobs::subscribe::PgProducer> QaBaseApp::pgqueueProducer() {
 
   LOGINFO("Creating pgqueue connection on " << topic);
 
-  return std::make_shared<PgProducer>(topic, pgQueueConf_.dbconnect, pgQueueConf_.env(), "qabased", DataProcessor::onKafkaSendError, DataProcessor::onKafkaSendSuccess);
+  return std::make_shared<PgProducer>(topic, pgQueueConf_.dbconnect, "qabased", DataProcessor::onKafkaSendError, DataProcessor::onKafkaSendSuccess);
 }
 
 

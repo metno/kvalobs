@@ -57,19 +57,19 @@ public:
   
 KvDataSerializeCommand::
 KvDataSerializeCommand(const std::list<kvalobs::kvData> &dataList, const std::string &producer)
-  :pPrivate_(new KvDataSerializeCommandPrivat(dataList, producer))
+  :ProducerCommand(checked), pPrivate_(new KvDataSerializeCommandPrivat(dataList, producer))
 {
 }
 
 KvDataSerializeCommand::
 KvDataSerializeCommand(const std::list<kvalobs::kvData> &&dataList, const std::string &producer)
-  : pPrivate_(new KvDataSerializeCommandPrivat(dataList,producer))
+  :ProducerCommand(checked), pPrivate_(new KvDataSerializeCommandPrivat(dataList,producer))
 {
 
 }
 KvDataSerializeCommand::
 KvDataSerializeCommand(const kvalobs::kvData &dataElem, const std::string &producer)
-  : pPrivate_(new KvDataSerializeCommandPrivat(producer)){
+  :ProducerCommand(checked),  pPrivate_(new KvDataSerializeCommandPrivat(producer)){
     pPrivate_->data.push_back(dataElem);
 }
 

@@ -32,6 +32,7 @@
 #include <string>
 #include <memory>
 #include <set>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include "lib/decodeutility/kvalobsdata.h"
 #include "lib/kvsubscribe/ProducerCommand.h"
 #include "lib/kvalobs/kvStationInfo.h"
@@ -54,6 +55,7 @@ class PublishDataCommand : public kvalobs::service::ProducerCommand {
   std::string data;
   std::set<kvalobs::kvStationInfo> summary;
   std::string toLog;
+  
 
  public:
   explicit PublishDataCommand(const kvalobs::serialize::KvalobsData &pubData);

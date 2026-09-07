@@ -81,7 +81,12 @@ std::string getAppName() {
 }
 
 std::string fixDriverName(std::string driver) {
+  const char* kvlibdir = getenv("KVLIBDIR");
   std::string dir(PKGLIB_DBDIR);
+
+  if(kvlibdir){
+    dir = std::string(kvlibdir)+"/db";
+  }
 
   size_t i;
   if (soVersion.empty()) {

@@ -132,9 +132,10 @@ int main(int argc, char **argv) {
       }
 
       for (const Message &message : messages) {
-        std::cout << "id=" << message.id << " topic=" << message.topic
-                  << " created_at=" << message.created_at << '\n'
-                  << message.data << '\n';
+        std::cout << "\n------ id=" << message.id << " topic=" << message.topic
+                  << " created_at=" << message.created_at << "-----\n"
+                  << message.data 
+                  << "\n------- end message -------\n";
       }
 
       queue.commit_offset(options.consumer, topic, messages.back().id);

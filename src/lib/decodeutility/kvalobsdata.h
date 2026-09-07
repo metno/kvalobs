@@ -250,6 +250,10 @@ class KvalobsData {
   ///Can return is_spesial if the xml-document it is created from does not have the attribute 'created'.
   boost::posix_time::ptime created()const;
 
+  ///Newest observation in the data set. 
+  boost::posix_time::ptime obstime()const;
+
+
   ///Mostly for test and internal use. It is set when the data is deserialized.
   ///It will set the attribute
   void created(const boost::posix_time::ptime &time);
@@ -262,6 +266,7 @@ class KvalobsData {
 
   RejectList correctedMessages_;
   boost::posix_time::ptime created_;
+  boost::posix_time::ptime obstime_; //Newest observation time
 };
 
 std::ostream& operator<<(std::ostream &o, const KvalobsData &d);

@@ -30,6 +30,8 @@
 #define SRC_LIB_KVSUBSCRIBE_PRODUCERCOMMAND_H_
 
 #include <string>
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 #include "kvsubscribe/messageid.h"
 #include "miutil/blockingqueue.h"
 
@@ -43,12 +45,22 @@ namespace service {
  */
 
 class ProducerCommand {
-  ProducerCommand(const ProducerCommand &);
-  ProducerCommand& operator=(const ProducerCommand &);
+  ProducerCommand() = delete;
+  ProducerCommand(const ProducerCommand &)=delete;
+  ProducerCommand& operator=(const ProducerCommand &) = delete;
 
  public:
-  ProducerCommand();
+  typedef enum { raw, checked} TopicType;
+  ProducerCommand(TopicType topicQueue);
   virtual ~ProducerCommand();
+
+
+
+  TopicType topicQueue()const{ return topicQueue_; } ;
+
+  //can be is_special
+  boost::posix_time::ptime obstime() const { return obstime_; } 
+  void setObstime(const boost::posix_time::ptime &obstime) { obstime_ = obstime; }  
 
   virtual const char *getData(unsigned int *size) const = 0;
 
@@ -62,6 +74,9 @@ class ProducerCommand {
    */
   virtual void onSuccess(kvalobs::subscribe::MessageId msgId, const std::string &threadName, const std::string &data);
   virtual void onError(kvalobs::subscribe::MessageId msgId, const std::string &threadName, const std::string & data, const std::string & errorMessage);
+  protected:
+    TopicType topicQueue_;
+    boost::posix_time::ptime obstime_;  
 };
 
 typedef miutil::concurrent::BlockingQueuePtr<ProducerCommand> ProducerQue;

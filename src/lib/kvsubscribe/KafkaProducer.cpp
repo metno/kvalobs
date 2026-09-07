@@ -146,6 +146,17 @@ MessageId KafkaProducer::send(const char *data, unsigned length) {
   return *id;
 }
 
+MessageId KafkaProducer::send(const std::string &data, QueueType queue) {
+  return send(data.c_str(), data.size(), queue);
+}
+
+MessageId KafkaProducer::send(const char *data, unsigned length, QueueType queue) {
+  // Implement the logic to send data to the specified queue
+  // For now, just call the existing send function as a placeholder
+  return send(data, length);
+}
+
+
 void KafkaProducer::catchup(unsigned timeout) { producer_->poll(timeout); }
 
 } // namespace subscribe

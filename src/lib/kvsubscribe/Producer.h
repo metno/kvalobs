@@ -36,12 +36,14 @@
 #include <memory>
 #include <ostream>
 #include <string>
+#include <list>
 
 namespace kvalobs {
 namespace subscribe {
 
 class Producer {
 public:
+  typedef enum{raw, checked, checked_lowpri } QueueType;
   typedef std::function<void(MessageId id, const std::string &data)>
       SuccessHandler;
   typedef std::function<void(MessageId id, const std::string &data,
@@ -74,6 +76,9 @@ public:
 
   virtual MessageId send(const char *data, unsigned length) = 0;
 
+  virtual MessageId send(const std::string &data, QueueType queue) = 0;
+  virtual MessageId send(const char *data, unsigned length, QueueType queue) = 0;
+
   ErrorHandler setErrorHandler(ErrorHandler handler) {
     ErrorHandler old = onFailedDelivery_;
     onFailedDelivery_ = handler;
@@ -96,9 +101,14 @@ public:
   virtual void catchup(unsigned timeout = 0) = 0;
 
   std::string topic() const;
+  std::string environment() const { return environment_; };
+  std::list<std::string> validTopics() const { return validTopics_; };
+  std::string topic(QueueType queue) const;
 
 protected:
   std::string topic_;
+  std::string environment_;
+  std::list<std::string> validTopics_;
   ErrorHandler onFailedDelivery_;
   SuccessHandler onSuccessfulDelivery_;
 };

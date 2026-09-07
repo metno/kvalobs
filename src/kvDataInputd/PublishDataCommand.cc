@@ -36,8 +36,9 @@
 using std::string;
 
 PublishDataCommand::PublishDataCommand(const kvalobs::serialize::KvalobsData &pubData)
-    : data(kvalobs::serialize::KvalobsDataSerializer::serialize(pubData)), summary(pubData.summary()) {
+    : ProducerCommand(ProducerCommand::checked), data(kvalobs::serialize::KvalobsDataSerializer::serialize(pubData)), summary(pubData.summary()) {
   std::ostringstream o;
+  setObstime(pubData.obstime());
   o << "nObs: " << summary.size();
   if( !summary.empty() ) {
     kvalobs::kvStationInfo info(*summary.begin());

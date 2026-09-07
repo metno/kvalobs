@@ -138,7 +138,7 @@ bool startPgProducer(kvalobs::service::ProducerThread &producer,
       std::string name = producer.getName() + "-" + topic;
       producer.setName(name);
 
-      kvalobs::subscribe::PgProducer *pgProducer=new kvalobs::subscribe::PgProducer(topic, conf.dbconnect, conf.env(), "kvdatainputd");
+      kvalobs::subscribe::PgProducer *pgProducer=new kvalobs::subscribe::PgProducer(topic, conf.dbconnect, "kvdatainputd");
       producer.start(pgProducer);
     } else {
       LOGINFO("kafka disabled.");
@@ -163,8 +163,13 @@ DataSrcApp::DataSrcApp(int argn, char **argv, int nConnections_,
   miutil::conf::ConfSection *conf;
   string logdir(kvPath("logdir"));
   string myPath = kvPath("pkglibdir");
-  myPath += "/decode";
+  const char* kvlibdir = getenv("KVLIBDIR");
 
+  if(kvlibdir){
+    myPath = std::string(kvlibdir);
+  }
+  myPath += "/decode";
+  
   conf = KvBaseApp::getConfiguration();
 
   if (!conf) {
@@ -288,6 +293,16 @@ DataSrcApp::DataSrcApp(int argn, char **argv, int nConnections_,
     return;
   }
 
+  if (!startPgProducer(pgPubStream, pgqueConfig,
+                          pgqueConfig.getPublishTopic())) {
+    return;
+  }
+
+  if (!startPgProducer(pgRawStream, pgqueConfig,
+                          pgqueConfig.getRawTopic())) {
+    return;
+  }
+
   ok = true;
 }
 
@@ -310,7 +325,7 @@ string headStation(const kvalobs::serialize::KvalobsData &kd) {
 bool DataSrcApp::publishData(
     const std::list<kvalobs::serialize::KvalobsData> &publishData) {
   // std::cerr << "publishData: size " << publishData.size() << "\n\n";
-  if (publishData.size() == 0 || !kafkaConfig.enable) {
+  if (publishData.size() == 0 || !pgqueConfig.enable) {
     return true;
   }
 
@@ -321,11 +336,11 @@ bool DataSrcApp::publishData(
     std::unique_ptr<PublishDataCommand> data(new PublishDataCommand(d));
 
     try {
-      kafkaPubStream.queue->timedAdd(data.get(), std::chrono::seconds(4), true);
+      pgPubStream.queue->timedAdd(data.get(), std::chrono::seconds(4), true);
       data.release();
     } catch (std::exception &ex) {
       ret = false;
-      LOGWARN("Unable to post data to the 'checked' kafka queue.\nReason: "
+      LOGWARN("Unable to post data to the 'checked' pgqueue.\nReason: "
               << ex.what() << "\n"
               << headStation(d));
     }
@@ -339,6 +354,11 @@ int DataSrcApp::registerDb(int nConn) {
   string driver(kvPath("pkglibdir") + "/db/" + dbDriver);
   string drvId;
   int n = 0;
+
+  const char *kvlibdir = getenv("KVLIBDIR");
+  if(kvlibdir){
+    driver = std::string(kvlibdir)+"/db/" + dbDriver;
+  }
 
   LOGINFO("registerDb: loading driver <"
           << dnmi::db::DriverManager::fixDriverName(driver) << ">!\n");
@@ -836,8 +856,8 @@ void DataSrcApp::shutdown() {
   sigTerm = 1;
   decoderExecutor.shutdown();
   decoderExecutor.waitForTermination(std::chrono::seconds(60));
-  kafkaRawStream.shutdown();
-  kafkaRawStream.join(std::chrono::seconds(60));
-  kafkaPubStream.shutdown();
-  kafkaPubStream.join(std::chrono::seconds(60));
+  pgRawStream.shutdown();
+  pgRawStream.join(std::chrono::seconds(60));
+  pgPubStream.shutdown();
+  pgPubStream.join(std::chrono::seconds(60));
 }

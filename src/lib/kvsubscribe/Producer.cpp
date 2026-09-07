@@ -41,11 +41,57 @@ Producer::Producer(const std::string & topic,
                          SuccessHandler onSuccessfulDelivery):
                          topic_(topic),
                          onFailedDelivery_(onFailedDelivery),
-                         onSuccessfulDelivery_(onSuccessfulDelivery) {} 
+                         onSuccessfulDelivery_(onSuccessfulDelivery) {
+  std::cerr << "Creating Producer for topic: " << topic_ << std::endl;
+  bool isKvalobsTopic_ = topic_.find("kvalobs.") == 0;
+  std::cerr << "Creating Producer for topic: " << topic_ << " isKvalobs: " << (isKvalobsTopic_ ? "true" : "false") << std::endl;
+  if(!isKvalobsTopic_) {
+    throw std::logic_error("Topic does not start with 'kvalobs.': " + topic_);
+  }
 
-                         std::string Producer::topic() const {
+  std::size_t i = topic_.find('.');
+  if (i != std::string::npos) {
+    environment_ = topic_.substr(i + 1);
+    i = environment_.find(".");
+    if (i != std::string::npos) {
+      environment_.erase(i);
+    }
+  }
+
+  std::cerr << "Environment extracted from topic: '" << environment_ << "'" << std::endl;
+  if(environment_!="production" &&
+     environment_!="staging" && 
+     environment_!="development") {
+    throw std::logic_error("Invalid environment in topic name : '" + environment_ + "'");
+  }
+
+  validTopics_.clear();
+  validTopics_.push_back("kvalobs."+environment_+".raw");
+  validTopics_.push_back("kvalobs."+environment_+".checked");
+  validTopics_.push_back("kvalobs."+environment_+".checked.lowpri");
+
+  if(std::find(validTopics_.begin(), validTopics_.end(), topic_) == validTopics_.end()) {
+    throw std::logic_error("Invalid topic name #: " + topic_);
+  }
+}
+
+std::string Producer::topic() const {
   return topic_;
 }
+
+std::string Producer::topic(QueueType queue) const {
+  switch(queue) {
+    case raw:
+      return "kvalobs." + environment_ + ".raw";
+    case checked:
+      return "kvalobs." + environment_ + ".checked";
+    case checked_lowpri:
+      return "kvalobs." + environment_ + ".checked.lowpri";
+    default:
+      throw std::logic_error("Unknown queue type");
+  }
+}
+
 
 
 } // namespace subscribe
