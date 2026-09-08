@@ -16,7 +16,7 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AX_CXX_COMPILE_STDCXX([20],[noext],[mandatory])
 
-export PKG_CONFIG_PATH=`pwd`"/kvsupport/build$prefix/lib/kvalobs11/lib/pkgconfig:${PKG_CONFIG_PATH}"
+export PKG_CONFIG_PATH=`pwd`"/kvsupport/build$prefix/lib/kvalobs12/lib/pkgconfig:${PKG_CONFIG_PATH}"
 echo "PKG_CONFIG_PATH: '${PKG_CONFIG_PATH}'"
 #AC_CONFIG_SUBDIRS([src/lib/libhttpserver/libhttpserver-0.17.5])
 
