@@ -1,0 +1,5 @@
+usr/lib/libkvalobs_pgqueue.so
+usr/include/kvalobs/pgqueue
+usr/lib/libkvalobs_pgqueue.a
+usr/lib/libkvalobs_pgqueue.la
+usr/lib/pkgconfig/libkvalobs_pgqueue.pc

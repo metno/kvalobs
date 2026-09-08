@@ -1,3 +1,11 @@
+kvalobs (9.0.0-rc1) noble; urgency=medium
+  * Replace kafka.
+  * Use two checked queues, 
+    kvalobs.environment.checked and kvalobs.environment.checked.lowpri.
+
+ -- Borge Moe <borge.moe@met.no>  Tue, 8 Sep 2026 08:00:00 +0200
+
+
 kvalobs (8.0.2-1) noble; urgency=medium
   * Release 8.0.2
   * kvDataInputd - Option to run in gdb.

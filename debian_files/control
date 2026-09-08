@@ -15,7 +15,7 @@ Build-Depends: debhelper, autotools-dev, autoconf-archive, debconf, devscripts, 
   libperl-dev, libdbd-pg-perl, liblog4cpp5-dev, libcppunit-dev,
   libgnutls28-dev
 
-Package: libkvalobs11
+Package: libkvalobs12
 Section: libs
 Architecture: any
 Depends:  ${shlibs:Depends}, ${misc:Depends}
@@ -25,21 +25,35 @@ Description: Client library for kvalobs
 Package: libkvalobs-dev
 Section: libdevel
 Architecture: any
-Depends: libkvalobs11 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends} 
+Depends: libkvalobs12 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends} 
 Description: Client library for kvalobs
  May be used to write applications connecting to kvalobs
 
-Package: libkvcpp11
+Package: libkvpgqueue12
+Section: libdevel
+Architecture: any
+Depends:  
+Description: Client library for pgqueue
+ Kafka replacement implemented with a postgres.
+
+Package: libkvpgqueue-dev
+Section: libdevel
+Architecture: any
+Depends: libkvqueue12 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends} 
+Description: Client library for pgqueue
+ Kafka replacement implemented with a postgres.
+
+Package: libkvcpp12
 Section: libs
 Architecture: any
-Depends:  libkvalobs11 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Depends:  libkvalobs12 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: Runtime library for kvalobs clients
  Kvalobs is a quality control system for meteorological observations.
 
 Package: libkvcpp-dev
 Section: libdevel
 Architecture: any
-Depends: libkvcpp11 (= ${binary:Version}), 
+Depends: libkvcpp12 (= ${binary:Version}), 
  libkvalobs-dev (= ${binary:Version}),
  metlibs-putools-dev,
  libxml++2.6-dev (>= 2.14.0),
@@ -77,7 +91,7 @@ Description: Install sql files for creating kvalobs database
 
 Package: kvsubscribe
 Architecture: any
-Depends: libkvalobs11 (= ${binary:Version})
+Depends: libkvalobs12 (= ${binary:Version}), libkvpgqueue12 (= ${binary:Version})
 Description: List data from kvalobs in real time 
 
 #Package: kvkafkalistener
