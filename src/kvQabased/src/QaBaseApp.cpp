@@ -40,11 +40,9 @@
 
 namespace qabase {
 
-kvalobs::subscribe::KafkaConfig QaBaseApp::kafkaConf_;
 PgQueueConfig QaBaseApp::pgQueueConf_;
 std::shared_ptr<PgCluster> QaBaseApp::pgCluster_; 
 bool QaBaseApp::pgQueueEnabled_;
-bool QaBaseApp::kafkaEnabled_;
 
 namespace {
 std::string val(const std::string & name, miutil::conf::ConfSection * conf, const std::string & defaultValue) {
@@ -89,19 +87,10 @@ bool valAsBool(const std::string & name, miutil::conf::ConfSection * conf, bool 
 QaBaseApp::QaBaseApp(int argc, char ** argv)
     : KvBaseApp(argc, argv) {
 
-  miutil::conf::ConfSection * kafka = getConfiguration()->getSection("kafka");
-  kafkaConf_.brokers = val("brokers", kafka, "localhost");
-  kafkaConf_.topic = kvalobs::subscribe::queue::checked(val("domain", kafka, "test"));
-  kafkaConf_.requestRequiredAcks = valAsInt("request_required_acks", kafka, -1);
-  kafkaConf_.requestTimeoutMs = valAsInt("request_timeout_ms", kafka, 5000);
-  kafkaEnabled_ = valAsBool("enabled", kafka, true);
-  std::cerr << "Kafka Configuration:\n" <<kafkaConf_ << "\n\n";
-  LOGINFO("Kafka Configuration:\n" << kafkaConf_ << "\n");
-
   miutil::conf::ConfSection * pg = getConfiguration()->getSection("pgqueue");
 
   pgQueueConf_.enable = false;
-  if ( valAsBool("enabled", pg, false)) {
+  if ( valAsBool("enable", pg, false)) {
     pgQueueConf_.enable = true;
   }
   pgQueueEnabled_ = pgQueueConf_.enable;
@@ -115,15 +104,15 @@ QaBaseApp::QaBaseApp(int argc, char ** argv)
     pgQueueConf_.dbconnect.push_back(con);
   }
   
-  pgQueueConf_.domain = val("domain", pg, "test");
+  pgQueueConf_.domain = val("domain", pg, "development");
   if (pgQueueConf_.enable && pgQueueConf_.dbconnect.empty()) {
     throw std::runtime_error("No database connection specified in pgqueue config!");
   }
   
   std::stringstream ss;
   ss << "PgQueue Configuration:\n"
-     << "  enabled: " << (pgQueueConf_.enable?"true":"false") << "\n"
-     << "  domain: " << pgQueueConf_.domain << "\n"
+     << "     enable: " << (pgQueueConf_.enable?"true":"false") << "\n"
+     << "     domain: " << pgQueueConf_.domain << "\n"
      << "  dbconnect: ";
   for (const auto & con : pgQueueConf_.dbconnect) {
     ss << "\n    - " << con;
@@ -134,20 +123,10 @@ QaBaseApp::QaBaseApp(int argc, char ** argv)
 QaBaseApp::~QaBaseApp() {
 }
 
-bool QaBaseApp::kafkaEnabledInConfig() {
-  return kafkaEnabled_;
+bool QaBaseApp::queueEnabledInConfig() {
+  return pgQueueEnabled_;
 };
 
-std::shared_ptr<kvalobs::subscribe::KafkaProducer> QaBaseApp::kafkaProducer() {
-
-  using kvalobs::subscribe::KafkaProducer;
-
-  std::string queue = kafkaConf_.topic;
-
-  LOGINFO("Creating kafka connection on " << kafkaConf_.brokers << ", using topic " << queue);
-
-  return std::make_shared < KafkaProducer > (queue, kafkaConf_.brokers, DataProcessor::onKafkaSendError, DataProcessor::onKafkaSendSuccess);
-}
 
 std::shared_ptr<kvalobs::subscribe::PgProducer> QaBaseApp::pgqueueProducer() {
   using kvalobs::subscribe::PgProducer;
@@ -159,7 +138,7 @@ std::shared_ptr<kvalobs::subscribe::PgProducer> QaBaseApp::pgqueueProducer() {
 
   LOGINFO("Creating pgqueue connection on " << topic);
 
-  return std::make_shared<PgProducer>(topic, pgQueueConf_.dbconnect, "qabased", DataProcessor::onKafkaSendError, DataProcessor::onKafkaSendSuccess);
+  return std::make_shared<PgProducer>(topic, pgQueueConf_.dbconnect, "qabased", DataProcessor::onSendError, DataProcessor::onSendSuccess);
 }
 
 

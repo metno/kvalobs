@@ -157,11 +157,11 @@ class Configuration {
    * 
    * @return unsigned 
    */
-  unsigned maxKafkaSendErrors() const {
-    if( maxKafkaSendErrors_==0 || processCount_>1) {
+  unsigned maxSendErrors() const {
+    if( maxSendErrors_==0 || processCount_>1) {
       return std::numeric_limits<unsigned>::max();
     } 
-    return maxKafkaSendErrors_;
+    return maxSendErrors_;
   }
 
   /**
@@ -231,7 +231,7 @@ class Configuration {
   int logSize_;
   int numberOfLogs_;
   int selectForControlCount_;
-  unsigned maxKafkaSendErrors_;
+  unsigned maxSendErrors_;
 
   unsigned processCount_;
   int id_;

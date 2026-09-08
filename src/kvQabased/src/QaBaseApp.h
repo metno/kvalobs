@@ -73,21 +73,16 @@ class QaBaseApp : public KvBaseApp {
     return kafkaConf_.brokers;
   }*/
 
-  static std::shared_ptr<kvalobs::subscribe::KafkaProducer> kafkaProducer();
   static std::shared_ptr<kvalobs::subscribe::PgProducer> pgqueueProducer();
 
   static std::string baseLogDir();
-  static bool kafkaEnabledInConfig();
+  static bool queueEnabledInConfig();
+  static PgQueueConfig pgQueueConfig();
  private:
-  static kvalobs::subscribe::KafkaConfig kafkaConf_;
   static PgQueueConfig pgQueueConf_;
   static std::shared_ptr<PgCluster> pgCluster_;
   
-  static bool kafkaEnabled_;
   static bool pgQueueEnabled_;
-  //static std::string kafkaBrokers_;
-  //static std::string kafkaDomain_;
-
 };
 
 } /* namespace qabase */

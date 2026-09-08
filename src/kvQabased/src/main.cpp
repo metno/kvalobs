@@ -220,7 +220,7 @@ int main(int argc, char ** argv) {
     if ( !config.runNormally()) {
       return 0;
     }
-    qabase::DataProcessor::maxKafkaSendErrors=config.maxKafkaSendErrors();
+    qabase::DataProcessor::maxSendErrors=config.maxSendErrors();
 
     ProcessStatus processStatus;
     if (!config.haveObservationToCheck()) {
@@ -230,9 +230,9 @@ int main(int argc, char ** argv) {
     qabase::QaBaseApp app(argc, argv);
 
     LOGINFO("Log xml sendt to kafka: " << (config.logXml()?"true":"false"));
-    LOGINFO("Kafka send errors before terminating: " << config.maxKafkaSendErrors());
+    LOGINFO("Queue send errors before terminating: " << config.maxSendErrors());
     LOGINFO("ID: " << db::DatabaseAccess::qaId);
-    LOGINFO("Kafka enabled: " << (qabase::QaBaseApp::kafkaEnabledInConfig()?"true":"false"));
+    LOGINFO("Queue enabled: " << (qabase::QaBaseApp::queueEnabledInConfig()?"true":"false"));
     LOGDEBUG("Using model data name " << config.modelDataName());
 
 
@@ -265,7 +265,7 @@ int main(int argc, char ** argv) {
       LOGDEBUG("Connecting to database: " << dbConnect);
       auto db = std::make_shared<db::KvalobsDatabaseAccess>(dbConnect);
       auto checkRunner = std::make_shared<qabase::CheckRunner>(db);
-      qabase::NewDataListener listener(db, config.selectForControlCount(), qabase::QaBaseApp::kafkaEnabledInConfig());
+      qabase::NewDataListener listener(db, config.selectForControlCount(), qabase::QaBaseApp::queueEnabledInConfig());
       listener.run();
     }
   } catch (std::exception & e) {

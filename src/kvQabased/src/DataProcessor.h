@@ -57,9 +57,9 @@ class DataProcessor {
 
   static bool logXml;
   static bool logTransactions;
-  static unsigned maxKafkaSendErrors;
+  static unsigned maxSendErrors;
 
-  explicit DataProcessor(std::shared_ptr<qabase::CheckRunner> checkRunner, bool kafkaEnabled = true);
+  explicit DataProcessor(std::shared_ptr<qabase::CheckRunner> checkRunner, bool queueEnabled = true);
 
   ~DataProcessor();
 
@@ -68,10 +68,6 @@ class DataProcessor {
    */
   qabase::CheckRunner::KvalobsDataPtr runChecks(const qabase::Observation & obs) const;
 
-  /**
-   * Send a single dataList to Kafka
-   */
-  void sendToKafka(const qabase::Observation & obs, const qabase::CheckRunner::KvalobsDataPtr dataList, bool * stop = nullptr);
 
   /**
    * Send a single dataList to queue system
@@ -97,17 +93,15 @@ class DataProcessor {
   template<typename StationInfoIterator>
   void process(StationInfoIterator begin, StationInfoIterator end);
 
-  static void onKafkaSendSuccess(kvalobs::subscribe::MessageId id, const std::string & data);
-  static void onKafkaSendError(kvalobs::subscribe::MessageId id, const std::string & data, const std::string & errorMessage);
+  static void onSendSuccess(kvalobs::subscribe::MessageId id, const std::string & data);
+  static void onSendError(kvalobs::subscribe::MessageId id, const std::string & data, const std::string & errorMessage);
 
  private:
   void finalizeMessage_();
 
   std::shared_ptr<qabase::CheckRunner> checkRunner_;
   qabase::LogFileCreator logCreator_;
-  std::shared_ptr<kvalobs::subscribe::KafkaProducer> output_;
   std::shared_ptr<kvalobs::subscribe::PgProducer> pgqueue_;
-  bool kafkaEnabled_;
   bool queueEnabled_;
 };
 
