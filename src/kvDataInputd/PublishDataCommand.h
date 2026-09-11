@@ -60,7 +60,8 @@ class PublishDataCommand : public kvalobs::service::ProducerCommand {
  public:
   explicit PublishDataCommand(const kvalobs::serialize::KvalobsData &pubData);
 
-  const char *getData(unsigned int *size) const;
+  virtual const std::string name() const override;
+  virtual const char *getData(unsigned int *size) const override;
   virtual void onSend(kvalobs::subscribe::MessageId msgId, const std::string &threadName);
   virtual void onSuccess(kvalobs::subscribe::MessageId msgId, const std::string &threadName, const std::string &data);
   virtual void onError(kvalobs::subscribe::MessageId msgId, const std::string &threadName, const std::string & data,

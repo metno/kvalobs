@@ -34,7 +34,6 @@
 #include "decodeutility/kvalobsdata.h"
 #include "decodeutility/kvalobsdataserializer.h"
 #include "fileutil/pidfileutil.h"
-#include "kvsubscribe/KafkaProducer.h"
 #include "kvsubscribe/DataSubscriber.h"
 #include "milog/FLogStream.h"
 #include "milog/milog.h"
@@ -262,7 +261,7 @@ int main(int argc, char ** argv) {
       signal(SIGHUP, terminate);
 
       std::string dbConnect = qabase::QaBaseApp::createConnectString();
-      LOGDEBUG("Connecting to database: " << dbConnect);
+      LOGINFO("Connecting to database: " << dbConnect);
       auto db = std::make_shared<db::KvalobsDatabaseAccess>(dbConnect);
       auto checkRunner = std::make_shared<qabase::CheckRunner>(db);
       qabase::NewDataListener listener(db, config.selectForControlCount(), qabase::QaBaseApp::queueEnabledInConfig());

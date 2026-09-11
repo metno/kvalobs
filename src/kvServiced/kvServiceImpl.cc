@@ -1168,7 +1168,7 @@ CORBA::Boolean KvServiceImpl::getStationParam(
     int pos = -1;
 
     while (res->hasNext()) {
-      DRow r = res->next();
+      DRow &r = res->next();
       pos++;
       CORBA::Long rPos = 0;
       Station_param &sParam = (*spList)[pos];
@@ -1283,7 +1283,7 @@ CORBA::Boolean KvServiceImpl::getStationMetaData(
     CORBA::Long rPos;
 
     while (res->hasNext()) {
-      DRow r = res->next();
+      DRow &r = res->next();
       rPos = 0;
       pos++;
       //Station_metadata &md = (*stMeta)[ pos ];

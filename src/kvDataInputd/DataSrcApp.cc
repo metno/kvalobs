@@ -99,26 +99,6 @@ getQaIdInfo(miutil::conf::ConfSection *conf) {
 }
 
 namespace {
-bool startKafkaProducer(kvalobs::service::ProducerThread &producer,
-                        const KafkaConfig &conf, const std::string &topic) {
-  try {
-    if (conf.enable) {
-      LOGINFO("Starting kafka producer for topic <" << topic << ">. Brokers <"
-                                                    << conf.brokers << ">.");
-      std::string name = producer.getName() + "-" + topic;
-      producer.setName(name);
-      producer.start(conf.brokers, topic);
-    } else {
-      LOGINFO("kafka disabled.");
-    }
-  } catch (const std::exception &ex) {
-    LOGERROR("Failed to start the kafka stream for topic <"
-             << topic << ">.\nBrokers: <" << conf.brokers
-             << ">\nREason: " << ex.what());
-    return false;
-  }
-  return true;
-}
 
 bool startPgProducer(kvalobs::service::ProducerThread &producer,
                         const PgQueueConfig &conf, const std::string &topic) {
@@ -141,7 +121,7 @@ bool startPgProducer(kvalobs::service::ProducerThread &producer,
       kvalobs::subscribe::PgProducer *pgProducer=new kvalobs::subscribe::PgProducer(topic, conf.dbconnect, "kvdatainputd");
       producer.start(pgProducer);
     } else {
-      LOGINFO("kafka disabled.");
+      LOGINFO("pgqueue disabled.");
     }
   } catch (const std::exception &ex) {
     LOGERROR("Failed to start the postgres producer for topic <"
@@ -186,10 +166,6 @@ DataSrcApp::DataSrcApp(int argn, char **argv, int nConnections_,
       conf->getValue("kvDataInputd.http.threads").valAsInt(httpConfig.threads);
   httpConfig.loglevel =
       getLoglevelRecursivt(conf, "kvDataInputd.http", httpConfig.loglevel);
-  kafkaConfig.brokers =
-      conf->getValue("kafka.brokers").valAsString("localhost");
-  kafkaConfig.domain = conf->getValue("kafka.domain").valAsString("");
-  kafkaConfig.enable = conf->getValue("kafka.enable").valAsBool(true);
   pgqueConfig.enable = conf->getValue("pgqueue.enable").valAsBool(true);
   pgqueConfig.domain = conf->getValue("pgqueue.domain").valAsString("");
   if (pgqueConfig.enable) {
@@ -212,12 +188,7 @@ DataSrcApp::DataSrcApp(int argn, char **argv, int nConnections_,
       kvalobs::kvPath(kvalobs::sysconfdir) + "/stinfosys_params.csv";
   paramFile =
       conf->getValue("kvDataInputd.paramfile").valAsString(defautlParamFile);
-  if (kafkaConfig.domain.empty()) {
-    LOGFATAL("This kvalobs instance must have a name. kafka.domain must be set "
-             "in the configuration file.");
-    exit(1);
-  }
-
+ 
   getLogfileInfo(conf, "kvDataInputd.http", httpConfig.logRotate,
                  httpConfig.logSize);
 
@@ -282,16 +253,6 @@ DataSrcApp::DataSrcApp(int argn, char **argv, int nConnections_,
                             200, 1, new milog::StdLayout1());
   milog::createGlobalLogger(logdir, "kvDataInputd", "kv2kvdecoder",
                             milog::DEBUG, 1073741824, 1);
-
-  if (!startKafkaProducer(kafkaRawStream, kafkaConfig,
-                          kafkaConfig.getRawTopic())) {
-    return;
-  }
-
-  if (!startKafkaProducer(kafkaPubStream, kafkaConfig,
-                          kafkaConfig.getPublishTopic())) {
-    return;
-  }
 
   if (!startPgProducer(pgPubStream, pgqueConfig,
                           pgqueConfig.getPublishTopic())) {

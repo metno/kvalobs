@@ -40,10 +40,10 @@ RUN apt  update && apt install -y \
 
 #COPY --from=kvbins /usr/local/lib/libmetlibs*.so.* /usr/local/lib/
 COPY --from=kvbins /usr/lib/libkvalobs_*.so.* /usr/lib/
-COPY --from=kvbins /usr/lib/kvalobs11/db/*.so*  /usr/lib/kvalobs11/db/
-COPY --from=kvbins /usr/lib/kvalobs11/decode/*.so*  /usr/lib/kvalobs11/decode/
+COPY --from=kvbins /usr/lib/kvalobs12/db/*.so*  /usr/lib/kvalobs12/db/
+COPY --from=kvbins /usr/lib/kvalobs12/decode/*.so*  /usr/lib/kvalobs12/decode/
 COPY --from=kvbins /usr/share/kvalobs/VERSION /usr/share/kvalobs/VERSION
-COPY --from=kvbins /usr/lib/kvalobs11/lib/*.so*  /usr/lib/kvalobs11/lib/
+COPY --from=kvbins /usr/lib/kvalobs12/lib/*.so*  /usr/lib/kvalobs12/lib/
 
 RUN mkdir -p /var/lib/kvalobs/run
 

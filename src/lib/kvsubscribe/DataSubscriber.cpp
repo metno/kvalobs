@@ -28,7 +28,6 @@
  */
 
 #include "DataSubscriber.h"
-#include "KafkaConsumer.h"
 #include "queue.h"
 #include <decodeutility/kvalobsdata.h>
 #include <decodeutility/kvalobsdataparser.h>
@@ -78,24 +77,6 @@ DataSubscriber::DataSubscriber(Handler handler, Consumer *consumer)
       consumer_->setHandler(dataHandler);
     }
 
-DataSubscriber::DataSubscriber(Handler handler, const std::string &domain, 
-                               const std::string &brokers, const std::string &groupId)
-    : Consumer("", nullptr), handler_(handler), ownsConsumer_(true) {
-      std::string topicName = topic(domain);
-      consumer_ = new KafkaConsumer(topicName, brokers, groupId);
-      DataHandler *dataHandler = new DataHandler(handler_);
-      consumer_->setHandler(dataHandler);
-    }
-
-DataSubscriber::DataSubscriber(Handler handler, const std::string &domain, 
-                               const std::string &brokers)
-    : Consumer("", nullptr), handler_(handler), ownsConsumer_(true) {
-      std::string topicName = topic(domain);
-      std::string groupId = "default-group"; // Generate a default group ID
-      consumer_ = new KafkaConsumer(topicName, brokers, groupId);
-      DataHandler *dataHandler = new DataHandler(handler_);
-      consumer_->setHandler(dataHandler);
-    }
 
 DataSubscriber::~DataSubscriber() {
   if (ownsConsumer_ && consumer_) {

@@ -124,11 +124,8 @@ class DataSrcApp : public KvBaseApp {
   bool shutdown_;
   boost::posix_time::ptime nextParamCheckTime;
   HttpConfig httpConfig;
-  KafkaConfig kafkaConfig;
   PgQueueConfig pgqueConfig;
   DecoderExecutor decoderExecutor;
-  kvalobs::service::ProducerThread kafkaRawStream;
-  kvalobs::service::ProducerThread kafkaPubStream;
   kvalobs::service::ProducerThread pgRawStream;
   kvalobs::service::ProducerThread pgPubStream;
   kvalobs::decoder::StationFiltersPtr filters;
@@ -258,25 +255,16 @@ public:
    */
   virtual bool isOk() const;
 
-  /**
-   * \brief returns a pointer to the raw message queue.
-   *
-   * \return a pointer to the message que.
-   */
-  kvalobs::service::ProducerQuePtr getRawQueue() {
-    return kafkaRawStream.queue;
-  }
   kvalobs::service::ProducerQuePtr getPgRawQueue() {
     return pgRawStream.queue;
   }
 
 
-  kvalobs::service::ProducerQuePtr getPublishQueue() {
-    return kafkaPubStream.queue;
+  kvalobs::service::ProducerQuePtr getPgPublishQueue() {
+    return pgPubStream.queue;
   }
 
-  bool kafkaEnabled() const { return kafkaConfig.enable; }
-
+ 
   bool pgQueueEnabled() const { return pgqueConfig.enable; }
 
   /**

@@ -41,14 +41,14 @@ ProducerCommand::ProducerCommand(TopicType topicQueue) :
 ProducerCommand::~ProducerCommand() {
 }
 
-void ProducerCommand::onSend(kvalobs::subscribe::MessageId msgId, const std::string &threadName) {
+void ProducerCommand::onSend(kvalobs::subscribe::MessageId, const std::string &) {
 }
 
-void ProducerCommand::onSuccess(kvalobs::subscribe::MessageId msgId, const std::string &threadName, const std::string &data) {
+void ProducerCommand::onSuccess(kvalobs::subscribe::MessageId, const std::string &, const std::string &) {
 }
 
-void ProducerCommand::onError(kvalobs::subscribe::MessageId msgId, const std::string &threadName, const std::string & data,
-                              const std::string & errorMessage) {
+void ProducerCommand::onError(kvalobs::subscribe::MessageId, const std::string &, const std::string &,
+                              const std::string &) {
 }
 
 }  //  namespace service

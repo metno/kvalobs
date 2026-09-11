@@ -1052,7 +1052,7 @@ CORBA::Boolean KvServiceImpl::getStationParam(
     int pos = -1;
 
     while (res->hasNext()) {
-      DRow r = res->next();
+      DRow &r = res->next();
       pos++;
       CORBA::Long rPos = 0;
       Station_param &sParam = (*spList)[pos];

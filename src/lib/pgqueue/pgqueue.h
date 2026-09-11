@@ -82,6 +82,7 @@ public:
 
     const std::string& env(Environment e) const;
     
+    bool connected() const;
 private:
     std::vector<std::string>                       conninfos_;
     Seconds                                        cache_ttl_;
@@ -117,6 +118,7 @@ private:
 // ---------------------------------------------------------------------------
 class PgMessaging {
 public:
+    typedef enum { CONSUME_FROM_BEGINNING, CONSUME_FROM_END } ConsumeFromMode;
     // Takes a shared PgCluster reference — the cluster must outlive this object.
     explicit PgMessaging(PgCluster& cluster);
     ~PgMessaging();
@@ -139,7 +141,11 @@ public:
     void commit_offset(const std::string& consumer_name,
                        const std::string& topic,
                        long long          last_id);
-
+    
+    void set_consumer_offset(const std::string& consumer_name,
+                             const std::string& topic,
+                             ConsumeFromMode mode);
+    
     // --- Consumer reads (read → replica) ------------------------------------
     long long            get_offset(const std::string& consumer_name,
                                     const std::string& topic);

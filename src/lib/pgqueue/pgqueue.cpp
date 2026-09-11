@@ -113,6 +113,11 @@ void PgCluster::probe_locked() {
   probed_at_ = std::chrono::steady_clock::now();
 }
 
+bool PgCluster::connected() const {
+  std::lock_guard<std::mutex> lk(mu_);
+  return !nodes_.empty();
+}
+
 void PgCluster::reprobe() {
   std::lock_guard<std::mutex> lk(mu_);
   probe_locked();
@@ -212,7 +217,7 @@ void check_result(ResultGuard &g, ExecStatusType expected,
   try{
     check_result_raw(g.res, expected, ctx);
   } catch (const std::exception &e) {
-    std::cerr << "ERROR PgMessaging: " << ctx << ": unexpected result status" << std::endl;
+    std::cerr << "ERROR PgMessaging: " << ctx << ": unexpected result status. What: " << e.what() << std::endl;
     g.res=nullptr;
     throw;
   }
@@ -295,19 +300,31 @@ void PgMessaging::prepare_primary_stmts() {
         ON CONFLICT (consumer_name, topic) DO NOTHING
     )");
 
-  prepare(primaryCon_, "commit_offset", R"(
+  prepare(primaryCon_, "commit_offset", std::format(R"(
         UPDATE consumer_offsets
         SET last_id = $3, updated_at = now()
-        WHERE consumer_name = $1 AND topic = $2
-    )");
+        WHERE consumer_name = $1 AND topic = $2 AND tblname = '{0}'
+    )", msgTbl_).c_str());
+
+  prepare(primaryCon_, "set_offset_at_beginning", std::format(R"(
+        UPDATE consumer_offsets
+        SET last_id = (SELECT COALESCE(MIN(id), 0) FROM {0}), updated_at = now()
+        WHERE consumer_name = $1 AND topic = $2 AND tblname = '{0}'
+    )", msgTbl_).c_str());
+
+  prepare(primaryCon_, "set_offset_at_end", std::format(R"(
+        UPDATE consumer_offsets
+        SET last_id = (SELECT COALESCE(MAX(id), 0) FROM {0}), updated_at = now()
+        WHERE consumer_name = $1 AND topic = $2 AND tblname = '{0}'
+    )", msgTbl_).c_str());
 }
 
 void PgMessaging::prepare_replica_stmts() {
   // Statements that only read — executed on replica_.
-  prepare(replicaCon_, "get_offset", R"(
+  prepare(replicaCon_, "get_offset", std::format(R"(
         SELECT last_id FROM consumer_offsets
-        WHERE consumer_name = $1 AND topic = $2
-    )");
+        WHERE consumer_name = $1 AND topic = $2 AND tblname = '{0}'
+    )", msgTbl_).c_str());
 
   prepare(replicaCon_, "poll", std::format(R"(
         SELECT id, topic, data, created_at
@@ -322,7 +339,7 @@ void PgMessaging::prepare_replica_stmts() {
         SELECT COALESCE(MAX(m.id), 0) - co.last_id AS lag
         FROM consumer_offsets co
         LEFT JOIN {0} m ON m.topic = co.topic
-        WHERE co.consumer_name = $1 AND co.topic = $2
+        WHERE co.consumer_name = $1 AND co.topic = $2 AND co.tblname = '{0}'
         GROUP BY co.last_id
     )", msgTbl_).c_str());
 
@@ -413,6 +430,24 @@ void PgMessaging::commit_offset(const std::string &consumer_name,
       PQexecPrepared(static_cast<PGconn*>(primaryCon_), "commit_offset", 3, p, nullptr, nullptr, 0));
   check_command(g, "commit_offset");
 }
+
+void PgMessaging::set_consumer_offset(const std::string& consumer_name,
+                                      const std::string& topic,
+                                      ConsumeFromMode mode) {
+  const char *p[] = {consumer_name.c_str(), topic.c_str()};
+  
+  if (mode == CONSUME_FROM_BEGINNING) {
+    ResultGuard g(PQexecPrepared(static_cast<PGconn*>(primaryCon_), "set_offset_at_beginning", 2, p, nullptr, nullptr, 0));
+    check_command(g, "set_offset_at_beginning");
+  } else if (mode == CONSUME_FROM_END) {
+    ResultGuard g(PQexecPrepared(static_cast<PGconn*>(primaryCon_), "set_offset_at_end", 2, p, nullptr, nullptr, 0));
+    check_command(g, "set_offset_at_end");
+  } else {
+    throw std::invalid_argument("Invalid ConsumeFromMode");
+  }
+}
+
+
 
 // ===========================================================================
 // PgMessaging — Consumer reads (replica)

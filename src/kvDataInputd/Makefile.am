@@ -37,7 +37,6 @@ kvDataInputd_CPPFLAGS = $(AM_CPPFLAGS) $(libxmlpp_CFLAGS) $(postgresql_CFLAGS)
 kvDataInputd_LDFLAGS = \
    -pthread -export-dynamic \
    -R "$(pkglibdir)/lib" \
-   -R "$(rdkafka_LIBDIR)" \
    -R "$(libhttpserver_LIBDIR)" \
    -R "/usr/local/lib"
 
@@ -61,7 +60,6 @@ kvDataInputd_LDADD = \
    $(omniORB4_LIBS) \
    -lhttpserver \
    $(libhttpserver_LIBS) \
-   $(rdkafka_LIBS) \
    -ldl
 
 #if HAVE_GMOCK

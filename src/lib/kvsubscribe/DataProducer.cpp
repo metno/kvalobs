@@ -28,7 +28,6 @@
  */
 
 #include "DataProducer.h"
-#include "KafkaProducer.h"
 #include "queue.h"
 #include <decodeutility/kvalobsdata.h>
 #include <decodeutility/kvalobsdataserializer.h>
@@ -38,14 +37,6 @@ namespace subscribe {
 
 DataProducer::DataProducer(Producer *producer)
     : producer_(producer) {
-}
-    
-DataProducer::DataProducer(const std::string & domain,
-                           const std::string & brokers,
-                           Producer::ErrorHandler onFailedDelivery,
-                           Producer::SuccessHandler onSuccessfulDelivery)
-    : producer_(new KafkaProducer(queue::checked(domain), brokers, onFailedDelivery,
-                                  onSuccessfulDelivery)) {
 }
 
 DataProducer::~DataProducer() {

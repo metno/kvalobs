@@ -47,6 +47,10 @@ PublishDataCommand::PublishDataCommand(const kvalobs::serialize::KvalobsData &pu
   }
 }
 
+const std::string PublishDataCommand::name() const {
+  return std::string("PublishDataCommand");
+}
+
 const char *PublishDataCommand::getData(unsigned int *size) const {
   *size = data.size();
   return data.data();

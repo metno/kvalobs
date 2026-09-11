@@ -28,9 +28,7 @@
  */
 
 #include "Producer.h"
-#include "KafkaConfig.h"
 #include <iostream>
-#include <librdkafka/rdkafkacpp.h>
 
 namespace kvalobs {
 namespace subscribe {

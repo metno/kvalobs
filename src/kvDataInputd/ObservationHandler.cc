@@ -59,11 +59,9 @@ int HttpInternalServerError=http_utils::http_internal_server_error;
 
 ObservationHandler::ObservationHandler(
   DataSrcApp &app, 
-  kvalobs::service::ProducerQuePtr raw,
   kvalobs::service::ProducerQuePtr pgRaw
 ): app(app),
    serialNumber(0),
-   rawQue(raw),
    pgRawQue(pgRaw) {
 }
 
@@ -158,33 +156,23 @@ ObservationHandler::Observation ObservationHandler::getObservation(const httpser
 }
 
 void ObservationHandler::postOnRawQue(const std::string &rawData) {
-  if (rawData.empty() || (app.kafkaEnabled() == false && app.pgQueueEnabled() == false)) {
+  if (rawData.empty() || !app.pgQueueEnabled()) {
     return;
   }
-
-  std::unique_ptr<RawDataCommand> data;
-
-  if( app.kafkaEnabled() ) {
-    data.reset(new RawDataCommand(rawData));
+  
+  try {
+    // Ownership is transferred to the producer thread via the queue; it
+    // deletes the command once it has been sent (or on drain/shutdown).
+    RawDataCommand *data = new RawDataCommand(rawData);
     try {
-      rawQue->timedAdd(data.get(), std::chrono::seconds(4), true);
-      data.release();
-    } catch (std::exception &ex) {
-      LOGWARN("Unable to post data to the raw kafka queue.\nReason: " << ex.what() <<"\n"<< rawData);
+      pgRawQue->timedAdd(data, std::chrono::seconds(4), true);
+    } catch (...) {
+      delete data;
+      throw;
     }
+  } catch (std::exception &ex) {
+    LOGWARN("Unable to post data to the raw queue.\nReason: " << ex.what() <<"\n"<< rawData);
   }
-
-  if( app.pgQueueEnabled() ) {
-    data.reset(new RawDataCommand(rawData));
-
-    try {
-      pgRawQue->timedAdd(data.get(), std::chrono::seconds(4), true);
-      data.release();
-    } catch (std::exception &ex) {
-      LOGWARN("Unable to post data to the raw kafka queue.\nReason: " << ex.what() <<"\n"<< rawData);
-    }
-  }
-
 }
 
 unsigned long long ObservationHandler::getSerialNumber() {

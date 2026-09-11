@@ -13,10 +13,7 @@ libkvalobs_kvsubscribe_la_SOURCES = \
   Producer.cpp \
 	queue.cpp \
 	Consumer.cpp \
-	KafkaConfig.cpp \
-	KafkaConsumer.cpp \
 	DataSubscriber.cpp \
-	KafkaProducer.cpp \
 	PgProducer.cpp \
 	DataProducer.cpp \
 	HttpSendData.cc \
@@ -44,18 +41,14 @@ kvsubscribeinclude_HEADERS = \
 	Producer.h \
 	queue.h \
 	Consumer.h \
-	KafkaConsumer.h \
 	DataSubscriber.h \
-	KafkaProducer.h \
 	PgProducer.h \
 	DataProducer.h \
 	HttpSendData.h \
 	SendData.h \
 	ProducerCommand.h \
 	ProducerThread.h \
-	KafkaProducerThread.h \
 	KvDataSerializeCommand.h \
-	KafkaConfig.h \
 	creategroupid.h
 
 pkgconfigdir = $(libdir)/pkgconfig

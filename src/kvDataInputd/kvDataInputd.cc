@@ -119,7 +119,7 @@ int main(int argn, char **argv) {
     app.deletePidFile();
     return 2;
   }
-  ObservationHandler observationHandler(app, app.getRawQueue(), app.getPgRawQueue());
+  ObservationHandler observationHandler(app, app.getPgRawQueue());
   HttpConfig httpConfig = app.getHttpConfig();
 
   httpserver::webserver ws =

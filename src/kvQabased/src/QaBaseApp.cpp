@@ -30,7 +30,6 @@
 #include "QaBaseApp.h"
 #include <string>
 #include "kvalobs/kvPath.h"
-#include "kvsubscribe/KafkaProducer.h"
 #include "kvsubscribe/queue.h"
 #include "miconfparser/miconfparser.h"
 #include "DataProcessor.h"

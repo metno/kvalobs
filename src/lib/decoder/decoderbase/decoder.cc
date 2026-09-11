@@ -74,28 +74,28 @@ namespace {
 /**
  * Sort in lists where each elements in the lists have the same stationid, typeid and obstime.
  */
-std::list<std::list<kvalobs::kvData>> collate(const std::list<kvalobs::kvData> &data) {
-  namespace pt = boost::posix_time;
-  using std::map;
-  using std::list;
-  using kvalobs::kvData;
+// std::list<std::list<kvalobs::kvData>> collate(const std::list<kvalobs::kvData> &data) {
+//   namespace pt = boost::posix_time;
+//   using std::map;
+//   using std::list;
+//   using kvalobs::kvData;
 
-  map<long, map<long, map<pt::ptime, list<kvData>>> > collated;
-  list<list<kvData>> ret;
+//   map<long, map<long, map<pt::ptime, list<kvData>>> > collated;
+//   list<list<kvData>> ret;
 
-  for (auto &d : data) {
-    collated[d.stationID()][d.typeID()][d.obstime()].push_back(d);
-  }
+//   for (auto &d : data) {
+//     collated[d.stationID()][d.typeID()][d.obstime()].push_back(d);
+//   }
 
-  for (auto &sid : collated) {
-    for (auto &tid : sid.second) {
-      for (auto &obst : tid.second) {
-        ret.push_back(std::move(obst.second));
-      }
-    }
-  }
-  return ret;
-}
+//   for (auto &sid : collated) {
+//     for (auto &tid : sid.second) {
+//       for (auto &obst : tid.second) {
+//         ret.push_back(std::move(obst.second));
+//       }
+//     }
+//   }
+//   return ret;
+// }
 }  // namespace
 
 namespace kvdatainput {
@@ -162,14 +162,14 @@ std::ostream& kvalobs::decoder::operator<<(std::ostream& os, const kvalobs::deco
 kvalobs::decoder::DecoderBase::DecoderBase(dnmi::db::Connection &con_, const ParamList &params, const std::list<kvalobs::kvTypes> &typeList_,
                                            const std::string &obsType_, const std::string &obs_, int decoderId_)
     : decoderId(decoderId_),
+      theKvConf(0),
+      filters( new StationFilters() ),
+      useQaId_(-1),
       con(con_),
       paramList(params),
       typeList(typeList_),
       obsType(obsType_),
-      obs(obs_),
-      theKvConf(0),
-      filters( new StationFilters() ),
-      useQaId_(-1){
+      obs(obs_){
 }
 
 kvalobs::decoder::DecoderBase::~DecoderBase() {
@@ -423,7 +423,7 @@ long kvalobs::decoder::DecoderBase::getStationId(const std::string &key, const s
 
     if (res) {
       if (res->hasNext()) {
-        db::DRow row = res->next();
+        db::DRow &row = res->next();
         stationId = atol(row[0].c_str());
       }
       delete res;
@@ -592,7 +592,7 @@ bool kvalobs::decoder::DecoderBase::isTextParam(int paramid) {
   return decodeutility::isTextParam(paramid, paramList);
 }
 
-bool kvalobs::decoder::DecoderBase::loadConf(int sid, int tid, kvalobs::decoder::ConfParser &parser) {
+bool kvalobs::decoder::DecoderBase::loadConf(int , int , kvalobs::decoder::ConfParser &parser) {
   namespace c = miutil::conf;
   c::ConfParser myparser;
   ostringstream fnames;
@@ -858,7 +858,6 @@ void kvalobs::decoder::DecoderBase::loglevel(const std::string &logname, milog::
 
 milog::LogLevel kvalobs::decoder::DecoderBase::getConfLoglevel() const {
   string sectionName;
-  milog::LogLevel ll = milog::NOTSET;
 
   if (!theKvConf)
     return milog::DEBUG;

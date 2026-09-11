@@ -28,7 +28,6 @@
  */
 
 #include "lib/kvsubscribe/ProducerThread.h"
-#include "lib/kvsubscribe/KafkaProducer.h"
 #include "lib/kvsubscribe/Producer.h"
 #include "lib/kvsubscribe/messageid.h"
 #include "lib/milog/milog.h"
@@ -93,7 +92,7 @@ class Thread {
 
   
   void send(ProducerCommand *cmd) {
-    if (cmd) {
+    if ( cmd ) {
       unsigned int size;
       const char *data = cmd->getData(&size);
       if (data && size > 0) {
@@ -119,24 +118,7 @@ class Thread {
   }
 
 public:
-  Thread(const std::string &myName, const string &brokers,
-              const std::string &topic, shared_ptr<ProducerQue> myQue,
-              shared_ptr<BlockingQueuePtr<std::string>> myStatusQue){
-    producer= new  kvalobs::subscribe::KafkaProducer(
-            topic, brokers,
-            [this](kvalobs::subscribe::MessageId msgId, const std::string &data,
-                   const std::string &errorMessage) {
-              onError(msgId, data, errorMessage);
-            },
-            [this](kvalobs::subscribe::MessageId msgId, const std::string &data) {
-              onSuccess(msgId, data);
-            });
-        que=myQue; 
-        statusQue=myStatusQue;
-        name=myName;
-      }
-
-    Thread(kvalobs::subscribe::Producer *myProducer, const std::string &myName, 
+  Thread(kvalobs::subscribe::Producer *myProducer, const std::string &myName, 
        shared_ptr<ProducerQue> myQue,
        shared_ptr<BlockingQueuePtr<std::string>> myStatusQue)
     {
@@ -194,27 +176,16 @@ public:
     while (running) {
       try {
         producer->catchup(0);
-        send(que->timedGet(std::chrono::milliseconds(500), false));
+        ProducerCommand *cmd = que->timedGet(std::chrono::milliseconds(500), false);
+        if( cmd != nullptr ) {
+          send(cmd);
+        }
       } catch (const miutil::concurrent::QueueSuspended &ex) {
         running = false;
       } catch (const std::exception &ex) {
       }
     }
     drainQue();
-  }
-
-  static void startKafka(const std::string &name, const std::string &brokers,
-                    const std::string &topic, ProducerQuePtr que,
-                    shared_ptr<BlockingQueuePtr<std::string>> statusQue) {
-    try {
-      Thread myThread(name, brokers, topic, que, statusQue);
-      statusQue->add(new std::string("<STARTED>"));
-      myThread.run();
-      statusQue->add(new std::string("<EXIT>"));
-    } catch (const std::exception &ex) {
-      // Constructor failure
-      statusQue->add(new std::string(ex.what()));
-    }
   }
 
   static void startProducer( 
@@ -262,18 +233,6 @@ void ProducerThread::send(ProducerCommand *cmd) {
   try {
     queue->add(cmd);
   } catch (const std::exception &ex) {
-  }
-}
-
-void ProducerThread::start(const std::string &brokers,
-                                const std::string &topic) {
-  producerThread = thread(Thread::startKafka, name, brokers, topic, queue, statusQue);
-  string *res = statusQue->get();
-  if (*res == "<STARTED>") {
-    LOGINFO("KafkaProducerThread: " << name << ": started.");
-    return;
-  } else {
-    throw std::runtime_error(name + ": " + *res);
   }
 }
 

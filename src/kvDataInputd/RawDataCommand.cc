@@ -37,6 +37,10 @@ RawDataCommand::RawDataCommand(const std::string &rawData)
   setObstime(boost::posix_time::ptime());
 }
 
+const std::string RawDataCommand::name() const {
+  return std::string("RawDataCommand");
+}
+
 const char *RawDataCommand::getData(unsigned int *size) const {
   *size = data.size();
   return data.data();

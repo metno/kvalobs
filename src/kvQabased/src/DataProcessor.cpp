@@ -31,7 +31,6 @@
 #include "db/returntypes/Observation.h"
 #include "CheckRunner.h"
 #include "QaBaseApp.h"
-#include "kvsubscribe/KafkaProducer.h"
 #include "decodeutility/kvalobsdataserializer.h"
 #include "decodeutility/kvalobsdataparser.h"
 #include "decodeutility/kvalobsdata.h"

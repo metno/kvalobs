@@ -56,7 +56,8 @@ class RawDataCommand : public kvalobs::service::ProducerCommand {
   explicit RawDataCommand(const std::string &rawData);
   explicit RawDataCommand(const kvalobs::serialize::KvalobsData &kvalobsData);
 
-  const char *getData(unsigned int *size) const;
+  virtual const std::string name() const override;
+  virtual const  char *getData(unsigned int *size) const override;
   virtual void onSend(kvalobs::subscribe::MessageId msgId, const std::string &threadName);
   virtual void onSuccess(kvalobs::subscribe::MessageId msgId, const std::string &threadName, const std::string &data);
   virtual void onError(kvalobs::subscribe::MessageId msgId, const std::string &threadName, const std::string & data,

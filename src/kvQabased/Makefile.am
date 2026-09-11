@@ -6,7 +6,6 @@ AM_CPPFLAGS = \
 	-I$(top_builddir)/src/lib \
 	-I$(top_builddir)/src/lib/kvskel \
 	$(libxmlpp_CFLAGS) \
-	$(rdkafka_CFLAGS) \
 	$(BOOST_CPPFLAGS) \
 	$(perl_CFLAGS)
 
@@ -33,7 +32,6 @@ AM_LDFLAGS = \
 	$(BOOST_REGEX_LIB) \
 	$(BOOST_THREAD_LIB) $(BOOST_DATE_TIME_LIB) -lboost_system \
 	$(omniORB4_LIBS) \
-	$(rdkafka_LIBS) \
 	$(perl_LIBS)
 
 qabase_src_SOURCES =

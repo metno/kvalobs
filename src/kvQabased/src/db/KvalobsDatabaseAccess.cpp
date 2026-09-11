@@ -376,7 +376,7 @@ KvalobsDatabaseAccess::getObservation(const kvalobs::kvStationInfo &si) const {
   // Observation(long long id, int stationid, int type, const
   // boost::posix_time::ptime & obstime, const boost::posix_time::ptime &
   // tbtime)
-  auto row = result->next();
+  auto &row = result->next();
   auto id = boost::lexical_cast<long long>(row[0]);
   auto stationid = boost::lexical_cast<int>(row[1]);
   auto type = boost::lexical_cast<int>(row[2]);
@@ -509,7 +509,7 @@ void KvalobsDatabaseAccess::getData(
 
   db::DatabaseAccess::DataList data;
   while (result->hasNext()) {
-    auto r = result->next();
+    auto &r = result->next();
     kvalobs::kvData d = kvDataFromRow(r);
     long long obsid = boost::lexical_cast<long long>(r[12]);
     storeFetched(obsid, d);
@@ -544,7 +544,7 @@ bool KvalobsDatabaseAccess::pin(const qabase::Observation &obs) const {
     return false;
 
   while (result->hasNext()) {
-    auto r = result->next();
+    auto &r = result->next();
     kvalobs::kvData d = kvDataFromRow(r);
     long long obsid = boost::lexical_cast<long long>(r[12]);
     storeFetched(obsid, d);
@@ -585,7 +585,7 @@ void KvalobsDatabaseAccess::getTextData(
 
   db::DatabaseAccess::TextDataList data;
   while (result->hasNext()) {
-    auto r = result->next();
+    auto & r = result->next();
     kvalobs::kvTextData d = kvTextDataFromRow(r);
     long long obsid = boost::lexical_cast<long long>(r[6]);
     storeFetched(obsid, d);
@@ -817,7 +817,7 @@ KvalobsDatabaseAccess::newObservation(std::unique_ptr<dnmi::db::Result> &r) {
   }
 
   while (r->hasNext()) {
-    auto row = r->next();
+    auto &row = r->next();
     long long observationid = boost::lexical_cast<long long>(row[0]);
     int station = boost::lexical_cast<int>(row[1]);
     int type = boost::lexical_cast<int>(row[2]);
@@ -881,7 +881,7 @@ KvalobsDatabaseAccess::selectDataForControl(int limit) {
     if (needOwnTransaction)
       connection_->commit();
 
-    auto p = (*obs.begin())->id();
+    //auto p = (*obs.begin())->id();
 
     if (obs.size() == 1) {
       LOGINFO("Selected for control "
@@ -895,10 +895,10 @@ KvalobsDatabaseAccess::selectDataForControl(int limit) {
       log << "Selected for control " << whichSelect << ": #observations "
           << obs.size() << "\n";
       for (auto a : obs) {
-        log << (*obs.begin())->stationID() << "/" << (*obs.begin())->typeID()
-            << "/" << pt::to_kvalobs_string((*obs.begin())->obstime()) << "/"
-            << pt::to_kvalobs_string((*obs.begin())->tbtime()) << " ("
-            << (*obs.begin())->id() << ")";
+        log << a->stationID() << "/" << a->typeID()
+            << "/" << pt::to_kvalobs_string(a->obstime()) << "/"
+            << pt::to_kvalobs_string(a->tbtime()) << " ("
+            << a->id() << ")\n";
       }
       LOGINFO(log.str());
     }
@@ -929,9 +929,18 @@ void KvalobsDatabaseAccess::markProcessDone(const qabase::Observation &obs) {
 dnmi::db::Connection *
 KvalobsDatabaseAccess::createConnection(const std::string &databaseConnect) {
   static std::string driverId;
+  std::string kvlibdir=kvalobs::kvPath(kvalobs::pkglibdir);
+
+  if (const char *envKvlibdir = getenv("KVLIBDIR")) {
+    kvlibdir = envKvlibdir;
+  }
+
+  if( !kvlibdir.empty() && kvlibdir.back() != '/') {
+    kvlibdir += '/';
+  }
+
   if (driverId.empty()) {
-    std::string driver =
-        kvalobs::kvPath(kvalobs::pkglibdir) + "/db/pgdriver.so";
+    std::string driver = kvlibdir + "db/pgdriver.so";
 
     if (!dnmi::db::DriverManager::loadDriver(driver, driverId))
       throw std::runtime_error("Unable to load driver " + driver);

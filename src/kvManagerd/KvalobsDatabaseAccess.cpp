@@ -51,9 +51,19 @@ namespace {
 
 dnmi::db::Connection *createConnection(const std::string &databaseConnect) {
   static std::string driverId;
+  std::string kvlibdir=kvalobs::kvPath(kvalobs::pkglibdir);
+
+  if( const char* env_p = std::getenv("KVLIBDIR")) {
+    kvlibdir = env_p;
+  }
+
+  if (!kvlibdir.empty() && kvlibdir.back() != '/') {
+    kvlibdir += '/';
+  }
+
   if (driverId.empty()) {
     std::string driver =
-        kvalobs::kvPath(kvalobs::pkglibdir) + "/db/pgdriver.so";
+        kvlibdir + "db/pgdriver.so";
     if (!dnmi::db::DriverManager::loadDriver(driver, driverId))
       throw std::runtime_error("Unable to load driver " + driver);
   }
@@ -105,7 +115,7 @@ KvalobsDatabaseAccess::Time KvalobsDatabaseAccess::lastFindAllMissingRuntime() {
                       "key='LastMissingRun'";
   ResultPtr r = exec_(query);
   if (r->hasNext()) {
-    DRow row = r->next();
+    DRow &row = r->next();
     try {
       Time last = boost::posix_time::time_from_string(row[0]);
       return ptime(last.date(),

@@ -30,7 +30,6 @@
 #ifndef SRC_KVQABASED_SRC_QABASEAPP_H_
 #define SRC_KVQABASED_SRC_QABASEAPP_H_
 
-#include <kvsubscribe/KafkaConfig.h>
 #include <kvsubscribe/PgProducer.h>
 #include <kvsubscribe/queue.h>
 #include <kvalobs/kvbaseapp.h>

@@ -31,7 +31,6 @@
 #define SRC_KVQABASED_SRC_DATAPROCESSOR_H_
 
 #include "LogFileCreator.h"
-#include "kvsubscribe/KafkaProducer.h"
 #include "kvsubscribe/PgProducer.h"
 #include <memory>
 #include <string>

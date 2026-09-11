@@ -42,12 +42,7 @@ namespace subscribe {
 class DataProducer {
  public:
   DataProducer(Producer *producer);
-  DataProducer(const std::string & domain, const std::string & brokers =
-                   "localhost",
-               kvalobs::subscribe::Producer::ErrorHandler onFailedDelivery =
-                   [](MessageId, const std::string &, const std::string &) {},
-               kvalobs::subscribe::Producer::SuccessHandler onSuccessfulDelivery =
-                   [](MessageId, const std::string &) {});
+  
   ~DataProducer();
 
   MessageId send(const serialize::KvalobsData & data);
