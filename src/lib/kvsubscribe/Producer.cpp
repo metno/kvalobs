@@ -29,6 +29,7 @@
 
 #include "Producer.h"
 #include <iostream>
+#include <algorithm>
 
 namespace kvalobs {
 namespace subscribe {
