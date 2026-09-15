@@ -8,7 +8,8 @@ SUBDIRS = \
 	script \
 	tools/kv2kvparser \
 	tools/aexecd \
-	tools/kvpull
+	tools/kvpull\
+	service-libs	
 
 #tools/kv2kvDataInputd 
 #service-libs 

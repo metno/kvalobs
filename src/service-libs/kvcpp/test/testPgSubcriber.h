@@ -29,8 +29,8 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef SRC_SERVICE_LIBS_KVCPP_TEST_TESTKAFKASUBCRIBER_H_
-#define SRC_SERVICE_LIBS_KVCPP_TEST_TESTKAFKASUBCRIBER_H_
+#ifndef SRC_SERVICE_LIBS_KVCPP_TEST_TESTPGSUBCRIBER_H_
+#define SRC_SERVICE_LIBS_KVCPP_TEST_TESTPGSUBCRIBER_H_
 
 #include "lib/dnmithread/CommandQue.h"
 #include "lib/decodeutility/kvalobsdata.h"
@@ -47,14 +47,14 @@
 
 
 namespace kvservice {
-namespace kafka {
+namespace pg {
 namespace test {
 void broadcast(const ::kvalobs::serialize::KvalobsData & d,
                const KvDataSubscribeInfoHelper &info,
                dnmi::thread::CommandQue & queue);
 }  // namespace test
-}  // namespace kafka
+}  // namespace pg
 }  // namespace kvservice
 
 
-#endif  // SRC_SERVICE_LIBS_KVCPP_TEST_TESTKAFKASUBCRIBER_H_
+#endif  // SRC_SERVICE_LIBS_KVCPP_TEST_TESTPGSUBCRIBER_H_

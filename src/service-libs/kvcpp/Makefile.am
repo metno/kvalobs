@@ -1,5 +1,5 @@
 pkglibdir = $(libdir)/@PACKAGE_NAME@@KVALOBSLIBS_BIN_VERSION@
-SUBDIRS = corba sql kafka mock
+SUBDIRS = corba sql pgqueue mock
 
 lib_LTLIBRARIES = libkvalobs_kvcpp.la
 
@@ -43,7 +43,7 @@ libkvalobs_kvcpp_la_LDFLAGS= \
 	-R "$(pkglibdir)/lib"
 
 libkvalobs_kvcpp_la_LIBADD = \
-	$(top_builddir)/src/service-libs/kvcpp/kafka/libkafkakvapp.la \
+	$(top_builddir)/src/service-libs/kvcpp/pgqueue/libpgkvapp.la \
 	$(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
 	$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
 	$(top_builddir)/src/lib/fileutil/libkvalobs_fileutil.la \
@@ -54,8 +54,8 @@ libkvalobs_kvcpp_la_LIBADD = \
 	$(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la \
 	$(top_builddir)/src/lib/kvskel/libkvalobs_kvskel.la \
 	$(top_builddir)/src/lib/kvdb/libkvalobs_kvdb.la \
+	$(top_builddir)/src/lib/pgqueue/libkvalobs_pgqueue.la \
 	$(top_builddir)/src/lib/kvsubscribe/libkvalobs_kvsubscribe.la \
-	$(rdkafka_LIBS) \
 	@BOOST_FILESYSTEM_LIB@
 
 AM_CPPFLAGS = \
@@ -65,7 +65,6 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/src/service-libs \
 	-I$(top_builddir)/src/lib \
 	-I$(top_builddir)/src/lib/kvskel \
-	$(rdkafka_CFLAGS) \
 	$(omniORB4_CFLAGS) \
 	$(putools_CFLAGS)
 
@@ -85,6 +84,8 @@ $(pkgconfig_DATA): $(top_builddir)/config.status
 # 	$(top_builddir)/src/lib/kvalobs/libkvalobs_kvalobs.la \
 # 	$(top_builddir)/src/lib/dnmithread/libkvalobs_dnmithread.la \
 # 	$(top_builddir)/src/lib/milog/libkvalobs_milog.la \
+# 	$(top_builddir)/src/lib/pgqueue/libkvalobs_pgqueue.la \
+# 	$(top_builddir)/src/service-libs/kvcpp/pgqueue/libpgkvapp.la \
 # 	-lboost_system -lboost_timer -lomniDynamic4 -lomniORB4 -lomnithread \
 # 	-R "$(rdkafka_LIBDIR)"
 

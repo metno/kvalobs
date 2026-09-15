@@ -72,6 +72,7 @@ AC_CONFIG_FILES([Makefile
                  src/service-libs/kvcpp/Makefile
                  src/service-libs/kvcpp/corba/Makefile
                  src/service-libs/kvcpp/sql/Makefile
+                 src/service-libs/kvcpp/pgqueue/Makefile
                  src/service-libs/kvcpp/kafka/Makefile
                  src/service-libs/kvcpp/mock/Makefile
                  src/kvDataInputd/Makefile

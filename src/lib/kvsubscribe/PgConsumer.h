@@ -27,9 +27,11 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef __CONSUMER_H__
-#define __CONSUMER_H__
+#ifndef __PGCONSUMER_H__
+#define __PGCONSUMER_H__
 
+#include "Consumer.h"
+#include "lib/pgqueue/pgqueue.h"
 #include <functional>
 #include <list>
 #include <memory>
@@ -39,20 +41,6 @@
 namespace kvalobs {
 namespace subscribe {
 
-class ConsumerDataHandler {
-public:
-  virtual ~ConsumerDataHandler() {}
-  /**
-   * Process incoming data
-   */
-  virtual void data(const char *msg, unsigned length) = 0;
-
-  /**
-   * Handle errors on message arrival.
-   */
-  virtual void error(int code, const std::string &msg) = 0;
-};
-
 /**
  * Base class for subscribing to data from kvalobs.
  *
@@ -60,33 +48,27 @@ public:
  * methods data(...) and error(...) will be called as appropriate by this
  * class' event loop.
  */
-class Consumer {
+class PgConsumer : public kvalobs::subscribe::Consumer {
 public:
-  Consumer(const std::string &topic, const std::string &groupId,
-           ConsumerDataHandler *handler);
-  Consumer(const std::string &topic, const std::string &groupId);
+  // topic must be a valid kvalobs topic string.
+  //  "kvalobs.<env>.<checked|raw>" where env must start with one of
+  //  "production", "staging" or "development" env may be "productionN", where N
+  //  is a number indicating a specific production environment. Same for
+  //  "stagingN" and "developmentN" Example: "kvalobs.production.checked",
+  //  "kvalobs.staging.checked" or "kvalobs.production.raw"
+  // throws std::invalid_argument if no connections are provided or topic is
+  // invalid throws std::runtime_error if PgCluster instance creation fails
+  PgConsumer(const std::vector<std::string> &connections,
+             const std::string &topic, const std::string &groupId,
+             kvalobs::subscribe::ConsumerDataHandler *handler,
+             int pollSize = 100);
+  PgConsumer(const std::vector<std::string> &connections,
+             const std::string &topic, const std::string &groupId,
+             int pollSize = 100);
 
-  virtual ~Consumer();
+  virtual ~PgConsumer();
 
-  /**
-   * Set the data handler for this consumer.
-   *
-   * @param handler The new data handler to use
-   * @return The previous data handler
-   */
-  ConsumerDataHandler *setHandler(ConsumerDataHandler *handler);
-  ConsumerDataHandler *getHandler() const;
-
-  std::string getTopic() const;
-
-  /**
-   * Run until stop() has been called, processing events, calling data(...)
-   * and error(...) as appropriate.
-   *
-   * It may make sense to run this in a std::thread
-   */
-  virtual void run();
-
+  std::string getTopicLowpri() const;
   /**
    * Process one message, waiting maximum for the given time if no messages are
    * available.
@@ -94,41 +76,28 @@ public:
    * Must call handleData(...) or handleError(...) as appropriate.
    *
    */
-  virtual void runOnce(unsigned timeoutInMilliSeconds) = 0;
+  virtual void runOnce(unsigned timeoutInMilliSeconds) override;
 
   /**
    * Has stop() been called?
    */
-  virtual bool stopping() const = 0;
+  virtual bool stopping() const override;
 
   /**
    * Stop this consumer.
    */
-  virtual void stop() = 0;
-
-  /**
-   * call stop() an all consumers
-   */
-  static void stopAll();
+  virtual void stop() override;
 
 protected:
-  /**
-   * Process one message, waiting maximum for the given time if no messages are
-   * available.
-   *
-   * Must call handleData(...) or handleError(...) as appropriate.
-   *
-   */
-
-  void handleData(const char *msg, unsigned length);
-  void handleError(int code, const std::string &msg);
-  static void remove(Consumer *consumer);
-
-private:
-  ConsumerDataHandler *handler_;
-  std::string topic_;
+  std::unique_ptr<PgCluster> pgCluster_;
+  std::unique_ptr<PgMessaging> pgMessaging_;
+  int backOffInSeconds_;
   std::string groupId_;
-  static std::list<Consumer *> allConsumers_;
+  bool stopping_;
+  int pollSize_;
+
+  void init(const std::vector<std::string> &connections,
+            const std::string &topic, const std::string &groupId);
 };
 
 } // namespace subscribe

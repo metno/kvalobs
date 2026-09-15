@@ -1,7 +1,7 @@
 /*
  Kvalobs - Free Quality Control Software for Meteorological Observations
 
- Copyright (C) 2015 met.no
+ Copyright (C) 2016 met.no
 
  Contact information:
  Norwegian Meteorological Institute
@@ -25,43 +25,22 @@
  You should have received a copy of the GNU General Public License along
  with KVALOBS; if not, write to the Free Software Foundation Inc.,
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ */
 
+#include "lib/kvsubscribe/creategroupid.h"
+#include "../KvApp.h"
 #include "creategroupid.h"
-#include "lib/miutil/gethostname.h"
-#include "lib/miutil/getusername.h"
-#include <errno.h>
-#include <sstream>
-#include <unistd.h>
 
-#ifdef _GNU_SOURCE
-extern char *program_invocation_short_name;
-const char *groupid_Progname_ = program_invocation_short_name;
-#else
-extern char *__progname;
-const char *const char *groupid_Progname_ = __progname;
-#endif
+namespace kvservice {
+namespace pg {
 
-namespace kvalobs {
-namespace subscribe {
-
-std::string createConsumerGroupId(const std::string &prefix_) {
-  std::string prefix;
-  auto hostname = miutil::getHostname();
-  auto username = miutil::getUsername();
-  auto hostid = gethostid();
-
-  if (!prefix_.empty()) {
-    prefix = prefix_ + "_";
-  } else if (groupid_Progname_) {
-    prefix = groupid_Progname_;
+std::string createConsumerGroupId(const std::string &appName_) {
+  auto appName(appName_);
+  if (appName.empty()) {
+    appName = KvApp::appName;
   }
-
-  std::ostringstream ost;
-
-  ost << prefix << hostname << "_" << username << "_" << std::hex << hostid;
-  return ost.str();
+  return kvalobs::subscribe::createConsumerGroupId(appName);
 }
 
-} // namespace subscribe
-} // namespace kvalobs
+} // namespace pg
+} // namespace kvservice

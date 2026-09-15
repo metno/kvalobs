@@ -113,24 +113,52 @@ void releaseConnection(dnmi::db::Connection * connection) {
   dnmi::db::DriverManager::releaseConnection(connection);
 }
 
-std::string kafkaDomain(int argc, char **argv, std::shared_ptr<miutil::conf::ConfSection> preferredConfig) {
+std::string pgDomain(int argc, char **argv, std::shared_ptr<miutil::conf::ConfSection> preferredConfig) {
   std::shared_ptr<miutil::conf::ConfSection> config = KvApp::getConfiguration(preferredConfig, stem(argv[0]));
-  auto ret = getValue("kafka.domain", config);
-  LOGINFO("kafka.domain: '"<< ret << "'");
+  auto ret = getValue("pgqueue.domain", config);
+  LOGINFO("pgqueue.domain: '"<< ret << "'");
   return ret;
 }
 
-std::string kafkaBrokers(int argc, char ** argv, std::shared_ptr<miutil::conf::ConfSection> preferredConfig) {
+int pgConsumerPollSize(int argc, char **argv, std::shared_ptr<miutil::conf::ConfSection> preferredConfig) {
+  std::shared_ptr<miutil::conf::ConfSection> config = KvApp::getConfiguration(preferredConfig, stem(argv[0]));
+  int ret;
+  try{
+    ret = std::stoi( getValue("pgqueue.consumer_poll_size", config));
+  } catch( const std::exception &) {
+    ret=100;
+  }
+
+  LOGINFO("pgqueue.consumer_poll_size: '"<< ret << "'");
+  return ret;
+}
+
+
+std::vector<std::string> pgConnections(int argc, char ** argv, std::shared_ptr<miutil::conf::ConfSection> preferredConfig) {
   std::shared_ptr<miutil::conf::ConfSection> config = KvApp::getConfiguration(preferredConfig, stem(argv[0]));
 
-  return getValue("kafka.brokers", config);
+  std::vector<std::string> result;
+  try {
+    if (auto val = getValue("pgqueue.database_a", config); !val.empty())
+      result.push_back(val);
+  }
+  catch( const std::exception &) {
+  }
+  try {
+    if (auto val = getValue("pgqueue.database_b", config); !val.empty())
+      result.push_back(val);
+  }
+  catch( const std::exception &) {
+  }
+
+  return result;
 }
 
-}
+} // anonymous namespace
 
 CurrentKvApp::CurrentKvApp(int argc, char ** argv, std::shared_ptr<miutil::conf::ConfSection> preferredConfig)
     : sql::SqlGet(connector(argc, argv, preferredConfig), releaseConnection),
-      kafka::KafkaSubscribe(kafkaDomain(argc, argv, preferredConfig), kafkaBrokers(argc, argv, preferredConfig)) {
+      pg::PgSubscribe(pgDomain(argc, argv, preferredConfig), pgConnections(argc, argv, preferredConfig), pgConsumerPollSize(argc, argv, preferredConfig)) {
   std::shared_ptr<miutil::conf::ConfSection> conf = KvApp::getConfiguration(preferredConfig, stem(argv[0]));
   sendData_ = std::unique_ptr<kvalobs::datasource::SendData>(new kvalobs::datasource::HttpSendData(*conf));
   // needed for correct handling of CORBA::string_dup, below

@@ -15,6 +15,7 @@ libkvalobs_kvsubscribe_la_SOURCES = \
 	Consumer.cpp \
 	DataSubscriber.cpp \
 	PgProducer.cpp \
+	PgConsumer.cpp \
 	DataProducer.cpp \
 	HttpSendData.cc \
 	SendDataJsonResult.h SendDataJsonResult.cc \
@@ -43,6 +44,7 @@ kvsubscribeinclude_HEADERS = \
 	Consumer.h \
 	DataSubscriber.h \
 	PgProducer.h \
+	PgConsumer.h \
 	DataProducer.h \
 	HttpSendData.h \
 	SendData.h \

@@ -1,7 +1,7 @@
 /*
  Kvalobs - Free Quality Control Software for Meteorological Observations
 
- Copyright (C) 2015 met.no
+ Copyright (C) 2016 met.no
 
  Contact information:
  Norwegian Meteorological Institute
@@ -27,22 +27,17 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef SRC_LIB_KVSUBSCRIBE_CREATE_CONSUMER_GROUP_ID_H_
-#define SRC_LIB_KVSUBSCRIBE_CREATE_CONSUMER_GROUP_ID_H_
+#ifndef SRC_SERVICE_LIBS_KVCPP_KVQUEUE_CREATEGROUPID_H_
+#define SRC_SERVICE_LIBS_KVCPP_KVQUEUE_CREATEGROUPID_H_
 
 #include <string>
 
-namespace kvalobs {
-namespace subscribe {
+namespace kvservice {
+namespace pg {
 
-/**
- * \brief createConsumerGroupId create a reproducible consumer group id.
- * Try to create a reproducible consumer group id. It is created with use of
- * prefix, hostname, username and hostid.
- *
- */
-std::string createConsumerGroupId(const std::string &prefix = "");
+std::string createConsumerGroupId(const std::string &appName = "");
 
-} // namespace subscribe
-} // namespace kvalobs
+}
+} // namespace kvservice
+
 #endif

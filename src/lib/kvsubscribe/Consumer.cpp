@@ -50,8 +50,9 @@ public:
 NullDataHandler nullHandler;
 } // namespace
 
-Consumer::Consumer(const std::string &topic, ConsumerDataHandler *handler)
-    : stopping_(false), handler_(&nullHandler), topic_(topic) {
+Consumer::Consumer(const std::string &topic, const std::string &groupId,
+                   ConsumerDataHandler *handler)
+    : handler_(&nullHandler), topic_(topic), groupId_(groupId) {
   if (handler != nullptr) {
     handler_ = handler;
   } else {
@@ -60,11 +61,10 @@ Consumer::Consumer(const std::string &topic, ConsumerDataHandler *handler)
   allConsumers_.push_back(this);
 }
 
-Consumer::Consumer(const std::string &topic) : Consumer(topic, &nullHandler) {}
+Consumer::Consumer(const std::string &topic, const std::string &groupId)
+    : Consumer(topic, groupId, &nullHandler) {}
 
-Consumer::~Consumer() {
-  allConsumers_.remove(this);
-}
+Consumer::~Consumer() { allConsumers_.remove(this); }
 
 ConsumerDataHandler *Consumer::setHandler(ConsumerDataHandler *handler) {
   ConsumerDataHandler *old = handler_;
@@ -81,8 +81,6 @@ void Consumer::run() {
     runOnce(1000);
   }
 }
-
-
 
 void Consumer::stopAll() {
   for (auto consumer : allConsumers_) {
@@ -106,6 +104,6 @@ void Consumer::handleData(const char *msg, unsigned length) {
 void Consumer::handleError(int code, const std::string &msg) {
   handler_->error(code, msg);
 }
-
+void Consumer::remove(Consumer *consumer) { allConsumers_.remove(consumer); }
 } // namespace subscribe
 } // namespace kvalobs

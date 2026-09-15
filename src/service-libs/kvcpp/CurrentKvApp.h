@@ -33,7 +33,7 @@
 #include <memory>
 #include "KvApp.h"
 #include "sql/SqlGet.h"
-#include "kafka/KafkaSubscribe.h"
+#include "pgqueue/PgSubscribe.h"
 
 
 namespace kvalobs {
@@ -44,7 +44,7 @@ class SendData;
 
 namespace kvservice {
 
-class CurrentKvApp : public KvApp, virtual sql::SqlGet, virtual kafka::KafkaSubscribe {
+class CurrentKvApp : public KvApp, virtual sql::SqlGet, virtual pg::PgSubscribe {
  public:
   CurrentKvApp(int argc, char **argv, std::shared_ptr<miutil::conf::ConfSection> conf);
   virtual ~CurrentKvApp();
