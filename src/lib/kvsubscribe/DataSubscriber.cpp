@@ -71,8 +71,8 @@ private:
 std::function<void(const std::string &message, const serialize::KvalobsData &d)>
     DataSubscriber::debugWriter = writeNoDebug;
 
-DataSubscriber::DataSubscriber(Handler handler, Consumer *consumer)
-    : Consumer("", nullptr), handler_(handler), consumer_(consumer), ownsConsumer_(false) {
+DataSubscriber::DataSubscriber(Handler handler, Consumer *consumer,  bool ownsConsumer)
+    : Consumer("", consumer ? consumer->getGroupId() : ""), handler_(handler), consumer_(consumer), ownsConsumer_(ownsConsumer) {
       DataHandler *dataHandler = new DataHandler(handler_);
       consumer_->setHandler(dataHandler);
     }

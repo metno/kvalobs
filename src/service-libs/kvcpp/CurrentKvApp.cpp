@@ -62,8 +62,18 @@ std::string getValue(const std::string & key, std::shared_ptr<miutil::conf::Conf
     throw std::runtime_error("missing <" + key + "> in config file");
   if (val.size() > 1)
     throw std::runtime_error("Too many entries for <" + key + "> in config file");
-  return val.front().valAsString();
+  return val.valAsString();
 }
+
+long getIntValue(const std::string & key, std::shared_ptr<miutil::conf::ConfSection> conf, long defaultValue) {
+  auto val = conf->getValue(key);
+  if (val.empty())
+    throw std::runtime_error("missing <" + key + "> in config file");
+  if (val.size() > 1)
+    throw std::runtime_error("Too many entries for <" + key + "> in config file");
+  return val.valAsInt(defaultValue);
+}
+
 
 std::string removePassword(const std::string &connect) {
   using namespace std;
@@ -124,7 +134,7 @@ int pgConsumerPollSize(int argc, char **argv, std::shared_ptr<miutil::conf::Conf
   std::shared_ptr<miutil::conf::ConfSection> config = KvApp::getConfiguration(preferredConfig, stem(argv[0]));
   int ret;
   try{
-    ret = std::stoi( getValue("pgqueue.consumer_poll_size", config));
+    ret = getIntValue("pgqueue.consumer_poll_size", config, 100);
   } catch( const std::exception &) {
     ret=100;
   }

@@ -62,14 +62,16 @@ public:
   typedef std::function<void(const ::kvalobs::serialize::KvalobsData &)>
       Handler;
 
-  DataSubscriber(Handler handler, Consumer *consumer);
+  /**
+   * Constructor
+   * @param handler The function to handle new data
+   * @param consumer The underlying consumer to use.
+   * @param ownsConsumer If true, this class will delete the consumer when destroyed
+   * @note The consumer must not be nullptr.
+   */
+  DataSubscriber(Handler handler, Consumer *consumer, bool ownsConsumer=true);
   
-  // Convenience constructors that create KafkaConsumer internally
-  DataSubscriber(Handler handler, const std::string &domain, 
-                 const std::string &brokers, const std::string &groupId);
-  DataSubscriber(Handler handler, const std::string &domain, 
-                 const std::string &brokers);
-  
+    
   virtual ~DataSubscriber();
   
   // Consumer interface implementation

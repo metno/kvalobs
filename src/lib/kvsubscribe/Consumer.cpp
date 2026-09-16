@@ -75,6 +75,7 @@ ConsumerDataHandler *Consumer::setHandler(ConsumerDataHandler *handler) {
 ConsumerDataHandler *Consumer::getHandler() const { return handler_; }
 
 std::string Consumer::getTopic() const { return topic_; }
+std::string Consumer::getGroupId() const { return groupId_; }
 
 void Consumer::run() {
   while (!stopping()) {

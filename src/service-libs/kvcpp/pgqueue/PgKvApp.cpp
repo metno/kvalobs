@@ -63,7 +63,7 @@ PgKvApp::SubscriberID
 PgKvApp::subscribeData(const KvDataSubscribeInfoHelper &info,
                        dnmi::thread::CommandQue &queue) {
   auto groupId = getConsumerGroupId();
-  LOGDEBUG("PgKvApp::subscribeData: groupId: '" << groupId << "'.");
+  LOGINFO("PgKvApp::subscribeData: groupId: '" << groupId << "'.");
   return subscriptionHandler_.subscribeDataWithGroupId(info, queue, groupId);
 }
 

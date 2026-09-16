@@ -79,6 +79,8 @@ public:
 
   std::string getTopic() const;
 
+  std::string getGroupId() const;
+
   /**
    * Run until stop() has been called, processing events, calling data(...)
    * and error(...) as appropriate.

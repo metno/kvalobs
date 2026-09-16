@@ -168,8 +168,8 @@ PgSubscribe::PgSubscribe(const std::string & domain,
                                const std::vector<std::string> & connections,
                                int consumerPollSize)
     : domain_(domain),
-      connections_(connections),
       consumerPollSize_(consumerPollSize),
+      connections_(connections),
       shutdown_(false) {
 }
 
@@ -179,21 +179,30 @@ PgSubscribe::~PgSubscribe() {
 
 PgSubscribe::SubscriberID PgSubscribe::subscribeData(
     const KvDataSubscribeInfoHelper &info, dnmi::thread::CommandQue &queue) {
+  std::cerr  << "PgSubscribe::subscribeData: Subscribing with info: " << info << std::endl;
   auto groupId=KvApp::getConsumerGroupId();
+  std::cerr  << "PgSubscribe::subscribeData:Subscribing with groupId: " << groupId << std::endl;
   return subscribeDataWithGroupId(info, queue, groupId);
 }
 
 PgSubscribe::SubscriberID PgSubscribe::subscribeDataWithGroupId(const KvDataSubscribeInfoHelper &info,
                                      dnmi::thread::CommandQue &queue, const std::string &groupId){
-  std::string topic="kvalobs." + domain_+".checked";                                    
+  std::string topic="kvalobs." + domain_+".checked";  
+  std::cerr  << "PgSubscribe::subscribeDataWithGroupId: \n"
+            << "\ttopic:   " << topic << "\n"
+            << "\tgroupId: " << groupId << "\n"
+            << "\tconsumerPollSize: " << consumerPollSize_ << "\n"
+            << std::for_each(connections_.begin(), connections_.end(), [](const std::string &c){ std::cerr << "\tconnection: " << c << "\n"; })
+            << std::endl;
   PgConsumer *pgConsumer= new PgConsumer(connections_,
       topic, groupId, consumerPollSize_);
+  std::cerr << "PgConsumer created for topic: " << topic << " with groupId: " << groupId << std::endl;
   ConsumerPtr runner(
       new DataSubscriber(
           [info, & queue](const ::kvalobs::serialize::KvalobsData & d) {
             broadcast(d, info, queue);
-          }, pgConsumer));
-
+          }, pgConsumer, true));
+  std::cerr << "DataSubscriber created for topic: " << topic << " with groupId: " << groupId << std::endl;
   LOGINFO("SubscribeData: Consumer group id: '" << groupId << "'. topic: '" << runner->getTopic() <<"'.");
   std::string ret = uniqueString();
   consumers_[ret] = std::make_pair(runner,
@@ -226,7 +235,7 @@ PgSubscribe::SubscriberID PgSubscribe::subscribeKvHint(
   throw std::runtime_error("subscribeKvHint: Not implemented!");
 }
 
-void PgSubscribe::unsubscribe(const SubscriberID &subscriberid) {
+void PgSubscribe::unsubscribe(const PgSubscribe::SubscriberID &subscriberid) {
   getConsumer_(subscriberid).first->stop();
 }
 
@@ -235,11 +244,11 @@ void PgSubscribe::unsubscribeAll() {
     consumer.second.first->stop();
 }
 
-bool PgSubscribe::knowsAbout(const SubscriberID &subscriberid) const {
+bool PgSubscribe::knowsAbout(const PgSubscribe::SubscriberID &subscriberid) const {
   return consumers_.find(subscriberid) != consumers_.end();
 }
 
-void PgSubscribe::join(const SubscriberID &subscriberid) {
+void PgSubscribe::join(const PgSubscribe::SubscriberID &subscriberid) {
   unsubscribe(subscriberid);
   getConsumer_(subscriberid).second.join();
   consumers_.erase(subscriberid);
@@ -253,7 +262,7 @@ void PgSubscribe::joinAll() {
 }
 
 PgSubscribe::RunnableConsumer & PgSubscribe::getConsumer_(
-    const SubscriberID &subscriberid) {
+    const PgSubscribe::SubscriberID &subscriberid) {
   ConsumerCollection::iterator find = consumers_.find(subscriberid);
   if (consumers_.end() == find)
     throw std::runtime_error("Attempting to access invalid subscriber");
