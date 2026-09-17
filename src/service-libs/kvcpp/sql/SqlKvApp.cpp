@@ -54,7 +54,17 @@ std::string getValue(const std::string & key,
 
 dnmi::db::Connection * createConnection(const miutil::conf::ConfSection *conf) {
   std::string connectString = getValue("database.dbconnect", conf);
-  std::string driver = kvalobs::kvPath(kvalobs::pkglibdir) + "/db/"
+  std::string kvlibdir(kvalobs::kvPath(kvalobs::pkglibdir));
+
+  if( const char *cstr=getenv("KVLIBDIR")){
+    kvlibdir = cstr;
+  }
+
+  if (!kvlibdir.empty() && kvlibdir.back() != '/') {
+    kvlibdir += '/';
+  }
+
+  std::string driver = kvlibdir + "db/"
       + getValue("database.dbdriver", conf);
 
   std::string driverId;

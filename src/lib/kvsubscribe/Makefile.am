@@ -6,11 +6,11 @@ libkvalobs_kvsubscribe_la_CPPFLAGS = \
 	-I$(top_srcdir)/src \
 	-I$(top_srcdir)/src/lib \
 	$(postgresql_CFLAGS) \
-	$(rdkafka_CFLAGS) \
 	$(libxmlpp_CFLAGS) 
 
 libkvalobs_kvsubscribe_la_SOURCES = \
   Producer.cpp \
+	pgconfig.cpp \
 	queue.cpp \
 	Consumer.cpp \
 	DataSubscriber.cpp \
@@ -29,8 +29,8 @@ libkvalobs_kvsubscribe_la_SOURCES = \
 libkvalobs_kvsubscribe_la_LIBADD = \
 	$(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
 	$(top_builddir)/src/lib/json/libjson.la \
-	$(top_builddir)/src/lib/pgqueue/libkvalobs_pgqueue.la \
-	$(rdkafka_LIBS)
+	$(top_builddir)/src/lib/pgqueue/libkvalobs_pgqueue.la \ 
+	$(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la
 
 libkvalobs_kvsubscribe_la_LDFLAGS = \
 	-version-info @KVALOBSLIBS_SO_VERSION@ \
@@ -45,6 +45,7 @@ kvsubscribeinclude_HEADERS = \
 	DataSubscriber.h \
 	PgProducer.h \
 	PgConsumer.h \
+	pgconfig.h \
 	DataProducer.h \
 	HttpSendData.h \
 	SendData.h \

@@ -8,6 +8,6 @@ idldir=@datarootdir@/@PACKAGE@/idl
 Name: libkvsubscribe
 Description: Data subscription library for Kvalobs
 Version: @VERSION@
-Requires: libkvalobs_decodeutility libkvalobs_miutil
+Requires: libkvalobs_decodeutility libkvalobs_miutil libkvalobs_miconfparser
 Libs: -Wl,-rpath-link=${pkglibdir}/lib -L${pkglibdir}/lib -L${libdir} -lkvalobs_kvsubscribe 
 Cflags: -I@includedir@/kvalobs
