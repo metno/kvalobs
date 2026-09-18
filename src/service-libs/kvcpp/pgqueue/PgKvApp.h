@@ -8,7 +8,7 @@
 #ifndef SRC_SERVICE_LIBS_KVCPP_PG_PGKVAPP_H_
 #define SRC_SERVICE_LIBS_KVCPP_PG_PGKVAPP_H_
 
-#include "../corba/CorbaKvApp.h"
+#include "corba/CorbaKvApp.h"
 #include "PgSubscribe.h"
 
 namespace kvservice {

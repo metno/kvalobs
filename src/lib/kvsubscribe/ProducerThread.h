@@ -30,8 +30,8 @@
 #ifndef SRC_LIB_KVSUBSCRIBE_PRODUCERTHREAD_H_
 #define SRC_LIB_KVSUBSCRIBE_PRODUCERTHREAD_H_
 
-#include "kvsubscribe/ProducerCommand.h"
-#include "kvsubscribe/Producer.h"
+#include "Producer.h"
+#include "ProducerCommand.h"
 #include <string>
 #include <thread>
 
@@ -97,7 +97,7 @@ class ProducerThread {
 public:
   ProducerQuePtr queue;
   explicit ProducerThread(const std::string &name = "",
-                               unsigned int queueSize = 50);
+                          unsigned int queueSize = 50);
   ~ProducerThread();
 
   /**
@@ -106,8 +106,8 @@ public:
   void setName(const std::string &name_);
   std::string getName() const { return name; }
 
-  size_t getQueSize()const;
-  void setMaxQueSize(unsigned int  maxSize);
+  size_t getQueSize() const;
+  void setMaxQueSize(unsigned int maxSize);
 
   void send(ProducerCommand *cmd);
 

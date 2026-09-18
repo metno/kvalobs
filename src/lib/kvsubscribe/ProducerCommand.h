@@ -29,15 +29,14 @@
 #ifndef SRC_LIB_KVSUBSCRIBE_PRODUCERCOMMAND_H_
 #define SRC_LIB_KVSUBSCRIBE_PRODUCERCOMMAND_H_
 
-#include <string>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <string>
 
-#include "kvsubscribe/messageid.h"
+#include "messageid.h"
 #include "miutil/blockingqueue.h"
 
 namespace kvalobs {
 namespace service {
-
 
 /**
  * \brief This is the message that is passed to the
@@ -46,43 +45,52 @@ namespace service {
 
 class ProducerCommand {
   ProducerCommand() = delete;
-  ProducerCommand(const ProducerCommand &)=delete;
-  ProducerCommand& operator=(const ProducerCommand &) = delete;
+  ProducerCommand(const ProducerCommand &) = delete;
+  ProducerCommand &operator=(const ProducerCommand &) = delete;
 
- public:
-  typedef enum { raw, checked} TopicType;
+public:
+  typedef enum { raw, checked } TopicType;
   ProducerCommand(TopicType topicQueue);
   virtual ~ProducerCommand();
 
   virtual const std::string name() const = 0;
 
-  TopicType topicQueue()const{ return topicQueue_; } ;
+  TopicType topicQueue() const { return topicQueue_; };
 
-  //can be is_special
-  boost::posix_time::ptime obstime() const { return obstime_; } 
-  void setObstime(const boost::posix_time::ptime &obstime) { obstime_ = obstime; }  
+  // can be is_special
+  boost::posix_time::ptime obstime() const { return obstime_; }
+  void setObstime(const boost::posix_time::ptime &obstime) {
+    obstime_ = obstime;
+  }
 
   virtual const char *getData(unsigned int *size) const = 0;
 
   /**
    * If the MessageId is 0, then there was no data to send.
    */
-  virtual void onSend(kvalobs::subscribe::MessageId msgId,  const std::string &threadName);
+  virtual void onSend(kvalobs::subscribe::MessageId msgId,
+                      const std::string &threadName);
 
   /**
-   * If the MessageId is 0, then there was no data to send. We treat this as a success.
+   * If the MessageId is 0, then there was no data to send. We treat this as a
+   * success.
    */
-  virtual void onSuccess(kvalobs::subscribe::MessageId msgId, const std::string &threadName, const std::string &data);
-  virtual void onError(kvalobs::subscribe::MessageId msgId, const std::string &threadName, const std::string & data, const std::string & errorMessage);
-  protected:
-    TopicType topicQueue_;
-    boost::posix_time::ptime obstime_;  
+  virtual void onSuccess(kvalobs::subscribe::MessageId msgId,
+                         const std::string &threadName,
+                         const std::string &data);
+  virtual void onError(kvalobs::subscribe::MessageId msgId,
+                       const std::string &threadName, const std::string &data,
+                       const std::string &errorMessage);
+
+protected:
+  TopicType topicQueue_;
+  boost::posix_time::ptime obstime_;
 };
 
 typedef miutil::concurrent::BlockingQueuePtr<ProducerCommand> ProducerQue;
 typedef std::shared_ptr<ProducerQue> ProducerQuePtr;
 
-}  //  namespace service
-}  //  namespace kvalobs
+} //  namespace service
+} //  namespace kvalobs
 
-#endif  // SRC_LIB_KVSUBSCRIBE_PRODUCERCOMMAND_H_
+#endif // SRC_LIB_KVSUBSCRIBE_PRODUCERCOMMAND_H_

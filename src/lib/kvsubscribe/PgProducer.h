@@ -30,18 +30,19 @@
 #ifndef __KVSUBSCRIBE_PGPRODUCER_H__
 #define __KVSUBSCRIBE_PGPRODUCER_H__
 
-#include "messageid.h"
+
 #include "Producer.h"
+#include "messageid.h"
 #include "pgqueue/pgqueue.h"
 #include <cstdint>
 #include <functional>
 #include <memory>
-#include <ostream>
-#include <string>
-#include <vector>
-#include <queue>
 #include <mutex>
+#include <ostream>
+#include <queue>
+#include <string>
 #include <thread>
+#include <vector>
 
 class PgMessaging;
 
@@ -54,28 +55,25 @@ public:
    * Create a PgProducer that publishes to a PostgreSQL-backed queue.
    *
    * @param topic The topic (queue name) to publish to
-   * @param connections Vector of PostgreSQL connection strings (host, port, dbname, user, etc.)
+   * @param connections Vector of PostgreSQL connection strings (host, port,
+   * dbname, user, etc.)
    * @param onFailedDelivery Callback invoked on delivery failure
    * @param onSuccessfulDelivery Callback invoked on successful delivery
    */
   explicit PgProducer(
-      const std::string &topic,
-      const std::vector<std::string> &connections,
+      const std::string &topic, const std::vector<std::string> &connections,
       const std::string &appName,
       ErrorHandler onFailedDelivery = [](MessageId, const std::string &,
                                          const std::string &) {},
       SuccessHandler onSuccessfulDelivery = [](MessageId,
                                                const std::string &) {});
 
-
-   explicit PgProducer(
-      const std::string &topic,
-      PgCluster *cluster,
+  explicit PgProducer(
+      const std::string &topic, PgCluster *cluster,
       ErrorHandler onFailedDelivery = [](MessageId, const std::string &,
                                          const std::string &) {},
       SuccessHandler onSuccessfulDelivery = [](MessageId,
                                                const std::string &) {});
-
 
   ~PgProducer();
 
@@ -114,7 +112,6 @@ private:
   std::string queue_;
   mutable std::mutex mu_;
 
-  
   MessageId send(const char *data, unsigned length, const std::string &topic);
   // Pending deliveries for deferred callback processing
   struct PendingDelivery {

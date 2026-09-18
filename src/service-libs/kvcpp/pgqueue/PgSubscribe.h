@@ -30,7 +30,7 @@
 #ifndef SRC_SERVICE_LIBS_KVCPP_PG_PGSUBSCRIBE_H_
 #define SRC_SERVICE_LIBS_KVCPP_PG_PGSUBSCRIBE_H_
 
-#include "../KvApp.h"
+#include "kvcpp/KvApp.h"
 #include <boost/noncopyable.hpp>
 #include <condition_variable>
 #include <map>

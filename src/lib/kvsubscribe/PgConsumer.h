@@ -31,7 +31,7 @@
 #define __PGCONSUMER_H__
 
 #include "Consumer.h"
-#include "lib/pgqueue/pgqueue.h"
+#include "pgqueue/pgqueue.h"
 #include <functional>
 #include <list>
 #include <memory>

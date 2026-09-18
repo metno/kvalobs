@@ -10,8 +10,6 @@ class ConfSection;
 } // namespace conf
 } // namespace miutil
 
-
-
 namespace kvalobs {
 namespace subscribe {
 
@@ -20,9 +18,12 @@ struct PgConfig {
   std::string domain;
   bool enabled;
   int pollSize;
-
+  typedef enum { raw, checked } TopicType;
   PgConfig() : enabled(false), pollSize(0) {}
-  static PgConfig config(const miutil::conf::ConfSection *conf, const std::string &progname="", int defaultConsumerPollSize=10);
+  std::string topic(TopicType t = checked) const;
+  static PgConfig config(const miutil::conf::ConfSection *conf,
+                         const std::string &progname = "",
+                         int defaultConsumerPollSize = 10);
 };
 
 } // namespace subscribe
