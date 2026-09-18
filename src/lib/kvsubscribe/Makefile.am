@@ -29,7 +29,7 @@ libkvalobs_kvsubscribe_la_SOURCES = \
 libkvalobs_kvsubscribe_la_LIBADD = \
 	$(top_builddir)/src/lib/decodeutility/libkvalobs_decodeutility.la \
 	$(top_builddir)/src/lib/json/libjson.la \
-	$(top_builddir)/src/lib/pgqueue/libkvalobs_pgqueue.la \ 
+	$(top_builddir)/src/lib/pgqueue/libkvalobs_pgqueue.la \
 	$(top_builddir)/src/lib/miconfparser/libkvalobs_miconfparser.la
 
 libkvalobs_kvsubscribe_la_LDFLAGS = \
