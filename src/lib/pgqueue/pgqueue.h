@@ -1,29 +1,28 @@
 #pragma once
 
-
-#include <string>
-#include <vector>
 #include <chrono>
 #include <mutex>
 #include <stdexcept>
+#include <string>
+#include <vector>
 
 // ---------------------------------------------------------------------------
 // Message row returned from a poll
 // ---------------------------------------------------------------------------
 struct Message {
-    long long   id;
-    std::string topic;
-    std::string data;
-    std::string created_at;
+  long long id;
+  std::string topic;
+  std::string data;
+  std::string created_at;
 };
 
 // ---------------------------------------------------------------------------
 // NodeInfo — result of probing one connection string
 // ---------------------------------------------------------------------------
 struct NodeInfo {
-    std::string conninfo;
-    bool        is_primary = false;   // true  → primary (pg_is_in_recovery = f)
-                                      // false → replica (pg_is_in_recovery = t)
+  std::string conninfo;
+  bool is_primary = false; // true  → primary (pg_is_in_recovery = f)
+                           // false → replica (pg_is_in_recovery = t)
 };
 
 // ---------------------------------------------------------------------------
@@ -42,62 +41,60 @@ struct NodeInfo {
 //   std::string replica_ci = cluster.replica_conninfo();
 // ---------------------------------------------------------------------------
 
-
-
 class PgCluster {
 public:
-    friend class PgMessaging;
-    using Seconds = std::chrono::seconds;
-    typedef enum environment { production, staging, development } Environment;
+  friend class PgMessaging;
+  using Seconds = std::chrono::seconds;
+  typedef enum environment { production, staging, development } Environment;
 
-    explicit PgCluster(std::vector<std::string> conninfos,
-                       Environment env = development,
-                       const std::string &appName="",
-                       Seconds cache_ttl = Seconds{60});
+  explicit PgCluster(std::vector<std::string> conninfos,
+                     Environment env = development,
+                     const std::string &appName = "",
+                     Seconds cache_ttl = Seconds{60});
 
+  explicit PgCluster(std::vector<std::string> conninfos,
+                     const std::string env = "development",
+                     const std::string &appName = "",
+                     Seconds cache_ttl = Seconds{60});
 
-    explicit PgCluster(std::vector<std::string> conninfos,
-                       const std::string  env = "development",
-                       const std::string &appName="",
-                       Seconds cache_ttl = Seconds{60});
-                   
-    // Returns conninfo for the current primary.
-    // Throws if no primary is found.
-    std::string primary_conninfo();
-    
-    // Returns conninfo for a replica (round-robins if multiple).
-    // Falls back to primary if no replica is found (e.g. single-node setup).
-    std::string replica_conninfo();
+  // Returns conninfo for the current primary.
+  // Throws if no primary is found.
+  std::string primary_conninfo();
 
-    // Force an immediate re-probe (e.g. after a failover is detected).
-    void reprobe();
+  // Returns conninfo for a replica (round-robins if multiple).
+  // Falls back to primary if no replica is found (e.g. single-node setup).
+  std::string replica_conninfo();
 
-    // Returns a snapshot of what the last probe found.
-    std::vector<NodeInfo> topology();
-        
-    // Returns the environment enum for a given string (production, staging, dev)
-    // Throws std::invalid_argument if the string is invalid.
-    static  
-    Environment env(const std::string& s);
+  // Force an immediate re-probe (e.g. after a failover is detected).
+  void reprobe();
 
-    const std::string& env(Environment e) const;
-    
-    bool connected() const;
+  // Returns a snapshot of what the last probe found.
+  std::vector<NodeInfo> topology();
+
+  // Returns the environment enum for a given string (production, staging, dev)
+  // Throws std::invalid_argument if the string is invalid.
+  static Environment env(const std::string &s);
+
+  const std::string &env(Environment e) const;
+
+  bool connected() const;
+
 private:
-    std::vector<std::string>                       conninfos_;
-    Seconds                                        cache_ttl_;
-    std::vector<NodeInfo>                          nodes_;         // cached result
-    std::chrono::steady_clock::time_point          probed_at_;
-    size_t                                         replica_rr_{0}; // round-robin index
-    Environment                                    env_;
-    
-    mutable std::mutex                             mu_;
+  std::vector<std::string> conninfos_;
+  Seconds cache_ttl_;
+  std::vector<NodeInfo> nodes_; // cached result
+  std::chrono::steady_clock::time_point probed_at_;
+  size_t replica_rr_{0}; // round-robin index
+  Environment env_;
 
-    void probe_locked();   // must be called with mu_ held
-    bool cache_valid() const;
-    // Returns the messages table for the environment (kvproduction, kvstaging, kvdev)
-    std::string msgTable() const; 
+  mutable std::mutex mu_;
 
+  void probe_locked(); // must be called with mu_ held
+  bool cache_valid() const;
+  // Returns the messages table for the environment (kvproduction, kvstaging,
+  // kvdev)
+  std::string msgTable() const;
+  std::string topicTable() const;
 };
 
 // ---------------------------------------------------------------------------
@@ -118,49 +115,47 @@ private:
 // ---------------------------------------------------------------------------
 class PgMessaging {
 public:
-    typedef enum { CONSUME_FROM_BEGINNING, CONSUME_FROM_END } ConsumeFromMode;
-    // Takes a shared PgCluster reference — the cluster must outlive this object.
-    explicit PgMessaging(PgCluster& cluster);
-    ~PgMessaging();
+  typedef enum { CONSUME_FROM_BEGINNING, CONSUME_FROM_END } ConsumeFromMode;
+  // Takes a shared PgCluster reference — the cluster must outlive this object.
+  explicit PgMessaging(PgCluster &cluster);
+  ~PgMessaging();
 
-    PgMessaging(const PgMessaging&)            = delete;
-    PgMessaging& operator=(const PgMessaging&) = delete;
+  PgMessaging(const PgMessaging &) = delete;
+  PgMessaging &operator=(const PgMessaging &) = delete;
 
-    // --- Topics (write → primary) -------------------------------------------
-    void create_topic(const std::string& topic);
-    std::vector<std::string> list_topics() const;
-    bool topic_exists(const std::string& topic) const;
+  // --- Topics (write → primary) -------------------------------------------
+  void create_topic(const std::string &topic);
+  std::vector<std::string> list_topics() const;
+  bool topic_exists(const std::string &topic) const;
 
-    // --- Producer (write → primary) -----------------------------------------
-    long long publish(const std::string& topic, const std::string& data);
-    long long publish_dedup(const std::string& topic, const std::string& data);
+  // --- Producer (write → primary) -----------------------------------------
+  long long publish(const std::string &topic, const std::string &data);
+  long long publish_dedup(const std::string &topic, const std::string &data);
 
-    // --- Consumer writes (write → primary) ----------------------------------
-    void register_consumer(const std::string& consumer_name,
-                           const std::string& topic);
-    void commit_offset(const std::string& consumer_name,
-                       const std::string& topic,
-                       long long          last_id);
-    
-    void set_consumer_offset(const std::string& consumer_name,
-                             const std::string& topic,
-                             ConsumeFromMode mode);
-    
-    // --- Consumer reads (read → replica) ------------------------------------
-    long long            get_offset(const std::string& consumer_name,
-                                    const std::string& topic);
-    std::vector<Message> poll(const std::string& consumer_name,
-                              const std::string& topic,
-                              int                limit = 1000);
-    long long            consumer_lag(const std::string& consumer_name,
-                                      const std::string& topic);
+  // --- Consumer writes (write → primary) ----------------------------------
+  void register_consumer(const std::string &consumer_name,
+                         const std::string &topic);
+  void commit_offset(const std::string &consumer_name, const std::string &topic,
+                     long long last_id);
+
+  void set_consumer_offset(const std::string &consumer_name,
+                           const std::string &topic, ConsumeFromMode mode);
+
+  // --- Consumer reads (read → replica) ------------------------------------
+  long long get_offset(const std::string &consumer_name,
+                       const std::string &topic);
+  std::vector<Message> poll(const std::string &consumer_name,
+                            const std::string &topic, int limit = 1000);
+  long long consumer_lag(const std::string &consumer_name,
+                         const std::string &topic);
 
 private:
-    void *primaryCon_=nullptr;    // write connection
-    void *replicaCon_=nullptr;   // read connection
-    std::string msgTbl_;
-    std::string appName_;
+  void *primaryCon_ = nullptr; // write connection
+  void *replicaCon_ = nullptr; // read connection
+  std::string msgTbl_;
+  std::string topicTbl_;
+  std::string appName_;
 
-    void           prepare_primary_stmts();
-    void           prepare_replica_stmts();
+  void prepare_primary_stmts();
+  void prepare_replica_stmts();
 };

@@ -1,9 +1,22 @@
 #include "pgqueue.h"
-#include <libpq-fe.h>
 #include <algorithm>
+#include <iostream>
+#include <libpq-fe.h>
 #include <stdexcept>
 #include <string>
-#include <iostream>
+
+namespace {
+// Original table names (unused)
+// const std::string topicTableName = "topic";
+// const std::string productionTableName = "production";
+// const std::string stagingTableName = "staging";
+// const std::string developmentTableName = "development";
+
+const std::string topicTableName = "kvtopic";
+const std::string productionTableName = "kvproduction";
+const std::string stagingTableName = "kvstaging";
+const std::string developmentTableName = "kvdev";
+} // namespace
 
 // ---------------------------------------------------------------------------
 // RAII result guard
@@ -16,7 +29,6 @@ struct ResultGuard {
       PQclear(res);
   }
 
-
   ResultGuard(const ResultGuard &) = delete;
   ResultGuard &operator=(const ResultGuard &) = delete;
 };
@@ -25,14 +37,16 @@ struct ResultGuard {
 // PgCluster
 // ===========================================================================
 
-PgCluster::PgCluster(std::vector<std::string> conninfos, Environment env, const std::string &appName, Seconds cache_ttl)
+PgCluster::PgCluster(std::vector<std::string> conninfos, Environment env,
+                     const std::string &appName, Seconds cache_ttl)
     : conninfos_(std::move(conninfos)), cache_ttl_(cache_ttl), env_(env) {
   if (conninfos_.empty())
     throw std::runtime_error("PgCluster: no connection strings provided");
 
-  if ( !appName.empty() ) {
-    //check if the conninfos strings contain the application_name parapeter. If not add it.
-    for ( auto &con: conninfos_) {
+  if (!appName.empty()) {
+    // check if the conninfos strings contain the application_name parapeter. If
+    // not add it.
+    for (auto &con : conninfos_) {
       if (con.find("application_name") == std::string::npos) {
         con.append(std::format(R"( application_name={})", appName));
       }
@@ -46,28 +60,26 @@ PgCluster::PgCluster(std::vector<std::string> conninfos, Environment env, const 
   probe_locked();
 }
 
-PgCluster::PgCluster(std::vector<std::string> conninfos,
-                       const std::string  env,
-                       const std::string &appName,
-                       Seconds cache_ttl)
-    : PgCluster(std::move(conninfos), PgCluster::env(env), appName, cache_ttl) {}
+PgCluster::PgCluster(std::vector<std::string> conninfos, const std::string env,
+                     const std::string &appName, Seconds cache_ttl)
+    : PgCluster(std::move(conninfos), PgCluster::env(env), appName, cache_ttl) {
+}
 
-
-PgCluster::Environment PgCluster::env(const std::string& s) {
+PgCluster::Environment PgCluster::env(const std::string &s) {
   if (s == "production")
     return production;
   if (s == "staging")
     return staging;
   if (s == "development")
     return development;
-  throw std::invalid_argument(std::format("PgCluster: invalid environment: {}", s));
+  throw std::invalid_argument(
+      std::format("PgCluster: invalid environment: {}", s));
 }
 
-const std::string& PgCluster::env(Environment e) const {
+const std::string &PgCluster::env(Environment e) const {
   static const std::string envs[] = {"production", "staging", "development"};
   return envs[e];
 }
-
 
 bool PgCluster::cache_valid() const {
   // mu_ must be held by caller
@@ -84,13 +96,14 @@ void PgCluster::probe_locked() {
     PGconn *conn = PQconnectdb(ci.c_str());
     std::cerr << "Connecting to node: " << ci << '\n';
     if (!conn || PQstatus(conn) != CONNECTION_OK) {
-      if( !conn ) {
+      if (!conn) {
         std::cerr << "Failed to connect to node: '" << ci << "'\n";
       }
       // Node unreachable — skip, don't throw.
       if (conn) {
         PQfinish(conn);
-        std::cerr << "Failed to connect to node: " << PQerrorMessage(conn) << '\n';
+        std::cerr << "Failed to connect to node: " << PQerrorMessage(conn)
+                  << '\n';
       }
       continue;
     }
@@ -168,12 +181,14 @@ std::string PgCluster::replica_conninfo() {
   throw std::runtime_error("PgCluster: no usable node found");
 }
 
-std::string PgCluster::msgTable() const { 
-  return env_ == production ? "kvproduction" : env_ == staging ? "kvstaging" : "kvdev"; 
+std::string PgCluster::msgTable() const {
+  return env_ == production ? productionTableName
+         : env_ == staging  ? stagingTableName
+                            : developmentTableName;
 }
 
+std::string PgCluster::topicTable() const { return topicTableName; }
 
-  
 // ===========================================================================
 // PgMessaging — helpers
 // ===========================================================================
@@ -190,9 +205,8 @@ PGconn *connect(const std::string &conninfo) {
   return conn;
 }
 
-
 void prepare(void *conn_, const char *name, const char *sql) {
-  PGconn *conn = static_cast<PGconn*>(conn_);
+  PGconn *conn = static_cast<PGconn *>(conn_);
   ResultGuard g(PQprepare(conn, name, sql, 0, nullptr));
   if (PQresultStatus(g.res) != PGRES_COMMAND_OK) {
     throw std::runtime_error(std::string("PgMessaging: prepare '") + name +
@@ -200,30 +214,28 @@ void prepare(void *conn_, const char *name, const char *sql) {
   }
 }
 
-
 void check_result_raw(PGresult *res, ExecStatusType expected,
-                               const std::string &ctx) {
+                      const std::string &ctx) {
   if (PQresultStatus(res) != expected) {
-    std::cerr << "ERROR PgMessaging: " << ctx << ": unexpected result status" << std::endl;
+    std::cerr << "ERROR PgMessaging: " << ctx << ": unexpected result status"
+              << std::endl;
     std::string err = PQresultErrorMessage(res);
     PQclear(res);
     throw std::runtime_error(ctx + ": " + err);
   }
 }
 
-
 void check_result(ResultGuard &g, ExecStatusType expected,
-                               const std::string &ctx) {
-  try{
+                  const std::string &ctx) {
+  try {
     check_result_raw(g.res, expected, ctx);
   } catch (const std::exception &e) {
-    std::cerr << "ERROR PgMessaging: " << ctx << ": unexpected result status. What: " << e.what() << std::endl;
-    g.res=nullptr;
+    std::cerr << "ERROR PgMessaging: " << ctx
+              << ": unexpected result status. What: " << e.what() << std::endl;
+    g.res = nullptr;
     throw;
   }
 }
-
-
 
 void check_command_raw(PGresult *res, const std::string &ctx) {
   check_result_raw(res, PGRES_COMMAND_OK, ctx);
@@ -233,12 +245,13 @@ void check_command(ResultGuard &g, const std::string &ctx) {
   try {
     check_command_raw(g.res, ctx);
   } catch (const std::exception &e) {
-    std::cerr << "ERROR PgMessaging: " << ctx << ": unexpected result status" << std::endl;
+    std::cerr << "ERROR PgMessaging: " << ctx << ": unexpected result status"
+              << std::endl;
     g.res = nullptr;
     throw;
   }
 }
-}
+} // namespace
 // ===========================================================================
 // PgMessaging — construction / prepared statements
 // ===========================================================================
@@ -247,13 +260,14 @@ PgMessaging::PgMessaging(PgCluster &cluster) {
   primaryCon_ = connect(cluster.primary_conninfo());
   replicaCon_ = connect(cluster.replica_conninfo());
   msgTbl_ = cluster.msgTable();
+  topicTbl_ = cluster.topicTable();
   prepare_primary_stmts();
   prepare_replica_stmts();
 }
 
 PgMessaging::~PgMessaging() {
-  PGconn *primary_ = static_cast<PGconn*>(primaryCon_);
-  PGconn *replica_ = static_cast<PGconn*>(replicaCon_);
+  PGconn *primary_ = static_cast<PGconn *>(primaryCon_);
+  PGconn *replica_ = static_cast<PGconn *>(replicaCon_);
   if (primary_) {
     PQfinish(primary_);
     primaryCon_ = nullptr;
@@ -266,17 +280,25 @@ PgMessaging::~PgMessaging() {
 
 void PgMessaging::prepare_primary_stmts() {
   // Statements that write — executed on primary_.
-  prepare(primaryCon_, "create_topic",
-          "INSERT INTO kvtopic (topic) VALUES ($1) ON CONFLICT DO NOTHING");
+  prepare(
+      primaryCon_, "create_topic",
+      std::format(R"(INSERT INTO {} (topic) VALUES ($1) ON CONFLICT DO NOTHING
+    )",
+                  topicTbl_)
+          .c_str());
 
-  prepare(primaryCon_, "publish", std::format(R"(
+  prepare(primaryCon_, "publish",
+          std::format(R"(
         INSERT INTO {} (topic, data)
         VALUES ($1, $2)
         RETURNING id
-    )", msgTbl_).c_str());
-        //  "INSERT INTO messages (topic, data) VALUES ($1, $2) RETURNING id");
+    )",
+                      msgTbl_)
+              .c_str());
+  //  "INSERT INTO messages (topic, data) VALUES ($1, $2) RETURNING id");
 
-  prepare(primaryCon_, "publish_dedup", std::format(R"(
+  prepare(primaryCon_, "publish_dedup",
+          std::format(R"(
         WITH existing AS (
             SELECT id FROM {0}
             WHERE topic = $1 AND crc = md5($2)::uuid
@@ -292,7 +314,9 @@ void PgMessaging::prepare_primary_stmts() {
         UNION ALL
         SELECT id FROM existing
         LIMIT 1
-    )", msgTbl_).c_str());
+    )",
+                      msgTbl_)
+              .c_str());
 
   prepare(primaryCon_, "register_consumer", R"(
         INSERT INTO consumer_offsets (consumer_name, topic, last_id)
@@ -300,59 +324,83 @@ void PgMessaging::prepare_primary_stmts() {
         ON CONFLICT (consumer_name, topic) DO NOTHING
     )");
 
-  prepare(primaryCon_, "commit_offset", std::format(R"(
+  prepare(primaryCon_, "commit_offset",
+          std::format(R"(
         UPDATE consumer_offsets
         SET last_id = $3, updated_at = now()
         WHERE consumer_name = $1 AND topic = $2 AND tblname = '{0}'
-    )", msgTbl_).c_str());
+    )",
+                      msgTbl_)
+              .c_str());
 
-  prepare(primaryCon_, "set_offset_at_beginning", std::format(R"(
+  prepare(primaryCon_, "set_offset_at_beginning",
+          std::format(R"(
         UPDATE consumer_offsets
         SET last_id = (SELECT COALESCE(MIN(id), 0) FROM {0}), updated_at = now()
         WHERE consumer_name = $1 AND topic = $2 AND tblname = '{0}'
-    )", msgTbl_).c_str());
+    )",
+                      msgTbl_)
+              .c_str());
 
-  prepare(primaryCon_, "set_offset_at_end", std::format(R"(
+  prepare(primaryCon_, "set_offset_at_end",
+          std::format(R"(
         UPDATE consumer_offsets
         SET last_id = (SELECT COALESCE(MAX(id), 0) FROM {0}), updated_at = now()
         WHERE consumer_name = $1 AND topic = $2 AND tblname = '{0}'
-    )", msgTbl_).c_str());
+    )",
+                      msgTbl_)
+              .c_str());
 }
 
 void PgMessaging::prepare_replica_stmts() {
   // Statements that only read — executed on replica_.
-  prepare(replicaCon_, "get_offset", std::format(R"(
+  prepare(replicaCon_, "get_offset",
+          std::format(R"(
         SELECT last_id FROM consumer_offsets
         WHERE consumer_name = $1 AND topic = $2 AND tblname = '{0}'
-    )", msgTbl_).c_str());
+    )",
+                      msgTbl_)
+              .c_str());
 
-  prepare(replicaCon_, "poll", std::format(R"(
+  prepare(replicaCon_, "poll",
+          std::format(R"(
         SELECT id, topic, data, created_at
         FROM {0}
         WHERE topic = $1
           AND id > $2
         ORDER BY id
         LIMIT $3
-    )", msgTbl_).c_str());
+    )",
+                      msgTbl_)
+              .c_str());
 
-  prepare(replicaCon_, "consumer_lag", std::format(R"(
+  prepare(replicaCon_, "consumer_lag",
+          std::format(R"(
         SELECT COALESCE(MAX(m.id), 0) - co.last_id AS lag
         FROM consumer_offsets co
         LEFT JOIN {0} m ON m.topic = co.topic
         WHERE co.consumer_name = $1 AND co.topic = $2 AND co.tblname = '{0}'
         GROUP BY co.last_id
-    )", msgTbl_).c_str());
+    )",
+                      msgTbl_)
+              .c_str());
 
-  prepare(replicaCon_, "topic_exists", R"(
+  prepare(replicaCon_, "topic_exists",
+          std::format(R"(
         SELECT EXISTS (
-            SELECT 1 FROM kvtopic
+            SELECT 1 FROM {}
             WHERE topic = $1
         )
-    )");
-  
-  prepare(replicaCon_, "list_topics", R"(
-        SELECT topic FROM kvtopic
-    )");
+    )",
+                      topicTbl_)
+              .c_str());
+
+  prepare(replicaCon_, "list_topics",
+          std::format(R"(
+        SELECT topic FROM {}
+    )",
+                      topicTbl_)
+              .c_str());
 }
 
 // ===========================================================================
@@ -361,13 +409,14 @@ void PgMessaging::prepare_replica_stmts() {
 
 void PgMessaging::create_topic(const std::string &topic) {
   const char *p[] = {topic.c_str()};
-  ResultGuard g(
-      PQexecPrepared(static_cast<PGconn*>(primaryCon_), "create_topic", 1, p, nullptr, nullptr, 0));
+  ResultGuard g(PQexecPrepared(static_cast<PGconn *>(primaryCon_),
+                               "create_topic", 1, p, nullptr, nullptr, 0));
   check_command(g, "create_topic");
 }
 
 std::vector<std::string> PgMessaging::list_topics() const {
-  ResultGuard g(PQexecPrepared(static_cast<PGconn*>(primaryCon_), "list_topics", 0, nullptr, nullptr, nullptr, 0));
+  ResultGuard g(PQexecPrepared(static_cast<PGconn *>(primaryCon_),
+                               "list_topics", 0, nullptr, nullptr, nullptr, 0));
   check_result(g, PGRES_TUPLES_OK, "list_topics");
   std::vector<std::string> topics;
   for (int i = 0; i < PQntuples(g.res); ++i) {
@@ -376,14 +425,13 @@ std::vector<std::string> PgMessaging::list_topics() const {
   return topics;
 }
 
-bool PgMessaging::topic_exists(const std::string& topic) const {
+bool PgMessaging::topic_exists(const std::string &topic) const {
   const char *p[] = {topic.c_str()};
-  ResultGuard g(PQexecPrepared(static_cast<PGconn*>(primaryCon_), "topic_exists", 1, p, nullptr, nullptr, 0));
+  ResultGuard g(PQexecPrepared(static_cast<PGconn *>(primaryCon_),
+                               "topic_exists", 1, p, nullptr, nullptr, 0));
   check_result(g, PGRES_TUPLES_OK, "topic_exists");
   return PQntuples(g.res) > 0 && std::string(PQgetvalue(g.res, 0, 0)) == "t";
 }
-
-
 
 // ===========================================================================
 // PgMessaging — Producer (primary)
@@ -392,7 +440,8 @@ bool PgMessaging::topic_exists(const std::string& topic) const {
 long long PgMessaging::publish(const std::string &topic,
                                const std::string &data) {
   const char *p[] = {topic.c_str(), data.c_str()};
-  ResultGuard g(PQexecPrepared(static_cast<PGconn*>(primaryCon_), "publish", 2, p, nullptr, nullptr, 0));
+  ResultGuard g(PQexecPrepared(static_cast<PGconn *>(primaryCon_), "publish", 2,
+                               p, nullptr, nullptr, 0));
   check_result(g, PGRES_TUPLES_OK, "publish");
   if (PQntuples(g.res) == 0)
     throw std::runtime_error("publish: no id returned");
@@ -402,8 +451,8 @@ long long PgMessaging::publish(const std::string &topic,
 long long PgMessaging::publish_dedup(const std::string &topic,
                                      const std::string &data) {
   const char *p[] = {topic.c_str(), data.c_str()};
-  ResultGuard g(
-      PQexecPrepared(static_cast<PGconn*>(primaryCon_), "publish_dedup", 2, p, nullptr, nullptr, 0));
+  ResultGuard g(PQexecPrepared(static_cast<PGconn *>(primaryCon_),
+                               "publish_dedup", 2, p, nullptr, nullptr, 0));
   check_result(g, PGRES_TUPLES_OK, "publish_dedup");
   if (PQntuples(g.res) == 0)
     throw std::runtime_error("publish_dedup: no id returned");
@@ -417,8 +466,8 @@ long long PgMessaging::publish_dedup(const std::string &topic,
 void PgMessaging::register_consumer(const std::string &consumer_name,
                                     const std::string &topic) {
   const char *p[] = {consumer_name.c_str(), topic.c_str()};
-  ResultGuard g(
-      PQexecPrepared(static_cast<PGconn*>(primaryCon_), "register_consumer", 2, p, nullptr, nullptr, 0));
+  ResultGuard g(PQexecPrepared(static_cast<PGconn *>(primaryCon_),
+                               "register_consumer", 2, p, nullptr, nullptr, 0));
   check_command(g, "register_consumer");
 }
 
@@ -426,28 +475,30 @@ void PgMessaging::commit_offset(const std::string &consumer_name,
                                 const std::string &topic, long long last_id) {
   std::string id_str = std::to_string(last_id);
   const char *p[] = {consumer_name.c_str(), topic.c_str(), id_str.c_str()};
-  ResultGuard g(
-      PQexecPrepared(static_cast<PGconn*>(primaryCon_), "commit_offset", 3, p, nullptr, nullptr, 0));
+  ResultGuard g(PQexecPrepared(static_cast<PGconn *>(primaryCon_),
+                               "commit_offset", 3, p, nullptr, nullptr, 0));
   check_command(g, "commit_offset");
 }
 
-void PgMessaging::set_consumer_offset(const std::string& consumer_name,
-                                      const std::string& topic,
+void PgMessaging::set_consumer_offset(const std::string &consumer_name,
+                                      const std::string &topic,
                                       ConsumeFromMode mode) {
   const char *p[] = {consumer_name.c_str(), topic.c_str()};
-  
+
   if (mode == CONSUME_FROM_BEGINNING) {
-    ResultGuard g(PQexecPrepared(static_cast<PGconn*>(primaryCon_), "set_offset_at_beginning", 2, p, nullptr, nullptr, 0));
+    ResultGuard g(PQexecPrepared(static_cast<PGconn *>(primaryCon_),
+                                 "set_offset_at_beginning", 2, p, nullptr,
+                                 nullptr, 0));
     check_command(g, "set_offset_at_beginning");
   } else if (mode == CONSUME_FROM_END) {
-    ResultGuard g(PQexecPrepared(static_cast<PGconn*>(primaryCon_), "set_offset_at_end", 2, p, nullptr, nullptr, 0));
+    ResultGuard g(PQexecPrepared(static_cast<PGconn *>(primaryCon_),
+                                 "set_offset_at_end", 2, p, nullptr, nullptr,
+                                 0));
     check_command(g, "set_offset_at_end");
   } else {
     throw std::invalid_argument("Invalid ConsumeFromMode");
   }
 }
-
-
 
 // ===========================================================================
 // PgMessaging — Consumer reads (replica)
@@ -456,8 +507,8 @@ void PgMessaging::set_consumer_offset(const std::string& consumer_name,
 long long PgMessaging::get_offset(const std::string &consumer_name,
                                   const std::string &topic) {
   const char *p[] = {consumer_name.c_str(), topic.c_str()};
-  ResultGuard g(
-      PQexecPrepared(static_cast<PGconn*>(replicaCon_), "get_offset", 2, p, nullptr, nullptr, 0));
+  ResultGuard g(PQexecPrepared(static_cast<PGconn *>(replicaCon_), "get_offset",
+                               2, p, nullptr, nullptr, 0));
   check_result(g, PGRES_TUPLES_OK, "get_offset");
   if (PQntuples(g.res) == 0)
     return 0;
@@ -471,7 +522,8 @@ std::vector<Message> PgMessaging::poll(const std::string &consumer_name,
   std::string limit_str = std::to_string(limit);
 
   const char *p[] = {topic.c_str(), offset_str.c_str(), limit_str.c_str()};
-  ResultGuard g(PQexecPrepared(static_cast<PGconn*>(replicaCon_), "poll", 3, p, nullptr, nullptr, 0));
+  ResultGuard g(PQexecPrepared(static_cast<PGconn *>(replicaCon_), "poll", 3, p,
+                               nullptr, nullptr, 0));
   check_result(g, PGRES_TUPLES_OK, "poll");
 
   std::vector<Message> rows;
@@ -491,8 +543,8 @@ std::vector<Message> PgMessaging::poll(const std::string &consumer_name,
 long long PgMessaging::consumer_lag(const std::string &consumer_name,
                                     const std::string &topic) {
   const char *p[] = {consumer_name.c_str(), topic.c_str()};
-  ResultGuard g(
-      PQexecPrepared(static_cast<PGconn*>(replicaCon_), "consumer_lag", 2, p, nullptr, nullptr, 0));
+  ResultGuard g(PQexecPrepared(static_cast<PGconn *>(replicaCon_),
+                               "consumer_lag", 2, p, nullptr, nullptr, 0));
   check_result(g, PGRES_TUPLES_OK, "consumer_lag");
   if (PQntuples(g.res) == 0)
     return 0;
