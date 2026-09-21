@@ -6,7 +6,7 @@ ARG USER=vscode
 
 RUN apt update && apt install --yes python-is-python3 software-properties-common python3-pip gpg \
    less nano git python3-argcomplete git-lfs locales sshpass build-essential python3-dev python3.12-venv \
-   libgmock-dev language-pack-nb-base metno-bufrtables
+   libgmock-dev language-pack-nb-base metno-bufrtables bubblewrap socat maven openjdk-21-jdk
 
 RUN locale-gen "nb_NO.UTF-8" "en_US.UTF-8"
 RUN activate-global-python-argcomplete

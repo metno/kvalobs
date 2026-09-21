@@ -31,6 +31,7 @@
 #define SRC_SERVICE_LIBS_KVCPP_PG_PGSUBSCRIBE_H_
 
 #include "kvcpp/KvApp.h"
+#include "kvsubscribe/pgconfig.h"
 #include <boost/noncopyable.hpp>
 #include <condition_variable>
 #include <map>
@@ -52,9 +53,7 @@ class PgSubscribe : public virtual details::KvalobsSubscribe,
                     virtual details::KvAppControl,
                     boost::noncopyable {
 public:
-  PgSubscribe(const std::string &domain,
-              const std::vector<std::string> &connections,
-              int consumerPollSize);
+  PgSubscribe(const kvalobs::subscribe::PgConfig &config);
   ~PgSubscribe();
 
   virtual SubscriberID subscribeData(const KvDataSubscribeInfoHelper &info,
@@ -99,9 +98,11 @@ private:
   typedef std::pair<ConsumerPtr, std::thread> RunnableConsumer;
   typedef std::map<std::string, RunnableConsumer> ConsumerCollection;
 
-  std::string domain_;
-  int consumerPollSize_;
-  std::vector<std::string> connections_;
+  // std::string domain_;
+  // int consumerPollSize_;
+  // std::vector<std::string> connections_;
+  // std::string consumerGroup_;
+  kvalobs::subscribe::PgConfig config_;
   ConsumerCollection consumers_;
 
   RunnableConsumer &getConsumer_(const SubscriberID &subscriberid);

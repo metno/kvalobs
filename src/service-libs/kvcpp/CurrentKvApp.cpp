@@ -164,11 +164,24 @@ std::vector<std::string> pgConnections(int argc, char ** argv, std::shared_ptr<m
   return result;
 }
 
+
+kvalobs::subscribe::PgConfig getPgConfig(std::shared_ptr<miutil::conf::ConfSection> preferredConfig, const std::string &progName) {
+  kvalobs::subscribe::PgConfig config=kvalobs::subscribe::PgConfig::config(preferredConfig.get(), progName);
+  
+  if( config.consumerGroup.empty()) {
+    LOGWARN("No consumer group given or created for '" << progName<<"'");
+  } else {
+    LOGINFO("Using consumer group '" << config.consumerGroup << "' for '" << progName << "'");
+  } 
+
+  return config;
+}
+  
 } // anonymous namespace
 
 CurrentKvApp::CurrentKvApp(int argc, char ** argv, std::shared_ptr<miutil::conf::ConfSection> preferredConfig)
     : sql::SqlGet(connector(argc, argv, preferredConfig), releaseConnection),
-      pg::PgSubscribe(pgDomain(argc, argv, preferredConfig), pgConnections(argc, argv, preferredConfig), pgConsumerPollSize(argc, argv, preferredConfig)) {
+      pg::PgSubscribe(kvalobs::subscribe::PgConfig::config(preferredConfig.get(), stem(argv[0]))) {
   std::shared_ptr<miutil::conf::ConfSection> conf = KvApp::getConfiguration(preferredConfig, stem(argv[0]));
   sendData_ = std::unique_ptr<kvalobs::datasource::SendData>(new kvalobs::datasource::HttpSendData(*conf));
   // needed for correct handling of CORBA::string_dup, below

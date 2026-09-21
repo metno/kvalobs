@@ -124,11 +124,11 @@ std::string KvApp::getConfigValue(const std::string & key,
 }
 std::string KvApp::getConsumerGroupId(const std::string &consumerGroupIdKey) {
   auto progname=appName;
-  std::string idkey("pgqueue.groupid."+progname);
+  std::string idkey("pgqueue.consumer_group."+progname);
 
   auto val=getConfigValue(idkey, "");
   if ( val.empty() ) {
-    idkey="pgqueue.groupid";
+    idkey="pgqueue.consumer_group";
     val=getConfigValue(idkey, "");
   }
 

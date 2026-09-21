@@ -164,12 +164,9 @@ void broadcastNotification(
 
 }
 
-PgSubscribe::PgSubscribe(const std::string & domain,
-                               const std::vector<std::string> & connections,
-                               int consumerPollSize)
-    : domain_(domain),
-      consumerPollSize_(consumerPollSize),
-      connections_(connections),
+
+PgSubscribe::PgSubscribe(const kvalobs::subscribe::PgConfig &config)
+    : config_(config),
       shutdown_(false) {
 }
 
@@ -180,22 +177,22 @@ PgSubscribe::~PgSubscribe() {
 PgSubscribe::SubscriberID PgSubscribe::subscribeData(
     const KvDataSubscribeInfoHelper &info, dnmi::thread::CommandQue &queue) {
   std::cerr  << "PgSubscribe::subscribeData: Subscribing with info: " << info << std::endl;
-  auto groupId=KvApp::getConsumerGroupId();
+  auto groupId=config_.consumerGroup;
   std::cerr  << "PgSubscribe::subscribeData:Subscribing with groupId: " << groupId << std::endl;
   return subscribeDataWithGroupId(info, queue, groupId);
 }
 
 PgSubscribe::SubscriberID PgSubscribe::subscribeDataWithGroupId(const KvDataSubscribeInfoHelper &info,
                                      dnmi::thread::CommandQue &queue, const std::string &groupId){
-  std::string topic="kvalobs." + domain_+".checked";  
+  std::string topic="kvalobs." + config_.domain+".checked";  
   std::cerr  << "PgSubscribe::subscribeDataWithGroupId: \n"
             << "\ttopic:   " << topic << "\n"
             << "\tgroupId: " << groupId << "\n"
-            << "\tconsumerPollSize: " << consumerPollSize_ << "\n"
-            << std::for_each(connections_.begin(), connections_.end(), [](const std::string &c){ std::cerr << "\tconnection: " << c << "\n"; })
+            << "\tconsumerPollSize: " << config_.pollSize << "\n"
+            << std::for_each(config_.connections.begin(), config_.connections.end(), [](const std::string &c){ std::cerr << "\tconnection: " << c << "\n"; })
             << std::endl;
-  PgConsumer *pgConsumer= new PgConsumer(connections_,
-      topic, groupId, consumerPollSize_);
+  PgConsumer *pgConsumer= new PgConsumer(config_.connections,
+      topic, groupId, config_.pollSize);
   std::cerr << "PgConsumer created for topic: " << topic << " with groupId: " << groupId << std::endl;
   ConsumerPtr runner(
       new DataSubscriber(
@@ -213,10 +210,10 @@ PgSubscribe::SubscriberID PgSubscribe::subscribeDataWithGroupId(const KvDataSubs
 
 PgSubscribe::SubscriberID PgSubscribe::subscribeDataNotify(
     const KvDataSubscribeInfoHelper &info, dnmi::thread::CommandQue &queue) {
-    std::string topic="kvalobs." + domain_+".checked";                                    
-    std::string groupId=KvApp::getConsumerGroupId();
-    PgConsumer *pgConsumer= new PgConsumer(connections_,
-      topic, groupId, consumerPollSize_);
+    std::string topic="kvalobs." + config_.domain+".checked";                                    
+    std::string groupId=config_.consumerGroup;
+    PgConsumer *pgConsumer= new PgConsumer(config_.connections,
+      topic, groupId, config_.pollSize);
   ConsumerPtr runner(
       new DataSubscriber(
           [info, & queue](const ::kvalobs::serialize::KvalobsData & d) {

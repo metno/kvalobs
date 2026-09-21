@@ -1,4 +1,5 @@
 #include "pgconfig.h"
+#include "creategroupid.h"
 #include "lib/miconfparser/miconfparser.h"
 #include <string>
 #include <vector>
@@ -42,13 +43,26 @@ int pgConsumerPollSize(miutil::conf::ConfSection *conf,
                        const std::string &progname, int defaultValue) {
   if (!progname.empty()) {
     auto v =
-        getIntValue("pgqueue." + progname + ".consumer_poll_size", conf, -1);
+        getIntValue("pgqueue.consumer_poll_size."+progname, conf, -1);
     if (v != -1) {
       return v;
     }
   }
   return getIntValue("pgqueue.consumer_poll_size", conf, defaultValue);
 }
+
+std::string pgConsumerGroup(miutil::conf::ConfSection *conf,
+                       const std::string &progname, const std::string &defaultValue) {
+  if (!progname.empty()) {
+    auto v =
+        getValue("pgqueue.consumer_group."+progname, conf, "");
+    if (!v.empty()) {
+      return v; 
+    }
+  }
+  return getValue("pgqueue.consumer_group", conf, defaultValue);
+}
+
 
 std::vector<std::string> pgConnections(miutil::conf::ConfSection *conf) {
 
@@ -83,6 +97,7 @@ PgConfig PgConfig::config(const miutil::conf::ConfSection *conf,
       pgConnections(const_cast<miutil::conf::ConfSection *>(conf));
   cfg.domain = pgDomain(const_cast<miutil::conf::ConfSection *>(conf));
   cfg.enabled = pgEnabled(const_cast<miutil::conf::ConfSection *>(conf));
+  cfg.consumerGroup=getConsumerGroupId(const_cast<miutil::conf::ConfSection *>(conf), progname);
   return cfg;
 }
 std::string PgConfig::topic(TopicType t) const {
@@ -94,6 +109,15 @@ std::string PgConfig::topic(TopicType t) const {
   default:
     return "kvalobs." + domain + ".checked";
   }
+}
+
+std::string PgConfig::getConsumerGroupId(const miutil::conf::ConfSection *conf,const std::string &progname) {
+  std::string consumer = pgConsumerGroup(const_cast<miutil::conf::ConfSection *>(conf), progname, "");
+
+  if (consumer.empty() && !progname.empty()) {
+      consumer = createConsumerGroupId(progname);
+  }
+  return consumer;
 }
 
 } // namespace subscribe

@@ -31,6 +31,7 @@
 #define __PGCONSUMER_H__
 
 #include "Consumer.h"
+#include "pgconfig.h"
 #include "pgqueue/pgqueue.h"
 #include <functional>
 #include <list>
@@ -65,6 +66,8 @@ public:
   PgConsumer(const std::vector<std::string> &connections,
              const std::string &topic, const std::string &groupId,
              int pollSize = 100);
+  PgConsumer(PgConfig config);
+  PgConsumer(PgConfig config, ConsumerDataHandler *handler);
 
   virtual ~PgConsumer();
 
@@ -103,4 +106,4 @@ protected:
 } // namespace subscribe
 } // namespace kvalobs
 
-#endif /* __CONSUMER_H__ */
+#endif /* __PGCONSUMER_H__ */

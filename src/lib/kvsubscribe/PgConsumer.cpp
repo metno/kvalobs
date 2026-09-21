@@ -142,6 +142,20 @@ PgConsumer::PgConsumer(const std::vector<std::string> &connections,
     : Consumer(topic, groupId), stopping_(false), pollSize_(pollSize) {
   init(connections, topic, groupId);
 }
+PgConsumer::PgConsumer(PgConfig config)
+    : Consumer(config.topic(), config.consumerGroup),
+      stopping_(false),
+      pollSize_(config.pollSize) {
+  init(config.connections, config.topic(), config.consumerGroup);
+}
+
+PgConsumer::PgConsumer(PgConfig config, ConsumerDataHandler *handler)
+    : Consumer(config.topic(), config.consumerGroup, handler),
+      stopping_(false),
+      pollSize_(config.pollSize) {
+  init(config.connections, config.topic(), config.consumerGroup);
+}
+
 
 PgConsumer::~PgConsumer() { Consumer::remove(this); }
 
