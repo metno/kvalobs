@@ -7,11 +7,22 @@
 
 #include "PgKvApp.h"
 #include <kvsubscribe/DataSubscriber.h>
+#include "kvsubscribe/pgconfig.h"
+#include <boost/filesystem.hpp>
 #include <milog/milog.h>
 
 namespace kvservice {
 namespace pg {
 namespace {
+
+
+using boost::filesystem::path;
+
+std::string stem(const std::string & filename) {
+  return path(filename).stem().string();
+}
+
+
 std::string value(miutil::conf::ConfSection *conf, const std::string &key,
                   const std::string &fallback) {
   auto value = conf->getValue(key);
@@ -49,7 +60,7 @@ int getConsumerPollSize(miutil::conf::ConfSection *conf) {
 PgKvApp::PgKvApp(int &argc, char **argv, miutil::conf::ConfSection *conf,
                  const char *options[][2])
     : corba::CorbaKvApp(argc, argv, conf, options),
-      subscriptionHandler_(getDomain(conf), getConnectStr(conf), getConsumerPollSize(conf)) {}
+      subscriptionHandler_(kvalobs::subscribe::PgConfig::config(conf, stem(argv[0]))) {}
 
 PgKvApp::~PgKvApp() {}
 

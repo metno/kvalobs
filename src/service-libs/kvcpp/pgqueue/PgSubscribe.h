@@ -53,7 +53,7 @@ class PgSubscribe : public virtual details::KvalobsSubscribe,
                     virtual details::KvAppControl,
                     boost::noncopyable {
 public:
-  PgSubscribe(const kvalobs::subscribe::PgConfig &config);
+  PgSubscribe(kvalobs::subscribe::PgConfig config);
   ~PgSubscribe();
 
   virtual SubscriberID subscribeData(const KvDataSubscribeInfoHelper &info,

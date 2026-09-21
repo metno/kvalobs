@@ -165,7 +165,7 @@ void broadcastNotification(
 }
 
 
-PgSubscribe::PgSubscribe(const kvalobs::subscribe::PgConfig &config)
+PgSubscribe::PgSubscribe(kvalobs::subscribe::PgConfig config)
     : config_(config),
       shutdown_(false) {
 }
