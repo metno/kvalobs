@@ -28,6 +28,7 @@
  */
 
 #include "service-libs/kvcpp/KvApp.h"
+#include "kvsubscribe/pgconfig.h"
 #include "CurrentKvApp.h"
 #include <kvalobs/kvPath.h>
 #include "kafka/creategroupid.h"
@@ -43,6 +44,8 @@ namespace kvservice {
 
 KvApp *KvApp::kvApp = 0;
 std::string KvApp::appName="";
+std::string KvApp::consumerGroupId_;
+
 
 miutil::conf::ConfSection * readConf(const boost::filesystem::path & configFile) {
   if (!exists(configFile) || !is_regular_file(configFile))
@@ -122,7 +125,18 @@ std::string KvApp::getConfigValue(const std::string & key,
 
   return value.front().valAsString();
 }
+
+std::string KvApp::setConsumerGroupId(const std::string &consumer) {
+  std::string old(consumerGroupId_);
+  consumerGroupId_=consumer;
+  return old;
+}
+
 std::string KvApp::getConsumerGroupId(const std::string &consumerGroupIdKey) {
+  if( ! consumerGroupId_.empty() ) {
+    return consumerGroupId_;
+  }
+
   auto progname=appName;
   std::string idkey("pgqueue.consumer_group."+progname);
 

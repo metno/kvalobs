@@ -88,6 +88,7 @@ public:
    * Stop all and wait for threads to finish
    */
   void joinAll();
+  std::string consumerGroupId() const;
 
   virtual bool shutdown() const;
   virtual void doShutdown();

@@ -3,6 +3,7 @@
 #include <chrono>
 #include <csignal>
 #include <exception>
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <thread>
@@ -12,7 +13,25 @@
 namespace {
 volatile std::sig_atomic_t stopRequested = 0;
 
+bool deleteLogAtStart = true;
 void requestStop(int) { stopRequested = 1; }
+
+void writeErrorToFile(const std::string &message) {
+  if (deleteLogAtStart) {
+    std::ofstream errorFile("kvconsumer_error.log", std::ios::trunc);
+    deleteLogAtStart = false;
+  }
+
+  // Create timestamp
+  auto now = std::chrono::system_clock::now();
+  std::time_t now_c = std::chrono::system_clock::to_time_t(now);
+  std::string timestamp = std::ctime(&now_c);
+  timestamp.pop_back(); // remove trailing newline
+  std::ofstream errorFile("kvconsumer_error.log", std::ios::app);
+  if (errorFile) {
+    errorFile << "[" << timestamp << "] " << message << '\n';
+  }
+}
 
 
 void usage(const char *program) {
@@ -210,11 +229,15 @@ int main(int argc, char **argv) {
         }
       } catch (const std::exception &error) {
         std::cerr << "pgqueue_consumer: " << error.what() << '\n';
+        writeErrorToFile(std::string("pgqueue_consumer: ") + error.what());
+        reconnect = true;
       }
     }
     std::cout << "Stopped\n";
   } catch (const std::exception &error) {
+    
     std::cerr << "pgqueue_consumer: " << error.what() << '\n';
+    writeErrorToFile(std::string("pgqueue_consumer: ") + error.what());
     return 1;
   }
 

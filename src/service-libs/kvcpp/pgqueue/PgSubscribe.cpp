@@ -27,21 +27,21 @@
  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <stdexcept>
-#include <list>
-#include <set>
-#include <mutex>
+#include "service-libs/kvcpp/pgqueue/PgSubscribe.h"
 #include "boost/uuid/uuid.hpp"
 #include "boost/uuid/uuid_generators.hpp"
 #include "boost/uuid/uuid_io.hpp"
-#include "lib/kvsubscribe/DataSubscriber.h"
+#include "creategroupid.h"
 #include "lib/decodeutility/kvalobsdata.h"
+#include "lib/kvsubscribe/DataSubscriber.h"
+#include "lib/kvsubscribe/PgConsumer.h"
 #include "lib/milog/milog.h"
 #include "service-libs/kvcpp/kvevents.h"
-#include "lib/kvsubscribe/PgConsumer.h"
-#include "service-libs/kvcpp/pgqueue/PgSubscribe.h"
-#include "service-libs/kvcpp/test/testPgSubcriber.h"  // header file for the test interface
-#include "creategroupid.h"
+#include "service-libs/kvcpp/test/testPgSubcriber.h" // header file for the test interface
+#include <list>
+#include <mutex>
+#include <set>
+#include <stdexcept>
 
 using namespace kvalobs::subscribe;
 using namespace kvalobs;
@@ -55,8 +55,8 @@ std::string uniqueString() {
   return boost::uuids::to_string(generator());
 }
 
-void broadcast(const ::kvalobs::serialize::KvalobsData & d,
-               dnmi::thread::CommandQue & queue) {
+void broadcast(const ::kvalobs::serialize::KvalobsData &d,
+               dnmi::thread::CommandQue &queue) {
   std::map<int, kvservice::KvObsData> elements;
 
   boost::posix_time::ptime fakeTbtime(
@@ -64,8 +64,8 @@ void broadcast(const ::kvalobs::serialize::KvalobsData & d,
 
   std::list<kvData> data;
   d.getData(data, fakeTbtime);
-  for (const kvData & d : data) {
-    kvservice::KvObsData & obsData = elements[d.stationID()];
+  for (const kvData &d : data) {
+    kvservice::KvObsData &obsData = elements[d.stationID()];
     if (obsData.stationid() == 0 and d.stationID() != 0)
       obsData = kvservice::KvObsData(d.stationID());
     obsData.dataList().push_back(d);
@@ -73,8 +73,8 @@ void broadcast(const ::kvalobs::serialize::KvalobsData & d,
 
   std::list<kvTextData> textData;
   d.getData(textData, fakeTbtime);
-  for (const kvTextData & d : textData) {
-    kvservice::KvObsData & obsData = elements[d.stationID()];
+  for (const kvTextData &d : textData) {
+    kvservice::KvObsData &obsData = elements[d.stationID()];
     if (obsData.stationid() == 0 and d.stationID() != 0)
       obsData = kvservice::KvObsData(d.stationID());
     obsData.textDataList().push_back(d);
@@ -85,13 +85,13 @@ void broadcast(const ::kvalobs::serialize::KvalobsData & d,
   for (auto element : elements)
     toSend->push_back(element.second);
 
-  kvservice::DataEvent * event = new kvservice::DataEvent(toSend);
+  kvservice::DataEvent *event = new kvservice::DataEvent(toSend);
   queue.postAndBrodcast(event);
 }
 
-void broadcast(const ::kvalobs::serialize::KvalobsData & d,
+void broadcast(const ::kvalobs::serialize::KvalobsData &d,
                const KvDataSubscribeInfoHelper &info,
-               dnmi::thread::CommandQue & queue) {
+               dnmi::thread::CommandQue &queue) {
   auto stations = info.getDataSubscribeInfo()->ids;
   if (stations.length() == 0) {
     broadcast(d, queue);
@@ -109,7 +109,7 @@ void broadcast(const ::kvalobs::serialize::KvalobsData & d,
     std::list<kvData> dataInMessage;
     d.getData(dataInMessage, fakeTbtime);
     std::copy_if(dataInMessage.begin(), dataInMessage.end(),
-                 std::back_inserter(data), [& st](const kvalobs::kvData & d) {
+                 std::back_inserter(data), [&st](const kvalobs::kvData &d) {
                    return st.find(d.stationID()) != st.end();
                  });
   }
@@ -120,12 +120,12 @@ void broadcast(const ::kvalobs::serialize::KvalobsData & d,
     d.getData(textDataInMessage, fakeTbtime);
     std::copy_if(textDataInMessage.begin(), textDataInMessage.end(),
                  std::back_inserter(textData),
-                 [& st](const kvalobs::kvTextData & d) {
+                 [&st](const kvalobs::kvTextData &d) {
                    return st.find(d.stationID()) != st.end();
                  });
   }
 
-  if ( data.empty() && textData.empty() )  // Do not publish empty messages.
+  if (data.empty() && textData.empty()) // Do not publish empty messages.
     return;
 
   serialize::KvalobsData theData(data, textData);
@@ -135,7 +135,7 @@ void broadcast(const ::kvalobs::serialize::KvalobsData & d,
 }
 
 struct cmpWhat {
-  bool operator ()(const KvWhat & a, const KvWhat & b) const {
+  bool operator()(const KvWhat &a, const KvWhat &b) const {
     if (a.stationID() != b.stationID())
       return a.stationID() < b.stationID();
     if (a.typeID() != b.typeID())
@@ -144,9 +144,8 @@ struct cmpWhat {
   }
 };
 
-void broadcastNotification(
-    const ::kvalobs::serialize::KvalobsData & kvalobsData,
-    dnmi::thread::CommandQue &queue) {
+void broadcastNotification(const ::kvalobs::serialize::KvalobsData &kvalobsData,
+                           dnmi::thread::CommandQue &queue) {
 
   std::set<KvWhat, cmpWhat> elements;
   std::list<kvalobs::kvData> data;
@@ -158,77 +157,65 @@ void broadcastNotification(
     elements.insert(KvWhat(d.stationID(), d.typeID(), d.obstime()));
 
   KvWhatListPtr newData(new KvWhatList(elements.begin(), elements.end()));
-  kvservice::DataNotifyEvent * event = new kvservice::DataNotifyEvent(newData);
+  kvservice::DataNotifyEvent *event = new kvservice::DataNotifyEvent(newData);
   queue.postAndBrodcast(event);
 }
 
-}
-
+} // namespace
 
 PgSubscribe::PgSubscribe(kvalobs::subscribe::PgConfig config)
-    : config_(config),
-      shutdown_(false) {
-}
+    : config_(config), shutdown_(false) {}
 
-PgSubscribe::~PgSubscribe() {
-  joinAll();
-}
+PgSubscribe::~PgSubscribe() { joinAll(); }
 
-PgSubscribe::SubscriberID PgSubscribe::subscribeData(
-    const KvDataSubscribeInfoHelper &info, dnmi::thread::CommandQue &queue) {
-  std::cerr  << "PgSubscribe::subscribeData: Subscribing with info: " << info << std::endl;
-  auto groupId=config_.consumerGroup;
-  std::cerr  << "PgSubscribe::subscribeData:Subscribing with groupId: " << groupId << std::endl;
+PgSubscribe::SubscriberID
+PgSubscribe::subscribeData(const KvDataSubscribeInfoHelper &info,
+                           dnmi::thread::CommandQue &queue) {
+  auto groupId = config_.consumerGroup;
   return subscribeDataWithGroupId(info, queue, groupId);
 }
 
-PgSubscribe::SubscriberID PgSubscribe::subscribeDataWithGroupId(const KvDataSubscribeInfoHelper &info,
-                                     dnmi::thread::CommandQue &queue, const std::string &groupId){
-  std::string topic="kvalobs." + config_.domain+".checked";  
-  std::cerr  << "PgSubscribe::subscribeDataWithGroupId: \n"
-            << "\ttopic:   " << topic << "\n"
-            << "\tgroupId: " << groupId << "\n"
-            << "\tconsumerPollSize: " << config_.pollSize << "\n"
-            << std::for_each(config_.connections.begin(), config_.connections.end(), [](const std::string &c){ std::cerr << "\tconnection: " << c << "\n"; })
-            << std::endl;
-  PgConsumer *pgConsumer= new PgConsumer(config_.connections,
-      topic, groupId, config_.pollSize);
-  std::cerr << "PgConsumer created for topic: " << topic << " with groupId: " << groupId << std::endl;
-  ConsumerPtr runner(
-      new DataSubscriber(
-          [info, & queue](const ::kvalobs::serialize::KvalobsData & d) {
-            broadcast(d, info, queue);
-          }, pgConsumer, true));
-  std::cerr << "DataSubscriber created for topic: " << topic << " with groupId: " << groupId << std::endl;
-  LOGINFO("SubscribeData: Consumer group id: '" << groupId << "'. topic: '" << runner->getTopic() <<"'.");
+PgSubscribe::SubscriberID
+PgSubscribe::subscribeDataWithGroupId(const KvDataSubscribeInfoHelper &info,
+                                      dnmi::thread::CommandQue &queue,
+                                      const std::string &groupId) {
+  std::string topic = "kvalobs." + config_.domain + ".checked";
+  PgConsumer *pgConsumer =
+      new PgConsumer(config_.connections, topic, groupId, config_.pollSize);
+  ConsumerPtr runner(new DataSubscriber(
+      [info, &queue](const ::kvalobs::serialize::KvalobsData &d) {
+        broadcast(d, info, queue);
+      },
+      pgConsumer, true));
+  LOGINFO("SubscribeData: Consumer group id: '" << groupId << "'. topic: '"
+                                                << runner->getTopic() << "'.");
   std::string ret = uniqueString();
-  consumers_[ret] = std::make_pair(runner,
-                                   std::thread([runner]() {runner->run();}));
+  consumers_[ret] =
+      std::make_pair(runner, std::thread([runner]() { runner->run(); }));
   return ret;
 }
 
-
-PgSubscribe::SubscriberID PgSubscribe::subscribeDataNotify(
-    const KvDataSubscribeInfoHelper &info, dnmi::thread::CommandQue &queue) {
-    std::string topic="kvalobs." + config_.domain+".checked";                                    
-    std::string groupId=config_.consumerGroup;
-    PgConsumer *pgConsumer= new PgConsumer(config_.connections,
-      topic, groupId, config_.pollSize);
-  ConsumerPtr runner(
-      new DataSubscriber(
-          [info, & queue](const ::kvalobs::serialize::KvalobsData & d) {
-            broadcastNotification(d, queue);
-          },
-          pgConsumer));
+PgSubscribe::SubscriberID
+PgSubscribe::subscribeDataNotify(const KvDataSubscribeInfoHelper &info,
+                                 dnmi::thread::CommandQue &queue) {
+  std::string topic = "kvalobs." + config_.domain + ".checked";
+  std::string groupId = config_.consumerGroup;
+  PgConsumer *pgConsumer =
+      new PgConsumer(config_.connections, topic, groupId, config_.pollSize);
+  ConsumerPtr runner(new DataSubscriber(
+      [info, &queue](const ::kvalobs::serialize::KvalobsData &d) {
+        broadcastNotification(d, queue);
+      },
+      pgConsumer));
 
   std::string ret = uniqueString();
-  consumers_[ret] = std::make_pair(runner,
-                                   std::thread([runner]() {runner->run();}));
+  consumers_[ret] =
+      std::make_pair(runner, std::thread([runner]() { runner->run(); }));
   return ret;
 }
 
-PgSubscribe::SubscriberID PgSubscribe::subscribeKvHint(
-    dnmi::thread::CommandQue &queue) {
+PgSubscribe::SubscriberID
+PgSubscribe::subscribeKvHint(dnmi::thread::CommandQue &queue) {
   throw std::runtime_error("subscribeKvHint: Not implemented!");
 }
 
@@ -237,11 +224,12 @@ void PgSubscribe::unsubscribe(const PgSubscribe::SubscriberID &subscriberid) {
 }
 
 void PgSubscribe::unsubscribeAll() {
-  for (auto & consumer : consumers_)
+  for (auto &consumer : consumers_)
     consumer.second.first->stop();
 }
 
-bool PgSubscribe::knowsAbout(const PgSubscribe::SubscriberID &subscriberid) const {
+bool PgSubscribe::knowsAbout(
+    const PgSubscribe::SubscriberID &subscriberid) const {
   return consumers_.find(subscriberid) != consumers_.end();
 }
 
@@ -253,23 +241,20 @@ void PgSubscribe::join(const PgSubscribe::SubscriberID &subscriberid) {
 
 void PgSubscribe::joinAll() {
   unsubscribeAll();
-  for (auto & consumer : consumers_)
+  for (auto &consumer : consumers_)
     consumer.second.second.join();
   consumers_.clear();
 }
 
-PgSubscribe::RunnableConsumer & PgSubscribe::getConsumer_(
-    const PgSubscribe::SubscriberID &subscriberid) {
+PgSubscribe::RunnableConsumer &
+PgSubscribe::getConsumer_(const PgSubscribe::SubscriberID &subscriberid) {
   ConsumerCollection::iterator find = consumers_.find(subscriberid);
   if (consumers_.end() == find)
     throw std::runtime_error("Attempting to access invalid subscriber");
   return find->second;
-
 }
 
-bool PgSubscribe::shutdown() const {
-  return shutdown_;
-}
+bool PgSubscribe::shutdown() const { return shutdown_; }
 
 void PgSubscribe::doShutdown() {
   shutdown_ = true;
@@ -283,17 +268,21 @@ void PgSubscribe::run() {
   joinAll();
 }
 
+std::string PgSubscribe::consumerGroupId() const {
+  return config_.consumerGroup;
+}
+
 namespace test {
 /*
  * The namespace test is used to export function in the anonymous namespace
  * so they are available for unit testing. The test interface is defined in
  * kvcpp/test/testPgSubcriber.h.
  */
-void broadcast(const ::kvalobs::serialize::KvalobsData & d,
+void broadcast(const ::kvalobs::serialize::KvalobsData &d,
                const KvDataSubscribeInfoHelper &info,
-               dnmi::thread::CommandQue & queue) {
+               dnmi::thread::CommandQue &queue) {
   kvservice::pg::broadcast(d, info, queue);
 }
-}  // namespace test
-}  // namespace pg 
-}  // namespace kvservice
+} // namespace test
+} // namespace pg
+} // namespace kvservice

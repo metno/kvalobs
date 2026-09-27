@@ -217,11 +217,11 @@ void prepare(void *conn_, const char *name, const char *sql) {
 void check_result_raw(PGresult *res, ExecStatusType expected,
                       const std::string &ctx) {
   if (PQresultStatus(res) != expected) {
-    std::cerr << "ERROR PgMessaging: " << ctx << ": unexpected result status"
-              << std::endl;
+    std::string expectedStatus = PQresStatus(expected);
+    std::string gotStatus = PQresStatus(PQresultStatus(res));
     std::string err = PQresultErrorMessage(res);
     PQclear(res);
-    throw std::runtime_error(ctx + ": " + err);
+    throw std::runtime_error("PgMessaging: check_result_raw '" + ctx + "' failed: expected '" + expectedStatus + "', got '" + gotStatus + "', error: " + err);
   }
 }
 
@@ -230,8 +230,6 @@ void check_result(ResultGuard &g, ExecStatusType expected,
   try {
     check_result_raw(g.res, expected, ctx);
   } catch (const std::exception &e) {
-    std::cerr << "ERROR PgMessaging: " << ctx
-              << ": unexpected result status. What: " << e.what() << std::endl;
     g.res = nullptr;
     throw;
   }
@@ -245,8 +243,6 @@ void check_command(ResultGuard &g, const std::string &ctx) {
   try {
     check_command_raw(g.res, ctx);
   } catch (const std::exception &e) {
-    std::cerr << "ERROR PgMessaging: " << ctx << ": unexpected result status"
-              << std::endl;
     g.res = nullptr;
     throw;
   }
@@ -318,11 +314,13 @@ void PgMessaging::prepare_primary_stmts() {
                       msgTbl_)
               .c_str());
 
-  prepare(primaryCon_, "register_consumer", R"(
-        INSERT INTO consumer_offsets (consumer_name, topic, last_id)
-        VALUES ($1, $2, 0)
+  prepare(primaryCon_, "register_consumer", std::format(R"(
+        INSERT INTO consumer_offsets (consumer_name, topic, last_id, tblname)
+        VALUES ($1, $2, 0, '{0}')
         ON CONFLICT (consumer_name, topic) DO NOTHING
-    )");
+    )",
+                      msgTbl_)
+              .c_str() );
 
   prepare(primaryCon_, "commit_offset",
           std::format(R"(

@@ -97,8 +97,16 @@ std::string removePassword(const std::string &connect) {
 }
 
 dnmi::db::Connection * createConnection(std::shared_ptr<miutil::conf::ConfSection> conf) {
+  std::string kvlibdir=kvalobs::kvPath(kvalobs::pkglibdir);
   std::string connectString = getValue("database.dbconnect", conf);
-  std::string driver = kvalobs::kvPath(kvalobs::pkglibdir) + "/db/" + getValue("database.dbdriver", conf);
+
+  if (const char * clibdir = std::getenv("KVLIBDIR"); clibdir!=nullptr && strlen(clibdir) > 0) {
+    kvlibdir = std::string(clibdir);
+  }
+  if (kvlibdir.ends_with("/"))
+    kvlibdir.pop_back();
+
+  std::string driver = kvlibdir + "/db/" + getValue("database.dbdriver", conf);
 
   std::string driverId;
   if (!dnmi::db::DriverManager::loadDriver(driver, driverId))
@@ -123,68 +131,16 @@ void releaseConnection(dnmi::db::Connection * connection) {
   dnmi::db::DriverManager::releaseConnection(connection);
 }
 
-std::string pgDomain(int argc, char **argv, std::shared_ptr<miutil::conf::ConfSection> preferredConfig) {
-  std::shared_ptr<miutil::conf::ConfSection> config = KvApp::getConfiguration(preferredConfig, stem(argv[0]));
-  auto ret = getValue("pgqueue.domain", config);
-  LOGINFO("pgqueue.domain: '"<< ret << "'");
-  return ret;
-}
 
-int pgConsumerPollSize(int argc, char **argv, std::shared_ptr<miutil::conf::ConfSection> preferredConfig) {
-  std::shared_ptr<miutil::conf::ConfSection> config = KvApp::getConfiguration(preferredConfig, stem(argv[0]));
-  int ret;
-  try{
-    ret = getIntValue("pgqueue.consumer_poll_size", config, 100);
-  } catch( const std::exception &) {
-    ret=100;
-  }
-
-  LOGINFO("pgqueue.consumer_poll_size: '"<< ret << "'");
-  return ret;
-}
-
-
-std::vector<std::string> pgConnections(int argc, char ** argv, std::shared_ptr<miutil::conf::ConfSection> preferredConfig) {
-  std::shared_ptr<miutil::conf::ConfSection> config = KvApp::getConfiguration(preferredConfig, stem(argv[0]));
-
-  std::vector<std::string> result;
-  try {
-    if (auto val = getValue("pgqueue.database_a", config); !val.empty())
-      result.push_back(val);
-  }
-  catch( const std::exception &) {
-  }
-  try {
-    if (auto val = getValue("pgqueue.database_b", config); !val.empty())
-      result.push_back(val);
-  }
-  catch( const std::exception &) {
-  }
-
-  return result;
-}
-
-
-kvalobs::subscribe::PgConfig getPgConfig(std::shared_ptr<miutil::conf::ConfSection> preferredConfig, const std::string &progName) {
-  kvalobs::subscribe::PgConfig config=kvalobs::subscribe::PgConfig::config(preferredConfig.get(), progName);
-  
-  if( config.consumerGroup.empty()) {
-    LOGWARN("No consumer group given or created for '" << progName<<"'");
-  } else {
-    LOGINFO("Using consumer group '" << config.consumerGroup << "' for '" << progName << "'");
-  } 
-
-  return config;
-}
-  
 } // anonymous namespace
 
 CurrentKvApp::CurrentKvApp(int argc, char ** argv, std::shared_ptr<miutil::conf::ConfSection> preferredConfig)
     : sql::SqlGet(connector(argc, argv, preferredConfig), releaseConnection),
-      pg::PgSubscribe(kvalobs::subscribe::PgConfig::config(preferredConfig.get(), stem(argv[0]))) {
+      pg::PgSubscribe(kvalobs::subscribe::PgConfig::config(preferredConfig.get(), KvApp::appName)) {
   std::shared_ptr<miutil::conf::ConfSection> conf = KvApp::getConfiguration(preferredConfig, stem(argv[0]));
   sendData_ = std::unique_ptr<kvalobs::datasource::SendData>(new kvalobs::datasource::HttpSendData(*conf));
   // needed for correct handling of CORBA::string_dup, below
+  KvApp::setConsumerGroupId(this->consumerGroupId());
   int ac = 1;
   char * av = const_cast<char*>("fake");
   CORBA::ORB_init(ac, &av);

@@ -36,60 +36,6 @@ namespace kvalobs {
 namespace subscribe {
 
 namespace {
-
-bool consumeRaw(PgMessaging *queue, const std::string &topic,
-                const std::string &groupId, ConsumerDataHandler *handler,
-                int pollSize = 100) {
-  const std::vector<Message> messages = queue->poll(groupId, topic, pollSize);
-  if (messages.empty()) {
-    return false;
-  }
-
-  for (const Message &message : messages) {
-    handler->data(message.data.c_str(), message.data.size());
-  }
-  queue->commit_offset(groupId, topic, messages.back().id);
-  std::cout << "Committed offset " << messages.back().id << '\n';
-  return true;
-}
-
-bool consumeChecked(PgMessaging *queue, const std::string &topic,
-                    const std::string &groupId, ConsumerDataHandler *handler,
-                    int pollSize = 100) {
-  bool lowPri;
-  std::string topicLowpri(topic + ".lowpri");
-  std::vector<Message> messages;
-  messages.clear();
-  lowPri = false;
-  messages = queue->poll(groupId, topic, pollSize);
-  if (messages.empty()) {
-    lowPri = true;
-    messages = queue->poll(groupId, topicLowpri, pollSize);
-  }
-  if (messages.empty()) {
-    return false;
-  }
-
-  for (const Message &message : messages) {
-    handler->data(message.data.c_str(), message.data.size());
-  }
-
-  if (lowPri) {
-    queue->commit_offset(groupId, topicLowpri, messages.back().id);
-  } else {
-    queue->commit_offset(groupId, topic, messages.back().id);
-  }
-  return true;
-}
-
-bool consume(PgMessaging *queue, const std::string &topic,
-             const std::string &groupId, ConsumerDataHandler *handler,
-             int pollSize = 100) {
-  if (topic.find(".checked") != std::string::npos)
-    return consumeChecked(queue, topic, groupId, handler, pollSize);
-  return consumeRaw(queue, topic, groupId, handler, pollSize);
-}
-
 std::vector<std::string> splitTopic(const std::string &topic) {
   std::vector<std::string> parts;
   std::stringstream stream(topic);
@@ -143,19 +89,16 @@ PgConsumer::PgConsumer(const std::vector<std::string> &connections,
   init(connections, topic, groupId);
 }
 PgConsumer::PgConsumer(PgConfig config)
-    : Consumer(config.topic(), config.consumerGroup),
-      stopping_(false),
+    : Consumer(config.topic(), config.consumerGroup), stopping_(false),
       pollSize_(config.pollSize) {
   init(config.connections, config.topic(), config.consumerGroup);
 }
 
 PgConsumer::PgConsumer(PgConfig config, ConsumerDataHandler *handler)
-    : Consumer(config.topic(), config.consumerGroup, handler),
-      stopping_(false),
+    : Consumer(config.topic(), config.consumerGroup, handler), stopping_(false),
       pollSize_(config.pollSize) {
   init(config.connections, config.topic(), config.consumerGroup);
 }
-
 
 PgConsumer::~PgConsumer() { Consumer::remove(this); }
 
@@ -163,11 +106,13 @@ void PgConsumer::init(const std::vector<std::string> &connections,
                       const std::string &topic, const std::string &groupId) {
   backOffInSeconds_ = 1; // Initialize back-off duration in seconds
   PgCluster::Environment env = decodeTopic(topic);
-
+  hasRegisteredConsumerRaw_ = false;
+  hasRegisteredConsumerChecked_ = false;
   if (connections.empty())
     throw std::invalid_argument("No 'pgqueue' database connections provided");
 
-  pgCluster_ = std::make_unique<PgCluster>(connections, env, groupId);
+  pgCluster_ = std::make_unique<PgCluster>(
+      connections, env, PgConfig::getProgName());
 
   if (!pgCluster_)
     throw std::runtime_error("Failed to create PgCluster instance");
@@ -185,13 +130,13 @@ void PgConsumer::runOnce(unsigned timeoutInMilliSeconds) {
     if (!pgMessaging_)
       pgMessaging_ = std::make_unique<PgMessaging>(*pgCluster_.get());
 
-    if (!consume(pgMessaging_.get(), getTopic(), groupId_, getHandler(),
+    if (!consume(pgMessaging_.get(), getTopic(), getGroupId(), getHandler(),
                  pollSize_)) {
       std::this_thread::sleep_for(
           std::chrono::milliseconds(timeoutInMilliSeconds));
       // Handle error if needed
     }
-    backOffInSeconds_ = 0;
+    backOffInSeconds_ = 1;
   } catch (const std::exception &e) {
     handleError(
         0,
@@ -201,7 +146,7 @@ void PgConsumer::runOnce(unsigned timeoutInMilliSeconds) {
     std::this_thread::sleep_for(std::chrono::seconds(backOffInSeconds_));
     backOffInSeconds_ =
         std::min(backOffInSeconds_ * 2,
-                 60); // Exponential back-off with a maximum of 60 seconds
+                 256); // Exponential back-off with a maximum of 256 seconds
     pgCluster_->reprobe();
     pgMessaging_.reset();
   }
@@ -210,6 +155,75 @@ void PgConsumer::runOnce(unsigned timeoutInMilliSeconds) {
 bool PgConsumer::stopping() const { return stopping_; }
 
 void PgConsumer::stop() { stopping_ = true; }
+
+bool PgConsumer::consumeRaw(PgMessaging *queue, const std::string &topic,
+                const std::string &groupId, ConsumerDataHandler *handler,
+                int pollSize) {
+
+  if (!hasRegisteredConsumerRaw_) {
+    queue->register_consumer(groupId, topic);
+    hasRegisteredConsumerRaw_ = true;
+  }
+
+  const std::vector<Message> messages = queue->poll(groupId, topic, pollSize);
+  if (messages.empty()) {
+    return false;
+  }
+
+  for (const Message &message : messages) {
+    handler->data(message.data.c_str(), message.data.size());
+  }
+  queue->commit_offset(groupId, topic, messages.back().id);
+  std::cout << "Committed offset " << messages.back().id << '\n';
+  return true;
+}
+
+bool PgConsumer::consumeChecked(PgMessaging *queue, const std::string &topic,
+                    const std::string &groupId, ConsumerDataHandler *handler,
+                    int pollSize) {
+  static int statCounter = 0;
+  bool lowPri;
+  std::string topicLowpri(topic + ".lowpri");
+  std::vector<Message> messages;
+  
+  if (!hasRegisteredConsumerChecked_) {
+    queue->register_consumer(groupId, topicLowpri);
+    queue->register_consumer(groupId, topic);
+    hasRegisteredConsumerChecked_ = true;
+  }
+  statCounter++;
+ 
+  messages.clear();
+  lowPri = false;
+  messages = queue->poll(groupId, topic, pollSize);
+  if (messages.empty()) {
+    lowPri = true;
+    messages = queue->poll(groupId, topicLowpri, pollSize);
+  }
+  if (messages.empty()) {
+    return false;
+  }
+
+  for (const Message &message : messages) {
+    handler->data(message.data.c_str(), message.data.size());
+  }
+ 
+  if (lowPri) {
+    queue->commit_offset(groupId, topicLowpri, messages.back().id);
+  } else {
+    queue->commit_offset(groupId, topic, messages.back().id);
+  }
+  return true;
+}
+
+bool PgConsumer::consume(PgMessaging *queue, const std::string &topic,
+             const std::string &groupId, ConsumerDataHandler *handler,
+             int pollSize) {
+  if (topic.find(".checked") != std::string::npos)
+    return consumeChecked(queue, topic, groupId, handler, pollSize);
+  return consumeRaw(queue, topic, groupId, handler, pollSize);
+}
+
 
 } // namespace subscribe
 } // namespace kvalobs

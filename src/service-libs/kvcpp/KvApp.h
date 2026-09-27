@@ -414,6 +414,7 @@ class KvApp : private boost::noncopyable, public virtual details::KvalobsGet,
                                                             bool reset = false);
   static std::shared_ptr<miutil::conf::ConfSection> getDefaultConfiguration(const std::string & application="");
 
+  static std::string setConsumerGroupId(const std::string &consumer);
   static std::string getConsumerGroupId(const std::string &consumerGroupKIdKey="");
 
   static std::string getConfigValue(const std::string & key,
@@ -428,6 +429,8 @@ class KvApp : private boost::noncopyable, public virtual details::KvalobsGet,
   KvApp();
 
   virtual ~KvApp();
+  private:
+    static std::string consumerGroupId_;
 };
 
 /** @} */

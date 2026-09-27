@@ -21,29 +21,27 @@ struct PgConfig {
   int pollSize;
   std::string consumerGroup;
   bool enabled;
-  
+  static std::string progName;
 
   PgConfig() : enabled(false), pollSize(0) {}
   PgConfig(const std::string &domain,
-           const std::vector<std::string> &connections,
-           int pollSize,
-           const std::string &consumerGroup,
-           bool enabled)
-      : domain(domain),
-        connections(connections),
-        pollSize(pollSize),
-        consumerGroup(consumerGroup),
-        enabled(enabled) {}
+           const std::vector<std::string> &connections, int pollSize,
+           const std::string &consumerGroup, bool enabled)
+      : domain(domain), connections(connections), pollSize(pollSize),
+        consumerGroup(consumerGroup), enabled(enabled) {}
 
   std::string topic(TopicType t = checked) const;
   static PgConfig config(const miutil::conf::ConfSection *conf,
                          const std::string &progname = "",
                          int defaultConsumerPollSize = 10);
 
-
-  // Returns the consumer group ID for the given program name, creating one if necessary (program name is not empty). 
-  // If the program name is empty and no consumer group is configured, it will return an empty string. 
-  static std::string getConsumerGroupId(const miutil::conf::ConfSection *conf,const std::string &progname);
+  static void setProgName(const std::string &progname);
+  static std::string getProgName();
+  // Returns the consumer group ID for the given program name, creating one if
+  // necessary (program name is not empty). If the program name is empty and no
+  // consumer group is configured, it will return an empty string.
+  static std::string getConsumerGroupId(const miutil::conf::ConfSection *conf,
+                                        const std::string &progname);
 };
 
 } // namespace subscribe

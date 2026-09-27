@@ -42,8 +42,7 @@ std::string pgDomain(miutil::conf::ConfSection *conf) {
 int pgConsumerPollSize(miutil::conf::ConfSection *conf,
                        const std::string &progname, int defaultValue) {
   if (!progname.empty()) {
-    auto v =
-        getIntValue("pgqueue.consumer_poll_size."+progname, conf, -1);
+    auto v = getIntValue("pgqueue.consumer_poll_size." + progname, conf, -1);
     if (v != -1) {
       return v;
     }
@@ -52,17 +51,16 @@ int pgConsumerPollSize(miutil::conf::ConfSection *conf,
 }
 
 std::string pgConsumerGroup(miutil::conf::ConfSection *conf,
-                       const std::string &progname, const std::string &defaultValue) {
+                            const std::string &progname,
+                            const std::string &defaultValue) {
   if (!progname.empty()) {
-    auto v =
-        getValue("pgqueue.consumer_group."+progname, conf, "");
+    auto v = getValue("pgqueue.consumer_group." + progname, conf, "");
     if (!v.empty()) {
-      return v; 
+      return v;
     }
   }
   return getValue("pgqueue.consumer_group", conf, defaultValue);
 }
-
 
 std::vector<std::string> pgConnections(miutil::conf::ConfSection *conf) {
 
@@ -86,6 +84,12 @@ bool pgEnabled(miutil::conf::ConfSection *conf) {
 }
 } // namespace
 
+std::string PgConfig::progName;
+
+void PgConfig::setProgName(const std::string &progname) { progName = progname; }
+
+std::string PgConfig::getProgName() { return progName; }
+
 PgConfig PgConfig::config(const miutil::conf::ConfSection *conf,
                           const std::string &progname,
                           int defaultConsumerPollSize) {
@@ -97,7 +101,9 @@ PgConfig PgConfig::config(const miutil::conf::ConfSection *conf,
       pgConnections(const_cast<miutil::conf::ConfSection *>(conf));
   cfg.domain = pgDomain(const_cast<miutil::conf::ConfSection *>(conf));
   cfg.enabled = pgEnabled(const_cast<miutil::conf::ConfSection *>(conf));
-  cfg.consumerGroup=getConsumerGroupId(const_cast<miutil::conf::ConfSection *>(conf), progname);
+  cfg.consumerGroup = getConsumerGroupId(
+      const_cast<miutil::conf::ConfSection *>(conf), progname);
+  progName = progname;
   return cfg;
 }
 std::string PgConfig::topic(TopicType t) const {
@@ -111,12 +117,14 @@ std::string PgConfig::topic(TopicType t) const {
   }
 }
 
-std::string PgConfig::getConsumerGroupId(const miutil::conf::ConfSection *conf,const std::string &progname) {
-  std::string consumer = pgConsumerGroup(const_cast<miutil::conf::ConfSection *>(conf), progname, "");
+std::string PgConfig::getConsumerGroupId(const miutil::conf::ConfSection *conf,
+                                         const std::string &progname) {
+  std::string consumer = pgConsumerGroup(
+      const_cast<miutil::conf::ConfSection *>(conf), progname, "");
 
-  if (consumer.empty() && !progname.empty()) {
-      consumer = createConsumerGroupId(progname);
-  }
+  if (consumer.empty() ) {
+    consumer = createConsumerGroupId(progname.empty() ? progName : progname);
+  } 
   return consumer;
 }
 

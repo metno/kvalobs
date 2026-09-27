@@ -61,7 +61,7 @@ public:
   virtual void error(int code, const std::string &msg) override {
     // Default implementation: log the error
     milog::LogContext context("DataHandler");
-    LOGERROR(msg);
+    LOGERROR("Error code bladibla: " << code << ", message: " << msg);
   }
 private:
   DataSubscriber::Handler handler_;
@@ -72,7 +72,8 @@ std::function<void(const std::string &message, const serialize::KvalobsData &d)>
     DataSubscriber::debugWriter = writeNoDebug;
 
 DataSubscriber::DataSubscriber(Handler handler, Consumer *consumer,  bool ownsConsumer)
-    : Consumer("", consumer ? consumer->getGroupId() : ""), handler_(handler), consumer_(consumer), ownsConsumer_(ownsConsumer) {
+    : Consumer(consumer!=nullptr?consumer->getTopic():"", consumer!=nullptr ? consumer->getGroupId() : ""),
+     handler_(handler), consumer_(consumer), ownsConsumer_(ownsConsumer) {
       DataHandler *dataHandler = new DataHandler(handler_);
       consumer_->setHandler(dataHandler);
     }
