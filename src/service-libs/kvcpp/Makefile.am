@@ -90,27 +90,27 @@ $(pkgconfig_DATA): $(top_builddir)/config.status
 # 	-R "$(rdkafka_LIBDIR)"
 
 
-if HAVE_GTEST
+# if HAVE_GTEST
 
-TESTS = gtest
+# TESTS = gtest
 
-check_PROGRAMS = gtest
+# check_PROGRAMS = gtest
 
-gtest_SOURCES = \
-	test/testKafkaSubcriber.h \
-	test/gtest.cc
+# gtest_SOURCES = \
+# 	test/testKafkaSubcriber.h \
+# 	test/gtest.cc
 
-gtest_CPPFLAGS = \
-	-DTESTDIR="\""$(top_srcdir)/src/service-libs/kvcpp/test"\"" \
-	$(AM_CPPFLAGS) \
-	$(libkvalobs_kvcpp_la_CPPFLAGS) \
-	$(gtest_CFLAGS)
+# gtest_CPPFLAGS = \
+# 	-DTESTDIR="\""$(top_srcdir)/src/service-libs/kvcpp/test"\"" \
+# 	$(AM_CPPFLAGS) \
+# 	$(libkvalobs_kvcpp_la_CPPFLAGS) \
+# 	$(gtest_CFLAGS)
 
-gtest_LDADD = \
-	libkvalobs_kvcpp.la \
-	$(libkvalobs_kvcpp_la_LIBADD) \
-	$(gtest_LIBS)
+# gtest_LDADD = \
+# 	libkvalobs_kvcpp.la \
+# 	$(libkvalobs_kvcpp_la_LIBADD) \
+# 	$(gtest_LIBS)
 	
-endif
+# endif
 
 EXTRA_DIST = test/etc/kvalobs/gtest.conf

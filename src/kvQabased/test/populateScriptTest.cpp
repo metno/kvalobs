@@ -110,7 +110,7 @@ TEST_F(populateScriptTest, scriptGenerate) {
         "meta_timeoffset");
     ASSERT_TRUE(meta_timeoffset != numericList.end());
     ASSERT_EQ(1u, meta_timeoffset->second.size());
-    EXPECT_FLOAT_EQ(0, meta_timeoffset->second.front());
+    EXPECT_DOUBLE_EQ(0.0, meta_timeoffset->second.front());
   }
 }
 
@@ -136,13 +136,13 @@ TEST_F(populateScriptTest, minimalScript) {
   const scriptrunner::ScriptInput::ValueList & v = numericList["obstime"];
   ASSERT_EQ(6u, v.size());
   boost::posix_time::ptime t(
-      boost::gregorian::date(v[0], v[1], v[2]),
-      boost::posix_time::time_duration(v[3], v[4], v[5]));
+      boost::gregorian::date(static_cast<int>(v[0]),static_cast<int>(v[1]), static_cast<int>(v[2])),
+      boost::posix_time::time_duration(static_cast<int>(v[3]), static_cast<int>(v[4]), static_cast<int>(v[5])));
   EXPECT_EQ(observation.obstime(), t);
 
   scriptrunner::ScriptInput::NumericParameters numeric = obs->numeric();
-  EXPECT_FLOAT_EQ(1.15, numeric["station_latitude"]);
-  EXPECT_FLOAT_EQ(12.5, numeric["station_longitude"]);
+  EXPECT_DOUBLE_EQ(1.15, numeric["station_latitude"]);
+  EXPECT_DOUBLE_EQ(12.5, numeric["station_longitude"]);
 }
 
 TEST_F(populateScriptTest, usesOriginalValueForObs) {
@@ -496,17 +496,17 @@ TEST_F(populateScriptTest, metaData) {
   NumList::const_iterator m = numericList.find("M");
   ASSERT_TRUE(m != numericList.end());
   ASSERT_EQ(1u, m->second.size());
-  EXPECT_FLOAT_EQ(1.1, m->second.front());
+  EXPECT_FLOAT_EQ(1.1f, static_cast<float>(m->second.front()));
 
   NumList::const_iterator n = numericList.find("N");
   ASSERT_TRUE(n != numericList.end());
   ASSERT_EQ(1u, n->second.size());
-  EXPECT_FLOAT_EQ(2.2, n->second.front());
+  EXPECT_FLOAT_EQ(2.2f, static_cast<float>(n->second.front()));
 
   NumList::const_iterator meta_timeoffset = numericList.find("meta_timeoffset");
   ASSERT_TRUE(meta_timeoffset != numericList.end());
   ASSERT_EQ(1u, meta_timeoffset->second.size());
-  EXPECT_FLOAT_EQ(0, meta_timeoffset->second.front());
+  EXPECT_DOUBLE_EQ(0.0, meta_timeoffset->second.front());
 }
 
 TEST_F(populateScriptTest, getsValuesFromDb) {
@@ -559,11 +559,11 @@ TEST_F(populateScriptTest, modelData) {
   NumList numericList = model->numericList();
   EXPECT_EQ(3u, numericList.size());
   ASSERT_EQ(1u, numericList["mX"].size());
-  EXPECT_FLOAT_EQ(42.1, numericList["mX"].front());
+  EXPECT_DOUBLE_EQ(42.1, numericList["mX"].front());
   ASSERT_EQ(1u, numericList["mX_missing"].size());
   EXPECT_EQ(0, numericList["mX_missing"].front());
   ASSERT_EQ(1u, numericList["model_timeoffset"].size());
-  EXPECT_EQ(0, numericList["mX_missing"].front());
+  EXPECT_DOUBLE_EQ(0.0, numericList["model_timeoffset"].front());
 }
 
 TEST_F(populateScriptTest, nonmatchingSignatures) {
