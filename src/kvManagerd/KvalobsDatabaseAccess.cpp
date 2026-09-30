@@ -293,7 +293,7 @@ KvalobsDatabaseAccess::insertMissingDataQuery_(const DataIdentifier &di) const {
   q << "    " << di.obsid() << ", \n";
   q << "    mv.value,\n";
   q << "    q.paramid,\n";
-  q << "    q.sensor::char,\n";
+  q << "    q.sensor,\n";
   q << "    q.level,\n";
   q << "    mv.value,\n";
   q << "    mv.controlinfo,\n";
@@ -332,7 +332,7 @@ KvalobsDatabaseAccess::insertMissingDataQuery_(const DataIdentifier &di) const {
   //        ...but remove any combinations that already exist in data table
   q << "    SELECT \n";
   q << "      d.paramid, \n";
-  q << "      d.sensor::int,\n";
+  q << "      d.sensor,\n";
   q << "      d.level\n";
   q << "    FROM \n";
   q << "      obsdata d,\n";

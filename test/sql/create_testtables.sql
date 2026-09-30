@@ -5,7 +5,7 @@ CREATE TABLE rcvtest_data (
         paramid     INTEGER NOT NULL,
         tbtime      TIMESTAMP NOT NULL,
         typeid      INTEGER NOT NULL,
-        sensor      CHAR(1) DEFAULT '0',
+        sensor      SMALLINT DEFAULT 0,
         level       INTEGER DEFAULT 0,
         corrected   FLOAT NOT NULL,
         controlinfo CHAR(16) DEFAULT '0000000000000000',

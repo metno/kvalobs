@@ -222,7 +222,7 @@ std::string kvalobs::kvData::uniqueKey() const {
   ost << " WHERE stationid=" << stationid_ << " AND "
       << "       obstime=" << quoted(to_kvalobs_string(obstime_)) << " AND "
       << "       paramid=" << paramid_ << " AND " << "       typeid=" << typeid_
-      << " AND " << "       sensor=" << quoted(sensor_) << " AND "
+      << " AND " << "       sensor=" << sensor_ << " AND "
       << "       level=" << level_;
 
   return ost.str();
@@ -238,7 +238,7 @@ std::string kvalobs::kvData::toUpdate() const {
       << " AND " << "       obstime=" << quoted(to_kvalobs_string(obstime_))
       << " AND " << "       paramid=" << paramid_ << " AND "
       << "       typeid=" << typeid_ << " AND "
-      << "       sensor=" << quoted(sensor_) << " AND "
+      << "       sensor=" << sensor_ << " AND "
       << "       level=" << level_;
 
   return ost.str();

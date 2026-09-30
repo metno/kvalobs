@@ -57,13 +57,13 @@ string buildDataQuery(const kvalobs::kvStationInfoExt &st) {
 
   if (params.size() != 0) {
     list<kvalobs::kvStationInfoExt::Param>::const_iterator it = params.begin();
-    q << " AND ((paramid=" << it->paramid << "AND sensor='" << it->sensor
-      << "' AND level=" << it->level << ")";
+    q << " AND ((paramid=" << it->paramid << "AND sensor=" << it->sensor
+      << " AND level=" << it->level << ")";
     ++it;
 
     for (; it != params.end(); ++it)
-      q << " OR (paramid=" << it->paramid << "AND sensor='" << it->sensor
-        << "' AND level=" << it->level << ")";
+      q << " OR (paramid=" << it->paramid << "AND sensor=" << it->sensor
+        << " AND level=" << it->level << ")";
 
     q << ")";
   }

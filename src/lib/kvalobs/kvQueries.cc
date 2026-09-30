@@ -266,7 +266,7 @@ std::string kvQueries::selectData(const kvalobs::kvData &d) {
   ost << " where" << " stationid=" << d.stationID() << " and " << " obstime=\'"
       << to_kvalobs_string(d.obstime()) << "\' and " << " paramid="
       << d.paramID() << " and " << " level=" << d.level() << " and "
-      << " sensor=\'" << d.sensor() << "\' and" << " typeid=" << d.typeID();
+      << " sensor=" << d.sensor() << " and" << " typeid=" << d.typeID();
 
   return ost.str();
 }

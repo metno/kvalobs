@@ -489,7 +489,7 @@ void KvalobsDatabaseAccess::getData(
   if (parameter.haveLevel())
     query << "d.level=" << parameter.level() << " AND ";
   if (parameter.haveSensor())
-    query << "d.sensor='" << parameter.sensor() << "' AND ";
+    query << "d.sensor=" << parameter.sensor() << " AND ";
   if (parameter.haveType())
     query << "o.typeid=" << parameter.type() << " AND ";
   boost::posix_time::ptime t =
@@ -692,7 +692,7 @@ void KvalobsDatabaseAccess::write(const DataList &data) {
     query << " WHERE ";
     query << "observationid=" << obsid << " AND ";
     query << "paramid=" << it->paramID() << " AND ";
-    query << "sensor='" << it->sensor() << "' AND ";
+    query << "sensor=" << it->sensor() << " AND ";
     query << "level=" << it->level();
     query << " RETURNING observationid";
 

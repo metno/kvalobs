@@ -25,7 +25,7 @@ kvalobs_database_version()
 RETURNS text AS
 $BODY$
 BEGIN
-	RETURN '5.0.5';
+    RETURN '5.0.6';
 END;
 $BODY$
 LANGUAGE plpgsql IMMUTABLE;
@@ -53,7 +53,7 @@ CREATE TABLE obsdata (
     observationid BIGINT REFERENCES observations(observationid) ON DELETE CASCADE,
     original    FLOAT NOT NULL,
     paramid     INTEGER NOT NULL,
-    sensor      CHAR(1) NOT NULL DEFAULT '0',
+    sensor      SMALLINT NOT NULL DEFAULT 0,
     level       INTEGER NOT NULL DEFAULT 0,
     corrected   FLOAT NOT NULL,
     controlinfo CHAR(16) DEFAULT '0000000000000000',
@@ -142,7 +142,7 @@ CREATE TABLE data_history (
 	paramid	    INTEGER NOT NULL,
 	tbtime	    TIMESTAMP NOT NULL,
 	typeid	    INTEGER NOT NULL,
-	sensor	    CHAR(1) DEFAULT '0',
+    sensor	    SMALLINT DEFAULT 0,
 	level	    INTEGER DEFAULT 0,
 	corrected   FLOAT,
 	controlinfo CHAR(16) DEFAULT '0000000000000000',
@@ -290,7 +290,7 @@ CREATE OR REPLACE FUNCTION mkdata(
     paramid integer,
     tbtime timestamp,
     typeid_ integer,
-    sensor char(1),
+    sensor smallint,
     level integer,
     corrected float,
     controlinfo char(16),

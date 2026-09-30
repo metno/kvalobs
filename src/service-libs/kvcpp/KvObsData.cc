@@ -58,7 +58,7 @@ void KvObsData::operator=(const ObsData &obsData_) {
           boost::posix_time::time_from_string_nothrow((const char*) d.obstime),
           d.original, d.paramID,
           boost::posix_time::time_from_string_nothrow((const char*) d.tbtime),
-          d.typeID_, strlen(d.sensor) > 0 ? (int) *d.sensor : 0, d.level,
+          d.typeID_, strlen(d.sensor) > 0 ? std::stoi(d.sensor) : 0, d.level,
           d.corrected, kvControlInfo((char*) d.controlinfo),
           kvUseInfo((char*) d.useinfo), std::string(d.cfailed));
       dataList().push_back(data);
