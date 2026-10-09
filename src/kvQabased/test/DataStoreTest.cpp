@@ -41,22 +41,22 @@ TEST(DataStore_ParameterSortedDataListTest, fillMissing_nothingToFill) {
   DataStore::ParameterSortedDataList dl;
   dl["A"].push_back(
       factory.getData(
-          10, 1.1, boost::posix_time::time_from_string("2010-06-09 06:00:00")));
+          1.1, 10,boost::posix_time::time_from_string("2010-06-09 06:00:00")));
   dl["A"].push_back(
       factory.getData(
-          10, 1.1, boost::posix_time::time_from_string("2010-06-08 06:00:00")));
+         1.1, 10, boost::posix_time::time_from_string("2010-06-08 06:00:00")));
   dl["A"].push_back(
       factory.getData(
-          10, 1.1, boost::posix_time::time_from_string("2010-06-07 06:00:00")));
+          1.1, 10, boost::posix_time::time_from_string("2010-06-07 06:00:00")));
   dl["B"].push_back(
       factory.getData(
-          10, 1.1, boost::posix_time::time_from_string("2010-06-09 06:00:00")));
+          1.1, 10, boost::posix_time::time_from_string("2010-06-09 06:00:00")));
   dl["B"].push_back(
       factory.getData(
-          10, 1.1, boost::posix_time::time_from_string("2010-06-08 06:00:00")));
+          1.1, 10, boost::posix_time::time_from_string("2010-06-08 06:00:00")));
   dl["B"].push_back(
       factory.getData(
-          10, 1.1, boost::posix_time::time_from_string("2010-06-07 06:00:00")));
+          1.1, 10, boost::posix_time::time_from_string("2010-06-07 06:00:00")));
 
   DataStore::ParameterSortedDataList expectedResult = dl;
 
@@ -72,19 +72,19 @@ TEST(DataStore_ParameterSortedDataListTest, fillMissing_missingLastEntry) {
   DataStore::ParameterSortedDataList dl;
   dl["A"].push_back(
       factory.getData(
-          10, 1.1, boost::posix_time::time_from_string("2010-06-09 06:00:00")));
+          1.1, 10, boost::posix_time::time_from_string("2010-06-09 06:00:00")));
   dl["A"].push_back(
       factory.getData(
-          10, 1.1, boost::posix_time::time_from_string("2010-06-08 06:00:00")));
+          1.1, 10, boost::posix_time::time_from_string("2010-06-08 06:00:00")));
   dl["A"].push_back(
       factory.getData(
-          10, 1.1, boost::posix_time::time_from_string("2010-06-07 06:00:00")));
+          1.1, 10, boost::posix_time::time_from_string("2010-06-07 06:00:00")));
   dl["B"].push_back(
       factory.getData(
-          10, 1.1, boost::posix_time::time_from_string("2010-06-09 06:00:00")));
+          1.1, 10, boost::posix_time::time_from_string("2010-06-09 06:00:00")));
   dl["B"].push_back(
       factory.getData(
-          10, 1.1, boost::posix_time::time_from_string("2010-06-08 06:00:00")));
+          1.1, 10, boost::posix_time::time_from_string("2010-06-08 06:00:00")));
 
   DataStore::ParameterSortedDataList expectedResult = dl;
   expectedResult["B"].push_back(
@@ -106,19 +106,19 @@ TEST(DataStore_ParameterSortedDataListTest, fillMissing_missingLastEntry2) {
   DataStore::ParameterSortedDataList dl;
   dl["A"].push_back(
       factory.getData(
-          10, 1.1, boost::posix_time::time_from_string("2010-06-09 06:00:00")));
+          1.1,10, boost::posix_time::time_from_string("2010-06-09 06:00:00")));
   dl["A"].push_back(
       factory.getData(
-          10, 1.1, boost::posix_time::time_from_string("2010-06-08 06:00:00")));
+          1.1, 10, boost::posix_time::time_from_string("2010-06-08 06:00:00")));
   dl["B"].push_back(
       factory.getData(
-          10, 1.1, boost::posix_time::time_from_string("2010-06-09 06:00:00")));
+           1.1, 10, boost::posix_time::time_from_string("2010-06-09 06:00:00")));
   dl["B"].push_back(
       factory.getData(
-          10, 1.1, boost::posix_time::time_from_string("2010-06-08 06:00:00")));
+          1.1, 10, boost::posix_time::time_from_string("2010-06-08 06:00:00")));
   dl["B"].push_back(
       factory.getData(
-          10, 1.1, boost::posix_time::time_from_string("2010-06-07 06:00:00")));
+          1.1, 10, boost::posix_time::time_from_string("2010-06-07 06:00:00")));
 
   DataStore::ParameterSortedDataList expectedResult = dl;
   expectedResult["A"].push_back(
@@ -140,16 +140,16 @@ TEST(DataStore_ParameterSortedDataListTest, fillMissing_manyMissingLastEntries) 
   DataStore::ParameterSortedDataList dl;
   dl["A"].push_back(
       factory.getData(
-          10, 1.1, boost::posix_time::time_from_string("2010-06-09 06:00:00")));
+          1.1, 10,boost::posix_time::time_from_string("2010-06-09 06:00:00")));
   dl["B"].push_back(
       factory.getData(
-          10, 1.1, boost::posix_time::time_from_string("2010-06-09 06:00:00")));
+          1.1, 10, boost::posix_time::time_from_string("2010-06-09 06:00:00")));
   dl["B"].push_back(
       factory.getData(
-          10, 1.1, boost::posix_time::time_from_string("2010-06-08 06:00:00")));
+          1.1, 10, boost::posix_time::time_from_string("2010-06-08 06:00:00")));
   dl["B"].push_back(
       factory.getData(
-          10, 1.1, boost::posix_time::time_from_string("2010-06-07 06:00:00")));
+          1.1, 10,boost::posix_time::time_from_string("2010-06-07 06:00:00")));
 
   DataStore::ParameterSortedDataList expectedResult = dl;
   expectedResult["A"].push_back(
@@ -175,18 +175,18 @@ TEST(DataStore_ParameterSortedDataListTest, fillMissing_missingInAllSets) {
   //dl["A"].push_back(factory.getData(10, 1.1, boost::posix_time::time_from_string("2010-06-09 06:00:00")));
   dl["A"].push_back(
       factory.getData(
-          10, 1.1, boost::posix_time::time_from_string("2010-06-08 06:00:00")));
+          1.1, 10,boost::posix_time::time_from_string("2010-06-08 06:00:00")));
   dl["A"].push_back(
       factory.getData(
-          10, 1.1, boost::posix_time::time_from_string("2010-06-07 06:00:00")));
+          1.1, 10,boost::posix_time::time_from_string("2010-06-07 06:00:00")));
 
   dl["B"].push_back(
       factory.getData(
-          10, 1.1, boost::posix_time::time_from_string("2010-06-09 06:00:00")));
+          1.1, 10,boost::posix_time::time_from_string("2010-06-09 06:00:00")));
   //dl["B"].push_back(factory.getData(10, 1.1, boost::posix_time::time_from_string("2010-06-08 06:00:00")));
   dl["B"].push_back(
       factory.getData(
-          10, 1.1, boost::posix_time::time_from_string("2010-06-07 06:00:00")));
+          1.1, 10,boost::posix_time::time_from_string("2010-06-07 06:00:00")));
 
   DataStore::ParameterSortedDataList expectedResult = dl;
   expectedResult["A"].push_back(

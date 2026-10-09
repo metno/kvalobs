@@ -106,14 +106,14 @@ kvDataList getKvData(const string & s) {
       int pos = lexical_cast<int>(internCS[x++]);
       const boost::posix_time::ptime obt =
           boost::posix_time::time_from_string_nothrow(internCS[x++]);
-      float org = lexical_cast<float>(internCS[x++].data());
+      double org = lexical_cast<double>(internCS[x++].data());
       int par = lexical_cast<int>(internCS[x++].data());
       const boost::posix_time::ptime tbt =
           boost::posix_time::time_from_string_nothrow(internCS[x++]);
       int typ = lexical_cast<int>(internCS[x++].data());
       int sen = lexical_cast<int>(internCS[x++].data());
       int lvl = lexical_cast<int>(internCS[x++].data());
-      float cor = lexical_cast<float>(internCS[x++].data());
+      double cor = lexical_cast<double>(internCS[x++].data());
       const kvControlInfo cIn(internCS[x++]);
       const kvUseInfo uin(internCS[x++]);
       const string fai = internCS[x++];

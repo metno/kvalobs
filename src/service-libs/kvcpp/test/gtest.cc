@@ -50,7 +50,7 @@ namespace pt = boost::posix_time;
 namespace b = boost;
 
 namespace {
-kvalobs::kvData createKvData(const std::string &obstime, int sid, int tid, int pid, float val) {
+kvalobs::kvData createKvData(const std::string &obstime, int sid, int tid, int pid, double val) {
   pt::ptime obst = pt::from_iso_string(b::erase_all_copy(b::erase_all_copy(obstime, ":"), "-"));
   return kvalobs::kvData(sid, obst, val, pid, obst, tid, 0, 0, val, kvalobs::kvControlInfo(), kvalobs::kvUseInfo(), "");
 }

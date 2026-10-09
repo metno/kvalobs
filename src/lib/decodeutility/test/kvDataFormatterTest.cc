@@ -51,7 +51,7 @@ TEST_F(kvDataFormatterTest, noDecimal) {
   kvDataList out = getKvData(s);
   ASSERT_EQ(1u, out.size());
 
-  EXPECT_FLOAT_EQ(in.corrected(), out.front().corrected());
+  EXPECT_DOUBLE_EQ(in.corrected(), out.front().corrected());
 }
 
 TEST_F(kvDataFormatterTest, oneDecimal) {
@@ -64,7 +64,7 @@ TEST_F(kvDataFormatterTest, oneDecimal) {
   kvDataList out = getKvData(s);
   ASSERT_EQ(1u, out.size());
 
-  EXPECT_FLOAT_EQ(in.corrected(), out.front().corrected());
+  EXPECT_DOUBLE_EQ(in.corrected(), out.front().corrected());
 }
 
 TEST_F(kvDataFormatterTest, multipleDecimals) {
@@ -77,5 +77,5 @@ TEST_F(kvDataFormatterTest, multipleDecimals) {
   kvDataList out = getKvData(s);
   ASSERT_EQ(1u, out.size());
 
-  EXPECT_FLOAT_EQ(in.corrected(), out.front().corrected());
+  EXPECT_DOUBLE_EQ(in.corrected(), out.front().corrected());
 }

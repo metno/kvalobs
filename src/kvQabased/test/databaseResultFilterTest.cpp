@@ -43,12 +43,12 @@ TEST(databaseResultFilterTest, getStationParamTest) {
 
   using db::resultfilter::parseStationParam;
 
-  EXPECT_FLOAT_EQ(98, parseStationParam(metadata, "max"));
-  EXPECT_FLOAT_EQ(33.4, parseStationParam(metadata, "highest"));
-  EXPECT_FLOAT_EQ(30.1, parseStationParam(metadata, "high"));
-  EXPECT_FLOAT_EQ(0, parseStationParam(metadata, "low"));
-  EXPECT_FLOAT_EQ(-1, parseStationParam(metadata, "lowest"));
-  EXPECT_FLOAT_EQ(-2.2, parseStationParam(metadata, "min"));
+  EXPECT_FLOAT_EQ(98.0f, parseStationParam(metadata, "max"));
+  EXPECT_FLOAT_EQ(33.4f, parseStationParam(metadata, "highest"));
+  EXPECT_FLOAT_EQ(30.1f, parseStationParam(metadata, "high"));
+  EXPECT_FLOAT_EQ(0.0f, parseStationParam(metadata, "low"));
+  EXPECT_FLOAT_EQ(-1.0f, parseStationParam(metadata, "lowest"));
+  EXPECT_FLOAT_EQ(-2.2f, parseStationParam(metadata, "min"));
 }
 
 TEST(databaseResultFilterTest, getStationParamOneEntryTest) {
@@ -56,7 +56,7 @@ TEST(databaseResultFilterTest, getStationParamOneEntryTest) {
 
   using db::resultfilter::parseStationParam;
 
-  EXPECT_FLOAT_EQ(-2.2, parseStationParam(metadata, "C"));
+  EXPECT_FLOAT_EQ(-2.2f, parseStationParam(metadata, "C"));
 }
 
 TEST(databaseResultFilterTest, caseInsensitiveMetadataTest) {
@@ -64,7 +64,7 @@ TEST(databaseResultFilterTest, caseInsensitiveMetadataTest) {
 
   using db::resultfilter::parseStationParam;
 
-  EXPECT_FLOAT_EQ(-2.2, parseStationParam(metadata, "c"));
+  EXPECT_FLOAT_EQ(-2.2f, parseStationParam(metadata, "c"));
 }
 
 TEST(databaseResultFilterTest, getStationParamWrongKeyThrows) {
