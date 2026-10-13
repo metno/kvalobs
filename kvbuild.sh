@@ -47,34 +47,36 @@ Options:
   --list        list targets.
   --tag tagname tag the image with tagname, default ${VERSION}.
   --tag-and-latest tagname 
-                tag the image with tagname and also create latest tag.
+                tag the image with tagname and also create latest tag, dafault ${VERSION}.
   --tag-with-build-date 
                 Creates three tags: ${VERSION}, latest and a ${VERSION}-${BUILDDATE}.
                 If the enviroment variable KV_BUILD_DATE is set use
                 this as the build date. Format KV_BUILD_DATE YYYYMMDD.
+  --tag-with-latest
+                Tag the image with the latest tag.
   --staging     build and push to staging.
   --prod        build and push to prod.
   --test        only build, default
   --kvbuild     Build kvalobs, ie the kvbuild container. 
   --kvcpp       Build kvcpp and kvruntime. kvdev has all kvcpp development files 
                 and kvruntime has all runtime files needed for kvcpp
-  --builddep    Build the buildep container. The dafault is not to build
+  --builddep    Build the buildep container. The default is not to build
                 the container. 
-  --os os       The os to build for. There must exist deinition files in docker/kvalobs/os
+  --os os       The os to build for. There must exist definition files in docker/kvalobs/os
                 Default: $os
   --build-only  Only build the container(s). No push. Default: $build
   --push-only   Push only the container(s). No build. Default: $push
-                The containers must prevosly been buildt whith the same flags.
+                The containers must previously been built with the same flags.
   --no-cache    Do not use the docker build cache.
   --all-targets Build all targets.
   --print-version-tag
                 Print the version tag and exit.
 
               
-  The following opptions is mutally exclusive: --tag, --tag-and-latest, --tag-with-build-date
-  The following options is mutally exclusive: --build-only, --push-only
-  The following options is mutally exclusive: --staging, --prod, --test
-  
+  The following options are mutally exclusive: --tag, --tag-and-latest, --tag-with-build-date
+  The following options are mutally exclusive: --build-only, --push-only
+  The following options are mutally exclusive: --staging, --prod, --test
+  The following options are mutally exclusive: --tag-with-latest, --tag, --tag-and-latest, --tag-with-build-date
   This is a list of targets to build. Available targets is:
 
     '$avalable_targets'
@@ -96,7 +98,7 @@ validate_targets() {
       fi
     done 
     if [ "$found" == "false" ]; then
-      echo "Invalid target '$targets_in'"
+      echo "Invalid target '$target_in'"
       exit 1
     fi
   done
@@ -114,6 +116,10 @@ while test $# -ne 0; do
         tags="latest"
         tag_counter=$((tag_counter + 1))
         shift
+        ;;
+    --tag-with-latest) 
+        tags="latest"
+        tag_counter=$((tag_counter + 1))
         ;;
     --tag-with-build-date) 
         tag_counter=$((tag_counter + 1))
@@ -164,7 +170,7 @@ while test $# -ne 0; do
 done
 
 if [ $tag_counter -gt 1 ]; then
-  echo "Only one of --tag, --tag-and-latest or --tag-with-build-date can be used"
+  echo "Only one of --tag, --tag-and-latest, --tag-with-latest or --tag-with-build-date can be used"
   exit 1
 fi
 

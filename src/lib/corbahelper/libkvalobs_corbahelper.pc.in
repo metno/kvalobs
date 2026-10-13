@@ -10,4 +10,4 @@ Description: kvalobs corbahelper library
 Version: @VERSION@
 Requires: omniDynamic4 libkvalobs_milog libkvalobs_dnmithread libkvalobs_miconfparser
 Libs: -L${libdir} -lkvalobs_corbahelper @BOOST_THREAD_LIB@ @omniORB4_LIBS@ -lperl
-Cflags: -D_REENTRANT -I${includedir}/@PACKAGE@
+Cflags: -std=c++20 -D_REENTRANT -I${includedir}/@PACKAGE@

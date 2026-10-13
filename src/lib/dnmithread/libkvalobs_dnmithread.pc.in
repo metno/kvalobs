@@ -8,4 +8,4 @@ Name: libkvalobs_dnmithread
 Description: kvalobs dnmithread library
 Version: @VERSION@
 Libs: -L${libdir} -lkvalobs_dnmithread @BOOST_THREAD_LIB@ -lperl
-Cflags: -D_REENTRANT -I${includedir}/@PACKAGE@
+Cflags: -std=c++20 -D_REENTRANT -I${includedir}/@PACKAGE@

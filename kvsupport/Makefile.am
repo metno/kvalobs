@@ -11,6 +11,19 @@ sqlite3_src=$(sqlite3_version).tar.gz
 
 
 microhttpd_version=$(shell pkg-config --modversion libmicrohttpd)
+# ubuntu_codename=$(shell lsb_release -cs)
+# cxx_jammy = g++-11
+# cc_jammy = gcc-11
+# cxx_noble = g++-14
+# cc_noble = gcc-14
+# cxx_default = g++
+# cc_default = gcc
+# compiler_key = $(if $(filter jammy noble,$(ubuntu_codename)),$(ubuntu_codename),default)
+# cxx = $(cxx_$(compiler_key))
+# cc = $(cc_$(compiler_key))
+
+export CXX
+export CC
 
 #all-local: librdkafka libhttpserver libsqlite
 all-local: libsqlite libhttpserver
@@ -43,8 +56,7 @@ libhttpserver:
 		tar zxpf $(libhttpserver_src) ; \
 		(	cd $(libhttpserver_version) ; \
 			export LD_RUN_PATH="$(prefix)/lib/kvalobs@KVALOBSLIBS_BIN_VERSION@/lib" ; \
-			export CXX=g++-14 ; \
-			export CC=gcc-14 ; \
+			echo "Libhttpserver: Using compiler: CXX: $$CXX, CC: $$CC" ; \
 			./bootstrap --build --prefix=$(prefix)/lib/kvalobs@KVALOBSLIBS_BIN_VERSION@ ; \
 			mkdir -p build ; \
 			cd build ; \
@@ -69,9 +81,8 @@ libsqlite:
 		cp $(top_srcdir)/kvsupport/$(sqlite3_src) $(abs_top_builddir)/kvsupport ; \
 		tar zxpf $(sqlite3_src) ; \
 		(	cd $(sqlite3_version) ; \
+			echo "Sqlite: Using compiler: CXX: $$CXX, CC: $$CC" ; \
 			export LD_RUN_PATH="$(prefix)/lib/kvalobs@KVALOBSLIBS_BIN_VERSION@/lib" ; \
-			export CXX=g++-14 ; \
-			export CC=gcc-14 ; \
 			./configure --prefix=$(prefix)/lib/kvalobs@KVALOBSLIBS_BIN_VERSION@ --enable-shared=no --with-pic; \
 			make ; \
 			make DESTDIR=$(abs_top_builddir)/kvsupport/build install ) ; \

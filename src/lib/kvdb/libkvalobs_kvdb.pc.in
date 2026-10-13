@@ -9,4 +9,4 @@ Description: kvalobs kvdb library
 Version: @VERSION@
 Requires: libkvalobs_fileutil libkvalobs_milog
 Libs: -L${libdir} -lkvalobs_fileutil -lkvalobs_kvdb -lperl
-Cflags: -D_REENTRANT -I${includedir}/@PACKAGE@
+Cflags: -std=c++20 -D_REENTRANT -I${includedir}/@PACKAGE@

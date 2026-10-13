@@ -8,4 +8,4 @@ Name: libkvalobs_fileutil
 Description: kvalobs fileutil library
 Version: @VERSION@
 Libs: -L${libdir} -lkvalobs_fileutil -lperl
-Cflags: -D_REENTRANT -I${includedir}/@PACKAGE@
+Cflags: -std=c++20 -D_REENTRANT -I${includedir}/@PACKAGE@

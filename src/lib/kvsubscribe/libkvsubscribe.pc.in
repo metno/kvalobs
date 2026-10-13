@@ -10,4 +10,4 @@ Description: Data subscription library for Kvalobs
 Version: @VERSION@
 Requires: libkvalobs_decodeutility libkvalobs_miutil
 Libs: -Wl,-rpath-link=${pkglibdir}/lib -L${pkglibdir}/lib -L${libdir} -lkvalobs_kvsubscribe 
-Cflags: -I@includedir@/kvalobs
+Cflags: -std=c++20 -D_REENTRANT -I@includedir@/kvalobs

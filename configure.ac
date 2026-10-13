@@ -4,6 +4,29 @@ AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_MACRO_DIR([m4])
 
 LT_INIT
+
+AC_PATH_PROG([LSB_RELEASE], [lsb_release])
+ubuntu_codename=
+if test -n "$LSB_RELEASE"; then
+  ubuntu_codename=`"$LSB_RELEASE" -cs 2>/dev/null`
+fi
+
+if test -z "$CC"; then
+  case "$ubuntu_codename" in
+    jammy) CC=gcc-11 ;;
+    noble) CC=gcc-14 ;;
+    *) CC=gcc ;;
+  esac
+fi
+
+if test -z "$CXX"; then
+  case "$ubuntu_codename" in
+    jammy) CXX=g++-11 ;;
+    noble) CXX=g++-14 ;;
+    *) CXX=g++ ;; 
+  esac
+fi
+
 AC_PROG_LEX([yywrap])
 if test "x$LEX" == "x:"; then
 	AC_MSG_ERROR([lex/flex not found])
