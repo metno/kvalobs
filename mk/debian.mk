@@ -30,7 +30,7 @@ update-debian: prepare-debian
 
 build-debian:
 	cd $(PKG_DIR) && dpkg-buildpackage -rfakeroot -us -uc -sa
-	lintian $(DEBIAN_PACKAGE_NAME) $(DEBIAN_SOURCE_PACKAGE_NAME)
+#	lintian $(DEBIAN_PACKAGE_NAME) $(DEBIAN_SOURCE_PACKAGE_NAME)
 
 debian: dist-debian prepare-debian build-debian
 

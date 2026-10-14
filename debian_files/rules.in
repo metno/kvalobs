@@ -19,11 +19,17 @@ override_dh_auto_configure: pre-build configure-stamp
 configure-stamp:  pre-build 
 #	autoreconf -i
 #We are disabling tests in the debian package build
-	CFLAGS=-g CC=gcc-14 CXXFLAGS=-g CXX=g++-14 ./configure --prefix=/usr  --without-gmock \
+# 	CFLAGS=-g CC=gcc-14 CXXFLAGS=-g CXX=g++-14 ./configure --prefix=/usr  --without-gmock \
+# 	    --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info  \
+# 	    --localstatedir=/var --sysconfdir=/etc \
+# 	    --with-boost-libdir=/usr/lib/x86_64-linux-gnu
+# 	touch $@
+	CFLAGS=-g CXXFLAGS=-g CXX=@DEB_CXX@ ./configure --prefix=/usr  --without-gmock \
 	    --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info  \
 	    --localstatedir=/var --sysconfdir=/etc \
 	    --with-boost-libdir=/usr/lib/x86_64-linux-gnu
 	touch $@
+
 
 pre-build :: version-deb-autotools 
 

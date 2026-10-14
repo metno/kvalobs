@@ -1,7 +1,7 @@
 librdkafka_version = librdkafka-1.2.2
 librdkafka_src = $(librdkafka_version).tar.gz
 
-libhttpserver_version = libhttpserver-0.19.0-20241211
+libhttpserver_version = libhttpserver-0.19.0-20241211_20261014
 libhttpserver_src = $(libhttpserver_version).tar.gz
 
 #sqlite3_version = sqlite-autoconf-3360000
@@ -57,7 +57,7 @@ libhttpserver:
 		(	cd $(libhttpserver_version) ; \
 			export LD_RUN_PATH="$(prefix)/lib/kvalobs@KVALOBSLIBS_BIN_VERSION@/lib" ; \
 			echo "Libhttpserver: Using compiler: CXX: $$CXX, CC: $$CC" ; \
-			./bootstrap --build --prefix=$(prefix)/lib/kvalobs@KVALOBSLIBS_BIN_VERSION@ ; \
+			#./bootstrap --build --prefix=$(prefix)/lib/kvalobs@KVALOBSLIBS_BIN_VERSION@ ; \
 			mkdir -p build ; \
 			cd build ; \
 			#Hack to build on xenial \

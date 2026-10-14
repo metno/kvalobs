@@ -1,3 +1,8 @@
+kvalobs (8.0.3rc1-1) jammy; urgency=medium
+  * debian build changes
+ -- Borge Moe <borge.moe@met.no>  Wed, 14 Oct 2026 08:00:00 +0200
+
+
 kvalobs (8.0.2-1) noble; urgency=medium
   * Release 8.0.2
   * kvDataInputd - Option to run in gdb.

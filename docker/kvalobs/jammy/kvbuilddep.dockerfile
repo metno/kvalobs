@@ -23,12 +23,16 @@ RUN apt-key add /tmp/pg-ACCC4CF8.asc && rm /tmp/pg-ACCC4CF8.asc && \
 #   add-apt-repository 'deb [arch=amd64] https://packages.confluent.io/clients/deb focal  main'
 
 
+# libboost-date-time1.71.0 libboost-filesystem1.71.0 libboost-thread1.71.0 \
+# libboost-regex1.71.0  libboost-program-options1.71.0
+
+
 RUN apt-get update && apt-get -y install \
   debhelper autotools-dev autoconf-archive debconf devscripts fakeroot \
-  less mg \
-  automake libtool gfortran bison flex sqlite3 libsqlite3-dev libpq-dev python3\
+  build-essential automake libtool gfortran bison flex sqlite3 libpq-dev python3 g++-11 g++-12 \
   libxml2-dev libxml++2.6-dev libboost-dev libboost-thread-dev \
-  libboost-regex-dev libboost-filesystem-dev libboost-program-options-dev libboost-system-dev libboost-timer-dev \
+  libboost-date-time-dev libboost-filesystem-dev libboost-regex-dev \
+  libboost-program-options-dev libboost-system-dev \
   libomniorb4-dev  omniidl libperl-dev libdbd-pg-perl libcurl4-gnutls-dev liblog4cpp5-dev libcppunit-dev \
   cmake google-mock  zlib1g-dev libssl-dev libsasl2-dev libzstd-dev \
   librdkafka-dev=${kafka_VERSION} librdkafka++1=${kafka_VERSION} librdkafka-dev=${kafka_VERSION} \

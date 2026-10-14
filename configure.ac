@@ -1,5 +1,5 @@
 AC_PREREQ([2.71])
-AC_INIT([kvalobs],[8.0.2],[kvoss@met.no])
+AC_INIT([kvalobs],[8.0.3rc2],[kvoss@met.no])
 AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -11,21 +11,35 @@ if test -n "$LSB_RELEASE"; then
   ubuntu_codename=`"$LSB_RELEASE" -cs 2>/dev/null`
 fi
 
+#DEB_CC and DEB_CXX are used for specifying the Debian-specific compilers
+#in Debian packaging.
 if test -z "$CC"; then
   case "$ubuntu_codename" in
-    jammy) CC=gcc-11 ;;
-    noble) CC=gcc-14 ;;
-    *) CC=gcc ;;
+    jammy) CC=gcc-11; DEB_CC=gcc-11 ;;
+    noble) CC=gcc-14; DEB_CC=gcc-14 ;;
+    *) CC=gcc; DEB_CC=gcc ;;
   esac
 fi
 
 if test -z "$CXX"; then
   case "$ubuntu_codename" in
-    jammy) CXX=g++-11 ;;
-    noble) CXX=g++-14 ;;
-    *) CXX=g++ ;; 
+    jammy) CXX=g++-11; DEB_CXX=g++-11 ;;
+    noble) CXX=g++-14; DEB_CXX=g++-14 ;;
+    *) CXX=g++; DEB_CXX=g++ ;; 
   esac
 fi
+
+if test -n "$CXX" -a -z "$DEB_CXX"; then
+  AC_MSG_NOTICE([DEB_CXX not set, using CXX: $CXX])
+  DEB_CXX="$CXX"
+fi
+if test -n "$CC" -a -z "$DEB_CC"; then
+  AC_MSG_NOTICE([DEB_CC not set, using CC: $CC])
+  DEB_CC="$CC"
+fi
+
+AC_SUBST([DEB_CC])
+AC_SUBST([DEB_CXX])
 
 AC_PROG_LEX([yywrap])
 if test "x$LEX" == "x:"; then
@@ -131,6 +145,7 @@ AC_CONFIG_FILES([Makefile
                  debian_files/kvalobs.postrm 
                  debian_files/libkvalobs11.install
                  debian_files/rules
+                 debian_files/control
 ])
 
 #src/tools/kvpush/Makefile
