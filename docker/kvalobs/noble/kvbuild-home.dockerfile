@@ -9,9 +9,9 @@ ARG groupid=5010
 
 RUN useradd -ms /bin/bash --uid ${userid}  --user-group ${user}
 
-VOLUME /workspace/kvalobs
+VOLUME /workspaces/kvalobs
 
-RUN mkdir -p /workspace/kvalobs && chown ${user}:${user} /workspace/kvalobs
+RUN mkdir -p /workspaces/kvalobs && chown ${user}:${user} /workspaces/kvalobs
 
 WORKDIR /workspaces/kvalobs
 
