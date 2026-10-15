@@ -38,6 +38,7 @@ RUN apt update && apt install -y \
   libperl-dev libdbd-pg-perl  liblog4cpp5-dev libcppunit-dev \
   libgnutls28-dev 
 
+
 #librdkafka1=${kafka_VERSION} librdkafka++1=${kafka_VERSION} 
 
 #Build libhttpserver
