@@ -8,14 +8,13 @@ ARG kafka_VERSION=2.3.0-1build2
 #This includes metlibs-putools
 
 #Keys for internrepo.met.no, postgresql and confluent (librdkafka) repos
-COPY docker/pg-ACCC4CF8.asc docker/internrepo-4E8A0C14.asc docker/confluent_repo_key.asc /tmp/
+#COPY docker/pg-ACCC4CF8.asc docker/internrepo-4E8A0C14.asc docker/confluent_repo_key.asc /tmp/
+COPY docker/pg-ACCC4CF8.asc docker/internrepo-4E8A0C14.asc /etc/apt/trusted.gpg.d/
 RUN apt update && apt install -y gnupg2 software-properties-common apt-utils
 
-RUN apt-key add /tmp/internrepo-4E8A0C14.asc && rm /tmp/internrepo-4E8A0C14.asc && \
-  add-apt-repository 'deb [arch=amd64] http://internrepo.met.no/noble noble main contrib'
+RUN add-apt-repository 'deb [arch=amd64] http://internrepo.met.no/noble noble main contrib'
 
-RUN apt-key add /tmp/pg-ACCC4CF8.asc && rm /tmp/pg-ACCC4CF8.asc && \
-  add-apt-repository 'deb http://apt.postgresql.org/pub/repos/apt noble-pgdg main'
+RUN add-apt-repository 'deb http://apt.postgresql.org/pub/repos/apt noble-pgdg main'
 
 
 # RUN apt-key add /tmp/confluent_repo_key.asc && rm /tmp/confluent_repo_key.asc && \

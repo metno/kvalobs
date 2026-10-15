@@ -11,6 +11,7 @@ if test -n "$LSB_RELEASE"; then
   ubuntu_codename=`"$LSB_RELEASE" -cs 2>/dev/null`
 fi
 
+AC_SUBST([ubuntu_codename])
 #DEB_CC and DEB_CXX are used for specifying the Debian-specific compilers
 #in Debian packaging.
 if test -z "$CC"; then
@@ -146,6 +147,7 @@ AC_CONFIG_FILES([Makefile
                  debian_files/libkvalobs11.install
                  debian_files/rules
                  debian_files/control
+                 debian_files/changelog
 ])
 
 #src/tools/kvpush/Makefile
