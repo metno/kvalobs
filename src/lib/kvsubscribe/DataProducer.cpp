@@ -43,7 +43,7 @@ DataProducer::~DataProducer() {
 }
 
 MessageId DataProducer::send(const serialize::KvalobsData & data) {
-  return producer_->send(serialize::KvalobsDataSerializer::serialize(data));
+  return producer_->send(serialize::KvalobsDataSerializer::serialize(data), "application/xml");
 }
 
 } /* namespace subscribe */

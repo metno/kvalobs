@@ -56,6 +56,10 @@ const char *PublishDataCommand::getData(unsigned int *size) const {
   return data.data();
 }
 
+std::string PublishDataCommand::contentType() const {
+  return "application/xml";
+}
+
 void PublishDataCommand::onSend(kvalobs::subscribe::MessageId msgId, const std::string &threadName) {
   if (!toLog.empty()) {
     IDLOGDEBUG("kafka_pub", "Data(" << msgId << "): SENDT: " << toLog);

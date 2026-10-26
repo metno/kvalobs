@@ -69,7 +69,7 @@ public:
                                                const std::string &) {});
 
   explicit PgProducer(
-      const std::string &topic, PgCluster *cluster,
+      const std::string &topic, pgqueue::PgCluster *cluster,
       ErrorHandler onFailedDelivery = [](MessageId, const std::string &,
                                          const std::string &) {},
       SuccessHandler onSuccessfulDelivery = [](MessageId,
@@ -90,12 +90,12 @@ public:
    * @return a message id, that will be available in this object's constructor's
    *         onFailedDelivery and onSuccessfulDelivery functions
    */
-  MessageId send(const std::string &data) override;
+  MessageId send(const std::string &data, const std::string &contentType) override;
 
-  MessageId send(const char *data, unsigned length) override;
+  MessageId send(const char *data, unsigned length, const std::string &contentType) override;
 
-  MessageId send(const std::string &data, QueueType queue) override;
-  MessageId send(const char *data, unsigned length, QueueType queue) override;
+  MessageId send(const std::string &data, const std::string &contentType, QueueType queue) override;
+  MessageId send(const char *data, unsigned length, const std::string &contentType, QueueType queue) override;
 
   /**
    * Process all awaiting delivery reports.
@@ -106,13 +106,13 @@ public:
   void catchup(unsigned timeout = 0) override;
 
 private:
-  std::unique_ptr<PgCluster> cluster_;
-  std::unique_ptr<PgMessaging> messaging_;
+  std::unique_ptr<pgqueue::PgCluster> cluster_;
+  std::unique_ptr<pgqueue::PgMessaging> messaging_;
   MessageId messageId_;
   std::string queue_;
   mutable std::mutex mu_;
 
-  MessageId send(const char *data, unsigned length, const std::string &topic);
+  MessageId send(const char *data, unsigned length, const std::string &contentType, const std::string &topic);
   // Pending deliveries for deferred callback processing
   struct PendingDelivery {
     MessageId id;

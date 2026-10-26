@@ -40,7 +40,7 @@
 namespace qabase {
 
 PgQueueConfig QaBaseApp::pgQueueConf_;
-std::shared_ptr<PgCluster> QaBaseApp::pgCluster_; 
+std::shared_ptr<pgqueue::PgCluster> QaBaseApp::pgCluster_; 
 bool QaBaseApp::pgQueueEnabled_;
 
 namespace {

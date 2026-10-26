@@ -2,13 +2,17 @@
 
 #include <chrono>
 #include <csignal>
+#include <cstdlib>
+#include <cstring>
 #include <exception>
 #include <fstream>
+#include <getopt.h>
 #include <iostream>
+#include <pwd.h>
 #include <string>
 #include <thread>
+#include <unistd.h>
 #include <vector>
-#include <getopt.h>
 
 namespace {
 volatile std::sig_atomic_t stopRequested = 0;
@@ -33,48 +37,78 @@ void writeErrorToFile(const std::string &message) {
   }
 }
 
+// Consumer name on the form kvconsumer-cpp-<hostname>-<username>.
+std::string defaultConsumerName() {
+  char host[256] = {0};
+  if (gethostname(host, sizeof(host) - 1) != 0 || host[0] == '\0') {
+    std::strcpy(host, "unknown");
+  }
+
+  std::string user;
+  if (const passwd *pw = getpwuid(geteuid())) {
+    user = pw->pw_name;
+  } else if (const char *env = std::getenv("USER")) {
+    user = env;
+  }
+  if (user.empty()) {
+    user = "unknown";
+  }
+
+  return std::string("kvconsumer-cpp-") + host + "-" + user;
+}
 
 void usage(const char *program) {
-  std::cerr << "Usage: " << program << " [OPTIONS] [CONNECTIONS...]\n";
+  std::cerr << "Usage: " << program << " [OPTIONS]\n";
   std::cerr << "Options:\n";
-  std::cerr << "  -e, --environment ENV    Set the environment (default: development)\n";
+  std::cerr << "  -f, --config FILE      Specify a config file. (TODO: "
+               "Implement usage)\n";
+  std::cerr << "  -d, --domain DOMAIN    Set the domain (default: staging)\n";
   std::cerr << "  -r, --raw                Konsumes the raw queue\n";
-  std::cerr << "  -c, --consumer CONSUMER  Set the consumer (default: kvconsumer)\n";
+  std::cerr << "  -c, --consumer CONSUMER  Set the consumer (default: "
+               "kvconsumer-cpp-HOSTNAME-USERNAME)\n";
   std::cerr << "  -h, --help               Show this help message\n\n";
 }
 
 struct Options {
-  std::string environment;
+  std::string domain;
   std::string topic;
   std::string topicLowpri;
   std::string consumer;
+  std::string configFile;
   bool raw;
   std::vector<std::string> connections;
 };
 
-
 Options parse_options(int argc, char **argv) {
   Options options;
   static struct option long_options[] = {
-      {"environment", required_argument, nullptr, 'e'},
+      {"config", required_argument, nullptr, 'f'},
+      {"domain", required_argument, nullptr, 'd'},
       {"consumer", required_argument, nullptr, 'c'},
       {"raw", no_argument, nullptr, 'r'},
       {"help", no_argument, nullptr, 'h'},
-      {nullptr, 0, nullptr, 0}
-  };
+      {nullptr, 0, nullptr, 0}};
   int option_index = 0;
   int opt;
-  options.raw=false;
-  while ((opt = getopt_long(argc, argv, "e:c:h:r", long_options, &option_index)) != -1) {
+  options.raw = false;
+  while ((opt = getopt_long(argc, argv, "c:h:rd:f:", long_options,
+                            &option_index)) != -1) {
     switch (opt) {
-    case 'e':
-      options.environment = optarg;
+    case 'f':
+      // Use a config file if specified
+      // TODO: Implement reading and using the config file
+      std::cerr << "TODO: Config file specified: " << optarg << '\n';
+      options.configFile = optarg;
       break;
     case 'c':
       options.consumer = optarg;
       break;
     case 'r':
       options.raw = true;
+      break;
+    case 'd':
+      // Handle domain option if needed
+      options.domain = optarg;
       break;
     case 'h':
       usage(argv[0]);
@@ -85,71 +119,62 @@ Options parse_options(int argc, char **argv) {
     }
   }
 
-  if( options.environment.empty() ) {
-    options.environment="development";
-    std::cerr << "No environment specified, defaulting to 'development'\n";
-  } 
- 
-  if (options.environment=="staging") {
-    options.topic=options.raw?"kvalobs.staging.raw":"kvalobs.staging.checked";
-    options.topicLowpri="kvalobs.staging.checked.lowpri";
-  } else if (options.environment=="production") {
-    options.topic=options.raw?"kvalobs.production.raw":"kvalobs.production.checked";
-    options.topicLowpri="kvalobs.production.checked.lowpri";
-  } else if( options.environment=="development") {
-    options.topic=options.raw?"kvalobs.development.raw":"kvalobs.development.checked";
-    options.topicLowpri="kvalobs.development.checked.lowpri";
-  } else {
-    std::cerr << "Unknown environment '" << options.environment << "'\n";
-    exit(1);
+  if (options.domain.empty()) {
+    options.domain = "staging";
   }
- 
 
-  if ( options.connections.empty() ){
-    options.connections.push_back("user=kvdist dbname=kvqueue host=157.249.78.125 port=5432");
-    options.connections.push_back("user=kvdist dbname=kvqueue host=157.249.72.95 port=5432");
+  if (options.topic.empty()) {
+    options.topic = options.raw ? "kvalobs." + options.domain + ".raw"
+                                : "kvalobs." + options.domain + ".checked";
+    options.topicLowpri = "kvalobs." + options.domain + ".checked.lowpri";
+  }
+
+  if (options.connections.empty()) {
+    options.connections.push_back(
+        "user=kvdist dbname=pgqueue host=157.249.78.125 port=5432");
+    options.connections.push_back(
+        "user=kvdist dbname=pgqueue host=157.249.72.95 port=5432");
     std::cerr << "No connections specified. Using default connections.\n";
-    for ( auto &connection : options.connections ) {
-      std::cerr << "  -" << connection << '\n';
+    for (auto &connection : options.connections) {
+      std::cerr << "  - " << connection << '\n';
     }
   }
 
-  if ( options.consumer.empty() ) {
-    options.consumer = "kvconsumer";
-    std::cerr << "No consumer specified, defaulting to 'kvconsumer'\n";
+  if (options.consumer.empty()) {
+    options.consumer = defaultConsumerName();
+    std::cerr << "No consumer specified, defaulting to '" << options.consumer
+              << "'\n";
   }
 
   return options;
 }
 
-void consumeRaw(PgMessaging *queue, Options options) {
+void consumeRaw(pgqueue::PgMessaging *queue, Options options) {
   while (!stopRequested) {
-    const std::vector<Message> messages = queue->poll(options.consumer, options.topic);
+    const std::vector<pgqueue::Message> messages =
+        queue->poll(options.consumer, options.topic);
     if (messages.empty()) {
       std::this_thread::sleep_for(std::chrono::seconds(1));
       continue;
     }
 
-    for (const Message &message : messages) {
-      std::cout << "\n------ id=" << message.id << " topic=" << message.topic
-                << " created_at=" << message.created_at << "-----\n"
-                << message.data 
-                << "\n------- end message -------\n";
+    for (const pgqueue::Message &message : messages) {
+      std::cout << message;
     }
     queue->commit_offset(options.consumer, options.topic, messages.back().id);
     std::cout << "Committed offset " << messages.back().id << '\n';
   }
 }
 
-void consumeChecked(PgMessaging *queue, Options options) {
+void consumeChecked(pgqueue::PgMessaging *queue, Options options) {
   bool lowPri;
-  std::vector<Message> messages;
+  std::vector<pgqueue::Message> messages;
   while (!stopRequested) {
     messages.clear();
-    lowPri=false;
+    lowPri = false;
     messages = queue->poll(options.consumer, options.topic);
     if (messages.empty()) {
-      lowPri=true;
+      lowPri = true;
       messages = queue->poll(options.consumer, options.topicLowpri);
     }
     if (messages.empty()) {
@@ -157,59 +182,57 @@ void consumeChecked(PgMessaging *queue, Options options) {
       continue;
     }
 
-    for (const Message &message : messages) {
-      std::cout << "\n------ " << (lowPri ? "(lowpri)" : "") << " id=" << message.id << " topic=" << message.topic
-                << " created_at=" << message.created_at << "-----\n"
-                << message.data 
-                << "\n------- end message -------\n";
+    for (const pgqueue::Message &message : messages) {
+      std::cout << message;
     }
-    if( lowPri) {
-      queue->commit_offset(options.consumer, options.topicLowpri, messages.back().id);
+    if (lowPri) {
+      queue->commit_offset(options.consumer, options.topicLowpri,
+                           messages.back().id);
     } else {
       queue->commit_offset(options.consumer, options.topic, messages.back().id);
     }
-    std::cout << "Committed offset '" << (lowPri ? options.topicLowpri : options.topic) << "' " << messages.back().id << '\n';
+    std::cout << "Committed offset '"
+              << (lowPri ? options.topicLowpri : options.topic) << "' "
+              << messages.back().id << '\n';
   }
 }
-
-
 
 } // namespace
 
 int main(int argc, char **argv) {
-  
+
   Options options = parse_options(argc, argv);
 
-  if (options.environment.empty() || options.topic.empty() || options.consumer.empty() || options.connections.empty()) {
-    usage(argv[0]);
-    return 2;
-  }
   std::signal(SIGINT, requestStop);
 
   try {
-    PgCluster cluster(options.connections, options.environment, options.consumer);
-    std::unique_ptr<PgMessaging> queue = std::make_unique<PgMessaging>(cluster);
+    pgqueue::PgCluster cluster(options.connections, options.consumer);
+    std::unique_ptr<pgqueue::PgMessaging> queue =
+        std::make_unique<pgqueue::PgMessaging>(cluster);
     auto topo = cluster.topology();
     std::cerr << "Cluster topology:\n";
     for (const auto &node : topo) {
-      std::cerr << "  - " << node.conninfo << "  primary: " << (node.is_primary ? "true" : "false") << '\n';
+      std::cerr << "  - " << node.conninfo
+                << "  primary: " << (node.is_primary ? "true" : "false")
+                << '\n';
     }
 
     if (options.raw) {
-        queue->register_consumer(options.consumer, options.topic);
+      queue->register_consumer(options.consumer, options.topic);
     } else {
-        queue->register_consumer(options.consumer, options.topic);
-        queue->register_consumer(options.consumer, options.topicLowpri);
+      queue->register_consumer(options.consumer, options.topic);
+      queue->register_consumer(options.consumer, options.topicLowpri);
     }
 
-    if (options.raw ) {
-      std::cout << "Consuming raw data '" << options.topic << "' as " << options.consumer
-                << "; press Ctrl-C to stop\n";
+    if (options.raw) {
+      std::cout << "Consuming raw data '" << options.topic << "' as "
+                << options.consumer << "; press Ctrl-C to stop\n";
     } else {
-      std::cout << "Consuming checked data '" << options.topic << "' and '" << options.topicLowpri << "' as " << options.consumer
+      std::cout << "Consuming checked data '" << options.topic << "' and '"
+                << options.topicLowpri << "' as " << options.consumer
                 << "; press Ctrl-C to stop\n";
     }
-    bool reconnect=false;
+    bool reconnect = false;
     while (!stopRequested) {
       if (!cluster.connected()) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -217,12 +240,12 @@ int main(int argc, char **argv) {
         reconnect = true;
         continue;
       }
-      try{
+      try {
         if (reconnect) {
-          queue = std::make_unique<PgMessaging>(cluster);
+          queue = std::make_unique<pgqueue::PgMessaging>(cluster);
           reconnect = false;
         }
-        if( options.raw ) {
+        if (options.raw) {
           consumeRaw(queue.get(), options);
         } else {
           consumeChecked(queue.get(), options);
@@ -235,7 +258,7 @@ int main(int argc, char **argv) {
     }
     std::cout << "Stopped\n";
   } catch (const std::exception &error) {
-    
+
     std::cerr << "pgqueue_consumer: " << error.what() << '\n';
     writeErrorToFile(std::string("pgqueue_consumer: ") + error.what());
     return 1;

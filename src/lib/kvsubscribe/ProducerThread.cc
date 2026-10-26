@@ -107,7 +107,7 @@ class Thread {
         } else {
           queueType = kvalobs::subscribe::Producer::QueueType::raw;
         }
-        kvalobs::subscribe::MessageId msgId = producer->send(data, size,queueType);
+        kvalobs::subscribe::MessageId msgId = producer->send(data, size, cmd->contentType(), queueType);
         cmd->onSend(msgId, name);
         waitingAck[msgId] = shared_ptr<ProducerCommand>(cmd);
       } else {

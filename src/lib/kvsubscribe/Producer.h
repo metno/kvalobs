@@ -72,12 +72,12 @@ public:
    * @return a message id, that will be available in this object's constructor's
    *         onFailedDelivery and onSuccessfulDelivery functions
    */
-  virtual MessageId send(const std::string &data) = 0;
+  virtual MessageId send(const std::string &data, const std::string &contentType) = 0;
 
-  virtual MessageId send(const char *data, unsigned length) = 0;
+  virtual MessageId send(const char *data, unsigned length, const std::string &contentType) = 0;
 
-  virtual MessageId send(const std::string &data, QueueType queue) = 0;
-  virtual MessageId send(const char *data, unsigned length, QueueType queue) = 0;
+  virtual MessageId send(const std::string &data, const std::string &contentType, QueueType queue) = 0;
+  virtual MessageId send(const char *data, unsigned length, const std::string &contentType, QueueType queue) = 0;
 
   ErrorHandler setErrorHandler(ErrorHandler handler) {
     ErrorHandler old = onFailedDelivery_;

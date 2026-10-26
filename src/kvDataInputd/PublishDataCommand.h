@@ -61,6 +61,7 @@ class PublishDataCommand : public kvalobs::service::ProducerCommand {
   explicit PublishDataCommand(const kvalobs::serialize::KvalobsData &pubData);
 
   virtual const std::string name() const override;
+  virtual std::string contentType() const override;
   virtual const char *getData(unsigned int *size) const override;
   virtual void onSend(kvalobs::subscribe::MessageId msgId, const std::string &threadName);
   virtual void onSuccess(kvalobs::subscribe::MessageId msgId, const std::string &threadName, const std::string &data);

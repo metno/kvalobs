@@ -46,6 +46,36 @@ const char *RawDataCommand::getData(unsigned int *size) const {
   return data.data();
 }
 
+namespace {
+  bool startWith(const std::string &data, const std::string &prefix, bool ignoreCase) {
+    if(ignoreCase) {
+      if(data.size() < prefix.size()) {
+        return false;
+      }
+      
+      for(size_t i = 0; i < prefix.size(); ++i) {
+        if(tolower(data[i]) != tolower(prefix[i])) {
+          return false;
+        }
+      }
+    }
+    return data.compare(0, prefix.size(), prefix) == 0;
+  }
+}
+
+std::string RawDataCommand::contentType() const {
+  if (startWith(data, "kv2kv", true) ) {
+    return "application/xml";
+  } else if (startWith(data, "synop", true) ||
+             startWith(data, "kldata", true)) {
+    return "text/plain; charset=utf-8";
+  } else if (startWith(data, "bufr", true)) {
+    return "application/bufr";
+  }
+
+  return "application/octet-stream";
+}
+
 void RawDataCommand::onSend(kvalobs::subscribe::MessageId msgId, const std::string &threadName) {
   string::size_type i = data.find_first_of('\n');
   if (i != string::npos) {

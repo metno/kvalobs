@@ -155,11 +155,13 @@ ObservationHandler::Observation ObservationHandler::getObservation(const httpser
   return Observation(content.substr(iStart, i - iStart), content.substr(i + 1));
 }
 
+
+
 void ObservationHandler::postOnRawQue(const std::string &rawData) {
   if (rawData.empty() || !app.pgQueueEnabled()) {
     return;
   }
-  
+ 
   try {
     // Ownership is transferred to the producer thread via the queue; it
     // deletes the command once it has been sent (or on drain/shutdown).

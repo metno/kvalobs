@@ -65,6 +65,7 @@ public:
 
   virtual const char *getData(unsigned int *size) const = 0;
 
+  virtual std::string contentType() const;
   /**
    * If the MessageId is 0, then there was no data to send.
    */

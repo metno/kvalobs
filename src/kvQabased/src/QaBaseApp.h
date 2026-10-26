@@ -52,7 +52,6 @@ struct PgQueueConfig {
   PgQueueConfig(): enable(true) {}
 
   std::string getRawTopic() { return kvalobs::subscribe::queue::raw(domain); }
-  PgCluster::Environment env() const { return PgCluster::env(domain);}
   std::string getPublishTopic() {
     return kvalobs::subscribe::queue::checked(domain);
   }
@@ -79,7 +78,7 @@ class QaBaseApp : public KvBaseApp {
   static PgQueueConfig pgQueueConfig();
  private:
   static PgQueueConfig pgQueueConf_;
-  static std::shared_ptr<PgCluster> pgCluster_;
+  static std::shared_ptr<pgqueue::PgCluster> pgCluster_;
   
   static bool pgQueueEnabled_;
 };

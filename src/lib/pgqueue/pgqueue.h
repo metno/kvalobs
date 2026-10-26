@@ -6,15 +6,56 @@
 #include <string>
 #include <vector>
 
+namespace pgqueue {
+
+const std::string CONTENT_TYPE_BINARY = "application/octet-stream";
+const std::string CONTENT_TYPE_JSON = "application/json";
+const std::string CONTENT_TYPE_TEXT = "text/plain; charset=utf-8";
+const std::string CONTENT_TYPE_XML = "application/xml";
+const std::string CONTENT_TYPE_BUFR = "application/bufr";
+
+class PGException : public std::runtime_error {
+public:
+  explicit PGException(const std::string &msg) : std::runtime_error(msg) {}
+};
+
+class PGConnectionException : public PGException {
+public:
+  explicit PGConnectionException(const std::string &msg) : PGException(msg) {}
+};
+
+class PGQueryException : public PGException {
+protected:
+  std::string sqlstate_;
+
+public:
+  explicit PGQueryException(const std::string &msg, const char *sqlstate)
+      : PGException(msg), sqlstate_(sqlstate) {}
+  explicit PGQueryException(const std::string &msg, const std::string &sqlstate)
+      : PGException(msg), sqlstate_(sqlstate) {}
+
+  std::string sqlstate() const { return sqlstate_; }
+};
+
+class PGConfigException : public PGException {
+public:
+  explicit PGConfigException(const std::string &msg) : PGException(msg) {}
+};
+
 // ---------------------------------------------------------------------------
 // Message row returned from a poll
 // ---------------------------------------------------------------------------
 struct Message {
-  long long id;
+  std::int64_t id;
   std::string topic;
   std::string data;
-  std::string created_at;
+  std::string content_type;
+  std::chrono::sys_time<std::chrono::microseconds> created_at;
+
+  friend std::ostream &operator<<(std::ostream &os, const Message &m);
 };
+
+std::ostream &operator<<(std::ostream &os, const Message &m);
 
 // ---------------------------------------------------------------------------
 // NodeInfo — result of probing one connection string
@@ -45,17 +86,9 @@ class PgCluster {
 public:
   friend class PgMessaging;
   using Seconds = std::chrono::seconds;
-  typedef enum environment { production, staging, development } Environment;
 
   explicit PgCluster(std::vector<std::string> conninfos,
-                     Environment env = development,
-                     const std::string &appName = "",
-                     Seconds cache_ttl = Seconds{60});
-
-  explicit PgCluster(std::vector<std::string> conninfos,
-                     const std::string env = "development",
-                     const std::string &appName = "",
-                     Seconds cache_ttl = Seconds{60});
+                     const std::string &appName = "");
 
   // Returns conninfo for the current primary.
   // Throws if no primary is found.
@@ -73,28 +106,20 @@ public:
 
   // Returns the environment enum for a given string (production, staging, dev)
   // Throws std::invalid_argument if the string is invalid.
-  static Environment env(const std::string &s);
-
-  const std::string &env(Environment e) const;
 
   bool connected() const;
 
+  std::string errors() const;
+  bool hasErrors() const;
+
 private:
   std::vector<std::string> conninfos_;
-  Seconds cache_ttl_;
   std::vector<NodeInfo> nodes_; // cached result
-  std::chrono::steady_clock::time_point probed_at_;
-  size_t replica_rr_{0}; // round-robin index
-  Environment env_;
-
+  std::string appName_;
   mutable std::mutex mu_;
+  std::string error_;
 
   void probe_locked(); // must be called with mu_ held
-  bool cache_valid() const;
-  // Returns the messages table for the environment (kvproduction, kvstaging,
-  // kvdev)
-  std::string msgTable() const;
-  std::string topicTable() const;
 };
 
 // ---------------------------------------------------------------------------
@@ -124,38 +149,64 @@ public:
   PgMessaging &operator=(const PgMessaging &) = delete;
 
   // --- Topics (write → primary) -------------------------------------------
+  // Topics represent logical channels for messages.
+  // Create a new topic. One need kv_write privileges to create a topic.
   void create_topic(const std::string &topic);
   std::vector<std::string> list_topics() const;
+
+  // Check if a topic exists. One need kv_read privileges to check a topic.
   bool topic_exists(const std::string &topic) const;
 
   // --- Producer (write → primary) -----------------------------------------
-  long long publish(const std::string &topic, const std::string &data);
-  long long publish_dedup(const std::string &topic, const std::string &data);
+  // Publish a message to a topic. One need kv_write privileges to publish a
+  // message. The content_type parameter specifies the MIME type of the message
+  // data.
+  long long publish(const std::string &topic, const std::string &data,
+                    const std::string &content_type = CONTENT_TYPE_BINARY);
+  long long
+  publish_dedup(const std::string &topic, const std::string &data,
+                const std::string &content_type = CONTENT_TYPE_BINARY);
 
   // --- Consumer writes (write → primary) ----------------------------------
-  void register_consumer(const std::string &consumer_name,
-                         const std::string &topic);
+  // One need kv_read privileges to register a consumer and commit offsets.
+  long long register_consumer(const std::string &consumer_name,
+                              const std::string &topic);
+
+  // Commit the last processed message ID for a consumer on a topic.
+  // One need kv_write privileges to commit offsets.
   void commit_offset(const std::string &consumer_name, const std::string &topic,
                      long long last_id);
 
+  // Set the consumer offset to the beginning or end of the topic.
+  // One need kv_read privileges to set the consumer offset.
   void set_consumer_offset(const std::string &consumer_name,
                            const std::string &topic, ConsumeFromMode mode);
 
   // --- Consumer reads (read → replica) ------------------------------------
+  // Get the current offset for a consumer on a topic.
+  // One need kv_read privileges to get the offset.
   long long get_offset(const std::string &consumer_name,
                        const std::string &topic);
+
+  // Poll messages for a consumer on a topic.
+  // One need kv_read privileges to poll messages.
   std::vector<Message> poll(const std::string &consumer_name,
                             const std::string &topic, int limit = 1000);
-  long long consumer_lag(const std::string &consumer_name,
-                         const std::string &topic);
+
+  // Get the lag (difference between the latest message ID and the consumer's
+  // offset) for a consumer on a topic. Used for monitoring the consumer's
+  // progress relative to the latest message. One need kv_read privileges to get
+  // the consumer lag.
+  std::int64_t consumer_lag(const std::string &consumer_name,
+                            const std::string &topic);
 
 private:
   void *primaryCon_ = nullptr; // write connection
   void *replicaCon_ = nullptr; // read connection
-  std::string msgTbl_;
-  std::string topicTbl_;
   std::string appName_;
 
   void prepare_primary_stmts();
   void prepare_replica_stmts();
 };
+
+} // namespace pgqueue

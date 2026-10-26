@@ -208,11 +208,11 @@ void DataProcessor::sendToQueue(const qabase::Observation & obs, const qabase::C
     auto obstime = dataList->obstime();
     kvalobs::subscribe::MessageId messageid;
     if (obstime.is_special() ) {
-      messageid = pgqueue_->send(xml);
+      messageid = pgqueue_->send(xml, "application/xml");
     } else if ( obstime < (boost::posix_time::second_clock::universal_time() - boost::posix_time::hours(24)) ) {
-      messageid = pgqueue_->send(xml, kvalobs::subscribe::Producer::checked_lowpri);
+      messageid = pgqueue_->send(xml, "application/xml", kvalobs::subscribe::Producer::checked_lowpri);
     } else {
-      messageid = pgqueue_->send(xml, kvalobs::subscribe::Producer::checked);
+      messageid = pgqueue_->send(xml, "application/xml", kvalobs::subscribe::Producer::checked);
     }
     messages.insert(messageid);
     finalizeMessage_();

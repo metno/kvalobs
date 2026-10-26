@@ -92,8 +92,8 @@ public:
   virtual void stop() override;
 
 protected:
-  std::unique_ptr<PgCluster> pgCluster_;
-  std::unique_ptr<PgMessaging> pgMessaging_;
+  std::unique_ptr<pgqueue::PgCluster> pgCluster_;
+  std::unique_ptr<pgqueue::PgMessaging> pgMessaging_;
   int backOffInSeconds_;
   bool stopping_;
   int pollSize_;
@@ -101,13 +101,13 @@ protected:
   bool hasRegisteredConsumerChecked_;
   void init(const std::vector<std::string> &connections,
             const std::string &topic, const std::string &groupId);
-   bool consumeChecked(PgMessaging *queue, const std::string &topic,
+   bool consumeChecked(pgqueue::PgMessaging *queue, const std::string &topic,
                     const std::string &groupId, ConsumerDataHandler *handler,
                     int pollSize = 100);
-   bool consumeRaw(PgMessaging *queue, const std::string &topic,
+   bool consumeRaw(pgqueue::PgMessaging *queue, const std::string &topic,
                     const std::string &groupId, ConsumerDataHandler *handler,
                     int pollSize = 100);
-  bool consume(PgMessaging *queue, const std::string &topic,
+  bool consume(pgqueue::PgMessaging *queue, const std::string &topic,
                const std::string &groupId, ConsumerDataHandler *handler,
                int pollSize = 100);
 };

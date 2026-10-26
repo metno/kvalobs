@@ -48,27 +48,16 @@ PgProducer::PgProducer(const std::string &topic,
     throw std::logic_error("Empty PostgreSQL connection list");
   }
   
-  PgCluster::Environment myEnv;
-  if ( environment_=="production") {
-    myEnv = PgCluster::Environment::production;
-  } else if ( environment_=="staging") {
-    myEnv = PgCluster::Environment::staging;
-  } else if ( environment_=="development") {
-    myEnv = PgCluster::Environment::development;
-  } else {
-    throw std::logic_error("Invalid environment in topic name: " + environment_);
-  }
  
   try {
     // Create a PgCluster to handle primary/replica selection
-    cluster_ = std::make_unique<PgCluster>(
+    cluster_ = std::make_unique<pgqueue::PgCluster>(
         connections,
-        myEnv,  // environment
         appName  // app name for connection identification
     );
 
     // Create PgMessaging instance for publishing
-    messaging_ = std::make_unique<PgMessaging>(*cluster_);
+    messaging_ = std::make_unique<pgqueue::PgMessaging>(*cluster_);
 
     // Create the topic if it doesn't exist
     try {
@@ -87,7 +76,7 @@ PgProducer::PgProducer(const std::string &topic,
 
 PgProducer::PgProducer(
       const std::string &topic,
-      PgCluster *cluster,
+      pgqueue::PgCluster *cluster,
       ErrorHandler onFailedDelivery,
       SuccessHandler onSuccessfulDelivery)
     : Producer(topic, onFailedDelivery, onSuccessfulDelivery),
@@ -100,7 +89,7 @@ PgProducer::PgProducer(
 
   try {
     // Create PgMessaging instance for publishing
-    messaging_ = std::make_unique<PgMessaging>(*cluster_);
+    messaging_ = std::make_unique<pgqueue::PgMessaging>(*cluster_);
   } catch (const std::exception &e) {
     throw std::runtime_error(
         std::string("Failed to initialize PgProducer with existing cluster: ") + e.what());
@@ -112,15 +101,15 @@ PgProducer::~PgProducer() {
   catchup();
 }
 
-MessageId PgProducer::send(const std::string &data, QueueType queue) {
-  return send(data.c_str(), data.size(), queue);
+MessageId PgProducer::send(const std::string &data, const std::string &contentType, QueueType queue) {
+  return send(data.c_str(), data.size(), contentType, Producer::topic(queue));
 }
 
-MessageId PgProducer::send(const char *data, unsigned length, QueueType queue) {
-  return send(data, length, Producer::topic(queue));
+MessageId PgProducer::send(const char *data, unsigned length, const std::string &contentType, QueueType queue) {
+  return send(data, length, contentType, Producer::topic(queue));
 }
 
-MessageId PgProducer::send(const char *data, unsigned length, const std::string &topic) {
+MessageId PgProducer::send(const char *data, unsigned length, const std::string &contentType, const std::string &topic) {
   std::lock_guard<std::mutex> lock(mu_);
   int maxRetries = 3;
   MessageId id = messageId_++;
@@ -130,7 +119,7 @@ MessageId PgProducer::send(const char *data, unsigned length, const std::string 
   while (true) { 
     try {
       // Publish to the PostgreSQL queue
-      long long pgMsgId = messaging_->publish(topic, dataStr);
+      long long pgMsgId = messaging_->publish(topic, dataStr, contentType);
 
       // Queue a successful delivery notification
       PendingDelivery delivery;
@@ -155,7 +144,7 @@ MessageId PgProducer::send(const char *data, unsigned length, const std::string 
       }
       try {
         cluster_->reprobe();
-        messaging_ = std::make_unique<PgMessaging>(*cluster_);
+        messaging_ = std::make_unique<pgqueue::PgMessaging>(*cluster_);
       } catch (const std::runtime_error &e) {
         std::cerr << "Failed to reconnect to the cluster: " << e.what() << std::endl;
         std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -173,12 +162,12 @@ MessageId PgProducer::send(const char *data, unsigned length, const std::string 
   }
 }
 
-MessageId PgProducer::send(const std::string &data) {
-  return send(data.c_str(), data.size());
+MessageId PgProducer::send(const std::string &data, const std::string &contentType) {
+  return send(data.c_str(), data.size(), contentType);
 }
 
-MessageId PgProducer::send(const char *data, unsigned length) {
-  return send(data, length, topic_);
+MessageId PgProducer::send(const char *data, unsigned length, const std::string &contentType) {
+  return send(data, length, contentType, topic_);
 }
 
 void PgProducer::catchup(unsigned timeout) {

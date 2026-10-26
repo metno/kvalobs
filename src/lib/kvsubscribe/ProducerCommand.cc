@@ -41,6 +41,10 @@ ProducerCommand::ProducerCommand(TopicType topicQueue) :
 ProducerCommand::~ProducerCommand() {
 }
 
+std::string ProducerCommand::contentType() const {
+  return "application/octet-stream";
+}
+
 void ProducerCommand::onSend(kvalobs::subscribe::MessageId, const std::string &) {
 }
 

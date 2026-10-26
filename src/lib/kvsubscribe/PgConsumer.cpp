@@ -48,30 +48,6 @@ std::vector<std::string> splitTopic(const std::string &topic) {
   return parts;
 }
 
-PgCluster::Environment decodeTopic(const std::string &topic) {
-  auto parts = splitTopic(topic);
-
-  if (parts.empty() || parts.size() < 3 || parts[0] != "kvalobs") {
-    throw std::invalid_argument(
-        "Invalid topic string: " + topic +
-        ", expected at least 3 parts 'kvalobs.<env>.<checked|*>'");
-  }
-
-  auto type = parts[2];
-  if (type != "checked" && type != "raw") {
-    throw std::invalid_argument("Invalid topic type: " + type +
-                                ", expected 'checked' or 'raw'");
-  }
-
-  auto domain = parts[1];
-  if (domain.find("production") != std::string::npos)
-    return PgCluster::production;
-
-  if (domain.find("staging") != std::string::npos)
-    return PgCluster::staging;
-
-  return PgCluster::development;
-}
 
 } // namespace
 
@@ -105,14 +81,13 @@ PgConsumer::~PgConsumer() { Consumer::remove(this); }
 void PgConsumer::init(const std::vector<std::string> &connections,
                       const std::string &topic, const std::string &groupId) {
   backOffInSeconds_ = 1; // Initialize back-off duration in seconds
-  PgCluster::Environment env = decodeTopic(topic);
   hasRegisteredConsumerRaw_ = false;
   hasRegisteredConsumerChecked_ = false;
   if (connections.empty())
     throw std::invalid_argument("No 'pgqueue' database connections provided");
 
-  pgCluster_ = std::make_unique<PgCluster>(
-      connections, env, PgConfig::getProgName());
+  pgCluster_ = std::make_unique<pgqueue::PgCluster>(
+      connections, PgConfig::getProgName());
 
   if (!pgCluster_)
     throw std::runtime_error("Failed to create PgCluster instance");
@@ -128,7 +103,7 @@ std::string PgConsumer::getTopicLowpri() const {
 void PgConsumer::runOnce(unsigned timeoutInMilliSeconds) {
   try {
     if (!pgMessaging_)
-      pgMessaging_ = std::make_unique<PgMessaging>(*pgCluster_.get());
+      pgMessaging_ = std::make_unique<pgqueue::PgMessaging>(*pgCluster_.get());
 
     if (!consume(pgMessaging_.get(), getTopic(), getGroupId(), getHandler(),
                  pollSize_)) {
@@ -156,7 +131,7 @@ bool PgConsumer::stopping() const { return stopping_; }
 
 void PgConsumer::stop() { stopping_ = true; }
 
-bool PgConsumer::consumeRaw(PgMessaging *queue, const std::string &topic,
+bool PgConsumer::consumeRaw(pgqueue::PgMessaging *queue, const std::string &topic,
                 const std::string &groupId, ConsumerDataHandler *handler,
                 int pollSize) {
 
@@ -165,12 +140,12 @@ bool PgConsumer::consumeRaw(PgMessaging *queue, const std::string &topic,
     hasRegisteredConsumerRaw_ = true;
   }
 
-  const std::vector<Message> messages = queue->poll(groupId, topic, pollSize);
+  const std::vector<pgqueue::Message> messages = queue->poll(groupId, topic, pollSize);
   if (messages.empty()) {
     return false;
   }
 
-  for (const Message &message : messages) {
+  for (const pgqueue::Message &message : messages) {
     handler->data(message.data.c_str(), message.data.size());
   }
   queue->commit_offset(groupId, topic, messages.back().id);
@@ -178,13 +153,13 @@ bool PgConsumer::consumeRaw(PgMessaging *queue, const std::string &topic,
   return true;
 }
 
-bool PgConsumer::consumeChecked(PgMessaging *queue, const std::string &topic,
+bool PgConsumer::consumeChecked(pgqueue::PgMessaging *queue, const std::string &topic,
                     const std::string &groupId, ConsumerDataHandler *handler,
                     int pollSize) {
   static int statCounter = 0;
   bool lowPri;
   std::string topicLowpri(topic + ".lowpri");
-  std::vector<Message> messages;
+  std::vector<pgqueue::Message> messages;
   
   if (!hasRegisteredConsumerChecked_) {
     queue->register_consumer(groupId, topicLowpri);
@@ -204,7 +179,7 @@ bool PgConsumer::consumeChecked(PgMessaging *queue, const std::string &topic,
     return false;
   }
 
-  for (const Message &message : messages) {
+  for (const pgqueue::Message &message : messages) {
     handler->data(message.data.c_str(), message.data.size());
   }
  
@@ -216,7 +191,7 @@ bool PgConsumer::consumeChecked(PgMessaging *queue, const std::string &topic,
   return true;
 }
 
-bool PgConsumer::consume(PgMessaging *queue, const std::string &topic,
+bool PgConsumer::consume(pgqueue::PgMessaging *queue, const std::string &topic,
              const std::string &groupId, ConsumerDataHandler *handler,
              int pollSize) {
   if (topic.find(".checked") != std::string::npos)

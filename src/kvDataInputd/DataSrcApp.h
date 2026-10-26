@@ -93,7 +93,6 @@ struct PgQueueConfig {
   PgQueueConfig(): enable(true) {}
 
   std::string getRawTopic() { return kvalobs::subscribe::queue::raw(domain); }
-  PgCluster::Environment env() const { return PgCluster::env(domain);}
   std::string getPublishTopic() {
     return kvalobs::subscribe::queue::checked(domain);
   }
