@@ -39,7 +39,7 @@ std::list<Consumer *> Consumer::allConsumers_;
 namespace {
 class NullDataHandler : public ConsumerDataHandler {
 public:
-  void data(const char *msg, unsigned length) override {
+  void data(const char *msg, unsigned length, const std::string &content_type) override {
     // Do nothing
   }
 
@@ -98,8 +98,8 @@ void Consumer::stopAll() {
   allConsumers_.clear();
 }
 
-void Consumer::handleData(const char *msg, unsigned length) {
-  handler_->data(msg, length);
+void Consumer::handleData(const char *msg, unsigned length, const std::string &content_type) {
+  handler_->data(msg, length, content_type);
 }
 
 void Consumer::handleError(int code, const std::string &msg) {

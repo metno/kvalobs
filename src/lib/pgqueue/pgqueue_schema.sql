@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS messages (
     id         bigserial PRIMARY KEY,
     topic      text NOT NULL,
     data       bytea NOT NULL,
-    content_type text NOT NULL default 'application/octet-str',
+    content_type text NOT NULL default 'application/octet-stream',
     crc        uuid GENERATED ALWAYS AS (md5(data)::uuid) STORED,
     created_at timestamptz NOT NULL DEFAULT now()
 );

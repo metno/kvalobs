@@ -1,5 +1,6 @@
 #include "pgqueue.h"
 #include <algorithm>
+#include <fstream>
 #include <format>
 #include <iostream>
 #include <libpq-fe.h>
@@ -28,11 +29,12 @@ struct ResultGuard {
 // PgCluster
 // ===========================================================================
 
-PgCluster::PgCluster(std::vector<std::string> conninfos,
+PgCluster::PgCluster(std::vector<std::string> conninfos, bool only_primary,
                      const std::string &appName)
-    : conninfos_(std::move(conninfos)), appName_(appName) {
+    : conninfos_(std::move(conninfos)), appName_(appName),
+      only_primary_(only_primary) {
   if (conninfos_.empty())
-    throw std::runtime_error("PgCluster: no connection strings provided");
+    throw PGConfigException("PgCluster: no connection strings provided");
 
   if (!appName.empty()) {
     // check if the conninfos strings contain the application_name parapeter. If
@@ -47,6 +49,8 @@ PgCluster::PgCluster(std::vector<std::string> conninfos,
   for (const auto &con : conninfos_) {
     std::cerr << "  - " << con << '\n';
   }
+  std::cerr << "Application name: " << appName_ << '\n';
+  std::cerr << "Only primary: " << (only_primary_ ? "true" : "false") << '\n';
   std::lock_guard<std::mutex> lk(mu_);
   probe_locked();
 }
@@ -141,7 +145,7 @@ std::string PgCluster::replica_conninfo() {
     }
   }
 
-  if (!replicas.empty()) {
+  if (!replicas.empty() && !only_primary_) {
     // More than one replica, select the first
     return replicas[0]->conninfo;
   }
@@ -218,7 +222,7 @@ void check_result(ResultGuard &g, ExecStatusType expected,
                   const std::string &ctx) {
   try {
     check_result_raw(g.res, expected, ctx);
-  } catch (const std::exception &e) {
+  } catch (...) {
     g.res = nullptr;
     throw;
   }
@@ -231,7 +235,7 @@ void check_command_raw(PGresult *res, const std::string &ctx) {
 void check_command(ResultGuard &g, const std::string &ctx) {
   try {
     check_command_raw(g.res, ctx);
-  } catch (const std::exception &e) {
+  } catch (...) {
     g.res = nullptr;
     throw;
   }
@@ -263,11 +267,19 @@ std::ostream &operator<<(std::ostream &os, const Message &m) {
   return os;
 }
 
-PgMessaging::PgMessaging(PgCluster &cluster) {
+PgMessaging::PgMessaging(PgCluster &cluster)
+    : primaryCon_(nullptr), replicaCon_(nullptr), appName_(cluster.app_name()),
+      onlyPrimary_(cluster.only_primary()) {
   primaryCon_ = connect(cluster.primary_conninfo());
-  replicaCon_ = connect(cluster.replica_conninfo());
-  prepare_primary_stmts();
-  prepare_replica_stmts();
+  prepare_primary_stmts(primaryCon_);
+  if (onlyPrimary_) {
+    // prepare the replica statements on the primary connection instead of the
+    // replica connection
+    prepare_replica_stmts(primaryCon_);
+  } else {
+    replicaCon_ = connect(cluster.replica_conninfo());
+    prepare_replica_stmts(replicaCon_);
+  }
 }
 
 PgMessaging::~PgMessaging() {
@@ -283,13 +295,13 @@ PgMessaging::~PgMessaging() {
   }
 }
 
-void PgMessaging::prepare_primary_stmts() {
+void PgMessaging::prepare_primary_stmts(void *conn) {
   // Statements that write — executed on primary_.
-  prepare(primaryCon_, "create_topic",
+  prepare(conn, "create_topic",
           R"(INSERT INTO topic (topic) VALUES ($1) ON CONFLICT DO NOTHING
     )");
 
-  prepare(primaryCon_, "publish",
+  prepare(conn, "publish",
           R"(
         INSERT INTO messages (topic, data, content_type)
         VALUES ($1, $2::bytea, $3)
@@ -297,7 +309,7 @@ void PgMessaging::prepare_primary_stmts() {
     )");
   //  "INSERT INTO messages (topic, data) VALUES ($1, $2) RETURNING id");
 
-  prepare(primaryCon_, "publish_dedup",
+  prepare(conn, "publish_dedup",
           R"(
         WITH existing AS (
             SELECT id FROM messages
@@ -322,7 +334,7 @@ void PgMessaging::prepare_primary_stmts() {
   //       ON CONFLICT (consumer_name, topic) DO NOTHING
   //   )").c_str());
 
-  prepare(primaryCon_, "register_consumer",
+  prepare(conn, "register_consumer",
           R"(
         INSERT INTO consumer_offsets (consumer_name, topic)
         VALUES ($1, $2)
@@ -330,14 +342,14 @@ void PgMessaging::prepare_primary_stmts() {
         RETURNING last_id
     )");
 
-  prepare(primaryCon_, "commit_offset",
+  prepare(conn, "commit_offset",
           R"(
         UPDATE consumer_offsets
         SET last_id = $3, updated_at = now()
         WHERE consumer_name = $1 AND topic = $2
     )");
 
-  prepare(primaryCon_, "set_offset_at_beginning",
+  prepare(conn, "set_offset_at_beginning",
           R"(
         UPDATE consumer_offsets
         SET last_id = (SELECT COALESCE(MIN(id)-1, 0) FROM messages WHERE topic = $2),
@@ -345,7 +357,7 @@ void PgMessaging::prepare_primary_stmts() {
         WHERE consumer_name = $1 AND topic = $2
     )");
 
-  prepare(primaryCon_, "set_offset_at_end",
+  prepare(conn, "set_offset_at_end",
           R"(
         UPDATE consumer_offsets
         SET last_id = (SELECT COALESCE(MAX(id), 0) FROM messages WHERE topic = $2), 
@@ -354,15 +366,15 @@ void PgMessaging::prepare_primary_stmts() {
     )");
 }
 
-void PgMessaging::prepare_replica_stmts() {
+void PgMessaging::prepare_replica_stmts(void *conn) {
   // Statements that only read — executed on replica_.
-  prepare(replicaCon_, "get_offset",
+  prepare(conn, "get_offset",
           R"(
         SELECT last_id FROM consumer_offsets
         WHERE consumer_name = $1 AND topic = $2
     )");
 
-  prepare(replicaCon_, "poll",
+  prepare(conn, "poll",
           R"(
         SELECT id, topic, data, content_type, created_at
         FROM messages
@@ -371,7 +383,7 @@ void PgMessaging::prepare_replica_stmts() {
         ORDER BY id
         LIMIT $3
     )");
-  prepare(replicaCon_, "consumer_lag",
+  prepare(conn, "consumer_lag",
           R"(
         SELECT COALESCE(MAX(m.id), 0) - co.last_id AS lag
         FROM consumer_offsets co
@@ -379,7 +391,7 @@ void PgMessaging::prepare_replica_stmts() {
         WHERE co.consumer_name = $1 AND co.topic = $2
         GROUP BY co.last_id
     )");
-  prepare(replicaCon_, "topic_exists",
+  prepare(conn, "topic_exists",
           R"(
         SELECT EXISTS (
             SELECT 1 FROM topic
@@ -387,7 +399,7 @@ void PgMessaging::prepare_replica_stmts() {
         )
     )");
 
-  prepare(replicaCon_, "list_topics",
+  prepare(conn, "list_topics",
           R"(
         SELECT topic FROM topic
     )");
@@ -405,8 +417,9 @@ void PgMessaging::create_topic(const std::string &topic) {
 }
 
 std::vector<std::string> PgMessaging::list_topics() const {
-  ResultGuard g(PQexecPrepared(static_cast<PGconn *>(replicaCon_),
-                               "list_topics", 0, nullptr, nullptr, nullptr, 0));
+  void *conn = onlyPrimary_ ? primaryCon_ : replicaCon_;
+  ResultGuard g(PQexecPrepared(static_cast<PGconn *>(conn), "list_topics", 0,
+                               nullptr, nullptr, nullptr, 0));
   check_result(g, PGRES_TUPLES_OK, "list_topics");
   std::vector<std::string> topics;
   for (int i = 0; i < PQntuples(g.res); ++i) {
@@ -417,8 +430,9 @@ std::vector<std::string> PgMessaging::list_topics() const {
 
 bool PgMessaging::topic_exists(const std::string &topic) const {
   const char *p[] = {topic.c_str()};
-  ResultGuard g(PQexecPrepared(static_cast<PGconn *>(replicaCon_),
-                               "topic_exists", 1, p, nullptr, nullptr, 0));
+  void *conn = onlyPrimary_ ? primaryCon_ : replicaCon_;
+  ResultGuard g(PQexecPrepared(static_cast<PGconn *>(conn), "topic_exists", 1,
+                               p, nullptr, nullptr, 0));
   check_result(g, PGRES_TUPLES_OK, "topic_exists");
   return PQntuples(g.res) > 0 && std::string(PQgetvalue(g.res, 0, 0)) == "t";
 }
@@ -427,36 +441,42 @@ bool PgMessaging::topic_exists(const std::string &topic) const {
 // PgMessaging — Producer (primary)
 // ===========================================================================
 
-long long PgMessaging::publish(const std::string &topic,
-                               const std::string &data,
-                               const std::string &content_type) {
+std::uint64_t PgMessaging::publish(const std::string &topic,
+                                   const std::string &data,
+                                   const std::string &content_type) {
   const char *p[] = {topic.c_str(), data.c_str(), content_type.c_str()};
   ResultGuard g(PQexecPrepared(static_cast<PGconn *>(primaryCon_), "publish", 3,
                                p, nullptr, nullptr, 0));
   check_result(g, PGRES_TUPLES_OK, "publish");
-  if (PQntuples(g.res) == 0)
-    throw std::runtime_error("publish: no id returned");
-  return std::stoll(PQgetvalue(g.res, 0, 0));
+  if (PQntuples(g.res) == 0) {
+    std::string sqlstate = PQresultErrorField(g.res, PG_DIAG_SQLSTATE);
+    throw PGQueryException("publish: no id returned, SQLSTATE: " + sqlstate,
+                           sqlstate);
+  }
+  return std::stoull(PQgetvalue(g.res, 0, 0));
 }
 
-long long PgMessaging::publish_dedup(const std::string &topic,
-                                     const std::string &data,
-                                     const std::string &content_type) {
+std::uint64_t PgMessaging::publish_dedup(const std::string &topic,
+                                         const std::string &data,
+                                         const std::string &content_type) {
   const char *p[] = {topic.c_str(), data.c_str(), content_type.c_str()};
   ResultGuard g(PQexecPrepared(static_cast<PGconn *>(primaryCon_),
                                "publish_dedup", 3, p, nullptr, nullptr, 0));
   check_result(g, PGRES_TUPLES_OK, "publish_dedup");
-  if (PQntuples(g.res) == 0)
-    throw std::runtime_error("publish_dedup: no id returned");
-  return std::stoll(PQgetvalue(g.res, 0, 0));
+  if (PQntuples(g.res) == 0) {
+    std::string sqlstate = PQresultErrorField(g.res, PG_DIAG_SQLSTATE);
+    throw PGQueryException(
+        "publish_dedup: no id returned, SQLSTATE: " + sqlstate, sqlstate);
+  }
+  return std::stoull(PQgetvalue(g.res, 0, 0));
 }
 
 // ===========================================================================
 // PgMessaging — Consumer writes (primary)
 // ===========================================================================
 
-long long PgMessaging::register_consumer(const std::string &consumer_name,
-                                         const std::string &topic) {
+std::uint64_t PgMessaging::register_consumer(const std::string &consumer_name,
+                                             const std::string &topic) {
   const char *p[] = {consumer_name.c_str(), topic.c_str()};
   ResultGuard g(PQexecPrepared(static_cast<PGconn *>(primaryCon_),
                                "register_consumer", 2, p, nullptr, nullptr, 0));
@@ -468,12 +488,21 @@ long long PgMessaging::register_consumer(const std::string &consumer_name,
 }
 
 void PgMessaging::commit_offset(const std::string &consumer_name,
-                                const std::string &topic, long long last_id) {
+                                const std::string &topic,
+                                std::uint64_t last_id) {
   std::string id_str = std::to_string(last_id);
+  std::cerr << "Committing offset for consumer '" << consumer_name
+            << "' on topic '" << topic << "' with last_id " << id_str << '\n';
   const char *p[] = {consumer_name.c_str(), topic.c_str(), id_str.c_str()};
   ResultGuard g(PQexecPrepared(static_cast<PGconn *>(primaryCon_),
                                "commit_offset", 3, p, nullptr, nullptr, 0));
-  check_command(g, "commit_offset");
+  try {
+    check_command(g, "commit_offset");
+  } catch (const std::exception &error) {
+    std::cerr << "Error committing offset for consumer '" << consumer_name
+              << "' on topic '" << topic << "': " << error.what() << '\n';
+    throw;
+  }
 }
 
 void PgMessaging::set_consumer_offset(const std::string &consumer_name,
@@ -481,17 +510,22 @@ void PgMessaging::set_consumer_offset(const std::string &consumer_name,
                                       ConsumeFromMode mode) {
   const char *p[] = {consumer_name.c_str(), topic.c_str()};
 
-  if (mode == CONSUME_FROM_BEGINNING) {
+  switch (mode) {
+  case ConsumeFromMode::CONSUME_FROM_BEGINNING: {
     ResultGuard g(PQexecPrepared(static_cast<PGconn *>(primaryCon_),
                                  "set_offset_at_beginning", 2, p, nullptr,
                                  nullptr, 0));
     check_command(g, "set_offset_at_beginning");
-  } else if (mode == CONSUME_FROM_END) {
+    break;
+  }
+  case ConsumeFromMode::CONSUME_FROM_END: {
     ResultGuard g(PQexecPrepared(static_cast<PGconn *>(primaryCon_),
                                  "set_offset_at_end", 2, p, nullptr, nullptr,
                                  0));
     check_command(g, "set_offset_at_end");
-  } else {
+    break;
+  }
+  default: // Should never happen.
     throw std::invalid_argument("Invalid ConsumeFromMode");
   }
 }
@@ -500,21 +534,23 @@ void PgMessaging::set_consumer_offset(const std::string &consumer_name,
 // PgMessaging — Consumer reads (replica)
 // ===========================================================================
 
-long long PgMessaging::get_offset(const std::string &consumer_name,
-                                  const std::string &topic) {
+std::uint64_t PgMessaging::get_offset(const std::string &consumer_name,
+                                      const std::string &topic) {
+  void *conn = onlyPrimary_ ? primaryCon_ : replicaCon_;
+
   const char *p[] = {consumer_name.c_str(), topic.c_str()};
-  ResultGuard g(PQexecPrepared(static_cast<PGconn *>(replicaCon_), "get_offset",
-                               2, p, nullptr, nullptr, 0));
+  ResultGuard g(PQexecPrepared(static_cast<PGconn *>(conn), "get_offset", 2, p,
+                               nullptr, nullptr, 0));
   check_result(g, PGRES_TUPLES_OK, "get_offset");
   if (PQntuples(g.res) == 0)
     return 0;
-  return std::stoll(PQgetvalue(g.res, 0, 0));
+  return std::stoull(PQgetvalue(g.res, 0, 0));
 }
 
 namespace {
 // Helper functions for querying messages in binary format from PostgreSQL
-std::tuple<std::int64_t, bool> parse_binary_int64(PGresult *res, int row,
-                                                  int col) {
+std::tuple<std::uint64_t, bool> parse_binary_int64(PGresult *res, int row,
+                                                   int col) {
   if (PQgetisnull(res, row, col)) {
     return {0, false};
   }
@@ -524,16 +560,16 @@ std::tuple<std::int64_t, bool> parse_binary_int64(PGresult *res, int row,
   for (int i = 0; i < len; ++i) {
     v = (v << 8) | static_cast<unsigned char>(p[i]);
   }
-  return std::make_tuple(static_cast<std::int64_t>(v), true);
+  return std::make_tuple(v, true);
 }
 
 // Postgres epoch (2000-01-01) minus Unix epoch (1970-01-01), in seconds.
-constexpr std::int64_t pg_epoch_offset_s = 946'684'800;
+constexpr std::uint64_t pg_epoch_offset_s = 946'684'800;
 
 std::chrono::sys_time<std::chrono::microseconds>
 read_timestamptz(PGresult *res, int row, int col) {
   using namespace std::chrono;
-  std::int64_t us_since_2000 = std::get<0>(parse_binary_int64(res, row, col));
+  std::uint64_t us_since_2000 = std::get<0>(parse_binary_int64(res, row, col));
   return sys_time<microseconds>{microseconds{us_since_2000} +
                                 seconds{pg_epoch_offset_s}};
 }
@@ -542,12 +578,17 @@ read_timestamptz(PGresult *res, int row, int col) {
 
 std::vector<Message> PgMessaging::poll(const std::string &consumer_name,
                                        const std::string &topic, int limit) {
-  std::int64_t offset = get_offset(consumer_name, topic);
+  std::uint64_t offset = get_offset(consumer_name, topic);
+  std::cerr << "Polling for consumer '" << consumer_name << "' on topic '"
+            << topic << "' with offset " << offset << " and limit " << limit
+            << '\n';
+
   std::string offset_str = std::to_string(offset);
   std::string limit_str = std::to_string(limit);
 
   const char *p[] = {topic.c_str(), offset_str.c_str(), limit_str.c_str()};
-  ResultGuard g(PQexecPrepared(static_cast<PGconn *>(replicaCon_), "poll", 3, p,
+  void *conn = onlyPrimary_ ? primaryCon_ : replicaCon_;
+  ResultGuard g(PQexecPrepared(static_cast<PGconn *>(conn), "poll", 3, p,
                                nullptr, nullptr,
                                1)); // 1 request binary results
   check_result(g, PGRES_TUPLES_OK, "poll");
@@ -566,17 +607,136 @@ std::vector<Message> PgMessaging::poll(const std::string &consumer_name,
     m.created_at = read_timestamptz(g.res, i, 4);
     rows.push_back(std::move(m));
   }
+
+  std::cerr << "Polled " << rows.size()
+            << " first: " << (rows.empty() ? 0 : rows.front().id)
+            << " last: " << (rows.empty() ? 0 : rows.back().id)
+            << " messages for consumer '" << consumer_name << "' on topic '"
+            << topic << "'\n";
   return rows;
 }
 
-std::int64_t PgMessaging::consumer_lag(const std::string &consumer_name,
-                                       const std::string &topic) {
+std::uint64_t PgMessaging::consumer_lag(const std::string &consumer_name,
+                                        const std::string &topic) {
   const char *p[] = {consumer_name.c_str(), topic.c_str()};
-  ResultGuard g(PQexecPrepared(static_cast<PGconn *>(replicaCon_),
-                               "consumer_lag", 2, p, nullptr, nullptr, 0));
+  void *conn = onlyPrimary_ ? primaryCon_ : replicaCon_;
+  ResultGuard g(PQexecPrepared(static_cast<PGconn *>(conn), "consumer_lag", 2,
+                               p, nullptr, nullptr, 0));
   check_result(g, PGRES_TUPLES_OK, "consumer_lag");
   if (PQntuples(g.res) == 0)
     return 0;
-  return static_cast<std::int64_t>(std::stoll(PQgetvalue(g.res, 0, 0)));
+  return static_cast<std::uint64_t>(std::stoull(PQgetvalue(g.res, 0, 0)));
 }
+// ===========================================================================
+// Config
+// ===========================================================================
+
+namespace {
+std::string trim(const std::string &s) {
+  const char *ws = " \t\r\n";
+  size_t b = s.find_first_not_of(ws);
+  if (b == std::string::npos)
+    return "";
+  return s.substr(b, s.find_last_not_of(ws) - b + 1);
+}
+
+// Remove a '#' comment, unless the '#' is inside a quoted string.
+std::string strip_comment(const std::string &s) {
+  char quote = 0;
+  for (size_t i = 0; i < s.size(); ++i) {
+    if (quote) {
+      if (s[i] == quote)
+        quote = 0;
+    } else if (s[i] == '"' || s[i] == '\'') {
+      quote = s[i];
+    } else if (s[i] == '#' && (i == 0 || s[i - 1] == ' ' || s[i - 1] == '\t')) {
+      return s.substr(0, i);
+    }
+  }
+  return s;
+}
+
+std::string unquote(const std::string &s) {
+  if (s.size() >= 2 && (s.front() == '"' || s.front() == '\'') &&
+      s.back() == s.front())
+    return s.substr(1, s.size() - 2);
+  return s;
+}
+
+int parse_int(const std::string &path, int line, const std::string &key,
+              const std::string &value) {
+  size_t pos = 0;
+  int n = 0;
+  try {
+    n = std::stoi(value, &pos);
+  } catch (const std::exception &) {
+    pos = 0;
+  }
+  if (value.empty() || pos != value.size() || n <= 0)
+    throw PGConfigException(std::format(
+        "{}:{}: '{}' must be a positive integer, got '{}'", path, line, key,
+        value));
+  return n;
+}
+} // namespace
+
+Config read_config(const std::string &path) {
+  std::ifstream in(path);
+  if (!in)
+    throw PGConfigException("Could not open configuration file: " + path);
+
+  Config cfg;
+  bool in_connections = false;
+  std::string raw;
+  int line = 0;
+
+  while (std::getline(in, raw)) {
+    ++line;
+    const std::string text = trim(strip_comment(raw));
+    if (text.empty())
+      continue;
+
+    if (text.front() == '-') {
+      if (!in_connections)
+        throw PGConfigException(
+            std::format("{}:{}: list item outside 'connections'", path, line));
+      const std::string item = unquote(trim(text.substr(1)));
+      if (item.empty())
+        throw PGConfigException(
+            std::format("{}:{}: empty connection string", path, line));
+      cfg.connections.push_back(item);
+      continue;
+    }
+
+    const size_t colon = text.find(':');
+    if (colon == std::string::npos)
+      throw PGConfigException(
+          std::format("{}:{}: expected 'key: value'", path, line));
+
+    const std::string key = trim(text.substr(0, colon));
+    const std::string value = unquote(trim(text.substr(colon + 1)));
+    in_connections = false;
+
+    if (key == "topic") {
+      cfg.topic = value;
+    } else if (key == "max_pool_size") {
+      cfg.max_pool_size = parse_int(path, line, key, value);
+    } else if (key == "pool_interval_ms") {
+      cfg.pool_interval_ms = parse_int(path, line, key, value);
+    } else if (key == "connections") {
+      if (!value.empty())
+        throw PGConfigException(std::format(
+            "{}:{}: 'connections' must be followed by a list", path, line));
+      in_connections = true;
+    } else {
+      throw PGConfigException(
+          std::format("{}:{}: unknown key '{}'", path, line, key));
+    }
+  }
+
+  if (cfg.connections.empty())
+    throw PGConfigException(path + ": no connections specified");
+  return cfg;
+}
+
 } // namespace pgqueue

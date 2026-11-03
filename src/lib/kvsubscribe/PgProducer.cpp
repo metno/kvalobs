@@ -53,6 +53,7 @@ PgProducer::PgProducer(const std::string &topic,
     // Create a PgCluster to handle primary/replica selection
     cluster_ = std::make_unique<pgqueue::PgCluster>(
         connections,
+        true, // only primary 
         appName  // app name for connection identification
     );
 

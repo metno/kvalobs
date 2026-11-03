@@ -60,8 +60,10 @@ std::string defaultConsumerName() {
 void usage(const char *program) {
   std::cerr << "Usage: " << program << " [OPTIONS]\n";
   std::cerr << "Options:\n";
-  std::cerr << "  -f, --config FILE      Specify a config file. (TODO: "
-               "Implement usage)\n";
+  std::cerr << "  -C, --config FILE      Read connections from a config file "
+               "(topic is ignored;\n"
+               "                         the topics are built from the "
+               "domain)\n";
   std::cerr << "  -d, --domain DOMAIN    Set the domain (default: staging)\n";
   std::cerr << "  -r, --raw                Konsumes the raw queue\n";
   std::cerr << "  -c, --consumer CONSUMER  Set the consumer (default: "
@@ -82,7 +84,7 @@ struct Options {
 Options parse_options(int argc, char **argv) {
   Options options;
   static struct option long_options[] = {
-      {"config", required_argument, nullptr, 'f'},
+      {"config", required_argument, nullptr, 'C'},
       {"domain", required_argument, nullptr, 'd'},
       {"consumer", required_argument, nullptr, 'c'},
       {"raw", no_argument, nullptr, 'r'},
@@ -91,13 +93,11 @@ Options parse_options(int argc, char **argv) {
   int option_index = 0;
   int opt;
   options.raw = false;
-  while ((opt = getopt_long(argc, argv, "c:h:rd:f:", long_options,
+  while ((opt = getopt_long(argc, argv, "c:hrd:C:f:", long_options,
                             &option_index)) != -1) {
     switch (opt) {
-    case 'f':
-      // Use a config file if specified
-      // TODO: Implement reading and using the config file
-      std::cerr << "TODO: Config file specified: " << optarg << '\n';
+    case 'C':
+    case 'f': // -f kept for compatibility
       options.configFile = optarg;
       break;
     case 'c':
@@ -115,6 +115,19 @@ Options parse_options(int argc, char **argv) {
       exit(0);
     default:
       usage(argv[0]);
+      exit(1);
+    }
+  }
+
+  if (!options.configFile.empty()) {
+    try {
+      const pgqueue::Config cfg = pgqueue::read_config(options.configFile);
+      
+      if (options.connections.empty()) {
+        options.connections = cfg.connections;
+      }
+    } catch (const std::exception &error) {
+      std::cerr << "Failed to read config: " << error.what() << '\n';
       exit(1);
     }
   }
@@ -152,14 +165,14 @@ Options parse_options(int argc, char **argv) {
 void consumeRaw(pgqueue::PgMessaging *queue, Options options) {
   while (!stopRequested) {
     const std::vector<pgqueue::Message> messages =
-        queue->poll(options.consumer, options.topic);
+        queue->poll(options.consumer, options.topic, 10);
     if (messages.empty()) {
       std::this_thread::sleep_for(std::chrono::seconds(1));
       continue;
     }
 
     for (const pgqueue::Message &message : messages) {
-      std::cout << message;
+      std::cout << message << std::endl;
     }
     queue->commit_offset(options.consumer, options.topic, messages.back().id);
     std::cout << "Committed offset " << messages.back().id << '\n';
@@ -170,12 +183,11 @@ void consumeChecked(pgqueue::PgMessaging *queue, Options options) {
   bool lowPri;
   std::vector<pgqueue::Message> messages;
   while (!stopRequested) {
-    messages.clear();
     lowPri = false;
-    messages = queue->poll(options.consumer, options.topic);
+    messages = queue->poll(options.consumer, options.topic, 10);
     if (messages.empty()) {
       lowPri = true;
-      messages = queue->poll(options.consumer, options.topicLowpri);
+      messages = queue->poll(options.consumer, options.topicLowpri, 100);
     }
     if (messages.empty()) {
       std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -183,7 +195,7 @@ void consumeChecked(pgqueue::PgMessaging *queue, Options options) {
     }
 
     for (const pgqueue::Message &message : messages) {
-      std::cout << message;
+      std::cout << message << std::endl;
     }
     if (lowPri) {
       queue->commit_offset(options.consumer, options.topicLowpri,
@@ -206,7 +218,7 @@ int main(int argc, char **argv) {
   std::signal(SIGINT, requestStop);
 
   try {
-    pgqueue::PgCluster cluster(options.connections, options.consumer);
+    pgqueue::PgCluster cluster(options.connections, false, options.consumer);
     std::unique_ptr<pgqueue::PgMessaging> queue =
         std::make_unique<pgqueue::PgMessaging>(cluster);
     auto topo = cluster.topology();

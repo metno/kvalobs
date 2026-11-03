@@ -87,7 +87,7 @@ void PgConsumer::init(const std::vector<std::string> &connections,
     throw std::invalid_argument("No 'pgqueue' database connections provided");
 
   pgCluster_ = std::make_unique<pgqueue::PgCluster>(
-      connections, PgConfig::getProgName());
+      connections, false, PgConfig::getProgName());
 
   if (!pgCluster_)
     throw std::runtime_error("Failed to create PgCluster instance");
@@ -146,7 +146,7 @@ bool PgConsumer::consumeRaw(pgqueue::PgMessaging *queue, const std::string &topi
   }
 
   for (const pgqueue::Message &message : messages) {
-    handler->data(message.data.c_str(), message.data.size());
+    handler->data(message.data.c_str(), message.data.size(), message.content_type);
   }
   queue->commit_offset(groupId, topic, messages.back().id);
   std::cout << "Committed offset " << messages.back().id << '\n';
@@ -180,7 +180,7 @@ bool PgConsumer::consumeChecked(pgqueue::PgMessaging *queue, const std::string &
   }
 
   for (const pgqueue::Message &message : messages) {
-    handler->data(message.data.c_str(), message.data.size());
+    handler->data(message.data.c_str(), message.data.size(), message.content_type);
   }
  
   if (lowPri) {

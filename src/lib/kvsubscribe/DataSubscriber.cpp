@@ -47,7 +47,13 @@ void writeNoDebug(const std::string &message, const serialize::KvalobsData &d) {
 class DataHandler : public ConsumerDataHandler {
 public:
   DataHandler(DataSubscriber::Handler handler) : handler_(handler) {}
-  virtual void data(const char *msg, unsigned length) override {
+  virtual void data(const char *msg, unsigned length, const std::string &content_type) override {
+
+    if( ! content_type.empty() && content_type.find("application/xml") == std::string::npos) {
+      milog::LogContext context("DataHandler");
+      LOGWARN("Received message with unsupported content type: " << content_type<< ". Expected 'application/xml'");
+      return;
+    }
     std::string message(msg, length);
     serialize::KvalobsData d;
     serialize::KvalobsDataParser::parse(message, d);
@@ -61,7 +67,7 @@ public:
   virtual void error(int code, const std::string &msg) override {
     // Default implementation: log the error
     milog::LogContext context("DataHandler");
-    LOGERROR("Error code bladibla: " << code << ", message: " << msg);
+    LOGERROR("Error code: " << code << ", message: " << msg);
   }
 private:
   DataSubscriber::Handler handler_;

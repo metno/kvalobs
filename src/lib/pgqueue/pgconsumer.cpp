@@ -19,13 +19,20 @@ void usage(const char *program) {
   std::cerr << "Options:\n";
   std::cerr << "  -t, --topic TOPIC        Set the topic (default: "
                "kvalobs.test.raw)\n";
+  std::cerr << "  -c, --consumer NAME      Set the consumer (default: "
+               "kvconsumer)\n";
+  std::cerr << "  -C, --config FILE        Read topic and connections from a "
+               "configuration file\n";
   std::cerr << "  -h, --help               Show this help message\n";
-  std::cerr << "\n\nIf both -m and -f are specified, -m takes precedence.\n";
+  std::cerr << "\nSettings are taken from the command line first, then from "
+               "the configuration\nfile (see pgqueue.conf), then the "
+               "defaults.\n";
 }
 
 struct Options {
   std::string topic;
   std::string consumer;
+  std::string configFile;
   std::vector<std::string> connections;
 };
 
@@ -34,12 +41,13 @@ Options parse_options(int argc, char **argv) {
   static struct option long_options[] = {
       {"topic", required_argument, nullptr, 't'},
       {"consumer", required_argument, nullptr, 'c'},
+      {"config", required_argument, nullptr, 'C'},
       {"help", no_argument, nullptr, 'h'},
       {nullptr, 0, nullptr, 0}};
   int option_index = 0;
   int opt;
 
-  while ((opt = getopt_long(argc, argv, "t:c:h", long_options,
+  while ((opt = getopt_long(argc, argv, "t:c:hC:", long_options,
                             &option_index)) != -1) {
     switch (opt) {
     case 't':
@@ -47,6 +55,9 @@ Options parse_options(int argc, char **argv) {
       break;
     case 'c':
       options.consumer = optarg;
+      break;
+    case 'C':
+      options.configFile = optarg;
       break;
     case 'h':
       usage(argv[0]);
@@ -57,14 +68,29 @@ Options parse_options(int argc, char **argv) {
     }
   }
 
-  if (options.topic.empty()) {
-    std::cerr << "No topic specified. Using default 'kvalobs.test.raw'\n";
-    options.topic = "kvalobs.test.raw";
-  }
-
   // Handle connections from remaining arguments
   for (int i = optind; i < argc; ++i) {
     options.connections.push_back(argv[i]);
+  }
+
+  if (!options.configFile.empty()) {
+    try {
+      const pgqueue::Config cfg = pgqueue::read_config(options.configFile);
+      if (options.topic.empty()) {
+        options.topic = cfg.topic;
+      }
+      if (options.connections.empty()) {
+        options.connections = cfg.connections;
+      }
+    } catch (const std::exception &error) {
+      std::cerr << "Failed to read config: " << error.what() << '\n';
+      exit(1);
+    }
+  }
+
+  if (options.topic.empty()) {
+    std::cerr << "No topic specified. Using default 'kvalobs.test.raw'\n";
+    options.topic = "kvalobs.test.raw";
   }
 
   if (options.connections.empty()) {
@@ -103,7 +129,7 @@ int main(int argc, char **argv) {
   std::signal(SIGINT, requestStop);
 
   try {
-    pgqueue::PgCluster cluster(connections, options.consumer);
+    pgqueue::PgCluster cluster(connections, false, options.consumer);
     pgqueue::PgMessaging queue(cluster);
 
     auto topo = cluster.topology();
@@ -126,9 +152,7 @@ int main(int argc, char **argv) {
       }
 
       for (const pgqueue::Message &message : messages) {
-        std::cout << "\n------ id=" << message.id << " topic=" << message.topic
-                  << " created_at=" << message.created_at << "-----\n"
-                  << message.data << "\n------- end message -------\n";
+        std::cerr << message << std::endl;
       }
 
       queue.commit_offset(options.consumer, topic, messages.back().id);

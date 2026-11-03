@@ -45,7 +45,7 @@ public:
   /**
    * Process incoming data
    */
-  virtual void data(const char *msg, unsigned length) = 0;
+  virtual void data(const char *msg, unsigned length, const std::string &content_type) = 0;
 
   /**
    * Handle errors on message arrival.
@@ -122,7 +122,7 @@ protected:
    *
    */
 
-  void handleData(const char *msg, unsigned length);
+  void handleData(const char *msg, unsigned length, const std::string &content_type);
   void handleError(int code, const std::string &msg);
   static void remove(Consumer *consumer);
 
