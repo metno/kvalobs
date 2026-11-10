@@ -38,52 +38,43 @@ namespace dnmi {
 namespace db {
 class DRow;
 }
-}
+} // namespace dnmi
 
 /**
- * A unique identifier for an observation, consisting of stationid, typeid and obstime
+ * A unique identifier for an observation, consisting of stationid, typeid and
+ * obstime
  */
 class DataIdentifier {
- public:
+public:
   typedef boost::posix_time::ptime Time;
 
   /**
    * Read stationid, typeid, obstime from any row from any query
    */
-  explicit DataIdentifier(dnmi::db::DRow & row);
-
+  explicit DataIdentifier(dnmi::db::DRow &row);
   DataIdentifier(long long obsid, int station, int type, const Time &obstime);
+  DataIdentifier();
+  long long obsid() const { return obsid_; }
 
-  long long obsid() const { 
-    return obsid_; 
-  }
+  int station() const { return station_; }
 
-  int station() const {
-    return station_;
-  }
+  int type() const { return type_; }
 
-  int type() const {
-    return type_;
-  }
-
-  const Time & obstime() const {
-    return obstime_;
-  }
+  Time obstime() const { return obstime_; }
 
   static DataIdentifier invalid();
 
   bool isValid() const;
 
+  std::string sqlWhere(const std::string &identifier = std::string()) const;
 
-  std::string sqlWhere(const std::string & identifier = std::string()) const;
-
- private:
+private:
   long long obsid_;
   int station_;
   int type_;
   Time obstime_;
 };
 
-std::ostream & operator <<(std::ostream & s, const DataIdentifier & di);
+std::ostream &operator<<(std::ostream &s, const DataIdentifier &di);
 
 #endif /* SRC_KVMANAGERD_DATAIDENTIFIER_H_ */

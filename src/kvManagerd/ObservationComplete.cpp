@@ -28,30 +28,29 @@
  */
 
 #include "ObservationComplete.h"
-#include <thread>
-#include <iostream>
-#include <chrono>
-#include <string>
 #include "kvdb/kvdb.h"
 #include "milog/milog.h"
+#include <chrono>
+#include <iostream>
+#include <string>
+#include <thread>
 
 bool ObservationComplete::stopped_ = false;
 
-ObservationComplete::ObservationComplete(const std::string & connectString)
-    : dbAccess_(connectString) {
-}
+ObservationComplete::ObservationComplete(const std::string &connectString)
+    : dbAccess_(connectString) {}
 
-ObservationComplete::~ObservationComplete() {
-}
+ObservationComplete::~ObservationComplete() {}
 
 void ObservationComplete::operator()() {
   milog::LogContext context("ObservationComplete");
 
   while (!stopped()) {
+    DataIdentifier di;
     try {
-      //auto transaction = dbAccess_.transaction(true);
+      // auto transaction = dbAccess_.transaction(true);
       auto transaction = dbAccess_.transaction(false);
-      DataIdentifier di = dbAccess_.nextDataToProcess();
+      di = dbAccess_.nextDataToProcess();
       if (di.isValid()) {
         LOGDEBUG1(di);
         dbAccess_.addMissingData(di);
@@ -60,11 +59,12 @@ void ObservationComplete::operator()() {
         transaction->rollback();
         std::this_thread::sleep_for(std::chrono::seconds(1));
       }
-    } catch (dnmi::db::SQLSerializeError & e) {
+    } catch (dnmi::db::SQLSerializeError &e) {
       LOGDEBUG(e.what());
-    } catch ( dnmi::db::SQLException &e) {
-      LOGERROR(e.message());
-    } catch (std::exception & e) {
+    } catch (dnmi::db::SQLException &e) {
+      LOGERROR("Observation: observationid " << di << "\n"
+        << e.what());
+    } catch (std::exception &e) {
       LOGERROR(e.what());
       // ...and continue as if nothing happened
     }

@@ -28,27 +28,28 @@
  */
 
 #include "DataIdentifier.h"
+#include "kvdb/kvdb.h"
 #include <boost/date_time.hpp>
 #include <boost/lexical_cast.hpp>
 #include <sstream>
 #include <string>
-#include "kvdb/kvdb.h"
 
-DataIdentifier::DataIdentifier(dnmi::db::DRow & row) {
+DataIdentifier::DataIdentifier(dnmi::db::DRow &row) {
   obsid_ = boost::lexical_cast<long long>(row["observationid"]);
   station_ = boost::lexical_cast<int>(row["stationid"]);
   type_ = boost::lexical_cast<int>(row["typeid"]);
   obstime_ = boost::posix_time::time_from_string(row["obstime"]);
 }
 
-DataIdentifier::DataIdentifier(long long obsid, int station, int type, const Time &obstime)
-    : obsid_(obsid),
-      station_(station),
-      type_(type),
-      obstime_(obstime) {
-}
+DataIdentifier::DataIdentifier(long long obsid, int station, int type,
+                               const Time &obstime)
+    : obsid_(obsid), station_(station), type_(type), obstime_(obstime) {}
 
-std::string DataIdentifier::sqlWhere(const std::string & identifier) const {
+DataIdentifier::DataIdentifier()
+    : obsid_(std::numeric_limits<long long>::min()), station_(0), type_(0),
+      obstime_(boost::posix_time::ptime()) {}
+
+std::string DataIdentifier::sqlWhere(const std::string &identifier) const {
   std::string prefix;
   if (!identifier.empty())
     prefix = identifier + ".";
@@ -58,14 +59,15 @@ std::string DataIdentifier::sqlWhere(const std::string & identifier) const {
 }
 
 DataIdentifier DataIdentifier::invalid() {
-  return DataIdentifier(std::numeric_limits<long long>::min(), 0, 0, boost::posix_time::ptime());
+  return DataIdentifier(std::numeric_limits<long long>::min(), 0, 0,
+                        boost::posix_time::ptime());
 }
 
 bool DataIdentifier::isValid() const {
   return std::numeric_limits<long long>::min() != obsid_;
 }
 
-
-std::ostream & operator <<(std::ostream & s, const DataIdentifier & di) {
-  return s << di.obsid() << '(' << di.station() << '/' << di.type() << '/' << di.obstime() << ')';
+std::ostream &operator<<(std::ostream &s, const DataIdentifier &di) {
+  return s << di.obsid() << '(' << di.station() << '/' << di.type() << '/'
+           << di.obstime() << ')';
 }

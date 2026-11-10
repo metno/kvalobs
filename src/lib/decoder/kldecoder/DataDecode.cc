@@ -499,19 +499,22 @@ DataDecoder::decodeData(const std::string &obsData, int stationid, int typeId,
     o << "Invalid format. No data. stationid: " << stationid << " typeid: "
       << typeId;
     messages = o.str();
-    return 0;
+    return nullptr;
   } else {
     if (!decodeHeader(tmp, params, messages)) {
       ostringstream o;
       o << "INVALID header. stationid: " << stationid << " typeid: " << typeId;
+      if (!messages.empty()) {
+        o << " (" << messages << ")";
+      }
       messages = o.str();
-      return 0;
+      return nullptr;
     }
   }
 
   if (params.size() < 1) {
     messages = "No parameters in header!";
-    return 0;
+    return nullptr;
   }
 
   kvalobs::serialize::KvalobsData *kvData = new serialize::KvalobsData();
@@ -522,7 +525,7 @@ DataDecoder::decodeData(const std::string &obsData, int stationid, int typeId,
     if (!decodeData(klData, params.size(), obstime, receivedTime, typeId, tmp,
                     line, messages)) {
       delete kvData;
-      return 0;
+      return nullptr;
     }
 
     ostringstream ost;

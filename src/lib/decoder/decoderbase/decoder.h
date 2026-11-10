@@ -79,6 +79,8 @@ namespace decoder {
 
 class ConfParser;
 
+ std::chrono::minutes SetStationTypeidQaidCacheTTL(std::chrono::minutes ttl);
+
 typedef enum {
   YES,
   NO,
@@ -136,7 +138,7 @@ class QaIdInfo {
       if( random_ ) {
         return rand()%(qaMaxId_+1);
       } else {
-        //Use round robin
+         //Use round robin
         std::lock_guard<std::mutex> lck(m_);
         int ret=nextQaId_;
         nextQaId_ = (nextQaId_+1)%(qaMaxId_+1);
@@ -155,6 +157,58 @@ class QaIdInfo {
 };
 
 std::ostream& operator<<(std::ostream& os, const QaIdInfo& info);
+
+class StationTypeidQaidCache {
+  std::mutex m_;
+  struct CacheKey {
+    int stationId;
+    int typeId;
+    
+    CacheKey(int stationId_, int typeId_): stationId(stationId_), typeId(typeId_){}
+    bool operator<(const CacheKey &other) const {
+      return stationId < other.stationId || (stationId == other.stationId && typeId < other.typeId);
+    }
+  };
+  struct CacheValue {
+    int qaId;
+    std::chrono::minutes TTL;
+  };
+  
+  std::map<CacheKey, CacheValue> cache_;
+  std::chrono::minutes cacheTTL_;
+  std::chrono::system_clock::time_point nextCacheUpdate_;
+  void updateCacheIfNeeded() {
+    auto now = std::chrono::system_clock::now();
+    if(now >= nextCacheUpdate_) {
+      for(auto it = cache_.begin(); it != cache_.end(); ) {
+        if(it->second.TTL <= std::chrono::minutes(0)) {
+          it = cache_.erase(it);
+        } else {
+          it->second.TTL -= std::chrono::minutes(1);
+          ++it;
+        }
+      }
+      nextCacheUpdate_ = std::chrono::system_clock::now() + std::chrono::minutes(1);
+    }
+  }
+  public:
+    StationTypeidQaidCache(int cacheTTLInMinutes) : cacheTTL_(std::chrono::minutes(cacheTTLInMinutes)), nextCacheUpdate_(std::chrono::system_clock::now() + std::chrono::minutes(1)){}
+    // Add necessary member functions and data members here
+    int getQaIdToUse(int stationId, int typeId, const miutil::miTime &obstime, int quaid) {
+      //auto now = std::chrono::system_clock::now()-std::chrono::hours(24);
+      
+      std::lock_guard<std::mutex> lck(m_);
+      updateCacheIfNeeded();
+      auto it = cache_.find(CacheKey(stationId, typeId));
+      if(it != cache_.end()) {
+        it->second.TTL = cacheTTL_; //restart TTL for this cache entry
+        return it->second.qaId;
+      }
+      cache_[CacheKey(stationId, typeId)] = CacheValue{quaid, cacheTTL_ };
+      return quaid;
+    }
+};
+
 
 
 class DecoderBase {
