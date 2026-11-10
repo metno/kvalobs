@@ -40,6 +40,7 @@
 #include <kvdb/dbdrivermgr.h>
 #include <milog/milog.h>
 #include <miutil/timeconvert.h>
+#include <format>
 
 namespace pt = boost::posix_time;
 
@@ -449,24 +450,10 @@ namespace {
  */
 kvalobs::kvData kvDataFromRow(dnmi::db::DRow &row) {
   return kvalobs::kvData(row);
-//   return kvalobs::kvData(
-//       boost::lexical_cast<int>(row[0]),
-//       boost::posix_time::time_from_string(row[1]),
-//       std::stod(row[2]), boost::lexical_cast<int>(row[3]),
-//       boost::posix_time::time_from_string(row[4]),
-//       boost::lexical_cast<int>(row[5]), boost::lexical_cast<int>(row[6]),
-//       boost::lexical_cast<int>(row[7]), std::stod(row[8]),
-//       kvalobs::kvControlInfo(row[9]), kvalobs::kvUseInfo(row[10]), row[11]);
-// 
 }
 
 kvalobs::kvTextData kvTextDataFromRow(dnmi::db::DRow &row) {
   return kvalobs::kvTextData(row);
-  // return kvalobs::kvTextData(boost::lexical_cast<int>(row[0]),
-  //                            boost::posix_time::time_from_string(row[1]),
-  //                            row[2], boost::lexical_cast<int>(row[3]),
-  //                            boost::posix_time::time_from_string(row[4]),
-  //                            boost::lexical_cast<int>(row[5]));
 }
 } // namespace
 
@@ -718,13 +705,12 @@ KvalobsDatabaseAccess::selectFailedDataForControl(int limit) {
   std::ostringstream query;
 
   if (qaId > -1) {
+    // Only select observations for the current QA process.
     query << "SELECT o.observationid, stationid, typeid, obstime, o.tbtime "
              "FROM workque q, observations o "
-             "WHERE q.observationid=o.observationid AND qa_start<now()-'10 "
+             "WHERE q.observationid=o.observationid AND qa_start<now()-'15 "
              "minutes'::interval AND qa_stop is null"
-             " AND (qa_id="
-          << qaId
-          << " OR qa_id is null) "
+             " AND qa_id="  << qaId << " " <<
              "ORDER BY qa_id, priority, tbtime LIMIT "
           << limit << ";";
   } else
@@ -754,24 +740,89 @@ KvalobsDatabaseAccess::selectLatestDataBasedOnObstimeForControl(int limit) {
   std::ostringstream query;
 
   if (qaId > -1) {
-    query << "SELECT o.observationid, stationid, typeid, obstime, o.tbtime "
-             "FROM workque q, observations o "
-             "WHERE q.observationid=o.observationid AND qa_start IS NULL AND "
-             "process_start is not null"
-             " AND obstime >= date_trunc('hour', now()-'3 hours'::interval) "
-             "AND (qa_id="
-          << qaId
-          << " OR qa_id is null) "
-             "ORDER BY qa_id, priority, obstime LIMIT "
-          << limit << ";";
+    //Search and set qa_start and qa_id for the picked observations
+    //Skip locked rows to avoid conflicts with other processes.
+    //Setting the qa_start and qa_id ensures that other processes 
+    //do not pick the same observations.
+    query << std::format(R"(
+      WITH picked AS (
+        SELECT q.observationid, o.stationid, o.typeid, o.obstime, o.tbtime,
+               q.qa_id, q.priority
+        FROM   workque q
+        JOIN   observations o ON o.observationid = q.observationid
+        WHERE  q.qa_start IS NULL
+          AND  q.process_start IS NOT NULL
+          AND  o.obstime >= date_trunc('hour', now() - interval '3 hours')
+          AND  (q.qa_id = {0} OR q.qa_id IS NULL)
+        ORDER  BY q.qa_id, q.priority, o.obstime
+        LIMIT  {1}
+        FOR NO KEY UPDATE OF q SKIP LOCKED
+      ),
+      claimed AS (
+        UPDATE workque q
+        SET    qa_start = statement_timestamp(),
+               qa_id = {0}
+        FROM   picked p
+        WHERE  q.observationid = p.observationid
+        RETURNING q.observationid
+      )
+      SELECT p.observationid, p.stationid, p.typeid, p.obstime, p.tbtime
+      FROM   picked p
+      JOIN   claimed c USING (observationid)
+      ORDER  BY p.qa_id, p.priority, p.obstime;
+    )", qaId, limit);
+
+    //Old query for reference
+    // query << "SELECT o.observationid, stationid, typeid, obstime, o.tbtime "
+    //          "FROM workque q, observations o "
+    //          "WHERE q.observationid=o.observationid AND qa_start IS NULL AND "
+    //          "process_start is not null"
+    //          " AND obstime >= date_trunc('hour', now()-'3 hours'::interval) "
+    //          "AND (qa_id="
+    //       << qaId
+    //       << " OR qa_id is null) "
+    //          "ORDER BY qa_id, priority, obstime LIMIT "
+    //       << limit << ";";
   } else {
-    query << "SELECT o.observationid, stationid, typeid, obstime, o.tbtime "
-             "FROM workque q, observations o "
-             "WHERE q.observationid=o.observationid AND qa_start IS NULL AND "
-             "process_start is not null"
-             " AND obstime >= date_trunc('hour', now()-'3 hours'::interval) "
-             "ORDER BY priority, obstime LIMIT "
-          << limit << ";";
+    //Search and set qa_start for the picked observations
+    //Skip locked rows to avoid conflicts with other processes.
+    //Setting the qa_start ensures that other processes 
+    //do not pick the same observations.
+    query << std::format(R"(
+      WITH picked AS (
+        SELECT q.observationid, o.stationid, o.typeid, o.obstime, o.tbtime,
+              q.priority
+        FROM   workque q
+        JOIN   observations o ON o.observationid = q.observationid
+        WHERE  q.qa_start IS NULL
+          AND  q.process_start IS NOT NULL
+          AND  o.obstime >= date_trunc('hour', now() - interval '3 hours')
+        ORDER  BY q.priority, o.obstime
+        LIMIT  {0}
+        FOR NO KEY UPDATE OF q SKIP LOCKED
+      ),
+      claimed AS (
+        UPDATE workque q
+        SET    qa_start = statement_timestamp() 
+        FROM   picked p
+        WHERE  q.observationid = p.observationid
+        RETURNING q.observationid
+      )
+      SELECT p.observationid, p.stationid, p.typeid, p.obstime, p.tbtime
+      FROM   picked p
+      JOIN   claimed c USING (observationid)
+      ORDER  BY p.priority, p.obstime;
+    )", limit);
+
+
+    // The old query for reference
+    // query << "SELECT o.observationid, stationid, typeid, obstime, o.tbtime "
+    //          "FROM workque q, observations o "
+    //          "WHERE q.observationid=o.observationid AND qa_start IS NULL AND "
+    //          "process_start is not null"
+    //          " AND obstime >= date_trunc('hour', now()-'3 hours'::interval) "
+    //          "ORDER BY priority, obstime LIMIT "
+    //       << limit << ";";
   }
 
   std::unique_ptr<dnmi::db::Result> result(connection_->execQuery(query.str()));
@@ -788,21 +839,77 @@ KvalobsDatabaseAccess::selectOlderDataControl(int limit) {
   std::ostringstream query;
 
   if (qaId > -1) {
-    query << "SELECT o.observationid, stationid, typeid, obstime, o.tbtime "
-             "FROM workque q, observations o "
-             "WHERE q.observationid=o.observationid AND process_start is not "
-             "null AND qa_start IS NULL AND (qa_id="
-          << qaId
-          << " OR qa_id is null ) "
-             "ORDER BY qa_id, priority, tbtime LIMIT "
-          << limit << ";";
+    query << std::format(R"(
+      WITH picked AS (
+        SELECT q.observationid, o.stationid, o.typeid, o.obstime, o.tbtime,
+               q.qa_id, q.priority
+        FROM   workque q
+        JOIN   observations o ON o.observationid = q.observationid
+        WHERE  q.qa_start IS NULL
+          AND  q.process_start IS NOT NULL
+          AND  (q.qa_id = {0} OR q.qa_id IS NULL)
+        ORDER  BY q.qa_id, q.priority, o.tbtime
+        LIMIT  {1}
+        FOR NO KEY UPDATE OF q SKIP LOCKED
+      ),
+      claimed AS (
+        UPDATE workque q
+        SET    qa_start = statement_timestamp(),
+               qa_id = {0}
+        FROM   picked p
+        WHERE  q.observationid = p.observationid
+        RETURNING q.observationid
+      )
+      SELECT p.observationid, p.stationid, p.typeid, p.obstime, p.tbtime
+      FROM   picked p
+      JOIN   claimed c USING (observationid)
+      ORDER  BY p.qa_id, p.priority, p.tbtime;
+    )", qaId, limit);
+   
+
+    // old query for reference
+    // query << "SELECT o.observationid, stationid, typeid, obstime, o.tbtime "
+    //          "FROM workque q, observations o "
+    //          "WHERE q.observationid=o.observationid "
+    //          "  AND process_start is not null AND "
+    //          "  AND qa_start IS NULL AND (qa_id=" << qaId
+    //       << "  OR qa_id is null ) "
+    //          "ORDER BY qa_id, priority, tbtime LIMIT "
+    //       << limit << ";";
   } else {
-    query << "SELECT o.observationid, stationid, typeid, obstime, o.tbtime "
-             "FROM workque q, observations o "
-             "WHERE q.observationid=o.observationid AND process_start is not "
-             "null AND qa_start IS NULL "
-             "ORDER BY priority, tbtime LIMIT "
-          << limit << ";";
+
+    query << std::format(R"(
+      WITH picked AS (
+        SELECT q.observationid, o.stationid, o.typeid, o.obstime, o.tbtime,
+               q.qa_id, q.priority
+        FROM   workque q
+        JOIN   observations o ON o.observationid = q.observationid
+        WHERE  q.qa_start IS NULL
+          AND  q.process_start IS NOT NULL
+        ORDER  BY q.priority, o.tbtime
+        LIMIT  {0}
+        FOR NO KEY UPDATE OF q SKIP LOCKED
+      ),
+      claimed AS (
+        UPDATE workque q
+        SET    qa_start = statement_timestamp()
+        FROM   picked p
+        WHERE  q.observationid = p.observationid
+        RETURNING q.observationid
+      )
+      SELECT p.observationid, p.stationid, p.typeid, p.obstime, p.tbtime
+      FROM   picked p
+      JOIN   claimed c USING (observationid)
+      ORDER  BY p.priority, p.tbtime;
+    )", limit);
+
+    // old query for reference
+    // query << "SELECT o.observationid, stationid, typeid, obstime, o.tbtime "
+    //          "FROM workque q, observations o "
+    //          "WHERE q.observationid=o.observationid AND process_start is not "
+    //          "null AND qa_start IS NULL "
+    //          "ORDER BY priority, tbtime LIMIT "
+    //       << limit << ";";
   }
 
   std::unique_ptr<dnmi::db::Result> result(connection_->execQuery(query.str()));
@@ -868,19 +975,26 @@ KvalobsDatabaseAccess::selectDataForControl(int limit) {
       return obs;
     }
 
-    std::ostringstream query;
-    for (auto o : obs) {
-      query << "UPDATE workque SET qa_start=statement_timestamp() WHERE "
-            << "observationid=" << o->id() << ";";
-    }
+    // Mark observations as being processed
+    // Not needed anymore. This is done in the search of 
+    // observation to precess. (select....Control)
+    // std::ostringstream query;
+    // for (auto o : obs) {
+    //   query << "UPDATE workque SET qa_start=statement_timestamp() WHERE "
+    //         << "observationid=" << o->id() << ";";
+    // }
 
-    milog::LogContext context("query");
-    LOGDEBUG1(query.str());
+    // milog::LogContext context("query");
+    // LOGDEBUG1(query.str());
 
-    connection_->exec(query.str());
+    // connection_->exec(query.str());
+  
     if (needOwnTransaction)
       connection_->commit();
 
+    if( obs.empty() ) {
+      return obs;
+    }
     auto p = (*obs.begin())->id();
 
     if (obs.size() == 1) {
@@ -895,10 +1009,10 @@ KvalobsDatabaseAccess::selectDataForControl(int limit) {
       log << "Selected for control " << whichSelect << ": #observations "
           << obs.size() << "\n";
       for (auto a : obs) {
-        log << (*obs.begin())->stationID() << "/" << (*obs.begin())->typeID()
-            << "/" << pt::to_kvalobs_string((*obs.begin())->obstime()) << "/"
-            << pt::to_kvalobs_string((*obs.begin())->tbtime()) << " ("
-            << (*obs.begin())->id() << ")";
+        log << a->stationID() << "/" << a->typeID()
+            << "/" << pt::to_kvalobs_string(a->obstime()) << "/"
+            << pt::to_kvalobs_string(a->tbtime()) << " ("
+            << a->id() << ")";
       }
       LOGINFO(log.str());
     }
