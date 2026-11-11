@@ -943,8 +943,10 @@ KvalobsDatabaseAccess::selectDataForControl(int limit) {
   std::string whichSelect = "(Crached checks)";
   bool needOwnTransaction = !connection_->transactionInProgress();
   if (needOwnTransaction) {
-    LOGINFO("trying to select data for control - SERIALIZABLE");
-    connection_->beginTransaction(dnmi::db::Connection::SERIALIZABLE);
+    //LOGINFO("trying to select data for control - SERIALIZABLE");
+    //connection_->beginTransaction(dnmi::db::Connection::SERIALIZABLE);
+    LOGINFO("trying to select data for control - READ_COMMITTED");
+    connection_->beginTransaction(dnmi::db::Connection::READ_COMMITTED);
   } else {
     LOGWARN("trying to select data for control with previous transaction - "
             "isolation level not guaranteed");
